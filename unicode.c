@@ -1,3 +1,24 @@
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# define PREDEF_PLATFORM_UNIX
+# define _XOPEN_SOURCE
+#endif
+
+#if defined(PREDEF_PLATFORM_UNIX)
+# include <unistd.h>
+# if defined(_XOPEN_VERSION)
+#  if (_XOPEN_VERSION >= 4)
+#   define HAVE_WCWIDTH 1
+#  endif
+# endif
+#endif
+
+#if defined(HAVE_WCWIDTH)
+# include <wchar.h>
+# if (WCHAR_MAX >= 0x10FFFF)
+#  define HAVE_SANE_WCWIDTH 1
+# endif
+#endif
+
 #include "unicode.h"
 #include "common.h"
 
@@ -34,12 +55,6 @@ static inline bool in_range(unsigned int u, const struct codepoint_range *range,
 			return true;
 	}
 	return false;
-}
-
-// FIXME: incomplete. use generated tables
-static bool u_is_combining(unsigned int u)
-{
-	return u >= 0x0300 && u <= 0x036f;
 }
 
 bool u_is_upper(unsigned int u)
@@ -87,6 +102,24 @@ bool u_is_unprintable(unsigned int u)
 bool u_is_special_whitespace(unsigned int u)
 {
 	return in_range(u, evil_space, ARRAY_COUNT(evil_space));
+}
+
+#ifdef HAVE_SANE_WCWIDTH
+
+int u_char_width(unsigned int u)
+{
+	int width = wcwidth((wchar_t)u);
+	// Unprintable characters cause wcwidth() to return -1, but are
+	// rendered as "<xx>"
+	return (width >= 0) ? width : 4;
+}
+
+#else
+
+// FIXME: incomplete. use generated tables
+static bool u_is_combining(unsigned int u)
+{
+	return u >= 0x0300 && u <= 0x036f;
 }
 
 int u_char_width(unsigned int u)
@@ -165,6 +198,8 @@ narrow:
 wide:
 	return 2;
 }
+
+#endif
 
 unsigned int u_to_lower(unsigned int u)
 {
