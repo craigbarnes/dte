@@ -16,6 +16,16 @@
 
 bind C-left word-bwd
 bind C-right word-fwd
+bind C-up up
+bind C-down down
+
+bind M-left bol
+bind M-right eol
+bind M-up pgup
+bind M-down pgdown
+
+bind M-\; command
+bind M-: command
 
 bind ^A bol
 bind ^B left
