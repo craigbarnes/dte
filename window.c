@@ -80,7 +80,7 @@ struct view *window_open_buffer(struct window *w, const char *filename, bool mus
 	rmdir /tmp/x
 
 	# this should still succeed
-	dex /proc/$(pidof tail)/fd/3
+	dte /proc/$(pidof tail)/fd/3
 	*/
 	b = buffer_new(encoding);
 	if (load_buffer(b, must_exist, filename)) {

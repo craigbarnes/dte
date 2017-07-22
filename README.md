@@ -1,7 +1,7 @@
-dex
+dte
 ===
 
-Dextrous text editor
+Dexterous Text Editor
 
 Copyright 2010 Timo Hirvonen <tihirvon@gmail.com>
 
@@ -9,7 +9,7 @@ Copyright 2010 Timo Hirvonen <tihirvon@gmail.com>
 Introduction
 ------------
 
-dex is a small and easy to use text editor. Colors and bindings can be
+dte is a small and easy to use text editor. Colors and bindings can be
 fully customized to your liking.
 
 It has some features useful to programmers, like ctags support and it

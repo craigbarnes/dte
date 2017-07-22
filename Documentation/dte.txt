@@ -807,7 +807,7 @@ These are always defined and override environment variables of same
 name.
 
 $PKGDATADIR
-	Usually /usr/share/dex
+	Usually /usr/share/dte
 $FILE
 	Current file. Empty string if there's no filename.
 $WORD

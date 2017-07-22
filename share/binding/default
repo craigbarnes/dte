@@ -77,7 +77,7 @@ bind M-0 "view last"
 bind M-! "move-tab left"
 bind M-@ "move-tab right"
 
-bind F1 "run man dex"
+bind F1 "run man dte"
 
 # alternative pageup/pagedown behavior
 #bind pgup scroll-pgup

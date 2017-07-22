@@ -6,7 +6,7 @@ callgrind.out.*
 
 /Config.mk
 /Documentation/ttman
-/dex
+/dte
 /test
 
 !.git*

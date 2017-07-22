@@ -50,13 +50,12 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
 
-# all good names have been taken. make it easy to change
-PROGRAM = dex
+PROGRAM = dte
 VERSION = 1.0
 
 all: $(PROGRAM)$(X) test man
 
-dex_objects :=	 		\
+editor_objects :=	 		\
 	alias.o			\
 	bind.o			\
 	block.o			\
@@ -190,7 +189,7 @@ compiler:= $(addprefix share/,$(compiler))
 config	:= $(addprefix share/,$(config))
 syntax	:= $(addprefix share/,$(syntax))
 
-OBJECTS := $(dex_objects) $(test_objects)
+OBJECTS := $(editor_objects) $(test_objects)
 
 -include Config.mk
 include Makefile.lib
@@ -257,11 +256,11 @@ vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGD
 	@./update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 clean += *.o $(PROGRAM)$(X)
-$(PROGRAM)$(X): $(dex_objects)
+$(PROGRAM)$(X): $(editor_objects)
 	$(call cmd,ld,$(LIBS))
 
 clean += test
-test: $(filter-out main.o,$(dex_objects)) $(test_objects)
+test: $(filter-out main.o,$(editor_objects)) $(test_objects)
 	$(call cmd,ld,$(LIBS))
 
 man	:=					\

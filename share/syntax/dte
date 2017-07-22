@@ -1,4 +1,4 @@
-syntax dex
+syntax dte
 
 state start code
 	char " \t" this

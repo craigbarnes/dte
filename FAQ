@@ -5,14 +5,14 @@ Frequently (never actually) Asked Questions
 Q: Why the weird default key bindings?
 
 Because I'm a former vim user I made the default key bindings similar to
-vi (^Y (yy) is copy, ^D (dd) is cut and so on). Of course dex is
+vi (^Y (yy) is copy, ^D (dd) is cut and so on). Of course dte is
 modeless unlike vi. That makes them feel very different.
 
 
 Q: Is the syntax highlighter same used in JOE (Joe's Own Editor)?
 
 The idea did came from JOE, but I didn't use the code because I wanted
-to use different syntax (the same used in other dex rc files). Also
+to use different syntax (the same used in other dte rc files). Also
 colors are hard coded into JOE's syntax highlighting files, which is a
 major problem. To change the colors you'd have to edit all syntax files.
 So I decided to write my own.
@@ -22,4 +22,4 @@ Q: Why the custom build system and not Autotools?
 
 Because Autotools is absolutely horrible. configure is 10000 (yes, ten
 thousand) line shell script which generates tons of files. In contrast
-the makefiles and scripts in dex are only about 350 lines total.
+the makefiles and scripts in dte are only about 350 lines total.
