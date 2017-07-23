@@ -1196,6 +1196,30 @@ static void cmd_shift(const char *pf, char **args)
 	shift_lines(count);
 }
 
+static void cmd_smartend(const char *pf, char **args)
+{
+	if (! block_iter_eol(&view->cursor)) {
+		long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
+		if (view->cy < bottom)
+			move_down(bottom - view->cy);
+		else
+			block_iter_eof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
+}
+
+static void cmd_smarthome(const char *pf, char **args)
+{
+	if (! block_iter_bol(&view->cursor)) {
+		long top = view->vy + window_get_scroll_margin(window);
+		if (view->cy > top)
+			move_up(view->cy - top);
+		else
+			block_iter_bof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
+}
+
 static void cmd_suspend(const char *pf, char **args)
 {
 	suspend();
@@ -1551,6 +1575,8 @@ const struct command commands[] = {
 	{ "set",		"gl",	1, -1, cmd_set },
 	{ "setenv",		"",	2,  2, cmd_setenv },
 	{ "shift",		"",	1,  1, cmd_shift },
+	{ "smartend",		"",	0,  0, cmd_smartend },
+	{ "smarthome",		"",	0,  0, cmd_smarthome },
 	{ "suspend",		"",	0,  0, cmd_suspend },
 	{ "tag",		"r",	0,  1, cmd_tag },
 	{ "toggle",		"glv",	1, -1, cmd_toggle },
