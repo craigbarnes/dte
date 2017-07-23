@@ -478,6 +478,14 @@ shift <count>
 	Shift current or selected lines <count> indentation levels.
 	Count is usually -1 (decrease indent) or 1 (increase indent).
 
+smartend
+	Move cursor to end of line; if already there, to end of screen; if
+	already there, to end of file.
+
+smarthome
+	Move cursor to beginning of line; if already there, to beginning of
+	screen; if already there, to beginning of file.
+
 suspend
 	Suspend program.
 
