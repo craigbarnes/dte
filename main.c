@@ -27,12 +27,16 @@ static const char *builtin_rc =
 "bind pgdown pgdown\n"
 "bind delete delete\n"
 "bind ^\\[ unselect\n"
-"bind ^Z suspend\n"
+"bind ^Q quit\n"
+"bind ^Y redo\n"
+"bind ^Z undo\n"
 // backspace is either ^? or ^H
 "bind ^\\? erase\n"
 "bind ^H erase\n"
 // there must be a way to get to the command line
-"bind ^C command\n"
+"bind M-x command\n"
+"bind M-\\; command\n"
+"bind M-: command\n"
 // initialize builtin colors
 "hi\n"
 // must initialize string options

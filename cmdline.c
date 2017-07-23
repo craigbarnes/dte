@@ -173,9 +173,6 @@ int cmdline_handle_key(struct cmdline *c, struct ptr_array *history, int key)
 	case CTRL('F'):
 		cmdline_next_char(c);
 		return 1;
-	case CTRL('Z'):
-		suspend();
-		return 1;
 	case KEY_DELETE:
 		cmdline_delete(c);
 		break;

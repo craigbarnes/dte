@@ -477,7 +477,7 @@ shift <count>
 	Count is usually -1 (decrease indent) or 1 (increase indent).
 
 suspend
-	Suspend program. Usually bound to ^Z.
+	Suspend program.
 
 tag [-r] [tag]
 	Save current location to stack and go to the location of tag.
@@ -870,8 +870,6 @@ Delete to beginning of command line.
 Insert special character.
 @li ^W
 Erase word.
-@li ^Z
-Suspend.
 
 @h1 SEARCH MODE
 
