@@ -140,6 +140,7 @@ test_objects :=			\
 
 binding	:=	 		\
 	binding/default		\
+	binding/classic		\
 	# end
 
 color	:=			\
