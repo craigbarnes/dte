@@ -151,8 +151,10 @@ cut
 delete
 	Delete character or selection.
 
-delete-eol
+delete-eol [-n]
 	Delete to end of line.
+
+	-n delete newline if cursor is at end of line
 
 delete-word [-s]
 	Delete word after cursor.

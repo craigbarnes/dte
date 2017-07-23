@@ -255,6 +255,19 @@ static void cmd_delete(const char *pf, char **args)
 static void cmd_delete_eol(const char *pf, char **args)
 {
 	struct block_iter bi = view->cursor;
+
+	if (view->selection)
+		return;
+
+	if (*pf) {
+		unsigned int ch;
+		buffer_get_char(&view->cursor, &ch);
+		if (ch == '\n') {
+			delete_ch();
+			return;
+		}
+	}
+
 	buffer_delete_bytes(block_iter_eol(&bi));
 }
 
@@ -1503,7 +1516,7 @@ const struct command commands[] = {
 	{ "copy",		"",	0,  0, cmd_copy },
 	{ "cut",		"",	0,  0, cmd_cut },
 	{ "delete",		"",	0,  0, cmd_delete },
-	{ "delete-eol",		"",	0,  0, cmd_delete_eol },
+	{ "delete-eol",		"n",	0,  0, cmd_delete_eol },
 	{ "delete-word",	"s",	0,  0, cmd_delete_word },
 	{ "down",		"",	0,  0, cmd_down },
 	{ "eof",		"",	0,  0, cmd_eof },
