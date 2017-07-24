@@ -194,6 +194,7 @@ OBJECTS := $(editor_objects) $(test_objects)
 
 -include Config.mk
 include mk/build.mk
+include mk/docs.mk
 
 LIBS += -lcurses
 
@@ -264,32 +265,6 @@ clean += test
 test: $(filter-out main.o,$(editor_objects)) $(test_objects)
 	$(call cmd,ld,$(LIBS))
 
-man	:=					\
-	Documentation/$(PROGRAM).1		\
-	Documentation/$(PROGRAM)-syntax.7	\
-	# end
-
-clean += $(man) Documentation/*.o Documentation/ttman$(X)
-man: $(man)
-$(man): Documentation/ttman$(X)
-
-%.1: %.txt
-	$(call cmd,ttman)
-
-%.7: %.txt
-	$(call cmd,ttman)
-
-Documentation/ttman.o: Documentation/ttman.c
-	$(call cmd,host_cc)
-
-Documentation/ttman$(X): Documentation/ttman.o
-	$(call cmd,host_ld,)
-
-quiet_cmd_ttman = MAN    $@
-      cmd_ttman = sed -e s/%MAN%/$(shell echo $@ | sed 's:.*/\([^.]*\)\..*:\1:' | tr a-z A-Z)/g \
-			-e s/%PROGRAM%/$(PROGRAM)/g \
-			< $< | Documentation/ttman$(X) > $@
-
 install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(bindir)
 	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/binding
@@ -314,4 +289,5 @@ tags:
 dist:
 	git archive --prefix=$(TARNAME)/ -o $(TARNAME).tar.gz HEAD
 
-.PHONY: all man install tags dist FORCE
+
+.PHONY: all install tags dist FORCE
