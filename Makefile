@@ -193,7 +193,7 @@ syntax	:= $(addprefix share/,$(syntax))
 OBJECTS := $(editor_objects) $(test_objects)
 
 -include Config.mk
-include Makefile.lib
+include mk/build.mk
 
 LIBS += -lcurses
 
@@ -245,7 +245,7 @@ clean += .CFLAGS
 $(OBJECTS): .CFLAGS
 
 .CFLAGS: FORCE
-	@./update-option "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
+	@mk/update-option "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
 TARNAME = $(PROGRAM)-$(VERSION)
 
@@ -254,7 +254,7 @@ vars.o: .VARS
 vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 
 .VARS: FORCE
-	@./update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
+	@mk/update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 clean += *.o $(PROGRAM)$(X)
 $(PROGRAM)$(X): $(editor_objects)
