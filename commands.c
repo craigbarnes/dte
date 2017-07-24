@@ -824,6 +824,7 @@ static void cmd_save(const char *pf, char **args)
 	char *encoding = buffer->encoding;
 	const char *enc = NULL;
 	bool force = false;
+	bool prompt = false;
 	enum newline_sequence newline = buffer->newline;
 	mode_t old_mode = buffer->st.st_mode;
 	struct stat st;
@@ -839,6 +840,9 @@ static void cmd_save(const char *pf, char **args)
 			break;
 		case 'f':
 			force = true;
+			break;
+		case 'p':
+			prompt = true;
 			break;
 		case 'u':
 			newline = NEWLINE_UNIX;
@@ -874,8 +878,14 @@ static void cmd_save(const char *pf, char **args)
 		}
 	} else {
 		if (!absolute) {
-			error_msg("No filename.");
-			return;
+			if (prompt) {
+				set_input_mode(INPUT_COMMAND);
+				cmdline_set_text(&cmdline, "save ");
+				return;
+			} else {
+				error_msg("No filename.");
+				return;
+			}
 		}
 		if (buffer->ro && !force) {
 			error_msg("Use -f to force saving read-only file.");
@@ -1554,7 +1564,7 @@ const struct command commands[] = {
 	{ "replace",		"bcgi",	2,  2, cmd_replace },
 	{ "right",		"",	0,  0, cmd_right },
 	{ "run",		"-ps",	1, -1, cmd_run },
-	{ "save",		"de=fu",0,  1, cmd_save },
+	{ "save",		"de=fpu",0,  1, cmd_save },
 	{ "scroll-down",	"",	0,  0, cmd_scroll_down },
 	{ "scroll-pgdown",	"",	0,  0, cmd_scroll_pgdown },
 	{ "scroll-pgup",	"",	0,  0, cmd_scroll_pgup },
