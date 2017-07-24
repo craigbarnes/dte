@@ -75,7 +75,7 @@ syntax_files := \
 binding := $(addprefix share/binding/, default classic)
 color := $(addprefix share/color/, darkgray light light256)
 compiler:= $(addprefix share/compiler/, gcc go)
-config := $(addprefix share/config/, filetype rc)
+config := $(addprefix share/, filetype rc)
 syntax := $(addprefix share/syntax/, $(syntax_files))
 
 OBJECTS := $(editor_objects) $(test_objects)
