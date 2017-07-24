@@ -24,6 +24,5 @@ Documentation/ttman$(X): Documentation/ttman.o
 	$(call cmd,host_ld,)
 
 
-clean += $(man) Documentation/*.o Documentation/ttman$(X)
-
+CLEANFILES += $(man) Documentation/*.o Documentation/ttman$(X)
 .PHONY: man
