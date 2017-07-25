@@ -32,33 +32,41 @@ A small and flexible text editor.
 
 @h1 BASIC USAGE
 
-Here's some of the default key bindings. *M-x* means meta-x or alt-x and
-*^V* is ctrl-v. See /usr/share/%PROGRAM%/bindings/default for more keys.
+Here's some of the default key bindings. *M-x* means Alt+x and
+*^V* is Ctrl+v. See /usr/share/%PROGRAM%/bindings/default for more keys.
 
 	@li M-s
 	select
-	@li ^V
+	@li M-l
 	select lines
-	@li ^Y
-	copy current line or selection
-	@li ^D
-	cut current line or selection
-	@li ^P
-	paste
-	@li ^E
-	undo
-	@li ^R
-	redo
 	@li ^C
+	copy current line or selection
+	@li ^X
+	cut current line or selection
+	@li ^V
+	paste
+	@li ^Z
+	undo
+	@li ^Y
+	redo
+	@li M-x
 	enter command line
-	@li M-/
+	@li ^F
 	search
-	@li M-n
+	@li F3
 	search next
-	@li M-p
+	@li F4
 	search previous
+	@li ^T
+	Open new tab
 	@li M-`N`
 	activate `N`th tab
+	@li ^W
+	Close tab
+	@li ^S
+	Save file
+	@li ^Q
+	Quit
 
 On the command line you can use tab to complete commands and most of
 their parameters. Run *next* or *prev* to switch to next or previous
