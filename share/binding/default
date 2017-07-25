@@ -39,7 +39,7 @@ bind ^N open
 bind ^O git-open
 bind ^Q quit
 bind ^R 'command replace\ '
-bind ^S save
+bind ^S 'save -p'
 bind ^T open
 bind ^V paste
 bind ^W 'close -wq'

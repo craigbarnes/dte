@@ -397,7 +397,7 @@ run [-ps] <command> [parameters]...
 
 	-s silent. both stderr and stdout are redirected to /dev/null
 
-save [-dfu] [-e encoding] [filename]
+save [-dfup] [-e encoding] [filename]
 	Save file.  By default line-endings (LF vs CRLF) are preserved.
 
 	-d save with DOS/CRLF line-endings
@@ -405,6 +405,11 @@ save [-dfu] [-e encoding] [filename]
 	-f force saving read-only file
 
 	-u save with Unix/LF line-endings
+
+	-p
+		if no filename is specified and the buffer has no existing
+		filename, open the command line to allow one to be typed,
+		instead of showing the "no filename" error message.
 
 	-e encoding
 		Set file encoding. See "iconv -l" for list of supported

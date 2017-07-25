@@ -30,4 +30,4 @@ Coding Style
 * Above all else, be consistent with the existing code.
 
 
-[code blocks]: https://help.github.com/articles/github-flavored-markdown/#fenced-code-blocks
+[code blocks]: https://help.github.com/articles/creating-and-highlighting-code-blocks/#fenced-code-blocks
