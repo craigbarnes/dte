@@ -10,10 +10,12 @@ ft -i lua lua luajit
 # First line
 ft -c sh shell-script
 ft -c xml '^<\?xml(\s|$)'
+ft -c ini '^\[wrap-file\]$'
 
 # Filename patterns
 ft -f sh '/etc/default/.*'
 ft -f sh '/\.?bash(rc|_profile|_logout)$'
+ft -f sh '/\.(shrc|profile)$'
 ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
 ft -f docker Dockerfile$
