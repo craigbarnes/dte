@@ -83,6 +83,7 @@ OBJECTS := $(editor_objects) $(test_objects)
 all: $(PROGRAM)$(X) test man
 
 -include Config.mk
+include mk/compat.mk
 include mk/build.mk
 include mk/docs.mk
 
