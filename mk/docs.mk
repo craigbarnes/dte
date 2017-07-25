@@ -3,7 +3,7 @@ man := Documentation/$(PROGRAM).1 Documentation/$(PROGRAM)-syntax.7
 quiet_cmd_ttman = MAN    $@
 
 cmd_ttman = \
-    sed -e s/%MAN%/$(shell echo $@ | sed 's:.*/\([^.]*\)\..*:\1:' | tr a-z A-Z)/g \
+    $(SED) -e s/%MAN%/$(shell echo $@ | $(SED) 's:.*/\([^.]*\)\..*:\1:' | tr a-z A-Z)/g \
     -e s/%PROGRAM%/$(PROGRAM)/g \
     < $< | Documentation/ttman$(X) > $@
 

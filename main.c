@@ -15,28 +15,9 @@
 #include <locale.h>
 #include <langinfo.h>
 
+#include "bindings.inc"
+
 static const char *builtin_rc =
-// obvious bindings
-"bind left left\n"
-"bind right right\n"
-"bind up up\n"
-"bind down down\n"
-"bind home bol\n"
-"bind end eol\n"
-"bind pgup pgup\n"
-"bind pgdown pgdown\n"
-"bind delete delete\n"
-"bind ^\\[ unselect\n"
-"bind ^Q quit\n"
-"bind ^Y redo\n"
-"bind ^Z undo\n"
-// backspace is either ^? or ^H
-"bind ^\\? erase\n"
-"bind ^H erase\n"
-// there must be a way to get to the command line
-"bind M-x command\n"
-"bind M-\\; command\n"
-"bind M-: command\n"
 // initialize builtin colors
 "hi\n"
 // must initialize string options
@@ -149,6 +130,7 @@ int main(int argc, char *argv[])
 	if (streq(charset, "UTF-8"))
 		term_utf8 = true;
 
+	exec_builtin_rc(builtin_bindings);
 	exec_builtin_rc(builtin_rc);
 	fill_builtin_colors();
 

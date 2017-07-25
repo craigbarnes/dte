@@ -18,6 +18,7 @@ HOST_LD = $(HOST_CC)
 HOST_CFLAGS = -g -O2 -Wall
 HOST_LDFLAGS =
 INSTALL = install
+SED = sed
 RM = rm -f
 prefix = /usr/local
 bindir = $(prefix)/bin
@@ -137,9 +138,13 @@ $(OBJECTS): .CFLAGS
 
 vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 vars.o: .VARS
+main.o: bindings.inc
 
 .VARS: FORCE
 	@mk/update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
+
+bindings.inc: share/binding/builtin mk/rc2c.sed
+	$(call cmd,rc2c,builtin_bindings)
 
 $(PROGRAM)$(X): $(editor_objects)
 	$(call cmd,ld,$(LIBS))
@@ -171,7 +176,7 @@ dist:
 	git archive --prefix=$(TARNAME)/ -o $(TARNAME).tar.gz HEAD
 
 clean:
-	$(RM) .CFLAGS .VARS *.o $(PROGRAM)$(X) test $(CLEANFILES)
+	$(RM) .CFLAGS .VARS *.o bindings.inc $(PROGRAM)$(X) test $(CLEANFILES)
 	$(RM) -r $(dep_dirs)
 
 distclean: clean

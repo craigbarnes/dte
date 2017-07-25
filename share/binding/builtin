@@ -1,0 +1,22 @@
+# These key bindings are compiled directly into the editor so that a
+# minimal set of useful keys are bound even in the event that config
+# files cannot be loaded. This file is installed only for reference.
+
+bind left left
+bind right right
+bind up up
+bind down down
+bind home bol
+bind end eol
+bind pgup pgup
+bind pgdown pgdown
+bind delete delete
+bind ^\[ unselect
+bind ^Q quit
+bind ^Y redo
+bind ^Z undo
+bind ^\? erase
+bind ^H erase
+bind M-x command
+bind M-\; command
+bind M-: command

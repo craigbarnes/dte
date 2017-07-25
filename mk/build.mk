@@ -21,6 +21,12 @@ BASIC_LDFLAGS =
 BASIC_HOST_CFLAGS =
 BASIC_HOST_LDFLAGS =
 
+quiet_cmd_rc2c = GEN    $@
+
+cmd_rc2c = \
+    echo 'static const char *$(1) =' > $@; \
+    $(SED) -f mk/rc2c.sed $< >> $@
+
 # The following macros have been taken from Kbuild and simplified
 
 quiet_cmd_cc = CC     $@
