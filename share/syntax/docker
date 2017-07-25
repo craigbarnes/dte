@@ -1,0 +1,32 @@
+syntax docker
+
+list -i instruction \
+    ADD CMD COPY ENTRYPOINT ENV EXPOSE FROM MAINTAINER ONBUILD RUN \
+    USER VOLUME WORKDIR
+
+state start
+    char -b a-zA-Z ident
+    char # comment
+    char -n " \t\n" bad
+    eat start
+
+state ident
+    char -b a-zA-Z ident
+    char -bn " \t\n" bad error
+    inlist instruction arguments keyword
+    noeat -b bad
+
+state arguments
+    str "\\\n" arguments
+    char "\n" start
+    eat arguments
+
+state comment
+    char "\n" start
+    eat comment
+
+state bad error
+    recolor error
+    char " \t" arguments
+    char "\n" start
+    eat bad

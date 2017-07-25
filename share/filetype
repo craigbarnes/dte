@@ -1,4 +1,4 @@
-# interpreters
+# Interpreters
 ft -i tcl wish
 ft -i sh sh bash
 ft -i python python
@@ -7,26 +7,35 @@ ft -i php php
 ft -i awk awk gawk nawk
 ft -i lua lua luajit
 
-# first line
+# First line
+ft -c sh shell-script
 ft -c xml '^<\?xml(\s|$)'
 
-# regular expressions
-ft -f sh '/\.bash(rc|_profile|_logout)$'
+# Filename patterns
+ft -f sh '/etc/default/.*'
+ft -f sh '/\.?bash(rc|_profile|_logout)$'
 ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
+ft -f docker Dockerfile$
 ft -f dte '/\.dte/(rc|filetype|syntax/.*)$'
 ft -f dte $PKGDATADIR'/.*'
 ft -f gitcommit '/COMMIT_EDITMSG$'
 ft -f gitrebase '/git-rebase-todo$'
 ft -f indent '/\.indent\.pro$'
+ft -f ini (yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$
+ft -f ini \.(editorconfig|buildconfig)$
+ft -f ini '/etc/systemd/[a-z]+\.conf$'
+ft -f ini (gitconfig|/\.git/config|\.gitmodules)$
+ft -f lua (config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$
 ft -f mail '/tmpmsg-.*\.txt$'
 ft -f mail '(snd\.[0-9]+|\.letter|\.letter\.[0-9]+|\.followup|\.article|'\
 '\.article\.[0-9]+|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}|'\
 'ae[0-9]+\.txt|/tmp/SLRN[0-9A-Z.]+|\.eml$)'
 ft -f make '[mM]akefile(\.[^/]*)?$'
 ft -f make '/Make\.[^/]*$'
+ft -f robotstxt robots\.txt$
 
-# extensions
+# Filename extensions
 ft awk awk
 ft c c h
 ft c cpp hpp cc hh C H cxx hxx c++ moc inl pro
@@ -34,9 +43,11 @@ ft css css
 ft diff diff patch
 ft go go
 ft html html htm xhtml
+ft ini ini pls desktop override flatpakrepo flatpakref
+ft ini automount mount path service slice socket target timer
 ft java java
 ft javascript js
-ft lua lua
+ft lua lua rockspec ltcn
 ft make mk mak
 ft perl perl pl
 ft php php php3 php4 inc
@@ -46,7 +57,7 @@ ft sql sql
 ft tcl tcl
 ft xml xml
 
-# first is the default, second line required for adding smarty filetype
+# First is the default, second line required for adding smarty filetype
 ft html+smarty tpl
 ft smarty tpl
 

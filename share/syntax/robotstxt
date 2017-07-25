@@ -1,0 +1,34 @@
+syntax robotstxt
+
+list -i field user-agent: disallow: allow: crawl-delay: sitemap: host:
+
+state main code
+    char -b A-Za-z firstword
+    char # comment
+    char " \t" main
+    noeat remainder
+
+state firstword
+    char -b A-Za-z- firstword
+    char -b : field
+    noeat -b remainder
+
+state field
+    inlist field value keyword
+    recolor error
+    noeat remainder
+
+state value
+    char # comment
+    char "\n" main
+    eat value
+
+state remainder error
+    recolor error
+    char # comment
+    char "\n" main
+    eat remainder
+
+state comment
+    char "\n" main
+    eat comment

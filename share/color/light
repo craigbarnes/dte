@@ -96,3 +96,6 @@ hi smarty.smarty blue
 # xml
 hi xml.tag bold
 hi xml.attr blue
+
+# ini
+hi ini.section bold

@@ -88,3 +88,6 @@ hi smarty.smarty 0/0/5
 # xml
 hi xml.tag bold
 hi xml.attr 0/0/5
+
+# ini
+hi ini.section bold
