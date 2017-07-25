@@ -1209,7 +1209,7 @@ static void cmd_shift(const char *pf, char **args)
 	shift_lines(count);
 }
 
-static void cmd_smartend(const char *pf, char **args)
+static void cmd_inc_end(const char *pf, char **args)
 {
 	if (! block_iter_eol(&view->cursor)) {
 		long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
@@ -1221,7 +1221,7 @@ static void cmd_smartend(const char *pf, char **args)
 	view_reset_preferred_x(view);
 }
 
-static void cmd_smarthome(const char *pf, char **args)
+static void cmd_inc_home(const char *pf, char **args)
 {
 	if (! block_iter_bol(&view->cursor)) {
 		long top = view->vy + window_get_scroll_margin(window);
@@ -1588,8 +1588,8 @@ const struct command commands[] = {
 	{ "set",		"gl",	1, -1, cmd_set },
 	{ "setenv",		"",	2,  2, cmd_setenv },
 	{ "shift",		"",	1,  1, cmd_shift },
-	{ "smartend",		"",	0,  0, cmd_smartend },
-	{ "smarthome",		"",	0,  0, cmd_smarthome },
+	{ "inc-end",		"",	0,  0, cmd_inc_end },
+	{ "inc-home",		"",	0,  0, cmd_inc_home },
 	{ "suspend",		"",	0,  0, cmd_suspend },
 	{ "tag",		"r",	0,  1, cmd_tag },
 	{ "toggle",		"glv",	1, -1, cmd_toggle },
