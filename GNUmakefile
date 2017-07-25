@@ -37,7 +37,6 @@ WARNINGS = \
     -Wformat-security \
     -Wmissing-prototypes \
     -Wold-style-definition \
-    -Wredundant-decls \
     -Wwrite-strings \
     -Wundef \
     -Wshadow
