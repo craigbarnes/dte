@@ -416,6 +416,30 @@ static void cmd_hi(const char *pf, char **args)
 	}
 }
 
+static void cmd_inc_end(const char *pf, char **args)
+{
+	if (! block_iter_eol(&view->cursor)) {
+		long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
+		if (view->cy < bottom)
+			move_down(bottom - view->cy);
+		else
+			block_iter_eof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
+}
+
+static void cmd_inc_home(const char *pf, char **args)
+{
+	if (! block_iter_bol(&view->cursor)) {
+		long top = view->vy + window_get_scroll_margin(window);
+		if (view->cy > top)
+			move_up(view->cy - top);
+		else
+			block_iter_bof(&view->cursor);
+	}
+	view_reset_preferred_x(view);
+}
+
 static void cmd_include(const char *pf, char **args)
 {
 	read_config(commands, args[0], true);
@@ -1540,6 +1564,8 @@ const struct command commands[] = {
 	{ "ft",			"-cfi",	2, -1, cmd_ft },
 	{ "git-open",		"",	0,  0, cmd_git_open },
 	{ "hi",			"-",	0, -1, cmd_hi },
+	{ "inc-end",		"",	0,  0, cmd_inc_end },
+	{ "inc-home",		"",	0,  0, cmd_inc_home },
 	{ "include",		"",	1,  1, cmd_include },
 	{ "insert",		"km",	1,  1, cmd_insert },
 	{ "insert-special",	"",	0,  0, cmd_insert_special },

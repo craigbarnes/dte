@@ -268,6 +268,14 @@ hi <name> [fg-color [bg-color]]  [attribute]...
 	If you don't set fg/bg for the highlight color "default" then
 	terminal's default fg/bg is used.
 
+inc-end
+	Move cursor to end of line; if already there, to end of screen; if
+	already there, to end of file.
+
+inc-home
+	Move cursor to beginning of line; if already there, to beginning of
+	screen; if already there, to beginning of file.
+
 include <filename>
 	Read commands from file.
 
