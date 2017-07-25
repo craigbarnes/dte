@@ -1,7 +1,8 @@
 #!/usr/bin/sed -f
 
 # Append C statement terminator to the end
-$a\;
+$a\
+;
 
 # Delete comments and blank lines
 /^#/d
