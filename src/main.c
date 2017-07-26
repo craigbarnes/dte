@@ -88,7 +88,9 @@ int main(int argc, char *argv[])
 				command = opt_arg(opt, argv[++i]);
 				continue;
 			case 'V':
-				printf("%s %s\nWritten by Timo Hirvonen\n", program, version);
+				printf("%s %s\n", program, version);
+				puts("(C) 2017 Craig Barnes");
+				puts("(C) 2010-2015 Timo Hirvonen");
 				return 0;
 			}
 			if (opt[1] == '-') {
@@ -101,22 +103,22 @@ int main(int argc, char *argv[])
 	}
 
 	if (!isatty(1)) {
-		fprintf(stderr, "stdout doesn't refer to a terminal\n");
+		fputs("stdout doesn't refer to a terminal\n", stderr);
 		return 1;
 	}
 	if (term == NULL || term[0] == 0) {
-		fprintf(stderr, "TERM not set\n");
+		fputs("TERM not set\n", stderr);
 		return 1;
 	}
 	switch (term_init(term)) {
 	case -1:
-		fprintf(stderr, "terminal is hardcopy\n");
+		fputs("terminal is hardcopy\n", stderr);
 		return 1;
 	case -2:
-		fprintf(stderr, "terminal could not be found\n");
+		fputs("terminal could not be found\n", stderr);
 		return 1;
 	case -3:
-		fprintf(stderr, "terminfo database could not be found\n");
+		fputs("terminfo database could not be found\n", stderr);
 		return 1;
 	}
 
