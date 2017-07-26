@@ -1,0 +1,3 @@
+.distinfo export-subst
+.git* export-ignore
+CONTRIBUTING.md export-ignore
