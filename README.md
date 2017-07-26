@@ -12,13 +12,15 @@ fully customized to your liking.
 It has some features useful to programmers, like ctags support and it
 can parse compiler errors, but it does not aim to become an IDE.
 
-Installation
+Requirements
 ------------
 
-The only dependencies are libc and ncurses.
+* Modern C compiler (tested with [GCC] and [Clang])
+* [GNU Make] `>= 3.81`
+* [ncurses]
 
-To compile this program you need [GNU make] and a modern C compiler
-(tested with [GCC] and [Clang]).
+Installation
+------------
 
 You need to specify all options for both `make` and `make install`.
 Alternatively you can put your build options into a `Config.mk` file.
@@ -48,6 +50,7 @@ Public License version 2 for more details.
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
+[ncurses]: https://www.gnu.org/software/ncurses/
 [`GNUmakefile`]: https://github.com/dte-editor/dte/blob/master/GNUmakefile
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
