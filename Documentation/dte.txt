@@ -1,4 +1,4 @@
-@title %MAN% 1 2012
+@title %MAN% 1 "July 2017"
 
 @h1 NAME
 
@@ -256,7 +256,7 @@ hi <name> [fg-color [bg-color]]  [attribute]...
 	these colors it is easiest to use the R/G/B syntax where R, G
 	and B are values between 0 and 5.
 
-	Indexes 232..255 contain 24 grayscale values which can be used
+	Indexes 232..255 contain 24 grayscale values that can be used
 	to specify grayscale value more accurately than using the R/G/B
 	syntax.
 
@@ -668,7 +668,7 @@ ws-error [special]
 	special
 		Display all characters that look like regular space as
 		errors. One of these characters is no-break space
-		(U+00A0) which is often accidentally typed (AltGr+space
+		(U+00A0), which is often accidentally typed (AltGr+space
 		in some keyboard layouts).
 
 	trailing
@@ -811,12 +811,11 @@ Rc files can contain comments at beginning of line. Comment begins with
 with a command. This decision was made to make it possible to include #
 in commands without escaping.
 
-Commands can contain environment variables. Variable always expands into
-a single argument even if it contains whitespace. Variables inside
+Commands can contain environment variables. Variables always expand into
+a single argument even if they contains whitespace. Variables inside
 single or double quotes are NOT expanded. This makes it possible to bind
-a key to command which contains variable (inside single or double
-quotes) and the variable is expanded just before the command is
-executed.
+keys to commands that contain variables (inside single or double
+quotes), which will be expanded just before the command is executed.
 
 Example:
 	alias x "run chmod 755 $FILE"
@@ -908,21 +907,21 @@ Reverse search direction.
 @h1 FILES
 
 ~/.%PROGRAM%/rc
-	You personal configuration.
+	Your personal configuration.
 
 ~/.%PROGRAM%/syntax/\*
-	Your personal syntax files.  These override the syntax files which
+	Your personal syntax files.  These override the syntax files that
 	come with the program.
 
 ~/.%PROGRAM%/file-locks
-	Records open files to protect you from accidentally editing file
+	Records open files to protect you from accidentally editing files
 	opened in another process. Used only if *lock-files* is true.
-
-~/.%PROGRAM%/command-history and ~/.%PROGRAM%/search-history
-	Command and search history.
 
 ~/.%PROGRAM%/file-history
 	Last edited files and cursor positions.
+
+~/.%PROGRAM%/command-history and ~/.%PROGRAM%/search-history
+	Command and search history.
 
 /usr/share/%PROGRAM%/rc
 	Copy to ~/.%PROGRAM%/rc and customize.
