@@ -1,6 +1,7 @@
+S_FLAG := $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
+
 # Build verbosity
-ifneq "$(findstring s,$(MAKEFLAGS))" ""
-  # make -s
+ifdef S_FLAG
   cmd = $(call cmd_$(1),$(2))
 else
   ifeq "$(V)" "1"
