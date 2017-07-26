@@ -683,7 +683,10 @@ static void cmd_pass_through(const char *pf, char **args)
 
 static void cmd_paste(const char *pf, char **args)
 {
-	paste();
+	if (pf[0])
+		paste(true);
+	else
+		paste(false);
 }
 
 static void cmd_pgdown(const char *pf, char **args)
@@ -1584,7 +1587,7 @@ const struct command commands[] = {
 	{ "open",		"e=",	0, -1, cmd_open },
 	{ "option",		"-r",	3, -1, cmd_option },
 	{ "pass-through",	"-ms",	1, -1, cmd_pass_through },
-	{ "paste",		"",	0,  0, cmd_paste },
+	{ "paste",		"c",	0,  0, cmd_paste },
 	{ "pgdown",		"",	0,  0, cmd_pgdown },
 	{ "pgup",		"",	0,  0, cmd_pgup },
 	{ "prev",		"",	0,  0, cmd_prev },

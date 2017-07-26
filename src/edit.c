@@ -152,7 +152,7 @@ void insert_text(const char *text, long size)
 	block_iter_skip_bytes(&view->cursor, size);
 }
 
-void paste(void)
+void paste(bool at_cursor)
 {
 	long del_count = 0;
 
@@ -164,7 +164,7 @@ void paste(void)
 		unselect();
 	}
 
-	if (copy_is_lines) {
+	if (copy_is_lines && !at_cursor) {
 		int x = view_get_preferred_x(view);
 		if (!del_count)
 			block_iter_eat_line(&view->cursor);
