@@ -53,7 +53,7 @@ uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
 
-editor_objects := $(addsuffix .o, \
+editor_objects := $(addprefix src/, $(addsuffix .o, \
     alias bind block buffer-iter buffer cconv change cmdline color \
     command-mode commands common compiler completion config ctags ctype \
     cursed decoder detect edit editor encoder encoding env error \
@@ -63,9 +63,9 @@ editor_objects := $(addsuffix .o, \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
     syntax tabbar tag term-caps term uchar unicode vars view wbuf window \
-    xmalloc )
+    xmalloc ))
 
-test_objects := test-main.o
+test_objects := src/test-main.o
 
 syntax_files := \
     awk c config css diff docker gitcommit gitrebase go html html+smarty \
@@ -136,20 +136,20 @@ $(OBJECTS): .CFLAGS
 .CFLAGS: FORCE
 	@mk/update-option "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
-vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
-vars.o: .VARS
-main.o: bindings.inc
+src/vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
+src/vars.o: .VARS
+src/main.o: src/bindings.inc
 
 .VARS: FORCE
 	@mk/update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
-bindings.inc: share/binding/builtin mk/rc2c.sed
+src/bindings.inc: share/binding/builtin mk/rc2c.sed
 	$(call cmd,rc2c,builtin_bindings)
 
 $(PROGRAM)$(X): $(editor_objects)
 	$(call cmd,ld,$(LIBS))
 
-test: $(filter-out main.o, $(editor_objects)) $(test_objects)
+test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
 	$(call cmd,ld,$(LIBS))
 
 install: all
@@ -170,13 +170,13 @@ install: all
 	$(INSTALL) -m644 Documentation/$(PROGRAM)-syntax.7 $(DESTDIR)$(mandir)/man7
 
 tags:
-	ctags *.[ch]
+	ctags src/*.[ch]
 
 dist:
 	git archive --prefix=$(TARNAME)/ -o $(TARNAME).tar.gz HEAD
 
 clean:
-	$(RM) .CFLAGS .VARS *.o bindings.inc $(PROGRAM)$(X) test $(CLEANFILES)
+	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc $(PROGRAM)$(X) test $(CLEANFILES)
 	$(RM) -r $(dep_dirs)
 
 distclean: clean

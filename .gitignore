@@ -1,13 +1,14 @@
-.*
-*.o
-*.[0-9]
-tags
+/dte
+/test
+/src/*.o
+/src/bindings.inc
+/src/.depend
+/.VARS
+/.CFLAGS
+/Documentation/ttman
+/Documentation/*.[17o]
+/Config.mk
+
+/tags
 callgrind.out.*
 
-/Config.mk
-/Documentation/ttman
-/dte
-/bindings.inc
-/test
-
-!.git*
