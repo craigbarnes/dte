@@ -1,5 +1,4 @@
-HASFEATURE = $(filter $(1), $(.FEATURES))
-REQERROR   = Required feature "$(strip $(1))" not supported by $(MAKE)
-REQUIRE    = $(and $(or $(HASFEATURE), $(error $(REQERROR))),)
+REQUIRE = $(if $(filter $(1), $(.FEATURES)),, $(error $(REQERROR)))
+REQERROR = Required feature "$(strip $(1))" not supported by $(MAKE)
 
 $(call REQUIRE, target-specific)
