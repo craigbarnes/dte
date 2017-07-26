@@ -155,7 +155,6 @@ void insert_text(const char *text, long size)
 void paste(void)
 {
 	long del_count = 0;
-	int x = 0;
 
 	if (!copy_buf)
 		return;
@@ -165,15 +164,19 @@ void paste(void)
 		unselect();
 	}
 
-	x = view_get_preferred_x(view);
-	if (!del_count)
-		block_iter_eat_line(&view->cursor);
-	buffer_replace_bytes(del_count, copy_buf, copy_len);
+	if (copy_is_lines) {
+		int x = view_get_preferred_x(view);
+		if (!del_count)
+			block_iter_eat_line(&view->cursor);
+		buffer_replace_bytes(del_count, copy_buf, copy_len);
 
-	// Try to keep cursor column
-	move_to_preferred_x(x);
-	// New preferred_x
-	view_reset_preferred_x(view);
+		// try to keep cursor column
+		move_to_preferred_x(x);
+		// new preferred_x
+		view_reset_preferred_x(view);
+	} else {
+		buffer_replace_bytes(del_count, copy_buf, copy_len);
+	}
 }
 
 void delete_ch(void)
