@@ -21,7 +21,7 @@ bind ^Q quit
 bind ^R 'command replace\ '
 bind ^S 'save -p'
 bind ^T open
-bind ^V paste
+bind ^V 'paste -c'
 bind ^W 'close -wq'
 bind ^X cut
 bind ^Y redo
