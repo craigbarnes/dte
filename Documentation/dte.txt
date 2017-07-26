@@ -455,10 +455,12 @@ search [-Hnprw] [pattern]
 
 	-w search word under cursor
 
-select [-bl]
+select [-bkl]
 	Start selecting.
 
 	-b select code block starting from { and ending to }
+
+	-k keep existing selections
 
 	-l select whole lines
 

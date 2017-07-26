@@ -1141,11 +1141,15 @@ static void cmd_select(const char *pf, char **args)
 {
 	enum selection sel = SELECT_CHARS;
 	bool block = false;
+	bool keep = false;
 
 	while (*pf) {
 		switch (*pf) {
 		case 'b':
 			block = true;
+			break;
+		case 'k':
+			keep = true;
 			break;
 		case 'l':
 			block = false;
@@ -1161,7 +1165,7 @@ static void cmd_select(const char *pf, char **args)
 	}
 
 	if (view->selection) {
-		if (view->selection == sel) {
+		if (!keep && view->selection == sel) {
 			unselect();
 			return;
 		}
@@ -1596,7 +1600,7 @@ const struct command commands[] = {
 	{ "scroll-pgup",	"",	0,  0, cmd_scroll_pgup },
 	{ "scroll-up",		"",	0,  0, cmd_scroll_up },
 	{ "search",		"Hnprw",0,  1, cmd_search },
-	{ "select",		"bl",	0,  0, cmd_select },
+	{ "select",		"bkl",	0,  0, cmd_select },
 	{ "set",		"gl",	1, -1, cmd_set },
 	{ "setenv",		"",	2,  2, cmd_setenv },
 	{ "shift",		"",	1,  1, cmd_shift },
