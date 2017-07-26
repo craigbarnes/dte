@@ -359,6 +359,8 @@ pass-through [-ms] <command> [parameter]...
 paste
 	Paste.
 
+	-c paste at the cursor position
+
 pgdown
 	Move cursor page down. See also *scroll-pgdown*.
 
