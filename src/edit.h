@@ -8,7 +8,7 @@ void unselect(void);
 void cut(long len, bool is_lines);
 void copy(long len, bool is_lines);
 void insert_text(const char *text, long size);
-void paste(void);
+void paste(bool at_cursor);
 void delete_ch(void);
 void erase(void);
 void insert_ch(unsigned int ch);
