@@ -45,7 +45,6 @@ WARNINGS = \
 
 PROGRAM = dte
 VERSION = 1.0
-TARNAME = $(PROGRAM)-$(VERSION)
 PKGDATADIR = $(datadir)/$(PROGRAM)
 LIBS =
 X =
@@ -86,6 +85,7 @@ all: $(PROGRAM)$(X) test man
 include mk/compat.mk
 include mk/build.mk
 include mk/docs.mk
+-include mk/dist.mk
 
 LIBS += -lcurses
 
@@ -172,9 +172,6 @@ install: all
 tags:
 	ctags src/*.[ch]
 
-dist:
-	git archive --prefix=$(TARNAME)/ -o $(TARNAME).tar.gz HEAD
-
 clean:
 	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc $(PROGRAM)$(X) test $(CLEANFILES)
 	$(RM) -r $(dep_dirs)
@@ -184,7 +181,8 @@ distclean: clean
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install tags dist clean distclean FORCE
+.PHONY: all install tags clean distclean FORCE
+.DELETE_ON_ERROR:
 
 # FIXME: Using this without a deplist breaks bash completion for make targets
 .SECONDARY:

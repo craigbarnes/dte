@@ -8,7 +8,7 @@
 /Documentation/ttman
 /Documentation/*.[17o]
 /Config.mk
+/public/
 
 /tags
 callgrind.out.*
-
