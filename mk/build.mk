@@ -3,13 +3,10 @@ S_FLAG := $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 # Build verbosity
 ifdef S_FLAG
   cmd = $(call cmd_$(1),$(2))
+else ifeq "$(V)" "1"
+  cmd = @echo "$(call cmd_$(1),$(2))"; $(call cmd_$(1),$(2))
 else
-  ifeq "$(V)" "1"
-    # make V=1
-    cmd = @echo "$(call cmd_$(1),$(2))"; $(call cmd_$(1),$(2))
-  else
-    cmd = @echo "   $(quiet_cmd_$(1))"; $(call cmd_$(1),$(2))
-  endif
+  cmd = @echo "   $(quiet_cmd_$(1))"; $(call cmd_$(1),$(2))
 endif
 
 # Avoid random internationalization problems
