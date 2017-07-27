@@ -42,17 +42,10 @@ static void handle_sigwinch(int signum)
     resized = true;
 }
 
-static const char *opt_arg(const char *opt, const char *arg)
-{
-    if (arg == NULL) {
-        fprintf(stderr, "missing argument for option %s\n", opt);
-        exit(1);
-    }
-    return arg;
-}
-
 int main(int argc, char *argv[])
 {
+    static const char *opts = "[-RV] [-c command] [-t tag] [-r rcfile] [file]...";
+    static const char *optstring = "RVc:t:r:";
     const char *term = getenv("TERM");
     const char *home = getenv("HOME");
     const char *tag = NULL;
@@ -62,44 +55,37 @@ int main(int argc, char *argv[])
     char *search_history_filename;
     char *editor_dir;
     bool read_rc = true;
-    int i;
+    int ch;
 
     if (!home)
         home = "";
     home_dir = xstrdup(home);
 
-    for (i = 1; i < argc; i++) {
-        const char *opt = argv[i];
-
-        if (opt[0] != '-' || !opt[1])
+    while ((ch = getopt(argc, argv, optstring)) != -1) {
+        switch (ch) {
+        case 'c':
+            command = optarg;
             break;
-        if (!opt[2]) {
-            switch (opt[1]) {
-            case 'R':
-                read_rc = false;
-                continue;
-            case 't':
-                tag = opt_arg(opt, argv[++i]);
-                continue;
-            case 'r':
-                rc = opt_arg(opt, argv[++i]);
-                continue;
-            case 'c':
-                command = opt_arg(opt, argv[++i]);
-                continue;
-            case 'V':
-                printf("%s %s\n", program, version);
-                puts("(C) 2017 Craig Barnes");
-                puts("(C) 2010-2015 Timo Hirvonen");
-                return 0;
-            }
-            if (opt[1] == '-') {
-                i++;
-                break;
-            }
+        case 't':
+            tag = optarg;
+            break;
+        case 'r':
+            rc = optarg;
+            break;
+        case 'R':
+            read_rc = false;
+            break;
+        case 'V':
+            printf("%s %s\n", program, version);
+            puts("(C) 2017 Craig Barnes");
+            puts("(C) 2010-2015 Timo Hirvonen");
+            return 0;
+        case '?':
+        default:
+            printf("Usage: %s", argv[0]);
+            puts(opts);
+            return 1;
         }
-        printf("Usage: %s [-R] [-V] [-c command] [-t tag] [-r rcfile] [file]...\n", argv[0]);
-        return 1;
     }
 
     if (!isatty(1)) {
@@ -190,7 +176,7 @@ int main(int argc, char *argv[])
 
     editor_status = EDITOR_RUNNING;
 
-    for (; i < argc; i++)
+    for (int i = optind; i < argc; i++)
         window_open_buffer(window, argv[i], false, NULL);
     if (window->views.count == 0)
         window_open_empty_buffer(window);
