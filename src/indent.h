@@ -4,21 +4,21 @@
 #include "libc.h"
 
 struct indent_info {
-	// size in bytes
-	int bytes;
+    // size in bytes
+    int bytes;
 
-	// width in chars
-	int width;
+    // width in chars
+    int width;
 
-	// Number of whole indentation levels (depends on the indent-width option).
-	int level;
+    // Number of whole indentation levels (depends on the indent-width option).
+    int level;
 
-	// Only spaces or tabs depending of expand-tab, indent-width and tab-width.
-	// Note that "sane" line can contain spaces after tabs for alignment.
-	bool sane;
+    // Only spaces or tabs depending of expand-tab, indent-width and tab-width.
+    // Note that "sane" line can contain spaces after tabs for alignment.
+    bool sane;
 
-	// The line is empty or contains only white space.
-	bool wsonly;
+    // The line is empty or contains only white space.
+    bool wsonly;
 };
 
 char *make_indent(int width);

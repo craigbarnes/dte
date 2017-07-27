@@ -4,12 +4,12 @@
 #include "window.h"
 
 struct formatter {
-	char *buf;
-	long size;
-	long pos;
-	bool separator;
-	struct window *win;
-	const char *misc_status;
+    char *buf;
+    long size;
+    long pos;
+    bool separator;
+    struct window *win;
+    const char *misc_status;
 };
 
 void sf_init(struct formatter *f, struct window *win);

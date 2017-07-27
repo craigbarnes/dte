@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 struct ptr_array {
-	void **ptrs;
-	long alloc;
-	long count;
+    void **ptrs;
+    long alloc;
+    long count;
 };
 
 typedef void (*free_func)(void *ptr);
@@ -24,17 +24,17 @@ void *ptr_array_rel(struct ptr_array *array, void *ptr, long offset);
 
 static inline void *ptr_array_next(struct ptr_array *array, void *ptr)
 {
-	return ptr_array_rel(array, ptr, 1);
+    return ptr_array_rel(array, ptr, 1);
 }
 
 static inline void *ptr_array_prev(struct ptr_array *array, void *ptr)
 {
-	return ptr_array_rel(array, ptr, -1);
+    return ptr_array_rel(array, ptr, -1);
 }
 
 static inline void ptr_array_free(struct ptr_array *array)
 {
-	ptr_array_free_cb(array, free);
+    ptr_array_free_cb(array, free);
 }
 
 #endif

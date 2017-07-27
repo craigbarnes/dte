@@ -4,8 +4,8 @@
 #include "libc.h"
 
 struct error {
-	char *msg;
-	int code;
+    char *msg;
+    int code;
 };
 
 extern int nr_errors;

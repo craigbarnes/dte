@@ -41,21 +41,21 @@ extern unsigned char sane_ctype[256];
 
 static inline int to_lower(int x)
 {
-	if (isupper(x))
-		x |= 0x20;
-	return x;
+    if (isupper(x))
+        x |= 0x20;
+    return x;
 }
 
 static inline int to_upper(int x)
 {
-	if (islower(x))
-		x &= ~0x20;
-	return x;
+    if (islower(x))
+        x &= ~0x20;
+    return x;
 }
 
 static inline int is_word_byte(unsigned char byte)
 {
-	return isalnum(byte) || byte == '_' || byte > 0x7f;
+    return isalnum(byte) || byte == '_' || byte > 0x7f;
 }
 
 int hex_decode(int ch);

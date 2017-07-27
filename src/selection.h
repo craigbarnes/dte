@@ -4,10 +4,10 @@
 #include "view.h"
 
 struct selection_info {
-	struct block_iter si;
-	long so;
-	long eo;
-	bool swapped;
+    struct block_iter si;
+    long so;
+    long eo;
+    bool swapped;
 };
 
 void init_selection(struct view *v, struct selection_info *info);

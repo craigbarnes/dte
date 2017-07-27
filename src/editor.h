@@ -4,16 +4,16 @@
 #include "libc.h"
 
 enum editor_status {
-	EDITOR_INITIALIZING,
-	EDITOR_RUNNING,
-	EDITOR_EXITING,
+    EDITOR_INITIALIZING,
+    EDITOR_RUNNING,
+    EDITOR_EXITING,
 };
 
 enum input_mode {
-	INPUT_NORMAL,
-	INPUT_COMMAND,
-	INPUT_SEARCH,
-	INPUT_GIT_OPEN,
+    INPUT_NORMAL,
+    INPUT_COMMAND,
+    INPUT_SEARCH,
+    INPUT_GIT_OPEN,
 };
 
 extern enum editor_status editor_status;

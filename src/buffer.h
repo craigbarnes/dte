@@ -8,60 +8,60 @@
 #include "ptr-array.h"
 
 struct change {
-	struct change *next;
-	struct change **prev;
-	unsigned int nr_prev;
+    struct change *next;
+    struct change **prev;
+    unsigned int nr_prev;
 
-	// move after inserted text when undoing delete?
-	bool move_after;
+    // move after inserted text when undoing delete?
+    bool move_after;
 
-	long offset;
-	long del_count;
-	long ins_count;
+    long offset;
+    long del_count;
+    long ins_count;
 
-	// deleted bytes (inserted bytes need not to be saved)
-	char *buf;
+    // deleted bytes (inserted bytes need not to be saved)
+    char *buf;
 };
 
 struct buffer {
-	struct list_head blocks;
-	struct change change_head;
-	struct change *cur_change;
+    struct list_head blocks;
+    struct change change_head;
+    struct change *cur_change;
 
-	// used to determine if buffer is modified
-	struct change *saved_change;
+    // used to determine if buffer is modified
+    struct change *saved_change;
 
-	struct stat st;
+    struct stat st;
 
-	// needed for identifying buffers whose filename is NULL
-	unsigned int id;
+    // needed for identifying buffers whose filename is NULL
+    unsigned int id;
 
-	long nl;
+    long nl;
 
-	// views pointing to this buffer
-	struct ptr_array views;
+    // views pointing to this buffer
+    struct ptr_array views;
 
-	char *display_filename;
-	char *abs_filename;
+    char *display_filename;
+    char *abs_filename;
 
-	bool ro;
-	bool locked;
-	bool setup;
+    bool ro;
+    bool locked;
+    bool setup;
 
-	enum newline_sequence newline;
+    enum newline_sequence newline;
 
-	// Encoding of the file. Buffer always contains UTF-8.
-	char *encoding;
+    // Encoding of the file. Buffer always contains UTF-8.
+    char *encoding;
 
-	struct local_options options;
+    struct local_options options;
 
-	struct syntax *syn;
-	// Index 0 is always syn->states.ptrs[0].
-	// Lowest bit of an invalidated value is 1.
-	struct ptr_array line_start_states;
+    struct syntax *syn;
+    // Index 0 is always syn->states.ptrs[0].
+    // Lowest bit of an invalidated value is 1.
+    struct ptr_array line_start_states;
 
-	int changed_line_min;
-	int changed_line_max;
+    int changed_line_min;
+    int changed_line_max;
 };
 
 // buffer = view->buffer = window->view->buffer
@@ -72,18 +72,18 @@ extern bool everything_changed;
 
 static inline void mark_all_lines_changed(struct buffer *b)
 {
-	b->changed_line_min = 0;
-	b->changed_line_max = INT_MAX;
+    b->changed_line_min = 0;
+    b->changed_line_max = INT_MAX;
 }
 
 static inline void mark_everything_changed(void)
 {
-	everything_changed = true;
+    everything_changed = true;
 }
 
 static inline bool buffer_modified(struct buffer *b)
 {
-	return b->saved_change != b->cur_change;
+    return b->saved_change != b->cur_change;
 }
 
 void buffer_mark_lines_changed(struct buffer *b, int min, int max);

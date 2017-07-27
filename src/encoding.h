@@ -4,9 +4,9 @@
 #include "libc.h"
 
 struct byte_order_mark {
-	const char *encoding;
-	unsigned char bytes[4];
-	int len;
+    const char *encoding;
+    unsigned char bytes[4];
+    int len;
 };
 
 char *normalize_encoding(const char *encoding);

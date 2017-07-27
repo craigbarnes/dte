@@ -5,11 +5,11 @@
 #include "options.h"
 
 struct file_encoder {
-	struct cconv *cconv;
-	unsigned char *nbuf;
-	ssize_t nsize;
-	enum newline_sequence nls;
-	int fd;
+    struct cconv *cconv;
+    unsigned char *nbuf;
+    ssize_t nsize;
+    enum newline_sequence nls;
+    int fd;
 };
 
 struct file_encoder *new_file_encoder(const char *encoding, enum newline_sequence nls, int fd);

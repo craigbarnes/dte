@@ -6,16 +6,16 @@
 #include "term.h"
 
 struct cmdline {
-	struct gbuf buf;
-	long pos;
-	int search_pos;
-	char *search_text;
+    struct gbuf buf;
+    long pos;
+    int search_pos;
+    char *search_text;
 };
 
 enum {
-	CMDLINE_UNKNOWN_KEY,
-	CMDLINE_KEY_HANDLED,
-	CMDLINE_CANCEL,
+    CMDLINE_UNKNOWN_KEY,
+    CMDLINE_KEY_HANDLED,
+    CMDLINE_CANCEL,
 };
 
 #define CMDLINE(name) struct cmdline name = { GBUF_INIT, 0, -1, NULL }

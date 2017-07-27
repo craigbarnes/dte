@@ -4,8 +4,8 @@
 #include "term.h"
 
 struct editor_mode_ops {
-	void (*keypress)(int key);
-	void (*update)(void);
+    void (*keypress)(int key);
+    void (*update)(void);
 };
 
 extern const struct editor_mode_ops normal_mode_ops;

@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 struct gbuf {
-	unsigned char *buffer;
-	long alloc;
-	long len;
+    unsigned char *buffer;
+    long alloc;
+    long len;
 };
 
 #define GBUF_INIT { NULL, 0, 0 }
@@ -14,14 +14,14 @@ struct gbuf {
 
 static inline void gbuf_init(struct gbuf *buf)
 {
-	buf->buffer = NULL;
-	buf->alloc = 0;
-	buf->len = 0;
+    buf->buffer = NULL;
+    buf->alloc = 0;
+    buf->len = 0;
 }
 
 static inline void gbuf_clear(struct gbuf *buf)
 {
-	buf->len = 0;
+    buf->len = 0;
 }
 
 void gbuf_grow(struct gbuf *buf, long more);

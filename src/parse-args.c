@@ -11,90 +11,90 @@
  */
 const char *parse_args(char **args, const char *flag_desc, int min, int max)
 {
-	static char flags[16];
-	int argc = count_strings(args);
-	int nr_flags = 0;
-	int nr_flag_args = 0;
-	bool flags_after_arg = true;
-	int i, j;
+    static char flags[16];
+    int argc = count_strings(args);
+    int nr_flags = 0;
+    int nr_flag_args = 0;
+    bool flags_after_arg = true;
+    int i, j;
 
-	if (*flag_desc == '-') {
-		flag_desc++;
-		flags_after_arg = false;
-	}
+    if (*flag_desc == '-') {
+        flag_desc++;
+        flags_after_arg = false;
+    }
 
-	i = 0;
-	while (args[i]) {
-		char *arg = args[i];
+    i = 0;
+    while (args[i]) {
+        char *arg = args[i];
 
-		if (streq(arg, "--")) {
-			/* move the NULL too */
-			memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
-			free(arg);
-			argc--;
-			break;
-		}
-		if (arg[0] != '-' || !arg[1]) {
-			if (!flags_after_arg)
-				break;
-			i++;
-			continue;
-		}
+        if (streq(arg, "--")) {
+            /* move the NULL too */
+            memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
+            free(arg);
+            argc--;
+            break;
+        }
+        if (arg[0] != '-' || !arg[1]) {
+            if (!flags_after_arg)
+                break;
+            i++;
+            continue;
+        }
 
-		for (j = 1; arg[j]; j++) {
-			char flag = arg[j];
-			char *flag_arg;
-			char *flagp = strchr(flag_desc, flag);
+        for (j = 1; arg[j]; j++) {
+            char flag = arg[j];
+            char *flag_arg;
+            char *flagp = strchr(flag_desc, flag);
 
-			if (!flagp || flag == '=') {
-				error_msg("Invalid option -%c", flag);
-				return NULL;
-			}
-			flags[nr_flags++] = flag;
-			if (nr_flags == ARRAY_COUNT(flags)) {
-				error_msg("Too many options given.");
-				return NULL;
-			}
-			if (flagp[1] != '=')
-				continue;
+            if (!flagp || flag == '=') {
+                error_msg("Invalid option -%c", flag);
+                return NULL;
+            }
+            flags[nr_flags++] = flag;
+            if (nr_flags == ARRAY_COUNT(flags)) {
+                error_msg("Too many options given.");
+                return NULL;
+            }
+            if (flagp[1] != '=')
+                continue;
 
-			if (j > 1 || arg[j + 1]) {
-				error_msg("Flag -%c must be given separately because it requires an argument.", flag);
-				return NULL;
-			}
-			flag_arg = args[i + 1];
-			if (!flag_arg) {
-				error_msg("Option -%c requires on argument.", flag);
-				return NULL;
-			}
+            if (j > 1 || arg[j + 1]) {
+                error_msg("Flag -%c must be given separately because it requires an argument.", flag);
+                return NULL;
+            }
+            flag_arg = args[i + 1];
+            if (!flag_arg) {
+                error_msg("Option -%c requires on argument.", flag);
+                return NULL;
+            }
 
-			/* move flag argument before any other arguments */
-			if (i != nr_flag_args) {
-				// farg1 arg1  arg2 -f   farg2 arg3
-				// farg1 farg2 arg1 arg2 arg3
-				int count = i - nr_flag_args;
-				memmove(args + nr_flag_args + 1, args + nr_flag_args, count * sizeof(*args));
-			}
-			args[nr_flag_args++] = flag_arg;
-			i++;
-		}
+            /* move flag argument before any other arguments */
+            if (i != nr_flag_args) {
+                // farg1 arg1  arg2 -f   farg2 arg3
+                // farg1 farg2 arg1 arg2 arg3
+                int count = i - nr_flag_args;
+                memmove(args + nr_flag_args + 1, args + nr_flag_args, count * sizeof(*args));
+            }
+            args[nr_flag_args++] = flag_arg;
+            i++;
+        }
 
-		memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
-		free(arg);
-		argc--;
-	}
+        memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
+        free(arg);
+        argc--;
+    }
 
-	// don't count arguments to flags as arguments to command
-	argc -= nr_flag_args;
+    // don't count arguments to flags as arguments to command
+    argc -= nr_flag_args;
 
-	if (argc < min) {
-		error_msg("Not enough arguments");
-		return NULL;
-	}
-	if (max >= 0 && argc > max) {
-		error_msg("Too many arguments");
-		return NULL;
-	}
-	flags[nr_flags] = 0;
-	return flags;
+    if (argc < min) {
+        error_msg("Not enough arguments");
+        return NULL;
+    }
+    if (max >= 0 && argc > max) {
+        error_msg("Too many arguments");
+        return NULL;
+    }
+    flags[nr_flags] = 0;
+    return flags;
 }

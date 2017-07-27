@@ -6,11 +6,11 @@
 #include "libc.h"
 
 struct command {
-	const char *name;
-	const char *flags;
-	signed char min_args;
-	signed char max_args;
-	void (*cmd)(const char *, char **);
+    const char *name;
+    const char *flags;
+    signed char min_args;
+    signed char max_args;
+    void (*cmd)(const char *, char **);
 };
 
 /* parse-command.c */

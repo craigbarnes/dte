@@ -5,23 +5,23 @@
 #include "libc.h"
 
 struct frame {
-	struct frame *parent;
+    struct frame *parent;
 
-	// every frame contains either one window or multiple subframes
-	struct ptr_array frames;
-	struct window *window;
+    // every frame contains either one window or multiple subframes
+    struct ptr_array frames;
+    struct window *window;
 
-	// width and height
-	int w, h;
+    // width and height
+    int w, h;
 
-	bool vertical;
-	bool equal_size;
+    bool vertical;
+    bool equal_size;
 };
 
 enum resize_direction {
-	RESIZE_DIRECTION_AUTO,
-	RESIZE_DIRECTION_HORIZONTAL,
-	RESIZE_DIRECTION_VERTICAL,
+    RESIZE_DIRECTION_AUTO,
+    RESIZE_DIRECTION_HORIZONTAL,
+    RESIZE_DIRECTION_VERTICAL,
 };
 
 extern struct frame *root_frame;

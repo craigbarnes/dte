@@ -5,27 +5,27 @@
 #include "libc.h"
 
 struct output_buffer {
-	char buf[8192];
-	long count;
+    char buf[8192];
+    long count;
 
-	// number of characters scrolled (x direction)
-	unsigned int scroll_x;
+    // number of characters scrolled (x direction)
+    unsigned int scroll_x;
 
-	// current x position (tab 1-8, double-width 2, invalid utf8 byte 4)
-	// if smaller than scroll_x printed characters are not visible
-	unsigned int x;
+    // current x position (tab 1-8, double-width 2, invalid utf8 byte 4)
+    // if smaller than scroll_x printed characters are not visible
+    unsigned int x;
 
-	unsigned int width;
+    unsigned int width;
 
-	unsigned int tab_width;
-	enum {
-		TAB_NORMAL,
-		TAB_SPECIAL,
-		TAB_CONTROL,
-	} tab;
-	bool can_clear;
+    unsigned int tab_width;
+    enum {
+        TAB_NORMAL,
+        TAB_SPECIAL,
+        TAB_CONTROL,
+    } tab;
+    bool can_clear;
 
-	struct term_color color;
+    struct term_color color;
 };
 
 extern struct output_buffer obuf;

@@ -4,32 +4,32 @@
 #include "buffer.h"
 
 struct window {
-	struct ptr_array views;
-	struct frame *frame;
+    struct ptr_array views;
+    struct frame *frame;
 
-	// Current view
-	struct view *view;
+    // Current view
+    struct view *view;
 
-	// Previous view if set
-	struct view *prev_view;
+    // Previous view if set
+    struct view *prev_view;
 
-	// Coordinates and size of entire window including tabbar and status line
-	int x, y;
-	int w, h;
+    // Coordinates and size of entire window including tabbar and status line
+    int x, y;
+    int w, h;
 
-	// Coordinates and size of editable area
-	int edit_x, edit_y;
-	int edit_w, edit_h;
+    // Coordinates and size of editable area
+    int edit_x, edit_y;
+    int edit_w, edit_h;
 
-	struct {
-		int width;
-		int first;
-		int last;
-	} line_numbers;
+    struct {
+        int width;
+        int first;
+        int last;
+    } line_numbers;
 
-	int first_tab_idx;
+    int first_tab_idx;
 
-	bool update_tabbar;
+    bool update_tabbar;
 };
 
 extern struct window *window;

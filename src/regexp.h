@@ -14,12 +14,12 @@ bool regexp_exec_sub(const regex_t *re, const char *buf, long size, struct ptr_a
 
 static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
 {
-	return regexp_compile_internal(re, pattern, flags | REG_EXTENDED);
+    return regexp_compile_internal(re, pattern, flags | REG_EXTENDED);
 }
 
 static inline bool regexp_compile_basic(regex_t *re, const char *pattern, int flags)
 {
-	return regexp_compile_internal(re, pattern, flags);
+    return regexp_compile_internal(re, pattern, flags);
 }
 
 #endif

@@ -11,41 +11,41 @@
  * zero-sized blocks are forbidden.
  */
 struct block {
-	struct list_head node;
-	unsigned char *data;
-	long size;
-	long alloc;
-	long nl;
+    struct list_head node;
+    unsigned char *data;
+    long size;
+    long alloc;
+    long nl;
 };
 
 static inline struct block *BLOCK(struct list_head *item)
 {
-	return container_of(item, struct block, node);
+    return container_of(item, struct block, node);
 }
 
 struct block_iter {
-	struct block *blk;
-	struct list_head *head;
-	long offset;
+    struct block *blk;
+    struct list_head *head;
+    long offset;
 };
 
 struct lineref {
-	const unsigned char *line;
-	long size;
+    const unsigned char *line;
+    long size;
 };
 
 #define BLOCK_ITER(name, head) struct block_iter name = { BLOCK((head)->next), (head), 0 }
 
 static inline void block_iter_bof(struct block_iter *bi)
 {
-	bi->blk = BLOCK(bi->head->next);
-	bi->offset = 0;
+    bi->blk = BLOCK(bi->head->next);
+    bi->offset = 0;
 }
 
 static inline void block_iter_eof(struct block_iter *bi)
 {
-	bi->blk = BLOCK(bi->head->prev);
-	bi->offset = bi->blk->size;
+    bi->blk = BLOCK(bi->head->prev);
+    bi->offset = bi->blk->size;
 }
 
 void block_iter_normalize(struct block_iter *bi);
@@ -64,7 +64,7 @@ char *block_iter_get_bytes(const struct block_iter *bi, long len);
 
 static inline bool block_iter_is_eof(struct block_iter *bi)
 {
-	return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
+    return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
 }
 
 void fill_line_ref(struct block_iter *bi, struct lineref *lr);

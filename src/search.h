@@ -4,16 +4,16 @@
 #include "libc.h"
 
 enum search_direction {
-	SEARCH_FWD,
-	SEARCH_BWD,
+    SEARCH_FWD,
+    SEARCH_BWD,
 };
 
 enum {
-	REPLACE_CONFIRM = (1 << 0),
-	REPLACE_GLOBAL = (1 << 1),
-	REPLACE_IGNORE_CASE = (1 << 2),
-	REPLACE_BASIC = (1 << 3),
-	REPLACE_CANCEL = (1 << 4),
+    REPLACE_CONFIRM = (1 << 0),
+    REPLACE_GLOBAL = (1 << 1),
+    REPLACE_IGNORE_CASE = (1 << 2),
+    REPLACE_BASIC = (1 << 3),
+    REPLACE_CANCEL = (1 << 4),
 };
 
 bool search_tag(const char *pattern, bool *err);

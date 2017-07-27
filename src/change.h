@@ -4,10 +4,10 @@
 #include "libc.h"
 
 enum change_merge {
-	CHANGE_MERGE_NONE,
-	CHANGE_MERGE_INSERT,
-	CHANGE_MERGE_DELETE,
-	CHANGE_MERGE_ERASE,
+    CHANGE_MERGE_NONE,
+    CHANGE_MERGE_INSERT,
+    CHANGE_MERGE_DELETE,
+    CHANGE_MERGE_ERASE,
 };
 
 struct change;

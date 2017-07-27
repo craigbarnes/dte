@@ -5,8 +5,8 @@
 #include "file-location.h"
 
 struct message {
-	char *msg;
-	struct file_location *loc;
+    char *msg;
+    struct file_location *loc;
 };
 
 struct message *new_message(const char *msg);

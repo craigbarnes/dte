@@ -23,13 +23,13 @@
 #include <stdbool.h>
 
 #if defined(__GNUC__)
-#define likely(x)	__builtin_expect(!!(x), 1)
-#define unlikely(x)	__builtin_expect(!!(x), 0)
-#define NORETURN	__attribute__((__noreturn__))
-#define FORMAT(idx)	__attribute__((format(printf, (idx), (idx + 1))))
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#define NORETURN __attribute__((__noreturn__))
+#define FORMAT(idx) __attribute__((format(printf, (idx), (idx + 1))))
 #else
-#define likely(x)	(x)
-#define unlikely(x)	(x)
+#define likely(x) (x)
+#define unlikely(x) (x)
 #define NORETURN
 #define FORMAT(idx)
 #endif

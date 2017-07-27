@@ -8,129 +8,129 @@
 
 // commands that are allowed in config files
 static const char *config_commands[] = {
-	"alias",
-	"bind",
-	"cd",
-	"errorfmt",
-	"ft",
-	"hi",
-	"include",
-	"load-syntax",
-	"option",
-	"set",
-	"setenv",
+    "alias",
+    "bind",
+    "cd",
+    "errorfmt",
+    "ft",
+    "hi",
+    "include",
+    "load-syntax",
+    "option",
+    "set",
+    "setenv",
 };
 
 const struct command *current_command;
 
 static bool allowed_command(const char *name)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < ARRAY_COUNT(config_commands); i++) {
-		if (streq(name, config_commands[i]))
-			return true;
-	}
-	return false;
+    for (i = 0; i < ARRAY_COUNT(config_commands); i++) {
+        if (streq(name, config_commands[i]))
+            return true;
+    }
+    return false;
 }
 
 const struct command *find_command(const struct command *cmds, const char *name)
 {
-	int i;
+    int i;
 
-	for (i = 0; cmds[i].name; i++) {
-		const struct command *cmd = &cmds[i];
+    for (i = 0; cmds[i].name; i++) {
+        const struct command *cmd = &cmds[i];
 
-		if (streq(name, cmd->name))
-			return cmd;
-	}
-	return NULL;
+        if (streq(name, cmd->name))
+            return cmd;
+    }
+    return NULL;
 }
 
 static void run_command(const struct command *cmds, char **av)
 {
-	const struct command *cmd = find_command(cmds, av[0]);
-	const char *pf;
-	char **args;
+    const struct command *cmd = find_command(cmds, av[0]);
+    const char *pf;
+    char **args;
 
-	if (!cmd) {
-		PTR_ARRAY(array);
-		const char *alias_name = av[0];
-		const char *alias_value = find_alias(alias_name);
-		struct error *err = NULL;
-		int i;
+    if (!cmd) {
+        PTR_ARRAY(array);
+        const char *alias_name = av[0];
+        const char *alias_value = find_alias(alias_name);
+        struct error *err = NULL;
+        int i;
 
-		if (alias_value == NULL) {
-			error_msg("No such command or alias: %s", alias_name);
-			return;
-		}
-		if (!parse_commands(&array, alias_value, &err)) {
-			error_msg("Parsing alias %s: %s", alias_name, err->msg);
-			error_free(err);
-			ptr_array_free(&array);
-			return;
-		}
+        if (alias_value == NULL) {
+            error_msg("No such command or alias: %s", alias_name);
+            return;
+        }
+        if (!parse_commands(&array, alias_value, &err)) {
+            error_msg("Parsing alias %s: %s", alias_name, err->msg);
+            error_free(err);
+            ptr_array_free(&array);
+            return;
+        }
 
-		/* remove NULL */
-		array.count--;
+        /* remove NULL */
+        array.count--;
 
-		for (i = 1; av[i]; i++)
-			ptr_array_add(&array, xstrdup(av[i]));
-		ptr_array_add(&array, NULL);
+        for (i = 1; av[i]; i++)
+            ptr_array_add(&array, xstrdup(av[i]));
+        ptr_array_add(&array, NULL);
 
-		run_commands(cmds, &array);
-		ptr_array_free(&array);
-		return;
-	}
+        run_commands(cmds, &array);
+        ptr_array_free(&array);
+        return;
+    }
 
-	if (config_file && cmds == commands && !allowed_command(cmd->name)) {
-		error_msg("Command %s not allowed in config file.", cmd->name);
-		return;
-	}
+    if (config_file && cmds == commands && !allowed_command(cmd->name)) {
+        error_msg("Command %s not allowed in config file.", cmd->name);
+        return;
+    }
 
-	// By default change can't be merged with previous on.
-	// Any command can override this by calling begin_change() again.
-	begin_change(CHANGE_MERGE_NONE);
+    // By default change can't be merged with previous on.
+    // Any command can override this by calling begin_change() again.
+    begin_change(CHANGE_MERGE_NONE);
 
-	current_command = cmd;
-	args = av + 1;
-	pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-	if (pf)
-		cmd->cmd(pf, args);
-	current_command = NULL;
+    current_command = cmd;
+    args = av + 1;
+    pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
+    if (pf)
+        cmd->cmd(pf, args);
+    current_command = NULL;
 
-	end_change();
+    end_change();
 }
 
 void run_commands(const struct command *cmds, const struct ptr_array *array)
 {
-	int s, e;
+    int s, e;
 
-	s = 0;
-	while (s < array->count) {
-		e = s;
-		while (e < array->count && array->ptrs[e])
-			e++;
+    s = 0;
+    while (s < array->count) {
+        e = s;
+        while (e < array->count && array->ptrs[e])
+            e++;
 
-		if (e > s)
-			run_command(cmds, (char **)array->ptrs + s);
+        if (e > s)
+            run_command(cmds, (char **)array->ptrs + s);
 
-		s = e + 1;
-	}
+        s = e + 1;
+    }
 }
 
 void handle_command(const struct command *cmds, const char *cmd)
 {
-	struct error *err = NULL;
-	PTR_ARRAY(array);
+    struct error *err = NULL;
+    PTR_ARRAY(array);
 
-	if (!parse_commands(&array, cmd, &err)) {
-		error_msg("%s", err->msg);
-		error_free(err);
-		ptr_array_free(&array);
-		return;
-	}
+    if (!parse_commands(&array, cmd, &err)) {
+        error_msg("%s", err->msg);
+        error_free(err);
+        ptr_array_free(&array);
+        return;
+    }
 
-	run_commands(cmds, &array);
-	ptr_array_free(&array);
+    run_commands(cmds, &array);
+    ptr_array_free(&array);
 }

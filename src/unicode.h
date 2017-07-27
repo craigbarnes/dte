@@ -5,12 +5,12 @@
 
 static inline bool u_is_unicode(unsigned int uch)
 {
-	return uch <= 0x10ffffU;
+    return uch <= 0x10ffffU;
 }
 
 static inline bool u_is_ctrl(unsigned int u)
 {
-	return u < 0x20 || u == 0x7f;
+    return u < 0x20 || u == 0x7f;
 }
 
 bool u_is_upper(unsigned int u);

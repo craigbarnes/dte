@@ -5,26 +5,26 @@
 #include "libc.h"
 
 struct hl_color {
-	char *name;
-	struct term_color color;
+    char *name;
+    struct term_color color;
 };
 
 enum builtin_color {
-	BC_DEFAULT,
-	BC_NONTEXT,
-	BC_NOLINE,
-	BC_WSERROR,
-	BC_SELECTION,
-	BC_CURRENTLINE,
-	BC_LINENUMBER,
-	BC_STATUSLINE,
-	BC_COMMANDLINE,
-	BC_ERRORMSG,
-	BC_INFOMSG,
-	BC_TABBAR,
-	BC_ACTIVETAB,
-	BC_INACTIVETAB,
-	NR_BC
+    BC_DEFAULT,
+    BC_NONTEXT,
+    BC_NOLINE,
+    BC_WSERROR,
+    BC_SELECTION,
+    BC_CURRENTLINE,
+    BC_LINENUMBER,
+    BC_STATUSLINE,
+    BC_COMMANDLINE,
+    BC_ERRORMSG,
+    BC_INFOMSG,
+    BC_TABBAR,
+    BC_ACTIVETAB,
+    BC_INACTIVETAB,
+    NR_BC
 };
 
 extern struct term_color *builtin_colors[NR_BC];

@@ -10,8 +10,8 @@ extern bool term_utf8;
 
 static inline size_t ROUND_UP(size_t x, size_t r)
 {
-	r--;
-	return (x + r) & ~r;
+    r--;
+    return (x + r) & ~r;
 }
 
 #if DEBUG <= 0
@@ -34,44 +34,44 @@ static inline void d_print(const char *fmt, ...)
 
 #define STRINGIFY(a) #a
 #define BUG_ON(a) \
-	do { \
-		if (unlikely(a)) \
-			BUG("%s\n", STRINGIFY(a)); \
-	} while (0)
+    do { \
+        if (unlikely(a)) \
+            BUG("%s\n", STRINGIFY(a)); \
+    } while (0)
 
 static inline bool streq(const char *a, const char *b)
 {
-	return !strcmp(a, b);
+    return !strcmp(a, b);
 }
 
 static inline bool xstreq(const char *a, const char *b)
 {
-	if (a == b) {
-		return true;
-	}
-	if (a == NULL) {
-		return false;
-	}
-	if (b == NULL) {
-		return false;
-	}
-	return streq(a, b);
+    if (a == b) {
+        return true;
+    }
+    if (a == NULL) {
+        return false;
+    }
+    if (b == NULL) {
+        return false;
+    }
+    return streq(a, b);
 }
 
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {
-	return !strncmp(str, prefix, strlen(prefix));
+    return !strncmp(str, prefix, strlen(prefix));
 }
 
 static inline bool str_has_suffix(const char *str, const char *suffix)
 {
-	int l1 = strlen(str);
-	int l2 = strlen(suffix);
+    int l1 = strlen(str);
+    int l2 = strlen(suffix);
 
-	if (l2 > l1) {
-		return false;
-	}
-	return memcmp(str + l1 - l2, suffix, l2) == 0;
+    if (l2 > l1) {
+        return false;
+    }
+    return memcmp(str + l1 - l2, suffix, l2) == 0;
 }
 
 long count_nl(const char *buf, long size);

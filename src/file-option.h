@@ -2,8 +2,8 @@
 #define FILE_OPTION_H
 
 enum file_options_type {
-	FILE_OPTIONS_FILENAME,
-	FILE_OPTIONS_FILETYPE,
+    FILE_OPTIONS_FILENAME,
+    FILE_OPTIONS_FILETYPE,
 };
 
 struct buffer;

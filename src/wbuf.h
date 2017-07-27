@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 struct wbuf {
-	int fill;
-	int fd;
-	char buf[8192];
+    int fill;
+    int fd;
+    char buf[8192];
 };
 
 #define WBUF(name) struct wbuf name = { .fill = 0, .fd = -1, }
