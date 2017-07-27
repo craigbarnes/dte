@@ -51,6 +51,6 @@ Public License version 2 for more details.
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
-[`GNUmakefile`]: https://github.com/dte-editor/dte/blob/master/GNUmakefile
+[`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
