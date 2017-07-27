@@ -110,6 +110,7 @@ static int xiconv(struct cconv *c, char **ib, size_t *ic)
                 c->errors++;
                 // reset
                 iconv(c->cd, NULL, NULL, NULL, NULL);
+                return errno;
             case EINVAL:
                 return errno;
             case E2BIG:
