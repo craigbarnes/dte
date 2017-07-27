@@ -11,6 +11,7 @@
 #include "file-history.h"
 #include "search.h"
 #include "error.h"
+#include "move.h"
 
 #include <locale.h>
 #include <langinfo.h>
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     char *search_history_filename;
     char *editor_dir;
     bool read_rc = true;
+    int line = 0;
     int i;
 
     if (!home)
@@ -71,6 +73,10 @@ int main(int argc, char *argv[])
     for (i = 1; i < argc; i++) {
         const char *opt = argv[i];
 
+        if (opt[0] == '+') {
+            line = atoi(opt_arg(&opt[0], &opt[1]));
+            continue;
+        }
         if (opt[0] != '-' || !opt[1])
             break;
         if (!opt[2]) {
@@ -98,7 +104,7 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        printf("Usage: %s [-R] [-V] [-c command] [-t tag] [-r rcfile] [file]...\n", argv[0]);
+        printf("Usage: %s [-R] [-V] [-c command] [-t tag] [-r rcfile] [+line] [file]...\n", argv[0]);
         return 1;
     }
 
@@ -195,6 +201,8 @@ int main(int argc, char *argv[])
     if (window->views.count == 0)
         window_open_empty_buffer(window);
     set_view(window->views.ptrs[0]);
+    if (line != 0)
+        move_to_line(view, line);
 
     if (command || tag)
         resize();
