@@ -2,100 +2,100 @@
 syntax .awk-esc
 
 state special
-	char 0-3 oct1
-	char 4-7 oct2
-	char x hex0
-	# anything but \n
-	char -n "\n" END error
-	# don't eat \n
-	noeat END
+    char 0-3 oct1
+    char 4-7 oct2
+    char x hex0
+    # anything but \n
+    char -n "\n" END error
+    # don't eat \n
+    noeat END
 
 state oct1 special
-	char 0-7 oct2
-	noeat END
+    char 0-7 oct2
+    noeat END
 
 state oct2 special
-	char 0-7 END special
-	noeat END
+    char 0-7 END special
+    noeat END
 
 state hex0 special
-	char 0-9a-fA-F hex1
-	noeat END
+    char 0-9a-fA-F hex1
+    noeat END
 
 state hex1 special
-	char 0-9a-fA-F hex2
-	noeat END
+    char 0-9a-fA-F hex2
+    noeat END
 
 # "\xaff" is an error but "\xafg" is not
 state hex2 special
-	char 0-9a-fA-F END error
-	noeat END
+    char 0-9a-fA-F END error
+    noeat END
 
 syntax awk
 
 state code
-	char \" string
-	char / regexp
-	char # comment
-	char -b a-zA-Z_ ident
-	eat code
+    char \" string
+    char / regexp
+    char # comment
+    char -b a-zA-Z_ ident
+    eat code
 
 state string
-	char \\ dqescape
-	char \" code string
-	# avoid highlighting rest of the file again
-	char "\n" code
-	eat string
+    char \\ dqescape
+    char \" code string
+    # avoid highlighting rest of the file again
+    char "\n" code
+    eat string
 
 state regexp
-	char \\ regexpescape
-	char / code regexp
-	# avoid highlighting rest of the file again
-	char "\n" code
-	eat regexp
+    char \\ regexpescape
+    char / code regexp
+    # avoid highlighting rest of the file again
+    char "\n" code
+    eat regexp
 
 state dqescape special
-	char abfnrtv\\\" string special
-	noeat .awk-esc:string
+    char abfnrtv\\\" string special
+    noeat .awk-esc:string
 
 state regexpescape special
-	char abfnrtv\\/ regexp special
-	noeat .awk-esc:regexp
+    char abfnrtv\\/ regexp special
+    noeat .awk-esc:regexp
 
 state comment
-	char "\n" code
-	eat comment
+    char "\n" code
+    eat comment
 
 state ident
-	char -b a-zA-Z0-9_ ident
-	inlist keyword code
-	inlist builtin code
-	inlist pattern code
-	inlist variable code
-	noeat code
+    char -b a-zA-Z0-9_ ident
+    inlist keyword code
+    inlist builtin code
+    inlist pattern code
+    inlist variable code
+    noeat code
 
 # gawk reserved words are separated by an empty line
 
 list keyword \
-	break continue delete do else exit for function getline if next \
-	print printf return while \
+    break continue delete do else exit for function getline if next \
+    print printf return while \
 \
-	func nextfile
+    func nextfile
 
 list builtin \
-	atan2 close cos exp fflush gsub index int length log match rand sin \
-	split sprintf sqrt srand sub substr system \
+    atan2 close cos exp fflush gsub index int length log match rand sin \
+    split sprintf sqrt srand sub substr system \
 \
-	and asort bindtextdomain compl dcgettext gensub lshift mktime or \
-	rshift strftime strtonum systime tolower toupper xor
+    and asort bindtextdomain compl dcgettext gensub lshift mktime or \
+    rshift strftime strtonum systime tolower toupper xor
 
 list pattern BEGIN END
 
 list variable \
-	ARGC ARGV FILENAME FNR FS NF NR OFMT OFS ORS RLENGTH RS RSTART SUBSEP \
+    ARGC ARGV FILENAME FNR FS NF NR OFMT OFS ORS RLENGTH RS RSTART SUBSEP \
 \
-	ARGIND BINMODE CONVFMT ENVIRON ERRNO FIELDWIDTHS IGNORECASE LINT \
-	PROCINFO RLENGTH RT TEXTDOMAIN
+    ARGIND BINMODE CONVFMT ENVIRON ERRNO FIELDWIDTHS IGNORECASE LINT \
+    PROCINFO RLENGTH RT TEXTDOMAIN
 
 default string regexp
 default keyword pattern

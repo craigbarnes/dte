@@ -1,40 +1,40 @@
 syntax gitcommit
 
 state start text
-	char # comment-start
-	noeat text
+    char # comment-start
+    noeat text
 
 state text
-	char "\n" start
-	eat text
+    char "\n" start
+    eat text
 
 state comment-start comment
-	char "\n" start
-	char "\t" newfile comment
-	str ' On branch ' 		branch comment
-	str ' Changes to be committed:' comment added
-	str ' Changed but not updated:' comment modified
-	str ' Untracked files:' 	comment untracked
-	eat comment
+    char "\n" start
+    char "\t" newfile comment
+    str ' On branch ' branch comment
+    str ' Changes to be committed:' comment added
+    str ' Changed but not updated:' comment modified
+    str ' Untracked files:' comment untracked
+    eat comment
 
 state comment
-	char "\n" start
-	eat comment
+    char "\n" start
+    eat comment
 
 state branch notice
-	char "\n" start
-	eat branch
+    char "\n" start
+    eat branch
 
 # label or new file, not known yet
 state newfile
-	# buffer anything but \n or :
-	char "\n" start
-	# anything else but : (-n inverts bitmap)
-	char -bn : newfile
-	# recolor buffered bytes to label
-	recolor label
-	noeat file
+    # buffer anything but \n or :
+    char "\n" start
+    # anything else but : (-n inverts bitmap)
+    char -bn : newfile
+    # recolor buffered bytes to label
+    recolor label
+    noeat file
 
 state file
-	char "\n" start
-	eat file
+    char "\n" start
+    eat file

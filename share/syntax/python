@@ -1,111 +1,111 @@
 syntax .python-esc
 
 state esc special
-	char "abfnrtv'\\\"" END special
-	char 0-7 oct1
-	char x hex0
-	noeat END
+    char "abfnrtv'\\\"" END special
+    char 0-7 oct1
+    char x hex0
+    noeat END
 
 state oct1 special
-	char 0-7 oct2
-	noeat END
+    char 0-7 oct2
+    noeat END
 
 state oct2 special
-	char 0-7 END special
-	noeat END
+    char 0-7 END special
+    noeat END
 
 state hex0 special
-	char 0-9a-fA-F hex1
-	noeat END
+    char 0-9a-fA-F hex1
+    noeat END
 
 state hex1 special
-	char 0-9a-fA-F END special
-	noeat END
+    char 0-9a-fA-F END special
+    noeat END
 
 syntax python
 
 state start code
-	char # comment
-	str '"""' longdq
-	str "'''" longsq
-	char '"' dq
-	char "'" sq
-	# FIXME: [uU][rR]" [uU]" [rR]" [bB]" [bB][rR]"
-	char -b a-zA-Z_ ident
-	char 0 zero
-	char 1-9 dec
-	eat start
+    char # comment
+    str '"""' longdq
+    str "'''" longsq
+    char '"' dq
+    char "'" sq
+    # FIXME: [uU][rR]" [uU]" [rR]" [bB]" [bB][rR]"
+    char -b a-zA-Z_ ident
+    char 0 zero
+    char 1-9 dec
+    eat start
 
 state comment
-	char "\n" start
-	eat comment
+    char "\n" start
+    eat comment
 
 state longdq string
-	str '"""' start string
-	char -b "\\" .python-esc:longdq
-	eat longdq
+    str '"""' start string
+    char -b "\\" .python-esc:longdq
+    eat longdq
 
 state longsq string
-	str "'''" start string
-	char -b "\\" .python-esc:longsq
-	eat longsq
+    str "'''" start string
+    char -b "\\" .python-esc:longsq
+    eat longsq
 
 state dq string
-	char "\"" start string
-	char "\n" start
-	char -b "\\" .python-esc:dq
-	eat dq
+    char "\"" start string
+    char "\n" start
+    char -b "\\" .python-esc:dq
+    eat dq
 
 state sq string
-	char "'" start string
-	char "\n" start
-	char -b "\\" .python-esc:sq
-	eat sq
+    char "'" start string
+    char "\n" start
+    char -b "\\" .python-esc:sq
+    eat sq
 
 state ident
-	char -b a-zA-Z_0-9 ident
-	inlist keyword start
-	inlist constant start
-	noeat start
+    char -b a-zA-Z_0-9 ident
+    inlist keyword start
+    inlist constant start
+    noeat start
 
 state zero numeric
-	char bB bin
-	char oO0-7 oct
-	char xX hex
-	char . float
-	noeat int-suffix
+    char bB bin
+    char oO0-7 oct
+    char xX hex
+    char . float
+    noeat int-suffix
 
 state bin numeric
-	char 01 bin
-	noeat int-suffix
+    char 01 bin
+    noeat int-suffix
 
 state oct numeric
-	char 0-7 oct
-	noeat int-suffix
+    char 0-7 oct
+    noeat int-suffix
 
 state dec numeric
-	char 0-9 dec
-	noeat int-suffix
+    char 0-9 dec
+    noeat int-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat int-suffix
+    char 0-9a-fA-F hex
+    noeat int-suffix
 
 state int-suffix code
-	char lL int-end numeric
-	noeat int-end
+    char lL int-end numeric
+    noeat int-end
 
 state int-end error
-	char a-zA-Z0-9_ int-end
-	noeat start
+    char a-zA-Z0-9_ int-end
+    noeat start
 
 state float numeric
-	noeat start
+    noeat start
 
 list keyword \
-	and as assert break class continue def del elif else except exec \
-	finally for from global if import in is lambda not or pass print \
-	raise return try while with yield
+    and as assert break class continue def del elif else except exec \
+    finally for from global if import in is lambda not or pass print \
+    raise return try while with yield
 
 list constant \
-	None False True
+    None False True

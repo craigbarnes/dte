@@ -1,15 +1,15 @@
 syntax mail
 
 state bol text
-	char ">" quote
-	noeat text
+    char ">" quote
+    noeat text
 
 state text
-	char "\n" bol
-	eat text
+    char "\n" bol
+    eat text
 
 state quote
-	char "\n" bol
-	eat quote
+    char "\n" bol
+    eat quote
 
 default comment quote

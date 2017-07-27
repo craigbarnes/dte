@@ -2,20 +2,20 @@
 syntax .smarty-comment
 
 state comment
-	str "*}" END comment
-	eat comment
+    str "*}" END comment
+    eat comment
 
 syntax .smarty-code
 
 state smarty
-	char \} END smarty
-	eat smarty
+    char \} END smarty
+    eat smarty
 
 syntax .smarty-literal
 
 state literal
-	str "{/literal}" END literal
-	eat literal
+    str "{/literal}" END literal
+    eat literal
 
 # NOTE: Most of the following text has been copied from html syntax.
 #
@@ -26,206 +26,206 @@ state literal
 syntax .smarty-entity
 
 state entity
-	char # hash
-	char -b a-zA-Z0-9 name
-	recolor error 1
-	char "\n" END
-	eat END error
+    char # hash
+    char -b a-zA-Z0-9 name
+    recolor error 1
+    char "\n" END
+    eat END error
 
 state hash entity
-	char xX x
-	char 0-9 dec
-	eat END error
+    char xX x
+    char 0-9 dec
+    eat END error
 
 state x entity
-	char 0-9a-fA-F hex
-	eat END error
+    char 0-9a-fA-F hex
+    eat END error
 
 state hex entity
-	char 0-9a-fA-F hex
-	char ";" END entity
-	eat END error
+    char 0-9a-fA-F hex
+    char ";" END entity
+    eat END error
 
 state dec entity
-	char 0-9 dec
-	char ";" END entity
-	eat END error
+    char 0-9 dec
+    char ";" END entity
+    eat END error
 
 state name error
-	char -b a-zA-Z0-9 name
-	inlist entity semicolon
-	noeat semicolon
+    char -b a-zA-Z0-9 name
+    inlist entity semicolon
+    noeat semicolon
 
 state semicolon error
-	char ";" END entity
-	eat END error
+    char ";" END entity
+    eat END error
 
 # reserved characters, latin1 symbols, latin1 characters, math, greek, other
 list entity \
-	quot apos amp lt gt \
+    quot apos amp lt gt \
 \
-	nbsp iexcl cent pound curren yen brvbar sect uml copy ordf laquo not \
-	shy reg macr deg plusmn sup2 sup3 acute micro para middot cedil sup1 \
-	ordm raquo frac14 frac12 frac34 iquest times divide \
+    nbsp iexcl cent pound curren yen brvbar sect uml copy ordf laquo not \
+    shy reg macr deg plusmn sup2 sup3 acute micro para middot cedil sup1 \
+    ordm raquo frac14 frac12 frac34 iquest times divide \
 \
-	Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute \
-	Ecirc Euml Igrave Iacute Icirc Iuml ETH Ntilde Ograve Oacute Ocirc \
-	Otilde Ouml Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig \
-	agrave aacute acirc atilde auml aring aelig ccedil egrave eacute \
-	ecirc euml igrave iacute icirc iuml eth ntilde ograve oacute ocirc \
-	otilde ouml oslash ugrave uacute ucirc uuml yacute thorn yuml \
+    Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute \
+    Ecirc Euml Igrave Iacute Icirc Iuml ETH Ntilde Ograve Oacute Ocirc \
+    Otilde Ouml Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig \
+    agrave aacute acirc atilde auml aring aelig ccedil egrave eacute \
+    ecirc euml igrave iacute icirc iuml eth ntilde ograve oacute ocirc \
+    otilde ouml oslash ugrave uacute ucirc uuml yacute thorn yuml \
 \
-	forall part exist empty nabla isin notin ni prod sum minus lowast \
-	radic prop infin ang and or cap cup int there4 sim cong asymp ne \
-	equiv le ge sub sup nsub sube supe oplus otimes perp sdot \
+    forall part exist empty nabla isin notin ni prod sum minus lowast \
+    radic prop infin ang and or cap cup int there4 sim cong asymp ne \
+    equiv le ge sub sup nsub sube supe oplus otimes perp sdot \
 \
-	Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu \
-	Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega alpha beta \
-	gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi \
-	omicron pi rho sigmaf sigma tau upsilon phi chi psi omega thetasym \
-	upsih piv \
+    Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu \
+    Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega alpha beta \
+    gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi \
+    omicron pi rho sigmaf sigma tau upsilon phi chi psi omega thetasym \
+    upsih piv \
 \
-	OElig oelig Scaron scaron Yuml fnof circ tilde ensp emsp thinsp zwnj \
-	zwj lrm rlm ndash mdash lsquo rsquo sbquo ldquo rdquo bdquo dagger \
-	Dagger bull hellip permil prime Prime lsaquo rsaquo oline euro trade \
-	larr uarr rarr darr harr crarr lceil rceil lfloor rfloor loz spades \
-	clubs hearts diams
+    OElig oelig Scaron scaron Yuml fnof circ tilde ensp emsp thinsp zwnj \
+    zwj lrm rlm ndash mdash lsquo rsquo sbquo ldquo rdquo bdquo dagger \
+    Dagger bull hellip permil prime Prime lsaquo rsaquo oline euro trade \
+    larr uarr rarr darr harr crarr lceil rceil lfloor rfloor loz spades \
+    clubs hearts diams
 
 # main syntax
 syntax html+smarty
 
 state start text
-	char " \t\n" start
-	str "<!" doctype
-	noeat text
+    char " \t\n" start
+    str "<!" doctype
+    noeat text
 
 # Skip that useless bloated doctype which is too complicated to parse
 state doctype comment
-	char > text comment
-	char < text error
-	eat doctype
+    char > text comment
+    char < text error
+    eat doctype
 
 state text
-	str "<!--" comment
-	char < tag-start
-	char > start error
-	# smarty
-	char "&" .smarty-entity:text
-	str "{*" .smarty-comment:text
-	str "{literal}" .smarty-literal:text
-	char \{ .smarty-code:text
-	eat text
+    str "<!--" comment
+    char < tag-start
+    char > start error
+    # smarty
+    char "&" .smarty-entity:text
+    str "{*" .smarty-comment:text
+    str "{literal}" .smarty-literal:text
+    char \{ .smarty-code:text
+    eat text
 
 state comment
-	str -- --> text comment
-	eat comment
+    str -- --> text comment
+    eat comment
 
 state tag-start tag
-	char / close-tag
-	char -b a-zA-Z0-9_ tag-name
-	char " \t\n" tag-start
-	char > text tag
-	# smarty
-	str "{*" .smarty-comment:tag-start
-	str "{literal}" .smarty-literal:tag-start
-	char \{ .smarty-code:tag-start
-	eat tag-start error
+    char / close-tag
+    char -b a-zA-Z0-9_ tag-name
+    char " \t\n" tag-start
+    char > text tag
+    # smarty
+    str "{*" .smarty-comment:tag-start
+    str "{literal}" .smarty-literal:tag-start
+    char \{ .smarty-code:tag-start
+    eat tag-start error
 
 state close-tag tag
-	char -b a-zA-Z0-9_ close-tag-name
-	char " \t\n" close-tag
-	# smarty
-	str "{*" .smarty-comment:close-tag
-	char \{ .smarty-code:close-tag
-	eat text error
+    char -b a-zA-Z0-9_ close-tag-name
+    char " \t\n" close-tag
+    # smarty
+    str "{*" .smarty-comment:close-tag
+    char \{ .smarty-code:close-tag
+    eat text error
 
 state tag-name tag-unknown
-	char -b a-zA-Z0-9_ tag-name
-	inlist tag attrs
-	inlist tag-frameset attrs
-	inlist tag-transitional attrs
-	inlist tag-deprecated attrs
-	noeat attrs
+    char -b a-zA-Z0-9_ tag-name
+    inlist tag attrs
+    inlist tag-frameset attrs
+    inlist tag-transitional attrs
+    inlist tag-deprecated attrs
+    noeat attrs
 
 state close-tag-name tag-unknown
-	char -b a-zA-Z0-9_ close-tag-name
-	inlist tag close-tag-end
-	inlist tag-frameset close-tag-end
-	inlist tag-transitional close-tag-end
-	inlist tag-deprecated close-tag-end
-	noeat close-tag-end
+    char -b a-zA-Z0-9_ close-tag-name
+    inlist tag close-tag-end
+    inlist tag-frameset close-tag-end
+    inlist tag-transitional close-tag-end
+    inlist tag-deprecated close-tag-end
+    noeat close-tag-end
 
 state close-tag-end tag
-	char " \t\n" close-tag-end
-	char > text tag
-	# smarty
-	str "{*" .smarty-comment:close-tag-end
-	char \{ .smarty-code:close-tag-end
-	eat text error
+    char " \t\n" close-tag-end
+    char > text tag
+    # smarty
+    str "{*" .smarty-comment:close-tag-end
+    char \{ .smarty-code:close-tag-end
+    eat text error
 
 state attrs code
-	char " \t\n" attrs
-	char -b a-zA-Z attr-name
-	char > text tag
-	char / short-close
-	# smarty
-	str "{*" .smarty-comment:attrs
-	char \{ .smarty-code:attrs
-	eat attrs error
+    char " \t\n" attrs
+    char -b a-zA-Z attr-name
+    char > text tag
+    char / short-close
+    # smarty
+    str "{*" .smarty-comment:attrs
+    char \{ .smarty-code:attrs
+    eat attrs error
 
 state short-close tag
-	char > text tag
-	eat text error
+    char > text tag
+    eat text error
 
 state attr-name attr
-	char a-zA-Z:_- attr-name
-	char = attr-eq
-	noeat attrs
+    char a-zA-Z:_- attr-name
+    char = attr-eq
+    noeat attrs
 
 state attr-eq attr
-	char \" dq
-	char \' sq
-	noeat attrs
+    char \" dq
+    char \' sq
+    noeat attrs
 
 state dq string
-	char \" attrs string
-	char "\n" attrs
-	# smarty
-	char "&" .smarty-entity:dq
-	str "{*" .smarty-comment:dq
-	char \{ .smarty-code:dq
-	eat dq
+    char \" attrs string
+    char "\n" attrs
+    # smarty
+    char "&" .smarty-entity:dq
+    str "{*" .smarty-comment:dq
+    char \{ .smarty-code:dq
+    eat dq
 
 state sq string
-	char \' attrs string
-	char "\n" attrs
-	# smarty
-	char "&" .smarty-entity:sq
-	str "{*" .smarty-comment:sq
-	char \{ .smarty-code:sq
-	eat sq
+    char \' attrs string
+    char "\n" attrs
+    # smarty
+    char "&" .smarty-entity:sq
+    str "{*" .smarty-comment:sq
+    char \{ .smarty-code:sq
+    eat sq
 
 # strict/transitional/frameset
 list -i tag \
-	a abbr acronym address area b base bdo big blockquote body br \
-	button caption cite code col colgroup dd del dfn div dl dt em \
-	fieldset form h1 h2 h3 h4 h5 h6 head hr html i img input ins kbd \
-	label legend li link map meta noscript object ol optgroup option \
-	p param pre q samp script select small span strong style sub sup \
-	table tbody td textarea tfoot th thead title tr tt ul var
+    a abbr acronym address area b base bdo big blockquote body br \
+    button caption cite code col colgroup dd del dfn div dl dt em \
+    fieldset form h1 h2 h3 h4 h5 h6 head hr html i img input ins kbd \
+    label legend li link map meta noscript object ol optgroup option \
+    p param pre q samp script select small span strong style sub sup \
+    table tbody td textarea tfoot th thead title tr tt ul var
 
 # frameset
 list -i tag-frameset \
-	frame frameset
+    frame frameset
 
 # transitional/frameset
 list -i tag-transitional \
-	iframe noframes
+    iframe noframes
 
 # deprecated transitional/frameset
 # blink and marquee are non-standard
 list -i tag-deprecated \
-	applet basefont blink center dir font isindex marquee menu s strike u
+    applet basefont blink center dir font isindex marquee menu s strike u
 
 default code tag-unknown
 default tag tag-frameset tag-transitional

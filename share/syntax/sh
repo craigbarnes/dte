@@ -2,297 +2,297 @@
 syntax .sh-sq
 
 state string
-	char "'" END string
-	eat string
+    char "'" END string
+    eat string
 
 # escape inside double quotes
 syntax .sh-dq-escape
 
 state special
-	char '"$\`'"\n" END special
-	recolor string 1
-	eat END
+    char '"$\`'"\n" END special
+    recolor string 1
+    eat END
 
 # escape outside double quotes
 syntax .sh-command-escape
 
 state special
-	eat END special
+    eat END special
 
 # ${var}, $var, $1 etc. ($ already eaten)
 syntax .sh-var
 
 state variable
-	char '{' brace
-	char '*@#?$!0-9-' END variable
-	char a-zA-Z_ name
-	noeat END
+    char '{' brace
+    char '*@#?$!0-9-' END variable
+    char a-zA-Z_ name
+    noeat END
 
 state name variable
-	char a-zA-Z_0-9 name
-	noeat END
+    char a-zA-Z_0-9 name
+    noeat END
 
 state brace variable
-	char -n "\n}" brace
-	eat END variable
+    char -n "\n}" brace
+    eat END variable
 
 # $((expr)) "$((" already eaten
 syntax .sh-expression
 
 state expression special
-	# FIXME: there can be almost anything in $(( ... ))
-	char ')' expression-end
-	eat expression
+    # FIXME: there can be almost anything in $(( ... ))
+    char ')' expression-end
+    eat expression
 
 state expression-end special
-	char ')' END special
-	eat END error
+    char ')' END special
+    eat END error
 
 # double quoted string. $(cmd) and $((expr) not properly parsed
 syntax .sh-simple-dq
 
 state string
-	char \" END string
-	char \\ .sh-dq-escape:string
-	char \$ special
-	eat string
+    char \" END string
+    char \\ .sh-dq-escape:string
+    char \$ special
+    eat string
 
 state special
-	char '(' paren
-	recolor variable 1
-	noeat .sh-var:string
+    char '(' paren
+    recolor variable 1
+    noeat .sh-var:string
 
 state paren special
-	char '(' .sh-expression:string
-	noeat command
+    char '(' .sh-expression:string
+    noeat command
 
 state command
-	char ')' string special
-	char -n "\n" command
-	noeat string
+    char ')' string special
+    char -n "\n" command
+    noeat string
 
 # $(cmd)
 syntax .sh-pcommand
 
 state command
-	char ')' END special
-	char \' .sh-sq:command
-	char \" .sh-simple-dq:command
-	char \\ .sh-command-escape:command
-	char \$ .sh-var:command
-	eat command
+    char ')' END special
+    char \' .sh-sq:command
+    char \" .sh-simple-dq:command
+    char \\ .sh-command-escape:command
+    char \$ .sh-var:command
+    eat command
 
 # $var, $(command), $((expression))
 syntax .sh-dollar
 
 state special
-	char '(' paren
-	recolor variable 1
-	noeat .sh-var:END
+    char '(' paren
+    recolor variable 1
+    noeat .sh-var:END
 
 state paren special
-	char '(' .sh-expression:END
-	noeat .sh-pcommand:END
+    char '(' .sh-expression:END
+    noeat .sh-pcommand:END
 
 # `command`
 syntax .sh-backtick
 
 state special
-	# NOTE: you can't put "`" inside `...`, it's not possible
-	char \' .sh-sq:special
-	char \" .sh-simple-dq:special
-	char \\ .sh-command-escape:special
-	char \$ .sh-var:special
-	char ` END special
-	eat special
+    # NOTE: you can't put "`" inside `...`, it's not possible
+    char \' .sh-sq:special
+    char \" .sh-simple-dq:special
+    char \\ .sh-command-escape:special
+    char \$ .sh-var:special
+    char ` END special
+    eat special
 
 syntax .sh-dq
 
 # double quoted string
 state string
-	char '"' END string
-	char \\ .sh-dq-escape:string
-	char ` .sh-backtick:string
-	char \$ .sh-dollar:string
-	eat string
+    char '"' END string
+    char \\ .sh-dq-escape:string
+    char ` .sh-backtick:string
+    char \$ .sh-dollar:string
+    eat string
 
 # skip redirect etc. after <<EOF
 # e.g. cat <<EOF > /tmp/file
 syntax .sh-heredoc-skip-line
 
 state start
-	char "\n" END
-	eat start code
+    char "\n" END
+    eat start code
 
 # common to <<"EOF" and <<'EOF'
 syntax .sh-heredoc-common
 
 state start
-	noeat .sh-heredoc-skip-line:bol
+    noeat .sh-heredoc-skip-line:bol
 
 state bol string
-	heredocend match
-	noeat string
+    heredocend match
+    noeat string
 
 state string
-	char "\n" bol
-	eat string
+    char "\n" bol
+    eat string
 
 state match special
-	char "\n" END
-	# length clamped to bol
-	recolor string 1000
-	noeat string
+    char "\n" END
+    # length clamped to bol
+    recolor string 1000
+    noeat string
 
 # << EOF
 syntax .sh-heredoc
 
 state start code
-	noeat .sh-heredoc-skip-line:bol
+    noeat .sh-heredoc-skip-line:bol
 
 state bol string
-	heredocend match
-	noeat string
+    heredocend match
+    noeat string
 
 state string
-	char "\n" bol
-	char \` .sh-backtick:string
-	char \$ .sh-dollar:string
-	eat string
+    char "\n" bol
+    char \` .sh-backtick:string
+    char \$ .sh-dollar:string
+    eat string
 
 state match special
-	char "\n" END
-	# length clamped to bol
-	recolor string 1000
-	noeat string
+    char "\n" END
+    # length clamped to bol
+    recolor string 1000
+    noeat string
 
 # << "EOF"
 syntax .sh-heredoc-dq
 
 state start string
-	char -n \" END error
-	eat .sh-heredoc-common:END
+    char -n \" END error
+    eat .sh-heredoc-common:END
 
 # << 'EOF'
 syntax .sh-heredoc-sq
 
 state start string
-	char -n \' END error
-	eat .sh-heredoc-common:END
+    char -n \' END error
+    eat .sh-heredoc-common:END
 
 # commands can be at beginning of line or after any of && || ; & | { ` $(
 # also beginning of line can contain ( after which command is allowed
 syntax sh
 
 state start code
-	char -b a-zA-Z0-9_/.- command
-	char "\t " start
-	char "({" start special
-	noeat args
+    char -b a-zA-Z0-9_/.- command
+    char "\t " start
+    char "({" start special
+    noeat args
 
 state command code
-	# eat all garbage to distinguish test/run.sh from builtin test
-	char -b a-zA-Z0-9_/.- command
-	inlist keyword1 start keyword
-	inlist keyword2 args keyword
-	inlist builtin args
-	bufis for for
-	char \( function
-	noeat args
+    # eat all garbage to distinguish test/run.sh from builtin test
+    char -b a-zA-Z0-9_/.- command
+    inlist keyword1 start keyword
+    inlist keyword2 args keyword
+    inlist builtin args
+    bufis for for
+    char \( function
+    noeat args
 
 state function special
-	# don't try to validate syntax because there can be comments
-	# between "()" and "{"
-	char \) start special
-	eat start error
+    # don't try to validate syntax because there can be comments
+    # between "()" and "{"
+    char \) start special
+    eat start error
 
 state for keyword
-	char " \t" for
-	char a-zA-Z_ forvar
-	noeat forerror
+    char " \t" for
+    char a-zA-Z_ forvar
+    noeat forerror
 
 state forvar ident
-	char a-zA-Z_0-9 forvar
-	char " \t" forspace
-	noeat forerror
+    char a-zA-Z_0-9 forvar
+    char " \t" forspace
+    noeat forerror
 
 state forspace code
-	char " \t" forspace
-	str in in
-	noeat forerror
+    char " \t" forspace
+    str in in
+    noeat forerror
 
 state in keyword
-	char " \t" args
-	noeat forerror
+    char " \t" args
+    noeat forerror
 
 state forerror code
-	char a-zA-Z_0-9 args error
-	noeat args
+    char a-zA-Z_0-9 args error
+    noeat args
 
 state args code
-	char # comment
-	char "'" .sh-sq:args
-	char '"' .sh-dq:args
-	char \\ .sh-command-escape:args
-	char ` .sh-backtick:args
-	char \$ .sh-dollar:args
-	char "\n" start
-	# && is same as two &, same for |. does not matter
-	char ";&|" start special
-	# this might be error
-	char ()} args special
-	char < lt
-	eat args
+    char # comment
+    char "'" .sh-sq:args
+    char '"' .sh-dq:args
+    char \\ .sh-command-escape:args
+    char ` .sh-backtick:args
+    char \$ .sh-dollar:args
+    char "\n" start
+    # && is same as two &, same for |. does not matter
+    char ";&|" start special
+    # this might be error
+    char ()} args special
+    char < lt
+    eat args
 
 state comment
-	char "\n" start
-	eat comment
+    char "\n" start
+    eat comment
 
 state lt special
-	char < lt2
-	noeat args
+    char < lt2
+    noeat args
 
 state lt2 special
-	char < lt3
-	char -- - heredoc-start special
-	noeat heredoc-start
+    char < lt3
+    char -- - heredoc-start special
+    noeat heredoc-start
 
 state lt3 special
-	# cat <<<"string $var"
-	# cat <<< $(echo $USER)
-	noeat args
+    # cat <<<"string $var"
+    # cat <<< $(echo $USER)
+    noeat args
 
 state heredoc-start special
-	char " \t" heredoc-start
-	char \" heredoc-dq
-	char \' heredoc-sq
-	char "\n" start error
-	noeat heredoc
+    char " \t" heredoc-start
+    char \" heredoc-dq
+    char \' heredoc-sq
+    char "\n" start error
+    noeat heredoc
 
 state heredoc-dq string
-	char -bn "\"\n" heredoc-dq
-	heredocbegin .sh-heredoc-dq start
+    char -bn "\"\n" heredoc-dq
+    heredocbegin .sh-heredoc-dq start
 
 state heredoc-sq string
-	char -bn "\'\n" heredoc-sq
-	heredocbegin .sh-heredoc-sq start
+    char -bn "\'\n" heredoc-sq
+    heredocbegin .sh-heredoc-sq start
 
 state heredoc special
-	char -bn " \t\n;|>" heredoc
-	heredocbegin .sh-heredoc start
+    char -bn " \t\n;|>" heredoc
+    heredocbegin .sh-heredoc start
 
 # command allowed after these
 list keyword1 \
-	do else elif exec if then until while
+    do else elif exec if then until while
 
 # command not allowed after these
 list keyword2 \
-	break case continue done esac exit export fi function in return shift
+    break case continue done esac exit export fi function in return shift
 
 list builtin \
-	alias bg bind cd caller command compgen complete test kill source \
-	time declare typeset dirs disown echo enable eval fc fg getopts hash \
-	help history jobs let local logout popd printf pushd pwd read \
-	readonly shopt set trap type ulimit umask unalias unset wait "."
+    alias bg bind cd caller command compgen complete test kill source \
+    time declare typeset dirs disown echo enable eval fc fg getopts hash \
+    help history jobs let local logout popd printf pushd pwd read \
+    readonly shopt set trap type ulimit umask unalias unset wait "."
 
 default special expression

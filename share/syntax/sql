@@ -1,214 +1,214 @@
 syntax .sql-esc
 
 state esc special
-	char "0'\"bnrtZ\\%_" END special
-	noeat END
+    char "0'\"bnrtZ\\%_" END special
+    noeat END
 
 syntax sql
 
 state start code
-	char "'" sq
-	char '"' dq
-	char -b bB b
-	char -b xX x
-	char -b a-zA-Z_\$ word
-	char 0 zero
-	char 1-9 int
-	char . float
-	char @ at
-	char ` backtick
-	char -- - dash
-	char # comment
-	char / slash
-	eat start
+    char "'" sq
+    char '"' dq
+    char -b bB b
+    char -b xX x
+    char -b a-zA-Z_\$ word
+    char 0 zero
+    char 1-9 int
+    char . float
+    char @ at
+    char ` backtick
+    char -- - dash
+    char # comment
+    char / slash
+    eat start
 
 state zero numeric
-	char 0-9 int
-	char . float
-	# Only lowercase. Inconsistent with X'10ff'!
-	char b bin
-	char x hex
-	noeat trailing
+    char 0-9 int
+    char . float
+    # Only lowercase. Inconsistent with X'10ff'!
+    char b bin
+    char x hex
+    noeat trailing
 
 state int numeric
-	char 0-9 int
-	char . float
-	noeat trailing
+    char 0-9 int
+    char . float
+    noeat trailing
 
 state float numeric
-	char 0-9 float
-	noeat trailing
+    char 0-9 float
+    noeat trailing
 
 state bin numeric
-	char 01 bindigit
-	eat start error
+    char 01 bindigit
+    eat start error
 
 state bindigit numeric
-	char 01 bindigit
-	noeat trailing
+    char 01 bindigit
+    noeat trailing
 
 state hex numeric
-	char 0-9a-fA-F hexdigit
-	eat start error
+    char 0-9a-fA-F hexdigit
+    eat start error
 
 state hexdigit numeric
-	char 0-9a-fA-F hexdigit
-	noeat trailing
+    char 0-9a-fA-F hexdigit
+    noeat trailing
 
 state b code
-	# single quote only
-	char \' bitstr
-	noeat -b word
+    # single quote only
+    char \' bitstr
+    noeat -b word
 
 state bitstr
-	recolor string 2
-	noeat bitstrbit
+    recolor string 2
+    noeat bitstrbit
 
 state bitstrbit special
-	char 01 bitstrbit
-	char "\n'" start string
-	eat bitstrbit error
+    char 01 bitstrbit
+    char "\n'" start string
+    eat bitstrbit error
 
 state x code
-	# single quote only
-	char \' hexstr
-	noeat -b word
+    # single quote only
+    char \' hexstr
+    noeat -b word
 
 state hexstr
-	recolor string 2
-	noeat hexstreven
+    recolor string 2
+    noeat hexstreven
 
 state hexstreven special
-	char 0-9a-fA-F hexstrodd
-	char "\n'" start string
-	eat hexstrodd error
+    char 0-9a-fA-F hexstrodd
+    char "\n'" start string
+    eat hexstrodd error
 
 state hexstrodd special
-	char 0-9a-fA-F hexstreven
-	char "\n'" start error
-	eat hexstreven error
+    char 0-9a-fA-F hexstreven
+    char "\n'" start error
+    eat hexstreven error
 
 state word code
-	char -b a-zA-Z0-9_\$ word
-	inlist keyword start
-	inlist identifier start
-	char . column code
-	noeat start
+    char -b a-zA-Z0-9_\$ word
+    inlist keyword start
+    inlist identifier start
+    char . column code
+    noeat start
 
 state column
-	char -b a-zA-Z0-9_\$ column
-	noeat start
+    char -b a-zA-Z0-9_\$ column
+    noeat start
 
 state at variable
-	char a-zA-Z0-9._\$ variable
-	char "'" sq
-	char '"' dq
-	char ` backtick
-	eat start error
+    char a-zA-Z0-9._\$ variable
+    char "'" sq
+    char '"' dq
+    char ` backtick
+    eat start error
 
 state variable
-	char a-zA-Z0-9._\$ variable
-	noeat start
+    char a-zA-Z0-9._\$ variable
+    noeat start
 
 state sq string
-	char "\n'" start string
-	char \\ .sql-esc:sq
-	eat sq
+    char "\n'" start string
+    char \\ .sql-esc:sq
+    eat sq
 
 state dq string
-	char "\n"\" start string
-	char \\ .sql-esc:dq
-	eat dq
+    char "\n"\" start string
+    char \\ .sql-esc:dq
+    eat dq
 
 state backtick constant
-	char "\n`" start
-	eat backtick
+    char "\n`" start
+    eat backtick
 
 state dash comment
-	char -- - maybe-comment
-	recolor code 1
-	noeat start
+    char -- - maybe-comment
+    recolor code 1
+    noeat start
 
 state maybe-comment comment
-	char "\n" start
-	# control character or space required!
-	char "\x01- " comment
-	recolor code 2
-	noeat start
+    char "\n" start
+    # control character or space required!
+    char "\x01- " comment
+    recolor code 2
+    noeat start
 
 state comment
-	char "\n" start
-	eat comment
+    char "\n" start
+    eat comment
 
 state slash comment
-	char "*" maybe-c-comment
-	recolor code 1
-	noeat start
+    char "*" maybe-c-comment
+    recolor code 1
+    noeat start
 
 state maybe-c-comment comment
-	char ! begin-special-comment
-	noeat c-comment
+    char ! begin-special-comment
+    noeat c-comment
 
 state begin-special-comment
-	recolor special 3
-	noeat special-comment
+    recolor special 3
+    noeat special-comment
 
 state special-comment special
-	char "*" scstar
-	eat special-comment
+    char "*" scstar
+    eat special-comment
 
 state scstar special
-	char / start special
-	noeat special-comment
+    char / start special
+    noeat special-comment
 
 state c-comment comment
-	char "*" star
-	eat c-comment
+    char "*" star
+    eat c-comment
 
 state star comment
-	char / start comment
-	noeat c-comment
+    char / start comment
+    noeat c-comment
 
 state trailing error
-	char a-zA-Z0-9_\$ trailing
-	noeat start
+    char a-zA-Z0-9_\$ trailing
+    noeat start
 
 # FIXME: types should probably go to separate list
 list -i keyword \
-	ACCESSIBLE \
-	ADD ALL ALTER ANALYZE AND AS ASC ASENSITIVE BEFORE BETWEEN \
-	BIGINT BINARY BLOB BOTH BY CALL CASCADE CASE CHANGE CHAR \
-	CHARACTER CHECK COLLATE COLUMN CONDITION CONSTRAINT CONTINUE \
-	CONVERT CREATE CROSS CURRENT_DATE CURRENT_TIME \
-	CURRENT_TIMESTAMP CURRENT_USER CURSOR DATABASE DATABASES \
-	DAY_HOUR DAY_MICROSECOND DAY_MINUTE DAY_SECOND DEC DECIMAL \
-	DECLARE DEFAULT DELAYED DELETE DESC DESCRIBE DETERMINISTIC \
-	DISTINCT DISTINCTROW DIV DOUBLE DROP DUAL EACH ELSE ELSEIF \
-	ENCLOSED ESCAPED EXISTS EXIT EXPLAIN FALSE FETCH FLOAT FLOAT4 \
-	FLOAT8 FOR FORCE FOREIGN FROM FULLTEXT GRANT GROUP HAVING \
-	HIGH_PRIORITY HOUR_MICROSECOND HOUR_MINUTE HOUR_SECOND IF \
-	IGNORE IN INDEX INFILE INNER INOUT INSENSITIVE INSERT INT INT1 \
-	INT2 INT3 INT4 INT8 INTEGER INTERVAL INTO IS ITERATE JOIN KEY \
-	KEYS KILL LEADING LEAVE LEFT LIKE LIMIT LINEAR LINES LOAD LOCALTIME \
-	LOCALTIMESTAMP LOCK LONG LONGBLOB LONGTEXT LOOP LOW_PRIORITY \
-	MASTER_BIND MASTER_SSL_VERIFY_SERVER_CERT \
-	MATCH MAXVALUE MEDIUMBLOB MEDIUMINT MEDIUMTEXT MIDDLEINT \
-	MINUTE_MICROSECOND MINUTE_SECOND MOD MODIFIES NATURAL NOT \
-	NO_WRITE_TO_BINLOG NULL NUMERIC ON ONE_SHOT OPTIMIZE OPTION OPTIONALLY \
-	OR ORDER OUT OUTER OUTFILE PARTITION PRECISION PRIMARY PROCEDURE PURGE RANGE \
-	READ READS READ_WRITE REAL REFERENCES REGEXP RELEASE RENAME REPEAT \
-	REPLACE REQUIRE RESIGNAL RESTRICT RETURN REVOKE RIGHT RLIKE SCHEMA \
-	SCHEMAS SECOND_MICROSECOND SELECT SENSITIVE SEPARATOR SET \
-	SHOW SIGNAL SMALLINT SPATIAL SPECIFIC SQL SQLEXCEPTION \
-	SQLSTATE SQLWARNING SQL_BIG_RESULT SQL_CALC_FOUND_ROWS \
-	SQL_SMALL_RESULT SSL STARTING STRAIGHT_JOIN TABLE TERMINATED \
-	THEN TINYBLOB TINYINT TINYTEXT TO TRAILING TRIGGER TRUE UNDO \
-	UNION UNIQUE UNLOCK UNSIGNED UPDATE USAGE USE USING UTC_DATE \
-	UTC_TIME UTC_TIMESTAMP VALUES VARBINARY VARCHAR VARCHARACTER \
-	VARYING WHEN WHERE WHILE WITH WRITE XOR YEAR_MONTH ZEROFILL
+    ACCESSIBLE \
+    ADD ALL ALTER ANALYZE AND AS ASC ASENSITIVE BEFORE BETWEEN \
+    BIGINT BINARY BLOB BOTH BY CALL CASCADE CASE CHANGE CHAR \
+    CHARACTER CHECK COLLATE COLUMN CONDITION CONSTRAINT CONTINUE \
+    CONVERT CREATE CROSS CURRENT_DATE CURRENT_TIME \
+    CURRENT_TIMESTAMP CURRENT_USER CURSOR DATABASE DATABASES \
+    DAY_HOUR DAY_MICROSECOND DAY_MINUTE DAY_SECOND DEC DECIMAL \
+    DECLARE DEFAULT DELAYED DELETE DESC DESCRIBE DETERMINISTIC \
+    DISTINCT DISTINCTROW DIV DOUBLE DROP DUAL EACH ELSE ELSEIF \
+    ENCLOSED ESCAPED EXISTS EXIT EXPLAIN FALSE FETCH FLOAT FLOAT4 \
+    FLOAT8 FOR FORCE FOREIGN FROM FULLTEXT GRANT GROUP HAVING \
+    HIGH_PRIORITY HOUR_MICROSECOND HOUR_MINUTE HOUR_SECOND IF \
+    IGNORE IN INDEX INFILE INNER INOUT INSENSITIVE INSERT INT INT1 \
+    INT2 INT3 INT4 INT8 INTEGER INTERVAL INTO IS ITERATE JOIN KEY \
+    KEYS KILL LEADING LEAVE LEFT LIKE LIMIT LINEAR LINES LOAD LOCALTIME \
+    LOCALTIMESTAMP LOCK LONG LONGBLOB LONGTEXT LOOP LOW_PRIORITY \
+    MASTER_BIND MASTER_SSL_VERIFY_SERVER_CERT \
+    MATCH MAXVALUE MEDIUMBLOB MEDIUMINT MEDIUMTEXT MIDDLEINT \
+    MINUTE_MICROSECOND MINUTE_SECOND MOD MODIFIES NATURAL NOT \
+    NO_WRITE_TO_BINLOG NULL NUMERIC ON ONE_SHOT OPTIMIZE OPTION OPTIONALLY \
+    OR ORDER OUT OUTER OUTFILE PARTITION PRECISION PRIMARY PROCEDURE PURGE RANGE \
+    READ READS READ_WRITE REAL REFERENCES REGEXP RELEASE RENAME REPEAT \
+    REPLACE REQUIRE RESIGNAL RESTRICT RETURN REVOKE RIGHT RLIKE SCHEMA \
+    SCHEMAS SECOND_MICROSECOND SELECT SENSITIVE SEPARATOR SET \
+    SHOW SIGNAL SMALLINT SPATIAL SPECIFIC SQL SQLEXCEPTION \
+    SQLSTATE SQLWARNING SQL_BIG_RESULT SQL_CALC_FOUND_ROWS \
+    SQL_SMALL_RESULT SSL STARTING STRAIGHT_JOIN TABLE TERMINATED \
+    THEN TINYBLOB TINYINT TINYTEXT TO TRAILING TRIGGER TRUE UNDO \
+    UNION UNIQUE UNLOCK UNSIGNED UPDATE USAGE USE USING UTC_DATE \
+    UTC_TIME UTC_TIMESTAMP VALUES VARBINARY VARCHAR VARCHARACTER \
+    VARYING WHEN WHERE WHILE WITH WRITE XOR YEAR_MONTH ZEROFILL
 
 list -i identifier \
-	ACTION BIT DATE ENUM NO TEXT TIME TIMESTAMP
+    ACTION BIT DATE ENUM NO TEXT TIME TIMESTAMP
 
 default keyword identifier
 default code column

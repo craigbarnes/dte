@@ -2,187 +2,187 @@
 syntax .js-esc
 
 state special
-	char "'\"\\bfnrtv" END special
-	char 0 3n
-	char x 2left
-	char u 4left
-	noeat short
+    char "'\"\\bfnrtv" END special
+    char 0 3n
+    char x 2left
+    char u 4left
+    noeat short
 
 state 4left special
-	char 0-9a-fA-F 3left
-	noeat short
+    char 0-9a-fA-F 3left
+    noeat short
 
 state 3left special
-	char 0-9a-fA-F 2left
-	noeat short
+    char 0-9a-fA-F 2left
+    noeat short
 
 state 2left special
-	char 0-9a-fA-F 1left
-	noeat short
+    char 0-9a-fA-F 1left
+    noeat short
 
 state 1left special
-	char 0-9a-fA-F END special
-	noeat short
+    char 0-9a-fA-F END special
+    noeat short
 
 state 3n special
-	char 0-9 2n
-	noeat short
+    char 0-9 2n
+    noeat short
 
 state 2n special
-	char 0-9 1n
-	noeat short
+    char 0-9 1n
+    noeat short
 
 state 1n special
-	char 0-9 END special
-	noeat short
+    char 0-9 END special
+    noeat short
 
 state short special
-	# don't eat \n
-	char -n "\n" END error
-	noeat END
+    # don't eat \n
+    char -n "\n" END error
+    noeat END
 
 # main syntax
 syntax javascript
 
 state code
-	char -b a-zA-Z_ ident
-	char 0 zero
-	char 1-9 dec
-	char . dot
-	str "//" cpp-comment
-	str "/*" c-comment
-	char \' sq
-	char \" dq
-	char "(;:,=*/%&|!?+-" foo
-	eat code
+    char -b a-zA-Z_ ident
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    str "//" cpp-comment
+    str "/*" c-comment
+    char \' sq
+    char \" dq
+    char "(;:,=*/%&|!?+-" foo
+    eat code
 
 # who knows where regexps are allowed?
 state foo code
-	char " \t(;:,=*%&|!?+-" foo
-	str "//" cpp-comment
-	str "/*" c-comment
-	char / regexp
-	noeat code
+    char " \t(;:,=*%&|!?+-" foo
+    str "//" cpp-comment
+    str "/*" c-comment
+    char / regexp
+    noeat code
 
 # fucking idiotic regexp syntax
 state regexp
-	char "\\" regexp-esc
-	char / regexp-flags
-	char "\n" code error
-	eat regexp
+    char "\\" regexp-esc
+    char / regexp-flags
+    char "\n" code error
+    eat regexp
 
 state regexp-esc regexp
-	char "\n" code error
-	eat regexp
+    char "\n" code error
+    eat regexp
 
 state regexp-flags regexp
-	char gim regexp-flags
-	noeat code
+    char gim regexp-flags
+    noeat code
 
 state zero numeric
-	char xX hex
-	char . float
-	noeat check-suffix
+    char xX hex
+    char . float
+    noeat check-suffix
 
 state dec numeric
-	char 0-9 dec
-	char eE exp
-	char . float
-	noeat check-suffix
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat check-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat check-suffix
+    char 0-9a-fA-F hex
+    noeat check-suffix
 
 state dot numeric
-	char 0-9 float
-	recolor code 1
-	noeat code
+    char 0-9 float
+    recolor code 1
+    noeat code
 
 state float numeric
-	char 0-9 float
-	char eE exp
-	noeat check-suffix
+    char 0-9 float
+    char eE exp
+    noeat check-suffix
 
 state exp numeric
-	char +- exp-digit
-	char 0-9 exp-digit
-	noeat check-suffix
+    char +- exp-digit
+    char 0-9 exp-digit
+    noeat check-suffix
 
 state exp-digit numeric
-	char 0-9 exp-digit
-	noeat check-suffix
+    char 0-9 exp-digit
+    noeat check-suffix
 
 state check-suffix error
-	char a-zA-Z0-9_ check-suffix
-	noeat code
+    char a-zA-Z0-9_ check-suffix
+    noeat code
 
 state ident
-	char -b a-zA-Z0-9_ ident
-	inlist keyword code
-	inlist reserved code keyword
-	inlist type code
-	inlist errortype code type
-	inlist constant code
-	inlist function code builtin
-	inlist message code builtin
-	inlist global code builtin
-	inlist member code builtin
-	inlist deprecated code
-	noeat code
+    char -b a-zA-Z0-9_ ident
+    inlist keyword code
+    inlist reserved code keyword
+    inlist type code
+    inlist errortype code type
+    inlist constant code
+    inlist function code builtin
+    inlist message code builtin
+    inlist global code builtin
+    inlist member code builtin
+    inlist deprecated code
+    noeat code
 
 state cpp-comment comment
-	char "\n" code
-	eat cpp-comment
+    char "\n" code
+    eat cpp-comment
 
 state c-comment comment
-	str "*/" code comment
-	eat c-comment
+    str "*/" code comment
+    eat c-comment
 
 state sq string
-	char \' code string
-	char "\n" code
-	char "\\" .js-esc:sq
-	eat sq
+    char \' code string
+    char "\n" code
+    char "\\" .js-esc:sq
+    eat sq
 
 state dq string
-	char \" code string
-	char "\n" code
-	char "\\" .js-esc:dq
-	eat dq
+    char \" code string
+    char "\n" code
+    char "\\" .js-esc:dq
+    eat dq
 
 list keyword \
-	break case catch continue debugger default delete do else finally for \
-	function if in instanceof new return switch this throw try typeof var \
-	void while with
+    break case catch continue debugger default delete do else finally for \
+    function if in instanceof new return switch this throw try typeof var \
+    void while with
 
 list reserved \
-	class const enum export extends implements import interface let \
-	package private protected public static super yield
+    class const enum export extends implements import interface let \
+    package private protected public static super yield
 
 list type \
-	Array Boolean Date Function Number Object RegExp String
+    Array Boolean Date Function Number Object RegExp String
 
 list errortype \
-	Error EvalError RangeError ReferenceError SyntaxError TypeError URIError
+    Error EvalError RangeError ReferenceError SyntaxError TypeError URIError
 
 list constant \
-	arguments \
-	Infinity Math NaN false null true undefined
+    arguments \
+    Infinity Math NaN false null true undefined
 
 list function \
-	decodeURI decodeURIComponent encodeURI encodeURIComponent eval \
-	isFinite isNaN parseFloat parseInt
+    decodeURI decodeURIComponent encodeURI encodeURIComponent eval \
+    isFinite isNaN parseFloat parseInt
 
 # builtin?
 list message \
-	alert confirm prompt status
+    alert confirm prompt status
 
 list global \
-	self window top parent
+    self window top parent
 
 list member \
-	document event location
+    document event location
 
 list deprecated \
-	escape unescape
+    escape unescape

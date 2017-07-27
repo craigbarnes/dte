@@ -1,9 +1,9 @@
 syntax config
 
 state code
-	char # comment
-	eat code
+    char # comment
+    eat code
 
 state comment
-	char "\n" code
-	eat comment
+    char "\n" code
+    eat comment

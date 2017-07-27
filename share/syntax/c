@@ -2,269 +2,269 @@
 syntax .c-esc
 
 state start special
-	char "abfnrtv'\\\"" END special
-	char 0-3 oct1
-	char 4-7 oct2
-	char x hex0
-	# anything but \n
-	char -n "\n" END error
-	# don't eat \n
-	noeat END
+    char "abfnrtv'\\\"" END special
+    char 0-3 oct1
+    char 4-7 oct2
+    char x hex0
+    # anything but \n
+    char -n "\n" END error
+    # don't eat \n
+    noeat END
 
 state oct1 special
-	char 0-7 oct2
-	noeat END
+    char 0-7 oct2
+    noeat END
 
 state oct2 special
-	char 0-7 END special
-	noeat END
+    char 0-7 END special
+    noeat END
 
 state hex0 special
-	char 0-9a-fA-F hex1
-	noeat END
+    char 0-9a-fA-F hex1
+    noeat END
 
 state hex1 special
-	char 0-9a-fA-F hex2
-	noeat END
+    char 0-9a-fA-F hex2
+    noeat END
 
 # in strings "\xaff" is an error but "\xafg" is not
 # in chars both are errors
 state hex2 special
-	char 0-9a-fA-F END error
-	noeat END
+    char 0-9a-fA-F END error
+    noeat END
 
 syntax .c-string
 
 state string
-	char "\"" END string
-	# avoid highlighting rest of the file again
-	char "\n" END error
-	char "\\" .c-esc:string
-	eat string
+    char "\"" END string
+    # avoid highlighting rest of the file again
+    char "\n" END error
+    char "\\" .c-esc:string
+    eat string
 
 syntax .c-char
 
 state char
-	char "'\n" END error
-	char \\ .c-esc:char-end
-	eat char-end
+    char "'\n" END error
+    char \\ .c-esc:char-end
+    eat char-end
 
 state char-end char
-	char "'" END char
-	eat END error
+    char "'" END char
+    eat END error
 
 syntax .c-comment
 
 state comment
-	char "*" star
-	eat comment
+    char "*" star
+    eat comment
 
 state star comment
-	char / END comment
-	noeat comment
+    char / END comment
+    noeat comment
 
 syntax .cpp-comment
 
 state comment
-	char "\n" END
-	char \\ backslash
-	eat comment
+    char "\n" END
+    char \\ backslash
+    eat comment
 
 state backslash comment
-	# multiline comment?
-	char "\n" comment
-	noeat comment
+    # multiline comment?
+    char "\n" comment
+    noeat comment
 
 # main syntax
 syntax c
 
 state start code
-	char " \t" start
-	char # preproc
-	char -b a-zA-Z_ ident-label
-	noeat c
+    char " \t" start
+    char # preproc
+    char -b a-zA-Z_ ident-label
+    noeat c
 
 state preproc
-	char " \t" preproc
-	char -b a-zA-Z_ preproc-ident
-	noeat preproc-misc
+    char " \t" preproc
+    char -b a-zA-Z_ preproc-ident
+    noeat preproc-misc
 
 state preproc-ident preproc
-	char -b a-zA-Z0-9_ preproc-ident
-	bufis "include" preproc-include
-	inlist preproccond preproccond
-	noeat preproc-misc
+    char -b a-zA-Z0-9_ preproc-ident
+    bufis "include" preproc-include
+    inlist preproccond preproccond
+    noeat preproc-misc
 
 state preproccond
-	# recolor to start of the line
-	recolor preproccond 100
-	noeat preproc-misc
+    # recolor to start of the line
+    recolor preproccond 100
+    noeat preproc-misc
 
 state preproc-misc preproc
-	char "\n" start
-	char "\\" preproc-cont
-	char \" .c-string:preproc-misc
-	char \' .c-char:preproc-misc
-	str "/*" .c-comment:preproc-misc
-	str "//" .cpp-comment:start
-	eat preproc-misc
+    char "\n" start
+    char "\\" preproc-cont
+    char \" .c-string:preproc-misc
+    char \' .c-char:preproc-misc
+    str "/*" .c-comment:preproc-misc
+    str "//" .cpp-comment:start
+    eat preproc-misc
 
 # Only '#include\s*<header>' or '#include\s*"header"' are recognized although
 # '#include /* comment */ <header>' is valid too.
 state preproc-include preproc
-	char " \t" preproc-include
-	char "\n" start
-	char "\\" preproc-cont
-	char '"' local-include
-	char '<' system-include
-	# not an error: #include DEFINE
-	noeat preproc-misc
+    char " \t" preproc-include
+    char "\n" start
+    char "\\" preproc-cont
+    char '"' local-include
+    char '<' system-include
+    # not an error: #include DEFINE
+    noeat preproc-misc
 
 state preproc-cont preproc
-	char "\n" preproc-misc
-	noeat preproc-misc
+    char "\n" preproc-misc
+    noeat preproc-misc
 
 state local-include string
-	char '"' end-include string
-	char "\n" start
-	eat local-include
+    char '"' end-include string
+    char "\n" start
+    eat local-include
 
 state system-include string
-	char '>' end-include string
-	char "\n" start
-	eat system-include
+    char '>' end-include string
+    char "\n" start
+    eat system-include
 
 state end-include preproc
-	char "\n" start
-	char " \t" end-include
-	str "/*" .c-comment:end-include
-	str "//" .cpp-comment:start
-	eat preproc-error
+    char "\n" start
+    char " \t" end-include
+    str "/*" .c-comment:end-include
+    str "//" .cpp-comment:start
+    eat preproc-error
 
 state preproc-error error
-	char "\n" start
-	eat preproc-error
+    char "\n" start
+    eat preproc-error
 
 state c code
-	char -b a-zA-Z_ ident
-	char 0 zero
-	char 1-9 dec
-	char . dot
-	char \" .c-string:c
-	char \' .c-char:c
-	char "\n" start
-	char ';' semicolon
-	str "/*" .c-comment:c
-	str "//" .cpp-comment:start
-	eat c
+    char -b a-zA-Z_ ident
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    char \" .c-string:c
+    char \' .c-char:c
+    char "\n" start
+    char ';' semicolon
+    str "/*" .c-comment:c
+    str "//" .cpp-comment:start
+    eat c
 
 state semicolon code
-	char " \t" semicolon
-	char -b a-zA-Z_ ident-label
-	noeat c
+    char " \t" semicolon
+    char -b a-zA-Z_ ident-label
+    noeat c
 
 state ident-label ident
-	char -b a-zA-Z0-9_ ident-label
-	char -b : label
-	# don't reset buffer (-b)
-	noeat -b ident
+    char -b a-zA-Z0-9_ ident-label
+    char -b : label
+    # don't reset buffer (-b)
+    noeat -b ident
 
 state label
-	recolor label
-	noeat c
+    recolor label
+    noeat c
 
 state ident
-	char -b a-zA-Z0-9_ ident
-	inlist keyword c
-	inlist type c
-	inlist constant c
-	inlist cpp-keyword c
-	noeat c
+    char -b a-zA-Z0-9_ ident
+    inlist keyword c
+    inlist type c
+    inlist constant c
+    inlist cpp-keyword c
+    noeat c
 
 state zero numeric
-	char xX hex
-	char 0-7 oct
-	char . float
-	noeat check-suffix
+    char xX hex
+    char 0-7 oct
+    char . float
+    noeat check-suffix
 
 state oct numeric
-	char 0-7 oct
-	noeat check-suffix
+    char 0-7 oct
+    noeat check-suffix
 
 state dec numeric
-	char 0-9 dec
-	char eE exp
-	char . float
-	noeat check-suffix
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat check-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat check-suffix
+    char 0-9a-fA-F hex
+    noeat check-suffix
 
 state check-suffix error
-	char -b a-zA-Z0-9_ check-suffix
-	inlist numeric-suffix c numeric
-	noeat c
+    char -b a-zA-Z0-9_ check-suffix
+    inlist numeric-suffix c numeric
+    noeat c
 
 state dot numeric
-	char 0-9 float
-	recolor code 1
-	noeat c
+    char 0-9 float
+    recolor code 1
+    noeat c
 
 state float numeric
-	char 0-9 float
-	char eE exp
-	char fFlL float-suffix
-	char a-zA-Z0-9_ error-ident
-	noeat c
+    char 0-9 float
+    char eE exp
+    char fFlL float-suffix
+    char a-zA-Z0-9_ error-ident
+    noeat c
 
 state float-suffix numeric
-	char a-zA-Z0-9_ error-ident
-	noeat c
+    char a-zA-Z0-9_ error-ident
+    noeat c
 
 state exp numeric
-	char +- exp-digit
-	char 0-9 exp-digit
-	char a-zA-Z0-9_ error-ident
-	noeat c
+    char +- exp-digit
+    char 0-9 exp-digit
+    char a-zA-Z0-9_ error-ident
+    noeat c
 
 state exp-digit numeric
-	char 0-9 exp-digit
-	char a-zA-Z0-9_ error-ident
-	noeat c
+    char 0-9 exp-digit
+    char a-zA-Z0-9_ error-ident
+    noeat c
 
 state error-ident error
-	char a-zA-Z0-9_ error-ident
-	noeat c
+    char a-zA-Z0-9_ error-ident
+    noeat c
 
 list keyword \
-	if else for while do continue switch case break default return goto \
-	asm const static inline register extern volatile auto restrict sizeof \
-	typedef
+    if else for while do continue switch case break default return goto \
+    asm const static inline register extern volatile auto restrict sizeof \
+    typedef
 
 list type \
-	struct union enum void char short int long float double signed \
-	unsigned size_t ssize_t off_t ptrdiff_t time_t va_list wchar_t \
-	bool FILE DIR
+    struct union enum void char short int long float double signed \
+    unsigned size_t ssize_t off_t ptrdiff_t time_t va_list wchar_t \
+    bool FILE DIR
 
 list constant \
-	NULL stdin stdout stderr false true \
-	EPERM ENOENT ESRCH EINTR EIO ENXIO E2BIG ENOEXEC EBADF ECHILD EAGAIN \
-	ENOMEM EACCES EFAULT ENOTBLK EBUSY EEXIST EXDEV ENODEV ENOTDIR EISDIR \
-	EINVAL ENFILE EMFILE ENOTTY ETXTBSY EFBIG ENOSPC ESPIPE EROFS EMLINK \
-	EPIPE EDOM ERANGE
+    NULL stdin stdout stderr false true \
+    EPERM ENOENT ESRCH EINTR EIO ENXIO E2BIG ENOEXEC EBADF ECHILD EAGAIN \
+    ENOMEM EACCES EFAULT ENOTBLK EBUSY EEXIST EXDEV ENODEV ENOTDIR EISDIR \
+    EINVAL ENFILE EMFILE ENOTTY ETXTBSY EFBIG ENOSPC ESPIPE EROFS EMLINK \
+    EPIPE EDOM ERANGE
 
 list preproccond \
-	elif else endif if ifdef ifndef
+    elif else endif if ifdef ifndef
 
 list -i numeric-suffix \
-	ULL UL U LLU LU LL L
+    ULL UL U LLU LU LL L
 
 list cpp-keyword \
-	catch class const_cast delete dynamic_cast explicit friend \
-	mutable namespace new operator private protected public \
-	reinterpret_cast static_cast template this throw try typeid \
-	typeof typename using virtual
+    catch class const_cast delete dynamic_cast explicit friend \
+    mutable namespace new operator private protected public \
+    reinterpret_cast static_cast template this throw try typeid \
+    typeof typename using virtual
 
 default keyword cpp-keyword
 default preproc preproccond

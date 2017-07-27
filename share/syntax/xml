@@ -2,135 +2,135 @@
 syntax .xml-entity
 
 state entity
-	char # hash
-	char -b a-zA-Z0-9 name
-	recolor error 1
-	char "\n" END
-	eat END error
+    char # hash
+    char -b a-zA-Z0-9 name
+    recolor error 1
+    char "\n" END
+    eat END error
 
 state hash entity
-	char xX x
-	char 0-9 dec
-	eat END error
+    char xX x
+    char 0-9 dec
+    eat END error
 
 state x entity
-	char 0-9a-fA-F hex
-	eat END error
+    char 0-9a-fA-F hex
+    eat END error
 
 state hex entity
-	char 0-9a-fA-F hex
-	char ";" END entity
-	eat END error
+    char 0-9a-fA-F hex
+    char ";" END entity
+    eat END error
 
 state dec entity
-	char 0-9 dec
-	char ";" END entity
-	eat END error
+    char 0-9 dec
+    char ";" END entity
+    eat END error
 
 state name error
-	char -b a-zA-Z0-9 name
-	inlist entity semicolon
-	noeat semicolon
+    char -b a-zA-Z0-9 name
+    inlist entity semicolon
+    noeat semicolon
 
 state semicolon error
-	char ";" END entity
-	eat END error
+    char ";" END entity
+    eat END error
 
 # reserved characters, latin1 symbols, latin1 characters, math, greek, other
 list entity \
-	quot apos amp lt gt
+    quot apos amp lt gt
 
 # main syntax
 syntax xml
 
 state line1 text
-	char " \t\n" line1
-	str "<?" xml
-	str "<!" doctype
-	noeat text
+    char " \t\n" line1
+    str "<?" xml
+    str "<!" doctype
+    noeat text
 
 state line2 text
-	char " \t\n" line2
-	str "<!" doctype
-	noeat text
+    char " \t\n" line2
+    str "<!" doctype
+    noeat text
 
 # Eat <?xml ... ?>
 state xml comment
-	char > line2 comment
-	char < line2 error
-	eat xml
+    char > line2 comment
+    char < line2 error
+    eat xml
 
 # Skip that useless bloated doctype which is too complicated to parse
 state doctype comment
-	char > text comment
-	char < text error
-	eat doctype
+    char > text comment
+    char < text error
+    eat doctype
 
 state text
-	str "<!--" comment
-	char < tag-start
-	char > text error
-	char "&" .xml-entity:text
-	eat text
+    str "<!--" comment
+    char < tag-start
+    char > text error
+    char "&" .xml-entity:text
+    eat text
 
 state comment
-	str -- --> text comment
-	eat comment
+    str -- --> text comment
+    eat comment
 
 state tag-start tag
-	char / close-tag
-	char -b a-zA-Z_: tag-name
-	char > text tag
-	eat tag-start error
+    char / close-tag
+    char -b a-zA-Z_: tag-name
+    char > text tag
+    eat tag-start error
 
 state close-tag tag
-	char -b a-zA-Z_: close-tag-name
-	eat text error
+    char -b a-zA-Z_: close-tag-name
+    eat text error
 
 state tag-name tag
-	char -b a-zA-Z0-9_:.- tag-name
-	noeat attrs
+    char -b a-zA-Z0-9_:.- tag-name
+    noeat attrs
 
 state close-tag-name tag
-	char -b a-zA-Z0-9_:.- close-tag-name
-	noeat close-tag-end
+    char -b a-zA-Z0-9_:.- close-tag-name
+    noeat close-tag-end
 
 state close-tag-end special
-	char " \t\n" close-tag-end
-	char > text tag
-	eat text error
+    char " \t\n" close-tag-end
+    char > text tag
+    eat text error
 
 state attrs code
-	char " \t\n" attrs
-	char -b a-zA-Z attr-name
-	char > text tag
-	char / short-close
-	eat attrs error
+    char " \t\n" attrs
+    char -b a-zA-Z attr-name
+    char > text tag
+    char / short-close
+    eat attrs error
 
 state short-close tag
-	char > text tag
-	eat text error
+    char > text tag
+    eat text error
 
 state attr-name attr
-	char a-zA-Z:_- attr-name
-	char = attr-eq
-	noeat attrs
+    char a-zA-Z:_- attr-name
+    char = attr-eq
+    noeat attrs
 
 state attr-eq attr
-	char \" dq
-	char \' sq
-	noeat attrs
+    char \" dq
+    char \' sq
+    noeat attrs
 
 state dq string
-	char \" attrs string
-	char "\n" attrs
-	char "&" .xml-entity:dq
-	eat dq
+    char \" attrs string
+    char "\n" attrs
+    char "&" .xml-entity:dq
+    eat dq
 
 state sq string
-	char \' attrs string
-	char "\n" attrs
-	char "&" .xml-entity:sq
-	eat sq
+    char \' attrs string
+    char "\n" attrs
+    char "&" .xml-entity:sq
+    eat sq
 
 default special entity

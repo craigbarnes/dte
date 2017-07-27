@@ -1,79 +1,79 @@
 syntax .lua-long-string
 
 state body string
-	char \] end-match
-	eat body
+    char \] end-match
+    eat body
 
 state end-match string
-	heredocend end
-	noeat body
+    heredocend end
+    noeat body
 
 state end string
-	char \] END string
-	noeat body
+    char \] END string
+    noeat body
 
 syntax .lua-long-comment
 
 state body comment
-	char \] end-match
-	eat body
+    char \] end-match
+    eat body
 
 state end-match comment
-	heredocend end
-	noeat body
+    heredocend end
+    noeat body
 
 state end comment
-	char \] END comment
-	noeat body
+    char \] END comment
+    noeat body
 
 syntax .lua-escape
 
 state escape
-	char "abfnrtv\\\"'" END special
-	char x hex1
-	char 0-1 decimal-low
-	char 2 decimal-two
-	char 3-9 decimal-high
-	noeat short
+    char "abfnrtv\\\"'" END special
+    char x hex1
+    char 0-1 decimal-low
+    char 2 decimal-two
+    char 3-9 decimal-high
+    noeat short
 
 state hex1 special
-	char 0-9a-fA-F hex2
-	noeat short
+    char 0-9a-fA-F hex2
+    noeat short
 
 state hex2 special
-	char 0-9a-fA-F END special
-	noeat short
+    char 0-9a-fA-F END special
+    noeat short
 
 state decimal-low special
-	char 0-9 decimal-last
-	noeat END
+    char 0-9 decimal-last
+    noeat END
 
 state decimal-last special
-	char 0-9 END special
-	noeat END
+    char 0-9 END special
+    noeat END
 
 state decimal-two special
-	char 0-4 decimal-last
-	char 5 decimal-two-five
-	char 6-9 decimal-short
-	noeat END
+    char 0-4 decimal-last
+    char 5 decimal-two-five
+    char 6-9 decimal-short
+    noeat END
 
 state decimal-two-five special
-	char 0-5 END special
-	char 6-9 END error
-	noeat END
+    char 0-5 END special
+    char 6-9 END error
+    noeat END
 
 state decimal-high special
-	char 0-9 decimal-short
-	noeat END
+    char 0-9 decimal-short
+    noeat END
 
 state decimal-short special
-	char 0-9 END error
-	noeat END
+    char 0-9 END error
+    noeat END
 
 state short special
-	char -n "\n" END error
-	noeat END
+    char -n "\n" END error
+    noeat END
 
 syntax lua
 
@@ -81,147 +81,147 @@ list constant false true nil
 list opword and or not
 
 list keyword \
-	do end while repeat until if elseif then else for in \
-	function local return goto break
+    do end while repeat until if elseif then else for in \
+    function local return goto break
 
 state first-line
-	char " \t" first-line
-	char # line-comment
-	noeat code
+    char " \t" first-line
+    char # line-comment
+    noeat code
 
 state code
-	char -b a-zA-Z_ identifier
-	char 0 zero
-	char 1-9 decimal
-	char \' single-quote
-	char \" double-quote
-	char \- dash
-	char \[ bracket
-	char -b : colon
-	str "~=" code operator
-	char =/+\*#<>^%|&~ code operator
-	str "..." code special
-	str ".." code operator
-	char . dot
-	char !@`$\? bad-char
-	eat code
+    char -b a-zA-Z_ identifier
+    char 0 zero
+    char 1-9 decimal
+    char \' single-quote
+    char \" double-quote
+    char \- dash
+    char \[ bracket
+    char -b : colon
+    str "~=" code operator
+    char =/+\*#<>^%|&~ code operator
+    str "..." code special
+    str ".." code operator
+    char . dot
+    char !@`$\? bad-char
+    eat code
 
 state bracket string
-	char \[ .lua-long-string:code string
-	char -b = bracket-equals
-	recolor default 1
-	noeat code
+    char \[ .lua-long-string:code string
+    char -b = bracket-equals
+    recolor default 1
+    noeat code
 
 state colon
-	char -b : colon-colon
-	noeat code
+    char -b : colon-colon
+    noeat code
 
 state colon-colon
-	char -b a-zA-Z_ colon-colon-name
-	eat code error
+    char -b a-zA-Z_ colon-colon-name
+    eat code error
 
 state colon-colon-name
-	char -b a-zA-Z0-9_ colon-colon-name
-	char -b : colon-colon-name-colon
-	eat code error
+    char -b a-zA-Z0-9_ colon-colon-name
+    char -b : colon-colon-name-colon
+    eat code error
 
 state colon-colon-name-colon
-	char -b : label
-	eat code error
+    char -b : label
+    eat code error
 
 state label
-	recolor label
-	noeat code
+    recolor label
+    noeat code
 
 state bracket-equals string
-	char -b = bracket-equals
-	char -n \[ code error
-	heredocbegin .lua-long-string code
+    char -b = bracket-equals
+    char -n \[ code error
+    heredocbegin .lua-long-string code
 
 state dash operator
-	char \- dash-dash
-	noeat code
+    char \- dash-dash
+    noeat code
 
 state dash-dash comment
-	recolor comment 2
-	char "\n" code
-	char \[ dash-dash-bracket
-	eat line-comment comment
+    recolor comment 2
+    char "\n" code
+    char \[ dash-dash-bracket
+    eat line-comment comment
 
 state dash-dash-bracket comment
-	char \[ .lua-long-comment:code comment
-	char -b = dash-dash-bracket-equals comment
-	eat line-comment
+    char \[ .lua-long-comment:code comment
+    char -b = dash-dash-bracket-equals comment
+    eat line-comment
 
 state dash-dash-bracket-equals
-	char -b = dash-dash-bracket-equals comment
-	char -n \[ line-comment
-	heredocbegin .lua-long-comment code
+    char -b = dash-dash-bracket-equals comment
+    char -n \[ line-comment
+    heredocbegin .lua-long-comment code
 
 state line-comment comment
-	char "\n" code
-	eat line-comment comment
+    char "\n" code
+    eat line-comment comment
 
 state zero numeric
-	char 0-9 decimal
-	char xX hex
-	char . float
-	noeat check-suffix
+    char 0-9 decimal
+    char xX hex
+    char . float
+    noeat check-suffix
 
 state decimal numeric
-	char 0-9 decimal
-	char eE exponent
-	char . float
-	noeat check-suffix
+    char 0-9 decimal
+    char eE exponent
+    char . float
+    noeat check-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat check-suffix
+    char 0-9a-fA-F hex
+    noeat check-suffix
 
 state float numeric
-	char 0-9 float
-	char eE exponent
-	noeat check-suffix
+    char 0-9 float
+    char eE exponent
+    noeat check-suffix
 
 state exponent numeric
-	char +- exponent-digit
-	char 0-9 exponent-digit
-	noeat check-suffix
+    char +- exponent-digit
+    char 0-9 exponent-digit
+    noeat check-suffix
 
 state exponent-digit numeric
-	char 0-9 exponent-digit
-	noeat check-suffix
+    char 0-9 exponent-digit
+    noeat check-suffix
 
 state check-suffix error
-	char a-zA-Z0-9_ check-suffix
-	noeat code
+    char a-zA-Z0-9_ check-suffix
+    noeat code
 
 state dot
-	char 0-9 dot-float
-	noeat code
+    char 0-9 dot-float
+    noeat code
 
 state dot-float
-	recolor numeric 2
-	noeat float
+    recolor numeric 2
+    noeat float
 
 state identifier
-	char -b a-zA-Z0-9_ identifier
-	inlist keyword code
-	inlist constant code
-	inlist opword code operator
-	noeat code
+    char -b a-zA-Z0-9_ identifier
+    inlist keyword code
+    inlist constant code
+    inlist opword code operator
+    noeat code
 
 state single-quote string
-	char \' code string
-	char "\n" code
-	char "\\" .lua-escape:single-quote special
-	eat single-quote
+    char \' code string
+    char "\n" code
+    char "\\" .lua-escape:single-quote special
+    eat single-quote
 
 state double-quote string
-	char \" code string
-	char "\n" code
-	char "\\" .lua-escape:double-quote special
-	eat double-quote
+    char \" code string
+    char "\n" code
+    char "\\" .lua-escape:double-quote special
+    eat double-quote
 
 state bad-char error
-	noeat code
+    noeat code

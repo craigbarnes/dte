@@ -2,26 +2,26 @@
 syntax .css-comment
 
 state comment
-	char "*" star
-	eat comment
+    char "*" star
+    eat comment
 
 state star comment
-	char / END comment
-	noeat comment
+    char / END comment
+    noeat comment
 
 # eat erroneous statement. stop at ; or \n
 syntax .css-statementerror
 
 state error
-	char ";\n" END code
-	eat error
+    char ";\n" END code
+    eat error
 
 # eat erroneous selector. stop at whitespace or {
 syntax .css-selectorerror
 
 state error
-	char -n "\t\n\r {" error
-	noeat END
+    char -n "\t\n\r {" error
+    noeat END
 
 # hex escape: \[0-9a-fA-F]{1-6}
 # one hex digit already eaten
@@ -29,435 +29,435 @@ state error
 syntax .css-hex
 
 state hex1 special
-	char 0-9a-fA-F hex2
-	noeat ws
+    char 0-9a-fA-F hex2
+    noeat ws
 
 state hex2 special
-	char 0-9a-fA-F hex3
-	noeat ws
+    char 0-9a-fA-F hex3
+    noeat ws
 
 state hex3 special
-	char 0-9a-fA-F hex4
-	noeat ws
+    char 0-9a-fA-F hex4
+    noeat ws
 
 state hex4 special
-	char 0-9a-fA-F hex5
-	noeat ws
+    char 0-9a-fA-F hex5
+    noeat ws
 
 state hex5 special
-	char 0-9a-fA-F ws special
-	noeat ws
+    char 0-9a-fA-F ws special
+    noeat ws
 
 state ws
-	# whitespace is always skipped, even if there are 6 hex digits!
-	char "\t\n\r " END special
-	noeat END
+    # whitespace is always skipped, even if there are 6 hex digits!
+    char "\t\n\r " END special
+    noeat END
 
 # double quote
 syntax .css-dq
 
 state string
-	char \" END string
-	char \\ esc
-	char "\n" END error
-	eat string
+    char \" END string
+    char \\ esc
+    char "\n" END error
+    eat string
 
 state esc special
-	# \\ + \n -> continue to next line
-	char "\n\\\"" string special
-	char 0-9a-fA-F .css-hex:string
-	eat string error
+    # \\ + \n -> continue to next line
+    char "\n\\\"" string special
+    char 0-9a-fA-F .css-hex:string
+    eat string error
 
 # single quote
 syntax .css-sq
 
 state string
-	char \' END string
-	char \\ esc
-	char "\n" END error
-	eat string
+    char \' END string
+    char \\ esc
+    char "\n" END error
+    eat string
 
 state esc special
-	# \\ + \n -> continue to next line
-	char "\n\\'" string special
-	char 0-9a-fA-F .css-hex:string
-	eat string error
+    # \\ + \n -> continue to next line
+    char "\n\\'" string special
+    char 0-9a-fA-F .css-hex:string
+    eat string error
 
 # identifier
 syntax .css-ident
 
 state ident
-	char "a-zA-Z0-9\xa1-\xff_-" ident
-	noeat END
+    char "a-zA-Z0-9\xa1-\xff_-" ident
+    noeat END
 
 # attribute selector [x=y], [x|=y], [x~=y]
 syntax .css-attributeselector
 
 state attributeselector code
-	char -b a-zA-Z attribute
-	noeat close
+    char -b a-zA-Z attribute
+    noeat close
 
 state attribute
-	char -b a-zA-Z attribute
-	char "|~" op
-	char = value code
-	noeat close
+    char -b a-zA-Z attribute
+    char "|~" op
+    char = value code
+    noeat close
 
 state op code
-	char = value code
-	eat END error
+    char = value code
+    eat END error
 
 state value
-	char \" .css-dq:close
-	char \' .css-sq:close
-	char a-zA-Z_- .css-ident:close
-	noeat close
+    char \" .css-dq:close
+    char \' .css-sq:close
+    char a-zA-Z_- .css-ident:close
+    noeat close
 
 state close
-	char ] END code
-	eat END error
+    char ] END code
+    eat END error
 
 # url(...)
 syntax .css-url
 
 state url
-	char \" .css-dq:close
-	char \' .css-sq:close
-	noeat plain
+    char \" .css-dq:close
+    char \' .css-sq:close
+    noeat plain
 
 state plain code
-	char ) END url
-	char "\n" END error
-	eat plain
+    char ) END url
+    char "\n" END error
+    eat plain
 
 state close
-	char ) END url
-	eat END error
+    char ) END url
+    eat END error
 
 # list of words
 syntax .css-medialist
 
 state list code
-	char "\t\n " list
-	char -b a-zA-Z0-9_- name
-	noeat END
+    char "\t\n " list
+    char -b a-zA-Z0-9_- name
+    noeat END
 
 state name code
-	char -b a-zA-Z0-9_ name
-	inlist mediatype next
-	noeat next
+    char -b a-zA-Z0-9_ name
+    inlist mediatype next
+    noeat next
 
 state next code
-	char "\t\n " next
-	char , must
-	noeat END
+    char "\t\n " next
+    char , must
+    noeat END
 
 state must code
-	char "\t\n " must
-	char -b a-zA-Z0-9_ name
-	eat END error
+    char "\t\n " must
+    char -b a-zA-Z0-9_ name
+    eat END error
 
 list -i mediatype \
-	all braille embossed handheld print projection screen speech tty tv
+    all braille embossed handheld print projection screen speech tty tv
 
 # import statement
 syntax .css-import
 
 state import atkeyword
-	char "\t\n " arg
-	noeat error
+    char "\t\n " arg
+    noeat error
 
 state arg code
-	char "\t\n " arg
-	char \" .css-dq:medialist
-	char \' .css-sq:medialist
-	str -i "url(" .css-url:medialist
-	noeat error
+    char "\t\n " arg
+    char \" .css-dq:medialist
+    char \' .css-sq:medialist
+    str -i "url(" .css-url:medialist
+    noeat error
 
 state medialist
-	noeat .css-medialist:mediaend
+    noeat .css-medialist:mediaend
 
 state mediaend
-	char \; END code
-	noeat error
+    char \; END code
+    noeat error
 
 state error
-	noeat .css-statementerror:END
+    noeat .css-statementerror:END
 
 # namespace statement
 syntax .css-namespace
 
 state namespace atkeyword
-	char "\t\n " arg1
-	noeat error
+    char "\t\n " arg1
+    noeat error
 
 state arg1 code
-	char "\t\n " arg1
-	str -i "url(" .css-url:namespace-end
-	char a-zA-Z prefix
-	noeat arg2
+    char "\t\n " arg1
+    str -i "url(" .css-url:namespace-end
+    char a-zA-Z prefix
+    noeat arg2
 
 state prefix code
-	char a-zA-Z0-9- prefix
-	char "\t\n " arg2
-	noeat error
+    char a-zA-Z0-9- prefix
+    char "\t\n " arg2
+    noeat error
 
 state arg2 code
-	char "\t\n " arg2
-	char \" .css-dq:namespace-end
-	char \' .css-sq:namespace-end
-	str -i "url(" .css-url:namespace-end
-	noeat error
+    char "\t\n " arg2
+    char \" .css-dq:namespace-end
+    char \' .css-sq:namespace-end
+    str -i "url(" .css-url:namespace-end
+    noeat error
 
 state namespace-end
-	char "\t\n " namespace-end
-	char \; END code
-	noeat error
+    char "\t\n " namespace-end
+    char \; END code
+    noeat error
 
 state error
-	noeat .css-statementerror:END
+    noeat .css-statementerror:END
 
 # main syntax
 syntax css
 
 state verybeginning
-	# these 9 chars exactly + double quote
-	str -i '@charset ' charset
-	noeat start
+    # these 9 chars exactly + double quote
+    str -i '@charset ' charset
+    noeat start
 
 state charset atkeyword
-	char \" .css-dq:atend
-	eat .css-statementerror:start
+    char \" .css-dq:atend
+    eat .css-statementerror:start
 
 state atend code
-	char "\t\n " atend
-	char \; start
-	eat .css-statementerror:start
+    char "\t\n " atend
+    char \; start
+    eat .css-statementerror:start
 
 state start code
-	char " \t\n" start
-	char -b a-zA-Z tag
-	char . class
-	char # id
-	char -b : pseudo
-	char \[ .css-attributeselector:start
-	char \{ block
-	char 0-9_- .css-selectorerror:start
-	str "/*" .css-comment:start
-	char -b @ atrule
-	eat start
+    char " \t\n" start
+    char -b a-zA-Z tag
+    char . class
+    char # id
+    char -b : pseudo
+    char \[ .css-attributeselector:start
+    char \{ block
+    char 0-9_- .css-selectorerror:start
+    str "/*" .css-comment:start
+    char -b @ atrule
+    eat start
 
 state tag
-	char -b a-zA-Z0-9 tag
-	char _- .css-selectorerror:start
-	noeat start
+    char -b a-zA-Z0-9 tag
+    char _- .css-selectorerror:start
+    noeat start
 
 state pseudo code
-	char -b a-zA-Z0-9:- pseudo
-	inlist pseudoclass start
-	inlist exprpseudo nth pseudoclass
-	inlist pseudoelement start
-	inlist pagepseudoclass start pseudoclass
-	bufis -i :lang complexpseudo
-	bufis -i :not complexpseudo
-	noeat start
+    char -b a-zA-Z0-9:- pseudo
+    inlist pseudoclass start
+    inlist exprpseudo nth pseudoclass
+    inlist pseudoelement start
+    inlist pagepseudoclass start pseudoclass
+    bufis -i :lang complexpseudo
+    bufis -i :not complexpseudo
+    noeat start
 
 # lang(indetifier) { ... }
 # not(table) { ... }
 state complexpseudo pseudoclass
-	char ( complexexpr
-	eat .css-selectorerror:start
+    char ( complexexpr
+    eat .css-selectorerror:start
 
 # nth-child(odd|even|an+b) etc.
 state nth
-	char ( nthexpr
-	eat .css-selectorerror:start
+    char ( nthexpr
+    eat .css-selectorerror:start
 
 state nthexpr expr
-	char a-z0-9+- nthexpr
-	char ) start expr
-	eat .css-selectorerror:start
+    char a-z0-9+- nthexpr
+    char ) start expr
+    eat .css-selectorerror:start
 
 state complexexpr expr
-	char ) start expr
-	char -n "\n" complexexpr
-	noeat start
+    char ) start expr
+    char -n "\n" complexexpr
+    noeat start
 
 state class
-	char a-zA-Z0-9_- class
-	noeat start
+    char a-zA-Z0-9_- class
+    noeat start
 
 state id
-	char a-zA-Z0-9_- id
-	noeat start
+    char a-zA-Z0-9_- id
+    noeat start
 
 state atrule code
-	char -b a-zA-Z0-9_- atrule
-	# selectors
-	inlist atkeyword start
-	# @import { URI | string } [ media type, ...];
-	bufis -i "@import" .css-import:start atkeyword
-	# @namespace [prefix] { URI | string };
-	bufis -i "@namespace" .css-namespace:start atkeyword
-	# FIXME: @media not allowed inside @media
-	bufis -i @media mediatypes atkeyword
-	noeat start
+    char -b a-zA-Z0-9_- atrule
+    # selectors
+    inlist atkeyword start
+    # @import { URI | string } [ media type, ...];
+    bufis -i "@import" .css-import:start atkeyword
+    # @namespace [prefix] { URI | string };
+    bufis -i "@namespace" .css-namespace:start atkeyword
+    # FIXME: @media not allowed inside @media
+    bufis -i @media mediatypes atkeyword
+    noeat start
 
 state mediatypes
-	noeat .css-medialist:mediablock
+    noeat .css-medialist:mediablock
 
 state mediablock code
-	char "\t\n " mediablock
-	char \{ start
-	eat start error
+    char "\t\n " mediablock
+    char \{ start
+    eat start error
 
 state block code
-	char " \t\n;" block
-	char -b a-zA-Z- property
-	char 0-9_- property-error
-	char } start
-	str "/*" .css-comment:block
-	eat block
+    char " \t\n;" block
+    char -b a-zA-Z- property
+    char 0-9_- property-error
+    char } start
+    str "/*" .css-comment:block
+    eat block
 
 state property code
-	char -b a-zA-Z- property
-	char 0-9_ property-error
-	inlist property property-end
-	inlist fontfaceproperty property-end property
-	# could be unknown property
-	noeat property-end
+    char -b a-zA-Z- property
+    char 0-9_ property-error
+    inlist property property-end
+    inlist fontfaceproperty property-end property
+    # could be unknown property
+    noeat property-end
 
 state property-end code
-	char : values
-	char " \t\n" property-end
-	char ";" block
-	char } start
-	eat property-error
+    char : values
+    char " \t\n" property-end
+    char ";" block
+    char } start
+    eat property-error
 
 state values code
-	char " \t\n" values
-	char 0-9 int
-	char -- - minus
-	char # hexcolor
-	char ";" block
-	char \" .css-dq:values
-	char \' .css-sq:values
-	str -i "url(" .css-url:values
-	char -b a-zA-Z_ value
-	char } start
-	str "/*" .css-comment:values
-	eat values
+    char " \t\n" values
+    char 0-9 int
+    char -- - minus
+    char # hexcolor
+    char ";" block
+    char \" .css-dq:values
+    char \' .css-sq:values
+    str -i "url(" .css-url:values
+    char -b a-zA-Z_ value
+    char } start
+    str "/*" .css-comment:values
+    eat values
 
 state minus numeric
-	char 0-9 int
-	char . float
-	noeat values
+    char 0-9 int
+    char . float
+    noeat values
 
 state int numeric
-	char 0-9 int
-	char . float
-	char -b a-zA-Z% unit
-	noeat values
+    char 0-9 int
+    char . float
+    char -b a-zA-Z% unit
+    noeat values
 
 state float numeric
-	char 0-9 float
-	char -b a-zA-Z% unit
-	noeat values
+    char 0-9 float
+    char -b a-zA-Z% unit
+    noeat values
 
 state unit error
-	char -b a-zA-Z% unit
-	inlist unit values numeric
-	char ";" block
-	char } start
-	eat value-error
+    char -b a-zA-Z% unit
+    inlist unit values numeric
+    char ";" block
+    char } start
+    eat value-error
 
 state value code
-	char -b a-zA-Z0-9_- value
-	inlist value values
-	inlist color values
-	inlist func func value
-	noeat values
+    char -b a-zA-Z0-9_- value
+    inlist value values
+    inlist color values
+    inlist func func value
+    noeat values
 
 # FIXME: length must be 3 or 6
 state hexcolor color
-	char 0-9a-fA-F hexcolor
-	char g-zG-Z_- value-error
-	noeat values
+    char 0-9a-fA-F hexcolor
+    char g-zG-Z_- value-error
+    noeat values
 
 state func code
-	char " \t" func
-	char ( params
-	eat value-error
+    char " \t" func
+    char ( params
+    eat value-error
 
 state params code
-	char ) values
-	char ";" block
-	char } start
-	eat params
+    char ) values
+    char ";" block
+    char } start
+    eat params
 
 state property-error error
-	char a-zA-Z0-9_- property-error
-	noeat property
+    char a-zA-Z0-9_- property-error
+    noeat property
 
 state value-error error
-	char a-zA-Z0-9_- value-error
-	noeat values
+    char a-zA-Z0-9_- value-error
+    noeat values
 
 list -i property \
-	background background-attachment background-color \
-	background-image background-position background-repeat \
-	border border-bottom border-bottom-width border-color \
-	border-left border-left-width border-right border-right-width \
-	border-style border-top border-top-width border-width \
-	clear color display float \
-	font font-family font-size font-style font-variant font-weight \
-	height letter-spacing line-height \
-	list-style list-style-image list-style-position list-style-type \
-	margin margin-bottom margin-left margin-right margin-top \
-	padding padding-bottom padding-left padding-right padding-top \
-	text-align text-decoration text-indent text-transform \
-	vertical-align white-space width word-spacing \
-	border-bottom-color border-bottom-style border-collapse \
-	border-left-color border-left-style border-right-color \
-	border-right-style border-spacing border-top-color \
-	border-top-style bottom caption-side clip content \
-	counter-increment counter-reset cursor direction empty-cells \
-	left max-height max-width min-height min-width \
-	orphans outline outline-color outline-style outline-width \
-	overflow page-break-after page-break-before page-break-inside \
-	position quotes right table-layout text-shadow top \
-	unicode-bidi visibility widows z-index
+    background background-attachment background-color \
+    background-image background-position background-repeat \
+    border border-bottom border-bottom-width border-color \
+    border-left border-left-width border-right border-right-width \
+    border-style border-top border-top-width border-width \
+    clear color display float \
+    font font-family font-size font-style font-variant font-weight \
+    height letter-spacing line-height \
+    list-style list-style-image list-style-position list-style-type \
+    margin margin-bottom margin-left margin-right margin-top \
+    padding padding-bottom padding-left padding-right padding-top \
+    text-align text-decoration text-indent text-transform \
+    vertical-align white-space width word-spacing \
+    border-bottom-color border-bottom-style border-collapse \
+    border-left-color border-left-style border-right-color \
+    border-right-style border-spacing border-top-color \
+    border-top-style bottom caption-side clip content \
+    counter-increment counter-reset cursor direction empty-cells \
+    left max-height max-width min-height min-width \
+    orphans outline outline-color outline-style outline-width \
+    overflow page-break-after page-break-before page-break-inside \
+    position quotes right table-layout text-shadow top \
+    unicode-bidi visibility widows z-index
 
 list -i value \
-	absolute always armenian auto avoid baseline bidi-override blink \
-	block bold bolder both bottom capitalize center circle \
-	cjk-ideographic collapse compact condensed crop cross crosshair \
-	dashed decimal decimal-leading-zero default disc dotted double \
-	e-resize embed expanded extra-condensed extra-expanded fixed \
-	georgian groove hebrew help hidden hide hiragana hiragana-iroha \
-	inline inline-table inset inside italic justify katakana \
-	katakana-iroha landscape large larger left lighter line-through \
-	list-item lower-alpha lower-greek lower-latin lower-roman lowercase \
-	ltr marker medium middle move n-resize narrower ne-resize no-repeat \
-	none normal nowrap nw-resize oblique outset outside overline pointer \
-	potrait pre relative repeat repeat-x repeat-y ridge right rtl run-in \
-	s-resize scroll se-resize semi-condensed semi-expanded separate show \
-	small small-caps smaller solid square static sub super sw-resize \
-	table table-caption table-cell table-column table-column-group \
-	table-footer-group table-header-group table-row table-row-group text \
-	text-bottom text-top thick thin top ultra-condensed ultra-expanded \
-	underline upper-alpha upper-latin upper-roman uppercase visible \
-	w-resize wait wider x-large x-small xx-large xx-small
+    absolute always armenian auto avoid baseline bidi-override blink \
+    block bold bolder both bottom capitalize center circle \
+    cjk-ideographic collapse compact condensed crop cross crosshair \
+    dashed decimal decimal-leading-zero default disc dotted double \
+    e-resize embed expanded extra-condensed extra-expanded fixed \
+    georgian groove hebrew help hidden hide hiragana hiragana-iroha \
+    inline inline-table inset inside italic justify katakana \
+    katakana-iroha landscape large larger left lighter line-through \
+    list-item lower-alpha lower-greek lower-latin lower-roman lowercase \
+    ltr marker medium middle move n-resize narrower ne-resize no-repeat \
+    none normal nowrap nw-resize oblique outset outside overline pointer \
+    potrait pre relative repeat repeat-x repeat-y ridge right rtl run-in \
+    s-resize scroll se-resize semi-condensed semi-expanded separate show \
+    small small-caps smaller solid square static sub super sw-resize \
+    table table-caption table-cell table-column table-column-group \
+    table-footer-group table-header-group table-row table-row-group text \
+    text-bottom text-top thick thin top ultra-condensed ultra-expanded \
+    underline upper-alpha upper-latin upper-roman uppercase visible \
+    w-resize wait wider x-large x-small xx-large xx-small
 
 list -i color \
-	aqua black blue fuchsia gray green lime maroon navy olive \
-	purple red silver teal white yellow
+    aqua black blue fuchsia gray green lime maroon navy olive \
+    purple red silver teal white yellow
 
 # simple pseudo-classes
 list -i pseudoclass \
-	:active :checked :disabled :empty :enabled :first-child \
-	:first-of-type :focus :hover :last-child :last-of-type :link \
-	:only-child :only-of-type :root :target :visited
+    :active :checked :disabled :empty :enabled :first-child \
+    :first-of-type :focus :hover :last-child :last-of-type :link \
+    :only-child :only-of-type :root :target :visited
 
 # nth-child(odd) etc.
 list -i exprpseudo :nth-child :nth-last-child :nth-last-of-type :nth-of-type
@@ -466,29 +466,29 @@ list -i exprpseudo :nth-child :nth-last-child :nth-last-of-type :nth-of-type
 # CSS2.1 changed pseudo-elements start with a double colon
 # support only double colon for CSS3 pseudo-elements
 list -i pseudoelement \
-	:after :before :first-letter :first-line \
-	::after ::before ::first-letter ::first-line \
-	::selection
+    :after :before :first-letter :first-line \
+    ::after ::before ::first-letter ::first-line \
+    ::selection
 
 # @page
 list -i pagepseudoclass \
-	:left :right :first
+    :left :right :first
 
 # @font-face
 list -i fontfaceproperty \
-	font-family font-stretch font-style font-weight src unicode-range
+    font-family font-stretch font-style font-weight src unicode-range
 
 # %, distance, angle, time, frequency, resolution
 list -i unit \
-	% \
-	ch cm em ex in mm pc pt px rem vh vw vmin vmax \
-	deg grad rad turn \
-	ms s \
-	hz khz \
-	dpcm dpi dppx
+    % \
+    ch cm em ex in mm pc pt px rem vh vw vmin vmax \
+    deg grad rad turn \
+    ms s \
+    hz khz \
+    dpcm dpi dppx
 
 list -i func \
-	attr clip counter rect rgb
+    attr clip counter rect rgb
 
 # at-rules that work as selectors
 list -i atkeyword @page @font-face

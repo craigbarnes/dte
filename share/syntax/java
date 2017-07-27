@@ -1,163 +1,163 @@
 syntax .java-esc
 
 state char-esc special
-	char "bfnrt\\'\"" END special
-	char 0 oct
-	char u hex4
-	noeat short
+    char "bfnrt\\'\"" END special
+    char 0 oct
+    char u hex4
+    noeat short
 
 state oct special
-	char 0-3 oct2
-	char 4-7 oct1
-	noeat END
+    char 0-3 oct2
+    char 4-7 oct1
+    noeat END
 
 state oct2 special
-	char 0-7 oct1
-	noeat END
+    char 0-7 oct1
+    noeat END
 
 state oct1 special
-	char 0-7 END special
-	noeat END
+    char 0-7 END special
+    noeat END
 
 # \uXXXX can be anywhere in source code but that's just stupid
 state hex4 special
-	char 0-9a-fA-F hex3
-	noeat END
+    char 0-9a-fA-F hex3
+    noeat END
 
 state hex3 special
-	char 0-9a-fA-F hex2
-	noeat END
+    char 0-9a-fA-F hex2
+    noeat END
 
 state hex2 special
-	char 0-9a-fA-F hex1
-	noeat END
+    char 0-9a-fA-F hex1
+    noeat END
 
 state hex1 special
-	char 0-9a-fA-F END special
-	noeat END
+    char 0-9a-fA-F END special
+    noeat END
 
 state short special
-	char "\x80-\xff" not-ascii
-	# any ASCII character but \n
-	char -n "\n" END error
-	# don't eat \n
-	noeat END
+    char "\x80-\xff" not-ascii
+    # any ASCII character but \n
+    char -n "\n" END error
+    # don't eat \n
+    noeat END
 
 # eats (at least) one multibyte UTF-8 character
 state not-ascii error
-	char "\x80-\xff" not-ascii
-	noeat END
+    char "\x80-\xff" not-ascii
+    noeat END
 
 syntax java
 
 state code
-	char -b a-zA-Z_ ident
-	char 0 zero
-	char 1-9 dec
-	char . dot
-	char \" string
-	char \' char
-	str "//" cpp-comment
-	str "/*" c-comment
-	eat code
+    char -b a-zA-Z_ ident
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    char \" string
+    char \' char
+    str "//" cpp-comment
+    str "/*" c-comment
+    eat code
 
 state cpp-comment comment
-	char "\n" code
-	eat cpp-comment
+    char "\n" code
+    eat cpp-comment
 
 state c-comment comment
-	str "*/" code comment
-	eat c-comment
+    str "*/" code comment
+    eat c-comment
 
 state ident
-	char -b a-zA-Z0-9_ ident
-	inlist keyword code
-	inlist type code
-	inlist constant code
-	noeat code
+    char -b a-zA-Z0-9_ ident
+    inlist keyword code
+    inlist type code
+    inlist constant code
+    noeat code
 
 state zero numeric
-	char xX hex
-	char 0-7 oct
-	char . float
-	noeat num-suffix
+    char xX hex
+    char 0-7 oct
+    char . float
+    noeat num-suffix
 
 state oct numeric
-	char 0-7 oct
-	noeat num-suffix
+    char 0-7 oct
+    noeat num-suffix
 
 state dec numeric
-	char 0-9 dec
-	char eE exp
-	char . float
-	noeat num-suffix
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat num-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat num-suffix
+    char 0-9a-fA-F hex
+    noeat num-suffix
 
 state num-suffix
-	char lLfFdD check-suffix numeric
-	noeat check-suffix
+    char lLfFdD check-suffix numeric
+    noeat check-suffix
 
 state float-suffix
-	char fFdD check-suffix numeric
-	noeat check-suffix
+    char fFdD check-suffix numeric
+    noeat check-suffix
 
 state check-suffix error
-	char a-zA-Z0-9_ check-suffix
-	noeat code
+    char a-zA-Z0-9_ check-suffix
+    noeat code
 
 state dot numeric
-	char 0-9 float
-	recolor code 1
-	noeat code
+    char 0-9 float
+    recolor code 1
+    noeat code
 
 state float numeric
-	char 0-9 float
-	char eE exp
-	noeat float-suffix
+    char 0-9 float
+    char eE exp
+    noeat float-suffix
 
 state exp numeric
-	char +- exp-digit
-	char 0-9 exp-digit
-	noeat float-suffix
+    char +- exp-digit
+    char 0-9 exp-digit
+    noeat float-suffix
 
 state exp-digit numeric
-	char 0-9 exp-digit
-	noeat float-suffix
+    char 0-9 exp-digit
+    noeat float-suffix
 
 state string
-	char \\ .java-esc:string
-	char \" code string
-	eat string
+    char \\ .java-esc:string
+    char \" code string
+    eat string
 
 state char
-	char "\\" .java-esc:char-end
-	char "\n" code
-	char \' code error
-	char "\x80-\xff" not-ascii
-	eat char-end
+    char "\\" .java-esc:char-end
+    char "\n" code
+    char \' code error
+    char "\x80-\xff" not-ascii
+    eat char-end
 
 # eats (at least) one multibyte UTF-8 character
 state not-ascii char
-	char "\x80-\xff" not-ascii
-	noeat char-end
+    char "\x80-\xff" not-ascii
+    noeat char-end
 
 state char-end char
-	char \' code char
-	eat code error
+    char \' code char
+    eat code error
 
 list keyword \
-	abstract assert boolean break byte case catch char class const \
-	continue default do double else enum extends final finally float \
-	for goto if implements import instanceof int interface long native \
-	new package private protected public return short static strictfp \
-	super switch synchronized this throw throws transient try void \
-	volatile while
+    abstract assert boolean break byte case catch char class const \
+    continue default do double else enum extends final finally float \
+    for goto if implements import instanceof int interface long native \
+    new package private protected public return short static strictfp \
+    super switch synchronized this throw throws transient try void \
+    volatile while
 
 list type \
-	byte short int long float double boolean char
+    byte short int long float double boolean char
 
 list constant \
-	false true null
+    false true null

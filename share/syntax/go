@@ -1,199 +1,199 @@
 syntax .go-esc
 
 state special
-	char 0-3 oct1
-	# >255 byte value
-	char 4-7 END error
-	char x 2left
-	char u 4left
-	char U 8left
-	noeat short
+    char 0-3 oct1
+    # >255 byte value
+    char 4-7 END error
+    char x 2left
+    char u 4left
+    char U 8left
+    noeat short
 
 state oct1 special
-	char 0-7 oct2
-	noeat short
+    char 0-7 oct2
+    noeat short
 
 state oct2 special
-	char 0-7 END special
-	noeat short
+    char 0-7 END special
+    noeat short
 
 state 8left special
-	char 0-9a-fA-F 7left
-	noeat short
+    char 0-9a-fA-F 7left
+    noeat short
 
 state 7left special
-	char 0-9a-fA-F 6left
-	noeat short
+    char 0-9a-fA-F 6left
+    noeat short
 
 state 6left special
-	char 0-9a-fA-F 5left
-	noeat short
+    char 0-9a-fA-F 5left
+    noeat short
 
 state 5left special
-	char 0-9a-fA-F 4left
-	noeat short
+    char 0-9a-fA-F 4left
+    noeat short
 
 state 4left special
-	char 0-9a-fA-F 3left
-	noeat short
+    char 0-9a-fA-F 3left
+    noeat short
 
 state 3left special
-	char 0-9a-fA-F 2left
-	noeat short
+    char 0-9a-fA-F 2left
+    noeat short
 
 state 2left special
-	char 0-9a-fA-F 1left
-	noeat short
+    char 0-9a-fA-F 1left
+    noeat short
 
 state 1left special
-	char 0-9a-fA-F END special
-	noeat short
+    char 0-9a-fA-F END special
+    noeat short
 
 state short special
-	char "\x80-\xff" not-ascii
-	# any ASCII character but \n
-	char -n "\n" END error
-	# don't eat \n
-	noeat END
+    char "\x80-\xff" not-ascii
+    # any ASCII character but \n
+    char -n "\n" END error
+    # don't eat \n
+    noeat END
 
 # eats (at least) one multibyte UTF-8 character
 state not-ascii error
-	char "\x80-\xff" not-ascii
-	noeat END
+    char "\x80-\xff" not-ascii
+    noeat END
 
 syntax go
 
 state go code
-	char -b A-Z exported
-	char -b a-z_ ident
-	char 0 zero
-	char 1-9 dec
-	char . dot
-	char "\"" string
-	char "'" char
-	char ` raw-string
-	str "//" cpp-comment
-	str "/*" c-comment
-	eat go
+    char -b A-Z exported
+    char -b a-z_ ident
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    char "\"" string
+    char "'" char
+    char ` raw-string
+    str "//" cpp-comment
+    str "/*" c-comment
+    eat go
 
 state exported
-	char -b a-zA-Z0-9_ exported
-	noeat go
+    char -b a-zA-Z0-9_ exported
+    noeat go
 
 state ident
-	char -b a-zA-Z0-9_ ident
-	inlist keyword go
-	inlist type go
-	inlist constant go
-	inlist builtin go
-	noeat go
+    char -b a-zA-Z0-9_ ident
+    inlist keyword go
+    inlist type go
+    inlist constant go
+    inlist builtin go
+    noeat go
 
 state zero numeric
-	char xX hex
-	char 0-7 oct
-	char . float
-	noeat check-imag
+    char xX hex
+    char 0-7 oct
+    char . float
+    noeat check-imag
 
 state oct numeric
-	char 0-7 oct
-	noeat check-suffix
+    char 0-7 oct
+    noeat check-suffix
 
 state dec numeric
-	char 0-9 dec
-	char eE exp
-	char . float
-	noeat check-imag
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat check-imag
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat check-suffix
+    char 0-9a-fA-F hex
+    noeat check-suffix
 
 state check-suffix error
-	char a-zA-Z0-9_ check-suffix
-	noeat go
+    char a-zA-Z0-9_ check-suffix
+    noeat go
 
 state check-imag code
-	char i check-suffix numeric
-	noeat check-suffix
+    char i check-suffix numeric
+    noeat check-suffix
 
 state dot numeric
-	char 0-9 float
-	recolor code 1
-	noeat go
+    char 0-9 float
+    recolor code 1
+    noeat go
 
 state float numeric
-	char 0-9 float
-	char eE exp
-	noeat check-imag
+    char 0-9 float
+    char eE exp
+    noeat check-imag
 
 state exp numeric
-	char +- exp-digit
-	char 0-9 exp-digit
-	noeat check-imag
+    char +- exp-digit
+    char 0-9 exp-digit
+    noeat check-imag
 
 state exp-digit numeric
-	char 0-9 exp-digit
-	noeat check-imag
+    char 0-9 exp-digit
+    noeat check-imag
 
 state string
-	char "\"" go string
-	char "\n" go
-	char "\\" string-esc
-	eat string
+    char "\"" go string
+    char "\n" go
+    char "\\" string-esc
+    eat string
 
 state string-esc special
-	# \' is illegal inside string literal
-	char "abfnrtv\"\\" string special
-	noeat .go-esc:string
+    # \' is illegal inside string literal
+    char "abfnrtv\"\\" string special
+    noeat .go-esc:string
 
 state char
-	char "'" go error
-	char "\\" char-esc
-	char "\n" go
-	# assume multiple non-ASCII bytes are one UTF-8 character
-	char "\x80-\xff" not-ascii
-	eat char-end
+    char "'" go error
+    char "\\" char-esc
+    char "\n" go
+    # assume multiple non-ASCII bytes are one UTF-8 character
+    char "\x80-\xff" not-ascii
+    eat char-end
 
 state char-esc special
-	# \" is illegal inside character literal
-	char "abfnrtv'\\" char-end special
-	noeat .go-esc:char-end
+    # \" is illegal inside character literal
+    char "abfnrtv'\\" char-end special
+    noeat .go-esc:char-end
 
 state not-ascii char
-	char "\x80-\xff" not-ascii
-	noeat char-end
+    char "\x80-\xff" not-ascii
+    noeat char-end
 
 state char-end char
-	char "'" go char
-	eat go error
+    char "'" go char
+    eat go error
 
 state raw-string string
-	char ` go string
-	eat raw-string
+    char ` go string
+    eat raw-string
 
 state cpp-comment comment
-	char "\n" go
-	eat cpp-comment
+    char "\n" go
+    eat cpp-comment
 
 state c-comment comment
-	str "*/" go comment
-	eat c-comment
+    str "*/" go comment
+    eat c-comment
 
 list keyword \
-	break case chan const continue default defer else fallthrough \
-	for func go goto if import interface map package range return \
-	select struct switch type var
+    break case chan const continue default defer else fallthrough \
+    for func go goto if import interface map package range return \
+    select struct switch type var
 
 list constant \
-	false true iota nil
+    false true iota nil
 
 list builtin \
-	append cap close complex delete copy imag len \
-	make new panic print println real recover
+    append cap close complex delete copy imag len \
+    make new panic print println real recover
 
 list type \
-	bool byte complex64 complex128 float32 float64 \
-	int8 int16 int32 int64 string uint8 uint16 uint32 uint64 \
-	int uint uintptr error rune
+    bool byte complex64 complex128 float32 float64 \
+    int8 int16 int32 int64 string uint8 uint16 uint32 uint64 \
+    int uint uintptr error rune
 
 default ident exported

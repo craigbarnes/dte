@@ -1,7 +1,7 @@
 # default - not highlighted
 # text    - "highlighted" as text, usually same color as default
-# code	  - usually same as text
-# ident	  - variable, function or unknown type. usually same as code
+# code    - usually same as text
+# ident   - variable, function or unknown type. usually same as code
 #
 # The colors text and code are usually same but spell checking
 # (not implemented, sorry) is only enabled for text (and comments).

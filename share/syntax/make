@@ -1,95 +1,95 @@
 syntax make
 
 state start code
-	char "\n" start
-	char "\t" tab-indent
-	char " " space-indent
-	noeat not-recipe
+    char "\n" start
+    char "\t" tab-indent
+    char " " space-indent
+    noeat not-recipe
 
 # "^\t[ \t]*"
 state tab-indent code
-	char " \t" tab-indent
-	char "\n" start
-	char -b a-zA-Z_- not-target
-	noeat make
+    char " \t" tab-indent
+    char "\n" start
+    char -b a-zA-Z_- not-target
+    noeat make
 
 # "^ [ \t]*"
 state space-indent code
-	char " \t" space-indent
-	noeat not-recipe
+    char " \t" space-indent
+    noeat not-recipe
 
 # can't be target but can be recipe, variable or keyword
 state not-target code
-	char -b a-zA-Z_- not-target
-	inlist keyword make
-	noeat make
+    char -b a-zA-Z_- not-target
+    inlist keyword make
+    noeat make
 
 # can't be recipe but can be target, variable or keyword
 state not-recipe code
-	char -b . special-target
-	char -b a-zA-Z_- not-recipe
-	inlist keyword make
-	noeat make
+    char -b . special-target
+    char -b a-zA-Z_- not-recipe
+    inlist keyword make
+    noeat make
 
 state special-target code
-	char -b A-Z_ special-target
-	# FIXME: ".PHONY := ..." is valid
-	inlist special-target make
-	noeat make
+    char -b A-Z_ special-target
+    # FIXME: ".PHONY := ..." is valid
+    inlist special-target make
+    noeat make
 
 state make code
-	char # comment
-	char \$ dollar
-	char "\n" start
-	char \\ esc
-	# this is a hack
-	char ")}" make variable
-	eat make
+    char # comment
+    char \$ dollar
+    char "\n" start
+    char \\ esc
+    # this is a hack
+    char ")}" make variable
+    eat make
 
 state comment
-	char "\n" start
-	char \\ comment-esc
-	eat comment
+    char "\n" start
+    char \\ comment-esc
+    eat comment
 
 state comment-esc comment
-	char "\\\n" comment
-	noeat comment
+    char "\\\n" comment
+    noeat comment
 
 state dollar variable
-	char "({" lp
-	char a-zA-Z make variable
-	char '@%<?^+|*' make variable
-	char \$ make variable
-	noeat make
+    char "({" lp
+    char a-zA-Z make variable
+    char '@%<?^+|*' make variable
+    char \$ make variable
+    noeat make
 
 state lp variable
-	char -b a-zA-Z0-9_- variable
-	noeat make
+    char -b a-zA-Z0-9_- variable
+    noeat make
 
 state variable
-	char -b a-zA-Z0-9_- variable
-	char ")}" make variable
-	inlist function make builtin
-	noeat make
+    char -b a-zA-Z0-9_- variable
+    char ")}" make variable
+    inlist function make builtin
+    noeat make
 
 state esc special
-	char "\n" make
-	eat make special
+    char "\n" make
+    eat make special
 
 list keyword -- \
-	define else endef endif export ifdef ifeq ifndef ifneq -include \
-	include override unexport vpath
+    define else endef endif export ifdef ifeq ifndef ifneq -include \
+    include override unexport vpath
 
 list function \
-	abspath addprefix addsuffix and basename bindir call dir error eval \
-	filter filter-out findstring firstword flavor foreach if info join \
-	lastword notdir or origin patsubst realpath shell sort strip subst \
-	suffix value warning wildcard word wordlist words
+    abspath addprefix addsuffix and basename bindir call dir error eval \
+    filter filter-out findstring firstword flavor foreach if info join \
+    lastword notdir or origin patsubst realpath shell sort strip subst \
+    suffix value warning wildcard word wordlist words
 
 list special-target \
-	.DEFAULT .DEFAULT_GOAL .DELETE_ON_ERROR .EXPORT_ALL_VARIABLES \
-	.FEATURES .IGNORE .INCLUDE_DIRS .INTERMEDIATE .LIBPATTERNS \
-	.LOW_RESOLUTION_TIME .NOTPARALLEL .ONESHELL .PHONY .POSIX .PRECIOUS \
-	.SECONDARY .SECONDEXPANSION .SILENT .SUFFIXES .VARIABLES
+    .DEFAULT .DEFAULT_GOAL .DELETE_ON_ERROR .EXPORT_ALL_VARIABLES \
+    .FEATURES .IGNORE .INCLUDE_DIRS .INTERMEDIATE .LIBPATTERNS \
+    .LOW_RESOLUTION_TIME .NOTPARALLEL .ONESHELL .PHONY .POSIX .PRECIOUS \
+    .SECONDARY .SECONDEXPANSION .SILENT .SUFFIXES .VARIABLES
 
 default constant special-target

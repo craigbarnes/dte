@@ -1,53 +1,53 @@
 syntax dte
 
 state start code
-	char " \t" this
-	char # comment
-	noeat command
+    char " \t" this
+    char # comment
+    noeat command
 
 state comment
-	char "\n" start
-	eat this
+    char "\n" start
+    eat this
 
 state command code
-	char "'" sq
-	char '"' dq
-	char "\n" start
-	char "\\" escape
-	char -b \$ variable
-	char ";*?[]{}" this special
-	eat this
+    char "'" sq
+    char '"' dq
+    char "\n" start
+    char "\\" escape
+    char -b \$ variable
+    char ";*?[]{}" this special
+    eat this
 
 state sq string
-	char "'" command string
-	char "\n" start
-	eat this
+    char "'" command string
+    char "\n" start
+    eat this
 
 state dq string
-	char -b "\\" dq-escape
-	char '"' command string
-	char "\n" start
-	eat this
+    char -b "\\" dq-escape
+    char '"' command string
+    char "\n" start
+    eat this
 
 state dq-escape special
-	char "abfnrtv'\\\"" dq special
-	char x hex1
-	eat dq error
+    char "abfnrtv'\\\"" dq special
+    char x hex1
+    eat dq error
 
 state hex1 special
-	char 0-9a-fA-F hex2
-	char '"' command error
-	eat dq error
+    char 0-9a-fA-F hex2
+    char '"' command error
+    eat dq error
 
 state hex2 special
-	char 0-9a-fA-F dq special
-	char '"' command error
-	eat dq error
+    char 0-9a-fA-F dq special
+    char '"' command error
+    eat dq error
 
 state escape special
-	char "\n" command
-	eat command special
+    char "\n" command
+    eat command special
 
 state variable
-	char -b a-zA-Z_ this
-	noeat command
+    char -b a-zA-Z_ this
+    noeat command

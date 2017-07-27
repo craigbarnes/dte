@@ -2,293 +2,293 @@
 syntax .php-strvar
 
 state start
-	char a-zA-Z_ strvar
-	noeat END
+    char a-zA-Z_ strvar
+    noeat END
 
 state strvar
-	char a-zA-Z_0-9 strvar
-	noeat END
+    char a-zA-Z_0-9 strvar
+    noeat END
 
 # curly braces inside string
 syntax .php-strcurly
 
 state strvar
-	char \} END strvar
-	eat strvar
+    char \} END strvar
+    eat strvar
 
 # common escapes inside double quotes and heredocs
 syntax .php-esc
 
 state special
-	char x hex
-	# 1-3 octal digits, \777 (0x1ff) overflows to 0xff
-	char 0-7 oct1
-	recolor string 1
-	eat END
+    char x hex
+    # 1-3 octal digits, \777 (0x1ff) overflows to 0xff
+    char 0-7 oct1
+    recolor string 1
+    eat END
 
 state hex special
-	char 0-9a-fA-F hex2
-	# "\xq" is not an error, it's literal
-	recolor string 2
-	noeat END
+    char 0-9a-fA-F hex2
+    # "\xq" is not an error, it's literal
+    recolor string 2
+    noeat END
 
 state hex2 special
-	char 0-9a-fA-F END special
-	# single hex digit is ok
-	noeat END
+    char 0-9a-fA-F END special
+    # single hex digit is ok
+    noeat END
 
 state oct1 special
-	char 0-7 oct2
-	noeat END
+    char 0-7 oct2
+    noeat END
 
 state oct2 special
-	char 0-7 END special
-	noeat END
+    char 0-7 END special
+    noeat END
 
 # common to <<<END and <<<"END"
 syntax .php-heredoc-common
 
 state bol string
-	heredocend match
-	noeat string
+    heredocend match
+    noeat string
 
 state string
-	char "\n" bol
-	char \\ esc
-	char \$ .php-strvar:string strvar
-	str '{$' .php-strcurly:string strvar
-	eat string
+    char "\n" bol
+    char \\ esc
+    char \$ .php-strvar:string strvar
+    str '{$' .php-strcurly:string strvar
+    eat string
 
 state esc special
-	# NOTE: \" is not special unlike in double quotes
-	char 'nrtvf\$' string special
-	noeat .php-esc:string
+    # NOTE: \" is not special unlike in double quotes
+    char 'nrtvf\$' string special
+    noeat .php-esc:string
 
 state match special
-	char "\n" END
-	str ";\n" END
-	# length clamped to bol
-	recolor string 1000
-	noeat string
+    char "\n" END
+    str ";\n" END
+    # length clamped to bol
+    recolor string 1000
+    noeat string
 
 # heredoc: <<<END
 syntax .php-heredoc
 
 state start special
-	char "\n" .php-heredoc-common:END
-	noeat END
+    char "\n" .php-heredoc-common:END
+    noeat END
 
 # heredoc: <<<"END"
 syntax .php-heredoc-dq
 
 state start special
-	str "\"\n" .php-heredoc-common:END
-	noeat END
+    str "\"\n" .php-heredoc-common:END
+    noeat END
 
 # nowdoc: <<<'END'
 syntax .php-nowdoc
 
 state start special
-	str "'\n" bol
-	noeat END
+    str "'\n" bol
+    noeat END
 
 state bol string
-	heredocend match
-	noeat string
+    heredocend match
+    noeat string
 
 state string
-	char "\n" bol
-	eat string
+    char "\n" bol
+    eat string
 
 state match special
-	char "\n" END
-	str ";\n" END
-	# length clamped to bol
-	recolor string 1000
-	noeat string
+    char "\n" END
+    str ";\n" END
+    # length clamped to bol
+    recolor string 1000
+    noeat string
 
 # inside <? and ?>
 syntax .php
 
 state code
-	char -b a-zA-Z_ word
-	char \$ variable
-	char \" dq
-	char \' sq
-	char 0 zero
-	char 1-9 dec
-	char . dot
-	char \? qm
-	str "//" cpp-comment
-	str "/*" c-comment
-	char # sh-comment
-	str <<< heredoc
-	eat code
+    char -b a-zA-Z_ word
+    char \$ variable
+    char \" dq
+    char \' sq
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    char \? qm
+    str "//" cpp-comment
+    str "/*" c-comment
+    char # sh-comment
+    str <<< heredoc
+    eat code
 
 state word code
-	char -b a-zA-Z_0-9 word
-	inlist keyword code
-	inlist constant code
-	inlist lang code
-	noeat code
+    char -b a-zA-Z_0-9 word
+    inlist keyword code
+    inlist constant code
+    inlist lang code
+    noeat code
 
 state variable
-	char -b a-zA-Z_ variable2
-	noeat code
+    char -b a-zA-Z_ variable2
+    noeat code
 
 state variable2 variable
-	char -b a-zA-Z_0-9 variable2
-	bufis this this-keyword
-	noeat code
+    char -b a-zA-Z_0-9 variable2
+    bufis this this-keyword
+    noeat code
 
 state this-keyword
-	recolor this 5
-	noeat code
+    recolor this 5
+    noeat code
 
 state dq string
-	char \" code string
-	char \\ dqesc
-	char \$ .php-strvar:dq strvar
-	str '{$' .php-strcurly:dq strvar
-	eat dq
+    char \" code string
+    char \\ dqesc
+    char \$ .php-strvar:dq strvar
+    str '{$' .php-strcurly:dq strvar
+    eat dq
 
 state dqesc special
-	char 'nrtvf\$"' dq special
-	noeat .php-esc:dq
+    char 'nrtvf\$"' dq special
+    noeat .php-esc:dq
 
 state sq string
-	char \' code string
-	char \\ sqesc
-	eat sq
+    char \' code string
+    char \\ sqesc
+    eat sq
 
 state sqesc string
-	# not \ or '
-	char -n "\\'" sq
-	recolor special 1
-	eat sq special
+    # not \ or '
+    char -n "\\'" sq
+    recolor special 1
+    eat sq special
 
 state zero numeric
-	char xX hex
-	char 0-7 oct
-	char . float
-	noeat check-suffix
+    char xX hex
+    char 0-7 oct
+    char . float
+    noeat check-suffix
 
 state oct numeric
-	char 0-7 oct
-	noeat check-suffix
+    char 0-7 oct
+    noeat check-suffix
 
 state dec numeric
-	char 0-9 dec
-	char eE exp
-	char . float
-	noeat check-suffix
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat check-suffix
 
 state hex numeric
-	char 0-9a-fA-F hex
-	noeat check-suffix
+    char 0-9a-fA-F hex
+    noeat check-suffix
 
 state check-suffix error
-	char a-zA-Z0-9_ check-suffix
-	noeat code
+    char a-zA-Z0-9_ check-suffix
+    noeat code
 
 state dot numeric
-	char 0-9 float
-	recolor code 1
-	noeat code
+    char 0-9 float
+    recolor code 1
+    noeat code
 
 state float numeric
-	char 0-9 float
-	char eE exp
-	noeat check-suffix
+    char 0-9 float
+    char eE exp
+    noeat check-suffix
 
 state exp numeric
-	char +- exp-digit
-	char 0-9 exp-digit
-	noeat check-suffix
+    char +- exp-digit
+    char 0-9 exp-digit
+    noeat check-suffix
 
 state exp-digit numeric
-	char 0-9 exp-digit
-	noeat check-suffix
+    char 0-9 exp-digit
+    noeat check-suffix
 
 state qm tag
-	char > END tag
-	recolor code 1
-	noeat code
+    char > END tag
+    recolor code 1
+    noeat code
 
 state cpp-comment comment
-	char "\n" code
-	eat cpp-comment
+    char "\n" code
+    eat cpp-comment
 
 state c-comment comment
-	str "*/" code comment
-	eat c-comment
+    str "*/" code comment
+    eat c-comment
 
 state sh-comment comment
-	char "\n" code
-	eat sh-comment
+    char "\n" code
+    eat sh-comment
 
 state heredoc special
-	char -b a-zA-Z_ heredoc-plain
-	char \" heredoc-dq-start
-	char \' nowdoc-start
-	noeat code
+    char -b a-zA-Z_ heredoc-plain
+    char \" heredoc-dq-start
+    char \' nowdoc-start
+    noeat code
 
 state heredoc-plain special
-	char -b a-zA-Z0-9_ heredoc-plain
-	heredocbegin .php-heredoc code
+    char -b a-zA-Z0-9_ heredoc-plain
+    heredocbegin .php-heredoc code
 
 state heredoc-dq-start special
-	char -b a-zA-Z_ heredoc-dq
-	noeat code
+    char -b a-zA-Z_ heredoc-dq
+    noeat code
 
 state heredoc-dq special
-	char -b a-zA-Z0-9_ heredoc-dq
-	heredocbegin .php-heredoc-dq code
+    char -b a-zA-Z0-9_ heredoc-dq
+    heredocbegin .php-heredoc-dq code
 
 state nowdoc-start special
-	char -b a-zA-Z_ nowdoc
-	noeat code
+    char -b a-zA-Z_ nowdoc
+    noeat code
 
 state nowdoc special
-	char -b a-zA-Z0-9_ nowdoc
-	heredocbegin .php-nowdoc code
+    char -b a-zA-Z0-9_ nowdoc
+    heredocbegin .php-nowdoc code
 
 list keyword \
-	abstract and array as break case catch cfunction class clone \
-	const continue declare default do else elseif enddeclare \
-	endfor endforeach endif endswitch endwhile extends final for \
-	foreach function global goto if implements interface \
-	instanceof namespace new old_function or private protected \
-	public static switch throw try use var while xor self parent
+    abstract and array as break case catch cfunction class clone \
+    const continue declare default do else elseif enddeclare \
+    endfor endforeach endif endswitch endwhile extends final for \
+    foreach function global goto if implements interface \
+    instanceof namespace new old_function or private protected \
+    public static switch throw try use var while xor self parent
 
 list -i constant \
-	__CLASS__ __DIR__ __FILE__ __FUNCTION__ __METHOD__ __NAMESPACE__ \
-	false null true
+    __CLASS__ __DIR__ __FILE__ __FUNCTION__ __METHOD__ __NAMESPACE__ \
+    false null true
 
 # language constructs
 list lang \
-	die echo empty exit eval include include_once isset list require \
-	require_once return print unset
+    die echo empty exit eval include include_once isset list require \
+    require_once return print unset
 
 # main syntax
 syntax php
 
 state code
-	char < lab
-	eat code
+    char < lab
+    eat code
 
 state lab tag
-	char \? tag-php
-	recolor code 1
-	noeat code
+    char \? tag-php
+    recolor code 1
+    noeat code
 
 state tag-php tag
-	str "php" tag-ver
-	noeat .php:code
+    str "php" tag-ver
+    noeat .php:code
 
 state tag-ver tag
-	char 3-5 .php:code tag
-	noeat .php:code
+    char 3-5 .php:code tag
+    noeat .php:code
 
 default special tag
 default keyword lang
