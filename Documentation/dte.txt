@@ -6,7 +6,7 @@
 
 @h1 SYNOPSIS
 
-%PROGRAM% [-c command] [-t tag] [-r rcfile] [-V] [file]...
+%PROGRAM% [-c command] [-t tag] [-r rcfile] [-V] [+line] [file]...
 
 @h1 DESCRIPTION
 
@@ -29,6 +29,9 @@ A small and flexible text editor.
 
 -V
 	Display the version number and exit.
+
++line
+	Go to line.
 
 @h1 BASIC USAGE
 
