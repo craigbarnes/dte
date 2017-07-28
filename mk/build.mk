@@ -53,7 +53,7 @@ ifndef NO_DEPS
 dep_files := $(foreach f,$(OBJECTS),$(dir $f).depend/$(notdir $f).d)
 dep_dirs := $(addsuffix .depend,$(sort $(dir $(OBJECTS))))
 missing_dep_dirs := $(filter-out $(wildcard $(dep_dirs)),$(dep_dirs))
-BASIC_CFLAGS += -MF $(dir $@).depend/$(notdir $@).d -MMD -MP
+$(OBJECTS): BASIC_CFLAGS += -MF $(dir $@).depend/$(notdir $@).d -MMD -MP
 dep_files_present := $(wildcard $(dep_files))
 
 ifneq "$(dep_files_present)" ""
