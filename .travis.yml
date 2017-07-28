@@ -7,7 +7,7 @@ install:
     - sudo apt-get -qy install make gcc binutils libncurses5-dev git groff tar gzip
 script:
     - git fetch --tags
-    - make -j`nproc` all html dist
+    - make -j`nproc` all html dist V=1
     - sudo make install
     - dte -V
     - make check-dist
