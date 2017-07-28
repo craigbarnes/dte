@@ -1,5 +1,24 @@
 stages: [build, dist]
 
+build:alpine:
+    stage: build
+    image: alpine:3.6
+    script:
+        - apk --update add make gcc binutils ncurses
+        - make -j`nproc` V=1
+        - make install
+        - dte -V
+
+build:centos:
+    stage: build
+    image: centos:7
+    script:
+        - yum makecache
+        - yum -y install make gcc binutils ncurses-devel
+        - make -j`nproc` V=1
+        - make install
+        - dte -V
+
 build:debian:
     stage: build
     image: debian:stretch
