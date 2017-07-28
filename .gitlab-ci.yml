@@ -4,7 +4,7 @@ build:alpine:
     stage: build
     image: alpine:3.6
     script:
-        - apk --update add make gcc binutils ncurses
+        - apk --update add make gcc binutils ncurses libc-dev
         - make -j`nproc` V=1
         - make install
         - dte -V
@@ -14,7 +14,7 @@ build:centos:
     image: centos:7
     script:
         - yum makecache
-        - yum -y install make gcc binutils ncurses-devel libc-dev
+        - yum -y install make gcc binutils ncurses-devel
         - make -j`nproc` V=1
         - make install
         - dte -V
