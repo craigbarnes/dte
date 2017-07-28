@@ -56,7 +56,7 @@ static bool no_state(void)
 
 static void close_state(void)
 {
-    if (current_state && current_state->type == -1) {
+    if (current_state && current_state->type == STATE_INVALID) {
         // command prefix in error message makes no sense
         const struct command *save = current_command;
         current_command = NULL;
@@ -76,7 +76,7 @@ static struct state *find_or_add_state(const char *name)
     st = xnew0(struct state, 1);
     st->name = xstrdup(name);
     st->defined = false;
-    st->type = -1;
+    st->type = STATE_INVALID;
     ptr_array_add(&current_syntax->states, st);
     return st;
 }

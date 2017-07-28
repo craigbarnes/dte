@@ -73,6 +73,7 @@ struct state {
     bool copied;
 
     enum {
+        STATE_INVALID = -1,
         STATE_EAT,
         STATE_NOEAT,
         STATE_NOEAT_BUFFER,

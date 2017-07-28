@@ -221,6 +221,9 @@ static struct hl_color **highlight_line(struct syntax *syn, struct state *state,
                 sidx = i;
             state = handle_heredoc(syn, state, line + sidx, i - sidx);
             break;
+        case STATE_INVALID:
+        default:
+            BUG("Invalid default action type should never make it here");
         }
     }
 
