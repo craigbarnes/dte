@@ -14,7 +14,7 @@ build:centos:
     image: centos:7
     script:
         - yum makecache
-        - yum -y install make gcc binutils ncurses-devel
+        - yum -y install make gcc binutils ncurses-devel libc-dev
         - make -j`nproc` V=1
         - make install
         - dte -V
