@@ -119,7 +119,9 @@ endif
 
 # Clang does not like container_of()
 ifneq "$(CC)" "clang"
+ifneq "$(uname_S)" "Darwin"
   WARNINGS += -Wcast-align
+endif
 endif
 
 BASIC_CFLAGS += -std=gnu99
