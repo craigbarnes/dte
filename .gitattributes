@@ -1,4 +1,19 @@
+[attr]code text whitespace=tab-in-indent,tabwidth=4
+[attr]ttman text whitespace=indent-with-non-tab,tabwidth=8
+[attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
+[attr]make text
+
 .distinfo export-subst
 .git* export-ignore
+.travis.yml export-ignore
 CONTRIBUTING.md export-ignore
 mk/dist.mk export-ignore
+
+GNUmakefile make
+makefile make
+*.mk make
+*.[ch] code
+*.sed code
+*.sh code
+*.yml code
+*.md markdown
