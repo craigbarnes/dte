@@ -32,13 +32,11 @@ build:debian:
 
 pages:
     stage: dist
-    image: debian:stretch
+    image: alpine:3.6
     artifacts: {paths: [public]}
     only: [master]
-    variables: {DEBIAN_FRONTEND: noninteractive}
     script:
-        - apt-get update
-        - apt-get -qy install make gcc binutils git groff tar gzip
+        - apk --update add make gcc binutils libc-dev git groff tar gzip
         - git fetch --tags
         - make -j`mk/nproc.sh` html dist V=1
         - make check-dist
