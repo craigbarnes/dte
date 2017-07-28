@@ -4,7 +4,7 @@ build:alpine:
     stage: build
     image: alpine:3.6
     script:
-        - apk --update add make gcc binutils ncurses libc-dev
+        - apk --update add make gcc binutils ncurses ncurses-dev libc-dev
         - make -j`nproc` V=1
         - make install
         - dte -V
