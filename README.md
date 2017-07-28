@@ -31,6 +31,14 @@ Alternatively you can put your build options into a `Config.mk` file.
 The default `prefix` is `/usr/local` and [`DESTDIR`] works as usual. See
 the top of [`GNUmakefile`] for more information.
 
+Documentation
+-------------
+
+After installing, you can access the documentation in man page format
+via `man dte` and `man dte-syntax`.
+
+These pages are also available as [dte.1.html] and [dte-syntax.7.html].
+
 License
 -------
 
@@ -52,5 +60,7 @@ Public License version 2 for more details.
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
+[dte.1.html]: https://craigbarnes.gitlab.io/dte/dte.1.html
+[dte-syntax.7.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.7.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
