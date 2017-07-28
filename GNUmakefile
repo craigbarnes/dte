@@ -9,21 +9,21 @@
 # Dependency calculation is enabled by default if CC supports
 # the -MMD -MP -MF options.
 
-CC = gcc
+CC ?= gcc
 LD = $(CC)
-CFLAGS = -g -O2 -Wall
-LDFLAGS =
-HOST_CC = gcc
-HOST_LD = $(HOST_CC)
-HOST_CFLAGS = -g -O2 -Wall
-HOST_LDFLAGS =
+CFLAGS ?= -g -O2 -Wall
+LDFLAGS ?=
+HOST_CC ?= $(CC)
+HOST_LD ?= $(HOST_CC)
+HOST_CFLAGS ?= -g -O2 -Wall
+HOST_LDFLAGS ?=
 INSTALL = install
 SED = sed
 RM = rm -f
-prefix = /usr/local
-bindir = $(prefix)/bin
-datadir = $(prefix)/share
-mandir = $(datadir)/man
+prefix ?= /usr/local
+bindir ?= $(prefix)/bin
+datadir ?= $(prefix)/share
+mandir ?= $(datadir)/man
 
 # 0: Disable debugging.
 # 1: Enable BUG_ON() and light-weight sanity checks.
