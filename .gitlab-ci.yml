@@ -5,7 +5,7 @@ build:alpine:
     image: alpine:3.6
     script:
         - apk --update add make gcc binutils ncurses ncurses-dev libc-dev
-        - make -j`nproc` V=1
+        - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
 
@@ -15,7 +15,7 @@ build:centos:
     script:
         - yum makecache
         - yum -y install make gcc binutils ncurses-devel
-        - make -j`nproc` V=1
+        - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
 
@@ -26,7 +26,7 @@ build:debian:
     script:
         - apt-get update
         - apt-get -qy install make gcc binutils libncurses5-dev
-        - make -j`nproc` V=1
+        - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
 
@@ -40,5 +40,5 @@ pages:
         - apt-get update
         - apt-get -qy install make gcc binutils git groff tar gzip
         - git fetch --tags
-        - make -j`nproc` html dist V=1
+        - make -j`mk/nproc.sh` html dist V=1
         - make check-dist
