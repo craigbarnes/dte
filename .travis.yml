@@ -1,0 +1,13 @@
+language: c
+sudo: required
+os: [linux]
+compiler: [clang, gcc]
+install:
+    - sudo apt-get update
+    - sudo apt-get -qy install make gcc binutils libncurses5-dev git groff tar gzip
+script:
+    - git fetch --tags
+    - make -j`nproc` all html dist
+    - sudo make install
+    - dte -V
+    - make check-dist
