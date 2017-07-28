@@ -1,6 +1,5 @@
-# These key bindings are compiled directly into the editor so that a
-# minimal set of useful keys are bound even in the event that config
-# files cannot be loaded. This file is installed only for reference.
+# The following key bindings are compiled into the editor. They serve
+# as a basic fallback in case the normal config files can't be loaded.
 
 bind left left
 bind right right

@@ -71,7 +71,7 @@ syntax_files := \
     ini java javascript lua mail make php python robotstxt sh smarty sql xml \
     $(PROGRAM)
 
-binding := $(addprefix share/binding/, default classic)
+binding := $(addprefix share/binding/, default classic builtin)
 color := $(addprefix share/color/, darkgray light light256)
 compiler:= $(addprefix share/compiler/, gcc go)
 config := $(addprefix share/, filetype rc)
