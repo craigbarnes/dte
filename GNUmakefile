@@ -122,6 +122,7 @@ ifneq "$(CC)" "clang"
   WARNINGS += -Wcast-align
 endif
 
+BASIC_CFLAGS += -std=gnu99
 BASIC_CFLAGS += $(call cc-option,$(WARNINGS))
 BASIC_CFLAGS += $(call cc-option,-Wno-pointer-sign) # char vs unsigned char madness
 

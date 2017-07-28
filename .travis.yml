@@ -1,13 +1,9 @@
 language: c
-sudo: required
-os: [linux]
+sudo: false
+os: [linux, osx]
 compiler: [clang, gcc]
-install:
-    - sudo apt-get update
-    - sudo apt-get -qy install make gcc binutils libncurses5-dev git groff tar gzip
 script:
-    - git fetch --tags
-    - make -j`nproc` all html dist V=1
-    - sudo make install
-    - dte -V
-    - make check-dist
+    - export V=1 NO_DEPS=y
+    - make -j`mk/nproc.sh`
+    - make install DESTDIR="$PWD/pkgdir"
+    - pkgdir/usr/local/bin/dte -V

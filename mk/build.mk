@@ -1,14 +1,11 @@
 S_FLAG := $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 
-ifneq "$(S_FLAG)$(V)" ""
-  define cmd =
-    $(call cmd_$(1),$(2))
-  endef
+ifdef S_FLAG
+  cmd = $(call cmd_$(1),$(2))
+else ifeq "$(V)" "1"
+  cmd = @echo "$(call cmd_$(1),$(2))"; $(call cmd_$(1),$(2))
 else
-  define cmd =
-    @printf ' %-8s %s\n' $(quiet_cmd_$(1))
-    @$(call cmd_$(1),$(2))
-  endef
+  cmd = @echo "   $(quiet_cmd_$(1))"; $(call cmd_$(1),$(2))
 endif
 
 # Avoid random internationalization problems
