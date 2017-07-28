@@ -32,7 +32,7 @@ Documentation/%.o: Documentation/%.c
 	$(call cmd,host_cc)
 
 public/:
-	mkdir -p $@
+	@mkdir -p $@
 
 
 CLEANFILES += $(man) $(html) $(TTMAN) $(TTMAN).o

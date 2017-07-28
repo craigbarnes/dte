@@ -1,17 +1,18 @@
 S_FLAG := $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 
-# Build verbosity
-ifdef S_FLAG
-  cmd = $(call cmd_$(1),$(2))
-else ifeq "$(V)" "1"
-  cmd = @echo "$(call cmd_$(1),$(2))"; $(call cmd_$(1),$(2))
+ifneq "$(S_FLAG)$(V)" ""
+  define cmd =
+    $(call cmd_$(1),$(2))
+  endef
 else
-  cmd = @echo "   $(quiet_cmd_$(1))"; $(call cmd_$(1),$(2))
+  define cmd =
+    @printf ' %-8s %s\n' $(quiet_cmd_$(1))
+    @$(call cmd_$(1),$(2))
+  endef
 endif
 
 # Avoid random internationalization problems
-LC_ALL := C
-export LC_ALL
+export LC_ALL := C
 
 # CFLAGS and LDFLAGS can be set from the command line
 BASIC_CFLAGS =
