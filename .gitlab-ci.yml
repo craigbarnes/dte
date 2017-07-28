@@ -1,0 +1,25 @@
+stages: [build, dist]
+
+build:debian:
+    stage: build
+    image: debian:stretch
+    variables: {DEBIAN_FRONTEND: noninteractive}
+    script:
+        - apt-get update
+        - apt-get -qy install make gcc binutils libncurses5-dev
+        - make -j`nproc` V=1
+        - make install
+        - dte -V
+
+pages:
+    stage: dist
+    image: debian:stretch
+    artifacts: {paths: [public]}
+    only: [master]
+    variables: {DEBIAN_FRONTEND: noninteractive}
+    script:
+        - apt-get update
+        - apt-get -qy install make gcc binutils git groff tar gzip
+        - git fetch --tags
+        - make -j`nproc` html dist V=1
+        - make check-dist
