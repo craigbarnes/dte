@@ -1,25 +1,39 @@
-man := Documentation/$(PROGRAM).1 Documentation/$(PROGRAM)-syntax.7
+man1 := Documentation/$(PROGRAM).1
+man7 := Documentation/$(PROGRAM)-syntax.7
+man  := $(man1) $(man7)
+html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
+TTMAN = Documentation/ttman$(X)
 
-quiet_cmd_ttman = MAN    $@
-
+quiet_cmd_ttman = TTMAN  $@
 cmd_ttman = \
-    $(SED) -e s/%MAN%/$(shell echo $(*F) | tr a-z A-Z)/g \
+    $(SED) -e s/%MAN%/$(shell echo $(basename $(@F)) | tr a-z A-Z)/g \
     -e s/%PROGRAM%/$(PROGRAM)/g \
-    < $< | Documentation/ttman$(X) > $@
+    < $< | $(TTMAN) > $@
+
+quiet_cmd_man2html = GROFF  $@
+cmd_man2html = groff -mandoc -Thtml $< > $@
 
 man: $(man)
+html: $(html)
 
-$(man): Documentation/ttman$(X)
-
-%.1 %.7: %.txt
+$(man1): Documentation/$(PROGRAM).txt $(TTMAN)
 	$(call cmd,ttman)
 
-Documentation/ttman.o: Documentation/ttman.c
-	$(call cmd,host_cc)
+$(man7): Documentation/$(PROGRAM)-syntax.txt $(TTMAN)
+	$(call cmd,ttman)
 
-Documentation/ttman$(X): Documentation/ttman.o
+$(html): public/%.html: Documentation/% | public/
+	$(call cmd,man2html)
+
+$(TTMAN): %: %.o
 	$(call cmd,host_ld,)
 
+Documentation/%.o: Documentation/%.c
+	$(call cmd,host_cc)
 
-CLEANFILES += $(man) Documentation/*.o Documentation/ttman$(X)
-.PHONY: man
+public/:
+	mkdir -p $@
+
+
+CLEANFILES += $(man) $(html) $(TTMAN) $(TTMAN).o
+.PHONY: man html
