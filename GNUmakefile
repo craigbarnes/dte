@@ -11,7 +11,7 @@
 
 CC ?= gcc
 LD = $(CC)
-CFLAGS ?= -g -O2 -Wall
+CFLAGS ?= -g -O2
 LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_LD ?= $(HOST_CC)
@@ -33,7 +33,7 @@ DEBUG = 1
 
 # Enabled if CC supports them
 WARNINGS = \
-    -Wdeclaration-after-statement \
+    -Wall \
     -Wformat-security \
     -Wmissing-prototypes \
     -Wold-style-definition \
