@@ -5,7 +5,7 @@
 
 enum {
     KEY_ENTER = '\n',
-    KEY_UNICODE_MAX  = 0x010ffff,
+    KEY_UNICODE_MAX = 0x010ffff,
 
     KEY_SPECIAL_MIN = 0x0110000,
 

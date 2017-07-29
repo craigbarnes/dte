@@ -18,7 +18,7 @@ enum {
     CMDLINE_CANCEL,
 };
 
-#define CMDLINE(name) struct cmdline name = { GBUF_INIT, 0, -1, NULL }
+#define CMDLINE(name) struct cmdline name = {GBUF_INIT, 0, -1, NULL}
 
 void cmdline_clear(struct cmdline *c);
 void cmdline_set_text(struct cmdline *c, const char *text);

@@ -39,7 +39,7 @@ static inline void list_add_after(struct list_head *new, struct list_head *item)
     __list_add(new, item, item->next);
 }
 
-static inline void __list_del(struct list_head * prev, struct list_head * next)
+static inline void __list_del(struct list_head *prev, struct list_head *next)
 {
     next->prev = prev;
     prev->next = next;

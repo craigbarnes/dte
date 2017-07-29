@@ -11,7 +11,7 @@ struct ptr_array {
 
 typedef void (*free_func)(void *ptr);
 
-#define PTR_ARRAY(name) struct ptr_array name = { NULL, 0, 0 }
+#define PTR_ARRAY(name) struct ptr_array name = {NULL, 0, 0}
 #define FREE_FUNC(f) (free_func)f
 
 void ptr_array_add(struct ptr_array *array, void *ptr);
