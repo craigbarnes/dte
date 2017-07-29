@@ -11,6 +11,7 @@
 #include "file-history.h"
 #include "search.h"
 #include "error.h"
+#include "move.h"
 
 #include <locale.h>
 #include <langinfo.h>
@@ -44,7 +45,7 @@ static void handle_sigwinch(int signum)
 
 int main(int argc, char *argv[])
 {
-    static const char *opts = "[-RV] [-c command] [-t tag] [-r rcfile] [file]...";
+    static const char *opts = "[-RV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
     static const char *optstring = "RVc:t:r:";
     const char *term = getenv("TERM");
     const char *home = getenv("HOME");
@@ -176,10 +177,25 @@ int main(int argc, char *argv[])
 
     editor_status = EDITOR_RUNNING;
 
-    for (int i = optind; i < argc; i++)
-        window_open_buffer(window, argv[i], false, NULL);
+    for (int i = optind, lineno = 0; i < argc; i++) {
+        if (argv[i][0] == '+' && lineno <= 0) {
+            lineno = atoi(&argv[i][1]);
+            if (lineno <= 0) {
+                error_msg("Invalid line number: '%s'", &argv[i][1]);
+            }
+        } else {
+            struct view *v = window_open_buffer(window, argv[i], false, NULL);
+            if (lineno > 0) {
+                set_view(v);
+                move_to_line(v, lineno);
+                lineno = 0;
+            }
+        }
+    }
+
     if (window->views.count == 0)
         window_open_empty_buffer(window);
+
     set_view(window->views.ptrs[0]);
 
     if (command || tag)
