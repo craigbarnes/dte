@@ -434,20 +434,20 @@ static void cmd_syntax(const char *pf, char **args)
 }
 
 static const struct command syntax_commands[] = {
-    { "bufis", "i", 2,  3, cmd_bufis },
-    { "char", "bn", 2,  3, cmd_char },
-    { "default", "", 2, -1, cmd_default },
-    { "heredocbegin","", 2,  2, cmd_heredocbegin },
-    { "heredocend", "", 1,  2, cmd_heredocend },
-    { "eat", "", 1,  2, cmd_eat },
-    { "inlist", "", 2,  3, cmd_inlist },
-    { "list", "i", 2, -1, cmd_list },
-    { "noeat", "b", 1,  1, cmd_noeat },
-    { "recolor", "", 1,  2, cmd_recolor },
-    { "state", "", 1,  2, cmd_state },
-    { "str", "i", 2,  3, cmd_str },
-    { "syntax", "", 1,  1, cmd_syntax },
-    { NULL, NULL, 0,  0, NULL }
+    {"bufis", "i", 2,  3, cmd_bufis},
+    {"char", "bn", 2,  3, cmd_char},
+    {"default", "", 2, -1, cmd_default},
+    {"heredocbegin","", 2,  2, cmd_heredocbegin},
+    {"heredocend", "", 1,  2, cmd_heredocend},
+    {"eat", "", 1,  2, cmd_eat},
+    {"inlist", "", 2,  3, cmd_inlist},
+    {"list", "i", 2, -1, cmd_list},
+    {"noeat", "b", 1,  1, cmd_noeat},
+    {"recolor", "", 1,  2, cmd_recolor},
+    {"state", "", 1,  2, cmd_state},
+    {"str", "i", 2,  3, cmd_str},
+    {"syntax", "", 1,  1, cmd_syntax},
+    {NULL, NULL, 0,  0, NULL}
 };
 
 struct syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
