@@ -15,7 +15,7 @@ CFLAGS ?= -g -O2 -Wall
 LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_LD ?= $(HOST_CC)
-HOST_CFLAGS ?= -g -O2 -Wall
+HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 INSTALL = install
 SED = sed
@@ -137,14 +137,14 @@ BASIC_CFLAGS += -DDEBUG=$(DEBUG)
 $(OBJECTS): .CFLAGS
 
 .CFLAGS: FORCE
-	@mk/update-option "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
+	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
 src/vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 src/vars.o: .VARS
 src/main.o: src/bindings.inc
 
 .VARS: FORCE
-	@mk/update-option "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
+	@mk/optcheck.sh "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 src/bindings.inc: share/binding/builtin mk/rc2c.sed
 	$(call cmd,rc2c,builtin_bindings)

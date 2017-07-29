@@ -5,10 +5,7 @@ html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 TTMAN = Documentation/ttman$(X)
 
 quiet_cmd_ttman = TTMAN  $@
-cmd_ttman = \
-    $(SED) -e s/%MAN%/$(shell echo $(basename $(@F)) | tr a-z A-Z)/g \
-    -e s/%PROGRAM%/$(PROGRAM)/g \
-    < $< | $(TTMAN) > $@
+cmd_ttman = mk/manvars.sh '$<' '$(PROGRAM)' | $(TTMAN) > $@
 
 quiet_cmd_man2html = GROFF  $@
 cmd_man2html = groff -mandoc -Thtml $< > $@
