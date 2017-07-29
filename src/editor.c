@@ -221,7 +221,7 @@ void resize(void)
 
 void ui_end(void)
 {
-    struct term_color color = { -1, -1, 0 };
+    struct term_color color = {-1, -1, 0};
 
     buf_set_color(&color);
     buf_move_cursor(0, screen_h - 1);

@@ -200,7 +200,7 @@ static void cmd_compile(const char *pf, char **args)
         pf++;
     }
 
-    name= *args++;
+    name = *args++;
     c = find_compiler(name);
     if (!c) {
         error_msg("No such error parser %s", name);
@@ -818,7 +818,7 @@ static void cmd_right(const char *pf, char **args)
 
 static void cmd_run(const char *pf, char **args)
 {
-    int fd[3] = { 0, 1, 2 };
+    int fd[3] = {0, 1, 2};
     bool prompt = false;
 
     while (*pf) {

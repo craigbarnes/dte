@@ -24,7 +24,7 @@ static void git_open_clear(void)
 
 static char *cdup(void)
 {
-    static const char * const cmd[] = { "git", "rev-parse", "--show-cdup", NULL };
+    static const char *const cmd[] = {"git", "rev-parse", "--show-cdup", NULL};
     struct filter_data data;
     long len;
 
@@ -44,7 +44,7 @@ static char *cdup(void)
 
 static void git_open_load(void)
 {
-    static const char *cmd[] = { "git", "ls-files", "-z", NULL, NULL };
+    static const char *cmd[] = {"git", "ls-files", "-z", NULL, NULL};
     struct filter_data data;
     char *dir = cdup();
 

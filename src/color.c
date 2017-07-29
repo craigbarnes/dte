@@ -18,7 +18,7 @@ static const char * const attr_names[] = {
     "blink", "reverse", "invisible", "keep"
 };
 
-static const char * const builtin_color_names[NR_BC] = {
+static const char *const builtin_color_names[NR_BC] = {
     "default",
     "nontext",
     "noline",

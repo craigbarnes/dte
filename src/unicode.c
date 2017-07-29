@@ -28,20 +28,20 @@ struct codepoint_range {
 
 // All these are indistinguishable from ASCII space on terminal.
 static const struct codepoint_range evil_space[] = {
-    { 0x00a0, 0x00a0 }, // No-break space. Easy to type accidentally (AltGr+Space)
-    { 0x00ad, 0x00ad }, // Soft hyphen. Very very soft...
-    { 0x2000, 0x200a }, // Legacy spaces of varying sizes
-    { 0x2028, 0x2029 }, // Line and paragraph separators
-    { 0x202f, 0x202f }, // Narrow No-Break Space
-    { 0x205f, 0x205f }, // Mathematical space. Proven to be correct. Legacy
-    { 0x2800, 0x2800 }, // Braille Pattern Blank
+    {0x00a0, 0x00a0}, // No-break space. Easy to type accidentally (AltGr+Space)
+    {0x00ad, 0x00ad}, // Soft hyphen. Very very soft...
+    {0x2000, 0x200a}, // Legacy spaces of varying sizes
+    {0x2028, 0x2029}, // Line and paragraph separators
+    {0x202f, 0x202f}, // Narrow No-Break Space
+    {0x205f, 0x205f}, // Mathematical space. Proven to be correct. Legacy
+    {0x2800, 0x2800}, // Braille Pattern Blank
 };
 
 static const struct codepoint_range zero_width[] = {
-    { 0x200b, 0x200f },
-    { 0x202a, 0x202e },
-    { 0x2060, 0x2063 },
-    { 0xfeff, 0xfeff },
+    {0x200b, 0x200f},
+    {0x202a, 0x202e},
+    {0x2060, 0x2063},
+    {0xfeff, 0xfeff},
 };
 
 static inline bool in_range(unsigned int u, const struct codepoint_range *range, int count)

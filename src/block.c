@@ -99,8 +99,8 @@ static long split_and_insert(const char *buf, long len)
     long size3 = blk->size - size1;
     long total = size1 + size2 + size3;
     long start = 0; // beginning of new block
-    long size = 0;  // size of new block
-    long pos = 0;   // current position
+    long size = 0; // size of new block
+    long pos = 0; // current position
     long nl_added = 0;
 
     while (start < total) {

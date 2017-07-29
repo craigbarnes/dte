@@ -31,8 +31,8 @@ struct compiler *find_compiler(const char *name)
 
 void add_error_fmt(const char *compiler, bool ignore, const char *format, char **desc)
 {
-    const char *names[] = { "file", "line", "column", "message" };
-    int idx[ARRAY_COUNT(names)] = { -1, -1, -1, 0 };
+    const char *names[] = {"file", "line", "column", "message"};
+    int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
     struct error_format *f;
     int i, j;
 

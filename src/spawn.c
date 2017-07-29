@@ -157,8 +157,8 @@ static int handle_child_error(int pid)
 
 int spawn_filter(char **argv, struct filter_data *data)
 {
-    int p0[2] = { -1, -1 };
-    int p1[2] = { -1, -1 };
+    int p0[2] = {-1, -1};
+    int p1[2] = {-1, -1};
     int dev_null = -1;
     int fd[3], pid;
 

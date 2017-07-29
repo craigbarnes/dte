@@ -17,9 +17,9 @@ void set_color(struct term_color *color)
     struct term_color tmp = *color;
 
     // NOTE: -2 (keep) is treated as -1 (default)
-    if (tmp.fg  < 0)
+    if (tmp.fg < 0)
         tmp.fg = builtin_colors[BC_DEFAULT]->fg;
-    if (tmp.bg  < 0)
+    if (tmp.bg < 0)
         tmp.bg = builtin_colors[BC_DEFAULT]->bg;
     buf_set_color(&tmp);
 }

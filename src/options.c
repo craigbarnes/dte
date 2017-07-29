@@ -364,16 +364,29 @@ static char *flag_string(const struct option_desc *desc, union option_value valu
 }
 
 static const struct option_ops option_ops[] = {
-    { str_get, str_set, str_parse, str_string, str_equals },
-    { int_get, int_set, int_parse, int_string, int_equals },
-    { int_get, int_set, enum_parse, enum_string, int_equals },
-    { int_get, int_set, flag_parse, flag_string, int_equals },
+    {str_get, str_set, str_parse, str_string, str_equals},
+    {int_get, int_set, int_parse, int_string, int_equals},
+    {int_get, int_set, enum_parse, enum_string, int_equals},
+    {int_get, int_set, flag_parse, flag_string, int_equals},
 };
 
-static const char *bool_enum[] = { "false", "true", NULL };
-static const char *newline_enum[] = { "unix", "dos", NULL };
-const char *case_sensitive_search_enum[] = { "false", "true", "auto", NULL };
-static const char *tab_bar_enum[] = { "hidden", "horizontal", "vertical", "auto", NULL };
+static const char *bool_enum[] = {"false", "true", NULL};
+static const char *newline_enum[] = {"unix", "dos", NULL};
+const char *case_sensitive_search_enum[] = {"false", "true", "auto", NULL};
+
+static const char *detect_indent_values[] = {
+    "1", "2", "3", "4", "5", "6", "7", "8",
+    NULL
+};
+
+static const char *tab_bar_enum[] = {
+    "hidden",
+    "horizontal",
+    "vertical",
+    "auto",
+    NULL
+};
+
 static const char *ws_error_values[] = {
     "trailing",
     "space-indent",
@@ -384,7 +397,6 @@ static const char *ws_error_values[] = {
     "auto-indent",
     NULL
 };
-static const char *detect_indent_values[] = { "1", "2", "3", "4", "5", "6", "7", "8", NULL };
 
 static const struct option_desc option_desc[] = {
     BOOL_OPT("auto-indent", C(auto_indent), NULL),

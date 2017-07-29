@@ -7,28 +7,28 @@ struct encoding_alias {
 };
 
 static const struct encoding_alias aliases[] = {
-    { "UTF-8", "UTF8" },
-    { "UTF-16", "UTF16" },
-    { "UTF-16BE", "UTF16BE" },
-    { "UTF-16LE", "UTF16LE" },
-    { "UTF-32", "UTF32" },
-    { "UTF-32BE", "UTF32BE" },
-    { "UTF-32LE", "UTF32LE" },
-    { "UTF-16", "UCS2" },
-    { "UTF-16", "UCS-2" },
-    { "UTF-16BE", "UCS-2BE" },
-    { "UTF-16LE", "UCS-2LE" },
-    { "UTF-16", "UCS4" },
-    { "UTF-16", "UCS-4" },
-    { "UTF-16BE", "UCS-4BE" },
-    { "UTF-16LE", "UCS-4LE" },
+    {"UTF-8", "UTF8"},
+    {"UTF-16", "UTF16"},
+    {"UTF-16BE", "UTF16BE"},
+    {"UTF-16LE", "UTF16LE"},
+    {"UTF-32", "UTF32"},
+    {"UTF-32BE", "UTF32BE"},
+    {"UTF-32LE", "UTF32LE"},
+    {"UTF-16", "UCS2"},
+    {"UTF-16", "UCS-2"},
+    {"UTF-16BE", "UCS-2BE"},
+    {"UTF-16LE", "UCS-2LE"},
+    {"UTF-16", "UCS4"},
+    {"UTF-16", "UCS-4"},
+    {"UTF-16BE", "UCS-4BE"},
+    {"UTF-16LE", "UCS-4LE"},
 };
 
 static const struct byte_order_mark boms[] = {
-    { "UTF-32BE", { 0x00, 0x00, 0xfe, 0xff }, 4 },
-    { "UTF-32LE", { 0xff, 0xfe, 0x00, 0x00 }, 4 },
-    { "UTF-16BE", { 0xfe, 0xff }, 2 },
-    { "UTF-16LE", { 0xff, 0xfe }, 2 },
+    {"UTF-32BE", {0x00, 0x00, 0xfe, 0xff}, 4},
+    {"UTF-32LE", {0xff, 0xfe, 0x00, 0x00}, 4},
+    {"UTF-16BE", {0xfe, 0xff}, 2},
+    {"UTF-16LE", {0xff, 0xfe}, 2},
 };
 
 char *normalize_encoding(const char *encoding)

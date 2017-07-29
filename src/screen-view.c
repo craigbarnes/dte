@@ -183,7 +183,7 @@ static void screen_skip_char(struct line_info *info)
 
 static bool is_notice(const char *word, int len)
 {
-    static const char * const words[] = { "fixme", "todo", "xxx" };
+    static const char *const words[] = {"fixme", "todo", "xxx"};
     int i;
 
     for (i = 0; i < ARRAY_COUNT(words); i++) {
