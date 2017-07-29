@@ -1,1 +1,2 @@
 ee9fad122248d7821318e4d7874d13ae0645f819  public/dist/dte-1.0.tar.gz
+f62eb1606a69c0373ff302c533f36308ba94b08f  public/dist/dte-1.1.tar.gz
