@@ -1,6 +1,6 @@
-/* Stolen from Linux 2.6.7. Some functions renamed or removed. */
-#ifndef _LINUX_LIST_H
-#define _LINUX_LIST_H
+// Stolen from Linux 2.6.7. Some functions renamed or removed.
+#ifndef LIST_H
+#define LIST_H
 
 #include <stddef.h>
 
@@ -8,10 +8,8 @@ struct list_head {
     struct list_head *next, *prev;
 };
 
-#define LIST_HEAD_INIT(name) { &(name), &(name) }
-
-#define LIST_HEAD(name) \
-    struct list_head name = LIST_HEAD_INIT(name)
+#define LIST_HEAD_INIT(name) {&(name), &(name)}
+#define LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)
 
 static inline void list_init(struct list_head *head)
 {
@@ -19,10 +17,11 @@ static inline void list_init(struct list_head *head)
     head->prev = head;
 }
 
-static inline void __list_add(struct list_head *new,
-                  struct list_head *prev,
-                  struct list_head *next)
-{
+static inline void __list_add (
+    struct list_head *new,
+    struct list_head *prev,
+    struct list_head *next
+) {
     next->prev = new;
     new->next = next;
     new->prev = prev;
