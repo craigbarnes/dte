@@ -105,7 +105,7 @@ bool detect_indent(struct buffer *b)
 {
     BLOCK_ITER(bi, &b->blocks);
     int current_indent = 0;
-    int counts[9] = { 0, };
+    int counts[9] = {0};
     int tab_count = 0;
     int space_count = 0;
     int i;
