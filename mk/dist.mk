@@ -1,4 +1,4 @@
-DIST_VERSIONS = 1.0
+DIST_VERSIONS = 1.0 1.1
 DIST = $(addprefix public/dist/dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 
 quiet_cmd_git_archive = ARCHIVE $@

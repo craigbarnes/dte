@@ -44,7 +44,7 @@ WARNINGS = \
 # End of configuration
 
 PROGRAM = dte
-VERSION = 1.0
+VERSION = 1.1
 PKGDATADIR = $(datadir)/$(PROGRAM)
 LIBS =
 X =
