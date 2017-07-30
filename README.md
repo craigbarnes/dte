@@ -1,16 +1,20 @@
 dte
 ===
 
-Dexterous Text Editor
+dte is a small and easy to use console text editor.
 
-Introduction
-------------
+Features
+--------
 
-dte is a small and easy to use text editor. Colors and bindings can be
-fully customized to your liking.
-
-It has some features useful to programmers, like ctags support and it
-can parse compiler errors, but it does not aim to become an IDE.
+* Multiple buffers/tabs
+* Unlimited undo/redo
+* Search and replace
+* Syntax highlighting
+* Customizable color schemes
+* Customizable key bindings
+* Command language with auto-completion
+* Jump to definition (using [ctags])
+* Jump to compiler error
 
 Requirements
 ------------
@@ -55,6 +59,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 Public License version 2 for more details.
 
 
+[ctags]: https://en.wikipedia.org/wiki/Ctags
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
