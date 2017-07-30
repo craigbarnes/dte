@@ -16,6 +16,11 @@ Features
 * Jump to definition (using [ctags])
 * Jump to compiler error
 
+Screenshot
+----------
+
+![dte screenshot](https://craigbarnes.gitlab.io/dte/screenshot.png)
+
 Requirements
 ------------
 

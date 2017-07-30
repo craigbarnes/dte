@@ -38,5 +38,5 @@ pages:
     script:
         - apk --update add make gcc binutils libc-dev git groff tar gzip
         - git fetch --tags
-        - make -j`mk/nproc.sh` html dist V=1
+        - make -j`mk/nproc.sh` docs dist V=1
         - make check-dist
