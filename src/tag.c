@@ -6,7 +6,7 @@
 #include "common.h"
 
 static struct tag_file *current_tag_file;
-static char *current_filename; // for sorting tags
+static char *current_filename; // For sorting tags
 
 static int visibility_cmp(const struct tag *a, const struct tag *b)
 {
@@ -37,7 +37,7 @@ static int visibility_cmp(const struct tag *a, const struct tag *b)
         return -1;
     }
 
-    // both are NOT UNinteresting
+    // Both are NOT UNinteresting
 
     if (a->local && a_this_file) {
         if (b->local && b_this_file)
@@ -86,7 +86,7 @@ static int tag_cmp(const void *ap, const void *bp)
     return kind_cmp(a, b);
 }
 
-// find "tags" file from directory path and its parent directories
+// Find "tags" file from directory path and its parent directories
 static int open_tag_file(char *path)
 {
     const char tags[] = "tags";
@@ -180,7 +180,7 @@ void free_tags(struct ptr_array *tags)
     clear(tags);
 }
 
-// both parameters must be absolute and clean
+// Both parameters must be absolute and clean
 static char *path_relative(const char *filename, const char *dir)
 {
     int dlen = strlen(dir);
@@ -189,7 +189,7 @@ static char *path_relative(const char *filename, const char *dir)
         return NULL;
     }
     if (filename[dlen] == 0) {
-        // equal strings
+        // Equal strings
         return xstrdup(".");
     }
     if (filename[dlen] != '/') {

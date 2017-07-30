@@ -79,7 +79,7 @@ struct buffer *open_empty_buffer(void)
     struct buffer *b = buffer_new(charset);
     struct block *blk;
 
-    // at least one block required
+    // At least one block required
     blk = block_new(1);
     list_add_before(&blk->node, &b->blocks);
 
@@ -196,7 +196,7 @@ void buffer_update_syntax(struct buffer *b)
     struct syntax *syn = NULL;
 
     if (b->options.syntax) {
-        /* even "none" can have syntax */
+        // Even "none" can have syntax
         syn = find_syntax(b->options.filetype);
         if (!syn)
             syn = load_syntax_by_filetype(b->options.filetype);
@@ -206,7 +206,7 @@ void buffer_update_syntax(struct buffer *b)
 
     b->syn = syn;
     if (syn) {
-        // start state of first line is constant
+        // Start state of first line is constant
         struct ptr_array *s = &b->line_start_states;
         if (!s->alloc) {
             s->alloc = 64;

@@ -40,7 +40,7 @@ enum {
     MOD_SHIFT = 0x4000000U,
     MOD_MASK  = 0x7000000U,
 
-    KEY_PASTE = 0x8000000U, // not a key
+    KEY_PASTE = 0x8000000U, // Not a key
 };
 
 #define CTRL(x) (MOD_CTRL | (x))

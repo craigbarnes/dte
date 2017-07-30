@@ -34,7 +34,7 @@ static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
 
 static struct syntax *current_syntax;
 static struct state *current_state;
-static int saved_nr_errors; // used to check if nr_errors changed
+static int saved_nr_errors; // Used to check if nr_errors changed
 
 static bool no_syntax(void)
 {
@@ -57,7 +57,7 @@ static bool no_state(void)
 static void close_state(void)
 {
     if (current_state && current_state->type == STATE_INVALID) {
-        // command prefix in error message makes no sense
+        // Command prefix in error message makes no sense
         const struct command *save = current_command;
         current_command = NULL;
         error_msg("No default action in state %s", current_state->name);
@@ -319,7 +319,7 @@ static void cmd_inlist(const char *pf, char **args)
         return;
 
     if (list == NULL) {
-        // add undefined list
+        // Add undefined list
         list = xnew0(struct string_list, 1);
         list->name = xstrdup(name);
         ptr_array_add(&current_syntax->string_lists, list);
@@ -350,7 +350,7 @@ static void cmd_noeat(const char *pf, char **args)
 
 static void cmd_recolor(const char *pf, char **args)
 {
-    // if length is not specified then buffered bytes will be recolored
+    // If length is not specified then buffered bytes will be recolored
     enum condition_type type = COND_RECOLOR_BUFFER;
     struct condition *c;
     int len = 0;
@@ -404,7 +404,7 @@ static void cmd_str(const char *pf, char **args)
         return;
     }
 
-    // strings of length 2 are very common
+    // Strings of length 2 are very common
     if (!icase && len == 2)
         type = COND_STR2;
     c = add_condition(type, args[1], args[2]);

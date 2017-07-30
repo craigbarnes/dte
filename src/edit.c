@@ -170,9 +170,9 @@ void paste(bool at_cursor)
             block_iter_eat_line(&view->cursor);
         buffer_replace_bytes(del_count, copy_buf, copy_len);
 
-        // try to keep cursor column
+        // Try to keep cursor column
         move_to_preferred_x(x);
-        // new preferred_x
+        // New preferred_x
         view_reset_preferred_x(view);
     } else {
         buffer_replace_bytes(del_count, copy_buf, copy_len);
@@ -217,7 +217,7 @@ void erase(void)
     buffer_erase_bytes(size);
 }
 
-// goto beginning of whitespace (tabs and spaces) under cursor and
+// Go to beginning of whitespace (tabs and spaces) under cursor and
 // return number of whitespace bytes after cursor after moving cursor
 static long goto_beginning_of_whitespace(void)
 {
@@ -225,14 +225,14 @@ static long goto_beginning_of_whitespace(void)
     long count = 0;
     unsigned int u;
 
-    // count spaces and tabs at or after cursor
+    // Count spaces and tabs at or after cursor
     while (buffer_next_char(&bi, &u)) {
         if (u != '\t' && u != ' ')
             break;
         count++;
     }
 
-    // count spaces and tabs before cursor
+    // Count spaces and tabs before cursor
     while (buffer_prev_char(&view->cursor, &u)) {
         if (u != '\t' && u != ' ') {
             buffer_next_char(&view->cursor, &u);
@@ -254,7 +254,7 @@ static bool ws_only(struct lineref *lr)
     return true;
 }
 
-// non-empty line can be used to determine size of indentation for the next line
+// Non-empty line can be used to determine size of indentation for the next line
 static bool find_non_empty_line_bwd(struct block_iter *bi)
 {
     block_iter_bol(bi);
@@ -273,18 +273,18 @@ static void insert_nl(void)
     long ins_count = 1;
     char *ins = NULL;
 
-    // prepare deleted text (selection or whitespace around cursor)
+    // Prepare deleted text (selection or whitespace around cursor)
     if (view->selection) {
         del_count = prepare_selection(view);
         unselect();
     } else {
-        // trim whitespace around cursor
+        // Trim whitespace around cursor
         del_count = goto_beginning_of_whitespace();
     }
 
-    // prepare inserted indentation
+    // Prepare inserted indentation
     if (buffer->options.auto_indent) {
-        // current line will be split at cursor position
+        // Current line will be split at cursor position
         struct block_iter bi = view->cursor;
         long len = block_iter_bol(&bi);
         struct lineref lr;
@@ -305,7 +305,7 @@ static void insert_nl(void)
 
     begin_change(CHANGE_MERGE_NONE);
     if (ins) {
-        // add newline before indent
+        // Add newline before indent
         ins_count = strlen(ins);
         memmove(ins + 1, ins, ins_count);
         ins[0] = '\n';
@@ -318,7 +318,7 @@ static void insert_nl(void)
     }
     end_change();
 
-    // move after inserted text
+    // Move after inserted text
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
@@ -335,7 +335,7 @@ void insert_ch(unsigned int ch)
 
     ins = xmalloc(8);
     if (view->selection) {
-        // prepare deleted text (selection)
+        // Prepare deleted text (selection)
         del_count = prepare_selection(view);
         unselect();
     } else if (ch == '}' && buffer->options.auto_indent && buffer->options.brace_indent) {
@@ -348,7 +348,7 @@ void insert_ch(unsigned int ch)
             int width = get_indent_of_matching_brace();
 
             if (width >= 0) {
-                // replace current (ws only) line with some indent + '}'
+                // Replace current (ws only) line with some indent + '}'
                 block_iter_bol(&view->cursor);
                 del_count = curlr.size;
                 if (width) {
@@ -361,7 +361,7 @@ void insert_ch(unsigned int ch)
         }
     }
 
-    // prepare inserted text
+    // Prepare inserted text
     if (ch == '\t' && buffer->options.expand_tab) {
         ins_count = buffer->options.indent_width;
         memset(ins, ' ', ins_count);
@@ -369,7 +369,7 @@ void insert_ch(unsigned int ch)
         u_set_char_raw(ins, &ins_count, ch);
     }
 
-    // record change
+    // Record change
     if (del_count) {
         begin_change(CHANGE_MERGE_NONE);
     } else {
@@ -378,7 +378,7 @@ void insert_ch(unsigned int ch)
     buffer_replace_bytes(del_count, ins, ins_count);
     end_change();
 
-    // move after inserted text
+    // Move after inserted text
     block_iter_skip_bytes(&view->cursor, ins_count);
 
     free(ins);
@@ -408,7 +408,7 @@ static void join_selection(void)
         } else {
             if (join) {
                 buffer_replace_bytes(len, " ", 1);
-                /* skip the space we inserted and the char we read last */
+                // Skip the space we inserted and the char we read last
                 buffer_next_char(&view->cursor, &ch);
                 buffer_next_char(&view->cursor, &ch);
                 bi = view->cursor;
@@ -418,7 +418,7 @@ static void join_selection(void)
         }
     }
 
-    /* don't replace last \n which is at end of the selection */
+    // Don't replace last \n which is at end of the selection
     if (join && ch == '\n') {
         join--;
         len--;
@@ -426,7 +426,7 @@ static void join_selection(void)
 
     if (join) {
         if (ch == '\n') {
-            /* don't add space to end of line */
+            // Don't add space to end of line
             buffer_delete_bytes(len);
         } else {
             buffer_replace_bytes(len, " ", 1);
@@ -490,14 +490,14 @@ static void shift_right(int nr_lines, int count)
         get_indent_info(lr.line, lr.size, &info);
         if (info.wsonly) {
             if (info.bytes) {
-                // remove indentation
+                // Remove indentation
                 buffer_delete_bytes(info.bytes);
             }
         } else if (info.sane) {
-            // insert whitespace
+            // Insert whitespace
             buffer_insert_bytes(indent, indent_size);
         } else {
-            // replace whole indentation with sane one
+            // Replace whole indentation with sane one
             int size;
             char *buf = alloc_indent(info.level + count, &size);
             buffer_replace_bytes(info.bytes, buf, size);
@@ -522,7 +522,7 @@ static void shift_left(int nr_lines, int count)
         get_indent_info(lr.line, lr.size, &info);
         if (info.wsonly) {
             if (info.bytes) {
-                // remove indentation
+                // Remove indentation
                 buffer_delete_bytes(info.bytes);
             }
         } else if (info.level && info.sane) {
@@ -534,7 +534,7 @@ static void shift_left(int nr_lines, int count)
                 n *= buffer->options.indent_width;
             buffer_delete_bytes(n);
         } else if (info.bytes) {
-            // replace whole indentation with sane one
+            // Replace whole indentation with sane one
             if (info.level > count) {
                 int size;
                 char *buf = alloc_indent(info.level - count, &size);
@@ -575,7 +575,7 @@ void shift_lines(int count)
 
     if (view->selection) {
         if (info.swapped) {
-            // cursor should be at beginning of selection
+            // Cursor should be at beginning of selection
             block_iter_bol(&view->cursor);
             view->sel_so = block_iter_get_offset(&view->cursor);
             while (--nr_lines)
@@ -611,7 +611,7 @@ void clear_lines(void)
         del_count = prepare_selection(view);
         unselect();
 
-        // don't delete last newline
+        // Don't delete last newline
         if (del_count)
             del_count--;
     } else {
@@ -714,12 +714,12 @@ static unsigned int paragraph_size(void)
     block_iter_bol(&bi);
     fill_line_ref(&bi, &lr);
     if (is_paragraph_separator(lr.line, lr.size)) {
-        // not in paragraph
+        // Not in paragraph
         return 0;
     }
     indent_width = get_indent_width(lr.line, lr.size);
 
-    // goto beginning of paragraph
+    // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
         fill_line_ref(&bi, &lr);
         if (!in_paragraph(lr.line, lr.size, indent_width)) {
@@ -729,7 +729,7 @@ static unsigned int paragraph_size(void)
     }
     view->cursor = bi;
 
-    // get size of paragraph
+    // Get size of paragraph
     size = 0;
     do {
         long bytes = block_iter_eat_line(&bi);
@@ -858,7 +858,7 @@ void change_case(int mode)
 
     if (move && dst.len > 0) {
         if (was_selecting) {
-            // move cursor back to where it was
+            // Move cursor back to where it was
             long idx = dst.len;
             u_prev_char(dst.buffer, &idx);
             block_iter_skip_bytes(&view->cursor, idx);

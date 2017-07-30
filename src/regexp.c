@@ -46,7 +46,7 @@ bool regexp_exec(const regex_t *re, const char *buf, long size, long nr_m, regma
     m[0].rm_eo = size;
     return !regexec(re, buf, nr_m, m, flags | REG_STARTEND);
 #else
-    // buffer must be null-terminated string if REG_STARTED is not supported
+    // Buffer must be null-terminated string if REG_STARTED is not supported
     char *tmp = xnew(char, size + 1);
     int ret;
 

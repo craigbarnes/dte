@@ -98,7 +98,7 @@ void remove_extra_colors(void)
     for (i = NR_BC; i < hl_colors.count; i++) {
         struct hl_color *c = hl_colors.ptrs[i];
 
-        // make possible use after free error easy to see
+        // Make possible use after free error easy to see
         c->color.fg = COLOR_RED;
         c->color.bg = COLOR_YELLOW;
         c->color.attr = ATTR_BOLD;
@@ -206,7 +206,7 @@ void collect_colors_and_attributes(const char *prefix)
 {
     int i;
 
-    // skip first (keep) because it is in attr_names too
+    // Skip first (keep) because it is in attr_names too
     for (i = 1; i < ARRAY_COUNT(color_names); i++) {
         if (str_has_prefix(color_names[i], prefix))
             add_completion(xstrdup(color_names[i]));

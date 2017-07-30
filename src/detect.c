@@ -76,19 +76,19 @@ static int indent_len(struct buffer *b, const char *line, int len, bool *tab_ind
     }
     *tab_indent = false;
     if (pos == len) {
-        // whitespace only
+        // Whitespace only
         return -1;
     }
     if (pos == 0) {
-        // not indented
+        // Not indented
         return 0;
     }
     if (space_before_tab) {
-        // mixed indent
+        // Mixed indent
         return -2;
     }
     if (tabs) {
-        // tabs and possible spaces after tab for alignment
+        // Tabs and possible spaces after tab for alignment
         *tab_indent = true;
         return tabs * 8;
     }
@@ -118,18 +118,18 @@ bool detect_indent(struct buffer *b)
         fill_line_ref(&bi, &lr);
         indent = indent_len(b, lr.line, lr.size, &tab);
         if (indent == -2) {
-            // ignore mixed indent because tab width might not be 8
+            // Ignore mixed indent because tab width might not be 8
         } else if (indent == -1) {
-            // empty line, no change in indent
+            // Empty line, no change in indent
         } else if (indent == 0) {
             current_indent = 0;
         } else {
-            // indented line
+            // Indented line
             int change;
 
             // Count only increase in indentation because indentation
-            // almost always grows one level at time whereas
-            // indentation can decrease multiple levels all at once.
+            // almost always grows one level at time, whereas it can
+            // can decrease multiple levels all at once.
             if (current_indent == -1)
                 current_indent = 0;
             change = indent - current_indent;

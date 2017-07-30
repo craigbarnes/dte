@@ -109,14 +109,14 @@ static int get_current_indent_bytes(const char *buf, int cursor_offset)
         } else if (ch == ' ') {
             iwidth++;
         } else {
-            // cursor not at indentation
+            // Cursor not at indentation
             return -1;
         }
         ibytes++;
     }
 
     if (iwidth % buffer->options.indent_width) {
-        // cursor at middle of indentation level
+        // Cursor at middle of indentation level
         return -1;
     }
     return ibytes;
@@ -157,7 +157,7 @@ int get_indent_level_bytes_right(void)
         } else if (ch == ' ') {
             iwidth++;
         } else {
-            // no full indentation level at cursor position
+            // No full indentation level at cursor position
             return 0;
         }
 

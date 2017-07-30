@@ -13,7 +13,7 @@
 #include "path.h"
 
 static struct {
-    // part of string which is to be replaced
+    // Part of string which is to be replaced
     char *escaped;
     char *parsed;
 
@@ -22,7 +22,7 @@ static struct {
     struct ptr_array completions;
     int idx;
 
-    // should we add space after completed string if we have only one match?
+    // Should we add space after completed string if we have only one match?
     bool add_space;
 
     bool tilde_expanded;
@@ -166,7 +166,7 @@ static void collect_files(bool directories_only)
     free(str);
 
     if (completion.completions.count == 1) {
-        // add space if completed string is not a directory
+        // Add space if completed string is not a directory
         const char *s = completion.completions.ptrs[0];
         int len = strlen(s);
         completion.add_space = s[len - 1] != '/';

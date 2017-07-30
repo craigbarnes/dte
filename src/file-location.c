@@ -52,12 +52,12 @@ bool file_location_go(struct file_location *loc)
     bool ok = true;
 
     if (!v) {
-        // failed to open file. error message should be visible
+        // Failed to open file. Error message should be visible.
         return false;
     }
     if (w->view != v) {
         set_view(v);
-        // force centering view to the cursor because file changed
+        // Force centering view to the cursor because file changed
         v->force_center = true;
     }
     if (loc->pattern != NULL) {

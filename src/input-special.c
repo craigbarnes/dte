@@ -3,22 +3,22 @@
 #include "common.h"
 
 enum input_special {
-    /* not inputting special characters */
+    // Not inputting special characters
     INPUT_SPECIAL_NONE,
 
-    /* not known yet (just started by hitting ^V) */
+    // Not known yet (just started by hitting ^V)
     INPUT_SPECIAL_UNKNOWN,
 
-    /* accept any value 0-255 (3 octal digits) */
+    // Accept any value 0-255 (3 octal digits)
     INPUT_SPECIAL_OCT,
 
-    /* accept any value 0-255 (3 decimal digits) */
+    // Accept any value 0-255 (3 decimal digits)
     INPUT_SPECIAL_DEC,
 
-    /* accept any value 0-255 (2 hexadecimal digits) */
+    // Accept any value 0-255 (2 hexadecimal digits)
     INPUT_SPECIAL_HEX,
 
-    /* accept any valid unicode value (6 hexadecimal digits) */
+    // Accept any valid unicode value (6 hexadecimal digits)
     INPUT_SPECIAL_UNICODE,
 };
 

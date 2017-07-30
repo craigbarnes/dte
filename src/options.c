@@ -49,7 +49,7 @@ struct option_desc {
     bool global;
     union {
         struct {
-            // optional
+            // Optional
             bool (*validate)(const char *value);
         } str_opt;
         struct {
@@ -63,7 +63,7 @@ struct option_desc {
             const char **values;
         } flag_opt;
     } u;
-    // optional
+    // Optional
     void (*on_change)(void);
 };
 
@@ -123,7 +123,7 @@ struct option_ops {
     .on_change = _on_change, \
 }
 
-// can't reuse ENUM_OPT() because of weird macro expansion rules
+// Can't reuse ENUM_OPT() because of weird macro expansion rules
 #define BOOL_OPT(_name, OLG, _on_change) { \
     .ops = &option_ops[OPT_ENUM], \
     .name = _name, \
@@ -506,7 +506,7 @@ static void do_set_option(const struct option_desc *desc, const char *value, boo
         return;
     }
     if (!local && !global) {
-        // set both by default
+        // Set both by default
         if (desc->local)
             local = true;
         if (desc->global)
@@ -548,7 +548,7 @@ static const struct option_desc *find_toggle_option(const char *name, bool *glob
 
     if (*global)
         return must_find_global_option(name);
-    // toggle local value by default if option has both values
+    // Toggle local value by default if option has both values
     desc = must_find_option(name);
     if (desc && !desc->local)
         *global = true;
@@ -689,7 +689,7 @@ void collect_option_values(const char *name, const char *prefix)
         return;
 
     if (!*prefix) {
-        // complete value
+        // Complete value
         union option_value value;
         char *ptr;
 
@@ -702,7 +702,7 @@ void collect_option_values(const char *name, const char *prefix)
         add_completion(desc->ops->string(desc, value));
         free_value(desc, value);
     } else if (desc_is(desc, OPT_ENUM)) {
-        // complete possible values
+        // Complete possible values
         int i;
 
         for (i = 0; desc->u.enum_opt.values[i]; i++) {
@@ -710,7 +710,7 @@ void collect_option_values(const char *name, const char *prefix)
                 add_completion(xstrdup(desc->u.enum_opt.values[i]));
         }
     } else if (desc_is(desc, OPT_FLAG)) {
-        // complete possible values
+        // Complete possible values
         const char *comma = strrchr(prefix, ',');
         int i, prefix_len = 0;
 

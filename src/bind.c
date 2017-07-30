@@ -25,7 +25,7 @@ static bool parse_keys(struct key_chain *chain, const char *str)
     int len = strlen(keys);
     int i = 0;
 
-    // convert all whitespace to \0
+    // Convert all whitespace to \0
     for (i = 0; i < len; i++) {
         if (isspace(keys[i])) {
             keys[i] = 0;

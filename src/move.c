@@ -29,7 +29,7 @@ void move_to_preferred_x(int preferred_x)
 
         for (i = 0; i < lr.size && lr.line[i] == ' '; i++) {
             if (i + 1 == (ilevel + 1) * iw) {
-                // force cursor to beginning of the indentation level
+                // Force cursor to beginning of the indentation level
                 view->cursor.offset += ilevel * iw;
                 return;
             }

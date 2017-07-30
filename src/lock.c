@@ -46,7 +46,7 @@ static int rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
                 other_pid = pid;
             }
         } else {
-            // release lock from dead process
+            // Release lock from dead process
             remove_line = true;
         }
 

@@ -7,7 +7,7 @@
 PTR_ARRAY(search_history);
 PTR_ARRAY(command_history);
 
-// add item to end of array
+// Add item to end of array
 void history_add(struct ptr_array *history, const char *text, int max_entries)
 {
     int i;
@@ -15,10 +15,10 @@ void history_add(struct ptr_array *history, const char *text, int max_entries)
     if (text[0] == 0)
         return;
 
-    // don't add identical entries
+    // Don't add identical entries
     for (i = 0; i < history->count; i++) {
         if (streq(history->ptrs[i], text)) {
-            // move identical entry to end
+            // Move identical entry to end
             ptr_array_add(history, ptr_array_remove_idx(history, i));
             return;
         }

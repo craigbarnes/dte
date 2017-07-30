@@ -23,7 +23,7 @@ enum {
     T_ALL = 16 - 1,
 };
 
-// prefixes, st-256color matches st
+// Prefixes; st-256color matches st
 const char *terms[] = {
     "rxvt",
     "screen",
@@ -42,7 +42,7 @@ static const struct keymap builtin_keys[] = {
     {KEY_HOME, "\033[1~", T_ALL},
     {KEY_END, "\033[4~", T_ALL},
 
-    // fix keypad when numlock is off
+    // Fix keypad when numlock is off
     {'/', "\033Oo", T_ALL},
     {'*', "\033Oj", T_ALL},
     {'-', "\033Om", T_ALL},
@@ -161,27 +161,25 @@ int term_init(const char *term)
 
 void term_raw(void)
 {
-    /* see termios(3) */
+    // See termios(3)
     struct termios termios;
 
     tcgetattr(0, &termios);
     termios_save = termios;
 
-    /* disable buffering
-     * disable echo
-     * disable generation of signals (free some control keys)
-     */
+    // Disable buffering
+    // Disable echo
+    // Disable generation of signals (free some control keys)
     termios.c_lflag &= ~(ICANON | ECHO | ISIG);
 
-    /* disable CR to NL conversion (differentiate ^J from enter)
-     * disable flow control (free ^Q and ^S)
-     */
+    // Disable CR to NL conversion (differentiate ^J from enter)
+    // Disable flow control (free ^Q and ^S)
     termios.c_iflag &= ~(ICRNL | IXON | IXOFF);
 
-    /* read at least 1 char on each read() */
+    // Read at least 1 char on each read()
     termios.c_cc[VMIN] = 1;
 
-    /* read blocks until there are MIN(VMIN, requested) bytes available */
+    // Read blocks until there are MIN(VMIN, requested) bytes available
     termios.c_cc[VTIME] = 0;
 
     tcsetattr(0, 0, &termios);
@@ -202,7 +200,7 @@ static void consume_input(int len)
     if (input_buf_fill) {
         memmove(input_buf, input_buf + len, input_buf_fill);
 
-        /* keys are sent faster than we can read */
+        // Keys are sent faster than we can read
         input_can_be_truncated = true;
     }
 }
@@ -292,7 +290,7 @@ static bool read_special(int *key)
 
         len = strlen(keycode);
         if (len > input_buf_fill) {
-            /* this might be a truncated escape sequence */
+            // This might be a truncated escape sequence
             if (!memcmp(keycode, input_buf, input_buf_fill))
                 possibly_truncated = true;
             continue;
@@ -319,10 +317,10 @@ static bool read_simple(int *key)
 {
     unsigned char ch = 0;
 
-    /* > 0 bytes in buf */
+    // > 0 bytes in buf
     input_get_byte(&ch);
 
-    /* normal key */
+    // Normal key
     if (term_utf8 && ch > 0x7f) {
         /*
          * 10xx xxxx invalid
@@ -339,7 +337,7 @@ static bool read_simple(int *key)
             count++;
         }
         if (count == 0 || count > 3) {
-            /* invalid first byte */
+            // Invalid first byte
             return false;
         }
         u = ch & (bit - 1);
@@ -364,7 +362,7 @@ static bool read_simple(int *key)
             break;
         default:
             if (ch < 0x20) {
-                // control character
+                // Control character
                 *key = MOD_CTRL | ch | 0x40;
             } else {
                 *key = ch;
@@ -410,7 +408,7 @@ static bool read_key(int *key)
                 return true;
         }
         if (input_buf_fill == 1) {
-            /* sometimes alt-key gets split into two reads */
+            // Sometimes alt-key gets split into two reads
             fill_buffer_timeout();
 
             if (input_buf_fill > 1 && input_buf[1] == '\033') {
@@ -431,11 +429,11 @@ static bool read_key(int *key)
             }
         }
         if (input_buf_fill > 1) {
-            // unknown escape sequence or 'esc key' / 'alt-key'
+            // Unknown escape sequence or 'esc key' / 'alt-key'
             unsigned char ch;
             bool ok;
 
-            // throw escape away
+            // Throw escape away
             input_get_byte(&ch);
             ok = read_simple(key);
             if (!ok) {
@@ -446,7 +444,7 @@ static bool read_key(int *key)
                 *key |= MOD_META;
                 return true;
             }
-            // unknown escape sequence, avoid inserting it
+            // Unknown escape sequence, avoid inserting it
             input_buf_fill = 0;
             return false;
         }
@@ -459,7 +457,7 @@ bool term_read_key(int *key)
     bool ok = read_key(key);
     int k = *key;
     if (DEBUG > 2 && ok && k != KEY_PASTE && k > KEY_UNICODE_MAX) {
-        // modifiers and/or special key
+        // Modifiers and/or special key
         char *str = key_to_string(k);
         d_print("key: %s\n", str);
         free(str);
@@ -558,7 +556,7 @@ const char *term_set_color(const struct term_color *color)
         c.fg &= 7;
     }
 
-    // max 35 bytes (3 + 6 * 2 + 2 * 9 + 2)
+    // Max 35 bytes (3 + 6 * 2 + 2 * 9 + 2)
     buffer_pos = 0;
     buffer[buffer_pos++] = '\033';
     buffer[buffer_pos++] = '[';
@@ -608,7 +606,7 @@ const char *term_move_cursor(int x, int y)
 
     x++;
     y++;
-    // max 11 bytes
+    // Max 11 bytes
     buffer_pos = 0;
     buffer[buffer_pos++] = '\033';
     buffer[buffer_pos++] = '[';

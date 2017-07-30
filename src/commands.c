@@ -32,7 +32,7 @@
 #include "input-special.h"
 #include "git-open.h"
 
-// go to compiler error saving position if file changed or cursor moved
+// Go to compiler error saving position if file changed or cursor moved
 static void activate_current_message_save(void)
 {
     struct file_location *loc = create_file_location(view);
@@ -118,7 +118,7 @@ static void cmd_cd(const char *pf, char **args)
         update_short_filename_cwd(b, cwdp);
     }
 
-    // need to update all tabbars
+    // Need to update all tabbars
     mark_everything_changed();
 }
 
@@ -601,10 +601,10 @@ static void cmd_open(const char *pf, char **args)
         return;
     }
     if (!args[1]) {
-        // previous view is remembered when opening single file
+        // Previous view is remembered when opening single file
         window_open_file(window, args[0], encoding);
     } else {
-        // it makes no sense to remember previous view when opening multiple files
+        // It makes no sense to remember previous view when opening multiple files
         window_open_files(window, args, encoding);
     }
     free(encoding);
@@ -733,12 +733,12 @@ static void cmd_quit(const char *pf, char **args)
     for (i = 0; i < buffers.count; i++) {
         struct buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
-            // activate modified buffer
+            // Activate modified buffer
             struct view *v = window_find_view(window, b);
 
             if (v == NULL) {
-                // buffer isn't open in current window
-                // activate first window of the buffer
+                // Buffer isn't open in current window.
+                // Activate first window of the buffer.
                 v = b->views.ptrs[0];
                 window = v->window;
                 mark_everything_changed();
@@ -839,7 +839,7 @@ static void cmd_run(const char *pf, char **args)
 
 static int stat_changed(const struct stat *a, const struct stat *b)
 {
-    /* don't compare st_mode because we allow chmod 755 etc. */
+    // Don't compare st_mode because we allow chmod 755 etc.
     return a->st_mtime != b->st_mtime ||
         a->st_dev != b->st_dev ||
         a->st_ino != b->st_ino;
@@ -985,7 +985,7 @@ static void cmd_save(const char *pf, char **args)
             goto error;
         }
 
-        /* allow chmod 755 etc. */
+        // Allow chmod 755 etc.
         buffer->st.st_mode = st.st_mode;
     }
     if (save_buffer(buffer, absolute, encoding, newline))
@@ -1001,7 +1001,7 @@ static void cmd_save(const char *pf, char **args)
 
     if (absolute != buffer->abs_filename) {
         if (buffer->locked) {
-            // filename changes, relase old file lock
+            // Filename changes, relase old file lock
             unlock_file(buffer->abs_filename);
         }
         buffer->locked = new_locked;
@@ -1010,11 +1010,11 @@ static void cmd_save(const char *pf, char **args)
         buffer->abs_filename = absolute;
         update_short_filename(buffer);
 
-        // filename change is not detected (only buffer_modified() change)
+        // Filename change is not detected (only buffer_modified() change)
         mark_buffer_tabbars_changed(buffer);
     }
     if (!old_mode && streq(buffer->options.filetype, "none")) {
-        /* new file and most likely user has not changed the filetype */
+        // New file and most likely user has not changed the filetype
         if (buffer_detect_filetype(buffer)) {
             set_file_options(buffer);
             buffer_update_syntax(buffer);
@@ -1109,7 +1109,7 @@ static void cmd_search(const char *pf, char **args)
     if (w) {
         char *word = view_get_word_under_cursor(view);
         if (word == NULL) {
-            // error message would not be very useful here
+            // Error message would not be very useful here
             return;
         }
         pattern = xnew(char, strlen(word) + 5);
@@ -1181,7 +1181,7 @@ static void cmd_select(const char *pf, char **args)
     view->sel_eo = UINT_MAX;
     view->selection = sel;
 
-    // need to mark current line changed because cursor might
+    // Need to mark current line changed because cursor might
     // move up or down before screen is updated
     view_update_cursor_y(view);
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
@@ -1205,7 +1205,7 @@ static void cmd_set(const char *pf, char **args)
         pf++;
     }
 
-    // you can set only global values in config file
+    // You can set only global values in config file
     if (buffer == NULL) {
         if (local) {
             error_msg("Flag -l makes no sense in config file.");
@@ -1291,7 +1291,7 @@ static void cmd_tag(const char *pf, char **args)
         name = word;
     }
 
-    // filename helps to find correct tags
+    // Filename helps to find correct tags
     tag_file_find_tags(tf, buffer->abs_filename, name, &tags);
     if (tags.count == 0) {
         error_msg("Tag %s not found.", name);
@@ -1449,7 +1449,7 @@ static void cmd_wresize(const char *pf, char **args)
         pf++;
     }
     if (window->frame->parent == NULL) {
-        // only window
+        // Only window
         return;
     }
     if (arg) {
@@ -1477,15 +1477,15 @@ static void cmd_wsplit(const char *pf, char **args)
     while (*pf) {
         switch (*pf) {
         case 'b':
-            // add new window before current window
+            // Add new window before current window
             before = true;
             break;
         case 'h':
-            // split horizontally to get vertical layout
+            // Split horizontally to get vertical layout
             vertical = true;
             break;
         case 'r':
-            // split root frame instead of current window
+            // Split root frame instead of current window
             root = true;
             break;
         }
@@ -1512,7 +1512,7 @@ static void cmd_wsplit(const char *pf, char **args)
     }
 
     if (window->views.count == 0) {
-        // open failed, remove new window
+        // Open failed, remove new window
         remove_frame(window->frame);
 
         view = save;

@@ -39,7 +39,7 @@ void add_alias(const char *name, const char *value)
         return;
     }
 
-    /* replace existing alias */
+    // Replace existing alias
     for (i = 0; i < aliases.count; i++) {
         alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {

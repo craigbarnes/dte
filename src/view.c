@@ -70,7 +70,7 @@ static void view_center_to_cursor(struct view *v)
 
     v->vy = v->cy - hh;
     if (v->vy + w->edit_h > lines) {
-        /* -1 makes one ~ line visible so that you know where the EOF is */
+        // -1 makes one ~ line visible so that you know where the EOF is
         v->vy -= v->vy + w->edit_h - lines - 1;
     }
 }
@@ -130,7 +130,7 @@ bool view_can_close(struct view *v)
     if (!buffer_modified(v->buffer)) {
         return true;
     }
-    // open in another window?
+    // Open in another window?
     return v->buffer->views.count > 1;
 }
 

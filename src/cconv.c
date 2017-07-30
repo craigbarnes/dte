@@ -17,15 +17,15 @@ struct cconv {
     size_t consumed;
     int errors;
 
-    // temporary input buffer
+    // Temporary input buffer
     char tbuf[16];
     size_t tcount;
 
-    // replacement character 0xBF (inverted question mark)
+    // Replacement character 0xBF (inverted question mark)
     char rbuf[4];
     int rcount;
 
-    // input character size in bytes. zero for UTF-8
+    // Input character size in bytes. zero for UTF-8.
     int char_size;
 };
 
@@ -83,7 +83,7 @@ static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
     d_print("%d %zd\n", c->char_size, count);
     add_replacement(c);
     if (c->char_size == 0) {
-        // converting from UTF-8
+        // Converting from UTF-8
         long idx = 0;
         unsigned int u = u_get_char(buf, count, &idx);
         d_print("U+%04X\n", u);
@@ -108,7 +108,7 @@ static int xiconv(struct cconv *c, char **ib, size_t *ic)
             switch (errno) {
             case EILSEQ:
                 c->errors++;
-                // reset
+                // Reset
                 iconv(c->cd, NULL, NULL, NULL, NULL);
                 return errno;
             case EINVAL:
@@ -148,10 +148,10 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
         switch (rc) {
         case EINVAL:
             // Incomplete character at end of input buffer.
-            // try again with more input data
+            // Try again with more input data.
             continue;
         case EILSEQ:
-            // Invalid multibyte sequence.
+            // Invalid multibyte sequence
             skip = handle_invalid(c, c->tbuf, c->tcount);
             c->tcount -= skip;
             if (c->tcount > 0) {

@@ -55,7 +55,7 @@ void error_msg(const char *format, ...)
     va_list ap;
     int pos = 0;
 
-    // some implementations of *printf return -1 if output was truncated
+    // Some implementations of *printf return -1 if output was truncated
     if (config_file) {
         snprintf(error_buf, sizeof(error_buf), "%s:%d: ", config_file, config_line);
         pos = strlen(error_buf);

@@ -130,7 +130,7 @@ int u_char_width(unsigned int u)
     if (likely(u < 0x80))
         return 1;
 
-    /* unprintable characters (includes invalid bytes in unicode stream) are rendered "<xx>" */
+    // Unprintable characters (includes invalid bytes in unicode stream) are rendered "<xx>"
     if (u_is_unprintable(u))
         return 4;
 
@@ -141,17 +141,17 @@ int u_char_width(unsigned int u)
     if (likely(u < 0x1100U))
         return 1;
 
-    /* Hangul Jamo init. consonants */
+    // Hangul Jamo initial consonants
     if (u <= 0x115fU)
         goto wide;
 
-    /* angle brackets */
+    // Angle brackets
     if (u == 0x2329U || u == 0x232aU)
         goto wide;
 
     if (u < 0x2e80U)
         goto narrow;
-    /* CJK ... Yi */
+    // CJK ... Yi
     if (u < 0x302aU)
         goto wide;
     if (u <= 0x302fU)
@@ -162,35 +162,35 @@ int u_char_width(unsigned int u)
         goto narrow;
     if (u == 0x309aU)
         goto narrow;
-    /* CJK ... Yi */
+    // CJK ... Yi
     if (u <= 0xa4cfU)
         goto wide;
 
-    /* Hangul Syllables */
+    // Hangul Syllables
     if (u >= 0xac00U && u <= 0xd7a3U)
         goto wide;
 
-    /* CJK Compatibility Ideographs */
+    // CJK Compatibility Ideographs
     if (u >= 0xf900U && u <= 0xfaffU)
         goto wide;
 
-    /* CJK Compatibility Forms */
+    // CJK Compatibility Forms
     if (u >= 0xfe30U && u <= 0xfe6fU)
         goto wide;
 
-    /* Fullwidth Forms */
+    // Fullwidth Forms
     if (u >= 0xff00U && u <= 0xff60U)
         goto wide;
 
-    /* Fullwidth Forms */
+    // Fullwidth Forms
     if (u >= 0xffe0U && u <= 0xffe6U)
         goto wide;
 
-    /* CJK extra stuff */
+    // CJK extra stuff
     if (u >= 0x20000U && u <= 0x2fffdU)
         goto wide;
 
-    /* ? */
+    // ?
     if (u >= 0x30000U && u <= 0x3fffdU)
         goto wide;
 narrow:

@@ -30,10 +30,10 @@ static bool do_search_fwd(regex_t *regex, struct block_iter *bi, bool skip)
         // which is same as the cursor position.
         if (regexp_exec(regex, lr.line, lr.size, 1, &match, flags)) {
             if (skip && match.rm_so == 0) {
-                // ignore match at current cursor position
+                // Ignore match at current cursor position
                 long count = match.rm_eo;
                 if (count == 0) {
-                    // it is safe to skip one byte because every line
+                    // It is safe to skip one byte because every line
                     // has one extra byte (newline) that is not in lr.line
                     count = 1;
                 }
@@ -47,7 +47,7 @@ static bool do_search_fwd(regex_t *regex, struct block_iter *bi, bool skip)
             view_reset_preferred_x(view);
             return true;
         }
-        skip = false; // not at cursor position anymore
+        skip = false; // Not at cursor position anymore
         flags = 0;
     } while (block_iter_next_line(bi));
     return false;
@@ -70,21 +70,21 @@ static bool do_search_bwd(regex_t *regex, struct block_iter *bi, int cx, bool sk
             flags = REG_NOTBOL;
             if (cx >= 0) {
                 if (pos + match.rm_so >= cx) {
-                    // ignore match at or after cursor
+                    // Ignore match at or after cursor
                     break;
                 }
                 if (skip && pos + match.rm_eo > cx) {
-                    // search -rw should not find word under cursor
+                    // Search -rw should not find word under cursor
                     break;
                 }
             }
 
-            // this might be what we want (last match before cursor)
+            // This might be what we want (last match before cursor)
             offset = pos + match.rm_so;
             pos += match.rm_eo;
 
             if (match.rm_so == match.rm_eo) {
-                // zero length match
+                // Zero length match
                 break;
             }
         }
@@ -114,7 +114,7 @@ bool search_tag(const char *pattern, bool *err)
         view->center_on_scroll = true;
         found = true;
     } else {
-        // don't center view to cursor unnecessarily
+        // Don't center view to cursor unnecessarily
         view->force_center = false;
         error_msg("Tag not found.");
         *err = true;
@@ -128,7 +128,7 @@ static struct {
     char *pattern;
     enum search_direction direction;
 
-    /* if zero then regex hasn't been compiled */
+    // If zero then regex hasn't been compiled
     int re_flags;
 } current_search;
 
@@ -297,7 +297,7 @@ static int replace_on_line(struct lineref *lr, regex_t *re, const char *format,
         int match_len = m[0].rm_eo - m[0].rm_so;
         bool skip = false;
 
-        /* move cursor to beginning of the text to replace */
+        // Move cursor to beginning of the text to replace
         block_iter_skip_bytes(bi, m[0].rm_so);
         view->cursor = *bi;
 
@@ -312,7 +312,7 @@ static int replace_on_line(struct lineref *lr, regex_t *re, const char *format,
                 flags &= ~REPLACE_CONFIRM;
                 *flagsp = flags;
 
-                /* record rest of the changes as one chain */
+                // Record rest of the changes as one chain
                 begin_change_chain();
                 break;
             case 'q':
@@ -323,27 +323,27 @@ static int replace_on_line(struct lineref *lr, regex_t *re, const char *format,
         }
 
         if (skip) {
-            /* move cursor after the matched text */
+            // Move cursor after the matched text
             block_iter_skip_bytes(&view->cursor, match_len);
         } else {
             GBUF(b);
 
             build_replacement(&b, buf + pos, format, m);
 
-            /* lineref is invalidated by modification */
+            // lineref is invalidated by modification
             if (buf == lr->line)
                 buf = xmemdup(buf, lr->size);
 
             buffer_replace_bytes(match_len, b.buffer, b.len);
             nr++;
 
-            /* update selection length */
+            // Update selection length
             if (view->selection) {
                 view->sel_eo += b.len;
                 view->sel_eo -= match_len;
             }
 
-            /* move cursor after the replaced text */
+            // Move cursor after the replaced text
             block_iter_skip_bytes(&view->cursor, b.len);
             gbuf_free(&b);
         }
@@ -357,7 +357,7 @@ static int replace_on_line(struct lineref *lr, regex_t *re, const char *format,
 
         pos += m[0].rm_so + match_len;
 
-        /* don't match beginning of line again */
+        // Don't match beginning of line again
         eflags = REG_NOTBOL;
     }
 out:
@@ -401,12 +401,12 @@ void reg_replace(const char *pattern, const char *format, unsigned int flags)
         nr_bytes = block_iter_get_offset(&eof);
     }
 
-    /* record multiple changes as one chain only when replacing all */
+    // Record multiple changes as one chain only when replacing all
     if (!(flags & REPLACE_CONFIRM))
         begin_change_chain();
 
     while (1) {
-        // number of bytes to process
+        // Number of bytes to process
         long count;
         struct lineref lr;
         int nr;
@@ -414,7 +414,7 @@ void reg_replace(const char *pattern, const char *format, unsigned int flags)
         fill_line_ref(&bi, &lr);
         count = lr.size;
         if (lr.size > nr_bytes) {
-            // end of selection is not full line
+            // End of selection is not full line
             lr.size = nr_bytes;
         }
 
@@ -444,7 +444,7 @@ void reg_replace(const char *pattern, const char *format, unsigned int flags)
     }
 
     if (view->selection) {
-        // undo what init_selection() did
+        // Undo what init_selection() did
         if (view->sel_eo)
             view->sel_eo--;
         if (swapped) {

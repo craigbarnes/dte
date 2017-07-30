@@ -73,7 +73,7 @@ void sf_format(struct formatter *f, char *buf, long size, const char *format)
     unsigned int u;
 
     f->buf = buf;
-    f->size = size - 5; // max length of char and terminating NUL
+    f->size = size - 5; // Max length of char and terminating NUL
     f->pos = 0;
     f->separator = false;
 

@@ -25,7 +25,7 @@ long block_iter_eat_line(struct block_iter *bi)
     if (offset == bi->blk->size)
         return 0;
 
-    // there must be at least one newline
+    // There must be at least one newline
     if (bi->blk->nl == 1) {
         bi->offset = bi->blk->size;
     } else {
@@ -52,7 +52,7 @@ long block_iter_next_line(struct block_iter *bi)
     if (offset == bi->blk->size)
         return 0;
 
-    // there must be at least one newline
+    // There must be at least one newline
     if (bi->blk->nl == 1) {
         new_offset = bi->blk->size;
     } else {
@@ -128,7 +128,7 @@ long block_iter_eol(struct block_iter *bi)
     blk = bi->blk;
     offset = bi->offset;
     if (offset == blk->size) {
-        // cursor at end of last block
+        // Cursor at end of last block
         return 0;
     }
     if (blk->nl == 1) {
@@ -256,7 +256,7 @@ void fill_line_ref(struct block_iter *bi, struct lineref *lr)
     lr->line = bi->blk->data + bi->offset;
     max = bi->blk->size - bi->offset;
     if (max == 0) {
-        // cursor at end of last block
+        // Cursor at end of last block
         lr->size = 0;
         return;
     }
@@ -278,7 +278,7 @@ void fill_line_nl_ref(struct block_iter *bi, struct lineref *lr)
     lr->line = bi->blk->data + bi->offset;
     max = bi->blk->size - bi->offset;
     if (max == 0) {
-        // cursor at end of last block
+        // Cursor at end of last block
         lr->size = 0;
         return;
     }

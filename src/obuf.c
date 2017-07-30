@@ -28,7 +28,7 @@ void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x)
     obuf.can_clear = start_x + width == screen_w;
 }
 
-// does not update obuf.x
+// Does not update obuf.x
 void buf_add_bytes(const char *str, int count)
 {
     if (count > obuf_avail()) {
@@ -72,7 +72,7 @@ void buf_set_bytes(char ch, int count)
     }
 }
 
-// does not update obuf.x
+// Does not update obuf.x
 void buf_add_ch(char ch)
 {
     obuf_need_space(1);
@@ -173,7 +173,7 @@ static void buf_skip(unsigned int u)
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             obuf.x += (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
         } else {
-            // control
+            // Control
             obuf.x += 2;
         }
     } else {
@@ -208,7 +208,7 @@ bool buf_put_char(unsigned int u)
     unsigned int width;
 
     if (obuf.x < obuf.scroll_x) {
-        // scrolled, char (at least partially) invisible
+        // Scrolled, char (at least partially) invisible
         buf_skip(u);
         return true;
     }
@@ -230,7 +230,7 @@ bool buf_put_char(unsigned int u)
             u_set_ctrl(obuf.buf, &obuf.count, u);
             obuf.x += 2;
             if (unlikely(space == 1)) {
-                // wrote too much
+                // Wrote too much
                 obuf.count--;
                 obuf.x--;
             }
@@ -241,9 +241,9 @@ bool buf_put_char(unsigned int u)
             obuf.x += width;
             u_set_char(obuf.buf, &obuf.count, u);
         } else if (u_is_unprintable(u)) {
-            // <xx> would not fit
-            // there's enough space in the buffer so render all 4 characters
-            // but increment position less
+            // <xx> would not fit.
+            // There's enough space in the buffer so render all 4 characters
+            // but increment position less.
             long idx = obuf.count;
             u_set_hex(obuf.buf, &idx, u);
             obuf.count += space;

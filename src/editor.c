@@ -153,7 +153,7 @@ static void update_window(struct window *w)
         print_tabbar(w);
 
     if (options.show_line_numbers) {
-        // force updating lines numbers if all lines changed
+        // Force updating lines numbers if all lines changed
         update_line_numbers(w, v->buffer->changed_line_max == INT_MAX);
     }
 
@@ -168,7 +168,7 @@ static void update_window(struct window *w)
     update_status_line(w);
 }
 
-// update all visible views containing this buffer
+// Update all visible views containing this buffer
 static void update_buffer_windows(struct buffer *b)
 {
     long i;
@@ -176,13 +176,13 @@ static void update_buffer_windows(struct buffer *b)
     for (i = 0; i < b->views.count; i++) {
         struct view *v = b->views.ptrs[i];
         if (v->window->view == v) {
-            // visible view
+            // Visible view
             if (v != window->view) {
-                // restore cursor
+                // Restore cursor
                 v->cursor.blk = BLOCK(v->buffer->blocks.next);
                 block_iter_goto_offset(&v->cursor, v->saved_cursor_offset);
 
-                // these have already been updated for current view
+                // These have already been updated for current view
                 view_update_cursor_x(v);
                 view_update_cursor_y(v);
                 view_update(v);
@@ -208,11 +208,11 @@ void resize(void)
 
     // "dtach -r winch" sends SIGWINCH after program has been attached
     if (term_cap.strings[STR_CAP_CMD_ks]) {
-        // turn keypad on (makes cursor keys work)
+        // Turn keypad on (makes cursor keys work)
         buf_escape(term_cap.strings[STR_CAP_CMD_ks]);
     }
     if (term_cap.strings[STR_CAP_CMD_ti]) {
-        // use alternate buffer if possible
+        // Use alternate buffer if possible
         buf_escape(term_cap.strings[STR_CAP_CMD_ti]);
     }
 
@@ -227,11 +227,11 @@ void ui_end(void)
     buf_move_cursor(0, screen_h - 1);
     buf_show_cursor();
 
-    // back to main buffer
+    // Back to main buffer
     if (term_cap.strings[STR_CAP_CMD_te])
         buf_escape(term_cap.strings[STR_CAP_CMD_te]);
 
-    // turn keypad off
+    // Turn keypad off
     if (term_cap.strings[STR_CAP_CMD_ke])
         buf_escape(term_cap.strings[STR_CAP_CMD_ke]);
 
@@ -242,7 +242,7 @@ void ui_end(void)
 void suspend(void)
 {
     if (getpid() == getsid(0)) {
-        // session leader can't suspend
+        // Session leader can't suspend
         return;
     }
     if (!child_controls_terminal && editor_status != EDITOR_INITIALIZING)
@@ -286,7 +286,7 @@ char get_confirmation(const char *choices, const char *format, ...)
     view_update_cursor_y(v);
     view_update(v);
 
-    // set changed_line_min and changed_line_max before calling update_range()
+    // Set changed_line_min and changed_line_max before calling update_range()
     mark_all_lines_changed(v->buffer);
 
     start_update();

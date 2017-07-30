@@ -35,14 +35,14 @@ static int remove_double_slashes(char *str)
 }
 
 /*
- * canonicalizes path name
+ * Canonicalizes path name
  *
- *   - replaces double-slashes with one slash
- *   - removes any "." or ".." path components
- *   - makes path absolute
- *   - expands symbolic links
- *   - checks that all but the last expanded path component are directories
- *   - last path component is allowed to not exist
+ *   - Replaces double-slashes with one slash
+ *   - Removes any "." or ".." path components
+ *   - Makes path absolute
+ *   - Expands symbolic links
+ *   - Checks that all but the last expanded path component are directories
+ *   - Last path component is allowed to not exist
  */
 char *path_absolute(const char *filename)
 {
@@ -55,10 +55,10 @@ char *path_absolute(const char *filename)
 
     remove_double_slashes(buf);
 
-    // for each component:
-    //     remove "."
-    //     remove ".." and previous component
-    //     if symlink then replace with link destination and start over
+    // For each component:
+    //   * Remove "."
+    //   * Remove ".." and previous component
+    //   * If symlink then replace with link destination and start over
 
     sp = buf + 1;
     while (*sp) {
@@ -79,7 +79,7 @@ char *path_absolute(const char *filename)
         }
         if (streq(sp, "..")) {
             if (sp != buf + 1) {
-                // not first component, remove previous component
+                // Not first component, remove previous component
                 sp--;
                 while (sp[-1] != '/')
                     sp--;
@@ -127,7 +127,7 @@ char *path_absolute(const char *filename)
             }
             target[target_len] = 0;
 
-            // calculate length
+            // Calculate length
             if (target[0] != '/')
                 total_len = buf_len + 1;
             total_len += target_len;
@@ -138,7 +138,7 @@ char *path_absolute(const char *filename)
                 return NULL;
             }
 
-            // build new path
+            // Build new path
             if (target[0] != '/') {
                 memcpy(tmp, buf, buf_len);
                 pos += buf_len;
@@ -154,7 +154,7 @@ char *path_absolute(const char *filename)
             tmp[pos] = 0;
             pos = remove_double_slashes(tmp);
 
-            // restart
+            // Restart
             memcpy(buf, tmp, pos + 1);
             sp = buf + 1;
             continue;
@@ -184,14 +184,14 @@ char *relative_filename(const char *f, const char *cwd)
     int i, tlen, dotdot, len, clen = 0;
     char *filename;
 
-    // annoying special case
+    // Annoying special case
     if (cwd[1] == 0) {
         if (f[1] == 0)
             return xstrdup(f);
         return xstrdup(f + 1);
     }
 
-    // length of common path
+    // Length of common path
     while (cwd[clen] && cwd[clen] == f[clen])
         clen++;
 
@@ -202,13 +202,13 @@ char *relative_filename(const char *f, const char *cwd)
         return xstrdup(f + clen + 1);
     }
 
-    // common path components
+    // Common path components
     if (!path_component(cwd, clen) || !path_component(f, clen)) {
         while (clen > 0 && f[clen - 1] != '/')
             clen--;
     }
 
-    // number of "../" needed
+    // Number of "../" needed
     dotdot = 1;
     for (i = clen + 1; cwd[i]; i++) {
         if (cwd[i] == '/')
@@ -235,7 +235,7 @@ char *short_filename_cwd(const char *absolute, const char *cwd)
     int f_len = strlen(f);
 
     if (f_len >= abs_len) {
-        // prefer absolute if relative isn't shorter
+        // Prefer absolute if relative isn't shorter
         free(f);
         f = xstrdup(absolute);
         f_len = abs_len;

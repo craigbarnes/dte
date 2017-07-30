@@ -16,29 +16,28 @@ struct view {
 
     struct block_iter cursor;
 
-    // cursor position
+    // Cursor position
     int cx, cy;
 
-    // visual cursor x
-    // character widths: wide 2, tab 1-8, control 2, invalid char 4
+    // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
     int cx_display;
 
-    // cursor x in characters (invalid utf8 character (byte) is one char)
+    // Cursor x in characters (invalid UTF-8 character (byte) is one char)
     int cx_char;
 
-    // top left corner
+    // Top left corner
     int vx, vy;
 
-    // preferred cursor x (preferred value for cx_display)
+    // Preferred cursor x (preferred value for cx_display)
     int preferred_x;
 
-    // tab title
+    // Tab title
     int tt_width;
     int tt_truncated_width;
 
     enum selection selection;
 
-    // cursor offset when selection was started
+    // Cursor offset when selection was started
     long sel_so;
 
     // If sel_eo is UINT_MAX that means the offset must be calculated from
@@ -46,10 +45,10 @@ struct view {
     // not be same as cursor position (see search/replace code).
     long sel_eo;
 
-    // center view to cursor if scrolled
+    // Center view to cursor if scrolled
     bool center_on_scroll;
 
-    // force centering view to cursor
+    // Force centering view to cursor
     bool force_center;
 
     // These are used to save cursor state when there are multiple views

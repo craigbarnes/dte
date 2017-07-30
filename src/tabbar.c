@@ -51,7 +51,7 @@ void calculate_tabbar(struct window *win)
         struct view *v = win->views.ptrs[i];
 
         if (v == win->view) {
-            // make sure current tab is visible
+            // Make sure current tab is visible
             if (win->first_tab_idx > i)
                 win->first_tab_idx = i;
         }
@@ -60,12 +60,12 @@ void calculate_tabbar(struct window *win)
     }
 
     if (total_w <= win->w) {
-        // all tabs fit without truncating
+        // All tabs fit without truncating
         win->first_tab_idx = 0;
         return;
     }
 
-    // truncate all wide tabs
+    // Truncate all wide tabs
     total_w = 0;
     truncated_count = 0;
     for (i = 0; i < win->views.count; i++) {
@@ -82,15 +82,15 @@ void calculate_tabbar(struct window *win)
     }
 
     if (total_w > win->w) {
-        // not all tabs fit even after truncating wide tabs
+        // Not all tabs fit even after truncating wide tabs
         update_first_tab_idx(win);
         return;
     }
 
-    // all tabs fit after truncating wide tabs
+    // All tabs fit after truncating wide tabs
     extra = win->w - total_w;
 
-    // divide extra space between truncated tabs
+    // Divide extra space between truncated tabs
     while (extra > 0) {
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
@@ -105,7 +105,7 @@ void calculate_tabbar(struct window *win)
 
             avail = extra_avg;
             if (extra_mod) {
-                // this is needed for equal divide
+                // This is needed for equal divide
                 if (extra_avg == 0) {
                     avail++;
                     extra_mod--;

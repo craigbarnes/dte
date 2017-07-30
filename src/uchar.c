@@ -13,7 +13,7 @@ static inline int u_seq_len(unsigned int first_byte)
     if (first_byte < 0xf0)
         return 3;
 
-    // could be 0xf8 but RFC 3629 doesn't allow codepoints above 0x10ffff
+    // Could be 0xf8 but RFC 3629 doesn't allow codepoints above 0x10ffff
     if (first_byte < 0xf5)
         return 4;
     return -1;
@@ -36,8 +36,8 @@ static inline bool u_seq_len_ok(unsigned int uch, int len)
  * 2    0001 1111
  * 3    0000 1111
  * 4    0000 0111
- * 5    0000 0011    Forbidded by RFC 3629
- * 6    0000 0001    Forbidded by RFC 3629
+ * 5    0000 0011    Forbidden by RFC 3629
+ * 6    0000 0001    Forbidden by RFC 3629
  */
 static inline unsigned int u_get_first_byte_mask(unsigned int len)
 {
@@ -78,13 +78,13 @@ unsigned int u_prev_char(const unsigned char *buf, long *idx)
         count++;
         if (len == 0) {
             if (count == 4) {
-                /* too long sequence */
+                // Too long sequence
                 break;
             }
             u |= (ch & 0x3f) << shift;
             shift += 6;
         } else if (count != len) {
-            /* incorrect length */
+            // Incorrect length
             break;
         } else {
             u |= (ch & u_get_first_byte_mask(len)) << shift;
@@ -181,7 +181,7 @@ void u_set_char_raw(char *str, long *idx, unsigned int uch)
         i += 4;
         *idx = i;
     } else {
-        /* invalid byte value */
+        // Invalid byte value
         str[i++] = uch & 0xff;
         *idx = i;
     }
@@ -235,7 +235,7 @@ void u_set_hex(char *str, long *idx, unsigned int uch)
 
     str[i++] = '<';
     if (!u_is_unicode(uch)) {
-        // invalid byte (negated)
+        // Invalid byte (negated)
         uch *= -1;
         str[i++] = hex_tab[(uch >> 4) & 0x0f];
         str[i++] = hex_tab[uch & 0x0f];
@@ -255,7 +255,7 @@ unsigned int u_skip_chars(const char *str, int *width)
     while (str[idx] && w > 0)
         w -= u_char_width(u_str_get_char(str, &idx));
 
-    /* add 1..3 if skipped 'too much' (the last char was double width or invalid (<xx>)) */
+    // Add 1..3 if skipped 'too much' (the last char was double width or invalid (<xx>))
     *width -= w;
     return idx;
 }

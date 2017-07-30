@@ -8,10 +8,10 @@ struct output_buffer {
     char buf[8192];
     long count;
 
-    // number of characters scrolled (x direction)
+    // Number of characters scrolled (x direction)
     unsigned int scroll_x;
 
-    // current x position (tab 1-8, double-width 2, invalid utf8 byte 4)
+    // Current x position (tab 1-8, double-width 2, invalid UTF-8 byte 4)
     // if smaller than scroll_x printed characters are not visible
     unsigned int x;
 

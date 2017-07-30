@@ -73,12 +73,12 @@ static void print_vertical_tab_title(struct view *v, int idx, int width)
             if (filename[i] == '/')
                 count++;
         }
-        // ignore first slash because it does not separate components
+        // Ignore first slash because it does not separate components
         if (filename[0] == '/')
             count--;
 
         if (count > max) {
-            // skip possible first slash
+            // Skip possible first slash
             for (i = 1; ; i++) {
                 if (filename[i] == '/' && --count == max) {
                     i++;
@@ -93,7 +93,7 @@ static void print_vertical_tab_title(struct view *v, int idx, int width)
             filename += u_skip_chars(filename, &skip);
     }
     if (filename != orig_filename) {
-        // filename was shortened. add "<<" symbol
+        // filename was shortened. Add "<<" symbol.
         long i = strlen(buf);
         u_set_char(buf, &i, 0xab);
         buf[i] = 0;
@@ -121,7 +121,7 @@ static void print_vertical_tabbar(struct window *win)
         }
     }
     if (win->views.count <= h) {
-        // all tabs fit
+        // All tabs fit
         win->first_tab_idx = 0;
     } else {
         int max_y = win->first_tab_idx + h - 1;

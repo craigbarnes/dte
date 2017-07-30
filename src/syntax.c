@@ -116,7 +116,7 @@ static void update_state_colors(struct syntax *syn, struct state *s);
 struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m)
 {
     // NOTE: string_lists is owned by struct syntax so there's no need to
-    // copy it.  Freeing struct condition does not free any string lists.
+    // copy it. Freeing struct condition does not free any string lists.
     const char *prefix = get_prefix();
     struct ptr_array *states = &syn->states;
     int i, old_count = states->count;
@@ -224,7 +224,7 @@ void finalize_syntax(struct syntax *syn, int saved_nr_errors)
     for (i = 0; i < syn->states.count; i++) {
         struct state *s = syn->states.ptrs[i];
         if (!s->defined) {
-            // this state has been referenced but not defined
+            // This state has been referenced but not defined
             error_msg("No such state %s", s->name);
         }
     }
@@ -245,7 +245,7 @@ void finalize_syntax(struct syntax *syn, int saved_nr_errors)
         return;
     }
 
-    // unused states and lists cause warning only
+    // Unused states and lists cause warning only
     visit(syn->states.ptrs[0]);
     for (i = 0; i < syn->states.count; i++) {
         struct state *s = syn->states.ptrs[i];
@@ -321,7 +321,7 @@ void update_syntax_colors(struct syntax *syn)
     int i;
 
     if (is_subsyntax(syn)) {
-        // no point to update colors of a sub-syntax
+        // No point to update colors of a sub-syntax
         return;
     }
     for (i = 0; i < syn->states.count; i++)
@@ -338,7 +338,7 @@ void update_all_syntax_colors(void)
 
 void find_unused_subsyntaxes(void)
 {
-    // don't complain multiple times about same unused subsyntaxes
+    // Don't complain multiple times about same unused subsyntaxes
     static int i;
 
     for (; i < syntaxes.count; i++) {

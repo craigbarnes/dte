@@ -24,7 +24,7 @@ void add_file_history(int row, int col, const char *filename)
         if (streq(filename, e->filename)) {
             e->row = row;
             e->col = col;
-            // keep newest at end of the array
+            // Keep newest at end of the array
             ptr_array_add(&history, ptr_array_remove_idx(&history, i));
             return;
         }

@@ -50,7 +50,7 @@ static void read_errors(struct compiler *c, int fd, int quiet)
     char line[4096];
 
     if (!f) {
-        // should not happen
+        // Should not happen
         return;
     }
 

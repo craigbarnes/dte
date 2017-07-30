@@ -7,11 +7,11 @@
 struct frame {
     struct frame *parent;
 
-    // every frame contains either one window or multiple subframes
+    // Every frame contains either one window or multiple subframes
     struct ptr_array frames;
     struct window *window;
 
-    // width and height
+    // Width and height
     int w, h;
 
     bool vertical;

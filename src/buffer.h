@@ -12,14 +12,14 @@ struct change {
     struct change **prev;
     unsigned int nr_prev;
 
-    // move after inserted text when undoing delete?
+    // Move after inserted text when undoing delete?
     bool move_after;
 
     long offset;
     long del_count;
     long ins_count;
 
-    // deleted bytes (inserted bytes need not to be saved)
+    // Deleted bytes (inserted bytes need not to be saved)
     char *buf;
 };
 
@@ -28,17 +28,17 @@ struct buffer {
     struct change change_head;
     struct change *cur_change;
 
-    // used to determine if buffer is modified
+    // Used to determine if buffer is modified
     struct change *saved_change;
 
     struct stat st;
 
-    // needed for identifying buffers whose filename is NULL
+    // Needed for identifying buffers whose filename is NULL
     unsigned int id;
 
     long nl;
 
-    // views pointing to this buffer
+    // Views pointing to this buffer
     struct ptr_array views;
 
     char *display_filename;

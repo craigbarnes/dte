@@ -19,9 +19,9 @@
 #include "bindings.inc"
 
 static const char *builtin_rc =
-// initialize builtin colors
+// Initialize builtin colors
 "hi\n"
-// must initialize string options
+// Must initialize string options
 "set statusline-left \" %f%s%m%r%s%M\"\n"
 "set statusline-right \" %y,%X   %u   %E %n %t   %p \"\n";
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // create this early. needed if lock-files is true
+    // Create this early. Needed if lock-files is true.
     editor_dir = editor_file("");
     mkdir(editor_dir, 0755);
     free(editor_dir);
@@ -144,14 +144,13 @@ int main(int argc, char *argv[])
     update_all_syntax_colors();
     sort_aliases();
 
-    /* Terminal does not generate signals for control keys. */
+    // Terminal does not generate signals for control keys
     set_signal_handler(SIGINT, SIG_IGN);
     set_signal_handler(SIGQUIT, SIG_IGN);
     set_signal_handler(SIGPIPE, SIG_IGN);
 
-    /* Terminal does not generate signal for ^Z but someone can send
-     * us SIGTSTP nevertheless. SIGSTOP can't be caught.
-     */
+    // Terminal does not generate signal for ^Z but someone can send
+    // us SIGTSTP nevertheless. SIGSTOP can't be caught.
     set_signal_handler(SIGTSTP, handle_sigtstp);
 
     set_signal_handler(SIGCONT, handle_sigcont);
@@ -165,10 +164,9 @@ int main(int argc, char *argv[])
     if (search_history.count)
         search_set_regexp(search_history.ptrs[search_history.count - 1]);
 
-    /* Initialize terminal but don't update screen yet.  Also display
-     * "Press any key to continue" prompt if there were any errors
-     * during reading configuration files.
-     */
+    // Initialize terminal but don't update screen yet. Also display
+    // "Press any key to continue" prompt if there were any errors
+    // during reading configuration files.
     term_raw();
     if (nr_errors) {
         any_key();
@@ -215,7 +213,7 @@ int main(int argc, char *argv[])
     main_loop();
     ui_end();
 
-    // unlock files and add files to file history
+    // Unlock files and add files to file history
     remove_frame(root_frame);
 
     history_save(&command_history, command_history_filename);

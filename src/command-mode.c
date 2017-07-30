@@ -17,9 +17,8 @@ static void command_line_enter(void)
     set_input_mode(INPUT_NORMAL);
     ok = parse_commands(&array, str, &err);
 
-    /* Need to do this before executing the command because
-     * "command" can modify contents of command line.
-     */
+    // Need to do this before executing the command because
+    // "command" can modify contents of command line.
     history_add(&command_history, str, command_history_size);
     free(str);
     cmdline_clear(&cmdline);

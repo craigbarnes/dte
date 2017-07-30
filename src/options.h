@@ -9,23 +9,23 @@ enum newline_sequence {
 };
 
 enum {
-    // trailing whitespace
+    // Trailing whitespace
     WSE_TRAILING = 1 << 0,
 
-    // spaces in indentation
-    // does not include less than tab-width spaces at end of indentation
+    // Spaces in indentation.
+    // Does not include less than tab-width spaces at end of indentation.
     WSE_SPACE_INDENT = 1 << 1,
 
-    // less than tab-width spaces at end of indentation
+    // Less than tab-width spaces at end of indentation
     WSE_SPACE_ALIGN = 1 << 2,
 
-    // tab in indentation
+    // Tab in indentation
     WSE_TAB_INDENT = 1 << 3,
 
-    // tab anywhere but in indentation
+    // Tab anywhere but in indentation
     WSE_TAB_AFTER_INDENT = 1 << 4,
 
-    // special whitespace characters
+    // Special whitespace characters
     WSE_SPECIAL = 1 << 5,
 
     // expand-tab = false: WSE_SPACE_INDENT
@@ -60,7 +60,7 @@ struct common_options {
 };
 
 struct local_options {
-    /* these have also global values */
+    // These have also global values
     int auto_indent;
     int detect_indent;
     int emulate_tab;
@@ -72,14 +72,14 @@ struct local_options {
     int text_width;
     int ws_error;
 
-    /* only local */
+    // Only local
     int brace_indent;
     char *filetype;
     char *indent_regex;
 };
 
 struct global_options {
-    /* these have also local values */
+    // These have also local values
     int auto_indent;
     int detect_indent;
     int emulate_tab;
@@ -91,12 +91,12 @@ struct global_options {
     int text_width;
     int ws_error;
 
-    /* only global */
+    // Only global
     enum case_sensitive_search case_sensitive_search;
     int display_special;
     int esc_timeout;
     int lock_files;
-    enum newline_sequence newline; // default value for new files
+    enum newline_sequence newline; // Default value for new files
     int scroll_margin;
     int show_line_numbers;
     char *statusline_left;

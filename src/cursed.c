@@ -31,7 +31,7 @@ char *curses_str_cap(const char *name)
     char *str = tigetstr((char *)name);
 
     if (str == (char *)-1) {
-        // not a string cap (bug?)
+        // Not a string cap (bug?)
         return NULL;
     }
     // NULL = canceled or absent

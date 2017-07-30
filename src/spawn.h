@@ -3,13 +3,13 @@
 
 #include "compiler.h"
 
-/* Errors are read from stderr by default. */
+// Errors are read from stderr by default.
 #define SPAWN_READ_STDOUT (1 << 0)
 
-/* Redirect to /dev/null? */
+// Redirect to /dev/null?
 #define SPAWN_QUIET (1 << 2)
 
-/* Press any key to continue */
+// Press any key to continue
 #define SPAWN_PROMPT (1 << 4)
 
 struct filter_data {

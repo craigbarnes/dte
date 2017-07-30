@@ -6,7 +6,7 @@
 #include "config.h"
 #include "common.h"
 
-// commands that are allowed in config files
+// Commands that are allowed in config files
 static const char *config_commands[] = {
     "alias",
     "bind",
@@ -71,7 +71,7 @@ static void run_command(const struct command *cmds, char **av)
             return;
         }
 
-        /* remove NULL */
+        // Remove NULL
         array.count--;
 
         for (i = 1; av[i]; i++)

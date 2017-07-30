@@ -18,7 +18,7 @@ static int get_min_w(struct frame *f)
         }
         return max;
     } else {
-        int i, w = f->frames.count - 1; // separators
+        int i, w = f->frames.count - 1; // Separators
 
         for (i = 0; i < f->frames.count; i++)
             w += get_min_w(f->frames.ptrs[i]);
@@ -41,7 +41,7 @@ static int get_min_h(struct frame *f)
         }
         return max;
     } else {
-        int i, h = 0; // no separators
+        int i, h = 0; // No separators
 
         for (i = 0; i < f->frames.count; i++)
             h += get_min_h(f->frames.ptrs[i]);
@@ -90,7 +90,7 @@ static void divide_equally(struct frame *f)
 
     s = get_container_size(f);
 
-    // consume q and r as equally as possible
+    // Consume q and r as equally as possible
     n = count;
     do {
         used = 0;
@@ -292,7 +292,7 @@ void set_frame_size(struct frame *f, int w, int h)
     f->h = h;
     if (f->window) {
         if (!rightmost_frame(f))
-            w--; // separator
+            w--; // Separator
         set_window_size(f->window, w, h);
         return;
     }
@@ -368,7 +368,7 @@ struct frame *split_frame(struct window *w, bool vertical, bool before)
     f = w->frame;
     parent = f->parent;
     if (parent == NULL || parent->vertical != vertical) {
-        // reparent w
+        // Reparent w
         f->vertical = vertical;
         add_frame(f, w, 0);
         parent = f;
@@ -381,13 +381,13 @@ struct frame *split_frame(struct window *w, bool vertical, bool before)
     f = add_frame(parent, neww, idx);
     parent->equal_size = true;
 
-    // recalculate
+    // Recalculate
     set_frame_size(parent, parent->w, parent->h);
     update_window_coordinates();
     return f;
 }
 
-// doesn't really split root but adds new frame between root and its contents
+// Doesn't really split root but adds new frame between root and its contents
 struct frame *split_root(bool vertical, bool before)
 {
     struct frame *new_root, *f;
@@ -437,7 +437,7 @@ void remove_frame(struct frame *f)
     free_frame(f);
 
     if (parent->frames.count == 1) {
-        // replace parent with the only child frame
+        // Replace parent with the only child frame
         struct frame *gp = parent->parent;
         struct frame *c = parent->frames.ptrs[0];
 
@@ -455,7 +455,7 @@ void remove_frame(struct frame *f)
         parent = c;
     }
 
-    // recalculate
+    // Recalculate
     set_frame_size(parent, parent->w, parent->h);
     update_window_coordinates();
 }

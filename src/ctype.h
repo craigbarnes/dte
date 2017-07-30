@@ -1,10 +1,8 @@
-/*
- * Most of this code has been borrowed from the GIT version control system.
- */
+// Sane ctype (no locale and works with signed chars).
+// Most of this code has been borrowed from the GIT version control system.
 #ifndef CTYPE_H
 #define CTYPE_H
 
-/* Sane ctype - no locale, and works with signed chars */
 #undef isascii
 #undef isspace
 #undef isdigit

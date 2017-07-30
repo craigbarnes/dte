@@ -25,7 +25,7 @@ static bool is_default_bg_color(int color)
     return color == builtin_colors[BC_DEFAULT]->bg || color < 0;
 }
 
-// like mask_color() but can change bg color only if it has not been changed yet
+// Like mask_color() but can change bg color only if it has not been changed yet
 static void mask_color2(struct term_color *color, const struct term_color *over)
 {
     if (over->fg != -2)
@@ -74,7 +74,7 @@ static bool whitespace_error(struct line_info *info, unsigned int u, long i)
     int flags = get_ws_error_option(v->buffer);
 
     if (i >= info->trailing_ws_offset && flags & WSE_TRAILING) {
-        // Trailing whitespace.
+        // Trailing whitespace
         if (info->line_nr != v->cy || v->cx < info->trailing_ws_offset)
             return true;
         // Cursor is on this line and on the whitespace or at eol. It would
@@ -84,7 +84,7 @@ static bool whitespace_error(struct line_info *info, unsigned int u, long i)
 
     if (u == '\t') {
         if (i < info->indent_size) {
-            // in indentation
+            // In indentation
             if (flags & WSE_TAB_INDENT)
                 return true;
         } else {
@@ -92,7 +92,7 @@ static bool whitespace_error(struct line_info *info, unsigned int u, long i)
                 return true;
         }
     } else if (i < info->indent_size) {
-        // space in indentation
+        // Space in indentation
         const char *line = info->line;
         int count = 0, pos = i;
 
@@ -104,15 +104,15 @@ static bool whitespace_error(struct line_info *info, unsigned int u, long i)
         }
 
         if (count >= v->buffer->options.tab_width) {
-            // spaces used instead of tab
+            // Spaces used instead of tab
             if (flags & WSE_SPACE_INDENT)
                 return true;
         } else if (pos < info->size && line[pos] == '\t') {
-            // space before tab
+            // Space before tab
             if (flags & WSE_SPACE_INDENT)
                 return true;
         } else {
-            // less than tab width spaces at end of indentation
+            // Less than tab width spaces at end of indentation
             if (flags & WSE_SPACE_ALIGN)
                 return true;
         }
@@ -136,7 +136,7 @@ static unsigned int screen_next_char(struct line_info *info)
         u = u_get_nonascii(info->line, info->size, &info->pos);
         count = info->pos - pos;
 
-        // highly annoying no-break space etc.?
+        // Highly annoying no-break space etc.?
         if (u_is_special_whitespace(u) && (info->view->buffer->options.ws_error & WSE_SPECIAL))
             ws_error = true;
     }
@@ -168,7 +168,7 @@ static void screen_skip_char(struct line_info *info)
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             obuf.x += (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
         } else {
-            // control
+            // Control
             obuf.x += 2;
         }
     } else {
@@ -194,7 +194,7 @@ static bool is_notice(const char *word, int len)
     return false;
 }
 
-// highlight certain words inside comments
+// Highlight certain words inside comments
 static void hl_words(struct line_info *info)
 {
     struct hl_color *cc = find_color("comment");
@@ -208,7 +208,7 @@ static void hl_words(struct line_info *info)
     if (i >= info->size)
         return;
 
-    // go to beginning of partially visible word inside comment
+    // Go to beginning of partially visible word inside comment
     while (i > 0 && info->colors[i] == cc && is_word_byte(info->line[i]))
         i--;
 
@@ -222,7 +222,7 @@ static void hl_words(struct line_info *info)
                 break;
             i++;
         } else {
-            // beginning of a word inside comment
+            // Beginning of a word inside comment
             si = i++;
             while (i < info->size && info->colors[i] == cc && is_word_byte(info->line[i]))
                 i++;
@@ -245,7 +245,7 @@ static void line_info_init(struct line_info *info, struct view *v, struct block_
         info->sel_so = -1;
         info->sel_eo = -1;
     } else if (v->sel_eo != UINT_MAX) {
-        /* already calculated */
+        // Already calculated
         info->sel_so = v->sel_so;
         info->sel_eo = v->sel_eo;
         BUG_ON(info->sel_so > info->sel_eo);
@@ -313,7 +313,7 @@ static void print_line(struct line_info *info)
     }
 
     if (options.display_special && obuf.x >= obuf.scroll_x) {
-        // syntax highlighter highlights \n but use default color anyway
+        // Syntax highlighter highlights \n but use default color anyway
         color = *builtin_colors[BC_DEFAULT];
         mask_color(&color, builtin_colors[BC_NONTEXT]);
         mask_selection_and_current_line(info, &color);
@@ -368,15 +368,15 @@ void update_range(struct view *v, int y1, int y2)
         info.line_nr++;
 
         if (next_changed && i + 1 == y2 && y2 < v->window->edit_h) {
-            // more lines need to be updated not because their
+            // More lines need to be updated not because their
             // contents have changed but because their highlight
-            // state has
+            // state has.
             y2++;
         }
     }
 
     if (i < y2 && info.line_nr == v->cy) {
-        // dummy empty line is shown only if cursor is on it
+        // Dummy empty line is shown only if cursor is on it
         struct term_color color = *builtin_colors[BC_DEFAULT];
 
         obuf.x = 0;

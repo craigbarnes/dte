@@ -7,7 +7,7 @@
 static bool fill(struct file_decoder *dec)
 {
     size_t icount = dec->isize - dec->ipos;
-    size_t max = 7 * 1024; // smaller than cconv.obuf to make realloc less likely
+    size_t max = 7 * 1024; // Smaller than cconv.obuf to make realloc less likely
 
     if (icount > max)
         icount = max;
@@ -18,7 +18,7 @@ static bool fill(struct file_decoder *dec)
     cconv_process(dec->cconv, dec->ibuf + dec->ipos, icount);
     dec->ipos += icount;
     if (dec->ipos == dec->isize) {
-        // must be flushed after all input has been fed
+        // Must be flushed after all input has been fed
         cconv_flush(dec->cconv);
     }
     return true;
@@ -42,7 +42,7 @@ static bool detect(struct file_decoder *dec, const unsigned char *line, ssize_t 
                 // UTF-8 terminal, assuming latin1
                 encoding = "ISO-8859-1";
             } else {
-                // assuming locale's encoding
+                // Assuming locale's encoding
                 encoding = charset;
             }
             if (set_encoding(dec, encoding)) {
@@ -72,7 +72,7 @@ static bool decode_and_read_line(struct file_decoder *dec, char **linep, ssize_t
     }
 
     if (line) {
-        // newline not wanted
+        // Newline not wanted
         len--;
     } else {
         line = cconv_consume_all(dec->cconv, &len);
@@ -121,11 +121,11 @@ static bool detect_and_read_line(struct file_decoder *dec, char **linep, ssize_t
     }
 
     if (detect(dec, line, len)) {
-        // encoding detected
+        // Encoding detected
         return dec->read_line(dec, linep, lenp);
     }
 
-    // only ASCII so far
+    // Only ASCII so far
     dec->ipos += len;
     if (nl)
         dec->ipos++;

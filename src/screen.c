@@ -72,22 +72,22 @@ void update_status_line(struct window *win)
     lw = u_str_width(lbuf);
     rw = u_str_width(rbuf);
     if (lw + rw <= win->w) {
-        // both fit
+        // Both fit
         buf_add_str(lbuf);
         buf_set_bytes(' ', win->w - lw - rw);
         buf_add_str(rbuf);
     } else if (lw <= win->w && rw <= win->w) {
-        // both would fit separately, draw overlapping
+        // Both would fit separately, draw overlapping
         buf_add_str(lbuf);
         obuf.x = win->w - rw;
         buf_move_cursor(win->x + win->w - rw, win->y + win->h - 1);
         buf_add_str(rbuf);
     } else if (lw <= win->w) {
-        // left fits
+        // Left fits
         buf_add_str(lbuf);
         buf_clear_eol();
     } else if (rw <= win->w) {
-        // right fits
+        // Right fits
         buf_set_bytes(' ', win->w - rw);
         buf_add_str(rbuf);
     } else {
@@ -101,7 +101,7 @@ int print_command(char prefix)
     unsigned int u;
     int x;
 
-    // width of characters up to and including cursor position
+    // Width of characters up to and including cursor position
     w = 1; // ":" (prefix)
     i = 0;
     while (i <= cmdline.pos && i < cmdline.buf.len) {

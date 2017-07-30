@@ -47,10 +47,10 @@ struct view *window_open_buffer(struct window *w, const char *filename, bool mus
     }
     absolute = path_absolute(filename);
     if (absolute == NULL) {
-        // Let load_buffer() create error message.
+        // Let load_buffer() create error message
         dir_missing = errno == ENOENT;
     } else {
-        // already open?
+        // Already open?
         b = find_buffer(absolute);
     }
     if (b) {
@@ -121,7 +121,7 @@ struct view *window_get_view(struct window *w, struct buffer *b)
     struct view *v = window_find_view(w, b);
 
     if (v == NULL) {
-        // open the buffer in other window to this window
+        // Open the buffer in other window to this window
         v = window_add_buffer(w, b);
         v->cursor = ((struct view *)b->views.ptrs[0])->cursor;
     }
@@ -139,7 +139,7 @@ struct view *window_find_view(struct window *w, struct buffer *b)
             return v;
         }
     }
-    // buffer isn't open in this window
+    // Buffer isn't open in this window
     return NULL;
 }
 
@@ -147,7 +147,7 @@ struct view *window_find_unclosable_view(struct window *w, bool (*can_close)(str
 {
     long i;
 
-    // check active view first
+    // Check active view first
     if (w->view != NULL && !can_close(w->view)) {
         return w->view;
     }
@@ -209,7 +209,7 @@ void window_close_current(void)
     struct window *next;
 
     if (window->frame->parent == NULL) {
-        // don't close last window
+        // Don't close last window
         window_remove_views(window);
         set_view(window_open_empty_buffer(window));
         return;
@@ -258,7 +258,7 @@ void set_view(struct view *v)
     if (view == v)
         return;
 
-    /* forget previous view when changing view using any other command but open */
+    // Forget previous view when changing view using any other command but open
     if (window != NULL) {
         window->prev_view = NULL;
     }
@@ -284,7 +284,7 @@ void set_view(struct view *v)
         v->saved_cursor_offset = 0;
     }
 
-    // save cursor states of views sharing same buffer
+    // Save cursor states of views sharing same buffer
     for (i = 0; i < v->buffer->views.count; i++) {
         struct view *other = v->buffer->views.ptrs[i];
         if (other != v) {
@@ -317,7 +317,7 @@ static bool is_useless_empty_view(struct view *v)
         return false;
     if (v->window->views.count != 1)
         return false;
-    // touched?
+    // Touched?
     if (v->buffer->abs_filename != NULL || v->buffer->change_head.nr_prev != 0)
         return false;
     return true;
@@ -373,7 +373,7 @@ void mark_buffer_tabbars_changed(struct buffer *b)
 
 static int calc_vertical_tabbar_width(struct window *win)
 {
-    // line numbers are included in min_edit_w
+    // Line numbers are included in min_edit_w
     int min_edit_w = 80;
     int w = options.tab_bar_width;
 
@@ -392,13 +392,13 @@ enum tab_bar tabbar_visibility(struct window *win)
         return options.tab_bar;
     case TAB_BAR_VERTICAL:
         if (calc_vertical_tabbar_width(win) == 0) {
-            // not enough space
+            // Not enough space
             return TAB_BAR_HIDDEN;
         }
         return TAB_BAR_VERTICAL;
     case TAB_BAR_AUTO:
         if (calc_vertical_tabbar_width(win) == 0) {
-            // not enough space
+            // Not enough space
             return TAB_BAR_HORIZONTAL;
         }
         return TAB_BAR_VERTICAL;

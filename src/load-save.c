@@ -252,11 +252,11 @@ static int write_buffer(struct buffer *b, struct file_encoder *enc, const struct
         size += rc;
     }
     if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
-        // any real error hides this message
+        // Any real error hides this message
         error_msg("Warning: %d nonreversible character conversions. File saved.", cconv_nr_errors(enc->cconv));
     }
 
-    // need to truncate if writing to existing file
+    // Need to truncate if writing to existing file
     if (ftruncate(enc->fd, size)) {
         error_msg("Truncate failed: %s", strerror(errno));
         return -1;
@@ -276,7 +276,7 @@ int save_buffer(struct buffer *b, const char *filename, const char *encoding, en
     // Don't use temporary file when saving file in /tmp because
     // crontab command doesn't like the file to be replaced.
     if (!str_has_prefix(filename, "/tmp/")) {
-        // try to use temporary file first, safer
+        // Try to use temporary file first (safer)
         tmp = tmp_filename(filename);
         fd = mkstemp(tmp);
         if (fd < 0) {
@@ -295,7 +295,7 @@ int save_buffer(struct buffer *b, const char *filename, const char *encoding, en
             }
             fchmod(fd, b->st.st_mode);
         } else {
-            // new file
+            // New file
             fchmod(fd, 0666 & ~get_umask());
         }
     }
@@ -316,7 +316,7 @@ int save_buffer(struct buffer *b, const char *filename, const char *encoding, en
 
     enc = new_file_encoder(encoding, newline, fd);
     if (enc == NULL) {
-        // this should never happen because encoding is validated early
+        // This should never happen because encoding is validated early
         error_msg("iconv_open: %s", strerror(errno));
         close(fd);
         goto error;

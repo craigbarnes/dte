@@ -31,7 +31,7 @@ void init_selection(struct view *v, struct selection_info *info)
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
-        // character under cursor belongs to the selection
+        // Character under cursor belongs to the selection
         info->eo += buffer_next_char(&ei, &u);
     }
 }

@@ -8,8 +8,8 @@ static int parse_excmd(struct tag *t, const char *buf, int size)
     int i;
 
     if (ch == '/' || ch == '?') {
-        // the search pattern is not real regular expression
-        // need to escape special characters
+        // The search pattern is not a real regular expression.
+        // Need to escape special characters.
         char *pattern = xnew(char, size * 2);
         int j = 0;
 

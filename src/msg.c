@@ -67,7 +67,7 @@ void activate_current_message(void)
     m = msgs.ptrs[msg_pos];
     if (m->loc != NULL) {
         if (!file_location_go(m->loc)) {
-            // error message is visible
+            // Error message is visible
             return;
         }
     }

@@ -17,28 +17,28 @@ struct token {
     struct token *next;
     struct token *prev;
     enum {
-        TOK_TEXT, // max one line w/o \n
+        TOK_TEXT, // Max one line w/o \n
         TOK_NL, // \n
         TOK_ITALIC, // `
         TOK_BOLD, // *
         TOK_INDENT, // \t
 
-        // keywords (@...)
+        // Keywords (@...)
         TOK_H1,
         TOK_H2,
         TOK_LI,
         TOK_BR,
         TOK_PRE,
-        TOK_ENDPRE, // must be after TOK_PRE
+        TOK_ENDPRE, // Must be after TOK_PRE
         TOK_RAW,
-        TOK_ENDRAW, // must be after TOK_RAW
+        TOK_ENDRAW, // Must be after TOK_RAW
         TOK_TITLE, // WRITE 2 2001-12-13 "Linux 2.0.32" "Linux Programmer's Manual"
     } type;
     int line;
 
-    // not NUL-terminated
+    // Not NUL-terminated
     const char *text;
-    // length of text
+    // Length of text
     int len;
 };
 
@@ -58,7 +58,7 @@ static const struct {
     CONST_STR("bold"),
     CONST_STR("indent"),
 
-    // keywords
+    // Keywords
     CONST_STR("h1"),
     CONST_STR("h2"),
     CONST_STR("li"),
@@ -342,7 +342,7 @@ static struct token *get_indent(struct token *tok, int *ip)
     return tok;
 }
 
-// line must be non-empty
+// Line must be non-empty
 static struct token *check_line(struct token *tok, int *ip)
 {
     struct token *start;
@@ -380,7 +380,7 @@ static struct token *check_line(struct token *tok, int *ip)
         if (*ip)
             goto indentation;
 
-        // check arguments
+        // Check arguments
         tok = tok->next;
         while (tok != &head) {
             switch (tok->type) {
@@ -397,7 +397,7 @@ static struct token *check_line(struct token *tok, int *ip)
         }
         break;
     case TOK_LI:
-        // check arguments
+        // Check arguments
         tok = tok->next;
         while (tok != &head) {
             switch (tok->type) {
@@ -416,12 +416,12 @@ static struct token *check_line(struct token *tok, int *ip)
         }
         break;
     case TOK_PRE:
-        // checked later
+        // Checked later
         break;
     case TOK_RAW:
         if (*ip)
             goto indentation;
-        // checked later
+        // Checked later
         break;
     case TOK_ENDPRE:
     case TOK_ENDRAW:
@@ -462,7 +462,7 @@ static void normalize(void)
         struct token *start;
         int i, new_para = 0;
 
-        // remove empty lines
+        // Remove empty lines
         while (is_empty_line(tok)) {
             tok = remove_line(tok);
             new_para = 1;
@@ -470,7 +470,7 @@ static void normalize(void)
                 return;
         }
 
-        // skips indent
+        // Skips indent
         start = tok;
         tok = check_line(tok, &i);
 
@@ -479,15 +479,15 @@ static void normalize(void)
         case TOK_ITALIC:
         case TOK_BOLD:
         case TOK_BR:
-            // normal text
+            // Normal text
             if (new_para && prev_indent >= -1) {
-                // previous line/block was text or @pre
+                // Previous line/block was text or @pre
                 // and there was a empty line after it
                 insert_nl_before(start);
             }
 
             if (!new_para && prev_indent == i) {
-                // join with previous line
+                // Join with previous line
                 struct token *nl = start->prev;
 
                 if (nl->type != TOK_NL)
@@ -495,16 +495,16 @@ static void normalize(void)
 
                 if ((nl->prev != &head && nl->prev->type == TOK_BR) ||
                         tok->type == TOK_BR) {
-                    // don't convert \n after/before @br to ' '
+                    // Don't convert \n after/before @br to ' '
                     free_token(nl);
                 } else {
-                    // convert "\n" to " "
+                    // Convert "\n" to " "
                     nl->type = TOK_TEXT;
                     nl->text = " ";
                     nl->len = 1;
                 }
 
-                // remove indent
+                // Remove indent
                 while (start->type == TOK_INDENT) {
                     struct token *next = start->next;
                     free_token(start);
@@ -517,10 +517,10 @@ static void normalize(void)
             break;
         case TOK_PRE:
         case TOK_RAW:
-            // these can be directly after normal text
+            // These can be directly after normal text
             // but not joined with the previous line
             if (new_para && prev_indent >= -1) {
-                // previous line/block was text or @pre
+                // Previous line/block was text or @pre
                 // and there was a empty line after it
                 insert_nl_before(start);
             }
@@ -531,7 +531,7 @@ static void normalize(void)
         case TOK_H2:
         case TOK_LI:
         case TOK_TITLE:
-            // remove white space after H1, H2, L1 and TITLE
+            // Remove white space after H1, H2, L1 and TITLE
             tok = tok->next;
             while (tok != &head) {
                 int type = tok->type;
@@ -548,12 +548,12 @@ static void normalize(void)
                 if (type != TOK_INDENT)
                     break;
 
-                // empty TOK_TEXT or TOK_INDENT
+                // Empty TOK_TEXT or TOK_INDENT
                 next = tok->next;
                 free_token(tok);
                 tok = next;
             }
-            // not normal text. can't be joined
+            // Not normal text. can't be joined
             prev_indent = -2;
             tok = get_next_line(tok);
             break;
@@ -669,10 +669,9 @@ static struct token *output_raw(struct token *tok)
         switch (tok->type) {
         case TOK_TEXT:
             if (tok->len == 2 && !strncmp(tok->text, "\\\\", 2)) {
-                /* ugly special case
-                 * "\\" (\) was converted to "\\\\" (\\) because
-                 * nroff does escaping too.
-                 */
+                // Ugly special case.
+                // "\\" (\) was converted to "\\\\" (\\) because
+                // nroff does escaping too.
                 output("\\");
             } else {
                 output_buf(tok->text, tok->len);
@@ -802,8 +801,8 @@ static struct token *dump_one(struct token *tok)
         break;
     case TOK_TITLE:
         tok = title(tok, ".TH ");
-        // must be after .TH
-        // no hyphenation, adjust left
+        // Must be after ".TH".
+        // No hyphenation, adjust left.
         output(".nh\n.ad l\n");
         break;
     case TOK_NL:

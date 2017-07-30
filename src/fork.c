@@ -15,9 +15,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
     int move = error_fd < nr_fds;
     int max = error_fd;
 
-    /*
-     * Find if we must move fds out of the way.
-     */
+    // Find if we must move fds out of the way
     for (i = 0; i < nr_fds; i++) {
         if (fd[i] > max)
             max = fd[i];
@@ -42,9 +40,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
         }
     }
 
-    /*
-     * Now it is safe to duplicate fds in this order.
-     */
+    // Now it is safe to duplicate fds in this order
     for (i = 0; i < nr_fds; i++) {
         if (i == fd[i]) {
             // Clear FD_CLOEXEC flag
@@ -55,9 +51,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
         }
     }
 
-    /*
-     * Unignore signals. See man page exec(3p) for more information.
-     */
+    // Unignore signals (see man page exec(3p) for more information)
     set_signal_handler(SIGINT, SIG_DFL);
     set_signal_handler(SIGQUIT, SIG_DFL);
 
@@ -111,7 +105,7 @@ int fork_exec(char **argv, int fd[3])
     close(ep[0]);
 
     if (!rc) {
-        // child exec was successful
+        // Child exec was successful
         return pid;
     }
 

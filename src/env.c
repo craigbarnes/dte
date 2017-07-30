@@ -59,7 +59,7 @@ void collect_builtin_env(const char *prefix)
     }
 }
 
-// returns NULL only if name isn't in builtin array
+// Returns NULL only if name isn't in builtin array
 char *expand_builtin_env(const char *name)
 {
     int i;

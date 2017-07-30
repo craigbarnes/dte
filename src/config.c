@@ -35,7 +35,7 @@ static bool is_command(const char *str, int len)
     return false;
 }
 
-// odd number of backslashes at end of line?
+// Odd number of backslashes at end of line?
 static bool has_line_continuation(const char *str, int len)
 {
     int pos = len - 1;
@@ -102,7 +102,7 @@ int do_read_config(const struct command *cmds, const char *filename, bool must_e
 
 int read_config(const struct command *cmds, const char *filename, bool must_exist)
 {
-    /* recursive */
+    // Recursive
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
     int ret = do_read_config(cmds, filename, must_exist);
@@ -113,7 +113,7 @@ int read_config(const struct command *cmds, const char *filename, bool must_exis
 
 void exec_builtin_rc(const char *rc)
 {
-    // no need to change filename because there can't be any errors
+    // No need to change filename because there can't be any errors
     int saved_config_line = config_line;
     exec_config(commands, rc, strlen(rc));
     config_line = saved_config_line;

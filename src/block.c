@@ -98,13 +98,13 @@ static long split_and_insert(const char *buf, long len)
     long size2 = len;
     long size3 = blk->size - size1;
     long total = size1 + size2 + size3;
-    long start = 0; // beginning of new block
-    long size = 0; // size of new block
-    long pos = 0; // current position
+    long start = 0; // Beginning of new block
+    long size = 0; // Size of new block
+    long pos = 0; // Current position
     long nl_added = 0;
 
     while (start < total) {
-        // size of new block if next line would be added
+        // Size of new block if next line would be added
         long new_size = 0;
         long copied = 0;
         struct block *new;
@@ -142,15 +142,15 @@ static long split_and_insert(const char *buf, long len)
         }
 
         if (new_size <= BLOCK_EDIT_SIZE) {
-            // fits
+            // Fits
             size = new_size;
             pos = start + new_size;
             if (pos < total)
                 continue;
         } else {
-            // does not fit
+            // Does not fit
             if (!size) {
-                // one block containing one very long line
+                // One block containing one very long line
                 size = new_size;
                 pos = start + new_size;
             }
@@ -214,8 +214,8 @@ static long insert_bytes(const char *buf, long len)
     struct block *blk;
     long new_size;
 
-    // blocks must contain whole lines
-    // last char of buf might not be newline
+    // Blocks must contain whole lines.
+    // Last char of buf might not be newline.
     block_iter_normalize(&view->cursor);
 
     blk = view->cursor.blk;
@@ -224,8 +224,8 @@ static long insert_bytes(const char *buf, long len)
         return insert_to_current(buf, len);
 
     if (blk->nl <= 1 && !memchr(buf, '\n', len)) {
-        // can't split this possibly very long line
-        // insert_to_current() is much faster than split_and_insert()
+        // Can't split this possibly very long line.
+        // insert_to_current() is much faster than split_and_insert().
         return insert_to_current(buf, len);
     }
     return split_and_insert(buf, len);
@@ -262,7 +262,7 @@ char *do_delete(long len)
         return NULL;
 
     if (!offset) {
-        // the block where cursor is can become empty and thereby may be deleted
+        // The block where cursor is can become empty and thereby may be deleted
         saved_prev_node = blk->node.prev;
     }
 
@@ -294,7 +294,7 @@ char *do_delete(long len)
     }
 
     if (saved_prev_node) {
-        // cursor was at beginning of a block that was possibly deleted
+        // Cursor was at beginning of a block that was possibly deleted
         if (saved_prev_node->next == &buffer->blocks) {
             view->cursor.blk = BLOCK(saved_prev_node);
             view->cursor.offset = view->cursor.blk->size;
@@ -344,9 +344,9 @@ char *do_replace(long del, const char *buf, long ins)
 
     new_size = blk->size + ins - del;
     if (new_size > BLOCK_EDIT_SIZE) {
-        // should split
+        // Should split
         if (blk->nl > 1 || memchr(buf, '\n', ins)) {
-            // most likely can be splitted
+            // Most likely can be split
             goto slow;
         }
     }
@@ -356,7 +356,7 @@ char *do_replace(long del, const char *buf, long ins)
         xrenew(blk->data, blk->alloc);
     }
 
-    // modification is limited to one block
+    // Modification is limited to one block
     ptr = blk->data + offset;
     deleted = xmalloc(del);
     del_nl = copy_count_nl(deleted, ptr, del);
@@ -375,7 +375,7 @@ char *do_replace(long del, const char *buf, long ins)
 
     view_update_cursor_y(view);
     if (del_nl == ins_nl) {
-        // some line(s) changed but lines after them did not move up or down
+        // Some line(s) changed but lines after them did not move up or down
         buffer_mark_lines_changed(view->buffer, view->cy, view->cy + del_nl);
     } else {
         buffer_mark_lines_changed(view->buffer, view->cy, INT_MAX);

@@ -69,7 +69,7 @@ bool buf_parse_long(const char *str, int size, int *posp, long *valp)
         val += str[pos++] - '0';
         count++;
         if (val < old) {
-            // overflow
+            // Overflow
             return false;
         }
     }
@@ -140,7 +140,7 @@ ssize_t xread(int fd, void *buf, size_t count)
             return -1;
         }
         if (rc == 0) {
-            /* eof */
+            // eof
             break;
         }
         pos += rc;
@@ -229,7 +229,7 @@ void bug(const char *function, const char *fmt, ...)
     vfprintf(stderr, fmt, ap);
     va_end(ap);
 
-    // for core dump
+    // For core dump
     abort();
 }
 
@@ -246,7 +246,7 @@ void debug_print(const char *function, const char *fmt, ...)
         free(filename);
         BUG_ON(fd < 0);
 
-        // don't leak file descriptor to parent processes
+        // Don't leak file descriptor to parent processes
         fcntl(fd, F_SETFD, FD_CLOEXEC);
     }
 

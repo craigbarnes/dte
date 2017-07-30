@@ -5,16 +5,16 @@
 #include "key.h"
 
 enum {
-    STR_CAP_CMD_ac, // pairs of block graphic characters to map alternate character set
-    STR_CAP_CMD_ae, // end alternative character set
-    STR_CAP_CMD_as, // start alternative character set for block graphic characters
-    STR_CAP_CMD_ce, // clear to end of line
-    STR_CAP_CMD_ke, // turn keypad off
-    STR_CAP_CMD_ks, // turn keypad on
-    STR_CAP_CMD_te, // end program that uses cursor motion
-    STR_CAP_CMD_ti, // begin program that uses cursor motion
-    STR_CAP_CMD_ve, // show cursor
-    STR_CAP_CMD_vi, // hide cursor
+    STR_CAP_CMD_ac, // Pairs of block graphic characters to map alternate character set
+    STR_CAP_CMD_ae, // End alternative character set
+    STR_CAP_CMD_as, // Start alternative character set for block graphic characters
+    STR_CAP_CMD_ce, // Clear to end of line
+    STR_CAP_CMD_ke, // Turn keypad off
+    STR_CAP_CMD_ks, // Turn keypad on
+    STR_CAP_CMD_te, // End program that uses cursor motion
+    STR_CAP_CMD_ti, // Begin program that uses cursor motion
+    STR_CAP_CMD_ve, // Show cursor
+    STR_CAP_CMD_vi, // Hide cursor
 
     NR_STR_CAPS
 };
@@ -47,18 +47,18 @@ struct term_keymap {
     char *code;
 };
 
-// see termcap(5)
+// See termcap(5)
 struct term_cap {
-    /* boolean caps */
-    bool ut; // can clear to end of line with bg color set
+    // Boolean caps
+    bool ut; // Can clear to end of line with bg color set
 
-    /* integer caps */
+    // Integer caps
     int colors;
 
-    /* string caps */
+    // String caps
     char *strings[NR_STR_CAPS];
 
-    /* string caps (keys) */
+    // String caps (keys)
     struct term_keymap *keymap;
     int keymap_size;
 };
@@ -83,7 +83,7 @@ int term_get_size(int *w, int *h);
 
 const char *term_set_color(const struct term_color *color);
 
-/* move cursor (x and y are zero based) */
+// Move cursor (x and y are zero based)
 const char *term_move_cursor(int x, int y);
 
 void term_read_caps(void);

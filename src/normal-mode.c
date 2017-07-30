@@ -13,7 +13,7 @@ static void insert_paste(void)
     long size;
     char *text = term_read_paste(&size);
 
-    // because this is not a command (see run_command()) you have to
+    // Because this is not a command (see run_command()) you have to
     // call begin_change() to avoid merging this change into previous
     begin_change(CHANGE_MERGE_NONE);
     insert_text(text, size);

@@ -84,7 +84,7 @@ static struct state *handle_heredoc(struct syntax *syn, struct state *state, con
     return s->state;
 }
 
-// line should be terminated with \n unless it's the last line
+// Line should be terminated with \n unless it's the last line
 static struct hl_color **highlight_line(struct syntax *syn, struct state *state, const char *line, int len, struct state **ret)
 {
     static struct hl_color **colors;
@@ -181,7 +181,7 @@ static struct hl_color **highlight_line(struct syntax *syn, struct state *state,
                 }
                 } break;
             case COND_STR2:
-                // optimized COND_STR (length 2, case sensitive)
+                // Optimized COND_STR (length 2, case sensitive)
                 if (ch == cond->u.cond_str.str[0] && len - i > 1 &&
                         line[i + 1] == cond->u.cond_str.str[1]) {
                     colors[i++] = a->emit_color;
@@ -265,15 +265,15 @@ static int fill_hole(struct buffer *b, struct block_iter *bi, int sidx, int eidx
         highlight_line(b->syn, ptrs[idx++], lr.line, lr.size, &st);
 
         if (ptrs[idx] == st) {
-            // was not invalidated and didn't change
+            // Was not invalidated and didn't change
             break;
         }
 
         if (states_equal(ptrs, idx, st)) {
-            // was invalidated and didn't change
+            // Was invalidated and didn't change
             ptrs[idx] = st;
         } else {
-            // invalidated or not but changed anyway
+            // Invalidated or not but changed anyway
             ptrs[idx] = st;
             if (idx == eidx)
                 mark_state_invalid(ptrs, idx + 1);
@@ -298,7 +298,7 @@ void hl_fill_start_states(struct buffer *b, int line_nr)
     resize_line_states(s, line_nr + 2);
     states = (struct state **)s->ptrs;
 
-    // update invalid
+    // Update invalid
     last = line_nr;
     if (last >= s->count)
         last = s->count - 1;
@@ -310,7 +310,7 @@ void hl_fill_start_states(struct buffer *b, int line_nr)
         if (idx > last)
             break;
 
-        // go to line before first hole
+        // Go to line before first hole
         idx--;
         block_iter_move_down(&bi, idx - current_line);
         current_line = idx;
@@ -321,7 +321,7 @@ void hl_fill_start_states(struct buffer *b, int line_nr)
         current_line += count;
     }
 
-    // add new
+    // Add new
     block_iter_move_down(&bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
         struct lineref lr;
@@ -351,13 +351,13 @@ struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_
         s->ptrs[s->count++] = next;
         *next_changed = 1;
     } else if (s->ptrs[line_nr] == next) {
-        // was not invalidated and didn't change
+        // Was not invalidated and didn't change
     } else if (states_equal(s->ptrs, line_nr, next)) {
-        // was invalidated and didn't change
+        // Was invalidated and didn't change
         s->ptrs[line_nr] = next;
-        //*next_changed = 1;
+        // *next_changed = 1;
     } else {
-        // invalidated or not but changed anyway
+        // Invalidated or not but changed anyway
         s->ptrs[line_nr] = next;
         *next_changed = 1;
         if (line_nr + 1 < s->count)
@@ -366,25 +366,25 @@ struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_
     return colors;
 }
 
-// called after text have been inserted to rehighlight changed lines
+// Called after text has been inserted to re-highlight changed lines
 void hl_insert(struct buffer *b, int first, int lines)
 {
     struct ptr_array *s = &b->line_start_states;
     int i, last = first + lines;
 
     if (first >= s->count) {
-        // nothing to rehighlight
+        // Nothing to re-highlight
         return;
     }
 
     if (last + 1 >= s->count) {
-        // last already highlighted lines changed
-        // there's nothing to gain, throw them away
+        // Last already highlighted lines changed.
+        // There's nothing to gain, throw them away.
         s->count = first + 1;
         return;
     }
 
-    // add room for new line states
+    // Add room for new line states
     if (lines) {
         int to = last + 1;
         int from = first + 1;
@@ -393,12 +393,12 @@ void hl_insert(struct buffer *b, int first, int lines)
         s->count += lines;
     }
 
-    // invalidate start states of new and changed lines
+    // Invalidate start states of new and changed lines
     for (i = first + 1; i <= last + 1; i++)
         mark_state_invalid(s->ptrs, i);
 }
 
-// called after text have been deleted to rehighlight changed lines
+// Called after text has been deleted to re-highlight changed lines
 void hl_delete(struct buffer *b, int first, int deleted_nl)
 {
     struct ptr_array *s = &b->line_start_states;
@@ -408,21 +408,21 @@ void hl_delete(struct buffer *b, int first, int deleted_nl)
         return;
 
     if (first >= s->count) {
-        // nothing to highlight
+        // Nothing to highlight
         return;
     }
 
     if (last + 1 >= s->count) {
-        // last already highlighted lines changed
-        // there's nothing to gain, throw them away
+        // Last already highlighted lines changed.
+        // There's nothing to gain, throw them away.
         s->count = first + 1;
         return;
     }
 
-    // there are already highlighted lines after changed lines
-    // try to save the work.
+    // There are already highlighted lines after changed lines.
+    // Try to save the work.
 
-    // remove deleted lines (states)
+    // Remove deleted lines (states)
     if (deleted_nl) {
         int to = first + 1;
         int from = last + 1;
@@ -430,6 +430,6 @@ void hl_delete(struct buffer *b, int first, int deleted_nl)
         s->count -= deleted_nl;
     }
 
-    // invalidate line start state after the changed line
+    // Invalidate line start state after the changed line
     mark_state_invalid(s->ptrs, first + 1);
 }

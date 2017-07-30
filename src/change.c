@@ -23,7 +23,7 @@ static void add_change(struct change *change)
     buffer->cur_change = change;
 }
 
-/* This doesn't need to be local to buffer because commands are atomic. */
+// This doesn't need to be local to buffer because commands are atomic
 static struct change *change_barrier;
 
 static bool is_change_chain_barrier(struct change *change)
@@ -136,10 +136,8 @@ void begin_change_chain(void)
 {
     BUG_ON(change_barrier);
 
-    /*
-     * Allocate change chain barrier but add it to the change tree only if
-     * there will be any real changes
-     */
+    // Allocate change chain barrier but add it to the change tree only if
+    // there will be any real changes
     change_barrier = alloc_change();
     change_merge = CHANGE_MERGE_NONE;
 }
@@ -147,11 +145,11 @@ void begin_change_chain(void)
 void end_change_chain(void)
 {
     if (change_barrier) {
-        /* There were no changes in this change chain. */
+        // There were no changes in this change chain.
         free(change_barrier);
         change_barrier = NULL;
     } else {
-        /* There were some changes. Add end of chain marker. */
+        // There were some changes. Add end of chain marker.
         add_change(alloc_change());
     }
 }
@@ -181,7 +179,7 @@ static void reverse_change(struct change *change)
 
     block_iter_goto_offset(&view->cursor, change->offset);
     if (!change->ins_count) {
-        // convert delete to insert
+        // Convert delete to insert
         do_insert(change->buf, change->del_count);
         if (change->move_after)
             block_iter_skip_bytes(&view->cursor, change->del_count);
@@ -190,7 +188,7 @@ static void reverse_change(struct change *change)
         free(change->buf);
         change->buf = NULL;
     } else if (change->del_count) {
-        // reverse replace
+        // Reverse replace
         long del_count = change->ins_count;
         long ins_count = change->del_count;
         char *buf = do_replace(del_count, change->buf, ins_count);
@@ -200,7 +198,7 @@ static void reverse_change(struct change *change)
         change->ins_count = ins_count;
         change->del_count = del_count;
     } else {
-        // convert insert to delete
+        // Convert insert to delete
         change->buf = do_delete(change->ins_count);
         change->del_count = change->ins_count;
         change->ins_count = 0;
@@ -240,7 +238,7 @@ bool redo(unsigned int change_id)
 
     view_reset_preferred_x(view);
     if (!change->prev) {
-        /* don't complain if change_id is 0 */
+        // Don't complain if change_id is 0
         if (change_id)
             error_msg("Nothing to redo.");
         return false;
@@ -252,7 +250,7 @@ bool redo(unsigned int change_id)
             return false;
         }
     } else {
-        /* default to newest change  */
+        // Default to newest change
         change_id = change->nr_prev - 1;
         if (change->nr_prev > 1)
             info_msg("Redoing newest (%d) of %d possible changes.", change_id + 1, change->nr_prev);
@@ -295,7 +293,7 @@ top:
         if (--ch->nr_prev)
             goto top;
 
-        // we have become leaf
+        // We have become leaf
         free(ch->prev);
     }
 }
@@ -309,7 +307,7 @@ void buffer_insert_bytes(const char *buf, long len)
         return;
 
     if (buf[len - 1] != '\n' && block_iter_is_eof(&view->cursor)) {
-        // force newline at EOF
+        // Force newline at EOF
         do_insert("\n", 1);
         rec_len++;
     }
@@ -347,13 +345,13 @@ static void buffer_delete_bytes_internal(long len, bool move_after)
     if (len == 0)
         return;
 
-    // check if all newlines from EOF would be deleted
+    // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(len)) {
         struct block_iter bi = view->cursor;
         unsigned int u;
 
         if (buffer_prev_char(&bi, &u) && u != '\n') {
-            // no newline before cursor
+            // No newline before cursor
             if (--len == 0) {
                 begin_change(CHANGE_MERGE_NONE);
                 return;
@@ -390,10 +388,10 @@ void buffer_replace_bytes(long del_count, const char *inserted, long ins_count)
         return;
     }
 
-    // check if all newlines from EOF would be deleted
+    // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(del_count)) {
         if (inserted[ins_count - 1] != '\n') {
-            // don't replace last newline
+            // Don't replace last newline
             if (--del_count == 0) {
                 buffer_insert_bytes(inserted, ins_count);
                 return;

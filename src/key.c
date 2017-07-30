@@ -68,7 +68,7 @@ bool parse_key(int *key, const char *str)
     ch = u_get_char(str, len, &i);
     if (u_is_unicode(ch) && i == len) {
         if (modifiers == MOD_CTRL) {
-            // normalize
+            // Normalize
             switch (ch) {
             case 'i':
             case 'I':

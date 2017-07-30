@@ -28,7 +28,7 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
         char *arg = args[i];
 
         if (streq(arg, "--")) {
-            /* move the NULL too */
+            // Move the NULL too
             memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
             free(arg);
             argc--;
@@ -68,7 +68,7 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
                 return NULL;
             }
 
-            /* move flag argument before any other arguments */
+            // Move flag argument before any other arguments
             if (i != nr_flag_args) {
                 // farg1 arg1  arg2 -f   farg2 arg3
                 // farg1 farg2 arg1 arg2 arg3
@@ -84,7 +84,7 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
         argc--;
     }
 
-    // don't count arguments to flags as arguments to command
+    // Don't count arguments to flags as arguments to command
     argc -= nr_flag_args;
 
     if (argc < min) {
