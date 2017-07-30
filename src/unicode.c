@@ -281,25 +281,37 @@ static bool u_is_east_asian_wide(unsigned int u)
 
 int u_char_width(unsigned int u)
 {
+    // C0/C1 control characters and DELETE are rendered by the editor in
+    // caret notation (e.g. ^@), so have a width of 2 in this context.
+    // They are usually considered "unprintable" in other contexts.
     if (unlikely(u_is_ctrl(u)))
         return 2;
 
+    // Printable ASCII characters have a width of 1.
     if (likely(u < 0x80))
         return 1;
 
-    // Unprintable characters (includes invalid bytes in unicode stream) are rendered "<xx>"
+    // Other unprintable characters (including invalid UTF-8 bytes) are
+    // rendered as "<xx>", so have a width of 4 in this context.
     if (u_is_unprintable(u))
         return 4;
 
+    // Combining characters are "zero-width" because they compose onto
+    // adjacent glyphs. Some other characters are "non-spacing".
     if (u_is_combining(u))
         return 0;
 
+    // This is just a performance optimization (all east asian wide
+    // characters are >= 0x1100U).
     if (likely(u < 0x1100U))
         return 1;
 
+    // Some east asian characters are "wide" or "fullwidth" and occupy
+    // 2 columns.
     if (u_is_east_asian_wide(u))
         return 2;
 
+    // Everything else occupies 1 column.
     return 1;
 }
 
