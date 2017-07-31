@@ -49,8 +49,8 @@ Documentation/%.o: Documentation/%.c
 public/:
 	@mkdir -p $@
 
-check-docs:
-	@$(FINDLINKS) README.md | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
+check-docs: README.md CONTRIBUTING.md
+	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
 CLEANFILES += $(man) $(html) $(img) $(TTMAN) $(TTMAN).o
