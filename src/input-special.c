@@ -131,7 +131,7 @@ bool special_input_keypress(int key, char *buf, int *count)
     return true;
 }
 
-bool special_input_misc_status(char *status)
+bool special_input_misc_status(char *status, size_t status_maxlen)
 {
     int i, value = raw_input.value;
     const char *str = "";
@@ -141,7 +141,7 @@ bool special_input_misc_status(char *status)
         return false;
 
     if (input_special == INPUT_SPECIAL_UNKNOWN) {
-        strcpy(status, "[Insert special]");
+        strncpy(status, "[Insert special]", status_maxlen);
         return true;
     }
 
@@ -172,6 +172,6 @@ bool special_input_misc_status(char *status)
         break;
     }
 
-    sprintf(status, "[%s <%s>]", str, buf);
+    snprintf(status, status_maxlen, "[%s <%s>]", str, buf);
     return true;
 }

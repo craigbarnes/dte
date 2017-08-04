@@ -6,6 +6,6 @@
 
 void special_input_activate(void);
 bool special_input_keypress(int key, char *buf, int *count);
-bool special_input_misc_status(char *status);
+bool special_input_misc_status(char *status, size_t status_maxlen);
 
 #endif

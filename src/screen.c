@@ -31,9 +31,9 @@ void set_builtin_color(enum builtin_color c)
 
 static const char *format_misc_status(struct window *win)
 {
-    static char misc_status[32];
+    static char misc_status[32] = {'\0'};
 
-    if (special_input_misc_status(misc_status))
+    if (special_input_misc_status(misc_status, 31))
         return misc_status;
 
     if (input_mode == INPUT_SEARCH) {

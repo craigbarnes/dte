@@ -1112,8 +1112,9 @@ static void cmd_search(const char *pf, char **args)
             // Error message would not be very useful here
             return;
         }
-        pattern = xnew(char, strlen(word) + 5);
-        sprintf(pattern, "\\<%s\\>", word);
+        size_t len = strlen(word) + 5;
+        pattern = xnew(char, len);
+        snprintf(pattern, len, "\\<%s\\>", word);
         free(word);
     }
 
