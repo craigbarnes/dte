@@ -116,8 +116,9 @@ static int lock_or_unlock(const char *filename, bool lock)
     pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
-            xrenew(buf, size + strlen(filename) + 32);
-            sprintf(buf + size, "%d %s\n", getpid(), filename);
+            const size_t n = strlen(filename) + 32;
+            xrenew(buf, size + n);
+            snprintf(buf + size, n, "%d %s\n", getpid(), filename);
             size += strlen(buf + size);
         } else {
             error_msg("File is locked (%s) by process %d", file_locks, pid);
