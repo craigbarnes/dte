@@ -1,0 +1,41 @@
+syntax meson
+
+list keyword if elif else endif foreach endforeach
+list constant true false
+
+state start code
+    char # comment
+    str "'''" longstring
+    char "'" string
+    char -b a-zA-Z_ ident
+    char 0-9 number
+    eat start
+
+state comment
+    char "\n" start
+    eat comment
+
+state longstring string
+    str "'''" start string
+    eat longstring
+
+state string string
+    char "'" start string
+    char "\n" start
+    char -b "\\" string-escape
+    eat string
+
+state string-escape special
+    char "n'\\" string special
+    recolor string
+    noeat string
+
+state ident
+    char -b a-zA-Z_0-9 ident
+    inlist keyword start
+    inlist constant start
+    noeat start
+
+state number numeric
+    char 0-9 number
+    noeat start
