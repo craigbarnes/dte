@@ -158,7 +158,7 @@ static void cmd_close(const char *pf, char **args)
         return;
     }
 
-    if (allow_quit && buffers.count == 1) {
+    if (allow_quit && buffers.count == 1 && root_frame->frames.count <= 1) {
         editor_status = EDITOR_EXITING;
         return;
     }
