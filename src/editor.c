@@ -47,7 +47,7 @@ void any_key(void)
 {
     int key;
 
-    printf("Press any key to continue\n");
+    puts("Press any key to continue");
     while (!term_read_key(&key))
         ;
     if (key == KEY_PASTE)
