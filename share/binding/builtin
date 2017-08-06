@@ -12,6 +12,7 @@ bind pgdown pgdown
 bind delete delete
 bind ^\[ unselect
 bind ^Q quit
+bind ^W 'close -wq'
 bind ^Y redo
 bind ^Z undo
 bind ^\? erase
