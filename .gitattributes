@@ -9,6 +9,7 @@
 CONTRIBUTING.md export-ignore
 mk/dist.mk export-ignore
 
+Documentation/*.txt ttman
 GNUmakefile make
 makefile make
 *.mk make
