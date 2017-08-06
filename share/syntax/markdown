@@ -34,17 +34,24 @@ state line-start
     char +- bullet
     char -b "~" tilde
     char -b "`" backtick
+    char "\\" escape
     noeat text
 
 state text
     char "\n" line-start
-    char ` code-span
+    char "`" code-span
     char \[ reference
     str "**" double-asterisk
     str "__" double-underline
     char \* asterisk
     char _ underscore
+    char "\\" escape
     eat text
+
+state escape special
+    char "\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e" text special
+    recolor text 1
+    noeat text
 
 state bullet
     char "\n" line-start
@@ -115,9 +122,14 @@ state double-underline strong-emphasis
     eat double-underline
 
 state reference
-    char "\n" line-start
+    char "\\" reference-escape
     char \] reference-close reference
     eat reference
+
+state reference-escape special
+    char "\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e" reference special
+    recolor reference 1
+    noeat reference
 
 state reference-close
     char "\n" line-start
