@@ -38,9 +38,9 @@ static bool is_buffered(const struct condition *cond, const char *str, int len)
     return !memcmp(cond->u.cond_bufis.str, str, len);
 }
 
-static bool in_hash(struct string_list *list, const char *str, int len)
+static bool in_hash(struct string_list *list, const char *str, size_t len)
 {
-    unsigned int hash = buf_hash(str, len);
+    unsigned long hash = buf_hash(str, len);
     struct hash_str *h = list->hash[hash % ARRAY_COUNT(list->hash)];
 
     if (list->icase) {

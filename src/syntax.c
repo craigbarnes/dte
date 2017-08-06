@@ -7,11 +7,11 @@
 
 static PTR_ARRAY(syntaxes);
 
-unsigned int buf_hash(const char *str, unsigned int size)
+unsigned long buf_hash(const char *str, size_t size)
 {
-    long i, hash = 0;
+    unsigned long hash = 0;
 
-    for (i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         unsigned int ch = tolower(str[i]);
         hash = (hash << 5) - hash + ch;
     }

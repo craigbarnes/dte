@@ -298,8 +298,8 @@ static void cmd_list(const char *pf, char **args)
 
     for (i = 1; args[i]; i++) {
         const char *str = args[i];
-        int len = strlen(str);
-        long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
+        size_t len = strlen(str);
+        unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
         struct hash_str *h = xmalloc(sizeof(struct hash_str *) + sizeof(int) + len);
         h->next = list->hash[idx];
         h->len = len;

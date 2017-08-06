@@ -122,7 +122,7 @@ static inline bool is_subsyntax(struct syntax *syn)
     return syn->name[0] == '.';
 }
 
-unsigned int buf_hash(const char *str, unsigned int size);
+unsigned long buf_hash(const char *str, size_t size);
 struct string_list *find_string_list(struct syntax *syn, const char *name);
 struct state *find_state(struct syntax *syn, const char *name);
 struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m);
