@@ -73,8 +73,10 @@ void error_msg(const char *format, ...)
     msg_is_error = true;
     nr_errors++;
 
-    if (editor_status != EDITOR_RUNNING)
-        fprintf(stderr, "%s\n", error_buf);
+    if (editor_status != EDITOR_RUNNING) {
+        fputs(error_buf, stderr);
+        fputc('\n', stderr);
+    }
 }
 
 void info_msg(const char *format, ...)
