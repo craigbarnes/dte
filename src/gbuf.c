@@ -76,8 +76,11 @@ char *gbuf_steal_cstring(struct gbuf *buf)
 char *gbuf_cstring(struct gbuf *buf)
 {
     char *b = xnew(char, buf->len + 1);
-    memcpy(b, buf->buffer, buf->len);
-    b[buf->len] = 0;
+    if (buf->len > 0) {
+        BUG_ON(!buf->buffer);
+        memcpy(b, buf->buffer, buf->len);
+    }
+    b[buf->len] = '\0';
     return b;
 }
 
