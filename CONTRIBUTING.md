@@ -5,6 +5,7 @@ Pull Requests
 * Avoid mixing unrelated commits in the same pull request.
 * Include as few self-contained commits as necessary.
 * Use rebase to avoid fix-up commits and merge commits.
+* Install the provided git hooks (`make git-hooks`) before creating any commits.
 
 Bug Reports
 -----------

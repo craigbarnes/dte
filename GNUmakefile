@@ -85,7 +85,7 @@ all: $(PROGRAM)$(X) test man
 include mk/compat.mk
 include mk/build.mk
 include mk/docs.mk
--include mk/dist.mk
+-include mk/dev.mk
 
 LIBS += -lcurses
 

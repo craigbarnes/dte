@@ -1,0 +1,18 @@
+#!/bin/sh
+
+TMPDIR='.pre-commit-test/'
+MAKE="$(command -v gmake || command -v make)"
+ARGV0="$0"
+
+abort() {
+    echo "$ARGV0: Error: $1" >&2
+    exit 1
+}
+
+test -x "$MAKE" || abort 'unable to find GNU Make command'
+test ! -e "$TMPDIR" || abort "pre-commit TMPDIR already exists: '$TMPDIR'"
+
+git checkout-index --prefix="$TMPDIR" -af || exit 1
+trap "rm -rf '$TMPDIR'" EXIT
+
+$MAKE -j"$(mk/nproc.sh)" --directory="$TMPDIR"
