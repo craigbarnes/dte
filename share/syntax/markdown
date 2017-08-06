@@ -1,0 +1,127 @@
+syntax .markdown-fenced-code-block
+
+state body code-block
+    char "\n" line-start
+    eat body
+
+state line-start code-block
+    heredocend end
+    noeat body
+
+state end code-block
+    char "\n" END
+    noeat body
+
+syntax markdown
+
+# TODO:
+# * All variations of links and references
+# * Underlined headings
+# * Escapes
+
+default special unordered-list
+default numeric ordered-list
+
+state line-start
+    str "\t" code-block
+    str "    " code-block
+    char " " line-start
+    char # hash-heading
+    char > block-quote
+    char -b 0-9 digit
+    str "**" double-asterisk
+    char \* bullet-asterisk emphasis
+    char +- bullet
+    char -b "~" tilde
+    char -b "`" backtick
+    noeat text
+
+state text
+    char "\n" line-start
+    char ` code-span
+    char \[ reference
+    str "**" double-asterisk
+    str "__" double-underline
+    char \* asterisk
+    char _ underscore
+    eat text
+
+state bullet
+    char "\n" line-start
+    char -n " \t" text
+    recolor unordered-list 2
+    noeat text
+
+state bullet-asterisk
+    char "\n" line-start
+    char -n " \t" asterisk emphasis
+    recolor unordered-list 2
+    noeat text
+
+state code-block
+    char "\n" line-start
+    eat code-block
+
+state backtick code-block
+    char -b "`" backtick
+    bufis "`" code-span
+    bufis "``" text code-span
+    heredocbegin .markdown-fenced-code-block line-start
+
+state tilde code-block
+    char -b "~" tilde
+    bufis "~" text
+    bufis "~~" text
+    heredocbegin .markdown-fenced-code-block line-start
+
+state block-quote
+    char "\n" line-start
+    eat block-quote
+
+state digit
+    char "\n" line-start
+    char -b 0-9 digit
+    char -n . text
+    recolor ordered-list
+    eat text ordered-list
+
+state hash-heading heading
+    char "\n" line-start
+    eat hash-heading
+
+state code-span
+    char "\n" line-start
+    char ` text code-span
+    eat code-span
+
+state asterisk emphasis
+    char \* text emphasis
+    char -n "\n" asterisk
+    noeat line-start
+
+state double-asterisk strong-emphasis
+    char "\n" line-start
+    str "**" text strong-emphasis
+    eat double-asterisk
+
+state underscore emphasis
+    char _ text emphasis
+    char -n "\n" underscore
+    noeat line-start
+
+state double-underline strong-emphasis
+    char "\n" line-start
+    str "__" text strong-emphasis
+    eat double-underline
+
+state reference
+    char "\n" line-start
+    char \] reference-close reference
+    eat reference
+
+state reference-close
+    char "\n" line-start
+#    char ( reference-link
+#    char \[ reference-pointer
+#    char : reference-backref
+    noeat text

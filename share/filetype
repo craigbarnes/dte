@@ -52,6 +52,7 @@ ft java java
 ft javascript js
 ft lua lua rockspec ltcn
 ft make mk mak
+ft markdown md mkd mkdn markdown
 ft perl perl pl
 ft php php php3 php4 inc
 ft python py
