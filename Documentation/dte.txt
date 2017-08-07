@@ -506,6 +506,9 @@ shift <count>
 	Shift current or selected lines <count> indentation levels.
 	Count is usually -1 (decrease indent) or 1 (increase indent).
 
+	To specify a negative number, it's necessary to first disable
+	option parsing with "--", e.g. "shift -- -1".
+
 suspend
 	Suspend program.
 
