@@ -568,7 +568,7 @@ word-fwd [-s]
 wprev
 	Previous window.
 
-wresize [-hv] [[+-]N]
+wresize [-hv] [N|+N|-- -N]
 	If no parameter given, equalize window sizes in current frame.
 
 	-h resize horizontally
@@ -579,7 +579,8 @@ wresize [-hv] [[+-]N]
 
 	+N Increase size of current window by N characters.
 
-	-N Decrease size of current window by N characters.
+	-N Decrease size of current window by N characters
+	(prefixed with *--* to stop option parsing).
 
 wsplit [-bhr] [file...]
 	Like *open* but at first splits current window vertically.
