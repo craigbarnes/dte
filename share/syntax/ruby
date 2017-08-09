@@ -68,7 +68,7 @@ state =begin-nl comment
 state ident
     char -b a-zA-Z0-9_ ident
     inlist keyword start
-    inlist constant start
+    inlist pseudo-variable start
     noeat start
 
 state dq string
