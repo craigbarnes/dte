@@ -84,9 +84,10 @@ state sq string
     eat sq
 
 list keyword \
-    BEGIN class ensure self when END def not super while alias defined \
-    for or then yield and do if redo begin else in rescue undef break \
-    elsif module retry unless case end next return until
+    alias and begin break case class def defined do else elsif end \
+    ensure for if in module next not or redo rescue retry return super \
+    then undef unless until when while yield \
+    BEGIN END
 
 list pseudo-variable \
     true false nil self __FILE__ __LINE__
