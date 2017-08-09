@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     static const char *optstring = "RVc:t:r:";
     const char *term = getenv("TERM");
     const char *home = getenv("HOME");
+    const char *dte_home = getenv("DTE_HOME");
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
@@ -60,7 +61,13 @@ int main(int argc, char *argv[])
 
     if (!home)
         home = "";
+
     home_dir = xstrdup(home);
+
+    if (dte_home)
+        user_config_dir = xstrdup(dte_home);
+    else
+        user_config_dir = xsprintf("%s/.%s", home_dir, program);
 
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {

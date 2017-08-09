@@ -480,7 +480,7 @@ struct syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
 struct syntax *load_syntax_by_filetype(const char *filetype)
 {
     struct syntax *syn;
-    char *filename = xsprintf("%s/.%s/syntax/%s", home_dir, program, filetype);
+    char *filename = xsprintf("%s/syntax/%s", user_config_dir, filetype);
     int err;
 
     syn = load_syntax_file(filename, false, &err);

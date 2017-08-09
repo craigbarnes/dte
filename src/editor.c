@@ -16,6 +16,7 @@ enum editor_status editor_status;
 enum input_mode input_mode;
 CMDLINE(cmdline);
 char *home_dir;
+char *user_config_dir;
 char *charset;
 bool child_controls_terminal;
 bool resized;
@@ -252,7 +253,7 @@ void suspend(void)
 
 char *editor_file(const char *name)
 {
-    return xsprintf("%s/.%s/%s", home_dir, program, name);
+    return xsprintf("%s/%s", user_config_dir, name);
 }
 
 char get_confirmation(const char *choices, const char *format, ...)
