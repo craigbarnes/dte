@@ -9,6 +9,11 @@ struct builtin_env {
     char *(*expand)(void);
 };
 
+static char *expand_dte_home(void)
+{
+    return xstrdup(user_config_dir);
+}
+
 static char *expand_file(void)
 {
     struct view *v = window->view;
@@ -43,6 +48,7 @@ static char *expand_word(void)
 }
 
 static const struct builtin_env builtin[] = {
+    {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"PKGDATADIR", expand_pkgdatadir},
     {"WORD", expand_word},
