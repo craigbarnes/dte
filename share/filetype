@@ -6,6 +6,7 @@ ft -i perl perl
 ft -i php php
 ft -i awk awk gawk nawk
 ft -i lua lua luajit
+ft -i ruby ruby
 
 # First line
 ft -c sh shell-script
@@ -56,6 +57,7 @@ ft markdown md mkd mkdn markdown
 ft perl perl pl
 ft php php php3 php4 inc
 ft python py
+ft ruby rb
 ft sh sh bash
 ft sql sql
 ft tcl tcl

@@ -1,0 +1,92 @@
+syntax .ruby-esc
+
+# This sub-syntax was copied from the Python syntax
+# TODO: correct the rules to match the actual Ruby syntax
+
+state esc special
+    char "abfnrtv'\\\"" END special
+    char 0-7 oct1
+    char x hex0
+    noeat END
+
+state oct1 special
+    char 0-7 oct2
+    noeat END
+
+state oct2 special
+    char 0-7 END special
+    noeat END
+
+state hex0 special
+    char 0-9a-fA-F hex1
+    noeat END
+
+state hex1 special
+    char 0-9a-fA-F END special
+    noeat END
+
+syntax ruby
+
+# TODO:
+# * %Q() strings
+# * Expression substitution in strings
+# * Here document strings
+# * Command output (e.g. `date` or %x{ date })
+# * Regular expression literals
+# * Numeric literals
+# * Global variables (e.g. $foobar)
+# * Instance variables (e.g. @foobar)
+# * Constants (e.g. FOOBAR)
+
+state line-start code
+    char # comment
+    char " \b\t\n\v\f\r" line-start
+    str "=begin" =begin
+    noeat start
+
+state start code
+    char # comment
+    char "\n" line-start
+    char -b a-zA-Z_ ident
+    char '"' dq
+    char "'" sq
+    eat start
+
+state comment
+    char "\n" line-start
+    eat comment
+
+state =begin comment
+    char "\n" =begin-nl
+    eat =begin
+
+state =begin-nl comment
+    char " \b\t\n\v\f\r" =begin-nl
+    str "=end" comment
+    noeat =begin
+
+state ident
+    char -b a-zA-Z0-9_ ident
+    inlist keyword start
+    inlist constant start
+    noeat start
+
+state dq string
+    char "\"" start string
+    char "\n" line-start
+    char -b "\\" .ruby-esc:dq
+    eat dq
+
+state sq string
+    char "'" start string
+    char "\n" line-start
+    char -b "\\" .ruby-esc:sq
+    eat sq
+
+list keyword \
+    BEGIN class ensure self when END def not super while alias defined \
+    for or then yield and do if redo begin else in rescue undef break \
+    elsif module retry unless case end next return until
+
+list pseudo-variable \
+    true false nil self __FILE__ __LINE__

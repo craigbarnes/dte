@@ -69,7 +69,7 @@ test_objects := src/test-main.o
 syntax_files := \
     awk c config css diff docker gitcommit gitrebase go html html+smarty \
     ini java javascript lua mail make markdown meson php python robotstxt \
-    sh smarty sql xml $(PROGRAM)
+    ruby sh smarty sql xml $(PROGRAM)
 
 binding := $(addprefix share/binding/, default classic builtin)
 color := $(addprefix share/color/, darkgray light light256)
