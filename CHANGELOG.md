@@ -1,8 +1,8 @@
 dte Change Log
 --------------
 
-Version 1.3 (not yet released)
-------------------------------
+v1.3 (unreleased)
+-----------------
 
 * Added the ability to override the default user config directory via
   the `DTE_EDITOR` enviornment variable.
@@ -17,8 +17,10 @@ Version 1.3 (not yet released)
 * Added some descriptive comments to the default configs.
 * Various small fixes and clarifications to the man pages.
 
-Version 1.2 (latest release)
-----------------------------
+v1.2 (latest release)
+---------------------
+
+Released on 2017-07-30.
 
 * Unicode 10 support
 * Build system fixes
@@ -26,8 +28,10 @@ Version 1.2 (latest release)
 Full diff: <https://github.com/craigbarnes/dte/compare/v1.1...v1.2>  
 Download: [dte-1.2.tar.gz](https://craigbarnes.gitlab.io/dte/dist/dte-1.2.tar.gz)
 
-Version 1.1
------------
+v1.1
+----
+
+Released on 2017-07-29.
 
 Full diff: <https://github.com/craigbarnes/dte/compare/v1.0...v1.1>  
 Download: [dte-1.1.tar.gz](https://craigbarnes.gitlab.io/dte/dist/dte-1.1.tar.gz)
