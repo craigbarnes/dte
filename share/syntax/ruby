@@ -34,8 +34,6 @@ syntax ruby
 # * Command output (e.g. `date` or %x{ date })
 # * Regular expression literals
 # * Numeric literals
-# * Global variables (e.g. $foobar)
-# * Instance variables (e.g. @foobar)
 # * Constants (e.g. FOOBAR)
 
 state line-start code
@@ -50,7 +48,33 @@ state start code
     char -b a-zA-Z_ ident
     char '"' dq
     char "'" sq
+    char \$ global-variable
+    char -b @ maybe-instance-variable
+    char -b : maybe-symbol
     eat start
+
+state global-variable
+    char a-zA-Z0-9_- global-variable
+    char !@&`\'+~=/\\,\;.<>\*\$\?:\" start global-variable
+    noeat start
+
+state maybe-instance-variable instance-variable
+    char -b a-zA-Z_ instance-variable
+    recolor code
+    noeat start
+
+state instance-variable
+    char a-zA-Z0-9_ instance-variable
+    noeat start
+
+state maybe-symbol symbol
+    char -b a-zA-Z_ symbol
+    recolor code
+    noeat start
+
+state symbol
+    char a-zA-Z0-9_ symbol
+    noeat start
 
 state comment
     char "\n" line-start
@@ -90,4 +114,9 @@ list keyword \
     BEGIN END
 
 list pseudo-variable \
-    true false nil self __FILE__ __LINE__
+    true false nil self __FILE__ __LINE__ __dir__ __method__
+
+default numeric symbol
+default constant pseudo-variable
+default variable global-variable
+default variable instance-variable
