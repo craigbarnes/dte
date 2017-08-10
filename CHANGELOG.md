@@ -11,10 +11,10 @@ v1.3 (unreleased)
 * Fixed a bug with the `close -wq` command when using split frames
   (`wsplit`).
 * Fixed a segfault bug in `git-open` mode when not inside a git repo.
-* Fix a few cases of undefined behaviour and potential buffer overflow
+* Fixed a few cases of undefined behaviour and potential buffer overflow
   inherited from [dex].
 * Fixed all compiler warnings when building on OpenBSD 6.
-* Added some descriptive comments to the default configs.
+* Added some descriptive comments to the default config files.
 * Various small fixes and clarifications to the man pages.
 
 v1.2 (latest release)
@@ -22,8 +22,8 @@ v1.2 (latest release)
 
 Released on 2017-07-30.
 
-* Unicode 10 support
-* Build system fixes
+* Unicode 10 rendering support.
+* Various build system fixes.
 
 Full diff: <https://github.com/craigbarnes/dte/compare/v1.1...v1.2>  
 Download: [dte-1.2.tar.gz](https://craigbarnes.gitlab.io/dte/dist/dte-1.2.tar.gz)
