@@ -37,7 +37,7 @@ Alternatively you can put your build options into a `Config.mk` file.
     make prefix="$HOME/.local"
     make install prefix="$HOME/.local"
 
-The default `prefix` is `/usr/local` and [`DESTDIR`] works as usual. See
+The default [`prefix`] is `/usr/local` and [`DESTDIR`] works as usual. See
 the top of [`GNUmakefile`] for more information.
 
 Documentation
@@ -72,5 +72,6 @@ Public License version 2 for more details.
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [dte.1.html]: https://craigbarnes.gitlab.io/dte/dte.1.html
 [dte-syntax.7.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.7.html
+[`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
