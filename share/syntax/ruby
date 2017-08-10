@@ -113,13 +113,15 @@ state sq string
     eat sq
 
 list keyword \
-    alias and begin break case class def defined do else elsif end \
-    ensure for if in module next not or redo rescue retry return super \
-    then undef unless until when while yield \
-    BEGIN END
-
+    __ENCODING__ __LINE__  __FILE__ __method__ __callee__ __dir__ BEGIN END \
+    alias and begin break case class def defined? do else elsif end \
+    ensure false for if in module next nil not or redo rescue retry \
+    return self super then true undef unless until when while yield \
+  
 list pseudo-variable \
-    true false nil self __FILE__ __LINE__ __dir__ __method__
+     at_exit attr attr_accessor attr_reader attr_writer \
+     catch include lambda load loop private proc protected public \
+     raise fail require throw
 
 default numeric symbol
 default constant pseudo-variable
