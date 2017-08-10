@@ -1,3 +1,5 @@
+# These are the old key bindings from the dex editor, before it was forked
+
 bind C-left word-bwd
 bind C-right word-fwd
 bind C-up up

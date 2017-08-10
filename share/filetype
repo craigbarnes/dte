@@ -23,25 +23,26 @@ ft -f sh '/\.?bash(rc|_profile|_logout)$'
 ft -f sh '/\.(shrc|profile)$'
 ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
-ft -f docker Dockerfile$
+ft -f docker 'Dockerfile$'
 ft -f dte $PKGDATADIR'/.*'
 ft -f dte '/(\.dte|dte/share)/(rc|filetype|option|((syntax|color|binding|compiler)/.*))$'
 ft -f gitcommit '/COMMIT_EDITMSG$'
 ft -f gitrebase '/git-rebase-todo$'
 ft -f indent '/\.indent\.pro$'
-ft -f ini (yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$
-ft -f ini \.(editorconfig|buildconfig)$
+ft -f ini '(yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$'
+ft -f ini '\.(editorconfig|buildconfig)$'
 ft -f ini '/etc/systemd/[a-z]+\.conf$'
-ft -f ini (gitconfig|/\.git/config|\.gitmodules)$
-ft -f lua (config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$
+ft -f ini '(gitconfig|/\.git/config|\.gitmodules)$'
+ft -f lua '(config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$'
 ft -f mail '/tmpmsg-.*\.txt$'
 ft -f mail '(snd\.[0-9]+|\.letter|\.letter\.[0-9]+|\.followup|\.article|'\
 '\.article\.[0-9]+|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}|'\
 'ae[0-9]+\.txt|/tmp/SLRN[0-9A-Z.]+|\.eml$)'
 ft -f make '[mM]akefile(\.[^/]*)?$'
 ft -f make '/Make\.[^/]*$'
-ft -f meson (meson\.build|meson_options\.txt)$
-ft -f robotstxt robots\.txt$
+ft -f meson '(meson\.build|meson_options\.txt)$'
+ft -f robotstxt 'robots\.txt$'
+ft -f ruby 'Rakefile$'
 
 # "ft" matches against the filename extension
 ft awk awk
@@ -61,7 +62,7 @@ ft markdown md mkd mkdn markdown
 ft perl perl pl
 ft php php php3 php4 inc
 ft python py
-ft ruby rb
+ft ruby rb rake
 ft sh sh bash
 ft sql sql
 ft tcl tcl
