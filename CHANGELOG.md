@@ -25,7 +25,7 @@ Released on 2017-07-30.
 * Unicode 10 rendering support.
 * Various build system fixes.
 
-Full diff: <https://github.com/craigbarnes/dte/compare/v1.1...v1.2>  
+Git diff: [v1.1...v1.2](https://github.com/craigbarnes/dte/compare/v1.1...v1.2)  
 Download: [dte-1.2.tar.gz](https://craigbarnes.gitlab.io/dte/dist/dte-1.2.tar.gz)
 
 v1.1
@@ -33,7 +33,7 @@ v1.1
 
 Released on 2017-07-29.
 
-Full diff: <https://github.com/craigbarnes/dte/compare/v1.0...v1.1>  
+Git diff: [v1.0...v1.1](https://github.com/craigbarnes/dte/compare/v1.0...v1.1)  
 Download: [dte-1.1.tar.gz](https://craigbarnes.gitlab.io/dte/dist/dte-1.1.tar.gz)
 
 
