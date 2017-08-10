@@ -1,4 +1,3 @@
-# sub-syntax. used in text and attribute values
 syntax .html-entity
 
 state entity
@@ -36,38 +35,268 @@ state semicolon error
     char ";" END entity
     eat END error
 
-# reserved characters, latin1 symbols, latin1 characters, math, greek, other
+# Entities. Generated from:
+#
+#  curl https://html.spec.whatwg.org/entities.json | \
+#   sed -n 's/^ *"&\([A-Za-z0-9]\+\);\?".*/\1/p' | sort | uniq | \
+#   tr '\n' ' ' | fold -sw68 | sed 's/ *$/ \\/' | sed '$s/ \\/\n/' | \
+#   sed 's/^/    /'
+#
 list entity \
-    quot apos amp lt gt \
-\
-    nbsp iexcl cent pound curren yen brvbar sect uml copy ordf laquo not \
-    shy reg macr deg plusmn sup2 sup3 acute micro para middot cedil sup1 \
-    ordm raquo frac14 frac12 frac34 iquest times divide \
-\
-    Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute \
-    Ecirc Euml Igrave Iacute Icirc Iuml ETH Ntilde Ograve Oacute Ocirc \
-    Otilde Ouml Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig \
-    agrave aacute acirc atilde auml aring aelig ccedil egrave eacute \
-    ecirc euml igrave iacute icirc iuml eth ntilde ograve oacute ocirc \
-    otilde ouml oslash ugrave uacute ucirc uuml yacute thorn yuml \
-\
-    forall part exist empty nabla isin notin ni prod sum minus lowast \
-    radic prop infin ang and or cap cup int there4 sim cong asymp ne \
-    equiv le ge sub sup nsub sube supe oplus otimes perp sdot \
-\
-    Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu \
-    Nu Xi Omicron Pi Rho Sigma Tau Upsilon Phi Chi Psi Omega alpha beta \
-    gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi \
-    omicron pi rho sigmaf sigma tau upsilon phi chi psi omega thetasym \
-    upsih piv \
-\
-    OElig oelig Scaron scaron Yuml fnof circ tilde ensp emsp thinsp zwnj \
-    zwj lrm rlm ndash mdash lsquo rsquo sbquo ldquo rdquo bdquo dagger \
-    Dagger bull hellip permil prime Prime lsaquo rsaquo oline euro trade \
-    larr uarr rarr darr harr crarr lceil rceil lfloor rfloor loz spades \
-    clubs hearts diams
+    aacute Aacute abreve Abreve ac acd acE acirc Acirc acute acy Acy \
+    aelig AElig af afr Afr agrave Agrave alefsym aleph alpha Alpha \
+    amacr Amacr amalg amp AMP and And andand andd andslope andv ang \
+    ange angle angmsd angmsdaa angmsdab angmsdac angmsdad angmsdae \
+    angmsdaf angmsdag angmsdah angrt angrtvb angrtvbd angsph angst \
+    angzarr aogon Aogon aopf Aopf ap apacir ape apE apid apos \
+    ApplyFunction approx approxeq aring Aring ascr Ascr Assign ast \
+    asymp asympeq atilde Atilde auml Auml awconint awint backcong \
+    backepsilon backprime backsim backsimeq Backslash Barv barvee \
+    barwed Barwed barwedge bbrk bbrktbrk bcong bcy Bcy bdquo becaus \
+    because Because bemptyv bepsi bernou Bernoullis beta Beta beth \
+    between bfr Bfr bigcap bigcirc bigcup bigodot bigoplus bigotimes \
+    bigsqcup bigstar bigtriangledown bigtriangleup biguplus bigvee \
+    bigwedge bkarow blacklozenge blacksquare blacktriangle \
+    blacktriangledown blacktriangleleft blacktriangleright blank blk12 \
+    blk14 blk34 block bne bnequiv bnot bNot bopf Bopf bot bottom bowtie \
+    boxbox boxdl boxdL boxDl boxDL boxdr boxdR boxDr boxDR boxh boxH \
+    boxhd boxhD boxHd boxHD boxhu boxhU boxHu boxHU boxminus boxplus \
+    boxtimes boxul boxuL boxUl boxUL boxur boxuR boxUr boxUR boxv boxV \
+    boxvh boxvH boxVh boxVH boxvl boxvL boxVl boxVL boxvr boxvR boxVr \
+    boxVR bprime breve Breve brvbar bscr Bscr bsemi bsim bsime bsol \
+    bsolb bsolhsub bull bullet bump bumpe bumpE bumpeq Bumpeq cacute \
+    Cacute cap Cap capand capbrcup capcap capcup capdot \
+    CapitalDifferentialD caps caret caron Cayleys ccaps ccaron Ccaron \
+    ccedil Ccedil ccirc Ccirc Cconint ccups ccupssm cdot Cdot cedil \
+    Cedilla cemptyv cent centerdot CenterDot cfr Cfr chcy CHcy check \
+    checkmark chi Chi cir circ circeq circlearrowleft circlearrowright \
+    circledast circledcirc circleddash CircleDot circledR circledS \
+    CircleMinus CirclePlus CircleTimes cire cirE cirfnint cirmid \
+    cirscir ClockwiseContourIntegral CloseCurlyDoubleQuote \
+    CloseCurlyQuote clubs clubsuit colon Colon colone Colone coloneq \
+    comma commat comp compfn complement complexes cong congdot \
+    Congruent conint Conint ContourIntegral copf Copf coprod Coproduct \
+    copy COPY copysr CounterClockwiseContourIntegral crarr cross Cross \
+    cscr Cscr csub csube csup csupe ctdot cudarrl cudarrr cuepr cuesc \
+    cularr cularrp cup Cup cupbrcap cupcap CupCap cupcup cupdot cupor \
+    cups curarr curarrm curlyeqprec curlyeqsucc curlyvee curlywedge \
+    curren curvearrowleft curvearrowright cuvee cuwed cwconint cwint \
+    cylcty dagger Dagger daleth darr dArr Darr dash dashv Dashv dbkarow \
+    dblac dcaron Dcaron dcy Dcy dd DD ddagger ddarr DDotrahd ddotseq \
+    deg Del delta Delta demptyv dfisht dfr Dfr dHar dharl dharr \
+    DiacriticalAcute DiacriticalDot DiacriticalDoubleAcute \
+    DiacriticalGrave DiacriticalTilde diam diamond Diamond diamondsuit \
+    diams die DifferentialD digamma disin div divide divideontimes \
+    divonx djcy DJcy dlcorn dlcrop dollar dopf Dopf dot Dot DotDot \
+    doteq doteqdot DotEqual dotminus dotplus dotsquare doublebarwedge \
+    DoubleContourIntegral DoubleDot DoubleDownArrow DoubleLeftArrow \
+    DoubleLeftRightArrow DoubleLeftTee DoubleLongLeftArrow \
+    DoubleLongLeftRightArrow DoubleLongRightArrow DoubleRightArrow \
+    DoubleRightTee DoubleUpArrow DoubleUpDownArrow DoubleVerticalBar \
+    downarrow Downarrow DownArrow DownArrowBar DownArrowUpArrow \
+    DownBreve downdownarrows downharpoonleft downharpoonright \
+    DownLeftRightVector DownLeftTeeVector DownLeftVector \
+    DownLeftVectorBar DownRightTeeVector DownRightVector \
+    DownRightVectorBar DownTee DownTeeArrow drbkarow drcorn drcrop dscr \
+    Dscr dscy DScy dsol dstrok Dstrok dtdot dtri dtrif duarr duhar \
+    dwangle dzcy DZcy dzigrarr eacute Eacute easter ecaron Ecaron ecir \
+    ecirc Ecirc ecolon ecy Ecy eDDot edot eDot Edot ee efDot efr Efr eg \
+    egrave Egrave egs egsdot el Element elinters ell els elsdot emacr \
+    Emacr empty emptyset EmptySmallSquare emptyv EmptyVerySmallSquare \
+    emsp emsp13 emsp14 eng ENG ensp eogon Eogon eopf Eopf epar eparsl \
+    eplus epsi epsilon Epsilon epsiv eqcirc eqcolon eqsim eqslantgtr \
+    eqslantless Equal equals EqualTilde equest Equilibrium equiv \
+    equivDD eqvparsl erarr erDot escr Escr esdot esim Esim eta Eta eth \
+    ETH euml Euml euro excl exist Exists expectation exponentiale \
+    ExponentialE fallingdotseq fcy Fcy female ffilig fflig ffllig ffr \
+    Ffr filig FilledSmallSquare FilledVerySmallSquare fjlig flat fllig \
+    fltns fnof fopf Fopf forall ForAll fork forkv Fouriertrf fpartint \
+    frac12 frac13 frac14 frac15 frac16 frac18 frac23 frac25 frac34 \
+    frac35 frac38 frac45 frac56 frac58 frac78 frasl frown fscr Fscr \
+    gacute gamma Gamma gammad Gammad gap gbreve Gbreve Gcedil gcirc \
+    Gcirc gcy Gcy gdot Gdot ge gE gel gEl geq geqq geqslant ges gescc \
+    gesdot gesdoto gesdotol gesl gesles gfr Gfr gg Gg ggg gimel gjcy \
+    GJcy gl gla glE glj gnap gnapprox gne gnE gneq gneqq gnsim gopf \
+    Gopf grave GreaterEqual GreaterEqualLess GreaterFullEqual \
+    GreaterGreater GreaterLess GreaterSlantEqual GreaterTilde gscr Gscr \
+    gsim gsime gsiml gt Gt GT gtcc gtcir gtdot gtlPar gtquest gtrapprox \
+    gtrarr gtrdot gtreqless gtreqqless gtrless gtrsim gvertneqq gvnE \
+    Hacek hairsp half hamilt hardcy HARDcy harr hArr harrcir harrw Hat \
+    hbar hcirc Hcirc hearts heartsuit hellip hercon hfr Hfr \
+    HilbertSpace hksearow hkswarow hoarr homtht hookleftarrow \
+    hookrightarrow hopf Hopf horbar HorizontalLine hscr Hscr hslash \
+    hstrok Hstrok HumpDownHump HumpEqual hybull hyphen iacute Iacute ic \
+    icirc Icirc icy Icy Idot iecy IEcy iexcl iff ifr Ifr igrave Igrave \
+    ii iiiint iiint iinfin iiota ijlig IJlig Im imacr Imacr image \
+    ImaginaryI imagline imagpart imath imof imped Implies in incare \
+    infin infintie inodot int Int intcal integers Integral intercal \
+    Intersection intlarhk intprod InvisibleComma InvisibleTimes iocy \
+    IOcy iogon Iogon iopf Iopf iota Iota iprod iquest iscr Iscr isin \
+    isindot isinE isins isinsv isinv it itilde Itilde iukcy Iukcy iuml \
+    Iuml jcirc Jcirc jcy Jcy jfr Jfr jmath jopf Jopf jscr Jscr jsercy \
+    Jsercy jukcy Jukcy kappa Kappa kappav kcedil Kcedil kcy Kcy kfr Kfr \
+    kgreen khcy KHcy kjcy KJcy kopf Kopf kscr Kscr lAarr lacute Lacute \
+    laemptyv lagran lambda Lambda lang Lang langd langle lap Laplacetrf \
+    laquo larr lArr Larr larrb larrbfs larrfs larrhk larrlp larrpl \
+    larrsim larrtl lat latail lAtail late lates lbarr lBarr lbbrk \
+    lbrace lbrack lbrke lbrksld lbrkslu lcaron Lcaron lcedil Lcedil \
+    lceil lcub lcy Lcy ldca ldquo ldquor ldrdhar ldrushar ldsh le lE \
+    LeftAngleBracket leftarrow Leftarrow LeftArrow LeftArrowBar \
+    LeftArrowRightArrow leftarrowtail LeftCeiling LeftDoubleBracket \
+    LeftDownTeeVector LeftDownVector LeftDownVectorBar LeftFloor \
+    leftharpoondown leftharpoonup leftleftarrows leftrightarrow \
+    Leftrightarrow LeftRightArrow leftrightarrows leftrightharpoons \
+    leftrightsquigarrow LeftRightVector LeftTee LeftTeeArrow \
+    LeftTeeVector leftthreetimes LeftTriangle LeftTriangleBar \
+    LeftTriangleEqual LeftUpDownVector LeftUpTeeVector LeftUpVector \
+    LeftUpVectorBar LeftVector LeftVectorBar leg lEg leq leqq leqslant \
+    les lescc lesdot lesdoto lesdotor lesg lesges lessapprox lessdot \
+    lesseqgtr lesseqqgtr LessEqualGreater LessFullEqual LessGreater \
+    lessgtr LessLess lesssim LessSlantEqual LessTilde lfisht lfloor lfr \
+    Lfr lg lgE lHar lhard lharu lharul lhblk ljcy LJcy ll Ll llarr \
+    llcorner Lleftarrow llhard lltri lmidot Lmidot lmoust lmoustache \
+    lnap lnapprox lne lnE lneq lneqq lnsim loang loarr lobrk \
+    longleftarrow Longleftarrow LongLeftArrow longleftrightarrow \
+    Longleftrightarrow LongLeftRightArrow longmapsto longrightarrow \
+    Longrightarrow LongRightArrow looparrowleft looparrowright lopar \
+    lopf Lopf loplus lotimes lowast lowbar LowerLeftArrow \
+    LowerRightArrow loz lozenge lozf lpar lparlt lrarr lrcorner lrhar \
+    lrhard lrm lrtri lsaquo lscr Lscr lsh Lsh lsim lsime lsimg lsqb \
+    lsquo lsquor lstrok Lstrok lt Lt LT ltcc ltcir ltdot lthree ltimes \
+    ltlarr ltquest ltri ltrie ltrif ltrPar lurdshar luruhar lvertneqq \
+    lvnE macr male malt maltese map Map mapsto mapstodown mapstoleft \
+    mapstoup marker mcomma mcy Mcy mdash mDDot measuredangle \
+    MediumSpace Mellintrf mfr Mfr mho micro mid midast midcir middot \
+    minus minusb minusd minusdu MinusPlus mlcp mldr mnplus models mopf \
+    Mopf mp mscr Mscr mstpos mu Mu multimap mumap nabla nacute Nacute \
+    nang nap napE napid napos napprox natur natural naturals nbsp nbump \
+    nbumpe ncap ncaron Ncaron ncedil Ncedil ncong ncongdot ncup ncy Ncy \
+    ndash ne nearhk nearr neArr nearrow nedot NegativeMediumSpace \
+    NegativeThickSpace NegativeThinSpace NegativeVeryThinSpace nequiv \
+    nesear nesim NestedGreaterGreater NestedLessLess NewLine nexist \
+    nexists nfr Nfr nge ngE ngeq ngeqq ngeqslant nges nGg ngsim ngt nGt \
+    ngtr nGtv nharr nhArr nhpar ni nis nisd niv njcy NJcy nlarr nlArr \
+    nldr nle nlE nleftarrow nLeftarrow nleftrightarrow nLeftrightarrow \
+    nleq nleqq nleqslant nles nless nLl nlsim nlt nLt nltri nltrie nLtv \
+    nmid NoBreak NonBreakingSpace nopf Nopf not Not NotCongruent \
+    NotCupCap NotDoubleVerticalBar NotElement NotEqual NotEqualTilde \
+    NotExists NotGreater NotGreaterEqual NotGreaterFullEqual \
+    NotGreaterGreater NotGreaterLess NotGreaterSlantEqual \
+    NotGreaterTilde NotHumpDownHump NotHumpEqual notin notindot notinE \
+    notinva notinvb notinvc NotLeftTriangle NotLeftTriangleBar \
+    NotLeftTriangleEqual NotLess NotLessEqual NotLessGreater \
+    NotLessLess NotLessSlantEqual NotLessTilde NotNestedGreaterGreater \
+    NotNestedLessLess notni notniva notnivb notnivc NotPrecedes \
+    NotPrecedesEqual NotPrecedesSlantEqual NotReverseElement \
+    NotRightTriangle NotRightTriangleBar NotRightTriangleEqual \
+    NotSquareSubset NotSquareSubsetEqual NotSquareSuperset \
+    NotSquareSupersetEqual NotSubset NotSubsetEqual NotSucceeds \
+    NotSucceedsEqual NotSucceedsSlantEqual NotSucceedsTilde NotSuperset \
+    NotSupersetEqual NotTilde NotTildeEqual NotTildeFullEqual \
+    NotTildeTilde NotVerticalBar npar nparallel nparsl npart npolint \
+    npr nprcue npre nprec npreceq nrarr nrArr nrarrc nrarrw nrightarrow \
+    nRightarrow nrtri nrtrie nsc nsccue nsce nscr Nscr nshortmid \
+    nshortparallel nsim nsime nsimeq nsmid nspar nsqsube nsqsupe nsub \
+    nsube nsubE nsubset nsubseteq nsubseteqq nsucc nsucceq nsup nsupe \
+    nsupE nsupset nsupseteq nsupseteqq ntgl ntilde Ntilde ntlg \
+    ntriangleleft ntrianglelefteq ntriangleright ntrianglerighteq nu Nu \
+    num numero numsp nvap nvdash nvDash nVdash nVDash nvge nvgt nvHarr \
+    nvinfin nvlArr nvle nvlt nvltrie nvrArr nvrtrie nvsim nwarhk nwarr \
+    nwArr nwarrow nwnear oacute Oacute oast ocir ocirc Ocirc ocy Ocy \
+    odash odblac Odblac odiv odot odsold oelig OElig ofcir ofr Ofr ogon \
+    ograve Ograve ogt ohbar ohm oint olarr olcir olcross oline olt \
+    omacr Omacr omega Omega omicron Omicron omid ominus oopf Oopf opar \
+    OpenCurlyDoubleQuote OpenCurlyQuote operp oplus or Or orarr ord \
+    order orderof ordf ordm origof oror orslope orv oS oscr Oscr oslash \
+    Oslash osol otilde Otilde otimes Otimes otimesas ouml Ouml ovbar \
+    OverBar OverBrace OverBracket OverParenthesis par para parallel \
+    parsim parsl part PartialD pcy Pcy percnt period permil perp \
+    pertenk pfr Pfr phi Phi phiv phmmat phone pi Pi pitchfork piv \
+    planck planckh plankv plus plusacir plusb pluscir plusdo plusdu \
+    pluse PlusMinus plusmn plussim plustwo pm Poincareplane pointint \
+    popf Popf pound pr Pr prap prcue pre prE prec precapprox \
+    preccurlyeq Precedes PrecedesEqual PrecedesSlantEqual PrecedesTilde \
+    preceq precnapprox precneqq precnsim precsim prime Prime primes \
+    prnap prnE prnsim prod Product profalar profline profsurf prop \
+    Proportion Proportional propto prsim prurel pscr Pscr psi Psi \
+    puncsp qfr Qfr qint qopf Qopf qprime qscr Qscr quaternions quatint \
+    quest questeq quot QUOT rAarr race racute Racute radic raemptyv \
+    rang Rang rangd range rangle raquo rarr rArr Rarr rarrap rarrb \
+    rarrbfs rarrc rarrfs rarrhk rarrlp rarrpl rarrsim rarrtl Rarrtl \
+    rarrw ratail rAtail ratio rationals rbarr rBarr RBarr rbbrk rbrace \
+    rbrack rbrke rbrksld rbrkslu rcaron Rcaron rcedil Rcedil rceil rcub \
+    rcy Rcy rdca rdldhar rdquo rdquor rdsh Re real realine realpart \
+    reals rect reg REG ReverseElement ReverseEquilibrium \
+    ReverseUpEquilibrium rfisht rfloor rfr Rfr rHar rhard rharu rharul \
+    rho Rho rhov RightAngleBracket rightarrow Rightarrow RightArrow \
+    RightArrowBar RightArrowLeftArrow rightarrowtail RightCeiling \
+    RightDoubleBracket RightDownTeeVector RightDownVector \
+    RightDownVectorBar RightFloor rightharpoondown rightharpoonup \
+    rightleftarrows rightleftharpoons rightrightarrows rightsquigarrow \
+    RightTee RightTeeArrow RightTeeVector rightthreetimes RightTriangle \
+    RightTriangleBar RightTriangleEqual RightUpDownVector \
+    RightUpTeeVector RightUpVector RightUpVectorBar RightVector \
+    RightVectorBar ring risingdotseq rlarr rlhar rlm rmoust rmoustache \
+    rnmid roang roarr robrk ropar ropf Ropf roplus rotimes RoundImplies \
+    rpar rpargt rppolint rrarr Rrightarrow rsaquo rscr Rscr rsh Rsh \
+    rsqb rsquo rsquor rthree rtimes rtri rtrie rtrif rtriltri \
+    RuleDelayed ruluhar rx sacute Sacute sbquo sc Sc scap scaron Scaron \
+    sccue sce scE scedil Scedil scirc Scirc scnap scnE scnsim scpolint \
+    scsim scy Scy sdot sdotb sdote searhk searr seArr searrow sect semi \
+    seswar setminus setmn sext sfr Sfr sfrown sharp shchcy SHCHcy shcy \
+    SHcy ShortDownArrow ShortLeftArrow shortmid shortparallel \
+    ShortRightArrow ShortUpArrow shy sigma Sigma sigmaf sigmav sim \
+    simdot sime simeq simg simgE siml simlE simne simplus simrarr slarr \
+    SmallCircle smallsetminus smashp smeparsl smid smile smt smte smtes \
+    softcy SOFTcy sol solb solbar sopf Sopf spades spadesuit spar sqcap \
+    sqcaps sqcup sqcups Sqrt sqsub sqsube sqsubset sqsubseteq sqsup \
+    sqsupe sqsupset sqsupseteq squ square Square SquareIntersection \
+    SquareSubset SquareSubsetEqual SquareSuperset SquareSupersetEqual \
+    SquareUnion squarf squf srarr sscr Sscr ssetmn ssmile sstarf star \
+    Star starf straightepsilon straightphi strns sub Sub subdot sube \
+    subE subedot submult subne subnE subplus subrarr subset Subset \
+    subseteq subseteqq SubsetEqual subsetneq subsetneqq subsim subsub \
+    subsup succ succapprox succcurlyeq Succeeds SucceedsEqual \
+    SucceedsSlantEqual SucceedsTilde succeq succnapprox succneqq \
+    succnsim succsim SuchThat sum Sum sung sup Sup sup1 sup2 sup3 \
+    supdot supdsub supe supE supedot Superset SupersetEqual suphsol \
+    suphsub suplarr supmult supne supnE supplus supset Supset supseteq \
+    supseteqq supsetneq supsetneqq supsim supsub supsup swarhk swarr \
+    swArr swarrow swnwar szlig Tab target tau Tau tbrk tcaron Tcaron \
+    tcedil Tcedil tcy Tcy tdot telrec tfr Tfr there4 therefore \
+    Therefore theta Theta thetasym thetav thickapprox thicksim \
+    ThickSpace thinsp ThinSpace thkap thksim thorn THORN tilde Tilde \
+    TildeEqual TildeFullEqual TildeTilde times timesb timesbar timesd \
+    tint toea top topbot topcir topf Topf topfork tosa tprime trade \
+    TRADE triangle triangledown triangleleft trianglelefteq triangleq \
+    triangleright trianglerighteq tridot trie triminus TripleDot \
+    triplus trisb tritime trpezium tscr Tscr tscy TScy tshcy TSHcy \
+    tstrok Tstrok twixt twoheadleftarrow twoheadrightarrow uacute \
+    Uacute uarr uArr Uarr Uarrocir ubrcy Ubrcy ubreve Ubreve ucirc \
+    Ucirc ucy Ucy udarr udblac Udblac udhar ufisht ufr Ufr ugrave \
+    Ugrave uHar uharl uharr uhblk ulcorn ulcorner ulcrop ultri umacr \
+    Umacr uml UnderBar UnderBrace UnderBracket UnderParenthesis Union \
+    UnionPlus uogon Uogon uopf Uopf uparrow Uparrow UpArrow UpArrowBar \
+    UpArrowDownArrow updownarrow Updownarrow UpDownArrow UpEquilibrium \
+    upharpoonleft upharpoonright uplus UpperLeftArrow UpperRightArrow \
+    upsi Upsi upsih upsilon Upsilon UpTee UpTeeArrow upuparrows urcorn \
+    urcorner urcrop uring Uring urtri uscr Uscr utdot utilde Utilde \
+    utri utrif uuarr uuml Uuml uwangle vangrt varepsilon varkappa \
+    varnothing varphi varpi varpropto varr vArr varrho varsigma \
+    varsubsetneq varsubsetneqq varsupsetneq varsupsetneqq vartheta \
+    vartriangleleft vartriangleright vBar Vbar vBarv vcy Vcy vdash \
+    vDash Vdash VDash Vdashl vee Vee veebar veeeq vellip verbar Verbar \
+    vert Vert VerticalBar VerticalLine VerticalSeparator VerticalTilde \
+    VeryThinSpace vfr Vfr vltri vnsub vnsup vopf Vopf vprop vrtri vscr \
+    Vscr vsubne vsubnE vsupne vsupnE Vvdash vzigzag wcirc Wcirc wedbar \
+    wedge Wedge wedgeq weierp wfr Wfr wopf Wopf wp wr wreath wscr Wscr \
+    xcap xcirc xcup xdtri xfr Xfr xharr xhArr xi Xi xlarr xlArr xmap \
+    xnis xodot xopf Xopf xoplus xotime xrarr xrArr xscr Xscr xsqcup \
+    xuplus xutri xvee xwedge yacute Yacute yacy YAcy ycirc Ycirc ycy \
+    Ycy yen yfr Yfr yicy YIcy yopf Yopf yscr Yscr yucy YUcy yuml Yuml \
+    zacute Zacute zcaron Zcaron zcy Zcy zdot Zdot zeetrf ZeroWidthSpace \
+    zeta Zeta zfr Zfr zhcy ZHcy zigrarr zopf Zopf zscr Zscr zwj zwnj
 
-# main syntax
 syntax html
 
 state start text
@@ -107,16 +336,14 @@ state close-tag tag
 state tag-name tag-unknown
     char -b a-zA-Z0-9_ tag-name
     inlist tag attrs
-    inlist tag-frameset attrs
-    inlist tag-transitional attrs
+    inlist tag-html5 attrs
     inlist tag-deprecated attrs
     noeat attrs
 
 state close-tag-name tag-unknown
     char -b a-zA-Z0-9_ close-tag-name
     inlist tag close-tag-end
-    inlist tag-frameset close-tag-end
-    inlist tag-transitional close-tag-end
+    inlist tag-html5 close-tag-end
     inlist tag-deprecated close-tag-end
     noeat close-tag-end
 
@@ -158,29 +385,24 @@ state sq string
     char "&" .html-entity:sq
     eat sq
 
-# strict/transitional/frameset
 list -i tag \
     a abbr acronym address area b base bdo big blockquote body br \
     button caption cite code col colgroup dd del dfn div dl dt em \
-    fieldset form h1 h2 h3 h4 h5 h6 head hr html i img input ins kbd \
-    label legend li link map meta noscript object ol optgroup option \
-    p param pre q samp script select small span strong style sub sup \
-    table tbody td textarea tfoot th thead title tr tt ul var
+    fieldset form h1 h2 h3 h4 h5 h6 head hr html i iframe img input \
+    ins kbd label legend li link map meta noscript object ol optgroup \
+    option p param pre q samp script select small span strong style \
+    sub sup table tbody td textarea tfoot th thead title tr tt ul var
 
-# frameset
-list -i tag-frameset \
-    frame frameset
+list -i tag-html5 \
+    article aside audio canvas command datalist details embed figure \
+    footer header hgroup keygen main mark meter nav output progress ruby \
+    section time video wbr
 
-# transitional/frameset
-list -i tag-transitional \
-    iframe noframes
-
-# deprecated transitional/frameset
-# blink and marquee are non-standard
 list -i tag-deprecated \
-    applet basefont blink center dir font isindex marquee menu s strike u
+    acronym applet basefont big blink center dir font frame frameset \
+    isindex marquee menu noframes s strike tt u
 
 default code tag-unknown
-default tag tag-frameset tag-transitional
+default tag tag-html5
 default error tag-deprecated
 default special entity
