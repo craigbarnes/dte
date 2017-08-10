@@ -69,7 +69,12 @@ state instance-variable
 
 state maybe-symbol symbol
     char -b a-zA-Z_ symbol
+    char -b : double-colon
     recolor code
+    noeat start
+
+state double-colon
+    recolor double-colon
     noeat start
 
 state symbol
@@ -120,3 +125,4 @@ default numeric symbol
 default constant pseudo-variable
 default variable global-variable
 default variable instance-variable
+default operator double-colon
