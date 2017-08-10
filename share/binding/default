@@ -16,7 +16,7 @@ bind ^H 'erase-word -s'
 bind ^L "command 'line '"
 # ^M == Enter
 bind ^N open
-bind ^O git-open
+bind ^O 'command open\ '
 bind ^Q quit
 bind ^R 'command replace\ '
 bind ^S 'save -p'
