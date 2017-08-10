@@ -42,7 +42,7 @@ ft -f make '[mM]akefile(\.[^/]*)?$'
 ft -f make '/Make\.[^/]*$'
 ft -f meson '(meson\.build|meson_options\.txt)$'
 ft -f robotstxt 'robots\.txt$'
-ft -f ruby 'Rakefile$'
+ft -f ruby '(Capfile|Gemfile|Rakefile)$'
 
 # "ft" matches against the filename extension
 ft awk awk
@@ -62,7 +62,7 @@ ft markdown md mkd mkdn markdown
 ft perl perl pl
 ft php php php3 php4 inc
 ft python py
-ft ruby rb rake
+ft ruby rb rake gemspec
 ft sh sh bash
 ft sql sql
 ft tcl tcl
