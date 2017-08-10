@@ -258,7 +258,7 @@ void update_git_open(void)
     int w = screen_w;
     int h = screen_h - 1;
     int max_y = git_open.scroll + h - 1;
-    int i;
+    int i = 1;
 
     if (h >= git_open.files.count)
         git_open.scroll = 0;
@@ -273,7 +273,7 @@ void update_git_open(void)
     buf_clear_eol();
     y++;
 
-    for (i = 0; i < h; i++) {
+    for (; i < h; i++) {
         int file_idx = git_open.scroll + i;
         char *file;
         struct term_color color;
