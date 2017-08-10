@@ -1,4 +1,8 @@
-# Interpreters
+# This config file uses the "ft" command to associate file types with an
+# identifer. This identifier is then used to decide which syntax
+# highlighter and local options to use when opening files.
+
+# "ft -i" matches the interpreter name extracted from the Unix shebang (if any)
 ft -i tcl wish
 ft -i sh sh bash
 ft -i python python
@@ -8,12 +12,12 @@ ft -i awk awk gawk nawk
 ft -i lua lua luajit
 ft -i ruby ruby
 
-# First line
+# "ft -c" uses a regular expression to match the first line of the file
 ft -c sh shell-script
 ft -c xml '^<\?xml(\s|$)'
 ft -c ini '^\[wrap-file\]$'
 
-# Filename patterns
+# "ft -f" uses a regular expression to match the filename
 ft -f sh '/etc/default/.*'
 ft -f sh '/\.?bash(rc|_profile|_logout)$'
 ft -f sh '/\.(shrc|profile)$'
@@ -21,7 +25,7 @@ ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
 ft -f docker Dockerfile$
 ft -f dte $PKGDATADIR'/.*'
-ft -f dte '/(\.dte|dte/share)/(rc|filetype|((syntax|color|binding|compiler)/.*))$'
+ft -f dte '/(\.dte|dte/share)/(rc|filetype|option|((syntax|color|binding|compiler)/.*))$'
 ft -f gitcommit '/COMMIT_EDITMSG$'
 ft -f gitrebase '/git-rebase-todo$'
 ft -f indent '/\.indent\.pro$'
@@ -39,7 +43,7 @@ ft -f make '/Make\.[^/]*$'
 ft -f meson (meson\.build|meson_options\.txt)$
 ft -f robotstxt robots\.txt$
 
-# Filename extensions
+# "ft" matches against the filename extension
 ft awk awk
 ft c c h
 ft c cpp hpp cc hh C H cxx hxx c++ moc inl pro
@@ -69,5 +73,5 @@ ft smarty tpl
 
 ft -f config '/boot/grub/menu\.lst$'
 
-# should be last
+# Should be last
 ft -f config '/etc/.*'

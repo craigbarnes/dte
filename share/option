@@ -1,13 +1,19 @@
-option gitcommit,gitrebase file-history false
-option -r '/\.git/.*\.diff$' file-history false
-option diff,mail ws-error 0
-option make indent-width 8 expand-tab false emulate-tab false
-
-option c,css,go,java,javascript,php,sh brace-indent true
-
+# Patterns used to detect indent size when "auto-indent" option is enabled
 option c      indent-regex '^\s*(case|default|do|else|for|if|while)\b'
 option java   indent-regex '^\s*(case|default|do|else|for|if|while)\b'
 option lua    indent-regex '(then|do|repeat|else)\s*$|function\s*\(.*\)\s*$'
 option php    indent-regex '^\s*(case|default|do|else|for|foreach|if|while)\b'
 option python indent-regex ':\s*(#.*)?$'
 option sh     indent-regex '(^\s*|;\s*)(do|else|then)\b'
+
+# Scan for braces to detect indent size, for C-like languages
+option c,css,go,java,javascript,php,sh brace-indent true
+
+# Disable cursor history for git temporary files
+option gitcommit,gitrebase file-history false
+option -r '/\.git/.*\.diff$' file-history false
+
+# Override indent options for Makefiles, since they almost always require tabs
+option make indent-width 8 expand-tab false emulate-tab false
+
+option diff,mail ws-error 0
