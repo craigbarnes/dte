@@ -95,7 +95,7 @@ state =begin-nl comment
     noeat =begin
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_!\? ident
     inlist keyword start
     inlist pseudo-variable start
     noeat start
@@ -113,13 +113,13 @@ state sq string
     eat sq
 
 list keyword \
-    alias and begin break case class def defined do else elsif end \
+    alias and begin break case class def defined\? do else elsif end \
     ensure for if in module next not or redo rescue retry return super \
     then undef unless until when while yield \
     BEGIN END
 
 list pseudo-variable \
-    true false nil self __FILE__ __LINE__ __dir__ __method__
+    true false nil self __FILE__ __LINE__ __ENCODING__ __dir__ __method__
 
 default numeric symbol
 default constant pseudo-variable
