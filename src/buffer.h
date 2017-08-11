@@ -39,7 +39,7 @@ struct buffer {
     long nl;
 
     // Views pointing to this buffer
-    struct ptr_array views;
+    PointerArray views;
 
     char *display_filename;
     char *abs_filename;
@@ -58,7 +58,7 @@ struct buffer {
     struct syntax *syn;
     // Index 0 is always syn->states.ptrs[0].
     // Lowest bit of an invalidated value is 1.
-    struct ptr_array line_start_states;
+    PointerArray line_start_states;
 
     int changed_line_min;
     int changed_line_max;
@@ -67,7 +67,7 @@ struct buffer {
 // buffer = view->buffer = window->view->buffer
 extern struct view *view;
 extern struct buffer *buffer;
-extern struct ptr_array buffers;
+extern PointerArray buffers;
 extern bool everything_changed;
 
 static inline void mark_all_lines_changed(struct buffer *b)

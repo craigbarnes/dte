@@ -278,7 +278,7 @@ unexpected_eof:
     return -1;
 }
 
-bool parse_commands(struct ptr_array *array, const char *cmd, struct error **err)
+bool parse_commands(PointerArray *array, const char *cmd, struct error **err)
 {
     int pos = 0;
 

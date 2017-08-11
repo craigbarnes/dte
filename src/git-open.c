@@ -73,7 +73,7 @@ static bool contains_upper(const char *str)
     return false;
 }
 
-static void split(struct ptr_array *words, const char *str)
+static void split(PointerArray *words, const char *str)
 {
     int s, i = 0;
 
@@ -89,7 +89,7 @@ static void split(struct ptr_array *words, const char *str)
     }
 }
 
-static bool words_match(const char *name, struct ptr_array *words)
+static bool words_match(const char *name, PointerArray *words)
 {
     int i;
 
@@ -100,7 +100,7 @@ static bool words_match(const char *name, struct ptr_array *words)
     return true;
 }
 
-static bool words_match_icase(const char *name, struct ptr_array *words)
+static bool words_match_icase(const char *name, PointerArray *words)
 {
     int i;
 
@@ -123,8 +123,8 @@ static void git_open_filter(void)
     char *str = gbuf_cstring(&cmdline.buf);
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
-    bool (*match)(const char *, struct ptr_array *) = words_match_icase;
-    struct ptr_array words = PTR_ARRAY_NEW();
+    bool (*match)(const char *, PointerArray *) = words_match_icase;
+    PointerArray words = PTR_ARRAY_NEW();
 
     // NOTE: words_match_icase() requires str to be lowercase
     if (contains_upper(str))

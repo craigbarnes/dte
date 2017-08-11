@@ -3,7 +3,7 @@
 #include "error.h"
 #include "common.h"
 
-static struct ptr_array msgs = PTR_ARRAY_NEW();
+static PointerArray msgs = PTR_ARRAY_NEW();
 static int msg_pos;
 
 static void free_message(struct message *m)

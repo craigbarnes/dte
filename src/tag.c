@@ -168,7 +168,7 @@ struct tag_file *load_tag_file(void)
     return current_tag_file;
 }
 
-void free_tags(struct ptr_array *tags)
+void free_tags(PointerArray *tags)
 {
     int i;
     for (i = 0; i < tags->count; i++) {
@@ -198,7 +198,7 @@ static char *path_relative(const char *filename, const char *dir)
     return xstrdup(filename + dlen + 1);
 }
 
-void tag_file_find_tags(struct tag_file *tf, const char *filename, const char *name, struct ptr_array *tags)
+void tag_file_find_tags(struct tag_file *tf, const char *filename, const char *name, PointerArray *tags)
 {
     struct tag *t;
     size_t pos = 0;

@@ -22,6 +22,6 @@ enum {
 
 void cmdline_clear(struct cmdline *c);
 void cmdline_set_text(struct cmdline *c, const char *text);
-int cmdline_handle_key(struct cmdline *c, struct ptr_array *history, int key);
+int cmdline_handle_key(struct cmdline *c, PointerArray *history, int key);
 
 #endif

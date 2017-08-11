@@ -8,7 +8,7 @@ struct frame {
     struct frame *parent;
 
     // Every frame contains either one window or multiple subframes
-    struct ptr_array frames;
+    PointerArray frames;
     struct window *window;
 
     // Width and height

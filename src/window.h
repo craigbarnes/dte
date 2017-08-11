@@ -4,7 +4,7 @@
 #include "buffer.h"
 
 struct window {
-    struct ptr_array views;
+    PointerArray views;
     struct frame *frame;
 
     // Current view

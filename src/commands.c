@@ -1259,7 +1259,7 @@ static void cmd_suspend(const char *pf, char **args)
 static void cmd_tag(const char *pf, char **args)
 {
     struct tag_file *tf;
-    struct ptr_array tags = PTR_ARRAY_NEW();
+    PointerArray tags = PTR_ARRAY_NEW();
     const char *name = args[0];
     char *word = NULL;
     bool pop = false;

@@ -232,7 +232,7 @@ static struct hl_color **highlight_line(struct syntax *syn, struct state *state,
     return colors;
 }
 
-static void resize_line_states(struct ptr_array *s, unsigned int count)
+static void resize_line_states(PointerArray *s, unsigned int count)
 {
     if (s->alloc < count) {
         s->alloc = ROUND_UP(count, 64);
@@ -240,7 +240,7 @@ static void resize_line_states(struct ptr_array *s, unsigned int count)
     }
 }
 
-static void move_line_states(struct ptr_array *s, int to, int from, int count)
+static void move_line_states(PointerArray *s, int to, int from, int count)
 {
     memmove(s->ptrs + to, s->ptrs + from, count * sizeof(*s->ptrs));
 }
@@ -285,7 +285,7 @@ static int fill_hole(struct buffer *b, struct block_iter *bi, int sidx, int eidx
 void hl_fill_start_states(struct buffer *b, int line_nr)
 {
     BLOCK_ITER(bi, &b->blocks);
-    struct ptr_array *s = &b->line_start_states;
+    PointerArray *s = &b->line_start_states;
     struct state **states;
     int current_line = 0;
     int idx = 0;
@@ -335,7 +335,7 @@ void hl_fill_start_states(struct buffer *b, int line_nr)
 
 struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_nr, int *next_changed)
 {
-    struct ptr_array *s = &b->line_start_states;
+    PointerArray *s = &b->line_start_states;
     struct hl_color **colors;
     struct state *next;
 
@@ -369,7 +369,7 @@ struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_
 // Called after text has been inserted to re-highlight changed lines
 void hl_insert(struct buffer *b, int first, int lines)
 {
-    struct ptr_array *s = &b->line_start_states;
+    PointerArray *s = &b->line_start_states;
     int i, last = first + lines;
 
     if (first >= s->count) {
@@ -401,7 +401,7 @@ void hl_insert(struct buffer *b, int first, int lines)
 // Called after text has been deleted to re-highlight changed lines
 void hl_delete(struct buffer *b, int first, int deleted_nl)
 {
-    struct ptr_array *s = &b->line_start_states;
+    PointerArray *s = &b->line_start_states;
     int last = first + deleted_nl;
 
     if (s->count == 1)

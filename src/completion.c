@@ -19,7 +19,7 @@ static struct {
 
     char *head;
     char *tail;
-    struct ptr_array completions;
+    PointerArray completions;
     int idx;
 
     // Should we add space after completed string if we have only one match?
@@ -37,7 +37,7 @@ static int strptrcmp(const void *ap, const void *bp)
 
 static void sort_completions(void)
 {
-    struct ptr_array *a = &completion.completions;
+    PointerArray *a = &completion.completions;
     if (a->count > 1)
         qsort(a->ptrs, a->count, sizeof(*a->ptrs), strptrcmp);
 }
@@ -253,7 +253,7 @@ static void init_completion(void)
 {
     char *cmd = gbuf_cstring(&cmdline.buf);
     const char *str;
-    struct ptr_array array = PTR_ARRAY_NEW();
+    PointerArray array = PTR_ARRAY_NEW();
     int semicolon = -1;
     int completion_pos = -1;
     int len, pos = 0;

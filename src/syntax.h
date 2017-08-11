@@ -66,7 +66,7 @@ struct heredoc_state {
 struct state {
     char *name;
     char *emit_name;
-    struct ptr_array conds;
+    PointerArray conds;
 
     bool defined;
     bool visited;
@@ -83,7 +83,7 @@ struct state {
 
     struct {
         struct syntax *subsyntax;
-        struct ptr_array states;
+        PointerArray states;
     } heredoc;
 };
 
@@ -103,9 +103,9 @@ struct string_list {
 
 struct syntax {
     char *name;
-    struct ptr_array states;
-    struct ptr_array string_lists;
-    struct ptr_array default_colors;
+    PointerArray states;
+    PointerArray string_lists;
+    PointerArray default_colors;
     bool heredoc;
     bool used;
 };

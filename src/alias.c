@@ -11,7 +11,7 @@ struct alias {
     char *value;
 };
 
-static struct ptr_array aliases = PTR_ARRAY_NEW();
+static PointerArray aliases = PTR_ARRAY_NEW();
 
 static int validate_alias_name(const char *name)
 {

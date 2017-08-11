@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-void ptr_array_add(struct ptr_array *array, void *ptr)
+void ptr_array_add(PointerArray *array, void *ptr)
 {
     if (array->count == array->alloc) {
         // NOTE: if alloc was 1 then new alloc would be 1*3/2 = 1!
@@ -17,7 +17,7 @@ void ptr_array_add(struct ptr_array *array, void *ptr)
     array->ptrs[array->count++] = ptr;
 }
 
-void ptr_array_insert(struct ptr_array *array, void *ptr, long pos)
+void ptr_array_insert(PointerArray *array, void *ptr, long pos)
 {
     long count = array->count - pos;
     ptr_array_add(array, NULL);
@@ -25,7 +25,7 @@ void ptr_array_insert(struct ptr_array *array, void *ptr, long pos)
     array->ptrs[pos] = ptr;
 }
 
-void ptr_array_free_cb(struct ptr_array *array, free_func free_ptr)
+void ptr_array_free_cb(PointerArray *array, free_func free_ptr)
 {
     int i;
 
@@ -39,13 +39,13 @@ void ptr_array_free_cb(struct ptr_array *array, free_func free_ptr)
     array->count = 0;
 }
 
-void ptr_array_remove(struct ptr_array *array, void *ptr)
+void ptr_array_remove(PointerArray *array, void *ptr)
 {
     long pos = ptr_array_idx(array, ptr);
     ptr_array_remove_idx(array, pos);
 }
 
-void *ptr_array_remove_idx(struct ptr_array *array, long pos)
+void *ptr_array_remove_idx(PointerArray *array, long pos)
 {
     void *ptr = array->ptrs[pos];
     array->count--;
@@ -53,7 +53,7 @@ void *ptr_array_remove_idx(struct ptr_array *array, long pos)
     return ptr;
 }
 
-long ptr_array_idx(struct ptr_array *array, void *ptr)
+long ptr_array_idx(PointerArray *array, void *ptr)
 {
     long i;
 
@@ -64,7 +64,7 @@ long ptr_array_idx(struct ptr_array *array, void *ptr)
     return -1;
 }
 
-void *ptr_array_rel(struct ptr_array *array, void *ptr, long offset)
+void *ptr_array_rel(PointerArray *array, void *ptr, long offset)
 {
     long i = ptr_array_idx(array, ptr);
 

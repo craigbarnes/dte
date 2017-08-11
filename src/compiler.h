@@ -23,7 +23,7 @@ struct error_format {
 
 struct compiler {
     char *name;
-    struct ptr_array error_formats;
+    PointerArray error_formats;
 };
 
 void add_error_fmt(const char *compiler, bool ignore, const char *format, char **desc);

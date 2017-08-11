@@ -18,7 +18,7 @@ static bool next_line(struct block_iter *bi, struct lineref *lr)
 char *detect_interpreter(struct buffer *b)
 {
     BLOCK_ITER(bi, &b->blocks);
-    struct ptr_array m = PTR_ARRAY_NEW();
+    PointerArray m = PTR_ARRAY_NEW();
     struct lineref lr;
     char *ret;
 

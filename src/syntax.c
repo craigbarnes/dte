@@ -5,7 +5,7 @@
 #include "error.h"
 #include "common.h"
 
-static struct ptr_array syntaxes = PTR_ARRAY_NEW();
+static PointerArray syntaxes = PTR_ARRAY_NEW();
 
 unsigned long buf_hash(const char *str, size_t size)
 {
@@ -118,7 +118,7 @@ struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m)
     // NOTE: string_lists is owned by struct syntax so there's no need to
     // copy it. Freeing struct condition does not free any string lists.
     const char *prefix = get_prefix();
-    struct ptr_array *states = &syn->states;
+    PointerArray *states = &syn->states;
     int i, old_count = states->count;
 
     states->count += m->subsyn->states.count;

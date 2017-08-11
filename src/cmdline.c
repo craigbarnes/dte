@@ -117,7 +117,7 @@ void cmdline_set_text(struct cmdline *c, const char *text)
     c->search_pos = -1;
 }
 
-int cmdline_handle_key(struct cmdline *c, struct ptr_array *history, int key)
+int cmdline_handle_key(struct cmdline *c, PointerArray *history, int key)
 {
     char buf[4];
     int count;

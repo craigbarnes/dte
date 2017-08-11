@@ -4,11 +4,11 @@
 #include "ptr-array.h"
 #include "error.h"
 
-struct ptr_array search_history = PTR_ARRAY_NEW();
-struct ptr_array command_history = PTR_ARRAY_NEW();
+PointerArray search_history = PTR_ARRAY_NEW();
+PointerArray command_history = PTR_ARRAY_NEW();
 
 // Add item to end of array
-void history_add(struct ptr_array *history, const char *text, int max_entries)
+void history_add(PointerArray *history, const char *text, int max_entries)
 {
     int i;
 
@@ -28,7 +28,7 @@ void history_add(struct ptr_array *history, const char *text, int max_entries)
     ptr_array_add(history, xstrdup(text));
 }
 
-bool history_search_forward(struct ptr_array *history, int *pos, const char *text)
+bool history_search_forward(PointerArray *history, int *pos, const char *text)
 {
     int i = *pos;
 
@@ -41,7 +41,7 @@ bool history_search_forward(struct ptr_array *history, int *pos, const char *tex
     return false;
 }
 
-bool history_search_backward(struct ptr_array *history, int *pos, const char *text)
+bool history_search_backward(PointerArray *history, int *pos, const char *text)
 {
     int i = *pos;
 
@@ -54,7 +54,7 @@ bool history_search_backward(struct ptr_array *history, int *pos, const char *te
     return false;
 }
 
-void history_load(struct ptr_array *history, const char *filename, int max_entries)
+void history_load(PointerArray *history, const char *filename, int max_entries)
 {
     char *buf;
     ssize_t size, pos = 0;
@@ -70,7 +70,7 @@ void history_load(struct ptr_array *history, const char *filename, int max_entri
     free(buf);
 }
 
-void history_save(struct ptr_array *history, const char *filename)
+void history_save(PointerArray *history, const char *filename)
 {
     WBUF(buf);
     int i;

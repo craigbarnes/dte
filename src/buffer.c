@@ -15,7 +15,7 @@
 #include "detect.h"
 
 struct buffer *buffer;
-struct ptr_array buffers = PTR_ARRAY_NEW();
+PointerArray buffers = PTR_ARRAY_NEW();
 bool everything_changed;
 
 static void set_display_filename(struct buffer *b, char *name)
@@ -207,7 +207,7 @@ void buffer_update_syntax(struct buffer *b)
     b->syn = syn;
     if (syn) {
         // Start state of first line is constant
-        struct ptr_array *s = &b->line_start_states;
+        PointerArray *s = &b->line_start_states;
         if (!s->alloc) {
             s->alloc = 64;
             s->ptrs = xnew(void *, s->alloc);

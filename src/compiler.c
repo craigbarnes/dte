@@ -2,7 +2,7 @@
 #include "error.h"
 #include "common.h"
 
-static struct ptr_array compilers = PTR_ARRAY_NEW();
+static PointerArray compilers = PTR_ARRAY_NEW();
 
 static struct compiler *add_compiler(const char *name)
 {

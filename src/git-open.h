@@ -5,7 +5,7 @@
 #include "term.h"
 
 struct git_open {
-    struct ptr_array files;
+    PointerArray files;
     char *all_files;
     long size;
     int selected;

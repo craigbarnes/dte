@@ -522,7 +522,7 @@ static void collect_window(struct window *w, void *data)
 
 struct window *prev_window(struct window *w)
 {
-    struct ptr_array windows = PTR_ARRAY_NEW();
+    PointerArray windows = PTR_ARRAY_NEW();
     for_each_window_data(collect_window, &windows);
     w = ptr_array_prev(&windows, w);
     free(windows.ptrs);
@@ -531,7 +531,7 @@ struct window *prev_window(struct window *w)
 
 struct window *next_window(struct window *w)
 {
-    struct ptr_array windows = PTR_ARRAY_NEW();
+    PointerArray windows = PTR_ARRAY_NEW();
     for_each_window_data(collect_window, &windows);
     w = ptr_array_next(&windows, w);
     free(windows.ptrs);
