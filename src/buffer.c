@@ -15,7 +15,7 @@
 #include "detect.h"
 
 struct buffer *buffer;
-PTR_ARRAY(buffers);
+struct ptr_array buffers = PTR_ARRAY_NEW();
 bool everything_changed;
 
 static void set_display_filename(struct buffer *b, char *name)

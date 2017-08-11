@@ -4,7 +4,7 @@
 #include "search.h"
 #include "move.h"
 
-static PTR_ARRAY(file_locations);
+static struct ptr_array file_locations = PTR_ARRAY_NEW();
 
 struct file_location *create_file_location(struct view *v)
 {

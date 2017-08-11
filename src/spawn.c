@@ -26,7 +26,7 @@ static void handle_error_msg(struct compiler *c, char *str)
 
     for (i = 0; i < c->error_formats.count; i++) {
         const struct error_format *p = c->error_formats.ptrs[i];
-        PTR_ARRAY(m);
+        struct ptr_array m = PTR_ARRAY_NEW();
 
         if (!regexp_exec_sub(&p->re, str, len, &m, 0))
             continue;

@@ -124,7 +124,7 @@ static void git_open_filter(void)
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
     bool (*match)(const char *, struct ptr_array *) = words_match_icase;
-    PTR_ARRAY(words);
+    struct ptr_array words = PTR_ARRAY_NEW();
 
     // NOTE: words_match_icase() requires str to be lowercase
     if (contains_upper(str))

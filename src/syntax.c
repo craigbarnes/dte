@@ -5,7 +5,7 @@
 #include "error.h"
 #include "common.h"
 
-static PTR_ARRAY(syntaxes);
+static struct ptr_array syntaxes = PTR_ARRAY_NEW();
 
 unsigned long buf_hash(const char *str, size_t size)
 {

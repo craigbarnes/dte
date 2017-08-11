@@ -8,7 +8,7 @@
 
 static void command_line_enter(void)
 {
-    PTR_ARRAY(array);
+    struct ptr_array array = PTR_ARRAY_NEW();
     char *str = gbuf_cstring(&cmdline.buf);
     struct error *err = NULL;
     bool ok;

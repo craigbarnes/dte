@@ -13,6 +13,7 @@ typedef void (*free_func)(void *ptr);
 
 #define PTR_ARRAY(name) struct ptr_array name = {NULL, 0, 0}
 #define FREE_FUNC(f) (free_func)f
+#define PTR_ARRAY_NEW() {NULL, 0, 0}
 
 void ptr_array_add(struct ptr_array *array, void *ptr);
 void ptr_array_insert(struct ptr_array *array, void *ptr, long pos);

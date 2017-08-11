@@ -35,7 +35,7 @@ static const char *const builtin_color_names[NR_BC] = {
     "inactivetab",
 };
 
-static PTR_ARRAY(hl_colors);
+static struct ptr_array hl_colors = PTR_ARRAY_NEW();
 
 void fill_builtin_colors(void)
 {
