@@ -54,7 +54,7 @@ static void run_command(const struct command *cmds, char **av)
     char **args;
 
     if (!cmd) {
-        PTR_ARRAY(array);
+        struct ptr_array array = PTR_ARRAY_NEW();
         const char *alias_name = av[0];
         const char *alias_value = find_alias(alias_name);
         struct error *err = NULL;
@@ -122,7 +122,7 @@ void run_commands(const struct command *cmds, const struct ptr_array *array)
 void handle_command(const struct command *cmds, const char *cmd)
 {
     struct error *err = NULL;
-    PTR_ARRAY(array);
+    struct ptr_array array = PTR_ARRAY_NEW();
 
     if (!parse_commands(&array, cmd, &err)) {
         error_msg("%s", err->msg);

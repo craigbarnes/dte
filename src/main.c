@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
     if (command)
         handle_command(commands, command);
     if (tag) {
-        PTR_ARRAY(array);
+        struct ptr_array array = PTR_ARRAY_NEW();
         ptr_array_add(&array, xstrdup("tag"));
         ptr_array_add(&array, xstrdup(tag));
         ptr_array_add(&array, NULL);

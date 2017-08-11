@@ -10,7 +10,7 @@ struct history_entry {
     char *filename;
 };
 
-static PTR_ARRAY(history);
+static struct ptr_array history = PTR_ARRAY_NEW();
 
 #define max_history_size 500
 
