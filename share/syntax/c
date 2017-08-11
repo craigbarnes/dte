@@ -81,7 +81,8 @@ syntax c
 state start code
     char " \t" start
     char # preproc
-    char -b a-zA-Z_ ident-label
+    char -b a-z_ ident-label
+    char -b A-Z ident-upper-label
     noeat c
 
 state preproc
@@ -146,7 +147,8 @@ state preproc-error error
     eat preproc-error
 
 state c code
-    char -b a-zA-Z_ ident
+    char -b a-z_ ident
+    char -b A-Z ident-upper
     char 0 zero
     char 1-9 dec
     char . dot
@@ -180,6 +182,27 @@ state ident
     inlist constant c
     inlist cpp-keyword c
     noeat c
+
+state ident-upper ident
+    char -b a-z class-name
+    char -b A-Z0-9_ ident
+    noeat c
+
+state class-name
+    recolor class-name
+    char a-zA-Z0-9_ class-name
+    noeat c
+
+state ident-upper-label ident
+    char -b a-z class-name-label
+    char -b A-Z0-9_ ident-label
+    char -b : label
+    noeat c
+
+state class-name-label class-name
+    char -b a-zA-Z0-9_ class-name-label
+    char -b : label
+    noeat -b class-name
 
 state zero numeric
     char xX hex
@@ -266,5 +289,6 @@ list cpp-keyword \
     reinterpret_cast static_cast template this throw try typeid \
     typeof typename using virtual
 
+default ident class-name
 default keyword cpp-keyword
 default preproc preproccond
