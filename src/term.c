@@ -90,6 +90,11 @@ static const struct keymap builtin_keys[] = {
     {MOD_META | MOD_SHIFT | KEY_UP,    "\033[1;4A", T_SCREEN | T_XTERM},
     {MOD_META | MOD_SHIFT | KEY_DOWN,  "\033[1;4B", T_SCREEN | T_XTERM},
 
+    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT,  "\033[1;8D", T_SCREEN | T_XTERM},
+    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT, "\033[1;8C", T_SCREEN | T_XTERM},
+    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP,    "\033[1;8A", T_SCREEN | T_XTERM},
+    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN,  "\033[1;8B", T_SCREEN | T_XTERM},
+
     {MOD_SHIFT | '\t', "\033[Z", T_SCREEN | T_ST | T_XTERM},
 };
 
