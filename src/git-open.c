@@ -9,6 +9,7 @@
 #include "modes.h"
 #include "screen.h"
 #include "uchar.h"
+#include "error.h"
 
 struct git_open git_open;
 
@@ -46,18 +47,19 @@ static void git_open_load(void)
 {
     static const char *cmd[] = {"git", "ls-files", "-z", NULL, NULL};
     struct filter_data data;
+    int status = 0;
     char *dir = cdup();
 
     cmd[3] = dir;
 
     data.in = NULL;
     data.in_len = 0;
-    if (spawn_filter((char **)cmd, &data) == 0) {
+    if ((status = spawn_filter((char **)cmd, &data)) == 0) {
         git_open.all_files = data.out;
         git_open.size = data.out_len;
     } else {
-        git_open.all_files = NULL;
-        git_open.size = 0;
+        set_input_mode(INPUT_NORMAL);
+        error_msg("git-open: 'git ls-files' command returned %d", status);
     }
     free(dir);
 }
