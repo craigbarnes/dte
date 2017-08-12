@@ -1,5 +1,4 @@
 #include "tabbar.h"
-#include "window.h"
 #include "view.h"
 #include "uchar.h"
 

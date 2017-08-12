@@ -1,5 +1,4 @@
 #include "block.h"
-#include "iter.h"
 #include "buffer.h"
 #include "view.h"
 #include "hl.h"

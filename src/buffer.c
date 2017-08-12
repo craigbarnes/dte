@@ -1,7 +1,6 @@
 #include "buffer.h"
 #include "view.h"
 #include "editor.h"
-#include "change.h"
 #include "block.h"
 #include "filetype.h"
 #include "state.h"

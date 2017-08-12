@@ -1,6 +1,5 @@
 #include "load-save.h"
 #include "editor.h"
-#include "buffer.h"
 #include "block.h"
 #include "wbuf.h"
 #include "decoder.h"

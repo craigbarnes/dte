@@ -1,6 +1,4 @@
 #include "tag.h"
-#include "ctags.h"
-#include "ptr-array.h"
 #include "completion.h"
 #include "path.h"
 #include "common.h"

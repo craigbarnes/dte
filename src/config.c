@@ -1,5 +1,4 @@
 #include "config.h"
-#include "command.h"
 #include "error.h"
 #include "gbuf.h"
 #include "common.h"

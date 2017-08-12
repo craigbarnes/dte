@@ -1,6 +1,5 @@
 #include "selection.h"
 #include "buffer.h"
-#include "view.h"
 
 void init_selection(View *v, SelectionInfo *info)
 {

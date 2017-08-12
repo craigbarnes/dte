@@ -1,5 +1,4 @@
 #include "uchar.h"
-#include "unicode.h"
 #include "common.h"
 
 static inline int u_seq_len(unsigned int first_byte)

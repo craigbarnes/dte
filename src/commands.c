@@ -14,7 +14,6 @@
 #include "state.h"
 #include "syntax.h"
 #include "lock.h"
-#include "ptr-array.h"
 #include "bind.h"
 #include "alias.h"
 #include "tag.h"
@@ -28,7 +27,6 @@
 #include "selection.h"
 #include "encoding.h"
 #include "path.h"
-#include "error.h"
 #include "input-special.h"
 #include "git-open.h"
 

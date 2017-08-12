@@ -1,5 +1,4 @@
 #include "cmdline.h"
-#include "gbuf.h"
 #include "history.h"
 #include "editor.h"
 #include "common.h"

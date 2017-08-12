@@ -1,12 +1,10 @@
 #include "window.h"
-#include "view.h"
 #include "file-history.h"
 #include "path.h"
 #include "lock.h"
 #include "load-save.h"
 #include "error.h"
 #include "move.h"
-#include "frame.h"
 
 Window *window;
 

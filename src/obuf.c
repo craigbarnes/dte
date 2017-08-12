@@ -1,5 +1,4 @@
 #include "obuf.h"
-#include "term.h"
 #include "common.h"
 #include "uchar.h"
 

@@ -1,6 +1,4 @@
 #include "hl.h"
-#include "color.h"
-#include "buffer.h"
 #include "syntax.h"
 
 #include <inttypes.h>
