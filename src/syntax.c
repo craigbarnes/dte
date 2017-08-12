@@ -18,12 +18,12 @@ unsigned long buf_hash(const char *str, size_t size)
     return hash;
 }
 
-struct string_list *find_string_list(Syntax *syn, const char *name)
+StringList *find_string_list(Syntax *syn, const char *name)
 {
     int i;
 
     for (i = 0; i < syn->string_lists.count; i++) {
-        struct string_list *list = syn->string_lists.ptrs[i];
+        StringList *list = syn->string_lists.ptrs[i];
         if (streq(list->name, name))
             return list;
     }
@@ -87,7 +87,7 @@ static void fix_conditions(Syntax *syn, State *s, SyntaxMerge *m, const char *pr
     int i;
 
     for (i = 0; i < s->conds.count; i++) {
-        struct condition *c = s->conds.ptrs[i];
+        Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix);
         if (c->a.destination == NULL && has_destination(c->type))
             c->a.destination = m->return_state;
@@ -116,7 +116,7 @@ static void update_state_colors(Syntax *syn, State *s);
 State *merge_syntax(Syntax *syn, SyntaxMerge *m)
 {
     // NOTE: string_lists is owned by Syntax so there's no need to
-    // copy it. Freeing struct condition does not free any string lists.
+    // copy it. Freeing Condition does not free any string lists.
     const char *prefix = get_prefix();
     PointerArray *states = &syn->states;
     int i, old_count = states->count;
@@ -137,7 +137,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         s->emit_name = xstrdup(s->emit_name);
         s->conds.ptrs = xmemdup(s->conds.ptrs, sizeof(void *) * s->conds.alloc);
         for (j = 0; j < s->conds.count; j++)
-            s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(struct condition));
+            s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
 
         // Mark unvisited so that state that is used only as a return state gets visited.
         s->visited = false;
@@ -165,7 +165,7 @@ static void visit(State *s)
 
     s->visited = true;
     for (i = 0; i < s->conds.count; i++) {
-        struct condition *cond = s->conds.ptrs[i];
+        Condition *cond = s->conds.ptrs[i];
         if (cond->a.destination)
             visit(cond->a.destination);
     }
@@ -173,7 +173,7 @@ static void visit(State *s)
         visit(s->a.destination);
 }
 
-static void free_condition(struct condition *cond)
+static void free_condition(Condition *cond)
 {
     free(cond->a.emit_name);
     free(cond);
@@ -188,14 +188,14 @@ static void free_state(State *s)
     free(s);
 }
 
-static void free_string_list(struct string_list *list)
+static void free_string_list(StringList *list)
 {
     int i;
 
     for (i = 0; i < ARRAY_COUNT(list->hash); i++) {
-        struct hash_str *h = list->hash[i];
+        HashStr *h = list->hash[i];
         while (h) {
-            struct hash_str *next = h->next;
+            HashStr *next = h->next;
             free(h);
             h = next;
         }
@@ -229,7 +229,7 @@ void finalize_syntax(Syntax *syn, int saved_nr_errors)
         }
     }
     for (i = 0; i < syn->string_lists.count; i++) {
-        struct string_list *list = syn->string_lists.ptrs[i];
+        StringList *list = syn->string_lists.ptrs[i];
         if (!list->defined)
             error_msg("No such list %s", list->name);
     }
@@ -253,7 +253,7 @@ void finalize_syntax(Syntax *syn, int saved_nr_errors)
             error_msg("State %s is unreachable", s->name);
     }
     for (i = 0; i < syn->string_lists.count; i++) {
-        struct string_list *list = syn->string_lists.ptrs[i];
+        StringList *list = syn->string_lists.ptrs[i];
         if (!list->used)
             error_msg("List %s never used", list->name);
     }
@@ -310,7 +310,7 @@ static void update_state_colors(Syntax *syn, State *s)
     int i;
 
     for (i = 0; i < s->conds.count; i++) {
-        struct condition *c = s->conds.ptrs[i];
+        Condition *c = s->conds.ptrs[i];
         update_action_color(syn, &c->a);
     }
     update_action_color(syn, &s->a);

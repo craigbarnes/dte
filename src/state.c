@@ -145,9 +145,9 @@ static bool destination_state(const char *name, State **dest)
     return true;
 }
 
-static struct condition *add_condition(enum condition_type type, const char *dest, const char *emit)
+static Condition *add_condition(enum condition_type type, const char *dest, const char *emit)
 {
-    struct condition *c;
+    Condition *c;
     State *d = NULL;
 
     if (no_state())
@@ -156,7 +156,7 @@ static struct condition *add_condition(enum condition_type type, const char *des
     if (dest && !destination_state(dest, &d))
         return NULL;
 
-    c = xnew0(struct condition, 1);
+    c = xnew0(Condition, 1);
     c->a.destination = d;
     c->a.emit_name = emit ? xstrdup(emit) : NULL;
     c->type = type;
@@ -167,7 +167,7 @@ static struct condition *add_condition(enum condition_type type, const char *des
 static void cmd_bufis(const char *pf, char **args)
 {
     bool icase = !!*pf;
-    struct condition *c;
+    Condition *c;
     const char *str = args[0];
     int len = strlen(str);
 
@@ -187,7 +187,7 @@ static void cmd_char(const char *pf, char **args)
 {
     enum condition_type type = COND_CHAR;
     bool not = false;
-    struct condition *c;
+    Condition *c;
 
     while (*pf) {
         switch (*pf) {
@@ -277,7 +277,7 @@ static void cmd_heredocend(const char *pf, char **args)
 static void cmd_list(const char *pf, char **args)
 {
     const char *name = args[0];
-    struct string_list *list;
+    StringList *list;
     int i;
 
     close_state();
@@ -286,7 +286,7 @@ static void cmd_list(const char *pf, char **args)
 
     list = find_string_list(current_syntax, name);
     if (list == NULL) {
-        list = xnew0(struct string_list, 1);
+        list = xnew0(StringList, 1);
         list->name = xstrdup(name);
         ptr_array_add(&current_syntax->string_lists, list);
     } else if (list->defined) {
@@ -300,7 +300,7 @@ static void cmd_list(const char *pf, char **args)
         const char *str = args[i];
         size_t len = strlen(str);
         unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
-        struct hash_str *h = xmalloc(sizeof(struct hash_str *) + sizeof(int) + len);
+        HashStr *h = xmalloc(sizeof(HashStr *) + sizeof(int) + len);
         h->next = list->hash[idx];
         h->len = len;
         memcpy(h->str, str, len);
@@ -312,15 +312,15 @@ static void cmd_inlist(const char *pf, char **args)
 {
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
-    struct string_list *list = find_string_list(current_syntax, name);
-    struct condition *c = add_condition(COND_INLIST, args[1], emit);
+    StringList *list = find_string_list(current_syntax, name);
+    Condition *c = add_condition(COND_INLIST, args[1], emit);
 
     if (c == NULL)
         return;
 
     if (list == NULL) {
         // Add undefined list
-        list = xnew0(struct string_list, 1);
+        list = xnew0(StringList, 1);
         list->name = xstrdup(name);
         ptr_array_add(&current_syntax->string_lists, list);
     }
@@ -352,7 +352,7 @@ static void cmd_recolor(const char *pf, char **args)
 {
     // If length is not specified then buffered bytes will be recolored
     enum condition_type type = COND_RECOLOR_BUFFER;
-    struct condition *c;
+    Condition *c;
     int len = 0;
 
     if (args[1]) {
@@ -396,7 +396,7 @@ static void cmd_str(const char *pf, char **args)
     bool icase = !!*pf;
     enum condition_type type = icase ? COND_STR_ICASE : COND_STR;
     const char *str = args[0];
-    struct condition *c;
+    Condition *c;
     int len = strlen(str);
 
     if (len > ARRAY_COUNT(c->u.cond_str.str)) {

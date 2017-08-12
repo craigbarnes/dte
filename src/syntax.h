@@ -28,7 +28,21 @@ typedef struct action {
     struct hl_color *emit_color;
 } Action;
 
-struct condition {
+typedef struct hash_str {
+    struct hash_str *next;
+    int len;
+    char str[1];
+} HashStr;
+
+typedef struct {
+    char *name;
+    HashStr *hash[62];
+    bool icase;
+    bool used;
+    bool defined;
+} StringList;
+
+typedef struct {
     union {
         struct {
             int len;
@@ -39,7 +53,7 @@ struct condition {
             unsigned char bitmap[256 / 8];
         } cond_char;
         struct {
-            struct string_list *list;
+            StringList *list;
         } cond_inlist;
         struct {
             int len;
@@ -55,13 +69,13 @@ struct condition {
     } u;
     Action a;
     enum condition_type type;
-};
+} Condition;
 
-struct heredoc_state {
+typedef struct {
     struct state *state;
     char *delim;
     int len;
-};
+} HeredocState;
 
 typedef struct syntax {
     char *name;
@@ -96,20 +110,6 @@ typedef struct state {
     } heredoc;
 } State;
 
-struct hash_str {
-    struct hash_str *next;
-    int len;
-    char str[1];
-};
-
-struct string_list {
-    char *name;
-    struct hash_str *hash[62];
-    bool icase;
-    bool used;
-    bool defined;
-};
-
 typedef struct {
     Syntax *subsyn;
     State *return_state;
@@ -123,7 +123,7 @@ static inline bool is_subsyntax(Syntax *syn)
 }
 
 unsigned long buf_hash(const char *str, size_t size);
-struct string_list *find_string_list(Syntax *syn, const char *name);
+StringList *find_string_list(Syntax *syn, const char *name);
 State *find_state(Syntax *syn, const char *name);
 State *merge_syntax(Syntax *syn, SyntaxMerge *m);
 void finalize_syntax(Syntax *syn, int saved_nr_errors);

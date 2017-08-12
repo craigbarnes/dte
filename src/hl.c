@@ -29,7 +29,7 @@ static int bitmap_get(const unsigned char *bitmap, unsigned int idx)
     return bitmap[byte] & 1 << bit;
 }
 
-static bool is_buffered(const struct condition *cond, const char *str, int len)
+static bool is_buffered(const Condition *cond, const char *str, int len)
 {
     if (len != cond->u.cond_bufis.len)
         return false;
@@ -39,10 +39,10 @@ static bool is_buffered(const struct condition *cond, const char *str, int len)
     return !memcmp(cond->u.cond_bufis.str, str, len);
 }
 
-static bool in_hash(struct string_list *list, const char *str, size_t len)
+static bool in_hash(StringList *list, const char *str, size_t len)
 {
     unsigned long hash = buf_hash(str, len);
-    struct hash_str *h = list->hash[hash % ARRAY_COUNT(list->hash)];
+    HashStr *h = list->hash[hash % ARRAY_COUNT(list->hash)];
 
     if (list->icase) {
         while (h) {
@@ -62,7 +62,7 @@ static bool in_hash(struct string_list *list, const char *str, size_t len)
 
 static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int len)
 {
-    struct heredoc_state *s;
+    HeredocState *s;
     SyntaxMerge m;
     int i;
 
@@ -77,7 +77,7 @@ static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int l
     m.delim = delim;
     m.delim_len = len;
 
-    s = xnew0(struct heredoc_state, 1);
+    s = xnew0(HeredocState, 1);
     s->state = merge_syntax(syn, &m);
     s->delim = xmemdup(delim, len);
     s->len = len;
@@ -98,7 +98,7 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
     }
 
     while (1) {
-        const struct condition *cond;
+        const Condition *cond;
         const Action *a;
         unsigned char ch;
         int ci;
