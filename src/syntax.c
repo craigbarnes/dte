@@ -1,7 +1,5 @@
 #include "syntax.h"
 #include "state.h"
-#include "color.h"
-#include "ptr-array.h"
 #include "error.h"
 #include "common.h"
 

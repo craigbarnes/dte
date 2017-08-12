@@ -4,54 +4,50 @@
 
 #include <stddef.h>
 
-struct list_head {
+typedef struct list_head {
     struct list_head *next, *prev;
-};
+} ListHead;
 
 #define LIST_HEAD_INIT(name) {&(name), &(name)}
-#define LIST_HEAD(name) struct list_head name = LIST_HEAD_INIT(name)
+#define LIST_HEAD(name) ListHead name = LIST_HEAD_INIT(name)
 
-static inline void list_init(struct list_head *head)
+static inline void list_init(ListHead *head)
 {
     head->next = head;
     head->prev = head;
 }
 
-static inline void __list_add (
-    struct list_head *new,
-    struct list_head *prev,
-    struct list_head *next
-) {
+static inline void __list_add(ListHead *new, ListHead *prev, ListHead *next) {
     next->prev = new;
     new->next = next;
     new->prev = prev;
     prev->next = new;
 }
 
-static inline void list_add_before(struct list_head *new, struct list_head *item)
+static inline void list_add_before(ListHead *new, ListHead *item)
 {
     __list_add(new, item->prev, item);
 }
 
-static inline void list_add_after(struct list_head *new, struct list_head *item)
+static inline void list_add_after(ListHead *new, ListHead *item)
 {
     __list_add(new, item, item->next);
 }
 
-static inline void __list_del(struct list_head *prev, struct list_head *next)
+static inline void __list_del(ListHead *prev, ListHead *next)
 {
     next->prev = prev;
     prev->next = next;
 }
 
-static inline void list_del(struct list_head *entry)
+static inline void list_del(ListHead *entry)
 {
     __list_del(entry->prev, entry->next);
     entry->next = (void *)0x00100100;
     entry->prev = (void *)0x00200200;
 }
 
-static inline int list_empty(const struct list_head *head)
+static inline int list_empty(const ListHead *head)
 {
     return head->next == head;
 }

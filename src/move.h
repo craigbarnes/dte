@@ -2,9 +2,8 @@
 #define MOVE_H
 
 #include "libc.h"
-
-struct block_iter;
-struct view;
+#include "iter.h"
+#include "view.h"
 
 void move_to_preferred_x(int preferred_x);
 void move_cursor_left(void);
@@ -15,10 +14,10 @@ void move_up(int count);
 void move_down(int count);
 void move_bof(void);
 void move_eof(void);
-void move_to_line(struct view *v, int line);
-void move_to_column(struct view *v, int column);
+void move_to_line(View *v, int line);
+void move_to_column(View *v, int column);
 
-long word_fwd(struct block_iter *bi, bool skip_non_word);
-long word_bwd(struct block_iter *bi, bool skip_non_word);
+long word_fwd(BlockIter *bi, bool skip_non_word);
+long word_bwd(BlockIter *bi, bool skip_non_word);
 
 #endif

@@ -2,6 +2,7 @@
 #define SYNTAX_H
 
 #include "libc.h"
+#include "color.h"
 #include "ptr-array.h"
 
 enum condition_type {
@@ -25,7 +26,7 @@ typedef struct action {
     char *emit_name;
 
     // Set after all colors have been added (config loaded).
-    struct hl_color *emit_color;
+    HlColor *emit_color;
 } Action;
 
 typedef struct hash_str {

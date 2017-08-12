@@ -91,7 +91,7 @@ static long insert_to_current(const char *buf, long len)
 static long split_and_insert(const char *buf, long len)
 {
     Block *blk = view->cursor.blk;
-    struct list_head *prev_node = blk->node.prev;
+    ListHead *prev_node = blk->node.prev;
     const char *buf1 = blk->data;
     const char *buf2 = buf;
     const char *buf3 = blk->data + view->cursor.offset;
@@ -252,7 +252,7 @@ static int only_block(Block *blk)
 
 char *do_delete(long len)
 {
-    struct list_head *saved_prev_node = NULL;
+    ListHead *saved_prev_node = NULL;
     Block *blk = view->cursor.blk;
     long offset = view->cursor.offset;
     long pos = 0;
@@ -269,7 +269,7 @@ char *do_delete(long len)
 
     buf = xnew(char, len);
     while (pos < len) {
-        struct list_head *next = blk->node.next;
+        ListHead *next = blk->node.next;
         long avail = blk->size - offset;
         long count = len - pos;
         long nl;

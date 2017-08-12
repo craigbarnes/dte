@@ -11,21 +11,21 @@
  * zero-sized blocks are forbidden.
  */
 typedef struct block {
-    struct list_head node;
+    ListHead node;
     unsigned char *data;
     long size;
     long alloc;
     long nl;
 } Block;
 
-static inline Block *BLOCK(struct list_head *item)
+static inline Block *BLOCK(ListHead *item)
 {
     return container_of(item, Block, node);
 }
 
-typedef struct block_iter {
+typedef struct {
     Block *blk;
-    struct list_head *head;
+    ListHead *head;
     long offset;
 } BlockIter;
 

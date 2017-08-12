@@ -88,7 +88,7 @@ Buffer *open_empty_buffer(void)
 
 void free_buffer(Buffer *b)
 {
-    struct list_head *item;
+    ListHead *item;
 
     ptr_array_remove(&buffers, b);
 
@@ -97,7 +97,7 @@ void free_buffer(Buffer *b)
 
     item = b->blocks.next;
     while (item != &b->blocks) {
-        struct list_head *next = item->next;
+        ListHead *next = item->next;
         Block *blk = BLOCK(item);
 
         free(blk->data);

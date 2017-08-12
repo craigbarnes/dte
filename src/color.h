@@ -4,7 +4,7 @@
 #include "term.h"
 #include "libc.h"
 
-typedef struct hl_color {
+typedef struct {
     char *name;
     struct term_color color;
 } HlColor;

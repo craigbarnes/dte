@@ -26,7 +26,7 @@ struct change {
 };
 
 typedef struct buffer {
-    struct list_head blocks;
+    ListHead blocks;
     Change change_head;
     Change *cur_change;
 
