@@ -3,7 +3,7 @@
 
 #include "buffer.h"
 
-int load_buffer(struct buffer *b, bool must_exist, const char *filename);
-int save_buffer(struct buffer *b, const char *filename, const char *encoding, enum newline_sequence newline);
+int load_buffer(Buffer *b, bool must_exist, const char *filename);
+int save_buffer(Buffer *b, const char *filename, const char *encoding, enum newline_sequence newline);
 
 #endif

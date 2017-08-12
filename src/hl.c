@@ -251,7 +251,7 @@ static void block_iter_move_down(struct block_iter *bi, int count)
         block_iter_eat_line(bi);
 }
 
-static int fill_hole(struct buffer *b, struct block_iter *bi, int sidx, int eidx)
+static int fill_hole(Buffer *b, struct block_iter *bi, int sidx, int eidx)
 {
     void **ptrs = b->line_start_states.ptrs;
     int idx = sidx;
@@ -282,7 +282,7 @@ static int fill_hole(struct buffer *b, struct block_iter *bi, int sidx, int eidx
     return idx - sidx;
 }
 
-void hl_fill_start_states(struct buffer *b, int line_nr)
+void hl_fill_start_states(Buffer *b, int line_nr)
 {
     BLOCK_ITER(bi, &b->blocks);
     PointerArray *s = &b->line_start_states;
@@ -333,7 +333,7 @@ void hl_fill_start_states(struct buffer *b, int line_nr)
     }
 }
 
-struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_nr, int *next_changed)
+struct hl_color **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_changed)
 {
     PointerArray *s = &b->line_start_states;
     struct hl_color **colors;
@@ -367,7 +367,7 @@ struct hl_color **hl_line(struct buffer *b, const char *line, int len, int line_
 }
 
 // Called after text has been inserted to re-highlight changed lines
-void hl_insert(struct buffer *b, int first, int lines)
+void hl_insert(Buffer *b, int first, int lines)
 {
     PointerArray *s = &b->line_start_states;
     int i, last = first + lines;
@@ -399,7 +399,7 @@ void hl_insert(struct buffer *b, int first, int lines)
 }
 
 // Called after text has been deleted to re-highlight changed lines
-void hl_delete(struct buffer *b, int first, int deleted_nl)
+void hl_delete(Buffer *b, int first, int deleted_nl)
 {
     PointerArray *s = &b->line_start_states;
     int last = first + deleted_nl;

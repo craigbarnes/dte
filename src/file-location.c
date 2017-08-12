@@ -76,7 +76,7 @@ bool file_location_go(struct file_location *loc)
 bool file_location_return(struct file_location *loc)
 {
     Window *w = window;
-    struct buffer *b = find_buffer_by_id(loc->buffer_id);
+    Buffer *b = find_buffer_by_id(loc->buffer_id);
     View *v;
 
     if (b != NULL) {

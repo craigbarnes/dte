@@ -144,7 +144,7 @@ void print_message(const char *msg, bool is_error)
     }
 }
 
-void update_term_title(struct buffer *b)
+void update_term_title(Buffer *b)
 {
     static int term_type = -1;
     char title[1024];

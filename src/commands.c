@@ -114,7 +114,7 @@ static void cmd_cd(const char *pf, char **args)
     }
 
     for (i = 0; i < buffers.count; i++) {
-        struct buffer *b = buffers.ptrs[i];
+        Buffer *b = buffers.ptrs[i];
         update_short_filename_cwd(b, cwdp);
     }
 
@@ -731,7 +731,7 @@ static void cmd_quit(const char *pf, char **args)
         return;
     }
     for (i = 0; i < buffers.count; i++) {
-        struct buffer *b = buffers.ptrs[i];
+        Buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
             View *v = window_find_view(window, b);

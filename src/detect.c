@@ -15,7 +15,7 @@ static bool next_line(struct block_iter *bi, struct lineref *lr)
  * For example if file's first line is "#!/usr/bin/env python2" then
  * "python" is returned.
  */
-char *detect_interpreter(struct buffer *b)
+char *detect_interpreter(Buffer *b)
 {
     BLOCK_ITER(bi, &b->blocks);
     PointerArray m = PTR_ARRAY_NEW();
@@ -47,14 +47,14 @@ char *detect_interpreter(struct buffer *b)
     return xstrdup("wish");
 }
 
-static bool allow_odd_indent(struct buffer *b)
+static bool allow_odd_indent(Buffer *b)
 {
     // 1, 3, 5 and 7 space indent
     int odd = 1 << 0 | 1 << 2 | 1 << 4 | 1 << 6;
     return b->options.detect_indent & odd;
 }
 
-static int indent_len(struct buffer *b, const char *line, int len, bool *tab_indent)
+static int indent_len(Buffer *b, const char *line, int len, bool *tab_indent)
 {
     bool space_before_tab = false;
     int spaces = 0;
@@ -101,7 +101,7 @@ static int indent_len(struct buffer *b, const char *line, int len, bool *tab_ind
     return spaces;
 }
 
-bool detect_indent(struct buffer *b)
+bool detect_indent(Buffer *b)
 {
     BLOCK_ITER(bi, &b->blocks);
     int current_indent = 0;

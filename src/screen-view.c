@@ -54,7 +54,7 @@ static bool is_non_text(unsigned int u)
     return u_is_unprintable(u);
 }
 
-static int get_ws_error_option(struct buffer *b)
+static int get_ws_error_option(Buffer *b)
 {
     int flags = b->options.ws_error;
 

@@ -46,7 +46,7 @@ enum tab_bar {
     TAB_BAR_AUTO,
 };
 
-struct common_options {
+typedef struct {
     int auto_indent;
     int detect_indent;
     int emulate_tab;
@@ -57,9 +57,9 @@ struct common_options {
     int tab_width;
     int text_width;
     int ws_error;
-};
+} CommonOptions;
 
-struct local_options {
+typedef struct {
     // These have also global values
     int auto_indent;
     int detect_indent;
@@ -76,9 +76,9 @@ struct local_options {
     int brace_indent;
     char *filetype;
     char *indent_regex;
-};
+} LocalOptions;
 
-struct global_options {
+typedef struct {
     // These have also local values
     int auto_indent;
     int detect_indent;
@@ -104,9 +104,9 @@ struct global_options {
     enum tab_bar tab_bar;
     int tab_bar_max_components;
     int tab_bar_width;
-};
+} GlobalOptions;
 
-extern struct global_options options;
+extern GlobalOptions options;
 extern const char *case_sensitive_search_enum[];
 
 #define TAB_BAR_MIN_WIDTH 12
@@ -119,6 +119,6 @@ bool validate_local_options(char **strs);
 void collect_options(const char *prefix);
 void collect_toggleable_options(const char *prefix);
 void collect_option_values(const char *name, const char *prefix);
-void free_local_options(struct local_options *opt);
+void free_local_options(LocalOptions *opt);
 
 #endif

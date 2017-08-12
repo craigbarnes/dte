@@ -1,12 +1,13 @@
 #include "view.h"
 #include "window.h"
 #include "uchar.h"
+#include "buffer.h"
 
 View *view;
 
 void view_update_cursor_y(View *v)
 {
-    struct buffer *b = v->buffer;
+    Buffer *b = v->buffer;
     struct block *blk;
     unsigned int nl = 0;
 

@@ -10,7 +10,7 @@ enum change_merge {
     CHANGE_MERGE_ERASE,
 };
 
-struct change;
+typedef struct change Change;
 
 void begin_change(enum change_merge m);
 void end_change(void);
@@ -18,7 +18,7 @@ void begin_change_chain(void);
 void end_change_chain(void);
 bool undo(void);
 bool redo(unsigned int change_id);
-void free_changes(struct change *head);
+void free_changes(Change *head);
 void buffer_insert_bytes(const char *buf, long len);
 void buffer_delete_bytes(long len);
 void buffer_erase_bytes(long len);

@@ -7,14 +7,14 @@
 static enum change_merge change_merge;
 static enum change_merge prev_change_merge;
 
-static struct change *alloc_change(void)
+static Change *alloc_change(void)
 {
-    return xcalloc(sizeof(struct change));
+    return xcalloc(sizeof(Change));
 }
 
-static void add_change(struct change *change)
+static void add_change(Change *change)
 {
-    struct change *head = buffer->cur_change;
+    Change *head = buffer->cur_change;
 
     change->next = head;
     xrenew(head->prev, head->nr_prev + 1);
@@ -24,16 +24,16 @@ static void add_change(struct change *change)
 }
 
 // This doesn't need to be local to buffer because commands are atomic
-static struct change *change_barrier;
+static Change *change_barrier;
 
-static bool is_change_chain_barrier(struct change *change)
+static bool is_change_chain_barrier(Change *change)
 {
     return !change->ins_count && !change->del_count;
 }
 
-static struct change *new_change(void)
+static Change *new_change(void)
 {
-    struct change *change;
+    Change *change;
 
     if (change_barrier) {
         /*
@@ -61,7 +61,7 @@ static long buffer_offset(void)
 
 static void record_insert(long len)
 {
-    struct change *change = buffer->cur_change;
+    Change *change = buffer->cur_change;
 
     BUG_ON(!len);
     if (change_merge == prev_change_merge && change_merge == CHANGE_MERGE_INSERT) {
@@ -77,7 +77,7 @@ static void record_insert(long len)
 
 static void record_delete(char *buf, long len, bool move_after)
 {
-    struct change *change = buffer->cur_change;
+    Change *change = buffer->cur_change;
 
     BUG_ON(!len);
     BUG_ON(!buf);
@@ -109,7 +109,7 @@ static void record_delete(char *buf, long len, bool move_after)
 
 static void record_replace(char *deleted, long del_count, long ins_count)
 {
-    struct change *change;
+    Change *change;
 
     BUG_ON(del_count && !deleted);
     BUG_ON(!del_count && deleted);
@@ -172,7 +172,7 @@ static void fix_cursors(long offset, long del, long ins)
     }
 }
 
-static void reverse_change(struct change *change)
+static void reverse_change(Change *change)
 {
     if (buffer->views.count > 1)
         fix_cursors(change->offset, change->ins_count, change->del_count);
@@ -207,7 +207,7 @@ static void reverse_change(struct change *change)
 
 bool undo(void)
 {
-    struct change *change = buffer->cur_change;
+    Change *change = buffer->cur_change;
 
     view_reset_preferred_x(view);
     if (!change->next)
@@ -234,7 +234,7 @@ bool undo(void)
 
 bool redo(unsigned int change_id)
 {
-    struct change *change = buffer->cur_change;
+    Change *change = buffer->cur_change;
 
     view_reset_preferred_x(view);
     if (!change->prev) {
@@ -276,7 +276,7 @@ bool redo(unsigned int change_id)
     return true;
 }
 
-void free_changes(struct change *ch)
+void free_changes(Change *ch)
 {
 top:
     while (ch->nr_prev)
@@ -284,7 +284,7 @@ top:
 
     // ch is leaf now
     while (ch->next) {
-        struct change *next = ch->next;
+        Change *next = ch->next;
 
         free(ch->buf);
         free(ch);

@@ -15,7 +15,7 @@ Window *new_window(void)
     return xnew0(Window, 1);
 }
 
-View *window_add_buffer(Window *w, struct buffer *b)
+View *window_add_buffer(Window *w, Buffer *b)
 {
     View *v = xnew0(View, 1);
 
@@ -39,7 +39,7 @@ View *window_open_buffer(Window *w, const char *filename, bool must_exist, const
 {
     char *absolute;
     bool dir_missing = false;
-    struct buffer *b = NULL;
+    Buffer *b = NULL;
 
     if (filename[0] == 0) {
         error_msg("Empty filename not allowed");
@@ -116,7 +116,7 @@ View *window_open_buffer(Window *w, const char *filename, bool must_exist, const
     return window_add_buffer(w, b);
 }
 
-View *window_get_view(Window *w, struct buffer *b)
+View *window_get_view(Window *w, Buffer *b)
 {
     View *v = window_find_view(w, b);
 
@@ -128,7 +128,7 @@ View *window_get_view(Window *w, struct buffer *b)
     return v;
 }
 
-View *window_find_view(Window *w, struct buffer *b)
+View *window_find_view(Window *w, Buffer *b)
 {
     View *v;
     int i;
@@ -181,7 +181,7 @@ void window_free(Window *w)
 void remove_view(View *v)
 {
     Window *w = v->window;
-    struct buffer *b = v->buffer;
+    Buffer *b = v->buffer;
 
     if (v == w->prev_view) {
         w->prev_view = NULL;
@@ -362,7 +362,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
     }
 }
 
-void mark_buffer_tabbars_changed(struct buffer *b)
+void mark_buffer_tabbars_changed(Buffer *b)
 {
     long i;
     for (i = 0; i < b->views.count; i++) {

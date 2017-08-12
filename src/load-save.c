@@ -12,13 +12,13 @@
 
 #include <sys/mman.h>
 
-static void add_block(struct buffer *b, struct block *blk)
+static void add_block(Buffer *b, struct block *blk)
 {
     b->nl += blk->nl;
     list_add_before(&blk->node, &b->blocks);
 }
 
-static struct block *add_utf8_line(struct buffer *b, struct block *blk, const unsigned char *line, size_t len)
+static struct block *add_utf8_line(Buffer *b, struct block *blk, const unsigned char *line, size_t len)
 {
     size_t size = len + 1;
 
@@ -41,7 +41,7 @@ copy:
     return blk;
 }
 
-static int decode_and_add_blocks(struct buffer *b, const unsigned char *buf, size_t size)
+static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size)
 {
     const char *e = detect_encoding_from_bom(buf, size);
     struct file_decoder *dec;
@@ -117,7 +117,7 @@ static int decode_and_add_blocks(struct buffer *b, const unsigned char *buf, siz
     return 0;
 }
 
-static int read_blocks(struct buffer *b, int fd)
+static int read_blocks(Buffer *b, int fd)
 {
     size_t size = b->st.st_size;
     unsigned long map_size = 64 * 1024;
@@ -166,7 +166,7 @@ static int read_blocks(struct buffer *b, int fd)
     return rc;
 }
 
-int load_buffer(struct buffer *b, bool must_exist, const char *filename)
+int load_buffer(Buffer *b, bool must_exist, const char *filename)
 {
     int fd = open(filename, O_RDONLY);
 
@@ -234,7 +234,7 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(struct buffer *b, struct file_encoder *enc, const struct byte_order_mark *bom)
+static int write_buffer(Buffer *b, struct file_encoder *enc, const struct byte_order_mark *bom)
 {
     ssize_t size = 0;
     struct block *blk;
@@ -267,7 +267,7 @@ write_error:
     return -1;
 }
 
-int save_buffer(struct buffer *b, const char *filename, const char *encoding, enum newline_sequence newline)
+int save_buffer(Buffer *b, const char *filename, const char *encoding, enum newline_sequence newline)
 {
     struct file_encoder *enc;
     char *tmp = NULL;

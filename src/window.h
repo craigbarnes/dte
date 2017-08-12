@@ -37,11 +37,11 @@ typedef struct window {
 extern Window *window;
 
 Window *new_window(void);
-View *window_add_buffer(Window *w, struct buffer *b);
+View *window_add_buffer(Window *w, Buffer *b);
 View *window_open_empty_buffer(Window *w);
 View *window_open_buffer(Window *w, const char *filename, bool must_exist, const char *encoding);
-View *window_get_view(Window *w, struct buffer *b);
-View *window_find_view(Window *w, struct buffer *b);
+View *window_get_view(Window *w, Buffer *b);
+View *window_find_view(Window *w, Buffer *b);
 View *window_find_unclosable_view(Window *w, bool (*can_close)(View *));
 void window_remove_views(Window *w);
 void window_free(Window *w);
@@ -52,7 +52,7 @@ void set_view(View *v);
 View *window_open_new_file(Window *w);
 View *window_open_file(Window *w, const char *filename, const char *encoding);
 void window_open_files(Window *w, char **filenames, const char *encoding);
-void mark_buffer_tabbars_changed(struct buffer *b);
+void mark_buffer_tabbars_changed(Buffer *b);
 enum tab_bar tabbar_visibility(Window *win);
 int vertical_tabbar_width(Window *win);
 void calculate_line_numbers(Window *win);

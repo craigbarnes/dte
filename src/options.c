@@ -8,7 +8,7 @@
 #include "regexp.h"
 #include "error.h"
 
-struct global_options options = {
+GlobalOptions options = {
     .auto_indent = 1,
     .detect_indent = 0,
     .emulate_tab = 0,
@@ -139,13 +139,13 @@ struct option_ops {
     .local = _local, \
     .global = _global, \
 
-#define L(member) OLG(offsetof(struct local_options, member), true, false)
-#define G(member) OLG(offsetof(struct global_options, member), false, true)
-#define C(member) OLG(offsetof(struct common_options, member), true, true)
+#define L(member) OLG(offsetof(LocalOptions, member), true, false)
+#define G(member) OLG(offsetof(GlobalOptions, member), false, true)
+#define C(member) OLG(offsetof(CommonOptions, member), true, true)
 
 static void filetype_changed(void)
 {
-    struct buffer *b = window->view->buffer;
+    Buffer *b = window->view->buffer;
     set_file_options(b);
     buffer_update_syntax(b);
 }
@@ -426,7 +426,7 @@ static const struct option_desc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
 
-static inline char *local_ptr(const struct option_desc *desc, const struct local_options *opt)
+static inline char *local_ptr(const struct option_desc *desc, const LocalOptions *opt)
 {
     return (char *)opt + desc->offset;
 }
@@ -730,7 +730,7 @@ void collect_option_values(const char *name, const char *prefix)
     }
 }
 
-void free_local_options(struct local_options *opt)
+void free_local_options(LocalOptions *opt)
 {
     int i;
 

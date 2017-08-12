@@ -20,7 +20,7 @@ static void set_options(char **args)
         set_option(args[i], args[i + 1], true, false);
 }
 
-void set_file_options(struct buffer *b)
+void set_file_options(Buffer *b)
 {
     int i;
 

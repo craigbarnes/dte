@@ -170,7 +170,7 @@ static void update_window(Window *w)
 }
 
 // Update all visible views containing this buffer
-static void update_buffer_windows(struct buffer *b)
+static void update_buffer_windows(Buffer *b)
 {
     long i;
 
@@ -345,7 +345,7 @@ static void save_state(struct screen_state *s, View *v)
 static void update_screen(struct screen_state *s)
 {
     View *v = window->view;
-    struct buffer *b = v->buffer;
+    Buffer *b = v->buffer;
 
     if (everything_changed) {
         modes[input_mode]->update();

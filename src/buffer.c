@@ -14,11 +14,11 @@
 #include "uchar.h"
 #include "detect.h"
 
-struct buffer *buffer;
+Buffer *buffer;
 PointerArray buffers = PTR_ARRAY_NEW();
 bool everything_changed;
 
-static void set_display_filename(struct buffer *b, char *name)
+static void set_display_filename(Buffer *b, char *name)
 {
     free(b->display_filename);
     b->display_filename = name;
@@ -33,7 +33,7 @@ static void set_display_filename(struct buffer *b, char *name)
  * Syntax highlighter has different logic. It cares about contents of the
  * lines, not about selection or if the lines have been moved up or down.
  */
-void buffer_mark_lines_changed(struct buffer *b, int min, int max)
+void buffer_mark_lines_changed(Buffer *b, int min, int max)
 {
     if (min > max) {
         int tmp = min;
@@ -46,17 +46,17 @@ void buffer_mark_lines_changed(struct buffer *b, int min, int max)
         b->changed_line_max = max;
 }
 
-const char *buffer_filename(struct buffer *b)
+const char *buffer_filename(Buffer *b)
 {
     return b->display_filename;
 }
 
-struct buffer *buffer_new(const char *encoding)
+Buffer *buffer_new(const char *encoding)
 {
     static int id;
-    struct buffer *b;
+    Buffer *b;
 
-    b = xnew0(struct buffer, 1);
+    b = xnew0(Buffer, 1);
     list_init(&b->blocks);
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
@@ -65,7 +65,7 @@ struct buffer *buffer_new(const char *encoding)
     if (encoding)
         b->encoding = xstrdup(encoding);
 
-    memcpy(&b->options, &options, sizeof(struct common_options));
+    memcpy(&b->options, &options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
     b->options.filetype = xstrdup("none");
     b->options.indent_regex = xstrdup("");
@@ -74,9 +74,9 @@ struct buffer *buffer_new(const char *encoding)
     return b;
 }
 
-struct buffer *open_empty_buffer(void)
+Buffer *open_empty_buffer(void)
 {
-    struct buffer *b = buffer_new(charset);
+    Buffer *b = buffer_new(charset);
     struct block *blk;
 
     // At least one block required
@@ -87,7 +87,7 @@ struct buffer *open_empty_buffer(void)
     return b;
 }
 
-void free_buffer(struct buffer *b)
+void free_buffer(Buffer *b)
 {
     struct list_head *item;
 
@@ -120,14 +120,14 @@ static int same_file(const struct stat *a, const struct stat *b)
     return a->st_dev == b->st_dev && a->st_ino == b->st_ino;
 }
 
-struct buffer *find_buffer(const char *abs_filename)
+Buffer *find_buffer(const char *abs_filename)
 {
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
     int i;
 
     for (i = 0; i < buffers.count; i++) {
-        struct buffer *b = buffers.ptrs[i];
+        Buffer *b = buffers.ptrs[i];
         const char *f = b->abs_filename;
 
         if ((f != NULL && streq(f, abs_filename)) || (st_ok && same_file(&st, &b->st))) {
@@ -137,12 +137,12 @@ struct buffer *find_buffer(const char *abs_filename)
     return NULL;
 }
 
-struct buffer *find_buffer_by_id(unsigned int id)
+Buffer *find_buffer_by_id(unsigned int id)
 {
     int i;
 
     for (i = 0; i < buffers.count; i++) {
-        struct buffer *b = buffers.ptrs[i];
+        Buffer *b = buffers.ptrs[i];
         if (b->id == id) {
             return b;
         }
@@ -150,7 +150,7 @@ struct buffer *find_buffer_by_id(unsigned int id)
     return NULL;
 }
 
-bool buffer_detect_filetype(struct buffer *b)
+bool buffer_detect_filetype(Buffer *b)
 {
     char *interpreter = detect_interpreter(b);
     const char *ft = NULL;
@@ -174,7 +174,7 @@ bool buffer_detect_filetype(struct buffer *b)
     return false;
 }
 
-void update_short_filename_cwd(struct buffer *b, const char *cwd)
+void update_short_filename_cwd(Buffer *b, const char *cwd)
 {
     if (b->abs_filename) {
         if (cwd) {
@@ -186,12 +186,12 @@ void update_short_filename_cwd(struct buffer *b, const char *cwd)
     }
 }
 
-void update_short_filename(struct buffer *b)
+void update_short_filename(Buffer *b)
 {
     set_display_filename(b, short_filename(b->abs_filename));
 }
 
-void buffer_update_syntax(struct buffer *b)
+void buffer_update_syntax(Buffer *b)
 {
     struct syntax *syn = NULL;
 
@@ -219,7 +219,7 @@ void buffer_update_syntax(struct buffer *b)
     mark_all_lines_changed(b);
 }
 
-void buffer_setup(struct buffer *b)
+void buffer_setup(Buffer *b)
 {
     b->setup = true;
     buffer_detect_filetype(b);
