@@ -2,7 +2,7 @@
 #include "buffer.h"
 #include "regexp.h"
 
-static bool next_line(struct block_iter *bi, struct lineref *lr)
+static bool next_line(BlockIter *bi, LineRef *lr)
 {
     if (!block_iter_eat_line(bi))
         return false;
@@ -17,9 +17,9 @@ static bool next_line(struct block_iter *bi, struct lineref *lr)
  */
 char *detect_interpreter(Buffer *b)
 {
-    BLOCK_ITER(bi, &b->blocks);
+    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
     PointerArray m = PTR_ARRAY_NEW();
-    struct lineref lr;
+    LineRef lr;
     char *ret;
 
     fill_line_ref(&bi, &lr);
@@ -103,7 +103,7 @@ static int indent_len(Buffer *b, const char *line, int len, bool *tab_indent)
 
 bool detect_indent(Buffer *b)
 {
-    BLOCK_ITER(bi, &b->blocks);
+    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
     int current_indent = 0;
     int counts[9] = {0};
     int tab_count = 0;
@@ -111,7 +111,7 @@ bool detect_indent(Buffer *b)
     int i;
 
     for (i = 0; i < 200; i++) {
-        struct lineref lr;
+        LineRef lr;
         int indent;
         bool tab;
 

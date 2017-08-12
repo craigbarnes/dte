@@ -234,7 +234,7 @@ static void hl_words(struct line_info *info)
     }
 }
 
-static void line_info_init(struct line_info *info, View *v, struct block_iter *bi, long line_nr)
+static void line_info_init(struct line_info *info, View *v, BlockIter *bi, long line_nr)
 {
     memset(info, 0, sizeof(*info));
     info->view = v;
@@ -258,7 +258,7 @@ static void line_info_init(struct line_info *info, View *v, struct block_iter *b
     }
 }
 
-static void line_info_set_line(struct line_info *info, struct lineref *lr, HlColor **colors)
+static void line_info_set_line(struct line_info *info, LineRef *lr, HlColor **colors)
 {
     int i;
 
@@ -331,7 +331,7 @@ static void print_line(struct line_info *info)
 void update_range(View *v, int y1, int y2)
 {
     struct line_info info;
-    struct block_iter bi = v->cursor;
+    BlockIter bi = v->cursor;
     int i, got_line;
 
     buf_reset(v->window->edit_x, v->window->edit_w, v->vx);
@@ -352,7 +352,7 @@ void update_range(View *v, int y1, int y2)
     got_line = !block_iter_is_eof(&bi);
     hl_fill_start_states(v->buffer, info.line_nr);
     for (i = y1; got_line && i < y2; i++) {
-        struct lineref lr;
+        LineRef lr;
         HlColor **colors;
         int next_changed;
 

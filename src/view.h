@@ -14,7 +14,7 @@ typedef struct view {
     struct buffer *buffer;
     struct window *window;
 
-    struct block_iter cursor;
+    BlockIter cursor;
 
     // Cursor position
     int cx, cy;

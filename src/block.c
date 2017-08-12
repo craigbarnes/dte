@@ -1,4 +1,5 @@
 #include "block.h"
+#include "iter.h"
 #include "buffer.h"
 #include "view.h"
 #include "hl.h"
@@ -7,7 +8,7 @@
 
 static void sanity_check(void)
 {
-    struct block *blk;
+    Block *blk;
     bool cursor_seen = false;
 
     if (!DEBUG)
@@ -33,9 +34,9 @@ static inline size_t ALLOC_ROUND(size_t size)
     return ROUND_UP(size, 64);
 }
 
-struct block *block_new(long alloc)
+Block *block_new(long alloc)
 {
-    struct block *blk = xnew0(struct block, 1);
+    Block *blk = xnew0(Block, 1);
 
     alloc = ALLOC_ROUND(alloc);
     blk->data = xnew(char, alloc);
@@ -43,7 +44,7 @@ struct block *block_new(long alloc)
     return blk;
 }
 
-static void delete_block(struct block *blk)
+static void delete_block(Block *blk)
 {
     list_del(&blk->node);
     free(blk->data);
@@ -63,7 +64,7 @@ static long copy_count_nl(char *dst, const char *src, long len)
 
 static long insert_to_current(const char *buf, long len)
 {
-    struct block *blk = view->cursor.blk;
+    Block *blk = view->cursor.blk;
     long offset = view->cursor.offset;
     long size = blk->size + len;
     long nl;
@@ -89,7 +90,7 @@ static long insert_to_current(const char *buf, long len)
  */
 static long split_and_insert(const char *buf, long len)
 {
-    struct block *blk = view->cursor.blk;
+    Block *blk = view->cursor.blk;
     struct list_head *prev_node = blk->node.prev;
     const char *buf1 = blk->data;
     const char *buf2 = buf;
@@ -107,7 +108,7 @@ static long split_and_insert(const char *buf, long len)
         // Size of new block if next line would be added
         long new_size = 0;
         long copied = 0;
-        struct block *new;
+        Block *new;
 
         if (pos < size1) {
             const char *nl = memchr(buf1 + pos, '\n', size1 - pos);
@@ -211,7 +212,7 @@ static long split_and_insert(const char *buf, long len)
 
 static long insert_bytes(const char *buf, long len)
 {
-    struct block *blk;
+    Block *blk;
     long new_size;
 
     // Blocks must contain whole lines.
@@ -244,7 +245,7 @@ void do_insert(const char *buf, long len)
         hl_insert(buffer, view->cy, nl);
 }
 
-static int only_block(struct block *blk)
+static int only_block(Block *blk)
 {
     return blk->node.prev == &buffer->blocks && blk->node.next == &buffer->blocks;
 }
@@ -252,7 +253,7 @@ static int only_block(struct block *blk)
 char *do_delete(long len)
 {
     struct list_head *saved_prev_node = NULL;
-    struct block *blk = view->cursor.blk;
+    Block *blk = view->cursor.blk;
     long offset = view->cursor.offset;
     long pos = 0;
     long deleted_nl = 0;
@@ -305,7 +306,7 @@ char *do_delete(long len)
 
     blk = view->cursor.blk;
     if (blk->size && blk->data[blk->size - 1] != '\n' && blk->node.next != &buffer->blocks) {
-        struct block *next = BLOCK(blk->node.next);
+        Block *next = BLOCK(blk->node.next);
         long size = blk->size + next->size;
 
         if (size > blk->alloc) {
@@ -329,7 +330,7 @@ char *do_delete(long len)
 
 char *do_replace(long del, const char *buf, long ins)
 {
-    struct block *blk;
+    Block *blk;
     long offset, avail, new_size;
     char *ptr, *deleted;
     long del_nl, ins_nl;

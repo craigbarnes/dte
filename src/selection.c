@@ -4,7 +4,7 @@
 
 void init_selection(View *v, struct selection_info *info)
 {
-    struct block_iter ei;
+    BlockIter ei;
     unsigned int u;
 
     info->so = v->sel_so;
@@ -50,7 +50,7 @@ char *view_get_selection(View *v, long *size)
 
     *size = 0;
     if (v->selection) {
-        struct block_iter save = v->cursor;
+        BlockIter save = v->cursor;
         *size = prepare_selection(v);
         buf = block_iter_get_bytes(&v->cursor, *size);
         v->cursor = save;
@@ -60,7 +60,7 @@ char *view_get_selection(View *v, long *size)
 
 int get_nr_selected_lines(struct selection_info *info)
 {
-    struct block_iter bi = info->si;
+    BlockIter bi = info->si;
     long pos = info->so;
     unsigned int u = 0;
     int nr_lines = 1;
@@ -75,7 +75,7 @@ int get_nr_selected_lines(struct selection_info *info)
 
 int get_nr_selected_chars(struct selection_info *info)
 {
-    struct block_iter bi = info->si;
+    BlockIter bi = info->si;
     long pos = info->so;
     unsigned int u;
     int nr_chars = 0;

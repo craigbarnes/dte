@@ -246,19 +246,19 @@ static void move_line_states(PointerArray *s, int to, int from, int count)
     memmove(s->ptrs + to, s->ptrs + from, count * sizeof(*s->ptrs));
 }
 
-static void block_iter_move_down(struct block_iter *bi, int count)
+static void block_iter_move_down(BlockIter *bi, int count)
 {
     while (count--)
         block_iter_eat_line(bi);
 }
 
-static int fill_hole(Buffer *b, struct block_iter *bi, int sidx, int eidx)
+static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
 {
     void **ptrs = b->line_start_states.ptrs;
     int idx = sidx;
 
     while (idx < eidx) {
-        struct lineref lr;
+        LineRef lr;
         State *st;
 
         fill_line_nl_ref(bi, &lr);
@@ -285,7 +285,7 @@ static int fill_hole(Buffer *b, struct block_iter *bi, int sidx, int eidx)
 
 void hl_fill_start_states(Buffer *b, int line_nr)
 {
-    BLOCK_ITER(bi, &b->blocks);
+    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
     PointerArray *s = &b->line_start_states;
     State **states;
     int current_line = 0;
@@ -325,7 +325,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
     // Add new
     block_iter_move_down(&bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
-        struct lineref lr;
+        LineRef lr;
 
         fill_line_nl_ref(&bi, &lr);
         highlight_line(b->syn, states[s->count - 1], lr.line, lr.size, &states[s->count]);

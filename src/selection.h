@@ -4,7 +4,7 @@
 #include "view.h"
 
 struct selection_info {
-    struct block_iter si;
+    BlockIter si;
     long so;
     long eo;
     bool swapped;

@@ -25,7 +25,7 @@ int cmdline_x;
 static void sanity_check(void)
 {
     View *v = window->view;
-    struct block *blk;
+    Block *blk;
 
     if (!DEBUG)
         return;

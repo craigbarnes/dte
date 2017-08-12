@@ -11,13 +11,13 @@
 
 #define MAX_SUBSTRINGS 32
 
-static bool do_search_fwd(regex_t *regex, struct block_iter *bi, bool skip)
+static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
 {
     int flags = block_iter_is_bol(bi) ? 0 : REG_NOTBOL;
 
     do {
         regmatch_t match;
-        struct lineref lr;
+        LineRef lr;
 
         if (block_iter_is_eof(bi))
             return false;
@@ -53,14 +53,14 @@ static bool do_search_fwd(regex_t *regex, struct block_iter *bi, bool skip)
     return false;
 }
 
-static bool do_search_bwd(regex_t *regex, struct block_iter *bi, int cx, bool skip)
+static bool do_search_bwd(regex_t *regex, BlockIter *bi, int cx, bool skip)
 {
     if (block_iter_is_eof(bi))
         goto next;
 
     do {
         regmatch_t match;
-        struct lineref lr;
+        LineRef lr;
         int flags = 0;
         long offset = -1;
         long pos = 0;
@@ -104,7 +104,7 @@ next:
 
 bool search_tag(const char *pattern, bool *err)
 {
-    BLOCK_ITER(bi, &buffer->blocks);
+    BlockIter bi = BLOCK_ITER_NEW(&buffer->blocks);
     regex_t regex;
     bool found = false;
 
@@ -199,7 +199,7 @@ void search_set_regexp(const char *pattern)
 
 static void do_search_next(bool skip)
 {
-    struct block_iter bi = view->cursor;
+    BlockIter bi = view->cursor;
 
     if (!current_search.pattern) {
         error_msg("No previous search pattern.");
@@ -283,8 +283,8 @@ static void build_replacement(struct gbuf *buf, const char *line, const char *fo
  * "foo abc bar abc baz" "foo abc bar abc baz"
  * "foo x bar abc baz"   " bar abc baz"
  */
-static int replace_on_line(struct lineref *lr, regex_t *re, const char *format,
-    struct block_iter *bi, unsigned int *flagsp)
+static int replace_on_line(LineRef *lr, regex_t *re, const char *format,
+    BlockIter *bi, unsigned int *flagsp)
 {
     unsigned char *buf = (unsigned char *)lr->line;
     unsigned int flags = *flagsp;
@@ -368,7 +368,7 @@ out:
 
 void reg_replace(const char *pattern, const char *format, unsigned int flags)
 {
-    BLOCK_ITER(bi, &buffer->blocks);
+    BlockIter bi = BLOCK_ITER_NEW(&buffer->blocks);
     unsigned int nr_bytes;
     bool swapped = false;
     int re_flags = REG_NEWLINE;
@@ -396,7 +396,7 @@ void reg_replace(const char *pattern, const char *format, unsigned int flags)
         bi = view->cursor;
         nr_bytes = info.eo - info.so;
     } else {
-        struct block_iter eof = bi;
+        BlockIter eof = bi;
         block_iter_eof(&eof);
         nr_bytes = block_iter_get_offset(&eof);
     }
@@ -408,7 +408,7 @@ void reg_replace(const char *pattern, const char *format, unsigned int flags)
     while (1) {
         // Number of bytes to process
         long count;
-        struct lineref lr;
+        LineRef lr;
         int nr;
 
         fill_line_ref(&bi, &lr);

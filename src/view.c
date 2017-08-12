@@ -8,7 +8,7 @@ View *view;
 void view_update_cursor_y(View *v)
 {
     Buffer *b = v->buffer;
-    struct block *blk;
+    Block *blk;
     unsigned int nl = 0;
 
     list_for_each_entry(blk, &b->blocks, node) {
@@ -26,7 +26,7 @@ void view_update_cursor_x(View *v)
 {
     unsigned int tw = v->buffer->options.tab_width;
     long idx = 0;
-    struct lineref lr;
+    LineRef lr;
     int c = 0;
     int w = 0;
 
@@ -137,7 +137,7 @@ bool view_can_close(View *v)
 
 char *view_get_word_under_cursor(View *v)
 {
-    struct lineref lr;
+    LineRef lr;
     long i, ei, si = fetch_this_line(&v->cursor, &lr);
 
     while (si < lr.size) {

@@ -321,7 +321,7 @@ void buffer_insert_bytes(const char *buf, long len)
 
 static bool would_delete_last_bytes(long count)
 {
-    struct block *blk = view->cursor.blk;
+    Block *blk = view->cursor.blk;
     long offset = view->cursor.offset;
 
     while (1) {
@@ -347,7 +347,7 @@ static void buffer_delete_bytes_internal(long len, bool move_after)
 
     // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(len)) {
-        struct block_iter bi = view->cursor;
+        BlockIter bi = view->cursor;
         unsigned int u;
 
         if (buffer_prev_char(&bi, &u) && u != '\n') {

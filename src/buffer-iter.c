@@ -1,13 +1,13 @@
 #include "buffer.h"
 #include "uchar.h"
 
-long buffer_get_char(struct block_iter *bi, unsigned int *up)
+long buffer_get_char(BlockIter *bi, unsigned int *up)
 {
-    struct block_iter tmp = *bi;
+    BlockIter tmp = *bi;
     return buffer_next_char(&tmp, up);
 }
 
-long buffer_next_char(struct block_iter *bi, unsigned int *up)
+long buffer_next_char(BlockIter *bi, unsigned int *up)
 {
     long offset = bi->offset;
 
@@ -29,7 +29,7 @@ long buffer_next_char(struct block_iter *bi, unsigned int *up)
     return bi->offset - offset;
 }
 
-long buffer_prev_char(struct block_iter *bi, unsigned int *up)
+long buffer_prev_char(BlockIter *bi, unsigned int *up)
 {
     long offset = bi->offset;
 

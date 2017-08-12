@@ -124,7 +124,7 @@ static int get_current_indent_bytes(const char *buf, int cursor_offset)
 
 int get_indent_level_bytes_left(void)
 {
-    struct lineref lr;
+    LineRef lr;
     unsigned int cursor_offset = fetch_this_line(&view->cursor, &lr);
     int ibytes;
 
@@ -139,7 +139,7 @@ int get_indent_level_bytes_left(void)
 
 int get_indent_level_bytes_right(void)
 {
-    struct lineref lr;
+    LineRef lr;
     unsigned int cursor_offset = fetch_this_line(&view->cursor, &lr);
     int tw = buffer->options.tab_width;
     int i, ibytes, iwidth;

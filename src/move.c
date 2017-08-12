@@ -14,7 +14,7 @@ enum char_type {
 void move_to_preferred_x(int preferred_x)
 {
     unsigned int tw = buffer->options.tab_width;
-    struct lineref lr;
+    LineRef lr;
     long i = 0;
     unsigned int x = 0;
 
@@ -181,7 +181,7 @@ static enum char_type get_char_type(unsigned int u)
     return CT_OTHER;
 }
 
-static bool get_current_char_type(struct block_iter *bi, enum char_type *type)
+static bool get_current_char_type(BlockIter *bi, enum char_type *type)
 {
     unsigned int u;
 
@@ -192,7 +192,7 @@ static bool get_current_char_type(struct block_iter *bi, enum char_type *type)
     return true;
 }
 
-static long skip_fwd_char_type(struct block_iter *bi, enum char_type type)
+static long skip_fwd_char_type(BlockIter *bi, enum char_type type)
 {
     long count = 0;
     unsigned int u;
@@ -207,7 +207,7 @@ static long skip_fwd_char_type(struct block_iter *bi, enum char_type type)
     return count;
 }
 
-static long skip_bwd_char_type(struct block_iter *bi, enum char_type type)
+static long skip_bwd_char_type(BlockIter *bi, enum char_type type)
 {
     long count = 0;
     unsigned int u;
@@ -222,7 +222,7 @@ static long skip_bwd_char_type(struct block_iter *bi, enum char_type type)
     return count;
 }
 
-long word_fwd(struct block_iter *bi, bool skip_non_word)
+long word_fwd(BlockIter *bi, bool skip_non_word)
 {
     long count = 0;
     enum char_type type;
@@ -239,7 +239,7 @@ long word_fwd(struct block_iter *bi, bool skip_non_word)
     }
 }
 
-long word_bwd(struct block_iter *bi, bool skip_non_word)
+long word_bwd(BlockIter *bi, bool skip_non_word)
 {
     long count = 0;
     enum char_type type;

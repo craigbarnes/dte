@@ -35,8 +35,8 @@ static const char *epattern = "^\\s*\\}";
  */
 void select_block(void)
 {
-    struct block_iter sbi, ebi, bi = view->cursor;
-    struct lineref lr;
+    BlockIter sbi, ebi, bi = view->cursor;
+    LineRef lr;
     int level = 0;
 
     // If current line does not match \{\s*$ but matches ^\s*\} then
@@ -87,8 +87,8 @@ void select_block(void)
 
 static int get_indent_of_matching_brace(void)
 {
-    struct block_iter bi = view->cursor;
-    struct lineref lr;
+    BlockIter bi = view->cursor;
+    LineRef lr;
     int level = 0;
 
     while (block_iter_prev_line(&bi)) {
@@ -221,7 +221,7 @@ void erase(void)
 // return number of whitespace bytes after cursor after moving cursor
 static long goto_beginning_of_whitespace(void)
 {
-    struct block_iter bi = view->cursor;
+    BlockIter bi = view->cursor;
     long count = 0;
     unsigned int u;
 
@@ -243,7 +243,7 @@ static long goto_beginning_of_whitespace(void)
     return count;
 }
 
-static bool ws_only(struct lineref *lr)
+static bool ws_only(LineRef *lr)
 {
     long i;
     for (i = 0; i < lr->size; i++) {
@@ -255,11 +255,11 @@ static bool ws_only(struct lineref *lr)
 }
 
 // Non-empty line can be used to determine size of indentation for the next line
-static bool find_non_empty_line_bwd(struct block_iter *bi)
+static bool find_non_empty_line_bwd(BlockIter *bi)
 {
     block_iter_bol(bi);
     do {
-        struct lineref lr;
+        LineRef lr;
         fill_line_ref(bi, &lr);
         if (!ws_only(&lr))
             return true;
@@ -285,9 +285,9 @@ static void insert_nl(void)
     // Prepare inserted indentation
     if (buffer->options.auto_indent) {
         // Current line will be split at cursor position
-        struct block_iter bi = view->cursor;
+        BlockIter bi = view->cursor;
         long len = block_iter_bol(&bi);
-        struct lineref lr;
+        LineRef lr;
 
         fill_line_ref(&bi, &lr);
         lr.size = len;
@@ -339,8 +339,8 @@ void insert_ch(unsigned int ch)
         del_count = prepare_selection(view);
         unselect();
     } else if (ch == '}' && buffer->options.auto_indent && buffer->options.brace_indent) {
-        struct block_iter bi = view->cursor;
-        struct lineref curlr;
+        BlockIter bi = view->cursor;
+        LineRef curlr;
 
         block_iter_bol(&bi);
         fill_line_ref(&bi, &curlr);
@@ -388,7 +388,7 @@ static void join_selection(void)
 {
     long count = prepare_selection(view);
     long len = 0, join = 0;
-    struct block_iter bi;
+    BlockIter bi;
     unsigned int ch = 0;
 
     unselect();
@@ -437,7 +437,7 @@ static void join_selection(void)
 
 void join_lines(void)
 {
-    struct block_iter next, bi = view->cursor;
+    BlockIter next, bi = view->cursor;
     int count;
     unsigned int u;
 
@@ -484,7 +484,7 @@ static void shift_right(int nr_lines, int count)
     i = 0;
     while (1) {
         struct indent_info info;
-        struct lineref lr;
+        LineRef lr;
 
         fetch_this_line(&view->cursor, &lr);
         get_indent_info(lr.line, lr.size, &info);
@@ -516,7 +516,7 @@ static void shift_left(int nr_lines, int count)
     i = 0;
     while (1) {
         struct indent_info info;
-        struct lineref lr;
+        LineRef lr;
 
         fetch_this_line(&view->cursor, &lr);
         get_indent_info(lr.line, lr.size, &info);
@@ -581,7 +581,7 @@ void shift_lines(int count)
             while (--nr_lines)
                 block_iter_prev_line(&view->cursor);
         } else {
-            struct block_iter save = view->cursor;
+            BlockIter save = view->cursor;
             while (--nr_lines)
                 block_iter_prev_line(&view->cursor);
             view->sel_so = block_iter_get_offset(&view->cursor);
@@ -597,10 +597,10 @@ void clear_lines(void)
     char *indent = NULL;
 
     if (buffer->options.auto_indent) {
-        struct block_iter bi = view->cursor;
+        BlockIter bi = view->cursor;
 
         if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
-            struct lineref lr;
+            LineRef lr;
             fill_line_ref(&bi, &lr);
             indent = get_indent_for_next_line(lr.line, lr.size);
         }
@@ -636,10 +636,10 @@ void new_line(void)
     block_iter_eol(&view->cursor);
 
     if (buffer->options.auto_indent) {
-        struct block_iter bi = view->cursor;
+        BlockIter bi = view->cursor;
 
         if (find_non_empty_line_bwd(&bi)) {
-            struct lineref lr;
+            LineRef lr;
             fill_line_ref(&bi, &lr);
             ins = get_indent_for_next_line(lr.line, lr.size);
         }
@@ -706,8 +706,8 @@ static bool in_paragraph(const char *line, long size, int indent_width)
 
 static unsigned int paragraph_size(void)
 {
-    struct block_iter bi = view->cursor;
-    struct lineref lr;
+    BlockIter bi = view->cursor;
+    LineRef lr;
     unsigned int size;
     int indent_width;
 

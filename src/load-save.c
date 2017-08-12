@@ -12,13 +12,13 @@
 
 #include <sys/mman.h>
 
-static void add_block(Buffer *b, struct block *blk)
+static void add_block(Buffer *b, Block *blk)
 {
     b->nl += blk->nl;
     list_add_before(&blk->node, &b->blocks);
 }
 
-static struct block *add_utf8_line(Buffer *b, struct block *blk, const unsigned char *line, size_t len)
+static Block *add_utf8_line(Buffer *b, Block *blk, const unsigned char *line, size_t len)
 {
     size_t size = len + 1;
 
@@ -91,7 +91,7 @@ static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t siz
         return -1;
 
     if (file_decoder_read_line(dec, &line, &len)) {
-        struct block *blk = NULL;
+        Block *blk = NULL;
 
         if (len && line[len - 1] == '\r') {
             b->newline = NEWLINE_DOS;
@@ -195,12 +195,12 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         close(fd);
     }
     if (list_empty(&b->blocks)) {
-        struct block *blk = block_new(1);
+        Block *blk = block_new(1);
         list_add_before(&blk->node, &b->blocks);
     } else {
         // Incomplete lines are not allowed because they are
         // special cases and cause lots of trouble.
-        struct block *blk = BLOCK(b->blocks.prev);
+        Block *blk = BLOCK(b->blocks.prev);
         if (blk->size && blk->data[blk->size - 1] != '\n') {
             if (blk->size == blk->alloc) {
                 blk->alloc = ROUND_UP(blk->size + 1, 64);
@@ -237,7 +237,7 @@ static mode_t get_umask(void)
 static int write_buffer(Buffer *b, struct file_encoder *enc, const struct byte_order_mark *bom)
 {
     ssize_t size = 0;
-    struct block *blk;
+    Block *blk;
 
     if (bom) {
         size = bom->len;

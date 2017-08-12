@@ -36,7 +36,7 @@
 static void activate_current_message_save(void)
 {
     struct file_location *loc = create_file_location(view);
-    struct block_iter save = view->cursor;
+    BlockIter save = view->cursor;
 
     activate_current_message();
     if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
@@ -214,13 +214,13 @@ static void cmd_compile(const char *pf, char **args)
 
 static void cmd_copy(const char *pf, char **args)
 {
-    struct block_iter save = view->cursor;
+    BlockIter save = view->cursor;
 
     if (view->selection) {
         copy(prepare_selection(view), view->selection == SELECT_LINES);
         unselect();
     } else {
-        struct block_iter tmp;
+        BlockIter tmp;
         block_iter_bol(&view->cursor);
         tmp = view->cursor;
         copy(block_iter_eat_line(&tmp), 1);
@@ -239,7 +239,7 @@ static void cmd_cut(const char *pf, char **args)
         }
         unselect();
     } else {
-        struct block_iter tmp;
+        BlockIter tmp;
         block_iter_bol(&view->cursor);
         tmp = view->cursor;
         cut(block_iter_eat_line(&tmp), 1);
@@ -254,7 +254,7 @@ static void cmd_delete(const char *pf, char **args)
 
 static void cmd_delete_eol(const char *pf, char **args)
 {
-    struct block_iter bi = view->cursor;
+    BlockIter bi = view->cursor;
 
     if (view->selection)
         return;
@@ -274,7 +274,7 @@ static void cmd_delete_eol(const char *pf, char **args)
 static void cmd_delete_word(const char *pf, char **args)
 {
     bool skip_non_word = *pf == 's';
-    struct block_iter bi = view->cursor;
+    BlockIter bi = view->cursor;
 
     buffer_delete_bytes(word_fwd(&bi, skip_non_word));
 }
@@ -351,12 +351,12 @@ static void cmd_ft(const char *pf, char **args)
 static void cmd_filter(const char *pf, char **args)
 {
     struct filter_data data;
-    struct block_iter save = view->cursor;
+    BlockIter save = view->cursor;
 
     if (view->selection) {
         data.in_len = prepare_selection(view);
     } else {
-        struct block *blk;
+        Block *blk;
 
         data.in_len = 0;
         list_for_each_entry(blk, &buffer->blocks, node)

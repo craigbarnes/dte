@@ -76,7 +76,7 @@ Buffer *buffer_new(const char *encoding)
 Buffer *open_empty_buffer(void)
 {
     Buffer *b = buffer_new(charset);
-    struct block *blk;
+    Block *blk;
 
     // At least one block required
     blk = block_new(1);
@@ -98,7 +98,7 @@ void free_buffer(Buffer *b)
     item = b->blocks.next;
     while (item != &b->blocks) {
         struct list_head *next = item->next;
-        struct block *blk = BLOCK(item);
+        Block *blk = BLOCK(item);
 
         free(blk->data);
         free(blk);
@@ -155,8 +155,8 @@ bool buffer_detect_filetype(Buffer *b)
     const char *ft = NULL;
 
     if (BLOCK(b->blocks.next)->size) {
-        BLOCK_ITER(bi, &b->blocks);
-        struct lineref lr;
+        BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
+        LineRef lr;
 
         fill_line_ref(&bi, &lr);
         ft = find_ft(b->abs_filename, interpreter, lr.line, lr.size);
