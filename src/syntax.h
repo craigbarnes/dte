@@ -17,7 +17,7 @@ enum condition_type {
     COND_HEREDOCEND,
 };
 
-struct action {
+typedef struct action {
     struct state *destination;
 
     // If condition has no emit name this is set to destination state's
@@ -26,7 +26,7 @@ struct action {
 
     // Set after all colors have been added (config loaded).
     struct hl_color *emit_color;
-};
+} Action;
 
 struct condition {
     union {
@@ -53,7 +53,7 @@ struct condition {
             char *str;
         } cond_heredocend;
     } u;
-    struct action a;
+    Action a;
     enum condition_type type;
 };
 
@@ -63,7 +63,16 @@ struct heredoc_state {
     int len;
 };
 
-struct state {
+typedef struct syntax {
+    char *name;
+    PointerArray states;
+    PointerArray string_lists;
+    PointerArray default_colors;
+    bool heredoc;
+    bool used;
+} Syntax;
+
+typedef struct state {
     char *name;
     char *emit_name;
     PointerArray conds;
@@ -79,13 +88,13 @@ struct state {
         STATE_NOEAT_BUFFER,
         STATE_HEREDOCBEGIN,
     } type;
-    struct action a;
+    Action a;
 
     struct {
-        struct syntax *subsyntax;
+        Syntax *subsyntax;
         PointerArray states;
     } heredoc;
-};
+} State;
 
 struct hash_str {
     struct hash_str *next;
@@ -101,36 +110,27 @@ struct string_list {
     bool defined;
 };
 
-struct syntax {
-    char *name;
-    PointerArray states;
-    PointerArray string_lists;
-    PointerArray default_colors;
-    bool heredoc;
-    bool used;
-};
-
-struct syntax_merge {
-    struct syntax *subsyn;
-    struct state *return_state;
+typedef struct {
+    Syntax *subsyn;
+    State *return_state;
     const char *delim;
     int delim_len;
-};
+} SyntaxMerge;
 
-static inline bool is_subsyntax(struct syntax *syn)
+static inline bool is_subsyntax(Syntax *syn)
 {
     return syn->name[0] == '.';
 }
 
 unsigned long buf_hash(const char *str, size_t size);
-struct string_list *find_string_list(struct syntax *syn, const char *name);
-struct state *find_state(struct syntax *syn, const char *name);
-struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m);
-void finalize_syntax(struct syntax *syn, int saved_nr_errors);
+struct string_list *find_string_list(Syntax *syn, const char *name);
+State *find_state(Syntax *syn, const char *name);
+State *merge_syntax(Syntax *syn, SyntaxMerge *m);
+void finalize_syntax(Syntax *syn, int saved_nr_errors);
 
-struct syntax *find_any_syntax(const char *name);
-struct syntax *find_syntax(const char *name);
-void update_syntax_colors(struct syntax *syn);
+Syntax *find_any_syntax(const char *name);
+Syntax *find_syntax(const char *name);
+void update_syntax_colors(Syntax *syn);
 void update_all_syntax_colors(void);
 void find_unused_subsyntaxes(void);
 

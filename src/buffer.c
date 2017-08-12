@@ -5,7 +5,6 @@
 #include "block.h"
 #include "filetype.h"
 #include "state.h"
-#include "syntax.h"
 #include "file-option.h"
 #include "lock.h"
 #include "selection.h"
@@ -193,7 +192,7 @@ void update_short_filename(Buffer *b)
 
 void buffer_update_syntax(Buffer *b)
 {
-    struct syntax *syn = NULL;
+    Syntax *syn = NULL;
 
     if (b->options.syntax) {
         // Even "none" can have syntax

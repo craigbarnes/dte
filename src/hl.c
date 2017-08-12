@@ -1,23 +1,24 @@
 #include "hl.h"
+#include "color.h"
 #include "buffer.h"
 #include "syntax.h"
 
 #include <inttypes.h>
 
-static bool state_is_valid(const struct state *st)
+static bool state_is_valid(const State *st)
 {
     return ((uintptr_t)st & 1) == 0;
 }
 
 static void mark_state_invalid(void **ptrs, int idx)
 {
-    struct state *st = ptrs[idx];
-    ptrs[idx] = (struct state *)((uintptr_t)st | 1);
+    State *st = ptrs[idx];
+    ptrs[idx] = (State *)((uintptr_t)st | 1);
 }
 
-static bool states_equal(void **ptrs, int idx, const struct state *b)
+static bool states_equal(void **ptrs, int idx, const State *b)
 {
-    struct state *a = (struct state *)((uintptr_t)ptrs[idx] & ~(uintptr_t)1);
+    State *a = (State *)((uintptr_t)ptrs[idx] & ~(uintptr_t)1);
     return a == b;
 }
 
@@ -59,10 +60,10 @@ static bool in_hash(struct string_list *list, const char *str, size_t len)
     return false;
 }
 
-static struct state *handle_heredoc(struct syntax *syn, struct state *state, const char *delim, int len)
+static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int len)
 {
     struct heredoc_state *s;
-    struct syntax_merge m;
+    SyntaxMerge m;
     int i;
 
     for (i = 0; i < state->heredoc.states.count; i++) {
@@ -85,9 +86,9 @@ static struct state *handle_heredoc(struct syntax *syn, struct state *state, con
 }
 
 // Line should be terminated with \n unless it's the last line
-static struct hl_color **highlight_line(struct syntax *syn, struct state *state, const char *line, int len, struct state **ret)
+static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int len, State **ret)
 {
-    static struct hl_color **colors;
+    static HlColor **colors;
     static int alloc;
     int i = 0, sidx = -1;
 
@@ -98,7 +99,7 @@ static struct hl_color **highlight_line(struct syntax *syn, struct state *state,
 
     while (1) {
         const struct condition *cond;
-        const struct action *a;
+        const Action *a;
         unsigned char ch;
         int ci;
     top:
@@ -258,7 +259,7 @@ static int fill_hole(Buffer *b, struct block_iter *bi, int sidx, int eidx)
 
     while (idx < eidx) {
         struct lineref lr;
-        struct state *st;
+        State *st;
 
         fill_line_nl_ref(bi, &lr);
         block_iter_eat_line(bi);
@@ -286,7 +287,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 {
     BLOCK_ITER(bi, &b->blocks);
     PointerArray *s = &b->line_start_states;
-    struct state **states;
+    State **states;
     int current_line = 0;
     int idx = 0;
     int last;
@@ -296,7 +297,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 
     // NOTE: "+ 2" so that you don't have to worry about overflow in fill_hole()
     resize_line_states(s, line_nr + 2);
-    states = (struct state **)s->ptrs;
+    states = (State **)s->ptrs;
 
     // Update invalid
     last = line_nr;
@@ -333,11 +334,11 @@ void hl_fill_start_states(Buffer *b, int line_nr)
     }
 }
 
-struct hl_color **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_changed)
+HlColor **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_changed)
 {
     PointerArray *s = &b->line_start_states;
-    struct hl_color **colors;
-    struct state *next;
+    HlColor **colors;
+    State *next;
 
     *next_changed = 0;
     if (b->syn == NULL)

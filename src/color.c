@@ -44,9 +44,9 @@ void fill_builtin_colors(void)
         builtin_colors[i] = &find_color(builtin_color_names[i])->color;
 }
 
-struct hl_color *set_highlight_color(const char *name, const struct term_color *color)
+HlColor *set_highlight_color(const char *name, const struct term_color *color)
 {
-    struct hl_color *c;
+    HlColor *c;
     int i;
 
     for (i = 0; i < hl_colors.count; i++) {
@@ -57,28 +57,28 @@ struct hl_color *set_highlight_color(const char *name, const struct term_color *
         }
     }
 
-    c = xnew(struct hl_color, 1);
+    c = xnew(HlColor, 1);
     c->name = xstrdup(name);
     c->color = *color;
     ptr_array_add(&hl_colors, c);
     return c;
 }
 
-static struct hl_color *find_real_color(const char *name)
+static HlColor *find_real_color(const char *name)
 {
     int i;
 
     for (i = 0; i < hl_colors.count; i++) {
-        struct hl_color *c = hl_colors.ptrs[i];
+        HlColor *c = hl_colors.ptrs[i];
         if (streq(c->name, name))
             return c;
     }
     return NULL;
 }
 
-struct hl_color *find_color(const char *name)
+HlColor *find_color(const char *name)
 {
-    struct hl_color *color = find_real_color(name);
+    HlColor *color = find_real_color(name);
     const char *dot;
 
     if (color)
@@ -96,7 +96,7 @@ void remove_extra_colors(void)
 
     BUG_ON(hl_colors.count < NR_BC);
     for (i = NR_BC; i < hl_colors.count; i++) {
-        struct hl_color *c = hl_colors.ptrs[i];
+        HlColor *c = hl_colors.ptrs[i];
 
         // Make possible use after free error easy to see
         c->color.fg = COLOR_RED;
@@ -196,7 +196,7 @@ void collect_hl_colors(const char *prefix)
     int i;
 
     for (i = 0; i < hl_colors.count; i++) {
-        struct hl_color *c = hl_colors.ptrs[i];
+        HlColor *c = hl_colors.ptrs[i];
         if (str_has_prefix(c->name, prefix))
             add_completion(xstrdup(c->name));
     }

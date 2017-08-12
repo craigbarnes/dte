@@ -17,7 +17,7 @@ struct line_info {
     long pos;
     long indent_size;
     long trailing_ws_offset;
-    struct hl_color **colors;
+    HlColor **colors;
 };
 
 static bool is_default_bg_color(int color)
@@ -197,8 +197,8 @@ static bool is_notice(const char *word, int len)
 // Highlight certain words inside comments
 static void hl_words(struct line_info *info)
 {
-    struct hl_color *cc = find_color("comment");
-    struct hl_color *nc = find_color("notice");
+    HlColor *cc = find_color("comment");
+    HlColor *nc = find_color("notice");
     int i, j, si, max;
 
     if (info->colors == NULL || cc == NULL || nc == NULL)
@@ -258,7 +258,7 @@ static void line_info_init(struct line_info *info, View *v, struct block_iter *b
     }
 }
 
-static void line_info_set_line(struct line_info *info, struct lineref *lr, struct hl_color **colors)
+static void line_info_set_line(struct line_info *info, struct lineref *lr, HlColor **colors)
 {
     int i;
 
@@ -353,7 +353,7 @@ void update_range(View *v, int y1, int y2)
     hl_fill_start_states(v->buffer, info.line_nr);
     for (i = y1; got_line && i < y2; i++) {
         struct lineref lr;
-        struct hl_color **colors;
+        HlColor **colors;
         int next_changed;
 
         obuf.x = 0;

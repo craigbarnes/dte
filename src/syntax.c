@@ -18,7 +18,7 @@ unsigned long buf_hash(const char *str, size_t size)
     return hash;
 }
 
-struct string_list *find_string_list(struct syntax *syn, const char *name)
+struct string_list *find_string_list(Syntax *syn, const char *name)
 {
     int i;
 
@@ -30,12 +30,12 @@ struct string_list *find_string_list(struct syntax *syn, const char *name)
     return NULL;
 }
 
-struct state *find_state(struct syntax *syn, const char *name)
+State *find_state(Syntax *syn, const char *name)
 {
     int i;
 
     for (i = 0; i < syn->states.count; i++) {
-        struct state *s = syn->states.ptrs[i];
+        State *s = syn->states.ptrs[i];
         if (streq(s->name, name))
             return s;
     }
@@ -53,12 +53,12 @@ static bool has_destination(enum condition_type type)
     }
 }
 
-struct syntax *find_any_syntax(const char *name)
+Syntax *find_any_syntax(const char *name)
 {
     int i;
 
     for (i = 0; i < syntaxes.count; i++) {
-        struct syntax *syn = syntaxes.ptrs[i];
+        Syntax *syn = syntaxes.ptrs[i];
         if (streq(syn->name, name))
             return syn;
     }
@@ -72,7 +72,7 @@ static const char *fix_name(const char *name, const char *prefix)
     return buf;
 }
 
-static void fix_action(struct syntax *syn, struct action *a, const char *prefix)
+static void fix_action(Syntax *syn, Action *a, const char *prefix)
 {
     if (a->destination) {
         const char *name = fix_name(a->destination->name, prefix);
@@ -82,7 +82,7 @@ static void fix_action(struct syntax *syn, struct action *a, const char *prefix)
         a->emit_name = xstrdup(a->emit_name);
 }
 
-static void fix_conditions(struct syntax *syn, struct state *s, struct syntax_merge *m, const char *prefix)
+static void fix_conditions(Syntax *syn, State *s, SyntaxMerge *m, const char *prefix)
 {
     int i;
 
@@ -111,11 +111,11 @@ static const char *get_prefix(void)
     return prefix;
 }
 
-static void update_state_colors(struct syntax *syn, struct state *s);
+static void update_state_colors(Syntax *syn, State *s);
 
-struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m)
+State *merge_syntax(Syntax *syn, SyntaxMerge *m)
 {
-    // NOTE: string_lists is owned by struct syntax so there's no need to
+    // NOTE: string_lists is owned by Syntax so there's no need to
     // copy it. Freeing struct condition does not free any string lists.
     const char *prefix = get_prefix();
     PointerArray *states = &syn->states;
@@ -129,7 +129,7 @@ struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m)
     memcpy(states->ptrs + old_count, m->subsyn->states.ptrs, sizeof(*states->ptrs) * m->subsyn->states.count);
 
     for (i = old_count; i < states->count; i++) {
-        struct state *s = xmemdup(states->ptrs[i], sizeof(struct state));
+        State *s = xmemdup(states->ptrs[i], sizeof(State));
         int j;
 
         states->ptrs[i] = s;
@@ -156,7 +156,7 @@ struct state *merge_syntax(struct syntax *syn, struct syntax_merge *m)
     return states->ptrs[old_count];
 }
 
-static void visit(struct state *s)
+static void visit(State *s)
 {
     int i;
 
@@ -179,7 +179,7 @@ static void free_condition(struct condition *cond)
     free(cond);
 }
 
-static void free_state(struct state *s)
+static void free_state(State *s)
 {
     free(s->name);
     free(s->emit_name);
@@ -204,7 +204,7 @@ static void free_string_list(struct string_list *list)
     free(list);
 }
 
-static void free_syntax(struct syntax *syn)
+static void free_syntax(Syntax *syn)
 {
     ptr_array_free_cb(&syn->states, FREE_FUNC(free_state));
     ptr_array_free_cb(&syn->string_lists, FREE_FUNC(free_string_list));
@@ -214,7 +214,7 @@ static void free_syntax(struct syntax *syn)
     free(syn);
 }
 
-void finalize_syntax(struct syntax *syn, int saved_nr_errors)
+void finalize_syntax(Syntax *syn, int saved_nr_errors)
 {
     int i;
 
@@ -222,7 +222,7 @@ void finalize_syntax(struct syntax *syn, int saved_nr_errors)
         error_msg("Empty syntax");
 
     for (i = 0; i < syn->states.count; i++) {
-        struct state *s = syn->states.ptrs[i];
+        State *s = syn->states.ptrs[i];
         if (!s->defined) {
             // This state has been referenced but not defined
             error_msg("No such state %s", s->name);
@@ -248,7 +248,7 @@ void finalize_syntax(struct syntax *syn, int saved_nr_errors)
     // Unused states and lists cause warning only
     visit(syn->states.ptrs[0]);
     for (i = 0; i < syn->states.count; i++) {
-        struct state *s = syn->states.ptrs[i];
+        State *s = syn->states.ptrs[i];
         if (!s->visited && !s->copied)
             error_msg("State %s is unreachable", s->name);
     }
@@ -261,15 +261,15 @@ void finalize_syntax(struct syntax *syn, int saved_nr_errors)
     ptr_array_add(&syntaxes, syn);
 }
 
-struct syntax *find_syntax(const char *name)
+Syntax *find_syntax(const char *name)
 {
-    struct syntax *syn = find_any_syntax(name);
+    Syntax *syn = find_any_syntax(name);
     if (syn && is_subsyntax(syn))
         return NULL;
     return syn;
 }
 
-static const char *find_default_color(struct syntax *syn, const char *name)
+static const char *find_default_color(Syntax *syn, const char *name)
 {
     int i, j;
 
@@ -283,7 +283,7 @@ static const char *find_default_color(struct syntax *syn, const char *name)
     return NULL;
 }
 
-static void update_action_color(struct syntax *syn, struct action *a)
+static void update_action_color(Syntax *syn, Action *a)
 {
     const char *name = a->emit_name;
     const char *def;
@@ -305,7 +305,7 @@ static void update_action_color(struct syntax *syn, struct action *a)
     a->emit_color = find_color(full);
 }
 
-static void update_state_colors(struct syntax *syn, struct state *s)
+static void update_state_colors(Syntax *syn, State *s)
 {
     int i;
 
@@ -316,7 +316,7 @@ static void update_state_colors(struct syntax *syn, struct state *s)
     update_action_color(syn, &s->a);
 }
 
-void update_syntax_colors(struct syntax *syn)
+void update_syntax_colors(Syntax *syn)
 {
     int i;
 
@@ -342,7 +342,7 @@ void find_unused_subsyntaxes(void)
     static int i;
 
     for (; i < syntaxes.count; i++) {
-        struct syntax *s = syntaxes.ptrs[i];
+        Syntax *s = syntaxes.ptrs[i];
         if (!s->used && is_subsyntax(s))
             error_msg("Subsyntax %s is unused", s->name);
     }

@@ -32,8 +32,8 @@ static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
     }
 }
 
-static struct syntax *current_syntax;
-static struct state *current_state;
+static Syntax *current_syntax;
+static State *current_state;
 static int saved_nr_errors; // Used to check if nr_errors changed
 
 static bool no_syntax(void)
@@ -66,14 +66,14 @@ static void close_state(void)
     current_state = NULL;
 }
 
-static struct state *find_or_add_state(const char *name)
+static State *find_or_add_state(const char *name)
 {
-    struct state *st = find_state(current_syntax, name);
+    State *st = find_state(current_syntax, name);
 
     if (st)
         return st;
 
-    st = xnew0(struct state, 1);
+    st = xnew0(State, 1);
     st->name = xstrdup(name);
     st->defined = false;
     st->type = STATE_INVALID;
@@ -81,7 +81,7 @@ static struct state *find_or_add_state(const char *name)
     return st;
 }
 
-static struct state *reference_state(const char *name)
+static State *reference_state(const char *name)
 {
     if (streq(name, "this"))
         return current_state;
@@ -96,9 +96,9 @@ static bool not_subsyntax(void)
     return true;
 }
 
-static bool subsyntax_call(const char *name, const char *ret, struct state **dest)
+static bool subsyntax_call(const char *name, const char *ret, State **dest)
 {
-    struct syntax_merge m = {
+    SyntaxMerge m = {
         .subsyn = find_any_syntax(name),
         .return_state = NULL,
         .delim = NULL,
@@ -124,7 +124,7 @@ static bool subsyntax_call(const char *name, const char *ret, struct state **des
     return ok;
 }
 
-static bool destination_state(const char *name, struct state **dest)
+static bool destination_state(const char *name, State **dest)
 {
     char *sep = strchr(name, ':');
 
@@ -148,7 +148,7 @@ static bool destination_state(const char *name, struct state **dest)
 static struct condition *add_condition(enum condition_type type, const char *dest, const char *emit)
 {
     struct condition *c;
-    struct state *d = NULL;
+    State *d = NULL;
 
     if (no_state())
         return NULL;
@@ -238,7 +238,7 @@ static void cmd_eat(const char *pf, char **args)
 static void cmd_heredocbegin(const char *pf, char **args)
 {
     const char *sub;
-    struct syntax *subsyn;
+    Syntax *subsyn;
 
     if (no_state())
         return;
@@ -372,7 +372,7 @@ static void cmd_state(const char *pf, char **args)
 {
     const char *name = args[0];
     const char *emit = args[1] ? args[1] : args[0];
-    struct state *s;
+    State *s;
 
     close_state();
     if (no_syntax())
@@ -426,7 +426,7 @@ static void cmd_syntax(const char *pf, char **args)
     if (current_syntax)
         finish_syntax();
 
-    current_syntax = xnew0(struct syntax, 1);
+    current_syntax = xnew0(Syntax, 1);
     current_syntax->name = xstrdup(args[0]);
     current_state = NULL;
 
@@ -450,11 +450,11 @@ static const struct command syntax_commands[] = {
     {NULL, NULL, 0,  0, NULL}
 };
 
-struct syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
+Syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
 {
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
-    struct syntax *syn;
+    Syntax *syn;
 
     *err = do_read_config(syntax_commands, filename, must_exist);
     if (*err) {
@@ -477,9 +477,9 @@ struct syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
     return syn;
 }
 
-struct syntax *load_syntax_by_filetype(const char *filetype)
+Syntax *load_syntax_by_filetype(const char *filetype)
 {
-    struct syntax *syn;
+    Syntax *syn;
     char *filename = xsprintf("%s/syntax/%s", user_config_dir, filetype);
     int err;
 

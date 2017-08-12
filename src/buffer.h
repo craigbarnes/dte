@@ -7,6 +7,7 @@
 #include "common.h"
 #include "ptr-array.h"
 #include "change.h"
+#include "syntax.h"
 
 struct change {
     struct change *next;
@@ -56,7 +57,7 @@ typedef struct buffer {
 
     LocalOptions options;
 
-    struct syntax *syn;
+    Syntax *syn;
     // Index 0 is always syn->states.ptrs[0].
     // Lowest bit of an invalidated value is 1.
     PointerArray line_start_states;
