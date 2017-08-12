@@ -29,7 +29,7 @@ void set_builtin_color(enum builtin_color c)
     set_color(builtin_colors[c]);
 }
 
-static const char *format_misc_status(struct window *win)
+static const char *format_misc_status(Window *win)
 {
     static char misc_status[32] = {'\0'};
 
@@ -54,7 +54,7 @@ static const char *format_misc_status(struct window *win)
     return misc_status;
 }
 
-void update_status_line(struct window *win)
+void update_status_line(Window *win)
 {
     struct formatter f;
     char lbuf[256];
@@ -195,7 +195,7 @@ void mask_color(struct term_color *color, const struct term_color *over)
         color->attr = over->attr;
 }
 
-static void print_separator(struct window *win)
+static void print_separator(Window *win)
 {
     int y;
 
@@ -214,9 +214,9 @@ void update_separators(void)
     for_each_window(print_separator);
 }
 
-void update_line_numbers(struct window *win, bool force)
+void update_line_numbers(Window *win, bool force)
 {
-    struct view *v = win->view;
+    View *v = win->view;
     long lines = v->buffer->nl;
     int i, first, last;
     int x = win->x + vertical_tabbar_width(win);

@@ -734,7 +734,7 @@ static void cmd_quit(const char *pf, char **args)
         struct buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
-            struct view *v = window_find_view(window, b);
+            View *v = window_find_view(window, b);
 
             if (v == NULL) {
                 // Buffer isn't open in current window.
@@ -1380,7 +1380,7 @@ static void cmd_view(const char *pf, char **args)
 
 static void cmd_wclose(const char *pf, char **args)
 {
-    struct view *v = window_find_unclosable_view(window, view_can_close);
+    View *v = window_find_unclosable_view(window, view_can_close);
     bool force = !!*pf;
 
     if (v != NULL && !force) {
@@ -1394,7 +1394,7 @@ static void cmd_wclose(const char *pf, char **args)
 
 static void cmd_wflip(const char *pf, char **args)
 {
-    struct frame *f = window->frame;
+    Frame *f = window->frame;
 
     if (f->parent == NULL)
         return;
@@ -1472,8 +1472,8 @@ static void cmd_wsplit(const char *pf, char **args)
     bool before = false;
     bool vertical = false;
     bool root = false;
-    struct frame *f;
-    struct view *save;
+    Frame *f;
+    View *save;
 
     while (*pf) {
         switch (*pf) {
@@ -1507,7 +1507,7 @@ static void cmd_wsplit(const char *pf, char **args)
     if (*args) {
         window_open_files(window, args, NULL);
     } else {
-        struct view *new = window_add_buffer(window, save->buffer);
+        View *new = window_add_buffer(window, save->buffer);
         new->cursor = save->cursor;
         set_view(new);
     }
@@ -1526,7 +1526,7 @@ static void cmd_wsplit(const char *pf, char **args)
 
 static void cmd_wswap(const char *pf, char **args)
 {
-    struct frame *tmp, *parent = window->frame->parent;
+    Frame *tmp, *parent = window->frame->parent;
     int i, j;
 
     if (parent == NULL)

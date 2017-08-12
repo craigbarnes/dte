@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
                 error_msg("Invalid line number: '%s'", &argv[i][1]);
             }
         } else {
-            struct view *v = window_open_buffer(window, argv[i], false, NULL);
+            View *v = window_open_buffer(window, argv[i], false, NULL);
             if (lineno > 0) {
                 set_view(v);
                 move_to_line(v, lineno);

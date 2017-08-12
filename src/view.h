@@ -10,7 +10,7 @@ enum selection {
     SELECT_LINES,
 };
 
-struct view {
+typedef struct view {
     struct buffer *buffer;
     struct window *window;
 
@@ -55,18 +55,18 @@ struct view {
     // sharing same buffer.
     bool restore_cursor;
     long saved_cursor_offset;
-};
+} View;
 
-static inline void view_reset_preferred_x(struct view *v)
+static inline void view_reset_preferred_x(View *v)
 {
     v->preferred_x = -1;
 }
 
-void view_update_cursor_y(struct view *v);
-void view_update_cursor_x(struct view *v);
-void view_update(struct view *v);
-int view_get_preferred_x(struct view *v);
-bool view_can_close(struct view *v);
-char *view_get_word_under_cursor(struct view *v);
+void view_update_cursor_y(View *v);
+void view_update_cursor_x(View *v);
+void view_update(View *v);
+int view_get_preferred_x(View *v);
+bool view_can_close(View *v);
+char *view_get_word_under_cursor(View *v);
 
 #endif

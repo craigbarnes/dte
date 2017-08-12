@@ -148,13 +148,13 @@ void move_eof(void)
     view_reset_preferred_x(view);
 }
 
-void move_to_line(struct view *v, int line)
+void move_to_line(View *v, int line)
 {
     block_iter_goto_line(&v->cursor, line - 1);
     v->center_on_scroll = true;
 }
 
-void move_to_column(struct view *v, int column)
+void move_to_column(View *v, int column)
 {
     block_iter_bol(&v->cursor);
     while (column-- > 1) {

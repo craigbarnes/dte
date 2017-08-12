@@ -8,7 +8,7 @@ static int tab_title_width(int number, const char *filename)
     return 3 + number_width(number) + u_str_width(filename);
 }
 
-static void update_tab_title_width(struct view *v, int tab_number)
+static void update_tab_title_width(View *v, int tab_number)
 {
     int w = tab_title_width(tab_number, buffer_filename(v->buffer));
 
@@ -16,13 +16,13 @@ static void update_tab_title_width(struct view *v, int tab_number)
     v->tt_truncated_width = w;
 }
 
-static void update_first_tab_idx(struct window *win)
+static void update_first_tab_idx(Window *win)
 {
     int min_first_idx, max_first_idx, w;
 
     w = 0;
     for (max_first_idx = win->views.count; max_first_idx > 0; max_first_idx--) {
-        struct view *v = win->views.ptrs[max_first_idx - 1];
+        View *v = win->views.ptrs[max_first_idx - 1];
         w += v->tt_truncated_width;
         if (w > win->w)
             break;
@@ -30,7 +30,7 @@ static void update_first_tab_idx(struct window *win)
 
     w = 0;
     for (min_first_idx = win->views.count; min_first_idx > 0; min_first_idx--) {
-        struct view *v = win->views.ptrs[min_first_idx - 1];
+        View *v = win->views.ptrs[min_first_idx - 1];
         if (w || v == win->view)
             w += v->tt_truncated_width;
         if (w > win->w)
@@ -43,12 +43,12 @@ static void update_first_tab_idx(struct window *win)
         win->first_tab_idx = max_first_idx;
 }
 
-void calculate_tabbar(struct window *win)
+void calculate_tabbar(Window *win)
 {
     int extra, i, truncated_count, total_w = 0;
 
     for (i = 0; i < win->views.count; i++) {
-        struct view *v = win->views.ptrs[i];
+        View *v = win->views.ptrs[i];
 
         if (v == win->view) {
             // Make sure current tab is visible
@@ -69,7 +69,7 @@ void calculate_tabbar(struct window *win)
     total_w = 0;
     truncated_count = 0;
     for (i = 0; i < win->views.count; i++) {
-        struct view *v = win->views.ptrs[i];
+        View *v = win->views.ptrs[i];
         int truncated_w = 20;
 
         if (v->tt_width > truncated_w) {
@@ -96,7 +96,7 @@ void calculate_tabbar(struct window *win)
         int extra_mod = extra % truncated_count;
 
         for (i = 0; i < win->views.count; i++) {
-            struct view *v = win->views.ptrs[i];
+            View *v = win->views.ptrs[i];
             int add = v->tt_width - v->tt_truncated_width;
             int avail;
 

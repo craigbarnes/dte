@@ -159,7 +159,7 @@ static void fix_cursors(long offset, long del, long ins)
     int i;
 
     for (i = 0; i < buffer->views.count; i++) {
-        struct view *v = buffer->views.ptrs[i];
+        View *v = buffer->views.ptrs[i];
 
         if (v != view && offset < v->saved_cursor_offset) {
             if (offset + del <= v->saved_cursor_offset) {

@@ -2,7 +2,7 @@
 #include "buffer.h"
 #include "view.h"
 
-void init_selection(struct view *v, struct selection_info *info)
+void init_selection(View *v, struct selection_info *info)
 {
     struct block_iter ei;
     unsigned int u;
@@ -36,7 +36,7 @@ void init_selection(struct view *v, struct selection_info *info)
     }
 }
 
-long prepare_selection(struct view *v)
+long prepare_selection(View *v)
 {
     struct selection_info info;
     init_selection(v, &info);
@@ -44,7 +44,7 @@ long prepare_selection(struct view *v)
     return info.eo - info.so;
 }
 
-char *view_get_selection(struct view *v, long *size)
+char *view_get_selection(View *v, long *size)
 {
     char *buf = NULL;
 

@@ -8,16 +8,16 @@
 #include "move.h"
 #include "frame.h"
 
-struct window *window;
+Window *window;
 
-struct window *new_window(void)
+Window *new_window(void)
 {
-    return xnew0(struct window, 1);
+    return xnew0(Window, 1);
 }
 
-struct view *window_add_buffer(struct window *w, struct buffer *b)
+View *window_add_buffer(Window *w, struct buffer *b)
 {
-    struct view *v = xnew0(struct view, 1);
+    View *v = xnew0(View, 1);
 
     v->buffer = b;
     v->window = w;
@@ -30,12 +30,12 @@ struct view *window_add_buffer(struct window *w, struct buffer *b)
     return v;
 }
 
-struct view *window_open_empty_buffer(struct window *w)
+View *window_open_empty_buffer(Window *w)
 {
     return window_add_buffer(w, open_empty_buffer());
 }
 
-struct view *window_open_buffer(struct window *w, const char *filename, bool must_exist, const char *encoding)
+View *window_open_buffer(Window *w, const char *filename, bool must_exist, const char *encoding)
 {
     char *absolute;
     bool dir_missing = false;
@@ -116,21 +116,21 @@ struct view *window_open_buffer(struct window *w, const char *filename, bool mus
     return window_add_buffer(w, b);
 }
 
-struct view *window_get_view(struct window *w, struct buffer *b)
+View *window_get_view(Window *w, struct buffer *b)
 {
-    struct view *v = window_find_view(w, b);
+    View *v = window_find_view(w, b);
 
     if (v == NULL) {
         // Open the buffer in other window to this window
         v = window_add_buffer(w, b);
-        v->cursor = ((struct view *)b->views.ptrs[0])->cursor;
+        v->cursor = ((View *)b->views.ptrs[0])->cursor;
     }
     return v;
 }
 
-struct view *window_find_view(struct window *w, struct buffer *b)
+View *window_find_view(Window *w, struct buffer *b)
 {
-    struct view *v;
+    View *v;
     int i;
 
     for (i = 0; i < b->views.count; i++) {
@@ -143,7 +143,7 @@ struct view *window_find_view(struct window *w, struct buffer *b)
     return NULL;
 }
 
-struct view *window_find_unclosable_view(struct window *w, bool (*can_close)(struct view *))
+View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
 {
     long i;
 
@@ -152,7 +152,7 @@ struct view *window_find_unclosable_view(struct window *w, bool (*can_close)(str
         return w->view;
     }
     for (i = 0; i < w->views.count; i++) {
-        struct view *v = w->views.ptrs[i];
+        View *v = w->views.ptrs[i];
         if (!can_close(v)) {
             return v;
         }
@@ -160,16 +160,16 @@ struct view *window_find_unclosable_view(struct window *w, bool (*can_close)(str
     return NULL;
 }
 
-void window_remove_views(struct window *w)
+void window_remove_views(Window *w)
 {
     while (w->views.count > 0) {
-        struct view *v = w->views.ptrs[w->views.count - 1];
+        View *v = w->views.ptrs[w->views.count - 1];
         remove_view(v);
     }
 }
 
 // NOTE: w->frame isn't removed
-void window_free(struct window *w)
+void window_free(Window *w)
 {
     window_remove_views(w);
     free(w->views.ptrs);
@@ -178,9 +178,9 @@ void window_free(struct window *w)
 }
 
 // Remove view from v->window and v->buffer->views and free it.
-void remove_view(struct view *v)
+void remove_view(View *v)
 {
-    struct window *w = v->window;
+    Window *w = v->window;
     struct buffer *b = v->buffer;
 
     if (v == w->prev_view) {
@@ -206,7 +206,7 @@ void remove_view(struct view *v)
 
 void window_close_current(void)
 {
-    struct window *next;
+    Window *next;
 
     if (window->frame->parent == NULL) {
         // Don't close last window
@@ -224,7 +224,7 @@ void window_close_current(void)
     debug_frames();
 }
 
-void window_close_current_view(struct window *w)
+void window_close_current_view(Window *w)
 {
     long idx = ptr_array_idx(&w->views, w->view);
 
@@ -241,7 +241,7 @@ void window_close_current_view(struct window *w)
     w->view = w->views.ptrs[idx];
 }
 
-static void restore_cursor_from_history(struct view *v)
+static void restore_cursor_from_history(View *v)
 {
     int row, col;
 
@@ -251,7 +251,7 @@ static void restore_cursor_from_history(struct view *v)
     }
 }
 
-void set_view(struct view *v)
+void set_view(View *v)
 {
     int i;
 
@@ -286,7 +286,7 @@ void set_view(struct view *v)
 
     // Save cursor states of views sharing same buffer
     for (i = 0; i < v->buffer->views.count; i++) {
-        struct view *other = v->buffer->views.ptrs[i];
+        View *other = v->buffer->views.ptrs[i];
         if (other != v) {
             other->saved_cursor_offset = block_iter_get_offset(&other->cursor);
             other->restore_cursor = true;
@@ -294,10 +294,10 @@ void set_view(struct view *v)
     }
 }
 
-struct view *window_open_new_file(struct window *w)
+View *window_open_new_file(Window *w)
 {
-    struct view *prev = w->view;
-    struct view *v = window_open_empty_buffer(w);
+    View *prev = w->view;
+    View *v = window_open_empty_buffer(w);
 
     // FIXME: should not call set_view()
     set_view(v);
@@ -311,7 +311,7 @@ closed after opening another file. This is done because closing last
 buffer causes an empty buffer to be opened (window must contain at least
 one buffer).
 */
-static bool is_useless_empty_view(struct view *v)
+static bool is_useless_empty_view(View *v)
 {
     if (v == NULL)
         return false;
@@ -323,11 +323,11 @@ static bool is_useless_empty_view(struct view *v)
     return true;
 }
 
-struct view *window_open_file(struct window *w, const char *filename, const char *encoding)
+View *window_open_file(Window *w, const char *filename, const char *encoding)
 {
-    struct view *prev = w->view;
+    View *prev = w->view;
     bool useless = is_useless_empty_view(prev);
-    struct view *v = window_open_buffer(w, filename, false, encoding);
+    View *v = window_open_buffer(w, filename, false, encoding);
 
     if (v == NULL)
         return NULL;
@@ -342,15 +342,15 @@ struct view *window_open_file(struct window *w, const char *filename, const char
     return v;
 }
 
-void window_open_files(struct window *w, char **filenames, const char *encoding)
+void window_open_files(Window *w, char **filenames, const char *encoding)
 {
-    struct view *empty = w->view;
+    View *empty = w->view;
     bool useless = is_useless_empty_view(empty);
     bool first = true;
     int i;
 
     for (i = 0; filenames[i]; i++) {
-        struct view *v = window_open_buffer(w, filenames[i], false, encoding);
+        View *v = window_open_buffer(w, filenames[i], false, encoding);
         if (v && first) {
             // FIXME: should not call set_view()
             set_view(v);
@@ -366,12 +366,12 @@ void mark_buffer_tabbars_changed(struct buffer *b)
 {
     long i;
     for (i = 0; i < b->views.count; i++) {
-        struct view *v = b->views.ptrs[i];
+        View *v = b->views.ptrs[i];
         v->window->update_tabbar = true;
     }
 }
 
-static int calc_vertical_tabbar_width(struct window *win)
+static int calc_vertical_tabbar_width(Window *win)
 {
     // Line numbers are included in min_edit_w
     int min_edit_w = 80;
@@ -384,7 +384,7 @@ static int calc_vertical_tabbar_width(struct window *win)
     return w;
 }
 
-enum tab_bar tabbar_visibility(struct window *win)
+enum tab_bar tabbar_visibility(Window *win)
 {
     switch (options.tab_bar) {
     case TAB_BAR_HIDDEN:
@@ -406,7 +406,7 @@ enum tab_bar tabbar_visibility(struct window *win)
     return 0;
 }
 
-int vertical_tabbar_width(struct window *win)
+int vertical_tabbar_width(Window *win)
 {
     if (tabbar_visibility(win) == TAB_BAR_VERTICAL) {
         return calc_vertical_tabbar_width(win);
@@ -414,7 +414,7 @@ int vertical_tabbar_width(struct window *win)
     return 0;
 }
 
-static int line_numbers_width(struct window *win)
+static int line_numbers_width(Window *win)
 {
     int w = 0, min_w = 5;
 
@@ -426,12 +426,12 @@ static int line_numbers_width(struct window *win)
     return w;
 }
 
-static int edit_x_offset(struct window *win)
+static int edit_x_offset(Window *win)
 {
     return line_numbers_width(win) + vertical_tabbar_width(win);
 }
 
-static int edit_y_offset(struct window *win)
+static int edit_y_offset(Window *win)
 {
     if (tabbar_visibility(win) == TAB_BAR_HORIZONTAL) {
         return 1;
@@ -439,7 +439,7 @@ static int edit_y_offset(struct window *win)
     return 0;
 }
 
-static void set_edit_size(struct window *win)
+static void set_edit_size(Window *win)
 {
     int xo = edit_x_offset(win);
     int yo = edit_y_offset(win);
@@ -449,7 +449,7 @@ static void set_edit_size(struct window *win)
     win->edit_x = win->x + xo;
 }
 
-void calculate_line_numbers(struct window *win)
+void calculate_line_numbers(Window *win)
 {
     int w = line_numbers_width(win);
 
@@ -462,7 +462,7 @@ void calculate_line_numbers(struct window *win)
     set_edit_size(win);
 }
 
-void set_window_coordinates(struct window *win, int x, int y)
+void set_window_coordinates(Window *win, int x, int y)
 {
     win->x = x;
     win->y = y;
@@ -470,14 +470,14 @@ void set_window_coordinates(struct window *win, int x, int y)
     win->edit_y = y + edit_y_offset(win);
 }
 
-void set_window_size(struct window *win, int w, int h)
+void set_window_size(Window *win, int w, int h)
 {
     win->w = w;
     win->h = h;
     calculate_line_numbers(win);
 }
 
-int window_get_scroll_margin(struct window *w)
+int window_get_scroll_margin(Window *w)
 {
     int max = (w->edit_h - 1) / 2;
 
@@ -486,7 +486,7 @@ int window_get_scroll_margin(struct window *w)
     return options.scroll_margin;
 }
 
-static void frame_for_each_window(struct frame *f, void (*func)(struct window *, void *), void *data)
+static void frame_for_each_window(Frame *f, void (*func)(Window *, void *), void *data)
 {
     int i;
 
@@ -499,28 +499,28 @@ static void frame_for_each_window(struct frame *f, void (*func)(struct window *,
     }
 }
 
-static void for_each_window_data(void (*func)(struct window *, void *), void *data)
+static void for_each_window_data(void (*func)(Window *, void *), void *data)
 {
     frame_for_each_window(root_frame, func, data);
 }
 
-static void call_data(struct window *w, void *data)
+static void call_data(Window *w, void *data)
 {
-    void (*func)(struct window *) = data;
+    void (*func)(Window *) = data;
     func(w);
 }
 
-void for_each_window(void (*func)(struct window *w))
+void for_each_window(void (*func)(Window *w))
 {
     for_each_window_data(call_data, func);
 }
 
-static void collect_window(struct window *w, void *data)
+static void collect_window(Window *w, void *data)
 {
     ptr_array_add(data, w);
 }
 
-struct window *prev_window(struct window *w)
+Window *prev_window(Window *w)
 {
     PointerArray windows = PTR_ARRAY_NEW();
     for_each_window_data(collect_window, &windows);
@@ -529,7 +529,7 @@ struct window *prev_window(struct window *w)
     return w;
 }
 
-struct window *next_window(struct window *w)
+Window *next_window(Window *w)
 {
     PointerArray windows = PTR_ARRAY_NEW();
     for_each_window_data(collect_window, &windows);

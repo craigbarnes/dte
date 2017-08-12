@@ -24,7 +24,7 @@ int cmdline_x;
 
 static void sanity_check(void)
 {
-    struct view *v = window->view;
+    View *v = window->view;
     struct block *blk;
 
     if (!DEBUG)
@@ -85,9 +85,9 @@ static void update_command_line(void)
     buf_clear_eol();
 }
 
-static void update_window_full(struct window *w)
+static void update_window_full(Window *w)
 {
-    struct view *v = w->view;
+    View *v = w->view;
 
     view_update_cursor_x(v);
     view_update_cursor_y(v);
@@ -101,7 +101,7 @@ static void update_window_full(struct window *w)
 
 static void restore_cursor(void)
 {
-    struct view *v = window->view;
+    View *v = window->view;
     switch (input_mode) {
     case INPUT_NORMAL:
         buf_move_cursor(
@@ -122,7 +122,7 @@ static void start_update(void)
     buf_hide_cursor();
 }
 
-static void clear_update_tabbar(struct window *w)
+static void clear_update_tabbar(Window *w)
 {
     w->update_tabbar = false;
 }
@@ -145,9 +145,9 @@ static void update_all_windows(void)
     update_separators();
 }
 
-static void update_window(struct window *w)
+static void update_window(Window *w)
 {
-    struct view *v = w->view;
+    View *v = w->view;
     int y1, y2;
 
     if (w->update_tabbar)
@@ -175,7 +175,7 @@ static void update_buffer_windows(struct buffer *b)
     long i;
 
     for (i = 0; i < b->views.count; i++) {
-        struct view *v = b->views.ptrs[i];
+        View *v = b->views.ptrs[i];
         if (v->window->view == v) {
             // Visible view
             if (v != window->view) {
@@ -258,7 +258,7 @@ char *editor_file(const char *name)
 
 char get_confirmation(const char *choices, const char *format, ...)
 {
-    struct view *v = window->view;
+    View *v = window->view;
     char buf[4096];
     unsigned int key;
     int pos, i, count = strlen(choices);
@@ -333,7 +333,7 @@ struct screen_state {
     int vy;
 };
 
-static void save_state(struct screen_state *s, struct view *v)
+static void save_state(struct screen_state *s, View *v)
 {
     s->is_modified = buffer_modified(v->buffer);
     s->id = v->buffer->id;
@@ -344,7 +344,7 @@ static void save_state(struct screen_state *s, struct view *v)
 
 static void update_screen(struct screen_state *s)
 {
-    struct view *v = window->view;
+    View *v = window->view;
     struct buffer *b = v->buffer;
 
     if (everything_changed) {

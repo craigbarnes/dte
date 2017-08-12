@@ -60,7 +60,7 @@ static void add_status_pos(struct formatter *f)
     }
 }
 
-void sf_init(struct formatter *f, struct window *win)
+void sf_init(struct formatter *f, Window *win)
 {
     clear(f);
     f->win = win;
@@ -68,7 +68,7 @@ void sf_init(struct formatter *f, struct window *win)
 
 void sf_format(struct formatter *f, char *buf, long size, const char *format)
 {
-    struct view *v = f->win->view;
+    View *v = f->win->view;
     bool got_char;
     unsigned int u;
 

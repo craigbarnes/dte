@@ -2,16 +2,18 @@
 #define WINDOW_H
 
 #include "buffer.h"
+#include "frame.h"
+#include "view.h"
 
-struct window {
+typedef struct window {
     PointerArray views;
-    struct frame *frame;
+    Frame *frame;
 
     // Current view
-    struct view *view;
+    View *view;
 
     // Previous view if set
-    struct view *prev_view;
+    View *prev_view;
 
     // Coordinates and size of entire window including tabbar and status line
     int x, y;
@@ -30,35 +32,35 @@ struct window {
     int first_tab_idx;
 
     bool update_tabbar;
-};
+} Window;
 
-extern struct window *window;
+extern Window *window;
 
-struct window *new_window(void);
-struct view *window_add_buffer(struct window *w, struct buffer *b);
-struct view *window_open_empty_buffer(struct window *w);
-struct view *window_open_buffer(struct window *w, const char *filename, bool must_exist, const char *encoding);
-struct view *window_get_view(struct window *w, struct buffer *b);
-struct view *window_find_view(struct window *w, struct buffer *b);
-struct view *window_find_unclosable_view(struct window *w, bool (*can_close)(struct view *));
-void window_remove_views(struct window *w);
-void window_free(struct window *w);
-void remove_view(struct view *v);
+Window *new_window(void);
+View *window_add_buffer(Window *w, struct buffer *b);
+View *window_open_empty_buffer(Window *w);
+View *window_open_buffer(Window *w, const char *filename, bool must_exist, const char *encoding);
+View *window_get_view(Window *w, struct buffer *b);
+View *window_find_view(Window *w, struct buffer *b);
+View *window_find_unclosable_view(Window *w, bool (*can_close)(View *));
+void window_remove_views(Window *w);
+void window_free(Window *w);
+void remove_view(View *v);
 void window_close_current(void);
-void window_close_current_view(struct window *w);
-void set_view(struct view *v);
-struct view *window_open_new_file(struct window *w);
-struct view *window_open_file(struct window *w, const char *filename, const char *encoding);
-void window_open_files(struct window *w, char **filenames, const char *encoding);
+void window_close_current_view(Window *w);
+void set_view(View *v);
+View *window_open_new_file(Window *w);
+View *window_open_file(Window *w, const char *filename, const char *encoding);
+void window_open_files(Window *w, char **filenames, const char *encoding);
 void mark_buffer_tabbars_changed(struct buffer *b);
-enum tab_bar tabbar_visibility(struct window *win);
-int vertical_tabbar_width(struct window *win);
-void calculate_line_numbers(struct window *win);
-void set_window_coordinates(struct window *win, int x, int y);
-void set_window_size(struct window *win, int w, int h);
-int window_get_scroll_margin(struct window *w);
-void for_each_window(void (*func)(struct window *w));
-struct window *prev_window(struct window *w);
-struct window *next_window(struct window *w);
+enum tab_bar tabbar_visibility(Window *win);
+int vertical_tabbar_width(Window *win);
+void calculate_line_numbers(Window *win);
+void set_window_coordinates(Window *win, int x, int y);
+void set_window_size(Window *win, int w, int h);
+int window_get_scroll_margin(Window *w);
+void for_each_window(void (*func)(Window *w));
+Window *prev_window(Window *w);
+Window *next_window(Window *w);
 
 #endif

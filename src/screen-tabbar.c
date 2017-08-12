@@ -4,7 +4,7 @@
 #include "obuf.h"
 #include "view.h"
 
-static void print_horizontal_tab_title(struct view *v, int idx)
+static void print_horizontal_tab_title(View *v, int idx)
 {
     int skip = v->tt_width - v->tt_truncated_width;
     const char *filename = buffer_filename(v->buffer);
@@ -31,7 +31,7 @@ static void print_horizontal_tab_title(struct view *v, int idx)
         buf_put_char(' ');
 }
 
-static void print_horizontal_tabbar(struct window *win)
+static void print_horizontal_tabbar(Window *win)
 {
     int i;
 
@@ -40,7 +40,7 @@ static void print_horizontal_tabbar(struct window *win)
 
     calculate_tabbar(win);
     for (i = win->first_tab_idx; i < win->views.count; i++) {
-        struct view *v = win->views.ptrs[i];
+        View *v = win->views.ptrs[i];
 
         if (obuf.x + v->tt_truncated_width > win->w)
             break;
@@ -57,7 +57,7 @@ static void print_horizontal_tabbar(struct window *win)
     }
 }
 
-static void print_vertical_tab_title(struct view *v, int idx, int width)
+static void print_vertical_tab_title(View *v, int idx, int width)
 {
     const char *orig_filename = buffer_filename(v->buffer);
     const char *filename = orig_filename;
@@ -108,7 +108,7 @@ static void print_vertical_tab_title(struct view *v, int idx, int width)
     buf_clear_eol();
 }
 
-static void print_vertical_tabbar(struct window *win)
+static void print_vertical_tabbar(Window *win)
 {
     int width = vertical_tabbar_width(win);
     int h = win->edit_h;
@@ -150,7 +150,7 @@ static void print_vertical_tabbar(struct window *win)
     }
 }
 
-void print_tabbar(struct window *win)
+void print_tabbar(Window *win)
 {
     switch (tabbar_visibility(win)) {
     case TAB_BAR_HORIZONTAL:

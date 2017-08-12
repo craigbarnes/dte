@@ -16,7 +16,7 @@ static char *expand_dte_home(void)
 
 static char *expand_file(void)
 {
-    struct view *v = window->view;
+    View *v = window->view;
 
     if (v->buffer->abs_filename == NULL) {
         return xstrdup("");
@@ -31,7 +31,7 @@ static char *expand_pkgdatadir(void)
 
 static char *expand_word(void)
 {
-    struct view *v = window->view;
+    View *v = window->view;
     long size;
     char *str = view_get_selection(v, &size);
 

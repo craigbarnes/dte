@@ -6,7 +6,7 @@
 #include "hl.h"
 
 struct line_info {
-    struct view *view;
+    View *view;
     long line_nr;
     long offset;
     long sel_so;
@@ -70,7 +70,7 @@ static int get_ws_error_option(struct buffer *b)
 
 static bool whitespace_error(struct line_info *info, unsigned int u, long i)
 {
-    struct view *v = info->view;
+    View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
 
     if (i >= info->trailing_ws_offset && flags & WSE_TRAILING) {
@@ -234,7 +234,7 @@ static void hl_words(struct line_info *info)
     }
 }
 
-static void line_info_init(struct line_info *info, struct view *v, struct block_iter *bi, long line_nr)
+static void line_info_init(struct line_info *info, View *v, struct block_iter *bi, long line_nr)
 {
     memset(info, 0, sizeof(*info));
     info->view = v;
@@ -328,7 +328,7 @@ static void print_line(struct line_info *info)
     buf_clear_eol();
 }
 
-void update_range(struct view *v, int y1, int y2)
+void update_range(View *v, int y1, int y2)
 {
     struct line_info info;
     struct block_iter bi = v->cursor;

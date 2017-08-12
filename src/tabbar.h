@@ -3,6 +3,6 @@
 
 #include "window.h"
 
-void calculate_tabbar(struct window *win);
+void calculate_tabbar(Window *win);
 
 #endif

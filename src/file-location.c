@@ -6,7 +6,7 @@
 
 static PointerArray file_locations = PTR_ARRAY_NEW();
 
-struct file_location *create_file_location(struct view *v)
+struct file_location *create_file_location(View *v)
 {
     struct file_location *loc;
 
@@ -47,8 +47,8 @@ bool file_location_equals(const struct file_location *a, const struct file_locat
 
 bool file_location_go(struct file_location *loc)
 {
-    struct window *w = window;
-    struct view *v = window_open_buffer(w, loc->filename, true, NULL);
+    Window *w = window;
+    View *v = window_open_buffer(w, loc->filename, true, NULL);
     bool ok = true;
 
     if (!v) {
@@ -75,9 +75,9 @@ bool file_location_go(struct file_location *loc)
 
 bool file_location_return(struct file_location *loc)
 {
-    struct window *w = window;
+    Window *w = window;
     struct buffer *b = find_buffer_by_id(loc->buffer_id);
-    struct view *v;
+    View *v;
 
     if (b != NULL) {
         v = window_get_view(w, b);
