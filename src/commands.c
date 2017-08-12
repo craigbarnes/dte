@@ -181,7 +181,7 @@ static void cmd_command(const char *pf, char **args)
 
 static void cmd_compile(const char *pf, char **args)
 {
-    struct compiler *c;
+    Compiler *c;
     unsigned int flags = 0;
     const char *name;
 
@@ -350,7 +350,7 @@ static void cmd_ft(const char *pf, char **args)
 
 static void cmd_filter(const char *pf, char **args)
 {
-    struct filter_data data;
+    FilterData data;
     BlockIter save = view->cursor;
 
     if (view->selection) {
@@ -643,7 +643,7 @@ static void cmd_option(const char *pf, char **args)
 
 static void cmd_pass_through(const char *pf, char **args)
 {
-    struct filter_data data;
+    FilterData data;
     long del_len = 0;
     bool strip_nl = false;
     bool move = false;

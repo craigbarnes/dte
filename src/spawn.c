@@ -8,7 +8,7 @@
 #include "term.h"
 #include "fork.h"
 
-static void handle_error_msg(struct compiler *c, char *str)
+static void handle_error_msg(Compiler *c, char *str)
 {
     int i, len;
 
@@ -25,7 +25,7 @@ static void handle_error_msg(struct compiler *c, char *str)
         return;
 
     for (i = 0; i < c->error_formats.count; i++) {
-        const struct error_format *p = c->error_formats.ptrs[i];
+        const ErrorFormat *p = c->error_formats.ptrs[i];
         PointerArray m = PTR_ARRAY_NEW();
 
         if (!regexp_exec_sub(&p->re, str, len, &m, 0))
@@ -44,7 +44,7 @@ static void handle_error_msg(struct compiler *c, char *str)
     add_message(new_message(str));
 }
 
-static void read_errors(struct compiler *c, int fd, int quiet)
+static void read_errors(Compiler *c, int fd, int quiet)
 {
     FILE *f = fdopen(fd, "r");
     char line[4096];
@@ -62,7 +62,7 @@ static void read_errors(struct compiler *c, int fd, int quiet)
     fclose(f);
 }
 
-static void filter(int rfd, int wfd, struct filter_data *fdata)
+static void filter(int rfd, int wfd, FilterData *fdata)
 {
     unsigned int wlen = 0;
     GBUF(buf);
@@ -155,7 +155,7 @@ static int handle_child_error(int pid)
     return ret;
 }
 
-int spawn_filter(char **argv, struct filter_data *data)
+int spawn_filter(char **argv, FilterData *data)
 {
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
@@ -201,7 +201,7 @@ error:
     return -1;
 }
 
-void spawn_compiler(char **args, unsigned int flags, struct compiler *c)
+void spawn_compiler(char **args, unsigned int flags, Compiler *c)
 {
     int read_stdout = flags & SPAWN_READ_STDOUT;
     int prompt = flags & SPAWN_PROMPT;

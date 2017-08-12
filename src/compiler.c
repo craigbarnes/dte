@@ -4,25 +4,25 @@
 
 static PointerArray compilers = PTR_ARRAY_NEW();
 
-static struct compiler *add_compiler(const char *name)
+static Compiler *add_compiler(const char *name)
 {
-    struct compiler *c = find_compiler(name);
+    Compiler *c = find_compiler(name);
 
     if (c)
         return c;
 
-    c = xnew0(struct compiler, 1);
+    c = xnew0(Compiler, 1);
     c->name = xstrdup(name);
     ptr_array_add(&compilers, c);
     return c;
 }
 
-struct compiler *find_compiler(const char *name)
+Compiler *find_compiler(const char *name)
 {
     int i;
 
     for (i = 0; i < compilers.count; i++) {
-        struct compiler *c = compilers.ptrs[i];
+        Compiler *c = compilers.ptrs[i];
         if (streq(c->name, name))
             return c;
     }
@@ -33,7 +33,7 @@ void add_error_fmt(const char *compiler, bool ignore, const char *format, char *
 {
     const char *names[] = {"file", "line", "column", "message"};
     int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
-    struct error_format *f;
+    ErrorFormat *f;
     int i, j;
 
     for (i = 0; desc[i]; i++) {
@@ -49,7 +49,7 @@ void add_error_fmt(const char *compiler, bool ignore, const char *format, char *
         }
     }
 
-    f = xnew0(struct error_format, 1);
+    f = xnew0(ErrorFormat, 1);
     f->ignore = ignore;
     f->msg_idx = idx[3];
     f->file_idx = idx[0];

@@ -12,15 +12,15 @@
 // Press any key to continue
 #define SPAWN_PROMPT (1 << 4)
 
-struct filter_data {
+typedef struct {
     char *in;
     char *out;
     long in_len;
     long out_len;
-};
+} FilterData;
 
-int spawn_filter(char **argv, struct filter_data *data);
-void spawn_compiler(char **args, unsigned int flags, struct compiler *c);
+int spawn_filter(char **argv, FilterData *data);
+void spawn_compiler(char **args, unsigned int flags, Compiler *c);
 void spawn(char **args, int fd[3], bool prompt);
 
 #endif

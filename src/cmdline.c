@@ -6,7 +6,7 @@
 #include "uchar.h"
 #include "input-special.h"
 
-static void cmdline_delete(struct cmdline *c)
+static void cmdline_delete(CommandLine *c)
 {
     long pos = c->pos;
     long len = 1;
@@ -19,7 +19,7 @@ static void cmdline_delete(struct cmdline *c)
     gbuf_remove(&c->buf, c->pos, len);
 }
 
-static void cmdline_backspace(struct cmdline *c)
+static void cmdline_backspace(CommandLine *c)
 {
     if (c->pos) {
         u_prev_char(c->buf.buffer, &c->pos);
@@ -27,7 +27,7 @@ static void cmdline_backspace(struct cmdline *c)
     }
 }
 
-static void cmdline_erase_word(struct cmdline *c)
+static void cmdline_erase_word(CommandLine *c)
 {
     int i = c->pos;
 
@@ -52,30 +52,30 @@ static void cmdline_erase_word(struct cmdline *c)
     c->pos = i;
 }
 
-static void cmdline_delete_bol(struct cmdline *c)
+static void cmdline_delete_bol(CommandLine *c)
 {
     gbuf_remove(&c->buf, 0, c->pos);
     c->pos = 0;
 }
 
-static void cmdline_delete_eol(struct cmdline *c)
+static void cmdline_delete_eol(CommandLine *c)
 {
     c->buf.len = c->pos;
 }
 
-static void cmdline_prev_char(struct cmdline *c)
+static void cmdline_prev_char(CommandLine *c)
 {
     if (c->pos)
         u_prev_char(c->buf.buffer, &c->pos);
 }
 
-static void cmdline_next_char(struct cmdline *c)
+static void cmdline_next_char(CommandLine *c)
 {
     if (c->pos < c->buf.len)
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
 }
 
-static void cmdline_insert_bytes(struct cmdline *c, const char *buf, int size)
+static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
 {
     int i;
 
@@ -84,7 +84,7 @@ static void cmdline_insert_bytes(struct cmdline *c, const char *buf, int size)
         c->buf.buffer[c->pos++] = buf[i];
 }
 
-static void cmdline_insert_paste(struct cmdline *c)
+static void cmdline_insert_paste(CommandLine *c)
 {
     long size, i;
     char *text = term_read_paste(&size);
@@ -97,27 +97,27 @@ static void cmdline_insert_paste(struct cmdline *c)
     free(text);
 }
 
-static void set_text(struct cmdline *c, const char *text)
+static void set_text(CommandLine *c, const char *text)
 {
     gbuf_clear(&c->buf);
     gbuf_add_str(&c->buf, text);
     c->pos = strlen(text);
 }
 
-void cmdline_clear(struct cmdline *c)
+void cmdline_clear(CommandLine *c)
 {
     gbuf_clear(&c->buf);
     c->pos = 0;
     c->search_pos = -1;
 }
 
-void cmdline_set_text(struct cmdline *c, const char *text)
+void cmdline_set_text(CommandLine *c, const char *text)
 {
     set_text(c, text);
     c->search_pos = -1;
 }
 
-int cmdline_handle_key(struct cmdline *c, PointerArray *history, int key)
+int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
 {
     char buf[4];
     int count;

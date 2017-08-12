@@ -4,7 +4,6 @@
 #include "view.h"
 #include "term.h"
 #include "obuf.h"
-#include "cmdline.h"
 #include "search.h"
 #include "screen.h"
 #include "config.h"

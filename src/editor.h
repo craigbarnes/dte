@@ -2,6 +2,7 @@
 #define EDITOR_H
 
 #include "libc.h"
+#include "cmdline.h"
 
 enum editor_status {
     EDITOR_INITIALIZING,
@@ -18,7 +19,7 @@ enum input_mode {
 
 extern enum editor_status editor_status;
 extern enum input_mode input_mode;
-extern struct cmdline cmdline;
+extern CommandLine cmdline;
 extern char *home_dir;
 extern char *user_config_dir;
 extern char *charset;

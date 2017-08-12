@@ -5,12 +5,12 @@
 #include "gbuf.h"
 #include "term.h"
 
-struct cmdline {
+typedef struct {
     struct gbuf buf;
     long pos;
     int search_pos;
     char *search_text;
-};
+} CommandLine;
 
 enum {
     CMDLINE_UNKNOWN_KEY,
@@ -18,10 +18,10 @@ enum {
     CMDLINE_CANCEL,
 };
 
-#define CMDLINE(name) struct cmdline name = {GBUF_INIT, 0, -1, NULL}
+#define CMDLINE(name) CommandLine name = {GBUF_INIT, 0, -1, NULL}
 
-void cmdline_clear(struct cmdline *c);
-void cmdline_set_text(struct cmdline *c, const char *text);
-int cmdline_handle_key(struct cmdline *c, PointerArray *history, int key);
+void cmdline_clear(CommandLine *c);
+void cmdline_set_text(CommandLine *c, const char *text);
+int cmdline_handle_key(CommandLine *c, PointerArray *history, int key);
 
 #endif
