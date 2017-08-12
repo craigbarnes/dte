@@ -250,7 +250,7 @@ static void line_info_init(struct line_info *info, View *v, BlockIter *bi, long 
         info->sel_eo = v->sel_eo;
         BUG_ON(info->sel_so > info->sel_eo);
     } else {
-        struct selection_info sel;
+        SelectionInfo sel;
 
         init_selection(v, &sel);
         info->sel_so = sel.so;

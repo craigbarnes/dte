@@ -3,7 +3,7 @@
 
 #include "libc.h"
 
-struct indent_info {
+typedef struct {
     // Size in bytes
     int bytes;
 
@@ -19,12 +19,12 @@ struct indent_info {
 
     // The line is empty or contains only white space
     bool wsonly;
-};
+} IndentInfo;
 
 char *make_indent(int width);
 int brace_indent_inc(const char *line, unsigned int len);
 char *get_indent_for_next_line(const char *line, unsigned int len);
-void get_indent_info(const char *buf, int len, struct indent_info *info);
+void get_indent_info(const char *buf, int len, IndentInfo *info);
 int use_spaces_for_indent(void);
 int get_indent_level_bytes_left(void);
 int get_indent_level_bytes_right(void);

@@ -95,7 +95,7 @@ static int get_indent_of_matching_brace(void)
         fetch_this_line(&bi, &lr);
         if (regexp_match_nosub(spattern, lr.line, lr.size)) {
             if (level++ == 0) {
-                struct indent_info info;
+                IndentInfo info;
                 get_indent_info(lr.line, lr.size, &info);
                 return info.width;
             }
@@ -483,7 +483,7 @@ static void shift_right(int nr_lines, int count)
     indent = alloc_indent(count, &indent_size);
     i = 0;
     while (1) {
-        struct indent_info info;
+        IndentInfo info;
         LineRef lr;
 
         fetch_this_line(&view->cursor, &lr);
@@ -515,7 +515,7 @@ static void shift_left(int nr_lines, int count)
 
     i = 0;
     while (1) {
-        struct indent_info info;
+        IndentInfo info;
         LineRef lr;
 
         fetch_this_line(&view->cursor, &lr);
@@ -552,7 +552,7 @@ static void shift_left(int nr_lines, int count)
 void shift_lines(int count)
 {
     int nr_lines = 1;
-    struct selection_info info;
+    SelectionInfo info;
     int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
 
     if (x < 0)
@@ -691,7 +691,7 @@ static bool is_paragraph_separator(const char *line, long size)
 
 static int get_indent_width(const char *line, long size)
 {
-    struct indent_info info;
+    IndentInfo info;
 
     get_indent_info(line, size, &info);
     return info.width;
@@ -814,7 +814,7 @@ void change_case(int mode)
     GBUF(dst);
 
     if (view->selection) {
-        struct selection_info info;
+        SelectionInfo info;
 
         init_selection(view, &info);
         view->cursor = info.si;

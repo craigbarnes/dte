@@ -2,7 +2,7 @@
 #include "buffer.h"
 #include "view.h"
 
-void init_selection(View *v, struct selection_info *info)
+void init_selection(View *v, SelectionInfo *info)
 {
     BlockIter ei;
     unsigned int u;
@@ -38,7 +38,7 @@ void init_selection(View *v, struct selection_info *info)
 
 long prepare_selection(View *v)
 {
-    struct selection_info info;
+    SelectionInfo info;
     init_selection(v, &info);
     v->cursor = info.si;
     return info.eo - info.so;
@@ -58,7 +58,7 @@ char *view_get_selection(View *v, long *size)
     return buf;
 }
 
-int get_nr_selected_lines(struct selection_info *info)
+int get_nr_selected_lines(SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;
@@ -73,7 +73,7 @@ int get_nr_selected_lines(struct selection_info *info)
     return nr_lines;
 }
 
-int get_nr_selected_chars(struct selection_info *info)
+int get_nr_selected_chars(SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;

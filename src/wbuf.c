@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-int wbuf_flush(struct wbuf *wbuf)
+int wbuf_flush(WriteBuffer *wbuf)
 {
     if (wbuf->fill) {
         ssize_t rc = xwrite(wbuf->fd, wbuf->buf, wbuf->fill);
@@ -14,7 +14,7 @@ int wbuf_flush(struct wbuf *wbuf)
     return 0;
 }
 
-int wbuf_write(struct wbuf *wbuf, const char *buf, size_t count)
+int wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count)
 {
     ssize_t rc;
 
@@ -37,12 +37,12 @@ int wbuf_write(struct wbuf *wbuf, const char *buf, size_t count)
     return 0;
 }
 
-int wbuf_write_str(struct wbuf *wbuf, const char *str)
+int wbuf_write_str(WriteBuffer *wbuf, const char *str)
 {
     return wbuf_write(wbuf, str, strlen(str));
 }
 
-int wbuf_write_ch(struct wbuf *wbuf, char ch)
+int wbuf_write_ch(WriteBuffer *wbuf, char ch)
 {
     if (wbuf->fill + 1 > sizeof(wbuf->buf)) {
         ssize_t rc = wbuf_flush(wbuf);

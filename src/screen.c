@@ -40,7 +40,7 @@ static const char *format_misc_status(Window *win)
         snprintf(misc_status, sizeof(misc_status), "[case-sensitive = %s]",
             case_sensitive_search_enum[options.case_sensitive_search]);
     } else if (win->view->selection) {
-        struct selection_info info;
+        SelectionInfo info;
 
         init_selection(win->view, &info);
         if (win->view->selection == SELECT_LINES) {

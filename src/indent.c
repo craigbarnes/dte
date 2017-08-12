@@ -45,7 +45,7 @@ static bool indent_inc(const char *line, unsigned int len)
 
 char *get_indent_for_next_line(const char *line, unsigned int len)
 {
-    struct indent_info info;
+    IndentInfo info;
 
     get_indent_info(line, len, &info);
     if (indent_inc(line, len)) {
@@ -55,7 +55,7 @@ char *get_indent_for_next_line(const char *line, unsigned int len)
     return make_indent(info.width);
 }
 
-void get_indent_info(const char *buf, int len, struct indent_info *info)
+void get_indent_info(const char *buf, int len, IndentInfo *info)
 {
     int spaces = 0;
     int tabs = 0;

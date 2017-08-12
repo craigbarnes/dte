@@ -234,7 +234,7 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(Buffer *b, struct file_encoder *enc, const struct byte_order_mark *bom)
+static int write_buffer(Buffer *b, struct file_encoder *enc, const ByteOrderMark *bom)
 {
     ssize_t size = 0;
     Block *blk;

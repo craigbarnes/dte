@@ -1,12 +1,10 @@
 #include "encoding.h"
 #include "common.h"
 
-struct encoding_alias {
+static const struct {
     const char *encoding;
     const char *alias;
-};
-
-static const struct encoding_alias aliases[] = {
+} aliases[] = {
     {"UTF-8", "UTF8"},
     {"UTF-16", "UTF16"},
     {"UTF-16BE", "UTF16BE"},
@@ -24,7 +22,7 @@ static const struct encoding_alias aliases[] = {
     {"UTF-16LE", "UCS-4LE"},
 };
 
-static const struct byte_order_mark boms[] = {
+static const ByteOrderMark boms[] = {
     {"UTF-32BE", {0x00, 0x00, 0xfe, 0xff}, 4},
     {"UTF-32LE", {0xff, 0xfe, 0x00, 0x00}, 4},
     {"UTF-16BE", {0xfe, 0xff}, 2},
@@ -60,24 +58,24 @@ char *normalize_encoding(const char *encoding)
     return e;
 }
 
-static const struct byte_order_mark *get_bom(const unsigned char *buf, size_t size)
+static const ByteOrderMark *get_bom(const unsigned char *buf, size_t size)
 {
     int i;
 
     for (i = 0; i < ARRAY_COUNT(boms); i++) {
-        const struct byte_order_mark *bom = &boms[i];
+        const ByteOrderMark *bom = &boms[i];
         if (size >= bom->len && !memcmp(buf, bom->bytes, bom->len))
             return bom;
     }
     return NULL;
 }
 
-const struct byte_order_mark *get_bom_for_encoding(const char *encoding)
+const ByteOrderMark *get_bom_for_encoding(const char *encoding)
 {
     int i;
 
     for (i = 0; i < ARRAY_COUNT(boms); i++) {
-        const struct byte_order_mark *bom = &boms[i];
+        const ByteOrderMark *bom = &boms[i];
         if (streq(bom->encoding, encoding))
             return bom;
     }
@@ -86,7 +84,7 @@ const struct byte_order_mark *get_bom_for_encoding(const char *encoding)
 
 const char *detect_encoding_from_bom(const unsigned char *buf, size_t size)
 {
-    const struct byte_order_mark *bom = get_bom(buf, size);
+    const ByteOrderMark *bom = get_bom(buf, size);
     if (bom)
         return bom->encoding;
     return NULL;
