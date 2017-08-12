@@ -6,7 +6,7 @@
 static PointerArray msgs = PTR_ARRAY_NEW();
 static int msg_pos;
 
-static void free_message(struct message *m)
+static void free_message(Message *m)
 {
     free(m->msg);
     if (m->loc != NULL) {
@@ -15,7 +15,7 @@ static void free_message(struct message *m)
     free(m);
 }
 
-static bool message_equals(const struct message *a, const struct message *b)
+static bool message_equals(const Message *a, const Message *b)
 {
     if (!streq(a->msg, b->msg)) {
         return false;
@@ -29,7 +29,7 @@ static bool message_equals(const struct message *a, const struct message *b)
     return file_location_equals(a->loc, b->loc);
 }
 
-static bool is_duplicate(const struct message *m)
+static bool is_duplicate(const Message *m)
 {
     int i;
 
@@ -41,14 +41,14 @@ static bool is_duplicate(const struct message *m)
     return false;
 }
 
-struct message *new_message(const char *msg)
+Message *new_message(const char *msg)
 {
-    struct message *m = xnew0(struct message, 1);
+    Message *m = xnew0(Message, 1);
     m->msg = xstrdup(msg);
     return m;
 }
 
-void add_message(struct message *m)
+void add_message(Message *m)
 {
     if (is_duplicate(m)) {
         free_message(m);
@@ -59,7 +59,7 @@ void add_message(struct message *m)
 
 void activate_current_message(void)
 {
-    struct message *m;
+    Message *m;
 
     if (msg_pos == msgs.count) {
         return;

@@ -5,13 +5,13 @@
 #include "error.h"
 #include "libc.h"
 
-struct command {
+typedef struct {
     const char *name;
     const char *flags;
     signed char min_args;
     signed char max_args;
     void (*cmd)(const char *, char **);
-};
+} Command;
 
 // parse-command.c
 char *parse_command_arg(const char *cmd, bool tilde);
@@ -20,13 +20,13 @@ bool parse_commands(PointerArray *array, const char *cmd, struct error **err);
 char **copy_string_array(char **src, int count);
 
 // run.c
-extern const struct command *current_command;
+extern const Command *current_command;
 
-const struct command *find_command(const struct command *cmds, const char *name);
-void run_commands(const struct command *cmds, const PointerArray *array);
-void handle_command(const struct command *cmds, const char *cmd);
+const Command *find_command(const Command *cmds, const char *name);
+void run_commands(const Command *cmds, const PointerArray *array);
+void handle_command(const Command *cmds, const char *cmd);
 
 // commands.c
-extern const struct command commands[];
+extern const Command commands[];
 
 #endif

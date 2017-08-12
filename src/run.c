@@ -21,7 +21,7 @@ static const char *config_commands[] = {
     "setenv",
 };
 
-const struct command *current_command;
+const Command *current_command;
 
 static bool allowed_command(const char *name)
 {
@@ -34,12 +34,12 @@ static bool allowed_command(const char *name)
     return false;
 }
 
-const struct command *find_command(const struct command *cmds, const char *name)
+const Command *find_command(const Command *cmds, const char *name)
 {
     int i;
 
     for (i = 0; cmds[i].name; i++) {
-        const struct command *cmd = &cmds[i];
+        const Command *cmd = &cmds[i];
 
         if (streq(name, cmd->name))
             return cmd;
@@ -47,9 +47,9 @@ const struct command *find_command(const struct command *cmds, const char *name)
     return NULL;
 }
 
-static void run_command(const struct command *cmds, char **av)
+static void run_command(const Command *cmds, char **av)
 {
-    const struct command *cmd = find_command(cmds, av[0]);
+    const Command *cmd = find_command(cmds, av[0]);
     const char *pf;
     char **args;
 
@@ -102,7 +102,7 @@ static void run_command(const struct command *cmds, char **av)
     end_change();
 }
 
-void run_commands(const struct command *cmds, const PointerArray *array)
+void run_commands(const Command *cmds, const PointerArray *array)
 {
     int s, e;
 
@@ -119,7 +119,7 @@ void run_commands(const struct command *cmds, const PointerArray *array)
     }
 }
 
-void handle_command(const struct command *cmds, const char *cmd)
+void handle_command(const Command *cmds, const char *cmd)
 {
     struct error *err = NULL;
     PointerArray array = PTR_ARRAY_NEW();

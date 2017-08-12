@@ -58,7 +58,7 @@ static void close_state(void)
 {
     if (current_state && current_state->type == STATE_INVALID) {
         // Command prefix in error message makes no sense
-        const struct command *save = current_command;
+        const Command *save = current_command;
         current_command = NULL;
         error_msg("No default action in state %s", current_state->name);
         current_command = save;
@@ -433,7 +433,7 @@ static void cmd_syntax(const char *pf, char **args)
     saved_nr_errors = nr_errors;
 }
 
-static const struct command syntax_commands[] = {
+static const Command syntax_commands[] = {
     {"bufis", "i", 2,  3, cmd_bufis},
     {"char", "bn", 2,  3, cmd_char},
     {"default", "", 2, -1, cmd_default},

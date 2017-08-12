@@ -3,7 +3,7 @@
 
 #include "libc.h"
 
-struct file_location {
+typedef struct {
     // Needed after buffer is closed
     char *filename;
 
@@ -14,16 +14,16 @@ struct file_location {
     // If pattern is set then line and column are 0 and vice versa
     char *pattern; // Regex from tag file
     int line, column;
-};
+} FileLocation;
 
 struct view;
 
-struct file_location *create_file_location(struct view *v);
-void file_location_free(struct file_location *loc);
-bool file_location_equals(const struct file_location *a, const struct file_location *b);
-bool file_location_go(struct file_location *loc);
-bool file_location_return(struct file_location *loc);
-void push_file_location(struct file_location *loc);
+FileLocation *create_file_location(struct view *v);
+void file_location_free(FileLocation *loc);
+bool file_location_equals(const FileLocation *a, const FileLocation *b);
+bool file_location_go(FileLocation *loc);
+bool file_location_return(FileLocation *loc);
+void push_file_location(FileLocation *loc);
 void pop_file_location(void);
 
 #endif

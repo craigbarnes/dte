@@ -31,8 +31,8 @@ static void handle_error_msg(struct compiler *c, char *str)
         if (!regexp_exec_sub(&p->re, str, len, &m, 0))
             continue;
         if (!p->ignore) {
-            struct message *msg = new_message(m.ptrs[p->msg_idx]);
-            msg->loc = xnew0(struct file_location, 1);
+            Message *msg = new_message(m.ptrs[p->msg_idx]);
+            msg->loc = xnew0(FileLocation, 1);
             msg->loc->filename = p->file_idx < 0 ? NULL : xstrdup(m.ptrs[p->file_idx]);
             msg->loc->line = p->line_idx < 0 ? 0 : atoi(m.ptrs[p->line_idx]);
             msg->loc->column = p->column_idx < 0 ? 0 : atoi(m.ptrs[p->column_idx]);

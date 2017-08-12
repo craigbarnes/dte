@@ -35,7 +35,7 @@
 // Go to compiler error saving position if file changed or cursor moved
 static void activate_current_message_save(void)
 {
-    struct file_location *loc = create_file_location(view);
+    FileLocation *loc = create_file_location(view);
     BlockIter save = view->cursor;
 
     activate_current_message();
@@ -769,7 +769,7 @@ static void cmd_redo(const char *pf, char **args)
 
 static void cmd_repeat(const char *pf, char **args)
 {
-    const struct command *cmd;
+    const Command *cmd;
     int count;
 
     count = atoi(args[0]);
@@ -1300,12 +1300,12 @@ static void cmd_tag(const char *pf, char **args)
         int i;
         for (i = 0; i < tags.count; i++) {
             struct tag *t = tags.ptrs[i];
-            struct message *m;
+            Message *m;
             char buf[512];
 
             snprintf(buf, sizeof(buf), "Tag %s", name);
             m = new_message(buf);
-            m->loc = xnew0(struct file_location, 1);
+            m->loc = xnew0(FileLocation, 1);
             m->loc->filename = tag_file_get_tag_filename(tf, t);
             if (t->pattern) {
                 m->loc->pattern = t->pattern;
@@ -1543,7 +1543,7 @@ static void cmd_wswap(const char *pf, char **args)
     mark_everything_changed();
 }
 
-const struct command commands[] = {
+const Command commands[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
     {"bof", "", 0, 0, cmd_bof},

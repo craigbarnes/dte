@@ -6,11 +6,11 @@
 
 static PointerArray file_locations = PTR_ARRAY_NEW();
 
-struct file_location *create_file_location(View *v)
+FileLocation *create_file_location(View *v)
 {
-    struct file_location *loc;
+    FileLocation *loc;
 
-    loc = xnew0(struct file_location, 1);
+    loc = xnew0(FileLocation, 1);
     loc->filename = v->buffer->abs_filename ? xstrdup(v->buffer->abs_filename) : NULL;
     loc->buffer_id = v->buffer->id;
     loc->line = v->cy + 1;
@@ -18,14 +18,14 @@ struct file_location *create_file_location(View *v)
     return loc;
 }
 
-void file_location_free(struct file_location *loc)
+void file_location_free(FileLocation *loc)
 {
     free(loc->filename);
     free(loc->pattern);
     free(loc);
 }
 
-bool file_location_equals(const struct file_location *a, const struct file_location *b)
+bool file_location_equals(const FileLocation *a, const FileLocation *b)
 {
     if (!xstreq(a->filename, b->filename)) {
         return false;
@@ -45,7 +45,7 @@ bool file_location_equals(const struct file_location *a, const struct file_locat
     return true;
 }
 
-bool file_location_go(struct file_location *loc)
+bool file_location_go(FileLocation *loc)
 {
     Window *w = window;
     View *v = window_open_buffer(w, loc->filename, true, NULL);
@@ -73,7 +73,7 @@ bool file_location_go(struct file_location *loc)
     return ok;
 }
 
-bool file_location_return(struct file_location *loc)
+bool file_location_return(FileLocation *loc)
 {
     Window *w = window;
     Buffer *b = find_buffer_by_id(loc->buffer_id);
@@ -99,7 +99,7 @@ bool file_location_return(struct file_location *loc)
     return true;
 }
 
-void push_file_location(struct file_location *loc)
+void push_file_location(FileLocation *loc)
 {
     ptr_array_add(&file_locations, loc);
 }
@@ -109,7 +109,7 @@ void pop_file_location(void)
     bool go = true;
 
     while (file_locations.count > 0 && go) {
-        struct file_location *loc = file_locations.ptrs[--file_locations.count];
+        FileLocation *loc = file_locations.ptrs[--file_locations.count];
         go = !file_location_return(loc);
         file_location_free(loc);
     }

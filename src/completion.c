@@ -52,7 +52,7 @@ static void collect_commands(const char *prefix)
     int i;
 
     for (i = 0; commands[i].name; i++) {
-        const struct command *c = &commands[i];
+        const Command *c = &commands[i];
 
         if (str_has_prefix(c->name, prefix))
             add_completion(xstrdup(c->name));
@@ -192,7 +192,7 @@ static void collect_env(const char *prefix)
 
 static void collect_completions(char **args, int argc)
 {
-    const struct command *cmd;
+    const Command *cmd;
 
     if (!argc) {
         collect_commands(completion.parsed);

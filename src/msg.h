@@ -4,13 +4,13 @@
 #include "libc.h"
 #include "file-location.h"
 
-struct message {
+typedef struct {
     char *msg;
-    struct file_location *loc;
-};
+    FileLocation *loc;
+} Message;
 
-struct message *new_message(const char *msg);
-void add_message(struct message *m);
+Message *new_message(const char *msg);
+void add_message(Message *m);
 void activate_current_message(void);
 void activate_next_message(void);
 void activate_prev_message(void);

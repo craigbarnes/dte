@@ -45,7 +45,7 @@ static bool has_line_continuation(const char *str, int len)
     return (len - 1 - pos) % 2;
 }
 
-void exec_config(const struct command *cmds, const char *buf, size_t size)
+void exec_config(const Command *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
     char *cmd;
@@ -80,7 +80,7 @@ void exec_config(const struct command *cmds, const char *buf, size_t size)
     gbuf_free(&line);
 }
 
-int do_read_config(const struct command *cmds, const char *filename, bool must_exist)
+int do_read_config(const Command *cmds, const char *filename, bool must_exist)
 {
     char *buf;
     ssize_t size = read_file(filename, &buf);
@@ -100,7 +100,7 @@ int do_read_config(const struct command *cmds, const char *filename, bool must_e
     return 0;
 }
 
-int read_config(const struct command *cmds, const char *filename, bool must_exist)
+int read_config(const Command *cmds, const char *filename, bool must_exist)
 {
     // Recursive
     const char *saved_config_file = config_file;
