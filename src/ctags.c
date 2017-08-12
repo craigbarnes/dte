@@ -1,7 +1,7 @@
 #include "ctags.h"
 #include "common.h"
 
-static int parse_excmd(struct tag *t, const char *buf, int size)
+static int parse_excmd(Tag *t, const char *buf, int size)
 {
     char ch = *buf;
     long line;
@@ -52,7 +52,7 @@ static int parse_excmd(struct tag *t, const char *buf, int size)
     return i;
 }
 
-static int parse_line(struct tag *t, const char *buf, int size)
+static int parse_line(Tag *t, const char *buf, int size)
 {
     const char *end;
     int len, si = 0;
@@ -119,7 +119,7 @@ error:
     return false;
 }
 
-bool next_tag(struct tag_file *tf, size_t *posp, const char *prefix, int exact, struct tag *t)
+bool next_tag(TagFile *tf, size_t *posp, const char *prefix, int exact, Tag *t)
 {
     size_t prefix_len = strlen(prefix);
     size_t pos = *posp;
@@ -152,7 +152,7 @@ bool next_tag(struct tag_file *tf, size_t *posp, const char *prefix, int exact, 
 }
 
 // NOTE: t itself is not freed
-void free_tag(struct tag *t)
+void free_tag(Tag *t)
 {
     free(t->name);
     free(t->filename);

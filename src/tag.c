@@ -5,10 +5,10 @@
 #include "path.h"
 #include "common.h"
 
-static struct tag_file *current_tag_file;
+static TagFile *current_tag_file;
 static char *current_filename; // For sorting tags
 
-static int visibility_cmp(const struct tag *a, const struct tag *b)
+static int visibility_cmp(const Tag *a, const Tag *b)
 {
     bool a_this_file = false;
     bool b_this_file = false;
@@ -52,7 +52,7 @@ static int visibility_cmp(const struct tag *a, const struct tag *b)
     return 0;
 }
 
-static int kind_cmp(const struct tag *a, const struct tag *b)
+static int kind_cmp(const Tag *a, const Tag *b)
 {
     if (a->kind == b->kind)
         return 0;
@@ -75,8 +75,8 @@ static int kind_cmp(const struct tag *a, const struct tag *b)
 
 static int tag_cmp(const void *ap, const void *bp)
 {
-    const struct tag *a = *(const struct tag **)ap;
-    const struct tag *b = *(const struct tag **)bp;
+    const Tag *a = *(const Tag **)ap;
+    const Tag *b = *(const Tag **)bp;
     int ret;
 
     ret = visibility_cmp(a, b);
@@ -112,7 +112,7 @@ static int open_tag_file(char *path)
     return -1;
 }
 
-static bool tag_file_changed(struct tag_file *tf, const char *filename, struct stat *st)
+static bool tag_file_changed(TagFile *tf, const char *filename, struct stat *st)
 {
     if (tf->mtime != st->st_mtime) {
         return true;
@@ -120,16 +120,16 @@ static bool tag_file_changed(struct tag_file *tf, const char *filename, struct s
     return !streq(tf->filename, filename);
 }
 
-static void tag_file_free(struct tag_file *tf)
+static void tag_file_free(TagFile *tf)
 {
     free(tf->filename);
     free(tf->buf);
     free(tf);
 }
 
-struct tag_file *load_tag_file(void)
+TagFile *load_tag_file(void)
 {
-    struct tag_file *tf;
+    TagFile *tf;
     struct stat st;
     char path[4096];
     char *buf;
@@ -159,7 +159,7 @@ struct tag_file *load_tag_file(void)
         close(fd);
         return NULL;
     }
-    tf = xnew0(struct tag_file, 1);
+    tf = xnew0(TagFile, 1);
     tf->filename = xstrdup(path);
     tf->buf = buf;
     tf->size = size;
@@ -172,7 +172,7 @@ void free_tags(PointerArray *tags)
 {
     int i;
     for (i = 0; i < tags->count; i++) {
-        struct tag *t = tags->ptrs[i];
+        Tag *t = tags->ptrs[i];
         free_tag(t);
         free(t);
     }
@@ -198,15 +198,15 @@ static char *path_relative(const char *filename, const char *dir)
     return xstrdup(filename + dlen + 1);
 }
 
-void tag_file_find_tags(struct tag_file *tf, const char *filename, const char *name, PointerArray *tags)
+void tag_file_find_tags(TagFile *tf, const char *filename, const char *name, PointerArray *tags)
 {
-    struct tag *t;
+    Tag *t;
     size_t pos = 0;
 
-    t = xnew(struct tag, 1);
+    t = xnew(Tag, 1);
     while (next_tag(tf, &pos, name, 1, t)) {
         ptr_array_add(tags, t);
-        t = xnew(struct tag, 1);
+        t = xnew(Tag, 1);
     }
     free(t);
 
@@ -222,7 +222,7 @@ void tag_file_find_tags(struct tag_file *tf, const char *filename, const char *n
     current_filename = NULL;
 }
 
-char *tag_file_get_tag_filename(struct tag_file *tf, struct tag *t)
+char *tag_file_get_tag_filename(TagFile *tf, Tag *t)
 {
     char *dir = path_dirname(tf->filename);
     int a = strlen(dir);
@@ -236,9 +236,9 @@ char *tag_file_get_tag_filename(struct tag_file *tf, struct tag *t)
     return filename;
 }
 
-void collect_tags(struct tag_file *tf, const char *prefix)
+void collect_tags(TagFile *tf, const char *prefix)
 {
-    struct tag t;
+    Tag t;
     size_t pos = 0;
     char *prev = NULL;
 

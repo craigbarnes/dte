@@ -3,14 +3,14 @@
 
 #include "libc.h"
 
-struct tag_file {
+typedef struct {
     char *filename;
     char *buf;
     long size;
     time_t mtime;
-};
+} TagFile;
 
-struct tag {
+typedef struct {
     char *name;
     char *filename;
     char *pattern;
@@ -19,9 +19,9 @@ struct tag {
     int line;
     char kind;
     bool local;
-};
+} Tag;
 
-bool next_tag(struct tag_file *tf, size_t *posp, const char *prefix, int exact, struct tag *t);
-void free_tag(struct tag *t);
+bool next_tag(TagFile *tf, size_t *posp, const char *prefix, int exact, Tag *t);
+void free_tag(Tag *t);
 
 #endif

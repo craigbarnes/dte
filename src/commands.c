@@ -1258,7 +1258,7 @@ static void cmd_suspend(const char *pf, char **args)
 
 static void cmd_tag(const char *pf, char **args)
 {
-    struct tag_file *tf;
+    TagFile *tf;
     PointerArray tags = PTR_ARRAY_NEW();
     const char *name = args[0];
     char *word = NULL;
@@ -1299,7 +1299,7 @@ static void cmd_tag(const char *pf, char **args)
     } else {
         int i;
         for (i = 0; i < tags.count; i++) {
-            struct tag *t = tags.ptrs[i];
+            Tag *t = tags.ptrs[i];
             Message *m;
             char buf[512];
 
