@@ -217,7 +217,7 @@ void tag_file_find_tags(TagFile *tf, const char *filename, const char *name, Poi
         current_filename = path_relative(filename, dir);
         free(dir);
     }
-    if (tags->count > 0) {
+    if (tags->count > 1) {
         BUG_ON(!tags->ptrs);
         qsort(tags->ptrs, tags->count, sizeof(tags->ptrs[0]), tag_cmp);
     }

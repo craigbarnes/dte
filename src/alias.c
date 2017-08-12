@@ -67,7 +67,10 @@ static int alias_cmp(const void *ap, const void *bp)
 
 void sort_aliases(void)
 {
-    qsort(aliases.ptrs, aliases.count, sizeof(*aliases.ptrs), alias_cmp);
+    if (aliases.count > 1) {
+        BUG_ON(!aliases.ptrs);
+        qsort(aliases.ptrs, aliases.count, sizeof(*aliases.ptrs), alias_cmp);
+    }
 }
 
 const char *find_alias(const char *name)
