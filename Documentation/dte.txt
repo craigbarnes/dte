@@ -950,4 +950,4 @@ Timo Hirvonen <tihirvon\@gmail.com>
 
 @h1 SEE ALSO
 
-%PROGRAM%-syntax(7)
+%PROGRAM%-syntax(5)

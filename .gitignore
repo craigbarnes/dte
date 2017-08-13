@@ -6,7 +6,7 @@
 /.VARS
 /.CFLAGS
 /Documentation/ttman
-/Documentation/*.[17o]
+/Documentation/*.[15o]
 /Config.mk
 /public/
 

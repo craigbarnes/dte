@@ -169,8 +169,8 @@ install: all
 	$(INSTALL) -m644 $(color)    $(DESTDIR)$(PKGDATADIR)/color
 	$(INSTALL) -m644 $(compiler) $(DESTDIR)$(PKGDATADIR)/compiler
 	$(INSTALL) -m644 $(syntax)   $(DESTDIR)$(PKGDATADIR)/syntax
-	$(INSTALL) -m644 Documentation/$(PROGRAM).1 $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -m644 Documentation/$(PROGRAM)-syntax.7 $(DESTDIR)$(mandir)/man7
+	$(INSTALL) -m644 $(man1)     $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m644 $(man5)     $(DESTDIR)$(mandir)/man5
 
 tags:
 	ctags src/*.[ch]

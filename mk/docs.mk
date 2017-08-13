@@ -9,8 +9,8 @@ XARGS_P_FLAG = $(shell \
 )
 
 man1 := Documentation/$(PROGRAM).1
-man7 := Documentation/$(PROGRAM)-syntax.7
-man  := $(man1) $(man7)
+man5 := Documentation/$(PROGRAM)-syntax.5
+man  := $(man1) $(man5)
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 img  := public/screenshot.png
 
@@ -31,7 +31,7 @@ img: $(img)
 $(man1): Documentation/$(PROGRAM).txt $(TTMAN)
 	$(call cmd,ttman)
 
-$(man7): Documentation/$(PROGRAM)-syntax.txt $(TTMAN)
+$(man5): Documentation/$(PROGRAM)-syntax.txt $(TTMAN)
 	$(call cmd,ttman)
 
 $(html): public/%.html: Documentation/% | public/
