@@ -9,7 +9,7 @@ v1.3 (unreleased)
   the `DTE_EDITOR` enviornment variable.
 * Added syntax highlighting for the Markdown, Meson and Ruby languages.
 * Added syntax highlighting for HTML5 tags and all HTML5 named entities.
-* Added support for highlighting `typedef` ClassNames to the C syntax
+* Added support for highlighting capitalized ClassNames to the C syntax
   highlighter (can be used via `hi class-name green`).
 * Fixed a bug with the `close -wq` command when using split frames
   (`wsplit`).
@@ -18,7 +18,9 @@ v1.3 (unreleased)
   inherited from [dex].
 * Fixed all compiler warnings when building on OpenBSD 6.
 * Added some descriptive comments to the default config files.
-* Various small fixes and clarifications to the man pages.
+* Fixed and clarified a few small details in the man pages.
+* Renamed `inc-home` and `inc-end` commands to `bolsf` and `eolsf`,
+  for consistency with other similar commands.
 
 v1.2 (latest release)
 ---------------------
