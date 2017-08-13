@@ -16,7 +16,7 @@ struct filetype {
 
 static PointerArray filetypes = PTR_ARRAY_NEW();
 
-static const char *ignore[] = {
+static const char *const ignore[] = {
     "bak", "dpkg-dist", "dpkg-old", "new", "old", "orig", "pacnew",
     "pacorig", "pacsave", "rpmnew", "rpmsave",
 };

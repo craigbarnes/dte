@@ -11,7 +11,7 @@
 
 struct keymap {
     int key;
-    const char *code;
+    const char *const code;
     unsigned int terms;
 };
 
@@ -24,7 +24,7 @@ enum {
 };
 
 // Prefixes; st-256color matches st
-const char *terms[] = {
+const char *const terms[] = {
     "rxvt",
     "screen",
     "st",

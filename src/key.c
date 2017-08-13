@@ -3,7 +3,7 @@
 #include "ctype.h"
 #include "gbuf.h"
 
-static const char *special_names[NR_SPECIAL_KEYS] = {
+static const char *const special_names[NR_SPECIAL_KEYS] = {
     "insert",
     "delete",
     "home",

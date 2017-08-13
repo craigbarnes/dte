@@ -6,14 +6,14 @@
 
 struct term_color *builtin_colors[NR_BC];
 
-static const char * const color_names[] = {
+static const char *const color_names[] = {
     "keep", "default",
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "gray",
     "darkgray", "lightred", "lightgreen", "lightyellow", "lightblue",
     "lightmagenta", "lightcyan", "white",
 };
 
-static const char * const attr_names[] = {
+static const char *const attr_names[] = {
     "bold", "lowintensity", "italic", "underline",
     "blink", "reverse", "invisible", "keep"
 };

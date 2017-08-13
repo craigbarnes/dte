@@ -18,7 +18,7 @@
 
 #include "bindings.inc"
 
-static const char *builtin_rc =
+static const char *const builtin_rc =
 // Initialize builtin colors
 "hi\n"
 // Must initialize string options
@@ -45,11 +45,11 @@ static void handle_sigwinch(int signum)
 
 int main(int argc, char *argv[])
 {
-    static const char *opts = "[-RV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *optstring = "RVc:t:r:";
-    const char *term = getenv("TERM");
-    const char *home = getenv("HOME");
-    const char *dte_home = getenv("DTE_HOME");
+    static const char *const opts = "[-RV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
+    static const char *const optstring = "RVc:t:r:";
+    const char *const term = getenv("TERM");
+    const char *const home = getenv("HOME");
+    const char *const dte_home = getenv("DTE_HOME");
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
@@ -59,10 +59,7 @@ int main(int argc, char *argv[])
     bool read_rc = true;
     int ch;
 
-    if (!home)
-        home = "";
-
-    home_dir = xstrdup(home);
+    home_dir = xstrdup(home ? home : "");
 
     if (dte_home)
         user_config_dir = xstrdup(dte_home);

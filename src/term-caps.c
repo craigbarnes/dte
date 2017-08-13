@@ -2,7 +2,7 @@
 #include "cursed.h"
 #include "xmalloc.h"
 
-static const char *string_cap_map[NR_STR_CAPS] = {
+static const char *const string_cap_map[NR_STR_CAPS] = {
     "acsc", // acs_chars,
     "rmacs", // exit_alt_charset_mode,
     "smacs", // enter_alt_charset_mode,
@@ -15,7 +15,7 @@ static const char *string_cap_map[NR_STR_CAPS] = {
     "civis", // cursor_invisible,
 };
 
-static const char *key_cap_map[NR_SPECIAL_KEYS] = {
+static const char *const key_cap_map[NR_SPECIAL_KEYS] = {
     "kich1", // key_ic,
     "kdch1", // key_dc,
     "khome", // key_home,

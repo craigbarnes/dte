@@ -2,8 +2,8 @@
 #include "common.h"
 
 static const struct {
-    const char *encoding;
-    const char *alias;
+    const char *const encoding;
+    const char *const alias;
 } aliases[] = {
     {"UTF-8", "UTF8"},
     {"UTF-16", "UTF16"},
