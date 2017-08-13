@@ -97,7 +97,7 @@ state =begin-nl comment
 state ident
     char -b a-zA-Z0-9_!\? ident
     inlist keyword start
-    inlist pseudo-variable start
+    inlist true-false-nil start
     noeat start
 
 state dq string
@@ -112,17 +112,20 @@ state sq string
     char -b "\\" .ruby-esc:sq
     eat sq
 
+# Keywords (from https://github.com/ruby/ruby/blob/trunk/defs/keywords)
 list keyword \
+    __ENCODING__ __LINE__ __FILE__ BEGIN END \
     alias and begin break case class def defined\? do else elsif end \
-    ensure for if in module next not or redo rescue retry return super \
-    then undef unless until when while yield \
-    BEGIN END
+    ensure for if in module next not or redo rescue retry return self \
+    super then undef unless until when while yield
 
-list pseudo-variable \
-    true false nil self __FILE__ __LINE__ __ENCODING__ __dir__ __method__
+# These keywords could be in the same list as above but they are kept
+# separate here to allow the option of highlighting with a different color
+list true-false-nil \
+    true false nil
 
+default keyword true-false-nil
 default numeric symbol
-default constant pseudo-variable
 default variable global-variable
 default variable instance-variable
 default operator double-colon
