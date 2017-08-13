@@ -21,6 +21,10 @@ v1.3 (unreleased)
 * Fixed and clarified a few small details in the man pages.
 * Renamed `inc-home` and `inc-end` commands to `bolsf` and `eolsf`,
   for consistency with other similar commands.
+* Renamed `dte-syntax.7` man page to `dte-syntax.5`. Users with an
+  installation of `dte` from before this change may want to manually
+  delete the old section 7 man page, so that `man dte-syntax` always
+  uses the new section 5 page.
 
 v1.2 (latest release)
 ---------------------
