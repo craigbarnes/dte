@@ -110,6 +110,10 @@ bof
 bol
 	Move to beginning of line.
 
+bolsf
+	Incrementally move cursor to beginning of *l*ine, then beginning
+	of *s*creen, then beginning of *f*ile.
+
 case [-lu]
 	Change text case. Default is to change lower case to upper and
 	vice versa.
@@ -180,6 +184,10 @@ eof
 
 eol
 	Move cursor to end of line.
+
+eolsf
+	Incrementally move cursor to end of *l*ine, then end of
+	*s*creen, then end of *f*ile.
 
 erase
 	Erase character before cursor.
@@ -278,14 +286,6 @@ hi <name> [fg-color [bg-color]]  [attribute]...
 	Unset fg/bg colors are inherited from highlight color "default".
 	If you don't set fg/bg for the highlight color "default" then
 	terminal's default fg/bg is used.
-
-inc-end
-	Move cursor to end of line; if already there, to end of screen; if
-	already there, to end of file.
-
-inc-home
-	Move cursor to beginning of line; if already there, to beginning of
-	screen; if already there, to beginning of file.
 
 include <filename>
 	Read commands from file.
