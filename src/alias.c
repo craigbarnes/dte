@@ -6,10 +6,10 @@
 #include "completion.h"
 #include "command.h"
 
-struct alias {
+typedef struct {
     char *name;
     char *value;
-};
+} CommandAlias;
 
 static PointerArray aliases = PTR_ARRAY_NEW();
 
@@ -27,7 +27,7 @@ static int validate_alias_name(const char *name)
 
 void add_alias(const char *name, const char *value)
 {
-    struct alias *alias;
+    CommandAlias *alias;
     int i;
 
     if (!validate_alias_name(name)) {
@@ -49,7 +49,7 @@ void add_alias(const char *name, const char *value)
         }
     }
 
-    alias = xnew(struct alias, 1);
+    alias = xnew(CommandAlias, 1);
     alias->name = xstrdup(name);
     alias->value = xstrdup(value);
     ptr_array_add(&aliases, alias);
@@ -60,8 +60,8 @@ void add_alias(const char *name, const char *value)
 
 static int alias_cmp(const void *ap, const void *bp)
 {
-    const struct alias *a = *(const struct alias **)ap;
-    const struct alias *b = *(const struct alias **)bp;
+    const CommandAlias *a = *(const CommandAlias **)ap;
+    const CommandAlias *b = *(const CommandAlias **)bp;
     return strcmp(a->name, b->name);
 }
 
@@ -78,7 +78,7 @@ const char *find_alias(const char *name)
     int i;
 
     for (i = 0; i < aliases.count; i++) {
-        const struct alias *alias = aliases.ptrs[i];
+        const CommandAlias *alias = aliases.ptrs[i];
         if (streq(alias->name, name))
             return alias->value;
     }
@@ -90,7 +90,7 @@ void collect_aliases(const char *prefix)
     int i;
 
     for (i = 0; i < aliases.count; i++) {
-        struct alias *alias = aliases.ptrs[i];
+        CommandAlias *alias = aliases.ptrs[i];
         if (str_has_prefix(alias->name, prefix))
             add_completion(xstrdup(alias->name));
     }
