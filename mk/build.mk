@@ -66,5 +66,8 @@ else
 missing_dep_dirs =
 endif
 
-%.o: %.c $(missing_dep_dirs)
+%.o: %.c | $(missing_dep_dirs)
 	$(call cmd,cc)
+
+
+.SECONDARY: $(missing_dep_dirs)

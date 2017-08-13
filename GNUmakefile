@@ -186,6 +186,3 @@ distclean: clean
 .DEFAULT_GOAL = all
 .PHONY: all install tags clean distclean FORCE
 .DELETE_ON_ERROR:
-
-# FIXME: Using this without a deplist breaks bash completion for make targets
-.SECONDARY:
