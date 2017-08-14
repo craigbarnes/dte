@@ -104,7 +104,7 @@ next:
 
 bool search_tag(const char *pattern, bool *err)
 {
-    BlockIter bi = BLOCK_ITER_NEW(&buffer->blocks);
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     regex_t regex;
     bool found = false;
 
@@ -368,7 +368,7 @@ out:
 
 void reg_replace(const char *pattern, const char *format, unsigned int flags)
 {
-    BlockIter bi = BLOCK_ITER_NEW(&buffer->blocks);
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     unsigned int nr_bytes;
     bool swapped = false;
     int re_flags = REG_NEWLINE;

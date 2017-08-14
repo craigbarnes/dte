@@ -13,7 +13,7 @@
 #include "detect.h"
 
 Buffer *buffer;
-PointerArray buffers = PTR_ARRAY_NEW();
+PointerArray buffers = PTR_ARRAY_INIT;
 bool everything_changed;
 
 static void set_display_filename(Buffer *b, char *name)
@@ -154,7 +154,7 @@ bool buffer_detect_filetype(Buffer *b)
     const char *ft = NULL;
 
     if (BLOCK(b->blocks.next)->size) {
-        BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
+        BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
 
         fill_line_ref(&bi, &lr);

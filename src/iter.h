@@ -34,7 +34,7 @@ typedef struct {
     long size;
 } LineRef;
 
-#define BLOCK_ITER_NEW(head) {BLOCK((head)->next), (head), 0}
+#define BLOCK_ITER_INIT(head) {BLOCK((head)->next), (head), 0}
 
 static inline void block_iter_bof(BlockIter *bi)
 {

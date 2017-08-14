@@ -4,7 +4,7 @@
 #include "search.h"
 #include "move.h"
 
-static PointerArray file_locations = PTR_ARRAY_NEW();
+static PointerArray file_locations = PTR_ARRAY_INIT;
 
 FileLocation *create_file_location(View *v)
 {

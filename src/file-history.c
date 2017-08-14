@@ -10,7 +10,7 @@ typedef struct {
     char *filename;
 } HistoryEntry;
 
-static PointerArray history = PTR_ARRAY_NEW();
+static PointerArray history = PTR_ARRAY_INIT;
 
 #define max_history_size 500
 

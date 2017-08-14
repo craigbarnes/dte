@@ -10,7 +10,7 @@ struct file_option {
     char **strs;
 };
 
-static PointerArray file_options = PTR_ARRAY_NEW();
+static PointerArray file_options = PTR_ARRAY_INIT;
 
 static void set_options(char **args)
 {

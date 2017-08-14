@@ -17,8 +17,8 @@ static bool next_line(BlockIter *bi, LineRef *lr)
  */
 char *detect_interpreter(Buffer *b)
 {
-    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
-    PointerArray m = PTR_ARRAY_NEW();
+    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
+    PointerArray m = PTR_ARRAY_INIT;
     LineRef lr;
     char *ret;
 
@@ -103,7 +103,7 @@ static int indent_len(Buffer *b, const char *line, int len, bool *tab_indent)
 
 bool detect_indent(Buffer *b)
 {
-    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
+    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
     int current_indent = 0;
     int counts[9] = {0};
     int tab_count = 0;

@@ -14,7 +14,7 @@ struct filetype {
     enum detect_type type;
 };
 
-static PointerArray filetypes = PTR_ARRAY_NEW();
+static PointerArray filetypes = PTR_ARRAY_INIT;
 
 static const char *const ignore[] = {
     "bak", "dpkg-dist", "dpkg-old", "new", "old", "orig", "pacnew",

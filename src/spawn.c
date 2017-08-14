@@ -26,7 +26,7 @@ static void handle_error_msg(Compiler *c, char *str)
 
     for (i = 0; i < c->error_formats.count; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
-        PointerArray m = PTR_ARRAY_NEW();
+        PointerArray m = PTR_ARRAY_INIT;
 
         if (!regexp_exec_sub(&p->re, str, len, &m, 0))
             continue;

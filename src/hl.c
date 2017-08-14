@@ -283,7 +283,7 @@ static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
 
 void hl_fill_start_states(Buffer *b, int line_nr)
 {
-    BlockIter bi = BLOCK_ITER_NEW(&b->blocks);
+    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
     PointerArray *s = &b->line_start_states;
     State **states;
     int current_line = 0;

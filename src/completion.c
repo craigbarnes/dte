@@ -255,7 +255,7 @@ static void init_completion(void)
 {
     char *cmd = strbuf_cstring(&cmdline.buf);
     const char *str;
-    PointerArray array = PTR_ARRAY_NEW();
+    PointerArray array = PTR_ARRAY_INIT;
     int semicolon = -1;
     int completion_pos = -1;
     int len, pos = 0;

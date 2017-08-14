@@ -11,8 +11,8 @@ typedef struct {
 
 typedef void (*free_func)(void *ptr);
 
+#define PTR_ARRAY_INIT {NULL, 0, 0}
 #define FREE_FUNC(f) (free_func)f
-#define PTR_ARRAY_NEW() {NULL, 0, 0}
 
 void ptr_array_add(PointerArray *array, void *ptr);
 void ptr_array_insert(PointerArray *array, void *ptr, long pos);

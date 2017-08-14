@@ -2,7 +2,7 @@
 #include "error.h"
 #include "common.h"
 
-static PointerArray compilers = PTR_ARRAY_NEW();
+static PointerArray compilers = PTR_ARRAY_INIT;
 
 static Compiler *add_compiler(const char *name)
 {

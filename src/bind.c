@@ -17,7 +17,7 @@ struct binding {
 
 static struct key_chain pressed_keys;
 
-static PointerArray bindings = PTR_ARRAY_NEW();
+static PointerArray bindings = PTR_ARRAY_INIT;
 
 static bool parse_keys(struct key_chain *chain, const char *str)
 {

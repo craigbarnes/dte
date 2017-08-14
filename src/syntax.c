@@ -3,7 +3,7 @@
 #include "error.h"
 #include "common.h"
 
-static PointerArray syntaxes = PTR_ARRAY_NEW();
+static PointerArray syntaxes = PTR_ARRAY_INIT;
 
 unsigned long buf_hash(const char *str, size_t size)
 {

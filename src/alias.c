@@ -11,7 +11,7 @@ typedef struct {
     char *value;
 } CommandAlias;
 
-static PointerArray aliases = PTR_ARRAY_NEW();
+static PointerArray aliases = PTR_ARRAY_INIT;
 
 static int validate_alias_name(const char *name)
 {

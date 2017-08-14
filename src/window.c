@@ -520,7 +520,7 @@ static void collect_window(Window *w, void *data)
 
 Window *prev_window(Window *w)
 {
-    PointerArray windows = PTR_ARRAY_NEW();
+    PointerArray windows = PTR_ARRAY_INIT;
     for_each_window_data(collect_window, &windows);
     w = ptr_array_prev(&windows, w);
     free(windows.ptrs);
@@ -529,7 +529,7 @@ Window *prev_window(Window *w)
 
 Window *next_window(Window *w)
 {
-    PointerArray windows = PTR_ARRAY_NEW();
+    PointerArray windows = PTR_ARRAY_INIT;
     for_each_window_data(collect_window, &windows);
     w = ptr_array_next(&windows, w);
     free(windows.ptrs);

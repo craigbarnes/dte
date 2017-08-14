@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
     if (command)
         handle_command(commands, command);
     if (tag) {
-        PointerArray array = PTR_ARRAY_NEW();
+        PointerArray array = PTR_ARRAY_INIT;
         ptr_array_add(&array, xstrdup("tag"));
         ptr_array_add(&array, xstrdup(tag));
         ptr_array_add(&array, NULL);

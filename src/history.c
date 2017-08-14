@@ -4,8 +4,8 @@
 #include "ptr-array.h"
 #include "error.h"
 
-PointerArray search_history = PTR_ARRAY_NEW();
-PointerArray command_history = PTR_ARRAY_NEW();
+PointerArray search_history = PTR_ARRAY_INIT;
+PointerArray command_history = PTR_ARRAY_INIT;
 
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, int max_entries)
