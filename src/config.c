@@ -1,6 +1,6 @@
 #include "config.h"
 #include "error.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "common.h"
 
 const char *config_file;
@@ -48,7 +48,7 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
     char *cmd;
-    GBUF(line);
+    StringBuffer line = STRBUF_INIT;
 
     while (ptr < buf + size) {
         size_t n = buf + size - ptr;
@@ -59,24 +59,24 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 
         if (line.len || is_command(ptr, n)) {
             if (has_line_continuation(ptr, n)) {
-                gbuf_add_buf(&line, ptr, n - 1);
+                strbuf_add_buf(&line, ptr, n - 1);
             } else {
-                gbuf_add_buf(&line, ptr, n);
-                cmd = gbuf_cstring(&line);
+                strbuf_add_buf(&line, ptr, n);
+                cmd = strbuf_cstring(&line);
                 handle_command(cmds, cmd);
                 free(cmd);
-                gbuf_clear(&line);
+                strbuf_clear(&line);
             }
         }
         config_line++;
         ptr += n + 1;
     }
     if (line.len) {
-        cmd = gbuf_cstring(&line);
+        cmd = strbuf_cstring(&line);
         handle_command(cmds, cmd);
         free(cmd);
     }
-    gbuf_free(&line);
+    strbuf_free(&line);
 }
 
 int do_read_config(const Command *cmds, const char *filename, bool must_exist)

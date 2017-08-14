@@ -15,7 +15,7 @@ static void cmdline_delete(CommandLine *c)
 
     u_get_char(c->buf.buffer, c->buf.len, &pos);
     len = pos - c->pos;
-    gbuf_remove(&c->buf, c->pos, len);
+    strbuf_remove(&c->buf, c->pos, len);
 }
 
 static void cmdline_backspace(CommandLine *c)
@@ -47,13 +47,13 @@ static void cmdline_erase_word(CommandLine *c)
     while (i && is_word_byte(c->buf.buffer[i - 1]))
         i--;
 
-    gbuf_remove(&c->buf, i, c->pos - i);
+    strbuf_remove(&c->buf, i, c->pos - i);
     c->pos = i;
 }
 
 static void cmdline_delete_bol(CommandLine *c)
 {
-    gbuf_remove(&c->buf, 0, c->pos);
+    strbuf_remove(&c->buf, 0, c->pos);
     c->pos = 0;
 }
 
@@ -78,7 +78,7 @@ static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
 {
     int i;
 
-    gbuf_make_space(&c->buf, c->pos, size);
+    strbuf_make_space(&c->buf, c->pos, size);
     for (i = 0; i < size; i++)
         c->buf.buffer[c->pos++] = buf[i];
 }
@@ -98,14 +98,14 @@ static void cmdline_insert_paste(CommandLine *c)
 
 static void set_text(CommandLine *c, const char *text)
 {
-    gbuf_clear(&c->buf);
-    gbuf_add_str(&c->buf, text);
+    strbuf_clear(&c->buf);
+    strbuf_add_str(&c->buf, text);
     c->pos = strlen(text);
 }
 
 void cmdline_clear(CommandLine *c)
 {
-    gbuf_clear(&c->buf);
+    strbuf_clear(&c->buf);
     c->pos = 0;
     c->search_pos = -1;
 }
@@ -130,7 +130,7 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
         return 1;
     }
     if (key <= KEY_UNICODE_MAX) {
-        c->pos += gbuf_insert_ch(&c->buf, c->pos, key);
+        c->pos += strbuf_insert_ch(&c->buf, c->pos, key);
         return 1;
     }
     switch (key) {
@@ -193,7 +193,7 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
             return 0;
         if (c->search_pos < 0) {
             free(c->search_text);
-            c->search_text = gbuf_cstring(&c->buf);
+            c->search_text = strbuf_cstring(&c->buf);
             c->search_pos = history->count;
         }
         if (history_search_forward(history, &c->search_pos, c->search_text))

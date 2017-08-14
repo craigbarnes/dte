@@ -2,11 +2,11 @@
 #define CMDLINE_H
 
 #include "ptr-array.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "term.h"
 
 typedef struct {
-    struct gbuf buf;
+    StringBuffer buf;
     long pos;
     int search_pos;
     char *search_text;
@@ -18,7 +18,7 @@ enum {
     CMDLINE_CANCEL,
 };
 
-#define CMDLINE(name) CommandLine name = {GBUF_INIT, 0, -1, NULL}
+#define CMDLINE(name) CommandLine name = {STRBUF_INIT, 0, -1, NULL}
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);

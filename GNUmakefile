@@ -57,12 +57,12 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
     command-mode commands common compiler completion config ctags ctype \
     cursed decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
-    frame gbuf git-open history hl indent input-special iter key \
+    frame git-open history hl indent input-special iter key \
     load-save lock main modes move msg normal-mode obuf options \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
-    syntax tabbar tag term-caps term uchar unicode vars view wbuf window \
-    xmalloc ))
+    strbuf syntax tabbar tag term-caps term uchar unicode vars view \
+    wbuf window xmalloc ))
 
 test_objects := src/test-main.o
 

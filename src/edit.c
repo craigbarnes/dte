@@ -3,14 +3,14 @@
 #include "buffer.h"
 #include "view.h"
 #include "change.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "indent.h"
 #include "uchar.h"
 #include "regexp.h"
 #include "selection.h"
 
 struct paragraph_formatter {
-    struct gbuf buf;
+    StringBuffer buf;
     char *indent;
     int indent_len;
     int indent_width;
@@ -668,19 +668,19 @@ static void add_word(struct paragraph_formatter *pf, const char *word, int len)
         word_width += u_char_width(u_get_char(word, len, &i));
 
     if (pf->cur_width && pf->cur_width + 1 + word_width > pf->text_width) {
-        gbuf_add_ch(&pf->buf, '\n');
+        strbuf_add_ch(&pf->buf, '\n');
         pf->cur_width = 0;
     }
 
     if (pf->cur_width == 0) {
-        gbuf_add_buf(&pf->buf, pf->indent, pf->indent_len);
+        strbuf_add_buf(&pf->buf, pf->indent, pf->indent_len);
         pf->cur_width = pf->indent_width;
     } else {
-        gbuf_add_ch(&pf->buf, ' ');
+        strbuf_add_ch(&pf->buf, ' ');
         pf->cur_width++;
     }
 
-    gbuf_add_buf(&pf->buf, word, len);
+    strbuf_add_buf(&pf->buf, word, len);
     pf->cur_width += word_width;
 }
 
@@ -762,7 +762,7 @@ void format_paragraph(int text_width)
     sel = block_iter_get_bytes(&view->cursor, len);
     indent_width = get_indent_width(sel, len);
 
-    gbuf_init(&pf.buf);
+    strbuf_init(&pf.buf);
     pf.indent = make_indent(indent_width);
     pf.indent_len = pf.indent ? strlen(pf.indent) : 0;
     pf.indent_width = indent_width;
@@ -794,11 +794,11 @@ void format_paragraph(int text_width)
     }
 
     if (pf.buf.len)
-        gbuf_add_ch(&pf.buf, '\n');
+        strbuf_add_ch(&pf.buf, '\n');
     buffer_replace_bytes(len, pf.buf.buffer, pf.buf.len);
     if (pf.buf.len)
         block_iter_skip_bytes(&view->cursor, pf.buf.len - 1);
-    gbuf_free(&pf.buf);
+    strbuf_free(&pf.buf);
     free(pf.indent);
     free(sel);
 
@@ -811,7 +811,7 @@ void change_case(int mode)
     bool move = true;
     long text_len, i;
     char *src;
-    GBUF(dst);
+    StringBuffer dst = STRBUF_INIT;
 
     if (view->selection) {
         SelectionInfo info;
@@ -850,7 +850,7 @@ void change_case(int mode)
             u = towupper(u);
             break;
         }
-        gbuf_add_ch(&dst, u);
+        strbuf_add_ch(&dst, u);
     }
 
     buffer_replace_bytes(text_len, dst.buffer, dst.len);
@@ -867,5 +867,5 @@ void change_case(int mode)
         }
     }
 
-    gbuf_free(&dst);
+    strbuf_free(&dst);
 }

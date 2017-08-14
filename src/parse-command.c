@@ -1,13 +1,13 @@
 #include "command.h"
 #include "editor.h"
 #include "error.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "ptr-array.h"
 #include "env.h"
 #include "common.h"
 #include "uchar.h"
 
-static GBUF(arg);
+static StringBuffer arg = STRBUF_INIT;
 
 static void parse_home(const char *cmd, int *posp)
 {
@@ -25,7 +25,7 @@ static void parse_home(const char *cmd, int *posp)
     }
 
     if (!len) {
-        gbuf_add_str(&arg, home_dir);
+        strbuf_add_str(&arg, home_dir);
         *posp = pos + 1;
         return;
     }
@@ -39,7 +39,7 @@ static void parse_home(const char *cmd, int *posp)
     if (!passwd)
         return;
 
-    gbuf_add_str(&arg, passwd->pw_dir);
+    strbuf_add_str(&arg, passwd->pw_dir);
     *posp = pos + 1 + len;
 }
 
@@ -54,7 +54,7 @@ static void parse_sq(const char *cmd, int *posp)
         }
         if (!cmd[pos])
             break;
-        gbuf_add_byte(&arg, cmd[pos++]);
+        strbuf_add_byte(&arg, cmd[pos++]);
     }
     *posp = pos;
 }
@@ -71,7 +71,7 @@ static int unicode_escape(const char *str, int count)
         u = u << 4 | x;
     }
     if (u_is_unicode(u)) {
-        gbuf_add_ch(&arg, u);
+        strbuf_add_ch(&arg, u);
     }
     return i;
 }
@@ -91,28 +91,28 @@ static void parse_dq(const char *cmd, int *posp)
             switch (ch) {
             case '\\':
             case '"':
-                gbuf_add_byte(&arg, ch);
+                strbuf_add_byte(&arg, ch);
                 break;
             case 'a':
-                gbuf_add_ch(&arg, '\a');
+                strbuf_add_ch(&arg, '\a');
                 break;
             case 'b':
-                gbuf_add_ch(&arg, '\b');
+                strbuf_add_ch(&arg, '\b');
                 break;
             case 'f':
-                gbuf_add_ch(&arg, '\f');
+                strbuf_add_ch(&arg, '\f');
                 break;
             case 'n':
-                gbuf_add_ch(&arg, '\n');
+                strbuf_add_ch(&arg, '\n');
                 break;
             case 'r':
-                gbuf_add_ch(&arg, '\r');
+                strbuf_add_ch(&arg, '\r');
                 break;
             case 't':
-                gbuf_add_ch(&arg, '\t');
+                strbuf_add_ch(&arg, '\t');
                 break;
             case 'v':
-                gbuf_add_ch(&arg, '\v');
+                strbuf_add_ch(&arg, '\v');
                 break;
             case 'x':
                 if (cmd[pos]) {
@@ -122,7 +122,7 @@ static void parse_dq(const char *cmd, int *posp)
                         x2 = hex_decode(cmd[pos]);
                         if (x2 >= 0) {
                             pos++;
-                            gbuf_add_byte(&arg, x1 << 4 | x2);
+                            strbuf_add_byte(&arg, x1 << 4 | x2);
                         }
                     }
                 }
@@ -134,12 +134,12 @@ static void parse_dq(const char *cmd, int *posp)
                 pos += unicode_escape(cmd + pos, 8);
                 break;
             default:
-                gbuf_add_ch(&arg, '\\');
-                gbuf_add_byte(&arg, ch);
+                strbuf_add_ch(&arg, '\\');
+                strbuf_add_byte(&arg, ch);
                 break;
             }
         } else {
-            gbuf_add_byte(&arg, ch);
+            strbuf_add_byte(&arg, ch);
         }
     }
     *posp = pos;
@@ -171,12 +171,12 @@ static void parse_var(const char *cmd, int *posp)
     name = xstrslice(cmd, si, ei);
     value = expand_builtin_env(name);
     if (value != NULL) {
-        gbuf_add_str(&arg, value);
+        strbuf_add_str(&arg, value);
         free(value);
     } else {
         const char *val = getenv(name);
         if (val != NULL) {
-            gbuf_add_str(&arg, val);
+            strbuf_add_str(&arg, val);
         }
     }
     free(name);
@@ -204,12 +204,12 @@ char *parse_command_arg(const char *cmd, bool tilde)
         } else if (ch == '\\') {
             if (!cmd[pos])
                 break;
-            gbuf_add_byte(&arg, cmd[pos++]);
+            strbuf_add_byte(&arg, cmd[pos++]);
         } else {
-            gbuf_add_byte(&arg, ch);
+            strbuf_add_byte(&arg, ch);
         }
     }
-    return gbuf_steal_cstring(&arg);
+    return strbuf_steal_cstring(&arg);
 }
 
 int find_end(const char *cmd, int pos, struct error **err)

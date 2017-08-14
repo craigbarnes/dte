@@ -5,7 +5,7 @@
 #include "change.h"
 #include "error.h"
 #include "edit.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "regexp.h"
 #include "selection.h"
 
@@ -249,7 +249,7 @@ void search_next_word(void)
     do_search_next(true);
 }
 
-static void build_replacement(struct gbuf *buf, const char *line, const char *format, regmatch_t *m)
+static void build_replacement(StringBuffer *buf, const char *line, const char *format, regmatch_t *m)
 {
     int i = 0;
 
@@ -261,16 +261,16 @@ static void build_replacement(struct gbuf *buf, const char *line, const char *fo
                 int n = format[i++] - '0';
                 int len = m[n].rm_eo - m[n].rm_so;
                 if (len > 0)
-                    gbuf_add_buf(buf, line + m[n].rm_so, len);
+                    strbuf_add_buf(buf, line + m[n].rm_so, len);
             } else {
-                gbuf_add_byte(buf, format[i++]);
+                strbuf_add_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
             int len = m[0].rm_eo - m[0].rm_so;
             if (len > 0)
-                gbuf_add_buf(buf, line + m[0].rm_so, len);
+                strbuf_add_buf(buf, line + m[0].rm_so, len);
         } else {
-            gbuf_add_byte(buf, ch);
+            strbuf_add_byte(buf, ch);
         }
     }
 }
@@ -326,7 +326,7 @@ static int replace_on_line(LineRef *lr, regex_t *re, const char *format,
             // Move cursor after the matched text
             block_iter_skip_bytes(&view->cursor, match_len);
         } else {
-            GBUF(b);
+            StringBuffer b = STRBUF_INIT;
 
             build_replacement(&b, buf + pos, format, m);
 
@@ -345,7 +345,7 @@ static int replace_on_line(LineRef *lr, regex_t *re, const char *format,
 
             // Move cursor after the replaced text
             block_iter_skip_bytes(&view->cursor, b.len);
-            gbuf_free(&b);
+            strbuf_free(&b);
         }
         *bi = view->cursor;
 

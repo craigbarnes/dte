@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "regexp.h"
 #include "error.h"
-#include "gbuf.h"
+#include "strbuf.h"
 #include "msg.h"
 #include "term.h"
 #include "fork.h"
@@ -65,7 +65,7 @@ static void read_errors(Compiler *c, int fd, int quiet)
 static void filter(int rfd, int wfd, FilterData *fdata)
 {
     unsigned int wlen = 0;
-    GBUF(buf);
+    StringBuffer buf = STRBUF_INIT;
     int rc;
 
     if (!fdata->in_len) {
@@ -109,7 +109,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
                     error_msg("Command did not read all data.");
                 break;
             }
-            gbuf_add_buf(&buf, data, rc);
+            strbuf_add_buf(&buf, data, rc);
         }
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
             rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
@@ -127,7 +127,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             }
         }
     }
-    fdata->out = gbuf_steal(&buf, &fdata->out_len);
+    fdata->out = strbuf_steal(&buf, &fdata->out_len);
 }
 
 static int open_dev_null(int flags)

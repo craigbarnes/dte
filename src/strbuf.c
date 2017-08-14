@@ -1,8 +1,8 @@
-#include "gbuf.h"
+#include "strbuf.h"
 #include "common.h"
 #include "uchar.h"
 
-void gbuf_grow(struct gbuf *buf, long more)
+void strbuf_grow(StringBuffer *buf, long more)
 {
     long alloc = ROUND_UP(buf->len + more, 16);
 
@@ -12,68 +12,68 @@ void gbuf_grow(struct gbuf *buf, long more)
     }
 }
 
-void gbuf_free(struct gbuf *buf)
+void strbuf_free(StringBuffer *buf)
 {
     free(buf->buffer);
-    gbuf_init(buf);
+    strbuf_init(buf);
 }
 
-void gbuf_add_byte(struct gbuf *buf, unsigned char byte)
+void strbuf_add_byte(StringBuffer *buf, unsigned char byte)
 {
-    gbuf_grow(buf, 1);
+    strbuf_grow(buf, 1);
     buf->buffer[buf->len++] = byte;
 }
 
-long gbuf_add_ch(struct gbuf *buf, unsigned int u)
+long strbuf_add_ch(StringBuffer *buf, unsigned int u)
 {
     unsigned int len = u_char_size(u);
 
-    gbuf_grow(buf, len);
+    strbuf_grow(buf, len);
     u_set_char_raw(buf->buffer, &buf->len, u);
     return len;
 }
 
-long gbuf_insert_ch(struct gbuf *buf, long pos, unsigned int u)
+long strbuf_insert_ch(StringBuffer *buf, long pos, unsigned int u)
 {
     unsigned int len = u_char_size(u);
 
-    gbuf_make_space(buf, pos, len);
+    strbuf_make_space(buf, pos, len);
     u_set_char_raw(buf->buffer, &pos, u);
     return len;
 }
 
-void gbuf_add_str(struct gbuf *buf, const char *str)
+void strbuf_add_str(StringBuffer *buf, const char *str)
 {
-    gbuf_add_buf(buf, str, strlen(str));
+    strbuf_add_buf(buf, str, strlen(str));
 }
 
-void gbuf_add_buf(struct gbuf *buf, const char *ptr, long len)
+void strbuf_add_buf(StringBuffer *buf, const char *ptr, long len)
 {
     if (!len)
         return;
-    gbuf_grow(buf, len);
+    strbuf_grow(buf, len);
     memcpy(buf->buffer + buf->len, ptr, len);
     buf->len += len;
 }
 
-char *gbuf_steal(struct gbuf *buf, long *len)
+char *strbuf_steal(StringBuffer *buf, long *len)
 {
     char *b = buf->buffer;
     *len = buf->len;
-    gbuf_init(buf);
+    strbuf_init(buf);
     return b;
 }
 
-char *gbuf_steal_cstring(struct gbuf *buf)
+char *strbuf_steal_cstring(StringBuffer *buf)
 {
     char *b;
-    gbuf_add_byte(buf, 0);
+    strbuf_add_byte(buf, 0);
     b = buf->buffer;
-    gbuf_init(buf);
+    strbuf_init(buf);
     return b;
 }
 
-char *gbuf_cstring(struct gbuf *buf)
+char *strbuf_cstring(StringBuffer *buf)
 {
     char *b = xnew(char, buf->len + 1);
     if (buf->len > 0) {
@@ -84,15 +84,15 @@ char *gbuf_cstring(struct gbuf *buf)
     return b;
 }
 
-void gbuf_make_space(struct gbuf *buf, long pos, long len)
+void strbuf_make_space(StringBuffer *buf, long pos, long len)
 {
     BUG_ON(pos > buf->len);
-    gbuf_grow(buf, len);
+    strbuf_grow(buf, len);
     memmove(buf->buffer + pos + len, buf->buffer + pos, buf->len - pos);
     buf->len += len;
 }
 
-void gbuf_remove(struct gbuf *buf, long pos, long len)
+void strbuf_remove(StringBuffer *buf, long pos, long len)
 {
     BUG_ON(pos + len > buf->len);
     memmove(buf->buffer + pos, buf->buffer + pos + len, buf->len - pos - len);

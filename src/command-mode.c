@@ -9,7 +9,7 @@
 static void command_line_enter(void)
 {
     PointerArray array = PTR_ARRAY_NEW();
-    char *str = gbuf_cstring(&cmdline.buf);
+    char *str = strbuf_cstring(&cmdline.buf);
     struct error *err = NULL;
     bool ok;
 

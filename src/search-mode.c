@@ -10,7 +10,7 @@ static void search_mode_keypress(int key)
     switch (key) {
     case KEY_ENTER:
         if (cmdline.buf.len > 0) {
-            char *str = gbuf_cstring(&cmdline.buf);
+            char *str = strbuf_cstring(&cmdline.buf);
             search_set_regexp(str);
             search_next();
             history_add(&search_history, str, search_history_size);
