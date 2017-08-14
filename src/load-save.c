@@ -266,7 +266,7 @@ write_error:
     return -1;
 }
 
-int save_buffer(Buffer *b, const char *filename, const char *encoding, enum newline_sequence newline)
+int save_buffer(Buffer *b, const char *filename, const char *encoding, LineEndingType newline)
 {
     struct file_encoder *enc;
     char *tmp = NULL;

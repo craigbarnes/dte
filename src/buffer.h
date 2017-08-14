@@ -50,7 +50,7 @@ typedef struct buffer {
     bool locked;
     bool setup;
 
-    enum newline_sequence newline;
+    LineEndingType newline;
 
     // Encoding of the file. Buffer always contains UTF-8.
     char *encoding;

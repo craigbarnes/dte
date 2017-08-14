@@ -3,10 +3,10 @@
 
 #include "libc.h"
 
-enum newline_sequence {
+typedef enum {
     NEWLINE_UNIX,
     NEWLINE_DOS,
-};
+} LineEndingType;
 
 enum {
     // Trailing whitespace
@@ -33,11 +33,11 @@ enum {
     WSE_AUTO_INDENT = 1 << 6,
 };
 
-enum case_sensitive_search {
+typedef enum {
     CSS_FALSE,
     CSS_TRUE,
     CSS_AUTO,
-};
+} SearchCaseSensitivity;
 
 enum tab_bar {
     TAB_BAR_HIDDEN,
@@ -92,11 +92,11 @@ typedef struct {
     int ws_error;
 
     // Only global
-    enum case_sensitive_search case_sensitive_search;
+    SearchCaseSensitivity case_sensitive_search;
     int display_special;
     int esc_timeout;
     int lock_files;
-    enum newline_sequence newline; // Default value for new files
+    LineEndingType newline; // Default value for new files
     int scroll_margin;
     int show_line_numbers;
     char *statusline_left;

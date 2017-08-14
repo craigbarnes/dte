@@ -34,14 +34,14 @@ GlobalOptions options = {
     .tab_bar_width = 25,
 };
 
-enum option_type {
+typedef enum {
     OPT_STR,
     OPT_INT,
     OPT_ENUM,
     OPT_FLAG,
-};
+} OptionType;
 
-struct option_desc {
+typedef struct {
     const struct option_ops *ops;
     const char *name;
     unsigned int offset;
@@ -65,21 +65,21 @@ struct option_desc {
     } u;
     // Optional
     void (*on_change)(void);
-};
+} OptionDesc;
 
-union option_value {
+typedef union  {
     // OPT_STR
     char *str_val;
     // OPT_INT, OPT_ENUM, OPT_FLAG
     int int_val;
-};
+} OptionValue;
 
 struct option_ops {
-    union option_value (*get)(const struct option_desc *desc, void *ptr);
-    void (*set)(const struct option_desc *desc, void *ptr, union option_value value);
-    bool (*parse)(const struct option_desc *desc, const char *str, union option_value *value);
-    char *(*string)(const struct option_desc *desc, union option_value value);
-    bool (*equals)(const struct option_desc *desc, void *ptr, union option_value value);
+    OptionValue (*get)(const OptionDesc *desc, void *ptr);
+    void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
+    bool (*parse)(const OptionDesc *desc, const char *str, OptionValue *value);
+    char *(*string)(const OptionDesc *desc, OptionValue value);
+    bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
 };
 
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
@@ -200,21 +200,21 @@ static bool validate_regex(const char *value)
     return true;
 }
 
-static union option_value str_get(const struct option_desc *desc, void *ptr)
+static OptionValue str_get(const OptionDesc *desc, void *ptr)
 {
-    union option_value v;
+    OptionValue v;
     v.str_val = xstrdup(*(char **)ptr);
     return v;
 }
 
-static void str_set(const struct option_desc *desc, void *ptr, union option_value value)
+static void str_set(const OptionDesc *desc, void *ptr, OptionValue value)
 {
     char **strp = ptr;
     free(*strp);
     *strp = xstrdup(value.str_val);
 }
 
-static bool str_parse(const struct option_desc *desc, const char *str, union option_value *value)
+static bool str_parse(const OptionDesc *desc, const char *str, OptionValue *value)
 {
     if (desc->u.str_opt.validate && !desc->u.str_opt.validate(str)) {
         value->str_val = NULL;
@@ -224,29 +224,29 @@ static bool str_parse(const struct option_desc *desc, const char *str, union opt
     return true;
 }
 
-static char *str_string(const struct option_desc *desc, union option_value value)
+static char *str_string(const OptionDesc *desc, OptionValue value)
 {
     return xstrdup(value.str_val);
 }
 
-static bool str_equals(const struct option_desc *desc, void *ptr, union option_value value)
+static bool str_equals(const OptionDesc *desc, void *ptr, OptionValue value)
 {
     return streq(*(char **)ptr, value.str_val);
 }
 
-static union option_value int_get(const struct option_desc *desc, void *ptr)
+static OptionValue int_get(const OptionDesc *desc, void *ptr)
 {
-    union option_value v;
+    OptionValue v;
     v.int_val = *(int *)ptr;
     return v;
 }
 
-static void int_set(const struct option_desc *desc, void *ptr, union option_value value)
+static void int_set(const OptionDesc *desc, void *ptr, OptionValue value)
 {
     *(int *)ptr = value.int_val;
 }
 
-static bool int_parse(const struct option_desc *desc, const char *str, union option_value *value)
+static bool int_parse(const OptionDesc *desc, const char *str, OptionValue *value)
 {
     int val;
 
@@ -263,17 +263,17 @@ static bool int_parse(const struct option_desc *desc, const char *str, union opt
     return true;
 }
 
-static char *int_string(const struct option_desc *desc, union option_value value)
+static char *int_string(const OptionDesc *desc, OptionValue value)
 {
     return xsprintf("%d", value.int_val);
 }
 
-static bool int_equals(const struct option_desc *desc, void *ptr, union option_value value)
+static bool int_equals(const OptionDesc *desc, void *ptr, OptionValue value)
 {
     return *(int *)ptr == value.int_val;
 }
 
-static bool enum_parse(const struct option_desc *desc, const char *str, union option_value *value)
+static bool enum_parse(const OptionDesc *desc, const char *str, OptionValue *value)
 {
     int val, i;
 
@@ -291,12 +291,12 @@ static bool enum_parse(const struct option_desc *desc, const char *str, union op
     return true;
 }
 
-static char *enum_string(const struct option_desc *desc, union option_value value)
+static char *enum_string(const OptionDesc *desc, OptionValue value)
 {
     return xstrdup(desc->u.enum_opt.values[value.int_val]);
 }
 
-static bool flag_parse(const struct option_desc *desc, const char *str, union option_value *value)
+static bool flag_parse(const OptionDesc *desc, const char *str, OptionValue *value)
 {
     const char **values = desc->u.flag_opt.values;
     const char *ptr = str;
@@ -340,7 +340,7 @@ static bool flag_parse(const struct option_desc *desc, const char *str, union op
     return true;
 }
 
-static char *flag_string(const struct option_desc *desc, union option_value value)
+static char *flag_string(const OptionDesc *desc, OptionValue value)
 {
     const char **values = desc->u.flag_opt.values;
     int flags = value.int_val;
@@ -398,7 +398,7 @@ static const char *ws_error_values[] = {
     NULL
 };
 
-static const struct option_desc option_desc[] = {
+static const OptionDesc option_desc[] = {
     BOOL_OPT("auto-indent", C(auto_indent), NULL),
     BOOL_OPT("brace-indent", L(brace_indent), NULL),
     ENUM_OPT("case-sensitive-search", G(case_sensitive_search), case_sensitive_search_enum, NULL),
@@ -426,22 +426,22 @@ static const struct option_desc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
 
-static inline char *local_ptr(const struct option_desc *desc, const LocalOptions *opt)
+static inline char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
     return (char *)opt + desc->offset;
 }
 
-static inline char *global_ptr(const struct option_desc *desc)
+static inline char *global_ptr(const OptionDesc *desc)
 {
     return (char *)&options + desc->offset;
 }
 
-static bool desc_is(const struct option_desc *desc, enum option_type type)
+static bool desc_is(const OptionDesc *desc, OptionType type)
 {
     return desc->ops == &option_ops[type];
 }
 
-static void desc_set(const struct option_desc *desc, void *ptr, union option_value value)
+static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
 {
     desc->ops->set(desc, ptr, value);
     if (desc->on_change) {
@@ -451,18 +451,18 @@ static void desc_set(const struct option_desc *desc, void *ptr, union option_val
     }
 }
 
-static void free_value(const struct option_desc *desc, union option_value value)
+static void free_value(const OptionDesc *desc, OptionValue value)
 {
     if (desc_is(desc, OPT_STR))
         free(value.str_val);
 }
 
-static const struct option_desc *find_option(const char *name)
+static const OptionDesc *find_option(const char *name)
 {
     int i;
 
     for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const struct option_desc *desc = &option_desc[i];
+        const OptionDesc *desc = &option_desc[i];
 
         if (streq(name, desc->name))
             return desc;
@@ -470,18 +470,18 @@ static const struct option_desc *find_option(const char *name)
     return NULL;
 }
 
-static const struct option_desc *must_find_option(const char *name)
+static const OptionDesc *must_find_option(const char *name)
 {
-    const struct option_desc *desc = find_option(name);
+    const OptionDesc *desc = find_option(name);
 
     if (desc == NULL)
         error_msg("No such option %s", name);
     return desc;
 }
 
-static const struct option_desc *must_find_global_option(const char *name)
+static const OptionDesc *must_find_global_option(const char *name)
 {
-    const struct option_desc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(name);
 
     if (desc && !desc->global) {
         error_msg("Option %s is not global", name);
@@ -490,9 +490,9 @@ static const struct option_desc *must_find_global_option(const char *name)
     return desc;
 }
 
-static void do_set_option(const struct option_desc *desc, const char *value, bool local, bool global)
+static void do_set_option(const OptionDesc *desc, const char *value, bool local, bool global)
 {
-    union option_value val;
+    OptionValue val;
 
     if (local && !desc->local) {
         error_msg("Option %s is not local", desc->name);
@@ -522,7 +522,7 @@ static void do_set_option(const struct option_desc *desc, const char *value, boo
 
 void set_option(const char *name, const char *value, bool local, bool global)
 {
-    const struct option_desc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(name);
 
     if (!desc)
         return;
@@ -531,7 +531,7 @@ void set_option(const char *name, const char *value, bool local, bool global)
 
 void set_bool_option(const char *name, bool local, bool global)
 {
-    const struct option_desc *desc = must_find_option(name);
+    const OptionDesc *desc = must_find_option(name);
 
     if (!desc)
         return;
@@ -542,9 +542,9 @@ void set_bool_option(const char *name, bool local, bool global)
     do_set_option(desc, "true", local, global);
 }
 
-static const struct option_desc *find_toggle_option(const char *name, bool *global)
+static const OptionDesc *find_toggle_option(const char *name, bool *global)
 {
-    const struct option_desc *desc;
+    const OptionDesc *desc;
 
     if (*global)
         return must_find_global_option(name);
@@ -564,8 +564,8 @@ static int toggle(int value, const char **values)
 
 void toggle_option(const char *name, bool global, bool verbose)
 {
-    const struct option_desc *desc = find_toggle_option(name, &global);
-    union option_value value;
+    const OptionDesc *desc = find_toggle_option(name, &global);
+    OptionValue value;
     char *ptr = NULL;
 
     if (!desc)
@@ -592,9 +592,9 @@ void toggle_option(const char *name, bool global, bool verbose)
 
 void toggle_option_values(const char *name, bool global, bool verbose, char **values)
 {
-    const struct option_desc *desc = find_toggle_option(name, &global);
+    const OptionDesc *desc = find_toggle_option(name, &global);
     int i, count = count_strings(values);
-    union option_value *parsed_values;
+    OptionValue *parsed_values;
     int current = -1;
     bool error = false;
     char *ptr;
@@ -607,7 +607,7 @@ void toggle_option_values(const char *name, bool global, bool verbose, char **va
     } else {
         ptr = local_ptr(desc, &buffer->options);
     }
-    parsed_values = xnew(union option_value, count);
+    parsed_values = xnew(OptionValue, count);
     for (i = 0; i < count; i++) {
         if (desc->ops->parse(desc, values[i], &parsed_values[i])) {
             if (desc->ops->equals(desc, ptr, parsed_values[i]))
@@ -639,7 +639,7 @@ bool validate_local_options(char **strs)
     for (i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
-        const struct option_desc *desc = must_find_option(name);
+        const OptionDesc *desc = must_find_option(name);
 
         if (desc == NULL) {
             valid = false;
@@ -647,7 +647,7 @@ bool validate_local_options(char **strs)
             error_msg("Option %s is not local", name);
             valid = false;
         } else {
-            union option_value val;
+            OptionValue val;
 
             if (desc->ops->parse(desc, value, &val)) {
                 free_value(desc, val);
@@ -664,7 +664,7 @@ void collect_options(const char *prefix)
     int i;
 
     for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const struct option_desc *desc = &option_desc[i];
+        const OptionDesc *desc = &option_desc[i];
         if (str_has_prefix(desc->name, prefix))
             add_completion(xstrdup(desc->name));
     }
@@ -675,7 +675,7 @@ void collect_toggleable_options(const char *prefix)
     int i;
 
     for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const struct option_desc *desc = &option_desc[i];
+        const OptionDesc *desc = &option_desc[i];
         if (desc_is(desc, OPT_ENUM) && str_has_prefix(desc->name, prefix))
             add_completion(xstrdup(desc->name));
     }
@@ -683,14 +683,14 @@ void collect_toggleable_options(const char *prefix)
 
 void collect_option_values(const char *name, const char *prefix)
 {
-    const struct option_desc *desc = find_option(name);
+    const OptionDesc *desc = find_option(name);
 
     if (!desc)
         return;
 
     if (!*prefix) {
         // Complete value
-        union option_value value;
+        OptionValue value;
         char *ptr;
 
         if (desc->local) {
@@ -735,7 +735,7 @@ void free_local_options(LocalOptions *opt)
     int i;
 
     for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const struct option_desc *desc = &option_desc[i];
+        const OptionDesc *desc = &option_desc[i];
 
         if (desc->local && desc_is(desc, OPT_STR)) {
             char **local = (char **)local_ptr(desc, opt);

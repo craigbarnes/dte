@@ -3,7 +3,7 @@
 #include "common.h"
 #include "cconv.h"
 
-struct file_encoder *new_file_encoder(const char *encoding, enum newline_sequence nls, int fd)
+struct file_encoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 {
     struct file_encoder *enc = xnew0(struct file_encoder, 1);
 

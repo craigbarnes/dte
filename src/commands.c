@@ -850,7 +850,7 @@ static void cmd_save(const char *pf, char **args)
     const char *enc = NULL;
     bool force = false;
     bool prompt = false;
-    enum newline_sequence newline = buffer->newline;
+    LineEndingType newline = buffer->newline;
     mode_t old_mode = buffer->st.st_mode;
     struct stat st;
     bool new_locked = false;
