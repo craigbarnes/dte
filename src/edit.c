@@ -9,14 +9,14 @@
 #include "regexp.h"
 #include "selection.h"
 
-struct paragraph_formatter {
+typedef struct {
     StringBuffer buf;
     char *indent;
     int indent_len;
     int indent_width;
     int cur_width;
     int text_width;
-};
+} ParagraphFormatter;
 
 static char *copy_buf;
 static long copy_len;
@@ -659,7 +659,7 @@ void new_line(void)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
-static void add_word(struct paragraph_formatter *pf, const char *word, int len)
+static void add_word(ParagraphFormatter *pf, const char *word, int len)
 {
     long i = 0;
     int word_width = 0;
@@ -745,7 +745,7 @@ static unsigned int paragraph_size(void)
 
 void format_paragraph(int text_width)
 {
-    struct paragraph_formatter pf;
+    ParagraphFormatter pf;
     long len, i;
     int indent_width;
     char *sel;

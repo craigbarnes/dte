@@ -3,16 +3,13 @@
 #include "regexp.h"
 #include "ptr-array.h"
 
-/*
- * Single filetype and extension/regexp pair.
- *
- * Filetypes are not grouped by name to make it possible to order them freely.
- */
-struct filetype {
+// Single filetype and extension/regexp pair.
+// Filetypes are not grouped by name to make it possible to order them freely.
+typedef struct {
     char *name;
     char *str;
     enum detect_type type;
-};
+} FileType;
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
 
@@ -23,7 +20,7 @@ static const char *const ignore[] = {
 
 void add_filetype(const char *name, const char *str, enum detect_type type)
 {
-    struct filetype *ft;
+    FileType *ft;
     regex_t re;
 
     switch (type) {
@@ -37,7 +34,7 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
         break;
     }
 
-    ft = xnew(struct filetype, 1);
+    ft = xnew(FileType, 1);
     ft->name = xstrdup(name);
     ft->str = xstrdup(str);
     ft->type = type;
@@ -92,7 +89,7 @@ const char *find_ft(const char *filename, const char *interpreter,
     if (filename)
         ext = get_ext(filename);
     for (i = 0; i < filetypes.count; i++) {
-        const struct filetype *ft = filetypes.ptrs[i];
+        const FileType *ft = filetypes.ptrs[i];
 
         switch (ft->type) {
         case FT_EXTENSION:
@@ -124,7 +121,7 @@ bool is_ft(const char *name)
     int i;
 
     for (i = 0; i < filetypes.count; i++) {
-        const struct filetype *ft = filetypes.ptrs[i];
+        const FileType *ft = filetypes.ptrs[i];
         if (streq(ft->name, name))
             return true;
     }

@@ -3,11 +3,11 @@
 #include "options.h"
 #include "regexp.h"
 
-struct file_option {
+typedef struct {
     enum file_options_type type;
     char *type_or_pattern;
     char **strs;
-};
+} FileOption;
 
 static PointerArray file_options = PTR_ARRAY_INIT;
 
@@ -24,7 +24,7 @@ void set_file_options(Buffer *b)
     int i;
 
     for (i = 0; i < file_options.count; i++) {
-        const struct file_option *opt = file_options.ptrs[i];
+        const FileOption *opt = file_options.ptrs[i];
 
         if (opt->type == FILE_OPTIONS_FILETYPE) {
             if (streq(opt->type_or_pattern, b->options.filetype))
@@ -40,7 +40,7 @@ void set_file_options(Buffer *b)
 
 void add_file_options(enum file_options_type type, char *to, char **strs)
 {
-    struct file_option *opt;
+    FileOption *opt;
     regex_t re;
 
     if (type == FILE_OPTIONS_FILENAME) {
@@ -52,7 +52,7 @@ void add_file_options(enum file_options_type type, char *to, char **strs)
         regfree(&re);
     }
 
-    opt = xnew(struct file_option, 1);
+    opt = xnew(FileOption, 1);
     opt->type = type;
     opt->type_or_pattern = to;
     opt->strs = strs;
