@@ -9,9 +9,13 @@ typedef struct {
     long count;
 } PointerArray;
 
-typedef void (*free_func)(void *ptr);
+#define PTR_ARRAY_INIT { \
+    .ptrs = NULL, \
+    .alloc = 0, \
+    .count = 0 \
+}
 
-#define PTR_ARRAY_INIT {NULL, 0, 0}
+typedef void (*free_func)(void *ptr);
 #define FREE_FUNC(f) (free_func)f
 
 void ptr_array_add(PointerArray *array, void *ptr);

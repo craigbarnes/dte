@@ -8,9 +8,6 @@ typedef struct list_head {
     struct list_head *next, *prev;
 } ListHead;
 
-#define LIST_HEAD_INIT(name) {&(name), &(name)}
-#define LIST_HEAD(name) ListHead name = LIST_HEAD_INIT(name)
-
 static inline void list_init(ListHead *head)
 {
     head->next = head;

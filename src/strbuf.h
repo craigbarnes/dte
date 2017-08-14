@@ -9,7 +9,11 @@ typedef struct {
     long len;
 } StringBuffer;
 
-#define STRBUF_INIT { NULL, 0, 0 }
+#define STRBUF_INIT { \
+    .buffer = NULL, \
+    .alloc = 0, \
+    .len = 0 \
+}
 
 static inline void strbuf_init(StringBuffer *buf)
 {
