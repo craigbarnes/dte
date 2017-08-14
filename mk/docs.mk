@@ -35,11 +35,11 @@ $(img): public/%.png: Documentation/%.png | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
-$(TTMAN): %: %.o
+$(TTMAN): Documentation/ttman.o
 	$(E) HOSTLD $@
 	$(Q) $(HOST_LD) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
 
-Documentation/%.o: Documentation/%.c
+Documentation/ttman.o: Documentation/ttman.c
 	$(E) HOSTCC $@
 	$(Q) $(HOST_CC) $(HOST_CFLAGS) $(BASIC_HOST_CFLAGS) -c -o $@ $<
 

@@ -94,9 +94,8 @@ src/vars.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR
 
 src/main.o: src/bindings.inc
 src/vars.o: .VARS
-$(OBJECTS): .CFLAGS
 
-%.o: %.c | $(missing_dep_dirs)
+$(OBJECTS): src/%.o: src/%.c .CFLAGS | $(missing_dep_dirs)
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
