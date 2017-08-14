@@ -4,10 +4,10 @@
 #include "selection.h"
 #include "editor.h"
 
-struct builtin_env {
+typedef struct {
     const char *name;
     char *(*expand)(void);
-};
+} BuiltinEnv;
 
 static char *expand_dte_home(void)
 {
@@ -47,7 +47,7 @@ static char *expand_word(void)
     return str;
 }
 
-static const struct builtin_env builtin[] = {
+static const BuiltinEnv builtin[] = {
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"PKGDATADIR", expand_pkgdatadir},
@@ -71,7 +71,7 @@ char *expand_builtin_env(const char *name)
     int i;
 
     for (i = 0; i < ARRAY_COUNT(builtin); i++) {
-        const struct builtin_env *be = &builtin[i];
+        const BuiltinEnv *be = &builtin[i];
         if (streq(be->name, name)) {
             return be->expand();
         }

@@ -2,7 +2,7 @@
 #include "common.h"
 #include "uchar.h"
 
-struct output_buffer obuf;
+OutputBuffer obuf;
 int screen_w = 80;
 int screen_h = 24;
 

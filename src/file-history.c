@@ -5,10 +5,10 @@
 #include "ptr-array.h"
 #include "error.h"
 
-struct history_entry {
+typedef struct {
     int row, col;
     char *filename;
-};
+} HistoryEntry;
 
 static PointerArray history = PTR_ARRAY_NEW();
 
@@ -16,7 +16,7 @@ static PointerArray history = PTR_ARRAY_NEW();
 
 void add_file_history(int row, int col, const char *filename)
 {
-    struct history_entry *e;
+    HistoryEntry *e;
     int i;
 
     for (i = 0; i < history.count; i++) {
@@ -39,7 +39,7 @@ void add_file_history(int row, int col, const char *filename)
     if (!max_history_size)
         return;
 
-    e = xnew(struct history_entry, 1);
+    e = xnew(HistoryEntry, 1);
     e->row = row;
     e->col = col;
     e->filename = xstrdup(filename);
@@ -90,7 +90,7 @@ void save_file_history(void)
         return;
     }
     for (i = 0; i < history.count; i++) {
-        struct history_entry *e = history.ptrs[i];
+        HistoryEntry *e = history.ptrs[i];
         char str[64];
         snprintf(str, sizeof(str), "%d %d ", e->row, e->col);
         wbuf_write_str(&buf, str);
@@ -107,7 +107,7 @@ bool find_file_in_history(const char *filename, int *row, int *col)
     int i;
 
     for (i = 0; i < history.count; i++) {
-        struct history_entry *e = history.ptrs[i];
+        HistoryEntry *e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             *row = e->row;
             *col = e->col;

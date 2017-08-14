@@ -4,7 +4,7 @@
 #include "term.h"
 #include "libc.h"
 
-struct output_buffer {
+typedef struct {
     char buf[8192];
     long count;
 
@@ -26,9 +26,9 @@ struct output_buffer {
     bool can_clear;
 
     struct term_color color;
-};
+} OutputBuffer;
 
-extern struct output_buffer obuf;
+extern OutputBuffer obuf;
 extern int screen_w;
 extern int screen_h;
 

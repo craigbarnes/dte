@@ -324,15 +324,15 @@ char get_confirmation(const char *choices, const char *format, ...)
     return key;
 }
 
-struct screen_state {
+typedef struct {
     bool is_modified;
     int id;
     int cy;
     int vx;
     int vy;
-};
+} ScreenState;
 
-static void save_state(struct screen_state *s, View *v)
+static void save_state(ScreenState *s, View *v)
 {
     s->is_modified = buffer_modified(v->buffer);
     s->id = v->buffer->id;
@@ -341,7 +341,7 @@ static void save_state(struct screen_state *s, View *v)
     s->vy = v->vy;
 }
 
-static void update_screen(struct screen_state *s)
+static void update_screen(ScreenState *s)
 {
     View *v = window->view;
     Buffer *b = v->buffer;
@@ -408,7 +408,7 @@ void main_loop(void)
             modes[input_mode]->keypress(key);
             modes[input_mode]->update();
         } else {
-            struct screen_state s;
+            ScreenState s;
             save_state(&s, window->view);
             modes[input_mode]->keypress(key);
             sanity_check();
