@@ -10,7 +10,7 @@ static void command_line_enter(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
     char *str = strbuf_cstring(&cmdline.buf);
-    struct error *err = NULL;
+    Error *err = NULL;
     bool ok;
 
     reset_completion();

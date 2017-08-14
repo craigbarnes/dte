@@ -3,9 +3,9 @@
 #include "common.h"
 #include "cconv.h"
 
-struct file_encoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
+FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 {
-    struct file_encoder *enc = xnew0(struct file_encoder, 1);
+    FileEncoder *enc = xnew0(FileEncoder, 1);
 
     enc->nls = nls;
     enc->fd = fd;
@@ -20,7 +20,7 @@ struct file_encoder *new_file_encoder(const char *encoding, LineEndingType nls, 
     return enc;
 }
 
-void free_file_encoder(struct file_encoder *enc)
+void free_file_encoder(FileEncoder *enc)
 {
     if (enc->cconv != NULL)
         cconv_free(enc->cconv);
@@ -28,7 +28,7 @@ void free_file_encoder(struct file_encoder *enc)
     free(enc);
 }
 
-static ssize_t unix_to_dos(struct file_encoder *enc, const unsigned char *buf, ssize_t size)
+static ssize_t unix_to_dos(FileEncoder *enc, const unsigned char *buf, ssize_t size)
 {
     ssize_t s, d;
 
@@ -47,7 +47,7 @@ static ssize_t unix_to_dos(struct file_encoder *enc, const unsigned char *buf, s
 }
 
 // NOTE: buf must contain whole characters!
-ssize_t file_encoder_write(struct file_encoder *enc, const unsigned char *buf, ssize_t size)
+ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, ssize_t size)
 {
     if (enc->nls == NEWLINE_DOS) {
         size = unix_to_dos(enc, buf, size);

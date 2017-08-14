@@ -212,7 +212,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     return strbuf_steal_cstring(&arg);
 }
 
-int find_end(const char *cmd, int pos, struct error **err)
+int find_end(const char *cmd, int pos, Error **err)
 {
     while (1) {
         char ch = cmd[pos];
@@ -278,7 +278,7 @@ unexpected_eof:
     return -1;
 }
 
-bool parse_commands(PointerArray *array, const char *cmd, struct error **err)
+bool parse_commands(PointerArray *array, const char *cmd, Error **err)
 {
     int pos = 0;
 

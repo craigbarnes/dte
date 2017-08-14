@@ -1,12 +1,12 @@
 #include "unicode.h"
 #include "common.h"
 
-struct codepoint_range {
+typedef struct {
     unsigned int first, last;
-};
+} CodepointRange;
 
 // All these are indistinguishable from ASCII space on terminal.
-static const struct codepoint_range evil_space[] = {
+static const CodepointRange evil_space[] = {
     {0x00a0, 0x00a0}, // No-break space. Easy to type accidentally (AltGr+Space)
     {0x00ad, 0x00ad}, // Soft hyphen. Very very soft...
     {0x2000, 0x200a}, // Legacy spaces of varying sizes
@@ -16,7 +16,7 @@ static const struct codepoint_range evil_space[] = {
     {0x2800, 0x2800}, // Braille Pattern Blank
 };
 
-static const struct codepoint_range zero_width[] = {
+static const CodepointRange zero_width[] = {
     {0x200b, 0x200f},
     {0x202a, 0x202e},
     {0x2060, 0x2063},
@@ -34,7 +34,7 @@ static const struct codepoint_range zero_width[] = {
 //
 // Taken from the Unicode 10 character database at:
 // http://www.unicode.org/Public/10.0.0/ucd/UnicodeData.txt
-static const struct codepoint_range combining[] = {
+static const CodepointRange combining[] = {
     {0x0300, 0x036f}, {0x0483, 0x0489}, {0x0591, 0x05bd},
     {0x05bf, 0x05bf}, {0x05c1, 0x05c2}, {0x05c4, 0x05c5},
     {0x05c7, 0x05c7}, {0x0600, 0x0605}, {0x0610, 0x061a},
@@ -149,7 +149,7 @@ static const struct codepoint_range combining[] = {
 //
 // Taken from the Unicode 10 character database at:
 // http://www.unicode.org/Public/10.0.0/ucd/EastAsianWidth.txt
-static const struct codepoint_range east_asian_wide[] = {
+static const CodepointRange east_asian_wide[] = {
     {0x1100, 0x115f}, {0x231a, 0x231b}, {0x2329, 0x232a},
     {0x23e9, 0x23ec}, {0x23f0, 0x23f0}, {0x23f3, 0x23f3},
     {0x25fd, 0x25fe}, {0x2614, 0x2615}, {0x2648, 0x2653},
@@ -188,7 +188,7 @@ static const struct codepoint_range east_asian_wide[] = {
     {0x30000, 0x3fffd}
 };
 
-static inline bool in_range(unsigned int u, const struct codepoint_range *range, int count)
+static inline bool in_range(unsigned int u, const CodepointRange *range, int count)
 {
     for (int i = 0; i < count; i++) {
         if (u < range[i].first)
@@ -199,7 +199,7 @@ static inline bool in_range(unsigned int u, const struct codepoint_range *range,
     return false;
 }
 
-static inline bool bisearch(unsigned int u, const struct codepoint_range *range, int max)
+static inline bool bisearch(unsigned int u, const CodepointRange *range, int max)
 {
     int min = 0;
     int mid;

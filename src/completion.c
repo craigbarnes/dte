@@ -261,7 +261,7 @@ static void init_completion(void)
     int len, pos = 0;
 
     while (1) {
-        struct error *err = NULL;
+        Error *err = NULL;
         int end;
 
         while (isspace(cmd[pos]))

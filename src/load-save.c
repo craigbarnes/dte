@@ -43,7 +43,7 @@ copy:
 static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size)
 {
     const char *e = detect_encoding_from_bom(buf, size);
-    struct file_decoder *dec;
+    FileDecoder *dec;
     char *line;
     ssize_t len;
 
@@ -233,7 +233,7 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(Buffer *b, struct file_encoder *enc, const ByteOrderMark *bom)
+static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
 {
     ssize_t size = 0;
     Block *blk;
@@ -268,7 +268,7 @@ write_error:
 
 int save_buffer(Buffer *b, const char *filename, const char *encoding, LineEndingType newline)
 {
-    struct file_encoder *enc;
+    FileEncoder *enc;
     char *tmp = NULL;
     int fd;
 

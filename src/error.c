@@ -7,16 +7,16 @@ int nr_errors;
 bool msg_is_error;
 char error_buf[256];
 
-static struct error *error_new(char *msg)
+static Error *error_new(char *msg)
 {
-    struct error *err = xnew0(struct error, 1);
+    Error *err = xnew0(Error, 1);
     err->msg = msg;
     return err;
 }
 
-struct error *error_create(const char *format, ...)
+Error *error_create(const char *format, ...)
 {
-    struct error *err;
+    Error *err;
     va_list ap;
 
     va_start(ap, format);
@@ -25,9 +25,9 @@ struct error *error_create(const char *format, ...)
     return err;
 }
 
-struct error *error_create_errno(int code, const char *format, ...)
+Error *error_create_errno(int code, const char *format, ...)
 {
-    struct error *err;
+    Error *err;
     va_list ap;
 
     va_start(ap, format);
@@ -37,7 +37,7 @@ struct error *error_create_errno(int code, const char *format, ...)
     return err;
 }
 
-void error_free(struct error *err)
+void error_free(Error *err)
 {
     if (err != NULL) {
         free(err->msg);

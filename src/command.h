@@ -15,8 +15,8 @@ typedef struct {
 
 // parse-command.c
 char *parse_command_arg(const char *cmd, bool tilde);
-int find_end(const char *cmd, int pos, struct error **err);
-bool parse_commands(PointerArray *array, const char *cmd, struct error **err);
+int find_end(const char *cmd, int pos, Error **err);
+bool parse_commands(PointerArray *array, const char *cmd, Error **err);
 char **copy_string_array(char **src, int count);
 
 // run.c
