@@ -5,24 +5,6 @@ uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
 LIBS = -lcurses
 X =
 
-quiet_cmd_rc2c = GEN    $@
-
-cmd_rc2c = \
-    echo 'static const char *$(1) =' > $@; \
-    $(SED) -f mk/rc2c.sed $< >> $@
-
-quiet_cmd_cc = CC     $@
-      cmd_cc = $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
-
-quiet_cmd_ld = LD     $@
-      cmd_ld = $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(1)
-
-quiet_cmd_host_cc = HOSTCC $@
-      cmd_host_cc = $(HOST_CC) $(HOST_CFLAGS) $(BASIC_HOST_CFLAGS) -c -o $@ $<
-
-quiet_cmd_host_ld = HOSTLD $@
-      cmd_host_ld = $(HOST_LD) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^ $(1)
-
 try-run = $(shell if ($(1)) >/dev/null 2>&1; then echo "$(2)"; else echo "$(3)"; fi)
 cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 
@@ -30,11 +12,14 @@ cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 export LC_ALL := C
 
 ifdef S_FLAG
-  cmd = $(call cmd_$(1),$(2))
+  Q = @
+  E = @:
 else ifeq "$(V)" "1"
-  cmd = @echo "$(call cmd_$(1),$(2))"; $(call cmd_$(1),$(2))
+  Q =
+  E = @:
 else
-  cmd = @echo "   $(quiet_cmd_$(1))"; $(call cmd_$(1),$(2))
+  Q = @
+  E = @printf ' %7s  %s\n'
 endif
 
 ifeq "$(uname_S)" "Darwin"
@@ -112,7 +97,8 @@ src/vars.o: .VARS
 $(OBJECTS): .CFLAGS
 
 %.o: %.c | $(missing_dep_dirs)
-	$(call cmd,cc)
+	$(E) CC $@
+	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
 .CFLAGS: FORCE
 	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
@@ -121,7 +107,9 @@ $(OBJECTS): .CFLAGS
 	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 src/bindings.inc: share/binding/builtin mk/rc2c.sed
-	$(call cmd,rc2c,builtin_bindings)
+	$(E) GEN $@
+	$(Q) echo 'static const char *builtin_bindings =' > $@
+	$(Q) $(SED) -f mk/rc2c.sed $< >> $@
 
 
 .PHONY: FORCE

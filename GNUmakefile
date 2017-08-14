@@ -72,10 +72,12 @@ include mk/docs.mk
 all: dte$(X) test man
 
 dte$(X): $(editor_objects)
-	$(call cmd,ld,$(LIBS))
+	$(E) LD $@
+	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
 test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
-	$(call cmd,ld,$(LIBS))
+	$(E) LD $@
+	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
 install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(bindir)

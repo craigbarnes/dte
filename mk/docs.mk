@@ -14,37 +14,34 @@ man  := $(man1) $(man5)
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 img  := public/screenshot.png
 
-quiet_cmd_ttman = TTMAN  $@
-cmd_ttman = $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
-
-quiet_cmd_man2html = GROFF  $@
-cmd_man2html = groff -mandoc -Thtml $< > $@
-
-quiet_cmd_cp = CP     $@
-cmd_cp = cp $< $@
-
 docs: man html img
 man: $(man)
 html: $(html)
 img: $(img)
 
 $(man1): Documentation/dte.txt $(TTMAN)
-	$(call cmd,ttman)
+	$(E) TTMAN $@
+	$(Q) $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
 
 $(man5): Documentation/dte-syntax.txt $(TTMAN)
-	$(call cmd,ttman)
+	$(E) TTMAN $@
+	$(Q) $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
 
 $(html): public/%.html: Documentation/% | public/
-	$(call cmd,man2html)
+	$(E) GROFF $@
+	$(Q) groff -mandoc -Thtml $< > $@
 
 $(img): public/%.png: Documentation/%.png | public/
-	$(call cmd,cp)
+	$(E) CP $@
+	$(Q) cp $< $@
 
 $(TTMAN): %: %.o
-	$(call cmd,host_ld,)
+	$(E) HOSTLD $@
+	$(Q) $(HOST_LD) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
 
 Documentation/%.o: Documentation/%.c
-	$(call cmd,host_cc)
+	$(E) HOSTCC $@
+	$(Q) $(HOST_CC) $(HOST_CFLAGS) $(BASIC_HOST_CFLAGS) -c -o $@ $<
 
 public/:
 	@mkdir -p $@
