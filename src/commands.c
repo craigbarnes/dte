@@ -180,7 +180,7 @@ static void cmd_command(const char *pf, char **args)
 static void cmd_compile(const char *pf, char **args)
 {
     Compiler *c;
-    unsigned int flags = 0;
+    SpawnFlags flags = SPAWN_DEFAULT;
     const char *name;
 
     while (*pf) {

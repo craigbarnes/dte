@@ -44,7 +44,7 @@ static void handle_error_msg(Compiler *c, char *str)
     add_message(new_message(str));
 }
 
-static void read_errors(Compiler *c, int fd, int quiet)
+static void read_errors(Compiler *c, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
     char line[4096];
@@ -201,11 +201,11 @@ error:
     return -1;
 }
 
-void spawn_compiler(char **args, unsigned int flags, Compiler *c)
+void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
 {
-    int read_stdout = flags & SPAWN_READ_STDOUT;
-    int prompt = flags & SPAWN_PROMPT;
-    int quiet = flags & SPAWN_QUIET;
+    bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
+    bool prompt = !!(flags & SPAWN_PROMPT);
+    bool quiet = !!(flags & SPAWN_QUIET);
     int pid, dev_null, p[2], fd[3];
 
     fd[0] = open_dev_null(O_RDONLY);
