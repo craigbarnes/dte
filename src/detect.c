@@ -1,5 +1,4 @@
 #include "detect.h"
-#include "buffer.h"
 #include "regexp.h"
 
 static bool next_line(BlockIter *bi, LineRef *lr)

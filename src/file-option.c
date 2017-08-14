@@ -1,7 +1,6 @@
 #include "file-option.h"
 #include "ptr-array.h"
 #include "options.h"
-#include "buffer.h"
 #include "regexp.h"
 
 struct file_option {

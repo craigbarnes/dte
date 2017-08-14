@@ -2,10 +2,9 @@
 #define DETECT_H
 
 #include "libc.h"
+#include "buffer.h"
 
-struct buffer;
-
-char *detect_interpreter(struct buffer *b);
-bool detect_indent(struct buffer *b);
+char *detect_interpreter(Buffer *b);
+bool detect_indent(Buffer *b);
 
 #endif
