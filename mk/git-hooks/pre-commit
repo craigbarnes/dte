@@ -1,18 +1,23 @@
 #!/bin/sh
 
-TMPDIR='.pre-commit-test/'
-MAKE="$(command -v gmake || command -v make)"
-ARGV0="$0"
+# This pre-commit hook creates a fresh, temporary checkout of the index
+# (i.e. not including unstaged/dirty changes from the working tree)
+# and then performs a full build.
+
+TMPDIR='.pre-commit-test'
+PROGNAME="$0"
 
 abort() {
-    echo "$ARGV0: Error: $1" >&2
+    echo "$PROGNAME:$2: Error: $1" >&2
     exit 1
 }
 
-test -x "$MAKE" || abort 'unable to find GNU Make command'
-test ! -e "$TMPDIR" || abort "pre-commit TMPDIR already exists: '$TMPDIR'"
+test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists" $LINENO
 
-git checkout-index --prefix="$TMPDIR" -af || exit 1
+MAKE="$(command -v gmake || command -v make)"
+test -x "$MAKE" || abort 'unable to find GNU Make command' $LINENO
+
+git checkout-index --prefix="$TMPDIR/" -a || exit 1
 trap "rm -rf '$TMPDIR'" EXIT
 
 $MAKE -j"$(mk/nproc.sh)" --directory="$TMPDIR"
