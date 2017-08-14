@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     if (dte_home)
         user_config_dir = xstrdup(dte_home);
     else
-        user_config_dir = xsprintf("%s/.%s", home_dir, program);
+        user_config_dir = xsprintf("%s/.dte", home_dir);
 
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
             read_rc = false;
             break;
         case 'V':
-            printf("%s %s\n", program, version);
+            printf("dte %s\n", version);
             puts("(C) 2017 Craig Barnes");
             puts("(C) 2010-2015 Timo Hirvonen");
             return 0;

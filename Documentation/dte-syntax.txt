@@ -1,15 +1,15 @@
-@title %MAN% 5 2012
+@title DTE-SYNTAX 5 2012
 
 @h1 NAME
 
-Syntax of syntax highlighting files used by %PROGRAM%.
+Syntax of syntax highlighting files used by dte.
 
 @h1 DESCRIPTION
 
 Syntax file consists of states. A state consists of optional
 conditionals and one default action. The best way understand the syntax
-is to read /usr/share/%PROGRAM%/syntax/%PROGRAM% (a simple example) or
-/usr/share/%PROGRAM%/syntax/c (a more complete example using
+is to read %PKGDATADIR%/syntax/dte (a simple example) or
+%PKGDATADIR%/syntax/c (a more complete example using
 sub-syntaxes).
 
 Basic syntax of the syntax files is the same used in the rc files, but
@@ -166,4 +166,4 @@ Timo Hirvonen <tihirvon\@gmail.com>
 
 @h1 SEE ALSO
 
-%PROGRAM%(1)
+dte(1)

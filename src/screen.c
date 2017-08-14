@@ -163,10 +163,10 @@ void update_term_title(Buffer *b)
     }
 
     // FIXME: title must not contain control characters
-    snprintf(title, sizeof(title), "%s %c %s",
+    snprintf(title, sizeof(title), "%s %c dte",
         buffer_filename(b),
-        buffer_modified(b) ? '+' : '-',
-        program);
+        buffer_modified(b) ? '+' : '-'
+    );
 
     switch (term_type) {
     case 1:

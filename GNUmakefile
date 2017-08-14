@@ -27,7 +27,7 @@ mandir ?= $(datadir)/man
 
 # 0: Disable debugging.
 # 1: Enable BUG_ON() and light-weight sanity checks.
-# 2: Enable logging to ~/.$(PROGRAM)/debug.log.
+# 2: Enable logging to $(DTE_HOME)/debug.log.
 # 3: Enable expensive sanity checks.
 DEBUG = 1
 
@@ -43,9 +43,8 @@ WARNINGS = \
 
 # End of configuration
 
-PROGRAM = dte
 VERSION = 1.2
-PKGDATADIR = $(datadir)/$(PROGRAM)
+PKGDATADIR = $(datadir)/dte
 LIBS =
 X =
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
@@ -67,9 +66,9 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
 test_objects := src/test-main.o
 
 syntax_files := \
-    awk c config css diff docker gitcommit gitrebase go html html+smarty \
+    awk c config css diff docker dte gitcommit gitrebase go html html+smarty \
     ini java javascript lua mail make markdown meson php python robotstxt \
-    ruby sh smarty sql xml $(PROGRAM)
+    ruby sh smarty sql xml
 
 binding := $(addprefix share/binding/, default classic builtin)
 color := $(addprefix share/color/, darkgray light light256)
@@ -79,7 +78,7 @@ syntax := $(addprefix share/syntax/, $(syntax_files))
 
 OBJECTS := $(editor_objects) $(test_objects)
 
-all: $(PROGRAM)$(X) test man
+all: dte$(X) test man
 
 -include Config.mk
 include mk/compat.mk
@@ -139,17 +138,17 @@ $(OBJECTS): .CFLAGS
 .CFLAGS: FORCE
 	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
-src/vars.o: BASIC_CFLAGS += -DPROGRAM=\"$(PROGRAM)\" -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
+src/vars.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 src/vars.o: .VARS
 src/main.o: src/bindings.inc
 
 .VARS: FORCE
-	@mk/optcheck.sh "PROGRAM=$(PROGRAM) VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
+	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 src/bindings.inc: share/binding/builtin mk/rc2c.sed
 	$(call cmd,rc2c,builtin_bindings)
 
-$(PROGRAM)$(X): $(editor_objects)
+dte$(X): $(editor_objects)
 	$(call cmd,ld,$(LIBS))
 
 test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
@@ -163,7 +162,7 @@ install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/syntax
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man7
-	$(INSTALL) -m755 $(PROGRAM)$(X)  $(DESTDIR)$(bindir)
+	$(INSTALL) -m755 dte$(X)     $(DESTDIR)$(bindir)
 	$(INSTALL) -m644 $(config)   $(DESTDIR)$(PKGDATADIR)
 	$(INSTALL) -m644 $(binding)  $(DESTDIR)$(PKGDATADIR)/binding
 	$(INSTALL) -m644 $(color)    $(DESTDIR)$(PKGDATADIR)/color
@@ -176,7 +175,7 @@ tags:
 	ctags src/*.[ch]
 
 clean:
-	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc $(PROGRAM)$(X) test $(CLEANFILES)
+	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc dte$(X) test $(CLEANFILES)
 	$(RM) -r $(dep_dirs)
 
 distclean: clean

@@ -8,14 +8,14 @@ XARGS_P_FLAG = $(shell \
     echo '-P$(NPROC)' \
 )
 
-man1 := Documentation/$(PROGRAM).1
-man5 := Documentation/$(PROGRAM)-syntax.5
+man1 := Documentation/dte.1
+man5 := Documentation/dte-syntax.5
 man  := $(man1) $(man5)
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 img  := public/screenshot.png
 
 quiet_cmd_ttman = TTMAN  $@
-cmd_ttman = mk/manvars.sh '$<' '$(PROGRAM)' | $(TTMAN) > $@
+cmd_ttman = $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
 
 quiet_cmd_man2html = GROFF  $@
 cmd_man2html = groff -mandoc -Thtml $< > $@
@@ -28,10 +28,10 @@ man: $(man)
 html: $(html)
 img: $(img)
 
-$(man1): Documentation/$(PROGRAM).txt $(TTMAN)
+$(man1): Documentation/dte.txt $(TTMAN)
 	$(call cmd,ttman)
 
-$(man5): Documentation/$(PROGRAM)-syntax.txt $(TTMAN)
+$(man5): Documentation/dte-syntax.txt $(TTMAN)
 	$(call cmd,ttman)
 
 $(html): public/%.html: Documentation/% | public/

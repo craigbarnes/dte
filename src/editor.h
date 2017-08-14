@@ -27,7 +27,6 @@ extern bool child_controls_terminal;
 extern bool resized;
 extern int cmdline_x;
 
-extern const char *program;
 extern const char *version;
 extern const char *pkgdatadir;
 
