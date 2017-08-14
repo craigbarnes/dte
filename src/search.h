@@ -3,10 +3,10 @@
 
 #include "libc.h"
 
-enum search_direction {
+typedef enum {
     SEARCH_FWD,
     SEARCH_BWD,
-};
+} SearchDirection;
 
 enum {
     REPLACE_CONFIRM = (1 << 0),
@@ -18,8 +18,8 @@ enum {
 
 bool search_tag(const char *pattern, bool *err);
 
-void search_set_direction(enum search_direction dir);
-enum search_direction current_search_direction(void);
+void search_set_direction(SearchDirection dir);
+SearchDirection current_search_direction(void);
 void search_set_regexp(const char *pattern);
 void search_prev(void);
 void search_next(void);

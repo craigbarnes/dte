@@ -40,7 +40,7 @@ State *find_state(Syntax *syn, const char *name)
     return NULL;
 }
 
-static bool has_destination(enum condition_type type)
+static bool has_destination(ConditionType type)
 {
     switch (type) {
     case COND_RECOLOR:

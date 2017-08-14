@@ -126,18 +126,18 @@ bool search_tag(const char *pattern, bool *err)
 static struct {
     regex_t regex;
     char *pattern;
-    enum search_direction direction;
+    SearchDirection direction;
 
     // If zero then regex hasn't been compiled
     int re_flags;
 } current_search;
 
-void search_set_direction(enum search_direction dir)
+void search_set_direction(SearchDirection dir)
 {
     current_search.direction = dir;
 }
 
-enum search_direction current_search_direction(void)
+SearchDirection current_search_direction(void)
 {
     return current_search.direction;
 }

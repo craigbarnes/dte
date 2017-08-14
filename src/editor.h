@@ -4,21 +4,21 @@
 #include "libc.h"
 #include "cmdline.h"
 
-enum editor_status {
+typedef enum {
     EDITOR_INITIALIZING,
     EDITOR_RUNNING,
     EDITOR_EXITING,
-};
+} EditorStatus;
 
-enum input_mode {
+typedef enum {
     INPUT_NORMAL,
     INPUT_COMMAND,
     INPUT_SEARCH,
     INPUT_GIT_OPEN,
-};
+} InputMode;
 
-extern enum editor_status editor_status;
-extern enum input_mode input_mode;
+extern EditorStatus editor_status;
+extern InputMode input_mode;
 extern CommandLine cmdline;
 extern char *home_dir;
 extern char *user_config_dir;
@@ -32,7 +32,7 @@ extern const char *pkgdatadir;
 
 char *editor_file(const char *name);
 char get_confirmation(const char *choices, const char *format, ...) FORMAT(2);
-void set_input_mode(enum input_mode mode);
+void set_input_mode(InputMode mode);
 void any_key(void);
 void normal_update(void);
 void resize(void);

@@ -5,7 +5,7 @@
 #include "color.h"
 #include "ptr-array.h"
 
-enum condition_type {
+typedef enum {
     COND_BUFIS,
     COND_CHAR,
     COND_CHAR_BUFFER,
@@ -16,7 +16,7 @@ enum condition_type {
     COND_STR2,
     COND_STR_ICASE,
     COND_HEREDOCEND,
-};
+} ConditionType;
 
 typedef struct action {
     struct state *destination;
@@ -69,7 +69,7 @@ typedef struct {
         } cond_heredocend;
     } u;
     Action a;
-    enum condition_type type;
+    ConditionType type;
 } Condition;
 
 typedef struct {

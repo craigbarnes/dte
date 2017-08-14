@@ -145,7 +145,7 @@ static bool destination_state(const char *name, State **dest)
     return true;
 }
 
-static Condition *add_condition(enum condition_type type, const char *dest, const char *emit)
+static Condition *add_condition(ConditionType type, const char *dest, const char *emit)
 {
     Condition *c;
     State *d = NULL;
@@ -185,7 +185,7 @@ static void cmd_bufis(const char *pf, char **args)
 
 static void cmd_char(const char *pf, char **args)
 {
-    enum condition_type type = COND_CHAR;
+    ConditionType type = COND_CHAR;
     bool not = false;
     Condition *c;
 
@@ -351,7 +351,7 @@ static void cmd_noeat(const char *pf, char **args)
 static void cmd_recolor(const char *pf, char **args)
 {
     // If length is not specified then buffered bytes will be recolored
-    enum condition_type type = COND_RECOLOR_BUFFER;
+    ConditionType type = COND_RECOLOR_BUFFER;
     Condition *c;
     int len = 0;
 
@@ -394,7 +394,7 @@ static void cmd_state(const char *pf, char **args)
 static void cmd_str(const char *pf, char **args)
 {
     bool icase = !!*pf;
-    enum condition_type type = icase ? COND_STR_ICASE : COND_STR;
+    ConditionType type = icase ? COND_STR_ICASE : COND_STR;
     const char *str = args[0];
     Condition *c;
     int len = strlen(str);

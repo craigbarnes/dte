@@ -1078,7 +1078,7 @@ static void cmd_search(const char *pf, char **args)
     bool history = true;
     char cmd = 0;
     bool w = false;
-    enum search_direction dir = SEARCH_FWD;
+    SearchDirection dir = SEARCH_FWD;
     char *pattern = args[0];
 
     while (*pf) {
@@ -1433,7 +1433,7 @@ static void cmd_wprev(const char *pf, char **args)
 
 static void cmd_wresize(const char *pf, char **args)
 {
-    enum resize_direction dir = RESIZE_DIRECTION_AUTO;
+    ResizeDirection dir = RESIZE_DIRECTION_AUTO;
     const char *arg = *args;
 
     while (*pf) {

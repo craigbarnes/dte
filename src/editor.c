@@ -11,8 +11,8 @@
 #include "modes.h"
 #include "error.h"
 
-enum editor_status editor_status;
-enum input_mode input_mode;
+EditorStatus editor_status;
+InputMode input_mode;
 CMDLINE(cmdline);
 char *home_dir;
 char *user_config_dir;
@@ -38,7 +38,7 @@ static void sanity_check(void)
     BUG("cursor not seen\n");
 }
 
-void set_input_mode(enum input_mode mode)
+void set_input_mode(InputMode mode)
 {
     input_mode = mode;
 }

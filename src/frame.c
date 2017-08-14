@@ -264,7 +264,7 @@ Frame *new_root_frame(Window *w)
     return add_frame(NULL, w, 0);
 }
 
-static Frame *find_resizable(Frame *f, enum resize_direction dir)
+static Frame *find_resizable(Frame *f, ResizeDirection dir)
 {
     if (dir == RESIZE_DIRECTION_AUTO)
         return f;
@@ -310,7 +310,7 @@ void equalize_frame_sizes(Frame *parent)
     update_window_coordinates();
 }
 
-void add_to_frame_size(Frame *f, enum resize_direction dir, int amount)
+void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
 {
     f = find_resizable(f, dir);
     if (f == NULL)
@@ -324,7 +324,7 @@ void add_to_frame_size(Frame *f, enum resize_direction dir, int amount)
     update_window_coordinates();
 }
 
-void resize_frame(Frame *f, enum resize_direction dir, int size)
+void resize_frame(Frame *f, ResizeDirection dir, int size)
 {
     f = find_resizable(f, dir);
     if (f == NULL)
