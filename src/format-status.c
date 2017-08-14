@@ -3,19 +3,19 @@
 #include "view.h"
 #include "uchar.h"
 
-static void add_ch(struct formatter *f, char ch)
+static void add_ch(Formatter *f, char ch)
 {
     f->buf[f->pos++] = ch;
 }
 
-static void add_separator(struct formatter *f)
+static void add_separator(Formatter *f)
 {
     if (f->separator && f->pos < f->size)
         add_ch(f, ' ');
     f->separator = false;
 }
 
-static void add_status_str(struct formatter *f, const char *str)
+static void add_status_str(Formatter *f, const char *str)
 {
     long idx = 0;
 
@@ -28,7 +28,7 @@ static void add_status_str(struct formatter *f, const char *str)
 }
 
 FORMAT(2)
-static void add_status_format(struct formatter *f, const char *format, ...)
+static void add_status_format(Formatter *f, const char *format, ...)
 {
     char buf[1024];
     va_list ap;
@@ -39,7 +39,7 @@ static void add_status_format(struct formatter *f, const char *format, ...)
     add_status_str(f, buf);
 }
 
-static void add_status_pos(struct formatter *f)
+static void add_status_pos(Formatter *f)
 {
     long lines = f->win->view->buffer->nl;
     int h = f->win->edit_h;
@@ -60,13 +60,13 @@ static void add_status_pos(struct formatter *f)
     }
 }
 
-void sf_init(struct formatter *f, Window *win)
+void sf_init(Formatter *f, Window *win)
 {
     clear(f);
     f->win = win;
 }
 
-void sf_format(struct formatter *f, char *buf, long size, const char *format)
+void sf_format(Formatter *f, char *buf, long size, const char *format)
 {
     View *v = f->win->view;
     bool got_char;

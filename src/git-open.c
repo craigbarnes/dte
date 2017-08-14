@@ -233,7 +233,7 @@ static void git_open_update(void)
     buf_flush();
 }
 
-const struct editor_mode_ops git_open_ops = {
+const EditorModeOps git_open_ops = {
     .keypress = git_open_keypress,
     .update = git_open_update,
 };

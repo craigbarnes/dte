@@ -3,16 +3,16 @@
 
 #include "window.h"
 
-struct formatter {
+typedef struct {
     char *buf;
     long size;
     long pos;
     bool separator;
     Window *win;
     const char *misc_status;
-};
+} Formatter;
 
-void sf_init(struct formatter *f, Window *win);
-void sf_format(struct formatter *f, char *buf, long size, const char *format);
+void sf_init(Formatter *f, Window *win);
+void sf_format(Formatter *f, char *buf, long size, const char *format);
 
 #endif

@@ -49,7 +49,7 @@ static void normal_mode_keypress(int key)
     }
 }
 
-const struct editor_mode_ops normal_mode_ops = {
+const EditorModeOps normal_mode_ops = {
     .keypress = normal_mode_keypress,
     .update = normal_update,
 };

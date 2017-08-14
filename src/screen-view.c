@@ -5,7 +5,7 @@
 #include "selection.h"
 #include "hl.h"
 
-struct line_info {
+typedef struct {
     View *view;
     long line_nr;
     long offset;
@@ -18,7 +18,7 @@ struct line_info {
     long indent_size;
     long trailing_ws_offset;
     HlColor **colors;
-};
+} LineInfo;
 
 static bool is_default_bg_color(int color)
 {
@@ -36,7 +36,7 @@ static void mask_color2(struct term_color *color, const struct term_color *over)
         color->attr = over->attr;
 }
 
-static void mask_selection_and_current_line(struct line_info *info, struct term_color *color)
+static void mask_selection_and_current_line(LineInfo *info, struct term_color *color)
 {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
         mask_color(color, builtin_colors[BC_SELECTION]);
@@ -68,7 +68,7 @@ static int get_ws_error_option(Buffer *b)
     return flags;
 }
 
-static bool whitespace_error(struct line_info *info, unsigned int u, long i)
+static bool whitespace_error(LineInfo *info, unsigned int u, long i)
 {
     View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
@@ -120,7 +120,7 @@ static bool whitespace_error(struct line_info *info, unsigned int u, long i)
     return false;
 }
 
-static unsigned int screen_next_char(struct line_info *info)
+static unsigned int screen_next_char(LineInfo *info)
 {
     long count, pos = info->pos;
     unsigned int u = info->line[pos];
@@ -157,7 +157,7 @@ static unsigned int screen_next_char(struct line_info *info)
     return u;
 }
 
-static void screen_skip_char(struct line_info *info)
+static void screen_skip_char(LineInfo *info)
 {
     unsigned int u = info->line[info->pos++];
 
@@ -195,7 +195,7 @@ static bool is_notice(const char *word, int len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(struct line_info *info)
+static void hl_words(LineInfo *info)
 {
     HlColor *cc = find_color("comment");
     HlColor *nc = find_color("notice");
@@ -234,7 +234,7 @@ static void hl_words(struct line_info *info)
     }
 }
 
-static void line_info_init(struct line_info *info, View *v, BlockIter *bi, long line_nr)
+static void line_info_init(LineInfo *info, View *v, BlockIter *bi, long line_nr)
 {
     memset(info, 0, sizeof(*info));
     info->view = v;
@@ -258,7 +258,7 @@ static void line_info_init(struct line_info *info, View *v, BlockIter *bi, long 
     }
 }
 
-static void line_info_set_line(struct line_info *info, LineRef *lr, HlColor **colors)
+static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
 {
     int i;
 
@@ -286,7 +286,7 @@ static void line_info_set_line(struct line_info *info, LineRef *lr, HlColor **co
     }
 }
 
-static void print_line(struct line_info *info)
+static void print_line(LineInfo *info)
 {
     struct term_color color;
     unsigned int u;
@@ -330,7 +330,7 @@ static void print_line(struct line_info *info)
 
 void update_range(View *v, int y1, int y2)
 {
-    struct line_info info;
+    LineInfo info;
     BlockIter bi = v->cursor;
     int i, got_line;
 

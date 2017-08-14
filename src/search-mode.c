@@ -40,7 +40,7 @@ static void search_mode_keypress(int key)
     }
 }
 
-const struct editor_mode_ops search_mode_ops = {
+const EditorModeOps search_mode_ops = {
     .keypress = search_mode_keypress,
     .update = normal_update,
 };

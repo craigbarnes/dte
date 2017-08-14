@@ -5,21 +5,21 @@
 #include "command.h"
 #include "ptr-array.h"
 
-struct key_chain {
+typedef struct {
     int keys[3];
     int count;
-};
+} KeyChain;
 
-struct binding {
+typedef struct {
     char *command;
-    struct key_chain chain;
-};
+    KeyChain chain;
+} Binding;
 
-static struct key_chain pressed_keys;
+static KeyChain pressed_keys;
 
 static PointerArray bindings = PTR_ARRAY_INIT;
 
-static bool parse_keys(struct key_chain *chain, const char *str)
+static bool parse_keys(KeyChain *chain, const char *str)
 {
     char *keys = xstrdup(str);
     int len = strlen(keys);
@@ -68,9 +68,9 @@ static bool parse_keys(struct key_chain *chain, const char *str)
 
 void add_binding(const char *keys, const char *command)
 {
-    struct binding *b;
+    Binding *b;
 
-    b = xnew(struct binding, 1);
+    b = xnew(Binding, 1);
     if (!parse_keys(&b->chain, keys)) {
         free(b);
         return;
@@ -82,14 +82,14 @@ void add_binding(const char *keys, const char *command)
 
 void remove_binding(const char *keys)
 {
-    struct key_chain chain;
+    KeyChain chain;
     int i = bindings.count;
 
     if (!parse_keys(&chain, keys))
         return;
 
     while (i > 0) {
-        struct binding *b = bindings.ptrs[--i];
+        Binding *b = bindings.ptrs[--i];
 
         if (memcmp(&b->chain, &chain, sizeof(chain)) == 0) {
             ptr_array_remove_idx(&bindings, i);
@@ -108,8 +108,8 @@ void handle_binding(int key)
     pressed_keys.count++;
 
     for (i = bindings.count; i > 0; i--) {
-        struct binding *b = bindings.ptrs[i - 1];
-        struct key_chain *c = &b->chain;
+        Binding *b = bindings.ptrs[i - 1];
+        KeyChain *c = &b->chain;
 
         if (c->count < pressed_keys.count)
             continue;

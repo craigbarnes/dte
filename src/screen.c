@@ -56,7 +56,7 @@ static const char *format_misc_status(Window *win)
 
 void update_status_line(Window *win)
 {
-    struct formatter f;
+    Formatter f;
     char lbuf[256];
     char rbuf[256];
     int lw, rw;

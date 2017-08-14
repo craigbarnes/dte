@@ -55,7 +55,7 @@ static void command_mode_keypress(int key)
     }
 }
 
-const struct editor_mode_ops command_mode_ops = {
+const EditorModeOps command_mode_ops = {
     .keypress = command_mode_keypress,
     .update = normal_update,
 };

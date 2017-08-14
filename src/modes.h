@@ -3,15 +3,15 @@
 
 #include "term.h"
 
-struct editor_mode_ops {
+typedef struct {
     void (*keypress)(int key);
     void (*update)(void);
-};
+} EditorModeOps;
 
-extern const struct editor_mode_ops normal_mode_ops;
-extern const struct editor_mode_ops command_mode_ops;
-extern const struct editor_mode_ops search_mode_ops;
-extern const struct editor_mode_ops git_open_ops;
-extern const struct editor_mode_ops *const modes[];
+extern const EditorModeOps normal_mode_ops;
+extern const EditorModeOps command_mode_ops;
+extern const EditorModeOps search_mode_ops;
+extern const EditorModeOps git_open_ops;
+extern const EditorModeOps *const modes[];
 
 #endif
