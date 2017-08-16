@@ -95,6 +95,10 @@ static const struct keymap builtin_keys[] = {
     {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP,    "\033[1;8A", T_SCREEN | T_XTERM},
     {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN,  "\033[1;8B", T_SCREEN | T_XTERM},
 
+    {MOD_CTRL | KEY_DELETE, "\033[3;5~", T_SCREEN | T_XTERM},
+    {MOD_SHIFT | KEY_DELETE, "\033[3;2~", T_SCREEN | T_XTERM},
+    {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "\033[3;6~", T_SCREEN | T_XTERM},
+
     {MOD_SHIFT | '\t', "\033[Z", T_SCREEN | T_ST | T_XTERM},
 };
 
