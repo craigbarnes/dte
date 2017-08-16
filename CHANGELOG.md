@@ -5,6 +5,7 @@ v1.3 (unreleased)
 -----------------
 
 * Added support for binding Ctrl+Alt+Shift+arrows in xterm/screen/tmux.
+* Added support for binding Ctrl+delete/Shift+delete in xterm/screen/tmux.
 * Added the ability to override the default user config directory via
   the `DTE_EDITOR` enviornment variable.
 * Added syntax highlighting for the Markdown, Meson and Ruby languages.
