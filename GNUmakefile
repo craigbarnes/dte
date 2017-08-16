@@ -86,7 +86,7 @@ install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/compiler
 	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/syntax
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man7
+	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man5
 	$(INSTALL) -m755 dte$(X)     $(DESTDIR)$(bindir)
 	$(INSTALL) -m644 $(config)   $(DESTDIR)$(PKGDATADIR)
 	$(INSTALL) -m644 $(binding)  $(DESTDIR)$(PKGDATADIR)/binding
