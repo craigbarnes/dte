@@ -74,6 +74,41 @@ static void cmdline_next_char(CommandLine *c)
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
 }
 
+static void cmdline_next_word(CommandLine *c)
+{
+    const char *buf = c->buf.buffer;
+    const long len = c->buf.len;
+    long i = c->pos;
+
+    while (i < len && is_word_byte(buf[i]))
+        i++;
+
+    while (i < len && !is_word_byte(buf[i]))
+        i++;
+
+    c->pos = i;
+}
+
+static void cmdline_prev_word(CommandLine *c)
+{
+    const char *buf = c->buf.buffer;
+    long i = c->pos;
+
+    if (i > 1 && is_word_byte(buf[i]) && !is_word_byte(buf[i - 1]))
+        i--;
+
+    while (i > 0 && !is_word_byte(buf[i]))
+        i--;
+
+    while (i > 0 && is_word_byte(buf[i]))
+        i--;
+
+    if (i > 0)
+        i++;
+
+    c->pos = i;
+}
+
 static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
 {
     int i;
@@ -182,6 +217,13 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
     case KEY_RIGHT:
         cmdline_next_char(c);
         return 1;
+    case CTRL(KEY_LEFT):
+        cmdline_prev_word(c);
+        return 1;
+    case CTRL(KEY_RIGHT):
+        cmdline_next_word(c);
+        return 1;
+
     case KEY_HOME:
         c->pos = 0;
         return 1;
