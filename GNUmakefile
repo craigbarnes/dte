@@ -57,6 +57,7 @@ color := $(addprefix share/color/, darkgray light light256)
 compiler:= $(addprefix share/compiler/, gcc go)
 config := $(addprefix share/, filetype option rc)
 syntax := $(addprefix share/syntax/, $(syntax_files))
+dte := dte$(X)
 
 OBJECTS := $(editor_objects) $(test_objects)
 
@@ -69,14 +70,13 @@ include mk/build.mk
 include mk/docs.mk
 -include mk/dev.mk
 
-all: dte$(X) test man
+all: $(dte) test man
 
-dte$(X): $(editor_objects)
-	$(E) LD $@
-	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
-
+$(dte): $(editor_objects)
 test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
-	$(E) LD $@
+
+$(dte) test:
+	$(E) LINK $@
 	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
 install: all
@@ -87,7 +87,7 @@ install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/syntax
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man5
-	$(INSTALL) -m755 dte$(X)     $(DESTDIR)$(bindir)
+	$(INSTALL) -m755 $(dte)      $(DESTDIR)$(bindir)
 	$(INSTALL) -m644 $(config)   $(DESTDIR)$(PKGDATADIR)
 	$(INSTALL) -m644 $(binding)  $(DESTDIR)$(PKGDATADIR)/binding
 	$(INSTALL) -m644 $(color)    $(DESTDIR)$(PKGDATADIR)/color
@@ -100,7 +100,7 @@ tags:
 	ctags src/*.[ch]
 
 clean:
-	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc dte$(X) test $(CLEANFILES)
+	$(RM) .CFLAGS .VARS src/*.o src/bindings.inc $(dte) test $(CLEANFILES)
 	$(RM) -r $(dep_dirs)
 
 distclean: clean
