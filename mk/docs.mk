@@ -11,13 +11,14 @@ XARGS_P_FLAG = $(shell \
 man1 := Documentation/dte.1
 man5 := Documentation/dte-syntax.5
 man  := $(man1) $(man5)
+
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 img  := public/screenshot.png
+web  := $(html) $(img) $(patsubst %, %.gz, $(html))
 
-docs: man html img
+docs: man web
 man: $(man)
-html: $(html)
-img: $(img)
+web: $(web)
 
 $(man1): Documentation/dte.txt $(TTMAN)
 	$(E) TTMAN $@
@@ -35,6 +36,10 @@ $(img): public/%.png: Documentation/%.png | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
+public/%.gz: public/%
+	$(E) GZIP $@
+	$(Q) gzip -9 < $< > $@
+
 $(TTMAN): Documentation/ttman.o
 	$(E) HOSTLD $@
 	$(Q) $(HOST_LD) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
@@ -50,5 +55,5 @@ check-docs: README.md CONTRIBUTING.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
-CLEANFILES += $(man) $(html) $(img) $(TTMAN) $(TTMAN).o
-.PHONY: docs man html img check-docs
+CLEANFILES += $(man) $(web) $(TTMAN) $(TTMAN).o
+.PHONY: docs man web check-docs
