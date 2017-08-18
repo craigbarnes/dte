@@ -1,21 +1,17 @@
-/*
- * Sane locale-independent, ASCII ctype.
- *
- * No surprises, and works with signed and unsigned chars.
- *
- * Borrowed from the GIT version control system.
- */
+// Sane, locale-independent ASCII ctype (borrowed from git).
+// No surprises and works with signed and unsigned chars.
+
 #include "ctype.h"
 
 enum {
-    S = GIT_SPACE,
-    L = GIT_LOWER,
-    U = GIT_UPPER,
-    D = GIT_DIGIT,
-    x = GIT_LOWER | GIT_HEX_LOWER,
-    X = GIT_UPPER | GIT_HEX_UPPER,
-    G = GIT_GLOB_SPECIAL, // *, ?, \\, [
-    R = GIT_REGEX_SPECIAL, // $, (, ), +, ., ^, {, |
+    S = CTYPE_SPACE,
+    L = CTYPE_LOWER,
+    U = CTYPE_UPPER,
+    D = CTYPE_DIGIT,
+    x = CTYPE_LOWER | CTYPE_HEX_LOWER,
+    X = CTYPE_UPPER | CTYPE_HEX_UPPER,
+    G = CTYPE_GLOB_SPECIAL, // *, ?, \\, [
+    R = CTYPE_REGEX_SPECIAL, // $, (, ), +, ., ^, {, |
 };
 
 unsigned char sane_ctype[256] = {
@@ -32,11 +28,11 @@ unsigned char sane_ctype[256] = {
 
 int hex_decode(int ch)
 {
-    if (sane_istest(ch, GIT_DIGIT))
+    if (sane_istest(ch, CTYPE_DIGIT))
         return ch - '0';
-    if (sane_istest(ch, GIT_HEX_LOWER))
+    if (sane_istest(ch, CTYPE_HEX_LOWER))
         return ch - 'a' + 10;
-    if (sane_istest(ch, GIT_HEX_UPPER))
+    if (sane_istest(ch, CTYPE_HEX_UPPER))
         return ch - 'A' + 10;
     return -1;
 }
