@@ -36,7 +36,5 @@ pages:
     artifacts: {paths: [public]}
     only: [master]
     script:
-        - apk --update add make gcc binutils libc-dev git groff tar gzip
-        - git fetch --tags
-        - make -j`mk/nproc.sh` docs dist V=1
-        - make check-dist
+        - apk --update add make gcc binutils libc-dev groff gzip
+        - make -j`mk/nproc.sh` docs V=1
