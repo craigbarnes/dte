@@ -133,9 +133,12 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         states->ptrs[i] = s;
         s->name = xstrdup(fix_name(s->name, prefix));
         s->emit_name = xstrdup(s->emit_name);
-        s->conds.ptrs = xmemdup(s->conds.ptrs, sizeof(void *) * s->conds.alloc);
-        for (j = 0; j < s->conds.count; j++)
-            s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
+        if (s->conds.count > 0) {
+            s->conds.ptrs = xmemdup(s->conds.ptrs, sizeof(void *) * s->conds.alloc);
+            for (j = 0; j < s->conds.count; j++) {
+                s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
+            }
+        }
 
         // Mark unvisited so that state that is used only as a return state gets visited.
         s->visited = false;
