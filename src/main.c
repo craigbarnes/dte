@@ -179,9 +179,10 @@ int main(int argc, char *argv[])
 
     editor_status = EDITOR_RUNNING;
 
-    for (int i = optind, lineno = 0; i < argc; i++) {
+    long lineno = 0;
+    for (int i = optind; i < argc; i++) {
         if (argv[i][0] == '+' && lineno <= 0) {
-            lineno = atoi(&argv[i][1]);
+            lineno = atol(&argv[i][1]);
             if (lineno <= 0) {
                 error_msg("Invalid line number: '%s'", &argv[i][1]);
             }
