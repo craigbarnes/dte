@@ -17,7 +17,8 @@ mandir ?= $(datadir)/man
 # Enabled if supported by CC
 WARNINGS = \
     -Wall -Wformat-security -Wmissing-prototypes -Wold-style-definition \
-    -Wwrite-strings -Wundef -Wshadow
+    -Wwrite-strings -Wundef -Wshadow \
+    -Wextra -Wno-unused-parameter -Wno-sign-compare
 
 # More verbose build
 # V = 1
