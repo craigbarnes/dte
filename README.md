@@ -34,7 +34,7 @@ Installation
 You need to specify all options for both `make` and `make install`.
 Alternatively you can put your build options into a `Config.mk` file.
 
-    make prefix="$HOME/.local"
+    make -j8 prefix="$HOME/.local"
     make install prefix="$HOME/.local"
 
 The default [`prefix`] is `/usr/local` and [`DESTDIR`] works as usual. See
