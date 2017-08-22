@@ -87,8 +87,7 @@ int main(int argc, char *argv[])
             return 0;
         case '?':
         default:
-            printf("Usage: %s", argv[0]);
-            puts(opts);
+            fprintf(stderr, "Usage: %s %s\n", argv[0], opts);
             return 1;
         }
     }
