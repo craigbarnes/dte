@@ -488,7 +488,7 @@ Syntax *load_syntax_by_filetype(const char *filetype)
     if (syn || err != ENOENT)
         return syn;
 
-    filename = xsprintf("%s/syntax/%s", pkgdatadir, filetype);
+    filename = xsprintf("%s/syntax/%s", editor.pkgdatadir, filetype);
     syn = load_syntax_file(filename, false, &err);
     free(filename);
     return syn;

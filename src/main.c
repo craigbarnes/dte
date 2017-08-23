@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
             read_rc = false;
             break;
         case 'V':
-            printf("dte %s\n", version);
+            printf("dte %s\n", editor.version);
             puts("(C) 2017 Craig Barnes");
             puts("(C) 2010-2015 Timo Hirvonen");
             return 0;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
             char *filename = editor_file("rc");
             if (read_config(commands, filename, false)) {
                 free(filename);
-                filename = xsprintf("%s/rc", pkgdatadir);
+                filename = xsprintf("%s/rc", editor.pkgdatadir);
                 read_config(commands, filename, true);
             }
             free(filename);

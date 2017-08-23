@@ -90,10 +90,10 @@ $(dep_dirs):
 	@mkdir -p $@
 endif
 
-src/vars.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
+src/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 
 src/main.o: src/bindings.inc
-src/vars.o: .VARS
+src/editor.o: .VARS
 
 $(OBJECTS): src/%.o: src/%.c .CFLAGS | $(missing_dep_dirs)
 	$(E) CC $@

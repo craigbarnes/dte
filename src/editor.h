@@ -27,12 +27,11 @@ typedef struct {
     bool child_controls_terminal;
     bool resized;
     int cmdline_x;
+    const char *version;
+    const char *pkgdatadir;
 } EditorState;
 
 extern EditorState editor;
-
-extern const char *version;
-extern const char *pkgdatadir;
 
 char *editor_file(const char *name);
 char get_confirmation(const char *choices, const char *format, ...) FORMAT(2);

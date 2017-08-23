@@ -26,7 +26,7 @@ static char *expand_file(void)
 
 static char *expand_pkgdatadir(void)
 {
-    return xstrdup(pkgdatadir);
+    return xstrdup(editor.pkgdatadir);
 }
 
 static char *expand_word(void)

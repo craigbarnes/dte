@@ -12,7 +12,9 @@
 #include "error.h"
 
 EditorState editor = {
-    .cmdline = CMDLINE_INIT
+    .cmdline = CMDLINE_INIT,
+    .version = VERSION,
+    .pkgdatadir = PKGDATADIR
 };
 
 static void sanity_check(void)
