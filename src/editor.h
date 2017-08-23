@@ -18,7 +18,13 @@ typedef enum {
 } InputMode;
 
 typedef struct {
+    void (*keypress)(int key);
+    void (*update)(void);
+} EditorModeOps;
+
+typedef struct {
     EditorStatus status;
+    const EditorModeOps *mode_ops[4];
     InputMode input_mode;
     CommandLine cmdline;
     char *home_dir;

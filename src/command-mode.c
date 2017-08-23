@@ -1,4 +1,3 @@
-#include "modes.h"
 #include "cmdline.h"
 #include "history.h"
 #include "editor.h"

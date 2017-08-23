@@ -1,4 +1,3 @@
-#include "modes.h"
 #include "window.h"
 #include "view.h"
 #include "edit.h"

@@ -40,7 +40,7 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
     cursed decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
     frame git-open history hl indent input-special iter key \
-    load-save lock main modes move msg normal-mode obuf options \
+    load-save lock main move msg normal-mode obuf options \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
     strbuf syntax tabbar tag term-caps term uchar unicode view \

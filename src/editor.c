@@ -8,13 +8,23 @@
 #include "screen.h"
 #include "config.h"
 #include "command.h"
-#include "modes.h"
 #include "error.h"
+
+extern const EditorModeOps normal_mode_ops;
+extern const EditorModeOps command_mode_ops;
+extern const EditorModeOps search_mode_ops;
+extern const EditorModeOps git_open_ops;
 
 EditorState editor = {
     .cmdline = CMDLINE_INIT,
     .version = VERSION,
-    .pkgdatadir = PKGDATADIR
+    .pkgdatadir = PKGDATADIR,
+    .mode_ops = {
+        [INPUT_NORMAL] = &normal_mode_ops,
+        [INPUT_COMMAND] = &command_mode_ops,
+        [INPUT_SEARCH] = &search_mode_ops,
+        [INPUT_GIT_OPEN] = &git_open_ops
+    }
 };
 
 static void sanity_check(void)
@@ -212,7 +222,7 @@ void resize(void)
         buf_escape(term_cap.strings[STR_CAP_CMD_ti]);
     }
 
-    modes[editor.input_mode]->update();
+    editor.mode_ops[editor.input_mode]->update();
 }
 
 void ui_end(void)
@@ -343,7 +353,7 @@ static void update_screen(ScreenState *s)
     Buffer *b = v->buffer;
 
     if (everything_changed) {
-        modes[editor.input_mode]->update();
+        editor.mode_ops[editor.input_mode]->update();
         everything_changed = false;
         return;
     }
@@ -401,15 +411,15 @@ void main_loop(void)
 
         clear_error();
         if (editor.input_mode == INPUT_GIT_OPEN) {
-            modes[editor.input_mode]->keypress(key);
-            modes[editor.input_mode]->update();
+            editor.mode_ops[editor.input_mode]->keypress(key);
+            editor.mode_ops[editor.input_mode]->update();
         } else {
             ScreenState s;
             save_state(&s, window->view);
-            modes[editor.input_mode]->keypress(key);
+            editor.mode_ops[editor.input_mode]->keypress(key);
             sanity_check();
             if (editor.input_mode == INPUT_GIT_OPEN) {
-                modes[editor.input_mode]->update();
+                editor.mode_ops[editor.input_mode]->update();
             } else {
                 update_screen(&s);
             }

@@ -6,7 +6,6 @@
 #include "cmdline.h"
 #include "editor.h"
 #include "obuf.h"
-#include "modes.h"
 #include "screen.h"
 #include "uchar.h"
 #include "error.h"
