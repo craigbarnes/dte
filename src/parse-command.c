@@ -25,7 +25,7 @@ static void parse_home(const char *cmd, int *posp)
     }
 
     if (!len) {
-        strbuf_add_str(&arg, home_dir);
+        strbuf_add_str(&arg, editor.home_dir);
         *posp = pos + 1;
         return;
     }

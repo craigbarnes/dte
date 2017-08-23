@@ -73,7 +73,7 @@ void error_msg(const char *format, ...)
     msg_is_error = true;
     nr_errors++;
 
-    if (editor_status != EDITOR_RUNNING) {
+    if (editor.status != EDITOR_RUNNING) {
         fputs(error_buf, stderr);
         fputc('\n', stderr);
     }

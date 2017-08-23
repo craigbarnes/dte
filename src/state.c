@@ -470,7 +470,7 @@ Syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
     config_line = saved_config_line;
 
     syn = find_syntax(path_basename(filename));
-    if (syn && editor_status != EDITOR_INITIALIZING)
+    if (syn && editor.status != EDITOR_INITIALIZING)
         update_syntax_colors(syn);
     if (syn == NULL)
         *err = EINVAL;
@@ -480,7 +480,7 @@ Syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
 Syntax *load_syntax_by_filetype(const char *filetype)
 {
     Syntax *syn;
-    char *filename = xsprintf("%s/syntax/%s", user_config_dir, filetype);
+    char *filename = xsprintf("%s/syntax/%s", editor.user_config_dir, filetype);
     int err;
 
     syn = load_syntax_file(filename, false, &err);

@@ -160,7 +160,7 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
         // \n is not allowed in command line because
         // command/search history file would break
         if (count && buf[0] != '\n')
-            cmdline_insert_bytes(&cmdline, buf, count);
+            cmdline_insert_bytes(&editor.cmdline, buf, count);
         c->search_pos = -1;
         return 1;
     }

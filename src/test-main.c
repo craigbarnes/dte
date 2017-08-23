@@ -45,11 +45,11 @@ int main(int argc, char *argv[])
 
     if (!home)
         home = "";
-    home_dir = xstrdup(home);
+    editor.home_dir = xstrdup(home);
 
     setlocale(LC_CTYPE, "");
-    charset = nl_langinfo(CODESET);
-    if (streq(charset, "UTF-8"))
+    editor.charset = nl_langinfo(CODESET);
+    if (streq(editor.charset, "UTF-8"))
         term_utf8 = true;
 
     test_relative_filename();

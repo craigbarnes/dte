@@ -157,7 +157,7 @@ static void cmd_close(const char *pf, char **args)
     }
 
     if (allow_quit && buffers.count == 1 && root_frame->frames.count <= 1) {
-        editor_status = EDITOR_EXITING;
+        editor.status = EDITOR_EXITING;
         return;
     }
 
@@ -174,7 +174,7 @@ static void cmd_command(const char *pf, char **args)
 {
     set_input_mode(INPUT_COMMAND);
     if (args[0])
-        cmdline_set_text(&cmdline, args[0]);
+        cmdline_set_text(&editor.cmdline, args[0]);
 }
 
 static void cmd_compile(const char *pf, char **args)
@@ -408,7 +408,7 @@ static void cmd_hi(const char *pf, char **args)
 
     // Don't call update_all_syntax_colors() needlessly.
     // It is called right after config has been loaded.
-    if (editor_status != EDITOR_INITIALIZING) {
+    if (editor.status != EDITOR_INITIALIZING) {
         update_all_syntax_colors();
         mark_everything_changed();
     }
@@ -725,7 +725,7 @@ static void cmd_quit(const char *pf, char **args)
     int i;
 
     if (pf[0]) {
-        editor_status = EDITOR_EXITING;
+        editor.status = EDITOR_EXITING;
         return;
     }
     for (i = 0; i < buffers.count; i++) {
@@ -746,7 +746,7 @@ static void cmd_quit(const char *pf, char **args)
             return;
         }
     }
-    editor_status = EDITOR_EXITING;
+    editor.status = EDITOR_EXITING;
 }
 
 static void cmd_redo(const char *pf, char **args)
@@ -905,7 +905,7 @@ static void cmd_save(const char *pf, char **args)
         if (!absolute) {
             if (prompt) {
                 set_input_mode(INPUT_COMMAND);
-                cmdline_set_text(&cmdline, "save ");
+                cmdline_set_text(&editor.cmdline, "save ");
                 return;
             } else {
                 error_msg("No filename.");

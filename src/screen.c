@@ -36,7 +36,7 @@ static const char *format_misc_status(Window *win)
     if (special_input_misc_status(misc_status, 31))
         return misc_status;
 
-    if (input_mode == INPUT_SEARCH) {
+    if (editor.input_mode == INPUT_SEARCH) {
         snprintf(misc_status, sizeof(misc_status), "[case-sensitive = %s]",
             case_sensitive_search_enum[options.case_sensitive_search]);
     } else if (win->view->selection) {
@@ -104,11 +104,11 @@ int print_command(char prefix)
     // Width of characters up to and including cursor position
     w = 1; // ":" (prefix)
     i = 0;
-    while (i <= cmdline.pos && i < cmdline.buf.len) {
-        u = u_get_char(cmdline.buf.buffer, cmdline.buf.len, &i);
+    while (i <= editor.cmdline.pos && i < editor.cmdline.buf.len) {
+        u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);
         w += u_char_width(u);
     }
-    if (cmdline.pos == cmdline.buf.len) {
+    if (editor.cmdline.pos == editor.cmdline.buf.len) {
         w++;
     }
     if (w > screen_w)
@@ -118,12 +118,12 @@ int print_command(char prefix)
     i = 0;
     buf_put_char(prefix);
     x = obuf.x - obuf.scroll_x;
-    while (i < cmdline.buf.len) {
+    while (i < editor.cmdline.buf.len) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
-        u = u_get_char(cmdline.buf.buffer, cmdline.buf.len, &i);
+        u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);
         if (!buf_put_char(u))
             break;
-        if (i <= cmdline.pos)
+        if (i <= editor.cmdline.pos)
             x = obuf.x - obuf.scroll_x;
     }
     return x;
@@ -269,7 +269,7 @@ void update_git_open(void)
 
     buf_reset(x, w, 0);
     buf_move_cursor(0, 0);
-    cmdline_x = print_command('/');
+    editor.cmdline_x = print_command('/');
     buf_clear_eol();
     y++;
 

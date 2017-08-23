@@ -54,7 +54,7 @@ void add_alias(const char *name, const char *value)
     alias->value = xstrdup(value);
     ptr_array_add(&aliases, alias);
 
-    if (editor_status != EDITOR_INITIALIZING)
+    if (editor.status != EDITOR_INITIALIZING)
         sort_aliases();
 }
 

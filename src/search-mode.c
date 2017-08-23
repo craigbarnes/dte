@@ -9,8 +9,8 @@ static void search_mode_keypress(int key)
 {
     switch (key) {
     case KEY_ENTER:
-        if (cmdline.buf.len > 0) {
-            char *str = strbuf_cstring(&cmdline.buf);
+        if (editor.cmdline.buf.len > 0) {
+            char *str = strbuf_cstring(&editor.cmdline.buf);
             search_set_regexp(str);
             search_next();
             history_add(&search_history, str, search_history_size);
@@ -18,7 +18,7 @@ static void search_mode_keypress(int key)
         } else {
             search_next();
         }
-        cmdline_clear(&cmdline);
+        cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
         break;
     case MOD_META | 'c':
@@ -28,7 +28,7 @@ static void search_mode_keypress(int key)
         search_set_direction(current_search_direction() ^ 1);
         break;
     default:
-        switch (cmdline_handle_key(&cmdline, &search_history, key)) {
+        switch (cmdline_handle_key(&editor.cmdline, &search_history, key)) {
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:

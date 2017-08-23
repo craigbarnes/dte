@@ -109,7 +109,7 @@ static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t siz
     if (b->encoding == NULL) {
         e = dec->encoding;
         if (e == NULL)
-            e = charset;
+            e = editor.charset;
         b->encoding = xstrdup(e);
     }
     free_file_decoder(dec);
@@ -212,7 +212,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     if (b->encoding == NULL)
-        b->encoding = xstrdup(charset);
+        b->encoding = xstrdup(editor.charset);
     return 0;
 }
 

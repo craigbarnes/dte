@@ -18,7 +18,12 @@ enum {
     CMDLINE_CANCEL,
 };
 
-#define CMDLINE(name) CommandLine name = {STRBUF_INIT, 0, -1, NULL}
+#define CMDLINE_INIT { \
+    .buf = STRBUF_INIT, \
+    .pos = 0, \
+    .search_pos = -1, \
+    .search_text = NULL \
+}
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);

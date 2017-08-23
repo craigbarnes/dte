@@ -253,7 +253,7 @@ static void collect_completions(char **args, int argc)
 
 static void init_completion(void)
 {
-    char *cmd = strbuf_cstring(&cmdline.buf);
+    char *cmd = strbuf_cstring(&editor.cmdline.buf);
     const char *str;
     PointerArray array = PTR_ARRAY_INIT;
     int semicolon = -1;
@@ -267,8 +267,8 @@ static void init_completion(void)
         while (isspace(cmd[pos]))
             pos++;
 
-        if (pos >= cmdline.pos) {
-            completion_pos = cmdline.pos;
+        if (pos >= editor.cmdline.pos) {
+            completion_pos = editor.cmdline.pos;
             break;
         }
 
@@ -284,7 +284,7 @@ static void init_completion(void)
 
         end = find_end(cmd, pos, &err);
         error_free(err);
-        if (end < 0 || end >= cmdline.pos) {
+        if (end < 0 || end >= editor.cmdline.pos) {
             completion_pos = pos;
             break;
         }
@@ -319,7 +319,7 @@ static void init_completion(void)
     }
 
     str = cmd + completion_pos;
-    len = cmdline.pos - completion_pos;
+    len = editor.cmdline.pos - completion_pos;
     if (len && str[0] == '$') {
         bool var = true;
         int i;
@@ -339,7 +339,7 @@ static void init_completion(void)
             completion.escaped = NULL;
             completion.parsed = NULL;
             completion.head = xstrslice(cmd, 0, completion_pos);
-            completion.tail = xstrdup(cmd + cmdline.pos);
+            completion.tail = xstrdup(cmd + editor.cmdline.pos);
             collect_env(name);
             sort_completions();
             free(name);
@@ -352,7 +352,7 @@ static void init_completion(void)
     completion.escaped = xstrslice(str, 0, len);
     completion.parsed = parse_command_arg(completion.escaped, true);
     completion.head = xstrslice(cmd, 0, completion_pos);
-    completion.tail = xstrdup(cmd + cmdline.pos);
+    completion.tail = xstrdup(cmd + editor.cmdline.pos);
     completion.add_space = true;
 
     collect_completions((char **)array.ptrs + semicolon + 1, array.count - semicolon - 1);
@@ -419,8 +419,8 @@ void complete_command(void)
     }
     memcpy(str + head_len + middle_len, completion.tail, tail_len + 1);
 
-    cmdline_set_text(&cmdline, str);
-    cmdline.pos = head_len + middle_len;
+    cmdline_set_text(&editor.cmdline, str);
+    editor.cmdline.pos = head_len + middle_len;
 
     free(middle);
     free(str);

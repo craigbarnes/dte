@@ -9,7 +9,7 @@
 static void command_line_enter(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
-    char *str = strbuf_cstring(&cmdline.buf);
+    char *str = strbuf_cstring(&editor.cmdline.buf);
     Error *err = NULL;
     bool ok;
 
@@ -21,7 +21,7 @@ static void command_line_enter(void)
     // "command" can modify contents of command line.
     history_add(&command_history, str, command_history_size);
     free(str);
-    cmdline_clear(&cmdline);
+    cmdline_clear(&editor.cmdline);
 
     if (ok) {
         run_commands(commands, &array);
@@ -42,7 +42,7 @@ static void command_mode_keypress(int key)
         complete_command();
         break;
     default:
-        switch (cmdline_handle_key(&cmdline, &command_history, key)) {
+        switch (cmdline_handle_key(&editor.cmdline, &command_history, key)) {
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:

@@ -122,7 +122,7 @@ static const char *selected_file(void)
 
 static void git_open_filter(void)
 {
-    char *str = strbuf_cstring(&cmdline.buf);
+    char *str = strbuf_cstring(&editor.cmdline.buf);
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
     bool (*match)(const char *, PointerArray *) = words_match_icase;
@@ -182,7 +182,7 @@ void git_open_keypress(int key)
     switch (key) {
     case KEY_ENTER:
         open_selected();
-        cmdline_clear(&cmdline);
+        cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
         break;
     case CTRL('O'):
@@ -209,7 +209,7 @@ void git_open_keypress(int key)
         down(screen_h - 2);
         break;
     default:
-        switch (cmdline_handle_key(&cmdline, NULL, key)) {
+        switch (cmdline_handle_key(&editor.cmdline, NULL, key)) {
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:
@@ -228,7 +228,7 @@ static void git_open_update(void)
     buf_hide_cursor();
     update_term_title(window->view->buffer);
     update_git_open();
-    buf_move_cursor(cmdline_x, 0);
+    buf_move_cursor(editor.cmdline_x, 0);
     buf_show_cursor();
     buf_flush();
 }

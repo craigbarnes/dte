@@ -32,7 +32,7 @@ static void handle_sigtstp(int signum)
 
 static void handle_sigcont(int signum)
 {
-    if (!child_controls_terminal && editor_status != EDITOR_INITIALIZING) {
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
         term_raw();
         resize();
     }
@@ -40,7 +40,7 @@ static void handle_sigcont(int signum)
 
 static void handle_sigwinch(int signum)
 {
-    resized = true;
+    editor.resized = true;
 }
 
 int main(int argc, char *argv[])
@@ -59,12 +59,12 @@ int main(int argc, char *argv[])
     bool read_rc = true;
     int ch;
 
-    home_dir = xstrdup(home ? home : "");
+    editor.home_dir = xstrdup(home ? home : "");
 
     if (dte_home)
-        user_config_dir = xstrdup(dte_home);
+        editor.user_config_dir = xstrdup(dte_home);
     else
-        user_config_dir = xsprintf("%s/.dte", home_dir);
+        editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
 
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
     free(editor_dir);
 
     setlocale(LC_CTYPE, "");
-    charset = nl_langinfo(CODESET);
-    if (streq(charset, "UTF-8"))
+    editor.charset = nl_langinfo(CODESET);
+    if (streq(editor.charset, "UTF-8"))
         term_utf8 = true;
 
     exec_builtin_rc(builtin_bindings);
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         clear_error();
     }
 
-    editor_status = EDITOR_RUNNING;
+    editor.status = EDITOR_RUNNING;
 
     long lineno = 0;
     for (int i = optind; i < argc; i++) {

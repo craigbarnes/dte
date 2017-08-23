@@ -11,15 +11,9 @@
 #include "modes.h"
 #include "error.h"
 
-EditorStatus editor_status;
-InputMode input_mode;
-CMDLINE(cmdline);
-char *home_dir;
-char *user_config_dir;
-char *charset;
-bool child_controls_terminal;
-bool resized;
-int cmdline_x;
+EditorState editor = {
+    .cmdline = CMDLINE_INIT
+};
 
 static void sanity_check(void)
 {
@@ -40,7 +34,7 @@ static void sanity_check(void)
 
 void set_input_mode(InputMode mode)
 {
-    input_mode = mode;
+    editor.input_mode = mode;
 }
 
 void any_key(void)
@@ -68,7 +62,7 @@ static void update_command_line(void)
 
     buf_reset(0, screen_w, 0);
     buf_move_cursor(0, screen_h - 1);
-    switch (input_mode) {
+    switch (editor.input_mode) {
     case INPUT_NORMAL:
         print_message(error_buf, msg_is_error);
         break;
@@ -76,7 +70,7 @@ static void update_command_line(void)
         prefix = current_search_direction() == SEARCH_FWD ? '/' : '?';
         // fallthrough
     case INPUT_COMMAND:
-        cmdline_x = print_command(prefix);
+        editor.cmdline_x = print_command(prefix);
         break;
     case INPUT_GIT_OPEN:
         break;
@@ -101,7 +95,7 @@ static void update_window_full(Window *w)
 static void restore_cursor(void)
 {
     View *v = window->view;
-    switch (input_mode) {
+    switch (editor.input_mode) {
     case INPUT_NORMAL:
         buf_move_cursor(
             window->edit_x + v->cx_display - v->vx,
@@ -109,7 +103,7 @@ static void restore_cursor(void)
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        buf_move_cursor(cmdline_x, screen_h - 1);
+        buf_move_cursor(editor.cmdline_x, screen_h - 1);
         break;
     case INPUT_GIT_OPEN:
         break;
@@ -203,7 +197,7 @@ void normal_update(void)
 
 void resize(void)
 {
-    resized = false;
+    editor.resized = false;
     update_screen_size();
 
     // "dtach -r winch" sends SIGWINCH after program has been attached
@@ -216,7 +210,7 @@ void resize(void)
         buf_escape(term_cap.strings[STR_CAP_CMD_ti]);
     }
 
-    modes[input_mode]->update();
+    modes[editor.input_mode]->update();
 }
 
 void ui_end(void)
@@ -245,14 +239,14 @@ void suspend(void)
         // Session leader can't suspend
         return;
     }
-    if (!child_controls_terminal && editor_status != EDITOR_INITIALIZING)
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING)
         ui_end();
     kill(0, SIGSTOP);
 }
 
 char *editor_file(const char *name)
 {
-    return xsprintf("%s/%s", user_config_dir, name);
+    return xsprintf("%s/%s", editor.user_config_dir, name);
 }
 
 char get_confirmation(const char *choices, const char *format, ...)
@@ -317,7 +311,7 @@ char get_confirmation(const char *choices, const char *format, ...)
                 break;
             if (key == def)
                 break;
-        } else if (resized) {
+        } else if (editor.resized) {
             resize();
         }
     }
@@ -347,7 +341,7 @@ static void update_screen(ScreenState *s)
     Buffer *b = v->buffer;
 
     if (everything_changed) {
-        modes[input_mode]->update();
+        modes[editor.input_mode]->update();
         everything_changed = false;
         return;
     }
@@ -395,25 +389,25 @@ void set_signal_handler(int signum, void (*handler)(int))
 
 void main_loop(void)
 {
-    while (editor_status == EDITOR_RUNNING) {
+    while (editor.status == EDITOR_RUNNING) {
         int key;
 
-        if (resized)
+        if (editor.resized)
             resize();
         if (!term_read_key(&key))
             continue;
 
         clear_error();
-        if (input_mode == INPUT_GIT_OPEN) {
-            modes[input_mode]->keypress(key);
-            modes[input_mode]->update();
+        if (editor.input_mode == INPUT_GIT_OPEN) {
+            modes[editor.input_mode]->keypress(key);
+            modes[editor.input_mode]->update();
         } else {
             ScreenState s;
             save_state(&s, window->view);
-            modes[input_mode]->keypress(key);
+            modes[editor.input_mode]->keypress(key);
             sanity_check();
-            if (input_mode == INPUT_GIT_OPEN) {
-                modes[input_mode]->update();
+            if (editor.input_mode == INPUT_GIT_OPEN) {
+                modes[editor.input_mode]->update();
             } else {
                 update_screen(&s);
             }

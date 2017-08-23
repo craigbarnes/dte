@@ -74,7 +74,7 @@ Buffer *buffer_new(const char *encoding)
 
 Buffer *open_empty_buffer(void)
 {
-    Buffer *b = buffer_new(charset);
+    Buffer *b = buffer_new(editor.charset);
     Block *blk;
 
     // At least one block required

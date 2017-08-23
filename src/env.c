@@ -11,7 +11,7 @@ typedef struct {
 
 static char *expand_dte_home(void)
 {
-    return xstrdup(user_config_dir);
+    return xstrdup(editor.user_config_dir);
 }
 
 static char *expand_file(void)

@@ -232,7 +232,7 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
     }
 
     if (!quiet) {
-        child_controls_terminal = true;
+        editor.child_controls_terminal = true;
         ui_end();
     }
 
@@ -253,7 +253,7 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
         if (prompt)
             any_key();
         resize();
-        child_controls_terminal = false;
+        editor.child_controls_terminal = false;
     }
     close(p[0]);
     close(dev_null);
@@ -286,7 +286,7 @@ void spawn(char **args, int fd[3], bool prompt)
     quiet = redir_count == 3;
 
     if (!quiet) {
-        child_controls_terminal = true;
+        editor.child_controls_terminal = true;
         ui_end();
     }
 
@@ -302,7 +302,7 @@ void spawn(char **args, int fd[3], bool prompt)
         if (prompt)
             any_key();
         resize();
-        child_controls_terminal = false;
+        editor.child_controls_terminal = false;
     }
     if (dev_null >= 0)
         close(dev_null);

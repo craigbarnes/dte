@@ -230,7 +230,7 @@ char *relative_filename(const char *f, const char *cwd)
 char *short_filename_cwd(const char *absolute, const char *cwd)
 {
     char *f = relative_filename(absolute, cwd);
-    int home_len = strlen(home_dir);
+    int home_len = strlen(editor.home_dir);
     int abs_len = strlen(absolute);
     int f_len = strlen(f);
 
@@ -241,7 +241,7 @@ char *short_filename_cwd(const char *absolute, const char *cwd)
         f_len = abs_len;
     }
 
-    if (abs_len > home_len && !memcmp(absolute, home_dir, home_len) && absolute[home_len] == '/') {
+    if (abs_len > home_len && !memcmp(absolute, editor.home_dir, home_len) && absolute[home_len] == '/') {
         int len = abs_len - home_len + 1;
         if (len < f_len) {
             char *filename = xnew(char, len + 1);
@@ -265,13 +265,13 @@ char *short_filename(const char *absolute)
 
 char *filename_to_utf8(const char *filename)
 {
-    struct cconv *c = cconv_to_utf8(charset);
+    struct cconv *c = cconv_to_utf8(editor.charset);
     const unsigned char *buf;
     size_t len;
     char *str;
 
     if (c == NULL) {
-        d_print("iconv_open() using charset %s failed: %s\n", charset, strerror(errno));
+        d_print("iconv_open() using charset %s failed: %s\n", editor.charset, strerror(errno));
         return xstrdup(filename);
     }
     cconv_process(c, filename, strlen(filename));

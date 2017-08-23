@@ -221,7 +221,7 @@ void bug(const char *function, const char *fmt, ...)
 {
     va_list ap;
 
-    if (!child_controls_terminal && editor_status != EDITOR_INITIALIZING)
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING)
         ui_end();
 
     fprintf(stderr, "\n *** BUG *** %s: ", function);

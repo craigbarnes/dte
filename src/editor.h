@@ -17,15 +17,19 @@ typedef enum {
     INPUT_GIT_OPEN,
 } InputMode;
 
-extern EditorStatus editor_status;
-extern InputMode input_mode;
-extern CommandLine cmdline;
-extern char *home_dir;
-extern char *user_config_dir;
-extern char *charset;
-extern bool child_controls_terminal;
-extern bool resized;
-extern int cmdline_x;
+typedef struct {
+    EditorStatus status;
+    InputMode input_mode;
+    CommandLine cmdline;
+    char *home_dir;
+    char *user_config_dir;
+    char *charset;
+    bool child_controls_terminal;
+    bool resized;
+    int cmdline_x;
+} EditorState;
+
+extern EditorState editor;
 
 extern const char *version;
 extern const char *pkgdatadir;
