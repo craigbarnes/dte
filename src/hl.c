@@ -191,9 +191,10 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 }
                 break;
             case COND_HEREDOCEND: {
+                const char *str = cond->u.cond_heredocend.str;
                 int slen = cond->u.cond_heredocend.len;
                 int end = i + slen;
-                if (len >= end && !memcmp(cond->u.cond_heredocend.str, line + i, slen)) {
+                if (len >= end && (slen == 0 || !memcmp(str, line + i, slen))) {
                     while (i < end)
                         colors[i++] = a->emit_color;
                     sidx = -1;
