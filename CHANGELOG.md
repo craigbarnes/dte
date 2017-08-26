@@ -1,8 +1,10 @@
 dte changelog
 =============
 
-v1.3 (unreleased)
------------------
+v1.3 (latest release)
+---------------------
+
+Released on 2017-08-27.
 
 **Changes:**
 
@@ -24,10 +26,15 @@ v1.3 (unreleased)
 * Renamed `dte-syntax.7` man page to `dte-syntax.5` (users with an
   existing installation may want to manually delete `dte-syntax.7`).
 
-Git diff: [v1.2...master](https://github.com/craigbarnes/dte/compare/v1.2...master)
+Git diff: [v1.2...v1.3](https://github.com/craigbarnes/dte/compare/v1.2...v1.3)
 
-v1.2 (latest release)
----------------------
+**Downloads:**
+
+* [dte-1.3.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz)
+* [dte-1.3.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz.sig)
+
+v1.2
+----
 
 Released on 2017-07-30.
 
