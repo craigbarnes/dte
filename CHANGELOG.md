@@ -20,14 +20,11 @@ v1.3 (unreleased)
 * Fixed a few cases of undefined behaviour and potential buffer overflow
   inherited from [dex].
 * Fixed all compiler warnings when building on OpenBSD 6.
-* Added some descriptive comments to the default config files.
-* Fixed and clarified a few small details in the man pages.
+* Fixed and clarified various details in the man pages.
 * Renamed `inc-home` and `inc-end` commands to `bolsf` and `eolsf`,
   for consistency with other similar commands.
-* Renamed `dte-syntax.7` man page to `dte-syntax.5`. Users with an
-  installation of `dte` from before this change may want to manually
-  delete the old section 7 man page, so that `man dte-syntax` always
-  uses the new section 5 page.
+* Renamed `dte-syntax.7` man page to `dte-syntax.5` (users with an
+  existing installation may want to manually delete `dte-syntax.7`).
 
 Git diff: [v1.2...master](https://github.com/craigbarnes/dte/compare/v1.2...master)
 
