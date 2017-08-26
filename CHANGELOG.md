@@ -11,9 +11,7 @@ v1.3 (unreleased)
 * Added the ability to override the default user config directory via
   the `DTE_EDITOR` enviornment variable.
 * Added syntax highlighting for the Markdown, Meson and Ruby languages.
-* Added syntax highlighting for HTML5 tags and all HTML5 named entities.
-* Added support for highlighting capitalized ClassNames to the C syntax
-  highlighter (can be used via `hi class-name green`).
+* Improved syntax highlighting for the C, awk and HTML languages.
 * Fixed a bug with the `close -wq` command when using split frames
   (`wsplit`).
 * Fixed a segfault bug in `git-open` mode when not inside a git repo.

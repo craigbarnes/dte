@@ -1,4 +1,4 @@
-DIST_VERSIONS = 1.2 1.1 1.0
+DIST_VERSIONS = 1.3 1.2 1.1 1.0
 DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 

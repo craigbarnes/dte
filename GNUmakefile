@@ -63,7 +63,7 @@ dte := dte$(X)
 OBJECTS := $(editor_objects) $(test_objects)
 
 PKGDATADIR = $(datadir)/dte
-VERSION = 1.2
+VERSION = 1.3
 
 include mk/compat.mk
 -include Config.mk
