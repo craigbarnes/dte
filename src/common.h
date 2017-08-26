@@ -65,8 +65,8 @@ static inline bool str_has_prefix(const char *str, const char *prefix)
 
 static inline bool str_has_suffix(const char *str, const char *suffix)
 {
-    int l1 = strlen(str);
-    int l2 = strlen(suffix);
+    size_t l1 = strlen(str);
+    size_t l2 = strlen(suffix);
 
     if (l2 > l1) {
         return false;
