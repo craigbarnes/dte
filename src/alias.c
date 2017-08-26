@@ -15,12 +15,11 @@ static PointerArray aliases = PTR_ARRAY_INIT;
 
 static int validate_alias_name(const char *name)
 {
-    int i;
-
-    for (i = 0; name[i]; i++) {
+    for (unsigned int i = 0; name[i]; i++) {
         char ch = name[i];
-        if (!isalnum(ch) && ch != '-' && ch != '_')
+        if (!isalnum(ch) && ch != '-' && ch != '_') {
             return 0;
+        }
     }
     return !!name[0];
 }
@@ -28,7 +27,6 @@ static int validate_alias_name(const char *name)
 void add_alias(const char *name, const char *value)
 {
     CommandAlias *alias;
-    int i;
 
     if (!validate_alias_name(name)) {
         error_msg("Invalid alias name '%s'", name);
@@ -40,7 +38,7 @@ void add_alias(const char *name, const char *value)
     }
 
     // Replace existing alias
-    for (i = 0; i < aliases.count; i++) {
+    for (unsigned int i = 0; i < aliases.count; i++) {
         alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {
             free(alias->value);
@@ -54,8 +52,9 @@ void add_alias(const char *name, const char *value)
     alias->value = xstrdup(value);
     ptr_array_add(&aliases, alias);
 
-    if (editor.status != EDITOR_INITIALIZING)
+    if (editor.status != EDITOR_INITIALIZING) {
         sort_aliases();
+    }
 }
 
 static int alias_cmp(const void *ap, const void *bp)
@@ -75,23 +74,21 @@ void sort_aliases(void)
 
 const char *find_alias(const char *name)
 {
-    int i;
-
-    for (i = 0; i < aliases.count; i++) {
+    for (unsigned int i = 0; i < aliases.count; i++) {
         const CommandAlias *alias = aliases.ptrs[i];
-        if (streq(alias->name, name))
+        if (streq(alias->name, name)) {
             return alias->value;
+        }
     }
     return NULL;
 }
 
 void collect_aliases(const char *prefix)
 {
-    int i;
-
-    for (i = 0; i < aliases.count; i++) {
+    for (unsigned int i = 0; i < aliases.count; i++) {
         CommandAlias *alias = aliases.ptrs[i];
-        if (str_has_prefix(alias->name, prefix))
+        if (str_has_prefix(alias->name, prefix)) {
             add_completion(xstrdup(alias->name));
+        }
     }
 }
