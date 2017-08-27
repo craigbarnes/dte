@@ -283,11 +283,15 @@ static void build_replacement(StringBuffer *buf, const char *line, const char *f
  * "foo abc bar abc baz" "foo abc bar abc baz"
  * "foo x bar abc baz"   " bar abc baz"
  */
-static int replace_on_line(LineRef *lr, regex_t *re, const char *format,
-    BlockIter *bi, unsigned int *flagsp)
-{
+static int replace_on_line (
+    LineRef *lr,
+    regex_t *re,
+    const char *format,
+    BlockIter *bi,
+    ReplaceFlags *flagsp
+) {
     unsigned char *buf = (unsigned char *)lr->line;
-    unsigned int flags = *flagsp;
+    ReplaceFlags flags = *flagsp;
     regmatch_t m[MAX_SUBSTRINGS];
     size_t pos = 0;
     int eflags = 0;
@@ -366,7 +370,7 @@ out:
     return nr;
 }
 
-void reg_replace(const char *pattern, const char *format, unsigned int flags)
+void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
 {
     BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     unsigned int nr_bytes;
