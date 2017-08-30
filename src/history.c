@@ -72,7 +72,7 @@ void history_load(PointerArray *history, const char *filename, int max_entries)
 
 void history_save(PointerArray *history, const char *filename)
 {
-    WBUF(buf);
+    WriteBuffer buf = WBUF_INIT;
     int i;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);

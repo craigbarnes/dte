@@ -9,7 +9,10 @@ typedef struct {
     char buf[8192];
 } WriteBuffer;
 
-#define WBUF(name) WriteBuffer name = { .fill = 0, .fd = -1, }
+#define WBUF_INIT { \
+    .fill = 0, \
+    .fd = -1 \
+}
 
 int wbuf_flush(WriteBuffer *wbuf);
 int wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count);

@@ -80,7 +80,7 @@ void load_file_history(void)
 void save_file_history(void)
 {
     char *filename = editor_file("file-history");
-    WBUF(buf);
+    WriteBuffer buf = WBUF_INIT;
     int i;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
