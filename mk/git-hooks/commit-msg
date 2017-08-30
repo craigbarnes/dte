@@ -1,7 +1,6 @@
 #!/usr/bin/awk -f
 
 BEGIN {
-    FILE = ARGV[1]
     LINES = 0
 }
 
@@ -10,7 +9,7 @@ BEGIN {
 }
 
 /^.{73}/ {
-    printf("%s:%d: Line exceeds 72 columns\n", FILE, FNR)
+    printf("%s:%d: Line exceeds 72 columns\n", FILENAME, FNR)
     exit 1
 }
 
@@ -21,7 +20,7 @@ BEGIN {
 
 {
     if (++LINES == 2) {
-        printf("%s: Second line should be blank; see CONTRIBUTING.md\n", FILE)
+        printf("%s: Second line should be blank; see CONTRIBUTING.md\n", FILENAME)
         exit 1
     }
 }
