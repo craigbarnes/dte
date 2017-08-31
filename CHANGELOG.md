@@ -1,6 +1,15 @@
 dte changelog
 =============
 
+v1.4 (unreleased)
+-----------------
+
+**Changes:**
+
+* Added syntax highlighting for the [Vala] language.
+
+Git diff: [v1.3...master](https://github.com/craigbarnes/dte/compare/v1.3...master)
+
 v1.3 (latest release)
 ---------------------
 
@@ -66,3 +75,4 @@ Git diff: [v1.0...v1.1](https://github.com/craigbarnes/dte/compare/v1.0...v1.1)
 
 
 [dex]: https://github.com/tihirvon/dex
+[Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)

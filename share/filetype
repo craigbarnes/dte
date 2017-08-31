@@ -66,6 +66,7 @@ ft ruby rb rake gemspec
 ft sh sh bash
 ft sql sql
 ft tcl tcl
+ft vala vala vapi
 ft xml xml
 
 # First is the default, second line required for adding smarty filetype
