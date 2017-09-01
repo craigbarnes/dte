@@ -65,32 +65,27 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
 test_objects := src/test-main.o
 OBJECTS := $(editor_objects) $(test_objects)
 
-uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
-uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
-uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
+KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 
-ifeq "$(uname_S)" "Darwin"
+ifeq "$(KERNEL)" "Darwin"
   LIBS += -liconv
-endif
-ifeq "$(uname_O)" "Cygwin"
+else ifeq "$(OS)" "Cygwin"
   LIBS += -liconv
   EXEC_SUFFIX = .exe
-endif
-ifeq "$(uname_S)" "FreeBSD"
+else ifeq "$(KERNEL)" "FreeBSD"
   # libc of FreeBSD 10.0 includes iconv
-  ifeq ($(shell expr "$(uname_R)" : '[0-9]\.'),2)
+  ifeq ($(shell expr "`uname -r`" : '[0-9]\.'),2)
     LIBS += -liconv
     BASIC_CFLAGS += -I/usr/local/include
     BASIC_LDFLAGS += -L/usr/local/lib
   endif
-endif
-ifeq "$(uname_S)" "OpenBSD"
+else ifeq "$(KERNEL)" "OpenBSD"
   LIBS += -liconv
   BASIC_CFLAGS += -I/usr/local/include
   BASIC_LDFLAGS += -L/usr/local/lib
-endif
-ifeq "$(uname_S)" "NetBSD"
-  ifeq ($(shell expr "$(uname_R)" : '[01]\.'),2)
+else ifeq "$(KERNEL)" "NetBSD"
+  ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
     LIBS += -liconv
   endif
   BASIC_CFLAGS += -I/usr/pkg/include
