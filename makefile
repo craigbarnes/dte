@@ -2,9 +2,6 @@
 .POSIX:
 .SUFFIXES:
 
-# Prevents bmake from tying to read ".depend" as a makefile
-.MAKE.DEPENDFILE =
-
 all:
 	+gmake -f GNUmakefile all
 

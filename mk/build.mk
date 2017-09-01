@@ -109,27 +109,17 @@ endif
 
 BASIC_CFLAGS += -DDEBUG=$(DEBUG)
 
-# Dependency generation macros copied from GIT
 ifndef NO_DEPS
-  CC_CAN_GENERATE_DEPS := $(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)
-  ifeq "$(CC_CAN_GENERATE_DEPS)" "n"
-    NO_DEPS := y
-  endif
+ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
+  dep_dir = .depfiles/
+  dep_files = $(addprefix $(dep_dir), $(addsuffix .mk, $(notdir $(OBJECTS))))
+  $(OBJECTS): BASIC_CFLAGS += -MF $(dep_dir)$(@F).mk -MMD -MP
+  $(OBJECTS): | $(dep_dir)
+  $(dep_dir):; @mkdir -p $@
+  CLEANDIRS += $(dep_dir)
+  .SECONDARY: $(dep_dir)
+  -include $(dep_files)
 endif
-
-ifndef NO_DEPS
-dep_files := $(foreach f,$(OBJECTS),$(dir $f).depend/$(notdir $f).d)
-dep_dirs := $(addsuffix .depend,$(sort $(dir $(OBJECTS))))
-missing_dep_dirs := $(filter-out $(wildcard $(dep_dirs)),$(dep_dirs))
-$(OBJECTS): BASIC_CFLAGS += -MF $(dir $@).depend/$(notdir $@).d -MMD -MP
-dep_files_present := $(wildcard $(dep_files))
-
-ifneq "$(dep_files_present)" ""
-include $(dep_files_present)
-endif
-
-$(dep_dirs):
-	@mkdir -p $@
 endif
 
 $(dte): $(editor_objects)
@@ -142,7 +132,7 @@ $(dte) test:
 	$(E) LINK $@
 	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
-$(OBJECTS): src/%.o: src/%.c .CFLAGS | $(missing_dep_dirs)
+$(OBJECTS): src/%.o: src/%.c .CFLAGS
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
@@ -159,6 +149,4 @@ src/bindings.inc: share/binding/builtin mk/rc2c.sed
 
 
 CLEANFILES += $(dte) test $(OBJECTS) src/bindings.inc .VARS .CFLAGS
-CLEANDIRS += $(dep_dirs)
 .PHONY: FORCE
-.SECONDARY: $(dep_dirs)

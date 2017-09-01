@@ -2,7 +2,7 @@
 /test
 /src/*.o
 /src/bindings.inc
-/src/.depend
+/.depfiles/
 /.VARS
 /.CFLAGS
 /Documentation/ttman

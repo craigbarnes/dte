@@ -47,7 +47,7 @@ tags:
 
 clean:
 	$(RM) $(CLEANFILES)
-	$(RM) -r $(CLEANDIRS)
+	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 distclean: clean
 	$(RM) tags
