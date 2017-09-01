@@ -8,6 +8,11 @@ HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 LIBS = -lcurses
 SED = sed
+VERSION = 1.3
+PKGDATADIR = $(datadir)/dte
+
+try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
+cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 
 # Enabled if supported by CC
 WARNINGS = \
@@ -15,16 +20,15 @@ WARNINGS = \
     -Wwrite-strings -Wundef -Wshadow \
     -Wextra -Wno-unused-parameter -Wno-sign-compare
 
-VERSION = 1.3
-PKGDATADIR = $(datadir)/dte
-EXE =
-dte = dte$(EXE)
+BASIC_CFLAGS += \
+    -std=gnu99 \
+    -DDEBUG=$(DEBUG) \
+    $(call cc-option,$(WARNINGS)) \
+    $(call cc-option,-Wno-pointer-sign) # char vs unsigned char madness
 
-try-run = $(shell if ($(1)) >/dev/null 2>&1; then echo "$(2)"; else echo "$(3)"; fi)
-cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
-uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
-uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
-uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
+ifdef WERROR
+  BASIC_CFLAGS += $(call cc-option,-Werror -Wno-error=shadow -Wno-error=unused-variable)
+endif
 
 ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
   # Make "-s" flag was used (silent build)
@@ -39,9 +43,6 @@ else
   Q = @
   E = @printf ' %7s  %s\n'
 endif
-
-# Disable automatic dependency calculation
-# NO_DEPS = 1
 
 # 0: Disable debugging.
 # 1: Enable BUG_ON() and light-weight sanity checks.
@@ -64,12 +65,16 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
 test_objects := src/test-main.o
 OBJECTS := $(editor_objects) $(test_objects)
 
+uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
+uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
+
 ifeq "$(uname_S)" "Darwin"
   LIBS += -liconv
 endif
 ifeq "$(uname_O)" "Cygwin"
   LIBS += -liconv
-  EXE = .exe
+  EXEC_SUFFIX = .exe
 endif
 ifeq "$(uname_S)" "FreeBSD"
   # libc of FreeBSD 10.0 includes iconv
@@ -99,16 +104,6 @@ ifneq "$(uname_S)" "Darwin"
 endif
 endif
 
-BASIC_CFLAGS += -std=gnu99
-BASIC_CFLAGS += $(call cc-option,$(WARNINGS))
-BASIC_CFLAGS += $(call cc-option,-Wno-pointer-sign) # char vs unsigned char madness
-
-ifdef WERROR
-  BASIC_CFLAGS += $(call cc-option,-Werror -Wno-error=shadow -Wno-error=unused-variable)
-endif
-
-BASIC_CFLAGS += -DDEBUG=$(DEBUG)
-
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
   dep_dir = .depfiles/
@@ -121,6 +116,8 @@ ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null
   -include $(dep_files)
 endif
 endif
+
+dte = dte$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
 test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
