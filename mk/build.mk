@@ -14,21 +14,22 @@ PKGDATADIR = $(datadir)/dte
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 
-# Enabled if supported by CC
 WARNINGS = \
-    -Wall -Wformat-security -Wmissing-prototypes -Wold-style-definition \
-    -Wwrite-strings -Wundef -Wshadow \
+    -Wall -Wno-pointer-sign -Wformat-security -Wmissing-prototypes \
+    -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Wextra -Wno-unused-parameter -Wno-sign-compare
 
-BASIC_CFLAGS += \
-    -std=gnu99 \
-    -DDEBUG=$(DEBUG) \
-    $(call cc-option,$(WARNINGS)) \
-    $(call cc-option,-Wno-pointer-sign) # char vs unsigned char madness
+BASIC_CFLAGS += -std=gnu99 $(call cc-option,$(WARNINGS))
 
 ifdef WERROR
   BASIC_CFLAGS += $(call cc-option,-Werror -Wno-error=shadow -Wno-error=unused-variable)
 endif
+
+# 0: Disable debugging.
+# 1: Enable BUG_ON() and light-weight sanity checks.
+# 2: Enable logging to $(DTE_HOME)/debug.log.
+# 3: Enable expensive sanity checks.
+BASIC_CFLAGS += -DDEBUG=1
 
 ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
   # Make "-s" flag was used (silent build)
@@ -44,11 +45,6 @@ else
   E = @printf ' %7s  %s\n'
 endif
 
-# 0: Disable debugging.
-# 1: Enable BUG_ON() and light-weight sanity checks.
-# 2: Enable logging to $(DTE_HOME)/debug.log.
-# 3: Enable expensive sanity checks.
-DEBUG = 1
 
 editor_objects := $(addprefix src/, $(addsuffix .o, \
     alias bind block buffer-iter buffer cconv change cmdline color \
