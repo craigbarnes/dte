@@ -19,18 +19,18 @@ WARNINGS = \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Wextra -Wno-unused-parameter -Wno-sign-compare
 
-BASIC_CFLAGS += -std=gnu99 $(call cc-option,$(WARNINGS))
-
-ifdef WERROR
-  BASIC_CFLAGS += $(call cc-option,-Werror -Wno-error=shadow -Wno-error=unused-variable)
-endif
+# Use "initially recursive variable" trick so that cc-option is only
+# called once per build instead of once per object file (or not at
+# all for targets that don't use it).
+CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 
 # 0: Disable debugging.
 # 1: Enable BUG_ON() and light-weight sanity checks.
 # 2: Enable logging to $(DTE_HOME)/debug.log.
 # 3: Enable expensive sanity checks.
 DEBUG = 1
-BASIC_CFLAGS += -DDEBUG=$(DEBUG)
+
+BASIC_CFLAGS += -std=gnu99 -DDEBUG=$(DEBUG) $(CWARNS)
 
 ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
   # Make "-s" flag was used (silent build)
