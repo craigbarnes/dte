@@ -97,13 +97,6 @@ ifeq "$(uname_S)" "NetBSD"
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
-# Clang does not like container_of()
-ifneq "$(CC)" "clang"
-ifneq "$(uname_S)" "Darwin"
-  WARNINGS += -Wcast-align
-endif
-endif
-
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
   dep_dir = .depfiles/
