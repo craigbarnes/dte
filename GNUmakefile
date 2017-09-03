@@ -15,7 +15,7 @@ RM = rm -f
 syntax_files := \
     awk c config css diff docker dte gitcommit gitrebase go html html+smarty \
     ini java javascript lua mail make markdown meson php python robotstxt \
-    ruby sh smarty sql xml
+    ruby sh smarty sql vala xml
 
 binding := $(addprefix share/binding/, default classic builtin)
 color := $(addprefix share/color/, darkgray light light256)
