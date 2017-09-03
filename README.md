@@ -21,24 +21,31 @@ Screenshot
 
 ![dte screenshot](https://craigbarnes.gitlab.io/dte/screenshot.png)
 
-Requirements
-------------
-
-* Modern C compiler (tested with [GCC] and [Clang])
-* [GNU Make] `>= 3.81`
-* [ncurses]
-
 Installation
 ------------
 
-You need to specify all options for both `make` and `make install`.
-Alternatively you can put your build options into a `Config.mk` file.
+To build `dte` from source, first install the following dependencies:
 
-    make -j8 prefix="$HOME/.local"
+* Modern C Compiler
+* [GNU Make] `>= 3.81`
+* [ncurses]
+
+...then download and extract the latest release tarball:
+
+    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz
+    tar -xzf dte-1.3.tar.gz
+    cd dte-1.3
+
+...and compile and install:
+
+    make -j`mk/nproc.sh` && sudo make install
+
+The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
+works as usual. If you wish to override `prefix` you will need to do
+so for both `make` and `make install`, for example:
+
+    make prefix="$HOME/.local"
     make install prefix="$HOME/.local"
-
-The default [`prefix`] is `/usr/local` and [`DESTDIR`] works as usual. See
-the top of [`GNUmakefile`] for more information.
 
 Documentation
 -------------
@@ -65,8 +72,6 @@ Public License version 2 for more details.
 
 
 [ctags]: https://en.wikipedia.org/wiki/Ctags
-[GCC]: https://gcc.gnu.org/
-[Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
