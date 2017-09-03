@@ -45,7 +45,7 @@ works as usual. If you wish to override `prefix` you will need to do
 so for both `make` and `make install`, for example:
 
     make prefix="$HOME/.local"
-    make install prefix="$HOME/.local"
+    make prefix="$HOME/.local" install
 
 Documentation
 -------------
