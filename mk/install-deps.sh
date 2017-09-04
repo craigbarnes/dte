@@ -10,7 +10,7 @@ linux_distro() {
     centos|fedora)
         yum -y install make gcc binutils ncurses-devel;;
     debian|ubuntu)
-        apt-get -qy install make gcc binutils libncurses5-dev;;
+        apt-get update && apt-get -qy install make gcc binutils libncurses5-dev;;
     *)
         echo 'Unrecognized Linux distro; install GNU Make, GCC and ncurses manually';;
     esac
