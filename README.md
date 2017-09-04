@@ -30,6 +30,10 @@ To build `dte` from source, first install the following dependencies:
 * [GNU Make] `>= 3.81`
 * [ncurses]
 
+...which can (optionally) be done via the included script:
+
+    sudo mk/install-deps.sh
+
 ...then download and extract the latest release tarball:
 
     wget https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz
