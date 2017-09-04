@@ -4,7 +4,7 @@ build:alpine:
     stage: build
     image: alpine:3.6
     script:
-        - apk --update add make gcc binutils ncurses ncurses-dev libc-dev
+        - mk/install-deps.sh
         - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
@@ -13,8 +13,7 @@ build:centos:
     stage: build
     image: centos:7
     script:
-        - yum makecache
-        - yum -y install make gcc binutils ncurses-devel
+        - mk/install-deps.sh
         - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
@@ -24,8 +23,7 @@ build:debian:
     image: debian:stretch
     variables: {DEBIAN_FRONTEND: noninteractive}
     script:
-        - apt-get update
-        - apt-get -qy install make gcc binutils libncurses5-dev
+        - mk/install-deps.sh
         - make -j`mk/nproc.sh` V=1
         - make install
         - dte -V
