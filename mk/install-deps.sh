@@ -1,7 +1,13 @@
 #!/bin/sh
 set -e
 
-linux_distro() {
+error() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+case $(uname) in
+Linux)
     case $(. /etc/os-release && echo "$ID") in
     alpine)
         apk --update add make gcc binutils ncurses ncurses-dev libc-dev;;
@@ -10,21 +16,14 @@ linux_distro() {
     centos|fedora)
         yum -y install make gcc binutils ncurses-devel;;
     debian|ubuntu)
-        apt-get update && apt-get -qy install make gcc binutils libncurses5-dev;;
+        apt-get update && apt-get -qy install make gcc libncurses5-dev;;
     *)
-        echo 'Unrecognized Linux distro; install GNU Make, GCC and ncurses manually';;
-    esac
-}
-
-case $(uname) in
-Linux)
-    linux_distro;;
+        error 'Unrecognized Linux distro; install GNU Make, GCC and ncurses manually';;
+    esac;;
 OpenBSD)
     pkg_add -IU gmake gcc;;
 FreeBSD)
     pkg install gmake gcc;; # TODO: test this
-Darwin)
-    ;;
 *)
-    echo 'Unrecognized OS; install GNU Make, GCC and ncurses manually';;
+    error 'Unrecognized OS; install GNU Make, GCC and ncurses manually';;
 esac
