@@ -28,6 +28,16 @@ build:debian:
         - make install
         - dte -V
 
+build:ubuntu:
+    stage: build
+    image: ubuntu:16.04
+    variables: {DEBIAN_FRONTEND: noninteractive}
+    script:
+        - mk/install-deps.sh
+        - make -j`mk/nproc.sh` V=1
+        - make install
+        - dte -V
+
 pages:
     stage: dist
     image: alpine:3.6
