@@ -102,12 +102,10 @@ void remove_binding(const char *keys)
 
 void handle_binding(int key)
 {
-    int i;
-
     pressed_keys.keys[pressed_keys.count] = key;
     pressed_keys.count++;
 
-    for (i = bindings.count; i > 0; i--) {
+    for (int i = bindings.count; i > 0; i--) {
         Binding *b = bindings.ptrs[i - 1];
         KeyChain *c = &b->chain;
 

@@ -129,9 +129,7 @@ View *window_get_view(Window *w, Buffer *b)
 View *window_find_view(Window *w, Buffer *b)
 {
     View *v;
-    int i;
-
-    for (i = 0; i < b->views.count; i++) {
+    for (int i = 0; i < b->views.count; i++) {
         v = b->views.ptrs[i];
         if (v->window == w) {
             return v;
@@ -143,13 +141,11 @@ View *window_find_view(Window *w, Buffer *b)
 
 View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
 {
-    long i;
-
     // Check active view first
     if (w->view != NULL && !can_close(w->view)) {
         return w->view;
     }
-    for (i = 0; i < w->views.count; i++) {
+    for (long i = 0; i < w->views.count; i++) {
         View *v = w->views.ptrs[i];
         if (!can_close(v)) {
             return v;
@@ -195,8 +191,9 @@ void remove_view(View *v)
 
     ptr_array_remove(&b->views, v);
     if (b->views.count == 0) {
-        if (b->options.file_history && b->abs_filename)
+        if (b->options.file_history && b->abs_filename) {
             add_file_history(v->cy + 1, v->cx_char + 1, b->abs_filename);
+        }
         free_buffer(b);
     }
     free(v);
@@ -232,10 +229,12 @@ void window_close_current_view(Window *w)
         w->prev_view = NULL;
         return;
     }
-    if (w->views.count == 0)
+    if (w->views.count == 0) {
         window_open_empty_buffer(w);
-    if (w->views.count == idx)
+    }
+    if (w->views.count == idx) {
         idx--;
+    }
     w->view = w->views.ptrs[idx];
 }
 
@@ -251,10 +250,9 @@ static void restore_cursor_from_history(View *v)
 
 void set_view(View *v)
 {
-    int i;
-
-    if (view == v)
+    if (view == v) {
         return;
+    }
 
     // Forget previous view when changing view using any other command but open
     if (window != NULL) {
@@ -283,7 +281,7 @@ void set_view(View *v)
     }
 
     // Save cursor states of views sharing same buffer
-    for (i = 0; i < v->buffer->views.count; i++) {
+    for (int i = 0; i < v->buffer->views.count; i++) {
         View *other = v->buffer->views.ptrs[i];
         if (other != v) {
             other->saved_cursor_offset = block_iter_get_offset(&other->cursor);
@@ -311,13 +309,16 @@ one buffer).
 */
 static bool is_useless_empty_view(View *v)
 {
-    if (v == NULL)
+    if (v == NULL) {
         return false;
-    if (v->window->views.count != 1)
+    }
+    if (v->window->views.count != 1) {
         return false;
+    }
     // Touched?
-    if (v->buffer->abs_filename != NULL || v->buffer->change_head.nr_prev != 0)
+    if (v->buffer->abs_filename != NULL || v->buffer->change_head.nr_prev != 0) {
         return false;
+    }
     return true;
 }
 
@@ -327,8 +328,9 @@ View *window_open_file(Window *w, const char *filename, const char *encoding)
     bool useless = is_useless_empty_view(prev);
     View *v = window_open_buffer(w, filename, false, encoding);
 
-    if (v == NULL)
+    if (v == NULL) {
         return NULL;
+    }
 
     // FIXME: should not call set_view()
     set_view(v);
@@ -345,9 +347,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
     View *empty = w->view;
     bool useless = is_useless_empty_view(empty);
     bool first = true;
-    int i;
-
-    for (i = 0; filenames[i]; i++) {
+    for (int i = 0; filenames[i]; i++) {
         View *v = window_open_buffer(w, filenames[i], false, encoding);
         if (v && first) {
             // FIXME: should not call set_view()
@@ -362,8 +362,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
 
 void mark_buffer_tabbars_changed(Buffer *b)
 {
-    long i;
-    for (i = 0; i < b->views.count; i++) {
+    for (long i = 0; i < b->views.count; i++) {
         View *v = b->views.ptrs[i];
         v->window->update_tabbar = true;
     }
@@ -375,10 +374,12 @@ static int calc_vertical_tabbar_width(Window *win)
     int min_edit_w = 80;
     int w = options.tab_bar_width;
 
-    if (win->w - w < min_edit_w)
+    if (win->w - w < min_edit_w) {
         w = win->w - min_edit_w;
-    if (w < TAB_BAR_MIN_WIDTH)
+    }
+    if (w < TAB_BAR_MIN_WIDTH) {
         w = 0;
+    }
     return w;
 }
 
@@ -418,8 +419,9 @@ static int line_numbers_width(Window *win)
 
     if (options.show_line_numbers && win->view) {
         w = number_width(win->view->buffer->nl) + 1;
-        if (w < min_w)
+        if (w < min_w) {
             w = min_w;
+        }
     }
     return w;
 }
@@ -479,20 +481,19 @@ int window_get_scroll_margin(Window *w)
 {
     int max = (w->edit_h - 1) / 2;
 
-    if (options.scroll_margin > max)
+    if (options.scroll_margin > max) {
         return max;
+    }
     return options.scroll_margin;
 }
 
 static void frame_for_each_window(Frame *f, void (*func)(Window *, void *), void *data)
 {
-    int i;
-
     if (f->window != NULL) {
         func(f->window, data);
         return;
     }
-    for (i = 0; i < f->frames.count; i++) {
+    for (int i = 0; i < f->frames.count; i++) {
         frame_for_each_window(f->frames.ptrs[i], func, data);
     }
 }

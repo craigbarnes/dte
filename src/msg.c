@@ -31,9 +31,7 @@ static bool message_equals(const Message *a, const Message *b)
 
 static bool is_duplicate(const Message *m)
 {
-    int i;
-
-    for (i = 0; i < msgs.count; i++) {
+    for (int i = 0; i < msgs.count; i++) {
         if (message_equals(m, msgs.ptrs[i])) {
             return true;
         }

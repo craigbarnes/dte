@@ -5,7 +5,6 @@ static int parse_excmd(Tag *t, const char *buf, int size)
 {
     char ch = *buf;
     long line;
-    int i;
 
     if (ch == '/' || ch == '?') {
         // The search pattern is not a real regular expression.
@@ -13,7 +12,7 @@ static int parse_excmd(Tag *t, const char *buf, int size)
         char *pattern = xnew(char, size * 2);
         int j = 0;
 
-        for (i = 1; i < size; i++) {
+        for (int i = 1; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {
                 i++;
                 if (buf[i] == '\\')
@@ -41,12 +40,14 @@ static int parse_excmd(Tag *t, const char *buf, int size)
         return 0;
     }
 
-    i = 0;
-    if (!buf_parse_long(buf, size, &i, &line))
+    int i = 0;
+    if (!buf_parse_long(buf, size, &i, &line)) {
         return 0;
+    }
 
-    if (i + 1 < size && buf[i] == ';' && buf[i + 1] == '"')
+    if (i + 1 < size && buf[i] == ';' && buf[i + 1] == '"') {
         i += 2;
+    }
 
     t->line = line;
     return i;
@@ -59,32 +60,37 @@ static int parse_line(Tag *t, const char *buf, int size)
 
     clear(t);
     end = memchr(buf, '\t', size);
-    if (!end)
+    if (!end) {
         goto error;
+    }
 
     len = end - buf;
     t->name = xstrslice(buf, 0, len);
 
     si = len + 1;
-    if (si >= size)
+    if (si >= size) {
         goto error;
+    }
 
     end = memchr(buf + si, '\t', size - si);
     len = end - buf - si;
     t->filename = xstrslice(buf, si, si + len);
 
     si += len + 1;
-    if (si >= size)
+    if (si >= size) {
         goto error;
+    }
 
     // excmd can contain tabs
     len = parse_excmd(t, buf + si, size - si);
-    if (!len)
+    if (!len) {
         goto error;
+    }
 
     si += len;
-    if (si == size)
+    if (si == size) {
         return true;
+    }
 
     /*
      * Extension fields (key:[value]):
@@ -94,15 +100,17 @@ static int parse_line(Tag *t, const char *buf, int size)
      * union:NAME                         tag is member of union NAME
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
-    if (buf[si] != '\t')
+    if (buf[si] != '\t') {
         goto error;
+    }
 
     si++;
     while (si < size) {
         int ei = si;
 
-        while (ei < size && buf[ei] != '\t')
+        while (ei < size && buf[ei] != '\t') {
             ei++;
+        }
 
         len = ei - si;
         if (len == 1) {
@@ -129,21 +137,26 @@ bool next_tag(TagFile *tf, size_t *posp, const char *prefix, int exact, Tag *t)
         char *line = tf->buf + pos;
         char *end = memchr(line, '\n', len);
 
-        if (end)
+        if (end) {
             len = end - line;
+        }
         pos += len + 1;
 
-        if (!len || line[0] == '!')
+        if (!len || line[0] == '!') {
             continue;
+        }
 
-        if (len <= prefix_len || memcmp(line, prefix, prefix_len))
+        if (len <= prefix_len || memcmp(line, prefix, prefix_len)) {
             continue;
+        }
 
-        if (exact && line[prefix_len] != '\t')
+        if (exact && line[prefix_len] != '\t') {
             continue;
+        }
 
-        if (!parse_line(t, line, len))
+        if (!parse_line(t, line, len)) {
             continue;
+        }
 
         *posp = pos;
         return true;

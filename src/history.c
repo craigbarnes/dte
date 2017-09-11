@@ -10,21 +10,20 @@ PointerArray command_history = PTR_ARRAY_INIT;
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, int max_entries)
 {
-    int i;
-
     if (text[0] == 0)
         return;
 
     // Don't add identical entries
-    for (i = 0; i < history->count; i++) {
+    for (int i = 0; i < history->count; i++) {
         if (streq(history->ptrs[i], text)) {
             // Move identical entry to end
             ptr_array_add(history, ptr_array_remove_idx(history, i));
             return;
         }
     }
-    if (history->count == max_entries)
+    if (history->count == max_entries) {
         free(ptr_array_remove_idx(history, 0));
+    }
     ptr_array_add(history, xstrdup(text));
 }
 
@@ -73,7 +72,6 @@ void history_load(PointerArray *history, const char *filename, int max_entries)
 void history_save(PointerArray *history, const char *filename)
 {
     WriteBuffer buf = WBUF_INIT;
-    int i;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
     if (buf.fd < 0) {
@@ -81,7 +79,7 @@ void history_save(PointerArray *history, const char *filename)
         return;
     }
 
-    for (i = 0; i < history->count; i++) {
+    for (int i = 0; i < history->count; i++) {
         wbuf_write_str(&buf, history->ptrs[i]);
         wbuf_write_ch(&buf, '\n');
     }

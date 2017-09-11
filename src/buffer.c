@@ -122,9 +122,8 @@ Buffer *find_buffer(const char *abs_filename)
 {
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
-    int i;
 
-    for (i = 0; i < buffers.count; i++) {
+    for (int i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         const char *f = b->abs_filename;
 
@@ -137,9 +136,7 @@ Buffer *find_buffer(const char *abs_filename)
 
 Buffer *find_buffer_by_id(unsigned int id)
 {
-    int i;
-
-    for (i = 0; i < buffers.count; i++) {
+    for (int i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         if (b->id == id) {
             return b;

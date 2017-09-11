@@ -263,11 +263,9 @@ static void tokenize(const char *buf, int size)
 static int is_empty_line(const struct token *tok)
 {
     while (tok != &head) {
-        int i;
-
         switch (tok->type) {
         case TOK_TEXT:
-            for (i = 0; i < tok->len; i++) {
+            for (int i = 0; i < tok->len; i++) {
                 if (tok->text[i] != ' ')
                     return 0;
             }

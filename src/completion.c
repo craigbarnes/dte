@@ -51,15 +51,12 @@ void add_completion(char *str)
 
 static void collect_commands(const char *prefix)
 {
-    int i;
-
-    for (i = 0; commands[i].name; i++) {
+    for (int i = 0; commands[i].name; i++) {
         const Command *c = &commands[i];
-
-        if (str_has_prefix(c->name, prefix))
+        if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
+        }
     }
-
     collect_aliases(prefix);
 }
 
@@ -178,9 +175,8 @@ static void collect_files(bool directories_only)
 static void collect_env(const char *prefix)
 {
     extern char **environ;
-    int i;
 
-    for (i = 0; environ[i]; i++) {
+    for (int i = 0; environ[i]; i++) {
         const char *e = environ[i];
 
         if (str_has_prefix(e, prefix)) {
@@ -322,13 +318,14 @@ static void init_completion(void)
     len = editor.cmdline.pos - completion_pos;
     if (len && str[0] == '$') {
         bool var = true;
-        int i;
-        for (i = 1; i < len; i++) {
+        for (int i = 1; i < len; i++) {
             char ch = str[i];
-            if (isalpha(ch) || ch == '_')
+            if (isalpha(ch) || ch == '_') {
                 continue;
-            if (i > 1 && isdigit(ch))
+            }
+            if (i > 1 && isdigit(ch)) {
                 continue;
+            }
 
             var = false;
             break;
@@ -364,15 +361,16 @@ static void init_completion(void)
 static char *escape(const char *str)
 {
     StringBuffer buf = STRBUF_INIT;
-    int i;
 
-    if (!str[0])
+    if (!str[0]) {
         return xstrdup("\"\"");
+    }
 
-    if (str[0] == '~' && !completion.tilde_expanded)
+    if (str[0] == '~' && !completion.tilde_expanded) {
         strbuf_add_ch(&buf, '\\');
+    }
 
-    for (i = 0; str[i]; i++) {
+    for (int i = 0; str[i]; i++) {
         char ch = str[i];
         switch (ch) {
         case ' ':
@@ -390,6 +388,7 @@ static char *escape(const char *str)
             break;
         default:
             strbuf_add_byte(&buf, ch);
+            break;
         }
     }
     return strbuf_steal_cstring(&buf);
@@ -400,10 +399,12 @@ void complete_command(void)
     char *middle, *str;
     int head_len, middle_len, tail_len;
 
-    if (!completion.head)
+    if (!completion.head) {
         init_completion();
-    if (!completion.completions.count)
+    }
+    if (!completion.completions.count) {
         return;
+    }
 
     middle = escape(completion.completions.ptrs[completion.idx]);
     middle_len = strlen(middle);
@@ -425,8 +426,9 @@ void complete_command(void)
     free(middle);
     free(str);
     completion.idx = (completion.idx + 1) % completion.completions.count;
-    if (completion.completions.count == 1)
+    if (completion.completions.count == 1) {
         reset_completion();
+    }
 }
 
 void reset_completion(void)

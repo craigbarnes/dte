@@ -30,9 +30,9 @@ int count_strings(char **strings)
 
 void free_strings(char **strings)
 {
-    int i;
-    for (i = 0; strings[i]; i++)
+    for (int i = 0; strings[i]; i++) {
         free(strings[i]);
+    }
     free(strings);
 }
 

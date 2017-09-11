@@ -94,9 +94,8 @@ static int get_current_indent_bytes(const char *buf, int cursor_offset)
     int tw = buffer->options.tab_width;
     int ibytes = 0;
     int iwidth = 0;
-    int i;
 
-    for (i = 0; i < cursor_offset; i++) {
+    for (int i = 0; i < cursor_offset; i++) {
         char ch = buf[i];
 
         if (iwidth % buffer->options.indent_width == 0) {

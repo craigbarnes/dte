@@ -33,12 +33,12 @@ char *normalize_encoding(const char *encoding)
 {
     char *e = xstrdup(encoding);
     iconv_t cd;
-    int i;
 
-    for (i = 0; e[i]; i++)
+    for (int i = 0; e[i]; i++) {
         e[i] = toupper(e[i]);
+    }
 
-    for (i = 0; i < ARRAY_COUNT(aliases); i++) {
+    for (int i = 0; i < ARRAY_COUNT(aliases); i++) {
         if (streq(e, aliases[i].alias)) {
             free(e);
             e = xstrdup(aliases[i].encoding);
@@ -46,8 +46,9 @@ char *normalize_encoding(const char *encoding)
         }
     }
 
-    if (streq(e, "UTF-8"))
+    if (streq(e, "UTF-8")) {
         return e;
+    }
 
     cd = iconv_open("UTF-8", e);
     if (cd == (iconv_t)-1) {
@@ -60,24 +61,22 @@ char *normalize_encoding(const char *encoding)
 
 static const ByteOrderMark *get_bom(const unsigned char *buf, size_t size)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(boms); i++) {
+    for (int i = 0; i < ARRAY_COUNT(boms); i++) {
         const ByteOrderMark *bom = &boms[i];
-        if (size >= bom->len && !memcmp(buf, bom->bytes, bom->len))
+        if (size >= bom->len && !memcmp(buf, bom->bytes, bom->len)) {
             return bom;
+        }
     }
     return NULL;
 }
 
 const ByteOrderMark *get_bom_for_encoding(const char *encoding)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(boms); i++) {
+    for (int i = 0; i < ARRAY_COUNT(boms); i++) {
         const ByteOrderMark *bom = &boms[i];
-        if (streq(bom->encoding, encoding))
+        if (streq(bom->encoding, encoding)) {
             return bom;
+        }
     }
     return NULL;
 }
@@ -85,7 +84,8 @@ const ByteOrderMark *get_bom_for_encoding(const char *encoding)
 const char *detect_encoding_from_bom(const unsigned char *buf, size_t size)
 {
     const ByteOrderMark *bom = get_bom(buf, size);
-    if (bom)
+    if (bom) {
         return bom->encoding;
+    }
     return NULL;
 }

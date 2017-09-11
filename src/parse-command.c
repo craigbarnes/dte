@@ -312,9 +312,9 @@ char **copy_string_array(char **src, int count)
 {
     char **dst = xnew(char *, count + 1);
     int i;
-
-    for (i = 0; i < count; i++)
+    for (i = 0; i < count; i++) {
         dst[i] = xstrdup(src[i]);
+    }
     dst[i] = NULL;
     return dst;
 }

@@ -346,12 +346,12 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
     int flags = value.int_val;
     char buf[1024];
     char *ptr = buf;
-    int i;
 
-    if (!flags)
+    if (!flags) {
         return xstrdup("0");
+    }
 
-    for (i = 0; values[i]; i++) {
+    for (int i = 0; values[i]; i++) {
         if (flags & (1 << i)) {
             int len = strlen(values[i]);
             memcpy(ptr, values[i], len);
@@ -459,13 +459,11 @@ static void free_value(const OptionDesc *desc, OptionValue value)
 
 static const OptionDesc *find_option(const char *name)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-
-        if (streq(name, desc->name))
+        if (streq(name, desc->name)) {
             return desc;
+        }
     }
     return NULL;
 }
@@ -473,16 +471,15 @@ static const OptionDesc *find_option(const char *name)
 static const OptionDesc *must_find_option(const char *name)
 {
     const OptionDesc *desc = find_option(name);
-
-    if (desc == NULL)
+    if (desc == NULL) {
         error_msg("No such option %s", name);
+    }
     return desc;
 }
 
 static const OptionDesc *must_find_global_option(const char *name)
 {
     const OptionDesc *desc = must_find_option(name);
-
     if (desc && !desc->global) {
         error_msg("Option %s is not global", name);
         return NULL;
@@ -507,16 +504,20 @@ static void do_set_option(const OptionDesc *desc, const char *value, bool local,
     }
     if (!local && !global) {
         // Set both by default
-        if (desc->local)
+        if (desc->local) {
             local = true;
-        if (desc->global)
+        }
+        if (desc->global) {
             global = true;
+        }
     }
 
-    if (local)
+    if (local) {
         desc_set(desc, local_ptr(desc, &buffer->options), val);
-    if (global)
+    }
+    if (global) {
         desc_set(desc, global_ptr(desc), val);
+    }
     free_value(desc, val);
 }
 
@@ -524,8 +525,9 @@ void set_option(const char *name, const char *value, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
 
-    if (!desc)
+    if (!desc) {
         return;
+    }
     do_set_option(desc, value, local, global);
 }
 
@@ -533,8 +535,9 @@ void set_bool_option(const char *name, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
 
-    if (!desc)
+    if (!desc) {
         return;
+    }
     if (!desc_is(desc, OPT_ENUM) || desc->u.enum_opt.values != bool_enum) {
         error_msg("Option %s is not boolean.", desc->name);
         return;
@@ -546,19 +549,22 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
 {
     const OptionDesc *desc;
 
-    if (*global)
+    if (*global) {
         return must_find_global_option(name);
+    }
     // Toggle local value by default if option has both values
     desc = must_find_option(name);
-    if (desc && !desc->local)
+    if (desc && !desc->local) {
         *global = true;
+    }
     return desc;
 }
 
 static int toggle(int value, const char **values)
 {
-    if (!values[++value])
+    if (!values[++value]) {
         value = 0;
+    }
     return value;
 }
 
@@ -568,8 +574,9 @@ void toggle_option(const char *name, bool global, bool verbose)
     OptionValue value;
     char *ptr = NULL;
 
-    if (!desc)
+    if (!desc) {
         return;
+    }
     if (!desc_is(desc, OPT_ENUM)) {
         error_msg("Option %s is not toggleable.", name);
         return;
@@ -593,14 +600,15 @@ void toggle_option(const char *name, bool global, bool verbose)
 void toggle_option_values(const char *name, bool global, bool verbose, char **values)
 {
     const OptionDesc *desc = find_toggle_option(name, &global);
-    int i, count = count_strings(values);
+    int count = count_strings(values);
     OptionValue *parsed_values;
     int current = -1;
     bool error = false;
     char *ptr;
 
-    if (!desc)
+    if (!desc) {
         return;
+    }
 
     if (global) {
         ptr = global_ptr(desc);
@@ -608,16 +616,17 @@ void toggle_option_values(const char *name, bool global, bool verbose, char **va
         ptr = local_ptr(desc, &buffer->options);
     }
     parsed_values = xnew(OptionValue, count);
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         if (desc->ops->parse(desc, values[i], &parsed_values[i])) {
-            if (desc->ops->equals(desc, ptr, parsed_values[i]))
+            if (desc->ops->equals(desc, ptr, parsed_values[i])) {
                 current = i;
+            }
         } else {
             error = true;
         }
     }
     if (!error) {
-        i = (current + 1) % count;
+        int i = (current + 1) % count;
         desc_set(desc, ptr, parsed_values[i]);
         if (verbose) {
             char *str = desc->ops->string(desc, parsed_values[i]);
@@ -625,7 +634,7 @@ void toggle_option_values(const char *name, bool global, bool verbose, char **va
             free(str);
         }
     }
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         free_value(desc, parsed_values[i]);
     }
     free(parsed_values);
@@ -634,9 +643,8 @@ void toggle_option_values(const char *name, bool global, bool verbose, char **va
 bool validate_local_options(char **strs)
 {
     bool valid = true;
-    int i;
 
-    for (i = 0; strs[i]; i += 2) {
+    for (int i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
         const OptionDesc *desc = must_find_option(name);
@@ -661,23 +669,21 @@ bool validate_local_options(char **strs)
 
 void collect_options(const char *prefix)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        if (str_has_prefix(desc->name, prefix))
+        if (str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
+        }
     }
 }
 
 void collect_toggleable_options(const char *prefix)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        if (desc_is(desc, OPT_ENUM) && str_has_prefix(desc->name, prefix))
+        if (desc_is(desc, OPT_ENUM) && str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
+        }
     }
 }
 
@@ -685,8 +691,9 @@ void collect_option_values(const char *name, const char *prefix)
 {
     const OptionDesc *desc = find_option(name);
 
-    if (!desc)
+    if (!desc) {
         return;
+    }
 
     if (!*prefix) {
         // Complete value
@@ -703,20 +710,20 @@ void collect_option_values(const char *name, const char *prefix)
         free_value(desc, value);
     } else if (desc_is(desc, OPT_ENUM)) {
         // Complete possible values
-        int i;
-
-        for (i = 0; desc->u.enum_opt.values[i]; i++) {
-            if (str_has_prefix(desc->u.enum_opt.values[i], prefix))
+        for (int i = 0; desc->u.enum_opt.values[i]; i++) {
+            if (str_has_prefix(desc->u.enum_opt.values[i], prefix)) {
                 add_completion(xstrdup(desc->u.enum_opt.values[i]));
+            }
         }
     } else if (desc_is(desc, OPT_FLAG)) {
         // Complete possible values
         const char *comma = strrchr(prefix, ',');
-        int i, prefix_len = 0;
+        int prefix_len = 0;
 
-        if (comma)
+        if (comma) {
             prefix_len = ++comma - prefix;
-        for (i = 0; desc->u.flag_opt.values[i]; i++) {
+        }
+        for (int i = 0; desc->u.flag_opt.values[i]; i++) {
             const char *str = desc->u.flag_opt.values[i];
 
             if (str_has_prefix(str, prefix + prefix_len)) {
@@ -732,11 +739,8 @@ void collect_option_values(const char *name, const char *prefix)
 
 void free_local_options(LocalOptions *opt)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-
         if (desc->local && desc_is(desc, OPT_STR)) {
             char **local = (char **)local_ptr(desc, opt);
             free(*local);

@@ -84,29 +84,31 @@ const char *find_ft(const char *filename, const char *interpreter,
 {
     unsigned int filename_len = strlen(filename);
     char *ext = NULL;
-    int i;
 
     if (filename)
         ext = get_ext(filename);
-    for (i = 0; i < filetypes.count; i++) {
+    for (int i = 0; i < filetypes.count; i++) {
         const FileType *ft = filetypes.ptrs[i];
-
         switch (ft->type) {
         case FT_EXTENSION:
-            if (!ext || !streq(ext, ft->str))
+            if (!ext || !streq(ext, ft->str)) {
                 continue;
+            }
             break;
         case FT_FILENAME:
-            if (!filename || !regexp_match_nosub(ft->str, filename, filename_len))
+            if (!filename || !regexp_match_nosub(ft->str, filename, filename_len)) {
                 continue;
+            }
             break;
         case FT_CONTENT:
-            if (!first_line || !regexp_match_nosub(ft->str, first_line, line_len))
+            if (!first_line || !regexp_match_nosub(ft->str, first_line, line_len)) {
                 continue;
+            }
             break;
         case FT_INTERPRETER:
-            if (!interpreter || !streq(interpreter, ft->str))
+            if (!interpreter || !streq(interpreter, ft->str)) {
                 continue;
+            }
             break;
         }
         free(ext);
@@ -118,12 +120,11 @@ const char *find_ft(const char *filename, const char *interpreter,
 
 bool is_ft(const char *name)
 {
-    int i;
-
-    for (i = 0; i < filetypes.count; i++) {
+    for (int i = 0; i < filetypes.count; i++) {
         const FileType *ft = filetypes.ptrs[i];
-        if (streq(ft->name, name))
+        if (streq(ft->name, name)) {
             return true;
+        }
     }
     return false;
 }

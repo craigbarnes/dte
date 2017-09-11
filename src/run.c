@@ -25,24 +25,21 @@ const Command *current_command;
 
 static bool allowed_command(const char *name)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(config_commands); i++) {
-        if (streq(name, config_commands[i]))
+    for (int i = 0; i < ARRAY_COUNT(config_commands); i++) {
+        if (streq(name, config_commands[i])) {
             return true;
+        }
     }
     return false;
 }
 
 const Command *find_command(const Command *cmds, const char *name)
 {
-    int i;
-
-    for (i = 0; cmds[i].name; i++) {
+    for (int i = 0; cmds[i].name; i++) {
         const Command *cmd = &cmds[i];
-
-        if (streq(name, cmd->name))
+        if (streq(name, cmd->name)) {
             return cmd;
+        }
     }
     return NULL;
 }
@@ -58,7 +55,6 @@ static void run_command(const Command *cmds, char **av)
         const char *alias_name = av[0];
         const char *alias_value = find_alias(alias_name);
         Error *err = NULL;
-        int i;
 
         if (alias_value == NULL) {
             error_msg("No such command or alias: %s", alias_name);
@@ -74,8 +70,9 @@ static void run_command(const Command *cmds, char **av)
         // Remove NULL
         array.count--;
 
-        for (i = 1; av[i]; i++)
+        for (int i = 1; av[i]; i++) {
             ptr_array_add(&array, xstrdup(av[i]));
+        }
         ptr_array_add(&array, NULL);
 
         run_commands(cmds, &array);
@@ -95,8 +92,9 @@ static void run_command(const Command *cmds, char **av)
     current_command = cmd;
     args = av + 1;
     pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-    if (pf)
+    if (pf) {
         cmd->cmd(pf, args);
+    }
     current_command = NULL;
 
     end_change();

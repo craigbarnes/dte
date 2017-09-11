@@ -28,13 +28,13 @@ static void test_relative_filename(void)
         { "/a/b/c/d/e", "/a/b/file", "/a/b/file" }, // "../../../file" contains too many ".." components
         { "/a/foobar", "/a/foo/file", "../foo/file" },
     };
-    int i;
 
-    for (i = 0; i < ARRAY_COUNT(tests); i++) {
+    for (int i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct rel_test *t = &tests[i];
         char *result = relative_filename(t->path, t->cwd);
-        if (!streq(t->result, result))
+        if (!streq(t->result, result)) {
             fail("relative_filename(%s, %s) -> %s, expected %s\n", t->path, t->cwd, result, t->result);
+        }
         free(result);
     }
 }
@@ -43,8 +43,9 @@ int main(int argc, char *argv[])
 {
     const char *home = getenv("HOME");
 
-    if (!home)
+    if (!home) {
         home = "";
+    }
     editor.home_dir = xstrdup(home);
 
     setlocale(LC_CTYPE, "");

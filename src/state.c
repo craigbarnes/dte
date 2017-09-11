@@ -18,15 +18,13 @@ static void bitmap_set(unsigned char *bitmap, long idx)
 
 static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
 {
-    int i;
-
-    for (i = 0; pattern[i]; i++) {
+    for (int i = 0; pattern[i]; i++) {
         unsigned int ch = pattern[i];
-
         bitmap_set(bitmap, ch);
         if (pattern[i + 1] == '-' && pattern[i + 2]) {
-            for (ch = ch + 1; ch <= pattern[i + 2]; ch++)
+            for (ch = ch + 1; ch <= pattern[i + 2]; ch++) {
                 bitmap_set(bitmap, ch);
+            }
             i += 2;
         }
     }
@@ -202,33 +200,36 @@ static void cmd_char(const char *pf, char **args)
     }
 
     c = add_condition(type, args[1], args[2]);
-    if (!c)
+    if (!c) {
         return;
+    }
 
     set_bits(c->u.cond_char.bitmap, args[0]);
     if (not) {
-        int i;
-        for (i = 0; i < ARRAY_COUNT(c->u.cond_char.bitmap); i++)
+        for (int i = 0; i < ARRAY_COUNT(c->u.cond_char.bitmap); i++) {
             c->u.cond_char.bitmap[i] = ~c->u.cond_char.bitmap[i];
+        }
     }
 }
 
 static void cmd_default(const char *pf, char **args)
 {
     close_state();
-    if (no_syntax())
+    if (no_syntax()) {
         return;
-
+    }
     ptr_array_add(&current_syntax->default_colors, copy_string_array(args, count_strings(args)));
 }
 
 static void cmd_eat(const char *pf, char **args)
 {
-    if (no_state())
+    if (no_state()) {
         return;
+    }
 
-    if (!destination_state(args[0], &current_state->a.destination))
+    if (!destination_state(args[0], &current_state->a.destination)) {
         return;
+    }
 
     current_state->type = STATE_EAT;
     current_state->a.emit_name = args[1] ? xstrdup(args[1]) : NULL;
@@ -240,8 +241,9 @@ static void cmd_heredocbegin(const char *pf, char **args)
     const char *sub;
     Syntax *subsyn;
 
-    if (no_state())
+    if (no_state()) {
         return;
+    }
 
     sub = args[0];
     subsyn = find_any_syntax(sub);
@@ -255,8 +257,9 @@ static void cmd_heredocbegin(const char *pf, char **args)
     }
 
     // a.destination is used as the return state
-    if (!destination_state(args[1], &current_state->a.destination))
+    if (!destination_state(args[1], &current_state->a.destination)) {
         return;
+    }
 
     current_state->a.emit_name = NULL;
     current_state->type = STATE_HEREDOCBEGIN;
@@ -278,11 +281,11 @@ static void cmd_list(const char *pf, char **args)
 {
     const char *name = args[0];
     StringList *list;
-    int i;
 
     close_state();
-    if (no_syntax())
+    if (no_syntax()) {
         return;
+    }
 
     list = find_string_list(current_syntax, name);
     if (list == NULL) {
@@ -296,7 +299,7 @@ static void cmd_list(const char *pf, char **args)
     list->defined = true;
     list->icase = !!*pf;
 
-    for (i = 1; args[i]; i++) {
+    for (int i = 1; args[i]; i++) {
         const char *str = args[i];
         size_t len = strlen(str);
         unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
@@ -315,8 +318,9 @@ static void cmd_inlist(const char *pf, char **args)
     StringList *list = find_string_list(current_syntax, name);
     Condition *c = add_condition(COND_INLIST, args[1], emit);
 
-    if (c == NULL)
+    if (c == NULL) {
         return;
+    }
 
     if (list == NULL) {
         // Add undefined list
@@ -332,16 +336,18 @@ static void cmd_noeat(const char *pf, char **args)
 {
     int type = *pf ? STATE_NOEAT_BUFFER : STATE_NOEAT;
 
-    if (no_state())
+    if (no_state()) {
         return;
+    }
 
     if (streq(args[0], current_state->name)) {
         error_msg("Using noeat to to jump to parent state causes infinite loop");
         return;
     }
 
-    if (!destination_state(args[0], &current_state->a.destination))
+    if (!destination_state(args[0], &current_state->a.destination)) {
         return;
+    }
 
     current_state->a.emit_name = NULL;
     current_state->type = type;
@@ -364,8 +370,9 @@ static void cmd_recolor(const char *pf, char **args)
         }
     }
     c = add_condition(type, NULL, args[0]);
-    if (c && type == COND_RECOLOR)
+    if (c && type == COND_RECOLOR) {
         c->u.cond_recolor.len = len;
+    }
 }
 
 static void cmd_state(const char *pf, char **args)

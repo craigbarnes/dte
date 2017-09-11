@@ -63,13 +63,13 @@ bool regexp_exec_sub(const regex_t *re, const char *buf, long size, PointerArray
 {
     regmatch_t m[16];
     bool ret = regexp_exec(re, buf, size, ARRAY_COUNT(m), m, flags);
-    int i;
-
-    if (!ret)
+    if (!ret) {
         return false;
-    for (i = 0; i < ARRAY_COUNT(m); i++) {
-        if (m[i].rm_so == -1)
+    }
+    for (int i = 0; i < ARRAY_COUNT(m); i++) {
+        if (m[i].rm_so == -1) {
             break;
+        }
         ptr_array_add(matches, xstrslice(buf, m[i].rm_so, m[i].rm_eo));
     }
     return true;

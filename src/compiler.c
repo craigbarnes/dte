@@ -19,9 +19,7 @@ static Compiler *add_compiler(const char *name)
 
 Compiler *find_compiler(const char *name)
 {
-    int i;
-
-    for (i = 0; i < compilers.count; i++) {
+    for (int i = 0; i < compilers.count; i++) {
         Compiler *c = compilers.ptrs[i];
         if (streq(c->name, name))
             return c;
@@ -34,9 +32,8 @@ void add_error_fmt(const char *compiler, bool ignore, const char *format, char *
     const char *const names[] = {"file", "line", "column", "message"};
     int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
     ErrorFormat *f;
-    int i, j;
 
-    for (i = 0; desc[i]; i++) {
+    for (int i = 0, j = 0; desc[i]; i++) {
         for (j = 0; j < ARRAY_COUNT(names); j++) {
             if (streq(desc[i], names[j])) {
                 idx[j] = i + 1;
@@ -60,7 +57,7 @@ void add_error_fmt(const char *compiler, bool ignore, const char *format, char *
         free(f);
         return;
     }
-    for (i = 0; i < ARRAY_COUNT(idx); i++) {
+    for (int i = 0; i < ARRAY_COUNT(idx); i++) {
         // NOTE: -1 is larger than 0UL
         if (idx[i] > (int)f->re.re_nsub) {
             error_msg("Invalid substring count.");

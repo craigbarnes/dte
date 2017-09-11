@@ -511,9 +511,8 @@ static void shift_right(int nr_lines, int count)
 
 static void shift_left(int nr_lines, int count)
 {
-    int i;
+    int i = 0;
 
-    i = 0;
     while (1) {
         IndentInfo info;
         LineRef lr;
@@ -527,11 +526,12 @@ static void shift_left(int nr_lines, int count)
             }
         } else if (info.level && info.sane) {
             int n = count;
-
-            if (n > info.level)
+            if (n > info.level) {
                 n = info.level;
-            if (use_spaces_for_indent())
+            }
+            if (use_spaces_for_indent()) {
                 n *= buffer->options.indent_width;
+            }
             buffer_delete_bytes(n);
         } else if (info.bytes) {
             // Replace whole indentation with sane one
@@ -543,8 +543,9 @@ static void shift_left(int nr_lines, int count)
                 buffer_delete_bytes(info.bytes);
             }
         }
-        if (++i == nr_lines)
+        if (++i == nr_lines) {
             break;
+        }
         block_iter_eat_line(&view->cursor);
     }
 }
@@ -555,8 +556,9 @@ void shift_lines(int count)
     SelectionInfo info;
     int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
 
-    if (x < 0)
+    if (x < 0) {
         x = 0;
+    }
 
     if (view->selection) {
         view->selection = SELECT_LINES;
@@ -567,10 +569,11 @@ void shift_lines(int count)
 
     begin_change_chain();
     block_iter_bol(&view->cursor);
-    if (count > 0)
+    if (count > 0) {
         shift_right(nr_lines, count);
-    else
+    } else {
         shift_left(nr_lines, -count);
+    }
     end_change_chain();
 
     if (view->selection) {
@@ -578,12 +581,14 @@ void shift_lines(int count)
             // Cursor should be at beginning of selection
             block_iter_bol(&view->cursor);
             view->sel_so = block_iter_get_offset(&view->cursor);
-            while (--nr_lines)
+            while (--nr_lines) {
                 block_iter_prev_line(&view->cursor);
+            }
         } else {
             BlockIter save = view->cursor;
-            while (--nr_lines)
+            while (--nr_lines) {
                 block_iter_prev_line(&view->cursor);
+            }
             view->sel_so = block_iter_get_offset(&view->cursor);
             view->cursor = save;
         }
@@ -612,18 +617,21 @@ void clear_lines(void)
         unselect();
 
         // Don't delete last newline
-        if (del_count)
+        if (del_count) {
             del_count--;
+        }
     } else {
         block_iter_eol(&view->cursor);
         del_count = block_iter_bol(&view->cursor);
     }
 
-    if (!indent && !del_count)
+    if (!indent && !del_count) {
         return;
+    }
 
-    if (indent)
+    if (indent) {
         ins_count = strlen(indent);
+    }
     buffer_replace_bytes(del_count, indent, ins_count);
     block_iter_skip_bytes(&view->cursor, ins_count);
 }

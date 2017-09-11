@@ -89,7 +89,6 @@ static void cmd_cd(const char *pf, char **args)
     char cwd[8192];
     char *cwdp = NULL;
     bool got_cwd = !!getcwd(cwd, sizeof(cwd));
-    int i;
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
@@ -111,7 +110,7 @@ static void cmd_cd(const char *pf, char **args)
         cwdp = cwd;
     }
 
-    for (i = 0; i < buffers.count; i++) {
+    for (int i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         update_short_filename_cwd(b, cwdp);
     }
@@ -326,7 +325,6 @@ static void cmd_errorfmt(const char *pf, char **args)
 static void cmd_ft(const char *pf, char **args)
 {
     enum detect_type dt = FT_EXTENSION;
-    int i;
 
     while (*pf) {
         switch (*pf) {
@@ -342,7 +340,7 @@ static void cmd_ft(const char *pf, char **args)
         }
         pf++;
     }
-    for (i = 1; args[i]; i++)
+    for (int i = 1; args[i]; i++)
         add_filetype(args[0], args[i], dt);
 }
 
@@ -430,10 +428,11 @@ static void cmd_bolsf(const char *pf, char **args)
 {
     if (! block_iter_bol(&view->cursor)) {
         long top = view->vy + window_get_scroll_margin(window);
-        if (view->cy > top)
+        if (view->cy > top) {
             move_up(view->cy - top);
-        else
+        } else {
             block_iter_bof(&view->cursor);
+        }
     }
     view_reset_preferred_x(view);
 }
@@ -448,9 +447,9 @@ static void cmd_insert(const char *pf, char **args)
     const char *str = args[0];
 
     if (strchr(pf, 'k')) {
-        int i;
-        for (i = 0; str[i]; i++)
+        for (int i = 0; str[i]; i++) {
             insert_ch(str[i]);
+        }
     } else {
         long del_len = 0;
         long ins_len = strlen(str);
@@ -461,8 +460,9 @@ static void cmd_insert(const char *pf, char **args)
         }
 
         buffer_replace_bytes(del_len, str, ins_len);
-        if (strchr(pf, 'm'))
+        if (strchr(pf, 'm')) {
             block_iter_skip_bytes(&view->cursor, ins_len);
+        }
     }
 }
 
@@ -722,13 +722,11 @@ static void cmd_prev(const char *pf, char **args)
 
 static void cmd_quit(const char *pf, char **args)
 {
-    int i;
-
     if (pf[0]) {
         editor.status = EDITOR_EXITING;
         return;
     }
-    for (i = 0; i < buffers.count; i++) {
+    for (int i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
@@ -788,9 +786,8 @@ static void cmd_repeat(const char *pf, char **args)
 static void cmd_replace(const char *pf, char **args)
 {
     unsigned int flags = 0;
-    int i;
 
-    for (i = 0; pf[i]; i++) {
+    for (int i = 0; pf[i]; i++) {
         switch (pf[i]) {
         case 'b':
             flags |= REPLACE_BASIC;
@@ -1295,8 +1292,7 @@ static void cmd_tag(const char *pf, char **args)
     if (tags.count == 0) {
         error_msg("Tag %s not found.", name);
     } else {
-        int i;
-        for (i = 0; i < tags.count; i++) {
+        for (int i = 0; i < tags.count; i++) {
             Tag *t = tags.ptrs[i];
             Message *m;
             char buf[512];

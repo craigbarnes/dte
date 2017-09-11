@@ -146,9 +146,7 @@ static char *escape_key(const char *key, int len)
 
 static void term_setup_extra_keys(const char *term)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(terms); i++) {
+    for (int i = 0; i < ARRAY_COUNT(terms); i++) {
         if (str_has_prefix(term, terms[i])) {
             term_flags = 1 << i;
             break;
@@ -159,7 +157,6 @@ static void term_setup_extra_keys(const char *term)
 int term_init(const char *term)
 {
     int rc = curses_init(term);
-
     if (rc != 0) {
         return rc;
     }
@@ -259,9 +256,7 @@ static bool input_get_byte(unsigned char *ch)
 
 static const struct keymap *find_key(bool *possibly_truncated)
 {
-    int i;
-
-    for (i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
+    for (int i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
         const struct keymap *entry = &builtin_keys[i];
         int len;
 
@@ -284,28 +279,30 @@ static bool read_special(int *key)
 {
     const struct keymap *entry;
     bool possibly_truncated = false;
-    int i;
 
     if (DEBUG > 2) {
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
-    for (i = 0; i < term_cap.keymap_size; i++) {
+    for (int i = 0; i < term_cap.keymap_size; i++) {
         const struct term_keymap *km = &term_cap.keymap[i];
         const char *keycode = km->code;
         int len;
 
-        if (!keycode)
+        if (!keycode) {
             continue;
+        }
 
         len = strlen(keycode);
         if (len > input_buf_fill) {
             // This might be a truncated escape sequence
-            if (!memcmp(keycode, input_buf, input_buf_fill))
+            if (!memcmp(keycode, input_buf, input_buf_fill)) {
                 possibly_truncated = true;
+            }
             continue;
         }
-        if (strncmp(keycode, input_buf, len))
+        if (strncmp(keycode, input_buf, len)) {
             continue;
+        }
         *key = km->key;
         consume_input(len);
         return true;
@@ -317,8 +314,9 @@ static bool read_special(int *key)
         return true;
     }
 
-    if (possibly_truncated && input_can_be_truncated && fill_buffer())
+    if (possibly_truncated && input_can_be_truncated && fill_buffer()) {
         return read_special(key);
+    }
     return false;
 }
 
@@ -383,20 +381,19 @@ static bool read_simple(int *key)
 
 static bool is_text(const char *str, int len)
 {
-    int i;
-
-    for (i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         // NOTE: must be unsigned!
         unsigned char ch = str[i];
-
         switch (ch) {
         case '\t':
         case '\n':
         case '\r':
             break;
         default:
-            if (ch < 0x20 || ch == 0x7f)
+            if (ch < 0x20 || ch == 0x7f) {
                 return false;
+            }
+            break;
         }
     }
     return true;
@@ -404,8 +401,9 @@ static bool is_text(const char *str, int len)
 
 static bool read_key(int *key)
 {
-    if (!input_buf_fill && !fill_buffer())
+    if (!input_buf_fill && !fill_buffer()) {
         return false;
+    }
 
     if (input_buf_fill > 4 && is_text(input_buf, input_buf_fill)) {
         *key = KEY_PASTE;
@@ -413,8 +411,9 @@ static bool read_key(int *key)
     }
     if (input_buf[0] == '\033') {
         if (input_buf_fill > 1 || input_can_be_truncated) {
-            if (read_special(key))
+            if (read_special(key)) {
                 return true;
+            }
         }
         if (input_buf_fill == 1) {
             // Sometimes alt-key gets split into two reads
@@ -478,7 +477,6 @@ char *term_read_paste(long *size)
 {
     long alloc = ROUND_UP(input_buf_fill + 1, 1024);
     long count = 0;
-    long i;
     char *buf = xmalloc(alloc);
 
     if (input_buf_fill) {
@@ -497,10 +495,12 @@ char *term_read_paste(long *size)
         FD_ZERO(&set);
         FD_SET(0, &set);
         rc = select(1, &set, NULL, NULL, &tv);
-        if (rc < 0 && errno == EINTR)
+        if (rc < 0 && errno == EINTR) {
             continue;
-        if (rc <= 0)
+        }
+        if (rc <= 0) {
             break;
+        }
 
         if (alloc - count < 256) {
             alloc *= 2;
@@ -509,13 +509,15 @@ char *term_read_paste(long *size)
         do {
             rc = read(0, buf + count, alloc - count);
         } while (rc < 0 && errno == EINTR);
-        if (rc <= 0)
+        if (rc <= 0) {
             break;
+        }
         count += rc;
     }
-    for (i = 0; i < count; i++) {
-        if (buf[i] == '\r')
+    for (int i = 0; i < count; i++) {
+        if (buf[i] == '\r') {
             buf[i] = '\n';
+        }
     }
     *size = count;
     return buf;

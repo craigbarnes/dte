@@ -156,9 +156,7 @@ void end_change_chain(void)
 
 static void fix_cursors(long offset, long del, long ins)
 {
-    int i;
-
-    for (i = 0; i < buffer->views.count; i++) {
+    for (int i = 0; i < buffer->views.count; i++) {
         View *v = buffer->views.ptrs[i];
 
         if (v != view && offset < v->saved_cursor_offset) {

@@ -5,45 +5,46 @@ Frame *root_frame;
 
 static int get_min_w(Frame *f)
 {
-    if (f->window)
+    if (f->window) {
         return 8;
+    }
 
     if (f->vertical) {
-        int i, max = 0;
-
-        for (i = 0; i < f->frames.count; i++) {
+        int max = 0;
+        for (int i = 0; i < f->frames.count; i++) {
             int w = get_min_w(f->frames.ptrs[i]);
-            if (w > max)
+            if (w > max) {
                 max = w;
+            }
         }
         return max;
     } else {
-        int i, w = f->frames.count - 1; // Separators
-
-        for (i = 0; i < f->frames.count; i++)
+        int w = f->frames.count - 1; // Separators
+        for (int i = 0; i < f->frames.count; i++) {
             w += get_min_w(f->frames.ptrs[i]);
+        }
         return w;
     }
 }
 
 static int get_min_h(Frame *f)
 {
-    if (f->window)
+    if (f->window) {
         return 3;
+    }
 
     if (!f->vertical) {
-        int i, max = 0;
-
-        for (i = 0; i < f->frames.count; i++) {
+        int max = 0;
+        for (int i = 0; i < f->frames.count; i++) {
             int h = get_min_h(f->frames.ptrs[i]);
-            if (h > max)
+            if (h > max) {
                 max = h;
+            }
         }
         return max;
     } else {
-        int i, h = 0; // No separators
-
-        for (i = 0; i < f->frames.count; i++)
+        int h = 0; // No separators
+        for (int i = 0; i < f->frames.count; i++)
             h += get_min_h(f->frames.ptrs[i]);
         return h;
     }
@@ -51,42 +52,47 @@ static int get_min_h(Frame *f)
 
 static int get_min(Frame *f)
 {
-    if (f->parent->vertical)
+    if (f->parent->vertical) {
         return get_min_h(f);
+    }
     return get_min_w(f);
 }
 
 static int get_size(Frame *f)
 {
-    if (f->parent->vertical)
+    if (f->parent->vertical) {
         return f->h;
+    }
     return f->w;
 }
 
 static int get_container_size(Frame *f)
 {
-    if (f->vertical)
+    if (f->vertical) {
         return f->h;
+    }
     return f->w;
 }
 
 static void set_size(Frame *f, int size)
 {
-    if (f->parent->vertical)
+    if (f->parent->vertical) {
         set_frame_size(f, f->parent->w, size);
-    else
+    } else {
         set_frame_size(f, size, f->parent->h);
+    }
 }
 
 static void divide_equally(Frame *f)
 {
-    int q, r, s, i, n, used, count = f->frames.count;
+    int q, r, s, n, used, count = f->frames.count;
     int *size, *min;
 
     size = xnew0(int, count);
     min = xnew(int, count);
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         min[i] = get_min(f->frames.ptrs[i]);
+    }
 
     s = get_container_size(f);
 
@@ -96,7 +102,7 @@ static void divide_equally(Frame *f)
         used = 0;
         q = s / n;
         r = s % n;
-        for (i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             if (size[i] == 0 && min[i] > q) {
                 size[i] = min[i];
                 used += min[i];
@@ -106,11 +112,12 @@ static void divide_equally(Frame *f)
         s -= used;
     } while (used && n > 0);
 
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         Frame *c = f->frames.ptrs[i];
 
-        if (size[i] == 0)
+        if (size[i] == 0) {
             size[i] = q + (r-- > 0);
+        }
 
         set_size(c, size[i]);
     }
@@ -121,18 +128,19 @@ static void divide_equally(Frame *f)
 
 static void fix_size(Frame *f)
 {
-    int i, s, total, count = f->frames.count;
+    int s, total, count = f->frames.count;
     int *size, *min;
 
     size = xnew0(int, count);
     min = xnew(int, count);
     total = 0;
-    for (i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++) {
         Frame *c = f->frames.ptrs[i];
         min[i] = get_min(c);
         size[i] = get_size(c);
-        if (size[i] < min[i])
+        if (size[i] < min[i]) {
             size[i] = min[i];
+        }
         total += size[i];
     }
 
@@ -140,10 +148,11 @@ static void fix_size(Frame *f)
     if (total > s) {
         int n = total - s;
 
-        for (i = count - 1; n > 0 && i >= 0; i--) {
+        for (int i = count - 1; n > 0 && i >= 0; i--) {
             int new_size = size[i] - n;
-            if (new_size < min[i])
+            if (new_size < min[i]) {
                 new_size = min[i];
+            }
             n -= size[i] - new_size;
             size[i] = new_size;
         }
@@ -151,8 +160,9 @@ static void fix_size(Frame *f)
         size[count - 1] += s - total;
     }
 
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         set_size(f->frames.ptrs[i], size[i]);
+    }
 }
 
 static void add_to_sibling_size(Frame *f, int count)
@@ -160,10 +170,11 @@ static void add_to_sibling_size(Frame *f, int count)
     Frame *parent = f->parent;
     int idx = ptr_array_idx(&parent->frames, f);
 
-    if (idx == parent->frames.count - 1)
+    if (idx == parent->frames.count - 1) {
         f = parent->frames.ptrs[idx - 1];
-    else
+    } else {
         f = parent->frames.ptrs[idx + 1];
+    }
     set_size(f, get_size(f) + count);
 }
 
@@ -172,27 +183,31 @@ static int sub(Frame *f, int count)
     int min = get_min(f);
     int old = get_size(f);
     int new = old - count;
-    if (new < min)
+    if (new < min) {
         new = min;
-    if (new != old)
+    }
+    if (new != old) {
         set_size(f, new);
+    }
     return count - (old - new);
 }
 
 static void subtract_from_sibling_size(Frame *f, int count)
 {
     Frame *parent = f->parent;
-    int i, idx = ptr_array_idx(&parent->frames, f);
+    int idx = ptr_array_idx(&parent->frames, f);
 
-    for (i = idx + 1; i < parent->frames.count; i++) {
+    for (int i = idx + 1; i < parent->frames.count; i++) {
         count = sub(parent->frames.ptrs[i], count);
-        if (count == 0)
+        if (count == 0) {
             return;
+        }
     }
-    for (i = idx - 1; i >= 0; i--) {
+    for (int i = idx - 1; i >= 0; i--) {
         count = sub(parent->frames.ptrs[i], count);
-        if (count == 0)
+        if (count == 0) {
             return;
+        }
     }
 }
 
@@ -205,33 +220,40 @@ static void resize_to(Frame *f, int size)
     int max = total - (count - 1) * min;
     int change;
 
-    if (max < min)
+    if (max < min) {
         max = min;
-    if (size < min)
+    }
+    if (size < min) {
         size = min;
-    if (size > max)
+    }
+    if (size > max) {
         size = max;
+    }
 
     change = size - get_size(f);
-    if (change == 0)
+    if (change == 0) {
         return;
+    }
 
     set_size(f, size);
-    if (change < 0)
+    if (change < 0) {
         add_to_sibling_size(f, -change);
-    else
+    } else {
         subtract_from_sibling_size(f, change);
+    }
 }
 
 static bool rightmost_frame(Frame *f)
 {
     Frame *parent = f->parent;
 
-    if (parent == NULL)
+    if (parent == NULL) {
         return true;
+    }
     if (!parent->vertical) {
-        if (f != parent->frames.ptrs[parent->frames.count - 1])
+        if (f != parent->frames.ptrs[parent->frames.count - 1]) {
             return false;
+        }
     }
     return rightmost_frame(parent);
 }
@@ -266,14 +288,17 @@ Frame *new_root_frame(Window *w)
 
 static Frame *find_resizable(Frame *f, ResizeDirection dir)
 {
-    if (dir == RESIZE_DIRECTION_AUTO)
+    if (dir == RESIZE_DIRECTION_AUTO) {
         return f;
+    }
 
     while (f->parent) {
-        if (dir == RESIZE_DIRECTION_VERTICAL && f->parent->vertical)
+        if (dir == RESIZE_DIRECTION_VERTICAL && f->parent->vertical) {
             return f;
-        if (dir == RESIZE_DIRECTION_HORIZONTAL && !f->parent->vertical)
+        }
+        if (dir == RESIZE_DIRECTION_HORIZONTAL && !f->parent->vertical) {
             return f;
+        }
         f = f->parent;
     }
     return NULL;
@@ -284,23 +309,27 @@ void set_frame_size(Frame *f, int w, int h)
     int min_w = get_min_w(f);
     int min_h = get_min_h(f);
 
-    if (w < min_w)
+    if (w < min_w) {
         w = min_w;
-    if (h < min_h)
+    }
+    if (h < min_h) {
         h = min_h;
+    }
     f->w = w;
     f->h = h;
     if (f->window) {
-        if (!rightmost_frame(f))
+        if (!rightmost_frame(f)) {
             w--; // Separator
+        }
         set_window_size(f->window, w, h);
         return;
     }
 
-    if (f->equal_size)
+    if (f->equal_size) {
         divide_equally(f);
-    else
+    } else {
         fix_size(f);
+    }
 }
 
 void equalize_frame_sizes(Frame *parent)
@@ -313,22 +342,25 @@ void equalize_frame_sizes(Frame *parent)
 void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
 {
     f = find_resizable(f, dir);
-    if (f == NULL)
+    if (f == NULL) {
         return;
+    }
 
     f->parent->equal_size = false;
-    if (f->parent->vertical)
+    if (f->parent->vertical) {
         resize_to(f, f->h + amount);
-    else
+    } else {
         resize_to(f, f->w + amount);
+    }
     update_window_coordinates();
 }
 
 void resize_frame(Frame *f, ResizeDirection dir, int size)
 {
     f = find_resizable(f, dir);
-    if (f == NULL)
+    if (f == NULL) {
         return;
+    }
 
     f->parent->equal_size = false;
     resize_to(f, size);
@@ -337,20 +369,19 @@ void resize_frame(Frame *f, ResizeDirection dir, int size)
 
 static void update_frame_coordinates(Frame *f, int x, int y)
 {
-    int i;
-
     if (f->window) {
         set_window_coordinates(f->window, x, y);
         return;
     }
 
-    for (i = 0; i < f->frames.count; i++) {
+    for (int i = 0; i < f->frames.count; i++) {
         Frame *c = f->frames.ptrs[i];
         update_frame_coordinates(c, x, y);
-        if (f->vertical)
+        if (f->vertical) {
             y += c->h;
-        else
+        } else {
             x += c->w;
+        }
     }
 }
 
@@ -462,26 +493,31 @@ void remove_frame(Frame *f)
 
 static void debug_frame(Frame *f, int level)
 {
-    int i;
-
-    d_print("%*s%dx%d %d %d %ld\n",
+    d_print (
+        "%*s%dx%d %d %d %ld\n",
         level * 4, "",
         f->w, f->h,
         f->vertical, f->equal_size,
-        f->frames.count);
-    if (f->window)
-        d_print("%*swindow %d,%d %dx%d\n",
+        f->frames.count
+    );
+
+    if (f->window) {
+        d_print (
+            "%*swindow %d,%d %dx%d\n",
             (level + 1) * 4, "",
             f->window->x,
             f->window->y,
             f->window->w,
-            f->window->h);
+            f->window->h
+        );
+    }
 
     BUG_ON(f->window && f->frames.count);
-    if (f->window)
+    if (f->window) {
         BUG_ON(f != f->window->frame);
+    }
 
-    for (i = 0; i < f->frames.count; i++) {
+    for (int i = 0; i < f->frames.count; i++) {
         Frame *c = f->frames.ptrs[i];
         BUG_ON(c->parent != f);
         debug_frame(c, level + 1);

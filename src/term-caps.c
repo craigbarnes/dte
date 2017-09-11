@@ -43,14 +43,14 @@ static const char *const key_cap_map[NR_SPECIAL_KEYS] = {
 void term_read_caps(void)
 {
     struct term_keymap *km;
-    int i;
 
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
     term_cap.colors = curses_int_cap("colors"); // max_colors
-    for (i = 0; i < NR_STR_CAPS; i++) {
+    for (int i = 0; i < NR_STR_CAPS; i++) {
         term_cap.strings[i] = curses_str_cap(string_cap_map[i]);
     }
 
+    int i;
     term_cap.keymap_size = NR_SPECIAL_KEYS + 2;
     term_cap.keymap = xnew(struct term_keymap, term_cap.keymap_size);
     for (i = 0; i < NR_SPECIAL_KEYS; i++) {

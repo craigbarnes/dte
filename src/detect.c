@@ -107,9 +107,8 @@ bool detect_indent(Buffer *b)
     int counts[9] = {0};
     int tab_count = 0;
     int space_count = 0;
-    int i;
 
-    for (i = 0; i < 200; i++) {
+    for (int i = 0; i < 200; i++) {
         LineRef lr;
         int indent;
         bool tab;
@@ -129,11 +128,13 @@ bool detect_indent(Buffer *b)
             // Count only increase in indentation because indentation
             // almost always grows one level at time, whereas it can
             // can decrease multiple levels all at once.
-            if (current_indent == -1)
+            if (current_indent == -1) {
                 current_indent = 0;
+            }
             change = indent - current_indent;
-            if (change > 0 && change <= 8)
+            if (change > 0 && change <= 8) {
                 counts[change]++;
+            }
 
             if (tab) {
                 tab_count++;
@@ -143,8 +144,9 @@ bool detect_indent(Buffer *b)
             current_indent = indent;
         }
 
-        if (!block_iter_next_line(&bi))
+        if (!block_iter_next_line(&bi)) {
             break;
+        }
     }
     if (tab_count == 0 && space_count == 0) {
         return false;
@@ -155,11 +157,11 @@ bool detect_indent(Buffer *b)
         b->options.indent_width = b->options.tab_width;
     } else {
         int m = 0;
-
-        for (i = 1; i < ARRAY_COUNT(counts); i++) {
+        for (int i = 1; i < ARRAY_COUNT(counts); i++) {
             if (b->options.detect_indent & 1 << (i - 1)) {
-                if (counts[i] > counts[m])
+                if (counts[i] > counts[m]) {
                     m = i;
+                }
             }
         }
         if (m == 0) {

@@ -62,9 +62,8 @@ static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int l
 {
     HeredocState *s;
     SyntaxMerge m;
-    int i;
 
-    for (i = 0; i < state->heredoc.states.count; i++) {
+    for (int i = 0; i < state->heredoc.states.count; i++) {
         s = state->heredoc.states.ptrs[i];
         if (s->len == len && !memcmp(s->delim, delim, len))
             return s->state;

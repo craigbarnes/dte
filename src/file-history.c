@@ -17,9 +17,7 @@ static PointerArray history = PTR_ARRAY_INIT;
 void add_file_history(int row, int col, const char *filename)
 {
     HistoryEntry *e;
-    int i;
-
-    for (i = 0; i < history.count; i++) {
+    for (int i = 0; i < history.count; i++) {
         e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             e->row = row;
@@ -36,8 +34,9 @@ void add_file_history(int row, int col, const char *filename)
         free(e);
     }
 
-    if (!max_history_size)
+    if (!max_history_size) {
         return;
+    }
 
     e = xnew(HistoryEntry, 1);
     e->row = row;
@@ -81,7 +80,6 @@ void save_file_history(void)
 {
     char *filename = editor_file("file-history");
     WriteBuffer buf = WBUF_INIT;
-    int i;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
     if (buf.fd < 0) {
@@ -89,7 +87,7 @@ void save_file_history(void)
         free(filename);
         return;
     }
-    for (i = 0; i < history.count; i++) {
+    for (int i = 0; i < history.count; i++) {
         HistoryEntry *e = history.ptrs[i];
         char str[64];
         snprintf(str, sizeof(str), "%d %d ", e->row, e->col);
@@ -104,9 +102,7 @@ void save_file_history(void)
 
 bool find_file_in_history(const char *filename, int *row, int *col)
 {
-    int i;
-
-    for (i = 0; i < history.count; i++) {
+    for (int i = 0; i < history.count; i++) {
         HistoryEntry *e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             *row = e->row;

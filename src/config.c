@@ -24,8 +24,7 @@ const char *reset_colors_rc =
 
 static bool is_command(const char *str, int len)
 {
-    int i;
-    for (i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         if (str[i] == '#')
             return false;
         if (!isspace(str[i]))

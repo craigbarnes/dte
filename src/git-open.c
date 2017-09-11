@@ -79,43 +79,45 @@ static void split(PointerArray *words, const char *str)
     int s, i = 0;
 
     while (str[i]) {
-        while (isspace(str[i]))
+        while (isspace(str[i])) {
             i++;
-        if (!str[i])
+        }
+        if (!str[i]) {
             break;
+        }
         s = i++;
-        while (str[i] && !isspace(str[i]))
+        while (str[i] && !isspace(str[i])) {
             i++;
+        }
         ptr_array_add(words, xstrslice(str, s, i));
     }
 }
 
 static bool words_match(const char *name, PointerArray *words)
 {
-    int i;
-
-    for (i = 0; i < words->count; i++) {
-        if (!strstr(name, words->ptrs[i]))
+    for (int i = 0; i < words->count; i++) {
+        if (!strstr(name, words->ptrs[i])) {
             return false;
+        }
     }
     return true;
 }
 
 static bool words_match_icase(const char *name, PointerArray *words)
 {
-    int i;
-
-    for (i = 0; i < words->count; i++) {
-        if (u_str_index(name, words->ptrs[i]) < 0)
+    for (int i = 0; i < words->count; i++) {
+        if (u_str_index(name, words->ptrs[i]) < 0) {
             return false;
+        }
     }
     return true;
 }
 
 static const char *selected_file(void)
 {
-    if (git_open.files.count == 0)
+    if (git_open.files.count == 0) {
         return NULL;
+    }
     return git_open.files.ptrs[git_open.selected];
 }
 
@@ -128,18 +130,21 @@ static void git_open_filter(void)
     PointerArray words = PTR_ARRAY_INIT;
 
     // NOTE: words_match_icase() requires str to be lowercase
-    if (contains_upper(str))
+    if (contains_upper(str)) {
         match = words_match;
+    }
     split(&words, str);
     free(str);
 
     git_open.files.count = 0;
     while (ptr < end) {
         char *zero = memchr(ptr, 0, end - ptr);
-        if (zero == NULL)
+        if (zero == NULL) {
             break;
-        if (match(ptr, &words))
+        }
+        if (match(ptr, &words)) {
             ptr_array_add(&git_open.files, ptr);
+        }
         ptr = zero + 1;
     }
     ptr_array_free(&words);
@@ -150,15 +155,17 @@ static void git_open_filter(void)
 static void up(int count)
 {
     git_open.selected -= count;
-    if (git_open.selected < 0)
+    if (git_open.selected < 0) {
         git_open.selected = 0;
+    }
 }
 
 static void down(int count)
 {
     git_open.selected += count;
-    if (git_open.selected >= git_open.files.count)
+    if (git_open.selected >= git_open.files.count) {
         git_open.selected = git_open.files.count - 1;
+    }
 }
 
 static void open_selected(void)

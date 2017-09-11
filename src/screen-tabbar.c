@@ -41,17 +41,19 @@ static void print_horizontal_tabbar(Window *win)
     calculate_tabbar(win);
     for (i = win->first_tab_idx; i < win->views.count; i++) {
         View *v = win->views.ptrs[i];
-
-        if (obuf.x + v->tt_truncated_width > win->w)
+        if (obuf.x + v->tt_truncated_width > win->w) {
             break;
+        }
         print_horizontal_tab_title(v, i);
     }
     set_builtin_color(BC_TABBAR);
     if (i != win->views.count) {
-        while (obuf.x < obuf.width - 1)
+        while (obuf.x < obuf.width - 1) {
             buf_put_char(' ');
-        if (obuf.x == obuf.width - 1)
+        }
+        if (obuf.x == obuf.width - 1) {
             buf_put_char('>');
+        }
     } else {
         buf_clear_eol();
     }

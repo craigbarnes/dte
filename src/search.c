@@ -152,11 +152,10 @@ static void free_regex(void)
 
 static bool has_upper(const char *str)
 {
-    int i;
-
-    for (i = 0; str[i]; i++) {
-        if (isupper(str[i]))
+    for (int i = 0; str[i]; i++) {
+        if (isupper(str[i])) {
             return true;
+        }
     }
     return false;
 }

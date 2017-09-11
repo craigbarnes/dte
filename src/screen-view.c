@@ -28,12 +28,15 @@ static bool is_default_bg_color(int color)
 // Like mask_color() but can change bg color only if it has not been changed yet
 static void mask_color2(struct term_color *color, const struct term_color *over)
 {
-    if (over->fg != -2)
+    if (over->fg != -2) {
         color->fg = over->fg;
-    if (over->bg != -2 && is_default_bg_color(color->bg))
+    }
+    if (over->bg != -2 && is_default_bg_color(color->bg)) {
         color->bg = over->bg;
-    if (!(over->attr & ATTR_KEEP))
+    }
+    if (!(over->attr & ATTR_KEEP)) {
         color->attr = over->attr;
+    }
 }
 
 static void mask_selection_and_current_line(LineInfo *info, struct term_color *color)
@@ -47,10 +50,12 @@ static void mask_selection_and_current_line(LineInfo *info, struct term_color *c
 
 static bool is_non_text(unsigned int u)
 {
-    if (u < 0x20)
+    if (u < 0x20) {
         return u != '\t' || options.display_special;
-    if (u == 0x7f)
+    }
+    if (u == 0x7f) {
         return true;
+    }
     return u_is_unprintable(u);
 }
 
@@ -75,8 +80,9 @@ static bool whitespace_error(LineInfo *info, unsigned int u, long i)
 
     if (i >= info->trailing_ws_offset && flags & WSE_TRAILING) {
         // Trailing whitespace
-        if (info->line_nr != v->cy || v->cx < info->trailing_ws_offset)
+        if (info->line_nr != v->cy || v->cx < info->trailing_ws_offset) {
             return true;
+        }
         // Cursor is on this line and on the whitespace or at eol. It would
         // be annoying if the line you are editing displays trailing
         // whitespace as an error.
@@ -85,19 +91,22 @@ static bool whitespace_error(LineInfo *info, unsigned int u, long i)
     if (u == '\t') {
         if (i < info->indent_size) {
             // In indentation
-            if (flags & WSE_TAB_INDENT)
+            if (flags & WSE_TAB_INDENT) {
                 return true;
+            }
         } else {
-            if (flags & WSE_TAB_AFTER_INDENT)
+            if (flags & WSE_TAB_AFTER_INDENT) {
                 return true;
+            }
         }
     } else if (i < info->indent_size) {
         // Space in indentation
         const char *line = info->line;
         int count = 0, pos = i;
 
-        while (pos > 0 && line[pos - 1] == ' ')
+        while (pos > 0 && line[pos - 1] == ' ') {
             pos--;
+        }
         while (pos < info->size && line[pos] == ' ') {
             pos++;
             count++;
@@ -105,16 +114,19 @@ static bool whitespace_error(LineInfo *info, unsigned int u, long i)
 
         if (count >= v->buffer->options.tab_width) {
             // Spaces used instead of tab
-            if (flags & WSE_SPACE_INDENT)
+            if (flags & WSE_SPACE_INDENT) {
                 return true;
+            }
         } else if (pos < info->size && line[pos] == '\t') {
             // Space before tab
-            if (flags & WSE_SPACE_INDENT)
+            if (flags & WSE_SPACE_INDENT) {
                 return true;
+            }
         } else {
             // Less than tab width spaces at end of indentation
-            if (flags & WSE_SPACE_ALIGN)
+            if (flags & WSE_SPACE_ALIGN) {
                 return true;
+            }
         }
     }
     return false;
@@ -130,15 +142,17 @@ static unsigned int screen_next_char(LineInfo *info)
     if (likely(u < 0x80)) {
         info->pos++;
         count = 1;
-        if (u == '\t' || u == ' ')
+        if (u == '\t' || u == ' ') {
             ws_error = whitespace_error(info, u, pos);
+        }
     } else {
         u = u_get_nonascii(info->line, info->size, &info->pos);
         count = info->pos - pos;
 
         // Highly annoying no-break space etc.?
-        if (u_is_special_whitespace(u) && (info->view->buffer->options.ws_error & WSE_SPECIAL))
+        if (u_is_special_whitespace(u) && (info->view->buffer->options.ws_error & WSE_SPECIAL)) {
             ws_error = true;
+        }
     }
 
     if (info->colors && info->colors[pos]) {
@@ -146,10 +160,12 @@ static unsigned int screen_next_char(LineInfo *info)
     } else {
         color = *builtin_colors[BC_DEFAULT];
     }
-    if (is_non_text(u))
+    if (is_non_text(u)) {
         mask_color(&color, builtin_colors[BC_NONTEXT]);
-    if (ws_error)
+    }
+    if (ws_error) {
         mask_color(&color, builtin_colors[BC_WSERROR]);
+    }
     mask_selection_and_current_line(info, &color);
     set_color(&color);
 
@@ -184,12 +200,12 @@ static void screen_skip_char(LineInfo *info)
 static bool is_notice(const char *word, int len)
 {
     static const char *const words[] = {"fixme", "todo", "xxx"};
-    int i;
 
-    for (i = 0; i < ARRAY_COUNT(words); i++) {
+    for (int i = 0; i < ARRAY_COUNT(words); i++) {
         const char *w = words[i];
-        if (strlen(w) == len && !strncasecmp(w, word, len))
+        if (strlen(w) == len && !strncasecmp(w, word, len)) {
             return true;
+        }
     }
     return false;
 }
@@ -201,16 +217,19 @@ static void hl_words(LineInfo *info)
     HlColor *nc = find_color("notice");
     int i, j, si, max;
 
-    if (info->colors == NULL || cc == NULL || nc == NULL)
+    if (info->colors == NULL || cc == NULL || nc == NULL) {
         return;
+    }
 
     i = info->pos;
-    if (i >= info->size)
+    if (i >= info->size) {
         return;
+    }
 
     // Go to beginning of partially visible word inside comment
-    while (i > 0 && info->colors[i] == cc && is_word_byte(info->line[i]))
+    while (i > 0 && info->colors[i] == cc && is_word_byte(info->line[i])) {
         i--;
+    }
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
@@ -260,8 +279,6 @@ static void line_info_init(LineInfo *info, View *v, BlockIter *bi, long line_nr)
 
 static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
 {
-    int i;
-
     BUG_ON(lr->size == 0);
     BUG_ON(lr->line[lr->size - 1] != '\n');
 
@@ -270,18 +287,22 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
     info->pos = 0;
     info->colors = colors;
 
-    for (i = 0; i < info->size; i++) {
-        char ch = info->line[i];
-        if (ch != '\t' && ch != ' ')
-            break;
+    {
+        int i;
+        for (i = 0; i < info->size; i++) {
+            char ch = info->line[i];
+            if (ch != '\t' && ch != ' ')
+                break;
+        }
+        info->indent_size = i;
     }
-    info->indent_size = i;
 
     info->trailing_ws_offset = INT_MAX;
-    for (i = info->size - 1; i >= 0; i--) {
+    for (int i = info->size - 1; i >= 0; i--) {
         char ch = info->line[i];
-        if (ch != '\t' && ch != ' ')
+        if (ch != '\t' && ch != ' ') {
             break;
+        }
         info->trailing_ws_offset = i;
     }
 }
@@ -297,8 +318,9 @@ static void print_line(LineInfo *info)
     //
     // There can be a wide character (tab, control code etc.) which is
     // partially visible and can't be skipped using screen_skip_char().
-    while (obuf.x + 8 < obuf.scroll_x && info->pos < info->size)
+    while (obuf.x + 8 < obuf.scroll_x && info->pos < info->size) {
         screen_skip_char(info);
+    }
 
     hl_words(info);
 
