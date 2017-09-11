@@ -31,6 +31,7 @@ CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 DEBUG = 1
 
 BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
 
 ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
   # Make "-s" flag was used (silent build)
