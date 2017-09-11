@@ -7,7 +7,12 @@ error() {
 }
 
 linux_distro_id() {
-    awk 'BEGIN {FS = "="} $1 == "ID" {print $2}' /etc/os-release
+    awk -vFS='=' '
+        $1 == "ID" {
+            gsub("\"", "", $2)
+            print $2
+        }
+    ' /etc/os-release
 }
 
 case "$(uname)" in
