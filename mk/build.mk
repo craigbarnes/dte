@@ -90,8 +90,8 @@ endif
 
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-  $(OBJECTS): BASIC_CFLAGS += -MF build/$(@F).mk -MMD -MP
-  -include $(addprefix build/, $(addsuffix .mk, $(notdir $(OBJECTS))))
+  $(OBJECTS): BASIC_CFLAGS += -MF build/$*.mk -MMD -MP
+  -include $(patsubst %.o, %.mk, $(OBJECTS))
 endif
 endif
 
