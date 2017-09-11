@@ -18,5 +18,5 @@ $(GIT_HOOKS): .git/hooks/%: mk/git-hooks/%
 	$(Q) cp $< $@
 
 
-CLEANFILES += $(DIST_ALL)
+CLEANFILES += dte-*.tar.gz
 .PHONY: dist dist-all check-dist git-hooks
