@@ -6,9 +6,13 @@ error() {
     exit 1
 }
 
-case $(uname) in
+linux_distro_id() {
+    awk 'BEGIN {FS = "="} $1 == "ID" {print $2}' /etc/os-release
+}
+
+case "$(uname)" in
 Linux)
-    case $(. /etc/os-release && echo "$ID") in
+    case "$(linux_distro_id)" in
     alpine)
         apk --update add make gcc binutils ncurses ncurses-dev libc-dev;;
     arch)
