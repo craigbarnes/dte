@@ -7,12 +7,7 @@ error() {
 }
 
 linux_distro_id() {
-    awk -vFS='=' '
-        $1 == "ID" {
-            gsub("\"", "", $2)
-            print $2
-        }
-    ' /etc/os-release
+    sed -n 's/^ID="\?\([a-z0-9._-]\+\)"\?/\1/p' /etc/os-release
 }
 
 case "$(uname)" in
