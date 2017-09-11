@@ -3,8 +3,9 @@
 
 static int dup_close_on_exec(int old, int new)
 {
-    if (dup2(old, new) < 0)
+    if (dup2(old, new) < 0) {
         return -1;
+    }
     fcntl(new, F_SETFD, FD_CLOEXEC);
     return new;
 }
@@ -17,10 +18,12 @@ static void handle_child(char **argv, int fd[3], int error_fd)
 
     // Find if we must move fds out of the way
     for (i = 0; i < nr_fds; i++) {
-        if (fd[i] > max)
+        if (fd[i] > max) {
             max = fd[i];
-        if (fd[i] < i)
+        }
+        if (fd[i] < i) {
             move = 1;
+        }
     }
 
     if (move) {
@@ -28,14 +31,16 @@ static void handle_child(char **argv, int fd[3], int error_fd)
 
         if (error_fd < nr_fds) {
             error_fd = dup_close_on_exec(error_fd, next_free++);
-            if (error_fd < 0)
+            if (error_fd < 0) {
                 goto out;
+            }
         }
         for (i = 0; i < nr_fds; i++) {
             if (fd[i] < i) {
                 fd[i] = dup_close_on_exec(fd[i], next_free++);
-                if (fd[i] < 0)
+                if (fd[i] < 0) {
                     goto out;
+                }
             }
         }
     }
@@ -46,8 +51,9 @@ static void handle_child(char **argv, int fd[3], int error_fd)
             // Clear FD_CLOEXEC flag
             fcntl(fd[i], F_SETFD, 0);
         } else {
-            if (dup2(fd[i], i) < 0)
+            if (dup2(fd[i], i) < 0) {
                 goto out;
+            }
         }
     }
 
@@ -82,8 +88,9 @@ int fork_exec(char **argv, int fd[3])
     int pid, rc, status, error = 0;
     int ep[2];
 
-    if (pipe_close_on_exec(ep))
+    if (pipe_close_on_exec(ep)) {
         return -1;
+    }
 
     pid = fork();
     if (pid < 0) {
@@ -93,15 +100,18 @@ int fork_exec(char **argv, int fd[3])
         errno = error;
         return pid;
     }
-    if (!pid)
+    if (!pid) {
         handle_child(argv, fd, ep[1]);
+    }
 
     close(ep[1]);
     rc = read(ep[0], &error, sizeof(error));
-    if (rc > 0 && rc != sizeof(error))
+    if (rc > 0 && rc != sizeof(error)) {
         error = EPIPE;
-    if (rc < 0)
+    }
+    if (rc < 0) {
         error = errno;
+    }
     close(ep[0]);
 
     if (!rc) {
@@ -109,8 +119,9 @@ int fork_exec(char **argv, int fd[3])
         return pid;
     }
 
-    while (waitpid(pid, &status, 0) < 0 && errno == EINTR)
+    while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
         ;
+    }
     errno = error;
     return -1;
 }
@@ -120,19 +131,24 @@ int wait_child(int pid)
     int status;
 
     while (waitpid(pid, &status, 0) < 0) {
-        if (errno == EINTR)
+        if (errno == EINTR) {
             continue;
+        }
         return -errno;
     }
-    if (WIFEXITED(status))
+    if (WIFEXITED(status)) {
         return (unsigned char)WEXITSTATUS(status);
-    if (WIFSIGNALED(status))
+    }
+    if (WIFSIGNALED(status)) {
         return WTERMSIG(status) << 8;
-    if (WIFSTOPPED(status))
+    }
+    if (WIFSTOPPED(status)) {
         return WSTOPSIG(status) << 8;
+    }
 #if defined(WIFCONTINUED)
-    if (WIFCONTINUED(status))
+    if (WIFCONTINUED(status)) {
         return SIGCONT << 8;
+    }
 #endif
     return -EINVAL;
 }

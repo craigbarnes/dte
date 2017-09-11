@@ -107,11 +107,13 @@ void run_commands(const Command *cmds, const PointerArray *array)
     s = 0;
     while (s < array->count) {
         e = s;
-        while (e < array->count && array->ptrs[e])
+        while (e < array->count && array->ptrs[e]) {
             e++;
+        }
 
-        if (e > s)
+        if (e > s) {
             run_command(cmds, (char **)array->ptrs + s);
+        }
 
         s = e + 1;
     }

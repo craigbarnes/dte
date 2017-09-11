@@ -61,10 +61,11 @@ int main(int argc, char *argv[])
 
     editor.home_dir = xstrdup(home ? home : "");
 
-    if (dte_home)
+    if (dte_home) {
         editor.user_config_dir = xstrdup(dte_home);
-    else
+    } else {
         editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
+    }
 
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
@@ -119,8 +120,9 @@ int main(int argc, char *argv[])
 
     setlocale(LC_CTYPE, "");
     editor.charset = nl_langinfo(CODESET);
-    if (streq(editor.charset, "UTF-8"))
+    if (streq(editor.charset, "UTF-8")) {
         term_utf8 = true;
+    }
 
     exec_builtin_rc(builtin_bindings);
     exec_builtin_rc(builtin_rc);
@@ -164,8 +166,9 @@ int main(int argc, char *argv[])
     search_history_filename = editor_file("search-history");
     history_load(&command_history, command_history_filename, command_history_size);
     history_load(&search_history, search_history_filename, search_history_size);
-    if (search_history.count)
+    if (search_history.count) {
         search_set_regexp(search_history.ptrs[search_history.count - 1]);
+    }
 
     // Initialize terminal but don't update screen yet. Also display
     // "Press any key to continue" prompt if there were any errors
@@ -195,16 +198,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (window->views.count == 0)
+    if (window->views.count == 0) {
         window_open_empty_buffer(window);
+    }
 
     set_view(window->views.ptrs[0]);
 
-    if (command || tag)
+    if (command || tag) {
         resize();
+    }
 
-    if (command)
+    if (command) {
         handle_command(commands, command);
+    }
     if (tag) {
         PointerArray array = PTR_ARRAY_INIT;
         ptr_array_add(&array, xstrdup("tag"));

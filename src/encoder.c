@@ -22,8 +22,9 @@ FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 
 void free_file_encoder(FileEncoder *enc)
 {
-    if (enc->cconv != NULL)
+    if (enc->cconv != NULL) {
         cconv_free(enc->cconv);
+    }
     free(enc->nbuf);
     free(enc);
 }
@@ -39,8 +40,9 @@ static ssize_t unix_to_dos(FileEncoder *enc, const unsigned char *buf, ssize_t s
 
     for (s = 0, d = 0; s < size; s++) {
         unsigned char ch = buf[s];
-        if (ch == '\n')
+        if (ch == '\n') {
             enc->nbuf[d++] = '\r';
+        }
         enc->nbuf[d++] = ch;
     }
     return d;
@@ -54,8 +56,9 @@ ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, ssize_t s
         buf = enc->nbuf;
     }
 
-    if (enc->cconv == NULL)
+    if (enc->cconv == NULL) {
         return xwrite(enc->fd, buf, size);
+    }
 
     cconv_process(enc->cconv, buf, size);
     cconv_flush(enc->cconv);

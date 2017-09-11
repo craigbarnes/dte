@@ -17,10 +17,12 @@ void set_color(struct term_color *color)
     struct term_color tmp = *color;
 
     // NOTE: -2 (keep) is treated as -1 (default)
-    if (tmp.fg < 0)
+    if (tmp.fg < 0) {
         tmp.fg = builtin_colors[BC_DEFAULT]->fg;
-    if (tmp.bg < 0)
+    }
+    if (tmp.bg < 0) {
         tmp.bg = builtin_colors[BC_DEFAULT]->bg;
+    }
     buf_set_color(&tmp);
 }
 
@@ -33,15 +35,19 @@ static const char *format_misc_status(Window *win)
 {
     static char misc_status[32] = {'\0'};
 
-    if (special_input_misc_status(misc_status, 31))
+    if (special_input_misc_status(misc_status, 31)) {
         return misc_status;
+    }
 
     if (editor.input_mode == INPUT_SEARCH) {
-        snprintf(misc_status, sizeof(misc_status), "[case-sensitive = %s]",
-            case_sensitive_search_enum[options.case_sensitive_search]);
+        snprintf (
+            misc_status,
+            sizeof(misc_status),
+            "[case-sensitive = %s]",
+            case_sensitive_search_enum[options.case_sensitive_search]
+        );
     } else if (win->view->selection) {
         SelectionInfo info;
-
         init_selection(win->view, &info);
         if (win->view->selection == SELECT_LINES) {
             snprintf(misc_status, sizeof(misc_status), "[%d lines]", get_nr_selected_lines(&info));
@@ -111,8 +117,9 @@ int print_command(char prefix)
     if (editor.cmdline.pos == editor.cmdline.buf.len) {
         w++;
     }
-    if (w > screen_w)
+    if (w > screen_w) {
         obuf.scroll_x = w - screen_w;
+    }
 
     set_builtin_color(BC_COMMANDLINE);
     i = 0;
@@ -121,10 +128,12 @@ int print_command(char prefix)
     while (i < editor.cmdline.buf.len) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
         u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);
-        if (!buf_put_char(u))
+        if (!buf_put_char(u)) {
             break;
-        if (i <= editor.cmdline.pos)
+        }
+        if (i <= editor.cmdline.pos) {
             x = obuf.x - obuf.scroll_x;
+        }
     }
     return x;
 }
@@ -134,13 +143,15 @@ void print_message(const char *msg, bool is_error)
     enum builtin_color c = BC_COMMANDLINE;
     long i = 0;
 
-    if (msg[0])
+    if (msg[0]) {
         c = is_error ? BC_ERRORMSG : BC_INFOMSG;
+    }
     set_builtin_color(c);
     while (msg[i]) {
         unsigned int u = u_get_char(msg, i + 4, &i);
-        if (!buf_put_char(u))
+        if (!buf_put_char(u)) {
             break;
+        }
     }
 }
 
@@ -187,20 +198,24 @@ void update_term_title(Buffer *b)
 
 void mask_color(struct term_color *color, const struct term_color *over)
 {
-    if (over->fg != -2)
+    if (over->fg != -2) {
         color->fg = over->fg;
-    if (over->bg != -2)
+    }
+    if (over->bg != -2) {
         color->bg = over->bg;
-    if (!(over->attr & ATTR_KEEP))
+    }
+    if (!(over->attr & ATTR_KEEP)) {
         color->attr = over->attr;
+    }
 }
 
 static void print_separator(Window *win)
 {
     int y;
 
-    if (win->x + win->w == screen_w)
+    if (win->x + win->w == screen_w) {
         return;
+    }
 
     for (y = 0; y < win->h; y++) {
         buf_move_cursor(win->x + win->w, win->y + y);
@@ -218,25 +233,27 @@ void update_line_numbers(Window *win, bool force)
 {
     View *v = win->view;
     long lines = v->buffer->nl;
-    int i, first, last;
+    int first, last;
     int x = win->x + vertical_tabbar_width(win);
 
     calculate_line_numbers(win);
 
     first = v->vy + 1;
     last = v->vy + win->edit_h;
-    if (last > lines)
+    if (last > lines) {
         last = lines;
+    }
 
-    if (!force && win->line_numbers.first == first && win->line_numbers.last == last)
+    if (!force && win->line_numbers.first == first && win->line_numbers.last == last) {
         return;
+    }
 
     win->line_numbers.first = first;
     win->line_numbers.last = last;
 
     buf_reset(win->x, win->w, 0);
     set_builtin_color(BC_LINENUMBER);
-    for (i = 0; i < win->edit_h; i++) {
+    for (int i = 0; i < win->edit_h; i++) {
         int line = v->vy + i + 1;
         int w = win->line_numbers.width - 1;
         char buf[32];
@@ -260,12 +277,15 @@ void update_git_open(void)
     int max_y = git_open.scroll + h - 1;
     int i = 0;
 
-    if (h >= git_open.files.count)
+    if (h >= git_open.files.count) {
         git_open.scroll = 0;
-    if (git_open.scroll > git_open.selected)
+    }
+    if (git_open.scroll > git_open.selected) {
         git_open.scroll = git_open.selected;
-    if (git_open.selected > max_y)
+    }
+    if (git_open.selected > max_y) {
         git_open.scroll += git_open.selected - max_y;
+    }
 
     buf_reset(x, w, 0);
     buf_move_cursor(0, 0);
@@ -278,16 +298,18 @@ void update_git_open(void)
         char *file;
         struct term_color color;
 
-        if (file_idx >= git_open.files.count)
+        if (file_idx >= git_open.files.count) {
             break;
+        }
 
         file = git_open.files.ptrs[file_idx];
         obuf.x = 0;
         buf_move_cursor(x, y + i);
 
         color = *builtin_colors[BC_DEFAULT];
-        if (file_idx == git_open.selected)
+        if (file_idx == git_open.selected) {
             mask_color(&color, builtin_colors[BC_SELECTION]);
+        }
         buf_set_color(&color);
         buf_add_str(file);
         buf_clear_eol();
@@ -309,10 +331,12 @@ void update_window_sizes(void)
 void update_screen_size(void)
 {
     if (!term_get_size(&screen_w, &screen_h)) {
-        if (screen_w < 3)
+        if (screen_w < 3) {
             screen_w = 3;
-        if (screen_h < 3)
+        }
+        if (screen_h < 3) {
             screen_h = 3;
+        }
         update_window_sizes();
     }
 }

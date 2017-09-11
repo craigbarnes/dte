@@ -23,14 +23,16 @@ static Block *add_utf8_line(Buffer *b, Block *blk, const unsigned char *line, si
 
     if (blk) {
         size_t avail = blk->alloc - blk->size;
-        if (size <= avail)
+        if (size <= avail) {
             goto copy;
+        }
 
         add_block(b, blk);
     }
 
-    if (size < 8192)
+    if (size < 8192) {
         size = 8192;
+    }
     blk = block_new(size);
 copy:
     memcpy(blk->data + blk->size, line, len);
@@ -79,15 +81,17 @@ static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t siz
     // Skip BOM only if it matches the specified file encoding.
     if (b->encoding && e && streq(b->encoding, e)) {
         size_t bom_len = 2;
-        if (str_has_prefix(e, "UTF-32"))
+        if (str_has_prefix(e, "UTF-32")) {
             bom_len = 4;
+        }
         buf += bom_len;
         size -= bom_len;
     }
 
     dec = new_file_decoder(b->encoding, buf, size);
-    if (dec == NULL)
+    if (dec == NULL) {
         return -1;
+    }
 
     if (file_decoder_read_line(dec, &line, &len)) {
         Block *blk = NULL;
@@ -99,17 +103,20 @@ static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t siz
         blk = add_utf8_line(b, blk, line, len);
 
         while (file_decoder_read_line(dec, &line, &len)) {
-            if (b->newline == NEWLINE_DOS && len && line[len - 1] == '\r')
+            if (b->newline == NEWLINE_DOS && len && line[len - 1] == '\r') {
                 len--;
+            }
             blk = add_utf8_line(b, blk, line, len);
         }
-        if (blk)
+        if (blk) {
             add_block(b, blk);
+        }
     }
     if (b->encoding == NULL) {
         e = dec->encoding;
-        if (e == NULL)
+        if (e == NULL) {
             e = editor.charset;
+        }
         b->encoding = xstrdup(e);
     }
     free_file_decoder(dec);
@@ -146,8 +153,9 @@ static int read_blocks(Buffer *b, int fd)
                 free(buf);
                 return -1;
             }
-            if (rc == 0)
+            if (rc == 0) {
                 break;
+            }
             pos += rc;
             if (pos == alloc) {
                 alloc *= 2;
@@ -211,8 +219,9 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         }
     }
 
-    if (b->encoding == NULL)
+    if (b->encoding == NULL) {
         b->encoding = xstrdup(editor.charset);
+    }
     return 0;
 }
 
@@ -240,14 +249,16 @@ static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
 
     if (bom) {
         size = bom->len;
-        if (xwrite(enc->fd, bom->bytes, size) < 0)
+        if (xwrite(enc->fd, bom->bytes, size) < 0) {
             goto write_error;
+        }
     }
     list_for_each_entry(blk, &b->blocks, node) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
 
-        if (rc < 0)
+        if (rc < 0) {
             goto write_error;
+        }
         size += rc;
     }
     if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
@@ -337,8 +348,9 @@ int save_buffer(Buffer *b, const char *filename, const char *encoding, LineEndin
     stat(filename, &b->st);
     return 0;
 error:
-    if (enc != NULL)
+    if (enc != NULL) {
         free_file_encoder(enc);
+    }
     if (tmp != NULL) {
         unlink(tmp);
         free(tmp);

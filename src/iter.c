@@ -22,8 +22,9 @@ long block_iter_eat_line(BlockIter *bi)
     block_iter_normalize(bi);
 
     offset = bi->offset;
-    if (offset == bi->blk->size)
+    if (offset == bi->blk->size) {
         return 0;
+    }
 
     // There must be at least one newline
     if (bi->blk->nl == 1) {
@@ -49,8 +50,9 @@ long block_iter_next_line(BlockIter *bi)
     block_iter_normalize(bi);
 
     offset = bi->offset;
-    if (offset == bi->blk->size)
+    if (offset == bi->blk->size) {
         return 0;
+    }
 
     // There must be at least one newline
     if (bi->blk->nl == 1) {
@@ -60,8 +62,9 @@ long block_iter_next_line(BlockIter *bi)
         end = memchr(bi->blk->data + offset, '\n', bi->blk->size - offset);
         new_offset = end + 1 - bi->blk->data;
     }
-    if (new_offset == bi->blk->size && bi->blk->node.next == bi->head)
+    if (new_offset == bi->blk->size && bi->blk->node.next == bi->head) {
         return 0;
+    }
 
     bi->offset = new_offset;
     return bi->offset - offset;
@@ -77,20 +80,23 @@ long block_iter_prev_line(BlockIter *bi)
     long offset = bi->offset;
     long start = offset;
 
-    while (offset && blk->data[offset - 1] != '\n')
+    while (offset && blk->data[offset - 1] != '\n') {
         offset--;
+    }
 
     if (!offset) {
-        if (blk->node.prev == bi->head)
+        if (blk->node.prev == bi->head) {
             return 0;
+        }
         bi->blk = blk = BLOCK(blk->node.prev);
         offset = blk->size;
         start += offset;
     }
 
     offset--;
-    while (offset && blk->data[offset - 1] != '\n')
+    while (offset && blk->data[offset - 1] != '\n') {
         offset--;
+    }
     bi->offset = offset;
     return start - offset;
 }
@@ -102,14 +108,16 @@ long block_iter_bol(BlockIter *bi)
     block_iter_normalize(bi);
 
     offset = bi->offset;
-    if (!offset || offset == bi->blk->size)
+    if (!offset || offset == bi->blk->size) {
         return 0;
+    }
 
     if (bi->blk->nl == 1) {
         offset = 0;
     } else {
-        while (offset && bi->blk->data[offset - 1] != '\n')
+        while (offset && bi->blk->data[offset - 1] != '\n') {
             offset--;
+        }
     }
 
     ret = bi->offset - offset;
@@ -190,8 +198,9 @@ void block_iter_goto_line(BlockIter *bi, long line)
     bi->blk = blk;
     bi->offset = 0;
     while (nl < line) {
-        if (!block_iter_eat_line(bi))
+        if (!block_iter_eat_line(bi)) {
             break;
+        }
         nl++;
     }
 }
@@ -202,8 +211,9 @@ long block_iter_get_offset(const BlockIter *bi)
     long offset = 0;
 
     list_for_each_entry(blk, bi->head, node) {
-        if (blk == bi->blk)
+        if (blk == bi->blk) {
             break;
+        }
         offset += blk->size;
     }
     return offset + bi->offset;
@@ -213,8 +223,9 @@ bool block_iter_is_bol(const BlockIter *bi)
 {
     long offset = bi->offset;
 
-    if (!offset)
+    if (!offset) {
         return true;
+    }
     return bi->blk->data[offset - 1] == '\n';
 }
 
@@ -225,16 +236,18 @@ char *block_iter_get_bytes(const BlockIter *bi, long len)
     long pos = 0;
     char *buf;
 
-    if (!len)
+    if (!len) {
         return NULL;
+    }
 
     buf = xnew(char, len);
     while (pos < len) {
         long avail = blk->size - offset;
         long count = len - pos;
 
-        if (count > avail)
+        if (count > avail) {
             count = avail;
+        }
         memcpy(buf + pos, blk->data + offset, count);
         pos += count;
 

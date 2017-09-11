@@ -26,8 +26,9 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
     switch (type) {
     case FT_CONTENT:
     case FT_FILENAME:
-        if (!regexp_compile(&re, str, REG_NEWLINE | REG_NOSUB))
+        if (!regexp_compile(&re, str, REG_NEWLINE | REG_NOSUB)) {
             return;
+        }
         regfree(&re);
         break;
     default:
@@ -49,15 +50,18 @@ static char *get_ext(const char *filename)
     const char *ext = strrchr(filename, '.');
     int ext_len, i;
 
-    if (!ext)
+    if (!ext) {
         return NULL;
+    }
 
     ext++;
     ext_len = strlen(ext);
-    if (ext_len && ext[ext_len - 1] == '~')
+    if (ext_len && ext[ext_len - 1] == '~') {
         ext_len--;
-    if (!ext_len)
+    }
+    if (!ext_len) {
         return NULL;
+    }
 
     for (i = 0; i < ARRAY_COUNT(ignore); i++) {
         if (!strncmp(ignore[i], ext, ext_len) && !ignore[i][ext_len]) {
@@ -85,8 +89,9 @@ const char *find_ft(const char *filename, const char *interpreter,
     unsigned int filename_len = strlen(filename);
     char *ext = NULL;
 
-    if (filename)
+    if (filename) {
         ext = get_ext(filename);
+    }
     for (int i = 0; i < filetypes.count; i++) {
         const FileType *ft = filetypes.ptrs[i];
         switch (ft->type) {

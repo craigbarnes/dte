@@ -25,10 +25,12 @@ const char *reset_colors_rc =
 static bool is_command(const char *str, int len)
 {
     for (int i = 0; i < len; i++) {
-        if (str[i] == '#')
+        if (str[i] == '#') {
             return false;
-        if (!isspace(str[i]))
+        }
+        if (!isspace(str[i])) {
             return true;
+        }
     }
     return false;
 }
@@ -38,8 +40,9 @@ static bool has_line_continuation(const char *str, int len)
 {
     int pos = len - 1;
 
-    while (pos >= 0 && str[pos] == '\\')
+    while (pos >= 0 && str[pos] == '\\') {
         pos--;
+    }
     return (len - 1 - pos) % 2;
 }
 
@@ -53,8 +56,9 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
         size_t n = buf + size - ptr;
         char *end = memchr(ptr, '\n', n);
 
-        if (end)
+        if (end) {
             n = end - ptr;
+        }
 
         if (line.len || is_command(ptr, n)) {
             if (has_line_continuation(ptr, n)) {
@@ -85,8 +89,9 @@ int do_read_config(const Command *cmds, const char *filename, bool must_exist)
     int err = errno;
 
     if (size < 0) {
-        if (err != ENOENT || must_exist)
+        if (err != ENOENT || must_exist) {
             error_msg("Error reading %s: %s", filename, strerror(err));
+        }
         return err;
     }
 

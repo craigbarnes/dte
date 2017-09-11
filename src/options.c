@@ -193,8 +193,9 @@ static bool validate_regex(const char *value)
 {
     if (value[0]) {
         regex_t re;
-        if (!regexp_compile(&re, value, REG_NEWLINE | REG_NOSUB))
+        if (!regexp_compile(&re, value, REG_NEWLINE | REG_NOSUB)) {
             return false;
+        }
         regfree(&re);
     }
     return true;
@@ -453,8 +454,9 @@ static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
 
 static void free_value(const OptionDesc *desc, OptionValue value)
 {
-    if (desc_is(desc, OPT_STR))
+    if (desc_is(desc, OPT_STR)) {
         free(value.str_val);
+    }
 }
 
 static const OptionDesc *find_option(const char *name)

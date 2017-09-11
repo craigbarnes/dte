@@ -18,10 +18,12 @@ static void parse_home(const char *cmd, int *posp)
 
     for (len = 0; username[len]; len++) {
         char ch = username[len];
-        if (isspace(ch) || ch == '/' || ch == ':')
+        if (isspace(ch) || ch == '/' || ch == ':') {
             break;
-        if (!isalnum(ch))
+        }
+        if (!isalnum(ch)) {
             return;
+        }
     }
 
     if (!len) {
@@ -30,14 +32,16 @@ static void parse_home(const char *cmd, int *posp)
         return;
     }
 
-    if (len >= sizeof(buf))
+    if (len >= sizeof(buf)) {
         return;
+    }
 
     memcpy(buf, username, len);
     buf[len] = 0;
     passwd = getpwnam(buf);
-    if (!passwd)
+    if (!passwd) {
         return;
+    }
 
     strbuf_add_str(&arg, passwd->pw_dir);
     *posp = pos + 1 + len;
@@ -52,8 +56,9 @@ static void parse_sq(const char *cmd, int *posp)
             pos++;
             break;
         }
-        if (!cmd[pos])
+        if (!cmd[pos]) {
             break;
+        }
         strbuf_add_byte(&arg, cmd[pos++]);
     }
     *posp = pos;
@@ -66,8 +71,9 @@ static int unicode_escape(const char *str, int count)
 
     for (i = 0; i < count && str[i]; i++) {
         int x = hex_decode(str[i]);
-        if (x < 0)
+        if (x < 0) {
             break;
+        }
         u = u << 4 | x;
     }
     if (u_is_unicode(u)) {
@@ -83,8 +89,9 @@ static void parse_dq(const char *cmd, int *posp)
     while (cmd[pos]) {
         char ch = cmd[pos++];
 
-        if (ch == '"')
+        if (ch == '"') {
             break;
+        }
 
         if (ch == '\\' && cmd[pos]) {
             ch = cmd[pos++];
@@ -186,13 +193,15 @@ char *parse_command_arg(const char *cmd, bool tilde)
 {
     int pos = 0;
 
-    if (tilde && cmd[pos] == '~')
+    if (tilde && cmd[pos] == '~') {
         parse_home(cmd, &pos);
+    }
     while (1) {
         char ch = cmd[pos];
 
-        if (!ch || ch == ';' || isspace(ch))
+        if (!ch || ch == ';' || isspace(ch)) {
             break;
+        }
 
         pos++;
         if (ch == '\'') {
@@ -202,8 +211,9 @@ char *parse_command_arg(const char *cmd, bool tilde)
         } else if (ch == '$') {
             parse_var(cmd, &pos);
         } else if (ch == '\\') {
-            if (!cmd[pos])
+            if (!cmd[pos]) {
                 break;
+            }
             strbuf_add_byte(&arg, cmd[pos++]);
         } else {
             strbuf_add_byte(&arg, ch);
@@ -217,8 +227,9 @@ int find_end(const char *cmd, int pos, Error **err)
     while (1) {
         char ch = cmd[pos];
 
-        if (!ch || ch == ';' || isspace(ch))
+        if (!ch || ch == ';' || isspace(ch)) {
             break;
+        }
 
         pos++;
         if (ch == '\'') {
@@ -244,14 +255,16 @@ int find_end(const char *cmd, int pos, Error **err)
                     return -1;
                 }
                 if (cmd[pos++] == '\\') {
-                    if (!cmd[pos])
+                    if (!cmd[pos]) {
                         goto unexpected_eof;
+                    }
                     pos++;
                 }
             }
         } else if (ch == '\\') {
-            if (!cmd[pos])
+            if (!cmd[pos]) {
                 goto unexpected_eof;
+            }
             pos++;
         } else {
             switch (ch) {
@@ -285,11 +298,13 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
     while (1) {
         int end;
 
-        while (isspace(cmd[pos]))
+        while (isspace(cmd[pos])) {
             pos++;
+        }
 
-        if (!cmd[pos])
+        if (!cmd[pos]) {
             break;
+        }
 
         if (cmd[pos] == ';') {
             ptr_array_add(array, NULL);
@@ -298,8 +313,9 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
         }
 
         end = find_end(cmd, pos, err);
-        if (*err != NULL)
+        if (*err != NULL) {
             return false;
+        }
 
         ptr_array_add(array, parse_command_arg(cmd + pos, true));
         pos = end;

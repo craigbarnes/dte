@@ -102,8 +102,9 @@ static NORETURN void syntax(int line, const char *format, ...)
 
 static inline const char *keyword_name(int type)
 {
-    if (type < TOK_H1 || type > TOK_TITLE)
+    if (type < TOK_H1 || type > TOK_TITLE) {
         die("BUG: no keyword name for type %d\n", type);
+    }
     return token_names[type].str;
 }
 
@@ -116,8 +117,9 @@ static void *xmalloc(size_t size)
 {
     void *ret = malloc(size);
 
-    if (!ret)
+    if (!ret) {
         oom(size);
+    }
     return ret;
 }
 
@@ -145,8 +147,9 @@ static void free_token(struct token *tok)
     struct token *prev = tok->prev;
     struct token *next = tok->next;
 
-    if (tok == &head)
+    if (tok == &head) {
         BUG();
+    }
 
     prev->next = next;
     next->prev = prev;
@@ -171,19 +174,22 @@ static void emit(int type)
 
 static int emit_keyword(const char *buf, int size)
 {
-    int i, len;
+    int len;
 
     for (len = 0; len < size; len++) {
-        if (!isalnum(buf[len]))
+        if (!isalnum(buf[len])) {
             break;
+        }
     }
 
-    if (!len)
+    if (!len) {
         syntax(cur_line, "keyword expected\n");
+    }
 
-    for (i = TOK_H1; i < NR_TOKEN_NAMES; i++) {
-        if (len != token_names[i].len)
+    for (int i = TOK_H1; i < NR_TOKEN_NAMES; i++) {
+        if (len != token_names[i].len) {
             continue;
+        }
         if (!strncmp(buf, token_names[i].str, len)) {
             emit(i);
             return len;
@@ -199,8 +205,9 @@ static int emit_text(const char *buf, int size)
 
     for (i = 0; i < size; i++) {
         int c = buf[i];
-        if (c == '@' || c == '`' || c == '*' || c == '\n' || c == '\\' || c == '\t')
+        if (c == '@' || c == '`' || c == '*' || c == '\n' || c == '\\' || c == '\t') {
             break;
+        }
     }
     tok = new_token(TOK_TEXT);
     tok->text = buf;
@@ -266,8 +273,9 @@ static int is_empty_line(const struct token *tok)
         switch (tok->type) {
         case TOK_TEXT:
             for (int i = 0; i < tok->len; i++) {
-                if (tok->text[i] != ' ')
+                if (tok->text[i] != ' ') {
                     return 0;
+                }
             }
             break;
         case TOK_INDENT:
@@ -290,8 +298,9 @@ static struct token *remove_line(struct token *tok)
 
         free_token(tok);
         tok = next;
-        if (type == TOK_NL)
+        if (type == TOK_NL) {
             break;
+        }
     }
     return tok;
 }
@@ -303,14 +312,23 @@ static struct token *skip_after(struct token *tok, int type)
     while (tok != &head) {
         if (tok->type == type) {
             tok = tok->next;
-            if (tok->type != TOK_NL)
-                syntax(tok->line, "newline expected after @%s\n",
-                        keyword_name(type));
+            if (tok->type != TOK_NL) {
+                syntax (
+                    tok->line,
+                    "newline expected after @%s\n",
+                    keyword_name(type)
+                );
+            }
             return tok->next;
         }
-        if (tok->type >= TOK_H1)
-            syntax(tok->line, "keywords not allowed betweed @%s and @%s\n",
-                    keyword_name(type-1), keyword_name(type));
+        if (tok->type >= TOK_H1) {
+            syntax (
+                tok->line,
+                "keywords not allowed betweed @%s and @%s\n",
+                keyword_name(type-1),
+                keyword_name(type)
+            );
+        }
         tok = tok->next;
     }
     syntax(save->prev->line, "missing @%s\n", keyword_name(type));
@@ -366,8 +384,12 @@ static struct token *check_line(struct token *tok, int *ip)
             case TOK_NL:
                 return start;
             default:
-                syntax(tok->line, "@%s not allowed inside paragraph\n",
-                        keyword_name(tok->type));
+                syntax (
+                    tok->line,
+                    "@%s not allowed inside paragraph\n",
+                    keyword_name(tok->type)
+                );
+                break;
             }
             tok = tok->next;
         }
@@ -375,8 +397,9 @@ static struct token *check_line(struct token *tok, int *ip)
     case TOK_H1:
     case TOK_H2:
     case TOK_TITLE:
-        if (*ip)
+        if (*ip) {
             goto indentation;
+        }
 
         // Check arguments
         tok = tok->next;
@@ -388,8 +411,12 @@ static struct token *check_line(struct token *tok, int *ip)
             case TOK_NL:
                 return start;
             default:
-                syntax(tok->line, "@%s can contain only text\n",
-                        keyword_name(tok_type));
+                syntax (
+                    tok->line,
+                    "@%s can contain only text\n",
+                    keyword_name(tok_type)
+                );
+                break;
             }
             tok = tok->next;
         }
@@ -407,8 +434,12 @@ static struct token *check_line(struct token *tok, int *ip)
             case TOK_NL:
                 return start;
             default:
-                syntax(tok->line, "@%s not allowed inside @li\n",
-                        keyword_name(tok->type));
+                syntax (
+                    tok->line,
+                    "@%s not allowed inside @li\n",
+                    keyword_name(tok->type)
+                );
+                break;
             }
             tok = tok->next;
         }
@@ -417,8 +448,9 @@ static struct token *check_line(struct token *tok, int *ip)
         // Checked later
         break;
     case TOK_RAW:
-        if (*ip)
+        if (*ip) {
             goto indentation;
+        }
         // Checked later
         break;
     case TOK_ENDPRE:
@@ -464,8 +496,9 @@ static void normalize(void)
         while (is_empty_line(tok)) {
             tok = remove_line(tok);
             new_para = 1;
-            if (tok == &head)
+            if (tok == &head) {
                 return;
+            }
         }
 
         // Skips indent

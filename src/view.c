@@ -81,10 +81,12 @@ static void view_update_vx(View *v)
     Window *w = v->window;
     unsigned int c = 8;
 
-    if (v->cx_display - v->vx >= w->edit_w)
+    if (v->cx_display - v->vx >= w->edit_w) {
         v->vx = (v->cx_display - w->edit_w + c) / c * c;
-    if (v->cx_display < v->vx)
+    }
+    if (v->cx_display < v->vx) {
         v->vx = v->cx_display / c * c;
+    }
 }
 
 static void view_update_vy(View *v)
@@ -95,13 +97,15 @@ static void view_update_vy(View *v)
 
     if (v->cy < v->vy + margin) {
         v->vy = v->cy - margin;
-        if (v->vy < 0)
+        if (v->vy < 0) {
             v->vy = 0;
+        }
     } else if (v->cy > max_y) {
         v->vy += v->cy - max_y;
         max_y = v->buffer->nl - w->edit_h + 1;
-        if (v->vy > max_y && max_y >= 0)
+        if (v->vy > max_y && max_y >= 0) {
             v->vy = max_y;
+        }
     }
 }
 
@@ -142,24 +146,28 @@ char *view_get_word_under_cursor(View *v)
 
     while (si < lr.size) {
         i = si;
-        if (u_is_word_char(u_get_char(lr.line, lr.size, &i)))
+        if (u_is_word_char(u_get_char(lr.line, lr.size, &i))) {
             break;
+        }
         si = i;
     }
-    if (si == lr.size)
+    if (si == lr.size) {
         return NULL;
+    }
 
     ei = si;
     while (si > 0) {
         i = si;
-        if (!u_is_word_char(u_prev_char(lr.line, &i)))
+        if (!u_is_word_char(u_prev_char(lr.line, &i))) {
             break;
+        }
         si = i;
     }
     while (ei < lr.size) {
         i = ei;
-        if (!u_is_word_char(u_get_char(lr.line, lr.size, &i)))
+        if (!u_is_word_char(u_get_char(lr.line, lr.size, &i))) {
             break;
+        }
         ei = i;
     }
     return xstrslice(lr.line, si, ei);

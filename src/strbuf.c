@@ -49,8 +49,9 @@ void strbuf_add_str(StringBuffer *buf, const char *str)
 
 void strbuf_add_buf(StringBuffer *buf, const char *ptr, long len)
 {
-    if (!len)
+    if (!len) {
         return;
+    }
     strbuf_grow(buf, len);
     memcpy(buf->buffer + buf->len, ptr, len);
     buf->len += len;

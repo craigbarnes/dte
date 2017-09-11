@@ -50,8 +50,9 @@ int main(int argc, char *argv[])
 
     setlocale(LC_CTYPE, "");
     editor.charset = nl_langinfo(CODESET);
-    if (streq(editor.charset, "UTF-8"))
+    if (streq(editor.charset, "UTF-8")) {
         term_utf8 = true;
+    }
 
     test_relative_filename();
     return 0;

@@ -191,10 +191,12 @@ static const CodepointRange east_asian_wide[] = {
 static inline bool in_range(unsigned int u, const CodepointRange *range, int count)
 {
     for (int i = 0; i < count; i++) {
-        if (u < range[i].first)
+        if (u < range[i].first) {
             return false;
-        if (u <= range[i].last)
+        }
+        if (u <= range[i].last) {
             return true;
+        }
     }
     return false;
 }
@@ -243,24 +245,24 @@ bool u_is_space(unsigned int u)
 
 bool u_is_word_char(unsigned int u)
 {
-    if (u >= 'a' && u <= 'z')
+    if (u >= 'a' && u <= 'z') {
         return true;
-    if (u >= 'A' && u <= 'Z')
+    } else if (u >= 'A' && u <= 'Z') {
         return true;
-    if (u >= '0' && u <= '9')
+    } else if (u >= '0' && u <= '9') {
         return true;
+    }
     return u == '_' || u > 0x7f;
 }
 
 bool u_is_unprintable(unsigned int u)
 {
-    // Unprintable garbage inherited from latin1.
-    if (u >= 0x80 && u <= 0x9f)
+    // Unprintable garbage inherited from latin1
+    if (u >= 0x80 && u <= 0x9f) {
         return true;
-
-    if (in_range(u, zero_width, ARRAY_COUNT(zero_width)))
+    } else if (in_range(u, zero_width, ARRAY_COUNT(zero_width))) {
         return true;
-
+    }
     return !u_is_unicode(u);
 }
 
@@ -317,9 +319,11 @@ int u_char_width(unsigned int u)
 
 unsigned int u_to_lower(unsigned int u)
 {
-    if (u < 'A')
+    if (u < 'A') {
         return u;
-    if (u <= 'Z')
+    }
+    if (u <= 'Z') {
         return u + 'a' - 'A';
+    }
     return u;
 }

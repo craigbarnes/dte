@@ -39,8 +39,9 @@ static PointerArray hl_colors = PTR_ARRAY_INIT;
 
 void fill_builtin_colors(void)
 {
-    for (int i = 0; i < NR_BC; i++)
+    for (int i = 0; i < NR_BC; i++) {
         builtin_colors[i] = &find_color(builtin_color_names[i])->color;
+    }
 }
 
 HlColor *set_highlight_color(const char *name, const struct term_color *color)
@@ -66,8 +67,9 @@ static HlColor *find_real_color(const char *name)
 {
     for (int i = 0; i < hl_colors.count; i++) {
         HlColor *c = hl_colors.ptrs[i];
-        if (streq(c->name, name))
+        if (streq(c->name, name)) {
             return c;
+        }
     }
     return NULL;
 }
@@ -77,11 +79,13 @@ HlColor *find_color(const char *name)
     HlColor *color = find_real_color(name);
     const char *dot;
 
-    if (color)
+    if (color) {
         return color;
+    }
     dot = strchr(name, '.');
-    if (dot)
+    if (dot) {
         return find_real_color(dot + 1);
+    }
     return NULL;
 }
 
@@ -112,16 +116,20 @@ static bool parse_color(const char *str, int *val)
 
     if (parse_long(&ptr, &r)) {
         if (*ptr == 0) {
-            if (r < -2 || r > 255)
+            if (r < -2 || r > 255) {
                 return false;
+            }
             // color index -2..255
             *val = r;
             return true;
         }
-        if (r < 0 || r > 5 || *ptr++ != '/' || !parse_long(&ptr, &g) ||
+        if (
+            r < 0 || r > 5 || *ptr++ != '/' || !parse_long(&ptr, &g) ||
             g < 0 || g > 5 || *ptr++ != '/' || !parse_long(&ptr, &b) ||
-            b < 0 || b > 5 || *ptr)
+            b < 0 || b > 5 || *ptr
+        ) {
             return false;
+        }
 
         // r/g/b to color index 16..231 (6x6x6 color cube)
         *val = 16 + r * 36 + g * 6 + b;
@@ -166,10 +174,11 @@ bool parse_term_color(struct term_color *color, char **strs)
                     return false;
                 }
             } else {
-                if (!count)
+                if (!count) {
                     color->fg = val;
-                else
+                } else {
                     color->bg = val;
+                }
                 count++;
             }
         } else if (!parse_attr(str, &color->attr)) {
@@ -184,8 +193,9 @@ void collect_hl_colors(const char *prefix)
 {
     for (int i = 0; i < hl_colors.count; i++) {
         HlColor *c = hl_colors.ptrs[i];
-        if (str_has_prefix(c->name, prefix))
+        if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
+        }
     }
 }
 
@@ -193,11 +203,13 @@ void collect_colors_and_attributes(const char *prefix)
 {
     // Skip first (keep) because it is in attr_names too
     for (int i = 1; i < ARRAY_COUNT(color_names); i++) {
-        if (str_has_prefix(color_names[i], prefix))
+        if (str_has_prefix(color_names[i], prefix)) {
             add_completion(xstrdup(color_names[i]));
+        }
     }
     for (int i = 0; i < ARRAY_COUNT(attr_names); i++) {
-        if (str_has_prefix(attr_names[i], prefix))
+        if (str_has_prefix(attr_names[i], prefix)) {
             add_completion(xstrdup(attr_names[i]));
+        }
     }
 }

@@ -55,11 +55,13 @@ void select_block(void)
                 break;
             }
         }
-        if (regexp_match_nosub(epattern, lr.line, lr.size))
+        if (regexp_match_nosub(epattern, lr.line, lr.size)) {
             level--;
+        }
 
-        if (!block_iter_prev_line(&bi))
+        if (!block_iter_prev_line(&bi)) {
             return;
+        }
     }
 
     while (1) {
@@ -70,11 +72,13 @@ void select_block(void)
                 break;
             }
         }
-        if (regexp_match_nosub(spattern, lr.line, lr.size))
+        if (regexp_match_nosub(spattern, lr.line, lr.size)) {
             level++;
+        }
 
-        if (!block_iter_next_line(&bi))
+        if (!block_iter_next_line(&bi)) {
             return;
+        }
     }
 
     view->cursor = sbi;
@@ -100,8 +104,9 @@ static int get_indent_of_matching_brace(void)
                 return info.width;
             }
         }
-        if (regexp_match_nosub(epattern, lr.line, lr.size))
+        if (regexp_match_nosub(epattern, lr.line, lr.size)) {
             level--;
+        }
     }
     return -1;
 }
@@ -116,8 +121,9 @@ void unselect(void)
 
 static void record_copy(char *buf, long len, bool is_lines)
 {
-    if (copy_buf)
+    if (copy_buf) {
         free(copy_buf);
+    }
     copy_buf = buf;
     copy_len = len;
     copy_is_lines = is_lines;
@@ -156,8 +162,9 @@ void paste(bool at_cursor)
 {
     long del_count = 0;
 
-    if (!copy_buf)
+    if (!copy_buf) {
         return;
+    }
 
     if (view->selection) {
         del_count = prepare_selection(view);
@@ -166,8 +173,9 @@ void paste(bool at_cursor)
 
     if (copy_is_lines && !at_cursor) {
         int x = view_get_preferred_x(view);
-        if (!del_count)
+        if (!del_count) {
             block_iter_eat_line(&view->cursor);
+        }
         buffer_replace_bytes(del_count, copy_buf, copy_len);
 
         // Try to keep cursor column
@@ -189,10 +197,12 @@ void delete_ch(void)
         unselect();
     } else {
         begin_change(CHANGE_MERGE_DELETE);
-        if (buffer->options.emulate_tab)
+        if (buffer->options.emulate_tab) {
             size = get_indent_level_bytes_right();
-        if (size == 0)
+        }
+        if (size == 0) {
             size = buffer_get_char(&view->cursor, &u);
+        }
     }
     buffer_delete_bytes(size);
 }
@@ -211,8 +221,9 @@ void erase(void)
             size = get_indent_level_bytes_left();
             block_iter_back_bytes(&view->cursor, size);
         }
-        if (size == 0)
+        if (size == 0) {
             size = buffer_prev_char(&view->cursor, &u);
+        }
     }
     buffer_erase_bytes(size);
 }
@@ -227,8 +238,9 @@ static long goto_beginning_of_whitespace(void)
 
     // Count spaces and tabs at or after cursor
     while (buffer_next_char(&bi, &u)) {
-        if (u != '\t' && u != ' ')
+        if (u != '\t' && u != ' ') {
             break;
+        }
         count++;
     }
 
@@ -248,8 +260,9 @@ static bool ws_only(LineRef *lr)
     long i;
     for (i = 0; i < lr->size; i++) {
         char ch = lr->line[i];
-        if (ch != ' ' && ch != '\t')
+        if (ch != ' ' && ch != '\t') {
             return false;
+        }
     }
     return true;
 }
@@ -261,8 +274,9 @@ static bool find_non_empty_line_bwd(BlockIter *bi)
     do {
         LineRef lr;
         fill_line_ref(bi, &lr);
-        if (!ws_only(&lr))
+        if (!ws_only(&lr)) {
             return true;
+        }
     } while (block_iter_prev_line(bi));
     return false;
 }
@@ -396,8 +410,9 @@ static void join_selection(void)
 
     begin_change_chain();
     while (count > 0) {
-        if (!len)
+        if (!len) {
             view->cursor = bi;
+        }
 
         count -= buffer_next_char(&bi, &ch);
         if (ch == '\t' || ch == ' ') {
@@ -446,10 +461,12 @@ void join_lines(void)
         return;
     }
 
-    if (!block_iter_next_line(&bi))
+    if (!block_iter_next_line(&bi)) {
         return;
-    if (block_iter_is_eof(&bi))
+    }
+    if (block_iter_is_eof(&bi)) {
         return;
+    }
 
     next = bi;
     buffer_prev_char(&bi, &u);
@@ -462,8 +479,9 @@ void join_lines(void)
         count++;
     }
     while (buffer_next_char(&next, &u)) {
-        if (u != '\t' && u != ' ')
+        if (u != '\t' && u != ' ') {
             break;
+        }
         count++;
     }
 
@@ -502,8 +520,9 @@ static void shift_right(int nr_lines, int count)
             char *buf = alloc_indent(info.level + count, &size);
             buffer_replace_bytes(info.bytes, buf, size);
         }
-        if (++i == nr_lines)
+        if (++i == nr_lines) {
             break;
+        }
         block_iter_eat_line(&view->cursor);
     }
     free(indent);
@@ -672,8 +691,9 @@ static void add_word(ParagraphFormatter *pf, const char *word, int len)
     long i = 0;
     int word_width = 0;
 
-    while (i < len)
+    while (i < len) {
         word_width += u_char_width(u_get_char(word, len, &i));
+    }
 
     if (pf->cur_width && pf->cur_width + 1 + word_width > pf->text_width) {
         strbuf_add_ch(&pf->buf, '\n');
@@ -707,8 +727,9 @@ static int get_indent_width(const char *line, long size)
 
 static bool in_paragraph(const char *line, long size, int indent_width)
 {
-    if (get_indent_width(line, size) != indent_width)
+    if (get_indent_width(line, size) != indent_width) {
         return false;
+    }
     return !is_paragraph_separator(line, size);
 }
 
@@ -742,8 +763,9 @@ static unsigned int paragraph_size(void)
     do {
         long bytes = block_iter_eat_line(&bi);
 
-        if (!bytes)
+        if (!bytes) {
             break;
+        }
 
         size += bytes;
         fill_line_ref(&bi, &lr);
@@ -764,8 +786,9 @@ void format_paragraph(int text_width)
     } else {
         len = paragraph_size();
     }
-    if (!len)
+    if (!len) {
         return;
+    }
 
     sel = block_iter_get_bytes(&view->cursor, len);
     indent_width = get_indent_width(sel, len);
@@ -783,29 +806,34 @@ void format_paragraph(int text_width)
 
         while (i < len) {
             tmp = i;
-            if (!u_is_space(u_get_char(sel, len, &tmp)))
+            if (!u_is_space(u_get_char(sel, len, &tmp))) {
                 break;
+            }
             i = tmp;
         }
-        if (i == len)
+        if (i == len) {
             break;
+        }
 
         start = i;
         while (i < len) {
             tmp = i;
-            if (u_is_space(u_get_char(sel, len, &tmp)))
+            if (u_is_space(u_get_char(sel, len, &tmp))) {
                 break;
+            }
             i = tmp;
         }
 
         add_word(&pf, sel + start, i - start);
     }
 
-    if (pf.buf.len)
+    if (pf.buf.len) {
         strbuf_add_ch(&pf.buf, '\n');
+    }
     buffer_replace_bytes(len, pf.buf.buffer, pf.buf.len);
-    if (pf.buf.len)
+    if (pf.buf.len) {
         block_iter_skip_bytes(&view->cursor, pf.buf.len - 1);
+    }
     strbuf_free(&pf.buf);
     free(pf.indent);
     free(sel);
@@ -833,8 +861,9 @@ void change_case(int mode)
     } else {
         unsigned int u;
 
-        if (!buffer_get_char(&view->cursor, &u))
+        if (!buffer_get_char(&view->cursor, &u)) {
             return;
+        }
 
         text_len = u_char_size(u);
     }
@@ -846,10 +875,11 @@ void change_case(int mode)
 
         switch (mode) {
         case 't':
-            if (iswupper(u))
+            if (iswupper(u)) {
                 u = towlower(u);
-            else
+            } else {
                 u = towupper(u);
+            }
             break;
         case 'l':
             u = towlower(u);

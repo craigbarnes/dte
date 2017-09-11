@@ -10,8 +10,9 @@ static void sanity_check(void)
     Block *blk;
     bool cursor_seen = false;
 
-    if (!DEBUG)
+    if (!DEBUG) {
         return;
+    }
 
     BUG_ON(list_empty(&buffer->blocks));
 
@@ -19,10 +20,12 @@ static void sanity_check(void)
         BUG_ON(!blk->size && buffer->blocks.next->next != &buffer->blocks);
         BUG_ON(blk->size > blk->alloc);
         BUG_ON(blk->size && blk->data[blk->size - 1] != '\n');
-        if (blk == view->cursor.blk)
+        if (blk == view->cursor.blk) {
             cursor_seen = true;
-        if (DEBUG > 2)
+        }
+        if (DEBUG > 2) {
             BUG_ON(count_nl(blk->data, blk->size) != blk->nl);
+        }
     }
     BUG_ON(!cursor_seen);
     BUG_ON(view->cursor.offset > view->cursor.blk->size);
@@ -52,11 +55,12 @@ static void delete_block(Block *blk)
 
 static long copy_count_nl(char *dst, const char *src, long len)
 {
-    long i, nl = 0;
-    for (i = 0; i < len; i++) {
+    long nl = 0;
+    for (long i = 0; i < len; i++) {
         dst[i] = src[i];
-        if (src[i] == '\n')
+        if (src[i] == '\n') {
             nl++;
+        }
     }
     return nl;
 }
@@ -111,42 +115,48 @@ static long split_and_insert(const char *buf, long len)
 
         if (pos < size1) {
             const char *nl = memchr(buf1 + pos, '\n', size1 - pos);
-            if (nl)
+            if (nl) {
                 new_size = nl - buf1 + 1 - start;
+            }
         }
 
         if (!new_size && pos < size1 + size2) {
             long offset = 0;
             const char *nl;
 
-            if (pos > size1)
+            if (pos > size1) {
                 offset = pos - size1;
+            }
 
             nl = memchr(buf2 + offset, '\n', size2 - offset);
-            if (nl)
+            if (nl) {
                 new_size = size1 + nl - buf2 + 1 - start;
+            }
         }
 
         if (!new_size && pos < total) {
             long offset = 0;
             const char *nl;
 
-            if (pos > size1 + size2)
+            if (pos > size1 + size2) {
                 offset = pos - size1 - size2;
+            }
 
             nl = memchr(buf3 + offset, '\n', size3 - offset);
-            if (nl)
+            if (nl) {
                 new_size = size1 + size2 + nl - buf3 + 1 - start;
-            else
+            } else {
                 new_size = total - start;
+            }
         }
 
         if (new_size <= BLOCK_EDIT_SIZE) {
             // Fits
             size = new_size;
             pos = start + new_size;
-            if (pos < total)
+            if (pos < total) {
                 continue;
+            }
         } else {
             // Does not fit
             if (!size) {
@@ -162,8 +172,9 @@ static long split_and_insert(const char *buf, long len)
             long avail = size1 - start;
             long count = size;
 
-            if (count > avail)
+            if (count > avail) {
                 count = avail;
+            }
             new->nl += copy_count_nl(new->data, buf1 + start, count);
             copied += count;
             start += count;
@@ -173,8 +184,9 @@ static long split_and_insert(const char *buf, long len)
             long avail = size2 - offset;
             long count = size - copied;
 
-            if (count > avail)
+            if (count > avail) {
                 count = avail;
+            }
             new->nl += copy_count_nl(new->data + copied, buf2 + offset, count);
             copied += count;
             start += count;
@@ -220,8 +232,9 @@ static long insert_bytes(const char *buf, long len)
 
     blk = view->cursor.blk;
     new_size = blk->size + len;
-    if (new_size <= blk->alloc || new_size <= BLOCK_EDIT_SIZE)
+    if (new_size <= blk->alloc || new_size <= BLOCK_EDIT_SIZE) {
         return insert_to_current(buf, len);
+    }
 
     if (blk->nl <= 1 && !memchr(buf, '\n', len)) {
         // Can't split this possibly very long line.
@@ -240,8 +253,9 @@ void do_insert(const char *buf, long len)
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(view->buffer, view->cy, nl ? INT_MAX : view->cy);
-    if (buffer->syn)
+    if (buffer->syn) {
         hl_insert(buffer, view->cy, nl);
+    }
 }
 
 static int only_block(Block *blk)
@@ -258,8 +272,9 @@ char *do_delete(long len)
     long deleted_nl = 0;
     char *buf;
 
-    if (!len)
+    if (!len) {
         return NULL;
+    }
 
     if (!offset) {
         // The block where cursor is can become empty and thereby may be deleted
@@ -273,18 +288,21 @@ char *do_delete(long len)
         long count = len - pos;
         long nl;
 
-        if (count > avail)
+        if (count > avail) {
             count = avail;
+        }
         nl = copy_count_nl(buf + pos, blk->data + offset, count);
-        if (count < avail)
+        if (count < avail) {
             memmove(blk->data + offset, blk->data + offset + count, avail - count);
+        }
 
         deleted_nl += nl;
         buffer->nl -= nl;
         blk->nl -= nl;
         blk->size -= count;
-        if (!blk->size && !only_block(blk))
+        if (!blk->size && !only_block(blk)) {
             delete_block(blk);
+        }
 
         offset = 0;
         pos += count;
@@ -322,8 +340,9 @@ char *do_delete(long len)
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(view->buffer, view->cy, deleted_nl ? INT_MAX : view->cy);
-    if (buffer->syn)
+    if (buffer->syn) {
         hl_delete(buffer, view->cy, deleted_nl);
+    }
     return buf;
 }
 
@@ -339,8 +358,9 @@ char *do_replace(long del, const char *buf, long ins)
     offset = view->cursor.offset;
 
     avail = blk->size - offset;
-    if (del >= avail)
+    if (del >= avail) {
         goto slow;
+    }
 
     new_size = blk->size + ins - del;
     if (new_size > BLOCK_EDIT_SIZE) {
@@ -363,8 +383,9 @@ char *do_replace(long del, const char *buf, long ins)
     blk->nl -= del_nl;
     buffer->nl -= del_nl;
 
-    if (del != ins)
+    if (del != ins) {
         memmove(ptr + ins, ptr + del, avail - del);
+    }
 
     ins_nl = copy_count_nl(ptr, buf, ins);
     blk->nl += ins_nl;

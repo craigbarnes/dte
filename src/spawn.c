@@ -17,19 +17,22 @@ static void handle_error_msg(Compiler *c, char *str)
             str[i] = 0;
             break;
         }
-        if (str[i] == '\t')
+        if (str[i] == '\t') {
             str[i] = ' ';
+        }
     }
     len = i;
-    if (len == 0)
+    if (len == 0) {
         return;
+    }
 
     for (i = 0; i < c->error_formats.count; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
         PointerArray m = PTR_ARRAY_INIT;
 
-        if (!regexp_exec_sub(&p->re, str, len, &m, 0))
+        if (!regexp_exec_sub(&p->re, str, len, &m, 0)) {
             continue;
+        }
         if (!p->ignore) {
             Message *msg = new_message(m.ptrs[p->msg_idx]);
             msg->loc = xnew0(FileLocation, 1);
@@ -55,8 +58,9 @@ static void read_errors(Compiler *c, int fd, bool quiet)
     }
 
     while (fgets(line, sizeof(line), f)) {
-        if (!quiet)
+        if (!quiet) {
             fputs(line, stderr);
+        }
         handle_error_msg(c, line);
     }
     fclose(f);
@@ -85,13 +89,15 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             FD_SET(wfd, &wfds);
             wfdsp = &wfds;
         }
-        if (wfd > fd_high)
+        if (wfd > fd_high) {
             fd_high = wfd;
+        }
 
         rc = select(fd_high + 1, &rfds, wfdsp, NULL, NULL);
         if (rc < 0) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
+            }
             error_msg("select: %s", strerror(errno));
             break;
         }
@@ -105,8 +111,9 @@ static void filter(int rfd, int wfd, FilterData *fdata)
                 break;
             }
             if (!rc) {
-                if (wlen < fdata->in_len)
+                if (wlen < fdata->in_len) {
                     error_msg("Command did not read all data.");
+                }
                 break;
             }
             strbuf_add_buf(&buf, data, rc);
@@ -170,8 +177,9 @@ int spawn_filter(char **argv, FilterData *data)
         goto error;
     }
     dev_null = open_dev_null(O_WRONLY);
-    if (dev_null < 0)
+    if (dev_null < 0) {
         goto error;
+    }
 
     fd[0] = p0[0];
     fd[1] = p1[1];
@@ -189,8 +197,9 @@ int spawn_filter(char **argv, FilterData *data)
     close(p1[0]);
     close(p0[1]);
 
-    if (handle_child_error(pid))
+    if (handle_child_error(pid)) {
         return -1;
+    }
     return 0;
 error:
     close(p0[0]);
@@ -209,8 +218,9 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
     int pid, dev_null, p[2], fd[3];
 
     fd[0] = open_dev_null(O_RDONLY);
-    if (fd[0] < 0)
+    if (fd[0] < 0) {
         return;
+    }
     dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         close(fd[0]);
@@ -250,8 +260,9 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
     }
     if (!quiet) {
         term_raw();
-        if (prompt)
+        if (prompt) {
             any_key();
+        }
         resize();
         editor.child_controls_terminal = false;
     }
@@ -265,8 +276,9 @@ void spawn(char **args, int fd[3], bool prompt)
     int pid, quiet, redir_count = 0;
     int dev_null = open_dev_null(O_WRONLY);
 
-    if (dev_null < 0)
+    if (dev_null < 0) {
         return;
+    }
     if (fd[0] < 0) {
         fd[0] = open_dev_null(O_RDONLY);
         if (fd[0] < 0) {
@@ -299,11 +311,13 @@ void spawn(char **args, int fd[3], bool prompt)
     }
     if (!quiet) {
         term_raw();
-        if (prompt)
+        if (prompt) {
             any_key();
+        }
         resize();
         editor.child_controls_terminal = false;
     }
-    if (dev_null >= 0)
+    if (dev_null >= 0) {
         close(dev_null);
+    }
 }

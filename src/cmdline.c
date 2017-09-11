@@ -10,8 +10,9 @@ static void cmdline_delete(CommandLine *c)
     long pos = c->pos;
     long len = 1;
 
-    if (pos == c->buf.len)
+    if (pos == c->buf.len) {
         return;
+    }
 
     u_get_char(c->buf.buffer, c->buf.len, &pos);
     len = pos - c->pos;
@@ -30,22 +31,26 @@ static void cmdline_erase_word(CommandLine *c)
 {
     int i = c->pos;
 
-    if (!c->pos)
+    if (!c->pos) {
         return;
+    }
 
     // open /path/to/file^W => open /path/to/
 
     // erase whitespace
-    while (i && isspace(c->buf.buffer[i - 1]))
+    while (i && isspace(c->buf.buffer[i - 1])) {
         i--;
+    }
 
     // erase non-word bytes
-    while (i && !is_word_byte(c->buf.buffer[i - 1]))
+    while (i && !is_word_byte(c->buf.buffer[i - 1])) {
         i--;
+    }
 
     // erase word bytes
-    while (i && is_word_byte(c->buf.buffer[i - 1]))
+    while (i && is_word_byte(c->buf.buffer[i - 1])) {
         i--;
+    }
 
     strbuf_remove(&c->buf, i, c->pos - i);
     c->pos = i;
@@ -64,14 +69,16 @@ static void cmdline_delete_eol(CommandLine *c)
 
 static void cmdline_prev_char(CommandLine *c)
 {
-    if (c->pos)
+    if (c->pos) {
         u_prev_char(c->buf.buffer, &c->pos);
+    }
 }
 
 static void cmdline_next_char(CommandLine *c)
 {
-    if (c->pos < c->buf.len)
+    if (c->pos < c->buf.len) {
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
+    }
 }
 
 static void cmdline_next_word(CommandLine *c)
@@ -80,11 +87,13 @@ static void cmdline_next_word(CommandLine *c)
     const long len = c->buf.len;
     long i = c->pos;
 
-    while (i < len && is_word_byte(buf[i]))
+    while (i < len && is_word_byte(buf[i])) {
         i++;
+    }
 
-    while (i < len && !is_word_byte(buf[i]))
+    while (i < len && !is_word_byte(buf[i])) {
         i++;
+    }
 
     c->pos = i;
 }
@@ -94,17 +103,21 @@ static void cmdline_prev_word(CommandLine *c)
     const char *buf = c->buf.buffer;
     long i = c->pos;
 
-    if (i > 1 && is_word_byte(buf[i]) && !is_word_byte(buf[i - 1]))
+    if (i > 1 && is_word_byte(buf[i]) && !is_word_byte(buf[i - 1])) {
         i--;
+    }
 
-    while (i > 0 && !is_word_byte(buf[i]))
+    while (i > 0 && !is_word_byte(buf[i])) {
         i--;
+    }
 
-    while (i > 0 && is_word_byte(buf[i]))
+    while (i > 0 && is_word_byte(buf[i])) {
         i--;
+    }
 
-    if (i > 0)
+    if (i > 0) {
         i++;
+    }
 
     c->pos = i;
 }
@@ -112,8 +125,9 @@ static void cmdline_prev_word(CommandLine *c)
 static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
 {
     strbuf_make_space(&c->buf, c->pos, size);
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++) {
         c->buf.buffer[c->pos++] = buf[i];
+    }
 }
 
 static void cmdline_insert_paste(CommandLine *c)
@@ -122,8 +136,9 @@ static void cmdline_insert_paste(CommandLine *c)
     char *text = term_read_paste(&size);
 
     for (i = 0; i < size; i++) {
-        if (text[i] == '\n')
+        if (text[i] == '\n') {
             text[i] = ' ';
+        }
     }
     cmdline_insert_bytes(c, text, size);
     free(text);
@@ -157,8 +172,9 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
     if (special_input_keypress(key, buf, &count)) {
         // \n is not allowed in command line because
         // command/search history file would break
-        if (count && buf[0] != '\n')
+        if (count && buf[0] != '\n') {
             cmdline_insert_bytes(&editor.cmdline, buf, count);
+        }
         c->search_pos = -1;
         return 1;
     }
@@ -179,8 +195,9 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
         break;
     case CTRL('H'):
     case CTRL('?'):
-        if (c->buf.len == 0)
+        if (c->buf.len == 0) {
             return CMDLINE_CANCEL;
+        }
         cmdline_backspace(c);
         break;
     case CTRL('U'):
@@ -229,21 +246,25 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
         c->pos = c->buf.len;
         return 1;
     case KEY_UP:
-        if (history == NULL)
+        if (history == NULL) {
             return 0;
+        }
         if (c->search_pos < 0) {
             free(c->search_text);
             c->search_text = strbuf_cstring(&c->buf);
             c->search_pos = history->count;
         }
-        if (history_search_forward(history, &c->search_pos, c->search_text))
+        if (history_search_forward(history, &c->search_pos, c->search_text)) {
             set_text(c, history->ptrs[c->search_pos]);
+        }
         return 1;
     case KEY_DOWN:
-        if (history == NULL)
+        if (history == NULL) {
             return 0;
-        if (c->search_pos < 0)
+        }
+        if (c->search_pos < 0) {
             return 1;
+        }
         if (history_search_backward(history, &c->search_pos, c->search_text)) {
             set_text(c, history->ptrs[c->search_pos]);
         } else {

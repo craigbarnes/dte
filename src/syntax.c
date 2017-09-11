@@ -73,8 +73,9 @@ static void fix_action(Syntax *syn, Action *a, const char *prefix)
         const char *name = fix_name(a->destination->name, prefix);
         a->destination = find_state(syn, name);
     }
-    if (a->emit_name)
+    if (a->emit_name) {
         a->emit_name = xstrdup(a->emit_name);
+    }
 }
 
 static void fix_conditions(Syntax *syn, State *s, SyntaxMerge *m, const char *prefix)
@@ -146,8 +147,9 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
 
     for (i = old_count; i < states->count; i++) {
         fix_conditions(syn, states->ptrs[i], m, prefix);
-        if (m->delim)
+        if (m->delim) {
             update_state_colors(syn, states->ptrs[i]);
+        }
     }
 
     m->subsyn->used = true;

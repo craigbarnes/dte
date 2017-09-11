@@ -60,8 +60,9 @@ void move_to_preferred_x(int preferred_x)
             }
         }
     }
-    if (x > view->preferred_x)
+    if (x > view->preferred_x) {
         i--;
+    }
     view->cursor.offset += i;
 }
 
@@ -116,8 +117,9 @@ void move_up(int count)
     int x = view_get_preferred_x(view);
 
     while (count > 0) {
-        if (!block_iter_prev_line(&view->cursor))
+        if (!block_iter_prev_line(&view->cursor)) {
             break;
+        }
         count--;
     }
     move_to_preferred_x(x);
@@ -128,8 +130,9 @@ void move_down(int count)
     int x = view_get_preferred_x(view);
 
     while (count > 0) {
-        if (!block_iter_eat_line(&view->cursor))
+        if (!block_iter_eat_line(&view->cursor)) {
             break;
+        }
         count--;
     }
     move_to_preferred_x(x);
@@ -159,8 +162,9 @@ void move_to_column(View *v, int column)
     while (column-- > 1) {
         unsigned int u;
 
-        if (!buffer_next_char(&v->cursor, &u))
+        if (!buffer_next_char(&v->cursor, &u)) {
             break;
+        }
         if (u == '\n') {
             buffer_prev_char(&v->cursor, &u);
             break;
@@ -171,12 +175,15 @@ void move_to_column(View *v, int column)
 
 static enum char_type get_char_type(unsigned int u)
 {
-    if (u == '\n')
+    if (u == '\n') {
         return CT_NEWLINE;
-    if (u_is_space(u))
+    }
+    if (u_is_space(u)) {
         return CT_SPACE;
-    if (u_is_word_char(u))
+    }
+    if (u_is_word_char(u)) {
         return CT_WORD;
+    }
     return CT_OTHER;
 }
 
@@ -184,8 +191,9 @@ static bool get_current_char_type(BlockIter *bi, enum char_type *type)
 {
     unsigned int u;
 
-    if (!buffer_get_char(bi, &u))
+    if (!buffer_get_char(bi, &u)) {
         return false;
+    }
 
     *type = get_char_type(u);
     return true;
@@ -228,11 +236,13 @@ long word_fwd(BlockIter *bi, bool skip_non_word)
 
     while (1) {
         count += skip_fwd_char_type(bi, CT_SPACE);
-        if (!get_current_char_type(bi, &type))
+        if (!get_current_char_type(bi, &type)) {
             return count;
+        }
 
-        if (count && (!skip_non_word || (type == CT_WORD || type == CT_NEWLINE)))
+        if (count && (!skip_non_word || (type == CT_WORD || type == CT_NEWLINE))) {
             return count;
+        }
 
         count += skip_fwd_char_type(bi, type);
     }
@@ -246,8 +256,9 @@ long word_bwd(BlockIter *bi, bool skip_non_word)
 
     do {
         count += skip_bwd_char_type(bi, CT_SPACE);
-        if (!buffer_prev_char(bi, &u))
+        if (!buffer_prev_char(bi, &u)) {
             return count;
+        }
 
         type = get_char_type(u);
         count += u_char_size(u);

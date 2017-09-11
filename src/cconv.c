@@ -40,10 +40,12 @@ static struct cconv *create(iconv_t cd)
 
 static int encoding_char_size(const char *encoding)
 {
-    if (str_has_prefix(encoding, "UTF-16"))
+    if (str_has_prefix(encoding, "UTF-16")) {
         return 2;
-    if (str_has_prefix(encoding, "UTF-32"))
+    }
+    if (str_has_prefix(encoding, "UTF-32")) {
         return 2;
+    }
     return 1;
 }
 
@@ -71,8 +73,9 @@ static void resize_obuf(struct cconv *c)
 
 static void add_replacement(struct cconv *c)
 {
-    if (c->osize - c->opos < 4)
+    if (c->osize - c->opos < 4) {
         resize_obuf(c);
+    }
 
     memcpy(c->obuf + c->opos, c->rbuf, c->rcount);
     c->opos += c->rcount;
@@ -141,8 +144,9 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
         ic = c->tcount;
         rc = xiconv(c, &ib, &ic);
 
-        if (ic > 0)
+        if (ic > 0) {
             memmove(c->tbuf, ib, ic);
+        }
         c->tcount = ic;
 
         switch (rc) {
@@ -217,8 +221,9 @@ struct cconv *cconv_to_utf8(const char *encoding)
     iconv_t cd;
 
     cd = iconv_open("UTF-8", encoding);
-    if (cd == (iconv_t)-1)
+    if (cd == (iconv_t)-1) {
         return NULL;
+    }
     c = create(cd);
     memcpy(c->rbuf, replacement, sizeof(replacement));
     c->rcount = sizeof(replacement);
@@ -238,10 +243,12 @@ struct cconv *cconv_from_utf8(const char *encoding)
         snprintf(buf, sizeof(buf), "%s//TRANSLIT", encoding);
         cd = iconv_open(buf, "UTF-8");
     }
-    if (cd == (iconv_t)-1)
+    if (cd == (iconv_t)-1) {
         cd = iconv_open(encoding, "UTF-8");
-    if (cd == (iconv_t)-1)
+    }
+    if (cd == (iconv_t)-1) {
         return NULL;
+    }
     c = create(cd);
     encode_replacement(c);
     return c;

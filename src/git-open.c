@@ -30,8 +30,9 @@ static char *cdup(void)
 
     data.in = NULL;
     data.in_len = 0;
-    if (spawn_filter((char **)cmd, &data))
+    if (spawn_filter((char **)cmd, &data)) {
         return NULL;
+    }
 
     len = data.out_len;
     if (len > 1 && data.out[len - 1] == '\n') {
@@ -68,8 +69,9 @@ static bool contains_upper(const char *str)
     long i = 0;
 
     while (str[i]) {
-        if (u_is_upper(u_str_get_char(str, &i)))
+        if (u_is_upper(u_str_get_char(str, &i))) {
             return true;
+        }
     }
     return false;
 }
@@ -196,8 +198,9 @@ void git_open_keypress(int key)
         down(1);
         break;
     case MOD_META | 'e':
-        if (git_open.files.count > 0)
+        if (git_open.files.count > 0) {
             git_open.selected = git_open.files.count - 1;
+        }
         break;
     case MOD_META | 't':
         git_open.selected = 0;

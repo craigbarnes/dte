@@ -51,10 +51,11 @@ static void cmd_alias(const char *pf, char **args)
 
 static void cmd_bind(const char *pf, char **args)
 {
-    if (args[1])
+    if (args[1]) {
         add_binding(args[0], args[1]);
-    else
+    } else {
         remove_binding(args[0]);
+    }
 }
 
 static void cmd_bof(const char *pf, char **args)
@@ -102,8 +103,9 @@ static void cmd_cd(const char *pf, char **args)
         return;
     }
 
-    if (got_cwd)
+    if (got_cwd) {
         setenv("OLDPWD", cwd, 1);
+    }
     got_cwd = !!getcwd(cwd, sizeof(cwd));
     if (got_cwd) {
         setenv("PWD", cwd, 1);
@@ -172,8 +174,9 @@ static void cmd_close(const char *pf, char **args)
 static void cmd_command(const char *pf, char **args)
 {
     set_input_mode(INPUT_COMMAND);
-    if (args[0])
+    if (args[0]) {
         cmdline_set_text(&editor.cmdline, args[0]);
+    }
 }
 
 static void cmd_compile(const char *pf, char **args)
@@ -205,8 +208,9 @@ static void cmd_compile(const char *pf, char **args)
     }
     clear_messages();
     spawn_compiler(args, flags, c);
-    if (message_count())
+    if (message_count()) {
         activate_current_message_save();
+    }
 }
 
 static void cmd_copy(const char *pf, char **args)
@@ -253,8 +257,9 @@ static void cmd_delete_eol(const char *pf, char **args)
 {
     BlockIter bi = view->cursor;
 
-    if (view->selection)
+    if (view->selection) {
         return;
+    }
 
     if (*pf) {
         unsigned int ch;
@@ -340,8 +345,9 @@ static void cmd_ft(const char *pf, char **args)
         }
         pf++;
     }
-    for (int i = 1; args[i]; i++)
+    for (int i = 1; args[i]; i++) {
         add_filetype(args[0], args[i], dt);
+    }
 }
 
 static void cmd_filter(const char *pf, char **args)
@@ -378,8 +384,9 @@ static void cmd_format_paragraph(const char *pf, char **args)
 {
     int text_width = buffer->options.text_width;
 
-    if (args[0])
+    if (args[0]) {
         text_width = atoi(args[0]);
+    }
     if (text_width <= 0) {
         error_msg("Paragraph width must be positive.");
         return;
@@ -416,10 +423,11 @@ static void cmd_eolsf(const char *pf, char **args)
 {
     if (! block_iter_eol(&view->cursor)) {
         long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
-        if (view->cy < bottom)
+        if (view->cy < bottom) {
             move_down(bottom - view->cy);
-        else
+        } else {
             block_iter_eof(&view->cursor);
+        }
     }
     view_reset_preferred_x(view);
 }
@@ -506,8 +514,9 @@ static void cmd_load_syntax(const char *pf, char **args)
             load_syntax_file(filename, true, &err);
         }
     } else {
-        if (!find_syntax(filetype))
+        if (!find_syntax(filetype)) {
             load_syntax_by_filetype(filetype);
+        }
     }
 }
 
@@ -527,8 +536,9 @@ static void cmd_move_tab(const char *pf, char **args)
             return;
         }
         j = num - 1;
-        if (j >= window->views.count)
+        if (j >= window->views.count) {
             j = window->views.count - 1;
+        }
     }
     j = (window->views.count + j) % window->views.count;
     ptr_array_insert(&window->views, ptr_array_remove_idx(&window->views, i), j);
@@ -659,16 +669,18 @@ static void cmd_pass_through(const char *pf, char **args)
 
     data.in = NULL;
     data.in_len = 0;
-    if (spawn_filter(args, &data))
+    if (spawn_filter(args, &data)) {
         return;
+    }
 
     if (view->selection) {
         del_len = prepare_selection(view);
         unselect();
     }
     if (strip_nl && data.out_len > 0 && data.out[data.out_len - 1] == '\n') {
-        if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r')
+        if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r') {
             data.out_len--;
+        }
     }
 
     buffer_replace_bytes(del_len, data.out, data.out_len);
@@ -681,10 +693,11 @@ static void cmd_pass_through(const char *pf, char **args)
 
 static void cmd_paste(const char *pf, char **args)
 {
-    if (pf[0])
+    if (pf[0]) {
         paste(true);
-    else
+    } else {
         paste(false);
+    }
 }
 
 static void cmd_pgdown(const char *pf, char **args)
@@ -778,8 +791,9 @@ static void cmd_repeat(const char *pf, char **args)
     args += 2;
     pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
     if (pf) {
-        while (count-- > 0)
+        while (count-- > 0) {
             cmd->cmd(pf, args);
+        }
     }
 }
 
@@ -983,8 +997,9 @@ static void cmd_save(const char *pf, char **args)
         // Allow chmod 755 etc.
         buffer->st.st_mode = st.st_mode;
     }
-    if (save_buffer(buffer, absolute, encoding, newline))
+    if (save_buffer(buffer, absolute, encoding, newline)) {
         goto error;
+    }
 
     buffer->saved_change = buffer->cur_change;
     buffer->ro = false;
@@ -1017,19 +1032,23 @@ static void cmd_save(const char *pf, char **args)
     }
     return;
 error:
-    if (new_locked)
+    if (new_locked) {
         unlock_file(absolute);
-    if (absolute != buffer->abs_filename)
+    }
+    if (absolute != buffer->abs_filename) {
         free(absolute);
-    if (encoding != buffer->encoding)
+    }
+    if (encoding != buffer->encoding) {
         free(encoding);
+    }
 }
 
 static void cmd_scroll_down(const char *pf, char **args)
 {
     view->vy++;
-    if (view->cy < view->vy)
+    if (view->cy < view->vy) {
         move_down(1);
+    }
 }
 
 static void cmd_scroll_pgdown(const char *pf, char **args)
@@ -1039,8 +1058,9 @@ static void cmd_scroll_pgdown(const char *pf, char **args)
     if (view->vy < max && max > 0) {
         int count = window->edit_h - 1;
 
-        if (view->vy + count > max)
+        if (view->vy + count > max) {
             count = max - view->vy;
+        }
         view->vy += count;
         move_down(count);
     } else if (view->cy < buffer->nl) {
@@ -1053,8 +1073,9 @@ static void cmd_scroll_pgup(const char *pf, char **args)
     if (view->vy > 0) {
         int count = window->edit_h - 1;
 
-        if (count > view->vy)
+        if (count > view->vy) {
             count = view->vy;
+        }
         view->vy -= count;
         move_up(count);
     } else if (view->cy > 0) {
@@ -1064,10 +1085,12 @@ static void cmd_scroll_pgup(const char *pf, char **args)
 
 static void cmd_scroll_up(const char *pf, char **args)
 {
-    if (view->vy)
+    if (view->vy) {
         view->vy--;
-    if (view->vy + window->edit_h <= view->cy)
+    }
+    if (view->vy + window->edit_h <= view->cy) {
         move_up(1);
+    }
 }
 
 static void cmd_search(const char *pf, char **args)
@@ -1121,11 +1144,13 @@ static void cmd_search(const char *pf, char **args)
         } else {
             search_next();
         }
-        if (history)
+        if (history) {
             history_add(&search_history, pattern, search_history_size);
+        }
 
-        if (pattern != args[0])
+        if (pattern != args[0]) {
             free(pattern);
+        }
     } else if (cmd == 'n') {
         search_next();
     } else if (cmd == 'p') {
@@ -1218,8 +1243,9 @@ static void cmd_set(const char *pf, char **args)
         error_msg("One or even number of arguments expected.");
         return;
     }
-    for (i = 0; args[i]; i += 2)
+    for (i = 0; args[i]; i += 2) {
         set_option(args[i], args[i + 1], local, global);
+    }
 }
 
 static void cmd_setenv(const char *pf, char **args)
@@ -1282,8 +1308,9 @@ static void cmd_tag(const char *pf, char **args)
 
     if (!name) {
         word = view_get_word_under_cursor(view);
-        if (!word)
+        if (!word) {
             return;
+        }
         name = word;
     }
 
@@ -1331,10 +1358,11 @@ static void cmd_toggle(const char *pf, char **args)
         }
         pf++;
     }
-    if (args[1])
+    if (args[1]) {
         toggle_option_values(args[0], global, verbose, args + 1);
-    else
+    } else {
         toggle_option(args[0], global, verbose);
+    }
 }
 
 static void cmd_undo(const char *pf, char **args)
@@ -1366,8 +1394,9 @@ static void cmd_view(const char *pf, char **args)
             error_msg("View number must be positive.");
             return;
         }
-        if (idx > window->views.count - 1)
+        if (idx > window->views.count - 1) {
             idx = window->views.count - 1;
+        }
     }
     set_view(window->views.ptrs[idx]);
 }
@@ -1390,8 +1419,9 @@ static void cmd_wflip(const char *pf, char **args)
 {
     Frame *f = window->frame;
 
-    if (f->parent == NULL)
+    if (f->parent == NULL) {
         return;
+    }
 
     f->parent->vertical ^= 1;
     mark_everything_changed();
@@ -1450,10 +1480,11 @@ static void cmd_wresize(const char *pf, char **args)
     if (arg) {
         int n = atoi(arg);
 
-        if (arg[0] == '+' || arg[0] == '-')
+        if (arg[0] == '+' || arg[0] == '-') {
             add_to_frame_size(window->frame, dir, n);
-        else
+        } else {
             resize_frame(window->frame, dir, n);
+        }
     } else {
         equalize_frame_sizes(window->frame->parent);
     }
@@ -1487,10 +1518,11 @@ static void cmd_wsplit(const char *pf, char **args)
         pf++;
     }
 
-    if (root)
+    if (root) {
         f = split_root(vertical, before);
-    else
+    } else {
         f = split_frame(window, vertical, before);
+    }
 
     save = view;
     window = f->window;
@@ -1523,13 +1555,15 @@ static void cmd_wswap(const char *pf, char **args)
     Frame *tmp, *parent = window->frame->parent;
     int i, j;
 
-    if (parent == NULL)
+    if (parent == NULL) {
         return;
+    }
 
     i = ptr_array_idx(&parent->frames, window->frame);
     j = i + 1;
-    if (j == parent->frames.count)
+    if (j == parent->frames.count) {
         j = 0;
+    }
 
     tmp = parent->frames.ptrs[i];
     parent->frames.ptrs[i] = parent->frames.ptrs[j];

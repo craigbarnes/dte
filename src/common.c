@@ -11,8 +11,9 @@ long count_nl(const char *buf, long size)
 
     while (buf < end) {
         buf = memchr(buf, '\n', end - buf);
-        if (!buf)
+        if (!buf) {
             break;
+        }
         buf++;
         nl++;
     }
@@ -23,8 +24,9 @@ int count_strings(char **strings)
 {
     int count;
 
-    for (count = 0; strings[count]; count++)
+    for (count = 0; strings[count]; count++) {
         ;
+    }
     return count;
 }
 
@@ -73,8 +75,9 @@ bool buf_parse_long(const char *str, int size, int *posp, long *valp)
             return false;
         }
     }
-    if (count == 0)
+    if (count == 0) {
         return false;
+    }
     *posp = pos;
     *valp = sign * val;
     return true;
@@ -102,8 +105,9 @@ bool str_to_int(const char *str, int *valp)
 {
     long val;
 
-    if (!str_to_long(str, &val) || val < INT_MIN || val > INT_MAX)
+    if (!str_to_long(str, &val) || val < INT_MIN || val > INT_MAX) {
         return false;
+    }
     *valp = val;
     return true;
 }
@@ -135,8 +139,9 @@ ssize_t xread(int fd, void *buf, size_t count)
 
         rc = read(fd, b + pos, count - pos);
         if (rc == -1) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
+            }
             return -1;
         }
         if (rc == 0) {
@@ -158,8 +163,9 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
 
         rc = write(fd, b, count);
         if (rc == -1) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
+            }
             return -1;
         }
         b += rc;
@@ -183,8 +189,9 @@ long stat_read_file(const char *filename, char **bufp, struct stat *st)
     long r;
 
     *bufp = NULL;
-    if (fd == -1)
+    if (fd == -1) {
         return -1;
+    }
     if (fstat(fd, st) == -1) {
         close(fd);
         return -1;
@@ -221,8 +228,9 @@ void bug(const char *function, const char *fmt, ...)
 {
     va_list ap;
 
-    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING)
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
         ui_end();
+    }
 
     fprintf(stderr, "\n *** BUG *** %s: ", function);
     va_start(ap, fmt);

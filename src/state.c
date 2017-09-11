@@ -36,18 +36,21 @@ static int saved_nr_errors; // Used to check if nr_errors changed
 
 static bool no_syntax(void)
 {
-    if (current_syntax)
+    if (current_syntax) {
         return false;
+    }
     error_msg("No syntax started");
     return true;
 }
 
 static bool no_state(void)
 {
-    if (no_syntax())
+    if (no_syntax()) {
         return true;
-    if (current_state)
+    }
+    if (current_state) {
         return false;
+    }
     error_msg("No state started");
     return true;
 }
@@ -68,8 +71,9 @@ static State *find_or_add_state(const char *name)
 {
     State *st = find_state(current_syntax, name);
 
-    if (st)
+    if (st) {
         return st;
+    }
 
     st = xnew0(State, 1);
     st->name = xstrdup(name);
@@ -81,15 +85,17 @@ static State *find_or_add_state(const char *name)
 
 static State *reference_state(const char *name)
 {
-    if (streq(name, "this"))
+    if (streq(name, "this")) {
         return current_state;
+    }
     return find_or_add_state(name);
 }
 
 static bool not_subsyntax(void)
 {
-    if (is_subsyntax(current_syntax))
+    if (is_subsyntax(current_syntax)) {
         return false;
+    }
     error_msg("Destination state END allowed only in a subsyntax.");
     return true;
 }
@@ -112,13 +118,15 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
         ok = false;
     }
     if (streq(ret, "END")) {
-        if (not_subsyntax())
+        if (not_subsyntax()) {
             ok = false;
+        }
     } else if (ok) {
         m.return_state = reference_state(ret);
     }
-    if (ok)
+    if (ok) {
         *dest = merge_syntax(current_syntax, &m);
+    }
     return ok;
 }
 
@@ -134,8 +142,9 @@ static bool destination_state(const char *name, State **dest)
         return success;
     }
     if (streq(name, "END")) {
-        if (not_subsyntax())
+        if (not_subsyntax()) {
             return false;
+        }
         *dest = NULL;
         return true;
     }
@@ -148,11 +157,13 @@ static Condition *add_condition(ConditionType type, const char *dest, const char
     Condition *c;
     State *d = NULL;
 
-    if (no_state())
+    if (no_state()) {
         return NULL;
+    }
 
-    if (dest && !destination_state(dest, &d))
+    if (dest && !destination_state(dest, &d)) {
         return NULL;
+    }
 
     c = xnew0(Condition, 1);
     c->a.destination = d;
@@ -382,8 +393,9 @@ static void cmd_state(const char *pf, char **args)
     State *s;
 
     close_state();
-    if (no_syntax())
+    if (no_syntax()) {
         return;
+    }
     if (streq(name, "END") || streq(name, "this")) {
         error_msg("%s is reserved state name", name);
         return;
@@ -412,8 +424,9 @@ static void cmd_str(const char *pf, char **args)
     }
 
     // Strings of length 2 are very common
-    if (!icase && len == 2)
+    if (!icase && len == 2) {
         type = COND_STR2;
+    }
     c = add_condition(type, args[1], args[2]);
     if (c) {
         memcpy(c->u.cond_str.str, str, len);
@@ -430,8 +443,9 @@ static void finish_syntax(void)
 
 static void cmd_syntax(const char *pf, char **args)
 {
-    if (current_syntax)
+    if (current_syntax) {
         finish_syntax();
+    }
 
     current_syntax = xnew0(Syntax, 1);
     current_syntax->name = xstrdup(args[0]);
@@ -477,10 +491,12 @@ Syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
     config_line = saved_config_line;
 
     syn = find_syntax(path_basename(filename));
-    if (syn && editor.status != EDITOR_INITIALIZING)
+    if (syn && editor.status != EDITOR_INITIALIZING) {
         update_syntax_colors(syn);
-    if (syn == NULL)
+    }
+    if (syn == NULL) {
         *err = EINVAL;
+    }
     return syn;
 }
 
@@ -492,8 +508,9 @@ Syntax *load_syntax_by_filetype(const char *filetype)
 
     syn = load_syntax_file(filename, false, &err);
     free(filename);
-    if (syn || err != ENOENT)
+    if (syn || err != ENOENT) {
         return syn;
+    }
 
     filename = xsprintf("%s/syntax/%s", editor.pkgdatadir, filetype);
     syn = load_syntax_file(filename, false, &err);

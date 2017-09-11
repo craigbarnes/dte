@@ -9,11 +9,13 @@ static bool fill(FileDecoder *dec)
     size_t icount = dec->isize - dec->ipos;
     size_t max = 7 * 1024; // Smaller than cconv.obuf to make realloc less likely
 
-    if (icount > max)
+    if (icount > max) {
         icount = max;
+    }
 
-    if (dec->ipos == dec->isize)
+    if (dec->ipos == dec->isize) {
         return false;
+    }
 
     cconv_process(dec->cconv, dec->ibuf + dec->ipos, icount);
     dec->ipos += icount;
@@ -28,9 +30,7 @@ static int set_encoding(FileDecoder *dec, const char *encoding);
 
 static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
 {
-    ssize_t i = 0;
-
-    for (; i < len; i++) {
+    for (ssize_t i = 0; i < len; i++) {
         if (line[i] >= 0x80) {
             long idx = i;
             unsigned int u = u_get_nonascii(line, len, &idx);
@@ -64,11 +64,13 @@ static bool decode_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 
     while (1) {
         line = cconv_consume_line(dec->cconv, &len);
-        if (line)
+        if (line) {
             break;
+        }
 
-        if (!fill(dec))
+        if (!fill(dec)) {
             break;
+        }
     }
 
     if (line) {
@@ -76,8 +78,9 @@ static bool decode_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
         len--;
     } else {
         line = cconv_consume_all(dec->cconv, &len);
-        if (len == 0)
+        if (len == 0) {
             return false;
+        }
     }
 
     *linep = line;
@@ -96,8 +99,9 @@ static bool read_utf8_line(FileDecoder *dec, char **linep, ssize_t *lenp)
         dec->ipos += len + 1;
     } else {
         len = dec->isize - dec->ipos;
-        if (len == 0)
+        if (len == 0) {
             return false;
+        }
         dec->ipos += len;
     }
 
@@ -116,8 +120,9 @@ static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
         len = nl - line;
     } else {
         len = dec->isize - dec->ipos;
-        if (len == 0)
+        if (len == 0) {
             return false;
+        }
     }
 
     if (detect(dec, line, len)) {
@@ -127,8 +132,9 @@ static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 
     // Only ASCII so far
     dec->ipos += len;
-    if (nl)
+    if (nl) {
         dec->ipos++;
+    }
     *linep = line;
     *lenp = len;
     return true;
@@ -168,8 +174,9 @@ FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, ss
 
 void free_file_decoder(FileDecoder *dec)
 {
-    if (dec->cconv != NULL)
+    if (dec->cconv != NULL) {
         cconv_free(dec->cconv);
+    }
     free(dec->encoding);
     free(dec);
 }

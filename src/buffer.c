@@ -38,10 +38,12 @@ void buffer_mark_lines_changed(Buffer *b, int min, int max)
         min = max;
         max = tmp;
     }
-    if (min < b->changed_line_min)
+    if (min < b->changed_line_min) {
         b->changed_line_min = min;
-    if (max > b->changed_line_max)
+    }
+    if (max > b->changed_line_max) {
         b->changed_line_max = max;
+    }
 }
 
 const char *buffer_filename(Buffer *b)
@@ -60,8 +62,9 @@ Buffer *buffer_new(const char *encoding)
     b->saved_change = &b->change_head;
     b->id = ++id;
     b->newline = options.newline;
-    if (encoding)
+    if (encoding) {
         b->encoding = xstrdup(encoding);
+    }
 
     memcpy(&b->options, &options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
@@ -91,8 +94,9 @@ void free_buffer(Buffer *b)
 
     ptr_array_remove(&buffers, b);
 
-    if (b->locked)
+    if (b->locked) {
         unlock_file(b->abs_filename);
+    }
 
     item = b->blocks.next;
     while (item != &b->blocks) {
@@ -193,11 +197,13 @@ void buffer_update_syntax(Buffer *b)
     if (b->options.syntax) {
         // Even "none" can have syntax
         syn = find_syntax(b->options.filetype);
-        if (!syn)
+        if (!syn) {
             syn = load_syntax_by_filetype(b->options.filetype);
+        }
     }
-    if (syn == b->syn)
+    if (syn == b->syn) {
         return;
+    }
 
     b->syn = syn;
     if (syn) {

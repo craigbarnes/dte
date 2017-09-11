@@ -74,15 +74,17 @@ void activate_current_message(void)
 
 void activate_next_message(void)
 {
-    if (msg_pos + 1 < msgs.count)
+    if (msg_pos + 1 < msgs.count) {
         msg_pos++;
+    }
     activate_current_message();
 }
 
 void activate_prev_message(void)
 {
-    if (msg_pos > 0)
+    if (msg_pos > 0) {
         msg_pos--;
+    }
     activate_current_message();
 }
 

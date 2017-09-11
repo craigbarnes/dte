@@ -68,16 +68,19 @@ static void do_collect_files(const char *dirname, const char *dirprefix, const c
     struct dirent *de;
     DIR *dir;
 
-    if (plen >= sizeof(path) - 2)
+    if (plen >= sizeof(path) - 2) {
         return;
+    }
 
     dir = opendir(dirname);
-    if (!dir)
+    if (!dir) {
         return;
+    }
 
     memcpy(path, dirname, plen);
-    if (path[plen - 1] != '/')
+    if (path[plen - 1] != '/') {
         path[plen++] = '/';
+    }
 
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
@@ -87,28 +90,34 @@ static void do_collect_files(const char *dirname, const char *dirprefix, const c
         bool is_dir;
 
         if (flen) {
-            if (strncmp(name, fileprefix, flen))
+            if (strncmp(name, fileprefix, flen)) {
                 continue;
+            }
         } else {
-            if (name[0] == '.')
+            if (name[0] == '.') {
                 continue;
+            }
         }
 
         len = strlen(name);
-        if (plen + len + 2 > sizeof(path))
+        if (plen + len + 2 > sizeof(path)) {
             continue;
+        }
         memcpy(path + plen, name, len + 1);
 
-        if (lstat(path, &st))
+        if (lstat(path, &st)) {
             continue;
+        }
 
         is_dir = S_ISDIR(st.st_mode);
         if (S_ISLNK(st.st_mode)) {
-            if (!stat(path, &st))
+            if (!stat(path, &st)) {
                 is_dir = S_ISDIR(st.st_mode);
+            }
         }
-        if (!is_dir && directories_only)
+        if (!is_dir && directories_only) {
             continue;
+        }
 
         if (dirprefix[0]) {
             strbuf_add_str(&buf, dirprefix);
@@ -181,8 +190,9 @@ static void collect_env(const char *prefix)
 
         if (str_has_prefix(e, prefix)) {
             const char *end = strchr(e, '=');
-            if (end)
+            if (end) {
                 add_completion(xstrslice(e, 0, end - e));
+            }
         }
     }
     collect_builtin_env(prefix);
@@ -198,8 +208,9 @@ static void collect_completions(char **args, int argc)
     }
 
     cmd = find_command(commands, args[0]);
-    if (!cmd)
+    if (!cmd) {
         return;
+    }
 
     if (streq(cmd->name, "open") ||
         streq(cmd->name, "wsplit") ||
@@ -260,16 +271,18 @@ static void init_completion(void)
         Error *err = NULL;
         int end;
 
-        while (isspace(cmd[pos]))
+        while (isspace(cmd[pos])) {
             pos++;
+        }
 
         if (pos >= editor.cmdline.pos) {
             completion_pos = editor.cmdline.pos;
             break;
         }
 
-        if (!cmd[pos])
+        if (!cmd[pos]) {
             break;
+        }
 
         if (cmd[pos] == ';') {
             semicolon = array.count;

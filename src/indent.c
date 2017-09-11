@@ -7,8 +7,9 @@ char *make_indent(int width)
 {
     char *str;
 
-    if (width == 0)
+    if (width == 0) {
         return NULL;
+    }
 
     if (use_spaces_for_indent()) {
         str = xnew(char, width + 1);
@@ -33,10 +34,12 @@ static bool indent_inc(const char *line, unsigned int len)
     const char *re2 = "\\}\\s*(//.*|/\\*.*\\*/\\s*)?$";
 
     if (buffer->options.brace_indent) {
-        if (regexp_match_nosub(re1, line, len))
+        if (regexp_match_nosub(re1, line, len)) {
             return true;
-        if (regexp_match_nosub(re2, line, len))
+        }
+        if (regexp_match_nosub(re2, line, len)) {
             return false;
+        }
     }
 
     re1 = buffer->options.indent_regex;
@@ -77,8 +80,9 @@ void get_indent_info(const char *buf, int len, IndentInfo *info)
         info->bytes++;
         pos++;
 
-        if (info->width % buffer->options.indent_width == 0 && info->sane)
+        if (info->width % buffer->options.indent_width == 0 && info->sane) {
             info->sane = use_spaces_for_indent() ? !tabs : !spaces;
+        }
     }
     info->level = info->width / buffer->options.indent_width;
     info->wsonly = pos == len;
@@ -127,12 +131,14 @@ int get_indent_level_bytes_left(void)
     unsigned int cursor_offset = fetch_this_line(&view->cursor, &lr);
     int ibytes;
 
-    if (!cursor_offset)
+    if (!cursor_offset) {
         return 0;
+    }
 
     ibytes = get_current_indent_bytes(lr.line, cursor_offset);
-    if (ibytes < 0)
+    if (ibytes < 0) {
         return 0;
+    }
     return ibytes;
 }
 
@@ -144,8 +150,9 @@ int get_indent_level_bytes_right(void)
     int i, ibytes, iwidth;
 
     ibytes = get_current_indent_bytes(lr.line, cursor_offset);
-    if (ibytes < 0)
+    if (ibytes < 0) {
         return 0;
+    }
 
     iwidth = 0;
     for (i = cursor_offset; i < lr.size; i++) {
@@ -160,8 +167,9 @@ int get_indent_level_bytes_right(void)
             return 0;
         }
 
-        if (iwidth % buffer->options.indent_width == 0)
+        if (iwidth % buffer->options.indent_width == 0) {
             return i - cursor_offset + 1;
+        }
     }
     return 0;
 }

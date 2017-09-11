@@ -44,8 +44,9 @@ static int get_min_h(Frame *f)
         return max;
     } else {
         int h = 0; // No separators
-        for (int i = 0; i < f->frames.count; i++)
+        for (int i = 0; i < f->frames.count; i++) {
             h += get_min_h(f->frames.ptrs[i]);
+        }
         return h;
     }
 }
@@ -406,8 +407,9 @@ Frame *split_frame(Window *w, bool vertical, bool before)
     }
 
     idx = ptr_array_idx(&parent->frames, w->frame);
-    if (!before)
+    if (!before) {
         idx++;
+    }
     neww = new_window();
     f = add_frame(parent, neww, idx);
     parent->equal_size = true;

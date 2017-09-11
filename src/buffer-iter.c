@@ -12,8 +12,9 @@ long buffer_next_char(BlockIter *bi, unsigned int *up)
     long offset = bi->offset;
 
     if (offset == bi->blk->size) {
-        if (bi->blk->node.next == bi->head)
+        if (bi->blk->node.next == bi->head) {
             return 0;
+        }
         bi->blk = BLOCK(bi->blk->node.next);
         bi->offset = offset = 0;
     }
@@ -34,8 +35,9 @@ long buffer_prev_char(BlockIter *bi, unsigned int *up)
     long offset = bi->offset;
 
     if (!offset) {
-        if (bi->blk->node.prev == bi->head)
+        if (bi->blk->node.prev == bi->head) {
             return 0;
+        }
         bi->blk = BLOCK(bi->blk->node.prev);
         bi->offset = offset = bi->blk->size;
     }

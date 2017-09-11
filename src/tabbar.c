@@ -23,23 +23,28 @@ static void update_first_tab_idx(Window *win)
     for (max_first_idx = win->views.count; max_first_idx > 0; max_first_idx--) {
         View *v = win->views.ptrs[max_first_idx - 1];
         w += v->tt_truncated_width;
-        if (w > win->w)
+        if (w > win->w) {
             break;
+        }
     }
 
     w = 0;
     for (min_first_idx = win->views.count; min_first_idx > 0; min_first_idx--) {
         View *v = win->views.ptrs[min_first_idx - 1];
-        if (w || v == win->view)
+        if (w || v == win->view) {
             w += v->tt_truncated_width;
-        if (w > win->w)
+        }
+        if (w > win->w) {
             break;
+        }
     }
 
-    if (win->first_tab_idx < min_first_idx)
+    if (win->first_tab_idx < min_first_idx) {
         win->first_tab_idx = min_first_idx;
-    if (win->first_tab_idx > max_first_idx)
+    }
+    if (win->first_tab_idx > max_first_idx) {
         win->first_tab_idx = max_first_idx;
+    }
 }
 
 void calculate_tabbar(Window *win)
@@ -51,8 +56,9 @@ void calculate_tabbar(Window *win)
 
         if (v == win->view) {
             // Make sure current tab is visible
-            if (win->first_tab_idx > i)
+            if (win->first_tab_idx > i) {
                 win->first_tab_idx = i;
+            }
         }
         update_tab_title_width(v, i + 1);
         total_w += v->tt_width;
@@ -99,8 +105,9 @@ void calculate_tabbar(Window *win)
             int add = v->tt_width - v->tt_truncated_width;
             int avail;
 
-            if (add == 0)
+            if (add == 0) {
                 continue;
+            }
 
             avail = extra_avg;
             if (extra_mod) {
@@ -110,10 +117,11 @@ void calculate_tabbar(Window *win)
                     extra_mod--;
                 }
             }
-            if (add > avail)
+            if (add > avail) {
                 add = avail;
-            else
+            } else {
                 truncated_count--;
+            }
 
             v->tt_truncated_width += add;
             extra -= add;

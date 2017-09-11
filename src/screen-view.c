@@ -237,17 +237,20 @@ static void hl_words(LineInfo *info)
 
     while (i < info->size) {
         if (info->colors[i] != cc || !is_word_byte(info->line[i])) {
-            if (i > max)
+            if (i > max) {
                 break;
+            }
             i++;
         } else {
             // Beginning of a word inside comment
             si = i++;
-            while (i < info->size && info->colors[i] == cc && is_word_byte(info->line[i]))
+            while (i < info->size && info->colors[i] == cc && is_word_byte(info->line[i])) {
                 i++;
+            }
             if (is_notice(info->line + si, i - si)) {
-                for (j = si; j < i; j++)
+                for (j = si; j < i; j++) {
                     info->colors[j] = nc;
+                }
             }
         }
     }
@@ -291,8 +294,9 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
         int i;
         for (i = 0; i < info->size; i++) {
             char ch = info->line[i];
-            if (ch != '\t' && ch != ' ')
+            if (ch != '\t' && ch != ' ') {
                 break;
+            }
         }
         info->indent_size = i;
     }
@@ -360,10 +364,12 @@ void update_range(View *v, int y1, int y2)
     obuf.tab_width = v->buffer->options.tab_width;
     obuf.tab = options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
-    for (i = 0; i < v->cy - y1; i++)
+    for (i = 0; i < v->cy - y1; i++) {
         block_iter_prev_line(&bi);
-    for (i = 0; i < y1 - v->cy; i++)
+    }
+    for (i = 0; i < y1 - v->cy; i++) {
         block_iter_eat_line(&bi);
+    }
     block_iter_bol(&bi);
 
     line_info_init(&info, v, &bi, y1);
@@ -409,8 +415,9 @@ void update_range(View *v, int y1, int y2)
         buf_clear_eol();
     }
 
-    if (i < y2)
+    if (i < y2) {
         set_builtin_color(BC_NOLINE);
+    }
     for (; i < y2; i++) {
         obuf.x = 0;
         buf_move_cursor(v->window->edit_x, v->window->edit_y + i);

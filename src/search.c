@@ -19,8 +19,9 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
         regmatch_t match;
         LineRef lr;
 
-        if (block_iter_is_eof(bi))
+        if (block_iter_is_eof(bi)) {
             return false;
+        }
 
         fill_line_ref(bi, &lr);
 
@@ -55,8 +56,9 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
 
 static bool do_search_bwd(regex_t *regex, BlockIter *bi, int cx, bool skip)
 {
-    if (block_iter_is_eof(bi))
+    if (block_iter_is_eof(bi)) {
         goto next;
+    }
 
     do {
         regmatch_t match;
@@ -171,19 +173,22 @@ static bool update_regex(void)
         re_flags |= REG_ICASE;
         break;
     case CSS_AUTO:
-        if (!has_upper(current_search.pattern))
+        if (!has_upper(current_search.pattern)) {
             re_flags |= REG_ICASE;
+        }
         break;
     }
 
-    if (re_flags == current_search.re_flags)
+    if (re_flags == current_search.re_flags) {
         return true;
+    }
 
     free_regex();
 
     current_search.re_flags = re_flags;
-    if (regexp_compile(&current_search.regex, current_search.pattern, current_search.re_flags))
+    if (regexp_compile(&current_search.regex, current_search.pattern, current_search.re_flags)) {
         return true;
+    }
 
     free_regex();
     return false;
@@ -204,11 +209,13 @@ static void do_search_next(bool skip)
         error_msg("No previous search pattern.");
         return;
     }
-    if (!update_regex())
+    if (!update_regex()) {
         return;
+    }
     if (current_search.direction == SEARCH_FWD) {
-        if (do_search_fwd(&current_search.regex, &bi, true))
+        if (do_search_fwd(&current_search.regex, &bi, true)) {
             return;
+        }
 
         block_iter_bof(&bi);
         if (do_search_fwd(&current_search.regex, &bi, false)) {
@@ -219,8 +226,9 @@ static void do_search_next(bool skip)
     } else {
         int cursor_x = block_iter_bol(&bi);
 
-        if (do_search_bwd(&current_search.regex, &bi, cursor_x, skip))
+        if (do_search_bwd(&current_search.regex, &bi, cursor_x, skip)) {
             return;
+        }
 
         block_iter_eof(&bi);
         if (do_search_bwd(&current_search.regex, &bi, -1, false)) {
@@ -259,15 +267,17 @@ static void build_replacement(StringBuffer *buf, const char *line, const char *f
             if (format[i] >= '1' && format[i] <= '9') {
                 int n = format[i++] - '0';
                 int len = m[n].rm_eo - m[n].rm_so;
-                if (len > 0)
+                if (len > 0) {
                     strbuf_add_buf(buf, line + m[n].rm_so, len);
+                }
             } else {
                 strbuf_add_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
             int len = m[0].rm_eo - m[0].rm_so;
-            if (len > 0)
+            if (len > 0) {
                 strbuf_add_buf(buf, line + m[0].rm_so, len);
+            }
         } else {
             strbuf_add_byte(buf, ch);
         }
@@ -334,8 +344,9 @@ static int replace_on_line (
             build_replacement(&b, buf + pos, format, m);
 
             // lineref is invalidated by modification
-            if (buf == lr->line)
+            if (buf == lr->line) {
                 buf = xmemdup(buf, lr->size);
+            }
 
             buffer_replace_bytes(match_len, b.buffer, b.len);
             nr++;
@@ -352,11 +363,13 @@ static int replace_on_line (
         }
         *bi = view->cursor;
 
-        if (!match_len)
+        if (!match_len) {
             break;
+        }
 
-        if (!(flags & REPLACE_GLOBAL))
+        if (!(flags & REPLACE_GLOBAL)) {
             break;
+        }
 
         pos += m[0].rm_so + match_len;
 
@@ -364,8 +377,9 @@ static int replace_on_line (
         eflags = REG_NOTBOL;
     }
 out:
-    if (buf != lr->line)
+    if (buf != lr->line) {
         free(buf);
+    }
     return nr;
 }
 
@@ -379,14 +393,17 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     int nr_lines = 0;
     regex_t re;
 
-    if (flags & REPLACE_IGNORE_CASE)
+    if (flags & REPLACE_IGNORE_CASE) {
         re_flags |= REG_ICASE;
+    }
     if (flags & REPLACE_BASIC) {
-        if (!regexp_compile_basic(&re, pattern, re_flags))
+        if (!regexp_compile_basic(&re, pattern, re_flags)) {
             return;
+        }
     } else {
-        if (!regexp_compile(&re, pattern, re_flags))
+        if (!regexp_compile(&re, pattern, re_flags)) {
             return;
+        }
     }
 
     if (view->selection) {
@@ -405,8 +422,9 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     }
 
     // Record multiple changes as one chain only when replacing all
-    if (!(flags & REPLACE_CONFIRM))
+    if (!(flags & REPLACE_CONFIRM)) {
         begin_change_chain();
+    }
 
     while (1) {
         // Number of bytes to process
@@ -426,17 +444,20 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
             nr_substitutions += nr;
             nr_lines++;
         }
-        if (flags & REPLACE_CANCEL)
+        if (flags & REPLACE_CANCEL) {
             break;
-        if (count + 1 >= nr_bytes)
+        }
+        if (count + 1 >= nr_bytes) {
             break;
+        }
         nr_bytes -= count + 1;
 
         BUG_ON(!block_iter_next_line(&bi));
     }
 
-    if (!(flags & REPLACE_CONFIRM))
+    if (!(flags & REPLACE_CONFIRM)) {
         end_change_chain();
+    }
 
     regfree(&re);
 
@@ -448,8 +469,9 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
 
     if (view->selection) {
         // Undo what init_selection() did
-        if (view->sel_eo)
+        if (view->sel_eo) {
             view->sel_eo--;
+        }
         if (swapped) {
             long tmp = view->sel_so;
             view->sel_so = view->sel_eo;

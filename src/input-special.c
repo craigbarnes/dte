@@ -106,8 +106,9 @@ static void keypress(int key, char *buf, int *count)
         }
         raw_input.value *= raw_input.base;
         raw_input.value += n;
-        if (++raw_input.nr < raw_input.max_chars)
+        if (++raw_input.nr < raw_input.max_chars) {
             return;
+        }
     }
 
     if (input_special == INPUT_SPECIAL_UNICODE && u_is_unicode(raw_input.value)) {
@@ -125,8 +126,9 @@ static void keypress(int key, char *buf, int *count)
 bool special_input_keypress(int key, char *buf, int *count)
 {
     *count = 0;
-    if (input_special == INPUT_SPECIAL_NONE)
+    if (input_special == INPUT_SPECIAL_NONE) {
         return false;
+    }
     keypress(key, buf, count);
     return true;
 }
@@ -137,8 +139,9 @@ bool special_input_misc_status(char *status, size_t status_maxlen)
     const char *str = "";
     char buf[7];
 
-    if (input_special == INPUT_SPECIAL_NONE)
+    if (input_special == INPUT_SPECIAL_NONE) {
         return false;
+    }
 
     if (input_special == INPUT_SPECIAL_UNKNOWN) {
         strncpy(status, "[Insert special]", status_maxlen);
@@ -149,8 +152,9 @@ bool special_input_misc_status(char *status, size_t status_maxlen)
         buf[raw_input.nr - i - 1] = hex_tab[value % raw_input.base];
         value /= raw_input.base;
     }
-    while (i < raw_input.max_chars)
+    while (i < raw_input.max_chars) {
         buf[i++] = ' ';
+    }
     buf[i] = 0;
 
     switch (input_special) {

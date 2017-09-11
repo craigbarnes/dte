@@ -215,15 +215,18 @@ static bool fill_buffer(void)
 {
     int rc;
 
-    if (input_buf_fill == sizeof(input_buf))
+    if (input_buf_fill == sizeof(input_buf)) {
         return false;
+    }
 
-    if (!input_buf_fill)
+    if (!input_buf_fill) {
         input_can_be_truncated = false;
+    }
 
     rc = read(0, input_buf + input_buf_fill, sizeof(input_buf) - input_buf_fill);
-    if (rc <= 0)
+    if (rc <= 0) {
         return false;
+    }
     input_buf_fill += rc;
     return true;
 }
@@ -240,15 +243,17 @@ static bool fill_buffer_timeout(void)
     FD_ZERO(&set);
     FD_SET(0, &set);
     rc = select(1, &set, NULL, NULL, &tv);
-    if (rc > 0 && fill_buffer())
+    if (rc > 0 && fill_buffer()) {
         return true;
+    }
     return false;
 }
 
 static bool input_get_byte(unsigned char *ch)
 {
-    if (!input_buf_fill && !fill_buffer())
+    if (!input_buf_fill && !fill_buffer()) {
         return false;
+    }
     *ch = input_buf[0];
     consume_input(1);
     return true;
@@ -349,10 +354,12 @@ static bool read_simple(int *key)
         }
         u = ch & (bit - 1);
         do {
-            if (!input_get_byte(&ch))
+            if (!input_get_byte(&ch)) {
                 return false;
-            if (ch >> 6 != 2)
+            }
+            if (ch >> 6 != 2) {
                 return false;
+            }
             u = (u << 6) | (ch & 0x3f);
         } while (--count);
         *key = u;
@@ -601,10 +608,12 @@ const char *term_set_color(const struct term_color *color)
         buffer[buffer_pos++] = ';';
         buffer[buffer_pos++] = '8';
     }
-    if (c.fg >= 0)
+    if (c.fg >= 0) {
         buffer_color('3', c.fg);
-    if (c.bg >= 0)
+    }
+    if (c.bg >= 0) {
         buffer_color('4', c.bg);
+    }
     buffer[buffer_pos++] = 'm';
     buffer[buffer_pos++] = 0;
     return buffer;
@@ -612,8 +621,9 @@ const char *term_set_color(const struct term_color *color)
 
 const char *term_move_cursor(int x, int y)
 {
-    if (x < 0 || x >= 999 || y < 0 || y >= 999)
+    if (x < 0 || x >= 999 || y < 0 || y >= 999) {
         return "";
+    }
 
     x++;
     y++;

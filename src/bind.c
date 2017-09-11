@@ -43,8 +43,9 @@ static bool parse_keys(KeyChain *chain, const char *str)
         while (i < len && keys[i] != 0) {
             i++;
         }
-        if (key == keys + i)
+        if (key == keys + i) {
             break;
+        }
 
         if (chain->count >= ARRAY_COUNT(chain->keys)) {
             error_msg("Too many keys.");
@@ -85,8 +86,9 @@ void remove_binding(const char *keys)
     KeyChain chain;
     int i = bindings.count;
 
-    if (!parse_keys(&chain, keys))
+    if (!parse_keys(&chain, keys)) {
         return;
+    }
 
     while (i > 0) {
         Binding *b = bindings.ptrs[--i];
@@ -109,14 +111,17 @@ void handle_binding(int key)
         Binding *b = bindings.ptrs[i - 1];
         KeyChain *c = &b->chain;
 
-        if (c->count < pressed_keys.count)
+        if (c->count < pressed_keys.count) {
             continue;
+        }
 
-        if (memcmp(c->keys, pressed_keys.keys, pressed_keys.count * sizeof(pressed_keys.keys[0])))
+        if (memcmp(c->keys, pressed_keys.keys, pressed_keys.count * sizeof(pressed_keys.keys[0]))) {
             continue;
+        }
 
-        if (c->count > pressed_keys.count)
+        if (c->count > pressed_keys.count) {
             return;
+        }
 
         handle_command(commands, b->command);
         break;

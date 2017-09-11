@@ -13,8 +13,9 @@ static int obuf_avail(void)
 
 static void obuf_need_space(int count)
 {
-    if (obuf_avail() < count)
+    if (obuf_avail() < count) {
         buf_flush();
+    }
 }
 
 void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x)
@@ -45,13 +46,15 @@ void buf_set_bytes(char ch, int count)
 {
     int skip;
 
-    if (obuf.x + count > obuf.scroll_x + obuf.width)
+    if (obuf.x + count > obuf.scroll_x + obuf.width) {
         count = obuf.scroll_x + obuf.width - obuf.x;
+    }
 
     skip = obuf.scroll_x - obuf.x;
     if (skip > 0) {
-        if (skip > count)
+        if (skip > count) {
             skip = count;
+        }
         obuf.x += skip;
         count -= skip;
     }
@@ -62,8 +65,9 @@ void buf_set_bytes(char ch, int count)
 
         obuf_need_space(1);
         avail = obuf_avail();
-        if (n > avail)
+        if (n > avail) {
             n = avail;
+        }
 
         memset(obuf.buf + obuf.count, ch, n);
         obuf.count += n;
@@ -87,21 +91,24 @@ void buf_add_str(const char *str)
 {
     long i = 0;
     while (str[i]) {
-        if (!buf_put_char(u_str_get_char(str, &i)))
+        if (!buf_put_char(u_str_get_char(str, &i))) {
             break;
+        }
     }
 }
 
 void buf_hide_cursor(void)
 {
-    if (term_cap.strings[STR_CAP_CMD_vi])
+    if (term_cap.strings[STR_CAP_CMD_vi]) {
         buf_escape(term_cap.strings[STR_CAP_CMD_vi]);
+    }
 }
 
 void buf_show_cursor(void)
 {
-    if (term_cap.strings[STR_CAP_CMD_ve])
+    if (term_cap.strings[STR_CAP_CMD_ve]) {
         buf_escape(term_cap.strings[STR_CAP_CMD_ve]);
+    }
 }
 
 void buf_move_cursor(int x, int y)
@@ -111,8 +118,9 @@ void buf_move_cursor(int x, int y)
 
 void buf_set_color(const struct term_color *color)
 {
-    if (!memcmp(color, &obuf.color, sizeof(*color)))
+    if (!memcmp(color, &obuf.color, sizeof(*color))) {
         return;
+    }
 
     buf_escape(term_set_color(color));
     obuf.color = *color;
@@ -145,8 +153,9 @@ static void skipped_too_much(unsigned int u)
     obuf_need_space(8);
     if (u == '\t' && obuf.tab != TAB_CONTROL) {
         char ch = ' ';
-        if (obuf.tab == TAB_SPECIAL)
+        if (obuf.tab == TAB_SPECIAL) {
             ch = '-';
+        }
         memset(obuf.buf + obuf.count, ch, n);
         obuf.count += n;
     } else if (u < 0x20) {
@@ -180,8 +189,9 @@ static void buf_skip(unsigned int u)
         obuf.x += u_char_width(u);
     }
 
-    if (obuf.x > obuf.scroll_x)
+    if (obuf.x > obuf.scroll_x) {
         skipped_too_much(u);
+    }
 }
 
 static void print_tab(unsigned int width)
@@ -212,8 +222,9 @@ bool buf_put_char(unsigned int u)
         return true;
     }
 
-    if (!space)
+    if (!space) {
         return false;
+    }
 
     obuf_need_space(8);
     if (likely(u < 0x80)) {
@@ -222,8 +233,9 @@ bool buf_put_char(unsigned int u)
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             width = (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
-            if (width > space)
+            if (width > space) {
                 width = space;
+            }
             print_tab(width);
         } else {
             u_set_ctrl(obuf.buf, &obuf.count, u);

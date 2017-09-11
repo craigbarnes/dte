@@ -19,16 +19,18 @@ static void print_horizontal_tab_title(View *v, int idx)
         idx + 1,
         buffer_modified(v->buffer) ? "+" : ":");
 
-    if (v == v->window->view)
+    if (v == v->window->view) {
         set_builtin_color(BC_ACTIVETAB);
-    else
+    } else {
         set_builtin_color(BC_INACTIVETAB);
+    }
     buf_add_str(buf);
     buf_add_str(filename);
-    if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1)
+    if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1) {
         buf_put_char('>');
-    else
+    } else {
         buf_put_char(' ');
+    }
 }
 
 static void print_horizontal_tabbar(Window *win)
@@ -72,12 +74,14 @@ static void print_vertical_tab_title(View *v, int idx, int width)
         int i, count = 1;
 
         for (i = 0; filename[i]; i++) {
-            if (filename[i] == '/')
+            if (filename[i] == '/') {
                 count++;
+            }
         }
         // Ignore first slash because it does not separate components
-        if (filename[0] == '/')
+        if (filename[0] == '/') {
             count--;
+        }
 
         if (count > max) {
             // Skip possible first slash
@@ -91,8 +95,9 @@ static void print_vertical_tab_title(View *v, int idx, int width)
         }
     } else {
         skip = strlen(buf) + u_str_width(filename) - width + 1;
-        if (skip > 0)
+        if (skip > 0) {
             filename += u_skip_chars(filename, &skip);
+        }
     }
     if (filename != orig_filename) {
         // filename was shortened. Add "<<" symbol.
@@ -101,10 +106,11 @@ static void print_vertical_tab_title(View *v, int idx, int width)
         buf[i] = 0;
     }
 
-    if (v == v->window->view)
+    if (v == v->window->view) {
         set_builtin_color(BC_ACTIVETAB);
-    else
+    } else {
         set_builtin_color(BC_INACTIVETAB);
+    }
     buf_add_str(buf);
     buf_add_str(filename);
     buf_clear_eol();
@@ -128,16 +134,19 @@ static void print_vertical_tabbar(Window *win)
     } else {
         int max_y = win->first_tab_idx + h - 1;
 
-        if (win->first_tab_idx > cur_idx)
+        if (win->first_tab_idx > cur_idx) {
             win->first_tab_idx = cur_idx;
-        if (cur_idx > max_y)
+        }
+        if (cur_idx > max_y) {
             win->first_tab_idx += cur_idx - max_y;
+        }
     }
 
     buf_reset(win->x, width, 0);
     n = h;
-    if (n + win->first_tab_idx > win->views.count)
+    if (n + win->first_tab_idx > win->views.count) {
         n = win->views.count - win->first_tab_idx;
+    }
     for (i = 0; i < n; i++) {
         int idx = win->first_tab_idx + i;
         obuf.x = 0;

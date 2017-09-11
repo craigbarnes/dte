@@ -56,8 +56,9 @@ long ptr_array_idx(PointerArray *array, void *ptr)
     long i;
 
     for (i = 0; i < array->count; i++) {
-        if (array->ptrs[i] == ptr)
+        if (array->ptrs[i] == ptr) {
             return i;
+        }
     }
     return -1;
 }

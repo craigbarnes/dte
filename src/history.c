@@ -10,8 +10,9 @@ PointerArray command_history = PTR_ARRAY_INIT;
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, int max_entries)
 {
-    if (text[0] == 0)
+    if (text[0] == 0) {
         return;
+    }
 
     // Don't add identical entries
     for (int i = 0; i < history->count; i++) {
@@ -60,12 +61,14 @@ void history_load(PointerArray *history, const char *filename, int max_entries)
 
     size = read_file(filename, &buf);
     if (size < 0) {
-        if (errno != ENOENT)
+        if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
+        }
         return;
     }
-    while (pos < size)
+    while (pos < size) {
         history_add(history, buf_next_line(buf, &pos, size), max_entries);
+    }
     free(buf);
 }
 

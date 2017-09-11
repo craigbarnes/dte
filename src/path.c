@@ -9,8 +9,9 @@ static bool make_absolute(char *dst, int size, const char *src)
     int pos = 0;
 
     if (src[0] != '/') {
-        if (!getcwd(dst, size - 1))
+        if (!getcwd(dst, size - 1)) {
             return false;
+        }
         pos = strlen(dst);
         dst[pos++] = '/';
     }
@@ -27,8 +28,9 @@ static int remove_double_slashes(char *str)
     int s, d = 0;
 
     for (s = 0; str[s]; s++) {
-        if (str[s] != '/' || str[s + 1] != '/')
+        if (str[s] != '/' || str[s + 1] != '/') {
             str[d++] = str[s];
+        }
     }
     str[d] = 0;
     return d;
@@ -50,8 +52,9 @@ char *path_absolute(const char *filename)
     char buf[8192];
     char *sp;
 
-    if (!make_absolute(buf, sizeof(buf), filename))
+    if (!make_absolute(buf, sizeof(buf), filename)) {
         return NULL;
+    }
 
     remove_double_slashes(buf);
 
@@ -67,8 +70,9 @@ char *path_absolute(const char *filename)
         bool last = !ep;
         int rc;
 
-        if (ep)
+        if (ep) {
             *ep = 0;
+        }
         if (streq(sp, ".")) {
             if (last) {
                 *sp = 0;
@@ -81,8 +85,9 @@ char *path_absolute(const char *filename)
             if (sp != buf + 1) {
                 // Not first component, remove previous component
                 sp--;
-                while (sp[-1] != '/')
+                while (sp[-1] != '/') {
                     sp--;
+                }
             }
 
             if (last) {
@@ -95,8 +100,9 @@ char *path_absolute(const char *filename)
 
         rc = lstat(buf, &st);
         if (rc) {
-            if (last && errno == ENOENT)
+            if (last && errno == ENOENT) {
                 break;
+            }
             return NULL;
         }
 
@@ -119,8 +125,9 @@ char *path_absolute(const char *filename)
                 return NULL;
             }
             target_len = readlink(buf, target, sizeof(target));
-            if (target_len < 0)
+            if (target_len < 0) {
                 return NULL;
+            }
             if (target_len == sizeof(target)) {
                 errno = ENAMETOOLONG;
                 return NULL;
@@ -128,11 +135,13 @@ char *path_absolute(const char *filename)
             target[target_len] = 0;
 
             // Calculate length
-            if (target[0] != '/')
+            if (target[0] != '/') {
                 total_len = buf_len + 1;
+            }
             total_len += target_len;
-            if (rest)
+            if (rest) {
                 total_len += 1 + rest_len;
+            }
             if (total_len + 1 > sizeof(tmp)) {
                 errno = ENAMETOOLONG;
                 return NULL;
@@ -160,8 +169,9 @@ char *path_absolute(const char *filename)
             continue;
         }
 
-        if (last)
+        if (last) {
             break;
+        }
 
         if (!S_ISDIR(st.st_mode)) {
             errno = ENOTDIR;
@@ -186,14 +196,16 @@ char *relative_filename(const char *f, const char *cwd)
 
     // Annoying special case
     if (cwd[1] == 0) {
-        if (f[1] == 0)
+        if (f[1] == 0) {
             return xstrdup(f);
+        }
         return xstrdup(f + 1);
     }
 
     // Length of common path
-    while (cwd[clen] && cwd[clen] == f[clen])
+    while (cwd[clen] && cwd[clen] == f[clen]) {
         clen++;
+    }
 
     if (!cwd[clen] && f[clen] == '/') {
         // cwd    = /home/user
@@ -204,25 +216,29 @@ char *relative_filename(const char *f, const char *cwd)
 
     // Common path components
     if (!path_component(cwd, clen) || !path_component(f, clen)) {
-        while (clen > 0 && f[clen - 1] != '/')
+        while (clen > 0 && f[clen - 1] != '/') {
             clen--;
+        }
     }
 
     // Number of "../" needed
     dotdot = 1;
     for (i = clen + 1; cwd[i]; i++) {
-        if (cwd[i] == '/')
+        if (cwd[i] == '/') {
             dotdot++;
+        }
     }
-    if (dotdot > 2)
+    if (dotdot > 2) {
         return xstrdup(f);
+    }
 
     tlen = strlen(f + clen);
     len = dotdot * 3 + tlen;
 
     filename = xnew(char, len + 1);
-    for (i = 0; i < dotdot; i++)
+    for (i = 0; i < dotdot; i++) {
         memcpy(filename + i * 3, "../", 3);
+    }
     memcpy(filename + dotdot * 3, f + clen, tlen + 1);
     return filename;
 }
@@ -258,8 +274,9 @@ char *short_filename(const char *absolute)
 {
     char cwd[8192];
 
-    if (getcwd(cwd, sizeof(cwd)))
+    if (getcwd(cwd, sizeof(cwd))) {
         return short_filename_cwd(absolute, cwd);
+    }
     return xstrdup(absolute);
 }
 

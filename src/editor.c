@@ -32,8 +32,9 @@ static void sanity_check(void)
     View *v = window->view;
     Block *blk;
 
-    if (!DEBUG)
+    if (!DEBUG) {
         return;
+    }
 
     list_for_each_entry(blk, &v->buffer->blocks, node) {
         if (blk == v->cursor.blk) {
@@ -54,10 +55,12 @@ void any_key(void)
     int key;
 
     puts("Press any key to continue");
-    while (!term_read_key(&key))
+    while (!term_read_key(&key)) {
         ;
-    if (key == KEY_PASTE)
+    }
+    if (key == KEY_PASTE) {
         term_discard_paste();
+    }
 }
 
 static void show_message(const char *msg, bool is_error)
@@ -98,8 +101,9 @@ static void update_window_full(Window *w)
     view_update_cursor_y(v);
     view_update(v);
     print_tabbar(w);
-    if (options.show_line_numbers)
+    if (options.show_line_numbers) {
         update_line_numbers(w, true);
+    }
     update_range(v, v->vy, v->vy + w->edit_h);
     update_status_line(w);
 }
@@ -155,8 +159,9 @@ static void update_window(Window *w)
     View *v = w->view;
     int y1, y2;
 
-    if (w->update_tabbar)
+    if (w->update_tabbar) {
         print_tabbar(w);
+    }
 
     if (options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
@@ -165,10 +170,12 @@ static void update_window(Window *w)
 
     y1 = v->buffer->changed_line_min;
     y2 = v->buffer->changed_line_max;
-    if (y1 < v->vy)
+    if (y1 < v->vy) {
         y1 = v->vy;
-    if (y2 > v->vy + w->edit_h - 1)
+    }
+    if (y2 > v->vy + w->edit_h - 1) {
         y2 = v->vy + w->edit_h - 1;
+    }
 
     update_range(v, y1, y2 + 1);
     update_status_line(w);
@@ -234,12 +241,14 @@ void ui_end(void)
     buf_show_cursor();
 
     // Back to main buffer
-    if (term_cap.strings[STR_CAP_CMD_te])
+    if (term_cap.strings[STR_CAP_CMD_te]) {
         buf_escape(term_cap.strings[STR_CAP_CMD_te]);
+    }
 
     // Turn keypad off
-    if (term_cap.strings[STR_CAP_CMD_ke])
+    if (term_cap.strings[STR_CAP_CMD_ke]) {
         buf_escape(term_cap.strings[STR_CAP_CMD_ke]);
+    }
 
     buf_flush();
     term_cooked();
@@ -251,8 +260,9 @@ void suspend(void)
         // Session leader can't suspend
         return;
     }
-    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING)
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
         ui_end();
+    }
     kill(0, SIGSTOP);
 }
 
@@ -278,8 +288,9 @@ char get_confirmation(const char *choices, const char *format, ...)
     buf[pos++] = ' ';
     buf[pos++] = '[';
     for (i = 0; i < count; i++) {
-        if (isupper(choices[i]))
+        if (isupper(choices[i])) {
             def = tolower(choices[i]);
+        }
         buf[pos++] = choices[i];
         buf[pos++] = '/';
     }
@@ -319,10 +330,12 @@ char get_confirmation(const char *choices, const char *format, ...)
                 continue;
             }
             key = tolower(key);
-            if (strchr(choices, key))
+            if (strchr(choices, key)) {
                 break;
-            if (key == def)
+            }
+            if (key == def) {
                 break;
+            }
         } else if (editor.resized) {
             resize();
         }
@@ -374,16 +387,18 @@ static void update_screen(ScreenState *s)
             // Always update at least current line.
             buffer_mark_lines_changed(b, s->cy, v->cy);
         }
-        if (s->is_modified != buffer_modified(b))
+        if (s->is_modified != buffer_modified(b)) {
             mark_buffer_tabbars_changed(b);
+        }
     } else {
         window->update_tabbar = true;
         mark_all_lines_changed(b);
     }
 
     start_update();
-    if (window->update_tabbar)
+    if (window->update_tabbar) {
         update_term_title(b);
+    }
     update_buffer_windows(b);
     update_command_line();
     end_update();
@@ -404,10 +419,12 @@ void main_loop(void)
     while (editor.status == EDITOR_RUNNING) {
         int key;
 
-        if (editor.resized)
+        if (editor.resized) {
             resize();
-        if (!term_read_key(&key))
+        }
+        if (!term_read_key(&key)) {
             continue;
+        }
 
         clear_error();
         if (editor.input_mode == INPUT_GIT_OPEN) {

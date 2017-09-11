@@ -15,14 +15,16 @@ static int parse_excmd(Tag *t, const char *buf, int size)
         for (int i = 1; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {
                 i++;
-                if (buf[i] == '\\')
+                if (buf[i] == '\\') {
                     pattern[j++] = '\\';
+                }
                 pattern[j++] = buf[i];
                 continue;
             }
             if (buf[i] == ch) {
-                if (i + 2 < size && buf[i + 1] == ';' && buf[i + 2] == '"')
+                if (i + 2 < size && buf[i + 1] == ';' && buf[i + 2] == '"') {
                     i += 2;
+                }
                 pattern[j] = 0;
                 t->pattern = pattern;
                 return i + 1;

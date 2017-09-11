@@ -53,8 +53,9 @@ void load_file_history(void)
 
     size = read_file(filename, &buf);
     if (size < 0) {
-        if (errno != ENOENT)
+        if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
+        }
         free(filename);
         return;
     }
@@ -62,14 +63,18 @@ void load_file_history(void)
         const char *line = buf_next_line(buf, &pos, size);
         long row, col;
 
-        if (!parse_long(&line, &row) || row <= 0)
+        if (!parse_long(&line, &row) || row <= 0) {
             continue;
-        while (isspace(*line))
+        }
+        while (isspace(*line)) {
             line++;
-        if (!parse_long(&line, &col) || col <= 0)
+        }
+        if (!parse_long(&line, &col) || col <= 0) {
             continue;
-        while (isspace(*line))
+        }
+        while (isspace(*line)) {
             line++;
+        }
         add_file_history(row, col, line);
     }
     free(buf);

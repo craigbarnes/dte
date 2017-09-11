@@ -29,8 +29,9 @@ static int rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
             pid *= 10;
             pid += buf[pos++] - '0';
         }
-        while (pos < size && (buf[pos] == ' ' || buf[pos] == '\t'))
+        while (pos < size && (buf[pos] == ' ' || buf[pos] == '\t')) {
             pos++;
+        }
         nl = memchr(buf + pos, '\n', size - pos);
         next_bol = nl - buf + 1;
 
@@ -73,13 +74,15 @@ static int lock_or_unlock(const char *filename, bool lock)
         file_locks = editor_file("file-locks");
         file_locks_lock = editor_file("file-locks.lock");
     }
-    if (streq(filename, file_locks) || streq(filename, file_locks_lock))
+    if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
         return 0;
+    }
 
     while (1) {
         wfd = open(file_locks_lock, O_WRONLY | O_CREAT | O_EXCL, 0666);
-        if (wfd >= 0)
+        if (wfd >= 0) {
             break;
+        }
 
         if (errno != EEXIST) {
             error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));

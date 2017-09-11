@@ -172,15 +172,17 @@ static void fix_cursors(long offset, long del, long ins)
 
 static void reverse_change(Change *change)
 {
-    if (buffer->views.count > 1)
+    if (buffer->views.count > 1) {
         fix_cursors(change->offset, change->ins_count, change->del_count);
+    }
 
     block_iter_goto_offset(&view->cursor, change->offset);
     if (!change->ins_count) {
         // Convert delete to insert
         do_insert(change->buf, change->del_count);
-        if (change->move_after)
+        if (change->move_after) {
             block_iter_skip_bytes(&view->cursor, change->del_count);
+        }
         change->ins_count = change->del_count;
         change->del_count = 0;
         free(change->buf);
@@ -208,21 +210,24 @@ bool undo(void)
     Change *change = buffer->cur_change;
 
     view_reset_preferred_x(view);
-    if (!change->next)
+    if (!change->next) {
         return false;
+    }
 
     if (is_change_chain_barrier(change)) {
         int count = 0;
 
         while (1) {
             change = change->next;
-            if (is_change_chain_barrier(change))
+            if (is_change_chain_barrier(change)) {
                 break;
+            }
             reverse_change(change);
             count++;
         }
-        if (count > 1)
+        if (count > 1) {
             info_msg("Undid %d changes.", count);
+        }
     } else {
         reverse_change(change);
     }
@@ -237,8 +242,9 @@ bool redo(unsigned int change_id)
     view_reset_preferred_x(view);
     if (!change->prev) {
         // Don't complain if change_id is 0
-        if (change_id)
+        if (change_id) {
             error_msg("Nothing to redo.");
+        }
         return false;
     }
 
@@ -250,8 +256,9 @@ bool redo(unsigned int change_id)
     } else {
         // Default to newest change
         change_id = change->nr_prev - 1;
-        if (change->nr_prev > 1)
+        if (change->nr_prev > 1) {
             info_msg("Redoing newest (%d) of %d possible changes.", change_id + 1, change->nr_prev);
+        }
     }
 
     change = change->prev[change_id];
@@ -260,13 +267,15 @@ bool redo(unsigned int change_id)
 
         while (1) {
             change = change->prev[change->nr_prev - 1];
-            if (is_change_chain_barrier(change))
+            if (is_change_chain_barrier(change)) {
                 break;
+            }
             reverse_change(change);
             count++;
         }
-        if (count > 1)
+        if (count > 1) {
             info_msg("Redid %d changes.", count);
+        }
     } else {
         reverse_change(change);
     }
@@ -277,8 +286,9 @@ bool redo(unsigned int change_id)
 void free_changes(Change *ch)
 {
 top:
-    while (ch->nr_prev)
+    while (ch->nr_prev) {
         ch = ch->prev[ch->nr_prev - 1];
+    }
 
     // ch is leaf now
     while (ch->next) {
@@ -288,8 +298,9 @@ top:
         free(ch);
 
         ch = next;
-        if (--ch->nr_prev)
+        if (--ch->nr_prev) {
             goto top;
+        }
 
         // We have become leaf
         free(ch->prev);
@@ -301,8 +312,9 @@ void buffer_insert_bytes(const char *buf, long len)
     long rec_len = len;
 
     view_reset_preferred_x(view);
-    if (len == 0)
+    if (len == 0) {
         return;
+    }
 
     if (buf[len - 1] != '\n' && block_iter_is_eof(&view->cursor)) {
         // Force newline at EOF
@@ -313,8 +325,9 @@ void buffer_insert_bytes(const char *buf, long len)
     do_insert(buf, len);
     record_insert(rec_len);
 
-    if (buffer->views.count > 1)
+    if (buffer->views.count > 1) {
         fix_cursors(block_iter_get_offset(&view->cursor), len, 0);
+    }
 }
 
 static bool would_delete_last_bytes(long count)
@@ -325,11 +338,13 @@ static bool would_delete_last_bytes(long count)
     while (1) {
         long avail = blk->size - offset;
 
-        if (avail > count)
+        if (avail > count) {
             return false;
+        }
 
-        if (blk->node.next == view->cursor.head)
+        if (blk->node.next == view->cursor.head) {
             return true;
+        }
 
         count -= avail;
         blk = BLOCK(blk->node.next);
@@ -340,8 +355,9 @@ static bool would_delete_last_bytes(long count)
 static void buffer_delete_bytes_internal(long len, bool move_after)
 {
     view_reset_preferred_x(view);
-    if (len == 0)
+    if (len == 0) {
         return;
+    }
 
     // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(len)) {
@@ -358,8 +374,9 @@ static void buffer_delete_bytes_internal(long len, bool move_after)
     }
     record_delete(do_delete(len), len, move_after);
 
-    if (buffer->views.count > 1)
+    if (buffer->views.count > 1) {
         fix_cursors(block_iter_get_offset(&view->cursor), len, 0);
+    }
 }
 
 void buffer_delete_bytes(long len)
@@ -400,6 +417,7 @@ void buffer_replace_bytes(long del_count, const char *inserted, long ins_count)
     deleted = do_replace(del_count, inserted, ins_count);
     record_replace(deleted, del_count, ins_count);
 
-    if (buffer->views.count > 1)
+    if (buffer->views.count > 1) {
         fix_cursors(block_iter_get_offset(&view->cursor), del_count, ins_count);
+    }
 }

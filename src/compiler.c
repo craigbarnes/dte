@@ -8,8 +8,9 @@ static Compiler *add_compiler(const char *name)
 {
     Compiler *c = find_compiler(name);
 
-    if (c)
+    if (c) {
         return c;
+    }
 
     c = xnew0(Compiler, 1);
     c->name = xstrdup(name);
@@ -21,8 +22,9 @@ Compiler *find_compiler(const char *name)
 {
     for (int i = 0; i < compilers.count; i++) {
         Compiler *c = compilers.ptrs[i];
-        if (streq(c->name, name))
+        if (streq(c->name, name)) {
             return c;
+        }
     }
     return NULL;
 }

@@ -3,18 +3,23 @@
 
 static inline int u_seq_len(unsigned int first_byte)
 {
-    if (first_byte < 0x80)
+    if (first_byte < 0x80) {
         return 1;
-    if (first_byte < 0xc0)
+    }
+    if (first_byte < 0xc0) {
         return 0;
-    if (first_byte < 0xe0)
+    }
+    if (first_byte < 0xe0) {
         return 2;
-    if (first_byte < 0xf0)
+    }
+    if (first_byte < 0xf0) {
         return 3;
+    }
 
     // Could be 0xf8 but RFC 3629 doesn't allow codepoints above 0x10ffff
-    if (first_byte < 0xf5)
+    if (first_byte < 0xf5) {
         return 4;
+    }
     return -1;
 }
 
@@ -47,8 +52,9 @@ unsigned int u_str_width(const unsigned char *str)
 {
     long i = 0, w = 0;
 
-    while (str[i])
+    while (str[i]) {
         w += u_char_width(u_str_get_char(str, &i));
+    }
     return w;
 }
 
@@ -64,8 +70,9 @@ unsigned int u_prev_char(const unsigned char *buf, long *idx)
         return u;
     }
 
-    if (!u_is_continuation(u))
+    if (!u_is_continuation(u)) {
         goto invalid;
+    }
 
     u &= 0x3f;
     count = 1;
@@ -87,8 +94,9 @@ unsigned int u_prev_char(const unsigned char *buf, long *idx)
             break;
         } else {
             u |= (ch & u_get_first_byte_mask(len)) << shift;
-            if (!u_seq_len_ok(u, len))
+            if (!u_seq_len_ok(u, len)) {
                 break;
+            }
 
             *idx = i;
             return u;
@@ -132,20 +140,23 @@ unsigned int u_get_nonascii(const unsigned char *buf, long size, long *idx)
 
     first = buf[i++];
     len = u_seq_len(first);
-    if (unlikely(len < 2 || len > size - i + 1))
+    if (unlikely(len < 2 || len > size - i + 1)) {
         goto invalid;
+    }
 
     u = first & u_get_first_byte_mask(len);
     c = len - 1;
     do {
         unsigned int ch = buf[i++];
-        if (!u_is_continuation(ch))
+        if (!u_is_continuation(ch)) {
             goto invalid;
+        }
         u = (u << 6) | (ch & 0x3f);
     } while (--c);
 
-    if (!u_seq_len_ok(u, len))
+    if (!u_seq_len_ok(u, len)) {
         goto invalid;
+    }
 
     *idx = i;
     return u;
@@ -251,8 +262,9 @@ unsigned int u_skip_chars(const char *str, int *width)
     int w = *width;
     long idx = 0;
 
-    while (str[idx] && w > 0)
+    while (str[idx] && w > 0) {
         w -= u_char_width(u_str_get_char(str, &idx));
+    }
 
     // Add 1..3 if skipped 'too much' (the last char was double width or invalid (<xx>))
     *width -= w;
@@ -267,8 +279,9 @@ static bool has_prefix(const char *str, const char *prefix_lcase)
 
     while ((pc = u_str_get_char(prefix_lcase, &ni))) {
         sc = u_str_get_char(str, &hi);
-        if (sc != pc && u_to_lower(sc) != pc)
+        if (sc != pc && u_to_lower(sc) != pc) {
             return false;
+        }
     }
     return true;
 }
@@ -279,14 +292,16 @@ int u_str_index(const char *haystack, const char *needle_lcase)
     long ni = 0;
     unsigned int nc = u_str_get_char(needle_lcase, &ni);
 
-    if (!nc)
+    if (!nc) {
         return 0;
+    }
 
     while (haystack[hi]) {
         long prev = hi;
         unsigned int hc = u_str_get_char(haystack, &hi);
-        if ((hc == nc || u_to_lower(hc) == nc) && has_prefix(haystack + hi, needle_lcase + ni))
+        if ((hc == nc || u_to_lower(hc) == nc) && has_prefix(haystack + hi, needle_lcase + ni)) {
             return prev;
+        }
     }
     return -1;
 }

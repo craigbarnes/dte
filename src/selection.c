@@ -22,8 +22,9 @@ void init_selection(View *v, SelectionInfo *info)
     ei = info->si;
     block_iter_skip_bytes(&ei, info->eo - info->so);
     if (block_iter_is_eof(&ei)) {
-        if (info->so == info->eo)
+        if (info->so == info->eo) {
             return;
+        }
         info->eo -= buffer_prev_char(&ei, &u);
     }
     if (v->selection == SELECT_LINES) {
@@ -65,8 +66,9 @@ int get_nr_selected_lines(SelectionInfo *info)
     int nr_lines = 1;
 
     while (pos < info->eo) {
-        if (u == '\n')
+        if (u == '\n') {
             nr_lines++;
+        }
         pos += buffer_next_char(&bi, &u);
     }
     return nr_lines;

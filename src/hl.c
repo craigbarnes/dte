@@ -29,11 +29,13 @@ static int bitmap_get(const unsigned char *bitmap, unsigned int idx)
 
 static bool is_buffered(const Condition *cond, const char *str, int len)
 {
-    if (len != cond->u.cond_bufis.len)
+    if (len != cond->u.cond_bufis.len) {
         return false;
+    }
 
-    if (cond->u.cond_bufis.icase)
+    if (cond->u.cond_bufis.icase) {
         return !strncasecmp(cond->u.cond_bufis.str, str, len);
+    }
     return !memcmp(cond->u.cond_bufis.str, str, len);
 }
 
@@ -44,14 +46,16 @@ static bool in_hash(StringList *list, const char *str, size_t len)
 
     if (list->icase) {
         while (h) {
-            if (len == h->len && !strncasecmp(str, h->str, len))
+            if (len == h->len && !strncasecmp(str, h->str, len)) {
                 return true;
+            }
             h = h->next;
         }
     } else {
         while (h) {
-            if (len == h->len && !memcmp(str, h->str, len))
+            if (len == h->len && !memcmp(str, h->str, len)) {
                 return true;
+            }
             h = h->next;
         }
     }
@@ -65,8 +69,9 @@ static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int l
 
     for (int i = 0; i < state->heredoc.states.count; i++) {
         s = state->heredoc.states.ptrs[i];
-        if (s->len == len && !memcmp(s->delim, delim, len))
+        if (s->len == len && !memcmp(s->delim, delim, len)) {
             return s->state;
+        }
     }
 
     m.subsyn = state->heredoc.subsyntax;
@@ -100,34 +105,39 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
         unsigned char ch;
         int ci;
     top:
-        if (i == len)
+        if (i == len) {
             break;
+        }
         ch = line[i];
         for (ci = 0; ci < state->conds.count; ci++) {
             cond = state->conds.ptrs[ci];
             a = &cond->a;
             switch (cond->type) {
             case COND_CHAR_BUFFER:
-                if (!bitmap_get(cond->u.cond_char.bitmap, ch))
+                if (!bitmap_get(cond->u.cond_char.bitmap, ch)) {
                     break;
-                if (sidx < 0)
+                }
+                if (sidx < 0) {
                     sidx = i;
+                }
                 colors[i++] = a->emit_color;
                 state = a->destination;
                 goto top;
             case COND_BUFIS:
                 if (sidx >= 0 && is_buffered(cond, line + sidx, i - sidx)) {
                     int idx;
-                    for (idx = sidx; idx < i; idx++)
+                    for (idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
+                    }
                     sidx = -1;
                     state = a->destination;
                     goto top;
                 }
                 break;
             case COND_CHAR:
-                if (!bitmap_get(cond->u.cond_char.bitmap, ch))
+                if (!bitmap_get(cond->u.cond_char.bitmap, ch)) {
                     break;
+                }
                 colors[i++] = a->emit_color;
                 sidx = -1;
                 state = a->destination;
@@ -135,8 +145,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
             case COND_INLIST:
                 if (sidx >= 0 && in_hash(cond->u.cond_inlist.list, line + sidx, i - sidx)) {
                     int idx;
-                    for (idx = sidx; idx < i; idx++)
+                    for (idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
+                    }
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -144,15 +155,18 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 break;
             case COND_RECOLOR: {
                 int idx = i - cond->u.cond_recolor.len;
-                if (idx < 0)
+                if (idx < 0) {
                     idx = 0;
-                while (idx < i)
+                }
+                while (idx < i) {
                     colors[idx++] = a->emit_color;
+                }
                 } break;
             case COND_RECOLOR_BUFFER:
                 if (sidx >= 0) {
-                    while (sidx < i)
+                    while (sidx < i) {
                         colors[sidx++] = a->emit_color;
+                    }
                     sidx = -1;
                 }
                 break;
@@ -160,8 +174,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 int slen = cond->u.cond_str.len;
                 int end = i + slen;
                 if (len >= end && !memcmp(cond->u.cond_str.str, line + i, slen)) {
-                    while (i < end)
+                    while (i < end) {
                         colors[i++] = a->emit_color;
+                    }
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -171,8 +186,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 int slen = cond->u.cond_str.len;
                 int end = i + slen;
                 if (len >= end && !strncasecmp(cond->u.cond_str.str, line + i, slen)) {
-                    while (i < end)
+                    while (i < end) {
                         colors[i++] = a->emit_color;
+                    }
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -194,8 +210,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 int slen = cond->u.cond_heredocend.len;
                 int end = i + slen;
                 if (len >= end && (slen == 0 || !memcmp(str, line + i, slen))) {
-                    while (i < end)
+                    while (i < end) {
                         colors[i++] = a->emit_color;
+                    }
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -216,8 +233,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
             state = a->destination;
             break;
         case STATE_HEREDOCBEGIN:
-            if (sidx < 0)
+            if (sidx < 0) {
                 sidx = i;
+            }
             state = handle_heredoc(syn, state, line + sidx, i - sidx);
             break;
         case STATE_INVALID:
@@ -226,8 +244,9 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
         }
     }
 
-    if (ret)
+    if (ret) {
         *ret = state;
+    }
     return colors;
 }
 
@@ -246,8 +265,9 @@ static void move_line_states(PointerArray *s, int to, int from, int count)
 
 static void block_iter_move_down(BlockIter *bi, int count)
 {
-    while (count--)
+    while (count--) {
         block_iter_eat_line(bi);
+    }
 }
 
 static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
@@ -274,8 +294,9 @@ static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
         } else {
             // Invalidated or not but changed anyway
             ptrs[idx] = st;
-            if (idx == eidx)
+            if (idx == eidx) {
                 mark_state_invalid(ptrs, idx + 1);
+            }
         }
     }
     return idx - sidx;
@@ -290,8 +311,9 @@ void hl_fill_start_states(Buffer *b, int line_nr)
     int idx = 0;
     int last;
 
-    if (b->syn == NULL)
+    if (b->syn == NULL) {
         return;
+    }
 
     // NOTE: "+ 2" so that you don't have to worry about overflow in fill_hole()
     resize_line_states(s, line_nr + 2);
@@ -299,15 +321,18 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 
     // Update invalid
     last = line_nr;
-    if (last >= s->count)
+    if (last >= s->count) {
         last = s->count - 1;
+    }
     while (1) {
         int count;
 
-        while (idx <= last && state_is_valid(states[idx]))
+        while (idx <= last && state_is_valid(states[idx])) {
             idx++;
-        if (idx > last)
+        }
+        if (idx > last) {
             break;
+        }
 
         // Go to line before first hole
         idx--;
@@ -339,8 +364,9 @@ HlColor **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_c
     State *next;
 
     *next_changed = 0;
-    if (b->syn == NULL)
+    if (b->syn == NULL) {
         return NULL;
+    }
 
     BUG_ON(line_nr >= s->count);
     colors = highlight_line(b->syn, s->ptrs[line_nr++], line, len, &next);
@@ -359,8 +385,9 @@ HlColor **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_c
         // Invalidated or not but changed anyway
         s->ptrs[line_nr] = next;
         *next_changed = 1;
-        if (line_nr + 1 < s->count)
+        if (line_nr + 1 < s->count) {
             mark_state_invalid(s->ptrs, line_nr + 1);
+        }
     }
     return colors;
 }
@@ -393,8 +420,9 @@ void hl_insert(Buffer *b, int first, int lines)
     }
 
     // Invalidate start states of new and changed lines
-    for (i = first + 1; i <= last + 1; i++)
+    for (i = first + 1; i <= last + 1; i++) {
         mark_state_invalid(s->ptrs, i);
+    }
 }
 
 // Called after text has been deleted to re-highlight changed lines
@@ -403,8 +431,9 @@ void hl_delete(Buffer *b, int first, int deleted_nl)
     PointerArray *s = &b->line_start_states;
     int last = first + deleted_nl;
 
-    if (s->count == 1)
+    if (s->count == 1) {
         return;
+    }
 
     if (first >= s->count) {
         // Nothing to highlight

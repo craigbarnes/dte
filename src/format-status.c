@@ -10,8 +10,9 @@ static void add_ch(Formatter *f, char ch)
 
 static void add_separator(Formatter *f)
 {
-    if (f->separator && f->pos < f->size)
+    if (f->separator && f->pos < f->size) {
         add_ch(f, ' ');
+    }
     f->separator = false;
 }
 
@@ -19,12 +20,14 @@ static void add_status_str(Formatter *f, const char *str)
 {
     long idx = 0;
 
-    if (!*str)
+    if (!*str) {
         return;
+    }
 
     add_separator(f);
-    while (f->pos < f->size && str[idx])
+    while (f->pos < f->size && str[idx]) {
         u_set_char(f->buf, &f->pos, u_str_get_char(str, &idx));
+    }
 }
 
 FORMAT(2)
@@ -46,10 +49,11 @@ static void add_status_pos(Formatter *f)
     int pos = f->win->view->vy;
 
     if (lines <= h) {
-        if (pos)
+        if (pos) {
             add_status_str(f, "Bot");
-        else
+        } else {
             add_status_str(f, "All");
+        }
     } else if (pos == 0) {
         add_status_str(f, "Top");
     } else if (pos + h - 1 >= lines) {
@@ -90,12 +94,14 @@ void sf_format(Formatter *f, char *buf, long size, const char *format)
                 add_status_str(f, buffer_filename(v->buffer));
                 break;
             case 'm':
-                if (buffer_modified(v->buffer))
+                if (buffer_modified(v->buffer)) {
                     add_status_str(f, "*");
+                }
                 break;
             case 'r':
-                if (v->buffer->ro)
+                if (v->buffer->ro) {
                     add_status_str(f, "RO");
+                }
                 break;
             case 'y':
                 add_status_format(f, "%d", v->cy + 1);
@@ -108,8 +114,9 @@ void sf_format(Formatter *f, char *buf, long size, const char *format)
                 break;
             case 'X':
                 add_status_format(f, "%d", v->cx_char + 1);
-                if (v->cx_display != v->cx_char)
+                if (v->cx_display != v->cx_char) {
                     add_status_format(f, "-%d", v->cx_display + 1);
+                }
                 break;
             case 'p':
                 add_status_pos(f);
@@ -118,8 +125,9 @@ void sf_format(Formatter *f, char *buf, long size, const char *format)
                 add_status_str(f, v->buffer->encoding);
                 break;
             case 'M': {
-                if (f->misc_status != NULL)
+                if (f->misc_status != NULL) {
                     add_status_str(f, f->misc_status);
+                }
                 break;
             }
             case 'n':

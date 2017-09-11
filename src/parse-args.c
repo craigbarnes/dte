@@ -35,8 +35,9 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
             break;
         }
         if (arg[0] != '-' || !arg[1]) {
-            if (!flags_after_arg)
+            if (!flags_after_arg) {
                 break;
+            }
             i++;
             continue;
         }
@@ -55,8 +56,9 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
                 error_msg("Too many options given.");
                 return NULL;
             }
-            if (flagp[1] != '=')
+            if (flagp[1] != '=') {
                 continue;
+            }
 
             if (j > 1 || arg[j + 1]) {
                 error_msg("Flag -%c must be given separately because it requires an argument.", flag);

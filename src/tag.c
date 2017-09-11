@@ -11,14 +11,17 @@ static int visibility_cmp(const Tag *a, const Tag *b)
     bool a_this_file = false;
     bool b_this_file = false;
 
-    if (!a->local && !b->local)
+    if (!a->local && !b->local) {
         return 0;
+    }
 
     // Is tag visibility limited to the current file?
-    if (a->local)
+    if (a->local) {
         a_this_file = current_filename && streq(current_filename, a->filename);
-    if (b->local)
+    }
+    if (b->local) {
         b_this_file = current_filename && streq(current_filename, b->filename);
+    }
 
     // Tags local to other file than current are not interesting.
     if (a->local && !a_this_file) {
@@ -38,8 +41,9 @@ static int visibility_cmp(const Tag *a, const Tag *b)
     // Both are NOT UNinteresting
 
     if (a->local && a_this_file) {
-        if (b->local && b_this_file)
+        if (b->local && b_this_file) {
             return 0;
+        }
         // a is more interesting bacause it is local symbol
         return -1;
     }
@@ -52,20 +56,25 @@ static int visibility_cmp(const Tag *a, const Tag *b)
 
 static int kind_cmp(const Tag *a, const Tag *b)
 {
-    if (a->kind == b->kind)
+    if (a->kind == b->kind) {
         return 0;
+    }
 
     // Struct member (m) is not very interesting.
-    if (a->kind == 'm')
+    if (a->kind == 'm') {
         return 1;
-    if (b->kind == 'm')
+    }
+    if (b->kind == 'm') {
         return -1;
+    }
 
     // Global variable (v) is not very interesting.
-    if (a->kind == 'v')
+    if (a->kind == 'v') {
         return 1;
-    if (b->kind == 'v')
+    }
+    if (b->kind == 'v') {
         return -1;
+    }
 
     // Struct (s), union (u)
     return 0;
@@ -78,8 +87,9 @@ static int tag_cmp(const void *ap, const void *bp)
     int ret;
 
     ret = visibility_cmp(a, b);
-    if (ret)
+    if (ret) {
         return ret;
+    }
 
     return kind_cmp(a, b);
 }

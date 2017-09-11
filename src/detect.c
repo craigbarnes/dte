@@ -3,8 +3,9 @@
 
 static bool next_line(BlockIter *bi, LineRef *lr)
 {
-    if (!block_iter_eat_line(bi))
+    if (!block_iter_eat_line(bi)) {
         return false;
+    }
     fill_line_ref(bi, lr);
     return true;
 }
@@ -22,25 +23,29 @@ char *detect_interpreter(Buffer *b)
     char *ret;
 
     fill_line_ref(&bi, &lr);
-    if (!regexp_match("^#!\\s*/.*(/env\\s+|/)([a-zA-Z_-]+)[0-9.]*(\\s|$)", lr.line, lr.size, &m))
+    if (!regexp_match("^#!\\s*/.*(/env\\s+|/)([a-zA-Z_-]+)[0-9.]*(\\s|$)", lr.line, lr.size, &m)) {
         return NULL;
+    }
 
     ret = xstrdup(m.ptrs[2]);
     ptr_array_free(&m);
 
-    if (!streq(ret, "sh"))
+    if (!streq(ret, "sh")) {
         return ret;
+    }
 
     /*
      * #!/bin/sh
      * # the next line restarts using wish \
      * exec wish "$0" "$@"
      */
-    if (!next_line(&bi, &lr) || !regexp_match_nosub("^#.*\\\\$", lr.line, lr.size))
+    if (!next_line(&bi, &lr) || !regexp_match_nosub("^#.*\\\\$", lr.line, lr.size)) {
         return ret;
+    }
 
-    if (!next_line(&bi, &lr) || !regexp_match_nosub("^exec\\s+wish\\s+", lr.line, lr.size))
+    if (!next_line(&bi, &lr) || !regexp_match_nosub("^exec\\s+wish\\s+", lr.line, lr.size)) {
         return ret;
+    }
 
     free(ret);
     return xstrdup("wish");

@@ -28,11 +28,14 @@ unsigned char sane_ctype[256] = {
 
 int hex_decode(int ch)
 {
-    if (sane_istest(ch, CTYPE_DIGIT))
+    if (sane_istest(ch, CTYPE_DIGIT)) {
         return ch - '0';
-    if (sane_istest(ch, CTYPE_HEX_LOWER))
+    }
+    if (sane_istest(ch, CTYPE_HEX_LOWER)) {
         return ch - 'a' + 10;
-    if (sane_istest(ch, CTYPE_HEX_UPPER))
+    }
+    if (sane_istest(ch, CTYPE_HEX_UPPER)) {
         return ch - 'A' + 10;
+    }
     return -1;
 }
