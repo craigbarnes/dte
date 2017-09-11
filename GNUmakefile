@@ -23,7 +23,7 @@ compiler:= $(addprefix share/compiler/, gcc go)
 config := $(addprefix share/, filetype option rc)
 syntax := $(addprefix share/syntax/, $(syntax_files))
 
-all: $(dte) test man
+all: $(dte) man
 
 install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(bindir)

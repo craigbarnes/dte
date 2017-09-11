@@ -1,8 +1,5 @@
 /dte
-/test
-/src/*.o
-/src/bindings.inc
-/.depfiles/
+/build/
 /.VARS
 /.CFLAGS
 /Documentation/ttman

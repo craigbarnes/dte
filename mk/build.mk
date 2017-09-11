@@ -30,7 +30,7 @@ CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 # 3: Enable expensive sanity checks.
 DEBUG = 1
 
-BASIC_CFLAGS += -std=gnu99 -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
 
 ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
   # Make "-s" flag was used (silent build)
@@ -46,8 +46,7 @@ else
   E = @printf ' %7s  %s\n'
 endif
 
-
-editor_objects := $(addprefix src/, $(addsuffix .o, \
+editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block buffer-iter buffer cconv change cmdline color \
     command-mode commands common compiler completion config ctags ctype \
     cursed decoder detect edit editor encoder encoding env error \
@@ -59,7 +58,7 @@ editor_objects := $(addprefix src/, $(addsuffix .o, \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
 
-test_objects := src/test-main.o
+test_objects := build/test-main.o
 OBJECTS := $(editor_objects) $(test_objects)
 
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
@@ -91,30 +90,24 @@ endif
 
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-  dep_dir = .depfiles/
-  dep_files = $(addprefix $(dep_dir), $(addsuffix .mk, $(notdir $(OBJECTS))))
-  $(OBJECTS): BASIC_CFLAGS += -MF $(dep_dir)$(@F).mk -MMD -MP
-  $(OBJECTS): | $(dep_dir)
-  $(dep_dir):; @mkdir -p $@
-  CLEANDIRS += $(dep_dir)
-  .SECONDARY: $(dep_dir)
-  -include $(dep_files)
+  $(OBJECTS): BASIC_CFLAGS += -MF build/$(@F).mk -MMD -MP
+  -include $(addprefix build/, $(addsuffix .mk, $(notdir $(OBJECTS))))
 endif
 endif
 
 dte = dte$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
-test: $(filter-out src/main.o, $(editor_objects)) $(test_objects)
-src/main.o: src/bindings.inc
-src/editor.o: .VARS
-src/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
+build/test: $(filter-out build/main.o, $(editor_objects)) $(test_objects)
+build/main.o: build/bindings.inc
+build/editor.o: .VARS
+build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 
-$(dte) test:
+$(dte) build/test:
 	$(E) LINK $@
 	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
-$(OBJECTS): src/%.o: src/%.c .CFLAGS
+$(OBJECTS): build/%.o: src/%.c .CFLAGS | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
@@ -124,11 +117,16 @@ $(OBJECTS): src/%.o: src/%.c .CFLAGS
 .VARS: FORCE
 	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
-src/bindings.inc: share/binding/builtin mk/rc2c.sed
+build/bindings.inc: share/binding/builtin mk/rc2c.sed | build/
 	$(E) GEN $@
 	$(Q) echo 'static const char *builtin_bindings =' > $@
 	$(Q) $(SED) -f mk/rc2c.sed $< >> $@
 
+build/:
+	@mkdir -p $@
 
-CLEANFILES += $(dte) test $(OBJECTS) src/bindings.inc .VARS .CFLAGS
+
+CLEANFILES += $(dte) .VARS .CFLAGS
+CLEANDIRS += build/
 .PHONY: FORCE
+.SECONDARY: build/
