@@ -1,9 +1,9 @@
 /dte
+/dte.1
+/dte-syntax.5
 /build/
 /.VARS
 /.CFLAGS
-/Documentation/ttman
-/Documentation/*.[15o]
 /Config.mk
 /public/
 /dte-*.tar.gz
