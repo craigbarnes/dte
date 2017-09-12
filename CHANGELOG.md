@@ -51,6 +51,7 @@ Released on 2017-07-30.
 
 * Unicode 10 rendering support.
 * Various build system fixes.
+* Coding style fixes.
 
 Git diff: [v1.1...v1.2](https://github.com/craigbarnes/dte/compare/v1.1...v1.2)
 
@@ -65,6 +66,21 @@ v1.1
 Released on 2017-07-29.
 
 **Changes:**
+
+* Renamed project from "dex" to "dte".
+* Changed default key bindings to be more like most GUI applications.
+* Added `-n` flag to `delete-eol` command, to enable deleting newlines
+  if the cursor is at the of the line.
+* Added `-p` flag to `save` command, to open a prompt if the current
+  buffer has no existing filename.
+* Added `inc-end` and `inc-home` commands that move the cursor
+  incrementally to the end/beginning of the line/screen/file.
+* Added a command-line option to jump to a specific line number after
+  opening a file.
+* Added syntax highlighting for `ini`, `robots.txt` and `Dockerfile`
+  languages.
+* Fixed a compilation error on OpenBSD.
+* Replaced quirky command-line option parser with POSIX `getopt(3)`.
 
 Git diff: [v1.0...v1.1](https://github.com/craigbarnes/dte/compare/v1.0...v1.1)
 
