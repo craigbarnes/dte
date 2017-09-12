@@ -39,6 +39,7 @@ Released on 2017-08-27.
 
 * [dte-1.3.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz)
 * [dte-1.3.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz.sig)
+* [dte-1.3.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz.sha256sum)
 
 v1.2
 ----
@@ -55,6 +56,7 @@ Released on 2017-07-30.
 
 * [dte-1.2.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz)
 * [dte-1.2.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz.sig)
+* [dte-1.2.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz.sha256sum)
 
 v1.1
 ----
@@ -82,6 +84,7 @@ Released on 2017-07-29.
 
 * [dte-1.1.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz)
 * [dte-1.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sig)
+* [dte-1.1.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sha256sum)
 
 
 [dex]: https://github.com/tihirvon/dex
