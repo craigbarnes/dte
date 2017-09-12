@@ -35,8 +35,6 @@ Released on 2017-08-27.
 * Renamed `dte-syntax.7` man page to `dte-syntax.5` (users with an
   existing installation may want to manually delete `dte-syntax.7`).
 
-Git diff: [v1.2...v1.3](https://github.com/craigbarnes/dte/compare/v1.2...v1.3)
-
 **Downloads:**
 
 * [dte-1.3.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz)
@@ -52,8 +50,6 @@ Released on 2017-07-30.
 * Unicode 10 rendering support.
 * Various build system fixes.
 * Coding style fixes.
-
-Git diff: [v1.1...v1.2](https://github.com/craigbarnes/dte/compare/v1.1...v1.2)
 
 **Downloads:**
 
@@ -81,8 +77,6 @@ Released on 2017-07-29.
   languages.
 * Fixed a compilation error on OpenBSD.
 * Replaced quirky command-line option parser with POSIX `getopt(3)`.
-
-Git diff: [v1.0...v1.1](https://github.com/craigbarnes/dte/compare/v1.0...v1.1)
 
 **Downloads:**
 
