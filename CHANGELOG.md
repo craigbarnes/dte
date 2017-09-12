@@ -86,6 +86,21 @@ Released on 2017-07-29.
 * [dte-1.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sig)
 * [dte-1.1.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sha256sum)
 
+v1.0
+----
+
+Released on 2015-04-28.
+
+This is identical to the `v1.0` [release][dex v1.0] of [dex][] (the editor
+from which this project was forked).
+
+**Downloads:**
+
+* [dte-1.0.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz)
+* [dte-1.0.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sig)
+* [dte-1.0.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sha256sum)
+
 
 [dex]: https://github.com/tihirvon/dex
+[dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
