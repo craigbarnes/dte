@@ -124,6 +124,7 @@ state ident
     inlist type code
     inlist errortype code type
     inlist constant code
+    inlist builtin-namespace code constant
     inlist function code builtin
     inlist message code builtin
     inlist global code builtin
@@ -161,14 +162,21 @@ list reserved \
     package private protected public static super yield
 
 list type \
-    Array Boolean Date Function Number Object RegExp String
+    Array Boolean Date Function Number Object RegExp String \
+    Map WeakMap Set WeakSet Symbol Promise Proxy ArrayBuffer DataView \
+    Float32Array Float64Array Int8Array Int16Array Int32Array \
+    Uint8Array Uint16Array Uint32Array Uint8ClampedArray
+
+# Non-constructible, built-in objects (used and referred to as "namespaces")
+list builtin-namespace \
+    Intl JSON Math Reflect WebAssembly
 
 list errortype \
     Error EvalError RangeError ReferenceError SyntaxError TypeError URIError
 
 list constant \
     arguments \
-    Infinity Math NaN false null true undefined
+    Infinity NaN false null true undefined
 
 list function \
     decodeURI decodeURIComponent encodeURI encodeURIComponent eval \
