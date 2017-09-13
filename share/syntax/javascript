@@ -1,4 +1,3 @@
-# charater escapes
 syntax .js-esc
 
 state special
@@ -41,16 +40,69 @@ state short special
     char -n "\n" END error
     noeat END
 
-# main syntax
+syntax .js-regexp
+
+state regexp
+    char "\\" regexp-esc
+    char "[" regexp-char-list-start
+    char "{" regexp-range
+    char "/" regexp-flags regexp
+    char "^$|()?:*+." regexp regexp-special
+    char "\n" END error
+    eat regexp
+
+state regexp-esc regexp-special
+    char "\n" END error
+    eat regexp regexp-special
+
+state regexp-char-list-start regexp-special
+    char ^ regexp-char-list regexp-special
+    char ] regexp regexp-special
+    char "\n" END error
+    eat regexp-char-list
+
+state regexp-char-list regexp
+    char "-" regexp-char-list regexp-special
+    char "\\" regexp-char-list-esc
+    char \] regexp regexp-special
+    char "\n" END error
+    eat regexp-char-list
+
+state regexp-char-list-esc regexp-special
+    char "\n" END error
+    eat regexp-char-list regexp-special
+
+state regexp-range regexp-special
+    char "0-9" regexp-range regexp
+    char "," regexp-range-second
+    char "}" regexp regexp-special
+    char "\n" END error
+    eat regexp-range error
+
+state regexp-range-second regexp-special
+    char "0-9" regexp-range-second regexp
+    char "}" regexp regexp-special
+    char "\n" END error
+    eat regexp-range-second error
+
+state regexp-flags regexp-special
+    char gimuy regexp-flags
+    noeat END
+
 syntax javascript
+
+state first-line
+    char " \t" first-line
+    char # line-comment
+    noeat code
 
 state code
     char -b a-zA-Z_ ident
     char 0 zero
     char 1-9 dec
     char . dot
-    str "//" cpp-comment
-    str "/*" c-comment
+    str "//" line-comment
+    str "/*" long-comment
     char \' sq
     char \" dq
     char "(;:,=*/%&|!?+-" foo
@@ -59,24 +111,9 @@ state code
 # who knows where regexps are allowed?
 state foo code
     char " \t(;:,=*%&|!?+-" foo
-    str "//" cpp-comment
-    str "/*" c-comment
-    char / regexp
-    noeat code
-
-# fucking idiotic regexp syntax
-state regexp
-    char "\\" regexp-esc
-    char / regexp-flags
-    char "\n" code error
-    eat regexp
-
-state regexp-esc regexp
-    char "\n" code error
-    eat regexp
-
-state regexp-flags regexp
-    char gim regexp-flags
+    str "//" line-comment
+    str "/*" long-comment
+    char / .js-regexp:code
     noeat code
 
 state zero numeric
@@ -132,13 +169,13 @@ state ident
     inlist deprecated code
     noeat code
 
-state cpp-comment comment
+state line-comment comment
     char "\n" code
-    eat cpp-comment
+    eat line-comment
 
-state c-comment comment
+state long-comment comment
     str "*/" code comment
-    eat c-comment
+    eat long-comment
 
 state sq string
     char \' code string
@@ -194,3 +231,6 @@ list member \
 
 list deprecated \
     escape unescape
+
+default special regexp
+default special regexp-special
