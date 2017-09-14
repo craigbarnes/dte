@@ -24,7 +24,7 @@ enum {
 };
 
 // Prefixes; st-256color matches st
-const char *const terms[] = {
+static const char *const terms[] = {
     "rxvt",
     "screen",
     "st",
