@@ -42,27 +42,29 @@ static const char *const key_cap_map[NR_SPECIAL_KEYS] = {
 
 void term_read_caps(void)
 {
-    struct term_keymap *km;
-
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
     term_cap.colors = curses_int_cap("colors"); // max_colors
-    for (int i = 0; i < NR_STR_CAPS; i++) {
+    for (size_t i = 0; i < NR_STR_CAPS; i++) {
         term_cap.strings[i] = curses_str_cap(string_cap_map[i]);
     }
 
-    int i;
     term_cap.keymap_size = NR_SPECIAL_KEYS + 2;
     term_cap.keymap = xnew(struct term_keymap, term_cap.keymap_size);
-    for (i = 0; i < NR_SPECIAL_KEYS; i++) {
-        km = &term_cap.keymap[i];
-        km->key = KEY_SPECIAL_MIN + i;
-        km->code = curses_str_cap(key_cap_map[i]);
+
+    for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
+        term_cap.keymap[i] = (struct term_keymap) {
+            .key = KEY_SPECIAL_MIN + i,
+            .code = curses_str_cap(key_cap_map[i])
+        };
     }
-    km = &term_cap.keymap[i];
-    km->key = MOD_SHIFT | KEY_LEFT;
-    km->code = curses_str_cap("kLFT"); // key_sleft
-    i++;
-    km = &term_cap.keymap[i];
-    km->key = MOD_SHIFT | KEY_RIGHT;
-    km->code = curses_str_cap("kRIT"); // key_sright
+
+    term_cap.keymap[NR_SPECIAL_KEYS] = (struct term_keymap) {
+        .key = MOD_SHIFT | KEY_LEFT,
+        .code = curses_str_cap("kLFT") // key_sleft
+    };
+
+    term_cap.keymap[NR_SPECIAL_KEYS + 1] = (struct term_keymap) {
+        .key = MOD_SHIFT | KEY_RIGHT,
+        .code = curses_str_cap("kRIT") // key_sright
+    };
 }

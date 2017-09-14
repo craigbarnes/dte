@@ -60,7 +60,7 @@ struct term_cap {
 
     // String caps (keys)
     struct term_keymap *keymap;
-    int keymap_size;
+    size_t keymap_size;
 };
 
 struct term_color {

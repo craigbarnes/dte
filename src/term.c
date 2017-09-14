@@ -146,7 +146,7 @@ static char *escape_key(const char *key, int len)
 
 static void term_setup_extra_keys(const char *term)
 {
-    for (int i = 0; i < ARRAY_COUNT(terms); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(terms); i++) {
         if (str_has_prefix(term, terms[i])) {
             term_flags = 1 << i;
             break;
@@ -288,7 +288,7 @@ static bool read_special(int *key)
     if (DEBUG > 2) {
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
-    for (int i = 0; i < term_cap.keymap_size; i++) {
+    for (size_t i = 0; i < term_cap.keymap_size; i++) {
         const struct term_keymap *km = &term_cap.keymap[i];
         const char *keycode = km->code;
         int len;
