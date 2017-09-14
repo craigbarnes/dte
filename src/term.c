@@ -9,11 +9,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-struct keymap {
+typedef struct {
     int key;
     const char *const code;
     unsigned int terms;
-};
+} KeyMap;
 
 enum {
     T_RXVT = 1,
@@ -31,7 +31,7 @@ const char *const terms[] = {
     "xterm",
 };
 
-static const struct keymap builtin_keys[] = {
+static const KeyMap builtin_keys[] = {
     // ansi
     {KEY_LEFT, "\033[D", T_ALL},
     {KEY_RIGHT, "\033[C", T_ALL},
@@ -259,10 +259,10 @@ static bool input_get_byte(unsigned char *ch)
     return true;
 }
 
-static const struct keymap *find_key(bool *possibly_truncated)
+static const KeyMap *find_key(bool *possibly_truncated)
 {
     for (int i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
-        const struct keymap *entry = &builtin_keys[i];
+        const KeyMap *entry = &builtin_keys[i];
         int len;
 
         if ((entry->terms & term_flags) == 0) {
@@ -282,7 +282,7 @@ static const struct keymap *find_key(bool *possibly_truncated)
 
 static bool read_special(int *key)
 {
-    const struct keymap *entry;
+    const KeyMap *entry;
     bool possibly_truncated = false;
 
     if (DEBUG > 2) {
