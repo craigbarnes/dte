@@ -408,7 +408,7 @@ void set_signal_handler(int signum, void (*handler)(int))
 {
     struct sigaction act;
 
-    clear(&act);
+    memzero(&act);
     sigemptyset(&act.sa_mask);
     act.sa_handler = handler;
     sigaction(signum, &act, NULL);

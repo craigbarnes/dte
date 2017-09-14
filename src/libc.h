@@ -35,6 +35,6 @@
 #endif
 
 #define ARRAY_COUNT(x) ((unsigned long)sizeof(x) / sizeof(x[0]))
-#define clear(ptr) memset((ptr), 0, sizeof(*(ptr)))
+#define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
 #endif

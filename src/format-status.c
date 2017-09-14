@@ -66,7 +66,7 @@ static void add_status_pos(Formatter *f)
 
 void sf_init(Formatter *f, Window *win)
 {
-    clear(f);
+    memzero(f);
     f->win = win;
 }
 

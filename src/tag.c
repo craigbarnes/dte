@@ -184,7 +184,7 @@ void free_tags(PointerArray *tags)
         free(t);
     }
     free(tags->ptrs);
-    clear(tags);
+    memzero(tags);
 }
 
 // Both parameters must be absolute and clean

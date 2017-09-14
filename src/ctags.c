@@ -60,7 +60,7 @@ static int parse_line(Tag *t, const char *buf, int size)
     const char *end;
     int len, si = 0;
 
-    clear(t);
+    memzero(t);
     end = memchr(buf, '\t', size);
     if (!end) {
         goto error;

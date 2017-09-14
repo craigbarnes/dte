@@ -32,7 +32,7 @@ static bool parse_keys(KeyChain *chain, const char *str)
         }
     }
 
-    clear(chain);
+    memzero(chain);
     for (i = 0; i < len; ) {
         const char *key;
 
@@ -126,7 +126,7 @@ void handle_binding(int key)
         handle_command(commands, b->command);
         break;
     }
-    clear(&pressed_keys);
+    memzero(&pressed_keys);
 }
 
 int nr_pressed_keys(void)
