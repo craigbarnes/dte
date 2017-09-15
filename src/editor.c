@@ -16,6 +16,8 @@ extern const EditorModeOps search_mode_ops;
 extern const EditorModeOps git_open_ops;
 
 EditorState editor = {
+    .status = EDITOR_INITIALIZING,
+    .child_controls_terminal = false,
     .cmdline = CMDLINE_INIT,
     .version = VERSION,
     .pkgdatadir = PKGDATADIR,
@@ -261,7 +263,7 @@ void suspend(void)
         return;
     }
     if (
-        !editor.child_controls_terminal
+        editor.child_controls_terminal == false
         && editor.status != EDITOR_INITIALIZING
     ) {
         ui_end();
