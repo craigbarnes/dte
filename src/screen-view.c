@@ -149,8 +149,10 @@ static unsigned int screen_next_char(LineInfo *info)
         u = u_get_nonascii(info->line, info->size, &info->pos);
         count = info->pos - pos;
 
-        // Highly annoying no-break space etc.?
-        if (u_is_special_whitespace(u) && (info->view->buffer->options.ws_error & WSE_SPECIAL)) {
+        if (
+            u_is_special_whitespace(u) // Highly annoying no-break space etc.
+            && (info->view->buffer->options.ws_error & WSE_SPECIAL)
+        ) {
             ws_error = true;
         }
     }

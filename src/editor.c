@@ -260,7 +260,10 @@ void suspend(void)
         // Session leader can't suspend
         return;
     }
-    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
+    if (
+        !editor.child_controls_terminal
+        && editor.status != EDITOR_INITIALIZING
+    ) {
         ui_end();
     }
     kill(0, SIGSTOP);

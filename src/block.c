@@ -322,7 +322,11 @@ char *do_delete(long len)
     }
 
     blk = view->cursor.blk;
-    if (blk->size && blk->data[blk->size - 1] != '\n' && blk->node.next != &buffer->blocks) {
+    if (
+        blk->size
+        && blk->data[blk->size - 1] != '\n'
+        && blk->node.next != &buffer->blocks
+    ) {
         Block *next = BLOCK(blk->node.next);
         long size = blk->size + next->size;
 

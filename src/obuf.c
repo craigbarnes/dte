@@ -129,7 +129,11 @@ void buf_set_color(const struct term_color *color)
 void buf_clear_eol(void)
 {
     if (obuf.x < obuf.scroll_x + obuf.width) {
-        if (obuf.can_clear && term_cap.strings[STR_CAP_CMD_ce] && (obuf.color.bg < 0 || term_cap.ut)) {
+        if (
+            obuf.can_clear
+            && term_cap.strings[STR_CAP_CMD_ce]
+            && (obuf.color.bg < 0 || term_cap.ut)
+        ) {
             buf_escape(term_cap.strings[STR_CAP_CMD_ce]);
             obuf.x = obuf.scroll_x + obuf.width;
         } else {

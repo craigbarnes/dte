@@ -131,7 +131,10 @@ Buffer *find_buffer(const char *abs_filename)
         Buffer *b = buffers.ptrs[i];
         const char *f = b->abs_filename;
 
-        if ((f != NULL && streq(f, abs_filename)) || (st_ok && same_file(&st, &b->st))) {
+        if (
+            (f != NULL && streq(f, abs_filename))
+            || (st_ok && same_file(&st, &b->st))
+        ) {
             return b;
         }
     }

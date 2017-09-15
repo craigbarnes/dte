@@ -64,7 +64,10 @@ static void record_insert(long len)
     Change *change = buffer->cur_change;
 
     BUG_ON(!len);
-    if (change_merge == prev_change_merge && change_merge == CHANGE_MERGE_INSERT) {
+    if (
+        change_merge == prev_change_merge
+        && change_merge == CHANGE_MERGE_INSERT
+    ) {
         BUG_ON(change->del_count);
         change->ins_count += len;
         return;

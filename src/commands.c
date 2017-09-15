@@ -958,7 +958,11 @@ static void cmd_save(const char *pf, char **args)
             }
         }
     } else {
-        if (absolute == buffer->abs_filename && !force && stat_changed(&buffer->st, &st)) {
+        if (
+            absolute == buffer->abs_filename
+            && !force
+            && stat_changed(&buffer->st, &st)
+        ) {
             error_msg("File has been modified by someone else. Use -f to force overwrite.");
             goto error;
         }

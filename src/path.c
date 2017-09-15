@@ -257,7 +257,11 @@ char *short_filename_cwd(const char *absolute, const char *cwd)
         f_len = abs_len;
     }
 
-    if (abs_len > home_len && !memcmp(absolute, editor.home_dir, home_len) && absolute[home_len] == '/') {
+    if (
+        abs_len > home_len
+        && !memcmp(absolute, editor.home_dir, home_len)
+        && absolute[home_len] == '/'
+    ) {
         int len = abs_len - home_len + 1;
         if (len < f_len) {
             char *filename = xnew(char, len + 1);

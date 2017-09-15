@@ -244,7 +244,11 @@ void update_line_numbers(Window *win, bool force)
         last = lines;
     }
 
-    if (!force && win->line_numbers.first == first && win->line_numbers.last == last) {
+    if (
+        !force
+        && win->line_numbers.first == first
+        && win->line_numbers.last == last
+    ) {
         return;
     }
 

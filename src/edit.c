@@ -352,7 +352,11 @@ void insert_ch(unsigned int ch)
         // Prepare deleted text (selection)
         del_count = prepare_selection(view);
         unselect();
-    } else if (ch == '}' && buffer->options.auto_indent && buffer->options.brace_indent) {
+    } else if (
+        ch == '}'
+        && buffer->options.auto_indent
+        && buffer->options.brace_indent
+    ) {
         BlockIter bi = view->cursor;
         LineRef curlr;
 
