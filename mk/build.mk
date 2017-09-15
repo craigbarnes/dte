@@ -8,8 +8,14 @@ HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 LIBS = -lcurses
 SED = sed
-VERSION = 1.3
 PKGDATADIR = $(datadir)/dte
+
+_VERSION := 1.3
+VERSION = $(or \
+    $(shell git describe --match='v$(_VERSION)' --dirty --broken 2>/dev/null | sed 's/^v//'), \
+    $(shell awk 'NR==1 && /^[a-f0-9]{40}$$/ {print "$(_VERSION)-" substr($$0,0,12) "-dist"}' .distinfo), \
+    $(_VERSION)-unknown \
+)
 
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
