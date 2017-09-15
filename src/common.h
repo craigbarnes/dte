@@ -20,7 +20,7 @@ static inline void BUG(const char *fmt, ...)
 {
 }
 #else
-#define BUG(...) bug(__FUNCTION__, __VA_ARGS__)
+#define BUG(...) bug(__func__, __VA_ARGS__)
 #endif
 
 #if DEBUG <= 1
@@ -29,7 +29,7 @@ static inline void d_print(const char *fmt, ...)
 {
 }
 #else
-#define d_print(...) debug_print(__FUNCTION__, __VA_ARGS__)
+#define d_print(...) debug_print(__func__, __VA_ARGS__)
 #endif
 
 #define STRINGIFY(a) #a
