@@ -6,13 +6,9 @@ error() {
     exit 1
 }
 
-linux_distro_id() {
-    sed -n 's/^ID="\?\([a-z0-9._-]\+\)"\?/\1/p' /etc/os-release
-}
-
 case "$(uname)" in
 Linux)
-    case "$(linux_distro_id)" in
+    case $(. /etc/os-release && echo "$ID") in
     alpine)
         apk --update add make gcc binutils ncurses ncurses-dev libc-dev;;
     arch)
