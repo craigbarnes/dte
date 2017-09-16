@@ -224,16 +224,21 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
     return line;
 }
 
-void bug(const char *function, const char *fmt, ...)
+void term_cleanup(void)
 {
-    va_list ap;
-
     if (
         !editor.child_controls_terminal
         && editor.status != EDITOR_INITIALIZING
     ) {
         ui_end();
     }
+}
+
+void bug(const char *function, const char *fmt, ...)
+{
+    va_list ap;
+
+    term_cleanup();
 
     fprintf(stderr, "\n *** BUG *** %s: ", function);
     va_start(ap, fmt);

@@ -3,6 +3,7 @@
 
 static void NORETURN malloc_fail(void)
 {
+    term_cleanup();
     fputs("Error: unable to allocate memory\n", stderr);
     abort();
 }

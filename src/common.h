@@ -89,6 +89,7 @@ ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t read_file(const char *filename, char **bufp);
 long stat_read_file(const char *filename, char **bufp, struct stat *st);
 char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
+void term_cleanup(void);
 void bug(const char *function, const char *fmt, ...) FORMAT(2) NORETURN;
 void debug_print(const char *function, const char *fmt, ...) FORMAT(2);
 
