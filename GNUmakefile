@@ -42,6 +42,9 @@ install: all
 	$(INSTALL) -m644 $(man1)     $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m644 $(man5)     $(DESTDIR)$(mandir)/man5
 
+check: build/test
+	@$<
+
 tags:
 	ctags src/*.[ch]
 
@@ -54,5 +57,5 @@ distclean: clean
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install tags clean distclean
+.PHONY: all install check tags clean distclean
 .DELETE_ON_ERROR:
