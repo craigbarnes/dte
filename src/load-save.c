@@ -247,7 +247,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
     ssize_t size = 0;
     Block *blk;
 
-    if (bom) {
+    if (bom && !streq(bom->encoding, "UTF-8")) {
         size = bom->len;
         if (xwrite(enc->fd, bom->bytes, size) < 0) {
             goto write_error;

@@ -20,7 +20,7 @@ static const CodepointRange zero_width[] = {
     {0x200b, 0x200f},
     {0x202a, 0x202e},
     {0x2060, 0x2063},
-    {0xfeff, 0xfeff},
+    {0xfeff, 0xfeff}, // Byte order mark (BOM)
 };
 
 // Lookup table for Unicode combining/zero-width characters.
