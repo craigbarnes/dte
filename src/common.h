@@ -5,9 +5,6 @@
 #include "ctype.h"
 #include "xmalloc.h"
 
-extern const char hex_tab[16];
-extern bool term_utf8;
-
 static inline size_t ROUND_UP(size_t x, size_t r)
 {
     r--;

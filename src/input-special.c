@@ -135,6 +135,7 @@ bool special_input_keypress(int key, char *buf, int *count)
 
 bool special_input_misc_status(char *status, size_t status_maxlen)
 {
+    static const char hex_tab[16] = "0123456789abcdef";
     int i, value = raw_input.value;
     const char *str = "";
     char buf[7];

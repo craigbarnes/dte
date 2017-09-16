@@ -1,9 +1,6 @@
 #include "common.h"
 #include "editor.h"
 
-const char hex_tab[16] = "0123456789abcdef";
-bool term_utf8;
-
 long count_nl(const char *buf, long size)
 {
     const char *end = buf + size;

@@ -336,7 +336,7 @@ static bool read_simple(int *key)
     input_get_byte(&ch);
 
     // Normal key
-    if (term_utf8 && ch > 0x7f) {
+    if (editor.term_utf8 && ch > 0x7f) {
         /*
          * 10xx xxxx invalid
          * 110x xxxx valid

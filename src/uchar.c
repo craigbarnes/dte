@@ -241,6 +241,7 @@ void u_set_char(char *str, long *idx, unsigned int uch)
 
 void u_set_hex(char *str, long *idx, unsigned int uch)
 {
+    static const char hex_tab[16] = "0123456789abcdef";
     long i = *idx;
 
     str[i++] = '<';

@@ -49,9 +49,7 @@ void init_editor_state(void)
 
     setlocale(LC_CTYPE, "");
     editor.charset = nl_langinfo(CODESET);
-    if (streq(editor.charset, "UTF-8")) {
-        term_utf8 = true;
-    }
+    editor.term_utf8 = streq(editor.charset, "UTF-8");
 }
 
 static void sanity_check(void)
