@@ -52,15 +52,20 @@ static void test_detect_encoding_from_bom(void)
         {"UTF-32LE", "\xff\xfe\x00\x00Hello", 9},
         {"UTF-16BE", "\xfe\xffHello", 7},
         {"UTF-16LE", "\xff\xfeHello", 7},
+        {NULL, "\x00\xef\xbb\xbfHello", 9},
+        {NULL, "\xef\xbb", 2},
     };
 
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct bom_test *t = &tests[i];
         const char *result = detect_encoding_from_bom(t->text, t->size);
-        if (!result || !streq(result, t->encoding)) {
+        if (!xstreq(result, t->encoding)) {
             fail (
                 "%s: test #%zd failed: got %s, expected %s\n",
-                __func__, i + 1, result ? result : "(null)", t->encoding
+                __func__,
+                i + 1,
+                result ? result : "(null)",
+                t->encoding ? t->encoding : "(null)"
             );
         }
     }
@@ -68,18 +73,7 @@ static void test_detect_encoding_from_bom(void)
 
 int main(int argc, char *argv[])
 {
-    const char *home = getenv("HOME");
-
-    if (!home) {
-        home = "";
-    }
-    editor.home_dir = xstrdup(home);
-
-    setlocale(LC_CTYPE, "");
-    editor.charset = nl_langinfo(CODESET);
-    if (streq(editor.charset, "UTF-8")) {
-        term_utf8 = true;
-    }
+    init_editor_state();
 
     test_relative_filename();
     test_detect_encoding_from_bom();

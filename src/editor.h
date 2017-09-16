@@ -39,6 +39,7 @@ typedef struct {
 
 extern EditorState editor;
 
+void init_editor_state(void);
 char *editor_file(const char *name);
 char get_confirmation(const char *choices, const char *format, ...) FORMAT(2);
 void set_input_mode(InputMode mode);

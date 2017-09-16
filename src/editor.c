@@ -1,3 +1,5 @@
+#include <locale.h>
+#include <langinfo.h>
 #include "editor.h"
 #include "buffer.h"
 #include "window.h"
@@ -26,6 +28,26 @@ EditorState editor = {
         [INPUT_GIT_OPEN] = &git_open_ops
     }
 };
+
+void init_editor_state(void)
+{
+    const char *const home = getenv("HOME");
+    const char *const dte_home = getenv("DTE_HOME");
+
+    editor.home_dir = xstrdup(home ? home : "");
+
+    if (dte_home) {
+        editor.user_config_dir = xstrdup(dte_home);
+    } else {
+        editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
+    }
+
+    setlocale(LC_CTYPE, "");
+    editor.charset = nl_langinfo(CODESET);
+    if (streq(editor.charset, "UTF-8")) {
+        term_utf8 = true;
+    }
+}
 
 static void sanity_check(void)
 {

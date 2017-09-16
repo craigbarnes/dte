@@ -13,9 +13,6 @@
 #include "error.h"
 #include "move.h"
 
-#include <locale.h>
-#include <langinfo.h>
-
 #include "bindings.inc"
 
 static const char *const builtin_rc =
@@ -48,8 +45,6 @@ int main(int argc, char *argv[])
     static const char *const opts = "[-RV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
     static const char *const optstring = "RVc:t:r:";
     const char *const term = getenv("TERM");
-    const char *const home = getenv("HOME");
-    const char *const dte_home = getenv("DTE_HOME");
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
@@ -59,13 +54,7 @@ int main(int argc, char *argv[])
     bool read_rc = true;
     int ch;
 
-    editor.home_dir = xstrdup(home ? home : "");
-
-    if (dte_home) {
-        editor.user_config_dir = xstrdup(dte_home);
-    } else {
-        editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
-    }
+    init_editor_state();
 
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
@@ -117,12 +106,6 @@ int main(int argc, char *argv[])
     editor_dir = editor_file("");
     mkdir(editor_dir, 0755);
     free(editor_dir);
-
-    setlocale(LC_CTYPE, "");
-    editor.charset = nl_langinfo(CODESET);
-    if (streq(editor.charset, "UTF-8")) {
-        term_utf8 = true;
-    }
 
     exec_builtin_rc(builtin_bindings);
     exec_builtin_rc(builtin_rc);
