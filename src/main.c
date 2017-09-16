@@ -25,16 +25,6 @@ static const char *const builtin_rc =
 "set statusline-left \" %f%s%m%r%s%M\"\n"
 "set statusline-right \" %y,%X   %u   %E %n %t   %p \"\n";
 
-static void handle_abort(int signum)
-{
-    if (
-        editor.child_controls_terminal == false
-        && editor.status != EDITOR_INITIALIZING
-    ) {
-        ui_end();
-    }
-}
-
 static void handle_sigtstp(int signum)
 {
     suspend();
@@ -42,10 +32,7 @@ static void handle_sigtstp(int signum)
 
 static void handle_sigcont(int signum)
 {
-    if (
-        editor.child_controls_terminal == false
-        && editor.status != EDITOR_INITIALIZING
-    ) {
+    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
         term_raw();
         resize();
     }
@@ -161,8 +148,6 @@ int main(int argc, char *argv[])
 
     update_all_syntax_colors();
     sort_aliases();
-
-    set_signal_handler(SIGABRT, handle_abort);
 
     // Terminal does not generate signals for control keys
     set_signal_handler(SIGINT, SIG_IGN);
