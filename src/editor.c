@@ -18,7 +18,12 @@ extern const EditorModeOps search_mode_ops;
 extern const EditorModeOps git_open_ops;
 
 EditorState editor = {
+    .status = EDITOR_INITIALIZING,
+    .input_mode = INPUT_NORMAL,
+    .child_controls_terminal = false,
+    .resized = false,
     .cmdline = CMDLINE_INIT,
+    .cmdline_x = 0,
     .version = VERSION,
     .pkgdatadir = PKGDATADIR,
     .mode_ops = {
