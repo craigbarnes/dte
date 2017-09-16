@@ -42,7 +42,7 @@ install: all
 	$(INSTALL) -m644 $(man1)     $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m644 $(man5)     $(DESTDIR)$(mandir)/man5
 
-check: build/test
+check: build/test all
 	@$<
 
 tags:

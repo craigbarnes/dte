@@ -20,4 +20,4 @@ test -x "$MAKE" || abort 'unable to find GNU Make command' $LINENO
 git checkout-index --prefix="$TMPDIR/" -a || exit 1
 trap "rm -rf '$TMPDIR'" EXIT
 
-$MAKE -j"$(mk/nproc.sh)" --directory="$TMPDIR"
+$MAKE -j"$(mk/nproc.sh)" --directory="$TMPDIR" check
