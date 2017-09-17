@@ -107,21 +107,21 @@ dte = dte$(EXEC_SUFFIX)
 $(dte): $(editor_objects)
 build/test: $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 build/main.o: build/bindings.inc
-build/editor.o: .VARS
+build/editor.o: build/VARS.txt
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 
 $(dte) build/test:
 	$(E) LINK $@
 	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
 
-$(OBJECTS): build/%.o: src/%.c .CFLAGS | build/
+$(OBJECTS): build/%.o: src/%.c build/CFLAGS.txt | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
-.CFLAGS: FORCE
+build/CFLAGS.txt: FORCE | build/
 	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
-.VARS: FORCE
+build/VARS.txt: FORCE | build/
 	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
 
 build/bindings.inc: share/binding/builtin mk/rc2c.sed | build/
@@ -133,7 +133,7 @@ build/:
 	@mkdir -p $@
 
 
-CLEANFILES += $(dte) .VARS .CFLAGS
+CLEANFILES += $(dte)
 CLEANDIRS += build/
 .PHONY: FORCE
 .SECONDARY: build/
