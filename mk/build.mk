@@ -12,7 +12,7 @@ PKGDATADIR = $(datadir)/dte
 
 _VERSION := 1.3
 VERSION = $(or \
-    $(shell git describe --match='v$(_VERSION)' --dirty --broken 2>/dev/null | sed 's/^v//'), \
+    $(shell git describe --match='v$(_VERSION)' 2>/dev/null | sed 's/^v//'), \
     $(shell awk 'NR==1 && /^[a-f0-9]{40}$$/ {print "$(_VERSION)-" substr($$0,0,12) "-dist"}' .distinfo), \
     $(_VERSION)-unknown \
 )
