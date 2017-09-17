@@ -1,0 +1,221 @@
+# Mostly copied from the C syntax file
+# TODO: Fix up to match the actual D syntax
+
+syntax .d-esc
+
+state start special
+    char "abfnrtv'\\\"" END special
+    char 0-3 oct1
+    char 4-7 oct2
+    char x hex0
+    char -n "\n" END error
+    noeat END
+
+state oct1 special
+    char 0-7 oct2
+    noeat END
+
+state oct2 special
+    char 0-7 END special
+    noeat END
+
+state hex0 special
+    char 0-9a-fA-F hex1
+    noeat END
+
+state hex1 special
+    char 0-9a-fA-F hex2
+    noeat END
+
+# in strings "\xaff" is an error but "\xafg" is not
+# in chars both are errors
+state hex2 special
+    char 0-9a-fA-F END error
+    noeat END
+
+syntax .d-string
+
+state string
+    char "\"" END string
+    char "\n" END error
+    char "\\" .d-esc:string
+    eat string
+
+syntax .d-char
+
+state char
+    char "'\n" END error
+    char \\ .d-esc:char-end
+    eat char-end
+
+state char-end char
+    char "'" END char
+    eat END error
+
+syntax .d-long-comment
+
+state comment
+    char "*" star
+    eat comment
+
+state star comment
+    char / END comment
+    noeat comment
+
+syntax .d-line-comment
+
+state comment
+    char "\n" END
+    char \\ backslash
+    eat comment
+
+state backslash comment
+    # multiline comment?
+    char "\n" comment
+    noeat comment
+
+syntax d
+
+state start code
+    char " \t" start
+    char -b a-z_ ident-label
+    char -b A-Z ident-upper-label
+    noeat code
+
+state code code
+    char -b a-z_ ident
+    char -b A-Z ident-upper
+    char 0 zero
+    char 1-9 dec
+    char . dot
+    char \" .d-string:code
+    char \' .d-char:code
+    char "\n" start
+    char ';' semicolon
+    str "/*" .d-long-comment:code
+    str "//" .d-line-comment:start
+    eat code
+
+state semicolon code
+    char " \t" semicolon
+    char -b a-zA-Z_ ident-label
+    noeat code
+
+state ident-label ident
+    char -b a-zA-Z0-9_ ident-label
+    char -b : label
+    noeat -b ident
+
+state label
+    recolor label
+    noeat code
+
+state ident
+    char -b a-zA-Z0-9_ ident
+    inlist keyword code
+    inlist deprecated-keyword code error
+    inlist constant code
+    inlist type code
+    inlist special-token code
+    noeat code
+
+state ident-upper ident
+    char -b a-z class-name
+    char -b A-Z0-9_ ident
+    noeat code
+
+state class-name
+    recolor class-name
+    char a-zA-Z0-9_ class-name
+    noeat code
+
+state ident-upper-label ident
+    char -b a-z class-name-label
+    char -b A-Z0-9_ ident-label
+    char -b : label
+    noeat code
+
+state class-name-label class-name
+    char -b a-zA-Z0-9_ class-name-label
+    char -b : label
+    noeat -b class-name
+
+state zero numeric
+    char xX hex
+    char 0-7 oct
+    char . float
+    noeat code
+
+state oct numeric
+    char 0-7 oct
+    noeat code
+
+state dec numeric
+    char 0-9 dec
+    char eE exp
+    char . float
+    noeat code
+
+state hex numeric
+    char 0-9a-fA-F hex
+    noeat code
+
+state dot numeric
+    char 0-9 float
+    recolor code 1
+    noeat code
+
+state float numeric
+    char 0-9 float
+    char eE exp
+    char fFlL float-suffix
+    char a-zA-Z0-9_ error-ident
+    noeat code
+
+state float-suffix numeric
+    char a-zA-Z0-9_ error-ident
+    noeat code
+
+state exp numeric
+    char +- exp-digit
+    char 0-9 exp-digit
+    char a-zA-Z0-9_ error-ident
+    noeat code
+
+state exp-digit numeric
+    char 0-9 exp-digit
+    char a-zA-Z0-9_ error-ident
+    noeat code
+
+state error-ident error
+    char a-zA-Z0-9_ error-ident
+    noeat code
+
+list keyword \
+    abstract alias align asm assert auto body break case cast catch \
+    class const continue debug default deprecated do else enum export \
+    extern final finally for foreach foreach_reverse goto if immutable \
+    import in inout interface invariant is lazy macro mixin module new \
+    nothrow out override package pragma private protected public pure \
+    ref return scope shared static struct super switch synchronized \
+    template this throw try typeid typeof union unittest version while \
+    with __FILE__ __FILE_FULL_PATH__ __MODULE__ __LINE__ __FUNCTION__ \
+    __PRETTY_FUNCTION__ __gshared __traits __vector __parameters
+
+list deprecated-keyword \
+    delete typedef volatile
+
+list constant \
+    true false null
+
+list type \
+    bool byte ubyte short ushort int uint long ulong char wchar dchar \
+    float double real ifloat idouble ireal cfloat cdouble creal void \
+    cent ucent size_t ptrdiff_t function delegate
+    # TODO: union/enum?
+
+list special-token \
+    __DATE__ __EOF__ __TIME__ __TIMESTAMP__ __VENDOR__ __VERSION__
+
+default ident class-name
+default macro special-token
