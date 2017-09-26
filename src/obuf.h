@@ -29,8 +29,6 @@ typedef struct {
 } OutputBuffer;
 
 extern OutputBuffer obuf;
-extern int screen_w;
-extern int screen_h;
 
 void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x);
 void buf_add_bytes(const char *str, int count);

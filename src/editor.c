@@ -22,6 +22,8 @@ EditorState editor = {
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .resized = false,
+    .screen_w = 80,
+    .screen_h = 24,
     .cmdline = CMDLINE_INIT,
     .cmdline_x = 0,
     .version = VERSION,
@@ -90,8 +92,8 @@ void any_key(void)
 
 static void show_message(const char *msg, bool is_error)
 {
-    buf_reset(0, screen_w, 0);
-    buf_move_cursor(0, screen_h - 1);
+    buf_reset(0, editor.screen_w, 0);
+    buf_move_cursor(0, editor.screen_h - 1);
     print_message(msg, is_error);
     buf_clear_eol();
 }
@@ -100,8 +102,8 @@ static void update_command_line(void)
 {
     char prefix = ':';
 
-    buf_reset(0, screen_w, 0);
-    buf_move_cursor(0, screen_h - 1);
+    buf_reset(0, editor.screen_w, 0);
+    buf_move_cursor(0, editor.screen_h - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         print_message(error_buf, msg_is_error);
@@ -144,7 +146,7 @@ static void restore_cursor(void)
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        buf_move_cursor(editor.cmdline_x, screen_h - 1);
+        buf_move_cursor(editor.cmdline_x, editor.screen_h - 1);
         break;
     case INPUT_GIT_OPEN:
         break;
@@ -262,7 +264,7 @@ void ui_end(void)
     struct term_color color = {-1, -1, 0};
 
     buf_set_color(&color);
-    buf_move_cursor(0, screen_h - 1);
+    buf_move_cursor(0, editor.screen_h - 1);
     buf_show_cursor();
 
     // Back to main buffer

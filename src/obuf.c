@@ -1,10 +1,9 @@
 #include "obuf.h"
 #include "common.h"
+#include "editor.h"
 #include "uchar.h"
 
 OutputBuffer obuf;
-int screen_w = 80;
-int screen_h = 24;
 
 static int obuf_avail(void)
 {
@@ -25,7 +24,7 @@ void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x)
     obuf.scroll_x = scroll_x;
     obuf.tab_width = 8;
     obuf.tab = TAB_CONTROL;
-    obuf.can_clear = start_x + width == screen_w;
+    obuf.can_clear = start_x + width == editor.screen_w;
 }
 
 // Does not update obuf.x

@@ -33,6 +33,8 @@ typedef struct {
     bool child_controls_terminal;
     bool resized;
     bool term_utf8;
+    int screen_w;
+    int screen_h;
     int cmdline_x;
     const char *version;
     const char *pkgdatadir;
