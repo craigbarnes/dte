@@ -6,7 +6,10 @@ v1.4 (unreleased)
 
 **Changes:**
 
-* Added syntax highlighting for the [Vala] language.
+* Added syntax highlighting for the [Vala] and [D] languages.
+* Allow binding additional, xterm-style key combinations
+  (e.g. `bind C-M-S-left ...`) when `$TERM` is `tmux` (previously
+  only available for `xterm` and `screen`).
 
 Git diff: [v1.3...master](https://github.com/craigbarnes/dte/compare/v1.3...master)
 
@@ -104,3 +107,4 @@ from which this project was forked).
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
+[D]: https://dlang.org/
