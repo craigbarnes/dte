@@ -26,7 +26,7 @@ Installation
 
 To build `dte` from source, first install the following dependencies:
 
-* Modern C Compiler
+* [GCC] or [Clang]
 * [GNU Make] `>= 3.81`
 * [ncurses]
 
@@ -76,6 +76,8 @@ Public License version 2 for more details.
 
 
 [ctags]: https://en.wikipedia.org/wiki/Ctags
+[GCC]: https://gcc.gnu.org/
+[Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
