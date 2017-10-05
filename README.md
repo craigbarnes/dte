@@ -30,7 +30,7 @@ To build `dte` from source, first install the following dependencies:
 * [GNU Make] `>= 3.81`
 * [ncurses]
 
-...which can (optionally) be done via the included script:
+...which can (optionally) be done via the included [script][install-deps.sh]:
 
     sudo mk/install-deps.sh
 
@@ -80,6 +80,7 @@ Public License version 2 for more details.
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
+[install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [dte.1.html]: https://craigbarnes.gitlab.io/dte/dte.1.html
 [dte-syntax.5.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.5.html
