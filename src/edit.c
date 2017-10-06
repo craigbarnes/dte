@@ -573,23 +573,7 @@ static void shift_left(int nr_lines, int count)
     }
 }
 
-void shift_lines(int count)
-{
-    int nr_lines = 1;
-    SelectionInfo info;
-    int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
-
-    if (x < 0) {
-        x = 0;
-    }
-
-    if (view->selection) {
-        view->selection = SELECT_LINES;
-        init_selection(view, &info);
-        view->cursor = info.si;
-        nr_lines = get_nr_selected_lines(&info);
-    }
-
+static void do_shift_lines(int count, int nr_lines) {
     begin_change_chain();
     block_iter_bol(&view->cursor);
     if (count > 0) {
@@ -598,8 +582,23 @@ void shift_lines(int count)
         shift_left(nr_lines, -count);
     }
     end_change_chain();
+}
+
+void shift_lines(int count)
+{
+    int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
+
+    if (x < 0) {
+        x = 0;
+    }
 
     if (view->selection) {
+        SelectionInfo info;
+        view->selection = SELECT_LINES;
+        init_selection(view, &info);
+        view->cursor = info.si;
+        int nr_lines = get_nr_selected_lines(&info);
+        do_shift_lines(count, nr_lines);
         if (info.swapped) {
             // Cursor should be at beginning of selection
             block_iter_bol(&view->cursor);
@@ -615,6 +614,8 @@ void shift_lines(int count)
             view->sel_so = block_iter_get_offset(&view->cursor);
             view->cursor = save;
         }
+    } else {
+        do_shift_lines(count, 1);
     }
     move_to_preferred_x(x);
 }
