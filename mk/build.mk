@@ -1,12 +1,10 @@
 CC ?= gcc
-LD = $(CC)
 CFLAGS ?= -g -O2
 LDFLAGS ?=
 HOST_CC ?= $(CC)
-HOST_LD ?= $(HOST_CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
-LIBS = -lcurses
+LDLIBS = -lcurses
 SED = sed
 PKGDATADIR = $(datadir)/dte
 
@@ -72,24 +70,24 @@ KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 
 ifeq "$(KERNEL)" "Darwin"
-  LIBS += -liconv
+  LDLIBS += -liconv
 else ifeq "$(OS)" "Cygwin"
-  LIBS += -liconv
+  LDLIBS += -liconv
   EXEC_SUFFIX = .exe
 else ifeq "$(KERNEL)" "FreeBSD"
   # libc of FreeBSD 10.0 includes iconv
   ifeq ($(shell expr "`uname -r`" : '[0-9]\.'),2)
-    LIBS += -liconv
+    LDLIBS += -liconv
     BASIC_CFLAGS += -I/usr/local/include
     BASIC_LDFLAGS += -L/usr/local/lib
   endif
 else ifeq "$(KERNEL)" "OpenBSD"
-  LIBS += -liconv
+  LDLIBS += -liconv
   BASIC_CFLAGS += -I/usr/local/include
   BASIC_LDFLAGS += -L/usr/local/lib
 else ifeq "$(KERNEL)" "NetBSD"
   ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
-    LIBS += -liconv
+    LDLIBS += -liconv
   endif
   BASIC_CFLAGS += -I/usr/pkg/include
   BASIC_LDFLAGS += -L/usr/pkg/lib
@@ -112,11 +110,11 @@ build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDAT
 
 $(dte) build/test:
 	$(E) LINK $@
-	$(Q) $(LD) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LIBS)
+	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(OBJECTS): build/%.o: src/%.c build/CFLAGS.txt | build/
 	$(E) CC $@
-	$(Q) $(CC) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
 
 build/CFLAGS.txt: FORCE | build/
 	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@

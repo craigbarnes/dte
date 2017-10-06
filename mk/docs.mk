@@ -42,7 +42,7 @@ public/%.gz: public/%
 
 $(TTMAN): build/ttman.o
 	$(E) HOSTLD $@
-	$(Q) $(HOST_LD) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
+	$(Q) $(HOST_CC) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
 
 build/ttman.o: Documentation/ttman.c | build/
 	$(E) HOSTCC $@
