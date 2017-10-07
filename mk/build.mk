@@ -37,20 +37,6 @@ DEBUG = 1
 BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
 BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
 
-ifneq "$(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))" ""
-  # Make "-s" flag was used (silent build)
-  Q = @
-  E = @:
-else ifeq "$(V)" "1"
-  # "V=1" variable was set (verbose build)
-  Q =
-  E = @:
-else
-  # Normal build
-  Q = @
-  E = @printf ' %7s  %s\n'
-endif
-
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block buffer-iter buffer cconv change cmdline color \
     command-mode commands common compiler completion config ctags ctype \
@@ -65,9 +51,6 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
 
 test_objects := build/test-main.o
 OBJECTS := $(editor_objects) $(test_objects)
-
-KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
-OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
