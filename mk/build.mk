@@ -49,8 +49,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
 
-test_objects := build/test-main.o
-OBJECTS := $(editor_objects) $(test_objects)
+test_objects := build/test/test_main.o
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
@@ -78,26 +77,32 @@ endif
 
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-  $(OBJECTS): BASIC_CFLAGS += -MF build/$*.mk -MMD -MP
-  -include $(patsubst %.o, %.mk, $(OBJECTS))
+  $(editor_objects): BASIC_CFLAGS += -MF build/$*.mk -MMD -MP
+  $(test_objects): BASIC_CFLAGS += -MF build/test/$*.mk -MMD -MP
+  -include $(patsubst %.o, %.mk, $(editor_objects) $(test_objects))
 endif
 endif
 
 dte = dte$(EXEC_SUFFIX)
+test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
-build/test: $(filter-out build/main.o, $(editor_objects)) $(test_objects)
+$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 build/main.o: build/bindings.inc
 build/editor.o: build/VARS.txt
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
 
-$(dte) build/test:
+$(dte) $(test):
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(OBJECTS): build/%.o: src/%.c build/CFLAGS.txt | build/
+$(editor_objects): build/%.o: src/%.c build/CFLAGS.txt | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
+
+$(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
+	$(E) CC $@
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -Isrc -c -o $@ $<
 
 build/CFLAGS.txt: FORCE | build/
 	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
@@ -110,7 +115,7 @@ build/bindings.inc: share/binding/builtin mk/rc2c.sed | build/
 	$(Q) echo 'static const char *builtin_bindings =' > $@
 	$(Q) $(SED) -f mk/rc2c.sed $< >> $@
 
-build/:
+build/ build/test/:
 	@mkdir -p $@
 
 
