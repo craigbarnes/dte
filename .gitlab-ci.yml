@@ -5,6 +5,7 @@ build:alpine:
     image: alpine:3.6
     script:
         - mk/install-deps.sh
+        - make vars
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
@@ -14,6 +15,7 @@ build:centos:
     image: centos:7
     script:
         - mk/install-deps.sh
+        - make vars
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
@@ -24,6 +26,7 @@ build:debian:
     variables: {DEBIAN_FRONTEND: noninteractive}
     script:
         - mk/install-deps.sh
+        - make vars
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
@@ -34,6 +37,7 @@ build:ubuntu:
     variables: {DEBIAN_FRONTEND: noninteractive}
     script:
         - mk/install-deps.sh
+        - make vars
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V

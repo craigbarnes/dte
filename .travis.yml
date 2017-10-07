@@ -3,7 +3,7 @@ sudo: false
 os: [linux, osx]
 compiler: [clang, gcc]
 script:
-    - export V=1
-    - make -j`mk/nproc.sh` check
+    - make vars
+    - make -j`mk/nproc.sh` check V=1
     - make install DESTDIR="$PWD/pkgdir"
     - pkgdir/usr/local/bin/dte -V
