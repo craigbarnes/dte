@@ -77,8 +77,7 @@ endif
 
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-  $(editor_objects): BASIC_CFLAGS += -MF build/$*.mk -MMD -MP
-  $(test_objects): BASIC_CFLAGS += -MF build/test/$*.mk -MMD -MP
+  $(editor_objects) $(test_objects): DEPFLAGS = -MF $(patsubst %.o, %.mk, $@) -MMD -MP
   -include $(patsubst %.o, %.mk, $(editor_objects) $(test_objects))
 endif
 endif
@@ -98,14 +97,14 @@ $(dte) $(test):
 
 $(editor_objects): build/%.o: src/%.c build/CFLAGS.txt | build/
 	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
 
 $(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
 	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) -Isrc -c -o $@ $<
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
 build/CFLAGS.txt: FORCE | build/
-	@mk/optcheck.sh "$(CC) $(CFLAGS) $(BASIC_CFLAGS)" $@
+	@mk/optcheck.sh "$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
 build/VARS.txt: FORCE | build/
 	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
