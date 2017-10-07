@@ -5,7 +5,7 @@ STREQ = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 PRINTVAR = printf '\033[1m%-11s\033[0m= %s\n' '$(1)' '$(strip $($(1)))'
 
 USERVARS = \
-    VERSION CC CFLAGS LDFLAGS LDLIBS PKGDATADIR KERNEL \
+    VERSION CC CFLAGS LDFLAGS LDLIBS DEBUG PKGDATADIR KERNEL \
     $(if $(call STREQ, $(KERNEL), Linux), DISTRO)
 
 vars:
