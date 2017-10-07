@@ -89,7 +89,7 @@ static inline bool buffer_modified(Buffer *b)
 }
 
 void buffer_mark_lines_changed(Buffer *b, int min, int max);
-const char *buffer_filename(Buffer *b);
+const char *buffer_filename(const Buffer *b);
 
 void update_short_filename_cwd(Buffer *b, const char *cwd);
 void update_short_filename(Buffer *b);

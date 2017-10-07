@@ -26,7 +26,7 @@ static void add_change(Change *change)
 // This doesn't need to be local to buffer because commands are atomic
 static Change *change_barrier;
 
-static bool is_change_chain_barrier(Change *change)
+static bool is_change_chain_barrier(const Change *change)
 {
     return !change->ins_count && !change->del_count;
 }
@@ -310,7 +310,7 @@ top:
     }
 }
 
-void buffer_insert_bytes(const char *buf, long len)
+void buffer_insert_bytes(const char *buf, const long len)
 {
     long rec_len = len;
 
@@ -394,8 +394,6 @@ void buffer_erase_bytes(long len)
 
 void buffer_replace_bytes(long del_count, const char *inserted, long ins_count)
 {
-    char *deleted = NULL;
-
     view_reset_preferred_x(view);
     if (del_count == 0) {
         buffer_insert_bytes(inserted, ins_count);
@@ -417,7 +415,7 @@ void buffer_replace_bytes(long del_count, const char *inserted, long ins_count)
         }
     }
 
-    deleted = do_replace(del_count, inserted, ins_count);
+    char *deleted = do_replace(del_count, inserted, ins_count);
     record_replace(deleted, del_count, ins_count);
 
     if (buffer->views.count > 1) {

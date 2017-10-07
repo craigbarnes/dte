@@ -46,7 +46,7 @@ void buffer_mark_lines_changed(Buffer *b, int min, int max)
     }
 }
 
-const char *buffer_filename(Buffer *b)
+const char *buffer_filename(const Buffer *b)
 {
     return b->display_filename;
 }
