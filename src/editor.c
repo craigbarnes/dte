@@ -381,16 +381,7 @@ typedef struct {
     int vy;
 } ScreenState;
 
-static void save_state(ScreenState *s, View *v)
-{
-    s->is_modified = buffer_modified(v->buffer);
-    s->id = v->buffer->id;
-    s->cy = v->cy;
-    s->vx = v->vx;
-    s->vy = v->vy;
-}
-
-static void update_screen(ScreenState *s)
+static void update_screen(const ScreenState *s)
 {
     View *v = window->view;
     Buffer *b = v->buffer;
@@ -461,8 +452,14 @@ void main_loop(void)
             editor.mode_ops[editor.input_mode]->keypress(key);
             editor.mode_ops[editor.input_mode]->update();
         } else {
-            ScreenState s;
-            save_state(&s, window->view);
+            const View *v = window->view;
+            const ScreenState s = {
+                .is_modified = buffer_modified(v->buffer),
+                .id = v->buffer->id,
+                .cy = v->cy,
+                .vx = v->vx,
+                .vy = v->vy
+            };
             editor.mode_ops[editor.input_mode]->keypress(key);
             sanity_check();
             if (editor.input_mode == INPUT_GIT_OPEN) {
