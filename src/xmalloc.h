@@ -24,7 +24,7 @@ char *xstrdup(const char *str) MALLOC NONNULL;
 char *xstrcut(const char *str, size_t size) MALLOC NONNULL;
 void *xmemdup(const void *ptr, size_t size) NONNULL;
 
-static inline NONNULL char *xstrslice(const char *str, size_t pos, size_t end)
+static inline MALLOC NONNULL char *xstrslice(const char *str, size_t pos, size_t end)
 {
     return xstrcut(str + pos, end - pos);
 }
