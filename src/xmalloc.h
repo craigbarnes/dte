@@ -5,8 +5,10 @@
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 #define MALLOC __attribute__((__malloc__))
+#define NONNULL __attribute__((nonnull))
 #else
 #define MALLOC
+#define NONNULL
 #endif
 
 #define xnew(type, n) (type *)xmalloc(sizeof(type) * (n))
@@ -15,14 +17,14 @@
                     mem = xrealloc(mem, sizeof(*mem) * (n)); \
                 } while (0)
 
-void * MALLOC xmalloc(size_t size);
-void * MALLOC xcalloc(size_t size);
-void * MALLOC xrealloc(void *ptr, size_t size);
-char * MALLOC xstrdup(const char *str);
-char * MALLOC xstrcut(const char *str, size_t size);
-void * MALLOC xmemdup(const void *ptr, size_t size);
+void *xmalloc(size_t size) MALLOC;
+void *xcalloc(size_t size) MALLOC;
+void *xrealloc(void *ptr, size_t size);
+char *xstrdup(const char *str) MALLOC NONNULL;
+char *xstrcut(const char *str, size_t size) MALLOC NONNULL;
+void *xmemdup(const void *ptr, size_t size) NONNULL;
 
-static inline char *xstrslice(const char *str, size_t pos, size_t end)
+static inline NONNULL char *xstrslice(const char *str, size_t pos, size_t end)
 {
     return xstrcut(str + pos, end - pos);
 }

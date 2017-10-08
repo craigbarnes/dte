@@ -18,6 +18,7 @@ static void NORETURN malloc_fail (
 
 void *xmalloc(size_t size)
 {
+    BUG_ON(size == 0);
     void *ptr = malloc(size);
     if (unlikely(ptr == NULL)) {
         MALLOC_FAIL(strerror(errno));
@@ -27,6 +28,7 @@ void *xmalloc(size_t size)
 
 void *xcalloc(size_t size)
 {
+    BUG_ON(size == 0);
     void *ptr = calloc(1, size);
     if (unlikely(ptr == NULL)) {
         MALLOC_FAIL(strerror(errno));
@@ -36,6 +38,7 @@ void *xcalloc(size_t size)
 
 void *xrealloc(void *ptr, size_t size)
 {
+    BUG_ON(size == 0);
     ptr = realloc(ptr, size);
     if (unlikely(ptr == NULL)) {
         MALLOC_FAIL(strerror(errno));
@@ -54,14 +57,16 @@ char *xstrdup(const char *str)
 
 char *xstrcut(const char *str, size_t size)
 {
+    BUG_ON(size == 0);
     char *s = xmalloc(size + 1);
     memcpy(s, str, size);
-    s[size] = 0;
+    s[size] = '\0';
     return s;
 }
 
 void *xmemdup(const void *ptr, size_t size)
 {
+    BUG_ON(size == 0);
     void *buf = xmalloc(size);
     memcpy(buf, ptr, size);
     return buf;
