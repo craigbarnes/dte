@@ -36,7 +36,7 @@ static inline void d_print(const char *fmt, ...)
             BUG("%s\n", STRINGIFY(a)); \
     } while (0)
 
-static inline bool streq(const char *a, const char *b)
+static inline NONNULL bool streq(const char *a, const char *b)
 {
     return !strcmp(a, b);
 }
@@ -45,22 +45,20 @@ static inline bool xstreq(const char *a, const char *b)
 {
     if (a == b) {
         return true;
-    }
-    if (a == NULL) {
+    } else if (a == NULL) {
         return false;
-    }
-    if (b == NULL) {
+    } else if (b == NULL) {
         return false;
     }
     return streq(a, b);
 }
 
-static inline bool str_has_prefix(const char *str, const char *prefix)
+static inline NONNULL bool str_has_prefix(const char *str, const char *prefix)
 {
     return !strncmp(str, prefix, strlen(prefix));
 }
 
-static inline bool str_has_suffix(const char *str, const char *suffix)
+static inline NONNULL bool str_has_suffix(const char *str, const char *suffix)
 {
     size_t l1 = strlen(str);
     size_t l2 = strlen(suffix);
