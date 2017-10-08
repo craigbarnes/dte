@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #include "libc.h"
-#include "ctype.h"
+#include "ascii.h"
 #include "xmalloc.h"
 
 static inline size_t ROUND_UP(size_t x, size_t r)

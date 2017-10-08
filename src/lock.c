@@ -25,7 +25,7 @@ static int rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
         int pid = 0;
         char *nl;
 
-        while (pos < size && isdigit(buf[pos])) {
+        while (pos < size && ascii_isdigit(buf[pos])) {
             pid *= 10;
             pid += buf[pos++] - '0';
         }

@@ -1,6 +1,6 @@
 #include "key.h"
 #include "uchar.h"
-#include "ctype.h"
+#include "ascii.h"
 #include "strbuf.h"
 
 static const char *const special_names[NR_SPECIAL_KEYS] = {
@@ -34,7 +34,7 @@ static int parse_modifiers(const char *str, int *modifiersp)
     int i = 0;
 
     while (true) {
-        unsigned char ch = toupper(str[i]);
+        unsigned char ch = ascii_toupper(str[i]);
 
         if (ch == '^' && str[i + 1] != 0) {
             modifiers |= MOD_CTRL;

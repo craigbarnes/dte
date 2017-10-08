@@ -10,7 +10,7 @@ unsigned long buf_hash(const char *str, size_t size)
     unsigned long hash = 0;
 
     for (size_t i = 0; i < size; i++) {
-        unsigned int ch = tolower(str[i]);
+        unsigned int ch = ascii_tolower(str[i]);
         hash = (hash << 5) - hash + ch;
     }
     return hash;

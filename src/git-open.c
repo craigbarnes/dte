@@ -81,14 +81,14 @@ static void split(PointerArray *words, const char *str)
     int s, i = 0;
 
     while (str[i]) {
-        while (isspace(str[i])) {
+        while (ascii_isspace(str[i])) {
             i++;
         }
         if (!str[i]) {
             break;
         }
         s = i++;
-        while (str[i] && !isspace(str[i])) {
+        while (str[i] && !ascii_isspace(str[i])) {
             i++;
         }
         ptr_array_add(words, xstrslice(str, s, i));

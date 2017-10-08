@@ -36,7 +36,7 @@ char *normalize_encoding(const char *encoding)
     iconv_t cd;
 
     for (int i = 0; e[i]; i++) {
-        e[i] = toupper(e[i]);
+        e[i] = ascii_toupper(e[i]);
     }
 
     for (int i = 0; i < ARRAY_COUNT(aliases); i++) {

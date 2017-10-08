@@ -155,7 +155,7 @@ static void free_regex(void)
 static bool has_upper(const char *str)
 {
     for (int i = 0; str[i]; i++) {
-        if (isupper(str[i])) {
+        if (ascii_isupper(str[i])) {
             return true;
         }
     }

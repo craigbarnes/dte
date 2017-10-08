@@ -271,7 +271,7 @@ static void init_completion(void)
         Error *err = NULL;
         int end;
 
-        while (isspace(cmd[pos])) {
+        while (ascii_isspace(cmd[pos])) {
             pos++;
         }
 
@@ -333,10 +333,10 @@ static void init_completion(void)
         bool var = true;
         for (int i = 1; i < len; i++) {
             char ch = str[i];
-            if (isalpha(ch) || ch == '_') {
+            if (ascii_isalpha(ch) || ch == '_') {
                 continue;
             }
-            if (i > 1 && isdigit(ch)) {
+            if (i > 1 && ascii_isdigit(ch)) {
                 continue;
             }
 

@@ -66,13 +66,13 @@ void load_file_history(void)
         if (!parse_long(&line, &row) || row <= 0) {
             continue;
         }
-        while (isspace(*line)) {
+        while (ascii_isspace(*line)) {
             line++;
         }
         if (!parse_long(&line, &col) || col <= 0) {
             continue;
         }
-        while (isspace(*line)) {
+        while (ascii_isspace(*line)) {
             line++;
         }
         add_file_history(row, col, line);

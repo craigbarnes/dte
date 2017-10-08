@@ -17,7 +17,7 @@ static int validate_alias_name(const char *name)
 {
     for (unsigned int i = 0; name[i]; i++) {
         char ch = name[i];
-        if (!isalnum(ch) && ch != '-' && ch != '_') {
+        if (!ascii_isalnum(ch) && ch != '-' && ch != '_') {
             return 0;
         }
     }

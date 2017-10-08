@@ -28,7 +28,7 @@ static bool is_command(const char *str, int len)
         if (str[i] == '#') {
             return false;
         }
-        if (!isspace(str[i])) {
+        if (!ascii_isspace(str[i])) {
             return true;
         }
     }

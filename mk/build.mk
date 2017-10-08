@@ -38,8 +38,8 @@ BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
 BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
-    alias bind block buffer-iter buffer cconv change cmdline color \
-    command-mode commands common compiler completion config ctags ctype \
+    alias ascii bind block buffer-iter buffer cconv change cmdline \
+    color command-mode commands common compiler completion config ctags \
     cursed decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
     frame git-open history hl indent input-special iter key \

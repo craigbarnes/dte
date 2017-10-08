@@ -318,8 +318,8 @@ char get_confirmation(const char *choices, const char *format, ...)
     buf[pos++] = ' ';
     buf[pos++] = '[';
     for (i = 0; i < count; i++) {
-        if (isupper(choices[i])) {
-            def = tolower(choices[i]);
+        if (ascii_isupper(choices[i])) {
+            def = ascii_tolower(choices[i]);
         }
         buf[pos++] = choices[i];
         buf[pos++] = '/';
@@ -359,7 +359,7 @@ char get_confirmation(const char *choices, const char *format, ...)
             if (key > 127) {
                 continue;
             }
-            key = tolower(key);
+            key = ascii_tolower(key);
             if (strchr(choices, key)) {
                 break;
             }

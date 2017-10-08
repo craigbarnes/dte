@@ -38,7 +38,7 @@ static void cmdline_erase_word(CommandLine *c)
     // open /path/to/file^W => open /path/to/
 
     // erase whitespace
-    while (i && isspace(c->buf.buffer[i - 1])) {
+    while (i && ascii_isspace(c->buf.buffer[i - 1])) {
         i--;
     }
 

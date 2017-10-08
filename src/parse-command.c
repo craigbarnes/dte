@@ -18,10 +18,10 @@ static void parse_home(const char *cmd, int *posp)
 
     for (len = 0; username[len]; len++) {
         char ch = username[len];
-        if (isspace(ch) || ch == '/' || ch == ':') {
+        if (ascii_isspace(ch) || ch == '/' || ch == ':') {
             break;
         }
-        if (!isalnum(ch)) {
+        if (!ascii_isalnum(ch)) {
             return;
         }
     }
@@ -161,11 +161,11 @@ static void parse_var(const char *cmd, int *posp)
     while (1) {
         char ch = cmd[ei];
 
-        if (isalpha(ch) || ch == '_') {
+        if (ascii_isalpha(ch) || ch == '_') {
             ei++;
             continue;
         }
-        if (ei > si && isdigit(ch)) {
+        if (ei > si && ascii_isdigit(ch)) {
             ei++;
             continue;
         }
@@ -199,7 +199,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     while (1) {
         char ch = cmd[pos];
 
-        if (!ch || ch == ';' || isspace(ch)) {
+        if (!ch || ch == ';' || ascii_isspace(ch)) {
             break;
         }
 
@@ -227,7 +227,7 @@ int find_end(const char *cmd, int pos, Error **err)
     while (1) {
         char ch = cmd[pos];
 
-        if (!ch || ch == ';' || isspace(ch)) {
+        if (!ch || ch == ';' || ascii_isspace(ch)) {
             break;
         }
 
@@ -298,7 +298,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
     while (1) {
         int end;
 
-        while (isspace(cmd[pos])) {
+        while (ascii_isspace(cmd[pos])) {
             pos++;
         }
 

@@ -61,7 +61,7 @@ bool buf_parse_long(const char *str, int size, int *posp, long *valp)
         sign = -1;
         pos++;
     }
-    while (pos < size && isdigit(str[pos])) {
+    while (pos < size && ascii_isdigit(str[pos])) {
         long old = val;
 
         val *= 10;
