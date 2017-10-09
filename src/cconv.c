@@ -120,7 +120,7 @@ static int xiconv(struct cconv *c, char **ib, size_t *ic)
                 resize_obuf(c);
                 continue;
             default:
-                BUG("iconv: %s\n", strerror(errno));
+                BUG("iconv: %s", strerror(errno));
             }
         } else {
             c->errors += rc;

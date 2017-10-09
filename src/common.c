@@ -231,19 +231,25 @@ void term_cleanup(void)
     }
 }
 
-void bug(const char *function, const char *fmt, ...)
-{
-    va_list ap;
-
+void bug (
+    const char *file,
+    int line,
+    const char *func,
+    const char *fmt,
+    ...
+) {
     term_cleanup();
 
-    fprintf(stderr, "\n *** BUG *** %s: ", function);
+    fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
+
+    va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
 
-    // For core dump
-    abort();
+    fputs("'\n", stderr);
+
+    abort(); // For core dump
 }
 
 void debug_print(const char *function, const char *fmt, ...)

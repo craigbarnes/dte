@@ -12,28 +12,22 @@ static inline size_t ROUND_UP(size_t x, size_t r)
 }
 
 #if DEBUG <= 0
-FORMAT(1)
-static inline void BUG(const char *fmt, ...)
-{
-}
+  FORMAT(1) static inline void BUG(const char *fmt, ...) {}
 #else
-#define BUG(...) bug(__func__, __VA_ARGS__)
+  #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #endif
 
 #if DEBUG <= 1
-FORMAT(1)
-static inline void d_print(const char *fmt, ...)
-{
-}
+  FORMAT(1) static inline void d_print(const char *fmt, ...) {}
 #else
-#define d_print(...) debug_print(__func__, __VA_ARGS__)
+  #define d_print(...) debug_print(__func__, __VA_ARGS__)
 #endif
 
 #define STRINGIFY(a) #a
 #define BUG_ON(a) \
     do { \
         if (unlikely(a)) \
-            BUG("%s\n", STRINGIFY(a)); \
+            BUG("%s", STRINGIFY(a)); \
     } while (0)
 
 static inline NONNULL bool streq(const char *a, const char *b)
@@ -85,7 +79,15 @@ ssize_t read_file(const char *filename, char **bufp);
 long stat_read_file(const char *filename, char **bufp, struct stat *st);
 char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
 void term_cleanup(void);
-void bug(const char *function, const char *fmt, ...) FORMAT(2) NORETURN;
+
+void bug (
+    const char *file,
+    int line,
+    const char *funct,
+    const char *fmt,
+    ...
+) FORMAT(4) NORETURN;
+
 void debug_print(const char *function, const char *fmt, ...) FORMAT(2);
 
 #endif

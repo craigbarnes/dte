@@ -69,7 +69,7 @@ static void sanity_check(void)
             return;
         }
     }
-    BUG("cursor not seen\n");
+    BUG("cursor not seen");
 }
 
 void set_input_mode(InputMode mode)
