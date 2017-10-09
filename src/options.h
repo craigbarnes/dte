@@ -46,32 +46,24 @@ enum tab_bar {
     TAB_BAR_AUTO,
 };
 
-typedef struct {
-    int auto_indent;
-    int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
-    int indent_width;
-    int syntax;
-    int tab_width;
-    int text_width;
+#define COMMON_OPTIONS \
+    int auto_indent; \
+    int detect_indent; \
+    int emulate_tab; \
+    int expand_tab; \
+    int file_history; \
+    int indent_width; \
+    int syntax; \
+    int tab_width; \
+    int text_width; \
     int ws_error;
+
+typedef struct {
+    COMMON_OPTIONS;
 } CommonOptions;
 
 typedef struct {
-    // These have also global values
-    int auto_indent;
-    int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
-    int indent_width;
-    int syntax;
-    int tab_width;
-    int text_width;
-    int ws_error;
-
+    COMMON_OPTIONS;
     // Only local
     int brace_indent;
     char *filetype;
@@ -79,18 +71,7 @@ typedef struct {
 } LocalOptions;
 
 typedef struct {
-    // These have also local values
-    int auto_indent;
-    int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
-    int indent_width;
-    int syntax;
-    int tab_width;
-    int text_width;
-    int ws_error;
-
+    COMMON_OPTIONS;
     // Only global
     SearchCaseSensitivity case_sensitive_search;
     int display_special;
@@ -105,6 +86,8 @@ typedef struct {
     int tab_bar_max_components;
     int tab_bar_width;
 } GlobalOptions;
+
+#undef COMMON_OPTIONS
 
 extern const char *case_sensitive_search_enum[];
 
