@@ -23,22 +23,14 @@ static const char *const config_commands[] = {
 
 const Command *current_command;
 
-static int bsearch_strcmp(const void *p1, const void *p2) {
-    const char *const key = p1;
-    const char *const *arg = p2;
-    return strcmp(key, *arg);
-}
-
 static bool allowed_command(const char *name)
 {
-    const char *const found = bsearch (
-        name,
-        config_commands,
-        ARRAY_COUNT(config_commands),
-        sizeof(const char *const),
-        bsearch_strcmp
-    );
-    return found != NULL;
+    for (int i = 0; i < ARRAY_COUNT(config_commands); i++) {
+        if (streq(name, config_commands[i])) {
+            return true;
+        }
+    }
+    return false;
 }
 
 const Command *find_command(const Command *cmds, const char *name)
