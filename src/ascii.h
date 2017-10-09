@@ -1,7 +1,7 @@
 #ifndef ASCII_H
 #define ASCII_H
 
-extern unsigned char ascii_table[256];
+extern unsigned char dte_ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
@@ -12,7 +12,7 @@ extern unsigned char ascii_table[256];
 #define ASCII_HEX_LOWER 0x40
 #define ASCII_HEX_UPPER 0x80
 
-#define sane_istest(x,mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
+#define sane_istest(x,mask) ((dte_ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) sane_istest(x, ASCII_SPACE)
 #define ascii_isdigit(x) sane_istest(x, ASCII_DIGIT)
 #define ascii_islower(x) sane_istest(x, ASCII_LOWER)
