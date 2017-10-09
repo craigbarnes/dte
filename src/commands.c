@@ -405,7 +405,7 @@ static void cmd_hi(const char *pf, char **args)
     struct term_color color;
 
     if (args[0] == NULL) {
-        exec_builtin_rc(reset_colors_rc);
+        exec_reset_colors_rc();
         remove_extra_colors();
     } else if (parse_term_color(&color, args + 1)) {
         set_highlight_color(args[0], &color);

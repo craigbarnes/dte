@@ -6,7 +6,7 @@
 const char *config_file;
 int config_line;
 
-const char *reset_colors_rc =
+static const char *const reset_colors_rc =
 "hi default\n"
 "hi nontext blue keep\n"
 "hi noline blue\n"
@@ -120,4 +120,9 @@ void exec_builtin_rc(const char *rc)
     int saved_config_line = config_line;
     exec_config(commands, rc, strlen(rc));
     config_line = saved_config_line;
+}
+
+void exec_reset_colors_rc(void)
+{
+    exec_builtin_rc(reset_colors_rc);
 }
