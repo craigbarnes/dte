@@ -57,7 +57,6 @@ char *xstrdup(const char *str)
 
 char *xstrcut(const char *str, size_t size)
 {
-    BUG_ON(size == 0);
     char *s = xmalloc(size + 1);
     memcpy(s, str, size);
     s[size] = '\0';
