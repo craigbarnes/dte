@@ -1,7 +1,7 @@
 #ifndef ASCII_H
 #define ASCII_H
 
-extern unsigned char dte_ascii_table[256];
+extern const unsigned char dte_ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
