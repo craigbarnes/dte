@@ -1,5 +1,6 @@
 #include "screen.h"
 #include "tabbar.h"
+#include "editor.h"
 #include "uchar.h"
 #include "obuf.h"
 #include "view.h"
@@ -65,7 +66,7 @@ static void print_vertical_tab_title(View *v, int idx, int width)
 {
     const char *orig_filename = buffer_filename(v->buffer);
     const char *filename = orig_filename;
-    int max = options.tab_bar_max_components;
+    int max = editor.options.tab_bar_max_components;
     char buf[16];
     int skip;
 

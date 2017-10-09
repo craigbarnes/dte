@@ -61,12 +61,12 @@ Buffer *buffer_new(const char *encoding)
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
     b->id = ++id;
-    b->newline = options.newline;
+    b->newline = editor.options.newline;
     if (encoding) {
         b->encoding = xstrdup(encoding);
     }
 
-    memcpy(&b->options, &options, sizeof(CommonOptions));
+    memcpy(&b->options, &editor.options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
     b->options.filetype = xstrdup("none");
     b->options.indent_regex = xstrdup("");

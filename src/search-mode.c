@@ -2,7 +2,6 @@
 #include "history.h"
 #include "editor.h"
 #include "search.h"
-#include "options.h"
 
 static void search_mode_keypress(int key)
 {
@@ -21,7 +20,7 @@ static void search_mode_keypress(int key)
         set_input_mode(INPUT_NORMAL);
         break;
     case MOD_META | 'c':
-        options.case_sensitive_search = (options.case_sensitive_search + 1) % 3;
+        editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
         break;
     case MOD_META | 'r':
         search_set_direction(current_search_direction() ^ 1);

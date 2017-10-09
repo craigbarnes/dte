@@ -1,4 +1,5 @@
 #include "window.h"
+#include "editor.h"
 #include "file-history.h"
 #include "path.h"
 #include "lock.h"
@@ -100,7 +101,7 @@ View *window_open_buffer(Window *w, const char *filename, bool must_exist, const
     }
     update_short_filename(b);
 
-    if (options.lock_files) {
+    if (editor.options.lock_files) {
         if (lock_file(b->abs_filename)) {
             b->ro = true;
         } else {
@@ -372,7 +373,7 @@ static int calc_vertical_tabbar_width(Window *win)
 {
     // Line numbers are included in min_edit_w
     int min_edit_w = 80;
-    int w = options.tab_bar_width;
+    int w = editor.options.tab_bar_width;
 
     if (win->w - w < min_edit_w) {
         w = win->w - min_edit_w;
@@ -385,10 +386,10 @@ static int calc_vertical_tabbar_width(Window *win)
 
 enum tab_bar tabbar_visibility(Window *win)
 {
-    switch (options.tab_bar) {
+    switch (editor.options.tab_bar) {
     case TAB_BAR_HIDDEN:
     case TAB_BAR_HORIZONTAL:
-        return options.tab_bar;
+        return editor.options.tab_bar;
     case TAB_BAR_VERTICAL:
         if (calc_vertical_tabbar_width(win) == 0) {
             // Not enough space
@@ -417,7 +418,7 @@ static int line_numbers_width(Window *win)
 {
     int w = 0, min_w = 5;
 
-    if (options.show_line_numbers && win->view) {
+    if (editor.options.show_line_numbers && win->view) {
         w = number_width(win->view->buffer->nl) + 1;
         if (w < min_w) {
             w = min_w;
@@ -481,10 +482,10 @@ int window_get_scroll_margin(Window *w)
 {
     int max = (w->edit_h - 1) / 2;
 
-    if (options.scroll_margin > max) {
+    if (editor.options.scroll_margin > max) {
         return max;
     }
-    return options.scroll_margin;
+    return editor.options.scroll_margin;
 }
 
 static void frame_for_each_window(Frame *f, void (*func)(Window *, void *), void *data)

@@ -1,7 +1,6 @@
 #include "term.h"
 #include "common.h"
 #include "editor.h"
-#include "options.h"
 #include "cursed.h"
 
 #undef CTRL
@@ -237,8 +236,8 @@ static bool fill_buffer(void)
 static bool fill_buffer_timeout(void)
 {
     struct timeval tv = {
-        .tv_sec = options.esc_timeout / 1000,
-        .tv_usec = (options.esc_timeout % 1000) * 1000
+        .tv_sec = editor.options.esc_timeout / 1000,
+        .tv_usec = (editor.options.esc_timeout % 1000) * 1000
     };
     fd_set set;
     int rc;

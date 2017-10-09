@@ -1,4 +1,5 @@
 #include "options.h"
+#include "editor.h"
 #include "window.h"
 #include "view.h"
 #include "completion.h"
@@ -7,32 +8,6 @@
 #include "common.h"
 #include "regexp.h"
 #include "error.h"
-
-GlobalOptions options = {
-    .auto_indent = 1,
-    .detect_indent = 0,
-    .emulate_tab = 0,
-    .expand_tab = 0,
-    .file_history = 1,
-    .indent_width = 8,
-    .syntax = 1,
-    .tab_width = 8,
-    .text_width = 72,
-    .ws_error = WSE_SPECIAL,
-
-    .case_sensitive_search = CSS_TRUE,
-    .display_special = 0,
-    .esc_timeout = 100,
-    .lock_files = 1,
-    .newline = NEWLINE_UNIX,
-    .scroll_margin = 0,
-    .show_line_numbers = 0,
-    .statusline_left = NULL,
-    .statusline_right = NULL,
-    .tab_bar = TAB_BAR_HORIZONTAL,
-    .tab_bar_max_components = 0,
-    .tab_bar_width = 25,
-};
 
 typedef enum {
     OPT_STR,
@@ -434,7 +409,7 @@ static inline char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 
 static inline char *global_ptr(const OptionDesc *desc)
 {
-    return (char *)&options + desc->offset;
+    return (char *)&editor.options + desc->offset;
 }
 
 static bool desc_is(const OptionDesc *desc, OptionType type)

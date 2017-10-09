@@ -934,7 +934,7 @@ static void cmd_save(const char *pf, char **args)
             error_msg("stat failed for %s: %s", absolute, strerror(errno));
             goto error;
         }
-        if (options.lock_files) {
+        if (editor.options.lock_files) {
             if (absolute == buffer->abs_filename) {
                 if (!buffer->locked) {
                     if (lock_file(absolute)) {
@@ -970,7 +970,7 @@ static void cmd_save(const char *pf, char **args)
             error_msg("Will not overwrite directory %s", absolute);
             goto error;
         }
-        if (options.lock_files) {
+        if (editor.options.lock_files) {
             if (absolute == buffer->abs_filename) {
                 if (!buffer->locked) {
                     if (lock_file(absolute)) {

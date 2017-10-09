@@ -106,7 +106,6 @@ typedef struct {
     int tab_bar_width;
 } GlobalOptions;
 
-extern GlobalOptions options;
 extern const char *case_sensitive_search_enum[];
 
 #define TAB_BAR_MIN_WIDTH 12

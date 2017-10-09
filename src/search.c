@@ -166,7 +166,7 @@ static bool update_regex(void)
 {
     int re_flags = REG_NEWLINE;
 
-    switch (options.case_sensitive_search) {
+    switch (editor.options.case_sensitive_search) {
     case CSS_TRUE:
         break;
     case CSS_FALSE:

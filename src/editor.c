@@ -28,6 +28,31 @@ EditorState editor = {
     .cmdline_x = 0,
     .version = VERSION,
     .pkgdatadir = PKGDATADIR,
+    .options = {
+        .auto_indent = true,
+        .detect_indent = 0,
+        .emulate_tab = false,
+        .expand_tab = false,
+        .file_history = true,
+        .indent_width = 8,
+        .syntax = true,
+        .tab_width = 8,
+        .text_width = 72,
+        .ws_error = WSE_SPECIAL,
+
+        .case_sensitive_search = CSS_TRUE,
+        .display_special = false,
+        .esc_timeout = 100,
+        .lock_files = true,
+        .newline = NEWLINE_UNIX,
+        .scroll_margin = 0,
+        .show_line_numbers = false,
+        .statusline_left = NULL,
+        .statusline_right = NULL,
+        .tab_bar = TAB_BAR_HORIZONTAL,
+        .tab_bar_max_components = 0,
+        .tab_bar_width = 25,
+    },
     .mode_ops = {
         [INPUT_NORMAL] = &normal_mode_ops,
         [INPUT_COMMAND] = &command_mode_ops,
@@ -128,7 +153,7 @@ static void update_window_full(Window *w)
     view_update_cursor_y(v);
     view_update(v);
     print_tabbar(w);
-    if (options.show_line_numbers) {
+    if (editor.options.show_line_numbers) {
         update_line_numbers(w, true);
     }
     update_range(v, v->vy, v->vy + w->edit_h);
@@ -190,7 +215,7 @@ static void update_window(Window *w)
         print_tabbar(w);
     }
 
-    if (options.show_line_numbers) {
+    if (editor.options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
         update_line_numbers(w, v->buffer->changed_line_max == INT_MAX);
     }

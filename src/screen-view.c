@@ -52,7 +52,7 @@ static void mask_selection_and_current_line(LineInfo *info, struct term_color *c
 static bool is_non_text(unsigned int u)
 {
     if (u < 0x20) {
-        return u != '\t' || options.display_special;
+        return u != '\t' || editor.options.display_special;
     }
     if (u == 0x7f) {
         return true;
@@ -341,7 +341,7 @@ static void print_line(LineInfo *info)
         }
     }
 
-    if (options.display_special && obuf.x >= obuf.scroll_x) {
+    if (editor.options.display_special && obuf.x >= obuf.scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
         color = *builtin_colors[BC_DEFAULT];
         mask_color(&color, builtin_colors[BC_NONTEXT]);
@@ -365,7 +365,7 @@ void update_range(View *v, int y1, int y2)
 
     buf_reset(v->window->edit_x, v->window->edit_w, v->vx);
     obuf.tab_width = v->buffer->options.tab_width;
-    obuf.tab = options.display_special ? TAB_SPECIAL : TAB_NORMAL;
+    obuf.tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     for (i = 0; i < v->cy - y1; i++) {
         block_iter_prev_line(&bi);

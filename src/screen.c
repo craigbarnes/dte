@@ -44,7 +44,7 @@ static const char *format_misc_status(Window *win)
             misc_status,
             sizeof(misc_status),
             "[case-sensitive = %s]",
-            case_sensitive_search_enum[options.case_sensitive_search]
+            case_sensitive_search_enum[editor.options.case_sensitive_search]
         );
     } else if (win->view->selection) {
         SelectionInfo info;
@@ -69,8 +69,8 @@ void update_status_line(Window *win)
 
     sf_init(&f, win);
     f.misc_status = format_misc_status(win);
-    sf_format(&f, lbuf, sizeof(lbuf), options.statusline_left);
-    sf_format(&f, rbuf, sizeof(rbuf), options.statusline_right);
+    sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
+    sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
     buf_reset(win->x, win->w, 0);
     buf_move_cursor(win->x, win->y + win->h - 1);

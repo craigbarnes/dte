@@ -3,6 +3,7 @@
 
 #include "libc.h"
 #include "cmdline.h"
+#include "options.h"
 
 typedef enum {
     EDITOR_INITIALIZING,
@@ -27,6 +28,7 @@ typedef struct {
     const EditorModeOps *mode_ops[4];
     InputMode input_mode;
     CommandLine cmdline;
+    GlobalOptions options;
     char *home_dir;
     char *user_config_dir;
     char *charset;
