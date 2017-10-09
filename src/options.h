@@ -74,7 +74,7 @@ typedef struct {
     int ws_error;
 
     // Only local
-    int brace_indent;
+    bool brace_indent;
     char *filetype;
     char *indent_regex;
 } LocalOptions;
