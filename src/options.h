@@ -47,27 +47,28 @@ enum tab_bar {
 };
 
 typedef struct {
-    int auto_indent;
+    bool auto_indent;
     int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
+    bool emulate_tab;
+    bool expand_tab;
+    bool file_history;
     int indent_width;
-    int syntax;
+    bool syntax;
     int tab_width;
     int text_width;
     int ws_error;
 } CommonOptions;
 
+// TODO: Embed CommonOptions as a C11 "unnamed struct" instead of duplicating
 typedef struct {
     // These have also global values
-    int auto_indent;
+    bool auto_indent;
     int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
+    bool emulate_tab;
+    bool expand_tab;
+    bool file_history;
     int indent_width;
-    int syntax;
+    bool syntax;
     int tab_width;
     int text_width;
     int ws_error;
@@ -80,25 +81,25 @@ typedef struct {
 
 typedef struct {
     // These have also local values
-    int auto_indent;
+    bool auto_indent;
     int detect_indent;
-    int emulate_tab;
-    int expand_tab;
-    int file_history;
+    bool emulate_tab;
+    bool expand_tab;
+    bool file_history;
     int indent_width;
-    int syntax;
+    bool syntax;
     int tab_width;
     int text_width;
     int ws_error;
 
     // Only global
     SearchCaseSensitivity case_sensitive_search;
-    int display_special;
+    bool display_special;
     int esc_timeout;
-    int lock_files;
+    bool lock_files;
     LineEndingType newline; // Default value for new files
     int scroll_margin;
-    int show_line_numbers;
+    bool show_line_numbers;
     char *statusline_left;
     char *statusline_right;
     enum tab_bar tab_bar;
