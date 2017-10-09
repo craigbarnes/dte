@@ -67,7 +67,7 @@ Buffer *buffer_new(const char *encoding)
     }
 
     memcpy(&b->options, &editor.options, sizeof(CommonOptions));
-    b->options.brace_indent = false;
+    b->options.brace_indent = 0;
     b->options.filetype = xstrdup("none");
     b->options.indent_regex = xstrdup("");
 
