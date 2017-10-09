@@ -17,9 +17,9 @@ void ptr_array_add(PointerArray *array, void *ptr)
     array->ptrs[array->count++] = ptr;
 }
 
-void ptr_array_insert(PointerArray *array, void *ptr, long pos)
+void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
 {
-    long count = array->count - pos;
+    size_t count = array->count - pos;
     ptr_array_add(array, NULL);
     memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void *));
     array->ptrs[pos] = ptr;
@@ -27,7 +27,7 @@ void ptr_array_insert(PointerArray *array, void *ptr, long pos)
 
 void ptr_array_free_cb(PointerArray *array, free_func free_ptr)
 {
-    for (int i = 0; i < array->count; i++) {
+    for (size_t i = 0; i < array->count; i++) {
         free_ptr(array->ptrs[i]);
         array->ptrs[i] = NULL;
     }
@@ -39,11 +39,11 @@ void ptr_array_free_cb(PointerArray *array, free_func free_ptr)
 
 void ptr_array_remove(PointerArray *array, void *ptr)
 {
-    long pos = ptr_array_idx(array, ptr);
+    size_t pos = ptr_array_idx(array, ptr);
     ptr_array_remove_idx(array, pos);
 }
 
-void *ptr_array_remove_idx(PointerArray *array, long pos)
+void *ptr_array_remove_idx(PointerArray *array, size_t pos)
 {
     void *ptr = array->ptrs[pos];
     array->count--;
@@ -51,11 +51,9 @@ void *ptr_array_remove_idx(PointerArray *array, long pos)
     return ptr;
 }
 
-long ptr_array_idx(PointerArray *array, void *ptr)
+size_t ptr_array_idx(PointerArray *array, void *ptr)
 {
-    long i;
-
-    for (i = 0; i < array->count; i++) {
+    for (size_t i = 0; i < array->count; i++) {
         if (array->ptrs[i] == ptr) {
             return i;
         }
@@ -63,12 +61,8 @@ long ptr_array_idx(PointerArray *array, void *ptr)
     return -1;
 }
 
-void *ptr_array_rel(PointerArray *array, void *ptr, long offset)
+void *ptr_array_rel(PointerArray *array, void *ptr, size_t offset)
 {
-    long i = ptr_array_idx(array, ptr);
-
-    if (i < 0) {
-        return NULL;
-    }
+    size_t i = ptr_array_idx(array, ptr);
     return array->ptrs[(i + offset + array->count) % array->count];
 }
