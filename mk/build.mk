@@ -88,8 +88,7 @@ test = build/test/test$(EXEC_SUFFIX)
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 build/main.o: build/bindings.inc
-build/editor.o: build/VARS.txt
-build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\" -DPKGDATADIR=\"$(PKGDATADIR)\"
+build/editor.o: build/VERSION.h build/PKGDATADIR.h
 
 $(dte) $(test):
 	$(E) LINK $@
@@ -106,8 +105,11 @@ $(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
 build/CFLAGS.txt: FORCE | build/
 	@mk/optcheck.sh "$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
-build/VARS.txt: FORCE | build/
-	@mk/optcheck.sh "VERSION=$(VERSION) PKGDATADIR=$(PKGDATADIR)" $@
+build/PKGDATADIR.h: FORCE | build/
+	@mk/optcheck.sh '#define PKGDATADIR "$(PKGDATADIR)"' $@
+
+build/VERSION.h: FORCE | build/
+	@mk/optcheck.sh '#define VERSION "$(VERSION)"' $@
 
 build/bindings.inc: share/binding/builtin mk/rc2c.sed | build/
 	$(E) GEN $@

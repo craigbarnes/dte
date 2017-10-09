@@ -11,6 +11,8 @@
 #include "config.h"
 #include "command.h"
 #include "error.h"
+#include "VERSION.h"
+#include "PKGDATADIR.h"
 
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
