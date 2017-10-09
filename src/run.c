@@ -25,7 +25,7 @@ const Command *current_command;
 
 static bool allowed_command(const char *name)
 {
-    for (int i = 0; i < ARRAY_COUNT(config_commands); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(config_commands); i++) {
         if (streq(name, config_commands[i])) {
             return true;
         }
@@ -35,7 +35,7 @@ static bool allowed_command(const char *name)
 
 const Command *find_command(const Command *cmds, const char *name)
 {
-    for (int i = 0; cmds[i].name; i++) {
+    for (size_t i = 0; cmds[i].name; i++) {
         const Command *cmd = &cmds[i];
         if (streq(name, cmd->name)) {
             return cmd;
@@ -70,7 +70,7 @@ static void run_command(const Command *cmds, char **av)
         // Remove NULL
         array.count--;
 
-        for (int i = 1; av[i]; i++) {
+        for (size_t i = 1; av[i]; i++) {
             ptr_array_add(&array, xstrdup(av[i]));
         }
         ptr_array_add(&array, NULL);
@@ -102,7 +102,7 @@ static void run_command(const Command *cmds, char **av)
 
 void run_commands(const Command *cmds, const PointerArray *array)
 {
-    int s, e;
+    size_t s, e;
 
     s = 0;
     while (s < array->count) {
