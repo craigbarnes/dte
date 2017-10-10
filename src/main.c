@@ -164,12 +164,11 @@ int main(int argc, char *argv[])
 
     editor.status = EDITOR_RUNNING;
 
-    long lineno = 0;
-    for (int i = optind; i < argc; i++) {
+    for (int i = optind, lineno = 0; i < argc; i++) {
         if (argv[i][0] == '+' && lineno <= 0) {
-            lineno = atol(&argv[i][1]);
-            if (lineno <= 0) {
-                error_msg("Invalid line number: '%s'", &argv[i][1]);
+            const char *const lineno_string = &argv[i][1];
+            if (!str_to_int(lineno_string, &lineno) || lineno <= 0) {
+                error_msg("Invalid line number: '%s'", lineno_string);
             }
         } else {
             View *v = window_open_buffer(window, argv[i], false, NULL);
