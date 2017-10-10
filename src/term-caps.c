@@ -48,9 +48,6 @@ void term_read_caps(void)
         term_cap.strings[i] = curses_str_cap(string_cap_map[i]);
     }
 
-    term_cap.keymap_size = NR_SPECIAL_KEYS + 2;
-    term_cap.keymap = xnew(struct term_keymap, term_cap.keymap_size);
-
     for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
         term_cap.keymap[i] = (struct term_keymap) {
             .key = KEY_SPECIAL_MIN + i,

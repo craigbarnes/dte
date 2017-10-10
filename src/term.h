@@ -59,8 +59,7 @@ struct term_cap {
     char *strings[NR_STR_CAPS];
 
     // String caps (keys)
-    struct term_keymap *keymap;
-    size_t keymap_size;
+    struct term_keymap keymap[NR_SPECIAL_KEYS + 2];
 };
 
 struct term_color {
