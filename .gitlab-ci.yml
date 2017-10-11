@@ -46,3 +46,9 @@ pages:
     script:
         - apk --update add make gcc binutils libc-dev groff gzip
         - make -j`mk/nproc.sh` docs V=1
+        - make -j`mk/nproc.sh` TERMINFO_DISABLE=1 LDFLAGS=-static V=1
+        - strip dte
+        - ls -lh dte
+        - size dte
+        - readelf -h dte
+        - cp dte public/dte-linux-$(uname -m)
