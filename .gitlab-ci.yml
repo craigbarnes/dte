@@ -43,7 +43,7 @@ pages:
     image: alpine:3.6
     artifacts: {paths: [public]}
     only: [master]
-    script:
+    script: &PAGES_SCRIPT
         - apk --update add make gcc binutils libc-dev groff gzip
         - make -j`mk/nproc.sh` docs V=1
         - make -j`mk/nproc.sh` TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static' V=1
@@ -52,3 +52,10 @@ pages:
         - size dte
         - readelf -h dte
         - cp dte public/dte-linux-$(uname -m)
+
+# Same as "pages" but without public artifacts (for testing non-master branches)
+pages:non-master:
+    stage: build
+    image: alpine:3.6
+    except: [master]
+    script: *PAGES_SCRIPT
