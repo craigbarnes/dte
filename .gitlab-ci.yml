@@ -9,9 +9,11 @@ build:alpine:
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
+        - strip dte && ls -l dte && size dte
         - make clean
         - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
         - ./dte -V
+        - strip dte && ls -l dte && size dte
 
 build:centos:
     stage: build
