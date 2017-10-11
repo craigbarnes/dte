@@ -11,7 +11,6 @@ bind M-down pgdown
 bind ^C copy
 bind ^F search
 bind ^G 'search -n'
-bind ^H 'erase-word -s'
 # ^I == Tab
 bind ^L "command 'line '"
 # ^M == Enter
