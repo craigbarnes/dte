@@ -9,6 +9,9 @@ build:alpine:
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
+        - make clean
+        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+        - ./dte -V
 
 build:centos:
     stage: build
@@ -19,6 +22,9 @@ build:centos:
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
+        - make clean
+        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+        - ./dte -V
 
 build:debian:
     stage: build
@@ -30,6 +36,9 @@ build:debian:
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
+        - make clean
+        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+        - ./dte -V
 
 build:ubuntu:
     stage: build
@@ -41,6 +50,9 @@ build:ubuntu:
         - make -j`mk/nproc.sh` check V=1
         - make install
         - dte -V
+        - make clean
+        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+        - ./dte -V
 
 pages:
     stage: dist

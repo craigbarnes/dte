@@ -44,7 +44,7 @@ enum {
 
 struct term_keymap {
     int key;
-    char *code;
+    const char *code;
 };
 
 // See termcap(5)
@@ -56,7 +56,7 @@ struct term_cap {
     int colors;
 
     // String caps
-    char *strings[NR_STR_CAPS];
+    const char *strings[NR_STR_CAPS];
 
     // String caps (keys)
     struct term_keymap keymap[NR_SPECIAL_KEYS + 2];
@@ -70,7 +70,9 @@ struct term_color {
 
 extern struct term_cap term_cap;
 
-int term_init(const char *term);
+int term_init(const char *const term);
+void term_setup_extra_keys(const char *const term);
+
 void term_raw(void);
 void term_cooked(void);
 

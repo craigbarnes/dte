@@ -104,7 +104,20 @@ static const KeyMap builtin_keys[] = {
     {MOD_SHIFT | '\t', "\033[Z", T_ST | T_XTERM_LIKE},
 };
 
-struct term_cap term_cap;
+// These basic default values are for ANSI compatible terminals.
+// They will be overwritten by term_init() in most cases.
+struct term_cap term_cap = {
+    .colors = 8,
+    .strings = {
+        [STR_CAP_CMD_ce] = "\033[K"
+    },
+    .keymap = {
+        {KEY_LEFT, "\033[D"},
+        {KEY_RIGHT, "\033[C"},
+        {KEY_UP, "\033[A"},
+        {KEY_DOWN, "\033[B"},
+    }
+};
 
 static struct termios termios_save;
 static char buffer[64];
@@ -146,7 +159,7 @@ static char *escape_key(const char *key, int len)
     return buf;
 }
 
-static void term_setup_extra_keys(const char *term)
+void term_setup_extra_keys(const char *const term)
 {
     for (size_t i = 0; i < ARRAY_COUNT(terms); i++) {
         if (str_has_prefix(term, terms[i])) {
@@ -154,17 +167,6 @@ static void term_setup_extra_keys(const char *term)
             break;
         }
     }
-}
-
-int term_init(const char *term)
-{
-    int rc = curses_init(term);
-    if (rc != 0) {
-        return rc;
-    }
-    term_read_caps();
-    term_setup_extra_keys(term);
-    return 0;
 }
 
 void term_raw(void)

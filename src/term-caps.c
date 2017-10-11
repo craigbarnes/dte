@@ -1,6 +1,74 @@
 #include "term.h"
+
+#ifdef TERMINFO_DISABLE
+
+#include "common.h" // For str_has_prefix
+
+int term_init(const char *const term)
+{
+    static const struct term_cap xterm_caps = {
+        .ut = false,
+        .colors = 8,
+        .strings = {
+            [STR_CAP_CMD_ce] = "\033[K", // Clear to end of line
+            [STR_CAP_CMD_ke] = "\033[?1l\033>", // Turn keypad off
+            [STR_CAP_CMD_ks] = "\033[?1h\033=", // Turn keypad on
+            [STR_CAP_CMD_te] = "\033[?1049l", // End program that uses cursor motion
+            [STR_CAP_CMD_ti] = "\033[?1049h", // Begin program that uses cursor motion
+            [STR_CAP_CMD_vi] = "\033[?25l", // Hide cursor
+
+            // Terminfo actually returns 2 escape sequences for the "cnorm"
+            // capability ("\033[?12l\033[?25h" for xterm and
+            // "\033[?34h\033[?25h" for tmux/screen) but using just the
+            // second sequence ("\033[?25h"), which is common to all 3
+            // terminals, seems to work.
+            [STR_CAP_CMD_ve] = "\033[?25h", // Show cursor
+        },
+        .keymap = {
+            {KEY_INSERT, "\033[2~"},
+            {KEY_DELETE, "\033[3~"},
+            {KEY_HOME, "\033OH"},
+            {KEY_END, "\033OF"},
+            {KEY_PAGE_UP, "\033[5~"},
+            {KEY_PAGE_DOWN, "\033[6~"},
+            {KEY_LEFT, "\033OD"},
+            {KEY_RIGHT, "\033OC"},
+            {KEY_UP, "\033OA"},
+            {KEY_DOWN, "\033OB"},
+            {KEY_F1, "\033OP"},
+            {KEY_F2, "\033OQ"},
+            {KEY_F3, "\033OR"},
+            {KEY_F4, "\033OS"},
+            {KEY_F5, "\033[15~"},
+            {KEY_F6, "\033[17~"},
+            {KEY_F7, "\033[18~"},
+            {KEY_F8, "\033[19~"},
+            {KEY_F9, "\033[20~"},
+            {KEY_F10, "\033[21~"},
+            {KEY_F11, "\033[23~"},
+            {KEY_F12, "\033[24~"},
+        },
+    };
+
+    if (
+        str_has_prefix(term, "tmux")
+        || str_has_prefix(term, "xterm")
+        || str_has_prefix(term, "screen")
+    ) {
+        term_cap = xterm_caps;
+    }
+
+    if (str_has_suffix(term, "256color")) {
+        term_cap.colors = 256;
+    }
+
+    term_setup_extra_keys(term);
+    return 0;
+}
+
+#else
+
 #include "cursed.h"
-#include "xmalloc.h"
 
 static const char *const string_cap_map[NR_STR_CAPS] = {
     "acsc", // acs_chars,
@@ -65,3 +133,16 @@ void term_read_caps(void)
         .code = curses_str_cap("kRIT") // key_sright
     };
 }
+
+int term_init(const char *term)
+{
+    int rc = curses_init(term);
+    if (rc != 0) {
+        return rc;
+    }
+    term_read_caps();
+    term_setup_extra_keys(term);
+    return 0;
+}
+
+#endif

@@ -7,3 +7,6 @@ script:
     - make -j`mk/nproc.sh` check V=1
     - make install DESTDIR="$PWD/pkgdir"
     - pkgdir/usr/local/bin/dte -V
+    - make clean
+    - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+    - ./dte -V

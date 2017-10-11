@@ -4,9 +4,15 @@ LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
-LDLIBS = -lcurses
 SED = sed
 PKGDATADIR = $(datadir)/dte
+
+ifdef TERMINFO_DISABLE
+  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+else
+  LDLIBS = -lcurses
+  editor_objects_extra := cursed
+endif
 
 _VERSION := 1.3
 VERSION = $(or \
@@ -40,14 +46,14 @@ BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
     color command-mode commands common compiler completion config ctags \
-    cursed decoder detect edit editor encoder encoding env error \
+    decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
     frame git-open history hl indent input-special iter key \
     load-save lock main move msg normal-mode obuf options \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
-    wbuf window xmalloc ))
+    wbuf window xmalloc $(editor_objects_extra) ))
 
 test_objects := build/test/test_main.o
 
