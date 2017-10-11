@@ -3,7 +3,7 @@ stages: [build, dist]
 build:alpine:
     stage: build
     image: alpine:3.6
-    script:
+    script: &SCRIPT
         - mk/install-deps.sh
         - make vars
         - make -j`mk/nproc.sh` check V=1
@@ -16,43 +16,19 @@ build:alpine:
 build:centos:
     stage: build
     image: centos:7
-    script:
-        - mk/install-deps.sh
-        - make vars
-        - make -j`mk/nproc.sh` check V=1
-        - make install
-        - dte -V
-        - make clean
-        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
-        - ./dte -V
+    script: *SCRIPT
 
 build:debian:
     stage: build
     image: debian:stretch
     variables: {DEBIAN_FRONTEND: noninteractive}
-    script:
-        - mk/install-deps.sh
-        - make vars
-        - make -j`mk/nproc.sh` check V=1
-        - make install
-        - dte -V
-        - make clean
-        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
-        - ./dte -V
+    script: *SCRIPT
 
 build:ubuntu:
     stage: build
     image: ubuntu:16.04
     variables: {DEBIAN_FRONTEND: noninteractive}
-    script:
-        - mk/install-deps.sh
-        - make vars
-        - make -j`mk/nproc.sh` check V=1
-        - make install
-        - dte -V
-        - make clean
-        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
-        - ./dte -V
+    script: *SCRIPT
 
 pages:
     stage: dist
