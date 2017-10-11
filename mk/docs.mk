@@ -1,6 +1,5 @@
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-NPROC = $(shell sh mk/nproc.sh)
 TTMAN = build/ttman$(EXEC_SUFFIX)
 
 XARGS_P_FLAG = $(shell \
