@@ -50,7 +50,7 @@ pages:
         - strip dte
         - ls -lh dte
         - size dte
-        - ldd dte || :
+        - ldd dte || true
         - readelf -h dte
         - cp dte public/dte-linux-$(uname -m)
 
