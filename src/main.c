@@ -90,17 +90,7 @@ int main(int argc, char *argv[])
         fputs("TERM not set\n", stderr);
         return 1;
     }
-    switch (term_init(term)) {
-    case -1:
-        fputs("terminal is hardcopy\n", stderr);
-        return 1;
-    case -2:
-        fputs("terminal could not be found\n", stderr);
-        return 1;
-    case -3:
-        fputs("terminfo database could not be found\n", stderr);
-        return 1;
-    }
+    term_init(term);
 
     // Create this early. Needed if lock-files is true.
     editor_dir = editor_file("");

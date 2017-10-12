@@ -70,7 +70,7 @@ struct term_color {
 
 extern TerminalCapabilities term_cap;
 
-int term_init(const char *const term);
+void term_init(const char *const term);
 void term_setup_extra_keys(const char *const term);
 
 void term_raw(void);

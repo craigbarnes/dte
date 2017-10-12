@@ -68,7 +68,13 @@ int term_init(const char *const term)
 
 #else
 
-#include "cursed.h"
+// These are normally declared in the <curses.h> and <term.h> headers.
+// They are not included here because of the insane number of unprefixed
+// symbols they declare and because of previous bugs caused by using them.
+int setupterm(const char *term, int filedes, int *errret);
+int tigetflag(const char *capname);
+int tigetnum(const char *capname);
+char *tigetstr(const char *capname);
 
 static const char *const string_cap_map[NR_STR_CAPS] = {
     "acsc", // acs_chars,
@@ -116,6 +122,28 @@ static const struct {
     {MOD_SHIFT | KEY_END, "kEND"},
 };
 
+static int curses_bool_cap(const char *name)
+{
+    return tigetflag(name);
+}
+
+static int curses_int_cap(const char *name)
+{
+    return tigetnum(name);
+}
+
+static char *curses_str_cap(const char *name)
+{
+    char *str = tigetstr(name);
+
+    if (str == (char *)-1) {
+        // Not a string cap (bug?)
+        return NULL;
+    }
+    // NULL = canceled or absent
+    return str;
+}
+
 void term_read_caps(void)
 {
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
@@ -133,15 +161,13 @@ void term_read_caps(void)
     }
 }
 
-int term_init(const char *term)
+void term_init(const char *const term)
 {
-    int rc = curses_init(term);
-    if (rc != 0) {
-        return rc;
-    }
+    // Initialize ncurses (or call exit(3) on failure)
+    setupterm(term, 1, (int*)0);
+
     term_read_caps();
     term_setup_extra_keys(term);
-    return 0;
 }
 
 #endif
