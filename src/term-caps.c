@@ -117,21 +117,15 @@ void term_read_caps(void)
     }
 
     for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
-        term_cap.keymap[i] = (struct term_keymap) {
-            .key = KEY_SPECIAL_MIN + i,
-            .code = curses_str_cap(key_cap_map[i])
-        };
+        term_cap.keymap[i].key = KEY_SPECIAL_MIN + i;
+        term_cap.keymap[i].code = curses_str_cap(key_cap_map[i]);
     }
 
-    term_cap.keymap[NR_SPECIAL_KEYS] = (struct term_keymap) {
-        .key = MOD_SHIFT | KEY_LEFT,
-        .code = curses_str_cap("kLFT") // key_sleft
-    };
+    term_cap.keymap[NR_SPECIAL_KEYS].key = MOD_SHIFT | KEY_LEFT;
+    term_cap.keymap[NR_SPECIAL_KEYS].code = curses_str_cap("kLFT");
 
-    term_cap.keymap[NR_SPECIAL_KEYS + 1] = (struct term_keymap) {
-        .key = MOD_SHIFT | KEY_RIGHT,
-        .code = curses_str_cap("kRIT") // key_sright
-    };
+    term_cap.keymap[NR_SPECIAL_KEYS + 1].key = MOD_SHIFT | KEY_RIGHT;
+    term_cap.keymap[NR_SPECIAL_KEYS + 1].code = curses_str_cap("kRIT");
 }
 
 int term_init(const char *term)
