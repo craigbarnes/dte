@@ -44,7 +44,7 @@ static const char *format_misc_status(Window *win)
             misc_status,
             sizeof(misc_status),
             "[case-sensitive = %s]",
-            case_sensitive_search_enum[editor.options.case_sensitive_search]
+            case_sensitivity_to_string(editor.options.case_sensitive_search)
         );
     } else if (win->view->selection) {
         SelectionInfo info;

@@ -89,8 +89,6 @@ typedef struct {
 
 #undef COMMON_OPTIONS
 
-extern const char *case_sensitive_search_enum[];
-
 #define TAB_BAR_MIN_WIDTH 12
 
 void set_option(const char *name, const char *value, bool local, bool global);
@@ -102,5 +100,6 @@ void collect_options(const char *prefix);
 void collect_toggleable_options(const char *prefix);
 void collect_option_values(const char *name, const char *prefix);
 void free_local_options(LocalOptions *opt);
+const char *case_sensitivity_to_string(SearchCaseSensitivity s);
 
 #endif

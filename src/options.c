@@ -348,7 +348,13 @@ static const struct option_ops option_ops[] = {
 
 static const char *bool_enum[] = {"false", "true", NULL};
 static const char *newline_enum[] = {"unix", "dos", NULL};
-const char *case_sensitive_search_enum[] = {"false", "true", "auto", NULL};
+
+static const char *case_sensitive_search_enum[] = {
+    "false",
+    "true",
+    "auto",
+    NULL
+};
 
 static const char *detect_indent_values[] = {
     "1", "2", "3", "4", "5", "6", "7", "8",
@@ -724,4 +730,8 @@ void free_local_options(LocalOptions *opt)
             *local = NULL;
         }
     }
+}
+
+const char *case_sensitivity_to_string(SearchCaseSensitivity s) {
+    return case_sensitive_search_enum[s];
 }
