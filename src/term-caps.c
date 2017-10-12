@@ -63,7 +63,6 @@ void term_init(const char *const term)
     }
 
     term_setup_extra_keys(term);
-    return 0;
 }
 
 #else
