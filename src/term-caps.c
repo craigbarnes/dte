@@ -4,7 +4,7 @@
 
 #include "common.h" // For str_has_prefix
 
-int term_init(const char *const term)
+void term_init(const char *const term)
 {
     static const TerminalCapabilities xterm_caps = {
         .ut = false,
