@@ -33,6 +33,7 @@ typedef struct {
     char *user_config_dir;
     char *charset;
     bool child_controls_terminal;
+    bool everything_changed;
     bool resized;
     bool term_utf8;
     int screen_w;

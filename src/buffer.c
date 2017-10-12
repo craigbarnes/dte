@@ -14,7 +14,6 @@
 
 Buffer *buffer;
 PointerArray buffers = PTR_ARRAY_INIT;
-bool everything_changed;
 
 static void set_display_filename(Buffer *b, char *name)
 {

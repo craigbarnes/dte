@@ -8,6 +8,7 @@
 #include "ptr-array.h"
 #include "change.h"
 #include "syntax.h"
+#include "editor.h"
 
 struct change {
     struct change *next;
@@ -70,7 +71,6 @@ typedef struct buffer {
 extern struct view *view;
 extern Buffer *buffer;
 extern PointerArray buffers;
-extern bool everything_changed;
 
 static inline void mark_all_lines_changed(Buffer *b)
 {
@@ -80,7 +80,7 @@ static inline void mark_all_lines_changed(Buffer *b)
 
 static inline void mark_everything_changed(void)
 {
-    everything_changed = true;
+    editor.everything_changed = true;
 }
 
 static inline bool buffer_modified(Buffer *b)

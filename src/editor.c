@@ -23,6 +23,7 @@ EditorState editor = {
     .status = EDITOR_INITIALIZING,
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
+    .everything_changed = false,
     .resized = false,
     .screen_w = 80,
     .screen_h = 24,
@@ -415,9 +416,9 @@ static void update_screen(const ScreenState *s)
     View *v = window->view;
     Buffer *b = v->buffer;
 
-    if (everything_changed) {
+    if (editor.everything_changed) {
         editor.mode_ops[editor.input_mode]->update();
-        everything_changed = false;
+        editor.everything_changed = false;
         return;
     }
 
