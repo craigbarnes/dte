@@ -5,9 +5,17 @@
 
 enum {
     KEY_ENTER = '\n',
+
+    // This is the maximum Unicode codepoint allowed by RFC 3629.
+    // When stored in a 32-bit integer, it only requires the first
+    // 21 low-order bits, leaving 11 high-order bits available to
+    // be used as bit flags.
     KEY_UNICODE_MAX = 0x010ffff,
 
-    KEY_SPECIAL_MIN = 0x0110000,
+    // In addition to the 11 unused, high-order bits, there are also
+    // some unused values in the range from KEY_UNICODE_MAX + 1 to
+    // (1 << 21) - 1, which can be used to represent special keys.
+    KEY_SPECIAL_MIN = KEY_UNICODE_MAX + 1,
 
     KEY_INSERT = KEY_SPECIAL_MIN,
     KEY_DELETE,
@@ -35,12 +43,13 @@ enum {
     KEY_SPECIAL_MAX = KEY_F12,
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
 
-    MOD_CTRL  = 0x1000000U,
-    MOD_META  = 0x2000000U,
-    MOD_SHIFT = 0x4000000U,
-    MOD_MASK  = 0x7000000U,
+    // Modifier keys stored as bit flags (as described above).
+    MOD_CTRL  = 0x1000000U, // 1 << 24
+    MOD_META  = 0x2000000U, // 1 << 25
+    MOD_SHIFT = 0x4000000U, // 1 << 26
+    MOD_MASK  = 0x7000000U, // MOD_CTRL | MOD_META | MOD_SHIFT
 
-    KEY_PASTE = 0x8000000U, // Not a key
+    KEY_PASTE = 0x8000000U, // 1 << 27 (not a key)
 };
 
 #define CTRL(x) (MOD_CTRL | (x))
