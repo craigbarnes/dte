@@ -38,6 +38,8 @@ typedef struct {
     int screen_w;
     int screen_h;
     int cmdline_x;
+    PointerArray search_history;
+    PointerArray command_history;
     const char *version;
     const char *pkgdatadir;
 } EditorState;

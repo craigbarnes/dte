@@ -147,10 +147,18 @@ int main(int argc, char *argv[])
     load_file_history();
     command_history_filename = editor_file("command-history");
     search_history_filename = editor_file("search-history");
-    history_load(&command_history, command_history_filename, command_history_size);
-    history_load(&search_history, search_history_filename, search_history_size);
-    if (search_history.count) {
-        search_set_regexp(search_history.ptrs[search_history.count - 1]);
+    history_load (
+        &editor.command_history,
+        command_history_filename,
+        command_history_size
+    );
+    history_load (
+        &editor.search_history,
+        search_history_filename,
+        search_history_size
+    );
+    if (editor.search_history.count) {
+        search_set_regexp(editor.search_history.ptrs[editor.search_history.count - 1]);
     }
 
     // Initialize terminal but don't update screen yet. Also display
@@ -208,8 +216,8 @@ int main(int argc, char *argv[])
     // Unlock files and add files to file history
     remove_frame(root_frame);
 
-    history_save(&command_history, command_history_filename);
-    history_save(&search_history, search_history_filename);
+    history_save(&editor.command_history, command_history_filename);
+    history_save(&editor.search_history, search_history_filename);
     free(command_history_filename);
     free(search_history_filename);
     save_file_history();

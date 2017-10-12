@@ -11,7 +11,7 @@ static void search_mode_keypress(int key)
             char *str = strbuf_cstring(&editor.cmdline.buf);
             search_set_regexp(str);
             search_next();
-            history_add(&search_history, str, search_history_size);
+            history_add(&editor.search_history, str, search_history_size);
             free(str);
         } else {
             search_next();
@@ -26,7 +26,7 @@ static void search_mode_keypress(int key)
         search_set_direction(current_search_direction() ^ 1);
         break;
     default:
-        switch (cmdline_handle_key(&editor.cmdline, &search_history, key)) {
+        switch (cmdline_handle_key(&editor.cmdline, &editor.search_history, key)) {
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:

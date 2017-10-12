@@ -1149,7 +1149,7 @@ static void cmd_search(const char *pf, char **args)
             search_next();
         }
         if (history) {
-            history_add(&search_history, pattern, search_history_size);
+            history_add(&editor.search_history, pattern, search_history_size);
         }
 
         if (pattern != args[0]) {

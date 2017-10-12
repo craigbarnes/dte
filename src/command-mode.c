@@ -18,7 +18,7 @@ static void command_line_enter(void)
 
     // Need to do this before executing the command because
     // "command" can modify contents of command line.
-    history_add(&command_history, str, command_history_size);
+    history_add(&editor.command_history, str, command_history_size);
     free(str);
     cmdline_clear(&editor.cmdline);
 
@@ -41,7 +41,7 @@ static void command_mode_keypress(int key)
         complete_command();
         break;
     default:
-        switch (cmdline_handle_key(&editor.cmdline, &command_history, key)) {
+        switch (cmdline_handle_key(&editor.cmdline, &editor.command_history, key)) {
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:
