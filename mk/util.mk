@@ -1,6 +1,6 @@
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
-DISTRO = $(shell . /etc/os-release && echo "$$PRETTY_NAME")
+DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
 ARCH = $(shell uname -m 2>/dev/null)
 NPROC = $(shell sh mk/nproc.sh)
 STREQ = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
