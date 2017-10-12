@@ -44,7 +44,8 @@ pages:
     artifacts: {paths: [public]}
     only: [master]
     script: &PAGES_SCRIPT
-        - apk --update add make gcc binutils libc-dev groff gzip
+        - apk --update add git make gcc binutils libc-dev groff gzip
+        - git fetch --tags
         - make -j`mk/nproc.sh` docs V=1
         - make -j`mk/nproc.sh` vars check TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static' V=1
         - strip dte
