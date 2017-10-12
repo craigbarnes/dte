@@ -106,7 +106,7 @@ static const KeyMap builtin_keys[] = {
 
 // These basic default values are for ANSI compatible terminals.
 // They will be overwritten by term_init() in most cases.
-struct term_cap term_cap = {
+TerminalCapabilities term_cap = {
     .colors = 8,
     .strings = {
         [STR_CAP_CMD_ce] = "\033[K"

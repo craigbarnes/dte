@@ -47,8 +47,8 @@ struct term_keymap {
     const char *code;
 };
 
-// See termcap(5)
-struct term_cap {
+// See terminfo(5)
+typedef struct {
     // Boolean caps
     bool ut; // Can clear to end of line with bg color set
 
@@ -60,7 +60,7 @@ struct term_cap {
 
     // String caps (keys)
     struct term_keymap keymap[NR_SPECIAL_KEYS + 2];
-};
+} TerminalCapabilities;
 
 struct term_color {
     short fg;
@@ -68,7 +68,7 @@ struct term_color {
     unsigned short attr;
 };
 
-extern struct term_cap term_cap;
+extern TerminalCapabilities term_cap;
 
 int term_init(const char *const term);
 void term_setup_extra_keys(const char *const term);

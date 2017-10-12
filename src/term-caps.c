@@ -6,7 +6,7 @@
 
 int term_init(const char *const term)
 {
-    static const struct term_cap xterm_caps = {
+    static const TerminalCapabilities xterm_caps = {
         .ut = false,
         .colors = 8,
         .strings = {
