@@ -1,6 +1,7 @@
 #include "term.h"
 #include "common.h"
 #include "editor.h"
+#include "cursed.h"
 
 #undef CTRL
 
