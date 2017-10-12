@@ -21,6 +21,7 @@
 #include <signal.h>
 #include <iconv.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #if defined(__GNUC__)
 #define likely(x) __builtin_expect(!!(x), 1)
@@ -36,5 +37,6 @@
 
 #define ARRAY_COUNT(x) ((unsigned long)sizeof(x) / sizeof(x[0]))
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
+#define static_assert(x) _Static_assert((x), #x)
 
 #endif

@@ -83,49 +83,54 @@ static const char *const string_cap_map[NR_STR_CAPS] = {
     "civis", // cursor_invisible,
 };
 
-static const char *const key_cap_map[NR_SPECIAL_KEYS] = {
-    "kich1", // key_ic,
-    "kdch1", // key_dc,
-    "khome", // key_home,
-    "kend", // key_end,
-    "kpp", // key_ppage,
-    "knp", // key_npage,
-    "kcub1", // key_left,
-    "kcuf1", // key_right,
-    "kcuu1", // key_up,
-    "kcud1", // key_down,
-    "kf1", // key_f1,
-    "kf2", // key_f2,
-    "kf3", // key_f3,
-    "kf4", // key_f4,
-    "kf5", // key_f5,
-    "kf6", // key_f6,
-    "kf7", // key_f7,
-    "kf8", // key_f8,
-    "kf9", // key_f9,
-    "kf10", // key_f10,
-    "kf11", // key_f11,
-    "kf12", // key_f12,
+static const struct {
+    uint32_t key;
+    const char *const capname;
+} key_cap_map[] = {
+    {KEY_INSERT, "kich1"},
+    {KEY_DELETE, "kdch1"},
+    {KEY_HOME, "khome"},
+    {KEY_END, "kend"},
+    {KEY_PAGE_UP, "kpp"},
+    {KEY_PAGE_DOWN, "knp"},
+    {KEY_LEFT, "kcub1"},
+    {KEY_RIGHT, "kcuf1"},
+    {KEY_UP, "kcuu1"},
+    {KEY_DOWN, "kcud1"},
+    {KEY_F1, "kf1"},
+    {KEY_F2, "kf2"},
+    {KEY_F3, "kf3"},
+    {KEY_F4, "kf4"},
+    {KEY_F5, "kf5"},
+    {KEY_F6, "kf6"},
+    {KEY_F7, "kf7"},
+    {KEY_F8, "kf8"},
+    {KEY_F9, "kf9"},
+    {KEY_F10, "kf10"},
+    {KEY_F11, "kf11"},
+    {KEY_F12, "kf12"},
+
+    {MOD_SHIFT | KEY_LEFT, "kLFT"},
+    {MOD_SHIFT | KEY_RIGHT, "kRIT"},
+    {MOD_SHIFT | KEY_HOME, "kHOM"},
+    {MOD_SHIFT | KEY_END, "kEND"},
 };
 
 void term_read_caps(void)
 {
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
     term_cap.colors = curses_int_cap("colors"); // max_colors
+
+    static_assert(ARRAY_COUNT(term_cap.strings) == ARRAY_COUNT(string_cap_map));
     for (size_t i = 0; i < NR_STR_CAPS; i++) {
         term_cap.strings[i] = curses_str_cap(string_cap_map[i]);
     }
 
-    for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
-        term_cap.keymap[i].key = KEY_SPECIAL_MIN + i;
-        term_cap.keymap[i].code = curses_str_cap(key_cap_map[i]);
+    static_assert(ARRAY_COUNT(term_cap.keymap) == ARRAY_COUNT(key_cap_map));
+    for (size_t i = 0; i < ARRAY_COUNT(key_cap_map); i++) {
+        term_cap.keymap[i].key = key_cap_map[i].key;
+        term_cap.keymap[i].code = curses_str_cap(key_cap_map[i].capname);
     }
-
-    term_cap.keymap[NR_SPECIAL_KEYS].key = MOD_SHIFT | KEY_LEFT;
-    term_cap.keymap[NR_SPECIAL_KEYS].code = curses_str_cap("kLFT");
-
-    term_cap.keymap[NR_SPECIAL_KEYS + 1].key = MOD_SHIFT | KEY_RIGHT;
-    term_cap.keymap[NR_SPECIAL_KEYS + 1].code = curses_str_cap("kRIT");
 }
 
 int term_init(const char *term)

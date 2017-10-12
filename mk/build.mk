@@ -40,8 +40,8 @@ CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 # 3: Enable expensive sanity checks.
 DEBUG = 1
 
-BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
-BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
+BASIC_CFLAGS += -std=gnu11 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_HOST_CFLAGS += -std=gnu11 $(CWARNS)
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \

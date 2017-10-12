@@ -59,7 +59,7 @@ typedef struct {
     const char *strings[NR_STR_CAPS];
 
     // String caps (keys)
-    struct term_keymap keymap[NR_SPECIAL_KEYS + 2];
+    struct term_keymap keymap[NR_SPECIAL_KEYS + 4];
 } TerminalCapabilities;
 
 struct term_color {
