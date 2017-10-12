@@ -109,7 +109,7 @@ void set_input_mode(InputMode mode)
 
 void any_key(void)
 {
-    int key;
+    Key key;
 
     puts("Press any key to continue");
     while (!term_read_key(&key)) {
@@ -335,7 +335,7 @@ char get_confirmation(const char *choices, const char *format, ...)
 {
     View *v = window->view;
     char buf[4096];
-    unsigned int key;
+    Key key;
     int pos, i, count = strlen(choices);
     char def = 0;
     va_list ap;
@@ -468,7 +468,7 @@ void set_signal_handler(int signum, void (*handler)(int))
 void main_loop(void)
 {
     while (editor.status == EDITOR_RUNNING) {
-        int key;
+        Key key;
 
         if (editor.resized) {
             resize();

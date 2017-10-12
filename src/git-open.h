@@ -15,6 +15,6 @@ struct git_open {
 extern struct git_open git_open;
 
 void git_open_reload(void);
-void git_open_keypress(int key);
+void git_open_keypress(Key key);
 
 #endif

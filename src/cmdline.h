@@ -27,6 +27,6 @@ enum {
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);
-int cmdline_handle_key(CommandLine *c, PointerArray *history, int key);
+int cmdline_handle_key(CommandLine *c, PointerArray *history, Key key);
 
 #endif

@@ -21,7 +21,7 @@ static void insert_paste(void)
     free(text);
 }
 
-static void normal_mode_keypress(int key)
+static void normal_mode_keypress(Key key)
 {
     char buf[4];
     int count;

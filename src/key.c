@@ -28,10 +28,10 @@ static const char *const special_names[NR_SPECIAL_KEYS] = {
     "F12",
 };
 
-static int parse_modifiers(const char *str, int *modifiersp)
+static Key parse_modifiers(const char *str, Key *modifiersp)
 {
-    int modifiers = 0;
-    int i = 0;
+    Key modifiers = 0;
+    Key i = 0;
 
     while (true) {
         unsigned char ch = ascii_toupper(str[i]);
@@ -56,15 +56,14 @@ static int parse_modifiers(const char *str, int *modifiersp)
     return i;
 }
 
-bool parse_key(int *key, const char *str)
+bool parse_key(Key *key, const char *str)
 {
-    int modifiers, ch;
-    long i, len;
+    Key modifiers, ch;
 
     str += parse_modifiers(str, &modifiers);
-    len = strlen(str);
+    size_t len = strlen(str);
 
-    i = 0;
+    size_t i = 0;
     ch = u_get_char(str, len, &i);
     if (u_is_unicode(ch) && i == len) {
         if (modifiers == MOD_CTRL) {
@@ -106,7 +105,7 @@ bool parse_key(int *key, const char *str)
     return false;
 }
 
-char *key_to_string(int key)
+char *key_to_string(Key key)
 {
     StringBuffer buf = STRBUF_INIT;
 
@@ -145,7 +144,7 @@ char *key_to_string(int key)
     return strbuf_steal_cstring(&buf);
 }
 
-bool key_to_ctrl(int key, unsigned char *byte)
+bool key_to_ctrl(Key key, unsigned char *byte)
 {
     if ((key & MOD_MASK) != MOD_CTRL) {
         return false;

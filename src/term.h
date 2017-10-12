@@ -43,7 +43,7 @@ enum {
 };
 
 struct term_keymap {
-    int key;
+    Key key;
     const char *code;
 };
 
@@ -76,7 +76,7 @@ void term_setup_extra_keys(const char *const term);
 void term_raw(void);
 void term_cooked(void);
 
-bool term_read_key(int *key);
+bool term_read_key(Key *key);
 char *term_read_paste(long *size);
 void term_discard_paste(void);
 

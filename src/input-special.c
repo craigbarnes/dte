@@ -35,7 +35,7 @@ void special_input_activate(void)
     input_special = INPUT_SPECIAL_UNKNOWN;
 }
 
-static void keypress(int key, char *buf, int *count)
+static void keypress(Key key, char *buf, int *count)
 {
     if (key == KEY_PASTE) {
         term_discard_paste();
@@ -123,7 +123,7 @@ static void keypress(int key, char *buf, int *count)
     input_special = INPUT_SPECIAL_NONE;
 }
 
-bool special_input_keypress(int key, char *buf, int *count)
+bool special_input_keypress(Key key, char *buf, int *count)
 {
     *count = 0;
     if (input_special == INPUT_SPECIAL_NONE) {

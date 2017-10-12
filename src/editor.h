@@ -19,7 +19,7 @@ typedef enum {
 } InputMode;
 
 typedef struct {
-    void (*keypress)(int key);
+    void (*keypress)(Key key);
     void (*update)(void);
 } EditorModeOps;
 

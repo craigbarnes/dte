@@ -3,7 +3,7 @@
 #include "editor.h"
 #include "search.h"
 
-static void search_mode_keypress(int key)
+static void search_mode_keypress(Key key)
 {
     switch (key) {
     case KEY_ENTER:

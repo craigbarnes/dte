@@ -185,7 +185,7 @@ void git_open_reload(void)
     git_open_filter();
 }
 
-void git_open_keypress(int key)
+void git_open_keypress(Key key)
 {
     switch (key) {
     case KEY_ENTER:

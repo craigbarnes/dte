@@ -84,7 +84,7 @@ static const char *const string_cap_map[NR_STR_CAPS] = {
 };
 
 static const struct {
-    uint32_t key;
+    Key key;
     const char *const capname;
 } key_cap_map[] = {
     {KEY_INSERT, "kich1"},

@@ -164,7 +164,7 @@ void cmdline_set_text(CommandLine *c, const char *text)
     c->search_pos = -1;
 }
 
-int cmdline_handle_key(CommandLine *c, PointerArray *history, int key)
+int cmdline_handle_key(CommandLine *c, PointerArray *history, Key key)
 {
     char buf[4];
     int count;

@@ -1,13 +1,12 @@
 #include "bind.h"
-#include "key.h"
 #include "common.h"
 #include "error.h"
 #include "command.h"
 #include "ptr-array.h"
 
 typedef struct {
-    int keys[3];
-    int count;
+    Key keys[3];
+    size_t count;
 } KeyChain;
 
 typedef struct {
@@ -22,18 +21,17 @@ static PointerArray bindings = PTR_ARRAY_INIT;
 static bool parse_keys(KeyChain *chain, const char *str)
 {
     char *keys = xstrdup(str);
-    int len = strlen(keys);
-    int i = 0;
+    size_t len = strlen(keys);
 
     // Convert all whitespace to \0
-    for (i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         if (ascii_isspace(keys[i])) {
             keys[i] = 0;
         }
     }
 
     memzero(chain);
-    for (i = 0; i < len; ) {
+    for (size_t i = 0; i < len; ) {
         const char *key;
 
         while (i < len && keys[i] == 0) {
@@ -84,7 +82,7 @@ void add_binding(const char *keys, const char *command)
 void remove_binding(const char *keys)
 {
     KeyChain chain;
-    int i = bindings.count;
+    size_t i = bindings.count;
 
     if (!parse_keys(&chain, keys)) {
         return;
@@ -102,12 +100,12 @@ void remove_binding(const char *keys)
     }
 }
 
-void handle_binding(int key)
+void handle_binding(Key key)
 {
     pressed_keys.keys[pressed_keys.count] = key;
     pressed_keys.count++;
 
-    for (int i = bindings.count; i > 0; i--) {
+    for (size_t i = bindings.count; i > 0; i--) {
         Binding *b = bindings.ptrs[i - 1];
         KeyChain *c = &b->chain;
 

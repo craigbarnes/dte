@@ -9,7 +9,7 @@
 #include <termios.h>
 
 typedef struct {
-    int key;
+    Key key;
     const char *const code;
     unsigned int terms;
 } KeyMap;
@@ -121,13 +121,13 @@ TerminalCapabilities term_cap = {
 
 static struct termios termios_save;
 static char buffer[64];
-static int buffer_pos;
+static size_t buffer_pos;
 static unsigned int term_flags; // T_*
 
 static void buffer_num(unsigned int num)
 {
     char stack[32];
-    int pos = 0;
+    size_t pos = 0;
 
     do {
         stack[pos++] = (num % 10) + '0';
@@ -201,10 +201,10 @@ void term_cooked(void)
 }
 
 static char input_buf[256];
-static int input_buf_fill;
+static size_t input_buf_fill;
 static bool input_can_be_truncated;
 
-static void consume_input(int len)
+static void consume_input(size_t len)
 {
     input_buf_fill -= len;
     if (input_buf_fill) {
@@ -265,14 +265,12 @@ static bool input_get_byte(unsigned char *ch)
 
 static const KeyMap *find_key(bool *possibly_truncated)
 {
-    for (int i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
         const KeyMap *entry = &builtin_keys[i];
-        int len;
-
         if ((entry->terms & term_flags) == 0) {
             continue;
         }
-        len = strlen(entry->code);
+        size_t len = strlen(entry->code);
         if (len > input_buf_fill) {
             if (!memcmp(entry->code, input_buf, input_buf_fill)) {
                 *possibly_truncated = true;
@@ -284,7 +282,7 @@ static const KeyMap *find_key(bool *possibly_truncated)
     return NULL;
 }
 
-static bool read_special(int *key)
+static bool read_special(Key *key)
 {
     const KeyMap *entry;
     bool possibly_truncated = false;
@@ -295,13 +293,12 @@ static bool read_special(int *key)
     for (size_t i = 0; i < ARRAY_COUNT(term_cap.keymap); i++) {
         const struct term_keymap *km = &term_cap.keymap[i];
         const char *keycode = km->code;
-        int len;
 
         if (!keycode) {
             continue;
         }
 
-        len = strlen(keycode);
+        size_t len = strlen(keycode);
         if (len > input_buf_fill) {
             // This might be a truncated escape sequence
             if (!memcmp(keycode, input_buf, input_buf_fill)) {
@@ -329,7 +326,7 @@ static bool read_special(int *key)
     return false;
 }
 
-static bool read_simple(int *key)
+static bool read_simple(Key *key)
 {
     unsigned char ch = 0;
 
@@ -390,9 +387,9 @@ static bool read_simple(int *key)
     return true;
 }
 
-static bool is_text(const char *str, int len)
+static bool is_text(const char *str, size_t len)
 {
-    for (int i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         // NOTE: must be unsigned!
         unsigned char ch = str[i];
         switch (ch) {
@@ -410,7 +407,7 @@ static bool is_text(const char *str, int len)
     return true;
 }
 
-static bool read_key(int *key)
+static bool read_key(Key *key)
 {
     if (!input_buf_fill && !fill_buffer()) {
         return false;
@@ -471,10 +468,10 @@ static bool read_key(int *key)
     return read_simple(key);
 }
 
-bool term_read_key(int *key)
+bool term_read_key(Key *key)
 {
     bool ok = read_key(key);
-    int k = *key;
+    Key k = *key;
     if (DEBUG > 2 && ok && k != KEY_PASTE && k > KEY_UNICODE_MAX) {
         // Modifiers and/or special key
         char *str = key_to_string(k);
@@ -486,8 +483,8 @@ bool term_read_key(int *key)
 
 char *term_read_paste(long *size)
 {
-    long alloc = ROUND_UP(input_buf_fill + 1, 1024);
-    long count = 0;
+    size_t alloc = ROUND_UP(input_buf_fill + 1, 1024);
+    size_t count = 0;
     char *buf = xmalloc(alloc);
 
     if (input_buf_fill) {
@@ -525,7 +522,7 @@ char *term_read_paste(long *size)
         }
         count += rc;
     }
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (buf[i] == '\r') {
             buf[i] = '\n';
         }
