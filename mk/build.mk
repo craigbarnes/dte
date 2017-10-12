@@ -11,7 +11,6 @@ ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
   LDLIBS = -lcurses
-  editor_objects_extra := cursed
 endif
 
 _VERSION := 1.3
@@ -53,7 +52,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
-    wbuf window xmalloc $(editor_objects_extra) ))
+    wbuf window xmalloc ))
 
 test_objects := build/test/test_main.o
 

@@ -68,7 +68,8 @@ int term_init(const char *const term)
 
 #else
 
-#include "cursed.h"
+#include <curses.h>
+#include <term.h>
 
 static const char *const string_cap_map[NR_STR_CAPS] = {
     "acsc", // acs_chars,
@@ -116,6 +117,28 @@ static const struct {
     {MOD_SHIFT | KEY_END, "kEND"},
 };
 
+static int curses_bool_cap(const char *name)
+{
+    return tigetflag((char *)name);
+}
+
+static int curses_int_cap(const char *name)
+{
+    return tigetnum((char *)name);
+}
+
+static char *curses_str_cap(const char *name)
+{
+    char *str = tigetstr((char *)name);
+
+    if (str == (char *)-1) {
+        // Not a string cap (bug?)
+        return NULL;
+    }
+    // NULL = canceled or absent
+    return str;
+}
+
 void term_read_caps(void)
 {
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
@@ -131,6 +154,19 @@ void term_read_caps(void)
         term_cap.keymap[i].key = key_cap_map[i].key;
         term_cap.keymap[i].code = curses_str_cap(key_cap_map[i].capname);
     }
+}
+
+static int curses_init(const char *term)
+{
+    int err;
+
+    if (setupterm((char *)term, 1, &err) == ERR) {
+        // -1 (1) terminal is hardcopy
+        // -2 (0) terminal could not be found
+        // -3 (-1) terminfo database could not be found
+        return err - 2;
+    }
+    return 0;
 }
 
 int term_init(const char *term)
