@@ -32,6 +32,7 @@ WARNINGS = \
 # called once per build instead of once per object file (or not at
 # all for targets that don't use it).
 CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
+CSTD = $(eval CSTD := $(call cc-option,-std=gnu11,-std=gnu99))$(CSTD)
 
 ifdef USE_SANITIZER
   SANITIZER_FLAGS = -fsanitize=address,leak,undefined
@@ -46,8 +47,8 @@ else
   DEBUG = 1
 endif
 
-BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
-BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
+BASIC_CFLAGS += $(CSTD) -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
