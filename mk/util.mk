@@ -5,6 +5,7 @@ ARCH = $(shell uname -m 2>/dev/null)
 NPROC = $(shell sh mk/nproc.sh)
 TPUT = $(shell sh -c 'command -v tput')
 TPUT-V = $(if $(TPUT), $(shell $(TPUT) -V 2>/dev/null))
+CC-VERSION = $(shell $(CC) --version 2>/dev/null | head -n1)
 STREQ = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 PRINTVAR = printf '\033[1m%13s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
@@ -13,7 +14,7 @@ USERVARS = CC CFLAGS LDFLAGS LDLIBS DEBUG PKGDATADIR
 AUTOVARS = \
     VERSION KERNEL \
     $(if $(call STREQ,$(KERNEL),Linux), DISTRO) \
-    ARCH NPROC TERM TPUT TPUT-V MAKE_VERSION SHELL
+    ARCH NPROC TERM TPUT TPUT-V MAKE_VERSION SHELL CC-VERSION
 
 vars:
 	@echo
