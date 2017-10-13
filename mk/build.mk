@@ -33,11 +33,18 @@ WARNINGS = \
 # all for targets that don't use it).
 CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 
-# 0: Disable debugging.
-# 1: Enable BUG_ON() and light-weight sanity checks.
-# 2: Enable logging to $(DTE_HOME)/debug.log.
-# 3: Enable expensive sanity checks.
-DEBUG = 1
+ifdef USE_SANITIZER
+  SANITIZER_FLAGS = -fsanitize=address,leak,undefined
+  BASIC_CFLAGS += $(SANITIZER_FLAGS)
+  BASIC_LDFLAGS += $(SANITIZER_FLAGS)
+  DEBUG = 3
+else
+  # 0: Disable debugging
+  # 1: Enable BUG_ON() and light-weight sanity checks
+  # 2: Enable logging to $(DTE_HOME)/debug.log
+  # 3: Enable expensive sanity checks
+  DEBUG = 1
+endif
 
 BASIC_CFLAGS += -std=gnu11 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
 BASIC_HOST_CFLAGS += -std=gnu11 $(CWARNS)
