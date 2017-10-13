@@ -35,7 +35,7 @@
 #define FORMAT(idx)
 #endif
 
-#if __STDC_VERSION__ >= 201112L
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #define static_assert(x) _Static_assert((x), #x)
 #else
 #define static_assert(x)

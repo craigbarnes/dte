@@ -46,8 +46,8 @@ else
   DEBUG = 1
 endif
 
-BASIC_CFLAGS += -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
-BASIC_HOST_CFLAGS += $(CWARNS)
+BASIC_CFLAGS += -std=gnu99 -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_HOST_CFLAGS += -std=gnu99 $(CWARNS)
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
