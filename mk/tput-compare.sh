@@ -20,16 +20,22 @@ if test -z "$caps"; then
     '
 fi
 
-col='%-10s'
+col='  %-9s'
 col1=' %-6s |'
 
-printf "$col1 $col $col $col $col $col $col\n" cap $terms
-printf '%78s\n' |tr " " "-"
+printf "$col1" cap
+for term in $terms; do
+    printf "$col" "$term"
+done
+printf '\n'
+
+ncols="$(tput cols 2>/dev/null)"
+printf "%${ncols:-80}s\n" |tr " " "-"
 
 for cap in $caps; do
     printf "$col1" "$cap"
     for term in $terms; do
-        printf " $col" "$(escaped_tput -T $term $cap)"
+        printf "$col" "$(escaped_tput -T $term $cap)"
     done
     printf '\n'
 done
