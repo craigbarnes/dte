@@ -98,15 +98,15 @@ void buf_add_str(const char *str)
 
 void buf_hide_cursor(void)
 {
-    if (term_cap.strings[STR_CAP_CMD_vi]) {
-        buf_escape(term_cap.strings[STR_CAP_CMD_vi]);
+    if (term_cap.strings[TERMCAP_HIDE_CURSOR]) {
+        buf_escape(term_cap.strings[TERMCAP_HIDE_CURSOR]);
     }
 }
 
 void buf_show_cursor(void)
 {
-    if (term_cap.strings[STR_CAP_CMD_ve]) {
-        buf_escape(term_cap.strings[STR_CAP_CMD_ve]);
+    if (term_cap.strings[TERMCAP_SHOW_CURSOR]) {
+        buf_escape(term_cap.strings[TERMCAP_SHOW_CURSOR]);
     }
 }
 
@@ -130,10 +130,10 @@ void buf_clear_eol(void)
     if (obuf.x < obuf.scroll_x + obuf.width) {
         if (
             obuf.can_clear
-            && term_cap.strings[STR_CAP_CMD_ce]
+            && term_cap.strings[TERMCAP_CLEAR_TO_EOL]
             && (obuf.color.bg < 0 || term_cap.ut)
         ) {
-            buf_escape(term_cap.strings[STR_CAP_CMD_ce]);
+            buf_escape(term_cap.strings[TERMCAP_CLEAR_TO_EOL]);
             obuf.x = obuf.scroll_x + obuf.width;
         } else {
             buf_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);

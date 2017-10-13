@@ -5,16 +5,13 @@
 #include "key.h"
 
 enum {
-    STR_CAP_CMD_ac, // Pairs of block graphic characters to map alternate character set
-    STR_CAP_CMD_ae, // End alternative character set
-    STR_CAP_CMD_as, // Start alternative character set for block graphic characters
-    STR_CAP_CMD_ce, // Clear to end of line
-    STR_CAP_CMD_ke, // Turn keypad off
-    STR_CAP_CMD_ks, // Turn keypad on
-    STR_CAP_CMD_te, // End program that uses cursor motion
-    STR_CAP_CMD_ti, // Begin program that uses cursor motion
-    STR_CAP_CMD_ve, // Show cursor
-    STR_CAP_CMD_vi, // Hide cursor
+    TERMCAP_CLEAR_TO_EOL,
+    TERMCAP_KEYPAD_OFF,
+    TERMCAP_KEYPAD_ON,
+    TERMCAP_CUP_MODE_OFF,
+    TERMCAP_CUP_MODE_ON,
+    TERMCAP_SHOW_CURSOR,
+    TERMCAP_HIDE_CURSOR,
 
     NR_STR_CAPS
 };

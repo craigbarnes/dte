@@ -10,19 +10,19 @@ void term_init(const char *const term)
         .ut = false,
         .colors = 8,
         .strings = {
-            [STR_CAP_CMD_ce] = "\033[K", // Clear to end of line
-            [STR_CAP_CMD_ke] = "\033[?1l\033>", // Turn keypad off
-            [STR_CAP_CMD_ks] = "\033[?1h\033=", // Turn keypad on
-            [STR_CAP_CMD_te] = "\033[?1049l", // End program that uses cursor motion
-            [STR_CAP_CMD_ti] = "\033[?1049h", // Begin program that uses cursor motion
-            [STR_CAP_CMD_vi] = "\033[?25l", // Hide cursor
+            [TERMCAP_CLEAR_TO_EOL] = "\033[K",
+            [TERMCAP_KEYPAD_OFF] = "\033[?1l\033>",
+            [TERMCAP_KEYPAD_ON] = "\033[?1h\033=",
+            [TERMCAP_CUP_MODE_OFF] = "\033[?1049l",
+            [TERMCAP_CUP_MODE_ON] = "\033[?1049h",
+            [TERMCAP_HIDE_CURSOR] = "\033[?25l",
 
             // Terminfo actually returns 2 escape sequences for the "cnorm"
             // capability ("\033[?12l\033[?25h" for xterm and
             // "\033[?34h\033[?25h" for tmux/screen) but using just the
             // second sequence ("\033[?25h"), which is common to all 3
             // terminals, seems to work.
-            [STR_CAP_CMD_ve] = "\033[?25h", // Show cursor
+            [TERMCAP_SHOW_CURSOR] = "\033[?25h",
         },
         .keymap = {
             {KEY_INSERT, "\033[2~"},
@@ -74,19 +74,6 @@ int setupterm(const char *term, int filedes, int *errret);
 int tigetflag(const char *capname);
 int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
-
-static const char *const string_cap_map[NR_STR_CAPS] = {
-    "acsc", // acs_chars,
-    "rmacs", // exit_alt_charset_mode,
-    "smacs", // enter_alt_charset_mode,
-    "el", // clr_eol,
-    "rmkx", // keypad_local,
-    "smkx", // keypad_xmit,
-    "rmcup", // exit_ca_mode,
-    "smcup", // enter_ca_mode,
-    "cnorm", // cursor_normal,
-    "civis", // cursor_invisible,
-};
 
 static const struct {
     Key key;
@@ -148,10 +135,14 @@ void term_read_caps(void)
     term_cap.ut = curses_bool_cap("bce"); // back_color_erase
     term_cap.colors = curses_int_cap("colors"); // max_colors
 
-    static_assert(ARRAY_COUNT(term_cap.strings) == ARRAY_COUNT(string_cap_map));
-    for (size_t i = 0; i < NR_STR_CAPS; i++) {
-        term_cap.strings[i] = curses_str_cap(string_cap_map[i]);
-    }
+    static_assert(ARRAY_COUNT(term_cap.strings) == 7);
+    term_cap.strings[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
+    term_cap.strings[TERMCAP_KEYPAD_OFF] = curses_str_cap("rmkx");
+    term_cap.strings[TERMCAP_KEYPAD_ON] = curses_str_cap("smkx");
+    term_cap.strings[TERMCAP_CUP_MODE_OFF] = curses_str_cap("rmcup");
+    term_cap.strings[TERMCAP_CUP_MODE_ON] = curses_str_cap("smcup");
+    term_cap.strings[TERMCAP_SHOW_CURSOR] = curses_str_cap("cnorm");
+    term_cap.strings[TERMCAP_HIDE_CURSOR] = curses_str_cap("civis");
 
     static_assert(ARRAY_COUNT(term_cap.keymap) == ARRAY_COUNT(key_cap_map));
     for (size_t i = 0; i < ARRAY_COUNT(key_cap_map); i++) {

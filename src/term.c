@@ -108,7 +108,7 @@ static const KeyMap builtin_keys[] = {
 TerminalCapabilities term_cap = {
     .colors = 8,
     .strings = {
-        [STR_CAP_CMD_ce] = "\033[K"
+        [TERMCAP_CLEAR_TO_EOL] = "\033[K"
     },
     .keymap = {
         {KEY_LEFT, "\033[D"},
