@@ -51,6 +51,7 @@ ft c cpp hpp cc hh C H cxx hxx c++ moc inl pro
 ft css css
 ft d d
 ft diff diff patch
+ft dte dterc
 ft go go
 ft html html htm xhtml
 ft ini ini pls desktop override flatpakrepo flatpakref
