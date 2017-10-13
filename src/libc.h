@@ -35,8 +35,13 @@
 #define FORMAT(idx)
 #endif
 
+#if __STDC_VERSION__ >= 201112L
+#define static_assert(x) _Static_assert((x), #x)
+#else
+#define static_assert(x)
+#endif
+
 #define ARRAY_COUNT(x) ((unsigned long)sizeof(x) / sizeof(x[0]))
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
-#define static_assert(x) _Static_assert((x), #x)
 
 #endif
