@@ -6,7 +6,7 @@
 
 static PointerArray file_locations = PTR_ARRAY_INIT;
 
-FileLocation *create_file_location(View *v)
+FileLocation *create_file_location(const View *v)
 {
     FileLocation *loc;
 
@@ -45,7 +45,7 @@ bool file_location_equals(const FileLocation *a, const FileLocation *b)
     return true;
 }
 
-bool file_location_go(FileLocation *loc)
+bool file_location_go(const FileLocation *loc)
 {
     Window *w = window;
     View *v = window_open_buffer(w, loc->filename, true, NULL);
@@ -73,7 +73,7 @@ bool file_location_go(FileLocation *loc)
     return ok;
 }
 
-bool file_location_return(FileLocation *loc)
+bool file_location_return(const FileLocation *loc)
 {
     Window *w = window;
     Buffer *b = find_buffer_by_id(loc->buffer_id);

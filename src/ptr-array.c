@@ -55,7 +55,7 @@ void *ptr_array_remove_idx(PointerArray *array, size_t pos)
     return ptr;
 }
 
-size_t ptr_array_idx(PointerArray *array, void *ptr)
+size_t ptr_array_idx(const PointerArray *array, const void *ptr)
 {
     for (size_t i = 0; i < array->count; i++) {
         if (array->ptrs[i] == ptr) {
@@ -65,7 +65,7 @@ size_t ptr_array_idx(PointerArray *array, void *ptr)
     return -1;
 }
 
-void *ptr_array_rel(PointerArray *array, void *ptr, size_t offset)
+void *ptr_array_rel(const PointerArray *array, const void *ptr, size_t offset)
 {
     size_t i = ptr_array_idx(array, ptr);
     return array->ptrs[(i + offset + array->count) % array->count];

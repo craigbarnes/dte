@@ -258,7 +258,7 @@ void do_insert(const char *buf, long len)
     }
 }
 
-static bool only_block(Block *blk)
+static bool only_block(const Block *blk)
 {
     return
         blk->node.prev == &buffer->blocks

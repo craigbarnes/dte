@@ -124,8 +124,8 @@ static inline bool is_subsyntax(Syntax *syn)
 }
 
 unsigned long buf_hash(const char *str, size_t size);
-StringList *find_string_list(Syntax *syn, const char *name);
-State *find_state(Syntax *syn, const char *name);
+StringList *find_string_list(const Syntax *syn, const char *name);
+State *find_state(const Syntax *syn, const char *name);
 State *merge_syntax(Syntax *syn, SyntaxMerge *m);
 void finalize_syntax(Syntax *syn, int saved_nr_errors);
 

@@ -10,10 +10,10 @@ typedef struct {
     bool swapped;
 } SelectionInfo;
 
-void init_selection(View *v, SelectionInfo *info);
+void init_selection(const View *v, SelectionInfo *info);
 long prepare_selection(View *v);
 char *view_get_selection(View *v, long *size);
-int get_nr_selected_lines(SelectionInfo *info);
-int get_nr_selected_chars(SelectionInfo *info);
+int get_nr_selected_lines(const SelectionInfo *info);
+int get_nr_selected_chars(const SelectionInfo *info);
 
 #endif

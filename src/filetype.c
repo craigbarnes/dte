@@ -83,9 +83,12 @@ static char *get_ext(const char *filename)
     return xstrslice(ext, 0, ext_len);
 }
 
-const char *find_ft(const char *filename, const char *interpreter,
-    const char *first_line, unsigned int line_len)
-{
+const char *find_ft (
+    const char *filename,
+    const char *interpreter,
+    const char *first_line,
+    unsigned int line_len
+) {
     unsigned int filename_len = strlen(filename);
     char *ext = NULL;
 

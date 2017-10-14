@@ -16,7 +16,7 @@ unsigned long buf_hash(const char *str, size_t size)
     return hash;
 }
 
-StringList *find_string_list(Syntax *syn, const char *name)
+StringList *find_string_list(const Syntax *syn, const char *name)
 {
     for (int i = 0; i < syn->string_lists.count; i++) {
         StringList *list = syn->string_lists.ptrs[i];
@@ -27,7 +27,7 @@ StringList *find_string_list(Syntax *syn, const char *name)
     return NULL;
 }
 
-State *find_state(Syntax *syn, const char *name)
+State *find_state(const Syntax *syn, const char *name)
 {
     for (int i = 0; i < syn->states.count; i++) {
         State *s = syn->states.ptrs[i];

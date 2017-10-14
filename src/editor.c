@@ -239,7 +239,7 @@ static void update_window(Window *w)
 }
 
 // Update all visible views containing this buffer
-static void update_buffer_windows(Buffer *b)
+static void update_buffer_windows(const Buffer *const b)
 {
     long i;
 
@@ -411,7 +411,7 @@ typedef struct {
     int vy;
 } ScreenState;
 
-static void update_screen(const ScreenState *s)
+static void update_screen(const ScreenState *const s)
 {
     View *v = window->view;
     Buffer *b = v->buffer;

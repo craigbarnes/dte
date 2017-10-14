@@ -264,7 +264,7 @@ void cconv_flush(struct cconv *c)
     }
 }
 
-int cconv_nr_errors(struct cconv *c)
+int cconv_nr_errors(const struct cconv *c)
 {
     return c->errors;
 }

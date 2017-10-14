@@ -1,7 +1,7 @@
 #include "selection.h"
 #include "buffer.h"
 
-void init_selection(View *v, SelectionInfo *info)
+void init_selection(const View *v, SelectionInfo *info)
 {
     BlockIter ei;
     unsigned int u;
@@ -58,7 +58,7 @@ char *view_get_selection(View *v, long *size)
     return buf;
 }
 
-int get_nr_selected_lines(SelectionInfo *info)
+int get_nr_selected_lines(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;
@@ -74,7 +74,7 @@ int get_nr_selected_lines(SelectionInfo *info)
     return nr_lines;
 }
 
-int get_nr_selected_chars(SelectionInfo *info)
+int get_nr_selected_chars(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;

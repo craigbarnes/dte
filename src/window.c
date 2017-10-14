@@ -379,7 +379,7 @@ void mark_buffer_tabbars_changed(Buffer *b)
     }
 }
 
-static int calc_vertical_tabbar_width(Window *win)
+static int calc_vertical_tabbar_width(const Window *win)
 {
     // Line numbers are included in min_edit_w
     int min_edit_w = 80;
@@ -394,7 +394,7 @@ static int calc_vertical_tabbar_width(Window *win)
     return w;
 }
 
-enum tab_bar tabbar_visibility(Window *win)
+enum tab_bar tabbar_visibility(const Window *win)
 {
     switch (editor.options.tab_bar) {
     case TAB_BAR_HIDDEN:
@@ -416,7 +416,7 @@ enum tab_bar tabbar_visibility(Window *win)
     return 0;
 }
 
-int vertical_tabbar_width(Window *win)
+int vertical_tabbar_width(const Window *win)
 {
     if (tabbar_visibility(win) == TAB_BAR_VERTICAL) {
         return calc_vertical_tabbar_width(win);
@@ -424,7 +424,7 @@ int vertical_tabbar_width(Window *win)
     return 0;
 }
 
-static int line_numbers_width(Window *win)
+static int line_numbers_width(const Window *win)
 {
     int w = 0, min_w = 5;
 
@@ -437,12 +437,12 @@ static int line_numbers_width(Window *win)
     return w;
 }
 
-static int edit_x_offset(Window *win)
+static int edit_x_offset(const Window *win)
 {
     return line_numbers_width(win) + vertical_tabbar_width(win);
 }
 
-static int edit_y_offset(Window *win)
+static int edit_y_offset(const Window *win)
 {
     if (tabbar_visibility(win) == TAB_BAR_HORIZONTAL) {
         return 1;
@@ -488,7 +488,7 @@ void set_window_size(Window *win, int w, int h)
     calculate_line_numbers(win);
 }
 
-int window_get_scroll_margin(Window *w)
+int window_get_scroll_margin(const Window *w)
 {
     int max = (w->edit_h - 1) / 2;
 

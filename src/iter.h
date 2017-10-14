@@ -18,7 +18,7 @@ typedef struct block {
     long nl;
 } Block;
 
-static inline Block *BLOCK(ListHead *item)
+static inline Block *BLOCK(const ListHead *const item)
 {
     return container_of(item, Block, node);
 }
@@ -66,7 +66,7 @@ long block_iter_get_offset(const BlockIter *bi);
 bool block_iter_is_bol(const BlockIter *bi);
 char *block_iter_get_bytes(const BlockIter *bi, long len);
 
-static inline bool block_iter_is_eof(BlockIter *bi)
+static inline bool block_iter_is_eof(const BlockIter *bi)
 {
     return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
 }

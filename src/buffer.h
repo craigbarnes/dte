@@ -83,7 +83,7 @@ static inline void mark_everything_changed(void)
     editor.everything_changed = true;
 }
 
-static inline bool buffer_modified(Buffer *b)
+static inline bool buffer_modified(const Buffer *b)
 {
     return b->saved_change != b->cur_change;
 }

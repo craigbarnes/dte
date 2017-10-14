@@ -18,11 +18,11 @@ typedef struct {
 
 struct view;
 
-FileLocation *create_file_location(struct view *v);
+FileLocation *create_file_location(const struct view *v);
 void file_location_free(FileLocation *loc);
 bool file_location_equals(const FileLocation *a, const FileLocation *b);
-bool file_location_go(FileLocation *loc);
-bool file_location_return(FileLocation *loc);
+bool file_location_go(const FileLocation *loc);
+bool file_location_return(const FileLocation *loc);
 void push_file_location(FileLocation *loc);
 void pop_file_location(void);
 

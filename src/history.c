@@ -25,8 +25,11 @@ void history_add(PointerArray *history, const char *text, int max_entries)
     ptr_array_add(history, xstrdup(text));
 }
 
-bool history_search_forward(PointerArray *history, int *pos, const char *text)
-{
+bool history_search_forward (
+    const PointerArray *history,
+    int *pos,
+    const char *text
+) {
     int i = *pos;
 
     while (--i >= 0) {
@@ -38,8 +41,11 @@ bool history_search_forward(PointerArray *history, int *pos, const char *text)
     return false;
 }
 
-bool history_search_backward(PointerArray *history, int *pos, const char *text)
-{
+bool history_search_backward (
+    const PointerArray *history,
+    int *pos,
+    const char *text
+) {
     int i = *pos;
 
     while (++i < history->count) {

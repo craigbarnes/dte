@@ -53,7 +53,7 @@ void view_update_cursor_x(View *v)
     v->cx_display = w;
 }
 
-static int view_is_cursor_visible(View *v)
+static bool view_is_cursor_visible(const View *v)
 {
     return v->cy < v->vy || v->cy > v->vy + v->window->edit_h - 1;
 }
