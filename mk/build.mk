@@ -28,11 +28,17 @@ WARNINGS = \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Wextra -Wno-unused-parameter -Wno-sign-compare
 
-# Use "initially recursive variable" trick so that cc-option is only
-# called once per build instead of once per object file (or not at
-# all for targets that don't use it).
-CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
-CSTD = $(eval CSTD := $(call cc-option,-std=gnu11,-std=gnu99))$(CSTD)
+CWARNS = $(call cc-option,$(WARNINGS))
+CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
+
+ifneq "$(MAKE_VERSION)" "3.81"
+  # Use "initially recursive" trick so that these variables are only
+  # expanded (at most) once per build instead of once per object file.
+  # Disabled for Make 3.81 due to an intermittent crash bug.
+  make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
+  $(call make-lazy,CWARNS)
+  $(call make-lazy,CSTD)
+endif
 
 ifdef USE_SANITIZER
   export ASAN_OPTIONS=detect_leaks=0
