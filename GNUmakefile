@@ -48,7 +48,7 @@ check: $(test) all
 	$(Q) $<
 
 check-commands: $(dte) | build/test/
-	@$(dte) -c "$$(cat test/thai.dterc | sed '/^\#/d;/^$$/d' | tr '\n' ';')"
+	@$(dte) -R -c "$$(cat test/thai.dterc | sed '/^\#/d;/^$$/d' | tr '\n' ';')"
 	@diff -q build/test/thai-utf8.txt test/thai-utf8.txt
 	@diff -q build/test/thai-tis620.txt test/thai-tis620.txt
 	@$(RM)  build/test/thai-utf8.txt build/test/thai-tis620.txt
