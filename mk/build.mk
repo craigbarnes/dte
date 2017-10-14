@@ -35,7 +35,8 @@ CWARNS = $(eval CWARNS := $(call cc-option,$(WARNINGS)))$(CWARNS)
 CSTD = $(eval CSTD := $(call cc-option,-std=gnu11,-std=gnu99))$(CSTD)
 
 ifdef USE_SANITIZER
-  SANITIZER_FLAGS = -fsanitize=address,leak,undefined
+  export ASAN_OPTIONS=detect_leaks=0
+  SANITIZER_FLAGS = -fsanitize=address,undefined
   BASIC_CFLAGS += $(SANITIZER_FLAGS)
   BASIC_LDFLAGS += $(SANITIZER_FLAGS)
   DEBUG = 3

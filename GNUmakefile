@@ -47,6 +47,12 @@ check: $(test) all
 	$(E) TEST $<
 	$(Q) $<
 
+check-commands: $(dte) | build/test/
+	@$(dte) -c "$$(cat test/thai.dterc | sed '/^\#/d;/^$$/d' | tr '\n' ';')"
+	@diff -q build/test/thai-utf8.txt test/thai-utf8.txt
+	@diff -q build/test/thai-tis620.txt test/thai-tis620.txt
+	@$(RM)  build/test/thai-utf8.txt build/test/thai-tis620.txt
+
 tags:
 	ctags src/*.[ch]
 
@@ -59,5 +65,5 @@ distclean: clean
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install check tags clean distclean
+.PHONY: all install check check-commands tags clean distclean
 .DELETE_ON_ERROR:
