@@ -101,12 +101,18 @@ const char *find_ft(const char *filename, const char *interpreter,
             }
             break;
         case FT_FILENAME:
-            if (!filename || !regexp_match_nosub(ft->str, filename, filename_len)) {
+            if (
+                !filename
+                || !regexp_match_nosub(ft->str, filename, filename_len)
+            ) {
                 continue;
             }
             break;
         case FT_CONTENT:
-            if (!first_line || !regexp_match_nosub(ft->str, first_line, line_len)) {
+            if (
+                !first_line
+                || !regexp_match_nosub(ft->str, first_line, line_len)
+            ) {
                 continue;
             }
             break;

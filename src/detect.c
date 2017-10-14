@@ -23,7 +23,12 @@ char *detect_interpreter(Buffer *b)
     char *ret;
 
     fill_line_ref(&bi, &lr);
-    if (!regexp_match("^#!\\s*/.*(/env\\s+|/)([a-zA-Z_-]+)[0-9.]*(\\s|$)", lr.line, lr.size, &m)) {
+    if (!regexp_match (
+        "^#!\\s*/.*(/env\\s+|/)([a-zA-Z_-]+)[0-9.]*(\\s|$)",
+        lr.line,
+        lr.size,
+        &m
+    )) {
         return NULL;
     }
 
@@ -39,11 +44,17 @@ char *detect_interpreter(Buffer *b)
      * # the next line restarts using wish \
      * exec wish "$0" "$@"
      */
-    if (!next_line(&bi, &lr) || !regexp_match_nosub("^#.*\\\\$", lr.line, lr.size)) {
+    if (
+        !next_line(&bi, &lr)
+        || !regexp_match_nosub("^#.*\\\\$", lr.line, lr.size)
+    ) {
         return ret;
     }
 
-    if (!next_line(&bi, &lr) || !regexp_match_nosub("^exec\\s+wish\\s+", lr.line, lr.size)) {
+    if (
+        !next_line(&bi, &lr)
+        || !regexp_match_nosub("^exec\\s+wish\\s+", lr.line, lr.size)
+    ) {
         return ret;
     }
 

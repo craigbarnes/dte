@@ -190,8 +190,11 @@ static void str_set(const OptionDesc *desc, void *ptr, OptionValue value)
     *strp = xstrdup(value.str_val);
 }
 
-static bool str_parse(const OptionDesc *desc, const char *str, OptionValue *value)
-{
+static bool str_parse (
+    const OptionDesc *desc,
+    const char *str,
+    OptionValue *value
+) {
     if (desc->u.str_opt.validate && !desc->u.str_opt.validate(str)) {
         value->str_val = NULL;
         return false;
@@ -222,8 +225,11 @@ static void int_set(const OptionDesc *desc, void *ptr, OptionValue value)
     *(int *)ptr = value.int_val;
 }
 
-static bool int_parse(const OptionDesc *desc, const char *str, OptionValue *value)
-{
+static bool int_parse (
+    const OptionDesc *desc,
+    const char *str,
+    OptionValue *value
+) {
     int val;
 
     if (!str_to_int(str, &val)) {
@@ -249,8 +255,11 @@ static bool int_equals(const OptionDesc *desc, void *ptr, OptionValue value)
     return *(int *)ptr == value.int_val;
 }
 
-static bool enum_parse(const OptionDesc *desc, const char *str, OptionValue *value)
-{
+static bool enum_parse (
+    const OptionDesc *desc,
+    const char *str,
+    OptionValue *value
+) {
     int val, i;
 
     for (i = 0; desc->u.enum_opt.values[i]; i++) {
@@ -272,8 +281,11 @@ static char *enum_string(const OptionDesc *desc, OptionValue value)
     return xstrdup(desc->u.enum_opt.values[value.int_val]);
 }
 
-static bool flag_parse(const OptionDesc *desc, const char *str, OptionValue *value)
-{
+static bool flag_parse (
+    const OptionDesc *desc,
+    const char *str,
+    OptionValue *value
+) {
     const char **values = desc->u.flag_opt.values;
     const char *ptr = str;
     int val, flags = 0;
@@ -470,8 +482,12 @@ static const OptionDesc *must_find_global_option(const char *name)
     return desc;
 }
 
-static void do_set_option(const OptionDesc *desc, const char *value, bool local, bool global)
-{
+static void do_set_option (
+    const OptionDesc *desc,
+    const char *value,
+    bool local,
+    bool global
+) {
     OptionValue val;
 
     if (local && !desc->local) {
@@ -580,8 +596,12 @@ void toggle_option(const char *name, bool global, bool verbose)
     }
 }
 
-void toggle_option_values(const char *name, bool global, bool verbose, char **values)
-{
+void toggle_option_values (
+    const char *name,
+    bool global,
+    bool verbose,
+    char **values
+) {
     const OptionDesc *desc = find_toggle_option(name, &global);
     int count = count_strings(values);
     OptionValue *parsed_values;

@@ -40,8 +40,10 @@ static void mask_color2(struct term_color *color, const struct term_color *over)
     }
 }
 
-static void mask_selection_and_current_line(LineInfo *info, struct term_color *color)
-{
+static void mask_selection_and_current_line (
+    LineInfo *info,
+    struct term_color *color
+) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
         mask_color(color, builtin_colors[BC_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
@@ -247,7 +249,10 @@ static void hl_words(LineInfo *info)
         } else {
             // Beginning of a word inside comment
             si = i++;
-            while (i < info->size && info->colors[i] == cc && is_word_byte(info->line[i])) {
+            while (
+                i < info->size && info->colors[i] == cc
+                && is_word_byte(info->line[i])
+            ) {
                 i++;
             }
             if (is_notice(info->line + si, i - si)) {
@@ -391,7 +396,13 @@ void update_range(View *v, int y1, int y2)
         buf_move_cursor(v->window->edit_x, v->window->edit_y + i);
 
         fill_line_nl_ref(&bi, &lr);
-        colors = hl_line(v->buffer, lr.line, lr.size, info.line_nr, &next_changed);
+        colors = hl_line (
+            v->buffer,
+            lr.line,
+            lr.size,
+            info.line_nr,
+            &next_changed
+        );
         line_info_set_line(&info, &lr, colors);
         print_line(&info);
 

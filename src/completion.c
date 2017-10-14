@@ -60,8 +60,12 @@ static void collect_commands(const char *prefix)
     collect_aliases(prefix);
 }
 
-static void do_collect_files(const char *dirname, const char *dirprefix, const char *fileprefix, bool directories_only)
-{
+static void do_collect_files (
+    const char *dirname,
+    const char *dirprefix,
+    const char *fileprefix,
+    bool directories_only
+) {
     char path[8192];
     int plen = strlen(dirname);
     int flen = strlen(fileprefix);
@@ -365,7 +369,10 @@ static void init_completion(void)
     completion.tail = xstrdup(cmd + editor.cmdline.pos);
     completion.add_space = true;
 
-    collect_completions((char **)array.ptrs + semicolon + 1, array.count - semicolon - 1);
+    collect_completions (
+        (char **)array.ptrs + semicolon + 1,
+        array.count - semicolon - 1
+    );
     sort_completions();
     ptr_array_free(&array);
     free(cmd);

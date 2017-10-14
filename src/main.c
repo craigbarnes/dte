@@ -29,7 +29,10 @@ static void handle_sigtstp(int signum)
 
 static void handle_sigcont(int signum)
 {
-    if (!editor.child_controls_terminal && editor.status != EDITOR_INITIALIZING) {
+    if (
+        !editor.child_controls_terminal
+        && editor.status != EDITOR_INITIALIZING
+    ) {
         term_raw();
         resize();
     }
@@ -101,7 +104,8 @@ int main(int argc, char *argv[])
     exec_builtin_rc(builtin_rc);
     fill_builtin_colors();
 
-    // NOTE: syntax_changed() uses window. should possibly create window after reading rc
+    // NOTE: syntax_changed() uses window. Should possibly create
+    // window after reading rc.
     window = new_window();
     root_frame = new_root_frame(window);
 
@@ -148,7 +152,9 @@ int main(int argc, char *argv[])
         search_history_size
     );
     if (editor.search_history.count) {
-        search_set_regexp(editor.search_history.ptrs[editor.search_history.count - 1]);
+        search_set_regexp (
+            editor.search_history.ptrs[editor.search_history.count - 1]
+        );
     }
 
     // Initialize terminal but don't update screen yet. Also display

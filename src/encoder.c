@@ -29,8 +29,11 @@ void free_file_encoder(FileEncoder *enc)
     free(enc);
 }
 
-static ssize_t unix_to_dos(FileEncoder *enc, const unsigned char *buf, ssize_t size)
-{
+static ssize_t unix_to_dos (
+    FileEncoder *enc,
+    const unsigned char *buf,
+    ssize_t size
+) {
     ssize_t s, d;
 
     if (enc->nsize < size * 2) {
@@ -49,8 +52,11 @@ static ssize_t unix_to_dos(FileEncoder *enc, const unsigned char *buf, ssize_t s
 }
 
 // NOTE: buf must contain whole characters!
-ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, ssize_t size)
-{
+ssize_t file_encoder_write (
+    FileEncoder *enc,
+    const unsigned char *buf,
+    ssize_t size
+) {
     if (enc->nls == NEWLINE_DOS) {
         size = unix_to_dos(enc, buf, size);
         buf = enc->nbuf;

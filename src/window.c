@@ -34,8 +34,12 @@ View *window_open_empty_buffer(Window *w)
     return window_add_buffer(w, open_empty_buffer());
 }
 
-View *window_open_buffer(Window *w, const char *filename, bool must_exist, const char *encoding)
-{
+View *window_open_buffer (
+    Window *w,
+    const char *filename,
+    bool must_exist,
+    const char *encoding
+) {
     char *absolute;
     bool dir_missing = false;
     Buffer *b = NULL;
@@ -268,7 +272,10 @@ void set_view(View *v)
 
     if (!v->buffer->setup) {
         buffer_setup(v->buffer);
-        if (v->buffer->options.file_history && v->buffer->abs_filename != NULL) {
+        if (
+            v->buffer->options.file_history
+            && v->buffer->abs_filename != NULL
+        ) {
             restore_cursor_from_history(v);
         }
     }
@@ -317,7 +324,10 @@ static bool is_useless_empty_view(View *v)
         return false;
     }
     // Touched?
-    if (v->buffer->abs_filename != NULL || v->buffer->change_head.nr_prev != 0) {
+    if (
+        v->buffer->abs_filename != NULL
+        || v->buffer->change_head.nr_prev != 0
+    ) {
         return false;
     }
     return true;
@@ -488,8 +498,11 @@ int window_get_scroll_margin(Window *w)
     return editor.options.scroll_margin;
 }
 
-static void frame_for_each_window(Frame *f, void (*func)(Window *, void *), void *data)
-{
+static void frame_for_each_window (
+    Frame *f,
+    void (*func)(Window *, void *),
+    void *data
+) {
     if (f->window != NULL) {
         func(f->window, data);
         return;
@@ -499,8 +512,10 @@ static void frame_for_each_window(Frame *f, void (*func)(Window *, void *), void
     }
 }
 
-static void for_each_window_data(void (*func)(Window *, void *), void *data)
-{
+static void for_each_window_data (
+    void (*func)(Window *, void *),
+    void *data
+) {
     frame_for_each_window(root_frame, func, data);
 }
 

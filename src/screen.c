@@ -50,9 +50,19 @@ static const char *format_misc_status(Window *win)
         SelectionInfo info;
         init_selection(win->view, &info);
         if (win->view->selection == SELECT_LINES) {
-            snprintf(misc_status, sizeof(misc_status), "[%d lines]", get_nr_selected_lines(&info));
+            snprintf (
+                misc_status,
+                sizeof(misc_status),
+                "[%d lines]",
+                get_nr_selected_lines(&info)
+            );
         } else {
-            snprintf(misc_status, sizeof(misc_status), "[%d chars]", get_nr_selected_chars(&info));
+            snprintf (
+                misc_status,
+                sizeof(misc_status),
+                "[%d chars]",
+                get_nr_selected_chars(&info)
+            );
         }
     } else {
         return NULL;

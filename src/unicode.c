@@ -188,8 +188,11 @@ static const CodepointRange east_asian_wide[] = {
     {0x30000, 0x3fffd}
 };
 
-static inline bool in_range(unsigned int u, const CodepointRange *range, int count)
-{
+static inline bool in_range (
+    unsigned int u,
+    const CodepointRange *range,
+    int count
+) {
     for (int i = 0; i < count; i++) {
         if (u < range[i].first) {
             return false;
@@ -201,8 +204,11 @@ static inline bool in_range(unsigned int u, const CodepointRange *range, int cou
     return false;
 }
 
-static inline bool bisearch(unsigned int u, const CodepointRange *range, int max)
-{
+static inline bool bisearch (
+    unsigned int u,
+    const CodepointRange *range,
+    int max
+) {
     int min = 0;
     int mid;
 

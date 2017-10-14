@@ -153,7 +153,10 @@ static void cmd_close(const char *pf, char **args)
     }
 
     if (!view_can_close(view) && !force) {
-        error_msg("The buffer is modified. Save or run 'close -f' to close without saving.");
+        error_msg (
+            "The buffer is modified. "
+            "Save or run 'close -f' to close without saving."
+        );
         return;
     }
 
@@ -541,7 +544,11 @@ static void cmd_move_tab(const char *pf, char **args)
         }
     }
     j = (window->views.count + j) % window->views.count;
-    ptr_array_insert(&window->views, ptr_array_remove_idx(&window->views, i), j);
+    ptr_array_insert (
+        &window->views,
+        ptr_array_remove_idx(&window->views, i),
+        j
+    );
     window->update_tabbar = true;
 }
 
@@ -612,7 +619,8 @@ static void cmd_open(const char *pf, char **args)
         // Previous view is remembered when opening single file
         window_open_file(window, args[0], encoding);
     } else {
-        // It makes no sense to remember previous view when opening multiple files
+        // It makes no sense to remember previous view when opening
+        // multiple files
         window_open_files(window, args, encoding);
     }
     free(encoding);
@@ -634,7 +642,11 @@ static void cmd_option(const char *pf, char **args)
     }
 
     if (*pf) {
-        add_file_options(FILE_OPTIONS_FILENAME, xstrdup(args[0]), copy_string_array(strs, count));
+        add_file_options (
+            FILE_OPTIONS_FILENAME,
+            xstrdup(args[0]),
+            copy_string_array(strs, count)
+        );
         return;
     }
 
@@ -644,7 +656,11 @@ static void cmd_option(const char *pf, char **args)
 
         comma = strchr(list, ',');
         len = comma ? comma - list : strlen(list);
-        add_file_options(FILE_OPTIONS_FILETYPE, xstrslice(list, 0, len), copy_string_array(strs, count));
+        add_file_options (
+            FILE_OPTIONS_FILETYPE,
+            xstrslice(list, 0, len),
+            copy_string_array(strs, count)
+        );
         list = comma + 1;
     } while (comma);
 }
@@ -753,7 +769,10 @@ static void cmd_quit(const char *pf, char **args)
                 mark_everything_changed();
             }
             set_view(v);
-            error_msg("Save modified files or run 'quit -f' to quit without saving.");
+            error_msg (
+                "Save modified files or run 'quit -f' to quit"
+                " without saving."
+            );
             return;
         }
     }
@@ -963,7 +982,10 @@ static void cmd_save(const char *pf, char **args)
             && !force
             && stat_changed(&buffer->st, &st)
         ) {
-            error_msg("File has been modified by someone else. Use -f to force overwrite.");
+            error_msg (
+                "File has been modified by someone else."
+                " Use -f to force overwrite."
+            );
             goto error;
         }
         if (S_ISDIR(st.st_mode)) {
@@ -1412,7 +1434,10 @@ static void cmd_wclose(const char *pf, char **args)
 
     if (v != NULL && !force) {
         set_view(v);
-        error_msg("Save modified files or run 'wclose -f' to close window without saving.");
+        error_msg (
+            "Save modified files or run 'wclose -f' to close "
+            "window without saving."
+        );
         return;
     }
 

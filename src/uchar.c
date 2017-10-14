@@ -267,7 +267,8 @@ unsigned int u_skip_chars(const char *str, int *width)
         w -= u_char_width(u_str_get_char(str, &idx));
     }
 
-    // Add 1..3 if skipped 'too much' (the last char was double width or invalid (<xx>))
+    // Add 1..3 if skipped 'too much' (the last char was double
+    // width or invalid (<xx>))
     *width -= w;
     return idx;
 }
@@ -300,7 +301,10 @@ int u_str_index(const char *haystack, const char *needle_lcase)
     while (haystack[hi]) {
         long prev = hi;
         unsigned int hc = u_str_get_char(haystack, &hi);
-        if ((hc == nc || u_to_lower(hc) == nc) && has_prefix(haystack + hi, needle_lcase + ni)) {
+        if (
+            (hc == nc || u_to_lower(hc) == nc)
+            && has_prefix(haystack + hi, needle_lcase + ni)
+        ) {
             return prev;
         }
     }

@@ -78,8 +78,12 @@ static void fix_action(Syntax *syn, Action *a, const char *prefix)
     }
 }
 
-static void fix_conditions(Syntax *syn, State *s, SyntaxMerge *m, const char *prefix)
-{
+static void fix_conditions (
+    Syntax *syn,
+    State *s,
+    SyntaxMerge *m,
+    const char *prefix
+) {
     for (int i = 0; i < s->conds.count; i++) {
         Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix);
@@ -122,7 +126,11 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         states->alloc = states->count;
         xrenew(states->ptrs, states->alloc);
     }
-    memcpy(states->ptrs + old_count, m->subsyn->states.ptrs, sizeof(*states->ptrs) * m->subsyn->states.count);
+    memcpy (
+        states->ptrs + old_count,
+        m->subsyn->states.ptrs,
+        sizeof(*states->ptrs) * m->subsyn->states.count
+    );
 
     for (i = old_count; i < states->count; i++) {
         State *s = xmemdup(states->ptrs[i], sizeof(State));
@@ -132,13 +140,17 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         s->name = xstrdup(fix_name(s->name, prefix));
         s->emit_name = xstrdup(s->emit_name);
         if (s->conds.count > 0) {
-            s->conds.ptrs = xmemdup(s->conds.ptrs, sizeof(void *) * s->conds.alloc);
+            s->conds.ptrs = xmemdup (
+                s->conds.ptrs,
+                sizeof(void *) * s->conds.alloc
+            );
             for (j = 0; j < s->conds.count; j++) {
                 s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
             }
         }
 
-        // Mark unvisited so that state that is used only as a return state gets visited.
+        // Mark unvisited so that state that is used only as a return
+        // state gets visited.
         s->visited = false;
 
         // Don't complain about unvisited copied states.

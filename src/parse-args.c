@@ -61,7 +61,11 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
             }
 
             if (j > 1 || arg[j + 1]) {
-                error_msg("Flag -%c must be given separately because it requires an argument.", flag);
+                error_msg (
+                    "Flag -%c must be given separately because it"
+                    " requires an argument.",
+                    flag
+                );
                 return NULL;
             }
             flag_arg = args[i + 1];
@@ -75,7 +79,11 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
                 // farg1 arg1  arg2 -f   farg2 arg3
                 // farg1 farg2 arg1 arg2 arg3
                 int count = i - nr_flag_args;
-                memmove(args + nr_flag_args + 1, args + nr_flag_args, count * sizeof(*args));
+                memmove (
+                    args + nr_flag_args + 1,
+                    args + nr_flag_args,
+                    count * sizeof(*args)
+                );
             }
             args[nr_flag_args++] = flag_arg;
             i++;

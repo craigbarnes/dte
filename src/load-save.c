@@ -17,8 +17,12 @@ static void add_block(Buffer *b, Block *blk)
     list_add_before(&blk->node, &b->blocks);
 }
 
-static Block *add_utf8_line(Buffer *b, Block *blk, const unsigned char *line, size_t len)
-{
+static Block *add_utf8_line (
+    Buffer *b,
+    Block *blk,
+    const unsigned char *line,
+    size_t len
+) {
     size_t size = len + 1;
 
     if (blk) {
@@ -42,8 +46,11 @@ copy:
     return blk;
 }
 
-static int decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size)
-{
+static int decode_and_add_blocks (
+    Buffer *b,
+    const unsigned char *buf,
+    size_t size
+) {
     const char *e = detect_encoding_from_bom(buf, size);
     FileDecoder *dec;
     char *line;
@@ -263,7 +270,10 @@ static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
     }
     if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
         // Any real error hides this message
-        error_msg("Warning: %d nonreversible character conversions. File saved.", cconv_nr_errors(enc->cconv));
+        error_msg (
+            "Warning: %d nonreversible character conversions. File saved.",
+            cconv_nr_errors(enc->cconv)
+        );
     }
 
     // Need to truncate if writing to existing file
@@ -277,8 +287,12 @@ write_error:
     return -1;
 }
 
-int save_buffer(Buffer *b, const char *filename, const char *encoding, LineEndingType newline)
-{
+int save_buffer (
+    Buffer *b,
+    const char *filename,
+    const char *encoding,
+    LineEndingType newline
+) {
     FileEncoder *enc;
     char *tmp = NULL;
     int fd;
@@ -296,7 +310,8 @@ int save_buffer(Buffer *b, const char *filename, const char *encoding, LineEndin
         } else if (b->st.st_mode) {
             // Preserve ownership and mode of the original file if possible.
 
-            // "ignoring return value of 'fchown', declared with attribute warn_unused_result"
+            // "ignoring return value of 'fchown', declared with attribute
+            // warn_unused_result"
             //
             // Casting to void does not hide this warning when
             // using GCC and clang does not like this:

@@ -111,12 +111,18 @@ static void keypress(Key key, char *buf, int *count)
         }
     }
 
-    if (input_special == INPUT_SPECIAL_UNICODE && u_is_unicode(raw_input.value)) {
+    if (
+        input_special == INPUT_SPECIAL_UNICODE
+        && u_is_unicode(raw_input.value)
+    ) {
         long idx = 0;
         u_set_char_raw(buf, &idx, raw_input.value);
         *count = idx;
     }
-    if (input_special != INPUT_SPECIAL_UNICODE && raw_input.value <= 255) {
+    if (
+        input_special != INPUT_SPECIAL_UNICODE
+        && raw_input.value <= 255
+    ) {
         buf[0] = raw_input.value;
         *count = 1;
     }

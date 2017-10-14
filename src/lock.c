@@ -35,7 +35,10 @@ static int rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
         nl = memchr(buf + pos, '\n', size - pos);
         next_bol = nl - buf + 1;
 
-        same = filename_len == next_bol - 1 - pos && !memcmp(buf + pos, filename, filename_len);
+        same =
+            filename_len == next_bol - 1 - pos
+            && !memcmp(buf + pos, filename, filename_len)
+        ;
         if (pid == my_pid) {
             if (same) {
                 // lock = 1 => pid conflict. lock must be stale
@@ -85,13 +88,20 @@ static int lock_or_unlock(const char *filename, bool lock)
         }
 
         if (errno != EEXIST) {
-            error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));
+            error_msg (
+                "Error creating %s: %s",
+                file_locks_lock,
+                strerror(errno)
+            );
             return -1;
         }
         if (++tries == 3) {
             if (unlink(file_locks_lock)) {
-                error_msg("Error removing stale lock file %s: %s",
-                        file_locks_lock, strerror(errno));
+                error_msg (
+                    "Error removing stale lock file %s: %s",
+                    file_locks_lock,
+                    strerror(errno)
+                );
                 return -1;
             }
             error_msg("Stale lock file %s removed.", file_locks_lock);
@@ -136,7 +146,12 @@ static int lock_or_unlock(const char *filename, bool lock)
         goto error;
     }
     if (rename(file_locks_lock, file_locks)) {
-        error_msg("Renaming %s to %s: %s", file_locks_lock, file_locks, strerror(errno));
+        error_msg (
+            "Renaming %s to %s: %s",
+            file_locks_lock,
+            file_locks,
+            strerror(errno)
+        );
         goto error;
     }
     free(buf);

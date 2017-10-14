@@ -153,7 +153,10 @@ TagFile *load_tag_file(void)
         return NULL;
     }
     fstat(fd, &st);
-    if (current_tag_file != NULL && tag_file_changed(current_tag_file, path, &st)) {
+    if (
+        current_tag_file != NULL
+        && tag_file_changed(current_tag_file, path, &st)
+    ) {
         tag_file_free(current_tag_file);
         current_tag_file = NULL;
     }
@@ -205,8 +208,12 @@ static char *path_relative(const char *filename, const char *dir)
     return xstrdup(filename + dlen + 1);
 }
 
-void tag_file_find_tags(TagFile *tf, const char *filename, const char *name, PointerArray *tags)
-{
+void tag_file_find_tags (
+    TagFile *tf,
+    const char *filename,
+    const char *name,
+    PointerArray *tags
+) {
     Tag *t;
     size_t pos = 0;
 

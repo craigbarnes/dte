@@ -90,7 +90,9 @@ void get_indent_info(const char *buf, int len, IndentInfo *info)
 
 int use_spaces_for_indent(void)
 {
-    return buffer->options.expand_tab || buffer->options.indent_width != buffer->options.tab_width;
+    return
+        buffer->options.expand_tab
+        || buffer->options.indent_width != buffer->options.tab_width;
 }
 
 static int get_current_indent_bytes(const char *buf, int cursor_offset)

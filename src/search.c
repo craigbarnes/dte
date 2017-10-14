@@ -68,7 +68,10 @@ static bool do_search_bwd(regex_t *regex, BlockIter *bi, int cx, bool skip)
         long pos = 0;
 
         fill_line_ref(bi, &lr);
-        while (pos <= lr.size && regexp_exec(regex, lr.line + pos, lr.size - pos, 1, &match, flags)) {
+        while (
+            pos <= lr.size
+            && regexp_exec(regex, lr.line + pos, lr.size - pos, 1, &match, flags)
+        ) {
             flags = REG_NOTBOL;
             if (cx >= 0) {
                 if (pos + match.rm_so >= cx) {
@@ -186,7 +189,11 @@ static bool update_regex(void)
     free_regex();
 
     current_search.re_flags = re_flags;
-    if (regexp_compile(&current_search.regex, current_search.pattern, current_search.re_flags)) {
+    if (regexp_compile(
+        &current_search.regex,
+        current_search.pattern,
+        current_search.re_flags
+    )) {
         return true;
     }
 
@@ -256,8 +263,12 @@ void search_next_word(void)
     do_search_next(true);
 }
 
-static void build_replacement(StringBuffer *buf, const char *line, const char *format, regmatch_t *m)
-{
+static void build_replacement (
+    StringBuffer *buf,
+    const char *line,
+    const char *format,
+    regmatch_t *m
+) {
     int i = 0;
 
     while (format[i]) {
@@ -306,7 +317,14 @@ static int replace_on_line (
     int eflags = 0;
     int nr = 0;
 
-    while (regexp_exec(re, buf + pos, lr->size - pos, MAX_SUBSTRINGS, m, eflags)) {
+    while (regexp_exec (
+        re,
+        buf + pos,
+        lr->size - pos,
+        MAX_SUBSTRINGS,
+        m,
+        eflags
+    )) {
         int match_len = m[0].rm_eo - m[0].rm_so;
         bool skip = false;
 

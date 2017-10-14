@@ -62,8 +62,12 @@ static bool in_hash(StringList *list, const char *str, size_t len)
     return false;
 }
 
-static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int len)
-{
+static State *handle_heredoc (
+    Syntax *syn,
+    State *state,
+    const char *delim,
+    int len
+) {
     HeredocState *s;
     SyntaxMerge m;
 
@@ -88,8 +92,13 @@ static State *handle_heredoc(Syntax *syn, State *state, const char *delim, int l
 }
 
 // Line should be terminated with \n unless it's the last line
-static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int len, State **ret)
-{
+static HlColor **highlight_line (
+    Syntax *syn,
+    State *state,
+    const char *line,
+    int len,
+    State **ret
+) {
     static HlColor **colors;
     static int alloc;
     int i = 0, sidx = -1;
@@ -143,7 +152,10 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
                 state = a->destination;
                 goto top;
             case COND_INLIST:
-                if (sidx >= 0 && in_hash(cond->u.cond_inlist.list, line + sidx, i - sidx)) {
+                if (
+                    sidx >= 0
+                    && in_hash(cond->u.cond_inlist.list, line + sidx, i - sidx)
+                ) {
                     int idx;
                     for (idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
@@ -173,7 +185,10 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
             case COND_STR: {
                 int slen = cond->u.cond_str.len;
                 int end = i + slen;
-                if (len >= end && !memcmp(cond->u.cond_str.str, line + i, slen)) {
+                if (
+                    len >= end
+                    && !memcmp(cond->u.cond_str.str, line + i, slen)
+                ) {
                     while (i < end) {
                         colors[i++] = a->emit_color;
                     }
@@ -185,7 +200,10 @@ static HlColor **highlight_line(Syntax *syn, State *state, const char *line, int
             case COND_STR_ICASE: {
                 int slen = cond->u.cond_str.len;
                 int end = i + slen;
-                if (len >= end && !strncasecmp(cond->u.cond_str.str, line + i, slen)) {
+                if (
+                    len >= end
+                    && !strncasecmp(cond->u.cond_str.str, line + i, slen)
+                ) {
                     while (i < end) {
                         colors[i++] = a->emit_color;
                     }
@@ -351,14 +369,25 @@ void hl_fill_start_states(Buffer *b, int line_nr)
         LineRef lr;
 
         fill_line_nl_ref(&bi, &lr);
-        highlight_line(b->syn, states[s->count - 1], lr.line, lr.size, &states[s->count]);
+        highlight_line (
+            b->syn,
+            states[s->count - 1],
+            lr.line,
+            lr.size,
+            &states[s->count]
+        );
         s->count++;
         block_iter_eat_line(&bi);
     }
 }
 
-HlColor **hl_line(Buffer *b, const char *line, int len, int line_nr, int *next_changed)
-{
+HlColor **hl_line (
+    Buffer *b,
+    const char *line,
+    int len,
+    int line_nr,
+    int *next_changed
+) {
     PointerArray *s = &b->line_start_states;
     HlColor **colors;
     State *next;

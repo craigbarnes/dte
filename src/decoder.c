@@ -7,7 +7,9 @@
 static bool fill(FileDecoder *dec)
 {
     size_t icount = dec->isize - dec->ipos;
-    size_t max = 7 * 1024; // Smaller than cconv.obuf to make realloc less likely
+
+    // Smaller than cconv.obuf to make realloc less likely
+    size_t max = 7 * 1024;
 
     if (icount > max) {
         icount = max;
@@ -155,8 +157,11 @@ static int set_encoding(FileDecoder *dec, const char *encoding)
     return 0;
 }
 
-FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, ssize_t size)
-{
+FileDecoder *new_file_decoder (
+    const char *encoding,
+    const unsigned char *buf,
+    ssize_t size
+) {
     FileDecoder *dec = xnew0(FileDecoder, 1);
 
     dec->ibuf = buf;

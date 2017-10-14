@@ -152,8 +152,11 @@ static bool destination_state(const char *name, State **dest)
     return true;
 }
 
-static Condition *add_condition(ConditionType type, const char *dest, const char *emit)
-{
+static Condition *add_condition (
+    ConditionType type,
+    const char *dest,
+    const char *emit
+) {
     Condition *c;
     State *d = NULL;
 
@@ -181,7 +184,10 @@ static void cmd_bufis(const char *pf, char **args)
     int len = strlen(str);
 
     if (len > ARRAY_COUNT(c->u.cond_bufis.str)) {
-        error_msg("Maximum length of string is %lu bytes", ARRAY_COUNT(c->u.cond_bufis.str));
+        error_msg (
+            "Maximum length of string is %lu bytes",
+            ARRAY_COUNT(c->u.cond_bufis.str)
+        );
         return;
     }
     c = add_condition(COND_BUFIS, args[1], args[2]);
@@ -229,7 +235,10 @@ static void cmd_default(const char *pf, char **args)
     if (no_syntax()) {
         return;
     }
-    ptr_array_add(&current_syntax->default_colors, copy_string_array(args, count_strings(args)));
+    ptr_array_add (
+        &current_syntax->default_colors,
+        copy_string_array(args, count_strings(args))
+    );
 }
 
 static void cmd_eat(const char *pf, char **args)
@@ -352,7 +361,10 @@ static void cmd_noeat(const char *pf, char **args)
     }
 
     if (streq(args[0], current_state->name)) {
-        error_msg("Using noeat to to jump to parent state causes infinite loop");
+        error_msg (
+            "Using noeat to to jump to parent state causes"
+            " infinite loop"
+        );
         return;
     }
 
@@ -419,7 +431,10 @@ static void cmd_str(const char *pf, char **args)
     int len = strlen(str);
 
     if (len > ARRAY_COUNT(c->u.cond_str.str)) {
-        error_msg("Maximum length of string is %lu bytes", ARRAY_COUNT(c->u.cond_str.str));
+        error_msg (
+            "Maximum length of string is %lu bytes",
+            ARRAY_COUNT(c->u.cond_str.str)
+        );
         return;
     }
 

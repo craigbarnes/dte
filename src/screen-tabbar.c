@@ -70,7 +70,13 @@ static void print_vertical_tab_title(View *v, int idx, int width)
     char buf[16];
     int skip;
 
-    snprintf(buf, sizeof(buf), "%2d%s", idx + 1, buffer_modified(v->buffer) ? "+" : " ");
+    snprintf (
+        buf,
+        sizeof(buf),
+        "%2d%s",
+        idx + 1,
+        buffer_modified(v->buffer) ? "+" : " "
+    );
     if (max) {
         int i, count = 1;
 

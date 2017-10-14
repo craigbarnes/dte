@@ -14,8 +14,12 @@ bool regexp_match_nosub(const char *pattern, const char *buf, long size)
     return ret;
 }
 
-bool regexp_match(const char *pattern, const char *buf, long size, PointerArray *m)
-{
+bool regexp_match (
+    const char *pattern,
+    const char *buf,
+    long size,
+    PointerArray *m
+) {
     regex_t re;
     bool ret;
 
@@ -38,8 +42,14 @@ bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
     return true;
 }
 
-bool regexp_exec(const regex_t *re, const char *buf, long size, long nr_m, regmatch_t *m, int flags)
-{
+bool regexp_exec (
+    const regex_t *re,
+    const char *buf,
+    long size,
+    long nr_m,
+    regmatch_t *m,
+    int flags
+) {
 #ifdef REG_STARTEND
     BUG_ON(!nr_m);
     m[0].rm_so = 0;
@@ -59,8 +69,13 @@ bool regexp_exec(const regex_t *re, const char *buf, long size, long nr_m, regma
 #endif
 }
 
-bool regexp_exec_sub(const regex_t *re, const char *buf, long size, PointerArray *matches, int flags)
-{
+bool regexp_exec_sub (
+    const regex_t *re,
+    const char *buf,
+    long size,
+    PointerArray *matches,
+    int flags
+) {
     regmatch_t m[16];
     bool ret = regexp_exec(re, buf, size, ARRAY_COUNT(m), m, flags);
     if (!ret) {

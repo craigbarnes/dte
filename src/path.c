@@ -292,7 +292,11 @@ char *filename_to_utf8(const char *filename)
     char *str;
 
     if (c == NULL) {
-        d_print("iconv_open() using charset %s failed: %s\n", editor.charset, strerror(errno));
+        d_print (
+            "iconv_open() using charset %s failed: %s\n",
+            editor.charset,
+            strerror(errno)
+        );
         return xstrdup(filename);
     }
     cconv_process(c, filename, strlen(filename));

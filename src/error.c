@@ -57,11 +57,21 @@ void error_msg(const char *format, ...)
 
     // Some implementations of *printf return -1 if output was truncated
     if (config_file) {
-        snprintf(error_buf, sizeof(error_buf), "%s:%d: ", config_file, config_line);
+        snprintf (
+            error_buf,
+            sizeof(error_buf),
+            "%s:%d: ",
+            config_file,
+            config_line
+        );
         pos = strlen(error_buf);
         if (current_command) {
-            snprintf(error_buf + pos, sizeof(error_buf) - pos,
-                "%s: ", current_command->name);
+            snprintf (
+                error_buf + pos,
+                sizeof(error_buf) - pos,
+                "%s: ",
+                current_command->name
+            );
             pos += strlen(error_buf + pos);
         }
     }

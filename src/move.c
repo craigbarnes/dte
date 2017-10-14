@@ -240,7 +240,10 @@ long word_fwd(BlockIter *bi, bool skip_non_word)
             return count;
         }
 
-        if (count && (!skip_non_word || (type == CT_WORD || type == CT_NEWLINE))) {
+        if (
+            count
+            && (!skip_non_word || (type == CT_WORD || type == CT_NEWLINE))
+        ) {
             return count;
         }
 

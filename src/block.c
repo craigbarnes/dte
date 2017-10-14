@@ -258,9 +258,11 @@ void do_insert(const char *buf, long len)
     }
 }
 
-static int only_block(Block *blk)
+static bool only_block(Block *blk)
 {
-    return blk->node.prev == &buffer->blocks && blk->node.next == &buffer->blocks;
+    return
+        blk->node.prev == &buffer->blocks
+        && blk->node.next == &buffer->blocks;
 }
 
 char *do_delete(long len)
@@ -293,7 +295,11 @@ char *do_delete(long len)
         }
         nl = copy_count_nl(buf + pos, blk->data + offset, count);
         if (count < avail) {
-            memmove(blk->data + offset, blk->data + offset + count, avail - count);
+            memmove (
+                blk->data + offset,
+                blk->data + offset + count,
+                avail - count
+            );
         }
 
         deleted_nl += nl;
@@ -343,7 +349,11 @@ char *do_delete(long len)
     sanity_check();
 
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, deleted_nl ? INT_MAX : view->cy);
+    buffer_mark_lines_changed (
+        view->buffer,
+        view->cy,
+        deleted_nl ? INT_MAX : view->cy
+    );
     if (buffer->syn) {
         hl_delete(buffer, view->cy, deleted_nl);
     }

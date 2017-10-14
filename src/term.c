@@ -226,7 +226,11 @@ static bool fill_buffer(void)
         input_can_be_truncated = false;
     }
 
-    rc = read(0, input_buf + input_buf_fill, sizeof(input_buf) - input_buf_fill);
+    rc = read (
+        0,
+        input_buf + input_buf_fill,
+        sizeof(input_buf) - input_buf_fill
+    );
     if (rc <= 0) {
         return false;
     }
