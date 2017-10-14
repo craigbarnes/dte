@@ -21,11 +21,11 @@ web: $(web)
 
 $(man1): Documentation/dte.txt $(TTMAN)
 	$(E) TTMAN $@
-	$(Q) $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
+	$(Q) $(TTMAN) < $< > $@
 
 $(man5): Documentation/dte-syntax.txt $(TTMAN)
 	$(E) TTMAN $@
-	$(Q) $(SED) 's|%PKGDATADIR%|$(PKGDATADIR)|g' '$<' | $(TTMAN) > $@
+	$(Q) $(TTMAN) < $< > $@
 
 $(html): public/%.html: % | public/
 	$(E) GROFF $@

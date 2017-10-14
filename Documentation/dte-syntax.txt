@@ -6,11 +6,9 @@ Syntax of syntax highlighting files used by dte.
 
 @h1 DESCRIPTION
 
-Syntax file consists of states. A state consists of optional
+A syntax file consists of multiple states. A state consists of optional
 conditionals and one default action. The best way understand the syntax
-is to read %PKGDATADIR%/syntax/dte (a simple example) or
-%PKGDATADIR%/syntax/c (a more complete example using
-sub-syntaxes).
+of these files is to read through some examples (see link below).
 
 Basic syntax of the syntax files is the same used in the rc files, but
 the available commands are different.
@@ -167,3 +165,5 @@ Timo Hirvonen <tihirvon\@gmail.com>
 @h1 SEE ALSO
 
 dte(1)
+
+https://github.com/craigbarnes/dte/blob/master/share/syntax/dte
