@@ -107,7 +107,7 @@ test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
-build/main.o: build/bindings.inc
+build/main.o: build/BINDINGS.h
 build/editor.o: build/VERSION.h build/PKGDATADIR.h
 
 $(dte) $(test):
@@ -131,7 +131,7 @@ build/PKGDATADIR.h: FORCE | build/
 build/VERSION.h: FORCE | build/
 	@mk/optcheck.sh '#define VERSION "$(VERSION)"' $@
 
-build/bindings.inc: share/binding/builtin mk/rc2c.sed | build/
+build/BINDINGS.h: share/binding/builtin mk/rc2c.sed | build/
 	$(E) GEN $@
 	$(Q) echo 'static const char *builtin_bindings =' > $@
 	$(Q) $(SED) -f mk/rc2c.sed $< >> $@

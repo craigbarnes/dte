@@ -12,8 +12,7 @@
 #include "search.h"
 #include "error.h"
 #include "move.h"
-
-#include "bindings.inc"
+#include "BINDINGS.h"
 
 static const char *const builtin_rc =
 // Initialize builtin colors
