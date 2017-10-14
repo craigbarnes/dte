@@ -12,14 +12,7 @@
 #include "search.h"
 #include "error.h"
 #include "move.h"
-#include "BINDINGS.h"
-
-static const char *const builtin_rc =
-// Initialize builtin colors
-"hi\n"
-// Must initialize string options
-"set statusline-left \" %f%s%m%r%s%M\"\n"
-"set statusline-right \" %y,%X   %u   %E %n %t   %p \"\n";
+#include "BUILTIN_CONFIG.h"
 
 static void handle_sigtstp(int signum)
 {
@@ -99,8 +92,8 @@ int main(int argc, char *argv[])
     mkdir(editor_dir, 0755);
     free(editor_dir);
 
-    exec_builtin_rc(builtin_bindings);
-    exec_builtin_rc(builtin_rc);
+    exec_builtin_rc("hi\n");
+    exec_builtin_rc(builtin_config);
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create
@@ -113,11 +106,7 @@ int main(int argc, char *argv[])
             read_config(commands, rc, true);
         } else {
             char *filename = editor_file("rc");
-            if (read_config(commands, filename, false)) {
-                free(filename);
-                filename = xsprintf("%s/rc", editor.pkgdatadir);
-                read_config(commands, filename, true);
-            }
+            read_config(commands, filename, false);
             free(filename);
         }
     }

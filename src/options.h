@@ -80,8 +80,8 @@ typedef struct {
     LineEndingType newline; // Default value for new files
     int scroll_margin;
     int show_line_numbers;
-    char *statusline_left;
-    char *statusline_right;
+    const char *statusline_left;
+    const char *statusline_right;
     enum tab_bar tab_bar;
     int tab_bar_max_components;
     int tab_bar_width;

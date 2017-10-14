@@ -1,3 +1,15 @@
+bind left left
+bind right right
+bind up up
+bind down down
+bind home bol
+bind end eol
+bind pgup pgup
+bind pgdown pgdown
+bind delete delete
+bind ^\[ unselect
+bind ^\? erase
+
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
 bind C-up up

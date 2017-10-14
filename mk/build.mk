@@ -107,7 +107,7 @@ test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
-build/main.o: build/BINDINGS.h
+build/main.o: build/BUILTIN_CONFIG.h
 build/editor.o: build/VERSION.h build/PKGDATADIR.h
 
 $(dte) $(test):
@@ -131,10 +131,19 @@ build/PKGDATADIR.h: FORCE | build/
 build/VERSION.h: FORCE | build/
 	@mk/optcheck.sh '#define VERSION "$(VERSION)"' $@
 
-build/BINDINGS.h: share/binding/builtin mk/rc2c.sed | build/
+BUILTIN_CONFIG_FILES = \
+    share/rc \
+    share/binding \
+    share/color/light \
+    share/compiler/gcc \
+    share/compiler/go \
+    share/filetype \
+    share/option
+
+build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
 	$(E) GEN $@
-	$(Q) echo 'static const char *builtin_bindings =' > $@
-	$(Q) $(SED) -f mk/rc2c.sed $< >> $@
+	$(Q) echo 'static const char *builtin_config =' > $@
+	$(Q) $(SED) -f mk/rc2c.sed $^ >> $@
 
 build/ build/test/:
 	@mkdir -p $@

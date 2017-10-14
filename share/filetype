@@ -24,8 +24,7 @@ ft -f sh '/\.(shrc|profile)$'
 ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
 ft -f docker 'Dockerfile$'
-ft -f dte $PKGDATADIR'/.*'
-ft -f dte '/\.?dte/(share/)?(rc|filetype|option|((syntax|color|binding|compiler)/.*))$'
+ft -f dte '/\.?dte/(rc|filetype|option|((syntax|color|binding|compiler)/.*))$'
 ft -f gitcommit '/COMMIT_EDITMSG$'
 ft -f gitrebase '/git-rebase-todo$'
 ft -f indent '/\.indent\.pro$'
@@ -76,6 +75,3 @@ ft html+smarty tpl
 ft smarty tpl
 
 ft -f config '/boot/grub/menu\.lst$'
-
-# Should be last
-ft -f config '/etc/.*'
