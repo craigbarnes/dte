@@ -496,7 +496,7 @@ void remove_frame(Frame *f)
 static void debug_frame(Frame *f, int level)
 {
     d_print (
-        "%*s%dx%d %d %d %ld\n",
+        "%*s%dx%d %d %d %zu\n",
         level * 4, "",
         f->w, f->h,
         f->vertical, f->equal_size,

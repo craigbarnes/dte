@@ -69,7 +69,7 @@ void activate_current_message(void)
             return;
         }
     }
-    info_msg("[%d/%ld] %s", msg_pos + 1, msgs.count, m->msg);
+    info_msg("[%d/%zu] %s", msg_pos + 1, msgs.count, m->msg);
 }
 
 void activate_next_message(void)
