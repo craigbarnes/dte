@@ -2,6 +2,7 @@
 #include "error.h"
 #include "strbuf.h"
 #include "common.h"
+#include "BUILTIN_SYNTAX.h"
 
 const char *config_file;
 int config_line;
@@ -84,6 +85,20 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 
 int do_read_config(const Command *cmds, const char *filename, bool must_exist)
 {
+    if (str_has_prefix(filename, "builtin://")) {
+        for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+            if (streq(filename, builtin_configs[i].name)) {
+                config_file = filename;
+                config_line = 1;
+                const char *src = builtin_configs[i].source;
+                exec_config(cmds, src, strlen(src));
+                return 0;
+            }
+        }
+        // TODO: add error message and non-zero return if must_exist == true ?
+        return 0;
+    }
+
     char *buf;
     ssize_t size = read_file(filename, &buf);
     int err = errno;

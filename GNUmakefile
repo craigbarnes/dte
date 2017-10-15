@@ -13,23 +13,15 @@ mandir ?= $(datadir)/man
 INSTALL = install
 RM = rm -f
 
-syntax := $(addprefix share/syntax/, \
-    awk c config css d diff docker dte gitcommit gitrebase go html html+smarty \
-    ini java javascript lua mail make markdown meson php python robotstxt \
-    ruby sh smarty sql vala xml \
-)
-
 all: $(dte) man
 
 install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(bindir)
-	$(INSTALL) -d -m755 $(DESTDIR)$(PKGDATADIR)/syntax
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man5
-	$(INSTALL) -m755 $(dte)      $(DESTDIR)$(bindir)
-	$(INSTALL) -m644 $(syntax)   $(DESTDIR)$(PKGDATADIR)/syntax
-	$(INSTALL) -m644 $(man1)     $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -m644 $(man5)     $(DESTDIR)$(mandir)/man5
+	$(INSTALL) -m755 $(dte) $(DESTDIR)$(bindir)
+	$(INSTALL) -m644 $(man1) $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m644 $(man5) $(DESTDIR)$(mandir)/man5
 
 check: $(test) all
 	$(E) TEST $<

@@ -42,7 +42,6 @@ typedef struct {
     PointerArray search_history;
     PointerArray command_history;
     const char *version;
-    const char *pkgdatadir;
 } EditorState;
 
 extern EditorState editor;

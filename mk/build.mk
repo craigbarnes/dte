@@ -5,7 +5,7 @@ HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 SED = sed
-PKGDATADIR = $(datadir)/dte
+AWK = awk
 
 ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
@@ -108,7 +108,8 @@ test = build/test/test$(EXEC_SUFFIX)
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 build/main.o: build/BUILTIN_CONFIG.h
-build/editor.o: build/VERSION.h build/PKGDATADIR.h
+build/editor.o: build/VERSION.h
+build/config.o: build/BUILTIN_SYNTAX.h
 
 $(dte) $(test):
 	$(E) LINK $@
@@ -125,9 +126,6 @@ $(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
 build/CFLAGS.txt: FORCE | build/
 	@mk/optcheck.sh "$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)" $@
 
-build/PKGDATADIR.h: FORCE | build/
-	@mk/optcheck.sh '#define PKGDATADIR "$(PKGDATADIR)"' $@
-
 build/VERSION.h: FORCE | build/
 	@mk/optcheck.sh '#define VERSION "$(VERSION)"' $@
 
@@ -140,10 +138,19 @@ BUILTIN_CONFIG_FILES = \
     share/filetype \
     share/option
 
+BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
+    awk c config css d diff docker dte gitcommit gitrebase go html html+smarty \
+    ini java javascript lua mail make markdown meson php python robotstxt \
+    ruby sh smarty sql vala xml )
+
 build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
 	$(E) GEN $@
 	$(Q) echo 'static const char *builtin_config =' > $@
 	$(Q) $(SED) -f mk/rc2c.sed $^ >> $@
+
+build/BUILTIN_SYNTAX.h: $(BUILTIN_SYNTAX_FILES) | build/
+	$(E) GEN $@
+	$(Q) $(AWK) -f mk/syntax2c.awk $^ > $@
 
 build/ build/test/:
 	@mkdir -p $@

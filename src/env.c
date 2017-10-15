@@ -24,11 +24,6 @@ static char *expand_file(void)
     return xstrdup(v->buffer->abs_filename);
 }
 
-static char *expand_pkgdatadir(void)
-{
-    return xstrdup(editor.pkgdatadir);
-}
-
 static char *expand_word(void)
 {
     View *v = window->view;
@@ -50,7 +45,6 @@ static char *expand_word(void)
 static const BuiltinEnv builtin[] = {
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
-    {"PKGDATADIR", expand_pkgdatadir},
     {"WORD", expand_word},
 };
 

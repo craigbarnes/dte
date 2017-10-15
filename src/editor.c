@@ -12,7 +12,6 @@
 #include "command.h"
 #include "error.h"
 #include "VERSION.h"
-#include "PKGDATADIR.h"
 
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
@@ -32,7 +31,6 @@ EditorState editor = {
     .cmdline = CMDLINE_INIT,
     .cmdline_x = 0,
     .version = VERSION,
-    .pkgdatadir = PKGDATADIR,
     .options = {
         .auto_indent = true,
         .detect_indent = 0,
