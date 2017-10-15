@@ -42,7 +42,7 @@ To build `dte` from source, first install the following dependencies:
 
 ...and compile and install:
 
-    make -j`mk/nproc.sh` && sudo make install
+    make -j8 && sudo make install
 
 The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
 works as usual. If you wish to override `prefix` you will need to do
