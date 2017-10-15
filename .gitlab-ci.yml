@@ -21,21 +21,24 @@ build:alpine:
         - ldd dte
         - readelf -h dte
 
-build:centos:
-    stage: build
-    image: centos:7
-    script: *SCRIPT
-
 build:debian:
     stage: build
     image: debian:stretch
     variables: {DEBIAN_FRONTEND: noninteractive}
-    script: *SCRIPT
-    after_script:
+    script:
+        - mk/install-deps.sh
         - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" HOST_CC=gcc TERMINFO_DISABLE=1 V=1
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" V=1
+        - make vars check
+        - export HOST_CC=gcc TERMINFO_DISABLE=1
+        - make clean && make vars check CC=gcc
         - make clean && make vars check CC=arm-linux-gnueabihf-gcc
         - make clean && make vars check CC=aarch64-linux-gnu-gcc
+
+build:centos:
+    stage: build
+    image: centos:7
+    script: *SCRIPT
 
 build:ubuntu:
     stage: build
