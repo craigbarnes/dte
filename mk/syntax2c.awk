@@ -1,8 +1,7 @@
 #!/usr/bin/awk -f
 
 function escape_ident(s) {
-    gsub(/\+/, "_", s)
-    gsub(/\//, "_", s)
+    gsub(/[+\/]/, "_", s)
     return s
 }
 
