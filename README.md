@@ -45,11 +45,7 @@ To build `dte` from source, first install the following dependencies:
     make -j8 && sudo make install
 
 The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
-works as usual. If you wish to override `prefix` you will need to do
-so for both `make` and `make install`, for example:
-
-    make prefix="$HOME/.local"
-    make prefix="$HOME/.local" install
+works as usual.
 
 Documentation
 -------------
