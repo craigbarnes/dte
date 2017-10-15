@@ -11,7 +11,6 @@
 #include "config.h"
 #include "command.h"
 #include "error.h"
-#include "VERSION.h"
 
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
@@ -43,6 +42,7 @@ EditorState editor = {
         .text_width = 72,
         .ws_error = WSE_SPECIAL,
 
+        // Global-only options
         .case_sensitive_search = CSS_TRUE,
         .display_special = false,
         .esc_timeout = 100,
@@ -87,13 +87,12 @@ void init_editor_state(void)
 
 static void sanity_check(void)
 {
-    View *v = window->view;
-    Block *blk;
-
     if (!DEBUG) {
         return;
     }
 
+    View *v = window->view;
+    Block *blk;
     list_for_each_entry(blk, &v->buffer->blocks, node) {
         if (blk == v->cursor.blk) {
             BUG_ON(v->cursor.offset > v->cursor.blk->size);

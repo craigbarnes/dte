@@ -95,6 +95,13 @@ else ifeq "$(KERNEL)" "NetBSD"
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
+# If "make install" with no other named targets
+ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
+ OPTCHECK = :
+else
+ OPTCHECK = mk/optcheck.sh '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+endif
+
 ifndef NO_DEPS
 ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
   $(editor_objects) $(test_objects): DEPFLAGS = -MF $(patsubst %.o, %.mk, $@) -MMD -MP
@@ -104,12 +111,14 @@ endif
 
 dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
-
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
+
 build/main.o: build/BUILTIN_CONFIG.h
-build/editor.o: build/VERSION.h
 build/config.o: build/BUILTIN_SYNTAX.h
+build/term-caps.o: build/CFLAGS_TERM_CAPS.txt
+build/editor.o: build/CFLAGS_EDITOR.txt
+build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 
 $(dte) $(test):
 	$(E) LINK $@
@@ -124,10 +133,13 @@ $(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
 build/CFLAGS.txt: FORCE | build/
-	@mk/optcheck.sh "$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)" $@
+	@$(OPTCHECK)
 
-build/VERSION.h: FORCE | build/
-	@mk/optcheck.sh '#define VERSION "$(VERSION)"' $@
+build/CFLAGS_EDITOR.txt: FORCE | build/
+	@$(OPTCHECK)
+
+build/CFLAGS_TERM_CAPS.txt: FORCE | build/
+	@$(OPTCHECK)
 
 BUILTIN_CONFIG_FILES = \
     share/rc \
