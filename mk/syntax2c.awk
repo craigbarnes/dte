@@ -14,7 +14,7 @@ function escape_string(s) {
 
 FNR == 1 {
     if (NR != 1) {
-        print "\n"
+        print "\"\"\n"
     }
     name = FILENAME
     ident = "builtin_config_" escape_ident(name)
@@ -28,7 +28,8 @@ FNR == 1 {
 }
 
 END {
-    print "\nstatic const struct {"
+    print "\"\"\n"
+    print "static const struct {"
     print "    const char *const name;"
     print "    const char *const source;"
     print "} builtin_configs[" nfiles "] = {"
