@@ -37,8 +37,8 @@ static void handle_sigwinch(int signum)
 
 int main(int argc, char *argv[])
 {
-    static const char *const opts = "[-RV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *const optstring = "RVc:t:r:";
+    static const char *const opts = "[-bhRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
+    static const char *const optstring = "bhRVc:t:r:";
     const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
@@ -65,10 +65,16 @@ int main(int argc, char *argv[])
         case 'R':
             read_rc = false;
             break;
+        case 'b':
+            puts(builtin_config);
+            return 0;
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017 Craig Barnes");
             puts("(C) 2010-2015 Timo Hirvonen");
+            return 0;
+        case 'h':
+            fprintf(stderr, "Usage: %s %s\n", argv[0], opts);
             return 0;
         case '?':
         default:
