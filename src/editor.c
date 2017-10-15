@@ -52,8 +52,8 @@ EditorState editor = {
         .newline = NEWLINE_UNIX,
         .scroll_margin = 0,
         .show_line_numbers = false,
-        .statusline_left = " %f%s%m%r%s%M",
-        .statusline_right = " %y,%X   %u   %E %n %t   %p ",
+        .statusline_left = NULL,
+        .statusline_right = NULL,
         .tab_bar = TAB_BAR_HORIZONTAL,
         .tab_bar_max_components = 0,
         .tab_bar_width = 25,
@@ -82,6 +82,9 @@ void init_editor_state(void)
     setlocale(LC_CTYPE, "");
     editor.charset = nl_langinfo(CODESET);
     editor.term_utf8 = streq(editor.charset, "UTF-8");
+
+    editor.options.statusline_left = xstrdup(" %f%s%m%r%s%M");
+    editor.options.statusline_right = xstrdup(" %y,%X   %u   %E %n %t   %p ");
 }
 
 static void sanity_check(void)
