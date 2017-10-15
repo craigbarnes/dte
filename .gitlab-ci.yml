@@ -31,6 +31,11 @@ build:debian:
     image: debian:stretch
     variables: {DEBIAN_FRONTEND: noninteractive}
     script: *SCRIPT
+    after_script:
+        - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" HOST_CC=gcc TERMINFO_DISABLE=1 V=1
+        - make clean && make vars check CC=arm-linux-gnueabihf-gcc
+        - make clean && make vars check CC=aarch64-linux-gnu-gcc
 
 build:ubuntu:
     stage: build
