@@ -1,9 +1,9 @@
-include builtin://share/binding/default
-include builtin://share/color/light
-include builtin://share/compiler/gcc
-include builtin://share/compiler/go
-include builtin://share/filetype
-include builtin://share/option
+include builtin://binding/default
+include builtin://color/light
+include builtin://compiler/gcc
+include builtin://compiler/go
+include builtin://filetype
+include builtin://option
 
 alias cl close
 alias o open

@@ -17,6 +17,7 @@ FNR == 1 {
         print "\"\"\n"
     }
     name = FILENAME
+    gsub(/^share\//, "", name)
     ident = "builtin_config_" escape_ident(name)
     print "#define " ident " \\"
     names[++nfiles] = name

@@ -44,18 +44,7 @@ static char *expand_word(void)
 
 static char *expand_pkgdatadir(void)
 {
-    static bool warned;
-    if (!warned) {
-        fputs (
-            "\n\033[1;31mNOTICE:\033[0m "
-            "$PKGDATADIR has been removed from dte\n"
-            "See: https://github.com/craigbarnes/dte/issues/70\n\n",
-            stderr
-        );
-        editor.everything_changed = true;
-        warned = true;
-    }
-    return xstrdup("");
+    return xstrdup("builtin:/");
 }
 
 static const BuiltinEnv builtin[] = {

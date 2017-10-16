@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     free(editor_dir);
 
     exec_builtin_rc("hi\n");
-    read_config(commands, "builtin://share/rc", true);
+    read_config(commands, "builtin://rc", true);
 
     fill_builtin_colors();
 
