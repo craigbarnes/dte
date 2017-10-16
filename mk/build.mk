@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS ?= -O2
+CFLAGS ?= -g -O2
 LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
@@ -13,8 +13,8 @@ else
   LDLIBS = -lcurses
 endif
 
-VERSION := 1.4
-#VERSION = $(or \
+_VERSION := 1.4
+VERSION = $(or \
     $(shell git describe --match='v$(_VERSION)' 2>/dev/null | sed 's/^v//'), \
     $(shell awk 'NR==1 && /^[a-f0-9]{40}$$/ {print "$(_VERSION)-" substr($$0,0,12) "-dist"}' .distinfo), \
     $(_VERSION)-unknown \
@@ -51,7 +51,7 @@ else
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 2: Enable logging to $(DTE_HOME)/debug.log
   # 3: Enable expensive sanity checks
-  DEBUG = 0
+  DEBUG = 1
 endif
 
 BASIC_CFLAGS += $(CSTD) -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
