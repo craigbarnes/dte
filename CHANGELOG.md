@@ -1,20 +1,30 @@
 dte changelog
 =============
 
-v1.4 (unreleased)
------------------
+v1.4 (latest release)
+---------------------
 
 **Changes:**
 
+* Changed the build system to compile all default configs and syntax
+  highlighting files into the `dte` binary instead of installing and
+  loading them from disk. The `$PKGDATADIR` variable is now removed.
 * Added syntax highlighting for the [Vala] and [D] languages.
-* Allow binding additional, xterm-style key combinations
+* Added the ability to bind additional, xterm-style key combinations
   (e.g. `bind C-M-S-left ...`) when `$TERM` is `tmux` (previously
   only available for `xterm` and `screen`).
+* Added an option to compile without linking to the ncurses library
+  (`make TERMINFO_DISABLE=1`), to make it easier to create portable,
+  statically-linked builds.
 
-Git diff: [v1.3...master](https://github.com/craigbarnes/dte/compare/v1.3...master)
+**Downloads:**
 
-v1.3 (latest release)
----------------------
+* [dte-1.4.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz)
+* [dte-1.4.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz.sig)
+* [dte-1.4.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz.sha256sum)
+
+v1.3
+----
 
 Released on 2017-08-27.
 

@@ -36,9 +36,9 @@ To build `dte` from source, first install the following dependencies:
 
 ...then download and extract the latest release tarball:
 
-    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz
-    tar -xzf dte-1.3.tar.gz
-    cd dte-1.3
+    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz
+    tar -xzf dte-1.4.tar.gz
+    cd dte-1.4
 
 ...and compile and install:
 

@@ -10,6 +10,7 @@ CONTRIBUTING.md export-ignore
 mk/dev.mk export-ignore
 mk/git-hooks/ export-ignore
 mk/dist-sha1sums.txt export-ignore
+mk/tput-compare.sh export-ignore
 
 Documentation/*.txt ttman
 GNUmakefile make
