@@ -148,6 +148,7 @@ BUILTIN_CONFIG_FILES = \
     $(BUILTIN_SYNTAX_FILES) \
     share/rc \
     share/binding/default \
+    share/binding/shift-select \
     share/color/light \
     share/color/light256 \
     share/color/darkgray \
