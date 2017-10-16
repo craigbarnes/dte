@@ -24,7 +24,14 @@ Screenshot
 Installation
 ------------
 
-To build `dte` from source, first install the following dependencies:
+To build `dte` from source, first download and extract the latest
+release tarball:
+
+    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz
+    tar -xzf dte-1.4.tar.gz
+    cd dte-1.4
+
+Then install the following dependencies:
 
 * [GCC] or [Clang]
 * [GNU Make] `>= 3.81`
@@ -34,13 +41,7 @@ To build `dte` from source, first install the following dependencies:
 
     sudo mk/install-deps.sh
 
-...then download and extract the latest release tarball:
-
-    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz
-    tar -xzf dte-1.4.tar.gz
-    cd dte-1.4
-
-...and compile and install:
+Then compile and install:
 
     make -j8 && sudo make install
 
