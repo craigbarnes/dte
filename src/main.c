@@ -12,7 +12,6 @@
 #include "search.h"
 #include "error.h"
 #include "move.h"
-#include "BUILTIN_CONFIG.h"
 
 static void handle_sigtstp(int signum)
 {
@@ -37,8 +36,8 @@ static void handle_sigwinch(int signum)
 
 int main(int argc, char *argv[])
 {
-    static const char *const opts = "[-bhRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *const optstring = "bhRVc:t:r:";
+    static const char *const opts = "[-hRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
+    static const char *const optstring = "hRVc:t:r:";
     const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
@@ -65,9 +64,6 @@ int main(int argc, char *argv[])
         case 'R':
             read_rc = false;
             break;
-        case 'b':
-            puts(builtin_config);
-            return 0;
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017 Craig Barnes");
@@ -99,7 +95,8 @@ int main(int argc, char *argv[])
     free(editor_dir);
 
     exec_builtin_rc("hi\n");
-    exec_builtin_rc(builtin_config);
+    read_config(commands, "builtin://share/rc", true);
+
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create

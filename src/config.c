@@ -2,7 +2,7 @@
 #include "error.h"
 #include "strbuf.h"
 #include "common.h"
-#include "BUILTIN_SYNTAX.h"
+#include "BUILTIN_CONFIG.h"
 
 const char *config_file;
 int config_line;
@@ -95,7 +95,13 @@ int do_read_config(const Command *cmds, const char *filename, bool must_exist)
                 return 0;
             }
         }
-        // TODO: add error message and non-zero return if must_exist == true ?
+        if (must_exist) {
+            error_msg (
+                "Error reading '%s': no built-in config exists for that path",
+                filename
+            );
+            return 1;
+        }
         return 0;
     }
 

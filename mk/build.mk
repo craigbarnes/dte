@@ -4,7 +4,6 @@ LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
-SED = sed
 AWK = awk
 
 ifdef TERMINFO_DISABLE
@@ -114,8 +113,7 @@ test = build/test/test$(EXEC_SUFFIX)
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 
-build/main.o: build/BUILTIN_CONFIG.h
-build/config.o: build/BUILTIN_SYNTAX.h
+build/config.o: build/BUILTIN_CONFIG.h
 build/term-caps.o: build/CFLAGS_TERM_CAPS.txt
 build/editor.o: build/CFLAGS_EDITOR.txt
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
@@ -141,26 +139,24 @@ build/CFLAGS_EDITOR.txt: FORCE | build/
 build/CFLAGS_TERM_CAPS.txt: FORCE | build/
 	@$(OPTCHECK)
 
-BUILTIN_CONFIG_FILES = \
-    share/rc \
-    share/binding \
-    share/color/light \
-    share/compiler/gcc \
-    share/compiler/go \
-    share/filetype \
-    share/option
-
 BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     html+smarty ini java javascript lua mail make markdown meson nginx \
     php python robotstxt ruby sh smarty sql vala xml )
 
-build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
-	$(E) GEN $@
-	$(Q) echo 'static const char *builtin_config =' > $@
-	$(Q) $(SED) -f mk/rc2c.sed $^ >> $@
+BUILTIN_CONFIG_FILES = \
+    $(BUILTIN_SYNTAX_FILES) \
+    share/rc \
+    share/binding/default \
+    share/color/light \
+    share/color/light256 \
+    share/color/darkgray \
+    share/compiler/gcc \
+    share/compiler/go \
+    share/filetype \
+    share/option
 
-build/BUILTIN_SYNTAX.h: $(BUILTIN_SYNTAX_FILES) | build/
+build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/syntax2c.awk $^ > $@
 

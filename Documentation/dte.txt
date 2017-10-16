@@ -6,16 +6,13 @@ dte
 
 @h1 SYNOPSIS
 
-dte [-bhRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...
+dte [-hRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...
 
 @h1 DESCRIPTION
 
 A small and flexible text editor.
 
 @h1 COMMAND LINE OPTIONS
-
--b
-	Print the built-in, default configuration and exit.
 
 -c command
 	Run this command after reading the rc file and opening any files
