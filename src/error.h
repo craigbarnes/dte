@@ -13,7 +13,7 @@ extern bool msg_is_error;
 extern char error_buf[256];
 
 Error *error_create(const char *format, ...) FORMAT(1);
-Error *error_create_errno(int code, const char *format, ...);
+Error *error_create_errno(int code, const char *format, ...) FORMAT(2);
 void error_free(Error *err);
 
 void clear_error(void);
