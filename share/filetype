@@ -40,6 +40,7 @@ ft -f mail '(snd\.[0-9]+|\.letter|\.letter\.[0-9]+|\.followup|\.article|'\
 ft -f make '[mM]akefile(\.[^/]*)?$'
 ft -f make '/Make\.[^/]*$'
 ft -f meson '(meson\.build|meson_options\.txt)$'
+ft -f nginx '/nginx\.conf$' '^/etc/nginx/'
 ft -f robotstxt 'robots\.txt$'
 ft -f ruby '(Capfile|Gemfile|Rakefile)$'
 
@@ -60,6 +61,7 @@ ft javascript js
 ft lua lua rockspec ltcn
 ft make mk mak
 ft markdown md mkd mkdn markdown
+ft nginx nginx
 ft perl perl pl
 ft php php php3 php4 inc
 ft python py

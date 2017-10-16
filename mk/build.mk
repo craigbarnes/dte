@@ -151,9 +151,9 @@ BUILTIN_CONFIG_FILES = \
     share/option
 
 BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
-    awk c config css d diff docker dte gitcommit gitrebase go html html+smarty \
-    ini java javascript lua mail make markdown meson php python robotstxt \
-    ruby sh smarty sql vala xml )
+    awk c config css d diff docker dte gitcommit gitrebase go html \
+    html+smarty ini java javascript lua mail make markdown meson nginx \
+    php python robotstxt ruby sh smarty sql vala xml )
 
 build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
 	$(E) GEN $@
