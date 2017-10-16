@@ -527,7 +527,7 @@ Syntax *load_syntax_by_filetype(const char *filetype)
         return syn;
     }
 
-    filename = xsprintf("builtin://share/syntax/%s", filetype);
+    filename = xsprintf("builtin://syntax/%s", filetype);
     syn = load_syntax_file(filename, false, &err);
     free(filename);
     return syn;
