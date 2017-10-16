@@ -30,10 +30,10 @@ build:debian:
         - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
         - export MAKEFLAGS="-j$(mk/nproc.sh)" V=1
         - make vars check
-        - export HOST_CC=gcc TERMINFO_DISABLE=1
-        - make clean && make vars check CC=gcc
-        - make clean && make vars check CC=arm-linux-gnueabihf-gcc
-        - make clean && make vars check CC=aarch64-linux-gnu-gcc
+        - export TERMINFO_DISABLE=1
+        - make clean && make vars dte CC=gcc
+        - make clean && make vars dte CC=arm-linux-gnueabihf-gcc
+        - make clean && make vars dte CC=aarch64-linux-gnu-gcc
 
 build:centos:
     stage: build
