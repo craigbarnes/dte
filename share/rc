@@ -14,6 +14,7 @@ alias t tag
 alias man "run man"
 alias make "compile gcc make"
 alias read "pass-through cat"
+alias help "man dte"
 
 # format quoted text in email messages
 alias fmt-email "filter fmt -w 74 -p '> '"
