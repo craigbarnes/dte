@@ -188,7 +188,7 @@ static const CodepointRange east_asian_wide[] = {
     {0x30000, 0x3fffd}
 };
 
-static inline bool in_range (
+static inline PURE bool in_range (
     unsigned int u,
     const CodepointRange *range,
     int count
@@ -204,7 +204,7 @@ static inline bool in_range (
     return false;
 }
 
-static inline bool bisearch (
+static inline PURE bool bisearch (
     unsigned int u,
     const CodepointRange *range,
     int max
