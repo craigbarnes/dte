@@ -1,7 +1,7 @@
 #include "uchar.h"
 #include "common.h"
 
-static inline int u_seq_len(unsigned int first_byte)
+static inline CONST_FN int u_seq_len(unsigned int first_byte)
 {
     if (first_byte < 0x80) {
         return 1;
@@ -23,12 +23,12 @@ static inline int u_seq_len(unsigned int first_byte)
     return -1;
 }
 
-static inline bool u_is_continuation(unsigned int uch)
+static inline CONST_FN bool u_is_continuation(unsigned int uch)
 {
     return (uch & 0xc0) == 0x80;
 }
 
-static inline bool u_seq_len_ok(unsigned int uch, int len)
+static inline CONST_FN bool u_seq_len_ok(unsigned int uch, int len)
 {
     return u_char_size(uch) == len;
 }
@@ -43,7 +43,7 @@ static inline bool u_seq_len_ok(unsigned int uch, int len)
  * 5    0000 0011    Forbidden by RFC 3629
  * 6    0000 0001    Forbidden by RFC 3629
  */
-static inline unsigned int u_get_first_byte_mask(unsigned int len)
+static inline CONST_FN unsigned int u_get_first_byte_mask(unsigned int len)
 {
     return (1U << 7U >> len) - 1U;
 }

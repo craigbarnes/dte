@@ -5,7 +5,7 @@
 #include "ascii.h"
 #include "xmalloc.h"
 
-static inline size_t ROUND_UP(size_t x, size_t r)
+static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
 {
     r--;
     return (x + r) & ~r;
@@ -66,7 +66,7 @@ static inline NONNULL bool str_has_suffix(const char *str, const char *suffix)
 long count_nl(const char *buf, long size);
 int count_strings(char **strings);
 void free_strings(char **strings);
-int number_width(long n);
+int number_width(long n) CONST_FN;
 bool buf_parse_long(const char *str, int size, int *posp, long *valp);
 bool parse_long(const char **strp, long *valp);
 bool str_to_long(const char *str, long *valp);

@@ -3,7 +3,7 @@
 
 #include "unicode.h"
 
-static inline unsigned int u_char_size(unsigned int uch)
+static inline CONST_FN unsigned int u_char_size(unsigned int uch)
 {
     if (uch <= 0x7fU)
         return 1;
