@@ -30,7 +30,7 @@ static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
             BUG("%s", STRINGIFY(a)); \
     } while (0)
 
-static inline NONNULL bool streq(const char *a, const char *b)
+static inline NONNULL_ARGS bool streq(const char *a, const char *b)
 {
     return !strcmp(a, b);
 }
@@ -47,13 +47,17 @@ static inline bool xstreq(const char *a, const char *b)
     return streq(a, b);
 }
 
-static inline NONNULL bool str_has_prefix(const char *str, const char *prefix)
-{
+static inline NONNULL_ARGS bool str_has_prefix (
+    const char *str,
+    const char *prefix
+) {
     return !strncmp(str, prefix, strlen(prefix));
 }
 
-static inline NONNULL bool str_has_suffix(const char *str, const char *suffix)
-{
+static inline NONNULL_ARGS bool str_has_suffix (
+    const char *str,
+    const char *suffix
+) {
     size_t l1 = strlen(str);
     size_t l2 = strlen(suffix);
 
