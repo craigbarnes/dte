@@ -114,29 +114,23 @@ $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 
 build/config.o: build/BUILTIN_CONFIG.h
-build/term-caps.o: build/CFLAGS_TERM_CAPS.txt
-build/editor.o: build/CFLAGS_EDITOR.txt
+build/term-caps.o: build/term-caps.cflags
+build/editor.o: build/editor.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 
 $(dte) $(test):
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(editor_objects): build/%.o: src/%.c build/CFLAGS.txt | build/
+$(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
 
-$(test_objects): build/test/%.o: test/%.c build/CFLAGS.txt | build/test/
+$(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
-build/CFLAGS.txt: FORCE | build/
-	@$(OPTCHECK)
-
-build/CFLAGS_EDITOR.txt: FORCE | build/
-	@$(OPTCHECK)
-
-build/CFLAGS_TERM_CAPS.txt: FORCE | build/
+build/%.cflags: FORCE | build/
 	@$(OPTCHECK)
 
 BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
