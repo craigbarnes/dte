@@ -914,17 +914,19 @@ static void cmd_save(const char *pf, char **args)
         }
     }
 
-    if (args[0]) {
-        char *tmp;
+    // The normalize_encoding() call above may have allocated memory, so
+    // use "goto error" instead of early return beyond this point, to
+    // ensure correct de-allocation.
 
+    if (args[0]) {
         if (args[0][0] == 0) {
             error_msg("Empty filename not allowed");
-            return;
+            goto error;
         }
-        tmp = path_absolute(args[0]);
+        char *tmp = path_absolute(args[0]);
         if (!tmp) {
             error_msg("Failed to make absolute path: %s", strerror(errno));
-            return;
+            goto error;
         }
         if (absolute && streq(tmp, absolute)) {
             free(tmp);
@@ -936,15 +938,18 @@ static void cmd_save(const char *pf, char **args)
             if (prompt) {
                 set_input_mode(INPUT_COMMAND);
                 cmdline_set_text(&editor.cmdline, "save ");
-                return;
+                // This branch is not really an error, but we still return via
+                // the "error" label because we need to clean up memory and
+                // that's all it's used for currently.
+                goto error;
             } else {
                 error_msg("No filename.");
-                return;
+                goto error;
             }
         }
         if (buffer->ro && !force) {
             error_msg("Use -f to force saving read-only file.");
-            return;
+            goto error;
         }
     }
 
