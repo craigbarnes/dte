@@ -89,13 +89,13 @@ const char *find_ft (
     const char *first_line,
     unsigned int line_len
 ) {
-    unsigned int filename_len = strlen(filename);
+    size_t filename_len = 0;
     char *ext = NULL;
-
     if (filename) {
         ext = get_ext(filename);
+        filename_len = strlen(filename);
     }
-    for (int i = 0; i < filetypes.count; i++) {
+    for (size_t i = 0; i < filetypes.count; i++) {
         const FileType *ft = filetypes.ptrs[i];
         switch (ft->type) {
         case FT_EXTENSION:
