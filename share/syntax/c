@@ -178,6 +178,7 @@ state label
 state ident
     char -b a-zA-Z0-9_ ident
     inlist keyword c
+    inlist c11-keyword c
     inlist type c
     inlist constant c
     inlist cpp-keyword c
@@ -265,6 +266,10 @@ list keyword \
     asm const static inline register extern volatile auto restrict sizeof \
     typedef
 
+list c11-keyword \
+    _Alignas _Alignof _Noreturn \
+    alignas alignof noreturn
+
 list type \
     struct union enum void char short int long float double signed \
     unsigned size_t ssize_t off_t ptrdiff_t time_t va_list wchar_t \
@@ -295,5 +300,6 @@ list cpp-keyword \
     typeof typename using virtual
 
 default ident class-name
+default keyword c11-keyword
 default keyword cpp-keyword
 default preproc preproccond
