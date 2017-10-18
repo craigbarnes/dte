@@ -166,8 +166,8 @@ TagFile *load_tag_file(void)
     }
     buf = xnew(char, st.st_size);
     size = xread(fd, buf, st.st_size);
+    close(fd);
     if (size < 0) {
-        close(fd);
         return NULL;
     }
     tf = xnew0(TagFile, 1);
