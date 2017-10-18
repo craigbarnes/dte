@@ -659,6 +659,7 @@ void clear_lines(void)
         ins_count = strlen(indent);
     }
     buffer_replace_bytes(del_count, indent, ins_count);
+    free(indent);
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
