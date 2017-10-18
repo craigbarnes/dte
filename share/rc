@@ -5,12 +5,6 @@ include builtin://compiler/go
 include builtin://filetype
 include builtin://option
 
-alias cl close
-alias o open
-alias q quit
-alias r replace
-alias s save
-alias t tag
 alias help "run man dte"
 alias man "run man"
 alias make "compile gcc make"
