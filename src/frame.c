@@ -164,6 +164,9 @@ static void fix_size(Frame *f)
     for (int i = 0; i < count; i++) {
         set_size(f->frames.ptrs[i], size[i]);
     }
+
+    free(size);
+    free(min);
 }
 
 static void add_to_sibling_size(Frame *f, int count)
