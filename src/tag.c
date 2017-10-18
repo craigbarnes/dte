@@ -138,26 +138,22 @@ static void tag_file_free(TagFile *tf)
 
 TagFile *load_tag_file(void)
 {
-    TagFile *tf;
-    struct stat st;
     char path[4096];
-    char *buf;
-    long size;
-    int fd;
-
-    // 5 = length of "/tags"
-    if (!getcwd(path, sizeof(path) - 5)) {
+    if (!getcwd(path, sizeof(path) - 5)) { // 5 = length of "/tags"
         return NULL;
     }
-    fd = open_tag_file(path);
+
+    int fd = open_tag_file(path);
     if (fd < 0) {
         return NULL;
     }
-    if (fstat(fd, &st) != 0) {
-        error_msg("fstat failed on %s: %s", path, strerror(errno));
+
+    struct stat st;
+    if (fstat(fd, &st) != 0 || st.st_size <= 0) {
         close(fd);
         return NULL;
     }
+
     if (
         current_tag_file != NULL
         && tag_file_changed(current_tag_file, path, &st)
@@ -169,13 +165,16 @@ TagFile *load_tag_file(void)
         close(fd);
         return current_tag_file;
     }
-    buf = xnew(char, st.st_size);
-    size = xread(fd, buf, st.st_size);
+
+    char *buf = xnew(char, st.st_size);
+    ssize_t size = xread(fd, buf, st.st_size);
     close(fd);
     if (size < 0) {
+        free(buf);
         return NULL;
     }
-    tf = xnew0(TagFile, 1);
+
+    TagFile *tf = xnew0(TagFile, 1);
     tf->filename = xstrdup(path);
     tf->buf = buf;
     tf->size = size;
