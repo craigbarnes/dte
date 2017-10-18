@@ -523,6 +523,7 @@ static void shift_right(int nr_lines, int count)
             int size;
             char *buf = alloc_indent(info.level + count, &size);
             buffer_replace_bytes(info.bytes, buf, size);
+            free(buf);
         }
         if (++i == nr_lines) {
             break;
@@ -562,6 +563,7 @@ static void shift_left(int nr_lines, int count)
                 int size;
                 char *buf = alloc_indent(info.level - count, &size);
                 buffer_replace_bytes(info.bytes, buf, size);
+                free(buf);
             } else {
                 buffer_delete_bytes(info.bytes);
             }
