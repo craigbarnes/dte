@@ -132,9 +132,7 @@ ssize_t xread(int fd, void *buf, size_t count)
     size_t pos = 0;
 
     do {
-        int rc;
-
-        rc = read(fd, b + pos, count - pos);
+        ssize_t rc = read(fd, b + pos, count - pos);
         if (rc == -1) {
             if (errno == EINTR) {
                 continue;
