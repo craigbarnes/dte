@@ -1,6 +1,7 @@
 #include "tag.h"
 #include "completion.h"
 #include "path.h"
+#include "error.h"
 #include "common.h"
 
 static TagFile *current_tag_file;
@@ -152,7 +153,11 @@ TagFile *load_tag_file(void)
     if (fd < 0) {
         return NULL;
     }
-    fstat(fd, &st);
+    if (fstat(fd, &st) != 0) {
+        error_msg("fstat failed on %s: %s", path, strerror(errno));
+        close(fd);
+        return NULL;
+    }
     if (
         current_tag_file != NULL
         && tag_file_changed(current_tag_file, path, &st)

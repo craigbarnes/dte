@@ -1,7 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include "macros.h"
 
 typedef struct {
     char *msg;
