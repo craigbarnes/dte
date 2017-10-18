@@ -493,6 +493,8 @@ void remove_frame(Frame *f)
     update_window_coordinates();
 }
 
+#ifdef DEBUG_FRAMES
+
 static void debug_frame(Frame *f, int level)
 {
     d_print (
@@ -528,6 +530,11 @@ static void debug_frame(Frame *f, int level)
 
 void debug_frames(void)
 {
-    return;
     debug_frame(root_frame, 0);
 }
+
+#else
+
+void debug_frames(void) {}
+
+#endif
