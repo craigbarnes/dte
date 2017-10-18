@@ -194,7 +194,11 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
             return -1;
         }
     } else {
-        fstat(fd, &b->st);
+        if (fstat(fd, &b->st) != 0) {
+            error_msg("fstat failed on %s: %s", filename, strerror(errno));
+            close(fd);
+            return -1;
+        }
         if (!S_ISREG(b->st.st_mode)) {
             error_msg("Not a regular file %s", filename);
             close(fd);
