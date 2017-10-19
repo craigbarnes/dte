@@ -51,7 +51,7 @@ void add_completion(char *str)
 
 static void collect_commands(const char *prefix)
 {
-    for (int i = 0; commands[i].name; i++) {
+    for (size_t i = 0; commands[i].name; i++) {
         const Command *c = &commands[i];
         if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
@@ -67,8 +67,8 @@ static void do_collect_files (
     bool directories_only
 ) {
     char path[8192];
-    int plen = strlen(dirname);
-    int flen = strlen(fileprefix);
+    size_t plen = strlen(dirname);
+    size_t flen = strlen(fileprefix);
     struct dirent *de;
     DIR *dir;
 
@@ -90,7 +90,7 @@ static void do_collect_files (
         const char *name = de->d_name;
         StringBuffer buf = STRBUF_INIT;
         struct stat st;
-        int len;
+        size_t len;
         bool is_dir;
 
         if (flen) {
@@ -150,7 +150,7 @@ static void collect_files(bool directories_only)
         if (fileprefix == str) {
             // str doesn't contain slashes
             // complete ~ to ~/ or ~user to ~user/
-            int len = strlen(str);
+            size_t len = strlen(str);
             char *s = xmalloc(len + 2);
             memcpy(s, str, len);
             s[len] = '/';
@@ -180,8 +180,10 @@ static void collect_files(bool directories_only)
     if (completion.completions.count == 1) {
         // Add space if completed string is not a directory
         const char *s = completion.completions.ptrs[0];
-        int len = strlen(s);
-        completion.add_space = s[len - 1] != '/';
+        size_t len = strlen(s);
+        if (len > 0) {
+            completion.add_space = s[len - 1] != '/';
+        }
     }
 }
 
@@ -189,7 +191,7 @@ static void collect_env(const char *prefix)
 {
     extern char **environ;
 
-    for (int i = 0; environ[i]; i++) {
+    for (size_t i = 0; environ[i]; i++) {
         const char *e = environ[i];
 
         if (str_has_prefix(e, prefix)) {
@@ -269,7 +271,7 @@ static void init_completion(void)
     PointerArray array = PTR_ARRAY_INIT;
     int semicolon = -1;
     int completion_pos = -1;
-    int len, pos = 0;
+    size_t len, pos = 0;
 
     while (1) {
         Error *err = NULL;
@@ -307,7 +309,7 @@ static void init_completion(void)
             const char *value = find_alias(name);
 
             if (value) {
-                int i, save = array.count;
+                size_t i, save = array.count;
 
                 if (!parse_commands(&array, value, &err)) {
                     error_free(err);
@@ -335,7 +337,7 @@ static void init_completion(void)
     len = editor.cmdline.pos - completion_pos;
     if (len && str[0] == '$') {
         bool var = true;
-        for (int i = 1; i < len; i++) {
+        for (size_t i = 1; i < len; i++) {
             char ch = str[i];
             if (ascii_isalpha(ch) || ch == '_') {
                 continue;
@@ -390,7 +392,7 @@ static char *escape(const char *str)
         strbuf_add_ch(&buf, '\\');
     }
 
-    for (int i = 0; str[i]; i++) {
+    for (size_t i = 0; str[i]; i++) {
         char ch = str[i];
         switch (ch) {
         case ' ':
@@ -417,7 +419,7 @@ static char *escape(const char *str)
 void complete_command(void)
 {
     char *middle, *str;
-    int head_len, middle_len, tail_len;
+    size_t head_len, middle_len, tail_len;
 
     if (!completion.head) {
         init_completion();
