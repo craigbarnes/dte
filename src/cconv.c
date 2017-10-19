@@ -87,7 +87,7 @@ static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
     add_replacement(c);
     if (c->char_size == 0) {
         // Converting from UTF-8
-        long idx = 0;
+        size_t idx = 0;
         unsigned int u = u_get_char(buf, count, &idx);
         d_print("U+%04X\n", u);
         return idx;

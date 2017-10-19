@@ -151,7 +151,7 @@ int print_command(char prefix)
 void print_message(const char *msg, bool is_error)
 {
     enum builtin_color c = BC_COMMANDLINE;
-    long i = 0;
+    size_t i = 0;
 
     if (msg[0]) {
         c = is_error ? BC_ERRORMSG : BC_INFOMSG;

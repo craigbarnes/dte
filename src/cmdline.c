@@ -7,8 +7,8 @@
 
 static void cmdline_delete(CommandLine *c)
 {
-    long pos = c->pos;
-    long len = 1;
+    size_t pos = c->pos;
+    size_t len = 1;
 
     if (pos == c->buf.len) {
         return;
@@ -84,8 +84,8 @@ static void cmdline_next_char(CommandLine *c)
 static void cmdline_next_word(CommandLine *c)
 {
     const char *buf = c->buf.buffer;
-    const long len = c->buf.len;
-    long i = c->pos;
+    const size_t len = c->buf.len;
+    size_t i = c->pos;
 
     while (i < len && is_word_byte(buf[i])) {
         i++;
@@ -101,7 +101,7 @@ static void cmdline_next_word(CommandLine *c)
 static void cmdline_prev_word(CommandLine *c)
 {
     const char *buf = c->buf.buffer;
-    long i = c->pos;
+    size_t i = c->pos;
 
     if (i > 1 && is_word_byte(buf[i]) && !is_word_byte(buf[i - 1])) {
         i--;
@@ -132,7 +132,7 @@ static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
 
 static void cmdline_insert_paste(CommandLine *c)
 {
-    long size, i;
+    size_t size, i;
     char *text = term_read_paste(&size);
 
     for (i = 0; i < size; i++) {

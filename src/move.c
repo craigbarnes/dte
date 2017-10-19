@@ -14,7 +14,7 @@ void move_to_preferred_x(int preferred_x)
 {
     unsigned int tw = buffer->options.tab_width;
     LineRef lr;
-    long i = 0;
+    size_t i = 0;
     unsigned int x = 0;
 
     view->preferred_x = preferred_x;
@@ -50,7 +50,7 @@ void move_to_preferred_x(int preferred_x)
                 x += 2;
             }
         } else {
-            int next = i;
+            size_t next = i;
             i--;
             u = u_get_nonascii(lr.line, lr.size, &i);
             x += u_char_width(u);

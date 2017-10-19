@@ -115,9 +115,10 @@ static void keypress(Key key, char *buf, int *count)
         input_special == INPUT_SPECIAL_UNICODE
         && u_is_unicode(raw_input.value)
     ) {
-        long idx = 0;
+        size_t idx = 0;
         u_set_char_raw(buf, &idx, raw_input.value);
-        *count = idx;
+        // TODO: count should really be changed to size_t
+        *count = (int)idx;
     }
     if (
         input_special != INPUT_SPECIAL_UNICODE
