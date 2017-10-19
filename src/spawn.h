@@ -13,8 +13,8 @@ typedef enum {
 typedef struct {
     char *in;
     char *out;
-    long in_len;
-    long out_len;
+    size_t in_len;
+    size_t out_len;
 } FilterData;
 
 int spawn_filter(char **argv, FilterData *data);

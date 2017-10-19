@@ -6,7 +6,7 @@
 
 typedef struct {
     char buf[8192];
-    long count;
+    size_t count;
 
     // Number of characters scrolled (x direction)
     unsigned int scroll_x;

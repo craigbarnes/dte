@@ -18,13 +18,11 @@ static void add_separator(Formatter *f)
 
 static void add_status_str(Formatter *f, const char *str)
 {
-    long idx = 0;
-
     if (!*str) {
         return;
     }
-
     add_separator(f);
+    size_t idx = 0;
     while (f->pos < f->size && str[idx]) {
         u_set_char(f->buf, &f->pos, u_str_get_char(str, &idx));
     }

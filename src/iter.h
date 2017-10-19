@@ -13,8 +13,8 @@
 typedef struct block {
     ListHead node;
     unsigned char *data;
-    long size;
-    long alloc;
+    size_t size;
+    size_t alloc;
     long nl;
 } Block;
 
@@ -26,7 +26,7 @@ static inline Block *BLOCK(const ListHead *const item)
 typedef struct {
     Block *blk;
     ListHead *head;
-    long offset;
+    size_t offset;
 } BlockIter;
 
 typedef struct {

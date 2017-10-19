@@ -108,7 +108,7 @@ static void print_vertical_tab_title(View *v, int idx, int width)
     }
     if (filename != orig_filename) {
         // filename was shortened. Add "<<" symbol.
-        long i = strlen(buf);
+        size_t i = strlen(buf);
         u_set_char(buf, &i, 0xab);
         buf[i] = 0;
     }

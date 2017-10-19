@@ -113,7 +113,7 @@ void update_status_line(Window *win)
 
 int print_command(char prefix)
 {
-    long i, w;
+    size_t i, w;
     unsigned int u;
     int x;
 

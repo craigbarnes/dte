@@ -14,8 +14,8 @@ typedef struct {
     long sel_eo;
 
     const unsigned char *line;
-    long size;
-    long pos;
+    size_t size;
+    size_t pos;
     long indent_size;
     long trailing_ws_offset;
     HlColor **colors;
@@ -202,11 +202,11 @@ static void screen_skip_char(LineInfo *info)
     }
 }
 
-static bool is_notice(const char *word, int len)
+static bool is_notice(const char *word, size_t len)
 {
     static const char *const words[] = {"fixme", "todo", "xxx"};
 
-    for (int i = 0; i < ARRAY_COUNT(words); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(words); i++) {
         const char *w = words[i];
         if (strlen(w) == len && !strncasecmp(w, word, len)) {
             return true;
@@ -220,7 +220,7 @@ static void hl_words(LineInfo *info)
 {
     HlColor *cc = find_color("comment");
     HlColor *nc = find_color("notice");
-    int i, j, si, max;
+    size_t i, j, si, max;
 
     if (info->colors == NULL || cc == NULL || nc == NULL) {
         return;

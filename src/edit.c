@@ -784,7 +784,7 @@ static unsigned int paragraph_size(void)
 void format_paragraph(int text_width)
 {
     ParagraphFormatter pf;
-    long len, i;
+    size_t len, i;
     int indent_width;
     char *sel;
 
@@ -810,7 +810,7 @@ void format_paragraph(int text_width)
 
     i = 0;
     while (1) {
-        long start, tmp;
+        size_t start, tmp;
 
         while (i < len) {
             tmp = i;
