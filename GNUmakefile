@@ -23,6 +23,11 @@ install: all
 	$(INSTALL) -m644 $(man1) $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m644 $(man5) $(DESTDIR)$(mandir)/man5
 
+uninstall:
+	$(RM) $(DESTDIR)$(bindir)/$(dte)
+	$(RM) $(addprefix $(DESTDIR)$(mandir)/man1/, $(man1))
+	$(RM) $(addprefix $(DESTDIR)$(mandir)/man5/, $(man5))
+
 check: $(test) all
 	$(E) TEST $<
 	$(Q) $<
@@ -45,5 +50,5 @@ distclean: clean
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install check check-commands tags clean distclean
+.PHONY: all install uninstall check check-commands tags clean distclean
 .DELETE_ON_ERROR:
