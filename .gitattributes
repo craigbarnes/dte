@@ -17,8 +17,13 @@ GNUmakefile make
 makefile make
 *.mk make
 *.[ch] code
+*.awk code
 *.sed code
 *.sh code
 *.yml code
+*.dterc code
+share/** code
 mk/git-hooks/* code
+test/*.txt text
+LICENSE text
 *.md markdown
