@@ -56,6 +56,23 @@ endif
 BASIC_CFLAGS += $(CSTD) -Ibuild -DDEBUG=$(DEBUG) $(CWARNS)
 BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 
+BUILTIN_CONFIGS = \
+    share/rc \
+    share/filetype \
+    share/option \
+    share/binding/default \
+    share/binding/shift-select \
+    share/color/light \
+    share/color/light256 \
+    share/color/darkgray \
+    share/compiler/gcc \
+    share/compiler/go
+
+BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
+    awk c config css d diff docker dte gitcommit gitrebase go html \
+    html+smarty ini java javascript lua mail make markdown meson nginx \
+    php python robotstxt ruby sh smarty sql vala xml )
+
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
     color command-mode commands common compiler completion config ctags \
@@ -68,7 +85,8 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
 
-test_objects := build/test/test_main.o
+test_objects := \
+    build/test/test_main.o
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
@@ -133,25 +151,7 @@ $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK)
 
-BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
-    awk c config css d diff docker dte gitcommit gitrebase go html \
-    html+smarty ini java javascript lua mail make markdown meson nginx \
-    php python robotstxt ruby sh smarty sql vala xml )
-
-BUILTIN_CONFIG_FILES = \
-    $(BUILTIN_SYNTAX_FILES) \
-    share/rc \
-    share/binding/default \
-    share/binding/shift-select \
-    share/color/light \
-    share/color/light256 \
-    share/color/darkgray \
-    share/compiler/gcc \
-    share/compiler/go \
-    share/filetype \
-    share/option
-
-build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIG_FILES) | build/
+build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) $(BUILTIN_SYNTAX_FILES) | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/syntax2c.awk $^ > $@
 
