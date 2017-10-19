@@ -28,7 +28,7 @@ WARNINGS = \
     -Wno-unused-parameter -Wno-sign-compare -Wno-pointer-sign
 
 ifdef WERROR
-  WARNINGS += -Werror
+  WARNINGS += -Werror -Wno-error=attributes
 endif
 
 CWARNS = $(call cc-option,$(WARNINGS))
