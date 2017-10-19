@@ -13,12 +13,12 @@
 #include "error.h"
 #include "move.h"
 
-static void handle_sigtstp(int signum)
+static void handle_sigtstp(int UNUSED(signum))
 {
     suspend();
 }
 
-static void handle_sigcont(int signum)
+static void handle_sigcont(int UNUSED(signum))
 {
     if (
         !editor.child_controls_terminal
@@ -29,7 +29,7 @@ static void handle_sigcont(int signum)
     }
 }
 
-static void handle_sigwinch(int signum)
+static void handle_sigwinch(int UNUSED(signum))
 {
     editor.resized = true;
 }

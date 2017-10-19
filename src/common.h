@@ -12,13 +12,13 @@ static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
 }
 
 #if DEBUG <= 0
-  FORMAT(1) static inline void BUG(const char *fmt, ...) {}
+  static inline void BUG(const char* UNUSED(fmt), ...) {}
 #else
   #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #endif
 
 #if DEBUG <= 1
-  FORMAT(1) static inline void d_print(const char *fmt, ...) {}
+  static inline void d_print(const char* UNUSED(fmt), ...) {}
 #else
   #define d_print(...) debug_print(__func__, __VA_ARGS__)
 #endif

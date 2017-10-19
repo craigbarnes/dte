@@ -1,6 +1,7 @@
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 3)
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
+#define UNUSED(x) UNUSED__ ## x __attribute__((unused))
 #define NONNULL_ARGS __attribute__((nonnull))
 #define MALLOC __attribute__((__malloc__))
 #define FORMAT(idx) __attribute__((format(printf, (idx), (idx + 1))))
@@ -9,6 +10,7 @@
 #else
 #define likely(x) (x)
 #define unlikely(x) (x)
+#define UNUSED
 #define NONNULL_ARGS
 #define MALLOC
 #define FORMAT(idx)

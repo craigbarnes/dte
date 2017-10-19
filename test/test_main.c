@@ -71,7 +71,7 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
     init_editor_state();
 
