@@ -67,7 +67,7 @@ static const BuiltinEnv builtin[] = {
 
 void collect_builtin_env(const char *prefix)
 {
-    for (int i = 0; i < ARRAY_COUNT(builtin); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
         const char *name = builtin[i].name;
         if (str_has_prefix(name, prefix)) {
             add_completion(xstrdup(name));
@@ -78,7 +78,7 @@ void collect_builtin_env(const char *prefix)
 // Returns NULL only if name isn't in builtin array
 char *expand_builtin_env(const char *name)
 {
-    for (int i = 0; i < ARRAY_COUNT(builtin); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
         const BuiltinEnv *be = &builtin[i];
         if (streq(be->name, name)) {
             return be->expand();

@@ -6,7 +6,7 @@
 typedef struct {
     const char *encoding;
     unsigned char bytes[4];
-    int len;
+    size_t len;
 } ByteOrderMark;
 
 char *normalize_encoding(const char *encoding);

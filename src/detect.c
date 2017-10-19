@@ -172,8 +172,8 @@ bool detect_indent(Buffer *b)
         b->options.expand_tab = false;
         b->options.indent_width = b->options.tab_width;
     } else {
-        int m = 0;
-        for (int i = 1; i < ARRAY_COUNT(counts); i++) {
+        size_t m = 0;
+        for (size_t i = 1; i < ARRAY_COUNT(counts); i++) {
             if (b->options.detect_indent & 1 << (i - 1)) {
                 if (counts[i] > counts[m]) {
                     m = i;

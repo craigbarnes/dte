@@ -529,7 +529,7 @@ static void cmd_load_syntax(const char *pf, char **args)
 
 static void cmd_move_tab(const char *pf, char **args)
 {
-    long j, i = ptr_array_idx(&window->views, view);
+    size_t j, i = ptr_array_idx(&window->views, view);
     char *str = args[0];
 
     if (streq(str, "left")) {

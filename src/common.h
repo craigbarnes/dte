@@ -67,8 +67,8 @@ static inline NONNULL_ARGS bool str_has_suffix (
     return memcmp(str + l1 - l2, suffix, l2) == 0;
 }
 
-long count_nl(const char *buf, long size);
-int count_strings(char **strings);
+size_t count_nl(const char *buf, size_t size);
+size_t count_strings(char **strings);
 void free_strings(char **strings);
 int number_width(long n) CONST_FN;
 bool buf_parse_long(const char *str, int size, int *posp, long *valp);

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "editor.h"
 
-long count_nl(const char *buf, long size)
+size_t count_nl(const char *buf, size_t size)
 {
     const char *end = buf + size;
-    long nl = 0;
+    size_t nl = 0;
 
     while (buf < end) {
         buf = memchr(buf, '\n', end - buf);
@@ -17,10 +17,9 @@ long count_nl(const char *buf, long size)
     return nl;
 }
 
-int count_strings(char **strings)
+size_t count_strings(char **strings)
 {
-    int count;
-
+    size_t count;
     for (count = 0; strings[count]; count++) {
         ;
     }
@@ -29,7 +28,7 @@ int count_strings(char **strings)
 
 void free_strings(char **strings)
 {
-    for (int i = 0; strings[i]; i++) {
+    for (size_t i = 0; strings[i]; i++) {
         free(strings[i]);
     }
     free(strings);

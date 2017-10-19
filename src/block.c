@@ -53,10 +53,10 @@ static void delete_block(Block *blk)
     free(blk);
 }
 
-static long copy_count_nl(char *dst, const char *src, long len)
+static size_t copy_count_nl(char *dst, const char *const src, size_t len)
 {
-    long nl = 0;
-    for (long i = 0; i < len; i++) {
+    size_t nl = 0;
+    for (size_t i = 0; i < len; i++) {
         dst[i] = src[i];
         if (src[i] == '\n') {
             nl++;
