@@ -9,6 +9,8 @@ prefix ?= /usr/local
 bindir ?= $(prefix)/bin
 datadir ?= $(prefix)/share
 mandir ?= $(datadir)/man
+man1dir ?= $(mandir)/man1
+man5dir ?= $(mandir)/man5
 
 INSTALL = install
 RM = rm -f
@@ -17,16 +19,16 @@ all: $(dte) man
 
 install: all
 	$(INSTALL) -d -m755 $(DESTDIR)$(bindir)
-	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -d -m755 $(DESTDIR)$(mandir)/man5
+	$(INSTALL) -d -m755 $(DESTDIR)$(man1dir)
+	$(INSTALL) -d -m755 $(DESTDIR)$(man5dir)
 	$(INSTALL) -m755 $(dte) $(DESTDIR)$(bindir)
-	$(INSTALL) -m644 $(man1) $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -m644 $(man5) $(DESTDIR)$(mandir)/man5
+	$(INSTALL) -m644 $(man1) $(DESTDIR)$(man1dir)
+	$(INSTALL) -m644 $(man5) $(DESTDIR)$(man5dir)
 
 uninstall:
 	$(RM) $(DESTDIR)$(bindir)/$(dte)
-	$(RM) $(addprefix $(DESTDIR)$(mandir)/man1/, $(man1))
-	$(RM) $(addprefix $(DESTDIR)$(mandir)/man5/, $(man5))
+	$(RM) $(addprefix $(DESTDIR)$(man1dir)/, $(man1))
+	$(RM) $(addprefix $(DESTDIR)$(man5dir)/, $(man5))
 
 check: $(test) all
 	$(E) TEST $<
