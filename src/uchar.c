@@ -23,7 +23,7 @@ static inline CONST_FN int u_seq_len(unsigned int first_byte)
     return -1;
 }
 
-static inline CONST_FN bool u_is_continuation(unsigned int uch)
+static inline CONST_FN bool u_is_continuation(CodePoint uch)
 {
     return (uch & 0xc0) == 0x80;
 }
@@ -50,7 +50,7 @@ static inline CONST_FN unsigned int u_get_first_byte_mask(unsigned int len)
 
 unsigned int u_str_width(const unsigned char *str)
 {
-    long i = 0, w = 0;
+    size_t i = 0, w = 0;
 
     while (str[i]) {
         w += u_char_width(u_str_get_char(str, &i));
@@ -58,11 +58,11 @@ unsigned int u_str_width(const unsigned char *str)
     return w;
 }
 
-unsigned int u_prev_char(const unsigned char *buf, long *idx)
+unsigned int u_prev_char(const unsigned char *buf, size_t *idx)
 {
-    long i = *idx;
+    size_t i = *idx;
     unsigned int count, shift;
-    unsigned int u;
+    CodePoint u;
 
     u = buf[--i];
     if (likely(u < 0x80)) {
@@ -108,9 +108,9 @@ invalid:
     return -u;
 }
 
-unsigned int u_str_get_char(const unsigned char *str, long *idx)
+unsigned int u_str_get_char(const unsigned char *str, size_t *idx)
 {
-    long i = *idx;
+    size_t i = *idx;
     unsigned int u = str[i];
 
     if (likely(u < 0x80)) {
@@ -120,9 +120,9 @@ unsigned int u_str_get_char(const unsigned char *str, long *idx)
     return u_get_nonascii(str, i + 4, idx);
 }
 
-unsigned int u_get_char(const unsigned char *buf, long size, long *idx)
+unsigned int u_get_char(const unsigned char *buf, size_t size, size_t *idx)
 {
-    long i = *idx;
+    size_t i = *idx;
     unsigned int u = buf[i];
 
     if (likely(u < 0x80)) {
@@ -132,9 +132,9 @@ unsigned int u_get_char(const unsigned char *buf, long size, long *idx)
     return u_get_nonascii(buf, size, idx);
 }
 
-unsigned int u_get_nonascii(const unsigned char *buf, long size, long *idx)
+unsigned int u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
 {
-    long i = *idx;
+    size_t i = *idx;
     int len, c;
     unsigned int first, u;
 
@@ -165,9 +165,9 @@ invalid:
     return -first;
 }
 
-void u_set_char_raw(char *str, long *idx, unsigned int uch)
+void u_set_char_raw(char *str, size_t *idx, CodePoint uch)
 {
-    long i = *idx;
+    size_t i = *idx;
 
     if (uch <= 0x7fU) {
         str[i++] = uch;
@@ -197,9 +197,9 @@ void u_set_char_raw(char *str, long *idx, unsigned int uch)
     }
 }
 
-void u_set_char(char *str, long *idx, unsigned int uch)
+void u_set_char(char *str, size_t *idx, CodePoint uch)
 {
-    long i = *idx;
+    size_t i = *idx;
 
     if (uch < 0x80) {
         if (likely(!u_is_ctrl(uch))) {
@@ -239,10 +239,10 @@ void u_set_char(char *str, long *idx, unsigned int uch)
     }
 }
 
-void u_set_hex(char *str, long *idx, unsigned int uch)
+void u_set_hex(char *str, size_t *idx, CodePoint uch)
 {
     static const char hex_tab[16] = "0123456789abcdef";
-    long i = *idx;
+    size_t i = *idx;
 
     str[i++] = '<';
     if (!u_is_unicode(uch)) {
@@ -258,10 +258,10 @@ void u_set_hex(char *str, long *idx, unsigned int uch)
     *idx = i;
 }
 
-unsigned int u_skip_chars(const char *str, int *width)
+size_t u_skip_chars(const char *str, int *width)
 {
     int w = *width;
-    long idx = 0;
+    size_t idx = 0;
 
     while (str[idx] && w > 0) {
         w -= u_char_width(u_str_get_char(str, &idx));
@@ -275,8 +275,8 @@ unsigned int u_skip_chars(const char *str, int *width)
 
 static bool has_prefix(const char *str, const char *prefix_lcase)
 {
-    long ni = 0;
-    long hi = 0;
+    size_t ni = 0;
+    size_t hi = 0;
     unsigned int pc, sc;
 
     while ((pc = u_str_get_char(prefix_lcase, &ni))) {
@@ -290,8 +290,8 @@ static bool has_prefix(const char *str, const char *prefix_lcase)
 
 int u_str_index(const char *haystack, const char *needle_lcase)
 {
-    long hi = 0;
-    long ni = 0;
+    size_t hi = 0;
+    size_t ni = 0;
     unsigned int nc = u_str_get_char(needle_lcase, &ni);
 
     if (!nc) {
@@ -299,7 +299,7 @@ int u_str_index(const char *haystack, const char *needle_lcase)
     }
 
     while (haystack[hi]) {
-        long prev = hi;
+        size_t prev = hi;
         unsigned int hc = u_str_get_char(haystack, &hi);
         if (
             (hc == nc || u_to_lower(hc) == nc)

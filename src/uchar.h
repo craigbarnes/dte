@@ -1,44 +1,47 @@
 #ifndef UCHAR_H
 #define UCHAR_H
 
+#include <stddef.h>
 #include "unicode.h"
 
-static inline CONST_FN unsigned int u_char_size(unsigned int uch)
+static inline CONST_FN unsigned int u_char_size(CodePoint uch)
 {
-    if (uch <= 0x7fU)
+    if (uch <= 0x7fU) {
         return 1;
-    if (uch <= 0x7ffU)
+    } else if (uch <= 0x7ffU) {
         return 2;
-    if (uch <= 0xffffU)
+    } else if (uch <= 0xffffU) {
         return 3;
-    if (uch <= 0x10ffffU)
+    } else if (uch <= 0x10ffffU) {
         return 4;
+    }
 
     // Invalid byte in UTF-8 byte sequence.
     return 1;
 }
 
-static inline void u_set_ctrl(char *buf, long *idx, unsigned int u)
+static inline void u_set_ctrl(char *buf, size_t *idx, CodePoint u)
 {
-    long i = *idx;
+    size_t i = *idx;
     buf[i++] = '^';
-    if (u == 0x7f)
+    if (u == 0x7f) {
         buf[i++] = '?';
-    else
+    } else {
         buf[i++] = u | 0x40;
+    }
     *idx = i;
 }
 
 unsigned int u_str_width(const unsigned char *str);
 
-unsigned int u_prev_char(const unsigned char *buf, long *idx);
-unsigned int u_str_get_char(const unsigned char *str, long *idx);
-unsigned int u_get_char(const unsigned char *buf, long size, long *idx);
-unsigned int u_get_nonascii(const unsigned char *buf, long size, long *idx);
+unsigned int u_prev_char(const unsigned char *buf, size_t *idx);
+unsigned int u_str_get_char(const unsigned char *str, size_t *idx);
+unsigned int u_get_char(const unsigned char *buf, size_t size, size_t *idx);
+unsigned int u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx);
 
-void u_set_char_raw(char *str, long *idx, unsigned int uch);
-void u_set_char(char *str, long *idx, unsigned int uch);
-void u_set_hex(char *str, long *idx, unsigned int uch);
+void u_set_char_raw(char *str, size_t *idx, CodePoint uch);
+void u_set_char(char *str, size_t *idx, CodePoint uch);
+void u_set_hex(char *str, size_t *idx, CodePoint uch);
 
 /*
  * Total width of skipped characters is stored back to @width.
@@ -49,7 +52,7 @@ void u_set_hex(char *str, long *idx, unsigned int uch);
  *
  * Returns number of bytes skipped.
  */
-unsigned int u_skip_chars(const char *str, int *width);
+size_t u_skip_chars(const char *str, int *width);
 
 int u_str_index(const char *haystack, const char *needle_lcase);
 
