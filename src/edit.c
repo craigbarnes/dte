@@ -694,10 +694,10 @@ void new_line(void)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
-static void add_word(ParagraphFormatter *pf, const char *word, int len)
+static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
 {
-    long i = 0;
-    int word_width = 0;
+    size_t i = 0;
+    unsigned int word_width = 0;
 
     while (i < len) {
         word_width += u_char_width(u_get_char(word, len, &i));

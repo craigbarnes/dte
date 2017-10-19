@@ -2,24 +2,27 @@
 #define UNICODE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "macros.h"
 
-static inline CONST_FN bool u_is_unicode(unsigned int uch)
+typedef uint_fast32_t CodePoint;
+
+static inline CONST_FN bool u_is_unicode(CodePoint uch)
 {
     return uch <= 0x10ffffU;
 }
 
-static inline CONST_FN bool u_is_ctrl(unsigned int u)
+static inline CONST_FN bool u_is_ctrl(CodePoint u)
 {
     return u < 0x20 || u == 0x7f;
 }
 
-bool u_is_upper(unsigned int u) CONST_FN;
-bool u_is_space(unsigned int u) PURE;
-bool u_is_word_char(unsigned int u) CONST_FN;
-bool u_is_unprintable(unsigned int u) PURE;
-bool u_is_special_whitespace(unsigned int u) PURE;
-int u_char_width(unsigned int uch) PURE;
-unsigned int u_to_lower(unsigned int u) CONST_FN;
+bool u_is_upper(CodePoint u) CONST_FN;
+bool u_is_space(CodePoint u) PURE;
+bool u_is_word_char(CodePoint u) CONST_FN;
+bool u_is_unprintable(CodePoint u) PURE;
+bool u_is_special_whitespace(CodePoint u) PURE;
+unsigned int u_char_width(CodePoint uch) PURE;
+CodePoint u_to_lower(CodePoint u) CONST_FN;
 
 #endif

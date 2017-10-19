@@ -2,7 +2,7 @@
 #include "common.h"
 
 typedef struct {
-    unsigned int first, last;
+    CodePoint first, last;
 } CodepointRange;
 
 // All these are indistinguishable from ASCII space on terminal.
@@ -189,11 +189,11 @@ static const CodepointRange east_asian_wide[] = {
 };
 
 static inline PURE bool in_range (
-    unsigned int u,
-    const CodepointRange *range,
-    int count
+    CodePoint u,
+    const CodepointRange *const range,
+    size_t count
 ) {
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (u < range[i].first) {
             return false;
         }
@@ -205,12 +205,12 @@ static inline PURE bool in_range (
 }
 
 static inline PURE bool bisearch (
-    unsigned int u,
-    const CodepointRange *range,
-    int max
+    CodePoint u,
+    const CodepointRange *const range,
+    size_t max
 ) {
-    int min = 0;
-    int mid;
+    size_t min = 0;
+    size_t mid;
 
     if (u < range[0].first || u > range[max].last) {
         return false;
@@ -230,12 +230,12 @@ static inline PURE bool bisearch (
     return false;
 }
 
-bool u_is_upper(unsigned int u)
+bool u_is_upper(CodePoint u)
 {
     return u >= 'A' && u <= 'Z';
 }
 
-bool u_is_space(unsigned int u)
+bool u_is_space(CodePoint u)
 {
     switch (u) {
     case '\t':
@@ -249,7 +249,7 @@ bool u_is_space(unsigned int u)
     return u_is_special_whitespace(u);
 }
 
-bool u_is_word_char(unsigned int u)
+bool u_is_word_char(CodePoint u)
 {
     if (u >= 'a' && u <= 'z') {
         return true;
@@ -261,7 +261,7 @@ bool u_is_word_char(unsigned int u)
     return u == '_' || u > 0x7f;
 }
 
-bool u_is_unprintable(unsigned int u)
+bool u_is_unprintable(CodePoint u)
 {
     // Unprintable garbage inherited from latin1
     if (u >= 0x80 && u <= 0x9f) {
@@ -272,22 +272,22 @@ bool u_is_unprintable(unsigned int u)
     return !u_is_unicode(u);
 }
 
-bool u_is_special_whitespace(unsigned int u)
+bool u_is_special_whitespace(CodePoint u)
 {
     return in_range(u, evil_space, ARRAY_COUNT(evil_space));
 }
 
-static bool u_is_combining(unsigned int u)
+static bool u_is_combining(CodePoint u)
 {
     return bisearch(u, combining, ARRAY_COUNT(combining) - 1);
 }
 
-static bool u_is_east_asian_wide(unsigned int u)
+static bool u_is_east_asian_wide(CodePoint u)
 {
     return bisearch(u, east_asian_wide, ARRAY_COUNT(east_asian_wide) - 1);
 }
 
-int u_char_width(unsigned int u)
+unsigned int u_char_width(CodePoint u)
 {
     // C0/C1 control characters and DELETE are rendered by the editor in
     // caret notation (e.g. ^@), so have a width of 2 in this context.
@@ -323,7 +323,7 @@ int u_char_width(unsigned int u)
     return 1;
 }
 
-unsigned int u_to_lower(unsigned int u)
+CodePoint u_to_lower(CodePoint u)
 {
     if (u < 'A') {
         return u;
