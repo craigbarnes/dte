@@ -10,13 +10,12 @@ build:alpine:
         - make install
         - dte -V
         - strip dte && du -h dte
-        - size dte
         - ldd dte
-        - make clean
+        - make clean && make uninstall
         - make vars check TERMINFO_DISABLE=1
-        - ./dte -V
+        - make install
+        - dte -V
         - strip dte && du -h dte
-        - size dte
         - ldd dte
 
 build:debian:
