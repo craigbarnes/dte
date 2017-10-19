@@ -83,7 +83,7 @@ static void add_replacement(struct cconv *c)
 
 static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
 {
-    d_print("%d %zd\n", c->char_size, count);
+    d_print("%d %zu\n", c->char_size, count);
     add_replacement(c);
     if (c->char_size == 0) {
         // Converting from UTF-8
@@ -159,7 +159,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
             skip = handle_invalid(c, c->tbuf, c->tcount);
             c->tcount -= skip;
             if (c->tcount > 0) {
-                d_print("tcount=%zd, skip=%zd\n", c->tcount, skip);
+                d_print("tcount=%zu, skip=%zu\n", c->tcount, skip);
                 memmove(c->tbuf, c->tbuf + skip, c->tcount);
                 continue;
             }

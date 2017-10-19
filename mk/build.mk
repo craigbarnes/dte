@@ -25,6 +25,7 @@ cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 WARNINGS = \
     -Wall -Wextra -Wformat-security -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
+    -Wformat=2 -Wformat-signedness -Wframe-larger-than=32768 \
     -Wno-sign-compare -Wno-pointer-sign
 
 ifdef WERROR

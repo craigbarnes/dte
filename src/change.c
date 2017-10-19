@@ -254,7 +254,7 @@ bool redo(unsigned int change_id)
     if (change_id) {
         if (--change_id >= change->nr_prev) {
             error_msg (
-                "There are only %d possible changes to redo.",
+                "There are only %u possible changes to redo.",
                 change->nr_prev
             );
             return false;
@@ -264,8 +264,8 @@ bool redo(unsigned int change_id)
         change_id = change->nr_prev - 1;
         if (change->nr_prev > 1) {
             info_msg (
-                "Redoing newest (%d) of %d possible changes.",
-                change_id + 1,
+                "Redoing newest (%u) of %u possible changes.",
+                change_id + 1u,
                 change->nr_prev
             );
         }
