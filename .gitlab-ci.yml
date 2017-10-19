@@ -5,21 +5,19 @@ build:alpine:
     image: alpine:3.6
     script: &SCRIPT
         - mk/install-deps.sh
-        - make vars
-        - make -j`mk/nproc.sh` check V=1
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
+        - make vars check
         - make install
         - dte -V
-        - strip dte && ls -lh dte
+        - strip dte && du -h dte
         - size dte
         - ldd dte
-        - readelf -h dte
         - make clean
-        - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+        - make vars check TERMINFO_DISABLE=1
         - ./dte -V
-        - strip dte && ls -lh dte
+        - strip dte && du -h dte
         - size dte
         - ldd dte
-        - readelf -h dte
 
 build:debian:
     stage: build
@@ -28,7 +26,7 @@ build:debian:
     script:
         - mk/install-deps.sh
         - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" CFLAGS='-O2 -g -pipe -Werror' V=1
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check
         - export TERMINFO_DISABLE=1
         - make clean && make vars dte CC=gcc

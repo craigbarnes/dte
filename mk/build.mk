@@ -23,9 +23,13 @@ try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
 
 WARNINGS = \
-    -Wall -Wno-pointer-sign -Wformat-security -Wmissing-prototypes \
+    -Wall -Wextra -Wformat-security -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
-    -Wextra -Wno-unused-parameter -Wno-sign-compare
+    -Wno-unused-parameter -Wno-sign-compare -Wno-pointer-sign
+
+ifdef WERROR
+  WARNINGS += -Werror
+endif
 
 CWARNS = $(call cc-option,$(WARNINGS))
 CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
@@ -114,9 +118,9 @@ endif
 
 # If "make install" with no other named targets
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
- OPTCHECK = :
+  OPTCHECK = :
 else
- OPTCHECK = mk/optcheck.sh '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+  OPTCHECK = mk/optcheck.sh '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
 endif
 
 ifndef NO_DEPS
