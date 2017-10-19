@@ -29,7 +29,7 @@ static void cmdline_backspace(CommandLine *c)
 
 static void cmdline_erase_word(CommandLine *c)
 {
-    int i = c->pos;
+    size_t i = c->pos;
 
     if (!c->pos) {
         return;

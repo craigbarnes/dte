@@ -5,14 +5,14 @@
 
 typedef struct {
     char *buf;
-    long size;
-    long pos;
+    size_t size;
+    size_t pos;
     bool separator;
     Window *win;
     const char *misc_status;
 } Formatter;
 
 void sf_init(Formatter *f, Window *win);
-void sf_format(Formatter *f, char *buf, long size, const char *format);
+void sf_format(Formatter *f, char *buf, size_t size, const char *format);
 
 #endif

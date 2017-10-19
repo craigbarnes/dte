@@ -75,7 +75,7 @@ static void keypress(Key key, char *buf, int *count)
                     buf[0] = byte;
                     *count = 1;
                 } else if (u_is_unicode(key)) {
-                    long idx = 0;
+                    size_t idx = 0;
                     u_set_char_raw(buf, &idx, key);
                     *count = idx;
                 }

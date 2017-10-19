@@ -31,7 +31,7 @@ typedef struct {
 
 typedef struct {
     const unsigned char *line;
-    long size;
+    size_t size;
 } LineRef;
 
 #define BLOCK_ITER_INIT(head_) { \

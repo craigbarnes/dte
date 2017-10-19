@@ -338,8 +338,8 @@ static void insert_nl(void)
 
 void insert_ch(unsigned int ch)
 {
-    long del_count = 0;
-    long ins_count = 0;
+    size_t del_count = 0;
+    size_t ins_count = 0;
     char *ins;
 
     if (ch == '\n') {
@@ -853,7 +853,7 @@ void change_case(int mode)
 {
     bool was_selecting = false;
     bool move = true;
-    long text_len, i;
+    size_t text_len, i;
     char *src;
     StringBuffer dst = STRBUF_INIT;
 
@@ -905,7 +905,7 @@ void change_case(int mode)
     if (move && dst.len > 0) {
         if (was_selecting) {
             // Move cursor back to where it was
-            long idx = dst.len;
+            size_t idx = dst.len;
             u_prev_char(dst.buffer, &idx);
             block_iter_skip_bytes(&view->cursor, idx);
         } else {

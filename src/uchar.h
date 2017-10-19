@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include "unicode.h"
 
-static inline CONST_FN unsigned int u_char_size(CodePoint uch)
+static inline CONST_FN size_t u_char_size(CodePoint uch)
 {
     if (uch <= 0x7fU) {
         return 1;

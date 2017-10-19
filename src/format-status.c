@@ -70,7 +70,7 @@ void sf_init(Formatter *f, Window *win)
     f->win = win;
 }
 
-void sf_format(Formatter *f, char *buf, long size, const char *format)
+void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     View *v = f->win->view;
     bool got_char;

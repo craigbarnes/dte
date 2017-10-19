@@ -2,9 +2,9 @@
 #include "common.h"
 #include "uchar.h"
 
-void strbuf_grow(StringBuffer *buf, long more)
+void strbuf_grow(StringBuffer *buf, size_t more)
 {
-    long alloc = ROUND_UP(buf->len + more, 16);
+    size_t alloc = ROUND_UP(buf->len + more, 16);
 
     if (alloc > buf->alloc) {
         buf->alloc = alloc;
@@ -24,18 +24,18 @@ void strbuf_add_byte(StringBuffer *buf, unsigned char byte)
     buf->buffer[buf->len++] = byte;
 }
 
-long strbuf_add_ch(StringBuffer *buf, unsigned int u)
+size_t strbuf_add_ch(StringBuffer *buf, CodePoint u)
 {
-    unsigned int len = u_char_size(u);
+    size_t len = u_char_size(u);
 
     strbuf_grow(buf, len);
     u_set_char_raw(buf->buffer, &buf->len, u);
     return len;
 }
 
-long strbuf_insert_ch(StringBuffer *buf, long pos, unsigned int u)
+size_t strbuf_insert_ch(StringBuffer *buf, size_t pos, CodePoint u)
 {
-    unsigned int len = u_char_size(u);
+    size_t len = u_char_size(u);
 
     strbuf_make_space(buf, pos, len);
     u_set_char_raw(buf->buffer, &pos, u);
@@ -47,7 +47,7 @@ void strbuf_add_str(StringBuffer *buf, const char *str)
     strbuf_add_buf(buf, str, strlen(str));
 }
 
-void strbuf_add_buf(StringBuffer *buf, const char *ptr, long len)
+void strbuf_add_buf(StringBuffer *buf, const char *ptr, size_t len)
 {
     if (!len) {
         return;
@@ -57,7 +57,7 @@ void strbuf_add_buf(StringBuffer *buf, const char *ptr, long len)
     buf->len += len;
 }
 
-char *strbuf_steal(StringBuffer *buf, long *len)
+char *strbuf_steal(StringBuffer *buf, size_t *len)
 {
     char *b = buf->buffer;
     *len = buf->len;
@@ -85,7 +85,7 @@ char *strbuf_cstring(StringBuffer *buf)
     return b;
 }
 
-void strbuf_make_space(StringBuffer *buf, long pos, long len)
+void strbuf_make_space(StringBuffer *buf, size_t pos, size_t len)
 {
     BUG_ON(pos > buf->len);
     strbuf_grow(buf, len);
@@ -93,7 +93,7 @@ void strbuf_make_space(StringBuffer *buf, long pos, long len)
     buf->len += len;
 }
 
-void strbuf_remove(StringBuffer *buf, long pos, long len)
+void strbuf_remove(StringBuffer *buf, size_t pos, size_t len)
 {
     BUG_ON(pos + len > buf->len);
     memmove(buf->buffer + pos, buf->buffer + pos + len, buf->len - pos - len);

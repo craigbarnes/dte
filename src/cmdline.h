@@ -7,7 +7,7 @@
 
 typedef struct {
     StringBuffer buf;
-    long pos;
+    size_t pos;
     int search_pos;
     char *search_text;
 } CommandLine;
