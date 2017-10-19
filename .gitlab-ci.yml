@@ -28,7 +28,7 @@ build:debian:
     script:
         - mk/install-deps.sh
         - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" V=1
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" CFLAGS='-O2 -g -pipe -Werror' V=1
         - make vars check
         - export TERMINFO_DISABLE=1
         - make clean && make vars dte CC=gcc
