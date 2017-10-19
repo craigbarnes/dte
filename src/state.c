@@ -486,13 +486,13 @@ static const Command syntax_commands[] = {
     {NULL, NULL, 0,  0, NULL}
 };
 
-Syntax *load_syntax_file(const char *filename, bool must_exist, int *err)
+Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 {
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
     Syntax *syn;
 
-    *err = do_read_config(syntax_commands, filename, must_exist);
+    *err = do_read_config(syntax_commands, filename, flags);
     if (*err) {
         config_file = saved_config_file;
         config_line = saved_config_line;
@@ -521,14 +521,14 @@ Syntax *load_syntax_by_filetype(const char *filetype)
     char *filename = xsprintf("%s/syntax/%s", editor.user_config_dir, filetype);
     int err;
 
-    syn = load_syntax_file(filename, false, &err);
+    syn = load_syntax_file(filename, CFG_NOFLAGS, &err);
     free(filename);
     if (syn || err != ENOENT) {
         return syn;
     }
 
-    filename = xsprintf("builtin://syntax/%s", filetype);
-    syn = load_syntax_file(filename, false, &err);
+    filename = xsprintf("syntax/%s", filetype);
+    syn = load_syntax_file(filename, CFG_BUILTIN, &err);
     free(filename);
     return syn;
 }

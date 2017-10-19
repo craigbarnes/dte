@@ -35,7 +35,7 @@ END {
     print "    const char *const source;"
     print "} builtin_configs[" nfiles "] = {"
     for (i = 1; i <= nfiles; i++) {
-        print "    {\"builtin://" names[i]  "\", " idents[i] "},"
+        print "    {\"" names[i]  "\", " idents[i] "},"
     }
     print "};"
 }

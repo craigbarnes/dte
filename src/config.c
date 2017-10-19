@@ -83,9 +83,12 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
     strbuf_free(&line);
 }
 
-int do_read_config(const Command *cmds, const char *filename, bool must_exist)
+int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
 {
-    if (str_has_prefix(filename, "builtin://")) {
+    const bool must_exist = flags & CFG_MUST_EXIST;
+    const bool builtin = flags & CFG_BUILTIN;
+
+    if (builtin) {
         for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
             if (streq(filename, builtin_configs[i].name)) {
                 config_file = filename;
@@ -124,12 +127,12 @@ int do_read_config(const Command *cmds, const char *filename, bool must_exist)
     return 0;
 }
 
-int read_config(const Command *cmds, const char *filename, bool must_exist)
+int read_config(const Command *cmds, const char *filename, ConfigFlags flags)
 {
     // Recursive
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
-    int ret = do_read_config(cmds, filename, must_exist);
+    int ret = do_read_config(cmds, filename, flags);
     config_file = saved_config_file;
     config_line = saved_config_line;
     return ret;

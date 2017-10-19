@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
     free(editor_dir);
 
     exec_builtin_rc("hi\n");
-    read_config(commands, "builtin://rc", true);
+    read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 
     fill_builtin_colors();
 
@@ -106,10 +106,10 @@ int main(int argc, char *argv[])
 
     if (read_rc) {
         if (rc) {
-            read_config(commands, rc, true);
+            read_config(commands, rc, CFG_MUST_EXIST);
         } else {
             char *filename = editor_file("rc");
-            read_config(commands, filename, false);
+            read_config(commands, filename, CFG_NOFLAGS);
             free(filename);
         }
     }

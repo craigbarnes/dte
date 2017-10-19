@@ -1,9 +1,9 @@
-include builtin://binding/default
-include builtin://color/light
-include builtin://compiler/gcc
-include builtin://compiler/go
-include builtin://filetype
-include builtin://option
+include -b binding/default
+include -b color/light
+include -b compiler/gcc
+include -b compiler/go
+include -b filetype
+include -b option
 
 alias help "run man dte"
 alias man "run man"

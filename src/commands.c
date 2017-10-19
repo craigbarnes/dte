@@ -450,7 +450,11 @@ static void cmd_bolsf(const char *pf, char **args)
 
 static void cmd_include(const char *pf, char **args)
 {
-    read_config(commands, args[0], true);
+    ConfigFlags flags = CFG_MUST_EXIST;
+    if (*pf == 'b') {
+        flags |= CFG_BUILTIN;
+    }
+    read_config(commands, args[0], flags);
 }
 
 static void cmd_insert(const char *pf, char **args)
@@ -1636,7 +1640,7 @@ const Command commands[] = {
     {"ft", "-cfi", 2, -1, cmd_ft},
     {"git-open", "", 0, 0, cmd_git_open},
     {"hi", "-", 0, -1, cmd_hi},
-    {"include", "", 1, 1, cmd_include},
+    {"include", "b", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
     {"insert-special", "", 0, 0, cmd_insert_special},
     {"join", "", 0, 0, cmd_join},
