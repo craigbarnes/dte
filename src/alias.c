@@ -15,7 +15,7 @@ static PointerArray aliases = PTR_ARRAY_INIT;
 
 static int validate_alias_name(const char *name)
 {
-    for (unsigned int i = 0; name[i]; i++) {
+    for (size_t i = 0; name[i]; i++) {
         char ch = name[i];
         if (!ascii_isalnum(ch) && ch != '-' && ch != '_') {
             return 0;
@@ -38,7 +38,7 @@ void add_alias(const char *name, const char *value)
     }
 
     // Replace existing alias
-    for (unsigned int i = 0; i < aliases.count; i++) {
+    for (size_t i = 0; i < aliases.count; i++) {
         alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {
             free(alias->value);
@@ -74,7 +74,7 @@ void sort_aliases(void)
 
 const char *find_alias(const char *name)
 {
-    for (unsigned int i = 0; i < aliases.count; i++) {
+    for (size_t i = 0; i < aliases.count; i++) {
         const CommandAlias *alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {
             return alias->value;
@@ -85,7 +85,7 @@ const char *find_alias(const char *name)
 
 void collect_aliases(const char *prefix)
 {
-    for (unsigned int i = 0; i < aliases.count; i++) {
+    for (size_t i = 0; i < aliases.count; i++) {
         CommandAlias *alias = aliases.ptrs[i];
         if (str_has_prefix(alias->name, prefix)) {
             add_completion(xstrdup(alias->name));

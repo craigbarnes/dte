@@ -134,7 +134,7 @@ View *window_get_view(Window *w, Buffer *b)
 View *window_find_view(Window *w, Buffer *b)
 {
     View *v;
-    for (int i = 0; i < b->views.count; i++) {
+    for (size_t i = 0; i < b->views.count; i++) {
         v = b->views.ptrs[i];
         if (v->window == w) {
             return v;
@@ -289,7 +289,7 @@ void set_view(View *v)
     }
 
     // Save cursor states of views sharing same buffer
-    for (int i = 0; i < v->buffer->views.count; i++) {
+    for (size_t i = 0; i < v->buffer->views.count; i++) {
         View *other = v->buffer->views.ptrs[i];
         if (other != v) {
             other->saved_cursor_offset = block_iter_get_offset(&other->cursor);
@@ -358,7 +358,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
     View *empty = w->view;
     bool useless = is_useless_empty_view(empty);
     bool first = true;
-    for (int i = 0; filenames[i]; i++) {
+    for (size_t i = 0; filenames[i]; i++) {
         View *v = window_open_buffer(w, filenames[i], false, encoding);
         if (v && first) {
             // FIXME: should not call set_view()
@@ -507,7 +507,7 @@ static void frame_for_each_window (
         func(f->window, data);
         return;
     }
-    for (int i = 0; i < f->frames.count; i++) {
+    for (size_t i = 0; i < f->frames.count; i++) {
         frame_for_each_window(f->frames.ptrs[i], func, data);
     }
 }

@@ -18,7 +18,7 @@ unsigned long buf_hash(const char *str, size_t size)
 
 StringList *find_string_list(const Syntax *syn, const char *name)
 {
-    for (int i = 0; i < syn->string_lists.count; i++) {
+    for (size_t i = 0; i < syn->string_lists.count; i++) {
         StringList *list = syn->string_lists.ptrs[i];
         if (streq(list->name, name)) {
             return list;
@@ -29,7 +29,7 @@ StringList *find_string_list(const Syntax *syn, const char *name)
 
 State *find_state(const Syntax *syn, const char *name)
 {
-    for (int i = 0; i < syn->states.count; i++) {
+    for (size_t i = 0; i < syn->states.count; i++) {
         State *s = syn->states.ptrs[i];
         if (streq(s->name, name)) {
             return s;
@@ -51,7 +51,7 @@ static bool has_destination(ConditionType type)
 
 Syntax *find_any_syntax(const char *name)
 {
-    for (int i = 0; i < syntaxes.count; i++) {
+    for (size_t i = 0; i < syntaxes.count; i++) {
         Syntax *syn = syntaxes.ptrs[i];
         if (streq(syn->name, name)) {
             return syn;
@@ -84,7 +84,7 @@ static void fix_conditions (
     SyntaxMerge *m,
     const char *prefix
 ) {
-    for (int i = 0; i < s->conds.count; i++) {
+    for (size_t i = 0; i < s->conds.count; i++) {
         Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix);
         if (c->a.destination == NULL && has_destination(c->type)) {
@@ -174,7 +174,7 @@ static void visit(State *s)
         return;
     }
     s->visited = true;
-    for (int i = 0; i < s->conds.count; i++) {
+    for (size_t i = 0; i < s->conds.count; i++) {
         Condition *cond = s->conds.ptrs[i];
         if (cond->a.destination) {
             visit(cond->a.destination);
@@ -202,7 +202,7 @@ static void free_state(State *s)
 
 static void free_string_list(StringList *list)
 {
-    for (int i = 0; i < ARRAY_COUNT(list->hash); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(list->hash); i++) {
         HashStr *h = list->hash[i];
         while (h) {
             HashStr *next = h->next;
@@ -230,14 +230,14 @@ void finalize_syntax(Syntax *syn, int saved_nr_errors)
         error_msg("Empty syntax");
     }
 
-    for (int i = 0; i < syn->states.count; i++) {
+    for (size_t i = 0; i < syn->states.count; i++) {
         State *s = syn->states.ptrs[i];
         if (!s->defined) {
             // This state has been referenced but not defined
             error_msg("No such state %s", s->name);
         }
     }
-    for (int i = 0; i < syn->string_lists.count; i++) {
+    for (size_t i = 0; i < syn->string_lists.count; i++) {
         StringList *list = syn->string_lists.ptrs[i];
         if (!list->defined) {
             error_msg("No such list %s", list->name);
@@ -259,13 +259,13 @@ void finalize_syntax(Syntax *syn, int saved_nr_errors)
 
     // Unused states and lists cause warning only
     visit(syn->states.ptrs[0]);
-    for (int i = 0; i < syn->states.count; i++) {
+    for (size_t i = 0; i < syn->states.count; i++) {
         State *s = syn->states.ptrs[i];
         if (!s->visited && !s->copied) {
             error_msg("State %s is unreachable", s->name);
         }
     }
-    for (int i = 0; i < syn->string_lists.count; i++) {
+    for (size_t i = 0; i < syn->string_lists.count; i++) {
         StringList *list = syn->string_lists.ptrs[i];
         if (!list->used) {
             error_msg("List %s never used", list->name);
@@ -286,7 +286,7 @@ Syntax *find_syntax(const char *name)
 
 static const char *find_default_color(Syntax *syn, const char *name)
 {
-    for (int i = 0; i < syn->default_colors.count; i++) {
+    for (size_t i = 0; i < syn->default_colors.count; i++) {
         char **strs = syn->default_colors.ptrs[i];
         for (int j = 1; strs[j]; j++) {
             if (streq(strs[j], name)) {
@@ -324,7 +324,7 @@ static void update_action_color(Syntax *syn, Action *a)
 
 static void update_state_colors(Syntax *syn, State *s)
 {
-    for (int i = 0; i < s->conds.count; i++) {
+    for (size_t i = 0; i < s->conds.count; i++) {
         Condition *c = s->conds.ptrs[i];
         update_action_color(syn, &c->a);
     }
@@ -337,14 +337,14 @@ void update_syntax_colors(Syntax *syn)
         // No point to update colors of a sub-syntax
         return;
     }
-    for (int i = 0; i < syn->states.count; i++) {
+    for (size_t i = 0; i < syn->states.count; i++) {
         update_state_colors(syn, syn->states.ptrs[i]);
     }
 }
 
 void update_all_syntax_colors(void)
 {
-    for (int i = 0; i < syntaxes.count; i++) {
+    for (size_t i = 0; i < syntaxes.count; i++) {
         update_syntax_colors(syntaxes.ptrs[i]);
     }
 }
@@ -352,7 +352,7 @@ void update_all_syntax_colors(void)
 void find_unused_subsyntaxes(void)
 {
     // Don't complain multiple times about same unused subsyntaxes
-    static int i;
+    static size_t i;
 
     for (; i < syntaxes.count; i++) {
         Syntax *s = syntaxes.ptrs[i];

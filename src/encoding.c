@@ -35,11 +35,11 @@ char *normalize_encoding(const char *encoding)
     char *e = xstrdup(encoding);
     iconv_t cd;
 
-    for (int i = 0; e[i]; i++) {
+    for (size_t i = 0; e[i]; i++) {
         e[i] = ascii_toupper(e[i]);
     }
 
-    for (int i = 0; i < ARRAY_COUNT(aliases); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(aliases); i++) {
         if (streq(e, aliases[i].alias)) {
             free(e);
             e = xstrdup(aliases[i].encoding);
@@ -62,7 +62,7 @@ char *normalize_encoding(const char *encoding)
 
 static const ByteOrderMark *get_bom(const unsigned char *buf, size_t size)
 {
-    for (int i = 0; i < ARRAY_COUNT(boms); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(boms); i++) {
         const ByteOrderMark *bom = &boms[i];
         if (size >= bom->len && !memcmp(buf, bom->bytes, bom->len)) {
             return bom;
@@ -73,7 +73,7 @@ static const ByteOrderMark *get_bom(const unsigned char *buf, size_t size)
 
 const ByteOrderMark *get_bom_for_encoding(const char *encoding)
 {
-    for (int i = 0; i < ARRAY_COUNT(boms); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(boms); i++) {
         const ByteOrderMark *bom = &boms[i];
         if (streq(bom->encoding, encoding)) {
             return bom;

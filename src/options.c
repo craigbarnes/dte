@@ -135,7 +135,7 @@ static void syntax_changed(void)
 static bool validate_statusline_format(const char *value)
 {
     static const char chars[] = "fmryYxXpEMnstu%";
-    int i = 0;
+    size_t i = 0;
 
     while (value[i]) {
         char ch = value[i++];
@@ -298,7 +298,7 @@ static bool flag_parse (
     while (*ptr) {
         const char *end = strchr(ptr, ',');
         char *buf;
-        int i, len;
+        size_t len;
 
         if (end) {
             len = end - ptr;
@@ -311,6 +311,7 @@ static bool flag_parse (
         buf[len] = 0;
         ptr = end;
 
+        size_t i;
         for (i = 0; values[i]; i++) {
             if (streq(buf, values[i])) {
                 flags |= 1 << i;
@@ -339,9 +340,9 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
         return xstrdup("0");
     }
 
-    for (int i = 0; values[i]; i++) {
+    for (size_t i = 0; values[i]; i++) {
         if (flags & (1 << i)) {
-            int len = strlen(values[i]);
+            size_t len = strlen(values[i]);
             memcpy(ptr, values[i], len);
             ptr += len;
             *ptr++ = ',';
@@ -454,7 +455,7 @@ static void free_value(const OptionDesc *desc, OptionValue value)
 
 static const OptionDesc *find_option(const char *name)
 {
-    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (streq(name, desc->name)) {
             return desc;
@@ -619,7 +620,7 @@ void toggle_option_values (
         ptr = local_ptr(desc, &buffer->options);
     }
     parsed_values = xnew(OptionValue, count);
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (desc->ops->parse(desc, values[i], &parsed_values[i])) {
             if (desc->ops->equals(desc, ptr, parsed_values[i])) {
                 current = i;
@@ -637,7 +638,7 @@ void toggle_option_values (
             free(str);
         }
     }
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         free_value(desc, parsed_values[i]);
     }
     free(parsed_values);
@@ -647,7 +648,7 @@ bool validate_local_options(char **strs)
 {
     bool valid = true;
 
-    for (int i = 0; strs[i]; i += 2) {
+    for (size_t i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
         const OptionDesc *desc = must_find_option(name);
@@ -672,7 +673,7 @@ bool validate_local_options(char **strs)
 
 void collect_options(const char *prefix)
 {
-    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
@@ -682,7 +683,7 @@ void collect_options(const char *prefix)
 
 void collect_toggleable_options(const char *prefix)
 {
-    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (desc_is(desc, OPT_ENUM) && str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
@@ -713,7 +714,7 @@ void collect_option_values(const char *name, const char *prefix)
         free_value(desc, value);
     } else if (desc_is(desc, OPT_ENUM)) {
         // Complete possible values
-        for (int i = 0; desc->u.enum_opt.values[i]; i++) {
+        for (size_t i = 0; desc->u.enum_opt.values[i]; i++) {
             if (str_has_prefix(desc->u.enum_opt.values[i], prefix)) {
                 add_completion(xstrdup(desc->u.enum_opt.values[i]));
             }
@@ -742,7 +743,7 @@ void collect_option_values(const char *name, const char *prefix)
 
 void free_local_options(LocalOptions *opt)
 {
-    for (int i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (desc->local && desc_is(desc, OPT_STR)) {
             char **local = (char **)local_ptr(desc, opt);

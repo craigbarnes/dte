@@ -112,7 +112,7 @@ static void cmd_cd(const char *pf, char **args)
         cwdp = cwd;
     }
 
-    for (int i = 0; i < buffers.count; i++) {
+    for (size_t i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         update_short_filename_cwd(b, cwdp);
     }
@@ -348,7 +348,7 @@ static void cmd_ft(const char *pf, char **args)
         }
         pf++;
     }
-    for (int i = 1; args[i]; i++) {
+    for (size_t i = 1; args[i]; i++) {
         add_filetype(args[0], args[i], dt);
     }
 }
@@ -462,7 +462,7 @@ static void cmd_insert(const char *pf, char **args)
     const char *str = args[0];
 
     if (strchr(pf, 'k')) {
-        for (int i = 0; str[i]; i++) {
+        for (size_t i = 0; str[i]; i++) {
             insert_ch(str[i]);
         }
     } else {
@@ -759,7 +759,7 @@ static void cmd_quit(const char *pf, char **args)
         editor.status = EDITOR_EXITING;
         return;
     }
-    for (int i = 0; i < buffers.count; i++) {
+    for (size_t i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
@@ -824,7 +824,7 @@ static void cmd_replace(const char *pf, char **args)
 {
     unsigned int flags = 0;
 
-    for (int i = 0; pf[i]; i++) {
+    for (size_t i = 0; pf[i]; i++) {
         switch (pf[i]) {
         case 'b':
             flags |= REPLACE_BASIC;
@@ -1247,7 +1247,7 @@ static void cmd_set(const char *pf, char **args)
 {
     bool global = false;
     bool local = false;
-    int i, count = count_strings(args);
+    int count = count_strings(args);
 
     while (*pf) {
         switch (*pf) {
@@ -1278,7 +1278,7 @@ static void cmd_set(const char *pf, char **args)
         error_msg("One or even number of arguments expected.");
         return;
     }
-    for (i = 0; args[i]; i += 2) {
+    for (size_t i = 0; args[i]; i += 2) {
         set_option(args[i], args[i + 1], local, global);
     }
 }
@@ -1354,7 +1354,7 @@ static void cmd_tag(const char *pf, char **args)
     if (tags.count == 0) {
         error_msg("Tag %s not found.", name);
     } else {
-        for (int i = 0; i < tags.count; i++) {
+        for (size_t i = 0; i < tags.count; i++) {
             Tag *t = tags.ptrs[i];
             Message *m;
             char buf[512];
@@ -1591,7 +1591,7 @@ static void cmd_wsplit(const char *pf, char **args)
 static void cmd_wswap(const char *pf, char **args)
 {
     Frame *tmp, *parent = window->frame->parent;
-    int i, j;
+    size_t i, j;
 
     if (parent == NULL) {
         return;

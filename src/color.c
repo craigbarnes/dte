@@ -39,7 +39,7 @@ static PointerArray hl_colors = PTR_ARRAY_INIT;
 
 void fill_builtin_colors(void)
 {
-    for (int i = 0; i < NR_BC; i++) {
+    for (size_t i = 0; i < NR_BC; i++) {
         builtin_colors[i] = &find_color(builtin_color_names[i])->color;
     }
 }
@@ -48,7 +48,7 @@ HlColor *set_highlight_color(const char *name, const struct term_color *color)
 {
     HlColor *c;
 
-    for (int i = 0; i < hl_colors.count; i++) {
+    for (size_t i = 0; i < hl_colors.count; i++) {
         c = hl_colors.ptrs[i];
         if (streq(name, c->name)) {
             c->color = *color;
@@ -65,7 +65,7 @@ HlColor *set_highlight_color(const char *name, const struct term_color *color)
 
 static HlColor *find_real_color(const char *name)
 {
-    for (int i = 0; i < hl_colors.count; i++) {
+    for (size_t i = 0; i < hl_colors.count; i++) {
         HlColor *c = hl_colors.ptrs[i];
         if (streq(c->name, name)) {
             return c;
@@ -93,7 +93,7 @@ HlColor *find_color(const char *name)
 void remove_extra_colors(void)
 {
     BUG_ON(hl_colors.count < NR_BC);
-    for (int i = NR_BC; i < hl_colors.count; i++) {
+    for (size_t i = NR_BC; i < hl_colors.count; i++) {
         HlColor *c = hl_colors.ptrs[i];
 
         // Make possible use after free error easy to see
@@ -135,7 +135,7 @@ static bool parse_color(const char *str, int *val)
         *val = 16 + r * 36 + g * 6 + b;
         return true;
     }
-    for (int i = 0; i < ARRAY_COUNT(color_names); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(color_names); i++) {
         if (streq(str, color_names[i])) {
             *val = i - 2;
             return true;
@@ -146,7 +146,7 @@ static bool parse_color(const char *str, int *val)
 
 static bool parse_attr(const char *str, unsigned short *attr)
 {
-    for (int i = 0; i < ARRAY_COUNT(attr_names); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
         if (streq(str, attr_names[i])) {
             *attr |= 1 << i;
             return true;
@@ -160,7 +160,7 @@ bool parse_term_color(struct term_color *color, char **strs)
     color->fg = -1;
     color->bg = -1;
     color->attr = 0;
-    for (int i = 0, count = 0; strs[i]; i++) {
+    for (size_t i = 0, count = 0; strs[i]; i++) {
         const char *str = strs[i];
         int val;
 
@@ -191,7 +191,7 @@ bool parse_term_color(struct term_color *color, char **strs)
 
 void collect_hl_colors(const char *prefix)
 {
-    for (int i = 0; i < hl_colors.count; i++) {
+    for (size_t i = 0; i < hl_colors.count; i++) {
         HlColor *c = hl_colors.ptrs[i];
         if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
@@ -202,12 +202,12 @@ void collect_hl_colors(const char *prefix)
 void collect_colors_and_attributes(const char *prefix)
 {
     // Skip first (keep) because it is in attr_names too
-    for (int i = 1; i < ARRAY_COUNT(color_names); i++) {
+    for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {
         if (str_has_prefix(color_names[i], prefix)) {
             add_completion(xstrdup(color_names[i]));
         }
     }
-    for (int i = 0; i < ARRAY_COUNT(attr_names); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
         if (str_has_prefix(attr_names[i], prefix)) {
             add_completion(xstrdup(attr_names[i]));
         }
