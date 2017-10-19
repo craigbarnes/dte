@@ -7,7 +7,7 @@ void select_block(void);
 void unselect(void);
 void cut(long len, bool is_lines);
 void copy(long len, bool is_lines);
-void insert_text(const char *text, long size);
+void insert_text(const char *text, size_t size);
 void paste(bool at_cursor);
 void delete_ch(void);
 void erase(void);

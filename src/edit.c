@@ -146,7 +146,7 @@ void copy(long len, bool is_lines)
     }
 }
 
-void insert_text(const char *text, long size)
+void insert_text(const char *text, size_t size)
 {
     long del_count = 0;
 

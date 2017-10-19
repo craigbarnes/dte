@@ -484,7 +484,7 @@ bool term_read_key(Key *key)
     return ok;
 }
 
-char *term_read_paste(long *size)
+char *term_read_paste(size_t *size)
 {
     size_t alloc = ROUND_UP(input_buf_fill + 1, 1024);
     size_t count = 0;
@@ -536,7 +536,7 @@ char *term_read_paste(long *size)
 
 void term_discard_paste(void)
 {
-    long size;
+    size_t size;
     free(term_read_paste(&size));
 }
 
