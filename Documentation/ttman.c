@@ -70,7 +70,7 @@ static const struct {
     CONST_STR("title")
 };
 #define NR_TOKEN_NAMES (sizeof(token_names) / sizeof(token_names[0]))
-#define BUG() die("BUG in %s\n", __FUNCTION__)
+#define BUG() die("BUG in %s\n", __func__)
 
 #ifdef __GNUC__
 #define NORETURN __attribute__((__noreturn__))
