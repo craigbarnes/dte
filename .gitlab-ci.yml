@@ -20,11 +20,9 @@ build:alpine:
 
 build:debian:
     stage: build
-    image: debian:stretch
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     variables: {DEBIAN_FRONTEND: noninteractive}
     script:
-        - mk/install-deps.sh
-        - apt-get -qy install gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu
         - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check
         - export TERMINFO_DISABLE=1
