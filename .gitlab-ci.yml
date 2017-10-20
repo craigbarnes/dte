@@ -57,6 +57,7 @@ pages:
         - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
         - tar -czf "public/$TARNAME.tar.gz" dte dte.1 dte-syntax.5
         - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
+        - tree public/
 
 # Same as "pages" but without public artifacts (for testing non-master branches)
 pages:non-master:
