@@ -3,9 +3,9 @@
 
 #include "iter.h"
 
-Block *block_new(long size);
-void do_insert(const char *buf, long len);
-char *do_delete(long len);
-char *do_replace(long del, const char *buf, long ins);
+Block *block_new(size_t size);
+void do_insert(const char *buf, size_t len);
+char *do_delete(size_t len);
+char *do_replace(size_t del, const char *buf, size_t ins);
 
 #endif

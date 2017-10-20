@@ -36,7 +36,7 @@ static inline size_t ALLOC_ROUND(size_t size)
     return ROUND_UP(size, 64);
 }
 
-Block *block_new(long alloc)
+Block *block_new(size_t alloc)
 {
     Block *blk = xnew0(Block, 1);
 
@@ -65,12 +65,12 @@ static size_t copy_count_nl(char *dst, const char *const src, size_t len)
     return nl;
 }
 
-static long insert_to_current(const char *buf, long len)
+static size_t insert_to_current(const char *buf, size_t len)
 {
     Block *blk = view->cursor.blk;
-    long offset = view->cursor.offset;
-    long size = blk->size + len;
-    long nl;
+    size_t offset = view->cursor.offset;
+    size_t size = blk->size + len;
+    size_t nl;
 
     if (size > blk->alloc) {
         blk->alloc = ALLOC_ROUND(size);
@@ -91,26 +91,26 @@ static long insert_to_current(const char *buf, long len)
  *   - Size of any block can be larger than BLOCK_EDIT_SIZE
  *     only if there's a very long line
  */
-static long split_and_insert(const char *buf, long len)
+static size_t split_and_insert(const char *buf, size_t len)
 {
     Block *blk = view->cursor.blk;
     ListHead *prev_node = blk->node.prev;
     const char *buf1 = blk->data;
     const char *buf2 = buf;
     const char *buf3 = blk->data + view->cursor.offset;
-    long size1 = view->cursor.offset;
-    long size2 = len;
-    long size3 = blk->size - size1;
-    long total = size1 + size2 + size3;
-    long start = 0; // Beginning of new block
-    long size = 0; // Size of new block
-    long pos = 0; // Current position
-    long nl_added = 0;
+    size_t size1 = view->cursor.offset;
+    size_t size2 = len;
+    size_t size3 = blk->size - size1;
+    size_t total = size1 + size2 + size3;
+    size_t start = 0; // Beginning of new block
+    size_t size = 0; // Size of new block
+    size_t pos = 0; // Current position
+    size_t nl_added = 0;
 
     while (start < total) {
         // Size of new block if next line would be added
-        long new_size = 0;
-        long copied = 0;
+        size_t new_size = 0;
+        size_t copied = 0;
         Block *new;
 
         if (pos < size1) {
@@ -121,7 +121,7 @@ static long split_and_insert(const char *buf, long len)
         }
 
         if (!new_size && pos < size1 + size2) {
-            long offset = 0;
+            size_t offset = 0;
             const char *nl;
 
             if (pos > size1) {
@@ -135,7 +135,7 @@ static long split_and_insert(const char *buf, long len)
         }
 
         if (!new_size && pos < total) {
-            long offset = 0;
+            size_t offset = 0;
             const char *nl;
 
             if (pos > size1 + size2) {
@@ -169,8 +169,8 @@ static long split_and_insert(const char *buf, long len)
         BUG_ON(!size);
         new = block_new(size);
         if (start < size1) {
-            long avail = size1 - start;
-            long count = size;
+            size_t avail = size1 - start;
+            size_t count = size;
 
             if (count > avail) {
                 count = avail;
@@ -180,9 +180,9 @@ static long split_and_insert(const char *buf, long len)
             start += count;
         }
         if (start >= size1 && start < size1 + size2) {
-            long offset = start - size1;
-            long avail = size2 - offset;
-            long count = size - copied;
+            size_t offset = start - size1;
+            size_t avail = size2 - offset;
+            size_t count = size - copied;
 
             if (count > avail) {
                 count = avail;
@@ -192,9 +192,9 @@ static long split_and_insert(const char *buf, long len)
             start += count;
         }
         if (start >= size1 + size2) {
-            long offset = start - size1 - size2;
-            long avail = size3 - offset;
-            long count = size - copied;
+            size_t offset = start - size1 - size2;
+            size_t avail = size3 - offset;
+            size_t count = size - copied;
 
             BUG_ON(count > avail);
             new->nl += copy_count_nl(new->data + copied, buf3 + offset, count);
@@ -221,10 +221,10 @@ static long split_and_insert(const char *buf, long len)
     return nl_added;
 }
 
-static long insert_bytes(const char *buf, long len)
+static size_t insert_bytes(const char *buf, size_t len)
 {
     Block *blk;
-    long new_size;
+    size_t new_size;
 
     // Blocks must contain whole lines.
     // Last char of buf might not be newline.
@@ -244,9 +244,9 @@ static long insert_bytes(const char *buf, long len)
     return split_and_insert(buf, len);
 }
 
-void do_insert(const char *buf, long len)
+void do_insert(const char *buf, size_t len)
 {
-    long nl = insert_bytes(buf, len);
+    size_t nl = insert_bytes(buf, len);
 
     buffer->nl += nl;
     sanity_check();
@@ -265,13 +265,13 @@ static bool only_block(const Block *blk)
         && blk->node.next == &buffer->blocks;
 }
 
-char *do_delete(long len)
+char *do_delete(size_t len)
 {
     ListHead *saved_prev_node = NULL;
     Block *blk = view->cursor.blk;
-    long offset = view->cursor.offset;
-    long pos = 0;
-    long deleted_nl = 0;
+    size_t offset = view->cursor.offset;
+    size_t pos = 0;
+    size_t deleted_nl = 0;
     char *buf;
 
     if (!len) {
@@ -286,9 +286,9 @@ char *do_delete(long len)
     buf = xnew(char, len);
     while (pos < len) {
         ListHead *next = blk->node.next;
-        long avail = blk->size - offset;
-        long count = len - pos;
-        long nl;
+        size_t avail = blk->size - offset;
+        size_t count = len - pos;
+        size_t nl;
 
         if (count > avail) {
             count = avail;
@@ -334,7 +334,7 @@ char *do_delete(long len)
         && blk->node.next != &buffer->blocks
     ) {
         Block *next = BLOCK(blk->node.next);
-        long size = blk->size + next->size;
+        size_t size = blk->size + next->size;
 
         if (size > blk->alloc) {
             blk->alloc = ALLOC_ROUND(size);
@@ -360,12 +360,12 @@ char *do_delete(long len)
     return buf;
 }
 
-char *do_replace(long del, const char *buf, long ins)
+char *do_replace(size_t del, const char *buf, size_t ins)
 {
     Block *blk;
-    long offset, avail, new_size;
+    size_t offset, avail, new_size;
     char *ptr, *deleted;
-    long del_nl, ins_nl;
+    size_t del_nl, ins_nl;
 
     block_iter_normalize(&view->cursor);
     blk = view->cursor.blk;

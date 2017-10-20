@@ -134,7 +134,7 @@ const char *find_ft (
 
 bool is_ft(const char *name)
 {
-    for (int i = 0; i < filetypes.count; i++) {
+    for (size_t i = 0; i < filetypes.count; i++) {
         const FileType *ft = filetypes.ptrs[i];
         if (streq(ft->name, name)) {
             return true;

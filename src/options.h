@@ -56,7 +56,7 @@ enum tab_bar {
     int syntax; \
     int tab_width; \
     int text_width; \
-    int ws_error;
+    int ws_error
 
 typedef struct {
     COMMON_OPTIONS;

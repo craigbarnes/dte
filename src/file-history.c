@@ -17,7 +17,7 @@ static PointerArray history = PTR_ARRAY_INIT;
 void add_file_history(int row, int col, const char *filename)
 {
     HistoryEntry *e;
-    for (int i = 0; i < history.count; i++) {
+    for (size_t i = 0; i < history.count; i++) {
         e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             e->row = row;

@@ -13,14 +13,14 @@ static PointerArray file_options = PTR_ARRAY_INIT;
 
 static void set_options(char **args)
 {
-    for (int i = 0; args[i]; i += 2) {
+    for (size_t i = 0; args[i]; i += 2) {
         set_option(args[i], args[i + 1], true, false);
     }
 }
 
 void set_file_options(Buffer *b)
 {
-    for (int i = 0; i < file_options.count; i++) {
+    for (size_t i = 0; i < file_options.count; i++) {
         const FileOption *opt = file_options.ptrs[i];
 
         if (opt->type == FILE_OPTIONS_FILETYPE) {

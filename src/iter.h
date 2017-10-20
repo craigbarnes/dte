@@ -15,7 +15,7 @@ typedef struct block {
     unsigned char *data;
     size_t size;
     size_t alloc;
-    long nl;
+    size_t nl;
 } Block;
 
 static inline Block *BLOCK(const ListHead *const item)
@@ -53,18 +53,18 @@ static inline void block_iter_eof(BlockIter *bi)
 }
 
 void block_iter_normalize(BlockIter *bi);
-long block_iter_eat_line(BlockIter *bi);
-long block_iter_next_line(BlockIter *bi);
-long block_iter_prev_line(BlockIter *bi);
-long block_iter_bol(BlockIter *bi);
-long block_iter_eol(BlockIter *bi);
-void block_iter_back_bytes(BlockIter *bi, long count);
-void block_iter_skip_bytes(BlockIter *bi, long count);
-void block_iter_goto_offset(BlockIter *bi, long offset);
-void block_iter_goto_line(BlockIter *bi, long line);
-long block_iter_get_offset(const BlockIter *bi);
+size_t block_iter_eat_line(BlockIter *bi);
+size_t block_iter_next_line(BlockIter *bi);
+size_t block_iter_prev_line(BlockIter *bi);
+size_t block_iter_bol(BlockIter *bi);
+size_t block_iter_eol(BlockIter *bi);
+void block_iter_back_bytes(BlockIter *bi, size_t count);
+void block_iter_skip_bytes(BlockIter *bi, size_t count);
+void block_iter_goto_offset(BlockIter *bi, size_t offset);
+void block_iter_goto_line(BlockIter *bi, size_t line);
+size_t block_iter_get_offset(const BlockIter *bi);
 bool block_iter_is_bol(const BlockIter *bi);
-char *block_iter_get_bytes(const BlockIter *bi, long len);
+char *block_iter_get_bytes(const BlockIter *bi, size_t len);
 
 static inline bool block_iter_is_eof(const BlockIter *bi)
 {
@@ -73,6 +73,6 @@ static inline bool block_iter_is_eof(const BlockIter *bi)
 
 void fill_line_ref(BlockIter *bi, LineRef *lr);
 void fill_line_nl_ref(BlockIter *bi, LineRef *lr);
-long fetch_this_line(const BlockIter *bi, LineRef *lr);
+size_t fetch_this_line(const BlockIter *bi, LineRef *lr);
 
 #endif

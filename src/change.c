@@ -54,12 +54,12 @@ static Change *new_change(void)
     return change;
 }
 
-static long buffer_offset(void)
+static size_t buffer_offset(void)
 {
     return block_iter_get_offset(&view->cursor);
 }
 
-static void record_insert(long len)
+static void record_insert(size_t len)
 {
     Change *change = buffer->cur_change;
 
@@ -78,7 +78,7 @@ static void record_insert(long len)
     change->ins_count = len;
 }
 
-static void record_delete(char *buf, long len, bool move_after)
+static void record_delete(char *buf, size_t len, bool move_after)
 {
     Change *change = buffer->cur_change;
 
@@ -110,7 +110,7 @@ static void record_delete(char *buf, long len, bool move_after)
     change->buf = buf;
 }
 
-static void record_replace(char *deleted, long del_count, long ins_count)
+static void record_replace(char *deleted, size_t del_count, size_t ins_count)
 {
     Change *change;
 
@@ -157,7 +157,7 @@ void end_change_chain(void)
     }
 }
 
-static void fix_cursors(long offset, long del, long ins)
+static void fix_cursors(size_t offset, size_t del, size_t ins)
 {
     for (int i = 0; i < buffer->views.count; i++) {
         View *v = buffer->views.ptrs[i];
@@ -192,8 +192,8 @@ static void reverse_change(Change *change)
         change->buf = NULL;
     } else if (change->del_count) {
         // Reverse replace
-        long del_count = change->ins_count;
-        long ins_count = change->del_count;
+        size_t del_count = change->ins_count;
+        size_t ins_count = change->del_count;
         char *buf = do_replace(del_count, change->buf, ins_count);
 
         free(change->buf);
@@ -317,9 +317,9 @@ top:
     }
 }
 
-void buffer_insert_bytes(const char *buf, const long len)
+void buffer_insert_bytes(const char *buf, const size_t len)
 {
-    long rec_len = len;
+    size_t rec_len = len;
 
     view_reset_preferred_x(view);
     if (len == 0) {
@@ -340,13 +340,13 @@ void buffer_insert_bytes(const char *buf, const long len)
     }
 }
 
-static bool would_delete_last_bytes(long count)
+static bool would_delete_last_bytes(size_t count)
 {
     Block *blk = view->cursor.blk;
-    long offset = view->cursor.offset;
+    size_t offset = view->cursor.offset;
 
     while (1) {
-        long avail = blk->size - offset;
+        size_t avail = blk->size - offset;
 
         if (avail > count) {
             return false;
@@ -362,7 +362,7 @@ static bool would_delete_last_bytes(long count)
     }
 }
 
-static void buffer_delete_bytes_internal(long len, bool move_after)
+static void buffer_delete_bytes_internal(size_t len, bool move_after)
 {
     view_reset_preferred_x(view);
     if (len == 0) {
@@ -389,17 +389,17 @@ static void buffer_delete_bytes_internal(long len, bool move_after)
     }
 }
 
-void buffer_delete_bytes(long len)
+void buffer_delete_bytes(size_t len)
 {
     buffer_delete_bytes_internal(len, false);
 }
 
-void buffer_erase_bytes(long len)
+void buffer_erase_bytes(size_t len)
 {
     buffer_delete_bytes_internal(len, true);
 }
 
-void buffer_replace_bytes(long del_count, const char *inserted, long ins_count)
+void buffer_replace_bytes(size_t del_count, const char *inserted, size_t ins_count)
 {
     view_reset_preferred_x(view);
     if (del_count == 0) {

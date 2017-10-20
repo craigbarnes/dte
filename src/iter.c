@@ -15,9 +15,9 @@ void block_iter_normalize(BlockIter *bi)
  * Move after next newline (beginning of next line or end of file).
  * Returns number of bytes iterator advanced.
  */
-long block_iter_eat_line(BlockIter *bi)
+size_t block_iter_eat_line(BlockIter *bi)
 {
-    long offset;
+    size_t offset;
 
     block_iter_normalize(bi);
 
@@ -42,10 +42,10 @@ long block_iter_eat_line(BlockIter *bi)
  * If there is no next line iterator is not advanced.
  * Returns number of bytes iterator advanced.
  */
-long block_iter_next_line(BlockIter *bi)
+size_t block_iter_next_line(BlockIter *bi)
 {
-    long offset;
-    long new_offset;
+    size_t offset;
+    size_t new_offset;
 
     block_iter_normalize(bi);
 
@@ -74,11 +74,11 @@ long block_iter_next_line(BlockIter *bi)
  * Move to beginning of previous line.
  * Returns number of bytes moved which is zero if there's no previous line.
  */
-long block_iter_prev_line(BlockIter *bi)
+size_t block_iter_prev_line(BlockIter *bi)
 {
     Block *blk = bi->blk;
-    long offset = bi->offset;
-    long start = offset;
+    size_t offset = bi->offset;
+    size_t start = offset;
 
     while (offset && blk->data[offset - 1] != '\n') {
         offset--;
@@ -101,9 +101,9 @@ long block_iter_prev_line(BlockIter *bi)
     return start - offset;
 }
 
-long block_iter_bol(BlockIter *bi)
+size_t block_iter_bol(BlockIter *bi)
 {
-    long offset, ret;
+    size_t offset, ret;
 
     block_iter_normalize(bi);
 
@@ -125,10 +125,10 @@ long block_iter_bol(BlockIter *bi)
     return ret;
 }
 
-long block_iter_eol(BlockIter *bi)
+size_t block_iter_eol(BlockIter *bi)
 {
     Block *blk;
-    long offset;
+    size_t offset;
     const unsigned char *end;
 
     block_iter_normalize(bi);
@@ -148,7 +148,7 @@ long block_iter_eol(BlockIter *bi)
     return bi->offset - offset;
 }
 
-void block_iter_back_bytes(BlockIter *bi, long count)
+void block_iter_back_bytes(BlockIter *bi, size_t count)
 {
     while (count > bi->offset) {
         count -= bi->offset;
@@ -158,9 +158,9 @@ void block_iter_back_bytes(BlockIter *bi, long count)
     bi->offset -= count;
 }
 
-void block_iter_skip_bytes(BlockIter *bi, long count)
+void block_iter_skip_bytes(BlockIter *bi, size_t count)
 {
-    long avail = bi->blk->size - bi->offset;
+    size_t avail = bi->blk->size - bi->offset;
 
     while (count > avail) {
         count -= avail;
@@ -171,7 +171,7 @@ void block_iter_skip_bytes(BlockIter *bi, long count)
     bi->offset += count;
 }
 
-void block_iter_goto_offset(BlockIter *bi, long offset)
+void block_iter_goto_offset(BlockIter *bi, size_t offset)
 {
     Block *blk;
 
@@ -185,10 +185,10 @@ void block_iter_goto_offset(BlockIter *bi, long offset)
     }
 }
 
-void block_iter_goto_line(BlockIter *bi, long line)
+void block_iter_goto_line(BlockIter *bi, size_t line)
 {
     Block *blk = BLOCK(bi->head->next);
-    long nl = 0;
+    size_t nl = 0;
 
     while (blk->node.next != bi->head && nl + blk->nl < line) {
         nl += blk->nl;
@@ -205,10 +205,10 @@ void block_iter_goto_line(BlockIter *bi, long line)
     }
 }
 
-long block_iter_get_offset(const BlockIter *bi)
+size_t block_iter_get_offset(const BlockIter *bi)
 {
     Block *blk;
-    long offset = 0;
+    size_t offset = 0;
 
     list_for_each_entry(blk, bi->head, node) {
         if (blk == bi->blk) {
@@ -221,7 +221,7 @@ long block_iter_get_offset(const BlockIter *bi)
 
 bool block_iter_is_bol(const BlockIter *bi)
 {
-    long offset = bi->offset;
+    size_t offset = bi->offset;
 
     if (!offset) {
         return true;
@@ -229,11 +229,11 @@ bool block_iter_is_bol(const BlockIter *bi)
     return bi->blk->data[offset - 1] == '\n';
 }
 
-char *block_iter_get_bytes(const BlockIter *bi, long len)
+char *block_iter_get_bytes(const BlockIter *bi, size_t len)
 {
     Block *blk = bi->blk;
-    long offset = bi->offset;
-    long pos = 0;
+    size_t offset = bi->offset;
+    size_t pos = 0;
     char *buf;
 
     if (!len) {
@@ -242,8 +242,8 @@ char *block_iter_get_bytes(const BlockIter *bi, long len)
 
     buf = xnew(char, len);
     while (pos < len) {
-        long avail = blk->size - offset;
-        long count = len - pos;
+        size_t avail = blk->size - offset;
+        size_t count = len - pos;
 
         if (count > avail) {
             count = avail;
@@ -261,7 +261,7 @@ char *block_iter_get_bytes(const BlockIter *bi, long len)
 // bi should be at bol
 void fill_line_ref(BlockIter *bi, LineRef *lr)
 {
-    long max;
+    size_t max;
     const unsigned char *nl;
 
     block_iter_normalize(bi);
@@ -283,7 +283,7 @@ void fill_line_ref(BlockIter *bi, LineRef *lr)
 
 void fill_line_nl_ref(BlockIter *bi, LineRef *lr)
 {
-    long max;
+    size_t max;
     const unsigned char *nl;
 
     block_iter_normalize(bi);
@@ -303,10 +303,10 @@ void fill_line_nl_ref(BlockIter *bi, LineRef *lr)
     lr->size = nl - lr->line + 1;
 }
 
-long fetch_this_line(const BlockIter *bi, LineRef *lr)
+size_t fetch_this_line(const BlockIter *bi, LineRef *lr)
 {
     BlockIter tmp = *bi;
-    long count = block_iter_bol(&tmp);
+    size_t count = block_iter_bol(&tmp);
 
     fill_line_ref(&tmp, lr);
     return count;
