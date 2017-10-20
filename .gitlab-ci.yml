@@ -2,7 +2,7 @@ stages: [build, dist]
 
 build:alpine:
     stage: build
-    image: alpine:3.6
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     script: &SCRIPT
         - mk/install-deps.sh
         - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
@@ -43,24 +43,22 @@ build:ubuntu:
 
 pages:
     stage: dist
-    image: alpine:3.6
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     artifacts: {paths: [public]}
     only: [master]
     script: &PAGES_SCRIPT
-        - apk --update add git make gcc binutils libc-dev groff gzip
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - git fetch --tags
-        - make -j`mk/nproc.sh` docs V=1
-        - make -j`mk/nproc.sh` vars check TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static' V=1
+        - make docs
+        - make vars check TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static'
         - strip dte
-        - ls -lh dte
-        - size dte
+        - du -h dte
         - ldd dte || true
-        - readelf -h dte
         - cp dte public/dte-linux-$(uname -m)
 
 # Same as "pages" but without public artifacts (for testing non-master branches)
 pages:non-master:
     stage: build
-    image: alpine:3.6
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     except: [master]
     script: *PAGES_SCRIPT
