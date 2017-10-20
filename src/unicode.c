@@ -16,10 +16,13 @@ static const CodepointRange evil_space[] = {
     {0x2800, 0x2800}, // Braille Pattern Blank
 };
 
-static const CodepointRange zero_width[] = {
+// TODO: format [Cf] amd unassigned ranges
+static const CodepointRange unprintable[] = {
+    {0x0080, 0x009f}, // C1 control characters
     {0x200b, 0x200f},
     {0x202a, 0x202e},
     {0x2060, 0x2063},
+    {0xd800, 0xdfff}, // Surrogates
     {0xfeff, 0xfeff}, // Byte order mark (BOM)
 };
 
@@ -188,22 +191,6 @@ static const CodepointRange east_asian_wide[] = {
     {0x30000, 0x3fffd}
 };
 
-static inline PURE bool in_range (
-    CodePoint u,
-    const CodepointRange *const range,
-    size_t count
-) {
-    for (size_t i = 0; i < count; i++) {
-        if (u < range[i].first) {
-            return false;
-        }
-        if (u <= range[i].last) {
-            return true;
-        }
-    }
-    return false;
-}
-
 static inline PURE bool bisearch (
     CodePoint u,
     const CodepointRange *const range,
@@ -263,10 +250,7 @@ bool u_is_word_char(CodePoint u)
 
 bool u_is_unprintable(CodePoint u)
 {
-    // Unprintable garbage inherited from latin1
-    if (u >= 0x80 && u <= 0x9f) {
-        return true;
-    } else if (in_range(u, zero_width, ARRAY_COUNT(zero_width))) {
+    if (bisearch(u, unprintable, ARRAY_COUNT(unprintable) - 1)) {
         return true;
     }
     return !u_is_unicode(u);
@@ -274,7 +258,7 @@ bool u_is_unprintable(CodePoint u)
 
 bool u_is_special_whitespace(CodePoint u)
 {
-    return in_range(u, evil_space, ARRAY_COUNT(evil_space));
+    return bisearch(u, evil_space, ARRAY_COUNT(evil_space) - 1);
 }
 
 static bool u_is_combining(CodePoint u)
@@ -289,7 +273,7 @@ static bool u_is_east_asian_wide(CodePoint u)
 
 unsigned int u_char_width(CodePoint u)
 {
-    // C0/C1 control characters and DELETE are rendered by the editor in
+    // C0 control characters and DELETE are rendered by the editor in
     // caret notation (e.g. ^@), so have a width of 2 in this context.
     // They are usually considered "unprintable" in other contexts.
     if (unlikely(u_is_ctrl(u)))
