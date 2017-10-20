@@ -26,7 +26,6 @@ static char *cdup(void)
 {
     static const char *const cmd[] = {"git", "rev-parse", "--show-cdup", NULL};
     FilterData data;
-    long len;
 
     data.in = NULL;
     data.in_len = 0;
@@ -34,7 +33,7 @@ static char *cdup(void)
         return NULL;
     }
 
-    len = data.out_len;
+    const size_t len = data.out_len;
     if (len > 1 && data.out[len - 1] == '\n') {
         data.out[len - 1] = 0;
         return data.out;
@@ -67,7 +66,6 @@ static void git_open_load(void)
 static bool contains_upper(const char *str)
 {
     size_t i = 0;
-
     while (str[i]) {
         if (u_is_upper(u_str_get_char(str, &i))) {
             return true;
@@ -78,8 +76,7 @@ static bool contains_upper(const char *str)
 
 static void split(PointerArray *words, const char *str)
 {
-    int s, i = 0;
-
+    size_t s, i = 0;
     while (str[i]) {
         while (ascii_isspace(str[i])) {
             i++;
@@ -97,7 +94,7 @@ static void split(PointerArray *words, const char *str)
 
 static bool words_match(const char *name, PointerArray *words)
 {
-    for (int i = 0; i < words->count; i++) {
+    for (size_t i = 0; i < words->count; i++) {
         if (!strstr(name, words->ptrs[i])) {
             return false;
         }
@@ -107,7 +104,7 @@ static bool words_match(const char *name, PointerArray *words)
 
 static bool words_match_icase(const char *name, PointerArray *words)
 {
-    for (int i = 0; i < words->count; i++) {
+    for (size_t i = 0; i < words->count; i++) {
         if (u_str_index(name, words->ptrs[i]) < 0) {
             return false;
         }

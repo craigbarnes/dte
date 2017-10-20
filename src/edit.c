@@ -257,8 +257,7 @@ static long goto_beginning_of_whitespace(void)
 
 static bool ws_only(LineRef *lr)
 {
-    long i;
-    for (i = 0; i < lr->size; i++) {
+    for (size_t i = 0; i < lr->size; i++) {
         char ch = lr->line[i];
         if (ch != ' ' && ch != '\t') {
             return false;

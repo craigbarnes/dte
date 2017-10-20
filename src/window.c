@@ -150,7 +150,7 @@ View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
     if (w->view != NULL && !can_close(w->view)) {
         return w->view;
     }
-    for (long i = 0; i < w->views.count; i++) {
+    for (size_t i = 0; i < w->views.count; i++) {
         View *v = w->views.ptrs[i];
         if (!can_close(v)) {
             return v;
@@ -226,7 +226,7 @@ void window_close_current(void)
 
 void window_close_current_view(Window *w)
 {
-    long idx = ptr_array_idx(&w->views, w->view);
+    size_t idx = ptr_array_idx(&w->views, w->view);
 
     remove_view(w->view);
     if (w->prev_view != NULL) {
@@ -373,7 +373,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
 
 void mark_buffer_tabbars_changed(Buffer *b)
 {
-    for (long i = 0; i < b->views.count; i++) {
+    for (size_t i = 0; i < b->views.count; i++) {
         View *v = b->views.ptrs[i];
         v->window->update_tabbar = true;
     }

@@ -241,9 +241,7 @@ static void update_window(Window *w)
 // Update all visible views containing this buffer
 static void update_buffer_windows(const Buffer *const b)
 {
-    long i;
-
-    for (i = 0; i < b->views.count; i++) {
+    for (size_t i = 0; i < b->views.count; i++) {
         View *v = b->views.ptrs[i];
         if (v->window->view == v) {
             // Visible view
