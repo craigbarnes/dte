@@ -68,15 +68,14 @@ static void do_collect_files (
 ) {
     char path[8192];
     size_t plen = strlen(dirname);
-    size_t flen = strlen(fileprefix);
-    struct dirent *de;
-    DIR *dir;
+    const size_t flen = strlen(fileprefix);
+    BUG_ON(plen == 0U);
 
     if (plen >= sizeof(path) - 2) {
         return;
     }
 
-    dir = opendir(dirname);
+    DIR *const dir = opendir(dirname);
     if (!dir) {
         return;
     }
@@ -86,6 +85,7 @@ static void do_collect_files (
         path[plen++] = '/';
     }
 
+    const struct dirent *de;
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
         StringBuffer buf = STRBUF_INIT;
