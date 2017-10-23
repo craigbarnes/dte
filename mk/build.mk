@@ -9,7 +9,15 @@ AWK = awk
 ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
-  LDLIBS = -lcurses
+  LDLIBS = $(or \
+    $(shell pkg-config --libs tinfo 2>/dev/null), \
+    $(shell ncursesw6-config --libs 2>/dev/null), \
+    $(shell ncurses6-config --libs 2>/dev/null), \
+    $(shell ncursesw5-config --libs 2>/dev/null), \
+    $(shell ncurses5-config --libs 2>/dev/null), \
+    $(shell pkg-config --libs ncurses 2>/dev/null), \
+    -lcurses \
+  )
 endif
 
 _VERSION := 1.4
