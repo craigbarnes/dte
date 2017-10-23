@@ -20,7 +20,7 @@ BEGIN {
 
 {
     if (++LINES == 2) {
-        printf("%s: Second line should be blank; see CONTRIBUTING.md\n", FILENAME)
+        printf("%s: line #2 should be blank; see docs/CONTRIBUTING.md\n", FILENAME)
         exit 1
     }
 }

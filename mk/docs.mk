@@ -19,11 +19,11 @@ docs: man web
 man: $(man)
 web: $(web)
 
-$(man1): Documentation/dte.txt $(TTMAN)
+$(man1): docs/dte.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
-$(man5): Documentation/dte-syntax.txt $(TTMAN)
+$(man5): docs/dte-syntax.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
@@ -31,7 +31,7 @@ $(html): public/%.html: % | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Thtml $< > $@
 
-$(img): public/%.png: Documentation/%.png | public/
+$(img): public/%.png: docs/%.png | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
@@ -43,14 +43,14 @@ $(TTMAN): build/ttman.o
 	$(E) HOSTLD $@
 	$(Q) $(HOST_CC) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
 
-build/ttman.o: Documentation/ttman.c | build/
+build/ttman.o: docs/ttman.c | build/
 	$(E) HOSTCC $@
 	$(Q) $(HOST_CC) $(HOST_CFLAGS) $(BASIC_HOST_CFLAGS) -c -o $@ $<
 
 public/:
 	@mkdir -p $@
 
-check-docs: README.md CONTRIBUTING.md
+check-docs: README.md docs/CONTRIBUTING.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
