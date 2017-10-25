@@ -28,7 +28,7 @@ VERSION = $(or \
 )
 
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
-cc-option = $(call try-run, $(CC) $(1) -c -x c /dev/null -o /dev/null,$(1),$(2))
+cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
 
 WARNINGS = \
     -Wall -Wextra -Wformat=2 -Wmissing-prototypes -Wstrict-prototypes \
