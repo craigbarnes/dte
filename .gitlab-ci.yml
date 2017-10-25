@@ -25,6 +25,7 @@ build:debian:
         - make vars check
         - export TERMINFO_DISABLE=1
         - make clean && make vars dte CC=gcc
+        - make clean && make vars dte CC=clang
         - make clean && make vars dte CC=arm-linux-gnueabihf-gcc
         - make clean && make vars dte CC=aarch64-linux-gnu-gcc
 
