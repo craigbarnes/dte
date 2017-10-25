@@ -4,7 +4,6 @@ build:alpine:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     script: &SCRIPT
-        - mk/install-deps.sh
         - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check
         - make install
@@ -21,7 +20,6 @@ build:alpine:
 build:debian:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
-    variables: {DEBIAN_FRONTEND: noninteractive}
     script:
         - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check
@@ -32,13 +30,12 @@ build:debian:
 
 build:centos:
     stage: build
-    image: centos:7
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
     script: *SCRIPT
 
 build:ubuntu:
     stage: build
-    image: ubuntu:16.04
-    variables: {DEBIAN_FRONTEND: noninteractive}
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
     script: *SCRIPT
 
 pages:
