@@ -31,7 +31,8 @@ try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
 
 WARNINGS = \
-    -Wall -Wextra -Wformat=2 -Wmissing-prototypes -Wstrict-prototypes \
+    -Wall -Wextra -Wformat -Wformat-security \
+    -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Wno-sign-compare -Wno-pointer-sign
 
