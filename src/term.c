@@ -103,20 +103,7 @@ static const KeyMap builtin_keys[] = {
     {MOD_SHIFT | '\t', "\033[Z", T_ST | T_XTERM_LIKE},
 };
 
-// These basic default values are for ANSI compatible terminals.
-// They will be overwritten by term_init() in most cases.
-TerminalCapabilities term_cap = {
-    .colors = 8,
-    .strings = {
-        [TERMCAP_CLEAR_TO_EOL] = "\033[K"
-    },
-    .keymap = {
-        {KEY_LEFT, "\033[D"},
-        {KEY_RIGHT, "\033[C"},
-        {KEY_UP, "\033[A"},
-        {KEY_DOWN, "\033[B"},
-    }
-};
+TerminalCapabilities term_cap;
 
 static struct termios termios_save;
 static char buffer[64];

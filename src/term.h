@@ -84,6 +84,4 @@ const char *term_set_color(const struct term_color *color);
 // Move cursor (x and y are zero based)
 const char *term_move_cursor(int x, int y);
 
-void term_read_caps(void);
-
 #endif
