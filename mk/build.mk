@@ -172,7 +172,7 @@ build/%.cflags: FORCE | build/
 
 build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) $(BUILTIN_SYNTAX_FILES) | build/
 	$(E) GEN $@
-	$(Q) $(AWK) -f mk/syntax2c.awk $^ > $@
+	$(Q) $(AWK) -f mk/config2c.awk $^ > $@
 
 build/ build/test/:
 	@mkdir -p $@
