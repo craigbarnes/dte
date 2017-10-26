@@ -269,11 +269,11 @@ static bool input_get_byte(unsigned char *ch)
 static const KeyMap *find_key(bool *possibly_truncated)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
-        const KeyMap *entry = &builtin_keys[i];
+        const KeyMap *const entry = &builtin_keys[i];
         if ((entry->terms & term_flags) == 0) {
             continue;
         }
-        size_t len = strlen(entry->code);
+        const size_t len = strlen(entry->code);
         if (len > input_buf_fill) {
             if (!memcmp(entry->code, input_buf, input_buf_fill)) {
                 *possibly_truncated = true;
@@ -301,7 +301,7 @@ static bool read_special(Key *key)
             continue;
         }
 
-        size_t len = strlen(keycode);
+        const size_t len = strlen(keycode);
         if (len > input_buf_fill) {
             // This might be a truncated escape sequence
             if (!memcmp(keycode, input_buf, input_buf_fill)) {
@@ -390,11 +390,11 @@ static bool read_simple(Key *key)
     return true;
 }
 
-static bool is_text(const char *str, size_t len)
+static bool is_text(const char *const str, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
         // NOTE: must be unsigned!
-        unsigned char ch = str[i];
+        const unsigned char ch = str[i];
         switch (ch) {
         case '\t':
         case '\n':
@@ -450,11 +450,10 @@ static bool read_key(Key *key)
         if (input_buf_fill > 1) {
             // Unknown escape sequence or 'esc key' / 'alt-key'
             unsigned char ch;
-            bool ok;
 
             // Throw escape away
             input_get_byte(&ch);
-            ok = read_simple(key);
+            const bool ok = read_simple(key);
             if (!ok) {
                 return false;
             }
@@ -473,8 +472,8 @@ static bool read_key(Key *key)
 
 bool term_read_key(Key *key)
 {
-    bool ok = read_key(key);
-    Key k = *key;
+    const bool ok = read_key(key);
+    const Key k = *key;
     if (DEBUG > 2 && ok && k != KEY_PASTE && k > KEY_UNICODE_MAX) {
         // Modifiers and/or special key
         char *str = key_to_string(k);
@@ -543,7 +542,6 @@ void term_discard_paste(void)
 int term_get_size(int *w, int *h)
 {
     struct winsize ws;
-
     if (ioctl(0, TIOCGWINSZ, &ws) != -1) {
         *w = ws.ws_col;
         *h = ws.ws_row;
