@@ -1,12 +1,14 @@
-// Stolen from Linux 2.6.7. Some functions renamed or removed.
 #ifndef LIST_H
 #define LIST_H
 
-#include <stddef.h>
+#include <stddef.h> // offsetof
+#include <stdbool.h>
 
-typedef struct list_head {
-    struct list_head *next, *prev;
-} ListHead;
+typedef struct ListHead ListHead;
+
+struct ListHead {
+    ListHead *next, *prev;
+};
 
 static inline void list_init(ListHead *head)
 {
@@ -14,7 +16,7 @@ static inline void list_init(ListHead *head)
     head->prev = head;
 }
 
-static inline void __list_add(ListHead *new, ListHead *prev, ListHead *next) {
+static inline void list_add(ListHead *new, ListHead *prev, ListHead *next) {
     next->prev = new;
     new->next = next;
     new->prev = prev;
@@ -23,28 +25,23 @@ static inline void __list_add(ListHead *new, ListHead *prev, ListHead *next) {
 
 static inline void list_add_before(ListHead *new, ListHead *item)
 {
-    __list_add(new, item->prev, item);
+    list_add(new, item->prev, item);
 }
 
 static inline void list_add_after(ListHead *new, ListHead *item)
 {
-    __list_add(new, item, item->next);
-}
-
-static inline void __list_del(ListHead *prev, ListHead *next)
-{
-    next->prev = prev;
-    prev->next = next;
+    list_add(new, item, item->next);
 }
 
 static inline void list_del(ListHead *entry)
 {
-    __list_del(entry->prev, entry->next);
+    entry->next->prev = entry->prev;
+    entry->prev->next = entry->next;
     entry->next = (void *)0x00100100;
     entry->prev = (void *)0x00200200;
 }
 
-static inline int list_empty(const ListHead *head)
+static inline bool list_empty(const ListHead *const head)
 {
     return head->next == head;
 }
@@ -59,7 +56,8 @@ static inline int list_empty(const ListHead *head)
  */
 #define container_of(ptr, type, member) ({ \
     const __typeof__( ((type *)0)->member ) *__mptr = (ptr); \
-    (type *)( (char *)__mptr - offsetof(type,member) );})
+    (type *)( (char *)__mptr - offsetof(type,member) ); \
+})
 
 /**
  * list_for_each_entry - iterate over list of given type
@@ -68,8 +66,10 @@ static inline int list_empty(const ListHead *head)
  * @member: the name of the list_struct within the struct.
  */
 #define list_for_each_entry(pos, head, member) \
-    for (pos = container_of((head)->next, __typeof__(*pos), member); \
-         &pos->member != (head); \
-         pos = container_of(pos->member.next, __typeof__(*pos), member))
+    for ( \
+        pos = container_of((head)->next, __typeof__(*pos), member); \
+        &pos->member != (head); \
+        pos = container_of(pos->member.next, __typeof__(*pos), member) \
+    )
 
 #endif
