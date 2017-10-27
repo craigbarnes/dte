@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
     const char *command = NULL;
     char *command_history_filename;
     char *search_history_filename;
-    char *editor_dir;
     bool read_rc = true;
     int ch;
 
@@ -90,8 +89,10 @@ int main(int argc, char *argv[])
     term_init(term);
 
     // Create this early. Needed if lock-files is true.
-    editor_dir = editor_file("");
-    mkdir(editor_dir, 0755);
+    char *editor_dir = editor_file("");
+    if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
+        error_msg("Error creating %s: %s", editor_dir, strerror(errno));
+    }
     free(editor_dir);
 
     exec_builtin_rc("hi\n");
