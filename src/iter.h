@@ -4,24 +4,16 @@
 #include "libc.h"
 #include "list.h"
 
-/*
- * Block always contains whole lines.
- *
- * There's one zero-sized block when the file is empty. Otherwise
- * zero-sized blocks are forbidden.
- */
-typedef struct block {
+// Blocks always contains whole lines.
+// There's one zero-sized block when the file is empty.
+// Otherwise zero-sized blocks are forbidden.
+typedef struct {
     ListHead node;
     unsigned char *data;
     size_t size;
     size_t alloc;
     size_t nl;
 } Block;
-
-static inline Block *BLOCK(const ListHead *const item)
-{
-    return container_of(item, Block, node);
-}
 
 typedef struct {
     Block *blk;
@@ -40,6 +32,11 @@ typedef struct {
     .offset = 0 \
 }
 
+static inline Block *BLOCK(const ListHead *const item)
+{
+    return container_of(item, Block, node);
+}
+
 static inline void block_iter_bof(BlockIter *bi)
 {
     bi->blk = BLOCK(bi->head->next);
@@ -50,6 +47,11 @@ static inline void block_iter_eof(BlockIter *bi)
 {
     bi->blk = BLOCK(bi->head->prev);
     bi->offset = bi->blk->size;
+}
+
+static inline bool block_iter_is_eof(const BlockIter *const bi)
+{
+    return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
 }
 
 void block_iter_normalize(BlockIter *bi);
@@ -65,11 +67,6 @@ void block_iter_goto_line(BlockIter *bi, size_t line);
 size_t block_iter_get_offset(const BlockIter *bi);
 bool block_iter_is_bol(const BlockIter *bi);
 char *block_iter_get_bytes(const BlockIter *bi, size_t len);
-
-static inline bool block_iter_is_eof(const BlockIter *bi)
-{
-    return bi->offset == bi->blk->size && bi->blk->node.next == bi->head;
-}
 
 void fill_line_ref(BlockIter *bi, LineRef *lr);
 void fill_line_nl_ref(BlockIter *bi, LineRef *lr);
