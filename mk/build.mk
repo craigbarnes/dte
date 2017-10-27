@@ -85,7 +85,8 @@ BUILTIN_CONFIGS = \
     share/color/light256 \
     share/color/darkgray \
     share/compiler/gcc \
-    share/compiler/go
+    share/compiler/go \
+    $(BUILTIN_SYNTAX_FILES)
 
 BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
     awk c config css d diff docker dte gitcommit gitrebase go html \
@@ -170,9 +171,9 @@ $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK)
 
-build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) $(BUILTIN_SYNTAX_FILES) | build/
+build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
-	$(Q) $(AWK) -f mk/config2c.awk $^ > $@
+	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
 build/ build/test/:
 	@mkdir -p $@

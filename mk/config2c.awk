@@ -14,22 +14,23 @@ function escape_string(s) {
 
 FNR == 1 {
     if (NR != 1) {
-        print "\"\"\n"
+        print ";\n"
     }
     name = FILENAME
     gsub(/^share\//, "", name)
     ident = "builtin_config_" escape_ident(name)
-    print "#define " ident " \\"
+    print "static const char " ident "[] ="
+
     names[++nfiles] = name
     idents[nfiles] = ident
 }
 
 {
-    print "\"" escape_string($0) "\\n\" \\"
+    print "\"" escape_string($0) "\\n\""
 }
 
 END {
-    print "\"\"\n"
+    print ";\n"
     print "static const struct {"
     print "    const char *const name;"
     print "    const char *const source;"
