@@ -133,7 +133,7 @@ static int decode_and_add_blocks (
 static int read_blocks(Buffer *b, int fd)
 {
     size_t size = b->st.st_size;
-    unsigned long map_size = 64 * 1024;
+    size_t map_size = 64 * 1024;
     unsigned char *buf = NULL;
     bool mapped = false;
     ssize_t rc;
