@@ -13,22 +13,6 @@
 #include "syntax.h"
 #include "editor.h"
 
-struct change {
-    struct change *next;
-    struct change **prev;
-    unsigned int nr_prev;
-
-    // Move after inserted text when undoing delete?
-    bool move_after;
-
-    long offset;
-    long del_count;
-    long ins_count;
-
-    // Deleted bytes (inserted bytes need not to be saved)
-    char *buf;
-};
-
 typedef struct buffer {
     ListHead blocks;
     Change change_head;
