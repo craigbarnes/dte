@@ -500,11 +500,14 @@ static void normalize(void)
                 // Join with previous line
                 Token *nl = start->prev;
 
-                if (nl->type != TOK_NL)
+                if (nl->type != TOK_NL) {
                     BUG();
+                }
 
-                if ((nl->prev != &head && nl->prev->type == TOK_BR) ||
-                        tok->type == TOK_BR) {
+                if (
+                    (nl->prev != &head && nl->prev->type == TOK_BR)
+                    || tok->type == TOK_BR
+                ) {
                     // Don't convert \n after/before @br to ' '
                     free_token(nl);
                 } else {
@@ -552,11 +555,13 @@ static void normalize(void)
                         tok->text++;
                         tok->len--;
                     }
-                    if (tok->len)
+                    if (tok->len) {
                         break;
+                    }
                 }
-                if (type != TOK_INDENT)
+                if (type != TOK_INDENT) {
                     break;
+                }
 
                 // Empty TOK_TEXT or TOK_INDENT
                 next = tok->next;
@@ -794,8 +799,9 @@ static Token *dump_one(Token *tok)
     case TOK_ITALIC:
     case TOK_BOLD:
     case TOK_BR:
-        if (tok->type == TOK_TEXT && tok->len && tok->text[0] == '.')
+        if (tok->type == TOK_TEXT && tok->len && tok->text[0] == '.') {
             output("\\&");
+        }
         tok = output_para(tok);
         break;
     case TOK_H1:
