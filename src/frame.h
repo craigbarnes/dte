@@ -1,8 +1,8 @@
 #ifndef FRAME_H
 #define FRAME_H
 
+#include <stdbool.h>
 #include "ptr-array.h"
-#include "libc.h"
 
 struct frame {
     struct frame *parent;

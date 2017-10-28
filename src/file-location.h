@@ -1,7 +1,7 @@
 #ifndef FILE_LOCATION_H
 #define FILE_LOCATION_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 typedef struct {
     // Needed after buffer is closed

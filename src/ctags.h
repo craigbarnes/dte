@@ -1,7 +1,9 @@
 #ifndef CTAGS_H
 #define CTAGS_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <time.h>
 
 typedef struct {
     char *filename;

@@ -1,7 +1,8 @@
 #ifndef EDIT_H
 #define EDIT_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 void select_block(void);
 void unselect(void);

@@ -1,7 +1,7 @@
 #ifndef FILE_HISTORY_H
 #define FILE_HISTORY_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 void add_file_history(int row, int col, const char *filename);
 void load_file_history(void);

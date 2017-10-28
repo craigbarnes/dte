@@ -1,7 +1,7 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include "libc.h"
+#include <sys/types.h>
 #include "options.h"
 
 typedef struct {

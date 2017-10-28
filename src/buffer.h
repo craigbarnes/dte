@@ -1,6 +1,9 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include <sys/stat.h>
+#include <stdbool.h>
+#include <limits.h>
 #include "iter.h"
 #include "list.h"
 #include "options.h"

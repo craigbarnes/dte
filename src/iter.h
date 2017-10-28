@@ -1,7 +1,8 @@
 #ifndef ITER_H
 #define ITER_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
 #include "list.h"
 
 // Blocks always contains whole lines.

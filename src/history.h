@@ -1,8 +1,8 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
+#include <stdbool.h>
 #include "ptr-array.h"
-#include "libc.h"
 
 #define search_history_size 100
 #define command_history_size 500

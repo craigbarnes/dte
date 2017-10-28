@@ -1,7 +1,6 @@
 #ifndef MSG_H
 #define MSG_H
 
-#include "libc.h"
 #include "file-location.h"
 
 typedef struct {

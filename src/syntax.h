@@ -1,7 +1,8 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
 #include "color.h"
 #include "ptr-array.h"
 

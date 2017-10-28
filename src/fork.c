@@ -1,3 +1,8 @@
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "fork.h"
 #include "editor.h"
 

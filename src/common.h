@@ -1,15 +1,17 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <string.h>
 #include "libc.h"
 #include "ascii.h"
+#include "macros.h"
 #include "xmalloc.h"
 
-static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
-{
-    r--;
-    return (x + r) & ~r;
-}
+#define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
 #if DEBUG <= 0
   static inline void BUG(const char* UNUSED(fmt), ...) {}
@@ -29,6 +31,12 @@ static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
         if (unlikely(a)) \
             BUG("%s", STRINGIFY(a)); \
     } while (0)
+
+static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
+{
+    r--;
+    return (x + r) & ~r;
+}
 
 static inline NONNULL_ARGS bool streq(const char *a, const char *b)
 {

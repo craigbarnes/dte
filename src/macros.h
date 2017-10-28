@@ -38,5 +38,4 @@
 #define static_assert(x)
 #endif
 
-#define ARRAY_COUNT(x) ((unsigned long)sizeof(x) / sizeof(x[0]))
-#define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
+#define ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))

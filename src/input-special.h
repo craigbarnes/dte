@@ -1,8 +1,9 @@
 #ifndef INPUT_SPECIAL_H
 #define INPUT_SPECIAL_H
 
+#include <stdbool.h>
+#include <stddef.h>
 #include "term.h"
-#include "libc.h"
 
 void special_input_activate(void);
 bool special_input_keypress(Key key, char *buf, int *count);

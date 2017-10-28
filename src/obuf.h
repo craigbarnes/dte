@@ -1,8 +1,9 @@
 #ifndef OBUF_H
 #define OBUF_H
 
+#include <stdbool.h>
+#include <stddef.h>
 #include "term.h"
-#include "libc.h"
 
 typedef struct {
     char buf[8192];

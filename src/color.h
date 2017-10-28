@@ -1,8 +1,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <stdbool.h>
 #include "term.h"
-#include "libc.h"
 
 typedef struct {
     char *name;

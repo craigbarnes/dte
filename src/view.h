@@ -1,7 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "libc.h"
+#include <stdbool.h>
 #include "iter.h"
 
 enum selection {

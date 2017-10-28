@@ -1,7 +1,8 @@
 #ifndef CHANGE_H
 #define CHANGE_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 enum change_merge {
     CHANGE_MERGE_NONE,

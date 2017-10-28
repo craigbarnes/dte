@@ -1,9 +1,9 @@
 #ifndef REGEXP_H
 #define REGEXP_H
 
-#include "libc.h"
-#include "ptr-array.h"
+#include <stdbool.h>
 #include <regex.h>
+#include "ptr-array.h"
 
 bool regexp_match_nosub(const char *pattern, const char *buf, long size);
 bool regexp_match(const char *pattern, const char *buf, long size, PointerArray *m);

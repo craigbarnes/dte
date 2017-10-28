@@ -1,9 +1,9 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include <stdbool.h>
 #include "ptr-array.h"
 #include "regexp.h"
-#include "libc.h"
 
 typedef struct {
     char *file;

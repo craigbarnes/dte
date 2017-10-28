@@ -1,7 +1,8 @@
 #ifndef DECODER_H
 #define DECODER_H
 
-#include "libc.h"
+#include <sys/types.h>
+#include <stdbool.h>
 
 typedef struct file_decoder {
     char *encoding;

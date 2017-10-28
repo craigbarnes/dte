@@ -1,7 +1,7 @@
 #ifndef DETECT_H
 #define DETECT_H
 
-#include "libc.h"
+#include <stdbool.h>
 #include "buffer.h"
 
 char *detect_interpreter(Buffer *b);

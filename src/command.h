@@ -1,9 +1,9 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <stdbool.h>
 #include "ptr-array.h"
 #include "error.h"
-#include "libc.h"
 
 typedef struct {
     const char *name;

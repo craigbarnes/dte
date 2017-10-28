@@ -1,7 +1,8 @@
 #ifndef TERM_H
 #define TERM_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stddef.h>
 #include "key.h"
 
 enum {

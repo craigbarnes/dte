@@ -1,8 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stddef.h>
 #include "command.h"
-#include "libc.h"
 
 typedef enum {
     CFG_NOFLAGS = 0,

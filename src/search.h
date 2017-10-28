@@ -1,7 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 typedef enum {
     SEARCH_FWD,

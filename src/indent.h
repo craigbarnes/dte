@@ -1,7 +1,7 @@
 #ifndef INDENT_H
 #define INDENT_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 typedef struct {
     // Size in bytes

@@ -1,7 +1,7 @@
 #ifndef FILETYPE_H
 #define FILETYPE_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 enum detect_type {
     FT_EXTENSION,

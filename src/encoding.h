@@ -1,7 +1,7 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
-#include "libc.h"
+#include <stddef.h>
 
 typedef struct {
     const char *encoding;
