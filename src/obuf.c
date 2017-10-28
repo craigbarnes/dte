@@ -5,19 +5,19 @@
 
 OutputBuffer obuf;
 
-static int obuf_avail(void)
+static size_t obuf_avail(void)
 {
     return sizeof(obuf.buf) - obuf.count;
 }
 
-static void obuf_need_space(int count)
+static void obuf_need_space(size_t count)
 {
     if (obuf_avail() < count) {
         buf_flush();
     }
 }
 
-void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x)
+void buf_reset(size_t start_x, size_t width, size_t scroll_x)
 {
     obuf.x = 0;
     obuf.width = width;
@@ -28,7 +28,7 @@ void buf_reset(unsigned int start_x, unsigned int width, unsigned int scroll_x)
 }
 
 // Does not update obuf.x
-void buf_add_bytes(const char *str, int count)
+void buf_add_bytes(const char *const str, size_t count)
 {
     if (count > obuf_avail()) {
         buf_flush();
@@ -41,7 +41,7 @@ void buf_add_bytes(const char *str, int count)
     obuf.count += count;
 }
 
-void buf_set_bytes(char ch, int count)
+void buf_set_bytes(char ch, size_t count)
 {
     int skip;
 
@@ -60,7 +60,7 @@ void buf_set_bytes(char ch, int count)
 
     obuf.x += count;
     while (count) {
-        int avail, n = count;
+        size_t avail, n = count;
 
         obuf_need_space(1);
         avail = obuf_avail();
@@ -81,12 +81,12 @@ void buf_add_ch(char ch)
     obuf.buf[obuf.count++] = ch;
 }
 
-void buf_escape(const char *str)
+void buf_escape(const char *const str)
 {
     buf_add_bytes(str, strlen(str));
 }
 
-void buf_add_str(const char *str)
+void buf_add_str(const char *const str)
 {
     size_t i = 0;
     while (str[i]) {
@@ -115,7 +115,7 @@ void buf_move_cursor(int x, int y)
     buf_escape(term_move_cursor(x, y));
 }
 
-void buf_set_color(const TermColor *color)
+void buf_set_color(const TermColor *const color)
 {
     if (!memcmp(color, &obuf.color, sizeof(*color))) {
         return;
@@ -149,9 +149,9 @@ void buf_flush(void)
     }
 }
 
-static void skipped_too_much(unsigned int u)
+static void skipped_too_much(CodePoint u)
 {
-    int n = obuf.x - obuf.scroll_x;
+    size_t n = obuf.x - obuf.scroll_x;
 
     obuf_need_space(8);
     if (u == '\t' && obuf.tab != TAB_CONTROL) {
@@ -176,7 +176,7 @@ static void skipped_too_much(unsigned int u)
     }
 }
 
-static void buf_skip(unsigned int u)
+static void buf_skip(CodePoint u)
 {
     if (likely(u < 0x80)) {
         if (likely(!u_is_ctrl(u))) {
@@ -197,7 +197,7 @@ static void buf_skip(unsigned int u)
     }
 }
 
-static void print_tab(unsigned int width)
+static void print_tab(size_t width)
 {
     char ch = ' ';
 
@@ -214,10 +214,10 @@ static void print_tab(unsigned int width)
     }
 }
 
-bool buf_put_char(unsigned int u)
+bool buf_put_char(CodePoint u)
 {
-    unsigned int space = obuf.scroll_x + obuf.width - obuf.x;
-    unsigned int width;
+    size_t space = obuf.scroll_x + obuf.width - obuf.x;
+    size_t width;
 
     if (obuf.x < obuf.scroll_x) {
         // Scrolled, char (at least partially) invisible

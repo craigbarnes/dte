@@ -120,7 +120,7 @@ void any_key(void)
     }
 }
 
-static void show_message(const char *msg, bool is_error)
+static void show_message(const char *const msg, bool is_error)
 {
     buf_reset(0, editor.screen_w, 0);
     buf_move_cursor(0, editor.screen_h - 1);
@@ -289,7 +289,11 @@ void resize(void)
 
 void ui_end(void)
 {
-    TermColor color = {-1, -1, 0};
+    const TermColor color = {
+        .fg = COLOR_DEFAULT,
+        .bg = COLOR_DEFAULT,
+        .attr = 0
+    };
 
     buf_set_color(&color);
     buf_move_cursor(0, editor.screen_h - 1);
