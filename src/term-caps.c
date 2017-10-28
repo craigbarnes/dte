@@ -24,8 +24,8 @@ static char *curses_str_cap(const char *name)
 
 static void term_read_caps(void)
 {
-    term_cap.ut = tigetflag("bce"); // back_color_erase
-    term_cap.colors = tigetnum("colors"); // max_colors
+    term_cap.back_color_erase = tigetflag("bce");
+    term_cap.max_colors = tigetnum("colors");
 
     static_assert(ARRAY_COUNT(term_cap.strings) == 7);
     term_cap.strings[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
@@ -85,7 +85,7 @@ static void term_init_fallback(const char *const term)
 #else
 
 static const TerminalCapabilities ansi_caps = {
-    .colors = 8,
+    .max_colors = 8,
     .strings = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K"
     },
@@ -105,8 +105,8 @@ static void term_init_fallback(const char *const UNUSED(term))
 #endif // ifndef TERMINFO_DISABLE
 
 static const TerminalCapabilities xterm_caps = {
-    .ut = false,
-    .colors = 8,
+    .back_color_erase = false,
+    .max_colors = 8,
     .strings = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K",
         [TERMCAP_KEYPAD_OFF] = "\033[?1l\033>",
@@ -157,7 +157,7 @@ void term_init(const char *const term)
     ) {
         term_cap = xterm_caps;
         if (str_has_suffix(term, "256color")) {
-            term_cap.colors = 256;
+            term_cap.max_colors = 256;
         }
     } else {
         term_init_fallback(term);

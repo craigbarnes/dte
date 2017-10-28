@@ -558,7 +558,7 @@ const char *term_set_color(const struct term_color *color)
 
     // TERM=xterm: 8 colors
     // TERM=linux: 8 colors. colors > 7 corrupt screen
-    if (term_cap.colors < 16 && c.fg >= 8 && c.fg <= 15) {
+    if (term_cap.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
         c.attr |= ATTR_BOLD;
         c.fg &= 7;
     }

@@ -131,7 +131,7 @@ void buf_clear_eol(void)
         if (
             obuf.can_clear
             && term_cap.strings[TERMCAP_CLEAR_TO_EOL]
-            && (obuf.color.bg < 0 || term_cap.ut)
+            && (obuf.color.bg < 0 || term_cap.back_color_erase)
         ) {
             buf_escape(term_cap.strings[TERMCAP_CLEAR_TO_EOL]);
             obuf.x = obuf.scroll_x + obuf.width;
