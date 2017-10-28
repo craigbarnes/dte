@@ -274,15 +274,15 @@ static const KeyMap *find_key(bool *possibly_truncated)
 
 static bool read_special(Key *key)
 {
-    const KeyMap *entry;
     bool possibly_truncated = false;
 
     if (DEBUG > 2) {
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
+
     for (size_t i = 0; i < ARRAY_COUNT(term_cap.keymap); i++) {
-        const struct term_keymap *km = &term_cap.keymap[i];
-        const char *keycode = km->code;
+        const TermKeyMap *const km = &term_cap.keymap[i];
+        const char *const keycode = km->code;
 
         if (!keycode) {
             continue;
@@ -303,7 +303,8 @@ static bool read_special(Key *key)
         consume_input(len);
         return true;
     }
-    entry = find_key(&possibly_truncated);
+
+    const KeyMap *entry = find_key(&possibly_truncated);
     if (entry != NULL) {
         *key = entry->key;
         consume_input(strlen(entry->code));
@@ -313,6 +314,7 @@ static bool read_special(Key *key)
     if (possibly_truncated && input_can_be_truncated && fill_buffer()) {
         return read_special(key);
     }
+
     return false;
 }
 

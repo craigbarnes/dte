@@ -40,17 +40,17 @@ enum {
     ATTR_KEEP = 0x80,
 };
 
-struct term_keymap {
+typedef struct {
     Key key;
     const char *code;
-};
+} TermKeyMap;
 
 // See terminfo(5)
 typedef struct {
     bool back_color_erase; // Can clear to end of line with bg color set
     int max_colors;
     const char *strings[NR_STR_CAPS];
-    struct term_keymap keymap[NR_SPECIAL_KEYS + 4];
+    TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
 } TerminalCapabilities;
 
 struct term_color {
