@@ -88,7 +88,7 @@ char *xsprintf(const char *format, ...) FORMAT(1);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t read_file(const char *filename, char **bufp);
-long stat_read_file(const char *filename, char **bufp, struct stat *st);
+ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st);
 char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
 void term_cleanup(void);
 
