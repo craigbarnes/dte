@@ -6,7 +6,7 @@
 static char *file_locks;
 static char *file_locks_lock;
 
-static int process_exists(int pid)
+static bool process_exists(int pid)
 {
     return !kill(pid, 0);
 }

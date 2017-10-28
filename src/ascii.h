@@ -1,6 +1,7 @@
 #ifndef ASCII_H
 #define ASCII_H
 
+#include <stdbool.h>
 #include "macros.h"
 
 extern const unsigned char dte_ascii_table[256];
@@ -41,7 +42,7 @@ static inline int PURE ascii_toupper(int x)
     return x;
 }
 
-static inline int PURE is_word_byte(unsigned char byte)
+static inline bool PURE is_word_byte(unsigned char byte)
 {
     return ascii_isalnum(byte) || byte == '_' || byte > 0x7f;
 }

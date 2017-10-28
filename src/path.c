@@ -184,7 +184,7 @@ char *path_absolute(const char *filename)
     return xstrdup(buf);
 }
 
-static int path_component(const char *path, int pos)
+static bool path_component(const char *path, int pos)
 {
     return path[pos] == 0 || pos == 0 || path[pos - 1] == '/';
 }

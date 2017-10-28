@@ -869,7 +869,7 @@ static void cmd_run(const char *pf, char **args)
     spawn(args, fd, prompt);
 }
 
-static int stat_changed(const struct stat *a, const struct stat *b)
+static bool stat_changed(const struct stat *const a, const struct stat *const b)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
     return a->st_mtime != b->st_mtime ||
