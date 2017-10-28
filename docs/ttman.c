@@ -1,10 +1,9 @@
-/*
- * ttman - text to man converter
- *
- * Copyright 2006-2010 Timo Hirvonen <tihirvon@gmail.com>
- *
- * This file is licensed under the GPLv2.
- */
+// ttman - text to man converter
+// Copyright 2017 Craig Barnes
+// Copyright 2006-2010 Timo Hirvonen
+// Licensed under the GPLv2
+
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -12,52 +11,52 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
+#include "../src/macros.h"
 
-struct token {
-    struct token *next;
-    struct token *prev;
-    enum {
-        TOK_TEXT, // Max one line w/o \n
-        TOK_NL, // \n
-        TOK_ITALIC, // `
-        TOK_BOLD, // *
-        TOK_INDENT, // \t
+typedef enum {
+    TOK_TEXT, // Max one line w/o \n
+    TOK_NL, // \n
+    TOK_ITALIC, // `
+    TOK_BOLD, // *
+    TOK_INDENT, // \t
+    // Keywords (@...)
+    TOK_H1,
+    TOK_H2,
+    TOK_LI,
+    TOK_BR,
+    TOK_PRE,
+    TOK_ENDPRE, // Must be after TOK_PRE
+    TOK_RAW,
+    TOK_ENDRAW, // Must be after TOK_RAW
+    TOK_TITLE, // WRITE 2 2001-12-13 "Linux 2.0.32" "Linux Programmer's Manual"
+} TokenType;
 
-        // Keywords (@...)
-        TOK_H1,
-        TOK_H2,
-        TOK_LI,
-        TOK_BR,
-        TOK_PRE,
-        TOK_ENDPRE, // Must be after TOK_PRE
-        TOK_RAW,
-        TOK_ENDRAW, // Must be after TOK_RAW
-        TOK_TITLE, // WRITE 2 2001-12-13 "Linux 2.0.32" "Linux Programmer's Manual"
-    } type;
-    int line;
+typedef struct Token Token;
 
-    // Not NUL-terminated
-    const char *text;
-    // Length of text
-    int len;
+struct Token {
+    Token *next;
+    Token *prev;
+    TokenType type;
+    size_t line;
+    const char *text; // Not NUL-terminated
+    size_t len; // Length of text
 };
 
 static const char *program;
-static int cur_line = 1;
-static struct token head = {&head, &head, TOK_TEXT, 0, NULL, 0};
+static size_t cur_line = 1;
+static Token head = {&head, &head, TOK_TEXT, 0, NULL, 0};
 
 #define CONST_STR(str) {str, sizeof(str) - 1}
 
 static const struct {
-    const char *str;
-    int len;
+    const char *const str;
+    size_t len;
 } token_names[] = {
     CONST_STR("text"),
     CONST_STR("nl"),
     CONST_STR("italic"),
     CONST_STR("bold"),
     CONST_STR("indent"),
-
     // Keywords
     CONST_STR("h1"),
     CONST_STR("h2"),
@@ -69,19 +68,12 @@ static const struct {
     CONST_STR("endraw"),
     CONST_STR("title")
 };
-#define NR_TOKEN_NAMES (sizeof(token_names) / sizeof(token_names[0]))
+
 #define BUG() die("BUG in %s\n", __func__)
 
-#ifdef __GNUC__
-#define NORETURN __attribute__((__noreturn__))
-#else
-#define NORETURN
-#endif
-
-static NORETURN void die(const char *format, ...)
+static NORETURN FORMAT(1) void die(const char *format, ...)
 {
     va_list ap;
-
     fprintf(stderr, "%s: ", program);
     va_start(ap, format);
     vfprintf(stderr, format, ap);
@@ -89,52 +81,49 @@ static NORETURN void die(const char *format, ...)
     exit(1);
 }
 
-static NORETURN void syntax(int line, const char *format, ...)
+static NORETURN FORMAT(2) void syntax(size_t line, const char *format, ...)
 {
     va_list ap;
-
-    fprintf(stderr, "line %d: error: ", line);
+    fprintf(stderr, "line %zu: error: ", line);
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
     exit(1);
 }
 
-static inline const char *keyword_name(int type)
+static inline const char *keyword_name(TokenType type)
 {
     if (type < TOK_H1 || type > TOK_TITLE) {
-        die("BUG: no keyword name for type %d\n", type);
+        die("BUG: no keyword name for type %u\n", type);
     }
     return token_names[type].str;
 }
 
 static void oom(size_t size)
 {
-    die("OOM when allocating %ul bytes\n", size);
+    die("OOM when allocating %zu bytes\n", size);
 }
 
 static void *xmalloc(size_t size)
 {
     void *ret = malloc(size);
-
     if (!ret) {
         oom(size);
     }
     return ret;
 }
 
-static char *memdup(const char *str, int len)
+static char *memdup(const char *const str, size_t len)
 {
     char *s = xmalloc(len + 1);
     memcpy(s, str, len);
-    s[len] = 0;
+    s[len] = '\0';
     return s;
 }
 
-static struct token *new_token(int type)
+static Token *new_token(TokenType type)
 {
-    struct token *tok = xmalloc(sizeof(struct token));
-
+    Token *tok = xmalloc(sizeof(Token));
     tok->prev = NULL;
     tok->next = NULL;
     tok->type = type;
@@ -142,10 +131,10 @@ static struct token *new_token(int type)
     return tok;
 }
 
-static void free_token(struct token *tok)
+static void free_token(Token *tok)
 {
-    struct token *prev = tok->prev;
-    struct token *next = tok->next;
+    Token *prev = tok->prev;
+    Token *next = tok->next;
 
     if (tok == &head) {
         BUG();
@@ -156,7 +145,7 @@ static void free_token(struct token *tok)
     free(tok);
 }
 
-static void emit_token(struct token *tok)
+static void emit_token(Token *tok)
 {
     tok->prev = head.prev;
     tok->next = &head;
@@ -164,18 +153,17 @@ static void emit_token(struct token *tok)
     head.prev = tok;
 }
 
-static void emit(int type)
+static void emit(TokenType type)
 {
-    struct token *tok = new_token(type);
+    Token *tok = new_token(type);
     tok->len = 0;
     tok->text = NULL;
     emit_token(tok);
 }
 
-static int emit_keyword(const char *buf, int size)
+static size_t emit_keyword(const char *const buf, size_t size)
 {
-    int len;
-
+    size_t len;
     for (len = 0; len < size; len++) {
         if (!isalnum(buf[len])) {
             break;
@@ -186,7 +174,7 @@ static int emit_keyword(const char *buf, int size)
         syntax(cur_line, "keyword expected\n");
     }
 
-    for (int i = TOK_H1; i < NR_TOKEN_NAMES; i++) {
+    for (size_t i = TOK_H1; i < ARRAY_COUNT(token_names); i++) {
         if (len != token_names[i].len) {
             continue;
         }
@@ -198,33 +186,28 @@ static int emit_keyword(const char *buf, int size)
     syntax(cur_line, "invalid keyword '@%s'\n", memdup(buf, len));
 }
 
-static int emit_text(const char *buf, int size)
+static size_t emit_text(const char *const buf, size_t size)
 {
-    struct token *tok;
-    int i;
-
+    size_t i;
     for (i = 0; i < size; i++) {
-        int c = buf[i];
+        const char c = buf[i];
         if (c == '@' || c == '`' || c == '*' || c == '\n' || c == '\\' || c == '\t') {
             break;
         }
     }
-    tok = new_token(TOK_TEXT);
+    Token *tok = new_token(TOK_TEXT);
     tok->text = buf;
     tok->len = i;
     emit_token(tok);
     return i;
 }
 
-static void tokenize(const char *buf, int size)
+static void tokenize(const char *buf, size_t size)
 {
-    int pos = 0;
+    size_t pos = 0;
 
     while (pos < size) {
-        struct token *tok;
-        int ch;
-
-        ch = buf[pos++];
+        const char ch = buf[pos++];
         switch (ch) {
         case '@':
             pos += emit_keyword(buf + pos, size - pos);
@@ -242,8 +225,8 @@ static void tokenize(const char *buf, int size)
         case '\t':
             emit(TOK_INDENT);
             break;
-        case '\\':
-            tok = new_token(TOK_TEXT);
+        case '\\': {
+            Token *tok = new_token(TOK_TEXT);
             tok->text = buf + pos;
             tok->len = 1;
             if (pos == size) {
@@ -259,6 +242,7 @@ static void tokenize(const char *buf, int size)
 
             emit_token(tok);
             break;
+            }
         default:
             pos--;
             pos += emit_text(buf + pos, size - pos);
@@ -267,34 +251,34 @@ static void tokenize(const char *buf, int size)
     }
 }
 
-static int is_empty_line(const struct token *tok)
+static bool is_empty_line(const Token *tok)
 {
     while (tok != &head) {
         switch (tok->type) {
         case TOK_TEXT:
-            for (int i = 0; i < tok->len; i++) {
+            for (size_t i = 0; i < tok->len; i++) {
                 if (tok->text[i] != ' ') {
-                    return 0;
+                    return false;
                 }
             }
             break;
         case TOK_INDENT:
             break;
         case TOK_NL:
-            return 1;
+            return true;
         default:
-            return 0;
+            return false;
         }
         tok = tok->next;
     }
-    return 1;
+    return true;
 }
 
-static struct token *remove_line(struct token *tok)
+static Token *remove_line(Token *tok)
 {
     while (tok != &head) {
-        struct token *next = tok->next;
-        int type = tok->type;
+        Token *next = tok->next;
+        TokenType type = tok->type;
 
         free_token(tok);
         tok = next;
@@ -305,9 +289,9 @@ static struct token *remove_line(struct token *tok)
     return tok;
 }
 
-static struct token *skip_after(struct token *tok, int type)
+static Token *skip_after(Token *tok, TokenType type)
 {
-    struct token *save = tok;
+    const Token *const save = tok;
 
     while (tok != &head) {
         if (tok->type == type) {
@@ -325,7 +309,7 @@ static struct token *skip_after(struct token *tok, int type)
             syntax (
                 tok->line,
                 "keywords not allowed betweed @%s and @%s\n",
-                keyword_name(type-1),
+                keyword_name(type - 1),
                 keyword_name(type)
             );
         }
@@ -334,22 +318,21 @@ static struct token *skip_after(struct token *tok, int type)
     syntax(save->prev->line, "missing @%s\n", keyword_name(type));
 }
 
-static struct token *get_next_line(struct token *tok)
+static Token *get_next_line(Token *tok)
 {
     while (tok != &head) {
-        int type = tok->type;
-
+        const TokenType type = tok->type;
         tok = tok->next;
-        if (type == TOK_NL)
+        if (type == TOK_NL) {
             break;
+        }
     }
     return tok;
 }
 
-static struct token *get_indent(struct token *tok, int *ip)
+static Token *get_indent(Token *tok, int *ip)
 {
     int i = 0;
-
     while (tok != &head && tok->type == TOK_INDENT) {
         tok = tok->next;
         i++;
@@ -359,14 +342,11 @@ static struct token *get_indent(struct token *tok, int *ip)
 }
 
 // Line must be non-empty
-static struct token *check_line(struct token *tok, int *ip)
+static Token *check_line(Token *tok, int *ip)
 {
-    struct token *start;
-    int tok_type;
+    Token *start = tok = get_indent(tok, ip);
 
-    start = tok = get_indent(tok, ip);
-
-    tok_type = tok->type;
+    const TokenType tok_type = tok->type;
     switch (tok_type) {
     case TOK_TEXT:
     case TOK_BOLD:
@@ -467,11 +447,10 @@ indentation:
     syntax(tok->line, "indentation before @%s\n", keyword_name(tok->type));
 }
 
-static void insert_nl_before(struct token *next)
+static void insert_nl_before(Token *next)
 {
-    struct token *prev = next->prev;
-    struct token *new = new_token(TOK_NL);
-
+    Token *prev = next->prev;
+    Token *new = new_token(TOK_NL);
     new->prev = prev;
     new->next = next;
     prev->next = new;
@@ -480,7 +459,7 @@ static void insert_nl_before(struct token *next)
 
 static void normalize(void)
 {
-    struct token *tok = head.next;
+    Token *tok = head.next;
     /*
      * >= 0 if previous line was text (== amount of indent)
      *   -1 if previous block was @pre (amount of indent doesn't matter)
@@ -489,20 +468,20 @@ static void normalize(void)
     int prev_indent = -2;
 
     while (tok != &head) {
-        struct token *start;
-        int i, new_para = 0;
+        bool new_para = false;
 
         // Remove empty lines
         while (is_empty_line(tok)) {
             tok = remove_line(tok);
-            new_para = 1;
+            new_para = true;
             if (tok == &head) {
                 return;
             }
         }
 
         // Skips indent
-        start = tok;
+        Token *start = tok;
+        int i;
         tok = check_line(tok, &i);
 
         switch (tok->type) {
@@ -519,7 +498,7 @@ static void normalize(void)
 
             if (!new_para && prev_indent == i) {
                 // Join with previous line
-                struct token *nl = start->prev;
+                Token *nl = start->prev;
 
                 if (nl->type != TOK_NL)
                     BUG();
@@ -537,7 +516,7 @@ static void normalize(void)
 
                 // Remove indent
                 while (start->type == TOK_INDENT) {
-                    struct token *next = start->next;
+                    Token *next = start->next;
                     free_token(start);
                     start = next;
                 }
@@ -565,8 +544,8 @@ static void normalize(void)
             // Remove white space after H1, H2, L1 and TITLE
             tok = tok->next;
             while (tok != &head) {
-                int type = tok->type;
-                struct token *next;
+                TokenType type = tok->type;
+                Token *next;
 
                 if (type == TOK_TEXT) {
                     while (tok->len && *tok->text == ' ') {
@@ -598,70 +577,74 @@ static void normalize(void)
     }
 }
 
-#define output(...) fprintf(stdout, __VA_ARGS__)
+#define output(str) fputs(str, stdout)
 
-static void output_buf(const char *buf, int len)
+static void output_buf(const char *const buf, size_t len)
 {
-    int ret = fwrite(buf, 1, len, stdout);
-    if (ret != len)
+    size_t ret = fwrite(buf, 1, len, stdout);
+    if (ret != len) {
         die("fwrite failed\n");
+    }
 }
 
-static void output_text(struct token *tok)
+static void output_text(const Token *tok)
 {
     char buf[1024];
     const char *str = tok->text;
-    int len = tok->len;
-    int pos = 0;
+    size_t len = tok->len;
+    size_t pos = 0;
 
     while (len) {
-        int c = *str++;
-
+        const char c = *str++;
         if (pos >= sizeof(buf) - 1) {
             output_buf(buf, pos);
             pos = 0;
         }
-        if (c == '-')
+        if (c == '-') {
             buf[pos++] = '\\';
+        }
         buf[pos++] = c;
         len--;
     }
 
-    if (pos)
+    if (pos) {
         output_buf(buf, pos);
+    }
 }
 
 static int bold = 0;
 static int italic = 0;
 static int indent = 0;
 
-static struct token *output_pre(struct token *tok)
+static Token *output_pre(Token *tok)
 {
-    int bol = 1;
+    bool bol = true;
 
-    if (tok->type != TOK_NL)
+    if (tok->type != TOK_NL) {
         syntax(tok->line, "newline expected after @pre\n");
+    }
 
     output(".nf\n");
     tok = tok->next;
     while (tok != &head) {
         if (bol) {
             int i;
-
             tok = get_indent(tok, &i);
-            if (i != indent && tok->type != TOK_NL)
+            if (i != indent && tok->type != TOK_NL) {
                 syntax(tok->line, "indent changed in @pre\n");
+            }
         }
 
         switch (tok->type) {
         case TOK_TEXT:
-            if (bol && tok->len && tok->text[0] == '.')
+            if (bol && tok->len && tok->text[0] == '.') {
                 output("\\&");
+            }
             output_text(tok);
             break;
         case TOK_NL:
             output("\n");
-            bol = 1;
+            bol = true;
             tok = tok->next;
             continue;
         case TOK_ITALIC:
@@ -677,23 +660,25 @@ static struct token *output_pre(struct token *tok)
         case TOK_ENDPRE:
             output(".fi\n");
             tok = tok->next;
-            if (tok != &head && tok->type == TOK_NL)
+            if (tok != &head && tok->type == TOK_NL) {
                 tok = tok->next;
+            }
             return tok;
         default:
             BUG();
             break;
         }
-        bol = 0;
+        bol = false;
         tok = tok->next;
     }
     return tok;
 }
 
-static struct token *output_raw(struct token *tok)
+static Token *output_raw(Token *tok)
 {
-    if (tok->type != TOK_NL)
+    if (tok->type != TOK_NL) {
         syntax(tok->line, "newline expected after @raw\n");
+    }
 
     tok = tok->next;
     while (tok != &head) {
@@ -734,10 +719,9 @@ static struct token *output_raw(struct token *tok)
     return tok;
 }
 
-static struct token *output_para(struct token *tok)
+static Token *output_para(Token *tok)
 {
-    int bol = 1;
-
+    bool bol = true;
     while (tok != &head) {
         switch (tok->type) {
         case TOK_TEXT:
@@ -765,7 +749,7 @@ static struct token *output_para(struct token *tok)
             } else {
                 output("\n.br\n");
             }
-            bol = 1;
+            bol = true;
             tok = tok->next;
             continue;
         case TOK_NL:
@@ -778,22 +762,21 @@ static struct token *output_para(struct token *tok)
             BUG();
             break;
         }
-        bol = 0;
+        bol = false;
         tok = tok->next;
     }
     return tok;
 }
 
-static struct token *title(struct token *tok, const char *cmd)
+static Token *title(Token *tok, const char *const cmd)
 {
-    output("%s", cmd);
+    output(cmd);
     return output_para(tok->next);
 }
 
-static struct token *dump_one(struct token *tok)
+static Token *dump_one(Token *tok)
 {
     int i;
-
     tok = get_indent(tok, &i);
     if (tok->type != TOK_RAW) {
         while (indent < i) {
@@ -851,35 +834,36 @@ static struct token *dump_one(struct token *tok)
 
 static void dump(void)
 {
-    struct token *tok = head.next;
-
-    while (tok != &head)
+    Token *tok = head.next;
+    while (tok != &head) {
         tok = dump_one(tok);
+    }
 }
 
 static void process(void)
 {
     char *buf = NULL;
-    int alloc = 0;
-    int size = 0;
+    size_t alloc = 0;
+    size_t size = 0;
 
     while (1) {
-        int rc;
-
         if (alloc - size == 0) {
             alloc += 8192;
             buf = realloc(buf, alloc);
-            if (!buf)
+            if (!buf) {
                 oom(alloc);
+            }
         }
-        rc = read(0, buf + size, alloc - size);
+        ssize_t rc = read(0, buf + size, alloc - size);
         if (rc < 0) {
-            if (errno == EINTR)
+            if (errno == EINTR) {
                 continue;
+            }
             die("read: %s\n", strerror(errno));
         }
-        if (!rc)
+        if (!rc) {
             break;
+        }
         size += rc;
     }
 
