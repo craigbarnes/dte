@@ -44,7 +44,15 @@ struct Token {
 
 static const char *program;
 static size_t cur_line = 1;
-static Token head = {&head, &head, TOK_TEXT, 0, NULL, 0};
+
+static Token head = {
+    .next = &head,
+    .prev = &head,
+    .type = TOK_TEXT,
+    .line = 0,
+    .text = NULL,
+    .len = 0
+};
 
 #define CONST_STR(str) {str, sizeof(str) - 1}
 
