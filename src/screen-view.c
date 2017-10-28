@@ -27,7 +27,7 @@ static bool is_default_bg_color(int color)
 }
 
 // Like mask_color() but can change bg color only if it has not been changed yet
-static void mask_color2(struct term_color *color, const struct term_color *over)
+static void mask_color2(TermColor *color, const TermColor *over)
 {
     if (over->fg != -2) {
         color->fg = over->fg;
@@ -42,7 +42,7 @@ static void mask_color2(struct term_color *color, const struct term_color *over)
 
 static void mask_selection_and_current_line (
     LineInfo *info,
-    struct term_color *color
+    TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
         mask_color(color, builtin_colors[BC_SELECTION]);
@@ -139,7 +139,7 @@ static unsigned int screen_next_char(LineInfo *info)
 {
     long count, pos = info->pos;
     unsigned int u = info->line[pos];
-    struct term_color color;
+    TermColor color;
     bool ws_error = false;
 
     if (likely(u < 0x80)) {
@@ -321,7 +321,7 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
 
 static void print_line(LineInfo *info)
 {
-    struct term_color color;
+    TermColor color;
     unsigned int u;
 
     // Screen might be scrolled horizontally. Skip most invisible
@@ -419,7 +419,7 @@ void update_range(View *v, int y1, int y2)
 
     if (i < y2 && info.line_nr == v->cy) {
         // Dummy empty line is shown only if cursor is on it
-        struct term_color color = *builtin_colors[BC_DEFAULT];
+        TermColor color = *builtin_colors[BC_DEFAULT];
 
         obuf.x = 0;
         mask_color2(&color, builtin_colors[BC_CURRENTLINE]);

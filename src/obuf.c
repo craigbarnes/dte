@@ -115,7 +115,7 @@ void buf_move_cursor(int x, int y)
     buf_escape(term_move_cursor(x, y));
 }
 
-void buf_set_color(const struct term_color *color)
+void buf_set_color(const TermColor *color)
 {
     if (!memcmp(color, &obuf.color, sizeof(*color))) {
         return;

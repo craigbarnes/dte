@@ -12,9 +12,9 @@
 #include "input-special.h"
 #include "selection.h"
 
-void set_color(struct term_color *color)
+void set_color(TermColor *color)
 {
-    struct term_color tmp = *color;
+    TermColor tmp = *color;
 
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
@@ -206,7 +206,7 @@ void update_term_title(Buffer *b)
     }
 }
 
-void mask_color(struct term_color *color, const struct term_color *over)
+void mask_color(TermColor *color, const TermColor *over)
 {
     if (over->fg != -2) {
         color->fg = over->fg;
@@ -310,7 +310,7 @@ void update_git_open(void)
     for (; i < h; i++) {
         int file_idx = git_open.scroll + i;
         char *file;
-        struct term_color color;
+        TermColor color;
 
         if (file_idx >= git_open.files.count) {
             break;

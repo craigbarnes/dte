@@ -4,7 +4,7 @@
 #include "completion.h"
 #include "error.h"
 
-struct term_color *builtin_colors[NR_BC];
+TermColor *builtin_colors[NR_BC];
 
 static const char *const color_names[] = {
     "keep", "default",
@@ -44,7 +44,7 @@ void fill_builtin_colors(void)
     }
 }
 
-HlColor *set_highlight_color(const char *name, const struct term_color *color)
+HlColor *set_highlight_color(const char *name, const TermColor *color)
 {
     HlColor *c;
 
@@ -155,7 +155,7 @@ static bool parse_attr(const char *str, unsigned short *attr)
     return false;
 }
 
-bool parse_term_color(struct term_color *color, char **strs)
+bool parse_term_color(TermColor *color, char **strs)
 {
     color->fg = -1;
     color->bg = -1;

@@ -6,7 +6,7 @@
 
 typedef struct {
     char *name;
-    struct term_color color;
+    TermColor color;
 } HlColor;
 
 enum builtin_color {
@@ -27,13 +27,13 @@ enum builtin_color {
     NR_BC
 };
 
-extern struct term_color *builtin_colors[NR_BC];
+extern TermColor *builtin_colors[NR_BC];
 
 void fill_builtin_colors(void);
-HlColor *set_highlight_color(const char *name, const struct term_color *color);
+HlColor *set_highlight_color(const char *name, const TermColor *color);
 HlColor *find_color(const char *name);
 void remove_extra_colors(void);
-bool parse_term_color(struct term_color *color, char **strs);
+bool parse_term_color(TermColor *color, char **strs);
 void collect_hl_colors(const char *prefix);
 void collect_colors_and_attributes(const char *prefix);
 

@@ -405,7 +405,7 @@ static void cmd_git_open(const char* UNUSED(pf), char** UNUSED(args))
 
 static void cmd_hi(const char* UNUSED(pf), char **args)
 {
-    struct term_color color;
+    TermColor color;
 
     if (args[0] == NULL) {
         exec_reset_colors_rc();

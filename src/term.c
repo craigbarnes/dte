@@ -554,9 +554,9 @@ static void buffer_color(char x, unsigned char color)
     }
 }
 
-const char *term_set_color(const struct term_color *color)
+const char *term_set_color(const TermColor *color)
 {
-    struct term_color c = *color;
+    TermColor c = *color;
 
     // TERM=xterm: 8 colors
     // TERM=linux: 8 colors. colors > 7 corrupt screen

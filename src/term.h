@@ -53,11 +53,11 @@ typedef struct {
     TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
 } TerminalCapabilities;
 
-struct term_color {
+typedef struct {
     short fg;
     short bg;
     unsigned short attr;
-};
+} TermColor;
 
 extern TerminalCapabilities term_cap;
 
@@ -73,7 +73,7 @@ void term_discard_paste(void);
 
 int term_get_size(int *w, int *h);
 
-const char *term_set_color(const struct term_color *color);
+const char *term_set_color(const TermColor *color);
 
 // Move cursor (x and y are zero based)
 const char *term_move_cursor(int x, int y);

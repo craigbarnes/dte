@@ -1,12 +1,14 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "window.h"
+#include "buffer.h"
 #include "color.h"
+#include "term.h"
+#include "window.h"
 
-void set_color(struct term_color *color);
+void set_color(TermColor *color);
 void set_builtin_color(enum builtin_color c);
-void mask_color(struct term_color *color, const struct term_color *over);
+void mask_color(TermColor *color, const TermColor *over);
 
 void print_tabbar(Window *w);
 int print_command(char prefix);
