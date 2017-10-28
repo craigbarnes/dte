@@ -399,8 +399,11 @@ void buffer_erase_bytes(size_t len)
     buffer_delete_bytes_internal(len, true);
 }
 
-void buffer_replace_bytes(size_t del_count, const char *inserted, size_t ins_count)
-{
+void buffer_replace_bytes (
+    size_t del_count,
+    const char *const inserted,
+    size_t ins_count
+) {
     view_reset_preferred_x(view);
     if (del_count == 0) {
         buffer_insert_bytes(inserted, ins_count);
