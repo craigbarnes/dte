@@ -1,3 +1,5 @@
+#include <strings.h>
+#include <string.h>
 #include "key.h"
 #include "uchar.h"
 #include "ascii.h"

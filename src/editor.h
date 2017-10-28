@@ -1,7 +1,8 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include "macros.h"
 #include "cmdline.h"
 #include "options.h"
 

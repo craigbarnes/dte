@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include "libc.h"
+#include <stdbool.h>
 
 typedef enum {
     NEWLINE_UNIX,

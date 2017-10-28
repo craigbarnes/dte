@@ -1,8 +1,10 @@
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
+#include <stddef.h>
 #include "ptr-array.h"
 #include "strbuf.h"
+#include "key.h"
 #include "term.h"
 
 typedef struct {

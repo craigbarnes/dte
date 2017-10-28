@@ -1,7 +1,8 @@
 #ifndef KEY_H
 #define KEY_H
 
-#include "libc.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 enum {
     KEY_ENTER = '\n',
