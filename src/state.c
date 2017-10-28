@@ -185,7 +185,7 @@ static void cmd_bufis(const char *pf, char **args)
 
     if (len > ARRAY_COUNT(c->u.cond_bufis.str)) {
         error_msg (
-            "Maximum length of string is %lu bytes",
+            "Maximum length of string is %zu bytes",
             ARRAY_COUNT(c->u.cond_bufis.str)
         );
         return;
@@ -432,7 +432,7 @@ static void cmd_str(const char *pf, char **args)
 
     if (len > ARRAY_COUNT(c->u.cond_str.str)) {
         error_msg (
-            "Maximum length of string is %lu bytes",
+            "Maximum length of string is %zu bytes",
             ARRAY_COUNT(c->u.cond_str.str)
         );
         return;
