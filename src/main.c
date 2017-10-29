@@ -82,7 +82,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!isatty(1)) {
+    if (!isatty(fileno(stdin))) {
+        if (!freopen("/dev/tty", "r", stdin)) {
+            fputs("Cannot reopen input tty\n", stderr);
+            return 1;
+        }
+    }
+    if (!isatty(fileno(stdout))) {
         fputs("stdout doesn't refer to a terminal\n", stderr);
         return 1;
     }
