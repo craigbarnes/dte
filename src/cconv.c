@@ -273,13 +273,13 @@ char *cconv_consume_line(struct cconv *c, size_t *len)
 {
     char *line = c->obuf + c->consumed;
     char *nl = memchr(line, '\n', c->opos - c->consumed);
-    size_t n;
 
     if (nl == NULL) {
         *len = 0;
         return NULL;
     }
-    n = nl - line + 1;
+
+    size_t n = nl - line + 1;
     c->consumed += n;
     *len = n;
     return line;

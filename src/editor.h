@@ -30,9 +30,9 @@ typedef struct {
     InputMode input_mode;
     CommandLine cmdline;
     GlobalOptions options;
-    char *home_dir;
-    char *user_config_dir;
-    char *charset;
+    const char *home_dir;
+    const char *user_config_dir;
+    const char *charset;
     bool child_controls_terminal;
     bool everything_changed;
     bool resized;
