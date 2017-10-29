@@ -14,21 +14,21 @@
 #include "../src/macros.h"
 
 typedef enum {
-    TOK_TEXT, // Max one line w/o \n
+    TOK_TEXT, // Max. one line without \n
     TOK_NL, // \n
-    TOK_ITALIC, // `
-    TOK_BOLD, // *
+    TOK_ITALIC, // `text`
+    TOK_BOLD, // *text*
     TOK_INDENT, // \t
-    // Keywords (@...)
-    TOK_H1,
-    TOK_H2,
-    TOK_LI,
-    TOK_BR,
-    TOK_PRE,
-    TOK_ENDPRE, // Must be after TOK_PRE
-    TOK_RAW,
-    TOK_ENDRAW, // Must be after TOK_RAW
-    TOK_TITLE, // WRITE 2 2001-12-13 "Linux 2.0.32" "Linux Programmer's Manual"
+    // Keywords:
+    TOK_H1, // @h1
+    TOK_H2, // @h2
+    TOK_LI, // @li
+    TOK_BR, // @br
+    TOK_PRE, // @pre
+    TOK_ENDPRE, // @endpre (must be after TOK_PRE)
+    TOK_RAW, // @raw
+    TOK_ENDRAW, // @endraw (must be after TOK_RAW)
+    TOK_TITLE, // @title DTE 1 "July 2017"
 } TokenType;
 
 typedef struct Token Token;
