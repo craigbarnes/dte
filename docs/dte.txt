@@ -87,8 +87,8 @@ previous file. The commands *open*, *save* and *quit* should be obvious.
 	buffer.
 
 *bind* <`key`> [`command`]
-	Bind `key` to `command`. If `command` is not given then the binding
-	for `key` is removed.
+	Bind `command` to `key`. If no `command` is given then any existing
+	binding for `key` is removed.
 
 	Keys:
 		insert delete home end pgup pgdown left right up down F1
