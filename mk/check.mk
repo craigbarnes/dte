@@ -1,3 +1,5 @@
+CMDTEST = $(dte) -Rc "$$(sed '/^\#/d;/^$$/d' < '$(strip $(1))' | tr '\n' ';')"
+
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     test_main ))
 
@@ -10,10 +12,11 @@ check: $(test) all
 	$(Q) $<
 
 check-commands: $(dte) | build/test/
-	@$(dte) -R -c "$$(cat test/thai.dterc | sed '/^\#/d;/^$$/d' | tr '\n' ';')"
-	@diff -q build/test/thai-utf8.txt test/thai-utf8.txt
-	@diff -q build/test/thai-tis620.txt test/thai-tis620.txt
-	@$(RM)  build/test/thai-utf8.txt build/test/thai-tis620.txt
+	$(E) CMDTEST test/thai.dterc
+	$(Q) $(call CMDTEST, test/thai.dterc)
+	$(Q) diff -q build/test/thai-utf8.txt test/thai-utf8.txt
+	$(Q) diff -q build/test/thai-tis620.txt test/thai-tis620.txt
+	$(Q) $(RM) build/test/thai-*.txt
 
 $(test):
 	$(E) LINK $@
