@@ -18,7 +18,7 @@ FNR == 1 {
     }
     name = FILENAME
     gsub(/^share\//, "", name)
-    ident = "builtin_config_" escape_ident(name)
+    ident = "builtin_" escape_ident(name)
     print "static const char " ident "[] ="
 
     names[++nfiles] = name
