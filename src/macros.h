@@ -5,7 +5,6 @@
 #define DO_PRAGMA(x) _Pragma(#x)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
-#define MESSAGE(x) DO_PRAGMA(message #x)
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
@@ -15,7 +14,6 @@
 #define PURE __attribute__((__pure__))
 #define CONST_FN __attribute__((__const__))
 #else
-#define MESSAGE(x)
 #define likely(x) (x)
 #define unlikely(x) (x)
 #define UNUSED
@@ -27,8 +25,10 @@
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 5)
+#define MESSAGE(x) DO_PRAGMA(message #x)
 #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
+#define MESSAGE(x)
 #define RETURNS_NONNULL
 #endif
 
