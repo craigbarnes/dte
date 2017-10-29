@@ -147,7 +147,7 @@ previous file. The commands *open*, *save* and *quit* should be obvious.
 
 *compile* [*-1ps*] <`errorfmt`> <`command`> [`parameters`]...
 	Run external `command` and collect error messages. This can be
-	used to run `make`(1) and `grep`(1).
+	used to run *make*(1) and *grep*(1).
 
 	*-1* read error messages from stdout instead of stderr
 
@@ -217,7 +217,7 @@ previous file. The commands *open*, *save* and *quit* should be obvious.
 	used.
 
 	This command merges the selection into one paragraph. To format
-	multiple paragraphs use the external `fmt`(1) program with the
+	multiple paragraphs use the external *fmt*(1) program with the
 	*filter* command, e.g. *filter fmt -w 60*.
 
 *ft* <`filetype`> <`extensions`>...
@@ -262,7 +262,7 @@ previous file. The commands *open*, *save* and *quit* should be obvious.
 
 	Color can be given as a numeric value too (-2..255).
 
-	Colors 16-255 are supported by modern `xterm`(1) compatible terminal
+	Colors 16-255 are supported by modern *xterm*(1) compatible terminal
 	emulators. There's a 6x6x6 color cube at indexes 16..231. For
 	these colors it is easiest to use the R/G/B syntax where R, G
 	and B are values between 0 and 5.
@@ -608,14 +608,14 @@ to set filetype/filename specific options.
 Global values of these options serve as default values for local
 (per-file) options.
 
-auto-indent [true]
+*auto-indent* [true]
 	Automatically insert indentation when pressing enter.
 	Indentation is copied from previous non-empty line. If also the
 	*indent-regex* local option is set then indentation is
 	automatically increased if the regular expression matches
 	current line.
 
-detect-indent [""]
+*detect-indent* [""]
 	Comma separated list of indent widths (1-8) to detect
 	automatically when file is opened. Set to "" to disable. Tab
 	indentation is detected if the value is not "". Adjusts
@@ -625,83 +625,83 @@ detect-indent [""]
 	Example:
 		set detect-indent 2,3,4,8
 
-emulate-tab [false]
+*emulate-tab* [false]
 	Make *delete*, *erase* and moving *left* and *right* inside
 	indentation feel as if there were tabs instead of spaces.
 
-expand-tab [false]
+*expand-tab* [false]
 	Convert tab to spaces on insert.
 
-file-history [true]
+*file-history* [true]
 	Save line and column for each file to $DTE_HOME/file-history.
 
-indent-width [8]
+*indent-width* [8]
 	Size of indentation in spaces.
 
-syntax [true]
+*syntax* [true]
 	Use syntax highlighting.
 
-tab-width [8]
+*tab-width* [8]
 	Width of tab. Recommended value is 8. If you use other
 	indentation size than 8 you should use spaces to indent.
 
-text-width [72]
+*text-width* [72]
 	Preferred with of text. Used as default value for
 	*format-paragraph*.
 
-ws-error [special]
+*ws-error* [special]
 	Comma separated list of flags that describe what whitespace
 	errors should be highlighted. Set to "" to disable.
 
-	auto-indent
-		If expand-tab is true then same as
+	*auto-indent*
+		If *expand-tab* is true then same as
 		`tab-after-indent,tab-indent` otherwise same as
 		`space-indent`.
 
-	space-align
+	*space-align*
 		Display spaces used as alignment after tabs in
 		indentation as error.
 
-	space-indent
+	*space-indent*
 		Display spaces in indentation as error. Note that this
 		still allows using less than `tab-width` spaces at end
 		of indentation for alignment.
 
-	tab-after-indent
+	*tab-after-indent*
 		Display tabs used anywhere else but indentation as
 		errors.
 
-	tab-indent
+	*tab-indent*
 		Display tabs in indentation as errors. If you set this
 		you most likely want to set `tab-after-indent` too.
 
-	special
+	*special*
 		Display all characters that look like regular space as
 		errors. One of these characters is no-break space
 		(U+00A0), which is often accidentally typed (AltGr+space
 		in some keyboard layouts).
 
-	trailing
+	*trailing*
 		Display trailing whitespace as error.
 
 @h2 Local only options
 
-brace-indent [false]
+*brace-indent* [false]
 	Scan for { and } when calculating indentation size. Depends on
 	the *auto-indent* option.
 
-filetype [none]
+*filetype* [none]
 	Type of file. Value must be previously registered using the *ft*
 	command.
 
-indent-regex [""]
+*indent-regex* [""]
 	If this regular expression matches current line when enter is
 	pressed and *auto-indent* is true then indentation is increased.
 	Set to "" to disable.
 
 @h2 Global only options
 
-case-sensitive-search [true]
+*case-sensitive-search* [true]
 	false
 		Search is case-insensitive.
 	true
@@ -710,10 +710,10 @@ case-sensitive-search [true]
 		If search string contains a uppercase letter search is
 		case-sensitive, otherwise it is case-insensitive.
 
-display-special [false]
+*display-special* [false]
 	Display special characters.
 
-esc-timeout [100] 0...2000
+*esc-timeout* [100] 0...2000
 	When single escape is read from the terminal dte waits some
 	time before treating the escape as a single keypress. The
 	timeout value is in milliseconds.
@@ -722,21 +722,21 @@ esc-timeout [100] 0...2000
 	timeout can cause escape sequences of for example arrow keys to
 	be split and treated as multiple key presses.
 
-lock-files [true]
+*lock-files* [true]
 	Lock files using $DTE_HOME/file-locks. Only protects from your
 	own mistakes (two processes editing same file).
 
-newline [unix]
+*newline* [unix]
 	Whether to use LF (`unix`) or CRLF (`dos`) line-endings. This is
 	just a default value for new files.
 
-scroll-margin [0]
+*scroll-margin* [0]
 	Minimum number of lines to keep visible before and after cursor.
 
-show-line-numbers [false]
+*show-line-numbers* [false]
 	Show line numbers.
 
-statusline-left [" %f%s%m%r%s%M"]
+*statusline-left* [" %f%s%m%r%s%M"]
 	Format string for the left aligned part of status line.
 
 	@li %f
@@ -785,10 +785,10 @@ statusline-left [" %f%s%m%r%s%M"]
 	@li %%
 	Literal %.
 
-statusline-right [" %y,%X   %u   %E %n %t   %p "]
+*statusline-right* [" %y,%X   %u   %E %n %t   %p "]
 	Format string for the right aligned part of status line.
 
-tab-bar [horizontal]
+*tab-bar* [horizontal]
 	hidden
 		Hide tab bar.
 	horizontal
@@ -798,11 +798,11 @@ tab-bar [horizontal]
 	auto
 		Show tab bar on left if there's enough space, on top otherwise.
 
-tab-bar-max-components [0]
+*tab-bar-max-components* [0]
 	Maximum number of path components displayed in vertical tab bar.
 	Set to 0 to disable.
 
-tab-bar-width [25]
+*tab-bar-width* [25]
 	Width of vertical tab bar. Note that width of tab bar is
 	automatically reduced to keep editing area at least 80
 	characters wide. Vertical tab bar is shown only if there's
@@ -915,7 +915,7 @@ Reverse search direction.
 @h1 ENVIRONMENT
 
 *DTE_HOME*
-	User configuration directory. Defaults to *~/.dte* if not set.
+	User configuration directory. Defaults to *$HOME/.dte* if not set.
 
 @h1 FILES
 
