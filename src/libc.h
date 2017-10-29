@@ -1,6 +1,7 @@
 #ifndef LIBC_H
 #define LIBC_H
 
+#include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
