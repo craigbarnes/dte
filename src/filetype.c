@@ -87,7 +87,7 @@ const char *find_ft (
     const char *filename,
     const char *interpreter,
     const char *first_line,
-    unsigned int line_len
+    size_t line_len
 ) {
     size_t filename_len = 0;
     char *ext = NULL;

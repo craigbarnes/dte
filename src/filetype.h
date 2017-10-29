@@ -2,6 +2,7 @@
 #define FILETYPE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 enum detect_type {
     FT_EXTENSION,
@@ -17,7 +18,7 @@ const char *find_ft (
     const char *filename,
     const char *interpreter,
     const char *first_line,
-    unsigned int line_len
+    size_t line_len
 );
 
 #endif
