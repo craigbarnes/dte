@@ -2,6 +2,7 @@ include mk/compat.mk
 include mk/util.mk
 -include Config.mk
 include mk/build.mk
+include mk/check.mk
 include mk/docs.mk
 -include mk/dev.mk
 
@@ -30,16 +31,6 @@ uninstall:
 	$(RM) $(addprefix $(DESTDIR)$(man1dir)/, $(man1))
 	$(RM) $(addprefix $(DESTDIR)$(man5dir)/, $(man5))
 
-check: $(test) all
-	$(E) TEST $<
-	$(Q) $<
-
-check-commands: $(dte) | build/test/
-	@$(dte) -R -c "$$(cat test/thai.dterc | sed '/^\#/d;/^$$/d' | tr '\n' ';')"
-	@diff -q build/test/thai-utf8.txt test/thai-utf8.txt
-	@diff -q build/test/thai-tis620.txt test/thai-tis620.txt
-	@$(RM)  build/test/thai-utf8.txt build/test/thai-tis620.txt
-
 tags:
 	ctags src/*.[ch]
 
@@ -52,5 +43,5 @@ distclean: clean
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install uninstall check check-commands tags clean distclean
+.PHONY: all install uninstall tags clean distclean
 .DELETE_ON_ERROR:

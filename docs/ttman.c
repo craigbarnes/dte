@@ -199,7 +199,10 @@ static size_t emit_text(const char *const buf, size_t size)
     size_t i;
     for (i = 0; i < size; i++) {
         const char c = buf[i];
-        if (c == '@' || c == '`' || c == '*' || c == '\n' || c == '\\' || c == '\t') {
+        if (
+            c == '@' || c == '`' || c == '*' ||
+            c == '\n' || c == '\\' || c == '\t'
+        ) {
             break;
         }
     }

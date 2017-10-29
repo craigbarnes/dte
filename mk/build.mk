@@ -107,9 +107,6 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
 
-test_objects := \
-    build/test/test_main.o
-
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
 else ifeq "$(OS)" "Cygwin"
@@ -149,26 +146,20 @@ endif
 endif
 
 dte = dte$(EXEC_SUFFIX)
-test = build/test/test$(EXEC_SUFFIX)
-$(dte): $(editor_objects)
-$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 
+$(dte): $(editor_objects)
 build/config.o: build/BUILTIN_CONFIG.h
 build/term-caps.o: build/term-caps.cflags
 build/editor.o: build/editor.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 
-$(dte) $(test):
+$(dte):
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
-
-$(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
-	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK)
@@ -177,7 +168,7 @@ build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
-build/ build/test/:
+build/:
 	@mkdir -p $@
 
 
