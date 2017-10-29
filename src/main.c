@@ -29,10 +29,14 @@ static void handle_sigcont(int UNUSED(signum))
     }
 }
 
+#ifdef SIGWINCH
 static void handle_sigwinch(int UNUSED(signum))
 {
     editor.resized = true;
 }
+#else
+MESSAGE("SIGWINCH not defined; disabling handler")
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -128,7 +132,10 @@ int main(int argc, char *argv[])
     set_signal_handler(SIGTSTP, handle_sigtstp);
 
     set_signal_handler(SIGCONT, handle_sigcont);
+
+#ifdef SIGWINCH
     set_signal_handler(SIGWINCH, handle_sigwinch);
+#endif
 
     load_file_history();
     command_history_filename = editor_file("command-history");

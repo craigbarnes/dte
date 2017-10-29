@@ -1,7 +1,11 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#define ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))
+#define DO_PRAGMA(x) _Pragma(#x)
+
 #if defined(__GNUC__) && (__GNUC__ >= 3)
+#define MESSAGE(x) DO_PRAGMA(message #x)
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
@@ -11,6 +15,7 @@
 #define PURE __attribute__((__pure__))
 #define CONST_FN __attribute__((__const__))
 #else
+#define MESSAGE(x)
 #define likely(x) (x)
 #define unlikely(x) (x)
 #define UNUSED
@@ -40,7 +45,5 @@
 #else
 #define static_assert(x)
 #endif
-
-#define ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))
 
 #endif
