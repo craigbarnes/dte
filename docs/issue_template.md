@@ -1,9 +1,9 @@
-<!--
-If reporting a bug, insert the output of running `make vars` below:
--->
+**Issue description**:
+
+TODO
+
+**Output of** `make vars`:
 
 ```
-# "make vars" output:
-
-
+TODO
 ```
