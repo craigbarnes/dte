@@ -48,8 +48,10 @@ static char *expand_pkgdatadir(void)
     if (!warned) {
         fputs (
             "\n\033[1;31mNOTICE:\033[0m "
-            "$PKGDATADIR has been removed from dte\n"
-            "See: https://github.com/craigbarnes/dte/issues/70\n\n",
+            "$PKGDATADIR has been removed from dte\n\n"
+            "  The command \"include $PKGDATADIR/...\" is now"
+            " \"include -b ...\"\n\n"
+            "  See: https://github.com/craigbarnes/dte/issues/70\n\n\n",
             stderr
         );
         editor.everything_changed = true;
