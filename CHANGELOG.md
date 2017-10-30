@@ -1,8 +1,23 @@
 dte changelog
 =============
 
+v1.5 (unreleased)
+-----------------
+
+**Changes:**
+
+* Added syntax highlighting for Nginx config files
+* Added various POSIX and C11 features to C syntax highlighter.
+* Added proper formatting to man pages.
+* Fixed a terminal input bug triggered by redirecting `stdin`.
+* Fixed some (rare) memory and file descriptor leaks.
+* Fixed a few portability issues.
+* Many code quality and style fixes.
+
 v1.4 (latest release)
 ---------------------
+
+Released on 2017-10-16.
 
 **Changes:**
 
