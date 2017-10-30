@@ -17,7 +17,7 @@ FNR == 1 {
         print ";\n"
     }
     name = FILENAME
-    gsub(/^share\//, "", name)
+    gsub(/^config\//, "", name)
     ident = "builtin_" escape_ident(name)
     print "static const char " ident "[] ="
 

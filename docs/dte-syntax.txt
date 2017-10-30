@@ -166,4 +166,4 @@ Timo Hirvonen <tihirvon\@gmail.com>
 
 *dte*(1)
 
-https://github.com/craigbarnes/dte/blob/master/share/syntax/dte
+`https://github.com/craigbarnes/dte/tree/master/config/syntax`

@@ -78,19 +78,19 @@ BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
 BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 
 BUILTIN_CONFIGS = \
-    share/rc \
-    share/filetype \
-    share/option \
-    share/binding/default \
-    share/binding/shift-select \
-    share/color/light \
-    share/color/light256 \
-    share/color/darkgray \
-    share/compiler/gcc \
-    share/compiler/go \
+    config/rc \
+    config/filetype \
+    config/option \
+    config/binding/default \
+    config/binding/shift-select \
+    config/color/light \
+    config/color/light256 \
+    config/color/darkgray \
+    config/compiler/gcc \
+    config/compiler/go \
     $(BUILTIN_SYNTAX_FILES)
 
-BUILTIN_SYNTAX_FILES = $(addprefix share/syntax/, \
+BUILTIN_SYNTAX_FILES = $(addprefix config/syntax/, \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     html+smarty ini java javascript lua mail make markdown meson nginx \
     php python robotstxt ruby sh smarty sql vala xml )

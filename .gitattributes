@@ -22,7 +22,7 @@ makefile make
 *.sh code
 *.yml code
 *.dterc code
-share/** code
+config/** code
 mk/git-hooks/* code
 test/*.txt text
 LICENSE text
