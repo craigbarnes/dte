@@ -48,6 +48,9 @@ Then compile and install:
 The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
 works as usual.
 
+**Note**: In addition to the dependencies listed above, `dte` also
+requires a [POSIX 2008] compliant OS.
+
 Documentation
 -------------
 
@@ -83,4 +86,5 @@ Public License version 2 for more details.
 [dte-syntax.5.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.5.html
 [`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
+[POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
