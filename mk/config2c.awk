@@ -25,6 +25,13 @@ FNR == 1 {
     idents[nfiles] = ident
 }
 
+# Discard comment lines to save some space. The newline character is
+# retained so that error messages still give the correct line number.
+/^#/ {
+    print "\"\\n\""
+    next
+}
+
 {
     print "\"" escape_string($0) "\\n\""
 }
