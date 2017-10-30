@@ -8,7 +8,7 @@
 typedef struct {
     char *filename;
     char *buf;
-    long size;
+    size_t size;
     time_t mtime;
 } TagFile;
 
@@ -23,7 +23,14 @@ typedef struct {
     bool local;
 } Tag;
 
-bool next_tag(TagFile *tf, size_t *posp, const char *prefix, int exact, Tag *t);
+bool next_tag (
+    const TagFile *tf,
+    size_t *posp,
+    const char *prefix,
+    bool exact,
+    Tag *t
+);
+
 void free_tag(Tag *t);
 
 #endif

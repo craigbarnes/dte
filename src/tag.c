@@ -222,7 +222,7 @@ void tag_file_find_tags (
     size_t pos = 0;
 
     t = xnew(Tag, 1);
-    while (next_tag(tf, &pos, name, 1, t)) {
+    while (next_tag(tf, &pos, name, true, t)) {
         ptr_array_add(tags, t);
         t = xnew(Tag, 1);
     }
@@ -263,7 +263,7 @@ void collect_tags(TagFile *tf, const char *prefix)
     size_t pos = 0;
     char *prev = NULL;
 
-    while (next_tag(tf, &pos, prefix, 0, &t)) {
+    while (next_tag(tf, &pos, prefix, false, &t)) {
         if (!prev || !streq(prev, t.name)) {
             add_completion(t.name);
             prev = t.name;

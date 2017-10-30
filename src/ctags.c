@@ -129,8 +129,13 @@ error:
     return false;
 }
 
-bool next_tag(TagFile *tf, size_t *posp, const char *prefix, int exact, Tag *t)
-{
+bool next_tag (
+    const TagFile *tf,
+    size_t *posp,
+    const char *prefix,
+    bool exact,
+    Tag *t
+) {
     size_t prefix_len = strlen(prefix);
     size_t pos = *posp;
 
