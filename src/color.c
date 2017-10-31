@@ -3,8 +3,7 @@
 #include "common.h"
 #include "completion.h"
 #include "error.h"
-
-TermColor *builtin_colors[NR_BC];
+#include "editor.h"
 
 static const char *const color_names[] = {
     "keep", "default",
@@ -18,7 +17,7 @@ static const char *const attr_names[] = {
     "blink", "reverse", "invisible", "keep"
 };
 
-static const char *const builtin_color_names[NR_BC] = {
+static const char *const builtin_color_names[] = {
     "default",
     "nontext",
     "noline",
@@ -34,13 +33,14 @@ static const char *const builtin_color_names[NR_BC] = {
     "activetab",
     "inactivetab",
 };
+static_assert(ARRAY_COUNT(builtin_color_names) == NR_BC);
 
 static PointerArray hl_colors = PTR_ARRAY_INIT;
 
 void fill_builtin_colors(void)
 {
     for (size_t i = 0; i < NR_BC; i++) {
-        builtin_colors[i] = &find_color(builtin_color_names[i])->color;
+        editor.builtin_colors[i] = &find_color(builtin_color_names[i])->color;
     }
 }
 

@@ -18,17 +18,17 @@ void set_color(TermColor *color)
 
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = builtin_colors[BC_DEFAULT]->fg;
+        tmp.fg = editor.builtin_colors[BC_DEFAULT]->fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = builtin_colors[BC_DEFAULT]->bg;
+        tmp.bg = editor.builtin_colors[BC_DEFAULT]->bg;
     }
     buf_set_color(&tmp);
 }
 
 void set_builtin_color(enum builtin_color c)
 {
-    set_color(builtin_colors[c]);
+    set_color(editor.builtin_colors[c]);
 }
 
 static const char *format_misc_status(Window *win)
@@ -320,9 +320,9 @@ void update_git_open(void)
         obuf.x = 0;
         buf_move_cursor(x, y + i);
 
-        color = *builtin_colors[BC_DEFAULT];
+        color = *editor.builtin_colors[BC_DEFAULT];
         if (file_idx == git_open.selected) {
-            mask_color(&color, builtin_colors[BC_SELECTION]);
+            mask_color(&color, editor.builtin_colors[BC_SELECTION]);
         }
         buf_set_color(&color);
         buf_add_str(file);

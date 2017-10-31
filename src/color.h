@@ -27,8 +27,6 @@ enum builtin_color {
     NR_BC
 };
 
-extern TermColor *builtin_colors[NR_BC];
-
 void fill_builtin_colors(void);
 HlColor *set_highlight_color(const char *name, const TermColor *color);
 HlColor *find_color(const char *name);
