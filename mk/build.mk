@@ -11,10 +11,6 @@ ifdef TERMINFO_DISABLE
 else
   LDLIBS = $(or \
     $(shell pkg-config --libs tinfo 2>/dev/null), \
-    $(shell ncursesw6-config --libs 2>/dev/null), \
-    $(shell ncurses6-config --libs 2>/dev/null), \
-    $(shell ncursesw5-config --libs 2>/dev/null), \
-    $(shell ncurses5-config --libs 2>/dev/null), \
     $(shell pkg-config --libs ncurses 2>/dev/null), \
     -lcurses \
   )
