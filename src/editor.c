@@ -275,13 +275,13 @@ void resize(void)
     update_screen_size();
 
     // "dtach -r winch" sends SIGWINCH after program has been attached
-    if (term_cap.strings[TERMCAP_KEYPAD_ON]) {
+    if (terminal.control_codes[TERMCAP_KEYPAD_ON]) {
         // Turn keypad on (makes cursor keys work)
-        buf_escape(term_cap.strings[TERMCAP_KEYPAD_ON]);
+        buf_escape(terminal.control_codes[TERMCAP_KEYPAD_ON]);
     }
-    if (term_cap.strings[TERMCAP_CUP_MODE_ON]) {
+    if (terminal.control_codes[TERMCAP_CUP_MODE_ON]) {
         // Use alternate buffer if possible
-        buf_escape(term_cap.strings[TERMCAP_CUP_MODE_ON]);
+        buf_escape(terminal.control_codes[TERMCAP_CUP_MODE_ON]);
     }
 
     editor.mode_ops[editor.input_mode]->update();
@@ -300,13 +300,13 @@ void ui_end(void)
     buf_show_cursor();
 
     // Back to main buffer
-    if (term_cap.strings[TERMCAP_CUP_MODE_OFF]) {
-        buf_escape(term_cap.strings[TERMCAP_CUP_MODE_OFF]);
+    if (terminal.control_codes[TERMCAP_CUP_MODE_OFF]) {
+        buf_escape(terminal.control_codes[TERMCAP_CUP_MODE_OFF]);
     }
 
     // Turn keypad off
-    if (term_cap.strings[TERMCAP_KEYPAD_OFF]) {
-        buf_escape(term_cap.strings[TERMCAP_KEYPAD_OFF]);
+    if (terminal.control_codes[TERMCAP_KEYPAD_OFF]) {
+        buf_escape(terminal.control_codes[TERMCAP_KEYPAD_OFF]);
     }
 
     buf_flush();

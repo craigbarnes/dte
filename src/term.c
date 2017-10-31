@@ -103,7 +103,7 @@ static const KeyMap builtin_keys[] = {
     {MOD_SHIFT | '\t', "\033[Z", T_ST | T_XTERM_LIKE},
 };
 
-TerminalCapabilities term_cap;
+TerminalInfo terminal;
 
 static struct termios termios_save;
 static char buffer[64];
@@ -280,8 +280,8 @@ static bool read_special(Key *key)
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
 
-    for (size_t i = 0; i < ARRAY_COUNT(term_cap.keymap); i++) {
-        const TermKeyMap *const km = &term_cap.keymap[i];
+    for (size_t i = 0; i < ARRAY_COUNT(terminal.keymap); i++) {
+        const TermKeyMap *const km = &terminal.keymap[i];
         const char *const keycode = km->code;
 
         if (!keycode) {
@@ -560,7 +560,7 @@ const char *term_set_color(const TermColor *color)
 
     // TERM=xterm: 8 colors
     // TERM=linux: 8 colors. colors > 7 corrupt screen
-    if (term_cap.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
+    if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
         c.attr |= ATTR_BOLD;
         c.fg &= 7;
     }

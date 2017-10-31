@@ -41,25 +41,25 @@ enum {
 };
 
 typedef struct {
+    short fg;
+    short bg;
+    unsigned short attr;
+} TermColor;
+
+typedef struct {
     Key key;
     const char *code;
 } TermKeyMap;
 
 // See terminfo(5)
 typedef struct {
-    bool back_color_erase; // Can clear to end of line with bg color set
+    bool can_bg_color_erase; // Can clear to end of line with bg color set
     int max_colors;
-    const char *strings[NR_STR_CAPS];
+    const char *control_codes[NR_STR_CAPS];
     TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
-} TerminalCapabilities;
+} TerminalInfo;
 
-typedef struct {
-    short fg;
-    short bg;
-    unsigned short attr;
-} TermColor;
-
-extern TerminalCapabilities term_cap;
+extern TerminalInfo terminal;
 
 void term_init(const char *const term);
 void term_setup_extra_keys(const char *const term);

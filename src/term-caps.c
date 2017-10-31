@@ -24,17 +24,17 @@ static char *curses_str_cap(const char *name)
 
 static void term_read_caps(void)
 {
-    term_cap.back_color_erase = tigetflag("bce");
-    term_cap.max_colors = tigetnum("colors");
+    terminal.can_bg_color_erase = tigetflag("bce");
+    terminal.max_colors = tigetnum("colors");
 
-    static_assert(ARRAY_COUNT(term_cap.strings) == 7);
-    term_cap.strings[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
-    term_cap.strings[TERMCAP_KEYPAD_OFF] = curses_str_cap("rmkx");
-    term_cap.strings[TERMCAP_KEYPAD_ON] = curses_str_cap("smkx");
-    term_cap.strings[TERMCAP_CUP_MODE_OFF] = curses_str_cap("rmcup");
-    term_cap.strings[TERMCAP_CUP_MODE_ON] = curses_str_cap("smcup");
-    term_cap.strings[TERMCAP_SHOW_CURSOR] = curses_str_cap("cnorm");
-    term_cap.strings[TERMCAP_HIDE_CURSOR] = curses_str_cap("civis");
+    static_assert(ARRAY_COUNT(terminal.control_codes) == 7);
+    terminal.control_codes[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
+    terminal.control_codes[TERMCAP_KEYPAD_OFF] = curses_str_cap("rmkx");
+    terminal.control_codes[TERMCAP_KEYPAD_ON] = curses_str_cap("smkx");
+    terminal.control_codes[TERMCAP_CUP_MODE_OFF] = curses_str_cap("rmcup");
+    terminal.control_codes[TERMCAP_CUP_MODE_ON] = curses_str_cap("smcup");
+    terminal.control_codes[TERMCAP_SHOW_CURSOR] = curses_str_cap("cnorm");
+    terminal.control_codes[TERMCAP_HIDE_CURSOR] = curses_str_cap("civis");
 
     static const struct {
         Key key;
@@ -68,10 +68,10 @@ static void term_read_caps(void)
         {MOD_SHIFT | KEY_END, "kEND"},
     };
 
-    static_assert(ARRAY_COUNT(term_cap.keymap) == ARRAY_COUNT(key_cap_map));
+    static_assert(ARRAY_COUNT(terminal.keymap) == ARRAY_COUNT(key_cap_map));
     for (size_t i = 0; i < ARRAY_COUNT(key_cap_map); i++) {
-        term_cap.keymap[i].key = key_cap_map[i].key;
-        term_cap.keymap[i].code = curses_str_cap(key_cap_map[i].capname);
+        terminal.keymap[i].key = key_cap_map[i].key;
+        terminal.keymap[i].code = curses_str_cap(key_cap_map[i].capname);
     }
 }
 
@@ -84,9 +84,9 @@ static void term_init_fallback(const char *const term)
 
 #else
 
-static const TerminalCapabilities ansi_caps = {
+static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
-    .strings = {
+    .control_codes = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K"
     },
     .keymap = {
@@ -99,15 +99,15 @@ static const TerminalCapabilities ansi_caps = {
 
 static void term_init_fallback(const char *const UNUSED(term))
 {
-    term_cap = ansi_caps;
+    terminal = terminal_ansi;
 }
 
 #endif // ifndef TERMINFO_DISABLE
 
-static const TerminalCapabilities xterm_caps = {
-    .back_color_erase = false,
+static const TerminalInfo terminal_xterm = {
+    .can_bg_color_erase = false,
     .max_colors = 8,
-    .strings = {
+    .control_codes = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K",
         [TERMCAP_KEYPAD_OFF] = "\033[?1l\033>",
         [TERMCAP_KEYPAD_ON] = "\033[?1h\033=",
@@ -155,9 +155,9 @@ void term_init(const char *const term)
         || str_has_prefix(term, "xterm")
         || str_has_prefix(term, "screen")
     ) {
-        term_cap = xterm_caps;
+        terminal = terminal_xterm;
         if (str_has_suffix(term, "256color")) {
-            term_cap.max_colors = 256;
+            terminal.max_colors = 256;
         }
     } else {
         term_init_fallback(term);
