@@ -7,10 +7,7 @@ XARGS_P_FLAG = $(shell \
     echo '-P$(NPROC)' \
 )
 
-man1 := dte.1
-man5 := dte-syntax.5
-man  := $(man1) $(man5)
-
+man  := dte.1 dte-syntax.5
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 img  := public/screenshot.png
 web  := $(html) $(img) $(patsubst %, %.gz, $(html))
@@ -19,11 +16,11 @@ docs: man web
 man: $(man)
 web: $(web)
 
-$(man1): docs/dte.txt $(TTMAN)
+dte.1: docs/dte.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
-$(man5): docs/dte-syntax.txt $(TTMAN)
+dte-syntax.5: docs/dte-syntax.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
