@@ -9,6 +9,8 @@ v1.5 (unreleased)
 * Added syntax highlighting for Nginx config files
 * Added various POSIX and C11 features to C syntax highlighter.
 * Added proper formatting to man pages.
+* Added `-B` and `-b` command-line flags for listing and dumping
+  built-in rc files.
 * Fixed a terminal input bug triggered by redirecting `stdin`.
 * Fixed some (rare) memory and file descriptor leaks.
 * Fixed a few portability issues.

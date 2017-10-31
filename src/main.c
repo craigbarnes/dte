@@ -52,8 +52,11 @@ static int dump_builtin_config(const char *const name)
 
 int main(int argc, char *argv[])
 {
-    static const char *const opts = "[-hRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *const optstring = "hBRVb:c:t:r:";
+    static const char optstring[] = "hBRVb:c:t:r:";
+    static const char opts[] =
+        "[-hbBRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
+    static_assert(ARRAY_COUNT(opts) < 70);
+
     const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
