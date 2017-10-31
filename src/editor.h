@@ -37,8 +37,6 @@ typedef struct {
     bool everything_changed;
     bool resized;
     bool term_utf8;
-    int screen_w;
-    int screen_h;
     int cmdline_x;
     PointerArray search_history;
     PointerArray command_history;

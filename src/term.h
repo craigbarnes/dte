@@ -51,10 +51,11 @@ typedef struct {
     const char *code;
 } TermKeyMap;
 
-// See terminfo(5)
 typedef struct {
     bool can_bg_color_erase; // Can clear to end of line with bg color set
     int max_colors;
+    int width;
+    int height;
     const char *control_codes[NR_STR_CAPS];
     TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
 } TerminalInfo;

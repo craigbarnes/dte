@@ -24,7 +24,7 @@ void buf_reset(size_t start_x, size_t width, size_t scroll_x)
     obuf.scroll_x = scroll_x;
     obuf.tab_width = 8;
     obuf.tab = TAB_CONTROL;
-    obuf.can_clear = start_x + width == editor.screen_w;
+    obuf.can_clear = start_x + width == terminal.width;
 }
 
 // Does not update obuf.x

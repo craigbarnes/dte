@@ -23,8 +23,6 @@ EditorState editor = {
     .child_controls_terminal = false,
     .everything_changed = false,
     .resized = false,
-    .screen_w = 80,
-    .screen_h = 24,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
     .cmdline = CMDLINE_INIT,
@@ -122,8 +120,8 @@ void any_key(void)
 
 static void show_message(const char *const msg, bool is_error)
 {
-    buf_reset(0, editor.screen_w, 0);
-    buf_move_cursor(0, editor.screen_h - 1);
+    buf_reset(0, terminal.width, 0);
+    buf_move_cursor(0, terminal.height - 1);
     print_message(msg, is_error);
     buf_clear_eol();
 }
@@ -132,8 +130,8 @@ static void update_command_line(void)
 {
     char prefix = ':';
 
-    buf_reset(0, editor.screen_w, 0);
-    buf_move_cursor(0, editor.screen_h - 1);
+    buf_reset(0, terminal.width, 0);
+    buf_move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         print_message(error_buf, msg_is_error);
@@ -176,7 +174,7 @@ static void restore_cursor(void)
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        buf_move_cursor(editor.cmdline_x, editor.screen_h - 1);
+        buf_move_cursor(editor.cmdline_x, terminal.height - 1);
         break;
     case INPUT_GIT_OPEN:
         break;
@@ -296,7 +294,7 @@ void ui_end(void)
     };
 
     buf_set_color(&color);
-    buf_move_cursor(0, editor.screen_h - 1);
+    buf_move_cursor(0, terminal.height - 1);
     buf_show_cursor();
 
     // Back to main buffer

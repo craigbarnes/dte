@@ -209,10 +209,10 @@ void git_open_keypress(Key key)
         down(1);
         break;
     case KEY_PAGE_UP:
-        up(editor.screen_h - 2);
+        up(terminal.height - 2);
         break;
     case KEY_PAGE_DOWN:
-        down(editor.screen_h - 2);
+        down(terminal.height - 2);
         break;
     default:
         switch (cmdline_handle_key(&editor.cmdline, NULL, key)) {

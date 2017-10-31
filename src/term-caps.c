@@ -22,10 +22,13 @@ static char *curses_str_cap(const char *name)
     return str;
 }
 
+// See terminfo(5)
 static void term_read_caps(void)
 {
     terminal.can_bg_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
+    terminal.width = tigetnum("cols");
+    terminal.height = tigetnum("lines");
 
     static_assert(ARRAY_COUNT(terminal.control_codes) == 7);
     terminal.control_codes[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
@@ -86,6 +89,8 @@ static void term_init_fallback(const char *const term)
 
 static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
+    .width = 80,
+    .height = 24,
     .control_codes = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K"
     },
@@ -107,6 +112,8 @@ static void term_init_fallback(const char *const UNUSED(term))
 static const TerminalInfo terminal_xterm = {
     .can_bg_color_erase = false,
     .max_colors = 8,
+    .width = 80,
+    .height = 24,
     .control_codes = {
         [TERMCAP_CLEAR_TO_EOL] = "\033[K",
         [TERMCAP_KEYPAD_OFF] = "\033[?1l\033>",

@@ -238,7 +238,7 @@ static void hl_words(LineInfo *info)
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    max = info->pos + editor.screen_w * 4 + 8;
+    max = info->pos + terminal.width * 4 + 8;
 
     while (i < info->size) {
         if (info->colors[i] != cc || !is_word_byte(info->line[i])) {

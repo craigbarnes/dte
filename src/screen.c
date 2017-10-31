@@ -127,8 +127,8 @@ int print_command(char prefix)
     if (editor.cmdline.pos == editor.cmdline.buf.len) {
         w++;
     }
-    if (w > editor.screen_w) {
-        obuf.scroll_x = w - editor.screen_w;
+    if (w > terminal.width) {
+        obuf.scroll_x = w - terminal.width;
     }
 
     set_builtin_color(BC_COMMANDLINE);
@@ -223,7 +223,7 @@ static void print_separator(Window *win)
 {
     int y;
 
-    if (win->x + win->w == editor.screen_w) {
+    if (win->x + win->w == terminal.width) {
         return;
     }
 
@@ -286,8 +286,8 @@ void update_git_open(void)
 {
     int x = 0;
     int y = 0;
-    int w = editor.screen_w;
-    int h = editor.screen_h - 1;
+    int w = terminal.width;
+    int h = terminal.height - 1;
     int max_y = git_open.scroll + h - 1;
     int i = 0;
 
@@ -338,18 +338,18 @@ void update_git_open(void)
 
 void update_window_sizes(void)
 {
-    set_frame_size(root_frame, editor.screen_w, editor.screen_h - 1);
+    set_frame_size(root_frame, terminal.width, terminal.height - 1);
     update_window_coordinates();
 }
 
 void update_screen_size(void)
 {
-    if (!term_get_size(&editor.screen_w, &editor.screen_h)) {
-        if (editor.screen_w < 3) {
-            editor.screen_w = 3;
+    if (!term_get_size(&terminal.width, &terminal.height)) {
+        if (terminal.width < 3) {
+            terminal.width = 3;
         }
-        if (editor.screen_h < 3) {
-            editor.screen_h = 3;
+        if (terminal.height < 3) {
+            terminal.height = 3;
         }
         update_window_sizes();
     }
