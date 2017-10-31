@@ -38,10 +38,22 @@ static void handle_sigwinch(int UNUSED(signum))
 MESSAGE("SIGWINCH not defined; disabling handler")
 #endif
 
+static int dump_builtin_config(const char *const name)
+{
+    const char *const cfg = get_builtin_config(name);
+    if (cfg) {
+        fputs(cfg, stdout);
+        return 0;
+    } else {
+        fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
+        return 1;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     static const char *const opts = "[-hRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *const optstring = "hRVc:t:r:";
+    static const char *const optstring = "hRVb:c:t:r:";
     const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
@@ -67,6 +79,8 @@ int main(int argc, char *argv[])
         case 'R':
             read_rc = false;
             break;
+        case 'b':
+            return dump_builtin_config(optarg);
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017 Craig Barnes");
