@@ -83,29 +83,37 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
     strbuf_free(&line);
 }
 
+const char *get_builtin_config(const char *const name)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+        if (streq(name, builtin_configs[i].name)) {
+            return builtin_configs[i].source;
+        }
+    }
+    return NULL;
+}
+
 int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
 {
     const bool must_exist = flags & CFG_MUST_EXIST;
     const bool builtin = flags & CFG_BUILTIN;
 
     if (builtin) {
-        for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
-            if (streq(filename, builtin_configs[i].name)) {
-                config_file = filename;
-                config_line = 1;
-                const char *src = builtin_configs[i].source;
-                exec_config(cmds, src, strlen(src));
-                return 0;
-            }
-        }
-        if (must_exist) {
+        const char *const cfg = get_builtin_config(filename);
+        if (cfg) {
+            config_file = filename;
+            config_line = 1;
+            exec_config(cmds, cfg, strlen(cfg));
+            return 0;
+        } else if (must_exist) {
             error_msg (
                 "Error reading '%s': no built-in config exists for that path",
                 filename
             );
             return 1;
+        } else {
+            return 0;
         }
-        return 0;
     }
 
     char *buf;
