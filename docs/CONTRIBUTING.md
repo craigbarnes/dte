@@ -10,8 +10,9 @@ Pull Requests
 Bug Reports
 -----------
 
-* Check for existing bug reports before opening a new one.
-* Include error messages and test cases as Markdown [code blocks].
+* Check for existing [bug reports] before opening a new one.
+* Include any error messages or test cases as Markdown [code blocks].
+* Include the output of running `make vars`.
 * Avoid linking to external paste services.
 * Make test cases as minimal as possible.
 
@@ -31,4 +32,5 @@ Coding Style
 * Above all else, be consistent with the existing code.
 
 
+[bug reports]: https://github.com/craigbarnes/dte/issues
 [code blocks]: https://help.github.com/articles/creating-and-highlighting-code-blocks/#fenced-code-blocks
