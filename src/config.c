@@ -91,11 +91,11 @@ void list_builtin_configs(void)
     }
 }
 
-const char *get_builtin_config(const char *const name)
+const BuiltinConfig *get_builtin_config(const char *const name)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         if (streq(name, builtin_configs[i].name)) {
-            return builtin_configs[i].source;
+            return &builtin_configs[i];
         }
     }
     return NULL;
@@ -107,11 +107,11 @@ int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
     const bool builtin = flags & CFG_BUILTIN;
 
     if (builtin) {
-        const char *const cfg = get_builtin_config(filename);
+        const BuiltinConfig *cfg = get_builtin_config(filename);
         if (cfg) {
             config_file = filename;
             config_line = 1;
-            exec_config(cmds, cfg, strlen(cfg));
+            exec_config(cmds, cfg->source, cfg->source_len);
             return 0;
         } else if (must_exist) {
             error_msg (

@@ -40,9 +40,9 @@ MESSAGE("SIGWINCH not defined; disabling handler")
 
 static int dump_builtin_config(const char *const name)
 {
-    const char *const cfg = get_builtin_config(name);
+    const BuiltinConfig *cfg = get_builtin_config(name);
     if (cfg) {
-        fputs(cfg, stdout);
+        fputs(cfg->source, stdout);
         return 0;
     } else {
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);

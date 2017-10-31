@@ -31,12 +31,10 @@ FNR == 1 {
 
 END {
     print ";\n"
-    print "static const struct {"
-    print "    const char *const name;"
-    print "    const char *const source;"
-    print "} builtin_configs[" nfiles "] = {"
+    print "static const BuiltinConfig builtin_configs[" nfiles "] = {"
     for (i = 1; i <= nfiles; i++) {
-        print "    {\"" names[i]  "\", " idents[i] "},"
+        ident = idents[i]
+        print "    {\"" names[i]  "\", " ident ", ARRAY_COUNT(" ident ") - 1},"
     }
     print "};"
 }
