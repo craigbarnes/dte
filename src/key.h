@@ -18,6 +18,7 @@ enum {
     // (1 << 21) - 1, which can be used to represent special keys.
     KEY_SPECIAL_MIN = KEY_UNICODE_MAX + 1,
 
+    // Note: these must be kept in sync with the array of names in key.c
     KEY_INSERT = KEY_SPECIAL_MIN,
     KEY_DELETE,
     KEY_HOME,

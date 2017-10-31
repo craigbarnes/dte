@@ -5,6 +5,7 @@
 #include "ascii.h"
 #include "strbuf.h"
 
+// Note: these strings must be kept in sync with the enum in key.h
 static const char *const special_names[NR_SPECIAL_KEYS] = {
     "insert",
     "delete",
