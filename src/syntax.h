@@ -19,8 +19,11 @@ typedef enum {
     COND_HEREDOCEND,
 } ConditionType;
 
-typedef struct action {
-    struct state *destination;
+typedef struct State State;
+typedef struct HashStr HashStr;
+
+typedef struct {
+    State *destination;
 
     // If condition has no emit name this is set to destination state's
     // emit name or list name (COND_LIST).
@@ -30,11 +33,11 @@ typedef struct action {
     HlColor *emit_color;
 } Action;
 
-typedef struct hash_str {
-    struct hash_str *next;
+struct HashStr {
+    HashStr *next;
     int len;
     char str[1];
-} HashStr;
+};
 
 typedef struct {
     char *name;
@@ -74,12 +77,12 @@ typedef struct {
 } Condition;
 
 typedef struct {
-    struct state *state;
+    State *state;
     char *delim;
     int len;
 } HeredocState;
 
-typedef struct syntax {
+typedef struct {
     char *name;
     PointerArray states;
     PointerArray string_lists;
@@ -88,7 +91,7 @@ typedef struct syntax {
     bool used;
 } Syntax;
 
-typedef struct state {
+struct State {
     char *name;
     char *emit_name;
     PointerArray conds;
@@ -110,7 +113,7 @@ typedef struct state {
         Syntax *subsyntax;
         PointerArray states;
     } heredoc;
-} State;
+};
 
 typedef struct {
     Syntax *subsyn;
