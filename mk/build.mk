@@ -5,6 +5,7 @@ HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 AWK = awk
+VERSION = $(shell mk/version.sh 1.4)
 
 ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
@@ -15,13 +16,6 @@ else
     -lcurses \
   )
 endif
-
-_VERSION := 1.4
-VERSION = $(or \
-    $(shell git describe --match='v$(_VERSION)' 2>/dev/null | sed 's/^v//'), \
-    $(shell awk 'NR==1 && /^[a-f0-9]{40}$$/ {print "$(_VERSION)-" substr($$0,0,12) "-dist"}' .distinfo), \
-    $(_VERSION)-unknown \
-)
 
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
