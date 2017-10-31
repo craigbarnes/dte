@@ -53,7 +53,7 @@ static int dump_builtin_config(const char *const name)
 int main(int argc, char *argv[])
 {
     static const char *const opts = "[-hRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static const char *const optstring = "hRVb:c:t:r:";
+    static const char *const optstring = "hBRVb:c:t:r:";
     const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
@@ -81,6 +81,9 @@ int main(int argc, char *argv[])
             break;
         case 'b':
             return dump_builtin_config(optarg);
+        case 'B':
+            list_builtin_configs();
+            return 0;
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017 Craig Barnes");

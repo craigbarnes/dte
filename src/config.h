@@ -13,6 +13,7 @@ typedef enum {
 extern const char *config_file;
 extern int config_line;
 
+void list_builtin_configs(void);
 const char *get_builtin_config(const char *const name);
 void exec_config(const Command *cmds, const char *buf, size_t size);
 int do_read_config(const Command *cmds, const char *filename, ConfigFlags f);

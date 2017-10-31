@@ -6,7 +6,7 @@ dte
 
 @h1 SYNOPSIS
 
-*dte* [*-hRV*] [*-c* `command`] [*-t* `tag`] [*-r* `rcfile`] [*-b* `name`] [[*+*`line`] `file`]...
+*dte* [*-hBRV*] [*-c* `command`] [*-t* `tag`] [*-r* `rcfile`] [*-b* `name`] [[*+*`line`] `file`]...
 
 @h1 DESCRIPTION
 
@@ -25,7 +25,12 @@ A small and flexible text editor.
 	Read configuration from `rcfile` instead of $DTE_HOME/rc.
 
 *-b* `name`
-	Dump the built-in rc or syntax file with `name` and exit.
+	Dump the contents of the built-in rc or syntax file with `name`
+	and exit.
+
+*-B*
+	Print a list of all built-in config names that can be used with
+	the *-b* option and exit.
 
 *-R*
 	Don't read the rc file.

@@ -83,6 +83,14 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
     strbuf_free(&line);
 }
 
+void list_builtin_configs(void)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+        fputs(builtin_configs[i].name, stdout);
+        fputc('\n', stdout);
+    }
+}
+
 const char *get_builtin_config(const char *const name)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
