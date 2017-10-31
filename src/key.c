@@ -6,7 +6,7 @@
 #include "strbuf.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
-static const char *const special_names[NR_SPECIAL_KEYS] = {
+static const char *const special_names[] = {
     "insert",
     "delete",
     "home",
@@ -30,14 +30,15 @@ static const char *const special_names[NR_SPECIAL_KEYS] = {
     "F11",
     "F12",
 };
+static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
 
-static Key parse_modifiers(const char *str, Key *modifiersp)
+static Key parse_modifiers(const char *const str, Key *modifiersp)
 {
     Key modifiers = 0;
     Key i = 0;
 
     while (true) {
-        unsigned char ch = ascii_toupper(str[i]);
+        const unsigned char ch = ascii_toupper(str[i]);
 
         if (ch == '^' && str[i + 1] != 0) {
             modifiers |= MOD_CTRL;
@@ -64,7 +65,7 @@ bool parse_key(Key *key, const char *str)
     Key modifiers, ch;
 
     str += parse_modifiers(str, &modifiers);
-    size_t len = strlen(str);
+    const size_t len = strlen(str);
 
     size_t i = 0;
     ch = u_get_char(str, len, &i);
