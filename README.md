@@ -48,9 +48,6 @@ Then compile and install:
 The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
 works as usual.
 
-**Note**: In addition to the dependencies listed above, `dte` also
-requires a [POSIX 2008] compliant OS.
-
 Documentation
 -------------
 
@@ -58,6 +55,23 @@ After installing, you can access the documentation in man page format
 via `man dte` and `man dte-syntax`.
 
 These pages are also available as [dte.1.html] and [dte-syntax.5.html].
+
+Testing
+-------
+
+`dte` is tested on the following platforms:
+
+* Debian ([GitLab CI])
+* CentOS ([GitLab CI])
+* Alpine Linux ([GitLab CI])
+* Ubuntu ([GitLab CI] and [Travis CI])
+* Mac OS X ([Travis CI])
+* OpenBSD (occasional, manual testing)
+* FreeBSD (occasional, manual testing)
+
+Other [POSIX 2008] compatible platforms should also work, but may
+require build system fixes. [Bug reports] and/or [pull requests] are
+welcome.
 
 License
 -------
@@ -87,4 +101,8 @@ Public License version 2 for more details.
 [`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/
+[GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
+[Travis CI]: https://travis-ci.org/craigbarnes/dte
+[Bug reports]: https://github.com/craigbarnes/dte/issues
+[pull requests]: https://github.com/craigbarnes/dte/pulls
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
