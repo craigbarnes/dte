@@ -22,10 +22,11 @@ build:debian:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
-        - make vars check
+        - make vars check && make install && dte -V
         - export TERMINFO_DISABLE=1
-        - make clean && make vars dte CC=gcc
-        - make clean && make vars dte CC=clang
+        - make clean && make vars check CC=gcc
+        - make clean && make vars check CC=clang
+        - make clean && make vars check CC=tcc
         - make clean && make vars dte CC=arm-linux-gnueabihf-gcc
         - make clean && make vars dte CC=aarch64-linux-gnu-gcc
 
