@@ -61,11 +61,11 @@ Testing
 
 `dte` is tested on the following platforms:
 
-* Debian ([GitLab CI])
-* CentOS ([GitLab CI])
-* Alpine Linux ([GitLab CI])
-* Ubuntu ([GitLab CI] and [Travis CI])
-* Mac OS X ([Travis CI])
+* Debian ([CI][GitLab CI])
+* CentOS ([CI][GitLab CI])
+* Alpine Linux ([CI][GitLab CI])
+* Ubuntu ([CI][GitLab CI])
+* Mac OS X ([CI][Travis CI])
 * OpenBSD (occasional, manual testing)
 * FreeBSD (occasional, manual testing)
 
