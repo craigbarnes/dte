@@ -70,7 +70,6 @@ BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 BUILTIN_CONFIGS = \
     config/rc \
     config/filetype \
-    config/option \
     config/binding/default \
     config/binding/shift-select \
     config/color/light \

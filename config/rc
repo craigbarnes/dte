@@ -3,7 +3,6 @@ include -b color/light
 include -b compiler/gcc
 include -b compiler/go
 include -b filetype
-include -b option
 
 alias help "run man dte"
 alias man "run man"
