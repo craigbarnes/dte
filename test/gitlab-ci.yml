@@ -9,17 +9,13 @@ build:alpine:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     script: &SCRIPT
-        - make check
-        - make install
-        - dte -V
-        - strip dte && du -h dte
-        - ldd dte
-        - make clean && make uninstall
         - make check TERMINFO_DISABLE=1
-        - make install
-        - dte -V
-        - strip dte && du -h dte
         - ldd dte
+        - make clean
+        - make check
+        - ldd dte
+        - make install && dte -V
+        - strip dte && du -k -h dte
 
 build:debian:
     stage: build
