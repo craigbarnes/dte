@@ -1,10 +1,13 @@
 stages: [build, dist]
 
+before_script:
+    - git fetch --tags
+    - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
+
 build:alpine:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     script: &SCRIPT
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check
         - make install
         - dte -V
@@ -21,7 +24,6 @@ build:debian:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
         - make vars check && make install && dte -V
         - export TERMINFO_DISABLE=1
         - make clean && make vars check CC=gcc
@@ -46,8 +48,6 @@ pages:
     artifacts: {paths: [public]}
     only: [master]
     script: &PAGES_SCRIPT
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
-        - git fetch --tags
         - make docs
         - make vars check TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static'
         - strip dte
