@@ -1,6 +1,10 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
+#error C99 compiler required
+#endif
+
 #define ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))
 #define DO_PRAGMA(x) _Pragma(#x)
 
@@ -32,7 +36,7 @@
 #define RETURNS_NONNULL
 #endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if __STDC_VERSION__ >= 201112L
 #define NORETURN _Noreturn
 #elif defined(__GNUC__)
 #define NORETURN __attribute__((__noreturn__))
@@ -40,7 +44,7 @@
 #define NORETURN
 #endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if __STDC_VERSION__ >= 201112L
 #define static_assert(x) _Static_assert((x), #x)
 #else
 #define static_assert(x)
