@@ -12,8 +12,8 @@ typedef enum {
 
 typedef struct {
     const char *const name;
-    const char *const source;
-    size_t source_len;
+    const char *const text;
+    size_t text_len;
 } BuiltinConfig;
 
 extern const char *config_file;
