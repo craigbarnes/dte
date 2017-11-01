@@ -1,3 +1,10 @@
+# This config rebinds cursor movement keys so that pressing
+# Shift+key starts (or continues) selecting an area of text
+# while pressing a key without Shift will end the selection.
+#
+# This config is not loaded by default. To use it, add
+# "include -b binding/shift-select" to your personal rc file.
+
 bind up 'unselect; up'
 bind down 'unselect; down'
 bind left 'unselect; left'
