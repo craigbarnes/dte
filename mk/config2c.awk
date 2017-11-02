@@ -7,8 +7,8 @@ function escape_ident(s) {
 
 function escape_string(s) {
     gsub(/^ +/, "", s)
-    gsub(/\\/, "\\\\", s)
-    gsub(/"/, "\\\"", s)
+    gsub(/\\/, "\\134", s)
+    gsub(/"/, "\\042", s)
     return s
 }
 
