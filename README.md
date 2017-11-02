@@ -54,8 +54,14 @@ Documentation
 After installing, you can access the documentation in man page format
 via `man 1 dte`, `man 5 dterc` and `man 5 dte-syntax`.
 
-These pages are also available as [dte.1.html], [dterc.5.html] and
-[dte-syntax.5.html].
+These pages are also available online in HTML and PDF formats:
+
+* [dte.1.html](https://craigbarnes.gitlab.io/dte/dte.1.html)
+* [dterc.5.html](https://craigbarnes.gitlab.io/dte/dterc.5.html)
+* [dte-syntax.5.html](https://craigbarnes.gitlab.io/dte/dte-syntax.5.html)
+* [dte.1.pdf](https://craigbarnes.gitlab.io/dte/dte.1.pdf)
+* [dterc.5.pdf](https://craigbarnes.gitlab.io/dte/dterc.5.pdf)
+* [dte-syntax.5.pdf](https://craigbarnes.gitlab.io/dte/dte-syntax.5.pdf)
 
 Testing
 -------
@@ -97,9 +103,6 @@ Public License version 2 for more details.
 [ncurses]: https://www.gnu.org/software/ncurses/
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
-[dte.1.html]: https://craigbarnes.gitlab.io/dte/dte.1.html
-[dterc.5.html]: https://craigbarnes.gitlab.io/dte/dterc.5.html
-[dte-syntax.5.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.5.html
 [`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/

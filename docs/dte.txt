@@ -6,7 +6,7 @@ dte \- A small and flexible text editor
 
 @h1 SYNOPSIS
 
-*dte* [*-hBRV*] [*-c* `command`] [*-t* `tag`] [*-r* `rcfile`] [*-b* `name`] [[*+*`line`] `file`]...
+*dte* [*-hBRV*] [*-c* `command`] [*-t* `tag`] [*-r* `rcfile`] [*-b* `name`] [[+`line`] `file`]...
 
 @h1 OPTIONS
 
