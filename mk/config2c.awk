@@ -6,9 +6,9 @@ function escape_ident(s) {
 }
 
 function escape_string(s) {
-    gsub(/\\/, "\\134", s)
-    gsub(/"/, "\\042", s)
     gsub(/^ +/, "", s)
+    gsub(/\\/, "\\\\", s)
+    gsub(/"/, "\\\"", s)
     return s
 }
 
@@ -20,7 +20,6 @@ FNR == 1 {
     gsub(/^config\//, "", name)
     ident = "builtin_" escape_ident(name)
     print "static const char " ident "[] ="
-
     names[++nfiles] = name
     idents[nfiles] = ident
 }
@@ -34,7 +33,7 @@ END {
     print "static const BuiltinConfig builtin_configs[" nfiles "] = {"
     for (i = 1; i <= nfiles; i++) {
         ident = idents[i]
-        print "    {\"" names[i]  "\", " ident ", ARRAY_COUNT(" ident ") - 1},"
+        print "    {\"" names[i] "\", " ident ", ARRAY_COUNT(" ident ") - 1},"
     }
     print "};"
 }
