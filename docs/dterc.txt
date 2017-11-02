@@ -2,7 +2,7 @@
 
 @h1 NAME
 
-dterc \- Command and configuration language for the *dte*(1) editor
+dterc \- Command and configuration language used by *dte*(1)
 
 @h1 COMMAND SYNTAX
 
