@@ -48,28 +48,14 @@ Can't contain single quotes, no escaping possible.
 
 May contain the following escapes:
 
-@li \\a
-Bell
-@li \\b
-Backspace
-@li \\t
-Horizontal tab
-@li \\n
-New line
-@li \\v
-Vertical tab
-@li \\f
-Form feed
-@li \\r
-Carriage return
-@li \\\\
-Literal \\
-@li \\x0a
+@li *\\a \\b \\t \\n \\v \\f \\r \\\\*
+Control characters (same as in C)
+@li *\\x*0a
 Hexadecimal byte value 0x0a. Note that 0x00 is not supported because
 strings are NUL-terminated.
-@li \\u20ac
+@li *\\u*20ac
 Four hex digit unicode code point U+20AC.
-@li \\U000020ac
+@li *\\U*000020ac
 Eight hex digit unicode code point U+20AC.
 
 @h1 COMMANDS
