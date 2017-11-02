@@ -52,9 +52,10 @@ Documentation
 -------------
 
 After installing, you can access the documentation in man page format
-via `man dte` and `man dte-syntax`.
+via `man 1 dte`, `man 5 dterc` and `man 5 dte-syntax`.
 
-These pages are also available as [dte.1.html] and [dte-syntax.5.html].
+These pages are also available as [dte.1.html], [dterc.5.html] and
+[dte-syntax.5.html].
 
 Testing
 -------
@@ -97,6 +98,7 @@ Public License version 2 for more details.
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [dte.1.html]: https://craigbarnes.gitlab.io/dte/dte.1.html
+[dterc.5.html]: https://craigbarnes.gitlab.io/dte/dterc.5.html
 [dte-syntax.5.html]: https://craigbarnes.gitlab.io/dte/dte-syntax.5.html
 [`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html

@@ -51,7 +51,7 @@ pages:
         - du -h dte
         - ldd dte || true
         - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
-        - tar -czf "public/$TARNAME.tar.gz" dte dte.1 dte-syntax.5
+        - tar -czf "public/$TARNAME.tar.gz" dte dte.1 dterc.5 dte-syntax.5
         - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
         - tree public/
 

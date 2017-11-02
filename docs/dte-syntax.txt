@@ -1,8 +1,8 @@
-@title DTE-SYNTAX 5 2012
+@title DTE-SYNTAX 5 "November 2017"
 
 @h1 NAME
 
-Syntax of syntax highlighting files used by *dte*(1).
+dte\-syntax \- Format of the syntax highlighting files used by *dte*(1).
 
 @h1 DESCRIPTION
 
@@ -158,12 +158,14 @@ the return state defined in the main syntax. Whole sub-syntax tree is
 copied into the main syntax and all destination states in the sub-syntax
 whose name is END are replaced with "c".
 
-@h1 AUTHORS
-
-Timo Hirvonen <tihirvon\@gmail.com>
-
 @h1 SEE ALSO
 
 *dte*(1)
 
+*dterc*(5)
+
 `https://github.com/craigbarnes/dte/tree/master/config/syntax`
+
+@h1 AUTHORS
+
+Timo Hirvonen <tihirvon\@gmail.com>
