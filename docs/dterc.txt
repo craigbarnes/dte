@@ -6,16 +6,18 @@ dterc \- Command and configuration language used by *dte*(1)
 
 @h1 COMMAND SYNTAX
 
-The *dte* command language syntax is similar to shell but simpler.
+*dterc* is the language used in *dte*(1) *r*untime *c*onfiguration files
+and also in the command mode used from within the editor.
+
+The syntax of the language is quite similar to shell, but much simpler.
 
 Commands are separated either by a newline or ";" character. To make a
-command span multiple lines in an rc file escape the newline (put
-\\ at end of the line).
+command span multiple lines in an rc file, escape the newline (put
+"\\" at the end of the line).
 
 Rc files can contain comments at the start of a line. Comments begin
-with a "#" character and can be indented, but you can't put a comment on
-same line as a command. This decision was made to make it possible to
-include "#" in commands without escaping.
+with a "#" character and can be indented, but they can't be put on the
+same line as a command.
 
 Commands can contain environment variables. Variables always expand into
 a single argument even if they contain whitespace. Variables inside
@@ -31,18 +33,17 @@ if $FILE contains whitespace.
 
 @h2 Special variables
 
-These are always defined and override environment variables of same
-name.
+These variables are always defined and override environment variables of
+the same name.
 
 *$FILE*
-	Current file. Empty string if there's no filename.
+	The filename of the current buffer (or an empty string if unsaved).
 *$WORD*
-	Selected text or word under cursor. Empty string if there's no
-	selection and cursor is not on a word.
+	The selected text or the word under the cursor.
 
 @h2 Single quoted strings
 
-Can't contain single quotes, no escaping possible.
+Can't contain single quotes or escaped characters.
 
 @h2 Double quoted strings
 
