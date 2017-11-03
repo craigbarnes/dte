@@ -27,7 +27,7 @@ Installation
 To build `dte` from source, first download and extract the latest
 release tarball:
 
-    wget https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz
+    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz
     tar -xzf dte-1.5.tar.gz
     cd dte-1.5
 
