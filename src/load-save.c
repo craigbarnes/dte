@@ -204,6 +204,11 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
             close(fd);
             return -1;
         }
+        if (b->st.st_size >= 256LL * 1024LL * 1024LL) {
+            error_msg("File exceeds 256MiB file size limit %s", filename);
+            close(fd);
+            return -1;
+        }
 
         if (read_blocks(b, fd)) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
