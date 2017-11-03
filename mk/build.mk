@@ -5,14 +5,16 @@ HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 AWK = awk
+PKGCONFIG = pkg-config
+PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.5)
 
 ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
   LDLIBS = $(or \
-    $(shell pkg-config --libs tinfo 2>/dev/null), \
-    $(shell pkg-config --libs ncurses 2>/dev/null), \
+    $(call PKGLIBS, tinfo), \
+    $(call PKGLIBS, ncurses), \
     -lcurses \
   )
 endif
