@@ -42,37 +42,37 @@ dte \- A small and flexible text editor
 Here's some of the default key bindings. *M-x* means Alt+x and
 *^V* is Ctrl+v.
 
-@li M-s
+@li *M-s*
 Select
-@li M-l
+@li *M-l*
 Select lines
-@li ^C
+@li *^C*
 Copy current line or selection
-@li ^X
+@li *^X*
 Cut current line or selection
-@li ^V
+@li *^V*
 Paste
-@li ^Z
+@li *^Z*
 Undo
-@li ^Y
+@li *^Y*
 Redo
-@li M-x
+@li *M-x*
 Enter command mode
-@li ^F
+@li *^F*
 Enter search mode
-@li F3
+@li *F3*
 Search next
-@li F4
+@li *F4*
 Search previous
-@li ^T
+@li *^T*
 Open new tab
-@li M-`N`
+@li *M-*`N`
 Activate `N`th tab
-@li ^W
+@li *^W*
 Close tab
-@li ^S
+@li *^S*
 Save file
-@li ^Q
+@li *^Q*
 Quit
 
 @h1 COMMAND MODE
@@ -84,35 +84,35 @@ self-explanatory. For a full list of available commands, see *dterc*(5).
 
 The default key bindings for command mode are:
 
-@li left
+@li *left*
 Move left
-@li right
+@li *right*
 Move right
-@li up/down
+@li *up*/*down*
 Browse previous command history.
-@li tab
+@li *tab*
 Auto-complete current command or argument
-@li ^A
+@li *^A*
 Go to beginning of command line
-@li ^B
+@li *^B*
 Move left
-@li ^C
+@li *^C*
 Exit command mode
-@li ^D
+@li *^D*
 Delete
-@li ^E
+@li *^E*
 Go to end of command line
-@li ^F
+@li *^F*
 Move right
-@li ^K
+@li *^K*
 Delete to end of command line
-@li ^U
+@li *^U*
 Delete to beginning of command line
-@li ^V
+@li *^V*
 Insert special character
-@li ^W
+@li *^W*
 Erase word
-@li Esc
+@li *Esc*
 Exit command mode
 
 @h1 SEARCH MODE
@@ -123,9 +123,9 @@ in the current buffer.
 The key bindings for search mode are mostly the same as in command mode,
 plus these additional keys:
 
-@li M-c
+@li *M-c*
 Toggle case sensitive search option.
-@li M-r
+@li *M-r*
 Reverse search direction.
 
 @h1 ENVIRONMENT
