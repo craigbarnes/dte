@@ -1,11 +1,11 @@
 CC ?= gcc
-CFLAGS ?= -g -O2
+CFLAGS ?= -O2
 LDFLAGS ?=
 HOST_CC ?= $(CC)
 HOST_CFLAGS ?= $(CFLAGS)
 HOST_LDFLAGS ?=
 AWK = awk
-VERSION = $(shell mk/version.sh 1.4)
+VERSION = 1.5
 
 ifdef TERMINFO_DISABLE
   build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
@@ -61,7 +61,7 @@ else
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 2: Enable logging to $(DTE_HOME)/debug.log
   # 3: Enable expensive sanity checks
-  DEBUG = 1
+  DEBUG = 0
 endif
 
 BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)

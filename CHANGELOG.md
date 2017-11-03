@@ -1,8 +1,8 @@
 dte changelog
 =============
 
-v1.5 (unreleased)
------------------
+v1.5 (latest release)
+---------------------
 
 **Changes:**
 
@@ -10,14 +10,20 @@ v1.5 (unreleased)
 * Added some POSIX and C11 features to the C syntax highlighter.
 * Added new command-line flags for listing (`-B`) and dumping
   (`-b`) built-in rc files.
-* Split some of the `dte(1)` man page into a separate `dterc(5)`
-  page.
+* Moved some of the documentation in the `dte(1)` man page to a
+  separate `dterc(5)` page.
 * Fixed a terminal input bug triggered by redirecting `stdin`.
 * Fixed some memory and file descriptor leaks.
 * Fixed a few portability issues.
 
-v1.4 (latest release)
----------------------
+**Downloads:**
+
+* [dte-1.5.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz)
+* [dte-1.5.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz.sig)
+* [dte-1.5.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz.sha256sum)
+
+v1.4
+----
 
 Released on 2017-10-16.
 
