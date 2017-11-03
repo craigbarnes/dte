@@ -6,15 +6,15 @@ v1.5 (unreleased)
 
 **Changes:**
 
-* Added syntax highlighting for Nginx config files
-* Added various POSIX and C11 features to C syntax highlighter.
-* Added proper formatting to man pages.
-* Added `-B` and `-b` command-line flags for listing and dumping
-  built-in rc files.
+* Added syntax highlighting for Nginx config files.
+* Added some POSIX and C11 features to the C syntax highlighter.
+* Added new command-line flags for listing (`-B`) and dumping
+  (`-b`) built-in rc files.
+* Split some of the `dte(1)` man page into a separate `dterc(5)`
+  page.
 * Fixed a terminal input bug triggered by redirecting `stdin`.
-* Fixed some (rare) memory and file descriptor leaks.
+* Fixed some memory and file descriptor leaks.
 * Fixed a few portability issues.
-* Many code quality and style fixes.
 
 v1.4 (latest release)
 ---------------------
