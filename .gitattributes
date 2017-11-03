@@ -8,6 +8,7 @@
 .travis.yml export-ignore
 docs/CONTRIBUTING.md export-ignore
 test/gitlab-ci.yml export-ignore
+test/extract-readme-code.sed export-ignore
 mk/dev.mk export-ignore
 mk/git-hooks/ export-ignore
 mk/sha256sums.txt export-ignore
