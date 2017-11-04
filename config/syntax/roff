@@ -1,0 +1,41 @@
+syntax roff
+
+state line-start
+    char -b '.' request
+    char "\n" line-start
+    noeat text
+
+state request
+    char -b a-zA-Z request
+    inlist section section
+    noeat text
+
+state escape-start escape
+    char -b '"#' comment
+    char -b f font-selection
+    char "\\.%! |^&)/~:{}acdeEprtu-" text escape
+    eat text error
+
+state font-selection escape
+    char -b RBI text escape
+    noeat text
+
+state text
+    char -b '\\' escape-start
+    char "\n" line-start
+    eat text
+
+state comment
+    recolor comment
+    char "\n" line-start
+    eat comment
+
+state section
+    char "\n" line-start
+    eat section
+
+list section .SH .SS
+
+default special escape
+default string request
+default keyword section

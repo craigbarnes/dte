@@ -84,7 +84,7 @@ BUILTIN_CONFIGS = \
 BUILTIN_SYNTAX_FILES = $(addprefix config/syntax/, \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     html+smarty ini java javascript lua mail make markdown meson nginx \
-    php python robotstxt ruby sh smarty sql vala xml )
+    php python robotstxt roff ruby sh smarty sql vala xml )
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
