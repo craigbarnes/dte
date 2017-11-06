@@ -638,26 +638,26 @@ Global values of these options serve as default values for local
 	errors should be highlighted. Set to "" to disable.
 
 	*auto-indent*
-		If *expand-tab* is true then same as
-		*tab-after-indent,tab-indent* otherwise same as
-		*space-indent*.
+		If the *expand-tab* option is enabled then this is the
+		same as "tab-after-indent,tab-indent". Otherwise it's
+		the same as "space-indent".
 
 	*space-align*
-		Display spaces used as alignment after tabs in
-		indentation as error.
+		Highlight spaces used for alignment after tab
+		indents as errors.
 
 	*space-indent*
-		Display spaces in indentation as error. Note that this
-		still allows using less than *tab-width* spaces at end
-		of indentation for alignment.
+		Highlight space indents as errors. Note that this
+		still allows using less than *tab-width* spaces at the
+		end of indentation for alignment.
 
 	*tab-after-indent*
-		Display tabs used anywhere else but indentation as
+		Highlight tabs used anywhere other than indentation as
 		errors.
 
 	*tab-indent*
-		Display tabs in indentation as errors. If you set this
-		you most likely want to set *tab-after-indent* too.
+		Highlight tabs in indentation as errors. If you set this
+		you most likely want to set "tab-after-indent" too.
 
 	*special*
 		Display all characters that look like regular space as
@@ -666,7 +666,8 @@ Global values of these options serve as default values for local
 		in some keyboard layouts).
 
 	*trailing*
-		Display trailing whitespace as error.
+		Highlight trailing whitespace characters at the end of
+		lines as errors.
 
 @h2 Local only options
 
