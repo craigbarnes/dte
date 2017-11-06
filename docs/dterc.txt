@@ -600,7 +600,7 @@ Global values of these options serve as default values for local
 	current line.
 
 *detect-indent* [""]
-	Comma separated list of indent widths (1-8) to detect
+	Comma-separated list of indent widths (1-8) to detect
 	automatically when file is opened. Set to "" to disable. Tab
 	indentation is detected if the value is not "". Adjusts
 	following options if indentation style is detected:
@@ -634,13 +634,13 @@ Global values of these options serve as default values for local
 	*format-paragraph*.
 
 *ws-error* [special]
-	Comma separated list of flags that describe what whitespace
+	Comma-separated list of flags that describe which whitespace
 	errors should be highlighted. Set to "" to disable.
 
 	*auto-indent*
 		If *expand-tab* is true then same as
-		`tab-after-indent,tab-indent` otherwise same as
-		`space-indent`.
+		*tab-after-indent,tab-indent* otherwise same as
+		*space-indent*.
 
 	*space-align*
 		Display spaces used as alignment after tabs in
@@ -648,7 +648,7 @@ Global values of these options serve as default values for local
 
 	*space-indent*
 		Display spaces in indentation as error. Note that this
-		still allows using less than `tab-width` spaces at end
+		still allows using less than *tab-width* spaces at end
 		of indentation for alignment.
 
 	*tab-after-indent*
@@ -657,7 +657,7 @@ Global values of these options serve as default values for local
 
 	*tab-indent*
 		Display tabs in indentation as errors. If you set this
-		you most likely want to set `tab-after-indent` too.
+		you most likely want to set *tab-after-indent* too.
 
 	*special*
 		Display all characters that look like regular space as
@@ -671,8 +671,8 @@ Global values of these options serve as default values for local
 @h2 Local only options
 
 *brace-indent* [false]
-	Scan for { and } when calculating indentation size. Depends on
-	the *auto-indent* option.
+	Scan for "{" and "}" characters when calculating indentation size.
+	Depends on the *auto-indent* option.
 
 *filetype* [none]
 	Type of file. Value must be previously registered using the *ft*
