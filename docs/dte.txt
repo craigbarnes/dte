@@ -84,10 +84,6 @@ self-explanatory. For a full list of available commands, see *dterc*(5).
 
 The default key bindings for command mode are:
 
-@li *left*
-Move left
-@li *right*
-Move right
 @li *up*/*down*
 Browse previous command history.
 @li *tab*
