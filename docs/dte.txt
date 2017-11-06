@@ -145,7 +145,8 @@ Reverse search direction.
 	enabled.
 
 *$DTE_HOME/file-history*
-	Last edited files and cursor positions.
+	Last edited files and cursor positions. Used only if the
+	*file-history* option is enabled.
 
 *$DTE_HOME/command-history* and *$DTE_HOME/search-history*
 	Command and search history.
