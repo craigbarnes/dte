@@ -4,6 +4,93 @@
 
 dterc \- Command and configuration language used by *dte*(1)
 
+@h1 SYNOPSIS
+
+*alias* `name` `command`@br
+*bind* `key` [`command`]@br
+*bof*@br
+*bol*@br
+*bolsf*@br
+*case* [*-lu*]@br
+*cd* `directory`@br
+*center-view*@br
+*clear*@br
+*close* [*-fqw*]@br
+*command* [`text`]@br
+*compile* [*-1ps*] `errorfmt` `command` [`parameters`]...@br
+*copy*@br
+*cut*@br
+*delete*@br
+*delete-eol* [*-n*]@br
+*delete-word* [*-s*]@br
+*down*@br
+*eof*@br
+*eol*@br
+*eolsf*@br
+*erase*@br
+*erase-bol*@br
+*erase-word* [*-s*]@br
+*errorfmt* [*-i*] `compiler` `regexp` [*file*|*line*|*column*|*message*]...@br
+*filter* `command` [`parameter`]...@br
+*format-paragraph* [`width`]@br
+*ft* `filetype` `extensions`...@br
+*ft* *-c* `filetype` `regexp`...@br
+*ft* *-f* `filetype` `regexp`...@br
+*ft* *-i* `filetype` `interpreters`...@br
+*git-open*@br
+*hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...@br
+*include* `file`@br
+*insert* [*-km*] `text`@br
+*insert-special*@br
+*join*@br
+*left*@br
+*line* `number`@br
+*load-syntax* `filename`|`filetype`@br
+*move-tab* `N`|*left*|*right*@br
+*msg* [*-np*]@br
+*new-line*@br
+*next*@br
+*open* [*-e* `encoding`] [`file`]...@br
+*option* `filetype` `option` `value`...@br
+*option* [*-r*] `regexp` `option` `value`...@br
+*pass-through* [*-ms*] `command` [`parameter`]...@br
+*paste*@br
+*pgdown*@br
+*pgup*@br
+*prev*@br
+*quit* [*-f*]@br
+*redo* [`choice`]@br
+*repeat* `count` `command` [`parameters`]...@br
+*replace* [*-bcgi*] `pattern` `replacement`@br
+*right*@br
+*run* [*-ps*] `command` [`parameters`]...@br
+*save* [*-dfup*] [*-e* `encoding`] [`filename`]@br
+*scroll-down*@br
+*scroll-pgdown*@br
+*scroll-pgup*@br
+*scroll-up*@br
+*search* [*-Hnprw*] [`pattern`]@br
+*select* [*-bkl*]@br
+*set* [*-gl*] `option` [`value`] ...@br
+*setenv* `name` `value`@br
+*shift* `count`@br
+*suspend*@br
+*tag* [*-r*] [`tag`]@br
+*toggle* [*-gv*] `option` [`values`]...@br
+*undo*@br
+*unselect*@br
+*up*@br
+*view* `N`|*last*@br
+*wclose* [*-f*]@br
+*wflip*@br
+*wnext*@br
+*word-bwd* [*-s*]@br
+*word-fwd* [*-s*]@br
+*wprev*@br
+*wresize* [*-hv*] [`N`|*+*`N`|*-- -*`N`]@br
+*wsplit* [*-bhr*] [`file`]...@br
+*wswap*@br
+
 @h1 COMMAND SYNTAX
 
 *dterc* is the language used in *dte*(1) *r*untime *c*onfiguration files
@@ -184,7 +271,7 @@ Eight hex digit unicode code point U+20AC.
 
 	*-s* be more "aggressive"
 
-*errorfmt* [*-i*] <`compiler`> <`regexp`> [file|line|column|message]...
+*errorfmt* [*-i*] <`compiler`> <`regexp`> [*file*|*line*|*column*|*message*]...
 
 	*-i* ignore this error
 
