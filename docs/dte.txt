@@ -148,8 +148,12 @@ Reverse search direction.
 	Last edited files and cursor positions. Used only if the
 	*file-history* option is enabled.
 
-*$DTE_HOME/command-history* and *$DTE_HOME/search-history*
-	Command and search history.
+*$DTE_HOME/command-history*
+	History of *dterc*(5) commands previously used while in
+	command mode.
+
+*$DTE_HOME/search-history*
+	History of search patterns previously used in search mode.
 
 @h1 SEE ALSO
 
