@@ -39,7 +39,7 @@ dterc \- Command and configuration language used by *dte*(1)
 *ft* *-i* `filetype` `interpreters`...@br
 *git-open*@br
 *hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...@br
-*include* `file`@br
+*include* [*-b*] `file`@br
 *insert* [*-km*] `text`@br
 *insert-special*@br
 *join*@br
@@ -358,8 +358,10 @@ Eight hex digit unicode code point U+20AC.
 	If you don't set fg/bg for the highlight color "default" then
 	terminal's default fg/bg is used.
 
-*include* <`file`>
+*include* [*-b*] <`file`>
 	Read commands from `file`.
+
+	*-b* read built-in `file` instead of reading from the filesystem
 
 *insert* [*-km*] <`text`>
 	Insert `text` into the buffer.
