@@ -16,6 +16,24 @@ NORETURN static void malloc_fail (
     abort();
 }
 
+size_t size_multiply(size_t a, size_t b)
+{
+    if (unsigned_mult_overflows(a, b)) {
+        char buf[256] = {'\0'};
+        term_cleanup();
+        snprintf (
+            buf,
+            255,
+            "size_t overflow: %" PRIuMAX " * %" PRIuMAX "\n",
+            (uintmax_t)a,
+            (uintmax_t)b
+        );
+        fputs(buf, stderr);
+        exit(1);
+    }
+    return a * b;
+}
+
 void *xmalloc(size_t size)
 {
     BUG_ON(size == 0);
