@@ -33,10 +33,7 @@ dterc \- Command and configuration language used by *dte*(1)
 *errorfmt* [*-i*] `compiler` `regexp` [*file*|*line*|*column*|*message*]...@br
 *filter* `command` [`parameter`]...@br
 *format-paragraph* [`width`]@br
-*ft* `filetype` `extensions`...@br
-*ft* *-c* `filetype` `regexp`...@br
-*ft* *-f* `filetype` `regexp`...@br
-*ft* *-i* `filetype` `interpreters`...@br
+*ft* [*-cfi*] `filetype` `association`...@br
 *git-open*@br
 *hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...@br
 *include* [*-b*] `file`@br
@@ -52,7 +49,7 @@ dterc \- Command and configuration language used by *dte*(1)
 *next*@br
 *open* [*-e* `encoding`] [`file`]...@br
 *option* `filetype` `option` `value`...@br
-*option* [*-r*] `regexp` `option` `value`...@br
+*option* *-r* `regexp` `option` `value`...@br
 *pass-through* [*-ms*] `command` [`parameter`]...@br
 *paste*@br
 *pgdown*@br
@@ -148,7 +145,7 @@ Eight hex digit unicode code point U+20AC.
 
 @h1 COMMANDS
 
-*alias* <`name`> <`command`>
+*alias* `name` `command`
 	Create an alias `name` for `command`.
 
 	Example:
@@ -157,7 +154,7 @@ Eight hex digit unicode code point U+20AC.
 	Now you can run "read file.txt" to insert file.txt into the current
 	buffer.
 
-*bind* <`key`> [`command`]
+*bind* `key` [`command`]
 	Bind `command` to `key`. If no `command` is given then any existing
 	binding for `key` is removed.
 
@@ -193,7 +190,7 @@ Eight hex digit unicode code point U+20AC.
 
 	*-u* upper case
 
-*cd* <`directory`>
+*cd* `directory`
 	Change directory. Updates $PWD and $OLDPWD. "*cd -*" changes to
 	previous directory ($OLDPWD).
 
@@ -216,7 +213,7 @@ Eight hex digit unicode code point U+20AC.
 	Enter command line. If `text` is given then it is written to the
 	command line (see the default binding *^L* why this is useful).
 
-*compile* [*-1ps*] <`errorfmt`> <`command`> [`parameters`]...
+*compile* [*-1ps*] `errorfmt` `command` [`parameters`]...
 	Run external `command` and collect error messages. This can be
 	used to run *make*(1) and *grep*(1).
 
@@ -271,13 +268,13 @@ Eight hex digit unicode code point U+20AC.
 
 	*-s* be more "aggressive"
 
-*errorfmt* [*-i*] <`compiler`> <`regexp`> [*file*|*line*|*column*|*message*]...
+*errorfmt* [*-i*] `compiler` `regexp` [*file*|*line*|*column*|*message*]...
 
 	*-i* ignore this error
 
 	See *compile* and *msg* commands for more information.
 
-*filter* <`command`> [`parameter`]...
+*filter* `command` [`parameter`]...
 	Filter selected text or whole file through external `command`.
 
 	Example: filter sort -r
@@ -291,17 +288,17 @@ Eight hex digit unicode code point U+20AC.
 	multiple paragraphs use the external *fmt*(1) program with the
 	*filter* command, e.g. *filter fmt -w 60*.
 
-*ft* <`filetype`> <`extensions`>...
+*ft* `filetype` `extensions`...
 	Associate filename `extensions` with `filetype`.
 
-*ft* *-c* <`filetype`> <`regexp`>...
+*ft* *-c* `filetype` `regexp`...
 	Detect `filetype` by matching `regexp` against first line of
 	file.
 
-*ft* *-f* <`filetype`> <`regexp`>...
+*ft* *-f* `filetype` `regexp`...
 	Detect filetype by matching the regexp against filename.
 
-*ft* *-i* <`filetype`> <`interpreters`>...
+*ft* *-i* `filetype` `interpreters`...
 	Associate `interpreters` with `filetype`. Interpreters are parsed
 	from the *#!* line in many scripts.
 
@@ -323,7 +320,7 @@ Eight hex digit unicode code point U+20AC.
 	@li M-t
 	Go to top of file list.
 
-*hi* <`name`> [`fg-color` [`bg-color`]] [`attribute`]...
+*hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...
 	Set highlight color.
 
 	Colors:
@@ -358,12 +355,12 @@ Eight hex digit unicode code point U+20AC.
 	If you don't set fg/bg for the highlight color "default" then
 	terminal's default fg/bg is used.
 
-*include* [*-b*] <`file`>
+*include* [*-b*] `file`
 	Read commands from `file`.
 
 	*-b* read built-in `file` instead of reading from the filesystem
 
-*insert* [*-km*] <`text`>
+*insert* [*-km*] `text`
 	Insert `text` into the buffer.
 
 	*-k* insert one character at a time as if it has been typed
@@ -385,13 +382,13 @@ Eight hex digit unicode code point U+20AC.
 *left*
 	Move left.
 
-*line* <`number`>
+*line* `number`
 	Go to line.
 
-*load-syntax* <`filename`|`filetype`>
+*load-syntax* `filename`|`filetype`
 	If argument contains / it is considered a filename.
 
-*move-tab* <`N`|*left*|*right*>
+*move-tab* `N`|*left*|*right*
 	Move current tab to position `N` or 1 position left or right.
 
 *msg* [*-np*]
@@ -418,14 +415,14 @@ Eight hex digit unicode code point U+20AC.
 		Set file `encoding`. See "iconv -l" for list of supported
 		encodings.
 
-*option* <`filetype`> <`option`> <`value`>...
+*option* `filetype` `option` `value`...
 	Add automatic `option` for `filetype`. Options are automatically
 	set when file is opened.
 
-*option* [*-r*] <`regexp`> <`option`> <`value`>...
+*option* *-r* `regexp` `option` `value`...
 	Add automatic `option` for filenames matching `regexp`.
 
-*pass-through* [*-ms*] <`command`> [`parameter`]...
+*pass-through* [*-ms*] `command` [`parameter`]...
 	Run external `command` and insert its output.
 
 	*-m* move after the inserted text
@@ -460,10 +457,10 @@ Eight hex digit unicode code point U+20AC.
 	If the change was not the one you wanted, just run *undo* and
 	then, for example, *redo 1*.
 
-*repeat* <`count`> <`command`> [`parameters`]...
+*repeat* `count` `command` [`parameters`]...
 	Run `command` `count` times.
 
-*replace* [*-bcgi*] <`pattern`> <`replacement`>
+*replace* [*-bcgi*] `pattern` `replacement`
 
 	*-b* use basic instead of extended regular expression syntax
 
@@ -476,7 +473,7 @@ Eight hex digit unicode code point U+20AC.
 *right*
 	Move right.
 
-*run* [*-ps*] <`command`> [`parameters`]...
+*run* [*-ps*] `command` [`parameters`]...
 	Run external `command`.
 
 	*-p* display "Press any key to continue" prompt
@@ -541,7 +538,7 @@ Eight hex digit unicode code point U+20AC.
 
 	*-l* select whole lines
 
-*set* [*-gl*] <`option`> [`value`] ...
+*set* [*-gl*] `option` [`value`] ...
 	Set `value` for `option`. Value can be omitted for boolean option to set
 	it true. Multiple options can be set at once but then `value` must
 	be given for every option.
@@ -571,10 +568,10 @@ Eight hex digit unicode code point U+20AC.
 	To change option for specific filetypes and filenames use the
 	*option* command.
 
-*setenv* <`name`> <`value`>
+*setenv* `name` `value`
 	Set environment variable.
 
-*shift* <`count`>
+*shift* `count`
 	Shift current or selected lines by `count` indentation levels.
 	Count is usually -1 (decrease indent) or 1 (increase indent).
 
@@ -596,7 +593,7 @@ Eight hex digit unicode code point U+20AC.
 
 	See also *msg* command.
 
-*toggle* [*-gv*] <`option`> [`values`]...
+*toggle* [*-gv*] `option` [`values`]...
 	Toggle `option`. If list of `values` is not given then the option
 	must be either boolean or enum.
 
@@ -616,7 +613,7 @@ Eight hex digit unicode code point U+20AC.
 *up*
 	Move cursor up.
 
-*view* <`N`|*last*>
+*view* `N`|*last*
 	Display `N`th or last open file.
 
 *wclose* [*-f*]
