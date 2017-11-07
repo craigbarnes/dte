@@ -1,7 +1,7 @@
 #include "xmalloc.h"
 #include "common.h"
 
-#define MALLOC_FAIL(msg) malloc_fail(__FILE__, __LINE__, __func__, (msg));
+#define MALLOC_FAIL(msg) malloc_fail(__FILE__, __LINE__, __func__, (msg))
 
 NORETURN static void malloc_fail (
     const char *const file,
@@ -11,7 +11,7 @@ NORETURN static void malloc_fail (
 ) {
     char buf[256] = {'\0'};
     term_cleanup();
-    snprintf(buf, 255, "%s:%d: Error in '%s': %s\n", file, line, func, msg);
+    snprintf(buf, 255, "\n%s:%d: Error in '%s': %s\n", file, line, func, msg);
     fputs(buf, stderr);
     abort();
 }
@@ -21,13 +21,7 @@ size_t size_multiply(size_t a, size_t b)
     if (unsigned_mult_overflows(a, b)) {
         char buf[256] = {'\0'};
         term_cleanup();
-        snprintf (
-            buf,
-            255,
-            "size_t overflow: %" PRIuMAX " * %" PRIuMAX "\n",
-            (uintmax_t)a,
-            (uintmax_t)b
-        );
+        snprintf(buf, 255, "\nsize_multiply() overflow: %zu * %zu\n", a, b);
         fputs(buf, stderr);
         exit(1);
     }

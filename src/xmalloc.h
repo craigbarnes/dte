@@ -29,11 +29,9 @@ char *xstrcut(const char *str, size_t size) MALLOC NONNULL_ARGS RETURNS_NONNULL;
 void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL;
 size_t size_multiply(size_t a, size_t b);
 
-static inline MALLOC NONNULL_ARGS RETURNS_NONNULL char *xstrslice (
-    const char *str,
-    size_t pos,
-    size_t end
-) {
+MALLOC NONNULL_ARGS RETURNS_NONNULL
+static inline char *xstrslice(const char *str, size_t pos, size_t end)
+{
     return xstrcut(str + pos, end - pos);
 }
 
