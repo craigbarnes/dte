@@ -126,7 +126,7 @@ endif
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
   OPTCHECK = :
 else
-  OPTCHECK = mk/optcheck.sh '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+  OPTCHECK = mk/optcheck.sh
 endif
 
 ifndef NO_DEPS
@@ -139,6 +139,7 @@ endif
 dte = dte$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
+build/BUILTIN_CONFIG.h: build/BUILTIN_CONFIG.list
 build/config.o: build/BUILTIN_CONFIG.h
 build/term-caps.o: build/term-caps.cflags
 build/editor.o: build/editor.cflags
@@ -153,7 +154,10 @@ $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
 
 build/%.cflags: FORCE | build/
-	@$(OPTCHECK)
+	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+
+build/BUILTIN_CONFIG.list: FORCE | build/
+	@$(OPTCHECK) '$(BUILTIN_CONFIGS)' $@
 
 build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
