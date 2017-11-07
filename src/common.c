@@ -225,7 +225,7 @@ void term_cleanup(void)
     }
 }
 
-void bug (
+NORETURN void bug (
     const char *file,
     int line,
     const char *func,
