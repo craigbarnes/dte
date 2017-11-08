@@ -10,17 +10,15 @@ alias make "compile gcc make"
 alias read "pass-through cat"
 alias builtin "include -b"
 
-# format quoted text in email messages
+# Format quoted text in email messages
 alias fmt-email "filter fmt -w 74 -p '> '"
 
-# gray background for current line
+# Use gray background for current line
 #hi currentline keep gray keep
 
 errorfmt grep "^([^:]+):([0-9]+):(.*)" file line message
 
-# Remove possible "F" from $LESS so that less will always wait for
-# keypress and "run" can be used without -p.
-#
-#   R: allow ANSI colors
-#   S: chop long lines
+# Remove possible 'F' from $LESS so that less will always wait
+# for keypress and "run" can be used without "-p".
+# ('R' = allow ANSI colors, 'S' = chop long lines)
 setenv LESS RS

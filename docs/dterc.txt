@@ -668,15 +668,15 @@ Eight hex digit unicode code point U+20AC.
 
 @h1 OPTIONS
 
-Options can be changed using the *set* command. Enumerated option values
-can also be *toggle*d. To see which options are enumerated type "toggle "
-on command line and press tab. You can also use the *option* command
-to set filetype/filename specific options.
+Options can be changed using the *set* command. Enumerated options can
+also be *toggle*d. To see which options are enumerated, type "toggle "
+in command mode and press the tab key. You can also use the *option*
+command to set default options for specific file types.
 
 @h2 Local and global options
 
-Global values of these options serve as default values for local
-(per-file) options.
+The global values for these options serve as the default values for
+local (per-file) options.
 
 *auto-indent* [true]
 	Automatically insert indentation when pressing enter.
