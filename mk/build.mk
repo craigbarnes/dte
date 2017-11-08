@@ -139,8 +139,8 @@ endif
 dte = dte$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
-build/BUILTIN_CONFIG.h: build/BUILTIN_CONFIG.list
-build/config.o: build/BUILTIN_CONFIG.h
+build/builtin-config.h: build/builtin-config.list
+build/config.o: build/builtin-config.h
 build/term-caps.o: build/term-caps.cflags
 build/editor.o: build/editor.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
@@ -156,10 +156,10 @@ $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
 
-build/BUILTIN_CONFIG.list: FORCE | build/
+build/builtin-config.list: FORCE | build/
 	@$(OPTCHECK) '$(BUILTIN_CONFIGS)' $@
 
-build/BUILTIN_CONFIG.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
+build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 

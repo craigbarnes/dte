@@ -2,7 +2,7 @@
 #include "error.h"
 #include "strbuf.h"
 #include "common.h"
-#include "../build/BUILTIN_CONFIG.h"
+#include "../build/builtin-config.h"
 
 const char *config_file;
 int config_line;
