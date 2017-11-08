@@ -5,7 +5,15 @@
 #error C99 compiler required
 #endif
 
-#define ARRAY_COUNT(x) (sizeof(x) / sizeof((x)[0]))
+// Calculate the number of elements in an array.
+// The extra division on the third line is a trick to help prevent
+// passing a pointer to the first element of an array instead of a
+// reference to the array itself.
+#define ARRAY_COUNT(x) ( \
+    (sizeof(x) / sizeof((x)[0])) \
+    / ((size_t)(!(sizeof(x) % sizeof((x)[0])))) \
+)
+
 #define DO_PRAGMA(x) _Pragma(#x)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
