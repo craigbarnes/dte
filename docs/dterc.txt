@@ -416,11 +416,12 @@ Eight hex digit unicode code point U+20AC.
 		encodings.
 
 *option* `filetype` `option` `value`...
-	Add automatic `option` for `filetype`. Options are automatically
-	set when file is opened.
+	Add automatic `option` for `filetype` (as previously registered
+	with the *ft* command). Automatic options are set when files are
+	are opened.
 
 *option* *-r* `regexp` `option` `value`...
-	Add automatic `option` for filenames matching `regexp`.
+	Add automatic `option` for filenames that match `regexp`.
 
 *pass-through* [*-ms*] `command` [`parameter`]...
 	Run external `command` and insert its output.
