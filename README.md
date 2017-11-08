@@ -80,6 +80,28 @@ Other [POSIX 2008] compatible platforms should also work, but may
 require build system fixes. [Bug reports] and/or [pull requests] are
 welcome.
 
+Packaging
+---------
+
+The following optional build variables may be useful when packaging
+`dte`:
+
+* `V=1`: Enable verbose build output
+* `WERROR=1`: Turn all compiler warnings into errors. May be useful for
+  running automated tests.
+* `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
+  linking to the system [terminfo]/curses library. The built-in terminal
+  support is considerably less comprehensive than terminfo but may make
+  it easier to create a statically linked binary, if required.
+* `BUILTIN_SYNTAX_FILES='...'`: Specify a subset of [syntax files] to
+  compile into the program binary (the default is to include all of
+  them). This can be used to reduce the size of the program binary, for
+  use in resource-constrained environments.
+
+Example usage:
+
+    make -j8 V=1 TERMINFO_DISABLE=1 BUILTIN_SYNTAX_FILES='c make sh awk'
+
 License
 -------
 
@@ -101,8 +123,10 @@ Public License version 2 for more details.
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
+[terminfo]: https://linux.die.net/man/5/terminfo
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
+[syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
 [`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 [`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/
