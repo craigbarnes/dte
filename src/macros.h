@@ -54,11 +54,13 @@
 
 // __has_extension is a Clang macro used to determine if a feature is
 // available even if not standardized in the current "-std" mode.
-#ifndef __has_extension
-#define __has_extension(x) 0
+#ifdef __has_extension
+#define HAS_EXTENSION(x) __has_extension(x)
+#else
+#define HAS_EXTENSION(x) 0
 #endif
 
-#if (__STDC_VERSION__ >= 201112L) || __has_extension(c_static_assert)
+#if (__STDC_VERSION__ >= 201112L) || HAS_EXTENSION(c_static_assert)
 #define static_assert(x) _Static_assert((x), #x)
 #else
 #define static_assert(x)
