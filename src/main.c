@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!isatty(fileno(stdout))) {
+    if (!isatty(STDOUT_FILENO)) {
         fputs("stdout doesn't refer to a terminal\n", stderr);
         return 1;
     }
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
         fputs("TERM not set\n", stderr);
         return 1;
     }
-    if (!isatty(fileno(stdin))) {
+    if (!isatty(STDIN_FILENO)) {
         if (!freopen("/dev/tty", "r", stdin)) {
             fputs("Cannot reopen input tty\n", stderr);
             return 1;

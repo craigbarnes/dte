@@ -214,7 +214,7 @@ static bool fill_buffer(void)
     }
 
     rc = read (
-        0,
+        STDIN_FILENO,
         input_buf + input_buf_fill,
         sizeof(input_buf) - input_buf_fill
     );
@@ -506,7 +506,7 @@ char *term_read_paste(size_t *size)
             xrenew(buf, alloc);
         }
         do {
-            rc = read(0, buf + count, alloc - count);
+            rc = read(STDIN_FILENO, buf + count, alloc - count);
         } while (rc < 0 && errno == EINTR);
         if (rc <= 0) {
             break;
