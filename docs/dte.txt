@@ -138,7 +138,8 @@ Reverse search direction.
 
 *$DTE_HOME/syntax/\**
 	Your personal syntax files. These override the syntax files that
-	come with the program. See *dte-syntax*(5).
+	come with the program. See *dte-syntax*(5) for more information
+	or run "dte -b syntax/dte" for a basic example.
 
 *$DTE_HOME/file-locks*
 	Records open files to protect you from accidentally editing files
