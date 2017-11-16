@@ -254,7 +254,7 @@ void debug_print(const char *function, const char *fmt, ...)
     va_list ap;
 
     if (fd < 0) {
-        char *filename = editor_file("debug.log");
+        char *filename = editor_cache_file("debug.log");
         fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0666);
         free(filename);
         BUG_ON(fd < 0);

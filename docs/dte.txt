@@ -127,7 +127,12 @@ Reverse search direction.
 @h1 ENVIRONMENT
 
 *DTE_HOME*
-	User configuration directory. Defaults to *$HOME/.dte* if not set.
+	User configuration directory. Defaults to *~/.dte* if not set.
+
+*XDG_CACHE_HOME*
+	If this is set, it's used instead of the default directory
+	(*~/.cache/dte*) for storing non-essential cache and history
+	files.
 
 @h1 FILES
 
@@ -141,20 +146,20 @@ Reverse search direction.
 	come with the program. See *dte-syntax*(5) for more information
 	or run "dte -b syntax/dte" for a basic example.
 
-*$DTE_HOME/file-locks*
+*~/.cache/dte/file-locks*
 	Records open files to protect you from accidentally editing files
 	opened in another process. Used only if the *lock-files* option is
 	enabled.
 
-*$DTE_HOME/file-history*
+*~/.cache/dte/file-history*
 	History of edited files and cursor positions. Used only if the
 	*file-history* option is enabled.
 
-*$DTE_HOME/command-history*
+*~/.cache/dte/command-history*
 	History of *dterc*(5) commands previously used while in
 	command mode.
 
-*$DTE_HOME/search-history*
+*~/.cache/dte/search-history*
 	History of search patterns previously used in search mode.
 
 @h1 SEE ALSO

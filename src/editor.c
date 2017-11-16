@@ -66,6 +66,7 @@ void init_editor_state(void)
 {
     const char *const home = getenv("HOME");
     const char *const dte_home = getenv("DTE_HOME");
+    const char *const xdg_cache_home = getenv("XDG_CACHE_HOME");
 
     editor.home_dir = xstrdup(home ? home : "");
 
@@ -73,6 +74,12 @@ void init_editor_state(void)
         editor.user_config_dir = xstrdup(dte_home);
     } else {
         editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
+    }
+
+    if (xdg_cache_home) {
+        editor.user_cache_dir = xsprintf("%s/dte", xdg_cache_home);
+    } else {
+        editor.user_cache_dir = xsprintf("%s/.cache/dte", editor.home_dir);
     }
 
     setlocale(LC_CTYPE, "");
@@ -329,6 +336,11 @@ void suspend(void)
 char *editor_file(const char *name)
 {
     return xsprintf("%s/%s", editor.user_config_dir, name);
+}
+
+char *editor_cache_file(const char *name)
+{
+    return xsprintf("%s/%s", editor.user_cache_dir, name);
 }
 
 char get_confirmation(const char *choices, const char *format, ...)
