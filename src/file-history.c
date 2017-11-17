@@ -47,7 +47,7 @@ void add_file_history(int row, int col, const char *filename)
 
 void load_file_history(void)
 {
-    char *filename = editor_cache_file("file-history");
+    char *filename = editor_file("file-history");
     ssize_t size, pos = 0;
     char *buf;
 
@@ -83,7 +83,7 @@ void load_file_history(void)
 
 void save_file_history(void)
 {
-    char *filename = editor_cache_file("file-history");
+    char *filename = editor_file("file-history");
     WriteBuffer buf = WBUF_INIT;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);

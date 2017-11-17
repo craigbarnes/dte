@@ -119,14 +119,12 @@ int main(int argc, char *argv[])
 
     term_init(term);
 
-    // Create this early (needed if "lock-files" option is enabled)
-    if (mkdir(editor.user_cache_dir, 0755) != 0 && errno != EEXIST) {
-        error_msg (
-            "Error creating %s: %s",
-            editor.user_cache_dir,
-            strerror(errno)
-        );
+    // Create this early. Needed if lock-files is true.
+    char *editor_dir = editor_file("");
+    if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
+        error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
+    free(editor_dir);
 
     exec_builtin_rc("hi\n");
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
@@ -167,8 +165,8 @@ int main(int argc, char *argv[])
 #endif
 
     load_file_history();
-    command_history_filename = editor_cache_file("command-history");
-    search_history_filename = editor_cache_file("search-history");
+    command_history_filename = editor_file("command-history");
+    search_history_filename = editor_file("search-history");
     history_load (
         &editor.command_history,
         command_history_filename,

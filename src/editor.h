@@ -35,7 +35,6 @@ typedef struct {
     GlobalOptions options;
     const char *home_dir;
     const char *user_config_dir;
-    const char *user_cache_dir;
     const char *charset;
     bool child_controls_terminal;
     bool everything_changed;
@@ -51,7 +50,6 @@ extern EditorState editor;
 
 void init_editor_state(void);
 char *editor_file(const char *name);
-char *editor_cache_file(const char *name);
 char get_confirmation(const char *choices, const char *format, ...) FORMAT(2);
 void set_input_mode(InputMode mode);
 void any_key(void);
