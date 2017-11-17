@@ -131,8 +131,7 @@ Reverse search direction.
 
 *XDG_CACHE_HOME*
 	If this is set, it's used instead of the default directory
-	(*~/.cache/dte*) for storing non-essential cache and history
-	files.
+	(*~/.cache*) for storing non-essential cache and history files.
 
 @h1 FILES
 
