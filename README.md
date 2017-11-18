@@ -45,9 +45,6 @@ Then compile and install:
 
     make -j8 && sudo make install
 
-The default installation [`prefix`] is `/usr/local` and [`DESTDIR`]
-works as usual.
-
 Documentation
 -------------
 
@@ -86,7 +83,13 @@ Packaging
 The following optional build variables may be useful when packaging
 `dte`:
 
-* `V=1`: Enable verbose build output
+* `prefix`: Top-level installation prefix (defaults to `/usr/local`).
+* `bindir`: Installation prefix for program binary (defaults to
+  `$prefix/bin`).
+* `mandir`: Installation prefix for manual pages (defaults to.
+  `$prefix/share/man`)
+* `DESTDIR`: Standard variable used for [staged installs].
+* `V=1`: Enable verbose build output.
 * `WERROR=1`: Turn all compiler warnings into errors. May be useful for
   running automated tests.
 * `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
@@ -100,7 +103,8 @@ The following optional build variables may be useful when packaging
 
 Example usage:
 
-    make -j8 V=1 TERMINFO_DISABLE=1 BUILTIN_SYNTAX_FILES='c make sh awk'
+    make V=1
+    make install V=1 prefix=/usr DESTDIR="$(pwd)/PKG"
 
 License
 -------
@@ -127,8 +131,7 @@ Public License version 2 for more details.
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
-[`prefix`]: https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
-[`DESTDIR`]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
+[staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/
 [GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
 [Travis CI]: https://travis-ci.org/craigbarnes/dte
