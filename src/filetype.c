@@ -45,17 +45,16 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
 // file.c.old~ -> c
 // file..old   -> old
 // file.old    -> old
-static char *get_ext(const char *filename)
+static char *get_ext(const char *const filename)
 {
     const char *ext = strrchr(filename, '.');
-    int ext_len, i;
 
     if (!ext) {
         return NULL;
     }
 
     ext++;
-    ext_len = strlen(ext);
+    size_t ext_len = strlen(ext);
     if (ext_len && ext[ext_len - 1] == '~') {
         ext_len--;
     }
@@ -63,7 +62,7 @@ static char *get_ext(const char *filename)
         return NULL;
     }
 
-    for (i = 0; i < ARRAY_COUNT(ignore); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(ignore); i++) {
         if (!strncmp(ignore[i], ext, ext_len) && !ignore[i][ext_len]) {
             int idx = -2;
             while (ext + idx >= filename) {
