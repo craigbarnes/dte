@@ -86,8 +86,8 @@ The following optional build variables may be useful when packaging
 * `prefix`: Top-level installation prefix (defaults to `/usr/local`).
 * `bindir`: Installation prefix for program binary (defaults to
   `$prefix/bin`).
-* `mandir`: Installation prefix for manual pages (defaults to.
-  `$prefix/share/man`)
+* `mandir`: Installation prefix for manual pages (defaults to
+  `$prefix/share/man`).
 * `DESTDIR`: Standard variable used for [staged installs].
 * `V=1`: Enable verbose build output.
 * `WERROR=1`: Turn all compiler warnings into errors. May be useful for
