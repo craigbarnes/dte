@@ -104,7 +104,7 @@ The following optional build variables may be useful when packaging
 Example usage:
 
     make V=1
-    make install V=1 prefix=/usr DESTDIR="$(pwd)/PKG"
+    make install V=1 prefix=/usr DESTDIR=PKG
 
 License
 -------
