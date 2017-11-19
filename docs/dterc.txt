@@ -296,7 +296,7 @@ Eight hex digit unicode code point U+20AC.
 	file.
 
 *ft* *-f* `filetype` `regexp`...
-	Detect filetype by matching the regexp against filename.
+	Detect `filetype` by matching `regexp` against filename.
 
 *ft* *-i* `filetype` `interpreters`...
 	Associate `interpreters` with `filetype`. Interpreters are parsed
