@@ -94,8 +94,9 @@ The following optional build variables may be useful when packaging
   running automated tests.
 * `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
   linking to the system [terminfo]/curses library. The built-in terminal
-  support is considerably less comprehensive than terminfo but may make
-  it easier to create a statically linked binary, if required.
+  support currently only works with [xterm]-compatible or
+  [ANSI]-compatible terminals but makes it much easier to create a
+  portable, statically linked binary.
 * `BUILTIN_SYNTAX_FILES='...'`: Specify a subset of [syntax files] to
   compile into the program binary (the default is to include all of
   them). This can be used to reduce the size of the program binary, for
@@ -128,6 +129,8 @@ Public License version 2 for more details.
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://linux.die.net/man/5/terminfo
+[ANSI]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
+[xterm]: https://invisible-island.net/xterm/
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
