@@ -35,7 +35,8 @@ Then install the following dependencies:
 
 * [GCC] or [Clang]
 * [GNU Make] `>= 3.81`
-* [ncurses]
+* [terminfo] library (typically provided by [ncurses] on Linux or by
+  default on BSDs)
 
 ...which can (optionally) be done via the included [script][install-deps.sh]:
 
@@ -128,7 +129,7 @@ Public License version 2 for more details.
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
-[terminfo]: https://linux.die.net/man/5/terminfo
+[terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [ANSI]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
 [xterm]: https://invisible-island.net/xterm/
 [install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
