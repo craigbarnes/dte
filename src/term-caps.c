@@ -30,14 +30,15 @@ static void term_read_caps(void)
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
 
-    static_assert(ARRAY_COUNT(terminal.control_codes) == 7);
-    terminal.control_codes[TERMCAP_CLEAR_TO_EOL] = curses_str_cap("el");
-    terminal.control_codes[TERMCAP_KEYPAD_OFF] = curses_str_cap("rmkx");
-    terminal.control_codes[TERMCAP_KEYPAD_ON] = curses_str_cap("smkx");
-    terminal.control_codes[TERMCAP_CUP_MODE_OFF] = curses_str_cap("rmcup");
-    terminal.control_codes[TERMCAP_CUP_MODE_ON] = curses_str_cap("smcup");
-    terminal.control_codes[TERMCAP_SHOW_CURSOR] = curses_str_cap("cnorm");
-    terminal.control_codes[TERMCAP_HIDE_CURSOR] = curses_str_cap("civis");
+    terminal.control_codes = (TermControlCodes) {
+        .clear_to_eol = curses_str_cap("el"),
+        .keypad_off = curses_str_cap("rmkx"),
+        .keypad_on = curses_str_cap("smkx"),
+        .cup_mode_off = curses_str_cap("rmcup"),
+        .cup_mode_on = curses_str_cap("smcup"),
+        .show_cursor = curses_str_cap("cnorm"),
+        .hide_cursor = curses_str_cap("civis")
+    };
 
     static const struct {
         Key key;
@@ -92,7 +93,7 @@ static const TerminalInfo terminal_ansi = {
     .width = 80,
     .height = 24,
     .control_codes = {
-        [TERMCAP_CLEAR_TO_EOL] = "\033[K"
+        .clear_to_eol = "\033[K"
     },
     .keymap = {
         {KEY_LEFT, "\033[D"},
@@ -115,19 +116,19 @@ static const TerminalInfo terminal_xterm = {
     .width = 80,
     .height = 24,
     .control_codes = {
-        [TERMCAP_CLEAR_TO_EOL] = "\033[K",
-        [TERMCAP_KEYPAD_OFF] = "\033[?1l\033>",
-        [TERMCAP_KEYPAD_ON] = "\033[?1h\033=",
-        [TERMCAP_CUP_MODE_OFF] = "\033[?1049l",
-        [TERMCAP_CUP_MODE_ON] = "\033[?1049h",
-        [TERMCAP_HIDE_CURSOR] = "\033[?25l",
+        .clear_to_eol = "\033[K",
+        .keypad_off = "\033[?1l\033>",
+        .keypad_on = "\033[?1h\033=",
+        .cup_mode_off = "\033[?1049l",
+        .cup_mode_on = "\033[?1049h",
+        .hide_cursor = "\033[?25l",
 
         // Terminfo actually returns 2 escape sequences for the "cnorm"
         // capability ("\033[?12l\033[?25h" for xterm and
         // "\033[?34h\033[?25h" for tmux/screen) but using just the
         // second sequence ("\033[?25h"), which is common to all 3
         // terminals, seems to work.
-        [TERMCAP_SHOW_CURSOR] = "\033[?25h",
+        .show_cursor = "\033[?25h",
     },
     .keymap = {
         {KEY_INSERT, "\033[2~"},

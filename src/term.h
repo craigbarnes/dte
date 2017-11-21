@@ -6,18 +6,6 @@
 #include "key.h"
 
 enum {
-    TERMCAP_CLEAR_TO_EOL,
-    TERMCAP_KEYPAD_OFF,
-    TERMCAP_KEYPAD_ON,
-    TERMCAP_CUP_MODE_OFF,
-    TERMCAP_CUP_MODE_ON,
-    TERMCAP_SHOW_CURSOR,
-    TERMCAP_HIDE_CURSOR,
-
-    NR_STR_CAPS
-};
-
-enum {
     COLOR_DEFAULT = -1,
     COLOR_BLACK,
     COLOR_RED,
@@ -47,6 +35,16 @@ typedef struct {
 } TermColor;
 
 typedef struct {
+    const char *clear_to_eol;
+    const char *keypad_off;
+    const char *keypad_on;
+    const char *cup_mode_off;
+    const char *cup_mode_on;
+    const char *show_cursor;
+    const char *hide_cursor;
+} TermControlCodes;
+
+typedef struct {
     Key key;
     const char *code;
 } TermKeyMap;
@@ -56,7 +54,7 @@ typedef struct {
     int max_colors;
     int width;
     int height;
-    const char *control_codes[NR_STR_CAPS];
+    TermControlCodes control_codes;
     TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
 } TerminalInfo;
 
