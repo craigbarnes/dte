@@ -19,22 +19,17 @@ WARNINGS = \
 WARNINGS_EXTRA = \
     -Wformat-signedness -Wframe-larger-than=32768
 
-BUILTIN_SYNTAX_FILES = \
+BUILTIN_SYNTAX_FILES := \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     html+smarty ini java javascript lua mail make markdown meson nginx \
     php python robotstxt roff ruby sh smarty sql vala xml
 
-BUILTIN_CONFIGS = \
-    config/rc \
-    config/filetype \
-    config/binding/default \
-    config/binding/shift-select \
-    config/color/light \
-    config/color/light256 \
-    config/color/darkgray \
-    config/compiler/gcc \
-    config/compiler/go \
-    $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
+BUILTIN_CONFIGS := $(addprefix config/, \
+    rc filetype \
+    binding/default binding/shift-select \
+    color/light color/light256 color/darkgray \
+    compiler/gcc compiler/go \
+    $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block buffer-iter buffer cconv change cmdline \
