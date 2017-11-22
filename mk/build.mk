@@ -9,19 +9,6 @@ PKGCONFIG = pkg-config
 PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.5)
 
-ifdef TERMINFO_DISABLE
-  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
-else
-  LDLIBS = $(or \
-    $(call PKGLIBS, tinfo), \
-    $(call PKGLIBS, ncurses), \
-    -lcurses \
-  )
-endif
-
-try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
-cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
-
 WARNINGS = \
     -Wall -Wextra -Wformat -Wformat-security \
     -Wmissing-prototypes -Wstrict-prototypes \
@@ -35,6 +22,15 @@ WARNINGS_EXTRA = \
 ifdef WERROR
   WARNINGS += -Werror
 endif
+
+ifdef TERMINFO_DISABLE
+  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+else
+  LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
+endif
+
+try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
+cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
 
 CWARNS = \
     $(call cc-option,$(WARNINGS)) \
