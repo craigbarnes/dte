@@ -19,53 +19,6 @@ WARNINGS = \
 WARNINGS_EXTRA = \
     -Wformat-signedness -Wframe-larger-than=32768
 
-ifdef WERROR
-  WARNINGS += -Werror
-endif
-
-ifdef TERMINFO_DISABLE
-  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
-else
-  LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
-endif
-
-try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
-cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
-
-CWARNS = \
-    $(call cc-option,$(WARNINGS)) \
-    $(foreach W, $(WARNINGS_EXTRA),$(call cc-option,$(W)))
-
-CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
-
-ifneq "$(MAKE_VERSION)" "3.81"
-  # Use "initially recursive" trick so that these variables are only
-  # expanded (at most) once per build instead of once per object file.
-  make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
-  $(call make-lazy,CWARNS)
-  $(call make-lazy,CSTD)
-else
-  $(warning Disabling optimizations to work around a bug in GNU Make 3.81)
-  $(warning Expect much slower build speeds)
-endif
-
-ifdef USE_SANITIZER
-  export ASAN_OPTIONS=detect_leaks=0
-  SANITIZER_FLAGS = -fsanitize=address,undefined
-  BASIC_CFLAGS += $(SANITIZER_FLAGS)
-  BASIC_LDFLAGS += $(SANITIZER_FLAGS)
-  DEBUG = 3
-else
-  # 0: Disable debugging
-  # 1: Enable BUG_ON() and light-weight sanity checks
-  # 2: Enable logging to $(DTE_HOME)/debug.log
-  # 3: Enable expensive sanity checks
-  DEBUG = 1
-endif
-
-BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
-BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
-
 BUILTIN_SYNTAX_FILES = \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     html+smarty ini java javascript lua mail make markdown meson nginx \
@@ -94,6 +47,53 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     screen-tabbar screen-view search-mode search selection spawn state \
     strbuf syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
+
+ifdef WERROR
+  WARNINGS += -Werror
+endif
+
+ifdef TERMINFO_DISABLE
+  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+else
+  LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
+endif
+
+ifdef USE_SANITIZER
+  export ASAN_OPTIONS=detect_leaks=0
+  SANITIZER_FLAGS = -fsanitize=address,undefined
+  BASIC_CFLAGS += $(SANITIZER_FLAGS)
+  BASIC_LDFLAGS += $(SANITIZER_FLAGS)
+  DEBUG = 3
+else
+  # 0: Disable debugging
+  # 1: Enable BUG_ON() and light-weight sanity checks
+  # 2: Enable logging to $(DTE_HOME)/debug.log
+  # 3: Enable expensive sanity checks
+  DEBUG = 1
+endif
+
+try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
+cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
+
+CWARNS = \
+    $(call cc-option,$(WARNINGS)) \
+    $(foreach W, $(WARNINGS_EXTRA),$(call cc-option,$(W)))
+
+CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
+
+ifneq "$(MAKE_VERSION)" "3.81"
+  # Use "initially recursive" trick so that these variables are only
+  # expanded (at most) once per build instead of once per object file.
+  make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
+  $(call make-lazy,CWARNS)
+  $(call make-lazy,CSTD)
+else
+  $(warning Disabling optimizations to work around a bug in GNU Make 3.81)
+  $(warning Expect much slower build speeds)
+endif
+
+BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
+BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
