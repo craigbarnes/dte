@@ -15,12 +15,6 @@ ft -i ruby ruby macruby rake jruby crystal
 ft -i sh sh bash ash dash ksh mksh pdksh zsh openrc-run
 ft -i tcl wish
 
-# "ft -c" uses a regular expression to match the first line of the file
-ft -c roff '^\.TH '
-ft -c sh shell-script
-ft -c xml '^<\?xml( |$)'
-ft -c ini '^\[wrap-file\]$'
-
 # "ft -b" matches the file basename
 ft -b docker Dockerfile
 ft -b gitcommit COMMIT_EDITMSG
@@ -81,6 +75,13 @@ ft xml xml
 ft yaml yaml yml
 ft html+smarty tpl
 ft smarty tpl
+
+# "ft -c" uses a regular expression to match the first line of the file
+ft -c html '^<!(doctype|DOCTYPE) (html|HTML)'
+ft -c ini '^\[wrap-file\]$'
+ft -c roff '^\.TH [A-Z0-9]'
+ft -c sh '^#.* shell-script'
+ft -c xml '^<\?xml( |$)'
 
 # The "option" command sets default local options for specific file types
 
