@@ -4,13 +4,15 @@
 
 # "ft -i" matches the interpreter name extracted from the Unix shebang (if any)
 ft -i tcl wish
-ft -i sh sh bash
+ft -i sh sh bash ash dash ksh mksh pdksh zsh
 ft -i python python
 ft -i perl perl
 ft -i php php
 ft -i awk awk gawk nawk
 ft -i lua lua luajit
 ft -i ruby ruby
+ft -i c tcc
+ft -i make make gmake
 
 # "ft -c" uses a regular expression to match the first line of the file
 ft -c roff '^\.TH '
@@ -24,34 +26,32 @@ ft -f sh '/\.?bash(rc|_profile|_logout)$'
 ft -f sh '/\.(shrc|profile)$'
 ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
 ft -f sh '/conf\.d/.*$'
-ft -f docker 'Dockerfile$'
+ft -f docker '/Dockerfile$'
 ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
 ft -f gitcommit '/COMMIT_EDITMSG$'
 ft -f gitrebase '/git-rebase-todo$'
 ft -f indent '/\.indent\.pro$'
-ft -f ini '(yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$'
-ft -f ini '\.(editorconfig|buildconfig)$'
+ft -f ini '/(yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$'
+ft -f ini '/\.(editorconfig|buildconfig)$'
 ft -f ini '/etc/systemd/[a-z]+\.conf$'
 ft -f ini '(gitconfig|/\.git/config|\.gitmodules)$'
-ft -f lua '(config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$'
+ft -f lua '/(config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$'
 ft -f mail '/tmpmsg-.*\.txt$'
 ft -f mail '(snd\.[0-9]+|\.letter|\.letter\.[0-9]+|\.followup|\.article|'\
 '\.article\.[0-9]+|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}|'\
 'ae[0-9]+\.txt|/tmp/SLRN[0-9A-Z.]+|\.eml$)'
-ft -f make '[mM]akefile(\.[^/]*)?$'
-ft -f make '/Make\.[^/]*$'
-ft -f meson '(meson\.build|meson_options\.txt)$'
+ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
+ft -f meson '/(meson\.build|meson_options\.txt)$'
 ft -f nginx '/nginx\.conf$' '^/etc/nginx/'
-ft -f robotstxt 'robots\.txt$'
-ft -f ruby '(Capfile|Gemfile|Rakefile)$'
+ft -f robotstxt '/robots\.txt$'
+ft -f ruby '/(Capfile|Gemfile|Rakefile)$'
 ft -f config '/boot/grub/menu\.lst$'
 
 # "ft" matches against the filename extension
-ft awk awk
-ft c c h
-ft c cpp hpp cc hh C H cxx hxx c++ moc inl pro
+ft awk awk gawk mawk nawk
+ft c c h cpp hpp cc hh C H cxx hxx c++
 ft css css
-ft d d
+ft d d di
 ft diff diff patch
 ft dte dterc
 ft go go
@@ -60,16 +60,16 @@ ft ini ini pls desktop override flatpakrepo flatpakref
 ft ini automount mount path service slice socket target timer
 ft java java
 ft javascript js
-ft lua lua rockspec ltcn
+ft lua lua rockspec
 ft make mk mak
 ft markdown md mkd mkdn markdown
 ft nginx nginx
 ft perl perl pl
-ft php php php3 php4 inc
+ft php php php3 php4
 ft python py
 ft roff 1 2 3 4 5 6 7 8 9
 ft ruby rb rake gemspec
-ft sh sh bash
+ft sh sh bash ksh zsh
 ft sql sql
 ft tcl tcl
 ft vala vala vapi
