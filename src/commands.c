@@ -336,6 +336,9 @@ static void cmd_ft(const char *pf, char **args)
 
     while (*pf) {
         switch (*pf) {
+        case 'b':
+            dt = FT_BASENAME;
+            break;
         case 'c':
             dt = FT_CONTENT;
             break;
@@ -1637,7 +1640,7 @@ const Command commands[] = {
     {"errorfmt", "i", 2, 6, cmd_errorfmt},
     {"filter", "-", 1, -1, cmd_filter},
     {"format-paragraph", "", 0, 1, cmd_format_paragraph},
-    {"ft", "-cfi", 2, -1, cmd_ft},
+    {"ft", "-bcfi", 2, -1, cmd_ft},
     {"git-open", "", 0, 0, cmd_git_open},
     {"hi", "-", 0, -1, cmd_hi},
     {"include", "b", 1, 1, cmd_include},

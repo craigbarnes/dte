@@ -20,32 +20,29 @@ ft -c sh shell-script
 ft -c xml '^<\?xml( |$)'
 ft -c ini '^\[wrap-file\]$'
 
+# "ft -b" matches the file basename
+ft -b docker Dockerfile
+ft -b gitcommit COMMIT_EDITMSG
+ft -b gitrebase git-rebase-todo
+ft -b indent .indent.pro
+ft -b ini \
+    .editorconfig .gitconfig .gitmodules mimeapps.list \
+    pacman.conf yum.conf
+ft -b lua .luacov .luacheckrc config.ld rockspec.in
+ft -b meson meson.build meson_options.txt
+ft -b nginx nginx.conf
+ft -b robotstxt robots.txt
+ft -b ruby Capfile Gemfile Rakefile
+ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD
+
 # "ft -f" uses a regular expression to match the filename
-ft -f sh '/etc/default/.*'
-ft -f sh '/\.?bash(rc|_profile|_logout)$'
-ft -f sh '/\.(shrc|profile)$'
-ft -f sh '/(PKGBUILD|\.INSTALL|install|rc\.conf(\.local)?)$'
-ft -f sh '/conf\.d/.*$'
-ft -f docker '/Dockerfile$'
+ft -f config '^/boot/grub/menu\.lst$'
 ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
-ft -f gitcommit '/COMMIT_EDITMSG$'
-ft -f gitrebase '/git-rebase-todo$'
-ft -f indent '/\.indent\.pro$'
-ft -f ini '/(yum\.conf|mimeapps\.list|weechat/.+\.conf|pinforc)$'
-ft -f ini '/\.(editorconfig|buildconfig)$'
-ft -f ini '/etc/systemd/[a-z]+\.conf$'
-ft -f ini '(gitconfig|/\.git/config|\.gitmodules)$'
-ft -f lua '/(config\.ld|rockspec\.in|\.luacov|\.luacheckrc)$'
-ft -f mail '/tmpmsg-.*\.txt$'
-ft -f mail '(snd\.[0-9]+|\.letter|\.letter\.[0-9]+|\.followup|\.article|'\
-'\.article\.[0-9]+|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}|'\
-'ae[0-9]+\.txt|/tmp/SLRN[0-9A-Z.]+|\.eml$)'
+ft -f ini '/\.git/config$' '^/etc/systemd/[a-z]+\.conf$'
+ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
-ft -f meson '/(meson\.build|meson_options\.txt)$'
-ft -f nginx '/nginx\.conf$' '^/etc/nginx/'
-ft -f robotstxt '/robots\.txt$'
-ft -f ruby '/(Capfile|Gemfile|Rakefile)$'
-ft -f config '/boot/grub/menu\.lst$'
+ft -f nginx '^/etc/nginx/'
+ft -f sh '^/etc/default/.*'
 
 # "ft" matches against the filename extension
 ft awk awk gawk mawk nawk
@@ -61,6 +58,7 @@ ft ini automount mount path service slice socket target timer
 ft java java
 ft javascript js
 ft lua lua rockspec
+ft mail eml
 ft make mk mak
 ft markdown md mkd mkdn markdown
 ft nginx nginx

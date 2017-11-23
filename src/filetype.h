@@ -9,6 +9,7 @@ enum detect_type {
     FT_FILENAME,
     FT_CONTENT,
     FT_INTERPRETER,
+    FT_BASENAME,
 };
 
 void add_filetype(const char *name, const char *str, enum detect_type type);

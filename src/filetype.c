@@ -1,6 +1,7 @@
 #include "filetype.h"
 #include "common.h"
 #include "regexp.h"
+#include "path.h"
 #include "ptr-array.h"
 
 // Single filetype and extension/regexp pair.
@@ -89,8 +90,10 @@ const char *find_ft (
     size_t line_len
 ) {
     size_t filename_len = 0;
+    const char *base = NULL;
     char *ext = NULL;
     if (filename) {
+        base = path_basename(filename);
         ext = get_ext(filename);
         filename_len = strlen(filename);
     }
@@ -99,6 +102,11 @@ const char *find_ft (
         switch (ft->type) {
         case FT_EXTENSION:
             if (!ext || !streq(ext, ft->str)) {
+                continue;
+            }
+            break;
+        case FT_BASENAME:
+            if (!base || !streq(base, ft->str)) {
                 continue;
             }
             break;

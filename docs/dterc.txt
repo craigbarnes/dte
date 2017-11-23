@@ -33,7 +33,7 @@ dterc \- Command and configuration language used by *dte*(1)
 *errorfmt* [*-i*] `compiler` `regexp` [*file*|*line*|*column*|*message*]...@br
 *filter* `command` [`parameter`]...@br
 *format-paragraph* [`width`]@br
-*ft* [*-cfi*] `filetype` `association`...@br
+*ft* [*-bcfi*] `filetype` `association`...@br
 *git-open*@br
 *hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...@br
 *include* [*-b*] `file`@br
@@ -288,8 +288,11 @@ Eight hex digit unicode code point U+20AC.
 	multiple paragraphs use the external *fmt*(1) program with the
 	*filter* command, e.g. *filter fmt -w 60*.
 
-*ft* `filetype` `extensions`...
-	Associate filename `extensions` with `filetype`.
+*ft* `filetype` `extension`...
+	Associate filename `extension` with `filetype`.
+
+*ft* *-b* `filetype` `basename`...
+	Associate file `basename` with `filetype`.
 
 *ft* *-c* `filetype` `regexp`...
 	Detect `filetype` by matching `regexp` against first line of
@@ -298,8 +301,8 @@ Eight hex digit unicode code point U+20AC.
 *ft* *-f* `filetype` `regexp`...
 	Detect `filetype` by matching `regexp` against filename.
 
-*ft* *-i* `filetype` `interpreters`...
-	Associate `interpreters` with `filetype`. Interpreters are parsed
+*ft* *-i* `filetype` `interpreter`...
+	Associate `interpreter` with `filetype`. Interpreters are parsed
 	from the *#!* line in many scripts.
 
 *git-open*
