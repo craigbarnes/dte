@@ -1,4 +1,3 @@
-# sub-syntaxes first
 syntax .c-esc
 
 state start special
@@ -6,9 +5,9 @@ state start special
     char 0-3 oct1
     char 4-7 oct2
     char x hex0
-    # anything but \n
+    # Anything but \n
     char -n "\n" END error
-    # don't eat \n
+    # Don't eat \n
     noeat END
 
 state oct1 special
@@ -27,8 +26,8 @@ state hex1 special
     char 0-9a-fA-F hex2
     noeat END
 
-# in strings "\xaff" is an error but "\xafg" is not
-# in chars both are errors
+# In strings "\xaff" is an error but "\xafg" is not.
+# In chars both are errors.
 state hex2 special
     char 0-9a-fA-F END error
     noeat END
@@ -37,7 +36,7 @@ syntax .c-string
 
 state string
     char "\"" END string
-    # avoid highlighting rest of the file again
+    # Avoid highlighting rest of the file again
     char "\n" END error
     char "\\" .c-esc:string
     eat string
@@ -71,11 +70,10 @@ state comment
     eat comment
 
 state backslash comment
-    # multiline comment?
+    # Multi-line comment?
     char "\n" comment
     noeat comment
 
-# main syntax
 syntax c
 
 state start code
@@ -97,7 +95,7 @@ state preproc-ident preproc
     noeat preproc-misc
 
 state preproccond
-    # recolor to start of the line
+    # Recolor to start of the line
     recolor preproccond 100
     noeat preproc-misc
 
@@ -110,15 +108,13 @@ state preproc-misc preproc
     str "//" .cpp-comment:start
     eat preproc-misc
 
-# Only '#include\s*<header>' or '#include\s*"header"' are recognized although
-# '#include /* comment */ <header>' is valid too.
 state preproc-include preproc
     char " \t" preproc-include
     char "\n" start
     char "\\" preproc-cont
     char '"' local-include
     char '<' system-include
-    # not an error: #include DEFINE
+    # Not an error: #include DEFINE
     noeat preproc-misc
 
 state preproc-cont preproc
@@ -168,7 +164,6 @@ state semicolon code
 state ident-label ident
     char -b a-zA-Z0-9_ ident-label
     char -b : label
-    # don't reset buffer (-b)
     noeat -b ident
 
 state label

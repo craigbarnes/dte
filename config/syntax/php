@@ -9,14 +9,14 @@ state strvar
     char a-zA-Z_0-9 strvar
     noeat END
 
-# curly braces inside string
+# Curly braces inside string
 syntax .php-strcurly
 
 state strvar
     char \} END strvar
     eat strvar
 
-# common escapes inside double quotes and heredocs
+# Common escapes inside double quotes and heredocs
 syntax .php-esc
 
 state special
@@ -34,7 +34,7 @@ state hex special
 
 state hex2 special
     char 0-9a-fA-F END special
-    # single hex digit is ok
+    # Single hex digit is ok
     noeat END
 
 state oct1 special
@@ -45,7 +45,7 @@ state oct2 special
     char 0-7 END special
     noeat END
 
-# common to <<<END and <<<"END"
+# Common to <<<END and <<<"END"
 syntax .php-heredoc-common
 
 state bol string
@@ -67,7 +67,7 @@ state esc special
 state match special
     char "\n" END
     str ";\n" END
-    # length clamped to bol
+    # Length clamped to bol
     recolor string 1000
     noeat string
 
@@ -103,11 +103,11 @@ state string
 state match special
     char "\n" END
     str ";\n" END
-    # length clamped to bol
+    # Length clamped to bol
     recolor string 1000
     noeat string
 
-# inside <? and ?>
+# Inside <? and ?>
 syntax .php
 
 state code
@@ -162,7 +162,7 @@ state sq string
     eat sq
 
 state sqesc string
-    # not \ or '
+    # Not \ or '
     char -n "\\'" sq
     recolor special 1
     eat sq special
@@ -265,12 +265,11 @@ list -i constant \
     __CLASS__ __DIR__ __FILE__ __FUNCTION__ __METHOD__ __NAMESPACE__ \
     false null true
 
-# language constructs
+# Language constructs
 list lang \
     die echo empty exit eval include include_once isset list require \
     require_once return print unset
 
-# main syntax
 syntax php
 
 state code

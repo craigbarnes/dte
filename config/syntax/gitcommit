@@ -25,13 +25,13 @@ state branch notice
     char "\n" start
     eat branch
 
-# label or new file, not known yet
+# abel or new file, not known yet
 state newfile
-    # buffer anything but \n or :
+    # Buffer anything but \n or :
     char "\n" start
-    # anything else but : (-n inverts bitmap)
+    # Anything else but : (-n inverts bitmap)
     char -bn : newfile
-    # recolor buffered bytes to label
+    # Recolor buffered bytes to label
     recolor label
     noeat file
 

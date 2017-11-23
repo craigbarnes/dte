@@ -1,13 +1,13 @@
-# escapes common to string and regexp
+# Escapes common to string and regexp
 syntax .awk-esc
 
 state special
     char 0-3 oct1
     char 4-7 oct2
     char x hex0
-    # anything but \n
+    # Anything but \n
     char -n "\n" END error
-    # don't eat \n
+    # Don't eat \n
     noeat END
 
 state oct1 special
@@ -43,14 +43,14 @@ state code
 state string
     char \\ dqescape
     char \" code string
-    # avoid highlighting rest of the file again
+    # Avoid highlighting rest of the file again
     char "\n" code
     eat string
 
 state regexp
     char \\ regexpescape
     char / code regexp
-    # avoid highlighting rest of the file again
+    # Avoid highlighting rest of the file again
     char "\n" code
     eat regexp
 

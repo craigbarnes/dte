@@ -38,12 +38,12 @@ state hex1 special
 
 state short special
     char "\x80-\xff" not-ascii
-    # any ASCII character but \n
+    # Any ASCII character but \n
     char -n "\n" END error
-    # don't eat \n
+    # Don't eat \n
     noeat END
 
-# eats (at least) one multibyte UTF-8 character
+# Eats (at least) one multibyte UTF-8 character
 state not-ascii error
     char "\x80-\xff" not-ascii
     noeat END
@@ -139,7 +139,7 @@ state char
     char "\x80-\xff" not-ascii
     eat char-end
 
-# eats (at least) one multibyte UTF-8 character
+# Eats (at least) one multibyte UTF-8 character
 state not-ascii char
     char "\x80-\xff" not-ascii
     noeat char-end

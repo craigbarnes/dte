@@ -1,4 +1,4 @@
-# sub-syntax. used in text and attribute values
+# Used in text and attribute values
 syntax .xml-entity
 
 state entity
@@ -36,11 +36,9 @@ state semicolon error
     char ";" END entity
     eat END error
 
-# reserved characters, latin1 symbols, latin1 characters, math, greek, other
 list entity \
     quot apos amp lt gt
 
-# main syntax
 syntax xml
 
 state line1 text

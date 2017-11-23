@@ -56,7 +56,7 @@ state hexdigit numeric
     noeat trailing
 
 state b code
-    # single quote only
+    # Single quote only
     char \' bitstr
     noeat -b word
 
@@ -70,7 +70,7 @@ state bitstrbit special
     eat bitstrbit error
 
 state x code
-    # single quote only
+    # Single quote only
     char \' hexstr
     noeat -b word
 
@@ -131,7 +131,7 @@ state dash comment
 
 state maybe-comment comment
     char "\n" start
-    # control character or space required!
+    # Control character or space required!
     char "\x01- " comment
     recolor code 2
     noeat start

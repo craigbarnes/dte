@@ -1,25 +1,20 @@
-# This color theme should be used with black on white terminal.
+# This color scheme should be used with black on white terminals
 
-# reset colors
+# Reset
 hi
 
-# builtin colors
 hi default
 hi nontext 0/0/5 keep
 hi noline 0/0/5
 hi wserror default 5/5/0
 hi selection keep 254 keep
-#hi currentline keep keep keep
 hi linenumber 0/0/0 254
 hi statusline 0/0/0 4/4/4
-#hi commandline
 hi errormsg bold 4/0/0
 hi infomsg bold 0/0/5
 hi tabbar 0/0/0 255
-#hi activetab bold
 hi inactivetab 0/0/0 255
 
-# common to many syntax files
 hi text
 hi code
 hi ident
@@ -36,50 +31,27 @@ hi comment 2/2/1
 hi error 0/0/0 5/5/0
 hi variable 0/0/5
 
-# Same syntax file is used for C and C++.
 hi c.preproc 0/0/5
 hi c.preproccond 0/0/5
-# To disable highlighting of C++ specific keywords uncomment this.
-#hi c.cpp-keyword
-
-# css
 hi css.id 0/0/5
 hi css.class 0/0/5
 hi css.pseudoclass 4/0/4 bold
 hi css.pseudoelement 0/3/0 bold
-
-# diff
 hi diff.header bold
 hi diff.chunk 0/0/0 254
 hi diff.added 0/0/5
 hi diff.removed bold 4/0/0
 hi diff.context keep keep
-
-# gitcommit
 hi gitcommit.added bold
 hi gitcommit.modified bold 4/0/0
 hi gitcommit.untracked bold 4/0/0
 hi gitcommit.newfile bold 0/3/0
-
-# go
 hi go.builtin 0/0/5
-
-# html
 hi html.tag bold
 hi html.attr 0/0/5
-
-# javascript
 hi javascript.regexp 4/0/4
-
-# make
 hi make.builtin bold
-
-# sh
 hi sh.builtin bold
-
-# xml
 hi xml.tag bold
 hi xml.attr 0/0/5
-
-# ini
 hi ini.section bold

@@ -18,13 +18,13 @@ state space-indent code
     char " \t" space-indent
     noeat not-recipe
 
-# can't be target but can be recipe, variable or keyword
+# Can't be target but can be recipe, variable or keyword
 state not-target code
     char -b a-zA-Z_- not-target
     inlist keyword make
     noeat make
 
-# can't be recipe but can be target, variable or keyword
+# Can't be recipe but can be target, variable or keyword
 state not-recipe code
     char -b . special-target
     char -b a-zA-Z_- not-recipe

@@ -1,11 +1,11 @@
-# single quoted string
+# Single quoted string
 syntax .sh-sq
 
 state string
     char "'" END string
     eat string
 
-# escape inside double quotes
+# Escape inside double quotes
 syntax .sh-dq-escape
 
 state special
@@ -13,7 +13,7 @@ state special
     recolor string 1
     eat END
 
-# escape outside double quotes
+# Escape outside double quotes
 syntax .sh-command-escape
 
 state special
@@ -48,7 +48,7 @@ state expression-end special
     char ')' END special
     eat END error
 
-# double quoted string. $(cmd) and $((expr) not properly parsed
+# Double quoted string. $(cmd) and $((expr) not properly parsed
 syntax .sh-simple-dq
 
 state string
@@ -108,7 +108,7 @@ state special
 
 syntax .sh-dq
 
-# double quoted string
+# Double quoted string
 state string
     char '"' END string
     char \\ .sh-dq-escape:string
@@ -116,7 +116,7 @@ state string
     char \$ .sh-dollar:string
     eat string
 
-# skip redirect etc. after <<EOF
+# Skip redirect etc. after <<EOF
 # e.g. cat <<EOF > /tmp/file
 syntax .sh-heredoc-skip-line
 
@@ -124,7 +124,7 @@ state start
     char "\n" END
     eat start code
 
-# common to <<"EOF" and <<'EOF'
+# Common to <<"EOF" and <<'EOF'
 syntax .sh-heredoc-common
 
 state start
@@ -140,7 +140,7 @@ state string
 
 state match special
     char "\n" END
-    # length clamped to bol
+    # Length clamped to bol
     recolor string 1000
     noeat string
 
@@ -162,7 +162,7 @@ state string
 
 state match special
     char "\n" END
-    # length clamped to bol
+    # Length clamped to bol
     recolor string 1000
     noeat string
 
@@ -180,7 +180,7 @@ state start string
     char -n \' END error
     eat .sh-heredoc-common:END
 
-# commands can be at beginning of line or after any of && || ; & | { ` $(
+# Commands can be at beginning of line or after any of && || ; & | { ` $(
 # also beginning of line can contain ( after which command is allowed
 syntax sh
 
@@ -191,7 +191,7 @@ state start code
     noeat args
 
 state command code
-    # eat all garbage to distinguish test/run.sh from builtin test
+    # Eat all garbage to distinguish test/run.sh from builtin test
     char -b a-zA-Z0-9_/.- command
     inlist keyword1 start keyword
     inlist keyword2 args keyword
@@ -201,7 +201,7 @@ state command code
     noeat args
 
 state function special
-    # don't try to validate syntax because there can be comments
+    # Don't try to validate syntax because there can be comments
     # between "()" and "{"
     char \) start special
     eat start error
@@ -239,7 +239,7 @@ state args code
     char "\n" start
     # && is same as two &, same for |. does not matter
     char ";&|" start special
-    # this might be error
+    # This might be error
     char ()} args special
     char < lt
     eat args
@@ -281,11 +281,11 @@ state heredoc special
     char -bn " \t\n;|>" heredoc
     heredocbegin .sh-heredoc start
 
-# command allowed after these
+# Command allowed after these
 list keyword1 \
     do else elif exec if then until while
 
-# command not allowed after these
+# Command not allowed after these
 list keyword2 \
     break case continue done esac exit export fi function in return shift
 

@@ -1,23 +1,19 @@
-# reset colors
+# Reset
 hi
 
-# builtin colors
 hi default 250 235
 hi nontext 5/3/0 keep
 hi noline  234 234
 hi wserror default 5/5/3
 hi selection keep 238 keep
-#hi currentline keep keep keep
 hi linenumber 250 237
 hi statusline 252 239
-#hi commandline
 hi errormsg 5/3/0
 hi infomsg 0/4/5
 hi tabbar 250 237
 hi activetab 255
 hi inactivetab 250 237
 
-# common to many syntax files
 hi text
 hi code
 hi ident
@@ -34,50 +30,27 @@ hi comment 242
 hi error 232 216
 hi variable 0/4/5
 
-# Same syntax file is used for C and C++.
 hi c.preproc 0/3/5
 hi c.preproccond 27
-# To disable highlighting of C++ specific keywords uncomment this.
-#hi c.cpp-keyword
-
-# css
 hi css.id 0/2/5
 hi css.class 0/3/5
 hi css.pseudoclass 5/2/5
 hi css.pseudoelement 0/5/0
-
-# diff
 hi diff.header 255
 hi diff.chunk 250 239
 hi diff.added 0/3/5
 hi diff.removed 5/1/1
 hi diff.context keep keep
-
-# gitcommit
 hi gitcommit.added 0/3/5
 hi gitcommit.modified 202
 hi gitcommit.untracked 202
 hi gitcommit.newfile 0/4/0
-
-# go
 hi go.builtin 0/3/5
-
-# html
 hi html.tag 3/5/2
 hi html.attr 0/3/5
-
-# javascript
 hi javascript.regexp 5/2/5
-
-# make
 hi make.builtin 5/5/4
-
-# sh
 hi sh.builtin 5/5/4
-
-# xml
 hi xml.tag 3/5/2
 hi xml.attr 0/3/5
-
-# ini
 hi ini.section bold

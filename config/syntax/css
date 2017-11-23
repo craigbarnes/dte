@@ -1,4 +1,3 @@
-# comment
 syntax .css-comment
 
 state comment
@@ -9,23 +8,23 @@ state star comment
     char / END comment
     noeat comment
 
-# eat erroneous statement. stop at ; or \n
+# Eat erroneous statement; stop at ; or \n
 syntax .css-statementerror
 
 state error
     char ";\n" END code
     eat error
 
-# eat erroneous selector. stop at whitespace or {
+# Eat erroneous selector; stop at whitespace or {
 syntax .css-selectorerror
 
 state error
     char -n "\t\n\r {" error
     noeat END
 
-# hex escape: \[0-9a-fA-F]{1-6}
-# one hex digit already eaten
-# can be terminated with whitespace character which is skipped
+# Hex escape: \[0-9a-fA-F]{1-6}
+# One hex digit already eaten
+# Can be terminated with whitespace character that is skipped
 syntax .css-hex
 
 state hex1 special
@@ -49,11 +48,11 @@ state hex5 special
     noeat ws
 
 state ws
-    # whitespace is always skipped, even if there are 6 hex digits!
+    # Whitespace is always skipped, even if there are 6 hex digits!
     char "\t\n\r " END special
     noeat END
 
-# double quote
+# Double quote
 syntax .css-dq
 
 state string
@@ -68,7 +67,7 @@ state esc special
     char 0-9a-fA-F .css-hex:string
     eat string error
 
-# single quote
+# Single quote
 syntax .css-sq
 
 state string
@@ -83,14 +82,13 @@ state esc special
     char 0-9a-fA-F .css-hex:string
     eat string error
 
-# identifier
 syntax .css-ident
 
 state ident
     char "a-zA-Z0-9\xa1-\xff_-" ident
     noeat END
 
-# attribute selector [x=y], [x|=y], [x~=y]
+# Attribute selector [x=y], [x|=y], [x~=y]
 syntax .css-attributeselector
 
 state attributeselector code
@@ -134,7 +132,7 @@ state close
     char ) END url
     eat END error
 
-# list of words
+# List of words
 syntax .css-medialist
 
 state list code
@@ -160,7 +158,6 @@ state must code
 list -i mediatype \
     all braille embossed handheld print projection screen speech tty tv
 
-# import statement
 syntax .css-import
 
 state import atkeyword
@@ -184,7 +181,6 @@ state mediaend
 state error
     noeat .css-statementerror:END
 
-# namespace statement
 syntax .css-namespace
 
 state namespace atkeyword
@@ -217,11 +213,10 @@ state namespace-end
 state error
     noeat .css-statementerror:END
 
-# main syntax
 syntax css
 
 state verybeginning
-    # these 9 chars exactly + double quote
+    # These 9 chars exactly + double quote
     str -i '@charset ' charset
     noeat start
 
@@ -293,7 +288,7 @@ state id
 
 state atrule code
     char -b a-zA-Z0-9_- atrule
-    # selectors
+    # Selectors
     inlist atkeyword start
     # @import { URI | string } [ media type, ...];
     bufis -i "@import" .css-import:start atkeyword
@@ -324,7 +319,7 @@ state property code
     char 0-9_ property-error
     inlist property property-end
     inlist fontfaceproperty property-end property
-    # could be unknown property
+    # Could be unknown property
     noeat property-end
 
 state property-end code
@@ -453,7 +448,7 @@ list -i color \
     aqua black blue fuchsia gray green lime maroon navy olive \
     purple red silver teal white yellow
 
-# simple pseudo-classes
+# Simple pseudo-classes
 list -i pseudoclass \
     :active :checked :disabled :empty :enabled :first-child \
     :first-of-type :focus :hover :last-child :last-of-type :link \

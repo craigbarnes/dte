@@ -36,7 +36,7 @@ state 1n special
     noeat short
 
 state short special
-    # don't eat \n
+    # Don't eat \n
     char -n "\n" END error
     noeat END
 

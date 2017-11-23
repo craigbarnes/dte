@@ -27,8 +27,8 @@ state hex1 special
     char 0-9a-fA-F hex2
     noeat END
 
-# in strings "\xaff" is an error but "\xafg" is not
-# in chars both are errors
+# In strings "\xaff" is an error but "\xafg" is not.
+# In chars both are errors.
 state hex2 special
     char 0-9a-fA-F END error
     noeat END
@@ -70,7 +70,7 @@ state comment
     eat comment
 
 state backslash comment
-    # multiline comment?
+    # Multi-line comment?
     char "\n" comment
     noeat comment
 
