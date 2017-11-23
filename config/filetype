@@ -3,16 +3,17 @@
 # highlighter and local options to use when opening files.
 
 # "ft -i" matches the interpreter name extracted from the Unix shebang (if any)
-ft -i tcl wish
-ft -i sh sh bash ash dash ksh mksh pdksh zsh
-ft -i python python
+ft -i awk awk gawk nawk
+ft -i c tcc
+ft -i javascript node
+ft -i lua lua luajit
+ft -i make make gmake
 ft -i perl perl
 ft -i php php
-ft -i awk awk gawk nawk
-ft -i lua lua luajit
-ft -i ruby ruby
-ft -i c tcc
-ft -i make make gmake
+ft -i python python python2 python3
+ft -i ruby ruby macruby rake jruby crystal
+ft -i sh sh bash ash dash ksh mksh pdksh zsh openrc-run
+ft -i tcl wish
 
 # "ft -c" uses a regular expression to match the first line of the file
 ft -c roff '^\.TH '
@@ -28,12 +29,15 @@ ft -b indent .indent.pro
 ft -b ini \
     .editorconfig .gitconfig .gitmodules mimeapps.list \
     pacman.conf yum.conf
+ft -b json .jshintrc
 ft -b lua .luacov .luacheckrc config.ld rockspec.in
 ft -b meson meson.build meson_options.txt
 ft -b nginx nginx.conf
+ft -b python BUILD.bazel
 ft -b robotstxt robots.txt
-ft -b ruby Capfile Gemfile Rakefile
-ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD
+ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
+ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD APKBUILD
+ft -b yaml .clang-format
 
 # "ft -f" uses a regular expression to match the filename
 ft -f config '^/boot/grub/menu\.lst$'
@@ -47,6 +51,7 @@ ft -f sh '^/etc/default/.*'
 # "ft" matches against the filename extension
 ft awk awk gawk mawk nawk
 ft c c h cpp hpp cc hh C H cxx hxx c++
+ft csharp cs
 ft css css
 ft d d di
 ft diff diff patch
@@ -57,21 +62,23 @@ ft ini ini pls desktop override flatpakrepo flatpakref
 ft ini automount mount path service slice socket target timer
 ft java java
 ft javascript js
+ft json json geojson topojson
 ft lua lua rockspec
 ft mail eml
 ft make mk mak
 ft markdown md mkd mkdn markdown
-ft nginx nginx
+ft nginx nginx nginxconf
 ft perl perl pl
 ft php php php3 php4
-ft python py
+ft python py py3 wsgi
 ft roff 1 2 3 4 5 6 7 8 9
-ft ruby rb rake gemspec
-ft sh sh bash ksh zsh
+ft ruby rb rake gemspec cr
+ft sh sh bash ksh zsh ebuild
 ft sql sql
 ft tcl tcl
 ft vala vala vapi
 ft xml xml
+ft yaml yaml yml
 ft html+smarty tpl
 ft smarty tpl
 
