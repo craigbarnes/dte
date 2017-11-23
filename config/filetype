@@ -73,8 +73,6 @@ ft tcl tcl
 ft vala vala vapi
 ft xml xml
 ft yaml yaml yml
-ft html+smarty tpl
-ft smarty tpl
 
 # "ft -c" uses a regular expression to match the first line of the file
 ft -c html '^<!(doctype|DOCTYPE) (html|HTML)(>$| )'

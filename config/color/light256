@@ -68,11 +68,6 @@ hi go.builtin 0/0/5
 hi html.tag bold
 hi html.attr 0/0/5
 
-# html+smarty
-hi html+smarty.smarty 0/0/5
-hi html+smarty.tag bold
-hi html+smarty.attr 0/0/5
-
 # javascript
 hi javascript.regexp 4/0/4
 
@@ -81,9 +76,6 @@ hi make.builtin bold
 
 # sh
 hi sh.builtin bold
-
-# smarty
-hi smarty.smarty 0/0/5
 
 # xml
 hi xml.tag bold

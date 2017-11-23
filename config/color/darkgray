@@ -66,11 +66,6 @@ hi go.builtin 0/3/5
 hi html.tag 3/5/2
 hi html.attr 0/3/5
 
-# html+smarty
-hi html+smarty.smarty 0/3/5
-hi html+smarty.tag 3/5/2
-hi html+smarty.attr 0/3/5
-
 # javascript
 hi javascript.regexp 5/2/5
 
@@ -79,9 +74,6 @@ hi make.builtin 5/5/4
 
 # sh
 hi sh.builtin 5/5/4
-
-# smarty
-hi smarty.smarty 0/3/5
 
 # xml
 hi xml.tag 3/5/2
