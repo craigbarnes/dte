@@ -77,7 +77,7 @@ ft html+smarty tpl
 ft smarty tpl
 
 # "ft -c" uses a regular expression to match the first line of the file
-ft -c html '^<!(doctype|DOCTYPE) (html|HTML)'
+ft -c html '^<!(doctype|DOCTYPE) (html|HTML)(>$| )'
 ft -c ini '^\[wrap-file\]$'
 ft -c roff '^\.TH [A-Z0-9]'
 ft -c sh '^#.* shell-script'
