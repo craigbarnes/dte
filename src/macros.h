@@ -14,6 +14,20 @@
     / ((size_t)(!(sizeof(x) % sizeof((x)[0])))) \
 )
 
+// __has_extension is a Clang macro used to determine if a feature is
+// available even if not standardized in the current "-std" mode.
+#ifdef __has_extension
+#define HAS_EXTENSION(x) __has_extension(x)
+#else
+#define HAS_EXTENSION(x) 0
+#endif
+
+#ifdef __has_attribute
+#define HAS_ATTRIBUTE(x) __has_attribute(x)
+#else
+#define HAS_ATTRIBUTE(x) 0
+#endif
+
 #define DO_PRAGMA(x) _Pragma(#x)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
@@ -34,18 +48,22 @@
 #define CONST_FN
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ >= 4)
+#if (defined(__GNUC__) && __GNUC__ >= 4) || HAS_ATTRIBUTE(nonnull)
 #define NONNULL_ARGS __attribute__((__nonnull__))
 #else
 #define NONNULL_ARGS
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ >= 5)
-#define MESSAGE(x) DO_PRAGMA(message #x)
+#if (defined(__GNUC__) && __GNUC__ >= 5) || HAS_ATTRIBUTE(returns_nonnull)
 #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
-#define MESSAGE(x)
 #define RETURNS_NONNULL
+#endif
+
+#if defined(__GNUC__) && (__GNUC__ >= 5)
+#define MESSAGE(x) DO_PRAGMA(message #x)
+#else
+#define MESSAGE(x)
 #endif
 
 #if __STDC_VERSION__ >= 201112L
@@ -54,14 +72,6 @@
 #define NORETURN __attribute__((__noreturn__))
 #else
 #define NORETURN
-#endif
-
-// __has_extension is a Clang macro used to determine if a feature is
-// available even if not standardized in the current "-std" mode.
-#ifdef __has_extension
-#define HAS_EXTENSION(x) __has_extension(x)
-#else
-#define HAS_EXTENSION(x) 0
 #endif
 
 #if (__STDC_VERSION__ >= 201112L) || HAS_EXTENSION(c_static_assert)
