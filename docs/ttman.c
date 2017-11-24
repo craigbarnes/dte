@@ -173,7 +173,7 @@ static size_t emit_keyword(const char *const buf, size_t size)
 {
     size_t len;
     for (len = 0; len < size; len++) {
-        if (!isalnum(buf[len])) {
+        if (!isalnum((unsigned char)buf[len])) {
             break;
         }
     }
