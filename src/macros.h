@@ -20,7 +20,6 @@
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
-#define NONNULL_ARGS __attribute__((__nonnull__))
 #define MALLOC __attribute__((__malloc__))
 #define FORMAT(idx) __attribute__((__format__(printf, (idx), (idx + 1))))
 #define PURE __attribute__((__pure__))
@@ -29,11 +28,16 @@
 #define likely(x) (x)
 #define unlikely(x) (x)
 #define UNUSED
-#define NONNULL_ARGS
 #define MALLOC
 #define FORMAT(idx)
 #define PURE
 #define CONST_FN
+#endif
+
+#if defined(__GNUC__) && (__GNUC__ >= 4)
+#define NONNULL_ARGS __attribute__((__nonnull__))
+#else
+#define NONNULL_ARGS
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 5)
@@ -46,7 +50,7 @@
 
 #if __STDC_VERSION__ >= 201112L
 #define NORETURN _Noreturn
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && (__GNUC__ >= 3)
 #define NORETURN __attribute__((__noreturn__))
 #else
 #define NORETURN
