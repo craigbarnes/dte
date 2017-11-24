@@ -8,9 +8,9 @@ XARGS_P_FLAG = $(shell \
 )
 
 man  := dte.1 dterc.5 dte-syntax.5
-pdf  := $(addprefix public/, $(addsuffix .pdf, $(notdir $(man))))
-html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
+pdf  := public/dte.pdf
 img  := public/screenshot.png
+html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 web  := $(html) $(pdf) $(img) $(patsubst %, %.gz, $(html) $(pdf))
 
 docs: man web
@@ -21,9 +21,9 @@ web: $(web)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
-$(pdf): public/%.pdf: % | public/
+$(pdf): $(man) | public/
 	$(E) GROFF $@
-	$(Q) groff -mandoc -Tpdf $< > $@
+	$(Q) groff -mandoc -Tpdf $^ > $@
 
 $(html): public/%.html: % | public/
 	$(E) GROFF $@
