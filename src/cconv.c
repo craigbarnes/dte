@@ -55,7 +55,12 @@ static void encode_replacement(struct cconv *c)
     char *ob = c->rbuf;
     size_t ic = sizeof(replacement);
     size_t oc = sizeof(c->rbuf);
-    size_t rc = iconv(c->cd, &ib, &ic, &ob, &oc);
+
+    // POSIX defines the second parameter of iconv(3) as "char **restrict"
+    // but some systems (notably NetBSD) declare it as "const char **restrict".
+    // The IGNORE_DISCARDED_QUALIFIERS macro is used to temporarily disable the
+    // relevant compiler warning, since it's a well known and harmless issue.
+    size_t rc = iconv(c->cd, IGNORE_DISCARDED_QUALIFIERS(&ib), &ic, &ob, &oc);
 
     if (rc == (size_t)-1) {
         c->rbuf[0] = 0xbf;
@@ -104,7 +109,7 @@ static int xiconv(struct cconv *c, char **ib, size_t *ic)
     while (1) {
         char *ob = c->obuf + c->opos;
         size_t oc = c->osize - c->opos;
-        size_t rc = iconv(c->cd, ib, ic, &ob, &oc);
+        size_t rc = iconv(c->cd, IGNORE_DISCARDED_QUALIFIERS(ib), ic, &ob, &oc);
 
         c->opos = ob - c->obuf;
         if (rc == (size_t)-1) {

@@ -28,6 +28,12 @@
 #define HAS_ATTRIBUTE(x) 0
 #endif
 
+#ifdef __has_warning
+#define HAS_WARNING(x) __has_warning(x)
+#else
+#define HAS_WARNING(x) 0
+#endif
+
 #define DO_PRAGMA(x) _Pragma(#x)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
@@ -78,6 +84,16 @@
 #define static_assert(x) _Static_assert((x), #x)
 #else
 #define static_assert(x)
+#endif
+
+#if defined(__clang__) && HAS_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
+#define IGNORE_DISCARDED_QUALIFIERS(x) \
+    DO_PRAGMA(clang diagnostic push) \
+    DO_PRAGMA(clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers") \
+    (x) \
+    DO_PRAGMA(clang diagnostic pop)
+#else
+#define IGNORE_DISCARDED_QUALIFIERS(x) (x)
 #endif
 
 #endif
