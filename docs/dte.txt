@@ -2,7 +2,7 @@
 
 @h1 NAME
 
-dte \- A small and flexible text editor
+dte - A small and flexible text editor
 
 @h1 SYNOPSIS
 

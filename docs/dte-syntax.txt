@@ -2,7 +2,7 @@
 
 @h1 NAME
 
-dte\-syntax \- Format of the syntax highlighting files used by *dte*(1)
+dte-syntax - Format of the syntax highlighting files used by *dte*(1)
 
 @h1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 
 @h1 NAME
 
-dterc \- Command and configuration language used by *dte*(1)
+dterc - Command and configuration language used by *dte*(1)
 
 @h1 SYNOPSIS
 
