@@ -34,6 +34,7 @@ state start code
     char -b a-zA-Z_ ident
     char 0 zero
     char 1-9 dec
+    # TODO: char . dot  # Possible float literal, e.g. .25
     eat start
 
 state comment
@@ -70,7 +71,7 @@ state ident
 
 state zero numeric
     char bB bin
-    char oO0-7 oct
+    char oO oct
     char xX hex
     char . float
     noeat int-suffix
@@ -85,6 +86,8 @@ state oct numeric
 
 state dec numeric
     char 0-9 dec
+    char eE exponent
+    char . float
     noeat int-suffix
 
 state hex numeric
@@ -100,6 +103,20 @@ state int-end error
     noeat start
 
 state float numeric
+    char 0-9 float
+    char eE exponent
+    noeat float-end
+
+state exponent numeric
+    char 0-9+- exponent-digit
+    noeat float-end
+
+state exponent-digit numeric
+    char 0-9 exponent-digit
+    noeat float-end
+
+state float-end error
+    char a-zA-Z_ float-end
     noeat start
 
 list keyword \
