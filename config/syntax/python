@@ -39,7 +39,8 @@ state start code
     char -b a-zA-Z_ ident
     char 0 zero
     char 1-9 dec
-    # TODO: char . dot  # Possible float literal, e.g. .25
+    char . dot
+    char " \t\f\r\n" whitespace
     eat start
 
 state comment
@@ -131,6 +132,23 @@ state exponent-digit numeric
 
 state float-end error
     char a-zA-Z_ float-end
+    noeat start
+
+state whitespace
+    char " \t\f\r\n" whitespace
+    char . whitespace-dot
+    noeat start
+
+state whitespace-dot code
+    char 0-9 dot-float
+    noeat start
+
+state dot-float numeric
+    recolor numeric 2
+    noeat float
+
+state dot code
+    char 0-9 dot error
     noeat start
 
 list keyword \
