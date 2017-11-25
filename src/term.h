@@ -55,7 +55,8 @@ typedef struct {
     int width;
     int height;
     TermControlCodes control_codes;
-    TermKeyMap keymap[NR_SPECIAL_KEYS + 4];
+    const TermKeyMap *keymap;
+    size_t keymap_length;
 } TerminalInfo;
 
 extern TerminalInfo terminal;

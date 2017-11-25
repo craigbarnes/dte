@@ -280,7 +280,7 @@ static bool read_special(Key *key)
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
 
-    for (size_t i = 0; i < ARRAY_COUNT(terminal.keymap); i++) {
+    for (size_t i = 0; i < terminal.keymap_length; i++) {
         const TermKeyMap *const km = &terminal.keymap[i];
         const char *const keycode = km->code;
 

@@ -41,7 +41,7 @@ static void term_read_caps(void)
     };
 
     static const struct {
-        Key key;
+        const Key key;
         const char *const capname;
     } key_cap_map[] = {
         {KEY_INSERT, "kich1"},
@@ -72,11 +72,16 @@ static void term_read_caps(void)
         {MOD_SHIFT | KEY_END, "kEND"},
     };
 
-    static_assert(ARRAY_COUNT(terminal.keymap) == ARRAY_COUNT(key_cap_map));
-    for (size_t i = 0; i < ARRAY_COUNT(key_cap_map); i++) {
-        terminal.keymap[i].key = key_cap_map[i].key;
-        terminal.keymap[i].code = curses_str_cap(key_cap_map[i].capname);
+    static const size_t keymap_length = ARRAY_COUNT(key_cap_map);
+    TermKeyMap *keymap = xnew(TermKeyMap, keymap_length);
+
+    for (size_t i = 0; i < keymap_length; i++) {
+        keymap[i].key = key_cap_map[i].key;
+        keymap[i].code = curses_str_cap(key_cap_map[i].capname);
     }
+
+    terminal.keymap = keymap;
+    terminal.keymap_length = keymap_length;
 }
 
 static void term_init_fallback(const char *const term)
@@ -88,18 +93,21 @@ static void term_init_fallback(const char *const term)
 
 #else
 
+static const TermKeyMap ansi_keymap[] = {
+    {KEY_LEFT, "\033[D"},
+    {KEY_RIGHT, "\033[C"},
+    {KEY_UP, "\033[A"},
+    {KEY_DOWN, "\033[B"},
+};
+
 static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .keymap = ansi_keymap,
+    .keymap_length = ARRAY_COUNT(ansi_keymap),
     .control_codes = {
         .clear_to_eol = "\033[K"
-    },
-    .keymap = {
-        {KEY_LEFT, "\033[D"},
-        {KEY_RIGHT, "\033[C"},
-        {KEY_UP, "\033[A"},
-        {KEY_DOWN, "\033[B"},
     }
 };
 
@@ -110,11 +118,38 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
+static const TermKeyMap xterm_keymap[] = {
+    {KEY_INSERT, "\033[2~"},
+    {KEY_DELETE, "\033[3~"},
+    {KEY_HOME, "\033OH"},
+    {KEY_END, "\033OF"},
+    {KEY_PAGE_UP, "\033[5~"},
+    {KEY_PAGE_DOWN, "\033[6~"},
+    {KEY_LEFT, "\033OD"},
+    {KEY_RIGHT, "\033OC"},
+    {KEY_UP, "\033OA"},
+    {KEY_DOWN, "\033OB"},
+    {KEY_F1, "\033OP"},
+    {KEY_F2, "\033OQ"},
+    {KEY_F3, "\033OR"},
+    {KEY_F4, "\033OS"},
+    {KEY_F5, "\033[15~"},
+    {KEY_F6, "\033[17~"},
+    {KEY_F7, "\033[18~"},
+    {KEY_F8, "\033[19~"},
+    {KEY_F9, "\033[20~"},
+    {KEY_F10, "\033[21~"},
+    {KEY_F11, "\033[23~"},
+    {KEY_F12, "\033[24~"},
+};
+
 static const TerminalInfo terminal_xterm = {
     .can_bg_color_erase = false,
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .keymap = xterm_keymap,
+    .keymap_length = ARRAY_COUNT(xterm_keymap),
     .control_codes = {
         .clear_to_eol = "\033[K",
         .keypad_off = "\033[?1l\033>",
@@ -129,31 +164,7 @@ static const TerminalInfo terminal_xterm = {
         // second sequence ("\033[?25h"), which is common to all 3
         // terminals, seems to work.
         .show_cursor = "\033[?25h",
-    },
-    .keymap = {
-        {KEY_INSERT, "\033[2~"},
-        {KEY_DELETE, "\033[3~"},
-        {KEY_HOME, "\033OH"},
-        {KEY_END, "\033OF"},
-        {KEY_PAGE_UP, "\033[5~"},
-        {KEY_PAGE_DOWN, "\033[6~"},
-        {KEY_LEFT, "\033OD"},
-        {KEY_RIGHT, "\033OC"},
-        {KEY_UP, "\033OA"},
-        {KEY_DOWN, "\033OB"},
-        {KEY_F1, "\033OP"},
-        {KEY_F2, "\033OQ"},
-        {KEY_F3, "\033OR"},
-        {KEY_F4, "\033OS"},
-        {KEY_F5, "\033[15~"},
-        {KEY_F6, "\033[17~"},
-        {KEY_F7, "\033[18~"},
-        {KEY_F8, "\033[19~"},
-        {KEY_F9, "\033[20~"},
-        {KEY_F10, "\033[21~"},
-        {KEY_F11, "\033[23~"},
-        {KEY_F12, "\033[24~"},
-    },
+    }
 };
 
 void term_init(const char *const term)
