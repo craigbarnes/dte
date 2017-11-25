@@ -1,5 +1,10 @@
 syntax .python-esc
 
+# TODO (allowed in string literals only; not byte literals):
+# \N{name}
+# \uxxxx
+# \Uxxxxxxxx
+
 state esc special
     char "abfnrtv'\\\"" END special
     char 0-7 oct1
@@ -73,7 +78,9 @@ state zero numeric
     char bB bin
     char oO oct
     char xX hex
+    char 0 dec-zero
     char . float
+    char eE exponent
     noeat int-suffix
 
 state bin numeric
@@ -88,6 +95,13 @@ state dec numeric
     char 0-9 dec
     char eE exponent
     char . float
+    noeat int-suffix
+
+state dec-zero numeric
+    char 0 dec-zero
+    char eE exponent
+    char . float
+    # TODO: digits 1-9 are allowed here but only if the number becomes a float
     noeat int-suffix
 
 state hex numeric
