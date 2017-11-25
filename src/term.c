@@ -15,31 +15,17 @@ typedef struct {
 
 enum {
     T_RXVT = 1,
-    T_SCREEN = 2,
-    T_ST = 4,
-    T_TMUX = 8,
-    T_XTERM = 16,
-    T_XTERM_LIKE = T_XTERM | T_SCREEN | T_TMUX,
-    T_ALL = T_XTERM_LIKE | T_RXVT | T_ST,
+    T_ST = 2,
+    T_ALL = T_RXVT | T_ST,
 };
 
 // Prefixes; st-256color matches st
 static const char *const terms[] = {
     "rxvt",
-    "screen",
     "st",
-    "tmux",
-    "xterm",
 };
 
 static const KeyMap builtin_keys[] = {
-    // ansi
-    {KEY_LEFT, "\033[D", T_ALL},
-    {KEY_RIGHT, "\033[C", T_ALL},
-    {KEY_UP, "\033[A", T_ALL},
-    {KEY_DOWN, "\033[B", T_ALL},
-
-    // ???
     {KEY_HOME, "\033[1~", T_ALL},
     {KEY_END, "\033[4~", T_ALL},
 
@@ -54,53 +40,33 @@ static const KeyMap builtin_keys[] = {
     {MOD_SHIFT | KEY_RIGHT,"\033[c", T_RXVT},
     {MOD_SHIFT | KEY_UP, "\033[a", T_RXVT},
     {MOD_SHIFT | KEY_DOWN, "\033[b", T_RXVT},
-    {MOD_SHIFT | KEY_UP, "\033[1;2A", T_ST | T_XTERM_LIKE},
-    {MOD_SHIFT | KEY_DOWN, "\033[1;2B", T_ST | T_XTERM_LIKE},
-    {MOD_SHIFT | KEY_LEFT, "\033[1;2D", T_ST | T_XTERM_LIKE},
-    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C", T_ST | T_XTERM_LIKE},
+    {MOD_SHIFT | KEY_UP, "\033[1;2A", T_ST},
+    {MOD_SHIFT | KEY_DOWN, "\033[1;2B", T_ST},
+    {MOD_SHIFT | KEY_LEFT, "\033[1;2D", T_ST},
+    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C", T_ST},
 
     {MOD_CTRL | KEY_LEFT,  "\033Od", T_RXVT},
     {MOD_CTRL | KEY_RIGHT, "\033Oc", T_RXVT},
     {MOD_CTRL | KEY_UP,    "\033Oa", T_RXVT},
     {MOD_CTRL | KEY_DOWN,  "\033Ob", T_RXVT},
-    {MOD_CTRL | KEY_LEFT,  "\033[1;5D", T_ST | T_XTERM_LIKE},
-    {MOD_CTRL | KEY_RIGHT, "\033[1;5C", T_ST | T_XTERM_LIKE},
-    {MOD_CTRL | KEY_UP,    "\033[1;5A", T_ST | T_XTERM_LIKE},
-    {MOD_CTRL | KEY_DOWN,  "\033[1;5B", T_ST | T_XTERM_LIKE},
-
-    {MOD_CTRL | MOD_SHIFT | KEY_LEFT,  "\033[1;6D", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_SHIFT | KEY_RIGHT, "\033[1;6C", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_SHIFT | KEY_UP,    "\033[1;6A", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_SHIFT | KEY_DOWN,  "\033[1;6B", T_XTERM_LIKE},
+    {MOD_CTRL | KEY_LEFT,  "\033[1;5D", T_ST},
+    {MOD_CTRL | KEY_RIGHT, "\033[1;5C", T_ST},
+    {MOD_CTRL | KEY_UP,    "\033[1;5A", T_ST},
+    {MOD_CTRL | KEY_DOWN,  "\033[1;5B", T_ST},
 
     {MOD_META | KEY_LEFT,  "\033\033[D", T_RXVT},
     {MOD_META | KEY_RIGHT, "\033\033[C", T_RXVT},
     {MOD_META | KEY_UP,    "\033\033[A", T_RXVT},
     {MOD_META | KEY_DOWN,  "\033\033[B", T_RXVT},
-    {MOD_META | KEY_LEFT,  "\033[1;3D", T_ST | T_XTERM_LIKE},
-    {MOD_META | KEY_RIGHT, "\033[1;3C", T_ST | T_XTERM_LIKE},
-    {MOD_META | KEY_UP,    "\033[1;3A", T_ST | T_XTERM_LIKE},
-    {MOD_META | KEY_DOWN,  "\033[1;3B", T_ST | T_XTERM_LIKE},
+    {MOD_META | KEY_LEFT,  "\033[1;3D", T_ST},
+    {MOD_META | KEY_RIGHT, "\033[1;3C", T_ST},
+    {MOD_META | KEY_UP,    "\033[1;3A", T_ST},
+    {MOD_META | KEY_DOWN,  "\033[1;3B", T_ST},
 
     {MOD_META | MOD_SHIFT | KEY_LEFT,  "\033\033[d", T_RXVT},
     {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033\033[c", T_RXVT},
     {MOD_META | MOD_SHIFT | KEY_UP,    "\033\033[a", T_RXVT},
     {MOD_META | MOD_SHIFT | KEY_DOWN,  "\033\033[b", T_RXVT},
-    {MOD_META | MOD_SHIFT | KEY_LEFT,  "\033[1;4D", T_XTERM_LIKE},
-    {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033[1;4C", T_XTERM_LIKE},
-    {MOD_META | MOD_SHIFT | KEY_UP,    "\033[1;4A", T_XTERM_LIKE},
-    {MOD_META | MOD_SHIFT | KEY_DOWN,  "\033[1;4B", T_XTERM_LIKE},
-
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT,  "\033[1;8D", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT, "\033[1;8C", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP,    "\033[1;8A", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN,  "\033[1;8B", T_XTERM_LIKE},
-
-    {MOD_CTRL | KEY_DELETE, "\033[3;5~", T_XTERM_LIKE},
-    {MOD_SHIFT | KEY_DELETE, "\033[3;2~", T_XTERM_LIKE},
-    {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "\033[3;6~", T_XTERM_LIKE},
-
-    {MOD_SHIFT | '\t', "\033[Z", T_ST | T_XTERM_LIKE},
 };
 
 TerminalInfo terminal;
