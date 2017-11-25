@@ -103,6 +103,7 @@ state dec-zero numeric
     char eE exponent
     char . float
     # TODO: digits 1-9 are allowed here but only if the number becomes a float
+    # (i.e contains a point, exponent or imaginary suffix [jJ] somewhere)
     noeat int-suffix
 
 state hex numeric
@@ -110,7 +111,9 @@ state hex numeric
     noeat int-suffix
 
 state int-suffix code
+    # TODO: Remove long int suffixes? (removed in Python 3)
     char lL int-end numeric
+    char jJ float-end numeric
     noeat int-end
 
 state int-end error
@@ -120,15 +123,26 @@ state int-end error
 state float numeric
     char 0-9 float
     char eE exponent
-    noeat float-end
+    noeat float-suffix
 
 state exponent numeric
-    char 0-9+- exponent-digit
+    char +- exponent-sign
+    char 0-9 exponent-digit
+    recolor error 1
+    noeat float-end
+
+state exponent-sign numeric
+    char 0-9 exponent-digit
+    recolor error 2
     noeat float-end
 
 state exponent-digit numeric
     char 0-9 exponent-digit
-    noeat float-end
+    noeat float-suffix
+
+state float-suffix code
+    char jJ float-end numeric
+    noeat int-end
 
 state float-end error
     char a-zA-Z_ float-end
