@@ -166,6 +166,10 @@ static void term_init_fallback(const char *const UNUSED(term))
     {'+', "\033Ok"}, \
     {'\r', "\033OM"},
 
+static const TermKeyMap st_keymap[] = {
+    XTERM_KEYMAP_COMMON
+};
+
 static const TermKeyMap xterm_keymap[] = {
     XTERM_KEYMAP_COMMON
     {MOD_CTRL | MOD_SHIFT | KEY_LEFT, "\033[1;6D"},
@@ -184,40 +188,6 @@ static const TermKeyMap xterm_keymap[] = {
     {MOD_SHIFT | KEY_DELETE, "\033[3;2~"},
     {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "\033[3;6~"},
     {MOD_SHIFT | '\t', "\033[Z"},
-};
-
-static const TermControlCodes xterm_control_codes = {
-    .clear_to_eol = "\033[K",
-    .keypad_off = "\033[?1l\033>",
-    .keypad_on = "\033[?1h\033=",
-    .cup_mode_off = "\033[?1049l",
-    .cup_mode_on = "\033[?1049h",
-    .hide_cursor = "\033[?25l",
-    .show_cursor = "\033[?25h",
-};
-
-static const TerminalInfo terminal_xterm = {
-    .can_bg_color_erase = false,
-    .max_colors = 8,
-    .width = 80,
-    .height = 24,
-    .keymap = xterm_keymap,
-    .keymap_length = ARRAY_COUNT(xterm_keymap),
-    .control_codes = &xterm_control_codes
-};
-
-static const TermKeyMap st_keymap[] = {
-    XTERM_KEYMAP_COMMON
-};
-
-static const TerminalInfo terminal_st = {
-    .can_bg_color_erase = true,
-    .max_colors = 8,
-    .width = 80,
-    .height = 24,
-    .keymap = st_keymap,
-    .keymap_length = ARRAY_COUNT(st_keymap),
-    .control_codes = &xterm_control_codes
 };
 
 static const TermKeyMap rxvt_keymap[] = {
@@ -263,6 +233,16 @@ static const TermKeyMap rxvt_keymap[] = {
     {MOD_META | MOD_SHIFT | KEY_DOWN, "\033\033[b"},
 };
 
+static const TermControlCodes xterm_control_codes = {
+    .clear_to_eol = "\033[K",
+    .keypad_off = "\033[?1l\033>",
+    .keypad_on = "\033[?1h\033=",
+    .cup_mode_off = "\033[?1049l",
+    .cup_mode_on = "\033[?1049h",
+    .hide_cursor = "\033[?25l",
+    .show_cursor = "\033[?25h",
+};
+
 static const TermControlCodes rxvt_control_codes = {
     .clear_to_eol = "\033[K",
     .keypad_off = "\033>",
@@ -271,6 +251,26 @@ static const TermControlCodes rxvt_control_codes = {
     .cup_mode_on = "\0337\033[?47h",
     .hide_cursor = "\033[?25l",
     .show_cursor = "\033[?25h",
+};
+
+static const TerminalInfo terminal_xterm = {
+    .can_bg_color_erase = false,
+    .max_colors = 8,
+    .width = 80,
+    .height = 24,
+    .keymap = xterm_keymap,
+    .keymap_length = ARRAY_COUNT(xterm_keymap),
+    .control_codes = &xterm_control_codes
+};
+
+static const TerminalInfo terminal_st = {
+    .can_bg_color_erase = true,
+    .max_colors = 8,
+    .width = 80,
+    .height = 24,
+    .keymap = st_keymap,
+    .keymap_length = ARRAY_COUNT(st_keymap),
+    .control_codes = &xterm_control_codes
 };
 
 static const TerminalInfo terminal_rxvt = {
