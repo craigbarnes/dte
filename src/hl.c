@@ -214,8 +214,11 @@ static HlColor **highlight_line (
                 } break;
             case COND_STR2:
                 // Optimized COND_STR (length 2, case sensitive)
-                if (ch == cond->u.cond_str.str[0] && len - i > 1 &&
-                        line[i + 1] == cond->u.cond_str.str[1]) {
+                if (
+                    ch == cond->u.cond_str.str[0]
+                    && len - i > 1
+                    && line[i + 1] == cond->u.cond_str.str[1]
+                ) {
                     colors[i++] = a->emit_color;
                     colors[i++] = a->emit_color;
                     sidx = -1;

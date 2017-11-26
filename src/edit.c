@@ -42,9 +42,12 @@ void select_block(void)
     // If current line does not match \{\s*$ but matches ^\s*\} then
     // cursor is likely at end of the block you want to select.
     fetch_this_line(&bi, &lr);
-    if (!regexp_match_nosub(spattern, lr.line, lr.size) &&
-         regexp_match_nosub(epattern, lr.line, lr.size))
+    if (
+        !regexp_match_nosub(spattern, lr.line, lr.size)
+        && regexp_match_nosub(epattern, lr.line, lr.size)
+    ) {
         block_iter_prev_line(&bi);
+    }
 
     while (1) {
         fetch_this_line(&bi, &lr);

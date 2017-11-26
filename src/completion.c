@@ -218,13 +218,15 @@ static void collect_completions(char **args, int argc)
         return;
     }
 
-    if (streq(cmd->name, "open") ||
-        streq(cmd->name, "wsplit") ||
-        streq(cmd->name, "save") ||
-        streq(cmd->name, "compile") ||
-        streq(cmd->name, "run") ||
-        streq(cmd->name, "pass-through") ||
-        streq(cmd->name, "include")) {
+    if (
+        streq(cmd->name, "open")
+        || streq(cmd->name, "wsplit")
+        || streq(cmd->name, "save")
+        || streq(cmd->name, "compile")
+        || streq(cmd->name, "run")
+        || streq(cmd->name, "pass-through")
+        || streq(cmd->name, "include")
+    ) {
         collect_files(false);
         return;
     }

@@ -113,7 +113,7 @@ void handle_binding(Key key)
             continue;
         }
 
-        if (memcmp(
+        if (memcmp (
             c->keys,
             pressed_keys.keys,
             pressed_keys.count * sizeof(pressed_keys.keys[0])

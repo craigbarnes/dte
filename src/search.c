@@ -189,7 +189,7 @@ static bool update_regex(void)
     free_regex();
 
     current_search.re_flags = re_flags;
-    if (regexp_compile(
+    if (regexp_compile (
         &current_search.regex,
         current_search.pattern,
         current_search.re_flags

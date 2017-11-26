@@ -26,10 +26,12 @@
 #endif
 
 #define STRINGIFY(a) #a
+
 #define BUG_ON(a) \
     do { \
-        if (unlikely(a)) \
+        if (unlikely(a)) { \
             BUG("%s", STRINGIFY(a)); \
+        } \
     } while (0)
 
 static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
