@@ -31,13 +31,15 @@ static void term_read_caps(void)
     terminal.height = tigetnum("lines");
 
     TermControlCodes *tcc = xmalloc(sizeof(TermControlCodes));
-    tcc->clear_to_eol = curses_str_cap("el");
-    tcc->keypad_off = curses_str_cap("rmkx");
-    tcc->keypad_on = curses_str_cap("smkx");
-    tcc->cup_mode_off = curses_str_cap("rmcup");
-    tcc->cup_mode_on = curses_str_cap("smcup");
-    tcc->show_cursor = curses_str_cap("cnorm");
-    tcc->hide_cursor = curses_str_cap("civis");
+    *tcc = (TermControlCodes) {
+        .clear_to_eol = curses_str_cap("el"),
+        .keypad_off = curses_str_cap("rmkx"),
+        .keypad_on = curses_str_cap("smkx"),
+        .cup_mode_off = curses_str_cap("rmcup"),
+        .cup_mode_on = curses_str_cap("smcup"),
+        .show_cursor = curses_str_cap("cnorm"),
+        .hide_cursor = curses_str_cap("civis")
+    };
     terminal.control_codes = tcc;
 
     static const struct {
