@@ -1,6 +1,3 @@
-# This was copied from the Java syntax but should be mostly correct
-# TODO: check against the Vala language spec and update if necessary
-
 syntax .vala-esc
 
 state char-esc special
@@ -50,6 +47,7 @@ state not-ascii error
     char "\x80-\xff" not-ascii
     noeat END
 
+# TODO: Check against the Vala spec (was copied from the Java syntax)
 syntax vala
 
 state code

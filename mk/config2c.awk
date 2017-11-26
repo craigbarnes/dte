@@ -24,6 +24,11 @@ FNR == 1 {
     idents[nfiles] = ident
 }
 
+/^# *(TODO|FIXME)/ {
+    print "\"\\n\""
+    next
+}
+
 {
     print "\"" escape_string($0) "\\n\""
 }

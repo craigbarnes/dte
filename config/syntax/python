@@ -1,10 +1,6 @@
 syntax .python-esc
 
-# TODO (allowed in string literals only; not byte literals):
-# \N{name}
-# \uxxxx
-# \Uxxxxxxxx
-
+# TODO: \N{name}  \uxxxx  \Uxxxxxxxx
 state esc special
     char "abfnrtv'\\\"" END special
     char 0-7 oct1
@@ -35,7 +31,7 @@ state start code
     str "'''" longsq
     char '"' dq
     char "'" sq
-    # FIXME: [uU][rR]" [uU]" [rR]" [bB]" [bB][rR]"
+    # TODO: [uU][rR]" [uU]" [rR]" [bB]" [bB][rR]"
     char -b a-zA-Z_ ident
     char 0 zero
     char 1-9 dec
@@ -103,7 +99,6 @@ state dec-zero numeric
     char eE exponent
     char . float
     # TODO: digits 1-9 are allowed here but only if the number becomes a float
-    # (i.e contains a point, exponent or imaginary suffix [jJ] somewhere)
     noeat int-suffix
 
 state hex numeric

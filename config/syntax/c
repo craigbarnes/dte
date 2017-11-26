@@ -1,5 +1,6 @@
 syntax .c-esc
 
+# TODO: C11 Unicode escapes (e.g. "\u00ff" and "\U00ff99cc")
 state start special
     char "abfnrtv'\\\"" END special
     char 0-3 oct1

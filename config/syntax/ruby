@@ -1,8 +1,6 @@
 syntax .ruby-esc
 
-# This sub-syntax was copied from the Python syntax
-# TODO: correct the rules to match the actual Ruby syntax
-
+# TODO: Check this against the Ruby spec (was copied from the Python syntax)
 state esc special
     char "abfnrtv'\\\"" END special
     char 0-7 oct1
@@ -27,14 +25,12 @@ state hex1 special
 
 syntax ruby
 
-# TODO:
-# * %Q() strings
-# * Expression substitution in strings
-# * Here document strings
-# * Command output (e.g. `date` or %x{ date })
-# * Regular expression literals
-# * Numeric literals
-# * Constants (e.g. FOOBAR)
+# TODO: %Q() strings
+# TODO: Expression substitution in strings (e.g. "my name is #{$ruby}")
+# TODO: Here document strings (e.g. print <<EOF ...)
+# TODO: Command output (e.g. `date` or %x{ date })
+# TODO: Regular expression literals  (e.g. /^Ruby/i or %r|^/usr/local/.*|)
+# TODO: Numeric literals
 
 state line-start code
     char # comment

@@ -14,10 +14,9 @@ state end code-block
 
 syntax markdown
 
-# TODO:
-# * All variations of links and references
-# * Underlined headings
-# * Escapes
+# TODO: All variations of links and references
+# TODO: Underlined headings
+# TODO: Escapes
 
 default special unordered-list
 default numeric ordered-list

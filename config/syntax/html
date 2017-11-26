@@ -299,12 +299,14 @@ list entity \
 
 syntax html
 
+# TODO: Allow comments before doctype
+# TODO: Don't highlight tags inside RCDATA elements (e.g. style, script, etc.)
+
 state start text
     char " \t\n" start
     str "<!" doctype
     noeat text
 
-# Skip that useless bloated doctype which is too complicated to parse
 state doctype comment
     char > text comment
     char < text error

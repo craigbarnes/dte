@@ -1,6 +1,3 @@
-# Mostly copied from the C syntax file
-# TODO: Fix up to match the actual D syntax
-
 syntax .d-esc
 
 state start special
@@ -82,6 +79,7 @@ state start code
     char -b A-Z ident-upper-label
     noeat code
 
+# TODO: Fix up to match the D syntax spec (originally copied from C)
 state code code
     char -b a-z_ ident
     char -b A-Z ident-upper
