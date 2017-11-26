@@ -10,7 +10,7 @@ v1.5 (latest release)
 * Added some POSIX and C11 features to the C syntax highlighter.
 * Added new command-line flags for listing (`-B`) and dumping
   (`-b`) built-in rc files.
-* Moved some of the documentation in the `dte(1)` man page to a
+* Moved some of the documentation from the `dte(1)` man page to a
   separate `dterc(5)` page.
 * Fixed a terminal input bug triggered by redirecting `stdin`.
 * Fixed some memory and file descriptor leaks.

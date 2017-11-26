@@ -13,6 +13,7 @@ mk/dev.mk export-ignore
 mk/git-hooks/ export-ignore
 mk/sha256sums.txt export-ignore
 mk/tput-compare.sh export-ignore
+mk/get-html-entities.sh export-ignore
 
 docs/*.txt ttman
 GNUmakefile make
