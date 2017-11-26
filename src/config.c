@@ -2,6 +2,7 @@
 #include "error.h"
 #include "strbuf.h"
 #include "common.h"
+#include "completion.h"
 #include "../build/builtin-config.h"
 
 const char *config_file;
@@ -88,6 +89,16 @@ void list_builtin_configs(void)
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         fputs(builtin_configs[i].name, stdout);
         fputc('\n', stdout);
+    }
+}
+
+void collect_builtin_configs(const char *const prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+        const BuiltinConfig *cfg = &builtin_configs[i];;
+        if (str_has_prefix(cfg->name, prefix)) {
+            add_completion(xstrdup(cfg->name));
+        }
     }
 }
 

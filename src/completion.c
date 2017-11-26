@@ -11,6 +11,7 @@
 #include "color.h"
 #include "env.h"
 #include "path.h"
+#include "config.h"
 
 static struct {
     // Part of string which is to be replaced
@@ -225,13 +226,25 @@ static void collect_completions(char **args, int argc)
         || streq(cmd->name, "compile")
         || streq(cmd->name, "run")
         || streq(cmd->name, "pass-through")
-        || streq(cmd->name, "include")
     ) {
         collect_files(false);
         return;
     }
     if (streq(cmd->name, "cd")) {
         collect_files(true);
+        return;
+    }
+    if (streq(cmd->name, "include")) {
+        switch (argc) {
+        case 1:
+            collect_files(false);
+            break;
+        case 2:
+            if (streq(args[1], "-b")) {
+                collect_builtin_configs(completion.parsed);
+            }
+            break;
+        }
         return;
     }
     if (streq(cmd->name, "hi")) {
