@@ -14,10 +14,10 @@ html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
 web  := $(html) $(pdf) $(img) $(patsubst %, %.gz, $(html) $(pdf))
 
 docs: man web
-man: $(man)
+man: docs/dterc.5 docs/dte-syntax.5
 web: $(web)
 
-docs/%.1 docs/%.5: docs/%.txt $(TTMAN)
+docs/%.5: docs/%.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
