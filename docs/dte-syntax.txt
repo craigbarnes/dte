@@ -160,11 +160,9 @@ whose name is END are replaced with "c".
 
 @h1 SEE ALSO
 
-*dte*(1)
-
-*dterc*(5)
-
-`https://github.com/craigbarnes/dte/tree/master/config/syntax`
+*dte*(1),
+*dterc*(5),
+https://github.com/craigbarnes/dte/tree/master/config/syntax
 
 @h1 AUTHORS
 

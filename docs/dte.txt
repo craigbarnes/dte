@@ -158,12 +158,10 @@ Reverse search direction.
 
 @h1 SEE ALSO
 
-*dterc*(5)
-
+*dterc*(5),
 *dte-syntax*(5)
 
 @h1 AUTHORS
 
-Craig Barnes <cr\@igbarn.es>
-
+Craig Barnes <cr\@igbarn.es>@br
 Timo Hirvonen <tihirvon\@gmail.com>

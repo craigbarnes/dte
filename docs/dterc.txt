@@ -886,12 +886,10 @@ local (per-file) options.
 
 @h1 SEE ALSO
 
-*dte*(1)
-
+*dte*(1),
 *dte-syntax*(5)
 
 @h1 AUTHORS
 
-Craig Barnes <cr\@igbarn.es>
-
+Craig Barnes <cr\@igbarn.es>@br
 Timo Hirvonen <tihirvon\@gmail.com>
