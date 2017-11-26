@@ -476,23 +476,3 @@ const char *term_set_color(const TermColor *color)
     buffer[buffer_pos++] = 0;
     return buffer;
 }
-
-const char *term_move_cursor(int x, int y)
-{
-    if (x < 0 || x >= 999 || y < 0 || y >= 999) {
-        return "";
-    }
-
-    x++;
-    y++;
-    // Max 11 bytes
-    buffer_pos = 0;
-    buffer[buffer_pos++] = '\033';
-    buffer[buffer_pos++] = '[';
-    buffer_num(y);
-    buffer[buffer_pos++] = ';';
-    buffer_num(x);
-    buffer[buffer_pos++] = 'H';
-    buffer[buffer_pos++] = 0;
-    return buffer;
-}

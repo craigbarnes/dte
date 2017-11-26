@@ -110,9 +110,23 @@ void buf_show_cursor(void)
     }
 }
 
+// Move cursor to screen position (x and y are zero-based)
 void buf_move_cursor(int x, int y)
 {
-    buf_escape(term_move_cursor(x, y));
+    if (x < 0 || x >= 999 || y < 0 || y >= 999) {
+        return;
+    }
+    static char buf[16];
+    int pos = snprintf (
+        buf,
+        15,
+        "\033[%u;%uH",
+        ((unsigned int)y) + 1,
+        ((unsigned int)x) + 1
+    );
+    BUG_ON(pos < 6);  // \E[0;0H == 6 bytes
+    BUG_ON(pos > 10); // \E[998;998H == 10 bytes
+    buf_escape(buf);
 }
 
 void buf_set_color(const TermColor *const color)

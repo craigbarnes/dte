@@ -74,7 +74,4 @@ int term_get_size(int *w, int *h);
 
 const char *term_set_color(const TermColor *color);
 
-// Move cursor (x and y are zero based)
-const char *term_move_cursor(int x, int y);
-
 #endif
