@@ -96,10 +96,6 @@ The following optional build variables may be useful when packaging
   support currently only works with [xterm]-compatible or
   [ANSI]-compatible terminals but makes it much easier to create a
   portable, statically linked binary.
-* `BUILTIN_SYNTAX_FILES='...'`: Specify a subset of [syntax files] to
-  compile into the program binary (the default is to include all of
-  them). This can be used to reduce the size of the program binary, for
-  use in resource-constrained environments.
 
 Example usage:
 
