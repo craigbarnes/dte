@@ -1,0 +1,202 @@
+.TH DTE\-SYNTAX 5 "November 2017"
+.nh
+.ad l
+.SH NAME
+dte\-syntax \- Format of the syntax highlighting files used by \fBdte\fR(1)
+.SH DESCRIPTION
+A syntax file consists of multiple states. A state consists of optional conditionals and one default action. The best way understand the syntax of these files is to read through some examples (see link below).
+
+Basic syntax of the syntax files is the same used in the rc files, but the available commands are different.
+
+Conditionals and default actions have destination state. The special destination state "this" can be used to jump to current state.
+.SH COMMANDS
+.SS Main commands
+\fBsyntax\fR <\fIname\fR>
+.RS
+Begin a new syntax. One syntax file can contain multiple syntax definitions, but you should only define one real syntax in one syntax file.
+.RE
+
+.RS
+See also SUB\-SYNTAXES.
+.RE
+
+\fBstate\fR <\fIname\fR> [\fIemit\-color\fR]
+.RS
+Add new state. Conditionals (if any) and one default action must follow. First state is the start state.
+.RE
+
+\fBdefault\fR <\fIcolor\fR> <\fIname\fR>...
+.RS
+Set default \fIcolor\fR for emitted \fIname\fR.
+.RE
+
+.RS
+Example:
+.RS
+default numeric oct dec hex
+.RE
+.RE
+
+.RS
+If there is no color defined for oct, dec or hex then color numeric is used instead.
+.RE
+
+\fBlist\fR [\fB\-i\fR] <\fIname\fR> <\fIstring\fR>...
+.RS
+Define a list of strings.
+.RE
+
+.RS
+Example:
+.RS
+list keyword if else for while do continue switch case
+.RE
+.RE
+
+.RS
+Use conditional \fBinlist\fR to test if a buffered string is in a list.
+.RE
+
+.RS
+\fB\-i\fR Make list case\-insensitive.
+.RE
+.SS Conditionals
+\fBbufis\fR [\fB\-i\fR] <\fIstring\fR> <\fIdestination\fR> [\fIemit\-name\fR]
+.RS
+Test if buffered bytes are same as \fIstring\fR. If they are emit \fIemit\-name\fR and jump to \fIdestination\fR state.
+.RE
+
+\fBchar\fR [\fB\-bn\fR] <\fIcharacters\fR> <\fIdestination\fR> [\fIemit\-name\fR]
+.RS
+Test if current byte is in the character list. If it is then emit \fIemit\-color\fR and jump to \fIdestination\fR state. If \fIemit\-name\fR is not given then destination states emit name is used.
+.RE
+
+.RS
+Characters is a list of strings. Ranges are supported ("a\-d" is same as "abcd").
+.RE
+
+.RS
+\fB\-b\fR Add byte to buffer.
+.RE
+
+.RS
+\fB\-n\fR Invert character bitmap.
+.RE
+
+\fBheredocend\fR <\fIdestination\fR>
+.RS
+Compare following characters to heredoc end delimiter and go to destination state if comparison is true.
+.RE
+
+\fBinlist\fR <\fIlist\fR> <\fIdestination\fR> [\fIemit\-name\fR]
+.RS
+Test if buffered bytes are found in \fIlist\fR. If found, emit \fIemit\-name\fR and jump to \fIdestination\fR state.
+.RE
+
+\fBstr\fR [\fB\-i\fR] <\fIstring\fR> <\fIdestination\fR> [\fIemit\-name\fR]
+.RS
+See if following bytes are same as \fIstring\fR. If they are emit \fIemit\-name\fR and jump to \fIdestination\fR state.
+.RE
+
+.RS
+\fB\-i\fR case\-insensitive.
+.RE
+
+.RS
+NOTE: This conditional can be slow, especially if \fIstring\fR is longer than two bytes.
+.RE
+.SS Default actions
+Last command of every state must be default action. It is an unconditional jump.
+
+\fBeat\fR <\fIdestination\fR> [\fIemit\-name\fR]
+.RS
+Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR state.
+.RE
+
+\fBheredocbegin\fR <\fIsubsyntax\fR> <\fIreturn\-state\fR>
+.RS
+Store buffered bytes as heredoc end delimiter and go to \fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must contain a \fBheredocend\fR conditional.
+.RE
+
+\fBnoeat\fR [\fB\-b\fR] <\fIdestination\fR>
+.RS
+Continue to \fIdestination\fR state without emitting color or consuming byte.
+.RE
+
+.RS
+\fB\-b\fR Don't stop buffering.
+.RE
+.SS Other commands
+\fBrecolor\fR <\fIcolor\fR> [\fIcount\fR]
+.RS
+If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise recolor buffered bytes.
+.RE
+.SH SUB\-SYNTAXES
+Sub\-syntaxes are useful when same states are needed in many contexts.
+
+Sub\-syntax name must be prefixed with ".". It is recommended to also use main syntax's name in the prefix. For example ".c\-comment" if "c" is the main syntax.
+
+Sub\-syntax is a syntax of which some destination state's name is END. END is a special state name which is replaced by state given at another syntax.
+
+Example:
+
+.RS
+# sub\-syntax
+.br
+syntax .c\-comment
+.RE
+
+.RS
+state comment
+.RS
+char "*" star
+.br
+eat comment
+.RE
+.RE
+
+.RS
+state star comment
+.RS
+# END is a special state name
+.br
+char / END comment
+.br
+noeat comment
+.RE
+.RE
+
+.RS
+# main syntax
+.br
+syntax c
+.RE
+
+.RS
+state c code
+.RS
+char " \\t\\n" c
+.br
+char \-b a\-zA\-Z_ ident
+.br
+char "\\"" string
+.br
+char "'" char
+.br
+# call sub\-syntax
+.br
+str "/*" .c\-comment:c
+.br
+eat c
+.RE
+.RE
+
+.RS
+# other states removed
+.RE
+
+In this example the destination state ".c\-comment:c" is special syntax for calling a sub\-syntax. ".c\-comment" is name of the sub\-syntax and "c" is the return state defined in the main syntax. Whole sub\-syntax tree is copied into the main syntax and all destination states in the sub\-syntax whose name is END are replaced with "c".
+.SH SEE ALSO
+\fBdte\fR(1), \fBdterc\fR(5), https://github.com/craigbarnes/dte/tree/master/config/syntax
+.SH AUTHORS
+Timo Hirvonen <tihirvon@gmail.com>

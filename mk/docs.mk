@@ -7,7 +7,7 @@ XARGS_P_FLAG = $(shell \
     echo '-P$(NPROC)' \
 )
 
-man  := dte.1 dterc.5 dte-syntax.5
+man  := docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 pdf  := public/dte.pdf
 img  := public/screenshot.png
 html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
@@ -17,7 +17,7 @@ docs: man web
 man: $(man)
 web: $(web)
 
-%.1 %.5: docs/%.txt $(TTMAN)
+docs/%.1 docs/%.5: docs/%.txt $(TTMAN)
 	$(E) TTMAN $@
 	$(Q) $(TTMAN) < $< > $@
 
@@ -25,7 +25,7 @@ $(pdf): $(man) | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Tpdf $^ > $@
 
-$(html): public/%.html: % | public/
+$(html): public/%.html: docs/% | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Thtml $< > $@
 
@@ -52,6 +52,5 @@ check-docs: README.md docs/CONTRIBUTING.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
-CLEANFILES += $(man)
 CLEANDIRS += public/
 .PHONY: docs man web check-docs
