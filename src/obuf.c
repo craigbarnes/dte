@@ -135,7 +135,73 @@ void buf_set_color(const TermColor *const color)
         return;
     }
 
-    buf_escape(term_set_color(color));
+    TermColor c = *color;
+
+    // TERM=xterm: 8 colors
+    // TERM=linux: 8 colors. colors > 7 corrupt screen
+    if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
+        c.attr |= ATTR_BOLD;
+        c.fg &= 7;
+    }
+
+    // Max 34 bytes (3 + 6 * 2 + 2 * 9 + 1)
+    char buf[64];
+    size_t i = 0;
+    buf[i++] = '\033';
+    buf[i++] = '[';
+    buf[i++] = '0';
+
+    if (c.attr & ATTR_BOLD) {
+        buf[i++] = ';';
+        buf[i++] = '1';
+    }
+    if (c.attr & ATTR_LOW_INTENSITY) {
+        buf[i++] = ';';
+        buf[i++] = '2';
+    }
+    if (c.attr & ATTR_ITALIC) {
+        buf[i++] = ';';
+        buf[i++] = '3';
+    }
+    if (c.attr & ATTR_UNDERLINE) {
+        buf[i++] = ';';
+        buf[i++] = '4';
+    }
+    if (c.attr & ATTR_BLINKING) {
+        buf[i++] = ';';
+        buf[i++] = '5';
+    }
+    if (c.attr & ATTR_REVERSE_VIDEO) {
+        buf[i++] = ';';
+        buf[i++] = '7';
+    }
+    if (c.attr & ATTR_INVISIBLE_TEXT) {
+        buf[i++] = ';';
+        buf[i++] = '8';
+    }
+    if (c.fg >= 0) {
+        const unsigned char fg = (unsigned char) c.fg;
+        if (fg < 8) {
+            buf[i++] = ';';
+            buf[i++] = '3';
+            buf[i++] = '0' + fg;
+        } else {
+            i += snprintf(&buf[i], 10, ";38;5;%u", fg);
+        }
+    }
+    if (c.bg >= 0) {
+        const unsigned char bg = (unsigned char) c.bg;
+        if (bg < 8) {
+            buf[i++] = ';';
+            buf[i++] = '4';
+            buf[i++] = '0' + bg;
+        } else {
+            i += snprintf(&buf[i], 10, ";48;5;%u", bg);
+        }
+    }
+    buf[i++] = 'm';
+
+    buf_add_bytes(buf, i);
     obuf.color = *color;
 }
 

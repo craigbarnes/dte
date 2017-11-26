@@ -10,22 +10,6 @@
 TerminalInfo terminal;
 
 static struct termios termios_save;
-static char buffer[64];
-static size_t buffer_pos;
-
-static void buffer_num(unsigned int num)
-{
-    char stack[32];
-    size_t pos = 0;
-
-    do {
-        stack[pos++] = (num % 10) + '0';
-        num /= 10;
-    } while (num);
-    do {
-        buffer[buffer_pos++] = stack[--pos];
-    } while (pos);
-}
 
 static char *escape_key(const char *key, int len)
 {
@@ -404,75 +388,4 @@ int term_get_size(int *w, int *h)
         return 0;
     }
     return -1;
-}
-
-static void buffer_color(char x, unsigned char color)
-{
-    buffer[buffer_pos++] = ';';
-    buffer[buffer_pos++] = x;
-    if (color < 8) {
-        buffer[buffer_pos++] = '0' + color;
-    } else {
-        buffer[buffer_pos++] = '8';
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '5';
-        buffer[buffer_pos++] = ';';
-        buffer_num(color);
-    }
-}
-
-const char *term_set_color(const TermColor *color)
-{
-    TermColor c = *color;
-
-    // TERM=xterm: 8 colors
-    // TERM=linux: 8 colors. colors > 7 corrupt screen
-    if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
-        c.attr |= ATTR_BOLD;
-        c.fg &= 7;
-    }
-
-    // Max 35 bytes (3 + 6 * 2 + 2 * 9 + 2)
-    buffer_pos = 0;
-    buffer[buffer_pos++] = '\033';
-    buffer[buffer_pos++] = '[';
-    buffer[buffer_pos++] = '0';
-
-    if (c.attr & ATTR_BOLD) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '1';
-    }
-    if (c.attr & ATTR_LOW_INTENSITY) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '2';
-    }
-    if (c.attr & ATTR_ITALIC) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '3';
-    }
-    if (c.attr & ATTR_UNDERLINE) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '4';
-    }
-    if (c.attr & ATTR_BLINKING) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '5';
-    }
-    if (c.attr & ATTR_REVERSE_VIDEO) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '7';
-    }
-    if (c.attr & ATTR_INVISIBLE_TEXT) {
-        buffer[buffer_pos++] = ';';
-        buffer[buffer_pos++] = '8';
-    }
-    if (c.fg >= 0) {
-        buffer_color('3', c.fg);
-    }
-    if (c.bg >= 0) {
-        buffer_color('4', c.bg);
-    }
-    buffer[buffer_pos++] = 'm';
-    buffer[buffer_pos++] = 0;
-    return buffer;
 }

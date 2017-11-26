@@ -72,6 +72,4 @@ void term_discard_paste(void);
 
 int term_get_size(int *w, int *h);
 
-const char *term_set_color(const TermColor *color);
-
 #endif
