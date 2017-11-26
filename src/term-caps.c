@@ -291,7 +291,12 @@ void term_init(const char *const term)
         || str_has_prefix(term, "screen")
     ) {
         terminal = terminal_xterm;
-    } else if (streq(term, "st") || str_has_prefix(term, "st-")) {
+    } else if (
+        streq(term, "st")
+        || streq(term, "stterm")
+        || str_has_prefix(term, "st-")
+        || str_has_prefix(term, "stterm-")
+    ) {
         terminal = terminal_st;
     } else if (streq(term, "rxvt") || str_has_prefix(term, "rxvt-")) {
         terminal = terminal_rxvt;
