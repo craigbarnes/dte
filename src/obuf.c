@@ -98,15 +98,15 @@ void buf_add_str(const char *const str)
 
 void buf_hide_cursor(void)
 {
-    if (terminal.control_codes.hide_cursor) {
-        buf_escape(terminal.control_codes.hide_cursor);
+    if (terminal.control_codes->hide_cursor) {
+        buf_escape(terminal.control_codes->hide_cursor);
     }
 }
 
 void buf_show_cursor(void)
 {
-    if (terminal.control_codes.show_cursor) {
-        buf_escape(terminal.control_codes.show_cursor);
+    if (terminal.control_codes->show_cursor) {
+        buf_escape(terminal.control_codes->show_cursor);
     }
 }
 
@@ -130,10 +130,10 @@ void buf_clear_eol(void)
     if (obuf.x < obuf.scroll_x + obuf.width) {
         if (
             obuf.can_clear
-            && terminal.control_codes.clear_to_eol
+            && terminal.control_codes->clear_to_eol
             && (obuf.color.bg < 0 || terminal.can_bg_color_erase)
         ) {
-            buf_escape(terminal.control_codes.clear_to_eol);
+            buf_escape(terminal.control_codes->clear_to_eol);
             obuf.x = obuf.scroll_x + obuf.width;
         } else {
             buf_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);

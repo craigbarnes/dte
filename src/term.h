@@ -54,7 +54,7 @@ typedef struct {
     int max_colors;
     int width;
     int height;
-    TermControlCodes control_codes;
+    const TermControlCodes *control_codes;
     const TermKeyMap *keymap;
     size_t keymap_length;
 } TerminalInfo;
@@ -62,7 +62,6 @@ typedef struct {
 extern TerminalInfo terminal;
 
 void term_init(const char *const term);
-void term_setup_extra_keys(const char *const term);
 
 void term_raw(void);
 void term_cooked(void);

@@ -273,13 +273,13 @@ void resize(void)
     update_screen_size();
 
     // "dtach -r winch" sends SIGWINCH after program has been attached
-    if (terminal.control_codes.keypad_on) {
+    if (terminal.control_codes->keypad_on) {
         // Turn keypad on (makes cursor keys work)
-        buf_escape(terminal.control_codes.keypad_on);
+        buf_escape(terminal.control_codes->keypad_on);
     }
-    if (terminal.control_codes.cup_mode_on) {
+    if (terminal.control_codes->cup_mode_on) {
         // Use alternate buffer if possible
-        buf_escape(terminal.control_codes.cup_mode_on);
+        buf_escape(terminal.control_codes->cup_mode_on);
     }
 
     editor.mode_ops[editor.input_mode]->update();
@@ -298,13 +298,13 @@ void ui_end(void)
     buf_show_cursor();
 
     // Back to main buffer
-    if (terminal.control_codes.cup_mode_off) {
-        buf_escape(terminal.control_codes.cup_mode_off);
+    if (terminal.control_codes->cup_mode_off) {
+        buf_escape(terminal.control_codes->cup_mode_off);
     }
 
     // Turn keypad off
-    if (terminal.control_codes.keypad_off) {
-        buf_escape(terminal.control_codes.keypad_off);
+    if (terminal.control_codes->keypad_off) {
+        buf_escape(terminal.control_codes->keypad_off);
     }
 
     buf_flush();

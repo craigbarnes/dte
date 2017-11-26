@@ -30,15 +30,15 @@ static void term_read_caps(void)
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
 
-    terminal.control_codes = (TermControlCodes) {
-        .clear_to_eol = curses_str_cap("el"),
-        .keypad_off = curses_str_cap("rmkx"),
-        .keypad_on = curses_str_cap("smkx"),
-        .cup_mode_off = curses_str_cap("rmcup"),
-        .cup_mode_on = curses_str_cap("smcup"),
-        .show_cursor = curses_str_cap("cnorm"),
-        .hide_cursor = curses_str_cap("civis")
-    };
+    TermControlCodes *tcc = xmalloc(sizeof(TermControlCodes));
+    tcc->clear_to_eol = curses_str_cap("el");
+    tcc->keypad_off = curses_str_cap("rmkx");
+    tcc->keypad_on = curses_str_cap("smkx");
+    tcc->cup_mode_off = curses_str_cap("rmcup");
+    tcc->cup_mode_on = curses_str_cap("smcup");
+    tcc->show_cursor = curses_str_cap("cnorm");
+    tcc->hide_cursor = curses_str_cap("civis");
+    terminal.control_codes = tcc;
 
     static const struct {
         const Key key;
@@ -100,15 +100,17 @@ static const TermKeyMap ansi_keymap[] = {
     {KEY_DOWN, "\033[B"},
 };
 
+static const TermControlCodes ansi_control_codes = {
+    .clear_to_eol = "\033[K"
+};
+
 static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
     .keymap = ansi_keymap,
     .keymap_length = ARRAY_COUNT(ansi_keymap),
-    .control_codes = {
-        .clear_to_eol = "\033[K"
-    }
+    .control_codes = &ansi_control_codes
 };
 
 static void term_init_fallback(const char *const UNUSED(term))
@@ -118,43 +120,52 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
+#define XTERM_KEYMAP_COMMON \
+    {KEY_INSERT, "\033[2~"}, \
+    {KEY_DELETE, "\033[3~"}, \
+    {KEY_HOME, "\033OH"}, \
+    {KEY_HOME, "\033[1~"}, \
+    {KEY_END, "\033OF"}, \
+    {KEY_END, "\033[4~"}, \
+    {KEY_PAGE_UP, "\033[5~"}, \
+    {KEY_PAGE_DOWN, "\033[6~"}, \
+    {KEY_LEFT, "\033OD"}, \
+    {KEY_RIGHT, "\033OC"}, \
+    {KEY_UP, "\033OA"}, \
+    {KEY_DOWN, "\033OB"}, \
+    {KEY_F1, "\033OP"}, \
+    {KEY_F2, "\033OQ"}, \
+    {KEY_F3, "\033OR"}, \
+    {KEY_F4, "\033OS"}, \
+    {KEY_F5, "\033[15~"}, \
+    {KEY_F6, "\033[17~"}, \
+    {KEY_F7, "\033[18~"}, \
+    {KEY_F8, "\033[19~"}, \
+    {KEY_F9, "\033[20~"}, \
+    {KEY_F10, "\033[21~"}, \
+    {KEY_F11, "\033[23~"}, \
+    {KEY_F12, "\033[24~"}, \
+    {MOD_SHIFT | KEY_UP, "\033[1;2A"}, \
+    {MOD_SHIFT | KEY_DOWN, "\033[1;2B"}, \
+    {MOD_SHIFT | KEY_LEFT, "\033[1;2D"}, \
+    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C"}, \
+    {MOD_CTRL | KEY_LEFT, "\033[1;5D"}, \
+    {MOD_CTRL | KEY_RIGHT, "\033[1;5C"}, \
+    {MOD_CTRL | KEY_UP, "\033[1;5A"}, \
+    {MOD_CTRL | KEY_DOWN, "\033[1;5B"}, \
+    {MOD_META | KEY_LEFT, "\033[1;3D"}, \
+    {MOD_META | KEY_RIGHT, "\033[1;3C"}, \
+    {MOD_META | KEY_UP, "\033[1;3A"}, \
+    {MOD_META | KEY_DOWN, "\033[1;3B"}, \
+    /* Fix keypad when numlock is off */ \
+    {'/', "\033Oo"}, \
+    {'*', "\033Oj"}, \
+    {'-', "\033Om"}, \
+    {'+', "\033Ok"}, \
+    {'\r', "\033OM"},
+
 static const TermKeyMap xterm_keymap[] = {
-    {KEY_INSERT, "\033[2~"},
-    {KEY_DELETE, "\033[3~"},
-    {KEY_HOME, "\033OH"},
-    {KEY_HOME, "\033[1~"},
-    {KEY_END, "\033OF"},
-    {KEY_END, "\033[4~"},
-    {KEY_PAGE_UP, "\033[5~"},
-    {KEY_PAGE_DOWN, "\033[6~"},
-    {KEY_LEFT, "\033OD"},
-    {KEY_RIGHT, "\033OC"},
-    {KEY_UP, "\033OA"},
-    {KEY_DOWN, "\033OB"},
-    {KEY_F1, "\033OP"},
-    {KEY_F2, "\033OQ"},
-    {KEY_F3, "\033OR"},
-    {KEY_F4, "\033OS"},
-    {KEY_F5, "\033[15~"},
-    {KEY_F6, "\033[17~"},
-    {KEY_F7, "\033[18~"},
-    {KEY_F8, "\033[19~"},
-    {KEY_F9, "\033[20~"},
-    {KEY_F10, "\033[21~"},
-    {KEY_F11, "\033[23~"},
-    {KEY_F12, "\033[24~"},
-    {MOD_SHIFT | KEY_UP, "\033[1;2A"},
-    {MOD_SHIFT | KEY_DOWN, "\033[1;2B"},
-    {MOD_SHIFT | KEY_LEFT, "\033[1;2D"},
-    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C"},
-    {MOD_CTRL | KEY_LEFT, "\033[1;5D"},
-    {MOD_CTRL | KEY_RIGHT, "\033[1;5C"},
-    {MOD_CTRL | KEY_UP, "\033[1;5A"},
-    {MOD_CTRL | KEY_DOWN, "\033[1;5B"},
-    {MOD_META | KEY_LEFT, "\033[1;3D"},
-    {MOD_META | KEY_RIGHT, "\033[1;3C"},
-    {MOD_META | KEY_UP, "\033[1;3A"},
-    {MOD_META | KEY_DOWN, "\033[1;3B"},
+    XTERM_KEYMAP_COMMON
     {MOD_CTRL | MOD_SHIFT | KEY_LEFT, "\033[1;6D"},
     {MOD_CTRL | MOD_SHIFT | KEY_RIGHT, "\033[1;6C"},
     {MOD_CTRL | MOD_SHIFT | KEY_UP, "\033[1;6A"},
@@ -171,12 +182,16 @@ static const TermKeyMap xterm_keymap[] = {
     {MOD_SHIFT | KEY_DELETE, "\033[3;2~"},
     {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "\033[3;6~"},
     {MOD_SHIFT | '\t', "\033[Z"},
-    // Fix keypad when numlock is off
-    {'/', "\033Oo"},
-    {'*', "\033Oj"},
-    {'-', "\033Om"},
-    {'+', "\033Ok"},
-    {'\r', "\033OM"},
+};
+
+static const TermControlCodes xterm_control_codes = {
+    .clear_to_eol = "\033[K",
+    .keypad_off = "\033[?1l\033>",
+    .keypad_on = "\033[?1h\033=",
+    .cup_mode_off = "\033[?1049l",
+    .cup_mode_on = "\033[?1049h",
+    .hide_cursor = "\033[?25l",
+    .show_cursor = "\033[?25h",
 };
 
 static const TerminalInfo terminal_xterm = {
@@ -186,21 +201,84 @@ static const TerminalInfo terminal_xterm = {
     .height = 24,
     .keymap = xterm_keymap,
     .keymap_length = ARRAY_COUNT(xterm_keymap),
-    .control_codes = {
-        .clear_to_eol = "\033[K",
-        .keypad_off = "\033[?1l\033>",
-        .keypad_on = "\033[?1h\033=",
-        .cup_mode_off = "\033[?1049l",
-        .cup_mode_on = "\033[?1049h",
-        .hide_cursor = "\033[?25l",
+    .control_codes = &xterm_control_codes
+};
 
-        // Terminfo actually returns 2 escape sequences for the "cnorm"
-        // capability ("\033[?12l\033[?25h" for xterm and
-        // "\033[?34h\033[?25h" for tmux/screen) but using just the
-        // second sequence ("\033[?25h"), which is common to all 3
-        // terminals, seems to work.
-        .show_cursor = "\033[?25h",
-    }
+static const TermKeyMap st_keymap[] = {
+    XTERM_KEYMAP_COMMON
+};
+
+static const TerminalInfo terminal_st = {
+    .can_bg_color_erase = true,
+    .max_colors = 8,
+    .width = 80,
+    .height = 24,
+    .keymap = st_keymap,
+    .keymap_length = ARRAY_COUNT(st_keymap),
+    .control_codes = &xterm_control_codes
+};
+
+static const TermKeyMap rxvt_keymap[] = {
+    {KEY_INSERT, "\033[2~"},
+    {KEY_DELETE, "\033[3~"},
+    {KEY_HOME, "\033[7~"},
+    {KEY_END, "\033[8~"},
+    {KEY_PAGE_UP, "\033[5~"},
+    {KEY_PAGE_DOWN, "\033[6~"},
+    {KEY_LEFT, "\033[D"},
+    {KEY_RIGHT, "\033[C"},
+    {KEY_UP, "\033[A"},
+    {KEY_DOWN, "\033[B"},
+    {KEY_F1, "\033[11~"},
+    {KEY_F2, "\033[12~"},
+    {KEY_F3, "\033[13~"},
+    {KEY_F4, "\033[14~"},
+    {KEY_F5, "\033[15~"},
+    {KEY_F6, "\033[17~"},
+    {KEY_F7, "\033[18~"},
+    {KEY_F8, "\033[19~"},
+    {KEY_F9, "\033[20~"},
+    {KEY_F10, "\033[21~"},
+    {KEY_F11, "\033[23~"},
+    {KEY_F12, "\033[24~"},
+    {MOD_SHIFT | KEY_HOME, "\033[7$"},
+    {MOD_SHIFT | KEY_END, "\033[8$"},
+    {MOD_SHIFT | KEY_LEFT, "\033[d"},
+    {MOD_SHIFT | KEY_RIGHT, "\033[c"},
+    {MOD_SHIFT | KEY_UP, "\033[a"},
+    {MOD_SHIFT | KEY_DOWN, "\033[b"},
+    {MOD_CTRL | KEY_LEFT, "\033Od"},
+    {MOD_CTRL | KEY_RIGHT, "\033Oc"},
+    {MOD_CTRL | KEY_UP, "\033Oa"},
+    {MOD_CTRL | KEY_DOWN, "\033Ob"},
+    {MOD_META | KEY_LEFT, "\033\033[D"},
+    {MOD_META | KEY_RIGHT, "\033\033[C"},
+    {MOD_META | KEY_UP, "\033\033[A"},
+    {MOD_META | KEY_DOWN, "\033\033[B"},
+    {MOD_META | MOD_SHIFT | KEY_LEFT, "\033\033[d"},
+    {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033\033[c"},
+    {MOD_META | MOD_SHIFT | KEY_UP, "\033\033[a"},
+    {MOD_META | MOD_SHIFT | KEY_DOWN, "\033\033[b"},
+};
+
+static const TermControlCodes rxvt_control_codes = {
+    .clear_to_eol = "\033[K",
+    .keypad_off = "\033>",
+    .keypad_on = "\033=",
+    .cup_mode_off = "\033[2J\033[?47l\0338",
+    .cup_mode_on = "\0337\033[?47h",
+    .hide_cursor = "\033[?25l",
+    .show_cursor = "\033[?25h",
+};
+
+static const TerminalInfo terminal_rxvt = {
+    .can_bg_color_erase = true,
+    .max_colors = 8,
+    .width = 80,
+    .height = 24,
+    .keymap = rxvt_keymap,
+    .keymap_length = ARRAY_COUNT(rxvt_keymap),
+    .control_codes = &rxvt_control_codes
 };
 
 void term_init(const char *const term)
@@ -211,12 +289,15 @@ void term_init(const char *const term)
         || str_has_prefix(term, "screen")
     ) {
         terminal = terminal_xterm;
-        if (str_has_suffix(term, "256color")) {
-            terminal.max_colors = 256;
-        }
+    } else if (streq(term, "st") || str_has_prefix(term, "st-")) {
+        terminal = terminal_st;
+    } else if (streq(term, "rxvt") || str_has_prefix(term, "rxvt-")) {
+        terminal = terminal_rxvt;
     } else {
         term_init_fallback(term);
     }
 
-    term_setup_extra_keys(term);
+    if (str_has_suffix(term, "256color")) {
+        terminal.max_colors = 256;
+    }
 }

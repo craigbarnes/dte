@@ -7,74 +7,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-typedef struct {
-    Key key;
-    const char *const code;
-    unsigned int terms;
-} KeyMap;
-
-enum {
-    T_RXVT = 1,
-    T_ST = 2,
-    T_ALL = T_RXVT | T_ST,
-};
-
-// Prefixes; st-256color matches st
-static const char *const terms[] = {
-    "rxvt",
-    "st",
-};
-
-static const KeyMap builtin_keys[] = {
-    {KEY_HOME, "\033[1~", T_ALL},
-    {KEY_END, "\033[4~", T_ALL},
-
-    // Fix keypad when numlock is off
-    {'/', "\033Oo", T_ALL},
-    {'*', "\033Oj", T_ALL},
-    {'-', "\033Om", T_ALL},
-    {'+', "\033Ok", T_ALL},
-    {'\r', "\033OM", T_ALL},
-
-    {MOD_SHIFT | KEY_LEFT, "\033[d", T_RXVT},
-    {MOD_SHIFT | KEY_RIGHT,"\033[c", T_RXVT},
-    {MOD_SHIFT | KEY_UP, "\033[a", T_RXVT},
-    {MOD_SHIFT | KEY_DOWN, "\033[b", T_RXVT},
-    {MOD_SHIFT | KEY_UP, "\033[1;2A", T_ST},
-    {MOD_SHIFT | KEY_DOWN, "\033[1;2B", T_ST},
-    {MOD_SHIFT | KEY_LEFT, "\033[1;2D", T_ST},
-    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C", T_ST},
-
-    {MOD_CTRL | KEY_LEFT,  "\033Od", T_RXVT},
-    {MOD_CTRL | KEY_RIGHT, "\033Oc", T_RXVT},
-    {MOD_CTRL | KEY_UP,    "\033Oa", T_RXVT},
-    {MOD_CTRL | KEY_DOWN,  "\033Ob", T_RXVT},
-    {MOD_CTRL | KEY_LEFT,  "\033[1;5D", T_ST},
-    {MOD_CTRL | KEY_RIGHT, "\033[1;5C", T_ST},
-    {MOD_CTRL | KEY_UP,    "\033[1;5A", T_ST},
-    {MOD_CTRL | KEY_DOWN,  "\033[1;5B", T_ST},
-
-    {MOD_META | KEY_LEFT,  "\033\033[D", T_RXVT},
-    {MOD_META | KEY_RIGHT, "\033\033[C", T_RXVT},
-    {MOD_META | KEY_UP,    "\033\033[A", T_RXVT},
-    {MOD_META | KEY_DOWN,  "\033\033[B", T_RXVT},
-    {MOD_META | KEY_LEFT,  "\033[1;3D", T_ST},
-    {MOD_META | KEY_RIGHT, "\033[1;3C", T_ST},
-    {MOD_META | KEY_UP,    "\033[1;3A", T_ST},
-    {MOD_META | KEY_DOWN,  "\033[1;3B", T_ST},
-
-    {MOD_META | MOD_SHIFT | KEY_LEFT,  "\033\033[d", T_RXVT},
-    {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033\033[c", T_RXVT},
-    {MOD_META | MOD_SHIFT | KEY_UP,    "\033\033[a", T_RXVT},
-    {MOD_META | MOD_SHIFT | KEY_DOWN,  "\033\033[b", T_RXVT},
-};
-
 TerminalInfo terminal;
 
 static struct termios termios_save;
 static char buffer[64];
 static size_t buffer_pos;
-static unsigned int term_flags; // T_*
 
 static void buffer_num(unsigned int num)
 {
@@ -109,16 +46,6 @@ static char *escape_key(const char *key, int len)
     }
     buf[j] = 0;
     return buf;
-}
-
-void term_setup_extra_keys(const char *const term)
-{
-    for (size_t i = 0; i < ARRAY_COUNT(terms); i++) {
-        if (str_has_prefix(term, terms[i])) {
-            term_flags = 1 << i;
-            break;
-        }
-    }
 }
 
 void term_raw(void)
@@ -219,25 +146,6 @@ static bool input_get_byte(unsigned char *ch)
     return true;
 }
 
-static const KeyMap *find_key(bool *possibly_truncated)
-{
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_keys); i++) {
-        const KeyMap *const entry = &builtin_keys[i];
-        if ((entry->terms & term_flags) == 0) {
-            continue;
-        }
-        const size_t len = strlen(entry->code);
-        if (len > input_buf_fill) {
-            if (!memcmp(entry->code, input_buf, input_buf_fill)) {
-                *possibly_truncated = true;
-            }
-        } else if (strncmp(entry->code, input_buf, len) == 0) {
-            return entry;
-        }
-    }
-    return NULL;
-}
-
 static bool read_special(Key *key)
 {
     bool possibly_truncated = false;
@@ -267,13 +175,6 @@ static bool read_special(Key *key)
         }
         *key = km->key;
         consume_input(len);
-        return true;
-    }
-
-    const KeyMap *entry = find_key(&possibly_truncated);
-    if (entry != NULL) {
-        *key = entry->key;
-        consume_input(strlen(entry->code));
         return true;
     }
 
