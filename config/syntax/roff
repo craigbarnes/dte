@@ -5,6 +5,8 @@ state line-start
     char "\n" line-start
     noeat text
 
+# TODO: Highlight .TH request in bold
+# TODO: Highlight "quoted strings" in request arguments
 state request
     char -b a-zA-Z request
     inlist section section
@@ -13,7 +15,20 @@ state request
 state escape-start escape
     char -b '"#' comment
     char -b f font-selection
+    char -b ( 2char-escape
     char "\\.%! |^&)/~:{}acdeEprtu-" text escape
+    eat text error
+
+state 2char-escape escape
+    char -b "A-Za-z0-9_<>=!?$%*|/'\":^,~.`+-" 2char-escape-2
+    recolor error
+    char "\n" line-start
+    eat text error
+
+state 2char-escape-2 escape
+    char "A-Za-z0-9_<>=!?$%*|/'\":^,~.`+-" text escape
+    recolor error
+    char "\n" line-start
     eat text error
 
 state font-selection escape
