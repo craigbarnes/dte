@@ -254,6 +254,18 @@ static void tokenize(const char *buf, size_t size)
             emit_token(tok);
             break;
             }
+        case ' ':
+            if (
+                (pos + 3) < size
+                && buf[pos] == ' '
+                && buf[pos+1] == ' '
+                && buf[pos+2] == ' '
+            ) {
+                emit(TOK_INDENT);
+                pos += 3;
+                break;
+            }
+            // fallthrough
         default:
             pos--;
             pos += emit_text(buf + pos, size - pos);

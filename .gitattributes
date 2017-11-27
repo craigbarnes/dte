@@ -1,5 +1,4 @@
 [attr]code text whitespace=tab-in-indent,tabwidth=4
-[attr]ttman text whitespace=indent-with-non-tab,tabwidth=8
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
 [attr]make text
 
@@ -15,7 +14,6 @@ mk/sha256sums.txt export-ignore
 mk/tput-compare.sh export-ignore
 mk/get-html-entities.sh export-ignore
 
-docs/*.txt ttman
 GNUmakefile make
 makefile make
 *.mk make
@@ -25,6 +23,7 @@ makefile make
 *.sh code
 *.yml code
 *.dterc code
+docs/*.txt code
 config/** code
 mk/git-hooks/* code
 test/*.txt text

@@ -21,70 +21,70 @@ destination state "this" can be used to jump to current state.
 @h2 Main commands
 
 *syntax* <`name`>
-	Begin a new syntax. One syntax file can contain multiple syntax
-	definitions, but you should only define one real syntax in one
-	syntax file.
+    Begin a new syntax. One syntax file can contain multiple syntax
+    definitions, but you should only define one real syntax in one
+    syntax file.
 
-	See also SUB-SYNTAXES.
+    See also SUB-SYNTAXES.
 
 *state* <`name`> [`emit-color`]
-	Add new state. Conditionals (if any) and one default action must
-	follow. First state is the start state.
+    Add new state. Conditionals (if any) and one default action must
+    follow. First state is the start state.
 
 *default* <`color`> <`name`>...
-	Set default `color` for emitted `name`.
+    Set default `color` for emitted `name`.
 
-	Example:
-		default numeric oct dec hex
+    Example:
+        default numeric oct dec hex
 
-	If there is no color defined for oct, dec or hex then color
-	numeric is used instead.
+    If there is no color defined for oct, dec or hex then color
+    numeric is used instead.
 
 *list* [*-i*] <`name`> <`string`>...
-	Define a list of strings.
+    Define a list of strings.
 
-	Example:
-		list keyword if else for while do continue switch case
+    Example:
+        list keyword if else for while do continue switch case
 
-	Use conditional *inlist* to test if a buffered string is in a
-	list.
+    Use conditional *inlist* to test if a buffered string is in a
+    list.
 
-	*-i* Make list case-insensitive.
+    *-i* Make list case-insensitive.
 
 @h2 Conditionals
 
 *bufis* [*-i*] <`string`> <`destination`> [`emit-name`]
-	Test if buffered bytes are same as `string`. If they are emit
-	`emit-name` and jump to `destination` state.
+    Test if buffered bytes are same as `string`. If they are emit
+    `emit-name` and jump to `destination` state.
 
 *char* [*-bn*] <`characters`> <`destination`> [`emit-name`]
-	Test if current byte is in the character list. If it is then
-	emit `emit-color` and jump to `destination` state. If `emit-name`
-	is not given then destination states emit name is used.
+    Test if current byte is in the character list. If it is then
+    emit `emit-color` and jump to `destination` state. If `emit-name`
+    is not given then destination states emit name is used.
 
-	Characters is a list of strings. Ranges are supported ("a-d" is
-	same as "abcd").
+    Characters is a list of strings. Ranges are supported ("a-d" is
+    same as "abcd").
 
-	*-b* Add byte to buffer.
+    *-b* Add byte to buffer.
 
-	*-n* Invert character bitmap.
+    *-n* Invert character bitmap.
 
 *heredocend* <`destination`>
-	Compare following characters to heredoc end delimiter and go to
-	destination state if comparison is true.
+    Compare following characters to heredoc end delimiter and go to
+    destination state if comparison is true.
 
 *inlist* <`list`> <`destination`> [`emit-name`]
-	Test if buffered bytes are found in `list`. If found, emit
-	`emit-name` and jump to `destination` state.
+    Test if buffered bytes are found in `list`. If found, emit
+    `emit-name` and jump to `destination` state.
 
 *str* [*-i*] <`string`> <`destination`> [`emit-name`]
-	See if following bytes are same as `string`. If they are emit
-	`emit-name` and jump to `destination` state.
+    See if following bytes are same as `string`. If they are emit
+    `emit-name` and jump to `destination` state.
 
-	*-i* case-insensitive.
+    *-i* case-insensitive.
 
-	NOTE: This conditional can be slow, especially if `string` is
-	longer than two bytes.
+    NOTE: This conditional can be slow, especially if `string` is
+    longer than two bytes.
 
 @h2 Default actions
 
@@ -92,25 +92,25 @@ Last command of every state must be default action. It is an
 unconditional jump.
 
 *eat* <`destination`> [`emit-name`]
-	Consume byte, emit `emit-name` color and continue to `destination`
-	state.
+    Consume byte, emit `emit-name` color and continue to `destination`
+    state.
 
 *heredocbegin* <`subsyntax`> <`return-state`>
-	Store buffered bytes as heredoc end delimiter and go to
-	`subsyntax`. Sub-syntax is like any other sub-syntax but it must
-	contain a *heredocend* conditional.
+    Store buffered bytes as heredoc end delimiter and go to
+    `subsyntax`. Sub-syntax is like any other sub-syntax but it must
+    contain a *heredocend* conditional.
 
 *noeat* [*-b*] <`destination`>
-	Continue to `destination` state without emitting color or
-	consuming byte.
+    Continue to `destination` state without emitting color or
+    consuming byte.
 
-	*-b* Don't stop buffering.
+    *-b* Don't stop buffering.
 
 @h2 Other commands
 
 *recolor* <`color`> [`count`]
-	If `count` is given, recolor `count` previous bytes, otherwise
-	recolor buffered bytes.
+    If `count` is given, recolor `count` previous bytes, otherwise
+    recolor buffered bytes.
 
 @h1 SUB-SYNTAXES
 
@@ -126,31 +126,31 @@ syntax.
 
 Example:
 
-	# sub-syntax@br
-	syntax .c-comment
+    # sub-syntax@br
+    syntax .c-comment
 
-	state comment
-		char "\*" star@br
-		eat comment
+    state comment
+        char "\*" star@br
+        eat comment
 
-	state star comment
-		# END is a special state name@br
-		char / END comment@br
-		noeat comment
+    state star comment
+        # END is a special state name@br
+        char / END comment@br
+        noeat comment
 
-	# main syntax@br
-	syntax c
+    # main syntax@br
+    syntax c
 
-	state c code
-		char " \\t\\n" c@br
-		char -b a-zA-Z_ ident@br
-		char "\\"" string@br
-		char "'" char@br
-		# call sub-syntax@br
-		str "/\*" .c-comment:c@br
-		eat c
+    state c code
+        char " \\t\\n" c@br
+        char -b a-zA-Z_ ident@br
+        char "\\"" string@br
+        char "'" char@br
+        # call sub-syntax@br
+        str "/\*" .c-comment:c@br
+        eat c
 
-	# other states removed
+    # other states removed
 
 In this example the destination state ".c-comment:c" is special syntax for
 calling a sub-syntax. ".c-comment" is name of the sub-syntax and "c" is

@@ -110,7 +110,7 @@ keys to commands that contain variables (inside single or double
 quotes), which will be expanded just before the command is executed.
 
 Example:
-	alias x "run chmod 755 $FILE"
+    alias x "run chmod 755 $FILE"
 
 $FILE is expanded when the alias x is executed. The command works even
 if $FILE contains whitespace.
@@ -121,9 +121,9 @@ These variables are always defined and override environment variables of
 the same name.
 
 *$FILE*
-	The filename of the current buffer (or an empty string if unsaved).
+    The filename of the current buffer (or an empty string if unsaved).
 *$WORD*
-	The selected text or the word under the cursor.
+    The selected text or the word under the cursor.
 
 @h2 Single quoted strings
 
@@ -146,530 +146,530 @@ Eight hex digit unicode code point U+20AC.
 @h1 COMMANDS
 
 *alias* `name` `command`
-	Create an alias `name` for `command`.
+    Create an alias `name` for `command`.
 
-	Example:
-		alias read "pass-through cat"
+    Example:
+        alias read "pass-through cat"
 
-	Now you can run "read file.txt" to insert file.txt into the current
-	buffer.
+    Now you can run "read file.txt" to insert file.txt into the current
+    buffer.
 
 *bind* `key` [`command`]
-	Bind `command` to `key`. If no `command` is given then any existing
-	binding for `key` is removed.
+    Bind `command` to `key`. If no `command` is given then any existing
+    binding for `key` is removed.
 
-	Special keys:
-		insert delete home end pgup pgdown left right up down F1
-		F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 enter tab space (or sp)
+    Special keys:
+        insert delete home end pgup pgdown left right up down F1
+        F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 enter tab space (or sp)
 
-	Modifiers:
-		Ctrl: *C-X* or *^X*
+    Modifiers:
+        Ctrl: *C-X* or *^X*
 
-		Meta/Alt: *M-X*
+        Meta/Alt: *M-X*
 
-		Shift: *S-left*
+        Shift: *S-left*
 
-	Key chains are supported. For example "^X c" (press *^X* and then *c*).
-	Keys are separated by spaces.
+    Key chains are supported. For example "^X c" (press *^X* and then *c*).
+    Keys are separated by spaces.
 
 *bof*
-	Move to beginning of file.
+    Move to beginning of file.
 
 *bol*
-	Move to beginning of line.
+    Move to beginning of line.
 
 *bolsf*
-	Incrementally move cursor to beginning of *l*ine, then beginning
-	of *s*creen, then beginning of *f*ile.
+    Incrementally move cursor to beginning of *l*ine, then beginning
+    of *s*creen, then beginning of *f*ile.
 
 *case* [*-lu*]
-	Change text case. Default is to change lower case to upper and
-	vice versa.
+    Change text case. Default is to change lower case to upper and
+    vice versa.
 
-	*-l* lower case
+    *-l* lower case
 
-	*-u* upper case
+    *-u* upper case
 
 *cd* `directory`
-	Change directory. Updates $PWD and $OLDPWD. "*cd -*" changes to
-	previous directory ($OLDPWD).
+    Change directory. Updates $PWD and $OLDPWD. "*cd -*" changes to
+    previous directory ($OLDPWD).
 
 *center-view*
-	Center view to cursor.
+    Center view to cursor.
 
 *clear*
-	Clear current line.
+    Clear current line.
 
 *close* [*-fqw*]
-	Close file.
+    Close file.
 
-	*-f* close file even if it hasn't been saved after last modification
+    *-f* close file even if it hasn't been saved after last modification
 
-	*-q* quit if closing the last open file
+    *-q* quit if closing the last open file
 
-	*-w* close parent window if closing its last contained file
+    *-w* close parent window if closing its last contained file
 
 *command* [`text`]
-	Enter command line. If `text` is given then it is written to the
-	command line (see the default binding *^L* why this is useful).
+    Enter command line. If `text` is given then it is written to the
+    command line (see the default binding *^L* why this is useful).
 
 *compile* [*-1ps*] `errorfmt` `command` [`parameters`]...
-	Run external `command` and collect error messages. This can be
-	used to run *make*(1) and *grep*(1).
+    Run external `command` and collect error messages. This can be
+    used to run *make*(1) and *grep*(1).
 
-	*-1* read error messages from stdout instead of stderr
+    *-1* read error messages from stdout instead of stderr
 
-	*-p* display "Press any key to continue" prompt
+    *-p* display "Press any key to continue" prompt
 
-	*-s* silent. both stderr and stdout are redirected to /dev/null
+    *-s* silent. both stderr and stdout are redirected to /dev/null
 
-	See also *errorfmt* and *msg* commands.
+    See also *errorfmt* and *msg* commands.
 
 *copy*
-	Copy current line or selection.
+    Copy current line or selection.
 
 *cut*
-	Cut current line or selection.
+    Cut current line or selection.
 
 *delete*
-	Delete character or selection.
+    Delete character or selection.
 
 *delete-eol* [*-n*]
-	Delete to end of line.
+    Delete to end of line.
 
-	*-n* delete newline if cursor is at end of line
+    *-n* delete newline if cursor is at end of line
 
 *delete-word* [*-s*]
-	Delete word after cursor.
+    Delete word after cursor.
 
-	*-s* be more "aggressive"
+    *-s* be more "aggressive"
 
 *down*
-	Move cursor down.
+    Move cursor down.
 
 *eof*
-	Move cursor to end of file.
+    Move cursor to end of file.
 
 *eol*
-	Move cursor to end of line.
+    Move cursor to end of line.
 
 *eolsf*
-	Incrementally move cursor to end of *l*ine, then end of
-	*s*creen, then end of *f*ile.
+    Incrementally move cursor to end of *l*ine, then end of
+    *s*creen, then end of *f*ile.
 
 *erase*
-	Erase character before cursor.
+    Erase character before cursor.
 
 *erase-bol*
-	Erase to beginning of line.
+    Erase to beginning of line.
 
 *erase-word* [*-s*]
-	Erase word before cursor.
+    Erase word before cursor.
 
-	*-s* be more "aggressive"
+    *-s* be more "aggressive"
 
 *errorfmt* [*-i*] `compiler` `regexp` [*file*|*line*|*column*|*message*]...
 
-	*-i* ignore this error
+    *-i* ignore this error
 
-	See *compile* and *msg* commands for more information.
+    See *compile* and *msg* commands for more information.
 
 *filter* `command` [`parameter`]...
-	Filter selected text or whole file through external `command`.
+    Filter selected text or whole file through external `command`.
 
-	Example: filter sort -r
+    Example: filter sort -r
 
 *format-paragraph* [`width`]
-	Format the current selection or paragraph under the cursor. If
-	paragraph `width` is not given then the *text-width* option is
-	used.
+    Format the current selection or paragraph under the cursor. If
+    paragraph `width` is not given then the *text-width* option is
+    used.
 
-	This command merges the selection into one paragraph. To format
-	multiple paragraphs use the external *fmt*(1) program with the
-	*filter* command, e.g. *filter fmt -w 60*.
+    This command merges the selection into one paragraph. To format
+    multiple paragraphs use the external *fmt*(1) program with the
+    *filter* command, e.g. *filter fmt -w 60*.
 
 *ft* `filetype` `extension`...
-	Associate filename `extension` with `filetype`.
+    Associate filename `extension` with `filetype`.
 
 *ft* *-b* `filetype` `basename`...
-	Associate file `basename` with `filetype`.
+    Associate file `basename` with `filetype`.
 
 *ft* *-c* `filetype` `regexp`...
-	Detect `filetype` by matching `regexp` against first line of
-	file.
+    Detect `filetype` by matching `regexp` against first line of
+    file.
 
 *ft* *-f* `filetype` `regexp`...
-	Detect `filetype` by matching `regexp` against filename.
+    Detect `filetype` by matching `regexp` against filename.
 
 *ft* *-i* `filetype` `interpreter`...
-	Associate `interpreter` with `filetype`. Interpreters are parsed
-	from the *#!* line in many scripts.
+    Associate `interpreter` with `filetype`. Interpreters are parsed
+    from the *#!* line in many scripts.
 
 *git-open*
-	Interactive file opener. Lists all files in GIT repository.
+    Interactive file opener. Lists all files in GIT repository.
 
-	Same keys work as in command mode, but with these changes:
+    Same keys work as in command mode, but with these changes:
 
-	@li up
-	Move up in file list.
-	@li down
-	Move down in file list.
-	@li enter
-	Open file.
-	@li ^O
-	Open file but don't close git-open.
-	@li M-e
-	Go to end of file list.
-	@li M-t
-	Go to top of file list.
+    @li up
+    Move up in file list.
+    @li down
+    Move down in file list.
+    @li enter
+    Open file.
+    @li ^O
+    Open file but don't close git-open.
+    @li M-e
+    Go to end of file list.
+    @li M-t
+    Go to top of file list.
 
 *hi* `name` [`fg-color` [`bg-color`]] [`attribute`]...
-	Set highlight color.
+    Set highlight color.
 
-	Colors:
-		keep (-2) default (-1) black (0) red green yellow blue
-		magenta cyan gray darkgray lightred lightgreen lightyellow
-		lightblue lightmagenta lightcyan white
+    Colors:
+        keep (-2) default (-1) black (0) red green yellow blue
+        magenta cyan gray darkgray lightred lightgreen lightyellow
+        lightblue lightmagenta lightcyan white
 
-	Color can be given as a numeric value too (-2..255).
+    Color can be given as a numeric value too (-2..255).
 
-	Colors 16-255 are supported by modern *xterm*(1) compatible terminal
-	emulators. There's a 6x6x6 color cube at indexes 16..231. For
-	these colors it is easiest to use the R/G/B syntax where R, G
-	and B are values between 0 and 5.
+    Colors 16-255 are supported by modern *xterm*(1) compatible terminal
+    emulators. There's a 6x6x6 color cube at indexes 16..231. For
+    these colors it is easiest to use the R/G/B syntax where R, G
+    and B are values between 0 and 5.
 
-	Indexes 232..255 contain 24 grayscale values that can be used
-	to specify grayscale value more accurately than using the R/G/B
-	syntax.
+    Indexes 232..255 contain 24 grayscale values that can be used
+    to specify grayscale value more accurately than using the R/G/B
+    syntax.
 
-	Attributes:
-		bold lowintensity italic underline blink reverse invisible keep
+    Attributes:
+        bold lowintensity italic underline blink reverse invisible keep
 
-	The color and attribute value "keep" is useful in selected text
-	to keep `fg-color` and attributes and change only `bg-color`.
+    The color and attribute value "keep" is useful in selected text
+    to keep `fg-color` and attributes and change only `bg-color`.
 
-	NOTE: Because "keep" is both a color and an attribute you need to
-	specify both `fg-color` and `bg-color` if you want to set the "keep"
-	`attribute`.
+    NOTE: Because "keep" is both a color and an attribute you need to
+    specify both `fg-color` and `bg-color` if you want to set the "keep"
+    `attribute`.
 
-	If you omit any color it is set to default (-1).
+    If you omit any color it is set to default (-1).
 
-	Unset fg/bg colors are inherited from highlight color "default".
-	If you don't set fg/bg for the highlight color "default" then
-	terminal's default fg/bg is used.
+    Unset fg/bg colors are inherited from highlight color "default".
+    If you don't set fg/bg for the highlight color "default" then
+    terminal's default fg/bg is used.
 
 *include* [*-b*] `file`
-	Read commands from `file`.
+    Read commands from `file`.
 
-	*-b* read built-in `file` instead of reading from the filesystem
+    *-b* read built-in `file` instead of reading from the filesystem
 
 *insert* [*-km*] `text`
-	Insert `text` into the buffer.
+    Insert `text` into the buffer.
 
-	*-k* insert one character at a time as if it has been typed
+    *-k* insert one character at a time as if it has been typed
 
-	*-m* move after inserted text
+    *-m* move after inserted text
 
 *insert-special*
-	Insert special character.
+    Insert special character.
 
-	Insert control character,
-	type decimal value of byte to insert or press
-	*o* to insert octal byte value,
-	*x* to insert hexadecimal byte value or
-	*u* to insert hexadecimal unicode value.
+    Insert control character,
+    type decimal value of byte to insert or press
+    *o* to insert octal byte value,
+    *x* to insert hexadecimal byte value or
+    *u* to insert hexadecimal unicode value.
 
 *join*
-	Join selection or next line to current.
+    Join selection or next line to current.
 
 *left*
-	Move left.
+    Move left.
 
 *line* `number`
-	Go to line.
+    Go to line.
 
 *load-syntax* `filename`|`filetype`
-	If argument contains / it is considered a filename.
+    If argument contains / it is considered a filename.
 
 *move-tab* `N`|*left*|*right*
-	Move current tab to position `N` or 1 position left or right.
+    Move current tab to position `N` or 1 position left or right.
 
 *msg* [*-np*]
-	Show latest, next (-n) or previous (-p) message. If its location
-	is known (compile error or tag message) then the file will be
-	opened and cursor moved to the location.
+    Show latest, next (-n) or previous (-p) message. If its location
+    is known (compile error or tag message) then the file will be
+    opened and cursor moved to the location.
 
-	*-n* next message
+    *-n* next message
 
-	*-p* previous message
+    *-p* previous message
 
-	See also *compile* and *tag* commands.
+    See also *compile* and *tag* commands.
 
 *new-line*
-	Insert empty line under current line.
+    Insert empty line under current line.
 
 *next*
-	Display next file.
+    Display next file.
 
 *open* [*-e* `encoding`] [`file`]...
-	Open `file`. If filename is omitted, a new file is opened.
+    Open `file`. If filename is omitted, a new file is opened.
 
-	*-e* `encoding`
-		Set file `encoding`. See "iconv -l" for list of supported
-		encodings.
+    *-e* `encoding`
+        Set file `encoding`. See "iconv -l" for list of supported
+        encodings.
 
 *option* `filetype` `option` `value`...
-	Add automatic `option` for `filetype` (as previously registered
-	with the *ft* command). Automatic options are set when files are
-	are opened.
+    Add automatic `option` for `filetype` (as previously registered
+    with the *ft* command). Automatic options are set when files are
+    are opened.
 
 *option* *-r* `regexp` `option` `value`...
-	Add automatic `option` for filenames that match `regexp`.
+    Add automatic `option` for filenames that match `regexp`.
 
 *pass-through* [*-ms*] `command` [`parameter`]...
-	Run external `command` and insert its output.
+    Run external `command` and insert its output.
 
-	*-m* move after the inserted text
+    *-m* move after the inserted text
 
-	*-s* strip newline from end of the command output
+    *-s* strip newline from end of the command output
 
 *paste*
-	Paste.
+    Paste.
 
-	*-c* paste at the cursor position
+    *-c* paste at the cursor position
 
 *pgdown*
-	Move cursor page down. See also *scroll-pgdown*.
+    Move cursor page down. See also *scroll-pgdown*.
 
 *pgup*
-	Move cursor page up. See also *scroll-pgup*.
+    Move cursor page up. See also *scroll-pgup*.
 
 *prev*
-	Display previous file.
+    Display previous file.
 
 *quit* [*-f*]
-	Quit.
+    Quit.
 
-	*-f* force quitting even if there are unsaved files
+    *-f* force quitting even if there are unsaved files
 
 *redo* [`choice`]
-	Redo changes done by the *undo* command. If there are multiple
-	possibilities an informative message is displayed:
+    Redo changes done by the *undo* command. If there are multiple
+    possibilities an informative message is displayed:
 
-		Redoing newest (2) of 2 possible changes.
+        Redoing newest (2) of 2 possible changes.
 
-	If the change was not the one you wanted, just run *undo* and
-	then, for example, *redo 1*.
+    If the change was not the one you wanted, just run *undo* and
+    then, for example, *redo 1*.
 
 *repeat* `count` `command` [`parameters`]...
-	Run `command` `count` times.
+    Run `command` `count` times.
 
 *replace* [*-bcgi*] `pattern` `replacement`
 
-	*-b* use basic instead of extended regular expression syntax
+    *-b* use basic instead of extended regular expression syntax
 
-	*-c* ask for confirmation before each replacement
+    *-c* ask for confirmation before each replacement
 
-	*-g* replace all matches for each line (instead of just the first)
+    *-g* replace all matches for each line (instead of just the first)
 
-	*-i* ignore case
+    *-i* ignore case
 
 *right*
-	Move right.
+    Move right.
 
 *run* [*-ps*] `command` [`parameters`]...
-	Run external `command`.
+    Run external `command`.
 
-	*-p* display "Press any key to continue" prompt
+    *-p* display "Press any key to continue" prompt
 
-	*-s* silent -- both stderr and stdout are redirected to /dev/null
+    *-s* silent -- both stderr and stdout are redirected to /dev/null
 
 *save* [*-dfup*] [*-e* `encoding`] [`filename`]
-	Save file. By default line-endings (LF vs CRLF) are preserved.
+    Save file. By default line-endings (LF vs CRLF) are preserved.
 
-	*-d* save with DOS/CRLF line-endings
+    *-d* save with DOS/CRLF line-endings
 
-	*-f* force saving read-only file
+    *-f* force saving read-only file
 
-	*-u* save with Unix/LF line-endings
+    *-u* save with Unix/LF line-endings
 
-	*-p*
-		if no `filename` is specified and the buffer has no existing
-		filename, open the command line to allow one to be typed,
-		instead of showing the "no filename" error message.
+    *-p*
+        if no `filename` is specified and the buffer has no existing
+        filename, open the command line to allow one to be typed,
+        instead of showing the "no filename" error message.
 
-	*-e* `encoding`
-		Set file `encoding`. See "iconv -l" for list of supported
-		encodings.
+    *-e* `encoding`
+        Set file `encoding`. See "iconv -l" for list of supported
+        encodings.
 
 *scroll-down*
-	Scroll view down one line. Keeps cursor position unchanged if
-	possible.
+    Scroll view down one line. Keeps cursor position unchanged if
+    possible.
 
 *scroll-pgdown*
-	Scroll page down. Cursor position relative to top of screen is
-	maintained. See also *pgdown*.
+    Scroll page down. Cursor position relative to top of screen is
+    maintained. See also *pgdown*.
 
 *scroll-pgup*
-	Scroll page up. Cursor position relative to top of screen is
-	maintained. See also *pgup*.
+    Scroll page up. Cursor position relative to top of screen is
+    maintained. See also *pgup*.
 
 *scroll-up*
-	Scroll view up one line. Keeps cursor position unchanged if
-	possible.
+    Scroll view up one line. Keeps cursor position unchanged if
+    possible.
 
 *search* [*-Hnprw*] [`pattern`]
-	If no flags or just *-r* and no `pattern` given then dte changes
-	to search mode where you can type a regular expression to
-	search.
+    If no flags or just *-r* and no `pattern` given then dte changes
+    to search mode where you can type a regular expression to
+    search.
 
-	*-H* don't add `pattern` to search history
+    *-H* don't add `pattern` to search history
 
-	*-n* search next
+    *-n* search next
 
-	*-p* search previous
+    *-p* search previous
 
-	*-r* start searching backwards
+    *-r* start searching backwards
 
-	*-w* search word under cursor
+    *-w* search word under cursor
 
 *select* [*-bkl*]
-	Start selecting.
+    Start selecting.
 
-	*-b* select block between opening "{" and closing "}" curly braces
+    *-b* select block between opening "{" and closing "}" curly braces
 
-	*-k* keep existing selections
+    *-k* keep existing selections
 
-	*-l* select whole lines
+    *-l* select whole lines
 
 *set* [*-gl*] `option` [`value`] ...
-	Set `value` for `option`. Value can be omitted for boolean option to set
-	it true. Multiple options can be set at once but then `value` must
-	be given for every option.
+    Set `value` for `option`. Value can be omitted for boolean option to set
+    it true. Multiple options can be set at once but then `value` must
+    be given for every option.
 
-	There are three kinds of options.
+    There are three kinds of options.
 
-	@li 1. Global options
+    @li 1. Global options
 
-	@li 2. Local options
-		These are file specific options. Each open file has its
-		own copies of the option values.
+    @li 2. Local options
+        These are file specific options. Each open file has its
+        own copies of the option values.
 
-	@li 3. Options that have both global and local values
-		Global value is just a default local value for opened
-		files and never used for anything else. Changing global
-		value does not affect any already opened files.
+    @li 3. Options that have both global and local values
+        Global value is just a default local value for opened
+        files and never used for anything else. Changing global
+        value does not affect any already opened files.
 
-		By default *set* changes both global and local values.
+        By default *set* changes both global and local values.
 
-		*-g* change only global option value
+        *-g* change only global option value
 
-		*-l* change only local option value of current file
+        *-l* change only local option value of current file
 
-	In configuration files only global options can be set (no need
-	to specify the -g flag).
+    In configuration files only global options can be set (no need
+    to specify the -g flag).
 
-	To change option for specific filetypes and filenames use the
-	*option* command.
+    To change option for specific filetypes and filenames use the
+    *option* command.
 
 *setenv* `name` `value`
-	Set environment variable.
+    Set environment variable.
 
 *shift* `count`
-	Shift current or selected lines by `count` indentation levels.
-	Count is usually -1 (decrease indent) or 1 (increase indent).
+    Shift current or selected lines by `count` indentation levels.
+    Count is usually -1 (decrease indent) or 1 (increase indent).
 
-	To specify a negative number, it's necessary to first disable
-	option parsing with "*--*", e.g. "*shift -- -1*".
+    To specify a negative number, it's necessary to first disable
+    option parsing with "*--*", e.g. "*shift -- -1*".
 
 *suspend*
-	Suspend program.
+    Suspend program.
 
 *tag* [*-r*] [`tag`]
-	Save current location to stack and go to the location of `tag`.
-	Requires tags file generated by Exuberant Ctags. If no `tag` is
-	given then word under cursor is used as a tag instead.
+    Save current location to stack and go to the location of `tag`.
+    Requires tags file generated by Exuberant Ctags. If no `tag` is
+    given then word under cursor is used as a tag instead.
 
-	*-r* return back to previous location
+    *-r* return back to previous location
 
-	Tag files are searched from current working directory and its
-	parent directories.
+    Tag files are searched from current working directory and its
+    parent directories.
 
-	See also *msg* command.
+    See also *msg* command.
 
 *toggle* [*-gv*] `option` [`values`]...
-	Toggle `option`. If list of `values` is not given then the option
-	must be either boolean or enum.
+    Toggle `option`. If list of `values` is not given then the option
+    must be either boolean or enum.
 
-	*-g* toggle global option instead of local
+    *-g* toggle global option instead of local
 
-	*-v* display new value
+    *-v* display new value
 
-	If `option` has both local and global value then local is toggled
-	unless -g is given.
+    If `option` has both local and global value then local is toggled
+    unless -g is given.
 
 *undo*
-	Undo latest change.
+    Undo latest change.
 
 *unselect*
-	Unselect.
+    Unselect.
 
 *up*
-	Move cursor up.
+    Move cursor up.
 
 *view* `N`|*last*
-	Display `N`th or last open file.
+    Display `N`th or last open file.
 
 *wclose* [*-f*]
-	Close window.
+    Close window.
 
-	*-f* close even if there are unsaved files in the window
+    *-f* close even if there are unsaved files in the window
 
 *wflip*
-	Change from vertical layout to horizontal and vice versa.
+    Change from vertical layout to horizontal and vice versa.
 
 *wnext*
-	Next window.
+    Next window.
 
 *word-bwd* [*-s*]
-	Move cursor backward one word.
+    Move cursor backward one word.
 
-	*-s* skip special characters
+    *-s* skip special characters
 
 *word-fwd* [*-s*]
-	Move cursor forward one word.
+    Move cursor forward one word.
 
-	*-s* skip special characters
+    *-s* skip special characters
 
 *wprev*
-	Previous window.
+    Previous window.
 
 *wresize* [*-hv*] [`N`|*+*`N`|*-- -*`N`]
-	If no parameter given, equalize window sizes in current frame.
+    If no parameter given, equalize window sizes in current frame.
 
-	*-h* resize horizontally
+    *-h* resize horizontally
 
-	*-v* resize vertically
+    *-v* resize vertically
 
-	`N` Set size of current window to `N` characters.
+    `N` Set size of current window to `N` characters.
 
-	*+*`N` Increase size of current window by `N` characters.
+    *+*`N` Increase size of current window by `N` characters.
 
-	*-*`N` Decrease size of current window by `N` characters.
-	Use "*--*" to prevent the minus symbol being parsed as an option
-	flag, e.g. "*wresize -- -5*".
+    *-*`N` Decrease size of current window by `N` characters.
+    Use "*--*" to prevent the minus symbol being parsed as an option
+    flag, e.g. "*wresize -- -5*".
 
 *wsplit* [*-bhr*] [`file`]...
-	Like *open* but at first splits current window vertically.
+    Like *open* but at first splits current window vertically.
 
-	*-b* Add new window before current instead of after.
+    *-b* Add new window before current instead of after.
 
-	*-h* Split horizontally instead of vertically.
+    *-h* Split horizontally instead of vertically.
 
-	*-r* Split root instead of current window.
+    *-r* Split root instead of current window.
 
 *wswap*
-	Swap positions of this and next frame.
+    Swap positions of this and next frame.
 
 @h1 OPTIONS
 
@@ -684,205 +684,205 @@ The global values for these options serve as the default values for
 local (per-file) options.
 
 *auto-indent* [true]
-	Automatically insert indentation when pressing enter.
-	Indentation is copied from previous non-empty line. If also the
-	*indent-regex* local option is set then indentation is
-	automatically increased if the regular expression matches
-	current line.
+    Automatically insert indentation when pressing enter.
+    Indentation is copied from previous non-empty line. If also the
+    *indent-regex* local option is set then indentation is
+    automatically increased if the regular expression matches
+    current line.
 
 *detect-indent* [""]
-	Comma-separated list of indent widths (1-8) to detect
-	automatically when file is opened. Set to "" to disable. Tab
-	indentation is detected if the value is not "". Adjusts
-	following options if indentation style is detected:
-	*emulate-tab*, *expand-tab*, *indent-width*.
+    Comma-separated list of indent widths (1-8) to detect
+    automatically when file is opened. Set to "" to disable. Tab
+    indentation is detected if the value is not "". Adjusts
+    following options if indentation style is detected:
+    *emulate-tab*, *expand-tab*, *indent-width*.
 
-	Example:
-		set detect-indent 2,3,4,8
+    Example:
+        set detect-indent 2,3,4,8
 
 *emulate-tab* [false]
-	Make *delete*, *erase* and moving *left* and *right* inside
-	indentation feel as if there were tabs instead of spaces.
+    Make *delete*, *erase* and moving *left* and *right* inside
+    indentation feel as if there were tabs instead of spaces.
 
 *expand-tab* [false]
-	Convert tab to spaces on insert.
+    Convert tab to spaces on insert.
 
 *file-history* [true]
-	Save line and column for each file to $DTE_HOME/file-history.
+    Save line and column for each file to $DTE_HOME/file-history.
 
 *indent-width* [8]
-	Size of indentation in spaces.
+    Size of indentation in spaces.
 
 *syntax* [true]
-	Use syntax highlighting.
+    Use syntax highlighting.
 
 *tab-width* [8]
-	Width of tab. Recommended value is 8. If you use other
-	indentation size than 8 you should use spaces to indent.
+    Width of tab. Recommended value is 8. If you use other
+    indentation size than 8 you should use spaces to indent.
 
 *text-width* [72]
-	Preferred with of text. Used as default value for
-	*format-paragraph*.
+    Preferred with of text. Used as default value for
+    *format-paragraph*.
 
 *ws-error* [special]
-	Comma-separated list of flags that describe which whitespace
-	errors should be highlighted. Set to "" to disable.
+    Comma-separated list of flags that describe which whitespace
+    errors should be highlighted. Set to "" to disable.
 
-	*auto-indent*
-		If the *expand-tab* option is enabled then this is the
-		same as "tab-after-indent,tab-indent". Otherwise it's
-		the same as "space-indent".
+    *auto-indent*
+        If the *expand-tab* option is enabled then this is the
+        same as "tab-after-indent,tab-indent". Otherwise it's
+        the same as "space-indent".
 
-	*space-align*
-		Highlight spaces used for alignment after tab
-		indents as errors.
+    *space-align*
+        Highlight spaces used for alignment after tab
+        indents as errors.
 
-	*space-indent*
-		Highlight space indents as errors. Note that this
-		still allows using less than *tab-width* spaces at the
-		end of indentation for alignment.
+    *space-indent*
+        Highlight space indents as errors. Note that this
+        still allows using less than *tab-width* spaces at the
+        end of indentation for alignment.
 
-	*tab-after-indent*
-		Highlight tabs used anywhere other than indentation as
-		errors.
+    *tab-after-indent*
+        Highlight tabs used anywhere other than indentation as
+        errors.
 
-	*tab-indent*
-		Highlight tabs in indentation as errors. If you set this
-		you most likely want to set "tab-after-indent" too.
+    *tab-indent*
+        Highlight tabs in indentation as errors. If you set this
+        you most likely want to set "tab-after-indent" too.
 
-	*special*
-		Display all characters that look like regular space as
-		errors. One of these characters is no-break space
-		(U+00A0), which is often accidentally typed (AltGr+space
-		in some keyboard layouts).
+    *special*
+        Display all characters that look like regular space as
+        errors. One of these characters is no-break space
+        (U+00A0), which is often accidentally typed (AltGr+space
+        in some keyboard layouts).
 
-	*trailing*
-		Highlight trailing whitespace characters at the end of
-		lines as errors.
+    *trailing*
+        Highlight trailing whitespace characters at the end of
+        lines as errors.
 
 @h2 Local only options
 
 *brace-indent* [false]
-	Scan for "{" and "}" characters when calculating indentation size.
-	Depends on the *auto-indent* option.
+    Scan for "{" and "}" characters when calculating indentation size.
+    Depends on the *auto-indent* option.
 
 *filetype* [none]
-	Type of file. Value must be previously registered using the *ft*
-	command.
+    Type of file. Value must be previously registered using the *ft*
+    command.
 
 *indent-regex* [""]
-	If this regular expression matches current line when enter is
-	pressed and *auto-indent* is true then indentation is increased.
-	Set to "" to disable.
+    If this regular expression matches current line when enter is
+    pressed and *auto-indent* is true then indentation is increased.
+    Set to "" to disable.
 
 @h2 Global only options
 
 *case-sensitive-search* [true]
-	false
-		Search is case-insensitive.
-	true
-		Search is case-sensitive.
-	auto
-		If search string contains a uppercase letter search is
-		case-sensitive, otherwise it is case-insensitive.
+    false
+        Search is case-insensitive.
+    true
+        Search is case-sensitive.
+    auto
+        If search string contains a uppercase letter search is
+        case-sensitive, otherwise it is case-insensitive.
 
 *display-special* [false]
-	Display special characters.
+    Display special characters.
 
 *esc-timeout* [100] 0...2000
-	When single escape is read from the terminal dte waits some
-	time before treating the escape as a single keypress. The
-	timeout value is in milliseconds.
+    When single escape is read from the terminal dte waits some
+    time before treating the escape as a single keypress. The
+    timeout value is in milliseconds.
 
-	Too long timeout makes escape key feel slow and too small
-	timeout can cause escape sequences of for example arrow keys to
-	be split and treated as multiple key presses.
+    Too long timeout makes escape key feel slow and too small
+    timeout can cause escape sequences of for example arrow keys to
+    be split and treated as multiple key presses.
 
 *lock-files* [true]
-	Lock files using $DTE_HOME/file-locks. Only protects from your
-	own mistakes (two processes editing same file).
+    Lock files using $DTE_HOME/file-locks. Only protects from your
+    own mistakes (two processes editing same file).
 
 *newline* [unix]
-	Whether to use LF (`unix`) or CRLF (`dos`) line-endings. This is
-	just a default value for new files.
+    Whether to use LF (`unix`) or CRLF (`dos`) line-endings. This is
+    just a default value for new files.
 
 *scroll-margin* [0]
-	Minimum number of lines to keep visible before and after cursor.
+    Minimum number of lines to keep visible before and after cursor.
 
 *show-line-numbers* [false]
-	Show line numbers.
+    Show line numbers.
 
 *statusline-left* [" %f%s%m%r%s%M"]
-	Format string for the left aligned part of status line.
+    Format string for the left aligned part of status line.
 
-	@li %f
-	Filename.
+    @li %f
+    Filename.
 
-	@li %m
-	"\*" if file is has been modified since last save.
+    @li %m
+    "\*" if file is has been modified since last save.
 
-	@li %r
-	"RO" if file is read-only.
+    @li %r
+    "RO" if file is read-only.
 
-	@li %y
-	Cursor row.
+    @li %y
+    Cursor row.
 
-	@li %Y
-	Total rows in file.
+    @li %Y
+    Total rows in file.
 
-	@li %x
-	Cursor display column.
+    @li %x
+    Cursor display column.
 
-	@li %X
-	Cursor column as characters. If it differs from cursor
-	display column it is show too (e.g. "2-9").
+    @li %X
+    Cursor column as characters. If it differs from cursor
+    display column it is show too (e.g. "2-9").
 
-	@li %p
-	Position in percentage.
+    @li %p
+    Position in percentage.
 
-	@li %E
-	File encoding.
+    @li %E
+    File encoding.
 
-	@li %M
-	Miscellaneous status information.
+    @li %M
+    Miscellaneous status information.
 
-	@li %n
-	Line-ending (LF or CRLF).
+    @li %n
+    Line-ending (LF or CRLF).
 
-	@li %s
-	Add separator.
+    @li %s
+    Add separator.
 
-	@li %t
-	File type.
+    @li %t
+    File type.
 
-	@li %u
-	Hexadecimal unicode value value of character under cursor.
+    @li %u
+    Hexadecimal unicode value value of character under cursor.
 
-	@li %%
-	Literal %.
+    @li %%
+    Literal %.
 
 *statusline-right* [" %y,%X   %u   %E %n %t   %p "]
-	Format string for the right aligned part of status line.
+    Format string for the right aligned part of status line.
 
 *tab-bar* [horizontal]
-	hidden
-		Hide tab bar.
-	horizontal
-		Show tab bar on top.
-	vertical
-		Show tab bar on left if there's enough space, hide otherwise.
-	auto
-		Show tab bar on left if there's enough space, on top otherwise.
+    hidden
+        Hide tab bar.
+    horizontal
+        Show tab bar on top.
+    vertical
+        Show tab bar on left if there's enough space, hide otherwise.
+    auto
+        Show tab bar on left if there's enough space, on top otherwise.
 
 *tab-bar-max-components* [0]
-	Maximum number of path components displayed in vertical tab bar.
-	Set to 0 to disable.
+    Maximum number of path components displayed in vertical tab bar.
+    Set to 0 to disable.
 
 *tab-bar-width* [25]
-	Width of vertical tab bar. Note that width of tab bar is
-	automatically reduced to keep editing area at least 80
-	characters wide. Vertical tab bar is shown only if there's
-	enough space.
+    Width of vertical tab bar. Note that width of tab bar is
+    automatically reduced to keep editing area at least 80
+    characters wide. Vertical tab bar is shown only if there's
+    enough space.
 
 @h1 SEE ALSO
 
