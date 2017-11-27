@@ -117,16 +117,16 @@ void buf_move_cursor(int x, int y)
         return;
     }
     static char buf[16];
-    int pos = snprintf (
+    const int len = snprintf (
         buf,
-        15,
+        11, // == strlen("\033[998;998H") + 1 (for NUL, to avoid truncation)
         "\033[%u;%uH",
         ((unsigned int)y) + 1,
         ((unsigned int)x) + 1
     );
-    BUG_ON(pos < 6);  // \E[0;0H == 6 bytes
-    BUG_ON(pos > 10); // \E[998;998H == 10 bytes
-    buf_escape(buf);
+    BUG_ON(len < 6);  //  6 == strlen("\033[0;0H")
+    BUG_ON(len > 10); // 10 == strlen("\033[998;998H")
+    buf_add_bytes(buf, (size_t)len);
 }
 
 void buf_set_color(const TermColor *const color)
