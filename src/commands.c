@@ -484,6 +484,17 @@ static void cmd_insert(const char *pf, char **args)
     }
 }
 
+static void cmd_insert_builtin(const char* UNUSED(pf), char **args)
+{
+    const char *name = args[0];
+    const BuiltinConfig *cfg = get_builtin_config(name);
+    if (cfg) {
+        buffer_insert_bytes(cfg->text, cfg->text_len);
+    } else {
+        error_msg("No built-in config with name '%s'", name);
+    }
+}
+
 static void cmd_insert_special(const char* UNUSED(pf), char** UNUSED(args))
 {
     special_input_activate();
@@ -1645,6 +1656,7 @@ const Command commands[] = {
     {"hi", "-", 0, -1, cmd_hi},
     {"include", "b", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
+    {"insert-builtin", "", 1, 1, cmd_insert_builtin},
     {"insert-special", "", 0, 0, cmd_insert_special},
     {"join", "", 0, 0, cmd_join},
     {"left", "", 0, 0, cmd_left},

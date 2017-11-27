@@ -241,9 +241,15 @@ static void collect_completions(char **args, int argc)
             break;
         case 2:
             if (streq(args[1], "-b")) {
-                collect_builtin_configs(completion.parsed);
+                collect_builtin_configs(completion.parsed, false);
             }
             break;
+        }
+        return;
+    }
+    if (streq(cmd->name, "insert-builtin")) {
+        if (argc == 1) {
+            collect_builtin_configs(completion.parsed, true);
         }
         return;
     }

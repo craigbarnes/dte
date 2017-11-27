@@ -92,11 +92,11 @@ void list_builtin_configs(void)
     }
 }
 
-void collect_builtin_configs(const char *const prefix)
+void collect_builtin_configs(const char *const prefix, bool syntaxes)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         const BuiltinConfig *cfg = &builtin_configs[i];;
-        if (str_has_prefix(cfg->name, "syntax/")) {
+        if (syntaxes == false && str_has_prefix(cfg->name, "syntax/")) {
             return;
         } else if (str_has_prefix(cfg->name, prefix)) {
             add_completion(xstrdup(cfg->name));
