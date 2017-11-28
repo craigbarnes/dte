@@ -17,83 +17,93 @@
 // __has_extension is a Clang macro used to determine if a feature is
 // available even if not standardized in the current "-std" mode.
 #ifdef __has_extension
-#define HAS_EXTENSION(x) __has_extension(x)
+    #define HAS_EXTENSION(x) __has_extension(x)
 #else
-#define HAS_EXTENSION(x) 0
+    #define HAS_EXTENSION(x) 0
 #endif
 
 #ifdef __has_attribute
-#define HAS_ATTRIBUTE(x) __has_attribute(x)
+    #define HAS_ATTRIBUTE(x) __has_attribute(x)
 #else
-#define HAS_ATTRIBUTE(x) 0
+    #define HAS_ATTRIBUTE(x) 0
 #endif
 
 #ifdef __has_warning
-#define HAS_WARNING(x) __has_warning(x)
+    #define HAS_WARNING(x) __has_warning(x)
 #else
-#define HAS_WARNING(x) 0
+    #define HAS_WARNING(x) 0
 #endif
 
 #define DO_PRAGMA(x) _Pragma(#x)
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
-#define MALLOC __attribute__((__malloc__))
-#define FORMAT(idx) __attribute__((__format__(printf, (idx), (idx + 1))))
-#define PURE __attribute__((__pure__))
-#define CONST_FN __attribute__((__const__))
+    #define likely(x) __builtin_expect(!!(x), 1)
+    #define unlikely(x) __builtin_expect(!!(x), 0)
+    #define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
+    #define MALLOC __attribute__((__malloc__))
+    #define FORMAT(idx) __attribute__((__format__(printf, (idx), (idx + 1))))
+    #define PURE __attribute__((__pure__))
+    #define CONST_FN __attribute__((__const__))
 #else
-#define likely(x) (x)
-#define unlikely(x) (x)
-#define UNUSED
-#define MALLOC
-#define FORMAT(idx)
-#define PURE
-#define CONST_FN
+    #define likely(x) (x)
+    #define unlikely(x) (x)
+    #define UNUSED
+    #define MALLOC
+    #define FORMAT(idx)
+    #define PURE
+    #define CONST_FN
 #endif
 
 #if (defined(__GNUC__) && __GNUC__ >= 4) || HAS_ATTRIBUTE(nonnull)
-#define NONNULL_ARGS __attribute__((__nonnull__))
+    #define NONNULL_ARGS __attribute__((__nonnull__))
 #else
-#define NONNULL_ARGS
+    #define NONNULL_ARGS
 #endif
 
 #if (defined(__GNUC__) && __GNUC__ >= 5) || HAS_ATTRIBUTE(returns_nonnull)
-#define RETURNS_NONNULL __attribute__((__returns_nonnull__))
+    #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
-#define RETURNS_NONNULL
+    #define RETURNS_NONNULL
 #endif
 
 #if defined(__GNUC__) && (__GNUC__ >= 5)
-#define MESSAGE(x) DO_PRAGMA(message #x)
+    #define MESSAGE(x) DO_PRAGMA(message #x)
 #else
-#define MESSAGE(x)
+    #define MESSAGE(x)
 #endif
 
 #if __STDC_VERSION__ >= 201112L
-#define NORETURN _Noreturn
+    #define NORETURN _Noreturn
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
-#define NORETURN __attribute__((__noreturn__))
+    #define NORETURN __attribute__((__noreturn__))
 #else
-#define NORETURN
+    #define NORETURN
 #endif
 
 #if (__STDC_VERSION__ >= 201112L) || HAS_EXTENSION(c_static_assert)
-#define static_assert(x) _Static_assert((x), #x)
+    #define static_assert(x) _Static_assert((x), #x)
 #else
-#define static_assert(x)
+    #define static_assert(x)
 #endif
 
+// This macro supresses warnings about dicarded const qualifiers
+// It's only defined for Clang, since GCC is lacking the following
+// features required for an acceptable implementation:
+//
+// 1. The ability to apply pragmas at the granularity of individual
+//    function arguments instead of whole statements.
+// 2. A flag that only suppresses dicarded qualifier warnings without
+//    also suppressing incompatible-pointer-types warnings.
+// 3. Some mechanism equivalent to __has_warning().
+//
 #if defined(__clang__) && HAS_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
-#define IGNORE_DISCARDED_QUALIFIERS(x) \
-    DO_PRAGMA(clang diagnostic push) \
-    DO_PRAGMA(clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers") \
-    (x) \
-    DO_PRAGMA(clang diagnostic pop)
+    #define IGNORE_DISCARDED_QUALIFIERS(x) \
+        DO_PRAGMA(clang diagnostic push) \
+        DO_PRAGMA(clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers") \
+        (x) \
+        DO_PRAGMA(clang diagnostic pop)
 #else
-#define IGNORE_DISCARDED_QUALIFIERS(x) (x)
+    #define IGNORE_DISCARDED_QUALIFIERS(x) (x)
 #endif
 
 #endif
