@@ -18,7 +18,7 @@ static void bitmap_set(unsigned char *bitmap, long idx)
 
 static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
 {
-    for (int i = 0; pattern[i]; i++) {
+    for (size_t i = 0; pattern[i]; i++) {
         unsigned int ch = pattern[i];
         bitmap_set(bitmap, ch);
         if (pattern[i + 1] == '-' && pattern[i + 2]) {
@@ -106,9 +106,9 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
         .subsyn = find_any_syntax(name),
         .return_state = NULL,
         .delim = NULL,
-        .delim_len = -1,
+        .delim_len = 0,
     };
-    bool ok = 1;
+    bool ok = true;
 
     if (!m.subsyn) {
         error_msg("No such syntax %s", name);
@@ -132,7 +132,7 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
 
 static bool destination_state(const char *name, State **dest)
 {
-    char *sep = strchr(name, ':');
+    const char *const sep = strchr(name, ':');
 
     if (sep) {
         // subsyntax:returnstate
@@ -178,10 +178,10 @@ static Condition *add_condition (
 
 static void cmd_bufis(const char *pf, char **args)
 {
-    bool icase = !!*pf;
+    const bool icase = !!*pf;
     Condition *c;
     const char *str = args[0];
-    int len = strlen(str);
+    const size_t len = strlen(str);
 
     if (len > ARRAY_COUNT(c->u.cond_bufis.str)) {
         error_msg (
@@ -223,7 +223,7 @@ static void cmd_char(const char *pf, char **args)
 
     set_bits(c->u.cond_char.bitmap, args[0]);
     if (not) {
-        for (int i = 0; i < ARRAY_COUNT(c->u.cond_char.bitmap); i++) {
+        for (size_t i = 0; i < ARRAY_COUNT(c->u.cond_char.bitmap); i++) {
             c->u.cond_char.bitmap[i] = ~c->u.cond_char.bitmap[i];
         }
     }
@@ -319,9 +319,9 @@ static void cmd_list(const char *pf, char **args)
     list->defined = true;
     list->icase = !!*pf;
 
-    for (int i = 1; args[i]; i++) {
+    for (size_t i = 1; args[i]; i++) {
         const char *str = args[i];
-        size_t len = strlen(str);
+        const size_t len = strlen(str);
         unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
         HashStr *h = xmalloc(sizeof(HashStr *) + sizeof(int) + len);
         h->next = list->hash[idx];
@@ -391,10 +391,14 @@ static void cmd_recolor(const char* UNUSED(pf), char **args)
             error_msg("number of bytes must be larger than 0");
             return;
         }
+        if (len > 2500) {
+            error_msg("number of bytes cannot be larger than 2500");
+            return;
+        }
     }
     c = add_condition(type, NULL, args[0]);
     if (c && type == COND_RECOLOR) {
-        c->u.cond_recolor.len = len;
+        c->u.cond_recolor.len = (size_t)len;
     }
 }
 
@@ -428,7 +432,7 @@ static void cmd_str(const char *pf, char **args)
     ConditionType type = icase ? COND_STR_ICASE : COND_STR;
     const char *str = args[0];
     Condition *c;
-    int len = strlen(str);
+    size_t len = strlen(str);
 
     if (len > ARRAY_COUNT(c->u.cond_str.str)) {
         error_msg (

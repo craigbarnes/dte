@@ -50,8 +50,8 @@ typedef struct {
 typedef struct {
     union {
         struct {
-            int len;
-            int icase;
+            size_t len;
+            bool icase;
             char str[256 / 8 - 2 * sizeof(int)];
         } cond_bufis;
         struct {
@@ -61,14 +61,14 @@ typedef struct {
             StringList *list;
         } cond_inlist;
         struct {
-            int len;
+            size_t len;
         } cond_recolor;
         struct {
-            int len;
+            size_t len;
             char str[256 / 8 - sizeof(int)];
         } cond_str;
         struct {
-            int len;
+            size_t len;
             char *str;
         } cond_heredocend;
     } u;
@@ -79,7 +79,7 @@ typedef struct {
 typedef struct {
     State *state;
     char *delim;
-    int len;
+    size_t len;
 } HeredocState;
 
 typedef struct {
@@ -119,7 +119,7 @@ typedef struct {
     Syntax *subsyn;
     State *return_state;
     const char *delim;
-    int delim_len;
+    size_t delim_len;
 } SyntaxMerge;
 
 static inline bool is_subsyntax(Syntax *syn)

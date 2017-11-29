@@ -27,7 +27,7 @@ static int bitmap_get(const unsigned char *bitmap, unsigned int idx)
     return bitmap[byte] & 1 << bit;
 }
 
-static bool is_buffered(const Condition *cond, const char *str, int len)
+static bool is_buffered(const Condition *cond, const char *str, size_t len)
 {
     if (len != cond->u.cond_bufis.len) {
         return false;
@@ -66,12 +66,12 @@ static State *handle_heredoc (
     Syntax *syn,
     State *state,
     const char *delim,
-    int len
+    size_t len
 ) {
     HeredocState *s;
     SyntaxMerge m;
 
-    for (int i = 0; i < state->heredoc.states.count; i++) {
+    for (size_t i = 0; i < state->heredoc.states.count; i++) {
         s = state->heredoc.states.ptrs[i];
         if (s->len == len && !memcmp(s->delim, delim, len)) {
             return s->state;
@@ -96,12 +96,13 @@ static HlColor **highlight_line (
     Syntax *syn,
     State *state,
     const char *line,
-    int len,
+    size_t len,
     State **ret
 ) {
     static HlColor **colors;
-    static int alloc;
-    int i = 0, sidx = -1;
+    static size_t alloc;
+    size_t i = 0;
+    int sidx = -1;
 
     if (len > alloc) {
         alloc = ROUND_UP(len, 128);
@@ -112,13 +113,12 @@ static HlColor **highlight_line (
         const Condition *cond;
         const Action *a;
         unsigned char ch;
-        int ci;
     top:
         if (i == len) {
             break;
         }
         ch = line[i];
-        for (ci = 0; ci < state->conds.count; ci++) {
+        for (size_t ci = 0; ci < state->conds.count; ci++) {
             cond = state->conds.ptrs[ci];
             a = &cond->a;
             switch (cond->type) {
@@ -183,8 +183,8 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_STR: {
-                int slen = cond->u.cond_str.len;
-                int end = i + slen;
+                size_t slen = cond->u.cond_str.len;
+                size_t end = i + slen;
                 if (
                     len >= end
                     && !memcmp(cond->u.cond_str.str, line + i, slen)
@@ -198,8 +198,8 @@ static HlColor **highlight_line (
                 }
                 } break;
             case COND_STR_ICASE: {
-                int slen = cond->u.cond_str.len;
-                int end = i + slen;
+                size_t slen = cond->u.cond_str.len;
+                size_t end = i + slen;
                 if (
                     len >= end
                     && !strncasecmp(cond->u.cond_str.str, line + i, slen)
@@ -228,8 +228,8 @@ static HlColor **highlight_line (
                 break;
             case COND_HEREDOCEND: {
                 const char *str = cond->u.cond_heredocend.str;
-                int slen = cond->u.cond_heredocend.len;
-                int end = i + slen;
+                size_t slen = cond->u.cond_heredocend.len;
+                size_t end = i + slen;
                 if (len >= end && (slen == 0 || !memcmp(str, line + i, slen))) {
                     while (i < end) {
                         colors[i++] = a->emit_color;
@@ -271,7 +271,7 @@ static HlColor **highlight_line (
     return colors;
 }
 
-static void resize_line_states(PointerArray *s, unsigned int count)
+static void resize_line_states(PointerArray *s, size_t count)
 {
     if (s->alloc < count) {
         s->alloc = ROUND_UP(count, 64);
@@ -279,12 +279,16 @@ static void resize_line_states(PointerArray *s, unsigned int count)
     }
 }
 
-static void move_line_states(PointerArray *s, int to, int from, int count)
-{
+static void move_line_states (
+    PointerArray *s,
+    size_t to,
+    size_t from,
+    size_t count
+) {
     memmove(s->ptrs + to, s->ptrs + from, count * sizeof(*s->ptrs));
 }
 
-static void block_iter_move_down(BlockIter *bi, int count)
+static void block_iter_move_down(BlockIter *bi, size_t count)
 {
     while (count--) {
         block_iter_eat_line(bi);
@@ -346,8 +350,6 @@ void hl_fill_start_states(Buffer *b, int line_nr)
         last = s->count - 1;
     }
     while (1) {
-        int count;
-
         while (idx <= last && state_is_valid(states[idx])) {
             idx++;
         }
@@ -361,7 +363,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
         current_line = idx;
 
         // NOTE: might not fill entire hole which is ok
-        count = fill_hole(b, &bi, idx, last);
+        int count = fill_hole(b, &bi, idx, last);
         idx += count;
         current_line += count;
     }
@@ -387,7 +389,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 HlColor **hl_line (
     Buffer *b,
     const char *line,
-    int len,
+    size_t len,
     int line_nr,
     int *next_changed
 ) {
