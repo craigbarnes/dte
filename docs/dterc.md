@@ -4,7 +4,7 @@ section: 5
 date: November 2017
 description: Command and configuration language used by **dte**
 author: [Craig Barnes, Timo Hirvonen]
-...
+---
 
 # Command Syntax
 
