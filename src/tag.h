@@ -10,5 +10,6 @@ void tag_file_find_tags(TagFile *tf, const char *filename, const char *name, Poi
 char *tag_file_get_tag_filename(TagFile *tf, Tag *t);
 
 void collect_tags(TagFile *tf, const char *prefix);
+int print_tags(const char *prefix);
 
 #endif
