@@ -1,6 +1,5 @@
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-TTMAN = build/ttman$(EXEC_SUFFIX)
 PDMAN = pandoc -f markdown-superscript-smart-tex_math_dollars -t docs/pdman.lua
 SED = sed
 
@@ -19,14 +18,10 @@ docs: man web
 man: docs/dterc.5 docs/dte-syntax.5
 web: $(web)
 
-docs/dterc.5: docs/dterc.md docs/pdman.lua | build/
+docs/%.5: docs/%.md docs/pdman.lua | build/
 	$(E) PDMAN $@
 	$(Q) $(PDMAN) -o build/$(@F) $<
 	$(Q) $(SED) 's/^$$/./' build/$(@F) > $@
-
-docs/%.5: docs/%.txt $(TTMAN)
-	$(E) TTMAN $@
-	$(Q) $(TTMAN) < $< > $@
 
 $(pdf): $(man) | public/
 	$(E) GROFF $@
@@ -44,18 +39,10 @@ public/%.gz: public/%
 	$(E) GZIP $@
 	$(Q) gzip -9 < $< > $@
 
-$(TTMAN): build/ttman.o
-	$(E) HOSTLD $@
-	$(Q) $(HOST_CC) $(HOST_LDFLAGS) $(BASIC_HOST_LDFLAGS) -o $@ $^
-
-build/ttman.o: docs/ttman.c | build/
-	$(E) HOSTCC $@
-	$(Q) $(HOST_CC) $(HOST_CFLAGS) $(BASIC_HOST_CFLAGS) -c -o $@ $<
-
 public/:
 	@mkdir -p $@
 
-check-docs: README.md docs/CONTRIBUTING.md
+check-docs: README.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 

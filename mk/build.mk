@@ -1,9 +1,6 @@
 CC ?= gcc
 CFLAGS ?= -g -O2
 LDFLAGS ?=
-HOST_CC ?= $(CC)
-HOST_CFLAGS ?= $(CFLAGS)
-HOST_LDFLAGS ?=
 AWK = awk
 PKGCONFIG = pkg-config
 PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
@@ -88,7 +85,6 @@ else
 endif
 
 BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
-BASIC_HOST_CFLAGS += $(CSTD) $(CWARNS)
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv

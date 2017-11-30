@@ -38,7 +38,7 @@ function Doc(body, metadata, variables)
     local authors = assert(metadata.author)
     local buffer = Buffer()
     buffer:write (
-        ".TH ", escape(title:upper()), " ", section, ' "', date, '"\n',
+        ".TH ", title:upper(), " ", section, ' "', date, '"\n',
         ".nh\n.ad l\n.\n",
         ".SH NAME\n", title, " \\- ", description, "\n",
         ".SH SYNOPSIS\n", toc:tostring(),
@@ -106,7 +106,10 @@ function OrderedList(items)
 end
 
 function CodeBlock(s, attr)
-    return ".RS\n" .. s .. "\n.RE\n.P\n"
+    -- TODO: use .EX/.EE for this (see: groff_man(7))
+    local code = s:gsub("\n\n", "\n.P\n"):gsub("\n", "\n.br\n")
+
+    return ".RS\n" .. code .. "\n.RE\n.P\n"
 end
 
 function Code(s, attr)

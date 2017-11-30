@@ -1,202 +1,339 @@
 .TH DTE\-SYNTAX 5 "November 2017"
 .nh
 .ad l
+.
 .SH NAME
-dte\-syntax \- Format of the syntax highlighting files used by \fBdte\fR(1)
+dte\-syntax \- Format of syntax highlighting files used by \fBdte\fR
+.SH SYNOPSIS
+.P
+Commands:
+.br
+.
+.P
+Main commands:
+.br
+   \fBsyntax\fR \fIname\fR
+.br
+   \fBstate\fR \fIname\fR [\fIemit\-color\fR]
+.br
+   \fBdefault\fR \fIcolor\fR \fIname\fR...
+.br
+   \fBlist\fR [\fB\-i\fR] \fIname\fR \fIstring\fR...
+.br
+.
+.P
+Conditionals:
+.br
+   \fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
+.br
+   \fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
+.br
+   \fBheredocend\fR \fIdestination\fR
+.br
+   \fBinlist\fR \fIlist\fR \fIdestination\fR [\fIemit\-name\fR]
+.br
+   \fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
+.br
+.
+.P
+Default actions:
+.br
+   \fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
+.br
+   \fBheredocbegin\fR \fIsubsyntax\fR \fIreturn\-state\fR
+.br
+   \fBnoeat\fR [\fB\-b\fR] \fIdestination\fR
+.br
+.
+.P
+Other commands:
+.br
+   \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
+.br
 .SH DESCRIPTION
-A syntax file consists of multiple states. A state consists of optional conditionals and one default action. The best way understand the syntax of these files is to read through some examples (see link below).
-
-Basic syntax of the syntax files is the same used in the rc files, but the available commands are different.
-
-Conditionals and default actions have destination state. The special destination state "this" can be used to jump to current state.
+.
+A syntax file consists of multiple states. A state consists of optional
+conditionals and one default action. The best way understand the syntax
+is to read through some of the built\-in syntax files, which can be
+printed with \fBdte \-b\fR, for example:
+.P
+.
+.RS
+dte -b syntax/dte
+.br
+dte -b syntax/lua
+.RE
+.P
+.
+The basic syntax used is the same as in \fBdterc\fR(5) files, but the
+available commands are different.
+.P
+.
+Conditionals and default actions have a destination state. The special
+destination state \fBthis\fR can be used to jump to the current state.
+.P
+.
 .SH COMMANDS
+.
 .SS Main commands
-\fBsyntax\fR <\fIname\fR>
-.RS
-Begin a new syntax. One syntax file can contain multiple syntax definitions, but you should only define one real syntax in one syntax file.
+.
+.
 .RE
-
+\fBsyntax\fR \fIname\fR
 .RS
-See also SUB\-SYNTAXES.
+Begin a new syntax. One syntax file can contain multiple syntax
+definitions, but you should only define one real syntax in one
+syntax file.
+.P
+.
+See also: sub\-syntaxes.
+.P
+.
+.
 .RE
-
-\fBstate\fR <\fIname\fR> [\fIemit\-color\fR]
+\fBstate\fR \fIname\fR [\fIemit\-color\fR]
 .RS
-Add new state. Conditionals (if any) and one default action must follow. First state is the start state.
+Add new state. Conditionals (if any) and one default action must
+follow. The first state is the \fBstart\fR state.
+.P
+.
+.
 .RE
-
-\fBdefault\fR <\fIcolor\fR> <\fIname\fR>...
+\fBdefault\fR \fIcolor\fR \fIname\fR...
 .RS
 Set default \fIcolor\fR for emitted \fIname\fR.
-.RE
-
-.RS
+.P
+.
 Example:
+.P
+.
 .RS
 default numeric oct dec hex
 .RE
+.P
+.
+If there is no color defined for \fIoct\fR, \fIdec\fR or \fIhex\fR then color
+\fInumeric\fR is used instead.
+.P
+.
+.
 .RE
-
-.RS
-If there is no color defined for oct, dec or hex then color numeric is used instead.
-.RE
-
-\fBlist\fR [\fB\-i\fR] <\fIname\fR> <\fIstring\fR>...
+\fBlist\fR [\fB\-i\fR] \fIname\fR \fIstring\fR...
 .RS
 Define a list of strings.
-.RE
-
-.RS
+.P
+.
 Example:
+.P
+.
 .RS
 list keyword if else for while do continue switch case
 .RE
-.RE
-
-.RS
-Use conditional \fBinlist\fR to test if a buffered string is in a list.
-.RE
-
-.RS
-\fB\-i\fR Make list case\-insensitive.
-.RE
+.P
+.
+Use the \fBinlist\fR command to test if a buffered string is in a list.
+.P
+.
+.TP
+\fB\-i\fR
+Make list case\-insensitive.
+.PP
+.
 .SS Conditionals
-\fBbufis\fR [\fB\-i\fR] <\fIstring\fR> <\fIdestination\fR> [\fIemit\-name\fR]
-.RS
-Test if buffered bytes are same as \fIstring\fR. If they are emit \fIemit\-name\fR and jump to \fIdestination\fR state.
+.
+.
 .RE
-
-\fBchar\fR [\fB\-bn\fR] <\fIcharacters\fR> <\fIdestination\fR> [\fIemit\-name\fR]
+\fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Test if current byte is in the character list. If it is then emit \fIemit\-color\fR and jump to \fIdestination\fR state. If \fIemit\-name\fR is not given then destination states emit name is used.
+Test if buffered bytes are same as \fIstring\fR. If they are, emit
+\fIemit\-name\fR and jump to \fIdestination\fR state.
+.P
+.
+.
 .RE
-
+\fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Characters is a list of strings. Ranges are supported ("a\-d" is same as "abcd").
+Test if current byte is in the \fIcharacters\fR list. If it is then emit
+\fIemit\-color\fR and jump to \fIdestination\fR state. If \fIemit\-name\fR is not
+given then the \fIdestination\fR state's emit name is used.
+.P
+.
+\fIcharacters\fR is a list of strings. Ranges are supported (\fBa\-d\fR is the
+same as \fBabcd\fR).
+.P
+.
+.TP
+\fB\-b\fR
+Add byte to buffer.
+.PP
+.TP
+\fB\-n\fR
+Invert character bitmap.
+.PP
+.
+.
 .RE
-
+\fBheredocend\fR \fIdestination\fR
 .RS
-\fB\-b\fR Add byte to buffer.
+Compare following characters to heredoc end delimiter and go to
+destination state if comparison is true.
+.P
+.
+.
 .RE
-
+\fBinlist\fR \fIlist\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-\fB\-n\fR Invert character bitmap.
+Test if buffered bytes are found in \fIlist\fR. If found, emit
+\fIemit\-name\fR and jump to \fIdestination\fR state.
+.P
+.
+.
 .RE
-
-\fBheredocend\fR <\fIdestination\fR>
+\fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Compare following characters to heredoc end delimiter and go to destination state if comparison is true.
-.RE
-
-\fBinlist\fR <\fIlist\fR> <\fIdestination\fR> [\fIemit\-name\fR]
-.RS
-Test if buffered bytes are found in \fIlist\fR. If found, emit \fIemit\-name\fR and jump to \fIdestination\fR state.
-.RE
-
-\fBstr\fR [\fB\-i\fR] <\fIstring\fR> <\fIdestination\fR> [\fIemit\-name\fR]
-.RS
-See if following bytes are same as \fIstring\fR. If they are emit \fIemit\-name\fR and jump to \fIdestination\fR state.
-.RE
-
-.RS
-\fB\-i\fR case\-insensitive.
-.RE
-
-.RS
-NOTE: This conditional can be slow, especially if \fIstring\fR is longer than two bytes.
-.RE
+See if following bytes are same as \fIstring\fR. If they are emit
+\fIemit\-name\fR and jump to \fIdestination\fR state.
+.P
+.
+.TP
+\fB\-i\fR
+Case\-insensitive.
+.PP
+.
+NOTE: This conditional can be slow, especially if \fIstring\fR is
+longer than two bytes.
+.P
+.
 .SS Default actions
-Last command of every state must be default action. It is an unconditional jump.
-
-\fBeat\fR <\fIdestination\fR> [\fIemit\-name\fR]
-.RS
-Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR state.
+.
+Last command of every state must be default action. It is an
+unconditional jump.
+.P
+.
+.
 .RE
-
-\fBheredocbegin\fR <\fIsubsyntax\fR> <\fIreturn\-state\fR>
+\fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-Store buffered bytes as heredoc end delimiter and go to \fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must contain a \fBheredocend\fR conditional.
+Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR
+state.
+.P
+.
+.
 .RE
-
-\fBnoeat\fR [\fB\-b\fR] <\fIdestination\fR>
+\fBheredocbegin\fR \fIsubsyntax\fR \fIreturn\-state\fR
 .RS
-Continue to \fIdestination\fR state without emitting color or consuming byte.
+Store buffered bytes as heredoc end delimiter and go to
+\fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must
+contain a \fIheredocend\fR conditional.
+.P
+.
+.
 .RE
-
+\fBnoeat\fR [\fB\-b\fR] \fIdestination\fR
 .RS
-\fB\-b\fR Don't stop buffering.
-.RE
+Continue to \fIdestination\fR state without emitting color or
+consuming byte.
+.P
+.
+.TP
+\fB\-b\fR
+Don't stop buffering.
+.PP
+.
 .SS Other commands
-\fBrecolor\fR <\fIcolor\fR> [\fIcount\fR]
-.RS
-If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise recolor buffered bytes.
+.
+.
 .RE
+\fBrecolor\fR \fIcolor\fR [\fIcount\fR]
+.RS
+If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise
+recolor buffered bytes.
+.P
+.
 .SH SUB\-SYNTAXES
-Sub\-syntaxes are useful when same states are needed in many contexts.
-
-Sub\-syntax name must be prefixed with ".". It is recommended to also use main syntax's name in the prefix. For example ".c\-comment" if "c" is the main syntax.
-
-Sub\-syntax is a syntax of which some destination state's name is END. END is a special state name which is replaced by state given at another syntax.
-
+.
+Sub\-syntaxes are useful when same the states are needed in many contexts.
+.P
+.
+Sub\-syntax names must be prefixed with \fB.\fR. It's recommended to also use
+the main syntax name in the prefix. For example \fB.c\-comment\fR if \fBc\fR is
+the main syntax.
+.P
+.
+A sub\-syntax is a syntax in which some destination state's name is
+\fBEND\fR. \fBEND\fR is a special state name that is replaced by the state given
+at another syntax.
+.P
+.
 Example:
-
+.P
+.
 .RS
-# sub\-syntax
+# Sub-syntax
 .br
-syntax .c\-comment
-.RE
-
-.RS
+syntax .c-comment
+.br
+.P
+.br
 state comment
-.RS
-char "*" star
 .br
-eat comment
-.RE
-.RE
-
-.RS
+    char "*" star
+.br
+    eat comment
+.br
+.P
+.br
 state star comment
-.RS
-# END is a special state name
 .br
-char / END comment
+    # END is a special state name
 .br
-noeat comment
-.RE
-.RE
-
-.RS
-# main syntax
+    char / END comment
+.br
+    noeat comment
+.br
+.P
+.br
+# Main syntax
 .br
 syntax c
-.RE
-
-.RS
+.br
+.P
+.br
 state c code
-.RS
-char " \\t\\n" c
 .br
-char \-b a\-zA\-Z_ ident
+    char " \t\n" c
 .br
-char "\\"" string
+    char -b a-zA-Z_ ident
 .br
-char "'" char
+    char "\"" string
 .br
-# call sub\-syntax
+    char "'" char
 .br
-str "/*" .c\-comment:c
+    # Call sub-syntax
 .br
-eat c
+    str "/*" .c-comment:c
+.br
+    eat c
+.br
+.P
+.br
+# Other states removed
 .RE
-.RE
-
-.RS
-# other states removed
-.RE
-
-In this example the destination state ".c\-comment:c" is special syntax for calling a sub\-syntax. ".c\-comment" is name of the sub\-syntax and "c" is the return state defined in the main syntax. Whole sub\-syntax tree is copied into the main syntax and all destination states in the sub\-syntax whose name is END are replaced with "c".
+.P
+.
+In this example the destination state \fB.c\-comment:c\fR is special syntax for
+calling a sub\-syntax. \fB.c\-comment\fR is name of the sub\-syntax and \fBc\fR is
+the return state defined in the main syntax. Whole sub\-syntax tree is
+copied into the main syntax and all destination states in the sub\-syntax
+whose name is \fBEND\fR are replaced with \fBc\fR.
+.P
+.
 .SH SEE ALSO
-\fBdte\fR(1), \fBdterc\fR(5), https://github.com/craigbarnes/dte/tree/master/config/syntax
+.
+\fBdte\fR(1),
+\fBdterc\fR(5)
+.P
 .SH AUTHORS
-Timo Hirvonen <tihirvon@gmail.com>
+Craig Barnes
+.br
+Timo Hirvonen
