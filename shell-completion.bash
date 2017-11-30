@@ -14,14 +14,17 @@ _dte() {
         COMPREPLY=($(compgen -W "$(dte -B)" -- "$cur"))
         return;;
     -c)
-        COMPREPLY=()
+        # The -c option requires a dterc(5) command for its argument
+        # but that's too complex to complete -- so just suppress the
+        # default completions instead:
+        COMPREPLY=('')
         return;;
     -t)
         COMPREPLY=($(dte -T "$cur" | head -n50000))
         return;;
     esac
 
-    COMPREPLY=($(compgen -o default -- "$cur"))
+    COMPREPLY=()
 }
 
-complete -F _dte dte
+complete -o default -F _dte dte
