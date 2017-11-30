@@ -3,7 +3,7 @@
 .ad l
 .
 .SH NAME
-dterc \- Command and configuration language used by \fBdte\fR
+dterc \- Command and configuration language used by \fBdte\fR(1)
 .SH SYNOPSIS
 .P
 Commands:
@@ -242,7 +242,7 @@ Local and global options:
 .br
 .SH DESCRIPTION
 .
-\fBdterc\fR is the language used in \fBdte\fR(1) runtime configuration files
+dterc is the language used in \fBdte\fR(1) runtime configuration files
 and also in the command mode used from within the editor.
 .P
 .
@@ -1537,7 +1537,7 @@ be split and treated as multiple key presses.
 .RE
 \fBlock\-files\fR [true]
 .RS
-Lock files using $DTE_HOME/file\-locks. Only protects from your
+Lock files using \fB$DTE_HOME/file\-locks\fR. Only protects from your
 own mistakes (two processes editing same file).
 .P
 .
@@ -1836,10 +1836,8 @@ errors.
 .PP
 .
 .SH SEE ALSO
-.
 \fBdte\fR(1),
 \fBdte\-syntax\fR(5)
-.P
 .SH AUTHORS
 Craig Barnes
 .br

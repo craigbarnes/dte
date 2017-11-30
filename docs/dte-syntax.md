@@ -2,8 +2,9 @@
 title: dte-syntax
 section: 5
 date: November 2017
-description: Format of syntax highlighting files used by **dte**
+description: Format of syntax highlighting files used by `dte`
 author: [Craig Barnes, Timo Hirvonen]
+seealso: ["`dte`", "`dterc`"]
 ---
 
 # Description
@@ -16,7 +17,7 @@ printed with `dte -b`, for example:
     dte -b syntax/dte
     dte -b syntax/lua
 
-The basic syntax used is the same as in `dterc`(5) files, but the
+The basic syntax used is the same as in `dterc` files, but the
 available commands are different.
 
 Conditionals and default actions have a destination state. The special
@@ -120,7 +121,7 @@ state.
 
 Store buffered bytes as heredoc end delimiter and go to
 _subsyntax_. Sub-syntax is like any other sub-syntax but it must
-contain a *heredocend* conditional.
+contain a _heredocend_ conditional.
 
 ### **noeat** [**-b**] _destination_
 
@@ -151,42 +152,39 @@ at another syntax.
 
 Example:
 
-    # Sub-syntax
-    syntax .c-comment
+```sh
+# Sub-syntax
+syntax .c-comment
 
-    state comment
-        char "*" star
-        eat comment
+state comment
+    char "*" star
+    eat comment
 
-    state star comment
-        # END is a special state name
-        char / END comment
-        noeat comment
+state star comment
+    # END is a special state name
+    char / END comment
+    noeat comment
 
-    # Main syntax
-    syntax c
+# Main syntax
+syntax c
 
-    state c code
-        char " \t\n" c
-        char -b a-zA-Z_ ident
-        char "\"" string
-        char "'" char
-        # Call sub-syntax
-        str "/*" .c-comment:c
-        eat c
+state c code
+    char " \t\n" c
+    char -b a-zA-Z_ ident
+    char "\"" string
+    char "'" char
+    # Call sub-syntax
+    str "/*" .c-comment:c
+    eat c
 
-    # Other states removed
+# Other states removed
+```
 
 In this example the destination state `.c-comment:c` is special syntax for
 calling a sub-syntax. `.c-comment` is name of the sub-syntax and `c` is
 the return state defined in the main syntax. Whole sub-syntax tree is
 copied into the main syntax and all destination states in the sub-syntax
 whose name is `END` are replaced with `c`.
-
-# See also
-
-`dte`(1),
-`dterc`(5)
 
 
 [built-in syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax

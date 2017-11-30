@@ -35,6 +35,7 @@ function Doc(body, metadata, variables)
     local section = assert(metadata.section)
     local description = assert(metadata.description)
     local date = assert(metadata.date)
+    local seealso = assert(metadata.seealso)
     local authors = assert(metadata.author)
     local buffer = Buffer()
     buffer:write (
@@ -43,7 +44,8 @@ function Doc(body, metadata, variables)
         ".SH NAME\n", title, " \\- ", description, "\n",
         ".SH SYNOPSIS\n", toc:tostring(),
         body,
-        ".SH AUTHORS\n", concat(authors, "\n.br\n")
+        "\n.SH SEE ALSO\n", concat(seealso, ",\n"),
+        "\n.SH AUTHORS\n", concat(authors, "\n.br\n")
     )
     return buffer:tostring()
 end
@@ -113,7 +115,12 @@ function CodeBlock(s, attr)
 end
 
 function Code(s, attr)
-    return "\\fB" .. escape(s) .. "\\fR"
+    local crossrefs = {
+        dte = "(1)",
+        dterc = "(5)",
+        ["dte-syntax"] = "(5)"
+    }
+    return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
 end
 
 function Strong(s)

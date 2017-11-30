@@ -2,13 +2,14 @@
 title: dterc
 section: 5
 date: November 2017
-description: Command and configuration language used by **dte**
+description: Command and configuration language used by `dte`
 author: [Craig Barnes, Timo Hirvonen]
+seealso: ["`dte`", "`dte-syntax`"]
 ---
 
 # Description
 
-**dterc** is the language used in **dte**(1) runtime configuration files
+dterc is the language used in `dte` runtime configuration files
 and also in the command mode used from within the editor.
 
 The syntax of the language is quite similar to shell, but much simpler.
@@ -820,7 +821,7 @@ be split and treated as multiple key presses.
 
 ### **lock-files** [true]
 
-Lock files using $DTE_HOME/file-locks. Only protects from your
+Lock files using `$DTE_HOME/file-locks`. Only protects from your
 own mistakes (two processes editing same file).
 
 ### **newline** [unix]
@@ -1023,11 +1024,6 @@ errors should be highlighted. Set to `""` to disable.
 `trailing`
 :   Highlight trailing whitespace characters at the end of lines as
     errors.
-
-# See Also
-
-**dte**(1),
-**dte-syntax**(5)
 
 
 [`xterm`]: https://invisible-island.net/xterm/
