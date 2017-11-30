@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 _dte() {
     local cur prev words cword split
     _init_completion -s || return
