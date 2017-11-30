@@ -16,6 +16,7 @@ build:alpine:
         - ldd dte
         - make install && dte -V
         - strip dte && du -k -h dte
+        - test/objsize.sh dte
 
 build:debian:
     stage: build
@@ -50,6 +51,7 @@ pages:
         - make vars check TERMINFO_DISABLE=1 CC=gcc LDFLAGS='--static'
         - strip dte
         - du -h dte
+        - test/objsize.sh dte
         - ldd dte || true
         - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
         - tar -czf "public/$TARNAME.tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5
