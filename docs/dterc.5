@@ -284,13 +284,11 @@ These variables are always defined and override environment variables of
 the same name.
 .P
 .
-.
 .RE
 \fB$FILE\fR
 .RS
 The filename of the current buffer (or an empty string if unsaved).
 .P
-.
 .
 .RE
 \fB$WORD\fR
@@ -328,7 +326,6 @@ Eight hex digit unicode code point U+20AC.
 .
 .SH COMMANDS
 .
-.
 .RE
 \fBalias\fR \fIname\fR \fIcommand\fR
 .RS
@@ -346,7 +343,6 @@ alias read "pass-through cat"
 Now you can run \fBread file.txt\fR to insert \fBfile.txt\fR into the current
 buffer.
 .P
-.
 .
 .RE
 \fBbind\fR \fIkey\fR [\fIcommand\fR]
@@ -408,13 +404,11 @@ Key chains are supported. For example \fB"^X c"\fR (press \fB^X\fR and then \fBc
 Keys are separated by spaces.
 .P
 .
-.
 .RE
 \fBbof\fR
 .RS
 Move to beginning of file.
 .P
-.
 .
 .RE
 \fBbol\fR
@@ -422,14 +416,12 @@ Move to beginning of file.
 Move to beginning of line.
 .P
 .
-.
 .RE
 \fBbolsf\fR
 .RS
 Incrementally move cursor to beginning of line, then beginning
 of screen, then beginning of file.
 .P
-.
 .
 .RE
 \fBcase\fR [\fB\-lu\fR]
@@ -447,7 +439,6 @@ Lower case
 Upper case
 .PP
 .
-.
 .RE
 \fBcd\fR \fIdirectory\fR
 .RS
@@ -455,20 +446,17 @@ Change directory. Updates \fB$PWD\fR and \fB$OLDPWD\fR. \fBcd \-\fR changes to
 previous directory (\fB$OLDPWD\fR).
 .P
 .
-.
 .RE
 \fBcenter\-view\fR
 .RS
 Center view to cursor.
 .P
 .
-.
 .RE
 \fBclear\fR
 .RS
 Clear current line.
 .P
-.
 .
 .RE
 \fBclose\fR [\fB\-fqw\fR]
@@ -489,14 +477,12 @@ Quit if closing the last open file
 Close parent window if closing its last contained file
 .PP
 .
-.
 .RE
 \fBcommand\fR [\fItext\fR]
 .RS
 Enter command line. If \fItext\fR is given then it is written to the
 command line (see the default binding \fB^L\fR why this is useful).
 .P
-.
 .
 .RE
 \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
@@ -521,13 +507,11 @@ Silent. Both \fBstderr\fR and \fBstdout\fR are redirected to \fB/dev/null\fR
 See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
 .
-.
 .RE
 \fBcopy\fR
 .RS
 Copy current line or selection.
 .P
-.
 .
 .RE
 \fBcut\fR
@@ -535,13 +519,11 @@ Copy current line or selection.
 Cut current line or selection.
 .P
 .
-.
 .RE
 \fBdelete\fR
 .RS
 Delete character or selection.
 .P
-.
 .
 .RE
 \fBdelete\-eol\fR [\fB\-n\fR]
@@ -554,7 +536,6 @@ Delete to end of line.
 Delete newline if cursor is at end of line
 .PP
 .
-.
 .RE
 \fBdelete\-word\fR [\fB\-s\fR]
 .RS
@@ -566,13 +547,11 @@ Delete word after cursor.
 Be more "aggressive"
 .PP
 .
-.
 .RE
 \fBdown\fR
 .RS
 Move cursor down.
 .P
-.
 .
 .RE
 \fBeof\fR
@@ -580,13 +559,11 @@ Move cursor down.
 Move cursor to end of file.
 .P
 .
-.
 .RE
 \fBeol\fR
 .RS
 Move cursor to end of line.
 .P
-.
 .
 .RE
 \fBeolsf\fR
@@ -595,20 +572,17 @@ Incrementally move cursor to end of line, then end of screen, then
 end of file.
 .P
 .
-.
 .RE
 \fBerase\fR
 .RS
 Erase character before cursor.
 .P
 .
-.
 .RE
 \fBerase\-bol\fR
 .RS
 Erase to beginning of line.
 .P
-.
 .
 .RE
 \fBerase\-word\fR [\fB\-s\fR]
@@ -621,7 +595,6 @@ Erase word before cursor.
 Be more "aggressive"
 .PP
 .
-.
 .RE
 \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message]...
 .RS
@@ -632,7 +605,6 @@ Ignore this error
 .
 See \fBcompile\fR and \fBmsg\fR commands for more information.
 .P
-.
 .
 .RE
 \fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
@@ -648,7 +620,6 @@ filter sort -r
 .RE
 .P
 .
-.
 .RE
 \fBformat\-paragraph\fR [\fIwidth\fR]
 .RS
@@ -662,13 +633,11 @@ multiple paragraphs use the external \fBfmt\fR(1) program with the
 \fBfilter\fR command, e.g. \fBfilter fmt \-w 60\fR.
 .P
 .
-.
 .RE
 \fBft\fR \fIfiletype\fR \fIextension\fR...
 .RS
 Associate filename \fIextension\fR with \fIfiletype\fR.
 .P
-.
 .
 .RE
 \fBft\fR \fB\-b\fR \fIfiletype\fR \fIbasename\fR...
@@ -676,13 +645,11 @@ Associate filename \fIextension\fR with \fIfiletype\fR.
 Associate file \fIbasename\fR with \fIfiletype\fR.
 .P
 .
-.
 .RE
 \fBft\fR \fB\-c\fR \fIfiletype\fR \fIcontents\-regexp\fR...
 .RS
 Detect \fIfiletype\fR by matching \fIcontents\-regexp\fR against first line of file.
 .P
-.
 .
 .RE
 \fBft\fR \fB\-f\fR \fIfiletype\fR \fIfilename\-regexp\fR...
@@ -690,14 +657,12 @@ Detect \fIfiletype\fR by matching \fIcontents\-regexp\fR against first line of f
 Detect \fIfiletype\fR by matching \fIfilename\-regexp\fR against filename.
 .P
 .
-.
 .RE
 \fBft\fR \fB\-i\fR \fIfiletype\fR \fIinterpreter\fR...
 .RS
 Associate \fIinterpreter\fR with \fIfiletype\fR. Interpreters are parsed
 from the \fB#!\fR line in many scripts.
 .P
-.
 .
 .RE
 \fBgit\-open\fR
@@ -732,7 +697,6 @@ Go to end of file list.
 \fBM\-t\fR
 Go to top of file list.
 .PP
-.
 .
 .RE
 \fBhi\fR \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
@@ -833,7 +797,6 @@ If you don't set fg/bg for the highlight color \fBdefault\fR then
 terminal's default fg/bg is used.
 .P
 .
-.
 .RE
 \fBinclude\fR [\fB\-b\fR] \fIfile\fR
 .RS
@@ -844,7 +807,6 @@ Read commands from \fIfile\fR.
 \fB\-b\fR
 Read built\-in \fIfile\fR instead of reading from the filesystem
 .PP
-.
 .
 .RE
 \fBinsert\fR [\fB\-km\fR] \fItext\fR
@@ -860,7 +822,6 @@ Insert one character at a time as if it has been typed
 \fB\-m\fR
 Move after inserted text
 .PP
-.
 .
 .RE
 \fBinsert\-special\fR
@@ -883,13 +844,11 @@ Insert 2\-digit hexadecimal byte value
 Insert 6\-digit hexadecimal unicode value
 .PP
 .
-.
 .RE
 \fBjoin\fR
 .RS
 Join selection or next line to current.
 .P
-.
 .
 .RE
 \fBleft\fR
@@ -897,13 +856,11 @@ Join selection or next line to current.
 Move left.
 .P
 .
-.
 .RE
 \fBline\fR \fInumber\fR
 .RS
 Go to line.
 .P
-.
 .
 .RE
 \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
@@ -911,13 +868,11 @@ Go to line.
 If argument contains a \fB/\fR character it is considered a filename.
 .P
 .
-.
 .RE
 \fBmove\-tab\fR \fIN\fR|left|right
 .RS
 Move current tab to position \fIN\fR or 1 position left or right.
 .P
-.
 .
 .RE
 \fBmsg\fR [\fB\-np\fR]
@@ -939,20 +894,17 @@ Previous message
 See also \fBcompile\fR and \fBtag\fR commands.
 .P
 .
-.
 .RE
 \fBnew\-line\fR
 .RS
 Insert empty line under current line.
 .P
 .
-.
 .RE
 \fBnext\fR
 .RS
 Display next file.
 .P
-.
 .
 .RE
 \fBopen\fR [\fB\-e\fR \fIencoding\fR] [\fIfile\fR]...
@@ -965,7 +917,6 @@ Open \fIfile\fR. If filename is omitted, a new file is opened.
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .PP
 .
-.
 .RE
 \fBoption\fR \fIfiletype\fR \fIoption\fR \fIvalue\fR...
 .RS
@@ -974,13 +925,11 @@ with the \fBft\fR command). Automatic options are set when files are
 are opened.
 .P
 .
-.
 .RE
 \fBoption\fR \fB\-r\fR \fIregexp\fR \fIoption\fR \fIvalue\fR...
 .RS
 Add automatic \fIoption\fR for filenames that match \fIregexp\fR.
 .P
-.
 .
 .RE
 \fBpass\-through\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
@@ -997,7 +946,6 @@ Move after the inserted text
 Strip newline from end of the command output
 .PP
 .
-.
 .RE
 \fBpaste\fR
 .RS
@@ -1009,13 +957,11 @@ Paste.
 Paste at the cursor position
 .PP
 .
-.
 .RE
 \fBpgdown\fR
 .RS
 Move cursor page down. See also \fBscroll\-pgdown\fR.
 .P
-.
 .
 .RE
 \fBpgup\fR
@@ -1023,13 +969,11 @@ Move cursor page down. See also \fBscroll\-pgdown\fR.
 Move cursor page up. See also \fBscroll\-pgup\fR.
 .P
 .
-.
 .RE
 \fBprev\fR
 .RS
 Display previous file.
 .P
-.
 .
 .RE
 \fBquit\fR [\fB\-f\fR]
@@ -1041,7 +985,6 @@ Quit.
 \fB\-f\fR
 Force quitting even if there are unsaved files
 .PP
-.
 .
 .RE
 \fBredo\fR [\fIchoice\fR]
@@ -1059,13 +1002,11 @@ If the change was not the one you wanted, just run \fBundo\fR and
 then, for example, \fBredo 1\fR.
 .P
 .
-.
 .RE
 \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
 .RS
 Run \fIcommand\fR \fIcount\fR times.
 .P
-.
 .
 .RE
 \fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
@@ -1094,13 +1035,11 @@ Replace all matches for each line (instead of just the first)
 Ignore case
 .PP
 .
-.
 .RE
 \fBright\fR
 .RS
 Move right.
 .P
-.
 .
 .RE
 \fBrun\fR [\fB\-ps\fR] \fIcommand\fR [\fIparameters\fR]...
@@ -1116,7 +1055,6 @@ Display "Press any key to continue" prompt
 \fB\-s\fR
 Silent \-\- both \fBstderr\fR and \fBstdout\fR are redirected to \fB/dev/null\fR
 .PP
-.
 .
 .RE
 \fBsave\fR [\fB\-dfup\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
@@ -1145,13 +1083,11 @@ Open a command prompt if there's no specified or existing \fIfilename\fR
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .PP
 .
-.
 .RE
 \fBscroll\-down\fR
 .RS
 Scroll view down one line. Keeps cursor position unchanged if possible.
 .P
-.
 .
 .RE
 \fBscroll\-pgdown\fR
@@ -1160,7 +1096,6 @@ Scroll page down. Cursor position relative to top of screen is
 maintained. See also \fBpgdown\fR.
 .P
 .
-.
 .RE
 \fBscroll\-pgup\fR
 .RS
@@ -1168,13 +1103,11 @@ Scroll page up. Cursor position relative to top of screen is
 maintained. See also \fBpgup\fR.
 .P
 .
-.
 .RE
 \fBscroll\-up\fR
 .RS
 Scroll view up one line. Keeps cursor position unchanged if possible.
 .P
-.
 .
 .RE
 \fBsearch\fR [\fB\-Hnprw\fR] [\fIpattern\fR]
@@ -1204,7 +1137,6 @@ Start searching backwards
 Search word under cursor
 .PP
 .
-.
 .RE
 \fBselect\fR [\fB\-bkl\fR]
 .RS
@@ -1223,7 +1155,6 @@ Keep existing selections
 \fB\-l\fR
 Select whole lines
 .PP
-.
 .
 .RE
 \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...
@@ -1274,13 +1205,11 @@ To automatically set options for specific filetypes and filenames use
 the \fBoption\fR command.
 .P
 .
-.
 .RE
 \fBsetenv\fR \fIname\fR \fIvalue\fR
 .RS
 Set environment variable.
 .P
-.
 .
 .RE
 \fBshift\fR \fIcount\fR
@@ -1293,13 +1222,11 @@ To specify a negative number, it's necessary to first disable
 option parsing with \fB\-\-\fR, e.g. \fBshift \-\- \-1\fR.
 .P
 .
-.
 .RE
 \fBsuspend\fR
 .RS
 Suspend program.
 .P
-.
 .
 .RE
 \fBtag\fR [\fB\-r\fR] [\fItag\fR]
@@ -1321,7 +1248,6 @@ parent directories.
 See also \fBmsg\fR command.
 .P
 .
-.
 .RE
 \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .RS
@@ -1342,13 +1268,11 @@ If \fIoption\fR has both local and global value then local is toggled
 unless \-g is given.
 .P
 .
-.
 .RE
 \fBundo\fR
 .RS
 Undo latest change.
 .P
-.
 .
 .RE
 \fBunselect\fR
@@ -1356,20 +1280,17 @@ Undo latest change.
 Unselect.
 .P
 .
-.
 .RE
 \fBup\fR
 .RS
 Move cursor up.
 .P
 .
-.
 .RE
 \fBview\fR \fIN\fR|last
 .RS
 Display _N_th or last open file.
 .P
-.
 .
 .RE
 \fBwclose\fR [\fB\-f\fR]
@@ -1382,20 +1303,17 @@ Close window.
 Close even if there are unsaved files in the window
 .PP
 .
-.
 .RE
 \fBwflip\fR
 .RS
 Change from vertical layout to horizontal and vice versa.
 .P
 .
-.
 .RE
 \fBwnext\fR
 .RS
 Next window.
 .P
-.
 .
 .RE
 \fBword\-bwd\fR [\fB\-s\fR]
@@ -1408,7 +1326,6 @@ Move cursor backward one word.
 Skip special characters
 .PP
 .
-.
 .RE
 \fBword\-fwd\fR [\fB\-s\fR]
 .RS
@@ -1420,13 +1337,11 @@ Move cursor forward one word.
 Skip special characters
 .PP
 .
-.
 .RE
 \fBwprev\fR
 .RS
 Previous window.
 .P
-.
 .
 .RE
 \fBwresize\fR [\fB\-hv\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
@@ -1457,7 +1372,6 @@ prevent the minus symbol being parsed as an option flag, e.g.
 \fBwresize \-\- \-5\fR.
 .PP
 .
-.
 .RE
 \fBwsplit\fR [\fB\-bhr\fR] [\fIfile\fR]...
 .RS
@@ -1477,7 +1391,6 @@ Split horizontally instead of vertically.
 Split root instead of current window.
 .PP
 .
-.
 .RE
 \fBwswap\fR
 .RS
@@ -1493,7 +1406,6 @@ command to set default options for specific file types.
 .P
 .
 .SS Global options
-.
 .
 .RE
 \fBcase\-sensitive\-search\fR [true]
@@ -1512,13 +1424,11 @@ If search string contains a uppercase letter search is
 case\-sensitive, otherwise it is case\-insensitive.
 .PP
 .
-.
 .RE
 \fBdisplay\-special\fR [false]
 .RS
 Display special characters.
 .P
-.
 .
 .RE
 \fBesc\-timeout\fR [100] 0...2000
@@ -1533,14 +1443,12 @@ timeout can cause escape sequences of for example arrow keys to
 be split and treated as multiple key presses.
 .P
 .
-.
 .RE
 \fBlock\-files\fR [true]
 .RS
 Lock files using \fB$DTE_HOME/file\-locks\fR. Only protects from your
 own mistakes (two processes editing same file).
 .P
-.
 .
 .RE
 \fBnewline\fR [unix]
@@ -1549,20 +1457,17 @@ Whether to use LF (\fIunix\fR) or CRLF (\fIdos\fR) line\-endings. This is
 just a default value for new files.
 .P
 .
-.
 .RE
 \fBscroll\-margin\fR [0]
 .RS
 Minimum number of lines to keep visible before and after cursor.
 .P
 .
-.
 .RE
 \fBshow\-line\-numbers\fR [false]
 .RS
 Show line numbers.
 .P
-.
 .
 .RE
 \fBstatusline\-left\fR [" %f%s%m%r%s%M"]
@@ -1632,13 +1537,11 @@ Hexadecimal unicode value value of character under cursor.
 Literal \fB%\fR.
 .PP
 .
-.
 .RE
 \fBstatusline\-right\fR [" %y,%X %u %E %n %t %p "]
 .RS
 Format string for the right aligned part of status line.
 .P
-.
 .
 .RE
 \fBtab\-bar\fR [horizontal]
@@ -1660,14 +1563,12 @@ Show tab bar on left if there's enough space, hide otherwise.
 Show tab bar on left if there's enough space, on top otherwise.
 .PP
 .
-.
 .RE
 \fBtab\-bar\-max\-components\fR [0]
 .RS
 Maximum number of path components displayed in vertical tab bar.
 Set to \fB0\fR to disable.
 .P
-.
 .
 .RE
 \fBtab\-bar\-width\fR [25]
@@ -1680,7 +1581,6 @@ enough space.
 .
 .SS Local options
 .
-.
 .RE
 \fBbrace\-indent\fR [false]
 .RS
@@ -1688,14 +1588,12 @@ Scan for \fB{\fR and \fB}\fR characters when calculating indentation size.
 Depends on the \fBauto\-indent\fR option.
 .P
 .
-.
 .RE
 \fBfiletype\fR [none]
 .RS
 Type of file. Value must be previously registered using the \fBft\fR
 command.
 .P
-.
 .
 .RE
 \fBindent\-regex\fR [""]
@@ -1711,7 +1609,6 @@ The global values for these options serve as the default values for
 local (per\-file) options.
 .P
 .
-.
 .RE
 \fBauto\-indent\fR [true]
 .RS
@@ -1721,7 +1618,6 @@ Indentation is copied from previous non\-empty line. If also the
 automatically increased if the regular expression matches
 current line.
 .P
-.
 .
 .RE
 \fBdetect\-indent\fR [""]
@@ -1737,7 +1633,6 @@ Example:
 set detect\-indent 2,3,4,8
 .P
 .
-.
 .RE
 \fBemulate\-tab\fR [false]
 .RS
@@ -1745,13 +1640,11 @@ Make \fBdelete\fR, \fBerase\fR and moving \fBleft\fR and \fBright\fR inside
 indentation feel as if there were tabs instead of spaces.
 .P
 .
-.
 .RE
 \fBexpand\-tab\fR [false]
 .RS
 Convert tab to spaces on insert.
 .P
-.
 .
 .RE
 \fBfile\-history\fR [true]
@@ -1759,20 +1652,17 @@ Convert tab to spaces on insert.
 Save line and column for each file to \fB$DTE_HOME/file\-history\fR.
 .P
 .
-.
 .RE
 \fBindent\-width\fR [8]
 .RS
 Size of indentation in spaces.
 .P
 .
-.
 .RE
 \fBsyntax\fR [true]
 .RS
 Use syntax highlighting.
 .P
-.
 .
 .RE
 \fBtab\-width\fR [8]
@@ -1781,14 +1671,12 @@ Width of tab. Recommended value is \fB8\fR. If you use other
 indentation size than \fB8\fR you should use spaces to indent.
 .P
 .
-.
 .RE
 \fBtext\-width\fR [72]
 .RS
 Preferred with of text. Used as default value for
 \fBformat\-paragraph\fR.
 .P
-.
 .
 .RE
 \fBws\-error\fR [special]

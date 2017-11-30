@@ -47,7 +47,7 @@ function Doc(body, metadata, variables)
         "\n.SH SEE ALSO\n", concat(seealso, ",\n"),
         "\n.SH AUTHORS\n", concat(authors, "\n.br\n")
     )
-    return buffer:tostring()
+    return buffer:tostring():gsub("\n\n\n+", "\n\n"):gsub("\n\n", "\n.\n")
 end
 
 local in_toc_heading = false

@@ -77,7 +77,6 @@ destination state \fBthis\fR can be used to jump to the current state.
 .
 .SS Main commands
 .
-.
 .RE
 \fBsyntax\fR \fIname\fR
 .RS
@@ -89,14 +88,12 @@ syntax file.
 See also: sub\-syntaxes.
 .P
 .
-.
 .RE
 \fBstate\fR \fIname\fR [\fIemit\-color\fR]
 .RS
 Add new state. Conditionals (if any) and one default action must
 follow. The first state is the \fBstart\fR state.
 .P
-.
 .
 .RE
 \fBdefault\fR \fIcolor\fR \fIname\fR...
@@ -115,7 +112,6 @@ default numeric oct dec hex
 If there is no color defined for \fIoct\fR, \fIdec\fR or \fIhex\fR then color
 \fInumeric\fR is used instead.
 .P
-.
 .
 .RE
 \fBlist\fR [\fB\-i\fR] \fIname\fR \fIstring\fR...
@@ -141,14 +137,12 @@ Make list case\-insensitive.
 .
 .SS Conditionals
 .
-.
 .RE
 \fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Test if buffered bytes are same as \fIstring\fR. If they are, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-.
 .
 .RE
 \fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
@@ -171,7 +165,6 @@ Add byte to buffer.
 Invert character bitmap.
 .PP
 .
-.
 .RE
 \fBheredocend\fR \fIdestination\fR
 .RS
@@ -179,14 +172,12 @@ Compare following characters to heredoc end delimiter and go to
 destination state if comparison is true.
 .P
 .
-.
 .RE
 \fBinlist\fR \fIlist\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Test if buffered bytes are found in \fIlist\fR. If found, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-.
 .
 .RE
 \fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
@@ -210,14 +201,12 @@ Last command of every state must be default action. It is an
 unconditional jump.
 .P
 .
-.
 .RE
 \fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR
 state.
 .P
-.
 .
 .RE
 \fBheredocbegin\fR \fIsubsyntax\fR \fIreturn\-state\fR
@@ -226,7 +215,6 @@ Store buffered bytes as heredoc end delimiter and go to
 \fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must
 contain a \fIheredocend\fR conditional.
 .P
-.
 .
 .RE
 \fBnoeat\fR [\fB\-b\fR] \fIdestination\fR
@@ -241,7 +229,6 @@ Don't stop buffering.
 .PP
 .
 .SS Other commands
-.
 .
 .RE
 \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
