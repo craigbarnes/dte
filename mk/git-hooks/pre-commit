@@ -20,4 +20,13 @@ test -x "$MAKE" || abort 'unable to find GNU Make command' $LINENO
 git checkout-index --prefix="$TMPDIR/" -a || exit 1
 trap "rm -rf '$TMPDIR'" EXIT
 
-$MAKE -j"$(mk/nproc.sh)" --directory="$TMPDIR" check
+cp $TMPDIR/docs/*.[15] "$TMPDIR"
+
+$MAKE -B -j"$(mk/nproc.sh)" --directory="$TMPDIR" check man
+
+for F in $TMPDIR/docs/*.[15]; do
+    B="$(basename $F)"
+    if ! diff "$F" "$TMPDIR/$B" >/dev/null; then
+        abort "'docs/$B' needs to be re-generated before committing" $LINENO
+    fi
+done

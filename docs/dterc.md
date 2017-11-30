@@ -6,7 +6,7 @@ description: Command and configuration language used by **dte**
 author: [Craig Barnes, Timo Hirvonen]
 ---
 
-# Command Syntax
+# Description
 
 **dterc** is the language used in **dte**(1) runtime configuration files
 and also in the command mode used from within the editor.
