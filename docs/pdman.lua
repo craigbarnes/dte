@@ -51,6 +51,7 @@ end
 local in_toc_heading = false
 
 function Header(level, s, attr)
+    assert(level < 4)
     if level == 1 then
         if s:find("Commands", 1, true) then
             toc:write(".P\n", s, ":\n.br\n")
@@ -71,8 +72,6 @@ function Header(level, s, attr)
             toc:write("   ", s, "\n.br\n")
         end
         return "\n.RE\n" .. s .. "\n.RS"
-    else
-        error("Header with level > 3 is not yet implemeneted")
     end
 end
 
@@ -122,6 +121,10 @@ function Emph(s)
     return "\\fI" .. s .. "\\fR"
 end
 
+function Link(text, href, title, attr)
+    return text
+end
+
 function Str(s)
     return escape(s)
 end
@@ -162,7 +165,6 @@ function Subscript(s)
 function Superscript(s)
 function SmallCaps(s)
 function Strikeout(s)
-function Link(text, href, title, attr)
 function Image(s, src, tit, attr)
 function InlineMath(s)
 function DisplayMath(s)

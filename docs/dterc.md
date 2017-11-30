@@ -343,7 +343,7 @@ Colors:
 
 Color can be given as a numeric value too (`-2`..`255`).
 
-Colors `16`-`255` are supported by modern `xterm`(1) compatible terminal
+Colors `16`-`255` are supported by modern [`xterm`]-compatible terminal
 emulators. There's a 6x6x6 color cube at indexes `16`..`231`. For these
 colors it is easiest to use the R/G/B syntax where R, G and B are values
 between `0` and `5`.
@@ -1028,3 +1028,6 @@ errors should be highlighted. Set to `""` to disable.
 
 **dte**(1),
 **dte-syntax**(5)
+
+
+[`xterm`]: https://invisible-island.net/xterm/
