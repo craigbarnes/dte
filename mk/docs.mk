@@ -1,8 +1,8 @@
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-PANDOC = pandoc
-PDMAN = $(PANDOC) -f markdown-smart -t docs/pdman.lua
-PDHTML = $(PANDOC) -f markdown+smart -t html5 --toc --template=docs/template.html
+PANDOC = pandoc -f markdown_github+definition_lists+yaml_metadata_block
+PDMAN = $(PANDOC) -t docs/pdman.lua
+PDHTML = $(PANDOC) -t html5 --toc --template=docs/template.html
 
 XARGS_P_FLAG = $(shell \
     printf "1\n2" | xargs -P2 -I@ echo '@' >/dev/null 2>&1 && \
