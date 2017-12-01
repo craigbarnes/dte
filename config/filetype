@@ -91,7 +91,7 @@ option -r '/\.git/.*\.diff$' file-history false
 option c,css,go,java,javascript,php,sh,lua brace-indent true
 
 # Override indent options for Makefiles, since they almost always require tabs
-option make indent-width 8 expand-tab false emulate-tab false
+option make indent-width 8 expand-tab false emulate-tab false detect-indent ""
 
 # Patterns used to detect indent size when "auto-indent" option is enabled
 option c indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
