@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>dte text editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+  <div id="main-grid">
+    <header>
+      <div id="top-title">dte text editor</div>
+      <nav id="top-nav">
+        <a href="index.html">About</a>
+        <a href="releases.html">Releases</a>
+        <a href="dterc.html">dterc</a>
+        <a href="dte-syntax.html">dte-syntax</a>
+      </nav>
+    </header>
+    <nav id="toc">
+      $toc$
+    </nav>
+    <main>
+      $if(description)$
+      <h1>$title$</h1>
+      <p>$description$</p>
+      $endif$
+$body$
+    </main>
+    <footer>
+      <p>&copy; Craig Barnes 2017</p>
+    </footer>
+  </div>
+</body>
+</html>

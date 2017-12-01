@@ -1,4 +1,5 @@
 [attr]code text whitespace=tab-in-indent,tabwidth=4
+[attr]html text whitespace=tab-in-indent,tabwidth=2
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
 [attr]dterc code linguist-language=sh linguist-vendored
 
@@ -20,6 +21,7 @@ mk/get-html-entities.sh export-ignore
 *.sed code
 *.sh code
 *.yml code
+*.css code
 mk/git-hooks/* code
 
 LICENSE text
@@ -31,4 +33,5 @@ makefile text
 *.dterc dterc
 config/** dterc
 
+*.html html
 *.md markdown

@@ -52,12 +52,7 @@ Documentation
 After installing, you can access the documentation in man page format
 via `man 1 dte`, `man 5 dterc` and `man 5 dte-syntax`.
 
-These pages are also available online in HTML and PDF formats:
-
-* [dte.pdf](https://craigbarnes.gitlab.io/dte/dte.pdf)
-* [dte.1.html](https://craigbarnes.gitlab.io/dte/dte.1.html)
-* [dterc.5.html](https://craigbarnes.gitlab.io/dte/dterc.5.html)
-* [dte-syntax.5.html](https://craigbarnes.gitlab.io/dte/dte-syntax.5.html)
+Online documentation is also available at <https://craigbarnes.gitlab.io/dte/>.
 
 Testing
 -------

@@ -1,5 +1,5 @@
-dte changelog
-=============
+Releases
+========
 
 v1.5 (latest release)
 ---------------------

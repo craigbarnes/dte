@@ -1,35 +1,50 @@
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-PDMAN = pandoc -f markdown-superscript-smart-tex_math_dollars -t docs/pdman.lua
+PANDOC = pandoc
+PDMAN = $(PANDOC) -f markdown-smart -t docs/pdman.lua
+PDHTML = $(PANDOC) -f markdown+smart -t html5 --toc --template=docs/template.html
 
 XARGS_P_FLAG = $(shell \
     printf "1\n2" | xargs -P2 -I@ echo '@' >/dev/null 2>&1 && \
     echo '-P$(NPROC)' \
 )
 
-man  := docs/dte.1 docs/dterc.5 docs/dte-syntax.5
-pdf  := public/dte.pdf
-img  := public/screenshot.png
-html := $(addprefix public/, $(addsuffix .html, $(notdir $(man))))
-web  := $(html) $(pdf) $(img) $(patsubst %, %.gz, $(html) $(pdf))
+html = $(addprefix public/, $(addsuffix .html, \
+    index releases dterc dte-syntax \
+))
 
-docs: man web
+docs: man html gz
 man: docs/dterc.5 docs/dte-syntax.5
-web: $(web)
+html: $(html)
+pdf: public/dte.pdf
+gz: $(patsubst %, %.gz, $(html))
+$(html): docs/template.html | public/style.css
 
 docs/%.5: docs/%.md docs/pdman.lua
-	$(E) PDMAN $@
+	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
-$(pdf): $(man) | public/
+public/dte.pdf: docs/dte.1 docs/dterc.5 docs/dte-syntax.5 | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Tpdf $^ > $@
 
-$(html): public/%.html: docs/% | public/
-	$(E) GROFF $@
-	$(Q) groff -mandoc -Thtml $< > $@
+public/index.html: README.md | public/screenshot.png
+	$(E) PANDOC $@
+	$(Q) $(PDHTML) -Mtitle=zz -o $@ $<
 
-$(img): public/%.png: docs/%.png | public/
+public/releases.html: CHANGELOG.md
+	$(E) PANDOC $@
+	$(Q) $(PDHTML) -Mtitle=rrrr -o $@ $<
+
+public/%.html: docs/%.md
+	$(E) PANDOC $@
+	$(Q) $(PDHTML) -o $@ $<
+
+public/style.css: docs/layout.css docs/style.css | build/
+	$(E) CSSCAT $@
+	$(Q) cat $^ > $@
+
+public/screenshot.png: docs/screenshot.png | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
@@ -45,4 +60,4 @@ check-docs: README.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
 
 
 CLEANDIRS += public/
-.PHONY: docs man web check-docs
+.PHONY: docs man html pdf gz check-docs

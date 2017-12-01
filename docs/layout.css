@@ -1,0 +1,75 @@
+#main-grid > main {
+    grid-area: content;
+    color: #222;
+}
+
+#main-grid > header {
+    grid-area: header;
+    padding: 10px;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #ddd;
+}
+
+#main-grid > footer {
+    grid-area: footer;
+    color: #eee;
+    font-size: small;
+    text-align: right;
+}
+
+#top-title {
+    float: left;
+    font-size: 1.4em;
+}
+
+#top-nav {
+    float: right;
+    user-select: none;
+}
+
+#toc {
+    grid-area: sidebar;
+    border-bottom: 2px dashed #ccc;
+    margin-bottom: 1.5em;
+    padding-bottom: 1.8em;
+}
+
+#toc ul {
+    margin: 0 0 0 1.2em;
+    padding: 0.1em;
+}
+
+#main-grid {
+    display: grid;
+    grid-row-gap: 10px;
+    grid-template-areas:
+        "header"
+        "sidebar"
+        "content"
+        "footer";
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+@media only screen and (min-width: 1000px) and (min-device-width: 700px) {
+    #main-grid {
+        grid-template-areas:
+            "header  header"
+            "sidebar content"
+            "footer  footer";
+        grid-column-gap: 2.5em;
+        grid-row-gap: 20px;
+        grid-row-gap: 1em;
+        grid-template-columns: 1fr 4fr;
+    }
+
+    #toc {
+        border-bottom: none;
+        font-size: 0.9em;
+    }
+
+    #main-grid > main > h1:first-child {
+        margin-top: 0;
+    }
+}
