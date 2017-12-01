@@ -7,17 +7,16 @@ author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dterc`"]
 ---
 
-# Description
+# dte-syntax
 
-A syntax file consists of multiple states. A state consists of optional
+A dte syntax file consists of multiple states. A state consists of optional
 conditionals and one default action. The best way understand the syntax
 is to read through some of the [built-in syntax files], which can be
 printed with `dte -b`, for example:
 
     dte -b syntax/dte
-    dte -b syntax/lua
 
-The basic syntax used is the same as in `dterc` files, but the
+The basic syntax used is the same as in [`dterc`] files, but the
 available commands are different.
 
 Conditionals and default actions have a destination state. The special
@@ -187,4 +186,5 @@ copied into the main syntax and all destination states in the sub-syntax
 whose name is `END` are replaced with `c`.
 
 
+[`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 [built-in syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax

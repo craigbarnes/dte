@@ -7,7 +7,7 @@ author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
 ---
 
-# Description
+# dterc
 
 dterc is the language used in `dte` runtime configuration files
 and also in the command mode used from within the editor.

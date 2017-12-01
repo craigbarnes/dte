@@ -30,6 +30,10 @@ body {
     top: 1px;
 }
 
+#toc a em {
+    font-size: 0.95em;
+}
+
 a {
     color: #4183C4;
     text-decoration: none;

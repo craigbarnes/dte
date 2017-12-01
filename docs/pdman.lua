@@ -50,18 +50,25 @@ function Doc(body, metadata, variables)
     return (buffer:tostring():gsub("\n\n+", "\n.\n"))
 end
 
+local generate_toc = false
 local in_toc_heading = false
 
 function Header(level, s, attr)
     assert(level < 4)
     if level == 1 then
-        if s:find("Commands", 1, true) then
-            toc:write(".P\n", s, ":\n.br\n")
-            in_toc_heading = true
-        elseif s:find("Options", 1, true) then
-            in_toc_heading = true
-        else
-            in_toc_heading = false
+        if s == "dterc" or s == "dte\\-syntax" then
+            generate_toc = true
+            return ".SH DESCRIPTION\n"
+        end
+        if generate_toc then
+            if s == "Commands" then
+                toc:write(".P\n", s, ":\n.br\n")
+                in_toc_heading = true
+            elseif s == "Options" then
+                in_toc_heading = true
+            else
+                in_toc_heading = false
+            end
         end
         return ".SH " .. s:upper() .. "\n"
     elseif level == 2 then
