@@ -1,6 +1,6 @@
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-PANDOC = pandoc -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block
+PANDOC = pandoc -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
 PDMAN = $(PANDOC) -t docs/pdman.lua
 PDHTML = $(PANDOC) -t html5 --toc --template=docs/template.html
 
