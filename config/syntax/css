@@ -574,7 +574,7 @@ list -i fontfaceproperty \
 
 # %, distance, angle, time, frequency, resolution
 list -i unit \
-    % \
+    % fr \
     ch cm em ex in mm pc pt px rem vh vw vmin vmax \
     deg grad rad turn \
     ms s \
