@@ -987,8 +987,8 @@ indentation size than `8` you should use spaces to indent.
 
 ### **text-width** [72]
 
-Preferred with of text. Used as default value for
-`format-paragraph`.
+Preferred width of text. Used as the default argument for the
+`format-paragraph` command.
 
 ### **ws-error** [special]
 
