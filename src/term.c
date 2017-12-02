@@ -11,12 +11,11 @@ TerminalInfo terminal;
 
 static struct termios termios_save;
 
-static char *escape_key(const char *key, int len)
+static char *escape_key(const char *key, size_t len)
 {
     static char buf[1024];
-    int i, j = 0;
-
-    for (i = 0; i < len && i < sizeof(buf) - 1; i++) {
+    size_t j = 0;
+    for (size_t i = 0; i < len && i < sizeof(buf) - 1; i++) {
         unsigned char ch = key[i];
 
         if (ch < 0x20) {
@@ -80,8 +79,6 @@ static void consume_input(size_t len)
 
 static bool fill_buffer(void)
 {
-    int rc;
-
     if (input_buf_fill == sizeof(input_buf)) {
         return false;
     }
@@ -90,7 +87,7 @@ static bool fill_buffer(void)
         input_can_be_truncated = false;
     }
 
-    rc = read (
+    int rc = read (
         STDIN_FILENO,
         input_buf + input_buf_fill,
         sizeof(input_buf) - input_buf_fill
@@ -109,11 +106,10 @@ static bool fill_buffer_timeout(void)
         .tv_usec = (editor.options.esc_timeout % 1000) * 1000
     };
     fd_set set;
-    int rc;
 
     FD_ZERO(&set);
     FD_SET(0, &set);
-    rc = select(1, &set, NULL, NULL, &tv);
+    int rc = select(1, &set, NULL, NULL, &tv);
     if (rc > 0 && fill_buffer()) {
         return true;
     }
@@ -340,11 +336,10 @@ char *term_read_paste(size_t *size)
             .tv_usec = 0
         };
         fd_set set;
-        int rc;
 
         FD_ZERO(&set);
         FD_SET(0, &set);
-        rc = select(1, &set, NULL, NULL, &tv);
+        int rc = select(1, &set, NULL, NULL, &tv);
         if (rc < 0 && errno == EINTR) {
             continue;
         }
