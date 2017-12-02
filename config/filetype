@@ -49,6 +49,7 @@ ft csharp cs
 ft css css
 ft d d di
 ft diff diff patch
+ft docker dockerfile
 ft dte dterc
 ft go go
 ft html html htm xhtml
