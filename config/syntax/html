@@ -332,14 +332,12 @@ state close-tag tag
 state tag-name tag-unknown
     char -b a-zA-Z0-9_ tag-name
     inlist tag attrs
-    inlist tag-html5 attrs
     inlist tag-deprecated attrs
     noeat attrs
 
 state close-tag-name tag-unknown
     char -b a-zA-Z0-9_ close-tag-name
     inlist tag close-tag-end
-    inlist tag-html5 close-tag-end
     inlist tag-deprecated close-tag-end
     noeat close-tag-end
 
@@ -387,9 +385,8 @@ list -i tag \
     fieldset form h1 h2 h3 h4 h5 h6 head hr html i iframe img input \
     ins kbd label legend li link map meta noscript object ol optgroup \
     option p param pre q samp script select small span strong style \
-    sub sup table tbody td textarea tfoot th thead title tr tt ul var
-
-list -i tag-html5 \
+    sub sup table tbody td textarea tfoot th thead title tr tt ul var \
+\
     article aside audio canvas command datalist details embed figure \
     footer header hgroup keygen main mark meter nav output progress ruby \
     section time video wbr
@@ -399,6 +396,5 @@ list -i tag-deprecated \
     isindex marquee menu noframes s strike tt u
 
 default code tag-unknown
-default tag tag-html5
 default error tag-deprecated
 default special entity

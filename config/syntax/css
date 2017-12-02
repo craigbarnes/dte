@@ -231,7 +231,7 @@ state atend code
 
 state start code
     char " \t\n" start
-    char -b a-zA-Z tag
+    char -b a-zA-Z maybe-element
     char . class
     char # id
     char -b : pseudo
@@ -242,8 +242,9 @@ state start code
     char -b @ atrule
     eat start
 
-state tag
-    char -b a-zA-Z0-9 tag
+state maybe-element
+    char -b a-zA-Z0-9 maybe-element
+    inlist element start tag
     char _- .css-selectorerror:start
     noeat start
 
@@ -397,6 +398,18 @@ state property-error error
 state value-error error
     char a-zA-Z0-9_- value-error
     noeat values
+
+list -i element \
+    a abbr acronym address area b base bdo big blockquote body br \
+    button caption cite code col colgroup dd del dfn div dl dt em \
+    fieldset form h1 h2 h3 h4 h5 h6 head hr html i iframe img input \
+    ins kbd label legend li link map meta noscript object ol optgroup \
+    option p param pre q samp script select small span strong style \
+    sub sup table tbody td textarea tfoot th thead title tr tt ul var \
+\
+    article aside audio canvas command datalist details embed figure \
+    footer header hgroup keygen main mark meter nav output progress ruby \
+    section time video wbr
 
 # https://www.w3.org/Style/CSS/all-properties.en.json
 list -i property \
