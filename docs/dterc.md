@@ -56,7 +56,7 @@ Can't contain single quotes or escaped characters.
 
 May contain the following escapes:
 
-`\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`, `\`
+`\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`, `\\`
 :   Control characters (same as in C)
 
 `\x0a`
