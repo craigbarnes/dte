@@ -143,3 +143,11 @@ from which this project was forked).
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
 [D]: https://dlang.org/
+
+Public Key
+==========
+
+A detached PGP signature file is provided for each release. The public
+key for verifying these signatures is available to download at
+<https://craigbarnes.gitlab.io/pubkey/0330BEB4.asc>
+or from the keyserver at `hkps://hkps.pool.sks-keyservers.net`.
