@@ -4,6 +4,8 @@ Releases
 v1.5 (latest release)
 ---------------------
 
+Released on 2017-11-03.
+
 **Changes:**
 
 * Added syntax highlighting for Nginx config files.
