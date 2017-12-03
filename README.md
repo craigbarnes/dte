@@ -21,29 +21,23 @@ Screenshot
 
 ![dte screenshot](https://craigbarnes.gitlab.io/dte/screenshot.png)
 
-Installation
+Requirements
 ------------
-
-To build `dte` from source, first download and extract the latest
-release tarball:
-
-    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz
-    tar -xzf dte-1.5.tar.gz
-    cd dte-1.5
-
-Then install the following dependencies:
 
 * [GCC] or [Clang]
 * [GNU Make] `>= 3.81`
 * [terminfo] library (typically provided by [ncurses] on Linux or by
   default on BSDs)
 
-...which can (optionally) be done via the included [script][install-deps.sh]:
+Installation
+------------
 
-    sudo mk/install-deps.sh
+To build `dte` from source, first install the requirements listed above,
+then use the following commands:
 
-Then compile and install:
-
+    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz
+    tar -xzf dte-1.5.tar.gz
+    cd dte-1.5
     make -j8 && sudo make install
 
 Documentation
@@ -121,7 +115,6 @@ Public License version 2 for more details.
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [ANSI]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
-[install-deps.sh]: https://github.com/craigbarnes/dte/blob/master/mk/install-deps.sh
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
