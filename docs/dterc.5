@@ -242,11 +242,9 @@ Local and global options:
 .br
 .SH DESCRIPTION
 .
-dterc is the language used in \fBdte\fR(1) runtime configuration files
-and also in the command mode used from within the editor.
-.P
-.
-The syntax of the language is quite similar to shell, but much simpler.
+dterc is the language used in \fBdte\fR(1) configuration files and also in the
+command mode of the editor. The syntax of the language is quite similar
+to shell, but much simpler.
 .P
 .
 Commands are separated either by a newline or \fB;\fR character. To make a
@@ -298,12 +296,12 @@ The selected text or the word under the cursor.
 .
 .SS Single quoted strings
 .
-Can't contain single quotes or escaped characters.
+Single quoted strings can't contain single quotes or escaped characters.
 .P
 .
 .SS Double quoted strings
 .
-May contain the following escapes:
+Double quoted strings may contain the following escapes:
 .P
 .
 .TP
@@ -426,7 +424,7 @@ of screen, then beginning of file.
 .RE
 \fBcase\fR [\fB\-lu\fR]
 .RS
-Change text case. Default is to change lower case to upper and
+Change text case. The default is to change lower case to upper case and
 vice versa.
 .P
 .
@@ -442,8 +440,8 @@ Upper case
 .RE
 \fBcd\fR \fIdirectory\fR
 .RS
-Change directory. Updates \fB$PWD\fR and \fB$OLDPWD\fR. \fBcd \-\fR changes to
-previous directory (\fB$OLDPWD\fR).
+Change the working directory and update \fB$PWD\fR and \fB$OLDPWD\fR. Running
+\fBcd \-\fR changes to the previous directory (\fB$OLDPWD\fR).
 .P
 .
 .RE
@@ -480,8 +478,8 @@ Close parent window if closing its last contained file
 .RE
 \fBcommand\fR [\fItext\fR]
 .RS
-Enter command line. If \fItext\fR is given then it is written to the
-command line (see the default binding \fB^L\fR why this is useful).
+Enter command mode. If \fItext\fR is given then it is written to the command
+line (see the default \fB^L\fR key binding for why this is useful).
 .P
 .
 .RE

@@ -9,10 +9,9 @@ seealso: ["`dte`", "`dte-syntax`"]
 
 # dterc
 
-dterc is the language used in `dte` runtime configuration files
-and also in the command mode used from within the editor.
-
-The syntax of the language is quite similar to shell, but much simpler.
+dterc is the language used in `dte` configuration files and also in the
+command mode of the editor. The syntax of the language is quite similar
+to shell, but much simpler.
 
 Commands are separated either by a newline or `;` character. To make a
 command span multiple lines in an rc file, escape the newline (put `\\`
@@ -50,11 +49,11 @@ The selected text or the word under the cursor.
 
 ## Single quoted strings
 
-Can't contain single quotes or escaped characters.
+Single quoted strings can't contain single quotes or escaped characters.
 
 ## Double quoted strings
 
-May contain the following escapes:
+Double quoted strings may contain the following escapes:
 
 `\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`, `\\`
 :   Control characters (same as in C)
@@ -133,7 +132,7 @@ of screen, then beginning of file.
 
 ### **case** [**-lu**]
 
-Change text case. Default is to change lower case to upper and
+Change text case. The default is to change lower case to upper case and
 vice versa.
 
 `-l`
@@ -144,8 +143,8 @@ vice versa.
 
 ### **cd** _directory_
 
-Change directory. Updates `$PWD` and `$OLDPWD`. `cd -` changes to
-previous directory (`$OLDPWD`).
+Change the working directory and update `$PWD` and `$OLDPWD`. Running
+`cd -` changes to the previous directory (`$OLDPWD`).
 
 ### **center-view**
 
@@ -170,8 +169,8 @@ Close file.
 
 ### **command** [_text_]
 
-Enter command line. If _text_ is given then it is written to the
-command line (see the default binding `^L` why this is useful).
+Enter command mode. If _text_ is given then it is written to the command
+line (see the default `^L` key binding for why this is useful).
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
 
