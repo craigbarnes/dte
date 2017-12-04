@@ -957,6 +957,7 @@ indentation style is detected: `emulate-tab`, `expand-tab`,
 `indent-width`.
 
 Example:
+
     set detect-indent 2,3,4,8
 
 ### **emulate-tab** [false]
