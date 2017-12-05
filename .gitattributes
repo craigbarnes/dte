@@ -23,6 +23,7 @@ mk/get-html-entities.sh export-ignore
 *.yml code
 *.css code
 mk/git-hooks/* code
+docs/*.[15] code linguist-generated=true
 
 LICENSE text
 GNUmakefile text
@@ -33,5 +34,5 @@ makefile text
 *.dterc dterc
 config/** dterc
 
+*.md -dterc markdown
 *.html html
-*.md markdown
