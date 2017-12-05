@@ -43,16 +43,23 @@ build:ubuntu:
 
 pages:
     stage: dist
-    image: registry.gitlab.com/craigbarnes/dockerfiles/pandoc
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     artifacts: {paths: [public]}
     only: [master]
     script: &PAGES_SCRIPT
         - make docs
+        - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
+        - strip dte
+        - test/objsize.sh dte
+        - ldd dte
+        - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
+        - tar -czf "public/$TARNAME.tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5
+        - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
         - tree public/
 
 # Same as "pages" but without public artifacts (for testing non-master branches)
 pages:non-master:
     stage: build
-    image: registry.gitlab.com/craigbarnes/dockerfiles/pandoc
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     except: [master]
     script: *PAGES_SCRIPT
