@@ -51,7 +51,7 @@ pages:
         - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
         - strip dte
         - test/objsize.sh dte
-        - ldd dte || :
+        - ldd dte || true
         - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
         - tar -czf "public/$TARNAME.tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5
         - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
