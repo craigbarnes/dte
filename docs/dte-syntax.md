@@ -108,7 +108,7 @@ longer than two bytes.
 
 ## Default actions
 
-Last command of every state must be default action. It is an
+The last command of every state must be a default action. It is an
 unconditional jump.
 
 ### **eat** _destination_ [_emit-name_]
@@ -139,15 +139,15 @@ recolor buffered bytes.
 
 # Sub-syntaxes
 
-Sub-syntaxes are useful when same the states are needed in many contexts.
+Sub-syntaxes are useful when the same states are needed in many contexts.
 
 Sub-syntax names must be prefixed with `.`. It's recommended to also use
 the main syntax name in the prefix. For example `.c-comment` if `c` is
 the main syntax.
 
 A sub-syntax is a syntax in which some destination state's name is
-`END`. `END` is a special state name that is replaced by the state given
-at another syntax.
+`END`. `END` is a special state name that is replaced by the state
+specified in another syntax.
 
 Example:
 
@@ -179,11 +179,11 @@ state c code
 # Other states removed
 ```
 
-In this example the destination state `.c-comment:c` is special syntax for
-calling a sub-syntax. `.c-comment` is name of the sub-syntax and `c` is
-the return state defined in the main syntax. Whole sub-syntax tree is
-copied into the main syntax and all destination states in the sub-syntax
-whose name is `END` are replaced with `c`.
+In this example the destination state `.c-comment:c` is a special syntax
+for calling a sub-syntax. `.c-comment` is the name of the sub-syntax and
+`c` is the return state defined in the main syntax. The whole sub-syntax
+tree is copied into the main syntax and all destination states in the
+sub-syntax whose name is `END` are replaced with `c`.
 
 
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html

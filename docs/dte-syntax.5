@@ -195,7 +195,7 @@ longer than two bytes.
 .
 .SS Default actions
 .
-Last command of every state must be default action. It is an
+The last command of every state must be a default action. It is an
 unconditional jump.
 .P
 .
@@ -237,7 +237,7 @@ recolor buffered bytes.
 .
 .SH SUB\-SYNTAXES
 .
-Sub\-syntaxes are useful when same the states are needed in many contexts.
+Sub\-syntaxes are useful when the same states are needed in many contexts.
 .P
 .
 Sub\-syntax names must be prefixed with \fB.\fR. It's recommended to also use
@@ -246,8 +246,8 @@ the main syntax.
 .P
 .
 A sub\-syntax is a syntax in which some destination state's name is
-\fBEND\fR. \fBEND\fR is a special state name that is replaced by the state given
-at another syntax.
+\fBEND\fR. \fBEND\fR is a special state name that is replaced by the state
+specified in another syntax.
 .P
 .
 Example:
@@ -306,11 +306,11 @@ state c code
 .RE
 .P
 .
-In this example the destination state \fB.c\-comment:c\fR is special syntax for
-calling a sub\-syntax. \fB.c\-comment\fR is name of the sub\-syntax and \fBc\fR is
-the return state defined in the main syntax. Whole sub\-syntax tree is
-copied into the main syntax and all destination states in the sub\-syntax
-whose name is \fBEND\fR are replaced with \fBc\fR.
+In this example the destination state \fB.c\-comment:c\fR is a special syntax
+for calling a sub\-syntax. \fB.c\-comment\fR is the name of the sub\-syntax and
+\fBc\fR is the return state defined in the main syntax. The whole sub\-syntax
+tree is copied into the main syntax and all destination states in the
+sub\-syntax whose name is \fBEND\fR are replaced with \fBc\fR.
 .P
 .
 .SH SEE ALSO
