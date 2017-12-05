@@ -17,7 +17,7 @@ docs: man html gz
 man: docs/dterc.5 docs/dte-syntax.5
 html: $(html)
 pdf: public/dte.pdf
-gz: $(patsubst %, %.gz, $(html))
+gz: $(patsubst %, %.gz, $(html) public/style.css)
 $(html): docs/template.html | public/style.css
 
 docs/%.5: docs/%.md docs/pdman.lua
@@ -30,11 +30,11 @@ public/dte.pdf: docs/dte.1 docs/dterc.5 docs/dte-syntax.5 | public/
 
 public/index.html: README.md | public/screenshot.png
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle=zz -o $@ $<
+	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
 public/releases.html: CHANGELOG.md
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle=rrrr -o $@ $<
+	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
 public/%.html: docs/%.md
 	$(E) PANDOC $@
