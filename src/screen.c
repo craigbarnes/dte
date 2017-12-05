@@ -165,8 +165,14 @@ void print_message(const char *msg, bool is_error)
     }
 }
 
-void update_term_title(Buffer *b)
+void update_term_title(Buffer* UNUSED(b))
 {
+    // TODO: re-implement this function properly, using the `tsl` and
+    // `fsl` terminfo capabilities (or equivalent) and always restore
+    // the original title on exit.
+    return;
+
+    /*
     static int term_type = -1;
     char title[1024];
 
@@ -204,6 +210,7 @@ void update_term_title(Buffer *b)
         buf_escape("\033\\");
         break;
     }
+    */
 }
 
 void mask_color(TermColor *color, const TermColor *over)
