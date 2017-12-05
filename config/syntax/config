@@ -1,3 +1,6 @@
+# This is a generic syntax that just highlights Python-style comments,
+# as found in many simple, line-based config files in /etc.
+
 syntax config
 
 state code
