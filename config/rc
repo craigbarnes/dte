@@ -4,8 +4,6 @@ include -b compiler/gcc
 include -b compiler/go
 include -b filetype
 
-set detect-indent 2,3,4,8
-
 alias help "run man dte"
 alias man "run man"
 alias make "compile gcc make"

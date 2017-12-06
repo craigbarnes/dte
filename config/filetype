@@ -88,11 +88,14 @@ ft -c xml '^<\?xml( |$)'
 option gitcommit,gitrebase file-history false
 option -r '/\.git/.*\.diff$' file-history false
 
-# Scan for braces to detect indent size for C-like languages
-option c,css,go,java,javascript,php,sh,lua brace-indent true
+# Try to detect indent settings based on existing file contents
+option c,css,d,java,javascript,lua,nginx,php,sh,vala detect-indent 2,3,4,8
+
+# Scan for braces to determine next auto-ident size
+option c,css,d,go,java,javascript,lua,nginx,php,sh,vala brace-indent true
 
 # Override indent options for Makefiles, since they almost always require tabs
-option make indent-width 8 expand-tab false emulate-tab false detect-indent ""
+option make indent-width 8 expand-tab false emulate-tab false
 
 # Patterns used to detect indent size when "auto-indent" option is enabled
 option c indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
