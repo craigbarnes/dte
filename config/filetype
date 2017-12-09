@@ -34,13 +34,14 @@ ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD APKBUILD
 ft -b yaml .clang-format
 
 # "ft -f" uses a regular expression to match the filename
-ft -f config '^/boot/grub/menu\.lst$|/\.?git/?attributes$|^/etc/hosts$'
+ft -f config '^/boot/grub/menu\.lst$|/\.?git/?attributes$|^/etc/(hosts|fstab)$'
 ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
-ft -f ini '/\.git/config$' '^/etc/systemd/[a-z]+\.conf$'
+ft -f ini '/\.git/config$|^/etc/systemd/.+\.conf$|^/etc/krb5\.conf$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
 ft -f nginx '^/etc/nginx/'
-ft -f sh '^/etc/default/.*'
+ft -f sh '^/etc/default/.*|^/etc/profile$'
+ft -f xml '^/etc/drirc$'
 
 # "ft" matches against the filename extension
 ft awk awk gawk mawk nawk
@@ -81,6 +82,9 @@ ft -c ini '^\[wrap-file\]$'
 ft -c roff '^\.TH [A-Z0-9]'
 ft -c sh '^#.* shell-script'
 ft -c xml '^<\?xml( |$)'
+
+# This catch-all rule comes last, to give priority to more specific rules above
+ft -f config '^/etc/.*\.conf$'
 
 # The "option" command sets default local options for specific file types
 
