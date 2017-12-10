@@ -24,7 +24,7 @@ char *detect_interpreter(Buffer *b)
 
     fill_line_ref(&bi, &lr);
     if (!regexp_match (
-        "^#!\\s*/.*(/env\\s+|/)([a-zA-Z_-]+)[0-9.]*(\\s|$)",
+        "^#! */.*(/env +|/)([a-zA-Z_-]+)[0-9.]*( |$)",
         lr.line,
         lr.size,
         &m
@@ -53,7 +53,7 @@ char *detect_interpreter(Buffer *b)
 
     if (
         !next_line(&bi, &lr)
-        || !regexp_match_nosub("^exec\\s+wish\\s+", lr.line, lr.size)
+        || !regexp_match_nosub("^exec +wish +", lr.line, lr.size)
     ) {
         return ret;
     }
