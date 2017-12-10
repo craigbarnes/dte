@@ -30,8 +30,8 @@ char *make_indent(int width)
 
 static bool indent_inc(const char *line, unsigned int len)
 {
-    const char *re1 = "\\{\\s*(//.*|/\\*.*\\*/\\s*)?$";
-    const char *re2 = "\\}\\s*(//.*|/\\*.*\\*/\\s*)?$";
+    const char *re1 = "\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
+    const char *re2 = "\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
 
     if (buffer->options.brace_indent) {
         if (regexp_match_nosub(re1, line, len)) {
