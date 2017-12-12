@@ -12,7 +12,6 @@ test/extract-readme-code.sed export-ignore
 mk/dev.mk export-ignore
 test/git-hooks/ export-ignore
 mk/sha256sums.txt export-ignore
-mk/tput-compare.sh export-ignore
 mk/get-html-entities.sh export-ignore
 
 *.[ch] code
