@@ -801,7 +801,7 @@ command to set default options for specific file types.
 :   Search is case-sensitive.
 
 `auto`
-:   If search string contains a uppercase letter search is
+:   If search string contains an uppercase letter search is
     case-sensitive, otherwise it is case-insensitive.
 
 ### **display-special** [false]
