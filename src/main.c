@@ -213,8 +213,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    View *default_buffer = NULL;
     if (window->views.count == 0) {
-        window_open_empty_buffer(window);
+        default_buffer = window_open_empty_buffer(window);
     }
 
     set_view(window->views.ptrs[0]);
@@ -226,6 +227,7 @@ int main(int argc, char *argv[])
     if (command) {
         handle_command(commands, command);
     }
+
     if (tag) {
         PointerArray array = PTR_ARRAY_INIT;
         ptr_array_add(&array, xstrdup("tag"));
@@ -234,6 +236,21 @@ int main(int argc, char *argv[])
         run_commands(commands, &array);
         ptr_array_free(&array);
     }
+
+    if (
+        // If a default, empty buffer was opened above
+        default_buffer
+        // ...but other buffers were opened via the "-c" or "-t" options
+        && window->views.count > 1
+        // ...and the default buffer was not saved by a command
+        && default_buffer->buffer->abs_filename == NULL
+        // ...and is still unchanged
+        && default_buffer->buffer->change_head.nr_prev == 0
+    ) {
+        // Remove it and only show the explicitly opened buffers
+        remove_view(default_buffer);
+    }
+
     resize();
     main_loop();
     ui_end();
