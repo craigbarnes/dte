@@ -72,6 +72,7 @@ ft ruby rb rake gemspec cr
 ft sh sh bash ksh zsh ebuild
 ft sql sql
 ft tcl tcl
+ft tex tex cls ltx sty dtx ins bbl
 ft vala vala vapi
 ft xml xml
 ft yaml yaml yml

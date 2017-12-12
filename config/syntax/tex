@@ -1,0 +1,26 @@
+syntax tex
+
+# TODO: Inline math ($...$)
+# TODO: Display math ($$...$$, \[...\])
+
+state text
+    char \\ backslash
+    char % comment
+    eat text
+
+state backslash macro
+    char A-Za-z macro
+    char "\\,;{}" escape
+    eat text error
+
+state macro
+    char A-Za-z macro
+    noeat text
+
+state escape
+    recolor special 2
+    noeat text
+
+state comment
+    char "\n" text
+    eat comment
