@@ -316,6 +316,16 @@ static const TerminalInfo terminal_rxvt = {
 
 void term_init(const char *const term)
 {
+    if (getenv("DTE_FORCE_TERMINFO")) {
+#ifndef TERMINFO_DISABLE
+        term_init_fallback(term);
+        return;
+#else
+        fputs("'DTE_FORCE_TERMINFO' set but terminfo not linked\n", stderr);
+        exit(1);
+#endif
+    }
+
     if (
         str_has_prefix(term, "tmux")
         || str_has_prefix(term, "xterm")
