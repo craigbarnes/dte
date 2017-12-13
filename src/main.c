@@ -213,8 +213,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    View *empty_buffer = NULL;
     if (window->views.count == 0) {
-        window_open_empty_buffer(window);
+        empty_buffer = window_open_empty_buffer(window);
     }
 
     set_view(window->views.ptrs[0]);
@@ -226,6 +227,7 @@ int main(int argc, char *argv[])
     if (command) {
         handle_command(commands, command);
     }
+
     if (tag) {
         PointerArray array = PTR_ARRAY_INIT;
         ptr_array_add(&array, xstrdup("tag"));
@@ -234,6 +236,19 @@ int main(int argc, char *argv[])
         run_commands(commands, &array);
         ptr_array_free(&array);
     }
+
+    if (
+        // If window_open_empty_buffer() was called above
+        empty_buffer
+        // ...and no commands were executed via the "-c" flag
+        && !command
+        // ...and a file was opened via the "-t" flag
+        && tag && window->views.count > 1
+    ) {
+        // Close the empty buffer, leaving just the buffer opened via "-t"
+        remove_view(window->views.ptrs[0]);
+    }
+
     resize();
     main_loop();
     ui_end();
