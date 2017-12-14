@@ -185,6 +185,7 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, Key key)
     switch (key) {
     case CTRL('['): // ESC
     case CTRL('C'):
+    case CTRL('G'):
         cmdline_clear(c);
         return CMDLINE_CANCEL;
     case CTRL('D'):
