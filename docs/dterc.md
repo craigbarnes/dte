@@ -275,6 +275,21 @@ multiple paragraphs use the external `fmt`(1) program with the
 
 Associate filename _extension_ with _filetype_.
 
+Filetypes are used to determine which syntax highlighter and local
+options to use when opening files.
+
+Example:
+
+    ft sh sh bash ksh zsh
+
+See also:
+
+* The `option` command (below)
+* The `filetype` option (below)
+* The [`dte-syntax`] man page
+* The [built-in filetype associations][`config/filetype`]
+  (which can be listed by running `dte -b filetype`)
+
 ### **ft** **-b** _filetype_ _basename_...
 
 Associate file _basename_ with _filetype_.
@@ -1026,4 +1041,6 @@ errors should be highlighted. Set to `""` to disable.
     errors.
 
 
+[`dte-syntax`]: dte-syntax.html
+[`config/filetype`]: https://github.com/craigbarnes/dte/blob/master/config/filetype
 [`xterm`]: https://invisible-island.net/xterm/
