@@ -1,8 +1,9 @@
+PANDOC = pandoc
+PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
+PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
+PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-PANDOC = pandoc -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
-PDMAN = $(PANDOC) -t docs/pdman.lua
-PDHTML = $(PANDOC) -t html5 --toc --template=docs/template.html
 
 XARGS_P_FLAG = $(shell \
     printf "1\n2" | xargs -P2 -I@ echo '@' >/dev/null 2>&1 && \
