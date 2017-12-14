@@ -9,6 +9,7 @@ bind pgdown pgdown
 bind delete delete
 bind ^\[ unselect
 bind ^\? erase
+bind ^H erase
 
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
