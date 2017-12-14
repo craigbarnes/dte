@@ -44,10 +44,7 @@ clean:
 	$(RM) $(CLEANFILES)
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
-distclean: clean
-	$(RM) tags
-
 
 .DEFAULT_GOAL = all
-.PHONY: all install uninstall tags clean distclean
+.PHONY: all install uninstall tags clean
 .DELETE_ON_ERROR:
