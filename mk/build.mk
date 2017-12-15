@@ -91,13 +91,6 @@ ifeq "$(KERNEL)" "Darwin"
 else ifeq "$(OS)" "Cygwin"
   LDLIBS += -liconv
   EXEC_SUFFIX = .exe
-else ifeq "$(KERNEL)" "FreeBSD"
-  # libc of FreeBSD 10.0 includes iconv
-  ifeq ($(shell expr "`uname -r`" : '[0-9]\.'),2)
-    LDLIBS += -liconv
-    BASIC_CFLAGS += -I/usr/local/include
-    BASIC_LDFLAGS += -L/usr/local/lib
-  endif
 else ifeq "$(KERNEL)" "OpenBSD"
   LDLIBS += -liconv
   BASIC_CFLAGS += -I/usr/local/include
