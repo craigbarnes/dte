@@ -43,11 +43,11 @@ function Doc(body, metadata, variables)
         ".nh\n.ad l\n.\n",
         ".SH NAME\n", title, " \\- ", description, "\n",
         ".SH SYNOPSIS\n", toc:tostring(),
-        body,
-        "\n.SH SEE ALSO\n", concat(seealso, ",\n"),
+        body:gsub("\n\n+", "\n.\n"),
+        ".SH SEE ALSO\n", concat(seealso, ",\n"),
         "\n.SH AUTHORS\n", concat(authors, "\n.br\n")
     )
-    return (buffer:tostring():gsub("\n\n+", "\n.\n"))
+    return buffer:tostring()
 end
 
 local generate_toc = false
@@ -73,7 +73,7 @@ function Header(level, s, attr)
         return ".SH " .. s:upper() .. "\n"
     elseif level == 2 then
         if in_toc_heading then
-            toc:write("\n.P\n", s, ":\n.br\n")
+            toc:write(".P\n", s, ":\n.br\n")
         end
         return ".SS " .. s .. "\n"
     elseif level == 3 then
