@@ -13,7 +13,7 @@ build:alpine:
         - ldd dte
         - make clean
         - make check TERMINFO_DISABLE=1 LDFLAGS=-static
-        - ldd dte
+        - ldd dte || true
         - make clean
         - make check
         - ldd dte
