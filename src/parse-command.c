@@ -9,9 +9,9 @@
 
 static StringBuffer arg = STRBUF_INIT;
 
-static void parse_sq(const char *cmd, int *posp)
+static void parse_sq(const char *cmd, size_t *posp)
 {
-    int pos = *posp;
+    size_t pos = *posp;
 
     while (1) {
         if (cmd[pos] == '\'') {
@@ -26,11 +26,10 @@ static void parse_sq(const char *cmd, int *posp)
     *posp = pos;
 }
 
-static int unicode_escape(const char *str, int count)
+static size_t unicode_escape(const char *str, size_t count)
 {
-    unsigned int u = 0;
-    int i;
-
+    CodePoint u = 0;
+    size_t i;
     for (i = 0; i < count && str[i]; i++) {
         int x = hex_decode(str[i]);
         if (x < 0) {
@@ -44,9 +43,9 @@ static int unicode_escape(const char *str, int count)
     return i;
 }
 
-static void parse_dq(const char *cmd, int *posp)
+static void parse_dq(const char *cmd, size_t *posp)
 {
-    int pos = *posp;
+    size_t pos = *posp;
 
     while (cmd[pos]) {
         char ch = cmd[pos++];
@@ -114,10 +113,10 @@ static void parse_dq(const char *cmd, int *posp)
     *posp = pos;
 }
 
-static void parse_var(const char *cmd, int *posp)
+static void parse_var(const char *cmd, size_t *posp)
 {
-    int si = *posp;
-    int ei = si;
+    size_t si = *posp;
+    size_t ei = si;
     char *name, *value;
 
     while (1) {
@@ -153,7 +152,7 @@ static void parse_var(const char *cmd, int *posp)
 
 char *parse_command_arg(const char *cmd, bool tilde)
 {
-    int pos = 0;
+    size_t pos = 0;
 
     if (tilde && cmd[pos] == '~' && cmd[pos+1] == '/') {
         strbuf_add_str(&arg, editor.home_dir);
@@ -186,7 +185,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     return strbuf_steal_cstring(&arg);
 }
 
-int find_end(const char *cmd, int pos, Error **err)
+ssize_t find_end(const char *cmd, size_t pos, Error **err)
 {
     while (1) {
         char ch = cmd[pos];
@@ -262,11 +261,9 @@ unexpected_eof:
 
 bool parse_commands(PointerArray *array, const char *cmd, Error **err)
 {
-    int pos = 0;
+    size_t pos = 0;
 
     while (1) {
-        int end;
-
         while (ascii_isspace(cmd[pos])) {
             pos++;
         }
@@ -281,7 +278,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
             continue;
         }
 
-        end = find_end(cmd, pos, err);
+        ssize_t end = find_end(cmd, pos, err);
         if (*err != NULL) {
             return false;
         }
@@ -293,10 +290,10 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
     return true;
 }
 
-char **copy_string_array(char **src, int count)
+char **copy_string_array(char **src, size_t count)
 {
     char **dst = xnew(char *, count + 1);
-    int i;
+    size_t i;
     for (i = 0; i < count; i++) {
         dst[i] = xstrdup(src[i]);
     }

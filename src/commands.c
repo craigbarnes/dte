@@ -646,10 +646,11 @@ static void cmd_open(const char *pf, char **args)
 
 static void cmd_option(const char *pf, char **args)
 {
-    int argc = count_strings(args);
+    size_t argc = count_strings(args);
+    BUG_ON(argc == 0);
     char *list, *comma;
     char **strs = args + 1;
-    int count = argc - 1;
+    size_t count = argc - 1;
 
     if (argc % 2 == 0) {
         error_msg("Missing option value");
@@ -670,10 +671,8 @@ static void cmd_option(const char *pf, char **args)
 
     list = args[0];
     do {
-        int len;
-
         comma = strchr(list, ',');
-        len = comma ? comma - list : strlen(list);
+        size_t len = comma ? comma - list : strlen(list);
         add_file_options (
             FILE_OPTIONS_FILETYPE,
             xstrslice(list, 0, len),
