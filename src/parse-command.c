@@ -9,44 +9,6 @@
 
 static StringBuffer arg = STRBUF_INIT;
 
-static void parse_home(const char *cmd, int *posp)
-{
-    int len, pos = *posp;
-    const char *username = cmd + pos + 1;
-    struct passwd *passwd;
-    char buf[64];
-
-    for (len = 0; username[len]; len++) {
-        char ch = username[len];
-        if (ascii_isspace(ch) || ch == '/' || ch == ':') {
-            break;
-        }
-        if (!ascii_isalnum(ch)) {
-            return;
-        }
-    }
-
-    if (!len) {
-        strbuf_add_str(&arg, editor.home_dir);
-        *posp = pos + 1;
-        return;
-    }
-
-    if (len >= sizeof(buf)) {
-        return;
-    }
-
-    memcpy(buf, username, len);
-    buf[len] = 0;
-    passwd = getpwnam(buf);
-    if (!passwd) {
-        return;
-    }
-
-    strbuf_add_str(&arg, passwd->pw_dir);
-    *posp = pos + 1 + len;
-}
-
 static void parse_sq(const char *cmd, int *posp)
 {
     int pos = *posp;
@@ -193,9 +155,11 @@ char *parse_command_arg(const char *cmd, bool tilde)
 {
     int pos = 0;
 
-    if (tilde && cmd[pos] == '~') {
-        parse_home(cmd, &pos);
+    if (tilde && cmd[pos] == '~' && cmd[pos+1] == '/') {
+        strbuf_add_str(&arg, editor.home_dir);
+        pos++;
     }
+
     while (1) {
         char ch = cmd[pos];
 
