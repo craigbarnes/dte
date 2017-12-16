@@ -1,6 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <sys/types.h> // size_t, ssize_t
 #include <stdbool.h>
 #include "ptr-array.h"
 #include "error.h"
