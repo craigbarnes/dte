@@ -12,6 +12,9 @@ build:alpine:
         - make check TERMINFO_DISABLE=1
         - ldd dte
         - make clean
+        - make check TERMINFO_DISABLE=1 LDFLAGS=-static
+        - ldd dte
+        - make clean
         - make check
         - ldd dte
         - make install && dte -V
@@ -25,6 +28,12 @@ build:debian:
         - make check && make install && dte -V
         - sed -nf test/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
+        - make clean && make check CC=gcc
+        - make clean && make check CC=clang
+        - make clean && make check CC=tcc
+        - make clean && make dte CC=arm-linux-gnueabihf-gcc
+        - make clean && make dte CC=aarch64-linux-gnu-gcc
+        - export LDFLAGS=-static
         - make clean && make check CC=gcc
         - make clean && make check CC=clang
         - make clean && make check CC=tcc
