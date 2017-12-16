@@ -1,8 +1,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include <sys/types.h> // size_t, ssize_t
 #include <stdbool.h>
+#include <stddef.h>
 #include "ptr-array.h"
 #include "error.h"
 
@@ -16,7 +16,7 @@ typedef struct {
 
 // parse-command.c
 char *parse_command_arg(const char *cmd, bool tilde);
-ssize_t find_end(const char *cmd, size_t pos, Error **err);
+size_t find_end(const char *cmd, size_t pos, Error **err);
 bool parse_commands(PointerArray *array, const char *cmd, Error **err);
 char **copy_string_array(char **src, size_t count);
 

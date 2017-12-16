@@ -295,8 +295,6 @@ static void init_completion(void)
     size_t len, pos = 0;
 
     while (1) {
-        Error *err = NULL;
-
         while (ascii_isspace(cmd[pos])) {
             pos++;
         }
@@ -317,9 +315,10 @@ static void init_completion(void)
             continue;
         }
 
-        ssize_t end = find_end(cmd, pos, &err);
-        error_free(err);
-        if (end < 0 || end >= editor.cmdline.pos) {
+        Error *err = NULL;
+        size_t end = find_end(cmd, pos, &err);
+        if (err || end >= editor.cmdline.pos) {
+            error_free(err);
             completion_pos = pos;
             break;
         }

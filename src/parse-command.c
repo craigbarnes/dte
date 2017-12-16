@@ -185,7 +185,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     return strbuf_steal_cstring(&arg);
 }
 
-ssize_t find_end(const char *cmd, size_t pos, Error **err)
+size_t find_end(const char *cmd, size_t pos, Error **err)
 {
     while (1) {
         char ch = cmd[pos];
@@ -203,7 +203,7 @@ ssize_t find_end(const char *cmd, size_t pos, Error **err)
                 }
                 if (!cmd[pos]) {
                     *err = error_create("Missing '");
-                    return -1;
+                    return 0;
                 }
                 pos++;
             }
@@ -215,7 +215,7 @@ ssize_t find_end(const char *cmd, size_t pos, Error **err)
                 }
                 if (!cmd[pos]) {
                     *err = error_create("Missing \"");
-                    return -1;
+                    return 0;
                 }
                 if (cmd[pos++] == '\\') {
                     if (!cmd[pos]) {
@@ -249,14 +249,14 @@ ssize_t find_end(const char *cmd, size_t pos, Error **err)
                     "You need to escape %c (characters *?[{ are reserved)",
                     ch
                 );
-                return -1;
+                return 0;
             }
         }
     }
     return pos;
 unexpected_eof:
     *err = error_create("Unexpected EOF");
-    return -1;
+    return 0;
 }
 
 bool parse_commands(PointerArray *array, const char *cmd, Error **err)
@@ -278,7 +278,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
             continue;
         }
 
-        ssize_t end = find_end(cmd, pos, err);
+        size_t end = find_end(cmd, pos, err);
         if (*err != NULL) {
             return false;
         }
