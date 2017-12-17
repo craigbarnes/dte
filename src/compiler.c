@@ -20,7 +20,7 @@ static Compiler *add_compiler(const char *name)
 
 Compiler *find_compiler(const char *name)
 {
-    for (int i = 0; i < compilers.count; i++) {
+    for (size_t i = 0; i < compilers.count; i++) {
         Compiler *c = compilers.ptrs[i];
         if (streq(c->name, name)) {
             return c;
@@ -63,7 +63,7 @@ void add_error_fmt (
         free(f);
         return;
     }
-    for (int i = 0; i < ARRAY_COUNT(idx); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(idx); i++) {
         // NOTE: -1 is larger than 0UL
         if (idx[i] > (int)f->re.re_nsub) {
             error_msg("Invalid substring count.");

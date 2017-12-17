@@ -36,12 +36,11 @@ static void print_horizontal_tab_title(View *v, int idx)
 
 static void print_horizontal_tabbar(Window *win)
 {
-    int i;
-
     buf_reset(win->x, win->w, 0);
     buf_move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
+    int i;
     for (i = win->first_tab_idx; i < win->views.count; i++) {
         View *v = win->views.ptrs[i];
         if (obuf.x + v->tt_truncated_width > win->w) {

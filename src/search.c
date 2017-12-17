@@ -157,7 +157,7 @@ static void free_regex(void)
 
 static bool has_upper(const char *str)
 {
-    for (int i = 0; str[i]; i++) {
+    for (size_t i = 0; str[i]; i++) {
         if (ascii_isupper(str[i])) {
             return true;
         }
@@ -269,7 +269,7 @@ static void build_replacement (
     const char *format,
     regmatch_t *m
 ) {
-    int i = 0;
+    size_t i = 0;
 
     while (format[i]) {
         int ch = format[i++];

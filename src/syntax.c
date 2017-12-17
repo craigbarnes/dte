@@ -119,7 +119,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
     // copy it. Freeing Condition does not free any string lists.
     const char *prefix = get_prefix();
     PointerArray *states = &syn->states;
-    int i, old_count = states->count;
+    size_t i, old_count = states->count;
 
     states->count += m->subsyn->states.count;
     if (states->count > states->alloc) {

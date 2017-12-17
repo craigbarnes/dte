@@ -92,7 +92,7 @@ void save_file_history(void)
         free(filename);
         return;
     }
-    for (int i = 0; i < history.count; i++) {
+    for (size_t i = 0; i < history.count; i++) {
         HistoryEntry *e = history.ptrs[i];
         char str[64];
         snprintf(str, sizeof(str), "%d %d ", e->row, e->col);
@@ -107,7 +107,7 @@ void save_file_history(void)
 
 bool find_file_in_history(const char *filename, int *row, int *col)
 {
-    for (int i = 0; i < history.count; i++) {
+    for (size_t i = 0; i < history.count; i++) {
         HistoryEntry *e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             *row = e->row;

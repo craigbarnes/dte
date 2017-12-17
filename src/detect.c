@@ -124,7 +124,7 @@ bool detect_indent(Buffer *b)
     int tab_count = 0;
     int space_count = 0;
 
-    for (int i = 0; i < 200; i++) {
+    for (unsigned int i = 0; i < 200; i++) {
         LineRef lr;
         int indent;
         bool tab;

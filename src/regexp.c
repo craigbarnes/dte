@@ -81,7 +81,7 @@ bool regexp_exec_sub (
     if (!ret) {
         return false;
     }
-    for (int i = 0; i < ARRAY_COUNT(m); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(m); i++) {
         if (m[i].rm_so == -1) {
             break;
         }

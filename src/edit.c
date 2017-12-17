@@ -192,9 +192,7 @@ void paste(bool at_cursor)
 
 void delete_ch(void)
 {
-    unsigned int u;
     long size = 0;
-
     if (view->selection) {
         size = prepare_selection(view);
         unselect();
@@ -204,6 +202,7 @@ void delete_ch(void)
             size = get_indent_level_bytes_right();
         }
         if (size == 0) {
+            unsigned int u;
             size = buffer_get_char(&view->cursor, &u);
         }
     }
@@ -212,9 +211,7 @@ void delete_ch(void)
 
 void erase(void)
 {
-    unsigned int u;
     long size = 0;
-
     if (view->selection) {
         size = prepare_selection(view);
         unselect();
@@ -225,6 +222,7 @@ void erase(void)
             block_iter_back_bytes(&view->cursor, size);
         }
         if (size == 0) {
+            unsigned int u;
             size = buffer_prev_char(&view->cursor, &u);
         }
     }
@@ -501,11 +499,11 @@ void join_lines(void)
 
 static void shift_right(int nr_lines, int count)
 {
-    int i, indent_size;
+    int indent_size;
     char *indent;
 
     indent = alloc_indent(count, &indent_size);
-    i = 0;
+    int i = 0;
     while (1) {
         IndentInfo info;
         LineRef lr;
@@ -538,7 +536,6 @@ static void shift_right(int nr_lines, int count)
 static void shift_left(int nr_lines, int count)
 {
     int i = 0;
-
     while (1) {
         IndentInfo info;
         LineRef lr;

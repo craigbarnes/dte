@@ -185,7 +185,7 @@ TagFile *load_tag_file(void)
 
 void free_tags(PointerArray *tags)
 {
-    for (int i = 0; i < tags->count; i++) {
+    for (size_t i = 0; i < tags->count; i++) {
         Tag *t = tags->ptrs[i];
         free_tag(t);
         free(t);

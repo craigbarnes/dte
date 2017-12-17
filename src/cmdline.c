@@ -122,10 +122,10 @@ static void cmdline_prev_word(CommandLine *c)
     c->pos = i;
 }
 
-static void cmdline_insert_bytes(CommandLine *c, const char *buf, int size)
+static void cmdline_insert_bytes(CommandLine *c, const char *buf, size_t size)
 {
     strbuf_make_space(&c->buf, c->pos, size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         c->buf.buffer[c->pos++] = buf[i];
     }
 }

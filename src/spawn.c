@@ -10,7 +10,7 @@
 
 static void handle_error_msg(Compiler *c, char *str)
 {
-    int i, len;
+    size_t i, len;
 
     for (i = 0; str[i]; i++) {
         if (str[i] == '\n') {
