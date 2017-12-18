@@ -11,7 +11,7 @@ int tigetflag(const char *capname);
 int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
 
-static char *curses_str_cap(const char *name)
+static char *curses_str_cap(const char *const name)
 {
     char *str = tigetstr(name);
     if (str == (char *)-1) {
@@ -42,10 +42,7 @@ static void term_read_caps(void)
     };
     terminal.control_codes = tcc;
 
-    static const struct {
-        const Key key;
-        const char *const capname;
-    } key_cap_map[] = {
+    static TermKeyMap keymap[] = {
         {KEY_INSERT, "kich1"},
         {KEY_DELETE, "kdch1"},
         {KEY_HOME, "khome"},
@@ -105,12 +102,13 @@ static void term_read_caps(void)
         {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN, "kDN8"},
     };
 
-    static const size_t keymap_length = ARRAY_COUNT(key_cap_map);
-    TermKeyMap *keymap = xnew(TermKeyMap, keymap_length);
+    static const size_t keymap_length = ARRAY_COUNT(keymap);
 
+    // Replace all capability names in the keymap array above with the
+    // corresponding escape sequences fetched from terminfo.
     for (size_t i = 0; i < keymap_length; i++) {
-        keymap[i].key = key_cap_map[i].key;
-        keymap[i].code = curses_str_cap(key_cap_map[i].capname);
+        const char *const code = curses_str_cap(keymap[i].code);
+        keymap[i].code = code;
     }
 
     terminal.keymap = keymap;
