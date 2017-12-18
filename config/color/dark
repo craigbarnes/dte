@@ -1,0 +1,36 @@
+hi
+
+hi linenumber gray darkgray
+hi selection white blue
+
+hi text
+hi code
+hi ident
+hi keyword bold
+hi type green
+hi comment lowintensity gray
+hi numeric blue
+hi string yellow
+hi variable bold yellow
+hi constant bold cyan
+hi special magenta
+hi char magenta
+hi label bold red
+hi notice bold red
+hi error black yellow
+
+hi tex.macro bold yellow
+hi ini.section bold
+hi make.builtin bold magenta
+hi make.special-target green
+hi markdown.heading bold magenta
+hi markdown.emphasis italic cyan
+hi markdown.strong-emphasis bold cyan
+hi markdown.code-block yellow
+hi markdown.code-span yellow
+hi markdown.block-quote green
+hi markdown.reference bold blue
+hi html.tag bold magenta
+hi html.attr magenta
+hi xml.tag bold magenta
+hi xml.attr magenta
