@@ -35,9 +35,9 @@ Installation
 To build `dte` from source, first install the requirements listed above,
 then use the following commands:
 
-    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz
-    tar -xzf dte-1.5.tar.gz
-    cd dte-1.5
+    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz
+    tar -xzf dte-1.6.tar.gz
+    cd dte-1.6
     make -j8 && sudo make install
 
 Documentation

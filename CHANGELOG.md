@@ -1,8 +1,10 @@
 Releases
 ========
 
-v1.6 (unreleased)
------------------
+v1.6 (latest release)
+---------------------
+
+Released on 2017-12-20.
 
 **Changes:**
 
@@ -23,8 +25,14 @@ v1.6 (unreleased)
   avoid using `getpwnam(3)` and thereby allow static linking with GNU
   libc on Linux.
 
-v1.5 (latest release)
----------------------
+**Downloads:**
+
+* [dte-1.6.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz)
+* [dte-1.6.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz.sig)
+* [dte-1.6.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz.sha256sum)
+
+v1.5
+----
 
 Released on 2017-11-03.
 
