@@ -1,6 +1,28 @@
 Releases
 ========
 
+v1.6 (unreleased)
+-----------------
+
+**Changes:**
+
+* Added new, default `dark` color scheme.
+* Added Ctrl+G key binding to exit command mode.
+* Added Ctrl+H key binding for `erase` command.
+* Added syntax highlighting for TeX and roff (man page) files.
+* Improved syntax highlighting of Python numeric literals.
+* Improved syntax highlighting for CSS files.
+* Added `ft -b` command for detecting file types from file basenames.
+* Converted user documentation to Markdown format.
+* Created new [website] for online documentation.
+* Added support for terminfo extended (or "user-defined") capabilities.
+* Added built-in support for `st` and `rxvt` terminals.
+* Fixed some built-in regex patterns to avoid non-portable features.
+* Fixed compiler warnings on NetBSD.
+* Removed tilde expansion of `~username` from command mode, in order to
+  avoid using `getpwnam(3)` and thereby allow static linking with GNU
+  libc on Linux.
+
 v1.5 (latest release)
 ---------------------
 
@@ -138,12 +160,6 @@ from which this project was forked).
 * [dte-1.0.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sig)
 * [dte-1.0.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sha256sum)
 
-
-[dex]: https://github.com/tihirvon/dex
-[dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
-[Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
-[D]: https://dlang.org/
-
 Public Key
 ==========
 
@@ -151,3 +167,10 @@ A detached PGP signature file is provided for each release. The public
 key for verifying these signatures is available to download at
 <https://craigbarnes.gitlab.io/pubkey/0330BEB4.asc>
 or from the keyserver at `hkps://hkps.pool.sks-keyservers.net`.
+
+
+[website]: https://craigbarnes.gitlab.io/dte/
+[dex]: https://github.com/tihirvon/dex
+[dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
+[Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
+[D]: https://dlang.org/
