@@ -40,7 +40,7 @@ function Doc(body, metadata, variables)
         ".nh\n.ad l\n.\n",
         ".SH NAME\n", title, " \\- ", description, "\n",
         ".SH SYNOPSIS\n", toc:tostring(),
-        body:gsub("\n\n+", "\n.\n"),
+        body,
         ".SH SEE ALSO\n", concat(seealso, ",\n"),
         "\n.SH AUTHORS\n", concat(authors, "\n.br\n")
     )
@@ -77,7 +77,7 @@ function Header(level, s, attr)
         if in_toc_heading then
             toc:write("   ", s, "\n.br\n")
         end
-        return "\n.RE\n" .. s .. "\n.RS"
+        return ".RE\n" .. s .. "\n.RS\n"
     end
 end
 
@@ -112,10 +112,8 @@ function OrderedList(items)
 end
 
 function CodeBlock(s, attr)
-    -- TODO: use .EX/.EE for this (see: groff_man(7))
-    local code = s:gsub("\n\n", "\n.P\n"):gsub("\n", "\n.br\n")
-
-    return ".RS\n" .. code .. "\n.RE\n.P\n"
+    local code = s:gsub("[ \\-]", "\\%1")
+    return ".IP\n.nf\n\\f[C]\n" .. code .. "\n\\f[]\n.fi\n.PP\n"
 end
 
 function Code(s, attr)
@@ -152,7 +150,7 @@ function Plain(s)
 end
 
 function Blocksep()
-    return "\n"
+    return ""
 end
 
 function LineBreak()

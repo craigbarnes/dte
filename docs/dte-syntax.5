@@ -47,30 +47,26 @@ Other commands:
    \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
 .br
 .SH DESCRIPTION
-.
 A dte syntax file consists of multiple states. A state consists of optional
 conditionals and one default action. The best way understand the syntax
 is to read through some of the built\-in syntax files, which can be
 printed with \fBdte \-b\fR, for example:
 .P
-.
-.RS
-dte -b syntax/dte
-.RE
-.P
-.
+.IP
+.nf
+\f[C]
+dte\ \-b\ syntax/dte
+\f[]
+.fi
+.PP
 The basic syntax used is the same as in \fBdterc\fR(5) files, but the
 available commands are different.
 .P
-.
 Conditionals and default actions have a destination state. The special
 destination state \fBthis\fR can be used to jump to the current state.
 .P
-.
 .SH COMMANDS
-.
 .SS Main commands
-.
 .RE
 \fBsyntax\fR \fIname\fR
 .RS
@@ -78,66 +74,58 @@ Begin a new syntax. One syntax file can contain multiple syntax
 definitions, but you should only define one real syntax in one
 syntax file.
 .P
-.
 See also: sub\-syntaxes.
 .P
-.
 .RE
 \fBstate\fR \fIname\fR [\fIemit\-color\fR]
 .RS
 Add new state. Conditionals (if any) and one default action must
 follow. The first state is the \fBstart\fR state.
 .P
-.
 .RE
 \fBdefault\fR \fIcolor\fR \fIname\fR...
 .RS
 Set default \fIcolor\fR for emitted \fIname\fR.
 .P
-.
 Example:
 .P
-.
-.RS
-default numeric oct dec hex
-.RE
-.P
-.
+.IP
+.nf
+\f[C]
+default\ numeric\ oct\ dec\ hex
+\f[]
+.fi
+.PP
 If there is no color defined for \fIoct\fR, \fIdec\fR or \fIhex\fR then color
 \fInumeric\fR is used instead.
 .P
-.
 .RE
 \fBlist\fR [\fB\-i\fR] \fIname\fR \fIstring\fR...
 .RS
 Define a list of strings.
 .P
-.
 Example:
 .P
-.
-.RS
-list keyword if else for while do continue switch case
-.RE
-.P
-.
+.IP
+.nf
+\f[C]
+list\ keyword\ if\ else\ for\ while\ do\ continue\ switch\ case
+\f[]
+.fi
+.PP
 Use the \fBinlist\fR command to test if a buffered string is in a list.
 .P
-.
 .TP
 \fB\-i\fR
 Make list case\-insensitive.
 .PP
-.
 .SS Conditionals
-.
 .RE
 \fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Test if buffered bytes are same as \fIstring\fR. If they are, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-.
 .RE
 \fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
@@ -145,11 +133,9 @@ Test if current byte is in the \fIcharacters\fR list. If it is then emit
 \fIemit\-color\fR and jump to \fIdestination\fR state. If \fIemit\-name\fR is not
 given then the \fIdestination\fR state's emit name is used.
 .P
-.
 \fIcharacters\fR is a list of strings. Ranges are supported (\fBa\-d\fR is the
 same as \fBabcd\fR).
 .P
-.
 .TP
 \fB\-b\fR
 Add byte to buffer.
@@ -158,50 +144,41 @@ Add byte to buffer.
 \fB\-n\fR
 Invert character bitmap.
 .PP
-.
 .RE
 \fBheredocend\fR \fIdestination\fR
 .RS
 Compare following characters to heredoc end delimiter and go to
 destination state if comparison is true.
 .P
-.
 .RE
 \fBinlist\fR \fIlist\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Test if buffered bytes are found in \fIlist\fR. If found, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-.
 .RE
 \fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 See if following bytes are same as \fIstring\fR. If they are emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
-.
 .TP
 \fB\-i\fR
 Case\-insensitive.
 .PP
-.
 NOTE: This conditional can be slow, especially if \fIstring\fR is
 longer than two bytes.
 .P
-.
 .SS Default actions
-.
 The last command of every state must be a default action. It is an
 unconditional jump.
 .P
-.
 .RE
 \fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR
 state.
 .P
-.
 .RE
 \fBheredocbegin\fR \fIsubsyntax\fR \fIreturn\-state\fR
 .RS
@@ -209,99 +186,67 @@ Store buffered bytes as heredoc end delimiter and go to
 \fIsubsyntax\fR. Sub\-syntax is like any other sub\-syntax but it must
 contain a \fIheredocend\fR conditional.
 .P
-.
 .RE
 \fBnoeat\fR [\fB\-b\fR] \fIdestination\fR
 .RS
 Continue to \fIdestination\fR state without emitting color or
 consuming byte.
 .P
-.
 .TP
 \fB\-b\fR
 Don't stop buffering.
 .PP
-.
 .SS Other commands
-.
 .RE
 \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
 .RS
 If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise
 recolor buffered bytes.
 .P
-.
 .SH SUB\-SYNTAXES
-.
 Sub\-syntaxes are useful when the same states are needed in many contexts.
 .P
-.
 Sub\-syntax names must be prefixed with \fB.\fR. It's recommended to also use
 the main syntax name in the prefix. For example \fB.c\-comment\fR if \fBc\fR is
 the main syntax.
 .P
-.
 A sub\-syntax is a syntax in which some destination state's name is
 \fBEND\fR. \fBEND\fR is a special state name that is replaced by the state
 specified in another syntax.
 .P
-.
 Example:
 .P
-.
-.RS
-# Sub-syntax
-.br
-syntax .c-comment
-.br
-.P
-.br
-state comment
-.br
-    char "*" star
-.br
-    eat comment
-.br
-.P
-.br
-state star comment
-.br
-    # END is a special state name
-.br
-    char / END comment
-.br
-    noeat comment
-.br
-.P
-.br
-# Main syntax
-.br
-syntax c
-.br
-.P
-.br
-state c code
-.br
-    char " \t\n" c
-.br
-    char -b a-zA-Z_ ident
-.br
-    char "\"" string
-.br
-    char "'" char
-.br
-    # Call sub-syntax
-.br
-    str "/*" .c-comment:c
-.br
-    eat c
-.br
-.P
-.br
-# Other states removed
-.RE
-.P
-.
+.IP
+.nf
+\f[C]
+#\ Sub\-syntax
+syntax\ .c\-comment
+
+state\ comment
+\ \ \ \ char\ "*"\ star
+\ \ \ \ eat\ comment
+
+state\ star\ comment
+\ \ \ \ #\ END\ is\ a\ special\ state\ name
+\ \ \ \ char\ /\ END\ comment
+\ \ \ \ noeat\ comment
+
+#\ Main\ syntax
+syntax\ c
+
+state\ c\ code
+\ \ \ \ char\ "\ \\t\\n"\ c
+\ \ \ \ char\ \-b\ a\-zA\-Z_\ ident
+\ \ \ \ char\ "\\""\ string
+\ \ \ \ char\ "'"\ char
+\ \ \ \ #\ Call\ sub\-syntax
+\ \ \ \ str\ "/*"\ .c\-comment:c
+\ \ \ \ eat\ c
+
+#\ Other\ states\ removed
+\f[]
+.fi
+.PP
 In this example the destination state \fB.c\-comment:c\fR is a special syntax
 for calling a sub\-syntax. \fB.c\-comment\fR is the name of the sub\-syntax and
 \fBc\fR is the return state defined in the main syntax. The whole sub\-syntax
