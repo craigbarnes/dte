@@ -272,7 +272,6 @@ if \fB$FILE\fR contains whitespace.
 These variables are always defined and override environment variables of
 the same name.
 .P
-.RE
 \fB$FILE\fR
 .RS
 The filename of the current buffer (or an empty string if unsaved).
@@ -282,6 +281,7 @@ The filename of the current buffer (or an empty string if unsaved).
 .RS
 The selected text or the word under the cursor.
 .P
+.RE
 .SS Single quoted strings
 Single quoted strings can't contain single quotes or escaped characters.
 .P
@@ -306,7 +306,6 @@ Four hex digit unicode code point U+20AC.
 Eight hex digit unicode code point U+20AC.
 .PP
 .SH COMMANDS
-.RE
 \fBalias\fR \fIname\fR \fIcommand\fR
 .RS
 Create an alias \fIname\fR for \fIcommand\fR.
@@ -1259,6 +1258,7 @@ Split root instead of current window.
 .RS
 Swap positions of this and next frame.
 .P
+.RE
 .SH OPTIONS
 Options can be changed using the \fBset\fR command. Enumerated options can
 also be \fBtoggle\fRd. To see which options are enumerated, type "toggle "
@@ -1266,7 +1266,6 @@ in command mode and press the tab key. You can also use the \fBoption\fR
 command to set default options for specific file types.
 .P
 .SS Global options
-.RE
 \fBcase\-sensitive\-search\fR [true]
 .RS
 .TP
@@ -1424,8 +1423,8 @@ automatically reduced to keep editing area at least 80
 characters wide. Vertical tab bar is shown only if there's
 enough space.
 .P
-.SS Local options
 .RE
+.SS Local options
 \fBbrace\-indent\fR [false]
 .RS
 Scan for \fB{\fR and \fB}\fR characters when calculating indentation size.
@@ -1444,11 +1443,11 @@ If this regular expression matches current line when enter is
 pressed and \fBauto\-indent\fR is true then indentation is increased.
 Set to \fB""\fR to disable.
 .P
+.RE
 .SS Local and global options
 The global values for these options serve as the default values for
 local (per\-file) options.
 .P
-.RE
 \fBauto\-indent\fR [true]
 .RS
 Automatically insert indentation when pressing enter.

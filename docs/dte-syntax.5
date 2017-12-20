@@ -67,7 +67,6 @@ destination state \fBthis\fR can be used to jump to the current state.
 .P
 .SH COMMANDS
 .SS Main commands
-.RE
 \fBsyntax\fR \fIname\fR
 .RS
 Begin a new syntax. One syntax file can contain multiple syntax
@@ -119,8 +118,8 @@ Use the \fBinlist\fR command to test if a buffered string is in a list.
 \fB\-i\fR
 Make list case\-insensitive.
 .PP
-.SS Conditionals
 .RE
+.SS Conditionals
 \fBbufis\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Test if buffered bytes are same as \fIstring\fR. If they are, emit
@@ -169,11 +168,11 @@ Case\-insensitive.
 NOTE: This conditional can be slow, especially if \fIstring\fR is
 longer than two bytes.
 .P
+.RE
 .SS Default actions
 The last command of every state must be a default action. It is an
 unconditional jump.
 .P
-.RE
 \fBeat\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
 Consume byte, emit \fIemit\-name\fR color and continue to \fIdestination\fR
@@ -196,13 +195,14 @@ consuming byte.
 \fB\-b\fR
 Don't stop buffering.
 .PP
-.SS Other commands
 .RE
+.SS Other commands
 \fBrecolor\fR \fIcolor\fR [\fIcount\fR]
 .RS
 If \fIcount\fR is given, recolor \fIcount\fR previous bytes, otherwise
 recolor buffered bytes.
 .P
+.RE
 .SH SUB\-SYNTAXES
 Sub\-syntaxes are useful when the same states are needed in many contexts.
 .P

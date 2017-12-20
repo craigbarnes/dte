@@ -49,9 +49,17 @@ end
 
 local generate_toc = false
 local in_toc_heading = false
+local prev_heading_level = 0
 
 function Header(level, s, attr)
     assert(level < 4)
+
+    local prefix = ""
+    if prev_heading_level > 2 then
+        prefix = ".RE\n"
+    end
+    prev_heading_level = level
+
     if level == 1 then
         if s == "dterc" or s == "dte\\-syntax" then
             generate_toc = true
@@ -67,17 +75,17 @@ function Header(level, s, attr)
                 in_toc_heading = false
             end
         end
-        return ".SH " .. s:upper() .. "\n"
+        return prefix .. ".SH " .. s:upper() .. "\n"
     elseif level == 2 then
         if in_toc_heading then
             toc:write(".P\n", s, ":\n.br\n")
         end
-        return ".SS " .. s .. "\n"
+        return prefix .. ".SS " .. s .. "\n"
     elseif level == 3 then
         if in_toc_heading then
             toc:write("   ", s, "\n.br\n")
         end
-        return ".RE\n" .. s .. "\n.RS\n"
+        return prefix .. s .. "\n.RS\n"
     end
 end
 
