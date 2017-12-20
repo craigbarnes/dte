@@ -22,10 +22,7 @@ end
 setmetatable(Buffer, {__call = new_buffer})
 
 local function escape(s, in_attribute)
-    return (s:gsub("[\\-]", {
-        ["-"] = "\\-",
-        ["\\"] = "\\\\"
-    }))
+    return (s:gsub("[\\-]", "\\%1"))
 end
 
 local toc = Buffer()
