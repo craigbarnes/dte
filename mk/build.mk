@@ -107,7 +107,7 @@ endif
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
   OPTCHECK = :
 else
-  OPTCHECK = mk/optcheck.sh
+  OPTCHECK = SILENT_BUILD='$(MAKE_S)' mk/optcheck.sh
 endif
 
 ifndef NO_DEPS
