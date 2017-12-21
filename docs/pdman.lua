@@ -116,7 +116,7 @@ function OrderedList(items)
         buffer:write(tostring(i), ". ", item, "\n.br\n")
     end
     buffer:write(".P\n")
-    return buffer:tostring()
+    return (buffer:tostring():gsub("\n\n+", "\n.\n"))
 end
 
 function CodeBlock(s, attr)
