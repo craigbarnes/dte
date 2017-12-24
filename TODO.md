@@ -14,6 +14,10 @@ TODO
 * Built-in support for `vt220` and `linux` terminals
 * Better documentation for custom color schemes
 * Add plain-text only (no regex) option for `search` and `replace` commands
+* EditorConfig support
+* Allow custom key bindings in command mode
+* Fix `left`, `right` and `delete` commands to behave correctly with
+  combining characters.
 * Add more syntax highlighting definitions
    * pkg-config
    * JSON
