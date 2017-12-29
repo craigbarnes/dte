@@ -73,16 +73,8 @@ CWARNS = \
 
 CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
 
-ifneq "$(MAKE_VERSION)" "3.81"
-  # Use "initially recursive" trick so that these variables are only
-  # expanded (at most) once per build instead of once per object file.
-  make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
-  $(call make-lazy,CWARNS)
-  $(call make-lazy,CSTD)
-else
-  $(warning Disabling optimizations to work around a bug in GNU Make 3.81)
-  $(warning Expect much slower build speeds)
-endif
+$(call make-lazy,CWARNS)
+$(call make-lazy,CSTD)
 
 BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
 
