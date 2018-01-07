@@ -2,100 +2,99 @@
 #include "common.h"
 #include "uchar.h"
 
-void string_grow(String *buf, size_t more)
+void string_grow(String *s, size_t more)
 {
-    size_t alloc = ROUND_UP(buf->len + more, 16);
+    size_t alloc = ROUND_UP(s->len + more, 16);
 
-    if (alloc > buf->alloc) {
-        buf->alloc = alloc;
-        buf->buffer = xrealloc(buf->buffer, buf->alloc);
+    if (alloc > s->alloc) {
+        s->alloc = alloc;
+        s->buffer = xrealloc(s->buffer, s->alloc);
     }
 }
 
-void string_free(String *buf)
+void string_free(String *s)
 {
-    free(buf->buffer);
-    string_init(buf);
+    free(s->buffer);
+    string_init(s);
 }
 
-void string_add_byte(String *buf, unsigned char byte)
+void string_add_byte(String *s, unsigned char byte)
 {
-    string_grow(buf, 1);
-    buf->buffer[buf->len++] = byte;
+    string_grow(s, 1);
+    s->buffer[s->len++] = byte;
 }
 
-size_t string_add_ch(String *buf, CodePoint u)
-{
-    size_t len = u_char_size(u);
-
-    string_grow(buf, len);
-    u_set_char_raw(buf->buffer, &buf->len, u);
-    return len;
-}
-
-size_t string_insert_ch(String *buf, size_t pos, CodePoint u)
+size_t string_add_ch(String *s, CodePoint u)
 {
     size_t len = u_char_size(u);
 
-    string_make_space(buf, pos, len);
-    u_set_char_raw(buf->buffer, &pos, u);
+    string_grow(s, len);
+    u_set_char_raw(s->buffer, &s->len, u);
     return len;
 }
 
-void string_add_str(String *buf, const char *str)
+size_t string_insert_ch(String *s, size_t pos, CodePoint u)
 {
-    string_add_buf(buf, str, strlen(str));
+    size_t len = u_char_size(u);
+
+    string_make_space(s, pos, len);
+    u_set_char_raw(s->buffer, &pos, u);
+    return len;
 }
 
-void string_add_buf(String *buf, const char *ptr, size_t len)
+void string_add_str(String *s, const char *str)
+{
+    string_add_buf(s, str, strlen(str));
+}
+
+void string_add_buf(String *s, const char *ptr, size_t len)
 {
     if (!len) {
         return;
     }
-    string_grow(buf, len);
-    memcpy(buf->buffer + buf->len, ptr, len);
-    buf->len += len;
+    string_grow(s, len);
+    memcpy(s->buffer + s->len, ptr, len);
+    s->len += len;
 }
 
-char *string_steal(String *buf, size_t *len)
+char *string_steal(String *s, size_t *len)
 {
-    char *b = buf->buffer;
-    *len = buf->len;
-    string_init(buf);
+    char *b = s->buffer;
+    *len = s->len;
+    string_init(s);
     return b;
 }
 
-char *string_steal_cstring(String *buf)
+char *string_steal_cstring(String *s)
 {
-    char *b;
-    string_add_byte(buf, 0);
-    b = buf->buffer;
-    string_init(buf);
+    string_add_byte(s, '\0');
+    char *b = s->buffer;
+    string_init(s);
     return b;
 }
 
-char *string_cstring(String *buf)
+char *string_cstring(String *s)
 {
-    char *b = xnew(char, buf->len + 1);
-    if (buf->len > 0) {
-        BUG_ON(!buf->buffer);
-        memcpy(b, buf->buffer, buf->len);
+    char *b = xnew(char, s->len + 1);
+    if (s->len > 0) {
+        BUG_ON(!s->buffer);
+        memcpy(b, s->buffer, s->len);
     }
-    b[buf->len] = '\0';
+    b[s->len] = '\0';
     return b;
 }
 
-void string_make_space(String *buf, size_t pos, size_t len)
+void string_make_space(String *s, size_t pos, size_t len)
 {
-    BUG_ON(pos > buf->len);
-    string_grow(buf, len);
-    memmove(buf->buffer + pos + len, buf->buffer + pos, buf->len - pos);
-    buf->len += len;
+    BUG_ON(pos > s->len);
+    string_grow(s, len);
+    memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
+    s->len += len;
 }
 
-void string_remove(String *buf, size_t pos, size_t len)
+void string_remove(String *s, size_t pos, size_t len)
 {
-    BUG_ON(pos + len > buf->len);
-    memmove(buf->buffer + pos, buf->buffer + pos + len, buf->len - pos - len);
-    buf->len -= len;
+    BUG_ON(pos + len > s->len);
+    memmove(s->buffer + pos, s->buffer + pos + len, s->len - pos - len);
+    s->len -= len;
 }
