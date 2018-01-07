@@ -4,7 +4,7 @@
 #include "editor.h"
 #include "options.h"
 #include "alias.h"
-#include "string.h"
+#include "str.h"
 #include "ptr-array.h"
 #include "tag.h"
 #include "common.h"

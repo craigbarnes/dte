@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "view.h"
 #include "change.h"
-#include "string.h"
+#include "str.h"
 #include "indent.h"
 #include "uchar.h"
 #include "regexp.h"

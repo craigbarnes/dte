@@ -3,7 +3,7 @@
 #include "key.h"
 #include "uchar.h"
 #include "ascii.h"
-#include "string.h"
+#include "str.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char *const special_names[] = {

@@ -37,7 +37,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     load-save lock main move msg normal-mode obuf options \
     parse-args parse-command path ptr-array regexp run screen \
     screen-tabbar screen-view search-mode search selection spawn state \
-    string syntax tabbar tag term-caps term uchar unicode view \
+    str syntax tabbar tag term-caps term uchar unicode view \
     wbuf window xmalloc ))
 
 ifdef WERROR

@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include "ptr-array.h"
-#include "string.h"
+#include "str.h"
 #include "key.h"
 #include "term.h"
 

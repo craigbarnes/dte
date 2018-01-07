@@ -1,7 +1,7 @@
 #include "command.h"
 #include "editor.h"
 #include "error.h"
-#include "string.h"
+#include "str.h"
 #include "ptr-array.h"
 #include "env.h"
 #include "common.h"
