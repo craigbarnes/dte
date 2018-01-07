@@ -3,12 +3,12 @@
 
 #include <stddef.h>
 #include "ptr-array.h"
-#include "strbuf.h"
+#include "string.h"
 #include "key.h"
 #include "term.h"
 
 typedef struct {
-    StringBuffer buf;
+    String buf;
     size_t pos;
     int search_pos;
     char *search_text;
@@ -21,7 +21,7 @@ enum {
 };
 
 #define CMDLINE_INIT { \
-    .buf = STRBUF_INIT, \
+    .buf = STRING_INIT, \
     .pos = 0, \
     .search_pos = -1, \
     .search_text = NULL \

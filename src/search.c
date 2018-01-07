@@ -5,7 +5,7 @@
 #include "change.h"
 #include "error.h"
 #include "edit.h"
-#include "strbuf.h"
+#include "string.h"
 #include "regexp.h"
 #include "selection.h"
 
@@ -264,7 +264,7 @@ void search_next_word(void)
 }
 
 static void build_replacement (
-    StringBuffer *buf,
+    String *buf,
     const char *line,
     const char *format,
     regmatch_t *m
@@ -279,18 +279,18 @@ static void build_replacement (
                 int n = format[i++] - '0';
                 int len = m[n].rm_eo - m[n].rm_so;
                 if (len > 0) {
-                    strbuf_add_buf(buf, line + m[n].rm_so, len);
+                    string_add_buf(buf, line + m[n].rm_so, len);
                 }
             } else {
-                strbuf_add_byte(buf, format[i++]);
+                string_add_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
             int len = m[0].rm_eo - m[0].rm_so;
             if (len > 0) {
-                strbuf_add_buf(buf, line + m[0].rm_so, len);
+                string_add_buf(buf, line + m[0].rm_so, len);
             }
         } else {
-            strbuf_add_byte(buf, ch);
+            string_add_byte(buf, ch);
         }
     }
 }
@@ -357,7 +357,7 @@ static int replace_on_line (
             // Move cursor after the matched text
             block_iter_skip_bytes(&view->cursor, match_len);
         } else {
-            StringBuffer b = STRBUF_INIT;
+            String b = STRING_INIT;
 
             build_replacement(&b, buf + pos, format, m);
 
@@ -377,7 +377,7 @@ static int replace_on_line (
 
             // Move cursor after the replaced text
             block_iter_skip_bytes(&view->cursor, b.len);
-            strbuf_free(&b);
+            string_free(&b);
         }
         *bi = view->cursor;
 

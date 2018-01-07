@@ -8,7 +8,7 @@
 static void command_line_enter(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
-    char *str = strbuf_cstring(&editor.cmdline.buf);
+    char *str = string_cstring(&editor.cmdline.buf);
     Error *err = NULL;
     bool ok;
 

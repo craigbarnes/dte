@@ -1,13 +1,13 @@
 #include "command.h"
 #include "editor.h"
 #include "error.h"
-#include "strbuf.h"
+#include "string.h"
 #include "ptr-array.h"
 #include "env.h"
 #include "common.h"
 #include "uchar.h"
 
-static StringBuffer arg = STRBUF_INIT;
+static String arg = STRING_INIT;
 
 static void parse_sq(const char *cmd, size_t *posp)
 {
@@ -21,7 +21,7 @@ static void parse_sq(const char *cmd, size_t *posp)
         if (!cmd[pos]) {
             break;
         }
-        strbuf_add_byte(&arg, cmd[pos++]);
+        string_add_byte(&arg, cmd[pos++]);
     }
     *posp = pos;
 }
@@ -38,7 +38,7 @@ static size_t unicode_escape(const char *str, size_t count)
         u = u << 4 | x;
     }
     if (u_is_unicode(u)) {
-        strbuf_add_ch(&arg, u);
+        string_add_ch(&arg, u);
     }
     return i;
 }
@@ -59,28 +59,28 @@ static void parse_dq(const char *cmd, size_t *posp)
             switch (ch) {
             case '\\':
             case '"':
-                strbuf_add_byte(&arg, ch);
+                string_add_byte(&arg, ch);
                 break;
             case 'a':
-                strbuf_add_ch(&arg, '\a');
+                string_add_ch(&arg, '\a');
                 break;
             case 'b':
-                strbuf_add_ch(&arg, '\b');
+                string_add_ch(&arg, '\b');
                 break;
             case 'f':
-                strbuf_add_ch(&arg, '\f');
+                string_add_ch(&arg, '\f');
                 break;
             case 'n':
-                strbuf_add_ch(&arg, '\n');
+                string_add_ch(&arg, '\n');
                 break;
             case 'r':
-                strbuf_add_ch(&arg, '\r');
+                string_add_ch(&arg, '\r');
                 break;
             case 't':
-                strbuf_add_ch(&arg, '\t');
+                string_add_ch(&arg, '\t');
                 break;
             case 'v':
-                strbuf_add_ch(&arg, '\v');
+                string_add_ch(&arg, '\v');
                 break;
             case 'x':
                 if (cmd[pos]) {
@@ -90,7 +90,7 @@ static void parse_dq(const char *cmd, size_t *posp)
                         x2 = hex_decode(cmd[pos]);
                         if (x2 >= 0) {
                             pos++;
-                            strbuf_add_byte(&arg, x1 << 4 | x2);
+                            string_add_byte(&arg, x1 << 4 | x2);
                         }
                     }
                 }
@@ -102,12 +102,12 @@ static void parse_dq(const char *cmd, size_t *posp)
                 pos += unicode_escape(cmd + pos, 8);
                 break;
             default:
-                strbuf_add_ch(&arg, '\\');
-                strbuf_add_byte(&arg, ch);
+                string_add_ch(&arg, '\\');
+                string_add_byte(&arg, ch);
                 break;
             }
         } else {
-            strbuf_add_byte(&arg, ch);
+            string_add_byte(&arg, ch);
         }
     }
     *posp = pos;
@@ -139,12 +139,12 @@ static void parse_var(const char *cmd, size_t *posp)
     name = xstrslice(cmd, si, ei);
     value = expand_builtin_env(name);
     if (value != NULL) {
-        strbuf_add_str(&arg, value);
+        string_add_str(&arg, value);
         free(value);
     } else {
         const char *val = getenv(name);
         if (val != NULL) {
-            strbuf_add_str(&arg, val);
+            string_add_str(&arg, val);
         }
     }
     free(name);
@@ -155,7 +155,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     size_t pos = 0;
 
     if (tilde && cmd[pos] == '~' && cmd[pos+1] == '/') {
-        strbuf_add_str(&arg, editor.home_dir);
+        string_add_str(&arg, editor.home_dir);
         pos++;
     }
 
@@ -177,12 +177,12 @@ char *parse_command_arg(const char *cmd, bool tilde)
             if (!cmd[pos]) {
                 break;
             }
-            strbuf_add_byte(&arg, cmd[pos++]);
+            string_add_byte(&arg, cmd[pos++]);
         } else {
-            strbuf_add_byte(&arg, ch);
+            string_add_byte(&arg, ch);
         }
     }
-    return strbuf_steal_cstring(&arg);
+    return string_steal_cstring(&arg);
 }
 
 size_t find_end(const char *cmd, size_t pos, Error **err)

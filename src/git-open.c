@@ -122,7 +122,7 @@ static const char *selected_file(void)
 
 static void git_open_filter(void)
 {
-    char *str = strbuf_cstring(&editor.cmdline.buf);
+    char *str = string_cstring(&editor.cmdline.buf);
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
     bool (*match)(const char *, PointerArray *) = words_match_icase;

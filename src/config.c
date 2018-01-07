@@ -1,6 +1,6 @@
 #include "config.h"
 #include "error.h"
-#include "strbuf.h"
+#include "string.h"
 #include "common.h"
 #include "completion.h"
 #include "../build/builtin-config.h"
@@ -52,7 +52,7 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
     char *cmd;
-    StringBuffer line = STRBUF_INIT;
+    String line = STRING_INIT;
 
     while (ptr < buf + size) {
         size_t n = buf + size - ptr;
@@ -64,24 +64,24 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 
         if (line.len || is_command(ptr, n)) {
             if (has_line_continuation(ptr, n)) {
-                strbuf_add_buf(&line, ptr, n - 1);
+                string_add_buf(&line, ptr, n - 1);
             } else {
-                strbuf_add_buf(&line, ptr, n);
-                cmd = strbuf_cstring(&line);
+                string_add_buf(&line, ptr, n);
+                cmd = string_cstring(&line);
                 handle_command(cmds, cmd);
                 free(cmd);
-                strbuf_clear(&line);
+                string_clear(&line);
             }
         }
         config_line++;
         ptr += n + 1;
     }
     if (line.len) {
-        cmd = strbuf_cstring(&line);
+        cmd = string_cstring(&line);
         handle_command(cmds, cmd);
         free(cmd);
     }
-    strbuf_free(&line);
+    string_free(&line);
 }
 
 void list_builtin_configs(void)

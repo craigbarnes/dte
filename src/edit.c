@@ -3,14 +3,14 @@
 #include "buffer.h"
 #include "view.h"
 #include "change.h"
-#include "strbuf.h"
+#include "string.h"
 #include "indent.h"
 #include "uchar.h"
 #include "regexp.h"
 #include "selection.h"
 
 typedef struct {
-    StringBuffer buf;
+    String buf;
     char *indent;
     int indent_len;
     int indent_width;
@@ -703,19 +703,19 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     }
 
     if (pf->cur_width && pf->cur_width + 1 + word_width > pf->text_width) {
-        strbuf_add_ch(&pf->buf, '\n');
+        string_add_ch(&pf->buf, '\n');
         pf->cur_width = 0;
     }
 
     if (pf->cur_width == 0) {
-        strbuf_add_buf(&pf->buf, pf->indent, pf->indent_len);
+        string_add_buf(&pf->buf, pf->indent, pf->indent_len);
         pf->cur_width = pf->indent_width;
     } else {
-        strbuf_add_ch(&pf->buf, ' ');
+        string_add_ch(&pf->buf, ' ');
         pf->cur_width++;
     }
 
-    strbuf_add_buf(&pf->buf, word, len);
+    string_add_buf(&pf->buf, word, len);
     pf->cur_width += word_width;
 }
 
@@ -800,7 +800,7 @@ void format_paragraph(int text_width)
     sel = block_iter_get_bytes(&view->cursor, len);
     indent_width = get_indent_width(sel, len);
 
-    strbuf_init(&pf.buf);
+    string_init(&pf.buf);
     pf.indent = make_indent(indent_width);
     pf.indent_len = pf.indent ? strlen(pf.indent) : 0;
     pf.indent_width = indent_width;
@@ -835,13 +835,13 @@ void format_paragraph(int text_width)
     }
 
     if (pf.buf.len) {
-        strbuf_add_ch(&pf.buf, '\n');
+        string_add_ch(&pf.buf, '\n');
     }
     buffer_replace_bytes(len, pf.buf.buffer, pf.buf.len);
     if (pf.buf.len) {
         block_iter_skip_bytes(&view->cursor, pf.buf.len - 1);
     }
-    strbuf_free(&pf.buf);
+    string_free(&pf.buf);
     free(pf.indent);
     free(sel);
 
@@ -854,7 +854,7 @@ void change_case(int mode)
     bool move = true;
     size_t text_len, i;
     char *src;
-    StringBuffer dst = STRBUF_INIT;
+    String dst = STRING_INIT;
 
     if (view->selection) {
         SelectionInfo info;
@@ -895,7 +895,7 @@ void change_case(int mode)
             u = towupper(u);
             break;
         }
-        strbuf_add_ch(&dst, u);
+        string_add_ch(&dst, u);
     }
 
     buffer_replace_bytes(text_len, dst.buffer, dst.len);
@@ -912,5 +912,5 @@ void change_case(int mode)
         }
     }
 
-    strbuf_free(&dst);
+    string_free(&dst);
 }

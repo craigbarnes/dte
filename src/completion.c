@@ -4,7 +4,7 @@
 #include "editor.h"
 #include "options.h"
 #include "alias.h"
-#include "strbuf.h"
+#include "string.h"
 #include "ptr-array.h"
 #include "tag.h"
 #include "common.h"
@@ -89,7 +89,7 @@ static void do_collect_files (
     const struct dirent *de;
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
-        StringBuffer buf = STRBUF_INIT;
+        String buf = STRING_INIT;
         struct stat st;
         size_t len;
         bool is_dir;
@@ -125,16 +125,16 @@ static void do_collect_files (
         }
 
         if (dirprefix[0]) {
-            strbuf_add_str(&buf, dirprefix);
+            string_add_str(&buf, dirprefix);
             if (!str_has_suffix(dirprefix, "/")) {
-                strbuf_add_byte(&buf, '/');
+                string_add_byte(&buf, '/');
             }
         }
-        strbuf_add_str(&buf, name);
+        string_add_str(&buf, name);
         if (is_dir) {
-            strbuf_add_byte(&buf, '/');
+            string_add_byte(&buf, '/');
         }
-        add_completion(strbuf_steal_cstring(&buf));
+        add_completion(string_steal_cstring(&buf));
     }
     closedir(dir);
 }
@@ -287,7 +287,7 @@ static void collect_completions(char **args, int argc)
 
 static void init_completion(void)
 {
-    char *cmd = strbuf_cstring(&editor.cmdline.buf);
+    char *cmd = string_cstring(&editor.cmdline.buf);
     const char *str;
     PointerArray array = PTR_ARRAY_INIT;
     int semicolon = -1;
@@ -401,14 +401,14 @@ static void init_completion(void)
 
 static char *escape(const char *str)
 {
-    StringBuffer buf = STRBUF_INIT;
+    String buf = STRING_INIT;
 
     if (!str[0]) {
         return xstrdup("\"\"");
     }
 
     if (str[0] == '~' && !completion.tilde_expanded) {
-        strbuf_add_ch(&buf, '\\');
+        string_add_ch(&buf, '\\');
     }
 
     for (size_t i = 0; str[i]; i++) {
@@ -424,15 +424,15 @@ static char *escape(const char *str)
         case '[':
         case '\\':
         case '{':
-            strbuf_add_ch(&buf, '\\');
-            strbuf_add_byte(&buf, ch);
+            string_add_ch(&buf, '\\');
+            string_add_byte(&buf, ch);
             break;
         default:
-            strbuf_add_byte(&buf, ch);
+            string_add_byte(&buf, ch);
             break;
         }
     }
-    return strbuf_steal_cstring(&buf);
+    return string_steal_cstring(&buf);
 }
 
 void complete_command(void)

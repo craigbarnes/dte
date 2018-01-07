@@ -3,7 +3,7 @@
 #include "key.h"
 #include "uchar.h"
 #include "ascii.h"
-#include "strbuf.h"
+#include "string.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char *const special_names[] = {
@@ -111,41 +111,41 @@ bool parse_key(Key *key, const char *str)
 
 char *key_to_string(Key key)
 {
-    StringBuffer buf = STRBUF_INIT;
+    String buf = STRING_INIT;
 
     if (key & MOD_CTRL) {
-        strbuf_add_str(&buf, "C-");
+        string_add_str(&buf, "C-");
     }
     if (key & MOD_META) {
-        strbuf_add_str(&buf, "M-");
+        string_add_str(&buf, "M-");
     }
     if (key & MOD_SHIFT) {
-        strbuf_add_str(&buf, "S-");
+        string_add_str(&buf, "S-");
     }
     key = key & ~MOD_MASK;
     if (u_is_unicode(key)) {
         switch (key) {
         case '\t':
-            strbuf_add_str(&buf, "tab");
+            string_add_str(&buf, "tab");
             break;
         case KEY_ENTER:
-            strbuf_add_str(&buf, "enter");
+            string_add_str(&buf, "enter");
             break;
         case ' ':
-            strbuf_add_str(&buf, "space");
+            string_add_str(&buf, "space");
             break;
         default:
             // <0x20 or 0x7f shouldn't be possible
-            strbuf_add_ch(&buf, key);
+            string_add_ch(&buf, key);
         }
     } else if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        strbuf_add_str(&buf, special_names[key - KEY_SPECIAL_MIN]);
+        string_add_str(&buf, special_names[key - KEY_SPECIAL_MIN]);
     } else if (key == KEY_PASTE) {
-        strbuf_add_str(&buf, "paste");
+        string_add_str(&buf, "paste");
     } else {
-        strbuf_add_str(&buf, "???");
+        string_add_str(&buf, "???");
     }
-    return strbuf_steal_cstring(&buf);
+    return string_steal_cstring(&buf);
 }
 
 bool key_to_ctrl(Key key, unsigned char *byte)
