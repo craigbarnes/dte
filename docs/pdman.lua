@@ -92,8 +92,9 @@ end
 function DefinitionList(items)
     local buffer = Buffer()
     for i, item in ipairs(items) do
-        local term = assert(item[1])
-        local definitions = assert(item[2])
+        local term, definitions = next(item)
+        assert(type(term) == "string")
+        assert(type(definitions) == "table")
         assert(#definitions == 1)
         local definition = assert(definitions[1])
         buffer:write(".TP\n", term, "\n", definition, "\n.PP\n")
