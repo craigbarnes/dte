@@ -2,7 +2,7 @@
 #include "common.h"
 #include "uchar.h"
 
-void string_grow(String *s, size_t more)
+static void string_grow(String *s, size_t more)
 {
     size_t alloc = ROUND_UP(s->len + more, 16);
 
@@ -73,7 +73,7 @@ char *string_steal_cstring(String *s)
     return b;
 }
 
-char *string_cstring(String *s)
+char *string_cstring(const String *s)
 {
     char *b = xnew(char, s->len + 1);
     if (s->len > 0) {
