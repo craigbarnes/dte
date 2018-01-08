@@ -284,29 +284,6 @@ char *short_filename(const char *absolute)
     return xstrdup(absolute);
 }
 
-char *filename_to_utf8(const char *filename)
-{
-    struct cconv *c = cconv_to_utf8(editor.charset);
-    const unsigned char *buf;
-    size_t len;
-    char *str;
-
-    if (c == NULL) {
-        d_print (
-            "iconv_open() using charset %s failed: %s\n",
-            editor.charset,
-            strerror(errno)
-        );
-        return xstrdup(filename);
-    }
-    cconv_process(c, filename, strlen(filename));
-    cconv_flush(c);
-    buf = cconv_consume_all(c, &len);
-    str = xstrslice(buf, 0, len);
-    cconv_free(c);
-    return str;
-}
-
 char *path_dirname(const char *filename)
 {
     char *slash = strrchr(filename, '/');
