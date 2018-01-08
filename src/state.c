@@ -473,13 +473,16 @@ static void cmd_syntax(const char* UNUSED(pf), char **args)
     saved_nr_errors = nr_errors;
 }
 
+static void cmd_include(const char *pf, char **args);
+
 static const Command syntax_commands[] = {
     {"bufis", "i", 2,  3, cmd_bufis},
     {"char", "bn", 2,  3, cmd_char},
     {"default", "", 2, -1, cmd_default},
+    {"eat", "", 1,  2, cmd_eat},
     {"heredocbegin","", 2,  2, cmd_heredocbegin},
     {"heredocend", "", 1,  2, cmd_heredocend},
-    {"eat", "", 1,  2, cmd_eat},
+    {"include", "b", 1,  1, cmd_include},
     {"inlist", "", 2,  3, cmd_inlist},
     {"list", "i", 2, -1, cmd_list},
     {"noeat", "b", 1,  1, cmd_noeat},
@@ -489,6 +492,15 @@ static const Command syntax_commands[] = {
     {"syntax", "", 1,  1, cmd_syntax},
     {NULL, NULL, 0,  0, NULL}
 };
+
+static void cmd_include(const char *pf, char **args)
+{
+    ConfigFlags flags = CFG_MUST_EXIST;
+    if (*pf == 'b') {
+        flags |= CFG_BUILTIN;
+    }
+    read_config(syntax_commands, args[0], flags);
+}
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 {

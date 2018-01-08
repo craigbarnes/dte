@@ -9,7 +9,6 @@ TODO
 * Continuous testing for BSDs
 * Reproducible way to re-generate Unicode tables in `src/unicode.c`
 * Improve automatic encoding detection
-* Add `include` command for syntax files (to allow reusable mixins)
 * Contextual help bar for command mode
 * Built-in support for `vt220` and `linux` terminals
 * Better documentation for custom color schemes
