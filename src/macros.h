@@ -86,7 +86,7 @@
     #define static_assert(x)
 #endif
 
-// This macro supresses warnings about dicarded const qualifiers
+// This macro suppresses warnings about dicarded const qualifiers
 // It's only defined for Clang, since GCC is lacking the following
 // features required for an acceptable implementation:
 //

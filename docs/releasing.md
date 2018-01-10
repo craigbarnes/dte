@@ -14,7 +14,7 @@ dte Release Checklist
 2. Tag and upload
    1. `git tag -s -m "Release v${VER}" v${VER} ${COMMIT}`
    2. `make dist`
-   3. Upload tarball, sha256sum and detatched GPG signature to GitLab pages
+   3. Upload tarball, sha256sum and detached GPG signature to GitLab pages
    4. Wait for GitLab pages job to finish
    5. Check tarball link in `README.md` works
    6. Push tag to remotes

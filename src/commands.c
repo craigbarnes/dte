@@ -1059,7 +1059,7 @@ static void cmd_save(const char *pf, char **args)
 
     if (absolute != buffer->abs_filename) {
         if (buffer->locked) {
-            // Filename changes, relase old file lock
+            // Filename changes, release old file lock
             unlock_file(buffer->abs_filename);
         }
         buffer->locked = new_locked;

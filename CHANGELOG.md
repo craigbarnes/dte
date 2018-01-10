@@ -88,7 +88,7 @@ Released on 2017-08-27.
 * Added support for binding Ctrl+Alt+Shift+arrows in xterm/screen/tmux.
 * Added support for binding Ctrl+delete/Shift+delete in xterm/screen/tmux.
 * Added the ability to override the default user config directory via
-  the `DTE_HOME` enviornment variable.
+  the `DTE_HOME` environment variable.
 * Added syntax highlighting for the Markdown, Meson and Ruby languages.
 * Improved syntax highlighting for the C, awk and HTML languages.
 * Fixed a bug with the `close -wq` command when using split frames

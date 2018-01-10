@@ -547,7 +547,7 @@ list -i value \
     list-item lower-alpha lower-greek lower-latin lower-roman lowercase \
     ltr marker medium middle move n-resize narrower ne-resize no-repeat \
     none normal nowrap nw-resize oblique outset outside overline pointer \
-    potrait pre relative repeat repeat-x repeat-y ridge right rtl run-in \
+    portrait pre relative repeat repeat-x repeat-y ridge right rtl run-in \
     s-resize scroll se-resize semi-condensed semi-expanded separate show \
     small small-caps smaller solid square static sub super sw-resize \
     table table-caption table-cell table-column table-column-group \
