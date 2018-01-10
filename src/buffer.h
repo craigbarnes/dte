@@ -13,7 +13,7 @@
 #include "syntax.h"
 #include "editor.h"
 
-typedef struct buffer {
+typedef struct Buffer {
     ListHead blocks;
     Change change_head;
     Change *cur_change;
@@ -55,7 +55,7 @@ typedef struct buffer {
 } Buffer;
 
 // buffer = view->buffer = window->view->buffer
-extern struct view *view;
+extern struct View *view;
 extern Buffer *buffer;
 extern PointerArray buffers;
 

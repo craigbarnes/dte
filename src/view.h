@@ -10,9 +10,9 @@ enum selection {
     SELECT_LINES,
 };
 
-typedef struct view {
-    struct buffer *buffer;
-    struct window *window;
+typedef struct View {
+    struct Buffer *buffer;
+    struct Window *window;
 
     BlockIter cursor;
 

@@ -16,9 +16,9 @@ typedef struct {
     int line, column;
 } FileLocation;
 
-struct view;
+struct View;
 
-FileLocation *create_file_location(const struct view *v);
+FileLocation *create_file_location(const struct View *v);
 void file_location_free(FileLocation *loc);
 bool file_location_equals(const FileLocation *a, const FileLocation *b);
 bool file_location_go(const FileLocation *loc);

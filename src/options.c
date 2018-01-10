@@ -17,7 +17,7 @@ typedef enum {
 } OptionType;
 
 typedef struct {
-    const struct option_ops *ops;
+    const struct OptionOps *ops;
     const char *name;
     unsigned int offset;
     bool local;
@@ -49,13 +49,13 @@ typedef union  {
     int int_val;
 } OptionValue;
 
-struct option_ops {
+typedef struct OptionOps {
     OptionValue (*get)(const OptionDesc *desc, void *ptr);
     void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
     bool (*parse)(const OptionDesc *desc, const char *str, OptionValue *value);
     char *(*string)(const OptionDesc *desc, OptionValue value);
     bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
-};
+} OptionOps;
 
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
     .ops = &option_ops[OPT_STR], \
@@ -361,7 +361,7 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
     return xstrdup(buf);
 }
 
-static const struct option_ops option_ops[] = {
+static const OptionOps option_ops[] = {
     {str_get, str_set, str_parse, str_string, str_equals},
     {int_get, int_set, int_parse, int_string, int_equals},
     {int_get, int_set, enum_parse, enum_string, int_equals},

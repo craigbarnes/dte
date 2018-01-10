@@ -4,12 +4,12 @@
 #include <sys/types.h>
 #include <stdbool.h>
 
-typedef struct file_decoder {
+typedef struct FileDecoder {
     char *encoding;
     const unsigned char *ibuf;
     ssize_t ipos, isize;
     struct cconv *cconv;
-    bool (*read_line)(struct file_decoder *dec, char **linep, ssize_t *lenp);
+    bool (*read_line)(struct FileDecoder *dec, char **linep, ssize_t *lenp);
 } FileDecoder;
 
 FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, ssize_t size);

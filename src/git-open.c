@@ -10,7 +10,7 @@
 #include "uchar.h"
 #include "error.h"
 
-struct git_open git_open;
+GitOpenState git_open;
 
 static void git_open_clear(void)
 {

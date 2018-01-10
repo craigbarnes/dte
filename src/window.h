@@ -5,7 +5,7 @@
 #include "frame.h"
 #include "view.h"
 
-typedef struct window {
+typedef struct Window {
     PointerArray views;
     Frame *frame;
 
