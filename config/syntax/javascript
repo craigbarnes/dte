@@ -47,9 +47,9 @@ state regexp
     char "[" regexp-char-list-start
     char "{" regexp-range
     char "/" regexp-flags regexp
-    char "^$|()?:*+." regexp regexp-special
+    char "^$|()?:*+." this regexp-special
     char "\n" END error
-    eat regexp
+    eat this
 
 state regexp-esc regexp-special
     char "\n" END error
@@ -62,31 +62,31 @@ state regexp-char-list-start regexp-special
     eat regexp-char-list
 
 state regexp-char-list regexp
-    char "-" regexp-char-list regexp-special
+    char "-" this regexp-special
     char "\\" regexp-char-list-esc
     char \] regexp regexp-special
     char "\n" END error
-    eat regexp-char-list
+    eat this
 
 state regexp-char-list-esc regexp-special
     char "\n" END error
     eat regexp-char-list regexp-special
 
 state regexp-range regexp-special
-    char "0-9" regexp-range regexp
+    char "0-9" this regexp
     char "," regexp-range-second
     char "}" regexp regexp-special
     char "\n" END error
-    eat regexp-range error
+    eat this error
 
 state regexp-range-second regexp-special
-    char "0-9" regexp-range-second regexp
+    char "0-9" this regexp
     char "}" regexp regexp-special
     char "\n" END error
-    eat regexp-range-second error
+    eat this error
 
 state regexp-flags regexp-special
-    char gimuy regexp-flags
+    char gimuy this
     noeat END
 
 syntax javascript
@@ -106,7 +106,7 @@ state code
     char \' sq
     char \" dq
     char "(;:,=*/%&|!?+-" foo
-    eat code
+    eat this
 
 # who knows where regexps are allowed?
 state foo code
@@ -122,13 +122,13 @@ state zero numeric
     noeat check-suffix
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exp
     char . float
     noeat check-suffix
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat check-suffix
 
 state dot numeric
@@ -137,7 +137,7 @@ state dot numeric
     noeat code
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exp
     noeat check-suffix
 
@@ -147,15 +147,15 @@ state exp numeric
     noeat check-suffix
 
 state exp-digit numeric
-    char 0-9 exp-digit
+    char 0-9 this
     noeat check-suffix
 
 state check-suffix error
-    char a-zA-Z0-9_ check-suffix
+    char a-zA-Z0-9_ this
     noeat code
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_ this
     inlist keyword code
     inlist reserved code keyword
     inlist type code
@@ -171,23 +171,23 @@ state ident
 
 state line-comment comment
     char "\n" code
-    eat line-comment
+    eat this
 
 state long-comment comment
     str "*/" code comment
-    eat long-comment
+    eat this
 
 state sq string
     char \' code string
     char "\n" code
     char "\\" .js-esc:sq
-    eat sq
+    eat this
 
 state dq string
     char \" code string
     char "\n" code
     char "\\" .js-esc:dq
-    eat dq
+    eat this
 
 list keyword \
     break case catch continue debugger default delete do else finally for \

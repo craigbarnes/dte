@@ -36,7 +36,7 @@ state string
     char "\"" END string
     char "\n" END error
     char "\\" .d-esc:string
-    eat string
+    eat this
 
 syntax .d-char
 
@@ -53,7 +53,7 @@ syntax .d-long-comment
 
 state comment
     char "*" star
-    eat comment
+    eat this
 
 state star comment
     char / END comment
@@ -64,7 +64,7 @@ syntax .d-line-comment
 state comment
     char "\n" END
     char \\ backslash
-    eat comment
+    eat this
 
 state backslash comment
     # Multi-line comment?
@@ -92,7 +92,7 @@ state code code
     char ';' semicolon
     str "/*" .d-long-comment:code
     str "//" .d-line-comment:start
-    eat code
+    eat this
 
 state semicolon code
     char " \t" semicolon
@@ -100,7 +100,7 @@ state semicolon code
     noeat code
 
 state ident-label ident
-    char -b a-zA-Z0-9_ ident-label
+    char -b a-zA-Z0-9_ this
     char -b : label
     noeat -b ident
 
@@ -109,7 +109,7 @@ state label
     noeat code
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_ this
     inlist keyword code
     inlist deprecated-keyword code error
     inlist constant code
@@ -124,7 +124,7 @@ state ident-upper ident
 
 state class-name
     recolor class-name
-    char a-zA-Z0-9_ class-name
+    char a-zA-Z0-9_ this
     noeat code
 
 state ident-upper-label ident
@@ -134,7 +134,7 @@ state ident-upper-label ident
     noeat code
 
 state class-name-label class-name
-    char -b a-zA-Z0-9_ class-name-label
+    char -b a-zA-Z0-9_ this
     char -b : label
     noeat -b class-name
 
@@ -145,17 +145,17 @@ state zero numeric
     noeat code
 
 state oct numeric
-    char 0-7 oct
+    char 0-7 this
     noeat code
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exp
     char . float
     noeat code
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat code
 
 state dot numeric
@@ -164,7 +164,7 @@ state dot numeric
     noeat code
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exp
     char fFlL float-suffix
     char a-zA-Z0-9_ error-ident
@@ -181,12 +181,12 @@ state exp numeric
     noeat code
 
 state exp-digit numeric
-    char 0-9 exp-digit
+    char 0-9 this
     char a-zA-Z0-9_ error-ident
     noeat code
 
 state error-ident error
-    char a-zA-Z0-9_ error-ident
+    char a-zA-Z0-9_ this
     noeat code
 
 list keyword \

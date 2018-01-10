@@ -37,36 +37,36 @@ state start code
     char 1-9 dec
     char . dot
     char " \t\f\r\n" whitespace
-    eat start
+    eat this
 
 state comment
     char "\n" start
-    eat comment
+    eat this
 
 state longdq string
     str '"""' start string
     char -b "\\" .python-esc:longdq
-    eat longdq
+    eat this
 
 state longsq string
     str "'''" start string
     char -b "\\" .python-esc:longsq
-    eat longsq
+    eat this
 
 state dq string
     char "\"" start string
     char "\n" start
     char -b "\\" .python-esc:dq
-    eat dq
+    eat this
 
 state sq string
     char "'" start string
     char "\n" start
     char -b "\\" .python-esc:sq
-    eat sq
+    eat this
 
 state ident
-    char -b a-zA-Z_0-9 ident
+    char -b a-zA-Z_0-9 this
     inlist keyword start
     inlist constant start
     noeat start
@@ -81,28 +81,28 @@ state zero numeric
     noeat int-suffix
 
 state bin numeric
-    char 01 bin
+    char 01 this
     noeat int-suffix
 
 state oct numeric
-    char 0-7 oct
+    char 0-7 this
     noeat int-suffix
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exponent
     char . float
     noeat int-suffix
 
 state dec-zero numeric
-    char 0 dec-zero
+    char 0 this
     char eE exponent
     char . float
     # TODO: digits 1-9 are allowed here but only if the number becomes a float
     noeat int-suffix
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat int-suffix
 
 state int-suffix code
@@ -112,11 +112,11 @@ state int-suffix code
     noeat int-end
 
 state int-end error
-    char a-zA-Z0-9_ int-end
+    char a-zA-Z0-9_ this
     noeat start
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exponent
     noeat float-suffix
 
@@ -132,7 +132,7 @@ state exponent-sign numeric
     noeat float-end
 
 state exponent-digit numeric
-    char 0-9 exponent-digit
+    char 0-9 this
     noeat float-suffix
 
 state float-suffix code
@@ -140,7 +140,7 @@ state float-suffix code
     noeat int-end
 
 state float-end error
-    char a-zA-Z_ float-end
+    char a-zA-Z_ this
     noeat start
 
 state whitespace
@@ -157,7 +157,7 @@ state dot-float numeric
     noeat float
 
 state dot code
-    char 0-9 dot error
+    char 0-9 this error
     noeat start
 
 list keyword \

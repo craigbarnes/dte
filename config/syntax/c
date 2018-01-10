@@ -40,7 +40,7 @@ state string
     # Avoid highlighting rest of the file again
     char "\n" END error
     char "\\" .c-esc:string
-    eat string
+    eat this
 
 syntax .c-char
 
@@ -57,7 +57,7 @@ syntax .c-comment
 
 state comment
     char "*" star
-    eat comment
+    eat this
 
 state star comment
     char / END comment
@@ -68,7 +68,7 @@ syntax .cpp-comment
 state comment
     char "\n" END
     char \\ backslash
-    eat comment
+    eat this
 
 state backslash comment
     # Multi-line comment?
@@ -90,7 +90,7 @@ state preproc
     noeat preproc-misc
 
 state preproc-ident preproc
-    char -b a-zA-Z0-9_ preproc-ident
+    char -b a-zA-Z0-9_ this
     bufis "include" preproc-include
     inlist preproccond preproccond
     noeat preproc-misc
@@ -107,7 +107,7 @@ state preproc-misc preproc
     char \' .c-char:preproc-misc
     str "/*" .c-comment:preproc-misc
     str "//" .cpp-comment:start
-    eat preproc-misc
+    eat this
 
 state preproc-include preproc
     char " \t" preproc-include
@@ -125,12 +125,12 @@ state preproc-cont preproc
 state local-include string
     char '"' end-include string
     char "\n" start
-    eat local-include
+    eat this
 
 state system-include string
     char '>' end-include string
     char "\n" start
-    eat system-include
+    eat this
 
 state end-include preproc
     char "\n" start
@@ -141,7 +141,7 @@ state end-include preproc
 
 state preproc-error error
     char "\n" start
-    eat preproc-error
+    eat this
 
 state c code
     char -b a-z_ ident
@@ -155,7 +155,7 @@ state c code
     char ';' semicolon
     str "/*" .c-comment:c
     str "//" .cpp-comment:start
-    eat c
+    eat this
 
 state semicolon code
     char " \t" semicolon
@@ -163,7 +163,7 @@ state semicolon code
     noeat c
 
 state ident-label ident
-    char -b a-zA-Z0-9_ ident-label
+    char -b a-zA-Z0-9_ this
     char -b : label
     noeat -b ident
 
@@ -172,7 +172,7 @@ state label
     noeat c
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_ this
     inlist keyword c
     inlist c11-keyword c
     inlist type c
@@ -187,7 +187,7 @@ state ident-upper ident
 
 state class-name
     recolor class-name
-    char a-zA-Z0-9_ class-name
+    char a-zA-Z0-9_ this
     noeat c
 
 state ident-upper-label ident
@@ -197,7 +197,7 @@ state ident-upper-label ident
     noeat c
 
 state class-name-label class-name
-    char -b a-zA-Z0-9_ class-name-label
+    char -b a-zA-Z0-9_ this
     char -b : label
     noeat -b class-name
 
@@ -208,21 +208,21 @@ state zero numeric
     noeat check-suffix
 
 state oct numeric
-    char 0-7 oct
+    char 0-7 this
     noeat check-suffix
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exp
     char . float
     noeat check-suffix
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat check-suffix
 
 state check-suffix error
-    char -b a-zA-Z0-9_ check-suffix
+    char -b a-zA-Z0-9_ this
     inlist numeric-suffix c numeric
     noeat c
 
@@ -232,7 +232,7 @@ state dot numeric
     noeat c
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exp
     char fFlL float-suffix
     char a-zA-Z0-9_ error-ident
@@ -249,12 +249,12 @@ state exp numeric
     noeat c
 
 state exp-digit numeric
-    char 0-9 exp-digit
+    char 0-9 this
     char a-zA-Z0-9_ error-ident
     noeat c
 
 state error-ident error
-    char a-zA-Z0-9_ error-ident
+    char a-zA-Z0-9_ this
     noeat c
 
 list keyword \

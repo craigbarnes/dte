@@ -8,25 +8,25 @@ state start
     char -b a-zA-Z ident
     char # comment
     char -n " \t\n" bad
-    eat start
+    eat this
 
 state ident
-    char -b a-zA-Z ident
+    char -b a-zA-Z this
     char -bn " \t\n" bad error
     inlist instruction arguments keyword
     noeat -b bad
 
 state arguments
-    str "\\\n" arguments
+    str "\\\n" this
     char "\n" start
-    eat arguments
+    eat this
 
 state comment
     char "\n" start
-    eat comment
+    eat this
 
 state bad error
     recolor error
     char " \t" arguments
     char "\n" start
-    eat bad
+    eat this

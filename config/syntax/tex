@@ -6,7 +6,7 @@ syntax tex
 state text
     char \\ backslash
     char % comment
-    eat text
+    eat this
 
 state backslash macro
     char A-Za-z macro
@@ -14,7 +14,7 @@ state backslash macro
     eat text error
 
 state macro
-    char A-Za-z macro
+    char A-Za-z this
     noeat text
 
 state escape
@@ -23,4 +23,4 @@ state escape
 
 state comment
     char "\n" text
-    eat comment
+    eat this

@@ -2,7 +2,7 @@ syntax .css-comment
 
 state comment
     char "*" star
-    eat comment
+    eat this
 
 state star comment
     char / END comment
@@ -13,7 +13,7 @@ syntax .css-statementerror
 
 state error
     char ";\n" END code
-    eat error
+    eat this
 
 # Eat erroneous selector; stop at whitespace or {
 syntax .css-selectorerror
@@ -59,7 +59,7 @@ state string
     char \" END string
     char \\ esc
     char "\n" END error
-    eat string
+    eat this
 
 state esc special
     # \\ + \n -> continue to next line
@@ -74,7 +74,7 @@ state string
     char \' END string
     char \\ esc
     char "\n" END error
-    eat string
+    eat this
 
 state esc special
     # \\ + \n -> continue to next line
@@ -85,7 +85,7 @@ state esc special
 syntax .css-ident
 
 state ident
-    char "a-zA-Z0-9\xa1-\xff_-" ident
+    char "a-zA-Z0-9\xa1-\xff_-" this
     noeat END
 
 # Attribute selector [x=y], [x|=y], [x~=y]
@@ -96,7 +96,7 @@ state attributeselector code
     noeat close
 
 state attribute
-    char -b a-zA-Z attribute
+    char -b a-zA-Z this
     char "|~" op
     char = value code
     noeat close
@@ -126,7 +126,7 @@ state url
 state plain code
     char ) END url
     char "\n" END error
-    eat plain
+    eat this
 
 state close
     char ) END url
@@ -141,7 +141,7 @@ state list code
     noeat END
 
 state name code
-    char -b a-zA-Z0-9_ name
+    char -b a-zA-Z0-9_ this
     inlist mediatype next
     noeat next
 
@@ -194,7 +194,7 @@ state arg1 code
     noeat arg2
 
 state prefix code
-    char a-zA-Z0-9- prefix
+    char a-zA-Z0-9- this
     char "\t\n " arg2
     noeat error
 
@@ -240,16 +240,16 @@ state start code
     char 0-9_- .css-selectorerror:start
     str "/*" .css-comment:start
     char -b @ atrule
-    eat start
+    eat this
 
 state maybe-element
-    char -b a-zA-Z0-9 maybe-element
+    char -b a-zA-Z0-9 this
     inlist element start tag
     char _- .css-selectorerror:start
     noeat start
 
 state pseudo code
-    char -b a-zA-Z0-9:- pseudo
+    char -b a-zA-Z0-9:- this
     inlist pseudoclass start
     inlist exprpseudo nth pseudoclass
     inlist pseudoelement start
@@ -270,25 +270,25 @@ state nth
     eat .css-selectorerror:start
 
 state nthexpr expr
-    char a-z0-9+- nthexpr
+    char a-z0-9+- this
     char ) start expr
     eat .css-selectorerror:start
 
 state complexexpr expr
     char ) start expr
-    char -n "\n" complexexpr
+    char -n "\n" this
     noeat start
 
 state class
-    char a-zA-Z0-9_- class
+    char a-zA-Z0-9_- this
     noeat start
 
 state id
-    char a-zA-Z0-9_- id
+    char a-zA-Z0-9_- this
     noeat start
 
 state atrule code
-    char -b a-zA-Z0-9_- atrule
+    char -b a-zA-Z0-9_- this
     # Selectors
     inlist atkeyword start
     # @import { URI | string } [ media type, ...];
@@ -313,10 +313,10 @@ state block code
     char 0-9_- property-error
     char } start
     str "/*" .css-comment:block
-    eat block
+    eat this
 
 state property code
-    char -b a-zA-Z- property
+    char -b a-zA-Z- this
     char 0-9_ property-error
     inlist property property-end
     inlist fontfaceproperty property-end property
@@ -342,7 +342,7 @@ state values code
     char -b a-zA-Z_ value
     char } start
     str "/*" .css-comment:values
-    eat values
+    eat this
 
 state minus numeric
     char 0-9 int
@@ -350,25 +350,25 @@ state minus numeric
     noeat values
 
 state int numeric
-    char 0-9 int
+    char 0-9 this
     char . float
     char -b a-zA-Z% unit
     noeat values
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char -b a-zA-Z% unit
     noeat values
 
 state unit error
-    char -b a-zA-Z% unit
+    char -b a-zA-Z% this
     inlist unit values numeric
     char ";" block
     char } start
     eat value-error
 
 state value code
-    char -b a-zA-Z0-9_- value
+    char -b a-zA-Z0-9_- this
     inlist value values
     inlist color values
     inlist func func value
@@ -376,7 +376,7 @@ state value code
 
 # FIXME: length must be 3 or 6
 state hexcolor color
-    char 0-9a-fA-F hexcolor
+    char 0-9a-fA-F this
     char g-zG-Z_- value-error
     noeat values
 
@@ -389,14 +389,14 @@ state params code
     char ) values
     char ";" block
     char } start
-    eat params
+    eat this
 
 state property-error error
-    char a-zA-Z0-9_- property-error
+    char a-zA-Z0-9_- this
     noeat property
 
 state value-error error
-    char a-zA-Z0-9_- value-error
+    char a-zA-Z0-9_- this
     noeat values
 
 list -i element \

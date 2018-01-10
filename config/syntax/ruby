@@ -47,10 +47,10 @@ state start code
     char \$ global-variable
     char -b @ maybe-instance-variable
     char -b : maybe-symbol
-    eat start
+    eat this
 
 state global-variable
-    char a-zA-Z0-9_- global-variable
+    char a-zA-Z0-9_- this
     char !@&`\'+~=/\\,\;.<>\*\$\?:\" start global-variable
     noeat start
 
@@ -60,7 +60,7 @@ state maybe-instance-variable instance-variable
     noeat start
 
 state instance-variable
-    char a-zA-Z0-9_ instance-variable
+    char a-zA-Z0-9_ this
     noeat start
 
 state maybe-symbol symbol
@@ -74,16 +74,16 @@ state double-colon
     noeat start
 
 state symbol
-    char a-zA-Z0-9_ symbol
+    char a-zA-Z0-9_ this
     noeat start
 
 state comment
     char "\n" line-start
-    eat comment
+    eat this
 
 state =begin comment
     char "\n" =begin-nl
-    eat =begin
+    eat this
 
 state =begin-nl comment
     char " \b\t\n\v\f\r" =begin-nl
@@ -91,7 +91,7 @@ state =begin-nl comment
     noeat =begin
 
 state ident
-    char -b a-zA-Z0-9_!\? ident
+    char -b a-zA-Z0-9_!\? this
     inlist keyword start
     inlist true-false-nil start
     noeat start
@@ -100,13 +100,13 @@ state dq string
     char "\"" start string
     char "\n" line-start
     char -b "\\" .ruby-esc:dq
-    eat dq
+    eat this
 
 state sq string
     char "'" start string
     char "\n" line-start
     char -b "\\" .ruby-esc:sq
-    eat sq
+    eat this
 
 # Keywords (from https://github.com/ruby/ruby/blob/trunk/defs/keywords)
 list keyword \

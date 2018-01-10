@@ -58,7 +58,7 @@ state short special
 
 # Eats (at least) one multibyte UTF-8 character
 state not-ascii error
-    char "\x80-\xff" not-ascii
+    char "\x80-\xff" this
     noeat END
 
 syntax go
@@ -74,14 +74,14 @@ state go code
     char ` raw-string
     str "//" cpp-comment
     str "/*" c-comment
-    eat go
+    eat this
 
 state exported
-    char -b a-zA-Z0-9_ exported
+    char -b a-zA-Z0-9_ this
     noeat go
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_ this
     inlist keyword go
     inlist type go
     inlist constant go
@@ -95,21 +95,21 @@ state zero numeric
     noeat check-imag
 
 state oct numeric
-    char 0-7 oct
+    char 0-7 this
     noeat check-suffix
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exp
     char . float
     noeat check-imag
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat check-suffix
 
 state check-suffix error
-    char a-zA-Z0-9_ check-suffix
+    char a-zA-Z0-9_ this
     noeat go
 
 state check-imag code
@@ -122,7 +122,7 @@ state dot numeric
     noeat go
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exp
     noeat check-imag
 
@@ -132,14 +132,14 @@ state exp numeric
     noeat check-imag
 
 state exp-digit numeric
-    char 0-9 exp-digit
+    char 0-9 this
     noeat check-imag
 
 state string
     char "\"" go string
     char "\n" go
     char "\\" string-esc
-    eat string
+    eat this
 
 state string-esc special
     # \' is illegal inside string literal
@@ -160,7 +160,7 @@ state char-esc special
     noeat .go-esc:char-end
 
 state not-ascii char
-    char "\x80-\xff" not-ascii
+    char "\x80-\xff" this
     noeat char-end
 
 state char-end char
@@ -169,15 +169,15 @@ state char-end char
 
 state raw-string string
     char ` go string
-    eat raw-string
+    eat this
 
 state cpp-comment comment
     char "\n" go
-    eat cpp-comment
+    eat this
 
 state c-comment comment
     str "*/" go comment
-    eat c-comment
+    eat this
 
 list keyword \
     break case chan const continue default defer else fallthrough \

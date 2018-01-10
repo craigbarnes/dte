@@ -5,8 +5,8 @@ syntax config
 
 state code
     char # comment
-    eat code
+    eat this
 
 state comment
     char "\n" code
-    eat comment
+    eat this

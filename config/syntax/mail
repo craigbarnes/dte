@@ -6,10 +6,10 @@ state bol text
 
 state text
     char "\n" bol
-    eat text
+    eat this
 
 state quote
     char "\n" bol
-    eat quote
+    eat this
 
 default comment quote

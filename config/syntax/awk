@@ -38,21 +38,21 @@ state code
     char / regexp
     char # comment
     char -b a-zA-Z_ ident
-    eat code
+    eat this
 
 state string
     char \\ dqescape
     char \" code string
     # Avoid highlighting rest of the file again
     char "\n" code
-    eat string
+    eat this
 
 state regexp
     char \\ regexpescape
     char / code regexp
     # Avoid highlighting rest of the file again
     char "\n" code
-    eat regexp
+    eat this
 
 state dqescape special
     char abfnrtv\\\" string special
@@ -64,10 +64,10 @@ state regexpescape special
 
 state comment
     char "\n" code
-    eat comment
+    eat this
 
 state ident
-    char -b a-zA-Z0-9_ ident
+    char -b a-zA-Z0-9_ this
     inlist keyword code
     inlist builtin code
     inlist pattern code

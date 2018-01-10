@@ -2,7 +2,7 @@ syntax .markdown-fenced-code-block
 
 state body code-block
     char "\n" line-start
-    eat body
+    eat this
 
 state line-start code-block
     heredocend end
@@ -45,7 +45,7 @@ state text
     char \* asterisk
     char _ underscore
     char "\\" escape
-    eat text
+    eat this
 
 state escape special
     char "\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e" text special
@@ -66,64 +66,64 @@ state bullet-asterisk
 
 state code-block
     char "\n" line-start
-    eat code-block
+    eat this
 
 state backtick code-block
-    char -b "`" backtick
+    char -b "`" this
     bufis "`" code-span
     bufis "``" text code-span
     heredocbegin .markdown-fenced-code-block line-start
 
 state tilde code-block
-    char -b "~" tilde
+    char -b "~" this
     bufis "~" text
     bufis "~~" text
     heredocbegin .markdown-fenced-code-block line-start
 
 state block-quote
     char "\n" line-start
-    eat block-quote
+    eat this
 
 state digit
     char "\n" line-start
-    char -b 0-9 digit
+    char -b 0-9 this
     char -n . text
     recolor ordered-list
     eat text ordered-list
 
 state hash-heading heading
     char "\n" line-start
-    eat hash-heading
+    eat this
 
 state code-span
     char "\n" line-start
     char ` text code-span
-    eat code-span
+    eat this
 
 state asterisk emphasis
     char \* text emphasis
-    char -n "\n" asterisk
+    char -n "\n" this
     noeat line-start
 
 state double-asterisk strong-emphasis
     char "\n" line-start
     str "**" text strong-emphasis
-    eat double-asterisk
+    eat this
 
 state underscore emphasis
     char _ text emphasis
-    char -n "\n" underscore
+    char -n "\n" this
     noeat line-start
 
 state double-underline strong-emphasis
     char "\n" line-start
     str "__" text strong-emphasis
-    eat double-underline
+    eat this
 
 state reference
     char "\\" reference-escape
     char \] reference-close reference
-    eat reference
+    eat this
 
 state reference-escape special
     char "\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e" reference special

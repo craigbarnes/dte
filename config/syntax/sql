@@ -20,7 +20,7 @@ state start code
     char -- - dash
     char # comment
     char / slash
-    eat start
+    eat this
 
 state zero numeric
     char 0-9 int
@@ -31,12 +31,12 @@ state zero numeric
     noeat trailing
 
 state int numeric
-    char 0-9 int
+    char 0-9 this
     char . float
     noeat trailing
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     noeat trailing
 
 state bin numeric
@@ -44,7 +44,7 @@ state bin numeric
     eat start error
 
 state bindigit numeric
-    char 01 bindigit
+    char 01 this
     noeat trailing
 
 state hex numeric
@@ -52,7 +52,7 @@ state hex numeric
     eat start error
 
 state hexdigit numeric
-    char 0-9a-fA-F hexdigit
+    char 0-9a-fA-F this
     noeat trailing
 
 state b code
@@ -65,9 +65,9 @@ state bitstr
     noeat bitstrbit
 
 state bitstrbit special
-    char 01 bitstrbit
+    char 01 this
     char "\n'" start string
-    eat bitstrbit error
+    eat this error
 
 state x code
     # Single quote only
@@ -89,14 +89,14 @@ state hexstrodd special
     eat hexstreven error
 
 state word code
-    char -b a-zA-Z0-9_\$ word
+    char -b a-zA-Z0-9_\$ this
     inlist keyword start
     inlist identifier start
     char . column code
     noeat start
 
 state column
-    char -b a-zA-Z0-9_\$ column
+    char -b a-zA-Z0-9_\$ this
     noeat start
 
 state at variable
@@ -107,22 +107,22 @@ state at variable
     eat start error
 
 state variable
-    char a-zA-Z0-9._\$ variable
+    char a-zA-Z0-9._\$ this
     noeat start
 
 state sq string
     char "\n'" start string
     char \\ .sql-esc:sq
-    eat sq
+    eat this
 
 state dq string
     char "\n"\" start string
     char \\ .sql-esc:dq
-    eat dq
+    eat this
 
 state backtick constant
     char "\n`" start
-    eat backtick
+    eat this
 
 state dash comment
     char -- - maybe-comment
@@ -138,7 +138,7 @@ state maybe-comment comment
 
 state comment
     char "\n" start
-    eat comment
+    eat this
 
 state slash comment
     char "*" maybe-c-comment
@@ -155,7 +155,7 @@ state begin-special-comment
 
 state special-comment special
     char "*" scstar
-    eat special-comment
+    eat this
 
 state scstar special
     char / start special
@@ -163,14 +163,14 @@ state scstar special
 
 state c-comment comment
     char "*" star
-    eat c-comment
+    eat this
 
 state star comment
     char / start comment
     noeat c-comment
 
 state trailing error
-    char a-zA-Z0-9_\$ trailing
+    char a-zA-Z0-9_\$ this
     noeat start
 
 # FIXME: types should probably go to separate list

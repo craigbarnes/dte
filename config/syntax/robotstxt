@@ -9,7 +9,7 @@ state main code
     noeat remainder
 
 state firstword
-    char -b A-Za-z- firstword
+    char -b A-Za-z- this
     char -b : field
     noeat -b remainder
 
@@ -21,14 +21,14 @@ state field
 state value
     char # comment
     char "\n" main
-    eat value
+    eat this
 
 state remainder error
     recolor error
     char # comment
     char "\n" main
-    eat remainder
+    eat this
 
 state comment
     char "\n" main
-    eat comment
+    eat this

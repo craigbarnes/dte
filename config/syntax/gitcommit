@@ -6,7 +6,7 @@ state start text
 
 state text
     char "\n" start
-    eat text
+    eat this
 
 state comment-start comment
     char "\n" start
@@ -19,22 +19,22 @@ state comment-start comment
 
 state comment
     char "\n" start
-    eat comment
+    eat this
 
 state branch notice
     char "\n" start
-    eat branch
+    eat this
 
 # abel or new file, not known yet
 state newfile
     # Buffer anything but \n or :
     char "\n" start
     # Anything else but : (-n inverts bitmap)
-    char -bn : newfile
+    char -bn : this
     # Recolor buffered bytes to label
     recolor label
     noeat file
 
 state file
     char "\n" start
-    eat file
+    eat this

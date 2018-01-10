@@ -2,11 +2,11 @@ syntax .nginx-var
 
 state variable
     char "{" brace
-    char A-Za-z0-9_ variable
+    char A-Za-z0-9_ this
     noeat END
 
 state brace variable
-    char A-Za-z0-9_ brace
+    char A-Za-z0-9_ this
     char "}" END variable
     eat END error
 
@@ -16,7 +16,7 @@ state string
     char "\\" escape
     char \$ .nginx-var:string
     char "'" END string
-    eat string
+    eat this
 
 state escape special
     char "'$" string special
@@ -28,7 +28,7 @@ state string
     char "\\" escape
     char \$ .nginx-var:string
     char "\"" END string
-    eat string
+    eat this
 
 state escape special
     char "\"$" string special
@@ -48,10 +48,10 @@ state nginx
     char \\ escape
     char # comment
     char ";\n{" line-start
-    eat nginx
+    eat this
 
 state first-word
-    char -b a-z_ first-word
+    char -b a-z_ this
     inlist directive nginx keyword
     inlist deprecated_directive nginx error
     noeat nginx
@@ -64,7 +64,7 @@ state escape special
 
 state comment
     char "\n" line-start
-    eat comment
+    eat this
 
 list directive \
     accept_mutex accept_mutex_delay access_log add_after_body \

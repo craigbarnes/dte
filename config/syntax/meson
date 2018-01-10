@@ -9,21 +9,21 @@ state start code
     char "'" string
     char -b a-zA-Z_ ident
     char 0-9 number
-    eat start
+    eat this
 
 state comment
     char "\n" start
-    eat comment
+    eat this
 
 state longstring string
     str "'''" start string
-    eat longstring
+    eat this
 
 state string string
     char "'" start string
     char "\n" start
     char -b "\\" string-escape
-    eat string
+    eat this
 
 state string-escape special
     char "n'\\" string special
@@ -31,11 +31,11 @@ state string-escape special
     noeat string
 
 state ident
-    char -b a-zA-Z_0-9 ident
+    char -b a-zA-Z_0-9 this
     inlist keyword start
     inlist constant start
     noeat start
 
 state number numeric
-    char 0-9 number
+    char 0-9 this
     noeat start

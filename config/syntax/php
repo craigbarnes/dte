@@ -6,7 +6,7 @@ state start
     noeat END
 
 state strvar
-    char a-zA-Z_0-9 strvar
+    char a-zA-Z_0-9 this
     noeat END
 
 # Curly braces inside string
@@ -14,7 +14,7 @@ syntax .php-strcurly
 
 state strvar
     char \} END strvar
-    eat strvar
+    eat this
 
 # Common escapes inside double quotes and heredocs
 syntax .php-esc
@@ -57,7 +57,7 @@ state string
     char \\ esc
     char \$ .php-strvar:string strvar
     str '{$' .php-strcurly:string strvar
-    eat string
+    eat this
 
 state esc special
     # NOTE: \" is not special unlike in double quotes
@@ -98,7 +98,7 @@ state bol string
 
 state string
     char "\n" bol
-    eat string
+    eat this
 
 state match special
     char "\n" END
@@ -123,10 +123,10 @@ state code
     str "/*" c-comment
     char # sh-comment
     str <<< heredoc
-    eat code
+    eat this
 
 state word code
-    char -b a-zA-Z_0-9 word
+    char -b a-zA-Z_0-9 this
     inlist keyword code
     inlist constant code
     inlist lang code
@@ -137,7 +137,7 @@ state variable
     noeat code
 
 state variable2 variable
-    char -b a-zA-Z_0-9 variable2
+    char -b a-zA-Z_0-9 this
     bufis this this-keyword
     noeat code
 
@@ -150,7 +150,7 @@ state dq string
     char \\ dqesc
     char \$ .php-strvar:dq strvar
     str '{$' .php-strcurly:dq strvar
-    eat dq
+    eat this
 
 state dqesc special
     char 'nrtvf\$"' dq special
@@ -159,7 +159,7 @@ state dqesc special
 state sq string
     char \' code string
     char \\ sqesc
-    eat sq
+    eat this
 
 state sqesc string
     # Not \ or '
@@ -174,21 +174,21 @@ state zero numeric
     noeat check-suffix
 
 state oct numeric
-    char 0-7 oct
+    char 0-7 this
     noeat check-suffix
 
 state dec numeric
-    char 0-9 dec
+    char 0-9 this
     char eE exp
     char . float
     noeat check-suffix
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat check-suffix
 
 state check-suffix error
-    char a-zA-Z0-9_ check-suffix
+    char a-zA-Z0-9_ this
     noeat code
 
 state dot numeric
@@ -197,7 +197,7 @@ state dot numeric
     noeat code
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exp
     noeat check-suffix
 
@@ -207,7 +207,7 @@ state exp numeric
     noeat check-suffix
 
 state exp-digit numeric
-    char 0-9 exp-digit
+    char 0-9 this
     noeat check-suffix
 
 state qm tag
@@ -217,15 +217,15 @@ state qm tag
 
 state cpp-comment comment
     char "\n" code
-    eat cpp-comment
+    eat this
 
 state c-comment comment
     str "*/" code comment
-    eat c-comment
+    eat this
 
 state sh-comment comment
     char "\n" code
-    eat sh-comment
+    eat this
 
 state heredoc special
     char -b a-zA-Z_ heredoc-plain
@@ -234,7 +234,7 @@ state heredoc special
     noeat code
 
 state heredoc-plain special
-    char -b a-zA-Z0-9_ heredoc-plain
+    char -b a-zA-Z0-9_ this
     heredocbegin .php-heredoc code
 
 state heredoc-dq-start special
@@ -242,7 +242,7 @@ state heredoc-dq-start special
     noeat code
 
 state heredoc-dq special
-    char -b a-zA-Z0-9_ heredoc-dq
+    char -b a-zA-Z0-9_ this
     heredocbegin .php-heredoc-dq code
 
 state nowdoc-start special
@@ -250,7 +250,7 @@ state nowdoc-start special
     noeat code
 
 state nowdoc special
-    char -b a-zA-Z0-9_ nowdoc
+    char -b a-zA-Z0-9_ this
     heredocbegin .php-nowdoc code
 
 list keyword \
@@ -274,7 +274,7 @@ syntax php
 
 state code
     char < lab
-    eat code
+    eat this
 
 state lab tag
     char \? tag-php

@@ -1,7 +1,7 @@
 syntax make
 
 state start code
-    char "\n" start
+    char "\n" this
     char "\t" tab-indent
     char " " space-indent
     noeat not-recipe
@@ -20,19 +20,19 @@ state space-indent code
 
 # Can't be target but can be recipe, variable or keyword
 state not-target code
-    char -b a-zA-Z_- not-target
+    char -b a-zA-Z_- this
     inlist keyword make
     noeat make
 
 # Can't be recipe but can be target, variable or keyword
 state not-recipe code
     char -b . special-target
-    char -b a-zA-Z_- not-recipe
+    char -b a-zA-Z_- this
     inlist keyword make
     noeat make
 
 state special-target code
-    char -b A-Z_ special-target
+    char -b A-Z_ this
     # FIXME: ".PHONY := ..." is valid
     inlist special-target make
     noeat make
@@ -43,13 +43,13 @@ state make code
     char "\n" start
     char \\ esc
     # this is a hack
-    char ")}" make variable
-    eat make
+    char ")}" this variable
+    eat this
 
 state comment
     char "\n" start
     char \\ comment-esc
-    eat comment
+    eat this
 
 state comment-esc comment
     char "\\\n" comment
@@ -67,7 +67,7 @@ state lp variable
     noeat make
 
 state variable
-    char -b a-zA-Z0-9_- variable
+    char -b a-zA-Z0-9_- this
     char ")}" make variable
     inlist function make builtin
     noeat make

@@ -2,7 +2,7 @@ syntax .lua-long-string
 
 state body string
     char \] end-match
-    eat body
+    eat this
 
 state end-match string
     heredocend end
@@ -16,7 +16,7 @@ syntax .lua-long-comment
 
 state body comment
     char \] end-match
-    eat body
+    eat this
 
 state end-match comment
     heredocend end
@@ -98,13 +98,13 @@ state code
     char \- dash
     char \[ bracket
     char -b : colon
-    str "~=" code operator
-    char =/+\*#<>^%|&~ code operator
-    str "..." code special
-    str ".." code operator
+    str "~=" this operator
+    char =/+\*#<>^%|&~ this operator
+    str "..." this special
+    str ".." this operator
     char . dot
     char !@`$\? bad-char
-    eat code
+    eat this
 
 state bracket string
     char \[ .lua-long-string:code string
@@ -121,7 +121,7 @@ state colon-colon
     eat code error
 
 state colon-colon-name
-    char -b a-zA-Z0-9_ colon-colon-name
+    char -b a-zA-Z0-9_ this
     char -b : colon-colon-name-colon
     eat code error
 
@@ -134,7 +134,7 @@ state label
     noeat code
 
 state bracket-equals string
-    char -b = bracket-equals
+    char -b = this
     char -n \[ code error
     heredocbegin .lua-long-string code
 
@@ -154,13 +154,13 @@ state dash-dash-bracket comment
     eat line-comment
 
 state dash-dash-bracket-equals
-    char -b = dash-dash-bracket-equals comment
+    char -b = this comment
     char -n \[ line-comment
     heredocbegin .lua-long-comment code
 
 state line-comment comment
     char "\n" code
-    eat line-comment comment
+    eat this comment
 
 state zero numeric
     char 0-9 decimal
@@ -169,17 +169,17 @@ state zero numeric
     noeat check-suffix
 
 state decimal numeric
-    char 0-9 decimal
+    char 0-9 this
     char eE exponent
     char . float
     noeat check-suffix
 
 state hex numeric
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     noeat check-suffix
 
 state float numeric
-    char 0-9 float
+    char 0-9 this
     char eE exponent
     noeat check-suffix
 
@@ -189,11 +189,11 @@ state exponent numeric
     noeat check-suffix
 
 state exponent-digit numeric
-    char 0-9 exponent-digit
+    char 0-9 this
     noeat check-suffix
 
 state check-suffix error
-    char a-zA-Z0-9_ check-suffix
+    char a-zA-Z0-9_ this
     noeat code
 
 state dot
@@ -205,7 +205,7 @@ state dot-float
     noeat float
 
 state identifier
-    char -b a-zA-Z0-9_ identifier
+    char -b a-zA-Z0-9_ this
     inlist keyword code
     inlist constant code
     inlist opword code operator
@@ -215,13 +215,13 @@ state single-quote string
     char \' code string
     char "\n" code
     char "\\" .lua-escape:single-quote special
-    eat single-quote
+    eat this
 
 state double-quote string
     char \" code string
     char "\n" code
     char "\\" .lua-escape:double-quote special
-    eat double-quote
+    eat this
 
 state bad-char error
     noeat code

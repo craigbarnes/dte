@@ -2,13 +2,13 @@ syntax roff
 
 state line-start
     char -b '.' request
-    char "\n" line-start
+    char "\n" this
     noeat text
 
 # TODO: Highlight .TH request in bold
 # TODO: Highlight "quoted strings" in request arguments
 state request
-    char -b a-zA-Z request
+    char -b a-zA-Z this
     inlist section section
     noeat text
 
@@ -38,16 +38,16 @@ state font-selection escape
 state text
     char -b '\\' escape-start
     char "\n" line-start
-    eat text
+    eat this
 
 state comment
     recolor comment
     char "\n" line-start
-    eat comment
+    eat this
 
 state section
     char "\n" line-start
-    eat section
+    eat this
 
 list section .SH .SS
 

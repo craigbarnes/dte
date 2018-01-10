@@ -17,17 +17,17 @@ state x entity
     eat END error
 
 state hex entity
-    char 0-9a-fA-F hex
+    char 0-9a-fA-F this
     char ";" END entity
     eat END error
 
 state dec entity
-    char 0-9 dec
+    char 0-9 this
     char ";" END entity
     eat END error
 
 state name error
-    char -b a-zA-Z0-9 name
+    char -b a-zA-Z0-9 this
     inlist entity semicolon
     noeat semicolon
 
@@ -304,25 +304,25 @@ state start text
 state doctype comment
     char > text comment
     char < text error
-    eat doctype
+    eat this
 
 state text
     str "<!--" comment
     char < tag-start
     char > start error
     char "&" .html-entity:text
-    eat text
+    eat this
 
 state comment
     str -- --> text comment
-    eat comment
+    eat this
 
 state tag-start tag
     char / close-tag
     char -b a-zA-Z0-9_ tag-name
     char " \t\n" tag-start
     char > text tag
-    eat tag-start error
+    eat this error
 
 state close-tag tag
     char -b a-zA-Z0-9_ close-tag-name
@@ -330,13 +330,13 @@ state close-tag tag
     eat text error
 
 state tag-name tag-unknown
-    char -b a-zA-Z0-9_ tag-name
+    char -b a-zA-Z0-9_ this
     inlist tag attrs
     inlist tag-deprecated attrs
     noeat attrs
 
 state close-tag-name tag-unknown
-    char -b a-zA-Z0-9_ close-tag-name
+    char -b a-zA-Z0-9_ this
     inlist tag close-tag-end
     inlist tag-deprecated close-tag-end
     noeat close-tag-end
@@ -351,14 +351,14 @@ state attrs code
     char -b a-zA-Z attr-name
     char > text tag
     char / short-close
-    eat attrs error
+    eat this error
 
 state short-close tag
     char > text tag
     eat text error
 
 state attr-name attr
-    char a-zA-Z:_- attr-name
+    char a-zA-Z:_- this
     char = attr-eq
     noeat attrs
 
@@ -371,13 +371,13 @@ state dq string
     char \" attrs string
     char "\n" attrs
     char "&" .html-entity:dq
-    eat dq
+    eat this
 
 state sq string
     char \' attrs string
     char "\n" attrs
     char "&" .html-entity:sq
-    eat sq
+    eat this
 
 list -i tag \
     a abbr acronym address area b base bdo big blockquote body br \

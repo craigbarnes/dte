@@ -13,7 +13,7 @@ state comment
     eat this
 
 state identifier
-    char -b a-zA-Z0-9_ identifier
+    char -b a-zA-Z0-9_ this
     inlist keyword code
     noeat code
 

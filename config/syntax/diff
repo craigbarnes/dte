@@ -12,11 +12,11 @@ state headers header
 
 state header
     char "\n" headers
-    eat header
+    eat this
 
 state chunk
     char "\n" diff chunk
-    eat chunk
+    eat this
 
 state diff code
     char " " context
@@ -27,20 +27,20 @@ state diff code
 
 state context
     char "\n" diff
-    eat context
+    eat this
 
 state added
     char "\n" diff
-    eat added
+    eat this
 
 state removed
     char "\n" diff
-    eat removed
+    eat this
 
 state comment
     char "\n" headers
-    eat comment
+    eat this
 
 state text
     char "\n" headers
-    eat text
+    eat this
