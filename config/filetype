@@ -16,6 +16,7 @@ ft -i sh sh bash ash dash ksh mksh pdksh zsh openrc-run
 ft -i tcl wish
 
 # "ft -b" matches the file basename
+ft -b config Doxyfile
 ft -b docker Dockerfile
 ft -b gitcommit COMMIT_EDITMSG
 ft -b gitrebase git-rebase-todo

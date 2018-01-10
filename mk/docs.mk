@@ -1,3 +1,4 @@
+DOXYGEN = doxygen
 PANDOC = pandoc
 PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
@@ -10,15 +11,16 @@ XARGS_P_FLAG = $(shell \
     echo '-P$(NPROC)' \
 )
 
-html = $(addprefix public/, $(addsuffix .html, \
-    index releases dterc dte-syntax \
-))
+html-man = public/dterc.html public/dte-syntax.html
+html = public/index.html public/releases.html $(html-man)
 
 docs: man html gz
 man: docs/dterc.5 docs/dte-syntax.5
 html: $(html)
 pdf: public/dte.pdf
 gz: $(patsubst %, %.gz, $(html) public/style.css)
+doxygen: public/doxygen/index.html
+
 $(html): docs/template.html | public/style.css
 
 docs/%.5: docs/%.md docs/pdman.lua
@@ -37,7 +39,7 @@ public/releases.html: CHANGELOG.md
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
-public/%.html: docs/%.md
+$(html-man): public/%.html: docs/%.md
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -o $@ $<
 
@@ -53,6 +55,10 @@ public/%.gz: public/%
 	$(E) GZIP $@
 	$(Q) gzip -9 < $< > $@
 
+public/doxygen/index.html: docs/Doxyfile docs/DoxygenLayout.xml src/*.h | public/
+	$(E) DOXYGEN $(@D)/
+	$(Q) $(DOXYGEN) $<
+
 public/:
 	@mkdir -p $@
 
@@ -61,4 +67,4 @@ check-docs: README.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
 
 
 CLEANDIRS += public/
-.PHONY: docs man html pdf gz check-docs
+.PHONY: docs man html pdf gz doxygen check-docs
