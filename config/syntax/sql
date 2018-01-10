@@ -112,12 +112,12 @@ state variable
 
 state sq string
     char "\n'" start string
-    char \\ .sql-esc:sq
+    char \\ .sql-esc:this
     eat this
 
 state dq string
     char "\n"\" start string
-    char \\ .sql-esc:dq
+    char \\ .sql-esc:this
     eat this
 
 state backtick constant

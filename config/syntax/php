@@ -55,8 +55,8 @@ state bol string
 state string
     char "\n" bol
     char \\ esc
-    char \$ .php-strvar:string strvar
-    str '{$' .php-strcurly:string strvar
+    char \$ .php-strvar:this strvar
+    str '{$' .php-strcurly:this strvar
     eat this
 
 state esc special
@@ -148,8 +148,8 @@ state this-keyword
 state dq string
     char \" code string
     char \\ dqesc
-    char \$ .php-strvar:dq strvar
-    str '{$' .php-strcurly:dq strvar
+    char \$ .php-strvar:this strvar
+    str '{$' .php-strcurly:this strvar
     eat this
 
 state dqesc special

@@ -14,7 +14,7 @@ syntax .nginx-sq-string
 
 state string
     char "\\" escape
-    char \$ .nginx-var:string
+    char \$ .nginx-var:this
     char "'" END string
     eat this
 
@@ -26,7 +26,7 @@ syntax .nginx-dq-string
 
 state string
     char "\\" escape
-    char \$ .nginx-var:string
+    char \$ .nginx-var:this
     char "\"" END string
     eat this
 
@@ -42,9 +42,9 @@ state line-start
     noeat nginx
 
 state nginx
-    char \$ .nginx-var:nginx
-    char "\"" .nginx-dq-string:nginx
-    char "'" .nginx-sq-string:nginx
+    char \$ .nginx-var:this
+    char "\"" .nginx-dq-string:this
+    char "'" .nginx-sq-string:this
     char \\ escape
     char # comment
     char ";\n{" line-start

@@ -180,13 +180,13 @@ state long-comment comment
 state sq string
     char \' code string
     char "\n" code
-    char "\\" .js-esc:sq
+    char "\\" .js-esc:this
     eat this
 
 state dq string
     char \" code string
     char "\n" code
-    char "\\" .js-esc:dq
+    char "\\" .js-esc:this
     eat this
 
 list keyword \

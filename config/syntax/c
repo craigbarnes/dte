@@ -39,7 +39,7 @@ state string
     char "\"" END string
     # Avoid highlighting rest of the file again
     char "\n" END error
-    char "\\" .c-esc:string
+    char "\\" .c-esc:this
     eat this
 
 syntax .c-char
@@ -103,9 +103,9 @@ state preproccond
 state preproc-misc preproc
     char "\n" start
     char "\\" preproc-cont
-    char \" .c-string:preproc-misc
-    char \' .c-char:preproc-misc
-    str "/*" .c-comment:preproc-misc
+    char \" .c-string:this
+    char \' .c-char:this
+    str "/*" .c-comment:this
     str "//" .cpp-comment:start
     eat this
 
@@ -135,7 +135,7 @@ state system-include string
 state end-include preproc
     char "\n" start
     char " \t" end-include
-    str "/*" .c-comment:end-include
+    str "/*" .c-comment:this
     str "//" .cpp-comment:start
     eat preproc-error
 
@@ -149,11 +149,11 @@ state c code
     char 0 zero
     char 1-9 dec
     char . dot
-    char \" .c-string:c
-    char \' .c-char:c
+    char \" .c-string:this
+    char \' .c-char:this
     char "\n" start
     char ';' semicolon
-    str "/*" .c-comment:c
+    str "/*" .c-comment:this
     str "//" .cpp-comment:start
     eat this
 

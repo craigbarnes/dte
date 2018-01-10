@@ -214,13 +214,13 @@ state identifier
 state single-quote string
     char \' code string
     char "\n" code
-    char "\\" .lua-escape:single-quote special
+    char "\\" .lua-escape:this special
     eat this
 
 state double-quote string
     char \" code string
     char "\n" code
-    char "\\" .lua-escape:double-quote special
+    char "\\" .lua-escape:this special
     eat this
 
 state bad-char error

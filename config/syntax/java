@@ -128,7 +128,7 @@ state exp-digit numeric
     noeat float-suffix
 
 state string
-    char \\ .java-esc:string
+    char \\ .java-esc:this
     char \" code string
     eat this
 

@@ -235,10 +235,10 @@ state start code
     char . class
     char # id
     char -b : pseudo
-    char \[ .css-attributeselector:start
+    char \[ .css-attributeselector:this
     char \{ block
-    char 0-9_- .css-selectorerror:start
-    str "/*" .css-comment:start
+    char 0-9_- .css-selectorerror:this
+    str "/*" .css-comment:this
     char -b @ atrule
     eat this
 
@@ -312,7 +312,7 @@ state block code
     char -b a-zA-Z- property
     char 0-9_- property-error
     char } start
-    str "/*" .css-comment:block
+    str "/*" .css-comment:this
     eat this
 
 state property code
@@ -336,12 +336,12 @@ state values code
     char -- - minus
     char # hexcolor
     char ";" block
-    char \" .css-dq:values
-    char \' .css-sq:values
+    char \" .css-dq:this
+    char \' .css-sq:this
     str -i "url(" .css-url:values
     char -b a-zA-Z_ value
     char } start
-    str "/*" .css-comment:values
+    str "/*" .css-comment:this
     eat this
 
 state minus numeric

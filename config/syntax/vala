@@ -128,7 +128,7 @@ state exp-digit numeric
     noeat float-suffix
 
 state string
-    char \\ .vala-esc:string
+    char \\ .vala-esc:this
     char \" code string
     eat this
 

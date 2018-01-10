@@ -53,7 +53,7 @@ syntax .sh-simple-dq
 
 state string
     char \" END string
-    char \\ .sh-dq-escape:string
+    char \\ .sh-dq-escape:this
     char \$ special
     eat this
 
@@ -76,10 +76,10 @@ syntax .sh-pcommand
 
 state command
     char ')' END special
-    char \' .sh-sq:command
-    char \" .sh-simple-dq:command
-    char \\ .sh-command-escape:command
-    char \$ .sh-var:command
+    char \' .sh-sq:this
+    char \" .sh-simple-dq:this
+    char \\ .sh-command-escape:this
+    char \$ .sh-var:this
     eat this
 
 # $var, $(command), $((expression))
@@ -99,10 +99,10 @@ syntax .sh-backtick
 
 state special
     # NOTE: you can't put "`" inside `...`, it's not possible
-    char \' .sh-sq:special
-    char \" .sh-simple-dq:special
-    char \\ .sh-command-escape:special
-    char \$ .sh-var:special
+    char \' .sh-sq:this
+    char \" .sh-simple-dq:this
+    char \\ .sh-command-escape:this
+    char \$ .sh-var:this
     char ` END special
     eat this
 
@@ -111,9 +111,9 @@ syntax .sh-dq
 # Double quoted string
 state string
     char '"' END string
-    char \\ .sh-dq-escape:string
-    char ` .sh-backtick:string
-    char \$ .sh-dollar:string
+    char \\ .sh-dq-escape:this
+    char ` .sh-backtick:this
+    char \$ .sh-dollar:this
     eat this
 
 # Skip redirect etc. after <<EOF
@@ -156,8 +156,8 @@ state bol string
 
 state string
     char "\n" bol
-    char \` .sh-backtick:string
-    char \$ .sh-dollar:string
+    char \` .sh-backtick:this
+    char \$ .sh-dollar:this
     eat this
 
 state match special
@@ -231,11 +231,11 @@ state forerror code
 
 state args code
     char # comment
-    char "'" .sh-sq:args
-    char '"' .sh-dq:args
-    char \\ .sh-command-escape:args
-    char ` .sh-backtick:args
-    char \$ .sh-dollar:args
+    char "'" .sh-sq:this
+    char '"' .sh-dq:this
+    char \\ .sh-command-escape:this
+    char ` .sh-backtick:this
+    char \$ .sh-dollar:this
     char "\n" start
     # && is same as two &, same for |. does not matter
     char ";&|" start special

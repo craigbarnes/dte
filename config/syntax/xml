@@ -68,7 +68,7 @@ state text
     str "<!--" comment
     char < tag-start
     char > this error
-    char "&" .xml-entity:text
+    char "&" .xml-entity:this
     eat this
 
 state comment
@@ -122,13 +122,13 @@ state attr-eq attr
 state dq string
     char \" attrs string
     char "\n" attrs
-    char "&" .xml-entity:dq
+    char "&" .xml-entity:this
     eat this
 
 state sq string
     char \' attrs string
     char "\n" attrs
-    char "&" .xml-entity:sq
+    char "&" .xml-entity:this
     eat this
 
 default special entity

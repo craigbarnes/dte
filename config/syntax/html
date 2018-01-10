@@ -310,7 +310,7 @@ state text
     str "<!--" comment
     char < tag-start
     char > start error
-    char "&" .html-entity:text
+    char "&" .html-entity:this
     eat this
 
 state comment
@@ -370,13 +370,13 @@ state attr-eq attr
 state dq string
     char \" attrs string
     char "\n" attrs
-    char "&" .html-entity:dq
+    char "&" .html-entity:this
     eat this
 
 state sq string
     char \' attrs string
     char "\n" attrs
-    char "&" .html-entity:sq
+    char "&" .html-entity:this
     eat this
 
 list -i tag \

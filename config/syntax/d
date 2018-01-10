@@ -35,7 +35,7 @@ syntax .d-string
 state string
     char "\"" END string
     char "\n" END error
-    char "\\" .d-esc:string
+    char "\\" .d-esc:this
     eat this
 
 syntax .d-char
@@ -86,11 +86,11 @@ state code code
     char 0 zero
     char 1-9 dec
     char . dot
-    char \" .d-string:code
-    char \' .d-char:code
+    char \" .d-string:this
+    char \' .d-char:this
     char "\n" start
     char ';' semicolon
-    str "/*" .d-long-comment:code
+    str "/*" .d-long-comment:this
     str "//" .d-line-comment:start
     eat this
 
