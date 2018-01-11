@@ -64,7 +64,7 @@ Released on 2017-10-16.
 * Changed the build system to compile all default configs and syntax
   highlighting files into the `dte` binary instead of installing and
   loading them from disk. The `$PKGDATADIR` variable is now removed.
-* Added syntax highlighting for the [Vala] and [D] languages.
+* Added syntax highlighting for the Vala and D languages.
 * Added the ability to bind additional, xterm-style key combinations
   (e.g. `bind C-M-S-left ...`) when `$TERM` is `tmux` (previously
   only available for `xterm` and `screen`).
@@ -180,5 +180,3 @@ or from the keyserver at `hkps://hkps.pool.sks-keyservers.net`.
 [website]: https://craigbarnes.gitlab.io/dte/
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
-[Vala]: https://en.wikipedia.org/wiki/Vala_(programming_language)
-[D]: https://dlang.org/
