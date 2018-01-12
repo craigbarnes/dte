@@ -99,13 +99,13 @@ state ident
 state dq string
     char "\"" start string
     char "\n" line-start
-    char -b "\\" .ruby-esc:dq
+    char -b "\\" .ruby-esc:this
     eat this
 
 state sq string
     char "'" start string
     char "\n" line-start
-    char -b "\\" .ruby-esc:sq
+    char -b "\\" .ruby-esc:this
     eat this
 
 # Keywords (from https://github.com/ruby/ruby/blob/trunk/defs/keywords)

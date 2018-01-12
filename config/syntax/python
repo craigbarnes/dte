@@ -45,24 +45,24 @@ state comment
 
 state longdq string
     str '"""' start string
-    char -b "\\" .python-esc:longdq
+    char -b "\\" .python-esc:this
     eat this
 
 state longsq string
     str "'''" start string
-    char -b "\\" .python-esc:longsq
+    char -b "\\" .python-esc:this
     eat this
 
 state dq string
     char "\"" start string
     char "\n" start
-    char -b "\\" .python-esc:dq
+    char -b "\\" .python-esc:this
     eat this
 
 state sq string
     char "'" start string
     char "\n" start
-    char -b "\\" .python-esc:sq
+    char -b "\\" .python-esc:this
     eat this
 
 state ident

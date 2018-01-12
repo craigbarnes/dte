@@ -338,7 +338,7 @@ state values code
     char ";" block
     char \" .css-dq:this
     char \' .css-sq:this
-    str -i "url(" .css-url:values
+    str -i "url(" .css-url:this
     char -b a-zA-Z_ value
     char } start
     str "/*" .css-comment:this
