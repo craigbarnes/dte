@@ -14,7 +14,7 @@ command mode of the editor. The syntax of the language is quite similar
 to shell, but much simpler.
 
 Commands are separated either by a newline or `;` character. To make a
-command span multiple lines in an rc file, escape the newline (put `\\`
+command span multiple lines in an rc file, escape the newline (put `\`
 at the end of the line).
 
 Rc files can contain comments at the start of a line. Comments begin
