@@ -43,63 +43,63 @@ static void term_read_caps(void)
     terminal.control_codes = tcc;
 
     static TermKeyMap keymap[] = {
-        {KEY_INSERT, "kich1"},
-        {KEY_DELETE, "kdch1"},
-        {KEY_HOME, "khome"},
-        {KEY_END, "kend"},
-        {KEY_PAGE_UP, "kpp"},
-        {KEY_PAGE_DOWN, "knp"},
-        {KEY_LEFT, "kcub1"},
-        {KEY_RIGHT, "kcuf1"},
-        {KEY_UP, "kcuu1"},
-        {KEY_DOWN, "kcud1"},
-        {KEY_F1, "kf1"},
-        {KEY_F2, "kf2"},
-        {KEY_F3, "kf3"},
-        {KEY_F4, "kf4"},
-        {KEY_F5, "kf5"},
-        {KEY_F6, "kf6"},
-        {KEY_F7, "kf7"},
-        {KEY_F8, "kf8"},
-        {KEY_F9, "kf9"},
-        {KEY_F10, "kf10"},
-        {KEY_F11, "kf11"},
-        {KEY_F12, "kf12"},
-        {MOD_SHIFT | KEY_LEFT, "kLFT"},
-        {MOD_SHIFT | KEY_RIGHT, "kRIT"},
-        {MOD_SHIFT | KEY_HOME, "kHOM"},
-        {MOD_SHIFT | KEY_END, "kEND"},
-        {MOD_SHIFT | KEY_DELETE, "kDC"},
+        {"kich1", KEY_INSERT},
+        {"kdch1", KEY_DELETE},
+        {"khome", KEY_HOME},
+        {"kend", KEY_END},
+        {"kpp", KEY_PAGE_UP},
+        {"knp", KEY_PAGE_DOWN},
+        {"kcub1", KEY_LEFT},
+        {"kcuf1", KEY_RIGHT},
+        {"kcuu1", KEY_UP},
+        {"kcud1", KEY_DOWN},
+        {"kf1", KEY_F1},
+        {"kf2", KEY_F2},
+        {"kf3", KEY_F3},
+        {"kf4", KEY_F4},
+        {"kf5", KEY_F5},
+        {"kf6", KEY_F6},
+        {"kf7", KEY_F7},
+        {"kf8", KEY_F8},
+        {"kf9", KEY_F9},
+        {"kf10", KEY_F10},
+        {"kf11", KEY_F11},
+        {"kf12", KEY_F12},
+        {"kLFT", MOD_SHIFT | KEY_LEFT},
+        {"kRIT", MOD_SHIFT | KEY_RIGHT},
+        {"kHOM", MOD_SHIFT | KEY_HOME},
+        {"kEND", MOD_SHIFT | KEY_END},
+        {"kDC", MOD_SHIFT | KEY_DELETE},
 
         // Extended capabilities (see ncurses user_caps(5) manpage)
-        {MOD_CTRL | KEY_DELETE, "kDC5"},
-        {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "kDC6"},
-        {MOD_SHIFT | KEY_UP, "kUP"},
-        {MOD_SHIFT | KEY_DOWN, "kDN"},
-        {MOD_META | KEY_LEFT, "kLFT3"},
-        {MOD_META | KEY_RIGHT, "kRIT3"},
-        {MOD_META | KEY_UP, "kUP3"},
-        {MOD_META | KEY_DOWN, "kDN3"},
-        {MOD_CTRL | KEY_LEFT, "kLFT5"},
-        {MOD_CTRL | KEY_RIGHT, "kRIT5"},
-        {MOD_CTRL | KEY_UP, "kUP5"},
-        {MOD_CTRL | KEY_DOWN, "kDN5"},
-        {MOD_META | MOD_SHIFT | KEY_LEFT, "kLFT4"},
-        {MOD_META | MOD_SHIFT | KEY_RIGHT, "kRIT4"},
-        {MOD_META | MOD_SHIFT | KEY_UP, "kUP4"},
-        {MOD_META | MOD_SHIFT | KEY_DOWN, "kDN4"},
-        {MOD_CTRL | MOD_SHIFT | KEY_LEFT, "kLFT6"},
-        {MOD_CTRL | MOD_SHIFT | KEY_RIGHT, "kRIT6"},
-        {MOD_CTRL | MOD_SHIFT | KEY_UP, "kUP6"},
-        {MOD_CTRL | MOD_SHIFT | KEY_DOWN, "kDN6"},
-        {MOD_CTRL | MOD_META | KEY_LEFT, "kLFT7"},
-        {MOD_CTRL | MOD_META | KEY_RIGHT, "kRIT7"},
-        {MOD_CTRL | MOD_META | KEY_UP, "kUP7"},
-        {MOD_CTRL | MOD_META | KEY_DOWN, "kDN7"},
-        {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT, "kLFT8"},
-        {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT, "kRIT8"},
-        {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP, "kUP8"},
-        {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN, "kDN8"},
+        {"kDC5", MOD_CTRL | KEY_DELETE},
+        {"kDC6", MOD_CTRL | MOD_SHIFT | KEY_DELETE},
+        {"kUP", MOD_SHIFT | KEY_UP},
+        {"kDN", MOD_SHIFT | KEY_DOWN},
+        {"kLFT3", MOD_META | KEY_LEFT},
+        {"kRIT3", MOD_META | KEY_RIGHT},
+        {"kUP3", MOD_META | KEY_UP},
+        {"kDN3", MOD_META | KEY_DOWN},
+        {"kLFT5", MOD_CTRL | KEY_LEFT},
+        {"kRIT5", MOD_CTRL | KEY_RIGHT},
+        {"kUP5", MOD_CTRL | KEY_UP},
+        {"kDN5", MOD_CTRL | KEY_DOWN},
+        {"kLFT4", MOD_META | MOD_SHIFT | KEY_LEFT},
+        {"kRIT4", MOD_META | MOD_SHIFT | KEY_RIGHT},
+        {"kUP4", MOD_META | MOD_SHIFT | KEY_UP},
+        {"kDN4", MOD_META | MOD_SHIFT | KEY_DOWN},
+        {"kLFT6", MOD_CTRL | MOD_SHIFT | KEY_LEFT},
+        {"kRIT6", MOD_CTRL | MOD_SHIFT | KEY_RIGHT},
+        {"kUP6", MOD_CTRL | MOD_SHIFT | KEY_UP},
+        {"kDN6", MOD_CTRL | MOD_SHIFT | KEY_DOWN},
+        {"kLFT7", MOD_CTRL | MOD_META | KEY_LEFT},
+        {"kRIT7", MOD_CTRL | MOD_META | KEY_RIGHT},
+        {"kUP7", MOD_CTRL | MOD_META | KEY_UP},
+        {"kDN7", MOD_CTRL | MOD_META | KEY_DOWN},
+        {"kLFT8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT},
+        {"kRIT8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT},
+        {"kUP8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
+        {"kDN8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN},
     };
 
     static const size_t keymap_length = ARRAY_COUNT(keymap);
@@ -125,10 +125,10 @@ static void term_init_fallback(const char *const term)
 #else
 
 static const TermKeyMap ansi_keymap[] = {
-    {KEY_LEFT, "\033[D"},
-    {KEY_RIGHT, "\033[C"},
-    {KEY_UP, "\033[A"},
-    {KEY_DOWN, "\033[B"},
+    {"\033[A", KEY_UP},
+    {"\033[B", KEY_DOWN},
+    {"\033[C", KEY_RIGHT},
+    {"\033[D", KEY_LEFT},
 };
 
 static const TermControlCodes ansi_control_codes = {
@@ -152,48 +152,48 @@ static void term_init_fallback(const char *const UNUSED(term))
 #endif // ifndef TERMINFO_DISABLE
 
 #define XTERM_KEYMAP_COMMON \
-    {KEY_INSERT, "\033[2~"}, \
-    {KEY_DELETE, "\033[3~"}, \
-    {KEY_HOME, "\033OH"}, \
-    {KEY_HOME, "\033[1~"}, \
-    {KEY_END, "\033OF"}, \
-    {KEY_END, "\033[4~"}, \
-    {KEY_PAGE_UP, "\033[5~"}, \
-    {KEY_PAGE_DOWN, "\033[6~"}, \
-    {KEY_LEFT, "\033OD"}, \
-    {KEY_RIGHT, "\033OC"}, \
-    {KEY_UP, "\033OA"}, \
-    {KEY_DOWN, "\033OB"}, \
-    {KEY_F1, "\033OP"}, \
-    {KEY_F2, "\033OQ"}, \
-    {KEY_F3, "\033OR"}, \
-    {KEY_F4, "\033OS"}, \
-    {KEY_F5, "\033[15~"}, \
-    {KEY_F6, "\033[17~"}, \
-    {KEY_F7, "\033[18~"}, \
-    {KEY_F8, "\033[19~"}, \
-    {KEY_F9, "\033[20~"}, \
-    {KEY_F10, "\033[21~"}, \
-    {KEY_F11, "\033[23~"}, \
-    {KEY_F12, "\033[24~"}, \
-    {MOD_SHIFT | KEY_UP, "\033[1;2A"}, \
-    {MOD_SHIFT | KEY_DOWN, "\033[1;2B"}, \
-    {MOD_SHIFT | KEY_LEFT, "\033[1;2D"}, \
-    {MOD_SHIFT | KEY_RIGHT,"\033[1;2C"}, \
-    {MOD_CTRL | KEY_LEFT, "\033[1;5D"}, \
-    {MOD_CTRL | KEY_RIGHT, "\033[1;5C"}, \
-    {MOD_CTRL | KEY_UP, "\033[1;5A"}, \
-    {MOD_CTRL | KEY_DOWN, "\033[1;5B"}, \
-    {MOD_META | KEY_LEFT, "\033[1;3D"}, \
-    {MOD_META | KEY_RIGHT, "\033[1;3C"}, \
-    {MOD_META | KEY_UP, "\033[1;3A"}, \
-    {MOD_META | KEY_DOWN, "\033[1;3B"}, \
+    {"\033[2~", KEY_INSERT}, \
+    {"\033[3~", KEY_DELETE}, \
+    {"\033OH", KEY_HOME}, \
+    {"\033[1~", KEY_HOME}, \
+    {"\033OF", KEY_END}, \
+    {"\033[4~", KEY_END}, \
+    {"\033[5~", KEY_PAGE_UP}, \
+    {"\033[6~", KEY_PAGE_DOWN}, \
+    {"\033OD", KEY_LEFT}, \
+    {"\033OC", KEY_RIGHT}, \
+    {"\033OA", KEY_UP}, \
+    {"\033OB", KEY_DOWN}, \
+    {"\033OP", KEY_F1}, \
+    {"\033OQ", KEY_F2}, \
+    {"\033OR", KEY_F3}, \
+    {"\033OS", KEY_F4}, \
+    {"\033[15~", KEY_F5}, \
+    {"\033[17~", KEY_F6}, \
+    {"\033[18~", KEY_F7}, \
+    {"\033[19~", KEY_F8}, \
+    {"\033[20~", KEY_F9}, \
+    {"\033[21~", KEY_F10}, \
+    {"\033[23~", KEY_F11}, \
+    {"\033[24~", KEY_F12}, \
+    {"\033[1;2A", MOD_SHIFT | KEY_UP}, \
+    {"\033[1;2B", MOD_SHIFT | KEY_DOWN}, \
+    {"\033[1;2D", MOD_SHIFT | KEY_LEFT}, \
+    {"\033[1;2C", MOD_SHIFT | KEY_RIGHT}, \
+    {"\033[1;5D", MOD_CTRL | KEY_LEFT}, \
+    {"\033[1;5C", MOD_CTRL | KEY_RIGHT}, \
+    {"\033[1;5A", MOD_CTRL | KEY_UP}, \
+    {"\033[1;5B", MOD_CTRL | KEY_DOWN}, \
+    {"\033[1;3D", MOD_META | KEY_LEFT}, \
+    {"\033[1;3C", MOD_META | KEY_RIGHT}, \
+    {"\033[1;3A", MOD_META | KEY_UP}, \
+    {"\033[1;3B", MOD_META | KEY_DOWN}, \
     /* Fix keypad when numlock is off */ \
-    {'/', "\033Oo"}, \
-    {'*', "\033Oj"}, \
-    {'-', "\033Om"}, \
-    {'+', "\033Ok"}, \
-    {'\r', "\033OM"},
+    {"\033Oo", '/'}, \
+    {"\033Oj", '*'}, \
+    {"\033Om", '-'}, \
+    {"\033Ok", '+'}, \
+    {"\033OM", '\r'},
 
 static const TermKeyMap st_keymap[] = {
     XTERM_KEYMAP_COMMON
@@ -201,65 +201,65 @@ static const TermKeyMap st_keymap[] = {
 
 static const TermKeyMap xterm_keymap[] = {
     XTERM_KEYMAP_COMMON
-    {MOD_CTRL | MOD_SHIFT | KEY_LEFT, "\033[1;6D"},
-    {MOD_CTRL | MOD_SHIFT | KEY_RIGHT, "\033[1;6C"},
-    {MOD_CTRL | MOD_SHIFT | KEY_UP, "\033[1;6A"},
-    {MOD_CTRL | MOD_SHIFT | KEY_DOWN, "\033[1;6B"},
-    {MOD_META | MOD_SHIFT | KEY_LEFT, "\033[1;4D"},
-    {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033[1;4C"},
-    {MOD_META | MOD_SHIFT | KEY_UP, "\033[1;4A"},
-    {MOD_META | MOD_SHIFT | KEY_DOWN, "\033[1;4B"},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT, "\033[1;8D"},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT, "\033[1;8C"},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP, "\033[1;8A"},
-    {MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN, "\033[1;8B"},
-    {MOD_CTRL | KEY_DELETE, "\033[3;5~"},
-    {MOD_SHIFT | KEY_DELETE, "\033[3;2~"},
-    {MOD_CTRL | MOD_SHIFT | KEY_DELETE, "\033[3;6~"},
-    {MOD_SHIFT | '\t', "\033[Z"},
+    {"\033[1;6D", MOD_CTRL | MOD_SHIFT | KEY_LEFT},
+    {"\033[1;6C", MOD_CTRL | MOD_SHIFT | KEY_RIGHT},
+    {"\033[1;6A", MOD_CTRL | MOD_SHIFT | KEY_UP},
+    {"\033[1;6B", MOD_CTRL | MOD_SHIFT | KEY_DOWN},
+    {"\033[1;4D", MOD_META | MOD_SHIFT | KEY_LEFT},
+    {"\033[1;4C", MOD_META | MOD_SHIFT | KEY_RIGHT},
+    {"\033[1;4A", MOD_META | MOD_SHIFT | KEY_UP},
+    {"\033[1;4B", MOD_META | MOD_SHIFT | KEY_DOWN},
+    {"\033[1;8D", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT},
+    {"\033[1;8C", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT},
+    {"\033[1;8A", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
+    {"\033[1;8B", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN},
+    {"\033[3;5~", MOD_CTRL | KEY_DELETE},
+    {"\033[3;2~", MOD_SHIFT | KEY_DELETE},
+    {"\033[3;6~", MOD_CTRL | MOD_SHIFT | KEY_DELETE},
+    {"\033[Z", MOD_SHIFT | '\t'},
 };
 
 static const TermKeyMap rxvt_keymap[] = {
-    {KEY_INSERT, "\033[2~"},
-    {KEY_DELETE, "\033[3~"},
-    {KEY_HOME, "\033[7~"},
-    {KEY_END, "\033[8~"},
-    {KEY_PAGE_UP, "\033[5~"},
-    {KEY_PAGE_DOWN, "\033[6~"},
-    {KEY_LEFT, "\033[D"},
-    {KEY_RIGHT, "\033[C"},
-    {KEY_UP, "\033[A"},
-    {KEY_DOWN, "\033[B"},
-    {KEY_F1, "\033[11~"},
-    {KEY_F2, "\033[12~"},
-    {KEY_F3, "\033[13~"},
-    {KEY_F4, "\033[14~"},
-    {KEY_F5, "\033[15~"},
-    {KEY_F6, "\033[17~"},
-    {KEY_F7, "\033[18~"},
-    {KEY_F8, "\033[19~"},
-    {KEY_F9, "\033[20~"},
-    {KEY_F10, "\033[21~"},
-    {KEY_F11, "\033[23~"},
-    {KEY_F12, "\033[24~"},
-    {MOD_SHIFT | KEY_HOME, "\033[7$"},
-    {MOD_SHIFT | KEY_END, "\033[8$"},
-    {MOD_SHIFT | KEY_LEFT, "\033[d"},
-    {MOD_SHIFT | KEY_RIGHT, "\033[c"},
-    {MOD_SHIFT | KEY_UP, "\033[a"},
-    {MOD_SHIFT | KEY_DOWN, "\033[b"},
-    {MOD_CTRL | KEY_LEFT, "\033Od"},
-    {MOD_CTRL | KEY_RIGHT, "\033Oc"},
-    {MOD_CTRL | KEY_UP, "\033Oa"},
-    {MOD_CTRL | KEY_DOWN, "\033Ob"},
-    {MOD_META | KEY_LEFT, "\033\033[D"},
-    {MOD_META | KEY_RIGHT, "\033\033[C"},
-    {MOD_META | KEY_UP, "\033\033[A"},
-    {MOD_META | KEY_DOWN, "\033\033[B"},
-    {MOD_META | MOD_SHIFT | KEY_LEFT, "\033\033[d"},
-    {MOD_META | MOD_SHIFT | KEY_RIGHT, "\033\033[c"},
-    {MOD_META | MOD_SHIFT | KEY_UP, "\033\033[a"},
-    {MOD_META | MOD_SHIFT | KEY_DOWN, "\033\033[b"},
+    {"\033[2~", KEY_INSERT},
+    {"\033[3~", KEY_DELETE},
+    {"\033[7~", KEY_HOME},
+    {"\033[8~", KEY_END},
+    {"\033[5~", KEY_PAGE_UP},
+    {"\033[6~", KEY_PAGE_DOWN},
+    {"\033[D", KEY_LEFT},
+    {"\033[C", KEY_RIGHT},
+    {"\033[A", KEY_UP},
+    {"\033[B", KEY_DOWN},
+    {"\033[11~", KEY_F1},
+    {"\033[12~", KEY_F2},
+    {"\033[13~", KEY_F3},
+    {"\033[14~", KEY_F4},
+    {"\033[15~", KEY_F5},
+    {"\033[17~", KEY_F6},
+    {"\033[18~", KEY_F7},
+    {"\033[19~", KEY_F8},
+    {"\033[20~", KEY_F9},
+    {"\033[21~", KEY_F10},
+    {"\033[23~", KEY_F11},
+    {"\033[24~", KEY_F12},
+    {"\033[7$", MOD_SHIFT | KEY_HOME},
+    {"\033[8$", MOD_SHIFT | KEY_END},
+    {"\033[d", MOD_SHIFT | KEY_LEFT},
+    {"\033[c", MOD_SHIFT | KEY_RIGHT},
+    {"\033[a", MOD_SHIFT | KEY_UP},
+    {"\033[b", MOD_SHIFT | KEY_DOWN},
+    {"\033Od", MOD_CTRL | KEY_LEFT},
+    {"\033Oc", MOD_CTRL | KEY_RIGHT},
+    {"\033Oa", MOD_CTRL | KEY_UP},
+    {"\033Ob", MOD_CTRL | KEY_DOWN},
+    {"\033\033[D", MOD_META | KEY_LEFT},
+    {"\033\033[C", MOD_META | KEY_RIGHT},
+    {"\033\033[A", MOD_META | KEY_UP},
+    {"\033\033[B", MOD_META | KEY_DOWN},
+    {"\033\033[d", MOD_META | MOD_SHIFT | KEY_LEFT},
+    {"\033\033[c", MOD_META | MOD_SHIFT | KEY_RIGHT},
+    {"\033\033[a", MOD_META | MOD_SHIFT | KEY_UP},
+    {"\033\033[b", MOD_META | MOD_SHIFT | KEY_DOWN},
 };
 
 static const TermControlCodes xterm_control_codes = {

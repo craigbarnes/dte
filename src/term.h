@@ -45,8 +45,8 @@ typedef struct {
 } TermControlCodes;
 
 typedef struct {
-    Key key;
     const char *code;
+    Key key;
 } TermKeyMap;
 
 typedef struct {
