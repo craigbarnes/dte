@@ -1,7 +1,7 @@
 [attr]code text whitespace=tab-in-indent,tabwidth=4
 [attr]html text whitespace=tab-in-indent,tabwidth=2
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
-[attr]dterc code linguist-language=sh linguist-vendored
+[attr]dterc code
 
 .distinfo export-subst
 .git* export-ignore
