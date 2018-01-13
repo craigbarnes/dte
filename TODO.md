@@ -29,4 +29,3 @@ TODO
    * gettext
    * gnuplot
    * ninja
-   * Perl

@@ -1,7 +1,13 @@
 syntax perl
 
-# TODO: variables, numbers, regexp, builtins, POD
+state line-start
+    char "\n" this
+    char "=" maybe-pod
+    noeat code
+
+# TODO: variables, numbers, regexp, builtins
 state code
+    char "\n" line-start
     char # comment
     char -b a-zA-Z_ identifier
     char \" dq
@@ -9,7 +15,7 @@ state code
     eat this
 
 state comment
-    char "\n" code
+    char "\n" line-start
     eat this
 
 state identifier
@@ -28,7 +34,33 @@ state sq string
     # TODO: escapes
     eat this
 
+state maybe-pod pod
+    char a-z pod
+    recolor code 1
+    noeat code
+
+state pod
+    # TODO: Formatting Codes
+    char "\n" pod-line-start
+    eat this
+
+state pod-line-start pod
+    char "\n" this
+    str "=cut" maybe-cut
+    noeat pod
+
+state maybe-cut pod
+    char "\n" line-start
+    char " " cut-trailing
+    noeat pod
+
+state cut-trailing pod
+    char "\n" line-start
+    eat this
+
 list keyword \
     break continue default do each else elsif for foreach given if last \
     local my next our package return state sub unless until when while \
     __FILE__ __LINE__ __PACKAGE__
+
+default comment pod
