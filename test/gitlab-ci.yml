@@ -19,14 +19,14 @@ build:alpine:
         - ldd dte
         - make install && dte -V
         - strip dte && du -k -h dte
-        - test/objsize.sh dte
+        - tools/objsize.sh dte
 
 build:debian:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - make check && make install && dte -V
-        - sed -nf test/extract-readme-code.sed README.md | sh -e
+        - sed -nf tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
         - make clean && make check CC=gcc
         - make clean && make check CC=clang
@@ -58,7 +58,7 @@ pages:
         - make docs doxygen
         - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
         - strip dte
-        - test/objsize.sh dte
+        - tools/objsize.sh dte
         - ldd dte || true
         - TARNAME="$(./dte -V | head -n1 | tr -- ' ' -)-linux-$(uname -m)"
         - tar -czf "public/$TARNAME.tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5

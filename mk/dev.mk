@@ -13,7 +13,7 @@ $(DIST_ALL): dte-%.tar.gz:
 	$(E) ARCHIVE $@
 	$(Q) git archive --prefix='dte-$*/' -o '$@' 'v$*'
 
-$(GIT_HOOKS): .git/hooks/%: test/git-hooks/%
+$(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
 
