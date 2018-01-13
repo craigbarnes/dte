@@ -10,11 +10,10 @@ static void command_line_enter(void)
     PointerArray array = PTR_ARRAY_INIT;
     char *str = string_cstring(&editor.cmdline.buf);
     Error *err = NULL;
-    bool ok;
 
     reset_completion();
     set_input_mode(INPUT_NORMAL);
-    ok = parse_commands(&array, str, &err);
+    bool ok = parse_commands(&array, str, &err);
 
     // Need to do this before executing the command because
     // "command" can modify contents of command line.

@@ -184,9 +184,7 @@ static void cmd_command(const char* UNUSED(pf), char **args)
 
 static void cmd_compile(const char *pf, char **args)
 {
-    Compiler *c;
     SpawnFlags flags = SPAWN_DEFAULT;
-    const char *name;
 
     while (*pf) {
         switch (*pf) {
@@ -203,8 +201,8 @@ static void cmd_compile(const char *pf, char **args)
         pf++;
     }
 
-    name = *args++;
-    c = find_compiler(name);
+    const char *name = *args++;
+    Compiler *c = find_compiler(name);
     if (!c) {
         error_msg("No such error parser %s", name);
         return;
@@ -224,9 +222,8 @@ static void cmd_copy(const char* UNUSED(pf), char** UNUSED(args))
         copy(prepare_selection(view), view->selection == SELECT_LINES);
         unselect();
     } else {
-        BlockIter tmp;
         block_iter_bol(&view->cursor);
-        tmp = view->cursor;
+        BlockIter tmp = view->cursor;
         copy(block_iter_eat_line(&tmp), 1);
     }
     view->cursor = save;
@@ -365,10 +362,10 @@ static void cmd_filter(const char* UNUSED(pf), char **args)
         data.in_len = prepare_selection(view);
     } else {
         Block *blk;
-
         data.in_len = 0;
-        list_for_each_entry(blk, &buffer->blocks, node)
+        list_for_each_entry(blk, &buffer->blocks, node) {
             data.in_len += blk->size;
+        }
         move_bof();
     }
 
@@ -513,9 +510,7 @@ static void cmd_left(const char* UNUSED(pf), char** UNUSED(args))
 static void cmd_line(const char* UNUSED(pf), char **args)
 {
     int x = view_get_preferred_x(view);
-    int line;
-
-    line = atoi(args[0]);
+    int line = atoi(args[0]);
     if (line > 0) {
         move_to_line(view, line);
         move_to_preferred_x(x);
@@ -526,12 +521,12 @@ static void cmd_load_syntax(const char* UNUSED(pf), char **args)
 {
     const char *filename = args[0];
     const char *filetype = path_basename(filename);
-    int err;
 
     if (filename != filetype) {
         if (find_syntax(filetype)) {
             error_msg("Syntax for filetype %s already loaded", filetype);
         } else {
+            int err;
             load_syntax_file(filename, true, &err);
         }
     } else {
@@ -648,7 +643,6 @@ static void cmd_option(const char *pf, char **args)
 {
     size_t argc = count_strings(args);
     BUG_ON(argc == 0);
-    char *list, *comma;
     char **strs = args + 1;
     size_t count = argc - 1;
 
@@ -669,7 +663,7 @@ static void cmd_option(const char *pf, char **args)
         return;
     }
 
-    list = args[0];
+    char *comma, *list = args[0];
     do {
         comma = strchr(list, ',');
         size_t len = comma ? comma - list : strlen(list);
@@ -1327,10 +1321,6 @@ static void cmd_suspend(const char* UNUSED(pf), char** UNUSED(args))
 
 static void cmd_tag(const char *pf, char **args)
 {
-    TagFile *tf;
-    PointerArray tags = PTR_ARRAY_INIT;
-    const char *name = args[0];
-    char *word = NULL;
     bool pop = false;
 
     while (*pf) {
@@ -1348,12 +1338,14 @@ static void cmd_tag(const char *pf, char **args)
     }
 
     clear_messages();
-    tf = load_tag_file();
+    TagFile *tf = load_tag_file();
     if (tf == NULL) {
         error_msg("No tag file.");
         return;
     }
 
+    const char *name = args[0];
+    char *word = NULL;
     if (!name) {
         word = view_get_word_under_cursor(view);
         if (!word) {
@@ -1362,6 +1354,7 @@ static void cmd_tag(const char *pf, char **args)
         name = word;
     }
 
+    PointerArray tags = PTR_ARRAY_INIT;
     // Filename helps to find correct tags
     tag_file_find_tags(tf, buffer->abs_filename, name, &tags);
     if (tags.count == 0) {
@@ -1406,6 +1399,7 @@ static void cmd_toggle(const char *pf, char **args)
         }
         pf++;
     }
+
     if (args[1]) {
         toggle_option_values(args[0], global, verbose, args + 1);
     } else {
@@ -1433,7 +1427,6 @@ static void cmd_up(const char* UNUSED(pf), char** UNUSED(args))
 static void cmd_view(const char* UNUSED(pf), char **args)
 {
     int idx;
-
     if (streq(args[0], "last")) {
         idx = window->views.count - 1;
     } else {
@@ -1548,8 +1541,6 @@ static void cmd_wsplit(const char *pf, char **args)
     bool before = false;
     bool vertical = false;
     bool root = false;
-    Frame *f;
-    View *save;
 
     while (*pf) {
         switch (*pf) {
@@ -1569,13 +1560,14 @@ static void cmd_wsplit(const char *pf, char **args)
         pf++;
     }
 
+    Frame *f;
     if (root) {
         f = split_root(vertical, before);
     } else {
         f = split_frame(window, vertical, before);
     }
 
-    save = view;
+    View *save = view;
     window = f->window;
     view = NULL;
     buffer = NULL;
@@ -1603,20 +1595,18 @@ static void cmd_wsplit(const char *pf, char **args)
 
 static void cmd_wswap(const char* UNUSED(pf), char** UNUSED(args))
 {
-    Frame *tmp, *parent = window->frame->parent;
-    size_t i, j;
-
+    Frame *parent = window->frame->parent;
     if (parent == NULL) {
         return;
     }
 
-    i = ptr_array_idx(&parent->frames, window->frame);
-    j = i + 1;
+    size_t i = ptr_array_idx(&parent->frames, window->frame);
+    size_t j = i + 1;
     if (j == parent->frames.count) {
         j = 0;
     }
 
-    tmp = parent->frames.ptrs[i];
+    Frame *tmp = parent->frames.ptrs[i];
     parent->frames.ptrs[i] = parent->frames.ptrs[j];
     parent->frames.ptrs[j] = tmp;
     mark_everything_changed();

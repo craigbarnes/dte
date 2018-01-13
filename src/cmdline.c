@@ -132,10 +132,9 @@ static void cmdline_insert_bytes(CommandLine *c, const char *buf, size_t size)
 
 static void cmdline_insert_paste(CommandLine *c)
 {
-    size_t size, i;
+    size_t size;
     char *text = term_read_paste(&size);
-
-    for (i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         if (text[i] == '\n') {
             text[i] = ' ';
         }
@@ -168,7 +167,6 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, Key key)
 {
     char buf[4];
     int count;
-
     if (special_input_keypress(key, buf, &count)) {
         // \n is not allowed in command line because
         // command/search history file would break

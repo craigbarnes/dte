@@ -112,13 +112,11 @@ static void record_delete(char *buf, size_t len, bool move_after)
 
 static void record_replace(char *deleted, size_t del_count, size_t ins_count)
 {
-    Change *change;
-
     BUG_ON(del_count && !deleted);
     BUG_ON(!del_count && deleted);
     BUG_ON(!del_count && !ins_count);
 
-    change = new_change();
+    Change *change = new_change();
     change->offset = buffer_offset();
     change->ins_count = ins_count;
     change->del_count = del_count;
@@ -373,7 +371,6 @@ static void buffer_delete_bytes_internal(size_t len, bool move_after)
     if (would_delete_last_bytes(len)) {
         BlockIter bi = view->cursor;
         unsigned int u;
-
         if (buffer_prev_char(&bi, &u) && u != '\n') {
             // No newline before cursor
             if (--len == 0) {

@@ -89,10 +89,6 @@ static void do_collect_files (
     const struct dirent *de;
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
-        String buf = STRING_INIT;
-        struct stat st;
-        size_t len;
-        bool is_dir;
 
         if (flen) {
             if (strncmp(name, fileprefix, flen)) {
@@ -104,17 +100,18 @@ static void do_collect_files (
             }
         }
 
-        len = strlen(name);
+        size_t len = strlen(name);
         if (plen + len + 2 > sizeof(path)) {
             continue;
         }
         memcpy(path + plen, name, len + 1);
 
+        struct stat st;
         if (lstat(path, &st)) {
             continue;
         }
 
-        is_dir = S_ISDIR(st.st_mode);
+        bool is_dir = S_ISDIR(st.st_mode);
         if (S_ISLNK(st.st_mode)) {
             if (!stat(path, &st)) {
                 is_dir = S_ISDIR(st.st_mode);
@@ -124,6 +121,7 @@ static void do_collect_files (
             continue;
         }
 
+        String buf = STRING_INIT;
         if (dirprefix[0]) {
             string_add_str(&buf, dirprefix);
             if (!str_has_suffix(dirprefix, "/")) {
@@ -207,14 +205,12 @@ static void collect_env(const char *prefix)
 
 static void collect_completions(char **args, int argc)
 {
-    const Command *cmd;
-
     if (!argc) {
         collect_commands(completion.parsed);
         return;
     }
 
-    cmd = find_command(commands, args[0]);
+    const Command *cmd = find_command(commands, args[0]);
     if (!cmd) {
         return;
     }
@@ -288,11 +284,10 @@ static void collect_completions(char **args, int argc)
 static void init_completion(void)
 {
     char *cmd = string_cstring(&editor.cmdline.buf);
-    const char *str;
     PointerArray array = PTR_ARRAY_INIT;
     int semicolon = -1;
     int completion_pos = -1;
-    size_t len, pos = 0;
+    size_t pos = 0;
 
     while (1) {
         while (ascii_isspace(cmd[pos])) {
@@ -352,8 +347,8 @@ static void init_completion(void)
         pos = end;
     }
 
-    str = cmd + completion_pos;
-    len = editor.cmdline.pos - completion_pos;
+    const char *str = cmd + completion_pos;
+    size_t len = editor.cmdline.pos - completion_pos;
     if (len && str[0] == '$') {
         bool var = true;
         for (size_t i = 1; i < len; i++) {
@@ -437,9 +432,6 @@ static char *escape(const char *str)
 
 void complete_command(void)
 {
-    char *middle, *str;
-    size_t head_len, middle_len, tail_len;
-
     if (!completion.head) {
         init_completion();
     }
@@ -447,12 +439,12 @@ void complete_command(void)
         return;
     }
 
-    middle = escape(completion.completions.ptrs[completion.idx]);
-    middle_len = strlen(middle);
-    head_len = strlen(completion.head);
-    tail_len = strlen(completion.tail);
+    char *middle = escape(completion.completions.ptrs[completion.idx]);
+    size_t middle_len = strlen(middle);
+    size_t head_len = strlen(completion.head);
+    size_t tail_len = strlen(completion.tail);
 
-    str = xmalloc(head_len + middle_len + tail_len + 2);
+    char *str = xmalloc(head_len + middle_len + tail_len + 2);
     memcpy(str, completion.head, head_len);
     memcpy(str + head_len, middle, middle_len);
     if (completion.completions.count == 1 && completion.add_space) {

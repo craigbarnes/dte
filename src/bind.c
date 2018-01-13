@@ -31,12 +31,10 @@ static bool parse_keys(KeyChain *chain, const char *str)
 
     memzero(chain);
     for (size_t i = 0; i < len; ) {
-        const char *key;
-
         while (i < len && keys[i] == 0) {
             i++;
         }
-        key = keys + i;
+        const char *key = keys + i;
         while (i < len && keys[i] != 0) {
             i++;
         }

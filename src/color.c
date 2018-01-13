@@ -46,17 +46,15 @@ void fill_builtin_colors(void)
 
 HlColor *set_highlight_color(const char *name, const TermColor *color)
 {
-    HlColor *c;
-
     for (size_t i = 0; i < hl_colors.count; i++) {
-        c = hl_colors.ptrs[i];
+        HlColor *c = hl_colors.ptrs[i];
         if (streq(name, c->name)) {
             c->color = *color;
             return c;
         }
     }
 
-    c = xnew(HlColor, 1);
+    HlColor *c = xnew(HlColor, 1);
     c->name = xstrdup(name);
     c->color = *color;
     ptr_array_add(&hl_colors, c);
@@ -77,15 +75,15 @@ static HlColor *find_real_color(const char *name)
 HlColor *find_color(const char *name)
 {
     HlColor *color = find_real_color(name);
-    const char *dot;
-
     if (color) {
         return color;
     }
-    dot = strchr(name, '.');
+
+    const char *dot = strchr(name, '.');
     if (dot) {
         return find_real_color(dot + 1);
     }
+
     return NULL;
 }
 
@@ -163,7 +161,6 @@ bool parse_term_color(TermColor *color, char **strs)
     for (size_t i = 0, count = 0; strs[i]; i++) {
         const char *str = strs[i];
         int val;
-
         if (parse_color(str, &val)) {
             if (count > 1) {
                 if (val == -2) {
