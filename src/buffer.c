@@ -53,9 +53,8 @@ const char *buffer_filename(const Buffer *b)
 Buffer *buffer_new(const char *encoding)
 {
     static int id;
-    Buffer *b;
 
-    b = xnew0(Buffer, 1);
+    Buffer *b = xnew0(Buffer, 1);
     list_init(&b->blocks);
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
@@ -77,10 +76,9 @@ Buffer *buffer_new(const char *encoding)
 Buffer *open_empty_buffer(void)
 {
     Buffer *b = buffer_new(editor.charset);
-    Block *blk;
 
     // At least one block required
-    blk = block_new(1);
+    Block *blk = block_new(1);
     list_add_before(&blk->node, &b->blocks);
 
     set_display_filename(b, xstrdup("(No name)"));
@@ -89,15 +87,13 @@ Buffer *open_empty_buffer(void)
 
 void free_buffer(Buffer *b)
 {
-    ListHead *item;
-
     ptr_array_remove(&buffers, b);
 
     if (b->locked) {
         unlock_file(b->abs_filename);
     }
 
-    item = b->blocks.next;
+    ListHead *item = b->blocks.next;
     while (item != &b->blocks) {
         ListHead *next = item->next;
         Block *blk = BLOCK(item);

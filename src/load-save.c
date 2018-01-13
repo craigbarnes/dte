@@ -52,9 +52,6 @@ static int decode_and_add_blocks (
     size_t size
 ) {
     const char *e = detect_encoding_from_bom(buf, size);
-    FileDecoder *dec;
-    char *line;
-    ssize_t len;
 
     if (b->encoding == NULL) {
         if (e) {
@@ -95,11 +92,13 @@ static int decode_and_add_blocks (
         size -= bom_len;
     }
 
-    dec = new_file_decoder(b->encoding, buf, size);
+    FileDecoder *dec = new_file_decoder(b->encoding, buf, size);
     if (dec == NULL) {
         return -1;
     }
 
+    char *line;
+    ssize_t len;
     if (file_decoder_read_line(dec, &line, &len)) {
         Block *blk = NULL;
 
@@ -126,6 +125,7 @@ static int decode_and_add_blocks (
         }
         b->encoding = xstrdup(e);
     }
+
     free_file_decoder(dec);
     return 0;
 }
@@ -243,9 +243,9 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
 
 static char *tmp_filename(const char *filename)
 {
-    char *tmp, *dir = path_dirname(filename);
+    char *dir = path_dirname(filename);
     const char *base = path_basename(filename);
-    tmp = xsprintf("%s/.tmp.%s.XXXXXX", dir, base);
+    char *tmp = xsprintf("%s/.tmp.%s.XXXXXX", dir, base);
     free(dir);
     return tmp;
 }

@@ -7,15 +7,14 @@
 
 static void sanity_check(void)
 {
-    Block *blk;
-    bool cursor_seen = false;
-
     if (!DEBUG) {
         return;
     }
 
     BUG_ON(list_empty(&buffer->blocks));
 
+    bool cursor_seen = false;
+    Block *blk;
     list_for_each_entry(blk, &buffer->blocks, node) {
         BUG_ON(!blk->size && buffer->blocks.next->next != &buffer->blocks);
         BUG_ON(blk->size > blk->alloc);
@@ -39,7 +38,6 @@ static inline size_t ALLOC_ROUND(size_t size)
 Block *block_new(size_t alloc)
 {
     Block *blk = xnew0(Block, 1);
-
     alloc = ALLOC_ROUND(alloc);
     blk->data = xnew(char, alloc);
     blk->alloc = alloc;
@@ -70,14 +68,13 @@ static size_t insert_to_current(const char *buf, size_t len)
     Block *blk = view->cursor.blk;
     size_t offset = view->cursor.offset;
     size_t size = blk->size + len;
-    size_t nl;
 
     if (size > blk->alloc) {
         blk->alloc = ALLOC_ROUND(size);
         xrenew(blk->data, blk->alloc);
     }
     memmove(blk->data + offset + len, blk->data + offset, blk->size - offset);
-    nl = copy_count_nl(blk->data + offset, buf, len);
+    size_t nl = copy_count_nl(blk->data + offset, buf, len);
     blk->nl += nl;
     blk->size = size;
     return nl;
@@ -111,7 +108,6 @@ static size_t split_and_insert(const char *buf, size_t len)
         // Size of new block if next line would be added
         size_t new_size = 0;
         size_t copied = 0;
-        Block *new;
 
         if (pos < size1) {
             const char *nl = memchr(buf1 + pos, '\n', size1 - pos);
@@ -122,13 +118,11 @@ static size_t split_and_insert(const char *buf, size_t len)
 
         if (!new_size && pos < size1 + size2) {
             size_t offset = 0;
-            const char *nl;
-
             if (pos > size1) {
                 offset = pos - size1;
             }
 
-            nl = memchr(buf2 + offset, '\n', size2 - offset);
+            const char *nl = memchr(buf2 + offset, '\n', size2 - offset);
             if (nl) {
                 new_size = size1 + nl - buf2 + 1 - start;
             }
@@ -136,13 +130,11 @@ static size_t split_and_insert(const char *buf, size_t len)
 
         if (!new_size && pos < total) {
             size_t offset = 0;
-            const char *nl;
-
             if (pos > size1 + size2) {
                 offset = pos - size1 - size2;
             }
 
-            nl = memchr(buf3 + offset, '\n', size3 - offset);
+            const char *nl = memchr(buf3 + offset, '\n', size3 - offset);
             if (nl) {
                 new_size = size1 + size2 + nl - buf3 + 1 - start;
             } else {
@@ -167,7 +159,7 @@ static size_t split_and_insert(const char *buf, size_t len)
         }
 
         BUG_ON(!size);
-        new = block_new(size);
+        Block *new = block_new(size);
         if (start < size1) {
             size_t avail = size1 - start;
             size_t count = size;
@@ -223,15 +215,12 @@ static size_t split_and_insert(const char *buf, size_t len)
 
 static size_t insert_bytes(const char *buf, size_t len)
 {
-    Block *blk;
-    size_t new_size;
-
     // Blocks must contain whole lines.
     // Last char of buf might not be newline.
     block_iter_normalize(&view->cursor);
 
-    blk = view->cursor.blk;
-    new_size = blk->size + len;
+    Block *blk = view->cursor.blk;
+    size_t new_size = blk->size + len;
     if (new_size <= blk->alloc || new_size <= BLOCK_EDIT_SIZE) {
         return insert_to_current(buf, len);
     }
@@ -272,7 +261,6 @@ char *do_delete(size_t len)
     size_t offset = view->cursor.offset;
     size_t pos = 0;
     size_t deleted_nl = 0;
-    char *buf;
 
     if (!len) {
         return NULL;
@@ -283,17 +271,16 @@ char *do_delete(size_t len)
         saved_prev_node = blk->node.prev;
     }
 
-    buf = xnew(char, len);
+    char *buf = xnew(char, len);
     while (pos < len) {
         ListHead *next = blk->node.next;
         size_t avail = blk->size - offset;
         size_t count = len - pos;
-        size_t nl;
 
         if (count > avail) {
             count = avail;
         }
-        nl = copy_count_nl(buf + pos, blk->data + offset, count);
+        size_t nl = copy_count_nl(buf + pos, blk->data + offset, count);
         if (count < avail) {
             memmove (
                 blk->data + offset,
@@ -362,21 +349,16 @@ char *do_delete(size_t len)
 
 char *do_replace(size_t del, const char *buf, size_t ins)
 {
-    Block *blk;
-    size_t offset, avail, new_size;
-    char *ptr, *deleted;
-    size_t del_nl, ins_nl;
-
     block_iter_normalize(&view->cursor);
-    blk = view->cursor.blk;
-    offset = view->cursor.offset;
+    Block *blk = view->cursor.blk;
+    size_t offset = view->cursor.offset;
 
-    avail = blk->size - offset;
+    size_t avail = blk->size - offset;
     if (del >= avail) {
         goto slow;
     }
 
-    new_size = blk->size + ins - del;
+    size_t new_size = blk->size + ins - del;
     if (new_size > BLOCK_EDIT_SIZE) {
         // Should split
         if (blk->nl > 1 || memchr(buf, '\n', ins)) {
@@ -391,9 +373,9 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     }
 
     // Modification is limited to one block
-    ptr = blk->data + offset;
-    deleted = xmalloc(del);
-    del_nl = copy_count_nl(deleted, ptr, del);
+    char *ptr = blk->data + offset;
+    char *deleted = xmalloc(del);
+    size_t del_nl = copy_count_nl(deleted, ptr, del);
     blk->nl -= del_nl;
     buffer->nl -= del_nl;
 
@@ -401,7 +383,7 @@ char *do_replace(size_t del, const char *buf, size_t ins)
         memmove(ptr + ins, ptr + del, avail - del);
     }
 
-    ins_nl = copy_count_nl(ptr, buf, ins);
+    size_t ins_nl = copy_count_nl(ptr, buf, ins);
     blk->nl += ins_nl;
     buffer->nl += ins_nl;
     blk->size = new_size;

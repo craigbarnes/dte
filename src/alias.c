@@ -27,8 +27,6 @@ static bool is_valid_alias_name(const char *const name)
 
 void add_alias(const char *name, const char *value)
 {
-    CommandAlias *alias;
-
     if (!is_valid_alias_name(name)) {
         error_msg("Invalid alias name '%s'", name);
         return;
@@ -40,7 +38,7 @@ void add_alias(const char *name, const char *value)
 
     // Replace existing alias
     for (size_t i = 0; i < aliases.count; i++) {
-        alias = aliases.ptrs[i];
+        CommandAlias *alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {
             free(alias->value);
             alias->value = xstrdup(value);
@@ -48,7 +46,7 @@ void add_alias(const char *name, const char *value)
         }
     }
 
-    alias = xnew(CommandAlias, 1);
+    CommandAlias *alias = xnew(CommandAlias, 1);
     alias->name = xstrdup(name);
     alias->value = xstrdup(value);
     ptr_array_add(&aliases, alias);

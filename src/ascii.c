@@ -30,11 +30,9 @@ int hex_decode(int ch)
 {
     if (sane_istest(ch, ASCII_DIGIT)) {
         return ch - '0';
-    }
-    if (sane_istest(ch, ASCII_HEX_LOWER)) {
+    } else if (sane_istest(ch, ASCII_HEX_LOWER)) {
         return ch - 'a' + 10;
-    }
-    if (sane_istest(ch, ASCII_HEX_UPPER)) {
+    } else if (sane_istest(ch, ASCII_HEX_UPPER)) {
         return ch - 'A' + 10;
     }
     return -1;

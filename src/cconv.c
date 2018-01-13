@@ -141,13 +141,12 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
 
     while (c->tcount < sizeof(c->tbuf) && ipos < len) {
         size_t skip;
-        int rc;
 
         c->tbuf[c->tcount++] = input[ipos++];
 
         ib = c->tbuf;
         ic = c->tcount;
-        rc = xiconv(c, &ib, &ic);
+        int rc = xiconv(c, &ib, &ic);
 
         if (ic > 0) {
             memmove(c->tbuf, ib, ic);
@@ -178,9 +177,6 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
 
 void cconv_process(struct cconv *c, const char *input, size_t len)
 {
-    size_t ic;
-    char *ib;
-
     if (c->consumed > 0) {
         size_t fill = c->opos - c->consumed;
         memmove(c->obuf, c->obuf + c->consumed, fill);
@@ -194,8 +190,8 @@ void cconv_process(struct cconv *c, const char *input, size_t len)
         len -= ipos;
     }
 
-    ib = (char *)input;
-    ic = len;
+    char *ib = (char *)input;
+    size_t ic = len;
     while (ic > 0) {
         size_t skip;
 
