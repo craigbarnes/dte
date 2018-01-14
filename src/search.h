@@ -2,6 +2,7 @@
 #define SEARCH_H
 
 #include <stdbool.h>
+#include "macros.h"
 
 typedef enum {
     SEARCH_FWD,
@@ -25,6 +26,7 @@ void search_prev(void);
 void search_next(void);
 void search_next_word(void);
 
+NONNULL_ARGS
 void reg_replace(const char *pattern, const char *format, ReplaceFlags flags);
 
 #endif

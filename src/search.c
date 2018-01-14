@@ -411,6 +411,11 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     int nr_lines = 0;
     regex_t re;
 
+    if (pattern[0] == '\0') {
+        error_msg("Search pattern must contain at least 1 character");
+        return;
+    }
+
     if (flags & REPLACE_IGNORE_CASE) {
         re_flags |= REG_ICASE;
     }
