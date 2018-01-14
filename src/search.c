@@ -281,7 +281,7 @@ static void build_replacement (
                 if (len > 0) {
                     string_add_buf(buf, line + m[n].rm_so, len);
                 }
-            } else {
+            } else if (format[i] != '\0') {
                 string_add_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
