@@ -17,6 +17,7 @@ TODO
 * Allow custom key bindings in command mode
 * Fix `left`, `right` and `delete` commands to behave correctly with
   combining characters.
+* Gradually replace `xmalloc`/`xstrdup`/etc. with situational error recovery.
 * Add more syntax highlighting definitions
    * pkg-config
    * JSON
