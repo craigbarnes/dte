@@ -123,11 +123,10 @@ int main(int argc, char *argv[])
     term_init(term);
 
     // Create this early. Needed if lock-files is true.
-    char *editor_dir = editor_file("");
+    const char *const editor_dir = editor.user_config_dir;
     if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
-    free(editor_dir);
 
     exec_builtin_rc("hi\n");
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
