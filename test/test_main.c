@@ -6,6 +6,7 @@
 #include <locale.h>
 #include <langinfo.h>
 
+FORMAT(1)
 static void fail(const char *format, ...)
 {
     va_list ap;
@@ -61,7 +62,7 @@ static void test_detect_encoding_from_bom(void)
         const char *result = detect_encoding_from_bom(t->text, t->size);
         if (!xstreq(result, t->encoding)) {
             fail (
-                "%s: test #%zd failed: got %s, expected %s\n",
+                "%s: test #%zu failed: got %s, expected %s\n",
                 __func__,
                 i + 1,
                 result ? result : "(null)",
