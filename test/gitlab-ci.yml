@@ -55,7 +55,7 @@ pages:
     artifacts: {paths: [public]}
     only: [master]
     script: &PAGES_SCRIPT
-        - make docs doxygen
+        - make docs
         - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
         - strip dte
         - tools/objsize.sh dte
