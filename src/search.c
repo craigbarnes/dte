@@ -362,7 +362,7 @@ static int replace_on_line (
             build_replacement(&b, buf + pos, format, m);
 
             // lineref is invalidated by modification
-            if (buf == lr->line) {
+            if (buf == lr->line && lr->size != 0) {
                 buf = xmemdup(buf, lr->size);
             }
 
