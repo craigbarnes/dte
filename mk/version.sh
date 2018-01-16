@@ -1,6 +1,8 @@
 #!/bin/sh
-set -eu
 
+# This script generates the version string, as printed by "dte -V".
+
+set -eu
 export VPREFIX="$1"
 
 git_describe_ver=$(git describe --match="v$VPREFIX" 2>/dev/null || true)
