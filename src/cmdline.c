@@ -194,10 +194,9 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, Key key)
         break;
     case CTRL('H'):
     case CTRL('?'):
-        if (c->buf.len == 0) {
-            return CMDLINE_CANCEL;
+        if (c->buf.len > 0) {
+            cmdline_backspace(c);
         }
-        cmdline_backspace(c);
         break;
     case CTRL('U'):
         cmdline_delete_bol(c);
