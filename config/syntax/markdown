@@ -18,8 +18,14 @@ syntax markdown
 # TODO: Underlined headings
 # TODO: Escapes
 
-default special unordered-list
-default numeric ordered-list
+state file-start
+    str -- "---\n" yaml
+    noeat line-start
+
+state yaml
+    str -- "---\n" line-start yaml
+    str "...\n" line-start yaml
+    eat this
 
 state line-start
     str "\t" code-block
@@ -136,3 +142,7 @@ state reference-close
 #    char \[ reference-pointer
 #    char : reference-backref
     noeat text
+
+default comment yaml
+default special unordered-list
+default numeric ordered-list
