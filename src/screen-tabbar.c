@@ -15,16 +15,21 @@ static void print_horizontal_tab_title(View *v, int idx)
         filename += u_skip_chars(filename, &skip);
     }
 
-    snprintf(buf, sizeof(buf), "%c%d%s",
+    snprintf (
+        buf,
+        sizeof(buf),
+        "%c%d%s",
         obuf.x == 0 && idx > 0 ? '<' : ' ',
         idx + 1,
-        buffer_modified(v->buffer) ? "+" : ":");
+        buffer_modified(v->buffer) ? "+" : ":"
+    );
 
     if (v == v->window->view) {
         set_builtin_color(BC_ACTIVETAB);
     } else {
         set_builtin_color(BC_INACTIVETAB);
     }
+
     buf_add_str(buf);
     buf_add_str(filename);
     if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1) {
