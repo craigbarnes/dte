@@ -249,10 +249,6 @@ NORETURN void bug (
 void debug_print(const char *function, const char *fmt, ...)
 {
     static int fd = -1;
-    char buf[4096];
-    int pos;
-    va_list ap;
-
     if (fd < 0) {
         char *filename = editor_file("debug.log");
         fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0666);
@@ -263,10 +259,17 @@ void debug_print(const char *function, const char *fmt, ...)
         fcntl(fd, F_SETFD, FD_CLOEXEC);
     }
 
-    snprintf(buf, sizeof(buf), "%s: ", function);
-    pos = strlen(buf);
+    char buf[4096];
+    size_t write_max = ARRAY_COUNT(buf);
+    const int len1 = snprintf(buf, write_max, "%s: ", function);
+    BUG_ON(len1 <= 0 || len1 > write_max);
+    write_max -= len1;
+
+    va_list ap;
     va_start(ap, fmt);
-    vsnprintf(buf + pos, sizeof(buf) - pos, fmt, ap);
+    const int len2 = vsnprintf(buf + len1, write_max, fmt, ap);
     va_end(ap);
-    xwrite(fd, buf, strlen(buf));
+    BUG_ON(len2 <= 0 || len2 > write_max);
+
+    xwrite(fd, buf, len1 + len2);
 }
