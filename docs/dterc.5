@@ -799,7 +799,13 @@ Go to line.
 .RE
 \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
 .RS
-If argument contains a \fB/\fR character it is considered a filename.
+Load a \fBdte\-syntax\fR(5) file into the editor. If the argument contains a
+\fB/\fR character it's considered a filename.
+.P
+Note: this command only loads a syntax file ready for later use. To
+actually apply a syntax highlighter to the current buffer, use the
+\fBset\fR command to change the \fBfiletype\fR of the buffer instead, e.g.
+\fBset filetype html\fR.
 .P
 .RE
 \fBmove\-tab\fR \fIN\fR|left|right

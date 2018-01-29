@@ -437,7 +437,13 @@ Go to line.
 
 ### **load-syntax** _filename_|_filetype_
 
-If argument contains a `/` character it is considered a filename.
+Load a `dte-syntax` file into the editor. If the argument contains a
+`/` character it's considered a filename.
+
+Note: this command only loads a syntax file ready for later use. To
+actually apply a syntax highlighter to the current buffer, use the
+`set` command to change the `filetype` of the buffer instead, e.g.
+`set filetype html`.
 
 ### **move-tab** _N_|left|right
 
