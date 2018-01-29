@@ -17,6 +17,9 @@ TODO
 * Allow custom key bindings in command mode
 * Fix `left`, `right` and `delete` commands to behave correctly with
   combining characters.
+* Add user guide covering basic editor usage and also common issues faced
+  by new users (e.g. configuring the Meta key on OS X Terminal/FreeBSD VT,
+  quitting with unsaved changes, etc.)
 * Gradually replace `xmalloc`/`xstrdup`/etc. with situational error recovery.
 * Add more syntax highlighting definitions
    * pkg-config
