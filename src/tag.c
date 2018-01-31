@@ -85,9 +85,8 @@ static int tag_cmp(const void *ap, const void *bp)
 {
     const Tag *a = *(const Tag **)ap;
     const Tag *b = *(const Tag **)bp;
-    int ret;
 
-    ret = visibility_cmp(a, b);
+    int ret = visibility_cmp(a, b);
     if (ret) {
         return ret;
     }
@@ -101,14 +100,14 @@ static int open_tag_file(char *path)
     const char tags[] = "tags";
 
     while (*path) {
-        int fd, len = strlen(path);
+        size_t len = strlen(path);
         char *slash = strrchr(path, '/');
 
         if (slash != path + len - 1) {
             path[len++] = '/';
         }
         memcpy(path + len, tags, sizeof(tags));
-        fd = open(path, O_RDONLY);
+        int fd = open(path, O_RDONLY);
         if (fd >= 0) {
             return fd;
         }
@@ -197,7 +196,7 @@ void free_tags(PointerArray *tags)
 // Both parameters must be absolute and clean
 static char *path_relative(const char *filename, const char *dir)
 {
-    int dlen = strlen(dir);
+    size_t dlen = strlen(dir);
 
     if (!str_has_prefix(filename, dir)) {
         return NULL;
@@ -246,8 +245,8 @@ void tag_file_find_tags (
 char *tag_file_get_tag_filename(TagFile *tf, Tag *t)
 {
     char *dir = path_dirname(tf->filename);
-    int a = strlen(dir);
-    int b = strlen(t->filename);
+    size_t a = strlen(dir);
+    size_t b = strlen(t->filename);
     char *filename = xnew(char, a + b + 2);
 
     memcpy(filename, dir, a);
