@@ -49,11 +49,11 @@ int number_width(long n)
     return width;
 }
 
-bool buf_parse_long(const char *str, int size, int *posp, long *valp)
+bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
 {
-    int pos = *posp;
+    size_t pos = *posp;
+    size_t count = 0;
     int sign = 1;
-    int count = 0;
     long val = 0;
 
     if (pos < size && str[pos] == '-') {
@@ -82,8 +82,8 @@ bool buf_parse_long(const char *str, int size, int *posp, long *valp)
 bool parse_long(const char **strp, long *valp)
 {
     const char *str = *strp;
-    int size = strlen(str);
-    int pos = 0;
+    size_t size = strlen(str);
+    size_t pos = 0;
 
     if (buf_parse_long(str, size, &pos, valp)) {
         *strp = str + pos;

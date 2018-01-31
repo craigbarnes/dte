@@ -81,7 +81,7 @@ size_t count_nl(const char *buf, size_t size);
 size_t count_strings(char **strings);
 void free_strings(char **strings);
 int number_width(long n) CONST_FN;
-bool buf_parse_long(const char *str, int size, int *posp, long *valp);
+bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp);
 bool parse_long(const char **strp, long *valp);
 bool str_to_long(const char *str, long *valp);
 bool str_to_int(const char *str, int *valp);

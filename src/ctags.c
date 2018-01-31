@@ -1,7 +1,7 @@
 #include "ctags.h"
 #include "common.h"
 
-static int parse_excmd(Tag *t, const char *buf, int size)
+static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 {
     char ch = *buf;
     long line;
@@ -10,9 +10,8 @@ static int parse_excmd(Tag *t, const char *buf, int size)
         // The search pattern is not a real regular expression.
         // Need to escape special characters.
         char *pattern = xnew(char, size * 2);
-        int j = 0;
 
-        for (int i = 1; i < size; i++) {
+        for (size_t i = 1, j = 0; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {
                 i++;
                 if (buf[i] == '\\') {
@@ -42,7 +41,7 @@ static int parse_excmd(Tag *t, const char *buf, int size)
         return 0;
     }
 
-    int i = 0;
+    size_t i = 0;
     if (!buf_parse_long(buf, size, &i, &line)) {
         return 0;
     }
@@ -55,21 +54,18 @@ static int parse_excmd(Tag *t, const char *buf, int size)
     return i;
 }
 
-static int parse_line(Tag *t, const char *buf, int size)
+static bool parse_line(Tag *t, const char *buf, size_t size)
 {
-    const char *end;
-    int len, si = 0;
-
     memzero(t);
-    end = memchr(buf, '\t', size);
+    const char *end = memchr(buf, '\t', size);
     if (!end) {
         goto error;
     }
 
-    len = end - buf;
+    size_t len = end - buf;
     t->name = xstrslice(buf, 0, len);
 
-    si = len + 1;
+    size_t si = len + 1;
     if (si >= size) {
         goto error;
     }
@@ -108,7 +104,7 @@ static int parse_line(Tag *t, const char *buf, int size)
 
     si++;
     while (si < size) {
-        int ei = si;
+        size_t ei = si;
 
         while (ei < size && buf[ei] != '\t') {
             ei++;
