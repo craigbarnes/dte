@@ -32,6 +32,7 @@ ft -b python BUILD.bazel
 ft -b robotstxt robots.txt
 ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
 ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD APKBUILD
+ft -b xml drirc .drirc
 ft -b yaml .clang-format
 
 # "ft -f" uses a regular expression to match the filename
@@ -42,11 +43,11 @@ ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
 ft -f nginx '^/etc/nginx/'
 ft -f sh '^/etc/default/.*|^/etc/profile$'
-ft -f xml '^/etc/drirc$'
 
 # "ft" matches against the filename extension
 ft awk awk gawk mawk nawk
 ft c c h cpp hpp cc hh C H cxx hxx c++
+ft config doxy
 ft csharp cs
 ft css css
 ft d d di
@@ -75,7 +76,7 @@ ft sql sql
 ft tcl tcl
 ft tex tex cls ltx sty dtx ins bbl
 ft vala vala vapi
-ft xml xml
+ft xml xml xsd doap rdf
 ft yaml yaml yml
 
 # "ft -c" uses a regular expression to match the first line of the file
