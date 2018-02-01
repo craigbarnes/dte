@@ -35,7 +35,7 @@ typedef struct {
 
 struct HashStr {
     HashStr *next;
-    int len;
+    size_t len;
     char str[1];
 };
 

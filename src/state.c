@@ -323,7 +323,7 @@ static void cmd_list(const char *pf, char **args)
         const char *str = args[i];
         const size_t len = strlen(str);
         unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
-        HashStr *h = xmalloc(sizeof(HashStr *) + sizeof(int) + len);
+        HashStr *h = xmalloc(sizeof(HashStr *) + sizeof(size_t) + len);
         h->next = list->hash[idx];
         h->len = len;
         memcpy(h->str, str, len);
