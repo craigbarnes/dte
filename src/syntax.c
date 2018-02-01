@@ -119,7 +119,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
     // copy it. Freeing Condition does not free any string lists.
     const char *prefix = get_prefix();
     PointerArray *states = &syn->states;
-    size_t i, old_count = states->count;
+    size_t old_count = states->count;
 
     states->count += m->subsyn->states.count;
     if (states->count > states->alloc) {
@@ -132,9 +132,8 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         sizeof(*states->ptrs) * m->subsyn->states.count
     );
 
-    for (i = old_count; i < states->count; i++) {
+    for (size_t i = old_count; i < states->count; i++) {
         State *s = xmemdup(states->ptrs[i], sizeof(State));
-        int j;
 
         states->ptrs[i] = s;
         s->name = xstrdup(fix_name(s->name, prefix));
@@ -144,7 +143,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
                 s->conds.ptrs,
                 sizeof(void *) * s->conds.alloc
             );
-            for (j = 0; j < s->conds.count; j++) {
+            for (size_t j = 0; j < s->conds.count; j++) {
                 s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
             }
         }
@@ -157,7 +156,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         s->copied = true;
     }
 
-    for (i = old_count; i < states->count; i++) {
+    for (size_t i = old_count; i < states->count; i++) {
         fix_conditions(syn, states->ptrs[i], m, prefix);
         if (m->delim) {
             update_state_colors(syn, states->ptrs[i]);
