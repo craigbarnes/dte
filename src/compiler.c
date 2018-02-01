@@ -39,10 +39,10 @@ void add_error_fmt (
     int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
     ErrorFormat *f;
 
-    for (int i = 0, j = 0; desc[i]; i++) {
+    for (size_t i = 0, j = 0; desc[i]; i++) {
         for (j = 0; j < ARRAY_COUNT(names); j++) {
             if (streq(desc[i], names[j])) {
-                idx[j] = i + 1;
+                idx[j] = ((int)i) + 1;
                 break;
             }
         }
