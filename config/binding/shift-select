@@ -32,6 +32,8 @@ bind M-S-right 'select -k; eol'
 bind M-S-up 'select -k; pgup'
 bind M-S-down 'select -k; pgdown'
 
+bind C-M-up 'unselect; pgup'
+bind C-M-down 'unselect; pgdown'
 bind C-M-S-up 'select -kl; pgup'
 bind C-M-S-down 'select -kl; pgdown'
 
@@ -42,3 +44,10 @@ bind S-end 'select -k; eol'
 
 bind pgup 'unselect; pgup'
 bind pgdown 'unselect; pgdown'
+bind S-pgup 'select -k; pgup'
+bind S-pgdown 'select -k; pgdown'
+
+bind C-pgup 'unselect; pgup'
+bind C-pgdown 'unselect; pgdown'
+bind C-S-pgup 'select -kl; pgup'
+bind C-S-pgdown 'select -kl; pgdown'

@@ -188,6 +188,10 @@ static void term_init_fallback(const char *const UNUSED(term))
     {"\033[1;3C", MOD_META | KEY_RIGHT}, \
     {"\033[1;3A", MOD_META | KEY_UP}, \
     {"\033[1;3B", MOD_META | KEY_DOWN}, \
+    {"\033[5;2~", MOD_SHIFT | KEY_PAGE_UP}, \
+    {"\033[6;2~", MOD_SHIFT | KEY_PAGE_DOWN}, \
+    {"\033[5;5~", MOD_CTRL | KEY_PAGE_UP}, \
+    {"\033[6;5~", MOD_CTRL | KEY_PAGE_DOWN}, \
     /* Fix keypad when numlock is off */ \
     {"\033Oo", '/'}, \
     {"\033Oj", '*'}, \
@@ -209,10 +213,26 @@ static const TermKeyMap xterm_keymap[] = {
     {"\033[1;4C", MOD_META | MOD_SHIFT | KEY_RIGHT},
     {"\033[1;4A", MOD_META | MOD_SHIFT | KEY_UP},
     {"\033[1;4B", MOD_META | MOD_SHIFT | KEY_DOWN},
+    {"\033[1;7D", MOD_CTRL | MOD_META | KEY_LEFT},
+    {"\033[1;7C", MOD_CTRL | MOD_META | KEY_RIGHT},
+    {"\033[1;7A", MOD_CTRL | MOD_META | KEY_UP},
+    {"\033[1;7B", MOD_CTRL | MOD_META | KEY_DOWN},
     {"\033[1;8D", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT},
     {"\033[1;8C", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT},
     {"\033[1;8A", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
     {"\033[1;8B", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN},
+    {"\033[5;3~", MOD_META | KEY_PAGE_UP},
+    {"\033[6;3~", MOD_META | KEY_PAGE_DOWN},
+    {"\033[5;4~", MOD_META | MOD_SHIFT | KEY_PAGE_UP},
+    {"\033[6;4~", MOD_META | MOD_SHIFT | KEY_PAGE_DOWN},
+    {"\033[5;6~", MOD_CTRL | MOD_SHIFT | KEY_PAGE_UP},
+    {"\033[6;6~", MOD_CTRL | MOD_SHIFT | KEY_PAGE_DOWN},
+    {"\033[5;7~", MOD_CTRL | MOD_META | KEY_PAGE_UP},
+    {"\033[6;7~", MOD_CTRL | MOD_META | KEY_PAGE_DOWN},
+    {"\033[5;8~", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_PAGE_UP},
+    {"\033[6;8~", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_PAGE_DOWN},
+    {"\033[1;2H", MOD_SHIFT | KEY_HOME},
+    {"\033[1;2F", MOD_SHIFT | KEY_END},
     {"\033[3;5~", MOD_CTRL | KEY_DELETE},
     {"\033[3;2~", MOD_SHIFT | KEY_DELETE},
     {"\033[3;6~", MOD_CTRL | MOD_SHIFT | KEY_DELETE},
