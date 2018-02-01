@@ -4,7 +4,7 @@
 #include "common.h"
 
 static PointerArray msgs = PTR_ARRAY_INIT;
-static int msg_pos;
+static size_t msg_pos;
 
 static void free_message(Message *m)
 {
@@ -69,7 +69,7 @@ void activate_current_message(void)
             return;
         }
     }
-    info_msg("[%d/%zu] %s", msg_pos + 1, msgs.count, m->msg);
+    info_msg("[%zu/%zu] %s", msg_pos + 1, msgs.count, m->msg);
 }
 
 void activate_next_message(void)
