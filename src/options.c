@@ -613,7 +613,7 @@ void toggle_option_values (
     char **values
 ) {
     const OptionDesc *desc = find_toggle_option(name, &global);
-    int count = count_strings(values);
+    size_t count = count_strings(values);
     OptionValue *parsed_values;
     int current = -1;
     bool error = false;

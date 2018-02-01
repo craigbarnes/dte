@@ -12,10 +12,10 @@
 typedef struct {
     String buf;
     char *indent;
-    int indent_len;
-    int indent_width;
-    int cur_width;
-    int text_width;
+    size_t indent_len;
+    size_t indent_width;
+    size_t cur_width;
+    size_t text_width;
 } ParagraphFormatter;
 
 static char *copy_buf;

@@ -5,7 +5,7 @@
 #include "error.h"
 
 // Add item to end of array
-void history_add(PointerArray *history, const char *text, int max_entries)
+void history_add(PointerArray *history, const char *text, size_t max_entries)
 {
     if (text[0] == 0) {
         return;
@@ -57,7 +57,7 @@ bool history_search_backward (
     return false;
 }
 
-void history_load(PointerArray *history, const char *filename, int max_entries)
+void history_load(PointerArray *history, const char *filename, size_t max_entries)
 {
     char *buf;
     ssize_t size, pos = 0;
@@ -85,7 +85,7 @@ void history_save(PointerArray *history, const char *filename)
         return;
     }
 
-    for (int i = 0; i < history->count; i++) {
+    for (size_t i = 0; i < history->count; i++) {
         wbuf_write_str(&buf, history->ptrs[i]);
         wbuf_write_ch(&buf, '\n');
     }
