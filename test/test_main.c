@@ -31,7 +31,7 @@ static void test_relative_filename(void)
         { "/a/foobar", "/a/foo/file", "../foo/file" },
     };
 
-    for (int i = 0; i < ARRAY_COUNT(tests); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct rel_test *t = &tests[i];
         char *result = relative_filename(t->path, t->cwd);
         if (!streq(t->result, result)) {
