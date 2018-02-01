@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "macros.h"
 
-typedef uint_fast32_t CodePoint;
+typedef uint_least32_t CodePoint;
 
 static inline CONST_FN bool u_is_unicode(CodePoint uch)
 {
