@@ -3,13 +3,13 @@
 #include "common.h"
 #include "cconv.h"
 
-static bool make_absolute(char *dst, int size, const char *src)
+static bool make_absolute(char *dst, size_t size, const char *src)
 {
-    int len = strlen(src);
-    int pos = 0;
+    const size_t len = strlen(src);
+    size_t pos = 0;
 
     if (src[0] != '/') {
-        if (!getcwd(dst, size - 1)) {
+        if (!getcwd(dst, size)) {
             return false;
         }
         pos = strlen(dst);
@@ -23,11 +23,10 @@ static bool make_absolute(char *dst, int size, const char *src)
     return true;
 }
 
-static int remove_double_slashes(char *str)
+static size_t remove_double_slashes(char *str)
 {
-    int s, d = 0;
-
-    for (s = 0; str[s]; s++) {
+    size_t d = 0;
+    for (size_t s = 0; str[s]; s++) {
         if (str[s] != '/' || str[s + 1] != '/') {
             str[d++] = str[s];
         }
@@ -48,9 +47,8 @@ static int remove_double_slashes(char *str)
  */
 char *path_absolute(const char *filename)
 {
-    int depth = 0;
+    unsigned int depth = 0;
     char buf[8192];
-    char *sp;
 
     if (!make_absolute(buf, sizeof(buf), filename)) {
         return NULL;
@@ -63,12 +61,10 @@ char *path_absolute(const char *filename)
     //   * Remove ".." and previous component
     //   * If symlink then replace with link destination and start over
 
-    sp = buf + 1;
+    char *sp = buf + 1;
     while (*sp) {
-        struct stat st;
         char *ep = strchr(sp, '/');
         bool last = !ep;
-        int rc;
 
         if (ep) {
             *ep = 0;
@@ -98,7 +94,8 @@ char *path_absolute(const char *filename)
             continue;
         }
 
-        rc = lstat(buf, &st);
+        struct stat st;
+        int rc = lstat(buf, &st);
         if (rc) {
             if (last && errno == ENOENT) {
                 break;
@@ -109,11 +106,10 @@ char *path_absolute(const char *filename)
         if (S_ISLNK(st.st_mode)) {
             char target[8192];
             char tmp[8192];
-            int target_len;
-            int total_len = 0;
-            int buf_len = sp - 1 - buf;
-            int rest_len = 0;
-            int pos = 0;
+            size_t total_len = 0;
+            size_t buf_len = sp - 1 - buf;
+            size_t rest_len = 0;
+            size_t pos = 0;
             const char *rest = NULL;
 
             if (!last) {
@@ -124,7 +120,7 @@ char *path_absolute(const char *filename)
                 errno = ELOOP;
                 return NULL;
             }
-            target_len = readlink(buf, target, sizeof(target));
+            ssize_t target_len = readlink(buf, target, sizeof(target));
             if (target_len < 0) {
                 return NULL;
             }
@@ -184,16 +180,13 @@ char *path_absolute(const char *filename)
     return xstrdup(buf);
 }
 
-static bool path_component(const char *path, int pos)
+static bool path_component(const char *path, size_t pos)
 {
     return path[pos] == 0 || pos == 0 || path[pos - 1] == '/';
 }
 
 char *relative_filename(const char *f, const char *cwd)
 {
-    int i, tlen, dotdot, len, clen = 0;
-    char *filename;
-
     // Annoying special case
     if (cwd[1] == 0) {
         if (f[1] == 0) {
@@ -203,6 +196,7 @@ char *relative_filename(const char *f, const char *cwd)
     }
 
     // Length of common path
+    size_t clen = 0;
     while (cwd[clen] && cwd[clen] == f[clen]) {
         clen++;
     }
@@ -222,8 +216,8 @@ char *relative_filename(const char *f, const char *cwd)
     }
 
     // Number of "../" needed
-    dotdot = 1;
-    for (i = clen + 1; cwd[i]; i++) {
+    size_t dotdot = 1;
+    for (size_t i = clen + 1; cwd[i]; i++) {
         if (cwd[i] == '/') {
             dotdot++;
         }
@@ -232,11 +226,11 @@ char *relative_filename(const char *f, const char *cwd)
         return xstrdup(f);
     }
 
-    tlen = strlen(f + clen);
-    len = dotdot * 3 + tlen;
+    size_t tlen = strlen(f + clen);
+    size_t len = dotdot * 3 + tlen;
 
-    filename = xnew(char, len + 1);
-    for (i = 0; i < dotdot; i++) {
+    char *filename = xnew(char, len + 1);
+    for (size_t i = 0; i < dotdot; i++) {
         memcpy(filename + i * 3, "../", 3);
     }
     memcpy(filename + dotdot * 3, f + clen, tlen + 1);
@@ -246,9 +240,9 @@ char *relative_filename(const char *f, const char *cwd)
 char *short_filename_cwd(const char *absolute, const char *cwd)
 {
     char *f = relative_filename(absolute, cwd);
-    int home_len = strlen(editor.home_dir);
-    int abs_len = strlen(absolute);
-    int f_len = strlen(f);
+    size_t home_len = strlen(editor.home_dir);
+    size_t abs_len = strlen(absolute);
+    size_t f_len = strlen(f);
 
     if (f_len >= abs_len) {
         // Prefer absolute if relative isn't shorter
@@ -262,7 +256,7 @@ char *short_filename_cwd(const char *absolute, const char *cwd)
         && !memcmp(absolute, editor.home_dir, home_len)
         && absolute[home_len] == '/'
     ) {
-        int len = abs_len - home_len + 1;
+        size_t len = abs_len - home_len + 1;
         if (len < f_len) {
             char *filename = xnew(char, len + 1);
             filename[0] = '~';
