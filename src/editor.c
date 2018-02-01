@@ -405,7 +405,7 @@ char get_confirmation(const char *choices, const char *format, ...)
 
 typedef struct {
     bool is_modified;
-    int id;
+    unsigned int id;
     int cy;
     int vx;
     int vy;
