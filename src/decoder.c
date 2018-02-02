@@ -40,7 +40,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
 
             if (u_is_unicode(u)) {
                 encoding = "UTF-8";
-            } else if (streq(editor.charset, "UTF-8")) {
+            } else if (editor.term_utf8) {
                 // UTF-8 terminal, assuming latin1
                 encoding = "ISO-8859-1";
             } else {
