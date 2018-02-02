@@ -11,7 +11,7 @@ alias read "pass-through cat"
 alias builtin "include -b"
 
 errorfmt gitgrep "^([^:]+):([0-9]+):" file line
-alias git-grep 'compile -1s gitgrep git grep'
+alias git-grep 'compile -1s gitgrep git grep -n'
 
 # Remove possible 'F' from $LESS so that less will always wait
 # for keypress and "run" can be used without "-p".
