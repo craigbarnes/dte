@@ -256,7 +256,8 @@ void debug_print(const char *function, const char *fmt, ...)
         BUG_ON(fd < 0);
 
         // Don't leak file descriptor to parent processes
-        fcntl(fd, F_SETFD, FD_CLOEXEC);
+        int r = fcntl(fd, F_SETFD, FD_CLOEXEC);
+        BUG_ON(r == -1);
     }
 
     char buf[4096];
