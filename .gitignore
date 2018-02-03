@@ -1,8 +1,9 @@
-/dte
 /build/
-/Config.mk
 /public/
+/dte
 /dte-*.tar.gz
-
 /tags
 callgrind.out.*
+
+/Config.mk
+/.*.mk
