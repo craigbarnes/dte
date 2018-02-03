@@ -78,24 +78,9 @@ bind M-: command
 bind M-/ search
 bind M-\? "search -r"
 
-# Alt+Shift+1 / Alt+Shift+2
 bind M-! "move-tab left"
 bind M-@ "move-tab right"
 
 bind F1 "run man dte"
 bind F3 'search -n'
 bind F4 'search -p'
-
-# move to next/prev function or global variable
-#bind M-i "search -H  '^[a-zA-Z]'"
-#bind M-o "search -Hr '^[a-zA-Z]'"
-
-# grep word under cursor using GIT
-#bind M-g 'compile -s1 grep git grep -n -w -e $WORD'
-#bind M-G 'run -p git grep -n -w -e $WORD'
-
-# Insert date and time (press first ^X and then t)
-#bind '^X t' "pass-through -ms date '+%Y-%m-%d %H:%M'"
-
-# Toggle 3 different values of ws-error option (whitespace error highlighting)
-#bind F3 "toggle -v ws-error auto-indent,trailing trailing 0"
