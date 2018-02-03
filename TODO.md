@@ -15,10 +15,11 @@ TODO
 * Add a contextual help bar for command mode
 * Add built-in support for `vt220` and `linux` terminals
 * Add better documentation for custom color schemes
-* Add a plain-text only (no regex) option for `search` and `replace`
+* Add a plain-text only (no regex) option for the `search` and `replace`
   commands
 * Add support for EditorConfig files
 * Allow custom key bindings in command mode
+* Allow adding custom auto-completions for command aliases
 * Fix the `left`, `right` and `delete` commands to behave correctly with
   combining characters.
 * Add a user guide covering basic editor usage and also common issues faced
