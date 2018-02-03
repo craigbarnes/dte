@@ -9,7 +9,7 @@ typedef uint_least32_t CodePoint;
 
 static inline CONST_FN bool u_is_unicode(CodePoint uch)
 {
-    return uch <= 0x10ffffU;
+    return uch <= UINT32_C(0x10ffff);
 }
 
 static inline CONST_FN bool u_is_ctrl(CodePoint u)

@@ -6,13 +6,13 @@
 
 static inline CONST_FN size_t u_char_size(CodePoint uch)
 {
-    if (uch <= 0x7fU) {
+    if (uch <= UINT32_C(0x7f)) {
         return 1;
-    } else if (uch <= 0x7ffU) {
+    } else if (uch <= UINT32_C(0x7ff)) {
         return 2;
-    } else if (uch <= 0xffffU) {
+    } else if (uch <= UINT32_C(0xffff)) {
         return 3;
-    } else if (uch <= 0x10ffffU) {
+    } else if (uch <= UINT32_C(0x10ffff)) {
         return 4;
     }
 
