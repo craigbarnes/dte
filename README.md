@@ -25,9 +25,10 @@ Requirements
 ------------
 
 * [GCC] or [Clang]
-* [GNU Make] `>= 3.81`
-* [terminfo] library (typically provided by [ncurses] on Linux or by
-  default on BSDs)
+* [GNU Make] 3.81+
+* [terminfo] library (may be provided by [ncurses], depending on OS)
+* [iconv] library (may be included in libc, depending on OS)
+* [POSIX]-compatible [`sh`] and [`awk`]
 
 Installation
 ------------
@@ -61,7 +62,7 @@ Testing
 * OpenBSD (occasional, manual testing)
 * FreeBSD (occasional, manual testing)
 
-Other [POSIX 2008] compatible platforms should also work, but may
+Other [POSIX] 2008 compatible platforms should also work, but may
 require build system fixes. [Bug reports] and/or [pull requests] are
 welcome.
 
@@ -118,7 +119,10 @@ Public License version 2 for more details.
 [`GNUmakefile`]: https://github.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
-[POSIX 2008]: http://pubs.opengroup.org/onlinepubs/9699919799/
+[POSIX]: http://pubs.opengroup.org/onlinepubs/9699919799/
+[iconv]: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
+[`sh`]:  http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
+[`awk`]: http://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html
 [GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
 [Travis CI]: https://travis-ci.org/craigbarnes/dte
 [Bug reports]: https://github.com/craigbarnes/dte/issues

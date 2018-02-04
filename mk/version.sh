@@ -8,7 +8,7 @@ export VPREFIX="$1"
 git_describe_ver=$(git describe --match="v$VPREFIX" 2>/dev/null || true)
 
 if test -n "$git_describe_ver"; then
-    echo "$git_describe_ver" | sed 's/^v//'
+    echo "${git_describe_ver#v}"
     exit 0
 fi
 
