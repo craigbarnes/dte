@@ -26,6 +26,7 @@ build:debian:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - make check && make install && dte -V
+        - make check-syntax-files
         - sed -nf tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
         - make clean && make check CC=gcc
