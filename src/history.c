@@ -27,10 +27,10 @@ void history_add(PointerArray *history, const char *text, size_t max_entries)
 
 bool history_search_forward (
     const PointerArray *history,
-    int *pos,
+    ssize_t *pos,
     const char *text
 ) {
-    int i = *pos;
+    ssize_t i = *pos;
 
     while (--i >= 0) {
         if (str_has_prefix(history->ptrs[i], text)) {
@@ -43,10 +43,10 @@ bool history_search_forward (
 
 bool history_search_backward (
     const PointerArray *history,
-    int *pos,
+    ssize_t *pos,
     const char *text
 ) {
-    int i = *pos;
+    ssize_t i = *pos;
 
     while (++i < history->count) {
         if (str_has_prefix(history->ptrs[i], text)) {

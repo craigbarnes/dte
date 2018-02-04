@@ -10,7 +10,7 @@
 typedef struct {
     String buf;
     size_t pos;
-    int search_pos;
+    ssize_t search_pos;
     char *search_text;
 } CommandLine;
 
@@ -19,13 +19,6 @@ enum {
     CMDLINE_KEY_HANDLED,
     CMDLINE_CANCEL,
 };
-
-#define CMDLINE_INIT { \
-    .buf = STRING_INIT, \
-    .pos = 0, \
-    .search_pos = -1, \
-    .search_text = NULL \
-}
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);
