@@ -8,7 +8,6 @@ function print_match() {
     exitcode = 1
     fmt = "%s:%d: Replace destination name '%s' with 'this'\n"
     printf(fmt, FILENAME, FNR, STATE)
-    next
 }
 
 /^state / {
@@ -18,18 +17,22 @@ function print_match() {
 
 $1 == "eat" && $2 == STATE {
     print_match()
+    next
 }
 
 $1 == "noeat" && ($2 == STATE || ($2 == "-b" && $3 == STATE)) {
     print_match()
+    next
 }
 
 $1 ~ /^(char|str|bufis)$/ && $3 ~ "(^|:)" STATE "$" {
     print_match()
+    next
 }
 
 $1 ~ /^(char|str|bufis)$/ && $2 ~ /^-[bni]+$/ && $4 ~ "(^|:)" STATE "$" {
     print_match()
+    next
 }
 
 END {
