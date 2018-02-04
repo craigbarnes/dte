@@ -12,7 +12,6 @@
 #include "search.h"
 #include "error.h"
 #include "move.h"
-#include "tag.h"
 
 static void handle_sigtstp(int UNUSED(signum))
 {
@@ -53,7 +52,7 @@ static int dump_builtin_config(const char *const name)
 
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBRVb:c:t:T:r:";
+    static const char optstring[] = "hBRVb:c:t:r:";
     static const char opts[] =
         "[-hbBRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
     static_assert(ARRAY_COUNT(opts) < 70);
@@ -77,8 +76,6 @@ int main(int argc, char *argv[])
         case 't':
             tag = optarg;
             break;
-        case 'T':
-            return print_tags(optarg);
         case 'r':
             rc = optarg;
             break;

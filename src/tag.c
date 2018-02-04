@@ -256,31 +256,6 @@ char *tag_file_get_tag_filename(TagFile *tf, Tag *t)
     return filename;
 }
 
-int print_tags(const char *prefix)
-{
-    const TagFile *tf = load_tag_file();
-    if (!tf) {
-        return 1;
-    }
-
-    Tag t;
-    size_t pos = 0;
-    char *prev = NULL;
-
-    while (next_tag(tf, &pos, prefix, false, &t)) {
-        if (!prev || !streq(prev, t.name)) {
-            fputs(t.name, stdout);
-            fputc('\n', stdout);
-            free(prev);
-            prev = t.name;
-            t.name = NULL;
-        }
-        free_tag(&t);
-    }
-    free(prev);
-    return 0;
-}
-
 void collect_tags(TagFile *tf, const char *prefix)
 {
     Tag t;
