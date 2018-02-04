@@ -61,8 +61,6 @@ int main(int argc, char *argv[])
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
-    char *command_history_filename;
-    char *search_history_filename;
     bool read_rc = true;
     int ch;
 
@@ -163,9 +161,11 @@ int main(int argc, char *argv[])
     set_signal_handler(SIGWINCH, handle_sigwinch);
 #endif
 
-    load_file_history();
-    command_history_filename = editor_file("command-history");
-    search_history_filename = editor_file("search-history");
+    char *file_history_filename = editor_file("file-history");
+    load_file_history(file_history_filename);
+
+    char *command_history_filename = editor_file("command-history");
+    char *search_history_filename = editor_file("search-history");
     history_load (
         &editor.command_history,
         command_history_filename,
@@ -256,6 +256,9 @@ int main(int argc, char *argv[])
     history_save(&editor.search_history, search_history_filename);
     free(command_history_filename);
     free(search_history_filename);
-    save_file_history();
+
+    save_file_history(file_history_filename);
+    free(file_history_filename);
+
     return 0;
 }

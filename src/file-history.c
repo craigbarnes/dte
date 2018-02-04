@@ -1,6 +1,5 @@
 #include "file-history.h"
 #include "common.h"
-#include "editor.h"
 #include "wbuf.h"
 #include "ptr-array.h"
 #include "error.h"
@@ -45,9 +44,8 @@ void add_file_history(int row, int col, const char *filename)
     ptr_array_add(&history, e);
 }
 
-void load_file_history(void)
+void load_file_history(const char *filename)
 {
-    char *filename = editor_file("file-history");
     ssize_t size, pos = 0;
     char *buf;
 
@@ -56,7 +54,6 @@ void load_file_history(void)
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
         }
-        free(filename);
         return;
     }
     while (pos < size) {
@@ -78,18 +75,15 @@ void load_file_history(void)
         add_file_history(row, col, line);
     }
     free(buf);
-    free(filename);
 }
 
-void save_file_history(void)
+void save_file_history(const char *filename)
 {
-    char *filename = editor_file("file-history");
     WriteBuffer buf = WBUF_INIT;
 
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
     if (buf.fd < 0) {
         error_msg("Error creating %s: %s", filename, strerror(errno));
-        free(filename);
         return;
     }
     for (size_t i = 0; i < history.count; i++) {
@@ -102,7 +96,6 @@ void save_file_history(void)
     }
     wbuf_flush(&buf);
     close(buf.fd);
-    free(filename);
 }
 
 bool find_file_in_history(const char *filename, int *row, int *col)
