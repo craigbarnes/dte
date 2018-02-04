@@ -1,0 +1,16 @@
+syntax .test-string
+
+state string
+    char "\"" END string
+    eat string
+
+syntax test
+
+state code
+	char -b a-z ident
+    char \" .test-string:code
+    eat code
+
+state ident
+    char -b a-z ident
+    noeat ident

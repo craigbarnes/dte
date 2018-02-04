@@ -1,4 +1,5 @@
 CMDTEST = $(dte) -Rc "$$(sed '/^\#/d;/^$$/d' < '$(strip $(1))' | tr '\n' ';')"
+SYNTAX_LINT = $(AWK) -f test/syntax-lint.awk
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     test_main ))
@@ -18,6 +19,11 @@ check-commands: $(dte) | build/test/
 	$(Q) diff -q build/test/thai-tis620.txt test/thai-tis620.txt
 	$(Q) $(RM) build/test/thai-*.txt
 
+check-syntax-files:
+	$(E) LINT 'config/syntax/*'
+	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
+	$(Q) ! $(SYNTAX_LINT) test/syntax-lint.dterc >/dev/null
+
 $(test):
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
@@ -30,4 +36,4 @@ build/test/:
 	@mkdir -p $@
 
 
-.PHONY: check check-commands
+.PHONY: check check-commands check-syntax-files
