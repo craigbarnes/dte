@@ -63,10 +63,10 @@ Double quoted strings may contain the following escapes:
     strings are NUL-terminated.
 
 `\u20ac`
-:   Four hex digit unicode code point U+20AC.
+:   Four hex digit Unicode code point U+20AC.
 
 `\U000020ac`
-:   Eight hex digit unicode code point U+20AC.
+:   Eight hex digit Unicode code point U+20AC.
 
 # Commands
 
@@ -421,7 +421,7 @@ the following prefixes:
 :   Insert 2-digit hexadecimal byte value
 
 `u`
-:   Insert 6-digit hexadecimal unicode value
+:   Insert 6-digit hexadecimal Unicode value
 
 ### **join**
 
@@ -902,7 +902,7 @@ Format string for the left aligned part of status line.
 :   File type.
 
 `%u`
-:   Hexadecimal unicode value value of character under cursor.
+:   Hexadecimal Unicode value value of character under cursor.
 
 `%%`
 :   Literal `%`.
