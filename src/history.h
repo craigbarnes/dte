@@ -2,6 +2,7 @@
 #define HISTORY_H
 
 #include <stdbool.h>
+#include <sys/types.h>
 #include "ptr-array.h"
 
 #define search_history_size 100
