@@ -22,7 +22,7 @@ trap "rm -rf '$TMPDIR'" EXIT
 
 cp $TMPDIR/docs/*.[15] "$TMPDIR"
 
-$MAKE -B -j"$(mk/nproc.sh)" --directory="$TMPDIR" check man
+$MAKE -B -j"$(mk/nproc.sh)" -C"$TMPDIR" man check check-syntax-files
 
 for F in $TMPDIR/docs/*.[15]; do
     B="$(basename $F)"
