@@ -1,7 +1,7 @@
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
-#include <stddef.h>
+#include <sys/types.h>
 #include "ptr-array.h"
 #include "str.h"
 #include "key.h"
