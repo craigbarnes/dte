@@ -5,7 +5,9 @@
 # "this" is faster and usually also shorter and clearer.
 
 function print_match() {
-    print FILENAME ":" FNR ": " $0
+    exitcode = 1
+    fmt = "%s:%d: Replace destination name '%s' with 'this'\n"
+    printf(fmt, FILENAME, FNR, STATE)
     next
 }
 
@@ -28,4 +30,8 @@ $1 ~ /^(char|str|bufis)$/ && $3 ~ "(^|:)" STATE "$" {
 
 $1 ~ /^(char|str|bufis)$/ && $2 ~ /^-[bni]+$/ && $4 ~ "(^|:)" STATE "$" {
     print_match()
+}
+
+END {
+    exit exitcode
 }
