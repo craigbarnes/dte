@@ -2,6 +2,7 @@
 #define COMPILER_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "ptr-array.h"
 #include "regexp.h"
 
@@ -14,10 +15,10 @@ typedef struct {
 
 typedef struct {
     bool ignore;
-    signed char msg_idx;
-    signed char file_idx;
-    signed char line_idx;
-    signed char column_idx;
+    int8_t msg_idx;
+    int8_t file_idx;
+    int8_t line_idx;
+    int8_t column_idx;
     regex_t re;
 } ErrorFormat;
 

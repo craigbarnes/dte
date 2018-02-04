@@ -3,14 +3,15 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "ptr-array.h"
 #include "error.h"
 
 typedef struct {
     const char *name;
     const char *flags;
-    signed char min_args;
-    signed char max_args;
+    int8_t min_args;
+    int8_t max_args;
     void (*cmd)(const char *, char **);
 } Command;
 
