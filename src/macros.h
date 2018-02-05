@@ -104,7 +104,7 @@
 //
 // 1. The ability to apply pragmas at the granularity of individual
 //    function arguments instead of whole statements.
-// 2. A flag that only suppresses dicarded qualifier warnings without
+// 2. A flag that only suppresses discarded qualifier warnings without
 //    also suppressing incompatible-pointer-types warnings.
 // 3. Some mechanism equivalent to __has_warning().
 //
