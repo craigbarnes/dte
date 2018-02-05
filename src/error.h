@@ -13,12 +13,12 @@ extern int nr_errors;
 extern bool msg_is_error;
 extern char error_buf[256];
 
-Error *error_create(const char *format, ...) FORMAT(1);
-Error *error_create_errno(int code, const char *format, ...) FORMAT(2);
+Error *error_create(const char *format, ...) PRINTF(1);
+Error *error_create_errno(int code, const char *format, ...) PRINTF(2);
 void error_free(Error *err);
 
 void clear_error(void);
-void error_msg(const char *format, ...) FORMAT(1);
-void info_msg(const char *format, ...) FORMAT(1);
+void error_msg(const char *format, ...) PRINTF(1);
+void info_msg(const char *format, ...) PRINTF(1);
 
 #endif

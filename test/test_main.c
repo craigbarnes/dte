@@ -6,7 +6,7 @@
 #include <locale.h>
 #include <langinfo.h>
 
-FORMAT(1)
+PRINTF(1)
 static void fail(const char *format, ...)
 {
     va_list ap;

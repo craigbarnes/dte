@@ -28,7 +28,7 @@ static void add_status_str(Formatter *f, const char *str)
     }
 }
 
-FORMAT(2)
+PRINTF(2)
 static void add_status_format(Formatter *f, const char *format, ...)
 {
     char buf[1024];

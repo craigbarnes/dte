@@ -49,7 +49,7 @@
     #define unlikely(x) __builtin_expect(!!(x), 0)
     #define UNUSED(x) UNUSED__ ## x __attribute__((__unused__))
     #define MALLOC __attribute__((__malloc__))
-    #define FORMAT(idx) __attribute__((__format__(printf, (idx), (idx + 1))))
+    #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
     #define PURE __attribute__((__pure__))
     #define CONST_FN __attribute__((__const__))
 #else
@@ -57,7 +57,7 @@
     #define unlikely(x) (x)
     #define UNUSED
     #define MALLOC
-    #define FORMAT(idx)
+    #define PRINTF(x)
     #define PURE
     #define CONST_FN
 #endif

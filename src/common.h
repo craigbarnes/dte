@@ -86,7 +86,7 @@ bool parse_long(const char **strp, long *valp);
 bool str_to_long(const char *str, long *valp);
 bool str_to_int(const char *str, int *valp);
 char *xvsprintf(const char *format, va_list ap);
-char *xsprintf(const char *format, ...) FORMAT(1);
+char *xsprintf(const char *format, ...) PRINTF(1);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t read_file(const char *filename, char **bufp);
@@ -100,8 +100,8 @@ NORETURN void bug (
     const char *funct,
     const char *fmt,
     ...
-) FORMAT(4);
+) PRINTF(4);
 
-void debug_print(const char *function, const char *fmt, ...) FORMAT(2);
+void debug_print(const char *function, const char *fmt, ...) PRINTF(2);
 
 #endif
