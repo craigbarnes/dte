@@ -33,15 +33,15 @@ typedef struct {
 extern OutputBuffer obuf;
 
 void buf_reset(size_t start_x, size_t width, size_t scroll_x);
-void buf_add_bytes(const char *const str, size_t count);
+void buf_add_bytes(const char *str, size_t count);
 void buf_set_bytes(char ch, size_t count);
 void buf_add_ch(char ch);
-void buf_escape(const char *const str);
-void buf_add_str(const char *const str);
+void buf_escape(const char *str);
+void buf_add_str(const char *str);
 void buf_hide_cursor(void);
 void buf_show_cursor(void);
 void buf_move_cursor(int x, int y);
-void buf_set_color(const TermColor *const color);
+void buf_set_color(const TermColor *color);
 void buf_clear_eol(void);
 void buf_flush(void);
 bool buf_put_char(CodePoint u);

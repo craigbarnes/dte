@@ -61,7 +61,7 @@ typedef struct {
 
 extern TerminalInfo terminal;
 
-void term_init(const char *const term);
+void term_init(const char *term);
 
 void term_raw(void);
 void term_cooked(void);

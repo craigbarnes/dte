@@ -1,6 +1,5 @@
 #include "obuf.h"
 #include "common.h"
-#include "editor.h"
 #include "uchar.h"
 
 OutputBuffer obuf;
