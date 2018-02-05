@@ -280,7 +280,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
     if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
         // Any real error hides this message
         error_msg (
-            "Warning: %d nonreversible character conversions. File saved.",
+            "Warning: %zu nonreversible character conversions. File saved.",
             cconv_nr_errors(enc->cconv)
         );
     }

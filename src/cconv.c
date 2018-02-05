@@ -15,7 +15,7 @@ struct cconv {
     size_t opos;
 
     size_t consumed;
-    int errors;
+    size_t errors;
 
     // Temporary input buffer
     char tbuf[16];
@@ -265,7 +265,7 @@ void cconv_flush(struct cconv *c)
     }
 }
 
-int cconv_nr_errors(const struct cconv *c)
+size_t cconv_nr_errors(const struct cconv *c)
 {
     return c->errors;
 }
