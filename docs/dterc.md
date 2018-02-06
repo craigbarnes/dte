@@ -9,9 +9,9 @@ seealso: ["`dte`", "`dte-syntax`"]
 
 # dterc
 
-dterc is the language used in `dte` configuration files and also in the
-command mode of the editor. The syntax of the language is quite similar
-to shell, but much simpler.
+dterc is the language used in `dte` configuration files (`~/.dte/rc`)
+and also in the command mode of the editor (Alt+x). The syntax of the
+language is quite similar to shell, but much simpler.
 
 Commands are separated either by a newline or `;` character. To make a
 command span multiple lines in an rc file, escape the newline (put `\`
