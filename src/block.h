@@ -1,7 +1,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include "iter.h"
+#include "block-iter.h"
 
 Block *block_new(size_t size);
 void do_insert(const char *buf, size_t len);

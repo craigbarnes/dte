@@ -2,7 +2,7 @@
 #define VIEW_H
 
 #include <stdbool.h>
-#include "iter.h"
+#include "block-iter.h"
 
 enum selection {
     SELECT_NONE,

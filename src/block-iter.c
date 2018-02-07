@@ -1,4 +1,4 @@
-#include "iter.h"
+#include "block-iter.h"
 #include "common.h"
 
 void block_iter_normalize(BlockIter *bi)

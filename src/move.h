@@ -2,7 +2,7 @@
 #define MOVE_H
 
 #include <stdbool.h>
-#include "iter.h"
+#include "block-iter.h"
 #include "view.h"
 
 void move_to_preferred_x(int preferred_x);

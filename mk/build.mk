@@ -29,16 +29,15 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
-    alias ascii bind block buffer-iter buffer cconv change cmdline \
-    color command-mode commands common compiler completion config ctags \
-    decoder detect edit editor encoder encoding env error \
+    alias ascii bind block block-iter buffer buffer-iter cconv change \
+    cmdline color command-mode commands common compiler completion \
+    config ctags decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
-    frame git-open history hl indent input-special iter key \
-    load-save lock main move msg normal-mode obuf options \
-    parse-args parse-command path ptr-array regexp run screen \
-    screen-tabbar screen-view search-mode search selection spawn state \
-    str syntax tabbar tag term-caps term uchar unicode view \
-    wbuf window xmalloc ))
+    frame git-open history hl indent input-special key load-save lock \
+    main move msg normal-mode obuf options parse-args parse-command \
+    path ptr-array regexp run screen screen-tabbar screen-view \
+    search-mode search selection spawn state str syntax tabbar tag \
+    term-caps term uchar unicode view wbuf window xmalloc ))
 
 ifdef WERROR
   WARNINGS += -Werror

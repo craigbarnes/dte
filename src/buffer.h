@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <stdbool.h>
 #include <limits.h>
-#include "iter.h"
+#include "block-iter.h"
 #include "list.h"
 #include "options.h"
 #include "common.h"
