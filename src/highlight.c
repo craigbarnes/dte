@@ -1,4 +1,4 @@
-#include "hl.h"
+#include "highlight.h"
 #include "syntax.h"
 
 #include <inttypes.h>

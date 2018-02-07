@@ -33,8 +33,8 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     cmdline color command-mode commands common compiler completion \
     config ctags decoder detect edit editor encoder encoding env error \
     file-history file-location file-option filetype fork format-status \
-    frame git-open history hl indent input-special key load-save lock \
-    main move msg normal-mode obuf options parse-args parse-command \
+    frame git-open highlight history indent input-special key load-save \
+    lock main move msg normal-mode obuf options parse-args parse-command \
     path ptr-array regexp run screen screen-tabbar screen-view \
     search-mode search selection spawn state str syntax tabbar tag \
     term-caps term uchar unicode view wbuf window xmalloc ))

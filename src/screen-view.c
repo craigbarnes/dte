@@ -4,7 +4,7 @@
 #include "uchar.h"
 #include "obuf.h"
 #include "selection.h"
-#include "hl.h"
+#include "highlight.h"
 
 typedef struct {
     View *view;
