@@ -66,7 +66,7 @@
     #define unlikely(x) (x)
 #endif
 
-#if GNUC_AT_LEAST(4, 0) || HAS_ATTRIBUTE(nonnull)
+#if GNUC_AT_LEAST(3, 3) || HAS_ATTRIBUTE(nonnull)
     #define NONNULL_ARGS __attribute__((__nonnull__))
 #else
     #define NONNULL_ARGS
