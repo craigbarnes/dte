@@ -72,6 +72,12 @@
     #define NONNULL_ARGS
 #endif
 
+#if GNUC_AT_LEAST(3, 4) || HAS_ATTRIBUTE(warn_unused_result)
+    #define WARN_UNUSED_RESULT __attribute__((__warn_unused_result__))
+#else
+    #define WARN_UNUSED_RESULT
+#endif
+
 #if GNUC_AT_LEAST(5, 0) || HAS_ATTRIBUTE(returns_nonnull)
     #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else
