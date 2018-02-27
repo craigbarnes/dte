@@ -8,7 +8,7 @@ hi code
 hi ident
 hi keyword bold
 hi type green
-hi comment lowintensity gray
+hi comment darkgray
 hi numeric blue
 hi string yellow
 hi variable bold yellow
