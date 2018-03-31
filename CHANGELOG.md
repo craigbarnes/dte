@@ -29,7 +29,6 @@ Released on 2017-12-20.
 
 * [dte-1.6.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz)
 * [dte-1.6.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz.sig)
-* [dte-1.6.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.6.tar.gz.sha256sum)
 
 v1.5
 ----
@@ -52,7 +51,6 @@ Released on 2017-11-03.
 
 * [dte-1.5.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz)
 * [dte-1.5.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz.sig)
-* [dte-1.5.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.5.tar.gz.sha256sum)
 
 v1.4
 ----
@@ -76,7 +74,6 @@ Released on 2017-10-16.
 
 * [dte-1.4.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz)
 * [dte-1.4.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz.sig)
-* [dte-1.4.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.4.tar.gz.sha256sum)
 
 v1.3
 ----
@@ -107,7 +104,6 @@ Released on 2017-08-27.
 
 * [dte-1.3.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz)
 * [dte-1.3.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz.sig)
-* [dte-1.3.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.3.tar.gz.sha256sum)
 
 v1.2
 ----
@@ -124,7 +120,6 @@ Released on 2017-07-30.
 
 * [dte-1.2.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz)
 * [dte-1.2.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz.sig)
-* [dte-1.2.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.2.tar.gz.sha256sum)
 
 v1.1
 ----
@@ -152,7 +147,6 @@ Released on 2017-07-29.
 
 * [dte-1.1.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz)
 * [dte-1.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sig)
-* [dte-1.1.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.1.tar.gz.sha256sum)
 
 v1.0
 ----
@@ -166,7 +160,6 @@ from which this project was forked).
 
 * [dte-1.0.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz)
 * [dte-1.0.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sig)
-* [dte-1.0.tar.gz.sha256sum](https://craigbarnes.gitlab.io/dist/dte/dte-1.0.tar.gz.sha256sum)
 
 Public Key
 ==========
