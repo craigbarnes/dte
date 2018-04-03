@@ -136,7 +136,7 @@ build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
 build/:
-	@mkdir -p $@
+	$(Q) mkdir -p $@
 
 
 CLEANFILES += $(dte)

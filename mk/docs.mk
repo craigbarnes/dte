@@ -56,7 +56,7 @@ public/doxygen/index.html: docs/Doxyfile docs/DoxygenLayout.xml src/*.h | public
 	$(Q) $(DOXYGEN) $<
 
 public/:
-	@mkdir -p $@
+	$(Q) mkdir -p $@
 
 check-docs: README.md CHANGELOG.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)

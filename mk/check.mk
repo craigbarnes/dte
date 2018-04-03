@@ -32,8 +32,8 @@ $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
-build/test/:
-	@mkdir -p $@
+build/test/: | build/
+	$(Q) mkdir -p $@
 
 
 .PHONY: check check-commands check-syntax-files
