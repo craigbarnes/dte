@@ -31,7 +31,7 @@ public/index.html: README.md | public/screenshot.png
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
-public/releases.html: CHANGELOG.md
+public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
@@ -39,7 +39,7 @@ $(html-man): public/%.html: docs/%.md
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -o $@ $<
 
-public/style.css: docs/layout.css docs/style.css | build/
+public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
