@@ -3,6 +3,8 @@ TODO
 
 * Add a flag to the `bind` command to allow creating key bindings only
   for specific terminals (e.g. `bind -t ^xterm ^H 'erase-word -s'`)
+* Add a flag to the `bind` command to allow binding raw escape sequences
+  (e.g. `bind -r '\x1b[1;5C' word-fwd`), instead of interpretted key codes
 * Allow adding text to the initial buffer opened at startup by piping to
   `stdin`
 * Implement a "smart" home command that moves the cursor to the first
