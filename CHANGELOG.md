@@ -169,6 +169,12 @@ key for verifying these signatures is available to download at
 <https://craigbarnes.gitlab.io/pubkey/0330BEB4.asc>
 or from the keyserver at `hkps://hkps.pool.sks-keyservers.net`.
 
+Checksums
+=========
+
+A list of SHA256 checksums for all release tarballs and signatures is
+available at <https://craigbarnes.gitlab.io/dist/dte/dte-sha256sums.txt>.
+
 
 [website]: https://craigbarnes.gitlab.io/dte/
 [dex]: https://github.com/tihirvon/dex
