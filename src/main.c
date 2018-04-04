@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
             return 0;
         case 'V':
             printf("dte %s\n", editor.version);
-            puts("(C) 2017 Craig Barnes");
+            puts("(C) 2017-2018 Craig Barnes");
             puts("(C) 2010-2015 Timo Hirvonen");
             return 0;
         case 'h':
