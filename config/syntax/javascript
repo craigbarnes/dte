@@ -64,7 +64,7 @@ state regexp-char-list-start regexp-special
 state regexp-char-list regexp
     char "-" this regexp-special
     char "\\" regexp-char-list-esc
-    char \] regexp regexp-special
+    char ] regexp regexp-special
     char "\n" END error
     eat this
 

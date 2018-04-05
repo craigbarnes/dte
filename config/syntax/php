@@ -13,7 +13,7 @@ state strvar
 syntax .php-strcurly
 
 state strvar
-    char \} END strvar
+    char } END strvar
     eat this
 
 # Common escapes inside double quotes and heredocs

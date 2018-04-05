@@ -10,7 +10,7 @@ state line-start
     noeat text
 
 state section ini.section
-    char \] section-end ini.section
+    char ] section-end ini.section
     char "\n" line-start error
     eat this
 

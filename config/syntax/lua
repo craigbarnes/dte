@@ -1,7 +1,7 @@
 syntax .lua-long-string
 
 state body string
-    char \] end-match
+    char ] end-match
     eat this
 
 state end-match string
@@ -9,13 +9,13 @@ state end-match string
     noeat body
 
 state end string
-    char \] END string
+    char ] END string
     noeat body
 
 syntax .lua-long-comment
 
 state body comment
-    char \] end-match
+    char ] end-match
     eat this
 
 state end-match comment
@@ -23,7 +23,7 @@ state end-match comment
     noeat body
 
 state end comment
-    char \] END comment
+    char ] END comment
     noeat body
 
 syntax .lua-escape

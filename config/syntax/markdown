@@ -128,7 +128,7 @@ state double-underline strong-emphasis
 
 state reference
     char "\\" reference-escape
-    char \] reference-close reference
+    char ] reference-close reference
     eat this
 
 state reference-escape special
