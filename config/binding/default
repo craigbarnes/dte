@@ -7,8 +7,8 @@ bind end eol
 bind pgup pgup
 bind pgdown pgdown
 bind delete delete
-bind ^\[ unselect
-bind ^\? erase
+bind ^[ unselect
+bind ^? erase
 bind ^H erase
 
 bind C-left 'word-bwd -s'
@@ -76,7 +76,7 @@ bind 'M-^?' 'erase-word -s'
 bind M-\; command
 bind M-: command
 bind M-/ search
-bind M-\? "search -r"
+bind M-? "search -r"
 
 bind M-! "move-tab left"
 bind M-@ "move-tab right"

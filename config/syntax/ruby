@@ -51,7 +51,7 @@ state start code
 
 state global-variable
     char a-zA-Z0-9_- this
-    char !@&`\'+~=/\\,\;.<>\*\$\?:\" start global-variable
+    char !@&`\'+~=/\\,\;.<>*\$?:\" start global-variable
     noeat start
 
 state maybe-instance-variable instance-variable
@@ -91,7 +91,7 @@ state =begin-nl comment
     noeat =begin
 
 state ident
-    char -b a-zA-Z0-9_!\? this
+    char -b a-zA-Z0-9_!? this
     inlist keyword start
     inlist true-false-nil start
     noeat start
@@ -111,7 +111,7 @@ state sq string
 # Keywords (from https://github.com/ruby/ruby/blob/trunk/defs/keywords)
 list keyword \
     __ENCODING__ __LINE__ __FILE__ BEGIN END \
-    alias and begin break case class def defined\? do else elsif end \
+    alias and begin break case class def defined? do else elsif end \
     ensure for if in module next not or redo rescue retry return self \
     super then undef unless until when while yield
 

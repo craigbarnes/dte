@@ -15,7 +15,7 @@ state command code
     char "\n" start
     char "\\" escape
     char -b \$ variable
-    char ";*?[]{}" this special
+    char ";" this special
     eat this
 
 state sq string

@@ -4,7 +4,7 @@ list constant true false
 
 state line-start
     char " \t\n" line-start
-    char \[ section
+    char [ section
     char '#;' comment
     char = value error
     noeat text

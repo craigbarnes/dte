@@ -59,7 +59,7 @@ state dqescape special
     noeat .awk-esc:string
 
 state regexpescape special
-    char abfnrtv.\[\\(\*+\?\{|^\$/ regexp special
+    char abfnrtv.[({*+?|^/\\\$ regexp special
     noeat .awk-esc:regexp
 
 state comment

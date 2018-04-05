@@ -118,7 +118,7 @@ state code
     char 0 zero
     char 1-9 dec
     char . dot
-    char \? qm
+    char ? qm
     str "//" cpp-comment
     str "/*" c-comment
     char # sh-comment
@@ -277,7 +277,7 @@ state code
     eat this
 
 state lab tag
-    char \? tag-php
+    char ? tag-php
     recolor code 1
     noeat code
 

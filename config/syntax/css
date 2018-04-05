@@ -22,7 +22,7 @@ state error
     char -n "\t\n\r {" error
     noeat END
 
-# Hex escape: \[0-9a-fA-F]{1-6}
+# Hex escape: [0-9a-fA-F]{1,6}
 # One hex digit already eaten
 # Can be terminated with whitespace character that is skipped
 syntax .css-hex
@@ -235,8 +235,8 @@ state start code
     char . class
     char # id
     char -b : pseudo
-    char \[ .css-attributeselector:this
-    char \{ block
+    char [ .css-attributeselector:this
+    char { block
     char 0-9_- .css-selectorerror:this
     str "/*" .css-comment:this
     char -b @ atrule
@@ -304,7 +304,7 @@ state mediatypes
 
 state mediablock code
     char "\t\n " mediablock
-    char \{ start
+    char { start
     eat start error
 
 state block code

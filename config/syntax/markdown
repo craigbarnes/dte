@@ -35,7 +35,7 @@ state line-start
     char > block-quote
     char -b 0-9 digit
     str "**" double-asterisk
-    char \* bullet-asterisk emphasis
+    char * bullet-asterisk emphasis
     char +- bullet
     char -b "~" tilde
     char -b "`" backtick
@@ -45,10 +45,10 @@ state line-start
 state text
     char "\n" line-start
     char "`" code-span
-    char \[ reference
+    char [ reference
     str "**" double-asterisk
     str "__" double-underline
-    char \* asterisk
+    char * asterisk
     char _ underscore
     char "\\" escape
     eat this
@@ -107,7 +107,7 @@ state code-span
     eat this
 
 state asterisk emphasis
-    char \* text emphasis
+    char * text emphasis
     char -n "\n" this
     noeat line-start
 
@@ -139,7 +139,7 @@ state reference-escape special
 state reference-close
     char "\n" line-start
 #    char ( reference-link
-#    char \[ reference-pointer
+#    char [ reference-pointer
 #    char : reference-backref
     noeat text
 

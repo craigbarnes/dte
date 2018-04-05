@@ -96,18 +96,18 @@ state code
     char \' single-quote
     char \" double-quote
     char \- dash
-    char \[ bracket
+    char [ bracket
     char -b : colon
     str "~=" this operator
-    char =/+\*#<>^%|&~ this operator
+    char =/+*#<>^%|&~ this operator
     str "..." this special
     str ".." this operator
     char . dot
-    char !@`$\? bad-char
+    char !@`$? bad-char
     eat this
 
 state bracket string
-    char \[ .lua-long-string:code string
+    char [ .lua-long-string:code string
     char -b = bracket-equals
     recolor default 1
     noeat code
@@ -135,7 +135,7 @@ state label
 
 state bracket-equals string
     char -b = this
-    char -n \[ code error
+    char -n [ code error
     heredocbegin .lua-long-string code
 
 state dash operator
@@ -145,17 +145,17 @@ state dash operator
 state dash-dash comment
     recolor comment 2
     char "\n" code
-    char \[ dash-dash-bracket
+    char [ dash-dash-bracket
     eat line-comment comment
 
 state dash-dash-bracket comment
-    char \[ .lua-long-comment:code comment
+    char [ .lua-long-comment:code comment
     char -b = dash-dash-bracket-equals comment
     eat line-comment
 
 state dash-dash-bracket-equals
     char -b = this comment
-    char -n \[ line-comment
+    char -n [ line-comment
     heredocbegin .lua-long-comment code
 
 state line-comment comment
