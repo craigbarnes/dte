@@ -68,6 +68,19 @@ static void cmd_bol(const char* UNUSED(pf), char** UNUSED(args))
     move_bol();
 }
 
+static void cmd_bolsf(const char* UNUSED(pf), char** UNUSED(args))
+{
+    if (! block_iter_bol(&view->cursor)) {
+        long top = view->vy + window_get_scroll_margin(window);
+        if (view->cy > top) {
+            move_up(view->cy - top);
+        } else {
+            block_iter_bof(&view->cursor);
+        }
+    }
+    view_reset_preferred_x(view);
+}
+
 static void cmd_case(const char *pf, char** UNUSED(args))
 {
     int mode = 't';
@@ -296,6 +309,19 @@ static void cmd_eol(const char* UNUSED(pf), char** UNUSED(args))
     move_eol();
 }
 
+static void cmd_eolsf(const char* UNUSED(pf), char** UNUSED(args))
+{
+    if (! block_iter_eol(&view->cursor)) {
+        long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
+        if (view->cy < bottom) {
+            move_down(bottom - view->cy);
+        } else {
+            block_iter_eof(&view->cursor);
+        }
+    }
+    view_reset_preferred_x(view);
+}
+
 static void cmd_erase(const char* UNUSED(pf), char**  UNUSED(args))
 {
     erase();
@@ -325,32 +351,6 @@ static void cmd_errorfmt(const char *pf, char **args)
         pf++;
     }
     add_error_fmt(args[0], ignore, args[1], args + 2);
-}
-
-static void cmd_ft(const char *pf, char **args)
-{
-    enum detect_type dt = FT_EXTENSION;
-
-    while (*pf) {
-        switch (*pf) {
-        case 'b':
-            dt = FT_BASENAME;
-            break;
-        case 'c':
-            dt = FT_CONTENT;
-            break;
-        case 'f':
-            dt = FT_FILENAME;
-            break;
-        case 'i':
-            dt = FT_INTERPRETER;
-            break;
-        }
-        pf++;
-    }
-    for (size_t i = 1; args[i]; i++) {
-        add_filetype(args[0], args[i], dt);
-    }
 }
 
 static void cmd_filter(const char* UNUSED(pf), char **args)
@@ -397,6 +397,32 @@ static void cmd_format_paragraph(const char * UNUSED(pf), char **args)
     format_paragraph(text_width);
 }
 
+static void cmd_ft(const char *pf, char **args)
+{
+    enum detect_type dt = FT_EXTENSION;
+
+    while (*pf) {
+        switch (*pf) {
+        case 'b':
+            dt = FT_BASENAME;
+            break;
+        case 'c':
+            dt = FT_CONTENT;
+            break;
+        case 'f':
+            dt = FT_FILENAME;
+            break;
+        case 'i':
+            dt = FT_INTERPRETER;
+            break;
+        }
+        pf++;
+    }
+    for (size_t i = 1; args[i]; i++) {
+        add_filetype(args[0], args[i], dt);
+    }
+}
+
 static void cmd_git_open(const char* UNUSED(pf), char** UNUSED(args))
 {
     set_input_mode(INPUT_GIT_OPEN);
@@ -420,32 +446,6 @@ static void cmd_hi(const char* UNUSED(pf), char **args)
         update_all_syntax_colors();
         mark_everything_changed();
     }
-}
-
-static void cmd_eolsf(const char* UNUSED(pf), char** UNUSED(args))
-{
-    if (! block_iter_eol(&view->cursor)) {
-        long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
-        if (view->cy < bottom) {
-            move_down(bottom - view->cy);
-        } else {
-            block_iter_eof(&view->cursor);
-        }
-    }
-    view_reset_preferred_x(view);
-}
-
-static void cmd_bolsf(const char* UNUSED(pf), char** UNUSED(args))
-{
-    if (! block_iter_bol(&view->cursor)) {
-        long top = view->vy + window_get_scroll_margin(window);
-        if (view->cy > top) {
-            move_up(view->cy - top);
-        } else {
-            block_iter_bof(&view->cursor);
-        }
-    }
-    view_reset_preferred_x(view);
 }
 
 static void cmd_include(const char *pf, char **args)
