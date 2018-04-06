@@ -678,11 +678,8 @@ static void cmd_option(const char *pf, char **args)
 
 static void cmd_pass_through(const char *pf, char **args)
 {
-    FilterData data;
-    long del_len = 0;
     bool strip_nl = false;
     bool move = false;
-
     while (*pf) {
         switch (*pf++) {
         case 'm':
@@ -694,16 +691,17 @@ static void cmd_pass_through(const char *pf, char **args)
         }
     }
 
-    data.in = NULL;
-    data.in_len = 0;
+    FilterData data = {.in = NULL, .in_len = 0};
     if (spawn_filter(args, &data)) {
         return;
     }
 
+    long del_len = 0;
     if (view->selection) {
         del_len = prepare_selection(view);
         unselect();
     }
+
     if (strip_nl && data.out_len > 0 && data.out[data.out_len - 1] == '\n') {
         if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r') {
             data.out_len--;
