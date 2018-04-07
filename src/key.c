@@ -32,10 +32,10 @@ static const char *const special_names[] = {
 };
 static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
 
-static Key parse_modifiers(const char *const str, Key *modifiersp)
+static size_t parse_modifiers(const char *const str, Key *modifiersp)
 {
     Key modifiers = 0;
-    Key i = 0;
+    size_t i = 0;
 
     while (true) {
         const unsigned char ch = ascii_toupper(str[i]);
