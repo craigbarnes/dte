@@ -98,7 +98,7 @@ Commands:
 .br
    \fBnext\fR
 .br
-   \fBopen\fR [\fB\-e\fR \fIencoding\fR] [\fIfile\fR]...
+   \fBopen\fR [\fB\-g\fR] [\fB\-e\fR \fIencoding\fR] [\fIfile\fR]...
 .br
    \fBoption\fR \fIfiletype\fR \fIoption\fR \fIvalue\fR...
 .br
@@ -840,13 +840,17 @@ Insert empty line under current line.
 Display next file.
 .P
 .RE
-\fBopen\fR [\fB\-e\fR \fIencoding\fR] [\fIfile\fR]...
+\fBopen\fR [\fB\-g\fR] [\fB\-e\fR \fIencoding\fR] [\fIfile\fR]...
 .RS
 Open \fIfile\fR. If filename is omitted, a new file is opened.
 .P
 .TP
 \fB\-e\fR \fIencoding\fR
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
+.PP
+.TP
+\fB\-g\fR
+Perform \fBglob\fR(3) expansion on \fIfile\fR.
 .PP
 .RE
 \fBoption\fR \fIfiletype\fR \fIoption\fR \fIvalue\fR...

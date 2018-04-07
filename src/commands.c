@@ -1,3 +1,4 @@
+#include <glob.h>
 #include "editor.h"
 #include "edit.h"
 #include "move.h"
@@ -602,11 +603,15 @@ static void cmd_open(const char *pf, char **args)
 {
     const char *enc = NULL;
     char *encoding = NULL;
+    bool use_glob = false;
 
     while (*pf) {
         switch (*pf) {
         case 'e':
             enc = *args++;
+            break;
+        case 'g':
+            use_glob = args[0] ? true : false;
             break;
         }
         pf++;
@@ -620,23 +625,39 @@ static void cmd_open(const char *pf, char **args)
         }
     }
 
-    if (!args[0]) {
+    char **paths = args;
+    glob_t globbuf;
+    if (use_glob) {
+        int err = glob(args[0], GLOB_NOCHECK, NULL, &globbuf);
+        while (err == 0 && *++args) {
+            err = glob(*args, GLOB_NOCHECK | GLOB_APPEND, NULL, &globbuf);
+        }
+        if (globbuf.gl_pathc > 0) {
+            paths = globbuf.gl_pathv;
+        }
+    }
+
+    if (!paths[0]) {
         window_open_new_file(window);
         if (encoding) {
             free(buffer->encoding);
             buffer->encoding = encoding;
+            // buffer now owns encoding -- don't free() it below
+            encoding = NULL;
         }
-        return;
-    }
-    if (!args[1]) {
+    } else if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(window, args[0], encoding);
+        window_open_file(window, paths[0], encoding);
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(window, args, encoding);
+        window_open_files(window, paths, encoding);
     }
+
     free(encoding);
+    if (use_glob) {
+        globfree(&globbuf);
+    }
 }
 
 static void cmd_option(const char *pf, char **args)
@@ -1653,7 +1674,7 @@ const Command commands[] = {
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},
     {"next", "", 0, 0, cmd_next},
-    {"open", "e=", 0, -1, cmd_open},
+    {"open", "e=g", 0, -1, cmd_open},
     {"option", "-r", 3, -1, cmd_option},
     {"pass-through", "-ms", 1, -1, cmd_pass_through},
     {"paste", "c", 0, 0, cmd_paste},

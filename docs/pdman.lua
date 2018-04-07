@@ -129,7 +129,8 @@ function Code(s, attr)
     local crossrefs = {
         dte = "(1)",
         dterc = "(5)",
-        ["dte-syntax"] = "(5)"
+        ["dte-syntax"] = "(5)",
+        glob = "(3)"
     }
     return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
 end

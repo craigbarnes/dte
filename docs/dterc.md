@@ -471,12 +471,15 @@ Insert empty line under current line.
 
 Display next file.
 
-### **open** [**-e** _encoding_] [_file_]...
+### **open** [**-g**] [**-e** _encoding_] [_file_]...
 
 Open _file_. If filename is omitted, a new file is opened.
 
 `-e` _encoding_
 :   Set file _encoding_. See `iconv -l` for list of supported encodings.
+
+`-g`
+:   Perform [`glob`] expansion on _file_.
 
 ### **option** _filetype_ _option_ _value_...
 
@@ -1048,5 +1051,6 @@ errors should be highlighted. Set to `""` to disable.
 
 
 [`dte-syntax`]: dte-syntax.html
+[`glob`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`config/filetype`]: https://github.com/craigbarnes/dte/blob/master/config/filetype
 [`xterm`]: https://invisible-island.net/xterm/
