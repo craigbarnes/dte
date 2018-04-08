@@ -12,7 +12,7 @@ check: $(test) all
 	$(E) TEST $<
 	$(Q) $<
 
-check-commands: $(dte) | build/test/
+check-commands: $(dte)
 	$(E) CMDTEST test/thai.dterc
 	$(Q) $(call CMDTEST, test/thai.dterc)
 	$(Q) diff -q build/test/thai-utf8.txt test/thai-utf8.txt
