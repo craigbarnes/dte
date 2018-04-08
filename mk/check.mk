@@ -1,4 +1,3 @@
-CMDTEST = $(dte) -Rc "$$(sed '/^\#/d;/^$$/d' < '$(strip $(1))' | tr '\n' ';')"
 SYNTAX_LINT = $(AWK) -f test/syntax-lint.awk
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
@@ -14,7 +13,7 @@ check: $(test) all
 
 check-commands: $(dte)
 	$(E) CMDTEST test/thai.dterc
-	$(Q) $(call CMDTEST, test/thai.dterc)
+	$(Q) ./$(dte) -R -c 'eval cat test/thai.dterc'
 	$(Q) diff -q build/test/thai-utf8.txt test/thai-utf8.txt
 	$(Q) diff -q build/test/thai-tis620.txt test/thai-tis620.txt
 	$(Q) $(RM) build/test/thai-*.txt

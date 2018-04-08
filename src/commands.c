@@ -354,6 +354,16 @@ static void cmd_errorfmt(const char *pf, char **args)
     add_error_fmt(args[0], ignore, args[1], args + 2);
 }
 
+static void cmd_eval(const char* UNUSED(pf), char **args)
+{
+    FilterData data = {.in = NULL, .in_len = 0};
+    if (spawn_filter(args, &data)) {
+        return;
+    }
+    exec_config(commands, data.out, data.out_len);
+    free(data.out);
+}
+
 static void cmd_filter(const char* UNUSED(pf), char **args)
 {
     FilterData data;
@@ -1657,6 +1667,7 @@ const Command commands[] = {
     {"erase-bol", "", 0, 0, cmd_erase_bol},
     {"erase-word", "s", 0, 0, cmd_erase_word},
     {"errorfmt", "i", 2, 6, cmd_errorfmt},
+    {"eval", "-", 1, -1, cmd_eval},
     {"filter", "-", 1, -1, cmd_filter},
     {"format-paragraph", "", 0, 1, cmd_format_paragraph},
     {"ft", "-bcfi", 2, -1, cmd_ft},
