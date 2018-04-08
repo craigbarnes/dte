@@ -32,6 +32,7 @@ ft -b python BUILD.bazel
 ft -b robotstxt robots.txt
 ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
 ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD APKBUILD
+ft -b texmfcnf texmf.cnf
 ft -b xml drirc .drirc
 ft -b yaml .clang-format
 

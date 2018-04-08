@@ -1,0 +1,35 @@
+syntax texmfcnf
+
+state line-start
+    char "\n" this
+    char % comment
+    noeat text
+
+state text
+    char "\n" line-start
+    char " \t" space
+    char \$ dollar
+    eat this
+
+state space
+    char " \t" this
+    char % comment
+    noeat text
+
+state comment
+    char "\n" line-start
+    eat this
+
+state dollar variable
+    char A-Za-z_ variable
+    char { brace
+    noeat text
+
+state variable
+    char A-Za-z0-9_ this
+    noeat text
+
+state brace variable
+    char "\n" line-start
+    char } text variable
+    eat this
