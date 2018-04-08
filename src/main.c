@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
 
-    exec_builtin_rc("hi\n");
+    exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 
     fill_builtin_colors();
