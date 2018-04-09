@@ -7,9 +7,9 @@
 typedef struct {
     PointerArray files;
     char *all_files;
-    long size;
-    int selected;
-    int scroll;
+    size_t size;
+    size_t selected;
+    size_t scroll;
 } GitOpenState;
 
 extern GitOpenState git_open;

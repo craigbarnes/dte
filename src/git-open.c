@@ -151,19 +151,22 @@ static void git_open_filter(void)
     git_open.scroll = 0;
 }
 
-static void up(int count)
+static void up(size_t count)
 {
-    git_open.selected -= count;
-    if (git_open.selected < 0) {
+    if (count >= git_open.selected) {
         git_open.selected = 0;
+    } else {
+        git_open.selected -= count;
     }
 }
 
-static void down(int count)
+static void down(size_t count)
 {
-    git_open.selected += count;
-    if (git_open.selected >= git_open.files.count) {
-        git_open.selected = git_open.files.count - 1;
+    if (git_open.files.count > 1) {
+        git_open.selected += count;
+        if (git_open.selected >= git_open.files.count) {
+            git_open.selected = git_open.files.count - 1;
+        }
     }
 }
 
@@ -182,6 +185,14 @@ void git_open_reload(void)
     git_open_filter();
 }
 
+static inline size_t terminal_page_height(void) {
+    if (terminal.height >= 6) {
+        return terminal.height - 2;
+    } else {
+        return 1;
+    }
+}
+
 void git_open_keypress(Key key)
 {
     switch (key) {
@@ -195,7 +206,7 @@ void git_open_keypress(Key key)
         down(1);
         break;
     case MOD_META | 'e':
-        if (git_open.files.count > 0) {
+        if (git_open.files.count > 1) {
             git_open.selected = git_open.files.count - 1;
         }
         break;
@@ -209,10 +220,17 @@ void git_open_keypress(Key key)
         down(1);
         break;
     case KEY_PAGE_UP:
-        up(terminal.height - 2);
+        up(terminal_page_height());
         break;
     case KEY_PAGE_DOWN:
-        down(terminal.height - 2);
+        down(terminal_page_height());
+        break;
+    case '\t':
+        if (git_open.selected + 1 >= git_open.files.count) {
+            git_open.selected = 0;
+        } else {
+            down(1);
+        }
         break;
     default:
         switch (cmdline_handle_key(&editor.cmdline, NULL, key)) {
