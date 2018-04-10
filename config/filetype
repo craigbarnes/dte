@@ -31,7 +31,7 @@ ft -b nginx nginx.conf
 ft -b python BUILD.bazel
 ft -b robotstxt robots.txt
 ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
-ft -b sh .bashrc .bash_profile .bash_logout PKGBUILD APKBUILD
+ft -b sh APKBUILD PKGBUILD
 ft -b texmfcnf texmf.cnf
 ft -b xml drirc .drirc
 ft -b yaml .clang-format
@@ -43,7 +43,7 @@ ft -f ini '/\.git/config$|^/etc/systemd/.+\.conf$|^/etc/krb5\.conf$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
 ft -f nginx '^/etc/nginx/'
-ft -f sh '^/etc/default/.*|^/etc/profile$'
+ft -f sh '^/etc/default/|^/etc/profile$|(\.|/)bash(rc|_profile|_logout)$'
 
 # "ft" matches against the filename extension
 ft awk awk gawk mawk nawk
