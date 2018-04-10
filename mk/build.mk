@@ -7,7 +7,7 @@ PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.6)
 
 WARNINGS = \
-    -Wall -Wextra -Wformat -Wformat-security \
+    -Wall -Wextra -Wformat -Wformat-security -Wvla \
     -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
