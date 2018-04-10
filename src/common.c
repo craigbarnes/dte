@@ -62,7 +62,6 @@ bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
     }
     while (pos < size && ascii_isdigit(str[pos])) {
         long old = val;
-
         val *= 10;
         val += str[pos++] - '0';
         count++;
@@ -100,7 +99,6 @@ bool str_to_long(const char *str, long *valp)
 bool str_to_int(const char *str, int *valp)
 {
     long val;
-
     if (!str_to_long(str, &val) || val < INT_MIN || val > INT_MAX) {
         return false;
     }
@@ -118,9 +116,8 @@ char *xvsprintf(const char *format, va_list ap)
 char *xsprintf(const char *format, ...)
 {
     va_list ap;
-    char *str;
     va_start(ap, format);
-    str = xvsprintf(format, ap);
+    char *str = xvsprintf(format, ap);
     va_end(ap);
     return str;
 }
@@ -153,9 +150,7 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
     size_t count_save = count;
 
     do {
-        int rc;
-
-        rc = write(fd, b, count);
+        int rc = write(fd, b, count);
         if (rc == -1) {
             if (errno == EINTR) {
                 continue;
