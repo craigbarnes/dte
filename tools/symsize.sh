@@ -3,7 +3,7 @@
 # This script filters output from "nm" to show the sizes of symbols
 # (in KiB) in an object file, sorted from largest to smallest.
 
-nm -Ptd $@ | awk '
+nm -Ptd ${@:-dte} | awk '
 {
     name = $1
     type = $2
