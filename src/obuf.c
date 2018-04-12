@@ -32,7 +32,7 @@ void buf_add_bytes(const char *const str, size_t count)
     if (count > obuf_avail()) {
         buf_flush();
         if (count >= sizeof(obuf.buf)) {
-            xwrite(1, str, count);
+            xwrite(STDOUT_FILENO, str, count);
             return;
         }
     }
@@ -223,7 +223,7 @@ void buf_clear_eol(void)
 void buf_flush(void)
 {
     if (obuf.count) {
-        xwrite(1, obuf.buf, obuf.count);
+        xwrite(STDOUT_FILENO, obuf.buf, obuf.count);
         obuf.count = 0;
     }
 }
