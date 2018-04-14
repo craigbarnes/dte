@@ -1,10 +1,10 @@
 #ifndef WBUF_H
 #define WBUF_H
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef struct {
-    int fill;
+    size_t fill;
     int fd;
     char buf[8192];
 } WriteBuffer;
