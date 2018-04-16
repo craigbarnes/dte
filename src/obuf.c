@@ -130,6 +130,10 @@ void buf_move_cursor(int x, int y)
 
 void buf_set_color(const TermColor *const color)
 {
+    if (terminal.max_colors < 8) {
+        return;
+    }
+
     if (!memcmp(color, &obuf.color, sizeof(*color))) {
         return;
     }
