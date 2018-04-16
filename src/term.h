@@ -51,6 +51,7 @@ typedef struct {
 
 typedef struct {
     bool can_bg_color_erase; // Can clear to end of line with bg color set
+    bool has_dim_mode;
     int max_colors;
     int width;
     int height;

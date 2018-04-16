@@ -154,7 +154,7 @@ void buf_set_color(const TermColor *const color)
         buf[i++] = ';';
         buf[i++] = '1';
     }
-    if (c.attr & ATTR_LOW_INTENSITY) {
+    if (c.attr & ATTR_LOW_INTENSITY && terminal.has_dim_mode) {
         buf[i++] = ';';
         buf[i++] = '2';
     }
