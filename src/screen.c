@@ -7,7 +7,6 @@
 #include "search.h"
 #include "uchar.h"
 #include "frame.h"
-#include "git-open.h"
 #include "path.h"
 #include "input-special.h"
 #include "selection.h"

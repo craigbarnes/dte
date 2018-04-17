@@ -1,7 +1,7 @@
 #include "git-open.h"
+#include "ascii.h"
 #include "spawn.h"
 #include "window.h"
-#include "view.h"
 #include "ptr-array.h"
 #include "term.h"
 #include "cmdline.h"
@@ -9,6 +9,7 @@
 #include "obuf.h"
 #include "screen.h"
 #include "uchar.h"
+#include "unicode.h"
 #include "error.h"
 
 static struct {
