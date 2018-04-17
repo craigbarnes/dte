@@ -88,10 +88,10 @@ void get_indent_info(const char *buf, int len, IndentInfo *info)
     info->wsonly = pos == len;
 }
 
-int use_spaces_for_indent(void)
+bool use_spaces_for_indent(void)
 {
     return
-        buffer->options.expand_tab
+        buffer->options.expand_tab == true
         || buffer->options.indent_width != buffer->options.tab_width;
 }
 
