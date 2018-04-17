@@ -289,60 +289,6 @@ void update_line_numbers(Window *win, bool force)
     }
 }
 
-void update_git_open(void)
-{
-    int x = 0;
-    int y = 0;
-    int w = terminal.width;
-    int h = terminal.height - 1;
-    int max_y = git_open.scroll + h - 1;
-    int i = 0;
-
-    if (h >= git_open.files.count) {
-        git_open.scroll = 0;
-    }
-    if (git_open.scroll > git_open.selected) {
-        git_open.scroll = git_open.selected;
-    }
-    if (git_open.selected > max_y) {
-        git_open.scroll += git_open.selected - max_y;
-    }
-
-    buf_reset(x, w, 0);
-    buf_move_cursor(0, 0);
-    editor.cmdline_x = print_command('/');
-    buf_clear_eol();
-    y++;
-
-    for (; i < h; i++) {
-        int file_idx = git_open.scroll + i;
-        char *file;
-        TermColor color;
-
-        if (file_idx >= git_open.files.count) {
-            break;
-        }
-
-        file = git_open.files.ptrs[file_idx];
-        obuf.x = 0;
-        buf_move_cursor(x, y + i);
-
-        color = *editor.builtin_colors[BC_DEFAULT];
-        if (file_idx == git_open.selected) {
-            mask_color(&color, editor.builtin_colors[BC_SELECTION]);
-        }
-        buf_set_color(&color);
-        buf_add_str(file);
-        buf_clear_eol();
-    }
-    set_builtin_color(BC_DEFAULT);
-    for (; i < h; i++) {
-        obuf.x = 0;
-        buf_move_cursor(x, y + i);
-        buf_clear_eol();
-    }
-}
-
 void update_window_sizes(void)
 {
     set_frame_size(root_frame, terminal.width, terminal.height - 1);

@@ -4,6 +4,7 @@
 #include "buffer.h"
 #include "color.h"
 #include "term.h"
+#include "view.h"
 #include "window.h"
 
 void set_color(TermColor *color);
@@ -19,7 +20,6 @@ void update_separators(void);
 void update_status_line(Window *win);
 void update_window_sizes(void);
 void update_line_numbers(Window *win, bool force);
-void update_git_open(void);
 void update_screen_size(void);
 
 #endif
