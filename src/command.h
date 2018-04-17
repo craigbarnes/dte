@@ -12,7 +12,7 @@ typedef struct {
     const char *flags;
     int8_t min_args;
     int8_t max_args;
-    void (*cmd)(const char *, char **);
+    void (*cmd)(const char *flags, char **args);
 } Command;
 
 // parse-command.c

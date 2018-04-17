@@ -57,7 +57,7 @@ void normal_update(void);
 void resize(void);
 void ui_end(void);
 void suspend(void);
-void set_signal_handler(int signum, void (*handler)(int));
+void set_signal_handler(int signum, void (*handler)(int signum));
 void main_loop(void);
 
 #endif

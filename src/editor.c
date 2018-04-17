@@ -460,7 +460,7 @@ static void update_screen(const ScreenState *const s)
     end_update();
 }
 
-void set_signal_handler(int signum, void (*handler)(int))
+void set_signal_handler(int signum, void (*handler)(int signum))
 {
     struct sigaction act;
 
