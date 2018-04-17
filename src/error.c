@@ -47,13 +47,13 @@ void error_free(Error *err)
 
 void clear_error(void)
 {
-    error_buf[0] = 0;
+    error_buf[0] = '\0';
 }
 
 void error_msg(const char *format, ...)
 {
     va_list ap;
-    int pos = 0;
+    size_t pos = 0;
 
     // Some implementations of *printf return -1 if output was truncated
     if (config_file) {
