@@ -22,7 +22,6 @@ typedef struct {
 } IndentInfo;
 
 char *make_indent(int width);
-int brace_indent_inc(const char *line, unsigned int len);
 char *get_indent_for_next_line(const char *line, unsigned int len);
 void get_indent_info(const char *buf, int len, IndentInfo *info);
 int use_spaces_for_indent(void);
