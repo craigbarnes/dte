@@ -1,6 +1,8 @@
 #include "term.h"
 #include "common.h" // For str_has_prefix
 
+#define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
+
 #ifndef TERMINFO_DISABLE
 
 // These are normally declared in the <curses.h> and <term.h> headers.
@@ -26,10 +28,19 @@ static char *curses_str_cap(const char *const name)
 static void term_read_caps(void)
 {
     terminal.back_color_erase = tigetflag("bce");
-    terminal.has_dim_mode = xstreq(curses_str_cap("dim"), "\033[2m");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
+
+    terminal.attributes =
+        (xstreq(curses_str_cap("smul"), "\033[4m") ? ATTR_UNDERLINE : 0)
+        + (xstreq(curses_str_cap("rev"), "\033[7m") ? ATTR_REVERSE : 0)
+        + (xstreq(curses_str_cap("blink"), "\033[5m") ? ATTR_BLINK : 0)
+        + (xstreq(curses_str_cap("dim"), "\033[2m") ? ATTR_DIM : 0)
+        + (xstreq(curses_str_cap("bold"), "\033[1m") ? ATTR_BOLD : 0)
+        + (xstreq(curses_str_cap("invis"), "\033[8m") ? ATTR_INVIS : 0)
+        + (xstreq(curses_str_cap("sitm"), "\033[3m") ? ATTR_ITALIC : 0)
+    ;
 
     TermControlCodes *tcc = xmalloc(sizeof(TermControlCodes));
     *tcc = (TermControlCodes) {
@@ -141,6 +152,7 @@ static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .attributes = ANSI_ATTRS,
     .keymap = ansi_keymap,
     .keymap_length = ARRAY_COUNT(ansi_keymap),
     .control_codes = &ansi_control_codes
@@ -306,10 +318,10 @@ static const TermControlCodes rxvt_control_codes = {
 
 static const TerminalInfo terminal_xterm = {
     .back_color_erase = false,
-    .has_dim_mode = true,
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .keymap = xterm_keymap,
     .keymap_length = ARRAY_COUNT(xterm_keymap),
     .control_codes = &xterm_control_codes
@@ -317,10 +329,10 @@ static const TerminalInfo terminal_xterm = {
 
 static const TerminalInfo terminal_st = {
     .back_color_erase = true,
-    .has_dim_mode = true,
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .keymap = st_keymap,
     .keymap_length = ARRAY_COUNT(st_keymap),
     .control_codes = &xterm_control_codes
@@ -328,10 +340,10 @@ static const TerminalInfo terminal_st = {
 
 static const TerminalInfo terminal_rxvt = {
     .back_color_erase = true,
-    .has_dim_mode = false,
     .max_colors = 8,
     .width = 80,
     .height = 24,
+    .attributes = ANSI_ATTRS,
     .keymap = rxvt_keymap,
     .keymap_length = ARRAY_COUNT(rxvt_keymap),
     .control_codes = &rxvt_control_codes

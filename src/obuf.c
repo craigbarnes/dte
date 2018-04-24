@@ -154,34 +154,36 @@ void buf_set_color(const TermColor *const color)
     buf[i++] = '[';
     buf[i++] = '0';
 
-    if (c.attr & ATTR_BOLD) {
+    const unsigned short term_attrs = terminal.attributes;
+    if (c.attr & ATTR_BOLD && term_attrs & ATTR_BOLD) {
         buf[i++] = ';';
         buf[i++] = '1';
     }
-    if (c.attr & ATTR_DIM && terminal.has_dim_mode) {
+    if (c.attr & ATTR_DIM && term_attrs & ATTR_DIM) {
         buf[i++] = ';';
         buf[i++] = '2';
     }
-    if (c.attr & ATTR_ITALIC) {
+    if (c.attr & ATTR_ITALIC && term_attrs & ATTR_ITALIC) {
         buf[i++] = ';';
         buf[i++] = '3';
     }
-    if (c.attr & ATTR_UNDERLINE) {
+    if (c.attr & ATTR_UNDERLINE && term_attrs & ATTR_UNDERLINE) {
         buf[i++] = ';';
         buf[i++] = '4';
     }
-    if (c.attr & ATTR_BLINK) {
+    if (c.attr & ATTR_BLINK && term_attrs & ATTR_BLINK) {
         buf[i++] = ';';
         buf[i++] = '5';
     }
-    if (c.attr & ATTR_REVERSE) {
+    if (c.attr & ATTR_REVERSE && term_attrs & ATTR_REVERSE) {
         buf[i++] = ';';
         buf[i++] = '7';
     }
-    if (c.attr & ATTR_INVIS) {
+    if (c.attr & ATTR_INVIS && term_attrs & ATTR_INVIS) {
         buf[i++] = ';';
         buf[i++] = '8';
     }
+
     if (c.fg >= 0) {
         const unsigned char fg = (unsigned char) c.fg;
         if (fg < 8) {
@@ -192,6 +194,7 @@ void buf_set_color(const TermColor *const color)
             i += snprintf(&buf[i], 10, ";38;5;%u", fg);
         }
     }
+
     if (c.bg >= 0) {
         const unsigned char bg = (unsigned char) c.bg;
         if (bg < 8) {
@@ -202,8 +205,8 @@ void buf_set_color(const TermColor *const color)
             i += snprintf(&buf[i], 10, ";48;5;%u", bg);
         }
     }
-    buf[i++] = 'm';
 
+    buf[i++] = 'm';
     buf_add_bytes(buf, i);
     obuf.color = *color;
 }

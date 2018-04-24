@@ -51,10 +51,10 @@ typedef struct {
 
 typedef struct {
     bool back_color_erase;
-    bool has_dim_mode;
     int max_colors;
     int width;
     int height;
+    unsigned short attributes;
     const TermControlCodes *control_codes;
     const TermKeyMap *keymap;
     size_t keymap_length;
