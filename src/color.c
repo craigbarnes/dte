@@ -13,8 +13,14 @@ static const char *const color_names[] = {
 };
 
 static const char *const attr_names[] = {
-    "bold", "lowintensity", "italic", "underline",
-    "blink", "reverse", "invisible", "keep"
+    "keep",
+    "underline",
+    "reverse",
+    "blink",
+    "lowintensity",
+    "bold",
+    "invisible",
+    "italic"
 };
 
 static const char *const builtin_color_names[] = {

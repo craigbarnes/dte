@@ -18,14 +18,14 @@ enum {
 };
 
 enum {
-    ATTR_BOLD = 0x01,
-    ATTR_LOW_INTENSITY = 0x02,
-    ATTR_ITALIC = 0x04,
-    ATTR_UNDERLINE = 0x08,
-    ATTR_BLINKING = 0x10,
-    ATTR_REVERSE_VIDEO = 0x20,
-    ATTR_INVISIBLE_TEXT = 0x40,
-    ATTR_KEEP = 0x80,
+    ATTR_KEEP = 0x01,
+    ATTR_UNDERLINE = 0x02,
+    ATTR_REVERSE = 0x04,
+    ATTR_BLINK = 0x08,
+    ATTR_DIM = 0x10,
+    ATTR_BOLD = 0x20,
+    ATTR_INVIS = 0x40,
+    ATTR_ITALIC = 0x80,
 };
 
 typedef struct {

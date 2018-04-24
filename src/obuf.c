@@ -158,7 +158,7 @@ void buf_set_color(const TermColor *const color)
         buf[i++] = ';';
         buf[i++] = '1';
     }
-    if (c.attr & ATTR_LOW_INTENSITY && terminal.has_dim_mode) {
+    if (c.attr & ATTR_DIM && terminal.has_dim_mode) {
         buf[i++] = ';';
         buf[i++] = '2';
     }
@@ -170,15 +170,15 @@ void buf_set_color(const TermColor *const color)
         buf[i++] = ';';
         buf[i++] = '4';
     }
-    if (c.attr & ATTR_BLINKING) {
+    if (c.attr & ATTR_BLINK) {
         buf[i++] = ';';
         buf[i++] = '5';
     }
-    if (c.attr & ATTR_REVERSE_VIDEO) {
+    if (c.attr & ATTR_REVERSE) {
         buf[i++] = ';';
         buf[i++] = '7';
     }
-    if (c.attr & ATTR_INVISIBLE_TEXT) {
+    if (c.attr & ATTR_INVIS) {
         buf[i++] = ';';
         buf[i++] = '8';
     }
