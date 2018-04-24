@@ -25,7 +25,7 @@ static char *curses_str_cap(const char *const name)
 // See terminfo(5)
 static void term_read_caps(void)
 {
-    terminal.can_bg_color_erase = tigetflag("bce");
+    terminal.back_color_erase = tigetflag("bce");
     terminal.has_dim_mode = xstreq(curses_str_cap("dim"), "\033[2m");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
@@ -304,7 +304,7 @@ static const TermControlCodes rxvt_control_codes = {
 };
 
 static const TerminalInfo terminal_xterm = {
-    .can_bg_color_erase = false,
+    .back_color_erase = false,
     .has_dim_mode = true,
     .max_colors = 8,
     .width = 80,
@@ -315,7 +315,7 @@ static const TerminalInfo terminal_xterm = {
 };
 
 static const TerminalInfo terminal_st = {
-    .can_bg_color_erase = true,
+    .back_color_erase = true,
     .has_dim_mode = true,
     .max_colors = 8,
     .width = 80,
@@ -326,7 +326,7 @@ static const TerminalInfo terminal_st = {
 };
 
 static const TerminalInfo terminal_rxvt = {
-    .can_bg_color_erase = true,
+    .back_color_erase = true,
     .has_dim_mode = false,
     .max_colors = 8,
     .width = 80,

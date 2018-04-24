@@ -214,7 +214,7 @@ void buf_clear_eol(void)
         if (
             obuf.can_clear
             && terminal.control_codes->clear_to_eol
-            && (obuf.color.bg < 0 || terminal.can_bg_color_erase)
+            && (obuf.color.bg < 0 || terminal.back_color_erase)
         ) {
             buf_escape(terminal.control_codes->clear_to_eol);
             obuf.x = obuf.scroll_x + obuf.width;
