@@ -118,8 +118,9 @@ static void term_read_caps(void)
 
 static void term_init_fallback(const char *const term)
 {
-    // Initialize ncurses (or call exit(3) on failure)
+    // Initialize terminfo database (or call exit(3) on failure)
     setupterm(term, 1, (int*)0);
+
     term_read_caps();
 }
 

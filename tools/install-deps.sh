@@ -25,5 +25,5 @@ OpenBSD)
 FreeBSD)
     pkg install gmake gcc;; # TODO: test this
 *)
-    error 'Unrecognized OS; install GNU Make, GCC and ncurses manually';;
+    error 'Unrecognized OS; install GNU Make, GCC and curses manually';;
 esac

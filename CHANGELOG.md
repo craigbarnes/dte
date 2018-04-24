@@ -66,9 +66,9 @@ Released on 2017-10-16.
 * Added the ability to bind additional, xterm-style key combinations
   (e.g. `bind C-M-S-left ...`) when `$TERM` is `tmux` (previously
   only available for `xterm` and `screen`).
-* Added an option to compile without linking to the ncurses library
-  (`make TERMINFO_DISABLE=1`), to make it easier to create portable,
-  statically-linked builds.
+* Added an option to compile without linking to the curses/terminfo
+  library (`make TERMINFO_DISABLE=1`), to make it easier to create
+  portable, statically-linked builds.
 
 **Downloads:**
 
