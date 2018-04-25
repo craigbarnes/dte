@@ -100,12 +100,16 @@ static void cmdline_next_word(CommandLine *c)
 
 static void cmdline_prev_word(CommandLine *c)
 {
-    const char *buf = c->buf.buffer;
-    size_t i = c->pos;
-
-    if (i > 1 && is_word_byte(buf[i]) && !is_word_byte(buf[i - 1])) {
-        i--;
+    switch (c->pos) {
+    case 1:
+        c->pos = 0;
+        return;
+    case 0:
+        return;
     }
+
+    const char *const buf = c->buf.buffer;
+    size_t i = c->pos - 1;
 
     while (i > 0 && !is_word_byte(buf[i])) {
         i--;
