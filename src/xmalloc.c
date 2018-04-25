@@ -9,9 +9,9 @@ NORETURN static void malloc_fail (
     const char *const func,
     const char *const msg
 ) {
-    char buf[256] = {'\0'};
+    char buf[256];
     term_cleanup();
-    snprintf(buf, 255, "\n%s:%d: Error in '%s': %s\n", file, line, func, msg);
+    snprintf(buf, sizeof buf, "\n%s:%d: %s: %s\n", file, line, func, msg);
     fputs(buf, stderr);
     abort();
 }
@@ -19,9 +19,9 @@ NORETURN static void malloc_fail (
 size_t size_multiply(size_t a, size_t b)
 {
     if (unsigned_mult_overflows(a, b)) {
-        char buf[256] = {'\0'};
+        char buf[256];
         term_cleanup();
-        snprintf(buf, 255, "\nsize_multiply() overflow: %zu * %zu\n", a, b);
+        snprintf(buf, sizeof buf, "\nsize_t overflow: %zu * %zu\n", a, b);
         fputs(buf, stderr);
         exit(1);
     }
