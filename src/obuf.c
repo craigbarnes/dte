@@ -128,6 +128,18 @@ void buf_move_cursor(int x, int y)
     buf_add_bytes(buf, (size_t)len);
 }
 
+static bool can_set_attr(unsigned short attr, const TermColor *color)
+{
+    if (!(terminal.attributes & attr)) {
+        // Terminal doesn't support attr
+        return false;
+    } else if (terminal.ncv_attributes & attr) {
+        // Terminal only allows attr when not using colors
+        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+    }
+    return true;
+}
+
 void buf_set_color(const TermColor *const color)
 {
     if (terminal.max_colors < 8) {
@@ -154,32 +166,31 @@ void buf_set_color(const TermColor *const color)
     buf[i++] = '[';
     buf[i++] = '0';
 
-    const unsigned short term_attrs = terminal.attributes;
-    if (c.attr & ATTR_BOLD && term_attrs & ATTR_BOLD) {
+    if (c.attr & ATTR_BOLD && can_set_attr(ATTR_BOLD, &c)) {
         buf[i++] = ';';
         buf[i++] = '1';
     }
-    if (c.attr & ATTR_DIM && term_attrs & ATTR_DIM) {
+    if (c.attr & ATTR_DIM && can_set_attr(ATTR_DIM, &c)) {
         buf[i++] = ';';
         buf[i++] = '2';
     }
-    if (c.attr & ATTR_ITALIC && term_attrs & ATTR_ITALIC) {
+    if (c.attr & ATTR_ITALIC && can_set_attr(ATTR_ITALIC, &c)) {
         buf[i++] = ';';
         buf[i++] = '3';
     }
-    if (c.attr & ATTR_UNDERLINE && term_attrs & ATTR_UNDERLINE) {
+    if (c.attr & ATTR_UNDERLINE && can_set_attr(ATTR_UNDERLINE, &c)) {
         buf[i++] = ';';
         buf[i++] = '4';
     }
-    if (c.attr & ATTR_BLINK && term_attrs & ATTR_BLINK) {
+    if (c.attr & ATTR_BLINK && can_set_attr(ATTR_BLINK, &c)) {
         buf[i++] = ';';
         buf[i++] = '5';
     }
-    if (c.attr & ATTR_REVERSE && term_attrs & ATTR_REVERSE) {
+    if (c.attr & ATTR_REVERSE && can_set_attr(ATTR_REVERSE, &c)) {
         buf[i++] = ';';
         buf[i++] = '7';
     }
-    if (c.attr & ATTR_INVIS && term_attrs & ATTR_INVIS) {
+    if (c.attr & ATTR_INVIS && can_set_attr(ATTR_INVIS, &c)) {
         buf[i++] = ';';
         buf[i++] = '8';
     }

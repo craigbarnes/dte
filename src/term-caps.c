@@ -42,6 +42,20 @@ static void term_read_caps(void)
         + (xstreq(curses_str_cap("sitm"), "\033[3m") ? ATTR_ITALIC : 0)
     ;
 
+    const int ncv = tigetnum("ncv");
+    if (ncv <= 0) {
+        terminal.ncv_attributes = 0;
+    } else {
+        terminal.ncv_attributes = (unsigned short)ncv;
+        // The ATTR_* bitflag values used in this codebase are mostly
+        // the same as those used by terminfo, with the exception of
+        // ITALIC, which is bit 7 here, but bit 15 in terminfo. It
+        // must therefore be manually converted.
+        if ((ncv & (1 << 15)) && !(ncv & ATTR_ITALIC)) {
+            terminal.ncv_attributes |= ATTR_ITALIC;
+        }
+    }
+
     TermControlCodes *tcc = xmalloc(sizeof(TermControlCodes));
     *tcc = (TermControlCodes) {
         .clear_to_eol = curses_str_cap("el"),
@@ -153,6 +167,7 @@ static const TerminalInfo terminal_ansi = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS,
+    .ncv_attributes = ATTR_UNDERLINE,
     .keymap = ansi_keymap,
     .keymap_length = ARRAY_COUNT(ansi_keymap),
     .control_codes = &ansi_control_codes

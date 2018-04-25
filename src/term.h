@@ -55,6 +55,7 @@ typedef struct {
     int width;
     int height;
     unsigned short attributes;
+    unsigned short ncv_attributes;
     const TermControlCodes *control_codes;
     const TermKeyMap *keymap;
     size_t keymap_length;
