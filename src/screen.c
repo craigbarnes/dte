@@ -164,52 +164,44 @@ void print_message(const char *msg, bool is_error)
     }
 }
 
-void update_term_title(Buffer* UNUSED(b))
+void save_term_title(void)
 {
-    // TODO: re-implement this function properly, using the `tsl` and
-    // `fsl` terminfo capabilities (or equivalent) and always restore
-    // the original title on exit.
-    return;
+    const char *code = terminal.control_codes->save_title;
+    if (code) {
+        buf_escape(code);
+    }
+}
 
-    /*
-    static int term_type = -1;
-    char title[1024];
+void restore_term_title(void)
+{
+    const char *code = terminal.control_codes->restore_title;
+    if (code) {
+        buf_escape(code);
+    }
+}
 
-    if (term_type == -1) {
-        const char *term = getenv("TERM");
+void update_term_title(Buffer *b)
+{
+    const char *code_prefix = terminal.control_codes->set_title_begin;
+    const char *code_suffix = terminal.control_codes->set_title_end;
 
-        term_type = 0;
-        if (term) {
-            if (strstr(term, "xterm") || strstr(term, "rxvt")) {
-                term_type = 1;
-            } else if (streq(term, "screen")) {
-                term_type = 2;
-            }
-        }
+    if (code_prefix == NULL || code_suffix == NULL) {
+        return;
     }
 
     // FIXME: title must not contain control characters
-    snprintf(title, sizeof(title), "%s %c dte",
+    char title[1024];
+    snprintf (
+        title,
+        sizeof title,
+        "%s %c dte",
         buffer_filename(b),
         buffer_modified(b) ? '+' : '-'
     );
 
-    switch (term_type) {
-    case 1:
-        // xterm or compatible
-        buf_escape("\033]2;");
-        buf_escape(title);
-        buf_escape("\007");
-        break;
-    case 2:
-        // tmux or screen
-        // NOTE: screen might need to be configured to get it working
-        buf_escape("\033_");
-        buf_escape(title);
-        buf_escape("\033\\");
-        break;
-    }
-    */
+    buf_escape(code_prefix);
+    buf_escape(title);
+    buf_escape(code_suffix);
 }
 
 void mask_color(TermColor *color, const TermColor *over)

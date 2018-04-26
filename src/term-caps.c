@@ -319,6 +319,10 @@ static const TermControlCodes xterm_control_codes = {
     .cup_mode_on = "\033[?1049h",
     .hide_cursor = "\033[?25l",
     .show_cursor = "\033[?25h",
+    .save_title = "\033[22;2t",
+    .restore_title = "\033[23;2t",
+    .set_title_begin = "\033]2;",
+    .set_title_end = "\007",
 };
 
 static const TermControlCodes rxvt_control_codes = {
@@ -329,6 +333,10 @@ static const TermControlCodes rxvt_control_codes = {
     .cup_mode_on = "\0337\033[?47h",
     .hide_cursor = "\033[?25l",
     .show_cursor = "\033[?25h",
+    .save_title = "\033[22;2t",
+    .restore_title = "\033[23;2t",
+    .set_title_begin = "\033]2;",
+    .set_title_end = "\007",
 };
 
 static const TerminalInfo terminal_xterm = {

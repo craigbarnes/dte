@@ -42,6 +42,10 @@ typedef struct {
     const char *cup_mode_on;
     const char *show_cursor;
     const char *hide_cursor;
+    const char *save_title;
+    const char *restore_title;
+    const char *set_title_begin;
+    const char *set_title_end;
 } TermControlCodes;
 
 typedef struct {

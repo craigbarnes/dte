@@ -14,6 +14,8 @@ void mask_color(TermColor *color, const TermColor *over);
 void print_tabbar(Window *w);
 int print_command(char prefix);
 void print_message(const char *msg, bool is_error);
+void save_term_title(void);
+void restore_term_title(void);
 void update_term_title(Buffer *b);
 void update_range(View *v, int y1, int y2);
 void update_separators(void);

@@ -12,6 +12,7 @@
 #include "search.h"
 #include "error.h"
 #include "move.h"
+#include "screen.h"
 
 static void handle_sigtstp(int UNUSED(signum))
 {
@@ -116,6 +117,7 @@ int main(int argc, char *argv[])
     }
 
     term_init(term);
+    save_term_title();
 
     // Create this early. Needed if lock-files is true.
     const char *const editor_dir = editor.user_config_dir;
@@ -247,6 +249,7 @@ int main(int argc, char *argv[])
 
     resize();
     main_loop();
+    restore_term_title();
     ui_end();
 
     // Unlock files and add files to file history
