@@ -52,6 +52,7 @@ EditorState editor = {
         .lock_files = true,
         .newline = NEWLINE_UNIX,
         .scroll_margin = 0,
+        .set_window_title = true,
         .show_line_numbers = false,
         .statusline_left = NULL,
         .statusline_right = NULL,

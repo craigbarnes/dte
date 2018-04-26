@@ -856,6 +856,11 @@ just a default value for new files.
 
 Minimum number of lines to keep visible before and after cursor.
 
+### **set-window-title** [true]
+
+Set the window title to the filename of the current buffer (if the
+terminal supports it).
+
 ### **show-line-numbers** [false]
 
 Show line numbers.

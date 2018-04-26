@@ -185,7 +185,7 @@ void update_term_title(Buffer *b)
     const char *code_prefix = terminal.control_codes->set_title_begin;
     const char *code_suffix = terminal.control_codes->set_title_end;
 
-    if (code_prefix == NULL || code_suffix == NULL) {
+    if (!code_prefix || !code_suffix || !editor.options.set_window_title) {
         return;
     }
 

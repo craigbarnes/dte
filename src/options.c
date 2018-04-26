@@ -8,6 +8,7 @@
 #include "common.h"
 #include "regexp.h"
 #include "error.h"
+#include "screen.h"
 
 typedef enum {
     OPT_STR,
@@ -123,6 +124,16 @@ static void filetype_changed(void)
     Buffer *b = window->view->buffer;
     set_file_options(b);
     buffer_update_syntax(b);
+}
+
+static void set_window_title_changed(void)
+{
+    if (editor.options.set_window_title) {
+        update_term_title(window->view->buffer);
+    } else {
+        restore_term_title();
+        save_term_title();
+    }
 }
 
 static void syntax_changed(void)
@@ -418,6 +429,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(newline), newline_enum, NULL),
     INT_OPT("scroll-margin", G(scroll_margin), 0, 100, NULL),
+    BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
     BOOL_OPT("show-line-numbers", G(show_line_numbers), NULL),
     STR_OPT("statusline-left", G(statusline_left), validate_statusline_format, NULL),
     STR_OPT("statusline-right", G(statusline_right), validate_statusline_format, NULL),

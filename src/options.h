@@ -79,6 +79,7 @@ typedef struct {
     int lock_files;
     LineEndingType newline; // Default value for new files
     int scroll_margin;
+    int set_window_title;
     int show_line_numbers;
     const char *statusline_left;
     const char *statusline_right;
