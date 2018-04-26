@@ -56,8 +56,8 @@ static void term_read_caps(void)
         }
     }
 
-    TermControlCodes *tcc = xmalloc(sizeof(TermControlCodes));
-    *tcc = (TermControlCodes) {
+    static TermControlCodes tcc;
+    tcc = (TermControlCodes) {
         .clear_to_eol = curses_str_cap("el"),
         .keypad_off = curses_str_cap("rmkx"),
         .keypad_on = curses_str_cap("smkx"),
@@ -66,7 +66,7 @@ static void term_read_caps(void)
         .show_cursor = curses_str_cap("cnorm"),
         .hide_cursor = curses_str_cap("civis")
     };
-    terminal.control_codes = tcc;
+    terminal.control_codes = &tcc;
 
     static TermKeyMap keymap[] = {
         {"kich1", KEY_INSERT},
