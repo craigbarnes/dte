@@ -129,7 +129,9 @@ static void filetype_changed(void)
 static void set_window_title_changed(void)
 {
     if (editor.options.set_window_title) {
-        update_term_title(window->view->buffer);
+        if (editor.status == EDITOR_RUNNING) {
+            update_term_title(window->view->buffer);
+        }
     } else {
         restore_term_title();
         save_term_title();
