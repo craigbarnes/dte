@@ -31,7 +31,7 @@ ft -b nginx nginx.conf
 ft -b python BUILD.bazel
 ft -b robotstxt robots.txt
 ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
-ft -b sh APKBUILD PKGBUILD
+ft -b sh APKBUILD PKGBUILD mkinitcpio.conf
 ft -b texmfcnf texmf.cnf
 ft -b xml drirc .drirc
 ft -b yaml .clang-format
