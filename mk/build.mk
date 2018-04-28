@@ -50,9 +50,9 @@ else
 endif
 
 ifdef USE_SANITIZER
-  export ASAN_OPTIONS=detect_leaks=0
-  SANITIZER_FLAGS = -fsanitize=address,undefined
-  BASIC_CFLAGS += $(SANITIZER_FLAGS)
+  export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
+  SANITIZER_FLAGS = -fsanitize=address,undefined -fsanitize-address-use-after-scope
+  BASIC_CFLAGS += $(SANITIZER_FLAGS) -fno-omit-frame-pointer -fno-common
   BASIC_LDFLAGS += $(SANITIZER_FLAGS)
   DEBUG = 3
 else
