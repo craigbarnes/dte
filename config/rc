@@ -9,6 +9,7 @@ alias man "run man"
 alias make "compile gcc make"
 alias read "pass-through cat"
 alias builtin "include -b"
+alias trim 'replace "[ \t]+$" ""'
 
 errorfmt gitgrep "^([^:]+):([0-9]+):" file line
 alias git-grep 'compile -1s gitgrep git grep -n'
