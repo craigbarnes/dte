@@ -372,6 +372,22 @@ static const TerminalInfo terminal_rxvt = {
     .control_codes = &rxvt_control_codes
 };
 
+static bool term_match(const char *term, const char *prefix)
+{
+    if (str_has_prefix(term, prefix) == false) {
+        return false;
+    }
+    switch (term[strlen(prefix)]) {
+    // Exact match
+    case '\0':
+    // Prefix match
+    case '-':
+    case '+':
+        return true;
+    }
+    return false;
+}
+
 void term_init(const char *const term)
 {
     if (getenv("DTE_FORCE_TERMINFO")) {
@@ -385,19 +401,14 @@ void term_init(const char *const term)
     }
 
     if (
-        str_has_prefix(term, "tmux")
-        || str_has_prefix(term, "xterm")
-        || str_has_prefix(term, "screen")
+        term_match(term, "tmux")
+        || term_match(term, "xterm")
+        || term_match(term, "screen")
     ) {
         terminal = terminal_xterm;
-    } else if (
-        streq(term, "st")
-        || streq(term, "stterm")
-        || str_has_prefix(term, "st-")
-        || str_has_prefix(term, "stterm-")
-    ) {
+    } else if (term_match(term, "st") || term_match(term, "stterm")) {
         terminal = terminal_st;
-    } else if (streq(term, "rxvt") || str_has_prefix(term, "rxvt-")) {
+    } else if (term_match(term, "rxvt")) {
         terminal = terminal_rxvt;
     } else {
         term_init_fallback(term);
