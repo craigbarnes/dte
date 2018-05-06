@@ -2,8 +2,8 @@ Issues
 ------
 
 * Check for existing [bug reports] before opening a new one.
-* Include relevant error messages and/or test cases (formatted as
-  Markdown [code blocks]). Avoid linking to external paste services.
+* Include any relevant error messages as Markdown [code blocks].
+* Avoid linking to external paste services.
 * Include relevant system information (as printed by `make vars`).
 * Please do not use the issue tracker to make "feature requests".
   Pull requests are very welcome though.
@@ -18,8 +18,9 @@ Commits
 -------
 
 * Run `make git-hooks` **before** creating any commits. This installs
-  a git [`pre-commit`] hook that automatically builds and tests the code
-  and a [`commit-msg`] hook that checks commit message formatting.
+  a git [`pre-commit`] hook that automatically builds and tests each
+  commit and a [`commit-msg`] hook that checks commit message
+  formatting.
 
 Coding Style
 ------------
