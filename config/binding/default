@@ -7,9 +7,6 @@ bind end eol
 bind pgup pgup
 bind pgdown pgdown
 bind delete delete
-bind ^[ unselect
-bind ^? erase
-bind ^H erase
 
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
@@ -20,6 +17,12 @@ bind M-left bol
 bind M-right eol
 bind M-up pgup
 bind M-down pgdown
+
+# Either of these 2 may be equivalent to Backspace, depending on the
+# terminal, so they're both bound to erase by default for portability.
+# On some terminals one may be Backspace and the other Ctrl+Backspace.
+bind ^H erase
+bind ^? erase
 
 bind ^C copy
 bind ^F search
@@ -39,6 +42,7 @@ bind ^X cut
 bind ^Y redo
 bind ^Z undo
 bind ^] tag
+bind ^[ unselect
 
 bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
