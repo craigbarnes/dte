@@ -57,19 +57,21 @@ void add_message(Message *m)
 
 void activate_current_message(void)
 {
-    Message *m;
-
     if (msg_pos == msgs.count) {
         return;
     }
-    m = msgs.ptrs[msg_pos];
+    const Message *m = msgs.ptrs[msg_pos];
     if (m->loc != NULL && m->loc->filename != NULL) {
         if (!file_location_go(m->loc)) {
             // Error message is visible
             return;
         }
     }
-    info_msg("[%zu/%zu] %s", msg_pos + 1, msgs.count, m->msg);
+    if (msgs.count == 1) {
+        info_msg("%s", m->msg);
+    } else {
+        info_msg("[%zu/%zu] %s", msg_pos + 1, msgs.count, m->msg);
+    }
 }
 
 void activate_next_message(void)
