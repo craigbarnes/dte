@@ -1,4 +1,3 @@
-DOXYGEN = doxygen
 PANDOC = pandoc
 PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
@@ -15,7 +14,6 @@ man: docs/dterc.5 docs/dte-syntax.5
 html: $(html)
 pdf: public/dte.pdf
 gz: $(patsubst %, %.gz, $(html) public/style.css)
-doxygen: public/doxygen/index.html
 
 $(html): docs/template.html | public/style.css
 
@@ -51,10 +49,6 @@ public/%.gz: public/%
 	$(E) GZIP $@
 	$(Q) gzip -9 < $< > $@
 
-public/doxygen/index.html: docs/Doxyfile docs/DoxygenLayout.xml src/*.h | public/
-	$(E) DOXYGEN $(@D)/
-	$(Q) $(DOXYGEN) $<
-
 public/:
 	$(Q) mkdir -p $@
 
@@ -63,4 +57,4 @@ check-docs: README.md CHANGELOG.md docs/contributing.md docs/dterc.md docs/dte-s
 
 
 CLEANDIRS += public/
-.PHONY: docs man html pdf gz doxygen check-docs
+.PHONY: docs man html pdf gz check-docs
