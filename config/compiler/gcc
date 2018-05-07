@@ -1,19 +1,20 @@
 errorfmt -i gcc 'error: \(Each undeclared identifier is reported only once'
 errorfmt -i gcc 'error: for each function it appears in.\)'
-errorfmt -i gcc "^(.+):([0-9]+): note: " file line
-errorfmt -i gcc '^(.+):([0-9]+): error: \(near ' file line
-errorfmt -i gcc '^(.+):([0-9]+): warning: \(near ' file line
-errorfmt gcc "^(.+):([0-9]+):([0-9]+): (.*)" file line column message
-errorfmt gcc "^(.+):([0-9]+): (.*)" file line message
+errorfmt -i gcc "^([^:]+):([0-9]+):([0-9]+:)? note: "
+errorfmt -i gcc '^([^:]+):([0-9]+): (error|warning): \(near '
+errorfmt -i gcc "^([^:]+):([0-9]+):([0-9]+):$"
+errorfmt gcc "^([^:]+):([0-9]+):([0-9]+): (.*)" file line column message
+errorfmt gcc "^([^:]+):([0-9]+): (.*)" file line message
 errorfmt gcc "^.* at (.+):([0-9]+):$" file line
 errorfmt gcc " *inlined from '.*' at (.*):([0-9]+):" file line
-errorfmt -i gcc "^In file included from (.+):([0-9]+)[,:]" file line
-errorfmt -i gcc "^ +from (.+):([0-9]+)[,:]" file line
-errorfmt -i gcc "^(.+): (In function .*:)$" file message
+errorfmt -i gcc "^In file included from (.+):([0-9]+)[,:]"
+errorfmt -i gcc "^ +from (.+):([0-9]+)[,:]"
+errorfmt -i gcc "^([^:]+): (In function .*:)$"
 errorfmt -i gcc "^In function '.*',$"
-errorfmt -i gcc "^(.+): At top level:$" file
-errorfmt -i gcc "^cc1: (all )?warnings being treated as errors$"
+errorfmt -i gcc "^([^:]+): At top level:$"
+errorfmt -i gcc "^cc1: (all |some )?warnings being treated as errors$"
 errorfmt -i gcc '^make: \*\*\* \[.*\] Error [0-9]+$'
 errorfmt -i gcc '^make: \*\*\* Waiting for unfinished jobs'
 errorfmt -i gcc '^make: \*\*\* wait: No child processes.  Stop'
 errorfmt -i gcc "^collect2: ld returned [0-9]+ exit status$"
+errorfmt -i gcc '^[ \t]'
