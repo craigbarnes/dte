@@ -142,10 +142,6 @@ static bool can_set_attr(unsigned short attr, const TermColor *color)
 
 void buf_set_color(const TermColor *const color)
 {
-    if (terminal.max_colors < 8) {
-        return;
-    }
-
     if (!memcmp(color, &obuf.color, sizeof(*color))) {
         return;
     }
