@@ -1,10 +1,10 @@
 CC ?= gcc
-CFLAGS ?= -g -O2
+CFLAGS ?= -O2
 LDFLAGS ?=
 AWK = awk
 PKGCONFIG = pkg-config
 PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
-VERSION = $(shell mk/version.sh 1.6)
+VERSION = 1.7
 
 WARNINGS = \
     -Wall -Wextra -Wformat -Wformat-security -Wvla \
@@ -60,7 +60,7 @@ else
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 2: Enable logging to $(DTE_HOME)/debug.log
   # 3: Enable expensive sanity checks
-  DEBUG = 1
+  DEBUG = 0
 endif
 
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))

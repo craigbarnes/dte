@@ -1,8 +1,28 @@
 Releases
 ========
 
-v1.6 (latest release)
+v1.7 (latest release)
 ---------------------
+
+**Changes:**
+
+* Added support for opening multiple files using glob patterns
+  (e.g. `open -g *.[ch]`).
+* Added support for binding more xterm extended key combinations
+  (Ctrl/Meta/Shift + PageUp/PageDown/Home/End).
+* Added basic syntax highlighters for Perl and `texmf.cnf` files.
+* Improved compiler error parsing for newer versions of GCC.
+* Improved handling of underline/dim/italic terminal attributes
+  (including support for the `ncv` terminfo capability).
+* Many other small bug fixes and code improvements.
+
+**Downloads:**
+
+* [dte-1.7.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.7.tar.gz)
+* [dte-1.7.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.7.tar.gz.sig)
+
+v1.6
+----
 
 Released on 2017-12-20.
 
