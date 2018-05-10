@@ -27,6 +27,20 @@ end
 
 local toc = Buffer()
 
+local template = [[
+.TH %s %s "%s"
+.nh
+.ad l
+.
+.SH NAME
+%s \- %s
+.SH SYNOPSIS
+%s%s.
+.SH SEE ALSO
+%s
+.SH AUTHORS
+%s]]
+
 function Doc(body, metadata, variables)
     local title = assert(metadata.title)
     local section = assert(metadata.section)
@@ -34,17 +48,13 @@ function Doc(body, metadata, variables)
     local date = assert(metadata.date)
     local seealso = assert(metadata.seealso)
     local authors = assert(metadata.author)
-    local buffer = Buffer()
-    buffer:write (
-        ".TH ", title:upper(), " ", section, ' "', date, '"\n',
-        ".nh\n.ad l\n.\n",
-        ".SH NAME\n", title, " \\- ", description, "\n",
-        ".SH SYNOPSIS\n", toc:tostring(),
-        body,
-        ".SH SEE ALSO\n", concat(seealso, ",\n"),
-        "\n.SH AUTHORS\n", concat(authors, "\n.br\n")
+    return template:format (
+        title:upper(), section, date,
+        title, description,
+        toc:tostring(), body,
+        concat(seealso, ",\n"),
+        concat(authors, "\n.br\n")
     )
-    return buffer:tostring()
 end
 
 local generate_toc = false
