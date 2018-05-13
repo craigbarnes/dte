@@ -23,7 +23,7 @@ state separator1 code
     noeat error
 
 state space1 code
-    char " \t" space1
+    char " \t" this
     noeat sha1
 
 state sha1 constant

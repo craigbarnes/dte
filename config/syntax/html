@@ -297,7 +297,7 @@ syntax html
 # TODO: Don't highlight tags inside RCDATA elements (e.g. style, script, etc.)
 
 state start text
-    char " \t\n" start
+    char " \t\n" this
     str "<!" doctype
     noeat text
 
@@ -320,13 +320,13 @@ state comment
 state tag-start tag
     char / close-tag
     char -b a-zA-Z0-9_ tag-name
-    char " \t\n" tag-start
+    char " \t\n" this
     char > text tag
     eat this error
 
 state close-tag tag
     char -b a-zA-Z0-9_ close-tag-name
-    char " \t\n" close-tag
+    char " \t\n" this
     eat text error
 
 state tag-name tag-unknown
@@ -342,12 +342,12 @@ state close-tag-name tag-unknown
     noeat close-tag-end
 
 state close-tag-end tag
-    char " \t\n" close-tag-end
+    char " \t\n" this
     char > text tag
     eat text error
 
 state attrs code
-    char " \t\n" attrs
+    char " \t\n" this
     char -b a-zA-Z attr-name
     char > text tag
     char / short-close

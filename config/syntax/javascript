@@ -92,7 +92,7 @@ state regexp-flags regexp-special
 syntax javascript
 
 state first-line
-    char " \t" first-line
+    char " \t" this
     char # line-comment
     noeat code
 
@@ -110,7 +110,7 @@ state code
 
 # who knows where regexps are allowed?
 state foo code
-    char " \t(;:,=*%&|!?+-" foo
+    char " \t(;:,=*%&|!?+-" this
     str "//" line-comment
     str "/*" long-comment
     char / .js-regexp:code

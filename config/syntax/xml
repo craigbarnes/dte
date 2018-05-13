@@ -42,13 +42,13 @@ list entity \
 syntax xml
 
 state line1 text
-    char " \t\n" line1
+    char " \t\n" this
     str "<?" xml
     str "<!" doctype
     noeat text
 
 state line2 text
-    char " \t\n" line2
+    char " \t\n" this
     str "<!" doctype
     noeat text
 
@@ -94,12 +94,12 @@ state close-tag-name tag
     noeat close-tag-end
 
 state close-tag-end special
-    char " \t\n" close-tag-end
+    char " \t\n" this
     char > text tag
     eat text error
 
 state attrs code
-    char " \t\n" attrs
+    char " \t\n" this
     char -b a-zA-Z attr-name
     char > text tag
     char / short-close

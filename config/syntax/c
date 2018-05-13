@@ -78,14 +78,14 @@ state backslash comment
 syntax c
 
 state start code
-    char " \t" start
+    char " \t" this
     char # preproc
     char -b a-z_ ident-label
     char -b A-Z ident-upper-label
     noeat c
 
 state preproc
-    char " \t" preproc
+    char " \t" this
     char -b a-zA-Z_ preproc-ident
     noeat preproc-misc
 
@@ -110,7 +110,7 @@ state preproc-misc preproc
     eat this
 
 state preproc-include preproc
-    char " \t" preproc-include
+    char " \t" this
     char "\n" start
     char "\\" preproc-cont
     char '"' local-include
@@ -134,7 +134,7 @@ state system-include string
 
 state end-include preproc
     char "\n" start
-    char " \t" end-include
+    char " \t" this
     str "/*" .c-comment:this
     str "//" .cpp-comment:start
     eat preproc-error
@@ -158,7 +158,7 @@ state c code
     eat this
 
 state semicolon code
-    char " \t" semicolon
+    char " \t" this
     char -b a-zA-Z_ ident-label
     noeat c
 

@@ -186,7 +186,7 @@ syntax sh
 
 state start code
     char -b a-zA-Z0-9_/.- command
-    char "\t " start
+    char "\t " this
     char "({" this special
     noeat args
 
@@ -207,7 +207,7 @@ state function special
     eat start error
 
 state for keyword
-    char " \t" for
+    char " \t" this
     char a-zA-Z_ forvar
     noeat forerror
 
@@ -217,7 +217,7 @@ state forvar ident
     noeat forerror
 
 state forspace code
-    char " \t" forspace
+    char " \t" this
     str in in
     noeat forerror
 
@@ -263,7 +263,7 @@ state lt3 special
     noeat args
 
 state heredoc-start special
-    char " \t" heredoc-start
+    char " \t" this
     char \" heredoc-dq
     char \' heredoc-sq
     char "\n" start error

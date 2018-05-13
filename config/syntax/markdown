@@ -30,7 +30,7 @@ state yaml
 state line-start
     str "\t" code-block
     str "    " code-block
-    char " " line-start
+    char " " this
     char # hash-heading
     char > block-quote
     char -b 0-9 digit

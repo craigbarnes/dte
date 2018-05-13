@@ -5,7 +5,7 @@
 # "this" is faster and usually also shorter and clearer.
 
 function print_error(message) {
-    printf("%s:%d: %s\n", FILENAME, FNR, message)
+    printf("%s:%d: %s\n", FILENAME, FNR, message) > "/dev/stderr"
     exitcode = 1
 }
 

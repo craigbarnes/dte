@@ -85,7 +85,7 @@ list keyword \
     function local return goto break
 
 state first-line
-    char " \t" first-line
+    char " \t" this
     char # line-comment
     noeat code
 

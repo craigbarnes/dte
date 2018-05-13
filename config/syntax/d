@@ -74,7 +74,7 @@ state backslash comment
 syntax d
 
 state start code
-    char " \t" start
+    char " \t" this
     char -b a-z_ ident-label
     char -b A-Z ident-upper-label
     noeat code
@@ -95,7 +95,7 @@ state code code
     eat this
 
 state semicolon code
-    char " \t" semicolon
+    char " \t" this
     char -b a-zA-Z_ ident-label
     noeat code
 

@@ -38,7 +38,7 @@ syntax nginx
 
 state line-start
     char -b a-z_ first-word
-    char ";\n\t " line-start
+    char ";\n\t " this
     noeat nginx
 
 state nginx

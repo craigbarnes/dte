@@ -144,7 +144,7 @@ state float-end error
     noeat start
 
 state whitespace
-    char " \t\f\r\n" whitespace
+    char " \t\f\r\n" this
     char . whitespace-dot
     noeat start
 

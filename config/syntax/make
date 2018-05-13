@@ -8,14 +8,14 @@ state start code
 
 # "^\t[ \t]*"
 state tab-indent code
-    char " \t" tab-indent
+    char " \t" this
     char "\n" start
     char -b a-zA-Z_- not-target
     noeat make
 
 # "^ [ \t]*"
 state space-indent code
-    char " \t" space-indent
+    char " \t" this
     noeat not-recipe
 
 # Can't be target but can be recipe, variable or keyword

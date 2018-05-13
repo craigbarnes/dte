@@ -16,7 +16,7 @@ state escape-start escape
     char -b '"#' comment
     char -b f font-selection
     char -b ( 2char-escape
-    char "\\.%! |^&)/~:{}acdeEprtu-" text escape
+    char " \\.%!|^&)/~:{}acdeEprtu-" text escape
     eat text error
 
 state 2char-escape escape

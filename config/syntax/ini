@@ -3,7 +3,7 @@ syntax ini
 list constant true false
 
 state line-start
-    char " \t\n" line-start
+    char " \t\n" this
     char [ section
     char '#;' comment
     char = value error
@@ -17,7 +17,7 @@ state section ini.section
 state section-end
     char "\n" line-start
     char # comment
-    char " \t" section-end
+    char " \t" this
     eat this error
 
 state text

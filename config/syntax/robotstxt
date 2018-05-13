@@ -5,7 +5,7 @@ list -i field user-agent: disallow: allow: crawl-delay: sitemap: host:
 state main code
     char -b A-Za-z firstword
     char # comment
-    char " \t" main
+    char " \t" this
     noeat remainder
 
 state firstword

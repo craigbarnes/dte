@@ -19,7 +19,7 @@ state error
 syntax .css-selectorerror
 
 state error
-    char -n "\t\n\r {" error
+    char -n " \t\n\r{" this
     noeat END
 
 # Hex escape: [0-9a-fA-F]{1,6}
@@ -136,7 +136,7 @@ state close
 syntax .css-medialist
 
 state list code
-    char "\t\n " list
+    char "\t\n " this
     char -b a-zA-Z0-9_- name
     noeat END
 
@@ -146,12 +146,12 @@ state name code
     noeat next
 
 state next code
-    char "\t\n " next
+    char "\t\n " this
     char , must
     noeat END
 
 state must code
-    char "\t\n " must
+    char "\t\n " this
     char -b a-zA-Z0-9_ name
     eat END error
 
@@ -165,7 +165,7 @@ state import atkeyword
     noeat error
 
 state arg code
-    char "\t\n " arg
+    char "\t\n " this
     char \" .css-dq:medialist
     char \' .css-sq:medialist
     str -i "url(" .css-url:medialist
@@ -188,7 +188,7 @@ state namespace atkeyword
     noeat error
 
 state arg1 code
-    char "\t\n " arg1
+    char "\t\n " this
     str -i "url(" .css-url:namespace-end
     char a-zA-Z prefix
     noeat arg2
@@ -199,14 +199,14 @@ state prefix code
     noeat error
 
 state arg2 code
-    char "\t\n " arg2
+    char "\t\n " this
     char \" .css-dq:namespace-end
     char \' .css-sq:namespace-end
     str -i "url(" .css-url:namespace-end
     noeat error
 
 state namespace-end
-    char "\t\n " namespace-end
+    char "\t\n " this
     char \; END code
     noeat error
 
@@ -225,12 +225,12 @@ state charset atkeyword
     eat .css-statementerror:start
 
 state atend code
-    char "\t\n " atend
+    char "\t\n " this
     char \; start
     eat .css-statementerror:start
 
 state start code
-    char " \t\n" start
+    char " \t\n" this
     char -b a-zA-Z maybe-element
     char . class
     char # id
@@ -303,12 +303,12 @@ state mediatypes
     noeat .css-medialist:mediablock
 
 state mediablock code
-    char "\t\n " mediablock
+    char "\t\n " this
     char { start
     eat start error
 
 state block code
-    char " \t\n;" block
+    char " \t\n;" this
     char -b a-zA-Z- property
     char 0-9_- property-error
     char } start
@@ -325,13 +325,13 @@ state property code
 
 state property-end code
     char : values
-    char " \t\n" property-end
+    char " \t\n" this
     char ";" block
     char } start
     eat property-error
 
 state values code
-    char " \t\n" values
+    char " \t\n" this
     char 0-9 int
     char -- - minus
     char # hexcolor
@@ -381,7 +381,7 @@ state hexcolor color
     noeat values
 
 state func code
-    char " \t" func
+    char " \t" this
     char ( params
     eat value-error
 

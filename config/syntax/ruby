@@ -34,7 +34,7 @@ syntax ruby
 
 state line-start code
     char # comment
-    char " \b\t\n\v\f\r" line-start
+    char " \b\t\n\v\f\r" this
     str "=begin" =begin
     noeat start
 
@@ -86,7 +86,7 @@ state =begin comment
     eat this
 
 state =begin-nl comment
-    char " \b\t\n\v\f\r" =begin-nl
+    char " \b\t\n\v\f\r" this
     str "=end" comment
     noeat =begin
 

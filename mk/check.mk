@@ -21,7 +21,7 @@ check-commands: $(dte)
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'
 	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
-	$(Q) ! $(SYNTAX_LINT) test/syntax-lint.dterc >/dev/null
+	$(Q) ! $(SYNTAX_LINT) test/syntax-lint.dterc 2>/dev/null
 
 $(test):
 	$(E) LINK $@
