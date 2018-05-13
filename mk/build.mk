@@ -35,7 +35,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     file-history file-location file-option filetype fork format-status \
     frame git-open highlight history indent input-special key load-save \
     lock main move msg normal-mode obuf options parse-args parse-command \
-    path ptr-array regexp run screen screen-tabbar screen-view \
+    path ptr-array regexp run screen screen-tabbar screen-view script \
     search-mode search selection spawn state str syntax tabbar tag \
     term-caps term uchar unicode view wbuf window xmalloc ))
 
@@ -76,6 +76,7 @@ $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
 
 BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
+LDLIBS += $(LUA_LDLIBS)
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
@@ -115,7 +116,9 @@ build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
 build/term-caps.o: build/term-caps.cflags
 build/editor.o: build/editor.cflags
+build/script.o: build/script.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
+build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
 $(dte):
 	$(E) LINK $@

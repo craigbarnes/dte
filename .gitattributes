@@ -14,7 +14,8 @@ mk/dev.mk export-ignore
 mk/sha256sums.txt export-ignore
 tools/** export-ignore
 
-*.[ch] code
+src/*.[ch] code
+test/*.[ch] code
 *.lua code
 *.awk code
 *.sed code
@@ -36,3 +37,5 @@ config/README.md -dterc
 
 *.md markdown
 *.html html
+
+lib/** linguist-vendored

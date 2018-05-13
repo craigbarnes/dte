@@ -30,6 +30,7 @@
 #include "path.h"
 #include "input-special.h"
 #include "git-open.h"
+#include "script.h"
 
 // Go to compiler error saving position if file changed or cursor moved
 static void activate_current_message_save(void)
@@ -1681,6 +1682,8 @@ const Command commands[] = {
     {"left", "", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
+    {"lua", "", 1, 1, cmd_lua},
+    {"lua-file", "", 1, 1, cmd_lua_file},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},

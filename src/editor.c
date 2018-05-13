@@ -11,6 +11,7 @@
 #include "config.h"
 #include "command.h"
 #include "error.h"
+#include "script.h"
 
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
@@ -87,6 +88,8 @@ void init_editor_state(void)
 
     editor.options.statusline_left = xstrdup(" %f%s%m%r%s%M");
     editor.options.statusline_right = xstrdup(" %y,%X   %u   %E %n %t   %p ");
+
+    script_state_init();
 }
 
 static void sanity_check(void)

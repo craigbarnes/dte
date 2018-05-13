@@ -222,6 +222,7 @@ static void collect_completions(char **args, int argc)
         || streq(cmd->name, "compile")
         || streq(cmd->name, "run")
         || streq(cmd->name, "pass-through")
+        || streq(cmd->name, "lua-file")
     ) {
         collect_files(false);
         return;
