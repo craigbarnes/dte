@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
-package.path = "./tools/unicode/?.lua;" .. package.path
+package.path = "./tools/unicode/?.lua;./?.lua"
 local util = require "ucd-util"
 local ucd = util.read_ucd_file(arg[1], "EastAsianWidth.txt")
 assert(ucd:find("^# EastAsianWidth") == 1, "File format not recognized")
