@@ -238,14 +238,10 @@ bool u_is_space(CodePoint u)
 
 bool u_is_word_char(CodePoint u)
 {
-    if (u >= 'a' && u <= 'z') {
-        return true;
-    } else if (u >= 'A' && u <= 'Z') {
-        return true;
-    } else if (u >= '0' && u <= '9') {
+    if (u > 0x7f) {
         return true;
     }
-    return u == '_' || u > 0x7f;
+    return ascii_isalnum(u) || u == '_';
 }
 
 bool u_is_unprintable(CodePoint u)
