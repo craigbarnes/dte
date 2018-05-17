@@ -2,9 +2,10 @@
 #define ASCII_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "macros.h"
 
-extern const unsigned char dte_ascii_table[256];
+extern const uint8_t dte_ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02

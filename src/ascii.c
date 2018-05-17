@@ -14,7 +14,7 @@ enum {
     R = ASCII_REGEX_SPECIAL, // $, (, ), +, ., ^, {, |
 };
 
-const unsigned char dte_ascii_table[256] = {
+const uint8_t dte_ascii_table[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, S, S, 0, 0, S, 0, 0, //   0.. 15
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //  16.. 31
     S, 0, 0, 0, R, 0, 0, 0, R, R, G, R, 0, 0, R, 0, //  32.. 47
