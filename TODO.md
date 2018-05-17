@@ -11,8 +11,6 @@ TODO
   non-whitespace character on the current line
 * Implement macro recording and playback
 * Add support for 24-bit terminal colors
-* Add a script for reproducing and updating the generated Unicode tables
-  in `src/unicode.c`
 * Improve automatic charset encoding detection
 * Add a contextual help bar for command mode
 * Add built-in support for `vt220` and `linux` terminals
