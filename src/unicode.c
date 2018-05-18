@@ -240,7 +240,7 @@ bool u_is_special_whitespace(CodePoint u)
     return bisearch(u, evil_space, ARRAY_COUNT(evil_space) - 1);
 }
 
-static bool u_is_zero_width(CodePoint u)
+bool u_is_zero_width(CodePoint u)
 {
     return bisearch(u, zero_width, ARRAY_COUNT(zero_width) - 1);
 }

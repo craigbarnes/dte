@@ -22,6 +22,7 @@ bool u_is_space(CodePoint u) PURE;
 bool u_is_word_char(CodePoint u) PURE;
 bool u_is_unprintable(CodePoint u) PURE;
 bool u_is_special_whitespace(CodePoint u) PURE;
+bool u_is_zero_width(CodePoint u) PURE;
 unsigned int u_char_width(CodePoint uch) PURE;
 CodePoint u_to_lower(CodePoint u) CONST_FN;
 

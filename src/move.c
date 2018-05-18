@@ -79,7 +79,10 @@ void move_cursor_left(void)
         }
     }
 
-    buffer_prev_char(&view->cursor, &u);
+    do {
+        buffer_prev_char(&view->cursor, &u);
+    } while (u_is_zero_width(u));
+
     view_reset_preferred_x(view);
 }
 
@@ -96,7 +99,10 @@ void move_cursor_right(void)
         }
     }
 
-    buffer_next_char(&view->cursor, &u);
+    do {
+        buffer_next_char(&view->cursor, &u);
+    } while (u_is_zero_width(u));
+
     view_reset_preferred_x(view);
 }
 
