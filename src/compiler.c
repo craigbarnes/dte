@@ -35,7 +35,7 @@ void add_error_fmt (
     const char *format,
     char **desc
 ) {
-    const char *const names[] = {"file", "line", "column", "message"};
+    static const char names[][8] = {"file", "line", "column", "message"};
     int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
     ErrorFormat *f;
 
