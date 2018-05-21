@@ -19,9 +19,9 @@ size_t count_nl(const char *buf, size_t size)
 
 size_t count_strings(char **strings)
 {
-    size_t count;
-    for (count = 0; strings[count]; count++) {
-        ;
+    size_t count = 0;
+    while (strings[count]) {
+        count++;
     }
     return count;
 }
