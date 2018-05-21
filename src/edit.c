@@ -202,8 +202,13 @@ void delete_ch(void)
             size = get_indent_level_bytes_right();
         }
         if (size == 0) {
+            BlockIter bi = view->cursor;
             unsigned int u;
-            size = buffer_get_char(&view->cursor, &u);
+            size = buffer_next_char(&bi, &u);
+            long n = 0;
+            while ((n = buffer_next_char(&bi, &u)) && u_is_zero_width(u)) {
+                size += n;
+            }
         }
     }
     buffer_delete_bytes(size);
