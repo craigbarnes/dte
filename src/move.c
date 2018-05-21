@@ -68,8 +68,6 @@ void move_to_preferred_x(int preferred_x)
 
 void move_cursor_left(void)
 {
-    unsigned int u;
-
     if (buffer->options.emulate_tab) {
         int size = get_indent_level_bytes_left();
         if (size) {
@@ -79,6 +77,7 @@ void move_cursor_left(void)
         }
     }
 
+    CodePoint u;
     do {
         buffer_prev_char(&view->cursor, &u);
     } while (u_is_zero_width(u));
@@ -88,8 +87,6 @@ void move_cursor_left(void)
 
 void move_cursor_right(void)
 {
-    unsigned int u;
-
     if (buffer->options.emulate_tab) {
         int size = get_indent_level_bytes_right();
         if (size) {
@@ -99,6 +96,7 @@ void move_cursor_right(void)
         }
     }
 
+    CodePoint u;
     buffer_next_char(&view->cursor, &u);
     while (buffer_get_char(&view->cursor, &u) && u_is_zero_width(u)) {
         buffer_next_char(&view->cursor, &u);
@@ -167,8 +165,7 @@ void move_to_column(View *v, int column)
 {
     block_iter_bol(&v->cursor);
     while (column-- > 1) {
-        unsigned int u;
-
+        CodePoint u;
         if (!buffer_next_char(&v->cursor, &u)) {
             break;
         }
@@ -180,7 +177,7 @@ void move_to_column(View *v, int column)
     view_reset_preferred_x(v);
 }
 
-static enum char_type get_char_type(unsigned int u)
+static enum char_type get_char_type(CodePoint u)
 {
     if (u == '\n') {
         return CT_NEWLINE;
@@ -196,8 +193,7 @@ static enum char_type get_char_type(unsigned int u)
 
 static bool get_current_char_type(BlockIter *bi, enum char_type *type)
 {
-    unsigned int u;
-
+    CodePoint u;
     if (!buffer_get_char(bi, &u)) {
         return false;
     }
@@ -206,11 +202,10 @@ static bool get_current_char_type(BlockIter *bi, enum char_type *type)
     return true;
 }
 
-static long skip_fwd_char_type(BlockIter *bi, enum char_type type)
+static size_t skip_fwd_char_type(BlockIter *bi, enum char_type type)
 {
-    long count = 0;
-    unsigned int u;
-
+    size_t count = 0;
+    CodePoint u;
     while (buffer_next_char(bi, &u)) {
         if (get_char_type(u) != type) {
             buffer_prev_char(bi, &u);
@@ -221,11 +216,10 @@ static long skip_fwd_char_type(BlockIter *bi, enum char_type type)
     return count;
 }
 
-static long skip_bwd_char_type(BlockIter *bi, enum char_type type)
+static size_t skip_bwd_char_type(BlockIter *bi, enum char_type type)
 {
-    long count = 0;
-    unsigned int u;
-
+    size_t count = 0;
+    CodePoint u;
     while (buffer_prev_char(bi, &u)) {
         if (get_char_type(u) != type) {
             buffer_next_char(bi, &u);
@@ -236,9 +230,9 @@ static long skip_bwd_char_type(BlockIter *bi, enum char_type type)
     return count;
 }
 
-long word_fwd(BlockIter *bi, bool skip_non_word)
+size_t word_fwd(BlockIter *bi, bool skip_non_word)
 {
-    long count = 0;
+    size_t count = 0;
     enum char_type type;
 
     while (1) {
@@ -258,11 +252,11 @@ long word_fwd(BlockIter *bi, bool skip_non_word)
     }
 }
 
-long word_bwd(BlockIter *bi, bool skip_non_word)
+size_t word_bwd(BlockIter *bi, bool skip_non_word)
 {
-    long count = 0;
+    size_t count = 0;
     enum char_type type;
-    unsigned int u;
+    CodePoint u;
 
     do {
         count += skip_bwd_char_type(bi, CT_SPACE);

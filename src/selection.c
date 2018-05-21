@@ -58,12 +58,12 @@ char *view_get_selection(View *v, long *size)
     return buf;
 }
 
-int get_nr_selected_lines(const SelectionInfo *info)
+size_t get_nr_selected_lines(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;
-    unsigned int u = 0;
-    int nr_lines = 1;
+    CodePoint u = 0;
+    size_t nr_lines = 1;
 
     while (pos < info->eo) {
         if (u == '\n') {
@@ -74,12 +74,12 @@ int get_nr_selected_lines(const SelectionInfo *info)
     return nr_lines;
 }
 
-int get_nr_selected_chars(const SelectionInfo *info)
+size_t get_nr_selected_chars(const SelectionInfo *info)
 {
     BlockIter bi = info->si;
     long pos = info->so;
-    unsigned int u;
-    int nr_chars = 0;
+    CodePoint u;
+    size_t nr_chars = 0;
 
     while (pos < info->eo) {
         nr_chars++;

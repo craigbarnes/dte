@@ -192,7 +192,7 @@ void paste(bool at_cursor)
 
 void delete_ch(void)
 {
-    long size = 0;
+    size_t size = 0;
     if (view->selection) {
         size = prepare_selection(view);
         unselect();
@@ -203,9 +203,9 @@ void delete_ch(void)
         }
         if (size == 0) {
             BlockIter bi = view->cursor;
-            unsigned int u;
+            CodePoint u;
             size = buffer_next_char(&bi, &u);
-            long n = 0;
+            size_t n = 0;
             while ((n = buffer_next_char(&bi, &u)) && u_is_zero_width(u)) {
                 size += n;
             }
@@ -216,7 +216,7 @@ void delete_ch(void)
 
 void erase(void)
 {
-    long size = 0;
+    size_t size = 0;
     if (view->selection) {
         size = prepare_selection(view);
         unselect();
@@ -227,7 +227,7 @@ void erase(void)
             block_iter_back_bytes(&view->cursor, size);
         }
         if (size == 0) {
-            unsigned int u;
+            CodePoint u;
             size = buffer_prev_char(&view->cursor, &u);
         }
     }
@@ -236,11 +236,11 @@ void erase(void)
 
 // Go to beginning of whitespace (tabs and spaces) under cursor and
 // return number of whitespace bytes after cursor after moving cursor
-static long goto_beginning_of_whitespace(void)
+static size_t goto_beginning_of_whitespace(void)
 {
     BlockIter bi = view->cursor;
-    long count = 0;
-    unsigned int u;
+    size_t count = 0;
+    CodePoint u;
 
     // Count spaces and tabs at or after cursor
     while (buffer_next_char(&bi, &u)) {
@@ -409,10 +409,11 @@ void insert_ch(unsigned int ch)
 
 static void join_selection(void)
 {
+    // TODO: use size_t
     long count = prepare_selection(view);
     long len = 0, join = 0;
     BlockIter bi;
-    unsigned int ch = 0;
+    CodePoint ch = 0;
 
     unselect();
     bi = view->cursor;
@@ -461,9 +462,7 @@ static void join_selection(void)
 
 void join_lines(void)
 {
-    BlockIter next, bi = view->cursor;
-    int count;
-    unsigned int u;
+    BlockIter bi = view->cursor;
 
     if (view->selection) {
         join_selection();
@@ -477,9 +476,10 @@ void join_lines(void)
         return;
     }
 
-    next = bi;
+    BlockIter next = bi;
+    CodePoint u;
+    size_t count = 1;
     buffer_prev_char(&bi, &u);
-    count = 1;
     while (buffer_prev_char(&bi, &u)) {
         if (u != '\t' && u != ' ') {
             buffer_next_char(&bi, &u);
@@ -603,7 +603,7 @@ void shift_lines(int count)
         view->selection = SELECT_LINES;
         init_selection(view, &info);
         view->cursor = info.si;
-        int nr_lines = get_nr_selected_lines(&info);
+        size_t nr_lines = get_nr_selected_lines(&info);
         do_shift_lines(count, nr_lines);
         if (info.swapped) {
             // Cursor should be at beginning of selection
@@ -863,7 +863,6 @@ void change_case(int mode)
 
     if (view->selection) {
         SelectionInfo info;
-
         init_selection(view, &info);
         view->cursor = info.si;
         text_len = info.eo - info.so;
@@ -871,12 +870,10 @@ void change_case(int mode)
         was_selecting = true;
         move = !info.swapped;
     } else {
-        unsigned int u;
-
+        CodePoint u;
         if (!buffer_get_char(&view->cursor, &u)) {
             return;
         }
-
         text_len = u_char_size(u);
     }
 

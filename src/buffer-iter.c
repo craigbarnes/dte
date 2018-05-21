@@ -1,15 +1,15 @@
 #include "buffer.h"
 #include "uchar.h"
 
-long buffer_get_char(BlockIter *bi, unsigned int *up)
+size_t buffer_get_char(BlockIter *bi, CodePoint *up)
 {
     BlockIter tmp = *bi;
     return buffer_next_char(&tmp, up);
 }
 
-long buffer_next_char(BlockIter *bi, unsigned int *up)
+size_t buffer_next_char(BlockIter *bi, CodePoint *up)
 {
-    long offset = bi->offset;
+    size_t offset = bi->offset;
 
     if (offset == bi->blk->size) {
         if (bi->blk->node.next == bi->head) {
@@ -30,9 +30,9 @@ long buffer_next_char(BlockIter *bi, unsigned int *up)
     return bi->offset - offset;
 }
 
-long buffer_prev_char(BlockIter *bi, unsigned int *up)
+size_t buffer_prev_char(BlockIter *bi, CodePoint *up)
 {
-    long offset = bi->offset;
+    size_t offset = bi->offset;
 
     if (!offset) {
         if (bi->blk->node.prev == bi->head) {

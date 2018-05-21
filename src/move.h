@@ -17,7 +17,7 @@ void move_eof(void);
 void move_to_line(View *v, int line);
 void move_to_column(View *v, int column);
 
-long word_fwd(BlockIter *bi, bool skip_non_word);
-long word_bwd(BlockIter *bi, bool skip_non_word);
+size_t word_fwd(BlockIter *bi, bool skip_non_word);
+size_t word_bwd(BlockIter *bi, bool skip_non_word);
 
 #endif

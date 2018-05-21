@@ -89,8 +89,8 @@ bool buffer_detect_filetype(Buffer *b);
 void buffer_update_syntax(Buffer *b);
 void buffer_setup(Buffer *b);
 
-long buffer_get_char(BlockIter *bi, unsigned int *up);
-long buffer_next_char(BlockIter *bi, unsigned int *up);
-long buffer_prev_char(BlockIter *bi, unsigned int *up);
+size_t buffer_get_char(BlockIter *bi, CodePoint *up);
+size_t buffer_next_char(BlockIter *bi, CodePoint *up);
+size_t buffer_prev_char(BlockIter *bi, CodePoint *up);
 
 #endif

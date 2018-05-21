@@ -370,7 +370,7 @@ static void buffer_delete_bytes_internal(size_t len, bool move_after)
     // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(len)) {
         BlockIter bi = view->cursor;
-        unsigned int u;
+        CodePoint u;
         if (buffer_prev_char(&bi, &u) && u != '\n') {
             // No newline before cursor
             if (--len == 0) {

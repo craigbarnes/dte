@@ -71,15 +71,14 @@ void sf_init(Formatter *f, Window *win)
 void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     View *v = f->win->view;
-    bool got_char;
-    unsigned int u;
 
     f->buf = buf;
     f->size = size - 5; // Max length of char and terminating NUL
     f->pos = 0;
     f->separator = false;
 
-    got_char = buffer_get_char(&v->cursor, &u) > 0;
+    CodePoint u;
+    bool got_char = buffer_get_char(&v->cursor, &u) > 0;
     while (f->pos < f->size && *format) {
         char ch = *format++;
         if (ch != '%') {

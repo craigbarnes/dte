@@ -52,14 +52,14 @@ static const char *format_misc_status(Window *win)
             snprintf (
                 misc_status,
                 sizeof(misc_status),
-                "[%d lines]",
+                "[%zu lines]",
                 get_nr_selected_lines(&info)
             );
         } else {
             snprintf (
                 misc_status,
                 sizeof(misc_status),
-                "[%d chars]",
+                "[%zu chars]",
                 get_nr_selected_chars(&info)
             );
         }

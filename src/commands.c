@@ -277,7 +277,7 @@ static void cmd_delete_eol(const char *pf, char** UNUSED(args))
     }
 
     if (*pf) {
-        unsigned int ch;
+        CodePoint ch;
         buffer_get_char(&view->cursor, &ch);
         if (ch == '\n') {
             delete_ch();
