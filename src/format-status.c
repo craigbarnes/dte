@@ -42,7 +42,7 @@ static void add_status_format(Formatter *f, const char *format, ...)
 
 static void add_status_pos(Formatter *f)
 {
-    long lines = f->win->view->buffer->nl;
+    size_t lines = f->win->view->buffer->nl;
     int h = f->win->edit_h;
     int pos = f->win->view->vy;
 
@@ -104,7 +104,7 @@ void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_format(f, "%d", v->cy + 1);
                 break;
             case 'Y':
-                add_status_format(f, "%ld", v->buffer->nl);
+                add_status_format(f, "%zu", v->buffer->nl);
                 break;
             case 'x':
                 add_status_format(f, "%d", v->cx_display + 1);

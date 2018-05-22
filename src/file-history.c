@@ -46,16 +46,15 @@ void add_file_history(int row, int col, const char *filename)
 
 void load_file_history(const char *filename)
 {
-    ssize_t size, pos = 0;
     char *buf;
-
-    size = read_file(filename, &buf);
+    ssize_t size = read_file(filename, &buf);
     if (size < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
         }
         return;
     }
+    ssize_t pos = 0;
     while (pos < size) {
         const char *line = buf_next_line(buf, &pos, size);
         long row, col;

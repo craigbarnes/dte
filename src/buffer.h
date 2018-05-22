@@ -26,7 +26,7 @@ typedef struct Buffer {
     // Needed for identifying buffers whose filename is NULL
     unsigned int id;
 
-    long nl;
+    size_t nl;
 
     // Views pointing to this buffer
     PointerArray views;

@@ -60,7 +60,7 @@ static bool view_is_cursor_visible(const View *v)
 
 static void view_center_to_cursor(View *v)
 {
-    long lines = v->buffer->nl;
+    size_t lines = v->buffer->nl;
     Window *w = v->window;
     unsigned int hh = w->edit_h / 2;
 

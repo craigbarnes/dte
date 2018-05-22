@@ -478,8 +478,8 @@ static void cmd_insert(const char *pf, char **args)
             insert_ch(str[i]);
         }
     } else {
-        long del_len = 0;
-        long ins_len = strlen(str);
+        size_t del_len = 0;
+        size_t ins_len = strlen(str);
 
         if (view->selection) {
             del_len = prepare_selection(view);
@@ -728,7 +728,7 @@ static void cmd_pass_through(const char *pf, char **args)
         return;
     }
 
-    long del_len = 0;
+    size_t del_len = 0;
     if (view->selection) {
         del_len = prepare_selection(view);
         unselect();

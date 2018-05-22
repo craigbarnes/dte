@@ -240,7 +240,7 @@ void update_separators(void)
 void update_line_numbers(Window *win, bool force)
 {
     View *v = win->view;
-    long lines = v->buffer->nl;
+    size_t lines = v->buffer->nl;
     int first, last;
     int x = win->x + vertical_tabbar_width(win);
 

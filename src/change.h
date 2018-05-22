@@ -18,9 +18,9 @@ struct Change {
     Change **prev;
     unsigned int nr_prev;
     bool move_after; // Move after inserted text when undoing delete?
-    long offset;
-    long del_count;
-    long ins_count;
+    size_t offset;
+    size_t del_count;
+    size_t ins_count;
     char *buf; // Deleted bytes (inserted bytes need not be saved)
 };
 

@@ -481,7 +481,7 @@ void remove_frame(Frame *f)
         c->w = parent->w;
         c->h = parent->h;
         if (gp) {
-            long idx = ptr_array_idx(&gp->frames, parent);
+            size_t idx = ptr_array_idx(&gp->frames, parent);
             gp->frames.ptrs[idx] = c;
         } else {
             root_frame = c;

@@ -27,7 +27,7 @@ static char *expand_file(void)
 static char *expand_word(void)
 {
     View *v = window->view;
-    long size;
+    size_t size;
     char *str = view_get_selection(v, &size);
 
     if (str != NULL) {

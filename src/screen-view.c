@@ -8,16 +8,16 @@
 
 typedef struct {
     View *view;
-    long line_nr;
-    long offset;
-    long sel_so;
-    long sel_eo;
+    size_t line_nr;
+    size_t offset;
+    ssize_t sel_so;
+    ssize_t sel_eo;
 
     const unsigned char *line;
     size_t size;
     size_t pos;
-    long indent_size;
-    long trailing_ws_offset;
+    size_t indent_size;
+    size_t trailing_ws_offset;
     HlColor **colors;
 } LineInfo;
 
@@ -76,7 +76,7 @@ static int get_ws_error_option(Buffer *b)
     return flags;
 }
 
-static bool whitespace_error(LineInfo *info, unsigned int u, long i)
+static bool whitespace_error(LineInfo *info, unsigned int u, size_t i)
 {
     View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
@@ -137,8 +137,8 @@ static bool whitespace_error(LineInfo *info, unsigned int u, long i)
 
 static unsigned int screen_next_char(LineInfo *info)
 {
-    long count, pos = info->pos;
-    unsigned int u = info->line[pos];
+    size_t count, pos = info->pos;
+    CodePoint u = info->line[pos];
     TermColor color;
     bool ws_error = false;
 
@@ -180,7 +180,7 @@ static unsigned int screen_next_char(LineInfo *info)
 
 static void screen_skip_char(LineInfo *info)
 {
-    unsigned int u = info->line[info->pos++];
+    CodePoint u = info->line[info->pos++];
 
     info->offset++;
     if (likely(u < 0x80)) {
@@ -193,7 +193,7 @@ static void screen_skip_char(LineInfo *info)
             obuf.x += 2;
         }
     } else {
-        long pos = info->pos;
+        size_t pos = info->pos;
 
         info->pos--;
         u = u_get_nonascii(info->line, info->size, &info->pos);
@@ -264,7 +264,7 @@ static void hl_words(LineInfo *info)
     }
 }
 
-static void line_info_init(LineInfo *info, View *v, BlockIter *bi, long line_nr)
+static void line_info_init(LineInfo *info, View *v, BlockIter *bi, size_t line_nr)
 {
     memset(info, 0, sizeof(*info));
     info->view = v;

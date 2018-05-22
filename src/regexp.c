@@ -2,7 +2,7 @@
 #include "error.h"
 #include "common.h"
 
-bool regexp_match_nosub(const char *pattern, const char *buf, long size)
+bool regexp_match_nosub(const char *pattern, const char *buf, size_t size)
 {
     regmatch_t m;
     regex_t re;
@@ -17,7 +17,7 @@ bool regexp_match_nosub(const char *pattern, const char *buf, long size)
 bool regexp_match (
     const char *pattern,
     const char *buf,
-    long size,
+    size_t size,
     PointerArray *m
 ) {
     regex_t re;
@@ -45,8 +45,8 @@ bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 bool regexp_exec (
     const regex_t *re,
     const char *buf,
-    long size,
-    long nr_m,
+    size_t size,
+    size_t nr_m,
     regmatch_t *m,
     int flags
 ) {
@@ -72,7 +72,7 @@ bool regexp_exec (
 bool regexp_exec_sub (
     const regex_t *re,
     const char *buf,
-    long size,
+    size_t size,
     PointerArray *matches,
     int flags
 ) {

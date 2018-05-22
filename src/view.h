@@ -2,6 +2,7 @@
 #define VIEW_H
 
 #include <stdbool.h>
+#include <sys/types.h>
 #include "block-iter.h"
 
 enum selection {
@@ -38,12 +39,12 @@ typedef struct View {
     enum selection selection;
 
     // Cursor offset when selection was started
-    long sel_so;
+    ssize_t sel_so;
 
     // If sel_eo is UINT_MAX that means the offset must be calculated from
-    // the cursor iterator.  Otherwise the offset is precalculated and may
+    // the cursor iterator. Otherwise the offset is precalculated and may
     // not be same as cursor position (see search/replace code).
-    long sel_eo;
+    ssize_t sel_eo;
 
     // Center view to cursor if scrolled
     bool center_on_scroll;
@@ -54,7 +55,7 @@ typedef struct View {
     // These are used to save cursor state when there are multiple views
     // sharing same buffer.
     bool restore_cursor;
-    long saved_cursor_offset;
+    size_t saved_cursor_offset;
 } View;
 
 static inline void view_reset_preferred_x(View *v)

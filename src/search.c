@@ -32,13 +32,13 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
         if (regexp_exec(regex, lr.line, lr.size, 1, &match, flags)) {
             if (skip && match.rm_so == 0) {
                 // Ignore match at current cursor position
-                long count = match.rm_eo;
+                regoff_t count = match.rm_eo;
                 if (count == 0) {
                     // It is safe to skip one byte because every line
                     // has one extra byte (newline) that is not in lr.line
                     count = 1;
                 }
-                block_iter_skip_bytes(bi, count);
+                block_iter_skip_bytes(bi, (size_t)count);
                 return do_search_fwd(regex, bi, false);
             }
 

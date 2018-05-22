@@ -19,7 +19,7 @@ typedef struct {
 } ParagraphFormatter;
 
 static char *copy_buf;
-static long copy_len;
+static size_t copy_len;
 static bool copy_is_lines;
 
 static const char *const spattern = "\\{\\s*(//.*|/\\*.*\\*/\\s*)?$";
@@ -122,7 +122,7 @@ void unselect(void)
     }
 }
 
-static void record_copy(char *buf, long len, bool is_lines)
+static void record_copy(char *buf, size_t len, bool is_lines)
 {
     if (copy_buf) {
         free(copy_buf);
@@ -132,7 +132,7 @@ static void record_copy(char *buf, long len, bool is_lines)
     copy_is_lines = is_lines;
 }
 
-void cut(long len, bool is_lines)
+void cut(size_t len, bool is_lines)
 {
     if (len) {
         char *buf = block_iter_get_bytes(&view->cursor, len);
@@ -141,7 +141,7 @@ void cut(long len, bool is_lines)
     }
 }
 
-void copy(long len, bool is_lines)
+void copy(size_t len, bool is_lines)
 {
     if (len) {
         char *buf = block_iter_get_bytes(&view->cursor, len);
@@ -151,7 +151,7 @@ void copy(long len, bool is_lines)
 
 void insert_text(const char *text, size_t size)
 {
-    long del_count = 0;
+    size_t del_count = 0;
 
     if (view->selection) {
         del_count = prepare_selection(view);
@@ -163,7 +163,7 @@ void insert_text(const char *text, size_t size)
 
 void paste(bool at_cursor)
 {
-    long del_count = 0;
+    size_t del_count = 0;
 
     if (!copy_buf) {
         return;
@@ -288,8 +288,8 @@ static bool find_non_empty_line_bwd(BlockIter *bi)
 
 static void insert_nl(void)
 {
-    long del_count = 0;
-    long ins_count = 1;
+    size_t del_count = 0;
+    size_t ins_count = 1;
     char *ins = NULL;
 
     // Prepare deleted text (selection or whitespace around cursor)
@@ -305,7 +305,7 @@ static void insert_nl(void)
     if (buffer->options.auto_indent) {
         // Current line will be split at cursor position
         BlockIter bi = view->cursor;
-        long len = block_iter_bol(&bi);
+        size_t len = block_iter_bol(&bi);
         LineRef lr;
 
         fill_line_ref(&bi, &lr);
@@ -341,7 +341,7 @@ static void insert_nl(void)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
-void insert_ch(unsigned int ch)
+void insert_ch(CodePoint ch)
 {
     size_t del_count = 0;
     size_t ins_count = 0;
@@ -409,9 +409,8 @@ void insert_ch(unsigned int ch)
 
 static void join_selection(void)
 {
-    // TODO: use size_t
-    long count = prepare_selection(view);
-    long len = 0, join = 0;
+    size_t count = prepare_selection(view);
+    size_t len = 0, join = 0;
     BlockIter bi;
     CodePoint ch = 0;
 
@@ -628,7 +627,7 @@ void shift_lines(int count)
 
 void clear_lines(void)
 {
-    long del_count = 0, ins_count = 0;
+    size_t del_count = 0, ins_count = 0;
     char *indent = NULL;
 
     if (buffer->options.auto_indent) {
@@ -669,7 +668,7 @@ void clear_lines(void)
 
 void new_line(void)
 {
-    long ins_count = 1;
+    size_t ins_count = 1;
     char *ins = NULL;
 
     block_iter_eol(&view->cursor);
@@ -724,20 +723,19 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     pf->cur_width += word_width;
 }
 
-static bool is_paragraph_separator(const char *line, long size)
+static bool is_paragraph_separator(const char *line, size_t size)
 {
     return regexp_match_nosub("^\\s*(/\\*|\\*/)?\\s*$", line, size);
 }
 
-static int get_indent_width(const char *line, long size)
+static int get_indent_width(const char *line, size_t size)
 {
     IndentInfo info;
-
     get_indent_info(line, size, &info);
     return info.width;
 }
 
-static bool in_paragraph(const char *line, long size, int indent_width)
+static bool in_paragraph(const char *line, size_t size, int indent_width)
 {
     if (get_indent_width(line, size) != indent_width) {
         return false;
@@ -745,11 +743,10 @@ static bool in_paragraph(const char *line, long size, int indent_width)
     return !is_paragraph_separator(line, size);
 }
 
-static unsigned int paragraph_size(void)
+static size_t paragraph_size(void)
 {
     BlockIter bi = view->cursor;
     LineRef lr;
-    unsigned int size;
     int indent_width;
 
     block_iter_bol(&bi);
@@ -771,9 +768,9 @@ static unsigned int paragraph_size(void)
     view->cursor = bi;
 
     // Get size of paragraph
-    size = 0;
+    size_t size = 0;
     do {
-        long bytes = block_iter_eat_line(&bi);
+        size_t bytes = block_iter_eat_line(&bi);
 
         if (!bytes) {
             break;
@@ -880,7 +877,7 @@ void change_case(int mode)
     src = block_iter_get_bytes(&view->cursor, text_len);
     i = 0;
     while (i < text_len) {
-        unsigned int u = u_get_char(src, text_len, &i);
+        CodePoint u = u_get_char(src, text_len, &i);
 
         switch (mode) {
         case 't':
