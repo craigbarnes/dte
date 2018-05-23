@@ -23,10 +23,10 @@ struct cconv {
 
     // Replacement character 0xBF (inverted question mark)
     char rbuf[4];
-    int rcount;
+    size_t rcount;
 
     // Input character size in bytes. zero for UTF-8.
-    int char_size;
+    size_t char_size;
 };
 
 static struct cconv *create(iconv_t cd)
@@ -38,7 +38,7 @@ static struct cconv *create(iconv_t cd)
     return c;
 }
 
-static int encoding_char_size(const char *encoding)
+static size_t encoding_char_size(const char *encoding)
 {
     if (str_has_prefix(encoding, "UTF-16")) {
         return 2;
@@ -88,13 +88,13 @@ static void add_replacement(struct cconv *c)
 
 static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
 {
-    d_print("%d %zu\n", c->char_size, count);
+    d_print("%zu %zu\n", c->char_size, count);
     add_replacement(c);
     if (c->char_size == 0) {
         // Converting from UTF-8
         size_t idx = 0;
-        unsigned int u = u_get_char(buf, count, &idx);
-        d_print("U+%04X\n", u);
+        CodePoint u = u_get_char(buf, count, &idx);
+        d_print("U+%04" PRIX32 "\n", u);
         return idx;
     }
     if (c->char_size > count) {

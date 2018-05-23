@@ -1,7 +1,7 @@
 #ifndef UCHAR_H
 #define UCHAR_H
 
-#include <stddef.h>
+#include <sys/types.h>
 #include "unicode.h"
 
 static inline CONST_FN size_t u_char_size(CodePoint uch)
@@ -32,12 +32,12 @@ static inline void u_set_ctrl(char *buf, size_t *idx, CodePoint u)
     *idx = i;
 }
 
-unsigned int u_str_width(const unsigned char *str);
+size_t u_str_width(const unsigned char *str);
 
-unsigned int u_prev_char(const unsigned char *buf, size_t *idx);
-unsigned int u_str_get_char(const unsigned char *str, size_t *idx);
-unsigned int u_get_char(const unsigned char *buf, size_t size, size_t *idx);
-unsigned int u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx);
+CodePoint u_prev_char(const unsigned char *buf, size_t *idx);
+CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
+CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx);
+CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx);
 
 void u_set_char_raw(char *str, size_t *idx, CodePoint uch);
 void u_set_char(char *str, size_t *idx, CodePoint uch);
@@ -54,6 +54,6 @@ void u_set_hex(char *str, size_t *idx, CodePoint uch);
  */
 size_t u_skip_chars(const char *str, int *width);
 
-int u_str_index(const char *haystack, const char *needle_lcase);
+ssize_t u_str_index(const char *haystack, const char *needle_lcase);
 
 #endif

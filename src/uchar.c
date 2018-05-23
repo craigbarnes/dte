@@ -28,7 +28,7 @@ static inline CONST_FN bool u_is_continuation(CodePoint uch)
     return (uch & 0xc0) == 0x80;
 }
 
-static inline CONST_FN bool u_seq_len_ok(unsigned int uch, int len)
+static inline CONST_FN bool u_seq_len_ok(CodePoint uch, int len)
 {
     return u_char_size(uch) == len;
 }
@@ -48,17 +48,16 @@ static inline CONST_FN unsigned int u_get_first_byte_mask(unsigned int len)
     return (1U << 7U >> len) - 1U;
 }
 
-unsigned int u_str_width(const unsigned char *str)
+size_t u_str_width(const unsigned char *str)
 {
     size_t i = 0, w = 0;
-
     while (str[i]) {
         w += u_char_width(u_str_get_char(str, &i));
     }
     return w;
 }
 
-unsigned int u_prev_char(const unsigned char *buf, size_t *idx)
+CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 {
     size_t i = *idx;
     unsigned int count, shift;
@@ -108,11 +107,10 @@ invalid:
     return -u;
 }
 
-unsigned int u_str_get_char(const unsigned char *str, size_t *idx)
+CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
 {
     size_t i = *idx;
-    unsigned int u = str[i];
-
+    CodePoint u = str[i];
     if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
@@ -120,11 +118,10 @@ unsigned int u_str_get_char(const unsigned char *str, size_t *idx)
     return u_get_nonascii(str, i + 4, idx);
 }
 
-unsigned int u_get_char(const unsigned char *buf, size_t size, size_t *idx)
+CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    unsigned int u = buf[i];
-
+    CodePoint u = buf[i];
     if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
@@ -132,7 +129,7 @@ unsigned int u_get_char(const unsigned char *buf, size_t size, size_t *idx)
     return u_get_nonascii(buf, size, idx);
 }
 
-unsigned int u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
+CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
 {
     size_t i = *idx;
     int len, c;
@@ -277,7 +274,7 @@ static bool has_prefix(const char *str, const char *prefix_lcase)
 {
     size_t ni = 0;
     size_t hi = 0;
-    unsigned int pc, sc;
+    CodePoint pc, sc;
 
     while ((pc = u_str_get_char(prefix_lcase, &ni))) {
         sc = u_str_get_char(str, &hi);
@@ -288,11 +285,11 @@ static bool has_prefix(const char *str, const char *prefix_lcase)
     return true;
 }
 
-int u_str_index(const char *haystack, const char *needle_lcase)
+ssize_t u_str_index(const char *haystack, const char *needle_lcase)
 {
     size_t hi = 0;
     size_t ni = 0;
-    unsigned int nc = u_str_get_char(needle_lcase, &ni);
+    CodePoint nc = u_str_get_char(needle_lcase, &ni);
 
     if (!nc) {
         return 0;
@@ -300,7 +297,7 @@ int u_str_index(const char *haystack, const char *needle_lcase)
 
     while (haystack[hi]) {
         size_t prev = hi;
-        unsigned int hc = u_str_get_char(haystack, &hi);
+        CodePoint hc = u_str_get_char(haystack, &hi);
         if (
             (hc == nc || u_to_lower(hc) == nc)
             && has_prefix(haystack + hi, needle_lcase + ni)
