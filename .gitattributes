@@ -12,6 +12,7 @@ docs/releasing.md export-ignore
 test/gitlab-ci.yml export-ignore
 mk/dev.mk export-ignore
 mk/sha256sums.txt export-ignore
+tools export-ignore
 tools/** export-ignore
 
 src/*.[ch] code
