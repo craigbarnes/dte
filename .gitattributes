@@ -15,7 +15,7 @@ mk/sha256sums.txt export-ignore
 tools export-ignore
 tools/** export-ignore
 
-src/*.[ch] code
+src/*.[ch] code linguist-language=C
 test/*.[ch] code
 *.lua code
 *.awk code
