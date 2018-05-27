@@ -113,7 +113,7 @@ void update_status_line(Window *win)
 int print_command(char prefix)
 {
     size_t i, w;
-    unsigned int u;
+    CodePoint u;
     int x;
 
     // Width of characters up to and including cursor position
@@ -157,7 +157,7 @@ void print_message(const char *msg, bool is_error)
     }
     set_builtin_color(c);
     while (msg[i]) {
-        unsigned int u = u_get_char(msg, i + 4, &i);
+        CodePoint u = u_get_char(msg, i + 4, &i);
         if (!buf_put_char(u)) {
             break;
         }

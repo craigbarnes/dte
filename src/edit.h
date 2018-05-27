@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "unicode.h"
 
 void select_block(void);
 void unselect(void);
@@ -12,7 +13,7 @@ void insert_text(const char *text, size_t size);
 void paste(bool at_cursor);
 void delete_ch(void);
 void erase(void);
-void insert_ch(unsigned int ch);
+void insert_ch(CodePoint ch);
 void join_lines(void);
 void shift_lines(int count);
 void clear_lines(void);

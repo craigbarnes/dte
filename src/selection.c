@@ -4,7 +4,7 @@
 void init_selection(const View *v, SelectionInfo *info)
 {
     BlockIter ei;
-    unsigned int u;
+    CodePoint u;
 
     info->so = v->sel_so;
     info->eo = block_iter_get_offset(&v->cursor);

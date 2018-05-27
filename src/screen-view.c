@@ -51,7 +51,7 @@ static void mask_selection_and_current_line (
     }
 }
 
-static bool is_non_text(unsigned int u)
+static bool is_non_text(CodePoint u)
 {
     if (u < 0x20) {
         return u != '\t' || editor.options.display_special;
@@ -76,7 +76,7 @@ static int get_ws_error_option(Buffer *b)
     return flags;
 }
 
-static bool whitespace_error(LineInfo *info, unsigned int u, size_t i)
+static bool whitespace_error(LineInfo *info, CodePoint u, size_t i)
 {
     View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
@@ -135,7 +135,7 @@ static bool whitespace_error(LineInfo *info, unsigned int u, size_t i)
     return false;
 }
 
-static unsigned int screen_next_char(LineInfo *info)
+static CodePoint screen_next_char(LineInfo *info)
 {
     size_t count, pos = info->pos;
     CodePoint u = info->line[pos];
@@ -322,7 +322,7 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
 static void print_line(LineInfo *info)
 {
     TermColor color;
-    unsigned int u;
+    CodePoint u;
 
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char() which is much faster than

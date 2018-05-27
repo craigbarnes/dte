@@ -32,7 +32,7 @@ void view_update_cursor_x(View *v)
 
     v->cx = fetch_this_line(&v->cursor, &lr);
     while (idx < v->cx) {
-        unsigned int u = lr.line[idx++];
+        CodePoint u = lr.line[idx++];
 
         c++;
         if (likely(u < 0x80)) {

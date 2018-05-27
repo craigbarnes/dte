@@ -35,7 +35,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
     for (ssize_t i = 0; i < len; i++) {
         if (line[i] >= 0x80) {
             size_t idx = i;
-            unsigned int u = u_get_nonascii(line, len, &idx);
+            CodePoint u = u_get_nonascii(line, len, &idx);
             const char *encoding;
 
             if (u_is_unicode(u)) {

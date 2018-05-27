@@ -181,7 +181,7 @@ static bool read_simple(Key *key)
          * 1111 0xxx valid
          * 1111 1xxx invalid
          */
-        unsigned int u, bit = 1 << 6;
+        CodePoint u, bit = 1 << 6;
         int count = 0;
 
         while (ch & bit) {

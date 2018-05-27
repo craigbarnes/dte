@@ -144,7 +144,7 @@ CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
     u = first & u_get_first_byte_mask(len);
     c = len - 1;
     do {
-        unsigned int ch = buf[i++];
+        CodePoint ch = buf[i++];
         if (!u_is_continuation(ch)) {
             goto invalid;
         }
