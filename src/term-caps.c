@@ -68,17 +68,17 @@ static void term_read_caps(void)
     };
     terminal.control_codes = &tcc;
 
-    static TermKeyMap keymap[] = {
-        {"kich1", KEY_INSERT},
-        {"kdch1", KEY_DELETE},
-        {"khome", KEY_HOME},
-        {"kend", KEY_END},
-        {"kpp", KEY_PAGE_UP},
-        {"knp", KEY_PAGE_DOWN},
-        {"kcub1", KEY_LEFT},
-        {"kcuf1", KEY_RIGHT},
+    static const TermKeyMap special_keys[] = {
         {"kcuu1", KEY_UP},
         {"kcud1", KEY_DOWN},
+        {"kcub1", KEY_LEFT},
+        {"kcuf1", KEY_RIGHT},
+        {"kdch1", KEY_DELETE},
+        {"kpp", KEY_PAGE_UP},
+        {"knp", KEY_PAGE_DOWN},
+        {"khome", KEY_HOME},
+        {"kend", KEY_END},
+        {"kich1", KEY_INSERT},
         {"kf1", KEY_F1},
         {"kf2", KEY_F2},
         {"kf3", KEY_F3},
@@ -91,50 +91,66 @@ static void term_read_caps(void)
         {"kf10", KEY_F10},
         {"kf11", KEY_F11},
         {"kf12", KEY_F12},
-        {"kLFT", MOD_SHIFT | KEY_LEFT},
-        {"kRIT", MOD_SHIFT | KEY_RIGHT},
-        {"kHOM", MOD_SHIFT | KEY_HOME},
-        {"kEND", MOD_SHIFT | KEY_END},
-        {"kDC", MOD_SHIFT | KEY_DELETE},
-
-        // Extended capabilities (see ncurses user_caps(5) manpage)
-        {"kDC5", MOD_CTRL | KEY_DELETE},
-        {"kDC6", MOD_CTRL | MOD_SHIFT | KEY_DELETE},
-        {"kUP", MOD_SHIFT | KEY_UP},
-        {"kDN", MOD_SHIFT | KEY_DOWN},
-        {"kLFT3", MOD_META | KEY_LEFT},
-        {"kRIT3", MOD_META | KEY_RIGHT},
-        {"kUP3", MOD_META | KEY_UP},
-        {"kDN3", MOD_META | KEY_DOWN},
-        {"kLFT5", MOD_CTRL | KEY_LEFT},
-        {"kRIT5", MOD_CTRL | KEY_RIGHT},
-        {"kUP5", MOD_CTRL | KEY_UP},
-        {"kDN5", MOD_CTRL | KEY_DOWN},
-        {"kLFT4", MOD_META | MOD_SHIFT | KEY_LEFT},
-        {"kRIT4", MOD_META | MOD_SHIFT | KEY_RIGHT},
-        {"kUP4", MOD_META | MOD_SHIFT | KEY_UP},
-        {"kDN4", MOD_META | MOD_SHIFT | KEY_DOWN},
-        {"kLFT6", MOD_CTRL | MOD_SHIFT | KEY_LEFT},
-        {"kRIT6", MOD_CTRL | MOD_SHIFT | KEY_RIGHT},
-        {"kUP6", MOD_CTRL | MOD_SHIFT | KEY_UP},
-        {"kDN6", MOD_CTRL | MOD_SHIFT | KEY_DOWN},
-        {"kLFT7", MOD_CTRL | MOD_META | KEY_LEFT},
-        {"kRIT7", MOD_CTRL | MOD_META | KEY_RIGHT},
-        {"kUP7", MOD_CTRL | MOD_META | KEY_UP},
-        {"kDN7", MOD_CTRL | MOD_META | KEY_DOWN},
-        {"kLFT8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT},
-        {"kRIT8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT},
-        {"kUP8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
-        {"kDN8", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN},
     };
 
-    static const size_t keymap_length = ARRAY_COUNT(keymap);
+    // See: user_caps(5)
+    static const TermKeyMap extended_keys[] = {
+        {"kUP", KEY_UP},
+        {"kDN", KEY_DOWN},
+        {"kLFT", KEY_LEFT},
+        {"kRIT", KEY_RIGHT},
+        {"kDC", KEY_DELETE},
+        {"kPRV", KEY_PAGE_UP},
+        {"kNXT", KEY_PAGE_DOWN},
+        {"kHOM", KEY_HOME},
+        {"kEND", KEY_END},
+    };
 
-    // Replace all capability names in the keymap array above with the
-    // corresponding escape sequences fetched from terminfo.
-    for (size_t i = 0; i < keymap_length; i++) {
-        const char *const code = curses_str_cap(keymap[i].code);
-        keymap[i].code = code;
+    static const TermKeyMap extended_key_suffixes[] = {
+        {"", MOD_SHIFT},
+        {"3", MOD_META},
+        {"4", MOD_SHIFT | MOD_META},
+        {"5", MOD_CTRL},
+        {"6", MOD_SHIFT | MOD_CTRL},
+        {"7", MOD_META | MOD_CTRL},
+        {"8", MOD_SHIFT | MOD_META | MOD_CTRL}
+    };
+
+    static TermKeyMap keymap[85];
+    size_t keymap_length = 0;
+
+    static_assert (
+        ARRAY_COUNT(keymap) ==
+        (ARRAY_COUNT(extended_keys) * ARRAY_COUNT(extended_key_suffixes))
+        + ARRAY_COUNT(special_keys)
+    );
+
+    for (size_t i = 0; i < ARRAY_COUNT(special_keys); i++) {
+        const char *const code = curses_str_cap(special_keys[i].code);
+        if (code) {
+            keymap[keymap_length++] = (TermKeyMap) {
+                .code = code,
+                .key = special_keys[i].key
+            };
+        }
+    }
+
+    for (size_t i = 0; i < ARRAY_COUNT(extended_key_suffixes); i++) {
+        const char *const suffix = extended_key_suffixes[i].code;
+        const Key modifiers = extended_key_suffixes[i].key;
+        for (size_t j = 0; j < ARRAY_COUNT(extended_keys); j++) {
+            char cap[8];
+            int nc = snprintf(cap, 8, "%s%s", extended_keys[j].code, suffix);
+            BUG_ON(nc < 3); // Shortest should be strlen("kUP") == 3
+            BUG_ON(nc > 5); // Longest should be strlen("kEND8") == 5
+            const char *const code = curses_str_cap(cap);
+            if (code) {
+                keymap[keymap_length++] = (TermKeyMap) {
+                    .code = code,
+                    .key = modifiers | extended_keys[j].key
+                };
+            }
+        }
     }
 
     terminal.keymap = keymap;
