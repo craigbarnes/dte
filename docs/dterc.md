@@ -261,6 +261,12 @@ Example:
 
     filter sort -r
 
+Note that _command_ is executed directly using [`execvp`]. To use shell
+features like pipes or redirection, use a shell interpreter as the
+_command_. For example:
+
+    filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
+
 ### **format-paragraph** [_width_]
 
 Format the current selection or paragraph under the cursor. If
@@ -1056,6 +1062,7 @@ errors should be highlighted. Set to `""` to disable.
 
 
 [`dte-syntax`]: dte-syntax.html
+[`execvp`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`config/filetype`]: https://github.com/craigbarnes/dte/blob/master/config/filetype
 [`xterm`]: https://invisible-island.net/xterm/

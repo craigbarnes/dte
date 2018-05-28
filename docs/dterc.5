@@ -563,6 +563,17 @@ filter\ sort\ \-r
 \f[]
 .fi
 .PP
+Note that \fIcommand\fR is executed directly using \fBexecvp\fR(3). To use shell
+features like pipes or redirection, use a shell interpreter as the
+\fIcommand\fR. For example:
+.P
+.IP
+.nf
+\f[C]
+filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
+\f[]
+.fi
+.PP
 .RE
 \fBformat\-paragraph\fR [\fIwidth\fR]
 .RS
