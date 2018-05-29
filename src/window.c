@@ -159,7 +159,7 @@ View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
     return NULL;
 }
 
-void window_remove_views(Window *w)
+static void window_remove_views(Window *w)
 {
     while (w->views.count > 0) {
         View *v = w->views.ptrs[w->views.count - 1];

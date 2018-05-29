@@ -43,7 +43,6 @@ View *window_open_buffer(Window *w, const char *filename, bool must_exist, const
 View *window_get_view(Window *w, Buffer *b);
 View *window_find_view(Window *w, Buffer *b);
 View *window_find_unclosable_view(Window *w, bool (*can_close)(View *));
-void window_remove_views(Window *w);
 void window_free(Window *w);
 void remove_view(View *v);
 void window_close_current(void);
