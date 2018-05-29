@@ -3,12 +3,12 @@
 #include "indent.h"
 #include "uchar.h"
 
-enum char_type {
+typedef enum {
     CT_SPACE,
     CT_NEWLINE,
     CT_WORD,
     CT_OTHER,
-};
+} CharTypeEnum;
 
 void move_to_preferred_x(int preferred_x)
 {
@@ -177,7 +177,7 @@ void move_to_column(View *v, int column)
     view_reset_preferred_x(v);
 }
 
-static enum char_type get_char_type(CodePoint u)
+static CharTypeEnum get_char_type(CodePoint u)
 {
     if (u == '\n') {
         return CT_NEWLINE;
@@ -191,7 +191,7 @@ static enum char_type get_char_type(CodePoint u)
     return CT_OTHER;
 }
 
-static bool get_current_char_type(BlockIter *bi, enum char_type *type)
+static bool get_current_char_type(BlockIter *bi, CharTypeEnum *type)
 {
     CodePoint u;
     if (!buffer_get_char(bi, &u)) {
@@ -202,7 +202,7 @@ static bool get_current_char_type(BlockIter *bi, enum char_type *type)
     return true;
 }
 
-static size_t skip_fwd_char_type(BlockIter *bi, enum char_type type)
+static size_t skip_fwd_char_type(BlockIter *bi, CharTypeEnum type)
 {
     size_t count = 0;
     CodePoint u;
@@ -216,7 +216,7 @@ static size_t skip_fwd_char_type(BlockIter *bi, enum char_type type)
     return count;
 }
 
-static size_t skip_bwd_char_type(BlockIter *bi, enum char_type type)
+static size_t skip_bwd_char_type(BlockIter *bi, CharTypeEnum type)
 {
     size_t count = 0;
     CodePoint u;
@@ -233,7 +233,7 @@ static size_t skip_bwd_char_type(BlockIter *bi, enum char_type type)
 size_t word_fwd(BlockIter *bi, bool skip_non_word)
 {
     size_t count = 0;
-    enum char_type type;
+    CharTypeEnum type;
 
     while (1) {
         count += skip_fwd_char_type(bi, CT_SPACE);
@@ -255,7 +255,7 @@ size_t word_fwd(BlockIter *bi, bool skip_non_word)
 size_t word_bwd(BlockIter *bi, bool skip_non_word)
 {
     size_t count = 0;
-    enum char_type type;
+    CharTypeEnum type;
     CodePoint u;
 
     do {

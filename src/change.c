@@ -4,8 +4,8 @@
 #include "block.h"
 #include "view.h"
 
-static enum change_merge change_merge;
-static enum change_merge prev_change_merge;
+static ChangeMergeEnum change_merge;
+static ChangeMergeEnum prev_change_merge;
 
 static Change *alloc_change(void)
 {
@@ -123,7 +123,7 @@ static void record_replace(char *deleted, size_t del_count, size_t ins_count)
     change->buf = deleted;
 }
 
-void begin_change(enum change_merge m)
+void begin_change(ChangeMergeEnum m)
 {
     change_merge = m;
 }

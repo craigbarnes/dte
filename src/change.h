@@ -4,12 +4,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-enum change_merge {
+typedef enum {
     CHANGE_MERGE_NONE,
     CHANGE_MERGE_INSERT,
     CHANGE_MERGE_DELETE,
     CHANGE_MERGE_ERASE,
-};
+} ChangeMergeEnum;
 
 typedef struct Change Change;
 
@@ -24,7 +24,7 @@ struct Change {
     char *buf; // Deleted bytes (inserted bytes need not be saved)
 };
 
-void begin_change(enum change_merge m);
+void begin_change(ChangeMergeEnum m);
 void end_change(void);
 void begin_change_chain(void);
 void end_change_chain(void);
