@@ -205,7 +205,17 @@ Reverse search direction.
 .
 .TP
 .B DTE_HOME
-User configuration directory. Defaults to \fB~/.dte\fR if not set.
+User configuration directory. Defaults to \fB$HOME/.dte\fR if not set.
+.
+.TP
+.B DTE_FORCE_TERMINFO
+Force \fBdte\fR to use \fBterminfo\fR(5) database, even for terminals
+with built-in support. Enabled if set.
+.
+.TP
+.B TERM
+Identifier used to determine which \fBterminfo\fR(5) entry or built-in
+terminal support to use.
 .
 .SH FILES
 .
