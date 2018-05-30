@@ -39,6 +39,24 @@ static void handle_sigwinch(int UNUSED(signum))
 MESSAGE("SIGWINCH not defined; disabling handler")
 #endif
 
+static void set_signal_handlers(void)
+{
+    // Terminal does not generate signals for control keys
+    set_signal_handler(SIGINT, SIG_IGN);
+    set_signal_handler(SIGQUIT, SIG_IGN);
+    set_signal_handler(SIGPIPE, SIG_IGN);
+
+    // Terminal does not generate signal for ^Z but someone can send
+    // us SIGTSTP nevertheless. SIGSTOP can't be caught.
+    set_signal_handler(SIGTSTP, handle_sigtstp);
+
+    set_signal_handler(SIGCONT, handle_sigcont);
+
+#ifdef SIGWINCH
+    set_signal_handler(SIGWINCH, handle_sigwinch);
+#endif
+}
+
 static int dump_builtin_config(const char *const name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -143,20 +161,7 @@ int main(int argc, char *argv[])
     update_all_syntax_colors();
     sort_aliases();
 
-    // Terminal does not generate signals for control keys
-    set_signal_handler(SIGINT, SIG_IGN);
-    set_signal_handler(SIGQUIT, SIG_IGN);
-    set_signal_handler(SIGPIPE, SIG_IGN);
-
-    // Terminal does not generate signal for ^Z but someone can send
-    // us SIGTSTP nevertheless. SIGSTOP can't be caught.
-    set_signal_handler(SIGTSTP, handle_sigtstp);
-
-    set_signal_handler(SIGCONT, handle_sigcont);
-
-#ifdef SIGWINCH
-    set_signal_handler(SIGWINCH, handle_sigwinch);
-#endif
+    set_signal_handlers();
 
     char *file_history_filename = editor_file("file-history");
     load_file_history(file_history_filename);
