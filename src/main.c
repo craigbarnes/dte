@@ -93,7 +93,7 @@ static void showkey_loop(void)
             break;
         }
         char *str = key_to_string(key);
-        printf("   %-12s 0x%-12" PRIX32 "\n", str, key);
+        printf("   %-12s 0x%" PRIX32 "\n", str, key);
         free(str);
         fflush(stdout);
     }
