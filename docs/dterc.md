@@ -543,6 +543,10 @@ possibilities an informative message is displayed:
 If the change was not the one you wanted, just run `undo` and
 then, for example, `redo 1`.
 
+### **refresh**
+
+Trigger a full redraw of the screen.
+
 ### **repeat** _count_ _command_ [_parameters_]...
 
 Run _command_ _count_ times.

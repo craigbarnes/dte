@@ -836,6 +836,11 @@ static void cmd_redo(const char* UNUSED(pf), char **args)
     }
 }
 
+static void cmd_refresh(const char* UNUSED(pf), char** UNUSED(args))
+{
+    mark_everything_changed();
+}
+
 static void cmd_repeat(const char *pf, char **args)
 {
     const Command *cmd;
@@ -1697,6 +1702,7 @@ const Command commands[] = {
     {"prev", "", 0, 0, cmd_prev},
     {"quit", "f", 0, 0, cmd_quit},
     {"redo", "", 0, 1, cmd_redo},
+    {"refresh", "", 0, 0, cmd_refresh},
     {"repeat", "", 2, -1, cmd_repeat},
     {"replace", "bcgi", 2, 2, cmd_replace},
     {"right", "", 0, 0, cmd_right},

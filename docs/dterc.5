@@ -118,6 +118,8 @@ Commands:
 .br
    \fBredo\fR [\fIchoice\fR]
 .br
+   \fBrefresh\fR
+.br
    \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
 .br
    \fBreplace\fR [\fB\-bcgi\fR] \fIpattern\fR \fIreplacement\fR
@@ -938,6 +940,11 @@ Redoing\ newest\ (2)\ of\ 2\ possible\ changes.
 .PP
 If the change was not the one you wanted, just run \fBundo\fR and
 then, for example, \fBredo 1\fR.
+.P
+.RE
+\fBrefresh\fR
+.RS
+Trigger a full redraw of the screen.
 .P
 .RE
 \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
