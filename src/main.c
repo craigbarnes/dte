@@ -69,17 +69,54 @@ static int dump_builtin_config(const char *const name)
     }
 }
 
+static void showkey_loop(void)
+{
+    term_raw();
+    if (terminal.control_codes->keypad_on) {
+        fputs(terminal.control_codes->keypad_on, stdout);
+    }
+    puts("\nPress any key combination, or use Ctrl+D to exit\n");
+    fflush(stdout);
+
+    bool loop = true;
+    while (loop) {
+        Key key;
+        if (!term_read_key(&key)) {
+            continue;
+        }
+        switch (key) {
+        case KEY_PASTE:
+            term_discard_paste();
+            continue;
+        case CTRL('D'):
+            loop = false;
+            break;
+        }
+        char *str = key_to_string(key);
+        printf("   %-12s 0x%-12" PRIX32 "\n", str, key);
+        free(str);
+        fflush(stdout);
+    }
+
+    if (terminal.control_codes->keypad_off) {
+        fputs(terminal.control_codes->keypad_off, stdout);
+        fflush(stdout);
+    }
+    term_cooked();
+}
+
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBRVb:c:t:r:";
+    static const char optstring[] = "hBKRVb:c:t:r:";
     static const char opts[] =
-        "[-hbBRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
+        "[-hbBKRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
     static_assert(ARRAY_COUNT(opts) < 70);
 
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
     bool read_rc = true;
+    bool use_showkey = false;
     int ch;
 
     init_editor_state();
@@ -103,6 +140,9 @@ int main(int argc, char *argv[])
         case 'B':
             list_builtin_configs();
             return 0;
+        case 'K':
+            use_showkey = true;
+            break;
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017-2018 Craig Barnes");
@@ -130,7 +170,11 @@ int main(int argc, char *argv[])
     }
 
     term_init();
-    save_term_title();
+
+    if (use_showkey) {
+        showkey_loop();
+        return 0;
+    }
 
     // Create this early. Needed if lock-files is true.
     const char *const editor_dir = editor.user_config_dir;
@@ -138,9 +182,9 @@ int main(int argc, char *argv[])
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
 
+    save_term_title();
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
-
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create

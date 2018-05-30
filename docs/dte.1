@@ -9,7 +9,7 @@ dte \- A small and flexible text editor
 .SH SYNOPSIS
 .
 .B dte
-.RB [ \-hBRV ]
+.RB [ \-hBKRV ]
 [\fB\-c\fR \fIcommand\fR]
 [\fB\-t\fR \fIctag\fR]
 [\fB\-r\fR \fIrcfile\fR]
@@ -45,6 +45,11 @@ Print a list of all built\-in config names that can be used with the
 .TP
 .B \-R
 Don't read the rc file.
+.
+.TP
+.B \-K
+Start in a special mode that continuously reads input and prints the
+name and numeric code of each pressed key.
 .
 .TP
 .B \-h
