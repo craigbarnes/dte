@@ -137,20 +137,20 @@ static bool read_special(Key *key)
     for (size_t i = 0; i < terminal.keymap_length; i++) {
         const TermKeyMap *const km = &terminal.keymap[i];
         const char *const keycode = km->code;
-
-        if (!keycode) {
-            continue;
-        }
-
-        const size_t len = strlen(keycode);
+        const size_t len = km->code_length;
+        BUG_ON(keycode == NULL);
+        BUG_ON(len == 0);
         if (len > input_buf_fill) {
             // This might be a truncated escape sequence
-            if (!memcmp(keycode, input_buf, input_buf_fill)) {
+            if (
+                possibly_truncated == false
+                && !memcmp(keycode, input_buf, input_buf_fill)
+            ) {
                 possibly_truncated = true;
             }
             continue;
         }
-        if (strncmp(keycode, input_buf, len)) {
+        if (memcmp(keycode, input_buf, len)) {
             continue;
         }
         *key = km->key;

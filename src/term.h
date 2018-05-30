@@ -50,6 +50,7 @@ typedef struct {
 
 typedef struct {
     const char *code;
+    uint32_t code_length;
     Key key;
 } TermKeyMap;
 
