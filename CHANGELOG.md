@@ -4,6 +4,8 @@ Releases
 v1.7 (latest release)
 ---------------------
 
+Released on 2018-05-08.
+
 **Changes:**
 
 * Added support for opening multiple files using glob patterns
