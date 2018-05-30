@@ -404,8 +404,14 @@ static bool term_match(const char *term, const char *prefix)
     return false;
 }
 
-void term_init(const char *const term)
+void term_init(void)
 {
+    const char *const term = getenv("TERM");
+    if (term == NULL || term[0] == '\0') {
+        fputs("'TERM' not set\n", stderr);
+        exit(1);
+    }
+
     if (getenv("DTE_FORCE_TERMINFO")) {
 #ifndef TERMINFO_DISABLE
         term_init_fallback(term);

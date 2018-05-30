@@ -58,7 +58,6 @@ int main(int argc, char *argv[])
         "[-hbBRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
     static_assert(ARRAY_COUNT(opts) < 70);
 
-    const char *const term = getenv("TERM");
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
@@ -105,10 +104,6 @@ int main(int argc, char *argv[])
         fputs("stdout doesn't refer to a terminal\n", stderr);
         return 1;
     }
-    if (term == NULL || term[0] == 0) {
-        fputs("TERM not set\n", stderr);
-        return 1;
-    }
     if (!isatty(STDIN_FILENO)) {
         if (!freopen("/dev/tty", "r", stdin)) {
             fputs("Cannot reopen input tty\n", stderr);
@@ -116,7 +111,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    term_init(term);
+    term_init();
     save_term_title();
 
     // Create this early. Needed if lock-files is true.
