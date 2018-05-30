@@ -22,8 +22,8 @@ static char *copy_buf;
 static size_t copy_len;
 static bool copy_is_lines;
 
-static const char *const spattern = "\\{\\s*(//.*|/\\*.*\\*/\\s*)?$";
-static const char *const epattern = "^\\s*\\}";
+static const char *const spattern = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
+static const char *const epattern = "^[ \t]*\\}";
 
 /*
  * Stupid { ... } block selector.
@@ -725,7 +725,7 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
 
 static bool is_paragraph_separator(const char *line, size_t size)
 {
-    return regexp_match_nosub("^\\s*(/\\*|\\*/)?\\s*$", line, size);
+    return regexp_match_nosub("^[ \t]*(/\\*|\\*/)?[ \t]*$", line, size);
 }
 
 static int get_indent_width(const char *line, size_t size)
