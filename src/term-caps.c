@@ -204,92 +204,63 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
-#define XTERM_KEYMAP_COMMON \
-    KEY("\033[2~", KEY_INSERT), \
-    KEY("\033[3~", KEY_DELETE), \
-    KEY("\033OH", KEY_HOME), \
-    KEY("\033[1~", KEY_HOME), \
-    KEY("\033OF", KEY_END), \
-    KEY("\033[4~", KEY_END), \
-    KEY("\033[5~", KEY_PAGE_UP), \
-    KEY("\033[6~", KEY_PAGE_DOWN), \
-    KEY("\033OD", KEY_LEFT), \
-    KEY("\033OC", KEY_RIGHT), \
-    KEY("\033OA", KEY_UP), \
-    KEY("\033OB", KEY_DOWN), \
-    KEY("\033OP", KEY_F1), \
-    KEY("\033OQ", KEY_F2), \
-    KEY("\033OR", KEY_F3), \
-    KEY("\033OS", KEY_F4), \
-    KEY("\033[15~", KEY_F5), \
-    KEY("\033[17~", KEY_F6), \
-    KEY("\033[18~", KEY_F7), \
-    KEY("\033[19~", KEY_F8), \
-    KEY("\033[20~", KEY_F9), \
-    KEY("\033[21~", KEY_F10), \
-    KEY("\033[23~", KEY_F11), \
-    KEY("\033[24~", KEY_F12), \
-    KEY("\033[1;2A", MOD_SHIFT | KEY_UP), \
-    KEY("\033[1;2B", MOD_SHIFT | KEY_DOWN), \
-    KEY("\033[1;2D", MOD_SHIFT | KEY_LEFT), \
-    KEY("\033[1;2C", MOD_SHIFT | KEY_RIGHT), \
-    KEY("\033[1;5D", MOD_CTRL | KEY_LEFT), \
-    KEY("\033[1;5C", MOD_CTRL | KEY_RIGHT), \
-    KEY("\033[1;5A", MOD_CTRL | KEY_UP), \
-    KEY("\033[1;5B", MOD_CTRL | KEY_DOWN), \
-    KEY("\033[1;3D", MOD_META | KEY_LEFT), \
-    KEY("\033[1;3C", MOD_META | KEY_RIGHT), \
-    KEY("\033[1;3A", MOD_META | KEY_UP), \
-    KEY("\033[1;3B", MOD_META | KEY_DOWN), \
-    KEY("\033[5;2~", MOD_SHIFT | KEY_PAGE_UP), \
-    KEY("\033[6;2~", MOD_SHIFT | KEY_PAGE_DOWN), \
-    KEY("\033[5;5~", MOD_CTRL | KEY_PAGE_UP), \
-    KEY("\033[6;5~", MOD_CTRL | KEY_PAGE_DOWN), \
-    /* Fix keypad when numlock is off */ \
-    KEY("\033Oo", '/'), \
-    KEY("\033Oj", '*'), \
-    KEY("\033Om", '-'), \
-    KEY("\033Ok", '+'), \
-    KEY("\033OM", '\r'),
-
-static const TermKeyMap st_keymap[] = {
-    XTERM_KEYMAP_COMMON
-};
+#define XTERM_COMBO_KEYS(s1, s2, key) \
+    KEY("\033[" s1 ";2" s2, key | MOD_SHIFT), \
+    KEY("\033[" s1 ";3" s2, key | MOD_META), \
+    KEY("\033[" s1 ";4" s2, key | MOD_SHIFT | MOD_META), \
+    KEY("\033[" s1 ";5" s2, key | MOD_CTRL), \
+    KEY("\033[" s1 ";6" s2, key | MOD_SHIFT | MOD_CTRL), \
+    KEY("\033[" s1 ";7" s2, key | MOD_META | MOD_CTRL), \
+    KEY("\033[" s1 ";8" s2, key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
 static const TermKeyMap xterm_keymap[] = {
-    XTERM_KEYMAP_COMMON
-    KEY("\033[1;6D", MOD_CTRL | MOD_SHIFT | KEY_LEFT),
-    KEY("\033[1;6C", MOD_CTRL | MOD_SHIFT | KEY_RIGHT),
-    KEY("\033[1;6A", MOD_CTRL | MOD_SHIFT | KEY_UP),
-    KEY("\033[1;6B", MOD_CTRL | MOD_SHIFT | KEY_DOWN),
-    KEY("\033[1;4D", MOD_META | MOD_SHIFT | KEY_LEFT),
-    KEY("\033[1;4C", MOD_META | MOD_SHIFT | KEY_RIGHT),
-    KEY("\033[1;4A", MOD_META | MOD_SHIFT | KEY_UP),
-    KEY("\033[1;4B", MOD_META | MOD_SHIFT | KEY_DOWN),
-    KEY("\033[1;7D", MOD_CTRL | MOD_META | KEY_LEFT),
-    KEY("\033[1;7C", MOD_CTRL | MOD_META | KEY_RIGHT),
-    KEY("\033[1;7A", MOD_CTRL | MOD_META | KEY_UP),
-    KEY("\033[1;7B", MOD_CTRL | MOD_META | KEY_DOWN),
-    KEY("\033[1;8D", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_LEFT),
-    KEY("\033[1;8C", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_RIGHT),
-    KEY("\033[1;8A", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP),
-    KEY("\033[1;8B", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_DOWN),
-    KEY("\033[5;3~", MOD_META | KEY_PAGE_UP),
-    KEY("\033[6;3~", MOD_META | KEY_PAGE_DOWN),
-    KEY("\033[5;4~", MOD_META | MOD_SHIFT | KEY_PAGE_UP),
-    KEY("\033[6;4~", MOD_META | MOD_SHIFT | KEY_PAGE_DOWN),
-    KEY("\033[5;6~", MOD_CTRL | MOD_SHIFT | KEY_PAGE_UP),
-    KEY("\033[6;6~", MOD_CTRL | MOD_SHIFT | KEY_PAGE_DOWN),
-    KEY("\033[5;7~", MOD_CTRL | MOD_META | KEY_PAGE_UP),
-    KEY("\033[6;7~", MOD_CTRL | MOD_META | KEY_PAGE_DOWN),
-    KEY("\033[5;8~", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_PAGE_UP),
-    KEY("\033[6;8~", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_PAGE_DOWN),
-    KEY("\033[1;2H", MOD_SHIFT | KEY_HOME),
-    KEY("\033[1;2F", MOD_SHIFT | KEY_END),
-    KEY("\033[3;5~", MOD_CTRL | KEY_DELETE),
-    KEY("\033[3;2~", MOD_SHIFT | KEY_DELETE),
-    KEY("\033[3;6~", MOD_CTRL | MOD_SHIFT | KEY_DELETE),
+    KEY("\033OA", KEY_UP),
+    KEY("\033[A", KEY_UP),
+    KEY("\033OB", KEY_DOWN),
+    KEY("\033[B", KEY_DOWN),
+    KEY("\033OC", KEY_RIGHT),
+    KEY("\033[C", KEY_RIGHT),
+    KEY("\033OD", KEY_LEFT),
+    KEY("\033[D", KEY_LEFT),
+    KEY("\033OF", KEY_END),
+    KEY("\033[4~", KEY_END),
+    KEY("\033OH", KEY_HOME),
+    KEY("\033[1~", KEY_HOME),
+    KEY("\033[2~", KEY_INSERT),
+    KEY("\033[3~", KEY_DELETE),
+    KEY("\033[5~", KEY_PAGE_UP),
+    KEY("\033[6~", KEY_PAGE_DOWN),
+    KEY("\033OP", KEY_F1),
+    KEY("\033OQ", KEY_F2),
+    KEY("\033OR", KEY_F3),
+    KEY("\033OS", KEY_F4),
+    KEY("\033[15~", KEY_F5),
+    KEY("\033[17~", KEY_F6),
+    KEY("\033[18~", KEY_F7),
+    KEY("\033[19~", KEY_F8),
+    KEY("\033[20~", KEY_F9),
+    KEY("\033[21~", KEY_F10),
+    KEY("\033[23~", KEY_F11),
+    KEY("\033[24~", KEY_F12),
     KEY("\033[Z", MOD_SHIFT | '\t'),
+
+    XTERM_COMBO_KEYS("1", "A", KEY_UP),
+    XTERM_COMBO_KEYS("1", "B", KEY_DOWN),
+    XTERM_COMBO_KEYS("1", "C", KEY_RIGHT),
+    XTERM_COMBO_KEYS("1", "D", KEY_LEFT),
+    XTERM_COMBO_KEYS("1", "F", KEY_END),
+    XTERM_COMBO_KEYS("1", "H", KEY_HOME),
+    XTERM_COMBO_KEYS("2", "~", KEY_INSERT),
+    XTERM_COMBO_KEYS("3", "~", KEY_DELETE),
+    XTERM_COMBO_KEYS("5", "~", KEY_PAGE_UP),
+    XTERM_COMBO_KEYS("6", "~", KEY_PAGE_DOWN),
+
+    // Fix keypad when numlock is off
+    KEY("\033Oo", '/'),
+    KEY("\033Oj", '*'),
+    KEY("\033Om", '-'),
+    KEY("\033Ok", '+'),
+    KEY("\033OM", '\r'),
 };
 
 static const TermKeyMap rxvt_keymap[] = {
@@ -380,8 +351,8 @@ static const TerminalInfo terminal_st = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
-    .keymap = st_keymap,
-    .keymap_length = ARRAY_COUNT(st_keymap),
+    .keymap = xterm_keymap,
+    .keymap_length = ARRAY_COUNT(xterm_keymap),
     .control_codes = &xterm_control_codes
 };
 
