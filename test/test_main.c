@@ -6,14 +6,16 @@
 #include <locale.h>
 #include <langinfo.h>
 
+static unsigned int failed;
+
 PRINTF(1)
 static void fail(const char *format, ...)
 {
     va_list ap;
-
     va_start(ap, format);
     vfprintf(stderr, format, ap);
     va_end(ap);
+    failed += 1;
 }
 
 static void test_relative_filename(void)
@@ -78,5 +80,6 @@ int main(void)
 
     test_relative_filename();
     test_detect_encoding_from_bom();
-    return 0;
+
+    return failed ? 1 : 0;
 }
