@@ -1,3 +1,4 @@
+#include "macros.h"
 #include "editor.h"
 #include "common.h"
 #include "path.h"
@@ -18,27 +19,34 @@ static void fail(const char *format, ...)
     failed += 1;
 }
 
+#define EXPECT_STREQ(a, b) do { \
+    const char *s1 = (a), *s2 = (b); \
+    if (unlikely(!xstreq(s1, s2))) { \
+        fail ( \
+            "%s:%d: Strings not equal: '%s', '%s'\n", \
+            __FILE__, \
+            __LINE__, \
+            s1 ? s1 : "(null)", \
+            s2 ? s2 : "(null)" \
+        ); \
+    } \
+} while (0)
+
 static void test_relative_filename(void)
 {
     static const struct rel_test {
-        const char *cwd;
-        const char *path;
-        const char *result;
-    } tests[] = {
-        // NOTE: at most 2 ".." components allowed in relative name
+        const char *cwd, *path, *result;
+    } tests[] = { // NOTE: at most 2 ".." components allowed in relative name
         { "/", "/", "/" },
         { "/", "/file", "file" },
         { "/a/b/c/d", "/a/b/file", "../../file" },
-        { "/a/b/c/d/e", "/a/b/file", "/a/b/file" }, // "../../../file" contains too many ".." components
+        { "/a/b/c/d/e", "/a/b/file", "/a/b/file" },
         { "/a/foobar", "/a/foo/file", "../foo/file" },
     };
-
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct rel_test *t = &tests[i];
         char *result = relative_filename(t->path, t->cwd);
-        if (!streq(t->result, result)) {
-            fail("relative_filename(%s, %s) -> %s, expected %s\n", t->path, t->cwd, result, t->result);
-        }
+        EXPECT_STREQ(t->result, result);
         free(result);
     }
 }
@@ -58,19 +66,10 @@ static void test_detect_encoding_from_bom(void)
         {NULL, "\x00\xef\xbb\xbfHello", 9},
         {NULL, "\xef\xbb", 2},
     };
-
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct bom_test *t = &tests[i];
         const char *result = detect_encoding_from_bom(t->text, t->size);
-        if (!xstreq(result, t->encoding)) {
-            fail (
-                "%s: test #%zu failed: got %s, expected %s\n",
-                __func__,
-                i + 1,
-                result ? result : "(null)",
-                t->encoding ? t->encoding : "(null)"
-            );
-        }
+        EXPECT_STREQ(result, t->encoding);
     }
 }
 
