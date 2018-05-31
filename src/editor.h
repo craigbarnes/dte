@@ -5,6 +5,7 @@
 #include "macros.h"
 #include "cmdline.h"
 #include "options.h"
+#include "ptr-array.h"
 #include "color.h"
 #include "term.h"
 

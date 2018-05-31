@@ -4,6 +4,7 @@
 #include "common.h"
 #include "uchar.h"
 #include "input-special.h"
+#include "term.h"
 
 static void cmdline_delete(CommandLine *c)
 {

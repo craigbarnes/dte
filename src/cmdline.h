@@ -5,7 +5,6 @@
 #include "ptr-array.h"
 #include "str.h"
 #include "key.h"
-#include "term.h"
 
 typedef struct {
     String buf;
