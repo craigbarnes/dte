@@ -100,7 +100,7 @@ NORETURN void bug (
     const char *funct,
     const char *fmt,
     ...
-) PRINTF(4);
+) PRINTF(4) COLD;
 
 void debug_print(const char *function, const char *fmt, ...) PRINTF(2);
 

@@ -78,6 +78,12 @@
     #define WARN_UNUSED_RESULT
 #endif
 
+#if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(cold)
+    #define COLD __attribute__((__cold__))
+#else
+    #define COLD
+#endif
+
 #if GNUC_AT_LEAST(5, 0) || HAS_ATTRIBUTE(returns_nonnull)
     #define RETURNS_NONNULL __attribute__((__returns_nonnull__))
 #else

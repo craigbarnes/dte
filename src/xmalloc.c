@@ -3,7 +3,7 @@
 
 #define MALLOC_FAIL(msg) malloc_fail(__FILE__, __LINE__, __func__, (msg))
 
-NORETURN static void malloc_fail (
+NORETURN COLD static void malloc_fail (
     const char *const file,
     const int line,
     const char *const func,
