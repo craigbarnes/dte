@@ -147,10 +147,10 @@ ssize_t xread(int fd, void *buf, size_t count)
 ssize_t xwrite(int fd, const void *buf, size_t count)
 {
     const char *b = buf;
-    size_t count_save = count;
+    const size_t count_save = count;
 
     do {
-        int rc = write(fd, b, count);
+        ssize_t rc = write(fd, b, count);
         if (rc == -1) {
             if (errno == EINTR) {
                 continue;

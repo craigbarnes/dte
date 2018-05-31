@@ -68,9 +68,8 @@ static void read_errors(Compiler *c, int fd, bool quiet)
 
 static void filter(int rfd, int wfd, FilterData *fdata)
 {
-    unsigned int wlen = 0;
+    size_t wlen = 0;
     String buf = STRING_INIT;
-    int rc;
 
     if (!fdata->in_len) {
         close(wfd);
@@ -93,8 +92,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             fd_high = wfd;
         }
 
-        rc = select(fd_high + 1, &rfds, wfdsp, NULL, NULL);
-        if (rc < 0) {
+        if (select(fd_high + 1, &rfds, wfdsp, NULL, NULL) < 0) {
             if (errno == EINTR) {
                 continue;
             }
@@ -105,7 +103,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
         if (FD_ISSET(rfd, &rfds)) {
             char data[8192];
 
-            rc = read(rfd, data, sizeof(data));
+            ssize_t rc = read(rfd, data, sizeof(data));
             if (rc < 0) {
                 error_msg("read: %s", strerror(errno));
                 break;
@@ -116,15 +114,15 @@ static void filter(int rfd, int wfd, FilterData *fdata)
                 }
                 break;
             }
-            string_add_buf(&buf, data, rc);
+            string_add_buf(&buf, data, (size_t) rc);
         }
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
-            rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
+            ssize_t rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
             if (rc < 0) {
                 error_msg("write: %s", strerror(errno));
                 break;
             }
-            wlen += rc;
+            wlen += (size_t) rc;
             if (wlen == fdata->in_len) {
                 if (close(wfd)) {
                     error_msg("close: %s", strerror(errno));
