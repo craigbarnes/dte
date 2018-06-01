@@ -14,7 +14,7 @@ typedef struct {
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
 
-static const char *const ignore[] = {
+static const char ignore[][16] = {
     "bak", "dpkg-dist", "dpkg-old", "new", "old", "orig", "pacnew",
     "pacorig", "pacsave", "rpmnew", "rpmsave",
 };

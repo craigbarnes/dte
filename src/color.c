@@ -5,14 +5,14 @@
 #include "error.h"
 #include "editor.h"
 
-static const char *const color_names[] = {
+static const char color_names[][16] = {
     "keep", "default",
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "gray",
     "darkgray", "lightred", "lightgreen", "lightyellow", "lightblue",
     "lightmagenta", "lightcyan", "white",
 };
 
-static const char *const attr_names[] = {
+static const char attr_names[][16] = {
     "keep",
     "underline",
     "reverse",
@@ -23,7 +23,7 @@ static const char *const attr_names[] = {
     "italic"
 };
 
-static const char *const builtin_color_names[] = {
+static const char builtin_color_names[][16] = {
     "default",
     "nontext",
     "noline",

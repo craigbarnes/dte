@@ -7,7 +7,7 @@
 #include "common.h"
 
 // Commands that are allowed in config files
-static const char *const config_commands[] = {
+static const char config_commands[][16] = {
     "alias",
     "bind",
     "cd",
