@@ -10,20 +10,25 @@ enum {
     D = ASCII_DIGIT,
     x = ASCII_LOWER | ASCII_HEX_LOWER,
     X = ASCII_UPPER | ASCII_HEX_UPPER,
-    G = ASCII_GLOB_SPECIAL, // *, ?, \\, [
-    R = ASCII_REGEX_SPECIAL, // $, (, ), +, ., ^, {, |
 };
 
 const uint8_t dte_ascii_table[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, S, S, 0, 0, S, 0, 0, //   0.. 15
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //  16.. 31
-    S, 0, 0, 0, R, 0, 0, 0, R, R, G, R, 0, 0, R, 0, //  32.. 47
-    D, D, D, D, D, D, D, D, D, D, 0, 0, 0, 0, 0, G, //  48.. 63
-    0, X, X, X, X, X, X, U, U, U, U, U, U, U, U, U, //  64.. 79
-    U, U, U, U, U, U, U, U, U, U, U, G, G, 0, R, 0, //  80.. 95
-    0, x, x, x, x, x, x, L, L, L, L, L, L, L, L, L, //  96..111
-    L, L, L, L, L, L, L, L, L, L, L, R, R, 0, 0, 0, // 112..127
-    // Nothing in the 128.. range
+    ['\t'] = S, ['\n'] = S, ['\r'] = S, [' '] = S,
+
+    ['0'] = D, ['1'] = D, ['2'] = D, ['3'] = D, ['4'] = D,
+    ['5'] = D, ['6'] = D, ['7'] = D, ['8'] = D, ['9'] = D,
+
+    ['A'] = X, ['B'] = X, ['C'] = X, ['D'] = X, ['E'] = X, ['F'] = X,
+    ['G'] = U, ['H'] = U, ['I'] = U, ['J'] = U, ['K'] = U, ['L'] = U,
+    ['M'] = U, ['N'] = U, ['O'] = U, ['P'] = U, ['Q'] = U, ['R'] = U,
+    ['S'] = U, ['T'] = U, ['U'] = U, ['V'] = U, ['W'] = U, ['X'] = U,
+    ['Y'] = U, ['Z'] = U,
+
+    ['a'] = x, ['b'] = x, ['c'] = x, ['d'] = x, ['e'] = x, ['f'] = x,
+    ['g'] = L, ['h'] = L, ['i'] = L, ['j'] = L, ['k'] = L, ['l'] = L,
+    ['m'] = L, ['n'] = L, ['o'] = L, ['p'] = L, ['q'] = L, ['r'] = L,
+    ['s'] = L, ['t'] = L, ['u'] = L, ['v'] = L, ['w'] = L, ['x'] = L,
+    ['y'] = L, ['z'] = L,
 };
 
 int hex_decode(int ch)
