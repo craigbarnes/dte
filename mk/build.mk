@@ -102,11 +102,9 @@ else
   OPTCHECK = SILENT_BUILD='$(MAKE_S)' mk/optcheck.sh
 endif
 
-ifndef NO_DEPS
-ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-  $(editor_objects) $(test_objects): DEPFLAGS = -MF $(patsubst %.o, %.mk, $@) -MMD -MP
-  -include $(patsubst %.o, %.mk, $(editor_objects) $(test_objects))
-endif
+ifdef CC_DEPFILES
+  $(editor_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
+  -include $(patsubst %.o, %.mk, $(editor_objects))
 endif
 
 dte = dte$(EXEC_SUFFIX)

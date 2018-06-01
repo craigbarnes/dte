@@ -7,18 +7,25 @@ _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
 TPUT = $(shell sh -c 'command -v tput')
 TPUT-V = $(if $(TPUT), $(shell $(TPUT) -V 2>/dev/null))
-CC-VERSION = $(shell $(CC) --version 2>/dev/null | head -n1)
+CC_VERSION = $(shell $(CC) --version 2>/dev/null | head -n1)
 STREQ = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
 USERVARS = CC CFLAGS LDFLAGS LDLIBS DEBUG
 
+CC_DEPFILES = $(if $(and \
+    $(if $(NO_DEPS),,y), \
+    $(call try-run,$(CC) -E -xc -MMD -MP -MF - /dev/null > /dev/null,y,) \
+), yes)
+
+$(call make-lazy,CC_DEPFILES)
+
 AUTOVARS = \
     VERSION KERNEL \
     $(if $(call STREQ,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
-    TERM TPUT TPUT-V MAKE_VERSION SHELL CC-VERSION
+    TERM TPUT TPUT-V MAKE_VERSION SHELL CC_VERSION CC_DEPFILES
 
 vars:
 	@echo
