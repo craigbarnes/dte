@@ -843,11 +843,15 @@ static void cmd_refresh(const char* UNUSED(pf), char** UNUSED(args))
 
 static void cmd_repeat(const char *pf, char **args)
 {
-    const Command *cmd;
-    int count;
+    int count = 0;
+    if (!str_to_int(args[0], &count)) {
+        error_msg("Not a valid integer: %s", args[0]);
+        return;
+    } else if (count <= 0) {
+        return;
+    }
 
-    count = atoi(args[0]);
-    cmd = find_command(commands, args[1]);
+    const Command *cmd = find_command(commands, args[1]);
     if (!cmd) {
         error_msg("No such command: %s", args[1]);
         return;
