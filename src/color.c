@@ -150,9 +150,10 @@ static bool parse_color(const char *str, int *val)
 
 static bool parse_attr(const char *str, unsigned short *attr)
 {
+    static_assert(ARRAY_COUNT(attr_names) <= 16);
     for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
         if (streq(str, attr_names[i])) {
-            *attr |= 1 << i;
+            *attr |= 1u << i;
             return true;
         }
     }

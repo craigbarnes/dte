@@ -22,9 +22,9 @@ static bool states_equal(void **ptrs, int idx, const State *b)
 
 static int bitmap_get(const unsigned char *bitmap, unsigned int idx)
 {
-    unsigned int byte = idx / 8;
-    unsigned int bit = idx & 7;
-    return bitmap[byte] & 1 << bit;
+    unsigned int byte = idx / 8u;
+    unsigned int bit = idx & 7u;
+    return bitmap[byte] & 1u << bit;
 }
 
 static bool is_buffered(const Condition *cond, const char *str, size_t len)
