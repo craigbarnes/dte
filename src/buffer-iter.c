@@ -52,3 +52,23 @@ size_t buffer_prev_char(BlockIter *bi, CodePoint *up)
     *up = u_prev_char(bi->blk->data, &bi->offset);
     return offset - bi->offset;
 }
+
+size_t buffer_next_column(BlockIter *bi)
+{
+    CodePoint u;
+    size_t size = buffer_next_char(bi, &u);
+    while (buffer_get_char(bi, &u) && u_is_zero_width(u)) {
+        size += buffer_next_char(bi, &u);
+    }
+    return size;
+}
+
+size_t buffer_prev_column(BlockIter *bi)
+{
+    CodePoint u;
+    size_t size = 0;
+    do {
+        size += buffer_prev_char(bi, &u);
+    } while (u_is_zero_width(u));
+    return size;
+}

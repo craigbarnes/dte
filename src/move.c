@@ -76,12 +76,7 @@ void move_cursor_left(void)
             return;
         }
     }
-
-    CodePoint u;
-    do {
-        buffer_prev_char(&view->cursor, &u);
-    } while (u_is_zero_width(u));
-
+    buffer_prev_column(&view->cursor);
     view_reset_preferred_x(view);
 }
 
@@ -95,13 +90,7 @@ void move_cursor_right(void)
             return;
         }
     }
-
-    CodePoint u;
-    buffer_next_char(&view->cursor, &u);
-    while (buffer_get_char(&view->cursor, &u) && u_is_zero_width(u)) {
-        buffer_next_char(&view->cursor, &u);
-    }
-
+    buffer_next_column(&view->cursor);
     view_reset_preferred_x(view);
 }
 

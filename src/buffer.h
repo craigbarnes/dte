@@ -92,5 +92,7 @@ void buffer_setup(Buffer *b);
 size_t buffer_get_char(BlockIter *bi, CodePoint *up);
 size_t buffer_next_char(BlockIter *bi, CodePoint *up);
 size_t buffer_prev_char(BlockIter *bi, CodePoint *up);
+size_t buffer_next_column(BlockIter *bi);
+size_t buffer_prev_column(BlockIter *bi);
 
 #endif

@@ -203,12 +203,7 @@ void delete_ch(void)
         }
         if (size == 0) {
             BlockIter bi = view->cursor;
-            CodePoint u;
-            size = buffer_next_char(&bi, &u);
-            size_t n = 0;
-            while ((n = buffer_next_char(&bi, &u)) && u_is_zero_width(u)) {
-                size += n;
-            }
+            size = buffer_next_column(&bi);
         }
     }
     buffer_delete_bytes(size);
