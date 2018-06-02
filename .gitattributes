@@ -7,6 +7,7 @@
 .git* export-ignore
 .travis.yml export-ignore
 TODO.md export-ignore
+docs/README.md export-ignore
 docs/contributing.md export-ignore
 docs/releasing.md export-ignore
 test/gitlab-ci.yml export-ignore
