@@ -204,14 +204,14 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
-#define XTERM_COMBO_KEYS(s1, s2, key) \
-    KEY("\033[" s1 ";2" s2, key | MOD_SHIFT), \
-    KEY("\033[" s1 ";3" s2, key | MOD_META), \
-    KEY("\033[" s1 ";4" s2, key | MOD_SHIFT | MOD_META), \
-    KEY("\033[" s1 ";5" s2, key | MOD_CTRL), \
-    KEY("\033[" s1 ";6" s2, key | MOD_SHIFT | MOD_CTRL), \
-    KEY("\033[" s1 ";7" s2, key | MOD_META | MOD_CTRL), \
-    KEY("\033[" s1 ";8" s2, key | MOD_SHIFT | MOD_META | MOD_CTRL)
+#define XTERM_COMBO_KEYS(p, s, key) \
+    KEY(p "2" s, key | MOD_SHIFT), \
+    KEY(p "3" s, key | MOD_META), \
+    KEY(p "4" s, key | MOD_SHIFT | MOD_META), \
+    KEY(p "5" s, key | MOD_CTRL), \
+    KEY(p "6" s, key | MOD_SHIFT | MOD_CTRL), \
+    KEY(p "7" s, key | MOD_META | MOD_CTRL), \
+    KEY(p "8" s, key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
 static const TermKeyMap xterm_keymap[] = {
     KEY("\033OA", KEY_UP),
@@ -244,16 +244,16 @@ static const TermKeyMap xterm_keymap[] = {
     KEY("\033[24~", KEY_F12),
     KEY("\033[Z", MOD_SHIFT | '\t'),
 
-    XTERM_COMBO_KEYS("1", "A", KEY_UP),
-    XTERM_COMBO_KEYS("1", "B", KEY_DOWN),
-    XTERM_COMBO_KEYS("1", "C", KEY_RIGHT),
-    XTERM_COMBO_KEYS("1", "D", KEY_LEFT),
-    XTERM_COMBO_KEYS("1", "F", KEY_END),
-    XTERM_COMBO_KEYS("1", "H", KEY_HOME),
-    XTERM_COMBO_KEYS("2", "~", KEY_INSERT),
-    XTERM_COMBO_KEYS("3", "~", KEY_DELETE),
-    XTERM_COMBO_KEYS("5", "~", KEY_PAGE_UP),
-    XTERM_COMBO_KEYS("6", "~", KEY_PAGE_DOWN),
+    XTERM_COMBO_KEYS("\033[1;", "A", KEY_UP),
+    XTERM_COMBO_KEYS("\033[1;", "B", KEY_DOWN),
+    XTERM_COMBO_KEYS("\033[1;", "C", KEY_RIGHT),
+    XTERM_COMBO_KEYS("\033[1;", "D", KEY_LEFT),
+    XTERM_COMBO_KEYS("\033[1;", "F", KEY_END),
+    XTERM_COMBO_KEYS("\033[1;", "H", KEY_HOME),
+    XTERM_COMBO_KEYS("\033[2;", "~", KEY_INSERT),
+    XTERM_COMBO_KEYS("\033[3;", "~", KEY_DELETE),
+    XTERM_COMBO_KEYS("\033[5;", "~", KEY_PAGE_UP),
+    XTERM_COMBO_KEYS("\033[6;", "~", KEY_PAGE_DOWN),
 
     // Fix keypad when numlock is off
     KEY("\033Oo", '/'),
