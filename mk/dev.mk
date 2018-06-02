@@ -17,6 +17,23 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
 
+show-sizes: MAKEFLAGS += \
+    -j$(NPROC) --no-print-directory \
+    CFLAGS=-O2\ -pipe \
+    TERMINFO_DISABLE=1 \
+    DEBUG=0 USE_SANITIZER=
+
+show-sizes:
+	$(MAKE) USE_LUA=no dte=build/dte-dynamic
+	-$(MAKE) USE_LUA=dynamic dte=build/dte-dynamic+lua
+	$(MAKE) USE_LUA=static dte=build/dte-dynamic+staticlua
+	$(MAKE) USE_LUA=no LDFLAGS=-static dte=build/dte-static
+	$(MAKE) USE_LUA=static LDFLAGS=-static dte=build/dte-static+lua
+	-$(MAKE) CC=musl-gcc USE_LUA=no LDFLAGS=-static dte=build/dte-musl-static
+	-$(MAKE) CC=musl-gcc USE_LUA=static LDFLAGS=-static dte=build/dte-musl-static+lua
+	@strip build/dte-*
+	@du -h build/dte-*
+
 
 CLEANFILES += dte-*.tar.gz
-.PHONY: dist dist-all check-dist git-hooks
+.PHONY: dist dist-all check-dist git-hooks show-sizes
