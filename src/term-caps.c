@@ -9,6 +9,15 @@
     .key = (k) \
 }
 
+#define XKEYS(p, s, key) \
+    KEY(p "2" s, key | MOD_SHIFT), \
+    KEY(p "3" s, key | MOD_META), \
+    KEY(p "4" s, key | MOD_SHIFT | MOD_META), \
+    KEY(p "5" s, key | MOD_CTRL), \
+    KEY(p "6" s, key | MOD_SHIFT | MOD_CTRL), \
+    KEY(p "7" s, key | MOD_META | MOD_CTRL), \
+    KEY(p "8" s, key | MOD_SHIFT | MOD_META | MOD_CTRL)
+
 #ifndef TERMINFO_DISABLE
 
 // These are normally declared in the <curses.h> and <term.h> headers.
@@ -74,7 +83,7 @@ static void term_read_caps(void)
     };
     terminal.control_codes = &tcc;
 
-    static const TermKeyMap special_keys[] = {
+    static TermKeyMap keymap[] = {
         KEY("kcuu1", KEY_UP),
         KEY("kcud1", KEY_DOWN),
         KEY("kcub1", KEY_LEFT),
@@ -97,72 +106,43 @@ static void term_read_caps(void)
         KEY("kf10", KEY_F10),
         KEY("kf11", KEY_F11),
         KEY("kf12", KEY_F12),
+
+        KEY("kUP", MOD_SHIFT | KEY_UP),
+        KEY("kDN", MOD_SHIFT | KEY_DOWN),
+        KEY("kLFT", MOD_SHIFT | KEY_LEFT),
+        KEY("kRIT", MOD_SHIFT | KEY_RIGHT),
+        KEY("kDC", MOD_SHIFT | KEY_DELETE),
+        KEY("kPRV", MOD_SHIFT | KEY_PAGE_UP),
+        KEY("kNXT", MOD_SHIFT | KEY_PAGE_DOWN),
+        KEY("kHOM", MOD_SHIFT | KEY_HOME),
+        KEY("kEND", MOD_SHIFT | KEY_END),
+
+        XKEYS("kUP", "", KEY_UP),
+        XKEYS("kDN", "", KEY_DOWN),
+        XKEYS("kLFT", "", KEY_LEFT),
+        XKEYS("kRIT", "", KEY_RIGHT),
+        XKEYS("kDC", "", KEY_DELETE),
+        XKEYS("kPRV", "", KEY_PAGE_UP),
+        XKEYS("kNXT", "", KEY_PAGE_DOWN),
+        XKEYS("kHOM", "", KEY_HOME),
+        XKEYS("kEND", "", KEY_END),
     };
 
-    // See: user_caps(5)
-    static const TermKeyMap extended_keys[] = {
-        KEY("kUP", KEY_UP),
-        KEY("kDN", KEY_DOWN),
-        KEY("kLFT", KEY_LEFT),
-        KEY("kRIT", KEY_RIGHT),
-        KEY("kDC", KEY_DELETE),
-        KEY("kPRV", KEY_PAGE_UP),
-        KEY("kNXT", KEY_PAGE_DOWN),
-        KEY("kHOM", KEY_HOME),
-        KEY("kEND", KEY_END),
-    };
+    static_assert(ARRAY_COUNT(keymap) == 22 + 9 + (9 * 7));
 
-    static const TermKeyMap extended_key_suffixes[] = {
-        KEY("", MOD_SHIFT),
-        KEY("3", MOD_META),
-        KEY("4", MOD_SHIFT | MOD_META),
-        KEY("5", MOD_CTRL),
-        KEY("6", MOD_SHIFT | MOD_CTRL),
-        KEY("7", MOD_META | MOD_CTRL),
-        KEY("8", MOD_SHIFT | MOD_META | MOD_CTRL)
-    };
-
-    static TermKeyMap keymap[85];
-    size_t keymap_length = 0;
-
-    static_assert (
-        ARRAY_COUNT(keymap) ==
-        (ARRAY_COUNT(extended_keys) * ARRAY_COUNT(extended_key_suffixes))
-        + ARRAY_COUNT(special_keys)
-    );
-
-    for (size_t i = 0; i < ARRAY_COUNT(special_keys); i++) {
-        const char *const code = curses_str_cap(special_keys[i].code);
+    size_t n = 0;
+    for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
+        const char *const code = curses_str_cap(keymap[i].code);
         if (code && code[0] != '\0') {
-            keymap[keymap_length++] = (TermKeyMap) {
-                .code = code,
-                .code_length = strlen(code),
-                .key = special_keys[i].key
-            };
-        }
-    }
-
-    for (size_t i = 0; i < ARRAY_COUNT(extended_key_suffixes); i++) {
-        const char *const suffix = extended_key_suffixes[i].code;
-        const Key modifiers = extended_key_suffixes[i].key;
-        for (size_t j = 0; j < ARRAY_COUNT(extended_keys); j++) {
-            char cap[8];
-            int nc = snprintf(cap, 8, "%s%s", extended_keys[j].code, suffix);
-            BUG_ON(nc < 3); // Shortest should be strlen("kUP") == 3
-            BUG_ON(nc > 5); // Longest should be strlen("kEND8") == 5
-            const char *const code = curses_str_cap(cap);
-            if (code && code[0] != '\0') {
-                keymap[keymap_length++] = (TermKeyMap) {
-                    .code = code,
-                    .code_length = strlen(code),
-                    .key = modifiers | extended_keys[j].key
-                };
-            }
+            keymap[n].code = code;
+            keymap[n].code_length = strlen(code);
+            keymap[n].key = keymap[i].key;
+            n++;
         }
     }
 
     terminal.keymap = keymap;
-    terminal.keymap_length = keymap_length;
+    terminal.keymap_length = n;
 }
 
 static void term_init_fallback(const char *const term)
@@ -204,15 +184,6 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
-#define XTERM_COMBO_KEYS(p, s, key) \
-    KEY(p "2" s, key | MOD_SHIFT), \
-    KEY(p "3" s, key | MOD_META), \
-    KEY(p "4" s, key | MOD_SHIFT | MOD_META), \
-    KEY(p "5" s, key | MOD_CTRL), \
-    KEY(p "6" s, key | MOD_SHIFT | MOD_CTRL), \
-    KEY(p "7" s, key | MOD_META | MOD_CTRL), \
-    KEY(p "8" s, key | MOD_SHIFT | MOD_META | MOD_CTRL)
-
 static const TermKeyMap xterm_keymap[] = {
     KEY("\033OA", KEY_UP),
     KEY("\033[A", KEY_UP),
@@ -244,16 +215,16 @@ static const TermKeyMap xterm_keymap[] = {
     KEY("\033[24~", KEY_F12),
     KEY("\033[Z", MOD_SHIFT | '\t'),
 
-    XTERM_COMBO_KEYS("\033[1;", "A", KEY_UP),
-    XTERM_COMBO_KEYS("\033[1;", "B", KEY_DOWN),
-    XTERM_COMBO_KEYS("\033[1;", "C", KEY_RIGHT),
-    XTERM_COMBO_KEYS("\033[1;", "D", KEY_LEFT),
-    XTERM_COMBO_KEYS("\033[1;", "F", KEY_END),
-    XTERM_COMBO_KEYS("\033[1;", "H", KEY_HOME),
-    XTERM_COMBO_KEYS("\033[2;", "~", KEY_INSERT),
-    XTERM_COMBO_KEYS("\033[3;", "~", KEY_DELETE),
-    XTERM_COMBO_KEYS("\033[5;", "~", KEY_PAGE_UP),
-    XTERM_COMBO_KEYS("\033[6;", "~", KEY_PAGE_DOWN),
+    XKEYS("\033[1;", "A", KEY_UP),
+    XKEYS("\033[1;", "B", KEY_DOWN),
+    XKEYS("\033[1;", "C", KEY_RIGHT),
+    XKEYS("\033[1;", "D", KEY_LEFT),
+    XKEYS("\033[1;", "F", KEY_END),
+    XKEYS("\033[1;", "H", KEY_HOME),
+    XKEYS("\033[2;", "~", KEY_INSERT),
+    XKEYS("\033[3;", "~", KEY_DELETE),
+    XKEYS("\033[5;", "~", KEY_PAGE_UP),
+    XKEYS("\033[6;", "~", KEY_PAGE_DOWN),
 
     // Fix keypad when numlock is off
     KEY("\033Oo", '/'),
