@@ -12,7 +12,7 @@ enum {
     X = ASCII_UPPER | ASCII_HEX_UPPER,
 };
 
-const uint8_t dte_ascii_table[256] = {
+const unsigned char dte_ascii_table[256] = {
     ['\t'] = S, ['\n'] = S, ['\r'] = S, [' '] = S,
 
     ['0'] = D, ['1'] = D, ['2'] = D, ['3'] = D, ['4'] = D,
