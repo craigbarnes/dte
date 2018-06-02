@@ -23,7 +23,7 @@ ft -b gitrebase git-rebase-todo
 ft -b indent .indent.pro
 ft -b ini \
     .editorconfig .gitconfig .gitmodules mimeapps.list \
-    pacman.conf yum.conf
+    pacman.conf terminalrc yum.conf
 ft -b json .jshintrc
 ft -b lua .luacov .luacheckrc config.ld rockspec.in
 ft -b meson meson.build meson_options.txt
