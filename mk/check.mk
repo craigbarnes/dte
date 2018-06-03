@@ -5,8 +5,7 @@ test_objects := $(addprefix build/test/, $(addsuffix .o, \
 
 test = build/test/test$(EXEC_SUFFIX)
 
-ifdef CC_DEPFILES
-  $(test_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
+ifndef NO_DEPS
   -include $(patsubst %.o, %.mk, $(test_objects))
 endif
 

@@ -63,9 +63,6 @@ else
   DEBUG = 1
 endif
 
-try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
-cc-option = $(call try-run, $(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
-
 CWARNS = \
     $(call cc-option,$(WARNINGS)) \
     $(foreach W, $(WARNINGS_EXTRA),$(call cc-option,$(W)))
@@ -102,8 +99,7 @@ else
   OPTCHECK = SILENT_BUILD='$(MAKE_S)' mk/optcheck.sh
 endif
 
-ifdef CC_DEPFILES
-  $(editor_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
+ifndef NO_DEPS
   -include $(patsubst %.o, %.mk, $(editor_objects))
 endif
 
