@@ -1,3 +1,7 @@
+streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
+cc-option = $(call try-run,$(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
+
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
@@ -8,29 +12,16 @@ _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
 TPUT = $(shell sh -c 'command -v tput')
 TPUT-V = $(if $(TPUT), $(shell $(TPUT) -V 2>/dev/null))
 CC_VERSION = $(shell $(CC) --version 2>/dev/null | head -n1)
-STREQ = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
 USERVARS = CC CFLAGS LDFLAGS LDLIBS DEBUG
 
-try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
-cc-option = $(call try-run,$(CC) $(1) -Werror -c -x c /dev/null -o /dev/null,$(1),$(2))
-
-ifndef NO_DEPS
-  TRY_DEPFLAGS = $(call try-run, \
-    $(CC) -E -x c $(1) -MF /dev/null -o /dev/null /dev/null, \
-    $(strip $(1) -MF $(patsubst %.o, %.mk, $@)) \
-  )
-  DEPFLAGS = $(or $(call TRY_DEPFLAGS, -MMD -MP), $(call TRY_DEPFLAGS, -MD))
-  $(call make-lazy,DEPFLAGS)
-endif
-
 AUTOVARS = \
     VERSION KERNEL \
-    $(if $(call STREQ,$(KERNEL),Linux), DISTRO) \
+    $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
-    TERM TPUT TPUT-V MAKE_VERSION SHELL CC_VERSION CC_DEPFILES
+    TERM TPUT TPUT-V MAKE_VERSION SHELL CC_VERSION
 
 vars:
 	@echo

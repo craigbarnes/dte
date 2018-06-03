@@ -39,6 +39,9 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     search-mode search selection spawn state str syntax tabbar tag \
     term-caps term uchar unicode view wbuf window xmalloc ))
 
+test_objects := $(addprefix build/test/, $(addsuffix .o, \
+    test_main ))
+
 ifdef WERROR
   WARNINGS += -Werror
 endif
@@ -100,12 +103,19 @@ else
 endif
 
 ifndef NO_DEPS
-  -include $(patsubst %.o, %.mk, $(editor_objects))
+  ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
+    $(editor_objects) $(test_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
+  else ifeq '$(call try-run,$(CC) -MD -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
+    $(editor_objects) $(test_objects): DEPFLAGS = -MD -MF $(patsubst %.o, %.mk, $@)
+  endif
+  -include $(patsubst %.o, %.mk, $(editor_objects) $(test_objects))
 endif
 
 dte = dte$(EXEC_SUFFIX)
+test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
+$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
 build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
 build/term-caps.o: build/term-caps.cflags
@@ -114,13 +124,17 @@ build/script.o: build/script.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
-$(dte):
+$(dte) $(test):
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
+
+$(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
+	$(E) CC $@
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
 
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
@@ -131,6 +145,9 @@ build/builtin-config.list: FORCE | build/
 build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
+
+build/test/: | build/
+	$(Q) mkdir -p $@
 
 build/:
 	$(Q) mkdir -p $@

@@ -1,20 +1,5 @@
 SYNTAX_LINT = $(AWK) -f test/syntax-lint.awk
 
-test_objects := $(addprefix build/test/, $(addsuffix .o, \
-    test_main ))
-
-test = build/test/test$(EXEC_SUFFIX)
-
-ifndef NO_DEPS
-  -include $(patsubst %.o, %.mk, $(test_objects))
-endif
-
-$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
-
-check: $(test) all
-	$(E) TEST $<
-	$(Q) $<
-
 check-commands: $(dte)
 	$(E) CMDTEST test/thai.dterc
 	$(Q) ./$(dte) -R -c 'eval cat test/thai.dterc'
@@ -29,16 +14,5 @@ check-syntax-files:
 	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
 	$(Q) ! $(SYNTAX_LINT) test/syntax-lint.dterc 2>/dev/null
 
-$(test):
-	$(E) LINK $@
-	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
-	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
-
-build/test/: | build/
-	$(Q) mkdir -p $@
-
-
-.PHONY: check check-commands check-syntax-files
+.PHONY: check-commands check-syntax-files

@@ -21,6 +21,10 @@ RM = rm -f
 
 all: $(dte)
 
+check: $(test) all
+	$(E) TEST $<
+	$(Q) ./$<
+
 install: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man1dir)'
@@ -49,5 +53,5 @@ clean:
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install uninstall tags clean
+.PHONY: all check install uninstall tags clean
 .DELETE_ON_ERROR:
