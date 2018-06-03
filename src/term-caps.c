@@ -1,5 +1,5 @@
 #include "term.h"
-#include "common.h" // For str_has_prefix
+#include "common.h"
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
