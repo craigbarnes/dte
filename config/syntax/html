@@ -2,7 +2,7 @@ syntax .html-entity
 
 state entity
     char # hash
-    char -b a-zA-Z0-9 name
+    char -b a-zA-Z name
     recolor error 1
     char "\n" END
     eat END error
