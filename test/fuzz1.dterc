@@ -1,0 +1,95 @@
+run mkdir -p build/test/
+cd build/test/
+insert -km "1\n2\n3\n"
+bof
+bol
+bolsf
+case
+clear
+copy
+paste -c
+cut
+delete
+delete-eol
+delete-word
+down
+eof
+eol
+eolsf
+erase
+erase-bol
+erase-word
+filter sort -r
+ft ext filetype
+hi default red black bold
+include -b binding/shift-select
+insert-builtin syntax/dte
+bof
+select
+eof
+#format-paragraph 72
+join
+left
+line 1000
+load-syntax c
+load-syntax python
+load-syntax css
+load-syntax html
+msg
+new-line
+next
+paste
+pgdown
+pgup
+prev
+refresh
+insert "hello world\n"
+repeat 2 replace l r
+right
+run true
+scroll-down
+scroll-pgdown
+scroll-pgup
+scroll-up
+search -H '^ *b'
+search -n
+search -p
+select
+repeat 5 right
+cut
+paste -c
+set set-window-title true
+setenv SETENVTEST 1111
+insert $SETENVTEST
+shift +2
+clear
+#tag
+toggle set-window-title
+up
+view 1
+wflip
+wnext
+word-bwd
+word-fwd
+wprev
+wresize
+wsplit
+wswap
+save -f out
+pass-through echo pass-through-test
+select
+pgdown
+unselect
+repeat 1000 undo
+redo
+undo
+compile -1s gitgrep sh -c 'grep -n ^# ../../mk/*'
+close
+wclose
+repeat 20 open
+repeat 6 move-tab left
+repeat 3 move-tab right
+move-tab 17
+open -g ../../docs/*
+#suspend
+quit -f

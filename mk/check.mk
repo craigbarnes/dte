@@ -22,6 +22,8 @@ check-commands: $(dte)
 	$(Q) diff -q build/test/thai-utf8.txt test/thai-utf8.txt
 	$(Q) diff -q build/test/thai-tis620.txt test/thai-tis620.txt
 	$(Q) $(RM) build/test/thai-*.txt
+	$(E) CMDTEST test/fuzz1.dterc
+	$(Q) ./$(dte) -R -c 'eval cat test/fuzz1.dterc'
 
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'
