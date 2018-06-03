@@ -4,7 +4,7 @@
 # in config/syntax/html.
 
 curl https://html.spec.whatwg.org/entities.json |
-    sed -n 's/^ *"&\([A-Za-z0-9]\+\);\?".*/\1/p' |
+    sed -n 's/^ *"&\([A-Za-z0-9]\+\)":.*/\1/p' |
     sort |
     uniq |
     tr '\n' ' ' |
