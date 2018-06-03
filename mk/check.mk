@@ -8,6 +8,8 @@ check-commands: $(dte)
 	$(Q) $(RM) build/test/thai-*.txt
 	$(E) CMDTEST test/fuzz1.dterc
 	$(Q) ./$(dte) -R -c 'eval cat test/fuzz1.dterc'
+	$(E) RCTEST test/env.dterc
+	$(Q) ./$(dte) -r test/env.dterc -c 'quit -f'
 
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'

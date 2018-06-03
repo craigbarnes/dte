@@ -340,14 +340,13 @@ void insert_ch(CodePoint ch)
 {
     size_t del_count = 0;
     size_t ins_count = 0;
-    char *ins;
 
     if (ch == '\n') {
         insert_nl();
         return;
     }
 
-    ins = xmalloc(8);
+    char *ins = xmalloc(8);
     if (view->selection) {
         // Prepare deleted text (selection)
         del_count = prepare_selection(view);

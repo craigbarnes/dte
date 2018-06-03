@@ -16,7 +16,13 @@ static char *expand_dte_home(void)
 
 static char *expand_file(void)
 {
+    if (editor.status != EDITOR_RUNNING) {
+        return xstrdup("");
+    }
+
+    BUG_ON(!window);
     View *v = window->view;
+    BUG_ON(!v);
 
     if (v->buffer->abs_filename == NULL) {
         return xstrdup("");
@@ -26,10 +32,16 @@ static char *expand_file(void)
 
 static char *expand_word(void)
 {
+    if (editor.status != EDITOR_RUNNING) {
+        return xstrdup("");
+    }
+
+    BUG_ON(!window);
     View *v = window->view;
+    BUG_ON(!v);
+
     size_t size;
     char *str = view_get_selection(v, &size);
-
     if (str != NULL) {
         xrenew(str, size + 1);
         str[size] = 0;
