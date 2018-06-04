@@ -115,7 +115,7 @@
         DO_PRAGMA(clang diagnostic push) \
         DO_PRAGMA(clang diagnostic ignored wflag)
     #define UNIGNORE_WARNINGS DO_PRAGMA(clang diagnostic pop)
-#elif GNUC_AT_LEAST(3, 0)
+#elif GNUC_AT_LEAST(4, 6)
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(GCC diagnostic push) \
         DO_PRAGMA(GCC diagnostic ignored wflag)
