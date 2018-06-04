@@ -68,7 +68,9 @@ static inline size_t iconv_wrapper (
 
     return iconv(cd, inbuf, inbytesleft, outbuf, outbytesleft);
 
-    UNIGNORE_WARNINGS
+    #ifdef __NetBSD__
+     UNIGNORE_WARNINGS
+    #endif
 }
 
 static void encode_replacement(struct cconv *c)
