@@ -110,24 +110,19 @@
     #define static_assert(x)
 #endif
 
-// This macro suppresses warnings about dicarded const qualifiers
-// It's only defined for Clang, since GCC is lacking the following
-// features required for an acceptable implementation:
-//
-// 1. The ability to apply pragmas at the granularity of individual
-//    function arguments instead of whole statements.
-// 2. A flag that only suppresses discarded qualifier warnings without
-//    also suppressing incompatible-pointer-types warnings.
-// 3. Some mechanism equivalent to __has_warning().
-//
-#if defined(__clang__) && HAS_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
-    #define IGNORE_DISCARDED_QUALIFIERS(x) \
+#ifdef __clang__
+    #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \
-        DO_PRAGMA(clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers") \
-        (x) \
-        DO_PRAGMA(clang diagnostic pop)
+        DO_PRAGMA(clang diagnostic ignored wflag)
+    #define UNIGNORE_WARNINGS DO_PRAGMA(clang diagnostic pop)
+#elif GNUC_AT_LEAST(3, 0)
+    #define IGNORE_WARNING(wflag) \
+        DO_PRAGMA(GCC diagnostic push) \
+        DO_PRAGMA(GCC diagnostic ignored wflag)
+    #define UNIGNORE_WARNINGS DO_PRAGMA(GCC diagnostic pop)
 #else
-    #define IGNORE_DISCARDED_QUALIFIERS(x) (x)
+    #define IGNORE_WARNING(wflag)
+    #define UNIGNORE_WARNINGS
 #endif
 
 #endif
