@@ -22,7 +22,7 @@ ft -b gitcommit COMMIT_EDITMSG
 ft -b gitrebase git-rebase-todo
 ft -b indent .indent.pro
 ft -b ini \
-    .editorconfig .gitconfig .gitmodules mimeapps.list \
+    .editorconfig .gitconfig gitconfig .gitmodules mimeapps.list \
     pacman.conf terminalrc yum.conf
 ft -b json .jshintrc
 ft -b lua .luacov .luacheckrc config.ld rockspec.in
