@@ -42,6 +42,8 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     test_main ))
 
+all_objects := $(editor_objects) $(test_objects)
+
 ifdef WERROR
   WARNINGS += -Werror
 endif
@@ -103,19 +105,19 @@ else
 endif
 
 ifndef NO_DEPS
-  ifeq '$(call try-run,$(CC) -MMD -MP -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-    $(editor_objects) $(test_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
-  else ifeq '$(call try-run,$(CC) -MD -MF /dev/null -c -x c /dev/null -o /dev/null,y,n)' 'y'
-    $(editor_objects) $(test_objects): DEPFLAGS = -MD -MF $(patsubst %.o, %.mk, $@)
+  ifneq '' '$(call cc-option,-MMD -MP -MF /dev/null)'
+    $(all_objects): DEPFLAGS = -MMD -MP -MF $(patsubst %.o, %.mk, $@)
+  else ifneq '' '$(call cc-option,-MD -MF /dev/null)'
+    $(all_objects): DEPFLAGS = -MD -MF $(patsubst %.o, %.mk, $@)
   endif
-  -include $(patsubst %.o, %.mk, $(editor_objects) $(test_objects))
+  -include $(patsubst %.o, %.mk, $(all_objects))
 endif
 
 dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
-$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
+$(test): $(filter-out build/main.o, $(all_objects))
 build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
 build/term-caps.o: build/term-caps.cflags
