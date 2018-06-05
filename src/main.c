@@ -105,13 +105,23 @@ static void showkey_loop(void)
     term_cooked();
 }
 
+static const char usage[] =
+    "Usage: %s [OPTIONS] [[+LINE] FILE]...\n\n"
+    "Options:\n"
+    "   -c COMMAND  Run COMMAND after editor starts\n"
+    "   -t CTAG     Jump to source location of CTAG\n"
+    "   -r RCFILE   Read user config from RCFILE instead of ~/.dte/rc\n"
+    "   -b NAME     Print built-in config matching NAME and exit\n"
+    "   -B          Print list of built-in config names and exit\n"
+    "   -R          Don't load built-in, default config\n"
+    "   -K          Start editor in \"showkey\" mode\n"
+    "   -h          Display help summary and exit\n"
+    "   -V          Display version number and exit\n"
+    "\n";
+
 int main(int argc, char *argv[])
 {
     static const char optstring[] = "hBKRVb:c:t:r:";
-    static const char opts[] =
-        "[-hbBKRV] [-c command] [-t tag] [-r rcfile] [[+line] file]...";
-    static_assert(ARRAY_COUNT(opts) < 70);
-
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
@@ -149,11 +159,10 @@ int main(int argc, char *argv[])
             puts("(C) 2010-2015 Timo Hirvonen");
             return 0;
         case 'h':
-            fprintf(stderr, "Usage: %s %s\n", argv[0], opts);
+            printf(usage, argv[0]);
             return 0;
         case '?':
         default:
-            fprintf(stderr, "Usage: %s %s\n", argv[0], opts);
             return 1;
         }
     }
