@@ -113,7 +113,7 @@ static const char usage[] =
     "   -r RCFILE   Read user config from RCFILE instead of ~/.dte/rc\n"
     "   -b NAME     Print built-in config matching NAME and exit\n"
     "   -B          Print list of built-in config names and exit\n"
-    "   -R          Don't load built-in, default config\n"
+    "   -R          Don't read user config file\n"
     "   -K          Start editor in \"showkey\" mode\n"
     "   -h          Display help summary and exit\n"
     "   -V          Display version number and exit\n"
