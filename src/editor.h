@@ -49,6 +49,11 @@ typedef struct {
 
 extern EditorState editor;
 
+static inline void mark_everything_changed(void)
+{
+    editor.everything_changed = true;
+}
+
 void init_editor_state(void);
 char *editor_file(const char *name);
 char get_confirmation(const char *choices, const char *format, ...) PRINTF(2);

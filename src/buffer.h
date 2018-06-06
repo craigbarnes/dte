@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <limits.h>
 #include "block-iter.h"
 #include "list.h"
@@ -11,7 +12,7 @@
 #include "ptr-array.h"
 #include "change.h"
 #include "syntax.h"
-#include "editor.h"
+#include "unicode.h"
 
 typedef struct Buffer {
     ListHead blocks;
@@ -63,11 +64,6 @@ static inline void mark_all_lines_changed(Buffer *b)
 {
     b->changed_line_min = 0;
     b->changed_line_max = INT_MAX;
-}
-
-static inline void mark_everything_changed(void)
-{
-    editor.everything_changed = true;
 }
 
 static inline bool buffer_modified(const Buffer *b)
