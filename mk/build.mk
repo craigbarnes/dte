@@ -36,8 +36,8 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     frame git-open highlight history indent input-special key load-save \
     lock main move msg normal-mode obuf options parse-args parse-command \
     path ptr-array regexp run screen screen-tabbar screen-view script \
-    search-mode search selection spawn state str syntax tabbar tag \
-    term-caps term uchar unicode view wbuf window xmalloc ))
+    search-mode search selection spawn state str string-view syntax \
+    tabbar tag term-caps term uchar unicode view wbuf window xmalloc ))
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     test_main ))

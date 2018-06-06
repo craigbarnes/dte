@@ -3,6 +3,7 @@
 #include "regexp.h"
 #include "path.h"
 #include "ptr-array.h"
+#include "string-view.h"
 
 // Single filetype and extension/regexp pair.
 // Filetypes are not grouped by name to make it possible to order them freely.
@@ -46,12 +47,12 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
 // file.c.old~ -> c
 // file..old   -> old
 // file.old    -> old
-static char *get_ext(const char *const filename)
+static inline StringView get_ext(const char *const filename)
 {
     const char *ext = strrchr(filename, '.');
 
     if (!ext) {
-        return NULL;
+        return (StringView) {0};
     }
 
     ext++;
@@ -60,7 +61,7 @@ static char *get_ext(const char *const filename)
         ext_len--;
     }
     if (!ext_len) {
-        return NULL;
+        return (StringView) {0};
     }
 
     for (size_t i = 0; i < ARRAY_COUNT(ignore); i++) {
@@ -80,7 +81,11 @@ static char *get_ext(const char *const filename)
             break;
         }
     }
-    return xstrslice(ext, 0, ext_len);
+
+    return (StringView) {
+        .data = ext,
+        .length = ext_len
+    };
 }
 
 const char *find_ft (
@@ -91,7 +96,7 @@ const char *find_ft (
 ) {
     size_t filename_len = 0;
     const char *base = NULL;
-    char *ext = NULL;
+    StringView ext = {0};
     if (filename) {
         base = path_basename(filename);
         ext = get_ext(filename);
@@ -101,7 +106,7 @@ const char *find_ft (
         const FileType *ft = filetypes.ptrs[i];
         switch (ft->type) {
         case FT_EXTENSION:
-            if (!ext || !streq(ext, ft->str)) {
+            if (!ext.length || !string_view_equal_cstr(&ext, ft->str)) {
                 continue;
             }
             break;
@@ -132,10 +137,8 @@ const char *find_ft (
             }
             break;
         }
-        free(ext);
         return ft->name;
     }
-    free(ext);
     return NULL;
 }
 
