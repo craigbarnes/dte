@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -Dm50 src/filetype/interpreters.gperf  */
+/* Command-line: gperf -m50 src/filetype/interpreters.gperf  */
 /* Computed positions: -k'1,3,7' */
 /* Filtered by: tools/gperf-filter.sed */
 
@@ -69,14 +69,16 @@ filetype_from_interpreter (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
     {
-       2,  4,  3,  4,  6,  3,  4,  5,  4,  5,  3,  3,  3,  6,
-       4,  4,  6,  5,  4,  5,  4,  5,  6,  3,  4,  4,  7,  4,
-       4,  4,  4,  5,  7,  3,  3,  3,  6,  3,  7,  7,  7,  6,
-      10
+       0,  0,  2,  0,  4,  3,  4,  6,  3,  4,  5,  4,  5,  3,
+       3,  3,  6,  4,  4,  6,  5,  4,  5,  4,  5,  6,  3,  4,
+       4,  7,  4,  4,  4,  4,  5,  7,  3,  3,  3,  6,  3,  7,
+       7,  7,  6,  0,  0,  0,  0,  0,  0, 10
     };
   static const FileTypeHashSlot wordlist[] =
     {
+      {"",0}, {"",0},
       {"sh", SHELL},
+      {"",0},
       {"sbcl", COMMONLISP},
       {"php", PHP},
       {"perl", PERL},
@@ -118,15 +120,8 @@ filetype_from_interpreter (register const char *str, register size_t len)
       {"python2", PYTHON},
       {"macruby", RUBY},
       {"bigloo", SCHEME},
+      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
       {"openrc-run", SHELL}
-    };
-
-  static const signed char lookup[] =
-    {
-      -1, -1,  0, -1,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
-      11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-      25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
-      39, 40, 41, -1, -1, -1, -1, -1, -1, 42
     };
 
   if (len <= INTERPRETERS_MAX_WORD_LENGTH && len >= INTERPRETERS_MIN_WORD_LENGTH)
@@ -134,20 +129,13 @@ filetype_from_interpreter (register const char *str, register size_t len)
       register unsigned int key = ft_interpreter_hash (str, len);
 
       if (key <= INTERPRETERS_MAX_HASH_VALUE)
-        {
-          register int index = lookup[key];
+        if (len == lengthtable[key])
+          {
+            register const char *s = wordlist[key].key;
 
-          if (index >= 0)
-            {
-              if (len == lengthtable[index])
-                {
-                  register const char *s = wordlist[index].key;
-
-                  if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-                    return &wordlist[index];
-                }
-            }
-        }
+            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
+              return &wordlist[key];
+          }
     }
   return 0;
 }

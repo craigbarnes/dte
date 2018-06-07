@@ -5,6 +5,7 @@
 %define lookup-function-name filetype_from_extension
 %define hash-function-name ft_ext_hash
 %define constants-prefix EXTENSIONS_
+%define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;
 

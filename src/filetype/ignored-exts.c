@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -Dm50 src/filetype/ignored-exts.gperf  */
+/* Command-line: gperf -m50 src/filetype/ignored-exts.gperf  */
 /* Computed positions: -k'1,4' */
 /* Filtered by: tools/gperf-filter.sed */
 
@@ -64,12 +64,15 @@ is_ignored_extension (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
     {
-       3,  3,  6,  6,  7,  7,  3,  4,  8,  9,  7
+       0,  0,  0,  3,  3,  0,  6,  6,  7,  7,  3,  4,  8,  9,
+       7
     };
   static const char * const wordlist[] =
     {
+      "", "", "",
       "new",
       "bak",
+      "",
       "pacnew",
       "rpmnew",
       "pacsave",
@@ -81,31 +84,18 @@ is_ignored_extension (register const char *str, register size_t len)
       "pacorig"
     };
 
-  static const signed char lookup[] =
-    {
-      -1, -1, -1,  0,  1, -1,  2,  3,  4,  5,  6,  7,  8,  9,
-      10
-    };
-
   if (len <= IGNORED_EXTS_MAX_WORD_LENGTH && len >= IGNORED_EXTS_MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_ignored_ext_hash (str, len);
 
       if (key <= IGNORED_EXTS_MAX_HASH_VALUE)
-        {
-          register int index = lookup[key];
+        if (len == lengthtable[key])
+          {
+            register const char *s = wordlist[key];
 
-          if (index >= 0)
-            {
-              if (len == lengthtable[index])
-                {
-                  register const char *s = wordlist[index];
-
-                  if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-                    return s;
-                }
-            }
-        }
+            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
+              return s;
+          }
     }
   return 0;
 }

@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -Dm50 src/filetype/extensions.gperf  */
+/* Command-line: gperf -m50 -D src/filetype/extensions.gperf  */
 /* Computed positions: -k'1-2,$' */
 /* Filtered by: tools/gperf-filter.sed */
 

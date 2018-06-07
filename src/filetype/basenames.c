@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -Dm50 src/filetype/basenames.gperf  */
+/* Command-line: gperf -m50 src/filetype/basenames.gperf  */
 /* Computed positions: -k'1,11' */
 /* Filtered by: tools/gperf-filter.sed */
 
@@ -71,13 +71,14 @@ filetype_from_basename (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
     {
-       7,  8,  6,  7,  8,  9, 10,  8, 10, 13, 11, 15,  9,  9,
-      10, 11, 10, 11, 11,  7,  5, 17, 11,  7,  8, 13, 11,  8,
-      11, 10, 13, 11, 11, 11, 11,  9, 11, 14, 12,  8,  8,  8,
-      15
+       0,  0,  0,  0,  0,  0,  0,  7,  8,  6,  7,  8,  9, 10,
+       8, 10, 13, 11, 15,  9,  9, 10, 11, 10, 11, 11,  7,  5,
+      17, 11,  7,  8, 13, 11,  8, 11, 10, 13, 11, 11, 11, 11,
+       9, 11, 14, 12,  8,  8,  8, 15
     };
   static const FileTypeHashSlot wordlist[] =
     {
+      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
       {"Capfile", RUBY},
       {"makefile", MAKE},
       {".drirc", XML},
@@ -123,33 +124,18 @@ filetype_from_basename (register const char *str, register size_t len)
       {"git-rebase-todo", GITREBASE}
     };
 
-  static const signed char lookup[] =
-    {
-      -1, -1, -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,
-       7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
-      35, 36, 37, 38, 39, 40, 41, 42
-    };
-
   if (len <= BASENAMES_MAX_WORD_LENGTH && len >= BASENAMES_MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_base_hash (str, len);
 
       if (key <= BASENAMES_MAX_HASH_VALUE)
-        {
-          register int index = lookup[key];
+        if (len == lengthtable[key])
+          {
+            register const char *s = wordlist[key].key;
 
-          if (index >= 0)
-            {
-              if (len == lengthtable[index])
-                {
-                  register const char *s = wordlist[index].key;
-
-                  if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-                    return &wordlist[index];
-                }
-            }
-        }
+            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
+              return &wordlist[key];
+          }
     }
   return 0;
 }

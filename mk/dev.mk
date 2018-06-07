@@ -2,7 +2,8 @@ DIST_VERSIONS = 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
 DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 GPERF = gperf
-GPERF_GEN = $(GPERF) -Dm50 $(1).gperf | sed -f tools/gperf-filter.sed > $(1).c
+GPERF_FILTER = sed -f tools/gperf-filter.sed
+GPERF_GEN = $(GPERF) -m50 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
 
 dist: $(firstword $(DIST_ALL))
 dist-all: $(DIST_ALL)
@@ -20,8 +21,8 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(Q) cp $< $@
 
 gperf-gen:
+	$(call GPERF_GEN, src/filetype/extensions, -D)
 	$(call GPERF_GEN, src/filetype/basenames)
-	$(call GPERF_GEN, src/filetype/extensions)
 	$(call GPERF_GEN, src/filetype/interpreters)
 	$(call GPERF_GEN, src/filetype/ignored-exts)
 
