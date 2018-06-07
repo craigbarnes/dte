@@ -58,8 +58,7 @@
     #define PRINTF(x)
     #define PURE
     #define CONST_FN
-    #define CONSTRUCTOR
-    #define DESTRUCTOR
+    // CONSTRUCTOR and DESTRUCTOR deliberately left undefined
 #endif
 
 #if GNUC_AT_LEAST(3, 0) && defined(__OPTIMIZE__)
