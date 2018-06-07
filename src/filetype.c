@@ -210,10 +210,10 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
 // file.old    -> old
 static inline StringView get_ext(const char *const filename)
 {
+    StringView strview = STRING_VIEW_INIT;
     const char *ext = strrchr(filename, '.');
-
     if (!ext) {
-        return (StringView) {0};
+        return strview;
     }
 
     ext++;
@@ -222,7 +222,7 @@ static inline StringView get_ext(const char *const filename)
         ext_len--;
     }
     if (!ext_len) {
-        return (StringView) {0};
+        return strview;
     }
 
     if (is_ignored_extension(ext, ext_len)) {
@@ -240,10 +240,9 @@ static inline StringView get_ext(const char *const filename)
         }
     }
 
-    return (StringView) {
-        .data = ext,
-        .length = ext_len
-    };
+    strview.data = ext;
+    strview.length = ext_len;
+    return strview;
 }
 
 const char *find_ft (
@@ -254,7 +253,7 @@ const char *find_ft (
 ) {
     size_t filename_len = 0;
     const char *base = NULL;
-    StringView ext = {0};
+    StringView ext = STRING_VIEW_INIT;
     if (filename) {
         base = path_basename(filename);
         ext = get_ext(base);
