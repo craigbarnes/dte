@@ -430,6 +430,12 @@ static void cmd_ft(const char *pf, char **args)
         }
         pf++;
     }
+
+    if (args[0][0] == '\0') {
+        error_msg("Filetype can't be blank");
+        return;
+    }
+
     for (size_t i = 1; args[i]; i++) {
         add_filetype(args[0], args[i], dt);
     }

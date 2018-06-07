@@ -3,6 +3,7 @@
 #include "common.h"
 #include "path.h"
 #include "encoding.h"
+#include "filetype.h"
 
 #include <locale.h>
 #include <langinfo.h>
@@ -73,12 +74,35 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
+static void test_find_ft(void)
+{
+    static const struct ft_test {
+        const char *filename, *expected_filetype;
+    } tests[] = {
+        {"/usr/local/include/lib.h", "c"},
+        {"test.cc~", "c"},
+        {"test.c.pacnew", "c"},
+        {"test.lua", "lua"},
+        {"test.py", "python"},
+        {"makefile", "make"},
+        {"GNUmakefile", "make"},
+        {".file.yml", "yaml"},
+        {"/etc/nginx.conf", "nginx"},
+    };
+    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+        const struct ft_test *t = &tests[i];
+        const char *result = find_ft(t->filename, NULL, NULL, 0);
+        EXPECT_STREQ(result, t->expected_filetype);
+    }
+}
+
 int main(void)
 {
     init_editor_state();
 
     test_relative_filename();
     test_detect_encoding_from_bom();
+    test_find_ft();
 
     return failed ? 1 : 0;
 }

@@ -24,7 +24,6 @@ tools/** export-ignore
 *.yml code
 *.css code
 tools/git-hooks/* code
-docs/*.[15] code linguist-generated=true
 LICENSE text
 GNUmakefile text
 makefile text
@@ -36,3 +35,7 @@ config/README.md -dterc
 *.md markdown
 *.html html
 lib/** -whitespace linguist-vendored
+docs/*.[15] code linguist-generated
+src/filetype/basenames.c text linguist-generated
+src/filetype/extensions.c text linguist-generated
+src/filetype/interpreters.c text linguist-generated

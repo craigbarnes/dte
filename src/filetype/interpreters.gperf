@@ -1,0 +1,54 @@
+%struct-type
+%omit-struct-type
+%readonly-tables
+%compare-lengths
+%define lookup-function-name filetype_from_interpreter
+%define hash-function-name ft_interpreter_hash
+%define constants-prefix INTERPRETERS_
+%define slot-name key
+FileTypeHashSlot;
+
+%%
+ash, SHELL
+awk, AWK
+bash, SHELL
+bigloo, SCHEME
+ccl, COMMONLISP
+chicken, SCHEME
+clisp, COMMONLISP
+coffee, COFFEESCRIPT
+crystal, RUBY
+dash, SHELL
+ecl, COMMONLISP
+gawk, AWK
+gmake, MAKE
+groovy, GROOVY
+guile, SCHEME
+jruby, RUBY
+ksh, SHELL
+lisp, COMMONLISP
+luajit, LUA
+lua, LUA
+macruby, RUBY
+make, MAKE
+mawk, AWK
+mksh, SHELL
+nawk, AWK
+node, JAVASCRIPT
+openrc-run, SHELL
+pdksh, SHELL
+perl, PERL
+php, PHP
+python2, PYTHON
+python3, PYTHON
+python, PYTHON
+racket, SCHEME
+rake, RUBY
+ruby, RUBY
+sbcl, COMMONLISP
+sed, SED
+sh, SHELL
+tcc, C
+tclsh, TCL
+wish, TCL
+zsh, SHELL

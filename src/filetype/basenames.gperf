@@ -1,0 +1,54 @@
+%struct-type
+%omit-struct-type
+%readonly-tables
+%compare-lengths
+%define lookup-function-name filetype_from_basename
+%define hash-function-name ft_base_hash
+%define constants-prefix BASENAMES_
+%define slot-name key
+FileTypeHashSlot;
+
+%%
+APKBUILD, SHELL
+BSDmakefile, MAKE
+BUILD.bazel, PYTHON
+Capfile, RUBY
+.clang-format, YAML
+COMMIT_EDITMSG, GITCOMMIT
+config.ld, LUA
+Dockerfile, DOCKER
+Doxyfile, DOXYGEN
+.drirc, XML
+drirc, XML
+.editorconfig, INI
+Gemfile.lock, RUBY
+Gemfile, RUBY
+.gitconfig, INI
+gitconfig, INI
+.gitmodules, INI
+git-rebase-todo, GITREBASE
+GNUmakefile, MAKE
+.indent.pro, INDENT
+.inputrc, INPUTRC
+inputrc, INPUTRC
+.jshintrc, JSON
+.luacheckrc, LUA
+.luacov, LUA
+Makefile.am, MAKE
+Makefile.in, MAKE
+makefile, MAKE
+Makefile, MAKE
+meson.build, MESON
+meson_options.txt, MESON
+mimeapps.list, INI
+mkinitcpio.conf, SHELL
+nginx.conf, NGINX
+pacman.conf, INI
+PKGBUILD, SHELL
+Rakefile, RUBY
+robots.txt, ROBOTSTXT
+rockspec.in, LUA
+terminalrc, INI
+texmf.cnf, TEXMFCNF
+Vagrantfile, RUBY
+yum.conf, INI

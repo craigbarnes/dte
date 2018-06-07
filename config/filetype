@@ -2,83 +2,13 @@
 # identifer. This identifier is then used to decide which syntax
 # highlighter and local options to use when opening files.
 
-# "ft -i" matches the interpreter name extracted from the Unix shebang (if any)
-ft -i awk awk gawk nawk
-ft -i c tcc
-ft -i javascript node
-ft -i lua lua luajit
-ft -i make make gmake
-ft -i perl perl
-ft -i php php
-ft -i python python python2 python3
-ft -i ruby ruby macruby rake jruby crystal
-ft -i sh sh bash ash dash ksh mksh pdksh zsh openrc-run
-ft -i tcl wish
-
-# "ft -b" matches the file basename
-ft -b config Doxyfile .inputrc inputrc
-ft -b docker Dockerfile
-ft -b gitcommit COMMIT_EDITMSG
-ft -b gitrebase git-rebase-todo
-ft -b indent .indent.pro
-ft -b ini \
-    .editorconfig .gitconfig gitconfig .gitmodules mimeapps.list \
-    pacman.conf terminalrc yum.conf
-ft -b json .jshintrc
-ft -b lua .luacov .luacheckrc config.ld rockspec.in
-ft -b meson meson.build meson_options.txt
-ft -b nginx nginx.conf
-ft -b python BUILD.bazel
-ft -b robotstxt robots.txt
-ft -b ruby Capfile Gemfile Gemfile.lock Rakefile Vagrantfile
-ft -b sh APKBUILD PKGBUILD mkinitcpio.conf
-ft -b texmfcnf texmf.cnf
-ft -b xml drirc .drirc
-ft -b yaml .clang-format
-
 # "ft -f" uses a regular expression to match the filename
 ft -f config '^/boot/grub/menu\.lst$|/\.?git/?attributes$|^/etc/(hosts|fstab)$'
 ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
 ft -f ini '/\.git/config$|^/etc/systemd/.+\.conf$|^/etc/krb5\.conf$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
-ft -f make '/(GNU|BSD)?makefile$|/Makefile(\.am|\.in)?$'
 ft -f nginx '^/etc/nginx/'
 ft -f sh '^/etc/default/|^/etc/profile$|(\.|/)bash(rc|_profile|_logout)$'
-
-# "ft" matches against the filename extension
-ft awk awk gawk mawk nawk
-ft c c h cpp hpp cc hh C H cxx hxx c++
-ft config doxy
-ft csharp cs
-ft css css
-ft d d di
-ft diff diff patch
-ft docker dockerfile
-ft dte dterc
-ft go go
-ft html html htm xhtml
-ft ini ini pls desktop override flatpakrepo flatpakref
-ft ini automount mount path service slice socket target timer
-ft java java
-ft javascript js
-ft json json geojson topojson
-ft lua lua rockspec
-ft mail eml
-ft make mk mak
-ft markdown md mkd mkdn markdown
-ft nginx nginx nginxconf
-ft perl perl pl
-ft php php php3 php4
-ft python py py3 wsgi
-ft roff 1 2 3 4 5 6 7 8 9
-ft ruby rb rake gemspec cr
-ft sh sh bash ksh zsh ebuild
-ft sql sql
-ft tcl tcl
-ft tex tex cls ltx sty dtx ins bbl
-ft vala vala vapi
-ft xml xml xsd doap rdf
-ft yaml yaml yml
 
 # "ft -c" uses a regular expression to match the first line of the file
 ft -c html '^<!(doctype|DOCTYPE) (html|HTML)(>$| )'
@@ -86,9 +16,6 @@ ft -c ini '^\[wrap-file\]$'
 ft -c roff '^\.TH [A-Z0-9]'
 ft -c sh '^#.* shell-script'
 ft -c xml '^<\?xml( |$)'
-
-# This catch-all rule comes last, to give priority to more specific rules above
-ft -f config '^/etc/.*\.conf$'
 
 # The "option" command sets default local options for specific file types
 

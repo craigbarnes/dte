@@ -50,12 +50,16 @@
     #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
     #define PURE __attribute__((__pure__))
     #define CONST_FN __attribute__((__const__))
+    #define CONSTRUCTOR __attribute__((__constructor__))
+    #define DESTRUCTOR __attribute__((__destructor__))
 #else
     #define UNUSED
     #define MALLOC
     #define PRINTF(x)
     #define PURE
     #define CONST_FN
+    #define CONSTRUCTOR
+    #define DESTRUCTOR
 #endif
 
 #if GNUC_AT_LEAST(3, 0) && defined(__OPTIMIZE__)
