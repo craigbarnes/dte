@@ -66,7 +66,7 @@ ft_base_hash (register const char *str, register size_t len)
   return hval;
 }
 
-static const FileTypeHashSlot *
+static const FileTypeHashSlot*
 filetype_from_basename (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =

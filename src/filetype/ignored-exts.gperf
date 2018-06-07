@@ -1,0 +1,18 @@
+%readonly-tables
+%compare-lengths
+%define lookup-function-name is_ignored_extension
+%define hash-function-name ft_ignored_ext_hash
+%define constants-prefix IGNORED_EXTS_
+
+%%
+bak
+dpkg-dist
+dpkg-old
+new
+old
+orig
+pacnew
+pacorig
+pacsave
+rpmnew
+rpmsave

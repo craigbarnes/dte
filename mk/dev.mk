@@ -23,6 +23,7 @@ gperf-gen:
 	$(call GPERF_GEN, src/filetype/basenames)
 	$(call GPERF_GEN, src/filetype/extensions)
 	$(call GPERF_GEN, src/filetype/interpreters)
+	$(call GPERF_GEN, src/filetype/ignored-exts)
 
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \

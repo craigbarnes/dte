@@ -82,12 +82,19 @@ static void test_find_ft(void)
         {"/usr/local/include/lib.h", "c"},
         {"test.cc~", "c"},
         {"test.c.pacnew", "c"},
+        {"test.c.pacnew~", "c"},
         {"test.lua", "lua"},
         {"test.py", "python"},
         {"makefile", "make"},
         {"GNUmakefile", "make"},
         {".file.yml", "yaml"},
         {"/etc/nginx.conf", "nginx"},
+        {"file.c.old~", "c"},
+        {"file..rb", "ruby"},
+        {"file.rb", "ruby"},
+        {"", NULL},
+        {"/", NULL},
+        {"/etc../etc.c.old/c.old", NULL},
     };
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const struct ft_test *t = &tests[i];

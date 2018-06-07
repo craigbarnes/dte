@@ -169,6 +169,7 @@ typedef struct {
 #include "filetype/basenames.c"
 #include "filetype/extensions.c"
 #include "filetype/interpreters.c"
+#include "filetype/ignored-exts.c"
 
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
@@ -179,11 +180,6 @@ typedef struct {
 } FileType;
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
-
-static const char ignore[][16] = {
-    "bak", "dpkg-dist", "dpkg-old", "new", "old", "orig", "pacnew",
-    "pacorig", "pacsave", "rpmnew", "rpmsave",
-};
 
 void add_filetype(const char *name, const char *str, enum detect_type type)
 {
@@ -229,21 +225,18 @@ static inline StringView get_ext(const char *const filename)
         return (StringView) {0};
     }
 
-    for (size_t i = 0; i < ARRAY_COUNT(ignore); i++) {
-        if (!strncmp(ignore[i], ext, ext_len) && !ignore[i][ext_len]) {
-            int idx = -2;
-            while (ext + idx >= filename) {
-                if (ext[idx] == '.') {
-                    int len = -idx - 2;
-                    if (len) {
-                        ext -= len + 1;
-                        ext_len = len;
-                    }
-                    break;
+    if (is_ignored_extension(ext, ext_len)) {
+        int idx = -2;
+        while (ext + idx >= filename) {
+            if (ext[idx] == '.') {
+                int len = -idx - 2;
+                if (len) {
+                    ext -= len + 1;
+                    ext_len = len;
                 }
-                idx--;
+                break;
             }
-            break;
+            idx--;
         }
     }
 
@@ -264,7 +257,7 @@ const char *find_ft (
     StringView ext = {0};
     if (filename) {
         base = path_basename(filename);
-        ext = get_ext(filename);
+        ext = get_ext(base);
         filename_len = strlen(filename);
     }
 

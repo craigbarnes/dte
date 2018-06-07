@@ -8,7 +8,7 @@
 
 31,32 {/^$/d}
 
-s/^\(const FileTypeHashSlot\)/static \1/
+s/^const \(FileTypeHashSlot\|char\) \*$/static const \1*/
 
 /^\#line/d
 

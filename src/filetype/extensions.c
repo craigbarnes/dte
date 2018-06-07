@@ -57,7 +57,7 @@ ft_ext_hash (register const char *str, register size_t len)
   return hval + asso_values[(unsigned char)str[len - 1]];
 }
 
-static const FileTypeHashSlot *
+static const FileTypeHashSlot*
 filetype_from_extension (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
