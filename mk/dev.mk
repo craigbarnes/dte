@@ -25,6 +25,8 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/basenames, -n)
 	$(call GPERF_GEN, src/lookup/interpreters)
 	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
+	$(call GPERF_GEN, src/lookup/attributes, -n)
+	$(call GPERF_GEN, src/lookup/colors, -n)
 
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \

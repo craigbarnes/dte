@@ -1,0 +1,31 @@
+%{
+typedef struct {
+    const char *const name;
+    unsigned short attr;
+} AttrHashSlot;
+%}
+
+%struct-type
+%omit-struct-type
+%readonly-tables
+%null-strings
+%compare-lengths
+%global-table
+%define word-array-name attr_table
+%define constants-prefix ATTRS_
+%define lookup-function-name lookup_attr
+%define hash-function-name attr_hash
+%define length-table-name attr_length_table
+%define initializer-suffix ,0
+%define slot-name name
+AttrHashSlot;
+
+%%
+keep, ATTR_KEEP
+underline, ATTR_UNDERLINE
+reverse, ATTR_REVERSE
+blink, ATTR_BLINK
+lowintensity, ATTR_DIM
+bold, ATTR_BOLD
+invisible, ATTR_INVIS
+italic, ATTR_ITALIC

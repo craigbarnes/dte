@@ -8,7 +8,7 @@
 
 4,31 {/^$/d}
 
-s/^const \(FileTypeHashSlot\|char\) \*$/static const \1*/
+s/^const \([A-Za-z]*HashSlot\|char\) \*$/static const \1*/
 
 /^\#line/d
 

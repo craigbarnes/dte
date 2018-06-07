@@ -1,0 +1,41 @@
+%{
+typedef struct {
+    const char *const name;
+    short color;
+} ColorHashSlot;
+%}
+
+%struct-type
+%omit-struct-type
+%readonly-tables
+%null-strings
+%compare-lengths
+%global-table
+%define word-array-name color_table
+%define constants-prefix COLORS_
+%define lookup-function-name lookup_color
+%define hash-function-name color_hash
+%define length-table-name color_length_table
+%define initializer-suffix ,-2
+%define slot-name name
+ColorHashSlot;
+
+%%
+keep, -2
+default, -1
+black, 0
+red, 1
+green, 2
+yellow, 3
+blue, 4
+magenta, 5
+cyan, 6
+gray, 7
+darkgray, 8
+lightred, 9
+lightgreen, 10
+lightyellow, 11
+lightblue, 12
+lightmagenta, 13
+lightcyan, 14
+white, 15

@@ -5,23 +5,10 @@
 #include "error.h"
 #include "editor.h"
 
-static const char color_names[][16] = {
-    "keep", "default",
-    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "gray",
-    "darkgray", "lightred", "lightgreen", "lightyellow", "lightblue",
-    "lightmagenta", "lightcyan", "white",
-};
-
-static const char attr_names[][16] = {
-    "keep",
-    "underline",
-    "reverse",
-    "blink",
-    "lowintensity",
-    "bold",
-    "invisible",
-    "italic"
-};
+IGNORE_WARNING("-Wunused-parameter")
+#include "lookup/attributes.c"
+#include "lookup/colors.c"
+UNIGNORE_WARNINGS
 
 static const char builtin_color_names[][16] = {
     "default",
@@ -139,24 +126,24 @@ static bool parse_color(const char *str, int *val)
         *val = 16 + r * 36 + g * 6 + b;
         return true;
     }
-    for (size_t i = 0; i < ARRAY_COUNT(color_names); i++) {
-        if (streq(str, color_names[i])) {
-            *val = i - 2;
-            return true;
-        }
+
+    const ColorHashSlot *slot = lookup_color(str, strlen(str));
+    if (slot) {
+        *val = slot->color;
+        return true;
     }
+
     return false;
 }
 
 static bool parse_attr(const char *str, unsigned short *attr)
 {
-    static_assert(ARRAY_COUNT(attr_names) <= 16);
-    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
-        if (streq(str, attr_names[i])) {
-            *attr |= 1u << i;
-            return true;
-        }
+    const AttrHashSlot *slot = lookup_attr(str, strlen(str));
+    if (slot) {
+        *attr |= slot->attr;
+        return true;
     }
+
     return false;
 }
 
@@ -205,15 +192,19 @@ void collect_hl_colors(const char *prefix)
 
 void collect_colors_and_attributes(const char *prefix)
 {
-    // Skip first (keep) because it is in attr_names too
-    for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {
-        if (str_has_prefix(color_names[i], prefix)) {
-            add_completion(xstrdup(color_names[i]));
+    for (size_t i = COLORS_MIN_HASH_VALUE; i <= COLORS_MAX_HASH_VALUE; i++) {
+        const char *name = color_table[i].name;
+        if (name && str_has_prefix(name, prefix)) {
+            if (color_table[i].color == -2) {
+                continue; // Skip "keep" because it's in attr_table too
+            }
+            add_completion(xstrdup(name));
         }
     }
-    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
-        if (str_has_prefix(attr_names[i], prefix)) {
-            add_completion(xstrdup(attr_names[i]));
+    for (size_t i = ATTRS_MIN_HASH_VALUE; i <= ATTRS_MAX_HASH_VALUE; i++) {
+        const char *name = attr_table[i].name;
+        if (name && str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
         }
     }
 }
