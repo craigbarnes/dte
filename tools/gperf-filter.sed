@@ -4,7 +4,7 @@
 /* Filtered by: tools/gperf-filter.sed */
 }
 
-/^#if \!((' ' == 32) &&/, /^#endif/d
+/^#if \!((' ' == 32) &&/,/^#endif/d
 
 31,32 {/^$/d}
 
