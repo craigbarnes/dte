@@ -6,7 +6,7 @@
 
 /^#if \!((' ' == 32) &&/,/^#endif/d
 
-31,32 {/^$/d}
+4,31 {/^$/d}
 
 s/^const \(FileTypeHashSlot\|char\) \*$/static const \1*/
 

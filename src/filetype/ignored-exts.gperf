@@ -1,8 +1,8 @@
 %readonly-tables
 %compare-lengths
+%enum
 %define lookup-function-name is_ignored_extension
 %define hash-function-name ft_ignored_ext_hash
-%define constants-prefix IGNORED_EXTS_
 
 %%
 bak

@@ -2,12 +2,6 @@
 /* Command-line: gperf -m50 -n src/filetype/basenames.gperf  */
 /* Computed positions: -k'1-2,10' */
 /* Filtered by: tools/gperf-filter.sed */
-
-#define BASENAMES_TOTAL_KEYWORDS 43
-#define BASENAMES_MIN_WORD_LENGTH 5
-#define BASENAMES_MAX_WORD_LENGTH 17
-#define BASENAMES_MIN_HASH_VALUE 0
-#define BASENAMES_MAX_HASH_VALUE 42
 /* maximum key range = 43, duplicates = 0 */
 
 inline
@@ -70,6 +64,15 @@ ft_base_hash (register const char *str, register size_t len)
 static const FileTypeHashSlot*
 filetype_from_basename (register const char *str, register size_t len)
 {
+  enum
+    {
+      TOTAL_KEYWORDS = 43,
+      MIN_WORD_LENGTH = 5,
+      MAX_WORD_LENGTH = 17,
+      MIN_HASH_VALUE = 0,
+      MAX_HASH_VALUE = 42
+    };
+
   static const unsigned char lengthtable[] =
     {
        8, 11,  9, 15, 10, 11,  8,  7, 17, 11, 13, 11, 11, 11,
@@ -124,11 +127,11 @@ filetype_from_basename (register const char *str, register size_t len)
       {"APKBUILD", SHELL}
     };
 
-  if (len <= BASENAMES_MAX_WORD_LENGTH && len >= BASENAMES_MIN_WORD_LENGTH)
+  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_base_hash (str, len);
 
-      if (key <= BASENAMES_MAX_HASH_VALUE)
+      if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
             register const char *s = wordlist[key].key;

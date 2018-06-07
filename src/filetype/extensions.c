@@ -2,12 +2,6 @@
 /* Command-line: gperf -m50 -D src/filetype/extensions.gperf  */
 /* Computed positions: -k'1-2,$' */
 /* Filtered by: tools/gperf-filter.sed */
-
-#define EXTENSIONS_TOTAL_KEYWORDS 146
-#define EXTENSIONS_MIN_WORD_LENGTH 1
-#define EXTENSIONS_MAX_WORD_LENGTH 11
-#define EXTENSIONS_MIN_HASH_VALUE 13
-#define EXTENSIONS_MAX_HASH_VALUE 235
 /* maximum key range = 223, duplicates = 0 */
 
 inline
@@ -60,6 +54,15 @@ ft_ext_hash (register const char *str, register size_t len)
 static const FileTypeHashSlot*
 filetype_from_extension (register const char *str, register size_t len)
 {
+  enum
+    {
+      TOTAL_KEYWORDS = 146,
+      MIN_WORD_LENGTH = 1,
+      MAX_WORD_LENGTH = 11,
+      MIN_HASH_VALUE = 13,
+      MAX_HASH_VALUE = 235
+    };
+
   static const unsigned char lengthtable[] =
     {
        1,  1,  1,  1,  1,  1,  3,  4,  6,  2,  3,  3,  3,  1,
@@ -252,11 +255,11 @@ filetype_from_extension (register const char *str, register size_t len)
        -1,  -1,  -1,  -1,  -1, 145
     };
 
-  if (len <= EXTENSIONS_MAX_WORD_LENGTH && len >= EXTENSIONS_MIN_WORD_LENGTH)
+  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_ext_hash (str, len);
 
-      if (key <= EXTENSIONS_MAX_HASH_VALUE)
+      if (key <= MAX_HASH_VALUE)
         {
           register int index = lookup[key];
 

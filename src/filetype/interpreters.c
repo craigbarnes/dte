@@ -2,12 +2,6 @@
 /* Command-line: gperf -m50 src/filetype/interpreters.gperf  */
 /* Computed positions: -k'1,3,7' */
 /* Filtered by: tools/gperf-filter.sed */
-
-#define INTERPRETERS_TOTAL_KEYWORDS 43
-#define INTERPRETERS_MIN_WORD_LENGTH 2
-#define INTERPRETERS_MAX_WORD_LENGTH 10
-#define INTERPRETERS_MIN_HASH_VALUE 2
-#define INTERPRETERS_MAX_HASH_VALUE 51
 /* maximum key range = 50, duplicates = 0 */
 
 inline
@@ -67,6 +61,15 @@ ft_interpreter_hash (register const char *str, register size_t len)
 static const FileTypeHashSlot*
 filetype_from_interpreter (register const char *str, register size_t len)
 {
+  enum
+    {
+      TOTAL_KEYWORDS = 43,
+      MIN_WORD_LENGTH = 2,
+      MAX_WORD_LENGTH = 10,
+      MIN_HASH_VALUE = 2,
+      MAX_HASH_VALUE = 51
+    };
+
   static const unsigned char lengthtable[] =
     {
        0,  0,  2,  0,  4,  3,  4,  6,  3,  4,  5,  4,  5,  3,
@@ -125,11 +128,11 @@ filetype_from_interpreter (register const char *str, register size_t len)
       {"openrc-run", SHELL}
     };
 
-  if (len <= INTERPRETERS_MAX_WORD_LENGTH && len >= INTERPRETERS_MIN_WORD_LENGTH)
+  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_interpreter_hash (str, len);
 
-      if (key <= INTERPRETERS_MAX_HASH_VALUE)
+      if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
             register const char *s = wordlist[key].key;

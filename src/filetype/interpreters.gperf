@@ -3,9 +3,9 @@
 %readonly-tables
 %null-strings
 %compare-lengths
+%enum
 %define lookup-function-name filetype_from_interpreter
 %define hash-function-name ft_interpreter_hash
-%define constants-prefix INTERPRETERS_
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;

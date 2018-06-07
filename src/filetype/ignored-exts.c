@@ -2,12 +2,6 @@
 /* Command-line: gperf -m50 -n src/filetype/ignored-exts.gperf  */
 /* Computed positions: -k'1,$' */
 /* Filtered by: tools/gperf-filter.sed */
-
-#define IGNORED_EXTS_TOTAL_KEYWORDS 11
-#define IGNORED_EXTS_MIN_WORD_LENGTH 3
-#define IGNORED_EXTS_MAX_WORD_LENGTH 9
-#define IGNORED_EXTS_MIN_HASH_VALUE 0
-#define IGNORED_EXTS_MAX_HASH_VALUE 10
 /* maximum key range = 11, duplicates = 0 */
 
 inline
@@ -49,6 +43,15 @@ ft_ignored_ext_hash (register const char *str, register size_t len)
 static const char*
 is_ignored_extension (register const char *str, register size_t len)
 {
+  enum
+    {
+      TOTAL_KEYWORDS = 11,
+      MIN_WORD_LENGTH = 3,
+      MAX_WORD_LENGTH = 9,
+      MIN_HASH_VALUE = 0,
+      MAX_HASH_VALUE = 10
+    };
+
   static const unsigned char lengthtable[] =
     {
        4,  3,  8,  7,  6,  6,  7,  7,  9,  3,  3
@@ -68,11 +71,11 @@ is_ignored_extension (register const char *str, register size_t len)
       "bak"
     };
 
-  if (len <= IGNORED_EXTS_MAX_WORD_LENGTH && len >= IGNORED_EXTS_MIN_WORD_LENGTH)
+  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
       register unsigned int key = ft_ignored_ext_hash (str, len);
 
-      if (key <= IGNORED_EXTS_MAX_HASH_VALUE)
+      if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
             register const char *s = wordlist[key];

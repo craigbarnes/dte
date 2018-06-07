@@ -2,9 +2,9 @@
 %omit-struct-type
 %readonly-tables
 %compare-lengths
+%enum
 %define lookup-function-name filetype_from_basename
 %define hash-function-name ft_base_hash
-%define constants-prefix BASENAMES_
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;
