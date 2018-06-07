@@ -17,6 +17,7 @@ tools export-ignore
 tools/** export-ignore
 
 *.[ch] code linguist-language=C
+*.gperf code
 *.lua code
 *.awk code
 *.sed code
@@ -36,6 +37,6 @@ config/README.md -dterc
 *.html html
 lib/** -whitespace linguist-vendored
 docs/*.[15] code linguist-generated
-src/filetype/basenames.c text linguist-generated
-src/filetype/extensions.c text linguist-generated
-src/filetype/interpreters.c text linguist-generated
+src/filetype/basenames.c linguist-generated
+src/filetype/extensions.c linguist-generated
+src/filetype/interpreters.c linguist-generated
