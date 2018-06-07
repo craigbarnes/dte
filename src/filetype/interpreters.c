@@ -76,9 +76,9 @@ filetype_from_interpreter (register const char *str, register size_t len)
     };
   static const FileTypeHashSlot wordlist[] =
     {
-      {"",0}, {"",0},
+      {(char*)0,0}, {(char*)0,0},
       {"sh", SHELL},
-      {"",0},
+      {(char*)0,0},
       {"sbcl", COMMONLISP},
       {"php", PHP},
       {"perl", PERL},
@@ -120,7 +120,8 @@ filetype_from_interpreter (register const char *str, register size_t len)
       {"python2", PYTHON},
       {"macruby", RUBY},
       {"bigloo", SCHEME},
-      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
+      {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
+      {(char*)0,0}, {(char*)0,0},
       {"openrc-run", SHELL}
     };
 
@@ -133,7 +134,7 @@ filetype_from_interpreter (register const char *str, register size_t len)
           {
             register const char *s = wordlist[key].key;
 
-            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
+            if (s && *str == *s && !memcmp (str + 1, s + 1, len - 1))
               return &wordlist[key];
           }
     }

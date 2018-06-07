@@ -1,14 +1,14 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m50 src/filetype/ignored-exts.gperf  */
-/* Computed positions: -k'1,4' */
+/* Command-line: gperf -m50 -n src/filetype/ignored-exts.gperf  */
+/* Computed positions: -k'1,$' */
 /* Filtered by: tools/gperf-filter.sed */
 
 #define IGNORED_EXTS_TOTAL_KEYWORDS 11
 #define IGNORED_EXTS_MIN_WORD_LENGTH 3
 #define IGNORED_EXTS_MAX_WORD_LENGTH 9
-#define IGNORED_EXTS_MIN_HASH_VALUE 3
-#define IGNORED_EXTS_MAX_HASH_VALUE 14
-/* maximum key range = 12, duplicates = 0 */
+#define IGNORED_EXTS_MIN_HASH_VALUE 0
+#define IGNORED_EXTS_MAX_HASH_VALUE 10
+/* maximum key range = 11, duplicates = 0 */
 
 inline
 static unsigned int
@@ -16,47 +16,34 @@ ft_ignored_ext_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15,  1, 15,
-       4, 15, 15,  0, 15, 15, 15, 15, 15, 15,
-       0,  7,  0, 15,  1,  1, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-      15, 15, 15, 15, 15, 15
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11,  5, 11,
+       1,  3, 11,  0, 11, 11, 11,  5, 11, 11,
+       8,  0,  3, 11,  4, 11,  7, 11, 11,  1,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+      11, 11, 11, 11, 11, 11
     };
-  register unsigned int hval = len;
-
-  switch (hval)
-    {
-      default:
-        hval += asso_values[(unsigned char)str[3]];
-      /*FALLTHROUGH*/
-      case 3:
-      case 2:
-      case 1:
-        hval += asso_values[(unsigned char)str[0]];
-        break;
-    }
-  return hval;
+  return asso_values[(unsigned char)str[len - 1]] + asso_values[(unsigned char)str[0]];
 }
 
 static const char*
@@ -64,24 +51,21 @@ is_ignored_extension (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
     {
-       0,  0,  0,  3,  3,  0,  6,  6,  7,  7,  3,  4,  8,  9,
-       7
+       4,  3,  8,  7,  6,  6,  7,  7,  9,  3,  3
     };
   static const char * const wordlist[] =
     {
-      "", "", "",
-      "new",
-      "bak",
-      "",
+      "orig",
+      "old",
+      "dpkg-old",
+      "pacorig",
       "pacnew",
       "rpmnew",
       "pacsave",
       "rpmsave",
-      "old",
-      "orig",
-      "dpkg-old",
       "dpkg-dist",
-      "pacorig"
+      "new",
+      "bak"
     };
 
   if (len <= IGNORED_EXTS_MAX_WORD_LENGTH && len >= IGNORED_EXTS_MIN_WORD_LENGTH)

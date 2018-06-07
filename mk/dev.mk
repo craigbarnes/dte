@@ -22,9 +22,9 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 
 gperf-gen:
 	$(call GPERF_GEN, src/filetype/extensions, -D)
-	$(call GPERF_GEN, src/filetype/basenames)
+	$(call GPERF_GEN, src/filetype/basenames, -n)
 	$(call GPERF_GEN, src/filetype/interpreters)
-	$(call GPERF_GEN, src/filetype/ignored-exts)
+	$(call GPERF_GEN, src/filetype/ignored-exts, -n)
 
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \

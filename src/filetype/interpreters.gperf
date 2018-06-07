@@ -1,6 +1,7 @@
 %struct-type
 %omit-struct-type
 %readonly-tables
+%null-strings
 %compare-lengths
 %define lookup-function-name filetype_from_interpreter
 %define hash-function-name ft_interpreter_hash
