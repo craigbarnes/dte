@@ -21,10 +21,10 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(Q) cp $< $@
 
 gperf-gen:
-	$(call GPERF_GEN, src/filetype/extensions, -D)
-	$(call GPERF_GEN, src/filetype/basenames, -n)
-	$(call GPERF_GEN, src/filetype/interpreters)
-	$(call GPERF_GEN, src/filetype/ignored-exts, -n)
+	$(call GPERF_GEN, src/lookup/extensions, -D)
+	$(call GPERF_GEN, src/lookup/basenames, -n)
+	$(call GPERF_GEN, src/lookup/interpreters)
+	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
 
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \

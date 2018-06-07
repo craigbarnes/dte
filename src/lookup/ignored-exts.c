@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m50 -n src/filetype/ignored-exts.gperf  */
+/* Command-line: gperf -m50 -n src/lookup/ignored-exts.gperf  */
 /* Computed positions: -k'1,$' */
 /* Filtered by: tools/gperf-filter.sed */
 /* maximum key range = 11, duplicates = 0 */

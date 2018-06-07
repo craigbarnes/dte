@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m50 -n src/filetype/basenames.gperf  */
+/* Command-line: gperf -m50 -n src/lookup/basenames.gperf  */
 /* Computed positions: -k'1-2,10' */
 /* Filtered by: tools/gperf-filter.sed */
 /* maximum key range = 43, duplicates = 0 */

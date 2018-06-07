@@ -37,6 +37,4 @@ config/README.md -dterc
 *.html html
 lib/** -whitespace linguist-vendored
 docs/*.[15] code linguist-generated
-src/filetype/basenames.c linguist-generated
-src/filetype/extensions.c linguist-generated
-src/filetype/interpreters.c linguist-generated
+src/lookup/*.c linguist-generated
