@@ -121,12 +121,13 @@ static const char usage[] =
 
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBKRVb:c:t:r:";
+    static const char optstring[] = "hBHKRVb:c:t:r:";
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
     bool read_rc = true;
     bool use_showkey = false;
+    bool load_and_save_history = true;
     int ch;
 
     init_editor_state();
@@ -150,6 +151,9 @@ int main(int argc, char *argv[])
         case 'B':
             list_builtin_configs();
             return 0;
+        case 'H':
+            load_and_save_history = false;
+            break;
         case 'K':
             use_showkey = true;
             break;
@@ -216,25 +220,32 @@ int main(int argc, char *argv[])
 
     set_signal_handlers();
 
-    char *file_history_filename = editor_file("file-history");
-    load_file_history(file_history_filename);
+    char *file_history_filename = NULL;
+    char *command_history_filename = NULL;
+    char *search_history_filename = NULL;
+    if (load_and_save_history) {
+        file_history_filename = editor_file("file-history");
+        command_history_filename = editor_file("command-history");
+        search_history_filename = editor_file("search-history");
 
-    char *command_history_filename = editor_file("command-history");
-    char *search_history_filename = editor_file("search-history");
-    history_load (
-        &editor.command_history,
-        command_history_filename,
-        command_history_size
-    );
-    history_load (
-        &editor.search_history,
-        search_history_filename,
-        search_history_size
-    );
-    if (editor.search_history.count) {
-        search_set_regexp (
-            editor.search_history.ptrs[editor.search_history.count - 1]
+        load_file_history(file_history_filename);
+
+        history_load (
+            &editor.command_history,
+            command_history_filename,
+            command_history_size
         );
+
+        history_load (
+            &editor.search_history,
+            search_history_filename,
+            search_history_size
+        );
+        if (editor.search_history.count) {
+            search_set_regexp (
+                editor.search_history.ptrs[editor.search_history.count - 1]
+            );
+        }
     }
 
     // Initialize terminal but don't update screen yet. Also display
@@ -308,13 +319,16 @@ int main(int argc, char *argv[])
     // Unlock files and add files to file history
     remove_frame(root_frame);
 
-    history_save(&editor.command_history, command_history_filename);
-    history_save(&editor.search_history, search_history_filename);
-    free(command_history_filename);
-    free(search_history_filename);
+    if (load_and_save_history) {
+        history_save(&editor.command_history, command_history_filename);
+        free(command_history_filename);
 
-    save_file_history(file_history_filename);
-    free(file_history_filename);
+        history_save(&editor.search_history, search_history_filename);
+        free(search_history_filename);
+
+        save_file_history(file_history_filename);
+        free(file_history_filename);
+    }
 
     return 0;
 }
