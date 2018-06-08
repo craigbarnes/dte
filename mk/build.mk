@@ -32,7 +32,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias ascii bind block block-iter buffer buffer-iter cconv change \
     cmdline color command-mode commands common compiler completion \
     config ctags decoder detect edit editor encoder encoding env error \
-    file-history file-location file-option filetype fork format-status \
+    file-history file-option filetype fork format-status \
     frame git-open highlight history indent input-special key load-save \
     lock main move msg normal-mode obuf options parse-args parse-command \
     path ptr-array regexp run screen screen-tabbar screen-view script \
