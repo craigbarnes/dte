@@ -24,10 +24,13 @@ build:alpine:
 build:debian:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
+    coverage: '/^Total lines executed:: (\d+\.\d+\%)$/'
     script:
         - make check && make install && dte -V
         - make clean && make check USE_LUA=dynamic && ./dte -V
         - make clean && make check USE_LUA=static && ./dte -V
+        - make clean && make check CFLAGS='-O2 -g --coverage -fprofile-abs-path'
+        - gcov -n build/*.o 2>&1 | awk -f tools/gcov-total.awk
         - make check-syntax-files
         - sed -nf tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
