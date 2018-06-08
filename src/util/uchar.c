@@ -1,5 +1,4 @@
 #include "uchar.h"
-#include "common.h"
 
 static inline CONST_FN int u_seq_len(unsigned int first_byte)
 {

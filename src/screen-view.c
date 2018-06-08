@@ -1,7 +1,7 @@
 #include "screen.h"
 #include "view.h"
 #include "editor.h"
-#include "uchar.h"
+#include "util/uchar.h"
 #include "obuf.h"
 #include "selection.h"
 #include "highlight.h"

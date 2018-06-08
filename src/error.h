@@ -2,7 +2,7 @@
 #define ERROR_H
 
 #include <stdbool.h>
-#include "macros.h"
+#include "util/macros.h"
 
 typedef struct {
     char *msg;

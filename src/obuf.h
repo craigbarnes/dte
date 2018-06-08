@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "term.h"
-#include "unicode.h"
+#include "util/unicode.h"
 
 typedef struct {
     char buf[8192];

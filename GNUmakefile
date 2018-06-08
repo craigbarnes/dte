@@ -45,7 +45,7 @@ uninstall:
 	$(RM) '$(DESTDIR)$(man5dir)/dte-syntax.5'
 
 tags:
-	ctags src/*.[ch] src/lookup/*.c
+	ctags src/*.[ch] src/util/*.[ch] src/lookup/*.c
 
 clean:
 	$(RM) $(CLEANFILES)

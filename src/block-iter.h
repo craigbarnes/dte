@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "list.h"
+#include "util/list.h"
 
 // Blocks always contains whole lines.
 // There's one zero-sized block when the file is empty.

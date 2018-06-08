@@ -4,7 +4,7 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 
 typedef struct {
     char *file;

@@ -7,8 +7,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include "libc.h"
-#include "ascii.h"
-#include "macros.h"
+#include "util/ascii.h"
+#include "util/macros.h"
 #include "xmalloc.h"
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))

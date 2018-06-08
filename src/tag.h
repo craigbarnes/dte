@@ -2,7 +2,7 @@
 #define TAG_H
 
 #include "ctags.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 
 TagFile *load_tag_file(void);
 void free_tags(PointerArray *tags);

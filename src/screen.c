@@ -5,7 +5,7 @@
 #include "obuf.h"
 #include "cmdline.h"
 #include "search.h"
-#include "uchar.h"
+#include "util/uchar.h"
 #include "frame.h"
 #include "path.h"
 #include "input-special.h"

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "error.h"
 
 typedef struct {

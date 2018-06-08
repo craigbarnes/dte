@@ -8,8 +8,8 @@
 #include "lock.h"
 #include "selection.h"
 #include "path.h"
-#include "unicode.h"
-#include "uchar.h"
+#include "util/unicode.h"
+#include "util/uchar.h"
 #include "detect.h"
 
 Buffer *buffer;

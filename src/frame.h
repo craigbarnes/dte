@@ -2,7 +2,7 @@
 #define FRAME_H
 
 #include <stdbool.h>
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 
 struct Frame {
     struct Frame *parent;

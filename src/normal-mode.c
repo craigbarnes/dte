@@ -5,7 +5,7 @@
 #include "bind.h"
 #include "input-special.h"
 #include "editor.h"
-#include "unicode.h"
+#include "util/unicode.h"
 
 static void insert_paste(void)
 {

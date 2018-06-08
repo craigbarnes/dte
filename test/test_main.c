@@ -1,12 +1,11 @@
-#include "macros.h"
-#include "editor.h"
-#include "common.h"
-#include "path.h"
-#include "encoding.h"
-#include "filetype.h"
-
-#include <locale.h>
 #include <langinfo.h>
+#include <locale.h>
+#include "../src/util/macros.h"
+#include "../src/editor.h"
+#include "../src/common.h"
+#include "../src/path.h"
+#include "../src/encoding.h"
+#include "../src/filetype.h"
 
 static unsigned int failed;
 

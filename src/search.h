@@ -2,7 +2,7 @@
 #define SEARCH_H
 
 #include <stdbool.h>
-#include "macros.h"
+#include "util/macros.h"
 
 typedef enum {
     SEARCH_FWD,

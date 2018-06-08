@@ -1,5 +1,5 @@
 #include "buffer.h"
-#include "uchar.h"
+#include "util/uchar.h"
 
 size_t buffer_get_char(BlockIter *bi, CodePoint *up)
 {

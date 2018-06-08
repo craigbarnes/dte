@@ -1,9 +1,9 @@
 #include <strings.h>
 #include <string.h>
 #include "key.h"
-#include "uchar.h"
-#include "ascii.h"
-#include "str.h"
+#include "util/uchar.h"
+#include "util/ascii.h"
+#include "util/str.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char special_names[][8] = {

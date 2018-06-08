@@ -1,7 +1,7 @@
 #include "move.h"
 #include "buffer.h"
 #include "indent.h"
-#include "uchar.h"
+#include "util/uchar.h"
 
 typedef enum {
     CT_SPACE,

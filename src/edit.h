@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "unicode.h"
+#include "util/unicode.h"
 
 void select_block(void);
 void unselect(void);

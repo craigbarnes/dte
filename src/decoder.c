@@ -1,6 +1,6 @@
 #include "decoder.h"
 #include "editor.h"
-#include "uchar.h"
+#include "util/uchar.h"
 #include "common.h"
 #include "cconv.h"
 

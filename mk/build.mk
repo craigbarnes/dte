@@ -28,16 +28,20 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     compiler/gcc compiler/go \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
+util_objects := $(addprefix build/util/, $(addsuffix .o, \
+    ascii ptr-array str string-view uchar unicode ))
+
 editor_objects := $(addprefix build/, $(addsuffix .o, \
-    alias ascii bind block block-iter buffer buffer-iter cconv change \
+    alias bind block block-iter buffer buffer-iter cconv change \
     cmdline color command-mode commands common compiler completion \
-    config ctags decoder detect edit editor encoder encoding env error \
-    file-history file-option filetype fork format-status \
-    frame git-open highlight history indent input-special key load-save \
-    lock main move msg normal-mode obuf options parse-args parse-command \
-    path ptr-array regexp run screen screen-tabbar screen-view script \
-    search-mode search selection spawn state str string-view syntax \
-    tabbar tag term-caps term uchar unicode view wbuf window xmalloc ))
+    config ctags decoder detect edit editor encoder encoding env \
+    error file-history file-option filetype fork format-status \
+    frame git-open highlight history indent input-special key \
+    load-save lock main move msg normal-mode obuf options \
+    parse-args parse-command path regexp run screen screen-tabbar \
+    screen-view script search search-mode selection spawn state \
+    syntax tabbar tag term term-caps view wbuf window xmalloc )) \
+    $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     test_main ))
@@ -118,6 +122,7 @@ test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
+$(util_objects): | build/util/
 build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
 build/term-caps.o: build/term-caps.cflags
@@ -136,7 +141,7 @@ $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 
 $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -Isrc -c -o $@ $<
+	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
 
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
@@ -148,7 +153,7 @@ build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
-build/test/: | build/
+build/util/ build/test/: | build/
 	$(Q) mkdir -p $@
 
 build/:

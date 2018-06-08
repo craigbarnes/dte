@@ -3,7 +3,7 @@
 #include "common.h"
 #include "error.h"
 #include "move.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "search.h"
 #include "window.h"
 

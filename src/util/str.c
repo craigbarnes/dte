@@ -1,6 +1,9 @@
+#include <stdlib.h>
+#include <string.h>
 #include "str.h"
-#include "common.h"
 #include "uchar.h"
+#include "../common.h"
+#include "../xmalloc.h"
 
 static void string_grow(String *s, size_t more)
 {

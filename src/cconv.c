@@ -1,6 +1,6 @@
 #include "cconv.h"
 #include "common.h"
-#include "uchar.h"
+#include "util/uchar.h"
 
 #include <iconv.h>
 

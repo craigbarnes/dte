@@ -1,5 +1,5 @@
 #include "color.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "common.h"
 #include "completion.h"
 #include "error.h"

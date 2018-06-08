@@ -6,13 +6,13 @@
 #include <stddef.h>
 #include <limits.h>
 #include "block-iter.h"
-#include "list.h"
+#include "util/list.h"
 #include "options.h"
 #include "common.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "change.h"
 #include "syntax.h"
-#include "unicode.h"
+#include "util/unicode.h"
 
 typedef struct Buffer {
     ListHead blocks;

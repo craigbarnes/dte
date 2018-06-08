@@ -1,7 +1,6 @@
-#include "ptr-array.h"
-#include "xmalloc.h"
-
 #include <string.h>
+#include "ptr-array.h"
+#include "../xmalloc.h"
 
 void ptr_array_add(PointerArray *array, void *ptr)
 {

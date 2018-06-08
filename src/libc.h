@@ -24,6 +24,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "macros.h"
+#include "util/macros.h"
 
 #endif

@@ -1,5 +1,7 @@
+#include <stddef.h>
 #include "unicode.h"
-#include "common.h"
+#include "ascii.h"
+#include "macros.h"
 
 typedef struct {
     CodePoint first, last;

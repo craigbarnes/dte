@@ -1,10 +1,10 @@
 #include "filetype.h"
 #include "common.h"
-#include "macros.h"
+#include "util/macros.h"
 #include "regexp.h"
 #include "path.h"
-#include "ptr-array.h"
-#include "string-view.h"
+#include "util/ptr-array.h"
+#include "util/string-view.h"
 
 typedef enum {
     NONE = 0,

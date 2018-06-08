@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "regexp.h"
 #include "error.h"
-#include "str.h"
+#include "util/str.h"
 #include "msg.h"
 #include "term.h"
 #include "fork.h"

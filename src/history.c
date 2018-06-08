@@ -1,7 +1,7 @@
 #include "history.h"
 #include "common.h"
 #include "wbuf.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "error.h"
 
 // Add item to end of array

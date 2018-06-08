@@ -5,7 +5,7 @@
 #include "change.h"
 #include "error.h"
 #include "edit.h"
-#include "str.h"
+#include "util/str.h"
 #include "regexp.h"
 #include "selection.h"
 

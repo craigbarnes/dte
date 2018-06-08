@@ -2,7 +2,7 @@
 #include "common.h"
 #include "error.h"
 #include "command.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 
 typedef struct {
     Key keys[3];

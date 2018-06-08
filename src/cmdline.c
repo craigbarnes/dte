@@ -2,7 +2,7 @@
 #include "history.h"
 #include "editor.h"
 #include "common.h"
-#include "uchar.h"
+#include "util/uchar.h"
 #include "input-special.h"
 #include "term.h"
 

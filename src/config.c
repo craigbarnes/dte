@@ -1,6 +1,6 @@
 #include "config.h"
 #include "error.h"
-#include "str.h"
+#include "util/str.h"
 #include "common.h"
 #include "completion.h"
 #include "../build/builtin-config.h"

@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include "alias.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "common.h"
 #include "error.h"
 #include "editor.h"

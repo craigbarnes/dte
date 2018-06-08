@@ -2,10 +2,10 @@
 #define EDITOR_H
 
 #include <stdbool.h>
-#include "macros.h"
+#include "util/macros.h"
 #include "cmdline.h"
 #include "options.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "color.h"
 #include "term.h"
 

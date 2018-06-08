@@ -1,5 +1,5 @@
 #include "file-option.h"
-#include "ptr-array.h"
+#include "util/ptr-array.h"
 #include "options.h"
 #include "regexp.h"
 

@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <stddef.h>
-#include "macros.h"
+#include "util/macros.h"
 
 #define bitsizeof(x) (CHAR_BIT * sizeof(x))
 

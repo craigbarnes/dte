@@ -3,9 +3,9 @@
 #include "buffer.h"
 #include "view.h"
 #include "change.h"
-#include "str.h"
+#include "util/str.h"
 #include "indent.h"
-#include "uchar.h"
+#include "util/uchar.h"
 #include "regexp.h"
 #include "selection.h"
 
