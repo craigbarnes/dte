@@ -5,21 +5,23 @@
 #include "move.h"
 #include "ptr-array.h"
 #include "search.h"
-#include "view.h"
 #include "window.h"
 
 static PointerArray file_locations = PTR_ARRAY_INIT;
 static PointerArray msgs = PTR_ARRAY_INIT;
 static size_t msg_pos;
 
-// TODO: Pass abs_filename/buffer_id/cy/cx_char as arguments instead of View
-FileLocation *create_file_location(const View *v)
-{
+FileLocation *file_location_create (
+    const char *filename,
+    unsigned int buffer_id,
+    int line,
+    int column
+) {
     FileLocation *loc = xnew0(FileLocation, 1);
-    loc->filename = v->buffer->abs_filename ? xstrdup(v->buffer->abs_filename) : NULL;
-    loc->buffer_id = v->buffer->id;
-    loc->line = v->cy + 1;
-    loc->column = v->cx_char + 1;
+    loc->filename = filename ? xstrdup(filename) : NULL;
+    loc->buffer_id = buffer_id;
+    loc->line = line;
+    loc->column = column;
     return loc;
 }
 

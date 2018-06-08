@@ -19,9 +19,13 @@ typedef struct {
     FileLocation *loc;
 } Message;
 
-struct View;
+FileLocation *file_location_create (
+    const char *filename,
+    unsigned int buffer_id,
+    int line,
+    int column
+);
 
-FileLocation *create_file_location(const struct View *v);
 void file_location_free(FileLocation *loc);
 void push_file_location(FileLocation *loc);
 void pop_file_location(void);
