@@ -128,7 +128,7 @@ build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
 $(dte) $(test):
 	$(E) LINK $@
-	$(Q) $(CC) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
