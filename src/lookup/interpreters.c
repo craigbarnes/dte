@@ -1,8 +1,8 @@
 /* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -m50 src/lookup/interpreters.gperf  */
-/* Computed positions: -k'1,3,7' */
+/* Computed positions: -k'1,3' */
 /* Filtered by: tools/gperf-filter.sed */
-/* maximum key range = 50, duplicates = 0 */
+/* maximum key range = 53, duplicates = 0 */
 
 inline
 static unsigned int
@@ -10,44 +10,38 @@ ft_interpreter_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52,  0, 52, 52, 52, 52,
-      22, 21, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52,  5, 28,  0,
-      23, 32, 33, 10, 28, 19,  3,  6,  5, 13,
-       3,  9,  1, 52,  1,  0, 12,  2, 52, 14,
-      52, 23,  7, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52, 52, 52, 52, 52,
-      52, 52, 52, 52, 52, 52
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55,  7, 23,  0,
+      30, 25, 35,  6, 27, 21,  0,  6, 11,  3,
+       4, 19,  0, 55,  2,  0, 14,  0, 55, 15,
+      55,  2, 10, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
+      55, 55, 55, 55, 55, 55
     };
   register unsigned int hval = len;
 
   switch (hval)
     {
       default:
-        hval += asso_values[(unsigned char)str[6]];
-      /*FALLTHROUGH*/
-      case 6:
-      case 5:
-      case 4:
-      case 3:
         hval += asso_values[(unsigned char)str[2]];
       /*FALLTHROUGH*/
       case 2:
@@ -63,68 +57,66 @@ filetype_from_interpreter (register const char *str, register size_t len)
 {
   enum
     {
-      TOTAL_KEYWORDS = 43,
+      TOTAL_KEYWORDS = 41,
       MIN_WORD_LENGTH = 2,
       MAX_WORD_LENGTH = 10,
       MIN_HASH_VALUE = 2,
-      MAX_HASH_VALUE = 51
+      MAX_HASH_VALUE = 54
     };
 
   static const unsigned char lengthtable[] =
     {
-       0,  0,  2,  0,  4,  3,  4,  6,  3,  4,  5,  4,  5,  3,
-       3,  3,  6,  4,  4,  6,  5,  4,  5,  4,  5,  6,  3,  4,
-       4,  7,  4,  4,  4,  4,  5,  7,  3,  3,  3,  6,  3,  7,
-       7,  7,  6,  0,  0,  0,  0,  0,  0, 10
+       0,  0,  2,  3,  4,  5,  4,  4,  6,  7,  7,  5,  4,  4,
+       3,  4,  3,  3,  5,  4,  6,  3,  4,  4,  6,  4,  5,  4,
+       7,  4,  5,  6,  5,  3,  4,  6,  3,  3,  4,  3,  3,  6,
+       0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10
     };
   static const FileTypeHashSlot wordlist[] =
     {
       {(char*)0,0}, {(char*)0,0},
       {"sh", SHELL},
-      {(char*)0,0},
-      {"sbcl", COMMONLISP},
       {"php", PHP},
+      {"sbcl", COMMONLISP},
+      {"jruby", RUBY},
       {"perl", PERL},
+      {"mksh", SHELL},
       {"racket", SCHEME},
+      {"crystal", RUBY},
+      {"macruby", RUBY},
+      {"pdksh", SHELL},
+      {"rake", RUBY},
+      {"make", MAKE},
       {"ccl", COMMONLISP},
       {"lisp", COMMONLISP},
-      {"jruby", RUBY},
-      {"rake", RUBY},
-      {"pdksh", SHELL},
-      {"lua", LUA},
       {"awk", AWK},
       {"tcc", C},
-      {"luajit", LUA},
-      {"mksh", SHELL},
+      {"gmake", MAKE},
       {"wish", TCL},
       {"python", PYTHON},
-      {"gmake", MAKE},
+      {"lua", LUA},
+      {"mawk", AWK},
       {"nawk", AWK},
-      {"tclsh", TCL},
-      {"make", MAKE},
+      {"luajit", LUA},
+      {"gawk", AWK},
       {"clisp", COMMONLISP},
+      {"bash", SHELL},
+      {"chicken", SCHEME},
+      {"ruby", RUBY},
+      {"tclsh", TCL},
       {"groovy", GROOVY},
+      {"guile", SCHEME},
       {"sed", SED},
       {"dash", SHELL},
-      {"gawk", AWK},
-      {"chicken", SCHEME},
-      {"node", JAVASCRIPT},
-      {"mawk", AWK},
-      {"bash", SHELL},
-      {"ruby", RUBY},
-      {"guile", SCHEME},
-      {"crystal", RUBY},
-      {"ash", SHELL},
+      {"bigloo", SCHEME},
       {"ksh", SHELL},
+      {"ash", SHELL},
+      {"node", JAVASCRIPT},
+      {"ecl", COMMONLISP},
       {"zsh", SHELL},
       {"coffee", COFFEESCRIPT},
-      {"ecl", COMMONLISP},
-      {"python3", PYTHON},
-      {"python2", PYTHON},
-      {"macruby", RUBY},
-      {"bigloo", SCHEME},
       {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
-      {(char*)0,0}, {(char*)0,0},
+      {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
+      {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
       {"openrc-run", SHELL}
     };
 
