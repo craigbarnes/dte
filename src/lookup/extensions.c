@@ -1,7 +1,7 @@
 /* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -m50 -D src/lookup/extensions.gperf  */
 /* Computed positions: -k'1-2,$' */
-/* Filtered by: tools/gperf-filter.sed */
+/* Filtered by: mk/gperf-filter.sed */
 /* maximum key range = 223, duplicates = 0 */
 
 inline

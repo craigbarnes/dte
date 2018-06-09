@@ -1,7 +1,7 @@
 #!/usr/bin/sed -f
 
 4{/^$/i\
-/* Filtered by: tools/gperf-filter.sed */
+/* Filtered by: mk/gperf-filter.sed */
 }
 
 /^#if \!((' ' == 32) &&/,/^#endif/d

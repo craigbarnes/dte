@@ -1,7 +1,7 @@
 /* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -m50 -n src/lookup/colors.gperf  */
 /* Computed positions: -k'1,4,6' */
-/* Filtered by: tools/gperf-filter.sed */
+/* Filtered by: mk/gperf-filter.sed */
 
 typedef struct {
     const char *const name;
