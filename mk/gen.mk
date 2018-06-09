@@ -1,6 +1,12 @@
 GPERF = gperf
 GPERF_FILTER = sed -f mk/gperf-filter.sed
-GPERF_GEN = $(GPERF) -m50 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
+
+define GPERF_GEN
+  $(E) GPERF $(1).c
+  $(Q) $(GPERF) -m50 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
+endef
+
+gen: gperf-gen xterm-keys-gen
 
 gperf-gen:
 	$(call GPERF_GEN, src/lookup/extensions, -D)
@@ -11,7 +17,8 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/colors, -n)
 
 xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
-	$(LUA) mk/triegen.lua > src/lookup/xterm-keys.c
+	$(E) TRIEGEN src/lookup/xterm-keys.c
+	$(Q) $(LUA) mk/triegen.lua > src/lookup/xterm-keys.c
 
 
-.PHONY: gperf-gen xterm-keys-gen
+.PHONY: gen gperf-gen xterm-keys-gen
