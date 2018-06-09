@@ -87,7 +87,7 @@ static bool fill_buffer(void)
         input_can_be_truncated = false;
     }
 
-    int rc = read (
+    ssize_t rc = read (
         STDIN_FILENO,
         input_buf + input_buf_fill,
         sizeof(input_buf) - input_buf_fill
@@ -95,7 +95,7 @@ static bool fill_buffer(void)
     if (rc <= 0) {
         return false;
     }
-    input_buf_fill += rc;
+    input_buf_fill += (size_t)rc;
     return true;
 }
 
