@@ -1,9 +1,6 @@
 DIST_VERSIONS = 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
 DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
-GPERF = gperf
-GPERF_FILTER = sed -f tools/gperf-filter.sed
-GPERF_GEN = $(GPERF) -m50 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
 
 dist: $(firstword $(DIST_ALL))
 dist-all: $(DIST_ALL)
@@ -19,17 +16,6 @@ $(DIST_ALL): dte-%.tar.gz:
 $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
 	$(Q) cp $< $@
-
-gperf-gen:
-	$(call GPERF_GEN, src/lookup/extensions, -D)
-	$(call GPERF_GEN, src/lookup/basenames, -n)
-	$(call GPERF_GEN, src/lookup/interpreters)
-	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
-	$(call GPERF_GEN, src/lookup/attributes, -n)
-	$(call GPERF_GEN, src/lookup/colors, -n)
-
-xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
-	$(LUA) tools/gen-xterm-key-trie.lua > src/lookup/xterm-keys.c
 
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \
@@ -50,4 +36,4 @@ show-sizes:
 
 
 CLEANFILES += dte-*.tar.gz
-.PHONY: dist dist-all check-dist git-hooks gperf-gen xterm-keys-gen show-sizes
+.PHONY: dist dist-all check-dist git-hooks show-sizes

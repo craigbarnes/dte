@@ -5,6 +5,7 @@ include mk/build.mk
 include mk/check.mk
 include mk/lua.mk
 include mk/docs.mk
+include mk/gen.mk
 -include mk/dev.mk
 
 prefix ?= /usr/local
