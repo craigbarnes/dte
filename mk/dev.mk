@@ -28,6 +28,9 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/attributes, -n)
 	$(call GPERF_GEN, src/lookup/colors, -n)
 
+xterm-keys-gen: $(LUA)
+	$(LUA) tools/gen-xterm-key-trie.lua > src/lookup/xterm-keys.c
+
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \
     CFLAGS=-O2\ -pipe \
@@ -47,4 +50,4 @@ show-sizes:
 
 
 CLEANFILES += dte-*.tar.gz
-.PHONY: dist dist-all check-dist git-hooks gperf-gen show-sizes
+.PHONY: dist dist-all check-dist git-hooks gperf-gen xterm-keys-gen show-sizes

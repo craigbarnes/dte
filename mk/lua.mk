@@ -43,7 +43,7 @@ build/lua/liblua.a: $(liblua_objects)
 
 build/lua/lua: build/lua/lua.o build/lua/liblua.a
 	$(E) LINK $@
-	$(Q) $(CC) -o $@ $(LDFLAGS) $< $(LUA_LDLIBS)
+	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LUA_LDLIBS)
 
 $(lua_objects): build/lua/%.o: lib/lua/%.c build/lua/all.cflags | build/lua/
 	$(E) CC $@

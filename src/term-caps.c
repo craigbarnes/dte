@@ -1,5 +1,6 @@
 #include "term.h"
 #include "common.h"
+#include "lookup/xterm-keys.c"
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
@@ -9,14 +10,42 @@
     .key = (k) \
 }
 
-#define XKEYS(p, s, key) \
-    KEY(p "2" s, key | MOD_SHIFT), \
-    KEY(p "3" s, key | MOD_META), \
-    KEY(p "4" s, key | MOD_SHIFT | MOD_META), \
-    KEY(p "5" s, key | MOD_CTRL), \
-    KEY(p "6" s, key | MOD_SHIFT | MOD_CTRL), \
-    KEY(p "7" s, key | MOD_META | MOD_CTRL), \
-    KEY(p "8" s, key | MOD_SHIFT | MOD_META | MOD_CTRL)
+#define XKEYS(p, key) \
+    KEY(p,     key | MOD_SHIFT), \
+    KEY(p "3", key | MOD_META), \
+    KEY(p "4", key | MOD_SHIFT | MOD_META), \
+    KEY(p "5", key | MOD_CTRL), \
+    KEY(p "6", key | MOD_SHIFT | MOD_CTRL), \
+    KEY(p "7", key | MOD_META | MOD_CTRL), \
+    KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
+
+static ssize_t parse_key_sequence_from_keymap(const char *buf, size_t fill, Key *key)
+{
+    bool possibly_truncated = false;
+    for (size_t i = 0; i < terminal.keymap_length; i++) {
+        const TermKeyMap *const km = &terminal.keymap[i];
+        const char *const keycode = km->code;
+        const size_t len = km->code_length;
+        BUG_ON(keycode == NULL);
+        BUG_ON(len == 0);
+        if (len > fill) {
+            // This might be a truncated escape sequence
+            if (
+                possibly_truncated == false
+                && !memcmp(keycode, buf, fill)
+            ) {
+                possibly_truncated = true;
+            }
+            continue;
+        }
+        if (memcmp(keycode, buf, len)) {
+            continue;
+        }
+        *key = km->key;
+        return len;
+    }
+    return possibly_truncated ? -1 : 0;
+}
 
 #ifndef TERMINFO_DISABLE
 
@@ -42,6 +71,7 @@ static char *curses_str_cap(const char *const name)
 // See terminfo(5)
 static void term_read_caps(void)
 {
+    terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
@@ -107,28 +137,18 @@ static void term_read_caps(void)
         KEY("kf11", KEY_F11),
         KEY("kf12", KEY_F12),
 
-        KEY("kUP", MOD_SHIFT | KEY_UP),
-        KEY("kDN", MOD_SHIFT | KEY_DOWN),
-        KEY("kLFT", MOD_SHIFT | KEY_LEFT),
-        KEY("kRIT", MOD_SHIFT | KEY_RIGHT),
-        KEY("kDC", MOD_SHIFT | KEY_DELETE),
-        KEY("kPRV", MOD_SHIFT | KEY_PAGE_UP),
-        KEY("kNXT", MOD_SHIFT | KEY_PAGE_DOWN),
-        KEY("kHOM", MOD_SHIFT | KEY_HOME),
-        KEY("kEND", MOD_SHIFT | KEY_END),
-
-        XKEYS("kUP", "", KEY_UP),
-        XKEYS("kDN", "", KEY_DOWN),
-        XKEYS("kLFT", "", KEY_LEFT),
-        XKEYS("kRIT", "", KEY_RIGHT),
-        XKEYS("kDC", "", KEY_DELETE),
-        XKEYS("kPRV", "", KEY_PAGE_UP),
-        XKEYS("kNXT", "", KEY_PAGE_DOWN),
-        XKEYS("kHOM", "", KEY_HOME),
-        XKEYS("kEND", "", KEY_END),
+        XKEYS("kUP", KEY_UP),
+        XKEYS("kDN", KEY_DOWN),
+        XKEYS("kLFT", KEY_LEFT),
+        XKEYS("kRIT", KEY_RIGHT),
+        XKEYS("kDC", KEY_DELETE),
+        XKEYS("kPRV", KEY_PAGE_UP),
+        XKEYS("kNXT", KEY_PAGE_DOWN),
+        XKEYS("kHOM", KEY_HOME),
+        XKEYS("kEND", KEY_END),
     };
 
-    static_assert(ARRAY_COUNT(keymap) == 22 + 9 + (9 * 7));
+    static_assert(ARRAY_COUNT(keymap) == 22 + (9 * 7));
 
     size_t n = 0;
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
@@ -174,7 +194,8 @@ static const TerminalInfo terminal_ansi = {
     .ncv_attributes = ATTR_UNDERLINE,
     .keymap = ansi_keymap,
     .keymap_length = ARRAY_COUNT(ansi_keymap),
-    .control_codes = &ansi_control_codes
+    .control_codes = &ansi_control_codes,
+    .parse_key_sequence = &parse_key_sequence_from_keymap
 };
 
 static void term_init_fallback(const char *const UNUSED(term))
@@ -183,56 +204,6 @@ static void term_init_fallback(const char *const UNUSED(term))
 }
 
 #endif // ifndef TERMINFO_DISABLE
-
-static const TermKeyMap xterm_keymap[] = {
-    KEY("\033OA", KEY_UP),
-    KEY("\033[A", KEY_UP),
-    KEY("\033OB", KEY_DOWN),
-    KEY("\033[B", KEY_DOWN),
-    KEY("\033OC", KEY_RIGHT),
-    KEY("\033[C", KEY_RIGHT),
-    KEY("\033OD", KEY_LEFT),
-    KEY("\033[D", KEY_LEFT),
-    KEY("\033OF", KEY_END),
-    KEY("\033[4~", KEY_END),
-    KEY("\033OH", KEY_HOME),
-    KEY("\033[1~", KEY_HOME),
-    KEY("\033[2~", KEY_INSERT),
-    KEY("\033[3~", KEY_DELETE),
-    KEY("\033[5~", KEY_PAGE_UP),
-    KEY("\033[6~", KEY_PAGE_DOWN),
-    KEY("\033OP", KEY_F1),
-    KEY("\033OQ", KEY_F2),
-    KEY("\033OR", KEY_F3),
-    KEY("\033OS", KEY_F4),
-    KEY("\033[15~", KEY_F5),
-    KEY("\033[17~", KEY_F6),
-    KEY("\033[18~", KEY_F7),
-    KEY("\033[19~", KEY_F8),
-    KEY("\033[20~", KEY_F9),
-    KEY("\033[21~", KEY_F10),
-    KEY("\033[23~", KEY_F11),
-    KEY("\033[24~", KEY_F12),
-    KEY("\033[Z", MOD_SHIFT | '\t'),
-
-    XKEYS("\033[1;", "A", KEY_UP),
-    XKEYS("\033[1;", "B", KEY_DOWN),
-    XKEYS("\033[1;", "C", KEY_RIGHT),
-    XKEYS("\033[1;", "D", KEY_LEFT),
-    XKEYS("\033[1;", "F", KEY_END),
-    XKEYS("\033[1;", "H", KEY_HOME),
-    XKEYS("\033[2;", "~", KEY_INSERT),
-    XKEYS("\033[3;", "~", KEY_DELETE),
-    XKEYS("\033[5;", "~", KEY_PAGE_UP),
-    XKEYS("\033[6;", "~", KEY_PAGE_DOWN),
-
-    // Fix keypad when numlock is off
-    KEY("\033Oo", '/'),
-    KEY("\033Oj", '*'),
-    KEY("\033Om", '-'),
-    KEY("\033Ok", '+'),
-    KEY("\033OM", '\r'),
-};
 
 static const TermKeyMap rxvt_keymap[] = {
     KEY("\033[2~", KEY_INSERT),
@@ -311,9 +282,10 @@ static const TerminalInfo terminal_xterm = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
-    .keymap = xterm_keymap,
-    .keymap_length = ARRAY_COUNT(xterm_keymap),
-    .control_codes = &xterm_control_codes
+    .keymap = NULL,
+    .keymap_length = 0,
+    .control_codes = &xterm_control_codes,
+    .parse_key_sequence = &parse_xterm_key_sequence
 };
 
 static const TerminalInfo terminal_st = {
@@ -322,9 +294,10 @@ static const TerminalInfo terminal_st = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
-    .keymap = xterm_keymap,
-    .keymap_length = ARRAY_COUNT(xterm_keymap),
-    .control_codes = &xterm_control_codes
+    .keymap = NULL,
+    .keymap_length = 0,
+    .control_codes = &xterm_control_codes,
+    .parse_key_sequence = &parse_xterm_key_sequence
 };
 
 static const TerminalInfo terminal_rxvt = {
@@ -335,7 +308,8 @@ static const TerminalInfo terminal_rxvt = {
     .attributes = ANSI_ATTRS,
     .keymap = rxvt_keymap,
     .keymap_length = ARRAY_COUNT(rxvt_keymap),
-    .control_codes = &rxvt_control_codes
+    .control_codes = &rxvt_control_codes,
+    .parse_key_sequence = &parse_key_sequence_from_keymap
 };
 
 static bool term_match(const char *term, const char *prefix)

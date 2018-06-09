@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <sys/types.h>
 #include "key.h"
 
 enum {
@@ -64,6 +65,7 @@ typedef struct {
     const TermControlCodes *control_codes;
     const TermKeyMap *keymap;
     size_t keymap_length;
+    ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
 } TerminalInfo;
 
 extern TerminalInfo terminal;

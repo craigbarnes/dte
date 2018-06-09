@@ -58,20 +58,6 @@ else
   LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
 endif
 
-ifdef USE_SANITIZER
-  export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
-  SANITIZER_FLAGS = -fsanitize=address,undefined -fsanitize-address-use-after-scope
-  BASIC_CFLAGS += $(SANITIZER_FLAGS) -fno-omit-frame-pointer -fno-common
-  BASIC_LDFLAGS += $(SANITIZER_FLAGS)
-  DEBUG = 3
-else
-  # 0: Disable debugging
-  # 1: Enable BUG_ON() and light-weight sanity checks
-  # 2: Enable logging to $(DTE_HOME)/debug.log
-  # 3: Enable expensive sanity checks
-  DEBUG = 1
-endif
-
 CWARNS = \
     $(call cc-option,$(WARNINGS)) \
     $(foreach W, $(WARNINGS_EXTRA),$(call cc-option,$(W)))
@@ -80,9 +66,6 @@ CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
 
 $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
-
-BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
-LDLIBS += $(LUA_LDLIBS)
 
 ifeq "$(KERNEL)" "Darwin"
   LDLIBS += -liconv
@@ -101,6 +84,26 @@ else ifeq "$(KERNEL)" "NetBSD"
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
+dte = dte$(EXEC_SUFFIX)
+test = build/test/test$(EXEC_SUFFIX)
+
+ifdef USE_SANITIZER
+  export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
+  SANITIZER_FLAGS = -fsanitize=address,undefined -fsanitize-address-use-after-scope
+  $(all_objects): BASIC_CFLAGS += $(SANITIZER_FLAGS) -fno-omit-frame-pointer -fno-common
+  $(dte) $(test): BASIC_LDFLAGS += $(SANITIZER_FLAGS)
+  DEBUG = 3
+else
+  # 0: Disable debugging
+  # 1: Enable BUG_ON() and light-weight sanity checks
+  # 2: Enable logging to $(DTE_HOME)/debug.log
+  # 3: Enable expensive sanity checks
+  DEBUG = 1
+endif
+
+$(all_objects): BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
+$(dte) $(test): LDLIBS += $(LUA_LDLIBS)
+
 # If "make install" with no other named targets
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
   OPTCHECK = :
@@ -116,9 +119,6 @@ ifndef NO_DEPS
   endif
   -include $(patsubst %.o, %.mk, $(all_objects))
 endif
-
-dte = dte$(EXEC_SUFFIX)
-test = build/test/test$(EXEC_SUFFIX)
 
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))

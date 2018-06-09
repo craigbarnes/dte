@@ -128,37 +128,25 @@ static bool input_get_byte(unsigned char *ch)
 
 static bool read_special(Key *key)
 {
-    bool possibly_truncated = false;
-
     if (DEBUG > 2) {
         d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
     }
 
-    for (size_t i = 0; i < terminal.keymap_length; i++) {
-        const TermKeyMap *const km = &terminal.keymap[i];
-        const char *const keycode = km->code;
-        const size_t len = km->code_length;
-        BUG_ON(keycode == NULL);
-        BUG_ON(len == 0);
-        if (len > input_buf_fill) {
-            // This might be a truncated escape sequence
-            if (
-                possibly_truncated == false
-                && !memcmp(keycode, input_buf, input_buf_fill)
-            ) {
-                possibly_truncated = true;
-            }
-            continue;
-        }
-        if (memcmp(keycode, input_buf, len)) {
-            continue;
-        }
-        *key = km->key;
+    ssize_t len = terminal.parse_key_sequence(input_buf, input_buf_fill, key);
+    switch (len) {
+    case -1:
+        // Possibly truncated
+        break;
+    case 0:
+        // No match
+        return false;
+    default:
+        // Match
         consume_input(len);
         return true;
     }
 
-    if (possibly_truncated && input_can_be_truncated && fill_buffer()) {
+    if (input_can_be_truncated && fill_buffer()) {
         return read_special(key);
     }
 
