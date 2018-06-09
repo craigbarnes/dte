@@ -22,6 +22,8 @@ else ifeq "$(USE_LUA)" "dynamic"
   LUA_CFLAGS = $(call PKGCFLAGS, $(LUA_PC)) -DUSE_LUA
   LUA = $(call CMDFIND, $(LUA_PC) lua5.3 lua-5.3 lua53)
   $(foreach V, LUA_PC LUA_LDLIBS LUA_CFLAGS LUA, $(call make-lazy,$(V)))
+else
+  LUA = lua
 endif
 
 liblua_objects = $(addprefix build/lua/, \

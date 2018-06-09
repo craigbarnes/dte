@@ -28,7 +28,7 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/attributes, -n)
 	$(call GPERF_GEN, src/lookup/colors, -n)
 
-xterm-keys-gen: $(LUA)
+xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
 	$(LUA) tools/gen-xterm-key-trie.lua > src/lookup/xterm-keys.c
 
 show-sizes: MAKEFLAGS += \
