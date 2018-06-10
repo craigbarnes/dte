@@ -124,6 +124,7 @@ static void term_read_caps(void)
         KEY("khome", KEY_HOME),
         KEY("kend", KEY_END),
         KEY("kich1", KEY_INSERT),
+        KEY("kcbt", MOD_SHIFT | '\t'),
         KEY("kf1", KEY_F1),
         KEY("kf2", KEY_F2),
         KEY("kf3", KEY_F3),
@@ -148,7 +149,7 @@ static void term_read_caps(void)
         XKEYS("kEND", KEY_END),
     };
 
-    static_assert(ARRAY_COUNT(keymap) == 22 + (9 * 7));
+    static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
 
     size_t n = 0;
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
