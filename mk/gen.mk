@@ -17,8 +17,8 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/colors, -n)
 
 xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
-	$(E) TRIEGEN src/lookup/xterm-keys.c
-	$(Q) $(LUA) mk/triegen.lua > src/lookup/xterm-keys.c
+	$(E) GEN src/lookup/xterm-keys.c
+	$(Q) $(LUA) src/lookup/xterm-keys.lua > src/lookup/xterm-keys.c
 
 
 .PHONY: gen gperf-gen xterm-keys-gen
