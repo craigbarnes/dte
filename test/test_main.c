@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <langinfo.h>
 #include <locale.h>
 #include "../src/util/macros.h"
@@ -6,6 +7,7 @@
 #include "../src/path.h"
 #include "../src/encoding.h"
 #include "../src/filetype.h"
+#include "../src/lookup/xterm-keys.c"
 
 static unsigned int failed;
 
@@ -18,6 +20,18 @@ static void fail(const char *format, ...)
     va_end(ap);
     failed += 1;
 }
+
+#define EXPECT_EQ(a, b) do { \
+    if ((a) != (b)) { \
+        fail ( \
+            "%s:%d: Values not equal: %" PRIdMAX ", %" PRIdMAX "\n", \
+            __FILE__, \
+            __LINE__, \
+            (intmax_t)(a), \
+            (intmax_t)(b) \
+        ); \
+    } \
+} while (0)
 
 #define EXPECT_STREQ(a, b) do { \
     const char *s1 = (a), *s2 = (b); \
@@ -102,6 +116,26 @@ static void test_find_ft(void)
     }
 }
 
+static void test_parse_xterm_key_sequence(void)
+{
+    Key key;
+    ssize_t size;
+
+    size = parse_xterm_key_sequence("\033[Z", 3, &key);
+    EXPECT_EQ(size, 3);
+    EXPECT_EQ(key, MOD_SHIFT | '\t');
+
+    size = parse_xterm_key_sequence("\033[1;2A", 6, &key);
+    EXPECT_EQ(size, 6);
+    EXPECT_EQ(key, MOD_SHIFT | KEY_UP);
+    size = parse_xterm_key_sequence("\033[1;2", 5, &key);
+    EXPECT_EQ(size, -1);
+
+    size = parse_xterm_key_sequence("\033[6;8~", 6, &key);
+    EXPECT_EQ(size, 6);
+    EXPECT_EQ(key, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN);
+}
+
 int main(void)
 {
     init_editor_state();
@@ -109,6 +143,7 @@ int main(void)
     test_relative_filename();
     test_detect_encoding_from_bom();
     test_find_ft();
+    test_parse_xterm_key_sequence();
 
     return failed ? 1 : 0;
 }
