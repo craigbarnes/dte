@@ -13,6 +13,9 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
     case 'O':
         if (i >= length) return -1;
         switch(buf[i++]) {
+        case ' ':
+            *k = ' ';
+            return 3;
         case 'A':
             *k = KEY_UP;
             return 3;
@@ -30,6 +33,9 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             return 3;
         case 'H':
             *k = KEY_HOME;
+            return 3;
+        case 'I':
+            *k = '\t';
             return 3;
         case 'M':
             *k = '\r';
@@ -596,6 +602,15 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             return 3;
         case 'D':
             *k = KEY_LEFT;
+            return 3;
+        case 'F':
+            *k = KEY_END;
+            return 3;
+        case 'H':
+            *k = KEY_HOME;
+            return 3;
+        case 'L':
+            *k = KEY_INSERT;
             return 3;
         case 'Z':
             *k = MOD_SHIFT | '\t';
