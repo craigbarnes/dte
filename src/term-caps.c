@@ -181,6 +181,8 @@ static const TermKeyMap ansi_keymap[] = {
     KEY("\033[B", KEY_DOWN),
     KEY("\033[C", KEY_RIGHT),
     KEY("\033[D", KEY_LEFT),
+    KEY("\033[H", KEY_HOME),
+    KEY("\033[L", KEY_INSERT),
 };
 
 static const TermControlCodes ansi_control_codes = {
