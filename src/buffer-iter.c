@@ -66,9 +66,10 @@ size_t buffer_next_column(BlockIter *bi)
 size_t buffer_prev_column(BlockIter *bi)
 {
     CodePoint u;
-    size_t size = 0;
+    size_t skip, total = 0;
     do {
-        size += buffer_prev_char(bi, &u);
-    } while (u_is_zero_width(u));
-    return size;
+        skip = buffer_prev_char(bi, &u);
+        total += skip;
+    } while (skip && u_is_zero_width(u));
+    return total;
 }
