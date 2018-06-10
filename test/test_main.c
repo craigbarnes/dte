@@ -128,12 +128,22 @@ static void test_parse_xterm_key_sequence(void)
     size = parse_xterm_key_sequence("\033[1;2A", 6, &key);
     EXPECT_EQ(size, 6);
     EXPECT_EQ(key, MOD_SHIFT | KEY_UP);
-    size = parse_xterm_key_sequence("\033[1;2", 5, &key);
-    EXPECT_EQ(size, -1);
 
     size = parse_xterm_key_sequence("\033[6;8~", 6, &key);
     EXPECT_EQ(size, 6);
     EXPECT_EQ(key, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN);
+
+    size = parse_xterm_key_sequence("\033[1;2", 5, &key);
+    EXPECT_EQ(size, -1);
+
+    size = parse_xterm_key_sequence("\033[", 2, &key);
+    EXPECT_EQ(size, -1);
+
+    size = parse_xterm_key_sequence("\033O", 2, &key);
+    EXPECT_EQ(size, -1);
+
+    size = parse_xterm_key_sequence("\033O\033", 3, &key);
+    EXPECT_EQ(size, 0);
 }
 
 int main(void)
