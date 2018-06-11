@@ -17,55 +17,55 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
         switch(buf[i++]) {
         case ' ':
             *k = ' ';
-            return 3;
+            return i;
         case 'A':
             *k = KEY_UP;
-            return 3;
+            return i;
         case 'B':
             *k = KEY_DOWN;
-            return 3;
+            return i;
         case 'C':
             *k = KEY_RIGHT;
-            return 3;
+            return i;
         case 'D':
             *k = KEY_LEFT;
-            return 3;
+            return i;
         case 'F':
             *k = KEY_END;
-            return 3;
+            return i;
         case 'H':
             *k = KEY_HOME;
-            return 3;
+            return i;
         case 'I':
             *k = '\t';
-            return 3;
+            return i;
         case 'M':
             *k = '\r';
-            return 3;
+            return i;
         case 'P':
             *k = KEY_F1;
-            return 3;
+            return i;
         case 'Q':
             *k = KEY_F2;
-            return 3;
+            return i;
         case 'R':
             *k = KEY_F3;
-            return 3;
+            return i;
         case 'S':
             *k = KEY_F4;
-            return 3;
+            return i;
         case 'j':
             *k = '*';
-            return 3;
+            return i;
         case 'k':
             *k = '+';
-            return 3;
+            return i;
         case 'm':
             *k = '-';
-            return 3;
+            return i;
         case 'o':
             *k = '/';
-            return 3;
+            return i;
         }
         return 0;
     case '[':
@@ -94,22 +94,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_SHIFT | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_SHIFT | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_SHIFT | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_SHIFT | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_SHIFT | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_SHIFT | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '3':
@@ -117,22 +117,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_META | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_META | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_META | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_META | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_META | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_META | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '4':
@@ -140,22 +140,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_SHIFT | MOD_META | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_SHIFT | MOD_META | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_SHIFT | MOD_META | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_SHIFT | MOD_META | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_SHIFT | MOD_META | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_SHIFT | MOD_META | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '5':
@@ -163,22 +163,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_CTRL | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_CTRL | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_CTRL | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_CTRL | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_CTRL | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_CTRL | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '6':
@@ -186,22 +186,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_SHIFT | MOD_CTRL | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '7':
@@ -209,22 +209,22 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_META | MOD_CTRL | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_META | MOD_CTRL | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_META | MOD_CTRL | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_META | MOD_CTRL | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_META | MOD_CTRL | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_META | MOD_CTRL | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 case '8':
@@ -232,29 +232,29 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                     switch(buf[i++]) {
                     case 'A':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_UP;
-                        return 6;
+                        return i;
                     case 'B':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_DOWN;
-                        return 6;
+                        return i;
                     case 'C':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_RIGHT;
-                        return 6;
+                        return i;
                     case 'D':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_LEFT;
-                        return 6;
+                        return i;
                     case 'F':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_END;
-                        return 6;
+                        return i;
                     case 'H':
                         *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME;
-                        return 6;
+                        return i;
                     }
                     return 0;
                 }
                 return 0;
             case '~':
                 *k = KEY_HOME;
-                return 4;
+                return i;
             }
             return 0;
         case '2':
@@ -300,7 +300,7 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 return 0;
             case '~':
                 *k = KEY_INSERT;
-                return 4;
+                return i;
             }
             return 0;
         case '3':
@@ -334,7 +334,7 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 return 0;
             case '~':
                 *k = KEY_DELETE;
-                return 4;
+                return i;
             }
             return 0;
         case '4':
@@ -371,7 +371,7 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 return 0;
             case '~':
                 *k = KEY_PAGE_UP;
-                return 4;
+                return i;
             }
             return 0;
         case '6':
@@ -405,33 +405,33 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 return 0;
             case '~':
                 *k = KEY_PAGE_DOWN;
-                return 4;
+                return i;
             }
             return 0;
         case 'A':
             *k = KEY_UP;
-            return 3;
+            return i;
         case 'B':
             *k = KEY_DOWN;
-            return 3;
+            return i;
         case 'C':
             *k = KEY_RIGHT;
-            return 3;
+            return i;
         case 'D':
             *k = KEY_LEFT;
-            return 3;
+            return i;
         case 'F':
             *k = KEY_END;
-            return 3;
+            return i;
         case 'H':
             *k = KEY_HOME;
-            return 3;
+            return i;
         case 'L':
             *k = KEY_INSERT;
-            return 3;
+            return i;
         case 'Z':
             *k = MOD_SHIFT | '\t';
-            return 3;
+            return i;
         }
         return 0;
     }

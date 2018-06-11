@@ -150,7 +150,7 @@ local function write_trie(node, buffer)
         else
             buf:write (
                 indent, "*k = ", node, ";\n",
-                indent, "return ", depth, ";\n"
+                indent, "return i;\n"
             )
         end
     end
