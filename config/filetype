@@ -24,7 +24,7 @@ option gitcommit,gitrebase file-history false
 option -r '/\.git/.*\.diff$' file-history false
 
 # Try to detect indent settings based on existing file contents
-option c,css,d,java,javascript,lua,nginx,php,sh,vala detect-indent 2,3,4,8
+option c,css,d,java,javascript,lua,nginx,php,sh,vala detect-indent 2,4,8
 
 # Scan for braces to determine next auto-ident size
 option c,css,d,go,java,javascript,lua,nginx,php,sh,vala brace-indent true
