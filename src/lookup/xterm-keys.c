@@ -73,37 +73,17 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case '5':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F5;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F5;
+                goto check_trailing_tilde;
             case '7':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F6;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F6;
+                goto check_trailing_tilde;
             case '8':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F7;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F7;
+                goto check_trailing_tilde;
             case '9':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F8;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F8;
+                goto check_trailing_tilde;
             case ';':
                 if (i >= length) return -1;
                 switch(buf[i++]) {
@@ -279,96 +259,41 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case '0':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F9;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F9;
+                goto check_trailing_tilde;
             case '1':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F10;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F10;
+                goto check_trailing_tilde;
             case '3':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F11;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F11;
+                goto check_trailing_tilde;
             case '4':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '~':
-                    *k = KEY_F12;
-                    return 5;
-                }
-                return 0;
+                *k = KEY_F12;
+                goto check_trailing_tilde;
             case ';':
                 if (i >= length) return -1;
                 switch(buf[i++]) {
                 case '2':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '3':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '4':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '5':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_CTRL | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_CTRL | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '6':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_CTRL | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '7':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | MOD_CTRL | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | MOD_CTRL | KEY_INSERT;
+                    goto check_trailing_tilde;
                 case '8':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_INSERT;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_INSERT;
+                    goto check_trailing_tilde;
                 }
                 return 0;
             case '~':
@@ -383,61 +308,26 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 if (i >= length) return -1;
                 switch(buf[i++]) {
                 case '2':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '3':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '4':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '5':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_CTRL | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_CTRL | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '6':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_CTRL | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '7':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | MOD_CTRL | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | MOD_CTRL | KEY_DELETE;
+                    goto check_trailing_tilde;
                 case '8':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_DELETE;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_DELETE;
+                    goto check_trailing_tilde;
                 }
                 return 0;
             case '~':
@@ -446,13 +336,8 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             }
             return 0;
         case '4':
-            if (i >= length) return -1;
-            switch(buf[i++]) {
-            case '~':
-                *k = KEY_END;
-                return 4;
-            }
-            return 0;
+            *k = KEY_END;
+            goto check_trailing_tilde;
         case '5':
             if (i >= length) return -1;
             switch(buf[i++]) {
@@ -460,61 +345,26 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 if (i >= length) return -1;
                 switch(buf[i++]) {
                 case '2':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '3':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '4':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '5':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_CTRL | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_CTRL | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '6':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '7':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | MOD_CTRL | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | MOD_CTRL | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 case '8':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_UP;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_UP;
+                    goto check_trailing_tilde;
                 }
                 return 0;
             case '~':
@@ -529,61 +379,26 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
                 if (i >= length) return -1;
                 switch(buf[i++]) {
                 case '2':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '3':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '4':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '5':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_CTRL | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_CTRL | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '6':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '7':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 case '8':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case '~':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
-                        return 6;
-                    }
-                    return 0;
+                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
+                    goto check_trailing_tilde;
                 }
                 return 0;
             case '~':
@@ -617,6 +432,13 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
             return 3;
         }
         return 0;
+    }
+    return 0;
+check_trailing_tilde:
+    if (i >= length) {
+        return -1;
+    } else if (buf[i++] == '~') {
+        return i;
     }
     return 0;
 }
