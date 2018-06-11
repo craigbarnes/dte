@@ -8,12 +8,12 @@ typedef struct {
     unsigned short attr;
 } AttrHashSlot;
 
-#define ATTRS_TOTAL_KEYWORDS 8
-#define ATTRS_MIN_WORD_LENGTH 4
+#define ATTRS_TOTAL_KEYWORDS 9
+#define ATTRS_MIN_WORD_LENGTH 3
 #define ATTRS_MAX_WORD_LENGTH 12
 #define ATTRS_MIN_HASH_VALUE 0
-#define ATTRS_MAX_HASH_VALUE 7
-/* maximum key range = 8, duplicates = 0 */
+#define ATTRS_MAX_HASH_VALUE 8
+/* maximum key range = 9, duplicates = 0 */
 
 inline
 /*ARGSUSED*/
@@ -22,39 +22,39 @@ attr_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 6, 1, 8,
-      3, 3, 8, 8, 8, 1, 8, 2, 0, 8,
-      8, 8, 8, 8, 2, 8, 8, 3, 2, 0,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-      8, 8, 8, 8, 8, 8
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 7, 1, 9,
+      3, 4, 9, 9, 9, 1, 9, 3, 0, 3,
+      9, 9, 9, 9, 2, 9, 9, 2, 2, 0,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+      9, 9, 9, 9, 9, 9
     };
   return asso_values[(unsigned char)str[2]] + asso_values[(unsigned char)str[0]];
 }
 
 static const unsigned char attr_length_table[] =
   {
-    12,  4,  5,  9,  7,  4,  9,  6
+    12,  4,  5,  9,  7,  9,  3,  4,  6
   };
 
 static const AttrHashSlot attr_table[] =
@@ -64,8 +64,9 @@ static const AttrHashSlot attr_table[] =
     {"blink", ATTR_BLINK},
     {"invisible", ATTR_INVIS},
     {"reverse", ATTR_REVERSE},
-    {"keep", ATTR_KEEP},
     {"underline", ATTR_UNDERLINE},
+    {"dim", ATTR_DIM},
+    {"keep", ATTR_KEEP},
     {"italic", ATTR_ITALIC}
   };
 

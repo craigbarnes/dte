@@ -376,7 +376,7 @@ syntax.
 Attributes:
 
 * `bold`
-* `lowintensity`
+* `dim`
 * `italic`
 * `underline`
 * `blink`
