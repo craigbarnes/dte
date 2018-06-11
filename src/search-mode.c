@@ -19,6 +19,8 @@ static void search_mode_keypress(Key key)
         cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
         break;
+    case '\t':
+        break;
     case MOD_META | 'c':
         editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
         break;
