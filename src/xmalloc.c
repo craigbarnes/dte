@@ -18,7 +18,7 @@ NORETURN COLD static void malloc_fail (
 
 size_t size_multiply(size_t a, size_t b)
 {
-    if (unsigned_mult_overflows(a, b)) {
+    if (unlikely(unsigned_mult_overflows(a, b))) {
         char buf[256];
         term_cleanup();
         snprintf(buf, sizeof buf, "\nsize_t overflow: %zu * %zu\n", a, b);

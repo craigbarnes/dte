@@ -81,6 +81,12 @@
     #define WARN_UNUSED_RESULT
 #endif
 
+#if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(alloc_size)
+    #define ALLOC_SIZE(...) __attribute__((alloc_size(__VA_ARGS__)))
+#else
+    #define ALLOC_SIZE(...)
+#endif
+
 #if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(cold)
     #define COLD __attribute__((__cold__))
 #else
