@@ -90,32 +90,48 @@ static void test_find_ft(void)
 
 static void test_parse_xterm_key_sequence(void)
 {
-    Key key;
-    ssize_t size;
-
-    size = parse_xterm_key_sequence("\033[Z", 3, &key);
-    EXPECT_EQ(size, 3);
-    EXPECT_EQ(key, MOD_SHIFT | '\t');
-
-    size = parse_xterm_key_sequence("\033[1;2A", 6, &key);
-    EXPECT_EQ(size, 6);
-    EXPECT_EQ(key, MOD_SHIFT | KEY_UP);
-
-    size = parse_xterm_key_sequence("\033[6;8~", 6, &key);
-    EXPECT_EQ(size, 6);
-    EXPECT_EQ(key, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN);
-
-    size = parse_xterm_key_sequence("\033[1;2", 5, &key);
-    EXPECT_EQ(size, -1);
-
-    size = parse_xterm_key_sequence("\033[", 2, &key);
-    EXPECT_EQ(size, -1);
-
-    size = parse_xterm_key_sequence("\033O", 2, &key);
-    EXPECT_EQ(size, -1);
-
-    size = parse_xterm_key_sequence("\033O\033", 3, &key);
-    EXPECT_EQ(size, 0);
+    static const struct xterm_key_test {
+        const char *escape_sequence;
+        ssize_t expected_length;
+        Key expected_key;
+    } tests[] = {
+        {"\033[Z", 3, MOD_SHIFT | '\t'},
+        {"\033[1;2A", 6, MOD_SHIFT | KEY_UP},
+        {"\033[1;2", -1, 0},
+        {"\033[", -1, 0},
+        {"\033O", -1, 0},
+        {"\033[\033", 0, 0},
+        {"\033[A", 3, KEY_UP},
+        {"\033[F", 3, KEY_END},
+        {"\033[H", 3, KEY_HOME},
+        {"\033[L", 3, KEY_INSERT},
+        {"\033[1~", 4, KEY_HOME},
+        {"\033[5~", 4, KEY_PAGE_UP},
+        {"\033[6~", 4, KEY_PAGE_DOWN},
+        {"\033OD", 3, KEY_LEFT},
+        {"\033OF", 3, KEY_END},
+        {"\033OH", 3, KEY_HOME},
+        {"\033OP", 3, KEY_F1},
+        {"\033OQ", 3, KEY_F2},
+        {"\033OR", 3, KEY_F3},
+        {"\033OS", 3, KEY_F4},
+        {"\033[15~", 5, KEY_F5},
+        {"\033[17~", 5, KEY_F6},
+        {"\033[23~", 5, KEY_F11},
+        {"\033[24~", 5, KEY_F12},
+        {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
+        {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
+        {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
+    };
+    FOR_EACH_I(i, tests) {
+        const char *seq = tests[i].escape_sequence;
+        Key key;
+        ssize_t length = parse_xterm_key_sequence(seq, strlen(seq), &key);
+        IEXPECT_EQ(length, tests[i].expected_length, i, "lengths");
+        if (length > 0) {
+            IEXPECT_EQ(key, tests[i].expected_key, i, "keys");
+        }
+    }
 }
 
 void test_key_to_string(void);

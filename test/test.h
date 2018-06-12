@@ -19,6 +19,20 @@
     } \
 } while (0)
 
+#define IEXPECT_EQ(a, b, i, s) do { \
+    if ((a) != (b)) { \
+        fail ( \
+            "%s:%d: Test #%zu: %s not equal: %" PRIdMAX ", %" PRIdMAX "\n", \
+            __FILE__, \
+            __LINE__, \
+            ((i) + 1), \
+            (s), \
+            (intmax_t)(a), \
+            (intmax_t)(b) \
+        ); \
+    } \
+} while (0)
+
 #define EXPECT_STREQ(a, b) do { \
     const char *s1 = (a), *s2 = (b); \
     if (unlikely(!xstreq(s1, s2))) { \
