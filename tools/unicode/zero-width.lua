@@ -1,8 +1,7 @@
 #!/usr/bin/env lua
 package.path = "./tools/unicode/?.lua;./?.lua"
 local util = require "ucd-util"
-local ucd = util.read_ucd_file(arg[1], "UnicodeData.txt")
-assert(ucd:find("^0000;") == 1, "File format not recognized")
+local ucd = util.read_ucd(arg[1], "UnicodeData.txt", "^0000;")
 
 local zero_width = {
     Cf = true, -- Format (includes U+00AD SOFT HYPHEN, which is excluded below)

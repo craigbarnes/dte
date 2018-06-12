@@ -1,16 +1,25 @@
 local util = {}
 
-function util.read_ucd_file(path, ucdname)
-    assert(ucdname)
-    local baseurl = "https://www.unicode.org/Public/10.0.0/ucd"
+local function usage(ucdname)
     local usage = "Usage: %s path/to/%s\n(available from: %s/%s)\n"
+    local baseurl = "https://www.unicode.org/Public/10.0.0/ucd"
+    io.stderr:write(usage:format(arg[0], ucdname, baseurl, ucdname))
+end
+
+function util.read_ucd(path, ucdname, pattern)
+    assert(ucdname)
+    assert(pattern)
     if not path then
-        io.stderr:write(usage:format(arg[0], ucdname, baseurl, ucdname))
+        usage(ucdname)
         os.exit(1)
     end
     local file = assert(io.open(path, "r"))
     local text = assert(file:read("*a"))
     file:close()
+    if text:find(pattern) ~= 1 then
+        usage(ucdname)
+        os.exit(1)
+    end
     return text
 end
 
