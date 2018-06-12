@@ -44,7 +44,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
-    test_main ))
+    test-main ))
 
 all_objects := $(editor_objects) $(test_objects)
 
