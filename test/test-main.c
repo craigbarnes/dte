@@ -1,18 +1,15 @@
-#include <inttypes.h>
 #include <langinfo.h>
 #include <locale.h>
-#include "../src/util/macros.h"
+#include "test.h"
 #include "../src/editor.h"
-#include "../src/common.h"
 #include "../src/path.h"
 #include "../src/encoding.h"
 #include "../src/filetype.h"
 #include "../src/lookup/xterm-keys.c"
 
-static unsigned int failed;
+unsigned int failed;
 
-PRINTF(1)
-static void fail(const char *format, ...)
+void fail(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -20,34 +17,6 @@ static void fail(const char *format, ...)
     va_end(ap);
     failed += 1;
 }
-
-#define FOR_EACH_I(i, array) \
-    for (size_t i = 0; i < ARRAY_COUNT(array); i++)
-
-#define EXPECT_EQ(a, b) do { \
-    if ((a) != (b)) { \
-        fail ( \
-            "%s:%d: Values not equal: %" PRIdMAX ", %" PRIdMAX "\n", \
-            __FILE__, \
-            __LINE__, \
-            (intmax_t)(a), \
-            (intmax_t)(b) \
-        ); \
-    } \
-} while (0)
-
-#define EXPECT_STREQ(a, b) do { \
-    const char *s1 = (a), *s2 = (b); \
-    if (unlikely(!xstreq(s1, s2))) { \
-        fail ( \
-            "%s:%d: Strings not equal: '%s', '%s'\n", \
-            __FILE__, \
-            __LINE__, \
-            s1 ? s1 : "(null)", \
-            s2 ? s2 : "(null)" \
-        ); \
-    } \
-} while (0)
 
 static void test_relative_filename(void)
 {
@@ -149,48 +118,7 @@ static void test_parse_xterm_key_sequence(void)
     EXPECT_EQ(size, 0);
 }
 
-static void test_key_to_string(void)
-{
-    static const struct key_to_string_test {
-        const char *str;
-        Key key;
-    } tests[] = {
-        {"a", 'a'},
-        {"Z", 'Z'},
-        {"0", '0'},
-        {"{", '{'},
-        {"space", ' '},
-        {"enter", KEY_ENTER},
-        {"tab", '\t'},
-        {"insert", KEY_INSERT},
-        {"delete", KEY_DELETE},
-        {"home", KEY_HOME},
-        {"end", KEY_END},
-        {"pgup", KEY_PAGE_UP},
-        {"pgdown", KEY_PAGE_DOWN},
-        {"left", KEY_LEFT},
-        {"right", KEY_RIGHT},
-        {"up", KEY_UP},
-        {"down", KEY_DOWN},
-        {"C-A", MOD_CTRL | 'A'},
-        {"M-S-{", MOD_META | MOD_SHIFT | '{'},
-        {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
-        {"F1", KEY_F1},
-        {"F12", KEY_F12},
-        {"M-enter", MOD_META | KEY_ENTER},
-        {"M-space", MOD_META | ' '},
-        {"S-tab", MOD_SHIFT | '\t'},
-        {"C-M-S-F12", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F12},
-        {"C-M-S-up", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
-        {"C-M-delete", MOD_CTRL | MOD_META | KEY_DELETE},
-        {"C-home", MOD_CTRL | KEY_HOME},
-    };
-    FOR_EACH_I(i, tests) {
-        char *str = key_to_string(tests[i].key);
-        EXPECT_STREQ(str, tests[i].str);
-        free(str);
-    }
-}
+void test_key_to_string(void);
 
 int main(void)
 {
