@@ -7,8 +7,6 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-TerminalInfo terminal;
-
 static struct termios termios_save;
 
 static char *escape_key(const char *key, size_t len)

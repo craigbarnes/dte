@@ -2,6 +2,8 @@
 #include "common.h"
 #include "lookup/xterm-keys.c"
 
+TerminalInfo terminal;
+
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
 #define KEY(c, k) { \
