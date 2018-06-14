@@ -187,4 +187,4 @@ sub-syntax whose name is `END` are replaced with `c`.
 
 
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
-[built-in syntax files]: https://github.com/craigbarnes/dte/tree/master/config/syntax
+[built-in syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax

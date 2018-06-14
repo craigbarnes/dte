@@ -108,7 +108,6 @@ state sq string
     char -b "\\" .ruby-esc:this
     eat this
 
-# Keywords (from https://github.com/ruby/ruby/blob/trunk/defs/keywords)
 list keyword \
     __ENCODING__ __LINE__ __FILE__ BEGIN END \
     alias and begin break case class def defined? do else elsif end \

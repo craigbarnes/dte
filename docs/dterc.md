@@ -293,8 +293,6 @@ See also:
 * The `option` command (below)
 * The `filetype` option (below)
 * The [`dte-syntax`] man page
-* The [built-in filetype associations][`config/filetype`]
-  (which can be listed by running `dte -b filetype`)
 
 ### **ft** **-b** _filetype_ _basename_...
 
@@ -1068,5 +1066,4 @@ errors should be highlighted. Set to `""` to disable.
 [`dte-syntax`]: dte-syntax.html
 [`execvp`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
-[`config/filetype`]: https://github.com/craigbarnes/dte/blob/master/config/filetype
 [`xterm`]: https://invisible-island.net/xterm/

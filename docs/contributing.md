@@ -28,7 +28,7 @@ Coding Style
 * Above all else, be consistent with the existing code.
 
 
-[bug reports]: https://github.com/craigbarnes/dte/issues
-[code blocks]: https://help.github.com/articles/creating-and-highlighting-code-blocks/#fenced-code-blocks
-[`pre-commit`]: https://github.com/craigbarnes/dte/blob/master/tools/git-hooks/pre-commit
-[`commit-msg`]: https://github.com/craigbarnes/dte/blob/master/tools/git-hooks/commit-msg
+[bug reports]: https://gitlab.com/craigbarnes/dte/issues
+[code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-and-syntax-highlighting
+[`pre-commit`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/pre-commit
+[`commit-msg`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/commit-msg
