@@ -46,6 +46,9 @@ static void set_signal_handlers(void)
     set_signal_handler(SIGQUIT, SIG_IGN);
     set_signal_handler(SIGPIPE, SIG_IGN);
 
+    set_signal_handler(SIGUSR1, SIG_IGN);
+    set_signal_handler(SIGUSR2, SIG_IGN);
+
     // Terminal does not generate signal for ^Z but someone can send
     // us SIGTSTP nevertheless. SIGSTOP can't be caught.
     set_signal_handler(SIGTSTP, handle_sigtstp);
