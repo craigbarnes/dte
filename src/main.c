@@ -39,9 +39,38 @@ static void handle_sigwinch(int UNUSED(signum))
 MESSAGE("SIGWINCH not defined; disabling handler")
 #endif
 
+static void handle_fatal_signal(int signum)
+{
+    term_cleanup();
+
+    set_signal_handler(signum, SIG_DFL);
+
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, signum);
+    sigprocmask(SIG_UNBLOCK, &mask, NULL);
+
+    raise(signum);
+}
+
 static void set_signal_handlers(void)
 {
-    // Terminal does not generate signals for control keys
+    // SIGABRT is not included here, since we can always call
+    // term_cleanup() explicitly, before calling abort().
+    static const int fatal_signals[] = {
+        SIGBUS, SIGFPE, SIGILL, SIGSEGV,
+        SIGHUP, SIGTERM,
+    };
+
+    struct sigaction action;
+    memzero(&action);
+    sigfillset(&action.sa_mask);
+    action.sa_handler = handle_fatal_signal;
+
+    for (size_t i = 0; i < ARRAY_COUNT(fatal_signals); i++) {
+        sigaction(fatal_signals[i], &action, NULL);
+    }
+
     set_signal_handler(SIGINT, SIG_IGN);
     set_signal_handler(SIGQUIT, SIG_IGN);
     set_signal_handler(SIGPIPE, SIG_IGN);
@@ -49,10 +78,7 @@ static void set_signal_handlers(void)
     set_signal_handler(SIGUSR1, SIG_IGN);
     set_signal_handler(SIGUSR2, SIG_IGN);
 
-    // Terminal does not generate signal for ^Z but someone can send
-    // us SIGTSTP nevertheless. SIGSTOP can't be caught.
     set_signal_handler(SIGTSTP, handle_sigtstp);
-
     set_signal_handler(SIGCONT, handle_sigcont);
 
 #ifdef SIGWINCH
