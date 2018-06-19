@@ -16,6 +16,15 @@ local keys = {
     ["[5~"] = "KEY_PAGE_UP",
     ["[6~"] = "KEY_PAGE_DOWN",
 
+    -- These 4 sequences are "deprecated" in xterm, even though they
+    -- were used by default in older releases. They are still used by
+    -- some other, xterm-like terminal emulators and can still be
+    -- activated in xterm by setting the "oldXtermFKeys" resource.
+    ["[11~"] = "KEY_F1",
+    ["[12~"] = "KEY_F2",
+    ["[13~"] = "KEY_F3",
+    ["[14~"] = "KEY_F4",
+
     ["[15~"] = "KEY_F5",
     ["[17~"] = "KEY_F6",
     ["[18~"] = "KEY_F7",

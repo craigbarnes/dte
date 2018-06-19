@@ -74,6 +74,18 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
         case '1':
             if (i >= length) return -1;
             switch(buf[i++]) {
+            case '1':
+                *k = KEY_F1;
+                goto check_trailing_tilde;
+            case '2':
+                *k = KEY_F2;
+                goto check_trailing_tilde;
+            case '3':
+                *k = KEY_F3;
+                goto check_trailing_tilde;
+            case '4':
+                *k = KEY_F4;
+                goto check_trailing_tilde;
             case '5':
                 *k = KEY_F5;
                 goto check_trailing_tilde;
