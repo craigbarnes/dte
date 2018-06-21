@@ -59,6 +59,8 @@ static void set_signal_handlers(void)
     // term_cleanup() explicitly, before calling abort().
     static const int fatal_signals[] = {
         SIGBUS, SIGFPE, SIGILL, SIGSEGV,
+        SIGSYS, SIGTRAP, SIGXCPU, SIGXFSZ,
+        SIGALRM, SIGPROF, SIGVTALRM,
         SIGHUP, SIGTERM,
     };
 
