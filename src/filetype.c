@@ -319,6 +319,14 @@ const char *find_ft (
             return builtin_filetype_names[slot->filetype];
         }
     }
+    if (
+        filename
+        && filename_len >= sizeof("/etc/.conf")
+        && str_has_prefix(filename, "/etc/")
+        && str_has_suffix(filename, ".conf")
+    ) {
+        return "config";
+    }
 
     return NULL;
 }
