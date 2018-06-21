@@ -30,15 +30,6 @@ static void handle_sigcont(int UNUSED(signum))
     }
 }
 
-#ifdef SIGWINCH
-static void handle_sigwinch(int UNUSED(signum))
-{
-    editor.resized = true;
-}
-#else
-MESSAGE("SIGWINCH not defined; disabling handler")
-#endif
-
 static void handle_fatal_signal(int signum)
 {
     term_cleanup();

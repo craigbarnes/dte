@@ -99,12 +99,6 @@
     #define RETURNS_NONNULL
 #endif
 
-#if GNUC_AT_LEAST(5, 0)
-    #define MESSAGE(x) DO_PRAGMA(message #x)
-#else
-    #define MESSAGE(x)
-#endif
-
 #if __STDC_VERSION__ >= 201112L
     #define NORETURN _Noreturn
 #elif GNUC_AT_LEAST(3, 0)

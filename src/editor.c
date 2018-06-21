@@ -13,6 +13,8 @@
 #include "error.h"
 #include "script.h"
 
+static volatile sig_atomic_t terminal_resized;
+
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
 extern const EditorModeOps search_mode_ops;
@@ -23,7 +25,6 @@ EditorState editor = {
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .everything_changed = false,
-    .resized = false,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
     .version = VERSION,
@@ -276,9 +277,14 @@ void normal_update(void)
     end_update();
 }
 
+void handle_sigwinch(int UNUSED(signum))
+{
+    terminal_resized = true;
+}
+
 void resize(void)
 {
-    editor.resized = false;
+    terminal_resized = false;
     update_screen_size();
 
     // "dtach -r winch" sends SIGWINCH after program has been attached
@@ -405,7 +411,7 @@ char get_confirmation(const char *choices, const char *format, ...)
             if (key == def) {
                 break;
             }
-        } else if (editor.resized) {
+        } else if (terminal_resized) {
             resize();
         }
     }
@@ -478,7 +484,7 @@ void main_loop(void)
     while (editor.status == EDITOR_RUNNING) {
         Key key;
 
-        if (editor.resized) {
+        if (terminal_resized) {
             resize();
         }
         if (!term_read_key(&key)) {
