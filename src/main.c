@@ -55,21 +55,28 @@ static void set_signal_handlers(void)
         SIGHUP, SIGTERM,
     };
 
+    static const int ignored_signals[] = {
+        SIGINT, SIGQUIT, SIGPIPE,
+        SIGUSR1, SIGUSR2,
+    };
+
     struct sigaction action;
     memzero(&action);
     sigfillset(&action.sa_mask);
-    action.sa_handler = handle_fatal_signal;
 
+    action.sa_handler = handle_fatal_signal;
     for (size_t i = 0; i < ARRAY_COUNT(fatal_signals); i++) {
-        sigaction(fatal_signals[i], &action, NULL);
+        if (sigaction(fatal_signals[i], &action, NULL) != 0) {
+            BUG("Failed to add fatal_signals[%zu]: %s", i, strerror(errno));
+        }
     }
 
-    set_signal_handler(SIGINT, SIG_IGN);
-    set_signal_handler(SIGQUIT, SIG_IGN);
-    set_signal_handler(SIGPIPE, SIG_IGN);
-
-    set_signal_handler(SIGUSR1, SIG_IGN);
-    set_signal_handler(SIGUSR2, SIG_IGN);
+    action.sa_handler = SIG_IGN;
+    for (size_t i = 0; i < ARRAY_COUNT(ignored_signals); i++) {
+        if (sigaction(ignored_signals[i], &action, NULL) != 0) {
+            BUG("Failed to add ignored_signals[%zu]: %s", i, strerror(errno));
+        }
+    }
 
     set_signal_handler(SIGTSTP, handle_sigtstp);
     set_signal_handler(SIGCONT, handle_sigcont);
