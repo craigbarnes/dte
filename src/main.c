@@ -44,6 +44,13 @@ static void handle_fatal_signal(int signum)
     raise(signum);
 }
 
+static inline void do_sigaction(int sig, const struct sigaction *action)
+{
+    if (sigaction(sig, action, NULL) != 0) {
+        BUG("Failed to add handler for signal %d: %s", sig, strerror(errno));
+    }
+}
+
 static void set_signal_handlers(void)
 {
     // SIGABRT is not included here, since we can always call
@@ -60,30 +67,36 @@ static void set_signal_handlers(void)
         SIGUSR1, SIGUSR2,
     };
 
+    static const struct {
+        int signum;
+        void (*handler)(int);
+    } handled_signals[] = {
+        {SIGTSTP, handle_sigtstp},
+        {SIGCONT, handle_sigcont},
+#ifdef SIGWINCH
+        {SIGWINCH, handle_sigwinch},
+#endif
+    };
+
     struct sigaction action;
     memzero(&action);
     sigfillset(&action.sa_mask);
 
     action.sa_handler = handle_fatal_signal;
     for (size_t i = 0; i < ARRAY_COUNT(fatal_signals); i++) {
-        if (sigaction(fatal_signals[i], &action, NULL) != 0) {
-            BUG("Failed to add fatal_signals[%zu]: %s", i, strerror(errno));
-        }
+        do_sigaction(fatal_signals[i], &action);
     }
 
     action.sa_handler = SIG_IGN;
     for (size_t i = 0; i < ARRAY_COUNT(ignored_signals); i++) {
-        if (sigaction(ignored_signals[i], &action, NULL) != 0) {
-            BUG("Failed to add ignored_signals[%zu]: %s", i, strerror(errno));
-        }
+        do_sigaction(ignored_signals[i], &action);
     }
 
-    set_signal_handler(SIGTSTP, handle_sigtstp);
-    set_signal_handler(SIGCONT, handle_sigcont);
-
-#ifdef SIGWINCH
-    set_signal_handler(SIGWINCH, handle_sigwinch);
-#endif
+    sigemptyset(&action.sa_mask);
+    for (size_t i = 0; i < ARRAY_COUNT(handled_signals); i++) {
+        action.sa_handler = handled_signals[i].handler;
+        do_sigaction(handled_signals[i].signum, &action);
+    }
 }
 
 static int dump_builtin_config(const char *const name)
