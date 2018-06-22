@@ -10,7 +10,7 @@ gen: gperf-gen xterm-keys-gen
 
 gperf-gen:
 	$(call GPERF_GEN, src/lookup/extensions, -D)
-	$(call GPERF_GEN, src/lookup/basenames, -n)
+	$(call GPERF_GEN, src/lookup/basenames)
 	$(call GPERF_GEN, src/lookup/interpreters)
 	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
 	$(call GPERF_GEN, src/lookup/attributes, -n)
