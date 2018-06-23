@@ -18,17 +18,18 @@ static int dup_close_on_exec(int old, int new)
 
 static void handle_child(char **argv, int fd[3], int error_fd)
 {
-    int i, error, nr_fds = 3;
-    int move = error_fd < nr_fds;
+    int error;
+    int nr_fds = 3;
+    bool move = error_fd < nr_fds;
     int max = error_fd;
 
     // Find if we must move fds out of the way
-    for (i = 0; i < nr_fds; i++) {
+    for (int i = 0; i < nr_fds; i++) {
         if (fd[i] > max) {
             max = fd[i];
         }
         if (fd[i] < i) {
-            move = 1;
+            move = true;
         }
     }
 
@@ -41,7 +42,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
                 goto out;
             }
         }
-        for (i = 0; i < nr_fds; i++) {
+        for (int i = 0; i < nr_fds; i++) {
             if (fd[i] < i) {
                 fd[i] = dup_close_on_exec(fd[i], next_free++);
                 if (fd[i] < 0) {
@@ -52,7 +53,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
     }
 
     // Now it is safe to duplicate fds in this order
-    for (i = 0; i < nr_fds; i++) {
+    for (int i = 0; i < nr_fds; i++) {
         if (i == fd[i]) {
             // Clear FD_CLOEXEC flag
             fcntl(fd[i], F_SETFD, 0);
@@ -91,14 +92,14 @@ int pipe_close_on_exec(int fd[2])
 
 int fork_exec(char **argv, int fd[3])
 {
-    int pid, rc, status, error = 0;
+    int error = 0;
     int ep[2];
 
     if (pipe_close_on_exec(ep)) {
         return -1;
     }
 
-    pid = fork();
+    const pid_t pid = fork();
     if (pid < 0) {
         error = errno;
         close(ep[0]);
@@ -111,7 +112,7 @@ int fork_exec(char **argv, int fd[3])
     }
 
     close(ep[1]);
-    rc = read(ep[0], &error, sizeof(error));
+    const ssize_t rc = read(ep[0], &error, sizeof(error));
     if (rc > 0 && rc != sizeof(error)) {
         error = EPIPE;
     }
@@ -125,6 +126,7 @@ int fork_exec(char **argv, int fd[3])
         return pid;
     }
 
+    int status;
     while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
         ;
     }
@@ -135,7 +137,6 @@ int fork_exec(char **argv, int fd[3])
 int wait_child(int pid)
 {
     int status;
-
     while (waitpid(pid, &status, 0) < 0) {
         if (errno == EINTR) {
             continue;
