@@ -22,10 +22,9 @@ BUILTIN_SYNTAX_FILES := \
     python robotstxt roff ruby sh sql tex texmfcnf vala xml
 
 BUILTIN_CONFIGS := $(addprefix config/, \
-    rc filetype \
+    rc compiler/gcc compiler/go \
     binding/default binding/shift-select \
     color/dark color/light color/light256 color/darkgray \
-    compiler/gcc compiler/go \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
