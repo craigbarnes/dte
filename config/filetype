@@ -10,13 +10,6 @@ ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f nginx '^/etc/nginx/'
 ft -f sh '^/etc/default/|^/etc/profile$|(\.|/)bash(rc|_profile|_logout)$'
 
-# "ft -c" uses a regular expression to match the first line of the file
-ft -c html '^<!(doctype|DOCTYPE) (html|HTML)(>$| )'
-ft -c ini '^\[wrap-file\]$'
-ft -c roff '^\.TH [A-Z0-9]'
-ft -c sh '^#.* shell-script'
-ft -c xml '^<\?xml( |$)'
-
 # The "option" command sets default local options for specific file types
 
 # Don't remember cursor position for git temporary files

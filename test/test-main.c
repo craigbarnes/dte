@@ -59,9 +59,9 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
-static void test_find_ft(void)
+static void test_find_ft_filename(void)
 {
-    static const struct ft_test {
+    static const struct ft_filename_test {
         const char *filename, *expected_filetype;
     } tests[] = {
         {"/usr/local/include/lib.h", "c"},
@@ -82,8 +82,32 @@ static void test_find_ft(void)
         {"/etc../etc.c.old/c.old", NULL},
     };
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
-        const struct ft_test *t = &tests[i];
+        const struct ft_filename_test *t = &tests[i];
         const char *result = find_ft(t->filename, NULL, NULL, 0);
+        EXPECT_STREQ(result, t->expected_filetype);
+    }
+}
+
+static void test_find_ft_firstline(void)
+{
+    static const struct ft_firstline_test {
+        const char *line, *expected_filetype;
+    } tests[] = {
+        {"<!DOCTYPE html>", "html"},
+        {"<!doctype HTML", "html"},
+        {"<!doctype htm", NULL},
+        {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "xml"},
+        {"[wrap-file]", "ini"},
+        {"[wrap-file", NULL},
+        {".TH DTE 1", NULL},
+        {"", NULL},
+        {" ", NULL},
+        {" <?xml", NULL},
+        {"\0<?xml", NULL},
+    };
+    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+        const struct ft_firstline_test *t = &tests[i];
+        const char *result = find_ft(NULL, NULL, t->line, strlen(t->line));
         EXPECT_STREQ(result, t->expected_filetype);
     }
 }
@@ -142,7 +166,8 @@ int main(void)
 
     test_relative_filename();
     test_detect_encoding_from_bom();
-    test_find_ft();
+    test_find_ft_filename();
+    test_find_ft_firstline();
     test_parse_xterm_key_sequence();
     test_key_to_string();
 

@@ -313,6 +313,15 @@ const char *find_ft (
             return builtin_filetype_names[slot->filetype];
         }
     }
+    if (first_line) {
+        if (line_len >= 14 && !strncasecmp(first_line, "<!DOCTYPE HTML", 14)) {
+            return builtin_filetype_names[HTML];
+        } else if (line_len >= 11 && !strncmp(first_line, "[wrap-file]", 11)) {
+            return builtin_filetype_names[INI];
+        } else if (line_len >= 5 && !strncmp(first_line, "<?xml", 5)) {
+            return builtin_filetype_names[XML];
+        }
+    }
     if (ext.length) {
         slot = filetype_from_extension(ext.data, ext.length);
         if (slot) {
