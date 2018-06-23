@@ -57,12 +57,8 @@ else
   LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
 endif
 
-CWARNS = \
-    $(call cc-option,$(WARNINGS)) \
-    $(foreach W, $(WARNINGS_EXTRA),$(call cc-option,$(W)))
-
+CWARNS = $(WARNINGS) $(foreach W,$(WARNINGS_EXTRA),$(call cc-option,$(W)))
 CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
-
 $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
 
