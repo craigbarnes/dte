@@ -96,7 +96,7 @@ out:
     exit(42);
 }
 
-static int fork_exec(char **argv, int fd[3])
+static pid_t fork_exec(char **argv, int fd[3])
 {
     int error = 0;
     int ep[2];
@@ -140,7 +140,7 @@ static int fork_exec(char **argv, int fd[3])
     return -1;
 }
 
-static int wait_child(int pid)
+static int wait_child(pid_t pid)
 {
     int status;
     while (waitpid(pid, &status, 0) < 0) {
@@ -304,7 +304,7 @@ static int open_dev_null(int flags)
     return fd;
 }
 
-static int handle_child_error(int pid)
+static int handle_child_error(pid_t pid)
 {
     int ret = wait_child(pid);
 
@@ -323,7 +323,6 @@ int spawn_filter(char **argv, FilterData *data)
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
     int dev_null = -1;
-    int fd[3], pid;
 
     data->out = NULL;
     data->out_len = 0;
@@ -337,10 +336,8 @@ int spawn_filter(char **argv, FilterData *data)
         goto error;
     }
 
-    fd[0] = p0[0];
-    fd[1] = p1[1];
-    fd[2] = dev_null;
-    pid = fork_exec(argv, fd);
+    int fd[3] = {p0[0], p1[1], dev_null};
+    const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
         error_msg("Error: %s", strerror(errno));
         goto error;
@@ -368,16 +365,16 @@ error:
 
 void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
 {
-    bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
+    const bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
+    const bool quiet = !!(flags & SPAWN_QUIET);
     bool prompt = !!(flags & SPAWN_PROMPT);
-    bool quiet = !!(flags & SPAWN_QUIET);
-    int pid, dev_null, p[2], fd[3];
+    int p[2], fd[3];
 
     fd[0] = open_dev_null(O_RDONLY);
     if (fd[0] < 0) {
         return;
     }
-    dev_null = open_dev_null(O_WRONLY);
+    const int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         close(fd[0]);
         return;
@@ -402,11 +399,11 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
         ui_end();
     }
 
-    pid = fork_exec(args, fd);
+    const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
         error_msg("Error: %s", strerror(errno));
         close(p[1]);
-        prompt = 0;
+        prompt = false;
     } else {
         // Must close write end of the pipe before read_errors() or
         // the read end never gets EOF!
@@ -429,12 +426,12 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
 
 void spawn(char **args, int fd[3], bool prompt)
 {
-    int pid, quiet, redir_count = 0;
-    int dev_null = open_dev_null(O_WRONLY);
-
+    const int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         return;
     }
+
+    unsigned int redir_count = 0;
     if (fd[0] < 0) {
         fd[0] = open_dev_null(O_RDONLY);
         if (fd[0] < 0) {
@@ -451,14 +448,14 @@ void spawn(char **args, int fd[3], bool prompt)
         fd[2] = dev_null;
         redir_count++;
     }
-    quiet = redir_count == 3;
 
+    const bool quiet = (redir_count == 3);
     if (!quiet) {
         editor.child_controls_terminal = true;
         ui_end();
     }
 
-    pid = fork_exec(args, fd);
+    const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
         error_msg("Error: %s", strerror(errno));
         prompt = false;
