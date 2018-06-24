@@ -169,6 +169,7 @@ local function write_trie(node, buffer)
     serialize(node, 1)
 end
 
+local xterm_trie = make_trie(xterm_keys)
 local output = assert(io.stdout)
 
 output:write [[
@@ -186,7 +187,6 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
     size_t i = 1;
 ]]
 
-local xterm_trie = make_trie(xterm_keys)
 write_trie(xterm_trie, output)
 
 output:write [[
