@@ -50,9 +50,8 @@ syntax ruby
 # TODO: Numeric literals
 
 state line-start code
-    char # comment
-    char " \b\t\n\v\f\r" this
-    str "=begin" =begin
+    char "\n" this
+    char = line-start-eq
     noeat start
 
 state start code
@@ -98,14 +97,34 @@ state comment
     char "\n" line-start
     eat this
 
+state line-start-eq comment
+    str 'begin' =begin
+    recolor code 1
+    noeat start
+
 state =begin comment
-    char "\n" =begin-nl
+    char "\n" =begin-line-start
+    char " \t" =begin-text
+    recolor code 6
+    noeat start
+
+state =begin-text comment
+    char "\n" =begin-line-start
     eat this
 
-state =begin-nl comment
-    char " \b\t\n\v\f\r" this
-    str "=end" comment
-    noeat =begin
+state =begin-line-start comment
+    char "\n" this
+    str '=end' =begin-maybe-end
+    noeat =begin-text
+
+state =begin-maybe-end comment
+    char "\n" line-start
+    char " \t" =end
+    noeat =begin-text
+
+state =end comment
+    char "\n" line-start
+    eat this
 
 state ident
     char -b a-zA-Z0-9_!? this
