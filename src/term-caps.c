@@ -211,90 +211,7 @@ static void term_init_fallback(const char *const UNUSED(term))
 
 #endif // ifndef TERMINFO_DISABLE
 
-static const TermKeyMap rxvt_keymap[] = {
-    KEY("\033[2~", KEY_INSERT),
-    KEY("\033[3~", KEY_DELETE),
-    KEY("\033[7~", KEY_HOME),
-    KEY("\033[8~", KEY_END),
-    KEY("\033[5~", KEY_PAGE_UP),
-    KEY("\033[6~", KEY_PAGE_DOWN),
-    KEY("\033[D", KEY_LEFT),
-    KEY("\033[C", KEY_RIGHT),
-    KEY("\033[A", KEY_UP),
-    KEY("\033[B", KEY_DOWN),
-    KEY("\033[11~", KEY_F1),
-    KEY("\033[12~", KEY_F2),
-    KEY("\033[13~", KEY_F3),
-    KEY("\033[14~", KEY_F4),
-    KEY("\033[15~", KEY_F5),
-    KEY("\033[17~", KEY_F6),
-    KEY("\033[18~", KEY_F7),
-    KEY("\033[19~", KEY_F8),
-    KEY("\033[20~", KEY_F9),
-    KEY("\033[21~", KEY_F10),
-    KEY("\033[23~", KEY_F11),
-    KEY("\033[24~", KEY_F12),
-    KEY("\033[7$", MOD_SHIFT | KEY_HOME),
-    KEY("\033[8$", MOD_SHIFT | KEY_END),
-    KEY("\033[d", MOD_SHIFT | KEY_LEFT),
-    KEY("\033[c", MOD_SHIFT | KEY_RIGHT),
-    KEY("\033[a", MOD_SHIFT | KEY_UP),
-    KEY("\033[b", MOD_SHIFT | KEY_DOWN),
-    KEY("\033Od", MOD_CTRL | KEY_LEFT),
-    KEY("\033Oc", MOD_CTRL | KEY_RIGHT),
-    KEY("\033Oa", MOD_CTRL | KEY_UP),
-    KEY("\033Ob", MOD_CTRL | KEY_DOWN),
-    KEY("\033\033[D", MOD_META | KEY_LEFT),
-    KEY("\033\033[C", MOD_META | KEY_RIGHT),
-    KEY("\033\033[A", MOD_META | KEY_UP),
-    KEY("\033\033[B", MOD_META | KEY_DOWN),
-    KEY("\033\033[d", MOD_META | MOD_SHIFT | KEY_LEFT),
-    KEY("\033\033[c", MOD_META | MOD_SHIFT | KEY_RIGHT),
-    KEY("\033\033[a", MOD_META | MOD_SHIFT | KEY_UP),
-    KEY("\033\033[b", MOD_META | MOD_SHIFT | KEY_DOWN),
-};
-
-static const TermControlCodes xterm_control_codes = {
-    .clear_to_eol = "\033[K",
-    .keypad_off = "\033[?1l\033>",
-    .keypad_on = "\033[?1h\033=",
-    .cup_mode_off = "\033[?1049l",
-    .cup_mode_on = "\033[?1049h",
-    .hide_cursor = "\033[?25l",
-    .show_cursor = "\033[?25h",
-    .save_title = "\033[22;2t",
-    .restore_title = "\033[23;2t",
-    .set_title_begin = "\033]2;",
-    .set_title_end = "\007",
-};
-
-static const TermControlCodes rxvt_control_codes = {
-    .clear_to_eol = "\033[K",
-    .keypad_off = "\033>",
-    .keypad_on = "\033=",
-    .cup_mode_off = "\033[2J\033[?47l\0338",
-    .cup_mode_on = "\0337\033[?47h",
-    .hide_cursor = "\033[?25l",
-    .show_cursor = "\033[?25h",
-    .save_title = "\033[22;2t",
-    .restore_title = "\033[23;2t",
-    .set_title_begin = "\033]2;",
-    .set_title_end = "\007",
-};
-
 static const TerminalInfo terminal_xterm = {
-    .back_color_erase = false,
-    .max_colors = 8,
-    .width = 80,
-    .height = 24,
-    .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
-    .keymap = NULL,
-    .keymap_length = 0,
-    .control_codes = &xterm_control_codes,
-    .parse_key_sequence = &parse_xterm_key_sequence
-};
-
-static const TerminalInfo terminal_st = {
     .back_color_erase = true,
     .max_colors = 8,
     .width = 80,
@@ -302,20 +219,20 @@ static const TerminalInfo terminal_st = {
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .keymap = NULL,
     .keymap_length = 0,
-    .control_codes = &xterm_control_codes,
-    .parse_key_sequence = &parse_xterm_key_sequence
-};
-
-static const TerminalInfo terminal_rxvt = {
-    .back_color_erase = true,
-    .max_colors = 8,
-    .width = 80,
-    .height = 24,
-    .attributes = ANSI_ATTRS,
-    .keymap = rxvt_keymap,
-    .keymap_length = ARRAY_COUNT(rxvt_keymap),
-    .control_codes = &rxvt_control_codes,
-    .parse_key_sequence = &parse_key_sequence_from_keymap
+    .parse_key_sequence = &parse_xterm_key_sequence,
+    .control_codes = &(TermControlCodes) {
+        .clear_to_eol = "\033[K",
+        .keypad_off = "\033[?1l\033>",
+        .keypad_on = "\033[?1h\033=",
+        .cup_mode_off = "\033[?1049l",
+        .cup_mode_on = "\033[?1049h",
+        .hide_cursor = "\033[?25l",
+        .show_cursor = "\033[?25h",
+        .save_title = "\033[22;2t",
+        .restore_title = "\033[23;2t",
+        .set_title_begin = "\033]2;",
+        .set_title_end = "\007",
+    }
 };
 
 static bool term_match(const char *term, const char *prefix)
@@ -353,15 +270,17 @@ void term_init(void)
     }
 
     if (
+        term_match(term, "xterm")
+        || term_match(term, "st")
+        || term_match(term, "stterm")
+    ) {
+        terminal = terminal_xterm;
+    } else if (
         term_match(term, "tmux")
-        || term_match(term, "xterm")
         || term_match(term, "screen")
     ) {
         terminal = terminal_xterm;
-    } else if (term_match(term, "st") || term_match(term, "stterm")) {
-        terminal = terminal_st;
-    } else if (term_match(term, "rxvt")) {
-        terminal = terminal_rxvt;
+        terminal.back_color_erase = false;
     } else {
         term_init_fallback(term);
     }
