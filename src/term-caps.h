@@ -20,12 +20,6 @@ typedef struct {
 } TermControlCodes;
 
 typedef struct {
-    const char *code;
-    uint32_t code_length;
-    Key key;
-} TermKeyMap;
-
-typedef struct {
     bool back_color_erase;
     int max_colors;
     int width;
@@ -33,8 +27,6 @@ typedef struct {
     unsigned short attributes;
     unsigned short ncv_attributes;
     const TermControlCodes *control_codes;
-    const TermKeyMap *keymap;
-    size_t keymap_length;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
 } TerminalInfo;
 

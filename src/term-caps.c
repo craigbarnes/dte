@@ -24,11 +24,54 @@ TerminalInfo terminal;
     KEY(p "7", key | MOD_META | MOD_CTRL), \
     KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
+static struct TermKeyMap {
+    const char *code;
+    uint32_t code_length;
+    Key key;
+} keymap[] = {
+    KEY("kcuu1", KEY_UP),
+    KEY("kcud1", KEY_DOWN),
+    KEY("kcub1", KEY_LEFT),
+    KEY("kcuf1", KEY_RIGHT),
+    KEY("kdch1", KEY_DELETE),
+    KEY("kpp", KEY_PAGE_UP),
+    KEY("knp", KEY_PAGE_DOWN),
+    KEY("khome", KEY_HOME),
+    KEY("kend", KEY_END),
+    KEY("kich1", KEY_INSERT),
+    KEY("kcbt", MOD_SHIFT | '\t'),
+    KEY("kf1", KEY_F1),
+    KEY("kf2", KEY_F2),
+    KEY("kf3", KEY_F3),
+    KEY("kf4", KEY_F4),
+    KEY("kf5", KEY_F5),
+    KEY("kf6", KEY_F6),
+    KEY("kf7", KEY_F7),
+    KEY("kf8", KEY_F8),
+    KEY("kf9", KEY_F9),
+    KEY("kf10", KEY_F10),
+    KEY("kf11", KEY_F11),
+    KEY("kf12", KEY_F12),
+    XKEYS("kUP", KEY_UP),
+    XKEYS("kDN", KEY_DOWN),
+    XKEYS("kLFT", KEY_LEFT),
+    XKEYS("kRIT", KEY_RIGHT),
+    XKEYS("kDC", KEY_DELETE),
+    XKEYS("kPRV", KEY_PAGE_UP),
+    XKEYS("kNXT", KEY_PAGE_DOWN),
+    XKEYS("kHOM", KEY_HOME),
+    XKEYS("kEND", KEY_END),
+};
+
+static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
+
+static size_t keymap_length;
+
 static ssize_t parse_key_sequence_from_keymap(const char *buf, size_t fill, Key *key)
 {
     bool possibly_truncated = false;
-    for (size_t i = 0; i < terminal.keymap_length; i++) {
-        const TermKeyMap *const km = &terminal.keymap[i];
+    for (size_t i = 0; i < keymap_length; i++) {
+        const struct TermKeyMap *const km = &keymap[i];
         const char *const keycode = km->code;
         const size_t len = km->code_length;
         BUG_ON(keycode == NULL);
@@ -116,44 +159,6 @@ static void term_read_caps(void)
     };
     terminal.control_codes = &tcc;
 
-    static TermKeyMap keymap[] = {
-        KEY("kcuu1", KEY_UP),
-        KEY("kcud1", KEY_DOWN),
-        KEY("kcub1", KEY_LEFT),
-        KEY("kcuf1", KEY_RIGHT),
-        KEY("kdch1", KEY_DELETE),
-        KEY("kpp", KEY_PAGE_UP),
-        KEY("knp", KEY_PAGE_DOWN),
-        KEY("khome", KEY_HOME),
-        KEY("kend", KEY_END),
-        KEY("kich1", KEY_INSERT),
-        KEY("kcbt", MOD_SHIFT | '\t'),
-        KEY("kf1", KEY_F1),
-        KEY("kf2", KEY_F2),
-        KEY("kf3", KEY_F3),
-        KEY("kf4", KEY_F4),
-        KEY("kf5", KEY_F5),
-        KEY("kf6", KEY_F6),
-        KEY("kf7", KEY_F7),
-        KEY("kf8", KEY_F8),
-        KEY("kf9", KEY_F9),
-        KEY("kf10", KEY_F10),
-        KEY("kf11", KEY_F11),
-        KEY("kf12", KEY_F12),
-
-        XKEYS("kUP", KEY_UP),
-        XKEYS("kDN", KEY_DOWN),
-        XKEYS("kLFT", KEY_LEFT),
-        XKEYS("kRIT", KEY_RIGHT),
-        XKEYS("kDC", KEY_DELETE),
-        XKEYS("kPRV", KEY_PAGE_UP),
-        XKEYS("kNXT", KEY_PAGE_DOWN),
-        XKEYS("kHOM", KEY_HOME),
-        XKEYS("kEND", KEY_END),
-    };
-
-    static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
-
     size_t n = 0;
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
         const char *const code = curses_str_cap(keymap[i].code);
@@ -164,9 +169,7 @@ static void term_read_caps(void)
             n++;
         }
     }
-
-    terminal.keymap = keymap;
-    terminal.keymap_length = n;
+    keymap_length = n;
 }
 
 static void term_init_fallback(const char *const term)
@@ -204,8 +207,6 @@ static const TerminalInfo terminal_xterm = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
-    .keymap = NULL,
-    .keymap_length = 0,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .control_codes = &(TermControlCodes) {
         .clear_to_eol = "\033[K",
