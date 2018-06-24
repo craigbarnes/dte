@@ -1,10 +1,14 @@
 syntax .ruby-esc
 
-# TODO: Check this against the Ruby spec (was copied from the Python syntax)
+# TODO: \unnnn  Unicode codepoint, where nnnn is exactly 4 hex digits
+# TODO: \u{nnnn ...}  Unicode codepoint(s), where each nnnn is 1-6 hex digits
 state esc special
-    char "abfnrtv'\\\"" END special
+    char "abefnrstv'\\\"" END special
     char 0-7 oct1
     char x hex0
+    char c control
+    str 'C-' control
+    str 'M-' meta
     noeat END
 
 state oct1 special
@@ -21,6 +25,19 @@ state hex0 special
 
 state hex1 special
     char 0-9a-fA-F END special
+    noeat END
+
+state control special
+    str "\\M-" ascii-print
+    noeat ascii-print
+
+state meta special
+    str "\\c" ascii-print
+    str "\\C-" ascii-print
+    noeat ascii-print
+
+state ascii-print special
+    char "\x21-\x7e" END special
     noeat END
 
 syntax ruby
