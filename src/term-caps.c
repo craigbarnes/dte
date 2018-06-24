@@ -7,6 +7,8 @@ TerminalInfo terminal;
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
+#ifndef TERMINFO_DISABLE
+
 #define KEY(c, k) { \
     .code = (c), \
     .code_length = (sizeof(c) - 1), \
@@ -49,8 +51,6 @@ static ssize_t parse_key_sequence_from_keymap(const char *buf, size_t fill, Key 
     }
     return possibly_truncated ? -1 : 0;
 }
-
-#ifndef TERMINFO_DISABLE
 
 // These are normally declared in the <curses.h> and <term.h> headers.
 // They are not included here because of the insane number of unprefixed
@@ -179,29 +179,16 @@ static void term_init_fallback(const char *const term)
 
 #else
 
-static const TermKeyMap ansi_keymap[] = {
-    KEY("\033[A", KEY_UP),
-    KEY("\033[B", KEY_DOWN),
-    KEY("\033[C", KEY_RIGHT),
-    KEY("\033[D", KEY_LEFT),
-    KEY("\033[H", KEY_HOME),
-    KEY("\033[L", KEY_INSERT),
-};
-
-static const TermControlCodes ansi_control_codes = {
-    .clear_to_eol = "\033[K"
-};
-
 static const TerminalInfo terminal_ansi = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS,
     .ncv_attributes = ATTR_UNDERLINE,
-    .keymap = ansi_keymap,
-    .keymap_length = ARRAY_COUNT(ansi_keymap),
-    .control_codes = &ansi_control_codes,
-    .parse_key_sequence = &parse_key_sequence_from_keymap
+    .parse_key_sequence = &parse_xterm_key_sequence,
+    .control_codes = &(TermControlCodes) {
+        .clear_to_eol = "\033[K"
+    }
 };
 
 static void term_init_fallback(const char *const UNUSED(term))
