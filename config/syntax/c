@@ -176,6 +176,7 @@ state ident
     inlist keyword c
     inlist c11-keyword c
     inlist type c
+    inlist posix_type c
     inlist constant c
     inlist cpp-keyword c
     noeat c
@@ -276,6 +277,15 @@ list type \
     uint_fast8_t uint_fast16_t uint_fast32_t uint_fast64_t intptr_t \
     uintptr_t sig_atomic_t wint_t intmax_t uintmax_t char32_t char16_t \
 
+list posix_type \
+    blkcnt_t blksize_t clock_t clockid_t dev_t fsblkcnt_t fsfilcnt_t \
+    gid_t id_t ino_t key_t mode_t nlink_t pid_t suseconds_t timer_t \
+    uid_t trace_attr_t trace_event_id_t trace_event_set_t trace_id_t \
+    pthread_t pthread_attr_t pthread_barrier_t pthread_barrierattr_t \
+    pthread_cond_t pthread_condattr_t pthread_key_t pthread_mutex_t \
+    pthread_mutexattr_t pthread_once_t pthread_rwlock_t \
+    pthread_rwlockattr_t pthread_spinlock_t
+
 list constant \
     NULL stdin stdout stderr false true \
     E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT EAGAIN EALREADY \
@@ -306,3 +316,4 @@ default ident class-name
 default keyword c11-keyword
 default keyword cpp-keyword
 default preproc preproccond
+default type posix_type
