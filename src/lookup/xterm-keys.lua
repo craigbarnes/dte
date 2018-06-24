@@ -1,4 +1,4 @@
-local keys = {
+local xterm_keys = {
     -- CSI
     ["[A"] = "KEY_UP",
     ["[B"] = "KEY_DOWN",
@@ -78,33 +78,36 @@ local modifiers = {
     ["8"] = "MOD_SHIFT | MOD_META | MOD_CTRL",
 }
 
--- Expand key templates with modifier combos and insert into keys table
+-- Expand key templates with modifiers and insert into xterm_keys table
 for template, key in pairs(key_templates) do
     for num, mod in pairs(modifiers) do
         local seq = assert(template:gsub("_", num))
-        keys[seq] = mod .. " | " .. key
+        xterm_keys[seq] = mod .. " | " .. key
     end
 end
 
 -- Build a trie structure from tables, indexed by numeric byte values
-local trie = {}
-for seq, key in pairs(keys) do
-    local node = trie
-    local n = #seq
-    for i = 1, n do
-        local char = assert(seq:sub(i, i))
-        local byte = assert(char:byte())
-        if i == n then
-            -- Leaf node
-            assert(node[byte] == nil, "Clashing sequence: " .. seq)
-            node[byte] = key
-            break
-        elseif type(node[byte]) ~= "table" then
-            assert(node[byte] == nil, "Clashing sequence: " .. seq)
-            node[byte] = {}
+local function make_trie(keys)
+    local trie = {}
+    for seq, key in pairs(keys) do
+        local node = trie
+        local n = #seq
+        for i = 1, n do
+            local char = assert(seq:sub(i, i))
+            local byte = assert(char:byte())
+            if i == n then
+                -- Leaf node
+                assert(node[byte] == nil, "Clashing sequence: " .. seq)
+                node[byte] = key
+                break
+            elseif type(node[byte]) ~= "table" then
+                assert(node[byte] == nil, "Clashing sequence: " .. seq)
+                node[byte] = {}
+            end
+            node = node[byte]
         end
-        node = node[byte]
     end
+    return trie
 end
 
 -- Create a caching lookup table of indent strings
@@ -183,7 +186,8 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
     size_t i = 1;
 ]]
 
-write_trie(trie, output)
+local xterm_trie = make_trie(xterm_keys)
+write_trie(xterm_trie, output)
 
 output:write [[
 check_trailing_tilde:
