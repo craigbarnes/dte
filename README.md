@@ -83,9 +83,9 @@ The following optional build variables may be useful when packaging
 * `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
   linking to the system [terminfo]/curses library. This makes it much
   easier to build a portable, statically linked binary. The built-in
-  terminal support currently works with `tmux`, `screen`, `st`, `rxvt`,
-  `xterm` (and many other `xterm`-compatible terminals) and falls back
-  to pure [ANSI] mode for other terminals.
+  terminal support currently works with `tmux`, `screen`, `st`, `xterm`
+  (and many other `xterm`-compatible terminals) and falls back to
+  [ECMA-48] mode for other terminals.
 
 Example usage:
 
@@ -114,7 +114,7 @@ Public License version 2 for more details.
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
-[ANSI]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
+[ECMA-48]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
