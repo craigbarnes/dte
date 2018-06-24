@@ -65,7 +65,7 @@ static struct TermKeyMap {
 
 static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
 
-static size_t keymap_length;
+static size_t keymap_length = 0;
 
 static ssize_t parse_key_sequence_from_keymap(const char *buf, size_t fill, Key *key)
 {
@@ -159,17 +159,16 @@ static void term_read_caps(void)
     };
     terminal.control_codes = &tcc;
 
-    size_t n = 0;
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
         const char *const code = curses_str_cap(keymap[i].code);
         if (code && code[0] != '\0') {
-            keymap[n].code = code;
-            keymap[n].code_length = strlen(code);
-            keymap[n].key = keymap[i].key;
-            n++;
+            keymap[keymap_length++] = (struct TermKeyMap) {
+                .code = code,
+                .code_length = strlen(code),
+                .key = keymap[i].key
+            };
         }
     }
-    keymap_length = n;
 }
 
 static void term_init_fallback(const char *const term)
