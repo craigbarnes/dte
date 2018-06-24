@@ -124,8 +124,10 @@ void buf_move_cursor(int x, int y)
         ((unsigned int)y) + 1,
         ((unsigned int)x) + 1
     );
-    BUG_ON(len < 6);  //  6 == strlen("\033[0;0H")
-    BUG_ON(len > 10); // 10 == strlen("\033[998;998H")
+    static_assert(6 == STRLEN("\033[0;0H"));
+    BUG_ON(len < 6);
+    static_assert(10 == STRLEN("\033[998;998H"));
+    BUG_ON(len > 10);
     buf_add_bytes(buf, (size_t)len);
 }
 

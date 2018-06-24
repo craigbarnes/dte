@@ -5,6 +5,8 @@
 #error C99 compiler required
 #endif
 
+#define STRLEN(x) (sizeof("" x "") - 1)
+
 // Calculate the number of elements in an array.
 // The extra division on the third line is a trick to help prevent
 // passing a pointer to the first element of an array instead of a
