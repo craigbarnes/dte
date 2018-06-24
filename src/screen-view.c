@@ -5,6 +5,7 @@
 #include "obuf.h"
 #include "selection.h"
 #include "highlight.h"
+#include "term-caps.h"
 
 typedef struct {
     View *view;

@@ -1,3 +1,4 @@
+#include "term-caps.h"
 #include "term.h"
 #include "common.h"
 #include "lookup/xterm-keys.c"

@@ -3,6 +3,7 @@
 #include "view.h"
 #include "frame.h"
 #include "term.h"
+#include "term-caps.h"
 #include "config.h"
 #include "color.h"
 #include "syntax.h"

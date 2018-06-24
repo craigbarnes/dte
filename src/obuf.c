@@ -1,5 +1,6 @@
 #include "obuf.h"
 #include "common.h"
+#include "term-caps.h"
 #include "util/uchar.h"
 
 OutputBuffer obuf;
