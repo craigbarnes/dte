@@ -1,5 +1,5 @@
-#ifndef STRBUF_H
-#define STRBUF_H
+#ifndef UTIL_STR_H
+#define UTIL_STR_H
 
 #include <stddef.h>
 #include "macros.h"

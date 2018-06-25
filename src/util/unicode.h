@@ -1,5 +1,5 @@
-#ifndef UNICODE_H
-#define UNICODE_H
+#ifndef UTIL_UNICODE_H
+#define UTIL_UNICODE_H
 
 #include <stdbool.h>
 #include <stdint.h>

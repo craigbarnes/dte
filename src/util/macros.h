@@ -1,5 +1,5 @@
-#ifndef MACROS_H
-#define MACROS_H
+#ifndef UTIL_MACROS_H
+#define UTIL_MACROS_H
 
 #if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
 #error C99 compiler required

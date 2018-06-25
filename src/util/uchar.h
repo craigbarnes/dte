@@ -1,5 +1,5 @@
-#ifndef UCHAR_H
-#define UCHAR_H
+#ifndef UTIL_UCHAR_H
+#define UTIL_UCHAR_H
 
 #include <sys/types.h>
 #include "unicode.h"

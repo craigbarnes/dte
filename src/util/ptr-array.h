@@ -1,5 +1,5 @@
-#ifndef PTR_ARRAY_H
-#define PTR_ARRAY_H
+#ifndef UTIL_PTR_ARRAY_H
+#define UTIL_PTR_ARRAY_H
 
 #include <stdlib.h>
 

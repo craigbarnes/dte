@@ -1,5 +1,5 @@
-#ifndef STRING_VIEW_H
-#define STRING_VIEW_H
+#ifndef UTIL_STRING_VIEW_H
+#define UTIL_STRING_VIEW_H
 
 #include <stdbool.h>
 #include <stddef.h>

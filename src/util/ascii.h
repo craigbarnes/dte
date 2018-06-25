@@ -1,5 +1,5 @@
-#ifndef ASCII_H
-#define ASCII_H
+#ifndef UTIL_ASCII_H
+#define UTIL_ASCII_H
 
 #include <stdbool.h>
 #include "macros.h"
