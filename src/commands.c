@@ -5,7 +5,7 @@
 #include "window.h"
 #include "view.h"
 #include "change.h"
-#include "term.h"
+#include "term-read.h"
 #include "search.h"
 #include "cmdline.h"
 #include "history.h"

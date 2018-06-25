@@ -36,10 +36,10 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     config ctags decoder detect edit editor encoder encoding env \
     error file-history file-option filetype format-status \
     frame git-open highlight history indent input-special key \
-    load-save lock main move msg normal-mode obuf options \
-    parse-args parse-command path regexp run screen screen-tabbar \
-    screen-view script search search-mode selection spawn state \
-    syntax tabbar tag term term-caps view wbuf window xmalloc )) \
+    load-save lock main move msg normal-mode options parse-args \
+    parse-command path regexp run screen screen-tabbar screen-view \
+    script search search-mode selection spawn state syntax tabbar \
+    tag term-caps term-read term-write view wbuf window xmalloc )) \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \

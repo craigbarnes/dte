@@ -2,7 +2,7 @@
 #include "tabbar.h"
 #include "editor.h"
 #include "util/uchar.h"
-#include "obuf.h"
+#include "term-write.h"
 #include "view.h"
 
 static void print_horizontal_tab_title(View *v, int idx)

@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "term.h"
+#include "color.h"
 #include "util/unicode.h"
 
 typedef struct {

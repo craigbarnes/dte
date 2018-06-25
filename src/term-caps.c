@@ -1,5 +1,5 @@
 #include "term-caps.h"
-#include "term.h"
+#include "color.h"
 #include "common.h"
 #include "lookup/xterm-keys.c"
 

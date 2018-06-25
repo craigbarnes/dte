@@ -11,7 +11,7 @@
 #include "error.h"
 #include "util/str.h"
 #include "msg.h"
-#include "term.h"
+#include "term-read.h"
 
 static void close_on_exec(int fd)
 {

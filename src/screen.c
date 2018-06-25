@@ -2,7 +2,6 @@
 #include "format-status.h"
 #include "editor.h"
 #include "view.h"
-#include "obuf.h"
 #include "cmdline.h"
 #include "search.h"
 #include "util/uchar.h"
@@ -11,6 +10,8 @@
 #include "input-special.h"
 #include "selection.h"
 #include "term-caps.h"
+#include "term-read.h"
+#include "term-write.h"
 
 void set_color(TermColor *color)
 {

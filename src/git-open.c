@@ -6,7 +6,7 @@
 #include "term-caps.h"
 #include "cmdline.h"
 #include "editor.h"
-#include "obuf.h"
+#include "term-write.h"
 #include "screen.h"
 #include "util/uchar.h"
 #include "util/unicode.h"

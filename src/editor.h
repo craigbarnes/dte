@@ -7,7 +7,6 @@
 #include "options.h"
 #include "util/ptr-array.h"
 #include "color.h"
-#include "term.h"
 
 typedef enum {
     EDITOR_INITIALIZING,

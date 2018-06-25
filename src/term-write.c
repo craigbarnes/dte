@@ -1,4 +1,4 @@
-#include "obuf.h"
+#include "term-write.h"
 #include "common.h"
 #include "term-caps.h"
 #include "util/uchar.h"

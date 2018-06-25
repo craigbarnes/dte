@@ -1,7 +1,7 @@
 #include "input-special.h"
 #include "util/uchar.h"
 #include "common.h"
-#include "term.h"
+#include "term-read.h"
 
 enum input_special {
     // Not inputting special characters

@@ -3,7 +3,6 @@
 
 #include "buffer.h"
 #include "color.h"
-#include "term.h"
 #include "view.h"
 #include "window.h"
 

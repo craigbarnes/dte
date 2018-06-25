@@ -2,7 +2,7 @@
 #include "view.h"
 #include "editor.h"
 #include "util/uchar.h"
-#include "obuf.h"
+#include "term-write.h"
 #include "selection.h"
 #include "highlight.h"
 #include "term-caps.h"

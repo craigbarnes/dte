@@ -6,6 +6,7 @@
 #include "input-special.h"
 #include "editor.h"
 #include "util/unicode.h"
+#include "term-read.h"
 
 static void insert_paste(void)
 {

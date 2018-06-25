@@ -1,4 +1,4 @@
-#include "term.h"
+#include "term-read.h"
 #include "term-caps.h"
 #include "common.h"
 #include "editor.h"
