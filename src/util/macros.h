@@ -6,6 +6,9 @@
 #endif
 
 #define STRLEN(x) (sizeof("" x "") - 1)
+#define PASTE(a, b) a##b
+#define XPASTE(a, b) PASTE(a, b)
+#define DO_PRAGMA(x) _Pragma(#x)
 
 // Calculate the number of elements in an array.
 // The extra division on the third line is a trick to help prevent
@@ -44,8 +47,6 @@
     #define HAS_WARNING(x) 0
 #endif
 
-#define DO_PRAGMA(x) _Pragma(#x)
-
 #if GNUC_AT_LEAST(3, 0)
     #define UNUSED __attribute__((__unused__))
     #define MALLOC __attribute__((__malloc__))
@@ -64,6 +65,18 @@
 #endif
 
 #define UNUSED_ARG(x) unused__ ## x UNUSED
+
+#ifdef __COUNTER__ // Supported by GCC 4.3+ and Clang
+    #define COUNTER_ __COUNTER__
+#else
+    #define COUNTER_ __LINE__
+#endif
+
+#if defined(CONSTRUCTOR) && defined(DEBUG) && (DEBUG > 0)
+    #define UNITTEST static void CONSTRUCTOR XPASTE(utest__, COUNTER_)(void)
+#else
+    #define UNITTEST static void UNUSED XPASTE(utest__, COUNTER_)(void)
+#endif
 
 #if GNUC_AT_LEAST(3, 0) && defined(__OPTIMIZE__)
     #define likely(x) __builtin_expect(!!(x), 1)
