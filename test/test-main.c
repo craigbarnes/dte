@@ -29,7 +29,7 @@ static void test_relative_filename(void)
         { "/a/b/c/d/e", "/a/b/file", "/a/b/file" },
         { "/a/foobar", "/a/foo/file", "../foo/file" },
     };
-    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+    FOR_EACH_I(i, tests) {
         const struct rel_test *t = &tests[i];
         char *result = relative_filename(t->path, t->cwd);
         EXPECT_STREQ(t->result, result);
@@ -52,7 +52,7 @@ static void test_detect_encoding_from_bom(void)
         {NULL, "\x00\xef\xbb\xbfHello", 9},
         {NULL, "\xef\xbb", 2},
     };
-    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+    FOR_EACH_I(i, tests) {
         const struct bom_test *t = &tests[i];
         const char *result = detect_encoding_from_bom(t->text, t->size);
         EXPECT_STREQ(result, t->encoding);
@@ -81,7 +81,7 @@ static void test_find_ft_filename(void)
         {"/", NULL},
         {"/etc../etc.c.old/c.old", NULL},
     };
-    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+    FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
         const char *result = find_ft(t->filename, NULL, NULL, 0);
         EXPECT_STREQ(result, t->expected_filetype);
@@ -105,7 +105,7 @@ static void test_find_ft_firstline(void)
         {" <?xml", NULL},
         {"\0<?xml", NULL},
     };
-    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
+    FOR_EACH_I(i, tests) {
         const struct ft_firstline_test *t = &tests[i];
         const char *result = find_ft(NULL, NULL, t->line, strlen(t->line));
         EXPECT_STREQ(result, t->expected_filetype);
