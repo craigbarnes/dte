@@ -45,7 +45,7 @@ void script_state_init(void)
     script_state = L;
 }
 
-void cmd_lua(const char* UNUSED(pf), char **args)
+void cmd_lua(const char* UNUSED_ARG(pf), char **args)
 {
     const char *const text = *args;
     lua_State *L = script_state;
@@ -58,7 +58,7 @@ void cmd_lua(const char* UNUSED(pf), char **args)
     }
 }
 
-void cmd_lua_file(const char* UNUSED(pf), char **args)
+void cmd_lua_file(const char* UNUSED_ARG(pf), char **args)
 {
     const char *const filename = *args;
     lua_State *L = script_state;
@@ -80,12 +80,12 @@ static void no_lua_error(const char *cmd)
     error_msg("%s: editor was built without Lua scripting support", cmd);
 }
 
-void cmd_lua(const char* UNUSED(pf), char** UNUSED(args))
+void cmd_lua(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
     no_lua_error("lua");
 }
 
-void cmd_lua_file(const char* UNUSED(pf), char** UNUSED(args))
+void cmd_lua_file(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
     no_lua_error("lua-file");
 }

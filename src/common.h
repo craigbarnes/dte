@@ -14,13 +14,13 @@
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
 #if DEBUG <= 0
-  static inline void BUG(const char* UNUSED(fmt), ...) {}
+  static inline void BUG(const char* UNUSED_ARG(fmt), ...) {}
 #else
   #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #endif
 
 #if DEBUG <= 1
-  static inline void d_print(const char* UNUSED(fmt), ...) {}
+  static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
 #else
   #define d_print(...) debug_print(__func__, __VA_ARGS__)
 #endif

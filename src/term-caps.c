@@ -193,7 +193,7 @@ static const TerminalInfo terminal_ansi = {
     }
 };
 
-static void term_init_fallback(const char *const UNUSED(term))
+static void term_init_fallback(const char *const UNUSED_ARG(term))
 {
     terminal = terminal_ansi;
 }

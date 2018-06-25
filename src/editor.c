@@ -278,7 +278,7 @@ void normal_update(void)
     end_update();
 }
 
-void handle_sigwinch(int UNUSED(signum))
+void handle_sigwinch(int UNUSED_ARG(signum))
 {
     terminal_resized = true;
 }

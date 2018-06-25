@@ -189,7 +189,7 @@ static bool validate_regex(const char *value)
     return true;
 }
 
-static OptionValue str_get(const OptionDesc* UNUSED(desc), void *ptr)
+static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     OptionValue v;
     v.str_val = xstrdup(*(char **)ptr);
@@ -197,7 +197,7 @@ static OptionValue str_get(const OptionDesc* UNUSED(desc), void *ptr)
 }
 
 static void str_set (
-    const OptionDesc* UNUSED(desc),
+    const OptionDesc* UNUSED_ARG(desc),
     void *ptr,
     OptionValue value
 ) {
@@ -219,20 +219,20 @@ static bool str_parse (
     return true;
 }
 
-static char *str_string(const OptionDesc* UNUSED(desc), OptionValue value)
+static char *str_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
     return xstrdup(value.str_val);
 }
 
 static bool str_equals (
-    const OptionDesc* UNUSED(desc),
+    const OptionDesc* UNUSED_ARG(desc),
     void *ptr,
     OptionValue value
 ) {
     return streq(*(char **)ptr, value.str_val);
 }
 
-static OptionValue int_get(const OptionDesc* UNUSED(desc), void *ptr)
+static OptionValue int_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     OptionValue v;
     v.int_val = *(int *)ptr;
@@ -240,7 +240,7 @@ static OptionValue int_get(const OptionDesc* UNUSED(desc), void *ptr)
 }
 
 static void int_set (
-    const OptionDesc* UNUSED(desc),
+    const OptionDesc* UNUSED_ARG(desc),
     void *ptr,
     OptionValue value
 ) {
@@ -267,12 +267,12 @@ static bool int_parse (
     return true;
 }
 
-static char *int_string(const OptionDesc* UNUSED(desc), OptionValue value)
+static char *int_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
     return xsprintf("%d", value.int_val);
 }
 
-static bool int_equals(const OptionDesc* UNUSED(desc), void *ptr, OptionValue value)
+static bool int_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
 {
     return *(int *)ptr == value.int_val;
 }

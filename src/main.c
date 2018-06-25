@@ -15,12 +15,12 @@
 #include "move.h"
 #include "screen.h"
 
-static void handle_sigtstp(int UNUSED(signum))
+static void handle_sigtstp(int UNUSED_ARG(signum))
 {
     suspend();
 }
 
-static void handle_sigcont(int UNUSED(signum))
+static void handle_sigcont(int UNUSED_ARG(signum))
 {
     if (
         !editor.child_controls_terminal

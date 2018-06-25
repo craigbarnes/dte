@@ -229,7 +229,7 @@ static void cmd_char(const char *pf, char **args)
     }
 }
 
-static void cmd_default(const char* UNUSED(pf), char **args)
+static void cmd_default(const char* UNUSED_ARG(pf), char **args)
 {
     close_state();
     if (no_syntax()) {
@@ -241,7 +241,7 @@ static void cmd_default(const char* UNUSED(pf), char **args)
     );
 }
 
-static void cmd_eat(const char* UNUSED(pf), char **args)
+static void cmd_eat(const char* UNUSED_ARG(pf), char **args)
 {
     if (no_state()) {
         return;
@@ -256,7 +256,7 @@ static void cmd_eat(const char* UNUSED(pf), char **args)
     current_state = NULL;
 }
 
-static void cmd_heredocbegin(const char* UNUSED(pf), char **args)
+static void cmd_heredocbegin(const char* UNUSED_ARG(pf), char **args)
 {
     const char *sub;
     Syntax *subsyn;
@@ -291,7 +291,7 @@ static void cmd_heredocbegin(const char* UNUSED(pf), char **args)
     subsyn->used = true;
 }
 
-static void cmd_heredocend(const char* UNUSED(pf), char **args)
+static void cmd_heredocend(const char* UNUSED_ARG(pf), char **args)
 {
     add_condition(COND_HEREDOCEND, args[0], args[1]);
     current_syntax->heredoc = true;
@@ -331,7 +331,7 @@ static void cmd_list(const char *pf, char **args)
     }
 }
 
-static void cmd_inlist(const char* UNUSED(pf), char **args)
+static void cmd_inlist(const char* UNUSED_ARG(pf), char **args)
 {
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
@@ -377,7 +377,7 @@ static void cmd_noeat(const char *pf, char **args)
     current_state = NULL;
 }
 
-static void cmd_recolor(const char* UNUSED(pf), char **args)
+static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
@@ -402,7 +402,7 @@ static void cmd_recolor(const char* UNUSED(pf), char **args)
     }
 }
 
-static void cmd_state(const char* UNUSED(pf), char **args)
+static void cmd_state(const char* UNUSED_ARG(pf), char **args)
 {
     const char *name = args[0];
     const char *emit = args[1] ? args[1] : args[0];
@@ -460,7 +460,7 @@ static void finish_syntax(void)
     current_syntax = NULL;
 }
 
-static void cmd_syntax(const char* UNUSED(pf), char **args)
+static void cmd_syntax(const char* UNUSED_ARG(pf), char **args)
 {
     if (current_syntax) {
         finish_syntax();
