@@ -66,7 +66,7 @@ static bool allow_odd_indent(const Buffer *b)
 {
     // 1, 3, 5 and 7 space indent
     int odd = 1 << 0 | 1 << 2 | 1 << 4 | 1 << 6;
-    return b->options.detect_indent & odd;
+    return (b->options.detect_indent & odd) ? true : false;
 }
 
 static int indent_len(const Buffer *b, const char *line, int len, bool *tab_indent)
