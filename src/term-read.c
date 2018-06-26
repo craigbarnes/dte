@@ -16,7 +16,6 @@ static char *escape_key(const char *key, size_t len)
     size_t j = 0;
     for (size_t i = 0; i < len && i < sizeof(buf) - 1; i++) {
         unsigned char ch = key[i];
-
         if (ch < 0x20) {
             buf[j++] = '^';
             ch |= 0x40;
@@ -26,7 +25,7 @@ static char *escape_key(const char *key, size_t len)
         }
         buf[j++] = ch;
     }
-    buf[j] = 0;
+    buf[j] = '\0';
     return buf;
 }
 
@@ -361,13 +360,13 @@ void term_discard_paste(void)
     free(term_read_paste(&size));
 }
 
-int term_get_size(int *w, int *h)
+bool term_get_size(int *w, int *h)
 {
     struct winsize ws;
     if (ioctl(0, TIOCGWINSZ, &ws) != -1) {
         *w = ws.ws_col;
         *h = ws.ws_row;
-        return 0;
+        return true;
     }
-    return -1;
+    return false;
 }

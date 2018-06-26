@@ -290,7 +290,7 @@ void update_window_sizes(void)
 
 void update_screen_size(void)
 {
-    if (!term_get_size(&terminal.width, &terminal.height)) {
+    if (term_get_size(&terminal.width, &terminal.height)) {
         if (terminal.width < 3) {
             terminal.width = 3;
         }

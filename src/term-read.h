@@ -12,6 +12,6 @@ bool term_read_key(Key *key);
 char *term_read_paste(size_t *size);
 void term_discard_paste(void);
 
-int term_get_size(int *w, int *h);
+bool term_get_size(int *w, int *h);
 
 #endif
