@@ -4,6 +4,7 @@
 #include "frame.h"
 #include "term-caps.h"
 #include "term-read.h"
+#include "term-write.h"
 #include "config.h"
 #include "color.h"
 #include "syntax.h"
@@ -115,6 +116,9 @@ static int dump_builtin_config(const char *const name)
 static void showkey_loop(void)
 {
     term_raw();
+    if (terminal.control_codes->init) {
+        fputs(terminal.control_codes->init, stdout);
+    }
     if (terminal.control_codes->keypad_on) {
         fputs(terminal.control_codes->keypad_on, stdout);
     }
@@ -143,8 +147,11 @@ static void showkey_loop(void)
 
     if (terminal.control_codes->keypad_off) {
         fputs(terminal.control_codes->keypad_off, stdout);
-        fflush(stdout);
     }
+    if (terminal.control_codes->deinit) {
+        fputs(terminal.control_codes->deinit, stdout);
+    }
+    fflush(stdout);
     term_cooked();
 }
 
@@ -354,10 +361,19 @@ int main(int argc, char *argv[])
         remove_view(window->views.ptrs[0]);
     }
 
+    if (terminal.control_codes->init) {
+        buf_escape(terminal.control_codes->init);
+    }
+
     resize();
     main_loop();
     restore_term_title();
     ui_end();
+
+    if (terminal.control_codes->deinit) {
+        buf_escape(terminal.control_codes->deinit);
+        buf_flush();
+    }
 
     // Unlock files and add files to file history
     remove_frame(root_frame);

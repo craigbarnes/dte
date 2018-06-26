@@ -6,6 +6,8 @@
 #include "key.h"
 
 typedef struct {
+    const char *init;
+    const char *deinit;
     const char *clear_to_eol;
     const char *keypad_off;
     const char *keypad_on;

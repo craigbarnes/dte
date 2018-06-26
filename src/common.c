@@ -1,5 +1,6 @@
 #include "common.h"
 #include "editor.h"
+#include "term-caps.h"
 
 size_t count_nl(const char *buf, size_t size)
 {
@@ -212,11 +213,15 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
 
 void term_cleanup(void)
 {
-    if (
-        !editor.child_controls_terminal
-        && editor.status != EDITOR_INITIALIZING
-    ) {
+    if (editor.status == EDITOR_INITIALIZING) {
+        return;
+    }
+    if (!editor.child_controls_terminal) {
         ui_end();
+    }
+    const char *const deinit = terminal.control_codes->deinit;
+    if (deinit) {
+        xwrite(STDOUT_FILENO, deinit, strlen(deinit));
     }
 }
 

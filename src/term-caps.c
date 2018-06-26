@@ -207,6 +207,7 @@ static const TerminalInfo terminal_xterm = {
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .control_codes = &(TermControlCodes) {
+        // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .clear_to_eol = "\033[K",
         .keypad_off = "\033[?1l\033>",
         .keypad_on = "\033[?1h\033=",
@@ -255,9 +256,17 @@ void term_init(void)
 #endif
     }
 
-    if (
-        term_match(term, "xterm")
-        || term_match(term, "st")
+    if (term_match(term, "xterm")) {
+        terminal = terminal_xterm;
+        terminal.control_codes->init =
+            "\033[?1036s" // Save "metaSendsEscape"
+            "\033[?1036h" // Enable "metaSendsEscape"
+        ;
+        terminal.control_codes->deinit =
+            "\033[?1036r" // Restore "metaSendsEscape"
+        ;
+    } else if (
+        term_match(term, "st")
         || term_match(term, "stterm")
     ) {
         terminal = terminal_xterm;
