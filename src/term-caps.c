@@ -3,9 +3,19 @@
 #include "common.h"
 #include "lookup/xterm-keys.c"
 
-TerminalInfo terminal;
-
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
+
+TerminalInfo terminal = {
+    .max_colors = 8,
+    .width = 80,
+    .height = 24,
+    .attributes = ANSI_ATTRS,
+    .ncv_attributes = ATTR_UNDERLINE,
+    .parse_key_sequence = &parse_xterm_key_sequence,
+    .control_codes = &(TermControlCodes) {
+        .clear_to_eol = "\033[K"
+    }
+};
 
 #ifndef TERMINFO_DISABLE
 
@@ -181,21 +191,10 @@ static void term_init_fallback(const char *const term)
 
 #else
 
-static const TerminalInfo terminal_ansi = {
-    .max_colors = 8,
-    .width = 80,
-    .height = 24,
-    .attributes = ANSI_ATTRS,
-    .ncv_attributes = ATTR_UNDERLINE,
-    .parse_key_sequence = &parse_xterm_key_sequence,
-    .control_codes = &(TermControlCodes) {
-        .clear_to_eol = "\033[K"
-    }
-};
-
 static void term_init_fallback(const char *const UNUSED_ARG(term))
 {
-    terminal = terminal_ansi;
+    // Use the default TerminalInfo defined at the top of this file
+    // (ECMA-48 + xterm key parser).
 }
 
 #endif // ifndef TERMINFO_DISABLE
