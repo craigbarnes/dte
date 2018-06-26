@@ -31,7 +31,7 @@ public/index.html: build/docs/index.md | public/screenshot.png
 
 build/docs/index.md: README.md docs/keys.md | build/docs/
 	$(E) GEN $@
-	$(Q) sed '/^Online documentation is/,$$d' README.md > $@
+	$(Q) sed '/^Online documentation is/,/^Public License/d' README.md > $@
 	$(Q) sed '/^`/s|`\([^`]\+\)`|<kbd>\1</kbd>|g' docs/keys.md >> $@
 
 public/releases.html: CHANGELOG.md | public/
