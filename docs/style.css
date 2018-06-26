@@ -164,6 +164,20 @@ pre code {
     border: none;
 }
 
+kbd {
+    display: inline-block;
+    border-radius: 3px;
+    padding: 1px 6px;
+    margin: 0 2px;
+    font-size: small;
+    background-color: #fafbfc;
+    color: #444d56;
+    border: solid 1px #c6cbd1;
+    border-bottom-color: #959da5;
+    box-shadow: inset 0 -1px 0 #959da5;
+    vertical-align: middle;
+}
+
 .sourceLine {color: black}
 .sourceCode span.kw {font-weight: bold}
 .sourceCode span.st {color: goldenrod}

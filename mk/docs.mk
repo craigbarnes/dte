@@ -25,9 +25,14 @@ public/dte.pdf: docs/dte.1 docs/dterc.5 docs/dte-syntax.5 | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Tpdf $^ > $@
 
-public/index.html: README.md | public/screenshot.png
+public/index.html: build/docs/index.md | public/screenshot.png
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
+
+build/docs/index.md: README.md docs/keys.md | build/docs/
+	$(E) GEN $@
+	$(Q) sed '/^Online documentation is/,$$d' README.md > $@
+	$(Q) sed '/^`/s|`\([^`]\+\)`|<kbd>\1</kbd>|g' docs/keys.md >> $@
 
 public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
@@ -50,6 +55,9 @@ public/%.gz: public/%
 	$(Q) gzip -9 < $< > $@
 
 public/:
+	$(Q) mkdir -p $@
+
+build/docs/: build/
 	$(Q) mkdir -p $@
 
 check-docs: README.md CHANGELOG.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
