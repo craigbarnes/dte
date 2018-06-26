@@ -13,7 +13,7 @@ TODO
 * Add support for 24-bit terminal colors
 * Improve automatic charset encoding detection
 * Add a contextual help bar for command mode
-* Add built-in support for `vt220` and `linux` terminals
+* Add built-in support for `vt220` terminals
 * Add better documentation for custom color schemes
 * Add a plain-text only option for the `search` and `replace` commands
 * Add support for EditorConfig files

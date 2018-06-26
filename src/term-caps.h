@@ -26,7 +26,7 @@ typedef struct {
     int height;
     unsigned short attributes;
     unsigned short ncv_attributes;
-    const TermControlCodes *control_codes;
+    TermControlCodes *control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
 } TerminalInfo;
 

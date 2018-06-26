@@ -53,6 +53,13 @@ local xterm_keys = {
     ["Ok"] = "'+'",
     ["Om"] = "'-'",
     ["Oo"] = "'/'",
+
+    -- Linux console
+    ["[[A"] = "KEY_F1",
+    ["[[B"] = "KEY_F2",
+    ["[[C"] = "KEY_F3",
+    ["[[D"] = "KEY_F4",
+    ["[[E"] = "KEY_F5",
 }
 
 local key_templates = {

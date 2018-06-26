@@ -267,6 +267,10 @@ void term_init(void)
     ) {
         terminal = terminal_xterm;
         terminal.back_color_erase = false;
+    } else if (streq(term, "linux")) {
+        // Use the default TerminalInfo and just change the control codes
+        terminal.control_codes->hide_cursor = "\033[?25l\033[?1c";
+        terminal.control_codes->show_cursor = "\033[?25h\033[?0c";
     } else {
         term_init_fallback(term);
     }

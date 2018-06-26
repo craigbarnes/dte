@@ -444,6 +444,26 @@ static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
         case 'Z':
             *k = MOD_SHIFT | '\t';
             return i;
+        case '[':
+            if (i >= length) return -1;
+            switch(buf[i++]) {
+            case 'A':
+                *k = KEY_F1;
+                return i;
+            case 'B':
+                *k = KEY_F2;
+                return i;
+            case 'C':
+                *k = KEY_F3;
+                return i;
+            case 'D':
+                *k = KEY_F4;
+                return i;
+            case 'E':
+                *k = KEY_F5;
+                return i;
+            }
+            return 0;
         }
         return 0;
     }
