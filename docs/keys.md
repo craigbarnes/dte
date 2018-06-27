@@ -4,7 +4,7 @@ Default Key Bindings
 ### Editor
 
 `Alt`+`x`
-:   Enter command mode (see `dterc` for available commands)
+:   Enter command mode (see [`dterc`] for available commands)
 
 `Ctrl`+`q`
 :   Quit editor (use `quit -f` in command mode to quit with unsaved buffers)
@@ -104,3 +104,6 @@ Default Key Bindings
 
 `Alt`+`=`
 :   Increase indent level of selection (or line)
+
+
+[`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
