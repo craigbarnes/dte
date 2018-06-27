@@ -12,7 +12,7 @@ Default Key Bindings
 `Alt`+`z`
 :   Suspend editor (resume by running `fg` in the shell)
 
-### Buffers
+### Buffer
 
 `Ctrl`+`n`, `Ctrl`+`t`
 :   Open new, empty buffer
@@ -65,9 +65,6 @@ Default Key Bindings
 :   Find previous occurence of word under cursor
 
 ### Editing
-
-`Ctrl`+`r`
-:   Find and replace text (prompt)
 
 `Alt`+`s`
 :   Begin selecting characters
