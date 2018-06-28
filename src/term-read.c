@@ -1,5 +1,5 @@
 #include "term-read.h"
-#include "term-caps.h"
+#include "term-info.h"
 #include "common.h"
 #include "editor.h"
 

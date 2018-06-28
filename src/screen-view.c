@@ -5,7 +5,7 @@
 #include "term-write.h"
 #include "selection.h"
 #include "highlight.h"
-#include "term-caps.h"
+#include "term-info.h"
 
 typedef struct {
     View *view;

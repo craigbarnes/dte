@@ -4,7 +4,7 @@
 #include "buffer.h"
 #include "window.h"
 #include "view.h"
-#include "term-caps.h"
+#include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
 #include "search.h"

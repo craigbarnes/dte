@@ -3,7 +3,7 @@
 #include "spawn.h"
 #include "window.h"
 #include "util/ptr-array.h"
-#include "term-caps.h"
+#include "term-info.h"
 #include "cmdline.h"
 #include "editor.h"
 #include "term-write.h"

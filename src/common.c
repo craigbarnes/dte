@@ -1,6 +1,6 @@
 #include "common.h"
 #include "editor.h"
-#include "term-caps.h"
+#include "term-info.h"
 
 size_t count_nl(const char *buf, size_t size)
 {

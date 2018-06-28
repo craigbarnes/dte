@@ -9,7 +9,7 @@
 #include "path.h"
 #include "input-special.h"
 #include "selection.h"
-#include "term-caps.h"
+#include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
 

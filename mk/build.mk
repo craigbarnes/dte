@@ -39,7 +39,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     load-save lock main move msg normal-mode options parse-args \
     parse-command path regexp run screen screen-tabbar screen-view \
     script search search-mode selection spawn state syntax tabbar \
-    tag term-caps term-read term-write view wbuf window xmalloc )) \
+    tag term-info term-read term-write view wbuf window xmalloc )) \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
@@ -52,7 +52,7 @@ ifdef WERROR
 endif
 
 ifdef TERMINFO_DISABLE
-  build/term-caps.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+  build/term-info.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
   LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
 endif
@@ -120,7 +120,7 @@ $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
-build/term-caps.o: build/term-caps.cflags
+build/term-info.o: build/term-info.cflags
 build/editor.o: build/editor.cflags
 build/script.o: build/script.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"

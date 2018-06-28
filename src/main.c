@@ -2,7 +2,7 @@
 #include "window.h"
 #include "view.h"
 #include "frame.h"
-#include "term-caps.h"
+#include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
 #include "config.h"
