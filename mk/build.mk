@@ -32,14 +32,14 @@ util_objects := $(addprefix build/util/, $(addsuffix .o, \
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block block-iter buffer buffer-iter cconv change \
-    cmdline color command-mode commands common compiler completion \
-    config ctags decoder detect edit editor encoder encoding env \
-    error file-history file-option filetype format-status \
-    frame git-open highlight history indent input-special key \
-    load-save lock main move msg normal-mode options parse-args \
+    cmdline color commands common compiler completion config ctags \
+    decoder detect edit editor encoder encoding env error \
+    file-history file-option filetype format-status frame git-open \
+    highlight history indent input-special key load-save lock main \
+    mode-command mode-normal mode-search move msg options parse-args \
     parse-command path regexp run screen screen-tabbar screen-view \
-    script search search-mode selection spawn state syntax tabbar \
-    tag term-info term-read term-write view wbuf window xmalloc )) \
+    script search selection spawn state syntax tabbar tag term-info \
+    term-read term-write view wbuf window xmalloc )) \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
