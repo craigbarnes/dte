@@ -5,11 +5,11 @@
 #include <sys/types.h>
 #include "block-iter.h"
 
-enum selection {
+typedef enum {
     SELECT_NONE,
     SELECT_CHARS,
     SELECT_LINES,
-};
+} SelectionType;
 
 typedef struct View {
     struct Buffer *buffer;
@@ -36,7 +36,7 @@ typedef struct View {
     int tt_width;
     int tt_truncated_width;
 
-    enum selection selection;
+    SelectionType selection;
 
     // Cursor offset when selection was started
     ssize_t sel_so;

@@ -1256,7 +1256,7 @@ static void cmd_search(const char *pf, char **args)
 
 static void cmd_select(const char *pf, char** UNUSED_ARG(args))
 {
-    enum selection sel = SELECT_CHARS;
+    SelectionType sel = SELECT_CHARS;
     bool block = false;
     bool keep = false;
 
