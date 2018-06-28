@@ -38,7 +38,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     highlight history indent input-special key load-save lock main \
     mode-command mode-normal mode-search move msg options parse-args \
     parse-command path regexp run screen screen-tabbar screen-view \
-    script search selection spawn state syntax tabbar tag term-info \
+    script search selection spawn state syntax tag term-info \
     term-read term-write view wbuf window xmalloc )) \
     $(util_objects)
 
