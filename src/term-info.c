@@ -228,11 +228,8 @@ static bool term_match(const char *term, const char *prefix)
         return false;
     }
     switch (term[strlen(prefix)]) {
-    // Exact match
-    case '\0':
-    // Prefix match
-    case '-':
-    case '+':
+    case '\0': // Exact match
+    case  '-': // Prefix match
         return true;
     }
     return false;
