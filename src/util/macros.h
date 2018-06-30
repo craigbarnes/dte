@@ -118,6 +118,8 @@
     #define RETURNS_NONNULL
 #endif
 
+#define XMALLOC MALLOC RETURNS_NONNULL
+
 #if __STDC_VERSION__ >= 201112L
     #define NORETURN _Noreturn
 #elif GNUC_AT_LEAST(3, 0)

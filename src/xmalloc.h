@@ -21,15 +21,15 @@
     mem = xrealloc(mem, size_multiply(sizeof(*mem), (n))); \
 } while (0)
 
-void *xmalloc(size_t size) MALLOC RETURNS_NONNULL ALLOC_SIZE(1);
-void *xcalloc(size_t size) MALLOC RETURNS_NONNULL ALLOC_SIZE(1);
+void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
+void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
-char *xstrdup(const char *str) MALLOC NONNULL_ARGS RETURNS_NONNULL;
-char *xstrcut(const char *str, size_t size) MALLOC NONNULL_ARGS RETURNS_NONNULL;
+char *xstrdup(const char *str) XMALLOC NONNULL_ARGS;
+char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
 void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2);
 size_t size_multiply(size_t a, size_t b);
 
-MALLOC NONNULL_ARGS RETURNS_NONNULL
+XMALLOC NONNULL_ARGS
 static inline char *xstrslice(const char *str, size_t pos, size_t end)
 {
     return xstrcut(str + pos, end - pos);
