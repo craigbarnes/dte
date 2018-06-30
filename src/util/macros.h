@@ -51,6 +51,7 @@
     #define UNUSED __attribute__((__unused__))
     #define MALLOC __attribute__((__malloc__))
     #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
+    #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
     #define PURE __attribute__((__pure__))
     #define CONST_FN __attribute__((__const__))
     #define CONSTRUCTOR __attribute__((__constructor__))
@@ -59,6 +60,7 @@
     #define UNUSED
     #define MALLOC
     #define PRINTF(x)
+    #define VPRINTF(x)
     #define PURE
     #define CONST_FN
     // CONSTRUCTOR and DESTRUCTOR deliberately left undefined
