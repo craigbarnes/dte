@@ -129,6 +129,11 @@ static void showkey_loop(void)
     while (loop) {
         Key key;
         if (!term_read_key(&key)) {
+            const char *seq = term_get_last_key_escape_sequence();
+            if (seq) {
+                printf("   %-12s %-14s ^[%s\n", "UNKNOWN", "-", seq);
+                fflush(stdout);
+            }
             continue;
         }
         switch (key) {
@@ -140,7 +145,8 @@ static void showkey_loop(void)
             break;
         }
         char *str = key_to_string(key);
-        printf("   %-12s 0x%" PRIX32 "\n", str, key);
+        const char *seq = term_get_last_key_escape_sequence();
+        printf("   %-12s 0x%-12" PRIX32 " %s\n", str, key, seq ? seq : "");
         free(str);
         fflush(stdout);
     }

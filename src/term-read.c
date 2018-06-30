@@ -9,13 +9,18 @@
 #include <termios.h>
 
 static struct termios termios_save;
+static char input_buf[256];
+static size_t input_buf_fill;
+static bool input_can_be_truncated;
+static char last_escape_sequence[256];
+static size_t last_escape_sequence_length;
 
-static char *escape_key(const char *key, size_t len)
+static const char *escape_key(const char *seq, size_t len)
 {
     static char buf[1024];
     size_t j = 0;
     for (size_t i = 0; i < len && i < sizeof(buf) - 1; i++) {
-        unsigned char ch = key[i];
+        unsigned char ch = seq[i];
         if (ch < 0x20) {
             buf[j++] = '^';
             ch |= 0x40;
@@ -27,6 +32,20 @@ static char *escape_key(const char *key, size_t len)
     }
     buf[j] = '\0';
     return buf;
+}
+
+const char *term_get_last_key_escape_sequence(void)
+{
+    if (last_escape_sequence_length == 0) {
+        return NULL;
+    }
+    return escape_key(last_escape_sequence, last_escape_sequence_length);
+}
+
+static inline void record_last_key_escape_sequence(size_t length)
+{
+    memcpy(last_escape_sequence, input_buf, length);
+    last_escape_sequence_length = length;
 }
 
 void term_raw(void)
@@ -59,10 +78,6 @@ void term_cooked(void)
 {
     tcsetattr(0, 0, &termios_save);
 }
-
-static char input_buf[256];
-static size_t input_buf_fill;
-static bool input_can_be_truncated;
 
 static void consume_input(size_t len)
 {
@@ -126,10 +141,6 @@ static bool input_get_byte(unsigned char *ch)
 
 static bool read_special(Key *key)
 {
-    if (DEBUG > 2) {
-        d_print("keycode: '%s'\n", escape_key(input_buf, input_buf_fill));
-    }
-
     ssize_t len = terminal.parse_key_sequence(input_buf, input_buf_fill, key);
     switch (len) {
     case -1:
@@ -140,6 +151,7 @@ static bool read_special(Key *key)
         return false;
     default:
         // Match
+        record_last_key_escape_sequence(len);
         consume_input(len);
         return true;
     }
@@ -232,8 +244,10 @@ static bool is_text(const char *const str, size_t len)
     return true;
 }
 
-static bool read_key(Key *key)
+bool term_read_key(Key *key)
 {
+    last_escape_sequence_length = 0;
+
     if (!input_buf_fill && !fill_buffer()) {
         return false;
     }
@@ -285,24 +299,12 @@ static bool read_key(Key *key)
                 return true;
             }
             // Unknown escape sequence, avoid inserting it
+            record_last_key_escape_sequence(input_buf_fill);
             input_buf_fill = 0;
             return false;
         }
     }
     return read_simple(key);
-}
-
-bool term_read_key(Key *key)
-{
-    const bool ok = read_key(key);
-    const Key k = *key;
-    if (DEBUG > 2 && ok && k != KEY_PASTE && k > KEY_UNICODE_MAX) {
-        // Modifiers and/or special key
-        char *str = key_to_string(k);
-        d_print("key: %s\n", str);
-        free(str);
-    }
-    return ok;
 }
 
 char *term_read_paste(size_t *size)
