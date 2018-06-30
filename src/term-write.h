@@ -37,6 +37,7 @@ void buf_add_bytes(const char *str, size_t count);
 void buf_set_bytes(char ch, size_t count);
 void buf_add_ch(char ch);
 void buf_escape(const char *str);
+void buf_tputs(const char *str, int nr_affected_lines);
 void buf_add_str(const char *str);
 void buf_hide_cursor(void);
 void buf_show_cursor(void);

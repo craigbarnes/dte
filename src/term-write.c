@@ -86,6 +86,13 @@ void buf_escape(const char *const str)
     buf_add_bytes(str, strlen(str));
 }
 
+void buf_tputs(const char *const str, int UNUSED_ARG(nr_affected_lines))
+{
+    if (str) {
+        buf_add_bytes(str, strlen(str));
+    }
+}
+
 void buf_add_str(const char *const str)
 {
     size_t i = 0;
@@ -229,7 +236,7 @@ void buf_clear_eol(void)
             && terminal.control_codes->clear_to_eol
             && (obuf.color.bg < 0 || terminal.back_color_erase)
         ) {
-            buf_escape(terminal.control_codes->clear_to_eol);
+            terminal.put_string(terminal.control_codes->clear_to_eol, 1);
             obuf.x = obuf.scroll_x + obuf.width;
         } else {
             buf_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);

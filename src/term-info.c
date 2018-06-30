@@ -1,4 +1,5 @@
 #include "term-info.h"
+#include "term-write.h"
 #include "color.h"
 #include "common.h"
 #include "lookup/xterm-keys.c"
@@ -12,6 +13,7 @@ TerminalInfo terminal = {
     .attributes = ANSI_ATTRS,
     .ncv_attributes = ATTR_UNDERLINE,
     .parse_key_sequence = &parse_xterm_key_sequence,
+    .put_string = &buf_tputs,
     .control_codes = &(TermControlCodes) {
         .clear_to_eol = "\033[K"
     }
@@ -112,6 +114,7 @@ int setupterm(const char *term, int filedes, int *errret);
 int tigetflag(const char *capname);
 int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
+int tputs(const char *str, int affcnt, int (*putc_fn)(int));
 
 static char *curses_str_cap(const char *const name)
 {
@@ -124,10 +127,26 @@ static char *curses_str_cap(const char *const name)
     return str;
 }
 
+static int tputs_putc(int ch)
+{
+    buf_add_ch(ch);
+    return ch;
+}
+
+// The use of tputs(3) is necessary to expand padding specifiers in
+// strings returned by tigetstr(3).
+static void put_terminfo_string(const char *str, int nr_affected_lines)
+{
+    if (str) {
+        tputs(str, nr_affected_lines, tputs_putc);
+    }
+}
+
 // See terminfo(5)
 static void term_read_caps(void)
 {
     terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
+    terminal.put_string = &put_terminfo_string,
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
@@ -206,6 +225,7 @@ static const TerminalInfo terminal_xterm = {
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .parse_key_sequence = &parse_xterm_key_sequence,
+    .put_string = &buf_tputs,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .clear_to_eol = "\033[K",
