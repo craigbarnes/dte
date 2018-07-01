@@ -6,6 +6,8 @@
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
+static void buf_put_clear_to_eol(void);
+
 TerminalInfo terminal = {
     .max_colors = 8,
     .width = 80,
@@ -13,11 +15,19 @@ TerminalInfo terminal = {
     .attributes = ANSI_ATTRS,
     .ncv_attributes = ATTR_UNDERLINE,
     .parse_key_sequence = &parse_xterm_key_sequence,
-    .put_string = &buf_tputs,
+    .put_clear_to_eol = &buf_put_clear_to_eol,
     .control_codes = &(TermControlCodes) {
         .clear_to_eol = "\033[K"
     }
 };
+
+static void buf_put_clear_to_eol(void)
+{
+    const char *seq = terminal.control_codes->clear_to_eol;
+    if (seq) {
+        buf_escape(seq);
+    }
+}
 
 #ifndef TERMINFO_DISABLE
 
@@ -133,12 +143,11 @@ static int tputs_putc(int ch)
     return ch;
 }
 
-// The use of tputs(3) is necessary to expand padding specifiers in
-// strings returned by tigetstr(3).
-static void put_terminfo_string(const char *str, int nr_affected_lines)
+static void tputs_clear_to_eol(void)
 {
-    if (str) {
-        tputs(str, nr_affected_lines, tputs_putc);
+    const char *seq = terminal.control_codes->clear_to_eol;
+    if (seq) {
+        tputs(seq, 1, tputs_putc);
     }
 }
 
@@ -146,7 +155,8 @@ static void put_terminfo_string(const char *str, int nr_affected_lines)
 static void term_read_caps(void)
 {
     terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
-    terminal.put_string = &put_terminfo_string,
+    terminal.put_clear_to_eol = &tputs_clear_to_eol,
+
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
@@ -225,7 +235,7 @@ static const TerminalInfo terminal_xterm = {
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .parse_key_sequence = &parse_xterm_key_sequence,
-    .put_string = &buf_tputs,
+    .put_clear_to_eol = &buf_put_clear_to_eol,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .clear_to_eol = "\033[K",

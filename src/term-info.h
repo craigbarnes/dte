@@ -30,7 +30,7 @@ typedef struct {
     unsigned short ncv_attributes;
     TermControlCodes *control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
-    void (*put_string)(const char *str, int nr_affected_lines);
+    void (*put_clear_to_eol)(void);
 } TerminalInfo;
 
 extern TerminalInfo terminal;
