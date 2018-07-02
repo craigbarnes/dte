@@ -24,7 +24,7 @@ void set_color(TermColor *color)
     if (tmp.bg < 0) {
         tmp.bg = editor.builtin_colors[BC_DEFAULT]->bg;
     }
-    buf_set_color(&tmp);
+    terminal.set_color(&tmp);
 }
 
 void set_builtin_color(enum builtin_color c)

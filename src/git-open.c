@@ -297,7 +297,7 @@ static void git_open_update_screen(void)
         if (file_idx == git_open.selected) {
             mask_color(&color, editor.builtin_colors[BC_SELECTION]);
         }
-        buf_set_color(&color);
+        terminal.set_color(&color);
         buf_add_str(file);
         buf_clear_eol();
     }

@@ -3,11 +3,14 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include "color.h"
 #include "key.h"
 
 typedef struct {
     const char *init;
     const char *deinit;
+    const char *reset_colors;
+    const char *reset_attrs;
     const char *clear_to_eol;
     const char *keypad_off;
     const char *keypad_on;
@@ -31,6 +34,7 @@ typedef struct {
     TermControlCodes *control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
     void (*put_clear_to_eol)(void);
+    void (*set_color)(const TermColor *color);
 } TerminalInfo;
 
 extern TerminalInfo terminal;

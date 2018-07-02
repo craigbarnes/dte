@@ -145,7 +145,7 @@ static bool can_set_attr(unsigned short attr, const TermColor *color)
 
 void buf_set_color(const TermColor *const color)
 {
-    if (!memcmp(color, &obuf.color, sizeof(*color))) {
+    if (same_color(color, &obuf.color)) {
         return;
     }
 

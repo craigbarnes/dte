@@ -63,4 +63,13 @@ bool parse_term_color(TermColor *color, char **strs);
 void collect_hl_colors(const char *prefix);
 void collect_colors_and_attributes(const char *prefix);
 
+static inline bool same_color(const TermColor *c1, const TermColor *c2)
+{
+    return
+        c1->attr == c2->attr
+        && c1->fg == c2->fg
+        && c1->bg == c2->bg
+    ;
+}
+
 #endif

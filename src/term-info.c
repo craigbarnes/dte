@@ -16,7 +16,10 @@ TerminalInfo terminal = {
     .ncv_attributes = ATTR_UNDERLINE,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
+    .set_color = &buf_set_color,
     .control_codes = &(TermControlCodes) {
+        .reset_colors = "\033[39;49m",
+        .reset_attrs = "\033[0m",
         .clear_to_eol = "\033[K"
     }
 };
@@ -124,6 +127,7 @@ int setupterm(const char *term, int filedes, int *errret);
 int tigetflag(const char *capname);
 int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
+char *tiparm(const char *str, ...);
 int tputs(const char *str, int affcnt, int (*putc_fn)(int));
 
 static char *curses_str_cap(const char *const name)
@@ -151,26 +155,77 @@ static void tputs_clear_to_eol(void)
     }
 }
 
+static inline bool attr_is_set(const TermColor *color, unsigned short attr)
+{
+    if (!(color->attr & attr)) {
+        return false;
+    } else if (terminal.ncv_attributes & attr) {
+        // Terminal only allows attr when not using colors
+        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+    }
+    return true;
+}
+
+static void tputs_set_color(const TermColor *color)
+{
+    static bool done_init;
+    static const char *sgr, *setaf, *setab;
+    if (!done_init) {
+        sgr = curses_str_cap("sgr");
+        setaf = curses_str_cap("setaf");
+        setab = curses_str_cap("setab");
+        done_init = true;
+    }
+
+    if (same_color(color, &obuf.color)) {
+        return;
+    }
+
+    if (sgr) {
+        const char *attrs = tiparm (
+            sgr,
+            0, // p1 = "standout" (unused)
+            attr_is_set(color, ATTR_UNDERLINE),
+            attr_is_set(color, ATTR_REVERSE),
+            attr_is_set(color, ATTR_BLINK),
+            attr_is_set(color, ATTR_DIM),
+            attr_is_set(color, ATTR_BOLD),
+            attr_is_set(color, ATTR_INVIS),
+            0, // p8 = "protect" (unused)
+            0  // p9 = "altcharset" (unused)
+        );
+        tputs(attrs, 1, tputs_putc);
+    }
+
+    TermColor c = *color;
+    if (setaf && c.fg >= 0) {
+        const char *seq = tiparm(setaf, (int) c.fg);
+        if (seq) {
+            tputs(seq, 1, tputs_putc);
+        }
+    }
+    if (setab && c.bg >= 0) {
+        const char *seq = tiparm(setab, c.bg);
+        if (seq) {
+            tputs(seq, 1, tputs_putc);
+        }
+    }
+}
+
 // See terminfo(5)
 static void term_read_caps(void)
 {
     terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
-    terminal.put_clear_to_eol = &tputs_clear_to_eol,
+    terminal.put_clear_to_eol = &tputs_clear_to_eol;
+    terminal.set_color = &tputs_set_color;
 
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
 
-    terminal.attributes =
-        (xstreq(curses_str_cap("smul"), "\033[4m") ? ATTR_UNDERLINE : 0)
-        + (xstreq(curses_str_cap("rev"), "\033[7m") ? ATTR_REVERSE : 0)
-        + (xstreq(curses_str_cap("blink"), "\033[5m") ? ATTR_BLINK : 0)
-        + (xstreq(curses_str_cap("dim"), "\033[2m") ? ATTR_DIM : 0)
-        + (xstreq(curses_str_cap("bold"), "\033[1m") ? ATTR_BOLD : 0)
-        + (xstreq(curses_str_cap("invis"), "\033[8m") ? ATTR_INVIS : 0)
-        + (xstreq(curses_str_cap("sitm"), "\033[3m") ? ATTR_ITALIC : 0)
-    ;
+    // Not needed or used in terminfo mode
+    terminal.attributes = 0;
 
     const int ncv = tigetnum("ncv");
     if (ncv <= 0) {
@@ -188,6 +243,8 @@ static void term_read_caps(void)
 
     static TermControlCodes tcc;
     tcc = (TermControlCodes) {
+        .reset_colors = curses_str_cap("op"),
+        .reset_attrs = curses_str_cap("sgr0"),
         .clear_to_eol = curses_str_cap("el"),
         .keypad_off = curses_str_cap("rmkx"),
         .keypad_on = curses_str_cap("smkx"),
@@ -236,8 +293,11 @@ static const TerminalInfo terminal_xterm = {
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
+    .set_color = &buf_set_color,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+        .reset_colors = "\033[39;49m",
+        .reset_attrs = "\033[0m",
         .clear_to_eol = "\033[K",
         .keypad_off = "\033[?1l\033>",
         .keypad_on = "\033[?1h\033=",

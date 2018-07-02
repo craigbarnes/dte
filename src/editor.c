@@ -303,22 +303,21 @@ void resize(void)
 
 void ui_end(void)
 {
-    const TermColor color = {
-        .fg = COLOR_DEFAULT,
-        .bg = COLOR_DEFAULT,
-        .attr = 0
-    };
+    if (terminal.control_codes->reset_colors) {
+        buf_escape(terminal.control_codes->reset_colors);
+    }
 
-    buf_set_color(&color);
+    if (terminal.control_codes->reset_attrs) {
+        buf_escape(terminal.control_codes->reset_attrs);
+    }
+
     buf_move_cursor(0, terminal.height - 1);
     buf_show_cursor();
 
-    // Back to main buffer
     if (terminal.control_codes->cup_mode_off) {
         buf_escape(terminal.control_codes->cup_mode_off);
     }
 
-    // Turn keypad off
     if (terminal.control_codes->keypad_off) {
         buf_escape(terminal.control_codes->keypad_off);
     }
