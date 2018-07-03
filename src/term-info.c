@@ -213,8 +213,11 @@ static void tputs_set_color(const TermColor *color)
 }
 
 // See terminfo(5)
-static void term_read_caps(void)
+static void term_init_terminfo(const char *term)
 {
+    // Initialize terminfo database (or call exit(3) on failure)
+    setupterm(term, 1, (int*)0);
+
     terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
     terminal.put_clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
@@ -265,22 +268,6 @@ static void term_read_caps(void)
             };
         }
     }
-}
-
-static void term_init_fallback(const char *const term)
-{
-    // Initialize terminfo database (or call exit(3) on failure)
-    setupterm(term, 1, (int*)0);
-
-    term_read_caps();
-}
-
-#else
-
-static void term_init_fallback(const char *const UNUSED_ARG(term))
-{
-    // Use the default TerminalInfo defined at the top of this file
-    // (ECMA-48 + xterm key parser).
 }
 
 #endif // ifndef TERMINFO_DISABLE
@@ -335,7 +322,7 @@ void term_init(void)
 
     if (getenv("DTE_FORCE_TERMINFO")) {
 #ifndef TERMINFO_DISABLE
-        term_init_fallback(term);
+        term_init_terminfo(term);
         return;
 #else
         fputs("'DTE_FORCE_TERMINFO' set but terminfo not linked\n", stderr);
@@ -367,9 +354,13 @@ void term_init(void)
         // Use the default TerminalInfo and just change the control codes
         terminal.control_codes->hide_cursor = "\033[?25l\033[?1c";
         terminal.control_codes->show_cursor = "\033[?25h\033[?0c";
-    } else {
-        term_init_fallback(term);
     }
+#ifndef TERMINFO_DISABLE
+    else {
+        term_init_terminfo(term);
+        return;
+    }
+#endif
 
     if (str_has_suffix(term, "256color")) {
         terminal.max_colors = 256;
