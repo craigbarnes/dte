@@ -35,6 +35,7 @@ typedef struct {
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
     void (*put_clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
+    void (*move_cursor)(int x, int y);
 } TerminalInfo;
 
 extern TerminalInfo terminal;

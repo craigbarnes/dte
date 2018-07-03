@@ -1,6 +1,7 @@
 #include "screen.h"
 #include "editor.h"
 #include "util/uchar.h"
+#include "term-info.h"
 #include "term-write.h"
 #include "view.h"
 
@@ -170,7 +171,7 @@ static void print_horizontal_tab_title(View *v, int idx)
 static void print_horizontal_tabbar(Window *win)
 {
     buf_reset(win->x, win->w, 0);
-    buf_move_cursor(win->x, win->y);
+    terminal.move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
     int i;
@@ -289,13 +290,13 @@ static void print_vertical_tabbar(Window *win)
     for (i = 0; i < n; i++) {
         int idx = win->first_tab_idx + i;
         obuf.x = 0;
-        buf_move_cursor(win->x, win->y + i);
+        terminal.move_cursor(win->x, win->y + i);
         print_vertical_tab_title(win->views.ptrs[idx], idx, width);
     }
     set_builtin_color(BC_TABBAR);
     for (; i < h; i++) {
         obuf.x = 0;
-        buf_move_cursor(win->x, win->y + i);
+        terminal.move_cursor(win->x, win->y + i);
         buf_clear_eol();
     }
 }

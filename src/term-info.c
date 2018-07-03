@@ -17,6 +17,7 @@ TerminalInfo terminal = {
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &buf_set_color,
+    .move_cursor = &buf_move_cursor,
     .control_codes = &(TermControlCodes) {
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
@@ -155,6 +156,23 @@ static void tputs_clear_to_eol(void)
     }
 }
 
+static void tputs_move_cursor(int x, int y)
+{
+    static bool done_init;
+    static const char *cup;
+    if (!done_init) {
+        cup = curses_str_cap("cup");
+        done_init = true;
+    }
+
+    if (cup) {
+        const char *seq = tiparm(cup, y, x);
+        if (seq) {
+            tputs(seq, 1, tputs_putc);
+        }
+    }
+}
+
 static inline bool attr_is_set(const TermColor *color, unsigned short attr)
 {
     if (!(color->attr & attr)) {
@@ -221,6 +239,7 @@ static void term_init_terminfo(const char *term)
     terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
     terminal.put_clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
+    terminal.move_cursor = &tputs_move_cursor;
 
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
@@ -281,6 +300,7 @@ static const TerminalInfo terminal_xterm = {
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &buf_set_color,
+    .move_cursor = &buf_move_cursor,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .reset_colors = "\033[39;49m",

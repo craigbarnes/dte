@@ -275,7 +275,7 @@ static void git_open_update_screen(void)
     }
 
     buf_reset(x, w, 0);
-    buf_move_cursor(0, 0);
+    terminal.move_cursor(0, 0);
     editor.cmdline_x = print_command('/');
     buf_clear_eol();
     y++;
@@ -291,7 +291,7 @@ static void git_open_update_screen(void)
 
         file = git_open.files.ptrs[file_idx];
         obuf.x = 0;
-        buf_move_cursor(x, y + i);
+        terminal.move_cursor(x, y + i);
 
         color = *editor.builtin_colors[BC_DEFAULT];
         if (file_idx == git_open.selected) {
@@ -304,7 +304,7 @@ static void git_open_update_screen(void)
     set_builtin_color(BC_DEFAULT);
     for (; i < h; i++) {
         obuf.x = 0;
-        buf_move_cursor(x, y + i);
+        terminal.move_cursor(x, y + i);
         buf_clear_eol();
     }
 }
@@ -314,7 +314,7 @@ static void git_open_update(void)
     buf_hide_cursor();
     update_term_title(window->view->buffer);
     git_open_update_screen();
-    buf_move_cursor(editor.cmdline_x, 0);
+    terminal.move_cursor(editor.cmdline_x, 0);
     buf_show_cursor();
     buf_flush();
 }

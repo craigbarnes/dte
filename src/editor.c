@@ -132,7 +132,7 @@ void any_key(void)
 static void show_message(const char *const msg, bool is_error)
 {
     buf_reset(0, terminal.width, 0);
-    buf_move_cursor(0, terminal.height - 1);
+    terminal.move_cursor(0, terminal.height - 1);
     print_message(msg, is_error);
     buf_clear_eol();
 }
@@ -142,7 +142,7 @@ static void update_command_line(void)
     char prefix = ':';
 
     buf_reset(0, terminal.width, 0);
-    buf_move_cursor(0, terminal.height - 1);
+    terminal.move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         print_message(error_buf, msg_is_error);
@@ -179,13 +179,14 @@ static void restore_cursor(void)
     View *v = window->view;
     switch (editor.input_mode) {
     case INPUT_NORMAL:
-        buf_move_cursor(
+        terminal.move_cursor (
             window->edit_x + v->cx_display - v->vx,
-            window->edit_y + v->cy - v->vy);
+            window->edit_y + v->cy - v->vy
+        );
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        buf_move_cursor(editor.cmdline_x, terminal.height - 1);
+        terminal.move_cursor(editor.cmdline_x, terminal.height - 1);
         break;
     case INPUT_GIT_OPEN:
         break;
@@ -311,7 +312,7 @@ void ui_end(void)
         buf_escape(terminal.control_codes->reset_attrs);
     }
 
-    buf_move_cursor(0, terminal.height - 1);
+    terminal.move_cursor(0, terminal.height - 1);
     buf_show_cursor();
 
     if (terminal.control_codes->cup_mode_off) {

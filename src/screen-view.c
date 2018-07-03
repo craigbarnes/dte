@@ -394,7 +394,7 @@ void update_range(View *v, int y1, int y2)
         int next_changed;
 
         obuf.x = 0;
-        buf_move_cursor(v->window->edit_x, v->window->edit_y + i);
+        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i);
 
         fill_line_nl_ref(&bi, &lr);
         colors = hl_line (
@@ -426,7 +426,7 @@ void update_range(View *v, int y1, int y2)
         mask_color2(&color, editor.builtin_colors[BC_CURRENTLINE]);
         set_color(&color);
 
-        buf_move_cursor(v->window->edit_x, v->window->edit_y + i++);
+        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i++);
         buf_clear_eol();
     }
 
@@ -435,7 +435,7 @@ void update_range(View *v, int y1, int y2)
     }
     for (; i < y2; i++) {
         obuf.x = 0;
-        buf_move_cursor(v->window->edit_x, v->window->edit_y + i);
+        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i);
         buf_put_char('~');
         buf_clear_eol();
     }

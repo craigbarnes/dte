@@ -84,7 +84,7 @@ void update_status_line(Window *win)
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
     buf_reset(win->x, win->w, 0);
-    buf_move_cursor(win->x, win->y + win->h - 1);
+    terminal.move_cursor(win->x, win->y + win->h - 1);
     set_builtin_color(BC_STATUSLINE);
     lw = u_str_width(lbuf);
     rw = u_str_width(rbuf);
@@ -97,7 +97,7 @@ void update_status_line(Window *win)
         // Both would fit separately, draw overlapping
         buf_add_str(lbuf);
         obuf.x = win->w - rw;
-        buf_move_cursor(win->x + win->w - rw, win->y + win->h - 1);
+        terminal.move_cursor(win->x + win->w - rw, win->y + win->h - 1);
         buf_add_str(rbuf);
     } else if (lw <= win->w) {
         // Left fits
@@ -228,7 +228,7 @@ static void print_separator(Window *win)
     }
 
     for (y = 0; y < win->h; y++) {
-        buf_move_cursor(win->x + win->w, win->y + y);
+        terminal.move_cursor(win->x + win->w, win->y + y);
         buf_add_ch('|');
     }
 }
@@ -277,7 +277,7 @@ void update_line_numbers(Window *win, bool force)
         } else {
             snprintf(buf, sizeof(buf), "%*d ", w, line);
         }
-        buf_move_cursor(x, win->edit_y + i);
+        terminal.move_cursor(x, win->edit_y + i);
         buf_add_bytes(buf, win->line_numbers.width);
     }
 }
