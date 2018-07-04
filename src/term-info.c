@@ -6,7 +6,124 @@
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
 
-static void buf_put_clear_to_eol(void);
+static void buf_put_clear_to_eol(void)
+{
+    const char *seq = terminal.control_codes->clear_to_eol;
+    if (seq) {
+        buf_escape(seq);
+    }
+}
+
+static void ecma48_move_cursor(int x, int y)
+{
+    if (x < 0 || x >= 999 || y < 0 || y >= 999) {
+        return;
+    }
+    static char buf[16];
+    const int len = snprintf (
+        buf,
+        11, // == strlen("\033[998;998H") + 1 (for NUL, to avoid truncation)
+        "\033[%u;%uH",
+        // x and y are zero-based
+        ((unsigned int)y) + 1,
+        ((unsigned int)x) + 1
+    );
+    static_assert(6 == STRLEN("\033[0;0H"));
+    BUG_ON(len < 6);
+    static_assert(10 == STRLEN("\033[998;998H"));
+    BUG_ON(len > 10);
+    buf_add_bytes(buf, (size_t)len);
+}
+
+static bool can_set_attr(unsigned short attr, const TermColor *color)
+{
+    if (!(terminal.attributes & attr)) {
+        // Terminal doesn't support attr
+        return false;
+    } else if (terminal.ncv_attributes & attr) {
+        // Terminal only allows attr when not using colors
+        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+    }
+    return true;
+}
+
+static void ecma48_set_color(const TermColor *const color)
+{
+    if (same_color(color, &obuf.color)) {
+        return;
+    }
+
+    TermColor c = *color;
+
+    // TERM=xterm: 8 colors
+    // TERM=linux: 8 colors. colors > 7 corrupt screen
+    if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
+        c.attr |= ATTR_BOLD;
+        c.fg &= 7;
+    }
+
+    // Max 34 bytes (3 + 6 * 2 + 2 * 9 + 1)
+    char buf[64];
+    size_t i = 0;
+    buf[i++] = '\033';
+    buf[i++] = '[';
+    buf[i++] = '0';
+
+    if (c.attr & ATTR_BOLD && can_set_attr(ATTR_BOLD, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '1';
+    }
+    if (c.attr & ATTR_DIM && can_set_attr(ATTR_DIM, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '2';
+    }
+    if (c.attr & ATTR_ITALIC && can_set_attr(ATTR_ITALIC, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '3';
+    }
+    if (c.attr & ATTR_UNDERLINE && can_set_attr(ATTR_UNDERLINE, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '4';
+    }
+    if (c.attr & ATTR_BLINK && can_set_attr(ATTR_BLINK, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '5';
+    }
+    if (c.attr & ATTR_REVERSE && can_set_attr(ATTR_REVERSE, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '7';
+    }
+    if (c.attr & ATTR_INVIS && can_set_attr(ATTR_INVIS, &c)) {
+        buf[i++] = ';';
+        buf[i++] = '8';
+    }
+
+    if (c.fg >= 0) {
+        const unsigned char fg = (unsigned char) c.fg;
+        if (fg < 8) {
+            buf[i++] = ';';
+            buf[i++] = '3';
+            buf[i++] = '0' + fg;
+        } else {
+            i += snprintf(&buf[i], 10, ";38;5;%u", fg);
+        }
+    }
+
+    if (c.bg >= 0) {
+        const unsigned char bg = (unsigned char) c.bg;
+        if (bg < 8) {
+            buf[i++] = ';';
+            buf[i++] = '4';
+            buf[i++] = '0' + bg;
+        } else {
+            i += snprintf(&buf[i], 10, ";48;5;%u", bg);
+        }
+    }
+
+    buf[i++] = 'm';
+    buf_add_bytes(buf, i);
+    obuf.color = *color;
+}
 
 TerminalInfo terminal = {
     .max_colors = 8,
@@ -16,22 +133,14 @@ TerminalInfo terminal = {
     .ncv_attributes = ATTR_UNDERLINE,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
-    .set_color = &buf_set_color,
-    .move_cursor = &buf_move_cursor,
+    .set_color = &ecma48_set_color,
+    .move_cursor = &ecma48_move_cursor,
     .control_codes = &(TermControlCodes) {
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
         .clear_to_eol = "\033[K"
     }
 };
-
-static void buf_put_clear_to_eol(void)
-{
-    const char *seq = terminal.control_codes->clear_to_eol;
-    if (seq) {
-        buf_escape(seq);
-    }
-}
 
 #ifndef TERMINFO_DISABLE
 
@@ -299,8 +408,8 @@ static const TerminalInfo terminal_xterm = {
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
-    .set_color = &buf_set_color,
-    .move_cursor = &buf_move_cursor,
+    .set_color = &ecma48_set_color,
+    .move_cursor = &ecma48_move_cursor,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .reset_colors = "\033[39;49m",

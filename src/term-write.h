@@ -40,8 +40,6 @@ void buf_escape(const char *str);
 void buf_add_str(const char *str);
 void buf_hide_cursor(void);
 void buf_show_cursor(void);
-void buf_move_cursor(int x, int y);
-void buf_set_color(const TermColor *color);
 void buf_clear_eol(void);
 void buf_flush(void);
 bool buf_put_char(CodePoint u);
