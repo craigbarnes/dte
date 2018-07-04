@@ -3,6 +3,7 @@
 #include "window.h"
 #include "selection.h"
 #include "editor.h"
+#include "error.h"
 
 typedef struct {
     const char *name;
@@ -56,18 +57,7 @@ static char *expand_word(void)
 
 static char *expand_pkgdatadir(void)
 {
-    static bool warned;
-    if (!warned) {
-        fputs (
-            "\n\033[1;31mNOTICE:\033[0m "
-            "$PKGDATADIR has been removed from dte\n\n"
-            "  The command \"include $PKGDATADIR/...\" is now"
-            " \"include -b ...\"\n\n",
-            stderr
-        );
-        editor.everything_changed = true;
-        warned = true;
-    }
+    error_msg("The $PKGDATADIR variable was removed in dte v1.4");
     return xstrdup("");
 }
 
