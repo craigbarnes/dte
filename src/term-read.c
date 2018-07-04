@@ -1,14 +1,10 @@
+#include <sys/ioctl.h>
+#undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "term-read.h"
 #include "term-info.h"
 #include "common.h"
 #include "editor.h"
 
-#undef CTRL
-
-#include <sys/ioctl.h>
-#include <termios.h>
-
-static struct termios termios_save;
 static char input_buf[256];
 static size_t input_buf_fill;
 static bool input_can_be_truncated;
@@ -46,37 +42,6 @@ static inline void record_last_key_escape_sequence(size_t length)
 {
     memcpy(last_escape_sequence, input_buf, length);
     last_escape_sequence_length = length;
-}
-
-void term_raw(void)
-{
-    // See termios(3)
-    struct termios termios;
-
-    tcgetattr(0, &termios);
-    termios_save = termios;
-
-    // Disable buffering
-    // Disable echo
-    // Disable generation of signals (free some control keys)
-    termios.c_lflag &= ~(ICANON | ECHO | ISIG);
-
-    // Disable CR to NL conversion (differentiate ^J from enter)
-    // Disable flow control (free ^Q and ^S)
-    termios.c_iflag &= ~(ICRNL | IXON | IXOFF);
-
-    // Read at least 1 char on each read()
-    termios.c_cc[VMIN] = 1;
-
-    // Read blocks until there are MIN(VMIN, requested) bytes available
-    termios.c_cc[VTIME] = 0;
-
-    tcsetattr(0, 0, &termios);
-}
-
-void term_cooked(void)
-{
-    tcsetattr(0, 0, &termios_save);
 }
 
 static void consume_input(size_t len)

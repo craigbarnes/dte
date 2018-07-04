@@ -36,6 +36,8 @@ typedef struct {
     void (*put_clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);
+    void (*raw)(void);
+    void (*cooked)(void);
 } TerminalInfo;
 
 extern TerminalInfo terminal;

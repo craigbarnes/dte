@@ -324,7 +324,7 @@ void ui_end(void)
     }
 
     buf_flush();
-    term_cooked();
+    terminal.cooked();
 }
 
 void suspend(void)

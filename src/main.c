@@ -27,7 +27,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
         !editor.child_controls_terminal
         && editor.status != EDITOR_INITIALIZING
     ) {
-        term_raw();
+        terminal.raw();
         resize();
     }
 }
@@ -115,7 +115,7 @@ static int dump_builtin_config(const char *const name)
 
 static void showkey_loop(void)
 {
-    term_raw();
+    terminal.raw();
     if (terminal.control_codes->init) {
         fputs(terminal.control_codes->init, stdout);
     }
@@ -158,7 +158,7 @@ static void showkey_loop(void)
         fputs(terminal.control_codes->deinit, stdout);
     }
     fflush(stdout);
-    term_cooked();
+    terminal.cooked();
 }
 
 static const char usage[] =
@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
     // Initialize terminal but don't update screen yet. Also display
     // "Press any key to continue" prompt if there were any errors
     // during reading configuration files.
-    term_raw();
+    terminal.raw();
     if (nr_errors) {
         any_key();
         clear_error();

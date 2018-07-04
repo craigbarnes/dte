@@ -11,7 +11,7 @@
 #include "error.h"
 #include "util/str.h"
 #include "msg.h"
-#include "term-read.h"
+#include "term-info.h"
 
 static void close_on_exec(int fd)
 {
@@ -412,7 +412,7 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
         handle_child_error(pid);
     }
     if (!quiet) {
-        term_raw();
+        terminal.raw();
         if (prompt) {
             any_key();
         }
@@ -463,7 +463,7 @@ void spawn(char **args, int fd[3], bool prompt)
         handle_child_error(pid);
     }
     if (!quiet) {
-        term_raw();
+        terminal.raw();
         if (prompt) {
             any_key();
         }

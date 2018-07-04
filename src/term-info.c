@@ -1,3 +1,5 @@
+#include <termios.h>
+#undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "term-info.h"
 #include "term-write.h"
 #include "color.h"
@@ -5,6 +7,39 @@
 #include "lookup/xterm-keys.c"
 
 #define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
+
+static struct termios termios_save;
+
+static void term_raw(void)
+{
+    // See termios(3)
+    struct termios termios;
+
+    tcgetattr(0, &termios);
+    termios_save = termios;
+
+    // Disable buffering
+    // Disable echo
+    // Disable generation of signals (free some control keys)
+    termios.c_lflag &= ~(ICANON | ECHO | ISIG);
+
+    // Disable CR to NL conversion (differentiate ^J from enter)
+    // Disable flow control (free ^Q and ^S)
+    termios.c_iflag &= ~(ICRNL | IXON | IXOFF);
+
+    // Read at least 1 char on each read()
+    termios.c_cc[VMIN] = 1;
+
+    // Read blocks until there are MIN(VMIN, requested) bytes available
+    termios.c_cc[VTIME] = 0;
+
+    tcsetattr(0, 0, &termios);
+}
+
+static void term_cooked(void)
+{
+    tcsetattr(0, 0, &termios_save);
+}
 
 static void buf_put_clear_to_eol(void)
 {
@@ -55,14 +90,13 @@ static void ecma48_set_color(const TermColor *const color)
 
     TermColor c = *color;
 
-    // TERM=xterm: 8 colors
     // TERM=linux: 8 colors. colors > 7 corrupt screen
     if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
         c.attr |= ATTR_BOLD;
         c.fg &= 7;
     }
 
-    // Max 34 bytes (3 + 6 * 2 + 2 * 9 + 1)
+    // Max 36 bytes ("E[0;1;2;3;4;5;7;8;38;5;255;48;5;255m")
     char buf[64];
     size_t i = 0;
     buf[i++] = '\033';
@@ -131,6 +165,8 @@ TerminalInfo terminal = {
     .height = 24,
     .attributes = ANSI_ATTRS,
     .ncv_attributes = ATTR_UNDERLINE,
+    .raw = &term_raw,
+    .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &ecma48_set_color,
@@ -406,6 +442,8 @@ static const TerminalInfo terminal_xterm = {
     .width = 80,
     .height = 24,
     .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
+    .raw = &term_raw,
+    .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &ecma48_set_color,
