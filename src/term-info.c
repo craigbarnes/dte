@@ -97,11 +97,8 @@ static void ecma48_set_color(const TermColor *const color)
     }
 
     // Max 36 bytes ("E[0;1;2;3;4;5;7;8;38;5;255;48;5;255m")
-    char buf[64];
-    size_t i = 0;
-    buf[i++] = '\033';
-    buf[i++] = '[';
-    buf[i++] = '0';
+    char buf[64] = "\033[0";
+    size_t i = 3;
 
     if (c.attr & ATTR_BOLD && can_set_attr(ATTR_BOLD, &c)) {
         buf[i++] = ';';
