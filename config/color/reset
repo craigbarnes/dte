@@ -1,0 +1,14 @@
+hi default
+hi nontext blue keep
+hi noline blue
+hi wserror default yellow
+hi selection keep gray keep
+hi currentline keep keep keep
+hi linenumber
+hi statusline black gray
+hi commandline
+hi errormsg bold red
+hi infomsg bold blue
+hi tabbar black gray
+hi activetab bold
+hi inactivetab black gray

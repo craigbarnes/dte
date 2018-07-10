@@ -24,7 +24,7 @@ BUILTIN_SYNTAX_FILES := \
 BUILTIN_CONFIGS := $(addprefix config/, \
     rc compiler/gcc compiler/go \
     binding/default binding/shift-select \
-    color/dark color/light color/light256 color/darkgray \
+    color/reset color/dark color/light color/light256 color/darkgray \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \

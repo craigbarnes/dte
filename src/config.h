@@ -25,7 +25,6 @@ const BuiltinConfig *get_builtin_config(const char *name);
 void exec_config(const Command *cmds, const char *buf, size_t size);
 int do_read_config(const Command *cmds, const char *filename, ConfigFlags f);
 int read_config(const Command *cmds, const char *filename, ConfigFlags f);
-void exec_builtin_rc(const char *rc);
 void exec_reset_colors_rc(void);
 
 #endif
