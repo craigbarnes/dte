@@ -6,8 +6,6 @@
 #include "common.h"
 #include "lookup/xterm-keys.c"
 
-#define ANSI_ATTRS (ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK | ATTR_BOLD)
-
 static struct termios termios_save;
 
 static void term_raw(void)
@@ -70,63 +68,79 @@ static void ecma48_move_cursor(int x, int y)
     buf_add_bytes(buf, (size_t)len);
 }
 
-static bool can_set_attr(unsigned short attr, const TermColor *color)
-{
-    if (!(terminal.attributes & attr)) {
-        // Terminal doesn't support attr
-        return false;
-    } else if (terminal.ncv_attributes & attr) {
-        // Terminal only allows attr when not using colors
-        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
-    }
-    return true;
-}
-
 static void ecma48_set_color(const TermColor *const color)
 {
     if (same_color(color, &obuf.color)) {
         return;
     }
 
+    // Max 14 bytes ("E[0;1;7;30;40m")
+    char buf[32] = "\033[0";
+    size_t i = 3;
     TermColor c = *color;
 
-    // TERM=linux: 8 colors. colors > 7 corrupt screen
-    if (terminal.max_colors < 16 && c.fg >= 8 && c.fg <= 15) {
+    if (c.fg >= 8 && c.fg <= 15) {
         c.attr |= ATTR_BOLD;
         c.fg &= 7;
+    }
+
+    // TODO: convert colors > 15 to closest supported color
+
+    if (c.attr & ATTR_BOLD) {
+        buf[i++] = ';';
+        buf[i++] = '1';
+    }
+    if (c.attr & ATTR_REVERSE) {
+        buf[i++] = ';';
+        buf[i++] = '7';
+    }
+
+    if (c.fg >= 0 && c.fg < 8) {
+        buf[i++] = ';';
+        buf[i++] = '3';
+        buf[i++] = '0' + (char) c.fg;
+    }
+
+    if (c.bg >= 0 && c.bg < 8) {
+        buf[i++] = ';';
+        buf[i++] = '4';
+        buf[i++] = '0' + (char) c.bg;
+    }
+
+    buf[i++] = 'm';
+    buf_add_bytes(buf, i);
+    obuf.color = *color;
+}
+
+static void xterm_set_color(const TermColor *const color)
+{
+    static const struct {
+        char code;
+        unsigned short attr;
+    } attr_map[] = {
+        {'1', ATTR_BOLD},
+        {'2', ATTR_DIM},
+        {'3', ATTR_ITALIC},
+        {'4', ATTR_UNDERLINE},
+        {'5', ATTR_BLINK},
+        {'7', ATTR_REVERSE},
+        {'8', ATTR_INVIS}
+    };
+
+    if (same_color(color, &obuf.color)) {
+        return;
     }
 
     // Max 36 bytes ("E[0;1;2;3;4;5;7;8;38;5;255;48;5;255m")
     char buf[64] = "\033[0";
     size_t i = 3;
+    TermColor c = *color;
 
-    if (c.attr & ATTR_BOLD && can_set_attr(ATTR_BOLD, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '1';
-    }
-    if (c.attr & ATTR_DIM && can_set_attr(ATTR_DIM, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '2';
-    }
-    if (c.attr & ATTR_ITALIC && can_set_attr(ATTR_ITALIC, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '3';
-    }
-    if (c.attr & ATTR_UNDERLINE && can_set_attr(ATTR_UNDERLINE, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '4';
-    }
-    if (c.attr & ATTR_BLINK && can_set_attr(ATTR_BLINK, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '5';
-    }
-    if (c.attr & ATTR_REVERSE && can_set_attr(ATTR_REVERSE, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '7';
-    }
-    if (c.attr & ATTR_INVIS && can_set_attr(ATTR_INVIS, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '8';
+    for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
+        if (c.attr & attr_map[j].attr) {
+            buf[i++] = ';';
+            buf[i++] = attr_map[j].code;
+        }
     }
 
     if (c.fg >= 0) {
@@ -160,8 +174,6 @@ TerminalInfo terminal = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
-    .attributes = ANSI_ATTRS,
-    .ncv_attributes = ATTR_UNDERLINE,
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key_sequence,
@@ -357,6 +369,8 @@ static void tputs_set_color(const TermColor *color)
         tputs(attrs, 1, tputs_putc);
     }
 
+    // TODO: convert colors outside supported range to closest supported color
+
     TermColor c = *color;
     if (setaf && c.fg >= 0) {
         const char *seq = tiparm(setaf, (int) c.fg);
@@ -387,9 +401,6 @@ static void term_init_terminfo(const char *term)
     terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
-
-    // Not needed or used in terminfo mode
-    terminal.attributes = 0;
 
     const int ncv = tigetnum("ncv");
     if (ncv <= 0) {
@@ -438,12 +449,11 @@ static const TerminalInfo terminal_xterm = {
     .max_colors = 8,
     .width = 80,
     .height = 24,
-    .attributes = ANSI_ATTRS | ATTR_INVIS | ATTR_DIM | ATTR_ITALIC,
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key_sequence,
     .put_clear_to_eol = &buf_put_clear_to_eol,
-    .set_color = &ecma48_set_color,
+    .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html

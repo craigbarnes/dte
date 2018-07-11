@@ -29,7 +29,6 @@ typedef struct {
     int max_colors;
     int width;
     int height;
-    unsigned short attributes;
     unsigned short ncv_attributes;
     TermControlCodes *control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
