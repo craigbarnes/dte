@@ -70,16 +70,40 @@ static void ecma48_move_cursor(int x, int y)
     buf_add_bytes(buf, (size_t)len);
 }
 
-static bool can_set_attr(unsigned short attr, const TermColor *color)
+static size_t add_attribute_codes_to_buffer(const TermColor c, char *buffer)
 {
-    if (!(terminal.attributes & attr)) {
-        // Terminal doesn't support attr
-        return false;
-    } else if (terminal.ncv_attributes & attr) {
-        // Terminal only allows attr when not using colors
-        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+    static const struct {
+        char code;
+        unsigned short attr;
+    } attr_map[] = {
+        {'1', ATTR_BOLD},
+        {'2', ATTR_DIM},
+        {'3', ATTR_ITALIC},
+        {'4', ATTR_UNDERLINE},
+        {'5', ATTR_BLINK},
+        {'7', ATTR_REVERSE},
+        {'8', ATTR_INVIS}
+    };
+    size_t n = 0;
+    for (size_t i = 0; i < ARRAY_COUNT(attr_map); i++) {
+        if (
+            // If attribute is set
+            (c.attr & attr_map[i].attr)
+            // and terminal supports it
+            && (terminal.attributes & attr_map[i].attr)
+            // and either...
+            && (
+                // terminal supports using it with non-default colors
+                !(terminal.ncv_attributes & c.attr)
+                // or colors are default
+                || (c.fg == COLOR_DEFAULT && c.fg == COLOR_DEFAULT)
+            )
+        ) {
+            buffer[n++] = ';';
+            buffer[n++] = attr_map[i].code;
+        }
     }
-    return true;
+    return n;
 }
 
 static void ecma48_set_color(const TermColor *const color)
@@ -100,34 +124,7 @@ static void ecma48_set_color(const TermColor *const color)
     char buf[64] = "\033[0";
     size_t i = 3;
 
-    if (c.attr & ATTR_BOLD && can_set_attr(ATTR_BOLD, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '1';
-    }
-    if (c.attr & ATTR_DIM && can_set_attr(ATTR_DIM, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '2';
-    }
-    if (c.attr & ATTR_ITALIC && can_set_attr(ATTR_ITALIC, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '3';
-    }
-    if (c.attr & ATTR_UNDERLINE && can_set_attr(ATTR_UNDERLINE, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '4';
-    }
-    if (c.attr & ATTR_BLINK && can_set_attr(ATTR_BLINK, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '5';
-    }
-    if (c.attr & ATTR_REVERSE && can_set_attr(ATTR_REVERSE, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '7';
-    }
-    if (c.attr & ATTR_INVIS && can_set_attr(ATTR_INVIS, &c)) {
-        buf[i++] = ';';
-        buf[i++] = '8';
-    }
+    i += add_attribute_codes_to_buffer(c, buf + i);
 
     if (c.fg >= 0) {
         const unsigned char fg = (unsigned char) c.fg;
