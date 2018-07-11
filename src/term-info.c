@@ -282,8 +282,10 @@ int setupterm(const char *term, int filedes, int *errret);
 int tigetflag(const char *capname);
 int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
-char *tiparm(const char *str, ...);
 int tputs(const char *str, int affcnt, int (*putc_fn)(int));
+char *tparm(const char*, long, long, long, long, long, long, long, long, long);
+#define tparm_1(str, p1) tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0)
+#define tparm_2(str, p1, p2) tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0)
 
 static char *curses_str_cap(const char *const name)
 {
@@ -320,7 +322,7 @@ static void tputs_move_cursor(int x, int y)
     }
 
     if (cup) {
-        const char *seq = tiparm(cup, y, x);
+        const char *seq = tparm_2(cup, y, x);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
@@ -354,7 +356,7 @@ static void tputs_set_color(const TermColor *color)
     }
 
     if (sgr) {
-        const char *attrs = tiparm (
+        const char *attrs = tparm (
             sgr,
             0, // p1 = "standout" (unused)
             attr_is_set(color, ATTR_UNDERLINE),
@@ -373,13 +375,13 @@ static void tputs_set_color(const TermColor *color)
 
     TermColor c = *color;
     if (setaf && c.fg >= 0) {
-        const char *seq = tiparm(setaf, (int) c.fg);
+        const char *seq = tparm_1(setaf, c.fg);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
     }
     if (setab && c.bg >= 0) {
-        const char *seq = tiparm(setab, c.bg);
+        const char *seq = tparm_1(setab, c.bg);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
