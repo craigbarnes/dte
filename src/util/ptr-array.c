@@ -24,7 +24,7 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
     array->ptrs[pos] = ptr;
 }
 
-void ptr_array_free_cb(PointerArray *array, free_func free_ptr)
+void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
 {
     for (size_t i = 0; i < array->count; i++) {
         free_ptr(array->ptrs[i]);

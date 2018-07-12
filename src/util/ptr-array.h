@@ -15,12 +15,12 @@ typedef struct {
     .count = 0 \
 }
 
-typedef void (*free_func)(void *ptr);
-#define FREE_FUNC(f) (free_func)f
+typedef void (*FreeFunction)(void *ptr);
+#define FREE_FUNC(f) (FreeFunction)f
 
 void ptr_array_add(PointerArray *array, void *ptr);
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos);
-void ptr_array_free_cb(PointerArray *array, free_func free_ptr);
+void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr);
 void ptr_array_remove(PointerArray *array, void *ptr);
 void *ptr_array_remove_idx(PointerArray *array, size_t pos);
 size_t ptr_array_idx(const PointerArray *array, const void *ptr);
