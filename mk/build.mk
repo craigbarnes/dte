@@ -83,10 +83,15 @@ dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
 
 ifdef USE_SANITIZER
+  SANITIZER_FLAGS := \
+    -fsanitize=address,undefined -fsanitize-address-use-after-scope \
+    -fno-omit-frame-pointer -fno-common
+  CC_SANITIZER_FLAGS := $(or \
+    $(call cc-option, $(SANITIZER_FLAGS)), \
+    $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
+  $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
+  $(dte) $(test): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
   export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
-  SANITIZER_FLAGS = -fsanitize=address,undefined -fsanitize-address-use-after-scope
-  $(all_objects): BASIC_CFLAGS += $(SANITIZER_FLAGS) -fno-omit-frame-pointer -fno-common
-  $(dte) $(test): BASIC_LDFLAGS += $(SANITIZER_FLAGS)
   DEBUG = 3
 else
   # 0: Disable debugging
