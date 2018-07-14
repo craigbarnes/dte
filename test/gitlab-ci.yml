@@ -9,7 +9,7 @@ build:alpine:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     script: &SCRIPT
-        - make check TERMINFO_DISABLE=1
+        - make check TERMINFO_DISABLE=1 USE_SANITIZER=1
         - ldd dte
         - make clean
         - make check TERMINFO_DISABLE=1 LDFLAGS=-static
@@ -26,9 +26,11 @@ build:debian:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     coverage: '/^Total lines executed:: (\d+\.\d+\%)$/'
     script:
+        - echo 'USE_SANITIZER = 1' > Config.mk
         - make check && make install && dte -V
         - make clean && make check USE_LUA=dynamic && ./dte -V
         - make clean && make check USE_LUA=static && ./dte -V
+        - rm -f Config.mk
         - make clean && make check CFLAGS='-O2 -g --coverage'
         - gcov -n build/*.o 2>&1 | awk -f tools/gcov-total.awk
         - make check-syntax-files
