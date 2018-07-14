@@ -75,9 +75,9 @@
 #endif
 
 #if defined(CONSTRUCTOR) && defined(DEBUG) && (DEBUG > 0)
-    #define UNITTEST static void CONSTRUCTOR XPASTE(utest__, COUNTER_)(void)
+    #define UNITTEST static void CONSTRUCTOR XPASTE(unittest_, COUNTER_)(void)
 #else
-    #define UNITTEST static void UNUSED XPASTE(utest__, COUNTER_)(void)
+    #define UNITTEST static void UNUSED XPASTE(unittest_, COUNTER_)(void)
 #endif
 
 #if GNUC_AT_LEAST(3, 0) && defined(__OPTIMIZE__)

@@ -149,9 +149,7 @@ static const char *const builtin_filetype_names[NR_BUILTIN_FILETYPES] = {
     [YAML] = "yaml",
 };
 
-#if (DEBUG >= 1) && defined(CONSTRUCTOR)
-static void CONSTRUCTOR sanity_check(void)
-{
+UNITTEST {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
         const char *const name = builtin_filetype_names[i];
         if (!name || name[0] == '\0') {
@@ -159,7 +157,6 @@ static void CONSTRUCTOR sanity_check(void)
         }
     }
 }
-#endif
 
 typedef struct {
     const char *const key;
