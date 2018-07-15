@@ -2,6 +2,12 @@ streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -x c -o /dev/null /dev/null,$(1),$(2))
 
+PKGCONFIG = $(or \
+    $(shell command -v pkg-config || command -v pkgconf), \
+    $(error Unable to find "pkg-config" or "pkgconf" program) )
+
+$(call make-lazy,PKGCONFIG)
+
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
@@ -21,7 +27,7 @@ AUTOVARS = \
     VERSION KERNEL \
     $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
-    TERM TPUT TPUT-V MAKE_VERSION SHELL CC_VERSION
+    TERM SHELL PKGCONFIG TPUT TPUT-V MAKE_VERSION CC_VERSION
 
 vars:
 	@echo

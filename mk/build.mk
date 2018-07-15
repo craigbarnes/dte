@@ -2,7 +2,6 @@ CC ?= gcc
 CFLAGS ?= -g -O2
 LDFLAGS ?=
 AWK = awk
-PKGCONFIG = pkg-config
 PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.7)
 

@@ -57,6 +57,11 @@ build:ubuntu:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
     script: *SCRIPT
 
+build:void-musl:
+    stage: build
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
+    script: *SCRIPT
+
 pages:
     stage: dist
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
