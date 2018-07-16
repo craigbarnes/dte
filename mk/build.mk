@@ -84,7 +84,7 @@ test = build/test/test$(EXEC_SUFFIX)
 ifdef USE_SANITIZER
   SANITIZER_FLAGS := \
     -fsanitize=address,undefined -fsanitize-address-use-after-scope \
-    -fno-omit-frame-pointer -fno-common
+    -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-common
   CC_SANITIZER_FLAGS := $(or \
     $(call cc-option, $(SANITIZER_FLAGS)), \
     $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
