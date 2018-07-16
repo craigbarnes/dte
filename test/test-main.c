@@ -158,6 +158,7 @@ static void test_parse_xterm_key_sequence(void)
     }
 }
 
+void test_util_ascii(void);
 void test_key_to_string(void);
 
 int main(void)
@@ -169,6 +170,7 @@ int main(void)
     test_find_ft_filename();
     test_find_ft_firstline();
     test_parse_xterm_key_sequence();
+    test_util_ascii();
     test_key_to_string();
 
     return failed ? 1 : 0;
