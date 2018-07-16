@@ -187,7 +187,7 @@ ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st)
     ssize_t r = xread(fd, buf, st->st_size);
     close(fd);
     if (r > 0) {
-        buf[r] = 0;
+        buf[r] = '\0';
         *bufp = buf;
     } else {
         free(buf);

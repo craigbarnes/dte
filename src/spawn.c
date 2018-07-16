@@ -172,7 +172,7 @@ static void handle_error_msg(Compiler *c, char *str)
 
     for (i = 0; str[i]; i++) {
         if (str[i] == '\n') {
-            str[i] = 0;
+            str[i] = '\0';
             break;
         }
         if (str[i] == '\t') {

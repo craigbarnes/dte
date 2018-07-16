@@ -24,7 +24,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
                 if (i + 2 < size && buf[i + 1] == ';' && buf[i + 2] == '"') {
                     i += 2;
                 }
-                pattern[j] = 0;
+                pattern[j] = '\0';
                 t->pattern = pattern;
                 return i + 1;
             }

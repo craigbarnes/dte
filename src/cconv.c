@@ -82,7 +82,7 @@ static void encode_replacement(struct cconv *c)
     size_t rc = iconv_wrapper(c->cd, &ib, &ic, &ob, &oc);
 
     if (rc == (size_t)-1) {
-        c->rbuf[0] = 0xbf;
+        c->rbuf[0] = '\xbf';
         c->rcount = 1;
     } else {
         c->rcount = ob - c->rbuf;

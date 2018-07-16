@@ -31,7 +31,7 @@ static size_t remove_double_slashes(char *str)
             str[d++] = str[s];
         }
     }
-    str[d] = 0;
+    str[d] = '\0';
     return d;
 }
 

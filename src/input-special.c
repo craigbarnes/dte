@@ -164,7 +164,7 @@ bool special_input_misc_status(char *status, size_t status_maxlen)
     while (i < raw_input.max_chars) {
         buf[i++] = ' ';
     }
-    buf[i] = 0;
+    buf[i] = '\0';
 
     switch (input_special) {
     case INPUT_SPECIAL_NONE:

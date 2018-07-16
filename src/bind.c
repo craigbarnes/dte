@@ -25,7 +25,7 @@ static bool parse_keys(KeyChain *chain, const char *str)
     // Convert all whitespace to \0
     for (size_t i = 0; i < len; i++) {
         if (ascii_isspace(keys[i])) {
-            keys[i] = 0;
+            keys[i] = '\0';
         }
     }
 

@@ -243,7 +243,7 @@ static void print_vertical_tab_title(View *v, int idx, int width)
         // filename was shortened. Add "<<" symbol.
         size_t i = strlen(buf);
         u_set_char(buf, &i, 0xab);
-        buf[i] = 0;
+        buf[i] = '\0';
     }
 
     if (v == v->window->view) {
