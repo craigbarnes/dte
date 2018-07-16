@@ -24,13 +24,10 @@ build:alpine:
 build:debian:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
-    coverage: '/^Total lines executed:: (\d+\.\d+\%)$/'
     script:
         - make check && make install && dte -V
         - make clean && make check USE_LUA=dynamic && ./dte -V
         - make clean && make check USE_LUA=static && ./dte -V
-        - make clean && make check CFLAGS='-O2 -g --coverage'
-        - gcov -n build/*.o 2>&1 | awk -f tools/gcov-total.awk
         - make check-syntax-files
         - sed -nf tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
@@ -65,8 +62,10 @@ pages:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     artifacts: {paths: [public]}
     only: [master]
+    coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
     script: &PAGES_SCRIPT
         - make docs
+        - make coverage-report
         - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
         - strip dte
         - tools/objsize.sh dte
@@ -82,4 +81,5 @@ pages:non-master:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     artifacts: {paths: [public], expire_in: 1 week}
     except: [master]
+    coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
     script: *PAGES_SCRIPT

@@ -34,6 +34,12 @@ show-sizes:
 	@strip build/dte-*
 	@du -h build/dte-*
 
+coverage-report:
+	$(MAKE) -j$(NPROC) check CFLAGS='-O2 -g -pipe --coverage' DEBUG=3 USE_SANITIZER=
+	gcov -i -o build/ $$(git ls-files -- src/*.[ch])
+	lcov -c -b . -d build/ --exclude '/usr/*' --exclude '*/test/*' -o build/coverage.info
+	genhtml --title 'dte coverage' -o public/coverage/ build/coverage.info
+
 
 CLEANFILES += dte-*.tar.gz
-.PHONY: dist dist-all check-dist git-hooks show-sizes
+.PHONY: dist dist-all check-dist git-hooks show-sizes coverage-report
