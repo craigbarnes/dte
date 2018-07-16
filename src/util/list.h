@@ -3,7 +3,6 @@
 
 #include <stddef.h> // offsetof
 #include <stdbool.h>
-#include "macros.h"
 
 typedef struct ListHead ListHead;
 
