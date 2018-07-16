@@ -3,6 +3,7 @@
 
 #include <stddef.h> // offsetof
 #include <stdbool.h>
+#include "macros.h"
 
 typedef struct ListHead ListHead;
 
@@ -54,7 +55,7 @@ static inline bool list_empty(const ListHead *const head)
  * @member: the name of the member within the struct.
  *
  */
-#define container_of(ptr, type, member) ({ \
+#define container_of(ptr, type, member) __extension__ ({ \
     const __typeof__( ((type *)0)->member ) *__mptr = (ptr); \
     (type *)( (char *)__mptr - offsetof(type,member) ); \
 })

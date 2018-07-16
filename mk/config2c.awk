@@ -12,6 +12,10 @@ function escape_string(s) {
     return s
 }
 
+BEGIN {
+    print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
+}
+
 FNR == 1 {
     if (NR != 1) {
         print ";\n"
@@ -34,7 +38,7 @@ FNR == 1 {
 }
 
 END {
-    print ";\n"
+    print ";\n\nUNIGNORE_WARNINGS\n"
     print "static const BuiltinConfig builtin_configs[" nfiles "] = {"
     for (i = 1; i <= nfiles; i++) {
         ident = idents[i]

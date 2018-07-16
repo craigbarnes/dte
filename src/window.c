@@ -519,6 +519,11 @@ static void for_each_window_data (
     frame_for_each_window(root_frame, func, data);
 }
 
+// Conversion from a void* pointer to a function pointer is not defined
+// by the ISO C standard, but POSIX explicitly requires it:
+// http://pubs.opengroup.org/onlinepubs/9699919799/functions/dlsym.html
+IGNORE_WARNING("-Wpedantic")
+
 static void call_data(Window *w, void *data)
 {
     void (*func)(Window *) = data;
@@ -529,6 +534,8 @@ void for_each_window(void (*func)(Window *w))
 {
     for_each_window_data(call_data, func);
 }
+
+UNIGNORE_WARNINGS
 
 static void collect_window(Window *w, void *data)
 {
