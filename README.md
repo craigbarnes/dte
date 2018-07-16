@@ -54,13 +54,24 @@ Testing
 
 `dte` is tested on the following platforms:
 
-* Debian ([CI][GitLab CI])
-* CentOS ([CI][GitLab CI])
-* Alpine Linux ([CI][GitLab CI])
-* Ubuntu ([CI][GitLab CI])
-* Mac OS X ([CI][Travis CI])
-* OpenBSD (occasional, manual testing)
-* FreeBSD (occasional, manual testing)
+**[GitLab CI]**:
+
+* Alpine Linux
+* CentOS
+* Debian
+* Ubuntu
+* Void Linux (musl)
+
+**[Travis CI]**:
+
+* Mac OS X
+* Ubuntu
+
+**Manual testing**:
+
+* FreeBSD
+* NetBSD
+* OpenBSD
 
 Other [POSIX] 2008 compatible platforms should also work, but may
 require build system fixes.
