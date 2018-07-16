@@ -36,7 +36,6 @@ show-sizes:
 
 coverage-report:
 	$(MAKE) -j$(NPROC) check CFLAGS='-O2 -g -pipe --coverage' DEBUG=3 USE_SANITIZER=
-	gcov -i -o build/ $$(git ls-files -- src/*.[ch])
 	lcov -c -b . -d build/ --exclude '/usr/*' --exclude '*/test/*' -o build/coverage.info
 	genhtml --title 'dte coverage' -o public/coverage/ build/coverage.info
 
