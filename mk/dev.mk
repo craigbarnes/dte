@@ -38,6 +38,8 @@ coverage-report:
 	$(MAKE) -j$(NPROC) check CFLAGS='-O2 -g -pipe --coverage' DEBUG=3 USE_SANITIZER=
 	lcov -c -b . -d build/ -o build/coverage.info
 	genhtml --title 'dte coverage' -o public/coverage/ build/coverage.info
+	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
+	  xargs $(XARGS_P_FLAG) -- gzip -9 -k
 
 
 CLEANFILES += dte-*.tar.gz
