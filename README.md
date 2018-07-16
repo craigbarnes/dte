@@ -89,8 +89,6 @@ The following optional build variables may be useful when packaging
   `$prefix/share/man`).
 * `DESTDIR`: Standard variable used for [staged installs].
 * `V=1`: Enable verbose build output.
-* `WERROR=1`: Turn all compiler warnings into errors. May be useful for
-  running automated tests.
 * `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
   linking to the system [terminfo]/curses library. This makes it much
   easier to build a portable, statically linked binary. The built-in
@@ -98,7 +96,7 @@ The following optional build variables may be useful when packaging
   (and many other `xterm`-compatible terminals) and falls back to
   [ECMA-48] mode for other terminals.
 
-Example usage:
+**Example usage**:
 
     make V=1
     make install V=1 prefix=/usr DESTDIR=PKG
