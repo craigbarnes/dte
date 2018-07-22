@@ -54,12 +54,12 @@ enum {
     KEY_PASTE = UINT32_C(0x8000000), // 1 << 27 (not a key)
 };
 
-typedef uint32_t Key;
+typedef uint32_t KeyCode;
 
 #define CTRL(x) (MOD_CTRL | (x))
 
-bool parse_key(Key *key, const char *str);
-char *key_to_string(Key key);
-bool key_to_ctrl(Key key, unsigned char *byte);
+bool parse_key(KeyCode *key, const char *str);
+char *key_to_string(KeyCode key);
+bool key_to_ctrl(KeyCode key, unsigned char *byte);
 
 #endif

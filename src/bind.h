@@ -5,7 +5,7 @@
 
 void add_binding(const char *keys, const char *command);
 void remove_binding(const char *keys);
-void handle_binding(Key key);
+void handle_binding(KeyCode key);
 int nr_pressed_keys(void);
 
 #endif

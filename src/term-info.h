@@ -31,7 +31,7 @@ typedef struct {
     int height;
     unsigned short ncv_attributes;
     TermControlCodes *control_codes;
-    ssize_t (*parse_key_sequence)(const char *buf, size_t length, Key *key);
+    ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     void (*put_clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);

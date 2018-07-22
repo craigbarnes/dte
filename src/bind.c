@@ -5,7 +5,7 @@
 #include "util/ptr-array.h"
 
 typedef struct {
-    Key keys[3];
+    KeyCode keys[3];
     size_t count;
 } KeyChain;
 
@@ -95,7 +95,7 @@ void remove_binding(const char *keys)
     }
 }
 
-void handle_binding(Key key)
+void handle_binding(KeyCode key)
 {
     pressed_keys.keys[pressed_keys.count] = key;
     pressed_keys.count++;

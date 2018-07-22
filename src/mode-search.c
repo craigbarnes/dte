@@ -3,7 +3,7 @@
 #include "history.h"
 #include "search.h"
 
-static void search_mode_keypress(Key key)
+static void search_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:

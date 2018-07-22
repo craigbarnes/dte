@@ -189,7 +189,7 @@ output:write [[
 #include <sys/types.h>
 #include "../key.h"
 
-static ssize_t parse_xterm_key_sequence(const char *buf, size_t length, Key *k)
+static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
 {
     if (length == 0 || buf[0] != '\033') {
         return 0;

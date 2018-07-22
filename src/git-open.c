@@ -201,7 +201,7 @@ static inline size_t terminal_page_height(void) {
     }
 }
 
-static void git_open_keypress(Key key)
+static void git_open_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:

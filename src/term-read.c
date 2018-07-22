@@ -104,7 +104,7 @@ static bool input_get_byte(unsigned char *ch)
     return true;
 }
 
-static bool read_special(Key *key)
+static bool read_special(KeyCode *key)
 {
     ssize_t len = terminal.parse_key_sequence(input_buf, input_buf_fill, key);
     switch (len) {
@@ -128,7 +128,7 @@ static bool read_special(Key *key)
     return false;
 }
 
-static bool read_simple(Key *key)
+static bool read_simple(KeyCode *key)
 {
     unsigned char ch = 0;
 
@@ -209,7 +209,7 @@ static bool is_text(const char *const str, size_t len)
     return true;
 }
 
-bool term_read_key(Key *key)
+bool term_read_key(KeyCode *key)
 {
     last_escape_sequence_length = 0;
 

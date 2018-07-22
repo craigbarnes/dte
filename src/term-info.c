@@ -176,7 +176,7 @@ TerminalInfo terminal = {
     .height = 24,
     .raw = &term_raw,
     .cooked = &term_cooked,
-    .parse_key_sequence = &parse_xterm_key_sequence,
+    .parse_key_sequence = &parse_xterm_key,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
@@ -207,7 +207,7 @@ TerminalInfo terminal = {
 static struct TermKeyMap {
     const char *code;
     uint32_t code_length;
-    Key key;
+    KeyCode key;
 } keymap[] = {
     KEY("kcuu1", KEY_UP),
     KEY("kcud1", KEY_DOWN),
@@ -247,7 +247,7 @@ static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
 
 static size_t keymap_length = 0;
 
-static ssize_t parse_key_sequence_from_keymap(const char *buf, size_t fill, Key *key)
+static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
 {
     bool possibly_truncated = false;
     for (size_t i = 0; i < keymap_length; i++) {
@@ -394,7 +394,7 @@ static void term_init_terminfo(const char *term)
     // Initialize terminfo database (or call exit(3) on failure)
     setupterm(term, 1, (int*)0);
 
-    terminal.parse_key_sequence = &parse_key_sequence_from_keymap;
+    terminal.parse_key_sequence = &parse_key_from_keymap;
     terminal.put_clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
@@ -453,7 +453,7 @@ static const TerminalInfo terminal_xterm = {
     .height = 24,
     .raw = &term_raw,
     .cooked = &term_cooked,
-    .parse_key_sequence = &parse_xterm_key_sequence,
+    .parse_key_sequence = &parse_xterm_key,
     .put_clear_to_eol = &buf_put_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,

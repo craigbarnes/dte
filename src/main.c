@@ -127,7 +127,7 @@ static void showkey_loop(void)
 
     bool loop = true;
     while (loop) {
-        Key key;
+        KeyCode key;
         if (!term_read_key(&key)) {
             const char *seq = term_get_last_key_escape_sequence();
             if (seq) {

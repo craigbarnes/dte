@@ -30,7 +30,7 @@ static void command_line_enter(void)
     ptr_array_free(&array);
 }
 
-static void command_mode_keypress(Key key)
+static void command_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:

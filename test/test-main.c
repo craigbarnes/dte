@@ -112,12 +112,12 @@ static void test_find_ft_firstline(void)
     }
 }
 
-static void test_parse_xterm_key_sequence(void)
+static void test_parse_xterm_key(void)
 {
     static const struct xterm_key_test {
         const char *escape_sequence;
         ssize_t expected_length;
-        Key expected_key;
+        KeyCode expected_key;
     } tests[] = {
         {"\033[Z", 3, MOD_SHIFT | '\t'},
         {"\033[1;2A", 6, MOD_SHIFT | KEY_UP},
@@ -149,8 +149,8 @@ static void test_parse_xterm_key_sequence(void)
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
-        Key key;
-        ssize_t length = parse_xterm_key_sequence(seq, strlen(seq), &key);
+        KeyCode key;
+        ssize_t length = parse_xterm_key(seq, strlen(seq), &key);
         IEXPECT_EQ(length, tests[i].expected_length, i, "lengths");
         if (length > 0) {
             IEXPECT_EQ(key, tests[i].expected_key, i, "keys");
@@ -169,7 +169,7 @@ int main(void)
     test_detect_encoding_from_bom();
     test_find_ft_filename();
     test_find_ft_firstline();
-    test_parse_xterm_key_sequence();
+    test_parse_xterm_key();
     test_util_ascii();
     test_key_to_string();
 

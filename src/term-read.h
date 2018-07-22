@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "key.h"
 
-bool term_read_key(Key *key);
+bool term_read_key(KeyCode *key);
 char *term_read_paste(size_t *size);
 void term_discard_paste(void);
 

@@ -32,9 +32,9 @@ static const char special_names[][8] = {
 };
 static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
 
-static size_t parse_modifiers(const char *const str, Key *modifiersp)
+static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
 {
-    Key modifiers = 0;
+    KeyCode modifiers = 0;
     size_t i = 0;
 
     while (true) {
@@ -60,9 +60,9 @@ static size_t parse_modifiers(const char *const str, Key *modifiersp)
     return i;
 }
 
-bool parse_key(Key *key, const char *str)
+bool parse_key(KeyCode *key, const char *str)
 {
-    Key modifiers, ch;
+    KeyCode modifiers, ch;
 
     str += parse_modifiers(str, &modifiers);
     const size_t len = strlen(str);
@@ -109,7 +109,7 @@ bool parse_key(Key *key, const char *str)
     return false;
 }
 
-char *key_to_string(Key key)
+char *key_to_string(KeyCode key)
 {
     String buf = STRING_INIT;
 
@@ -148,7 +148,7 @@ char *key_to_string(Key key)
     return string_steal_cstring(&buf);
 }
 
-bool key_to_ctrl(Key key, unsigned char *byte)
+bool key_to_ctrl(KeyCode key, unsigned char *byte)
 {
     if ((key & MOD_MASK) != MOD_CTRL) {
         return false;

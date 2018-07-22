@@ -5,7 +5,7 @@ void test_key_to_string(void)
 {
     static const struct key_to_string_test {
         const char *str;
-        Key key;
+        KeyCode key;
     } tests[] = {
         {"a", 'a'},
         {"Z", 'Z'},
