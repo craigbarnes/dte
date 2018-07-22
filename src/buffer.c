@@ -1,16 +1,16 @@
 #include "buffer.h"
-#include "view.h"
-#include "editor.h"
 #include "block.h"
-#include "filetype.h"
-#include "state.h"
+#include "detect.h"
+#include "editor.h"
 #include "file-option.h"
+#include "filetype.h"
 #include "lock.h"
 #include "selection.h"
+#include "state.h"
 #include "util/path.h"
-#include "util/unicode.h"
 #include "util/uchar.h"
-#include "detect.h"
+#include "util/unicode.h"
+#include "view.h"
 
 Buffer *buffer;
 PointerArray buffers = PTR_ARRAY_INIT;

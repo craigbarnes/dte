@@ -1,6 +1,6 @@
 #include "cmdline.h"
-#include "history.h"
 #include "editor.h"
+#include "history.h"
 #include "search.h"
 
 static void search_mode_keypress(Key key)

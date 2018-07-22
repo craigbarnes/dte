@@ -1,7 +1,6 @@
+#include <string.h>
 #include "wbuf.h"
 #include "common.h"
-
-#include <string.h>
 
 int wbuf_flush(WriteBuffer *wbuf)
 {

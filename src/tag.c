@@ -1,8 +1,8 @@
 #include "tag.h"
-#include "completion.h"
-#include "util/path.h"
-#include "error.h"
 #include "common.h"
+#include "completion.h"
+#include "error.h"
+#include "util/path.h"
 
 static TagFile *current_tag_file;
 static char *current_filename; // For sorting tags

@@ -2,11 +2,11 @@
 #define EDITOR_H
 
 #include <stdbool.h>
-#include "util/macros.h"
 #include "cmdline.h"
-#include "options.h"
-#include "util/ptr-array.h"
 #include "color.h"
+#include "options.h"
+#include "util/macros.h"
+#include "util/ptr-array.h"
 
 typedef enum {
     EDITOR_INITIALIZING,

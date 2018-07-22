@@ -1,8 +1,8 @@
 #include "decoder.h"
+#include "cconv.h"
+#include "common.h"
 #include "editor.h"
 #include "util/uchar.h"
-#include "common.h"
-#include "cconv.h"
 
 static bool fill(FileDecoder *dec)
 {

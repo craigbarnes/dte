@@ -1,13 +1,13 @@
 #include "state.h"
-#include "syntax.h"
 #include "color.h"
 #include "command.h"
-#include "editor.h"
-#include "parse-args.h"
-#include "config.h"
-#include "error.h"
-#include "util/path.h"
 #include "common.h"
+#include "config.h"
+#include "editor.h"
+#include "error.h"
+#include "parse-args.h"
+#include "syntax.h"
+#include "util/path.h"
 
 static void bitmap_set(unsigned char *bitmap, long idx)
 {

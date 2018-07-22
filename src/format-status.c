@@ -1,7 +1,7 @@
 #include "format-status.h"
-#include "window.h"
-#include "view.h"
 #include "util/uchar.h"
+#include "view.h"
+#include "window.h"
 
 static void add_ch(Formatter *f, char ch)
 {

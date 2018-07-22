@@ -2,9 +2,9 @@
 #define CMDLINE_H
 
 #include <sys/types.h>
+#include "key.h"
 #include "util/ptr-array.h"
 #include "util/str.h"
-#include "key.h"
 
 typedef struct {
     String buf;

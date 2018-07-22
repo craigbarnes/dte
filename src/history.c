@@ -1,8 +1,8 @@
 #include "history.h"
 #include "common.h"
-#include "wbuf.h"
-#include "util/ptr-array.h"
 #include "error.h"
+#include "util/ptr-array.h"
+#include "wbuf.h"
 
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, size_t max_entries)

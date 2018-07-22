@@ -1,8 +1,8 @@
 #ifndef DECODER_H
 #define DECODER_H
 
-#include <sys/types.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 typedef struct FileDecoder {
     char *encoding;

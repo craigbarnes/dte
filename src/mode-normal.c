@@ -1,12 +1,12 @@
-#include "window.h"
-#include "view.h"
-#include "edit.h"
-#include "change.h"
 #include "bind.h"
-#include "input-special.h"
+#include "change.h"
+#include "edit.h"
 #include "editor.h"
-#include "util/unicode.h"
+#include "input-special.h"
 #include "term-read.h"
+#include "util/unicode.h"
+#include "view.h"
+#include "window.h"
 
 static void insert_paste(void)
 {

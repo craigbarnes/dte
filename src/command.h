@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "util/ptr-array.h"
 #include "error.h"
+#include "util/ptr-array.h"
 
 typedef struct {
     const char *name;

@@ -1,6 +1,6 @@
 #include "regexp.h"
-#include "error.h"
 #include "common.h"
+#include "error.h"
 
 bool regexp_match_nosub(const char *pattern, const char *buf, size_t size)
 {

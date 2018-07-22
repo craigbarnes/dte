@@ -1,6 +1,6 @@
 #include "compiler.h"
-#include "error.h"
 #include "common.h"
+#include "error.h"
 #include "regexp.h"
 
 static PointerArray compilers = PTR_ARRAY_INIT;

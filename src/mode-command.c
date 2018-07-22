@@ -1,9 +1,9 @@
 #include "cmdline.h"
-#include "history.h"
-#include "editor.h"
 #include "command.h"
 #include "completion.h"
+#include "editor.h"
 #include "error.h"
+#include "history.h"
 
 static void command_line_enter(void)
 {

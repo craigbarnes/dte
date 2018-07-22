@@ -1,7 +1,7 @@
 #include "encoder.h"
-#include "util/uchar.h"
-#include "common.h"
 #include "cconv.h"
+#include "common.h"
+#include "util/uchar.h"
 
 FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 {

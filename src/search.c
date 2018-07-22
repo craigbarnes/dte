@@ -1,13 +1,13 @@
 #include "search.h"
 #include "buffer.h"
-#include "view.h"
-#include "editor.h"
 #include "change.h"
-#include "error.h"
 #include "edit.h"
-#include "util/str.h"
+#include "editor.h"
+#include "error.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/str.h"
+#include "view.h"
 
 #define MAX_SUBSTRINGS 32
 

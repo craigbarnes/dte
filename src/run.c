@@ -1,10 +1,10 @@
-#include "command.h"
-#include "error.h"
 #include "alias.h"
-#include "parse-args.h"
 #include "change.h"
-#include "config.h"
+#include "command.h"
 #include "common.h"
+#include "config.h"
+#include "error.h"
+#include "parse-args.h"
 
 // Commands that are allowed in config files
 static const char config_commands[][16] = {

@@ -1,7 +1,7 @@
 #include "change.h"
+#include "block.h"
 #include "buffer.h"
 #include "error.h"
-#include "block.h"
 #include "view.h"
 
 static ChangeMergeEnum change_merge;

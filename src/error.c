@@ -1,7 +1,7 @@
 #include "error.h"
-#include "editor.h"
-#include "config.h"
 #include "common.h"
+#include "config.h"
+#include "editor.h"
 
 int nr_errors;
 bool msg_is_error;

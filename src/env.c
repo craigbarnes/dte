@@ -1,9 +1,9 @@
 #include "env.h"
 #include "completion.h"
-#include "window.h"
-#include "selection.h"
 #include "editor.h"
 #include "error.h"
+#include "selection.h"
+#include "window.h"
 
 typedef struct {
     const char *name;

@@ -5,13 +5,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "spawn.h"
-#include "editor.h"
 #include "buffer.h"
-#include "regexp.h"
+#include "editor.h"
 #include "error.h"
-#include "util/str.h"
 #include "msg.h"
+#include "regexp.h"
 #include "term-info.h"
+#include "util/str.h"
 
 static void close_on_exec(int fd)
 {

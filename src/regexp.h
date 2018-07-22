@@ -1,8 +1,8 @@
 #ifndef REGEXP_H
 #define REGEXP_H
 
-#include <stdbool.h>
 #include <regex.h>
+#include <stdbool.h>
 #include "util/ptr-array.h"
 
 bool regexp_match_nosub(const char *pattern, const char *buf, size_t size);

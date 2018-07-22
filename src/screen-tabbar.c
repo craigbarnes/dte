@@ -1,8 +1,8 @@
-#include "screen.h"
 #include "editor.h"
-#include "util/uchar.h"
+#include "screen.h"
 #include "term-info.h"
 #include "term-write.h"
+#include "util/uchar.h"
 #include "view.h"
 
 static int tab_title_width(int number, const char *filename)

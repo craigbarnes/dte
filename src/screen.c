@@ -1,17 +1,17 @@
 #include "screen.h"
-#include "format-status.h"
-#include "editor.h"
-#include "view.h"
 #include "cmdline.h"
-#include "search.h"
-#include "util/path.h"
-#include "util/uchar.h"
+#include "editor.h"
+#include "format-status.h"
 #include "frame.h"
 #include "input-special.h"
+#include "search.h"
 #include "selection.h"
 #include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
+#include "util/path.h"
+#include "util/uchar.h"
+#include "view.h"
 
 void set_color(TermColor *color)
 {

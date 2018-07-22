@@ -1,9 +1,9 @@
 #include "color.h"
-#include "util/ptr-array.h"
 #include "common.h"
 #include "completion.h"
-#include "error.h"
 #include "editor.h"
+#include "error.h"
+#include "util/ptr-array.h"
 
 IGNORE_WARNING("-Wunused-parameter")
 #include "lookup/attributes.c"

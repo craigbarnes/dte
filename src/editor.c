@@ -2,17 +2,17 @@
 #include <langinfo.h>
 #include "editor.h"
 #include "buffer.h"
-#include "window.h"
-#include "view.h"
+#include "command.h"
+#include "config.h"
+#include "error.h"
+#include "screen.h"
+#include "script.h"
+#include "search.h"
 #include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
-#include "search.h"
-#include "screen.h"
-#include "config.h"
-#include "command.h"
-#include "error.h"
-#include "script.h"
+#include "view.h"
+#include "window.h"
 
 static volatile sig_atomic_t terminal_resized;
 

@@ -1,17 +1,17 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include <sys/stat.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <limits.h>
+#include <sys/stat.h>
 #include "block-iter.h"
-#include "util/list.h"
-#include "options.h"
-#include "common.h"
-#include "util/ptr-array.h"
 #include "change.h"
+#include "common.h"
+#include "options.h"
 #include "syntax.h"
+#include "util/list.h"
+#include "util/ptr-array.h"
 #include "util/unicode.h"
 
 typedef struct Buffer {

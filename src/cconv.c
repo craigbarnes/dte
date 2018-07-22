@@ -1,8 +1,7 @@
+#include <iconv.h>
 #include "cconv.h"
 #include "common.h"
 #include "util/uchar.h"
-
-#include <iconv.h>
 
 // U+00BF
 static unsigned char replacement[2] = "\xc2\xbf";

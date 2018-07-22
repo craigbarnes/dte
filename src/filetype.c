@@ -1,7 +1,7 @@
 #include "filetype.h"
 #include "common.h"
-#include "util/macros.h"
 #include "regexp.h"
+#include "util/macros.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"

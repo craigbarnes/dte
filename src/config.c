@@ -1,8 +1,8 @@
 #include "config.h"
-#include "error.h"
-#include "util/str.h"
 #include "common.h"
 #include "completion.h"
+#include "error.h"
+#include "util/str.h"
 #include "../build/builtin-config.h"
 
 const char *config_file;

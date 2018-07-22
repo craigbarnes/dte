@@ -1,11 +1,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "libc.h"
 #include "util/ascii.h"
 #include "util/macros.h"

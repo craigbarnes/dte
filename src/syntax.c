@@ -1,7 +1,7 @@
 #include "syntax.h"
-#include "state.h"
-#include "error.h"
 #include "common.h"
+#include "error.h"
+#include "state.h"
 
 static PointerArray syntaxes = PTR_ARRAY_INIT;
 

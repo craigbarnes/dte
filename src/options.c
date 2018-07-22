@@ -1,14 +1,14 @@
 #include "options.h"
-#include "editor.h"
-#include "window.h"
-#include "view.h"
+#include "common.h"
 #include "completion.h"
+#include "editor.h"
+#include "error.h"
 #include "file-option.h"
 #include "filetype.h"
-#include "common.h"
 #include "regexp.h"
-#include "error.h"
 #include "screen.h"
+#include "view.h"
+#include "window.h"
 
 typedef enum {
     OPT_STR,

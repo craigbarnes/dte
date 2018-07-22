@@ -1,7 +1,7 @@
 #include "file-option.h"
-#include "util/ptr-array.h"
 #include "options.h"
 #include "regexp.h"
+#include "util/ptr-array.h"
 
 typedef struct {
     enum file_options_type type;

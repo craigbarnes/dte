@@ -1,7 +1,7 @@
 #include "bind.h"
+#include "command.h"
 #include "common.h"
 #include "error.h"
-#include "command.h"
 #include "util/ptr-array.h"
 
 typedef struct {

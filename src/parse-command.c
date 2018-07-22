@@ -1,10 +1,10 @@
 #include "command.h"
-#include "editor.h"
-#include "error.h"
-#include "util/str.h"
-#include "util/ptr-array.h"
-#include "env.h"
 #include "common.h"
+#include "editor.h"
+#include "env.h"
+#include "error.h"
+#include "util/ptr-array.h"
+#include "util/str.h"
 #include "util/uchar.h"
 
 static String arg = STRING_INIT;

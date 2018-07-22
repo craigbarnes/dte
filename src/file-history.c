@@ -1,8 +1,8 @@
 #include "file-history.h"
 #include "common.h"
-#include "wbuf.h"
-#include "util/ptr-array.h"
 #include "error.h"
+#include "util/ptr-array.h"
+#include "wbuf.h"
 
 typedef struct {
     int row, col;

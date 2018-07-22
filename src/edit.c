@@ -1,13 +1,13 @@
 #include "edit.h"
-#include "move.h"
 #include "buffer.h"
-#include "view.h"
 #include "change.h"
-#include "util/str.h"
 #include "indent.h"
-#include "util/uchar.h"
+#include "move.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/str.h"
+#include "util/uchar.h"
+#include "view.h"
 
 typedef struct {
     String buf;

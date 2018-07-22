@@ -1,16 +1,16 @@
 #include "git-open.h"
-#include "util/ascii.h"
-#include "spawn.h"
-#include "window.h"
-#include "util/ptr-array.h"
-#include "term-info.h"
 #include "cmdline.h"
 #include "editor.h"
-#include "term-write.h"
+#include "error.h"
 #include "screen.h"
+#include "spawn.h"
+#include "term-info.h"
+#include "term-write.h"
+#include "util/ascii.h"
+#include "util/ptr-array.h"
 #include "util/uchar.h"
 #include "util/unicode.h"
-#include "error.h"
+#include "window.h"
 
 static struct {
     PointerArray files;

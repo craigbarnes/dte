@@ -1,11 +1,11 @@
 #include <stdbool.h>
 #include "alias.h"
-#include "util/ptr-array.h"
-#include "common.h"
-#include "error.h"
-#include "editor.h"
-#include "completion.h"
 #include "command.h"
+#include "common.h"
+#include "completion.h"
+#include "editor.h"
+#include "error.h"
+#include "util/ptr-array.h"
 
 typedef struct {
     char *name;

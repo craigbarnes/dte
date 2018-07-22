@@ -1,7 +1,6 @@
+#include <inttypes.h>
 #include "highlight.h"
 #include "syntax.h"
-
-#include <inttypes.h>
 
 static bool state_is_valid(const State *st)
 {

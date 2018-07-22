@@ -1,9 +1,9 @@
 #include <sys/ioctl.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
-#include "term-read.h"
-#include "term-info.h"
 #include "common.h"
 #include "editor.h"
+#include "term-info.h"
+#include "term-read.h"
 
 static char input_buf[256];
 static size_t input_buf_fill;

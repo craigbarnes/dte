@@ -1,10 +1,10 @@
 #include "cmdline.h"
-#include "history.h"
-#include "editor.h"
 #include "common.h"
-#include "util/uchar.h"
+#include "editor.h"
+#include "history.h"
 #include "input-special.h"
 #include "term-read.h"
+#include "util/uchar.h"
 
 static void cmdline_delete(CommandLine *c)
 {
