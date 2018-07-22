@@ -27,7 +27,7 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
-    ascii ptr-array str string-view uchar unicode ))
+    ascii path ptr-array str string-view uchar unicode ))
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block block-iter buffer buffer-iter cconv change \
@@ -36,7 +36,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     file-history file-option filetype format-status frame git-open \
     highlight history indent input-special key load-save lock main \
     mode-command mode-normal mode-search move msg options parse-args \
-    parse-command path regexp run screen screen-tabbar screen-view \
+    parse-command regexp run screen screen-tabbar screen-view \
     script search selection spawn state syntax tag term-info \
     term-read term-write view wbuf window xmalloc )) \
     $(util_objects)

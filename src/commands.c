@@ -27,7 +27,7 @@
 #include "load-save.h"
 #include "selection.h"
 #include "encoding.h"
-#include "path.h"
+#include "util/path.h"
 #include "input-special.h"
 #include "git-open.h"
 #include "script.h"

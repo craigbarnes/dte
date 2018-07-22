@@ -2,7 +2,7 @@
 #include <locale.h>
 #include "test.h"
 #include "../src/editor.h"
-#include "../src/path.h"
+#include "../src/util/path.h"
 #include "../src/encoding.h"
 #include "../src/filetype.h"
 #include "../src/lookup/xterm-keys.c"

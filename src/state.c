@@ -6,7 +6,7 @@
 #include "parse-args.h"
 #include "config.h"
 #include "error.h"
-#include "path.h"
+#include "util/path.h"
 #include "common.h"
 
 static void bitmap_set(unsigned char *bitmap, long idx)

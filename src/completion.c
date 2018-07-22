@@ -5,12 +5,12 @@
 #include "options.h"
 #include "alias.h"
 #include "util/str.h"
+#include "util/path.h"
 #include "util/ptr-array.h"
 #include "tag.h"
 #include "common.h"
 #include "color.h"
 #include "env.h"
-#include "path.h"
 #include "config.h"
 
 static struct {

@@ -1,7 +1,7 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include "util/macros.h"
+#include "macros.h"
 
 char *path_absolute(const char *filename) MALLOC NONNULL_ARGS;
 char *relative_filename(const char *f, const char *cwd) XMALLOC NONNULL_ARGS;

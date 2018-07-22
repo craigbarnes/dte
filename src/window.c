@@ -1,7 +1,7 @@
 #include "window.h"
 #include "editor.h"
 #include "file-history.h"
-#include "path.h"
+#include "util/path.h"
 #include "lock.h"
 #include "load-save.h"
 #include "error.h"

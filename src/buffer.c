@@ -7,7 +7,7 @@
 #include "file-option.h"
 #include "lock.h"
 #include "selection.h"
-#include "path.h"
+#include "util/path.h"
 #include "util/unicode.h"
 #include "util/uchar.h"
 #include "detect.h"

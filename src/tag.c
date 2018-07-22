@@ -1,6 +1,6 @@
 #include "tag.h"
 #include "completion.h"
-#include "path.h"
+#include "util/path.h"
 #include "error.h"
 #include "common.h"
 

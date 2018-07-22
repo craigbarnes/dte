@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "path.h"
-#include "xmalloc.h"
+#include "../xmalloc.h"
 
 static bool make_absolute(char *dst, size_t size, const char *src)
 {

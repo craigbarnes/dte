@@ -7,7 +7,7 @@
 #include "encoding.h"
 #include "error.h"
 #include "cconv.h"
-#include "path.h"
+#include "util/path.h"
 
 #include <sys/mman.h>
 
