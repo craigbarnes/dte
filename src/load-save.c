@@ -1,15 +1,13 @@
+#include <sys/mman.h>
 #include "load-save.h"
 #include "editor.h"
 #include "block.h"
-#include "wbuf.h"
 #include "decoder.h"
 #include "encoder.h"
 #include "encoding.h"
 #include "error.h"
 #include "cconv.h"
 #include "util/path.h"
-
-#include <sys/mman.h>
 
 static void add_block(Buffer *b, Block *blk)
 {
