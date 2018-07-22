@@ -1,7 +1,10 @@
-#include "editor.h"
+#include <errno.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "path.h"
-#include "common.h"
-#include "cconv.h"
+#include "xmalloc.h"
 
 static bool make_absolute(char *dst, size_t size, const char *src)
 {
@@ -69,7 +72,7 @@ char *path_absolute(const char *filename)
         if (ep) {
             *ep = 0;
         }
-        if (streq(sp, ".")) {
+        if (sp[0] == '.' && sp[1] == '\0') {
             if (last) {
                 *sp = 0;
                 break;
@@ -77,7 +80,7 @@ char *path_absolute(const char *filename)
             memmove(sp, ep + 1, strlen(ep + 1) + 1);
             continue;
         }
-        if (streq(sp, "..")) {
+        if (sp[0] == '.' && sp[1] == '.' && sp[2] == '\0') {
             if (sp != buf + 1) {
                 // Not first component, remove previous component
                 sp--;
@@ -235,47 +238,6 @@ char *relative_filename(const char *f, const char *cwd)
     }
     memcpy(filename + dotdot * 3, f + clen, tlen + 1);
     return filename;
-}
-
-char *short_filename_cwd(const char *absolute, const char *cwd)
-{
-    char *f = relative_filename(absolute, cwd);
-    size_t home_len = strlen(editor.home_dir);
-    size_t abs_len = strlen(absolute);
-    size_t f_len = strlen(f);
-
-    if (f_len >= abs_len) {
-        // Prefer absolute if relative isn't shorter
-        free(f);
-        f = xstrdup(absolute);
-        f_len = abs_len;
-    }
-
-    if (
-        abs_len > home_len
-        && !memcmp(absolute, editor.home_dir, home_len)
-        && absolute[home_len] == '/'
-    ) {
-        size_t len = abs_len - home_len + 1;
-        if (len < f_len) {
-            char *filename = xnew(char, len + 1);
-            filename[0] = '~';
-            memcpy(filename + 1, absolute + home_len, len);
-            free(f);
-            return filename;
-        }
-    }
-    return f;
-}
-
-char *short_filename(const char *absolute)
-{
-    char cwd[8192];
-
-    if (getcwd(cwd, sizeof(cwd))) {
-        return short_filename_cwd(absolute, cwd);
-    }
-    return xstrdup(absolute);
 }
 
 char *path_dirname(const char *filename)
