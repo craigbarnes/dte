@@ -221,13 +221,11 @@ void mask_color(TermColor *color, const TermColor *over)
 
 static void print_separator(Window *win)
 {
-    int y;
-
     if (win->x + win->w == terminal.width) {
         return;
     }
 
-    for (y = 0; y < win->h; y++) {
+    for (int y = 0; y < win->h; y++) {
         terminal.move_cursor(win->x + win->w, win->y + y);
         buf_add_ch('|');
     }
@@ -243,13 +241,12 @@ void update_line_numbers(Window *win, bool force)
 {
     View *v = win->view;
     size_t lines = v->buffer->nl;
-    int first, last;
     int x = win->x + vertical_tabbar_width(win);
 
     calculate_line_numbers(win);
 
-    first = v->vy + 1;
-    last = v->vy + win->edit_h;
+    int first = v->vy + 1;
+    int last = v->vy + win->edit_h;
     if (last > lines) {
         last = lines;
     }

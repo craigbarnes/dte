@@ -20,10 +20,8 @@ static void update_tab_title_width(View *v, int tab_number)
 
 static void update_first_tab_idx(Window *win)
 {
-    int min_first_idx, max_first_idx, w;
-
-    w = 0;
-    for (max_first_idx = win->views.count; max_first_idx > 0; max_first_idx--) {
+    size_t max_first_idx = win->views.count;
+    for (size_t w = 0; max_first_idx > 0; max_first_idx--) {
         View *v = win->views.ptrs[max_first_idx - 1];
         w += v->tt_truncated_width;
         if (w > win->w) {
@@ -31,8 +29,8 @@ static void update_first_tab_idx(Window *win)
         }
     }
 
-    w = 0;
-    for (min_first_idx = win->views.count; min_first_idx > 0; min_first_idx--) {
+    size_t min_first_idx = win->views.count;
+    for (size_t w = 0; min_first_idx > 0; min_first_idx--) {
         View *v = win->views.ptrs[min_first_idx - 1];
         if (w || v == win->view) {
             w += v->tt_truncated_width;
@@ -52,9 +50,9 @@ static void update_first_tab_idx(Window *win)
 
 static void calculate_tabbar(Window *win)
 {
-    int extra, i, truncated_count, total_w = 0;
+    int extra, truncated_count, total_w = 0;
 
-    for (i = 0; i < win->views.count; i++) {
+    for (size_t i = 0; i < win->views.count; i++) {
         View *v = win->views.ptrs[i];
 
         if (v == win->view) {
@@ -76,7 +74,7 @@ static void calculate_tabbar(Window *win)
     // Truncate all wide tabs
     total_w = 0;
     truncated_count = 0;
-    for (i = 0; i < win->views.count; i++) {
+    for (size_t i = 0; i < win->views.count; i++) {
         View *v = win->views.ptrs[i];
         int truncated_w = 20;
 
@@ -103,7 +101,7 @@ static void calculate_tabbar(Window *win)
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
 
-        for (i = 0; i < win->views.count; i++) {
+        for (size_t i = 0; i < win->views.count; i++) {
             View *v = win->views.ptrs[i];
             int add = v->tt_width - v->tt_truncated_width;
             int avail;
@@ -134,7 +132,7 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_horizontal_tab_title(View *v, int idx)
+static void print_horizontal_tab_title(View *v, size_t idx)
 {
     int skip = v->tt_width - v->tt_truncated_width;
     const char *filename = buffer_filename(v->buffer);
@@ -147,10 +145,10 @@ static void print_horizontal_tab_title(View *v, int idx)
     snprintf (
         buf,
         sizeof(buf),
-        "%c%d%s",
+        "%c%zu%c",
         obuf.x == 0 && idx > 0 ? '<' : ' ',
         idx + 1,
-        buffer_modified(v->buffer) ? "+" : ":"
+        buffer_modified(v->buffer) ? '+' : ':'
     );
 
     if (v == v->window->view) {
@@ -174,7 +172,7 @@ static void print_horizontal_tabbar(Window *win)
     terminal.move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
-    int i;
+    size_t i;
     for (i = win->first_tab_idx; i < win->views.count; i++) {
         View *v = win->views.ptrs[i];
         if (obuf.x + v->tt_truncated_width > win->w) {

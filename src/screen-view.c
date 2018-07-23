@@ -221,13 +221,12 @@ static void hl_words(LineInfo *info)
 {
     HlColor *cc = find_color("comment");
     HlColor *nc = find_color("notice");
-    size_t i, j, si, max;
 
     if (info->colors == NULL || cc == NULL || nc == NULL) {
         return;
     }
 
-    i = info->pos;
+    size_t i = info->pos;
     if (i >= info->size) {
         return;
     }
@@ -239,8 +238,9 @@ static void hl_words(LineInfo *info)
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    max = info->pos + terminal.width * 4 + 8;
+    const size_t max = info->pos + terminal.width * 4 + 8;
 
+    size_t si;
     while (i < info->size) {
         if (info->colors[i] != cc || !is_word_byte(info->line[i])) {
             if (i > max) {
@@ -257,7 +257,7 @@ static void hl_words(LineInfo *info)
                 i++;
             }
             if (is_notice(info->line + si, i - si)) {
-                for (j = si; j < i; j++) {
+                for (size_t j = si; j < i; j++) {
                     info->colors[j] = nc;
                 }
             }

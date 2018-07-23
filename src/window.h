@@ -29,7 +29,7 @@ typedef struct Window {
         int last;
     } line_numbers;
 
-    int first_tab_idx;
+    size_t first_tab_idx;
 
     bool update_tabbar;
 } Window;
