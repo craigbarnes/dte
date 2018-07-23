@@ -1,6 +1,5 @@
 errorfmt -i gcc 'error: \(Each undeclared identifier is reported only once'
 errorfmt -i gcc 'error: for each function it appears in.\)'
-errorfmt -i gcc "^([^:]+):([0-9]+):([0-9]+:)? note: "
 errorfmt -i gcc '^([^:]+):([0-9]+): (error|warning): \(near '
 errorfmt -i gcc "^([^:]+):([0-9]+):([0-9]+):$"
 errorfmt gcc "^([^:]+):([0-9]+):([0-9]+): (.*)" file line column message
