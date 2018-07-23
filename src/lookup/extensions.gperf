@@ -5,7 +5,8 @@
 %compare-lengths
 %enum
 %define lookup-function-name filetype_from_extension
-%define hash-function-name ft_ext_hash
+%define word-array-name filename_extension_table
+%define hash-function-name filename_extension_hash
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;
@@ -20,6 +21,7 @@ FileTypeHashSlot;
 7, ROFF
 8, ROFF
 9, ROFF
+ada, ADA
 adb, ADA
 ads, ADA
 asd, COMMONLISP
@@ -46,6 +48,7 @@ cr, RUBY
 cs, CSHARP
 cson, COFFEESCRIPT
 css, CSS
+csv, CSV
 cxx, CPLUSPLUS
 dart, DART
 d, D
@@ -54,6 +57,7 @@ di, D
 diff, DIFF
 doap, XML
 docker, DOCKER
+dot, DOT
 doxy, DOXYGEN
 dterc, DTERC
 dtx, TEX
@@ -70,9 +74,13 @@ geojson, JSON
 glslf, GLSL
 glsl, GLSL
 glslv, GLSL
+gnuplot, GNUPLOT
 go, GO
 gperf, GPERF
+gp, GNUPLOT
+gpi, GNUPLOT
 groovy, GROOVY
+gv, DOT
 h, C
 H, CPLUSPLUS
 hh, CPLUSPLUS
@@ -105,6 +113,9 @@ mount, INI
 nawk, AWK
 nginxconf, NGINX
 nginx, NGINX
+nim, NIM
+ninja, NINJA
+nix, NIX
 page, MALLARD
 patch, DIFF
 path, INI
@@ -113,7 +124,10 @@ perl, PERL
 php, PHP
 pl, PERL
 pls, INI
+plt, GNUPLOT
 pm, PERL
+po, GETTEXT
+pot, GETTEXT
 proto, PROTOBUF
 py3, PYTHON
 py, PYTHON
@@ -126,6 +140,7 @@ rkt, RACKET
 rockspec, LUA
 rs, RUST
 S, ASSEMBLY
+scala, SCALA
 scm, SCHEME
 scss, SCSS
 sed, SED
@@ -144,6 +159,8 @@ tex, TEX
 timer, INI
 toml, TOML
 topojson, JSON
+ts, TYPESCRIPT
+tsx, TYPESCRIPT
 ui, XML
 vala, VALA
 vapi, VALA
@@ -153,6 +170,8 @@ wsgi, PYTHON
 xhtml, HTML
 xml, XML
 xsd, XML
+xslt, XML
+xsl, XML
 yaml, YAML
 yml, YAML
 y, YACC
