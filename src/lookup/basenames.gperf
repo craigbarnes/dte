@@ -4,13 +4,20 @@
 %compare-lengths
 %enum
 %define lookup-function-name filetype_from_basename
-%define hash-function-name ft_base_hash
+%define word-array-name ft_basename_table
+%define hash-function-name ft_basename_hash
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;
 
 %%
 APKBUILD, SHELL
+.bash_logout, SHELL
+bash_logout, SHELL
+.bash_profile, SHELL
+bash_profile, SHELL
+.bashrc, SHELL
+bashrc, SHELL
 BSDmakefile, MAKE
 BUILD.bazel, PYTHON
 Capfile, RUBY
@@ -19,6 +26,8 @@ Cargo.lock, TOML
 CMakeLists.txt, CMAKE
 COMMIT_EDITMSG, GITCOMMIT
 config.ld, LUA
+.cshrc, SHELL
+cshrc, SHELL
 Dockerfile, DOCKER
 Doxyfile, DOXYGEN
 .drirc, XML
@@ -39,6 +48,7 @@ GNUmakefile, MAKE
 inputrc, INPUTRC
 .jshintrc, JSON
 Kbuild, MAKE
+krb5.conf, INI
 .luacheckrc, LUA
 .luacov, LUA
 Makefile.am, MAKE
@@ -52,6 +62,8 @@ mkinitcpio.conf, SHELL
 nginx.conf, NGINX
 pacman.conf, INI
 PKGBUILD, SHELL
+.profile, SHELL
+profile, SHELL
 Project.ede, EMACSLISP
 Rakefile, RUBY
 robots.txt, ROBOTSTXT
@@ -60,3 +72,13 @@ terminalrc, INI
 texmf.cnf, TEXMFCNF
 Vagrantfile, RUBY
 yum.conf, INI
+.zlogin, SHELL
+zlogin, SHELL
+.zlogout, SHELL
+zlogout, SHELL
+.zprofile, SHELL
+zprofile, SHELL
+.zshenv, SHELL
+zshenv, SHELL
+.zshrc, SHELL
+zshrc, SHELL

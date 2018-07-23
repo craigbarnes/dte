@@ -5,6 +5,7 @@
 %compare-lengths
 %enum
 %define lookup-function-name filetype_from_interpreter
+%define word-array-name ft_interpreter_table
 %define hash-function-name ft_interpreter_hash
 %define initializer-suffix ,0
 %define slot-name key
@@ -24,7 +25,9 @@ dash, SHELL
 ecl, COMMONLISP
 gawk, AWK
 gmake, MAKE
+gnuplot, GNUPLOT
 groovy, GROOVY
+gsed, SED
 guile, SCHEME
 jruby, RUBY
 ksh, SHELL
@@ -35,6 +38,7 @@ macruby, RUBY
 make, MAKE
 mawk, AWK
 mksh, SHELL
+moon, MOONSCRIPT
 nawk, AWK
 node, JAVASCRIPT
 openrc-run, SHELL
@@ -42,9 +46,11 @@ pdksh, SHELL
 perl, PERL
 php, PHP
 python, PYTHON
+r6rs, SCHEME
 racket, SCHEME
 rake, RUBY
 ruby, RUBY
+runhaskell, HASKELL
 sbcl, COMMONLISP
 sed, SED
 sh, SHELL

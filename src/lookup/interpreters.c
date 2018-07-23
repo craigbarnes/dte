@@ -2,7 +2,7 @@
 /* Command-line: gperf -m50 src/lookup/interpreters.gperf  */
 /* Computed positions: -k'1,3' */
 /* Filtered by: mk/gperf-filter.sed */
-/* maximum key range = 53, duplicates = 0 */
+/* maximum key range = 59, duplicates = 0 */
 
 inline
 static unsigned int
@@ -10,32 +10,32 @@ ft_interpreter_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55,  7, 23,  0,
-      30, 25, 35,  6, 27, 21,  0,  6, 11,  3,
-       4, 19,  0, 55,  2,  0, 14,  0, 55, 15,
-      55,  2, 10, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55, 55, 55, 55, 55,
-      55, 55, 55, 55, 55, 55
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62,  9, 35,  3,
+      33, 20,  4,  9, 31, 18, 12,  7, 12,  5,
+      24, 21,  2, 62,  0,  1, 14, 29, 62, 16,
+      62,  2,  8, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62, 62, 62, 62, 62,
+      62, 62, 62, 62, 62, 62
     };
   register unsigned int hval = len;
 
@@ -57,67 +57,75 @@ filetype_from_interpreter (register const char *str, register size_t len)
 {
   enum
     {
-      TOTAL_KEYWORDS = 41,
+      TOTAL_KEYWORDS = 46,
       MIN_WORD_LENGTH = 2,
       MAX_WORD_LENGTH = 10,
-      MIN_HASH_VALUE = 2,
-      MAX_HASH_VALUE = 54
+      MIN_HASH_VALUE = 3,
+      MAX_HASH_VALUE = 61
     };
 
   static const unsigned char lengthtable[] =
     {
-       0,  0,  2,  3,  4,  5,  4,  4,  6,  7,  7,  5,  4,  4,
-       3,  4,  3,  3,  5,  4,  6,  3,  4,  4,  6,  4,  5,  4,
-       7,  4,  5,  6,  5,  3,  4,  6,  3,  3,  4,  3,  3,  6,
-       0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 10
+       0,  0,  0,  2,  4,  0,  4,  3,  4,  6,  4,  4,  7,  6,
+       5,  7,  4,  4,  3,  3,  3,  4,  6,  5,  3,  4,  5,  6,
+       7,  4,  4,  5,  5,  4, 10,  3,  6,  3,  4,  4,  4,  3,
+       3,  3,  4,  7,  5,  0,  0,  0,  6, 10,  0,  0,  0,  0,
+       0,  0,  0,  0,  0,  4
     };
-  static const FileTypeHashSlot wordlist[] =
+  static const FileTypeHashSlot ft_interpreter_table[] =
     {
-      {(char*)0,0}, {(char*)0,0},
+      {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
       {"sh", SHELL},
+      {"r6rs", SCHEME},
+      {(char*)0,0},
+      {"perl", PERL},
       {"php", PHP},
       {"sbcl", COMMONLISP},
-      {"jruby", RUBY},
-      {"perl", PERL},
-      {"mksh", SHELL},
       {"racket", SCHEME},
-      {"crystal", RUBY},
-      {"macruby", RUBY},
-      {"pdksh", SHELL},
+      {"mksh", SHELL},
       {"rake", RUBY},
+      {"crystal", RUBY},
+      {"coffee", COFFEESCRIPT},
+      {"pdksh", SHELL},
+      {"macruby", RUBY},
       {"make", MAKE},
-      {"ccl", COMMONLISP},
       {"lisp", COMMONLISP},
+      {"ccl", COMMONLISP},
       {"awk", AWK},
       {"tcc", C},
-      {"gmake", MAKE},
       {"wish", TCL},
       {"python", PYTHON},
+      {"gmake", MAKE},
       {"lua", LUA},
       {"mawk", AWK},
-      {"nawk", AWK},
-      {"luajit", LUA},
-      {"gawk", AWK},
       {"clisp", COMMONLISP},
-      {"bash", SHELL},
+      {"luajit", LUA},
       {"chicken", SCHEME},
-      {"ruby", RUBY},
+      {"gawk", AWK},
+      {"moon", MOONSCRIPT},
       {"tclsh", TCL},
-      {"groovy", GROOVY},
       {"guile", SCHEME},
+      {"gsed", SED},
+      {"runhaskell", HASKELL},
+      {"ecl", COMMONLISP},
+      {"groovy", GROOVY},
       {"sed", SED},
       {"dash", SHELL},
-      {"bigloo", SCHEME},
+      {"ruby", RUBY},
+      {"bash", SHELL},
       {"ksh", SHELL},
-      {"ash", SHELL},
-      {"node", JAVASCRIPT},
-      {"ecl", COMMONLISP},
       {"zsh", SHELL},
-      {"coffee", COFFEESCRIPT},
+      {"ash", SHELL},
+      {"nawk", AWK},
+      {"gnuplot", GNUPLOT},
+      {"jruby", RUBY},
+      {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
+      {"bigloo", SCHEME},
+      {"openrc-run", SHELL},
       {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
       {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
-      {(char*)0,0}, {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
-      {"openrc-run", SHELL}
+      {(char*)0,0},
+      {"node", JAVASCRIPT}
     };
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
@@ -127,10 +135,10 @@ filetype_from_interpreter (register const char *str, register size_t len)
       if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
-            register const char *s = wordlist[key].key;
+            register const char *s = ft_interpreter_table[key].key;
 
             if (s && *str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &wordlist[key];
+              return &ft_interpreter_table[key];
           }
     }
   return 0;

@@ -24,10 +24,10 @@ setenv LESS RS
 
 ft -f config '^/boot/grub/menu\.lst$|/\.?git/?attributes$|^/etc/(hosts|fstab)$'
 ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
-ft -f ini '/\.git/config$|^/etc/systemd/.+\.conf$|^/etc/krb5\.conf$'
+ft -f ini '/\.git/config$|^/etc/systemd/.+\.conf$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 ft -f nginx '^/etc/nginx/'
-ft -f sh '^/etc/default/|^/etc/profile$|(\.|/)bash(rc|_profile|_logout)$'
+ft -f sh '^/etc/default/'
 
 # Don't remember cursor position for git temporary files
 option gitcommit,gitrebase file-history false
