@@ -14,6 +14,11 @@ typedef struct {
 
 static PointerArray aliases = PTR_ARRAY_INIT;
 
+static void CONSTRUCTOR prealloc(void)
+{
+    ptr_array_init(&aliases, 32);
+}
+
 static bool is_valid_alias_name(const char *const name)
 {
     for (size_t i = 0; name[i]; i++) {

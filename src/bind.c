@@ -17,6 +17,11 @@ typedef struct {
 static KeyChain pressed_keys;
 static PointerArray bindings = PTR_ARRAY_INIT;
 
+static void CONSTRUCTOR prealloc(void)
+{
+    ptr_array_init(&bindings, 128);
+}
+
 static bool parse_keys(KeyChain *chain, const char *str)
 {
     char *keys = xstrdup(str);

@@ -18,6 +18,7 @@ typedef struct {
 typedef void (*FreeFunction)(void *ptr);
 #define FREE_FUNC(f) (FreeFunction)f
 
+void ptr_array_init(PointerArray *array, size_t capacity);
 void ptr_array_add(PointerArray *array, void *ptr);
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos);
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr);

@@ -2,6 +2,13 @@
 #include "ptr-array.h"
 #include "../xmalloc.h"
 
+void ptr_array_init(PointerArray *array, size_t capacity)
+{
+    array->count = 0;
+    array->ptrs = xnew(array->ptrs, capacity);
+    array->alloc = capacity;
+}
+
 void ptr_array_add(PointerArray *array, void *ptr)
 {
     if (array->count == array->alloc) {
