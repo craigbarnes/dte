@@ -47,8 +47,13 @@
     #define HAS_WARNING(x) 0
 #endif
 
-#if GNUC_AT_LEAST(3, 0)
+#if GNUC_AT_LEAST(3, 0) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
+#else
+    #define UNUSED
+#endif
+
+#if GNUC_AT_LEAST(3, 0)
     #define MALLOC __attribute__((__malloc__))
     #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
     #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
@@ -57,13 +62,13 @@
     #define CONSTRUCTOR __attribute__((__constructor__))
     #define DESTRUCTOR __attribute__((__destructor__))
 #else
-    #define UNUSED
     #define MALLOC
     #define PRINTF(x)
     #define VPRINTF(x)
     #define PURE
     #define CONST_FN
-    // CONSTRUCTOR and DESTRUCTOR deliberately left undefined
+    #define CONSTRUCTOR UNUSED
+    #define DESTRUCTOR UNUSED
 #endif
 
 #define UNUSED_ARG(x) unused__ ## x UNUSED
@@ -74,7 +79,7 @@
     #define COUNTER_ __LINE__
 #endif
 
-#if defined(CONSTRUCTOR) && defined(DEBUG) && (DEBUG > 0)
+#if defined(DEBUG) && (DEBUG > 0)
     #define UNITTEST static void CONSTRUCTOR XPASTE(unittest_, COUNTER_)(void)
 #else
     #define UNITTEST static void UNUSED XPASTE(unittest_, COUNTER_)(void)

@@ -5,6 +5,7 @@
 #include "completion.h"
 #include "editor.h"
 #include "error.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 
 typedef struct {
