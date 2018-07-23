@@ -706,7 +706,9 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     }
 
     if (pf->cur_width == 0) {
-        string_add_buf(&pf->buf, pf->indent, pf->indent_len);
+        if (pf->indent_len) {
+            string_add_buf(&pf->buf, pf->indent, pf->indent_len);
+        }
         pf->cur_width = pf->indent_width;
     } else {
         string_add_ch(&pf->buf, ' ');
