@@ -37,6 +37,8 @@ drirc, XML
 Gemfile.lock, RUBY
 Gemfile, RUBY
 .gemrc, YAML
+.gitattributes, CONFIG
+gitattributes, CONFIG
 .gitconfig, INI
 gitconfig, INI
 .gitmodules, INI

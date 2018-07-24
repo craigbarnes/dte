@@ -22,8 +22,7 @@ alias git-changes "compile -1s gitchanges sh -c \"git diff -U0 | \
 # ('R' = allow ANSI colors, 'S' = chop long lines)
 setenv LESS RS
 
-ft -f config '^/boot/grub/menu\.lst$|/\.?git/?attributes$|^/etc/(hosts|fstab)$'
-ft -f dte '/\.?dte/(config/)?(rc|filetype|((syntax|color|binding|compiler)/.*))$'
+ft -f dte '/\.?dte/(config/)?(rc|((syntax|color|binding|compiler)/.*))$'
 ft -f ini '/\.git/config$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 

@@ -1,0 +1,16 @@
+%struct-type
+%omit-struct-type
+%readonly-tables
+%compare-lengths
+%enum
+%define lookup-function-name filetype_from_pathname
+%define word-array-name ft_pathname_table
+%define hash-function-name ft_pathname_hash
+%define initializer-suffix ,0
+%define slot-name key
+FileTypeHashSlot;
+
+%%
+/boot/grub/menu.lst, CONFIG
+/etc/fstab, CONFIG
+/etc/hosts, CONFIG

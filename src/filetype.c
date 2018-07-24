@@ -17,6 +17,7 @@ typedef enum {
     CMAKE,
     COFFEESCRIPT,
     COMMONLISP,
+    CONFIG,
     CPLUSPLUS,
     CSHARP,
     CSS,
@@ -98,6 +99,7 @@ static const char *const builtin_filetype_names[NR_BUILTIN_FILETYPES] = {
     [CMAKE] = "cmake",
     [COFFEESCRIPT] = "cmake",
     [COMMONLISP] = "lisp",
+    [CONFIG] = "config",
     [CPLUSPLUS] = "c",
     [CSHARP] = "csharp",
     [CSS] = "css",
@@ -181,10 +183,13 @@ typedef struct {
     const FileTypeEnum filetype;
 } FileTypeHashSlot;
 
+IGNORE_WARNING("-Wunused-parameter")
 #include "lookup/basenames.c"
+#include "lookup/pathnames.c"
 #include "lookup/extensions.c"
 #include "lookup/interpreters.c"
 #include "lookup/ignored-exts.c"
+UNIGNORE_WARNINGS
 
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
@@ -325,6 +330,13 @@ const char *find_ft (
         }
     }
 
+    if (path.length) {
+        slot = filetype_from_pathname(path.data, path.length);
+        if (slot) {
+            return builtin_filetype_names[slot->filetype];
+        }
+    }
+
     if (base.length) {
         slot = filetype_from_basename(base.data, base.length);
         if (slot) {
@@ -360,7 +372,7 @@ const char *find_ft (
         if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
         } else if (string_view_has_literal_prefix(&path, "/etc/")) {
-            return "config";
+            return builtin_filetype_names[CONFIG];
         }
     }
 
