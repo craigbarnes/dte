@@ -42,7 +42,7 @@ static inline PURE StringView string_view(const char *str, size_t length)
 }
 
 static inline PURE NONNULL_ARGS bool string_view_has_prefix (
-    StringView *sv,
+    const StringView *sv,
     const char *str,
     size_t length
 ) {
@@ -50,7 +50,7 @@ static inline PURE NONNULL_ARGS bool string_view_has_prefix (
 }
 
 static inline PURE NONNULL_ARGS bool string_view_has_prefix_icase (
-    StringView *sv,
+    const StringView *sv,
     const char *str,
     size_t length
 ) {

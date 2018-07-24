@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command.h"
+#include "util/string-view.h"
 
 typedef enum {
     CFG_NOFLAGS = 0,
@@ -12,8 +13,7 @@ typedef enum {
 
 typedef struct {
     const char *const name;
-    const char *const text;
-    size_t text_len;
+    const StringView text;
 } BuiltinConfig;
 
 extern const char *config_file;

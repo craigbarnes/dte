@@ -510,7 +510,7 @@ static void cmd_insert_builtin(const char* UNUSED_ARG(pf), char **args)
     const char *name = args[0];
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (cfg) {
-        buffer_insert_bytes(cfg->text, cfg->text_len);
+        buffer_insert_bytes(cfg->text.data, cfg->text.length);
     } else {
         error_msg("No built-in config with name '%s'", name);
     }

@@ -108,7 +108,7 @@ int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
         if (cfg) {
             config_file = filename;
             config_line = 1;
-            exec_config(cmds, cfg->text, cfg->text_len);
+            exec_config(cmds, cfg->text.data, cfg->text.length);
             return 0;
         } else if (must_exist) {
             error_msg (

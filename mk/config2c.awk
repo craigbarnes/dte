@@ -39,10 +39,16 @@ FNR == 1 {
 
 END {
     print ";\n\nUNIGNORE_WARNINGS\n"
+
+    print \
+        "#define cfg(n, t) { \\\n" \
+        "    .name = n, \\\n" \
+        "    .text = {.data = t, .length = sizeof(t) - 1} \\\n" \
+        "}\n"
+
     print "static const BuiltinConfig builtin_configs[" nfiles "] = {"
     for (i = 1; i <= nfiles; i++) {
-        ident = idents[i]
-        print "    {\"" names[i] "\", " ident ", ARRAY_COUNT(" ident ") - 1},"
+        print "    cfg(\"" names[i] "\", " idents[i] "),"
     }
     print "};"
 }
