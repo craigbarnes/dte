@@ -266,13 +266,14 @@ const char *find_ft (
     const char *first_line,
     size_t line_len
 ) {
-    size_t filename_len = 0;
-    const char *base = NULL;
+    StringView path = STRING_VIEW_INIT;
     StringView ext = STRING_VIEW_INIT;
+    StringView base = STRING_VIEW_INIT;
     if (filename) {
-        base = path_basename(filename);
-        ext = get_ext(base);
-        filename_len = strlen(filename);
+        const char *b = path_basename(filename);
+        ext = get_ext(b);
+        base = string_view(b, strlen(b));
+        path = string_view(filename, strlen(filename));
     }
 
     // Search user `ft` entries
@@ -285,14 +286,14 @@ const char *find_ft (
             }
             break;
         case FT_BASENAME:
-            if (!base || !streq(base, ft->str)) {
+            if (!base.length || !string_view_equal_cstr(&base, ft->str)) {
                 continue;
             }
             break;
         case FT_FILENAME:
             if (
-                !filename
-                || !regexp_match_nosub(ft->str, filename, filename_len)
+                !path.length
+                || !regexp_match_nosub(ft->str, path.data, path.length)
             ) {
                 continue;
             }
@@ -322,12 +323,14 @@ const char *find_ft (
             return builtin_filetype_names[slot->filetype];
         }
     }
-    if (base) {
-        slot = filetype_from_basename(base, strlen(base));
+
+    if (base.length) {
+        slot = filetype_from_basename(base.data, base.length);
         if (slot) {
             return builtin_filetype_names[slot->filetype];
         }
     }
+
     if (first_line) {
         if (line_len >= 14 && !strncasecmp(first_line, "<!DOCTYPE HTML", 14)) {
             return builtin_filetype_names[HTML];
@@ -337,19 +340,27 @@ const char *find_ft (
             return builtin_filetype_names[XML];
         }
     }
+
     if (ext.length) {
         slot = filetype_from_extension(ext.data, ext.length);
         if (slot) {
             return builtin_filetype_names[slot->filetype];
         }
     }
-    if (
-        filename
-        && filename_len >= sizeof("/etc/.conf")
-        && str_has_prefix(filename, "/etc/")
-        && str_has_suffix(filename, ".conf")
-    ) {
-        return "config";
+
+    if (string_view_has_literal_prefix(&path, "/etc/default/")) {
+        return builtin_filetype_names[SHELL];
+    } else if (string_view_has_literal_prefix(&path, "/etc/nginx/")) {
+        return builtin_filetype_names[NGINX];
+    }
+
+    static const StringView conf = STRING_VIEW("conf");
+    if (string_view_equal(&ext, &conf)) {
+        if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
+            return builtin_filetype_names[INI];
+        } else if (string_view_has_literal_prefix(&path, "/etc/")) {
+            return "config";
+        }
     }
 
     return NULL;
