@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
+#include <strings.h>
 #include "macros.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
@@ -27,7 +29,11 @@ typedef struct {
     string_view_has_prefix((sv), (prefix), STRLEN(prefix)) \
 )
 
-static inline StringView string_view(const char *str, size_t length)
+#define string_view_has_literal_prefix_icase(sv, prefix) ( \
+    string_view_has_prefix_icase((sv), (prefix), STRLEN(prefix)) \
+)
+
+static inline PURE StringView string_view(const char *str, size_t length)
 {
     return (StringView) {
         .data = str,
@@ -35,9 +41,20 @@ static inline StringView string_view(const char *str, size_t length)
     };
 }
 
-static inline bool string_view_has_prefix(StringView *sv, const char *str, size_t length)
-{
+static inline PURE NONNULL_ARGS bool string_view_has_prefix (
+    StringView *sv,
+    const char *str,
+    size_t length
+) {
     return sv->length >= length && memcmp(sv->data, str, length) == 0;
+}
+
+static inline PURE NONNULL_ARGS bool string_view_has_prefix_icase (
+    StringView *sv,
+    const char *str,
+    size_t length
+) {
+    return sv->length >= length && strncasecmp(sv->data, str, length) == 0;
 }
 
 bool string_view_equal(const StringView *a, const StringView *b) PURE NONNULL_ARGS;

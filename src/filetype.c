@@ -269,6 +269,7 @@ const char *find_ft (
     StringView path = STRING_VIEW_INIT;
     StringView ext = STRING_VIEW_INIT;
     StringView base = STRING_VIEW_INIT;
+    StringView line = string_view(first_line, line_len);
     if (filename) {
         const char *b = path_basename(filename);
         ext = get_ext(b);
@@ -300,8 +301,8 @@ const char *find_ft (
             break;
         case FT_CONTENT:
             if (
-                !first_line
-                || !regexp_match_nosub(ft->str, first_line, line_len)
+                !line.length
+                || !regexp_match_nosub(ft->str, line.data, line.length)
             ) {
                 continue;
             }
@@ -331,12 +332,12 @@ const char *find_ft (
         }
     }
 
-    if (first_line) {
-        if (line_len >= 14 && !strncasecmp(first_line, "<!DOCTYPE HTML", 14)) {
+    if (line.length) {
+        if (string_view_has_literal_prefix_icase(&line, "<!DOCTYPE HTML")) {
             return builtin_filetype_names[HTML];
-        } else if (line_len >= 11 && !strncmp(first_line, "[wrap-file]", 11)) {
+        } else if (string_view_has_literal_prefix(&line, "[wrap-file]")) {
             return builtin_filetype_names[INI];
-        } else if (line_len >= 5 && !strncmp(first_line, "<?xml", 5)) {
+        } else if (string_view_has_literal_prefix(&line, "<?xml")) {
             return builtin_filetype_names[XML];
         }
     }
