@@ -155,3 +155,9 @@ void exec_reset_colors_rc(void)
 {
     read_config(commands, "color/reset", CFG_MUST_EXIST | CFG_BUILTIN);
 }
+
+UNITTEST {
+    // Built-in configs can be customized, but these 2 are required:
+    BUG_ON(!get_builtin_config("rc"));
+    BUG_ON(!get_builtin_config("color/reset"));
+}
