@@ -4,11 +4,9 @@
 #include <stddef.h> // offsetof
 #include <stdbool.h>
 
-typedef struct ListHead ListHead;
-
-struct ListHead {
-    ListHead *next, *prev;
-};
+typedef struct ListHead {
+    struct ListHead *next, *prev;
+} ListHead;
 
 static inline void list_init(ListHead *head)
 {
