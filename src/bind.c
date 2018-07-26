@@ -91,6 +91,7 @@ static size_t mod_mask_enum(KeyCode k)
     default:
         BUG("Unknown modifier combination");
     }
+    return 0;
 }
 
 static ssize_t key_lookup_index(KeyCode k)
