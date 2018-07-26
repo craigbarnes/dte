@@ -29,7 +29,7 @@ build:debian:
         - make clean && make check USE_LUA=dynamic && ./dte -V
         - make clean && make check USE_LUA=static && ./dte -V
         - make check-syntax-files
-        - sed -nf tools/extract-readme-code.sed README.md | sh -e
+        - sed -f tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
         - make clean && make check CC=gcc
         - make clean && make check CC=clang
