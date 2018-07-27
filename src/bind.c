@@ -109,6 +109,8 @@ static ssize_t key_lookup_index(KeyCode k)
             return key;
         case MOD_META:
             return key + 128;
+        default:
+            break;
         }
     }
 
