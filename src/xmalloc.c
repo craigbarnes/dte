@@ -1,18 +1,21 @@
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "xmalloc.h"
 #include "common.h"
 
-#define MALLOC_FAIL(msg) malloc_fail(__FILE__, __LINE__, __func__, (msg))
+#define CHECK_ALLOC(x) do { \
+    if (unlikely((x) == NULL)) { \
+        malloc_fail(__func__, errno); \
+    } \
+} while (0)
 
-NORETURN COLD static void malloc_fail (
-    const char *const file,
-    const int line,
-    const char *const func,
-    const char *const msg
-) {
-    char buf[256];
+NORETURN COLD NONNULL_ARGS
+static void malloc_fail(const char *msg, int err) {
     term_cleanup();
-    snprintf(buf, sizeof buf, "\n%s:%d: %s: %s\n", file, line, func, msg);
-    fputs(buf, stderr);
+    errno = err;
+    perror(msg);
     abort();
 }
 
@@ -32,9 +35,7 @@ void *xmalloc(size_t size)
 {
     BUG_ON(size == 0);
     void *ptr = malloc(size);
-    if (unlikely(ptr == NULL)) {
-        MALLOC_FAIL(strerror(errno));
-    }
+    CHECK_ALLOC(ptr);
     return ptr;
 }
 
@@ -42,9 +43,7 @@ void *xcalloc(size_t size)
 {
     BUG_ON(size == 0);
     void *ptr = calloc(1, size);
-    if (unlikely(ptr == NULL)) {
-        MALLOC_FAIL(strerror(errno));
-    }
+    CHECK_ALLOC(ptr);
     return ptr;
 }
 
@@ -52,18 +51,14 @@ void *xrealloc(void *ptr, size_t size)
 {
     BUG_ON(size == 0);
     ptr = realloc(ptr, size);
-    if (unlikely(ptr == NULL)) {
-        MALLOC_FAIL(strerror(errno));
-    }
+    CHECK_ALLOC(ptr);
     return ptr;
 }
 
 char *xstrdup(const char *str)
 {
     char *s = strdup(str);
-    if (unlikely(s == NULL)) {
-        MALLOC_FAIL(strerror(errno));
-    }
+    CHECK_ALLOC(s);
     return s;
 }
 
