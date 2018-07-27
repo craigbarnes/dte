@@ -236,14 +236,11 @@ void cconv_process(struct cconv *c, const char *input, size_t len)
 
 struct cconv *cconv_to_utf8(const char *encoding)
 {
-    struct cconv *c;
-    iconv_t cd;
-
-    cd = iconv_open("UTF-8", encoding);
+    iconv_t cd = iconv_open("UTF-8", encoding);
     if (cd == (iconv_t)-1) {
         return NULL;
     }
-    c = create(cd);
+    struct cconv *c = create(cd);
     memcpy(c->rbuf, replacement, sizeof(replacement));
     c->rcount = sizeof(replacement);
     c->char_size = encoding_char_size(encoding);
@@ -252,23 +249,11 @@ struct cconv *cconv_to_utf8(const char *encoding)
 
 struct cconv *cconv_from_utf8(const char *encoding)
 {
-    struct cconv *c;
-    iconv_t cd = (iconv_t)-1;
-
-    // FIXME: enable transliteration?
-    if (0) {
-        // Enable transliteration if supported.
-        char buf[128];
-        snprintf(buf, sizeof(buf), "%s//TRANSLIT", encoding);
-        cd = iconv_open(buf, "UTF-8");
-    }
-    if (cd == (iconv_t)-1) {
-        cd = iconv_open(encoding, "UTF-8");
-    }
+    iconv_t cd = iconv_open(encoding, "UTF-8");
     if (cd == (iconv_t)-1) {
         return NULL;
     }
-    c = create(cd);
+    struct cconv *c = create(cd);
     encode_replacement(c);
     return c;
 }
