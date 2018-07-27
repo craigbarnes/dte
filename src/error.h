@@ -9,7 +9,7 @@ typedef struct {
     int code;
 } Error;
 
-extern int nr_errors;
+extern unsigned int nr_errors;
 extern bool msg_is_error;
 extern char error_buf[256];
 

@@ -131,7 +131,7 @@ unsigned long buf_hash(const char *str, size_t size);
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
 State *merge_syntax(Syntax *syn, SyntaxMerge *m);
-void finalize_syntax(Syntax *syn, int saved_nr_errors);
+void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors);
 
 Syntax *find_any_syntax(const char *name);
 Syntax *find_syntax(const char *name);

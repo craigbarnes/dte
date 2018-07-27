@@ -3,7 +3,7 @@
 #include "config.h"
 #include "editor.h"
 
-int nr_errors;
+unsigned int nr_errors;
 bool msg_is_error;
 char error_buf[256];
 

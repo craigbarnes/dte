@@ -32,7 +32,7 @@ static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
 
 static Syntax *current_syntax;
 static State *current_state;
-static int saved_nr_errors; // Used to check if nr_errors changed
+static unsigned int saved_nr_errors; // Used to check if nr_errors changed
 
 static bool no_syntax(void)
 {

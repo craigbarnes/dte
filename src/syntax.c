@@ -223,7 +223,7 @@ static void free_syntax(Syntax *syn)
     free(syn);
 }
 
-void finalize_syntax(Syntax *syn, int saved_nr_errors)
+void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
 {
     if (syn->states.count == 0) {
         error_msg("Empty syntax");
