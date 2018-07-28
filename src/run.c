@@ -5,32 +5,13 @@
 #include "config.h"
 #include "error.h"
 #include "parse-args.h"
-
-// Commands that are allowed in config files
-static const char config_commands[][16] = {
-    "alias",
-    "bind",
-    "cd",
-    "errorfmt",
-    "ft",
-    "hi",
-    "include",
-    "load-syntax",
-    "option",
-    "set",
-    "setenv",
-};
+#include "lookup/config-cmds.c"
 
 const Command *current_command;
 
 static bool allowed_command(const char *name)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(config_commands); i++) {
-        if (streq(name, config_commands[i])) {
-            return true;
-        }
-    }
-    return false;
+    return lookup_config_command(name, strlen(name)) ? true : false;
 }
 
 const Command *find_command(const Command *cmds, const char *name)
