@@ -63,16 +63,19 @@ local xterm_keys = {
 }
 
 local key_templates = {
-    ["[1;_A"] = "KEY_UP",
-    ["[1;_B"] = "KEY_DOWN",
-    ["[1;_C"] = "KEY_RIGHT",
-    ["[1;_D"] = "KEY_LEFT",
-    ["[1;_F"] = "KEY_END",
-    ["[1;_H"] = "KEY_HOME",
     ["[2;_~"] = "KEY_INSERT",
     ["[3;_~"] = "KEY_DELETE",
     ["[5;_~"] = "KEY_PAGE_UP",
     ["[6;_~"] = "KEY_PAGE_DOWN",
+
+    -- The following templates could be used here, but are handled below
+    -- as a special case, for greater efficiency in the generated code:
+    -- ["[1;_A"] = "KEY_UP",
+    -- ["[1;_B"] = "KEY_DOWN",
+    -- ["[1;_C"] = "KEY_RIGHT",
+    -- ["[1;_D"] = "KEY_LEFT",
+    -- ["[1;_F"] = "KEY_END",
+    -- ["[1;_H"] = "KEY_HOME",
 }
 
 local modifiers = {
@@ -85,11 +88,52 @@ local modifiers = {
     ["8"] = "MOD_SHIFT | MOD_META | MOD_CTRL",
 }
 
+local bracket1_impl = [=[
+if (i >= length) {
+    return -1;
+} else {
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    } else if (i >= length) {
+        return -1;
+    }
+    switch(buf[i++]) {
+    case 'A':
+        *k = mods | KEY_UP;
+        return i;
+    case 'B':
+        *k = mods | KEY_DOWN;
+        return i;
+    case 'C':
+        *k = mods | KEY_RIGHT;
+        return i;
+    case 'D':
+        *k = mods | KEY_LEFT;
+        return i;
+    case 'F':
+        *k = mods | KEY_END;
+        return i;
+    case 'H':
+        *k = mods | KEY_HOME;
+        return i;
+    }
+}
+return 0;
+]=]
+
 -- Expand key templates with modifiers and insert into xterm_keys table
 for template, key in pairs(key_templates) do
     for num, mod in pairs(modifiers) do
         local seq = assert(template:gsub("_", num))
         xterm_keys[seq] = mod .. " | " .. key
+    end
+end
+
+-- Insert special function node for handling "[1;" sequences
+xterm_keys["[1;"] = function(buf, indent)
+    for line in bracket1_impl:gmatch("[^\n]+") do
+        buf:write(indent, line, "\n")
     end
 end
 
@@ -141,7 +185,8 @@ local function write_trie(node, buffer)
     local buf = buffer or Buffer()
     local function serialize(node, depth)
         local indent = indents[depth]
-        if type(node) == "table" then
+        local node_type = type(node)
+        if node_type == "table" then
             if has_only_tilde_leaf(node) then
                 buf:write (
                     -- This should really set a temporary and decide whether
@@ -166,7 +211,10 @@ local function write_trie(node, buffer)
                 end
             end
             buf:write(indent, "}\n", indent, "return 0;\n")
+        elseif node_type == "function" then
+            node(buf, indent)
         else
+            assert(node_type == "string")
             buf:write (
                 indent, "*k = ", node, ";\n",
                 indent, "return i;\n"
@@ -188,6 +236,20 @@ output:write [[
 
 #include <sys/types.h>
 #include "../key.h"
+
+static KeyCode mod_enum_to_mod_mask(char mod_enum)
+{
+    switch (mod_enum) {
+    case '2': return MOD_SHIFT;
+    case '3': return MOD_META;
+    case '4': return MOD_SHIFT | MOD_META;
+    case '5': return MOD_CTRL;
+    case '6': return MOD_SHIFT | MOD_CTRL;
+    case '7': return MOD_META | MOD_CTRL;
+    case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
+    default:  return 0;
+    }
+}
 
 static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
 {

@@ -7,6 +7,20 @@
 #include <sys/types.h>
 #include "../key.h"
 
+static KeyCode mod_enum_to_mod_mask(char mod_enum)
+{
+    switch (mod_enum) {
+    case '2': return MOD_SHIFT;
+    case '3': return MOD_META;
+    case '4': return MOD_SHIFT | MOD_META;
+    case '5': return MOD_CTRL;
+    case '6': return MOD_SHIFT | MOD_CTRL;
+    case '7': return MOD_META | MOD_CTRL;
+    case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
+    default:  return 0;
+    }
+}
+
 static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
 {
     if (length == 0 || buf[0] != '\033') {
@@ -102,169 +116,35 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
                 *k = KEY_F8;
                 goto check_trailing_tilde;
             case ';':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '2':
-                    if (i >= length) return -1;
+                if (i >= length) {
+                    return -1;
+                } else {
+                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+                    if (mods == 0) {
+                        return 0;
+                    } else if (i >= length) {
+                        return -1;
+                    }
                     switch(buf[i++]) {
                     case 'A':
-                        *k = MOD_SHIFT | KEY_UP;
+                        *k = mods | KEY_UP;
                         return i;
                     case 'B':
-                        *k = MOD_SHIFT | KEY_DOWN;
+                        *k = mods | KEY_DOWN;
                         return i;
                     case 'C':
-                        *k = MOD_SHIFT | KEY_RIGHT;
+                        *k = mods | KEY_RIGHT;
                         return i;
                     case 'D':
-                        *k = MOD_SHIFT | KEY_LEFT;
+                        *k = mods | KEY_LEFT;
                         return i;
                     case 'F':
-                        *k = MOD_SHIFT | KEY_END;
+                        *k = mods | KEY_END;
                         return i;
                     case 'H':
-                        *k = MOD_SHIFT | KEY_HOME;
+                        *k = mods | KEY_HOME;
                         return i;
                     }
-                    return 0;
-                case '3':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_META | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_META | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_META | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_META | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_META | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_META | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
-                case '4':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_SHIFT | MOD_META | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_SHIFT | MOD_META | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_SHIFT | MOD_META | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_SHIFT | MOD_META | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_SHIFT | MOD_META | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_SHIFT | MOD_META | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
-                case '5':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_CTRL | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_CTRL | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_CTRL | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_CTRL | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_CTRL | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_CTRL | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
-                case '6':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_SHIFT | MOD_CTRL | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
-                case '7':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_META | MOD_CTRL | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_META | MOD_CTRL | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_META | MOD_CTRL | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_META | MOD_CTRL | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_META | MOD_CTRL | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_META | MOD_CTRL | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
-                case '8':
-                    if (i >= length) return -1;
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME;
-                        return i;
-                    }
-                    return 0;
                 }
                 return 0;
             case '~':
