@@ -27,7 +27,7 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
-    ascii path ptr-array string string-view uchar unicode ))
+    ascii path ptr-array string string-view uchar unicode xmalloc ))
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block block-iter buffer buffer-iter cconv change \
@@ -38,7 +38,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     mode-command mode-normal mode-search move msg options parse-args \
     parse-command regexp run screen screen-tabbar screen-view \
     script search selection spawn state syntax tag term-info \
-    term-read term-write view wbuf window xmalloc )) \
+    term-read term-write view wbuf window )) \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \

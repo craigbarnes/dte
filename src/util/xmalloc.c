@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xmalloc.h"
-#include "common.h"
+#include "../common.h"
 
 #define CHECK_ALLOC(x) do { \
     if (unlikely((x) == NULL)) { \

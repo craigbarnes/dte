@@ -9,7 +9,7 @@
 #include "libc.h"
 #include "util/ascii.h"
 #include "util/macros.h"
-#include "xmalloc.h"
+#include "util/xmalloc.h"
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
