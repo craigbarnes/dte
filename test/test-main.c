@@ -1,6 +1,7 @@
 #include <langinfo.h>
 #include <locale.h>
 #include "test.h"
+#include "../src/command.h"
 #include "../src/editor.h"
 #include "../src/util/path.h"
 #include "../src/encoding.h"
@@ -166,6 +167,33 @@ static void test_parse_xterm_key(void)
     }
 }
 
+static int command_cmp(const void *p1, const void *p2)
+{
+    const Command *c1 = p1, *c2 = p2;
+    return strcmp(c1->name, c2->name);
+}
+
+// Checks that `commands` array is sorted in binary searchable order
+static void test_commands_sort(void)
+{
+    size_t n = 0;
+    while (commands[n].name) {
+        n++;
+    }
+    EXPECT_EQ(n, 85);
+
+    const size_t size = n * sizeof(Command);
+    Command *commands_copy = xmalloc(size);
+    memcpy(commands_copy, commands, size);
+    qsort(commands_copy, n, sizeof(Command), command_cmp);
+
+    for (size_t i = 0; i < n; i++) {
+        EXPECT_STREQ(commands[i].name, commands_copy[i].name);
+    }
+
+    free(commands_copy);
+}
+
 void test_util_ascii(void);
 void test_key_to_string(void);
 
@@ -178,6 +206,8 @@ int main(void)
     test_find_ft_filename();
     test_find_ft_firstline();
     test_parse_xterm_key();
+    test_commands_sort();
+
     test_util_ascii();
     test_key_to_string();
 
