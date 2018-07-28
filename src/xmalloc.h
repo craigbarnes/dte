@@ -29,6 +29,13 @@ char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
 void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2);
 size_t size_multiply(size_t a, size_t b);
 
+CONST_FN
+static inline size_t ROUND_UP(size_t x, size_t r)
+{
+    r--;
+    return (x + r) & ~r;
+}
+
 XMALLOC NONNULL_ARGS
 static inline char *xstrslice(const char *str, size_t pos, size_t end)
 {

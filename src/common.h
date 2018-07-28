@@ -34,12 +34,6 @@
         } \
     } while (0)
 
-static inline size_t CONST_FN ROUND_UP(size_t x, size_t r)
-{
-    r--;
-    return (x + r) & ~r;
-}
-
 static inline NONNULL_ARGS bool streq(const char *a, const char *b)
 {
     return !strcmp(a, b);
