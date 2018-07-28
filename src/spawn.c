@@ -11,7 +11,7 @@
 #include "msg.h"
 #include "regexp.h"
 #include "term-info.h"
-#include "util/str.h"
+#include "util/string.h"
 
 static void close_on_exec(int fd)
 {

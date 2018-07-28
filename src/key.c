@@ -2,7 +2,7 @@
 #include <string.h>
 #include "key.h"
 #include "util/ascii.h"
-#include "util/str.h"
+#include "util/string.h"
 #include "util/uchar.h"
 
 // Note: these strings must be kept in sync with the enum in key.h

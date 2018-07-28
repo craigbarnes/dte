@@ -6,7 +6,7 @@
 #include "error.h"
 #include "regexp.h"
 #include "selection.h"
-#include "util/str.h"
+#include "util/string.h"
 #include "view.h"
 
 #define MAX_SUBSTRINGS 32

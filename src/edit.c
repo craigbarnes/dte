@@ -5,7 +5,7 @@
 #include "move.h"
 #include "regexp.h"
 #include "selection.h"
-#include "util/str.h"
+#include "util/string.h"
 #include "util/uchar.h"
 #include "view.h"
 

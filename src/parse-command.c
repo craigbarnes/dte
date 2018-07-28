@@ -4,7 +4,7 @@
 #include "env.h"
 #include "error.h"
 #include "util/ptr-array.h"
-#include "util/str.h"
+#include "util/string.h"
 #include "util/uchar.h"
 
 static String arg = STRING_INIT;

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "str.h"
+#include "string.h"
 #include "uchar.h"
 #include "../common.h"
 #include "../xmalloc.h"

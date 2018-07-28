@@ -11,7 +11,7 @@
 #include "tag.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
-#include "util/str.h"
+#include "util/string.h"
 
 static struct {
     // Part of string which is to be replaced
