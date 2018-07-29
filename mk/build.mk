@@ -130,9 +130,10 @@ build/script.o: build/script.cflags
 build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
-$(dte) $(test):
+$(dte) $(test): build/all.ldflags
 	$(E) LINK $@
-	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ \
+	     $(filter %.o, $^) $(LDLIBS)
 
 $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
@@ -141,6 +142,9 @@ $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
 	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
+
+build/all.ldflags: FORCE | build/
+	@$(OPTCHECK) '$(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) $(LDLIBS)' $@
 
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
