@@ -3,7 +3,7 @@
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
 [attr]dterc code
 
-.distinfo export-subst
+mk/version.sh export-subst
 .git* export-ignore
 .travis.yml export-ignore
 TODO.md export-ignore
