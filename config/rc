@@ -39,6 +39,12 @@ option c,css,d,go,java,javascript,lua,nginx,php,sh,vala brace-indent true
 # Override indent options for Makefiles, since they almost always require tabs
 option make indent-width 8 expand-tab false emulate-tab false
 
+# Use space indents in YAML files, since the language spec doesn't allow tabs
+option yaml \
+    expand-tab true \
+    emulate-tab true \
+    ws-error tab-indent,tab-after-indent,trailing,special
+
 # Patterns used to detect indent size when "auto-indent" option is enabled
 option c indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
 option java indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
