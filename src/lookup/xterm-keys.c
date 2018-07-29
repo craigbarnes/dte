@@ -168,31 +168,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
                 *k = KEY_F12;
                 goto check_trailing_tilde;
             case ';':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '2':
-                    *k = MOD_SHIFT | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '3':
-                    *k = MOD_META | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '4':
-                    *k = MOD_SHIFT | MOD_META | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '5':
-                    *k = MOD_CTRL | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '6':
-                    *k = MOD_SHIFT | MOD_CTRL | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '7':
-                    *k = MOD_META | MOD_CTRL | KEY_INSERT;
-                    goto check_trailing_tilde;
-                case '8':
-                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_INSERT;
+                if (i >= length) {
+                    return -1;
+                } else {
+                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+                    if (mods == 0) {
+                        return 0;
+                    }
+                    *k = mods | KEY_INSERT;
                     goto check_trailing_tilde;
                 }
-                return 0;
             case '~':
                 *k = KEY_INSERT;
                 return i;
@@ -202,31 +187,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case ';':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '2':
-                    *k = MOD_SHIFT | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '3':
-                    *k = MOD_META | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '4':
-                    *k = MOD_SHIFT | MOD_META | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '5':
-                    *k = MOD_CTRL | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '6':
-                    *k = MOD_SHIFT | MOD_CTRL | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '7':
-                    *k = MOD_META | MOD_CTRL | KEY_DELETE;
-                    goto check_trailing_tilde;
-                case '8':
-                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_DELETE;
+                if (i >= length) {
+                    return -1;
+                } else {
+                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+                    if (mods == 0) {
+                        return 0;
+                    }
+                    *k = mods | KEY_DELETE;
                     goto check_trailing_tilde;
                 }
-                return 0;
             case '~':
                 *k = KEY_DELETE;
                 return i;
@@ -239,31 +209,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case ';':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '2':
-                    *k = MOD_SHIFT | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '3':
-                    *k = MOD_META | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '4':
-                    *k = MOD_SHIFT | MOD_META | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '5':
-                    *k = MOD_CTRL | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '6':
-                    *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '7':
-                    *k = MOD_META | MOD_CTRL | KEY_PAGE_UP;
-                    goto check_trailing_tilde;
-                case '8':
-                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_UP;
+                if (i >= length) {
+                    return -1;
+                } else {
+                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+                    if (mods == 0) {
+                        return 0;
+                    }
+                    *k = mods | KEY_PAGE_UP;
                     goto check_trailing_tilde;
                 }
-                return 0;
             case '~':
                 *k = KEY_PAGE_UP;
                 return i;
@@ -273,31 +228,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case ';':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case '2':
-                    *k = MOD_SHIFT | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '3':
-                    *k = MOD_META | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '4':
-                    *k = MOD_SHIFT | MOD_META | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '5':
-                    *k = MOD_CTRL | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '6':
-                    *k = MOD_SHIFT | MOD_CTRL | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '7':
-                    *k = MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
-                    goto check_trailing_tilde;
-                case '8':
-                    *k = MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN;
+                if (i >= length) {
+                    return -1;
+                } else {
+                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+                    if (mods == 0) {
+                        return 0;
+                    }
+                    *k = mods | KEY_PAGE_DOWN;
                     goto check_trailing_tilde;
                 }
-                return 0;
             case '~':
                 *k = KEY_PAGE_DOWN;
                 return i;

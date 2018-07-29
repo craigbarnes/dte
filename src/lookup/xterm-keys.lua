@@ -62,32 +62,6 @@ local xterm_keys = {
     ["[[E"] = "KEY_F5",
 }
 
-local key_templates = {
-    ["[2;_~"] = "KEY_INSERT",
-    ["[3;_~"] = "KEY_DELETE",
-    ["[5;_~"] = "KEY_PAGE_UP",
-    ["[6;_~"] = "KEY_PAGE_DOWN",
-
-    -- The following templates could be used here, but are handled below
-    -- as a special case, for greater efficiency in the generated code:
-    -- ["[1;_A"] = "KEY_UP",
-    -- ["[1;_B"] = "KEY_DOWN",
-    -- ["[1;_C"] = "KEY_RIGHT",
-    -- ["[1;_D"] = "KEY_LEFT",
-    -- ["[1;_F"] = "KEY_END",
-    -- ["[1;_H"] = "KEY_HOME",
-}
-
-local modifiers = {
-    ["2"] = "MOD_SHIFT",
-    ["3"] = "MOD_META",
-    ["4"] = "MOD_SHIFT | MOD_META",
-    ["5"] = "MOD_CTRL",
-    ["6"] = "MOD_SHIFT | MOD_CTRL",
-    ["7"] = "MOD_META | MOD_CTRL",
-    ["8"] = "MOD_SHIFT | MOD_META | MOD_CTRL",
-}
-
 local bracket1_impl = [=[
 if (i >= length) {
     return -1;
@@ -122,20 +96,32 @@ if (i >= length) {
 return 0;
 ]=]
 
--- Expand key templates with modifiers and insert into xterm_keys table
-for template, key in pairs(key_templates) do
-    for num, mod in pairs(modifiers) do
-        local seq = assert(template:gsub("_", num))
-        xterm_keys[seq] = mod .. " | " .. key
+local template = [[
+if (i >= length) {
+    return -1;
+} else {
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    }
+    *k = mods | %s;
+    goto check_trailing_tilde;
+}
+]]
+
+local function make_generator_node(impl)
+    return function(buf, indent)
+        for line in impl:gmatch("[^\n]+") do
+            buf:write(indent, line, "\n")
+        end
     end
 end
 
--- Insert special function node for handling "[1;" sequences
-xterm_keys["[1;"] = function(buf, indent)
-    for line in bracket1_impl:gmatch("[^\n]+") do
-        buf:write(indent, line, "\n")
-    end
-end
+xterm_keys["[1;"] = make_generator_node(bracket1_impl)
+xterm_keys["[2;"] = make_generator_node(template:format("KEY_INSERT"))
+xterm_keys["[3;"] = make_generator_node(template:format("KEY_DELETE"))
+xterm_keys["[5;"] = make_generator_node(template:format("KEY_PAGE_UP"))
+xterm_keys["[6;"] = make_generator_node(template:format("KEY_PAGE_DOWN"))
 
 -- Build a trie structure from tables, indexed by numeric byte values
 local function make_trie(keys)
