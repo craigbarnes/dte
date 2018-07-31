@@ -110,19 +110,16 @@ void cmd_lua_file(const char* UNUSED_ARG(pf), char **args)
 
 void script_state_init(void) {}
 
-static void no_lua_error(const char *cmd)
-{
-    error_msg("%s: editor was built without Lua scripting support", cmd);
-}
+#define NO_LUA_MSG "editor was built without Lua scripting support"
 
 void cmd_lua(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    no_lua_error("lua");
+    error_msg("lua: " NO_LUA_MSG);
 }
 
 void cmd_lua_file(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    no_lua_error("lua-file");
+    error_msg("lua-file: " NO_LUA_MSG);
 }
 
 #endif
