@@ -3,17 +3,24 @@
 # This script filters output from "nm" to show the sizes of symbols
 # (in KiB) in an object file, sorted from largest to smallest.
 
-nm -Ptd ${@:-dte} | awk '
+if test ! -t 1; then
+    PAGER=cat
+fi
+
+${NM:-nm} -Ptd ${@:-dte} | sort -k4 -nr | awk '
 {
     name = $1
     type = $2
     size = $4
 
-    if (size < 128) {
+    if (size < 1) {
+        next
+    } else if (size < 10) {
+        printf(" %s %7d  %s\n", type, size, name)
         next
     }
 
-    ksize = sprintf("%.2f", $4 / 1024)
+    ksize = sprintf("%.2f", size / 1024)
     printf(" %s %6sK  %s\n", type, ksize, name)
 }
-' | sort -k2 -nr
+' | ${PAGER:-less}
