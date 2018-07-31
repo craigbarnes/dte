@@ -145,7 +145,7 @@ static void update_command_line(void)
     terminal.move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL:
-        print_message(error_buf, msg_is_error);
+        print_message(error_ptr, msg_is_error);
         break;
     case INPUT_SEARCH:
         prefix = current_search_direction() == SEARCH_FWD ? '/' : '?';

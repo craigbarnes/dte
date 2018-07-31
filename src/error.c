@@ -3,9 +3,10 @@
 #include "config.h"
 #include "editor.h"
 
+static char error_buf[256];
+const char *const error_ptr = error_buf;
 unsigned int nr_errors;
 bool msg_is_error;
-char error_buf[256];
 
 static Error *error_new(char *msg)
 {
@@ -52,7 +53,6 @@ void clear_error(void)
 
 void error_msg(const char *format, ...)
 {
-    va_list ap;
     size_t pos = 0;
 
     // Some implementations of *printf return -1 if output was truncated
@@ -76,6 +76,7 @@ void error_msg(const char *format, ...)
         }
     }
 
+    va_list ap;
     va_start(ap, format);
     vsnprintf(error_buf + pos, sizeof(error_buf) - pos, format, ap);
     va_end(ap);
@@ -92,7 +93,6 @@ void error_msg(const char *format, ...)
 void info_msg(const char *format, ...)
 {
     va_list ap;
-
     va_start(ap, format);
     vsnprintf(error_buf, sizeof(error_buf), format, ap);
     va_end(ap);
