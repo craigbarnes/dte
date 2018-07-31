@@ -3,11 +3,17 @@
 
 #ifdef USE_LUA
 
+#include <errno.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-#include "common.h"
 #include "edit.h"
+#include "util/macros.h"
 
 static lua_State *script_state;
 
@@ -30,18 +36,47 @@ static int luaopen_editor(lua_State *L)
     return 1;
 }
 
+static int os_setlocale(lua_State *L)
+{
+    // Locale should be set at editor startup and never touched again.
+    // It's almost always wrong for a library to call setlocale(3), so
+    // only broken Lua libraries will be affected by this.
+    return luaL_error(L, "setlocale() not allowed");
+}
+
+static void openlibs(lua_State *L) {
+    static const luaL_Reg libs[] = {
+        {"_G", luaopen_base},
+        {"package", luaopen_package},
+        {"coroutine", luaopen_coroutine},
+        {"table", luaopen_table},
+        {"io", luaopen_io},
+        {"string", luaopen_string},
+        {"math", luaopen_math},
+        {"utf8", luaopen_utf8},
+        {"editor", luaopen_editor},
+    };
+    for (size_t i = 0; i < ARRAY_COUNT(libs); i++) {
+        luaL_requiref(L, libs[i].name, libs[i].func, true);
+        lua_pop(L, 1);
+    }
+
+    luaL_requiref(L, "os", luaopen_io, true);
+    lua_pushliteral(L, "setlocale");
+    lua_pushcfunction(L, os_setlocale);
+    lua_rawset(L, -3);
+    lua_pop(L, 1);
+}
+
 void script_state_init(void)
 {
     lua_State *L = luaL_newstate();
     if (L == NULL) {
-        fputs("luaL_newstate() failed; insufficient memory\n", stderr);
+        errno = ENOMEM;
+        perror("luaL_newstate");
         exit(1);
     }
-    luaL_openlibs(L);
-    luaL_requiref(L, "editor", luaopen_editor, true);
-    BUG_ON(lua_gettop(L) != 1);
-    BUG_ON(!lua_istable(L, 1));
-    lua_pop(L, 1);
+    openlibs(L);
     script_state = L;
 }
 
