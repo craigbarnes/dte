@@ -4,6 +4,8 @@
 #include "editor.h"
 #include "error.h"
 #include "util/ptr-array.h"
+#include "util/strtonum.h"
+#include "util/xmalloc.h"
 
 IGNORE_WARNING("-Wunused-parameter")
 #include "lookup/attributes.c"

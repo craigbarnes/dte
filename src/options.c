@@ -7,6 +7,7 @@
 #include "filetype.h"
 #include "regexp.h"
 #include "screen.h"
+#include "util/strtonum.h"
 #include "view.h"
 #include "window.h"
 

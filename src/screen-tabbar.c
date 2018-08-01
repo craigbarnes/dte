@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "term-info.h"
 #include "term-write.h"
+#include "util/strtonum.h"
 #include "util/uchar.h"
 #include "view.h"
 

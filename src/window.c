@@ -6,6 +6,7 @@
 #include "lock.h"
 #include "move.h"
 #include "util/path.h"
+#include "util/strtonum.h"
 
 Window *window;
 

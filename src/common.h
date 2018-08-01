@@ -74,11 +74,6 @@ static inline NONNULL_ARGS bool str_has_suffix (
 size_t count_nl(const char *buf, size_t size);
 size_t count_strings(char **strings);
 void free_strings(char **strings);
-int number_width(long n) CONST_FN;
-bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp);
-bool parse_long(const char **strp, long *valp);
-bool str_to_long(const char *str, long *valp);
-bool str_to_int(const char *str, int *valp);
 char *xvsprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xsprintf(const char *format, ...) PRINTF(1) XMALLOC;
 ssize_t xread(int fd, void *buf, size_t count);

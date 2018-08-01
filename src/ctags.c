@@ -1,5 +1,8 @@
+#include <stdlib.h>
+#include <string.h>
 #include "ctags.h"
-#include "common.h"
+#include "util/strtonum.h"
+#include "util/xmalloc.h"
 
 static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 {
@@ -56,7 +59,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 
 static bool parse_line(Tag *t, const char *buf, size_t size)
 {
-    memzero(t);
+    *t = (Tag) {0};
     const char *end = memchr(buf, '\t', size);
     if (!end) {
         goto error;

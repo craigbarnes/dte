@@ -27,7 +27,7 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
-    ascii path ptr-array string string-view uchar unicode xmalloc ))
+    ascii path ptr-array string string-view strtonum uchar unicode xmalloc ))
 
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block block-iter buffer buffer-iter cconv change \

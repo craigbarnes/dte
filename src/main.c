@@ -1,7 +1,7 @@
-#include "editor.h"
 #include "alias.h"
 #include "color.h"
 #include "config.h"
+#include "editor.h"
 #include "error.h"
 #include "file-history.h"
 #include "frame.h"
@@ -13,6 +13,7 @@
 #include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
+#include "util/strtonum.h"
 #include "view.h"
 #include "window.h"
 

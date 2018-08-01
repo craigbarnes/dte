@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "term-read.h"
 #include "util/path.h"
+#include "util/strtonum.h"
 #include "view.h"
 #include "window.h"
 
