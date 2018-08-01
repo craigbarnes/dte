@@ -2,7 +2,7 @@ local util = {}
 
 local function usage(ucdname)
     local usage = "Usage: %s path/to/%s\n(available from: %s/%s)\n"
-    local baseurl = "https://www.unicode.org/Public/10.0.0/ucd"
+    local baseurl = "https://www.unicode.org/Public/11.0.0/ucd"
     io.stderr:write(usage:format(arg[0], ucdname, baseurl, ucdname))
 end
 
