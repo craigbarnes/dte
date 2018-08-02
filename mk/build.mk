@@ -128,7 +128,7 @@ endif
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
-build/builtin-config.h: build/builtin-config.list
+build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
 build/editor.o: build/version.h
 build/term-info.o: build/term-info.cflags
@@ -157,8 +157,8 @@ build/%.cflags: FORCE | build/
 build/version.h: FORCE | build/
 	@$(OPTCHECK) 'static const char version[] = "$(VERSION)";' $@
 
-build/builtin-config.list: FORCE | build/
-	@$(OPTCHECK) '$(BUILTIN_CONFIGS)' $@
+build/builtin-config.mk: FORCE | build/
+	@$(OPTCHECK) '$(@:.mk=.h): $(BUILTIN_CONFIGS)' $@
 
 build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
