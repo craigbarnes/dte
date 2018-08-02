@@ -5,8 +5,8 @@
 %compare-lengths
 %enum
 %define lookup-function-name filetype_from_interpreter
-%define word-array-name ft_interpreter_table
-%define hash-function-name ft_interpreter_hash
+%define word-array-name filetype_interpreter_table
+%define hash-function-name filetype_interpreter_hash
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;

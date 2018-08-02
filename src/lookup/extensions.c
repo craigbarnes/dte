@@ -6,7 +6,7 @@
 
 inline
 static unsigned int
-filename_extension_hash (register const char *str, register size_t len)
+filetype_extension_hash (register const char *str, register size_t len)
 {
   static const unsigned short asso_values[] =
     {
@@ -78,7 +78,7 @@ filetype_from_extension (register const char *str, register size_t len)
        9,  4,  5,  4,  3,  3,  2,  3,  3,  3,  2,  3,  1,  4,
        4,  2,  4,  3,  3,  3,  2,  3,  3,  2
     };
-  static const FileTypeHashSlot filename_extension_table[] =
+  static const FileTypeHashSlot filetype_extension_table[] =
     {
       {"m", OBJECTIVEC},
       {"3", ROFF},
@@ -280,7 +280,7 @@ filetype_from_extension (register const char *str, register size_t len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register unsigned int key = filename_extension_hash (str, len);
+      register unsigned int key = filetype_extension_hash (str, len);
 
       if (key <= MAX_HASH_VALUE)
         {
@@ -290,10 +290,10 @@ filetype_from_extension (register const char *str, register size_t len)
             {
               if (len == lengthtable[index])
                 {
-                  register const char *s = filename_extension_table[index].key;
+                  register const char *s = filetype_extension_table[index].key;
 
                   if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-                    return &filename_extension_table[index];
+                    return &filetype_extension_table[index];
                 }
             }
         }

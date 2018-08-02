@@ -6,7 +6,7 @@
 
 inline
 static unsigned int
-ft_basename_hash (register const char *str, register size_t len)
+filetype_basename_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -63,7 +63,7 @@ filetype_from_basename (register const char *str, register size_t len)
        0,  0,  0,  0,  0,  0, 11,  0,  0,  0,  0,  0,  0,  0,
        8,  0,  0, 14
     };
-  static const FileTypeHashSlot ft_basename_table[] =
+  static const FileTypeHashSlot filetype_basename_table[] =
     {
       {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
       {"cshrc", SHELL},
@@ -150,15 +150,15 @@ filetype_from_basename (register const char *str, register size_t len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register unsigned int key = ft_basename_hash (str, len);
+      register unsigned int key = filetype_basename_hash (str, len);
 
       if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
-            register const char *s = ft_basename_table[key].key;
+            register const char *s = filetype_basename_table[key].key;
 
             if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &ft_basename_table[key];
+              return &filetype_basename_table[key];
           }
     }
   return 0;

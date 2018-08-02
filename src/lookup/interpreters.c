@@ -6,7 +6,7 @@
 
 inline
 static unsigned int
-ft_interpreter_hash (register const char *str, register size_t len)
+filetype_interpreter_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -72,7 +72,7 @@ filetype_from_interpreter (register const char *str, register size_t len)
        3,  3,  4,  7,  5,  0,  0,  0,  6, 10,  0,  0,  0,  0,
        0,  0,  0,  0,  0,  4
     };
-  static const FileTypeHashSlot ft_interpreter_table[] =
+  static const FileTypeHashSlot filetype_interpreter_table[] =
     {
       {(char*)0,0}, {(char*)0,0}, {(char*)0,0},
       {"sh", SHELL},
@@ -130,15 +130,15 @@ filetype_from_interpreter (register const char *str, register size_t len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register unsigned int key = ft_interpreter_hash (str, len);
+      register unsigned int key = filetype_interpreter_hash (str, len);
 
       if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
-            register const char *s = ft_interpreter_table[key].key;
+            register const char *s = filetype_interpreter_table[key].key;
 
             if (s && *str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &ft_interpreter_table[key];
+              return &filetype_interpreter_table[key];
           }
     }
   return 0;

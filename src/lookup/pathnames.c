@@ -7,7 +7,7 @@
 inline
 /*ARGSUSED*/
 static unsigned int
-ft_pathname_hash (register const char *str, register size_t len)
+filetype_pathname_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -57,7 +57,7 @@ filetype_from_pathname (register const char *str, register size_t len)
     {
       10, 10, 19
     };
-  static const FileTypeHashSlot ft_pathname_table[] =
+  static const FileTypeHashSlot filetype_pathname_table[] =
     {
       {"/etc/hosts", CONFIG},
       {"/etc/fstab", CONFIG},
@@ -66,15 +66,15 @@ filetype_from_pathname (register const char *str, register size_t len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register unsigned int key = ft_pathname_hash (str, len);
+      register unsigned int key = filetype_pathname_hash (str, len);
 
       if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
-            register const char *s = ft_pathname_table[key].key;
+            register const char *s = filetype_pathname_table[key].key;
 
             if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &ft_pathname_table[key];
+              return &filetype_pathname_table[key];
           }
     }
   return 0;

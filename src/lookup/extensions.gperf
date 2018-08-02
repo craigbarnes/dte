@@ -5,8 +5,8 @@
 %compare-lengths
 %enum
 %define lookup-function-name filetype_from_extension
-%define word-array-name filename_extension_table
-%define hash-function-name filename_extension_hash
+%define word-array-name filetype_extension_table
+%define hash-function-name filetype_extension_hash
 %define initializer-suffix ,0
 %define slot-name key
 FileTypeHashSlot;
