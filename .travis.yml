@@ -3,6 +3,7 @@ sudo: false
 os: [linux, osx]
 compiler: [clang, gcc]
 script:
+    - git fetch --tags
     - make vars
     - make -j`mk/nproc.sh` check V=1
     - make install DESTDIR="$PWD/pkgdir"
