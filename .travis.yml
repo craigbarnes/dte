@@ -1,5 +1,6 @@
 language: c
 sudo: false
+git: {depth: false}
 os: [linux, osx]
 compiler: [clang, gcc]
 script:
