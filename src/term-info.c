@@ -39,12 +39,9 @@ static void term_cooked(void)
     tcsetattr(0, 0, &termios_save);
 }
 
-static void buf_put_clear_to_eol(void)
+static void ecma48_clear_to_eol(void)
 {
-    const char *seq = terminal.control_codes->clear_to_eol;
-    if (seq) {
-        buf_escape(seq);
-    }
+    buf_add_bytes("\033[K", 3);
 }
 
 static void ecma48_move_cursor(int x, int y)
@@ -177,13 +174,12 @@ TerminalInfo terminal = {
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key,
-    .put_clear_to_eol = &buf_put_clear_to_eol,
+    .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
     .control_codes = &(TermControlCodes) {
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
-        .clear_to_eol = "\033[K"
     }
 };
 
@@ -203,6 +199,14 @@ TerminalInfo terminal = {
     KEY(p "6", key | MOD_SHIFT | MOD_CTRL), \
     KEY(p "7", key | MOD_META | MOD_CTRL), \
     KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
+
+static struct {
+    const char *cup;
+    const char *el;
+    const char *setab;
+    const char *setaf;
+    const char *sgr;
+} terminfo;
 
 static struct TermKeyMap {
     const char *code;
@@ -306,23 +310,15 @@ static int tputs_putc(int ch)
 
 static void tputs_clear_to_eol(void)
 {
-    const char *seq = terminal.control_codes->clear_to_eol;
-    if (seq) {
-        tputs(seq, 1, tputs_putc);
+    if (terminfo.el) {
+        tputs(terminfo.el, 1, tputs_putc);
     }
 }
 
 static void tputs_move_cursor(int x, int y)
 {
-    static bool done_init;
-    static const char *cup;
-    if (!done_init) {
-        cup = curses_str_cap("cup");
-        done_init = true;
-    }
-
-    if (cup) {
-        const char *seq = tparm_2(cup, y, x);
+    if (terminfo.cup) {
+        const char *seq = tparm_2(terminfo.cup, y, x);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
@@ -342,22 +338,13 @@ static inline bool attr_is_set(const TermColor *color, unsigned short attr)
 
 static void tputs_set_color(const TermColor *color)
 {
-    static bool done_init;
-    static const char *sgr, *setaf, *setab;
-    if (!done_init) {
-        sgr = curses_str_cap("sgr");
-        setaf = curses_str_cap("setaf");
-        setab = curses_str_cap("setab");
-        done_init = true;
-    }
-
     if (same_color(color, &obuf.color)) {
         return;
     }
 
-    if (sgr) {
+    if (terminfo.sgr) {
         const char *attrs = tparm (
-            sgr,
+            terminfo.sgr,
             0, // p1 = "standout" (unused)
             attr_is_set(color, ATTR_UNDERLINE),
             attr_is_set(color, ATTR_REVERSE),
@@ -374,14 +361,14 @@ static void tputs_set_color(const TermColor *color)
     // TODO: convert colors outside supported range to closest supported color
 
     TermColor c = *color;
-    if (setaf && c.fg >= 0) {
-        const char *seq = tparm_1(setaf, c.fg);
+    if (terminfo.setaf && c.fg >= 0) {
+        const char *seq = tparm_1(terminfo.setaf, c.fg);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
     }
-    if (setab && c.bg >= 0) {
-        const char *seq = tparm_1(setab, c.bg);
+    if (terminfo.setab && c.bg >= 0) {
+        const char *seq = tparm_1(terminfo.setab, c.bg);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
@@ -395,9 +382,15 @@ static void term_init_terminfo(const char *term)
     setupterm(term, 1, (int*)0);
 
     terminal.parse_key_sequence = &parse_key_from_keymap;
-    terminal.put_clear_to_eol = &tputs_clear_to_eol;
+    terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
+
+    terminfo.cup = curses_str_cap("cup");
+    terminfo.el = curses_str_cap("el");
+    terminfo.setab = curses_str_cap("setab");
+    terminfo.setaf = curses_str_cap("setaf");
+    terminfo.sgr = curses_str_cap("sgr");
 
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
@@ -422,7 +415,6 @@ static void term_init_terminfo(const char *term)
     tcc = (TermControlCodes) {
         .reset_colors = curses_str_cap("op"),
         .reset_attrs = curses_str_cap("sgr0"),
-        .clear_to_eol = curses_str_cap("el"),
         .keypad_off = curses_str_cap("rmkx"),
         .keypad_on = curses_str_cap("smkx"),
         .cup_mode_off = curses_str_cap("rmcup"),
@@ -454,14 +446,13 @@ static const TerminalInfo terminal_xterm = {
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &parse_xterm_key,
-    .put_clear_to_eol = &buf_put_clear_to_eol,
+    .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
-        .clear_to_eol = "\033[K",
         .keypad_off = "\033[?1l\033>",
         .keypad_on = "\033[?1h\033=",
         .cup_mode_off = "\033[?1049l",

@@ -115,10 +115,9 @@ void buf_clear_eol(void)
     if (obuf.x < obuf.scroll_x + obuf.width) {
         if (
             obuf.can_clear
-            && terminal.control_codes->clear_to_eol
             && (obuf.color.bg < 0 || terminal.back_color_erase)
         ) {
-            terminal.put_clear_to_eol();
+            terminal.clear_to_eol();
             obuf.x = obuf.scroll_x + obuf.width;
         } else {
             buf_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);

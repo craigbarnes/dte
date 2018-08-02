@@ -11,7 +11,6 @@ typedef struct {
     const char *deinit;
     const char *reset_colors;
     const char *reset_attrs;
-    const char *clear_to_eol;
     const char *keypad_off;
     const char *keypad_on;
     const char *cup_mode_off;
@@ -32,7 +31,7 @@ typedef struct {
     unsigned short ncv_attributes;
     TermControlCodes *control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
-    void (*put_clear_to_eol)(void);
+    void (*clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);
     void (*raw)(void);
