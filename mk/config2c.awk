@@ -1,11 +1,17 @@
 #!/usr/bin/awk -f
 
 function escape_ident(s) {
-    gsub(/[+\/-]/, "_", s)
+    gsub(/[+\/.-]/, "_", s)
     return s
 }
 
 function escape_string(s) {
+    gsub(/\\/, "\\134", s)
+    gsub(/"/, "\\042", s)
+    return s
+}
+
+function escape_syntax(s) {
     gsub(/^ +/, "", s)
     gsub(/\\/, "\\134", s)
     gsub(/"/, "\\042", s)
@@ -30,6 +36,11 @@ FNR == 1 {
 
 /^# *(TODO|FIXME)/ {
     print "\"\\n\""
+    next
+}
+
+name ~ /syntax\// {
+    print "\"" escape_syntax($0) "\\n\""
     next
 }
 

@@ -8,6 +8,7 @@
 #include "history.h"
 #include "move.h"
 #include "screen.h"
+#include "script.h"
 #include "search.h"
 #include "syntax.h"
 #include "term-info.h"
@@ -255,6 +256,7 @@ int main(int argc, char *argv[])
     save_term_title();
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    run_builtin_script("=rc.lua");
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create

@@ -46,6 +46,12 @@ test_objects := $(addprefix build/test/, $(addsuffix .o, \
 
 all_objects := $(editor_objects) $(test_objects)
 
+ifeq "$(USE_LUA)" "static"
+  BUILTIN_CONFIGS += config/rc.lua
+else ifeq "$(USE_LUA)" "dynamic"
+  BUILTIN_CONFIGS += config/rc.lua
+endif
+
 ifdef WERROR
   WARNINGS += -Werror
 endif
