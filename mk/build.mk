@@ -130,10 +130,9 @@ $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 build/builtin-config.h: build/builtin-config.list
 build/config.o: build/builtin-config.h
+build/editor.o: build/version.h
 build/term-info.o: build/term-info.cflags
-build/editor.o: build/editor.cflags
 build/script.o: build/script.cflags
-build/editor.o: BASIC_CFLAGS += -DVERSION=\"$(VERSION)\"
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
 $(dte) $(test): build/all.ldflags
@@ -154,6 +153,9 @@ build/all.ldflags: FORCE | build/
 
 build/%.cflags: FORCE | build/
 	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+
+build/version.h: FORCE | build/
+	@$(OPTCHECK) 'static const char version[] = "$(VERSION)";' $@
 
 build/builtin-config.list: FORCE | build/
 	@$(OPTCHECK) '$(BUILTIN_CONFIGS)' $@

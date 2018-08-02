@@ -13,6 +13,7 @@
 #include "term-write.h"
 #include "view.h"
 #include "window.h"
+#include "../build/version.h"
 
 static volatile sig_atomic_t terminal_resized;
 
@@ -28,7 +29,7 @@ EditorState editor = {
     .everything_changed = false,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
-    .version = VERSION,
+    .version = version,
     .cmdline_x = 0,
     .cmdline = {
         .buf = STRING_INIT,

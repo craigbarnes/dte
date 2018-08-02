@@ -42,7 +42,7 @@ typedef struct {
     int cmdline_x;
     PointerArray search_history;
     PointerArray command_history;
-    const char *version;
+    const char *const version;
 } EditorState;
 
 extern EditorState editor;
