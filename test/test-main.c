@@ -155,21 +155,42 @@ static void test_parse_xterm_key(void)
         {"\033O", -1, 0},
         {"\033[\033", 0, 0},
         {"\033[A", 3, KEY_UP},
+        {"\033[B", 3, KEY_DOWN},
+        {"\033[C", 3, KEY_RIGHT},
+        {"\033[D", 3, KEY_LEFT},
         {"\033[F", 3, KEY_END},
         {"\033[H", 3, KEY_HOME},
         {"\033[L", 3, KEY_INSERT},
         {"\033[1~", 4, KEY_HOME},
         {"\033[5~", 4, KEY_PAGE_UP},
         {"\033[6~", 4, KEY_PAGE_DOWN},
+        {"\033O ", 3, ' '},
+        {"\033OA", 3, KEY_UP},
+        {"\033OB", 3, KEY_DOWN},
+        {"\033OC", 3, KEY_RIGHT},
         {"\033OD", 3, KEY_LEFT},
         {"\033OF", 3, KEY_END},
         {"\033OH", 3, KEY_HOME},
+        {"\033OI", 3, '\t'},
+        {"\033OM", 3, '\r'},
         {"\033OP", 3, KEY_F1},
         {"\033OQ", 3, KEY_F2},
         {"\033OR", 3, KEY_F3},
         {"\033OS", 3, KEY_F4},
+        {"\033Oj", 3, '*'},
+        {"\033Ok", 3, '+'},
+        {"\033Om", 3, '-'},
+        {"\033Oo", 3, '/'},
+        {"\033[11~", 5, KEY_F1},
+        {"\033[12~", 5, KEY_F2},
+        {"\033[13~", 5, KEY_F3},
+        {"\033[14~", 5, KEY_F4},
         {"\033[15~", 5, KEY_F5},
         {"\033[17~", 5, KEY_F6},
+        {"\033[18~", 5, KEY_F7},
+        {"\033[19~", 5, KEY_F8},
+        {"\033[20~", 5, KEY_F9},
+        {"\033[21~", 5, KEY_F10},
         {"\033[23~", 5, KEY_F11},
         {"\033[24~", 5, KEY_F12},
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
@@ -183,6 +204,50 @@ static void test_parse_xterm_key(void)
         IEXPECT_EQ(length, tests[i].expected_length, i, "lengths");
         if (length > 0) {
             IEXPECT_EQ(key, tests[i].expected_key, i, "keys");
+        }
+    }
+}
+
+static void test_parse_xterm_key_combo(void)
+{
+    static const struct {
+        char escape_sequence[8];
+        KeyCode key;
+    } templates[] = {
+        {"\033[1;_A", KEY_UP},
+        {"\033[1;_B", KEY_DOWN},
+        {"\033[1;_C", KEY_RIGHT},
+        {"\033[1;_D", KEY_LEFT},
+        {"\033[1;_F", KEY_END},
+        {"\033[1;_H", KEY_HOME},
+        {"\033[2;_~", KEY_INSERT},
+        {"\033[3;_~", KEY_DELETE},
+        {"\033[5;_~", KEY_PAGE_UP},
+        {"\033[6;_~", KEY_PAGE_DOWN}
+    };
+
+    static const struct {
+        char ch;
+        KeyCode mask;
+    } modifiers[] = {
+        {'2', MOD_SHIFT},
+        {'3', MOD_META},
+        {'4', MOD_SHIFT | MOD_META},
+        {'5', MOD_CTRL},
+        {'6', MOD_SHIFT | MOD_CTRL},
+        {'7', MOD_META | MOD_CTRL},
+        {'8', MOD_SHIFT | MOD_META | MOD_CTRL}
+    };
+
+    FOR_EACH_I(i, templates) {
+        FOR_EACH_I(j, modifiers) {
+            char seq[8];
+            memcpy(seq, templates[i].escape_sequence, 8);
+            seq[4] = modifiers[j].ch;
+            KeyCode key;
+            ssize_t length = parse_xterm_key(seq, 6, &key);
+            EXPECT_EQ(length, 6);
+            EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
         }
     }
 }
@@ -223,6 +288,7 @@ int main(void)
     test_find_ft_filename();
     test_find_ft_firstline();
     test_parse_xterm_key();
+    test_parse_xterm_key_combo();
     test_commands_sort();
 
     test_util_ascii();
