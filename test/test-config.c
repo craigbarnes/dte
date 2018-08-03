@@ -10,6 +10,7 @@
 #include "../build/test/test-config.h"
 
 static const StringView extra_rc = STRING_VIEW (
+    "set lock-files false\n"
     // Regression test for unquoted variables in rc files
     "bind M-p \"insert \"$WORD\n"
     "bind M-p \"insert \"$FILE\n"
