@@ -104,49 +104,17 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
                 *k = KEY_F4;
                 goto check_trailing_tilde;
             case '5':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F5;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F5;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F5;
+                goto check_delim;
             case '7':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F6;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F6;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F6;
+                goto check_delim;
             case '8':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F7;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F7;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F7;
+                goto check_delim;
             case '9':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F8;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F8;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F8;
+                goto check_delim;
             case ';':
                 if (i >= length) {
                     return -1;
@@ -200,49 +168,17 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case '0':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F9;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F9;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F9;
+                goto check_delim;
             case '1':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F10;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F10;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F10;
+                goto check_delim;
             case '3':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F11;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F11;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F11;
+                goto check_delim;
             case '4':
-                if (i >= length) return -1;
-                switch(buf[i++]) {
-                case ';':
-                    *k = KEY_F12;
-                    goto check_modifiers;
-                case '~':
-                    *k = KEY_F12;
-                    return i;
-                }
-                return 0;
+                *k = KEY_F12;
+                goto check_delim;
             case ';':
                 *k = KEY_INSERT;
                 goto check_modifiers;
@@ -252,41 +188,17 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             }
             return 0;
         case '3':
-            if (i >= length) return -1;
-            switch(buf[i++]) {
-            case ';':
-                *k = KEY_DELETE;
-                goto check_modifiers;
-            case '~':
-                *k = KEY_DELETE;
-                return i;
-            }
-            return 0;
+            *k = KEY_DELETE;
+            goto check_delim;
         case '4':
             *k = KEY_END;
             goto check_trailing_tilde;
         case '5':
-            if (i >= length) return -1;
-            switch(buf[i++]) {
-            case ';':
-                *k = KEY_PAGE_UP;
-                goto check_modifiers;
-            case '~':
-                *k = KEY_PAGE_UP;
-                return i;
-            }
-            return 0;
+            *k = KEY_PAGE_UP;
+            goto check_delim;
         case '6':
-            if (i >= length) return -1;
-            switch(buf[i++]) {
-            case ';':
-                *k = KEY_PAGE_DOWN;
-                goto check_modifiers;
-            case '~':
-                *k = KEY_PAGE_DOWN;
-                return i;
-            }
-            return 0;
+            *k = KEY_PAGE_DOWN;
+            goto check_delim;
         case 'A':
             *k = KEY_UP;
             return i;
@@ -335,6 +247,15 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
         return 0;
     }
     return 0;
+check_delim:
+    if (i >= length) return -1;
+    switch(buf[i++]) {
+    case ';':
+        goto check_modifiers;
+    case '~':
+        return i;
+    }
+    return 0;
 check_modifiers:
     if (i >= length) {
         return -1;
@@ -344,7 +265,6 @@ check_modifiers:
         return 0;
     }
     *k |= mods;
-
 check_trailing_tilde:
     if (i >= length) {
         return -1;

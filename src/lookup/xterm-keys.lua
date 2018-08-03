@@ -6,9 +6,9 @@ local function make_generator_node(impl)
     end
 end
 
-local function template_gen(key)
-    local template = "*k = %s;\ngoto check_modifiers;\n"
-    return make_generator_node(template:format(key))
+local function set_key_and_goto(key, label)
+    local template = "*k = %s;\ngoto %s;\n"
+    return make_generator_node(template:format(key, label))
 end
 
 local xterm_keys = {
@@ -24,10 +24,7 @@ local xterm_keys = {
 
     ["[1~"] = "KEY_HOME",
     ["[2~"] = "KEY_INSERT",
-    ["[3~"] = "KEY_DELETE",
     ["[4~"] = "KEY_END",
-    ["[5~"] = "KEY_PAGE_UP",
-    ["[6~"] = "KEY_PAGE_DOWN",
 
     -- These 4 sequences are "deprecated" in xterm, even though they
     -- were used by default in older releases. They are still used by
@@ -37,15 +34,6 @@ local xterm_keys = {
     ["[12~"] = "KEY_F2",
     ["[13~"] = "KEY_F3",
     ["[14~"] = "KEY_F4",
-
-    ["[15~"] = "KEY_F5",
-    ["[17~"] = "KEY_F6",
-    ["[18~"] = "KEY_F7",
-    ["[19~"] = "KEY_F8",
-    ["[20~"] = "KEY_F9",
-    ["[21~"] = "KEY_F10",
-    ["[23~"] = "KEY_F11",
-    ["[24~"] = "KEY_F12",
 
     -- SS3
     ["OA"] = "KEY_UP",
@@ -75,18 +63,18 @@ local xterm_keys = {
     ["[[E"] = "KEY_F5",
 
     -- Generators for Ctrl/Meta/Shift key combinations
-    ["[2;"] = template_gen("KEY_INSERT"),
-    ["[3;"] = template_gen("KEY_DELETE"),
-    ["[5;"] = template_gen("KEY_PAGE_UP"),
-    ["[6;"] = template_gen("KEY_PAGE_DOWN"),
-    ["[15;"] = template_gen("KEY_F5"),
-    ["[17;"] = template_gen("KEY_F6"),
-    ["[18;"] = template_gen("KEY_F7"),
-    ["[19;"] = template_gen("KEY_F8"),
-    ["[20;"] = template_gen("KEY_F9"),
-    ["[21;"] = template_gen("KEY_F10"),
-    ["[23;"] = template_gen("KEY_F11"),
-    ["[24;"] = template_gen("KEY_F12"),
+    ["[2;"] = set_key_and_goto("KEY_INSERT", "check_modifiers"),
+    ["[3"] = set_key_and_goto("KEY_DELETE", "check_delim"),
+    ["[5"] = set_key_and_goto("KEY_PAGE_UP", "check_delim"),
+    ["[6"] = set_key_and_goto("KEY_PAGE_DOWN", "check_delim"),
+    ["[15"] = set_key_and_goto("KEY_F5", "check_delim"),
+    ["[17"] = set_key_and_goto("KEY_F6", "check_delim"),
+    ["[18"] = set_key_and_goto("KEY_F7", "check_delim"),
+    ["[19"] = set_key_and_goto("KEY_F8", "check_delim"),
+    ["[20"] = set_key_and_goto("KEY_F9", "check_delim"),
+    ["[21"] = set_key_and_goto("KEY_F10", "check_delim"),
+    ["[23"] = set_key_and_goto("KEY_F11", "check_delim"),
+    ["[24"] = set_key_and_goto("KEY_F12", "check_delim"),
 }
 
 xterm_keys["[1;"] = make_generator_node [=[
@@ -260,6 +248,15 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
 write_trie(xterm_trie, output)
 
 output:write [[
+check_delim:
+    if (i >= length) return -1;
+    switch(buf[i++]) {
+    case ';':
+        goto check_modifiers;
+    case '~':
+        return i;
+    }
+    return 0;
 check_modifiers:
     if (i >= length) {
         return -1;
@@ -269,7 +266,6 @@ check_modifiers:
         return 0;
     }
     *k |= mods;
-
 check_trailing_tilde:
     if (i >= length) {
         return -1;
