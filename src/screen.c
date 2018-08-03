@@ -166,28 +166,9 @@ void print_message(const char *msg, bool is_error)
     }
 }
 
-void save_term_title(void)
-{
-    const char *code = terminal.control_codes->save_title;
-    if (code) {
-        buf_escape(code);
-    }
-}
-
-void restore_term_title(void)
-{
-    const char *code = terminal.control_codes->restore_title;
-    if (code) {
-        buf_escape(code);
-    }
-}
-
 void update_term_title(Buffer *b)
 {
-    const char *code_prefix = terminal.control_codes->set_title_begin;
-    const char *code_suffix = terminal.control_codes->set_title_end;
-
-    if (!code_prefix || !code_suffix || !editor.options.set_window_title) {
+    if (!terminal.set_title || !editor.options.set_window_title) {
         return;
     }
 
@@ -201,9 +182,7 @@ void update_term_title(Buffer *b)
         buffer_modified(b) ? '+' : '-'
     );
 
-    buf_escape(code_prefix);
-    buf_escape(title);
-    buf_escape(code_suffix);
+    terminal.set_title(title);
 }
 
 void mask_color(TermColor *color, const TermColor *over)

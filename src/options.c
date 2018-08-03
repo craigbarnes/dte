@@ -7,6 +7,7 @@
 #include "filetype.h"
 #include "regexp.h"
 #include "screen.h"
+#include "term-info.h"
 #include "util/strtonum.h"
 #include "view.h"
 #include "window.h"
@@ -133,9 +134,9 @@ static void set_window_title_changed(void)
         if (editor.status == EDITOR_RUNNING) {
             update_term_title(window->view->buffer);
         }
-    } else {
-        restore_term_title();
-        save_term_title();
+    } else if (terminal.restore_title && terminal.save_title) {
+        terminal.restore_title();
+        terminal.save_title();
     }
 }
 

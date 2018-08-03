@@ -145,7 +145,7 @@ void term_cleanup(void)
         return;
     }
     if (!editor.child_controls_terminal) {
-        ui_end();
+        editor.ui_end();
     }
     const char *const deinit = terminal.control_codes->deinit;
     if (deinit) {

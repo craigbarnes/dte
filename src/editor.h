@@ -43,6 +43,8 @@ typedef struct {
     PointerArray search_history;
     PointerArray command_history;
     const char *const version;
+    void (*resize)(void);
+    void (*ui_end)(void);
 } EditorState;
 
 extern EditorState editor;
@@ -59,8 +61,6 @@ void set_input_mode(InputMode mode);
 void any_key(void);
 void normal_update(void);
 void handle_sigwinch(int signum);
-void resize(void);
-void ui_end(void);
 void suspend(void);
 void set_signal_handler(int signum, void (*handler)(int signum));
 void main_loop(void);

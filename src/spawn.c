@@ -396,7 +396,7 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
 
     if (!quiet) {
         editor.child_controls_terminal = true;
-        ui_end();
+        editor.ui_end();
     }
 
     const pid_t pid = fork_exec(args, fd);
@@ -416,7 +416,7 @@ void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
         if (prompt) {
             any_key();
         }
-        resize();
+        editor.resize();
         editor.child_controls_terminal = false;
     }
     close(p[0]);
@@ -452,7 +452,7 @@ void spawn(char **args, int fd[3], bool prompt)
     const bool quiet = (redir_count == 3);
     if (!quiet) {
         editor.child_controls_terminal = true;
-        ui_end();
+        editor.ui_end();
     }
 
     const pid_t pid = fork_exec(args, fd);
@@ -467,7 +467,7 @@ void spawn(char **args, int fd[3], bool prompt)
         if (prompt) {
             any_key();
         }
-        resize();
+        editor.resize();
         editor.child_controls_terminal = false;
     }
     if (dev_null >= 0) {

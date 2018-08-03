@@ -17,10 +17,6 @@ typedef struct {
     const char *cup_mode_on;
     const char *show_cursor;
     const char *hide_cursor;
-    const char *save_title;
-    const char *restore_title;
-    const char *set_title_begin;
-    const char *set_title_end;
 } TermControlCodes;
 
 typedef struct {
@@ -36,6 +32,9 @@ typedef struct {
     void (*move_cursor)(int x, int y);
     void (*raw)(void);
     void (*cooked)(void);
+    void (*save_title)(void);
+    void (*restore_title)(void);
+    void (*set_title)(const char *title);
 } TerminalInfo;
 
 extern TerminalInfo terminal;

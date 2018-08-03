@@ -22,6 +22,9 @@ extern const EditorModeOps command_mode_ops;
 extern const EditorModeOps search_mode_ops;
 extern const EditorModeOps git_open_ops;
 
+static void resize(void);
+static void ui_end(void);
+
 EditorState editor = {
     .status = EDITOR_INITIALIZING,
     .input_mode = INPUT_NORMAL,
@@ -31,6 +34,8 @@ EditorState editor = {
     .command_history = PTR_ARRAY_INIT,
     .version = version,
     .cmdline_x = 0,
+    .resize = resize,
+    .ui_end = ui_end,
     .cmdline = {
         .buf = STRING_INIT,
         .pos = 0,
@@ -285,7 +290,7 @@ void handle_sigwinch(int UNUSED_ARG(signum))
     terminal_resized = true;
 }
 
-void resize(void)
+static void resize(void)
 {
     terminal_resized = false;
     update_screen_size();
@@ -303,7 +308,7 @@ void resize(void)
     editor.mode_ops[editor.input_mode]->update();
 }
 
-void ui_end(void)
+static void ui_end(void)
 {
     if (terminal.control_codes->reset_colors) {
         buf_escape(terminal.control_codes->reset_colors);

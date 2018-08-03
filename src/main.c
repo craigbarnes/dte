@@ -30,7 +30,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
         && editor.status != EDITOR_INITIALIZING
     ) {
         terminal.raw();
-        resize();
+        editor.resize();
     }
 }
 
@@ -253,7 +253,10 @@ int main(int argc, char *argv[])
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
 
-    save_term_title();
+    if (terminal.save_title) {
+        terminal.save_title();
+    }
+
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
     run_builtin_script("=rc.lua");
@@ -342,7 +345,7 @@ int main(int argc, char *argv[])
     set_view(window->views.ptrs[0]);
 
     if (command || tag) {
-        resize();
+        editor.resize();
     }
 
     if (command) {
@@ -374,10 +377,12 @@ int main(int argc, char *argv[])
         buf_escape(terminal.control_codes->init);
     }
 
-    resize();
+    editor.resize();
     main_loop();
-    restore_term_title();
-    ui_end();
+    if (terminal.restore_title) {
+        terminal.restore_title();
+    }
+    editor.ui_end();
 
     if (terminal.control_codes->deinit) {
         buf_escape(terminal.control_codes->deinit);

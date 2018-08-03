@@ -167,6 +167,9 @@ static void xterm_set_color(const TermColor *const color)
     obuf.color = *color;
 }
 
+static void no_op(void) {}
+static void no_op_s(const char* UNUSED_ARG(s)) {}
+
 TerminalInfo terminal = {
     .max_colors = 8,
     .width = 80,
@@ -177,6 +180,9 @@ TerminalInfo terminal = {
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
+    .save_title = &no_op,
+    .restore_title = &no_op,
+    .set_title = &no_op_s,
     .control_codes = &(TermControlCodes) {
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
@@ -438,6 +444,23 @@ static void term_init_terminfo(const char *term)
 
 #endif // ifndef TERMINFO_DISABLE
 
+static void xterm_save_title(void)
+{
+    buf_add_bytes("\033[22;2t", 7);
+}
+
+static void xterm_restore_title(void)
+{
+    buf_add_bytes("\033[23;2t", 7);
+}
+
+static void xterm_set_title(const char *title)
+{
+    buf_add_bytes("\033]2;", 4);
+    buf_escape(title);
+    buf_add_ch('\007');
+}
+
 static const TerminalInfo terminal_xterm = {
     .back_color_erase = true,
     .max_colors = 8,
@@ -449,6 +472,9 @@ static const TerminalInfo terminal_xterm = {
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,
+    .save_title = &xterm_save_title,
+    .restore_title = &xterm_restore_title,
+    .set_title = &xterm_set_title,
     .control_codes = &(TermControlCodes) {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .reset_colors = "\033[39;49m",
@@ -459,10 +485,6 @@ static const TerminalInfo terminal_xterm = {
         .cup_mode_on = "\033[?1049h",
         .hide_cursor = "\033[?25l",
         .show_cursor = "\033[?25h",
-        .save_title = "\033[22;2t",
-        .restore_title = "\033[23;2t",
-        .set_title_begin = "\033]2;",
-        .set_title_end = "\007",
     }
 };
 
