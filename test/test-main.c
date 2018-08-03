@@ -3,10 +3,15 @@
 #include "test.h"
 #include "../src/command.h"
 #include "../src/editor.h"
-#include "../src/util/path.h"
 #include "../src/encoding.h"
 #include "../src/filetype.h"
 #include "../src/lookup/xterm-keys.c"
+#include "../src/util/path.h"
+
+void test_util_ascii(void);
+void test_key_to_string(void);
+void init_headless_mode(void);
+void test_exec_config(void);
 
 unsigned int failed;
 
@@ -209,9 +214,6 @@ static void test_commands_sort(void)
     free(commands_copy);
 }
 
-void test_util_ascii(void);
-void test_key_to_string(void);
-
 int main(void)
 {
     init_editor_state();
@@ -225,6 +227,9 @@ int main(void)
 
     test_util_ascii();
     test_key_to_string();
+
+    init_headless_mode();
+    test_exec_config();
 
     return failed ? 1 : 0;
 }

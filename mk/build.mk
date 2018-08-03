@@ -26,6 +26,9 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix color/, reset dark light light256 darkgray) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
+TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
+    thai fuzz1 ))
+
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
     ascii path ptr-array string string-view strtonum uchar unicode xmalloc ))
 
@@ -42,7 +45,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
-    test-main test-key test-util ))
+    test-main test-config test-key test-util ))
 
 all_objects := $(editor_objects) $(test_objects)
 
@@ -130,6 +133,7 @@ $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
+build/test/test-config.o: build/test/test-config.h
 build/editor.o: build/version.h
 build/term-info.o: build/term-info.cflags
 build/script.o: build/script.cflags
@@ -163,6 +167,10 @@ build/builtin-config.mk: FORCE | build/
 build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
+
+build/test/test-config.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
+	$(E) GEN $@
+	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
 build/util/ build/test/: | build/
 	$(Q) mkdir -p $@
