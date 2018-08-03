@@ -19,10 +19,10 @@
   #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #endif
 
-#if DEBUG <= 1
-  static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
-#else
+#ifdef DEBUG_PRINT
   #define d_print(...) debug_print(__func__, __VA_ARGS__)
+#else
+  static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
 #define STRINGIFY(a) #a

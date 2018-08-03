@@ -104,7 +104,6 @@ ifdef USE_SANITIZER
 else
   # 0: Disable debugging
   # 1: Enable BUG_ON() and light-weight sanity checks
-  # 2: Enable logging to $(DTE_HOME)/debug.log
   # 3: Enable expensive sanity checks
   DEBUG = 1
 endif
