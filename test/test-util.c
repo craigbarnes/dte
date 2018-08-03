@@ -46,7 +46,7 @@ void test_util_ascii(void)
     EXPECT_EQ(hex_decode('~'), -1);
 }
 
-void test_number_width(void)
+void test_util_number_width(void)
 {
     EXPECT_EQ(number_width(0), 1);
     EXPECT_EQ(number_width(-1), 2);

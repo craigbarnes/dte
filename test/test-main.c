@@ -9,7 +9,7 @@
 #include "../src/util/path.h"
 
 void test_util_ascii(void);
-void test_util_numberwidth(void);
+void test_util_number_width(void);
 void test_key_to_string(void);
 void init_headless_mode(void);
 void test_exec_config(void);
@@ -353,6 +353,7 @@ int main(void)
     test_commands_sort();
 
     test_util_ascii();
+    test_util_number_width();
     test_key_to_string();
 
     init_headless_mode();
