@@ -1,5 +1,5 @@
 include -b binding/default
-include -b color/dark
+include -b color/default
 include -b compiler/gcc
 include -b compiler/go
 

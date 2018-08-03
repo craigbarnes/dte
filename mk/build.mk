@@ -23,7 +23,7 @@ BUILTIN_SYNTAX_FILES := \
 BUILTIN_CONFIGS := $(addprefix config/, \
     rc compiler/gcc compiler/go \
     binding/default binding/shift-select \
-    $(addprefix color/, reset dark light light256 darkgray) \
+    $(addprefix color/, reset default light light256 darkgray) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
