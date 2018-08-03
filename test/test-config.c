@@ -19,11 +19,12 @@ static void no_op(void) {}
 
 void init_headless_mode(void)
 {
+    static TermControlCodes tcc;
+    terminal.control_codes = &tcc;
+    terminal.cooked = &no_op;
+    terminal.raw = &no_op;
     editor.resize = &no_op;
     editor.ui_end = &no_op;
-    terminal.raw = &no_op;
-    terminal.cooked = &no_op;
-    terminal.control_codes = &(TermControlCodes) {0};
 
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
