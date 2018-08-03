@@ -1,6 +1,7 @@
 #include "test.h"
 #include "../src/util/ascii.h"
 #include "../src/util/strtonum.h"
+#include "../src/util/uchar.h"
 #include "../src/util/unicode.h"
 
 static void test_ascii(void)
@@ -105,6 +106,17 @@ static void test_u_is_upper(void)
     EXPECT_EQ(u_is_upper('0'), false);
 }
 
+static void test_u_str_width(void)
+{
+    EXPECT_EQ(u_str_width("foo"), 3);
+    EXPECT_EQ (
+        7, u_str_width (
+            "\xE0\xB8\x81\xE0\xB8\xB3\xE0\xB9\x81\xE0\xB8\x9E\xE0\xB8"
+            "\x87\xE0\xB8\xA1\xE0\xB8\xB5\xE0\xB8\xAB\xE0\xB8\xB9"
+        )
+    );
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -112,4 +124,5 @@ void test_util(void)
     test_u_char_width();
     test_u_to_lower();
     test_u_is_upper();
+    test_u_str_width();
 }
