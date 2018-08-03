@@ -1,3 +1,28 @@
+local template = [[
+if (i >= length) {
+    return -1;
+} else {
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    }
+    *k = mods | %s;
+    goto check_trailing_tilde;
+}
+]]
+
+local function make_generator_node(impl)
+    return function(buf, indent)
+        for line in impl:gmatch("[^\n]+") do
+            buf:write(indent, line, "\n")
+        end
+    end
+end
+
+local function template_gen(key)
+    return make_generator_node(template:format(key))
+end
+
 local xterm_keys = {
     -- CSI
     ["[A"] = "KEY_UP",
@@ -60,9 +85,23 @@ local xterm_keys = {
     ["[[C"] = "KEY_F3",
     ["[[D"] = "KEY_F4",
     ["[[E"] = "KEY_F5",
+
+    -- Generators for Ctrl/Meta/Shift key combinations
+    ["[2;"] = template_gen("KEY_INSERT"),
+    ["[3;"] = template_gen("KEY_DELETE"),
+    ["[5;"] = template_gen("KEY_PAGE_UP"),
+    ["[6;"] = template_gen("KEY_PAGE_DOWN"),
+    ["[15;"] = template_gen("KEY_F5"),
+    ["[17;"] = template_gen("KEY_F6"),
+    ["[18;"] = template_gen("KEY_F7"),
+    ["[19;"] = template_gen("KEY_F8"),
+    ["[20;"] = template_gen("KEY_F9"),
+    ["[21;"] = template_gen("KEY_F10"),
+    ["[23;"] = template_gen("KEY_F11"),
+    ["[24;"] = template_gen("KEY_F12"),
 }
 
-local bracket1_impl = [=[
+xterm_keys["[1;"] = make_generator_node [=[
 if (i >= length) {
     return -1;
 } else {
@@ -91,37 +130,22 @@ if (i >= length) {
     case 'H':
         *k = mods | KEY_HOME;
         return i;
+    case 'P':
+        *k = mods | KEY_F1;
+        return i;
+    case 'Q':
+        *k = mods | KEY_F2;
+        return i;
+    case 'R':
+        *k = mods | KEY_F3;
+        return i;
+    case 'S':
+        *k = mods | KEY_F4;
+        return i;
     }
 }
 return 0;
 ]=]
-
-local template = [[
-if (i >= length) {
-    return -1;
-} else {
-    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
-    if (mods == 0) {
-        return 0;
-    }
-    *k = mods | %s;
-    goto check_trailing_tilde;
-}
-]]
-
-local function make_generator_node(impl)
-    return function(buf, indent)
-        for line in impl:gmatch("[^\n]+") do
-            buf:write(indent, line, "\n")
-        end
-    end
-end
-
-xterm_keys["[1;"] = make_generator_node(bracket1_impl)
-xterm_keys["[2;"] = make_generator_node(template:format("KEY_INSERT"))
-xterm_keys["[3;"] = make_generator_node(template:format("KEY_DELETE"))
-xterm_keys["[5;"] = make_generator_node(template:format("KEY_PAGE_UP"))
-xterm_keys["[6;"] = make_generator_node(template:format("KEY_PAGE_DOWN"))
 
 -- Build a trie structure from tables, indexed by numeric byte values
 local function make_trie(keys)

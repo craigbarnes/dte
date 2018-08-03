@@ -1,5 +1,6 @@
 #include <langinfo.h>
 #include <locale.h>
+#include <string.h>
 #include "test.h"
 #include "../src/command.h"
 #include "../src/editor.h"
@@ -290,7 +291,19 @@ static void test_parse_xterm_key_combo(void)
         {"\033[2;_~", KEY_INSERT},
         {"\033[3;_~", KEY_DELETE},
         {"\033[5;_~", KEY_PAGE_UP},
-        {"\033[6;_~", KEY_PAGE_DOWN}
+        {"\033[6;_~", KEY_PAGE_DOWN},
+        {"\033[1;_P", KEY_F1},
+        {"\033[1;_Q", KEY_F2},
+        {"\033[1;_R", KEY_F3},
+        {"\033[1;_S", KEY_F4},
+        {"\033[15;_~", KEY_F5},
+        {"\033[17;_~", KEY_F6},
+        {"\033[18;_~", KEY_F7},
+        {"\033[19;_~", KEY_F8},
+        {"\033[20;_~", KEY_F9},
+        {"\033[21;_~", KEY_F10},
+        {"\033[23;_~", KEY_F11},
+        {"\033[24;_~", KEY_F12},
     };
 
     static const struct {
@@ -310,10 +323,14 @@ static void test_parse_xterm_key_combo(void)
         FOR_EACH_I(j, modifiers) {
             char seq[8];
             memcpy(seq, templates[i].escape_sequence, 8);
-            seq[4] = modifiers[j].ch;
+            BUG_ON(seq[7] != '\0');
+            char *underscore = strchr(seq, '_');
+            BUG_ON(underscore == NULL);
+            *underscore = modifiers[j].ch;
+            size_t seq_length = strlen(seq);
             KeyCode key;
-            ssize_t length = parse_xterm_key(seq, 6, &key);
-            EXPECT_EQ(length, 6);
+            ssize_t parsed_length = parse_xterm_key(seq, seq_length, &key);
+            EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
         }
     }
