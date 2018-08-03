@@ -1,5 +1,6 @@
 #include "test.h"
 #include "../src/util/ascii.h"
+#include "../src/util/strtonum.h"
 
 void test_util_ascii(void)
 {
@@ -43,4 +44,13 @@ void test_util_ascii(void)
     EXPECT_EQ(hex_decode(' '), -1);
     EXPECT_EQ(hex_decode('\0'), -1);
     EXPECT_EQ(hex_decode('~'), -1);
+}
+
+void test_number_width(void)
+{
+    EXPECT_EQ(number_width(0), 1);
+    EXPECT_EQ(number_width(-1), 2);
+    EXPECT_EQ(number_width(420), 3);
+    EXPECT_EQ(number_width(2147483647), 10);
+    EXPECT_EQ(number_width(-2147483647), 11);
 }
