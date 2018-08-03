@@ -1,16 +1,3 @@
-local template = [[
-if (i >= length) {
-    return -1;
-} else {
-    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
-    if (mods == 0) {
-        return 0;
-    }
-    *k = mods | %s;
-    goto check_trailing_tilde;
-}
-]]
-
 local function make_generator_node(impl)
     return function(buf, indent)
         for line in impl:gmatch("[^\n]+") do
@@ -20,6 +7,7 @@ local function make_generator_node(impl)
 end
 
 local function template_gen(key)
+    local template = "*k = %s;\ngoto check_modifiers;\n"
     return make_generator_node(template:format(key))
 end
 
@@ -272,6 +260,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
 write_trie(xterm_trie, output)
 
 output:write [[
+check_modifiers:
+    if (i >= length) {
+        return -1;
+    }
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    }
+    *k |= mods;
+
 check_trailing_tilde:
     if (i >= length) {
         return -1;
