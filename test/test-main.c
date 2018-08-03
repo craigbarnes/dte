@@ -221,6 +221,9 @@ static void test_parse_xterm_key(void)
         {"\033[H", 3, KEY_HOME},
         {"\033[L", 3, KEY_INSERT},
         {"\033[1~", 4, KEY_HOME},
+        {"\033[2~", 4, KEY_INSERT},
+        {"\033[3~", 4, KEY_DELETE},
+        {"\033[4~", 4, KEY_END},
         {"\033[5~", 4, KEY_PAGE_UP},
         {"\033[6~", 4, KEY_PAGE_DOWN},
         {"\033O ", 3, ' '},
@@ -255,6 +258,11 @@ static void test_parse_xterm_key(void)
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
+        {"\033[[A", 4, KEY_F1},
+        {"\033[[B", 4, KEY_F2},
+        {"\033[[C", 4, KEY_F3},
+        {"\033[[D", 4, KEY_F4},
+        {"\033[[E", 4, KEY_F5},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
