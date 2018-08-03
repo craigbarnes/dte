@@ -778,6 +778,7 @@ void free_local_options(LocalOptions *opt)
     }
 }
 
-const char *case_sensitivity_to_string(SearchCaseSensitivity s) {
+const char *case_sensitivity_to_string(SearchCaseSensitivity s)
+{
     return case_sensitive_search_enum[s];
 }

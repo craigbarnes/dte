@@ -572,7 +572,8 @@ static void shift_left(int nr_lines, int count)
     }
 }
 
-static void do_shift_lines(int count, int nr_lines) {
+static void do_shift_lines(int count, int nr_lines)
+{
     begin_change_chain();
     block_iter_bol(&view->cursor);
     if (count > 0) {

@@ -193,7 +193,8 @@ void git_open_reload(void)
     git_open_filter();
 }
 
-static inline size_t terminal_page_height(void) {
+static inline size_t terminal_page_height(void)
+{
     if (terminal.height >= 6) {
         return terminal.height - 2;
     } else {

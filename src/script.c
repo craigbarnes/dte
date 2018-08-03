@@ -44,7 +44,8 @@ static int luaopen_editor(lua_State *L)
     return 1;
 }
 
-static void openlibs(lua_State *L) {
+static void openlibs(lua_State *L)
+{
     static const luaL_Reg libs[] = {
         {"_G", luaopen_base},
         {"package", luaopen_package},

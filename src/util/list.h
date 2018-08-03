@@ -14,7 +14,8 @@ static inline void list_init(ListHead *head)
     head->prev = head;
 }
 
-static inline void list_add(ListHead *new, ListHead *prev, ListHead *next) {
+static inline void list_add(ListHead *new, ListHead *prev, ListHead *next)
+{
     next->prev = new;
     new->next = next;
     new->prev = prev;

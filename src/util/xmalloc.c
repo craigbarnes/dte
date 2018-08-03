@@ -12,7 +12,8 @@
 } while (0)
 
 NORETURN COLD NONNULL_ARGS
-static void malloc_fail(const char *msg, int err) {
+static void malloc_fail(const char *msg, int err)
+{
     term_cleanup();
     errno = err;
     perror(msg);
