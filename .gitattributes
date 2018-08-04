@@ -10,7 +10,6 @@ TODO.md export-ignore
 docs/README.md export-ignore
 docs/contributing.md export-ignore
 docs/releasing.md export-ignore
-test/gitlab-ci.yml export-ignore
 mk/dev.mk export-ignore
 mk/sha256sums.txt export-ignore
 tools export-ignore
