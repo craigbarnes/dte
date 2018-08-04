@@ -7,7 +7,7 @@
 #include "../src/term-info.h"
 #include "../src/util/string-view.h"
 #include "../src/window.h"
-#include "../build/test/test-config.h"
+#include "../build/test/data.h"
 
 static const StringView extra_rc = STRING_VIEW (
     "set lock-files false\n"

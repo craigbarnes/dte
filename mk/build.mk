@@ -45,7 +45,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
-    test-main test-config test-key test-util ))
+    config key main util ))
 
 all_objects := $(editor_objects) $(test_objects)
 
@@ -132,7 +132,7 @@ $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
-build/test/test-config.o: build/test/test-config.h
+build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/term-info.o: build/term-info.cflags
 build/script.o: build/script.cflags
@@ -167,7 +167,7 @@ build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(BUILTIN_CONFIGS) > $@
 
-build/test/test-config.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
+build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
