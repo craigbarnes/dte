@@ -414,12 +414,8 @@ static char *escape(const char *str)
         case '"':
         case '$':
         case '\'':
-        case '*':
         case ';':
-        case '?':
-        case '[':
         case '\\':
-        case '{':
             string_add_ch(&buf, '\\');
             string_add_byte(&buf, ch);
             break;
