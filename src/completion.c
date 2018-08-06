@@ -14,7 +14,7 @@
 #include "util/string.h"
 
 static struct {
-    // Part of string which is to be replaced
+    // Part of string that is to be replaced
     char *escaped;
     char *parsed;
 

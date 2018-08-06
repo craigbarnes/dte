@@ -72,7 +72,7 @@ size_t block_iter_next_line(BlockIter *bi)
 
 /*
  * Move to beginning of previous line.
- * Returns number of bytes moved which is zero if there's no previous line.
+ * Returns number of bytes moved, which is zero if there's no previous line.
  */
 size_t block_iter_prev_line(BlockIter *bi)
 {

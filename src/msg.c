@@ -90,7 +90,7 @@ static bool file_location_return(const FileLocation *loc)
         v = window_get_view(w, b);
     } else {
         if (loc->filename == NULL) {
-            // Can't restore closed buffer which had no filename.
+            // Can't restore closed buffer that had no filename.
             // Try again.
             return false;
         }

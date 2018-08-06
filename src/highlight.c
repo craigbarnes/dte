@@ -361,7 +361,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
         block_iter_move_down(&bi, idx - current_line);
         current_line = idx;
 
-        // NOTE: might not fill entire hole which is ok
+        // NOTE: might not fill entire hole, which is ok
         int count = fill_hole(b, &bi, idx, last);
         idx += count;
         current_line += count;

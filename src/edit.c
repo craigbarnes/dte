@@ -436,7 +436,7 @@ static void join_selection(void)
         }
     }
 
-    // Don't replace last \n which is at end of the selection
+    // Don't replace last \n that is at end of the selection
     if (join && ch == '\n') {
         join--;
         len--;

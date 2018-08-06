@@ -326,10 +326,10 @@ static void print_line(LineInfo *info)
     CodePoint u;
 
     // Screen might be scrolled horizontally. Skip most invisible
-    // characters using screen_skip_char() which is much faster than
+    // characters using screen_skip_char(), which is much faster than
     // buf_skip(screen_next_char(info)).
     //
-    // There can be a wide character (tab, control code etc.) which is
+    // There can be a wide character (tab, control code etc.) that is
     // partially visible and can't be skipped using screen_skip_char().
     while (obuf.x + 8 < obuf.scroll_x && info->pos < info->size) {
         screen_skip_char(info);
