@@ -11,18 +11,16 @@ typedef enum {
     CHANGE_MERGE_ERASE,
 } ChangeMergeEnum;
 
-typedef struct Change Change;
-
-struct Change {
-    Change *next;
-    Change **prev;
+typedef struct Change {
+    struct Change *next;
+    struct Change **prev;
     unsigned int nr_prev;
     bool move_after; // Move after inserted text when undoing delete?
     size_t offset;
     size_t del_count;
     size_t ins_count;
     char *buf; // Deleted bytes (inserted bytes need not be saved)
-};
+} Change;
 
 void begin_change(ChangeMergeEnum m);
 void end_change(void);
