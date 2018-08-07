@@ -1,3 +1,4 @@
+#include <iconv.h>
 #include "encoding.h"
 #include "common.h"
 #include "util/ascii.h"

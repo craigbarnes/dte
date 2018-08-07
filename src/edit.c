@@ -1,3 +1,4 @@
+#include <wctype.h>
 #include "edit.h"
 #include "buffer.h"
 #include "change.h"

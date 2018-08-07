@@ -1,4 +1,6 @@
 #include <sys/ioctl.h>
+#include <sys/select.h>
+#include <sys/time.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "common.h"
 #include "editor.h"

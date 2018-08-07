@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/select.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "spawn.h"

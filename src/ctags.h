@@ -2,8 +2,7 @@
 #define CTAGS_H
 
 #include <stdbool.h>
-#include <stddef.h>
-#include <time.h>
+#include <sys/types.h>
 
 typedef struct {
     char *filename;

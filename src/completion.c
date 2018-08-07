@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include "completion.h"
 #include "alias.h"
 #include "cmdline.h"

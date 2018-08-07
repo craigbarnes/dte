@@ -1,3 +1,4 @@
+#include <strings.h>
 #include "editor.h"
 #include "highlight.h"
 #include "screen.h"

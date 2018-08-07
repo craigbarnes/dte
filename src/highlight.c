@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <strings.h>
 #include "highlight.h"
 #include "syntax.h"
 #include "util/xmalloc.h"

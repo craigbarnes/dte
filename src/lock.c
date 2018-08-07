@@ -1,3 +1,5 @@
+#include <signal.h>
+#include <time.h>
 #include "lock.h"
 #include "buffer.h"
 #include "editor.h"
