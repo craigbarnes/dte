@@ -21,7 +21,6 @@ static KeyChain pressed_keys;
 // Fast lookup table for most common key combinations (Ctrl or Meta
 // with ASCII keys or any combination of modifiers with special keys)
 static char *bindings_lookup_table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
-static_assert(ARRAY_COUNT(bindings_lookup_table) < 512);
 
 // Fallback for all other keys (Unicode combos, multi-chord chains etc.)
 static PointerArray bindings_ptr_array = PTR_ARRAY_INIT;
