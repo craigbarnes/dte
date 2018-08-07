@@ -7,7 +7,7 @@ local function make_generator_node(impl)
 end
 
 local function set_key_and_goto(key, label)
-    local template = "*k = %s;\ngoto %s;\n"
+    local template = "tmp = %s;\ngoto %s;\n"
     return make_generator_node(template:format(key, label))
 end
 
@@ -175,10 +175,7 @@ local function write_trie(node, buffer)
         if node_type == "table" then
             if has_only_tilde_leaf(node) then
                 buf:write (
-                    -- This should really set a temporary and decide whether
-                    -- or not to set *k after the goto, but for some reason
-                    -- GCC bloats the jump table by 100 extra instructions.
-                    indent, "*k = ", node[("~"):byte()], ";\n",
+                    indent, "tmp = ", node[("~"):byte()], ";\n",
                     indent, "goto check_trailing_tilde;\n"
                 )
                 return
@@ -242,6 +239,7 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
     if (length == 0 || buf[0] != '\033') {
         return 0;
     }
+    KeyCode tmp;
     size_t i = 1;
 ]]
 
@@ -254,6 +252,7 @@ check_delim:
     case ';':
         goto check_modifiers;
     case '~':
+        *k = tmp;
         return i;
     }
     return 0;
@@ -265,11 +264,12 @@ check_modifiers:
     if (mods == 0) {
         return 0;
     }
-    *k |= mods;
+    tmp |= mods;
 check_trailing_tilde:
     if (i >= length) {
         return -1;
     } else if (buf[i++] == '~') {
+        *k = tmp;
         return i;
     }
     return 0;

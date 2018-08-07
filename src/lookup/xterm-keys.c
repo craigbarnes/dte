@@ -26,6 +26,7 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
     if (length == 0 || buf[0] != '\033') {
         return 0;
     }
+    KeyCode tmp;
     size_t i = 1;
     if (i >= length) return -1;
     switch(buf[i++]) {
@@ -92,28 +93,28 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case '1':
-                *k = KEY_F1;
+                tmp = KEY_F1;
                 goto check_trailing_tilde;
             case '2':
-                *k = KEY_F2;
+                tmp = KEY_F2;
                 goto check_trailing_tilde;
             case '3':
-                *k = KEY_F3;
+                tmp = KEY_F3;
                 goto check_trailing_tilde;
             case '4':
-                *k = KEY_F4;
+                tmp = KEY_F4;
                 goto check_trailing_tilde;
             case '5':
-                *k = KEY_F5;
+                tmp = KEY_F5;
                 goto check_delim;
             case '7':
-                *k = KEY_F6;
+                tmp = KEY_F6;
                 goto check_delim;
             case '8':
-                *k = KEY_F7;
+                tmp = KEY_F7;
                 goto check_delim;
             case '9':
-                *k = KEY_F8;
+                tmp = KEY_F8;
                 goto check_delim;
             case ';':
                 if (i >= length) {
@@ -168,19 +169,19 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             if (i >= length) return -1;
             switch(buf[i++]) {
             case '0':
-                *k = KEY_F9;
+                tmp = KEY_F9;
                 goto check_delim;
             case '1':
-                *k = KEY_F10;
+                tmp = KEY_F10;
                 goto check_delim;
             case '3':
-                *k = KEY_F11;
+                tmp = KEY_F11;
                 goto check_delim;
             case '4':
-                *k = KEY_F12;
+                tmp = KEY_F12;
                 goto check_delim;
             case ';':
-                *k = KEY_INSERT;
+                tmp = KEY_INSERT;
                 goto check_modifiers;
             case '~':
                 *k = KEY_INSERT;
@@ -188,16 +189,16 @@ static ssize_t parse_xterm_key(const char *buf, size_t length, KeyCode *k)
             }
             return 0;
         case '3':
-            *k = KEY_DELETE;
+            tmp = KEY_DELETE;
             goto check_delim;
         case '4':
-            *k = KEY_END;
+            tmp = KEY_END;
             goto check_trailing_tilde;
         case '5':
-            *k = KEY_PAGE_UP;
+            tmp = KEY_PAGE_UP;
             goto check_delim;
         case '6':
-            *k = KEY_PAGE_DOWN;
+            tmp = KEY_PAGE_DOWN;
             goto check_delim;
         case 'A':
             *k = KEY_UP;
@@ -253,6 +254,7 @@ check_delim:
     case ';':
         goto check_modifiers;
     case '~':
+        *k = tmp;
         return i;
     }
     return 0;
@@ -264,11 +266,12 @@ check_modifiers:
     if (mods == 0) {
         return 0;
     }
-    *k |= mods;
+    tmp |= mods;
 check_trailing_tilde:
     if (i >= length) {
         return -1;
     } else if (buf[i++] == '~') {
+        *k = tmp;
         return i;
     }
     return 0;
