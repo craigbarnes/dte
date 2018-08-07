@@ -156,8 +156,11 @@ void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_separator(f);
                 add_ch(f, ch);
                 break;
+            case '\0':
+                f->buf[f->pos] = '\0';
+                return;
             }
         }
     }
-    f->buf[f->pos] = 0;
+    f->buf[f->pos] = '\0';
 }
