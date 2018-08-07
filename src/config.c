@@ -2,7 +2,9 @@
 #include "common.h"
 #include "completion.h"
 #include "error.h"
+#include "util/ascii.h"
 #include "util/string.h"
+#include "util/xmalloc.h"
 #include "../build/builtin-config.h"
 
 const char *config_file;

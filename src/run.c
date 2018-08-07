@@ -5,6 +5,7 @@
 #include "config.h"
 #include "error.h"
 #include "parse-args.h"
+#include "util/xmalloc.h"
 #include "lookup/config-cmds.c"
 
 const Command *current_command;

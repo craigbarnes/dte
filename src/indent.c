@@ -1,6 +1,7 @@
 #include "indent.h"
 #include "buffer.h"
 #include "regexp.h"
+#include "util/xmalloc.h"
 #include "view.h"
 
 char *make_indent(int width)

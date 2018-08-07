@@ -1,6 +1,7 @@
 #include "input-special.h"
 #include "common.h"
 #include "term-read.h"
+#include "util/ascii.h"
 #include "util/uchar.h"
 
 enum input_special {

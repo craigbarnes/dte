@@ -2,6 +2,7 @@
 #include "block.h"
 #include "buffer.h"
 #include "error.h"
+#include "util/xmalloc.h"
 #include "view.h"
 
 static ChangeMergeEnum change_merge;

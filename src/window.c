@@ -7,6 +7,7 @@
 #include "move.h"
 #include "util/path.h"
 #include "util/strtonum.h"
+#include "util/xmalloc.h"
 
 Window *window;
 

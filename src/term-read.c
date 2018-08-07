@@ -4,6 +4,7 @@
 #include "editor.h"
 #include "term-info.h"
 #include "term-read.h"
+#include "util/xmalloc.h"
 
 static char input_buf[256];
 static size_t input_buf_fill;

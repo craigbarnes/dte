@@ -2,6 +2,8 @@
 #include "buffer.h"
 #include "editor.h"
 #include "error.h"
+#include "util/ascii.h"
+#include "util/xmalloc.h"
 
 static char *file_locks;
 static char *file_locks_lock;

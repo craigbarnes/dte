@@ -8,6 +8,7 @@
 #include "encoding.h"
 #include "error.h"
 #include "util/path.h"
+#include "util/xmalloc.h"
 
 static void add_block(Buffer *b, Block *blk)
 {

@@ -1,5 +1,7 @@
 #include "encoding.h"
 #include "common.h"
+#include "util/ascii.h"
+#include "util/xmalloc.h"
 
 static const struct {
     const char *const encoding;

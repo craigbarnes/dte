@@ -9,6 +9,7 @@
 #include "screen.h"
 #include "term-info.h"
 #include "util/strtonum.h"
+#include "util/xmalloc.h"
 #include "view.h"
 #include "window.h"
 

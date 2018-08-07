@@ -8,6 +8,7 @@
 #include "../src/filetype.h"
 #include "../src/lookup/xterm-keys.c"
 #include "../src/util/path.h"
+#include "../src/util/xmalloc.h"
 
 void test_util(void);
 void test_key_to_string(void);

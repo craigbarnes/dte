@@ -2,6 +2,7 @@
 #include "common.h"
 #include "config.h"
 #include "editor.h"
+#include "util/xmalloc.h"
 
 static char error_buf[256];
 const char *const error_ptr = error_buf;

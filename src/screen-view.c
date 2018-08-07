@@ -4,6 +4,7 @@
 #include "selection.h"
 #include "term-info.h"
 #include "term-write.h"
+#include "util/ascii.h"
 #include "util/uchar.h"
 #include "view.h"
 

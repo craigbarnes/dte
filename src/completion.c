@@ -9,9 +9,11 @@
 #include "env.h"
 #include "options.h"
 #include "tag.h"
+#include "util/ascii.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
+#include "util/xmalloc.h"
 
 static struct {
     // Part of string that is to be replaced

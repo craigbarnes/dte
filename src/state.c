@@ -8,6 +8,7 @@
 #include "parse-args.h"
 #include "syntax.h"
 #include "util/path.h"
+#include "util/xmalloc.h"
 
 static void bitmap_set(unsigned char *bitmap, long idx)
 {

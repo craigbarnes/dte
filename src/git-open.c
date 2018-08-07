@@ -10,6 +10,7 @@
 #include "util/ptr-array.h"
 #include "util/uchar.h"
 #include "util/unicode.h"
+#include "util/xmalloc.h"
 #include "window.h"
 
 static struct {

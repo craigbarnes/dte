@@ -1,6 +1,7 @@
 #include "view.h"
 #include "buffer.h"
 #include "util/uchar.h"
+#include "util/xmalloc.h"
 #include "window.h"
 
 View *view;

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "editor.h"
 #include "util/uchar.h"
+#include "util/xmalloc.h"
 
 static bool fill(FileDecoder *dec)
 {

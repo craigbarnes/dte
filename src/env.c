@@ -3,6 +3,7 @@
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
+#include "util/xmalloc.h"
 #include "window.h"
 
 typedef struct {

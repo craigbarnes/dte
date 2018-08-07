@@ -5,6 +5,7 @@
 #include "move.h"
 #include "search.h"
 #include "util/ptr-array.h"
+#include "util/xmalloc.h"
 #include "window.h"
 
 static PointerArray file_locations = PTR_ARRAY_INIT;

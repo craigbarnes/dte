@@ -11,6 +11,8 @@
 #include "term-info.h"
 #include "term-read.h"
 #include "term-write.h"
+#include "util/ascii.h"
+#include "util/xmalloc.h"
 #include "view.h"
 #include "window.h"
 #include "../build/version.h"

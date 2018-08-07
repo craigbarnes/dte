@@ -12,6 +12,7 @@
 #include "regexp.h"
 #include "term-info.h"
 #include "util/string.h"
+#include "util/xmalloc.h"
 
 static void close_on_exec(int fd)
 {

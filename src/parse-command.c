@@ -3,9 +3,11 @@
 #include "editor.h"
 #include "env.h"
 #include "error.h"
+#include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 #include "util/uchar.h"
+#include "util/xmalloc.h"
 
 static String arg = STRING_INIT;
 

@@ -2,6 +2,8 @@
 #include "common.h"
 #include "error.h"
 #include "state.h"
+#include "util/ascii.h"
+#include "util/xmalloc.h"
 
 static PointerArray syntaxes = PTR_ARRAY_INIT;
 

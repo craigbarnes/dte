@@ -2,6 +2,7 @@
 #include "common.h"
 #include "error.h"
 #include "util/ptr-array.h"
+#include "util/xmalloc.h"
 #include "wbuf.h"
 
 // Add item to end of array

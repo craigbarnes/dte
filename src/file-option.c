@@ -2,6 +2,7 @@
 #include "options.h"
 #include "regexp.h"
 #include "util/ptr-array.h"
+#include "util/xmalloc.h"
 
 typedef struct {
     enum file_options_type type;

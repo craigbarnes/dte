@@ -2,7 +2,9 @@
 #include "command.h"
 #include "common.h"
 #include "error.h"
+#include "util/ascii.h"
 #include "util/ptr-array.h"
+#include "util/xmalloc.h"
 
 typedef struct {
     KeyCode keys[3];

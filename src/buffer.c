@@ -10,6 +10,7 @@
 #include "util/path.h"
 #include "util/uchar.h"
 #include "util/unicode.h"
+#include "util/xmalloc.h"
 #include "view.h"
 
 Buffer *buffer;

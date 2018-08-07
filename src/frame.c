@@ -1,4 +1,5 @@
 #include "frame.h"
+#include "util/xmalloc.h"
 #include "window.h"
 
 Frame *root_frame;

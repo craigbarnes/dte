@@ -1,5 +1,6 @@
 #include "detect.h"
 #include "regexp.h"
+#include "util/xmalloc.h"
 
 static bool next_line(BlockIter *bi, LineRef *lr)
 {

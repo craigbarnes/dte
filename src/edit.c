@@ -7,6 +7,7 @@
 #include "selection.h"
 #include "util/string.h"
 #include "util/uchar.h"
+#include "util/xmalloc.h"
 #include "view.h"
 
 typedef struct {

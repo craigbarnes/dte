@@ -1,6 +1,7 @@
 #include "block.h"
 #include "buffer.h"
 #include "highlight.h"
+#include "util/xmalloc.h"
 #include "view.h"
 
 #define BLOCK_EDIT_SIZE 512
