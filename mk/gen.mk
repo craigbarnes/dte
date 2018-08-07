@@ -3,7 +3,7 @@ GPERF_FILTER = sed -f mk/gperf-filter.sed
 
 define GPERF_GEN
   $(E) GPERF $(1).c
-  $(Q) $(GPERF) -m50 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
+  $(Q) $(GPERF) -m75 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
 endef
 
 gen: gperf-gen xterm-keys-gen

@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m50 src/lookup/interpreters.gperf  */
+/* Command-line: gperf -m75 src/lookup/interpreters.gperf  */
 /* Computed positions: -k'1,3' */
 /* Filtered by: mk/gperf-filter.sed */
 /* maximum key range = 59, duplicates = 0 */

@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m50 -n src/lookup/pathnames.gperf  */
+/* Command-line: gperf -m75 -n src/lookup/pathnames.gperf  */
 /* Computed positions: -k'6' */
 /* Filtered by: mk/gperf-filter.sed */
 /* maximum key range = 3, duplicates = 0 */
