@@ -6,14 +6,15 @@ PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.7)
 
 WARNINGS = \
-    -Wall -Wextra -pedantic -Wformat -Wformat-security -Wvla \
+    -Wall -Wextra -pedantic -Wformat -Wformat-security \
     -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
 
 WARNINGS_EXTRA = \
-    -Wformat-signedness -Wshift-overflow=2 -Wframe-larger-than=32768
+    -Wformat-signedness -Wshift-overflow=2 -Wframe-larger-than=32768 \
+    -Wvla
 
 BUILTIN_SYNTAX_FILES := \
     awk c config css d diff docker dte gitcommit gitrebase go html \
