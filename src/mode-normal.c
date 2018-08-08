@@ -26,7 +26,6 @@ static void normal_mode_keypress(KeyCode key)
 {
     char buf[4];
     int count;
-
     if (special_input_keypress(key, buf, &count)) {
         if (count) {
             begin_change(CHANGE_MERGE_NONE);
@@ -36,14 +35,32 @@ static void normal_mode_keypress(KeyCode key)
         }
         return;
     }
+
     if (nr_pressed_keys()) {
         handle_binding(key);
         return;
     }
+
+    switch (key) {
+    case '\t':
+        if (view->selection == SELECT_LINES) {
+            shift_lines(1);
+            return;
+        }
+        break;
+    case MOD_SHIFT | '\t':
+        if (view->selection == SELECT_LINES) {
+            shift_lines(-1);
+            return;
+        }
+        break;
+    case KEY_PASTE:
+        insert_paste();
+        return;
+    }
+
     if (u_is_unicode(key)) {
         insert_ch(key);
-    } else if (key == KEY_PASTE) {
-        insert_paste();
     } else {
         handle_binding(key);
     }
