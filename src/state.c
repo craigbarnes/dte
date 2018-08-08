@@ -534,18 +534,28 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 
 Syntax *load_syntax_by_filetype(const char *filetype)
 {
+    const char *cfgdir = editor.user_config_dir;
+    char filename[4096];
     Syntax *syn;
-    char *filename = xsprintf("%s/syntax/%s", editor.user_config_dir, filetype);
-    int err;
+    int err, n;
 
+    n = snprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
+    if (n <= 0 || n >= sizeof filename) {
+        goto snprintf_error;
+    }
     syn = load_syntax_file(filename, CFG_NOFLAGS, &err);
-    free(filename);
     if (syn || err != ENOENT) {
         return syn;
     }
 
-    filename = xsprintf("syntax/%s", filetype);
+    n = snprintf(filename, sizeof filename, "syntax/%s", filetype);
+    if (n <= 0 || n >= sizeof filename) {
+        goto snprintf_error;
+    }
     syn = load_syntax_file(filename, CFG_BUILTIN, &err);
-    free(filename);
     return syn;
+
+snprintf_error:
+    error_msg("internal error: snprintf() failed (returned %d)", n);
+    return NULL;
 }
