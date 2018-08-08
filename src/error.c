@@ -22,7 +22,7 @@ Error *error_create(const char *format, ...)
     va_list ap;
 
     va_start(ap, format);
-    err = error_new(xvsprintf(format, ap));
+    err = error_new(xvasprintf(format, ap));
     va_end(ap);
     return err;
 }
@@ -33,7 +33,7 @@ Error *error_create_errno(int code, const char *format, ...)
     va_list ap;
 
     va_start(ap, format);
-    err = error_new(xvsprintf(format, ap));
+    err = error_new(xvasprintf(format, ap));
     va_end(ap);
     err->code = code;
     return err;

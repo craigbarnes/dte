@@ -272,7 +272,7 @@ static bool int_parse (
 
 static char *int_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
-    return xsprintf("%d", value.int_val);
+    return xasprintf("%d", value.int_val);
 }
 
 static bool int_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)

@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <limits.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include "macros.h"
 
@@ -27,6 +28,8 @@ void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
 char *xstrdup(const char *str) XMALLOC NONNULL_ARGS;
 char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
 void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2);
+char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
+char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply(size_t a, size_t b);
 
 CONST_FN

@@ -7,12 +7,12 @@
 
 #define CHECK_ALLOC(x) do { \
     if (unlikely((x) == NULL)) { \
-        malloc_fail(__func__, errno); \
+        fail(__func__, errno); \
     } \
 } while (0)
 
 NORETURN COLD NONNULL_ARGS
-static void malloc_fail(const char *msg, int err)
+static void fail(const char *msg, int err)
 {
     term_cleanup();
     errno = err;
@@ -77,4 +77,35 @@ void *xmemdup(const void *ptr, size_t size)
     void *buf = xmalloc(size);
     memcpy(buf, ptr, size);
     return buf;
+}
+
+static int xvasprintf_(char **strp, const char *format, va_list ap)
+{
+    va_list ap2;
+    va_copy(ap2, ap);
+    int n = vsnprintf(NULL, 0, format, ap2);
+    if (unlikely(n < 0)) {
+        fail("vsnprintf", errno);
+    }
+    va_end(ap2);
+    *strp = xmalloc(n + 1);
+    int m = vsnprintf(*strp, n + 1, format, ap);
+    BUG_ON(m != n);
+    return n;
+}
+
+char *xvasprintf(const char *format, va_list ap)
+{
+    char *str;
+    xvasprintf_(&str, format, ap);
+    return str;
+}
+
+char *xasprintf(const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    char *str = xvasprintf(format, ap);
+    va_end(ap);
+    return str;
 }

@@ -244,7 +244,7 @@ static char *tmp_filename(const char *filename)
 {
     char *dir = path_dirname(filename);
     const char *base = path_basename(filename);
-    char *tmp = xsprintf("%s/.tmp.%s.XXXXXX", dir, base);
+    char *tmp = xasprintf("%s/.tmp.%s.XXXXXX", dir, base);
     free(dir);
     return tmp;
 }

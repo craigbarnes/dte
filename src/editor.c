@@ -90,7 +90,7 @@ void init_editor_state(void)
     if (dte_home) {
         editor.user_config_dir = xstrdup(dte_home);
     } else {
-        editor.user_config_dir = xsprintf("%s/.dte", editor.home_dir);
+        editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir);
     }
 
     setlocale(LC_CTYPE, "");
@@ -353,7 +353,7 @@ void suspend(void)
 
 char *editor_file(const char *name)
 {
-    return xsprintf("%s/%s", editor.user_config_dir, name);
+    return xasprintf("%s/%s", editor.user_config_dir, name);
 }
 
 char get_confirmation(const char *choices, const char *format, ...)

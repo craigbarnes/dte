@@ -72,8 +72,6 @@ static inline NONNULL_ARGS bool str_has_suffix (
 size_t count_nl(const char *buf, size_t size);
 size_t count_strings(char **strings);
 void free_strings(char **strings);
-char *xvsprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
-char *xsprintf(const char *format, ...) PRINTF(1) XMALLOC;
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t read_file(const char *filename, char **bufp);

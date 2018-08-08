@@ -36,22 +36,6 @@ void free_strings(char **strings)
     free(strings);
 }
 
-char *xvsprintf(const char *format, va_list ap)
-{
-    char buf[4096];
-    vsnprintf(buf, sizeof(buf), format, ap);
-    return xstrdup(buf);
-}
-
-char *xsprintf(const char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
-    char *str = xvsprintf(format, ap);
-    va_end(ap);
-    return str;
-}
-
 ssize_t xread(int fd, void *buf, size_t count)
 {
     char *b = buf;
