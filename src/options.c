@@ -378,10 +378,10 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
 }
 
 static const OptionOps option_ops[] = {
-    {str_get, str_set, str_parse, str_string, str_equals},
-    {int_get, int_set, int_parse, int_string, int_equals},
-    {int_get, int_set, enum_parse, enum_string, int_equals},
-    {int_get, int_set, flag_parse, flag_string, int_equals},
+    [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals},
+    [OPT_INT] = {int_get, int_set, int_parse, int_string, int_equals},
+    [OPT_ENUM] = {int_get, int_set, enum_parse, enum_string, int_equals},
+    [OPT_FLAG] = {int_get, int_set, flag_parse, flag_string, int_equals},
 };
 
 static const char *bool_enum[] = {"false", "true", NULL};
