@@ -30,6 +30,7 @@ hi markdown.code-block yellow
 hi markdown.code-span yellow
 hi markdown.block-quote green
 hi markdown.reference bold blue
+hi markdown.url blue
 hi html.tag bold magenta
 hi html.attr magenta
 hi xml.tag bold magenta
