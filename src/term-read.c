@@ -41,12 +41,6 @@ const char *term_get_last_key_escape_sequence(void)
     return escape_key(last_escape_sequence, last_escape_sequence_length);
 }
 
-static inline void record_last_key_escape_sequence(size_t length)
-{
-    memcpy(last_escape_sequence, input_buf, length);
-    last_escape_sequence_length = length;
-}
-
 static void consume_input(size_t len)
 {
     input_buf_fill -= len;
@@ -119,7 +113,8 @@ static bool read_special(KeyCode *key)
         return false;
     default:
         // Match
-        record_last_key_escape_sequence(len);
+        memcpy(last_escape_sequence, input_buf, len);
+        last_escape_sequence_length = len;
         consume_input(len);
         return true;
     }
@@ -224,6 +219,7 @@ bool term_read_key(KeyCode *key)
         *key = KEY_PASTE;
         return true;
     }
+
     if (input_buf[0] == '\033') {
         if (input_buf_fill > 1 || input_can_be_truncated) {
             if (read_special(key)) {
@@ -253,25 +249,31 @@ bool term_read_key(KeyCode *key)
         }
         if (input_buf_fill > 1) {
             // Unknown escape sequence or 'esc key' / 'alt-key'
-            unsigned char ch;
 
             // Throw escape away
-            input_get_byte(&ch);
+            consume_input(1);
+
             const bool ok = read_simple(key);
             if (!ok) {
                 return false;
             }
+
             if (input_buf_fill == 0 || input_buf[0] == '\033') {
                 // 'esc key' or 'alt-key'
                 *key |= MOD_META;
                 return true;
             }
-            // Unknown escape sequence, avoid inserting it
-            record_last_key_escape_sequence(input_buf_fill);
+
+            // Unknown escape sequence; record it:
+            last_escape_sequence[0] = '\033';
+            memcpy(last_escape_sequence + 1, input_buf, input_buf_fill);
+            last_escape_sequence_length = input_buf_fill + 1;
+            // ...but don't insert it:
             input_buf_fill = 0;
             return false;
         }
     }
+
     return read_simple(key);
 }
 
