@@ -14,6 +14,8 @@ gperf-gen:
 	$(call GPERF_GEN, src/lookup/pathnames, -n)
 	$(call GPERF_GEN, src/lookup/interpreters)
 	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
+	$(call GPERF_GEN, src/lookup/attributes, -n)
+	$(call GPERF_GEN, src/lookup/colors, -n)
 	$(call GPERF_GEN, src/lookup/config-cmds, -n)
 
 xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
