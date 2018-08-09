@@ -2,6 +2,10 @@ DIST_VERSIONS = 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
 DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
+LCOV ?= lcov
+LCOVFLAGS ?= --no-external
+GENHTML ?= genhtml
+GENHTMLFLAGS ?= --no-function-coverage --title dte
 
 dist: $(firstword $(DIST_ALL))
 dist-all: $(DIST_ALL)
@@ -42,8 +46,8 @@ show-sizes:
 
 coverage-report:
 	$(MAKE) -j$(NPROC) check CFLAGS='-O2 -g -pipe --coverage' DEBUG=3 USE_SANITIZER=
-	lcov --no-external -c -b . -d build/ -o build/coverage.info
-	genhtml --title 'dte coverage' -o public/coverage/ build/coverage.info
+	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
+	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
 	  xargs $(XARGS_P_FLAG) -- gzip -9 -k -f
 
