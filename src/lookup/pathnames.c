@@ -1,81 +1,19 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m75 -n src/lookup/pathnames.gperf  */
-/* Computed positions: -k'6' */
-/* Filtered by: mk/gperf-filter.sed */
-/* maximum key range = 3, duplicates = 0 */
-
-inline
-/*ARGSUSED*/
-static unsigned int
-filetype_pathname_hash (register const char *str, register size_t len)
+static FileTypeEnum filetype_from_pathname(const char *buf, size_t len)
 {
-  static const unsigned char asso_values[] =
-    {
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 2, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 1, 3, 0, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-      3, 3, 3, 3, 3, 3
-    };
-  return asso_values[(unsigned char)str[5]];
-}
-
-static const FileTypeHashSlot*
-filetype_from_pathname (register const char *str, register size_t len)
-{
-  enum
-    {
-      TOTAL_KEYWORDS = 3,
-      MIN_WORD_LENGTH = 10,
-      MAX_WORD_LENGTH = 19,
-      MIN_HASH_VALUE = 0,
-      MAX_HASH_VALUE = 2
-    };
-
-  static const unsigned char lengthtable[] =
-    {
-      10, 10, 19
-    };
-  static const FileTypeHashSlot filetype_pathname_table[] =
-    {
-      {"/etc/hosts", CONFIG},
-      {"/etc/fstab", CONFIG},
-      {"/boot/grub/menu.lst", CONFIG}
-    };
-
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
-    {
-      register unsigned int key = filetype_pathname_hash (str, len);
-
-      if (key <= MAX_HASH_VALUE)
-        if (len == lengthtable[key])
-          {
-            register const char *s = filetype_pathname_table[key].key;
-
-            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &filetype_pathname_table[key];
-          }
+    switch(len) {
+    case 10:
+        if (memcmp(buf, "/etc/", 5)) {
+            return 0;
+        }
+        switch(buf[5]) {
+        case 'f':
+            return memcmp(buf + 6, "stab", 4) ? 0 : CONFIG;
+        case 'h':
+            return memcmp(buf + 6, "osts", 4) ? 0 : CONFIG;
+        }
+        return 0;
+    case 19:
+        return memcmp(buf, "/boot/grub/menu.lst", 19) ? 0 : CONFIG;
     }
-  return 0;
+    return 0;
 }

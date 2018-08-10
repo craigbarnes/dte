@@ -191,18 +191,11 @@ UNITTEST {
     }
 }
 
-typedef struct {
-    const char *const key;
-    const FileTypeEnum filetype;
-} FileTypeHashSlot;
-
-IGNORE_WARNING("-Wunused-parameter")
 #include "lookup/basenames.c"
 #include "lookup/pathnames.c"
 #include "lookup/extensions.c"
 #include "lookup/interpreters.c"
 #include "lookup/ignored-exts.c"
-UNIGNORE_WARNINGS
 
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
@@ -335,25 +328,25 @@ const char *find_ft (
     }
 
     // Search built-in hash tables
-    const FileTypeHashSlot *slot;
     if (interpreter) {
-        slot = filetype_from_interpreter(interpreter, strlen(interpreter));
-        if (slot) {
-            return builtin_filetype_names[slot->filetype];
+        size_t len = strlen(interpreter);
+        FileTypeEnum ft = filetype_from_interpreter(interpreter, len);
+        if (ft) {
+            return builtin_filetype_names[ft];
         }
     }
 
     if (path.length) {
-        slot = filetype_from_pathname(path.data, path.length);
-        if (slot) {
-            return builtin_filetype_names[slot->filetype];
+        FileTypeEnum ft = filetype_from_pathname(path.data, path.length);
+        if (ft) {
+            return builtin_filetype_names[ft];
         }
     }
 
     if (base.length) {
-        slot = filetype_from_basename(base.data, base.length);
-        if (slot) {
-            return builtin_filetype_names[slot->filetype];
+        FileTypeEnum ft = filetype_from_basename(base.data, base.length);
+        if (ft) {
+            return builtin_filetype_names[ft];
         }
     }
 
@@ -368,9 +361,9 @@ const char *find_ft (
     }
 
     if (ext.length) {
-        slot = filetype_from_extension(ext.data, ext.length);
-        if (slot) {
-            return builtin_filetype_names[slot->filetype];
+        FileTypeEnum ft = filetype_from_extension(ext.data, ext.length);
+        if (ft) {
+            return builtin_filetype_names[ft];
         }
     }
 

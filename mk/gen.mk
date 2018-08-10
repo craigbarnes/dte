@@ -1,26 +1,19 @@
-GPERF = gperf
-GPERF_FILTER = sed -f mk/gperf-filter.sed
-
-define GPERF_GEN
-  $(E) GPERF $(1).c
-  $(Q) $(GPERF) -m75 $(2) $(1).gperf | $(GPERF_FILTER) > $(1).c
+define LPERF_GEN
+  $(E) GEN $(1).c
+  $(Q) $(LUA) mk/lperf.lua $(1).lua > $(1).c
 endef
 
-gen: gperf-gen xterm-keys-gen
-
-gperf-gen:
-	$(call GPERF_GEN, src/lookup/extensions, -D)
-	$(call GPERF_GEN, src/lookup/basenames)
-	$(call GPERF_GEN, src/lookup/pathnames, -n)
-	$(call GPERF_GEN, src/lookup/interpreters)
-	$(call GPERF_GEN, src/lookup/ignored-exts, -n)
-	$(call GPERF_GEN, src/lookup/attributes, -n)
-	$(call GPERF_GEN, src/lookup/colors, -n)
-	$(call GPERF_GEN, src/lookup/config-cmds, -n)
-
-xterm-keys-gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
+gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
+	$(call LPERF_GEN, src/lookup/extensions)
+	$(call LPERF_GEN, src/lookup/basenames)
+	$(call LPERF_GEN, src/lookup/pathnames)
+	$(call LPERF_GEN, src/lookup/interpreters)
+	$(call LPERF_GEN, src/lookup/ignored-exts)
+	$(call LPERF_GEN, src/lookup/attributes)
+	$(call LPERF_GEN, src/lookup/colors)
+	$(call LPERF_GEN, src/lookup/config-cmds)
 	$(E) GEN src/lookup/xterm-keys.c
 	$(Q) $(LUA) src/lookup/xterm-keys.lua > src/lookup/xterm-keys.c
 
 
-.PHONY: gen gperf-gen xterm-keys-gen
+.PHONY: gen

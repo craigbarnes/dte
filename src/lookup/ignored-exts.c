@@ -1,88 +1,47 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m75 -n src/lookup/ignored-exts.gperf  */
-/* Computed positions: -k'1,$' */
-/* Filtered by: mk/gperf-filter.sed */
-/* maximum key range = 11, duplicates = 0 */
-
-inline
-static unsigned int
-ft_ignored_ext_hash (register const char *str, register size_t len)
+static bool is_ignored_extension(const char *buf, size_t len)
 {
-  static const unsigned char asso_values[] =
-    {
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11,  5, 11,
-       1,  3, 11,  0, 11, 11, 11,  5, 11, 11,
-       8,  0,  3, 11,  4, 11,  7, 11, 11,  1,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-      11, 11, 11, 11, 11, 11
-    };
-  return asso_values[(unsigned char)str[len - 1]] + asso_values[(unsigned char)str[0]];
-}
-
-static const char*
-is_ignored_extension (register const char *str, register size_t len)
-{
-  enum
-    {
-      TOTAL_KEYWORDS = 11,
-      MIN_WORD_LENGTH = 3,
-      MAX_WORD_LENGTH = 9,
-      MIN_HASH_VALUE = 0,
-      MAX_HASH_VALUE = 10
-    };
-
-  static const unsigned char lengthtable[] =
-    {
-       4,  3,  8,  7,  6,  6,  7,  7,  9,  3,  3
-    };
-  static const char * const wordlist[] =
-    {
-      "orig",
-      "old",
-      "dpkg-old",
-      "pacorig",
-      "pacnew",
-      "rpmnew",
-      "pacsave",
-      "rpmsave",
-      "dpkg-dist",
-      "new",
-      "bak"
-    };
-
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
-    {
-      register unsigned int key = ft_ignored_ext_hash (str, len);
-
-      if (key <= MAX_HASH_VALUE)
-        if (len == lengthtable[key])
-          {
-            register const char *s = wordlist[key];
-
-            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return s;
-          }
+    switch(len) {
+    case 3:
+        switch(buf[0]) {
+        case 'b':
+            return memcmp(buf + 1, "ak", 2) ? false : true;
+        case 'n':
+            return memcmp(buf + 1, "ew", 2) ? false : true;
+        case 'o':
+            return memcmp(buf + 1, "ld", 2) ? false : true;
+        }
+        return false;
+    case 4:
+        return memcmp(buf, "orig", 4) ? false : true;
+    case 6:
+        switch(buf[0]) {
+        case 'p':
+            return memcmp(buf + 1, "acnew", 5) ? false : true;
+        case 'r':
+            return memcmp(buf + 1, "pmnew", 5) ? false : true;
+        }
+        return false;
+    case 7:
+        switch(buf[0]) {
+        case 'p':
+            if (memcmp(buf + 1, "ac", 2)) {
+                return false;
+            }
+            switch(buf[3]) {
+            case 'o':
+                return memcmp(buf + 4, "rig", 3) ? false : true;
+            case 's':
+                return memcmp(buf + 4, "ave", 3) ? false : true;
+            }
+            return false;
+        case 'r':
+            return memcmp(buf + 1, "pmsave", 6) ? false : true;
+        }
+        return false;
+    case 8:
+        return memcmp(buf, "dpkg-old", 8) ? false : true;
+    case 9:
+        return memcmp(buf, "dpkg-dist", 9) ? false : true;
     }
-  return 0;
+    return false;
 }

@@ -6,11 +6,8 @@
 #include "util/ptr-array.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
-
-IGNORE_WARNING("-Wunused-parameter")
 #include "lookup/attributes.c"
 #include "lookup/colors.c"
-UNIGNORE_WARNINGS
 
 static const char builtin_color_names[][16] = {
     "default",
@@ -129,9 +126,9 @@ static bool parse_color(const char *str, int *val)
         return true;
     }
 
-    const ColorHashSlot *slot = lookup_color(str, strlen(str));
-    if (slot) {
-        *val = slot->color;
+    const short c = lookup_color(str, strlen(str));
+    if (c >= -2) {
+        *val = c;
         return true;
     }
 
@@ -140,9 +137,9 @@ static bool parse_color(const char *str, int *val)
 
 static bool parse_attr(const char *str, unsigned short *attr)
 {
-    const AttrHashSlot *slot = lookup_attr(str, strlen(str));
-    if (slot) {
-        *attr |= slot->attr;
+    const unsigned short a = lookup_attr(str, strlen(str));
+    if (a) {
+        *attr |= a;
         return true;
     }
 
@@ -194,19 +191,16 @@ void collect_hl_colors(const char *prefix)
 
 void collect_colors_and_attributes(const char *prefix)
 {
-    for (size_t i = COLORS_MIN_HASH_VALUE; i <= COLORS_MAX_HASH_VALUE; i++) {
-        const char *name = color_table[i].name;
-        if (name && str_has_prefix(name, prefix)) {
-            if (color_table[i].color == -2) {
-                continue; // Skip "keep" because it's in attr_table too
-            }
-            add_completion(xstrdup(name));
-        }
-    }
-    for (size_t i = ATTRS_MIN_HASH_VALUE; i <= ATTRS_MAX_HASH_VALUE; i++) {
-        const char *name = attr_table[i].name;
-        if (name && str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+    static const char names[][16] = {
+        "keep", "default", "black", "red", "green", "yellow",
+        "blue", "magenta", "cyan", "gray", "darkgray", "lightred",
+        "lightgreen", "lightyellow", "lightblue", "lightmagenta",
+        "lightcyan", "white", "underline", "reverse", "blink",
+        "dim", "bold", "invisible", "italic",
+    };
+    for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
+        if (str_has_prefix(names[i], prefix)) {
+            add_completion(xstrdup(names[i]));
         }
     }
 }

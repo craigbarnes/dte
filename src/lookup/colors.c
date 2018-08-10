@@ -1,117 +1,65 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m75 -n src/lookup/colors.gperf  */
-/* Computed positions: -k'1,4,6' */
-/* Filtered by: mk/gperf-filter.sed */
-
-typedef struct {
-    const char *const name;
-    short color;
-} ColorHashSlot;
-
-#define COLORS_TOTAL_KEYWORDS 18
-#define COLORS_MIN_WORD_LENGTH 3
-#define COLORS_MAX_WORD_LENGTH 12
-#define COLORS_MIN_HASH_VALUE 2
-#define COLORS_MAX_HASH_VALUE 19
-/* maximum key range = 18, duplicates = 0 */
-
-inline
-static unsigned int
-color_hash (register const char *str, register size_t len)
+static short lookup_color(const char *buf, size_t len)
 {
-  static const unsigned char asso_values[] =
-    {
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 10,  5, 11,
-       8,  4, 20,  4,  1, 20, 20,  8,  1, 10,
-       3, 20,  7, 20,  2, 20,  3, 20, 20,  8,
-      20,  1, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-      20, 20, 20, 20, 20, 20
-    };
-  register unsigned int hval = 0;
-
-  switch (len)
-    {
-      default:
-        hval += asso_values[(unsigned char)str[5]];
-      /*FALLTHROUGH*/
-      case 5:
-      case 4:
-        hval += asso_values[(unsigned char)str[3]];
-      /*FALLTHROUGH*/
-      case 3:
-      case 2:
-      case 1:
-        hval += asso_values[(unsigned char)str[0]];
-        break;
+    switch(len) {
+    case 3:
+        return memcmp(buf, "red", 3) ? -3 : 1;
+    case 4:
+        switch(buf[0]) {
+        case 'b':
+            return memcmp(buf + 1, "lue", 3) ? -3 : 4;
+        case 'c':
+            return memcmp(buf + 1, "yan", 3) ? -3 : 6;
+        case 'g':
+            return memcmp(buf + 1, "ray", 3) ? -3 : 7;
+        case 'k':
+            return memcmp(buf + 1, "eep", 3) ? -3 : -2;
+        }
+        return -3;
+    case 5:
+        switch(buf[0]) {
+        case 'b':
+            return memcmp(buf + 1, "lack", 4) ? -3 : 0;
+        case 'g':
+            return memcmp(buf + 1, "reen", 4) ? -3 : 2;
+        case 'w':
+            return memcmp(buf + 1, "hite", 4) ? -3 : 15;
+        }
+        return -3;
+    case 6:
+        return memcmp(buf, "yellow", 6) ? -3 : 3;
+    case 7:
+        switch(buf[0]) {
+        case 'd':
+            return memcmp(buf + 1, "efault", 6) ? -3 : -1;
+        case 'm':
+            return memcmp(buf + 1, "agenta", 6) ? -3 : 5;
+        }
+        return -3;
+    case 8:
+        switch(buf[0]) {
+        case 'd':
+            return memcmp(buf + 1, "arkgray", 7) ? -3 : 8;
+        case 'l':
+            return memcmp(buf + 1, "ightred", 7) ? -3 : 9;
+        }
+        return -3;
+    case 9:
+        if (memcmp(buf, "light", 5)) {
+            return -3;
+        }
+        switch(buf[5]) {
+        case 'b':
+            return memcmp(buf + 6, "lue", 3) ? -3 : 12;
+        case 'c':
+            return memcmp(buf + 6, "yan", 3) ? -3 : 14;
+        }
+        return -3;
+    case 10:
+        return memcmp(buf, "lightgreen", 10) ? -3 : 10;
+    case 11:
+        return memcmp(buf, "lightyellow", 11) ? -3 : 11;
+    case 12:
+        return memcmp(buf, "lightmagenta", 12) ? -3 : 13;
     }
-  return hval;
-}
-
-static const unsigned char color_length_table[] =
-  {
-     0,  0,  3, 11,  8,  4, 10,  9,  5,  4,  6,  5, 12,  9,
-     4,  4,  5,  7,  8,  7
-  };
-
-static const ColorHashSlot color_table[] =
-  {
-    {(char*)0,-2}, {(char*)0,-2},
-    {"red", 1},
-    {"lightyellow", 11},
-    {"lightred", 9},
-    {"gray", 7},
-    {"lightgreen", 10},
-    {"lightblue", 12},
-    {"green", 2},
-    {"blue", 4},
-    {"yellow", 3},
-    {"white", 15},
-    {"lightmagenta", 13},
-    {"lightcyan", 14},
-    {"cyan", 6},
-    {"keep", -2},
-    {"black", 0},
-    {"magenta", 5},
-    {"darkgray", 8},
-    {"default", -1}
-  };
-
-static const ColorHashSlot*
-lookup_color (register const char *str, register size_t len)
-{
-  if (len <= COLORS_MAX_WORD_LENGTH && len >= COLORS_MIN_WORD_LENGTH)
-    {
-      register unsigned int key = color_hash (str, len);
-
-      if (key <= COLORS_MAX_HASH_VALUE)
-        if (len == color_length_table[key])
-          {
-            register const char *s = color_table[key].name;
-
-            if (s && *str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &color_table[key];
-          }
-    }
-  return 0;
+    return -3;
 }

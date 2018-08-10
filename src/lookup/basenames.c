@@ -1,165 +1,167 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m75 src/lookup/basenames.gperf  */
-/* Computed positions: -k'1-2,$' */
-/* Filtered by: mk/gperf-filter.sed */
-/* maximum key range = 95, duplicates = 0 */
-
-inline
-static unsigned int
-filetype_basename_hash (register const char *str, register size_t len)
+static FileTypeEnum filetype_from_basename(const char *buf, size_t len)
 {
-  static const unsigned char asso_values[] =
-    {
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102,   5, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102,   0,  16,  31,  46, 102,
-      102,  56, 102, 102, 102,  21, 102,  29,   8,   0,
-       23, 102,  49,  46, 102,  15,  43, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102,  17,   8,   1,
-       22,   0,  26,   0, 102,  15,   8,   2,  30,  10,
-       25,   8,  36, 102,  22,   0,   6,  17,  16, 102,
-      102,  17,   8, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102, 102, 102, 102, 102,
-      102, 102, 102, 102, 102, 102
-    };
-  return len + asso_values[(unsigned char)str[1]] + asso_values[(unsigned char)str[0]] + asso_values[(unsigned char)str[len - 1]];
-}
-
-static const FileTypeHashSlot*
-filetype_from_basename (register const char *str, register size_t len)
-{
-  enum
-    {
-      TOTAL_KEYWORDS = 73,
-      MIN_WORD_LENGTH = 5,
-      MAX_WORD_LENGTH = 17,
-      MIN_HASH_VALUE = 7,
-      MAX_HASH_VALUE = 101
-    };
-
-  static const unsigned char lengthtable[] =
-    {
-       0,  0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  6,  6,  6,
-       5, 10, 11, 10, 13, 14,  6,  7,  9,  9,  9, 13, 13,  8,
-      13,  8,  6, 12,  6, 17,  6,  8,  7, 12, 15, 11,  9,  9,
-      11, 11, 13,  7, 10, 11,  7,  8,  5,  7,  8, 15,  8,  7,
-      11,  6,  7,  9, 10, 10,  8,  7, 10,  7, 11, 11,  8,  6,
-      12, 11, 11, 11,  8, 11,  0,  8,  0,  0, 14,  0, 11,  0,
-       0,  0,  0,  0,  0,  0, 11,  0,  0,  0,  0,  0,  0,  0,
-       8,  0,  0, 14
-    };
-  static const FileTypeHashSlot filetype_basename_table[] =
-    {
-      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
-      {"cshrc", SHELL},
-      {"",0}, {"",0},
-      {".gnus", EMACSLISP},
-      {".emacs", EMACSLISP},
-      {".gemrc", YAML},
-      {".cshrc", SHELL},
-      {"zshrc", SHELL},
-      {".gitconfig", INI},
-      {".gitmodules", INI},
-      {"terminalrc", INI},
-      {".editorconfig", INI},
-      {".gitattributes", CONFIG},
-      {".zshrc", SHELL},
-      {".bashrc", SHELL},
-      {".zprofile", SHELL},
-      {".jshintrc", JSON},
-      {"gitconfig", INI},
-      {".clang-format", YAML},
-      {".bash_profile", SHELL},
-      {".zlogout", SHELL},
-      {"gitattributes", CONFIG},
-      {".inputrc", INPUTRC},
-      {"zshenv", SHELL},
-      {".bash_logout", SHELL},
-      {"bashrc", SHELL},
-      {"meson_options.txt", MESON},
-      {".drirc", XML},
-      {"makefile", MAKE},
-      {".zshenv", SHELL},
-      {"bash_profile", SHELL},
-      {"git-rebase-todo", GITREBASE},
-      {".indent.pro", INDENT},
-      {"config.ld", LUA},
-      {"texmf.cnf", TEXMFCNF},
-      {"bash_logout", SHELL},
-      {"meson.build", MESON},
-      {"mimeapps.list", INI},
-      {".zlogin", SHELL},
-      {"robots.txt", ROBOTSTXT},
-      {".luacheckrc", LUA},
-      {"inputrc", INPUTRC},
-      {".profile", SHELL},
-      {"drirc", XML},
-      {"zlogout", SHELL},
-      {"zprofile", SHELL},
-      {"mkinitcpio.conf", SHELL},
-      {"Makefile", MAKE},
-      {"Capfile", RUBY},
-      {"Project.ede", EMACSLISP},
-      {"Kbuild", MAKE},
-      {".luacov", LUA},
-      {"krb5.conf", INI},
-      {"Cargo.lock", TOML},
-      {"nginx.conf", NGINX},
-      {"Doxyfile", DOXYGEN},
-      {"Gemfile", RUBY},
-      {"Dockerfile", DOCKER},
-      {"profile", SHELL},
-      {"rockspec.in", LUA},
-      {"Makefile.am", MAKE},
-      {"yum.conf", INI},
-      {"zlogin", SHELL},
-      {"Gemfile.lock", RUBY},
-      {"Vagrantfile", RUBY},
-      {"BUILD.bazel", PYTHON},
-      {"BSDmakefile", MAKE},
-      {"Rakefile", RUBY},
-      {"GNUmakefile", MAKE},
-      {"",0},
-      {"APKBUILD", SHELL},
-      {"",0}, {"",0},
-      {"CMakeLists.txt", CMAKE},
-      {"",0},
-      {"Makefile.in", MAKE},
-      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
-      {"pacman.conf", INI},
-      {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0}, {"",0},
-      {"PKGBUILD", SHELL},
-      {"",0}, {"",0},
-      {"COMMIT_EDITMSG", GITCOMMIT}
-    };
-
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
-    {
-      register unsigned int key = filetype_basename_hash (str, len);
-
-      if (key <= MAX_HASH_VALUE)
-        if (len == lengthtable[key])
-          {
-            register const char *s = filetype_basename_table[key].key;
-
-            if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-              return &filetype_basename_table[key];
-          }
+    switch(len) {
+    case 5:
+        switch(buf[0]) {
+        case 'c':
+            return memcmp(buf + 1, "shrc", 4) ? 0 : SHELL;
+        case 'd':
+            return memcmp(buf + 1, "rirc", 4) ? 0 : XML;
+        case 'z':
+            return memcmp(buf + 1, "shrc", 4) ? 0 : SHELL;
+        }
+        return 0;
+    case 6:
+        switch(buf[0]) {
+        case 'K':
+            return memcmp(buf + 1, "build", 5) ? 0 : MAKE;
+        case 'b':
+            return memcmp(buf + 1, "ashrc", 5) ? 0 : SHELL;
+        case 'z':
+            switch(buf[1]) {
+            case 'l':
+                return memcmp(buf + 2, "ogin", 4) ? 0 : SHELL;
+            case 's':
+                return memcmp(buf + 2, "henv", 4) ? 0 : SHELL;
+            }
+            return 0;
+        }
+        return 0;
+    case 7:
+        switch(buf[0]) {
+        case 'C':
+            return memcmp(buf + 1, "apfile", 6) ? 0 : RUBY;
+        case 'G':
+            return memcmp(buf + 1, "emfile", 6) ? 0 : RUBY;
+        case 'i':
+            return memcmp(buf + 1, "nputrc", 6) ? 0 : INPUTRC;
+        case 'p':
+            return memcmp(buf + 1, "rofile", 6) ? 0 : SHELL;
+        case 'z':
+            return memcmp(buf + 1, "logout", 6) ? 0 : SHELL;
+        }
+        return 0;
+    case 8:
+        switch(buf[0]) {
+        case 'A':
+            return memcmp(buf + 1, "PKBUILD", 7) ? 0 : SHELL;
+        case 'D':
+            return memcmp(buf + 1, "oxyfile", 7) ? 0 : DOXYGEN;
+        case 'M':
+            return memcmp(buf + 1, "akefile", 7) ? 0 : MAKE;
+        case 'P':
+            return memcmp(buf + 1, "KGBUILD", 7) ? 0 : SHELL;
+        case 'R':
+            return memcmp(buf + 1, "akefile", 7) ? 0 : RUBY;
+        case 'm':
+            return memcmp(buf + 1, "akefile", 7) ? 0 : MAKE;
+        case 'y':
+            return memcmp(buf + 1, "um.conf", 7) ? 0 : INI;
+        case 'z':
+            return memcmp(buf + 1, "profile", 7) ? 0 : SHELL;
+        }
+        return 0;
+    case 9:
+        switch(buf[0]) {
+        case 'c':
+            return memcmp(buf + 1, "onfig.ld", 8) ? 0 : LUA;
+        case 'g':
+            return memcmp(buf + 1, "itconfig", 8) ? 0 : INI;
+        case 'k':
+            return memcmp(buf + 1, "rb5.conf", 8) ? 0 : INI;
+        case 't':
+            return memcmp(buf + 1, "exmf.cnf", 8) ? 0 : TEXMFCNF;
+        }
+        return 0;
+    case 10:
+        switch(buf[0]) {
+        case 'C':
+            return memcmp(buf + 1, "argo.lock", 9) ? 0 : TOML;
+        case 'D':
+            return memcmp(buf + 1, "ockerfile", 9) ? 0 : DOCKER;
+        case 'n':
+            return memcmp(buf + 1, "ginx.conf", 9) ? 0 : NGINX;
+        case 'r':
+            return memcmp(buf + 1, "obots.txt", 9) ? 0 : ROBOTSTXT;
+        case 't':
+            return memcmp(buf + 1, "erminalrc", 9) ? 0 : INI;
+        }
+        return 0;
+    case 11:
+        switch(buf[0]) {
+        case 'B':
+            switch(buf[1]) {
+            case 'S':
+                return memcmp(buf + 2, "Dmakefile", 9) ? 0 : MAKE;
+            case 'U':
+                return memcmp(buf + 2, "ILD.bazel", 9) ? 0 : PYTHON;
+            }
+            return 0;
+        case 'G':
+            return memcmp(buf + 1, "NUmakefile", 10) ? 0 : MAKE;
+        case 'M':
+            if (memcmp(buf + 1, "akefile.", 8)) {
+                return 0;
+            }
+            switch(buf[9]) {
+            case 'a':
+                return (buf[10] != 'm') ? 0 : MAKE;
+            case 'i':
+                return (buf[10] != 'n') ? 0 : MAKE;
+            }
+            return 0;
+        case 'P':
+            return memcmp(buf + 1, "roject.ede", 10) ? 0 : EMACSLISP;
+        case 'V':
+            return memcmp(buf + 1, "agrantfile", 10) ? 0 : RUBY;
+        case 'b':
+            return memcmp(buf + 1, "ash_logout", 10) ? 0 : SHELL;
+        case 'm':
+            return memcmp(buf + 1, "eson.build", 10) ? 0 : MESON;
+        case 'p':
+            return memcmp(buf + 1, "acman.conf", 10) ? 0 : INI;
+        case 'r':
+            return memcmp(buf + 1, "ockspec.in", 10) ? 0 : LUA;
+        }
+        return 0;
+    case 12:
+        switch(buf[0]) {
+        case 'G':
+            return memcmp(buf + 1, "emfile.lock", 11) ? 0 : RUBY;
+        case 'b':
+            return memcmp(buf + 1, "ash_profile", 11) ? 0 : SHELL;
+        }
+        return 0;
+    case 13:
+        switch(buf[0]) {
+        case 'g':
+            return memcmp(buf + 1, "itattributes", 12) ? 0 : CONFIG;
+        case 'm':
+            return memcmp(buf + 1, "imeapps.list", 12) ? 0 : INI;
+        }
+        return 0;
+    case 14:
+        switch(buf[0]) {
+        case 'C':
+            switch(buf[1]) {
+            case 'M':
+                return memcmp(buf + 2, "akeLists.txt", 12) ? 0 : CMAKE;
+            case 'O':
+                return memcmp(buf + 2, "MMIT_EDITMSG", 12) ? 0 : GITCOMMIT;
+            }
+            return 0;
+        }
+        return 0;
+    case 15:
+        switch(buf[0]) {
+        case 'g':
+            return memcmp(buf + 1, "it-rebase-todo", 14) ? 0 : GITREBASE;
+        case 'm':
+            return memcmp(buf + 1, "kinitcpio.conf", 14) ? 0 : SHELL;
+        }
+        return 0;
+    case 17:
+        return memcmp(buf, "meson_options.txt", 17) ? 0 : MESON;
     }
-  return 0;
+    return 0;
 }

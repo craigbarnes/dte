@@ -1,325 +1,605 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m75 -D src/lookup/extensions.gperf  */
-/* Computed positions: -k'1-2,$' */
-/* Filtered by: mk/gperf-filter.sed */
-/* maximum key range = 338, duplicates = 0 */
-
-inline
-static unsigned int
-filetype_extension_hash (register const char *str, register size_t len)
+static FileTypeEnum filetype_from_extension(const char *buf, size_t len)
 {
-  static const unsigned short asso_values[] =
-    {
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369,  16, 369,  16, 369, 369, 369,  34,
-       33,  18,  19,  32,  16,  26,  25,  24, 369, 369,
-      369, 369, 369, 369, 369, 369, 369,  23, 369, 369,
-      369, 369,  22, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369,  21, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 123,  61,  17,
-       31,  20, 119,  55, 105,  90, 100, 103,  45,  20,
-       15,  96,  44,  23,  52,  15,  24,  88,  75,  43,
-       45, 130,  22,  36, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369, 369, 369,
-      369, 369, 369, 369, 369, 369, 369, 369
-    };
-  register unsigned int hval = len;
-
-  switch (hval)
-    {
-      default:
-        hval += asso_values[(unsigned char)str[1]+2];
-      /*FALLTHROUGH*/
-      case 1:
-        hval += asso_values[(unsigned char)str[0]];
-        break;
-    }
-  return hval + asso_values[(unsigned char)str[len - 1]];
-}
-
-static const FileTypeHashSlot*
-filetype_from_extension (register const char *str, register size_t len)
-{
-  enum
-    {
-      TOTAL_KEYWORDS = 177,
-      MIN_WORD_LENGTH = 1,
-      MAX_WORD_LENGTH = 11,
-      MIN_HASH_VALUE = 31,
-      MAX_HASH_VALUE = 368
-    };
-
-  static const unsigned char lengthtable[] =
-    {
-       1,  1,  1,  1,  1,  1,  1,  1,  1,  3,  1,  3,  1,  3,
-       1,  4,  5,  2,  2,  3,  4,  8,  4,  4,  1,  3,  1,  6,
-       1,  6,  1,  8,  6,  5,  3,  4,  3,  3,  2,  3,  2,  2,
-       4,  3,  3,  6,  1,  3,  4,  3,  2,  4,  7,  3,  8,  3,
-       4,  3,  3,  2,  4,  6,  3,  3,  4,  2,  4,  2,  3,  4,
-       3,  5,  2,  7,  5,  7,  7,  3,  5,  7,  5,  4,  3,  3,
-       3,  4,  2,  2,  3,  4,  5,  1,  3,  2,  3,  5,  2,  4,
-       3,  3,  4,  2,  5,  3,  2,  3,  3,  3,  5,  4,  5,  2,
-       4,  3,  2,  2,  4,  3,  3,  7,  3,  5,  3,  4,  4,  4,
-       3,  3,  5,  5,  4,  9,  3,  3,  4,  3,  3,  2,  4,  3,
-       2,  1,  2,  3,  6,  3,  3,  4,  2,  3,  4,  4,  2,  3,
-       3,  4,  5,  9,  3, 11,  4,  3,  5,  4,  3,  1, 10,  3,
-       3,  2,  2,  3,  3,  3,  2,  3,  3
-    };
-  static const FileTypeHashSlot filetype_extension_table[] =
-    {
-      {"s", ASSEMBLY},
-      {"6", ROFF},
-      {"c", C},
-      {"3", ROFF},
-      {"4", ROFF},
-      {"m", OBJECTIVEC},
-      {"S", ASSEMBLY},
-      {"H", CPLUSPLUS},
-      {"C", CPLUSPLUS},
-      {"sls", SCHEME},
-      {"9", ROFF},
-      {"cls", TEX},
-      {"8", ROFF},
-      {"c++", CPLUSPLUS},
-      {"7", ROFF},
-      {"scss", SCSS},
-      {"slice", INI},
-      {"cc", CPLUSPLUS},
-      {"m4", M4},
-      {"scm", SCHEME},
-      {"mkdn", MARKDOWN},
-      {"markdown", MARKDOWN},
-      {"make", MAKE},
-      {"moon", MOONSCRIPT},
-      {"d", D},
-      {"sld", SCHEME},
-      {"5", ROFF},
-      {"coffee", COFFEESCRIPT},
-      {"2", ROFF},
-      {"socket", INI},
-      {"1", ROFF},
-      {"topojson", JSON},
-      {"target", INI},
-      {"mount", INI},
-      {"mkd", MARKDOWN},
-      {"dart", DART},
-      {"pls", INI},
-      {"sql", SQL},
-      {"cl", COMMONLISP},
-      {"dot", DOT},
-      {"el", EMACSLISP},
-      {"pc", PKGCONFIG},
-      {"page", MALLARD},
-      {"plt", GNUPLOT},
-      {"cxx", CPLUSPLUS},
-      {"ebuild", SHELL},
-      {"l", LEX},
-      {"tcl", TCL},
-      {"rake", RUBY},
-      {"pot", GETTEXT},
-      {"cr", RUBY},
-      {"toml", TOML},
-      {"service", INI},
-      {"rkt", RACKET},
-      {"rockspec", LUA},
-      {"py3", PYTHON},
-      {"doap", XML},
-      {"sed", SED},
-      {"bat", BATCHFILE},
-      {"pl", PERL},
-      {"rktd", RACKET},
-      {"docker", DOCKER},
-      {"cpp", CPLUSPLUS},
-      {"svg", XML},
-      {"glsl", GLSL},
-      {"ss", SCHEME},
-      {"rktl", RACKET},
-      {"cs", CSHARP},
-      {"css", CSS},
-      {"cson", COFFEESCRIPT},
-      {"tex", TEX},
-      {"dterc", DTERC},
-      {"ts", TYPESCRIPT},
-      {"gnuplot", GNUPLOT},
-      {"vcard", VCARD},
-      {"geojson", JSON},
-      {"gemspec", RUBY},
-      {"clj", CLOJURE},
-      {"emacs", EMACSLISP},
-      {"desktop", INI},
-      {"cmake", CMAKE},
-      {"nawk", AWK},
-      {"bbl", TEX},
-      {"nim", NIM},
-      {"mak", MAKE},
-      {"mawk", AWK},
-      {"mk", MAKE},
-      {"rb", RUBY},
-      {"cmd", BATCHFILE},
-      {"perl", PERL},
-      {"glslv", GLSL},
-      {"v", VERILOG},
-      {"ins", TEX},
-      {"gp", GNUPLOT},
-      {"dtx", TEX},
-      {"nginx", NGINX},
-      {"rs", RUST},
-      {"vert", GLSL},
-      {"btm", BATCHFILE},
-      {"tsx", TYPESCRIPT},
-      {"xslt", XML},
-      {"pm", PERL},
-      {"scala", SCALA},
-      {"eml", EMAIL},
-      {"po", GETTEXT},
-      {"nix", NIX},
-      {"xsd", XML},
-      {"ltx", TEX},
-      {"proto", PROTOBUF},
-      {"path", INI},
-      {"patch", DIFF},
-      {"md", MARKDOWN},
-      {"texi", TEXINFO},
-      {"hxx", CPLUSPLUS},
-      {"go", GO},
-      {"gv", DOT},
-      {"gawk", AWK},
-      {"lsp", COMMONLISP},
-      {"xsl", XML},
-      {"texinfo", TEXINFO},
-      {"csv", CSV},
-      {"timer", INI},
-      {"ver", VERILOG},
-      {"vapi", VALA},
-      {"bash", SHELL},
-      {"doxy", DOXYGEN},
-      {"xml", XML},
-      {"php", PHP},
-      {"glslf", GLSL},
-      {"xhtml", HTML},
-      {"yaml", YAML},
-      {"automount", INI},
-      {"gpi", GNUPLOT},
-      {"vim", VIML},
-      {"frag", GLSL},
-      {"htm", HTML},
-      {"hpp", CPLUSPLUS},
-      {"js", JAVASCRIPT},
-      {"json", JSON},
-      {"vhd", VHDL},
-      {"hs", HASKELL},
-      {"h", C},
-      {"py", PYTHON},
-      {"lua", LUA},
-      {"groovy", GROOVY},
-      {"vcf", VCARD},
-      {"zsh", SHELL},
-      {"vala", VALA},
-      {"sh", SHELL},
-      {"sty", TEX},
-      {"vhdl", VHDL},
-      {"wsgi", PYTHON},
-      {"di", D},
-      {"ini", INI},
-      {"bib", BIBTEX},
-      {"html", HTML},
-      {"gperf", GPERF},
-      {"nginxconf", NGINX},
-      {"asm", ASSEMBLY},
-      {"flatpakrepo", INI},
-      {"java", JAVA},
-      {"asd", COMMONLISP},
-      {"ninja", NINJA},
-      {"diff", DIFF},
-      {"ads", ADA},
-      {"y", YACC},
-      {"flatpakref", INI},
-      {"auk", AWK},
-      {"yml", YAML},
-      {"vh", VHDL},
-      {"ui", XML},
-      {"rdf", XML},
-      {"ksh", SHELL},
-      {"adb", ADA},
-      {"hh", CPLUSPLUS},
-      {"awk", AWK},
-      {"ada", ADA}
-    };
-
-  static const short lookup[] =
-    {
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,   0,  -1,   1,  -1,   2,  -1,   3,  -1,   4,
-       -1,   5,  -1,   6,  -1,   7,  -1,   8,   9,  10,
-       11,  12,  13,  14,  15,  16,  17,  18,  19,  20,
-       21,  22,  23,  24,  25,  26,  27,  28,  29,  30,
-       31,  32,  33,  -1,  34,  -1,  35,  36,  37,  38,
-       -1,  39,  40,  41,  -1,  42,  43,  44,  45,  -1,
-       -1,  46,  47,  48,  49,  50,  51,  52,  -1,  53,
-       54,  55,  56,  -1,  57,  58,  59,  60,  -1,  -1,
-       -1,  -1,  61,  -1,  -1,  -1,  62,  -1,  63,  64,
-       65,  66,  67,  68,  69,  -1,  -1,  70,  71,  72,
-       73,  74,  75,  -1,  76,  77,  78,  79,  80,  81,
-       82,  83,  -1,  84,  85,  86,  87,  88,  89,  -1,
-       90,  91,  92,  93,  94,  95,  -1,  96,  97,  98,
-       99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
-      109, 110, 111, 112,  -1, 113, 114, 115,  -1, 116,
-      117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
-       -1, 127,  -1,  -1, 128, 129, 130,  -1,  -1, 131,
-      132, 133, 134, 135, 136, 137,  -1, 138,  -1, 139,
-      140, 141, 142,  -1, 143, 144,  -1, 145, 146, 147,
-       -1,  -1, 148, 149, 150, 151, 152, 153, 154, 155,
-       -1, 156,  -1, 157, 158,  -1,  -1,  -1,  -1,  -1,
-       -1, 159,  -1,  -1, 160, 161, 162,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1, 163,  -1,  -1,
-      164, 165,  -1, 166,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1, 167,  -1, 168,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1, 169, 170,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1, 171,  -1,  -1,  -1,  -1,  -1, 172,
-       -1,  -1,  -1,  -1,  -1,  -1, 173,  -1,  -1,  -1,
-       -1,  -1, 174,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, 175,
-       -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1, 176
-    };
-
-  if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
-    {
-      register unsigned int key = filetype_extension_hash (str, len);
-
-      if (key <= MAX_HASH_VALUE)
-        {
-          register int index = lookup[key];
-
-          if (index >= 0)
-            {
-              if (len == lengthtable[index])
-                {
-                  register const char *s = filetype_extension_table[index].key;
-
-                  if (*str == *s && !memcmp (str + 1, s + 1, len - 1))
-                    return &filetype_extension_table[index];
-                }
-            }
+    switch(len) {
+    case 1:
+        switch(buf[0]) {
+        case '1':
+            return ROFF;
+        case '2':
+            return ROFF;
+        case '3':
+            return ROFF;
+        case '4':
+            return ROFF;
+        case '5':
+            return ROFF;
+        case '6':
+            return ROFF;
+        case '7':
+            return ROFF;
+        case '8':
+            return ROFF;
+        case '9':
+            return ROFF;
+        case 'C':
+            return CPLUSPLUS;
+        case 'H':
+            return CPLUSPLUS;
+        case 'S':
+            return ASSEMBLY;
+        case 'c':
+            return C;
+        case 'd':
+            return D;
+        case 'h':
+            return C;
+        case 'l':
+            return LEX;
+        case 'm':
+            return OBJECTIVEC;
+        case 's':
+            return ASSEMBLY;
+        case 'v':
+            return VERILOG;
+        case 'y':
+            return YACC;
         }
+        return 0;
+    case 2:
+        switch(buf[0]) {
+        case 'c':
+            switch(buf[1]) {
+            case 'c':
+                return CPLUSPLUS;
+            case 'l':
+                return COMMONLISP;
+            case 'r':
+                return RUBY;
+            case 's':
+                return CSHARP;
+            }
+            return 0;
+        case 'd':
+            return (buf[1] != 'i') ? 0 : D;
+        case 'e':
+            return (buf[1] != 'l') ? 0 : EMACSLISP;
+        case 'g':
+            switch(buf[1]) {
+            case 'o':
+                return GO;
+            case 'p':
+                return GNUPLOT;
+            case 'v':
+                return DOT;
+            }
+            return 0;
+        case 'h':
+            switch(buf[1]) {
+            case 'h':
+                return CPLUSPLUS;
+            case 's':
+                return HASKELL;
+            }
+            return 0;
+        case 'j':
+            return (buf[1] != 's') ? 0 : JAVASCRIPT;
+        case 'm':
+            switch(buf[1]) {
+            case '4':
+                return M4;
+            case 'd':
+                return MARKDOWN;
+            case 'k':
+                return MAKE;
+            }
+            return 0;
+        case 'p':
+            switch(buf[1]) {
+            case 'c':
+                return PKGCONFIG;
+            case 'l':
+                return PERL;
+            case 'm':
+                return PERL;
+            case 'o':
+                return GETTEXT;
+            case 'y':
+                return PYTHON;
+            }
+            return 0;
+        case 'r':
+            switch(buf[1]) {
+            case 'b':
+                return RUBY;
+            case 's':
+                return RUST;
+            }
+            return 0;
+        case 's':
+            switch(buf[1]) {
+            case 'h':
+                return SHELL;
+            case 's':
+                return SCHEME;
+            }
+            return 0;
+        case 't':
+            return (buf[1] != 's') ? 0 : TYPESCRIPT;
+        case 'u':
+            return (buf[1] != 'i') ? 0 : XML;
+        case 'v':
+            return (buf[1] != 'h') ? 0 : VHDL;
+        }
+        return 0;
+    case 3:
+        switch(buf[0]) {
+        case 'a':
+            switch(buf[1]) {
+            case 'd':
+                switch(buf[2]) {
+                case 'a':
+                    return ADA;
+                case 'b':
+                    return ADA;
+                case 's':
+                    return ADA;
+                }
+                return 0;
+            case 's':
+                switch(buf[2]) {
+                case 'd':
+                    return COMMONLISP;
+                case 'm':
+                    return ASSEMBLY;
+                }
+                return 0;
+            case 'u':
+                return (buf[2] != 'k') ? 0 : AWK;
+            case 'w':
+                return (buf[2] != 'k') ? 0 : AWK;
+            }
+            return 0;
+        case 'b':
+            switch(buf[1]) {
+            case 'a':
+                return (buf[2] != 't') ? 0 : BATCHFILE;
+            case 'b':
+                return (buf[2] != 'l') ? 0 : TEX;
+            case 'i':
+                return (buf[2] != 'b') ? 0 : BIBTEX;
+            case 't':
+                return (buf[2] != 'm') ? 0 : BATCHFILE;
+            }
+            return 0;
+        case 'c':
+            switch(buf[1]) {
+            case 'l':
+                switch(buf[2]) {
+                case 'j':
+                    return CLOJURE;
+                case 's':
+                    return TEX;
+                }
+                return 0;
+            case 'm':
+                return (buf[2] != 'd') ? 0 : BATCHFILE;
+            case 'p':
+                return (buf[2] != 'p') ? 0 : CPLUSPLUS;
+            case 's':
+                switch(buf[2]) {
+                case 's':
+                    return CSS;
+                case 'v':
+                    return CSV;
+                }
+                return 0;
+            case 'x':
+                return (buf[2] != 'x') ? 0 : CPLUSPLUS;
+            }
+            return 0;
+        case 'd':
+            switch(buf[1]) {
+            case 'o':
+                return (buf[2] != 't') ? 0 : DOT;
+            case 't':
+                return (buf[2] != 'x') ? 0 : TEX;
+            }
+            return 0;
+        case 'e':
+            return memcmp(buf + 1, "ml", 2) ? 0 : EMAIL;
+        case 'g':
+            return memcmp(buf + 1, "pi", 2) ? 0 : GNUPLOT;
+        case 'h':
+            switch(buf[1]) {
+            case 'p':
+                return (buf[2] != 'p') ? 0 : CPLUSPLUS;
+            case 't':
+                return (buf[2] != 'm') ? 0 : HTML;
+            case 'x':
+                return (buf[2] != 'x') ? 0 : CPLUSPLUS;
+            }
+            return 0;
+        case 'i':
+            switch(buf[1]) {
+            case 'n':
+                switch(buf[2]) {
+                case 'i':
+                    return INI;
+                case 's':
+                    return TEX;
+                }
+                return 0;
+            }
+            return 0;
+        case 'k':
+            return memcmp(buf + 1, "sh", 2) ? 0 : SHELL;
+        case 'l':
+            switch(buf[1]) {
+            case 's':
+                return (buf[2] != 'p') ? 0 : COMMONLISP;
+            case 't':
+                return (buf[2] != 'x') ? 0 : TEX;
+            case 'u':
+                return (buf[2] != 'a') ? 0 : LUA;
+            }
+            return 0;
+        case 'm':
+            switch(buf[1]) {
+            case 'a':
+                return (buf[2] != 'k') ? 0 : MAKE;
+            case 'k':
+                return (buf[2] != 'd') ? 0 : MARKDOWN;
+            }
+            return 0;
+        case 'n':
+            switch(buf[1]) {
+            case 'i':
+                switch(buf[2]) {
+                case 'm':
+                    return NIM;
+                case 'x':
+                    return NIX;
+                }
+                return 0;
+            }
+            return 0;
+        case 'p':
+            switch(buf[1]) {
+            case 'h':
+                return (buf[2] != 'p') ? 0 : PHP;
+            case 'l':
+                switch(buf[2]) {
+                case 's':
+                    return INI;
+                case 't':
+                    return GNUPLOT;
+                }
+                return 0;
+            case 'o':
+                return (buf[2] != 't') ? 0 : GETTEXT;
+            case 'y':
+                return (buf[2] != '3') ? 0 : PYTHON;
+            }
+            return 0;
+        case 'r':
+            switch(buf[1]) {
+            case 'd':
+                return (buf[2] != 'f') ? 0 : XML;
+            case 'k':
+                return (buf[2] != 't') ? 0 : RACKET;
+            }
+            return 0;
+        case 's':
+            switch(buf[1]) {
+            case 'c':
+                return (buf[2] != 'm') ? 0 : SCHEME;
+            case 'e':
+                return (buf[2] != 'd') ? 0 : SED;
+            case 'l':
+                switch(buf[2]) {
+                case 'd':
+                    return SCHEME;
+                case 's':
+                    return SCHEME;
+                }
+                return 0;
+            case 'q':
+                return (buf[2] != 'l') ? 0 : SQL;
+            case 't':
+                return (buf[2] != 'y') ? 0 : TEX;
+            case 'v':
+                return (buf[2] != 'g') ? 0 : XML;
+            }
+            return 0;
+        case 't':
+            switch(buf[1]) {
+            case 'c':
+                return (buf[2] != 'l') ? 0 : TCL;
+            case 'e':
+                return (buf[2] != 'x') ? 0 : TEX;
+            case 's':
+                return (buf[2] != 'x') ? 0 : TYPESCRIPT;
+            }
+            return 0;
+        case 'v':
+            switch(buf[1]) {
+            case 'c':
+                return (buf[2] != 'f') ? 0 : VCARD;
+            case 'e':
+                return (buf[2] != 'r') ? 0 : VERILOG;
+            case 'h':
+                return (buf[2] != 'd') ? 0 : VHDL;
+            case 'i':
+                return (buf[2] != 'm') ? 0 : VIML;
+            }
+            return 0;
+        case 'x':
+            switch(buf[1]) {
+            case 'm':
+                return (buf[2] != 'l') ? 0 : XML;
+            case 's':
+                switch(buf[2]) {
+                case 'd':
+                    return XML;
+                case 'l':
+                    return XML;
+                }
+                return 0;
+            }
+            return 0;
+        case 'y':
+            return memcmp(buf + 1, "ml", 2) ? 0 : YAML;
+        case 'z':
+            return memcmp(buf + 1, "sh", 2) ? 0 : SHELL;
+        }
+        return 0;
+    case 4:
+        switch(buf[0]) {
+        case 'b':
+            return memcmp(buf + 1, "ash", 3) ? 0 : SHELL;
+        case 'c':
+            return memcmp(buf + 1, "son", 3) ? 0 : COFFEESCRIPT;
+        case 'd':
+            switch(buf[1]) {
+            case 'a':
+                return memcmp(buf + 2, "rt", 2) ? 0 : DART;
+            case 'i':
+                return memcmp(buf + 2, "ff", 2) ? 0 : DIFF;
+            case 'o':
+                switch(buf[2]) {
+                case 'a':
+                    return (buf[3] != 'p') ? 0 : XML;
+                case 'x':
+                    return (buf[3] != 'y') ? 0 : DOXYGEN;
+                }
+                return 0;
+            }
+            return 0;
+        case 'f':
+            return memcmp(buf + 1, "rag", 3) ? 0 : GLSL;
+        case 'g':
+            switch(buf[1]) {
+            case 'a':
+                return memcmp(buf + 2, "wk", 2) ? 0 : AWK;
+            case 'l':
+                return memcmp(buf + 2, "sl", 2) ? 0 : GLSL;
+            }
+            return 0;
+        case 'h':
+            return memcmp(buf + 1, "tml", 3) ? 0 : HTML;
+        case 'j':
+            switch(buf[1]) {
+            case 'a':
+                return memcmp(buf + 2, "va", 2) ? 0 : JAVA;
+            case 's':
+                return memcmp(buf + 2, "on", 2) ? 0 : JSON;
+            }
+            return 0;
+        case 'm':
+            switch(buf[1]) {
+            case 'a':
+                switch(buf[2]) {
+                case 'k':
+                    return (buf[3] != 'e') ? 0 : MAKE;
+                case 'w':
+                    return (buf[3] != 'k') ? 0 : AWK;
+                }
+                return 0;
+            case 'k':
+                return memcmp(buf + 2, "dn", 2) ? 0 : MARKDOWN;
+            case 'o':
+                return memcmp(buf + 2, "on", 2) ? 0 : MOONSCRIPT;
+            }
+            return 0;
+        case 'n':
+            return memcmp(buf + 1, "awk", 3) ? 0 : AWK;
+        case 'p':
+            switch(buf[1]) {
+            case 'a':
+                switch(buf[2]) {
+                case 'g':
+                    return (buf[3] != 'e') ? 0 : MALLARD;
+                case 't':
+                    return (buf[3] != 'h') ? 0 : INI;
+                }
+                return 0;
+            case 'e':
+                return memcmp(buf + 2, "rl", 2) ? 0 : PERL;
+            }
+            return 0;
+        case 'r':
+            switch(buf[1]) {
+            case 'a':
+                return memcmp(buf + 2, "ke", 2) ? 0 : RUBY;
+            case 'k':
+                switch(buf[2]) {
+                case 't':
+                    switch(buf[3]) {
+                    case 'd':
+                        return RACKET;
+                    case 'l':
+                        return RACKET;
+                    }
+                    return 0;
+                }
+                return 0;
+            }
+            return 0;
+        case 's':
+            return memcmp(buf + 1, "css", 3) ? 0 : SCSS;
+        case 't':
+            switch(buf[1]) {
+            case 'e':
+                return memcmp(buf + 2, "xi", 2) ? 0 : TEXINFO;
+            case 'o':
+                return memcmp(buf + 2, "ml", 2) ? 0 : TOML;
+            }
+            return 0;
+        case 'v':
+            switch(buf[1]) {
+            case 'a':
+                switch(buf[2]) {
+                case 'l':
+                    return (buf[3] != 'a') ? 0 : VALA;
+                case 'p':
+                    return (buf[3] != 'i') ? 0 : VALA;
+                }
+                return 0;
+            case 'e':
+                return memcmp(buf + 2, "rt", 2) ? 0 : GLSL;
+            case 'h':
+                return memcmp(buf + 2, "dl", 2) ? 0 : VHDL;
+            }
+            return 0;
+        case 'w':
+            return memcmp(buf + 1, "sgi", 3) ? 0 : PYTHON;
+        case 'x':
+            return memcmp(buf + 1, "slt", 3) ? 0 : XML;
+        case 'y':
+            return memcmp(buf + 1, "aml", 3) ? 0 : YAML;
+        }
+        return 0;
+    case 5:
+        switch(buf[0]) {
+        case 'c':
+            return memcmp(buf + 1, "make", 4) ? 0 : CMAKE;
+        case 'd':
+            return memcmp(buf + 1, "terc", 4) ? 0 : DTERC;
+        case 'e':
+            return memcmp(buf + 1, "macs", 4) ? 0 : EMACSLISP;
+        case 'g':
+            switch(buf[1]) {
+            case 'l':
+                if (memcmp(buf + 2, "sl", 2)) {
+                    return 0;
+                }
+                switch(buf[4]) {
+                case 'f':
+                    return GLSL;
+                case 'v':
+                    return GLSL;
+                }
+                return 0;
+            case 'p':
+                return memcmp(buf + 2, "erf", 3) ? 0 : GPERF;
+            }
+            return 0;
+        case 'm':
+            return memcmp(buf + 1, "ount", 4) ? 0 : INI;
+        case 'n':
+            switch(buf[1]) {
+            case 'g':
+                return memcmp(buf + 2, "inx", 3) ? 0 : NGINX;
+            case 'i':
+                return memcmp(buf + 2, "nja", 3) ? 0 : NINJA;
+            }
+            return 0;
+        case 'p':
+            switch(buf[1]) {
+            case 'a':
+                return memcmp(buf + 2, "tch", 3) ? 0 : DIFF;
+            case 'r':
+                return memcmp(buf + 2, "oto", 3) ? 0 : PROTOBUF;
+            }
+            return 0;
+        case 's':
+            switch(buf[1]) {
+            case 'c':
+                return memcmp(buf + 2, "ala", 3) ? 0 : SCALA;
+            case 'l':
+                return memcmp(buf + 2, "ice", 3) ? 0 : INI;
+            }
+            return 0;
+        case 't':
+            return memcmp(buf + 1, "imer", 4) ? 0 : INI;
+        case 'v':
+            return memcmp(buf + 1, "card", 4) ? 0 : VCARD;
+        case 'x':
+            return memcmp(buf + 1, "html", 4) ? 0 : HTML;
+        }
+        return 0;
+    case 6:
+        switch(buf[0]) {
+        case 'c':
+            return memcmp(buf + 1, "offee", 5) ? 0 : COFFEESCRIPT;
+        case 'd':
+            return memcmp(buf + 1, "ocker", 5) ? 0 : DOCKER;
+        case 'e':
+            return memcmp(buf + 1, "build", 5) ? 0 : SHELL;
+        case 'g':
+            return memcmp(buf + 1, "roovy", 5) ? 0 : GROOVY;
+        case 's':
+            return memcmp(buf + 1, "ocket", 5) ? 0 : INI;
+        case 't':
+            return memcmp(buf + 1, "arget", 5) ? 0 : INI;
+        }
+        return 0;
+    case 7:
+        switch(buf[0]) {
+        case 'd':
+            return memcmp(buf + 1, "esktop", 6) ? 0 : INI;
+        case 'g':
+            switch(buf[1]) {
+            case 'e':
+                switch(buf[2]) {
+                case 'm':
+                    return memcmp(buf + 3, "spec", 4) ? 0 : RUBY;
+                case 'o':
+                    return memcmp(buf + 3, "json", 4) ? 0 : JSON;
+                }
+                return 0;
+            case 'n':
+                return memcmp(buf + 2, "uplot", 5) ? 0 : GNUPLOT;
+            }
+            return 0;
+        case 's':
+            return memcmp(buf + 1, "ervice", 6) ? 0 : INI;
+        case 't':
+            return memcmp(buf + 1, "exinfo", 6) ? 0 : TEXINFO;
+        }
+        return 0;
+    case 8:
+        switch(buf[0]) {
+        case 'm':
+            return memcmp(buf + 1, "arkdown", 7) ? 0 : MARKDOWN;
+        case 'r':
+            return memcmp(buf + 1, "ockspec", 7) ? 0 : LUA;
+        case 't':
+            return memcmp(buf + 1, "opojson", 7) ? 0 : JSON;
+        }
+        return 0;
+    case 9:
+        switch(buf[0]) {
+        case 'a':
+            return memcmp(buf + 1, "utomount", 8) ? 0 : INI;
+        case 'n':
+            return memcmp(buf + 1, "ginxconf", 8) ? 0 : NGINX;
+        }
+        return 0;
+    case 10:
+        return memcmp(buf, "flatpakref", 10) ? 0 : INI;
+    case 11:
+        return memcmp(buf, "flatpakrepo", 11) ? 0 : INI;
     }
-  return 0;
+    return 0;
 }
