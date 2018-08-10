@@ -79,11 +79,11 @@ end
 local function memcmp(offset, str)
     local length = #str
     if length == 1 then
-        return ("(buf[%u] != '%s')"):format(offset, str)
+        return ("(s[%u] != '%s')"):format(offset, str)
     elseif offset == 0 then
-        return ('memcmp(buf, "%s", %u)'):format(str, length)
+        return ('memcmp(s, "%s", %u)'):format(str, length)
     end
-    return ('memcmp(buf + %d, "%s", %u)'):format(offset, str, length)
+    return ('memcmp(s + %d, "%s", %u)'):format(offset, str, length)
 end
 
 local function write_trie(node, default_return)
@@ -112,7 +112,7 @@ local function write_trie(node, default_return)
                 end
             end
 
-            buf:write(indent, "switch(buf[", tostring(level), "]) {\n")
+            buf:write(indent, "switch(s[", tostring(level), "]) {\n")
             for i = ("0"):byte(), ("z"):byte() do
                 local v = node[i]
                 if v then
@@ -148,7 +148,7 @@ local rtype = assert(defs.return_type, "No return_type defined")
 local rdefault = assert(defs.default_return, "No default_return defined")
 
 local headers = "#include <stddef.h>\n#include <string.h>\n\n"
-local proto = "%sstatic %s %s(const char *buf, size_t len)\n{\n"
+local proto = "%sstatic %s %s(const char *s, size_t len)\n{\n"
 local prelude = proto:format(defs.includes and headers or "", rtype, fname)
 local trie = assert(make_trie(keys))
 local body = assert(write_trie(trie, rdefault))
