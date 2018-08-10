@@ -9,15 +9,12 @@ static void test_find_ft_filename(void)
     } tests[] = {
         {"/usr/local/include/lib.h", "c"},
         {"test.cc~", "c"},
-        {"test.c.pacnew", "c"},
-        {"test.c.pacnew~", "c"},
         {"test.lua", "lua"},
         {"test.py", "python"},
         {"makefile", "make"},
         {"GNUmakefile", "make"},
         {".file.yml", "yaml"},
         {"/etc/nginx.conf", "nginx"},
-        {"file.c.old~", "c"},
         {"file..rb", "ruby"},
         {"file.rb", "ruby"},
         {"/etc/hosts", "config"},
@@ -31,6 +28,18 @@ static void test_find_ft_filename(void)
         {"", NULL},
         {"/", NULL},
         {"/etc../etc.c.old/c.old", NULL},
+        // Ignored extensions
+        {"test.c.bak", "c"},
+        {"test.c.new", "c"},
+        {"test.c.old~", "c"},
+        {"test.c.orig", "c"},
+        {"test.c.pacnew", "c"},
+        {"test.c.pacorig", "c"},
+        {"test.c.pacsave", "c"},
+        {"test.c.dpkg-dist", "c"},
+        {"test.c.dpkg-old", "c"},
+        {"test.c.rpmnew", "c"},
+        {"test.c.rpmsave", "c"},
     };
     FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
