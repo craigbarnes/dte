@@ -1,7 +1,7 @@
 #include "file-option.h"
 #include "options.h"
-#include "regexp.h"
 #include "util/ptr-array.h"
+#include "util/regexp.h"
 #include "util/xmalloc.h"
 
 typedef struct {

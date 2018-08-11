@@ -31,7 +31,8 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     thai fuzz1 ))
 
 util_objects := $(addprefix build/util/, $(addsuffix .o, \
-    ascii path ptr-array string string-view strtonum uchar unicode xmalloc ))
+    ascii path ptr-array regexp string string-view strtonum uchar \
+    unicode xmalloc ))
 
 encoding_objects := $(addprefix build/encoding/, $(addsuffix .o, \
     convert decoder encoder encoding ))
@@ -45,7 +46,7 @@ editor_objects := $(addprefix build/, $(addsuffix .o, \
     editor env error file-history file-option filetype format-status \
     frame git-open highlight history indent input-special load-save \
     lock main mode-command mode-normal mode-search move msg options \
-    parse-args parse-command regexp run screen screen-tabbar screen-view \
+    parse-args parse-command run screen screen-tabbar screen-view \
     script search selection spawn state syntax tag view wbuf window )) \
     $(encoding_objects) $(terminal_objects) $(util_objects)
 

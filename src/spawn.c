@@ -10,8 +10,8 @@
 #include "editor.h"
 #include "error.h"
 #include "msg.h"
-#include "regexp.h"
 #include "terminal/terminfo.h"
+#include "util/regexp.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 

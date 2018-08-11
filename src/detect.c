@@ -1,5 +1,5 @@
 #include "detect.h"
-#include "regexp.h"
+#include "util/regexp.h"
 #include "util/xmalloc.h"
 
 static bool allow_odd_indent(const Buffer *b)
