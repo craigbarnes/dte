@@ -477,7 +477,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
         }
         nr_bytes -= count + 1;
 
-        BUG_ON(!block_iter_next_line(&bi));
+        block_iter_next_line(&bi);
     }
 
     if (!(flags & REPLACE_CONFIRM)) {
