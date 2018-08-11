@@ -2,6 +2,8 @@
 #define TEST_H
 
 #include <inttypes.h>
+#include <stddef.h>
+#include "../src/util/macros.h"
 #include "../src/common.h"
 
 #define FOR_EACH_I(i, array) \

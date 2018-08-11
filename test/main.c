@@ -15,17 +15,6 @@ void test_key_to_string(void);
 void init_headless_mode(void);
 void test_exec_config(void);
 
-unsigned int failed;
-
-void fail(const char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
-    vfprintf(stderr, format, ap);
-    va_end(ap);
-    failed += 1;
-}
-
 static void test_relative_filename(void)
 {
     static const struct rel_test {
