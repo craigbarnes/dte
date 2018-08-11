@@ -2,11 +2,11 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
-#include "common.h"
-#include "editor.h"
-#include "term-info.h"
-#include "term-read.h"
-#include "util/xmalloc.h"
+#include "input.h"
+#include "terminfo.h"
+#include "../common.h"
+#include "../editor.h"
+#include "../util/xmalloc.h"
 
 static char input_buf[256];
 static size_t input_buf_fill;

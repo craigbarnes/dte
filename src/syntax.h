@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "color.h"
+#include "terminal/color.h"
 #include "util/ptr-array.h"
 
 typedef enum {

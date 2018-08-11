@@ -2,7 +2,7 @@
 #define BIND_H
 
 #include <stddef.h>
-#include "key.h"
+#include "terminal/key.h"
 
 void add_binding(const char *keys, const char *command);
 void remove_binding(const char *keys);

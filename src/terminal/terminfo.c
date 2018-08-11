@@ -1,10 +1,10 @@
 #include <termios.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
+#include "terminfo.h"
 #include "color.h"
-#include "common.h"
-#include "lookup/xterm-keys.c"
-#include "term-info.h"
-#include "term-write.h"
+#include "output.h"
+#include "../common.h"
+#include "../lookup/xterm-keys.c"
 
 static struct termios termios_save;
 

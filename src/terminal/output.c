@@ -1,7 +1,7 @@
-#include "common.h"
-#include "term-info.h"
-#include "term-write.h"
-#include "util/uchar.h"
+#include "output.h"
+#include "terminfo.h"
+#include "../common.h"
+#include "../util/uchar.h"
 
 OutputBuffer obuf;
 

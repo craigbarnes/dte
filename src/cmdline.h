@@ -2,7 +2,7 @@
 #define CMDLINE_H
 
 #include <sys/types.h>
-#include "key.h"
+#include "terminal/key.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 

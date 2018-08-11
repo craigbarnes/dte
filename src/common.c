@@ -1,6 +1,6 @@
 #include "common.h"
 #include "editor.h"
-#include "term-info.h"
+#include "terminal/terminfo.h"
 #include "util/xmalloc.h"
 
 size_t count_nl(const char *buf, size_t size)

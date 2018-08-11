@@ -11,7 +11,7 @@
 #include "error.h"
 #include "msg.h"
 #include "regexp.h"
-#include "term-info.h"
+#include "terminal/terminfo.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 

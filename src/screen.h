@@ -2,7 +2,7 @@
 #define SCREEN_H
 
 #include "buffer.h"
-#include "color.h"
+#include "terminal/color.h"
 #include "view.h"
 #include "window.h"
 

@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include "cmdline.h"
-#include "color.h"
 #include "options.h"
+#include "terminal/color.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

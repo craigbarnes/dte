@@ -1,5 +1,4 @@
 #include "state.h"
-#include "color.h"
 #include "command.h"
 #include "common.h"
 #include "config.h"
@@ -7,6 +6,7 @@
 #include "error.h"
 #include "parse-args.h"
 #include "syntax.h"
+#include "terminal/color.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
 

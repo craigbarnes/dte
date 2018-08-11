@@ -1,13 +1,13 @@
 #include "color.h"
-#include "common.h"
-#include "completion.h"
-#include "editor.h"
-#include "error.h"
-#include "util/ptr-array.h"
-#include "util/strtonum.h"
-#include "util/xmalloc.h"
-#include "lookup/attributes.c"
-#include "lookup/colors.c"
+#include "../common.h"
+#include "../completion.h"
+#include "../editor.h"
+#include "../error.h"
+#include "../util/ptr-array.h"
+#include "../util/strtonum.h"
+#include "../util/xmalloc.h"
+#include "../lookup/attributes.c"
+#include "../lookup/colors.c"
 
 static const char builtin_color_names[][16] = {
     "default",

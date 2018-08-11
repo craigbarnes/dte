@@ -5,7 +5,7 @@
 // See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
 #include <sys/types.h>
-#include "../key.h"
+#include "../terminal/key.h"
 
 static KeyCode mod_enum_to_mod_mask(char mod_enum)
 {

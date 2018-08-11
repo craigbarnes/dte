@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "key.h"
+#include "terminal/key.h"
 
 void special_input_activate(void);
 bool special_input_keypress(KeyCode key, char *buf, int *count);

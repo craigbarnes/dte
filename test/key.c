@@ -1,5 +1,5 @@
 #include "test.h"
-#include "../src/key.h"
+#include "../src/terminal/key.h"
 
 void test_key_to_string(void)
 {

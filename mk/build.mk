@@ -36,16 +36,18 @@ util_objects := $(addprefix build/util/, $(addsuffix .o, \
 encoding_objects := $(addprefix build/encoding/, $(addsuffix .o, \
     convert decoder encoder encoding ))
 
+terminal_objects := $(addprefix build/terminal/, $(addsuffix .o, \
+    color input key output terminfo ))
+
 editor_objects := $(addprefix build/, $(addsuffix .o, \
     alias bind block block-iter buffer buffer-iter change cmdline \
-    color commands common compiler completion config ctags detect edit \
+    commands common compiler completion config ctags detect edit \
     editor env error file-history file-option filetype format-status \
-    frame git-open highlight history indent input-special key load-save \
+    frame git-open highlight history indent input-special load-save \
     lock main mode-command mode-normal mode-search move msg options \
     parse-args parse-command regexp run screen screen-tabbar screen-view \
-    script search selection spawn state syntax tag term-info term-read \
-    term-write view wbuf window )) \
-    $(encoding_objects) $(util_objects)
+    script search selection spawn state syntax tag view wbuf window )) \
+    $(encoding_objects) $(terminal_objects) $(util_objects)
 
 test_objects := $(addprefix build/test/, $(addsuffix .o, \
     config filetype key main test util ))
@@ -134,6 +136,7 @@ $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 $(encoding_objects): | build/encoding/
+$(terminal_objects): | build/terminal/
 build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
@@ -175,7 +178,7 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/encoding/ build/util/ build/test/: | build/
+build/encoding/ build/terminal/ build/util/ build/test/: | build/
 	$(Q) mkdir -p $@
 
 build/:

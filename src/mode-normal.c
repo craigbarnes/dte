@@ -3,7 +3,7 @@
 #include "edit.h"
 #include "editor.h"
 #include "input-special.h"
-#include "term-read.h"
+#include "terminal/input.h"
 #include "util/unicode.h"
 #include "view.h"
 #include "window.h"
