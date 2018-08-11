@@ -5,12 +5,12 @@
 
 bool regexp_match_nosub(const char *pattern, const char *buf, size_t size)
 {
-    regmatch_t m;
     regex_t re;
-    bool ret;
-
-    BUG_ON(!regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB));
-    ret = regexp_exec(&re, buf, size, 1, &m, 0);
+    bool compiled = regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB);
+    DEBUG_VAR(compiled);
+    BUG_ON(!compiled);
+    regmatch_t m;
+    bool ret = regexp_exec(&re, buf, size, 1, &m, 0);
     regfree(&re);
     return ret;
 }
@@ -22,10 +22,10 @@ bool regexp_match (
     PointerArray *m
 ) {
     regex_t re;
-    bool ret;
-
-    BUG_ON(!regexp_compile(&re, pattern, REG_NEWLINE));
-    ret = regexp_exec_sub(&re, buf, size, m, 0);
+    bool compiled = regexp_compile(&re, pattern, REG_NEWLINE);
+    DEBUG_VAR(compiled);
+    BUG_ON(!compiled);
+    bool ret = regexp_exec_sub(&re, buf, size, m, 0);
     regfree(&re);
     return ret;
 }
