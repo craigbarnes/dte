@@ -147,24 +147,26 @@ build/terminal/terminfo.cflags: | build/terminal/
 build/script.o: build/script.cflags
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
+CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
+LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
+
 $(dte) $(test): build/all.ldflags
 	$(E) LINK $@
-	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) -o $@ \
-	     $(filter %.o, $^) $(LDLIBS)
+	$(Q) $(CC) $(LDFLAGS_ALL) -o $@ $(filter %.o, $^) $(LDLIBS)
 
 $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 
 $(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
-	$(Q) $(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS) $(DEPFLAGS) -c -o $@ $<
+	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 
 build/all.ldflags: FORCE | build/
-	@$(OPTCHECK) '$(CC) $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS) $(LDLIBS)' $@
+	@$(OPTCHECK) '$(CC) $(LDFLAGS_ALL) $(LDLIBS)' $@
 
 build/%.cflags: FORCE | build/
-	@$(OPTCHECK) '$(CC) $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)' $@
+	@$(OPTCHECK) '$(CC) $(CFLAGS_ALL)' $@
 
 build/version.h: FORCE | build/
 	@$(OPTCHECK) 'static const char version[] = "$(VERSION)";' $@
