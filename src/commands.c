@@ -8,7 +8,7 @@
 #include "config.h"
 #include "edit.h"
 #include "editor.h"
-#include "encoding.h"
+#include "encoding/encoding.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"

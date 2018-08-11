@@ -2,11 +2,7 @@
 #define OPTIONS_H
 
 #include <stdbool.h>
-
-typedef enum {
-    NEWLINE_UNIX,
-    NEWLINE_DOS,
-} LineEndingType;
+#include "encoding/encoder.h"
 
 enum {
     // Trailing whitespace

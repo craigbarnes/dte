@@ -2,7 +2,11 @@
 #define ENCODER_H
 
 #include <sys/types.h>
-#include "options.h"
+
+typedef enum {
+    NEWLINE_UNIX,
+    NEWLINE_DOS,
+} LineEndingType;
 
 typedef struct {
     struct cconv *cconv;

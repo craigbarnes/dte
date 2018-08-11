@@ -1,8 +1,9 @@
+#include <stdlib.h>
 #include "encoder.h"
-#include "cconv.h"
-#include "common.h"
-#include "util/uchar.h"
-#include "util/xmalloc.h"
+#include "convert.h"
+#include "../common.h"
+#include "../util/uchar.h"
+#include "../util/xmalloc.h"
 
 FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 {
