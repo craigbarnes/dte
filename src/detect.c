@@ -2,67 +2,6 @@
 #include "regexp.h"
 #include "util/xmalloc.h"
 
-static bool next_line(BlockIter *bi, LineRef *lr)
-{
-    if (!block_iter_eat_line(bi)) {
-        return false;
-    }
-    fill_line_ref(bi, lr);
-    return true;
-}
-
-/*
- * Parse #! line and return interpreter name without vesion number.
- * For example if file's first line is "#!/usr/bin/env python2" then
- * "python" is returned.
- */
-char *detect_interpreter(Buffer *b)
-{
-    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
-    PointerArray m = PTR_ARRAY_INIT;
-    LineRef lr;
-    char *ret;
-
-    fill_line_ref(&bi, &lr);
-    if (!regexp_match (
-        "^#! */.*(/env +|/)([a-zA-Z_-]+)[0-9.]*( |$)",
-        lr.line,
-        lr.size,
-        &m
-    )) {
-        return NULL;
-    }
-
-    ret = xstrdup(m.ptrs[2]);
-    ptr_array_free(&m);
-
-    if (!streq(ret, "sh")) {
-        return ret;
-    }
-
-    /*
-     * #!/bin/sh
-     * # the next line restarts using wish \
-     * exec wish "$0" "$@"
-     */
-    if (
-        !next_line(&bi, &lr)
-        || !regexp_match_nosub("^#.*\\\\$", lr.line, lr.size)
-    ) {
-        return ret;
-    }
-
-    if (
-        !next_line(&bi, &lr)
-        || !regexp_match_nosub("^exec +wish +", lr.line, lr.size)
-    ) {
-        return ret;
-    }
-
-    free(ret);
-    return xstrdup("wish");
-}
-
 static bool allow_odd_indent(const Buffer *b)
 {
     // 1, 3, 5 and 7 space indent

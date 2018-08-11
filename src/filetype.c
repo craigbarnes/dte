@@ -271,9 +271,22 @@ static inline StringView get_ext(const char *const filename)
     return strview;
 }
 
+// Parse shebang and return interpreter name without vesion number.
+// For example if line is "#!/usr/bin/env python2", "python" is returned.
+static char *get_interpreter(const char *line, size_t line_length)
+{
+    static const char re[] = "^#! */.*(/env +|/)([a-zA-Z0-9_-]+)[0-9.]*( |$)";
+    PointerArray m = PTR_ARRAY_INIT;
+    if (!regexp_match(re, line, line_length, &m)) {
+        return NULL;
+    }
+    char *ret = xstrdup(m.ptrs[2]);
+    ptr_array_free(&m);
+    return ret;
+}
+
 const char *find_ft (
     const char *filename,
-    const char *interpreter,
     const char *first_line,
     size_t line_len
 ) {
@@ -286,6 +299,15 @@ const char *find_ft (
         ext = get_ext(b);
         base = string_view(b, strlen(b));
         path = string_view(filename, strlen(filename));
+    }
+
+    char *interpreter = NULL;
+    size_t interpreter_len = 0;
+    if (line.length) {
+        interpreter = get_interpreter(line.data, line.length);
+        if (interpreter) {
+            interpreter_len = strlen(interpreter);
+        }
     }
 
     // Search user `ft` entries
@@ -329,8 +351,8 @@ const char *find_ft (
 
     // Search built-in hash tables
     if (interpreter) {
-        size_t len = strlen(interpreter);
-        FileTypeEnum ft = filetype_from_interpreter(interpreter, len);
+        FileTypeEnum ft = filetype_from_interpreter(interpreter, interpreter_len);
+        free(interpreter);
         if (ft) {
             return builtin_filetype_names[ft];
         }

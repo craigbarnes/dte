@@ -43,7 +43,7 @@ static void test_find_ft_filename(void)
     };
     FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
-        const char *result = find_ft(t->filename, NULL, NULL, 0);
+        const char *result = find_ft(t->filename, NULL, 0);
         EXPECT_STREQ(result, t->expected_filetype);
     }
 }
@@ -64,69 +64,57 @@ static void test_find_ft_firstline(void)
         {" ", NULL},
         {" <?xml", NULL},
         {"\0<?xml", NULL},
+        // Hashbangs
+        {"#!/usr/bin/ash", "sh"},
+        {"#!/usr/bin/awk", "awk"},
+        {"#!/usr/bin/bash", "sh"},
+        {"#!/usr/bin/bigloo", "scheme"},
+        {"#!/usr/bin/ccl", "lisp"},
+        {"#!/usr/bin/chicken", "scheme"},
+        {"#!/usr/bin/clisp", "lisp"},
+        {"#!/usr/bin/coffee", "coffeescript"},
+        {"#!/usr/bin/crystal", "ruby"},
+        {"#!/usr/bin/dash", "sh"},
+        {"#!/usr/bin/ecl", "lisp"},
+        {"#!/usr/bin/gawk", "awk"},
+        {"#!/usr/bin/gmake", "make"},
+        {"#!/usr/bin/gnuplot", "gnuplot"},
+        {"#!/usr/bin/groovy", "groovy"},
+        {"#!/usr/bin/gsed", "sed"},
+        {"#!/usr/bin/guile", "scheme"},
+        {"#!/usr/bin/jruby", "ruby"},
+        {"#!/usr/bin/ksh", "sh"},
+        {"#!/usr/bin/lisp", "lisp"},
+        {"#!/usr/bin/luajit", "lua"},
+        {"#!/usr/bin/lua", "lua"},
+        {"#!/usr/bin/macruby", "ruby"},
+        {"#!/usr/bin/make", "make"},
+        {"#!/usr/bin/mawk", "awk"},
+        {"#!/usr/bin/mksh", "sh"},
+        {"#!/usr/bin/moon", "moonscript"},
+        {"#!/usr/bin/nawk", "awk"},
+        {"#!/usr/bin/node", "javascript"},
+        {"#!/usr/bin/openrc-run", "sh"},
+        {"#!/usr/bin/pdksh", "sh"},
+        {"#!/usr/bin/perl", "perl"},
+        {"#!/usr/bin/php", "php"},
+        {"#!/usr/bin/python", "python"},
+        {"#!/usr/bin/r6rs", "scheme"},
+        {"#!/usr/bin/racket", "scheme"},
+        {"#!/usr/bin/rake", "ruby"},
+        {"#!/usr/bin/ruby", "ruby"},
+        {"#!/usr/bin/runhaskell", "haskell"},
+        {"#!/usr/bin/sbcl", "lisp"},
+        {"#!/usr/bin/sed", "sed"},
+        {"#!/bin/sh", "sh"},
+        {"#!/usr/bin/tcc", "c"},
+        {"#!/usr/bin/tclsh", "tcl"},
+        {"#!/usr/bin/wish", "tcl"},
+        {"#!/usr/bin/zsh", "sh"},
     };
     FOR_EACH_I(i, tests) {
         const struct ft_firstline_test *t = &tests[i];
-        const char *result = find_ft(NULL, NULL, t->line, strlen(t->line));
-        EXPECT_STREQ(result, t->expected_filetype);
-    }
-}
-
-static void test_find_ft_interpreter(void)
-{
-    static const struct ft_interpreter_test {
-        const char *interpreter, *expected_filetype;
-    } tests[] = {
-        {"ash", "sh"},
-        {"awk", "awk"},
-        {"bash", "sh"},
-        {"bigloo", "scheme"},
-        {"ccl", "lisp"},
-        {"chicken", "scheme"},
-        {"clisp", "lisp"},
-        {"coffee", "coffeescript"},
-        {"crystal", "ruby"},
-        {"dash", "sh"},
-        {"ecl", "lisp"},
-        {"gawk", "awk"},
-        {"gmake", "make"},
-        {"gnuplot", "gnuplot"},
-        {"groovy", "groovy"},
-        {"gsed", "sed"},
-        {"guile", "scheme"},
-        {"jruby", "ruby"},
-        {"ksh", "sh"},
-        {"lisp", "lisp"},
-        {"luajit", "lua"},
-        {"lua", "lua"},
-        {"macruby", "ruby"},
-        {"make", "make"},
-        {"mawk", "awk"},
-        {"mksh", "sh"},
-        {"moon", "moonscript"},
-        {"nawk", "awk"},
-        {"node", "javascript"},
-        {"openrc-run", "sh"},
-        {"pdksh", "sh"},
-        {"perl", "perl"},
-        {"php", "php"},
-        {"python", "python"},
-        {"r6rs", "scheme"},
-        {"racket", "scheme"},
-        {"rake", "ruby"},
-        {"ruby", "ruby"},
-        {"runhaskell", "haskell"},
-        {"sbcl", "lisp"},
-        {"sed", "sed"},
-        {"sh", "sh"},
-        {"tcc", "c"},
-        {"tclsh", "tcl"},
-        {"wish", "tcl"},
-        {"zsh", "sh"},
-    };
-    FOR_EACH_I(i, tests) {
-        const struct ft_interpreter_test *t = &tests[i];
-        const char *result = find_ft(NULL, t->interpreter, NULL, 0);
+        const char *result = find_ft(NULL, t->line, strlen(t->line));
         EXPECT_STREQ(result, t->expected_filetype);
     }
 }
@@ -135,5 +123,4 @@ void test_filetype(void)
 {
     test_find_ft_filename();
     test_find_ft_firstline();
-    test_find_ft_interpreter();
 }

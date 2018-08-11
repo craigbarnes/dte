@@ -150,19 +150,16 @@ Buffer *find_buffer_by_id(unsigned int id)
 
 bool buffer_detect_filetype(Buffer *b)
 {
-    char *interpreter = detect_interpreter(b);
     const char *ft = NULL;
 
     if (BLOCK(b->blocks.next)->size) {
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
-
         fill_line_ref(&bi, &lr);
-        ft = find_ft(b->abs_filename, interpreter, lr.line, lr.size);
+        ft = find_ft(b->abs_filename, lr.line, lr.size);
     } else if (b->abs_filename) {
-        ft = find_ft(b->abs_filename, interpreter, NULL, 0);
+        ft = find_ft(b->abs_filename, NULL, 0);
     }
-    free(interpreter);
 
     if (ft && !streq(ft, b->options.filetype)) {
         free(b->options.filetype);
