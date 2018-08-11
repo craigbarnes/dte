@@ -156,9 +156,11 @@ bool buffer_detect_filetype(Buffer *b)
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
         fill_line_ref(&bi, &lr);
-        ft = find_ft(b->abs_filename, lr.line, lr.size);
+        StringView line = string_view(lr.line, lr.size);
+        ft = find_ft(b->abs_filename, line);
     } else if (b->abs_filename) {
-        ft = find_ft(b->abs_filename, NULL, 0);
+        StringView line = STRING_VIEW_INIT;
+        ft = find_ft(b->abs_filename, line);
     }
 
     if (ft && !streq(ft, b->options.filetype)) {

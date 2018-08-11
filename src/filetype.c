@@ -271,29 +271,37 @@ static inline StringView get_ext(const char *const filename)
     return strview;
 }
 
-// Parse shebang and return interpreter name without vesion number.
-// For example if line is "#!/usr/bin/env python2", "python" is returned.
-static char *get_interpreter(const char *line, size_t line_length)
+// Parse hashbang and return interpreter name, without version number.
+// For example, if line is "#!/usr/bin/env python2", "python" is returned.
+static StringView get_interpreter(const StringView line)
 {
-    static const char re[] = "^#! */.*(/env +|/)([a-zA-Z0-9_-]+)[0-9.]*( |$)";
-    PointerArray m = PTR_ARRAY_INIT;
-    if (!regexp_match(re, line, line_length, &m)) {
-        return NULL;
+    static const char pat[] = "^#! */.*(/env +|/)([a-zA-Z0-9_-]+)[0-9.]*( |$)";
+    static regex_t re;
+    static bool compiled;
+    if (!compiled) {
+        compiled = regexp_compile(&re, pat, REG_NEWLINE);
+        BUG_ON(!compiled);
+        BUG_ON(re.re_nsub < 2);
     }
-    char *ret = xstrdup(m.ptrs[2]);
-    ptr_array_free(&m);
-    return ret;
+
+    StringView sv = STRING_VIEW_INIT;
+    regmatch_t m[3];
+    if (!regexp_exec(&re, line.data, line.length, ARRAY_COUNT(m), m, 0)) {
+        return sv;
+    }
+
+    regoff_t start = m[2].rm_so;
+    regoff_t end = m[2].rm_eo;
+    BUG_ON(start < 0 || end < 0);
+    sv = string_view(line.data + start, end - start);
+    return sv;
 }
 
-const char *find_ft (
-    const char *filename,
-    const char *first_line,
-    size_t line_len
-) {
+const char *find_ft(const char *filename, StringView line)
+{
     StringView path = STRING_VIEW_INIT;
     StringView ext = STRING_VIEW_INIT;
     StringView base = STRING_VIEW_INIT;
-    StringView line = string_view(first_line, line_len);
     if (filename) {
         const char *b = path_basename(filename);
         ext = get_ext(b);
@@ -301,13 +309,9 @@ const char *find_ft (
         path = string_view(filename, strlen(filename));
     }
 
-    char *interpreter = NULL;
-    size_t interpreter_len = 0;
+    StringView interpreter = STRING_VIEW_INIT;
     if (line.length) {
-        interpreter = get_interpreter(line.data, line.length);
-        if (interpreter) {
-            interpreter_len = strlen(interpreter);
-        }
+        interpreter = get_interpreter(line);
     }
 
     // Search user `ft` entries
@@ -341,7 +345,10 @@ const char *find_ft (
             }
             break;
         case FT_INTERPRETER:
-            if (!interpreter || !streq(interpreter, ft->str)) {
+            if (
+                !interpreter.length
+                || !string_view_equal_cstr(&interpreter, ft->str)
+            ) {
                 continue;
             }
             break;
@@ -350,9 +357,8 @@ const char *find_ft (
     }
 
     // Search built-in hash tables
-    if (interpreter) {
-        FileTypeEnum ft = filetype_from_interpreter(interpreter, interpreter_len);
-        free(interpreter);
+    if (interpreter.length) {
+        FileTypeEnum ft = filetype_from_interpreter(interpreter.data, interpreter.length);
         if (ft) {
             return builtin_filetype_names[ft];
         }

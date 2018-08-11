@@ -41,9 +41,10 @@ static void test_find_ft_filename(void)
         {"test.c.rpmnew", "c"},
         {"test.c.rpmsave", "c"},
     };
+    const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
-        const char *result = find_ft(t->filename, NULL, 0);
+        const char *result = find_ft(t->filename, empty_line);
         EXPECT_STREQ(result, t->expected_filetype);
     }
 }
@@ -111,10 +112,11 @@ static void test_find_ft_firstline(void)
         {"#!/usr/bin/tclsh", "tcl"},
         {"#!/usr/bin/wish", "tcl"},
         {"#!/usr/bin/zsh", "sh"},
+        {"#!/usr/bin/unknown", NULL},
     };
     FOR_EACH_I(i, tests) {
         const struct ft_firstline_test *t = &tests[i];
-        const char *result = find_ft(NULL, t->line, strlen(t->line));
+        const char *result = find_ft(NULL, string_view(t->line, strlen(t->line)));
         EXPECT_STREQ(result, t->expected_filetype);
     }
 }
