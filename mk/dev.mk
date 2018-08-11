@@ -39,6 +39,7 @@ show-sizes:
 	$(MAKE) USE_LUA=static dte=build/dte-dynamic+staticlua
 	$(MAKE) USE_LUA=no LDFLAGS=-static dte=build/dte-static
 	$(MAKE) USE_LUA=static LDFLAGS=-static dte=build/dte-static+lua
+	$(MAKE) USE_LUA=no dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES=
 	-$(MAKE) CC=musl-gcc USE_LUA=no LDFLAGS=-static dte=build/dte-musl-static
 	-$(MAKE) CC=musl-gcc USE_LUA=static LDFLAGS=-static dte=build/dte-musl-static+lua
 	@strip build/dte-*
