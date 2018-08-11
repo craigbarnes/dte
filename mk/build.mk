@@ -30,28 +30,28 @@ BUILTIN_CONFIGS := $(addprefix config/, \
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     thai fuzz1 ))
 
-util_objects := $(addprefix build/util/, $(addsuffix .o, \
+util_objects := $(call prefix-obj, build/util/, \
     ascii path ptr-array regexp string string-view strtonum uchar \
-    unicode xmalloc ))
+    unicode xmalloc )
 
-encoding_objects := $(addprefix build/encoding/, $(addsuffix .o, \
-    convert decoder encoder encoding ))
+encoding_objects := $(call prefix-obj, build/encoding/, \
+    convert decoder encoder encoding )
 
-terminal_objects := $(addprefix build/terminal/, $(addsuffix .o, \
-    color input key output terminfo ))
+terminal_objects := $(call prefix-obj, build/terminal/, \
+    color input key output terminfo )
 
-editor_objects := $(addprefix build/, $(addsuffix .o, \
+editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline \
     commands common compiler completion config ctags detect edit \
     editor env error file-history file-option filetype format-status \
     frame git-open highlight history indent input-special load-save \
     lock main mode-command mode-normal mode-search move msg options \
     parse-args parse-command run screen screen-tabbar screen-view \
-    script search selection spawn state syntax tag view wbuf window )) \
+    script search selection spawn state syntax tag view wbuf window ) \
     $(encoding_objects) $(terminal_objects) $(util_objects)
 
-test_objects := $(addprefix build/test/, $(addsuffix .o, \
-    config filetype key main test util ))
+test_objects := $(call prefix-obj, build/test/, \
+    config filetype key main test util )
 
 all_objects := $(editor_objects) $(test_objects)
 
