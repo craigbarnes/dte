@@ -66,7 +66,7 @@ ifdef WERROR
 endif
 
 ifdef TERMINFO_DISABLE
-  build/term-info.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+  build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
   LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
 endif
@@ -142,7 +142,8 @@ build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
-build/term-info.o: build/term-info.cflags
+build/terminal/terminfo.o: build/terminal/terminfo.cflags
+build/terminal/terminfo.cflags: | build/terminal/
 build/script.o: build/script.cflags
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 
