@@ -27,9 +27,6 @@
   static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
-#define STRINGIFY(a) #a
-
-
 static inline NONNULL_ARGS bool streq(const char *a, const char *b)
 {
     return !strcmp(a, b);
@@ -77,14 +74,10 @@ ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st);
 char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
 void term_cleanup(void);
 
-NORETURN void bug (
-    const char *file,
-    int line,
-    const char *funct,
-    const char *fmt,
-    ...
-) PRINTF(4) COLD;
+NORETURN COLD PRINTF(4)
+void bug(const char *file, int line, const char *func, const char *fmt, ...);
 
-void debug_print(const char *function, const char *fmt, ...) PRINTF(2);
+PRINTF(2)
+void debug_print(const char *function, const char *fmt, ...);
 
 #endif
