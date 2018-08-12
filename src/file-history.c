@@ -57,11 +57,11 @@ void load_file_history(const char *filename)
         }
         return;
     }
+
     ssize_t pos = 0;
     while (pos < size) {
         const char *line = buf_next_line(buf, &pos, size);
         long row, col;
-
         if (!parse_long(&line, &row) || row <= 0) {
             continue;
         }
@@ -76,34 +76,36 @@ void load_file_history(const char *filename)
         }
         add_file_history(row, col, line);
     }
+
     free(buf);
 }
 
 void save_file_history(const char *filename)
 {
     WriteBuffer buf = WBUF_INIT;
-
     buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
     if (buf.fd < 0) {
         error_msg("Error creating %s: %s", filename, strerror(errno));
         return;
     }
-    for (size_t i = 0; i < history.count; i++) {
-        HistoryEntry *e = history.ptrs[i];
+
+    for (size_t i = 0, n = history.count; i < n; i++) {
+        const HistoryEntry *e = history.ptrs[i];
         char str[64];
         snprintf(str, sizeof(str), "%d %d ", e->row, e->col);
         wbuf_write_str(&buf, str);
         wbuf_write_str(&buf, e->filename);
         wbuf_write_ch(&buf, '\n');
     }
+
     wbuf_flush(&buf);
     close(buf.fd);
 }
 
 bool find_file_in_history(const char *filename, int *row, int *col)
 {
-    for (size_t i = 0; i < history.count; i++) {
-        HistoryEntry *e = history.ptrs[i];
+    for (size_t i = 0, n = history.count; i < n; i++) {
+        const HistoryEntry *e = history.ptrs[i];
         if (streq(filename, e->filename)) {
             *row = e->row;
             *col = e->col;
