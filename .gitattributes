@@ -36,3 +36,4 @@ config/README.md -dterc
 lib/** -whitespace linguist-vendored
 docs/*.[15] code linguist-generated
 src/lookup/*.c linguist-generated
+src/terminal/xterm-keys.c linguist-generated

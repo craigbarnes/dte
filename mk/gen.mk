@@ -12,8 +12,8 @@ gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
 	$(call LPERF_GEN, src/lookup/attributes)
 	$(call LPERF_GEN, src/lookup/colors)
 	$(call LPERF_GEN, src/lookup/config-cmds)
-	$(E) GEN src/lookup/xterm-keys.c
-	$(Q) $(LUA) src/lookup/xterm-keys.lua > src/lookup/xterm-keys.c
+	$(E) GEN src/terminal/xterm-keys.c
+	$(Q) $(LUA) src/terminal/xterm-keys.lua > src/terminal/xterm-keys.c
 
 
 .PHONY: gen

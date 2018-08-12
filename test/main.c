@@ -5,7 +5,7 @@
 #include "../src/command.h"
 #include "../src/editor.h"
 #include "../src/encoding/encoding.h"
-#include "../src/lookup/xterm-keys.c"
+#include "../src/terminal/xterm.h"
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"
 
@@ -56,7 +56,7 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
-static void test_parse_xterm_key(void)
+static void test_xterm_parse_key(void)
 {
     static const struct xterm_key_test {
         const char *escape_sequence;
@@ -138,7 +138,7 @@ static void test_parse_xterm_key(void)
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
         KeyCode key;
-        ssize_t length = parse_xterm_key(seq, strlen(seq), &key);
+        ssize_t length = xterm_parse_key(seq, strlen(seq), &key);
         IEXPECT_EQ(length, tests[i].expected_length, i, "lengths");
         if (length > 0) {
             IEXPECT_EQ(key, tests[i].expected_key, i, "keys");
@@ -146,7 +146,7 @@ static void test_parse_xterm_key(void)
     }
 }
 
-static void test_parse_xterm_key_combo(void)
+static void test_xterm_parse_key_combo(void)
 {
     static const struct {
         char escape_sequence[8];
@@ -199,7 +199,7 @@ static void test_parse_xterm_key_combo(void)
             *underscore = modifiers[j].ch;
             size_t seq_length = strlen(seq);
             KeyCode key;
-            ssize_t parsed_length = parse_xterm_key(seq, seq_length, &key);
+            ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
             EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
         }
@@ -239,8 +239,8 @@ int main(void)
 
     test_relative_filename();
     test_detect_encoding_from_bom();
-    test_parse_xterm_key();
-    test_parse_xterm_key_combo();
+    test_xterm_parse_key();
+    test_xterm_parse_key_combo();
     test_commands_sort();
 
     test_filetype();

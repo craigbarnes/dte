@@ -38,7 +38,7 @@ encoding_objects := $(call prefix-obj, build/encoding/, \
     convert decoder encoder encoding )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color input key output terminfo )
+    color ecma48 input key output terminfo xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline \
