@@ -194,7 +194,6 @@ UNITTEST {
         }
         // Ensure fixed-size char arrays are null-terminated
         static const size_t n = sizeof(builtin_filetype_names[0]);
-        static_assert(n == 16);
         BUG_ON(memchr(name, '\0', n) == NULL);
     }
 }
