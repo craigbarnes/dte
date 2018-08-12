@@ -2,6 +2,8 @@
 [attr]html text whitespace=tab-in-indent,tabwidth=2
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
 [attr]dterc code
+[attr]generated is-generated linguist-generated
+[attr]vendored -whitespace is-vendored linguist-vendored
 
 mk/version.sh export-subst
 .git* export-ignore
@@ -33,7 +35,8 @@ config/** dterc
 config/README.md -dterc
 *.md markdown
 *.html html
-lib/** -whitespace linguist-vendored
-docs/*.[15] code linguist-generated
-src/lookup/*.c linguist-generated
-src/terminal/xterm-keys.c linguist-generated
+
+lib/** vendored
+docs/*.[15] code generated
+src/lookup/*.c generated
+src/terminal/xterm-keys.c generated

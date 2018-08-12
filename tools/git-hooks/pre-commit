@@ -21,15 +21,20 @@ MAKE="$MAKE --no-print-directory"
 git checkout-index --prefix="$TMPDIR/" -a || exit 1
 trap "rm -rf '$TMPDIR'" EXIT
 
-GENERATED="$TMPDIR/docs/*.[15] $TMPDIR/src/lookup/*.c"
-cp $GENERATED "$TMPDIR"
+GENERATED=''
+for G in $(git ls-files --error-unmatch ':(attr:is-generated)'); do
+    GENERATED="$GENERATED $TMPDIR/$G"
+done
 
-$MAKE -C"$TMPDIR" gen
-$MAKE -C"$TMPDIR" -B -j"$(mk/nproc.sh)" man check check-syntax-files
+mkdir -p "$TMPDIR/GEN/"
+cp $GENERATED "$TMPDIR/GEN/"
+$MAKE -C"$TMPDIR" -B -j"$(mk/nproc.sh)" gen man
 
 for F in $GENERATED; do
     B="$(basename $F)"
-    if ! diff "$F" "$TMPDIR/$B" >/dev/null; then
+    if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
         abort "re-generate '${F##${TMPDIR}/}' before committing" $LINENO
     fi
 done
+
+$MAKE -C"$TMPDIR" -B -j"$(mk/nproc.sh)" check check-syntax-files
