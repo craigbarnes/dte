@@ -1,8 +1,8 @@
 static FileTypeEnum filetype_from_basename(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 5:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return memcmp(s + 1, "shrc", 4) ? 0 : SHELL;
         case 'd':
@@ -12,13 +12,13 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 6:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'K':
             return memcmp(s + 1, "build", 5) ? 0 : MAKE;
         case 'b':
             return memcmp(s + 1, "ashrc", 5) ? 0 : SHELL;
         case 'z':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'l':
                 return memcmp(s + 2, "ogin", 4) ? 0 : SHELL;
             case 's':
@@ -28,7 +28,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 7:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'C':
             return memcmp(s + 1, "apfile", 6) ? 0 : RUBY;
         case 'G':
@@ -42,7 +42,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 8:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'A':
             return memcmp(s + 1, "PKBUILD", 7) ? 0 : SHELL;
         case 'D':
@@ -62,7 +62,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 9:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return memcmp(s + 1, "onfig.ld", 8) ? 0 : LUA;
         case 'g':
@@ -74,7 +74,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 10:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'C':
             return memcmp(s + 1, "argo.lock", 9) ? 0 : TOML;
         case 'D':
@@ -88,9 +88,9 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 11:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'B':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'S':
                 return memcmp(s + 2, "Dmakefile", 9) ? 0 : MAKE;
             case 'U':
@@ -103,7 +103,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
             if (memcmp(s + 1, "akefile.", 8)) {
                 return 0;
             }
-            switch(s[9]) {
+            switch (s[9]) {
             case 'a':
                 return (s[10] != 'm') ? 0 : MAKE;
             case 'i':
@@ -125,7 +125,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 12:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'G':
             return memcmp(s + 1, "emfile.lock", 11) ? 0 : RUBY;
         case 'b':
@@ -133,7 +133,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 13:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'g':
             return memcmp(s + 1, "itattributes", 12) ? 0 : CONFIG;
         case 'm':
@@ -141,9 +141,9 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 14:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'C':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'M':
                 return memcmp(s + 2, "akeLists.txt", 12) ? 0 : CMAKE;
             case 'O':
@@ -153,7 +153,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         }
         return 0;
     case 15:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'g':
             return memcmp(s + 1, "it-rebase-todo", 14) ? 0 : GITREBASE;
         case 'm':

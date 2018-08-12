@@ -1,11 +1,11 @@
 static FileTypeEnum filetype_from_pathname(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 10:
         if (memcmp(s, "/etc/", 5)) {
             return 0;
         }
-        switch(s[5]) {
+        switch (s[5]) {
         case 'f':
             return memcmp(s + 6, "stab", 4) ? 0 : CONFIG;
         case 'h':

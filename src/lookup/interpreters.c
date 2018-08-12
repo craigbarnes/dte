@@ -1,12 +1,12 @@
 static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 2:
         return memcmp(s, "sh", 2) ? 0 : SHELL;
     case 3:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'a':
-            switch(s[1]) {
+            switch (s[1]) {
             case 's':
                 return (s[2] != 'h') ? 0 : SHELL;
             case 'w':
@@ -32,13 +32,13 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         }
         return 0;
     case 4:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'b':
             return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
         case 'd':
             return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "wk", 2) ? 0 : AWK;
             case 's':
@@ -48,9 +48,9 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         case 'l':
             return memcmp(s + 1, "isp", 3) ? 0 : COMMONLISP;
         case 'm':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'k':
                     return (s[3] != 'e') ? 0 : MAKE;
                 case 'w':
@@ -64,7 +64,7 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
             }
             return 0;
         case 'n':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "wk", 2) ? 0 : AWK;
             case 'o':
@@ -74,7 +74,7 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         case 'p':
             return memcmp(s + 1, "erl", 3) ? 0 : PERL;
         case 'r':
-            switch(s[1]) {
+            switch (s[1]) {
             case '6':
                 return memcmp(s + 2, "rs", 2) ? 0 : SCHEME;
             case 'a':
@@ -90,11 +90,11 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         }
         return 0;
     case 5:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return memcmp(s + 1, "lisp", 4) ? 0 : COMMONLISP;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'm':
                 return memcmp(s + 2, "ake", 3) ? 0 : MAKE;
             case 'u':
@@ -110,7 +110,7 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         }
         return 0;
     case 6:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'b':
             return memcmp(s + 1, "igloo", 5) ? 0 : SCHEME;
         case 'c':
@@ -126,9 +126,9 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         }
         return 0;
     case 7:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'h':
                 return memcmp(s + 2, "icken", 5) ? 0 : SCHEME;
             case 'r':
@@ -142,7 +142,7 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
         }
         return 0;
     case 10:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'o':
             return memcmp(s + 1, "penrc-run", 9) ? 0 : SHELL;
         case 'r':

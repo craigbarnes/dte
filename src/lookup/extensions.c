@@ -1,8 +1,8 @@
 static FileTypeEnum filetype_from_extension(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 1:
-        switch(s[0]) {
+        switch (s[0]) {
         case '1':
             return ROFF;
         case '2':
@@ -46,9 +46,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 2:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return CPLUSPLUS;
             case 'l':
@@ -64,7 +64,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'e':
             return (s[1] != 'l') ? 0 : EMACSLISP;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'o':
                 return GO;
             case 'p':
@@ -74,7 +74,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'h':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'h':
                 return CPLUSPLUS;
             case 's':
@@ -84,7 +84,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'j':
             return (s[1] != 's') ? 0 : JAVASCRIPT;
         case 'm':
-            switch(s[1]) {
+            switch (s[1]) {
             case '4':
                 return M4;
             case 'd':
@@ -94,7 +94,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'p':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return PKGCONFIG;
             case 'l':
@@ -108,7 +108,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'r':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'b':
                 return RUBY;
             case 's':
@@ -116,7 +116,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 's':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'h':
                 return SHELL;
             case 's':
@@ -132,11 +132,11 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 3:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'a':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'd':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'a':
                     return ADA;
                 case 'b':
@@ -146,7 +146,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 }
                 return 0;
             case 's':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'd':
                     return COMMONLISP;
                 case 'm':
@@ -160,7 +160,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'b':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return (s[2] != 't') ? 0 : BATCHFILE;
             case 'b':
@@ -172,9 +172,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'c':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'l':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'j':
                     return CLOJURE;
                 case 's':
@@ -186,7 +186,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 'p':
                 return (s[2] != 'p') ? 0 : CPLUSPLUS;
             case 's':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 's':
                     return CSS;
                 case 'v':
@@ -198,7 +198,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'd':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'o':
                 return (s[2] != 't') ? 0 : DOT;
             case 't':
@@ -210,7 +210,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'g':
             return memcmp(s + 1, "pi", 2) ? 0 : GNUPLOT;
         case 'h':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'p':
                 return (s[2] != 'p') ? 0 : CPLUSPLUS;
             case 't':
@@ -220,9 +220,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'i':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'n':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'i':
                     return INI;
                 case 's':
@@ -234,7 +234,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'k':
             return memcmp(s + 1, "sh", 2) ? 0 : SHELL;
         case 'l':
-            switch(s[1]) {
+            switch (s[1]) {
             case 's':
                 return (s[2] != 'p') ? 0 : COMMONLISP;
             case 't':
@@ -244,7 +244,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'm':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return (s[2] != 'k') ? 0 : MAKE;
             case 'k':
@@ -252,9 +252,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'n':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'i':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'm':
                     return NIM;
                 case 'x':
@@ -264,11 +264,11 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'p':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'h':
                 return (s[2] != 'p') ? 0 : PHP;
             case 'l':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 's':
                     return INI;
                 case 't':
@@ -282,7 +282,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'r':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'd':
                 return (s[2] != 'f') ? 0 : XML;
             case 'k':
@@ -290,13 +290,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 's':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return (s[2] != 'm') ? 0 : SCHEME;
             case 'e':
                 return (s[2] != 'd') ? 0 : SED;
             case 'l':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'd':
                     return SCHEME;
                 case 's':
@@ -312,7 +312,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 't':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return (s[2] != 'l') ? 0 : TCL;
             case 'e':
@@ -322,7 +322,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'v':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return (s[2] != 'f') ? 0 : VCARD;
             case 'e':
@@ -334,11 +334,11 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'x':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'm':
                 return (s[2] != 'l') ? 0 : XML;
             case 's':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'd':
                     return XML;
                 case 'l':
@@ -354,19 +354,19 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 4:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'b':
             return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
         case 'c':
             return memcmp(s + 1, "son", 3) ? 0 : COFFEESCRIPT;
         case 'd':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "rt", 2) ? 0 : DART;
             case 'i':
                 return memcmp(s + 2, "ff", 2) ? 0 : DIFF;
             case 'o':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'a':
                     return (s[3] != 'p') ? 0 : XML;
                 case 'x':
@@ -378,7 +378,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'f':
             return memcmp(s + 1, "rag", 3) ? 0 : GLSL;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "wk", 2) ? 0 : AWK;
             case 'l':
@@ -388,7 +388,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'h':
             return memcmp(s + 1, "tml", 3) ? 0 : HTML;
         case 'j':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "va", 2) ? 0 : JAVA;
             case 's':
@@ -396,9 +396,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'm':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'k':
                     return (s[3] != 'e') ? 0 : MAKE;
                 case 'w':
@@ -414,9 +414,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'n':
             return memcmp(s + 1, "awk", 3) ? 0 : AWK;
         case 'p':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'g':
                     return (s[3] != 'e') ? 0 : MALLARD;
                 case 't':
@@ -428,13 +428,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'r':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "ke", 2) ? 0 : RUBY;
             case 'k':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 't':
-                    switch(s[3]) {
+                    switch (s[3]) {
                     case 'd':
                         return RACKET;
                     case 'l':
@@ -448,7 +448,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 's':
             return memcmp(s + 1, "css", 3) ? 0 : SCSS;
         case 't':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'e':
                 return memcmp(s + 2, "xi", 2) ? 0 : TEXINFO;
             case 'o':
@@ -456,9 +456,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'v':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'l':
                     return (s[3] != 'a') ? 0 : VALA;
                 case 'p':
@@ -480,7 +480,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 5:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return memcmp(s + 1, "make", 4) ? 0 : CMAKE;
         case 'd':
@@ -488,12 +488,12 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'e':
             return memcmp(s + 1, "macs", 4) ? 0 : EMACSLISP;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'l':
                 if (memcmp(s + 2, "sl", 2)) {
                     return 0;
                 }
-                switch(s[4]) {
+                switch (s[4]) {
                 case 'f':
                     return GLSL;
                 case 'v':
@@ -507,7 +507,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'm':
             return memcmp(s + 1, "ount", 4) ? 0 : INI;
         case 'n':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'g':
                 return memcmp(s + 2, "inx", 3) ? 0 : NGINX;
             case 'i':
@@ -515,7 +515,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'p':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'a':
                 return memcmp(s + 2, "tch", 3) ? 0 : DIFF;
             case 'r':
@@ -523,7 +523,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 's':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'c':
                 return memcmp(s + 2, "ala", 3) ? 0 : SCALA;
             case 'l':
@@ -539,7 +539,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 6:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return memcmp(s + 1, "offee", 5) ? 0 : COFFEESCRIPT;
         case 'd':
@@ -555,13 +555,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 7:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'd':
             return memcmp(s + 1, "esktop", 6) ? 0 : INI;
         case 'g':
-            switch(s[1]) {
+            switch (s[1]) {
             case 'e':
-                switch(s[2]) {
+                switch (s[2]) {
                 case 'm':
                     return memcmp(s + 3, "spec", 4) ? 0 : RUBY;
                 case 'o':
@@ -579,7 +579,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 8:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'm':
             return memcmp(s + 1, "arkdown", 7) ? 0 : MARKDOWN;
         case 'r':
@@ -589,7 +589,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 9:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'a':
             return memcmp(s + 1, "utomount", 8) ? 0 : INI;
         case 'n':

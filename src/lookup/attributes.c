@@ -1,10 +1,10 @@
 static unsigned short lookup_attr(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 3:
         return memcmp(s, "dim", 3) ? 0 : ATTR_DIM;
     case 4:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'b':
             return memcmp(s + 1, "old", 3) ? 0 : ATTR_BOLD;
         case 'k':
@@ -18,7 +18,7 @@ static unsigned short lookup_attr(const char *s, size_t len)
     case 7:
         return memcmp(s, "reverse", 7) ? 0 : ATTR_REVERSE;
     case 9:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'i':
             return memcmp(s + 1, "nvisible", 8) ? 0 : ATTR_INVIS;
         case 'u':

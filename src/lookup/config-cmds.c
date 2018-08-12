@@ -1,8 +1,8 @@
 static bool lookup_config_command(const char *s, size_t len)
 {
-    switch(len) {
+    switch (len) {
     case 2:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'c':
             return (s[1] != 'd') ? false : true;
         case 'f':
@@ -18,7 +18,7 @@ static bool lookup_config_command(const char *s, size_t len)
     case 5:
         return memcmp(s, "alias", 5) ? false : true;
     case 6:
-        switch(s[0]) {
+        switch (s[0]) {
         case 'o':
             return memcmp(s + 1, "ption", 5) ? false : true;
         case 's':

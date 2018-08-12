@@ -112,7 +112,7 @@ local function write_trie(node, default_return)
                 end
             end
 
-            buf:write(indent, "switch(s[", tostring(level), "]) {\n")
+            buf:write(indent, "switch (s[", tostring(level), "]) {\n")
             for i = ("0"):byte(), ("z"):byte() do
                 local v = node[i]
                 if v then
@@ -127,7 +127,7 @@ local function write_trie(node, default_return)
     end
 
     local indent = indents[1]
-    buf:write(indent, "switch(len) {\n")
+    buf:write(indent, "switch (len) {\n")
     for i = 1, node.n do
         local v = node[i]
         if v then
