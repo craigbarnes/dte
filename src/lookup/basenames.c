@@ -130,6 +130,8 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
             return memcmp(s + 1, "emfile.lock", 11) ? 0 : RUBY;
         case 'b':
             return memcmp(s + 1, "ash_profile", 11) ? 0 : SHELL;
+        case 'c':
+            return memcmp(s + 1, "onfigure.ac", 11) ? 0 : M4;
         }
         return 0;
     case 13:

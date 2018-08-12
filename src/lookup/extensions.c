@@ -103,6 +103,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 return PERL;
             case 'o':
                 return GETTEXT;
+            case 's':
+                return POSTSCRIPT;
             case 'y':
                 return PYTHON;
             }
@@ -206,7 +208,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             }
             return 0;
         case 'e':
-            return memcmp(s + 1, "ml", 2) ? 0 : EMAIL;
+            switch (s[1]) {
+            case 'm':
+                return (s[2] != 'l') ? 0 : EMAIL;
+            case 'p':
+                return (s[2] != 's') ? 0 : POSTSCRIPT;
+            }
+            return 0;
         case 'g':
             return memcmp(s + 1, "pi", 2) ? 0 : GNUPLOT;
         case 'h':
@@ -287,6 +295,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 return (s[2] != 'f') ? 0 : XML;
             case 'k':
                 return (s[2] != 't') ? 0 : RACKET;
+            case 's':
+                return (s[2] != 't') ? 0 : RESTRUCTUREDTEXT;
             }
             return 0;
         case 's':
@@ -557,7 +567,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
     case 7:
         switch (s[0]) {
         case 'd':
-            return memcmp(s + 1, "esktop", 6) ? 0 : INI;
+            switch (s[1]) {
+            case 'e':
+                return memcmp(s + 2, "sktop", 5) ? 0 : INI;
+            case 'o':
+                return memcmp(s + 2, "cbook", 5) ? 0 : XML;
+            }
+            return 0;
         case 'g':
             switch (s[1]) {
             case 'e':
@@ -597,7 +613,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return 0;
     case 10:
-        return memcmp(s, "flatpakref", 10) ? 0 : INI;
+        switch (s[0]) {
+        case 'f':
+            return memcmp(s + 1, "latpakref", 9) ? 0 : INI;
+        case 'p':
+            return memcmp(s + 1, "ostscript", 9) ? 0 : POSTSCRIPT;
+        }
+        return 0;
     case 11:
         return memcmp(s, "flatpakrepo", 11) ? 0 : INI;
     }

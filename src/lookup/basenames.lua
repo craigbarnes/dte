@@ -14,6 +14,7 @@ local basenames = {
     ["CMakeLists.txt"] = "CMAKE",
     ["COMMIT_EDITMSG"] = "GITCOMMIT",
     ["config.ld"] = "LUA",
+    ["configure.ac"] = "M4",
     [".cshrc"] = "SHELL",
     ["cshrc"] = "SHELL",
     ["Dockerfile"] = "DOCKER",
