@@ -193,8 +193,7 @@ UNITTEST {
             BUG("missing value at builtin_filetype_names[%zu]", i);
         }
         // Ensure fixed-size char arrays are null-terminated
-        static const size_t n = sizeof(builtin_filetype_names[0]);
-        BUG_ON(memchr(name, '\0', n) == NULL);
+        BUG_ON(memchr(name, '\0', sizeof(builtin_filetype_names[0])) == NULL);
     }
 }
 
