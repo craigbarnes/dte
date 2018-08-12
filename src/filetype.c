@@ -97,7 +97,7 @@ typedef enum {
     NR_BUILTIN_FILETYPES
 } FileTypeEnum;
 
-static const char *const builtin_filetype_names[NR_BUILTIN_FILETYPES] = {
+static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [NONE] = "none",
     [ADA] = "ada",
     [ASSEMBLY] = "asm",
@@ -189,9 +189,13 @@ static const char *const builtin_filetype_names[NR_BUILTIN_FILETYPES] = {
 UNITTEST {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
         const char *const name = builtin_filetype_names[i];
-        if (!name || name[0] == '\0') {
+        if (name[0] == '\0') {
             BUG("missing value at builtin_filetype_names[%zu]", i);
         }
+        // Ensure fixed-size char arrays are null-terminated
+        static const size_t n = sizeof(builtin_filetype_names[0]);
+        static_assert(n == 16);
+        BUG_ON(memchr(name, '\0', n) == NULL);
     }
 }
 
