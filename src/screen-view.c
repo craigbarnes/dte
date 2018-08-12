@@ -207,13 +207,10 @@ static void screen_skip_char(LineInfo *info)
 
 static bool is_notice(const char *word, size_t len)
 {
-    static const char *const words[] = {"fixme", "todo", "xxx"};
-
-    for (size_t i = 0; i < ARRAY_COUNT(words); i++) {
-        const char *w = words[i];
-        if (strlen(w) == len && !strncasecmp(w, word, len)) {
-            return true;
-        }
+    switch (len) {
+    case 3: return !strncasecmp(word, "xxx", 3);
+    case 4: return !strncasecmp(word, "todo", 4);
+    case 5: return !strncasecmp(word, "fixme", 5);
     }
     return false;
 }
