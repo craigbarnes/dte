@@ -24,8 +24,8 @@ static char *copy_buf;
 static size_t copy_len;
 static bool copy_is_lines;
 
-static const char *const spattern = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
-static const char *const epattern = "^[ \t]*\\}";
+static const char spattern[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
+static const char epattern[] = "^[ \t]*\\}";
 
 /*
  * Stupid { ... } block selector.
