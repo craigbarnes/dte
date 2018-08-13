@@ -1,5 +1,5 @@
-#ifndef CCONV_H
-#define CCONV_H
+#ifndef ENCODING_CONVERT_H
+#define ENCODING_CONVERT_H
 
 #include <stddef.h>
 

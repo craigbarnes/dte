@@ -1,5 +1,5 @@
-#ifndef OBUF_H
-#define OBUF_H
+#ifndef TERMINAL_OUTPUT_H
+#define TERMINAL_OUTPUT_H
 
 #include <stdbool.h>
 #include <stddef.h>

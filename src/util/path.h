@@ -1,5 +1,5 @@
-#ifndef PATH_H
-#define PATH_H
+#ifndef UTIL_PATH_H
+#define UTIL_PATH_H
 
 #include "macros.h"
 

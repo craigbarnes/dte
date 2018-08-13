@@ -1,5 +1,5 @@
-#ifndef ITER_H
-#define ITER_H
+#ifndef BLOCK_ITER_H
+#define BLOCK_ITER_H
 
 #include <stdbool.h>
 #include <stddef.h>

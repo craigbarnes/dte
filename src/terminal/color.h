@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef TERMINAL_COLOR_H
+#define TERMINAL_COLOR_H
 
 #include <stdbool.h>
 

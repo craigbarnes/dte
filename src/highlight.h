@@ -1,5 +1,5 @@
-#ifndef HL_H
-#define HL_H
+#ifndef HIGHLIGHT_H
+#define HIGHLIGHT_H
 
 #include "buffer.h"
 #include "terminal/color.h"

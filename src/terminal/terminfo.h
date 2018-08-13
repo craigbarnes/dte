@@ -1,5 +1,5 @@
-#ifndef TERM_CAPS_H
-#define TERM_CAPS_H
+#ifndef TERMINAL_TERMINFO_H
+#define TERMINAL_TERMINFO_H
 
 #include <stdbool.h>
 #include <sys/types.h>

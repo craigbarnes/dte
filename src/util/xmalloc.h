@@ -1,5 +1,5 @@
-#ifndef XMALLOC_H
-#define XMALLOC_H
+#ifndef UTIL_XMALLOC_H
+#define UTIL_XMALLOC_H
 
 #include <inttypes.h>
 #include <limits.h>

@@ -1,5 +1,5 @@
-#ifndef KEY_H
-#define KEY_H
+#ifndef TERMINAL_KEY_H
+#define TERMINAL_KEY_H
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -1,5 +1,5 @@
-#ifndef DECODER_H
-#define DECODER_H
+#ifndef ENCODING_DECODER_H
+#define ENCODING_DECODER_H
 
 #include <stdbool.h>
 #include <sys/types.h>

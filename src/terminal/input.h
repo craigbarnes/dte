@@ -1,5 +1,5 @@
-#ifndef TERM_H
-#define TERM_H
+#ifndef TERMINAL_INPUT_H
+#define TERMINAL_INPUT_H
 
 #include <stdbool.h>
 #include <stddef.h>

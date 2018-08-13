@@ -1,5 +1,5 @@
-#ifndef ENCODER_H
-#define ENCODER_H
+#ifndef ENCODING_ENCODER_H
+#define ENCODING_ENCODER_H
 
 #include <sys/types.h>
 

@@ -1,5 +1,5 @@
-#ifndef REGEXP_H
-#define REGEXP_H
+#ifndef UTIL_REGEXP_H
+#define UTIL_REGEXP_H
 
 #include <regex.h>
 #include <stdbool.h>
