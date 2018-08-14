@@ -36,6 +36,7 @@ typedef struct {
     const char *home_dir;
     const char *user_config_dir;
     const char *charset;
+    const char *pager;
     bool child_controls_terminal;
     bool everything_changed;
     bool term_utf8;

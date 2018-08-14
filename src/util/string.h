@@ -35,6 +35,7 @@ size_t string_add_ch(String *s, CodePoint u) NONNULL_ARGS;
 void string_add_str(String *s, const char *str) NONNULL_ARGS;
 void string_add_buf(String *s, const char *ptr, size_t len) NONNULL_ARGS;
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
+void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
 char *string_steal(String *s, size_t *len) NONNULL_ARGS;
 char *string_steal_cstring(String *s) NONNULL_ARGS;
 char *string_cstring(const String *s) NONNULL_ARGS;

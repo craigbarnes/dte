@@ -238,3 +238,66 @@ size_t nr_pressed_keys(void)
 {
     return pressed_keys.count;
 }
+
+String dump_bindings(void)
+{
+    static const KeyCode mod_enum_to_mod_mask[8] = {
+        [1] = MOD_SHIFT,
+        [2] = MOD_META,
+        [3] = MOD_SHIFT | MOD_META,
+        [4] = MOD_CTRL,
+        [5] = MOD_SHIFT | MOD_CTRL,
+        [6] = MOD_META | MOD_CTRL,
+        [7] = MOD_SHIFT | MOD_META | MOD_CTRL,
+    };
+
+    String buf = STRING_INIT;
+
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        const char *command = bindings_lookup_table[k];
+        if (command) {
+            char *keystr = key_to_string(MOD_CTRL | k);
+            string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+            free(keystr);
+        }
+    }
+
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        const char *command = bindings_lookup_table[k + 128];
+        if (command) {
+            char *keystr = key_to_string(MOD_META | k);
+            string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+            free(keystr);
+        }
+    }
+
+    for (size_t m = 0; m <= 7; m++) {
+        for (size_t k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
+            const size_t mod_offset = m * NR_SPECIAL_KEYS;
+            const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
+            const char *command = bindings_lookup_table[i];
+            if (command) {
+                char *keystr = key_to_string(mod_enum_to_mod_mask[m] | k);
+                string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+                free(keystr);
+            }
+        }
+    }
+
+    for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
+        const Binding *b = bindings_ptr_array.ptrs[i];
+        const KeyChain *c = &b->chain;
+        String tmp = STRING_INIT;
+        for (size_t j = 0, nkeys = c->count; j < nkeys; j++) {
+            char *keystr = key_to_string(c->keys[j]);
+            string_add_str(&tmp, keystr);
+            free(keystr);
+            string_add_byte(&tmp, ' ');
+        }
+        char *chainstr = string_steal_cstring(&tmp);
+        string_sprintf(&buf, "   %-10s  %s\n", chainstr, b->command);
+        free(chainstr);
+    }
+
+    return buf;
+}

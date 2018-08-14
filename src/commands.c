@@ -1367,6 +1367,31 @@ static void cmd_shift(const char* UNUSED_ARG(pf), char **args)
     shift_lines(count);
 }
 
+static void cmd_show_bindings(const char* UNUSED_ARG(p), char** UNUSED_ARG(a))
+{
+    char tmp[32] = "/tmp/.dte.binds.XXXXXX";
+    int fd = mkstemp(tmp);
+    if (fd < 0) {
+        error_msg("mkstemp() failed: %s", strerror(errno));
+        return;
+    }
+
+    String s = dump_bindings();
+    xwrite(fd, s.buffer, s.len);
+    close(fd);
+    string_free(&s);
+
+    PointerArray a = PTR_ARRAY_INIT;
+    ptr_array_add(&a, xstrdup("run"));
+    ptr_array_add(&a, xstrdup(editor.pager));
+    ptr_array_add(&a, xstrdup(tmp));
+    ptr_array_add(&a, NULL);
+    run_commands(commands, &a);
+    ptr_array_free(&a);
+
+    unlink(tmp);
+}
+
 static void cmd_suspend(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
     suspend();
@@ -1735,6 +1760,7 @@ const Command commands[] = {
     {"set", "gl", 1, -1, cmd_set},
     {"setenv", "", 2, 2, cmd_setenv},
     {"shift", "", 1, 1, cmd_shift},
+    {"show-bindings", "", 0, 0, cmd_show_bindings},
     {"suspend", "", 0, 0, cmd_suspend},
     {"tag", "r", 0, 1, cmd_tag},
     {"toggle", "glv", 1, -1, cmd_toggle},

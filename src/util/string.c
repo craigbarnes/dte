@@ -60,6 +60,28 @@ void string_add_buf(String *s, const char *ptr, size_t len)
     s->len += len;
 }
 
+static void string_vsprintf(String *s, const char *fmt, va_list ap)
+{
+    va_list ap2;
+    va_copy(ap2, ap);
+    // Calculate the required size
+    int n = vsnprintf(NULL, 0, fmt, ap2);
+    va_end(ap2);
+    BUG_ON(n < 0);
+    string_grow(s, n + 1);
+    int wrote = vsnprintf(s->buffer + s->len, n + 1, fmt, ap);
+    BUG_ON(wrote != n);
+    s->len += wrote;
+}
+
+void string_sprintf(String *s, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    string_vsprintf(s, fmt, ap);
+    va_end(ap);
+}
+
 char *string_steal(String *s, size_t *len)
 {
     char *b = s->buffer;
