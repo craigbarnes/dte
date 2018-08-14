@@ -219,6 +219,9 @@ output:write [[
 
 #include "xterm.h"
 
+// These values are used in xterm escape sequences to indicate
+// modifier+key combinations.
+// See also: user_caps(5)
 static KeyCode mod_enum_to_mod_mask(char mod_enum)
 {
     switch (mod_enum) {
