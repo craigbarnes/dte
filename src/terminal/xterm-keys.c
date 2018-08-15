@@ -19,8 +19,8 @@ static KeyCode mod_enum_to_mod_mask(char mod_enum)
     case '6': return MOD_SHIFT | MOD_CTRL;
     case '7': return MOD_META | MOD_CTRL;
     case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
-    default:  return 0;
     }
+    return 0;
 }
 
 static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
