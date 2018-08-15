@@ -23,6 +23,32 @@ static KeyCode mod_enum_to_mod_mask(char mod_enum)
     }
 }
 
+static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
+{
+    if (i >= length) {
+        return -1;
+    }
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    } else if (i >= length) {
+        return -1;
+    }
+    switch(buf[i++]) {
+    case 'A': *k = mods | KEY_UP; return i;
+    case 'B': *k = mods | KEY_DOWN; return i;
+    case 'C': *k = mods | KEY_RIGHT; return i;
+    case 'D': *k = mods | KEY_LEFT; return i;
+    case 'F': *k = mods | KEY_END; return i;
+    case 'H': *k = mods | KEY_HOME; return i;
+    case 'P': *k = mods | KEY_F1; return i;
+    case 'Q': *k = mods | KEY_F2; return i;
+    case 'R': *k = mods | KEY_F3; return i;
+    case 'S': *k = mods | KEY_F4; return i;
+    }
+    return 0;
+}
+
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     if (length == 0 || buf[0] != '\033') {
@@ -119,49 +145,7 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
                 tmp = KEY_F8;
                 goto check_delim;
             case ';':
-                if (i >= length) {
-                    return -1;
-                } else {
-                    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
-                    if (mods == 0) {
-                        return 0;
-                    } else if (i >= length) {
-                        return -1;
-                    }
-                    switch(buf[i++]) {
-                    case 'A':
-                        *k = mods | KEY_UP;
-                        return i;
-                    case 'B':
-                        *k = mods | KEY_DOWN;
-                        return i;
-                    case 'C':
-                        *k = mods | KEY_RIGHT;
-                        return i;
-                    case 'D':
-                        *k = mods | KEY_LEFT;
-                        return i;
-                    case 'F':
-                        *k = mods | KEY_END;
-                        return i;
-                    case 'H':
-                        *k = mods | KEY_HOME;
-                        return i;
-                    case 'P':
-                        *k = mods | KEY_F1;
-                        return i;
-                    case 'Q':
-                        *k = mods | KEY_F2;
-                        return i;
-                    case 'R':
-                        *k = mods | KEY_F3;
-                        return i;
-                    case 'S':
-                        *k = mods | KEY_F4;
-                        return i;
-                    }
-                }
-                return 0;
+                return parse_csi1(buf, length, i, k);
             case '~':
                 *k = KEY_HOME;
                 return i;

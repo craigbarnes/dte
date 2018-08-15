@@ -63,6 +63,7 @@ local xterm_keys = {
     ["[[E"] = "KEY_F5",
 
     -- Generators for Ctrl/Meta/Shift key combinations
+    ["[1;"] = make_generator_node("return parse_csi1(buf, length, i, k);"),
     ["[2;"] = set_key_and_goto("KEY_INSERT", "check_modifiers"),
     ["[3"] = set_key_and_goto("KEY_DELETE", "check_delim"),
     ["[5"] = set_key_and_goto("KEY_PAGE_UP", "check_delim"),
@@ -76,52 +77,6 @@ local xterm_keys = {
     ["[23"] = set_key_and_goto("KEY_F11", "check_delim"),
     ["[24"] = set_key_and_goto("KEY_F12", "check_delim"),
 }
-
-xterm_keys["[1;"] = make_generator_node [=[
-if (i >= length) {
-    return -1;
-} else {
-    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
-    if (mods == 0) {
-        return 0;
-    } else if (i >= length) {
-        return -1;
-    }
-    switch(buf[i++]) {
-    case 'A':
-        *k = mods | KEY_UP;
-        return i;
-    case 'B':
-        *k = mods | KEY_DOWN;
-        return i;
-    case 'C':
-        *k = mods | KEY_RIGHT;
-        return i;
-    case 'D':
-        *k = mods | KEY_LEFT;
-        return i;
-    case 'F':
-        *k = mods | KEY_END;
-        return i;
-    case 'H':
-        *k = mods | KEY_HOME;
-        return i;
-    case 'P':
-        *k = mods | KEY_F1;
-        return i;
-    case 'Q':
-        *k = mods | KEY_F2;
-        return i;
-    case 'R':
-        *k = mods | KEY_F3;
-        return i;
-    case 'S':
-        *k = mods | KEY_F4;
-        return i;
-    }
-}
-return 0;
-]=]
 
 -- Build a trie structure from tables, indexed by numeric byte values
 local function make_trie(keys)
@@ -234,6 +189,32 @@ static KeyCode mod_enum_to_mod_mask(char mod_enum)
     case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
     default:  return 0;
     }
+}
+
+static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
+{
+    if (i >= length) {
+        return -1;
+    }
+    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    if (mods == 0) {
+        return 0;
+    } else if (i >= length) {
+        return -1;
+    }
+    switch(buf[i++]) {
+    case 'A': *k = mods | KEY_UP; return i;
+    case 'B': *k = mods | KEY_DOWN; return i;
+    case 'C': *k = mods | KEY_RIGHT; return i;
+    case 'D': *k = mods | KEY_LEFT; return i;
+    case 'F': *k = mods | KEY_END; return i;
+    case 'H': *k = mods | KEY_HOME; return i;
+    case 'P': *k = mods | KEY_F1; return i;
+    case 'Q': *k = mods | KEY_F2; return i;
+    case 'R': *k = mods | KEY_F3; return i;
+    case 'S': *k = mods | KEY_F4; return i;
+    }
+    return 0;
 }
 
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
