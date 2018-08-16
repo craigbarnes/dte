@@ -35,3 +35,7 @@ hi html.tag bold magenta
 hi html.attr magenta
 hi xml.tag bold magenta
 hi xml.attr magenta
+hi diff.header cyan
+hi diff.chunk magenta
+hi diff.added bold green
+hi diff.removed bold red
