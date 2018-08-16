@@ -1,4 +1,6 @@
+#include <fcntl.h>
 #include <signal.h>
+#include <sys/stat.h>
 #include <time.h>
 #include "lock.h"
 #include "buffer.h"

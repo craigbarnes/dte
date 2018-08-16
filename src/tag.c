@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "tag.h"
 #include "common.h"
 #include "completion.h"

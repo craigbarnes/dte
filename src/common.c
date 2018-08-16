@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "common.h"
 #include "editor.h"
 #include "terminal/terminfo.h"

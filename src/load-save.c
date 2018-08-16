@@ -1,4 +1,6 @@
+#include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include "load-save.h"
 #include "block.h"
 #include "editor.h"

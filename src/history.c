@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "history.h"
 #include "common.h"
 #include "error.h"

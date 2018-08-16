@@ -1,12 +1,15 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "libc.h"
+#include <unistd.h>
 #include "util/macros.h"
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
