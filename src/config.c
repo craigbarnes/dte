@@ -2,6 +2,7 @@
 #include "common.h"
 #include "completion.h"
 #include "error.h"
+#include "terminal/terminfo.h"
 #include "util/ascii.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
@@ -155,11 +156,14 @@ int read_config(const Command *cmds, const char *filename, ConfigFlags flags)
 
 void exec_reset_colors_rc(void)
 {
-    read_config(commands, "color/reset", CFG_MUST_EXIST | CFG_BUILTIN);
+    bool colors = terminal.max_colors >= 8;
+    const char *cfg = colors ? "color/reset" : "color/reset-basic";
+    read_config(commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 UNITTEST {
-    // Built-in configs can be customized, but these 2 are required:
+    // Built-in configs can be customized, but these 3 are required:
     BUG_ON(!get_builtin_config("rc"));
     BUG_ON(!get_builtin_config("color/reset"));
+    BUG_ON(!get_builtin_config("color/reset-basic"));
 }

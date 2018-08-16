@@ -1,3 +1,4 @@
+# Reset for terminals that support at least 8 colors
 hi default
 hi nontext blue keep
 hi noline blue

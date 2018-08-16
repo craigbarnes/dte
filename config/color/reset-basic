@@ -1,0 +1,15 @@
+# Reset for terminals that support basic attributes but not colors (e.g. vt220)
+hi default
+hi nontext reverse
+hi noline
+hi wserror reverse
+hi selection reverse
+hi currentline keep keep keep
+hi linenumber reverse
+hi statusline reverse
+hi commandline
+hi errormsg bold
+hi infomsg
+hi tabbar reverse
+hi activetab bold
+hi inactivetab reverse
