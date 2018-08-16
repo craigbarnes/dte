@@ -24,7 +24,7 @@ static struct {
     char *head;
     char *tail;
     PointerArray completions;
-    int idx;
+    size_t idx;
 
     // Should we add space after completed string if we have only one match?
     bool add_space;
@@ -289,8 +289,8 @@ static void init_completion(void)
 {
     char *cmd = string_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
-    int semicolon = -1;
-    int completion_pos = -1;
+    ssize_t semicolon = -1;
+    ssize_t completion_pos = -1;
     size_t pos = 0;
 
     while (1) {
