@@ -100,11 +100,17 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
         case 'S':
             *k = KEY_F4;
             return i;
+        case 'X':
+            *k = '=';
+            return i;
         case 'j':
             *k = '*';
             return i;
         case 'k':
             *k = '+';
+            return i;
+        case 'l':
+            *k = ',';
             return i;
         case 'm':
             *k = '-';

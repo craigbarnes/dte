@@ -12,7 +12,6 @@ local function set_key_and_goto(key, label)
 end
 
 local xterm_keys = {
-    -- CSI
     ["[A"] = "KEY_UP",
     ["[B"] = "KEY_DOWN",
     ["[C"] = "KEY_RIGHT",
@@ -22,20 +21,6 @@ local xterm_keys = {
     ["[L"] = "KEY_INSERT",
     ["[Z"] = "MOD_SHIFT | '\\t'",
 
-    ["[1~"] = "KEY_HOME",
-    ["[2~"] = "KEY_INSERT",
-    ["[4~"] = "KEY_END",
-
-    -- These 4 sequences are "deprecated" in xterm, even though they
-    -- were used by default in older releases. They are still used by
-    -- some other, xterm-like terminal emulators and can still be
-    -- activated in xterm by setting the "oldXtermFKeys" resource.
-    ["[11~"] = "KEY_F1",
-    ["[12~"] = "KEY_F2",
-    ["[13~"] = "KEY_F3",
-    ["[14~"] = "KEY_F4",
-
-    -- SS3
     ["OA"] = "KEY_UP",
     ["OB"] = "KEY_DOWN",
     ["OC"] = "KEY_RIGHT",
@@ -48,19 +33,17 @@ local xterm_keys = {
     ["OQ"] = "KEY_F2",
     ["OR"] = "KEY_F3",
     ["OS"] = "KEY_F4",
-    ["O "] = "' '",
-
+    ["OX"] = "'='",
     ["Oj"] = "'*'",
     ["Ok"] = "'+'",
+    ["Ol"] = "','",
     ["Om"] = "'-'",
     ["Oo"] = "'/'",
+    ["O "] = "' '",
 
-    -- Linux console
-    ["[[A"] = "KEY_F1",
-    ["[[B"] = "KEY_F2",
-    ["[[C"] = "KEY_F3",
-    ["[[D"] = "KEY_F4",
-    ["[[E"] = "KEY_F5",
+    ["[1~"] = "KEY_HOME",
+    ["[2~"] = "KEY_INSERT",
+    ["[4~"] = "KEY_END",
 
     -- Generators for Ctrl/Meta/Shift key combinations
     ["[1;"] = make_generator_node("return parse_csi1(buf, length, i, k);"),
@@ -76,6 +59,22 @@ local xterm_keys = {
     ["[21"] = set_key_and_goto("KEY_F10", "check_delim"),
     ["[23"] = set_key_and_goto("KEY_F11", "check_delim"),
     ["[24"] = set_key_and_goto("KEY_F12", "check_delim"),
+
+    -- These 4 sequences are "deprecated" in xterm, even though they
+    -- were used by default in older releases. They are still used by
+    -- some other, xterm-like terminal emulators and can still be
+    -- activated in xterm by setting the "oldXtermFKeys" resource.
+    ["[11~"] = "KEY_F1",
+    ["[12~"] = "KEY_F2",
+    ["[13~"] = "KEY_F3",
+    ["[14~"] = "KEY_F4",
+
+    -- Linux console
+    ["[[A"] = "KEY_F1",
+    ["[[B"] = "KEY_F2",
+    ["[[C"] = "KEY_F3",
+    ["[[D"] = "KEY_F4",
+    ["[[E"] = "KEY_F5",
 }
 
 -- Build a trie structure from tables, indexed by numeric byte values
