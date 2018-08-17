@@ -697,7 +697,7 @@ void new_line(void)
 static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
 {
     size_t i = 0;
-    unsigned int word_width = 0;
+    size_t word_width = 0;
 
     while (i < len) {
         word_width += u_char_width(u_get_char(word, len, &i));

@@ -10,7 +10,7 @@ void view_update_cursor_y(View *v)
 {
     Buffer *b = v->buffer;
     Block *blk;
-    unsigned int nl = 0;
+    size_t nl = 0;
 
     list_for_each_entry(blk, &b->blocks, node) {
         if (blk == v->cursor.blk) {
