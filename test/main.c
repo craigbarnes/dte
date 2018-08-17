@@ -218,8 +218,8 @@ static void test_commands_sort(void)
     size_t n = 0;
     while (commands[n].name) {
         n++;
+        BUG_ON(n > 500);
     }
-    EXPECT_EQ(n, 86);
 
     const size_t size = n * sizeof(Command);
     Command *commands_copy = xmalloc(size);
