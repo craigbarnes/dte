@@ -41,6 +41,12 @@
     #define HAS_ATTRIBUTE(x) 0
 #endif
 
+#ifdef __has_builtin
+    #define HAS_BUILTIN(x) __has_builtin(x)
+#else
+    #define HAS_BUILTIN(x) 0
+#endif
+
 #ifdef __has_warning
     #define HAS_WARNING(x) __has_warning(x)
 #else
@@ -93,6 +99,12 @@
     #define unlikely(x) (x)
 #endif
 
+#if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_prefetch)
+    #define PREFETCH(addr, ...) __builtin_prefetch(addr, __VA_ARGS__)
+#else
+    #define PREFETCH(addr, ...)
+#endif
+
 #if GNUC_AT_LEAST(3, 3) || HAS_ATTRIBUTE(nonnull)
     #define NONNULL_ARGS __attribute__((__nonnull__))
 #else
@@ -115,6 +127,12 @@
     #define COLD __attribute__((__cold__))
 #else
     #define COLD
+#endif
+
+#if GNUC_AT_LEAST(4, 5) || HAS_BUILTIN(__builtin_unreachable)
+    #define UNREACHABLE() __builtin_unreachable()
+#else
+    #define UNREACHABLE()
 #endif
 
 #if GNUC_AT_LEAST(5, 0) || HAS_ATTRIBUTE(returns_nonnull)
