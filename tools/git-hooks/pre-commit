@@ -37,4 +37,4 @@ for F in $GENERATED; do
     fi
 done
 
-$MAKE -C"$TMPDIR" -B -j"$(mk/nproc.sh)" check check-syntax-files
+$MAKE -C"$TMPDIR" -B -j"$(mk/nproc.sh)" check check-syntax-files WERROR=1
