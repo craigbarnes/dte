@@ -2,19 +2,7 @@
 #define BLOCK_ITER_H
 
 #include <stdbool.h>
-#include <stddef.h>
-#include "util/list.h"
-
-// Blocks always contains whole lines.
-// There's one zero-sized block when the file is empty.
-// Otherwise zero-sized blocks are forbidden.
-typedef struct {
-    ListHead node;
-    unsigned char *data;
-    size_t size;
-    size_t alloc;
-    size_t nl;
-} Block;
+#include "block.h"
 
 typedef struct {
     Block *blk;
@@ -31,11 +19,6 @@ typedef struct {
     .blk = BLOCK((head_)->next), \
     .head = (head_), \
     .offset = 0 \
-}
-
-static inline Block *BLOCK(const ListHead *const item)
-{
-    return container_of(item, Block, node);
 }
 
 static inline void block_iter_bof(BlockIter *bi)

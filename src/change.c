@@ -1,5 +1,4 @@
 #include "change.h"
-#include "block.h"
 #include "buffer.h"
 #include "error.h"
 #include "util/xmalloc.h"

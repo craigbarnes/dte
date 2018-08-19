@@ -1,5 +1,4 @@
 #include "buffer.h"
-#include "block.h"
 #include "editor.h"
 #include "file-option.h"
 #include "filetype.h"
@@ -9,7 +8,6 @@
 #include "util/path.h"
 #include "util/regexp.h"
 #include "util/uchar.h"
-#include "util/unicode.h"
 #include "util/xmalloc.h"
 #include "view.h"
 
