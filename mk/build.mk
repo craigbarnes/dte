@@ -13,8 +13,9 @@ WARNINGS = \
     -Wno-sign-compare -Wno-pointer-sign
 
 WARNINGS_EXTRA = \
-    -Wformat-signedness -Wshift-overflow=2 -Wframe-larger-than=32768 \
-    -Wvla
+    -Wformat-signedness -Wformat-truncation -Wformat-overflow \
+    -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
+    -Wframe-larger-than=32768 -Wvla
 
 BUILTIN_SYNTAX_FILES := \
     awk c config css d diff docker dte gitcommit gitrebase go html \

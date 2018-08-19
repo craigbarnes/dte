@@ -6,7 +6,7 @@
 #include "unicode.h"
 
 typedef struct {
-    unsigned char *buffer;
+    unsigned char NONSTRING *buffer;
     size_t alloc;
     size_t len;
 } String;

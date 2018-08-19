@@ -109,7 +109,7 @@ static int dump_builtin_config(const char *const name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (cfg) {
-        fputs(cfg->text.data, stdout);
+        xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length);
         return 0;
     } else {
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);

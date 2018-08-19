@@ -141,6 +141,12 @@
     #define RETURNS_NONNULL
 #endif
 
+#if GNUC_AT_LEAST(8, 0) || HAS_ATTRIBUTE(nonstring)
+    #define NONSTRING __attribute__((__nonstring__))
+#else
+    #define NONSTRING
+#endif
+
 #define XMALLOC MALLOC RETURNS_NONNULL
 
 #if __STDC_VERSION__ >= 201112L

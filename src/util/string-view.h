@@ -11,7 +11,7 @@
 // the C++17 string_view class. The .data member will usually *not* be
 // null-terminated and the underlying string *must* outlive the view.
 typedef struct {
-    const char *data;
+    const char NONSTRING *data;
     size_t length;
 } StringView;
 

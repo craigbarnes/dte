@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "block.h"
+#include "util/macros.h"
 
 typedef struct {
     Block *blk;
@@ -11,7 +12,7 @@ typedef struct {
 } BlockIter;
 
 typedef struct {
-    const unsigned char *line;
+    const unsigned char NONSTRING *line;
     size_t size;
 } LineRef;
 
