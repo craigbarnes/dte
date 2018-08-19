@@ -9,23 +9,34 @@
 #include "../lookup/attributes.c"
 #include "../lookup/colors.c"
 
-static const char builtin_color_names[][16] = {
-    "default",
-    "nontext",
-    "noline",
-    "wserror",
-    "selection",
-    "currentline",
-    "linenumber",
-    "statusline",
-    "commandline",
-    "errormsg",
-    "infomsg",
-    "tabbar",
-    "activetab",
-    "inactivetab",
+static const char builtin_color_names[NR_BC][16] = {
+    [BC_DEFAULT] = "default",
+    [BC_NONTEXT] = "nontext",
+    [BC_NOLINE] = "noline",
+    [BC_WSERROR] = "wserror",
+    [BC_SELECTION] = "selection",
+    [BC_CURRENTLINE] = "currentline",
+    [BC_LINENUMBER] = "linenumber",
+    [BC_STATUSLINE] = "statusline",
+    [BC_COMMANDLINE] = "commandline",
+    [BC_ERRORMSG] = "errormsg",
+    [BC_INFOMSG] = "infomsg",
+    [BC_TABBAR] = "tabbar",
+    [BC_ACTIVETAB] = "activetab",
+    [BC_INACTIVETAB] = "inactivetab",
 };
-static_assert(ARRAY_COUNT(builtin_color_names) == NR_BC);
+
+UNITTEST {
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_color_names); i++) {
+        const char *const name = builtin_color_names[i];
+        if (name[0] == '\0') {
+            BUG("missing string at builtin_color_names[%zu]", i);
+        }
+        if (memchr(name, '\0', sizeof(builtin_color_names[0])) == NULL) {
+            BUG("builtin_color_names[%zu] missing null-terminator", i);
+        }
+    }
+}
 
 static PointerArray hl_colors = PTR_ARRAY_INIT;
 
