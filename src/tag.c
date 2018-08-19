@@ -185,15 +185,15 @@ TagFile *load_tag_file(void)
     return current_tag_file;
 }
 
+static void free_tags_cb(Tag *t)
+{
+    free_tag(t);
+    free(t);
+}
+
 void free_tags(PointerArray *tags)
 {
-    for (size_t i = 0; i < tags->count; i++) {
-        Tag *t = tags->ptrs[i];
-        free_tag(t);
-        free(t);
-    }
-    free(tags->ptrs);
-    memzero(tags);
+    ptr_array_free_cb(tags, FREE_FUNC(free_tags_cb));
 }
 
 // Both parameters must be absolute and clean
