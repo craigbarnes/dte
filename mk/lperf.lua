@@ -118,8 +118,16 @@ local function write_trie(node, buf, default_return)
     buf:write(indent, "}\n", indent, "return ", default_return, ";\n")
 end
 
-local filename = assert(arg[1], "Usage: " .. arg[0] .. " INPUT-FILE")
-local fn = assert(loadfile(filename, "t", {}))
+local input_filename = assert(arg[1], "Usage: " .. arg[0] .. " INPUT-FILE")
+local output_filename, output = arg[2]
+if output_filename then
+    output = assert(io.open(output_filename, "w"))
+    output:setvbuf("full")
+else
+    output = assert(io.stdout)
+end
+
+local fn = assert(loadfile(input_filename, "t", {}))
 local defs = assert(fn())
 local keys = assert(defs.keys, "No keys defined")
 local fname = assert(defs.function_name, "No function_name defined")
@@ -130,9 +138,7 @@ local headers = "#include <stddef.h>\n#include <string.h>\n\n"
 local proto = "%sstatic %s %s(const char *s, size_t len)\n{\n"
 local prelude = proto:format(defs.includes and headers or "", rtype, fname)
 
-local output = assert(io.stdout)
 local trie = assert(make_trie(keys))
-output:setvbuf("full")
 output:write(prelude)
 write_trie(trie, output, rdefault)
 output:write("}\n")

@@ -1,6 +1,6 @@
 define LPERF_GEN
   $(E) GEN $(1).c
-  $(Q) $(LUA) mk/lperf.lua $(1).lua > $(1).c
+  $(Q) $(LUA) mk/lperf.lua $(1).lua $(1).c
 endef
 
 gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
