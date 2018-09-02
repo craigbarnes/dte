@@ -41,6 +41,20 @@ static inline PURE StringView string_view(const char *str, size_t length)
     };
 }
 
+NONNULL_ARGS
+static inline bool string_view_equal(const StringView *a, const StringView *b)
+{
+    return a->length == b->length && memcmp(a->data, b->data, a->length) == 0;
+}
+
+NONNULL_ARGS
+static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
+{
+    size_t len = strlen(str);
+    return len == sv->length && memcmp(sv->data, str, len) == 0;
+}
+
+NONNULL_ARGS
 static inline PURE NONNULL_ARGS bool string_view_has_prefix (
     const StringView *sv,
     const char *str,
@@ -49,6 +63,7 @@ static inline PURE NONNULL_ARGS bool string_view_has_prefix (
     return sv->length >= length && memcmp(sv->data, str, length) == 0;
 }
 
+NONNULL_ARGS
 static inline PURE NONNULL_ARGS bool string_view_has_prefix_icase (
     const StringView *sv,
     const char *str,
@@ -56,8 +71,5 @@ static inline PURE NONNULL_ARGS bool string_view_has_prefix_icase (
 ) {
     return sv->length >= length && strncasecmp(sv->data, str, length) == 0;
 }
-
-bool string_view_equal(const StringView *a, const StringView *b) PURE NONNULL_ARGS;
-bool string_view_equal_cstr(const StringView *sv, const char *cstr) PURE NONNULL_ARGS;
 
 #endif
