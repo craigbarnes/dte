@@ -1,23 +1,5 @@
 local char, concat = string.char, table.concat
-local Buffer, Indent = {}, {}
-Buffer.__index = Buffer
-
-function Buffer:write(...)
-    local length = self.length
-    for i = 1, select("#", ...) do
-        length = length + 1
-        self[length] = select(i, ...)
-    end
-    self.length = length
-end
-
-function Buffer:tostring()
-    return concat(self)
-end
-
-function Buffer.new()
-    return setmetatable({length = 0}, Buffer)
-end
+local Indent = {}
 
 function Indent:__index(depth)
     assert(depth < 12)
@@ -86,10 +68,8 @@ local function memcmp(offset, str)
     return ('memcmp(s + %d, "%s", %u)'):format(offset, str, length)
 end
 
-local function write_trie(node, default_return)
-    local buf = Buffer.new()
+local function write_trie(node, buf, default_return)
     local indents = Indent.new(4)
-
     local function serialize(node, level, indent_depth)
         local indent = indents[indent_depth]
         if type(node) == "table" then
@@ -136,7 +116,6 @@ local function write_trie(node, default_return)
         end
     end
     buf:write(indent, "}\n", indent, "return ", default_return, ";\n")
-    return buf:tostring()
 end
 
 local filename = assert(arg[1], "Usage: " .. arg[0] .. " INPUT-FILE")
@@ -150,6 +129,11 @@ local rdefault = assert(defs.default_return, "No default_return defined")
 local headers = "#include <stddef.h>\n#include <string.h>\n\n"
 local proto = "%sstatic %s %s(const char *s, size_t len)\n{\n"
 local prelude = proto:format(defs.includes and headers or "", rtype, fname)
+
+local output = assert(io.stdout)
 local trie = assert(make_trie(keys))
-local body = assert(write_trie(trie, rdefault))
-io.stdout:write(prelude, body, "}\n")
+output:setvbuf("full")
+output:write(prelude)
+write_trie(trie, output, rdefault)
+output:write("}\n")
+output:flush()
