@@ -30,9 +30,9 @@
   static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
-static inline NONNULL_ARGS bool streq(const char *a, const char *b)
+static inline PURE NONNULL_ARGS bool streq(const char *a, const char *b)
 {
-    return !strcmp(a, b);
+    return strcmp(a, b) == 0;
 }
 
 static inline bool xstreq(const char *a, const char *b)
@@ -47,14 +47,14 @@ static inline bool xstreq(const char *a, const char *b)
     return streq(a, b);
 }
 
-static inline NONNULL_ARGS bool str_has_prefix (
+static inline PURE NONNULL_ARGS bool str_has_prefix (
     const char *str,
     const char *prefix
 ) {
-    return !strncmp(str, prefix, strlen(prefix));
+    return strncmp(str, prefix, strlen(prefix)) == 0;
 }
 
-static inline NONNULL_ARGS bool str_has_suffix (
+static inline PURE NONNULL_ARGS bool str_has_suffix (
     const char *str,
     const char *suffix
 ) {
