@@ -60,6 +60,7 @@
 #endif
 
 #if GNUC_AT_LEAST(3, 0)
+    #define ALIGNED(x) __attribute__((__aligned__(x)))
     #define MALLOC __attribute__((__malloc__))
     #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
     #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
@@ -68,6 +69,7 @@
     #define CONSTRUCTOR __attribute__((__constructor__))
     #define DESTRUCTOR __attribute__((__destructor__))
 #else
+    #define ALIGNED(x)
     #define MALLOC
     #define PRINTF(x)
     #define VPRINTF(x)
@@ -118,9 +120,15 @@
 #endif
 
 #if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(alloc_size)
-    #define ALLOC_SIZE(...) __attribute__((alloc_size(__VA_ARGS__)))
+    #define ALLOC_SIZE(...) __attribute__((__alloc_size__(__VA_ARGS__)))
 #else
     #define ALLOC_SIZE(...)
+#endif
+
+#if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(hot)
+    #define HOT __attribute__((__hot__))
+#else
+    #define HOT
 #endif
 
 #if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(cold)
