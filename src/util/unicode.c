@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include "unicode.h"
 #include "ascii.h"
-#include "macros.h"
 
 typedef struct {
     CodePoint first, last;
@@ -259,36 +258,34 @@ static bool u_is_double_width(CodePoint u)
 
 unsigned int u_char_width(CodePoint u)
 {
-    // C0 control characters and DELETE are rendered by the editor in
-    // caret notation (e.g. ^@), so have a width of 2 in this context.
-    // They are usually considered "unprintable" in other contexts.
-    if (unlikely(u_is_ctrl(u)))
+#if GNUC_AT_LEAST(3, 0)
+    switch (u) {
+    // C0 control or DEL (rendered in caret notation)
+    case 0x00 ... 0x1F:
+    case 0x7F:
         return 2;
-
-    // Printable ASCII characters have a width of 1.
-    if (likely(u < 0x80))
+    // Printable ASCII
+    case 0x20 ... 0x7E:
         return 1;
+    }
+#else
+    if (u_is_ctrl(u)) {
+        return 2;
+    } else if (u <= 0x7E) {
+        return 1;
+    }
+#endif
 
-    // Other unprintable characters (including invalid UTF-8 bytes) are
-    // rendered as "<xx>", so have a width of 4 in this context.
-    if (u_is_unprintable(u))
-        return 4;
-
-    // Combining characters are "zero-width" because they compose onto
-    // adjacent glyphs. Some other characters are "non-spacing".
-    if (u_is_zero_width(u))
+    if (u_is_unprintable(u)) {
+        return 4; // Rendered as <xx>
+    } else if (u_is_zero_width(u)) {
         return 0;
-
-    // This is just a performance optimization (all double width
-    // characters are >= 0x1100U).
-    if (likely(u < 0x1100U))
+    } else if (u < 0x1100U) {
         return 1;
-
-    // Some characters are "wide" or "fullwidth" and occupy 2 columns.
-    if (u_is_double_width(u))
+    } else if (u_is_double_width(u)) {
         return 2;
+    }
 
-    // Everything else occupies 1 column.
     return 1;
 }
 
