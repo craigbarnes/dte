@@ -64,26 +64,32 @@ static void test_u_char_width(void)
     EXPECT_EQ(u_char_width('z'), 1);
     EXPECT_EQ(u_char_width('A'), 1);
     EXPECT_EQ(u_char_width('Z'), 1);
+    EXPECT_EQ(u_char_width(' '), 1);
+    EXPECT_EQ(u_char_width('!'), 1);
+    EXPECT_EQ(u_char_width('/'), 1);
+    EXPECT_EQ(u_char_width('^'), 1);
+    EXPECT_EQ(u_char_width('`'), 1);
     EXPECT_EQ(u_char_width('~'), 1);
 
     // Rendered in caret notation (2 columns)
     EXPECT_EQ(u_char_width('\0'), 2);
     EXPECT_EQ(u_char_width('\r'), 2);
-    EXPECT_EQ(u_char_width(0x1f), 2);
+    EXPECT_EQ(u_char_width(0x1F), 2);
 
     // Rendered as <xx> (4 columns)
-    EXPECT_EQ(u_char_width(0xdfff), 4);
+    EXPECT_EQ(u_char_width(0x0080), 4);
+    EXPECT_EQ(u_char_width(0xDFFF), 4);
 
     // Zero width (0 columns)
-    EXPECT_EQ(u_char_width(0xaa31), 0);
-    EXPECT_EQ(u_char_width(0xaa32), 0);
+    EXPECT_EQ(u_char_width(0xAA31), 0);
+    EXPECT_EQ(u_char_width(0xAA32), 0);
 
     // Double width (2 columns)
     EXPECT_EQ(u_char_width(0x30000), 2);
-    EXPECT_EQ(u_char_width(0x3a009), 2);
-    EXPECT_EQ(u_char_width(0x3fffd), 2);
+    EXPECT_EQ(u_char_width(0x3A009), 2);
+    EXPECT_EQ(u_char_width(0x3FFFD), 2);
     EXPECT_EQ(u_char_width(0x2757), 2);
-    EXPECT_EQ(u_char_width(0x312f), 2);
+    EXPECT_EQ(u_char_width(0x312F), 2);
 }
 
 static void test_u_to_lower(void)
