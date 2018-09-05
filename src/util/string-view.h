@@ -55,7 +55,7 @@ static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
 }
 
 NONNULL_ARGS
-static inline PURE NONNULL_ARGS bool string_view_has_prefix (
+static inline bool string_view_has_prefix (
     const StringView *sv,
     const char *str,
     size_t length
@@ -64,7 +64,7 @@ static inline PURE NONNULL_ARGS bool string_view_has_prefix (
 }
 
 NONNULL_ARGS
-static inline PURE NONNULL_ARGS bool string_view_has_prefix_icase (
+static inline bool string_view_has_prefix_icase (
     const StringView *sv,
     const char *str,
     size_t length
