@@ -27,6 +27,7 @@ static struct {
     const char *setab;
     const char *setaf;
     const char *sgr;
+    const char *rep;
 } terminfo;
 
 static struct TermKeyMap {
@@ -196,6 +197,17 @@ static void tputs_set_color(const TermColor *color)
     }
 }
 
+static bool tputs_repeat_char(char ch, unsigned int reps)
+{
+    if (!terminfo.rep || ch < ' ' || ch > '~' || reps > 30000) {
+        return false;
+    }
+    const char *seq = tparm_2(terminfo.rep, ch, reps);
+    BUG_ON(!seq);
+    tputs(seq, 1, tputs_putc);
+    return true;
+}
+
 // See terminfo(5)
 static void term_init_terminfo(const char *term)
 {
@@ -206,12 +218,14 @@ static void term_init_terminfo(const char *term)
     terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
+    terminal.repeat_char = &tputs_repeat_char;
 
     terminfo.cup = curses_str_cap("cup");
     terminfo.el = curses_str_cap("el");
     terminfo.setab = curses_str_cap("setab");
     terminfo.setaf = curses_str_cap("setaf");
     terminfo.sgr = curses_str_cap("sgr");
+    terminfo.rep = curses_str_cap("rep");
 
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");

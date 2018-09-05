@@ -59,6 +59,11 @@ void buf_set_bytes(char ch, size_t count)
     }
 
     obuf.x += count;
+
+    if (count < 30000 && terminal.repeat_char(ch, count)) {
+        return;
+    }
+
     while (count) {
         size_t avail, n = count;
 

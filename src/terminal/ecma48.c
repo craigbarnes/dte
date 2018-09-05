@@ -110,6 +110,20 @@ void ecma48_set_color(const TermColor *const color)
     obuf.color = *color;
 }
 
+bool ecma48_repeat_char(char ch, unsigned int reps)
+{
+    if (ch < ' ' || ch > '~' || reps > 30000) {
+        return false;
+    }
+    char buf[64];
+    int n = snprintf(buf, sizeof buf, "%c\033[%ub", ch, reps);
+    if (n < 0) {
+        return false;
+    }
+    buf_add_bytes(buf, n);
+    return true;
+}
+
 static void no_op(void) {}
 static void no_op_s(const char* UNUSED_ARG(s)) {}
 
@@ -123,6 +137,7 @@ TerminalInfo terminal = {
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
+    .repeat_char = &ecma48_repeat_char,
     .save_title = &no_op,
     .restore_title = &no_op,
     .set_title = &no_op_s,
