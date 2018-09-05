@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <signal.h>
 #include "alias.h"
 #include "config.h"

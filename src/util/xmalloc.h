@@ -1,19 +1,9 @@
 #ifndef UTIL_XMALLOC_H
 #define UTIL_XMALLOC_H
 
-#include <inttypes.h>
-#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include "macros.h"
-
-#define bitsizeof(x) (CHAR_BIT * sizeof(x))
-
-#define maximum_unsigned_value_of_type(a) \
-    (UINTMAX_MAX >> (bitsizeof(uintmax_t) - bitsizeof(a)))
-
-#define unsigned_mult_overflows(a, b) \
-    ((a) && (b) > maximum_unsigned_value_of_type(a) / (a))
 
 #define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
 #define xnew0(type, n) xcalloc(size_multiply(sizeof(type), (n)))
