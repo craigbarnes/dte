@@ -124,6 +124,7 @@ char *xasprintf(const char *format, ...)
 
 UNITTEST {
     size_t r = 0;
+    DEBUG_VAR(r);
     BUG_ON(size_multiply_overflows(10, 20, &r));
     BUG_ON(r != 200);
     BUG_ON(size_multiply_overflows(0, 0, &r));
