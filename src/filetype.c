@@ -303,7 +303,7 @@ static StringView get_interpreter(const StringView line)
     return sv;
 }
 
-const char *find_ft(const char *filename, StringView line)
+HOT const char *find_ft(const char *filename, StringView line)
 {
     StringView path = STRING_VIEW_INIT;
     StringView ext = STRING_VIEW_INIT;
