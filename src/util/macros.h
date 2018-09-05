@@ -8,6 +8,7 @@
 #define STRLEN(x) (sizeof("" x "") - 1)
 #define PASTE(a, b) a##b
 #define XPASTE(a, b) PASTE(a, b)
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define DO_PRAGMA(x) _Pragma(#x)
 
 // Calculate the number of elements in an array.
@@ -158,10 +159,13 @@
 #define XMALLOC MALLOC RETURNS_NONNULL
 
 #if __STDC_VERSION__ >= 201112L
+    #define alignof(t) _Alignof(t)
     #define NORETURN _Noreturn
 #elif GNUC_AT_LEAST(3, 0)
+    #define alignof(t) __alignof__(t)
     #define NORETURN __attribute__((__noreturn__))
 #else
+    #define alignof(t) MIN(sizeof(t), offsetof(struct{char c; t x;}, x))
     #define NORETURN
 #endif
 
