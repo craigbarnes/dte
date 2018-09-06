@@ -3,6 +3,8 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
     switch (len) {
     case 5:
         switch (s[0]) {
+        case '.':
+            return memcmp(s + 1, "gnus", 4) ? 0 : EMACSLISP;
         case 'c':
             return memcmp(s + 1, "shrc", 4) ? 0 : SHELL;
         case 'd':
@@ -13,6 +15,20 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 6:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'c':
+                return memcmp(s + 2, "shrc", 4) ? 0 : SHELL;
+            case 'd':
+                return memcmp(s + 2, "rirc", 4) ? 0 : XML;
+            case 'e':
+                return memcmp(s + 2, "macs", 4) ? 0 : EMACSLISP;
+            case 'g':
+                return memcmp(s + 2, "emrc", 4) ? 0 : YAML;
+            case 'z':
+                return memcmp(s + 2, "shrc", 4) ? 0 : SHELL;
+            }
+            return 0;
         case 'K':
             return memcmp(s + 1, "build", 5) ? 0 : MAKE;
         case 'b':
@@ -29,6 +45,22 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 7:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'b':
+                return memcmp(s + 2, "ashrc", 5) ? 0 : SHELL;
+            case 'l':
+                return memcmp(s + 2, "uacov", 5) ? 0 : LUA;
+            case 'z':
+                switch (s[2]) {
+                case 'l':
+                    return memcmp(s + 3, "ogin", 4) ? 0 : SHELL;
+                case 's':
+                    return memcmp(s + 3, "henv", 4) ? 0 : SHELL;
+                }
+                return 0;
+            }
+            return 0;
         case 'C':
             return memcmp(s + 1, "apfile", 6) ? 0 : RUBY;
         case 'G':
@@ -43,6 +75,16 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 8:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'i':
+                return memcmp(s + 2, "nputrc", 6) ? 0 : INPUTRC;
+            case 'p':
+                return memcmp(s + 2, "rofile", 6) ? 0 : SHELL;
+            case 'z':
+                return memcmp(s + 2, "logout", 6) ? 0 : SHELL;
+            }
+            return 0;
         case 'A':
             return memcmp(s + 1, "PKBUILD", 7) ? 0 : SHELL;
         case 'D':
@@ -63,6 +105,14 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 9:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'j':
+                return memcmp(s + 2, "shintrc", 7) ? 0 : JSON;
+            case 'z':
+                return memcmp(s + 2, "profile", 7) ? 0 : SHELL;
+            }
+            return 0;
         case 'c':
             return memcmp(s + 1, "onfig.ld", 8) ? 0 : LUA;
         case 'g':
@@ -75,6 +125,8 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 10:
         switch (s[0]) {
+        case '.':
+            return memcmp(s + 1, "gitconfig", 9) ? 0 : INI;
         case 'C':
             return memcmp(s + 1, "argo.lock", 9) ? 0 : TOML;
         case 'D':
@@ -89,6 +141,16 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 11:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'g':
+                return memcmp(s + 2, "itmodules", 9) ? 0 : INI;
+            case 'i':
+                return memcmp(s + 2, "ndent.pro", 9) ? 0 : INDENT;
+            case 'l':
+                return memcmp(s + 2, "uacheckrc", 9) ? 0 : LUA;
+            }
+            return 0;
         case 'B':
             switch (s[1]) {
             case 'S':
@@ -126,6 +188,8 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 12:
         switch (s[0]) {
+        case '.':
+            return memcmp(s + 1, "bash_logout", 11) ? 0 : SHELL;
         case 'G':
             return memcmp(s + 1, "emfile.lock", 11) ? 0 : RUBY;
         case 'b':
@@ -136,6 +200,16 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 13:
         switch (s[0]) {
+        case '.':
+            switch (s[1]) {
+            case 'b':
+                return memcmp(s + 2, "ash_profile", 11) ? 0 : SHELL;
+            case 'c':
+                return memcmp(s + 2, "lang-format", 11) ? 0 : YAML;
+            case 'e':
+                return memcmp(s + 2, "ditorconfig", 11) ? 0 : INI;
+            }
+            return 0;
         case 'g':
             return memcmp(s + 1, "itattributes", 12) ? 0 : CONFIG;
         case 'm':
@@ -144,6 +218,8 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return 0;
     case 14:
         switch (s[0]) {
+        case '.':
+            return memcmp(s + 1, "gitattributes", 13) ? 0 : CONFIG;
         case 'C':
             switch (s[1]) {
             case 'M':

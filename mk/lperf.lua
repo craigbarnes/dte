@@ -26,6 +26,7 @@ local function make_trie(keys)
         local node = trie[n]
         for i = 1, n do
             local byte = assert(seq:sub(i, i):byte())
+            assert(byte >= (" "):byte() and byte <= ("~"):byte())
             if i == n then
                 -- Leaf node
                 assert(node[byte] == nil, "Clashing sequence: " .. seq)
@@ -93,7 +94,7 @@ local function write_trie(node, buf, default_return)
             end
 
             buf:write(indent, "switch (s[", tostring(level), "]) {\n")
-            for i = ("0"):byte(), ("z"):byte() do
+            for i = (" "):byte(), ("~"):byte() do
                 local v = node[i]
                 if v then
                     buf:write(indent, "case '", char(i), "':\n")

@@ -175,6 +175,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             return 0;
         case 'c':
             switch (s[1]) {
+            case '+':
+                return (s[2] != '+') ? 0 : CPLUSPLUS;
             case 'l':
                 switch (s[2]) {
                 case 'j':
