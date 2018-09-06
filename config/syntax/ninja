@@ -1,0 +1,30 @@
+syntax ninja
+
+state line-start code
+    char " \t" this
+    char # comment
+    noeat code
+
+state comment
+    char "\n" line-start
+    eat this
+
+state code
+    char "\n" line-start
+    str "$\n" line-start special
+    char -b \$ dollar
+    eat this
+
+state dollar variable
+    char -b ' $:' escape
+    noeat variable
+
+state variable
+    char " \t" code
+    char "\n" line-start
+    char "\x20-\x7e\xa1-\xff" this
+    eat code error
+
+state escape
+    recolor special
+    noeat code
