@@ -60,7 +60,7 @@ void buf_set_bytes(char ch, size_t count)
 
     obuf.x += count;
 
-    if (count < 30000 && terminal.repeat_char(ch, count)) {
+    if (count > 5 && count < 30000 && terminal.repeat_char(ch, count - 1)) {
         return;
     }
 
