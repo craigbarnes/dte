@@ -8,11 +8,13 @@ Features
 
 * Multiple buffers/tabs
 * Unlimited undo/redo
-* Search and replace
+* Regex search and replace
 * Syntax highlighting
 * Customizable color schemes
 * Customizable key bindings
 * Command language with auto-completion
+* Unicode 11 compatible text rendering
+* Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to compiler error
 
