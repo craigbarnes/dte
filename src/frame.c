@@ -12,7 +12,7 @@ static int get_min_w(Frame *f)
 
     if (f->vertical) {
         int max = 0;
-        for (int i = 0; i < f->frames.count; i++) {
+        for (int i = 0, n = f->frames.count; i < n; i++) {
             int w = get_min_w(f->frames.ptrs[i]);
             if (w > max) {
                 max = w;
@@ -21,7 +21,7 @@ static int get_min_w(Frame *f)
         return max;
     } else {
         int w = f->frames.count - 1; // Separators
-        for (int i = 0; i < f->frames.count; i++) {
+        for (int i = 0, n = f->frames.count; i < n; i++) {
             w += get_min_w(f->frames.ptrs[i]);
         }
         return w;
@@ -36,7 +36,7 @@ static int get_min_h(Frame *f)
 
     if (!f->vertical) {
         int max = 0;
-        for (int i = 0; i < f->frames.count; i++) {
+        for (int i = 0, n = f->frames.count; i < n; i++) {
             int h = get_min_h(f->frames.ptrs[i]);
             if (h > max) {
                 max = h;
@@ -45,7 +45,7 @@ static int get_min_h(Frame *f)
         return max;
     } else {
         int h = 0; // No separators
-        for (int i = 0; i < f->frames.count; i++) {
+        for (int i = 0, n = f->frames.count; i < n; i++) {
             h += get_min_h(f->frames.ptrs[i]);
         }
         return h;
@@ -202,7 +202,7 @@ static void subtract_from_sibling_size(Frame *f, int count)
     Frame *parent = f->parent;
     int idx = ptr_array_idx(&parent->frames, f);
 
-    for (int i = idx + 1; i < parent->frames.count; i++) {
+    for (int i = idx + 1, n = parent->frames.count; i < n; i++) {
         count = sub(parent->frames.ptrs[i], count);
         if (count == 0) {
             return;
@@ -379,7 +379,7 @@ static void update_frame_coordinates(Frame *f, int x, int y)
         return;
     }
 
-    for (int i = 0; i < f->frames.count; i++) {
+    for (int i = 0, n = f->frames.count; i < n; i++) {
         Frame *c = f->frames.ptrs[i];
         update_frame_coordinates(c, x, y);
         if (f->vertical) {
@@ -525,7 +525,7 @@ static void debug_frame(Frame *f, int level)
         BUG_ON(f != f->window->frame);
     }
 
-    for (int i = 0; i < f->frames.count; i++) {
+    for (int i = 0, n = f->frames.count; i < n; i++) {
         Frame *c = f->frames.ptrs[i];
         BUG_ON(c->parent != f);
         debug_frame(c, level + 1);

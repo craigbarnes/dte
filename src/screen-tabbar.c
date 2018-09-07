@@ -53,7 +53,7 @@ static void calculate_tabbar(Window *win)
 {
     int extra, truncated_count, total_w = 0;
 
-    for (size_t i = 0; i < win->views.count; i++) {
+    for (size_t i = 0, n = win->views.count; i < n; i++) {
         View *v = win->views.ptrs[i];
 
         if (v == win->view) {
@@ -75,7 +75,7 @@ static void calculate_tabbar(Window *win)
     // Truncate all wide tabs
     total_w = 0;
     truncated_count = 0;
-    for (size_t i = 0; i < win->views.count; i++) {
+    for (size_t i = 0, n = win->views.count; i < n; i++) {
         View *v = win->views.ptrs[i];
         int truncated_w = 20;
 
@@ -102,7 +102,7 @@ static void calculate_tabbar(Window *win)
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
 
-        for (size_t i = 0; i < win->views.count; i++) {
+        for (size_t i = 0, n = win->views.count; i < n; i++) {
             View *v = win->views.ptrs[i];
             int add = v->tt_width - v->tt_truncated_width;
             int avail;

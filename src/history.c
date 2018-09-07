@@ -15,7 +15,7 @@ void history_add(PointerArray *history, const char *text, size_t max_entries)
     }
 
     // Don't add identical entries
-    for (size_t i = 0; i < history->count; i++) {
+    for (size_t i = 0, n = history->count; i < n; i++) {
         if (streq(history->ptrs[i], text)) {
             // Move identical entry to end
             ptr_array_add(history, ptr_array_remove_idx(history, i));

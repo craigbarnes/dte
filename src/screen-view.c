@@ -299,8 +299,8 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
     info->colors = colors;
 
     {
-        int i;
-        for (i = 0; i < info->size; i++) {
+        size_t i, n;
+        for (i = 0, n = info->size; i < n; i++) {
             char ch = info->line[i];
             if (ch != '\t' && ch != ' ') {
                 break;
@@ -310,7 +310,7 @@ static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
     }
 
     info->trailing_ws_offset = INT_MAX;
-    for (int i = info->size - 1; i >= 0; i--) {
+    for (ssize_t i = info->size - 1; i >= 0; i--) {
         char ch = info->line[i];
         if (ch != '\t' && ch != ' ') {
             break;

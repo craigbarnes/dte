@@ -69,22 +69,20 @@ static State *handle_heredoc (
     const char *delim,
     size_t len
 ) {
-    HeredocState *s;
-    SyntaxMerge m;
-
-    for (size_t i = 0; i < state->heredoc.states.count; i++) {
-        s = state->heredoc.states.ptrs[i];
+    for (size_t i = 0, n = state->heredoc.states.count; i < n; i++) {
+        HeredocState *s = state->heredoc.states.ptrs[i];
         if (s->len == len && !memcmp(s->delim, delim, len)) {
             return s->state;
         }
     }
 
+    SyntaxMerge m;
     m.subsyn = state->heredoc.subsyntax;
     m.return_state = state->a.destination;
     m.delim = delim;
     m.delim_len = len;
 
-    s = xnew0(HeredocState, 1);
+    HeredocState *s = xnew0(HeredocState, 1);
     s->state = merge_syntax(syn, &m);
     s->delim = xmemdup(delim, len);
     s->len = len;
@@ -119,7 +117,7 @@ static HlColor **highlight_line (
             break;
         }
         ch = line[i];
-        for (size_t ci = 0; ci < state->conds.count; ci++) {
+        for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
             cond = state->conds.ptrs[ci];
             a = &cond->a;
             switch (cond->type) {

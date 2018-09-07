@@ -135,9 +135,8 @@ View *window_get_view(Window *w, Buffer *b)
 
 View *window_find_view(Window *w, Buffer *b)
 {
-    View *v;
-    for (size_t i = 0; i < b->views.count; i++) {
-        v = b->views.ptrs[i];
+    for (size_t i = 0, n = b->views.count; i < n; i++) {
+        View *v = b->views.ptrs[i];
         if (v->window == w) {
             return v;
         }
@@ -152,7 +151,7 @@ View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
     if (w->view != NULL && !can_close(w->view)) {
         return w->view;
     }
-    for (size_t i = 0; i < w->views.count; i++) {
+    for (size_t i = 0, n = w->views.count; i < n; i++) {
         View *v = w->views.ptrs[i];
         if (!can_close(v)) {
             return v;
@@ -291,7 +290,7 @@ void set_view(View *v)
     }
 
     // Save cursor states of views sharing same buffer
-    for (size_t i = 0; i < v->buffer->views.count; i++) {
+    for (size_t i = 0, n = v->buffer->views.count; i < n; i++) {
         View *other = v->buffer->views.ptrs[i];
         if (other != v) {
             other->saved_cursor_offset = block_iter_get_offset(&other->cursor);
@@ -375,7 +374,7 @@ void window_open_files(Window *w, char **filenames, const char *encoding)
 
 void mark_buffer_tabbars_changed(Buffer *b)
 {
-    for (size_t i = 0; i < b->views.count; i++) {
+    for (size_t i = 0, n = b->views.count; i < n; i++) {
         View *v = b->views.ptrs[i];
         v->window->update_tabbar = true;
     }

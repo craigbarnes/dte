@@ -63,7 +63,7 @@ void *ptr_array_remove_idx(PointerArray *array, size_t pos)
 
 size_t ptr_array_idx(const PointerArray *array, const void *ptr)
 {
-    for (size_t i = 0; i < array->count; i++) {
+    for (size_t i = 0, n = array->count; i < n; i++) {
         if (array->ptrs[i] == ptr) {
             return i;
         }
