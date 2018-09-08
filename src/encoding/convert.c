@@ -19,7 +19,7 @@ typedef enum {
     UTF32,
     UTF32BE,
     UTF32LE,
-    UNKNOWN_ENCODING,
+    UNKNOWN,
 } EncodingType;
 
 static const char encoding_names[][16] = {
@@ -32,7 +32,7 @@ static const char encoding_names[][16] = {
     [UTF32LE] = "UTF-32LE",
 };
 
-static_assert(UNKNOWN_ENCODING == ARRAY_COUNT(encoding_names));
+static_assert(UNKNOWN == ARRAY_COUNT(encoding_names));
 
 static const struct {
     const char alias[8];
@@ -376,7 +376,7 @@ static EncodingType lookup_encoding(const char *name)
             return encoding_aliases[i].encoding;
         }
     }
-    return UNKNOWN_ENCODING;
+    return UNKNOWN;
 }
 
 UNITTEST {
@@ -388,8 +388,8 @@ UNITTEST {
     BUG_ON(lookup_encoding("UTF16") != UTF16);
     BUG_ON(lookup_encoding("utf-32le") != UTF32LE);
     BUG_ON(lookup_encoding("ucs-4le") != UTF32LE);
-    BUG_ON(lookup_encoding("UTF8_") != UNKNOWN_ENCODING);
-    BUG_ON(lookup_encoding("UTF") != UNKNOWN_ENCODING);
+    BUG_ON(lookup_encoding("UTF8_") != UNKNOWN);
+    BUG_ON(lookup_encoding("UTF") != UNKNOWN);
 }
 
 char *normalize_encoding_name(const char *name)
@@ -400,7 +400,7 @@ char *normalize_encoding_name(const char *name)
     }
 
     char *normalized;
-    if (type == UNKNOWN_ENCODING) {
+    if (type == UNKNOWN) {
         normalized = xstrdup(name);
         for (size_t i = 0; normalized[i]; i++) {
             normalized[i] = ascii_toupper(normalized[i]);
