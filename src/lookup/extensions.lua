@@ -70,6 +70,7 @@ local extensions = {
     gp = "GNUPLOT",
     gpi = "GNUPLOT",
     groovy = "GROOVY",
+    gsed = "SED",
     gv = "DOT",
     h = "C",
     H = "CPLUSPLUS",

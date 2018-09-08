@@ -1,0 +1,14 @@
+syntax sed
+
+state line-start
+    char " \t\n" this
+    char # comment
+    noeat code
+
+state code
+    char "\n" line-start
+    eat this
+
+state comment
+    char "\n" line-start
+    eat this

@@ -20,7 +20,7 @@ WARNINGS_EXTRA = \
 BUILTIN_SYNTAX_FILES := \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     ini java javascript lua mail make markdown meson nginx ninja php \
-    python robotstxt roff ruby sh sql tex texmfcnf vala xml
+    python robotstxt roff ruby sed sh sql tex texmfcnf vala xml
 
 BUILTIN_CONFIGS := $(addprefix config/, \
     rc compiler/gcc compiler/go \

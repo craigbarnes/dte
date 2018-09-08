@@ -395,6 +395,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 return memcmp(s + 2, "wk", 2) ? 0 : AWK;
             case 'l':
                 return memcmp(s + 2, "sl", 2) ? 0 : GLSL;
+            case 's':
+                return memcmp(s + 2, "ed", 2) ? 0 : SED;
             }
             return 0;
         case 'h':
