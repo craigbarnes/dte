@@ -14,4 +14,6 @@ char *cconv_consume_line(struct cconv *c, size_t *len);
 char *cconv_consume_all(struct cconv *c, size_t *len);
 void cconv_free(struct cconv *c);
 
+char *normalize_encoding_name(const char *name);
+
 #endif

@@ -4,7 +4,7 @@
 #include "test.h"
 #include "../src/command.h"
 #include "../src/editor.h"
-#include "../src/encoding/encoding.h"
+#include "../src/encoding/bom.h"
 #include "../src/terminal/xterm.h"
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"

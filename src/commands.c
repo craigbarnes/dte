@@ -7,7 +7,7 @@
 #include "config.h"
 #include "edit.h"
 #include "editor.h"
-#include "encoding/encoding.h"
+#include "encoding/convert.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
@@ -643,7 +643,7 @@ static void cmd_open(const char *pf, char **args)
     }
 
     if (enc) {
-        encoding = normalize_encoding(enc);
+        encoding = normalize_encoding_name(enc);
         if (encoding == NULL) {
             error_msg("Unsupported encoding %s", enc);
             return;
@@ -971,15 +971,15 @@ static void cmd_save(const char *pf, char **args)
     }
 
     if (enc) {
-        encoding = normalize_encoding(enc);
+        encoding = normalize_encoding_name(enc);
         if (encoding == NULL) {
             error_msg("Unsupported encoding %s", enc);
             return;
         }
     }
 
-    // The normalize_encoding() call above may have allocated memory, so
-    // use "goto error" instead of early return beyond this point, to
+    // The normalize_encoding_name() call above may have allocated memory,
+    // so use "goto error" instead of early return beyond this point, to
     // ensure correct de-allocation.
 
     if (args[0]) {

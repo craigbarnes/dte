@@ -36,7 +36,7 @@ util_objects := $(call prefix-obj, build/util/, \
     unicode xmalloc )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
-    convert decoder encoder encoding )
+    bom convert decoder encoder )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key output terminfo xterm xterm-keys )
