@@ -30,7 +30,7 @@ typedef struct {
     void (*clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);
-    bool (*repeat_char)(char ch, unsigned int reps);
+    void (*repeat_byte)(char ch, size_t count);
     void (*raw)(void);
     void (*cooked)(void);
     void (*save_title)(void);

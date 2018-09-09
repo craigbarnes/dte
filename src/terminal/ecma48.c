@@ -110,36 +110,19 @@ void ecma48_set_color(const TermColor *const color)
     obuf.color = *color;
 }
 
-bool ecma48_repeat_char(char ch, unsigned int reps)
+void ecma48_repeat_byte(char ch, size_t count)
 {
-    if (ch < ' ' || ch > '~' || reps < 5 || reps > 30000) {
-        return false;
+    if (ch < ' ' || ch > '~' || count < 6 || count > 30000) {
+        buf_repeat_byte(ch, count);
+        return;
     }
-
-    // The logic below writes the char once and then emits the REP
-    // control sequence to make the terminal repeat that char. The
-    // first char counts toward the number of reps, so we subtract
-    // 1 from the rep count.
-    reps--;
-
-    char buf[64];
-    int n = snprintf(buf, sizeof buf, "%c\033[%ub", ch, reps);
-    if (n < 0) {
-        return false;
+    char buf[16];
+    int n = snprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
+    if (n < 5 || n > 9) {
+        buf_repeat_byte(ch, count);
+        return;
     }
     buf_add_bytes(buf, n);
-    return true;
-}
-
-// Some terminals only implement a subset of ECMA-48 and "REP" is one
-// control code that many seem to overlook. Therefore, we use this
-// no-op implementation by default and override it for terminals known
-// to support REP. Just returning false indicates to the caller that
-// it should assume nothing was output use a fallback implementation
-// instead.
-bool no_op_repeat_char(char UNUSED_ARG(ch), unsigned int UNUSED_ARG(reps))
-{
-    return false;
 }
 
 static void no_op(void) {}
@@ -155,7 +138,7 @@ TerminalInfo terminal = {
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
-    .repeat_char = &no_op_repeat_char,
+    .repeat_byte = &buf_repeat_byte,
     .save_title = &no_op,
     .restore_title = &no_op,
     .set_title = &no_op_s,

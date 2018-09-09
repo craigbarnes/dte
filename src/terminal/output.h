@@ -35,6 +35,7 @@ extern OutputBuffer obuf;
 void buf_reset(size_t start_x, size_t width, size_t scroll_x);
 void buf_add_bytes(const char *str, size_t count);
 void buf_set_bytes(char ch, size_t count);
+void buf_repeat_byte(char ch, size_t count);
 void buf_add_ch(char ch);
 void buf_escape(const char *str);
 void buf_add_str(const char *str);

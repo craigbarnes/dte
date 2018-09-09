@@ -197,15 +197,18 @@ static void tputs_set_color(const TermColor *color)
     }
 }
 
-static bool tputs_repeat_char(char ch, unsigned int reps)
+static void tputs_repeat_byte(char ch, size_t count)
 {
-    if (!terminfo.rep || ch < ' ' || ch > '~' || reps > 30000) {
-        return false;
+    if (ch < ' ' || ch > '~' || count < 6 || count > 30000) {
+        buf_repeat_byte(ch, count);
+        return;
     }
-    const char *seq = tparm_2(terminfo.rep, ch, reps);
-    BUG_ON(!seq);
+    const char *seq = tparm_2(terminfo.rep, ch, count);
+    if (!seq) {
+        buf_repeat_byte(ch, count);
+        return;
+    }
     tputs(seq, 1, tputs_putc);
-    return true;
 }
 
 // See terminfo(5)
@@ -218,7 +221,6 @@ static void term_init_terminfo(const char *term)
     terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
-    terminal.repeat_char = &tputs_repeat_char;
 
     terminfo.cup = curses_str_cap("cup");
     terminfo.el = curses_str_cap("el");
@@ -226,6 +228,10 @@ static void term_init_terminfo(const char *term)
     terminfo.setaf = curses_str_cap("setaf");
     terminfo.sgr = curses_str_cap("sgr");
     terminfo.rep = curses_str_cap("rep");
+
+    if (terminfo.rep) {
+        terminal.repeat_byte = &tputs_repeat_byte;
+    }
 
     terminal.back_color_erase = tigetflag("bce");
     terminal.max_colors = tigetnum("colors");
@@ -313,7 +319,7 @@ void term_init(void)
         terminal.control_codes->deinit =
             "\033[?1036r" // Restore "metaSendsEscape"
         ;
-        terminal.repeat_char = &ecma48_repeat_char;
+        terminal.repeat_byte = &ecma48_repeat_byte;
     } else if (
         term_match(term, "st")
         || term_match(term, "stterm")

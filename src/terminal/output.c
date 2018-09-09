@@ -41,15 +41,24 @@ void buf_add_bytes(const char *const str, size_t count)
     obuf.count += count;
 }
 
+void buf_repeat_byte(char ch, size_t count)
+{
+    while (count) {
+        obuf_need_space(1);
+        size_t avail = obuf_avail();
+        size_t n = (count > avail) ? avail : count;
+        memset(obuf.buf + obuf.count, ch, n);
+        obuf.count += n;
+        count -= n;
+    }
+}
+
 void buf_set_bytes(char ch, size_t count)
 {
-    int skip;
-
     if (obuf.x + count > obuf.scroll_x + obuf.width) {
         count = obuf.scroll_x + obuf.width - obuf.x;
     }
-
-    skip = obuf.scroll_x - obuf.x;
+    ssize_t skip = obuf.scroll_x - obuf.x;
     if (skip > 0) {
         if (skip > count) {
             skip = count;
@@ -57,26 +66,8 @@ void buf_set_bytes(char ch, size_t count)
         obuf.x += skip;
         count -= skip;
     }
-
     obuf.x += count;
-
-    if (count > 5 && count < 30000 && terminal.repeat_char(ch, count)) {
-        return;
-    }
-
-    while (count) {
-        size_t avail, n = count;
-
-        obuf_need_space(1);
-        avail = obuf_avail();
-        if (n > avail) {
-            n = avail;
-        }
-
-        memset(obuf.buf + obuf.count, ch, n);
-        obuf.count += n;
-        count -= n;
-    }
+    terminal.repeat_byte(ch, count);
 }
 
 // Does not update obuf.x
