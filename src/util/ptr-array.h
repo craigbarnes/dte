@@ -15,6 +15,7 @@ typedef struct {
     .count = 0 \
 }
 
+typedef int (*CompareFunction)(const void *, const void *);
 typedef void (*FreeFunction)(void *ptr);
 #define FREE_FUNC(f) (FreeFunction)f
 
@@ -40,6 +41,23 @@ static inline void *ptr_array_prev(const PointerArray *array, const void *ptr)
 static inline void ptr_array_free(PointerArray *array)
 {
     ptr_array_free_cb(array, free);
+}
+
+static inline void ptr_array_sort (
+    const PointerArray array,
+    CompareFunction compare
+) {
+    if (array.count >= 2) {
+        qsort(array.ptrs, array.count, sizeof(*array.ptrs), compare);
+    }
+}
+
+static inline void *ptr_array_bsearch (
+    const PointerArray array,
+    const void *ptr,
+    CompareFunction compare
+) {
+    return bsearch(&ptr, array.ptrs, array.count, sizeof(*array.ptrs), compare);
 }
 
 #endif

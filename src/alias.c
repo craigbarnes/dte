@@ -73,19 +73,16 @@ static int alias_cmp(const void *const ap, const void *const bp)
 
 void sort_aliases(void)
 {
-    if (aliases.count > 1) {
-        BUG_ON(!aliases.ptrs);
-        qsort(aliases.ptrs, aliases.count, sizeof(*aliases.ptrs), alias_cmp);
-    }
+    ptr_array_sort(aliases, alias_cmp);
 }
 
 const char *find_alias(const char *const name)
 {
-    for (size_t i = 0; i < aliases.count; i++) {
-        const CommandAlias *const alias = aliases.ptrs[i];
-        if (streq(alias->name, name)) {
-            return alias->value;
-        }
+    const CommandAlias key = {.name = (char*) name};
+    const void *ptr = ptr_array_bsearch(aliases, &key, alias_cmp);
+    if (ptr) {
+        const CommandAlias *alias = *(const CommandAlias **) ptr;
+        return alias->value;
     }
     return NULL;
 }
