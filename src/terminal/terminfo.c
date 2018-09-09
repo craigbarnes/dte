@@ -313,6 +313,7 @@ void term_init(void)
         terminal.control_codes->deinit =
             "\033[?1036r" // Restore "metaSendsEscape"
         ;
+        terminal.repeat_char = &ecma48_repeat_char;
     } else if (
         term_match(term, "st")
         || term_match(term, "stterm")
