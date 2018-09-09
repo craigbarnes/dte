@@ -118,7 +118,7 @@ void ecma48_repeat_byte(char ch, size_t count)
     }
     char buf[16];
     int n = snprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
-    if (n < 5 || n > 9) {
+    if (unlikely(n < 5 || n > 9)) {
         buf_repeat_byte(ch, count);
         return;
     }

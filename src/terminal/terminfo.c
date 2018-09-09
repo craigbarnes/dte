@@ -204,7 +204,7 @@ static void tputs_repeat_byte(char ch, size_t count)
         return;
     }
     const char *seq = tparm_2(terminfo.rep, ch, count);
-    if (!seq) {
+    if (unlikely(!seq)) {
         buf_repeat_byte(ch, count);
         return;
     }
