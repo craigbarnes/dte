@@ -10,12 +10,6 @@ local colors = {
     cyan = 6,
     gray = 7,
     darkgray = 8,
-    lightred = 9,
-    lightgreen = 10,
-    lightyellow = 11,
-    lightblue = 12,
-    lightmagenta = 13,
-    lightcyan = 14,
     white = 15,
 }
 

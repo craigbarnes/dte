@@ -137,13 +137,33 @@ static bool parse_color(const char *str, int *val)
         return true;
     }
 
-    const short c = lookup_color(str, strlen(str));
-    if (c >= -2) {
+    size_t len = strlen(str);
+    bool light = false;
+    if (len >= 8 && memcmp(str, "light", 5) == 0) {
+        light = true;
+        str += 5;
+        len -= 5;
+    }
+
+    short c = lookup_color(str, len);
+    switch (c) {
+    case -3:
+        return false;
+    case COLOR_RED:
+    case COLOR_GREEN:
+    case COLOR_YELLOW:
+    case COLOR_BLUE:
+    case COLOR_MAGENTA:
+    case COLOR_CYAN:
+        *val = light ? c + 8: c;
+        return true;
+    default:
+        if (light) {
+            return false;
+        }
         *val = c;
         return true;
     }
-
-    return false;
 }
 
 static bool parse_attr(const char *str, unsigned short *attr)

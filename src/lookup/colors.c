@@ -36,30 +36,7 @@ static short lookup_color(const char *s, size_t len)
         }
         return -3;
     case 8:
-        switch (s[0]) {
-        case 'd':
-            return memcmp(s + 1, "arkgray", 7) ? -3 : 8;
-        case 'l':
-            return memcmp(s + 1, "ightred", 7) ? -3 : 9;
-        }
-        return -3;
-    case 9:
-        if (memcmp(s, "light", 5)) {
-            return -3;
-        }
-        switch (s[5]) {
-        case 'b':
-            return memcmp(s + 6, "lue", 3) ? -3 : 12;
-        case 'c':
-            return memcmp(s + 6, "yan", 3) ? -3 : 14;
-        }
-        return -3;
-    case 10:
-        return memcmp(s, "lightgreen", 10) ? -3 : 10;
-    case 11:
-        return memcmp(s, "lightyellow", 11) ? -3 : 11;
-    case 12:
-        return memcmp(s, "lightmagenta", 12) ? -3 : 13;
+        return memcmp(s, "darkgray", 8) ? -3 : 8;
     }
     return -3;
 }

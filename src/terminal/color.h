@@ -12,7 +12,7 @@ enum {
     COLOR_BLUE,
     COLOR_MAGENTA,
     COLOR_CYAN,
-    COLOR_GREY
+    COLOR_GRAY
 };
 
 enum {
