@@ -32,7 +32,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     thai fuzz1 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii path ptr-array regexp string strtonum uchar \
+    ascii exec path ptr-array regexp string strtonum uchar \
     unicode xmalloc )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
