@@ -9,6 +9,8 @@
 #include "../lookup/attributes.c"
 #include "../lookup/colors.c"
 
+static PointerArray hl_colors = PTR_ARRAY_INIT;
+
 static const char builtin_color_names[NR_BC][16] = {
     [BC_DEFAULT] = "default",
     [BC_NONTEXT] = "nontext",
@@ -38,8 +40,6 @@ UNITTEST {
     }
 }
 
-static PointerArray hl_colors = PTR_ARRAY_INIT;
-
 void fill_builtin_colors(void)
 {
     for (size_t i = 0; i < NR_BC; i++) {
@@ -49,7 +49,7 @@ void fill_builtin_colors(void)
 
 HlColor *set_highlight_color(const char *name, const TermColor *color)
 {
-    for (size_t i = 0; i < hl_colors.count; i++) {
+    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
         HlColor *c = hl_colors.ptrs[i];
         if (streq(name, c->name)) {
             c->color = *color;
@@ -114,7 +114,6 @@ static bool parse_color(const char *str, int *val)
 {
     const char *ptr = str;
     long r, g, b;
-
     if (parse_long(&ptr, &r)) {
         if (*ptr == 0) {
             if (r < -2 || r > 255) {
@@ -145,7 +144,7 @@ static bool parse_color(const char *str, int *val)
         len -= 5;
     }
 
-    short c = lookup_color(str, len);
+    const short c = lookup_color(str, len);
     switch (c) {
     case -3:
         return false;
@@ -155,7 +154,7 @@ static bool parse_color(const char *str, int *val)
     case COLOR_BLUE:
     case COLOR_MAGENTA:
     case COLOR_CYAN:
-        *val = light ? c + 8: c;
+        *val = light ? c + 8 : c;
         return true;
     default:
         if (light) {
@@ -212,8 +211,8 @@ bool parse_term_color(TermColor *color, char **strs)
 
 void collect_hl_colors(const char *prefix)
 {
-    for (size_t i = 0; i < hl_colors.count; i++) {
-        HlColor *c = hl_colors.ptrs[i];
+    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
+        const HlColor *c = hl_colors.ptrs[i];
         if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
         }
