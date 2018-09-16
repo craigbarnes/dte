@@ -6,8 +6,6 @@
 #include "../util/ptr-array.h"
 #include "../util/strtonum.h"
 #include "../util/xmalloc.h"
-#include "../lookup/attributes.c"
-#include "../lookup/colors.c"
 
 static PointerArray hl_colors = PTR_ARRAY_INIT;
 
@@ -108,6 +106,69 @@ void remove_extra_colors(void)
         hl_colors.ptrs[i] = NULL;
     }
     hl_colors.count = NR_BC;
+}
+
+#define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
+
+static unsigned short lookup_attr(const char *s, size_t len)
+{
+    const char *cmp_str;
+    unsigned short cmp_val;
+    switch (len) {
+    case 3: CMP("dim", ATTR_DIM);
+    case 5: CMP("blink", ATTR_BLINK);
+    case 6: CMP("italic", ATTR_ITALIC);
+    case 7: CMP("reverse", ATTR_REVERSE);
+    case 12: CMP("lowintensity", ATTR_DIM);
+    case 4:
+        switch (s[0]) {
+        case 'b': CMP("bold", ATTR_BOLD);
+        case 'k': CMP("keep", ATTR_KEEP);
+        }
+        goto nomatch;
+    case 9:
+        switch (s[0]) {
+        case 'i': CMP("invisible", ATTR_INVIS);
+        case 'u': CMP("underline", ATTR_UNDERLINE);
+        }
+        goto nomatch;
+    }
+    nomatch: return 0;
+    compare: return memcmp(s, cmp_str, len) ? 0 : cmp_val;
+}
+
+static short lookup_color(const char *s, size_t len)
+{
+    const char *cmp_str;
+    short cmp_val;
+    switch (len) {
+    case 3: CMP("red", COLOR_RED);
+    case 6: CMP("yellow", COLOR_YELLOW);
+    case 8: CMP("darkgray", 8);
+    case 4:
+        switch (s[0]) {
+        case 'b': CMP("blue", COLOR_BLUE);
+        case 'c': CMP("cyan", COLOR_CYAN);
+        case 'g': CMP("gray", COLOR_GRAY);
+        case 'k': CMP("keep", -2);
+        }
+        goto nomatch;
+    case 5:
+        switch (s[0]) {
+        case 'b': CMP("black", COLOR_BLACK);
+        case 'g': CMP("green", COLOR_GREEN);
+        case 'w': CMP("white", 15);
+        }
+        goto nomatch;
+    case 7:
+        switch (s[0]) {
+        case 'd': CMP("default", COLOR_DEFAULT);
+        case 'm': CMP("magenta", COLOR_MAGENTA);
+        }
+        goto nomatch;
+    }
+    nomatch: return -3;
+    compare: return memcmp(s, cmp_str, len) ? -3 : cmp_val;
 }
 
 static bool parse_color(const char *str, int *val)
