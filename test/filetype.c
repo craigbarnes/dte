@@ -69,6 +69,7 @@ static void test_find_ft_firstline(void)
         {"<!doctype HTML", "html"},
         {"<!doctype htm", NULL},
         {"<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "xml"},
+        {"%YAML 1.1", "yaml"},
         {"[wrap-file]", "ini"},
         {"[wrap-file", NULL},
         {".TH DTE 1", NULL},

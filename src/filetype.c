@@ -384,13 +384,28 @@ HOT const char *find_ft(const char *filename, StringView line)
         }
     }
 
-    if (line.length) {
-        if (string_view_has_literal_prefix_icase(&line, "<!DOCTYPE HTML")) {
-            return builtin_filetype_names[HTML];
-        } else if (string_view_has_literal_prefix(&line, "[wrap-file]")) {
-            return builtin_filetype_names[INI];
-        } else if (string_view_has_literal_prefix(&line, "<?xml")) {
-            return builtin_filetype_names[XML];
+    if (line.length >= 5) {
+        switch (line.data[1]) {
+        case '!':
+            if (string_view_has_literal_prefix_icase(&line, "<!DOCTYPE HTML")) {
+                return builtin_filetype_names[HTML];
+            }
+            break;
+        case '?':
+            if (string_view_has_literal_prefix(&line, "<?xml")) {
+                return builtin_filetype_names[XML];
+            }
+            break;
+        case 'Y':
+            if (string_view_has_literal_prefix(&line, "%YAML")) {
+                return builtin_filetype_names[YAML];
+            }
+            break;
+        case 'w':
+            if (string_view_has_literal_prefix(&line, "[wrap-file]")) {
+                return builtin_filetype_names[INI];
+            }
+            break;
         }
     }
 
