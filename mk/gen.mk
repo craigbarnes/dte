@@ -9,7 +9,6 @@ gen: $(if $(call streq,$(USE_LUA),static), $(LUA))
 	$(call LPERF_GEN, src/lookup/pathnames)
 	$(call LPERF_GEN, src/lookup/interpreters)
 	$(call LPERF_GEN, src/lookup/ignored-exts)
-	$(call LPERF_GEN, src/lookup/config-cmds)
 	$(E) GEN src/terminal/xterm-keys.c
 	$(Q) $(LUA) src/terminal/xterm-keys.lua > src/terminal/xterm-keys.c
 

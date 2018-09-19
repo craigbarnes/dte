@@ -6,13 +6,44 @@
 #include "error.h"
 #include "parse-args.h"
 #include "util/xmalloc.h"
-#include "lookup/config-cmds.c"
 
 const Command *current_command;
 
 static bool allowed_command(const char *name)
 {
-    return lookup_config_command(name, strlen(name)) ? true : false;
+    size_t len = strlen(name);
+    switch (len) {
+    case 3: return !memcmp(name, "set", len);
+    case 4: return !memcmp(name, "bind", len);
+    case 5: return !memcmp(name, "alias", len);
+    case 7: return !memcmp(name, "include", len);
+    case 8: return !memcmp(name, "errorfmt", len);
+    case 11: return !memcmp(name, "load-syntax", len);
+    case 2:
+        switch (name[0]) {
+        case 'c': return name[1] == 'd';
+        case 'f': return name[1] == 't';
+        case 'h': return name[1] == 'i';
+        }
+        return false;
+    case 6:
+        switch (name[0]) {
+        case 'o': return !memcmp(name, "option", len);
+        case 's': return !memcmp(name, "setenv", len);
+        }
+        return false;
+    }
+    return false;
+}
+
+UNITTEST {
+    BUG_ON(!allowed_command("alias"));
+    BUG_ON(!allowed_command("cd"));
+    BUG_ON(!allowed_command("include"));
+    BUG_ON(!allowed_command("set"));
+    BUG_ON(allowed_command("alias_"));
+    BUG_ON(allowed_command("c"));
+    BUG_ON(allowed_command("cD"));
 }
 
 const Command *find_command(const Command *cmds, const char *name)
