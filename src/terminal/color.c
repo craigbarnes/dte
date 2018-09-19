@@ -125,16 +125,17 @@ static unsigned short lookup_attr(const char *s, size_t len)
         case 'b': CMP("bold", ATTR_BOLD);
         case 'k': CMP("keep", ATTR_KEEP);
         }
-        goto nomatch;
+        break;
     case 9:
         switch (s[0]) {
         case 'i': CMP("invisible", ATTR_INVIS);
         case 'u': CMP("underline", ATTR_UNDERLINE);
         }
-        goto nomatch;
+        break;
     }
-    nomatch: return 0;
-    compare: return memcmp(s, cmp_str, len) ? 0 : cmp_val;
+    return 0;
+compare:
+    return memcmp(s, cmp_str, len) ? 0 : cmp_val;
 }
 
 static short lookup_color(const char *s, size_t len)
@@ -152,23 +153,24 @@ static short lookup_color(const char *s, size_t len)
         case 'g': CMP("gray", COLOR_GRAY);
         case 'k': CMP("keep", -2);
         }
-        goto nomatch;
+        break;
     case 5:
         switch (s[0]) {
         case 'b': CMP("black", COLOR_BLACK);
         case 'g': CMP("green", COLOR_GREEN);
         case 'w': CMP("white", 15);
         }
-        goto nomatch;
+        break;
     case 7:
         switch (s[0]) {
         case 'd': CMP("default", COLOR_DEFAULT);
         case 'm': CMP("magenta", COLOR_MAGENTA);
         }
-        goto nomatch;
+        break;
     }
-    nomatch: return -3;
-    compare: return memcmp(s, cmp_str, len) ? -3 : cmp_val;
+    return -3;
+compare:
+    return memcmp(s, cmp_str, len) ? -3 : cmp_val;
 }
 
 static bool parse_color(const char *str, int *val)
