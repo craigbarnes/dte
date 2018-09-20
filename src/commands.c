@@ -247,7 +247,7 @@ static void cmd_copy(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     } else {
         block_iter_bol(&view->cursor);
         BlockIter tmp = view->cursor;
-        copy(block_iter_eat_line(&tmp), 1);
+        copy(block_iter_eat_line(&tmp), true);
     }
     view->cursor = save;
 }
@@ -266,7 +266,7 @@ static void cmd_cut(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
         BlockIter tmp;
         block_iter_bol(&view->cursor);
         tmp = view->cursor;
-        cut(block_iter_eat_line(&tmp), 1);
+        cut(block_iter_eat_line(&tmp), true);
         move_to_preferred_x(x);
     }
 }
