@@ -6,6 +6,7 @@
 #include "command.h"
 #include "config.h"
 #include "error.h"
+#include "mode.h"
 #include "screen.h"
 #include "script.h"
 #include "search.h"
@@ -19,11 +20,6 @@
 #include "../build/version.h"
 
 static volatile sig_atomic_t terminal_resized;
-
-extern const EditorModeOps normal_mode_ops;
-extern const EditorModeOps command_mode_ops;
-extern const EditorModeOps search_mode_ops;
-extern const EditorModeOps git_open_ops;
 
 static void resize(void);
 static void ui_end(void);

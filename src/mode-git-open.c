@@ -1,7 +1,7 @@
-#include "git-open.h"
 #include "cmdline.h"
 #include "editor.h"
 #include "error.h"
+#include "mode.h"
 #include "screen.h"
 #include "spawn.h"
 #include "terminal/output.h"

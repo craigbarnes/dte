@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "cmdline.h"
+#include "mode.h"
 #include "options.h"
 #include "terminal/color.h"
 #include "util/macros.h"
@@ -20,11 +21,6 @@ typedef enum {
     INPUT_SEARCH,
     INPUT_GIT_OPEN,
 } InputMode;
-
-typedef struct {
-    void (*keypress)(KeyCode key);
-    void (*update)(void);
-} EditorModeOps;
 
 typedef struct {
     EditorStatus status;

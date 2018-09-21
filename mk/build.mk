@@ -45,8 +45,8 @@ editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline \
     commands common compiler completion config ctags edit editor \
     env error file-history file-option filetype format-status frame \
-    git-open highlight history indent input-special load-save \
-    lock main mode-command mode-normal mode-search move msg options \
+    highlight history indent input-special load-save lock main \
+    mode-command mode-git-open mode-normal mode-search move msg options \
     parse-args parse-command run screen screen-tabbar screen-view \
     script search selection spawn state syntax tag view wbuf window ) \
     $(encoding_objects) $(terminal_objects) $(util_objects)

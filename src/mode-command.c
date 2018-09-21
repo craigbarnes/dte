@@ -4,6 +4,7 @@
 #include "editor.h"
 #include "error.h"
 #include "history.h"
+#include "mode.h"
 
 static void command_line_enter(void)
 {

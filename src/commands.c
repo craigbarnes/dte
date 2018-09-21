@@ -11,7 +11,6 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
-#include "git-open.h"
 #include "history.h"
 #include "input-special.h"
 #include "load-save.h"
