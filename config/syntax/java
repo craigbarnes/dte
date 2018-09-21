@@ -19,7 +19,6 @@ state oct1 special
     char 0-7 END special
     noeat END
 
-# \uXXXX can be anywhere in source code but that's just stupid
 state hex4 special
     char 0-9a-fA-F hex3
     noeat END

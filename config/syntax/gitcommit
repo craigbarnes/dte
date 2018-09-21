@@ -25,7 +25,7 @@ state branch notice
     char "\n" start
     eat this
 
-# abel or new file, not known yet
+# Label or new file, not known yet
 state newfile
     # Buffer anything but \n or :
     char "\n" start
