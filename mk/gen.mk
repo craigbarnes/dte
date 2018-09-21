@@ -1,4 +1,5 @@
 FETCH = curl -LSs -o $@
+UCD_TOOL = tools/gen-unicode-tables.lua
 UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
 LUA_DEP = $(if $(call streq,$(USE_LUA),static), $(LUA))
 
@@ -18,9 +19,9 @@ gen: $(LUA_DEP)
 
 gen-unicode-tables: build/unicode-tables.c
 
-build/unicode-tables.c: tools/gen-unicode-tables.lua $(UCD_FILES) | $(LUA_DEP)
+build/unicode-tables.c: $(UCD_TOOL) $(UCD_FILES) | $(LUA_DEP) build/
 	$(E) GEN $@
-	$(Q) $(LUA) $< $(UCD_FILES) > $@
+	$(Q) $(LUA) $(UCD_TOOL) $(UCD_FILES) > $@
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@
