@@ -26,7 +26,7 @@ static bool size_multiply_overflows(size_t a, size_t b, size_t *result)
 #if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_mul_overflow)
     return __builtin_mul_overflow(a, b, result);
 #else
-    if (a > 0 && b > SIZE_MAX / a) {
+    if (unlikely(a > 0 && b > SIZE_MAX / a)) {
         return true;
     }
     *result = a * b;
