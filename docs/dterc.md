@@ -412,21 +412,6 @@ Insert _text_ into the buffer.
 `-m`
 :   Move after inserted text
 
-### **insert-special**
-
-Enter an input mode that allows inserting special characters or byte
-values. After running the command, type a decimal value or use one of
-the following prefixes:
-
-`o`
-:   Insert 3-digit octal byte value
-
-`x`
-:   Insert 2-digit hexadecimal byte value
-
-`u`
-:   Insert 6-digit hexadecimal Unicode value
-
 ### **join**
 
 Join selection or next line to current.

@@ -3,7 +3,6 @@
 #include "editor.h"
 #include "format-status.h"
 #include "frame.h"
-#include "input-special.h"
 #include "search.h"
 #include "selection.h"
 #include "terminal/input.h"
@@ -35,10 +34,6 @@ void set_builtin_color(enum builtin_color c)
 static const char *format_misc_status(Window *win)
 {
     static char misc_status[32] = {'\0'};
-
-    if (special_input_misc_status(misc_status, 31)) {
-        return misc_status;
-    }
 
     if (editor.input_mode == INPUT_SEARCH) {
         snprintf (

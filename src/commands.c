@@ -12,7 +12,6 @@
 #include "filetype.h"
 #include "frame.h"
 #include "history.h"
-#include "input-special.h"
 #include "load-save.h"
 #include "lock.h"
 #include "move.h"
@@ -515,11 +514,6 @@ static void cmd_insert_builtin(const char* UNUSED_ARG(pf), char **args)
     } else {
         error_msg("No built-in config with name '%s'", name);
     }
-}
-
-static void cmd_insert_special(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
-{
-    special_input_activate();
 }
 
 static void cmd_join(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
@@ -1724,7 +1718,6 @@ const Command commands[] = {
     {"include", "b", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
     {"insert-builtin", "", 1, 1, cmd_insert_builtin},
-    {"insert-special", "", 0, 0, cmd_insert_special},
     {"join", "", 0, 0, cmd_join},
     {"left", "", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},

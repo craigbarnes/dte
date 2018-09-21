@@ -2,7 +2,6 @@
 #include "change.h"
 #include "edit.h"
 #include "editor.h"
-#include "input-special.h"
 #include "mode.h"
 #include "terminal/input.h"
 #include "util/unicode.h"
@@ -25,18 +24,6 @@ static void insert_paste(void)
 
 static void normal_mode_keypress(KeyCode key)
 {
-    char buf[4];
-    int count;
-    if (special_input_keypress(key, buf, &count)) {
-        if (count) {
-            begin_change(CHANGE_MERGE_NONE);
-            buffer_insert_bytes(buf, count);
-            end_change();
-            block_iter_skip_bytes(&window->view->cursor, count);
-        }
-        return;
-    }
-
     if (nr_pressed_keys()) {
         handle_binding(key);
         return;

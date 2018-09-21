@@ -2,7 +2,6 @@
 #include "common.h"
 #include "editor.h"
 #include "history.h"
-#include "input-special.h"
 #include "terminal/input.h"
 #include "util/ascii.h"
 #include "util/uchar.h"
@@ -171,17 +170,6 @@ void cmdline_set_text(CommandLine *c, const char *text)
 
 int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
 {
-    char buf[4];
-    int count;
-    if (special_input_keypress(key, buf, &count)) {
-        // \n is not allowed in command line because
-        // command/search history file would break
-        if (count && buf[0] != '\n') {
-            cmdline_insert_bytes(&editor.cmdline, buf, count);
-        }
-        c->search_pos = -1;
-        return 1;
-    }
     if (key <= KEY_UNICODE_MAX) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
         return 1;
@@ -206,9 +194,6 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
         break;
     case CTRL('U'):
         cmdline_delete_bol(c);
-        break;
-    case CTRL('V'):
-        special_input_activate();
         break;
     case CTRL('W'):
         cmdline_erase_word(c);
