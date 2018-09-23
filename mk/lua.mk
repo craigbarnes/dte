@@ -1,8 +1,8 @@
 AR = ar
-PKGEXISTS = $(PKGCONFIG) --exists $(1) 2>/dev/null && echo $(1)
-PKGFIND = $(shell for P in $(1); do $(call PKGEXISTS, $$P) && break; done)
-PKGCFLAGS = $(shell $(PKGCONFIG) --cflags $(1) 2>/dev/null)
-CMDFIND = $(shell for C in $(1); do command -v $$C && break; done)
+pkg-exists = $(PKGCONFIG) --exists $(1) 2>/dev/null && echo $(1)
+pkg-find = $(shell for P in $(1); do $(call pkg-exists, $$P) && break; done)
+pkg-cflags = $(shell $(PKGCONFIG) --cflags $(1) 2>/dev/null)
+cmd-find = $(shell for C in $(1); do command -v $$C && break; done)
 
 ifeq "$(USE_LUA)" "static"
   LUA_LDLIBS = build/lua/liblua.a -lm
@@ -14,13 +14,13 @@ ifeq "$(USE_LUA)" "static"
   $(dte) $(test): | build/lua/liblua.a
 else ifeq "$(USE_LUA)" "dynamic"
   LUA_PC = $(or \
-    $(call PKGFIND, lua53 lua5.3 lua-5.3), \
+    $(call pkg-find, lua53 lua5.3 lua-5.3), \
     $(shell $(PKGCONFIG) --exists 'lua >= 5.3; lua < 5.4' && echo lua), \
     $(error Unable to find pkg-config file for Lua 5.3) \
   )
-  LUA_LDLIBS = $(call PKGLIBS, $(LUA_PC))
-  LUA_CFLAGS = $(call PKGCFLAGS, $(LUA_PC)) -DUSE_LUA
-  LUA = $(call CMDFIND, $(LUA_PC) lua5.3 lua-5.3 lua53)
+  LUA_LDLIBS = $(call pkg-libs, $(LUA_PC))
+  LUA_CFLAGS = $(call pkg-cflags, $(LUA_PC)) -DUSE_LUA
+  LUA = $(call cmd-find, $(LUA_PC) lua5.3 lua-5.3 lua53)
   $(foreach V, LUA_PC LUA_LDLIBS LUA_CFLAGS LUA, $(call make-lazy,$(V)))
 else
   LUA = lua

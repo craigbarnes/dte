@@ -2,7 +2,6 @@ CC ?= gcc
 CFLAGS ?= -g -O2
 LDFLAGS ?=
 AWK = awk
-PKGLIBS = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 VERSION = $(shell mk/version.sh 1.7)
 
 WARNINGS = \
@@ -69,7 +68,7 @@ endif
 ifdef TERMINFO_DISABLE
   build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
-  LDLIBS += $(or $(call PKGLIBS, tinfo), $(call PKGLIBS, ncurses), -lcurses)
+  LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
 CWARNS = $(WARNINGS) $(foreach W,$(WARNINGS_EXTRA),$(call cc-option,$(W)))
