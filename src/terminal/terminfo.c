@@ -211,6 +211,18 @@ static void tputs_repeat_byte(char ch, size_t count)
     tputs(seq, 1, tputs_putc);
 }
 
+NORETURN COLD PRINTF(1)
+static void error(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    putc('\n', stderr);
+    fflush(stderr);
+    exit(1);
+}
+
 // See terminfo(5)
 static void term_init_terminfo(const char *term)
 {
@@ -223,6 +235,10 @@ static void term_init_terminfo(const char *term)
     terminal.move_cursor = &tputs_move_cursor;
 
     terminfo.cup = curses_str_cap("cup");
+    if (terminfo.cup == NULL) {
+        error("TERM type '%s' not supported: 'cup' capability required", term);
+    }
+
     terminfo.el = curses_str_cap("el");
     terminfo.setab = curses_str_cap("setab");
     terminfo.setaf = curses_str_cap("setaf");
@@ -296,8 +312,7 @@ void term_init(void)
 {
     const char *const term = getenv("TERM");
     if (term == NULL || term[0] == '\0') {
-        fputs("'TERM' not set\n", stderr);
-        exit(1);
+        error("'TERM' not set");
     }
 
     if (getenv("DTE_FORCE_TERMINFO")) {
@@ -305,8 +320,7 @@ void term_init(void)
         term_init_terminfo(term);
         return;
 #else
-        fputs("'DTE_FORCE_TERMINFO' set but terminfo not linked\n", stderr);
-        exit(1);
+        error("'DTE_FORCE_TERMINFO' set but terminfo not linked");
 #endif
     }
 
