@@ -1,6 +1,6 @@
 #include <string.h>
 #include "wbuf.h"
-#include "common.h"
+#include "util/xreadwrite.h"
 
 ssize_t wbuf_flush(WriteBuffer *wbuf)
 {

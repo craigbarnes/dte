@@ -1,9 +1,10 @@
 #include <stdlib.h>
+#include <string.h>
 #include "encoder.h"
 #include "convert.h"
-#include "../common.h"
 #include "../util/uchar.h"
 #include "../util/xmalloc.h"
+#include "../util/xreadwrite.h"
 
 FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
 {
@@ -12,7 +13,7 @@ FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
     enc->nls = nls;
     enc->fd = fd;
 
-    if (!streq(encoding, "UTF-8")) {
+    if (strcmp(encoding, "UTF-8") != 0) {
         enc->cconv = cconv_from_utf8(encoding);
         if (enc->cconv == NULL) {
             free(enc);

@@ -11,6 +11,7 @@
 #include "error.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 static void add_block(Buffer *b, Block *blk)
 {

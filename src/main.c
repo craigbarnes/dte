@@ -18,6 +18,7 @@
 #include "terminal/terminfo.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 #include "view.h"
 #include "window.h"
 

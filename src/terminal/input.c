@@ -1,10 +1,13 @@
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <unistd.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "input.h"
 #include "terminfo.h"
-#include "../common.h"
 #include "../editor.h"
 #include "../util/xmalloc.h"
 

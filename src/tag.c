@@ -6,6 +6,7 @@
 #include "error.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 static TagFile *current_tag_file;
 static char *current_filename; // For sorting tags

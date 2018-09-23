@@ -1,7 +1,6 @@
 #include <string.h>
 #include "decoder.h"
 #include "convert.h"
-#include "../common.h"
 #include "../editor.h"
 #include "../util/uchar.h"
 #include "../util/xmalloc.h"
@@ -146,7 +145,7 @@ static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 
 static int set_encoding(FileDecoder *dec, const char *encoding)
 {
-    if (streq(encoding, "UTF-8")) {
+    if (strcmp(encoding, "UTF-8") == 0) {
         dec->read_line = read_utf8_line;
     } else {
         dec->cconv = cconv_to_utf8(encoding);

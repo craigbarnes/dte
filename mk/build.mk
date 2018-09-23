@@ -32,7 +32,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum uchar \
-    unicode xmalloc )
+    unicode xmalloc xreadwrite )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder )
@@ -42,7 +42,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline \
-    commands common compiler completion config ctags edit editor \
+    commands common compiler completion config ctags debug edit editor \
     env error file-history file-option filetype format-status frame \
     highlight history indent load-save lock main \
     mode-command mode-git-open mode-normal mode-search move msg options \
