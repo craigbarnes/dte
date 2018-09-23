@@ -1,12 +1,25 @@
 #include <string.h>
 #include "wbuf.h"
+#include "util/macros.h"
 #include "util/xreadwrite.h"
+
+#define XFLUSH(buf) do { \
+    ssize_t rc_ = wbuf_flush(buf); \
+    if (unlikely(rc_ < 0)) { \
+        return rc_; \
+    } \
+} while (0)
+
+static inline size_t wbuf_avail(WriteBuffer *wbuf)
+{
+    return sizeof(wbuf->buf) - wbuf->fill;
+}
 
 ssize_t wbuf_flush(WriteBuffer *wbuf)
 {
     if (wbuf->fill) {
         ssize_t rc = xwrite(wbuf->fd, wbuf->buf, wbuf->fill);
-        if (rc < 0) {
+        if (unlikely(rc < 0)) {
             return rc;
         }
         wbuf->fill = 0;
@@ -16,19 +29,13 @@ ssize_t wbuf_flush(WriteBuffer *wbuf)
 
 ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count)
 {
-    if (wbuf->fill + count > sizeof(wbuf->buf)) {
-        ssize_t rc = wbuf_flush(wbuf);
-        if (rc < 0) {
-            return rc;
-        }
+    if (count > wbuf_avail(wbuf)) {
+        XFLUSH(wbuf);
     }
     if (count >= sizeof(wbuf->buf)) {
-        ssize_t rc = wbuf_flush(wbuf);
-        if (rc < 0) {
-            return rc;
-        }
-        rc = xwrite(wbuf->fd, buf, count);
-        if (rc < 0) {
+        XFLUSH(wbuf);
+        ssize_t rc = xwrite(wbuf->fd, buf, count);
+        if (unlikely(rc < 0)) {
             return rc;
         }
         return 0;
@@ -45,11 +52,8 @@ ssize_t wbuf_write_str(WriteBuffer *wbuf, const char *str)
 
 ssize_t wbuf_write_ch(WriteBuffer *wbuf, char ch)
 {
-    if (wbuf->fill + 1 > sizeof(wbuf->buf)) {
-        ssize_t rc = wbuf_flush(wbuf);
-        if (rc < 0) {
-            return rc;
-        }
+    if (wbuf_avail(wbuf) == 0) {
+        XFLUSH(wbuf);
     }
     wbuf->buf[wbuf->fill++] = ch;
     return 0;
