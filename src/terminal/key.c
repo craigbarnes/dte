@@ -86,7 +86,7 @@ bool parse_key(KeyCode *key, const char *str)
         *key = modifiers | ch;
         return true;
     }
-    if (!strcasecmp(str, "sp") || !strcasecmp(str, "space")) {
+    if (!strcasecmp(str, "space")) {
         *key = modifiers | ' ';
         return true;
     }
