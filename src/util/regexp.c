@@ -1,3 +1,4 @@
+#include <string.h>
 #include "regexp.h"
 #include "xmalloc.h"
 #include "../debug.h"
