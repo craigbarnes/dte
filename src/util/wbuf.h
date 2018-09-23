@@ -1,5 +1,5 @@
-#ifndef WBUF_H
-#define WBUF_H
+#ifndef UTIL_WBUF_H
+#define UTIL_WBUF_H
 
 #include <sys/types.h>
 

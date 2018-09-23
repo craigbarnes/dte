@@ -6,8 +6,8 @@
 #include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/strtonum.h"
+#include "util/wbuf.h"
 #include "util/xmalloc.h"
-#include "wbuf.h"
 
 typedef struct {
     int row, col;

@@ -32,7 +32,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum uchar \
-    unicode xmalloc xreadwrite )
+    unicode wbuf xmalloc xreadwrite )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder )
@@ -47,7 +47,7 @@ editor_objects := $(call prefix-obj, build/, \
     highlight history indent load-save lock main \
     mode-command mode-git-open mode-normal mode-search move msg options \
     parse-args parse-command run screen screen-tabbar screen-view \
-    script search selection spawn state syntax tag view wbuf window ) \
+    script search selection spawn state syntax tag view window ) \
     $(encoding_objects) $(terminal_objects) $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \

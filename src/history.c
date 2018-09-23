@@ -4,8 +4,8 @@
 #include "common.h"
 #include "error.h"
 #include "util/ptr-array.h"
+#include "util/wbuf.h"
 #include "util/xmalloc.h"
-#include "wbuf.h"
 
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, size_t max_entries)

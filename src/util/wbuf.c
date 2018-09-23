@@ -1,7 +1,7 @@
 #include <string.h>
+#include "macros.h"
 #include "wbuf.h"
-#include "util/macros.h"
-#include "util/xreadwrite.h"
+#include "xreadwrite.h"
 
 #define XFLUSH(buf) do { \
     ssize_t rc_ = wbuf_flush(buf); \

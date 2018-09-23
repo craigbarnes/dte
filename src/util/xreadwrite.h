@@ -1,5 +1,5 @@
-#ifndef XREADWRITE_H
-#define XREADWRITE_H
+#ifndef UTIL_XREADWRITE_H
+#define UTIL_XREADWRITE_H
 
 #include <sys/types.h>
 
