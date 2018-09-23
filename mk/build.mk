@@ -51,7 +51,7 @@ editor_objects := $(call prefix-obj, build/, \
     $(encoding_objects) $(terminal_objects) $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
-    config filetype key main test util )
+    config filetype main terminal test util )
 
 all_objects := $(editor_objects) $(test_objects)
 
