@@ -125,7 +125,7 @@ typedef struct OptionOps {
 static void filetype_changed(void)
 {
     Buffer *b = window->view->buffer;
-    set_file_options(b);
+    set_file_options_internal(b);
     buffer_update_syntax(b);
 }
 
@@ -673,20 +673,20 @@ void toggle_option_values (
 bool validate_local_options(char **strs)
 {
     bool valid = true;
-
     for (size_t i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
         const OptionDesc *desc = must_find_option(name);
-
         if (desc == NULL) {
             valid = false;
         } else if (!desc->local) {
             error_msg("Option %s is not local", name);
             valid = false;
+        } else if (streq(name, "filetype")) {
+            error_msg("filetype cannot be set via option command");
+            valid = false;
         } else {
             OptionValue val;
-
             if (desc->ops->parse(desc, value, &val)) {
                 free_value(desc, val);
             } else {

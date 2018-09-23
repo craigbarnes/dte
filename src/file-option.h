@@ -9,6 +9,7 @@ enum file_options_type {
 };
 
 void set_file_options(Buffer *b);
+void set_file_options_internal(Buffer *b);
 void add_file_options(enum file_options_type type, char *to, char **strs);
 
 #endif

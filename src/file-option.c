@@ -1,5 +1,6 @@
 #include "file-option.h"
 #include "options.h"
+#include "script.h"
 #include "util/ptr-array.h"
 #include "util/regexp.h"
 #include "util/xmalloc.h"
@@ -19,7 +20,7 @@ static void set_options(char **args)
     }
 }
 
-void set_file_options(Buffer *b)
+void set_file_options_internal(Buffer *b)
 {
     for (size_t i = 0; i < file_options.count; i++) {
         const FileOption *opt = file_options.ptrs[i];
@@ -39,6 +40,12 @@ void set_file_options(Buffer *b)
             set_options(opt->strs);
         }
     }
+}
+
+void set_file_options(Buffer *b)
+{
+    set_file_options_internal(b);
+    run_event_hooks(HOOK_SET_FILE_OPTIONS);
 }
 
 void add_file_options(enum file_options_type type, char *to, char **strs)
