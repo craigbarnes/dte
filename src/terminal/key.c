@@ -39,7 +39,6 @@ static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
 
     while (true) {
         const unsigned char ch = ascii_toupper(str[i]);
-
         if (ch == '^' && str[i + 1] != 0) {
             modifiers |= MOD_CTRL;
             i++;
@@ -62,13 +61,12 @@ static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
 
 bool parse_key(KeyCode *key, const char *str)
 {
-    KeyCode modifiers, ch;
-
+    KeyCode modifiers;
     str += parse_modifiers(str, &modifiers);
     const size_t len = strlen(str);
 
     size_t i = 0;
-    ch = u_get_char(str, len, &i);
+    KeyCode ch = u_get_char(str, len, &i);
     if (u_is_unicode(ch) && i == len) {
         if (modifiers == MOD_CTRL) {
             // Normalize
@@ -100,12 +98,14 @@ bool parse_key(KeyCode *key, const char *str)
         *key = modifiers | KEY_ENTER;
         return true;
     }
+
     for (i = 0; i < NR_SPECIAL_KEYS; i++) {
         if (!strcasecmp(str, special_names[i])) {
             *key = modifiers | (KEY_SPECIAL_MIN + i);
             return true;
         }
     }
+
     return false;
 }
 
@@ -153,14 +153,15 @@ bool key_to_ctrl(KeyCode key, unsigned char *byte)
     if ((key & MOD_MASK) != MOD_CTRL) {
         return false;
     }
+
     key &= ~MOD_CTRL;
     if (key >= '@' && key <= '_') {
         *byte = key & ~0x40;
         return true;
-    }
-    if (key == '?') {
+    } else if (key == '?') {
         *byte = 0x7f;
         return true;
     }
+
     return false;
 }
