@@ -198,9 +198,43 @@ static void test_key_to_string(void)
     }
 }
 
+static void test_key_to_ctrl(void)
+{
+    unsigned char c;
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '@', &c), true);
+    EXPECT_EQ(c, '\0');
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '_', &c), true);
+    EXPECT_EQ(c, 0x1F);
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'G', &c), true);
+    EXPECT_EQ(c, '\a');
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'I', &c), true);
+    EXPECT_EQ(c, '\t');
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'J', &c), true);
+    EXPECT_EQ(c, '\n');
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'M', &c), true);
+    EXPECT_EQ(c, '\r');
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '?', &c), true);
+    EXPECT_EQ(c, 0x7F);
+
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | ' ', &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'g', &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_META | '@', &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_SHIFT | '_', &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | MOD_SHIFT | 'M', &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 0x80, &c), false);
+    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 0xFF, &c), false);
+    EXPECT_EQ(key_to_ctrl('@', &c), false);
+    EXPECT_EQ(key_to_ctrl('\0', &c), false);
+    EXPECT_EQ(key_to_ctrl('_', &c), false);
+    EXPECT_EQ(key_to_ctrl('M', &c), false);
+    EXPECT_EQ(key_to_ctrl(0x80, &c), false);
+    EXPECT_EQ(key_to_ctrl(0xFF, &c), false);
+}
+
 void test_terminal(void)
 {
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
     test_key_to_string();
+    test_key_to_ctrl();
 }
