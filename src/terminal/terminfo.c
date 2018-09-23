@@ -4,6 +4,18 @@
 #include "xterm.h"
 #include "../common.h"
 
+NORETURN COLD PRINTF(1)
+static void error(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    putc('\n', stderr);
+    fflush(stderr);
+    exit(1);
+}
+
 #ifndef TERMINFO_DISABLE
 
 #define KEY(c, k) { \
@@ -209,18 +221,6 @@ static void tputs_repeat_byte(char ch, size_t count)
         return;
     }
     tputs(seq, 1, tputs_putc);
-}
-
-NORETURN COLD PRINTF(1)
-static void error(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    putc('\n', stderr);
-    fflush(stderr);
-    exit(1);
 }
 
 // See terminfo(5)
