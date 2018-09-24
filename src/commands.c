@@ -1004,7 +1004,7 @@ static void cmd_save(const char *pf, char **args)
                 goto error;
             }
         }
-        if (buffer->ro && !force) {
+        if (buffer->readonly && !force) {
             error_msg("Use -f to force saving read-only file.");
             goto error;
         }
@@ -1090,7 +1090,7 @@ static void cmd_save(const char *pf, char **args)
     }
 
     buffer->saved_change = buffer->cur_change;
-    buffer->ro = false;
+    buffer->readonly = false;
     buffer->newline = newline;
     if (encoding != buffer->encoding) {
         free(buffer->encoding);

@@ -35,7 +35,7 @@ typedef struct Buffer {
     char *display_filename;
     char *abs_filename;
 
-    bool ro;
+    bool readonly;
     bool locked;
     bool setup;
 

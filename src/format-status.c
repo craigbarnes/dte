@@ -96,7 +96,7 @@ void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 }
                 break;
             case 'r':
-                if (v->buffer->ro) {
+                if (v->buffer->readonly) {
                     add_status_str(f, "RO");
                 }
                 break;

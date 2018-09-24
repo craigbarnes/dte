@@ -109,14 +109,14 @@ View *window_open_buffer (
 
     if (editor.options.lock_files) {
         if (lock_file(b->abs_filename)) {
-            b->ro = true;
+            b->readonly = true;
         } else {
             b->locked = true;
         }
     }
-    if (b->st.st_mode != 0 && !b->ro && access(filename, W_OK)) {
+    if (b->st.st_mode != 0 && !b->readonly && access(filename, W_OK)) {
         error_msg("No write permission to %s, marking read-only.", filename);
-        b->ro = true;
+        b->readonly = true;
     }
     return window_add_buffer(w, b);
 }
