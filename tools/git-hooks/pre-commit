@@ -17,6 +17,8 @@ test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists" $LINENO
 MAKE="$(command -v gmake || command -v make)"
 test -x "$MAKE" || abort 'unable to find GNU Make command' $LINENO
 MAKE="$MAKE --no-print-directory -C $TMPDIR -j$(mk/nproc.sh)"
+export MAKEFLAGS='DEBUG=3 WERROR=1'
+export CFLAGS='-g -Og -pipe'
 
 git checkout-index --prefix="$TMPDIR/" -a || exit 1
 trap "rm -rf '$TMPDIR'" EXIT
@@ -28,7 +30,7 @@ done
 
 mkdir -p "$TMPDIR/GEN/"
 cp $GENERATED "$TMPDIR/GEN/"
-$MAKE -B gen man
+$MAKE -B gen man check-syntax-files
 
 for F in $GENERATED; do
     B="$(basename $F)"
@@ -37,5 +39,7 @@ for F in $GENERATED; do
     fi
 done
 
-$MAKE -B check check-syntax-files WERROR=1
-$MAKE check WERROR=1 TERMINFO_DISABLE=1
+$MAKE check
+$MAKE check TERMINFO_DISABLE=1
+$MAKE check USE_LUA=static
+$MAKE check DEBUG=0
