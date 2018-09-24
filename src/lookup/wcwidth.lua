@@ -1,5 +1,3 @@
-#!/usr/bin/env lua
-
 local usage = [[
 Usage: %s UnicodeData.txt EastAsianWidth.txt
 (both files available from: https://unicode.org/Public/11.0.0/ucd/)

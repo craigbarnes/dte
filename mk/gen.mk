@@ -1,26 +1,24 @@
 FETCH = curl -LSs -o $@
-UCD_TOOL = tools/gen-unicode-tables.lua
-UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
+LPERF = $(LUA) mk/lperf.lua
 LUA_DEP = $(filter build/lua/lua, $(LUA))
+UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
 
-GEN_LOOKUP_NAMES = basenames extensions ignored-exts interpreters pathnames
-GEN_LOOKUP_TARGETS = $(addprefix gen-lookup-, $(GEN_LOOKUP_NAMES))
+LPERF_TARGETS = $(addprefix gen-lookup-, \
+    basenames extensions ignored-exts interpreters pathnames )
 
-gen: $(GEN_LOOKUP_TARGETS) gen-xterm-keys
+gen: $(LPERF_TARGETS) gen-xterm-keys
 
-$(GEN_LOOKUP_TARGETS): gen-lookup-%: $(LUA_DEP)
+$(LPERF_TARGETS): gen-lookup-%: $(LUA_DEP)
 	$(E) GEN src/lookup/$*.c
-	$(Q) $(LUA) mk/lperf.lua src/lookup/$*.lua src/lookup/$*.c
+	$(Q) $(LPERF) src/lookup/$*.lua src/lookup/$*.c
 
 gen-xterm-keys: $(LUA_DEP)
 	$(E) GEN src/terminal/xterm-keys.c
 	$(Q) $(LUA) src/terminal/xterm-keys.lua > src/terminal/xterm-keys.c
 
-gen-unicode-tables: build/unicode-tables.c
-
-build/unicode-tables.c: $(UCD_TOOL) $(UCD_FILES) | $(LUA_DEP) build/
-	$(E) GEN $@
-	$(Q) $(LUA) $(UCD_TOOL) $(UCD_FILES) > $@
+gen-wcwidth: $(UCD_FILES) $(LUA_DEP)
+	$(E) GEN src/lookup/wcwidth.c
+	$(Q) $(LUA) src/lookup/wcwidth.lua $(UCD_FILES) > src/lookup/wcwidth.c
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@
@@ -30,4 +28,4 @@ $(UCD_FILES): | .cache/
 	@mkdir -p $@
 
 
-.PHONY: gen gen-xterm-keys gen-unicode-tables $(GEN_LOOKUP_TARGETS)
+.PHONY: gen gen-xterm-keys gen-wcwidth $(LPERF_TARGETS)
