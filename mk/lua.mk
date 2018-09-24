@@ -10,7 +10,6 @@ ifeq "$(USE_LUA)" "static"
     LUA_LDLIBS += -ldl
   endif
   LUA_CFLAGS = -Ilib/lua/ -DUSE_LUA
-  LUA = build/lua/lua
   $(dte) $(test): | build/lua/liblua.a
 else ifeq "$(USE_LUA)" "dynamic"
   LUA_PC = $(or \
@@ -20,11 +19,11 @@ else ifeq "$(USE_LUA)" "dynamic"
   )
   LUA_LDLIBS = $(call pkg-libs, $(LUA_PC))
   LUA_CFLAGS = $(call pkg-cflags, $(LUA_PC)) -DUSE_LUA
-  LUA = $(call cmd-find, $(LUA_PC) lua5.3 lua-5.3 lua53)
-  $(foreach V, LUA_PC LUA_LDLIBS LUA_CFLAGS LUA, $(call make-lazy,$(V)))
-else
-  LUA = lua
+  $(foreach V, LUA_PC LUA_LDLIBS LUA_CFLAGS, $(call make-lazy,$(V)))
 endif
+
+LUA = $(or $(call cmd-find, $(LUA_PC) lua5.3 lua-5.3 lua53 lua), build/lua/lua)
+$(call make-lazy,LUA)
 
 liblua_objects = $(addprefix build/lua/, \
     lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \

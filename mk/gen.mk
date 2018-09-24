@@ -1,7 +1,7 @@
 FETCH = curl -LSs -o $@
 UCD_TOOL = tools/gen-unicode-tables.lua
 UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
-LUA_DEP = $(if $(call streq,$(USE_LUA),static), $(LUA))
+LUA_DEP = $(filter build/lua/lua, $(LUA))
 
 GEN_LOOKUP_NAMES = basenames extensions ignored-exts interpreters pathnames
 GEN_LOOKUP_TARGETS = $(addprefix gen-lookup-, $(GEN_LOOKUP_NAMES))
