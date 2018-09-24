@@ -110,6 +110,18 @@ static void test_u_is_upper(void)
     EXPECT_EQ(u_is_upper('a'), false);
     EXPECT_EQ(u_is_upper('z'), false);
     EXPECT_EQ(u_is_upper('0'), false);
+    EXPECT_EQ(u_is_upper('9'), false);
+    EXPECT_EQ(u_is_upper('@'), false);
+    EXPECT_EQ(u_is_upper('['), false);
+    EXPECT_EQ(u_is_upper('{'), false);
+    EXPECT_EQ(u_is_upper('\0'), false);
+    EXPECT_EQ(u_is_upper('\t'), false);
+    EXPECT_EQ(u_is_upper(' '), false);
+    EXPECT_EQ(u_is_upper(0x00E0), false);
+    EXPECT_EQ(u_is_upper(0x00E7), false);
+    EXPECT_EQ(u_is_upper(0x1D499), false);
+    EXPECT_EQ(u_is_upper(0x1F315), false);
+    EXPECT_EQ(u_is_upper(0x10ffff), false);
 }
 
 static void test_u_str_width(void)
