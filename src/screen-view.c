@@ -364,39 +364,41 @@ static void print_line(LineInfo *info)
 
 void update_range(View *v, int y1, int y2)
 {
-    LineInfo info;
-    BlockIter bi = v->cursor;
-    int i, got_line;
+    const int edit_x = v->window->edit_x;
+    const int edit_y = v->window->edit_y;
+    const int edit_w = v->window->edit_w;
+    const int edit_h = v->window->edit_h;
 
-    buf_reset(v->window->edit_x, v->window->edit_w, v->vx);
+    buf_reset(edit_x, edit_w, v->vx);
     obuf.tab_width = v->buffer->options.tab_width;
     obuf.tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
-    for (i = 0; i < v->cy - y1; i++) {
+    BlockIter bi = v->cursor;
+    for (int i = 0, n = v->cy - y1; i < n; i++) {
         block_iter_prev_line(&bi);
     }
-    for (i = 0; i < y1 - v->cy; i++) {
+    for (int i = 0, n = y1 - v->cy; i < n; i++) {
         block_iter_eat_line(&bi);
     }
     block_iter_bol(&bi);
 
+    LineInfo info;
     line_info_init(&info, v, &bi, y1);
 
     y1 -= v->vy;
     y2 -= v->vy;
 
-    got_line = !block_iter_is_eof(&bi);
+    bool got_line = !block_iter_is_eof(&bi);
     hl_fill_start_states(v->buffer, info.line_nr);
+    int i;
     for (i = y1; got_line && i < y2; i++) {
-        LineRef lr;
-        HlColor **colors;
-        int next_changed;
-
         obuf.x = 0;
-        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i);
+        terminal.move_cursor(edit_x, edit_y + i);
 
+        LineRef lr;
         fill_line_nl_ref(&bi, &lr);
-        colors = hl_line (
+        int next_changed;
+        HlColor **colors = hl_line (
             v->buffer,
             lr.line,
             lr.size,
@@ -406,10 +408,10 @@ void update_range(View *v, int y1, int y2)
         line_info_set_line(&info, &lr, colors);
         print_line(&info);
 
-        got_line = block_iter_next_line(&bi);
+        got_line = !!block_iter_next_line(&bi);
         info.line_nr++;
 
-        if (next_changed && i + 1 == y2 && y2 < v->window->edit_h) {
+        if (next_changed && i + 1 == y2 && y2 < edit_h) {
             // More lines need to be updated not because their
             // contents have changed but because their highlight
             // state has.
@@ -425,7 +427,7 @@ void update_range(View *v, int y1, int y2)
         mask_color2(&color, editor.builtin_colors[BC_CURRENTLINE]);
         set_color(&color);
 
-        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i++);
+        terminal.move_cursor(edit_x, edit_y + i++);
         buf_clear_eol();
     }
 
@@ -434,7 +436,7 @@ void update_range(View *v, int y1, int y2)
     }
     for (; i < y2; i++) {
         obuf.x = 0;
-        terminal.move_cursor(v->window->edit_x, v->window->edit_y + i);
+        terminal.move_cursor(edit_x, edit_y + i);
         buf_put_char('~');
         buf_clear_eol();
     }
