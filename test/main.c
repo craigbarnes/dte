@@ -55,12 +55,6 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
-static int command_cmp(const void *p1, const void *p2)
-{
-    const Command *c1 = p1, *c2 = p2;
-    return strcmp(c1->name, c2->name);
-}
-
 // Checks that `commands` array is sorted in binary searchable order
 static void test_commands_sort(void)
 {
@@ -69,17 +63,14 @@ static void test_commands_sort(void)
         n++;
         BUG_ON(n > 500);
     }
-
-    const size_t size = n * sizeof(Command);
-    Command *commands_copy = xmalloc(size);
-    memcpy(commands_copy, commands, size);
-    qsort(commands_copy, n, sizeof(Command), command_cmp);
-
-    for (size_t i = 0; i < n; i++) {
-        EXPECT_STREQ(commands[i].name, commands_copy[i].name);
+    for (size_t i = 1; i < n; i++) {
+        const char *cur = commands[i].name;
+        const char *prev = commands[i - 1].name;
+        if (strcmp(cur, prev) <= 0) {
+            fail("Commands not in sorted order: %s, %s\n", cur, prev);
+            break;
+        }
     }
-
-    free(commands_copy);
 }
 
 int main(void)
