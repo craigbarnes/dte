@@ -14,13 +14,9 @@ function Indent.new(width)
 end
 
 local function make_trie(keys)
-    local trie = {n = 0}
+    local trie = {}
     for key, value in pairs(keys) do
         local key_length = #key
-        if key_length > trie.n then
-            trie.n = key_length
-        end
-
         local node = trie[key_length]
         if not node then
             node = {type = "branch", child_count = 0}
@@ -71,6 +67,7 @@ end
 local function make_index(keys)
     local index, n, longest = {}, 0, 0
     for k in pairs(keys) do
+        assert(k:match("^[#-~]+$"), k)
         n = n + 1
         index[n] = k
         local klen = #k
@@ -133,7 +130,7 @@ local function write_trie(node, buf, defs, index)
             end
 
             buf:write(indent, "switch (s[", tostring(level), "]) {\n")
-            for i = (" "):byte(), ("~"):byte() do
+            for i = node.min, node.max do
                 local v = node[i]
                 if v then
                     buf:write(indent, "case '", char(i), "':\n")
@@ -149,7 +146,7 @@ local function write_trie(node, buf, defs, index)
 
     local indent = indents[1]
     buf:write(indent, "switch (len) {\n")
-    for i = 1, node.n do
+    for i = 1, index.longest_key do
         local v = node[i]
         if v then
             buf:write(indent, "case ", tostring(i), ":\n")
