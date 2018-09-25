@@ -67,7 +67,7 @@ static void test_commands_sort(void)
         const char *cur = commands[i].name;
         const char *prev = commands[i - 1].name;
         if (strcmp(cur, prev) <= 0) {
-            fail("Commands not in sorted order: %s, %s\n", cur, prev);
+            FAIL("Commands not in sorted order: %s, %s", cur, prev);
             break;
         }
     }

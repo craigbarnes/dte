@@ -201,34 +201,34 @@ static void test_key_to_string(void)
 static void test_key_to_ctrl(void)
 {
     unsigned char c;
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '@', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | '@', &c));
     EXPECT_EQ(c, '\0');
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '_', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | '_', &c));
     EXPECT_EQ(c, 0x1F);
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'G', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | 'G', &c));
     EXPECT_EQ(c, '\a');
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'I', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | 'I', &c));
     EXPECT_EQ(c, '\t');
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'J', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | 'J', &c));
     EXPECT_EQ(c, '\n');
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'M', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | 'M', &c));
     EXPECT_EQ(c, '\r');
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | '?', &c), true);
+    EXPECT_TRUE(key_to_ctrl(MOD_CTRL | '?', &c));
     EXPECT_EQ(c, 0x7F);
 
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | ' ', &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 'g', &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_META | '@', &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_SHIFT | '_', &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | MOD_SHIFT | 'M', &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 0x80, &c), false);
-    EXPECT_EQ(key_to_ctrl(MOD_CTRL | 0xFF, &c), false);
-    EXPECT_EQ(key_to_ctrl('@', &c), false);
-    EXPECT_EQ(key_to_ctrl('\0', &c), false);
-    EXPECT_EQ(key_to_ctrl('_', &c), false);
-    EXPECT_EQ(key_to_ctrl('M', &c), false);
-    EXPECT_EQ(key_to_ctrl(0x80, &c), false);
-    EXPECT_EQ(key_to_ctrl(0xFF, &c), false);
+    EXPECT_FALSE(key_to_ctrl(MOD_CTRL | ' ', &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_CTRL | 'g', &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_META | '@', &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_SHIFT | '_', &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_CTRL | MOD_SHIFT | 'M', &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_CTRL | 0x80, &c));
+    EXPECT_FALSE(key_to_ctrl(MOD_CTRL | 0xFF, &c));
+    EXPECT_FALSE(key_to_ctrl('@', &c));
+    EXPECT_FALSE(key_to_ctrl('\0', &c));
+    EXPECT_FALSE(key_to_ctrl('_', &c));
+    EXPECT_FALSE(key_to_ctrl('M', &c));
+    EXPECT_FALSE(key_to_ctrl(0x80, &c));
+    EXPECT_FALSE(key_to_ctrl(0xFF, &c));
 }
 
 void test_terminal(void)

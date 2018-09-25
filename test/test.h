@@ -9,24 +9,19 @@
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)
 
-#define EXPECT_EQ(a, b) do { \
-    if ((a) != (b)) { \
-        fail ( \
-            "%s:%d: Values not equal: %" PRIdMAX ", %" PRIdMAX "\n", \
-            __FILE__, \
-            __LINE__, \
-            (intmax_t)(a), \
-            (intmax_t)(b) \
-        ); \
-    } \
-} while (0)
+#define FAIL(fmt, ...) fail(__FILE__, __LINE__, fmt, __VA_ARGS__)
+
+#define EXPECT_STREQ(s1, s2) expect_streq(__FILE__, __LINE__, s1, s2)
+#define EXPECT_EQ(a, b) expect_eq(__FILE__, __LINE__, a, b)
+#define EXPECT_TRUE(x) EXPECT_EQ(!!(x), 1)
+#define EXPECT_FALSE(x) EXPECT_EQ(x, 0)
 
 #define IEXPECT_EQ(a, b, i, s) do { \
     if ((a) != (b)) { \
         fail ( \
-            "%s:%d: Test #%zu: %s not equal: %" PRIdMAX ", %" PRIdMAX "\n", \
             __FILE__, \
             __LINE__, \
+            "Test #%zu: %s not equal: %" PRIdMAX ", %" PRIdMAX, \
             ((i) + 1), \
             (s), \
             (intmax_t)(a), \
@@ -35,22 +30,11 @@
     } \
 } while (0)
 
-#define EXPECT_STREQ(a, b) do { \
-    const char *s1 = (a), *s2 = (b); \
-    if (unlikely(!xstreq(s1, s2))) { \
-        fail ( \
-            "%s:%d: Strings not equal: '%s', '%s'\n", \
-            __FILE__, \
-            __LINE__, \
-            s1 ? s1 : "(null)", \
-            s2 ? s2 : "(null)" \
-        ); \
-    } \
-} while (0)
-
 extern unsigned int failed;
 
-void fail(const char *format, ...) PRINTF(1);
+void fail(const char *file, int line, const char *format, ...) PRINTF(3);
+void expect_streq(const char *file, int line, const char *s1, const char *s2);
+void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
 
 #if GNUC_AT_LEAST(4, 2)
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"

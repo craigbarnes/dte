@@ -22,18 +22,18 @@ static void test_ascii(void)
     EXPECT_EQ(ascii_toupper('~'), '~');
     EXPECT_EQ(ascii_toupper('\0'), '\0');
 
-    EXPECT_EQ(ascii_isspace(' '), true);
-    EXPECT_EQ(ascii_isspace('\t'), true);
-    EXPECT_EQ(ascii_isspace('\r'), true);
-    EXPECT_EQ(ascii_isspace('\n'), true);
+    EXPECT_TRUE(ascii_isspace(' '));
+    EXPECT_TRUE(ascii_isspace('\t'));
+    EXPECT_TRUE(ascii_isspace('\r'));
+    EXPECT_TRUE(ascii_isspace('\n'));
 
-    EXPECT_EQ(is_word_byte('a'), true);
-    EXPECT_EQ(is_word_byte('z'), true);
-    EXPECT_EQ(is_word_byte('A'), true);
-    EXPECT_EQ(is_word_byte('Z'), true);
-    EXPECT_EQ(is_word_byte('0'), true);
-    EXPECT_EQ(is_word_byte('9'), true);
-    EXPECT_EQ(is_word_byte('_'), true);
+    EXPECT_TRUE(is_word_byte('a'));
+    EXPECT_TRUE(is_word_byte('z'));
+    EXPECT_TRUE(is_word_byte('A'));
+    EXPECT_TRUE(is_word_byte('Z'));
+    EXPECT_TRUE(is_word_byte('0'));
+    EXPECT_TRUE(is_word_byte('9'));
+    EXPECT_TRUE(is_word_byte('_'));
 
     EXPECT_EQ(hex_decode('0'), 0);
     EXPECT_EQ(hex_decode('9'), 9);
@@ -105,23 +105,23 @@ static void test_u_to_lower(void)
 
 static void test_u_is_upper(void)
 {
-    EXPECT_EQ(u_is_upper('A'), true);
-    EXPECT_EQ(u_is_upper('Z'), true);
-    EXPECT_EQ(u_is_upper('a'), false);
-    EXPECT_EQ(u_is_upper('z'), false);
-    EXPECT_EQ(u_is_upper('0'), false);
-    EXPECT_EQ(u_is_upper('9'), false);
-    EXPECT_EQ(u_is_upper('@'), false);
-    EXPECT_EQ(u_is_upper('['), false);
-    EXPECT_EQ(u_is_upper('{'), false);
-    EXPECT_EQ(u_is_upper('\0'), false);
-    EXPECT_EQ(u_is_upper('\t'), false);
-    EXPECT_EQ(u_is_upper(' '), false);
-    EXPECT_EQ(u_is_upper(0x00E0), false);
-    EXPECT_EQ(u_is_upper(0x00E7), false);
-    EXPECT_EQ(u_is_upper(0x1D499), false);
-    EXPECT_EQ(u_is_upper(0x1F315), false);
-    EXPECT_EQ(u_is_upper(0x10ffff), false);
+    EXPECT_TRUE(u_is_upper('A'));
+    EXPECT_TRUE(u_is_upper('Z'));
+    EXPECT_FALSE(u_is_upper('a'));
+    EXPECT_FALSE(u_is_upper('z'));
+    EXPECT_FALSE(u_is_upper('0'));
+    EXPECT_FALSE(u_is_upper('9'));
+    EXPECT_FALSE(u_is_upper('@'));
+    EXPECT_FALSE(u_is_upper('['));
+    EXPECT_FALSE(u_is_upper('{'));
+    EXPECT_FALSE(u_is_upper('\0'));
+    EXPECT_FALSE(u_is_upper('\t'));
+    EXPECT_FALSE(u_is_upper(' '));
+    EXPECT_FALSE(u_is_upper(0x00E0));
+    EXPECT_FALSE(u_is_upper(0x00E7));
+    EXPECT_FALSE(u_is_upper(0x1D499));
+    EXPECT_FALSE(u_is_upper(0x1F315));
+    EXPECT_FALSE(u_is_upper(0x10ffff));
 }
 
 static void test_u_str_width(void)
