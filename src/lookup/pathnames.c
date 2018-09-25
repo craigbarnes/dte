@@ -1,19 +1,35 @@
+static const struct {
+    const char *const key;
+    const FileTypeEnum val;
+} filetype_from_pathname_table[3] = {
+    {"/boot/grub/menu.lst", CONFIG},
+    {"/etc/fstab", CONFIG},
+    {"/etc/hosts", CONFIG},
+};
+
 static FileTypeEnum filetype_from_pathname(const char *s, size_t len)
 {
+    size_t idx;
+    const char *key;
+    FileTypeEnum val;
     switch (len) {
     case 10:
-        if (memcmp(s, "/etc/", 5)) {
-            return 0;
-        }
         switch (s[5]) {
         case 'f':
-            return memcmp(s + 6, "stab", 4) ? 0 : CONFIG;
+            idx = 1; // /etc/fstab
+            goto compare;
         case 'h':
-            return memcmp(s + 6, "osts", 4) ? 0 : CONFIG;
+            idx = 2; // /etc/hosts
+            goto compare;
         }
-        return 0;
+        break;
     case 19:
-        return memcmp(s, "/boot/grub/menu.lst", 19) ? 0 : CONFIG;
+        idx = 0; // /boot/grub/menu.lst
+        goto compare;
     }
     return 0;
+compare:
+    key = filetype_from_pathname_table[idx].key;
+    val = filetype_from_pathname_table[idx].val;
+    return memcmp(s, key, len) ? 0 : val;
 }

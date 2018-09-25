@@ -1,245 +1,403 @@
+static const struct {
+    const char *const key;
+    const FileTypeEnum val;
+} filetype_from_basename_table[74] = {
+    {".bash_logout", SHELL},
+    {".bash_profile", SHELL},
+    {".bashrc", SHELL},
+    {".clang-format", YAML},
+    {".cshrc", SHELL},
+    {".drirc", XML},
+    {".editorconfig", INI},
+    {".emacs", EMACSLISP},
+    {".gemrc", YAML},
+    {".gitattributes", CONFIG},
+    {".gitconfig", INI},
+    {".gitmodules", INI},
+    {".gnus", EMACSLISP},
+    {".indent.pro", INDENT},
+    {".inputrc", INPUTRC},
+    {".jshintrc", JSON},
+    {".luacheckrc", LUA},
+    {".luacov", LUA},
+    {".profile", SHELL},
+    {".zlogin", SHELL},
+    {".zlogout", SHELL},
+    {".zprofile", SHELL},
+    {".zshenv", SHELL},
+    {".zshrc", SHELL},
+    {"APKBUILD", SHELL},
+    {"BSDmakefile", MAKE},
+    {"BUILD.bazel", PYTHON},
+    {"CMakeLists.txt", CMAKE},
+    {"COMMIT_EDITMSG", GITCOMMIT},
+    {"Capfile", RUBY},
+    {"Cargo.lock", TOML},
+    {"Dockerfile", DOCKER},
+    {"Doxyfile", DOXYGEN},
+    {"GNUmakefile", MAKE},
+    {"Gemfile", RUBY},
+    {"Gemfile.lock", RUBY},
+    {"Kbuild", MAKE},
+    {"Makefile", MAKE},
+    {"Makefile.am", MAKE},
+    {"Makefile.in", MAKE},
+    {"PKGBUILD", SHELL},
+    {"Project.ede", EMACSLISP},
+    {"Rakefile", RUBY},
+    {"Vagrantfile", RUBY},
+    {"bash_logout", SHELL},
+    {"bash_profile", SHELL},
+    {"bashrc", SHELL},
+    {"config.ld", LUA},
+    {"configure.ac", M4},
+    {"cshrc", SHELL},
+    {"drirc", XML},
+    {"git-rebase-todo", GITREBASE},
+    {"gitattributes", CONFIG},
+    {"gitconfig", INI},
+    {"inputrc", INPUTRC},
+    {"krb5.conf", INI},
+    {"makefile", MAKE},
+    {"meson.build", MESON},
+    {"meson_options.txt", MESON},
+    {"mimeapps.list", INI},
+    {"mkinitcpio.conf", SHELL},
+    {"nginx.conf", NGINX},
+    {"pacman.conf", INI},
+    {"profile", SHELL},
+    {"robots.txt", ROBOTSTXT},
+    {"rockspec.in", LUA},
+    {"terminalrc", INI},
+    {"texmf.cnf", TEXMFCNF},
+    {"yum.conf", INI},
+    {"zlogin", SHELL},
+    {"zlogout", SHELL},
+    {"zprofile", SHELL},
+    {"zshenv", SHELL},
+    {"zshrc", SHELL},
+};
+
 static FileTypeEnum filetype_from_basename(const char *s, size_t len)
 {
+    size_t idx;
+    const char *key;
+    FileTypeEnum val;
     switch (len) {
     case 5:
         switch (s[0]) {
         case '.':
-            return memcmp(s + 1, "gnus", 4) ? 0 : EMACSLISP;
+            idx = 12; // .gnus
+            goto compare;
         case 'c':
-            return memcmp(s + 1, "shrc", 4) ? 0 : SHELL;
+            idx = 49; // cshrc
+            goto compare;
         case 'd':
-            return memcmp(s + 1, "rirc", 4) ? 0 : XML;
+            idx = 50; // drirc
+            goto compare;
         case 'z':
-            return memcmp(s + 1, "shrc", 4) ? 0 : SHELL;
+            idx = 73; // zshrc
+            goto compare;
         }
-        return 0;
+        break;
     case 6:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'c':
-                return memcmp(s + 2, "shrc", 4) ? 0 : SHELL;
+                idx = 4; // .cshrc
+                goto compare;
             case 'd':
-                return memcmp(s + 2, "rirc", 4) ? 0 : XML;
+                idx = 5; // .drirc
+                goto compare;
             case 'e':
-                return memcmp(s + 2, "macs", 4) ? 0 : EMACSLISP;
+                idx = 7; // .emacs
+                goto compare;
             case 'g':
-                return memcmp(s + 2, "emrc", 4) ? 0 : YAML;
+                idx = 8; // .gemrc
+                goto compare;
             case 'z':
-                return memcmp(s + 2, "shrc", 4) ? 0 : SHELL;
+                idx = 23; // .zshrc
+                goto compare;
             }
-            return 0;
+            break;
         case 'K':
-            return memcmp(s + 1, "build", 5) ? 0 : MAKE;
+            idx = 36; // Kbuild
+            goto compare;
         case 'b':
-            return memcmp(s + 1, "ashrc", 5) ? 0 : SHELL;
+            idx = 46; // bashrc
+            goto compare;
         case 'z':
             switch (s[1]) {
             case 'l':
-                return memcmp(s + 2, "ogin", 4) ? 0 : SHELL;
+                idx = 69; // zlogin
+                goto compare;
             case 's':
-                return memcmp(s + 2, "henv", 4) ? 0 : SHELL;
+                idx = 72; // zshenv
+                goto compare;
             }
-            return 0;
+            break;
         }
-        return 0;
+        break;
     case 7:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'b':
-                return memcmp(s + 2, "ashrc", 5) ? 0 : SHELL;
+                idx = 2; // .bashrc
+                goto compare;
             case 'l':
-                return memcmp(s + 2, "uacov", 5) ? 0 : LUA;
+                idx = 17; // .luacov
+                goto compare;
             case 'z':
                 switch (s[2]) {
                 case 'l':
-                    return memcmp(s + 3, "ogin", 4) ? 0 : SHELL;
+                    idx = 19; // .zlogin
+                    goto compare;
                 case 's':
-                    return memcmp(s + 3, "henv", 4) ? 0 : SHELL;
+                    idx = 22; // .zshenv
+                    goto compare;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 'C':
-            return memcmp(s + 1, "apfile", 6) ? 0 : RUBY;
+            idx = 29; // Capfile
+            goto compare;
         case 'G':
-            return memcmp(s + 1, "emfile", 6) ? 0 : RUBY;
+            idx = 34; // Gemfile
+            goto compare;
         case 'i':
-            return memcmp(s + 1, "nputrc", 6) ? 0 : INPUTRC;
+            idx = 54; // inputrc
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "rofile", 6) ? 0 : SHELL;
+            idx = 63; // profile
+            goto compare;
         case 'z':
-            return memcmp(s + 1, "logout", 6) ? 0 : SHELL;
+            idx = 70; // zlogout
+            goto compare;
         }
-        return 0;
+        break;
     case 8:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'i':
-                return memcmp(s + 2, "nputrc", 6) ? 0 : INPUTRC;
+                idx = 14; // .inputrc
+                goto compare;
             case 'p':
-                return memcmp(s + 2, "rofile", 6) ? 0 : SHELL;
+                idx = 18; // .profile
+                goto compare;
             case 'z':
-                return memcmp(s + 2, "logout", 6) ? 0 : SHELL;
+                idx = 20; // .zlogout
+                goto compare;
             }
-            return 0;
+            break;
         case 'A':
-            return memcmp(s + 1, "PKBUILD", 7) ? 0 : SHELL;
+            idx = 24; // APKBUILD
+            goto compare;
         case 'D':
-            return memcmp(s + 1, "oxyfile", 7) ? 0 : DOXYGEN;
+            idx = 32; // Doxyfile
+            goto compare;
         case 'M':
-            return memcmp(s + 1, "akefile", 7) ? 0 : MAKE;
+            idx = 37; // Makefile
+            goto compare;
         case 'P':
-            return memcmp(s + 1, "KGBUILD", 7) ? 0 : SHELL;
+            idx = 40; // PKGBUILD
+            goto compare;
         case 'R':
-            return memcmp(s + 1, "akefile", 7) ? 0 : RUBY;
+            idx = 42; // Rakefile
+            goto compare;
         case 'm':
-            return memcmp(s + 1, "akefile", 7) ? 0 : MAKE;
+            idx = 56; // makefile
+            goto compare;
         case 'y':
-            return memcmp(s + 1, "um.conf", 7) ? 0 : INI;
+            idx = 68; // yum.conf
+            goto compare;
         case 'z':
-            return memcmp(s + 1, "profile", 7) ? 0 : SHELL;
+            idx = 71; // zprofile
+            goto compare;
         }
-        return 0;
+        break;
     case 9:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'j':
-                return memcmp(s + 2, "shintrc", 7) ? 0 : JSON;
+                idx = 15; // .jshintrc
+                goto compare;
             case 'z':
-                return memcmp(s + 2, "profile", 7) ? 0 : SHELL;
+                idx = 21; // .zprofile
+                goto compare;
             }
-            return 0;
+            break;
         case 'c':
-            return memcmp(s + 1, "onfig.ld", 8) ? 0 : LUA;
+            idx = 47; // config.ld
+            goto compare;
         case 'g':
-            return memcmp(s + 1, "itconfig", 8) ? 0 : INI;
+            idx = 53; // gitconfig
+            goto compare;
         case 'k':
-            return memcmp(s + 1, "rb5.conf", 8) ? 0 : INI;
+            idx = 55; // krb5.conf
+            goto compare;
         case 't':
-            return memcmp(s + 1, "exmf.cnf", 8) ? 0 : TEXMFCNF;
+            idx = 67; // texmf.cnf
+            goto compare;
         }
-        return 0;
+        break;
     case 10:
         switch (s[0]) {
         case '.':
-            return memcmp(s + 1, "gitconfig", 9) ? 0 : INI;
+            idx = 10; // .gitconfig
+            goto compare;
         case 'C':
-            return memcmp(s + 1, "argo.lock", 9) ? 0 : TOML;
+            idx = 30; // Cargo.lock
+            goto compare;
         case 'D':
-            return memcmp(s + 1, "ockerfile", 9) ? 0 : DOCKER;
+            idx = 31; // Dockerfile
+            goto compare;
         case 'n':
-            return memcmp(s + 1, "ginx.conf", 9) ? 0 : NGINX;
+            idx = 61; // nginx.conf
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "obots.txt", 9) ? 0 : ROBOTSTXT;
+            idx = 64; // robots.txt
+            goto compare;
         case 't':
-            return memcmp(s + 1, "erminalrc", 9) ? 0 : INI;
+            idx = 66; // terminalrc
+            goto compare;
         }
-        return 0;
+        break;
     case 11:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'g':
-                return memcmp(s + 2, "itmodules", 9) ? 0 : INI;
+                idx = 11; // .gitmodules
+                goto compare;
             case 'i':
-                return memcmp(s + 2, "ndent.pro", 9) ? 0 : INDENT;
+                idx = 13; // .indent.pro
+                goto compare;
             case 'l':
-                return memcmp(s + 2, "uacheckrc", 9) ? 0 : LUA;
+                idx = 16; // .luacheckrc
+                goto compare;
             }
-            return 0;
+            break;
         case 'B':
             switch (s[1]) {
             case 'S':
-                return memcmp(s + 2, "Dmakefile", 9) ? 0 : MAKE;
+                idx = 25; // BSDmakefile
+                goto compare;
             case 'U':
-                return memcmp(s + 2, "ILD.bazel", 9) ? 0 : PYTHON;
+                idx = 26; // BUILD.bazel
+                goto compare;
             }
-            return 0;
+            break;
         case 'G':
-            return memcmp(s + 1, "NUmakefile", 10) ? 0 : MAKE;
+            idx = 33; // GNUmakefile
+            goto compare;
         case 'M':
-            if (memcmp(s + 1, "akefile.", 8)) {
-                return 0;
-            }
             switch (s[9]) {
             case 'a':
-                return (s[10] != 'm') ? 0 : MAKE;
+                idx = 38; // Makefile.am
+                goto compare;
             case 'i':
-                return (s[10] != 'n') ? 0 : MAKE;
+                idx = 39; // Makefile.in
+                goto compare;
             }
-            return 0;
+            break;
         case 'P':
-            return memcmp(s + 1, "roject.ede", 10) ? 0 : EMACSLISP;
+            idx = 41; // Project.ede
+            goto compare;
         case 'V':
-            return memcmp(s + 1, "agrantfile", 10) ? 0 : RUBY;
+            idx = 43; // Vagrantfile
+            goto compare;
         case 'b':
-            return memcmp(s + 1, "ash_logout", 10) ? 0 : SHELL;
+            idx = 44; // bash_logout
+            goto compare;
         case 'm':
-            return memcmp(s + 1, "eson.build", 10) ? 0 : MESON;
+            idx = 57; // meson.build
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "acman.conf", 10) ? 0 : INI;
+            idx = 62; // pacman.conf
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "ockspec.in", 10) ? 0 : LUA;
+            idx = 65; // rockspec.in
+            goto compare;
         }
-        return 0;
+        break;
     case 12:
         switch (s[0]) {
         case '.':
-            return memcmp(s + 1, "bash_logout", 11) ? 0 : SHELL;
+            idx = 0; // .bash_logout
+            goto compare;
         case 'G':
-            return memcmp(s + 1, "emfile.lock", 11) ? 0 : RUBY;
+            idx = 35; // Gemfile.lock
+            goto compare;
         case 'b':
-            return memcmp(s + 1, "ash_profile", 11) ? 0 : SHELL;
+            idx = 45; // bash_profile
+            goto compare;
         case 'c':
-            return memcmp(s + 1, "onfigure.ac", 11) ? 0 : M4;
+            idx = 48; // configure.ac
+            goto compare;
         }
-        return 0;
+        break;
     case 13:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
             case 'b':
-                return memcmp(s + 2, "ash_profile", 11) ? 0 : SHELL;
+                idx = 1; // .bash_profile
+                goto compare;
             case 'c':
-                return memcmp(s + 2, "lang-format", 11) ? 0 : YAML;
+                idx = 3; // .clang-format
+                goto compare;
             case 'e':
-                return memcmp(s + 2, "ditorconfig", 11) ? 0 : INI;
+                idx = 6; // .editorconfig
+                goto compare;
             }
-            return 0;
+            break;
         case 'g':
-            return memcmp(s + 1, "itattributes", 12) ? 0 : CONFIG;
+            idx = 52; // gitattributes
+            goto compare;
         case 'm':
-            return memcmp(s + 1, "imeapps.list", 12) ? 0 : INI;
+            idx = 59; // mimeapps.list
+            goto compare;
         }
-        return 0;
+        break;
     case 14:
         switch (s[0]) {
         case '.':
-            return memcmp(s + 1, "gitattributes", 13) ? 0 : CONFIG;
+            idx = 9; // .gitattributes
+            goto compare;
         case 'C':
             switch (s[1]) {
             case 'M':
-                return memcmp(s + 2, "akeLists.txt", 12) ? 0 : CMAKE;
+                idx = 27; // CMakeLists.txt
+                goto compare;
             case 'O':
-                return memcmp(s + 2, "MMIT_EDITMSG", 12) ? 0 : GITCOMMIT;
+                idx = 28; // COMMIT_EDITMSG
+                goto compare;
             }
-            return 0;
+            break;
         }
-        return 0;
+        break;
     case 15:
         switch (s[0]) {
         case 'g':
-            return memcmp(s + 1, "it-rebase-todo", 14) ? 0 : GITREBASE;
+            idx = 51; // git-rebase-todo
+            goto compare;
         case 'm':
-            return memcmp(s + 1, "kinitcpio.conf", 14) ? 0 : SHELL;
+            idx = 60; // mkinitcpio.conf
+            goto compare;
         }
-        return 0;
+        break;
     case 17:
-        return memcmp(s, "meson_options.txt", 17) ? 0 : MESON;
+        idx = 58; // meson_options.txt
+        goto compare;
     }
     return 0;
+compare:
+    key = filetype_from_basename_table[idx].key;
+    val = filetype_from_basename_table[idx].val;
+    return memcmp(s, key, len) ? 0 : val;
 }

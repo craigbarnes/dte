@@ -1,5 +1,197 @@
+static const struct {
+    const char key[16];
+    const FileTypeEnum val;
+} filetype_from_extension_table[183] = {
+    {"1", ROFF},
+    {"2", ROFF},
+    {"3", ROFF},
+    {"4", ROFF},
+    {"5", ROFF},
+    {"6", ROFF},
+    {"7", ROFF},
+    {"8", ROFF},
+    {"9", ROFF},
+    {"C", CPLUSPLUS},
+    {"H", CPLUSPLUS},
+    {"S", ASSEMBLY},
+    {"ada", ADA},
+    {"adb", ADA},
+    {"ads", ADA},
+    {"asd", COMMONLISP},
+    {"asm", ASSEMBLY},
+    {"auk", AWK},
+    {"automount", INI},
+    {"awk", AWK},
+    {"bash", SHELL},
+    {"bat", BATCHFILE},
+    {"bbl", TEX},
+    {"bib", BIBTEX},
+    {"btm", BATCHFILE},
+    {"c", C},
+    {"c++", CPLUSPLUS},
+    {"cc", CPLUSPLUS},
+    {"cl", COMMONLISP},
+    {"clj", CLOJURE},
+    {"cls", TEX},
+    {"cmake", CMAKE},
+    {"cmd", BATCHFILE},
+    {"coffee", COFFEESCRIPT},
+    {"cpp", CPLUSPLUS},
+    {"cr", RUBY},
+    {"cs", CSHARP},
+    {"cson", COFFEESCRIPT},
+    {"css", CSS},
+    {"csv", CSV},
+    {"cxx", CPLUSPLUS},
+    {"d", D},
+    {"dart", DART},
+    {"desktop", INI},
+    {"di", D},
+    {"diff", DIFF},
+    {"doap", XML},
+    {"docbook", XML},
+    {"docker", DOCKER},
+    {"dot", DOT},
+    {"doxy", DOXYGEN},
+    {"dterc", DTERC},
+    {"dtx", TEX},
+    {"ebuild", SHELL},
+    {"el", EMACSLISP},
+    {"emacs", EMACSLISP},
+    {"eml", EMAIL},
+    {"eps", POSTSCRIPT},
+    {"flatpakref", INI},
+    {"flatpakrepo", INI},
+    {"frag", GLSL},
+    {"gawk", AWK},
+    {"gemspec", RUBY},
+    {"geojson", JSON},
+    {"glsl", GLSL},
+    {"glslf", GLSL},
+    {"glslv", GLSL},
+    {"gnuplot", GNUPLOT},
+    {"go", GO},
+    {"gp", GNUPLOT},
+    {"gperf", GPERF},
+    {"gpi", GNUPLOT},
+    {"groovy", GROOVY},
+    {"gsed", SED},
+    {"gv", DOT},
+    {"h", C},
+    {"hh", CPLUSPLUS},
+    {"hpp", CPLUSPLUS},
+    {"hs", HASKELL},
+    {"htm", HTML},
+    {"html", HTML},
+    {"hxx", CPLUSPLUS},
+    {"ini", INI},
+    {"ins", TEX},
+    {"java", JAVA},
+    {"js", JAVASCRIPT},
+    {"json", JSON},
+    {"ksh", SHELL},
+    {"l", LEX},
+    {"lsp", COMMONLISP},
+    {"ltx", TEX},
+    {"lua", LUA},
+    {"m", OBJECTIVEC},
+    {"m4", M4},
+    {"mak", MAKE},
+    {"make", MAKE},
+    {"markdown", MARKDOWN},
+    {"mawk", AWK},
+    {"md", MARKDOWN},
+    {"mk", MAKE},
+    {"mkd", MARKDOWN},
+    {"mkdn", MARKDOWN},
+    {"moon", MOONSCRIPT},
+    {"mount", INI},
+    {"nawk", AWK},
+    {"nginx", NGINX},
+    {"nginxconf", NGINX},
+    {"nim", NIM},
+    {"ninja", NINJA},
+    {"nix", NIX},
+    {"page", MALLARD},
+    {"patch", DIFF},
+    {"path", INI},
+    {"pc", PKGCONFIG},
+    {"perl", PERL},
+    {"php", PHP},
+    {"pl", PERL},
+    {"pls", INI},
+    {"plt", GNUPLOT},
+    {"pm", PERL},
+    {"po", GETTEXT},
+    {"postscript", POSTSCRIPT},
+    {"pot", GETTEXT},
+    {"proto", PROTOBUF},
+    {"ps", POSTSCRIPT},
+    {"py", PYTHON},
+    {"py3", PYTHON},
+    {"rake", RUBY},
+    {"rb", RUBY},
+    {"rdf", XML},
+    {"rkt", RACKET},
+    {"rktd", RACKET},
+    {"rktl", RACKET},
+    {"rockspec", LUA},
+    {"rs", RUST},
+    {"rst", RESTRUCTUREDTEXT},
+    {"s", ASSEMBLY},
+    {"scala", SCALA},
+    {"scm", SCHEME},
+    {"scss", SCSS},
+    {"sed", SED},
+    {"service", INI},
+    {"sh", SHELL},
+    {"sld", SCHEME},
+    {"slice", INI},
+    {"sls", SCHEME},
+    {"socket", INI},
+    {"sql", SQL},
+    {"ss", SCHEME},
+    {"sty", TEX},
+    {"svg", XML},
+    {"target", INI},
+    {"tcl", TCL},
+    {"tex", TEX},
+    {"texi", TEXINFO},
+    {"texinfo", TEXINFO},
+    {"timer", INI},
+    {"toml", TOML},
+    {"topojson", JSON},
+    {"ts", TYPESCRIPT},
+    {"tsx", TYPESCRIPT},
+    {"ui", XML},
+    {"v", VERILOG},
+    {"vala", VALA},
+    {"vapi", VALA},
+    {"vcard", VCARD},
+    {"vcf", VCARD},
+    {"ver", VERILOG},
+    {"vert", GLSL},
+    {"vh", VHDL},
+    {"vhd", VHDL},
+    {"vhdl", VHDL},
+    {"vim", VIML},
+    {"wsgi", PYTHON},
+    {"xhtml", HTML},
+    {"xml", XML},
+    {"xsd", XML},
+    {"xsl", XML},
+    {"xslt", XML},
+    {"y", YACC},
+    {"yaml", YAML},
+    {"yml", YAML},
+    {"zsh", SHELL},
+};
+
 static FileTypeEnum filetype_from_extension(const char *s, size_t len)
 {
+    size_t idx;
+    const char *key;
+    FileTypeEnum val;
     switch (len) {
     case 1:
         switch (s[0]) {
@@ -44,7 +236,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'y':
             return YACC;
         }
-        return 0;
+        break;
     case 2:
         switch (s[0]) {
         case 'c':
@@ -58,11 +250,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's':
                 return CSHARP;
             }
-            return 0;
+            break;
         case 'd':
-            return (s[1] != 'i') ? 0 : D;
+            idx = 44; // di
+            goto compare;
         case 'e':
-            return (s[1] != 'l') ? 0 : EMACSLISP;
+            idx = 54; // el
+            goto compare;
         case 'g':
             switch (s[1]) {
             case 'o':
@@ -72,7 +266,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 'v':
                 return DOT;
             }
-            return 0;
+            break;
         case 'h':
             switch (s[1]) {
             case 'h':
@@ -80,9 +274,10 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's':
                 return HASKELL;
             }
-            return 0;
+            break;
         case 'j':
-            return (s[1] != 's') ? 0 : JAVASCRIPT;
+            idx = 85; // js
+            goto compare;
         case 'm':
             switch (s[1]) {
             case '4':
@@ -92,7 +287,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 'k':
                 return MAKE;
             }
-            return 0;
+            break;
         case 'p':
             switch (s[1]) {
             case 'c':
@@ -108,7 +303,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 'y':
                 return PYTHON;
             }
-            return 0;
+            break;
         case 'r':
             switch (s[1]) {
             case 'b':
@@ -116,7 +311,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's':
                 return RUST;
             }
-            return 0;
+            break;
         case 's':
             switch (s[1]) {
             case 'h':
@@ -124,15 +319,18 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's':
                 return SCHEME;
             }
-            return 0;
+            break;
         case 't':
-            return (s[1] != 's') ? 0 : TYPESCRIPT;
+            idx = 159; // ts
+            goto compare;
         case 'u':
-            return (s[1] != 'i') ? 0 : XML;
+            idx = 161; // ui
+            goto compare;
         case 'v':
-            return (s[1] != 'h') ? 0 : VHDL;
+            idx = 169; // vh
+            goto compare;
         }
-        return 0;
+        break;
     case 3:
         switch (s[0]) {
         case 'a':
@@ -146,7 +344,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 's':
                     return ADA;
                 }
-                return 0;
+                break;
             case 's':
                 switch (s[2]) {
                 case 'd':
@@ -154,29 +352,36 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 'm':
                     return ASSEMBLY;
                 }
-                return 0;
+                break;
             case 'u':
-                return (s[2] != 'k') ? 0 : AWK;
+                idx = 17; // auk
+                goto compare;
             case 'w':
-                return (s[2] != 'k') ? 0 : AWK;
+                idx = 19; // awk
+                goto compare;
             }
-            return 0;
+            break;
         case 'b':
             switch (s[1]) {
             case 'a':
-                return (s[2] != 't') ? 0 : BATCHFILE;
+                idx = 21; // bat
+                goto compare;
             case 'b':
-                return (s[2] != 'l') ? 0 : TEX;
+                idx = 22; // bbl
+                goto compare;
             case 'i':
-                return (s[2] != 'b') ? 0 : BIBTEX;
+                idx = 23; // bib
+                goto compare;
             case 't':
-                return (s[2] != 'm') ? 0 : BATCHFILE;
+                idx = 24; // btm
+                goto compare;
             }
-            return 0;
+            break;
         case 'c':
             switch (s[1]) {
             case '+':
-                return (s[2] != '+') ? 0 : CPLUSPLUS;
+                idx = 26; // c++
+                goto compare;
             case 'l':
                 switch (s[2]) {
                 case 'j':
@@ -184,11 +389,13 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 's':
                     return TEX;
                 }
-                return 0;
+                break;
             case 'm':
-                return (s[2] != 'd') ? 0 : BATCHFILE;
+                idx = 32; // cmd
+                goto compare;
             case 'p':
-                return (s[2] != 'p') ? 0 : CPLUSPLUS;
+                idx = 34; // cpp
+                goto compare;
             case 's':
                 switch (s[2]) {
                 case 's':
@@ -196,39 +403,48 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 'v':
                     return CSV;
                 }
-                return 0;
+                break;
             case 'x':
-                return (s[2] != 'x') ? 0 : CPLUSPLUS;
+                idx = 40; // cxx
+                goto compare;
             }
-            return 0;
+            break;
         case 'd':
             switch (s[1]) {
             case 'o':
-                return (s[2] != 't') ? 0 : DOT;
+                idx = 49; // dot
+                goto compare;
             case 't':
-                return (s[2] != 'x') ? 0 : TEX;
+                idx = 52; // dtx
+                goto compare;
             }
-            return 0;
+            break;
         case 'e':
             switch (s[1]) {
             case 'm':
-                return (s[2] != 'l') ? 0 : EMAIL;
+                idx = 56; // eml
+                goto compare;
             case 'p':
-                return (s[2] != 's') ? 0 : POSTSCRIPT;
+                idx = 57; // eps
+                goto compare;
             }
-            return 0;
+            break;
         case 'g':
-            return memcmp(s + 1, "pi", 2) ? 0 : GNUPLOT;
+            idx = 71; // gpi
+            goto compare;
         case 'h':
             switch (s[1]) {
             case 'p':
-                return (s[2] != 'p') ? 0 : CPLUSPLUS;
+                idx = 77; // hpp
+                goto compare;
             case 't':
-                return (s[2] != 'm') ? 0 : HTML;
+                idx = 79; // htm
+                goto compare;
             case 'x':
-                return (s[2] != 'x') ? 0 : CPLUSPLUS;
+                idx = 81; // hxx
+                goto compare;
             }
-            return 0;
+            break;
         case 'i':
             switch (s[1]) {
             case 'n':
@@ -238,29 +454,35 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 's':
                     return TEX;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 'k':
-            return memcmp(s + 1, "sh", 2) ? 0 : SHELL;
+            idx = 87; // ksh
+            goto compare;
         case 'l':
             switch (s[1]) {
             case 's':
-                return (s[2] != 'p') ? 0 : COMMONLISP;
+                idx = 89; // lsp
+                goto compare;
             case 't':
-                return (s[2] != 'x') ? 0 : TEX;
+                idx = 90; // ltx
+                goto compare;
             case 'u':
-                return (s[2] != 'a') ? 0 : LUA;
+                idx = 91; // lua
+                goto compare;
             }
-            return 0;
+            break;
         case 'm':
             switch (s[1]) {
             case 'a':
-                return (s[2] != 'k') ? 0 : MAKE;
+                idx = 94; // mak
+                goto compare;
             case 'k':
-                return (s[2] != 'd') ? 0 : MARKDOWN;
+                idx = 100; // mkd
+                goto compare;
             }
-            return 0;
+            break;
         case 'n':
             switch (s[1]) {
             case 'i':
@@ -270,13 +492,14 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 'x':
                     return NIX;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 'p':
             switch (s[1]) {
             case 'h':
-                return (s[2] != 'p') ? 0 : PHP;
+                idx = 115; // php
+                goto compare;
             case 'l':
                 switch (s[2]) {
                 case 's':
@@ -284,29 +507,36 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 't':
                     return GNUPLOT;
                 }
-                return 0;
+                break;
             case 'o':
-                return (s[2] != 't') ? 0 : GETTEXT;
+                idx = 122; // pot
+                goto compare;
             case 'y':
-                return (s[2] != '3') ? 0 : PYTHON;
+                idx = 126; // py3
+                goto compare;
             }
-            return 0;
+            break;
         case 'r':
             switch (s[1]) {
             case 'd':
-                return (s[2] != 'f') ? 0 : XML;
+                idx = 129; // rdf
+                goto compare;
             case 'k':
-                return (s[2] != 't') ? 0 : RACKET;
+                idx = 130; // rkt
+                goto compare;
             case 's':
-                return (s[2] != 't') ? 0 : RESTRUCTUREDTEXT;
+                idx = 135; // rst
+                goto compare;
             }
-            return 0;
+            break;
         case 's':
             switch (s[1]) {
             case 'c':
-                return (s[2] != 'm') ? 0 : SCHEME;
+                idx = 138; // scm
+                goto compare;
             case 'e':
-                return (s[2] != 'd') ? 0 : SED;
+                idx = 140; // sed
+                goto compare;
             case 'l':
                 switch (s[2]) {
                 case 'd':
@@ -314,41 +544,52 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 's':
                     return SCHEME;
                 }
-                return 0;
+                break;
             case 'q':
-                return (s[2] != 'l') ? 0 : SQL;
+                idx = 147; // sql
+                goto compare;
             case 't':
-                return (s[2] != 'y') ? 0 : TEX;
+                idx = 149; // sty
+                goto compare;
             case 'v':
-                return (s[2] != 'g') ? 0 : XML;
+                idx = 150; // svg
+                goto compare;
             }
-            return 0;
+            break;
         case 't':
             switch (s[1]) {
             case 'c':
-                return (s[2] != 'l') ? 0 : TCL;
+                idx = 152; // tcl
+                goto compare;
             case 'e':
-                return (s[2] != 'x') ? 0 : TEX;
+                idx = 153; // tex
+                goto compare;
             case 's':
-                return (s[2] != 'x') ? 0 : TYPESCRIPT;
+                idx = 160; // tsx
+                goto compare;
             }
-            return 0;
+            break;
         case 'v':
             switch (s[1]) {
             case 'c':
-                return (s[2] != 'f') ? 0 : VCARD;
+                idx = 166; // vcf
+                goto compare;
             case 'e':
-                return (s[2] != 'r') ? 0 : VERILOG;
+                idx = 167; // ver
+                goto compare;
             case 'h':
-                return (s[2] != 'd') ? 0 : VHDL;
+                idx = 170; // vhd
+                goto compare;
             case 'i':
-                return (s[2] != 'm') ? 0 : VIML;
+                idx = 172; // vim
+                goto compare;
             }
-            return 0;
+            break;
         case 'x':
             switch (s[1]) {
             case 'm':
-                return (s[2] != 'l') ? 0 : XML;
+                idx = 175; // xml
+                goto compare;
             case 's':
                 switch (s[2]) {
                 case 'd':
@@ -356,95 +597,119 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 'l':
                     return XML;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 'y':
-            return memcmp(s + 1, "ml", 2) ? 0 : YAML;
+            idx = 181; // yml
+            goto compare;
         case 'z':
-            return memcmp(s + 1, "sh", 2) ? 0 : SHELL;
+            idx = 182; // zsh
+            goto compare;
         }
-        return 0;
+        break;
     case 4:
         switch (s[0]) {
         case 'b':
-            return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
+            idx = 20; // bash
+            goto compare;
         case 'c':
-            return memcmp(s + 1, "son", 3) ? 0 : COFFEESCRIPT;
+            idx = 37; // cson
+            goto compare;
         case 'd':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "rt", 2) ? 0 : DART;
+                idx = 42; // dart
+                goto compare;
             case 'i':
-                return memcmp(s + 2, "ff", 2) ? 0 : DIFF;
+                idx = 45; // diff
+                goto compare;
             case 'o':
                 switch (s[2]) {
                 case 'a':
-                    return (s[3] != 'p') ? 0 : XML;
+                    idx = 46; // doap
+                    goto compare;
                 case 'x':
-                    return (s[3] != 'y') ? 0 : DOXYGEN;
+                    idx = 50; // doxy
+                    goto compare;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 'f':
-            return memcmp(s + 1, "rag", 3) ? 0 : GLSL;
+            idx = 60; // frag
+            goto compare;
         case 'g':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "wk", 2) ? 0 : AWK;
+                idx = 61; // gawk
+                goto compare;
             case 'l':
-                return memcmp(s + 2, "sl", 2) ? 0 : GLSL;
+                idx = 64; // glsl
+                goto compare;
             case 's':
-                return memcmp(s + 2, "ed", 2) ? 0 : SED;
+                idx = 73; // gsed
+                goto compare;
             }
-            return 0;
+            break;
         case 'h':
-            return memcmp(s + 1, "tml", 3) ? 0 : HTML;
+            idx = 80; // html
+            goto compare;
         case 'j':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "va", 2) ? 0 : JAVA;
+                idx = 84; // java
+                goto compare;
             case 's':
-                return memcmp(s + 2, "on", 2) ? 0 : JSON;
+                idx = 86; // json
+                goto compare;
             }
-            return 0;
+            break;
         case 'm':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
                 case 'k':
-                    return (s[3] != 'e') ? 0 : MAKE;
+                    idx = 95; // make
+                    goto compare;
                 case 'w':
-                    return (s[3] != 'k') ? 0 : AWK;
+                    idx = 97; // mawk
+                    goto compare;
                 }
-                return 0;
+                break;
             case 'k':
-                return memcmp(s + 2, "dn", 2) ? 0 : MARKDOWN;
+                idx = 101; // mkdn
+                goto compare;
             case 'o':
-                return memcmp(s + 2, "on", 2) ? 0 : MOONSCRIPT;
+                idx = 102; // moon
+                goto compare;
             }
-            return 0;
+            break;
         case 'n':
-            return memcmp(s + 1, "awk", 3) ? 0 : AWK;
+            idx = 104; // nawk
+            goto compare;
         case 'p':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
                 case 'g':
-                    return (s[3] != 'e') ? 0 : MALLARD;
+                    idx = 110; // page
+                    goto compare;
                 case 't':
-                    return (s[3] != 'h') ? 0 : INI;
+                    idx = 112; // path
+                    goto compare;
                 }
-                return 0;
+                break;
             case 'e':
-                return memcmp(s + 2, "rl", 2) ? 0 : PERL;
+                idx = 114; // perl
+                goto compare;
             }
-            return 0;
+            break;
         case 'r':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "ke", 2) ? 0 : RUBY;
+                idx = 127; // rake
+                goto compare;
             case 'k':
                 switch (s[2]) {
                 case 't':
@@ -454,178 +719,224 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                     case 'l':
                         return RACKET;
                     }
-                    return 0;
+                    break;
                 }
-                return 0;
+                break;
             }
-            return 0;
+            break;
         case 's':
-            return memcmp(s + 1, "css", 3) ? 0 : SCSS;
+            idx = 139; // scss
+            goto compare;
         case 't':
             switch (s[1]) {
             case 'e':
-                return memcmp(s + 2, "xi", 2) ? 0 : TEXINFO;
+                idx = 154; // texi
+                goto compare;
             case 'o':
-                return memcmp(s + 2, "ml", 2) ? 0 : TOML;
+                idx = 157; // toml
+                goto compare;
             }
-            return 0;
+            break;
         case 'v':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
                 case 'l':
-                    return (s[3] != 'a') ? 0 : VALA;
+                    idx = 163; // vala
+                    goto compare;
                 case 'p':
-                    return (s[3] != 'i') ? 0 : VALA;
+                    idx = 164; // vapi
+                    goto compare;
                 }
-                return 0;
+                break;
             case 'e':
-                return memcmp(s + 2, "rt", 2) ? 0 : GLSL;
+                idx = 168; // vert
+                goto compare;
             case 'h':
-                return memcmp(s + 2, "dl", 2) ? 0 : VHDL;
+                idx = 171; // vhdl
+                goto compare;
             }
-            return 0;
+            break;
         case 'w':
-            return memcmp(s + 1, "sgi", 3) ? 0 : PYTHON;
+            idx = 173; // wsgi
+            goto compare;
         case 'x':
-            return memcmp(s + 1, "slt", 3) ? 0 : XML;
+            idx = 178; // xslt
+            goto compare;
         case 'y':
-            return memcmp(s + 1, "aml", 3) ? 0 : YAML;
+            idx = 180; // yaml
+            goto compare;
         }
-        return 0;
+        break;
     case 5:
         switch (s[0]) {
         case 'c':
-            return memcmp(s + 1, "make", 4) ? 0 : CMAKE;
+            idx = 31; // cmake
+            goto compare;
         case 'd':
-            return memcmp(s + 1, "terc", 4) ? 0 : DTERC;
+            idx = 51; // dterc
+            goto compare;
         case 'e':
-            return memcmp(s + 1, "macs", 4) ? 0 : EMACSLISP;
+            idx = 55; // emacs
+            goto compare;
         case 'g':
             switch (s[1]) {
             case 'l':
-                if (memcmp(s + 2, "sl", 2)) {
-                    return 0;
-                }
                 switch (s[4]) {
                 case 'f':
                     return GLSL;
                 case 'v':
                     return GLSL;
                 }
-                return 0;
+                break;
             case 'p':
-                return memcmp(s + 2, "erf", 3) ? 0 : GPERF;
+                idx = 70; // gperf
+                goto compare;
             }
-            return 0;
+            break;
         case 'm':
-            return memcmp(s + 1, "ount", 4) ? 0 : INI;
+            idx = 103; // mount
+            goto compare;
         case 'n':
             switch (s[1]) {
             case 'g':
-                return memcmp(s + 2, "inx", 3) ? 0 : NGINX;
+                idx = 105; // nginx
+                goto compare;
             case 'i':
-                return memcmp(s + 2, "nja", 3) ? 0 : NINJA;
+                idx = 108; // ninja
+                goto compare;
             }
-            return 0;
+            break;
         case 'p':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "tch", 3) ? 0 : DIFF;
+                idx = 111; // patch
+                goto compare;
             case 'r':
-                return memcmp(s + 2, "oto", 3) ? 0 : PROTOBUF;
+                idx = 123; // proto
+                goto compare;
             }
-            return 0;
+            break;
         case 's':
             switch (s[1]) {
             case 'c':
-                return memcmp(s + 2, "ala", 3) ? 0 : SCALA;
+                idx = 137; // scala
+                goto compare;
             case 'l':
-                return memcmp(s + 2, "ice", 3) ? 0 : INI;
+                idx = 144; // slice
+                goto compare;
             }
-            return 0;
+            break;
         case 't':
-            return memcmp(s + 1, "imer", 4) ? 0 : INI;
+            idx = 156; // timer
+            goto compare;
         case 'v':
-            return memcmp(s + 1, "card", 4) ? 0 : VCARD;
+            idx = 165; // vcard
+            goto compare;
         case 'x':
-            return memcmp(s + 1, "html", 4) ? 0 : HTML;
+            idx = 174; // xhtml
+            goto compare;
         }
-        return 0;
+        break;
     case 6:
         switch (s[0]) {
         case 'c':
-            return memcmp(s + 1, "offee", 5) ? 0 : COFFEESCRIPT;
+            idx = 33; // coffee
+            goto compare;
         case 'd':
-            return memcmp(s + 1, "ocker", 5) ? 0 : DOCKER;
+            idx = 48; // docker
+            goto compare;
         case 'e':
-            return memcmp(s + 1, "build", 5) ? 0 : SHELL;
+            idx = 53; // ebuild
+            goto compare;
         case 'g':
-            return memcmp(s + 1, "roovy", 5) ? 0 : GROOVY;
+            idx = 72; // groovy
+            goto compare;
         case 's':
-            return memcmp(s + 1, "ocket", 5) ? 0 : INI;
+            idx = 146; // socket
+            goto compare;
         case 't':
-            return memcmp(s + 1, "arget", 5) ? 0 : INI;
+            idx = 151; // target
+            goto compare;
         }
-        return 0;
+        break;
     case 7:
         switch (s[0]) {
         case 'd':
             switch (s[1]) {
             case 'e':
-                return memcmp(s + 2, "sktop", 5) ? 0 : INI;
+                idx = 43; // desktop
+                goto compare;
             case 'o':
-                return memcmp(s + 2, "cbook", 5) ? 0 : XML;
+                idx = 47; // docbook
+                goto compare;
             }
-            return 0;
+            break;
         case 'g':
             switch (s[1]) {
             case 'e':
                 switch (s[2]) {
                 case 'm':
-                    return memcmp(s + 3, "spec", 4) ? 0 : RUBY;
+                    idx = 62; // gemspec
+                    goto compare;
                 case 'o':
-                    return memcmp(s + 3, "json", 4) ? 0 : JSON;
+                    idx = 63; // geojson
+                    goto compare;
                 }
-                return 0;
+                break;
             case 'n':
-                return memcmp(s + 2, "uplot", 5) ? 0 : GNUPLOT;
+                idx = 67; // gnuplot
+                goto compare;
             }
-            return 0;
+            break;
         case 's':
-            return memcmp(s + 1, "ervice", 6) ? 0 : INI;
+            idx = 141; // service
+            goto compare;
         case 't':
-            return memcmp(s + 1, "exinfo", 6) ? 0 : TEXINFO;
+            idx = 155; // texinfo
+            goto compare;
         }
-        return 0;
+        break;
     case 8:
         switch (s[0]) {
         case 'm':
-            return memcmp(s + 1, "arkdown", 7) ? 0 : MARKDOWN;
+            idx = 96; // markdown
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "ockspec", 7) ? 0 : LUA;
+            idx = 133; // rockspec
+            goto compare;
         case 't':
-            return memcmp(s + 1, "opojson", 7) ? 0 : JSON;
+            idx = 158; // topojson
+            goto compare;
         }
-        return 0;
+        break;
     case 9:
         switch (s[0]) {
         case 'a':
-            return memcmp(s + 1, "utomount", 8) ? 0 : INI;
+            idx = 18; // automount
+            goto compare;
         case 'n':
-            return memcmp(s + 1, "ginxconf", 8) ? 0 : NGINX;
+            idx = 106; // nginxconf
+            goto compare;
         }
-        return 0;
+        break;
     case 10:
         switch (s[0]) {
         case 'f':
-            return memcmp(s + 1, "latpakref", 9) ? 0 : INI;
+            idx = 58; // flatpakref
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "ostscript", 9) ? 0 : POSTSCRIPT;
+            idx = 121; // postscript
+            goto compare;
         }
-        return 0;
+        break;
     case 11:
-        return memcmp(s, "flatpakrepo", 11) ? 0 : INI;
+        idx = 59; // flatpakrepo
+        goto compare;
     }
     return 0;
+compare:
+    key = filetype_from_extension_table[idx].key;
+    val = filetype_from_extension_table[idx].val;
+    return memcmp(s, key, len) ? 0 : val;
 }

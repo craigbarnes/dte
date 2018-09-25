@@ -1,47 +1,79 @@
+static const struct {
+    const char key[16];
+    const bool val;
+} is_ignored_extension_table[11] = {
+    {"bak", true},
+    {"dpkg-dist", true},
+    {"dpkg-old", true},
+    {"new", true},
+    {"old", true},
+    {"orig", true},
+    {"pacnew", true},
+    {"pacorig", true},
+    {"pacsave", true},
+    {"rpmnew", true},
+    {"rpmsave", true},
+};
+
 static bool is_ignored_extension(const char *s, size_t len)
 {
+    size_t idx;
+    const char *key;
+    bool val;
     switch (len) {
     case 3:
         switch (s[0]) {
         case 'b':
-            return memcmp(s + 1, "ak", 2) ? false : true;
+            idx = 0; // bak
+            goto compare;
         case 'n':
-            return memcmp(s + 1, "ew", 2) ? false : true;
+            idx = 3; // new
+            goto compare;
         case 'o':
-            return memcmp(s + 1, "ld", 2) ? false : true;
+            idx = 4; // old
+            goto compare;
         }
-        return false;
+        break;
     case 4:
-        return memcmp(s, "orig", 4) ? false : true;
+        idx = 5; // orig
+        goto compare;
     case 6:
         switch (s[0]) {
         case 'p':
-            return memcmp(s + 1, "acnew", 5) ? false : true;
+            idx = 6; // pacnew
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "pmnew", 5) ? false : true;
+            idx = 9; // rpmnew
+            goto compare;
         }
-        return false;
+        break;
     case 7:
         switch (s[0]) {
         case 'p':
-            if (memcmp(s + 1, "ac", 2)) {
-                return false;
-            }
             switch (s[3]) {
             case 'o':
-                return memcmp(s + 4, "rig", 3) ? false : true;
+                idx = 7; // pacorig
+                goto compare;
             case 's':
-                return memcmp(s + 4, "ave", 3) ? false : true;
+                idx = 8; // pacsave
+                goto compare;
             }
-            return false;
+            break;
         case 'r':
-            return memcmp(s + 1, "pmsave", 6) ? false : true;
+            idx = 10; // rpmsave
+            goto compare;
         }
-        return false;
+        break;
     case 8:
-        return memcmp(s, "dpkg-old", 8) ? false : true;
+        idx = 2; // dpkg-old
+        goto compare;
     case 9:
-        return memcmp(s, "dpkg-dist", 9) ? false : true;
+        idx = 1; // dpkg-dist
+        goto compare;
     }
     return false;
+compare:
+    key = is_ignored_extension_table[idx].key;
+    val = is_ignored_extension_table[idx].val;
+    return memcmp(s, key, len) ? false : val;
 }

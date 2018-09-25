@@ -1,154 +1,259 @@
+static const struct {
+    const char key[16];
+    const FileTypeEnum val;
+} filetype_from_interpreter_table[46] = {
+    {"ash", SHELL},
+    {"awk", AWK},
+    {"bash", SHELL},
+    {"bigloo", SCHEME},
+    {"ccl", COMMONLISP},
+    {"chicken", SCHEME},
+    {"clisp", COMMONLISP},
+    {"coffee", COFFEESCRIPT},
+    {"crystal", RUBY},
+    {"dash", SHELL},
+    {"ecl", COMMONLISP},
+    {"gawk", AWK},
+    {"gmake", MAKE},
+    {"gnuplot", GNUPLOT},
+    {"groovy", GROOVY},
+    {"gsed", SED},
+    {"guile", SCHEME},
+    {"jruby", RUBY},
+    {"ksh", SHELL},
+    {"lisp", COMMONLISP},
+    {"lua", LUA},
+    {"luajit", LUA},
+    {"macruby", RUBY},
+    {"make", MAKE},
+    {"mawk", AWK},
+    {"mksh", SHELL},
+    {"moon", MOONSCRIPT},
+    {"nawk", AWK},
+    {"node", JAVASCRIPT},
+    {"openrc-run", SHELL},
+    {"pdksh", SHELL},
+    {"perl", PERL},
+    {"php", PHP},
+    {"python", PYTHON},
+    {"r6rs", SCHEME},
+    {"racket", SCHEME},
+    {"rake", RUBY},
+    {"ruby", RUBY},
+    {"runhaskell", HASKELL},
+    {"sbcl", COMMONLISP},
+    {"sed", SED},
+    {"sh", SHELL},
+    {"tcc", C},
+    {"tclsh", TCL},
+    {"wish", TCL},
+    {"zsh", SHELL},
+};
+
 static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
 {
+    size_t idx;
+    const char *key;
+    FileTypeEnum val;
     switch (len) {
     case 2:
-        return memcmp(s, "sh", 2) ? 0 : SHELL;
+        idx = 41; // sh
+        goto compare;
     case 3:
         switch (s[0]) {
         case 'a':
             switch (s[1]) {
             case 's':
-                return (s[2] != 'h') ? 0 : SHELL;
+                idx = 0; // ash
+                goto compare;
             case 'w':
-                return (s[2] != 'k') ? 0 : AWK;
+                idx = 1; // awk
+                goto compare;
             }
-            return 0;
+            break;
         case 'c':
-            return memcmp(s + 1, "cl", 2) ? 0 : COMMONLISP;
+            idx = 4; // ccl
+            goto compare;
         case 'e':
-            return memcmp(s + 1, "cl", 2) ? 0 : COMMONLISP;
+            idx = 10; // ecl
+            goto compare;
         case 'k':
-            return memcmp(s + 1, "sh", 2) ? 0 : SHELL;
+            idx = 18; // ksh
+            goto compare;
         case 'l':
-            return memcmp(s + 1, "ua", 2) ? 0 : LUA;
+            idx = 20; // lua
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "hp", 2) ? 0 : PHP;
+            idx = 32; // php
+            goto compare;
         case 's':
-            return memcmp(s + 1, "ed", 2) ? 0 : SED;
+            idx = 40; // sed
+            goto compare;
         case 't':
-            return memcmp(s + 1, "cc", 2) ? 0 : C;
+            idx = 42; // tcc
+            goto compare;
         case 'z':
-            return memcmp(s + 1, "sh", 2) ? 0 : SHELL;
+            idx = 45; // zsh
+            goto compare;
         }
-        return 0;
+        break;
     case 4:
         switch (s[0]) {
         case 'b':
-            return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
+            idx = 2; // bash
+            goto compare;
         case 'd':
-            return memcmp(s + 1, "ash", 3) ? 0 : SHELL;
+            idx = 9; // dash
+            goto compare;
         case 'g':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "wk", 2) ? 0 : AWK;
+                idx = 11; // gawk
+                goto compare;
             case 's':
-                return memcmp(s + 2, "ed", 2) ? 0 : SED;
+                idx = 15; // gsed
+                goto compare;
             }
-            return 0;
+            break;
         case 'l':
-            return memcmp(s + 1, "isp", 3) ? 0 : COMMONLISP;
+            idx = 19; // lisp
+            goto compare;
         case 'm':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
                 case 'k':
-                    return (s[3] != 'e') ? 0 : MAKE;
+                    idx = 23; // make
+                    goto compare;
                 case 'w':
-                    return (s[3] != 'k') ? 0 : AWK;
+                    idx = 24; // mawk
+                    goto compare;
                 }
-                return 0;
+                break;
             case 'k':
-                return memcmp(s + 2, "sh", 2) ? 0 : SHELL;
+                idx = 25; // mksh
+                goto compare;
             case 'o':
-                return memcmp(s + 2, "on", 2) ? 0 : MOONSCRIPT;
+                idx = 26; // moon
+                goto compare;
             }
-            return 0;
+            break;
         case 'n':
             switch (s[1]) {
             case 'a':
-                return memcmp(s + 2, "wk", 2) ? 0 : AWK;
+                idx = 27; // nawk
+                goto compare;
             case 'o':
-                return memcmp(s + 2, "de", 2) ? 0 : JAVASCRIPT;
+                idx = 28; // node
+                goto compare;
             }
-            return 0;
+            break;
         case 'p':
-            return memcmp(s + 1, "erl", 3) ? 0 : PERL;
+            idx = 31; // perl
+            goto compare;
         case 'r':
             switch (s[1]) {
             case '6':
-                return memcmp(s + 2, "rs", 2) ? 0 : SCHEME;
+                idx = 34; // r6rs
+                goto compare;
             case 'a':
-                return memcmp(s + 2, "ke", 2) ? 0 : RUBY;
+                idx = 36; // rake
+                goto compare;
             case 'u':
-                return memcmp(s + 2, "by", 2) ? 0 : RUBY;
+                idx = 37; // ruby
+                goto compare;
             }
-            return 0;
+            break;
         case 's':
-            return memcmp(s + 1, "bcl", 3) ? 0 : COMMONLISP;
+            idx = 39; // sbcl
+            goto compare;
         case 'w':
-            return memcmp(s + 1, "ish", 3) ? 0 : TCL;
+            idx = 44; // wish
+            goto compare;
         }
-        return 0;
+        break;
     case 5:
         switch (s[0]) {
         case 'c':
-            return memcmp(s + 1, "lisp", 4) ? 0 : COMMONLISP;
+            idx = 6; // clisp
+            goto compare;
         case 'g':
             switch (s[1]) {
             case 'm':
-                return memcmp(s + 2, "ake", 3) ? 0 : MAKE;
+                idx = 12; // gmake
+                goto compare;
             case 'u':
-                return memcmp(s + 2, "ile", 3) ? 0 : SCHEME;
+                idx = 16; // guile
+                goto compare;
             }
-            return 0;
+            break;
         case 'j':
-            return memcmp(s + 1, "ruby", 4) ? 0 : RUBY;
+            idx = 17; // jruby
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "dksh", 4) ? 0 : SHELL;
+            idx = 30; // pdksh
+            goto compare;
         case 't':
-            return memcmp(s + 1, "clsh", 4) ? 0 : TCL;
+            idx = 43; // tclsh
+            goto compare;
         }
-        return 0;
+        break;
     case 6:
         switch (s[0]) {
         case 'b':
-            return memcmp(s + 1, "igloo", 5) ? 0 : SCHEME;
+            idx = 3; // bigloo
+            goto compare;
         case 'c':
-            return memcmp(s + 1, "offee", 5) ? 0 : COFFEESCRIPT;
+            idx = 7; // coffee
+            goto compare;
         case 'g':
-            return memcmp(s + 1, "roovy", 5) ? 0 : GROOVY;
+            idx = 14; // groovy
+            goto compare;
         case 'l':
-            return memcmp(s + 1, "uajit", 5) ? 0 : LUA;
+            idx = 21; // luajit
+            goto compare;
         case 'p':
-            return memcmp(s + 1, "ython", 5) ? 0 : PYTHON;
+            idx = 33; // python
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "acket", 5) ? 0 : SCHEME;
+            idx = 35; // racket
+            goto compare;
         }
-        return 0;
+        break;
     case 7:
         switch (s[0]) {
         case 'c':
             switch (s[1]) {
             case 'h':
-                return memcmp(s + 2, "icken", 5) ? 0 : SCHEME;
+                idx = 5; // chicken
+                goto compare;
             case 'r':
-                return memcmp(s + 2, "ystal", 5) ? 0 : RUBY;
+                idx = 8; // crystal
+                goto compare;
             }
-            return 0;
+            break;
         case 'g':
-            return memcmp(s + 1, "nuplot", 6) ? 0 : GNUPLOT;
+            idx = 13; // gnuplot
+            goto compare;
         case 'm':
-            return memcmp(s + 1, "acruby", 6) ? 0 : RUBY;
+            idx = 22; // macruby
+            goto compare;
         }
-        return 0;
+        break;
     case 10:
         switch (s[0]) {
         case 'o':
-            return memcmp(s + 1, "penrc-run", 9) ? 0 : SHELL;
+            idx = 29; // openrc-run
+            goto compare;
         case 'r':
-            return memcmp(s + 1, "unhaskell", 9) ? 0 : HASKELL;
+            idx = 38; // runhaskell
+            goto compare;
         }
-        return 0;
+        break;
     }
     return 0;
+compare:
+    key = filetype_from_interpreter_table[idx].key;
+    val = filetype_from_interpreter_table[idx].val;
+    return memcmp(s, key, len) ? 0 : val;
 }
