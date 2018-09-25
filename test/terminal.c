@@ -84,13 +84,14 @@ static void test_xterm_parse_key(void)
         {"\033[[D", 4, KEY_F4},
         {"\033[[E", 4, KEY_F5},
     };
+    const size_t start_line = __LINE__ - 1 - ARRAY_COUNT(tests);
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
         KeyCode key;
         ssize_t length = xterm_parse_key(seq, strlen(seq), &key);
-        IEXPECT_EQ(length, tests[i].expected_length, i, "lengths");
+        IEXPECT_EQ(start_line + i, length, tests[i].expected_length);
         if (length > 0) {
-            IEXPECT_EQ(key, tests[i].expected_key, i, "keys");
+            IEXPECT_EQ(start_line + i, key, tests[i].expected_key);
         }
     }
 }

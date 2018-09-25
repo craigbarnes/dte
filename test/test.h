@@ -16,19 +16,7 @@
 #define EXPECT_TRUE(x) EXPECT_EQ(!!(x), 1)
 #define EXPECT_FALSE(x) EXPECT_EQ(x, 0)
 
-#define IEXPECT_EQ(a, b, i, s) do { \
-    if ((a) != (b)) { \
-        fail ( \
-            __FILE__, \
-            __LINE__, \
-            "Test #%zu: %s not equal: %" PRIdMAX ", %" PRIdMAX, \
-            ((i) + 1), \
-            (s), \
-            (intmax_t)(a), \
-            (intmax_t)(b) \
-        ); \
-    } \
-} while (0)
+#define IEXPECT_EQ(line, a, b) expect_eq(__FILE__, line, a, b)
 
 extern unsigned int failed;
 
