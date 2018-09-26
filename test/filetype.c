@@ -20,6 +20,7 @@ static void test_find_ft_filename(void)
         {"file.rb", "ruby"},
         {"/etc/hosts", "config"},
         {"/etc/fstab", "config"},
+        {"/var/fstab", NULL},
         {"/boot/grub/menu.lst", "config"},
         {"/etc/krb5.conf", "ini"},
         {"/etc/ld.so.conf", "config"},
@@ -36,6 +37,17 @@ static void test_find_ft_filename(void)
         {".gitmodules", "ini"},
         {".jshintrc", "json"},
         {".zshrc", "sh"},
+        {"Makefile.am", "make"},
+        {"Makefile.in", "make"},
+        {"Makefile.i_", NULL},
+        {"Makefile.a_", NULL},
+        {"Makefile._m", NULL},
+        {"M_______.am", NULL},
+        {"file.glslf", "glsl"},
+        {"file.glslv", "glsl"},
+        {"file.gl_lv", NULL},
+        {"file.gls_v", NULL},
+        {"file.gl__v", NULL},
         {"._", NULL},
         {".1234", NULL},
         {".12345", NULL},
@@ -44,7 +56,6 @@ static void test_find_ft_filename(void)
         {"", NULL},
         {"/", NULL},
         {"/etc../etc.c.old/c.old", NULL},
-        // Ignored extensions
         {"test.c.bak", "c"},
         {"test.c.new", "c"},
         {"test.c.old~", "c"},
@@ -57,11 +68,12 @@ static void test_find_ft_filename(void)
         {"test.c.rpmnew", "c"},
         {"test.c.rpmsave", "c"},
     };
+    const size_t start_line = __LINE__ - 1 - ARRAY_COUNT(tests);
     const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
         const char *result = find_ft(t->filename, empty_line);
-        EXPECT_STREQ(result, t->expected_filetype);
+        IEXPECT_STREQ(start_line + i, result, t->expected_filetype);
     }
 }
 

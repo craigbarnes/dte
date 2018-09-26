@@ -549,6 +549,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'g':
             switch (s[1]) {
             case 'l':
+                if (memcmp(s + 2, "sl", 2)) {
+                    return 0;
+                }
                 switch (s[4]) {
                 case 'f': return GLSL;
                 case 'v': return GLSL;

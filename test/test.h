@@ -17,6 +17,7 @@
 #define EXPECT_FALSE(x) EXPECT_EQ(x, 0)
 
 #define IEXPECT_EQ(line, a, b) expect_eq(__FILE__, line, a, b)
+#define IEXPECT_STREQ(line, s1, s2) expect_streq(__FILE__, line, s1, s2)
 
 extern unsigned int failed;
 
