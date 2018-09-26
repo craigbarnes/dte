@@ -64,22 +64,20 @@ local function mark_leaf_nodes_compressed(node)
 end
 
 local function compress(node)
-    local buf, n = {}, 0
+    local skip = 0
     while node.type == "branch" do
         if node.child_count > 1 then
-            if n > 1 then
+            if skip > 1 then
                 mark_leaf_nodes_compressed(node)
-                return concat(buf), node
+                return skip, node
             end
             return false
         end
-        local k = node.min
-        n = n + 1
-        buf[n] = char(k)
-        node = node[k]
+        skip = skip + 1
+        node = node[node.min]
     end
     assert(node.type == "leaf")
-    return concat(buf), node
+    return skip, node
 end
 
 local function make_index(keys)
@@ -138,11 +136,11 @@ local function write_trie(node, buf, defs, index)
     local function serialize(node, level, indent_depth)
         local indent = indents[indent_depth]
         if node.type == "branch" then
-            local substring, next_node = compress(node)
-            if substring then
+            local skip, next_node = compress(node)
+            if skip then
                 if next_node.type == "branch" then
                     node = next_node
-                    level = level + #substring
+                    level = level + skip
                 else
                     cmp(next_node, index, buf)
                     return
