@@ -49,11 +49,26 @@ local function make_trie(keys)
     return trie
 end
 
+local function mark_leaf_nodes_compressed(node)
+    for i = node.min, node.max do
+        local child = node[i]
+        if child then
+            if child.type == "leaf" then
+                child.compressed = true
+            else
+                assert(child.type == "branch")
+                mark_leaf_nodes_compressed(child)
+            end
+        end
+    end
+end
+
 local function compress(node)
     local buf, n = {}, 0
     while node.type == "branch" do
         if node.child_count > 1 then
             if n > 1 then
+                mark_leaf_nodes_compressed(node)
                 return concat(buf), node
             end
             return false
@@ -63,6 +78,7 @@ local function compress(node)
         buf[n] = char(k)
         node = node[k]
     end
+    assert(node.type == "leaf")
     return concat(buf), node
 end
 
@@ -110,14 +126,10 @@ local function write_index(index, buf, defs)
     buf:write("};\n\n")
 end
 
-local function memcmp(offset, str)
-    local length = #str
-    if length == 1 then
-        return ("(s[%u] != '%s')"):format(offset, str)
-    elseif offset == 0 then
-        return ('memcmp(s, "%s", %u)'):format(str, length)
-    end
-    return ('memcmp(s + %d, "%s", %u)'):format(offset, str, length)
+local function cmp(node, index, buf)
+    assert(node.type == "leaf")
+    local key = node.key
+    buf:write(" CMP(", index[key] - 1, "); // ", key, "\n")
 end
 
 local function write_trie(node, buf, defs, index)
@@ -126,19 +138,13 @@ local function write_trie(node, buf, defs, index)
     local function serialize(node, level, indent_depth)
         local indent = indents[indent_depth]
         if node.type == "branch" then
-            local s, n = compress(node)
-            if s then
-                if n.type == "branch" then
-                    buf:write (
-                        "\n", indent, "if (", memcmp(level, s), ") {\n",
-                        indent, "    return ", default_return, ";\n",
-                        indent, "}"
-                    )
-                    node = n
-                    level = level + #s
+            local substring, next_node = compress(node)
+            if substring then
+                if next_node.type == "branch" then
+                    node = next_node
+                    level = level + #substring
                 else
-                    assert(n.type == "leaf")
-                    buf:write(" CMP(", index[n.key] - 1, "); // ", n.key, "\n")
+                    cmp(next_node, index, buf)
                     return
                 end
             end
@@ -154,7 +160,11 @@ local function write_trie(node, buf, defs, index)
             buf:write(indent, "}\n", indent, "break;\n")
         else
             assert(node.type == "leaf")
-            buf:write(" return ", node.value, ";\n")
+            if node.compressed then
+                cmp(node, index, buf)
+            else
+                buf:write(" return ", node.value, ";\n")
+            end
         end
     end
 

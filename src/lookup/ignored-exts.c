@@ -40,9 +40,6 @@ static bool is_ignored_extension(const char *s, size_t len)
     case 7:
         switch (s[0]) {
         case 'p':
-            if (memcmp(s + 1, "ac", 2)) {
-                return false;
-            }
             switch (s[3]) {
             case 'o': CMP(7); // pacorig
             case 's': CMP(8); // pacsave

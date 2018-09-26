@@ -196,9 +196,6 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
             break;
         case 'G': CMP(33); // GNUmakefile
         case 'M':
-            if (memcmp(s + 1, "akefile.", 8)) {
-                return 0;
-            }
             switch (s[9]) {
             case 'a': CMP(38); // Makefile.am
             case 'i': CMP(39); // Makefile.in
