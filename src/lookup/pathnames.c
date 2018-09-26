@@ -7,6 +7,8 @@ static const struct {
     {"/etc/hosts", CONFIG},
 };
 
+#define CMP(i) idx = i; goto compare
+
 static FileTypeEnum filetype_from_pathname(const char *s, size_t len)
 {
     size_t idx;
@@ -15,17 +17,11 @@ static FileTypeEnum filetype_from_pathname(const char *s, size_t len)
     switch (len) {
     case 10:
         switch (s[5]) {
-        case 'f':
-            idx = 1; // /etc/fstab
-            goto compare;
-        case 'h':
-            idx = 2; // /etc/hosts
-            goto compare;
+        case 'f': CMP(1); // /etc/fstab
+        case 'h': CMP(2); // /etc/hosts
         }
         break;
-    case 19:
-        idx = 0; // /boot/grub/menu.lst
-        goto compare;
+    case 19: CMP(0); // /boot/grub/menu.lst
     }
     return 0;
 compare:
@@ -33,3 +29,5 @@ compare:
     val = filetype_from_pathname_table[idx].val;
     return memcmp(s, key, len) ? 0 : val;
 }
+
+#undef CMP

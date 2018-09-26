@@ -78,6 +78,8 @@ static const struct {
     {"zshrc", SHELL},
 };
 
+#define CMP(i) idx = i; goto compare
+
 static FileTypeEnum filetype_from_basename(const char *s, size_t len)
 {
     size_t idx;
@@ -86,55 +88,29 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
     switch (len) {
     case 5:
         switch (s[0]) {
-        case '.':
-            idx = 12; // .gnus
-            goto compare;
-        case 'c':
-            idx = 49; // cshrc
-            goto compare;
-        case 'd':
-            idx = 50; // drirc
-            goto compare;
-        case 'z':
-            idx = 73; // zshrc
-            goto compare;
+        case '.': CMP(12); // .gnus
+        case 'c': CMP(49); // cshrc
+        case 'd': CMP(50); // drirc
+        case 'z': CMP(73); // zshrc
         }
         break;
     case 6:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'c':
-                idx = 4; // .cshrc
-                goto compare;
-            case 'd':
-                idx = 5; // .drirc
-                goto compare;
-            case 'e':
-                idx = 7; // .emacs
-                goto compare;
-            case 'g':
-                idx = 8; // .gemrc
-                goto compare;
-            case 'z':
-                idx = 23; // .zshrc
-                goto compare;
+            case 'c': CMP(4); // .cshrc
+            case 'd': CMP(5); // .drirc
+            case 'e': CMP(7); // .emacs
+            case 'g': CMP(8); // .gemrc
+            case 'z': CMP(23); // .zshrc
             }
             break;
-        case 'K':
-            idx = 36; // Kbuild
-            goto compare;
-        case 'b':
-            idx = 46; // bashrc
-            goto compare;
+        case 'K': CMP(36); // Kbuild
+        case 'b': CMP(46); // bashrc
         case 'z':
             switch (s[1]) {
-            case 'l':
-                idx = 69; // zlogin
-                goto compare;
-            case 's':
-                idx = 72; // zshenv
-                goto compare;
+            case 'l': CMP(69); // zlogin
+            case 's': CMP(72); // zshenv
             }
             break;
         }
@@ -143,257 +119,135 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'b':
-                idx = 2; // .bashrc
-                goto compare;
-            case 'l':
-                idx = 17; // .luacov
-                goto compare;
+            case 'b': CMP(2); // .bashrc
+            case 'l': CMP(17); // .luacov
             case 'z':
                 switch (s[2]) {
-                case 'l':
-                    idx = 19; // .zlogin
-                    goto compare;
-                case 's':
-                    idx = 22; // .zshenv
-                    goto compare;
+                case 'l': CMP(19); // .zlogin
+                case 's': CMP(22); // .zshenv
                 }
                 break;
             }
             break;
-        case 'C':
-            idx = 29; // Capfile
-            goto compare;
-        case 'G':
-            idx = 34; // Gemfile
-            goto compare;
-        case 'i':
-            idx = 54; // inputrc
-            goto compare;
-        case 'p':
-            idx = 63; // profile
-            goto compare;
-        case 'z':
-            idx = 70; // zlogout
-            goto compare;
+        case 'C': CMP(29); // Capfile
+        case 'G': CMP(34); // Gemfile
+        case 'i': CMP(54); // inputrc
+        case 'p': CMP(63); // profile
+        case 'z': CMP(70); // zlogout
         }
         break;
     case 8:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'i':
-                idx = 14; // .inputrc
-                goto compare;
-            case 'p':
-                idx = 18; // .profile
-                goto compare;
-            case 'z':
-                idx = 20; // .zlogout
-                goto compare;
+            case 'i': CMP(14); // .inputrc
+            case 'p': CMP(18); // .profile
+            case 'z': CMP(20); // .zlogout
             }
             break;
-        case 'A':
-            idx = 24; // APKBUILD
-            goto compare;
-        case 'D':
-            idx = 32; // Doxyfile
-            goto compare;
-        case 'M':
-            idx = 37; // Makefile
-            goto compare;
-        case 'P':
-            idx = 40; // PKGBUILD
-            goto compare;
-        case 'R':
-            idx = 42; // Rakefile
-            goto compare;
-        case 'm':
-            idx = 56; // makefile
-            goto compare;
-        case 'y':
-            idx = 68; // yum.conf
-            goto compare;
-        case 'z':
-            idx = 71; // zprofile
-            goto compare;
+        case 'A': CMP(24); // APKBUILD
+        case 'D': CMP(32); // Doxyfile
+        case 'M': CMP(37); // Makefile
+        case 'P': CMP(40); // PKGBUILD
+        case 'R': CMP(42); // Rakefile
+        case 'm': CMP(56); // makefile
+        case 'y': CMP(68); // yum.conf
+        case 'z': CMP(71); // zprofile
         }
         break;
     case 9:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'j':
-                idx = 15; // .jshintrc
-                goto compare;
-            case 'z':
-                idx = 21; // .zprofile
-                goto compare;
+            case 'j': CMP(15); // .jshintrc
+            case 'z': CMP(21); // .zprofile
             }
             break;
-        case 'c':
-            idx = 47; // config.ld
-            goto compare;
-        case 'g':
-            idx = 53; // gitconfig
-            goto compare;
-        case 'k':
-            idx = 55; // krb5.conf
-            goto compare;
-        case 't':
-            idx = 67; // texmf.cnf
-            goto compare;
+        case 'c': CMP(47); // config.ld
+        case 'g': CMP(53); // gitconfig
+        case 'k': CMP(55); // krb5.conf
+        case 't': CMP(67); // texmf.cnf
         }
         break;
     case 10:
         switch (s[0]) {
-        case '.':
-            idx = 10; // .gitconfig
-            goto compare;
-        case 'C':
-            idx = 30; // Cargo.lock
-            goto compare;
-        case 'D':
-            idx = 31; // Dockerfile
-            goto compare;
-        case 'n':
-            idx = 61; // nginx.conf
-            goto compare;
-        case 'r':
-            idx = 64; // robots.txt
-            goto compare;
-        case 't':
-            idx = 66; // terminalrc
-            goto compare;
+        case '.': CMP(10); // .gitconfig
+        case 'C': CMP(30); // Cargo.lock
+        case 'D': CMP(31); // Dockerfile
+        case 'n': CMP(61); // nginx.conf
+        case 'r': CMP(64); // robots.txt
+        case 't': CMP(66); // terminalrc
         }
         break;
     case 11:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'g':
-                idx = 11; // .gitmodules
-                goto compare;
-            case 'i':
-                idx = 13; // .indent.pro
-                goto compare;
-            case 'l':
-                idx = 16; // .luacheckrc
-                goto compare;
+            case 'g': CMP(11); // .gitmodules
+            case 'i': CMP(13); // .indent.pro
+            case 'l': CMP(16); // .luacheckrc
             }
             break;
         case 'B':
             switch (s[1]) {
-            case 'S':
-                idx = 25; // BSDmakefile
-                goto compare;
-            case 'U':
-                idx = 26; // BUILD.bazel
-                goto compare;
+            case 'S': CMP(25); // BSDmakefile
+            case 'U': CMP(26); // BUILD.bazel
             }
             break;
-        case 'G':
-            idx = 33; // GNUmakefile
-            goto compare;
+        case 'G': CMP(33); // GNUmakefile
         case 'M':
             switch (s[9]) {
-            case 'a':
-                idx = 38; // Makefile.am
-                goto compare;
-            case 'i':
-                idx = 39; // Makefile.in
-                goto compare;
+            case 'a': CMP(38); // Makefile.am
+            case 'i': CMP(39); // Makefile.in
             }
             break;
-        case 'P':
-            idx = 41; // Project.ede
-            goto compare;
-        case 'V':
-            idx = 43; // Vagrantfile
-            goto compare;
-        case 'b':
-            idx = 44; // bash_logout
-            goto compare;
-        case 'm':
-            idx = 57; // meson.build
-            goto compare;
-        case 'p':
-            idx = 62; // pacman.conf
-            goto compare;
-        case 'r':
-            idx = 65; // rockspec.in
-            goto compare;
+        case 'P': CMP(41); // Project.ede
+        case 'V': CMP(43); // Vagrantfile
+        case 'b': CMP(44); // bash_logout
+        case 'm': CMP(57); // meson.build
+        case 'p': CMP(62); // pacman.conf
+        case 'r': CMP(65); // rockspec.in
         }
         break;
     case 12:
         switch (s[0]) {
-        case '.':
-            idx = 0; // .bash_logout
-            goto compare;
-        case 'G':
-            idx = 35; // Gemfile.lock
-            goto compare;
-        case 'b':
-            idx = 45; // bash_profile
-            goto compare;
-        case 'c':
-            idx = 48; // configure.ac
-            goto compare;
+        case '.': CMP(0); // .bash_logout
+        case 'G': CMP(35); // Gemfile.lock
+        case 'b': CMP(45); // bash_profile
+        case 'c': CMP(48); // configure.ac
         }
         break;
     case 13:
         switch (s[0]) {
         case '.':
             switch (s[1]) {
-            case 'b':
-                idx = 1; // .bash_profile
-                goto compare;
-            case 'c':
-                idx = 3; // .clang-format
-                goto compare;
-            case 'e':
-                idx = 6; // .editorconfig
-                goto compare;
+            case 'b': CMP(1); // .bash_profile
+            case 'c': CMP(3); // .clang-format
+            case 'e': CMP(6); // .editorconfig
             }
             break;
-        case 'g':
-            idx = 52; // gitattributes
-            goto compare;
-        case 'm':
-            idx = 59; // mimeapps.list
-            goto compare;
+        case 'g': CMP(52); // gitattributes
+        case 'm': CMP(59); // mimeapps.list
         }
         break;
     case 14:
         switch (s[0]) {
-        case '.':
-            idx = 9; // .gitattributes
-            goto compare;
+        case '.': CMP(9); // .gitattributes
         case 'C':
             switch (s[1]) {
-            case 'M':
-                idx = 27; // CMakeLists.txt
-                goto compare;
-            case 'O':
-                idx = 28; // COMMIT_EDITMSG
-                goto compare;
+            case 'M': CMP(27); // CMakeLists.txt
+            case 'O': CMP(28); // COMMIT_EDITMSG
             }
             break;
         }
         break;
     case 15:
         switch (s[0]) {
-        case 'g':
-            idx = 51; // git-rebase-todo
-            goto compare;
-        case 'm':
-            idx = 60; // mkinitcpio.conf
-            goto compare;
+        case 'g': CMP(51); // git-rebase-todo
+        case 'm': CMP(60); // mkinitcpio.conf
         }
         break;
-    case 17:
-        idx = 58; // meson_options.txt
-        goto compare;
+    case 17: CMP(58); // meson_options.txt
     }
     return 0;
 compare:
@@ -401,3 +255,5 @@ compare:
     val = filetype_from_basename_table[idx].val;
     return memcmp(s, key, len) ? 0 : val;
 }
+
+#undef CMP

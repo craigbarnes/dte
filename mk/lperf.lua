@@ -121,26 +121,23 @@ local function write_trie(node, buf, defs, index)
                     level = level + skip
                 else
                     assert(n.type == "leaf")
-                    buf:write (
-                        indent, "idx = ", index[n.key] - 1, "; // ", n.key, "\n",
-                        indent, "goto compare;\n"
-                    )
+                    buf:write(" CMP(", index[n.key] - 1, "); // ", n.key, "\n")
                     return
                 end
             end
 
-            buf:write(indent, "switch (s[", tostring(level), "]) {\n")
+            buf:write("\n", indent, "switch (s[", tostring(level), "]) {\n")
             for i = node.min, node.max do
                 local v = node[i]
                 if v then
-                    buf:write(indent, "case '", char(i), "':\n")
+                    buf:write(indent, "case '", char(i), "':")
                     serialize(v, level + 1, indent_depth + 1)
                 end
             end
             buf:write(indent, "}\n", indent, "break;\n")
         else
             assert(node.type == "leaf")
-            buf:write(indent, "return ", node.value, ";\n")
+            buf:write(" return ", node.value, ";\n")
         end
     end
 
@@ -149,7 +146,7 @@ local function write_trie(node, buf, defs, index)
     for i = 1, index.longest_key do
         local v = node[i]
         if v then
-            buf:write(indent, "case ", tostring(i), ":\n")
+            buf:write(indent, "case ", tostring(i), ":")
             serialize(v, 0, 2)
         end
     end
@@ -175,6 +172,8 @@ local index = assert(make_index(keys))
 local trie = assert(make_trie(keys))
 
 local prelude = [[
+#define CMP(i) idx = i; goto compare
+
 static %s %s(const char *s, size_t len)
 {
     size_t idx;
@@ -188,6 +187,8 @@ compare:
     val = %s_table[idx].val;
     return memcmp(s, key, len) ? %s : val;
 }
+
+#undef CMP
 ]]
 
 write_index(index, output, defs)

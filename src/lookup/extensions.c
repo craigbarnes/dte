@@ -187,6 +187,8 @@ static const struct {
     {"zsh", SHELL},
 };
 
+#define CMP(i) idx = i; goto compare
+
 static FileTypeEnum filetype_from_extension(const char *s, size_t len)
 {
     size_t idx;
@@ -195,140 +197,86 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
     switch (len) {
     case 1:
         switch (s[0]) {
-        case '1':
-            return ROFF;
-        case '2':
-            return ROFF;
-        case '3':
-            return ROFF;
-        case '4':
-            return ROFF;
-        case '5':
-            return ROFF;
-        case '6':
-            return ROFF;
-        case '7':
-            return ROFF;
-        case '8':
-            return ROFF;
-        case '9':
-            return ROFF;
-        case 'C':
-            return CPLUSPLUS;
-        case 'H':
-            return CPLUSPLUS;
-        case 'S':
-            return ASSEMBLY;
-        case 'c':
-            return C;
-        case 'd':
-            return D;
-        case 'h':
-            return C;
-        case 'l':
-            return LEX;
-        case 'm':
-            return OBJECTIVEC;
-        case 's':
-            return ASSEMBLY;
-        case 'v':
-            return VERILOG;
-        case 'y':
-            return YACC;
+        case '1': return ROFF;
+        case '2': return ROFF;
+        case '3': return ROFF;
+        case '4': return ROFF;
+        case '5': return ROFF;
+        case '6': return ROFF;
+        case '7': return ROFF;
+        case '8': return ROFF;
+        case '9': return ROFF;
+        case 'C': return CPLUSPLUS;
+        case 'H': return CPLUSPLUS;
+        case 'S': return ASSEMBLY;
+        case 'c': return C;
+        case 'd': return D;
+        case 'h': return C;
+        case 'l': return LEX;
+        case 'm': return OBJECTIVEC;
+        case 's': return ASSEMBLY;
+        case 'v': return VERILOG;
+        case 'y': return YACC;
         }
         break;
     case 2:
         switch (s[0]) {
         case 'c':
             switch (s[1]) {
-            case 'c':
-                return CPLUSPLUS;
-            case 'l':
-                return COMMONLISP;
-            case 'r':
-                return RUBY;
-            case 's':
-                return CSHARP;
+            case 'c': return CPLUSPLUS;
+            case 'l': return COMMONLISP;
+            case 'r': return RUBY;
+            case 's': return CSHARP;
             }
             break;
-        case 'd':
-            idx = 44; // di
-            goto compare;
-        case 'e':
-            idx = 54; // el
-            goto compare;
+        case 'd': CMP(44); // di
+        case 'e': CMP(54); // el
         case 'g':
             switch (s[1]) {
-            case 'o':
-                return GO;
-            case 'p':
-                return GNUPLOT;
-            case 'v':
-                return DOT;
+            case 'o': return GO;
+            case 'p': return GNUPLOT;
+            case 'v': return DOT;
             }
             break;
         case 'h':
             switch (s[1]) {
-            case 'h':
-                return CPLUSPLUS;
-            case 's':
-                return HASKELL;
+            case 'h': return CPLUSPLUS;
+            case 's': return HASKELL;
             }
             break;
-        case 'j':
-            idx = 85; // js
-            goto compare;
+        case 'j': CMP(85); // js
         case 'm':
             switch (s[1]) {
-            case '4':
-                return M4;
-            case 'd':
-                return MARKDOWN;
-            case 'k':
-                return MAKE;
+            case '4': return M4;
+            case 'd': return MARKDOWN;
+            case 'k': return MAKE;
             }
             break;
         case 'p':
             switch (s[1]) {
-            case 'c':
-                return PKGCONFIG;
-            case 'l':
-                return PERL;
-            case 'm':
-                return PERL;
-            case 'o':
-                return GETTEXT;
-            case 's':
-                return POSTSCRIPT;
-            case 'y':
-                return PYTHON;
+            case 'c': return PKGCONFIG;
+            case 'l': return PERL;
+            case 'm': return PERL;
+            case 'o': return GETTEXT;
+            case 's': return POSTSCRIPT;
+            case 'y': return PYTHON;
             }
             break;
         case 'r':
             switch (s[1]) {
-            case 'b':
-                return RUBY;
-            case 's':
-                return RUST;
+            case 'b': return RUBY;
+            case 's': return RUST;
             }
             break;
         case 's':
             switch (s[1]) {
-            case 'h':
-                return SHELL;
-            case 's':
-                return SCHEME;
+            case 'h': return SHELL;
+            case 's': return SCHEME;
             }
             break;
-        case 't':
-            idx = 159; // ts
-            goto compare;
-        case 'u':
-            idx = 161; // ui
-            goto compare;
-        case 'v':
-            idx = 169; // vh
-            goto compare;
+        case 't': CMP(159); // ts
+        case 'u': CMP(161); // ui
+        case 'v': CMP(169); // vh
         }
         break;
     case 3:
@@ -337,602 +285,355 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             switch (s[1]) {
             case 'd':
                 switch (s[2]) {
-                case 'a':
-                    return ADA;
-                case 'b':
-                    return ADA;
-                case 's':
-                    return ADA;
+                case 'a': return ADA;
+                case 'b': return ADA;
+                case 's': return ADA;
                 }
                 break;
             case 's':
                 switch (s[2]) {
-                case 'd':
-                    return COMMONLISP;
-                case 'm':
-                    return ASSEMBLY;
+                case 'd': return COMMONLISP;
+                case 'm': return ASSEMBLY;
                 }
                 break;
-            case 'u':
-                idx = 17; // auk
-                goto compare;
-            case 'w':
-                idx = 19; // awk
-                goto compare;
+            case 'u': CMP(17); // auk
+            case 'w': CMP(19); // awk
             }
             break;
         case 'b':
             switch (s[1]) {
-            case 'a':
-                idx = 21; // bat
-                goto compare;
-            case 'b':
-                idx = 22; // bbl
-                goto compare;
-            case 'i':
-                idx = 23; // bib
-                goto compare;
-            case 't':
-                idx = 24; // btm
-                goto compare;
+            case 'a': CMP(21); // bat
+            case 'b': CMP(22); // bbl
+            case 'i': CMP(23); // bib
+            case 't': CMP(24); // btm
             }
             break;
         case 'c':
             switch (s[1]) {
-            case '+':
-                idx = 26; // c++
-                goto compare;
+            case '+': CMP(26); // c++
             case 'l':
                 switch (s[2]) {
-                case 'j':
-                    return CLOJURE;
-                case 's':
-                    return TEX;
+                case 'j': return CLOJURE;
+                case 's': return TEX;
                 }
                 break;
-            case 'm':
-                idx = 32; // cmd
-                goto compare;
-            case 'p':
-                idx = 34; // cpp
-                goto compare;
+            case 'm': CMP(32); // cmd
+            case 'p': CMP(34); // cpp
             case 's':
                 switch (s[2]) {
-                case 's':
-                    return CSS;
-                case 'v':
-                    return CSV;
+                case 's': return CSS;
+                case 'v': return CSV;
                 }
                 break;
-            case 'x':
-                idx = 40; // cxx
-                goto compare;
+            case 'x': CMP(40); // cxx
             }
             break;
         case 'd':
             switch (s[1]) {
-            case 'o':
-                idx = 49; // dot
-                goto compare;
-            case 't':
-                idx = 52; // dtx
-                goto compare;
+            case 'o': CMP(49); // dot
+            case 't': CMP(52); // dtx
             }
             break;
         case 'e':
             switch (s[1]) {
-            case 'm':
-                idx = 56; // eml
-                goto compare;
-            case 'p':
-                idx = 57; // eps
-                goto compare;
+            case 'm': CMP(56); // eml
+            case 'p': CMP(57); // eps
             }
             break;
-        case 'g':
-            idx = 71; // gpi
-            goto compare;
+        case 'g': CMP(71); // gpi
         case 'h':
             switch (s[1]) {
-            case 'p':
-                idx = 77; // hpp
-                goto compare;
-            case 't':
-                idx = 79; // htm
-                goto compare;
-            case 'x':
-                idx = 81; // hxx
-                goto compare;
+            case 'p': CMP(77); // hpp
+            case 't': CMP(79); // htm
+            case 'x': CMP(81); // hxx
             }
             break;
         case 'i':
             switch (s[1]) {
             case 'n':
                 switch (s[2]) {
-                case 'i':
-                    return INI;
-                case 's':
-                    return TEX;
+                case 'i': return INI;
+                case 's': return TEX;
                 }
                 break;
             }
             break;
-        case 'k':
-            idx = 87; // ksh
-            goto compare;
+        case 'k': CMP(87); // ksh
         case 'l':
             switch (s[1]) {
-            case 's':
-                idx = 89; // lsp
-                goto compare;
-            case 't':
-                idx = 90; // ltx
-                goto compare;
-            case 'u':
-                idx = 91; // lua
-                goto compare;
+            case 's': CMP(89); // lsp
+            case 't': CMP(90); // ltx
+            case 'u': CMP(91); // lua
             }
             break;
         case 'm':
             switch (s[1]) {
-            case 'a':
-                idx = 94; // mak
-                goto compare;
-            case 'k':
-                idx = 100; // mkd
-                goto compare;
+            case 'a': CMP(94); // mak
+            case 'k': CMP(100); // mkd
             }
             break;
         case 'n':
             switch (s[1]) {
             case 'i':
                 switch (s[2]) {
-                case 'm':
-                    return NIM;
-                case 'x':
-                    return NIX;
+                case 'm': return NIM;
+                case 'x': return NIX;
                 }
                 break;
             }
             break;
         case 'p':
             switch (s[1]) {
-            case 'h':
-                idx = 115; // php
-                goto compare;
+            case 'h': CMP(115); // php
             case 'l':
                 switch (s[2]) {
-                case 's':
-                    return INI;
-                case 't':
-                    return GNUPLOT;
+                case 's': return INI;
+                case 't': return GNUPLOT;
                 }
                 break;
-            case 'o':
-                idx = 122; // pot
-                goto compare;
-            case 'y':
-                idx = 126; // py3
-                goto compare;
+            case 'o': CMP(122); // pot
+            case 'y': CMP(126); // py3
             }
             break;
         case 'r':
             switch (s[1]) {
-            case 'd':
-                idx = 129; // rdf
-                goto compare;
-            case 'k':
-                idx = 130; // rkt
-                goto compare;
-            case 's':
-                idx = 135; // rst
-                goto compare;
+            case 'd': CMP(129); // rdf
+            case 'k': CMP(130); // rkt
+            case 's': CMP(135); // rst
             }
             break;
         case 's':
             switch (s[1]) {
-            case 'c':
-                idx = 138; // scm
-                goto compare;
-            case 'e':
-                idx = 140; // sed
-                goto compare;
+            case 'c': CMP(138); // scm
+            case 'e': CMP(140); // sed
             case 'l':
                 switch (s[2]) {
-                case 'd':
-                    return SCHEME;
-                case 's':
-                    return SCHEME;
+                case 'd': return SCHEME;
+                case 's': return SCHEME;
                 }
                 break;
-            case 'q':
-                idx = 147; // sql
-                goto compare;
-            case 't':
-                idx = 149; // sty
-                goto compare;
-            case 'v':
-                idx = 150; // svg
-                goto compare;
+            case 'q': CMP(147); // sql
+            case 't': CMP(149); // sty
+            case 'v': CMP(150); // svg
             }
             break;
         case 't':
             switch (s[1]) {
-            case 'c':
-                idx = 152; // tcl
-                goto compare;
-            case 'e':
-                idx = 153; // tex
-                goto compare;
-            case 's':
-                idx = 160; // tsx
-                goto compare;
+            case 'c': CMP(152); // tcl
+            case 'e': CMP(153); // tex
+            case 's': CMP(160); // tsx
             }
             break;
         case 'v':
             switch (s[1]) {
-            case 'c':
-                idx = 166; // vcf
-                goto compare;
-            case 'e':
-                idx = 167; // ver
-                goto compare;
-            case 'h':
-                idx = 170; // vhd
-                goto compare;
-            case 'i':
-                idx = 172; // vim
-                goto compare;
+            case 'c': CMP(166); // vcf
+            case 'e': CMP(167); // ver
+            case 'h': CMP(170); // vhd
+            case 'i': CMP(172); // vim
             }
             break;
         case 'x':
             switch (s[1]) {
-            case 'm':
-                idx = 175; // xml
-                goto compare;
+            case 'm': CMP(175); // xml
             case 's':
                 switch (s[2]) {
-                case 'd':
-                    return XML;
-                case 'l':
-                    return XML;
+                case 'd': return XML;
+                case 'l': return XML;
                 }
                 break;
             }
             break;
-        case 'y':
-            idx = 181; // yml
-            goto compare;
-        case 'z':
-            idx = 182; // zsh
-            goto compare;
+        case 'y': CMP(181); // yml
+        case 'z': CMP(182); // zsh
         }
         break;
     case 4:
         switch (s[0]) {
-        case 'b':
-            idx = 20; // bash
-            goto compare;
-        case 'c':
-            idx = 37; // cson
-            goto compare;
+        case 'b': CMP(20); // bash
+        case 'c': CMP(37); // cson
         case 'd':
             switch (s[1]) {
-            case 'a':
-                idx = 42; // dart
-                goto compare;
-            case 'i':
-                idx = 45; // diff
-                goto compare;
+            case 'a': CMP(42); // dart
+            case 'i': CMP(45); // diff
             case 'o':
                 switch (s[2]) {
-                case 'a':
-                    idx = 46; // doap
-                    goto compare;
-                case 'x':
-                    idx = 50; // doxy
-                    goto compare;
+                case 'a': CMP(46); // doap
+                case 'x': CMP(50); // doxy
                 }
                 break;
             }
             break;
-        case 'f':
-            idx = 60; // frag
-            goto compare;
+        case 'f': CMP(60); // frag
         case 'g':
             switch (s[1]) {
-            case 'a':
-                idx = 61; // gawk
-                goto compare;
-            case 'l':
-                idx = 64; // glsl
-                goto compare;
-            case 's':
-                idx = 73; // gsed
-                goto compare;
+            case 'a': CMP(61); // gawk
+            case 'l': CMP(64); // glsl
+            case 's': CMP(73); // gsed
             }
             break;
-        case 'h':
-            idx = 80; // html
-            goto compare;
+        case 'h': CMP(80); // html
         case 'j':
             switch (s[1]) {
-            case 'a':
-                idx = 84; // java
-                goto compare;
-            case 's':
-                idx = 86; // json
-                goto compare;
+            case 'a': CMP(84); // java
+            case 's': CMP(86); // json
             }
             break;
         case 'm':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'k':
-                    idx = 95; // make
-                    goto compare;
-                case 'w':
-                    idx = 97; // mawk
-                    goto compare;
+                case 'k': CMP(95); // make
+                case 'w': CMP(97); // mawk
                 }
                 break;
-            case 'k':
-                idx = 101; // mkdn
-                goto compare;
-            case 'o':
-                idx = 102; // moon
-                goto compare;
+            case 'k': CMP(101); // mkdn
+            case 'o': CMP(102); // moon
             }
             break;
-        case 'n':
-            idx = 104; // nawk
-            goto compare;
+        case 'n': CMP(104); // nawk
         case 'p':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'g':
-                    idx = 110; // page
-                    goto compare;
-                case 't':
-                    idx = 112; // path
-                    goto compare;
+                case 'g': CMP(110); // page
+                case 't': CMP(112); // path
                 }
                 break;
-            case 'e':
-                idx = 114; // perl
-                goto compare;
+            case 'e': CMP(114); // perl
             }
             break;
         case 'r':
             switch (s[1]) {
-            case 'a':
-                idx = 127; // rake
-                goto compare;
+            case 'a': CMP(127); // rake
             case 'k':
                 switch (s[2]) {
                 case 't':
                     switch (s[3]) {
-                    case 'd':
-                        return RACKET;
-                    case 'l':
-                        return RACKET;
+                    case 'd': return RACKET;
+                    case 'l': return RACKET;
                     }
                     break;
                 }
                 break;
             }
             break;
-        case 's':
-            idx = 139; // scss
-            goto compare;
+        case 's': CMP(139); // scss
         case 't':
             switch (s[1]) {
-            case 'e':
-                idx = 154; // texi
-                goto compare;
-            case 'o':
-                idx = 157; // toml
-                goto compare;
+            case 'e': CMP(154); // texi
+            case 'o': CMP(157); // toml
             }
             break;
         case 'v':
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'l':
-                    idx = 163; // vala
-                    goto compare;
-                case 'p':
-                    idx = 164; // vapi
-                    goto compare;
+                case 'l': CMP(163); // vala
+                case 'p': CMP(164); // vapi
                 }
                 break;
-            case 'e':
-                idx = 168; // vert
-                goto compare;
-            case 'h':
-                idx = 171; // vhdl
-                goto compare;
+            case 'e': CMP(168); // vert
+            case 'h': CMP(171); // vhdl
             }
             break;
-        case 'w':
-            idx = 173; // wsgi
-            goto compare;
-        case 'x':
-            idx = 178; // xslt
-            goto compare;
-        case 'y':
-            idx = 180; // yaml
-            goto compare;
+        case 'w': CMP(173); // wsgi
+        case 'x': CMP(178); // xslt
+        case 'y': CMP(180); // yaml
         }
         break;
     case 5:
         switch (s[0]) {
-        case 'c':
-            idx = 31; // cmake
-            goto compare;
-        case 'd':
-            idx = 51; // dterc
-            goto compare;
-        case 'e':
-            idx = 55; // emacs
-            goto compare;
+        case 'c': CMP(31); // cmake
+        case 'd': CMP(51); // dterc
+        case 'e': CMP(55); // emacs
         case 'g':
             switch (s[1]) {
             case 'l':
                 switch (s[4]) {
-                case 'f':
-                    return GLSL;
-                case 'v':
-                    return GLSL;
+                case 'f': return GLSL;
+                case 'v': return GLSL;
                 }
                 break;
-            case 'p':
-                idx = 70; // gperf
-                goto compare;
+            case 'p': CMP(70); // gperf
             }
             break;
-        case 'm':
-            idx = 103; // mount
-            goto compare;
+        case 'm': CMP(103); // mount
         case 'n':
             switch (s[1]) {
-            case 'g':
-                idx = 105; // nginx
-                goto compare;
-            case 'i':
-                idx = 108; // ninja
-                goto compare;
+            case 'g': CMP(105); // nginx
+            case 'i': CMP(108); // ninja
             }
             break;
         case 'p':
             switch (s[1]) {
-            case 'a':
-                idx = 111; // patch
-                goto compare;
-            case 'r':
-                idx = 123; // proto
-                goto compare;
+            case 'a': CMP(111); // patch
+            case 'r': CMP(123); // proto
             }
             break;
         case 's':
             switch (s[1]) {
-            case 'c':
-                idx = 137; // scala
-                goto compare;
-            case 'l':
-                idx = 144; // slice
-                goto compare;
+            case 'c': CMP(137); // scala
+            case 'l': CMP(144); // slice
             }
             break;
-        case 't':
-            idx = 156; // timer
-            goto compare;
-        case 'v':
-            idx = 165; // vcard
-            goto compare;
-        case 'x':
-            idx = 174; // xhtml
-            goto compare;
+        case 't': CMP(156); // timer
+        case 'v': CMP(165); // vcard
+        case 'x': CMP(174); // xhtml
         }
         break;
     case 6:
         switch (s[0]) {
-        case 'c':
-            idx = 33; // coffee
-            goto compare;
-        case 'd':
-            idx = 48; // docker
-            goto compare;
-        case 'e':
-            idx = 53; // ebuild
-            goto compare;
-        case 'g':
-            idx = 72; // groovy
-            goto compare;
-        case 's':
-            idx = 146; // socket
-            goto compare;
-        case 't':
-            idx = 151; // target
-            goto compare;
+        case 'c': CMP(33); // coffee
+        case 'd': CMP(48); // docker
+        case 'e': CMP(53); // ebuild
+        case 'g': CMP(72); // groovy
+        case 's': CMP(146); // socket
+        case 't': CMP(151); // target
         }
         break;
     case 7:
         switch (s[0]) {
         case 'd':
             switch (s[1]) {
-            case 'e':
-                idx = 43; // desktop
-                goto compare;
-            case 'o':
-                idx = 47; // docbook
-                goto compare;
+            case 'e': CMP(43); // desktop
+            case 'o': CMP(47); // docbook
             }
             break;
         case 'g':
             switch (s[1]) {
             case 'e':
                 switch (s[2]) {
-                case 'm':
-                    idx = 62; // gemspec
-                    goto compare;
-                case 'o':
-                    idx = 63; // geojson
-                    goto compare;
+                case 'm': CMP(62); // gemspec
+                case 'o': CMP(63); // geojson
                 }
                 break;
-            case 'n':
-                idx = 67; // gnuplot
-                goto compare;
+            case 'n': CMP(67); // gnuplot
             }
             break;
-        case 's':
-            idx = 141; // service
-            goto compare;
-        case 't':
-            idx = 155; // texinfo
-            goto compare;
+        case 's': CMP(141); // service
+        case 't': CMP(155); // texinfo
         }
         break;
     case 8:
         switch (s[0]) {
-        case 'm':
-            idx = 96; // markdown
-            goto compare;
-        case 'r':
-            idx = 133; // rockspec
-            goto compare;
-        case 't':
-            idx = 158; // topojson
-            goto compare;
+        case 'm': CMP(96); // markdown
+        case 'r': CMP(133); // rockspec
+        case 't': CMP(158); // topojson
         }
         break;
     case 9:
         switch (s[0]) {
-        case 'a':
-            idx = 18; // automount
-            goto compare;
-        case 'n':
-            idx = 106; // nginxconf
-            goto compare;
+        case 'a': CMP(18); // automount
+        case 'n': CMP(106); // nginxconf
         }
         break;
     case 10:
         switch (s[0]) {
-        case 'f':
-            idx = 58; // flatpakref
-            goto compare;
-        case 'p':
-            idx = 121; // postscript
-            goto compare;
+        case 'f': CMP(58); // flatpakref
+        case 'p': CMP(121); // postscript
         }
         break;
-    case 11:
-        idx = 59; // flatpakrepo
-        goto compare;
+    case 11: CMP(59); // flatpakrepo
     }
     return 0;
 compare:
@@ -940,3 +641,5 @@ compare:
     val = filetype_from_extension_table[idx].val;
     return memcmp(s, key, len) ? 0 : val;
 }
+
+#undef CMP
