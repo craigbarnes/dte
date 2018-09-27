@@ -124,10 +124,11 @@ local function write_index(index, buf, defs)
     buf:write("};\n\n")
 end
 
-local function cmp(node, index, buf)
+local function cmp(node, index, buf, last_char_only)
     assert(node.type == "leaf")
+    local macro = last_char_only and "CMPN" or "CMP"
     local key = node.key
-    buf:write(" CMP(", index[key] - 1, "); // ", key, "\n")
+    buf:write(" ", macro, "(", index[key] - 1, "); // ", key, "\n")
 end
 
 local function write_trie(node, buf, defs, index)
@@ -142,7 +143,8 @@ local function write_trie(node, buf, defs, index)
                     node = next_node
                     level = level + skip
                 else
-                    cmp(next_node, index, buf)
+                    local last_only = (skip == 1 and not next_node.compressed)
+                    cmp(next_node, index, buf, last_only)
                     return
                 end
             end
@@ -178,6 +180,13 @@ local function write_trie(node, buf, defs, index)
     buf:write(indent, "}\n", indent, "return ", default_return, ";\n")
 end
 
+local function expand_template(template, context)
+    return (template:gsub('$(%b{})', function(match)
+        local key = assert(match:sub(2, -2))
+        return context[key] or error("Missing template field: " .. key, 4)
+    end))
+end
+
 local input_filename = assert(arg[1], "Usage: " .. arg[0] .. " INPUT-FILE")
 local output_filename, output = arg[2]
 if output_filename then
@@ -190,34 +199,38 @@ end
 local fn = assert(loadfile(input_filename, "t", {}))
 local defs = assert(fn())
 local keys = assert(defs.keys, "No keys defined")
-local fname = assert(defs.function_name, "No function_name defined")
-local rtype = assert(defs.return_type, "No return_type defined")
-local rdefault = assert(defs.default_return, "No default_return defined")
+assert(defs.function_name, "No function_name defined")
+assert(defs.return_type, "No return_type defined")
+assert(defs.default_return, "No default_return defined")
 local index = assert(make_index(keys))
 local trie = assert(make_trie(keys))
 
 local prelude = [[
 #define CMP(i) idx = i; goto compare
+#define CMPN(i) idx = i; goto compare_last_char
+#define KEY ${function_name}_table[idx].key
+#define VAL ${function_name}_table[idx].val
 
-static %s %s(const char *s, size_t len)
+static ${return_type} ${function_name}(const char *s, size_t len)
 {
     size_t idx;
-    const char *key;
-    %s val;
 ]]
 
 local postlude = [[
 compare:
-    key = %s_table[idx].key;
-    val = %s_table[idx].val;
-    return memcmp(s, key, len) ? %s : val;
+    return (memcmp(s, KEY, len) == 0) ? VAL : ${default_return};
+compare_last_char:
+    return (s[len - 1] == KEY[len - 1]) ? VAL : ${default_return};
 }
 
 #undef CMP
+#undef CMPN
+#undef KEY
+#undef VAL
 ]]
 
 write_index(index, output, defs)
-output:write(prelude:format(rtype, fname, rtype))
+output:write(expand_template(prelude, defs))
 write_trie(trie, output, defs, index)
-output:write(postlude:format(fname, fname, rdefault))
+output:write(expand_template(postlude, defs))
 output:flush()

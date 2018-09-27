@@ -146,6 +146,7 @@ build/terminal/terminfo.o: build/terminal/terminfo.cflags
 build/terminal/terminfo.cflags: | build/terminal/
 build/script.o: build/script.cflags
 build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
+build/filetype.o: BASIC_CFLAGS += -Wno-unused-label
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)

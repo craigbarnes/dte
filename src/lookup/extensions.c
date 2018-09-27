@@ -188,12 +188,13 @@ static const struct {
 };
 
 #define CMP(i) idx = i; goto compare
+#define CMPN(i) idx = i; goto compare_last_char
+#define KEY filetype_from_extension_table[idx].key
+#define VAL filetype_from_extension_table[idx].val
 
 static FileTypeEnum filetype_from_extension(const char *s, size_t len)
 {
     size_t idx;
-    const char *key;
-    FileTypeEnum val;
     switch (len) {
     case 1:
         switch (s[0]) {
@@ -229,8 +230,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's': return CSHARP;
             }
             break;
-        case 'd': CMP(44); // di
-        case 'e': CMP(54); // el
+        case 'd': CMPN(44); // di
+        case 'e': CMPN(54); // el
         case 'g':
             switch (s[1]) {
             case 'o': return GO;
@@ -244,7 +245,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's': return HASKELL;
             }
             break;
-        case 'j': CMP(85); // js
+        case 'j': CMPN(85); // js
         case 'm':
             switch (s[1]) {
             case '4': return M4;
@@ -274,9 +275,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 's': return SCHEME;
             }
             break;
-        case 't': CMP(159); // ts
-        case 'u': CMP(161); // ui
-        case 'v': CMP(169); // vh
+        case 't': CMPN(159); // ts
+        case 'u': CMPN(161); // ui
+        case 'v': CMPN(169); // vh
         }
         break;
     case 3:
@@ -296,56 +297,56 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
                 case 'm': return ASSEMBLY;
                 }
                 break;
-            case 'u': CMP(17); // auk
-            case 'w': CMP(19); // awk
+            case 'u': CMPN(17); // auk
+            case 'w': CMPN(19); // awk
             }
             break;
         case 'b':
             switch (s[1]) {
-            case 'a': CMP(21); // bat
-            case 'b': CMP(22); // bbl
-            case 'i': CMP(23); // bib
-            case 't': CMP(24); // btm
+            case 'a': CMPN(21); // bat
+            case 'b': CMPN(22); // bbl
+            case 'i': CMPN(23); // bib
+            case 't': CMPN(24); // btm
             }
             break;
         case 'c':
             switch (s[1]) {
-            case '+': CMP(26); // c++
+            case '+': CMPN(26); // c++
             case 'l':
                 switch (s[2]) {
                 case 'j': return CLOJURE;
                 case 's': return TEX;
                 }
                 break;
-            case 'm': CMP(32); // cmd
-            case 'p': CMP(34); // cpp
+            case 'm': CMPN(32); // cmd
+            case 'p': CMPN(34); // cpp
             case 's':
                 switch (s[2]) {
                 case 's': return CSS;
                 case 'v': return CSV;
                 }
                 break;
-            case 'x': CMP(40); // cxx
+            case 'x': CMPN(40); // cxx
             }
             break;
         case 'd':
             switch (s[1]) {
-            case 'o': CMP(49); // dot
-            case 't': CMP(52); // dtx
+            case 'o': CMPN(49); // dot
+            case 't': CMPN(52); // dtx
             }
             break;
         case 'e':
             switch (s[1]) {
-            case 'm': CMP(56); // eml
-            case 'p': CMP(57); // eps
+            case 'm': CMPN(56); // eml
+            case 'p': CMPN(57); // eps
             }
             break;
         case 'g': CMP(71); // gpi
         case 'h':
             switch (s[1]) {
-            case 'p': CMP(77); // hpp
-            case 't': CMP(79); // htm
-            case 'x': CMP(81); // hxx
+            case 'p': CMPN(77); // hpp
+            case 't': CMPN(79); // htm
+            case 'x': CMPN(81); // hxx
             }
             break;
         case 'i':
@@ -361,15 +362,15 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         case 'k': CMP(87); // ksh
         case 'l':
             switch (s[1]) {
-            case 's': CMP(89); // lsp
-            case 't': CMP(90); // ltx
-            case 'u': CMP(91); // lua
+            case 's': CMPN(89); // lsp
+            case 't': CMPN(90); // ltx
+            case 'u': CMPN(91); // lua
             }
             break;
         case 'm':
             switch (s[1]) {
-            case 'a': CMP(94); // mak
-            case 'k': CMP(100); // mkd
+            case 'a': CMPN(94); // mak
+            case 'k': CMPN(100); // mkd
             }
             break;
         case 'n':
@@ -384,57 +385,57 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             break;
         case 'p':
             switch (s[1]) {
-            case 'h': CMP(115); // php
+            case 'h': CMPN(115); // php
             case 'l':
                 switch (s[2]) {
                 case 's': return INI;
                 case 't': return GNUPLOT;
                 }
                 break;
-            case 'o': CMP(122); // pot
-            case 'y': CMP(126); // py3
+            case 'o': CMPN(122); // pot
+            case 'y': CMPN(126); // py3
             }
             break;
         case 'r':
             switch (s[1]) {
-            case 'd': CMP(129); // rdf
-            case 'k': CMP(130); // rkt
-            case 's': CMP(135); // rst
+            case 'd': CMPN(129); // rdf
+            case 'k': CMPN(130); // rkt
+            case 's': CMPN(135); // rst
             }
             break;
         case 's':
             switch (s[1]) {
-            case 'c': CMP(138); // scm
-            case 'e': CMP(140); // sed
+            case 'c': CMPN(138); // scm
+            case 'e': CMPN(140); // sed
             case 'l':
                 switch (s[2]) {
                 case 'd': return SCHEME;
                 case 's': return SCHEME;
                 }
                 break;
-            case 'q': CMP(147); // sql
-            case 't': CMP(149); // sty
-            case 'v': CMP(150); // svg
+            case 'q': CMPN(147); // sql
+            case 't': CMPN(149); // sty
+            case 'v': CMPN(150); // svg
             }
             break;
         case 't':
             switch (s[1]) {
-            case 'c': CMP(152); // tcl
-            case 'e': CMP(153); // tex
-            case 's': CMP(160); // tsx
+            case 'c': CMPN(152); // tcl
+            case 'e': CMPN(153); // tex
+            case 's': CMPN(160); // tsx
             }
             break;
         case 'v':
             switch (s[1]) {
-            case 'c': CMP(166); // vcf
-            case 'e': CMP(167); // ver
-            case 'h': CMP(170); // vhd
-            case 'i': CMP(172); // vim
+            case 'c': CMPN(166); // vcf
+            case 'e': CMPN(167); // ver
+            case 'h': CMPN(170); // vhd
+            case 'i': CMPN(172); // vim
             }
             break;
         case 'x':
             switch (s[1]) {
-            case 'm': CMP(175); // xml
+            case 'm': CMPN(175); // xml
             case 's':
                 switch (s[2]) {
                 case 'd': return XML;
@@ -457,8 +458,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             case 'i': CMP(45); // diff
             case 'o':
                 switch (s[2]) {
-                case 'a': CMP(46); // doap
-                case 'x': CMP(50); // doxy
+                case 'a': CMPN(46); // doap
+                case 'x': CMPN(50); // doxy
                 }
                 break;
             }
@@ -482,8 +483,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'k': CMP(95); // make
-                case 'w': CMP(97); // mawk
+                case 'k': CMPN(95); // make
+                case 'w': CMPN(97); // mawk
                 }
                 break;
             case 'k': CMP(101); // mkdn
@@ -495,8 +496,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'g': CMP(110); // page
-                case 't': CMP(112); // path
+                case 'g': CMPN(110); // page
+                case 't': CMPN(112); // path
                 }
                 break;
             case 'e': CMP(114); // perl
@@ -528,8 +529,8 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'l': CMP(163); // vala
-                case 'p': CMP(164); // vapi
+                case 'l': CMPN(163); // vala
+                case 'p': CMPN(164); // vapi
                 }
                 break;
             case 'e': CMP(168); // vert
@@ -637,9 +638,12 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
     }
     return 0;
 compare:
-    key = filetype_from_extension_table[idx].key;
-    val = filetype_from_extension_table[idx].val;
-    return memcmp(s, key, len) ? 0 : val;
+    return (memcmp(s, KEY, len) == 0) ? VAL : 0;
+compare_last_char:
+    return (s[len - 1] == KEY[len - 1]) ? VAL : 0;
 }
 
 #undef CMP
+#undef CMPN
+#undef KEY
+#undef VAL

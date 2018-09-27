@@ -51,20 +51,21 @@ static const struct {
 };
 
 #define CMP(i) idx = i; goto compare
+#define CMPN(i) idx = i; goto compare_last_char
+#define KEY filetype_from_interpreter_table[idx].key
+#define VAL filetype_from_interpreter_table[idx].val
 
 static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
 {
     size_t idx;
-    const char *key;
-    FileTypeEnum val;
     switch (len) {
     case 2: CMP(41); // sh
     case 3:
         switch (s[0]) {
         case 'a':
             switch (s[1]) {
-            case 's': CMP(0); // ash
-            case 'w': CMP(1); // awk
+            case 's': CMPN(0); // ash
+            case 'w': CMPN(1); // awk
             }
             break;
         case 'c': CMP(4); // ccl
@@ -92,8 +93,8 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
             switch (s[1]) {
             case 'a':
                 switch (s[2]) {
-                case 'k': CMP(23); // make
-                case 'w': CMP(24); // mawk
+                case 'k': CMPN(23); // make
+                case 'w': CMPN(24); // mawk
                 }
                 break;
             case 'k': CMP(25); // mksh
@@ -163,9 +164,12 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
     }
     return 0;
 compare:
-    key = filetype_from_interpreter_table[idx].key;
-    val = filetype_from_interpreter_table[idx].val;
-    return memcmp(s, key, len) ? 0 : val;
+    return (memcmp(s, KEY, len) == 0) ? VAL : 0;
+compare_last_char:
+    return (s[len - 1] == KEY[len - 1]) ? VAL : 0;
 }
 
 #undef CMP
+#undef CMPN
+#undef KEY
+#undef VAL

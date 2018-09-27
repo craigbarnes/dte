@@ -16,12 +16,13 @@ static const struct {
 };
 
 #define CMP(i) idx = i; goto compare
+#define CMPN(i) idx = i; goto compare_last_char
+#define KEY is_ignored_extension_table[idx].key
+#define VAL is_ignored_extension_table[idx].val
 
 static bool is_ignored_extension(const char *s, size_t len)
 {
     size_t idx;
-    const char *key;
-    bool val;
     switch (len) {
     case 3:
         switch (s[0]) {
@@ -53,9 +54,12 @@ static bool is_ignored_extension(const char *s, size_t len)
     }
     return false;
 compare:
-    key = is_ignored_extension_table[idx].key;
-    val = is_ignored_extension_table[idx].val;
-    return memcmp(s, key, len) ? false : val;
+    return (memcmp(s, KEY, len) == 0) ? VAL : false;
+compare_last_char:
+    return (s[len - 1] == KEY[len - 1]) ? VAL : false;
 }
 
 #undef CMP
+#undef CMPN
+#undef KEY
+#undef VAL
