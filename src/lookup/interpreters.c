@@ -1,7 +1,7 @@
-static const struct {
-    const char key[16];
-    const FileTypeEnum val;
-} filetype_from_interpreter_table[46] = {
+static const struct FileInterpreterMap {
+    const char key[8];
+    const FileTypeEnum filetype;
+} interpreters[] = {
     {"ash", SHELL},
     {"awk", AWK},
     {"bash", SHELL},
@@ -31,7 +31,6 @@ static const struct {
     {"moon", MOONSCRIPT},
     {"nawk", AWK},
     {"node", JAVASCRIPT},
-    {"openrc-run", SHELL},
     {"pdksh", SHELL},
     {"perl", PERL},
     {"php", PHP},
@@ -40,7 +39,6 @@ static const struct {
     {"racket", SCHEME},
     {"rake", RUBY},
     {"ruby", RUBY},
-    {"runhaskell", HASKELL},
     {"sbcl", COMMONLISP},
     {"sed", SED},
     {"sh", SHELL},
@@ -50,126 +48,37 @@ static const struct {
     {"zsh", SHELL},
 };
 
-#define CMP(i) idx = i; goto compare
-#define CMPN(i) idx = i; goto compare_last_char
-#define KEY filetype_from_interpreter_table[idx].key
-#define VAL filetype_from_interpreter_table[idx].val
+static int interpreter_cmp(const void *key, const void *elem)
+{
+    const StringView *sv = key;
+    const char *ext = elem; // Cast to first member of struct
+    return memcmp(sv->data, ext, sv->length);
+}
 
 static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
 {
-    size_t idx;
     switch (len) {
-    case 2: CMP(41); // sh
-    case 3:
-        switch (s[0]) {
-        case 'a':
-            switch (s[1]) {
-            case 's': CMPN(0); // ash
-            case 'w': CMPN(1); // awk
-            }
-            break;
-        case 'c': CMP(4); // ccl
-        case 'e': CMP(10); // ecl
-        case 'k': CMP(18); // ksh
-        case 'l': CMP(20); // lua
-        case 'p': CMP(32); // php
-        case 's': CMP(40); // sed
-        case 't': CMP(42); // tcc
-        case 'z': CMP(45); // zsh
-        }
-        break;
-    case 4:
-        switch (s[0]) {
-        case 'b': CMP(2); // bash
-        case 'd': CMP(9); // dash
-        case 'g':
-            switch (s[1]) {
-            case 'a': CMP(11); // gawk
-            case 's': CMP(15); // gsed
-            }
-            break;
-        case 'l': CMP(19); // lisp
-        case 'm':
-            switch (s[1]) {
-            case 'a':
-                switch (s[2]) {
-                case 'k': CMPN(23); // make
-                case 'w': CMPN(24); // mawk
-                }
-                break;
-            case 'k': CMP(25); // mksh
-            case 'o': CMP(26); // moon
-            }
-            break;
-        case 'n':
-            switch (s[1]) {
-            case 'a': CMP(27); // nawk
-            case 'o': CMP(28); // node
-            }
-            break;
-        case 'p': CMP(31); // perl
-        case 'r':
-            switch (s[1]) {
-            case '6': CMP(34); // r6rs
-            case 'a': CMP(36); // rake
-            case 'u': CMP(37); // ruby
-            }
-            break;
-        case 's': CMP(39); // sbcl
-        case 'w': CMP(44); // wish
-        }
-        break;
-    case 5:
-        switch (s[0]) {
-        case 'c': CMP(6); // clisp
-        case 'g':
-            switch (s[1]) {
-            case 'm': CMP(12); // gmake
-            case 'u': CMP(16); // guile
-            }
-            break;
-        case 'j': CMP(17); // jruby
-        case 'p': CMP(30); // pdksh
-        case 't': CMP(43); // tclsh
-        }
-        break;
-    case 6:
-        switch (s[0]) {
-        case 'b': CMP(3); // bigloo
-        case 'c': CMP(7); // coffee
-        case 'g': CMP(14); // groovy
-        case 'l': CMP(21); // luajit
-        case 'p': CMP(33); // python
-        case 'r': CMP(35); // racket
-        }
-        break;
-    case 7:
-        switch (s[0]) {
-        case 'c':
-            switch (s[1]) {
-            case 'h': CMP(5); // chicken
-            case 'r': CMP(8); // crystal
-            }
-            break;
-        case 'g': CMP(13); // gnuplot
-        case 'm': CMP(22); // macruby
-        }
+    case 2: case 3: case 4:
+    case 5: case 6: case 7:
+    case 8:
         break;
     case 10:
         switch (s[0]) {
-        case 'o': CMP(29); // openrc-run
-        case 'r': CMP(38); // runhaskell
+        case 'o': return memcmp(s, "openrc-run", len) ? NONE : SHELL;
+        case 'r': return memcmp(s, "runhaskell", len) ? NONE : HASKELL;
         }
-        break;
+        // Fallthrough
+    default:
+        return NONE;
     }
-    return 0;
-compare:
-    return (memcmp(s, KEY, len) == 0) ? VAL : 0;
-compare_last_char:
-    return (s[len - 1] == KEY[len - 1]) ? VAL : 0;
-}
 
-#undef CMP
-#undef CMPN
-#undef KEY
-#undef VAL
+    const StringView sv = string_view(s, len);
+    const struct FileInterpreterMap *e = bsearch (
+        &sv,
+        interpreters,
+        ARRAY_COUNT(interpreters),
+        sizeof(interpreters[0]),
+        interpreter_cmp
+    );
+    return e ? e->filetype : 0;
+}

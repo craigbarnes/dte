@@ -40,4 +40,5 @@ docs/*.[15] code generated
 src/lookup/*.c generated
 src/lookup/basenames.c -generated
 src/lookup/extensions.c -generated
+src/lookup/interpreters.c -generated
 src/terminal/xterm-keys.c generated

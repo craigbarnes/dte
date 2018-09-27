@@ -147,6 +147,8 @@ static void test_find_ft_firstline(void)
         {"#!/usr/bin/tclsh", "tcl"},
         {"#!/usr/bin/wish", "tcl"},
         {"#!/usr/bin/zsh", "sh"},
+        {"#!/usr/bin/_unhaskell", NULL},
+        {"#!/usr/bin/runhaskel_", NULL},
         {"#!/usr/bin/unknown", NULL},
     };
     FOR_EACH_I(i, tests) {
