@@ -162,19 +162,6 @@ static const struct FileExtensionMap {
     {"zsh", SHELL},
 };
 
-static int extension_cmp(const void *key, const void *elem)
-{
-    const StringView *sv = key;
-    const char *ext = elem; // Cast to first member of struct
-
-    // Note: this may read zero padding bytes from the key, but it
-    // compares as expected (because zero bytes compare less than
-    // non-zero bytes) and it never reads past the end because a
-    // table member is at most 8 bytes and this function is never
-    // called for keys longer than 8 bytes.
-    return memcmp(sv->data, ext, sv->length);
-}
-
 static FileTypeEnum filetype_from_extension(const char *s, size_t len)
 {
     switch (len) {
@@ -218,7 +205,7 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         extensions,
         ARRAY_COUNT(extensions),
         sizeof(extensions[0]),
-        extension_cmp
+        ft_compare
     );
     return e ? e->filetype : 0;
 }

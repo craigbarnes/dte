@@ -37,8 +37,7 @@ config/README.md -dterc
 
 lib/** vendored
 docs/*.[15] code generated
-src/lookup/*.c generated
-src/lookup/basenames.c -generated
-src/lookup/extensions.c -generated
-src/lookup/interpreters.c -generated
+src/lookup/ignored-exts.lua generated
+src/lookup/pathnames.lua generated
+src/lookup/wcwidth.lua generated
 src/terminal/xterm-keys.c generated

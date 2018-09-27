@@ -197,6 +197,13 @@ UNITTEST {
     }
 }
 
+static int ft_compare(const void *key, const void *elem)
+{
+    const StringView *sv = key;
+    const char *ext = elem; // Cast to first member of struct
+    return memcmp(sv->data, ext, sv->length);
+}
+
 #include "lookup/basenames.c"
 #include "lookup/pathnames.c"
 #include "lookup/extensions.c"

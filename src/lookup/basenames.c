@@ -77,13 +77,6 @@ static const struct FileBasenameMap {
     {"zshrc", SHELL},
 };
 
-static int basename_cmp(const void *key, const void *elem)
-{
-    const StringView *sv = key;
-    const char *ext = elem; // Cast to first member of struct
-    return memcmp(sv->data, ext, sv->length);
-}
-
 static FileTypeEnum filetype_from_basename(const char *s, size_t len)
 {
     switch (len) {
@@ -103,7 +96,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         basenames,
         ARRAY_COUNT(basenames),
         sizeof(basenames[0]),
-        basename_cmp
+        ft_compare
     );
     return e ? e->filetype : 0;
 }
