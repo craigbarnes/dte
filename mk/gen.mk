@@ -4,7 +4,7 @@ LUA_DEP = $(filter build/lua/lua, $(LUA))
 UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
 
 LPERF_TARGETS = $(addprefix gen-lookup-, \
-    basenames ignored-exts interpreters pathnames )
+    ignored-exts interpreters pathnames )
 
 gen: $(LPERF_TARGETS) gen-xterm-keys
 
