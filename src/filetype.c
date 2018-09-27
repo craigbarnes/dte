@@ -244,34 +244,47 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
     ptr_array_add(&filetypes, ft);
 }
 
+static void *memrchr_(const void *m, int c, size_t n)
+{
+    const unsigned char *s = m;
+    c = (int)(unsigned char)c;
+    while (n--) {
+        if (s[n] == c) {
+            return (void*)(s + n);
+        }
+    }
+    return NULL;
+}
+
 // file.c.old~ -> c
 // file..old   -> old
 // file.old    -> old
-static inline StringView get_ext(const char *const filename)
+static inline StringView get_ext(const StringView filename)
 {
-    StringView strview = STRING_VIEW_INIT;
-    const char *ext = strrchr(filename, '.');
-    if (!ext) {
-        return strview;
+    StringView ext = STRING_VIEW_INIT;
+    ext.data = memrchr_(filename.data, '.', filename.length);
+    if (ext.data == NULL) {
+        return ext;
     }
 
-    ext++;
-    size_t ext_len = strlen(ext);
-    if (ext_len && ext[ext_len - 1] == '~') {
-        ext_len--;
+    ext.data++;
+    ext.length = filename.length - (ext.data - filename.data);
+
+    if (ext.length && ext.data[ext.length - 1] == '~') {
+        ext.length--;
     }
-    if (!ext_len) {
-        return strview;
+    if (ext.length == 0) {
+        return ext;
     }
 
-    if (is_ignored_extension(ext, ext_len)) {
+    if (is_ignored_extension(ext.data, ext.length)) {
         int idx = -2;
-        while (ext + idx >= filename) {
-            if (ext[idx] == '.') {
+        while (ext.data + idx >= filename.data) {
+            if (ext.data[idx] == '.') {
                 int len = -idx - 2;
                 if (len) {
-                    ext -= len + 1;
-                    ext_len = len;
+                    ext.data -= len + 1;
+                    ext.length = len;
                 }
                 break;
             }
@@ -279,9 +292,7 @@ static inline StringView get_ext(const char *const filename)
         }
     }
 
-    strview.data = ext;
-    strview.length = ext_len;
-    return strview;
+    return ext;
 }
 
 // Parse hashbang and return interpreter name, without version number.
@@ -317,8 +328,8 @@ HOT const char *find_ft(const char *filename, StringView line)
     StringView base = STRING_VIEW_INIT;
     if (filename) {
         const char *b = path_basename(filename);
-        ext = get_ext(b);
         base = string_view(b, strlen(b));
+        ext = get_ext(base);
         path = string_view(filename, strlen(filename));
     }
 
