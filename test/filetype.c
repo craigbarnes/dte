@@ -20,7 +20,6 @@ static void test_find_ft_filename(void)
         {"file.rb", "ruby"},
         {"/etc/hosts", "config"},
         {"/etc/fstab", "config"},
-        {"/var/fstab", NULL},
         {"/boot/grub/menu.lst", "config"},
         {"/etc/krb5.conf", "ini"},
         {"/etc/ld.so.conf", "config"},

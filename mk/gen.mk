@@ -3,8 +3,7 @@ LPERF = $(LUA) mk/lperf.lua
 LUA_DEP = $(filter build/lua/lua, $(LUA))
 UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
 
-LPERF_TARGETS = $(addprefix gen-lookup-, \
-    ignored-exts pathnames )
+LPERF_TARGETS = $(addprefix gen-lookup-, ignored-exts)
 
 gen: $(LPERF_TARGETS) gen-xterm-keys
 

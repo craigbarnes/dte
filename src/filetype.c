@@ -205,7 +205,6 @@ static int ft_compare(const void *key, const void *elem)
 }
 
 #include "lookup/basenames.c"
-#include "lookup/pathnames.c"
 #include "lookup/extensions.c"
 #include "lookup/interpreters.c"
 #include "lookup/ignored-exts.c"
@@ -395,13 +394,6 @@ HOT const char *find_ft(const char *filename, StringView line)
     // Search built-in hash tables
     if (interpreter.length) {
         FileTypeEnum ft = filetype_from_interpreter(interpreter.data, interpreter.length);
-        if (ft) {
-            return builtin_filetype_names[ft];
-        }
-    }
-
-    if (path.length) {
-        FileTypeEnum ft = filetype_from_pathname(path.data, path.length);
         if (ft) {
             return builtin_filetype_names[ft];
         }
