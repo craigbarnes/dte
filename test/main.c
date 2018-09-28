@@ -28,7 +28,7 @@ static void test_relative_filename(void)
     FOR_EACH_I(i, tests) {
         const struct rel_test *t = &tests[i];
         char *result = relative_filename(t->path, t->cwd);
-        EXPECT_STREQ(t->result, result);
+        IEXPECT_STREQ(t->result, result);
         free(result);
     }
 }
@@ -51,7 +51,7 @@ static void test_detect_encoding_from_bom(void)
     FOR_EACH_I(i, tests) {
         const struct bom_test *t = &tests[i];
         const char *result = detect_encoding_from_bom(t->text, t->size);
-        EXPECT_STREQ(result, t->encoding);
+        IEXPECT_STREQ(result, t->encoding);
     }
 }
 

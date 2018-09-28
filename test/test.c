@@ -41,3 +41,31 @@ void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
         );
     }
 }
+
+void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2)
+{
+    if (unlikely(!xstreq(s1, s2))) {
+        fail (
+            file,
+            line,
+            "Test #%zu: strings not equal: '%s', '%s'",
+            i + 1,
+            s1 ? s1 : "(null)",
+            s2 ? s2 : "(null)"
+        );
+    }
+}
+
+void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b)
+{
+    if (unlikely(a != b)) {
+        fail (
+            file,
+            line,
+            "Test #%zu: values not equal: %" PRIdMAX ", %" PRIdMAX,
+            i + 1,
+            a,
+            b
+        );
+    }
+}

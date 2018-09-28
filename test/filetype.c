@@ -73,12 +73,11 @@ static void test_find_ft_filename(void)
         {"test.c.rpmnew", "c"},
         {"test.c.rpmsave", "c"},
     };
-    const size_t start_line = __LINE__ - 1 - ARRAY_COUNT(tests);
     const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {
         const struct ft_filename_test *t = &tests[i];
         const char *result = find_ft(t->filename, empty_line);
-        IEXPECT_STREQ(start_line + i, result, t->expected_filetype);
+        IEXPECT_STREQ(result, t->expected_filetype);
     }
 }
 
@@ -153,7 +152,7 @@ static void test_find_ft_firstline(void)
     FOR_EACH_I(i, tests) {
         const struct ft_firstline_test *t = &tests[i];
         const char *result = find_ft(NULL, string_view(t->line, strlen(t->line)));
-        EXPECT_STREQ(result, t->expected_filetype);
+        IEXPECT_STREQ(result, t->expected_filetype);
     }
 }
 

@@ -94,19 +94,19 @@ static void test_xterm_parse_key(void)
         KeyCode key = 0x18;
         ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
         ssize_t expected_length = tests[i].expected_length;
-        EXPECT_EQ(parsed_length, expected_length);
+        IEXPECT_EQ(parsed_length, expected_length);
         if (parsed_length <= 0) {
             // If nothing was parsed, key should be unmodified
-            EXPECT_EQ(key, 0x18);
+            IEXPECT_EQ(key, 0x18);
             continue;
         }
-        EXPECT_EQ(key, tests[i].expected_key);
+        IEXPECT_EQ(key, tests[i].expected_key);
         // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
             parsed_length = xterm_parse_key(seq, n, &key);
-            EXPECT_EQ(parsed_length, -1);
-            EXPECT_EQ(key, 0x18);
+            IEXPECT_EQ(parsed_length, -1);
+            IEXPECT_EQ(key, 0x18);
         }
     }
 }
@@ -222,7 +222,7 @@ static void test_key_to_string(void)
     };
     FOR_EACH_I(i, tests) {
         char *str = key_to_string(tests[i].key);
-        EXPECT_STREQ(str, tests[i].str);
+        IEXPECT_STREQ(str, tests[i].str);
         free(str);
     }
 }
