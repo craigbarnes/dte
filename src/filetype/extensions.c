@@ -207,5 +207,5 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         sizeof(extensions[0]),
         ft_compare
     );
-    return e ? e->filetype : 0;
+    return e ? e->filetype : NONE;
 }
