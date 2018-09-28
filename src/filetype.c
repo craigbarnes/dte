@@ -452,7 +452,7 @@ HOT const char *find_ft(const char *filename, StringView line)
         return builtin_filetype_names[NGINX];
     }
 
-    static const StringView conf = STRING_VIEW("conf");
+    const StringView conf = STRING_VIEW("conf");
     if (string_view_equal(&ext, &conf)) {
         if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
