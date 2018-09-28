@@ -204,10 +204,10 @@ static int ft_compare(const void *key, const void *elem)
     return memcmp(sv->data, ext, sv->length);
 }
 
-#include "lookup/basenames.c"
-#include "lookup/extensions.c"
-#include "lookup/interpreters.c"
-#include "lookup/ignored-exts.c"
+#include "filetype/basenames.c"
+#include "filetype/extensions.c"
+#include "filetype/interpreters.c"
+#include "filetype/ignored-exts.c"
 
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.

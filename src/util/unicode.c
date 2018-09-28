@@ -6,7 +6,7 @@ typedef struct {
     CodePoint first, last;
 } CodepointRange;
 
-#include "../lookup/wcwidth.c"
+#include "wcwidth.c"
 
 // All these are indistinguishable from ASCII space on terminal.
 static const CodepointRange evil_space[] = {

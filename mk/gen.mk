@@ -9,8 +9,8 @@ gen-xterm-keys: $(LUA_DEP)
 	$(Q) $(LUA) src/terminal/xterm-keys.lua > src/terminal/xterm-keys.c
 
 gen-wcwidth: $(UCD_FILES) $(LUA_DEP)
-	$(E) GEN src/lookup/wcwidth.c
-	$(Q) $(LUA) src/lookup/wcwidth.lua $(UCD_FILES) > src/lookup/wcwidth.c
+	$(E) GEN src/util/wcwidth.c
+	$(Q) $(LUA) src/util/wcwidth.lua $(UCD_FILES) > src/util/wcwidth.c
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@
