@@ -215,13 +215,13 @@ typedef struct {
     char *name;
     char *str;
     enum detect_type type;
-} FileType;
+} UserFileTypeEntry;
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
 
 void add_filetype(const char *name, const char *str, enum detect_type type)
 {
-    FileType *ft;
+    UserFileTypeEntry *ft;
     regex_t re;
 
     switch (type) {
@@ -236,7 +236,7 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
         break;
     }
 
-    ft = xnew(FileType, 1);
+    ft = xnew(UserFileTypeEntry, 1);
     ft->name = xstrdup(name);
     ft->str = xstrdup(str);
     ft->type = type;
@@ -351,7 +351,7 @@ HOT const char *find_ft(const char *filename, StringView line)
 
     // Search user `ft` entries
     for (size_t i = 0; i < filetypes.count; i++) {
-        const FileType *ft = filetypes.ptrs[i];
+        const UserFileTypeEntry *ft = filetypes.ptrs[i];
         switch (ft->type) {
         case FT_EXTENSION:
             if (!ext.length || !string_view_equal_cstr(&ext, ft->str)) {
@@ -462,7 +462,7 @@ bool is_ft(const char *name)
         return false;
     }
     for (size_t i = 0; i < filetypes.count; i++) {
-        const FileType *ft = filetypes.ptrs[i];
+        const UserFileTypeEntry *ft = filetypes.ptrs[i];
         if (streq(ft->name, name)) {
             return true;
         }
