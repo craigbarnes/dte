@@ -38,4 +38,3 @@ config/README.md -dterc
 lib/** vendored
 docs/*.[15] code generated
 src/util/wcwidth.lua generated
-src/terminal/xterm-keys.c generated
