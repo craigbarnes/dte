@@ -18,6 +18,8 @@ static void test_xterm_parse_key(void)
         {"\033[1;2F", 6, MOD_SHIFT | KEY_END},
         {"\033[1;2H", 6, MOD_SHIFT | KEY_HOME},
         {"\033[1;8H", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
+        {"\033[1;8H~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
+        {"\033[1;8H~_", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
         {"\033", -1, 0},
         {"\033[", -1, 0},
         {"\033]", 0, 0},
@@ -85,21 +87,23 @@ static void test_xterm_parse_key(void)
         {"\033[[D", 4, KEY_F4},
         {"\033[[E", 4, KEY_F5},
     };
-    const size_t start_line = __LINE__ - 1 - ARRAY_COUNT(tests);
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
         const size_t seq_length = strlen(seq);
         BUG_ON(seq_length == 0);
-        KeyCode key;
+        KeyCode key = 0x18;
         ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
-        IEXPECT_EQ(start_line + i, parsed_length, tests[i].expected_length);
-        if (parsed_length > 0) {
-            IEXPECT_EQ(start_line + i, key, tests[i].expected_key);
+        ssize_t expected_length = tests[i].expected_length;
+        EXPECT_EQ(parsed_length, expected_length);
+        if (parsed_length <= 0) {
+            // If nothing was parsed, key should be unmodified
+            EXPECT_EQ(key, 0x18);
+            continue;
         }
-        // Ensure that parsing any truncated sequence returns -1 and
-        // doesn't set the out param:
+        EXPECT_EQ(key, tests[i].expected_key);
+        // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
-        for (size_t n = seq_length - 1; n != 0; n--) {
+        for (size_t n = expected_length - 1; n != 0; n--) {
             parsed_length = xterm_parse_key(seq, n, &key);
             EXPECT_EQ(parsed_length, -1);
             EXPECT_EQ(key, 0x18);
@@ -161,6 +165,19 @@ static void test_xterm_parse_key_combo(void)
             size_t seq_length = strlen(seq);
             KeyCode key;
             ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+            EXPECT_EQ(parsed_length, seq_length);
+            EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
+            // Truncated
+            key = 0x18;
+            for (size_t n = seq_length - 1; n != 0; n--) {
+                parsed_length = xterm_parse_key(seq, n, &key);
+                EXPECT_EQ(parsed_length, -1);
+                EXPECT_EQ(key, 0x18);
+            }
+            // Overlength
+            key = 0x18;
+            seq[seq_length] = '~';
+            parsed_length = xterm_parse_key(seq, seq_length + 1, &key);
             EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
         }
