@@ -1,31 +1,9 @@
-static const struct FileBasenameMap {
+typedef struct {
     const char key[16];
     const FileTypeEnum filetype;
-} basenames[] = {
-    {".bash_logout", SHELL},
-    {".bash_profile", SHELL},
-    {".bashrc", SHELL},
-    {".clang-format", YAML},
-    {".cshrc", SHELL},
-    {".drirc", XML},
-    {".editorconfig", INI},
-    {".emacs", EMACSLISP},
-    {".gemrc", YAML},
-    {".gitattributes", CONFIG},
-    {".gitconfig", INI},
-    {".gitmodules", INI},
-    {".gnus", EMACSLISP},
-    {".indent.pro", INDENT},
-    {".inputrc", INPUTRC},
-    {".jshintrc", JSON},
-    {".luacheckrc", LUA},
-    {".luacov", LUA},
-    {".profile", SHELL},
-    {".zlogin", SHELL},
-    {".zlogout", SHELL},
-    {".zprofile", SHELL},
-    {".zshenv", SHELL},
-    {".zshrc", SHELL},
+} FileBasenameMap;
+
+static const FileBasenameMap basenames[] = {
     {"APKBUILD", SHELL},
     {"BSDmakefile", MAKE},
     {"BUILD.bazel", PYTHON},
@@ -46,17 +24,9 @@ static const struct FileBasenameMap {
     {"Project.ede", EMACSLISP},
     {"Rakefile", RUBY},
     {"Vagrantfile", RUBY},
-    {"bash_logout", SHELL},
-    {"bash_profile", SHELL},
-    {"bashrc", SHELL},
     {"config.ld", LUA},
     {"configure.ac", M4},
-    {"cshrc", SHELL},
-    {"drirc", XML},
     {"git-rebase-todo", GITREBASE},
-    {"gitattributes", CONFIG},
-    {"gitconfig", INI},
-    {"inputrc", INPUTRC},
     {"krb5.conf", INI},
     {"makefile", MAKE},
     {"meson.build", MESON},
@@ -64,12 +34,34 @@ static const struct FileBasenameMap {
     {"mkinitcpio.conf", SHELL},
     {"nginx.conf", NGINX},
     {"pacman.conf", INI},
-    {"profile", SHELL},
     {"robots.txt", ROBOTSTXT},
     {"rockspec.in", LUA},
     {"terminalrc", INI},
     {"texmf.cnf", TEXMFCNF},
     {"yum.conf", INI},
+};
+
+// These are matched with or without a leading dot
+static const FileBasenameMap dotfiles[] = {
+    {"bash_logout", SHELL},
+    {"bash_profile", SHELL},
+    {"bashrc", SHELL},
+    {"clang-format", YAML},
+    {"cshrc", SHELL},
+    {"drirc", XML},
+    {"editorconfig", INI},
+    {"emacs", EMACSLISP},
+    {"gemrc", YAML},
+    {"gitattributes", CONFIG},
+    {"gitconfig", INI},
+    {"gitmodules", INI},
+    {"gnus", EMACSLISP},
+    {"indent.pro", INDENT},
+    {"inputrc", INPUTRC},
+    {"jshintrc", JSON},
+    {"luacheckrc", LUA},
+    {"luacov", LUA},
+    {"profile", SHELL},
     {"zlogin", SHELL},
     {"zlogout", SHELL},
     {"zprofile", SHELL},
@@ -90,13 +82,28 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return NONE;
     }
 
-    const StringView sv = string_view(s, len);
-    const struct FileBasenameMap *e = bsearch (
+    StringView sv = string_view(s, len);
+    const FileBasenameMap *e = bsearch (
         &sv,
         basenames,
         ARRAY_COUNT(basenames),
         sizeof(basenames[0]),
         ft_compare
     );
-    return e ? e->filetype : 0;
+    if (e) {
+        return e->filetype;
+    }
+
+    if (s[0] == '.') {
+        sv.data++;
+        sv.length--;
+    }
+    e = bsearch (
+        &sv,
+        dotfiles,
+        ARRAY_COUNT(dotfiles),
+        sizeof(dotfiles[0]),
+        ft_compare
+    );
+    return e ? e->filetype : NONE;
 }
