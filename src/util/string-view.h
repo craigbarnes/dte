@@ -20,7 +20,7 @@ typedef struct {
     .length = 0 \
 }
 
-#define STRING_VIEW(s) { \
+#define STRING_VIEW(s) (StringView) { \
     .data = s, \
     .length = STRLEN(s) \
 }

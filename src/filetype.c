@@ -256,9 +256,6 @@ static void *memrchr_(const void *m, int c, size_t n)
     return NULL;
 }
 
-// file.c.old~ -> c
-// file..old   -> old
-// file.old    -> old
 static inline StringView get_ext(const StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;
@@ -293,6 +290,21 @@ static inline StringView get_ext(const StringView filename)
     }
 
     return ext;
+}
+
+UNITTEST {
+    StringView sv = get_ext(STRING_VIEW("file.c.old~"));
+    DEBUG_VAR(sv);
+    BUG_ON(!string_view_equal_cstr(&sv, "c"));
+    sv = get_ext(STRING_VIEW("file..old"));
+    BUG_ON(!string_view_equal_cstr(&sv, "old"));
+    sv = get_ext(STRING_VIEW("file.old"));
+    BUG_ON(!string_view_equal_cstr(&sv, "old"));
+    sv = get_ext(STRING_VIEW("a.c~"));
+    BUG_ON(!string_view_equal_cstr(&sv, "c"));
+    // TODO:
+    // sv = get_ext(STRING_VIEW(".c~"));
+    // BUG_ON(!string_view_equal_cstr(&sv, ""));
 }
 
 // Parse hashbang and return interpreter name, without version number.
