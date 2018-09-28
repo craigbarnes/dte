@@ -9,12 +9,12 @@
 #include "../src/window.h"
 #include "../build/test/data.h"
 
-static const StringView extra_rc = STRING_VIEW (
+static const char extra_rc[] =
     "set lock-files false\n"
     // Regression test for unquoted variables in rc files
     "bind M-p \"insert \"$WORD\n"
     "bind M-p \"insert \"$FILE\n"
-);
+;
 
 static void no_op(void) {}
 
@@ -35,7 +35,7 @@ void init_headless_mode(void)
     window = new_window();
     root_frame = new_root_frame(window);
 
-    exec_config(commands, extra_rc.data, extra_rc.length);
+    exec_config(commands, extra_rc, sizeof(extra_rc) - 1);
 
     set_view(window_open_empty_buffer(window));
 }
