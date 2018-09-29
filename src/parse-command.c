@@ -59,30 +59,17 @@ static void parse_dq(const char *cmd, size_t *posp)
         if (ch == '\\' && cmd[pos]) {
             ch = cmd[pos++];
             switch (ch) {
+            case 'a': ch = '\a'; goto add_byte;
+            case 'b': ch = '\b'; goto add_byte;
+            case 'f': ch = '\f'; goto add_byte;
+            case 'n': ch = '\n'; goto add_byte;
+            case 'r': ch = '\r'; goto add_byte;
+            case 't': ch = '\t'; goto add_byte;
+            case 'v': ch = '\v'; goto add_byte;
             case '\\':
             case '"':
+            add_byte:
                 string_add_byte(&arg, ch);
-                break;
-            case 'a':
-                string_add_ch(&arg, '\a');
-                break;
-            case 'b':
-                string_add_ch(&arg, '\b');
-                break;
-            case 'f':
-                string_add_ch(&arg, '\f');
-                break;
-            case 'n':
-                string_add_ch(&arg, '\n');
-                break;
-            case 'r':
-                string_add_ch(&arg, '\r');
-                break;
-            case 't':
-                string_add_ch(&arg, '\t');
-                break;
-            case 'v':
-                string_add_ch(&arg, '\v');
                 break;
             case 'x':
                 if (cmd[pos]) {
@@ -104,7 +91,7 @@ static void parse_dq(const char *cmd, size_t *posp)
                 pos += unicode_escape(cmd + pos, 8);
                 break;
             default:
-                string_add_ch(&arg, '\\');
+                string_add_byte(&arg, '\\');
                 string_add_byte(&arg, ch);
                 break;
             }
