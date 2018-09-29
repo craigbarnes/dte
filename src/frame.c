@@ -498,7 +498,6 @@ void remove_frame(Frame *f)
 }
 
 #ifdef DEBUG_FRAMES
-
 static void debug_frame(Frame *f, int level)
 {
     d_print (
@@ -536,9 +535,4 @@ void debug_frames(void)
 {
     debug_frame(root_frame, 0);
 }
-
-#else
-
-void debug_frames(void) {}
-
 #endif

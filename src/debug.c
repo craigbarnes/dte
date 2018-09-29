@@ -24,13 +24,9 @@ void term_cleanup(void)
     }
 }
 
-NORETURN void bug (
-    const char *file,
-    int line,
-    const char *func,
-    const char *fmt,
-    ...
-) {
+#if DEBUG >= 1
+NORETURN
+void bug(const char *file, int line, const char *func, const char *fmt, ...) {
     term_cleanup();
 
     fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
@@ -44,7 +40,9 @@ NORETURN void bug (
 
     abort(); // For core dump
 }
+#endif
 
+#ifdef DEBUG_PRINT
 void debug_print(const char *function, const char *fmt, ...)
 {
     static int fd = -1;
@@ -74,3 +72,4 @@ void debug_print(const char *function, const char *fmt, ...)
 
     xwrite(fd, buf, len1 + len2);
 }
+#endif
