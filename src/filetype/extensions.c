@@ -103,6 +103,7 @@ static const struct FileExtensionMap {
     {"pm", PERL},
     {"po", GETTEXT},
     {"pot", GETTEXT},
+    {"pp", RUBY},
     {"proto", PROTOBUF},
     {"ps", POSTSCRIPT},
     {"py", PYTHON},

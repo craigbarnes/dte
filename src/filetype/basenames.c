@@ -24,6 +24,7 @@ static const FileBasenameMap basenames[] = {
     {"Project.ede", EMACSLISP},
     {"Rakefile", RUBY},
     {"Vagrantfile", RUBY},
+    {"build.gradle", GRADLE},
     {"config.ld", LUA},
     {"configure.ac", M4},
     {"fstab", CONFIG},
