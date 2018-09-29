@@ -63,6 +63,7 @@ static const FileBasenameMap dotfiles[] = {
     {"indent.pro", INDENT},
     {"inputrc", CONFIG},
     {"jshintrc", JSON},
+    {"lcovrc", CONFIG},
     {"luacheckrc", LUA},
     {"luacov", LUA},
     {"profile", SHELL},
