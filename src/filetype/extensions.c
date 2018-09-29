@@ -91,7 +91,7 @@ static const struct FileExtensionMap {
     {"nim", NIM},
     {"ninja", NINJA},
     {"nix", NIX},
-    {"page", MALLARD},
+    {"page", XML},
     {"patch", DIFF},
     {"path", INI},
     {"pc", PKGCONFIG},
