@@ -37,7 +37,7 @@ static const struct FileExtensionMap {
     {"docbook", XML},
     {"docker", DOCKER},
     {"dot", DOT},
-    {"doxy", DOXYGEN},
+    {"doxy", CONFIG},
     {"dterc", DTERC},
     {"dtx", TEX},
     {"ebuild", SHELL},
