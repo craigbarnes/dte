@@ -56,25 +56,28 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
-    if (mods == 0) {
+    KeyCode tmp = mod_enum_to_mod_mask(buf[i++]);
+    if (tmp == 0) {
         return 0;
     } else if (i >= length) {
         return -1;
     }
     switch(buf[i++]) {
-    case 'A': *k = mods | KEY_UP; return i;
-    case 'B': *k = mods | KEY_DOWN; return i;
-    case 'C': *k = mods | KEY_RIGHT; return i;
-    case 'D': *k = mods | KEY_LEFT; return i;
-    case 'F': *k = mods | KEY_END; return i;
-    case 'H': *k = mods | KEY_HOME; return i;
-    case 'P': *k = mods | KEY_F1; return i;
-    case 'Q': *k = mods | KEY_F2; return i;
-    case 'R': *k = mods | KEY_F3; return i;
-    case 'S': *k = mods | KEY_F4; return i;
+    case 'A': tmp |= KEY_UP; goto match;
+    case 'B': tmp |= KEY_DOWN; goto match;
+    case 'C': tmp |= KEY_RIGHT; goto match;
+    case 'D': tmp |= KEY_LEFT; goto match;
+    case 'F': tmp |= KEY_END; goto match;
+    case 'H': tmp |= KEY_HOME; goto match;
+    case 'P': tmp |= KEY_F1; goto match;
+    case 'Q': tmp |= KEY_F2; goto match;
+    case 'R': tmp |= KEY_F3; goto match;
+    case 'S': tmp |= KEY_F4; goto match;
     }
     return 0;
+match:
+    *k = tmp;
+    return i;
 }
 
 static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
