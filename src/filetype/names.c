@@ -6,12 +6,11 @@ typedef enum {
     BATCHFILE,
     BIBTEX,
     C,
+    CPLUSPLUS,
     CLOJURE,
     CMAKE,
     COFFEESCRIPT,
-    COMMONLISP,
     CONFIG,
-    CPLUSPLUS,
     CSHARP,
     CSS,
     CSV,
@@ -22,7 +21,6 @@ typedef enum {
     DOT,
     DTERC,
     EMACSLISP,
-    EMAIL,
     GETTEXT,
     GITCOMMIT,
     GITREBASE,
@@ -40,8 +38,10 @@ typedef enum {
     JAVASCRIPT,
     JSON,
     LEX,
+    LISP,
     LUA,
     M4,
+    MAIL,
     MAKE,
     MARKDOWN,
     MESON,
@@ -58,9 +58,9 @@ typedef enum {
     PROTOBUF,
     PYTHON,
     RACKET,
-    RESTRUCTUREDTEXT,
     ROBOTSTXT,
     ROFF,
+    RESTRUCTUREDTEXT,
     RUBY,
     RUST,
     SCALA,
@@ -94,12 +94,11 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [BATCHFILE] = "batch",
     [BIBTEX] = "bibtex",
     [C] = "c",
+    [CPLUSPLUS] = "c",
     [CLOJURE] = "clojure",
     [CMAKE] = "cmake",
     [COFFEESCRIPT] = "coffeescript",
-    [COMMONLISP] = "lisp",
     [CONFIG] = "config",
-    [CPLUSPLUS] = "c",
     [CSHARP] = "csharp",
     [CSS] = "css",
     [CSV] = "csv",
@@ -110,7 +109,6 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [DOT] = "dot",
     [DTERC] = "dte",
     [EMACSLISP] = "elisp",
-    [EMAIL] = "mail",
     [GETTEXT] = "gettext",
     [GITCOMMIT] = "gitcommit",
     [GITREBASE] = "gitrebase",
@@ -128,8 +126,10 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [JAVASCRIPT] = "javascript",
     [JSON] = "json",
     [LEX] = "lex",
+    [LISP] = "lisp",
     [LUA] = "lua",
     [M4] = "m4",
+    [MAIL] = "mail",
     [MAKE] = "make",
     [MARKDOWN] = "markdown",
     [MESON] = "meson",
@@ -142,7 +142,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [PERL] = "perl",
     [PHP] = "php",
     [PKGCONFIG] = "pkg-config",
-    [POSTSCRIPT] = "ps",
+    [POSTSCRIPT] = "postscript",
     [PROTOBUF] = "protobuf",
     [PYTHON] = "python",
     [RACKET] = "racket",
@@ -174,12 +174,20 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
 };
 
 UNITTEST {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
+    BUG_ON(strcmp(builtin_filetype_names[0], "none") != 0);
+    BUG_ON(strcmp(builtin_filetype_names[1], "ada") != 0);
+    for (size_t i = 2; i < ARRAY_COUNT(builtin_filetype_names); i++) {
         const char *const name = builtin_filetype_names[i];
         if (name[0] == '\0') {
             BUG("missing value at builtin_filetype_names[%zu]", i);
         }
         // Ensure fixed-size char arrays are null-terminated
         BUG_ON(memchr(name, '\0', sizeof(builtin_filetype_names[0])) == NULL);
+        // Ensure FileTypeEnum values are sorted according to their name
+        // string (to allow name -> value lookups via binary search).
+        const char *const prev = builtin_filetype_names[i - 1];
+        if (memcmp(name, prev, 16) < 0) {
+            BUG("Filetype names not in sorted order: %s, %s", prev, name);
+        }
     }
 }
