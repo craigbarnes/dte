@@ -27,7 +27,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    switch(buf[i++]) {
+    switch (buf[i++]) {
     case ' ': *k = ' '; return i;
     case 'A': *k = KEY_UP; return i;
     case 'B': *k = KEY_DOWN; return i;
@@ -62,7 +62,7 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     } else if (i >= length) {
         return -1;
     }
-    switch(buf[i++]) {
+    switch (buf[i++]) {
     case 'A': tmp |= KEY_UP; goto match;
     case 'B': tmp |= KEY_DOWN; goto match;
     case 'C': tmp |= KEY_RIGHT; goto match;
@@ -86,7 +86,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return -1;
     }
     KeyCode tmp;
-    switch(buf[i++]) {
+    switch (buf[i++]) {
     case '3': tmp = KEY_DELETE; goto check_delim;
     case '4': tmp = KEY_END; goto check_trailing_tilde;
     case '5':tmp = KEY_PAGE_UP; goto check_delim;
@@ -101,7 +101,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'Z': *k = MOD_SHIFT | '\t'; return i;
     case '1':
         if (i >= length) return -1;
-        switch(buf[i++]) {
+        switch (buf[i++]) {
         case '1': tmp = KEY_F1; goto check_trailing_tilde;
         case '2': tmp = KEY_F2; goto check_trailing_tilde;
         case '3': tmp = KEY_F3; goto check_trailing_tilde;
@@ -116,7 +116,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return 0;
     case '2':
         if (i >= length) return -1;
-        switch(buf[i++]) {
+        switch (buf[i++]) {
         case '0': tmp = KEY_F9; goto check_delim;
         case '1': tmp = KEY_F10; goto check_delim;
         case '3': tmp = KEY_F11; goto check_delim;
@@ -127,7 +127,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return 0;
     case '[':
         if (i >= length) return -1;
-        switch(buf[i++]) {
+        switch (buf[i++]) {
         // Linux console keys
         case 'A': *k = KEY_F1; return i;
         case 'B': *k = KEY_F2; return i;
@@ -140,7 +140,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     return 0;
 check_delim:
     if (i >= length) return -1;
-    switch(buf[i++]) {
+    switch (buf[i++]) {
     case ';':
         goto check_modifiers;
     case '~':
@@ -174,7 +174,7 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
     } else if (length == 1) {
         return -1;
     }
-    switch(buf[1]) {
+    switch (buf[1]) {
     case 'O': return parse_ss3(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
     }
