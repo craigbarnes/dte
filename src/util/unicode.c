@@ -8,17 +8,6 @@ typedef struct {
 
 #include "wcwidth.c"
 
-// All these are indistinguishable from ASCII space on terminal.
-static const CodepointRange evil_space[] = {
-    {0x00a0, 0x00a0}, // No-break space. Easy to type accidentally (AltGr+Space)
-    {0x00ad, 0x00ad}, // Soft hyphen. Very very soft...
-    {0x2000, 0x200a}, // Legacy spaces of varying sizes
-    {0x2028, 0x2029}, // Line and paragraph separators
-    {0x202f, 0x202f}, // Narrow No-Break Space
-    {0x205f, 0x205f}, // Mathematical space. Proven to be correct. Legacy
-    {0x2800, 0x2800}, // Braille Pattern Blank
-};
-
 // TODO: format [Cf] amd unassigned ranges
 static const CodepointRange unprintable[] = {
     {0x0080, 0x009f}, // C1 control characters
@@ -55,11 +44,6 @@ static inline PURE bool bisearch (
     return false;
 }
 
-bool u_is_upper(CodePoint u)
-{
-    return u >= 'A' && u <= 'Z';
-}
-
 bool u_is_space(CodePoint u)
 {
     switch (u) {
@@ -92,7 +76,29 @@ bool u_is_unprintable(CodePoint u)
 
 bool u_is_special_whitespace(CodePoint u)
 {
-    return bisearch(u, evil_space, ARRAY_COUNT(evil_space) - 1);
+    // These are all indistinguishable from ASCII space in a terminal
+    switch (u) {
+    case 0x00a0: // No-break space (AltGr+space)
+    case 0x00ad: // Soft hyphen
+    case 0x2000: // En quad
+    case 0x2001: // Em quad
+    case 0x2002: // En space
+    case 0x2003: // Em space
+    case 0x2004: // 3-per-em space
+    case 0x2005: // 4-per-em space
+    case 0x2006: // 6-per-em space
+    case 0x2007: // Figure space
+    case 0x2008: // Punctuation space
+    case 0x2009: // Thin space
+    case 0x200a: // Hair space
+    case 0x2028: // Line separator
+    case 0x2029: // Paragraph separator
+    case 0x202f: // Narrow no-break space
+    case 0x205f: // Medium mathematical space
+    case 0x2800: // Braille pattern blank
+        return true;
+    }
+    return false;
 }
 
 bool u_is_zero_width(CodePoint u)
@@ -136,15 +142,4 @@ unsigned int u_char_width(CodePoint u)
     }
 
     return 1;
-}
-
-CodePoint u_to_lower(CodePoint u)
-{
-    if (u < 'A') {
-        return u;
-    }
-    if (u <= 'Z') {
-        return u + 'a' - 'A';
-    }
-    return u;
 }
