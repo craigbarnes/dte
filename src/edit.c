@@ -704,7 +704,7 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     }
 
     if (pf->cur_width && pf->cur_width + 1 + word_width > pf->text_width) {
-        string_add_ch(&pf->buf, '\n');
+        string_add_byte(&pf->buf, '\n');
         pf->cur_width = 0;
     }
 
@@ -714,7 +714,7 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
         }
         pf->cur_width = pf->indent_width;
     } else {
-        string_add_ch(&pf->buf, ' ');
+        string_add_byte(&pf->buf, ' ');
         pf->cur_width++;
     }
 
@@ -836,7 +836,7 @@ void format_paragraph(int text_width)
     }
 
     if (pf.buf.len) {
-        string_add_ch(&pf.buf, '\n');
+        string_add_byte(&pf.buf, '\n');
     }
     buffer_replace_bytes(len, pf.buf.buffer, pf.buf.len);
     if (pf.buf.len) {

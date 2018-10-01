@@ -407,7 +407,7 @@ static char *escape(const char *str)
     }
 
     if (str[0] == '~' && !completion.tilde_expanded) {
-        string_add_ch(&buf, '\\');
+        string_add_byte(&buf, '\\');
     }
 
     for (size_t i = 0; str[i]; i++) {
@@ -419,7 +419,7 @@ static char *escape(const char *str)
         case '\'':
         case ';':
         case '\\':
-            string_add_ch(&buf, '\\');
+            string_add_byte(&buf, '\\');
             string_add_byte(&buf, ch);
             break;
         default:
