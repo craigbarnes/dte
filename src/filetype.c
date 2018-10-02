@@ -223,6 +223,8 @@ HOT const char *find_ft(const char *filename, StringView line)
         case '!':
             if (string_view_has_literal_prefix_icase(&line, "<!DOCTYPE HTML")) {
                 return builtin_filetype_names[HTML];
+            } else if (string_view_has_literal_prefix(&line, "<!DOCTYPE")) {
+                return builtin_filetype_names[XML];
             }
             break;
         case '?':
