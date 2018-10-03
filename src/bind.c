@@ -70,7 +70,7 @@ static bool parse_keys(KeyChain *chain, const char *str)
     return true;
 }
 
-static size_t mod_mask_enum(KeyCode k)
+static CONST_FN size_t mod_mask_enum(KeyCode k)
 {
     switch (k & MOD_MASK) {
     case 0:
@@ -90,12 +90,11 @@ static size_t mod_mask_enum(KeyCode k)
     case MOD_SHIFT | MOD_META | MOD_CTRL:
         return 7;
     default:
-        BUG("Unknown modifier combination");
+        UNREACHABLE();
     }
-    return 0;
 }
 
-static ssize_t key_lookup_index(KeyCode k)
+static CONST_FN ssize_t key_lookup_index(KeyCode k)
 {
     const KeyCode key = k & ~MOD_MASK;
 

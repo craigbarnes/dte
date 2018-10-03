@@ -205,7 +205,7 @@ static void screen_skip_char(LineInfo *info)
     }
 }
 
-static bool is_notice(const char *word, size_t len)
+static PURE bool is_notice(const char *word, size_t len)
 {
     switch (len) {
     case 3: return !memcmp(word, "XXX", 3);

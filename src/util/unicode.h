@@ -27,10 +27,10 @@ static inline CONST_FN CodePoint u_to_lower(CodePoint u)
     return u_is_upper(u) ? u + 32 : u;
 }
 
-bool u_is_space(CodePoint u) PURE;
+bool u_is_space(CodePoint u) CONST_FN;
 bool u_is_word_char(CodePoint u) PURE;
 bool u_is_unprintable(CodePoint u) PURE;
-bool u_is_special_whitespace(CodePoint u) PURE;
+bool u_is_special_whitespace(CodePoint u) CONST_FN;
 bool u_is_zero_width(CodePoint u) PURE;
 unsigned int u_char_width(CodePoint uch) PURE;
 

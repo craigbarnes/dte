@@ -9,7 +9,7 @@
 
 const Command *current_command;
 
-static bool allowed_command(const char *name)
+static PURE bool allowed_command(const char *name)
 {
     size_t len = strlen(name);
     switch (len) {
