@@ -1,5 +1,6 @@
 #include "test.h"
 #include "../src/util/ascii.h"
+#include "../src/util/string.h"
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"
 #include "../src/util/unicode.h"
@@ -46,6 +47,44 @@ static void test_ascii(void)
     EXPECT_EQ(hex_decode(' '), -1);
     EXPECT_EQ(hex_decode('\0'), -1);
     EXPECT_EQ(hex_decode('~'), -1);
+}
+
+static void test_string(void)
+{
+    String s = STRING_INIT;
+    char *cstr = string_cstring(&s);
+    EXPECT_STREQ(cstr, "");
+    free(cstr);
+
+    string_insert_ch(&s, 0, 0x1F4AF);
+    EXPECT_EQ(s.len, 4);
+    EXPECT_EQ(memcmp(s.buffer, "\xF0\x9F\x92\xAF", s.len), 0);
+
+    string_add_str(&s, "test");
+    EXPECT_EQ(s.len, 8);
+    EXPECT_EQ(memcmp(s.buffer, "\xF0\x9F\x92\xAFtest", s.len), 0);
+
+    string_remove(&s, 0, 5);
+    EXPECT_EQ(s.len, 3);
+    EXPECT_EQ(memcmp(s.buffer, "est", s.len), 0);
+
+    string_make_space(&s, 0, 1);
+    EXPECT_EQ(s.len, 4);
+    s.buffer[0] = 't';
+    EXPECT_EQ(memcmp(s.buffer, "test", s.len), 0);
+
+    string_clear(&s);
+    EXPECT_EQ(s.len, 0);
+    string_insert_ch(&s, 0, 0x0E01);
+    EXPECT_EQ(s.len, 3);
+    EXPECT_EQ(memcmp(s.buffer, "\xE0\xB8\x81", s.len), 0);
+
+    string_clear(&s);
+    string_sprintf(&s, "%d %s\n", 88, "test");
+    EXPECT_EQ(s.len, 8);
+    EXPECT_EQ(memcmp(s.buffer, "88 test\n", s.len), 0);
+
+    string_free(&s);
 }
 
 static void test_number_width(void)
@@ -138,6 +177,7 @@ static void test_u_str_width(void)
 void test_util(void)
 {
     test_ascii();
+    test_string();
     test_number_width();
     test_u_char_width();
     test_u_to_lower();
