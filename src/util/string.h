@@ -17,6 +17,10 @@ typedef struct {
     .len = 0 \
 }
 
+#define string_add_literal(s, l) ( \
+    string_add_buf(s, l, STRLEN(l)) \
+)
+
 static inline NONNULL_ARGS void string_init(String *s)
 {
     s->buffer = NULL;

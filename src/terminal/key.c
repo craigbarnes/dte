@@ -114,25 +114,26 @@ char *key_to_string(KeyCode key)
     String buf = STRING_INIT;
 
     if (key & MOD_CTRL) {
-        string_add_str(&buf, "C-");
+        string_add_literal(&buf, "C-");
     }
     if (key & MOD_META) {
-        string_add_str(&buf, "M-");
+        string_add_literal(&buf, "M-");
     }
     if (key & MOD_SHIFT) {
-        string_add_str(&buf, "S-");
+        string_add_literal(&buf, "S-");
     }
-    key = key & ~MOD_MASK;
+
+    key &= ~MOD_MASK;
     if (u_is_unicode(key)) {
         switch (key) {
         case '\t':
-            string_add_str(&buf, "tab");
+            string_add_literal(&buf, "tab");
             break;
         case KEY_ENTER:
-            string_add_str(&buf, "enter");
+            string_add_literal(&buf, "enter");
             break;
         case ' ':
-            string_add_str(&buf, "space");
+            string_add_literal(&buf, "space");
             break;
         default:
             // <0x20 or 0x7f shouldn't be possible
@@ -141,10 +142,11 @@ char *key_to_string(KeyCode key)
     } else if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
         string_add_str(&buf, special_names[key - KEY_SPECIAL_MIN]);
     } else if (key == KEY_PASTE) {
-        string_add_str(&buf, "paste");
+        string_add_literal(&buf, "paste");
     } else {
-        string_add_str(&buf, "???");
+        string_add_literal(&buf, "???");
     }
+
     return string_steal_cstring(&buf);
 }
 
