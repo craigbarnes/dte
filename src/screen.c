@@ -18,17 +18,17 @@ void set_color(TermColor *color)
 
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = editor.builtin_colors[BC_DEFAULT]->fg;
+        tmp.fg = builtin_colors[BC_DEFAULT]->fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = editor.builtin_colors[BC_DEFAULT]->bg;
+        tmp.bg = builtin_colors[BC_DEFAULT]->bg;
     }
     terminal.set_color(&tmp);
 }
 
 void set_builtin_color(enum builtin_color c)
 {
-    set_color(editor.builtin_colors[c]);
+    set_color(builtin_colors[c]);
 }
 
 static const char *format_misc_status(Window *win)

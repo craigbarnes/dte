@@ -26,41 +26,13 @@ enum {
     ATTR_ITALIC = 0x80,
 };
 
-enum builtin_color {
-    BC_DEFAULT,
-    BC_NONTEXT,
-    BC_NOLINE,
-    BC_WSERROR,
-    BC_SELECTION,
-    BC_CURRENTLINE,
-    BC_LINENUMBER,
-    BC_STATUSLINE,
-    BC_COMMANDLINE,
-    BC_ERRORMSG,
-    BC_INFOMSG,
-    BC_TABBAR,
-    BC_ACTIVETAB,
-    BC_INACTIVETAB,
-    NR_BC
-};
-
 typedef struct {
     short fg;
     short bg;
     unsigned short attr;
 } TermColor;
 
-typedef struct {
-    char *name;
-    TermColor color;
-} HlColor;
-
-void fill_builtin_colors(void);
-HlColor *set_highlight_color(const char *name, const TermColor *color);
-HlColor *find_color(const char *name);
-void remove_extra_colors(void);
 bool parse_term_color(TermColor *color, char **strs);
-void collect_hl_colors(const char *prefix);
 
 static inline bool same_color(const TermColor *c1, const TermColor *c2)
 {

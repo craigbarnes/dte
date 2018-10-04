@@ -26,7 +26,7 @@ typedef struct {
 
 static bool is_default_bg_color(int color)
 {
-    return color == editor.builtin_colors[BC_DEFAULT]->bg || color < 0;
+    return color == builtin_colors[BC_DEFAULT]->bg || color < 0;
 }
 
 // Like mask_color() but can change bg color only if it has not been changed yet
@@ -48,9 +48,9 @@ static void mask_selection_and_current_line (
     TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
-        mask_color(color, editor.builtin_colors[BC_SELECTION]);
+        mask_color(color, builtin_colors[BC_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        mask_color2(color, editor.builtin_colors[BC_CURRENTLINE]);
+        mask_color2(color, builtin_colors[BC_CURRENTLINE]);
     }
 }
 
@@ -166,13 +166,13 @@ static CodePoint screen_next_char(LineInfo *info)
     if (info->colors && info->colors[pos]) {
         color = info->colors[pos]->color;
     } else {
-        color = *editor.builtin_colors[BC_DEFAULT];
+        color = *builtin_colors[BC_DEFAULT];
     }
     if (is_non_text(u)) {
-        mask_color(&color, editor.builtin_colors[BC_NONTEXT]);
+        mask_color(&color, builtin_colors[BC_NONTEXT]);
     }
     if (ws_error) {
-        mask_color(&color, editor.builtin_colors[BC_WSERROR]);
+        mask_color(&color, builtin_colors[BC_WSERROR]);
     }
     mask_selection_and_current_line(info, &color);
     set_color(&color);
@@ -348,14 +348,14 @@ static void print_line(LineInfo *info)
 
     if (editor.options.display_special && obuf.x >= obuf.scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
-        color = *editor.builtin_colors[BC_DEFAULT];
-        mask_color(&color, editor.builtin_colors[BC_NONTEXT]);
+        color = *builtin_colors[BC_DEFAULT];
+        mask_color(&color, builtin_colors[BC_NONTEXT]);
         mask_selection_and_current_line(info, &color);
         set_color(&color);
         buf_put_char('$');
     }
 
-    color = *editor.builtin_colors[BC_DEFAULT];
+    color = *builtin_colors[BC_DEFAULT];
     mask_selection_and_current_line(info, &color);
     set_color(&color);
     info->offset++;
@@ -421,10 +421,10 @@ void update_range(View *v, int y1, int y2)
 
     if (i < y2 && info.line_nr == v->cy) {
         // Dummy empty line is shown only if cursor is on it
-        TermColor color = *editor.builtin_colors[BC_DEFAULT];
+        TermColor color = *builtin_colors[BC_DEFAULT];
 
         obuf.x = 0;
-        mask_color2(&color, editor.builtin_colors[BC_CURRENTLINE]);
+        mask_color2(&color, builtin_colors[BC_CURRENTLINE]);
         set_color(&color);
 
         terminal.move_cursor(edit_x, edit_y + i++);

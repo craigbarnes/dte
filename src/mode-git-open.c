@@ -295,9 +295,9 @@ static void git_open_update_screen(void)
         obuf.x = 0;
         terminal.move_cursor(x, y + i);
 
-        color = *editor.builtin_colors[BC_DEFAULT];
+        color = *builtin_colors[BC_DEFAULT];
         if (file_idx == git_open.selected) {
-            mask_color(&color, editor.builtin_colors[BC_SELECTION]);
+            mask_color(&color, builtin_colors[BC_SELECTION]);
         }
         terminal.set_color(&color);
         buf_add_str(file);

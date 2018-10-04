@@ -25,7 +25,6 @@ typedef enum {
 typedef struct {
     EditorStatus status;
     const EditorModeOps *mode_ops[4];
-    TermColor *builtin_colors[NR_BC];
     InputMode input_mode;
     CommandLine cmdline;
     GlobalOptions options;

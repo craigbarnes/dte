@@ -41,7 +41,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key output terminfo xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \
-    alias bind block block-iter buffer buffer-iter change cmdline \
+    alias bind block block-iter buffer buffer-iter change cmdline color \
     commands common compiler completion config ctags debug edit editor \
     env error file-history file-option filetype format-status frame \
     highlight history indent load-save lock main \
