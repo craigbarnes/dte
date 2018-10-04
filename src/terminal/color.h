@@ -61,7 +61,6 @@ HlColor *find_color(const char *name);
 void remove_extra_colors(void);
 bool parse_term_color(TermColor *color, char **strs);
 void collect_hl_colors(const char *prefix);
-void collect_colors_and_attributes(const char *prefix);
 
 static inline bool same_color(const TermColor *c1, const TermColor *c2)
 {

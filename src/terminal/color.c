@@ -1,3 +1,4 @@
+#include <string.h>
 #include "color.h"
 #include "../common.h"
 #include "../completion.h"
@@ -278,22 +279,6 @@ void collect_hl_colors(const char *prefix)
         const HlColor *c = hl_colors.ptrs[i];
         if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));
-        }
-    }
-}
-
-void collect_colors_and_attributes(const char *prefix)
-{
-    static const char names[][16] = {
-        "keep", "default", "black", "red", "green", "yellow",
-        "blue", "magenta", "cyan", "gray", "darkgray", "lightred",
-        "lightgreen", "lightyellow", "lightblue", "lightmagenta",
-        "lightcyan", "white", "underline", "reverse", "blink",
-        "dim", "bold", "invisible", "italic",
-    };
-    for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
-        if (str_has_prefix(names[i], prefix)) {
-            add_completion(xstrdup(names[i]));
         }
     }
 }
