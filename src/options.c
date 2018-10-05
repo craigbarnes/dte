@@ -23,7 +23,7 @@ typedef enum {
 typedef struct {
     const struct OptionOps *ops;
     const char *name;
-    unsigned int offset;
+    size_t offset;
     bool local;
     bool global;
     union {
@@ -286,7 +286,6 @@ static bool enum_parse (
     OptionValue *value
 ) {
     int val, i;
-
     for (i = 0; desc->u.enum_opt.values[i]; i++) {
         if (streq(desc->u.enum_opt.values[i], str)) {
             value->int_val = i;
@@ -748,7 +747,7 @@ void collect_option_values(const char *name, const char *prefix)
     } else if (desc_is(desc, OPT_FLAG)) {
         // Complete possible values
         const char *comma = strrchr(prefix, ',');
-        int prefix_len = 0;
+        size_t prefix_len = 0;
 
         if (comma) {
             prefix_len = ++comma - prefix;
@@ -757,7 +756,7 @@ void collect_option_values(const char *name, const char *prefix)
             const char *str = desc->u.flag_opt.values[i];
 
             if (str_has_prefix(str, prefix + prefix_len)) {
-                int str_len = strlen(str);
+                size_t str_len = strlen(str);
                 char *completion = xmalloc(prefix_len + str_len + 1);
                 memcpy(completion, prefix, prefix_len);
                 memcpy(completion + prefix_len, str, str_len + 1);
