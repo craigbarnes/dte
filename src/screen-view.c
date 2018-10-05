@@ -1,13 +1,12 @@
 #include <strings.h>
+#include "screen.h"
 #include "editor.h"
 #include "highlight.h"
-#include "screen.h"
 #include "selection.h"
 #include "terminal/output.h"
 #include "terminal/terminfo.h"
 #include "util/ascii.h"
 #include "util/uchar.h"
-#include "view.h"
 
 typedef struct {
     View *view;

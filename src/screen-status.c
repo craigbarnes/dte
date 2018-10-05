@@ -1,7 +1,18 @@
-#include "format-status.h"
+#include "screen.h"
+#include "editor.h"
+#include "selection.h"
+#include "terminal/output.h"
+#include "terminal/terminfo.h"
 #include "util/uchar.h"
-#include "view.h"
-#include "window.h"
+
+typedef struct {
+    char *buf;
+    size_t size;
+    size_t pos;
+    bool separator;
+    Window *win;
+    const char *misc_status;
+} Formatter;
 
 static void add_ch(Formatter *f, char ch)
 {
@@ -62,13 +73,13 @@ static void add_status_pos(Formatter *f)
     }
 }
 
-void sf_init(Formatter *f, Window *win)
+static void sf_init(Formatter *f, Window *win)
 {
     memzero(f);
     f->win = win;
 }
 
-void sf_format(Formatter *f, char *buf, size_t size, const char *format)
+static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     View *v = f->win->view;
 
@@ -163,4 +174,80 @@ void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         }
     }
     f->buf[f->pos] = '\0';
+}
+
+static const char *format_misc_status(Window *win)
+{
+    static char misc_status[32] = {'\0'};
+
+    if (editor.input_mode == INPUT_SEARCH) {
+        snprintf (
+            misc_status,
+            sizeof(misc_status),
+            "[case-sensitive = %s]",
+            case_sensitivity_to_string(editor.options.case_sensitive_search)
+        );
+    } else if (win->view->selection) {
+        SelectionInfo info;
+        init_selection(win->view, &info);
+        if (win->view->selection == SELECT_LINES) {
+            snprintf (
+                misc_status,
+                sizeof(misc_status),
+                "[%zu lines]",
+                get_nr_selected_lines(&info)
+            );
+        } else {
+            snprintf (
+                misc_status,
+                sizeof(misc_status),
+                "[%zu chars]",
+                get_nr_selected_chars(&info)
+            );
+        }
+    } else {
+        return NULL;
+    }
+    return misc_status;
+}
+
+void update_status_line(Window *win)
+{
+    Formatter f;
+    char lbuf[256];
+    char rbuf[256];
+    int lw, rw;
+
+    sf_init(&f, win);
+    f.misc_status = format_misc_status(win);
+    sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
+    sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
+
+    buf_reset(win->x, win->w, 0);
+    terminal.move_cursor(win->x, win->y + win->h - 1);
+    set_builtin_color(BC_STATUSLINE);
+    lw = u_str_width(lbuf);
+    rw = u_str_width(rbuf);
+    if (lw + rw <= win->w) {
+        // Both fit
+        buf_add_str(lbuf);
+        buf_set_bytes(' ', win->w - lw - rw);
+        buf_add_str(rbuf);
+    } else if (lw <= win->w && rw <= win->w) {
+        // Both would fit separately, draw overlapping
+        buf_add_str(lbuf);
+        obuf.x = win->w - rw;
+        terminal.move_cursor(win->x + win->w - rw, win->y + win->h - 1);
+        buf_add_str(rbuf);
+    } else if (lw <= win->w) {
+        // Left fits
+        buf_add_str(lbuf);
+        buf_clear_eol();
+    } else if (rw <= win->w) {
+        // Right fits
+        buf_set_bytes(' ', win->w - rw);
+        buf_add_str(rbuf);
+    } else {
+        buf_clear_eol();
+    }
 }

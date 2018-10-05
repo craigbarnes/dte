@@ -43,11 +43,11 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline color \
     commands common compiler completion config ctags debug edit editor \
-    env error file-history file-option filetype format-status frame \
-    highlight history indent load-save lock main \
-    mode-command mode-git-open mode-normal mode-search move msg options \
-    parse-args parse-command run screen screen-tabbar screen-view \
-    script search selection spawn state syntax tag view window ) \
+    env error file-history file-option filetype frame highlight history \
+    indent load-save lock main mode-command mode-git-open mode-normal \
+    mode-search move msg options parse-args parse-command run screen \
+    screen-status screen-tabbar screen-view script search selection \
+    spawn state syntax tag view window ) \
     $(encoding_objects) $(terminal_objects) $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
