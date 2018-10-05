@@ -2,16 +2,17 @@
 #define INDENT_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct {
     // Size in bytes
-    int bytes;
+    size_t bytes;
 
     // Width in chars
-    int width;
+    size_t width;
 
     // Number of whole indentation levels (depends on the indent-width option)
-    int level;
+    size_t level;
 
     // Only spaces or tabs depending on expand-tab, indent-width and tab-width.
     // Note that "sane" line can contain spaces after tabs for alignment.
@@ -21,12 +22,12 @@ typedef struct {
     bool wsonly;
 } IndentInfo;
 
-char *make_indent(int width);
-char *get_indent_for_next_line(const char *line, unsigned int len);
-void get_indent_info(const char *buf, int len, IndentInfo *info);
+char *make_indent(size_t width);
+char *get_indent_for_next_line(const char *line, size_t len);
+void get_indent_info(const char *buf, size_t len, IndentInfo *info);
 bool use_spaces_for_indent(void);
-int get_indent_level_bytes_left(void);
-int get_indent_level_bytes_right(void);
-char *alloc_indent(int count, int *sizep);
+size_t get_indent_level_bytes_left(void);
+size_t get_indent_level_bytes_right(void);
+char *alloc_indent(size_t count, size_t *sizep);
 
 #endif

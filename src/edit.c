@@ -497,13 +497,13 @@ void join_lines(void)
     }
 }
 
-static void shift_right(int nr_lines, int count)
+static void shift_right(size_t nr_lines, size_t count)
 {
-    int indent_size;
+    size_t indent_size;
     char *indent;
 
     indent = alloc_indent(count, &indent_size);
-    int i = 0;
+    size_t i = 0;
     while (1) {
         IndentInfo info;
         LineRef lr;
@@ -520,7 +520,7 @@ static void shift_right(int nr_lines, int count)
             buffer_insert_bytes(indent, indent_size);
         } else {
             // Replace whole indentation with sane one
-            int size;
+            size_t size;
             char *buf = alloc_indent(info.level + count, &size);
             buffer_replace_bytes(info.bytes, buf, size);
             free(buf);
@@ -533,9 +533,9 @@ static void shift_right(int nr_lines, int count)
     free(indent);
 }
 
-static void shift_left(int nr_lines, int count)
+static void shift_left(size_t nr_lines, size_t count)
 {
-    int i = 0;
+    size_t i = 0;
     while (1) {
         IndentInfo info;
         LineRef lr;
@@ -548,7 +548,7 @@ static void shift_left(int nr_lines, int count)
                 buffer_delete_bytes(info.bytes);
             }
         } else if (info.level && info.sane) {
-            int n = count;
+            size_t n = count;
             if (n > info.level) {
                 n = info.level;
             }
@@ -559,7 +559,7 @@ static void shift_left(int nr_lines, int count)
         } else if (info.bytes) {
             // Replace whole indentation with sane one
             if (info.level > count) {
-                int size;
+                size_t size;
                 char *buf = alloc_indent(info.level - count, &size);
                 buffer_replace_bytes(info.bytes, buf, size);
                 free(buf);
@@ -574,7 +574,7 @@ static void shift_left(int nr_lines, int count)
     }
 }
 
-static void do_shift_lines(int count, int nr_lines)
+static void do_shift_lines(size_t count, size_t nr_lines)
 {
     begin_change_chain();
     block_iter_bol(&view->cursor);
@@ -586,7 +586,7 @@ static void do_shift_lines(int count, int nr_lines)
     end_change_chain();
 }
 
-void shift_lines(int count)
+void shift_lines(size_t count)
 {
     int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
 
@@ -727,14 +727,14 @@ static bool is_paragraph_separator(const char *line, size_t size)
     return regexp_match_nosub("^[ \t]*(/\\*|\\*/)?[ \t]*$", line, size);
 }
 
-static int get_indent_width(const char *line, size_t size)
+static size_t get_indent_width(const char *line, size_t size)
 {
     IndentInfo info;
     get_indent_info(line, size, &info);
     return info.width;
 }
 
-static bool in_paragraph(const char *line, size_t size, int indent_width)
+static bool in_paragraph(const char *line, size_t size, size_t indent_width)
 {
     if (get_indent_width(line, size) != indent_width) {
         return false;
@@ -746,7 +746,6 @@ static size_t paragraph_size(void)
 {
     BlockIter bi = view->cursor;
     LineRef lr;
-    int indent_width;
 
     block_iter_bol(&bi);
     fill_line_ref(&bi, &lr);
@@ -754,7 +753,7 @@ static size_t paragraph_size(void)
         // Not in paragraph
         return 0;
     }
-    indent_width = get_indent_width(lr.line, lr.size);
+    size_t indent_width = get_indent_width(lr.line, lr.size);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
@@ -783,11 +782,7 @@ static size_t paragraph_size(void)
 
 void format_paragraph(int text_width)
 {
-    ParagraphFormatter pf;
-    size_t len, i;
-    int indent_width;
-    char *sel;
-
+    size_t len;
     if (view->selection) {
         view->selection = SELECT_LINES;
         len = prepare_selection(view);
@@ -798,9 +793,10 @@ void format_paragraph(int text_width)
         return;
     }
 
-    sel = block_iter_get_bytes(&view->cursor, len);
-    indent_width = get_indent_width(sel, len);
+    char *sel = block_iter_get_bytes(&view->cursor, len);
+    size_t indent_width = get_indent_width(sel, len);
 
+    ParagraphFormatter pf;
     string_init(&pf.buf);
     pf.indent = make_indent(indent_width);
     pf.indent_len = pf.indent ? strlen(pf.indent) : 0;
@@ -808,7 +804,7 @@ void format_paragraph(int text_width)
     pf.cur_width = 0;
     pf.text_width = text_width;
 
-    i = 0;
+    size_t i = 0;
     while (1) {
         size_t start, tmp;
 
