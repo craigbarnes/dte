@@ -116,11 +116,6 @@ static void sanity_check(void)
 #endif
 }
 
-void set_input_mode(InputMode mode)
-{
-    editor.input_mode = mode;
-}
-
 void any_key(void)
 {
     KeyCode key;

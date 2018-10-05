@@ -50,10 +50,14 @@ static inline void mark_everything_changed(void)
     editor.everything_changed = true;
 }
 
+static inline void set_input_mode(InputMode mode)
+{
+    editor.input_mode = mode;
+}
+
 void init_editor_state(void);
 char *editor_file(const char *name) XMALLOC NONNULL_ARGS;
 char get_confirmation(const char *choices, const char *format, ...) PRINTF(2);
-void set_input_mode(InputMode mode);
 void any_key(void);
 void normal_update(void);
 void handle_sigwinch(int signum);

@@ -32,11 +32,6 @@ void free_changes(Change *head);
 void buffer_insert_bytes(const char *buf, size_t len);
 void buffer_delete_bytes(size_t len);
 void buffer_erase_bytes(size_t len);
-
-void buffer_replace_bytes (
-    size_t del_count,
-    const char *const inserted,
-    size_t ins_count
-);
+void buffer_replace_bytes(size_t del_count, const char *ins, size_t ins_count);
 
 #endif
