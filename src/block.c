@@ -6,11 +6,9 @@
 
 #define BLOCK_EDIT_SIZE 512
 
-#if DEBUG <= 0
-static void sanity_check(void) {}
-#else
 static void sanity_check(void)
 {
+#if DEBUG >= 1
     BUG_ON(list_empty(&buffer->blocks));
     bool cursor_seen = false;
     Block *blk;
@@ -27,8 +25,8 @@ static void sanity_check(void)
     }
     BUG_ON(!cursor_seen);
     BUG_ON(view->cursor.offset > view->cursor.blk->size);
-}
 #endif
+}
 
 static inline size_t ALLOC_ROUND(size_t size)
 {

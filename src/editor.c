@@ -103,10 +103,7 @@ void init_editor_state(void)
 
 static void sanity_check(void)
 {
-    if (!DEBUG) {
-        return;
-    }
-
+#if DEBUG >= 1
     View *v = window->view;
     Block *blk;
     list_for_each_entry(blk, &v->buffer->blocks, node) {
@@ -116,6 +113,7 @@ static void sanity_check(void)
         }
     }
     BUG("cursor not seen");
+#endif
 }
 
 void set_input_mode(InputMode mode)
