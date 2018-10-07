@@ -377,9 +377,7 @@ int main(int argc, char *argv[])
         remove_view(window->views.ptrs[0]);
     }
 
-    if (terminal.control_codes.init) {
-        buf_escape(terminal.control_codes.init);
-    }
+    buf_escape(terminal.control_codes.init);
 
     editor.resize();
     main_loop();
@@ -388,10 +386,8 @@ int main(int argc, char *argv[])
     }
     editor.ui_end();
 
-    if (terminal.control_codes.deinit) {
-        buf_escape(terminal.control_codes.deinit);
-        buf_flush();
-    }
+    buf_escape(terminal.control_codes.deinit);
+    buf_flush();
 
     // Unlock files and add files to file history
     remove_frame(root_frame);

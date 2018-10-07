@@ -1,4 +1,3 @@
-#include <string.h>
 #include <unistd.h>
 #include "output.h"
 #include "terminfo.h"
@@ -79,11 +78,6 @@ void buf_add_ch(char ch)
     obuf.buf[obuf.count++] = ch;
 }
 
-void buf_escape(const char *const str)
-{
-    buf_add_bytes(str, strlen(str));
-}
-
 void buf_add_str(const char *const str)
 {
     size_t i = 0;
@@ -96,16 +90,12 @@ void buf_add_str(const char *const str)
 
 void buf_hide_cursor(void)
 {
-    if (terminal.control_codes.hide_cursor) {
-        buf_escape(terminal.control_codes.hide_cursor);
-    }
+    buf_escape(terminal.control_codes.hide_cursor);
 }
 
 void buf_show_cursor(void)
 {
-    if (terminal.control_codes.show_cursor) {
-        buf_escape(terminal.control_codes.show_cursor);
-    }
+    buf_escape(terminal.control_codes.show_cursor);
 }
 
 void buf_clear_eol(void)
