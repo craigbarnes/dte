@@ -574,7 +574,7 @@ static void shift_left(size_t nr_lines, size_t count)
     }
 }
 
-static void do_shift_lines(size_t count, size_t nr_lines)
+static void do_shift_lines(ssize_t count, size_t nr_lines)
 {
     begin_change_chain();
     block_iter_bol(&view->cursor);
@@ -586,7 +586,7 @@ static void do_shift_lines(size_t count, size_t nr_lines)
     end_change_chain();
 }
 
-void shift_lines(size_t count)
+void shift_lines(ssize_t count)
 {
     int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
 
