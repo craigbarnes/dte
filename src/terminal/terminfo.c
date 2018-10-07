@@ -272,8 +272,7 @@ static void term_init_terminfo(const char *term)
         }
     }
 
-    static TermControlCodes tcc;
-    tcc = (TermControlCodes) {
+    terminal.control_codes = (TermControlCodes) {
         .reset_colors = curses_str_cap("op"),
         .reset_attrs = curses_str_cap("sgr0"),
         .keypad_off = curses_str_cap("rmkx"),
@@ -283,7 +282,6 @@ static void term_init_terminfo(const char *term)
         .show_cursor = curses_str_cap("cnorm"),
         .hide_cursor = curses_str_cap("civis")
     };
-    terminal.control_codes = &tcc;
 
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
         const char *const code = curses_str_cap(keymap[i].code);
@@ -330,11 +328,11 @@ void term_init(void)
 
     if (term_match(term, "xterm")) {
         terminal = terminal_xterm;
-        terminal.control_codes->init =
+        terminal.control_codes.init =
             "\033[?1036s" // Save "metaSendsEscape"
             "\033[?1036h" // Enable "metaSendsEscape"
         ;
-        terminal.control_codes->deinit =
+        terminal.control_codes.deinit =
             "\033[?1036r" // Restore "metaSendsEscape"
         ;
         terminal.repeat_byte = &ecma48_repeat_byte;
@@ -351,8 +349,8 @@ void term_init(void)
         terminal.back_color_erase = false;
     } else if (streq(term, "linux")) {
         // Use the default TerminalInfo and just change the control codes
-        terminal.control_codes->hide_cursor = "\033[?25l\033[?1c";
-        terminal.control_codes->show_cursor = "\033[?25h\033[?0c";
+        terminal.control_codes.hide_cursor = "\033[?25l\033[?1c";
+        terminal.control_codes.show_cursor = "\033[?25h\033[?0c";
     }
 #ifndef TERMINFO_DISABLE
     else {

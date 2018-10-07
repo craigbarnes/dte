@@ -122,11 +122,11 @@ static int dump_builtin_config(const char *const name)
 static void showkey_loop(void)
 {
     terminal.raw();
-    if (terminal.control_codes->init) {
-        fputs(terminal.control_codes->init, stdout);
+    if (terminal.control_codes.init) {
+        fputs(terminal.control_codes.init, stdout);
     }
-    if (terminal.control_codes->keypad_on) {
-        fputs(terminal.control_codes->keypad_on, stdout);
+    if (terminal.control_codes.keypad_on) {
+        fputs(terminal.control_codes.keypad_on, stdout);
     }
     puts("\nPress any key combination, or use Ctrl+D to exit\n");
     fflush(stdout);
@@ -157,11 +157,11 @@ static void showkey_loop(void)
         fflush(stdout);
     }
 
-    if (terminal.control_codes->keypad_off) {
-        fputs(terminal.control_codes->keypad_off, stdout);
+    if (terminal.control_codes.keypad_off) {
+        fputs(terminal.control_codes.keypad_off, stdout);
     }
-    if (terminal.control_codes->deinit) {
-        fputs(terminal.control_codes->deinit, stdout);
+    if (terminal.control_codes.deinit) {
+        fputs(terminal.control_codes.deinit, stdout);
     }
     fflush(stdout);
     terminal.cooked();
@@ -377,8 +377,8 @@ int main(int argc, char *argv[])
         remove_view(window->views.ptrs[0]);
     }
 
-    if (terminal.control_codes->init) {
-        buf_escape(terminal.control_codes->init);
+    if (terminal.control_codes.init) {
+        buf_escape(terminal.control_codes.init);
     }
 
     editor.resize();
@@ -388,8 +388,8 @@ int main(int argc, char *argv[])
     }
     editor.ui_end();
 
-    if (terminal.control_codes->deinit) {
-        buf_escape(terminal.control_codes->deinit);
+    if (terminal.control_codes.deinit) {
+        buf_escape(terminal.control_codes.deinit);
         buf_flush();
     }
 

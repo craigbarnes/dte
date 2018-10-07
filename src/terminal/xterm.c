@@ -93,7 +93,7 @@ const TerminalInfo terminal_xterm = {
     .save_title = &xterm_save_title,
     .restore_title = &xterm_restore_title,
     .set_title = &xterm_set_title,
-    .control_codes = &(TermControlCodes) {
+    .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",

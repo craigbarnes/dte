@@ -142,7 +142,7 @@ TerminalInfo terminal = {
     .save_title = &no_op,
     .restore_title = &no_op,
     .set_title = &no_op_s,
-    .control_codes = &(TermControlCodes) {
+    .control_codes = {
         .reset_colors = "\033[39;49m",
         .reset_attrs = "\033[0m",
     }

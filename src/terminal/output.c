@@ -96,15 +96,15 @@ void buf_add_str(const char *const str)
 
 void buf_hide_cursor(void)
 {
-    if (terminal.control_codes->hide_cursor) {
-        buf_escape(terminal.control_codes->hide_cursor);
+    if (terminal.control_codes.hide_cursor) {
+        buf_escape(terminal.control_codes.hide_cursor);
     }
 }
 
 void buf_show_cursor(void)
 {
-    if (terminal.control_codes->show_cursor) {
-        buf_escape(terminal.control_codes->show_cursor);
+    if (terminal.control_codes.show_cursor) {
+        buf_escape(terminal.control_codes.show_cursor);
     }
 }
 

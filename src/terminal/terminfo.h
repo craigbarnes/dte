@@ -25,7 +25,7 @@ typedef struct {
     int width;
     int height;
     unsigned short ncv_attributes;
-    TermControlCodes *control_codes;
+    TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     void (*clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
