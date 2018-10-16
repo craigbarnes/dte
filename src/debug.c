@@ -18,9 +18,12 @@ void term_cleanup(void)
     if (!editor.child_controls_terminal) {
         editor.ui_end();
     }
-    const char *const deinit = terminal.control_codes.deinit;
-    if (deinit) {
-        xwrite(STDOUT_FILENO, deinit, strlen(deinit));
+    if (terminal.control_codes.deinit.length) {
+        xwrite (
+            STDOUT_FILENO,
+            terminal.control_codes.deinit.data,
+            terminal.control_codes.deinit.length
+        );
     }
 }
 

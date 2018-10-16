@@ -1,7 +1,12 @@
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "output.h"
 #include "terminfo.h"
+#include "../debug.h"
 #include "../util/uchar.h"
+#include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 
 OutputBuffer obuf;
@@ -76,6 +81,41 @@ void buf_add_ch(char ch)
 {
     obuf_need_space(1);
     obuf.buf[obuf.count++] = ch;
+}
+
+static void buf_vsprintf(const char *fmt, va_list ap)
+{
+    va_list ap2;
+    va_copy(ap2, ap);
+    // Calculate the required size
+    int n = vsnprintf(NULL, 0, fmt, ap2);
+    va_end(ap2);
+    BUG_ON(n < 0);
+
+    if (n >= obuf_avail()) {
+        buf_flush();
+        if (n >= sizeof(obuf.buf)) {
+            char *tmp = xmalloc(n + 1);
+            int wrote = vsnprintf(tmp, n + 1, fmt, ap);
+            DEBUG_VAR(wrote);
+            BUG_ON(wrote != n);
+            xwrite(STDOUT_FILENO, tmp, n);
+            free(tmp);
+            return;
+        }
+    }
+
+    int wrote = vsnprintf(obuf.buf + obuf.count, n + 1, fmt, ap);
+    BUG_ON(wrote != n);
+    obuf.count += wrote;
+}
+
+void buf_sprintf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    buf_vsprintf(fmt, ap);
+    va_end(ap);
 }
 
 void buf_add_str(const char *const str)

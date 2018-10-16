@@ -129,15 +129,26 @@ char *tparm(const char*, long, long, long, long, long, long, long, long, long);
 #define tparm_1(str, p1) tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0)
 #define tparm_2(str, p1, p2) tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0)
 
-static char *curses_str_cap(const char *const name)
+static char *get_terminfo_string(const char *capname)
 {
-    char *str = tigetstr(name);
+    char *str = tigetstr(capname);
     if (str == (char *)-1) {
         // Not a string cap (bug?)
         return NULL;
     }
     // NULL = canceled or absent
     return str;
+}
+
+static StringView get_terminfo_string_view(const char *capname)
+{
+    StringView sv = STRING_VIEW_INIT;
+    char *str = get_terminfo_string(capname);
+    if (str) {
+        sv.data = str;
+        sv.length = strlen(str);
+    }
+    return sv;
 }
 
 static int tputs_putc(int ch)
@@ -238,16 +249,16 @@ static void term_init_terminfo(const char *term)
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
 
-    terminfo.cup = curses_str_cap("cup");
+    terminfo.cup = get_terminfo_string("cup");
     if (terminfo.cup == NULL) {
         error("TERM type '%s' not supported: 'cup' capability required", term);
     }
 
-    terminfo.el = curses_str_cap("el");
-    terminfo.setab = curses_str_cap("setab");
-    terminfo.setaf = curses_str_cap("setaf");
-    terminfo.sgr = curses_str_cap("sgr");
-    terminfo.rep = curses_str_cap("rep");
+    terminfo.el = get_terminfo_string("el");
+    terminfo.setab = get_terminfo_string("setab");
+    terminfo.setaf = get_terminfo_string("setaf");
+    terminfo.sgr = get_terminfo_string("sgr");
+    terminfo.rep = get_terminfo_string("rep");
 
     if (terminfo.rep) {
         terminal.repeat_byte = &tputs_repeat_byte;
@@ -273,18 +284,18 @@ static void term_init_terminfo(const char *term)
     }
 
     terminal.control_codes = (TermControlCodes) {
-        .reset_colors = curses_str_cap("op"),
-        .reset_attrs = curses_str_cap("sgr0"),
-        .keypad_off = curses_str_cap("rmkx"),
-        .keypad_on = curses_str_cap("smkx"),
-        .cup_mode_off = curses_str_cap("rmcup"),
-        .cup_mode_on = curses_str_cap("smcup"),
-        .show_cursor = curses_str_cap("cnorm"),
-        .hide_cursor = curses_str_cap("civis")
+        .reset_colors = get_terminfo_string_view("op"),
+        .reset_attrs = get_terminfo_string_view("sgr0"),
+        .keypad_off = get_terminfo_string_view("rmkx"),
+        .keypad_on = get_terminfo_string_view("smkx"),
+        .cup_mode_off = get_terminfo_string_view("rmcup"),
+        .cup_mode_on = get_terminfo_string_view("smcup"),
+        .show_cursor = get_terminfo_string_view("cnorm"),
+        .hide_cursor = get_terminfo_string_view("civis")
     };
 
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
-        const char *const code = curses_str_cap(keymap[i].code);
+        const char *const code = get_terminfo_string(keymap[i].code);
         if (code && code[0] != '\0') {
             keymap[keymap_length++] = (struct TermKeyMap) {
                 .code = code,
@@ -328,13 +339,13 @@ void term_init(void)
 
     if (term_match(term, "xterm")) {
         terminal = terminal_xterm;
-        terminal.control_codes.init =
+        terminal.control_codes.init = STRING_VIEW (
             "\033[?1036s" // Save "metaSendsEscape"
             "\033[?1036h" // Enable "metaSendsEscape"
-        ;
-        terminal.control_codes.deinit =
+        );
+        terminal.control_codes.deinit = STRING_VIEW (
             "\033[?1036r" // Restore "metaSendsEscape"
-        ;
+        );
         terminal.repeat_byte = &ecma48_repeat_byte;
     } else if (
         term_match(term, "st")
@@ -349,8 +360,8 @@ void term_init(void)
         terminal.back_color_erase = false;
     } else if (streq(term, "linux")) {
         // Use the default TerminalInfo and just change the control codes
-        terminal.control_codes.hide_cursor = "\033[?25l\033[?1c";
-        terminal.control_codes.show_cursor = "\033[?25h\033[?0c";
+        terminal.control_codes.hide_cursor = STRING_VIEW("\033[?25l\033[?1c");
+        terminal.control_codes.show_cursor = STRING_VIEW("\033[?25h\033[?0c");
     }
 #ifndef TERMINFO_DISABLE
     else {

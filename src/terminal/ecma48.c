@@ -143,7 +143,15 @@ TerminalInfo terminal = {
     .restore_title = &no_op,
     .set_title = &no_op_s,
     .control_codes = {
-        .reset_colors = "\033[39;49m",
-        .reset_attrs = "\033[0m",
+        .init = STRING_VIEW_INIT,
+        .deinit = STRING_VIEW_INIT,
+        .reset_colors = STRING_VIEW("\033[39;49m"),
+        .reset_attrs = STRING_VIEW("\033[0m"),
+        .keypad_off = STRING_VIEW_INIT,
+        .keypad_on = STRING_VIEW_INIT,
+        .cup_mode_off = STRING_VIEW_INIT,
+        .cup_mode_on = STRING_VIEW_INIT,
+        .show_cursor = STRING_VIEW_INIT,
+        .hide_cursor = STRING_VIEW_INIT,
     }
 };

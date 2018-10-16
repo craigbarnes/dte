@@ -5,18 +5,19 @@
 #include <sys/types.h>
 #include "color.h"
 #include "key.h"
+#include "../util/string-view.h"
 
 typedef struct {
-    const char *init;
-    const char *deinit;
-    const char *reset_colors;
-    const char *reset_attrs;
-    const char *keypad_off;
-    const char *keypad_on;
-    const char *cup_mode_off;
-    const char *cup_mode_on;
-    const char *show_cursor;
-    const char *hide_cursor;
+    StringView init;
+    StringView deinit;
+    StringView reset_colors;
+    StringView reset_attrs;
+    StringView keypad_off;
+    StringView keypad_on;
+    StringView cup_mode_off;
+    StringView cup_mode_on;
+    StringView show_cursor;
+    StringView hide_cursor;
 } TermControlCodes;
 
 typedef struct {

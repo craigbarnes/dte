@@ -5,18 +5,18 @@
 
 void xterm_save_title(void)
 {
-    buf_add_bytes("\033[22;2t", 7);
+    buf_add_literal("\033[22;2t");
 }
 
 void xterm_restore_title(void)
 {
-    buf_add_bytes("\033[23;2t", 7);
+    buf_add_literal("\033[23;2t");
 }
 
 void xterm_set_title(const char *title)
 {
-    buf_add_bytes("\033]2;", 4);
-    buf_escape(title);
+    buf_add_literal("\033]2;");
+    buf_add_bytes(title, strlen(title));
     buf_add_ch('\007');
 }
 
@@ -95,13 +95,15 @@ const TerminalInfo terminal_xterm = {
     .set_title = &xterm_set_title,
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-        .reset_colors = "\033[39;49m",
-        .reset_attrs = "\033[0m",
-        .keypad_off = "\033[?1l\033>",
-        .keypad_on = "\033[?1h\033=",
-        .cup_mode_off = "\033[?1049l",
-        .cup_mode_on = "\033[?1049h",
-        .hide_cursor = "\033[?25l",
-        .show_cursor = "\033[?25h",
+        .init = STRING_VIEW_INIT,
+        .deinit = STRING_VIEW_INIT,
+        .reset_colors = STRING_VIEW("\033[39;49m"),
+        .reset_attrs = STRING_VIEW("\033[0m"),
+        .keypad_off = STRING_VIEW("\033[?1l\033>"),
+        .keypad_on = STRING_VIEW("\033[?1h\033="),
+        .cup_mode_off = STRING_VIEW("\033[?1049l"),
+        .cup_mode_on = STRING_VIEW("\033[?1049h"),
+        .hide_cursor = STRING_VIEW("\033[?25l"),
+        .show_cursor = STRING_VIEW("\033[?25h"),
     }
 };
