@@ -103,21 +103,6 @@ static inline StringView get_ext(const StringView filename)
     return ext;
 }
 
-UNITTEST {
-    StringView sv = get_ext(STRING_VIEW("file.c.old~"));
-    DEBUG_VAR(sv);
-    BUG_ON(!string_view_equal_cstr(&sv, "c"));
-    sv = get_ext(STRING_VIEW("file..old"));
-    BUG_ON(!string_view_equal_cstr(&sv, "old"));
-    sv = get_ext(STRING_VIEW("file.old"));
-    BUG_ON(!string_view_equal_cstr(&sv, "old"));
-    sv = get_ext(STRING_VIEW("a.c~"));
-    BUG_ON(!string_view_equal_cstr(&sv, "c"));
-    // TODO:
-    // sv = get_ext(STRING_VIEW(".c~"));
-    // BUG_ON(!string_view_equal_cstr(&sv, ""));
-}
-
 // Parse hashbang and return interpreter name, without version number.
 // For example, if line is "#!/usr/bin/env python2", "python" is returned.
 static StringView get_interpreter(const StringView line)

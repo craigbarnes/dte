@@ -95,8 +95,13 @@ const TerminalInfo terminal_xterm = {
     .set_title = &xterm_set_title,
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-        .init = STRING_VIEW_INIT,
-        .deinit = STRING_VIEW_INIT,
+        .init = STRING_VIEW (
+            "\033[?1036s" // Save "metaSendsEscape"
+            "\033[?1036h" // Enable "metaSendsEscape"
+        ),
+        .deinit = STRING_VIEW (
+            "\033[?1036r" // Restore "metaSendsEscape"
+        ),
         .reset_colors = STRING_VIEW("\033[39;49m"),
         .reset_attrs = STRING_VIEW("\033[0m"),
         .keypad_off = STRING_VIEW("\033[?1l\033>"),

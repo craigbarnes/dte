@@ -339,13 +339,6 @@ void term_init(void)
 
     if (term_match(term, "xterm")) {
         terminal = terminal_xterm;
-        terminal.control_codes.init = STRING_VIEW (
-            "\033[?1036s" // Save "metaSendsEscape"
-            "\033[?1036h" // Enable "metaSendsEscape"
-        );
-        terminal.control_codes.deinit = STRING_VIEW (
-            "\033[?1036r" // Restore "metaSendsEscape"
-        );
         terminal.repeat_byte = &ecma48_repeat_byte;
     } else if (
         term_match(term, "st")
@@ -360,8 +353,10 @@ void term_init(void)
         terminal.back_color_erase = false;
     } else if (streq(term, "linux")) {
         // Use the default TerminalInfo and just change the control codes
-        terminal.control_codes.hide_cursor = STRING_VIEW("\033[?25l\033[?1c");
-        terminal.control_codes.show_cursor = STRING_VIEW("\033[?25h\033[?0c");
+        const StringView hide_cursor = STRING_VIEW("\033[?25l\033[?1c");
+        const StringView show_cursor = STRING_VIEW("\033[?25h\033[?0c");
+        terminal.control_codes.hide_cursor = hide_cursor;
+        terminal.control_codes.show_cursor = show_cursor;
     }
 #ifndef TERMINFO_DISABLE
     else {

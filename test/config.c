@@ -20,7 +20,7 @@ static void no_op(void) {}
 
 void init_headless_mode(void)
 {
-    terminal.control_codes = (TermControlCodes) {.init = NULL};
+    memzero(&terminal.control_codes);
     terminal.cooked = &no_op;
     terminal.raw = &no_op;
     editor.resize = &no_op;

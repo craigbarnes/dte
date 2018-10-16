@@ -61,6 +61,7 @@ static void test_find_ft_filename(void)
         {"", NULL},
         {"/", NULL},
         {"/etc../etc.c.old/c.old", NULL},
+        // TODO: {".c~", NULL},
         {"test.c.bak", "c"},
         {"test.c.new", "c"},
         {"test.c.old~", "c"},
