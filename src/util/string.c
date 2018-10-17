@@ -63,6 +63,7 @@ void string_add_buf(String *s, const char *ptr, size_t len)
     s->len += len;
 }
 
+VPRINTF(2)
 static void string_vsprintf(String *s, const char *fmt, va_list ap)
 {
     va_list ap2;

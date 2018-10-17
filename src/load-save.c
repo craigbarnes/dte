@@ -243,6 +243,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     return 0;
 }
 
+XMALLOC NONNULL_ARGS
 static char *tmp_filename(const char *filename)
 {
     char *dir = path_dirname(filename);

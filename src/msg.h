@@ -1,6 +1,8 @@
 #ifndef MSG_H
 #define MSG_H
 
+#include "util/macros.h"
+
 typedef struct {
     // Needed after buffer is closed
     char *filename;
@@ -36,6 +38,6 @@ void activate_current_message(void);
 void activate_next_message(void);
 void activate_prev_message(void);
 void clear_messages(void);
-int message_count(void);
+int message_count(void) PURE;
 
 #endif

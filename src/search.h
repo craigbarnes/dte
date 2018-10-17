@@ -20,7 +20,7 @@ typedef enum {
 bool search_tag(const char *pattern, bool *err);
 
 void search_set_direction(SearchDirection dir);
-SearchDirection current_search_direction(void);
+SearchDirection current_search_direction(void) PURE;
 void search_set_regexp(const char *pattern);
 void search_prev(void);
 void search_next(void);

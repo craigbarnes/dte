@@ -83,6 +83,7 @@ void buf_add_ch(char ch)
     obuf.buf[obuf.count++] = ch;
 }
 
+VPRINTF(1)
 static void buf_vsprintf(const char *fmt, va_list ap)
 {
     va_list ap2;

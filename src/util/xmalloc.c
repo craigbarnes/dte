@@ -91,6 +91,7 @@ void *xmemdup(const void *ptr, size_t size)
     return buf;
 }
 
+VPRINTF(2)
 static int xvasprintf_(char **strp, const char *format, va_list ap)
 {
     va_list ap2;
