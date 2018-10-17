@@ -24,6 +24,7 @@ all: $(dte)
 check: $(test) all
 	$(E) TEST $<
 	$(Q) ./$<
+	$(Q) diff -u build/test/env.txt test/data/env.txt
 	$(Q) diff -u build/test/thai-utf8.txt test/data/thai-utf8.txt
 # TODO: $(Q) diff -u build/test/thai-tis620.txt test/data/thai-tis620.txt
 	$(Q) $(RM) build/test/thai-*.txt
