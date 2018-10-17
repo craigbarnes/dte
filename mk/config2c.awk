@@ -19,6 +19,7 @@ function escape_syntax(s) {
 }
 
 BEGIN {
+    print "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)\n"
     print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
 }
 
@@ -29,7 +30,7 @@ FNR == 1 {
     name = FILENAME
     gsub(/^config\//, "", name)
     ident = "builtin_" escape_ident(name)
-    print "static const char " ident "[] ="
+    print "static CONFIG_SECTION const char " ident "[] ="
     names[++nfiles] = name
     idents[nfiles] = ident
 }
@@ -57,7 +58,7 @@ END {
         "    .text = {.data = t, .length = sizeof(t) - 1} \\\n" \
         "}\n"
 
-    print "static const BuiltinConfig builtin_configs[" nfiles "] = {"
+    print "static CONFIG_SECTION const BuiltinConfig builtin_configs[] = {"
     for (i = 1; i <= nfiles; i++) {
         print "    cfg(\"" names[i] "\", " idents[i] "),"
     }

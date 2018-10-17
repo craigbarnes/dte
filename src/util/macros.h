@@ -102,6 +102,12 @@
     #define unlikely(x) (x)
 #endif
 
+#if GNUC_AT_LEAST(3, 0) && defined(__ELF__)
+    #define SECTION(x) __attribute__((__section__(x)))
+#else
+    #define SECTION(x)
+#endif
+
 #if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_prefetch)
     #define PREFETCH(addr, ...) __builtin_prefetch(addr, __VA_ARGS__)
 #else
