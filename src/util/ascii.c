@@ -5,10 +5,12 @@ enum {
     L = ASCII_LOWER,
     U = ASCII_UPPER,
     D = ASCII_DIGIT,
+    u = ASCII_UNDERSCORE,
 };
 
 const unsigned char ascii_table[256] = {
     ['\t'] = S, ['\n'] = S, ['\r'] = S, [' '] = S,
+    ['_'] = u,
 
     ['0'] = D, ['1'] = D, ['2'] = D, ['3'] = D, ['4'] = D,
     ['5'] = D, ['6'] = D, ['7'] = D, ['8'] = D, ['9'] = D,

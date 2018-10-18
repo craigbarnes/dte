@@ -108,14 +108,13 @@ static void parse_var(const char *cmd, size_t *posp)
     size_t ei = si;
 
     const char first_char = cmd[ei];
-    if (!ascii_isalpha(first_char) && first_char != '_') {
+    if (!is_alpha_or_underscore(first_char)) {
         return;
     }
     ei++;
 
     while (1) {
-        char ch = cmd[ei];
-        if (ascii_isalnum(ch) || ch == '_') {
+        if (is_alnum_or_underscore(cmd[ei])) {
             ei++;
             continue;
         }

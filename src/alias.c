@@ -26,7 +26,7 @@ static bool is_valid_alias_name(const char *const name)
 {
     for (size_t i = 0; name[i]; i++) {
         const char ch = name[i];
-        if (!ascii_isalnum(ch) && ch != '-' && ch != '_') {
+        if (!is_alnum_or_underscore(ch) && ch != '-') {
             return false;
         }
     }

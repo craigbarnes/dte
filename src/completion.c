@@ -371,17 +371,18 @@ static void init_completion(void)
     size_t len = editor.cmdline.pos - completion_pos;
     if (len && str[0] == '$') {
         bool var = true;
-        for (size_t i = 1; i < len; i++) {
-            char ch = str[i];
-            if (ascii_isalpha(ch) || ch == '_') {
-                continue;
+        if (len >= 2) {
+            if (is_alpha_or_underscore(str[1])) {
+                for (size_t i = 2; i < len; i++) {
+                    if (is_alnum_or_underscore(str[i])) {
+                        continue;
+                    }
+                    var = false;
+                    break;
+                }
+            } else {
+                var = false;
             }
-            if (i > 1 && ascii_isdigit(ch)) {
-                continue;
-            }
-
-            var = false;
-            break;
         }
         if (var) {
             char *name = xstrslice(str, 1, len);

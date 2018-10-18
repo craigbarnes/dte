@@ -63,7 +63,7 @@ bool u_is_word_char(CodePoint u)
     if (u > 0x7f) {
         return true;
     }
-    return ascii_isalnum(u) || u == '_';
+    return is_alnum_or_underscore(u);
 }
 
 bool u_is_unprintable(CodePoint u)
