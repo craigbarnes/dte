@@ -140,34 +140,43 @@ char *parse_command_arg(const char *cmd, bool tilde)
 {
     size_t pos = 0;
 
-    if (tilde && cmd[pos] == '~' && cmd[pos+1] == '/') {
+    if (tilde && cmd[pos] == '~' && cmd[pos + 1] == '/') {
         string_add_str(&arg, editor.home_dir);
         pos++;
     }
 
     while (1) {
-        char ch = cmd[pos];
-
-        if (!ch || ch == ';' || ascii_isspace(ch)) {
-            break;
-        }
-
-        pos++;
-        if (ch == '\'') {
+        const char ch = cmd[pos++];
+        switch (ch) {
+        case '\0':
+        case '\t':
+        case '\n':
+        case '\r':
+        case ' ':
+        case ';':
+            goto end;
+        case '\'':
             parse_sq(cmd, &pos);
-        } else if (ch == '"') {
+            break;
+        case '"':
             parse_dq(cmd, &pos);
-        } else if (ch == '$') {
+            break;
+        case '$':
             parse_var(cmd, &pos);
-        } else if (ch == '\\') {
-            if (!cmd[pos]) {
-                break;
+            break;
+        case '\\':
+            if (cmd[pos] == '\0') {
+                goto end;
             }
             string_add_byte(&arg, cmd[pos++]);
-        } else {
+            break;
+        default:
             string_add_byte(&arg, ch);
+            break;
         }
     }
+
+end:
     return string_steal_cstring(&arg);
 }
 
