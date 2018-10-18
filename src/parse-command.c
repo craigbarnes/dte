@@ -146,7 +146,7 @@ char *parse_command_arg(const char *cmd, bool tilde)
     }
 
     while (1) {
-        const char ch = cmd[pos++];
+        char ch = cmd[pos++];
         switch (ch) {
         case '\0':
         case '\t':
@@ -165,11 +165,11 @@ char *parse_command_arg(const char *cmd, bool tilde)
             parse_var(cmd, &pos);
             break;
         case '\\':
-            if (cmd[pos] == '\0') {
+            ch = cmd[pos++];
+            if (ch == '\0') {
                 goto end;
             }
-            string_add_byte(&arg, cmd[pos++]);
-            break;
+            // Fallthrough
         default:
             string_add_byte(&arg, ch);
             break;
