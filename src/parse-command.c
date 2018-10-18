@@ -20,7 +20,7 @@ static void parse_sq(const char *cmd, size_t *posp)
             pos++;
             break;
         }
-        if (!cmd[pos]) {
+        if (cmd[pos] == '\0') {
             break;
         }
         string_add_byte(&arg, cmd[pos++]);
@@ -180,53 +180,58 @@ end:
     return string_steal_cstring(&arg);
 }
 
-size_t find_end(const char *cmd, size_t pos, Error **err)
+size_t find_end(const char *cmd, const size_t startpos, Error **err)
 {
+    size_t pos = startpos;
     while (1) {
-        char ch = cmd[pos];
-
-        if (!ch || ch == ';' || ascii_isspace(ch)) {
-            break;
-        }
-
-        pos++;
-        if (ch == '\'') {
+        switch (cmd[pos++]) {
+        case '\'':
             while (1) {
                 if (cmd[pos] == '\'') {
                     pos++;
                     break;
                 }
-                if (!cmd[pos]) {
+                if (cmd[pos] == '\0') {
                     *err = error_create("Missing '");
                     return 0;
                 }
                 pos++;
             }
-        } else if (ch == '"') {
+            break;
+        case '"':
             while (1) {
                 if (cmd[pos] == '"') {
                     pos++;
                     break;
                 }
-                if (!cmd[pos]) {
+                if (cmd[pos] == '\0') {
                     *err = error_create("Missing \"");
                     return 0;
                 }
                 if (cmd[pos++] == '\\') {
-                    if (!cmd[pos]) {
+                    if (cmd[pos] == '\0') {
                         goto unexpected_eof;
                     }
                     pos++;
                 }
             }
-        } else if (ch == '\\') {
-            if (!cmd[pos]) {
+            break;
+        case '\\':
+            if (cmd[pos] == '\0') {
                 goto unexpected_eof;
             }
             pos++;
+            break;
+        case '\0':
+        case '\t':
+        case '\n':
+        case '\r':
+        case ' ':
+        case ';':
+            return pos - 1;
         }
     }
-    return pos;
+    BUG("Unexpected break of outer loop");
 unexpected_eof:
     *err = error_create("Unexpected EOF");
     return 0;
@@ -241,7 +246,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
             pos++;
         }
 
-        if (!cmd[pos]) {
+        if (cmd[pos] == '\0') {
             break;
         }
 
