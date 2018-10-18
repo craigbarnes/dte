@@ -106,27 +106,25 @@ static void parse_var(const char *cmd, size_t *posp)
 {
     size_t si = *posp;
     size_t ei = si;
-    char *name, *value;
+
+    const char first_char = cmd[ei];
+    if (!ascii_isalpha(first_char) && first_char != '_') {
+        return;
+    }
+    ei++;
 
     while (1) {
         char ch = cmd[ei];
-
-        if (ascii_isalpha(ch) || ch == '_') {
-            ei++;
-            continue;
-        }
-        if (ei > si && ascii_isdigit(ch)) {
+        if (ascii_isalnum(ch) || ch == '_') {
             ei++;
             continue;
         }
         break;
     }
     *posp = ei;
-    if (ei == si) {
-        return;
-    }
-    name = xstrslice(cmd, si, ei);
-    value = expand_builtin_env(name);
+
+    char *name = xstrslice(cmd, si, ei);
+    char *value = expand_builtin_env(name);
     if (value != NULL) {
         string_add_str(&arg, value);
         free(value);
