@@ -8,6 +8,7 @@
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/uchar.h"
 #include "util/xmalloc.h"
 
 typedef struct {
@@ -24,19 +25,34 @@ static void CONSTRUCTOR prealloc(void)
 
 static bool is_valid_alias_name(const char *const name)
 {
-    for (size_t i = 0; name[i]; i++) {
-        const char ch = name[i];
-        if (!is_alnum_or_underscore(ch) && ch != '-') {
+    if (unlikely(name[0] == '\0')) {
+        error_msg("Empty alias name not allowed");
+        return false;
+    }
+
+    size_t i = 0;
+    CodePoint u;
+    while ((u = u_str_get_char(name, &i))) {
+        if (u > 0x7F) {
+            if (u_is_unicode(u)) {
+                continue;
+            }
+            error_msg("Invalid UTF-8 in alias name (at offset %zu)", i - 1);
             return false;
         }
+        if (is_alnum_or_underscore(u) || u == '-' || u == '?' || u == '!') {
+            continue;
+        }
+        error_msg("Invalid byte in alias name: 0x%02x", (unsigned int)u);
+        return false;
     }
-    return !!name[0];
+
+    return true;
 }
 
 void add_alias(const char *name, const char *value)
 {
     if (!is_valid_alias_name(name)) {
-        error_msg("Invalid alias name '%s'", name);
         return;
     }
     if (find_command(commands, name)) {
