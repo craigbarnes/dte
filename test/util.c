@@ -35,6 +35,12 @@ static void test_ascii(void)
     EXPECT_TRUE(is_word_byte('0'));
     EXPECT_TRUE(is_word_byte('9'));
     EXPECT_TRUE(is_word_byte('_'));
+    EXPECT_TRUE(is_word_byte(0x80));
+    EXPECT_TRUE(is_word_byte(0xFF));
+    EXPECT_FALSE(is_word_byte('-'));
+    EXPECT_FALSE(is_word_byte('.'));
+    EXPECT_FALSE(is_word_byte(0x7F));
+    EXPECT_FALSE(is_word_byte(0x00));
 
     EXPECT_EQ(hex_decode('0'), 0);
     EXPECT_EQ(hex_decode('9'), 9);

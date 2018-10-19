@@ -23,27 +23,18 @@ static void CONSTRUCTOR prealloc(void)
     ptr_array_init(&aliases, 32);
 }
 
-static bool is_valid_alias_name(const char *const name)
+static bool is_valid_alias_name(const char *name)
 {
     if (unlikely(name[0] == '\0')) {
         error_msg("Empty alias name not allowed");
         return false;
     }
 
-    size_t i = 0;
-    CodePoint u;
-    while ((u = u_str_get_char(name, &i))) {
-        if (u > 0x7F) {
-            if (u_is_unicode(u)) {
-                continue;
-            }
-            error_msg("Invalid UTF-8 in alias name (at offset %zu)", i - 1);
-            return false;
-        }
-        if (is_alnum_or_underscore(u) || u == '-' || u == '?' || u == '!') {
+    for (unsigned char c; (c = *name); name++) {
+        if (is_word_byte(c) || c == '-' || c == '?' || c == '!') {
             continue;
         }
-        error_msg("Invalid byte in alias name: 0x%02x", (unsigned int)u);
+        error_msg("Invalid byte in alias name: 0x%02x", (unsigned int)c);
         return false;
     }
 

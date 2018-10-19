@@ -2,18 +2,21 @@
 #define UTIL_ASCII_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "macros.h"
 
-extern const unsigned char ascii_table[256];
+extern const uint8_t ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
 #define ASCII_LOWER 0x04
 #define ASCII_UPPER 0x08
 #define ASCII_UNDERSCORE 0x10
+#define ASCII_NONASCII 0x20
 
 #define ASCII_ALPHA (ASCII_LOWER | ASCII_UPPER)
 #define ASCII_ALNUM (ASCII_ALPHA | ASCII_DIGIT)
+#define ASCII_WORDBYTE (ASCII_ALNUM | ASCII_UNDERSCORE | ASCII_NONASCII)
 
 #define ascii_test(x, mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
@@ -25,6 +28,7 @@ extern const unsigned char ascii_table[256];
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
+#define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
 static inline int PURE ascii_tolower(int x)
 {
@@ -40,11 +44,6 @@ static inline int PURE ascii_toupper(int x)
         return x & ~0x20;
     }
     return x;
-}
-
-static inline bool PURE is_word_byte(unsigned char byte)
-{
-    return is_alnum_or_underscore(byte) || byte > 0x7f;
 }
 
 int hex_decode(int ch) CONST_FN;

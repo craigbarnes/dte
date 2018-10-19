@@ -6,9 +6,10 @@ enum {
     U = ASCII_UPPER,
     D = ASCII_DIGIT,
     u = ASCII_UNDERSCORE,
+    N = ASCII_NONASCII,
 };
 
-const unsigned char ascii_table[256] = {
+const uint8_t ascii_table[256] = {
     ['\t'] = S, ['\n'] = S, ['\r'] = S, [' '] = S,
     ['_'] = u,
 
@@ -26,6 +27,16 @@ const unsigned char ascii_table[256] = {
     ['m'] = L, ['n'] = L, ['o'] = L, ['p'] = L, ['q'] = L, ['r'] = L,
     ['s'] = L, ['t'] = L, ['u'] = L, ['v'] = L, ['w'] = L, ['x'] = L,
     ['y'] = L, ['z'] = L,
+
+    [0x80] = N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
 };
 
 int hex_decode(int ch)
