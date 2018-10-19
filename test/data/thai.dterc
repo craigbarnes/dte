@@ -1,4 +1,5 @@
-open -e UTF-8
+alias เปิด open
+เปิด -e UTF-8
 insert "ภาษาไทย\n"
 up
 copy
