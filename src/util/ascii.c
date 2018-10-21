@@ -28,15 +28,15 @@ const uint8_t ascii_table[256] = {
     ['s'] = L, ['t'] = L, ['u'] = L, ['v'] = L, ['w'] = L, ['x'] = L,
     ['y'] = L, ['z'] = L,
 
-    [0x80] = N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
-    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N,
+    [0x7F] = 0,
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0x80 .. 0x8F
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0x90 .. 0x9F
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xA0 .. 0xAF
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xB0 .. 0xBF
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xC0 .. 0xCF
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xD0 .. 0xDF
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xE0 .. 0xEF
+    N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xF0 .. 0xFF
 };
 
 int hex_decode(int ch)
