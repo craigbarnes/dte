@@ -339,7 +339,7 @@ char get_confirmation(const char *choices, const char *format, ...)
     char buf[4096];
     KeyCode key;
     int pos, i, count = strlen(choices);
-    char def = 0;
+    unsigned char def = 0;
     va_list ap;
 
     va_start(ap, format);

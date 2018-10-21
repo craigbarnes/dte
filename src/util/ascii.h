@@ -9,10 +9,12 @@ extern const uint8_t ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
-#define ASCII_LOWER 0x04
-#define ASCII_UPPER 0x08
-#define ASCII_UNDERSCORE 0x10
-#define ASCII_NONASCII 0x20
+// 0x04
+// 0x08
+#define ASCII_LOWER 0x10
+#define ASCII_UPPER 0x20
+#define ASCII_UNDERSCORE 0x40
+#define ASCII_NONASCII 0x80
 
 #define ASCII_ALPHA (ASCII_LOWER | ASCII_UPPER)
 #define ASCII_ALNUM (ASCII_ALPHA | ASCII_DIGIT)
@@ -30,20 +32,14 @@ extern const uint8_t ascii_table[256];
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
-static inline int PURE ascii_tolower(int x)
+static inline PURE unsigned char ascii_tolower(unsigned char c)
 {
-    if (ascii_isupper(x)) {
-        return x | 0x20;
-    }
-    return x;
+    return c + (ascii_table[c] & ASCII_UPPER);
 }
 
-static inline int PURE ascii_toupper(int x)
+static inline PURE unsigned char ascii_toupper(unsigned char c)
 {
-    if (ascii_islower(x)) {
-        return x & ~0x20;
-    }
-    return x;
+    return c - ((ascii_table[c] & ASCII_LOWER) << 1);
 }
 
 int hex_decode(int ch) CONST_FN;
