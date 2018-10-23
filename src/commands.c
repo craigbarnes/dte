@@ -461,6 +461,8 @@ static void cmd_hi(const char* UNUSED_ARG(pf), char **args)
         exec_reset_colors_rc();
         remove_extra_colors();
     } else if (parse_term_color(&color, args + 1)) {
+        color.fg = convert_color_to_nearest_supported(color.fg);
+        color.bg = convert_color_to_nearest_supported(color.bg);
         set_highlight_color(args[0], &color);
     }
 

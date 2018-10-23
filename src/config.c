@@ -156,7 +156,7 @@ int read_config(const Command *cmds, const char *filename, ConfigFlags flags)
 
 void exec_reset_colors_rc(void)
 {
-    bool colors = terminal.max_colors >= 8;
+    bool colors = terminal.color_type >= TERM_8_COLOR;
     const char *cfg = colors ? "color/reset" : "color/reset-basic";
     read_config(commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }

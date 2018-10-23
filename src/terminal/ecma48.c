@@ -77,13 +77,6 @@ void ecma48_set_color(const TermColor *const color)
     size_t i = 3;
     TermColor c = *color;
 
-    if (c.fg >= 8 && c.fg <= 15) {
-        c.attr |= ATTR_BOLD;
-        c.fg &= 7;
-    }
-
-    // TODO: convert colors > 15 to closest supported color
-
     if (c.attr & ATTR_BOLD) {
         buf[i++] = ';';
         buf[i++] = '1';
@@ -129,7 +122,7 @@ static void no_op(void) {}
 static void no_op_s(const char* UNUSED_ARG(s)) {}
 
 TerminalInfo terminal = {
-    .max_colors = 8,
+    .color_type = TERM_8_COLOR,
     .width = 80,
     .height = 24,
     .raw = &term_raw,

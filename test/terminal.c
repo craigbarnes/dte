@@ -1,7 +1,32 @@
 #include <string.h>
 #include "test.h"
+#include "../src/terminal/color.h"
 #include "../src/terminal/key.h"
 #include "../src/terminal/xterm.h"
+
+static void test_parse_term_color(void)
+{
+    static const struct {
+        const char *const strs[4];
+        const TermColor expected_color;
+    } tests[] = {
+        {{"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
+        {{"#ff0000"}, {0xff0000 | COLOR_FLAG_RGB, -1, 0}},
+        {{"black", "#00ffff"}, {COLOR_BLACK, 0x00ffff | COLOR_FLAG_RGB, 0}},
+    };
+    FOR_EACH_I(i, tests) {
+        TermColor parsed_color, expected_color;
+        bool ok = parse_term_color(&parsed_color, (char**) tests[i].strs);
+        IEXPECT_TRUE(ok);
+        if (!ok) {
+            continue;
+        }
+        expected_color = tests[i].expected_color;
+        IEXPECT_EQ(parsed_color.fg, expected_color.fg);
+        IEXPECT_EQ(parsed_color.bg, expected_color.bg);
+        IEXPECT_EQ(parsed_color.attr, expected_color.attr);
+    }
+}
 
 static void test_xterm_parse_key(void)
 {
@@ -262,6 +287,7 @@ static void test_key_to_ctrl(void)
 
 void test_terminal(void)
 {
+    test_parse_term_color();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
     test_key_to_string();

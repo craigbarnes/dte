@@ -2,6 +2,7 @@
 #include "xterm.h"
 #include "ecma48.h"
 #include "output.h"
+#include "../debug.h"
 
 void xterm_save_title(void)
 {
@@ -18,6 +19,31 @@ void xterm_set_title(const char *title)
     buf_add_literal("\033]2;");
     buf_add_bytes(title, strlen(title));
     buf_add_ch('\007');
+}
+
+static inline void do_set_color(char *buf, size_t *pos, int32_t color, char ch)
+{
+    if (color < 0) {
+        return;
+    }
+
+    size_t i = *pos;
+    buf[i++] = ';';
+    buf[i++] = ch;
+
+    if (color < 8) {
+        buf[i++] = '0' + color;
+    } else if (color < 256) {
+        i += snprintf(buf + i, 8, "8;5;%u", (unsigned int) color);
+    } else if (color & COLOR_FLAG_RGB) {
+        uint8_t r, g, b;
+        color_split_rgb(color, &r, &g, &b);
+        i += snprintf(buf + i, 16, "8;2;%hhu;%hhu;%hhu", r, g, b);
+    } else {
+        BUG("color value shouldn't be > 255 when COLOR_FLAG_RGB bit is unset");
+    }
+
+    *pos = i;
 }
 
 void xterm_set_color(const TermColor *color)
@@ -39,39 +65,19 @@ void xterm_set_color(const TermColor *color)
         return;
     }
 
-    // Max 36 bytes ("E[0;1;2;3;4;5;7;8;38;5;255;48;5;255m")
+    // Max 52 bytes ("E[0;1;2;3;4;5;7;8;38;2;255;255;255;48;2;255;255;255m")
     char buf[64] = "\033[0";
     size_t i = 3;
-    TermColor c = *color;
 
     for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
-        if (c.attr & attr_map[j].attr) {
+        if (color->attr & attr_map[j].attr) {
             buf[i++] = ';';
             buf[i++] = attr_map[j].code;
         }
     }
 
-    if (c.fg >= 0) {
-        const unsigned char fg = (unsigned char) c.fg;
-        if (fg < 8) {
-            buf[i++] = ';';
-            buf[i++] = '3';
-            buf[i++] = '0' + fg;
-        } else {
-            i += snprintf(&buf[i], 10, ";38;5;%u", fg);
-        }
-    }
-
-    if (c.bg >= 0) {
-        const unsigned char bg = (unsigned char) c.bg;
-        if (bg < 8) {
-            buf[i++] = ';';
-            buf[i++] = '4';
-            buf[i++] = '0' + bg;
-        } else {
-            i += snprintf(&buf[i], 10, ";48;5;%u", bg);
-        }
-    }
+    do_set_color(buf, &i, color->fg, '3');
+    do_set_color(buf, &i, color->bg, '4');
 
     buf[i++] = 'm';
     buf_add_bytes(buf, i);
@@ -80,7 +86,7 @@ void xterm_set_color(const TermColor *color)
 
 const TerminalInfo terminal_xterm = {
     .back_color_erase = true,
-    .max_colors = 8,
+    .color_type = TERM_TRUE_COLOR,
     .width = 80,
     .height = 24,
     .raw = &term_raw,

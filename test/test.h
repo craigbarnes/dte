@@ -18,6 +18,8 @@
 
 #define IEXPECT_EQ(a, b) iexpect_eq(__FILE__, __LINE__, i, a, b)
 #define IEXPECT_STREQ(s1, s2) iexpect_streq(__FILE__, __LINE__, i, s1, s2)
+#define IEXPECT_TRUE(x) IEXPECT_EQ(!!(x), 1)
+#define IEXPECT_FALSE(x) IEXPECT_EQ(x, 0)
 
 extern unsigned int failed;
 

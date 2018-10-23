@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
     bool back_color_erase;
-    int max_colors;
+    TermColorCapabilityType color_type;
     int width;
     int height;
     unsigned short ncv_attributes;

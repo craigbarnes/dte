@@ -265,9 +265,25 @@ static void term_init_terminfo(const char *term)
     }
 
     terminal.back_color_erase = tigetflag("bce");
-    terminal.max_colors = tigetnum("colors");
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
+
+    switch (tigetnum("colors")) {
+    case 0x1000000:
+    case 256:
+        terminal.color_type = TERM_256_COLOR;
+        break;
+    case 16:
+        terminal.color_type = TERM_16_COLOR;
+        break;
+    case 88:
+    case 8:
+        terminal.color_type = TERM_8_COLOR;
+        break;
+    default:
+        terminal.color_type = TERM_0_COLOR;
+        break;
+    }
 
     const int ncv = tigetnum("ncv");
     if (ncv <= 0) {
@@ -366,6 +382,6 @@ void term_init(void)
 #endif
 
     if (str_has_suffix(term, "256color")) {
-        terminal.max_colors = 256;
+        terminal.color_type = TERM_256_COLOR;
     }
 }
