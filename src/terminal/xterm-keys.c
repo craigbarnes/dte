@@ -27,26 +27,35 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    switch (buf[i++]) {
-    case ' ': *k = ' '; return i;
-    case 'A': *k = KEY_UP; return i;
-    case 'B': *k = KEY_DOWN; return i;
-    case 'C': *k = KEY_RIGHT; return i;
-    case 'D': *k = KEY_LEFT; return i;
-    case 'F': *k = KEY_END; return i;
-    case 'H': *k = KEY_HOME; return i;
-    case 'I': *k = '\t'; return i;
-    case 'M': *k = '\r'; return i;
-    case 'P': *k = KEY_F1; return i;
-    case 'Q': *k = KEY_F2; return i;
-    case 'R': *k = KEY_F3; return i;
-    case 'S': *k = KEY_F4; return i;
-    case 'X': *k = '='; return i;
-    case 'j': *k = '*'; return i;
-    case 'k': *k = '+'; return i;
-    case 'l': *k = ','; return i;
-    case 'm': *k = '-'; return i;
-    case 'o': *k = '/'; return i;
+    const char ch = buf[i++];
+    switch (ch) {
+    case 'A': // Up
+    case 'B': // Down
+    case 'C': // Right
+    case 'D': // Left
+    case 'F': // End
+    case 'H': // Home
+        *k = KEY_UP + (ch - 'A');
+        return i;
+    case 'P': // F1
+    case 'Q': // F2
+    case 'R': // F3
+    case 'S': // F4
+        *k = KEY_F1 + (ch - 'P');
+        return i;
+    case 'X':
+        *k = '=';
+        return i;
+    case ' ':
+        *k = ch;
+        return i;
+    case 'j': case 'k': case 'l': case 'm':
+    case 'n': case 'o': case 'p': case 'q':
+    case 'r': case 's': case 't': case 'u':
+    case 'v': case 'w': case 'x': case 'y':
+    case 'z': case 'I': case 'M':
+        *k = ch - 64;
+        return i;
     }
     return 0;
 }
@@ -62,17 +71,22 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     } else if (i >= length) {
         return -1;
     }
-    switch (buf[i++]) {
-    case 'A': tmp |= KEY_UP; goto match;
-    case 'B': tmp |= KEY_DOWN; goto match;
-    case 'C': tmp |= KEY_RIGHT; goto match;
-    case 'D': tmp |= KEY_LEFT; goto match;
-    case 'F': tmp |= KEY_END; goto match;
-    case 'H': tmp |= KEY_HOME; goto match;
-    case 'P': tmp |= KEY_F1; goto match;
-    case 'Q': tmp |= KEY_F2; goto match;
-    case 'R': tmp |= KEY_F3; goto match;
-    case 'S': tmp |= KEY_F4; goto match;
+    const char ch = buf[i++];
+    switch (ch) {
+    case 'A': // Up
+    case 'B': // Down
+    case 'C': // Right
+    case 'D': // Left
+    case 'F': // End
+    case 'H': // Home
+        tmp |= KEY_UP + (ch - 'A');
+        goto match;
+    case 'P': // F1
+    case 'Q': // F2
+    case 'R': // F3
+    case 'S': // F4
+        tmp |= KEY_F1 + (ch - 'P');
+        goto match;
     }
     return 0;
 match:
@@ -86,30 +100,37 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return -1;
     }
     KeyCode tmp;
-    switch (buf[i++]) {
-    case '3': tmp = KEY_DELETE; goto check_delim;
-    case '4': tmp = KEY_END; goto check_trailing_tilde;
-    case '5':tmp = KEY_PAGE_UP; goto check_delim;
-    case '6': tmp = KEY_PAGE_DOWN; goto check_delim;
-    case 'A': *k = KEY_UP; return i;
-    case 'B': *k = KEY_DOWN; return i;
-    case 'C': *k = KEY_RIGHT; return i;
-    case 'D': *k = KEY_LEFT; return i;
-    case 'F': *k = KEY_END; return i;
-    case 'H': *k = KEY_HOME; return i;
+    char ch = buf[i++];
+    switch (ch) {
+    case 'A': // Up
+    case 'B': // Down
+    case 'C': // Right
+    case 'D': // Left
+    case 'F': // End
+    case 'H': // Home
+        *k = KEY_UP + (ch - 'A');
+        return i;
     case 'L': *k = KEY_INSERT; return i;
     case 'Z': *k = MOD_SHIFT | '\t'; return i;
+    case '3': tmp = KEY_DELETE; goto check_delim;
+    case '4': tmp = KEY_END; goto check_trailing_tilde;
+    case '5': tmp = KEY_PAGE_UP; goto check_delim;
+    case '6': tmp = KEY_PAGE_DOWN; goto check_delim;
     case '1':
         if (i >= length) return -1;
-        switch (buf[i++]) {
-        case '1': tmp = KEY_F1; goto check_trailing_tilde;
-        case '2': tmp = KEY_F2; goto check_trailing_tilde;
-        case '3': tmp = KEY_F3; goto check_trailing_tilde;
-        case '4': tmp = KEY_F4; goto check_trailing_tilde;
-        case '5': tmp = KEY_F5; goto check_delim;
-        case '7': tmp = KEY_F6; goto check_delim;
-        case '8': tmp = KEY_F7; goto check_delim;
-        case '9': tmp = KEY_F8; goto check_delim;
+        switch (ch = buf[i++]) {
+        case '1': // F1
+        case '2': // F2
+        case '3': // F3
+        case '4': // F4
+        case '5': // F5
+            tmp = KEY_F1 + (ch - '1');
+            goto check_delim;
+        case '7': // F6
+        case '8': // F7
+        case '9': // F8
+            tmp = KEY_F6 + (ch - '7');
+            goto check_delim;
         case ';': return parse_csi1(buf, length, i, k);
         case '~': *k = KEY_HOME; return i;
         }
@@ -127,13 +148,15 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return 0;
     case '[':
         if (i >= length) return -1;
-        switch (buf[i++]) {
+        switch (ch = buf[i++]) {
         // Linux console keys
-        case 'A': *k = KEY_F1; return i;
-        case 'B': *k = KEY_F2; return i;
-        case 'C': *k = KEY_F3; return i;
-        case 'D': *k = KEY_F4; return i;
-        case 'E': *k = KEY_F5; return i;
+        case 'A': // F1
+        case 'B': // F2
+        case 'C': // F3
+        case 'D': // F4
+        case 'E': // F5
+            *k = KEY_F1 + (ch - 'A');
+            return i;
         }
         return 0;
     }
