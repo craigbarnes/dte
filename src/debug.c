@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -9,6 +10,7 @@
 #include "editor.h"
 #include "terminal/terminfo.h"
 #include "util/xreadwrite.h"
+#include "util/xsnprintf.h"
 
 void term_cleanup(void)
 {
@@ -25,6 +27,15 @@ void term_cleanup(void)
             terminal.control_codes.deinit.length
         );
     }
+}
+
+NORETURN
+void fatal_error(const char *msg, int err)
+{
+    term_cleanup();
+    errno = err;
+    perror(msg);
+    abort();
 }
 
 #if DEBUG >= 1
@@ -63,15 +74,13 @@ void debug_print(const char *function, const char *fmt, ...)
 
     char buf[4096];
     size_t write_max = ARRAY_COUNT(buf);
-    const int len1 = snprintf(buf, write_max, "%s: ", function);
-    BUG_ON(len1 <= 0 || len1 > write_max);
+    const int len1 = xsnprintf(buf, write_max, "%s: ", function);
     write_max -= len1;
 
     va_list ap;
     va_start(ap, fmt);
-    const int len2 = vsnprintf(buf + len1, write_max, fmt, ap);
+    const int len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     va_end(ap);
-    BUG_ON(len2 <= 0 || len2 > write_max);
 
     xwrite(fd, buf, len1 + len2);
 }

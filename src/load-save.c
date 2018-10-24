@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include "load-save.h"

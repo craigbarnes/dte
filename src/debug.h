@@ -30,4 +30,7 @@
 
 void term_cleanup(void);
 
+NORETURN COLD NONNULL_ARGS
+void fatal_error(const char *msg, int err);
+
 #endif

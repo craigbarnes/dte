@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "error.h"
 #include "common.h"
 #include "config.h"

@@ -8,6 +8,7 @@
 #include "util/strtonum.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 
 typedef struct {
     int row, col;
@@ -94,7 +95,7 @@ void save_file_history(const char *filename)
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
         char str[64];
-        snprintf(str, sizeof(str), "%d %d ", e->row, e->col);
+        xsnprintf(str, sizeof(str), "%d %d ", e->row, e->col);
         wbuf_write_str(&buf, str);
         wbuf_write_str(&buf, e->filename);
         wbuf_write_ch(&buf, '\n');

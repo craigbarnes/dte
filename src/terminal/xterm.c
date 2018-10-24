@@ -3,6 +3,7 @@
 #include "ecma48.h"
 #include "output.h"
 #include "../debug.h"
+#include "../util/xsnprintf.h"
 
 void xterm_save_title(void)
 {
@@ -34,11 +35,11 @@ static inline void do_set_color(char *buf, size_t *pos, int32_t color, char ch)
     if (color < 8) {
         buf[i++] = '0' + color;
     } else if (color < 256) {
-        i += snprintf(buf + i, 8, "8;5;%u", (unsigned int) color);
+        i += xsnprintf(buf + i, 8, "8;5;%u", (unsigned int) color);
     } else if (color & COLOR_FLAG_RGB) {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        i += snprintf(buf + i, 16, "8;2;%hhu;%hhu;%hhu", r, g, b);
+        i += xsnprintf(buf + i, 16, "8;2;%hhu;%hhu;%hhu", r, g, b);
     } else {
         BUG("color value shouldn't be > 255 when COLOR_FLAG_RGB bit is unset");
     }

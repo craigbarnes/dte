@@ -9,7 +9,7 @@
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)
 
-#define FAIL(fmt, ...) fail(__FILE__, __LINE__, fmt, __VA_ARGS__)
+#define FAIL(fmt, ...) test_fail(__FILE__, __LINE__, fmt, __VA_ARGS__)
 
 #define EXPECT_STREQ(s1, s2) expect_streq(__FILE__, __LINE__, s1, s2)
 #define EXPECT_EQ(a, b) expect_eq(__FILE__, __LINE__, a, b)
@@ -23,7 +23,7 @@
 
 extern unsigned int failed;
 
-void fail(const char *file, int line, const char *format, ...) PRINTF(3);
+void test_fail(const char *file, int line, const char *format, ...) PRINTF(3);
 void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2);

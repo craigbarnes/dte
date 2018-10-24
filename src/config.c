@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "config.h"
 #include "common.h"
 #include "completion.h"

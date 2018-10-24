@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "screen.h"
 #include "cmdline.h"
 #include "editor.h"
@@ -8,6 +9,7 @@
 #include "terminal/terminfo.h"
 #include "util/path.h"
 #include "util/uchar.h"
+#include "util/xsnprintf.h"
 #include "view.h"
 
 void set_color(TermColor *color)
@@ -166,9 +168,9 @@ void update_line_numbers(Window *win, bool force)
         char buf[32];
 
         if (line > lines) {
-            snprintf(buf, sizeof(buf), "%*s ", w, "");
+            xsnprintf(buf, sizeof(buf), "%*s ", w, "");
         } else {
-            snprintf(buf, sizeof(buf), "%*d ", w, line);
+            xsnprintf(buf, sizeof(buf), "%*d ", w, line);
         }
         terminal.move_cursor(x, win->edit_y + i);
         buf_add_bytes(buf, win->line_numbers.width);

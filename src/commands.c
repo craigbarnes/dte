@@ -29,6 +29,7 @@
 #include "util/path.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
 
@@ -1222,7 +1223,7 @@ static void cmd_search(const char *pf, char **args)
         }
         size_t len = strlen(word) + 5;
         pattern = xnew(char, len);
-        snprintf(pattern, len, "\\<%s\\>", word);
+        xsnprintf(pattern, len, "\\<%s\\>", word);
         free(word);
     }
 
@@ -1435,11 +1436,9 @@ static void cmd_tag(const char *pf, char **args)
     } else {
         for (size_t i = 0; i < tags.count; i++) {
             Tag *t = tags.ptrs[i];
-            Message *m;
             char buf[512];
-
-            snprintf(buf, sizeof(buf), "Tag %s", name);
-            m = new_message(buf);
+            xsnprintf(buf, sizeof(buf), "Tag %s", name);
+            Message *m = new_message(buf);
             m->loc = xnew0(FileLocation, 1);
             m->loc->filename = tag_file_get_tag_filename(tf, t);
             if (t->pattern) {

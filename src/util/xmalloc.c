@@ -9,18 +9,9 @@
 
 #define CHECK_ALLOC(x) do { \
     if (unlikely((x) == NULL)) { \
-        fail(__func__, errno); \
+        fatal_error(__func__, errno); \
     } \
 } while (0)
-
-NORETURN COLD NONNULL_ARGS
-static void fail(const char *msg, int err)
-{
-    term_cleanup();
-    errno = err;
-    perror(msg);
-    abort();
-}
 
 static bool size_multiply_overflows(size_t a, size_t b, size_t *result)
 {
@@ -39,7 +30,7 @@ size_t size_multiply(size_t a, size_t b)
 {
     size_t result;
     if (unlikely(size_multiply_overflows(a, b, &result))) {
-        fail(__func__, EOVERFLOW);
+        fatal_error(__func__, EOVERFLOW);
     }
     return result;
 }
@@ -98,7 +89,7 @@ static int xvasprintf_(char **strp, const char *format, va_list ap)
     va_copy(ap2, ap);
     int n = vsnprintf(NULL, 0, format, ap2);
     if (unlikely(n < 0)) {
-        fail("vsnprintf", errno);
+        fatal_error("vsnprintf", errno);
     }
     va_end(ap2);
     *strp = xmalloc(n + 1);

@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include <signal.h>
+#include <stdio.h>
 #include "alias.h"
 #include "config.h"
 #include "editor.h"

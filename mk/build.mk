@@ -32,7 +32,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum uchar \
-    unicode wbuf xmalloc xreadwrite )
+    unicode wbuf xmalloc xreadwrite xsnprintf )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder )

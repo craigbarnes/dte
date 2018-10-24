@@ -4,6 +4,7 @@
 #include "terminal/terminfo.h"
 #include "util/strtonum.h"
 #include "util/uchar.h"
+#include "util/xsnprintf.h"
 
 static int tab_title_width(int number, const char *filename)
 {
@@ -142,7 +143,7 @@ static void print_horizontal_tab_title(View *v, size_t idx)
         filename += u_skip_chars(filename, &skip);
     }
 
-    snprintf (
+    xsnprintf (
         buf,
         sizeof(buf),
         "%c%zu%c",
@@ -201,7 +202,7 @@ static void print_vertical_tab_title(View *v, int idx, int width)
     char buf[16];
     int skip;
 
-    snprintf (
+    xsnprintf (
         buf,
         sizeof(buf),
         "%2d%s",

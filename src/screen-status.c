@@ -4,6 +4,7 @@
 #include "terminal/output.h"
 #include "terminal/terminfo.h"
 #include "util/uchar.h"
+#include "util/xsnprintf.h"
 
 typedef struct {
     char *buf;
@@ -44,9 +45,8 @@ static void add_status_format(Formatter *f, const char *format, ...)
 {
     char buf[1024];
     va_list ap;
-
     va_start(ap, format);
-    vsnprintf(buf, sizeof(buf), format, ap);
+    xvsnprintf(buf, sizeof(buf), format, ap);
     va_end(ap);
     add_status_str(f, buf);
 }
@@ -181,7 +181,7 @@ static const char *format_misc_status(Window *win)
     static char misc_status[32] = {'\0'};
 
     if (editor.input_mode == INPUT_SEARCH) {
-        snprintf (
+        xsnprintf (
             misc_status,
             sizeof(misc_status),
             "[case-sensitive = %s]",
@@ -191,14 +191,14 @@ static const char *format_misc_status(Window *win)
         SelectionInfo info;
         init_selection(win->view, &info);
         if (win->view->selection == SELECT_LINES) {
-            snprintf (
+            xsnprintf (
                 misc_status,
                 sizeof(misc_status),
                 "[%zu lines]",
                 get_nr_selected_lines(&info)
             );
         } else {
-            snprintf (
+            xsnprintf (
                 misc_status,
                 sizeof(misc_status),
                 "[%zu chars]",

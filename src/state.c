@@ -9,6 +9,7 @@
 #include "terminal/color.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 
 static void bitmap_set(unsigned char *bitmap, long idx)
 {
@@ -536,26 +537,14 @@ Syntax *load_syntax_by_filetype(const char *filetype)
 {
     const char *cfgdir = editor.user_config_dir;
     char filename[4096];
-    Syntax *syn;
-    int err, n;
+    int err;
 
-    n = snprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
-    if (n <= 0 || n >= sizeof filename) {
-        goto snprintf_error;
-    }
-    syn = load_syntax_file(filename, CFG_NOFLAGS, &err);
+    xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
+    Syntax *syn = load_syntax_file(filename, CFG_NOFLAGS, &err);
     if (syn || err != ENOENT) {
         return syn;
     }
 
-    n = snprintf(filename, sizeof filename, "syntax/%s", filetype);
-    if (n <= 0 || n >= sizeof filename) {
-        goto snprintf_error;
-    }
-    syn = load_syntax_file(filename, CFG_BUILTIN, &err);
-    return syn;
-
-snprintf_error:
-    error_msg("internal error: snprintf() failed (returned %d)", n);
-    return NULL;
+    xsnprintf(filename, sizeof filename, "syntax/%s", filetype);
+    return load_syntax_file(filename, CFG_BUILTIN, &err);
 }

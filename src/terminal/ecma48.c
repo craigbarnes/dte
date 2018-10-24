@@ -6,6 +6,7 @@
 #include "terminfo.h"
 #include "xterm.h"
 #include "../util/macros.h"
+#include "../util/xsnprintf.h"
 
 static struct termios termios_save;
 
@@ -51,18 +52,14 @@ void ecma48_move_cursor(int x, int y)
         return;
     }
     static char buf[16];
-    const int len = snprintf (
+    const int len = xsnprintf (
         buf,
-        11, // == strlen("\033[998;998H") + 1 (for NUL, to avoid truncation)
+        11, // == strlen("\033[998;998H\0")
         "\033[%u;%uH",
         // x and y are zero-based
         ((unsigned int)y) + 1,
         ((unsigned int)x) + 1
     );
-    static_assert(6 == STRLEN("\033[0;0H"));
-    //BUG_ON(len < 6);
-    static_assert(10 == STRLEN("\033[998;998H"));
-    //BUG_ON(len > 10);
     buf_add_bytes(buf, (size_t)len);
 }
 
@@ -110,11 +107,7 @@ void ecma48_repeat_byte(char ch, size_t count)
         return;
     }
     char buf[16];
-    int n = snprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
-    if (unlikely(n < 5 || n > 9)) {
-        buf_repeat_byte(ch, count);
-        return;
-    }
+    int n = xsnprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
     buf_add_bytes(buf, n);
 }
 

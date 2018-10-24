@@ -1,6 +1,7 @@
 #include <langinfo.h>
 #include <locale.h>
 #include <signal.h>
+#include <stdio.h>
 #include "editor.h"
 #include "buffer.h"
 #include "command.h"

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "syntax.h"
 #include "common.h"
 #include "error.h"
