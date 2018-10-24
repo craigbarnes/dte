@@ -49,11 +49,12 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     case ' ':
         *k = ch;
         return i;
-    case 'j': case 'k': case 'l': case 'm':
-    case 'n': case 'o': case 'p': case 'q':
-    case 'r': case 's': case 't': case 'u':
-    case 'v': case 'w': case 'x': case 'y':
-    case 'z': case 'I': case 'M':
+    case 'j': case 'k': case 'l':
+    case 'm': case 'n': case 'o':
+    case 'p': case 'q': case 'r':
+    case 's': case 't': case 'u':
+    case 'v': case 'w': case 'x':
+    case 'y': case 'I': case 'M':
         *k = ch - 64;
         return i;
     }
