@@ -1,5 +1,6 @@
 #include "test.h"
 #include "../src/util/ascii.h"
+#include "../src/util/hashset.h"
 #include "../src/util/string.h"
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"
@@ -180,6 +181,51 @@ static void test_u_str_width(void)
     );
 }
 
+static void test_hashset(void)
+{
+    static const char *const strings[] = {
+        "foo", "Foo", "bar", "quux", "etc",
+        "\t\xff\x80\b", "\t\t\t", "\x01\x02\x03\xfe\xff",
+#if __STDC_VERSION__ >= 201112L
+        u8"ภาษาไทย",
+        u8"中文",
+        u8"日本語",
+#endif
+    };
+
+    HashSet set;
+    hashset_init(&set, (char**)strings, ARRAY_COUNT(strings), false);
+
+    EXPECT_TRUE(hashset_contains(&set, "\t\xff\x80\b", 4));
+    EXPECT_TRUE(hashset_contains(&set, "foo", 3));
+    EXPECT_TRUE(hashset_contains(&set, "Foo", 3));
+
+    EXPECT_FALSE(hashset_contains(&set, "FOO", 3));
+    EXPECT_FALSE(hashset_contains(&set, "", 0));
+    EXPECT_FALSE(hashset_contains(&set, NULL, 0));
+    EXPECT_FALSE(hashset_contains(&set, "\0", 1));
+
+    const char *last_string = strings[ARRAY_COUNT(strings) - 1];
+    EXPECT_TRUE(hashset_contains(&set, last_string, strlen(last_string)));
+
+    FOR_EACH_I(i, strings) {
+        const char *str = strings[i];
+        const size_t len = strlen(str);
+        EXPECT_TRUE(hashset_contains(&set, str, len));
+        EXPECT_FALSE(hashset_contains(&set, str, len - 1));
+        EXPECT_FALSE(hashset_contains(&set, str + 1, len - 1));
+    }
+
+    hashset_free(&set);
+    memzero(&set);
+
+    hashset_init(&set, (char**)strings, ARRAY_COUNT(strings), true);
+    EXPECT_TRUE(hashset_contains(&set, "foo", 3));
+    EXPECT_TRUE(hashset_contains(&set, "FOO", 3));
+    EXPECT_TRUE(hashset_contains(&set, "fOO", 3));
+    hashset_free(&set);
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -189,4 +235,5 @@ void test_util(void)
     test_u_to_lower();
     test_u_is_upper();
     test_u_str_width();
+    test_hashset();
 }
