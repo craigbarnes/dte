@@ -92,7 +92,7 @@ void xterm_set_color(const TermColor *color)
 
 const TerminalInfo terminal_xterm = {
     .back_color_erase = true,
-    .color_type = TERM_TRUE_COLOR,
+    .color_type = TERM_8_COLOR,
     .width = 80,
     .height = 24,
     .raw = &term_raw,
