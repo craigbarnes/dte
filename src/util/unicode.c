@@ -60,10 +60,7 @@ bool u_is_space(CodePoint u)
 
 bool u_is_word_char(CodePoint u)
 {
-    if (u > 0x7f) {
-        return true;
-    }
-    return is_alnum_or_underscore(u);
+    return u >= 0x80 || is_alnum_or_underscore(u);
 }
 
 bool u_is_unprintable(CodePoint u)
