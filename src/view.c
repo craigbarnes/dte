@@ -36,7 +36,7 @@ void view_update_cursor_x(View *v)
         CodePoint u = lr.line[idx++];
 
         c++;
-        if (likely(u < 0x80)) {
+        if (u < 0x80) {
             if (!u_is_ctrl(u)) {
                 w++;
             } else if (u == '\t') {

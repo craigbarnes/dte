@@ -191,8 +191,8 @@ static void skipped_too_much(CodePoint u)
 
 static void buf_skip(CodePoint u)
 {
-    if (likely(u < 0x80)) {
-        if (likely(!u_is_ctrl(u))) {
+    if (u < 0x80) {
+        if (!u_is_ctrl(u)) {
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             obuf.x += (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
@@ -243,8 +243,8 @@ bool buf_put_char(CodePoint u)
     }
 
     obuf_need_space(8);
-    if (likely(u < 0x80)) {
-        if (likely(!u_is_ctrl(u))) {
+    if (u < 0x80) {
+        if (!u_is_ctrl(u)) {
             obuf.buf[obuf.count++] = u;
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {

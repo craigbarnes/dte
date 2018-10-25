@@ -144,7 +144,7 @@ static CodePoint screen_next_char(LineInfo *info)
     TermColor color;
     bool ws_error = false;
 
-    if (likely(u < 0x80)) {
+    if (u < 0x80) {
         info->pos++;
         count = 1;
         if (u == '\t' || u == ' ') {
@@ -183,10 +183,9 @@ static CodePoint screen_next_char(LineInfo *info)
 static void screen_skip_char(LineInfo *info)
 {
     CodePoint u = info->line[info->pos++];
-
     info->offset++;
-    if (likely(u < 0x80)) {
-        if (likely(!u_is_ctrl(u))) {
+    if (u < 0x80) {
+        if (!u_is_ctrl(u)) {
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             obuf.x += (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
@@ -196,7 +195,6 @@ static void screen_skip_char(LineInfo *info)
         }
     } else {
         size_t pos = info->pos;
-
         info->pos--;
         u = u_get_nonascii(info->line, info->size, &info->pos);
         obuf.x += u_char_width(u);
