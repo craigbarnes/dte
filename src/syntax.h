@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "color.h"
+#include "util/hashset.h"
 #include "util/ptr-array.h"
 
 typedef enum {
@@ -30,16 +31,9 @@ typedef struct {
     HlColor *emit_color;
 } Action;
 
-typedef struct HashStr {
-    struct HashStr *next;
-    size_t len;
-    char str[1];
-} HashStr;
-
 typedef struct {
     char *name;
-    HashStr *hash[62];
-    bool icase;
+    HashSet strings;
     bool used;
     bool defined;
 } StringList;
@@ -125,7 +119,6 @@ static inline bool is_subsyntax(Syntax *syn)
     return syn->name[0] == '.';
 }
 
-unsigned long buf_hash(const char *str, size_t size);
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
 State *merge_syntax(Syntax *syn, SyntaxMerge *m);

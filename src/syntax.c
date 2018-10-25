@@ -8,17 +8,6 @@
 
 static PointerArray syntaxes = PTR_ARRAY_INIT;
 
-unsigned long buf_hash(const char *str, size_t size)
-{
-    unsigned long hash = 0;
-
-    for (size_t i = 0; i < size; i++) {
-        unsigned int ch = ascii_tolower(str[i]);
-        hash = (hash << 5) - hash + ch;
-    }
-    return hash;
-}
-
 StringList *find_string_list(const Syntax *syn, const char *name)
 {
     for (size_t i = 0, n = syn->string_lists.count; i < n; i++) {
@@ -204,14 +193,7 @@ static void free_state(State *s)
 
 static void free_string_list(StringList *list)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(list->hash); i++) {
-        HashStr *h = list->hash[i];
-        while (h) {
-            HashStr *next = h->next;
-            free(h);
-            h = next;
-        }
-    }
+    hashset_free(&list->strings);
     free(list->name);
     free(list);
 }

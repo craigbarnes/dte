@@ -301,15 +301,13 @@ static void cmd_heredocend(const char* UNUSED_ARG(pf), char **args)
 
 static void cmd_list(const char *pf, char **args)
 {
-    const char *name = args[0];
-    StringList *list;
-
     close_state();
     if (no_syntax()) {
         return;
     }
 
-    list = find_string_list(current_syntax, name);
+    const char *name = args[0];
+    StringList *list = find_string_list(current_syntax, name);
     if (list == NULL) {
         list = xnew0(StringList, 1);
         list->name = xstrdup(name);
@@ -319,18 +317,9 @@ static void cmd_list(const char *pf, char **args)
         return;
     }
     list->defined = true;
-    list->icase = !!*pf;
 
-    for (size_t i = 1; args[i]; i++) {
-        const char *str = args[i];
-        const size_t len = strlen(str);
-        unsigned long idx = buf_hash(str, len) % ARRAY_COUNT(list->hash);
-        HashStr *h = xmalloc(sizeof(HashStr *) + sizeof(size_t) + len);
-        h->next = list->hash[idx];
-        h->len = len;
-        memcpy(h->str, str, len);
-        list->hash[idx] = h;
-    }
+    bool icase = !!*pf;
+    hashset_init(&list->strings, args + 1, count_strings(args) - 1, icase);
 }
 
 static void cmd_inlist(const char* UNUSED_ARG(pf), char **args)

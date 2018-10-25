@@ -40,29 +40,6 @@ static bool is_buffered(const Condition *cond, const char *str, size_t len)
     return !memcmp(cond->u.cond_bufis.str, str, len);
 }
 
-static bool in_hash(StringList *list, const char *str, size_t len)
-{
-    unsigned long hash = buf_hash(str, len);
-    HashStr *h = list->hash[hash % ARRAY_COUNT(list->hash)];
-
-    if (list->icase) {
-        while (h) {
-            if (len == h->len && !strncasecmp(str, h->str, len)) {
-                return true;
-            }
-            h = h->next;
-        }
-    } else {
-        while (h) {
-            if (len == h->len && !memcmp(str, h->str, len)) {
-                return true;
-            }
-            h = h->next;
-        }
-    }
-    return false;
-}
-
 static State *handle_heredoc (
     Syntax *syn,
     State *state,
@@ -153,7 +130,11 @@ static HlColor **highlight_line (
             case COND_INLIST:
                 if (
                     sidx >= 0
-                    && in_hash(cond->u.cond_inlist.list, line + sidx, i - sidx)
+                    && hashset_contains (
+                        &cond->u.cond_inlist.list->strings,
+                        line + sidx,
+                        i - sidx
+                    )
                 ) {
                     int idx;
                     for (idx = sidx; idx < i; idx++) {
