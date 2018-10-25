@@ -5,22 +5,27 @@
 #include "ascii.h"
 #include "xmalloc.h"
 
-static unsigned long buf_hash(const char *str, size_t size)
+#define FNV_BASE UINT32_C(2166136261)
+#define FNV_PRIME UINT32_C(16777619)
+
+static uint32_t fnv_1a_hash(const char *str, size_t len)
 {
-    unsigned long hash = 0;
-    for (size_t i = 0; i < size; i++) {
-        unsigned long ch = str[i];
-        hash = (hash << 5) - hash + ch;
+    uint32_t hash = FNV_BASE;
+    while (len--) {
+        uint32_t c = *str++;
+        hash ^= c;
+        hash *= FNV_PRIME;
     }
     return hash;
 }
 
-static unsigned long buf_hash_icase(const char *str, size_t size)
+static uint32_t fnv_1a_hash_icase(const char *str, size_t len)
 {
-    unsigned long hash = 0;
-    for (size_t i = 0; i < size; i++) {
-        unsigned long ch = ascii_tolower(str[i]);
-        hash = (hash << 5) - hash + ch;
+    uint32_t hash = FNV_BASE;
+    while (len--) {
+        uint32_t c = ascii_tolower(*str++);
+        hash ^= c;
+        hash *= FNV_PRIME;
     }
     return hash;
 }
@@ -41,16 +46,17 @@ void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
     set->table_size = table_size;
     set->table = table;
     if (icase) {
-        set->hash = buf_hash_icase;
+        set->hash = fnv_1a_hash_icase;
         set->compare = strncasecmp;
     } else {
-        set->hash = buf_hash;
+        set->hash = fnv_1a_hash;
         set->compare = memcmp_strings;
     }
     for (size_t i = 0; i < nstrings; i++) {
         const char *str = strings[i];
         const size_t str_len = strlen(str);
-        unsigned long slot = set->hash(str, str_len) % table_size;
+        const uint32_t hash = set->hash(str, str_len);
+        const size_t slot = (size_t)hash % table_size;
         HashSetEntry *h = xmalloc(sizeof(HashSetEntry) + str_len);
         h->next = table[slot];
         h->str_len = str_len;
@@ -74,7 +80,7 @@ void hashset_free(HashSet *set)
 
 bool hashset_contains(HashSet *set, const char *str, size_t str_len)
 {
-    unsigned long hash = set->hash(str, str_len);
+    uint32_t hash = set->hash(str, str_len);
     HashSetEntry *h = set->table[hash % set->table_size];
     while (h) {
         if (str_len == h->str_len && !set->compare(str, h->str, str_len)) {

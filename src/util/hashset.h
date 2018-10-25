@@ -1,8 +1,9 @@
 #ifndef UTIL_HASHSET_H
 #define UTIL_HASHSET_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 #include "macros.h"
 
 // This is a container type for holding a *set* of related strings.
@@ -13,7 +14,7 @@
 typedef struct {
     struct HashSetEntry **table;
     size_t table_size;
-    unsigned long (*hash)(const char *str, size_t size);
+    uint32_t (*hash)(const char *str, size_t len);
     int (*compare)(const char *s1, const char *s2, size_t n);
 } HashSet;
 
