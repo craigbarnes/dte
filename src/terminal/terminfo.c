@@ -269,7 +269,7 @@ static void term_init_terminfo(const char *term)
     terminal.height = tigetnum("lines");
 
     switch (tigetnum("colors")) {
-    case 0x1000000:
+    case 16777216:
     case 256:
         terminal.color_type = TERM_256_COLOR;
         break;

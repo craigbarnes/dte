@@ -69,11 +69,11 @@ void ecma48_set_color(const TermColor *const color)
         return;
     }
 
-    // Max 14 bytes ("E[0;1;7;30;40m")
     char buf[32] = "\033[0";
     size_t i = 3;
-    TermColor c = *color;
+    static_assert(sizeof(buf) >= STRLEN("\033[0;1;7;30;40m"));
 
+    TermColor c = *color;
     if (c.attr & ATTR_BOLD) {
         buf[i++] = ';';
         buf[i++] = '1';

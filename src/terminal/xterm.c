@@ -67,9 +67,13 @@ void xterm_set_color(const TermColor *color)
         return;
     }
 
-    // Max 54 bytes ("E[0;1;2;3;4;5;7;8;9;38;2;255;255;255;48;2;255;255;255m")
     char buf[64] = "\033[0";
     size_t i = 3;
+
+    static_assert(sizeof(buf) >= STRLEN("\033[0m")
+        + (2 * ARRAY_COUNT(attr_map))
+        + (2 * STRLEN(";38;2;255;255;255"))
+    );
 
     for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
         if (color->attr & attr_map[j].attr) {
