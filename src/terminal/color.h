@@ -36,6 +36,7 @@ enum {
     ATTR_BOLD = 0x20,
     ATTR_INVIS = 0x40,
     ATTR_ITALIC = 0x80,
+    ATTR_STRIKETHROUGH = 0x100,
 };
 
 typedef struct {

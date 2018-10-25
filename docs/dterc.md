@@ -377,6 +377,7 @@ Attributes:
 * `dim`
 * `italic`
 * `underline`
+* `strikethrough`
 * `blink`
 * `reverse`
 * `invisible`

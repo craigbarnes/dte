@@ -59,14 +59,15 @@ void xterm_set_color(const TermColor *color)
         {'4', ATTR_UNDERLINE},
         {'5', ATTR_BLINK},
         {'7', ATTR_REVERSE},
-        {'8', ATTR_INVIS}
+        {'8', ATTR_INVIS},
+        {'9', ATTR_STRIKETHROUGH}
     };
 
     if (same_color(color, &obuf.color)) {
         return;
     }
 
-    // Max 52 bytes ("E[0;1;2;3;4;5;7;8;38;2;255;255;255;48;2;255;255;255m")
+    // Max 54 bytes ("E[0;1;2;3;4;5;7;8;9;38;2;255;255;255;48;2;255;255;255m")
     char buf[64] = "\033[0";
     size_t i = 3;
 

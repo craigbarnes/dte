@@ -20,6 +20,7 @@ static unsigned short lookup_attr(const char *s, size_t len)
     case 6: CMP("italic", ATTR_ITALIC);
     case 7: CMP("reverse", ATTR_REVERSE);
     case 12: CMP("lowintensity", ATTR_DIM);
+    case 13: CMP("strikethrough", ATTR_STRIKETHROUGH);
     case 4:
         switch (s[0]) {
         case 'b': CMP("bold", ATTR_BOLD);
