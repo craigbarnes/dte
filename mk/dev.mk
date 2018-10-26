@@ -46,7 +46,7 @@ show-sizes:
 	@du -h build/dte-*
 
 coverage-report:
-	$(MAKE) -j$(NPROC) check CFLAGS='-O2 -g -pipe --coverage' DEBUG=3 USE_SANITIZER=
+	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
 	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
