@@ -5,6 +5,7 @@
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"
 #include "../src/util/unicode.h"
+#include "../src/util/xmalloc.h"
 
 static void test_ascii(void)
 {
@@ -226,6 +227,21 @@ static void test_hashset(void)
     hashset_free(&set);
 }
 
+static void test_round_up(void)
+{
+    EXPECT_EQ(ROUND_UP(3, 8), 8);
+    EXPECT_EQ(ROUND_UP(8, 8), 8);
+    EXPECT_EQ(ROUND_UP(9, 8), 16);
+    EXPECT_EQ(ROUND_UP(0, 16), 0);
+    EXPECT_EQ(ROUND_UP(1, 16), 16);
+    EXPECT_EQ(ROUND_UP(123, 16), 128);
+    EXPECT_EQ(ROUND_UP(4, 64), 64);
+    EXPECT_EQ(ROUND_UP(80, 64), 128);
+    EXPECT_EQ(ROUND_UP(256, 256), 256);
+    EXPECT_EQ(ROUND_UP(257, 256), 512);
+    EXPECT_EQ(ROUND_UP(8000, 256), 8192);
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -236,4 +252,5 @@ void test_util(void)
     test_u_is_upper();
     test_u_str_width();
     test_hashset();
+    test_round_up();
 }

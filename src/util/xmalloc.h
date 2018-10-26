@@ -22,6 +22,7 @@ char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply(size_t a, size_t b);
 
+// Round x up to a multiple of r (which *must* be a power of 2)
 CONST_FN
 static inline size_t ROUND_UP(size_t x, size_t r)
 {
