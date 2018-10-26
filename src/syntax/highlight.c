@@ -21,13 +21,6 @@ static bool states_equal(void **ptrs, int idx, const State *b)
     return a == b;
 }
 
-static int bitmap_get(const unsigned char *bitmap, unsigned int idx)
-{
-    unsigned int byte = idx / 8u;
-    unsigned int bit = idx & 7u;
-    return bitmap[byte] & 1u << bit;
-}
-
 static bool is_buffered(const Condition *cond, const char *str, size_t len)
 {
     if (len != cond->u.cond_bufis.len) {
@@ -99,7 +92,7 @@ static HlColor **highlight_line (
             a = &cond->a;
             switch (cond->type) {
             case COND_CHAR_BUFFER:
-                if (!bitmap_get(cond->u.cond_char.bitmap, ch)) {
+                if (!bitset_contains(cond->u.cond_char.bitset, ch)) {
                     break;
                 }
                 if (sidx < 0) {
@@ -120,7 +113,7 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_CHAR:
-                if (!bitmap_get(cond->u.cond_char.bitmap, ch)) {
+                if (!bitset_contains(cond->u.cond_char.bitset, ch)) {
                     break;
                 }
                 colors[i++] = a->emit_color;

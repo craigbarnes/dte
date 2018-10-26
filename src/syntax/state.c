@@ -11,27 +11,6 @@
 #include "../util/xmalloc.h"
 #include "../util/xsnprintf.h"
 
-static void bitmap_set(unsigned char *bitmap, long idx)
-{
-    unsigned int byte = idx / 8u;
-    unsigned int bit = idx & 7u;
-    bitmap[byte] |= 1u << bit;
-}
-
-static void set_bits(unsigned char *bitmap, const unsigned char *pattern)
-{
-    for (size_t i = 0; pattern[i]; i++) {
-        unsigned int ch = pattern[i];
-        bitmap_set(bitmap, ch);
-        if (pattern[i + 1] == '-' && pattern[i + 2]) {
-            for (ch = ch + 1; ch <= pattern[i + 2]; ch++) {
-                bitmap_set(bitmap, ch);
-            }
-            i += 2;
-        }
-    }
-}
-
 static Syntax *current_syntax;
 static State *current_state;
 static unsigned int saved_nr_errors; // Used to check if nr_errors changed
@@ -223,10 +202,10 @@ static void cmd_char(const char *pf, char **args)
         return;
     }
 
-    set_bits(c->u.cond_char.bitmap, args[0]);
+    bitset_add_pattern(c->u.cond_char.bitset, args[0]);
     if (not) {
-        for (size_t i = 0; i < ARRAY_COUNT(c->u.cond_char.bitmap); i++) {
-            c->u.cond_char.bitmap[i] = ~c->u.cond_char.bitmap[i];
+        for (size_t i = 0; i < ARRAY_COUNT(c->u.cond_char.bitset); i++) {
+            c->u.cond_char.bitset[i] = ~c->u.cond_char.bitset[i];
         }
     }
 }

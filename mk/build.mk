@@ -38,7 +38,7 @@ encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
-    color hashset highlight state syntax )
+    bitset color hashset highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key output terminfo xterm xterm-keys )

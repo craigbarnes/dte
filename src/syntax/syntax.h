@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "bitset.h"
 #include "color.h"
 #include "hashset.h"
 #include "../util/ptr-array.h"
@@ -46,7 +47,7 @@ typedef struct {
             char str[256 / 8 - 2 * sizeof(int)];
         } cond_bufis;
         struct {
-            unsigned char bitmap[256 / 8];
+            BitSet bitset;
         } cond_char;
         struct {
             StringList *list;
