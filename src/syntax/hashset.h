@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "macros.h"
+#include "../util/macros.h"
 
 // This is a container type for holding a *set* of related strings.
 // It uses hashing for primary lookups and separate chaining for

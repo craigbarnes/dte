@@ -12,7 +12,7 @@
 #include "screen.h"
 #include "script.h"
 #include "search.h"
-#include "syntax.h"
+#include "syntax/syntax.h"
 #include "terminal/color.h"
 #include "terminal/input.h"
 #include "terminal/output.h"

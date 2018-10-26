@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "color.h"
-#include "util/hashset.h"
-#include "util/ptr-array.h"
+#include "hashset.h"
+#include "../util/ptr-array.h"
 
 typedef enum {
     COND_BUFIS,

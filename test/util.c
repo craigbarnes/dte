@@ -1,6 +1,6 @@
 #include "test.h"
+#include "../src/syntax/hashset.h"
 #include "../src/util/ascii.h"
-#include "../src/util/hashset.h"
 #include "../src/util/string.h"
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"

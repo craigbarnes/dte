@@ -1,7 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "terminal/color.h"
+#include "../terminal/color.h"
 
 enum builtin_color {
     BC_DEFAULT,

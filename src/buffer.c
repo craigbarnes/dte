@@ -4,7 +4,7 @@
 #include "filetype.h"
 #include "lock.h"
 #include "selection.h"
-#include "state.h"
+#include "syntax/state.h"
 #include "util/path.h"
 #include "util/regexp.h"
 #include "util/uchar.h"

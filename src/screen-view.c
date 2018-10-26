@@ -1,8 +1,8 @@
 #include <strings.h>
 #include "screen.h"
 #include "editor.h"
-#include "highlight.h"
 #include "selection.h"
+#include "syntax/highlight.h"
 #include "terminal/output.h"
 #include "terminal/terminfo.h"
 #include "util/ascii.h"

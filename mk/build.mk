@@ -31,24 +31,30 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai fuzz1 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec hashset path ptr-array regexp string strtonum uchar \
+    ascii exec path ptr-array regexp string strtonum uchar \
     unicode wbuf xmalloc xreadwrite xsnprintf )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder )
 
+syntax_objects := $(call prefix-obj, build/syntax/, \
+    color hashset highlight state syntax )
+
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key output terminfo xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \
-    alias bind block block-iter buffer buffer-iter change cmdline color \
+    alias bind block block-iter buffer buffer-iter change cmdline \
     commands common compiler completion config ctags debug edit editor \
-    env error file-history file-option filetype frame highlight history \
+    env error file-history file-option filetype frame history \
     indent load-save lock main mode-command mode-git-open mode-normal \
     mode-search move msg options parse-args parse-command run screen \
     screen-status screen-tabbar screen-view script search selection \
-    spawn state syntax tag view window ) \
-    $(encoding_objects) $(terminal_objects) $(util_objects)
+    spawn tag view window ) \
+    $(encoding_objects) \
+    $(syntax_objects) \
+    $(terminal_objects) \
+    $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
     config filetype main terminal test util )
@@ -137,6 +143,7 @@ $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 $(encoding_objects): | build/encoding/
+$(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 build/builtin-config.h: build/builtin-config.mk
 build/config.o: build/builtin-config.h
@@ -183,7 +190,7 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/encoding/ build/terminal/ build/util/ build/test/: | build/
+build/encoding/ build/syntax/ build/terminal/ build/util/ build/test/: | build/
 	$(Q) mkdir -p $@
 
 build/:

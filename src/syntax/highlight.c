@@ -2,7 +2,7 @@
 #include <strings.h>
 #include "highlight.h"
 #include "syntax.h"
-#include "util/xmalloc.h"
+#include "../util/xmalloc.h"
 
 static bool state_is_valid(const State *st)
 {

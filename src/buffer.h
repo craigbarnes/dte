@@ -9,7 +9,7 @@
 #include "change.h"
 #include "common.h"
 #include "options.h"
-#include "syntax.h"
+#include "syntax/syntax.h"
 #include "util/list.h"
 #include "util/ptr-array.h"
 #include "util/unicode.h"

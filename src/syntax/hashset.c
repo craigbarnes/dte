@@ -2,8 +2,8 @@
 #include <string.h>
 #include <strings.h>
 #include "hashset.h"
-#include "ascii.h"
-#include "xmalloc.h"
+#include "../util/ascii.h"
+#include "../util/xmalloc.h"
 
 #define FNV_BASE UINT32_C(2166136261)
 #define FNV_PRIME UINT32_C(16777619)
