@@ -104,6 +104,23 @@ static void test_number_width(void)
     EXPECT_EQ(number_width(-2147483647), 11);
 }
 
+static void test_str_to_long(void)
+{
+    long val = 0;
+    EXPECT_TRUE(str_to_long("0", &val));
+    EXPECT_EQ(val, 0);
+    EXPECT_TRUE(str_to_long("00001", &val));
+    EXPECT_EQ(val, 1);
+    EXPECT_TRUE(str_to_long("-00001", &val));
+    EXPECT_EQ(val, -1);
+    EXPECT_TRUE(str_to_long("-8074", &val));
+    EXPECT_EQ(val, -8074);
+    EXPECT_TRUE(str_to_long("2147483647", &val));
+    EXPECT_EQ(val, 2147483647L);
+    EXPECT_TRUE(str_to_long("-2147483647", &val));
+    EXPECT_EQ(val, -2147483647L);
+}
+
 static void test_u_char_width(void)
 {
     // ASCII (1 column)
@@ -247,6 +264,7 @@ void test_util(void)
     test_ascii();
     test_string();
     test_number_width();
+    test_str_to_long();
     test_u_char_width();
     test_u_to_lower();
     test_u_is_upper();
