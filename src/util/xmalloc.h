@@ -21,6 +21,7 @@ void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL ALLOC_S
 char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply(size_t a, size_t b);
+size_t size_add(size_t a, size_t b);
 
 // Round x up to a multiple of r (which *must* be a power of 2)
 CONST_FN

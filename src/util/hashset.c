@@ -37,14 +37,12 @@ static int memcmp_strings(const char *s1, const char *s2, size_t n)
 
 void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
 {
-    size_t table_size = nstrings + (nstrings / 4);
-    if (unlikely(table_size < nstrings)) {
-        // size_t overflow; fall back to using 100% load factor
-        table_size = nstrings;
-    }
+    // Allocate table with 75% load factor (nstrings * 1.33)
+    size_t table_size = ROUND_UP(size_add(nstrings, nstrings / 3), 8);
     HashSetEntry **table = xnew0(HashSetEntry*, table_size);
     set->table_size = table_size;
     set->table = table;
+
     if (icase) {
         set->hash = fnv_1a_hash_icase;
         set->compare = strncasecmp;
@@ -52,6 +50,7 @@ void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
         set->hash = fnv_1a_hash;
         set->compare = memcmp_strings;
     }
+
     for (size_t i = 0; i < nstrings; i++) {
         const char *str = strings[i];
         const size_t str_len = strlen(str);

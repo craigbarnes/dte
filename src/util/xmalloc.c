@@ -26,10 +26,32 @@ static bool size_multiply_overflows(size_t a, size_t b, size_t *result)
 #endif
 }
 
+static bool size_add_overflows(size_t a, size_t b, size_t *result)
+{
+#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_add_overflow)
+    return __builtin_add_overflow(a, b, result);
+#else
+    if (unlikely(b > SIZE_MAX - a)) {
+        return true;
+    }
+    *result = a + b;
+    return false;
+#endif
+}
+
 size_t size_multiply(size_t a, size_t b)
 {
     size_t result;
     if (unlikely(size_multiply_overflows(a, b, &result))) {
+        fatal_error(__func__, EOVERFLOW);
+    }
+    return result;
+}
+
+size_t size_add(size_t a, size_t b)
+{
+    size_t result;
+    if (unlikely(size_add_overflows(a, b, &result))) {
         fatal_error(__func__, EOVERFLOW);
     }
     return result;
