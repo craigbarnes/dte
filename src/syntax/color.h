@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef SYNTAX_COLOR_H
+#define SYNTAX_COLOR_H
 
 #include "../terminal/color.h"
 

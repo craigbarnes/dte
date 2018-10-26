@@ -1,5 +1,5 @@
-#ifndef HIGHLIGHT_H
-#define HIGHLIGHT_H
+#ifndef SYNTAX_HIGHLIGHT_H
+#define SYNTAX_HIGHLIGHT_H
 
 #include "../buffer.h"
 #include "../terminal/color.h"

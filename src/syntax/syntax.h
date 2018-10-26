@@ -1,5 +1,5 @@
-#ifndef SYNTAX_H
-#define SYNTAX_H
+#ifndef SYNTAX_SYNTAX_H
+#define SYNTAX_SYNTAX_H
 
 #include <stdbool.h>
 #include <stddef.h>

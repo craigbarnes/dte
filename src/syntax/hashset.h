@@ -1,5 +1,5 @@
-#ifndef UTIL_HASHSET_H
-#define UTIL_HASHSET_H
+#ifndef SYNTAX_HASHSET_H
+#define SYNTAX_HASHSET_H
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef SYNTAX_STATE_H
+#define SYNTAX_STATE_H
 
 #include <stdbool.h>
 #include "syntax.h"
