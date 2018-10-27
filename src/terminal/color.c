@@ -211,7 +211,8 @@ static CONST_FN int color_dist_sq (
     return (R - r) * (R - r) + (G - g) * (G - g) + (B - b) * (B - b);
 }
 
-static CONST_FN uint8_t color_to_6cube(uint8_t c)
+// Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
+static CONST_FN uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
 {
     if (c < 48) {
         return 0;
@@ -222,20 +223,30 @@ static CONST_FN uint8_t color_to_6cube(uint8_t c)
     return (c - 35) / 40;
 }
 
+// Convert xterm color cube index to corresponding RGB color component
+static uint8_t cube_index_to_rgb_component(uint8_t index)
+{
+    static const uint8_t color_stops[6] = {
+        0x00, 0x5f, 0x87,
+        0xaf, 0xd7, 0xff
+    };
+    return color_stops[index];
+}
+
 static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
 {
-    static const uint8_t q2c[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
-    uint8_t qr, qg, qb, cr, cg, cb;
-    qr = color_to_6cube(r);
-    cr = q2c[qr];
-    qg = color_to_6cube(g);
-    cg = q2c[qg];
-    qb = color_to_6cube(b);
-    cb = q2c[qb];
+    uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
+    uint8_t r_stop = cube_index_to_rgb_component(r_idx);
 
-    if (cr == r && cg == g && cb == b) {
+    uint8_t g_idx = rgb_component_to_nearest_cube_index(g);
+    uint8_t g_stop = cube_index_to_rgb_component(g_idx);
+
+    uint8_t b_idx = rgb_component_to_nearest_cube_index(b);
+    uint8_t b_stop = cube_index_to_rgb_component(b_idx);
+
+    if (r_stop == r && g_stop == g && b_stop == b) {
         // Exact match
-        return ((16 + (36 * qr) + (6 * qg) + qb));
+        return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 
     // Calculate closest gray
@@ -243,13 +254,13 @@ static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
     int gray_idx = (gray_avg > 238) ? 23 : ((gray_avg - 3) / 10);
     int gray = 8 + (10 * gray_idx);
 
-    int d = color_dist_sq(cr, cg, cb, r, g, b);
+    int d = color_dist_sq(r_stop, g_stop, b_stop, r, g, b);
     if (color_dist_sq(gray, gray, gray, r, g, b) < d) {
         // Gray is closest match
         return 232 + gray_idx;
     } else {
         // 6x6x6 color is closest match
-        return 16 + (36 * qr) + (6 * qg) + qb;
+        return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 }
 
