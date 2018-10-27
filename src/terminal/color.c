@@ -254,12 +254,13 @@ static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
     int gray_idx = (gray_avg > 238) ? 23 : ((gray_avg - 3) / 10);
     int gray = 8 + (10 * gray_idx);
 
-    int d = color_dist_sq(r_stop, g_stop, b_stop, r, g, b);
-    if (color_dist_sq(gray, gray, gray, r, g, b) < d) {
+    int rgb_distance = color_dist_sq(r_stop, g_stop, b_stop, r, g, b);
+    int gray_distance = color_dist_sq(gray, gray, gray, r, g, b);
+    if (gray_distance < rgb_distance) {
         // Gray is closest match
         return 232 + gray_idx;
     } else {
-        // 6x6x6 color is closest match
+        // RGB cube color is closest match
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 }
