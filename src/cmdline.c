@@ -196,6 +196,8 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
         cmdline_delete_bol(c);
         break;
     case CTRL('W'):
+    case MOD_META | MOD_CTRL | 'H':
+    case MOD_META | MOD_CTRL | '?':
         cmdline_erase_word(c);
         break;
 
