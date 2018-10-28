@@ -53,7 +53,6 @@ static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
     switch (len) {
     case 2: case 3: case 4:
     case 5: case 6: case 7:
-    case 8:
         break;
     case 10:
         switch (s[0]) {

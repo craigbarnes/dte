@@ -1,5 +1,5 @@
 static const struct FileExtensionMap {
-    const char key[8];
+    const char ext[12];
     const FileTypeEnum filetype;
 } extensions[] = {
     {"ada", ADA},
@@ -8,6 +8,7 @@ static const struct FileExtensionMap {
     {"asd", LISP},
     {"asm", ASSEMBLY},
     {"auk", AWK},
+    {"automount", INI},
     {"awk", AWK},
     {"bash", SHELL},
     {"bat", BATCHFILE},
@@ -45,6 +46,8 @@ static const struct FileExtensionMap {
     {"emacs", EMACSLISP},
     {"eml", MAIL},
     {"eps", POSTSCRIPT},
+    {"flatpakref", INI},
+    {"flatpakrepo", INI},
     {"frag", GLSL},
     {"gawk", AWK},
     {"gemspec", RUBY},
@@ -88,6 +91,7 @@ static const struct FileExtensionMap {
     {"mount", INI},
     {"nawk", AWK},
     {"nginx", NGINX},
+    {"nginxconf", NGINX},
     {"nim", NIM},
     {"ninja", NINJA},
     {"nix", NIX},
@@ -186,16 +190,9 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         }
         return NONE;
     case 2: case 3: case 4: case 5:
-    case 6: case 7: case 8:
+    case 6: case 7: case 8: case 9:
+    case 10: case 11:
         break;
-    case 9:
-        switch (s[0]) {
-        case 'a': return memcmp(s, "automount", len) ? NONE : INI;
-        case 'n': return memcmp(s, "nginxconf", len) ? NONE : NGINX;
-        }
-        return NONE;
-    case 10: return memcmp(s, "flatpakref", len) ? NONE : INI;
-    case 11: return memcmp(s, "flatpakrepo", len) ? NONE : INI;
     default:
         return NONE;
     }

@@ -79,7 +79,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
     switch (len) {
     case  5:  case 6:  case 7:  case 8:
     case  9: case 10: case 11: case 12:
-    case 13: case 14: case 15: case 16:
+    case 13: case 14: case 15:
         break;
     case 17:
         return memcmp(s, "meson_options.txt", len) ? NONE : MESON;

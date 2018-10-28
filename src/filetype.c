@@ -11,7 +11,11 @@ static int ft_compare(const void *key, const void *elem)
 {
     const StringView *sv = key;
     const char *ext = elem; // Cast to first member of struct
-    return memcmp(sv->data, ext, sv->length);
+    int res = memcmp(sv->data, ext, sv->length);
+    if (res == 0 && ext[sv->length] != '\0') {
+        return -1;
+    }
+    return res;
 }
 
 // Built-in filetypes

@@ -12,6 +12,7 @@ static void test_find_ft_filename(void)
         {"test.c++", "c"},
         {"test.lua", "lua"},
         {"test.py", "python"},
+        {"test.rs", "rust"},
         {"test.C", "c"},
         {"test.H", "c"},
         {"test.S", "asm"},
