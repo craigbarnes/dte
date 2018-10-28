@@ -353,11 +353,7 @@ void term_init(void)
 #endif
     }
 
-    if (streq(term, "xterm-direct")) {
-        terminal = terminal_xterm;
-        terminal.repeat_byte = &ecma48_repeat_byte;
-        terminal.color_type = TERM_TRUE_COLOR;
-    } else if (term_match(term, "xterm")) {
+    if (term_match(term, "xterm")) {
         terminal = terminal_xterm;
         terminal.repeat_byte = &ecma48_repeat_byte;
     } else if (
@@ -390,5 +386,7 @@ void term_init(void)
         && str_has_suffix(term, "256color")
     ) {
         terminal.color_type = TERM_256_COLOR;
+    } else if (str_has_suffix(term, "-direct")) {
+        terminal.color_type = TERM_TRUE_COLOR;
     }
 }
