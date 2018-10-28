@@ -213,7 +213,7 @@ static void collect_colors_and_attributes(const char *prefix)
         "blue", "magenta", "cyan", "gray", "darkgray", "lightred",
         "lightgreen", "lightyellow", "lightblue", "lightmagenta",
         "lightcyan", "white", "underline", "reverse", "blink",
-        "dim", "bold", "invisible", "italic",
+        "dim", "bold", "invisible", "italic", "strikethrough"
     };
     for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
         if (str_has_prefix(names[i], prefix)) {
