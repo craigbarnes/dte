@@ -32,7 +32,7 @@ static void cmdline_erase_word(CommandLine *c)
 {
     size_t i = c->pos;
 
-    if (!c->pos) {
+    if (i == 0) {
         return;
     }
 
@@ -55,6 +55,27 @@ static void cmdline_erase_word(CommandLine *c)
 
     string_remove(&c->buf, i, c->pos - i);
     c->pos = i;
+}
+
+static void cmdline_delete_word(CommandLine *c)
+{
+    const unsigned char *buf = c->buf.buffer;
+    const size_t len = c->buf.len;
+    size_t i = c->pos;
+
+    if (i == len) {
+        return;
+    }
+
+    while (i < len && is_word_byte(buf[i])) {
+        i++;
+    }
+
+    while (i < len && !is_word_byte(buf[i])) {
+        i++;
+    }
+
+    string_remove(&c->buf, c->pos, i - c->pos);
 }
 
 static void cmdline_delete_bol(CommandLine *c)
@@ -199,6 +220,10 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
     case MOD_META | MOD_CTRL | 'H':
     case MOD_META | MOD_CTRL | '?':
         cmdline_erase_word(c);
+        break;
+    case MOD_CTRL | KEY_DELETE:
+    case MOD_META | KEY_DELETE:
+        cmdline_delete_word(c);
         break;
 
     case CTRL('A'):
