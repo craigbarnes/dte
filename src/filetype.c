@@ -146,7 +146,7 @@ HOT const char *find_ft(const char *filename, StringView line)
     }
 
     StringView interpreter = STRING_VIEW_INIT;
-    if (line.length) {
+    if (line.length >= 4 && line.data[0] == '#' && line.data[1] == '!') {
         interpreter = get_interpreter(line);
     }
 
@@ -192,7 +192,7 @@ HOT const char *find_ft(const char *filename, StringView line)
         return ft->name;
     }
 
-    // Search built-in hash tables
+    // Search built-in lookup tables
     if (interpreter.length) {
         FileTypeEnum ft = filetype_from_interpreter(interpreter.data, interpreter.length);
         if (ft) {
