@@ -70,41 +70,20 @@ static bool parse_keys(KeyChain *chain, const char *str)
     return true;
 }
 
-static CONST_FN size_t mod_mask_enum(KeyCode k)
-{
-    switch (k & MOD_MASK) {
-    case 0:
-        return 0;
-    case MOD_SHIFT:
-        return 1;
-    case MOD_META:
-        return 2;
-    case MOD_SHIFT | MOD_META:
-        return 3;
-    case MOD_CTRL:
-        return 4;
-    case MOD_SHIFT | MOD_CTRL:
-        return 5;
-    case MOD_META | MOD_CTRL:
-        return 6;
-    case MOD_SHIFT | MOD_META | MOD_CTRL:
-        return 7;
-    default:
-        UNREACHABLE();
-    }
-}
-
 static CONST_FN ssize_t key_lookup_index(KeyCode k)
 {
+    const KeyCode modifiers = k & MOD_MASK;
     const KeyCode key = k & ~MOD_MASK;
 
+    static_assert(MOD_MASK >> 24 == (1 | 2 | 4));
+
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        const size_t mod_offset = mod_mask_enum(k) * NR_SPECIAL_KEYS;
+        const size_t mod_offset = (modifiers >> 24) * NR_SPECIAL_KEYS;
         return (2 * 128) + mod_offset + (key - KEY_SPECIAL_MIN);
     }
 
     if (key >= 0x20 && key <= 0x7E) {
-        switch (k & MOD_MASK) {
+        switch (modifiers) {
         case MOD_CTRL:
             return key;
         case MOD_META:
@@ -121,8 +100,8 @@ UNITTEST {
     BUG_ON(key_lookup_index(MOD_MASK | KEY_SPECIAL_MAX) != 256 + (8 * NR_SPECIAL_KEYS) - 1);
     BUG_ON(key_lookup_index(KEY_SPECIAL_MIN) != 256);
     BUG_ON(key_lookup_index(KEY_SPECIAL_MAX) != 256 + NR_SPECIAL_KEYS - 1);
-    BUG_ON(key_lookup_index(MOD_SHIFT | KEY_SPECIAL_MIN) != 256 + NR_SPECIAL_KEYS);
-    BUG_ON(key_lookup_index(CTRL(KEY_SPECIAL_MAX)) != 256 + (5 * NR_SPECIAL_KEYS) - 1);
+    BUG_ON(key_lookup_index(MOD_CTRL | KEY_SPECIAL_MIN) != 256 + NR_SPECIAL_KEYS);
+    BUG_ON(key_lookup_index(MOD_SHIFT | KEY_SPECIAL_MAX) != 256 + (5 * NR_SPECIAL_KEYS) - 1);
 
     BUG_ON(key_lookup_index(MOD_CTRL | ' ') != 32);
     BUG_ON(key_lookup_index(MOD_META | ' ') != 32 + 128);
@@ -240,16 +219,6 @@ size_t nr_pressed_keys(void)
 
 String dump_bindings(void)
 {
-    static const KeyCode mod_enum_to_mod_mask[8] = {
-        [1] = MOD_SHIFT,
-        [2] = MOD_META,
-        [3] = MOD_SHIFT | MOD_META,
-        [4] = MOD_CTRL,
-        [5] = MOD_SHIFT | MOD_CTRL,
-        [6] = MOD_META | MOD_CTRL,
-        [7] = MOD_SHIFT | MOD_META | MOD_CTRL,
-    };
-
     String buf = STRING_INIT;
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
@@ -270,13 +239,15 @@ String dump_bindings(void)
         }
     }
 
+    static_assert(MOD_CTRL == (1 << 24));
     for (size_t m = 0; m <= 7; m++) {
+        const KeyCode modifiers = m << 24;
         for (size_t k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             const size_t mod_offset = m * NR_SPECIAL_KEYS;
             const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
             const char *command = bindings_lookup_table[i];
             if (command) {
-                char *keystr = key_to_string(mod_enum_to_mod_mask[m] | k);
+                char *keystr = key_to_string(modifiers | k);
                 string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
                 free(keystr);
             }
