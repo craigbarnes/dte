@@ -13,7 +13,7 @@
 #include "search.h"
 #include "terminal/input.h"
 #include "terminal/output.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/xmalloc.h"
 #include "view.h"

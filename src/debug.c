@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "debug.h"
 #include "editor.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 

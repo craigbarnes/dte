@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "color.h"
-#include "terminfo.h"
+#include "terminal.h"
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"

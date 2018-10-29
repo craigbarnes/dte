@@ -7,7 +7,7 @@
 #include <unistd.h>
 #undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "input.h"
-#include "terminfo.h"
+#include "terminal.h"
 #include "../editor.h"
 #include "../util/xmalloc.h"
 

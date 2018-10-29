@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "output.h"
-#include "terminfo.h"
+#include "terminal.h"
 #include "../debug.h"
 #include "../util/uchar.h"
 #include "../util/xmalloc.h"

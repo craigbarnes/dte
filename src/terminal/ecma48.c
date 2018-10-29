@@ -114,7 +114,7 @@ void ecma48_repeat_byte(char ch, size_t count)
 static void no_op(void) {}
 static void no_op_s(const char* UNUSED_ARG(s)) {}
 
-TerminalInfo terminal = {
+Terminal terminal = {
     .color_type = TERM_8_COLOR,
     .width = 80,
     .height = 24,

@@ -90,7 +90,7 @@ void xterm_set_color(const TermColor *color)
     obuf.color = *color;
 }
 
-const TerminalInfo terminal_xterm = {
+const Terminal xterm = {
     .back_color_erase = true,
     .color_type = TERM_8_COLOR,
     .width = 80,

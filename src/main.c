@@ -16,7 +16,7 @@
 #include "terminal/color.h"
 #include "terminal/input.h"
 #include "terminal/output.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"

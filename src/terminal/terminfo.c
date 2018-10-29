@@ -1,26 +1,15 @@
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "terminfo.h"
-#include "ecma48.h"
-#include "output.h"
-#include "xterm.h"
-#include "../common.h"
-
-NORETURN COLD PRINTF(1)
-static void error(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    putc('\n', stderr);
-    fflush(stderr);
-    exit(1);
-}
+#include "../util/macros.h"
 
 #ifndef TERMINFO_DISABLE
+
+#include <stdint.h>
+#include <string.h>
+#include "key.h"
+#include "output.h"
+#include "terminal.h"
+#include "../common.h"
+#include "../util/string-view.h"
 
 #define KEY(c, k) { \
     .code = (c), \
@@ -238,8 +227,7 @@ static void tputs_repeat_byte(char ch, size_t count)
     tputs(seq, 1, tputs_putc);
 }
 
-// See terminfo(5)
-static void term_init_terminfo(const char *term)
+bool term_init_terminfo(const char *term)
 {
     // Initialize terminfo database (or call exit(3) on failure)
     setupterm(term, 1, (int*)0);
@@ -251,7 +239,10 @@ static void term_init_terminfo(const char *term)
 
     terminfo.cup = get_terminfo_string("cup");
     if (terminfo.cup == NULL) {
-        error("TERM type '%s' not supported: 'cup' capability required", term);
+        term_init_fail (
+            "TERM type '%s' not supported: 'cup' capability required",
+            term
+        );
     }
 
     terminfo.el = get_terminfo_string("el");
@@ -320,73 +311,15 @@ static void term_init_terminfo(const char *term)
             };
         }
     }
+
+    return true; // Initialization succeeded
+}
+
+#else
+
+bool term_init_terminfo(const char* UNUSED_ARG(term))
+{
+    return false; // terminfo not available
 }
 
 #endif // ifndef TERMINFO_DISABLE
-
-static bool term_match(const char *term, const char *prefix)
-{
-    if (str_has_prefix(term, prefix) == false) {
-        return false;
-    }
-    switch (term[strlen(prefix)]) {
-    case '\0': // Exact match
-    case  '-': // Prefix match
-        return true;
-    }
-    return false;
-}
-
-void term_init(void)
-{
-    const char *const term = getenv("TERM");
-    if (term == NULL || term[0] == '\0') {
-        error("'TERM' not set");
-    }
-
-    if (getenv("DTE_FORCE_TERMINFO")) {
-#ifndef TERMINFO_DISABLE
-        term_init_terminfo(term);
-        return;
-#else
-        error("'DTE_FORCE_TERMINFO' set but terminfo not linked");
-#endif
-    }
-
-    if (term_match(term, "xterm")) {
-        terminal = terminal_xterm;
-        terminal.repeat_byte = &ecma48_repeat_byte;
-    } else if (
-        term_match(term, "st")
-        || term_match(term, "stterm")
-    ) {
-        terminal = terminal_xterm;
-    } else if (
-        term_match(term, "tmux")
-        || term_match(term, "screen")
-    ) {
-        terminal = terminal_xterm;
-        terminal.back_color_erase = false;
-    } else if (streq(term, "linux")) {
-        // Use the default TerminalInfo and just change the control codes
-        const StringView hide_cursor = STRING_VIEW("\033[?25l\033[?1c");
-        const StringView show_cursor = STRING_VIEW("\033[?25h\033[?0c");
-        terminal.control_codes.hide_cursor = hide_cursor;
-        terminal.control_codes.show_cursor = show_cursor;
-    }
-#ifndef TERMINFO_DISABLE
-    else {
-        term_init_terminfo(term);
-        return;
-    }
-#endif
-
-    if (
-        terminal.color_type < TERM_256_COLOR
-        && str_has_suffix(term, "256color")
-    ) {
-        terminal.color_type = TERM_256_COLOR;
-    } else if (str_has_suffix(term, "-direct")) {
-        terminal.color_type = TERM_TRUE_COLOR;
-    }
-}

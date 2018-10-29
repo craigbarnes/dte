@@ -8,7 +8,7 @@
 #include "editor.h"
 #include "error.h"
 #include "msg.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/exec.h"
 #include "util/regexp.h"
 #include "util/string.h"

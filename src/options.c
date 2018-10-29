@@ -6,7 +6,7 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "screen.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/regexp.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"

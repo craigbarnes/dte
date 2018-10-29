@@ -4,7 +4,7 @@
 #include "../src/editor.h"
 #include "../src/frame.h"
 #include "../src/script.h"
-#include "../src/terminal/terminfo.h"
+#include "../src/terminal/terminal.h"
 #include "../src/util/string-view.h"
 #include "../src/window.h"
 #include "../build/test/data.h"

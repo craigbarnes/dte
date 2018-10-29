@@ -5,7 +5,7 @@
 #include "screen.h"
 #include "spawn.h"
 #include "terminal/output.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/uchar.h"

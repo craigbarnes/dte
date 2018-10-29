@@ -6,7 +6,7 @@
 #include "search.h"
 #include "terminal/input.h"
 #include "terminal/output.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/path.h"
 #include "util/uchar.h"
 #include "util/xsnprintf.h"

@@ -4,7 +4,7 @@
 #include "selection.h"
 #include "syntax/highlight.h"
 #include "terminal/output.h"
-#include "terminal/terminfo.h"
+#include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/uchar.h"
 
