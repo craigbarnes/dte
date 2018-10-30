@@ -98,7 +98,7 @@ state close-tag-end special
 
 state attrs code
     char " \t\n" this
-    char -b a-zA-Z attr-name
+    char -b a-zA-Z:_ attr-name
     char > text tag
     char / short-close
     eat this error
@@ -108,7 +108,7 @@ state short-close tag
     eat text error
 
 state attr-name attr
-    char a-zA-Z:_- this
+    char a-zA-Z0-9_:.- this
     char = attr-eq
     noeat attrs
 
