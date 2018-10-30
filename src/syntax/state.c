@@ -338,10 +338,18 @@ static void cmd_noeat(const char *pf, char **args)
         return;
     }
 
-    if (!destination_state(args[0], &current_state->a.destination)) {
+    State *dest;
+    if (!destination_state(args[0], &dest)) {
+        return;
+    }
+    if (dest == current_state) {
+        // The noeat command doesn't consume anything, so jumping to
+        // the same state will always produce an infinite loop.
+        current_state->type = STATE_INVALID;
         return;
     }
 
+    current_state->a.destination = dest;
     current_state->a.emit_name = NULL;
     current_state->type = type;
     current_state = NULL;
