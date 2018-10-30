@@ -43,12 +43,12 @@ syntax xml
 state line1 text
     char " \t\n" this
     str "<?" xml
-    str "<!" doctype
+    str -i "<!doctype" doctype
     noeat text
 
 state line2 text
     char " \t\n" this
-    str "<!" doctype
+    str -i "<!doctype" doctype
     noeat text
 
 # Eat <?xml ... ?>
