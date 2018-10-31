@@ -133,7 +133,7 @@ static int decode_and_add_blocks (
     return 0;
 }
 
-static int read_blocks(Buffer *b, int fd)
+int read_blocks(Buffer *b, int fd)
 {
     size_t size = b->st.st_size;
     size_t map_size = 64 * 1024;

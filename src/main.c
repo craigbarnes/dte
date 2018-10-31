@@ -8,6 +8,7 @@
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
+#include "load-save.h"
 #include "move.h"
 #include "screen.h"
 #include "script.h"
@@ -230,7 +231,17 @@ int main(int argc, char *argv[])
         fputs("stdout doesn't refer to a terminal\n", stderr);
         return 1;
     }
+
+    Buffer *stdin_buffer = NULL;
     if (!isatty(STDIN_FILENO)) {
+        Buffer *b = buffer_new(editor.charset);
+        if (read_blocks(b, STDIN_FILENO) == 0) {
+            b->display_filename = xstrdup("(stdin)");
+            stdin_buffer = b;
+        } else {
+            free_buffer(b);
+            error_msg("Unable to read redirected stdin");
+        }
         if (!freopen("/dev/tty", "r", stdin)) {
             fputs("Cannot reopen input tty\n", stderr);
             return 1;
@@ -332,6 +343,10 @@ int main(int argc, char *argv[])
                 lineno = 0;
             }
         }
+    }
+
+    if (stdin_buffer) {
+        window_add_buffer(window, stdin_buffer);
     }
 
     View *empty_buffer = NULL;
