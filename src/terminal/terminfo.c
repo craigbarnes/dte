@@ -196,8 +196,6 @@ static void tputs_set_color(const TermColor *color)
         tputs(attrs, 1, tputs_putc);
     }
 
-    // TODO: convert colors outside supported range to closest supported color
-
     TermColor c = *color;
     if (terminfo.setaf && c.fg >= 0) {
         const char *seq = tparm_1(terminfo.setaf, c.fg);
@@ -211,6 +209,8 @@ static void tputs_set_color(const TermColor *color)
             tputs(seq, 1, tputs_putc);
         }
     }
+
+    obuf.color = *color;
 }
 
 static void tputs_repeat_byte(char ch, size_t count)
