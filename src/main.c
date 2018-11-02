@@ -124,8 +124,8 @@ static int dump_builtin_config(const char *const name)
 static void showkey_loop(void)
 {
     terminal.raw();
-    buf_escape(terminal.control_codes.init);
-    buf_escape(terminal.control_codes.keypad_on);
+    terminal.put_control_code(terminal.control_codes.init);
+    terminal.put_control_code(terminal.control_codes.keypad_on);
     buf_add_literal("\nPress any key combination, or use Ctrl+D to exit\n");
     buf_flush();
 
@@ -155,8 +155,8 @@ static void showkey_loop(void)
         buf_flush();
     }
 
-    buf_escape(terminal.control_codes.keypad_off);
-    buf_escape(terminal.control_codes.deinit);
+    terminal.put_control_code(terminal.control_codes.keypad_off);
+    terminal.put_control_code(terminal.control_codes.deinit);
     buf_flush();
     terminal.cooked();
 }
@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
         remove_view(window->views.ptrs[0]);
     }
 
-    buf_escape(terminal.control_codes.init);
+    terminal.put_control_code(terminal.control_codes.init);
 
     editor.resize();
     main_loop();
@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
     }
     editor.ui_end();
 
-    buf_escape(terminal.control_codes.deinit);
+    terminal.put_control_code(terminal.control_codes.deinit);
     buf_flush();
 
     // Unlock files and add files to file history

@@ -146,6 +146,13 @@ static int tputs_putc(int ch)
     return ch;
 }
 
+static void tputs_control_code(StringView code)
+{
+    if (code.length) {
+        tputs(code.data, 1, tputs_putc);
+    }
+}
+
 static void tputs_clear_to_eol(void)
 {
     if (terminfo.el) {
@@ -233,6 +240,7 @@ bool term_init_terminfo(const char *term)
     setupterm(term, 1, (int*)0);
 
     terminal.parse_key_sequence = &parse_key_from_keymap;
+    terminal.put_control_code = &tputs_control_code;
     terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;

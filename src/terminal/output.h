@@ -50,11 +50,4 @@ void buf_clear_eol(void);
 void buf_flush(void);
 bool buf_put_char(CodePoint u);
 
-static inline void buf_escape(StringView sv)
-{
-    if (sv.length != 0) {
-        buf_add_bytes(sv.data, sv.length);
-    }
-}
-
 #endif

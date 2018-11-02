@@ -98,6 +98,7 @@ const Terminal xterm = {
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &xterm_parse_key,
+    .put_control_code = &put_control_code,
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,

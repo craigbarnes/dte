@@ -291,24 +291,24 @@ static void resize(void)
     update_screen_size();
 
     // Turn keypad on (makes cursor keys work)
-    buf_escape(terminal.control_codes.keypad_on);
+    terminal.put_control_code(terminal.control_codes.keypad_on);
 
     // Use alternate buffer if possible
-    buf_escape(terminal.control_codes.cup_mode_on);
+    terminal.put_control_code(terminal.control_codes.cup_mode_on);
 
     editor.mode_ops[editor.input_mode]->update();
 }
 
 static void ui_end(void)
 {
-    buf_escape(terminal.control_codes.reset_colors);
-    buf_escape(terminal.control_codes.reset_attrs);
+    terminal.put_control_code(terminal.control_codes.reset_colors);
+    terminal.put_control_code(terminal.control_codes.reset_attrs);
 
     terminal.move_cursor(0, terminal.height - 1);
     buf_show_cursor();
 
-    buf_escape(terminal.control_codes.cup_mode_off);
-    buf_escape(terminal.control_codes.keypad_off);
+    terminal.put_control_code(terminal.control_codes.cup_mode_off);
+    terminal.put_control_code(terminal.control_codes.keypad_off);
 
     buf_flush();
     terminal.cooked();

@@ -131,12 +131,12 @@ void buf_add_str(const char *const str)
 
 void buf_hide_cursor(void)
 {
-    buf_escape(terminal.control_codes.hide_cursor);
+    terminal.put_control_code(terminal.control_codes.hide_cursor);
 }
 
 void buf_show_cursor(void)
 {
-    buf_escape(terminal.control_codes.show_cursor);
+    terminal.put_control_code(terminal.control_codes.show_cursor);
 }
 
 void buf_clear_eol(void)

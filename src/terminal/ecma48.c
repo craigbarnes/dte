@@ -111,6 +111,13 @@ void ecma48_repeat_byte(char ch, size_t count)
     buf_add_bytes(buf, n);
 }
 
+void put_control_code(StringView code)
+{
+    if (code.length) {
+        buf_add_bytes(code.data, code.length);
+    }
+}
+
 static void no_op(void) {}
 static void no_op_s(const char* UNUSED_ARG(s)) {}
 
@@ -121,6 +128,7 @@ Terminal terminal = {
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &xterm_parse_key,
+    .put_control_code = &put_control_code,
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
