@@ -133,6 +133,27 @@ static int decode_and_add_blocks (
     return 0;
 }
 
+static void fixup_blocks(Buffer *b)
+{
+    if (list_empty(&b->blocks)) {
+        Block *blk = block_new(1);
+        list_add_before(&blk->node, &b->blocks);
+    } else {
+        // Incomplete lines are not allowed because they are
+        // special cases and cause lots of trouble.
+        Block *blk = BLOCK(b->blocks.prev);
+        if (blk->size && blk->data[blk->size - 1] != '\n') {
+            if (blk->size == blk->alloc) {
+                blk->alloc = ROUND_UP(blk->size + 1, 64);
+                xrenew(blk->data, blk->alloc);
+            }
+            blk->data[blk->size++] = '\n';
+            blk->nl++;
+            b->nl++;
+        }
+    }
+}
+
 int read_blocks(Buffer *b, int fd)
 {
     size_t size = b->st.st_size;
@@ -180,6 +201,10 @@ int read_blocks(Buffer *b, int fd)
     } else {
         free(buf);
     }
+    if (rc) {
+        return rc;
+    }
+    fixup_blocks(b);
     return rc;
 }
 
@@ -196,6 +221,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
             error_msg("File %s does not exist.", filename);
             return -1;
         }
+        fixup_blocks(b);
     } else {
         if (fstat(fd, &b->st) != 0) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
@@ -219,23 +245,6 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
             return -1;
         }
         close(fd);
-    }
-    if (list_empty(&b->blocks)) {
-        Block *blk = block_new(1);
-        list_add_before(&blk->node, &b->blocks);
-    } else {
-        // Incomplete lines are not allowed because they are
-        // special cases and cause lots of trouble.
-        Block *blk = BLOCK(b->blocks.prev);
-        if (blk->size && blk->data[blk->size - 1] != '\n') {
-            if (blk->size == blk->alloc) {
-                blk->alloc = ROUND_UP(blk->size + 1, 64);
-                xrenew(blk->data, blk->alloc);
-            }
-            blk->data[blk->size++] = '\n';
-            blk->nl++;
-            b->nl++;
-        }
     }
 
     if (b->encoding == NULL) {
