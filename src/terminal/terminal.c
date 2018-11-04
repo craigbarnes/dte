@@ -94,6 +94,12 @@ void term_init(void)
         break;
     }
 
+    const char *colorterm = getenv("COLORTERM");
+    if (streq(colorterm, "truecolor")) {
+        terminal.color_type = TERM_TRUE_COLOR;
+        return;
+    }
+
     if (
         terminal.color_type < TERM_256_COLOR
         && str_has_suffix(term, "256color")
