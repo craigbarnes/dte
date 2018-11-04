@@ -8,6 +8,7 @@
 #include "key.h"
 #include "output.h"
 #include "terminal.h"
+#include "xterm.h"
 #include "../common.h"
 #include "../util/string-view.h"
 
@@ -269,6 +270,13 @@ bool term_init_terminfo(const char *term)
 
     switch (tigetnum("colors")) {
     case 16777216:
+        // Just use the built-in xterm_set_color() function if true color
+        // support is indicated. This bypasses tputs(3), but no true color
+        // terminal in existence actually depends on archaic tputs(3)
+        // features (like e.g. baudrate-dependant padding).
+        terminal.color_type = TERM_TRUE_COLOR;
+        terminal.set_color = &xterm_set_color;
+        break;
     case 256:
         terminal.color_type = TERM_256_COLOR;
         break;
