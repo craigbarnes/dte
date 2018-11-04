@@ -11,7 +11,6 @@
 #include "load-save.h"
 #include "move.h"
 #include "screen.h"
-#include "script.h"
 #include "search.h"
 #include "syntax/syntax.h"
 #include "terminal/color.h"
@@ -267,7 +266,6 @@ int main(int argc, char *argv[])
 
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
-    run_builtin_script("=rc.lua");
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create

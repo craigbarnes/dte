@@ -41,5 +41,4 @@ done
 
 $MAKE check
 $MAKE check TERMINFO_DISABLE=1
-$MAKE check USE_LUA=static
 $MAKE check DEBUG=0

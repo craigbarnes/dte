@@ -26,8 +26,6 @@ build:debian:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - make check && make install && dte -V
-        - make clean && make check USE_LUA=dynamic && ./dte -V
-        - make clean && make check USE_LUA=static && ./dte -V
         - make check-syntax-files
         - sed -f tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1

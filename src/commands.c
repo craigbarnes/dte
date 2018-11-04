@@ -17,7 +17,6 @@
 #include "move.h"
 #include "msg.h"
 #include "parse-args.h"
-#include "script.h"
 #include "search.h"
 #include "selection.h"
 #include "spawn.h"
@@ -1723,8 +1722,6 @@ const Command commands[] = {
     {"left", "", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
-    {"lua", "", 1, 1, cmd_lua},
-    {"lua-file", "", 1, 1, cmd_lua_file},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},

@@ -125,7 +125,7 @@ typedef struct OptionOps {
 static void filetype_changed(void)
 {
     Buffer *b = window->view->buffer;
-    set_file_options_internal(b);
+    set_file_options(b);
     buffer_update_syntax(b);
 }
 

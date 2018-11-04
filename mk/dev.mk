@@ -34,14 +34,10 @@ show-sizes: MAKEFLAGS += \
     DEBUG=0 USE_SANITIZER=
 
 show-sizes:
-	$(MAKE) USE_LUA=no dte=build/dte-dynamic
-	-$(MAKE) USE_LUA=dynamic dte=build/dte-dynamic+lua
-	$(MAKE) USE_LUA=static dte=build/dte-dynamic+staticlua
-	$(MAKE) USE_LUA=no LDFLAGS=-static dte=build/dte-static
-	$(MAKE) USE_LUA=static LDFLAGS=-static dte=build/dte-static+lua
-	$(MAKE) USE_LUA=no dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES=
-	-$(MAKE) CC=musl-gcc USE_LUA=no LDFLAGS=-static dte=build/dte-musl-static
-	-$(MAKE) CC=musl-gcc USE_LUA=static LDFLAGS=-static dte=build/dte-musl-static+lua
+	$(MAKE) dte=build/dte-dynamic
+	$(MAKE) dte=build/dte-static LDFLAGS=-static
+	$(MAKE) dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES=
+	-$(MAKE) dte=build/dte-musl-static CC=musl-gcc LDFLAGS=-static
 	@strip build/dte-*
 	@du -h build/dte-*
 

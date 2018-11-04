@@ -49,7 +49,7 @@ editor_objects := $(call prefix-obj, build/, \
     env error file-history file-option filetype frame history \
     indent load-save lock main mode-command mode-git-open mode-normal \
     mode-search move msg options parse-args parse-command run screen \
-    screen-status screen-tabbar screen-view script search selection \
+    screen-status screen-tabbar screen-view search selection \
     spawn tag view window ) \
     $(encoding_objects) \
     $(syntax_objects) \
@@ -60,12 +60,6 @@ test_objects := $(call prefix-obj, build/test/, \
     config filetype main terminal test util )
 
 all_objects := $(editor_objects) $(test_objects)
-
-ifeq "$(USE_LUA)" "static"
-  BUILTIN_CONFIGS += config/rc.lua
-else ifeq "$(USE_LUA)" "dynamic"
-  BUILTIN_CONFIGS += config/rc.lua
-endif
 
 ifdef WERROR
   WARNINGS += -Werror
@@ -121,7 +115,6 @@ else
 endif
 
 $(all_objects): BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
-$(dte) $(test): LDLIBS += $(LUA_LDLIBS)
 
 # If "make install" with no other named targets
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
@@ -151,8 +144,6 @@ build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags
 build/terminal/terminfo.cflags: | build/terminal/
-build/script.o: build/script.cflags
-build/script.o: BASIC_CFLAGS += $(LUA_CFLAGS)
 build/filetype.o: BASIC_CFLAGS += -Wno-unused-label
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)

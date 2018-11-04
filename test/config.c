@@ -3,7 +3,6 @@
 #include "../src/config.h"
 #include "../src/editor.h"
 #include "../src/frame.h"
-#include "../src/script.h"
 #include "../src/terminal/terminal.h"
 #include "../src/util/string-view.h"
 #include "../src/window.h"
@@ -28,7 +27,6 @@ void init_headless_mode(void)
 
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
-    run_builtin_script("=rc.lua");
     fill_builtin_colors();
 
     window = new_window();

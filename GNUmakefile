@@ -2,7 +2,6 @@ include mk/compat.mk
 include mk/util.mk
 -include Config.mk
 include mk/build.mk
-include mk/lua.mk
 include mk/docs.mk
 include mk/gen.mk
 -include mk/dev.mk
