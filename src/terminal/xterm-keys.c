@@ -49,6 +49,12 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     case ' ':
         *k = ch;
         return i;
+    case 'a': // Ctrl+Up (rxvt)
+    case 'b': // Ctrl+Down (rxvt)
+    case 'c': // Ctrl+Right (rxvt)
+    case 'd': // Ctrl+Left (rxvt)
+        *k = MOD_CTRL | (KEY_UP + (ch - 'a'));
+        return i;
     case 'j': case 'k': case 'l':
     case 'm': case 'n': case 'o':
     case 'p': case 'q': case 'r':
@@ -110,6 +116,12 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'F': // End
     case 'H': // Home
         *k = KEY_UP + (ch - 'A');
+        return i;
+    case 'a': // Shift+Up (rxvt)
+    case 'b': // Shift+Down (rxvt)
+    case 'c': // Shift+Right (rxvt)
+    case 'd': // Shift+Left (rxvt)
+        *k = MOD_SHIFT | (KEY_UP + (ch - 'a'));
         return i;
     case 'L': *k = KEY_INSERT; return i;
     case 'Z': *k = MOD_SHIFT | '\t'; return i;

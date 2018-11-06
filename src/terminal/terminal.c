@@ -8,21 +8,22 @@
 #include "../common.h"
 #include "../util/macros.h"
 
-typedef enum {
+enum {
     TERM_OTHER,
     TERM_LINUX,
     TERM_SCREEN,
     TERM_ST,
     TERM_TMUX,
+    TERM_URXVT,
     TERM_XTERM,
-} TerminalType;
+};
 
-static TerminalType get_term_type(const char *term)
+static uint8_t get_term_type(const char *term)
 {
     static const struct {
-        const char name[8];
+        const char name[14];
         uint8_t name_len;
-        TerminalType type;;
+        uint8_t type;
     } builtin_terminals[] = {
         {"xterm", 5, TERM_XTERM},
         {"st", 2, TERM_ST},
@@ -30,6 +31,7 @@ static TerminalType get_term_type(const char *term)
         {"tmux", 4, TERM_TMUX},
         {"screen", 6, TERM_SCREEN},
         {"linux", 5, TERM_LINUX},
+        {"rxvt-unicode", 12, TERM_URXVT},
     };
     for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
         const size_t n = builtin_terminals[i].name_len;
@@ -75,6 +77,7 @@ void term_init(void)
         terminal.repeat_byte = &ecma48_repeat_byte;
         break;
     case TERM_ST:
+    case TERM_URXVT:
         terminal = xterm;
         break;
     case TERM_TMUX:
