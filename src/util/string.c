@@ -33,7 +33,6 @@ void string_add_byte(String *s, unsigned char byte)
 size_t string_add_ch(String *s, CodePoint u)
 {
     size_t len = u_char_size(u);
-
     string_grow(s, len);
     u_set_char_raw(s->buffer, &s->len, u);
     return len;
@@ -42,7 +41,6 @@ size_t string_add_ch(String *s, CodePoint u)
 size_t string_insert_ch(String *s, size_t pos, CodePoint u)
 {
     size_t len = u_char_size(u);
-
     string_make_space(s, pos, len);
     u_set_char_raw(s->buffer, &pos, u);
     return len;

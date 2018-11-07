@@ -14,7 +14,6 @@ static String arg = STRING_INIT;
 static void parse_sq(const char *cmd, size_t *posp)
 {
     size_t pos = *posp;
-
     while (1) {
         if (cmd[pos] == '\'') {
             pos++;
@@ -271,10 +270,9 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
 char **copy_string_array(char **src, size_t count)
 {
     char **dst = xnew(char *, count + 1);
-    size_t i;
-    for (i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         dst[i] = xstrdup(src[i]);
     }
-    dst[i] = NULL;
+    dst[count] = NULL;
     return dst;
 }
