@@ -221,6 +221,46 @@ static void test_xterm_parse_key_combo(void)
     }
 }
 
+static void test_xterm_parse_key_combo_rxvt(void)
+{
+    static const struct {
+        char escape_sequence[8];
+        KeyCode key;
+    } templates[] = {
+        {"\033[3_", KEY_DELETE},
+        {"\033[5_", KEY_PAGE_UP},
+        {"\033[6_", KEY_PAGE_DOWN},
+        {"\033[7_", KEY_HOME},
+        {"\033[8_", KEY_END},
+    };
+
+    static const struct {
+        char ch;
+        KeyCode mask;
+    } modifiers[] = {
+        {'~', 0},
+        {'^', MOD_CTRL},
+        {'$', MOD_SHIFT},
+        {'@', MOD_SHIFT | MOD_CTRL},
+    };
+
+    FOR_EACH_I(i, templates) {
+        FOR_EACH_I(j, modifiers) {
+            char seq[8];
+            memcpy(seq, templates[i].escape_sequence, 8);
+            BUG_ON(seq[7] != '\0');
+            char *underscore = strchr(seq, '_');
+            BUG_ON(underscore == NULL);
+            *underscore = modifiers[j].ch;
+            size_t seq_length = strlen(seq);
+            KeyCode key;
+            ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+            EXPECT_EQ(parsed_length, seq_length);
+            EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
+        }
+    }
+}
+
 static void test_key_to_string(void)
 {
     static const struct key_to_string_test {
@@ -302,6 +342,7 @@ void test_terminal(void)
     test_parse_term_color();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
+    test_xterm_parse_key_combo_rxvt();
     test_key_to_string();
     test_key_to_ctrl();
 }

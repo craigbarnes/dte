@@ -125,10 +125,12 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         return i;
     case 'L': *k = KEY_INSERT; return i;
     case 'Z': *k = MOD_SHIFT | '\t'; return i;
-    case '3': tmp = KEY_DELETE; goto check_delim;
+    case '3': tmp = KEY_DELETE; goto check_delim_rxvt;
     case '4': tmp = KEY_END; goto check_trailing_tilde;
-    case '5': tmp = KEY_PAGE_UP; goto check_delim;
-    case '6': tmp = KEY_PAGE_DOWN; goto check_delim;
+    case '5': tmp = KEY_PAGE_UP; goto check_delim_rxvt;
+    case '6': tmp = KEY_PAGE_DOWN; goto check_delim_rxvt;
+    case '7': tmp = KEY_HOME; goto check_delim_rxvt;
+    case '8': tmp = KEY_END; goto check_delim_rxvt;
     case '1':
         if (i >= length) return -1;
         switch (ch = buf[i++]) {
@@ -198,6 +200,27 @@ check_trailing_tilde:
         return -1;
     } else if (buf[i++] == '~') {
         *k = tmp;
+        return i;
+    }
+    return 0;
+check_delim_rxvt:
+    if (i >= length) {
+        return -1;
+    }
+    switch (buf[i++]) {
+    case ';':
+        goto check_modifiers;
+    case '~':
+        *k = tmp;
+        return i;
+    case '^':
+        *k = MOD_CTRL | tmp;
+        return i;
+    case '$':
+        *k = MOD_SHIFT | tmp;
+        return i;
+    case '@':
+        *k = MOD_CTRL | MOD_SHIFT | tmp;
         return i;
     }
     return 0;
