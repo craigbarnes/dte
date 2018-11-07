@@ -668,8 +668,48 @@ Go to top of file list.
 .RS
 Set highlight color.
 .P
-Colors:
+The \fIname\fR argument can be a token name defined by a \fBdte\-syntax\fR(5) file
+or one of the following, built\-in highlight names:
 .P
+\(bu \fBdefault\fR
+.br
+\(bu \fBnontext\fR
+.br
+\(bu \fBnoline\fR
+.br
+\(bu \fBwserror\fR
+.br
+\(bu \fBselection\fR
+.br
+\(bu \fBcurrentline\fR
+.br
+\(bu \fBlinenumber\fR
+.br
+\(bu \fBstatusline\fR
+.br
+\(bu \fBcommandline\fR
+.br
+\(bu \fBerrormsg\fR
+.br
+\(bu \fBinfomsg\fR
+.br
+\(bu \fBtabbar\fR
+.br
+\(bu \fBactivetab\fR
+.br
+\(bu \fBinactivetab\fR
+.br
+.P
+The \fIfg\-color\fR and \fIbg\-color\fR arguments can be one of the following:
+.P
+\(bu No value (equivalent to \fBdefault\fR)
+.br
+\(bu A numeric value between \fB\-2\fR and \fB255\fR
+.br
+\(bu A 256\-color palette value in R/G/B notation (e.g. \fB0/3/5\fR)
+.br
+\(bu A true color value in CSS\-style #RRGGBB notation (e.g. \fB#ab90df\fR)
+.br
 \(bu \fBkeep\fR (\fB\-2\fR)
 .br
 \(bu \fBdefault\fR (\fB\-1\fR)
@@ -707,18 +747,14 @@ Colors:
 \(bu \fBwhite\fR
 .br
 .P
-Color can be given as a numeric value too (\fB\-2\fR..\fB255\fR).
+Colors \fB16\fR to \fB231\fR correspond to R/G/B colors. Colors \fB232\fR to \fB255\fR
+are grayscale values.
 .P
-Colors \fB16\fR\-\fB255\fR are supported by modern \fBxterm\fR\-compatible terminal
-emulators. There's a 6x6x6 color cube at indexes \fB16\fR..\fB231\fR. For these
-colors it is easiest to use the R/G/B syntax where R, G and B are values
-between \fB0\fR and \fB5\fR.
+If the terminal has limited support for rendering colors, the \fIfg\-color\fR
+and \fIbg\-color\fR arguments will fall back to the nearest supported color,
+which may be less precise than the value specified.
 .P
-Indexes \fB232\fR..\fB255\fR contain 24 grayscale values that can be used
-to specify grayscale value more accurately than using the R/G/B
-syntax.
-.P
-Attributes:
+The \fIattribute\fR argument(s) can be any combination of the following:
 .P
 \(bu \fBbold\fR
 .br
@@ -745,8 +781,6 @@ to keep \fIfg\-color\fR and attributes and change only \fIbg\-color\fR.
 NOTE: Because \fBkeep\fR is both a color and an attribute you need to
 specify both \fIfg\-color\fR and \fIbg\-color\fR if you want to set the \fBkeep\fR
 \fIattribute\fR.
-.P
-If you omit any color it is set to \fBdefault\fR (\fB\-1\fR).
 .P
 Unset fg/bg colors are inherited from highlight color \fBdefault\fR.
 If you don't set fg/bg for the highlight color \fBdefault\fR then

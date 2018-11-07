@@ -339,8 +339,30 @@ Same keys work as in command mode, but with these changes:
 
 Set highlight color.
 
-Colors:
+The _name_ argument can be a token name defined by a `dte-syntax` file
+or one of the following, built-in highlight names:
 
+* `default`
+* `nontext`
+* `noline`
+* `wserror`
+* `selection`
+* `currentline`
+* `linenumber`
+* `statusline`
+* `commandline`
+* `errormsg`
+* `infomsg`
+* `tabbar`
+* `activetab`
+* `inactivetab`
+
+The _fg-color_ and _bg-color_ arguments can be one of the following:
+
+* No value (equivalent to `default`)
+* A numeric value between `-2` and `255`
+* A 256-color palette value in R/G/B notation (e.g. `0/3/5`)
+* A true color value in CSS-style #RRGGBB notation (e.g. `#ab90df`)
 * `keep` (`-2`)
 * `default` (`-1`)
 * `black` (`0`)
@@ -360,18 +382,14 @@ Colors:
 * `lightcyan`
 * `white`
 
-Color can be given as a numeric value too (`-2`..`255`).
+Colors `16` to `231` correspond to R/G/B colors. Colors `232` to `255`
+are grayscale values.
 
-Colors `16`-`255` are supported by modern [`xterm`]-compatible terminal
-emulators. There's a 6x6x6 color cube at indexes `16`..`231`. For these
-colors it is easiest to use the R/G/B syntax where R, G and B are values
-between `0` and `5`.
+If the terminal has limited support for rendering colors, the _fg-color_
+and _bg-color_ arguments will fall back to the nearest supported color,
+which may be less precise than the value specified.
 
-Indexes `232`..`255` contain 24 grayscale values that can be used
-to specify grayscale value more accurately than using the R/G/B
-syntax.
-
-Attributes:
+The _attribute_ argument(s) can be any combination of the following:
 
 * `bold`
 * `dim`
@@ -389,8 +407,6 @@ to keep _fg-color_ and attributes and change only _bg-color_.
 NOTE: Because `keep` is both a color and an attribute you need to
 specify both _fg-color_ and _bg-color_ if you want to set the `keep`
 _attribute_.
-
-If you omit any color it is set to `default` (`-1`).
 
 Unset fg/bg colors are inherited from highlight color `default`.
 If you don't set fg/bg for the highlight color `default` then
