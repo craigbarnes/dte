@@ -13,7 +13,7 @@ ${NM:-nm} -Ptd ${@:-dte} | sort -k4 -nr | awk '
     type = $2
     size = $4
 
-    if (size < 1) {
+    if (size < 1 || type ~ /[Bb]/) {
         next
     } else if (size < 10) {
         printf(" %s %7d  %s\n", type, size, name)
