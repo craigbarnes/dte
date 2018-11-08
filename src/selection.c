@@ -32,7 +32,7 @@ void init_selection(const View *v, SelectionInfo *info)
         info->eo += block_iter_eat_line(&ei);
     } else {
         // Character under cursor belongs to the selection
-        info->eo += buffer_next_char(&ei, &u);
+        info->eo += buffer_next_column(&ei);
     }
 }
 
