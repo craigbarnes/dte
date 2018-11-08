@@ -19,13 +19,11 @@ static inline PURE NONNULL_ARGS bool streq(const char *a, const char *b)
     return strcmp(a, b) == 0;
 }
 
-static inline bool xstreq(const char *a, const char *b)
+static inline PURE bool xstreq(const char *a, const char *b)
 {
     if (a == b) {
         return true;
-    } else if (a == NULL) {
-        return false;
-    } else if (b == NULL) {
+    } else if (a == NULL || b == NULL) {
         return false;
     }
     return streq(a, b);

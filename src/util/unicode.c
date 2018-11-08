@@ -110,25 +110,12 @@ static bool u_is_double_width(CodePoint u)
 
 unsigned int u_char_width(CodePoint u)
 {
-#if GNUC_AT_LEAST(3, 0)
-    switch (u) {
-    // C0 control or DEL (rendered in caret notation)
-    case 0x00 ... 0x1F:
-    case 0x7F:
-        return 2;
-    // Printable ASCII
-    case 0x20 ... 0x7E:
+    if (u < 0x80) {
+        if (u < 0x20 || u == 0x7F) {
+            return 2; // Rendered in caret notation (e.g. ^@)
+        }
         return 1;
-    }
-#else
-    if (u_is_ctrl(u)) {
-        return 2;
-    } else if (u <= 0x7E) {
-        return 1;
-    }
-#endif
-
-    if (u_is_unprintable(u)) {
+    } else if (u_is_unprintable(u)) {
         return 4; // Rendered as <xx>
     } else if (u_is_zero_width(u)) {
         return 0;
