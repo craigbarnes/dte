@@ -98,7 +98,7 @@ void term_init(void)
     }
 
     const char *colorterm = getenv("COLORTERM");
-    if (streq(colorterm, "truecolor")) {
+    if (colorterm && streq(colorterm, "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
         return;
     }
