@@ -6,8 +6,8 @@ v1.8 (unreleased)
 
 **Changes:**
 
-* Added support for 24-bit `#rrggbb` colors to `hi` command.
-* Added support for `strikethrough` attribute to `hi` command.
+* Added support for 24-bit RGB terminal colors.
+* Added support for `strikethrough` terminal attribute.
 * Added support for `alias` names containing multi-byte Unicode characters.
 * Added `refresh` command (to force a full screen redraw).
 * Added `dte -K` command-line option (for keycode debugging).
