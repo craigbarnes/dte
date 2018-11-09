@@ -1,4 +1,5 @@
 #include "uchar.h"
+#include "ascii.h"
 
 static inline CONST_FN int u_seq_len(unsigned int first_byte)
 {
@@ -198,12 +199,12 @@ void u_set_char(char *str, size_t *idx, CodePoint uch)
     size_t i = *idx;
 
     if (uch < 0x80) {
-        if (!u_is_ctrl(uch)) {
+        if (ascii_iscntrl(uch)) {
+            u_set_ctrl(str, idx, uch);
+        } else {
             str[i++] = uch;
             *idx = i;
-            return;
         }
-        u_set_ctrl(str, idx, uch);
         return;
     }
     if (u_is_unprintable(uch)) {

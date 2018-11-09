@@ -1,5 +1,6 @@
 #include "view.h"
 #include "buffer.h"
+#include "util/ascii.h"
 #include "util/uchar.h"
 #include "util/xmalloc.h"
 #include "window.h"
@@ -37,7 +38,7 @@ void view_update_cursor_x(View *v)
 
         c++;
         if (u < 0x80) {
-            if (!u_is_ctrl(u)) {
+            if (!ascii_iscntrl(u)) {
                 w++;
             } else if (u == '\t') {
                 w = (w + tw) / tw * tw;

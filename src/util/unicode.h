@@ -12,11 +12,6 @@ static inline CONST_FN bool u_is_unicode(CodePoint u)
     return u <= UINT32_C(0x10ffff);
 }
 
-static inline CONST_FN bool u_is_ctrl(CodePoint u)
-{
-    return u < 0x20 || u == 0x7f;
-}
-
 static inline CONST_FN bool u_is_upper(CodePoint u)
 {
     return (u - 'A') < 26;

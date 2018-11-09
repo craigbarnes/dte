@@ -1,6 +1,7 @@
 #include "move.h"
 #include "buffer.h"
 #include "indent.h"
+#include "util/ascii.h"
 #include "util/uchar.h"
 
 typedef enum {
@@ -40,7 +41,7 @@ void move_to_preferred_x(int preferred_x)
         CodePoint u = lr.line[i++];
 
         if (u < 0x80) {
-            if (!u_is_ctrl(u)) {
+            if (!ascii_iscntrl(u)) {
                 x++;
             } else if (u == '\t') {
                 x = (x + tw) / tw * tw;

@@ -185,7 +185,7 @@ static void screen_skip_char(LineInfo *info)
     CodePoint u = info->line[info->pos++];
     info->offset++;
     if (u < 0x80) {
-        if (!u_is_ctrl(u)) {
+        if (!ascii_iscntrl(u)) {
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
             obuf.x += (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
