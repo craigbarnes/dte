@@ -240,7 +240,6 @@ bool term_init_terminfo(const char *term)
     // Initialize terminfo database (or call exit(3) on failure)
     setupterm(term, 1, (int*)0);
 
-    terminal.parse_key_sequence = &parse_key_from_keymap;
     terminal.put_control_code = &tputs_control_code;
     terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
@@ -317,15 +316,28 @@ bool term_init_terminfo(const char *term)
         .hide_cursor = get_terminfo_string_view("civis")
     };
 
+    bool xterm_compatible_key_codes = true;
+
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
         const char *const code = get_terminfo_string(keymap[i].code);
         if (code && code[0] != '\0') {
+            const size_t code_len = strlen(code);
+            const KeyCode key = keymap[i].key;
             keymap[keymap_length++] = (struct TermKeyMap) {
                 .code = code,
-                .code_length = strlen(code),
-                .key = keymap[i].key
+                .code_length = code_len,
+                .key = key
             };
+            KeyCode parsed_key;
+            const ssize_t parsed_len = xterm_parse_key(code, code_len, &parsed_key);
+            if (parsed_len <= 0 || parsed_key != key) {
+                xterm_compatible_key_codes = false;
+            }
         }
+    }
+
+    if (!xterm_compatible_key_codes) {
+        terminal.parse_key_sequence = &parse_key_from_keymap;
     }
 
     return true; // Initialization succeeded
