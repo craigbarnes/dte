@@ -1,6 +1,24 @@
 Releases
 ========
 
+v1.8 (unreleased)
+-----------------
+
+**Changes:**
+
+* Added support for 24-bit `#rrggbb` colors to `hi` command.
+* Added support for `strikethrough` attribute to `hi` command.
+* Added support for `alias` names containing multi-byte Unicode characters.
+* Added `refresh` command (to force a full screen redraw).
+* Added `dte -K` command-line option (for keycode debugging).
+* Added support for reading a buffer from `stdin` at startup.
+* Added support for binding Ctrl/Alt/Shift + F1-F12 on xterm-like terminals.
+* Improved cursor interaction with Unicode combining characters.
+* Improved built-in filetype detection.
+* Improved parsing of GCC error messages.
+* Updated character width lookup tables to Unicode 11.
+* Optimized code to reduce startup/input/redraw latency.
+
 v1.7 (latest release)
 ---------------------
 
@@ -12,7 +30,6 @@ Released on 2018-05-08.
   (e.g. `open -g *.[ch]`).
 * Added support for binding more xterm extended key combinations
   (Ctrl/Meta/Shift + PageUp/PageDown/Home/End).
-* Added basic syntax highlighters for Perl and `texmf.cnf` files.
 * Improved compiler error parsing for newer versions of GCC.
 * Improved handling of underline/dim/italic terminal attributes
   (including support for the `ncv` terminfo capability).
