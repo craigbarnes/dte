@@ -2,6 +2,8 @@
 
 enum {
     S = ASCII_SPACE,
+    C = ASCII_CNTRL,
+    s = ASCII_SPACE | ASCII_CNTRL,
     L = ASCII_LOWER,
     U = ASCII_UPPER,
     D = ASCII_DIGIT,
@@ -10,7 +12,12 @@ enum {
 };
 
 const uint8_t ascii_table[256] = {
-    ['\t'] = S, ['\n'] = S, ['\r'] = S, [' '] = S,
+    [0x00] = C, [0x01] = C, [0x02] = C, [0x03] = C, [0x04] = C,
+    [0x05] = C, [0x06] = C, ['\a'] = C, ['\b'] = C, ['\t'] = s,
+    ['\n'] = s, ['\v'] = C, ['\f'] = C, ['\r'] = s, [0x0E] = C,
+    C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, // 0x0F .. 0x1F
+
+    [' '] = S,
     ['_'] = u,
 
     ['0'] = D, ['1'] = D, ['2'] = D, ['3'] = D, ['4'] = D,
@@ -28,7 +35,7 @@ const uint8_t ascii_table[256] = {
     ['s'] = L, ['t'] = L, ['u'] = L, ['v'] = L, ['w'] = L, ['x'] = L,
     ['y'] = L, ['z'] = L,
 
-    [0x7F] = 0,
+    [0x7F] = C,
     N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0x80 .. 0x8F
     N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0x90 .. 0x9F
     N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, // 0xA0 .. 0xAF

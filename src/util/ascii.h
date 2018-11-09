@@ -9,7 +9,7 @@ extern const uint8_t ascii_table[256];
 
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
-// 0x04
+#define ASCII_CNTRL 0x04
 // 0x08
 #define ASCII_LOWER 0x10
 #define ASCII_UPPER 0x20
@@ -23,6 +23,7 @@ extern const uint8_t ascii_table[256];
 #define ascii_test(x, mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
 #define ascii_isdigit(x) ascii_test(x, ASCII_DIGIT)
+#define ascii_iscntrl(x) ascii_test(x, ASCII_CNTRL)
 #define ascii_islower(x) ascii_test(x, ASCII_LOWER)
 #define ascii_isupper(x) ascii_test(x, ASCII_UPPER)
 #define ascii_isalpha(x) ascii_test(x, ASCII_ALPHA)
