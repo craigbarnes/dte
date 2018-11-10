@@ -35,13 +35,10 @@ FNR == 1 {
     idents[nfiles] = ident
 }
 
-/^# *(TODO|FIXME)/ {
-    print "\"\\n\""
-    next
-}
-
 name ~ /syntax\// {
-    print "\"" escape_syntax($0) "\\n\""
+    if ($0 !~ /^ *#/) {
+        print "\"" escape_syntax($0) "\\n\""
+    }
     next
 }
 
