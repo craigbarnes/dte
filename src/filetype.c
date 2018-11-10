@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "filetype.h"
 #include "common.h"
 #include "util/macros.h"
@@ -24,6 +25,7 @@ static int ft_compare(const void *key, const void *elem)
 #include "filetype/extensions.c"
 #include "filetype/interpreters.c"
 #include "filetype/ignored-exts.c"
+#include "filetype/signatures.c"
 
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
@@ -207,30 +209,10 @@ HOT const char *find_ft(const char *filename, StringView line)
         }
     }
 
-    if (line.length >= 5) {
-        switch (line.data[1]) {
-        case '!':
-            if (string_view_has_literal_prefix_icase(&line, "<!DOCTYPE HTML")) {
-                return builtin_filetype_names[HTML];
-            } else if (string_view_has_literal_prefix(&line, "<!DOCTYPE")) {
-                return builtin_filetype_names[XML];
-            }
-            break;
-        case '?':
-            if (string_view_has_literal_prefix(&line, "<?xml")) {
-                return builtin_filetype_names[XML];
-            }
-            break;
-        case 'Y':
-            if (string_view_has_literal_prefix(&line, "%YAML")) {
-                return builtin_filetype_names[YAML];
-            }
-            break;
-        case 'w':
-            if (string_view_has_literal_prefix(&line, "[wrap-file]")) {
-                return builtin_filetype_names[INI];
-            }
-            break;
+    if (line.length) {
+        FileTypeEnum ft = filetype_from_signature(line.data, line.length);
+        if (ft) {
+            return builtin_filetype_names[ft];
         }
     }
 

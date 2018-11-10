@@ -108,6 +108,7 @@ static void test_find_ft_firstline(void)
         {"%YAML 1.1", "yaml"},
         {"[wrap-file]", "ini"},
         {"[wrap-file", NULL},
+        {"diff --git a/example.txt b/example.txt", "diff"},
         {".TH DTE 1", NULL},
         {"", NULL},
         {" ", NULL},
