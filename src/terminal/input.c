@@ -14,35 +14,6 @@
 static char input_buf[256];
 static size_t input_buf_fill;
 static bool input_can_be_truncated;
-static char last_escape_sequence[256];
-static size_t last_escape_sequence_length;
-
-static const char *escape_key(const char *seq, size_t len)
-{
-    static char buf[1024];
-    size_t j = 0;
-    for (size_t i = 0; i < len && i < sizeof(buf) - 1; i++) {
-        unsigned char ch = seq[i];
-        if (ch < 0x20) {
-            buf[j++] = '^';
-            ch |= 0x40;
-        } else if (ch == 0x7f) {
-            buf[j++] = '^';
-            ch = '?';
-        }
-        buf[j++] = ch;
-    }
-    buf[j] = '\0';
-    return buf;
-}
-
-const char *term_get_last_key_escape_sequence(void)
-{
-    if (last_escape_sequence_length == 0) {
-        return NULL;
-    }
-    return escape_key(last_escape_sequence, last_escape_sequence_length);
-}
 
 static void consume_input(size_t len)
 {
@@ -116,8 +87,6 @@ static bool read_special(KeyCode *key)
         return false;
     default:
         // Match
-        memcpy(last_escape_sequence, input_buf, len);
-        last_escape_sequence_length = len;
         consume_input(len);
         return true;
     }
@@ -212,8 +181,6 @@ static bool is_text(const char *const str, size_t len)
 
 bool term_read_key(KeyCode *key)
 {
-    last_escape_sequence_length = 0;
-
     if (!input_buf_fill && !fill_buffer()) {
         return false;
     }
@@ -267,11 +234,7 @@ bool term_read_key(KeyCode *key)
                 return true;
             }
 
-            // Unknown escape sequence; record it:
-            last_escape_sequence[0] = '\033';
-            memcpy(last_escape_sequence + 1, input_buf, input_buf_fill);
-            last_escape_sequence_length = input_buf_fill + 1;
-            // ...but don't insert it:
+            // Unknown escape sequence; avoid inserting it
             input_buf_fill = 0;
             return false;
         }

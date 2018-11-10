@@ -132,11 +132,8 @@ static void showkey_loop(void)
     while (loop) {
         KeyCode key;
         if (!term_read_key(&key)) {
-            const char *seq = term_get_last_key_escape_sequence();
-            if (seq) {
-                buf_sprintf("   %-12s %-14s ^[%s\n", "UNKNOWN", "-", seq);
-                buf_flush();
-            }
+            buf_add_literal("   UNKNOWN      -\n");
+            buf_flush();
             continue;
         }
         switch (key) {
@@ -148,8 +145,7 @@ static void showkey_loop(void)
             break;
         }
         char *str = key_to_string(key);
-        const char *seq = term_get_last_key_escape_sequence();
-        buf_sprintf("   %-12s 0x%-12" PRIX32 " %s\n", str, key, seq ? seq : "");
+        buf_sprintf("   %-12s 0x%-12" PRIX32 "\n", str, key);
         free(str);
         buf_flush();
     }
