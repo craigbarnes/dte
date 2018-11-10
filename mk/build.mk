@@ -114,7 +114,12 @@ else
   DEBUG = 1
 endif
 
-$(all_objects): BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS)
+ifeq "$(DEBUG)" "0"
+  UNWIND = $(call cc-option,-fno-asynchronous-unwind-tables)
+  $(call make-lazy,UNWIND)
+endif
+
+$(all_objects): BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS) $(UNWIND)
 
 # If "make install" with no other named targets
 ifeq "" "$(filter-out install,$(or $(MAKECMDGOALS),all))"
