@@ -141,6 +141,16 @@ static StringView get_terminfo_string_view(const char *capname)
     return sv;
 }
 
+static bool get_terminfo_flag(const char *capname)
+{
+    switch (tigetflag(capname)) {
+    case -1: // Not a boolean capability
+    case 0: // Canceled or absent
+        return false;
+    }
+    return true;
+}
+
 static int tputs_putc(int ch)
 {
     buf_add_ch(ch);
@@ -245,10 +255,17 @@ bool term_init_terminfo(const char *term)
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
 
+    if (get_terminfo_flag("nxon")) {
+        term_init_fail (
+            "TERM type '%s' not supported: 'nxon' flag is set",
+            term
+        );
+    }
+
     terminfo.cup = get_terminfo_string("cup");
     if (terminfo.cup == NULL) {
         term_init_fail (
-            "TERM type '%s' not supported: 'cup' capability required",
+            "TERM type '%s' not supported: no 'cup' capability",
             term
         );
     }
@@ -263,7 +280,7 @@ bool term_init_terminfo(const char *term)
         terminal.repeat_byte = &tputs_repeat_byte;
     }
 
-    terminal.back_color_erase = tigetflag("bce");
+    terminal.back_color_erase = get_terminfo_flag("bce");
     terminal.width = tigetnum("cols");
     terminal.height = tigetnum("lines");
 
