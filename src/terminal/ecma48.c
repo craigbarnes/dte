@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <termios.h>
+#include <unistd.h>
 #undef CTRL // macro from sys/ttydefaults.h clashes with the one in key.h
 #include "ecma48.h"
 #include "output.h"
@@ -12,20 +13,20 @@ static struct termios termios_save;
 
 void term_raw(void)
 {
-    // See termios(3)
+    // Get and save current attributes
     struct termios termios;
-
-    tcgetattr(0, &termios);
+    tcgetattr(STDIN_FILENO, &termios);
     termios_save = termios;
 
-    // Disable buffering
-    // Disable echo
-    // Disable generation of signals (free some control keys)
-    termios.c_lflag &= ~(ICANON | ECHO | ISIG);
-
-    // Disable CR to NL conversion (differentiate ^J from enter)
-    // Disable flow control (free ^Q and ^S)
-    termios.c_iflag &= ~(ICRNL | IXON | IXOFF);
+    // Enter "raw" mode (roughly equivalent to cfmakeraw(3) on Linux/BSD)
+    termios.c_lflag &= ~(ICANON | ECHO | ECHONL | ISIG | IEXTEN);
+    termios.c_iflag &= ~(
+        ICRNL | IXON | IXOFF
+        | IGNBRK | BRKINT | PARMRK
+        | ISTRIP | INLCR | IGNCR
+    );
+    termios.c_cflag &= ~(CSIZE | PARENB);
+    termios.c_cflag |= CS8;
 
     // Read at least 1 char on each read()
     termios.c_cc[VMIN] = 1;
@@ -33,12 +34,12 @@ void term_raw(void)
     // Read blocks until there are MIN(VMIN, requested) bytes available
     termios.c_cc[VTIME] = 0;
 
-    tcsetattr(0, 0, &termios);
+    tcsetattr(STDIN_FILENO, 0, &termios);
 }
 
 void term_cooked(void)
 {
-    tcsetattr(0, 0, &termios_save);
+    tcsetattr(STDIN_FILENO, 0, &termios_save);
 }
 
 void ecma48_clear_to_eol(void)
