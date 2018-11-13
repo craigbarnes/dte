@@ -125,14 +125,14 @@ static void showkey_loop(void)
     terminal.raw();
     terminal.put_control_code(terminal.control_codes.init);
     terminal.put_control_code(terminal.control_codes.keypad_on);
-    buf_add_literal("\nPress any key combination, or use Ctrl+D to exit\n");
+    buf_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
     buf_flush();
 
     bool loop = true;
     while (loop) {
         KeyCode key;
         if (!term_read_key(&key)) {
-            buf_add_literal("   UNKNOWN      -\n");
+            buf_add_literal("   UNKNOWN      -\r\n");
             buf_flush();
             continue;
         }
@@ -145,7 +145,7 @@ static void showkey_loop(void)
             break;
         }
         char *str = key_to_string(key);
-        buf_sprintf("   %-12s 0x%-12" PRIX32 "\n", str, key);
+        buf_sprintf("   %-12s 0x%-12" PRIX32 "\r\n", str, key);
         free(str);
         buf_flush();
     }

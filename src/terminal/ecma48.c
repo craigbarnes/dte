@@ -19,12 +19,13 @@ void term_raw(void)
     termios_save = termios;
 
     // Enter "raw" mode (roughly equivalent to cfmakeraw(3) on Linux/BSD)
-    termios.c_lflag &= ~(ICANON | ECHO | ECHONL | ISIG | IEXTEN);
     termios.c_iflag &= ~(
         ICRNL | IXON | IXOFF
         | IGNBRK | BRKINT | PARMRK
         | ISTRIP | INLCR | IGNCR
     );
+    termios.c_oflag &= ~OPOST;
+    termios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
     termios.c_cflag &= ~(CSIZE | PARENB);
     termios.c_cflag |= CS8;
 
