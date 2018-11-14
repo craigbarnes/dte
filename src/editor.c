@@ -356,7 +356,7 @@ char get_confirmation(const char *choices, const char *format, ...)
     }
     pos--;
     buf[pos++] = ']';
-    buf[pos] = 0;
+    buf[pos] = '\0';
 
     // update_windows() assumes these have been called for the current view
     view_update_cursor_x(v);

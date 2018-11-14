@@ -156,7 +156,7 @@ static void collect_files(bool directories_only)
             char *s = xmalloc(len + 2);
             memcpy(s, str, len);
             s[len] = '/';
-            s[len + 1] = 0;
+            s[len + 1] = '\0';
             add_completion(s);
         } else {
             char *dir = path_dirname(completion.parsed);

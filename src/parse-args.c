@@ -104,6 +104,6 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
         error_msg("Too many arguments");
         return NULL;
     }
-    flags[nr_flags] = 0;
+    flags[nr_flags] = '\0';
     return flags;
 }

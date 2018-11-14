@@ -332,7 +332,7 @@ static bool flag_parse (
             end = ptr + len;
         }
         buf = xmemdup(ptr, len + 1);
-        buf[len] = 0;
+        buf[len] = '\0';
         ptr = end;
 
         size_t i;
@@ -372,7 +372,7 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
             *ptr++ = ',';
         }
     }
-    ptr[-1] = 0;
+    ptr[-1] = '\0';
     return xstrdup(buf);
 }
 

@@ -77,7 +77,7 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
         *nl = 0;
         *posp += nl - line + 1;
     } else {
-        line[avail] = 0;
+        line[avail] = '\0';
         *posp += avail;
     }
     return line;

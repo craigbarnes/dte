@@ -64,7 +64,7 @@ bool regexp_exec (
 
     BUG_ON(!nr_m);
     memcpy(tmp, buf, size);
-    tmp[size] = 0;
+    tmp[size] = '\0';
     ret = !regexec(re, tmp, nr_m, m, flags);
     free(tmp);
     return ret;

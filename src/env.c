@@ -46,7 +46,7 @@ static char *expand_word(void)
     char *str = view_get_selection(v, &size);
     if (str != NULL) {
         xrenew(str, size + 1);
-        str[size] = 0;
+        str[size] = '\0';
     } else {
         str = view_get_word_under_cursor(v);
         if (str == NULL) {

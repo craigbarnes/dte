@@ -131,7 +131,7 @@ char *path_absolute(const char *filename)
                 errno = ENAMETOOLONG;
                 return NULL;
             }
-            target[target_len] = 0;
+            target[target_len] = '\0';
 
             // Calculate length
             if (target[0] != '/') {
@@ -159,7 +159,7 @@ char *path_absolute(const char *filename)
                 memcpy(tmp + pos, rest, rest_len);
                 pos += rest_len;
             }
-            tmp[pos] = 0;
+            tmp[pos] = '\0';
             pos = remove_double_slashes(tmp);
 
             // Restart

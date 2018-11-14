@@ -44,7 +44,7 @@ static char *cdup(void)
 
     const size_t len = data.out_len;
     if (len > 1 && data.out[len - 1] == '\n') {
-        data.out[len - 1] = 0;
+        data.out[len - 1] = '\0';
         return data.out;
     }
     free(data.out);
