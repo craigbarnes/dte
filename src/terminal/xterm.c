@@ -2,8 +2,6 @@
 #include "xterm.h"
 #include "ecma48.h"
 #include "output.h"
-#include "../debug.h"
-#include "../util/xsnprintf.h"
 
 void xterm_save_title(void)
 {
@@ -22,29 +20,24 @@ void xterm_set_title(const char *title)
     buf_add_ch('\007');
 }
 
-static inline void do_set_color(char *buf, size_t *pos, int32_t color, char ch)
+static inline void do_set_color(int32_t color, char ch)
 {
     if (color < 0) {
         return;
     }
 
-    size_t i = *pos;
-    buf[i++] = ';';
-    buf[i++] = ch;
+    buf_add_ch(';');
+    buf_add_ch(ch);
 
     if (color < 8) {
-        buf[i++] = '0' + color;
+        buf_add_ch('0' + color);
     } else if (color < 256) {
-        i += xsnprintf(buf + i, 8, "8;5;%u", (unsigned int) color);
-    } else if (color & COLOR_FLAG_RGB) {
+        buf_sprintf("8;5;%hhu", (uint8_t)color);
+    } else {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        i += xsnprintf(buf + i, 16, "8;2;%hhu;%hhu;%hhu", r, g, b);
-    } else {
-        BUG("color value shouldn't be > 255 when COLOR_FLAG_RGB bit is unset");
+        buf_sprintf("8;2;%hhu;%hhu;%hhu", r, g, b);
     }
-
-    *pos = i;
 }
 
 void xterm_set_color(const TermColor *color)
@@ -67,26 +60,19 @@ void xterm_set_color(const TermColor *color)
         return;
     }
 
-    char buf[64] = "\033[0";
-    size_t i = 3;
-
-    static_assert(sizeof(buf) >= STRLEN("\033[0m")
-        + (2 * ARRAY_COUNT(attr_map))
-        + (2 * STRLEN(";38;2;255;255;255"))
-    );
+    buf_add_literal("\033[0");
 
     for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
         if (color->attr & attr_map[j].attr) {
-            buf[i++] = ';';
-            buf[i++] = attr_map[j].code;
+            buf_add_ch(';');
+            buf_add_ch(attr_map[j].code);
         }
     }
 
-    do_set_color(buf, &i, color->fg, '3');
-    do_set_color(buf, &i, color->bg, '4');
+    do_set_color(color->fg, '3');
+    do_set_color(color->bg, '4');
 
-    buf[i++] = 'm';
-    buf_add_bytes(buf, i);
+    buf_add_ch('m');
     obuf.color = *color;
 }
 
