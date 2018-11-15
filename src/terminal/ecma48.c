@@ -45,7 +45,7 @@ void term_cooked(void)
 
 void ecma48_clear_to_eol(void)
 {
-    buf_add_bytes("\033[K", 3);
+    buf_add_literal("\033[K");
 }
 
 void ecma48_move_cursor(int x, int y)
@@ -53,16 +53,12 @@ void ecma48_move_cursor(int x, int y)
     if (x < 0 || x >= 999 || y < 0 || y >= 999) {
         return;
     }
-    static char buf[16];
-    const int len = xsnprintf (
-        buf,
-        11, // == strlen("\033[998;998H\0")
+    buf_sprintf (
         "\033[%u;%uH",
         // x and y are zero-based
         ((unsigned int)y) + 1,
         ((unsigned int)x) + 1
     );
-    buf_add_bytes(buf, (size_t)len);
 }
 
 void ecma48_set_color(const TermColor *const color)
@@ -108,9 +104,7 @@ void ecma48_repeat_byte(char ch, size_t count)
         buf_repeat_byte(ch, count);
         return;
     }
-    char buf[16];
-    int n = xsnprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
-    buf_add_bytes(buf, n);
+    buf_sprintf("%c\033[%zub", ch, count - 1);
 }
 
 void put_control_code(StringView code)
