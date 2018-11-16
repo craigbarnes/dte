@@ -1,6 +1,7 @@
 #include "test.h"
 #include "../src/syntax/hashset.h"
 #include "../src/util/ascii.h"
+#include "../src/util/path.h"
 #include "../src/util/string.h"
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"
@@ -280,6 +281,32 @@ static void test_round_up(void)
     EXPECT_EQ(ROUND_UP(8000, 256), 8192);
 }
 
+static void test_path_dirname_and_path_basename(void)
+{
+    static const struct {
+        const char *path;
+        const char *dirname;
+        const char *basename;
+    } tests[] = {
+        {"/home/user/example.txt", "/home/user", "example.txt"},
+        {"./../dir/example.txt", "./../dir", "example.txt"},
+        {"/usr/bin/", "/usr/bin", ""},
+        {"example.txt", ".", "example.txt"},
+        {"/usr/lib", "/usr", "lib"},
+        {"/usr", "/", "usr"},
+        {"usr", ".", "usr"},
+        {"/", "/", ""},
+        {".", ".", "."},
+        {"..", ".", ".."},
+    };
+    FOR_EACH_I(i, tests) {
+        char *dir = path_dirname(tests[i].path);
+        IEXPECT_STREQ(dir, tests[i].dirname);
+        free(dir);
+        IEXPECT_STREQ(path_basename(tests[i].path), tests[i].basename);
+    }
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -292,4 +319,5 @@ void test_util(void)
     test_u_str_width();
     test_hashset();
     test_round_up();
+    test_path_dirname_and_path_basename();
 }
