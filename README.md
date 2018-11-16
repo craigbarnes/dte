@@ -30,7 +30,7 @@ Requirements
 * [GNU Make] 3.81+
 * [terminfo] library (may be provided by [ncurses], depending on OS)
 * [iconv] library (may be included in libc, depending on OS)
-* [POSIX]-compatible [`sh`] and [`awk`] (compile-time only)
+* [POSIX]-compatible [`sh`] and [`awk`]
 
 Installation
 ------------
