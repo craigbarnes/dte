@@ -16,16 +16,12 @@ static void test_parse_term_color(void)
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
     };
     FOR_EACH_I(i, tests) {
-        TermColor parsed_color, expected_color;
-        bool ok = parse_term_color(&parsed_color, (char**) tests[i].strs);
+        TermColor parsed_color;
+        bool ok = parse_term_color(&parsed_color, (char**)tests[i].strs);
         IEXPECT_TRUE(ok);
-        if (!ok) {
-            continue;
+        if (ok) {
+            IEXPECT_TRUE(same_color(&parsed_color, &tests[i].expected_color));
         }
-        expected_color = tests[i].expected_color;
-        IEXPECT_EQ(parsed_color.fg, expected_color.fg);
-        IEXPECT_EQ(parsed_color.bg, expected_color.bg);
-        IEXPECT_EQ(parsed_color.attr, expected_color.attr);
     }
 }
 
