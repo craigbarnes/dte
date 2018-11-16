@@ -118,11 +118,21 @@ static void test_xterm_parse_key(void)
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
+        // Linux console
         {"\033[[A", 4, KEY_F1},
         {"\033[[B", 4, KEY_F2},
         {"\033[[C", 4, KEY_F3},
         {"\033[[D", 4, KEY_F4},
         {"\033[[E", 4, KEY_F5},
+        // rxvt
+        {"\033Oa", 3, MOD_CTRL | KEY_UP},
+        {"\033Ob", 3, MOD_CTRL | KEY_DOWN},
+        {"\033Oc", 3, MOD_CTRL | KEY_RIGHT},
+        {"\033Od", 3, MOD_CTRL | KEY_LEFT},
+        {"\033[a", 3, MOD_SHIFT | KEY_UP},
+        {"\033[b", 3, MOD_SHIFT | KEY_DOWN},
+        {"\033[c", 3, MOD_SHIFT | KEY_RIGHT},
+        {"\033[d", 3, MOD_SHIFT | KEY_LEFT},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
