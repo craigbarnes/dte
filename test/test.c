@@ -4,7 +4,7 @@
 
 unsigned int failed;
 
-void test_fail(const char *file, int line, const char *format, ...)
+static void test_fail(const char *file, int line, const char *format, ...)
 {
     fprintf(stderr, "%s:%d: ", file, line);
     va_list ap;

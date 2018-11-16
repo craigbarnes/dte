@@ -64,12 +64,7 @@ static void test_commands_sort(void)
         BUG_ON(n > 500);
     }
     for (size_t i = 1; i < n; i++) {
-        const char *cur = commands[i].name;
-        const char *prev = commands[i - 1].name;
-        if (strcmp(cur, prev) <= 0) {
-            FAIL("Commands not in sorted order: %s, %s", cur, prev);
-            break;
-        }
+        IEXPECT_GT(strcmp(commands[i].name, commands[i - 1].name), 0);
     }
 }
 
