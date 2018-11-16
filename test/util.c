@@ -176,6 +176,9 @@ static void test_u_char_width(void)
     EXPECT_EQ(u_char_width(0x3FFFD), 2);
     EXPECT_EQ(u_char_width(0x2757), 2);
     EXPECT_EQ(u_char_width(0x312F), 2);
+
+    // 1 column character >= 0x1100
+    EXPECT_EQ(u_char_width(0x104B3), 1);
 }
 
 static void test_u_to_lower(void)
