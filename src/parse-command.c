@@ -9,9 +9,7 @@
 #include "util/uchar.h"
 #include "util/xmalloc.h"
 
-static String arg = STRING_INIT;
-
-static void parse_sq(const char *cmd, size_t *posp)
+static void parse_sq(const char *cmd, size_t *posp, String *buf)
 {
     size_t pos = *posp;
     while (1) {
@@ -22,12 +20,12 @@ static void parse_sq(const char *cmd, size_t *posp)
         if (cmd[pos] == '\0') {
             break;
         }
-        string_add_byte(&arg, cmd[pos++]);
+        string_add_byte(buf, cmd[pos++]);
     }
     *posp = pos;
 }
 
-static size_t unicode_escape(const char *str, size_t count)
+static size_t unicode_escape(const char *str, size_t count, String *buf)
 {
     CodePoint u = 0;
     size_t i;
@@ -39,12 +37,12 @@ static size_t unicode_escape(const char *str, size_t count)
         u = u << 4 | x;
     }
     if (u_is_unicode(u)) {
-        string_add_ch(&arg, u);
+        string_add_ch(buf, u);
     }
     return i;
 }
 
-static void parse_dq(const char *cmd, size_t *posp)
+static void parse_dq(const char *cmd, size_t *posp, String *buf)
 {
     size_t pos = *posp;
 
@@ -68,7 +66,7 @@ static void parse_dq(const char *cmd, size_t *posp)
             case '\\':
             case '"':
             add_byte:
-                string_add_byte(&arg, ch);
+                string_add_byte(buf, ch);
                 break;
             case 'x':
                 if (cmd[pos]) {
@@ -78,30 +76,30 @@ static void parse_dq(const char *cmd, size_t *posp)
                         x2 = hex_decode(cmd[pos]);
                         if (x2 >= 0) {
                             pos++;
-                            string_add_byte(&arg, x1 << 4 | x2);
+                            string_add_byte(buf, x1 << 4 | x2);
                         }
                     }
                 }
                 break;
             case 'u':
-                pos += unicode_escape(cmd + pos, 4);
+                pos += unicode_escape(cmd + pos, 4, buf);
                 break;
             case 'U':
-                pos += unicode_escape(cmd + pos, 8);
+                pos += unicode_escape(cmd + pos, 8, buf);
                 break;
             default:
-                string_add_byte(&arg, '\\');
-                string_add_byte(&arg, ch);
+                string_add_byte(buf, '\\');
+                string_add_byte(buf, ch);
                 break;
             }
         } else {
-            string_add_byte(&arg, ch);
+            string_add_byte(buf, ch);
         }
     }
     *posp = pos;
 }
 
-static void parse_var(const char *cmd, size_t *posp)
+static void parse_var(const char *cmd, size_t *posp, String *buf)
 {
     size_t si = *posp;
     size_t ei = si;
@@ -124,12 +122,12 @@ static void parse_var(const char *cmd, size_t *posp)
     char *name = xstrslice(cmd, si, ei);
     char *value = expand_builtin_env(name);
     if (value != NULL) {
-        string_add_str(&arg, value);
+        string_add_str(buf, value);
         free(value);
     } else {
         const char *val = getenv(name);
         if (val != NULL) {
-            string_add_str(&arg, val);
+            string_add_str(buf, val);
         }
     }
     free(name);
@@ -137,10 +135,11 @@ static void parse_var(const char *cmd, size_t *posp)
 
 char *parse_command_arg(const char *cmd, bool tilde)
 {
+    String buf = STRING_INIT;
     size_t pos = 0;
 
     if (tilde && cmd[pos] == '~' && cmd[pos + 1] == '/') {
-        string_add_str(&arg, editor.home_dir);
+        string_add_str(&buf, editor.home_dir);
         pos++;
     }
 
@@ -155,13 +154,13 @@ char *parse_command_arg(const char *cmd, bool tilde)
         case ';':
             goto end;
         case '\'':
-            parse_sq(cmd, &pos);
+            parse_sq(cmd, &pos, &buf);
             break;
         case '"':
-            parse_dq(cmd, &pos);
+            parse_dq(cmd, &pos, &buf);
             break;
         case '$':
-            parse_var(cmd, &pos);
+            parse_var(cmd, &pos, &buf);
             break;
         case '\\':
             ch = cmd[pos++];
@@ -170,13 +169,13 @@ char *parse_command_arg(const char *cmd, bool tilde)
             }
             // Fallthrough
         default:
-            string_add_byte(&arg, ch);
+            string_add_byte(&buf, ch);
             break;
         }
     }
 
 end:
-    return string_steal_cstring(&arg);
+    return string_steal_cstring(&buf);
 }
 
 size_t find_end(const char *cmd, const size_t startpos, Error **err)
