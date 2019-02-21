@@ -17,6 +17,13 @@ typedef struct {
     size_t out_len;
 } FilterData;
 
+#define FILTER_DATA_INIT { \
+    .in = NULL, \
+    .out = NULL, \
+    .in_len = 0, \
+    .out_len = 0 \
+}
+
 int spawn_filter(char **argv, FilterData *data);
 void spawn_compiler(char **args, SpawnFlags flags, Compiler *c);
 void spawn(char **args, int fd[3], bool prompt);

@@ -34,10 +34,8 @@ static void git_open_clear(void)
 static char *cdup(void)
 {
     static const char *const cmd[] = {"git", "rev-parse", "--show-cdup", NULL};
-    FilterData data;
+    FilterData data = FILTER_DATA_INIT;
 
-    data.in = NULL;
-    data.in_len = 0;
     if (spawn_filter((char **)cmd, &data)) {
         return NULL;
     }
@@ -54,14 +52,11 @@ static char *cdup(void)
 static void git_open_load(void)
 {
     static const char *cmd[] = {"git", "ls-files", "-z", NULL, NULL};
-    FilterData data;
+    FilterData data = FILTER_DATA_INIT;
     int status = 0;
     char *dir = cdup();
-
     cmd[3] = dir;
 
-    data.in = NULL;
-    data.in_len = 0;
     if ((status = spawn_filter((char **)cmd, &data)) == 0) {
         git_open.all_files = data.out;
         git_open.size = data.out_len;

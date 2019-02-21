@@ -363,7 +363,7 @@ static void cmd_errorfmt(const char *pf, char **args)
 
 static void cmd_eval(const char* UNUSED_ARG(pf), char **args)
 {
-    FilterData data = {.in = NULL, .in_len = 0};
+    FilterData data = FILTER_DATA_INIT;
     if (spawn_filter(args, &data)) {
         return;
     }
@@ -732,7 +732,7 @@ static void cmd_pass_through(const char *pf, char **args)
         }
     }
 
-    FilterData data = {.in = NULL, .in_len = 0};
+    FilterData data = FILTER_DATA_INIT;
     if (spawn_filter(args, &data)) {
         return;
     }
