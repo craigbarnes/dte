@@ -44,6 +44,7 @@ EditorState editor = {
     .options = {
         .auto_indent = true,
         .detect_indent = 0,
+        .editorconfig = false,
         .emulate_tab = false,
         .expand_tab = false,
         .file_history = true,

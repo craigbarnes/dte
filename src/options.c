@@ -423,6 +423,7 @@ static const OptionDesc option_desc[] = {
     ENUM_OPT("case-sensitive-search", G(case_sensitive_search), case_sensitive_search_enum, NULL),
     FLAG_OPT("detect-indent", C(detect_indent), detect_indent_values, NULL),
     BOOL_OPT("display-special", G(display_special), NULL),
+    BOOL_OPT("editorconfig", C(editorconfig), NULL),
     BOOL_OPT("emulate-tab", C(emulate_tab), NULL),
     INT_OPT("esc-timeout", G(esc_timeout), 0, 2000, NULL),
     BOOL_OPT("expand-tab", C(expand_tab), NULL),

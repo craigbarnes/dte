@@ -45,6 +45,7 @@ enum tab_bar {
 #define COMMON_OPTIONS \
     int auto_indent; \
     int detect_indent; \
+    int editorconfig; \
     int emulate_tab; \
     int expand_tab; \
     int file_history; \
