@@ -3,6 +3,7 @@
 #include "util/ptr-array.h"
 #include "util/regexp.h"
 #include "util/xmalloc.h"
+#include "spawn.h"
 
 typedef struct {
     enum file_options_type type;
@@ -17,6 +18,73 @@ static void set_options(char **args)
     for (size_t i = 0; args[i]; i += 2) {
         set_option(args[i], args[i + 1], true, false);
     }
+}
+
+void set_editorconfig_options(Buffer *b)
+{
+    if (!b->options.editorconfig) {
+        return;
+    }
+
+    const char *path = b->abs_filename;
+    char cwd[8192];
+    if (path == NULL) {
+        // For buffers with no associated filename, use a dummy path of
+        // "$PWD/_", to obtain generic settings for the working directory
+        // or the user's default settings.
+        if (getcwd(cwd, sizeof(cwd) - 2) == NULL) {
+            return;
+        }
+        size_t n = strlen(cwd);
+        cwd[n++] = '/';
+        cwd[n++] = '_';
+        cwd[n] = '\0';
+        path = cwd;
+    }
+
+    const char *cmd[] = {"editorconfig", path, NULL};
+    FilterData data = FILTER_DATA_INIT;
+    if (spawn_filter((char**)cmd, &data) != 0 || data.out_len == 0) {
+        return;
+    }
+
+    ssize_t pos = 0, size = data.out_len;
+    while (pos < size) {
+        const char *key = buf_next_line(data.out, &pos, size);
+        char *val = strchr(key, '=');
+        if (val == NULL || val == key) {
+            continue;
+        }
+        *val++ = '\0';
+        if (*val == '\0') {
+            continue;
+        }
+
+        if (streq(key, "indent_style")) {
+            if (streq(val, "spaces")) {
+                b->options.expand_tab = true;
+                b->options.emulate_tab = true;
+                b->options.detect_indent = 0;
+            } else if (streq(val, "tabs")) {
+                b->options.expand_tab = false;
+                b->options.emulate_tab = false;
+                b->options.detect_indent = 0;
+            }
+        } else if (streq(key, "indent_size")) {
+            int n = atoi(val);
+            if (n > 0 && n <= 8) {
+                b->options.indent_width = n;
+                b->options.detect_indent = 0;
+            }
+        } else if (streq(key, "tab_width")) {
+            int n = atoi(val);
+            if (n > 0 && n <= 8) {
+                b->options.tab_width = n;
+            }
+        }
+    }
+
+    free(data.out);
 }
 
 void set_file_options(Buffer *b)

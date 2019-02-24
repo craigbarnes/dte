@@ -1117,6 +1117,7 @@ static void cmd_save(const char *pf, char **args)
         // New file and most likely user has not changed the filetype
         if (buffer_detect_filetype(buffer)) {
             set_file_options(buffer);
+            set_editorconfig_options(buffer);
             buffer_update_syntax(buffer);
         }
     }

@@ -11,4 +11,6 @@ enum file_options_type {
 void set_file_options(Buffer *b);
 void add_file_options(enum file_options_type type, char *to, char **strs);
 
+void set_editorconfig_options(Buffer *b);
+
 #endif

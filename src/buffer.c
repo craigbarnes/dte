@@ -4,7 +4,6 @@
 #include "filetype.h"
 #include "lock.h"
 #include "selection.h"
-#include "spawn.h"
 #include "syntax/state.h"
 #include "util/path.h"
 #include "util/regexp.h"
@@ -385,61 +384,12 @@ static bool detect_indent(Buffer *b)
     return true;
 }
 
-static void set_editorconfig_options(Buffer *b)
-{
-    const char *cmd[] = {"editorconfig", b->abs_filename, NULL};
-    FilterData data = FILTER_DATA_INIT;
-    if (spawn_filter((char**)cmd, &data) != 0 || data.out_len == 0) {
-        return;
-    }
-
-    ssize_t pos = 0, size = data.out_len;
-    while (pos < size) {
-        const char *key = buf_next_line(data.out, &pos, size);
-        char *val = strchr(key, '=');
-        if (val == NULL || val == key) {
-            continue;
-        }
-        *val++ = '\0';
-        if (*val == '\0') {
-            continue;
-        }
-
-        if (streq(key, "indent_style")) {
-            if (streq(val, "spaces")) {
-                b->options.expand_tab = true;
-                b->options.emulate_tab = true;
-                b->options.detect_indent = 0;
-            } else if (streq(val, "tabs")) {
-                b->options.expand_tab = false;
-                b->options.emulate_tab = false;
-                b->options.detect_indent = 0;
-            }
-        } else if (streq(key, "indent_size")) {
-            int n = atoi(val);
-            if (n > 0 && n <= 8) {
-                b->options.indent_width = n;
-                b->options.detect_indent = 0;
-            }
-        } else if (streq(key, "tab_width")) {
-            int n = atoi(val);
-            if (n > 0 && n <= 8) {
-                b->options.tab_width = n;
-            }
-        }
-    }
-
-    free(data.out);
-}
-
 void buffer_setup(Buffer *b)
 {
     b->setup = true;
     buffer_detect_filetype(b);
     set_file_options(b);
-    if (b->options.editorconfig && b->abs_filename != NULL) {
-        set_editorconfig_options(b);
-    }
+    set_editorconfig_options(b);
     buffer_update_syntax(b);
     if (b->options.detect_indent && b->abs_filename != NULL) {
         detect_indent(b);
