@@ -33,15 +33,29 @@ static uint8_t get_term_type(const char *term)
         {"linux", 5, TERM_LINUX},
         {"rxvt-unicode", 12, TERM_URXVT},
     };
+    const size_t term_len = strlen(term);
     for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
         const size_t n = builtin_terminals[i].name_len;
-        if (memcmp(term, builtin_terminals[i].name, n) == 0) {
+        if (term_len >= n && memcmp(term, builtin_terminals[i].name, n) == 0) {
             if (term[n] == '-' || term[n] == '\0') {
                 return builtin_terminals[i].type;
             }
         }
     }
     return TERM_OTHER;
+}
+
+UNITTEST {
+    BUG_ON(get_term_type("xterm") != TERM_XTERM);
+    BUG_ON(get_term_type("tmux") != TERM_TMUX);
+    BUG_ON(get_term_type("st") != TERM_ST);
+    BUG_ON(get_term_type("stterm") != TERM_ST);
+    BUG_ON(get_term_type("linux") != TERM_LINUX);
+    BUG_ON(get_term_type("xterm-256color") != TERM_XTERM);
+    BUG_ON(get_term_type("screen-256color") != TERM_SCREEN);
+    BUG_ON(get_term_type("x") != TERM_OTHER);
+    BUG_ON(get_term_type("xter") != TERM_OTHER);
+    BUG_ON(get_term_type("xtermz") != TERM_OTHER);
 }
 
 NORETURN
