@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include "util/list.h"
 
-// Blocks always contains whole lines.
+// Blocks always contain whole lines.
 // There's one zero-sized block when the file is empty.
 // Otherwise zero-sized blocks are forbidden.
 typedef struct {
