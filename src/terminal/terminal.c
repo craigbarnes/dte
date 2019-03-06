@@ -8,6 +8,8 @@
 #include "../common.h"
 #include "../util/macros.h"
 
+#define S(str) str,STRLEN(str)
+
 enum {
     TERM_OTHER,
     TERM_LINUX,
@@ -25,13 +27,13 @@ static uint8_t get_term_type(const char *term)
         uint8_t name_len;
         uint8_t type;
     } builtin_terminals[] = {
-        {"xterm", 5, TERM_XTERM},
-        {"st", 2, TERM_ST},
-        {"stterm", 6, TERM_ST},
-        {"tmux", 4, TERM_TMUX},
-        {"screen", 6, TERM_SCREEN},
-        {"linux", 5, TERM_LINUX},
-        {"rxvt-unicode", 12, TERM_URXVT},
+        {S("xterm"), TERM_XTERM},
+        {S("st"), TERM_ST},
+        {S("stterm"), TERM_ST},
+        {S("tmux"), TERM_TMUX},
+        {S("screen"), TERM_SCREEN},
+        {S("linux"), TERM_LINUX},
+        {S("rxvt-unicode"), TERM_URXVT},
     };
     const size_t term_len = strlen(term);
     for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
