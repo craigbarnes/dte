@@ -142,9 +142,9 @@ HOT const char *find_ft(const char *filename, StringView line)
     StringView base = STRING_VIEW_INIT;
     if (filename) {
         const char *b = path_basename(filename);
-        base = string_view(b, strlen(b));
+        base = string_view_from_cstring(b);
         ext = get_ext(base);
-        path = string_view(filename, strlen(filename));
+        path = string_view_from_cstring(filename);
     }
 
     StringView interpreter = STRING_VIEW_INIT;

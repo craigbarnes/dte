@@ -41,6 +41,14 @@ static inline PURE StringView string_view(const char *str, size_t length)
     };
 }
 
+static inline PURE StringView string_view_from_cstring(const char *str)
+{
+    return (StringView) {
+        .data = str,
+        .length = str ? strlen(str) : 0
+    };
+}
+
 PURE NONNULL_ARGS
 static inline bool string_view_equal(const StringView *a, const StringView *b)
 {

@@ -167,7 +167,7 @@ static void test_find_ft_firstline(void)
     };
     FOR_EACH_I(i, tests) {
         const struct ft_firstline_test *t = &tests[i];
-        const char *result = find_ft(NULL, string_view(t->line, strlen(t->line)));
+        const char *result = find_ft(NULL, string_view_from_cstring(t->line));
         IEXPECT_STREQ(result, t->expected_filetype);
     }
 }

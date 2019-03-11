@@ -132,13 +132,7 @@ static char *get_terminfo_string(const char *capname)
 
 static StringView get_terminfo_string_view(const char *capname)
 {
-    StringView sv = STRING_VIEW_INIT;
-    char *str = get_terminfo_string(capname);
-    if (str) {
-        sv.data = str;
-        sv.length = strlen(str);
-    }
-    return sv;
+    return string_view_from_cstring(get_terminfo_string(capname));
 }
 
 static bool get_terminfo_flag(const char *capname)
