@@ -4,10 +4,10 @@
 #include "test.h"
 #include "../src/command.h"
 #include "../src/editor.h"
-#include "../src/encoding/bom.h"
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"
 
+void test_encoding(void);
 void test_filetype(void);
 void test_terminal(void);
 void test_util(void);
@@ -33,28 +33,6 @@ static void test_relative_filename(void)
     }
 }
 
-static void test_detect_encoding_from_bom(void)
-{
-    static const struct bom_test {
-        const char *encoding;
-        const unsigned char *text;
-        size_t size;
-    } tests[] = {
-        {"UTF-8", "\xef\xbb\xbfHello", 8},
-        {"UTF-32BE", "\x00\x00\xfe\xffHello", 9},
-        {"UTF-32LE", "\xff\xfe\x00\x00Hello", 9},
-        {"UTF-16BE", "\xfe\xffHello", 7},
-        {"UTF-16LE", "\xff\xfeHello", 7},
-        {NULL, "\x00\xef\xbb\xbfHello", 9},
-        {NULL, "\xef\xbb", 2},
-    };
-    FOR_EACH_I(i, tests) {
-        const struct bom_test *t = &tests[i];
-        const char *result = detect_encoding_from_bom(t->text, t->size);
-        IEXPECT_STREQ(result, t->encoding);
-    }
-}
-
 // Checks that `commands` array is sorted in binary searchable order
 static void test_commands_sort(void)
 {
@@ -73,9 +51,9 @@ int main(void)
     init_editor_state();
 
     test_relative_filename();
-    test_detect_encoding_from_bom();
     test_commands_sort();
 
+    test_encoding();
     test_filetype();
     test_util();
     test_terminal();

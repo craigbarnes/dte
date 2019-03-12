@@ -54,7 +54,8 @@ static int decode_and_add_blocks (
     const unsigned char *buf,
     size_t size
 ) {
-    const char *e = detect_encoding_from_bom(buf, size);
+    EncodingType encoding_type = detect_encoding_from_bom(buf, size);
+    const char *e = encoding_type_to_string(encoding_type);
 
     if (b->encoding == NULL) {
         if (e) {
@@ -271,17 +272,21 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(Buffer *b, FileEncoder *enc, const ByteOrderMark *bom)
+static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
 {
     ssize_t size = 0;
     Block *blk;
 
-    if (bom && !streq(bom->encoding, "UTF-8")) {
-        size = bom->len;
-        if (xwrite(enc->fd, bom->bytes, size) < 0) {
-            goto write_error;
+    if (bom_type != UTF8) {
+        const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
+        if (bom) {
+            size = bom->len;
+            if (xwrite(enc->fd, bom->bytes, size) < 0) {
+                goto write_error;
+            }
         }
     }
+
     list_for_each_entry(blk, &b->blocks, node) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
 
@@ -368,7 +373,7 @@ int save_buffer (
         close(fd);
         goto error;
     }
-    if (write_buffer(b, enc, get_bom_for_encoding(encoding))) {
+    if (write_buffer(b, enc, lookup_encoding(encoding))) {
         close(fd);
         goto error;
     }

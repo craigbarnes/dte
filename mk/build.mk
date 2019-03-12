@@ -35,7 +35,7 @@ util_objects := $(call prefix-obj, build/util/, \
     unicode wbuf xmalloc xreadwrite xsnprintf )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
-    bom convert decoder encoder )
+    bom convert decoder encoder encoding )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
     bitset color hashset highlight state syntax )
@@ -57,7 +57,7 @@ editor_objects := $(call prefix-obj, build/, \
     $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
-    config filetype main terminal test util )
+    config encoding filetype main terminal test util )
 
 all_objects := $(editor_objects) $(test_objects)
 

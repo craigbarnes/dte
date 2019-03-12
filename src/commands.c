@@ -7,6 +7,7 @@
 #include "config.h"
 #include "edit.h"
 #include "editor.h"
+#include "encoding/encoding.h"
 #include "encoding/convert.h"
 #include "file-option.h"
 #include "filetype.h"
