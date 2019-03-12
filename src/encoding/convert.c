@@ -92,7 +92,7 @@ static size_t encoding_char_size(const char *encoding)
         return 2;
     }
     if (str_has_prefix(encoding, "UTF-32")) {
-        return 2;
+        return 4;
     }
     return 1;
 }
