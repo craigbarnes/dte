@@ -30,6 +30,8 @@ static const FileBasenameMap basenames[] = {
     {"fstab", CONFIG},
     {"git-rebase-todo", GITREBASE},
     {"hosts", CONFIG},
+    {"ip6tables.rules", CONFIG},
+    {"iptables.rules", CONFIG},
     {"krb5.conf", INI},
     {"makefile", MAKE},
     {"menu.lst", CONFIG},
