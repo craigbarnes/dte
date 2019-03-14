@@ -10,7 +10,7 @@
 
 #define S(str) str,STRLEN(str)
 
-enum {
+typedef enum {
     TERM_OTHER,
     TERM_LINUX,
     TERM_SCREEN,
@@ -18,15 +18,17 @@ enum {
     TERM_TMUX,
     TERM_URXVT,
     TERM_XTERM,
-};
+    TERM_KITTY,
+} TerminalType;
 
-static uint8_t get_term_type(const char *term)
+static TerminalType get_term_type(const char *term)
 {
     static const struct {
         const char name[14];
         uint8_t name_len;
         uint8_t type;
     } builtin_terminals[] = {
+        {S("xterm-kitty"), TERM_KITTY},
         {S("xterm"), TERM_XTERM},
         {S("st"), TERM_ST},
         {S("stterm"), TERM_ST},
@@ -49,6 +51,7 @@ static uint8_t get_term_type(const char *term)
 
 UNITTEST {
     BUG_ON(get_term_type("xterm") != TERM_XTERM);
+    BUG_ON(get_term_type("xterm-kitty") != TERM_KITTY);
     BUG_ON(get_term_type("tmux") != TERM_TMUX);
     BUG_ON(get_term_type("st") != TERM_ST);
     BUG_ON(get_term_type("stterm") != TERM_ST);
@@ -98,6 +101,7 @@ void term_init(void)
         break;
     case TERM_TMUX:
     case TERM_SCREEN:
+    case TERM_KITTY:
         terminal = xterm;
         terminal.back_color_erase = false;
         break;
