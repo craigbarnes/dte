@@ -394,7 +394,7 @@ void update_range(View *v, int y1, int y2)
 
         LineRef lr;
         fill_line_nl_ref(&bi, &lr);
-        int next_changed;
+        bool next_changed;
         HlColor **colors = hl_line (
             v->buffer,
             lr.line,

@@ -26,7 +26,7 @@ typedef struct {
     struct State *destination;
 
     // If condition has no emit name this is set to destination state's
-    // emit name or list name (COND_LIST).
+    // emit name or list name (COND_INLIST).
     char *emit_name;
 
     // Set after all colors have been added (config loaded).
@@ -68,7 +68,6 @@ typedef struct {
     Action a;
     ConditionType type;
 } Condition;
-
 
 typedef struct {
     char *name;

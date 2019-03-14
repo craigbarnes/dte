@@ -9,13 +9,13 @@ static bool state_is_valid(const State *st)
     return ((uintptr_t)st & 1) == 0;
 }
 
-static void mark_state_invalid(void **ptrs, int idx)
+static void mark_state_invalid(void **ptrs, size_t idx)
 {
     State *st = ptrs[idx];
     ptrs[idx] = (State *)((uintptr_t)st | 1);
 }
 
-static bool states_equal(void **ptrs, int idx, const State *b)
+static bool states_equal(void **ptrs, size_t idx, const State *b)
 {
     State *a = (State *)((uintptr_t)ptrs[idx] & ~(uintptr_t)1);
     return a == b;
@@ -46,11 +46,12 @@ static State *handle_heredoc (
         }
     }
 
-    SyntaxMerge m;
-    m.subsyn = state->heredoc.subsyntax;
-    m.return_state = state->a.destination;
-    m.delim = delim;
-    m.delim_len = len;
+    SyntaxMerge m = {
+        .subsyn = state->heredoc.subsyntax,
+        .return_state = state->a.destination,
+        .delim = delim,
+        .delim_len = len
+    };
 
     HeredocState *s = xnew0(HeredocState, 1);
     s->state = merge_syntax(syn, &m);
@@ -103,8 +104,7 @@ static HlColor **highlight_line (
                 goto top;
             case COND_BUFIS:
                 if (sidx >= 0 && is_buffered(cond, line + sidx, i - sidx)) {
-                    int idx;
-                    for (idx = sidx; idx < i; idx++) {
+                    for (int idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
                     sidx = -1;
@@ -129,8 +129,7 @@ static HlColor **highlight_line (
                         i - sidx
                     )
                 ) {
-                    int idx;
-                    for (idx = sidx; idx < i; idx++) {
+                    for (int idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
                     sidx = -1;
@@ -363,14 +362,14 @@ HlColor **hl_line (
     Buffer *b,
     const char *line,
     size_t len,
-    int line_nr,
-    int *next_changed
+    size_t line_nr,
+    bool *next_changed
 ) {
     PointerArray *s = &b->line_start_states;
     HlColor **colors;
     State *next;
 
-    *next_changed = 0;
+    *next_changed = false;
     if (b->syn == NULL) {
         return NULL;
     }
@@ -381,7 +380,7 @@ HlColor **hl_line (
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);
         s->ptrs[s->count++] = next;
-        *next_changed = 1;
+        *next_changed = true;
     } else if (s->ptrs[line_nr] == next) {
         // Was not invalidated and didn't change
     } else if (states_equal(s->ptrs, line_nr, next)) {
@@ -391,7 +390,7 @@ HlColor **hl_line (
     } else {
         // Invalidated or not but changed anyway
         s->ptrs[line_nr] = next;
-        *next_changed = 1;
+        *next_changed = true;
         if (line_nr + 1 < s->count) {
             mark_state_invalid(s->ptrs, line_nr + 1);
         }
@@ -400,10 +399,10 @@ HlColor **hl_line (
 }
 
 // Called after text has been inserted to re-highlight changed lines
-void hl_insert(Buffer *b, int first, int lines)
+void hl_insert(Buffer *b, size_t first, size_t lines)
 {
     PointerArray *s = &b->line_start_states;
-    int i, last = first + lines;
+    size_t last = first + lines;
 
     if (first >= s->count) {
         // Nothing to re-highlight
@@ -419,24 +418,24 @@ void hl_insert(Buffer *b, int first, int lines)
 
     // Add room for new line states
     if (lines) {
-        int to = last + 1;
-        int from = first + 1;
+        size_t to = last + 1;
+        size_t from = first + 1;
         resize_line_states(s, s->count + lines);
         move_line_states(s, to, from, s->count - from);
         s->count += lines;
     }
 
     // Invalidate start states of new and changed lines
-    for (i = first + 1; i <= last + 1; i++) {
+    for (size_t i = first + 1; i <= last + 1; i++) {
         mark_state_invalid(s->ptrs, i);
     }
 }
 
 // Called after text has been deleted to re-highlight changed lines
-void hl_delete(Buffer *b, int first, int deleted_nl)
+void hl_delete(Buffer *b, size_t first, size_t deleted_nl)
 {
     PointerArray *s = &b->line_start_states;
-    int last = first + deleted_nl;
+    size_t last = first + deleted_nl;
 
     if (s->count == 1) {
         return;
@@ -459,8 +458,8 @@ void hl_delete(Buffer *b, int first, int deleted_nl)
 
     // Remove deleted lines (states)
     if (deleted_nl) {
-        int to = first + 1;
-        int from = last + 1;
+        size_t to = first + 1;
+        size_t from = last + 1;
         move_line_states(s, to, from, s->count - from);
         s->count -= deleted_nl;
     }
