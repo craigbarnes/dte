@@ -23,7 +23,7 @@ static bool states_equal(void **ptrs, int idx, const State *b)
 
 static bool is_buffered(const Condition *cond, const char *str, size_t len)
 {
-    if (len != cond->u.cond_bufis.len) {
+    if (len != (size_t)cond->u.cond_bufis.len) {
         return false;
     }
 

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "bitset.h"
 #include "color.h"
 #include "hashset.h"
@@ -42,9 +43,9 @@ typedef struct {
 typedef struct {
     union {
         struct {
-            size_t len;
+            uint8_t len;
             bool icase;
-            char str[256 / 8 - 2 * sizeof(int)];
+            char str[30];
         } cond_bufis;
         struct {
             BitSet bitset;
@@ -56,8 +57,8 @@ typedef struct {
             size_t len;
         } cond_recolor;
         struct {
-            size_t len;
-            char str[256 / 8 - sizeof(int)];
+            uint8_t len;
+            char str[31];
         } cond_str;
         struct {
             size_t len;
