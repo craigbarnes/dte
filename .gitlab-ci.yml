@@ -55,7 +55,7 @@ build:void-musl:
     script: *SCRIPT
     image:
         name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
-        entrypoint: ["/bin/bash", "-c"]
+        entrypoint: []
 
 pages:
     stage: dist
