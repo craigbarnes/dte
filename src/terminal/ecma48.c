@@ -6,6 +6,7 @@
 #include "output.h"
 #include "terminfo.h"
 #include "xterm.h"
+#include "../util/ascii.h"
 #include "../util/macros.h"
 #include "../util/xsnprintf.h"
 
@@ -100,7 +101,8 @@ void ecma48_set_color(const TermColor *const color)
 
 void ecma48_repeat_byte(char ch, size_t count)
 {
-    if (ch < ' ' || ch > '~' || count < 6 || count > 30000) {
+    bool cntrl_or_nonascii = ascii_test(ch, ASCII_CNTRL | ASCII_NONASCII);
+    if (cntrl_or_nonascii || count < 6 || count > 30000) {
         buf_repeat_byte(ch, count);
         return;
     }
