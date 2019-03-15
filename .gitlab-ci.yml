@@ -52,8 +52,10 @@ build:ubuntu:
 
 build:void-musl:
     stage: build
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
     script: *SCRIPT
+    image:
+        name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
+        entrypoint: ["/bin/bash", "-c"]
 
 pages:
     stage: dist
