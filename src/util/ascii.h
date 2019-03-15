@@ -31,6 +31,7 @@ extern const uint8_t ascii_table[256];
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
+#define is_cntrl_or_nonascii(x) ascii_test(x, ASCII_CNTRL | ASCII_NONASCII)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
 static inline PURE unsigned char ascii_tolower(unsigned char c)

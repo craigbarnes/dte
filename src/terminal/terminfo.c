@@ -10,6 +10,7 @@
 #include "terminal.h"
 #include "xterm.h"
 #include "../common.h"
+#include "../util/ascii.h"
 #include "../util/string-view.h"
 
 #define KEY(c, k) { \
@@ -227,7 +228,7 @@ static void tputs_set_color(const TermColor *color)
 
 static void tputs_repeat_byte(char ch, size_t count)
 {
-    if (ch < ' ' || ch > '~' || count < 6 || count > 30000) {
+    if (is_cntrl_or_nonascii(ch) || count < 6 || count > 30000) {
         buf_repeat_byte(ch, count);
         return;
     }
