@@ -1,5 +1,8 @@
+#include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "file-history.h"
 #include "common.h"
 #include "error.h"
@@ -12,19 +15,26 @@
 
 typedef struct {
     int row, col;
-    char *filename;
+    size_t filename_len;
+    char filename[];
 } HistoryEntry;
 
 static PointerArray history = PTR_ARRAY_INIT;
 
 #define max_history_size 500
 
+static bool entry_match(const HistoryEntry *e, const char *filename, size_t len)
+{
+    return len == e->filename_len && memcmp(filename, e->filename, len) == 0;
+}
+
 void add_file_history(int row, int col, const char *filename)
 {
-    HistoryEntry *e;
+    const size_t filename_len = strlen(filename);
+
     for (size_t i = 0; i < history.count; i++) {
-        e = history.ptrs[i];
-        if (streq(filename, e->filename)) {
+        HistoryEntry *e = history.ptrs[i];
+        if (entry_match(e, filename, filename_len)) {
             e->row = row;
             e->col = col;
             // Keep newest at end of the array
@@ -33,20 +43,14 @@ void add_file_history(int row, int col, const char *filename)
         }
     }
 
-    while (max_history_size && history.count >= max_history_size) {
-        e = ptr_array_remove_idx(&history, 0);
-        free(e->filename);
-        free(e);
+    while (history.count >= max_history_size) {
+        free(ptr_array_remove_idx(&history, 0));
     }
 
-    if (!max_history_size) {
-        return;
-    }
-
-    e = xnew(HistoryEntry, 1);
+    HistoryEntry *e = xmalloc(sizeof(HistoryEntry) + filename_len);
     e->row = row;
     e->col = col;
-    e->filename = xstrdup(filename);
+    memcpy(e->filename, filename, filename_len);
     ptr_array_add(&history, e);
 }
 
@@ -94,10 +98,10 @@ void save_file_history(const char *filename)
 
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
-        char str[64];
-        xsnprintf(str, sizeof(str), "%d %d ", e->row, e->col);
-        wbuf_write_str(&buf, str);
-        wbuf_write_str(&buf, e->filename);
+        char tmp[64];
+        size_t tmp_len = xsnprintf(tmp, sizeof(tmp), "%d %d ", e->row, e->col);
+        wbuf_write(&buf, tmp, tmp_len);
+        wbuf_write(&buf, e->filename, e->filename_len);
         wbuf_write_ch(&buf, '\n');
     }
 
@@ -107,9 +111,10 @@ void save_file_history(const char *filename)
 
 bool find_file_in_history(const char *filename, int *row, int *col)
 {
+    const size_t filename_len = strlen(filename);
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
-        if (streq(filename, e->filename)) {
+        if (entry_match(e, filename, filename_len)) {
             *row = e->row;
             *col = e->col;
             return true;

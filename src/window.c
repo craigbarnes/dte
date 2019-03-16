@@ -247,7 +247,6 @@ void window_close_current_view(Window *w)
 static void restore_cursor_from_history(View *v)
 {
     int row, col;
-
     if (find_file_in_history(v->buffer->abs_filename, &row, &col)) {
         move_to_line(v, row);
         move_to_column(v, col);
