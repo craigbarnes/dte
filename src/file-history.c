@@ -50,6 +50,7 @@ void add_file_history(int row, int col, const char *filename)
     HistoryEntry *e = xmalloc(sizeof(HistoryEntry) + filename_len);
     e->row = row;
     e->col = col;
+    e->filename_len = filename_len;
     memcpy(e->filename, filename, filename_len);
     ptr_array_add(&history, e);
 }
