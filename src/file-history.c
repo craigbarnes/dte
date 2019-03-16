@@ -35,12 +35,21 @@ void add_file_history(int row, int col, const char *filename)
     for (size_t i = 0; i < history.count; i++) {
         HistoryEntry *e = history.ptrs[i];
         if (entry_match(e, filename, filename_len)) {
-            e->row = row;
-            e->col = col;
-            // Keep newest at end of the array
-            ptr_array_add(&history, ptr_array_remove_idx(&history, i));
+            ptr_array_remove_idx(&history, i);
+            if (row > 1 || col > 1) {
+                e->row = row;
+                e->col = col;
+                // Re-insert at end of array
+                ptr_array_add(&history, e);
+            } else {
+                free(e);
+            }
             return;
         }
+    }
+
+    if (row <= 1 && col <= 1) {
+        return;
     }
 
     while (history.count >= max_history_size) {
