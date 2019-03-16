@@ -51,14 +51,11 @@ void ptr_array_remove(PointerArray *array, void *ptr)
 
 void *ptr_array_remove_idx(PointerArray *array, size_t pos)
 {
-    void *ptr = array->ptrs[pos];
+    void **ptrs = array->ptrs;
+    void *removed = ptrs[pos];
     array->count--;
-    memmove (
-        array->ptrs + pos,
-        array->ptrs + pos + 1,
-        (array->count - pos) * sizeof(void *)
-    );
-    return ptr;
+    memmove(ptrs + pos, ptrs + pos + 1, (array->count - pos) * sizeof(void*));
+    return removed;
 }
 
 size_t ptr_array_idx(const PointerArray *array, const void *ptr)
