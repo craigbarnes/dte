@@ -101,7 +101,7 @@ void ecma48_set_color(const TermColor *const color)
 
 void ecma48_repeat_byte(char ch, size_t count)
 {
-    if (is_cntrl_or_nonascii(ch) || count < 6 || count > 30000) {
+    if (!ascii_isprint(ch) || count < 6 || count > 30000) {
         buf_repeat_byte(ch, count);
         return;
     }

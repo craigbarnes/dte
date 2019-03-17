@@ -52,6 +52,23 @@ static void test_ascii(void)
     EXPECT_FALSE(ascii_iscntrl(0x80));
     EXPECT_FALSE(ascii_iscntrl(0xFF));
 
+    EXPECT_TRUE(ascii_isprint(' '));
+    EXPECT_TRUE(ascii_isprint('!'));
+    EXPECT_TRUE(ascii_isprint('/'));
+    EXPECT_TRUE(ascii_isprint('a'));
+    EXPECT_TRUE(ascii_isprint('z'));
+    EXPECT_TRUE(ascii_isprint('0'));
+    EXPECT_TRUE(ascii_isprint('_'));
+    EXPECT_TRUE(ascii_isprint('~'));
+    EXPECT_FALSE(ascii_isprint('\0'));
+    EXPECT_FALSE(ascii_isprint('\t'));
+    EXPECT_FALSE(ascii_isprint('\n'));
+    EXPECT_FALSE(ascii_isprint('\r'));
+    EXPECT_FALSE(ascii_isprint(0x1F));
+    EXPECT_FALSE(ascii_isprint(0x7F));
+    EXPECT_FALSE(ascii_isprint(0x80));
+    EXPECT_FALSE(ascii_isprint(0xFF));
+
     EXPECT_TRUE(is_word_byte('a'));
     EXPECT_TRUE(is_word_byte('z'));
     EXPECT_TRUE(is_word_byte('A'));
