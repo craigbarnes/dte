@@ -8,9 +8,9 @@
 // These values are used in xterm escape sequences to indicate
 // modifier+key combinations.
 // See also: user_caps(5)
-static KeyCode mod_enum_to_mod_mask(char mod_enum)
+static KeyCode parse_modifier(char ch)
 {
-    switch (mod_enum) {
+    switch (ch) {
     case '2': return MOD_SHIFT;
     case '3': return MOD_META;
     case '4': return MOD_SHIFT | MOD_META;
@@ -72,7 +72,7 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    KeyCode tmp = mod_enum_to_mod_mask(buf[i++]);
+    KeyCode tmp = parse_modifier(buf[i++]);
     if (tmp == 0) {
         return 0;
     } else if (i >= length) {
@@ -190,7 +190,7 @@ check_modifiers:
     if (i >= length) {
         return -1;
     }
-    const KeyCode mods = mod_enum_to_mod_mask(buf[i++]);
+    const KeyCode mods = parse_modifier(buf[i++]);
     if (mods == 0) {
         return 0;
     }
