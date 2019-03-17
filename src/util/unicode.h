@@ -5,11 +5,13 @@
 #include <stdint.h>
 #include "macros.h"
 
+#define UNICODE_MAX_VALID_CODEPOINT UINT32_C(0x10ffff)
+
 typedef uint32_t CodePoint;
 
 static inline CONST_FN bool u_is_unicode(CodePoint u)
 {
-    return u <= UINT32_C(0x10ffff);
+    return u <= UNICODE_MAX_VALID_CODEPOINT;
 }
 
 static inline CONST_FN bool u_is_upper(CodePoint u)

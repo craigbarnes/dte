@@ -1,14 +1,17 @@
 // Escape sequence parser for xterm function keys.
-// Copyright 2018 Craig Barnes.
+// Copyright 2018-2019 Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
+#include <stdint.h>
 #include "xterm.h"
+#include "../util/ascii.h"
+#include "../util/unicode.h"
 
 // These values are used in xterm escape sequences to indicate
 // modifier+key combinations.
 // See also: user_caps(5)
-static KeyCode parse_modifier(char ch)
+static KeyCode decode_modifier(char ch)
 {
     switch (ch) {
     case '2': return MOD_SHIFT;
@@ -18,6 +21,33 @@ static KeyCode parse_modifier(char ch)
     case '6': return MOD_SHIFT | MOD_CTRL;
     case '7': return MOD_META | MOD_CTRL;
     case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
+    }
+    return 0;
+}
+
+static KeyCode decode_special_key(uint32_t code)
+{
+    switch (code) {
+    case 1: return KEY_HOME;
+    case 2: return KEY_INSERT;
+    case 3: return KEY_DELETE;
+    case 4: return KEY_END;
+    case 5: return KEY_PAGE_UP;
+    case 6: return KEY_PAGE_DOWN;
+    case 7: return KEY_HOME;
+    case 8: return KEY_END;
+    case 11: return KEY_F1;
+    case 12: return KEY_F2;
+    case 13: return KEY_F3;
+    case 14: return KEY_F4;
+    case 15: return KEY_F5;
+    case 17: return KEY_F6;
+    case 18: return KEY_F7;
+    case 19: return KEY_F8;
+    case 20: return KEY_F9;
+    case 21: return KEY_F10;
+    case 23: return KEY_F11;
+    case 24: return KEY_F12;
     }
     return 0;
 }
@@ -72,7 +102,7 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    KeyCode tmp = parse_modifier(buf[i++]);
+    KeyCode tmp = decode_modifier(buf[i++]);
     if (tmp == 0) {
         return 0;
     } else if (i >= length) {
@@ -94,10 +124,73 @@ static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'S': // F4
         tmp |= KEY_F1 + (ch - 'P');
         goto match;
+    case 'u':
+        tmp |= 0x01;
+        goto match;
     }
     return 0;
 match:
     *k = tmp;
+    return i;
+}
+
+static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    // Note: due to checks made by the caller, it's safe to assume that
+    // this loop will parse at least 1 digit.
+    uint32_t num = 0;
+    while (i < len && ascii_isdigit(buf[i])) {
+        num *= 10;
+        num += buf[i++] - '0';
+        if (num > UNICODE_MAX_VALID_CODEPOINT) {
+            return 0;
+        }
+    }
+    if (i >= len) {
+        return -1;
+    }
+
+    KeyCode mods = 0;
+    char ch = buf[i++];
+    if (ch == ';') {
+        if (i >= len) {
+            return -1;
+        }
+        mods = decode_modifier(buf[i++]);
+        if (mods == 0) {
+            return 0;
+        } else if (i >= len) {
+            return -1;
+        }
+        ch = buf[i++];
+    }
+
+    switch (ch) {
+    case '~':
+        goto special_key;
+    case '^':
+        mods = MOD_CTRL;
+        goto special_key;
+    case '$':
+        mods = MOD_SHIFT;
+        goto special_key;
+    case '@':
+        mods = MOD_CTRL | MOD_SHIFT;
+        goto special_key;
+    case 'u':
+        // See: www.leonerd.org.uk/hacks/fixterms/
+        *k = mods | num;
+        return i;
+    }
+    return 0;
+
+    KeyCode key;
+special_key:
+    key = decode_special_key(num);
+    if (key == 0) {
+        return 0;
+    }
+    *k = mods | key;
     return i;
 }
 
@@ -106,7 +199,6 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     if (i >= length) {
         return -1;
     }
-    KeyCode tmp;
     char ch = buf[i++];
     switch (ch) {
     case 'A': // Up
@@ -123,44 +215,22 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'd': // Shift+Left (rxvt)
         *k = MOD_SHIFT | (KEY_UP + (ch - 'a'));
         return i;
-    case 'L': *k = KEY_INSERT; return i;
-    case 'Z': *k = MOD_SHIFT | '\t'; return i;
-    case '3': tmp = KEY_DELETE; goto check_delim_rxvt;
-    case '4': tmp = KEY_END; goto check_trailing_tilde;
-    case '5': tmp = KEY_PAGE_UP; goto check_delim_rxvt;
-    case '6': tmp = KEY_PAGE_DOWN; goto check_delim_rxvt;
-    case '7': tmp = KEY_HOME; goto check_delim_rxvt;
-    case '8': tmp = KEY_END; goto check_delim_rxvt;
+    case 'L':
+        *k = KEY_INSERT;
+        return i;
+    case 'Z':
+        *k = MOD_SHIFT | '\t';
+        return i;
     case '1':
         if (i >= length) return -1;
-        switch (ch = buf[i++]) {
-        case '1': // F1
-        case '2': // F2
-        case '3': // F3
-        case '4': // F4
-        case '5': // F5
-            tmp = KEY_F1 + (ch - '1');
-            goto check_delim;
-        case '7': // F6
-        case '8': // F7
-        case '9': // F8
-            tmp = KEY_F6 + (ch - '7');
-            goto check_delim;
-        case ';': return parse_csi1(buf, length, i, k);
-        case '~': *k = KEY_HOME; return i;
+        if (buf[i] == ';') {
+            return parse_csi1(buf, length, i + 1, k);
         }
-        return 0;
-    case '2':
-        if (i >= length) return -1;
-        switch (buf[i++]) {
-        case '0': tmp = KEY_F9; goto check_delim;
-        case '1': tmp = KEY_F10; goto check_delim;
-        case '3': tmp = KEY_F11; goto check_delim;
-        case '4': tmp = KEY_F12; goto check_delim;
-        case ';': tmp = KEY_INSERT; goto check_modifiers;
-        case '~': *k = KEY_INSERT; return i;
-        }
-        return 0;
+        // Fallthrough
+    case '0': case '2': case '3':
+    case '4': case '5': case '6':
+    case '7': case '8': case '9':
+        return parse_csi_num(buf, length, i - 1, k);
     case '[':
         if (i >= length) return -1;
         switch (ch = buf[i++]) {
@@ -174,54 +244,6 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
             return i;
         }
         return 0;
-    }
-    return 0;
-check_delim:
-    if (i >= length) return -1;
-    switch (buf[i++]) {
-    case ';':
-        goto check_modifiers;
-    case '~':
-        *k = tmp;
-        return i;
-    }
-    return 0;
-check_modifiers:
-    if (i >= length) {
-        return -1;
-    }
-    const KeyCode mods = parse_modifier(buf[i++]);
-    if (mods == 0) {
-        return 0;
-    }
-    tmp |= mods;
-check_trailing_tilde:
-    if (i >= length) {
-        return -1;
-    } else if (buf[i++] == '~') {
-        *k = tmp;
-        return i;
-    }
-    return 0;
-check_delim_rxvt:
-    if (i >= length) {
-        return -1;
-    }
-    switch (buf[i++]) {
-    case ';':
-        goto check_modifiers;
-    case '~':
-        *k = tmp;
-        return i;
-    case '^':
-        *k = MOD_CTRL | tmp;
-        return i;
-    case '$':
-        *k = MOD_SHIFT | tmp;
-        return i;
-    case '@':
-        *k = MOD_CTRL | MOD_SHIFT | tmp;
-        return i;
     }
     return 0;
 }

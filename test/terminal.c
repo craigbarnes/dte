@@ -3,6 +3,7 @@
 #include "../src/terminal/color.h"
 #include "../src/terminal/key.h"
 #include "../src/terminal/xterm.h"
+#include "../src/util/unicode.h"
 
 static void test_parse_term_color(void)
 {
@@ -46,7 +47,7 @@ static void test_xterm_parse_key(void)
         {"\033[", -1, 0},
         {"\033]", 0, 0},
         {"\033[1", -1, 0},
-        {"\033[9", 0, 0},
+        {"\033[9", -1, 0},
         {"\033[1;", -1, 0},
         {"\033[1[", 0, 0},
         {"\033[1;2", -1, 0},
@@ -99,18 +100,22 @@ static void test_xterm_parse_key(void)
         {"\033Ow", 3, '7'},
         {"\033Ox", 3, '8'},
         {"\033Oy", 3, '9'},
+        {"\033[10~", 0, 0},
         {"\033[11~", 5, KEY_F1},
         {"\033[12~", 5, KEY_F2},
         {"\033[13~", 5, KEY_F3},
         {"\033[14~", 5, KEY_F4},
         {"\033[15~", 5, KEY_F5},
+        {"\033[16~", 0, 0},
         {"\033[17~", 5, KEY_F6},
         {"\033[18~", 5, KEY_F7},
         {"\033[19~", 5, KEY_F8},
         {"\033[20~", 5, KEY_F9},
         {"\033[21~", 5, KEY_F10},
+        {"\033[22~", 0, 0},
         {"\033[23~", 5, KEY_F11},
         {"\033[24~", 5, KEY_F12},
+        {"\033[25~", 0, 0},
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
@@ -129,6 +134,23 @@ static void test_xterm_parse_key(void)
         {"\033[b", 3, MOD_SHIFT | KEY_DOWN},
         {"\033[c", 3, MOD_SHIFT | KEY_RIGHT},
         {"\033[d", 3, MOD_SHIFT | KEY_LEFT},
+        // www.leonerd.org.uk/hacks/fixterms/
+        {"\033[0;3u", 6, MOD_META | 0},
+        {"\033[1;3u", 6, MOD_META | 1},
+        {"\033[2;3u", 6, MOD_META | 2},
+        {"\033[9;5u", 6, MOD_CTRL | '\t'},
+        {"\033[65;3u", 7, MOD_META | 'A'},
+        {"\033[127765;3u", 11, MOD_META | 127765ul},
+        {"\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
+        {"\033[1114112;3u", 0, 0},
+        {"\033[11141110;3u", 0, 0},
+        {"\033[11141111;3u", 0, 0},
+        {"\033[2147483647;3u", 0, 0}, // INT32_MAX
+        {"\033[2147483648;3u", 0, 0}, // INT32_MAX + 1
+        {"\033[4294967295;3u", 0, 0}, // UINT32_MAX
+        {"\033[4294967296;3u", 0, 0}, // UINT32_MAX + 1
+        {"\033[-1;3u", 0, 0},
+        {"\033[-2;3u", 0, 0},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
