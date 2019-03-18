@@ -52,7 +52,7 @@ static void test_xterm_parse_key(void)
         {"\033[1[", 0, 0},
         {"\033[1;2", -1, 0},
         {"\033[1;8", -1, 0},
-        {"\033[1;9", 0, 0},
+        {"\033[1;9", -1, 0},
         {"\033[1;_", 0, 0},
         {"\033[1;8Z", 0, 0},
         {"\033O", -1, 0},
@@ -134,6 +134,8 @@ static void test_xterm_parse_key(void)
         {"\033[b", 3, MOD_SHIFT | KEY_DOWN},
         {"\033[c", 3, MOD_SHIFT | KEY_RIGHT},
         {"\033[d", 3, MOD_SHIFT | KEY_LEFT},
+        // xterm + `modifyOtherKeys` option
+        {"\033[27;5;9~", 9, MOD_CTRL | '\t'},
         // www.leonerd.org.uk/hacks/fixterms/
         {"\033[0;3u", 6, MOD_META | 0},
         {"\033[1;3u", 6, MOD_META | 1},
@@ -267,9 +269,19 @@ static void test_xterm_parse_key_combo_rxvt(void)
         KeyCode mask;
     } modifiers[] = {
         {'~', 0},
+        /*
+        Note: the tests for these non-standard rxvt modifiers have been
+        disabled, because using '$' as a final byte is a violation of the
+        ECMA-48 spec:
+
         {'^', MOD_CTRL},
         {'$', MOD_SHIFT},
         {'@', MOD_SHIFT | MOD_CTRL},
+
+        For the rxvt developers to invent a new key encoding schemes where
+        a perfectly good, de facto standard (xterm) already existed was
+        foolish. To then violate the spec in the process was pure stupidity.
+        */
     };
 
     FOR_EACH_I(i, templates) {

@@ -8,19 +8,16 @@
 #include "../util/ascii.h"
 #include "../util/unicode.h"
 
-// These values are used in xterm escape sequences to indicate
-// modifier+key combinations.
-// See also: user_caps(5)
-static KeyCode decode_modifier(char ch)
+static KeyCode decode_modifiers(uint32_t n)
 {
-    switch (ch) {
-    case '2': return MOD_SHIFT;
-    case '3': return MOD_META;
-    case '4': return MOD_SHIFT | MOD_META;
-    case '5': return MOD_CTRL;
-    case '6': return MOD_SHIFT | MOD_CTRL;
-    case '7': return MOD_META | MOD_CTRL;
-    case '8': return MOD_SHIFT | MOD_META | MOD_CTRL;
+    switch (n) {
+    case 2: return MOD_SHIFT;
+    case 3: return MOD_META;
+    case 4: return MOD_SHIFT | MOD_META;
+    case 5: return MOD_CTRL;
+    case 6: return MOD_SHIFT | MOD_CTRL;
+    case 7: return MOD_META | MOD_CTRL;
+    case 8: return MOD_SHIFT | MOD_META | MOD_CTRL;
     }
     return 0;
 }
@@ -97,101 +94,116 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     return 0;
 }
 
-static ssize_t parse_csi1(const char *buf, size_t length, size_t i, KeyCode *k)
-{
-    if (i >= length) {
-        return -1;
-    }
-    KeyCode tmp = decode_modifier(buf[i++]);
-    if (tmp == 0) {
-        return 0;
-    } else if (i >= length) {
-        return -1;
-    }
-    const char ch = buf[i++];
-    switch (ch) {
-    case 'A': // Up
-    case 'B': // Down
-    case 'C': // Right
-    case 'D': // Left
-    case 'F': // End
-    case 'H': // Home
-        tmp |= KEY_UP + (ch - 'A');
-        goto match;
-    case 'P': // F1
-    case 'Q': // F2
-    case 'R': // F3
-    case 'S': // F4
-        tmp |= KEY_F1 + (ch - 'P');
-        goto match;
-    case 'u':
-        tmp |= 0x01;
-        goto match;
-    }
-    return 0;
-match:
-    *k = tmp;
-    return i;
-}
-
 static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
 {
-    // Note: due to checks made by the caller, it's safe to assume that
-    // this loop will parse at least 1 digit.
+    uint32_t params[4] = {0, 0, 0, 0};
+    size_t nparams = 0;
+    uint8_t final_byte = 0;
+
     uint32_t num = 0;
-    while (i < len && ascii_isdigit(buf[i])) {
-        num *= 10;
-        num += buf[i++] - '0';
-        if (num > UNICODE_MAX_VALID_CODEPOINT) {
-            return 0;
+    size_t digits = 0;
+    while (i < len) {
+        const char ch = buf[i++];
+        switch (ch) {
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+            num = (num * 10) + (ch - '0');
+            if (num > UNICODE_MAX_VALID_CODEPOINT) {
+                return 0;
+            }
+            digits++;
+            continue;
+        case ';':
+            params[nparams++] = num;
+            if (nparams > 2) {
+                return 0;
+            }
+            num = 0;
+            digits = 0;
+            continue;
+        case 'A': case 'B': case 'C': case 'D': case 'F':
+        case 'H': case 'P': case 'Q': case 'R': case 'S':
+        case 'u': case '~':
+            final_byte = ch;
+            if (digits > 0) {
+                params[nparams++] = num;
+            }
+            goto exit_loop;
         }
+        return 0;
     }
-    if (i >= len) {
-        return -1;
+exit_loop:
+
+    if (final_byte == 0) {
+        return (i >= len) ? -1 : 0;
     }
 
     KeyCode mods = 0;
-    char ch = buf[i++];
-    if (ch == ';') {
-        if (i >= len) {
-            return -1;
+    KeyCode key;
+
+    switch (nparams) {
+    case 3:
+        if (params[0] == 27 && final_byte == '~') {
+            mods = decode_modifiers(params[1]);
+            if (mods == 0) {
+                return 0;
+            }
+            *k = mods | params[2];
+            return i;
         }
-        mods = decode_modifier(buf[i++]);
+        return 0;
+    case 2:
+        mods = decode_modifiers(params[1]);
         if (mods == 0) {
             return 0;
-        } else if (i >= len) {
-            return -1;
         }
-        ch = buf[i++];
-    }
-
-    switch (ch) {
-    case '~':
-        goto special_key;
-    case '^':
-        mods = MOD_CTRL;
-        goto special_key;
-    case '$':
-        mods = MOD_SHIFT;
-        goto special_key;
-    case '@':
-        mods = MOD_CTRL | MOD_SHIFT;
-        goto special_key;
-    case 'u':
-        // See: www.leonerd.org.uk/hacks/fixterms/
-        *k = mods | num;
+        switch (final_byte) {
+        case '~':
+            key = decode_special_key(params[0]);
+            if (key == 0) {
+                return 0;
+            }
+            break;
+        case 'u':
+            key = params[0];
+            break;
+        case 'A': // Up
+        case 'B': // Down
+        case 'C': // Right
+        case 'D': // Left
+        case 'F': // End
+        case 'H': // Home
+            if (params[0] != 1) {
+                return 0;
+            }
+            key = KEY_UP + (final_byte - 'A');
+            break;
+        case 'P': // F1
+        case 'Q': // F2
+        case 'R': // F3
+        case 'S': // F4
+            if (params[0] != 1) {
+                return 0;
+            }
+            key = KEY_F1 + (final_byte - 'P');
+            break;
+        default:
+            return 0;
+        }
+        *k = mods | key;
         return i;
-    }
-    return 0;
-
-    KeyCode key;
-special_key:
-    key = decode_special_key(num);
-    if (key == 0) {
+    case 1:
+        if (final_byte == '~') {
+            key = decode_special_key(params[0]);
+            if (key == 0) {
+                return 0;
+            }
+            *k = key;
+            return i;
+        }
         return 0;
     }
-    *k = mods | key;
-    return i;
+    return 0;
 }
 
 static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
@@ -221,15 +233,8 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'Z':
         *k = MOD_SHIFT | '\t';
         return i;
-    case '1':
-        if (i >= length) return -1;
-        if (buf[i] == ';') {
-            return parse_csi1(buf, length, i + 1, k);
-        }
-        // Fallthrough
-    case '0': case '2': case '3':
-    case '4': case '5': case '6':
-    case '7': case '8': case '9':
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
         return parse_csi_num(buf, length, i - 1, k);
     case '[':
         if (i >= length) return -1;
