@@ -18,6 +18,32 @@ int number_width(long n)
     return width;
 }
 
+static bool long_add_overflows(long a, long b, long *result)
+{
+#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_saddl_overflow)
+    return __builtin_saddl_overflow(a, b, result);
+#else
+    if (unlikely(b > LONG_MAX - a)) {
+        return true;
+    }
+    *result = a + b;
+    return false;
+#endif
+}
+
+static bool long_multiply_overflows(long a, long b, long *result)
+{
+#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_smull_overflow)
+    return __builtin_smull_overflow(a, b, result);
+#else
+    if (unlikely(a > 0 && b > LONG_MAX / a)) {
+        return true;
+    }
+    *result = a * b;
+    return false;
+#endif
+}
+
 bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
 {
     size_t pos = *posp;
@@ -29,21 +55,26 @@ bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
         sign = -1;
         pos++;
     }
+
     while (pos < size && ascii_isdigit(str[pos])) {
-        long old = val;
-        val *= 10;
-        val += str[pos++] - '0';
-        count++;
-        if (val < old) {
-            // Overflow
+        if (long_multiply_overflows(val, 10, &val)) {
             return false;
         }
+        if (long_add_overflows(val, str[pos++] - '0', &val)) {
+            return false;
+        }
+        count++;
     }
     if (count == 0) {
         return false;
     }
+
+    if (long_multiply_overflows(val, sign, &val)) {
+        return false;
+    }
+
     *posp = pos;
-    *valp = sign * val;
+    *valp = val;
     return true;
 }
 
