@@ -73,12 +73,6 @@ static void add_status_pos(Formatter *f)
     }
 }
 
-static void sf_init(Formatter *f, Window *win)
-{
-    memzero(f);
-    f->win = win;
-}
-
 static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     View *v = f->win->view;
@@ -213,12 +207,9 @@ static const char *format_misc_status(Window *win)
 
 void update_status_line(Window *win)
 {
-    Formatter f;
+    Formatter f = {.win = win};
     char lbuf[256];
     char rbuf[256];
-    int lw, rw;
-
-    sf_init(&f, win);
     f.misc_status = format_misc_status(win);
     sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
@@ -226,8 +217,8 @@ void update_status_line(Window *win)
     buf_reset(win->x, win->w, 0);
     terminal.move_cursor(win->x, win->y + win->h - 1);
     set_builtin_color(BC_STATUSLINE);
-    lw = u_str_width(lbuf);
-    rw = u_str_width(rbuf);
+    size_t lw = u_str_width(lbuf);
+    size_t rw = u_str_width(rbuf);
     if (lw + rw <= win->w) {
         // Both fit
         buf_add_str(lbuf);
