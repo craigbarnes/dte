@@ -72,8 +72,8 @@ static bool parse_keys(KeyChain *chain, const char *str)
 
 static CONST_FN ssize_t key_lookup_index(KeyCode k)
 {
-    const KeyCode modifiers = k & MOD_MASK;
-    const KeyCode key = k & ~MOD_MASK;
+    const KeyCode modifiers = keycode_get_modifiers(k);
+    const KeyCode key = keycode_get_key(k);
 
     static_assert(MOD_MASK >> 24 == (1 | 2 | 4));
 

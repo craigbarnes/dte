@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "../util/macros.h"
 
 enum {
     KEY_ENTER = '\n',
@@ -55,6 +56,18 @@ enum {
 };
 
 typedef uint32_t KeyCode;
+
+CONST_FN
+static inline KeyCode keycode_get_key(KeyCode k)
+{
+    return k & ~MOD_MASK;
+}
+
+CONST_FN
+static inline KeyCode keycode_get_modifiers(KeyCode k)
+{
+    return k & MOD_MASK;
+}
 
 #define CTRL(x) (MOD_CTRL | (x))
 

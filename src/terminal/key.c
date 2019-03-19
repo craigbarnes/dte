@@ -109,21 +109,21 @@ bool parse_key(KeyCode *key, const char *str)
     return false;
 }
 
-char *key_to_string(KeyCode key)
+char *key_to_string(KeyCode k)
 {
     String buf = STRING_INIT;
 
-    if (key & MOD_CTRL) {
+    if (k & MOD_CTRL) {
         string_add_literal(&buf, "C-");
     }
-    if (key & MOD_META) {
+    if (k & MOD_META) {
         string_add_literal(&buf, "M-");
     }
-    if (key & MOD_SHIFT) {
+    if (k & MOD_SHIFT) {
         string_add_literal(&buf, "S-");
     }
 
-    key &= ~MOD_MASK;
+    const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
         switch (key) {
         case '\t':
@@ -150,13 +150,13 @@ char *key_to_string(KeyCode key)
     return string_steal_cstring(&buf);
 }
 
-bool key_to_ctrl(KeyCode key, unsigned char *byte)
+bool key_to_ctrl(KeyCode k, unsigned char *byte)
 {
-    if ((key & MOD_MASK) != MOD_CTRL) {
+    if (keycode_get_modifiers(k) != MOD_CTRL) {
         return false;
     }
 
-    key &= ~MOD_CTRL;
+    const KeyCode key = keycode_get_key(k);
     if (key >= '@' && key <= '_') {
         *byte = key & ~0x40;
         return true;
