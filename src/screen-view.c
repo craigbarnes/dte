@@ -9,7 +9,7 @@
 #include "util/uchar.h"
 
 typedef struct {
-    View *view;
+    const View *view;
     size_t line_nr;
     size_t offset;
     ssize_t sel_so;
@@ -80,7 +80,7 @@ static int get_ws_error_option(Buffer *b)
 
 static bool whitespace_error(LineInfo *info, CodePoint u, size_t i)
 {
-    View *v = info->view;
+    const View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
 
     if (i >= info->trailing_ws_offset && flags & WSE_TRAILING) {
@@ -261,7 +261,7 @@ static void hl_words(LineInfo *info)
     }
 }
 
-static void line_info_init(LineInfo *info, View *v, BlockIter *bi, size_t line_nr)
+static void line_info_init(LineInfo *info, const View *v, BlockIter *bi, size_t line_nr)
 {
     memset(info, 0, sizeof(*info));
     info->view = v;
@@ -359,7 +359,7 @@ static void print_line(LineInfo *info)
     buf_clear_eol();
 }
 
-void update_range(View *v, int y1, int y2)
+void update_range(const View *v, int y1, int y2)
 {
     const int edit_x = v->window->edit_x;
     const int edit_y = v->window->edit_y;

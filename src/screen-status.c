@@ -11,7 +11,7 @@ typedef struct {
     size_t size;
     size_t pos;
     bool separator;
-    Window *win;
+    const Window *win;
     const char *misc_status;
 } Formatter;
 
@@ -170,7 +170,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     f->buf[f->pos] = '\0';
 }
 
-static const char *format_misc_status(Window *win)
+static const char *format_misc_status(const Window *win)
 {
     if (editor.input_mode == INPUT_SEARCH) {
         switch (editor.options.case_sensitive_search) {
@@ -206,7 +206,7 @@ static const char *format_misc_status(Window *win)
     return NULL;
 }
 
-void update_status_line(Window *win)
+void update_status_line(const Window *win)
 {
     Formatter f = {.win = win};
     char lbuf[256];

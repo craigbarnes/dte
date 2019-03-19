@@ -12,7 +12,7 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 
-void set_color(TermColor *color)
+void set_color(const TermColor *color)
 {
     TermColor tmp = *color;
 
@@ -85,7 +85,7 @@ void print_message(const char *msg, bool is_error)
     }
 }
 
-void update_term_title(Buffer *b)
+void update_term_title(const Buffer *b)
 {
     if (!terminal.set_title || !editor.options.set_window_title) {
         return;
@@ -137,7 +137,7 @@ void update_separators(void)
 
 void update_line_numbers(Window *win, bool force)
 {
-    View *v = win->view;
+    const View *v = win->view;
     size_t lines = v->buffer->nl;
     int x = win->x + vertical_tabbar_width(win);
 

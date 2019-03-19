@@ -42,7 +42,7 @@ View *window_open_empty_buffer(Window *w);
 View *window_open_buffer(Window *w, const char *filename, bool must_exist, const char *encoding);
 View *window_get_view(Window *w, Buffer *b);
 View *window_find_view(Window *w, Buffer *b);
-View *window_find_unclosable_view(Window *w, bool (*can_close)(View *));
+View *window_find_unclosable_view(Window *w, bool (*can_close)(const View *));
 void window_free(Window *w);
 void remove_view(View *v);
 void window_close_current(void);

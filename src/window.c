@@ -145,7 +145,7 @@ View *window_find_view(Window *w, Buffer *b)
     return NULL;
 }
 
-View *window_find_unclosable_view(Window *w, bool (*can_close)(View *))
+View *window_find_unclosable_view(Window *w, bool (*can_close)(const View *))
 {
     // Check active view first
     if (w->view != NULL && !can_close(w->view)) {

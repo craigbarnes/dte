@@ -132,7 +132,7 @@ int view_get_preferred_x(View *v)
     return v->preferred_x;
 }
 
-bool view_can_close(View *v)
+bool view_can_close(const View *v)
 {
     if (!buffer_modified(v->buffer)) {
         return true;
@@ -141,7 +141,7 @@ bool view_can_close(View *v)
     return v->buffer->views.count > 1;
 }
 
-char *view_get_word_under_cursor(View *v)
+char *view_get_word_under_cursor(const View *v)
 {
     LineRef lr;
     size_t i, ei, si = fetch_this_line(&v->cursor, &lr);

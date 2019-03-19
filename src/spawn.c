@@ -14,7 +14,7 @@
 #include "util/string.h"
 #include "util/xmalloc.h"
 
-static void handle_error_msg(Compiler *c, char *str)
+static void handle_error_msg(const Compiler *c, char *str)
 {
     size_t i, len;
 
@@ -53,7 +53,7 @@ static void handle_error_msg(Compiler *c, char *str)
     add_message(new_message(str));
 }
 
-static void read_errors(Compiler *c, int fd, bool quiet)
+static void read_errors(const Compiler *c, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
     char line[4096];
@@ -211,7 +211,7 @@ error:
     return -1;
 }
 
-void spawn_compiler(char **args, SpawnFlags flags, Compiler *c)
+void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
 {
     const bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
     const bool quiet = !!(flags & SPAWN_QUIET);

@@ -124,8 +124,11 @@ static int open_tag_file(char *path)
     return -1;
 }
 
-static bool tag_file_changed(TagFile *tf, const char *filename, struct stat *st)
-{
+static bool tag_file_changed (
+    const TagFile *tf,
+    const char *filename,
+    const struct stat *st
+) {
     if (tf->mtime != st->st_mtime) {
         return true;
     }
@@ -216,7 +219,7 @@ static char *path_relative(const char *filename, const char *dir)
 }
 
 void tag_file_find_tags (
-    TagFile *tf,
+    const TagFile *tf,
     const char *filename,
     const char *name,
     PointerArray *tags
@@ -246,7 +249,7 @@ void tag_file_find_tags (
     current_filename = NULL;
 }
 
-char *tag_file_get_tag_filename(TagFile *tf, Tag *t)
+char *tag_file_get_tag_filename(const TagFile *tf, const Tag *t)
 {
     char *dir = path_dirname(tf->filename);
     size_t a = strlen(dir);
@@ -260,7 +263,7 @@ char *tag_file_get_tag_filename(TagFile *tf, Tag *t)
     return filename;
 }
 
-void collect_tags(TagFile *tf, const char *prefix)
+void collect_tags(const TagFile *tf, const char *prefix)
 {
     Tag t;
     size_t pos = 0;
