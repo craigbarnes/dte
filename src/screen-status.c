@@ -172,37 +172,38 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 
 static const char *format_misc_status(Window *win)
 {
-    static char misc_status[32] = {'\0'};
-
     if (editor.input_mode == INPUT_SEARCH) {
-        xsnprintf (
-            misc_status,
-            sizeof(misc_status),
-            "[case-sensitive = %s]",
-            case_sensitivity_to_string(editor.options.case_sensitive_search)
-        );
-    } else if (win->view->selection) {
-        SelectionInfo info;
-        init_selection(win->view, &info);
-        if (win->view->selection == SELECT_LINES) {
-            xsnprintf (
-                misc_status,
-                sizeof(misc_status),
-                "[%zu lines]",
-                get_nr_selected_lines(&info)
-            );
-        } else {
-            xsnprintf (
-                misc_status,
-                sizeof(misc_status),
-                "[%zu chars]",
-                get_nr_selected_chars(&info)
-            );
+        switch (editor.options.case_sensitive_search) {
+        case CSS_FALSE:
+            return "[case-sensitive = false]";
+        case CSS_TRUE:
+            return "[case-sensitive = true]";
+        case CSS_AUTO:
+            return "[case-sensitive = auto]";
         }
-    } else {
         return NULL;
     }
-    return misc_status;
+
+    if (win->view->selection == SELECT_NONE) {
+        return NULL;
+    }
+
+    static char buf[32];
+    SelectionInfo si;
+    init_selection(win->view, &si);
+
+    switch (win->view->selection) {
+    case SELECT_CHARS:
+        xsnprintf(buf, sizeof(buf), "[%zu chars]", get_nr_selected_chars(&si));
+        return buf;
+    case SELECT_LINES:
+        xsnprintf(buf, sizeof(buf), "[%zu lines]", get_nr_selected_lines(&si));
+        return buf;
+    case SELECT_NONE:
+        break;
+    }
+
+    return NULL;
 }
 
 void update_status_line(Window *win)

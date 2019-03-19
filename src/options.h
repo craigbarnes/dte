@@ -98,6 +98,5 @@ void collect_options(const char *prefix);
 void collect_toggleable_options(const char *prefix);
 void collect_option_values(const char *name, const char *prefix);
 void free_local_options(LocalOptions *opt);
-const char *case_sensitivity_to_string(SearchCaseSensitivity s);
 
 #endif
