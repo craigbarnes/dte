@@ -14,7 +14,6 @@ static int tab_title_width(int number, const char *filename)
 static void update_tab_title_width(View *v, int tab_number)
 {
     int w = tab_title_width(tab_number, buffer_filename(v->buffer));
-
     v->tt_width = w;
     v->tt_truncated_width = w;
 }
@@ -133,16 +132,16 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_horizontal_tab_title(View *v, size_t idx)
+static void print_horizontal_tab_title(const View *v, size_t idx)
 {
     int skip = v->tt_width - v->tt_truncated_width;
     const char *filename = buffer_filename(v->buffer);
-    char buf[16];
 
     if (skip > 0) {
         filename += u_skip_chars(filename, &skip);
     }
 
+    char buf[16];
     xsnprintf (
         buf,
         sizeof(buf),
@@ -160,6 +159,7 @@ static void print_horizontal_tab_title(View *v, size_t idx)
 
     buf_add_str(buf);
     buf_add_str(filename);
+
     if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1) {
         buf_put_char('>');
     } else {

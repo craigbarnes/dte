@@ -43,7 +43,7 @@ static void mask_color2(TermColor *color, const TermColor *over)
 }
 
 static void mask_selection_and_current_line (
-    LineInfo *info,
+    const LineInfo *info,
     TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
@@ -64,7 +64,7 @@ static bool is_non_text(CodePoint u)
     return u_is_unprintable(u);
 }
 
-static int get_ws_error_option(Buffer *b)
+static int get_ws_error_option(const Buffer *b)
 {
     int flags = b->options.ws_error;
 
@@ -78,7 +78,7 @@ static int get_ws_error_option(Buffer *b)
     return flags;
 }
 
-static bool whitespace_error(LineInfo *info, CodePoint u, size_t i)
+static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
     const View *v = info->view;
     int flags = get_ws_error_option(v->buffer);
@@ -213,7 +213,7 @@ static PURE bool is_notice(const char *word, size_t len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(LineInfo *info)
+static void hl_words(const LineInfo *info)
 {
     HlColor *cc = find_color("comment");
     HlColor *nc = find_color("notice");
@@ -261,8 +261,12 @@ static void hl_words(LineInfo *info)
     }
 }
 
-static void line_info_init(LineInfo *info, const View *v, BlockIter *bi, size_t line_nr)
-{
+static void line_info_init (
+    LineInfo *info,
+    const View *v,
+    const BlockIter *bi,
+    size_t line_nr
+) {
     memset(info, 0, sizeof(*info));
     info->view = v;
     info->line_nr = line_nr;
@@ -278,15 +282,17 @@ static void line_info_init(LineInfo *info, const View *v, BlockIter *bi, size_t 
         BUG_ON(info->sel_so > info->sel_eo);
     } else {
         SelectionInfo sel;
-
         init_selection(v, &sel);
         info->sel_so = sel.so;
         info->sel_eo = sel.eo;
     }
 }
 
-static void line_info_set_line(LineInfo *info, LineRef *lr, HlColor **colors)
-{
+static void line_info_set_line (
+    LineInfo *info,
+    const LineRef *lr,
+    HlColor **colors
+) {
     BUG_ON(lr->size == 0);
     BUG_ON(lr->line[lr->size - 1] != '\n');
 
