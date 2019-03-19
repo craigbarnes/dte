@@ -427,7 +427,7 @@ static char *escape(const char *str)
     }
 
     for (size_t i = 0; str[i]; i++) {
-        char ch = str[i];
+        const char ch = str[i];
         switch (ch) {
         case ' ':
         case '"':
@@ -436,8 +436,7 @@ static char *escape(const char *str)
         case ';':
         case '\\':
             string_add_byte(&buf, '\\');
-            string_add_byte(&buf, ch);
-            break;
+            // Fallthrough
         default:
             string_add_byte(&buf, ch);
             break;
