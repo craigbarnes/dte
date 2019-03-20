@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
         window_add_buffer(window, stdin_buffer);
     }
 
-    View *empty_buffer = NULL;
+    const View *empty_buffer = NULL;
     if (window->views.count == 0) {
         empty_buffer = window_open_empty_buffer(window);
     }

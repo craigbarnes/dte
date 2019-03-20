@@ -339,7 +339,7 @@ void buffer_insert_bytes(const char *buf, const size_t len)
 
 static bool would_delete_last_bytes(size_t count)
 {
-    Block *blk = view->cursor.blk;
+    const Block *blk = view->cursor.blk;
     size_t offset = view->cursor.offset;
 
     while (1) {
