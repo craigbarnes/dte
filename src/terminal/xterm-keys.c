@@ -159,51 +159,47 @@ exit_loop:
         }
         switch (final_byte) {
         case '~':
-            key = decode_special_key(params[0]);
-            if (key == 0) {
-                return 0;
-            }
-            break;
+            goto check_first_param_is_special_key;
         case 'u':
             key = params[0];
-            break;
+            goto set_k_and_return_i;
         case 'A': // Up
         case 'B': // Down
         case 'C': // Right
         case 'D': // Left
         case 'F': // End
         case 'H': // Home
-            if (params[0] != 1) {
-                return 0;
-            }
             key = KEY_UP + (final_byte - 'A');
-            break;
+            goto check_first_param_is_1;
         case 'P': // F1
         case 'Q': // F2
         case 'R': // F3
         case 'S': // F4
-            if (params[0] != 1) {
-                return 0;
-            }
             key = KEY_F1 + (final_byte - 'P');
-            break;
-        default:
-            return 0;
+            goto check_first_param_is_1;
         }
-        *k = mods | key;
-        return i;
+        return 0;
     case 1:
         if (final_byte == '~') {
-            key = decode_special_key(params[0]);
-            if (key == 0) {
-                return 0;
-            }
-            *k = key;
-            return i;
+            goto check_first_param_is_special_key;
         }
         return 0;
     }
     return 0;
+
+check_first_param_is_special_key:
+    key = decode_special_key(params[0]);
+    if (key == 0) {
+        return 0;
+    }
+    goto set_k_and_return_i;
+check_first_param_is_1:
+    if (params[0] != 1) {
+        return 0;
+    }
+set_k_and_return_i:
+    *k = mods | key;
+    return i;
 }
 
 static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
