@@ -2,6 +2,7 @@
 #include <string.h>
 #include "strtonum.h"
 #include "ascii.h"
+#include "checked-arith.h"
 
 int number_width(long n)
 {
@@ -16,32 +17,6 @@ int number_width(long n)
         width++;
     } while (n);
     return width;
-}
-
-static bool long_add_overflows(long a, long b, long *result)
-{
-#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_saddl_overflow)
-    return __builtin_saddl_overflow(a, b, result);
-#else
-    if (unlikely(b > LONG_MAX - a)) {
-        return true;
-    }
-    *result = a + b;
-    return false;
-#endif
-}
-
-static bool long_multiply_overflows(long a, long b, long *result)
-{
-#if GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(__builtin_smull_overflow)
-    return __builtin_smull_overflow(a, b, result);
-#else
-    if (unlikely(a > 0 && b > LONG_MAX / a)) {
-        return true;
-    }
-    *result = a * b;
-    return false;
-#endif
 }
 
 bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
