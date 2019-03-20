@@ -2,6 +2,7 @@
 #define UTIL_PTR_ARRAY_H
 
 #include <stdlib.h>
+#include "xmalloc.h"
 
 typedef struct {
     void **ptrs;
@@ -19,7 +20,6 @@ typedef int (*CompareFunction)(const void *, const void *);
 typedef void (*FreeFunction)(void *ptr);
 #define FREE_FUNC(f) (FreeFunction)f
 
-void ptr_array_init(PointerArray *array, size_t capacity);
 void ptr_array_add(PointerArray *array, void *ptr);
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos);
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr);
@@ -27,6 +27,14 @@ void ptr_array_remove(PointerArray *array, void *ptr);
 void *ptr_array_remove_idx(PointerArray *array, size_t pos);
 size_t ptr_array_idx(const PointerArray *array, const void *ptr);
 void *ptr_array_rel(const PointerArray *array, const void *ptr, size_t offset);
+
+static inline void ptr_array_init(PointerArray *array, size_t capacity)
+{
+    capacity = ROUND_UP(capacity, 8);
+    array->count = 0;
+    array->ptrs = capacity ? xnew(array->ptrs, capacity) : NULL;
+    array->alloc = capacity;
+}
 
 static inline void *ptr_array_next(const PointerArray *array, const void *ptr)
 {
