@@ -2,6 +2,7 @@
 #include "options.h"
 #include "util/ptr-array.h"
 #include "util/regexp.h"
+#include "util/string-view.h"
 #include "util/xmalloc.h"
 #include "spawn.h"
 
@@ -50,17 +51,16 @@ void set_editorconfig_options(Buffer *b)
 
     ssize_t pos = 0, size = data.out_len;
     while (pos < size) {
-        const char *key = buf_next_line(data.out, &pos, size);
-        char *val = strchr(key, '=');
-        if (val == NULL || val == key) {
-            continue;
-        }
-        *val++ = '\0';
-        if (*val == '\0') {
+        const char *const line = buf_next_line(data.out, &pos, size);
+        const char *const delim = strchr(line, '=');
+        if (delim == NULL || delim == line || delim[1] == '\0') {
             continue;
         }
 
-        if (streq(key, "indent_style")) {
+        const StringView key = string_view(line, (size_t)(delim - line));
+        const char *const val = delim + 1;
+
+        if (string_view_equal_literal(&key, "indent_style")) {
             if (streq(val, "spaces")) {
                 b->options.expand_tab = true;
                 b->options.emulate_tab = true;
@@ -70,13 +70,13 @@ void set_editorconfig_options(Buffer *b)
                 b->options.emulate_tab = false;
                 b->options.detect_indent = 0;
             }
-        } else if (streq(key, "indent_size")) {
+        } else if (string_view_equal_literal(&key, "indent_size")) {
             int n = atoi(val);
             if (n > 0 && n <= 8) {
                 b->options.indent_width = n;
                 b->options.detect_indent = 0;
             }
-        } else if (streq(key, "tab_width")) {
+        } else if (string_view_equal_literal(&key, "tab_width")) {
             int n = atoi(val);
             if (n > 0 && n <= 8) {
                 b->options.tab_width = n;

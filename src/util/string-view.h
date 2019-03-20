@@ -25,6 +25,10 @@ typedef struct {
     .length = STRLEN(s) \
 }
 
+#define string_view_equal_literal(sv, str) ( \
+    string_view_equal_cstrn((sv), (str), STRLEN(str)) \
+)
+
 #define string_view_has_literal_prefix(sv, prefix) ( \
     string_view_has_prefix((sv), (prefix), STRLEN(prefix)) \
 )
@@ -59,6 +63,15 @@ PURE NONNULL_ARGS
 static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
 {
     size_t len = strlen(str);
+    return len == sv->length && memcmp(sv->data, str, len) == 0;
+}
+
+PURE NONNULL_ARGS
+static inline bool string_view_equal_cstrn (
+    const StringView *sv,
+    const char *str,
+    size_t len
+) {
     return len == sv->length && memcmp(sv->data, str, len) == 0;
 }
 
