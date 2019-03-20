@@ -233,23 +233,24 @@ static void collect_completions(char **args, int argc)
     if (!cmd) {
         return;
     }
+    const StringView cmd_name = string_view_from_cstring(cmd->name);
 
     if (
-        streq(cmd->name, "open")
-        || streq(cmd->name, "wsplit")
-        || streq(cmd->name, "save")
-        || streq(cmd->name, "compile")
-        || streq(cmd->name, "run")
-        || streq(cmd->name, "pass-through")
+        string_view_equal_literal(&cmd_name, "open")
+        || string_view_equal_literal(&cmd_name, "wsplit")
+        || string_view_equal_literal(&cmd_name, "save")
+        || string_view_equal_literal(&cmd_name, "compile")
+        || string_view_equal_literal(&cmd_name, "run")
+        || string_view_equal_literal(&cmd_name, "pass-through")
     ) {
         collect_files(false);
         return;
     }
-    if (streq(cmd->name, "cd")) {
+    if (string_view_equal_literal(&cmd_name, "cd")) {
         collect_files(true);
         return;
     }
-    if (streq(cmd->name, "include")) {
+    if (string_view_equal_literal(&cmd_name, "include")) {
         switch (argc) {
         case 1:
             collect_files(false);
@@ -262,13 +263,13 @@ static void collect_completions(char **args, int argc)
         }
         return;
     }
-    if (streq(cmd->name, "insert-builtin")) {
+    if (string_view_equal_literal(&cmd_name, "insert-builtin")) {
         if (argc == 1) {
             collect_builtin_configs(completion.parsed, true);
         }
         return;
     }
-    if (streq(cmd->name, "hi")) {
+    if (string_view_equal_literal(&cmd_name, "hi")) {
         switch (argc) {
         case 1:
             collect_hl_colors(completion.parsed);
@@ -279,7 +280,7 @@ static void collect_completions(char **args, int argc)
         }
         return;
     }
-    if (streq(cmd->name, "set")) {
+    if (string_view_equal_literal(&cmd_name, "set")) {
         if (argc % 2) {
             collect_options(completion.parsed);
         } else {
@@ -287,11 +288,11 @@ static void collect_completions(char **args, int argc)
         }
         return;
     }
-    if (streq(cmd->name, "toggle") && argc == 1) {
+    if (string_view_equal_literal(&cmd_name, "toggle") && argc == 1) {
         collect_toggleable_options(completion.parsed);
         return;
     }
-    if (streq(cmd->name, "tag") && argc == 1) {
+    if (string_view_equal_literal(&cmd_name, "tag") && argc == 1) {
         TagFile *tf = load_tag_file();
         if (tf != NULL) {
             collect_tags(tf, completion.parsed);
