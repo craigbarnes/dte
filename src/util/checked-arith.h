@@ -9,6 +9,7 @@
 
 #define HAS_GNUC5_OR_BUILTIN(b) (GNUC_AT_LEAST(5, 0) || HAS_BUILTIN(b))
 
+NONNULL_ARGS
 static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
 {
 #if HAS_GNUC5_OR_BUILTIN(__builtin_add_overflow)
@@ -22,6 +23,7 @@ static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
 #endif
 }
 
+NONNULL_ARGS
 static inline bool size_multiply_overflows(size_t a, size_t b, size_t *result)
 {
 #if HAS_GNUC5_OR_BUILTIN(__builtin_mul_overflow)
@@ -35,6 +37,7 @@ static inline bool size_multiply_overflows(size_t a, size_t b, size_t *result)
 #endif
 }
 
+NONNULL_ARGS
 static inline bool long_add_overflows(long a, long b, long *result)
 {
 #if HAS_GNUC5_OR_BUILTIN(__builtin_saddl_overflow)
@@ -48,6 +51,7 @@ static inline bool long_add_overflows(long a, long b, long *result)
 #endif
 }
 
+NONNULL_ARGS
 static inline bool long_multiply_overflows(long a, long b, long *result)
 {
 #if HAS_GNUC5_OR_BUILTIN(__builtin_smull_overflow)

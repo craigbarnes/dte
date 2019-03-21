@@ -2,6 +2,7 @@
 #define UTIL_WBUF_H
 
 #include <sys/types.h>
+#include "macros.h"
 
 typedef struct {
     size_t fill;
@@ -14,9 +15,9 @@ typedef struct {
     .fd = -1 \
 }
 
-ssize_t wbuf_flush(WriteBuffer *wbuf);
-ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count);
-ssize_t wbuf_write_str(WriteBuffer *wbuf, const char *str);
-ssize_t wbuf_write_ch(WriteBuffer *wbuf, char ch);
+ssize_t wbuf_flush(WriteBuffer *wbuf) NONNULL_ARGS;
+ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count) NONNULL_ARGS;
+ssize_t wbuf_write_str(WriteBuffer *wbuf, const char *str) NONNULL_ARGS;
+ssize_t wbuf_write_ch(WriteBuffer *wbuf, char ch) NONNULL_ARGS;
 
 #endif

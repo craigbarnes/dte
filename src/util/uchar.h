@@ -4,7 +4,8 @@
 #include <sys/types.h>
 #include "unicode.h"
 
-static inline CONST_FN size_t u_char_size(CodePoint uch)
+CONST_FN
+static inline size_t u_char_size(CodePoint uch)
 {
     if (uch <= UINT32_C(0x7f)) {
         return 1;
@@ -20,6 +21,7 @@ static inline CONST_FN size_t u_char_size(CodePoint uch)
     return 1;
 }
 
+NONNULL_ARGS
 static inline void u_set_ctrl(char *buf, size_t *idx, CodePoint u)
 {
     size_t i = *idx;

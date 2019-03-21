@@ -116,8 +116,10 @@
 
 #if GNUC_AT_LEAST(3, 3) || HAS_ATTRIBUTE(nonnull)
     #define NONNULL_ARGS __attribute__((__nonnull__))
+    #define NONNULL_ARG(...) __attribute__((__nonnull__(__VA_ARGS__)))
 #else
     #define NONNULL_ARGS
+    #define NONNULL_ARG(...)
 #endif
 
 #if GNUC_AT_LEAST(3, 4) || HAS_ATTRIBUTE(warn_unused_result)

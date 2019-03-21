@@ -9,17 +9,20 @@
 
 typedef uint32_t CodePoint;
 
-static inline CONST_FN bool u_is_unicode(CodePoint u)
+CONST_FN
+static inline bool u_is_unicode(CodePoint u)
 {
     return u <= UNICODE_MAX_VALID_CODEPOINT;
 }
 
-static inline CONST_FN bool u_is_upper(CodePoint u)
+CONST_FN
+static inline bool u_is_upper(CodePoint u)
 {
     return (u - 'A') < 26;
 }
 
-static inline CONST_FN CodePoint u_to_lower(CodePoint u)
+CONST_FN
+static inline CodePoint u_to_lower(CodePoint u)
 {
     return u_is_upper(u) ? u + 32 : u;
 }
