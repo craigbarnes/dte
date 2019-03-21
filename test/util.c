@@ -284,6 +284,33 @@ static void test_u_str_width(void)
     );
 }
 
+static void test_u_set_ctrl(void)
+{
+    char buf[16];
+    size_t i;
+    memzero(&buf);
+
+    i = 0;
+    u_set_ctrl(buf, &i, '\0');
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(memcmp(buf, "^@", 3), 0);
+
+    i = 0;
+    u_set_ctrl(buf, &i, '\t');
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(memcmp(buf, "^I", 3), 0);
+
+    i = 0;
+    u_set_ctrl(buf, &i, 0x1F);
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(memcmp(buf, "^_", 3), 0);
+
+    i = 0;
+    u_set_ctrl(buf, &i, 0x7F);
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(memcmp(buf, "^?", 3), 0);
+}
+
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -334,6 +361,7 @@ static void test_round_up(void)
     EXPECT_EQ(ROUND_UP(3, 8), 8);
     EXPECT_EQ(ROUND_UP(8, 8), 8);
     EXPECT_EQ(ROUND_UP(9, 8), 16);
+    EXPECT_EQ(ROUND_UP(0, 8), 0);
     EXPECT_EQ(ROUND_UP(0, 16), 0);
     EXPECT_EQ(ROUND_UP(1, 16), 16);
     EXPECT_EQ(ROUND_UP(123, 16), 128);
@@ -381,6 +409,7 @@ void test_util(void)
     test_u_to_lower();
     test_u_is_upper();
     test_u_str_width();
+    test_u_set_ctrl();
     test_hashset();
     test_round_up();
     test_path_dirname_and_path_basename();
