@@ -33,16 +33,26 @@ static void test_relative_filename(void)
     }
 }
 
-// Checks that `commands` array is sorted in binary searchable order
-static void test_commands_sort(void)
+static void test_commands_array(void)
 {
+    static const size_t name_size = ARRAY_COUNT(commands[0].name);
+    static const size_t flags_size = ARRAY_COUNT(commands[0].flags);
+
     size_t n = 0;
-    while (commands[n].name) {
+    while (commands[n].cmd) {
         n++;
         BUG_ON(n > 500);
     }
+
     for (size_t i = 1; i < n; i++) {
-        IEXPECT_GT(strcmp(commands[i].name, commands[i - 1].name), 0);
+        const Command *const cmd = &commands[i];
+
+        // Check that fixed-size arrays are null-terminated within bounds
+        ASSERT_EQ(cmd->name[name_size - 1], '\0');
+        ASSERT_EQ(cmd->flags[flags_size - 1], '\0');
+
+        // Check that array is sorted by name field, in binary searchable order
+        IEXPECT_GT(strcmp(cmd->name, commands[i - 1].name), 0);
     }
 }
 
@@ -51,7 +61,7 @@ int main(void)
     init_editor_state();
 
     test_relative_filename();
-    test_commands_sort();
+    test_commands_array();
 
     test_encoding();
     test_filetype();

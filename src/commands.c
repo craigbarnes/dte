@@ -402,20 +402,6 @@ static void cmd_filter(const char* UNUSED_ARG(pf), char **args)
     unselect();
 }
 
-static void cmd_format_paragraph(const char * UNUSED_ARG(pf), char **args)
-{
-    int text_width = buffer->options.text_width;
-
-    if (args[0]) {
-        text_width = atoi(args[0]);
-    }
-    if (text_width <= 0) {
-        error_msg("Paragraph width must be positive.");
-        return;
-    }
-    format_paragraph(text_width);
-}
-
 static void cmd_ft(const char *pf, char **args)
 {
     enum detect_type dt = FT_EXTENSION;
@@ -1574,6 +1560,20 @@ static void cmd_wprev(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     debug_frames();
 }
 
+static void cmd_wrap_paragraph(const char * UNUSED_ARG(pf), char **args)
+{
+    int text_width = buffer->options.text_width;
+
+    if (args[0]) {
+        text_width = atoi(args[0]);
+    }
+    if (text_width <= 0) {
+        error_msg("Paragraph width must be positive.");
+        return;
+    }
+    format_paragraph(text_width);
+}
+
 static void cmd_wresize(const char *pf, char **args)
 {
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
@@ -1713,7 +1713,6 @@ const Command commands[] = {
     {"errorfmt", "i", 2, 6, cmd_errorfmt},
     {"eval", "-", 1, -1, cmd_eval},
     {"filter", "-", 1, -1, cmd_filter},
-    {"format-paragraph", "", 0, 1, cmd_format_paragraph},
     {"ft", "-bcfi", 2, -1, cmd_ft},
     {"git-open", "", 0, 0, cmd_git_open},
     {"hi", "-", 0, -1, cmd_hi},
@@ -1766,8 +1765,9 @@ const Command commands[] = {
     {"word-bwd", "s", 0, 0, cmd_word_bwd},
     {"word-fwd", "s", 0, 0, cmd_word_fwd},
     {"wprev", "", 0, 0, cmd_wprev},
+    {"wrap-paragraph", "", 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", 0, 1, cmd_wresize},
     {"wsplit", "bhr", 0, -1, cmd_wsplit},
     {"wswap", "", 0, 0, cmd_wswap},
-    {NULL, NULL, 0, 0, NULL}
+    {"", "", 0, 0, NULL}
 };

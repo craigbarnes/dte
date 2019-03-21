@@ -468,7 +468,7 @@ static const Command syntax_commands[] = {
     {"state", "", 1,  2, cmd_state},
     {"str", "i", 2,  3, cmd_str},
     {"syntax", "", 1,  1, cmd_syntax},
-    {NULL, NULL, 0,  0, NULL}
+    {"", "", 0,  0, NULL}
 };
 
 static void cmd_include(const char *pf, char **args)

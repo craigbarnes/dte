@@ -60,7 +60,7 @@ Commands:
 .br
    \fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
 .br
-   \fBformat\-paragraph\fR [\fIwidth\fR]
+   \fBwrap\-paragraph\fR [\fIwidth\fR]
 .br
    \fBft\fR \fIfiletype\fR \fIextension\fR...
 .br
@@ -575,7 +575,7 @@ filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
 .fi
 .PP
 .RE
-\fBformat\-paragraph\fR [\fIwidth\fR]
+\fBwrap\-paragraph\fR [\fIwidth\fR]
 .RS
 Format the current selection or paragraph under the cursor. If
 paragraph \fIwidth\fR is not given then the \fBtext\-width\fR option is
@@ -1558,7 +1558,7 @@ indentation size than \fB8\fR you should use spaces to indent.
 \fBtext\-width\fR [72]
 .RS
 Preferred width of text. Used as the default argument for the
-\fBformat\-paragraph\fR command.
+\fBwrap\-paragraph\fR command.
 .P
 .RE
 \fBws\-error\fR [special]

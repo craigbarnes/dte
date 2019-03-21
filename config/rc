@@ -55,3 +55,6 @@ option sh indent-regex '(^|;)[ \t]*(do|else|then)\b'
 
 # Don't highlight whitespace errors in diff and mail files
 option diff,mail ws-error 0
+
+# Alias for old, built-in command (for backwards compatibility)
+alias format-paragraph wrap-paragraph

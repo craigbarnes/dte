@@ -27,7 +27,7 @@ insert-builtin syntax/dte
 bof
 select
 eof
-#format-paragraph 72
+#wrap-paragraph 72
 join
 left
 line 1000

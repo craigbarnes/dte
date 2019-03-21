@@ -20,12 +20,16 @@
 #define IEXPECT_FALSE(x) IEXPECT_EQ(x, 0)
 #define IEXPECT_GT(a, b) IEXPECT_TRUE(a > b)
 
+#define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
+
 extern unsigned int failed;
 
 void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2);
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
+
+void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 
 #if GNUC_AT_LEAST(4, 2)
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"

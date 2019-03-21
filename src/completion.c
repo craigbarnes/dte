@@ -55,7 +55,7 @@ void add_completion(char *str)
 
 static void collect_commands(const char *prefix)
 {
-    for (size_t i = 0; commands[i].name; i++) {
+    for (size_t i = 0; commands[i].cmd; i++) {
         const Command *c = &commands[i];
         if (str_has_prefix(c->name, prefix)) {
             add_completion(xstrdup(c->name));

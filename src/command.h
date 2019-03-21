@@ -8,8 +8,8 @@
 #include "util/ptr-array.h"
 
 typedef struct {
-    const char *name;
-    const char *flags;
+    const char name[15];
+    const char flags[7];
     int8_t min_args;
     int8_t max_args;
     void (*cmd)(const char *flags, char **args);

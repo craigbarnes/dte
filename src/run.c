@@ -48,7 +48,7 @@ UNITTEST {
 
 const Command *find_command(const Command *cmds, const char *name)
 {
-    for (size_t i = 0; cmds[i].name; i++) {
+    for (size_t i = 0; cmds[i].cmd; i++) {
         const Command *cmd = &cmds[i];
         if (streq(name, cmd->name)) {
             return cmd;

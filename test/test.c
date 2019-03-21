@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "test.h"
 
 unsigned int failed;
@@ -68,5 +69,19 @@ void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b)
             a,
             b
         );
+    }
+}
+
+void assert_eq(const char *file, int line, intmax_t a, intmax_t b)
+{
+    if (unlikely(a != b)) {
+        test_fail (
+            file,
+            line,
+            "ERROR: Values not equal: %" PRIdMAX ", %" PRIdMAX,
+            a,
+            b
+        );
+        abort();
     }
 }

@@ -49,7 +49,7 @@ bind M-c 'toggle -v case-sensitive-search'
 bind M-e eof
 bind M-f 'search -w'
 bind M-F 'search -wr'
-bind M-j format-paragraph
+bind M-j wrap-paragraph
 bind M-l 'select -l'
 bind M-n 'msg -n'
 bind M-p 'msg -p'

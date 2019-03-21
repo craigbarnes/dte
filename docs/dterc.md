@@ -267,7 +267,7 @@ _command_. For example:
 
     filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
 
-### **format-paragraph** [_width_]
+### **wrap-paragraph** [_width_]
 
 Format the current selection or paragraph under the cursor. If
 paragraph _width_ is not given then the `text-width` option is
@@ -1027,7 +1027,7 @@ indentation size than `8` you should use spaces to indent.
 ### **text-width** [72]
 
 Preferred width of text. Used as the default argument for the
-`format-paragraph` command.
+`wrap-paragraph` command.
 
 ### **ws-error** [special]
 
