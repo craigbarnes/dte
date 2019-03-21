@@ -26,7 +26,7 @@ Screenshot
 Requirements
 ------------
 
-* [GCC] or [Clang]
+* [GCC] 4.6+ or [Clang]
 * [GNU Make] 3.81+
 * [terminfo] library (may be provided by [ncurses], depending on OS)
 * [iconv] library (may be included in libc, depending on OS)
