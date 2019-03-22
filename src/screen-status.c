@@ -208,10 +208,12 @@ static const char *format_misc_status(const Window *win)
 
 void update_status_line(const Window *win)
 {
-    Formatter f = {.win = win};
+    Formatter f = {
+        .win = win,
+        .misc_status = format_misc_status(win)
+    };
     char lbuf[256];
     char rbuf[256];
-    f.misc_status = format_misc_status(win);
     sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
