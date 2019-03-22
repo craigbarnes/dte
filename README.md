@@ -74,6 +74,7 @@ Testing
 * FreeBSD
 * NetBSD
 * OpenBSD
+* Cygwin
 
 Other [POSIX] 2008 compatible platforms should also work, but may
 require build system fixes.
