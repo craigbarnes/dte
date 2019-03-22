@@ -224,13 +224,13 @@ static CONST_FN uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
 }
 
 // Convert xterm color cube index to corresponding RGB color component
-static uint8_t cube_index_to_rgb_component(uint8_t index)
+static uint8_t cube_index_to_rgb_component(uint8_t idx)
 {
     static const uint8_t color_stops[6] = {
         0x00, 0x5f, 0x87,
         0xaf, 0xd7, 0xff
     };
-    return color_stops[index];
+    return color_stops[idx];
 }
 
 static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
