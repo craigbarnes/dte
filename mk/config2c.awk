@@ -19,7 +19,11 @@ function escape_syntax(s) {
 }
 
 BEGIN {
-    print "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)\n"
+    print "#ifdef __linux__"
+    print "#define CONFIG_SECTION SECTION(\".dte.config\") ALIGNED(8)"
+    print "#else"
+    print "#define CONFIG_SECTION"
+    print "#endif\n"
     print "IGNORE_WARNING(\"-Woverlength-strings\")\n"
 }
 
