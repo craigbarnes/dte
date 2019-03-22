@@ -796,13 +796,14 @@ void format_paragraph(int text_width)
     char *sel = block_iter_get_bytes(&view->cursor, len);
     size_t indent_width = get_indent_width(sel, len);
 
-    ParagraphFormatter pf;
-    string_init(&pf.buf);
-    pf.indent = make_indent(indent_width);
-    pf.indent_len = pf.indent ? strlen(pf.indent) : 0;
-    pf.indent_width = indent_width;
-    pf.cur_width = 0;
-    pf.text_width = text_width;
+    ParagraphFormatter pf = {
+        .buf = STRING_INIT,
+        .indent = make_indent(indent_width),
+        .indent_len = pf.indent ? strlen(pf.indent) : 0,
+        .indent_width = indent_width,
+        .cur_width = 0,
+        .text_width = text_width
+    };
 
     size_t i = 0;
     while (1) {
