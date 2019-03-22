@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <strings.h>
 #include "encoding.h"
 #include "../common.h"
 #include "../util/ascii.h"
