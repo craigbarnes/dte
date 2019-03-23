@@ -4,6 +4,7 @@
 #include "../src/util/ascii.h"
 #include "../src/util/path.h"
 #include "../src/util/string.h"
+#include "../src/util/string-view.h"
 #include "../src/util/strtonum.h"
 #include "../src/util/uchar.h"
 #include "../src/util/unicode.h"
@@ -134,6 +135,36 @@ static void test_string(void)
     EXPECT_EQ(memcmp(s.buffer, "88 test\n", s.len), 0);
 
     string_free(&s);
+}
+
+static void test_string_view(void)
+{
+    const StringView sv1 = STRING_VIEW("testing");
+    EXPECT_TRUE(string_view_equal_cstr(&sv1, "testing"));
+    EXPECT_FALSE(string_view_equal_cstr(&sv1, "testin"));
+    EXPECT_FALSE(string_view_equal_cstr(&sv1, "TESTING"));
+    EXPECT_TRUE(string_view_has_literal_prefix(&sv1, "test"));
+    EXPECT_TRUE(string_view_has_literal_prefix_icase(&sv1, "TEst"));
+    EXPECT_FALSE(string_view_has_literal_prefix(&sv1, "TEst"));
+    EXPECT_FALSE(string_view_has_literal_prefix_icase(&sv1, "TEst_"));
+
+    const StringView sv2 = string_view(sv1.data, sv1.length);
+    EXPECT_TRUE(string_view_equal(&sv1, &sv2));
+
+    const StringView sv3 = STRING_VIEW("\0test\0 ...");
+    EXPECT_TRUE(string_view_equal_strn(&sv3, "\0test\0 ...", 10));
+    EXPECT_TRUE(string_view_equal_literal(&sv3, "\0test\0 ..."));
+    EXPECT_TRUE(string_view_has_prefix(&sv3, "\0test", 5));
+    EXPECT_TRUE(string_view_has_literal_prefix(&sv3, "\0test\0"));
+    EXPECT_FALSE(string_view_equal_cstr(&sv3, "\0test\0 ..."));
+
+    const StringView sv4 = sv3;
+    EXPECT_TRUE(string_view_equal(&sv4, &sv3));
+
+    const StringView sv5 = string_view_from_cstring("foobar");
+    EXPECT_TRUE(string_view_equal_literal(&sv5, "foobar"));
+    EXPECT_TRUE(string_view_has_literal_prefix(&sv5, "foo"));
+    EXPECT_FALSE(string_view_equal_cstr(&sv5, "foo"));
 }
 
 static void test_number_width(void)
@@ -402,6 +433,7 @@ void test_util(void)
 {
     test_ascii();
     test_string();
+    test_string_view();
     test_number_width();
     test_str_to_long();
     test_buf_parse_long();

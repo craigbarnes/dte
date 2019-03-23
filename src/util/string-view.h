@@ -26,7 +26,7 @@ typedef struct {
 }
 
 #define string_view_equal_literal(sv, str) ( \
-    string_view_equal_cstrn((sv), (str), STRLEN(str)) \
+    string_view_equal_strn((sv), (str), STRLEN(str)) \
 )
 
 #define string_view_has_literal_prefix(sv, prefix) ( \
@@ -67,7 +67,7 @@ static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
 }
 
 PURE NONNULL_ARGS
-static inline bool string_view_equal_cstrn (
+static inline bool string_view_equal_strn (
     const StringView *sv,
     const char *str,
     size_t len
