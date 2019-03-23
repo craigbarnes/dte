@@ -121,7 +121,7 @@ Keys are separated by spaces.
 
 Move to beginning of file.
 
-### **bol**
+### **bol** [**-s**]
 
 Move to beginning of line.
 
