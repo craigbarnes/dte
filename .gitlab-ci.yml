@@ -2,7 +2,7 @@ stages: [build, dist]
 
 before_script:
     - git fetch --tags
-    - export MAKEFLAGS="-j$(mk/nproc.sh)" WERROR=1 V=1
+    - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
     - make vars
 
 build:alpine:
@@ -11,13 +11,12 @@ build:alpine:
     script: &SCRIPT
         - make check TERMINFO_DISABLE=1
         - ldd dte
-        - make clean
-        - make check TERMINFO_DISABLE=1 LDFLAGS=-static
+        - make clean && make check TERMINFO_DISABLE=1 LDFLAGS=-static
         - ldd dte || true
-        - make clean
-        - make check
+        - make clean && make check
         - ldd dte
-        - make install && dte -V
+        - make clean && make check CSTD='-std=c99 -D_POSIX_C_SOURCE=200809L'
+        - make clean && make DEBUG=0 && make install && dte -V
         - strip dte && du -k -h dte
         - tools/objsize.sh dte
 
