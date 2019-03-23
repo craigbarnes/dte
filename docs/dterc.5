@@ -1,4 +1,4 @@
-.TH DTERC 5 "November 2017"
+.TH DTERC 5 "March 2019"
 .nh
 .ad l
 .
@@ -388,6 +388,11 @@ Move to beginning of file.
 .RS
 Move to beginning of line.
 .P
+.TP
+\fB\-s\fR
+Move to right edge of indentation or beginning of line, depending on
+current cursor position.
+.PP
 .RE
 \fBbolsf\fR
 .RS
@@ -1114,7 +1119,7 @@ its own copies of the option values.
 .
 .br
 3. Options that have both global and local values. The Global value is
-just a default local value for opened files and never used for
+just a default local value for opened files and is never used for
 anything else. Changing the global value does not affect any already
 opened files.
 .P
@@ -1186,8 +1191,8 @@ toggle global option instead of local
 \fB\-v\fR
 display new value
 .PP
-If \fIoption\fR has both local and global value then local is toggled
-unless \-g is given.
+If \fIoption\fR has both local and global values then local is toggled
+unless \fB\-g\fR is used.
 .P
 .RE
 \fBundo\fR

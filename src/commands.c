@@ -72,9 +72,13 @@ static void cmd_bof(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     move_bof();
 }
 
-static void cmd_bol(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_bol(const char *pf, char** UNUSED_ARG(args))
 {
-    move_bol();
+    if (*pf == 's') {
+        move_bol_smart();
+    } else {
+        move_bol();
+    }
 }
 
 static void cmd_bolsf(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
@@ -1689,7 +1693,7 @@ const Command commands[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
     {"bof", "", 0, 0, cmd_bof},
-    {"bol", "", 0, 0, cmd_bol},
+    {"bol", "s", 0, 0, cmd_bol},
     {"bolsf", "", 0, 0, cmd_bolsf},
     {"case", "lu", 0, 0, cmd_case},
     {"cd", "", 1, 1, cmd_cd},

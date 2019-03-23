@@ -1,7 +1,7 @@
 ---
 title: dterc
 section: 5
-date: November 2017
+date: March 2019
 description: Command and configuration language used by `dte`
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
@@ -124,6 +124,10 @@ Move to beginning of file.
 ### **bol**
 
 Move to beginning of line.
+
+`-s`
+:   Move to right edge of indentation or beginning of line, depending on
+    current cursor position.
 
 ### **bolsf**
 
@@ -668,7 +672,7 @@ There are three kinds of options.
    its own copies of the option values.
 
 3. Options that have both global and local values. The Global value is
-   just a default local value for opened files and never used for
+   just a default local value for opened files and is never used for
    anything else. Changing the global value does not affect any already
    opened files.
 
@@ -727,8 +731,8 @@ must be either boolean or enum.
 `-v`
 :   display new value
 
-If _option_ has both local and global value then local is toggled
-unless -g is given.
+If _option_ has both local and global values then local is toggled
+unless `-g` is used.
 
 ### **undo**
 

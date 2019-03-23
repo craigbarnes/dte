@@ -22,6 +22,7 @@ extern const uint8_t ascii_table[256];
 
 #define ascii_test(x, mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
+#define ascii_isblank(x) ((x) == ' ' || (x) == '\t')
 #define ascii_isdigit(x) ascii_test(x, ASCII_DIGIT)
 #define ascii_iscntrl(x) ascii_test(x, ASCII_CNTRL)
 #define ascii_islower(x) ascii_test(x, ASCII_LOWER)

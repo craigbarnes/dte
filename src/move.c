@@ -108,6 +108,27 @@ void move_bol(void)
     view_reset_preferred_x(view);
 }
 
+void move_bol_smart(void)
+{
+    LineRef lr;
+    const size_t cursor_offset = fetch_this_line(&view->cursor, &lr);
+
+    size_t indent_bytes = 0;
+    while (ascii_isblank(*lr.line++)) {
+        indent_bytes++;
+    }
+
+    size_t move_bytes;
+    if (cursor_offset > indent_bytes) {
+        move_bytes = cursor_offset - indent_bytes;
+    } else {
+        move_bytes = cursor_offset;
+    }
+
+    block_iter_back_bytes(&view->cursor, move_bytes);
+    view_reset_preferred_x(view);
+}
+
 void move_eol(void)
 {
     block_iter_eol(&view->cursor);
