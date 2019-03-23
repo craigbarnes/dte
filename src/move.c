@@ -77,7 +77,7 @@ void move_to_preferred_x(int preferred_x)
 void move_cursor_left(void)
 {
     if (buffer->options.emulate_tab) {
-        int size = get_indent_level_bytes_left();
+        size_t size = get_indent_level_bytes_left();
         if (size) {
             block_iter_back_bytes(&view->cursor, size);
             view_reset_preferred_x(view);
@@ -91,7 +91,7 @@ void move_cursor_left(void)
 void move_cursor_right(void)
 {
     if (buffer->options.emulate_tab) {
-        int size = get_indent_level_bytes_right();
+        size_t size = get_indent_level_bytes_right();
         if (size) {
             block_iter_skip_bytes(&view->cursor, size);
             view_reset_preferred_x(view);
