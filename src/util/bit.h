@@ -21,7 +21,8 @@
 #define USE_BUILTIN(fn, arg)
 #endif
 
-static inline unsigned int bit_popcount_u64(uint64_t n) {
+static inline unsigned int bit_popcount_u64(uint64_t n)
+{
     USE_BUILTIN(popcount, n);
     n -= ((n >> 1) & U64(0x5555555555555555));
     n = (n & U64(0x3333333333333333)) + ((n >> 2) & U64(0x3333333333333333));
@@ -29,14 +30,16 @@ static inline unsigned int bit_popcount_u64(uint64_t n) {
     return (n * U64(0x0101010101010101)) >> 56;
 }
 
-static inline unsigned int bit_popcount_u32(uint32_t n) {
+static inline unsigned int bit_popcount_u32(uint32_t n)
+{
     USE_BUILTIN(popcount, n);
     n -= ((n >> 1) & U32(0x55555555));
     n = (n & U32(0x33333333)) + ((n >> 2) & U32(0x33333333));
     return (((n + (n >> 4)) & U32(0x0F0F0F0F)) * U32(0x01010101)) >> 24;
 }
 
-static inline unsigned int bit_count_leading_zeros_u64(uint64_t n) {
+static inline unsigned int bit_count_leading_zeros_u64(uint64_t n)
+{
     BUG_ON(n == 0);
     USE_BUILTIN(clz, n);
     n |= (n >> 1);
@@ -48,7 +51,8 @@ static inline unsigned int bit_count_leading_zeros_u64(uint64_t n) {
     return bit_popcount_u64(~n);
 }
 
-static inline unsigned int bit_count_leading_zeros_u32(uint32_t n) {
+static inline unsigned int bit_count_leading_zeros_u32(uint32_t n)
+{
     BUG_ON(n == 0);
     USE_BUILTIN(clz, n);
     n |= (n >> 1);
@@ -59,13 +63,15 @@ static inline unsigned int bit_count_leading_zeros_u32(uint32_t n) {
     return bit_popcount_u32(~n);
 }
 
-static inline unsigned int bit_count_trailing_zeros_u64(uint64_t n) {
+static inline unsigned int bit_count_trailing_zeros_u64(uint64_t n)
+{
     BUG_ON(n == 0);
     USE_BUILTIN(ctz, n);
     return bit_popcount_u64(~n & (n - 1));
 }
 
-static inline unsigned int bit_count_trailing_zeros_u32(uint32_t n) {
+static inline unsigned int bit_count_trailing_zeros_u32(uint32_t n)
+{
     BUG_ON(n == 0);
     USE_BUILTIN(ctz, n);
     return bit_popcount_u32(~n & (n - 1));
