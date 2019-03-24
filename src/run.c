@@ -60,9 +60,6 @@ const Command *find_command(const Command *cmds, const char *name)
 static void run_command(const Command *cmds, char **av)
 {
     const Command *cmd = find_command(cmds, av[0]);
-    const char *pf;
-    char **args;
-
     if (!cmd) {
         PointerArray array = PTR_ARRAY_INIT;
         const char *alias_name = av[0];
@@ -98,13 +95,13 @@ static void run_command(const Command *cmds, char **av)
         return;
     }
 
-    // By default change can't be merged with previous on.
+    // By default change can't be merged with previous one.
     // Any command can override this by calling begin_change() again.
     begin_change(CHANGE_MERGE_NONE);
 
     current_command = cmd;
-    args = av + 1;
-    pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
+    char **args = av + 1;
+    const char *pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
     if (pf) {
         cmd->cmd(pf, args);
     }
@@ -115,11 +112,9 @@ static void run_command(const Command *cmds, char **av)
 
 void run_commands(const Command *cmds, const PointerArray *array)
 {
-    size_t s, e;
-
-    s = 0;
+    size_t s = 0;
     while (s < array->count) {
-        e = s;
+        size_t e = s;
         while (e < array->count && array->ptrs[e]) {
             e++;
         }
