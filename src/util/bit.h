@@ -10,11 +10,11 @@
 
 #if GNUC_AT_LEAST(3, 4)
 #define USE_BUILTIN(fn, arg) \
-    if (__builtin_types_compatible_p(typeof(arg), unsigned long long)) { \
+    if (__builtin_types_compatible_p(__typeof__(arg), unsigned long long)) { \
         return __builtin_ ## fn ## ll(arg); \
-    } else if (__builtin_types_compatible_p(typeof(arg), unsigned long)) { \
+    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned long)) { \
         return __builtin_ ## fn ## l(arg); \
-    } else if (__builtin_types_compatible_p(typeof(arg), unsigned int)) { \
+    } else if (__builtin_types_compatible_p(__typeof__(arg), unsigned int)) { \
         return __builtin_ ## fn(arg); \
     }
 #else
