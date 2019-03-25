@@ -178,8 +178,14 @@ line (see the default `^L` key binding for why this is useful).
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
 
-Run external _command_ and collect error messages. This can be
-used to run `make`(1) and `grep`(1).
+Run external _command_ and collect output messages. This can be
+used to run e.g. compilers, build systems, code search utilities,
+etc. and then jump to a file/line position for each message.
+
+The _errorfmt_ argument corresponds to a regex capture pattern
+previously specified by the `errorfmt` command. After _command_
+exits successfully, parsed messages can be navigated using the
+`msg` command.
 
 `-1`
 :   Read error messages from stdout instead of stderr

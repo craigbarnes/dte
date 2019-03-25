@@ -455,8 +455,14 @@ line (see the default \fB^L\fR key binding for why this is useful).
 .RE
 \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
 .RS
-Run external \fIcommand\fR and collect error messages. This can be
-used to run \fBmake\fR(1) and \fBgrep\fR(1).
+Run external \fIcommand\fR and collect output messages. This can be
+used to run e.g. compilers, build systems, code search utilities,
+etc. and then jump to a file/line position for each message.
+.P
+The \fIerrorfmt\fR argument corresponds to a regex capture pattern
+previously specified by the \fBerrorfmt\fR command. After \fIcommand\fR
+exits successfully, parsed messages can be navigated using the
+\fBmsg\fR command.
 .P
 .TP
 \fB\-1\fR
