@@ -119,7 +119,7 @@ void any_key(void)
 {
     KeyCode key;
 
-    puts("Press any key to continue");
+    fputs("Press any key to continue\r\n", stderr);
     while (!term_read_key(&key)) {
         ;
     }
