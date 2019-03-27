@@ -11,16 +11,19 @@
 
 static void parse_sq(const char *cmd, size_t *posp, String *buf)
 {
-    size_t pos = *posp;
+    const size_t start_pos = *posp;
+    size_t pos = start_pos;
+    char ch;
     while (1) {
-        if (cmd[pos] == '\'') {
-            pos++;
+        ch = cmd[pos];
+        if (ch == '\'' || ch == '\0') {
             break;
         }
-        if (cmd[pos] == '\0') {
-            break;
-        }
-        string_add_byte(buf, cmd[pos++]);
+        pos++;
+    }
+    string_add_buf(buf, cmd + start_pos, pos - start_pos);
+    if (ch == '\'') {
+        pos++;
     }
     *posp = pos;
 }
