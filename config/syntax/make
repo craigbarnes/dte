@@ -3,7 +3,7 @@ syntax make
 state start code
     char "\n" this
     char "\t" tab-indent
-    char " " space-indent
+    char ' '  space-indent
     noeat not-recipe
 
 # "^\t[ \t]*"
@@ -43,7 +43,7 @@ state make code
     char "\n" start
     char \\ esc
     # this is a hack
-    char ")}" this variable
+    char ')}' this variable
     eat this
 
 state comment
@@ -56,7 +56,7 @@ state comment-esc comment
     noeat comment
 
 state dollar variable
-    char "({" lp
+    char '({' lp
     char a-zA-Z make variable
     char '@%<?^+|*' make variable
     char \$ make variable
@@ -68,7 +68,7 @@ state lp variable
 
 state variable
     char -b a-zA-Z0-9_- this
-    char ")}" make variable
+    char ')}' make variable
     inlist function make builtin
     noeat make
 

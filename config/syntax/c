@@ -36,7 +36,7 @@ state hex2 special
 syntax .c-string
 
 state string
-    char "\"" END string
+    char '"' END string
     # Avoid highlighting rest of the file again
     char "\n" END error
     char "\\" .c-esc:this
@@ -56,7 +56,7 @@ state char-end char
 syntax .c-comment
 
 state comment
-    char "*" star
+    char '*' star
     eat this
 
 state star comment
@@ -91,7 +91,7 @@ state preproc
 
 state preproc-ident preproc
     char -b a-zA-Z0-9_ this
-    bufis "include" preproc-include
+    bufis 'include' preproc-include
     inlist preproccond preproccond
     noeat preproc-misc
 
@@ -105,8 +105,8 @@ state preproc-misc preproc
     char "\\" preproc-cont
     char \" .c-string:this
     char \' .c-char:this
-    str "/*" .c-comment:this
-    str "//" .cpp-comment:start
+    str '/*' .c-comment:this
+    str '//' .cpp-comment:start
     eat this
 
 state preproc-include preproc
@@ -135,8 +135,8 @@ state system-include string
 state end-include preproc
     char "\n" start
     char " \t" this
-    str "/*" .c-comment:this
-    str "//" .cpp-comment:start
+    str '/*' .c-comment:this
+    str '//' .cpp-comment:start
     eat preproc-error
 
 state preproc-error error
@@ -153,8 +153,8 @@ state c code
     char \' .c-char:this
     char "\n" start
     char ';' semicolon
-    str "/*" .c-comment:this
-    str "//" .cpp-comment:start
+    str '/*' .c-comment:this
+    str '//' .cpp-comment:start
     eat this
 
 state semicolon code

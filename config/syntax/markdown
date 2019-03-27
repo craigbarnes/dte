@@ -51,10 +51,10 @@ state line-start
 
 state text
     char "\n" line-start
-    char "`" code-span
+    char '`' code-span
     char [ reference
-    str "**" double-asterisk
-    str "__" double-underline
+    str '**' double-asterisk
+    str '__' double-underline
     char * asterisk
     char _ underscore
     char "\\" .markdown-escape:this
@@ -77,15 +77,15 @@ state code-block
     eat this
 
 state backtick code-block
-    char -b "`" this
-    bufis "`" code-span
-    bufis "``" text code-span
+    char -b '`' this
+    bufis '`' code-span
+    bufis '``' text code-span
     heredocbegin .markdown-fenced-code-block line-start
 
 state tilde code-block
-    char -b "~" this
-    bufis "~" text
-    bufis "~~" text
+    char -b '~' this
+    bufis '~' text
+    bufis '~~' text
     heredocbegin .markdown-fenced-code-block line-start
 
 state block-quote
@@ -115,7 +115,7 @@ state asterisk emphasis
 
 state double-asterisk strong-emphasis
     char "\n" line-start
-    str "**" text strong-emphasis
+    str '**' text strong-emphasis
     eat this
 
 state underscore emphasis
@@ -125,7 +125,7 @@ state underscore emphasis
 
 state double-underline strong-emphasis
     char "\n" line-start
-    str "__" text strong-emphasis
+    str '__' text strong-emphasis
     eat this
 
 state reference

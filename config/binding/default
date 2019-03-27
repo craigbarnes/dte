@@ -28,7 +28,7 @@ bind ^C copy
 bind ^F search
 bind ^G 'search -n'
 # ^I == Tab
-bind ^L "command 'line '"
+bind ^L 'command line\ '
 # ^M == Enter
 bind ^N open
 bind ^O 'command open\ '
@@ -59,16 +59,16 @@ bind M-u unselect
 bind M-x command
 bind M-z suspend
 
-bind M-1 "view 1"
-bind M-2 "view 2"
-bind M-3 "view 3"
-bind M-4 "view 4"
-bind M-5 "view 5"
-bind M-6 "view 6"
-bind M-7 "view 7"
-bind M-8 "view 8"
-bind M-9 "view 9"
-bind M-0 "view last"
+bind M-1 'view 1'
+bind M-2 'view 2'
+bind M-3 'view 3'
+bind M-4 'view 4'
+bind M-5 'view 5'
+bind M-6 'view 6'
+bind M-7 'view 7'
+bind M-8 'view 8'
+bind M-9 'view 9'
+bind M-0 'view last'
 
 bind M-, prev
 bind M-. next
@@ -76,16 +76,16 @@ bind M-< wprev
 bind M-> wnext
 bind M-- 'shift -- -1'
 bind M-= 'shift +1'
-bind 'M-^?' 'erase-word -s'
+bind M-C-? 'erase-word -s'
 bind M-\; command
 bind M-: command
 bind M-/ search
-bind M-? "search -r"
+bind M-? 'search -r'
 
-bind M-! "move-tab left"
-bind M-@ "move-tab right"
+bind M-! 'move-tab left'
+bind M-@ 'move-tab right'
 
-bind F1 "run man dte"
+bind F1 'run man dte'
 bind F3 'search -n'
 bind F4 'search -p'
 bind F5 refresh

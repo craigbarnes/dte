@@ -98,10 +98,10 @@ state code
     char \- dash
     char [ bracket
     char -b : colon
-    str "~=" this operator
+    str '~=' this operator
     char =/+*#<>^%|&~ this operator
-    str "..." this special
-    str ".." this operator
+    str '...' this special
+    str '..' this operator
     char . dot
     char !@`$? bad-char
     eat this

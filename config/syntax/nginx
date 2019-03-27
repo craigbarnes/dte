@@ -1,13 +1,13 @@
 syntax .nginx-var
 
 state variable
-    char "{" brace
+    char '{' brace
     char A-Za-z0-9_ this
     noeat END
 
 state brace variable
     char A-Za-z0-9_ this
-    char "}" END variable
+    char '}' END variable
     eat END error
 
 syntax .nginx-sq-string
