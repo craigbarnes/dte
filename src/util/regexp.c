@@ -52,20 +52,15 @@ bool regexp_exec (
     regmatch_t *m,
     int flags
 ) {
-#ifdef REG_STARTEND
     BUG_ON(!nr_m);
+#ifdef REG_STARTEND
     m[0].rm_so = 0;
     m[0].rm_eo = size;
     return !regexec(re, buf, nr_m, m, flags | REG_STARTEND);
 #else
-    // Buffer must be null-terminated string if REG_STARTED is not supported
-    char *tmp = xnew(char, size + 1);
-    int ret;
-
-    BUG_ON(!nr_m);
-    memcpy(tmp, buf, size);
-    tmp[size] = '\0';
-    ret = !regexec(re, tmp, nr_m, m, flags);
+    // Buffer must be null-terminated if REG_STARTEND isn't supported
+    char *tmp = xstrcut(buf, size);
+    int ret = !regexec(re, tmp, nr_m, m, flags);
     free(tmp);
     return ret;
 #endif
