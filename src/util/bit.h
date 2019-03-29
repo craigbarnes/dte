@@ -77,4 +77,16 @@ static inline unsigned int bit_count_trailing_zeros_u32(uint32_t n)
     return bit_popcount_u32(~n & (n - 1));
 }
 
+static inline unsigned int bit_find_first_set_u64(uint64_t n)
+{
+    USE_BUILTIN(ffs, n);
+    return n ? bit_count_trailing_zeros_u64(n) + 1 : 0;
+}
+
+static inline unsigned int bit_find_first_set_u32(uint32_t n)
+{
+    USE_BUILTIN(ffs, n);
+    return n ? bit_count_trailing_zeros_u32(n) + 1 : 0;
+}
+
 #endif

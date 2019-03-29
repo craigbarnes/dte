@@ -456,6 +456,20 @@ void test_bitop(void)
     EXPECT_EQ(bit_count_trailing_zeros_u64(U64(0x10000000)), 28);
     EXPECT_EQ(bit_count_trailing_zeros_u64(U64(0x100000000000)), 44);
     EXPECT_EQ(bit_count_trailing_zeros_u64(UINT64_MAX), 0);
+
+    EXPECT_EQ(bit_find_first_set_u32(0), 0);
+    EXPECT_EQ(bit_find_first_set_u32(1), 1);
+    EXPECT_EQ(bit_find_first_set_u32(2), 2);
+    EXPECT_EQ(bit_find_first_set_u32(3), 1);
+    EXPECT_EQ(bit_find_first_set_u32(64), 7);
+    EXPECT_EQ(bit_find_first_set_u32(U32(1) << 31), 32);
+
+    EXPECT_EQ(bit_find_first_set_u64(0), 0);
+    EXPECT_EQ(bit_find_first_set_u64(1), 1);
+    EXPECT_EQ(bit_find_first_set_u64(2), 2);
+    EXPECT_EQ(bit_find_first_set_u64(3), 1);
+    EXPECT_EQ(bit_find_first_set_u64(64), 7);
+    EXPECT_EQ(bit_find_first_set_u64(U64(1) << 63), 64);
 }
 
 static void test_path_dirname_and_path_basename(void)
