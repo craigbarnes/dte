@@ -35,7 +35,8 @@ static inline unsigned int bit_popcount_u32(uint32_t n)
     USE_BUILTIN(popcount, n);
     n -= ((n >> 1) & U32(0x55555555));
     n = (n & U32(0x33333333)) + ((n >> 2) & U32(0x33333333));
-    return (((n + (n >> 4)) & U32(0x0F0F0F0F)) * U32(0x01010101)) >> 24;
+    n = (n + (n >> 4)) & U32(0x0F0F0F0F);
+    return (n * U32(0x01010101)) >> 24;
 }
 
 static inline unsigned int bit_count_leading_zeros_u64(uint64_t n)
