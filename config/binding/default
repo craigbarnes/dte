@@ -28,17 +28,17 @@ bind S-pgdown 'pgdown -c'
 
 bind C-S-left 'word-bwd -cs'
 bind C-S-right 'word-fwd -cs'
-bind C-S-up 'up -cl'
-bind C-S-down 'down -cl'
+bind C-S-up 'up -l'
+bind C-S-down 'down -l'
 bind M-S-left 'bol -c'
 bind M-S-right 'eol -c'
 bind M-S-up 'pgup -c'
 bind M-S-down 'pgdown -c'
 
-bind C-M-S-up 'pgup -cl'
-bind C-M-S-down 'pgdown -cl'
-bind C-S-pgup 'pgup -cl'
-bind C-S-pgdown 'pgdown -cl'
+bind C-M-S-up 'pgup -l'
+bind C-M-S-down 'pgdown -l'
+bind C-S-pgup 'pgup -l'
+bind C-S-pgdown 'pgdown -l'
 
 # Either of these 2 may be equivalent to Backspace, depending on the
 # terminal, so they're both bound to erase by default for portability.
