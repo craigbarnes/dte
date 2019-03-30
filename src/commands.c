@@ -33,6 +33,50 @@
 #include "view.h"
 #include "window.h"
 
+static void do_selection(SelectionType sel)
+{
+    if (sel == SELECT_NONE) {
+        if (view->next_movement_cancels_selection) {
+            view->next_movement_cancels_selection = false;
+            unselect();
+        }
+        return;
+    }
+
+    view->next_movement_cancels_selection = true;
+
+    if (view->selection) {
+        view->selection = sel;
+        mark_all_lines_changed(buffer);
+        return;
+    }
+
+    view->sel_so = block_iter_get_offset(&view->cursor);
+    view->sel_eo = UINT_MAX;
+    view->selection = sel;
+
+    // Need to mark current line changed because cursor might
+    // move up or down before screen is updated
+    view_update_cursor_y(view);
+    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+}
+
+static void handle_select_chars_flag(const char *pf)
+{
+    do_selection(strchr(pf, 'c') ? SELECT_CHARS : SELECT_NONE);
+}
+
+static void handle_select_chars_or_lines_flags(const char *pf)
+{
+    SelectionType sel = SELECT_NONE;
+    if (strchr(pf, 'l')) {
+        sel = SELECT_LINES;
+    } else if (strchr(pf, 'c')) {
+        sel = SELECT_CHARS;
+    }
+    do_selection(sel);
+}
+
 // Go to compiler error saving position if file changed or cursor moved
 static void activate_current_message_save(void)
 {
@@ -74,7 +118,8 @@ static void cmd_bof(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_bol(const char *pf, char** UNUSED_ARG(args))
 {
-    if (*pf == 's') {
+    handle_select_chars_flag(pf);
+    if (strchr(pf, 's')) {
         move_bol_smart();
     } else {
         move_bol();
@@ -307,8 +352,9 @@ static void cmd_delete_word(const char *pf, char** UNUSED_ARG(args))
     buffer_delete_bytes(word_fwd(&bi, skip_non_word));
 }
 
-static void cmd_down(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_down(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_or_lines_flags(pf);
     move_down(1);
 }
 
@@ -317,8 +363,9 @@ static void cmd_eof(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     move_eof();
 }
 
-static void cmd_eol(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_eol(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_flag(pf);
     move_eol();
 }
 
@@ -514,8 +561,9 @@ static void cmd_join(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     join_lines();
 }
 
-static void cmd_left(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_left(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_flag(pf);
     move_cursor_left();
 }
 
@@ -757,8 +805,10 @@ static void cmd_paste(const char *pf, char** UNUSED_ARG(args))
     }
 }
 
-static void cmd_pgdown(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_pgdown(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_or_lines_flags(pf);
+
     long margin = window_get_scroll_margin(window);
     long bottom = view->vy + window->edit_h - 1 - margin;
     long count;
@@ -771,8 +821,10 @@ static void cmd_pgdown(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     move_down(count);
 }
 
-static void cmd_pgup(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_pgup(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_or_lines_flags(pf);
+
     long margin = window_get_scroll_margin(window);
     long top = view->vy + margin;
     long count;
@@ -889,8 +941,9 @@ static void cmd_replace(const char *pf, char **args)
     reg_replace(args[0], args[1], flags);
 }
 
-static void cmd_right(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_right(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_flag(pf);
     move_cursor_right();
 }
 
@@ -1265,6 +1318,8 @@ static void cmd_select(const char *pf, char** UNUSED_ARG(args))
         pf++;
     }
 
+    view->next_movement_cancels_selection = false;
+
     if (block) {
         select_block();
         return;
@@ -1482,8 +1537,9 @@ static void cmd_unselect(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
     unselect();
 }
 
-static void cmd_up(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_up(const char *pf, char** UNUSED_ARG(args))
 {
+    handle_select_chars_or_lines_flags(pf);
     move_up(1);
 }
 
@@ -1544,14 +1600,16 @@ static void cmd_wnext(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_word_bwd(const char *pf, char** UNUSED_ARG(args))
 {
-    bool skip_non_word = *pf == 's';
+    handle_select_chars_flag(pf);
+    bool skip_non_word = strchr(pf, 's');
     word_bwd(&view->cursor, skip_non_word);
     view_reset_preferred_x(view);
 }
 
 static void cmd_word_fwd(const char *pf, char** UNUSED_ARG(args))
 {
-    bool skip_non_word = *pf == 's';
+    handle_select_chars_flag(pf);
+    bool skip_non_word = strchr(pf, 's');
     word_fwd(&view->cursor, skip_non_word);
     view_reset_preferred_x(view);
 }
@@ -1693,7 +1751,7 @@ const Command commands[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
     {"bof", "", 0, 0, cmd_bof},
-    {"bol", "s", 0, 0, cmd_bol},
+    {"bol", "cs", 0, 0, cmd_bol},
     {"bolsf", "", 0, 0, cmd_bolsf},
     {"case", "lu", 0, 0, cmd_case},
     {"cd", "", 1, 1, cmd_cd},
@@ -1707,9 +1765,9 @@ const Command commands[] = {
     {"delete", "", 0, 0, cmd_delete},
     {"delete-eol", "n", 0, 0, cmd_delete_eol},
     {"delete-word", "s", 0, 0, cmd_delete_word},
-    {"down", "", 0, 0, cmd_down},
+    {"down", "cl", 0, 0, cmd_down},
     {"eof", "", 0, 0, cmd_eof},
-    {"eol", "", 0, 0, cmd_eol},
+    {"eol", "c", 0, 0, cmd_eol},
     {"eolsf", "", 0, 0, cmd_eolsf},
     {"erase", "", 0, 0, cmd_erase},
     {"erase-bol", "", 0, 0, cmd_erase_bol},
@@ -1724,7 +1782,7 @@ const Command commands[] = {
     {"insert", "km", 1, 1, cmd_insert},
     {"insert-builtin", "", 1, 1, cmd_insert_builtin},
     {"join", "", 0, 0, cmd_join},
-    {"left", "", 0, 0, cmd_left},
+    {"left", "c", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
     {"move-tab", "", 1, 1, cmd_move_tab},
@@ -1735,15 +1793,15 @@ const Command commands[] = {
     {"option", "-r", 3, -1, cmd_option},
     {"pass-through", "-ms", 1, -1, cmd_pass_through},
     {"paste", "c", 0, 0, cmd_paste},
-    {"pgdown", "", 0, 0, cmd_pgdown},
-    {"pgup", "", 0, 0, cmd_pgup},
+    {"pgdown", "cl", 0, 0, cmd_pgdown},
+    {"pgup", "cl", 0, 0, cmd_pgup},
     {"prev", "", 0, 0, cmd_prev},
     {"quit", "f", 0, 0, cmd_quit},
     {"redo", "", 0, 1, cmd_redo},
     {"refresh", "", 0, 0, cmd_refresh},
     {"repeat", "", 2, -1, cmd_repeat},
     {"replace", "bcgi", 2, 2, cmd_replace},
-    {"right", "", 0, 0, cmd_right},
+    {"right", "c", 0, 0, cmd_right},
     {"run", "-ps", 1, -1, cmd_run},
     {"save", "de=fpu", 0, 1, cmd_save},
     {"scroll-down", "", 0, 0, cmd_scroll_down},
@@ -1761,13 +1819,13 @@ const Command commands[] = {
     {"toggle", "glv", 1, -1, cmd_toggle},
     {"undo", "", 0, 0, cmd_undo},
     {"unselect", "", 0, 0, cmd_unselect},
-    {"up", "", 0, 0, cmd_up},
+    {"up", "cl", 0, 0, cmd_up},
     {"view", "", 1, 1, cmd_view},
     {"wclose", "f", 0, 0, cmd_wclose},
     {"wflip", "", 0, 0, cmd_wflip},
     {"wnext", "", 0, 0, cmd_wnext},
-    {"word-bwd", "s", 0, 0, cmd_word_bwd},
-    {"word-fwd", "s", 0, 0, cmd_word_fwd},
+    {"word-bwd", "cs", 0, 0, cmd_word_bwd},
+    {"word-fwd", "cs", 0, 0, cmd_word_fwd},
     {"wprev", "", 0, 0, cmd_wprev},
     {"wrap-paragraph", "", 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", 0, 1, cmd_wresize},

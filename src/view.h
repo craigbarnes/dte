@@ -37,6 +37,7 @@ typedef struct View {
     int tt_truncated_width;
 
     SelectionType selection;
+    bool next_movement_cancels_selection;
 
     // Cursor offset when selection was started
     ssize_t sel_so;

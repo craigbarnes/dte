@@ -12,11 +12,33 @@ bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'
 bind C-up up
 bind C-down down
-
 bind M-left bol
 bind M-right eol
 bind M-up pgup
 bind M-down pgdown
+
+bind S-left 'left -c'
+bind S-right 'right -c'
+bind S-up 'up -c'
+bind S-down 'down -c'
+bind S-home 'bol -c'
+bind S-end 'eol -c'
+bind S-pgup 'pgup -c'
+bind S-pgdown 'pgdown -c'
+
+bind C-S-left 'word-bwd -cs'
+bind C-S-right 'word-fwd -cs'
+bind C-S-up 'up -cl'
+bind C-S-down 'down -cl'
+bind M-S-left 'bol -c'
+bind M-S-right 'eol -c'
+bind M-S-up 'pgup -c'
+bind M-S-down 'pgdown -c'
+
+bind C-M-S-up 'pgup -cl'
+bind C-M-S-down 'pgdown -cl'
+bind C-S-pgup 'pgup -cl'
+bind C-S-pgdown 'pgdown -cl'
 
 # Either of these 2 may be equivalent to Backspace, depending on the
 # terminal, so they're both bound to erase by default for portability.

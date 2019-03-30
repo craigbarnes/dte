@@ -121,13 +121,16 @@ Keys are separated by spaces.
 
 Move to beginning of file.
 
-### **bol** [**-s**]
+### **bol** [**-cs**]
 
 Move to beginning of line.
 
+`-c`
+:   Select characters
+
 `-s`
-:   Move to right edge of indentation or beginning of line, depending on
-    current cursor position.
+:   Move to beginning of indented text or beginning of line, depending
+    on current cursor position.
 
 ### **bolsf**
 
@@ -224,17 +227,26 @@ Delete word after cursor.
 `-s`
 :   Be more "aggressive"
 
-### **down**
+### **down** [**-cl**]
 
 Move cursor down.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
 
 ### **eof**
 
 Move cursor to end of file.
 
-### **eol**
+### **eol** [**-c**]
 
 Move cursor to end of line.
+
+`-c`
+:   Select characters
 
 ### **eolsf**
 
@@ -443,9 +455,12 @@ Insert _text_ into the buffer.
 
 Join selection or next line to current.
 
-### **left**
+### **left** [**-c**]
 
 Move left.
+
+`-c`
+:   Select characters
 
 ### **line** _number_
 
@@ -524,13 +539,25 @@ Paste.
 `-c`
 :   Paste at the cursor position
 
-### **pgdown**
+### **pgdown** [**-cl**]
 
 Move cursor page down. See also `scroll-pgdown`.
 
-### **pgup**
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
+
+### **pgup** [**-cl**]
 
 Move cursor page up. See also `scroll-pgup`.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
 
 ### **prev**
 
@@ -580,9 +607,12 @@ The _pattern_ is a POSIX extended **regex**(7).
 `-i`
 :   Ignore case
 
-### **right**
+### **right** [**-c**]
 
 Move right.
+
+`-c`
+:   Select characters
 
 ### **run** [**-ps**] _command_ [_parameters_]...
 
@@ -748,9 +778,15 @@ Undo latest change.
 
 Unselect.
 
-### **up**
+### **up** [**-cl**]
 
 Move cursor up.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
 
 ### **view** _N_|last
 
@@ -771,16 +807,22 @@ Change from vertical layout to horizontal and vice versa.
 
 Next window.
 
-### **word-bwd** [**-s**]
+### **word-bwd** [**-cs**]
 
 Move cursor backward one word.
+
+`-c`
+:   Select characters
 
 `-s`
 :   Skip special characters
 
-### **word-fwd** [**-s**]
+### **word-fwd** [**-cs**]
 
 Move cursor forward one word.
+
+`-c`
+:   Select characters
 
 `-s`
 :   Skip special characters
