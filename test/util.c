@@ -343,6 +343,35 @@ static void test_u_set_ctrl(void)
     EXPECT_EQ(memcmp(buf, "^?", 3), 0);
 }
 
+static void test_u_prev_char(void)
+{
+    const unsigned char *buf = "深圳市";
+    size_t idx = 9;
+    CodePoint c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 0x5E02);
+    EXPECT_EQ(idx, 6);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 0x5733);
+    EXPECT_EQ(idx, 3);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 0x6DF1);
+    EXPECT_EQ(idx, 0);
+
+    idx = 1;
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, -((CodePoint)0xE6UL));
+    EXPECT_EQ(idx, 0);
+
+    buf = "Shenzhen";
+    idx = 8;
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 'n');
+    EXPECT_EQ(idx, 7);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 'e');
+    EXPECT_EQ(idx, 6);
+}
+
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -518,6 +547,7 @@ void test_util(void)
     test_u_is_upper();
     test_u_str_width();
     test_u_set_ctrl();
+    test_u_prev_char();
     test_hashset();
     test_round_up();
     test_bitop();
