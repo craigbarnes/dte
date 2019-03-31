@@ -23,7 +23,7 @@ typedef struct {
     HlColor **colors;
 } LineInfo;
 
-static bool is_default_bg_color(int color)
+static bool is_default_bg_color(int32_t color)
 {
     return color == builtin_colors[BC_DEFAULT]->bg || color < 0;
 }
