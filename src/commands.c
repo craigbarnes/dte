@@ -128,7 +128,8 @@ static void cmd_bol(const char *pf, char** UNUSED_ARG(args))
 
 static void cmd_bolsf(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    if (! block_iter_bol(&view->cursor)) {
+    do_selection(SELECT_NONE);
+    if (!block_iter_bol(&view->cursor)) {
         long top = view->vy + window_get_scroll_margin(window);
         if (view->cy > top) {
             move_up(view->cy - top);
@@ -371,7 +372,8 @@ static void cmd_eol(const char *pf, char** UNUSED_ARG(args))
 
 static void cmd_eolsf(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    if (! block_iter_eol(&view->cursor)) {
+    do_selection(SELECT_NONE);
+    if (!block_iter_eol(&view->cursor)) {
         long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
         if (view->cy < bottom) {
             move_down(bottom - view->cy);
