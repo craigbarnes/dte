@@ -194,7 +194,7 @@ static void print_horizontal_tabbar(Window *win)
     }
 }
 
-static void print_vertical_tab_title(View *v, int idx, int width)
+static void print_vertical_tab_title(const View *v, int idx, int width)
 {
     const char *orig_filename = buffer_filename(v->buffer);
     const char *filename = orig_filename;

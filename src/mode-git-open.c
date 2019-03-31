@@ -96,7 +96,7 @@ static void split(PointerArray *words, const char *str)
     }
 }
 
-static bool words_match(const char *name, PointerArray *words)
+static bool words_match(const char *name, const PointerArray *words)
 {
     for (size_t i = 0, n = words->count; i < n; i++) {
         if (!strstr(name, words->ptrs[i])) {
@@ -106,7 +106,7 @@ static bool words_match(const char *name, PointerArray *words)
     return true;
 }
 
-static bool words_match_icase(const char *name, PointerArray *words)
+static bool words_match_icase(const char *name, const PointerArray *words)
 {
     for (size_t i = 0, n = words->count; i < n; i++) {
         if (u_str_index(name, words->ptrs[i]) < 0) {
@@ -129,7 +129,7 @@ static void git_open_filter(void)
     char *str = string_cstring(&editor.cmdline.buf);
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
-    bool (*match)(const char *, PointerArray *) = words_match_icase;
+    bool (*match)(const char*, const PointerArray*) = words_match_icase;
     PointerArray words = PTR_ARRAY_INIT;
 
     // NOTE: words_match_icase() requires str to be lowercase

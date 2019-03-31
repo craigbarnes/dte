@@ -115,7 +115,7 @@ typedef struct {
     size_t delim_len;
 } SyntaxMerge;
 
-static inline bool is_subsyntax(Syntax *syn)
+static inline bool is_subsyntax(const Syntax *syn)
 {
     return syn->name[0] == '.';
 }

@@ -258,7 +258,7 @@ static size_t goto_beginning_of_whitespace(void)
     return count;
 }
 
-static bool ws_only(LineRef *lr)
+static bool ws_only(const LineRef *lr)
 {
     for (size_t i = 0, n = lr->size; i < n; i++) {
         char ch = lr->line[i];
