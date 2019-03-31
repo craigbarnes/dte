@@ -498,6 +498,13 @@ static void test_path_dirname_and_path_basename(void)
     }
 }
 
+static void test_path_absolute(void)
+{
+    char *abs = path_absolute("./build/../build/test/test-symlink");
+    EXPECT_STREQ(path_basename(abs), "README.md");
+    free(abs);
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -515,4 +522,5 @@ void test_util(void)
     test_round_up();
     test_bitop();
     test_path_dirname_and_path_basename();
+    test_path_absolute();
 }

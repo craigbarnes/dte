@@ -22,6 +22,7 @@ all: $(dte)
 
 check: $(test) all
 	$(E) TEST $<
+	$(Q) ln -sf ../../README.md build/test/test-symlink
 	$(Q) ./$<
 	$(Q) diff -u build/test/env.txt test/data/env.txt
 	$(Q) diff -u build/test/thai-utf8.txt test/data/thai-utf8.txt
