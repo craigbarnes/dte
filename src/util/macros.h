@@ -64,6 +64,10 @@
     #define ASAN_ENABLED 1
 #endif
 
+#if defined(__clang__) && HAS_FEATURE(address_sanitizer)
+    #define CLANG_ASAN_ENABLED 1
+#endif
+
 #if GNUC_AT_LEAST(3, 0) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
 #else

@@ -53,7 +53,9 @@ bool regexp_exec (
     int flags
 ) {
     BUG_ON(!nr_m);
-#if defined(REG_STARTEND) && !defined(ASAN_ENABLED)
+// Clang's address sanitizer seemingly doesn't take REG_STARTEND into
+// account when checking for buffer overflow.
+#if defined(REG_STARTEND) && !defined(CLANG_ASAN_ENABLED)
     m[0].rm_so = 0;
     m[0].rm_eo = size;
     return !regexec(re, buf, nr_m, m, flags | REG_STARTEND);
