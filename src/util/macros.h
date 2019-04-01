@@ -54,6 +54,16 @@
     #define HAS_WARNING(x) 0
 #endif
 
+#ifdef __has_feature
+    #define HAS_FEATURE(x) __has_feature(x)
+#else
+    #define HAS_FEATURE(x) 0
+#endif
+
+#if defined(__SANITIZE_ADDRESS__) || HAS_FEATURE(address_sanitizer)
+    #define ASAN_ENABLED 1
+#endif
+
 #if GNUC_AT_LEAST(3, 0) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
 #else
