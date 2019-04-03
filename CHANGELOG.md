@@ -13,11 +13,22 @@ v1.8 (unreleased)
 * Added `dte -K` command-line option (for keycode debugging).
 * Added support for reading a buffer from `stdin` at startup.
 * Added support for binding Ctrl/Alt/Shift + F1-F12 on xterm-like terminals.
+* Added `-s` flag to `bol` command, to allow moving to beginning of indented
+  text, before moving to beginning of line (a.k.a "smart home").
+* Added `-c` flag to all cursor movement commands, to allow selecting
+  characters while moving.
+* Added `-l` flag to `up`, `down`, `pgup` and `pgdown` commands, to
+  allow selecting whole lines while moving.
+* Added default bindings for various Shift+key combinations, for doing
+  GUI-style text selections.
+* Added key bindings to command mode for deleting/erasing whole words
+  (Alt+Delete and Alt+Backspace).
 * Improved cursor interaction with Unicode combining characters.
 * Improved built-in filetype detection.
 * Improved parsing of GCC error messages.
+* Improved documentation for `hi` and `compile` commands.
 * Updated character width lookup tables to Unicode 11.
-* Optimized code to reduce startup/input/redraw latency.
+* Optimized code to reduce editor startup and input latency.
 
 v1.7 (latest release)
 ---------------------
