@@ -99,6 +99,7 @@ bind M-> wnext
 bind M-- 'shift -- -1'
 bind M-= 'shift +1'
 bind M-C-? 'erase-word -s'
+bind M-delete 'delete-word -s'
 bind M-\; command
 bind M-: command
 bind M-/ search
