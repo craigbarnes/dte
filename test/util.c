@@ -316,6 +316,33 @@ static void test_u_str_width(void)
     );
 }
 
+static void test_u_set_char(void)
+{
+    char buf[16];
+    size_t i;
+    memzero(&buf);
+
+    i = 0;
+    u_set_char(buf, &i, 'a');
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 'a');
+
+    i = 0;
+    u_set_char(buf, &i, 0x00DF);
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(memcmp(buf, "\xC3\x9F", 2), 0);
+
+    i = 0;
+    u_set_char(buf, &i, 0x0E01);
+    EXPECT_EQ(i, 3);
+    EXPECT_EQ(memcmp(buf, "\xE0\xB8\x81", 3), 0);
+
+    i = 0;
+    u_set_char(buf, &i, 0x22C5F);
+    EXPECT_EQ(i, 4);
+    EXPECT_EQ(memcmp(buf, "\xF0\xA2\xB1\x9F", 4), 0);
+}
+
 static void test_u_set_ctrl(void)
 {
     char buf[16];
@@ -546,6 +573,7 @@ void test_util(void)
     test_u_to_lower();
     test_u_is_upper();
     test_u_str_width();
+    test_u_set_char();
     test_u_set_ctrl();
     test_u_prev_char();
     test_hashset();

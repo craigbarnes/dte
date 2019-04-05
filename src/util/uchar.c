@@ -225,20 +225,19 @@ void u_set_char(char *str, size_t *idx, CodePoint uch)
 void u_set_hex(char *str, size_t *idx, CodePoint uch)
 {
     static const char hex_tab[16] = "0123456789abcdef";
-    size_t i = *idx;
-
-    str[i++] = '<';
+    char *p = str + *idx;
+    p[0] = '<';
     if (!u_is_unicode(uch)) {
         // Invalid byte (negated)
         uch *= -1;
-        str[i++] = hex_tab[(uch >> 4) & 0x0f];
-        str[i++] = hex_tab[uch & 0x0f];
+        p[1] = hex_tab[(uch >> 4) & 0x0f];
+        p[2] = hex_tab[uch & 0x0f];
     } else {
-        str[i++] = '?';
-        str[i++] = '?';
+        p[1] = '?';
+        p[2] = '?';
     }
-    str[i++] = '>';
-    *idx = i;
+    p[3] = '>';
+    *idx += 4;
 }
 
 size_t u_skip_chars(const char *str, int *width)
