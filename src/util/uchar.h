@@ -26,11 +26,7 @@ static inline void u_set_ctrl(char *buf, size_t *idx, CodePoint u)
 {
     size_t i = *idx;
     buf[i++] = '^';
-    if (u == 0x7f) {
-        buf[i++] = '?';
-    } else {
-        buf[i++] = u | 0x40;
-    }
+    buf[i++] = (u == 0x7F) ? '?' : u | 0x40;
     *idx = i;
 }
 
