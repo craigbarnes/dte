@@ -139,18 +139,16 @@ String dump_bindings(void)
     for (KeyCode k = 0x20; k < 0x7E; k++) {
         const char *command = bindings_lookup_table[k];
         if (command) {
-            char *keystr = key_to_string(MOD_CTRL | k);
+            const char *keystr = key_to_string(MOD_CTRL | k);
             string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
-            free(keystr);
         }
     }
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
         const char *command = bindings_lookup_table[k + 128];
         if (command) {
-            char *keystr = key_to_string(MOD_META | k);
+            const char *keystr = key_to_string(MOD_META | k);
             string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
-            free(keystr);
         }
     }
 
@@ -162,18 +160,16 @@ String dump_bindings(void)
             const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
             const char *command = bindings_lookup_table[i];
             if (command) {
-                char *keystr = key_to_string(modifiers | k);
+                const char *keystr = key_to_string(modifiers | k);
                 string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
-                free(keystr);
             }
         }
     }
 
     for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
         const Binding *b = bindings_ptr_array.ptrs[i];
-        char *keystr = key_to_string(b->key);
+        const char *keystr = key_to_string(b->key);
         string_sprintf(&buf, "   %-10s  %s\n", keystr, b->command);
-        free(keystr);
     }
 
     return buf;

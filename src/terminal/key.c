@@ -2,7 +2,6 @@
 #include <string.h>
 #include "key.h"
 #include "../util/ascii.h"
-#include "../util/string.h"
 #include "../util/uchar.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
@@ -109,45 +108,50 @@ bool parse_key(KeyCode *key, const char *str)
     return false;
 }
 
-char *key_to_string(KeyCode k)
+const char *key_to_string(KeyCode k)
 {
-    String buf = STRING_INIT;
+    static char buf[32];
+    size_t i = 0;
 
     if (k & MOD_CTRL) {
-        string_add_literal(&buf, "C-");
+        buf[i++] = 'C';
+        buf[i++] = '-';
     }
     if (k & MOD_META) {
-        string_add_literal(&buf, "M-");
+        buf[i++] = 'M';
+        buf[i++] = '-';
     }
     if (k & MOD_SHIFT) {
-        string_add_literal(&buf, "S-");
+        buf[i++] = 'S';
+        buf[i++] = '-';
     }
 
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
         switch (key) {
         case '\t':
-            string_add_literal(&buf, "tab");
+            strcpy(buf + i, "tab");
             break;
         case KEY_ENTER:
-            string_add_literal(&buf, "enter");
+            strcpy(buf + i, "enter");
             break;
         case ' ':
-            string_add_literal(&buf, "space");
+            strcpy(buf + i, "space");
             break;
         default:
             // <0x20 or 0x7f shouldn't be possible
-            string_add_ch(&buf, key);
+            u_set_char_raw(buf, &i, key);
+            buf[i] = '\0';
         }
     } else if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        string_add_str(&buf, special_names[key - KEY_SPECIAL_MIN]);
+        strcpy(buf + i, special_names[key - KEY_SPECIAL_MIN]);
     } else if (key == KEY_PASTE) {
-        string_add_literal(&buf, "paste");
+        strcpy(buf + i, "paste");
     } else {
-        string_add_literal(&buf, "???");
+        strcpy(buf + i, "???");
     }
 
-    return string_steal_cstring(&buf);
+    return buf;
 }
 
 bool key_to_ctrl(KeyCode k, unsigned char *byte)

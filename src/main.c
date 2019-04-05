@@ -144,9 +144,8 @@ static void showkey_loop(void)
             loop = false;
             break;
         }
-        char *str = key_to_string(key);
+        const char *str = key_to_string(key);
         buf_sprintf("   %-12s 0x%-12" PRIX32 "\r\n", str, key);
-        free(str);
         buf_flush();
     }
 

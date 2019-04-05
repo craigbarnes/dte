@@ -72,7 +72,7 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
 #define CTRL(x) (MOD_CTRL | (x))
 
 bool parse_key(KeyCode *key, const char *str);
-char *key_to_string(KeyCode key);
+const char *key_to_string(KeyCode key);
 bool key_to_ctrl(KeyCode key, unsigned char *byte);
 
 #endif

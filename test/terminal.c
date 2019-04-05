@@ -338,9 +338,8 @@ static void test_key_to_string(void)
         {"C-home", MOD_CTRL | KEY_HOME},
     };
     FOR_EACH_I(i, tests) {
-        char *str = key_to_string(tests[i].key);
+        const char *str = key_to_string(tests[i].key);
         IEXPECT_STREQ(str, tests[i].str);
-        free(str);
     }
 }
 
