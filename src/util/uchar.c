@@ -45,7 +45,7 @@ static inline CONST_FN bool u_seq_len_ok(CodePoint uch, int len)
  */
 static inline CONST_FN unsigned int u_get_first_byte_mask(unsigned int len)
 {
-    return (1U << 7U >> len) - 1U;
+    return (1U << 7U >> len) - 1;
 }
 
 size_t u_str_width(const unsigned char *str)
@@ -165,39 +165,33 @@ invalid:
 void u_set_char_raw(char *str, size_t *idx, CodePoint uch)
 {
     size_t i = *idx;
-
-    if (uch <= 0x7fU) {
+    if (uch <= 0x7f) {
         str[i++] = uch;
-        *idx = i;
-    } else if (uch <= 0x7ffU) {
+    } else if (uch <= 0x7ff) {
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xc0U;
+        str[i + 0] = uch | 0xc0;
         i += 2;
-        *idx = i;
-    } else if (uch <= 0xffffU) {
+    } else if (uch <= 0xffff) {
         str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xe0U;
+        str[i + 0] = uch | 0xe0;
         i += 3;
-        *idx = i;
-    } else if (uch <= 0x10ffffU) {
+    } else if (uch <= 0x10ffff) {
         str[i + 3] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xf0U;
+        str[i + 0] = uch | 0xf0;
         i += 4;
-        *idx = i;
     } else {
         // Invalid byte value
         str[i++] = uch & 0xff;
-        *idx = i;
     }
+    *idx = i;
 }
 
 void u_set_char(char *str, size_t *idx, CodePoint uch)
 {
     size_t i = *idx;
-
     if (uch < 0x80) {
         if (ascii_iscntrl(uch)) {
             u_set_ctrl(str, idx, uch);
@@ -205,32 +199,24 @@ void u_set_char(char *str, size_t *idx, CodePoint uch)
             str[i++] = uch;
             *idx = i;
         }
-        return;
-    }
-    if (u_is_unprintable(uch)) {
+    } else if (u_is_unprintable(uch)) {
         u_set_hex(str, idx, uch);
-        return;
-    }
-    if (uch <= 0x7ff) {
+    } else if (uch <= 0x7ff) {
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xc0U;
+        str[i + 0] = uch | 0xc0;
         i += 2;
         *idx = i;
-        return;
-    }
-    if (uch <= 0xffff) {
+    } else if (uch <= 0xffff) {
         str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xe0U;
+        str[i + 0] = uch | 0xe0;
         i += 3;
         *idx = i;
-        return;
-    }
-    if (uch <= 0x10ffff) {
+    } else if (uch <= 0x10ffff) {
         str[i + 3] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
         str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xf0U;
+        str[i + 0] = uch | 0xf0;
         i += 4;
         *idx = i;
     }
