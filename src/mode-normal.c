@@ -24,11 +24,6 @@ static void insert_paste(void)
 
 static void normal_mode_keypress(KeyCode key)
 {
-    if (nr_pressed_keys()) {
-        handle_binding(key);
-        return;
-    }
-
     switch (key) {
     case '\t':
         if (view->selection == SELECT_LINES) {

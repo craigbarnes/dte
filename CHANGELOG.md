@@ -29,6 +29,9 @@ v1.8 (unreleased)
 * Improved documentation for `hi` and `compile` commands.
 * Updated character width lookup tables to Unicode 11.
 * Optimized code to reduce editor startup and input latency.
+* Removed support for chained key bindings (e.g. `bind '^X c' ...`).
+  Commands that aren't bound to simple key combinations can just be
+  accessed via command mode.
 * Removed support for recognizing Ctrl/Alt/Shift key combinations
   produced by the `rxvt` terminal emulator (and descendants). The
   key codes produced by `rxvt` violate the ECMA-48 specification.

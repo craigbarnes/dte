@@ -114,9 +114,6 @@ Alt:
 Shift:
 :   `S-left`
 
-Key chains are supported. For example `"^X c"` (press `^X` and then `c`).
-Keys are separated by spaces.
-
 ### **bof**
 
 Move to beginning of file.
