@@ -165,7 +165,7 @@ static void cmd_cd(const char* UNUSED_ARG(pf), char **args)
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
-        if (dir == NULL || dir[0] == 0) {
+        if (dir == NULL || dir[0] == '\0') {
             error_msg("cd: OLDPWD not set");
             return;
         }
@@ -1024,7 +1024,7 @@ static void cmd_save(const char *pf, char **args)
     // ensure correct de-allocation.
 
     if (args[0]) {
-        if (args[0][0] == 0) {
+        if (args[0][0] == '\0') {
             error_msg("Empty filename not allowed");
             goto error;
         }

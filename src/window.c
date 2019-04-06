@@ -46,7 +46,7 @@ View *window_open_buffer (
     bool dir_missing = false;
     Buffer *b = NULL;
 
-    if (filename[0] == 0) {
+    if (filename[0] == '\0') {
         error_msg("Empty filename not allowed");
         return NULL;
     }

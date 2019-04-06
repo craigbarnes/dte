@@ -38,7 +38,7 @@ static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
 
     while (true) {
         const unsigned char ch = ascii_toupper(str[i]);
-        if (ch == '^' && str[i + 1] != 0) {
+        if (ch == '^' && str[i + 1] != '\0') {
             modifiers |= MOD_CTRL;
             i++;
         } else if (ch == 'C' && str[i + 1] == '-') {

@@ -208,7 +208,7 @@ static char *path_relative(const char *filename, const char *dir)
     if (!str_has_prefix(filename, dir)) {
         return NULL;
     }
-    if (filename[dlen] == 0) {
+    if (filename[dlen] == '\0') {
         // Equal strings
         return xstrdup(".");
     }

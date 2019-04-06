@@ -185,14 +185,14 @@ char *path_absolute(const char *filename)
 
 static bool path_component(const char *path, size_t pos)
 {
-    return path[pos] == 0 || pos == 0 || path[pos - 1] == '/';
+    return path[pos] == '\0' || pos == 0 || path[pos - 1] == '/';
 }
 
 char *relative_filename(const char *f, const char *cwd)
 {
     // Annoying special case
-    if (cwd[1] == 0) {
-        if (f[1] == 0) {
+    if (cwd[1] == '\0') {
+        if (f[1] == '\0') {
             return xstrdup(f);
         }
         return xstrdup(f + 1);

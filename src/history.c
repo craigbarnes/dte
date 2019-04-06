@@ -10,7 +10,7 @@
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, size_t max_entries)
 {
-    if (text[0] == 0) {
+    if (text[0] == '\0') {
         return;
     }
 
