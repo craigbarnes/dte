@@ -29,18 +29,14 @@ function RangeTable:merge_adjacent()
 end
 
 function RangeTable:print_ranges(name, output)
-    local n = self.n
-    output:write("static const CodepointRange ", name, "[] = {\n    ")
+    local n = assert(self.n)
+    output:write("static const CodepointRange ", name, "[] = {\n")
     for i = 1, n do
-        local min, max, sep = self[i].min, self[i].max, ", "
-        if i == n then
-            sep = ""
-        elseif i % 3 == 0 then
-            sep = ",\n    "
-        end
-        output:write(("{0x%04x, 0x%04x}%s"):format(min, max, sep))
+        local min = assert(self[i].min)
+        local max = assert(self[i].max)
+        output:write(("    {0x%04x, 0x%04x},\n"):format(min, max))
     end
-    output:write("\n};\n\n")
+    output:write("};\n\n")
 end
 
 local function read_ucd(path, pattern)
@@ -62,33 +58,65 @@ end
 local unidata = read_ucd(arg[1], "^0000;")
 local eaw = read_ucd(arg[2], "^# EastAsianWidth")
 
-local zero_width_categories = {
-    Cf = true, -- Format (includes U+00AD SOFT HYPHEN, which is excluded below)
-    Me = true, -- Enclosing_Mark
-    Mn = true -- Nonspacing_Mark
+local nonspacing_mark = RangeTable.new()
+local special_whitespace = RangeTable.new()
+local unprintable = RangeTable.new()
+local double_width = RangeTable.new()
+local exclude = RangeTable.new()
+
+local mappings = {
+    Zs = special_whitespace, -- Space_Separator (various non-zero width spaces)
+    Zl = special_whitespace, -- Line_Separator (U+2028 only)
+    Zp = special_whitespace, -- Paragraph_Separator (U+2029 only)
+    Cc = unprintable, -- Control
+    Cf = unprintable, -- Format
+    Cs = unprintable, -- Surrogate
+    Co = unprintable, -- Private_Use
+    Me = nonspacing_mark, -- Enclosing_Mark
+    Mn = nonspacing_mark, -- Nonspacing_Mark
+    [0x0020] = exclude, -- ASCII space (Zs)
+    [0x00AD] = special_whitespace, -- Soft hyphen (Cf)
+    [0x1680] = exclude, -- Ogham space mark (Zs)
+    [0x3000] = exclude, -- Ideographic space (Zs)
 }
 
-local zero_width = RangeTable.new()
-for codepoint, category in unidata:gmatch "(%x+);[^;]*;(%u%a);[^\n]*\n" do
-    codepoint = assert(tonumber(codepoint, 16))
-    assert(category)
-    if
-        (zero_width_categories[category] and codepoint ~= 0x00AD)
-        -- ZERO WIDTH SPACE
-        or codepoint == 0x200B
-        -- Hangul Jamo medial vowels and final consonants
-        or (codepoint >= 0x1160 and codepoint <= 0x11FF)
-    then
-        zero_width:insert(codepoint, codepoint)
-    end
+-- ASCII
+for u = 0x00, 0x7F do
+    mappings[u] = exclude
 end
 
-local double_width = RangeTable.new()
+local prev_codepoint = -1
+local range = false
+for codepoint, name, category in unidata:gmatch "(%x+);([^;]*);(%u%a);[^\n]*\n" do
+    codepoint = assert(tonumber(codepoint, 16))
+    assert(codepoint > prev_codepoint)
+    assert(category)
+    local t = mappings[codepoint] or mappings[category]
+    if t then
+        if range then
+            assert(name:match("^<.*, Last>$"))
+            range = false
+            t:insert(prev_codepoint, codepoint)
+        elseif name:match("^<.*, First>$") then
+            range = true
+        else
+            t:insert(codepoint, codepoint)
+        end
+    end
+    prev_codepoint = codepoint
+end
+
+assert(prev_codepoint == 0x10FFFD)
+assert(exclude.n == 127 + 3)
+
 for min, max in eaw:gmatch "\n(%x+)%.*(%x*);[WF]" do
     min = assert(tonumber(min, 16))
     max = tonumber(max, 16)
     double_width:insert(min, max or min)
 end
 
-zero_width:merge_adjacent():print_ranges("zero_width", io.stdout)
-double_width:merge_adjacent():print_ranges("double_width", io.stdout)
+local stdout = io.stdout
+special_whitespace:merge_adjacent():print_ranges("special_whitespace", stdout)
+unprintable:merge_adjacent():print_ranges("unprintable", stdout)
+nonspacing_mark:merge_adjacent():print_ranges("nonspacing_mark", stdout)
+double_width:merge_adjacent():print_ranges("double_width", stdout)
