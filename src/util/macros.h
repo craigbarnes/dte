@@ -172,10 +172,22 @@
     #define RETURNS_NONNULL
 #endif
 
+#if GNUC_AT_LEAST(6, 0) || HAS_ATTRIBUTE(target_clones)
+    #define TARGET_CLONES(x) __attribute__((__target_clones__(x)))
+#else
+    #define TARGET_CLONES(x)
+#endif
+
 #if GNUC_AT_LEAST(8, 0) || HAS_ATTRIBUTE(nonstring)
     #define NONSTRING __attribute__((__nonstring__))
 #else
     #define NONSTRING
+#endif
+
+#if defined(__x86_64__) && !defined(__SSE4_2__)
+    #define FMV_SSE42 TARGET_CLONES("sse4.2,default")
+#else
+    #define FMV_SSE42
 #endif
 
 #define XMALLOC MALLOC RETURNS_NONNULL
