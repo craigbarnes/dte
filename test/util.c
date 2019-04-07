@@ -254,7 +254,7 @@ static void test_u_char_width(void)
     EXPECT_EQ(u_char_width('\r'), 2);
     EXPECT_EQ(u_char_width(0x1F), 2);
 
-    // Rendered as <xx> (4 columns)
+    // Unprintable (rendered as <xx> -- 4 columns)
     EXPECT_EQ(u_char_width(0x0080), 4);
     EXPECT_EQ(u_char_width(0xDFFF), 4);
 
@@ -263,11 +263,13 @@ static void test_u_char_width(void)
     EXPECT_EQ(u_char_width(0xAA32), 0);
 
     // Double width (2 columns)
-    EXPECT_EQ(u_char_width(0x30000), 2);
-    EXPECT_EQ(u_char_width(0x3A009), 2);
-    EXPECT_EQ(u_char_width(0x3FFFD), 2);
     EXPECT_EQ(u_char_width(0x2757), 2);
     EXPECT_EQ(u_char_width(0x312F), 2);
+
+    // Double width but unassigned (rendered as <xx> -- 4 columns)
+    EXPECT_EQ(u_char_width(0x30000), 4);
+    EXPECT_EQ(u_char_width(0x3A009), 4);
+    EXPECT_EQ(u_char_width(0x3FFFD), 4);
 
     // 1 column character >= 0x1100
     EXPECT_EQ(u_char_width(0x104B3), 1);
@@ -305,6 +307,55 @@ static void test_u_is_upper(void)
     EXPECT_FALSE(u_is_upper(0x10ffff));
 }
 
+static void test_u_is_unprintable(void)
+{
+    // Private-use characters ------------------------------------------
+    // (https://www.unicode.org/faq/private_use.html#pua2)
+
+    // There are three ranges of private-use characters in the standard.
+    // The main range in the BMP is U+E000..U+F8FF, containing 6,400
+    // private-use characters.
+    EXPECT_TRUE(u_is_unprintable(0xE000));
+    EXPECT_TRUE(u_is_unprintable(0xF8FF));
+
+    // ... there are also two large ranges of supplementary private-use
+    // characters, consisting of most of the code points on planes 15
+    // and 16: U+F0000..U+FFFFD and U+100000..U+10FFFD. Together those
+    // ranges allocate another 131,068 private-use characters.
+    EXPECT_TRUE(u_is_unprintable(0xF0000));
+    EXPECT_TRUE(u_is_unprintable(0xFFFFD));
+    EXPECT_TRUE(u_is_unprintable(0x100000));
+    EXPECT_TRUE(u_is_unprintable(0x10FFFd));
+
+    // Non-characters --------------------------------------------------
+    // (https://www.unicode.org/faq/private_use.html#noncharacters)
+    unsigned int noncharacter_count = 0;
+
+    // "A contiguous range of 32 noncharacters: U+FDD0..U+FDEF in the BMP"
+    for (CodePoint u = 0xFDD0; u <= 0xFDEF; u++) {
+        EXPECT_TRUE(u_is_unprintable(u));
+        noncharacter_count++;
+    }
+
+    // "The last two code points of the BMP, U+FFFE and U+FFFF"
+    EXPECT_TRUE(u_is_unprintable(0xFFFE));
+    EXPECT_TRUE(u_is_unprintable(0xFFFF));
+    noncharacter_count += 2;
+
+    // "The last two code points of each of the 16 supplementary planes:
+    // U+1FFFE, U+1FFFF, U+2FFFE, U+2FFFF, ... U+10FFFE, U+10FFFF"
+    for (CodePoint step = 1; step <= 16; step++) {
+        const CodePoint u = (0x10000 * step) + 0xFFFE;
+        EXPECT_TRUE(u_is_unprintable(u));
+        EXPECT_TRUE(u_is_unprintable(u + 1));
+        noncharacter_count += 2;
+    }
+
+    // "Q: How many noncharacters does Unicode have?"
+    // "A: Exactly 66"
+    EXPECT_EQ(noncharacter_count, 66);
+}
+
 static void test_u_str_width(void)
 {
     EXPECT_EQ(u_str_width("foo"), 3);
@@ -338,9 +389,15 @@ static void test_u_set_char(void)
     EXPECT_EQ(memcmp(buf, "\xE0\xB8\x81", 3), 0);
 
     i = 0;
+    u_set_char(buf, &i, 0x1F914);
+    EXPECT_EQ(i, 4);
+    EXPECT_EQ(memcmp(buf, "\xF0\x9F\xA4\x94", 4), 0);
+
+    i = 0;
     u_set_char(buf, &i, 0x22C5F);
     EXPECT_EQ(i, 4);
-    EXPECT_EQ(memcmp(buf, "\xF0\xA2\xB1\x9F", 4), 0);
+    // Note: string separated to prevent "-Wtrigraphs" warning
+    EXPECT_EQ(memcmp(buf, "<" "?" "?" ">", 4), 0);
 }
 
 static void test_u_set_ctrl(void)
@@ -572,6 +629,7 @@ void test_util(void)
     test_u_char_width();
     test_u_to_lower();
     test_u_is_upper();
+    test_u_is_unprintable();
     test_u_str_width();
     test_u_set_char();
     test_u_set_ctrl();

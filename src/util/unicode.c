@@ -98,10 +98,10 @@ unsigned int u_char_width(CodePoint u)
             return 2; // Rendered in caret notation (e.g. ^@)
         }
         return 1;
-    } else if (u_is_unprintable(u)) {
-        return 4; // Rendered as <xx>
     } else if (u_is_nonspacing_mark(u)) {
         return 0;
+    } else if (u_is_unprintable(u)) {
+        return 4; // Rendered as <xx>
     } else if (u < 0x1100U) {
         return 1;
     } else if (u_is_double_width(u)) {

@@ -72,12 +72,18 @@ local mappings = {
     Cf = unprintable, -- Format
     Cs = unprintable, -- Surrogate
     Co = unprintable, -- Private_Use
+    Cn = unprintable, -- Unassigned
     Me = nonspacing_mark, -- Enclosing_Mark
     Mn = nonspacing_mark, -- Nonspacing_Mark
-    [0x0020] = exclude, -- ASCII space (Zs)
-    [0x00AD] = special_whitespace, -- Soft hyphen (Cf)
-    [0x1680] = exclude, -- Ogham space mark (Zs)
-    [0x3000] = exclude, -- Ideographic space (Zs)
+
+    -- This is a "Cf" character, but is included in special_whitespace because
+    -- it looks exactly like a normal space when using a monospace font:
+    [0x00AD] = special_whitespace, -- Soft hyphen
+
+    -- These are "Zs" characters, but don't need to be in special_whitespace
+    -- because they can easily be distinguished from a normal space:
+    [0x1680] = exclude, -- Ogham space mark (looks like an em dash)
+    [0x3000] = exclude, -- Ideographic space (double width space)
 }
 
 -- ASCII
@@ -90,7 +96,15 @@ local range = false
 for codepoint, name, category in unidata:gmatch "(%x+);([^;]*);(%u%a);[^\n]*\n" do
     codepoint = assert(tonumber(codepoint, 16))
     assert(codepoint > prev_codepoint)
+    assert(name)
     assert(category)
+
+    -- Omitted codepoints default to the "Cn" (unassigned) category
+    -- https://www.unicode.org/reports/tr44/tr44-21.html#Default_Values_Table
+    if not range and prev_codepoint < codepoint - 1 then
+        unprintable:insert(prev_codepoint + 1, codepoint - 1)
+    end
+
     local t = mappings[codepoint] or mappings[category]
     if t then
         if range then
@@ -108,6 +122,7 @@ end
 
 assert(prev_codepoint == 0x10FFFD)
 assert(exclude.n == 127 + 3)
+unprintable:insert(prev_codepoint + 1, 0x10FFFF)
 
 for min, max in eaw:gmatch "\n(%x+)%.*(%x*);[WF]" do
     min = assert(tonumber(min, 16))
@@ -117,6 +132,6 @@ end
 
 local stdout = io.stdout
 special_whitespace:merge_adjacent():print_ranges("special_whitespace", stdout)
-unprintable:merge_adjacent():print_ranges("unprintable", stdout)
 nonspacing_mark:merge_adjacent():print_ranges("nonspacing_mark", stdout)
 double_width:merge_adjacent():print_ranges("double_width", stdout)
+unprintable:merge_adjacent():print_ranges("unprintable", stdout)
