@@ -3,9 +3,9 @@ DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
 LCOV ?= lcov
-LCOVFLAGS ?= --no-external --rc lcov_excl_line='(BUG|fatal_error) *\('
+LCOVFLAGS ?= --config-file mk/lcovrc
 GENHTML ?= genhtml
-GENHTMLFLAGS ?= --no-function-coverage --title dte
+GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 
 dist: $(firstword $(DIST_ALL))
 dist-all: $(DIST_ALL)

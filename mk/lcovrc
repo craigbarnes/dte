@@ -1,0 +1,8 @@
+lcov_excl_line = (BUG|fatal_error) *\(
+lcov_function_coverage = 0
+
+genhtml_function_coverage = 0
+genhtml_hi_limit = 85
+genhtml_med_limit = 70
+genhtml_sort = 0
+geninfo_external = 0
