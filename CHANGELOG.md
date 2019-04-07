@@ -23,11 +23,12 @@ v1.8 (unreleased)
   GUI-style text selections.
 * Added key bindings to command mode for deleting/erasing whole words
   (Alt+Delete and Alt+Backspace).
-* Improved cursor interaction with Unicode combining characters.
 * Improved built-in filetype detection.
 * Improved parsing of GCC error messages.
 * Improved documentation for `hi` and `compile` commands.
-* Updated character width lookup tables to Unicode 11.
+* Improved cursor interaction with Unicode combining characters.
+* Improved handling of Unicode whitespace and unprintable characters.
+* Updated character class lookup tables to Unicode 11.
 * Optimized code to reduce editor startup and input latency.
 * Removed support for chained key bindings (e.g. `bind '^X c' ...`).
   Commands that aren't bound to simple key combinations can just be
