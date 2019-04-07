@@ -811,7 +811,7 @@ void format_paragraph(int text_width)
 
         while (i < len) {
             tmp = i;
-            if (!u_is_space(u_get_char(sel, len, &tmp))) {
+            if (!u_is_breakable_whitespace(u_get_char(sel, len, &tmp))) {
                 break;
             }
             i = tmp;
@@ -823,7 +823,7 @@ void format_paragraph(int text_width)
         start = i;
         while (i < len) {
             tmp = i;
-            if (u_is_space(u_get_char(sel, len, &tmp))) {
+            if (u_is_breakable_whitespace(u_get_char(sel, len, &tmp))) {
                 break;
             }
             i = tmp;

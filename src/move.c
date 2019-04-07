@@ -200,7 +200,7 @@ static CharTypeEnum get_char_type(CodePoint u)
     if (u == '\n') {
         return CT_NEWLINE;
     }
-    if (u_is_space(u)) {
+    if (u_is_breakable_whitespace(u)) {
         return CT_SPACE;
     }
     if (u_is_word_char(u)) {

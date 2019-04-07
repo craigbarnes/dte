@@ -36,7 +36,10 @@ static inline PURE bool bisearch (
     return false;
 }
 
-bool u_is_space(CodePoint u)
+// Returns true for any whitespace character that isn't "non-breaking",
+// i.e. one that is used purely to separate words and may, for example,
+// be "broken" (changed to a newline) by hard wrapping.
+bool u_is_breakable_whitespace(CodePoint u)
 {
     switch (u) {
     case '\t':
@@ -45,9 +48,19 @@ bool u_is_space(CodePoint u)
     case '\f':
     case '\r':
     case ' ':
+    case 0x2000: // En quad
+    case 0x2001: // Em quad
+    case 0x2002: // En space
+    case 0x2003: // Em space
+    case 0x2004: // 3-per-em space
+    case 0x2005: // 4-per-em space
+    case 0x2006: // 6-per-em space
+    case 0x2009: // Thin space
+    case 0x200a: // Hair space
+    case 0x3000: // Ideographic space
         return true;
     }
-    return u_is_special_whitespace(u);
+    return false;
 }
 
 bool u_is_word_char(CodePoint u)
