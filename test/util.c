@@ -307,6 +307,24 @@ static void test_u_is_upper(void)
     EXPECT_FALSE(u_is_upper(0x10ffff));
 }
 
+static void test_u_is_special_whitespace(void)
+{
+    EXPECT_FALSE(u_is_special_whitespace(' '));
+    EXPECT_FALSE(u_is_special_whitespace('\t'));
+    EXPECT_FALSE(u_is_special_whitespace('\n'));
+    EXPECT_FALSE(u_is_special_whitespace('a'));
+    EXPECT_FALSE(u_is_special_whitespace(0x1680));
+    EXPECT_FALSE(u_is_special_whitespace(0x3000));
+    EXPECT_TRUE(u_is_special_whitespace(0x00A0));
+    EXPECT_TRUE(u_is_special_whitespace(0x00AD));
+    EXPECT_TRUE(u_is_special_whitespace(0x2000));
+    EXPECT_TRUE(u_is_special_whitespace(0x200a));
+    EXPECT_TRUE(u_is_special_whitespace(0x2028));
+    EXPECT_TRUE(u_is_special_whitespace(0x2029));
+    EXPECT_TRUE(u_is_special_whitespace(0x202f));
+    EXPECT_TRUE(u_is_special_whitespace(0x205f));
+}
+
 static void test_u_is_unprintable(void)
 {
     // Private-use characters ------------------------------------------
@@ -629,6 +647,7 @@ void test_util(void)
     test_u_char_width();
     test_u_to_lower();
     test_u_is_upper();
+    test_u_is_special_whitespace();
     test_u_is_unprintable();
     test_u_str_width();
     test_u_set_char();
