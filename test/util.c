@@ -412,7 +412,7 @@ static void test_u_set_char(void)
     EXPECT_EQ(memcmp(buf, "\xF0\x9F\xA4\x94", 4), 0);
 
     i = 0;
-    u_set_char(buf, &i, 0x22C5F);
+    u_set_char(buf, &i, 0x10FFFF);
     EXPECT_EQ(i, 4);
     // Note: string separated to prevent "-Wtrigraphs" warning
     EXPECT_EQ(memcmp(buf, "<" "?" "?" ">", 4), 0);

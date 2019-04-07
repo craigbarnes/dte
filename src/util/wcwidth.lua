@@ -106,17 +106,19 @@ for codepoint, name, category in unidata:gmatch "(%x+);([^;]*);(%u%a);[^\n]*\n" 
     end
 
     local t = mappings[codepoint] or mappings[category]
-    if t then
-        if range then
-            assert(name:match("^<.*, Last>$"))
-            range = false
+
+    if range then
+        assert(name:match("^<.*, Last>$"))
+        range = false
+        if t then
             t:insert(prev_codepoint, codepoint)
-        elseif name:match("^<.*, First>$") then
-            range = true
-        else
-            t:insert(codepoint, codepoint)
         end
+    elseif name:match("^<.*, First>$") then
+        range = true
+    elseif t then
+        t:insert(codepoint, codepoint)
     end
+
     prev_codepoint = codepoint
 end
 
