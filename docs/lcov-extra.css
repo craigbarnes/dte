@@ -1,0 +1,20 @@
+td.coverPerLo,
+td.coverNumLo,
+td.headerCovTableEntryLo
+{
+    background-color: rgba(255, 53, 47, 0.55);
+}
+
+td.coverPerMed,
+td.coverNumMed,
+td.headerCovTableEntryMed
+{
+    background-color: rgba(255, 224, 80, 0.55);
+}
+
+td.coverPerHi,
+td.coverNumHi,
+td.headerCovTableEntryHi
+{
+    background-color: rgba(27, 234, 89, 0.55);
+}
