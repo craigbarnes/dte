@@ -4,6 +4,7 @@
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
 #include "../src/util/path.h"
+#include "../src/util/regexp.h"
 #include "../src/util/string.h"
 #include "../src/util/string-view.h"
 #include "../src/util/strtonum.h"
@@ -663,6 +664,24 @@ static void test_path_absolute(void)
     free(abs);
 }
 
+static void test_regexp_match(void)
+{
+    static const char buf[] = "fn(a);\n";
+
+    PointerArray a = PTR_ARRAY_INIT;
+    bool matched = regexp_match("^[a-z]+\\(", buf, sizeof(buf) - 1, &a);
+    EXPECT_TRUE(matched);
+    EXPECT_EQ(a.count, 1);
+    EXPECT_STREQ(a.ptrs[0], "fn(");
+    ptr_array_free(&a);
+
+    ptr_array_init(&a, 0);
+    matched = regexp_match("^[a-z]+\\([0-9]", buf, sizeof(buf) - 1, &a);
+    EXPECT_FALSE(matched);
+    EXPECT_EQ(a.count, 0);
+    ptr_array_free(&a);
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -685,4 +704,5 @@ void test_util(void)
     test_bitop();
     test_path_dirname_and_path_basename();
     test_path_absolute();
+    test_regexp_match();
 }
