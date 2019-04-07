@@ -35,12 +35,14 @@ extern const uint8_t ascii_table[256];
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
-static inline PURE unsigned char ascii_tolower(unsigned char c)
+CONST_FN
+static inline unsigned char ascii_tolower(unsigned char c)
 {
     return c + (ascii_table[c] & ASCII_UPPER);
 }
 
-static inline PURE unsigned char ascii_toupper(unsigned char c)
+CONST_FN
+static inline unsigned char ascii_toupper(unsigned char c)
 {
     return c - ((ascii_table[c] & ASCII_LOWER) << 1);
 }

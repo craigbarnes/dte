@@ -28,10 +28,10 @@ static inline CodePoint u_to_lower(CodePoint u)
 }
 
 bool u_is_breakable_whitespace(CodePoint u) CONST_FN;
-bool u_is_word_char(CodePoint u) PURE;
-bool u_is_unprintable(CodePoint u) PURE;
+bool u_is_word_char(CodePoint u) CONST_FN;
+bool u_is_unprintable(CodePoint u) CONST_FN;
 bool u_is_special_whitespace(CodePoint u) CONST_FN;
-bool u_is_nonspacing_mark(CodePoint u) PURE;
-unsigned int u_char_width(CodePoint uch) PURE;
+bool u_is_nonspacing_mark(CodePoint u) CONST_FN;
+unsigned int u_char_width(CodePoint uch) CONST_FN;
 
 #endif
