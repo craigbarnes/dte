@@ -472,6 +472,33 @@ static void test_u_prev_char(void)
     c = u_prev_char(buf, &idx);
     EXPECT_EQ(c, 'e');
     EXPECT_EQ(idx, 6);
+
+    buf = "🥣🥤";
+    idx = 8;
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 0x1F964);
+    EXPECT_EQ(idx, 4);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, 0x1F963);
+    EXPECT_EQ(idx, 0);
+
+    buf = "\xF0\xF5";
+    idx = 2;
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, -((CodePoint)buf[1]));
+    EXPECT_EQ(idx, 1);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, -((CodePoint)buf[0]));
+    EXPECT_EQ(idx, 0);
+
+    buf = "\xF5\xF0";
+    idx = 2;
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, -((CodePoint)buf[1]));
+    EXPECT_EQ(idx, 1);
+    c = u_prev_char(buf, &idx);
+    EXPECT_EQ(c, -((CodePoint)buf[0]));
+    EXPECT_EQ(idx, 0);
 }
 
 static void test_hashset(void)
