@@ -7,14 +7,11 @@
 
 static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 {
-    char ch = *buf;
-    long line;
-
+    const char ch = *buf;
     if (ch == '/' || ch == '?') {
         // The search pattern is not a real regular expression.
         // Need to escape special characters.
         char *pattern = xnew(char, size * 2);
-
         for (size_t i = 1, j = 0; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {
                 i++;
@@ -45,8 +42,9 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
         return 0;
     }
 
-    size_t i = 0;
-    if (!buf_parse_long(buf, size, &i, &line)) {
+    long line;
+    size_t i = buf_parse_long(buf, size, &line);
+    if (i == 0) {
         return 0;
     }
 

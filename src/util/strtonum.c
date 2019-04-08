@@ -19,51 +19,65 @@ int number_width(long n)
     return width;
 }
 
-bool buf_parse_long(const char *str, size_t size, size_t *posp, long *valp)
+size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
 {
-    size_t pos = *posp;
-    size_t count = 0;
-    int sign = 1;
-    long val = 0;
-
-    if (pos < size && str[pos] == '-') {
-        sign = -1;
-        pos++;
+    if (size == 0 || !ascii_isdigit(str[0])) {
+        return 0;
     }
 
-    while (pos < size && ascii_isdigit(str[pos])) {
-        if (long_multiply_overflows(val, 10, &val)) {
-            return false;
+    uintmax_t val = str[0] - '0';
+    size_t i = 1;
+
+    while (i < size && ascii_isdigit(str[i])) {
+        if (umax_multiply_overflows(val, 10, &val)) {
+            return 0;
         }
-        if (long_add_overflows(val, str[pos++] - '0', &val)) {
-            return false;
+        if (umax_add_overflows(val, str[i++] - '0', &val)) {
+            return 0;
         }
-        count++;
-    }
-    if (count == 0) {
-        return false;
     }
 
-    if (long_multiply_overflows(val, sign, &val)) {
-        return false;
-    }
-
-    *posp = pos;
     *valp = val;
-    return true;
+    return i;
+}
+
+size_t buf_parse_long(const char *str, size_t size, long *valp)
+{
+    bool negative = false;
+    if (size && str[0] == '-') {
+        negative = true;
+        str++;
+        size--;
+    }
+
+    uintmax_t val;
+    size_t n = buf_parse_uintmax(str, size, &val);
+    if (n == 0 || val > LONG_MAX) {
+        return 0;
+    }
+
+    if (negative) {
+        n += 1;
+        *valp = -((long)val);
+    } else {
+        *valp = (long)val;
+    }
+
+    return n;
 }
 
 bool parse_long(const char **strp, long *valp)
 {
     const char *str = *strp;
     size_t size = strlen(str);
-    size_t pos = 0;
 
-    if (buf_parse_long(str, size, &pos, valp)) {
-        *strp = str + pos;
-        return true;
+    size_t n = buf_parse_long(str, size, valp);
+    if (n == 0) {
+        return false;
     }
-    return false;
+
+    *strp = str + n;
+    return true;
 }
 
 bool str_to_long(const char *str, long *valp)

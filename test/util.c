@@ -204,35 +204,31 @@ static void test_buf_parse_long(void)
         char long_min[64];
         size_t long_min_len = xsnprintf(long_min, 64, "%ld", LONG_MIN + 1);
 
-        size_t pos = 0;
         long val = 88;
-        EXPECT_TRUE(buf_parse_long(long_min, long_min_len, &pos, &val));
+        size_t digits = buf_parse_long(long_min, long_min_len, &val);
+        EXPECT_EQ(digits, long_min_len);
         EXPECT_EQ(val, LONG_MIN + 1);
-        EXPECT_EQ(pos, long_min_len);
 
-        pos = 0;
         val = 88;
         long_min[long_min_len++] = '1';
-        EXPECT_FALSE(buf_parse_long(long_min, long_min_len, &pos, &val));
+        digits = buf_parse_long(long_min, long_min_len, &val);
+        EXPECT_EQ(digits, 0);
         EXPECT_EQ(val, 88);
-        EXPECT_EQ(pos, 0);
     }
     {
         char long_max[64];
         size_t long_max_len = xsnprintf(long_max, 64, "%ld", LONG_MAX);
 
-        size_t pos = 0;
         long val = 88;
-        EXPECT_TRUE(buf_parse_long(long_max, long_max_len, &pos, &val));
+        size_t digits = buf_parse_long(long_max, long_max_len, &val);
+        EXPECT_EQ(digits, long_max_len);
         EXPECT_EQ(val, LONG_MAX);
-        EXPECT_EQ(pos, long_max_len);
 
-        pos = 0;
         val = 99;
         long_max[long_max_len++] = '1';
-        EXPECT_FALSE(buf_parse_long(long_max, long_max_len, &pos, &val));
+        digits = buf_parse_long(long_max, long_max_len, &val);
+        EXPECT_EQ(digits, 0);
         EXPECT_EQ(val, 99);
-        EXPECT_EQ(pos, 0);
     }
 }
 
