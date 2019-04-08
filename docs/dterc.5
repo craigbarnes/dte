@@ -187,6 +187,8 @@ Global options:
 .br
    \fBesc\-timeout\fR [100] 0...2000
 .br
+   \fBfilesize\-limit\fR [250]
+.br
    \fBlock\-files\fR [true]
 .br
    \fBnewline\fR [unix]
@@ -1402,6 +1404,13 @@ timeout value is in milliseconds.
 Too long timeout makes escape key feel slow and too small
 timeout can cause escape sequences of for example arrow keys to
 be split and treated as multiple key presses.
+.P
+.RE
+\fBfilesize\-limit\fR [250]
+.RS
+Refuse to open any file with a size larger than this value (in
+mebibytes). Useful to prevent accidentally opening very large
+files, which can take a long time on some systems.
 .P
 .RE
 \fBlock\-files\fR [true]

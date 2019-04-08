@@ -83,6 +83,7 @@ typedef struct {
     enum tab_bar tab_bar;
     int tab_bar_max_components;
     int tab_bar_width;
+    int filesize_limit;
 } GlobalOptions;
 
 #undef COMMON_OPTIONS

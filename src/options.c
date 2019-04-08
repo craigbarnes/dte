@@ -428,6 +428,7 @@ static const OptionDesc option_desc[] = {
     INT_OPT("esc-timeout", G(esc_timeout), 0, 2000, NULL),
     BOOL_OPT("expand-tab", C(expand_tab), NULL),
     BOOL_OPT("file-history", C(file_history), NULL),
+    INT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     INT_OPT("indent-width", C(indent_width), 1, 8, NULL),
     STR_OPT("indent-regex", L(indent_regex), validate_regex, NULL),

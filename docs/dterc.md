@@ -901,6 +901,12 @@ Too long timeout makes escape key feel slow and too small
 timeout can cause escape sequences of for example arrow keys to
 be split and treated as multiple key presses.
 
+### **filesize-limit** [250]
+
+Refuse to open any file with a size larger than this value (in
+mebibytes). Useful to prevent accidentally opening very large
+files, which can take a long time on some systems.
+
 ### **lock-files** [true]
 
 Lock files using `$DTE_HOME/file-locks`. Only protects from your

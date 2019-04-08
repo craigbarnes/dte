@@ -68,6 +68,7 @@ EditorState editor = {
         .tab_bar = TAB_BAR_HORIZONTAL,
         .tab_bar_max_components = 0,
         .tab_bar_width = 25,
+        .filesize_limit = 250,
     },
     .mode_ops = {
         [INPUT_NORMAL] = &normal_mode_ops,
