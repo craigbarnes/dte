@@ -7,6 +7,7 @@
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"
 
+void test_cmdline(void);
 void test_encoding(void);
 void test_filetype(void);
 void test_terminal(void);
@@ -67,6 +68,7 @@ int main(void)
     test_filetype();
     test_util();
     test_terminal();
+    test_cmdline();
 
     init_headless_mode();
     test_exec_config();
