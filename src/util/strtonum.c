@@ -69,18 +69,15 @@ size_t buf_parse_long(const char *str, size_t size, long *valp)
 bool parse_long(const char **strp, long *valp)
 {
     const char *str = *strp;
-    size_t size = strlen(str);
-
-    size_t n = buf_parse_long(str, size, valp);
+    const size_t n = buf_parse_long(str, strlen(str), valp);
     if (n == 0) {
         return false;
     }
-
     *strp = str + n;
     return true;
 }
 
-bool str_to_long(const char *str, long *valp)
+static bool str_to_long(const char *str, long *valp)
 {
     return parse_long(&str, valp) && *str == 0;
 }
@@ -92,5 +89,20 @@ bool str_to_int(const char *str, int *valp)
         return false;
     }
     *valp = val;
+    return true;
+}
+
+bool str_to_size(const char *str, size_t *valp)
+{
+    uintmax_t val;
+    const size_t len = strlen(str);
+    if (len == 0) {
+        return false;
+    }
+    const size_t n = buf_parse_uintmax(str, len, &val);
+    if (n != len || val > SIZE_MAX) {
+        return false;
+    }
+    *valp = (size_t)val;
     return true;
 }

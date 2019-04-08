@@ -178,23 +178,6 @@ static void test_number_width(void)
     EXPECT_EQ(number_width(-2147483647), 11);
 }
 
-static void test_str_to_long(void)
-{
-    long val = 0;
-    EXPECT_TRUE(str_to_long("0", &val));
-    EXPECT_EQ(val, 0);
-    EXPECT_TRUE(str_to_long("00001", &val));
-    EXPECT_EQ(val, 1);
-    EXPECT_TRUE(str_to_long("-00001", &val));
-    EXPECT_EQ(val, -1);
-    EXPECT_TRUE(str_to_long("-8074", &val));
-    EXPECT_EQ(val, -8074);
-    EXPECT_TRUE(str_to_long("2147483647", &val));
-    EXPECT_EQ(val, 2147483647L);
-    EXPECT_TRUE(str_to_long("-2147483647", &val));
-    EXPECT_EQ(val, -2147483647L);
-}
-
 static void test_buf_parse_long(void)
 {
     {
@@ -230,6 +213,24 @@ static void test_buf_parse_long(void)
         EXPECT_EQ(digits, 0);
         EXPECT_EQ(val, 99);
     }
+}
+
+static void test_str_to_size(void)
+{
+    size_t val = 0;
+    EXPECT_TRUE(str_to_size("100", &val));
+    EXPECT_EQ(val, 100);
+    EXPECT_TRUE(str_to_size("0", &val));
+    EXPECT_EQ(val, 0);
+    EXPECT_TRUE(str_to_size("000000001003", &val));
+    EXPECT_EQ(val, 1003);
+    EXPECT_TRUE(str_to_size("29132", &val));
+    EXPECT_EQ(val, 29132);
+
+    EXPECT_FALSE(str_to_size("", &val));
+    EXPECT_FALSE(str_to_size("100x", &val));
+    EXPECT_FALSE(str_to_size("-100", &val));
+    EXPECT_FALSE(str_to_size("99999999999999999999999999999999", &val));
 }
 
 static void test_u_char_width(void)
@@ -684,8 +685,8 @@ void test_util(void)
     test_string();
     test_string_view();
     test_number_width();
-    test_str_to_long();
     test_buf_parse_long();
+    test_str_to_size();
     test_u_char_width();
     test_u_to_lower();
     test_u_is_upper();

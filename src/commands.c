@@ -608,8 +608,8 @@ static void cmd_move_tab(const char* UNUSED_ARG(pf), char **args)
     } else if (streq(str, "right")) {
         j = i + 1;
     } else {
-        long num;
-        if (!str_to_long(str, &num) || num < 1) {
+        size_t num;
+        if (!str_to_size(str, &num) || num == 0) {
             error_msg("Invalid tab position %s", str);
             return;
         }
