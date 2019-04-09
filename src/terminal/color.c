@@ -6,7 +6,6 @@
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"
-#include "../util/strtonum.h"
 
 #define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
 
@@ -87,17 +86,15 @@ static int32_t color_join_rgb(uint8_t r, uint8_t g, uint8_t b)
 static bool parse_color(const char *str, int32_t *val)
 {
     size_t len = strlen(str);
+    if (len == 0) {
+        return false;
+    }
 
+    // Parse #rrggbb
     if (str[0] == '#') {
         if (len != 7) {
             return false;
         }
-        for (size_t i = 1; i < len; i++) {
-            if (hex_decode(str[i]) == -1) {
-                return false;
-            }
-        }
-
         uint8_t r, g, b;
         int n = sscanf(str + 1, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8, &r, &g, &b);
         if (n != 3) {
@@ -107,28 +104,26 @@ static bool parse_color(const char *str, int32_t *val)
         return true;
     }
 
-    const char *ptr = str;
-    long r, g, b;
-    if (parse_long(&ptr, &r)) {
-        if (*ptr == 0) {
-            if (r < -2 || r > 255) {
-                return false;
-            }
-            // color index -2..255
-            *val = r;
-            return true;
-        }
-        if (
-            len != 5 ||
-            r < 0 || r > 5 || *ptr++ != '/' || !parse_long(&ptr, &g) ||
-            g < 0 || g > 5 || *ptr++ != '/' || !parse_long(&ptr, &b) ||
-            b < 0 || b > 5 || *ptr
-        ) {
+    // Parse r/g/b
+    if (len == 5 && str[1] == '/') {
+        uint8_t r, g, b;
+        int n = sscanf(str, "%1" SCNu8 "/%1" SCNu8 "/%1" SCNu8, &r, &g, &b);
+        if (n != 3 || r > 5 || g > 5 || b > 5) {
             return false;
         }
-
-        // r/g/b to color index 16..231 (6x6x6 color cube)
+        // Convert to color index 16..231 (xterm 6x6x6 color cube)
         *val = 16 + r * 36 + g * 6 + b;
+        return true;
+    }
+
+    // Parse -2 .. 255
+    if (len <= 3 && (str[0] == '-' || ascii_isdigit(str[0]))) {
+        int32_t x;
+        int n = sscanf(str, "%3" SCNd32, &x);
+        if (n != 1 || x < -2 || x > 255) {
+            return false;
+        }
+        *val = x;
         return true;
     }
 
