@@ -105,9 +105,8 @@ void save_file_history(const char *filename)
 
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
-        char tmp[64];
-        size_t tmp_len = xsnprintf(tmp, sizeof(tmp), "%d %d ", e->row, e->col);
-        wbuf_write(&buf, tmp, tmp_len);
+        wbuf_need_space(&buf, 64);
+        buf.fill += xsnprintf(buf.buf + buf.fill, 64, "%d %d ", e->row, e->col);
         wbuf_write(&buf, e->filename, e->filename_len);
         wbuf_write_ch(&buf, '\n');
     }

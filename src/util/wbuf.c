@@ -28,6 +28,13 @@ ssize_t wbuf_flush(WriteBuffer *wbuf)
     return 0;
 }
 
+void wbuf_need_space(WriteBuffer *wbuf, size_t count)
+{
+    if (wbuf_avail(wbuf) < count) {
+        wbuf_flush(wbuf);
+    }
+}
+
 ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count)
 {
     if (count > wbuf_avail(wbuf)) {
