@@ -153,7 +153,7 @@ String dump_bindings(void)
     }
 
     static_assert(MOD_CTRL == (1 << 24));
-    for (size_t m = 0; m <= 7; m++) {
+    for (KeyCode m = 0; m <= 7; m++) {
         const KeyCode modifiers = m << 24;
         for (size_t k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             const size_t mod_offset = m * NR_SPECIAL_KEYS;
