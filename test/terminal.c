@@ -15,6 +15,13 @@ static void test_parse_term_color(void)
         {{"#ff0000"}, {0xff0000 | COLOR_FLAG_RGB, -1, 0}},
         {{"black", "#00ffff"}, {COLOR_BLACK, 0x00ffff | COLOR_FLAG_RGB, 0}},
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
+        {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
+        {{"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
+        {{"-1", "-2"}, {COLOR_DEFAULT, -2, 0}},
+        {{"keep", "red", "keep"}, {-2, COLOR_RED, ATTR_KEEP}},
+        {{"bold", "blink"}, {-1, -1, ATTR_BOLD | ATTR_BLINK}},
+        {{"0", "255"}, {COLOR_BLACK, 255, 0}},
+        {{"white", "green", "underline"}, {15, COLOR_GREEN, ATTR_UNDERLINE}},
     };
     FOR_EACH_I(i, tests) {
         TermColor parsed_color;
