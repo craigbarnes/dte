@@ -1,14 +1,14 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "file-history.h"
 #include "common.h"
 #include "error.h"
-#include "util/ascii.h"
 #include "util/ptr-array.h"
-#include "util/strtonum.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -78,20 +78,17 @@ void load_file_history(const char *filename)
     ssize_t pos = 0;
     while (pos < size) {
         const char *line = buf_next_line(buf, &pos, size);
-        long row, col;
-        if (!parse_long(&line, &row) || row <= 0) {
+        unsigned int row, col;
+        int offset;
+        int n = sscanf(line, "%u%*[ \t]%u%*[ \t]%n", &row, &col, &offset);
+        if (n != 2 || row > INT_MAX || col > INT_MAX) {
             continue;
         }
-        while (ascii_isspace(*line)) {
-            line++;
+        const char *path = line + offset;
+        if (path[0] != '/') {
+            continue; // Path must be absolute
         }
-        if (!parse_long(&line, &col) || col <= 0) {
-            continue;
-        }
-        while (ascii_isspace(*line)) {
-            line++;
-        }
-        add_file_history(row, col, line);
+        add_file_history(row, col, path);
     }
 
     free(buf);
