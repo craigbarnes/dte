@@ -80,7 +80,7 @@ void load_file_history(const char *filename)
         const char *line = buf_next_line(buf, &pos, size);
         unsigned int row, col;
         int offset;
-        int n = sscanf(line, "%u%*[ \t]%u%*[ \t]%n", &row, &col, &offset);
+        int n = sscanf(line, "%u%*20[ \t]%u%*20[ \t]%n", &row, &col, &offset);
         if (n != 2 || row > INT_MAX || col > INT_MAX) {
             continue;
         }
