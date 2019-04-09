@@ -16,15 +16,17 @@ typedef enum {
 } TermColorCapabilityType;
 
 enum {
+    COLOR_INVALID = -3,
+    COLOR_KEEP = -2,
     COLOR_DEFAULT = -1,
-    COLOR_BLACK,
-    COLOR_RED,
-    COLOR_GREEN,
-    COLOR_YELLOW,
-    COLOR_BLUE,
-    COLOR_MAGENTA,
-    COLOR_CYAN,
-    COLOR_GRAY
+    COLOR_BLACK = 0,
+    COLOR_RED = 1,
+    COLOR_GREEN = 2,
+    COLOR_YELLOW = 3,
+    COLOR_BLUE = 4,
+    COLOR_MAGENTA = 5,
+    COLOR_CYAN = 6,
+    COLOR_GRAY = 7
 };
 
 enum {

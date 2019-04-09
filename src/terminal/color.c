@@ -51,7 +51,7 @@ static int32_t lookup_color(const char *s, size_t len)
         case 'b': CMP("blue", COLOR_BLUE);
         case 'c': CMP("cyan", COLOR_CYAN);
         case 'g': CMP("gray", COLOR_GRAY);
-        case 'k': CMP("keep", -2);
+        case 'k': CMP("keep", COLOR_KEEP);
         }
         break;
     case 5:
@@ -68,9 +68,9 @@ static int32_t lookup_color(const char *s, size_t len)
         }
         break;
     }
-    return -3;
+    return COLOR_INVALID;
 compare:
-    return memcmp(s, cmp_str, len) ? -3 : cmp_val;
+    return memcmp(s, cmp_str, len) ? COLOR_INVALID : cmp_val;
 }
 
 static int32_t color_join_rgb(uint8_t r, uint8_t g, uint8_t b)
@@ -83,25 +83,24 @@ static int32_t color_join_rgb(uint8_t r, uint8_t g, uint8_t b)
     ;
 }
 
-static bool parse_color(const char *str, int32_t *val)
+static int32_t parse_color(const char *str)
 {
     size_t len = strlen(str);
     if (len == 0) {
-        return false;
+        return COLOR_INVALID;
     }
 
     // Parse #rrggbb
     if (str[0] == '#') {
         if (len != 7) {
-            return false;
+            return COLOR_INVALID;
         }
         uint8_t r, g, b;
         int n = sscanf(str + 1, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8, &r, &g, &b);
         if (n != 3) {
-            return false;
+            return COLOR_INVALID;
         }
-        *val = color_join_rgb(r, g, b);
-        return true;
+        return color_join_rgb(r, g, b);
     }
 
     // Parse r/g/b
@@ -109,11 +108,10 @@ static bool parse_color(const char *str, int32_t *val)
         uint8_t r, g, b;
         int n = sscanf(str, "%1" SCNu8 "/%1" SCNu8 "/%1" SCNu8, &r, &g, &b);
         if (n != 3 || r > 5 || g > 5 || b > 5) {
-            return false;
+            return COLOR_INVALID;
         }
         // Convert to color index 16..231 (xterm 6x6x6 color cube)
-        *val = 16 + r * 36 + g * 6 + b;
-        return true;
+        return 16 + r * 36 + g * 6 + b;
     }
 
     // Parse -2 .. 255
@@ -121,10 +119,9 @@ static bool parse_color(const char *str, int32_t *val)
         int32_t x;
         int n = sscanf(str, "%3" SCNd32, &x);
         if (n != 1 || x < -2 || x > 255) {
-            return false;
+            return COLOR_INVALID;
         }
-        *val = x;
-        return true;
+        return x;
     }
 
     bool light = false;
@@ -136,22 +133,20 @@ static bool parse_color(const char *str, int32_t *val)
 
     const int32_t c = lookup_color(str, len);
     switch (c) {
-    case -3:
-        return false;
+    case COLOR_INVALID:
+        return COLOR_INVALID;
     case COLOR_RED:
     case COLOR_GREEN:
     case COLOR_YELLOW:
     case COLOR_BLUE:
     case COLOR_MAGENTA:
     case COLOR_CYAN:
-        *val = light ? c + 8 : c;
-        return true;
+        return light ? c + 8 : c;
     default:
         if (light) {
-            return false;
+            return COLOR_INVALID;
         }
-        *val = c;
-        return true;
+        return c;
     }
 }
 
@@ -168,15 +163,15 @@ static bool parse_attr(const char *str, unsigned short *attr)
 
 bool parse_term_color(TermColor *color, char **strs)
 {
-    color->fg = -1;
-    color->bg = -1;
+    color->fg = COLOR_DEFAULT;
+    color->bg = COLOR_DEFAULT;
     color->attr = 0;
     for (size_t i = 0, count = 0; strs[i]; i++) {
-        const char *str = strs[i];
-        int32_t val;
-        if (parse_color(str, &val)) {
+        const char *const str = strs[i];
+        const int32_t val = parse_color(str);
+        if (val != COLOR_INVALID) {
             if (count > 1) {
-                if (val == -2) {
+                if (val == COLOR_KEEP) {
                     // "keep" is also a valid attribute
                     color->attr |= ATTR_KEEP;
                 } else {
