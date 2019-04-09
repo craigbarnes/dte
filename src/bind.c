@@ -64,6 +64,7 @@ void add_binding(const char *keystr, const char *command)
 {
     KeyCode key;
     if (!parse_key(&key, keystr)) {
+        error_msg("invalid key string: %s", keystr);
         return;
     }
 

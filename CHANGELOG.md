@@ -4,7 +4,7 @@ Releases
 v1.8 (unreleased)
 -----------------
 
-**Changes:**
+**Additions:**
 
 * Added support for 24-bit RGB terminal colors.
 * Added support for `strikethrough` terminal attribute.
@@ -23,21 +23,30 @@ v1.8 (unreleased)
   GUI-style text selections.
 * Added key bindings to command mode for deleting/erasing whole words
   (Alt+Delete and Alt+Backspace).
-* Improved built-in filetype detection.
-* Improved parsing of GCC error messages.
-* Improved documentation for `hi` and `compile` commands.
-* Improved cursor interaction with Unicode combining characters.
+
+**Improvements:**
+
+* Optimized built-in filetype detection.
+* Fixed cursor interaction with Unicode combining characters.
 * Improved handling of Unicode whitespace and unprintable characters.
 * Updated character class lookup tables to Unicode 11.
+* Expanded documentation for `hi` and `compile` commands.
 * Optimized code to reduce editor startup and input latency.
+
+**Breaking changes:**
+
+* Changed the `bind` command to be much more strict when parsing key
+  strings and show an error message when invalid. The caret (`^`)
+  modifier can now only be used alone (not in combination with other
+  modifiers) and the `C-`, `M-` and `S-` modifiers *must* be
+  uppercase.
 * Removed support for chained key bindings (e.g. `bind '^X c' ...`).
   Commands that aren't bound to simple key combinations can just be
   accessed via command mode.
-* Removed support for recognizing Ctrl/Alt/Shift key combinations
-  produced by the `rxvt` terminal emulator (and descendants). The
-  key codes produced by `rxvt` violate the ECMA-48 specification.
-  Users of such terminals are encouraged to configure the key codes
-  to mimic `xterm` instead.
+* Removed support for recognizing some Ctrl/Alt/Shift key combinations
+  produced by the `rxvt` terminal emulator. The key codes produced by
+  `rxvt` violate the [ECMA-48] specification. Users of such terminals
+  are encouraged to configure the key codes to mimic `xterm` instead.
 
 v1.7 (latest release)
 ---------------------
@@ -238,3 +247,4 @@ available at <https://craigbarnes.gitlab.io/dist/dte/dte-sha256sums.txt>.
 [website]: https://craigbarnes.gitlab.io/dte/
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
+[ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm

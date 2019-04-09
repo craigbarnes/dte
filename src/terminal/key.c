@@ -36,24 +36,29 @@ static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
     KeyCode modifiers = 0;
     size_t i = 0;
 
-    while (true) {
-        const unsigned char ch = ascii_toupper(str[i]);
-        if (ch == '^' && str[i + 1] != '\0') {
-            modifiers |= MOD_CTRL;
-            i++;
-        } else if (ch == 'C' && str[i + 1] == '-') {
-            modifiers |= MOD_CTRL;
-            i += 2;
-        } else if (ch == 'M' && str[i + 1] == '-') {
-            modifiers |= MOD_META;
-            i += 2;
-        } else if (ch == 'S' && str[i + 1] == '-') {
-            modifiers |= MOD_SHIFT;
-            i += 2;
-        } else {
+    while (1) {
+        KeyCode tmp;
+        switch (str[i]) {
+        case 'C':
+            tmp = MOD_CTRL;
             break;
+        case 'M':
+            tmp = MOD_META;
+            break;
+        case 'S':
+            tmp = MOD_SHIFT;
+            break;
+        default:
+            goto end;
         }
+        if (str[i + 1] != '-' || modifiers & tmp) {
+            goto end;
+        }
+        modifiers |= tmp;
+        i += 2;
     }
+
+end:
     *modifiersp = modifiers;
     return i;
 }
@@ -61,9 +66,14 @@ static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
 bool parse_key(KeyCode *key, const char *str)
 {
     KeyCode modifiers;
-    str += parse_modifiers(str, &modifiers);
-    const size_t len = strlen(str);
+    if (str[0] == '^' && str[1] != '\0') {
+        modifiers = MOD_CTRL;
+        str += 1;
+    } else {
+        str += parse_modifiers(str, &modifiers);
+    }
 
+    const size_t len = strlen(str);
     size_t i = 0;
     KeyCode ch = u_get_char(str, len, &i);
     if (u_is_unicode(ch) && i == len) {
