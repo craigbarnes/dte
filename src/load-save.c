@@ -54,49 +54,52 @@ static int decode_and_add_blocks (
     const unsigned char *buf,
     size_t size
 ) {
-    EncodingType encoding_type = detect_encoding_from_bom(buf, size);
-    const char *e = encoding_type_to_string(encoding_type);
+    EncodingType bom_type = detect_encoding_from_bom(buf, size);
 
-    if (b->encoding == NULL) {
-        if (e) {
+    switch (b->encoding.type) {
+    case ENCODING_AUTODETECT:
+        if (bom_type != UNKNOWN_ENCODING) {
             // UTF-16BE/LE or UTF-32BE/LE
-            b->encoding = xstrdup(e);
+            BUG_ON(b->encoding.name != NULL);
+            b->encoding.type = bom_type;
         }
-    } else if (streq(b->encoding, "UTF-16")) {
-        // BE or LE?
-        if (e && str_has_prefix(e, b->encoding)) {
-            free(b->encoding);
-            b->encoding = xstrdup(e);
-        } else {
+        break;
+    case UTF16:
+        switch (bom_type) {
+        case UTF16LE:
+        case UTF16BE:
+            b->encoding.type = bom_type;
+            break;
+        default:
             // "open -e UTF-16" but incompatible or no BOM.
             // Do what the user wants. Big-endian is default.
-            free(b->encoding);
-            b->encoding = xstrdup("UTF-16BE");
+            b->encoding.type = UTF16BE;
         }
-    } else if (streq(b->encoding, "UTF-32")) {
-        // BE or LE?
-        if (e && str_has_prefix(e, b->encoding)) {
-            free(b->encoding);
-            b->encoding = xstrdup(e);
-        } else {
+        break;
+    case UTF32:
+        switch (bom_type) {
+        case UTF32LE:
+        case UTF32BE:
+            b->encoding.type = bom_type;
+            break;
+        default:
             // "open -e UTF-32" but incompatible or no BOM.
             // Do what the user wants. Big-endian is default.
-            free(b->encoding);
-            b->encoding = xstrdup("UTF-32BE");
+            b->encoding.type = UTF32BE;
         }
+        break;
+    default:
+        break;
     }
 
     // Skip BOM only if it matches the specified file encoding.
-    if (b->encoding && e && streq(b->encoding, e)) {
-        size_t bom_len = 2;
-        if (str_has_prefix(e, "UTF-32")) {
-            bom_len = 4;
-        }
+    if (bom_type != UNKNOWN_ENCODING && bom_type == b->encoding.type) {
+        const size_t bom_len = get_bom_for_encoding(bom_type)->len;
         buf += bom_len;
         size -= bom_len;
     }
 
-    FileDecoder *dec = new_file_decoder(b->encoding, buf, size);
+    FileDecoder *dec = new_file_decoder(encoding_to_string(&b->encoding), buf, size);
     if (dec == NULL) {
         return -1;
     }
@@ -122,12 +125,13 @@ static int decode_and_add_blocks (
             add_block(b, blk);
         }
     }
-    if (b->encoding == NULL) {
-        e = dec->encoding;
-        if (e == NULL) {
-            e = editor.charset;
+
+    if (b->encoding.type == ENCODING_AUTODETECT) {
+        if (dec->encoding) {
+            b->encoding = encoding_from_name(dec->encoding);
+        } else {
+            b->encoding = encoding_from_name(editor.charset);
         }
-        b->encoding = xstrdup(e);
     }
 
     free_file_decoder(dec);
@@ -252,9 +256,10 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         close(fd);
     }
 
-    if (b->encoding == NULL) {
-        b->encoding = xstrdup(editor.charset);
+    if (b->encoding.type == ENCODING_AUTODETECT) {
+        b->encoding = encoding_from_name(editor.charset);
     }
+
     return 0;
 }
 

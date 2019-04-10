@@ -1,6 +1,7 @@
 #ifndef ENCODING_CONVERT_H
 #define ENCODING_CONVERT_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 struct cconv;
@@ -14,6 +15,7 @@ char *cconv_consume_line(struct cconv *c, size_t *len);
 char *cconv_consume_all(struct cconv *c, size_t *len);
 void cconv_free(struct cconv *c);
 
+bool encoding_supported_by_iconv(const char *encoding);
 char *normalize_encoding_name(const char *name);
 
 #endif

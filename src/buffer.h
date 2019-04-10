@@ -9,6 +9,7 @@
 #include "change.h"
 #include "common.h"
 #include "options.h"
+#include "encoding/encoding.h"
 #include "syntax/syntax.h"
 #include "util/list.h"
 #include "util/ptr-array.h"
@@ -42,7 +43,7 @@ typedef struct Buffer {
     LineEndingType newline;
 
     // Encoding of the file. Buffer always contains UTF-8.
-    char *encoding;
+    Encoding encoding;
 
     LocalOptions options;
 

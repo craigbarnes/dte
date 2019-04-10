@@ -662,14 +662,12 @@ static void cmd_next(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_open(const char *pf, char **args)
 {
-    const char *enc = NULL;
-    char *encoding = NULL;
+    const char *requested_encoding = NULL;
     bool use_glob = false;
-
     while (*pf) {
         switch (*pf) {
         case 'e':
-            enc = *args++;
+            requested_encoding = *args++;
             break;
         case 'g':
             use_glob = args[0] ? true : false;
@@ -678,12 +676,21 @@ static void cmd_open(const char *pf, char **args)
         pf++;
     }
 
-    if (enc) {
-        encoding = normalize_encoding_name(enc);
-        if (encoding == NULL) {
-            error_msg("Unsupported encoding %s", enc);
+    bool dealloc_encoding = true;
+    Encoding encoding = {
+        .type = ENCODING_AUTODETECT,
+        .name = NULL
+    };
+
+    if (requested_encoding) {
+        if (
+            lookup_encoding(requested_encoding) != UTF8
+            && !encoding_supported_by_iconv(requested_encoding)
+        ) {
+            error_msg("Unsupported encoding %s", requested_encoding);
             return;
         }
+        encoding = encoding_from_name(requested_encoding);
     }
 
     char **paths = args;
@@ -700,22 +707,24 @@ static void cmd_open(const char *pf, char **args)
 
     if (!paths[0]) {
         window_open_new_file(window);
-        if (encoding) {
-            free(buffer->encoding);
+        if (requested_encoding) {
+            free_encoding(&buffer->encoding);
             buffer->encoding = encoding;
-            // buffer now owns encoding -- don't free() it below
-            encoding = NULL;
+            // buffer now owns encoding -- don't free it below
+            dealloc_encoding = false;
         }
     } else if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(window, paths[0], encoding);
+        window_open_file(window, paths[0], encoding_to_string(&encoding));
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(window, paths, encoding);
+        window_open_files(window, paths, encoding_to_string(&encoding));
     }
 
-    free(encoding);
+    if (dealloc_encoding) {
+        free_encoding(&encoding);
+    }
     if (use_glob) {
         globfree(&globbuf);
     }
@@ -981,8 +990,9 @@ static bool stat_changed(const struct stat *const a, const struct stat *const b)
 static void cmd_save(const char *pf, char **args)
 {
     char *absolute = buffer->abs_filename;
-    char *encoding = buffer->encoding;
-    const char *enc = NULL;
+    Encoding encoding = buffer->encoding;
+    bool encoding_alloced = false;
+    const char *requested_encoding = NULL;
     bool force = false;
     bool prompt = false;
     LineEndingType newline = buffer->newline;
@@ -996,7 +1006,7 @@ static void cmd_save(const char *pf, char **args)
             newline = NEWLINE_DOS;
             break;
         case 'e':
-            enc = *args++;
+            requested_encoding = *args++;
             break;
         case 'f':
             force = true;
@@ -1011,12 +1021,16 @@ static void cmd_save(const char *pf, char **args)
         pf++;
     }
 
-    if (enc) {
-        encoding = normalize_encoding_name(enc);
-        if (encoding == NULL) {
-            error_msg("Unsupported encoding %s", enc);
+    if (requested_encoding) {
+        if (
+            lookup_encoding(requested_encoding) != UTF8
+            && !encoding_supported_by_iconv(requested_encoding)
+        ) {
+            error_msg("Unsupported encoding %s", requested_encoding);
             return;
         }
+        encoding = encoding_from_name(requested_encoding);
+        encoding_alloced = true;
     }
 
     // The normalize_encoding_name() call above may have allocated memory,
@@ -1133,15 +1147,15 @@ static void cmd_save(const char *pf, char **args)
         // Allow chmod 755 etc.
         buffer->st.st_mode = st.st_mode;
     }
-    if (save_buffer(buffer, absolute, encoding, newline)) {
+    if (save_buffer(buffer, absolute, encoding_to_string(&encoding), newline)) {
         goto error;
     }
 
     buffer->saved_change = buffer->cur_change;
     buffer->readonly = false;
     buffer->newline = newline;
-    if (encoding != buffer->encoding) {
-        free(buffer->encoding);
+    if (encoding_alloced) {
+        free_encoding(&buffer->encoding);
         buffer->encoding = encoding;
     }
 
@@ -1175,8 +1189,8 @@ error:
     if (absolute != buffer->abs_filename) {
         free(absolute);
     }
-    if (encoding != buffer->encoding) {
-        free(encoding);
+    if (encoding_alloced) {
+        free_encoding(&encoding);
     }
 }
 

@@ -60,7 +60,9 @@ Buffer *buffer_new(const char *encoding)
     b->id = ++id;
     b->newline = editor.options.newline;
     if (encoding) {
-        b->encoding = xstrdup(encoding);
+        b->encoding = encoding_from_name(encoding);
+    } else {
+        b->encoding.type = ENCODING_AUTODETECT;
     }
 
     memcpy(&b->options, &editor.options, sizeof(CommonOptions));
@@ -106,7 +108,7 @@ void free_buffer(Buffer *b)
     free(b->views.ptrs);
     free(b->display_filename);
     free(b->abs_filename);
-    free(b->encoding);
+    free_encoding(&b->encoding);
     free_local_options(&b->options);
     free(b);
 }

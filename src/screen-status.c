@@ -124,7 +124,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_pos(f);
                 break;
             case 'E':
-                add_status_str(f, v->buffer->encoding);
+                add_status_str(f, encoding_to_string(&v->buffer->encoding));
                 break;
             case 'M': {
                 if (f->misc_status != NULL) {
