@@ -223,6 +223,7 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
         break;
     case MOD_CTRL | KEY_DELETE:
     case MOD_META | KEY_DELETE:
+    case MOD_META | 'd':
         cmdline_delete_word(c);
         break;
 
@@ -249,9 +250,11 @@ int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key)
         cmdline_next_char(c);
         return 1;
     case CTRL(KEY_LEFT):
+    case MOD_META | 'b':
         cmdline_prev_word(c);
         return 1;
     case CTRL(KEY_RIGHT):
+    case MOD_META | 'f':
         cmdline_next_word(c);
         return 1;
 
