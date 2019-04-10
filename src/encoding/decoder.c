@@ -46,7 +46,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
                 encoding = "ISO-8859-1";
             } else {
                 // Assuming locale's encoding
-                encoding = editor.charset;
+                encoding = encoding_to_string(&editor.charset);
             }
             if (set_encoding(dec, encoding)) {
                 // FIXME: error message?

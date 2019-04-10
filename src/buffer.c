@@ -49,7 +49,7 @@ const char *buffer_filename(const Buffer *b)
     return b->display_filename;
 }
 
-Buffer *buffer_new(const char *encoding)
+Buffer *buffer_new(const Encoding *encoding)
 {
     static int id;
 
@@ -59,8 +59,9 @@ Buffer *buffer_new(const char *encoding)
     b->saved_change = &b->change_head;
     b->id = ++id;
     b->newline = editor.options.newline;
+
     if (encoding) {
-        b->encoding = encoding_from_name(encoding);
+        b->encoding = encoding_clone(encoding);
     } else {
         b->encoding.type = ENCODING_AUTODETECT;
     }
@@ -76,7 +77,7 @@ Buffer *buffer_new(const char *encoding)
 
 Buffer *open_empty_buffer(void)
 {
-    Buffer *b = buffer_new(editor.charset);
+    Buffer *b = buffer_new(&editor.charset);
 
     // At least one block required
     Block *blk = block_new(1);

@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 
     Buffer *stdin_buffer = NULL;
     if (!isatty(STDIN_FILENO)) {
-        Buffer *b = buffer_new(editor.charset);
+        Buffer *b = buffer_new(&editor.charset);
         if (read_blocks(b, STDIN_FILENO) == 0) {
             b->display_filename = xstrdup("(stdin)");
             stdin_buffer = b;

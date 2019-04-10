@@ -5,6 +5,7 @@
 #include "cmdline.h"
 #include "mode.h"
 #include "options.h"
+#include "encoding/encoding.h"
 #include "terminal/color.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -30,7 +31,7 @@ typedef struct {
     GlobalOptions options;
     const char *home_dir;
     const char *user_config_dir;
-    const char *charset;
+    Encoding charset;
     const char *pager;
     bool child_controls_terminal;
     bool everything_changed;

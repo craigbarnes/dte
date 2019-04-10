@@ -130,7 +130,7 @@ static int decode_and_add_blocks (
         if (dec->encoding) {
             b->encoding = encoding_from_name(dec->encoding);
         } else {
-            b->encoding = encoding_from_name(editor.charset);
+            b->encoding = encoding_clone(&editor.charset);
         }
     }
 
@@ -257,7 +257,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
-        b->encoding = encoding_from_name(editor.charset);
+        b->encoding = encoding_clone(&editor.charset);
     }
 
     return 0;
@@ -326,7 +326,7 @@ write_error:
 int save_buffer (
     Buffer *b,
     const char *filename,
-    const char *encoding,
+    const Encoding *encoding,
     LineEndingType newline
 ) {
     FileEncoder *enc;
@@ -382,7 +382,7 @@ int save_buffer (
         close(fd);
         goto error;
     }
-    if (write_buffer(b, enc, lookup_encoding(encoding))) {
+    if (write_buffer(b, enc, encoding->type)) {
         close(fd);
         goto error;
     }

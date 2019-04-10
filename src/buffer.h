@@ -80,7 +80,7 @@ void update_short_filename_cwd(Buffer *b, const char *cwd);
 void update_short_filename(Buffer *b);
 Buffer *find_buffer(const char *abs_filename);
 Buffer *find_buffer_by_id(unsigned int id);
-Buffer *buffer_new(const char *encoding);
+Buffer *buffer_new(const Encoding *encoding);
 Buffer *open_empty_buffer(void);
 void free_buffer(Buffer *b);
 bool buffer_detect_filetype(Buffer *b);

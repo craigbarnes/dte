@@ -94,8 +94,8 @@ void init_editor_state(void)
     }
 
     setlocale(LC_CTYPE, "");
-    editor.charset = nl_langinfo(CODESET);
-    editor.term_utf8 = streq(editor.charset, "UTF-8");
+    editor.charset = encoding_from_name(nl_langinfo(CODESET));
+    editor.term_utf8 = (editor.charset.type == UTF8);
 
     editor.options.statusline_left = xstrdup(" %f%s%m%r%s%M");
     editor.options.statusline_right = xstrdup(" %y,%X   %u   %E %n %t   %p ");

@@ -40,7 +40,7 @@ View *window_open_buffer (
     Window *w,
     const char *filename,
     bool must_exist,
-    const char *encoding
+    const Encoding *encoding
 ) {
     char *absolute;
     bool dir_missing = false;
@@ -333,7 +333,7 @@ static bool is_useless_empty_view(View *v)
     return true;
 }
 
-View *window_open_file(Window *w, const char *filename, const char *encoding)
+View *window_open_file(Window *w, const char *filename, const Encoding *encoding)
 {
     View *prev = w->view;
     bool useless = is_useless_empty_view(prev);
@@ -353,7 +353,7 @@ View *window_open_file(Window *w, const char *filename, const char *encoding)
     return v;
 }
 
-void window_open_files(Window *w, char **filenames, const char *encoding)
+void window_open_files(Window *w, char **filenames, const Encoding *encoding)
 {
     View *empty = w->view;
     bool useless = is_useless_empty_view(empty);

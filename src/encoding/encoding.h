@@ -47,13 +47,23 @@ static inline Encoding encoding_from_name(const char *name)
 }
 
 NONNULL_ARGS
-static inline const char *encoding_to_string(Encoding *e)
+static inline const char *encoding_to_string(const Encoding *e)
 {
     if (e->type == UNKNOWN_ENCODING) {
         return e->name;
     } else {
         return encoding_type_to_string(e->type);
     }
+}
+
+NONNULL_ARGS
+static inline Encoding encoding_clone(const Encoding *e)
+{
+    Encoding clone = {
+        .type = e->type,
+        .name = (e->type == UNKNOWN_ENCODING) ? xstrdup(e->name) : NULL
+    };
+    return clone;
 }
 
 static inline void free_encoding(Encoding *e)

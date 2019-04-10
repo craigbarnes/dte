@@ -715,11 +715,11 @@ static void cmd_open(const char *pf, char **args)
         }
     } else if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(window, paths[0], encoding_to_string(&encoding));
+        window_open_file(window, paths[0], &encoding);
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(window, paths, encoding_to_string(&encoding));
+        window_open_files(window, paths, &encoding);
     }
 
     if (dealloc_encoding) {
@@ -1147,7 +1147,7 @@ static void cmd_save(const char *pf, char **args)
         // Allow chmod 755 etc.
         buffer->st.st_mode = st.st_mode;
     }
-    if (save_buffer(buffer, absolute, encoding_to_string(&encoding), newline)) {
+    if (save_buffer(buffer, absolute, &encoding, newline)) {
         goto error;
     }
 

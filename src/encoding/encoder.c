@@ -6,15 +6,15 @@
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 
-FileEncoder *new_file_encoder(const char *encoding, LineEndingType nls, int fd)
+FileEncoder *new_file_encoder(const Encoding *encoding, LineEndingType nls, int fd)
 {
     FileEncoder *enc = xnew0(FileEncoder, 1);
 
     enc->nls = nls;
     enc->fd = fd;
 
-    if (strcmp(encoding, "UTF-8") != 0) {
-        enc->cconv = cconv_from_utf8(encoding);
+    if (encoding->type == UTF8) {
+        enc->cconv = cconv_from_utf8(encoding_to_string(encoding));
         if (enc->cconv == NULL) {
             free(enc);
             return NULL;
