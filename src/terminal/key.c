@@ -163,21 +163,3 @@ const char *key_to_string(KeyCode k)
 
     return buf;
 }
-
-bool key_to_ctrl(KeyCode k, unsigned char *byte)
-{
-    if (keycode_get_modifiers(k) != MOD_CTRL) {
-        return false;
-    }
-
-    const KeyCode key = keycode_get_key(k);
-    if (key >= '@' && key <= '_') {
-        *byte = key & ~0x40;
-        return true;
-    } else if (key == '?') {
-        *byte = 0x7f;
-        return true;
-    }
-
-    return false;
-}
