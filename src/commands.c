@@ -1033,7 +1033,7 @@ static void cmd_save(const char *pf, char **args)
         encoding_alloced = true;
     }
 
-    // The normalize_encoding_name() call above may have allocated memory,
+    // The encoding_from_name() call above may have allocated memory,
     // so use "goto error" instead of early return beyond this point, to
     // ensure correct de-allocation.
 

@@ -321,28 +321,3 @@ bool encoding_supported_by_iconv(const char *encoding)
     iconv_close(cd);
     return true;
 }
-
-char *normalize_encoding_name(const char *name)
-{
-    EncodingType type = lookup_encoding(name);
-    if (type == UTF8) {
-        return xstrdup(encoding_type_to_string(UTF8));
-    }
-
-    char *normalized;
-    if (type == UNKNOWN_ENCODING) {
-        normalized = xstrdup(name);
-        for (size_t i = 0; normalized[i]; i++) {
-            normalized[i] = ascii_toupper(normalized[i]);
-        }
-    } else {
-        normalized = xstrdup(encoding_type_to_string(type));
-    }
-
-    if (encoding_supported_by_iconv(normalized)) {
-        return normalized;
-    }
-
-    free(normalized);
-    return NULL;
-}

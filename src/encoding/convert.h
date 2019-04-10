@@ -16,6 +16,5 @@ char *cconv_consume_all(struct cconv *c, size_t *len);
 void cconv_free(struct cconv *c);
 
 bool encoding_supported_by_iconv(const char *encoding);
-char *normalize_encoding_name(const char *name);
 
 #endif

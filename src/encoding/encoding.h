@@ -41,7 +41,7 @@ static inline Encoding encoding_from_name(const char *name)
     const EncodingType type = lookup_encoding(name);
     Encoding e = {
         .type = type,
-        .name = (type == UNKNOWN_ENCODING) ? xstrdup(name) : NULL
+        .name = (type == UNKNOWN_ENCODING) ? xstrdup_toupper(name) : NULL
     };
     return e;
 }
