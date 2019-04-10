@@ -240,7 +240,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         }
         if (b->st.st_size / 1024 / 1024 > editor.options.filesize_limit) {
             error_msg (
-                "File size exceeds 'filesize-limit' option (%dMiB): %s",
+                "File size exceeds 'filesize-limit' option (%uMiB): %s",
                 editor.options.filesize_limit,
                 filename
             );

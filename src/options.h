@@ -43,17 +43,17 @@ enum tab_bar {
 };
 
 #define COMMON_OPTIONS \
-    int auto_indent; \
-    int detect_indent; \
-    int editorconfig; \
-    int emulate_tab; \
-    int expand_tab; \
-    int file_history; \
-    int indent_width; \
-    int syntax; \
-    int tab_width; \
-    int text_width; \
-    int ws_error
+    unsigned int auto_indent; \
+    unsigned int detect_indent; \
+    unsigned int editorconfig; \
+    unsigned int emulate_tab; \
+    unsigned int expand_tab; \
+    unsigned int file_history; \
+    unsigned int indent_width; \
+    unsigned int syntax; \
+    unsigned int tab_width; \
+    unsigned int text_width; \
+    unsigned int ws_error
 
 typedef struct {
     COMMON_OPTIONS;
@@ -62,7 +62,7 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only local
-    int brace_indent;
+    unsigned int brace_indent;
     char *filetype;
     char *indent_regex;
 } LocalOptions;
@@ -71,19 +71,19 @@ typedef struct {
     COMMON_OPTIONS;
     // Only global
     SearchCaseSensitivity case_sensitive_search;
-    int display_special;
-    int esc_timeout;
-    int lock_files;
+    unsigned int display_special;
+    unsigned int esc_timeout;
+    unsigned int lock_files;
     LineEndingType newline; // Default value for new files
-    int scroll_margin;
-    int set_window_title;
-    int show_line_numbers;
+    unsigned int scroll_margin;
+    unsigned int set_window_title;
+    unsigned int show_line_numbers;
     const char *statusline_left;
     const char *statusline_right;
     enum tab_bar tab_bar;
-    int tab_bar_max_components;
-    int tab_bar_width;
-    int filesize_limit;
+    unsigned int tab_bar_max_components;
+    unsigned int tab_bar_width;
+    unsigned int filesize_limit;
 } GlobalOptions;
 
 #undef COMMON_OPTIONS

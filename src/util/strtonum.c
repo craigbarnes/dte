@@ -81,6 +81,21 @@ bool str_to_int(const char *str, int *valp)
     return true;
 }
 
+bool str_to_uint(const char *str, unsigned int *valp)
+{
+    const size_t len = strlen(str);
+    if (len == 0) {
+        return false;
+    }
+    uintmax_t val;
+    const size_t n = buf_parse_uintmax(str, len, &val);
+    if (n != len || val > UINT_MAX) {
+        return false;
+    }
+    *valp = (unsigned int)val;
+    return true;
+}
+
 bool str_to_size(const char *str, size_t *valp)
 {
     const size_t len = strlen(str);
