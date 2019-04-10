@@ -35,12 +35,12 @@ typedef enum {
     CSS_AUTO,
 } SearchCaseSensitivity;
 
-enum tab_bar {
+typedef enum {
     TAB_BAR_HIDDEN,
     TAB_BAR_HORIZONTAL,
     TAB_BAR_VERTICAL,
     TAB_BAR_AUTO,
-};
+} TabBarMode;
 
 #define COMMON_OPTIONS \
     unsigned int auto_indent; \
@@ -70,20 +70,20 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only global
-    SearchCaseSensitivity case_sensitive_search;
     unsigned int display_special;
     unsigned int esc_timeout;
+    unsigned int filesize_limit;
     unsigned int lock_files;
-    LineEndingType newline; // Default value for new files
     unsigned int scroll_margin;
     unsigned int set_window_title;
     unsigned int show_line_numbers;
-    const char *statusline_left;
-    const char *statusline_right;
-    enum tab_bar tab_bar;
     unsigned int tab_bar_max_components;
     unsigned int tab_bar_width;
-    unsigned int filesize_limit;
+    LineEndingType newline; // Default value for new files
+    SearchCaseSensitivity case_sensitive_search;
+    TabBarMode tab_bar;
+    const char *statusline_left;
+    const char *statusline_right;
 } GlobalOptions;
 
 #undef COMMON_OPTIONS

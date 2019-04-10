@@ -394,7 +394,7 @@ static int calc_vertical_tabbar_width(const Window *win)
     return w;
 }
 
-enum tab_bar tabbar_visibility(const Window *win)
+TabBarMode tabbar_visibility(const Window *win)
 {
     switch (editor.options.tab_bar) {
     case TAB_BAR_HIDDEN:
