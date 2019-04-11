@@ -21,6 +21,7 @@
 #define IEXPECT_GT(a, b) IEXPECT_TRUE(a > b)
 
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
+#define ASSERT_TRUE(x) ASSERT_EQ(!!(x), 1)
 
 extern unsigned int failed;
 

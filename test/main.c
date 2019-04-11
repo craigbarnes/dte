@@ -1,4 +1,5 @@
 #include <langinfo.h>
+#include <limits.h>
 #include <locale.h>
 #include <string.h>
 #include "test.h"
@@ -57,8 +58,17 @@ static void test_commands_array(void)
     }
 }
 
+static void test_posix_sanity(void)
+{
+    // These assertions are not guaranteed by ISO C99, but they are required
+    // by POSIX and are relied upon by this codebase.
+    ASSERT_TRUE(NULL == (void*)0);
+    ASSERT_EQ(CHAR_BIT, 8);
+}
+
 int main(void)
 {
+    test_posix_sanity();
     init_editor_state();
 
     test_relative_filename();
