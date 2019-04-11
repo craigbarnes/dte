@@ -87,24 +87,25 @@ static void set_size(Frame *f, int size)
 
 static void divide_equally(const Frame *f)
 {
-    int q, r, s, n, used, count = f->frames.count;
-    int *size, *min;
+    size_t count = f->frames.count;
+    BUG_ON(count == 0);
 
-    size = xnew0(int, count);
-    min = xnew(int, count);
-    for (int i = 0; i < count; i++) {
+    int *size = xnew0(int, count);
+    int *min = xnew(int, count);
+    for (size_t i = 0; i < count; i++) {
         min[i] = get_min(f->frames.ptrs[i]);
     }
 
-    s = get_container_size(f);
+    int q, r, used;
+    int s = get_container_size(f);
+    size_t n = count;
 
     // Consume q and r as equally as possible
-    n = count;
     do {
         used = 0;
         q = s / n;
         r = s % n;
-        for (int i = 0; i < count; i++) {
+        for (size_t i = 0; i < count; i++) {
             if (size[i] == 0 && min[i] > q) {
                 size[i] = min[i];
                 used += min[i];
@@ -114,13 +115,11 @@ static void divide_equally(const Frame *f)
         s -= used;
     } while (used && n > 0);
 
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         Frame *c = f->frames.ptrs[i];
-
         if (size[i] == 0) {
             size[i] = q + (r-- > 0);
         }
-
         set_size(c, size[i]);
     }
 
