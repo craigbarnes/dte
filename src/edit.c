@@ -795,11 +795,12 @@ void format_paragraph(int text_width)
 
     char *sel = block_iter_get_bytes(&view->cursor, len);
     size_t indent_width = get_indent_width(sel, len);
+    char *indent = make_indent(indent_width);
 
     ParagraphFormatter pf = {
         .buf = STRING_INIT,
-        .indent = make_indent(indent_width),
-        .indent_len = pf.indent ? strlen(pf.indent) : 0,
+        .indent = indent,
+        .indent_len = indent ? strlen(indent) : 0,
         .indent_width = indent_width,
         .cur_width = 0,
         .text_width = text_width
