@@ -12,6 +12,7 @@ Features
 * Syntax highlighting
 * Customizable color schemes
 * Customizable key bindings
+* Support for all `xterm` Ctrl/Alt/Shift key codes
 * Command language with auto-completion
 * Unicode 11 compatible text rendering
 * Support for multiple encodings (using [iconv])
