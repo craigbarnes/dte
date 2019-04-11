@@ -30,6 +30,7 @@ extern const uint8_t ascii_table[256];
 #define ascii_isalpha(x) ascii_test(x, ASCII_ALPHA)
 #define ascii_isalnum(x) ascii_test(x, ASCII_ALNUM)
 #define ascii_isprint(x) (!ascii_test(x, ASCII_CNTRL | ASCII_NONASCII))
+#define ascii_is_nonspace_cntrl(x) (ascii_table[(unsigned char)(x)] == ASCII_CNTRL)
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)

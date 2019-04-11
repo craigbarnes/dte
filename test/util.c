@@ -57,6 +57,21 @@ static void test_ascii(void)
     EXPECT_FALSE(ascii_iscntrl(0x80));
     EXPECT_FALSE(ascii_iscntrl(0xFF));
 
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\0'));
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\a'));
+    EXPECT_TRUE(ascii_is_nonspace_cntrl('\b'));
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x0E));
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x1F));
+    EXPECT_TRUE(ascii_is_nonspace_cntrl(0x7F));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\t'));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\n'));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('\r'));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(' '));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl('a'));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x7E));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0x80));
+    EXPECT_FALSE(ascii_is_nonspace_cntrl(0xFF));
+
     EXPECT_TRUE(ascii_isprint(' '));
     EXPECT_TRUE(ascii_isprint('!'));
     EXPECT_TRUE(ascii_isprint('/'));

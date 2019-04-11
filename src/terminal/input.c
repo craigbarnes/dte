@@ -9,6 +9,7 @@
 #include "input.h"
 #include "terminal.h"
 #include "../editor.h"
+#include "../util/ascii.h"
 #include "../util/xmalloc.h"
 
 static char input_buf[256];
@@ -162,18 +163,8 @@ static bool read_simple(KeyCode *key)
 static bool is_text(const char *const str, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
-        // NOTE: must be unsigned!
-        const unsigned char ch = str[i];
-        switch (ch) {
-        case '\t':
-        case '\n':
-        case '\r':
-            break;
-        default:
-            if (ch < 0x20 || ch == 0x7f) {
-                return false;
-            }
-            break;
+        if (ascii_is_nonspace_cntrl(str[i])) {
+            return false;
         }
     }
     return true;
