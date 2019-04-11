@@ -233,7 +233,9 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case '5': case '6': case '7': case '8': case '9':
         return parse_csi_num(buf, length, i - 1, k);
     case '[':
-        if (i >= length) return -1;
+        if (i >= length) {
+            return -1;
+        }
         switch (ch = buf[i++]) {
         // Linux console keys
         case 'A': // F1
