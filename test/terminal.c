@@ -143,6 +143,10 @@ static void test_xterm_parse_key(void)
         {"\033[d", 3, MOD_SHIFT | KEY_LEFT},
         // xterm + `modifyOtherKeys` option
         {"\033[27;5;9~", 9, MOD_CTRL | '\t'},
+        {"\033[27;3;1114111~", 15, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
+        {"\033[27;3;1114112~", 0, 0},
+        {"\033[27;999999999999999999999;123~", 0, 0},
+        {"\033[27;123;99999999999999999~", 0, 0},
         // www.leonerd.org.uk/hacks/fixterms/
         {"\033[0;3u", 6, MOD_META | 0},
         {"\033[1;3u", 6, MOD_META | 1},
