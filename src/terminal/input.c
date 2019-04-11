@@ -55,10 +55,17 @@ static bool fill_buffer_timeout(void)
         .tv_sec = editor.options.esc_timeout / 1000,
         .tv_usec = (editor.options.esc_timeout % 1000) * 1000
     };
-    fd_set set;
 
+    fd_set set;
     FD_ZERO(&set);
-    FD_SET(STDIN_FILENO, &set); // NOLINT(clang-analyzer-core.uninitialized)
+
+    // The Clang static analyzer can't always determine that the
+    // FD_ZERO() call above has initialized the fd_set -- in glibc
+    // it's implemented via "__asm__ __volatile__".
+    //
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
+    FD_SET(STDIN_FILENO, &set);
+
     int rc = select(1, &set, NULL, NULL, &tv);
     if (rc > 0 && fill_buffer()) {
         return true;
@@ -250,10 +257,13 @@ char *term_read_paste(size_t *size)
             .tv_sec = 0,
             .tv_usec = 0
         };
-        fd_set set;
 
+        fd_set set;
         FD_ZERO(&set);
-        FD_SET(STDIN_FILENO, &set); // NOLINT(clang-analyzer-core.uninitialized)
+
+        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
+        FD_SET(STDIN_FILENO, &set);
+
         int rc = select(1, &set, NULL, NULL, &tv);
         if (rc < 0 && errno == EINTR) {
             continue;
