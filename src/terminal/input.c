@@ -122,7 +122,7 @@ static bool read_simple(KeyCode *key)
          * 1111 0xxx valid
          * 1111 1xxx invalid
          */
-        CodePoint u, bit = 1 << 6;
+        CodePoint bit = 1 << 6;
         int count = 0;
 
         while (ch & bit) {
@@ -133,7 +133,7 @@ static bool read_simple(KeyCode *key)
             // Invalid first byte
             return false;
         }
-        u = ch & (bit - 1);
+        CodePoint u = ch & (bit - 1);
         do {
             if (!input_get_byte(&ch)) {
                 return false;
