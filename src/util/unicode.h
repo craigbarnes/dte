@@ -16,6 +16,12 @@ static inline bool u_is_unicode(CodePoint u)
 }
 
 CONST_FN
+static inline bool u_is_cntrl(CodePoint u)
+{
+    return u < 0x20 || u == 0x7f;
+}
+
+CONST_FN
 static inline bool u_is_upper(CodePoint u)
 {
     return (u - 'A') < 26;

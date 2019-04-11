@@ -1,6 +1,7 @@
 #include <strings.h>
 #include <string.h>
 #include "key.h"
+#include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/uchar.h"
 
@@ -118,6 +119,8 @@ bool parse_key(KeyCode *key, const char *str)
     return false;
 }
 
+#define COPY(dest, src) memcpy(dest, src, STRLEN(src) + 1)
+
 const char *key_to_string(KeyCode k)
 {
     static char buf[32];
@@ -136,29 +139,35 @@ const char *key_to_string(KeyCode k)
         buf[i++] = '-';
     }
 
+    char *const ptr = buf + i;
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
         switch (key) {
         case '\t':
-            strcpy(buf + i, "tab");
+            COPY(ptr, "tab");
             break;
         case KEY_ENTER:
-            strcpy(buf + i, "enter");
+            COPY(ptr, "enter");
             break;
         case ' ':
-            strcpy(buf + i, "space");
+            COPY(ptr, "space");
             break;
         default:
-            // <0x20 or 0x7f shouldn't be possible
+            BUG_ON(u_is_cntrl(key));
             u_set_char_raw(buf, &i, key);
             buf[i] = '\0';
         }
     } else if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        strcpy(buf + i, special_names[key - KEY_SPECIAL_MIN]);
+        static_assert(sizeof(special_names[0]) == 8);
+        memcpy (
+            ptr,
+            special_names[key - KEY_SPECIAL_MIN],
+            sizeof(special_names[0])
+        );
     } else if (key == KEY_PASTE) {
-        strcpy(buf + i, "paste");
+        COPY(ptr, "paste");
     } else {
-        strcpy(buf + i, "???");
+        COPY(ptr, "???");
     }
 
     return buf;

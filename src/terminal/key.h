@@ -72,6 +72,8 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
 #define CTRL(x) (MOD_CTRL | (x))
 
 bool parse_key(KeyCode *key, const char *str);
+
+RETURNS_NONNULL
 const char *key_to_string(KeyCode key);
 
 #endif

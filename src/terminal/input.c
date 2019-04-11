@@ -58,7 +58,7 @@ static bool fill_buffer_timeout(void)
     fd_set set;
 
     FD_ZERO(&set);
-    FD_SET(STDIN_FILENO, &set);
+    FD_SET(STDIN_FILENO, &set); // NOLINT(clang-analyzer-core.uninitialized)
     int rc = select(1, &set, NULL, NULL, &tv);
     if (rc > 0 && fill_buffer()) {
         return true;
@@ -253,7 +253,7 @@ char *term_read_paste(size_t *size)
         fd_set set;
 
         FD_ZERO(&set);
-        FD_SET(STDIN_FILENO, &set);
+        FD_SET(STDIN_FILENO, &set); // NOLINT(clang-analyzer-core.uninitialized)
         int rc = select(1, &set, NULL, NULL, &tv);
         if (rc < 0 && errno == EINTR) {
             continue;
