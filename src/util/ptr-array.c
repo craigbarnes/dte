@@ -1,6 +1,5 @@
 #include <string.h>
 #include "ptr-array.h"
-#include "../debug.h"
 
 void ptr_array_add(PointerArray *array, void *ptr)
 {
@@ -13,11 +12,6 @@ void ptr_array_add(PointerArray *array, void *ptr)
         }
         xrenew(array->ptrs, array->alloc);
     }
-
-    // Make sure static analyzers know that this can never be NULL on
-    // return, since apparently some can't figure that out themselves
-    BUG_ON(array->ptrs == NULL);
-
     array->ptrs[array->count++] = ptr;
 }
 
