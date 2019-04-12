@@ -7,9 +7,12 @@ LCOVFLAGS ?= --config-file mk/lcovrc
 GENHTML ?= genhtml
 GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 
+clang_tidy_targets = $(addprefix clang-tidy-, $(editor_sources) $(test_sources))
+
 dist: $(firstword $(DIST_ALL))
 dist-all: $(DIST_ALL)
 git-hooks: $(GIT_HOOKS)
+clang-tidy: $(clang_tidy_targets)
 
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'
@@ -53,9 +56,13 @@ build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
+$(clang_tidy_targets): clang-tidy-%:
+	$(E) TIDY $*
+	$(Q) clang-tidy -quiet $* -- -DDEBUG=3 1>&2
+
 
 CLEANFILES += dte-*.tar.gz
 
 .PHONY: \
     check-syntax-files check-dist dist dist-all git-hooks \
-    show-sizes coverage-report
+    show-sizes coverage-report clang-tidy $(clang_tidy_targets)

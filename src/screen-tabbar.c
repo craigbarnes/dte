@@ -259,9 +259,9 @@ static void print_vertical_tabbar(Window *win)
 {
     int width = vertical_tabbar_width(win);
     int h = win->edit_h;
-    int i, n, cur_idx = 0;
+    size_t cur_idx = 0;
 
-    for (i = 0; i < win->views.count; i++) {
+    for (size_t i = 0; i < win->views.count; i++) {
         if (win->view == win->views.ptrs[i]) {
             cur_idx = i;
             break;
@@ -271,8 +271,7 @@ static void print_vertical_tabbar(Window *win)
         // All tabs fit
         win->first_tab_idx = 0;
     } else {
-        int max_y = win->first_tab_idx + h - 1;
-
+        size_t max_y = win->first_tab_idx + h - 1;
         if (win->first_tab_idx > cur_idx) {
             win->first_tab_idx = cur_idx;
         }
@@ -282,12 +281,13 @@ static void print_vertical_tabbar(Window *win)
     }
 
     buf_reset(win->x, width, 0);
-    n = h;
+    int n = h;
     if (n + win->first_tab_idx > win->views.count) {
         n = win->views.count - win->first_tab_idx;
     }
+    size_t i;
     for (i = 0; i < n; i++) {
-        int idx = win->first_tab_idx + i;
+        size_t idx = win->first_tab_idx + i;
         obuf.x = 0;
         terminal.move_cursor(win->x, win->y + i);
         print_vertical_tab_title(win->views.ptrs[idx], idx, width);

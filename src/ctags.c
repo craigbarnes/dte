@@ -151,7 +151,7 @@ bool next_tag (
             continue;
         }
 
-        if (len <= prefix_len || memcmp(line, prefix, prefix_len)) {
+        if (len <= prefix_len || memcmp(line, prefix, prefix_len) != 0) {
             continue;
         }
 

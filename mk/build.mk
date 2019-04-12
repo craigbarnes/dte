@@ -61,6 +61,9 @@ test_objects := $(call prefix-obj, build/test/, \
 
 all_objects := $(editor_objects) $(test_objects)
 
+editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
+test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
+
 ifdef WERROR
   WARNINGS += -Werror
 endif

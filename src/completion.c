@@ -94,7 +94,7 @@ static void do_collect_files (
         const char *name = de->d_name;
 
         if (flen) {
-            if (strncmp(name, fileprefix, flen)) {
+            if (strncmp(name, fileprefix, flen) != 0) {
                 continue;
             }
         } else {
