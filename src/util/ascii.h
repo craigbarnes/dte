@@ -22,7 +22,6 @@ extern const uint8_t ascii_table[256];
 
 #define ascii_test(x, mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
-#define ascii_isblank(x) ((x) == ' ' || (x) == '\t')
 #define ascii_isdigit(x) ascii_test(x, ASCII_DIGIT)
 #define ascii_iscntrl(x) ascii_test(x, ASCII_CNTRL)
 #define ascii_islower(x) ascii_test(x, ASCII_LOWER)
@@ -35,6 +34,12 @@ extern const uint8_t ascii_table[256];
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
+
+CONST_FN
+static inline bool ascii_isblank(unsigned char c)
+{
+    return c == ' ' || c == '\t';
+}
 
 CONST_FN
 static inline unsigned char ascii_tolower(unsigned char c)
