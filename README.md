@@ -120,14 +120,14 @@ Public License version 2 for more details.
 [GNU Make]: https://www.gnu.org/software/make/
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
-[ECMA-48]: http://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
+[ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
-[POSIX]: http://pubs.opengroup.org/onlinepubs/9699919799/
-[iconv]: http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
-[`sh`]:  http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
-[`awk`]: http://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html
+[POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
+[iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
+[`sh`]:  https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
+[`awk`]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html
 [GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
 [Travis CI]: https://travis-ci.org/craigbarnes/dte
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html

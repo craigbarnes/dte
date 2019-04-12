@@ -1121,6 +1121,6 @@ errors should be highlighted. Set to `""` to disable.
 
 
 [`dte-syntax`]: dte-syntax.html
-[`execvp`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
-[`glob`]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
+[`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
+[`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`xterm`]: https://invisible-island.net/xterm/

@@ -521,7 +521,7 @@ static void for_each_window_data (
 
 // Conversion from a void* pointer to a function pointer is not defined
 // by the ISO C standard, but POSIX explicitly requires it:
-// http://pubs.opengroup.org/onlinepubs/9699919799/functions/dlsym.html
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/dlsym.html
 IGNORE_WARNING("-Wpedantic")
 
 static void call_data(Window *w, void *data)
