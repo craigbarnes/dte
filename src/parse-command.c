@@ -50,7 +50,7 @@ static void parse_dq(const char *cmd, size_t *posp, String *buf)
     size_t pos = *posp;
 
     while (cmd[pos]) {
-        char ch = cmd[pos++];
+        unsigned char ch = cmd[pos++];
 
         if (ch == '"') {
             break;
@@ -59,17 +59,15 @@ static void parse_dq(const char *cmd, size_t *posp, String *buf)
         if (ch == '\\' && cmd[pos]) {
             ch = cmd[pos++];
             switch (ch) {
-            case 'a': ch = '\a'; goto add_byte;
-            case 'b': ch = '\b'; goto add_byte;
-            case 'f': ch = '\f'; goto add_byte;
-            case 'n': ch = '\n'; goto add_byte;
-            case 'r': ch = '\r'; goto add_byte;
-            case 't': ch = '\t'; goto add_byte;
-            case 'v': ch = '\v'; goto add_byte;
+            case 'a': ch = '\a'; break;
+            case 'b': ch = '\b'; break;
+            case 'f': ch = '\f'; break;
+            case 'n': ch = '\n'; break;
+            case 'r': ch = '\r'; break;
+            case 't': ch = '\t'; break;
+            case 'v': ch = '\v'; break;
             case '\\':
             case '"':
-            add_byte:
-                string_add_byte(buf, ch);
                 break;
             case 'x':
                 if (cmd[pos]) {
@@ -79,26 +77,27 @@ static void parse_dq(const char *cmd, size_t *posp, String *buf)
                         x2 = hex_decode(cmd[pos]);
                         if (x2 >= 0) {
                             pos++;
-                            string_add_byte(buf, x1 << 4 | x2);
+                            ch = x1 << 4 | x2;
+                            break;
                         }
                     }
                 }
-                break;
+                continue;
             case 'u':
                 pos += unicode_escape(cmd + pos, 4, buf);
-                break;
+                continue;
             case 'U':
                 pos += unicode_escape(cmd + pos, 8, buf);
-                break;
+                continue;
             default:
                 string_add_byte(buf, '\\');
-                string_add_byte(buf, ch);
                 break;
             }
-        } else {
-            string_add_byte(buf, ch);
         }
+
+        string_add_byte(buf, ch);
     }
+
     *posp = pos;
 }
 
