@@ -159,7 +159,12 @@ static void test_string(void)
     for (size_t i = 0; i < 40; i++) {
         string_add_byte(&s, 'a');
     }
+
+    EXPECT_EQ(s.len, 40);
     cstr = string_steal_cstring(&s);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    EXPECT_PTREQ(s.buffer, NULL);
     EXPECT_STREQ(cstr, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     free(cstr);
 }
