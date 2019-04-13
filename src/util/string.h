@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "macros.h"
 #include "unicode.h"
+#include "xmalloc.h"
 
 typedef struct {
     unsigned char NONSTRING *buffer;
@@ -26,6 +27,16 @@ static inline NONNULL_ARGS void string_init(String *s)
     s->buffer = NULL;
     s->alloc = 0;
     s->len = 0;
+}
+
+static inline String string_new(size_t size)
+{
+    size = ROUND_UP(size, 16);
+    return (String) {
+        .buffer = size ? xmalloc(size) : NULL,
+        .alloc = size,
+        .len = 0
+    };
 }
 
 static inline NONNULL_ARGS void string_clear(String *s)

@@ -142,7 +142,11 @@ static void do_collect_files (
 
 static void collect_files(bool directories_only)
 {
-    char *str = parse_command_arg(completion.escaped, false);
+    char *str = parse_command_arg (
+        completion.escaped,
+        strlen(completion.escaped),
+        false
+    );
 
     if (!streq(completion.parsed, str)) {
         // ~ was expanded
@@ -199,7 +203,7 @@ static void collect_env(const char *prefix)
         if (str_has_prefix(e, prefix)) {
             const char *end = strchr(e, '=');
             if (end) {
-                add_completion(xstrslice(e, 0, end - e));
+                add_completion(xstrcut(e, end - e));
             }
         }
     }
@@ -352,17 +356,17 @@ static void init_completion(void)
                         array.ptrs[i] = NULL;
                     }
                     array.count = save;
-                    ptr_array_add(&array, parse_command_arg(name, true));
+                    ptr_array_add(&array, parse_command_arg(name, end - pos, true));
                 } else {
                     // Remove NULL
                     array.count--;
                 }
             } else {
-                ptr_array_add(&array, parse_command_arg(name, true));
+                ptr_array_add(&array, parse_command_arg(name, end - pos, true));
             }
             free(name);
         } else {
-            ptr_array_add(&array, parse_command_arg(cmd + pos, true));
+            ptr_array_add(&array, parse_command_arg(cmd + pos, end - pos, true));
         }
         pos = end;
     }
@@ -389,7 +393,7 @@ static void init_completion(void)
             completion_pos++;
             completion.escaped = NULL;
             completion.parsed = NULL;
-            completion.head = xstrslice(cmd, 0, completion_pos);
+            completion.head = xstrcut(cmd, completion_pos);
             completion.tail = xstrdup(cmd + editor.cmdline.pos);
             collect_env(name);
             sort_completions();
@@ -400,9 +404,9 @@ static void init_completion(void)
         }
     }
 
-    completion.escaped = xstrslice(str, 0, len);
-    completion.parsed = parse_command_arg(completion.escaped, true);
-    completion.head = xstrslice(cmd, 0, completion_pos);
+    completion.escaped = xstrcut(str, len);
+    completion.parsed = parse_command_arg(completion.escaped, len, true);
+    completion.head = xstrcut(cmd, completion_pos);
     completion.tail = xstrdup(cmd + editor.cmdline.pos);
     completion.add_space = true;
 

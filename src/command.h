@@ -16,7 +16,7 @@ typedef struct {
 } Command;
 
 // parse-command.c
-char *parse_command_arg(const char *cmd, bool tilde);
+char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, Error **err);
 bool parse_commands(PointerArray *array, const char *cmd, Error **err);
 char **copy_string_array(char **src, size_t count);
