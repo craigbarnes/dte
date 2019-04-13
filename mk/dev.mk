@@ -60,6 +60,10 @@ $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
 	$(Q) clang-tidy -quiet $* -- -DDEBUG=3 1>&2
 
+clang-tidy-src/config.c: build/builtin-config.h
+clang-tidy-src/editor.c: build/version.h
+clang-tidy-test/config.c: build/test/data.h
+
 
 CLEANFILES += dte-*.tar.gz
 
