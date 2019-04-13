@@ -639,6 +639,7 @@ void toggle_option_values (
     }
 
     size_t count = count_strings(values);
+    BUG_ON(count == 0);
     size_t current = 0;
     bool error = false;
     char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);

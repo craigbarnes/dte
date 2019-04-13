@@ -50,8 +50,7 @@ static void update_first_tab_idx(Window *win)
 
 static void calculate_tabbar(Window *win)
 {
-    int extra, truncated_count, total_w = 0;
-
+    int total_w = 0;
     for (size_t i = 0, n = win->views.count; i < n; i++) {
         View *v = win->views.ptrs[i];
 
@@ -73,7 +72,7 @@ static void calculate_tabbar(Window *win)
 
     // Truncate all wide tabs
     total_w = 0;
-    truncated_count = 0;
+    int truncated_count = 0;
     for (size_t i = 0, n = win->views.count; i < n; i++) {
         View *v = win->views.ptrs[i];
         int truncated_w = 20;
@@ -94,10 +93,11 @@ static void calculate_tabbar(Window *win)
     }
 
     // All tabs fit after truncating wide tabs
-    extra = win->w - total_w;
+    int extra = win->w - total_w;
 
     // Divide extra space between truncated tabs
     while (extra > 0) {
+        BUG_ON(truncated_count == 0);
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
 
