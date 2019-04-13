@@ -10,12 +10,17 @@
 
 static void string_grow(String *s, size_t more)
 {
-    size_t alloc = ROUND_UP(s->len + more, 16);
-
-    if (alloc > s->alloc) {
-        s->alloc = alloc;
-        s->buffer = xrealloc(s->buffer, s->alloc);
+    const size_t len = s->len + more;
+    size_t alloc = s->alloc;
+    if (alloc >= len) {
+        return;
     }
+    while (alloc < len) {
+        alloc = (alloc * 3 + 2) / 2;
+    }
+    alloc = ROUND_UP(alloc, 16);
+    s->buffer = xrealloc(s->buffer, alloc);
+    s->alloc = alloc;
 }
 
 void string_free(String *s)

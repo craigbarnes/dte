@@ -152,6 +152,16 @@ static void test_string(void)
     EXPECT_EQ(memcmp(s.buffer, "88 test\n", s.len), 0);
 
     string_free(&s);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    EXPECT_PTREQ(s.buffer, NULL);
+
+    for (size_t i = 0; i < 40; i++) {
+        string_add_byte(&s, 'a');
+    }
+    cstr = string_steal_cstring(&s);
+    EXPECT_STREQ(cstr, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    free(cstr);
 }
 
 static void test_string_view(void)

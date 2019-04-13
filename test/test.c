@@ -31,6 +31,13 @@ void expect_streq(const char *file, int line, const char *s1, const char *s2)
     }
 }
 
+void expect_ptreq(const char *file, int line, const void *p1, const void *p2)
+{
+    if (unlikely(p1 != p2)) {
+        test_fail(file, line, "Pointers not equal: %p, %p", p1, p2);
+    }
+}
+
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
 {
     if (unlikely(a != b)) {
