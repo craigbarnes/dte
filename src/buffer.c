@@ -51,7 +51,7 @@ const char *buffer_filename(const Buffer *b)
 
 Buffer *buffer_new(const Encoding *encoding)
 {
-    static int id;
+    static unsigned int id;
 
     Buffer *b = xnew0(Buffer, 1);
     list_init(&b->blocks);
@@ -69,7 +69,7 @@ Buffer *buffer_new(const Encoding *encoding)
     memcpy(&b->options, &editor.options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
     b->options.filetype = xstrdup("none");
-    b->options.indent_regex = xstrdup("");
+    b->options.indent_regex = NULL;
 
     ptr_array_add(&buffers, b);
     return b;

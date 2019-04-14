@@ -43,7 +43,7 @@ static bool indent_inc(const char *line, size_t len)
     }
 
     re1 = buffer->options.indent_regex;
-    return *re1 && regexp_match_nosub(re1, line, len);
+    return re1 && *re1 && regexp_match_nosub(re1, line, len);
 }
 
 char *get_indent_for_next_line(const char *line, size_t len)
