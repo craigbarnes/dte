@@ -60,19 +60,18 @@ static inline bool string_view_equal(const StringView *a, const StringView *b)
 }
 
 PURE NONNULL_ARGS
-static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
-{
-    size_t len = strlen(str);
-    return len == sv->length && memcmp(sv->data, str, len) == 0;
-}
-
-PURE NONNULL_ARGS
 static inline bool string_view_equal_strn (
     const StringView *sv,
     const char *str,
     size_t len
 ) {
     return len == sv->length && memcmp(sv->data, str, len) == 0;
+}
+
+PURE NONNULL_ARGS
+static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
+{
+    return string_view_equal_strn(sv, str, strlen(str));
 }
 
 PURE NONNULL_ARGS
