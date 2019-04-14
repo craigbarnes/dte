@@ -117,7 +117,7 @@ static bool destination_state(const char *name, State **dest)
 
     if (sep) {
         // subsyntax:returnstate
-        char *sub = xstrslice(name, 0, sep - name);
+        char *sub = xstrcut(name, sep - name);
         bool success = subsyntax_call(sub, sep + 1, dest);
         free(sub);
         return success;

@@ -65,7 +65,7 @@ static bool parse_line(Tag *t, const char *buf, size_t size)
     }
 
     size_t len = end - buf;
-    t->name = xstrslice(buf, 0, len);
+    t->name = xstrcut(buf, len);
 
     size_t si = len + 1;
     if (si >= size) {

@@ -760,7 +760,7 @@ static void cmd_option(const char *pf, char **args)
         size_t len = comma ? comma - list : strlen(list);
         add_file_options (
             FILE_OPTIONS_FILETYPE,
-            xstrslice(list, 0, len),
+            xstrcut(list, len),
             copy_string_array(strs, count)
         );
         list = comma + 1;
