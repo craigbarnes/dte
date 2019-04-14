@@ -55,8 +55,11 @@ Single quoted strings can't contain single quotes or escaped characters.
 
 Double quoted strings may contain the following escapes:
 
-`\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`, `\\`
+`\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`
 :   Control characters (same as in C)
+
+`\\`
+:   Escaped backslash
 
 `\x0a`
 :   Hexadecimal byte value 0x0a. Note that `\x00` is not supported because
