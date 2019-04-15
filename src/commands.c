@@ -572,11 +572,13 @@ static void cmd_left(const char *pf, char** UNUSED_ARG(args))
 static void cmd_line(const char* UNUSED_ARG(pf), char **args)
 {
     int x = view_get_preferred_x(view);
-    int line = atoi(args[0]);
-    if (line > 0) {
-        move_to_line(view, line);
-        move_to_preferred_x(x);
+    size_t line;
+    if (!str_to_size(args[0], &line) || line == 0) {
+        error_msg("Invalid line number: %s", args[0]);
+        return;
     }
+    move_to_line(view, line);
+    move_to_preferred_x(x);
 }
 
 static void cmd_load_syntax(const char* UNUSED_ARG(pf), char **args)
