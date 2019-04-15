@@ -1,6 +1,7 @@
 #ifndef MSG_H
 #define MSG_H
 
+#include <stddef.h>
 #include "util/macros.h"
 
 typedef struct {
@@ -9,11 +10,11 @@ typedef struct {
 
     // Needed if buffer doesn't have filename.
     // Pointer would have to be set to NULL after closing buffer.
-    unsigned int buffer_id;
+    unsigned long buffer_id;
 
     // If pattern is set then line and column are 0 and vice versa
     char *pattern; // Regex from tag file
-    int line, column;
+    unsigned long line, column;
 } FileLocation;
 
 typedef struct {
@@ -23,9 +24,9 @@ typedef struct {
 
 FileLocation *file_location_create (
     const char *filename,
-    unsigned int buffer_id,
-    int line,
-    int column
+    unsigned long buffer_id,
+    unsigned long line,
+    unsigned long column
 );
 
 void file_location_free(FileLocation *loc);
@@ -38,6 +39,6 @@ void activate_current_message(void);
 void activate_next_message(void);
 void activate_prev_message(void);
 void clear_messages(void);
-int message_count(void) PURE;
+size_t message_count(void) PURE;
 
 #endif

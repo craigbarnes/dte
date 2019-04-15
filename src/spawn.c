@@ -12,6 +12,7 @@
 #include "util/exec.h"
 #include "util/regexp.h"
 #include "util/string.h"
+#include "util/strtonum.h"
 #include "util/xmalloc.h"
 
 static void handle_error_msg(const Compiler *c, char *str)
@@ -42,9 +43,15 @@ static void handle_error_msg(const Compiler *c, char *str)
         if (!p->ignore) {
             Message *msg = new_message(m.ptrs[p->msg_idx]);
             msg->loc = xnew0(FileLocation, 1);
-            msg->loc->filename = p->file_idx < 0 ? NULL : xstrdup(m.ptrs[p->file_idx]);
-            msg->loc->line = p->line_idx < 0 ? 0 : atoi(m.ptrs[p->line_idx]);
-            msg->loc->column = p->column_idx < 0 ? 0 : atoi(m.ptrs[p->column_idx]);
+            if (p->file_idx >= 0) {
+                msg->loc->filename = xstrdup(m.ptrs[p->file_idx]);
+                if (p->line_idx >= 0) {
+                    str_to_ulong(m.ptrs[p->line_idx], &msg->loc->line);
+                }
+                if (p->column_idx >= 0) {
+                    str_to_ulong(m.ptrs[p->column_idx], &msg->loc->column);
+                }
+            }
             add_message(msg);
         }
         ptr_array_free(&m);

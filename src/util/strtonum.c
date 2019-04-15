@@ -119,3 +119,18 @@ bool str_to_size(const char *str, size_t *valp)
     *valp = (size_t)val;
     return true;
 }
+
+bool str_to_ulong(const char *str, unsigned long *valp)
+{
+    const size_t len = strlen(str);
+    if (len == 0) {
+        return false;
+    }
+    uintmax_t val;
+    const size_t n = buf_parse_uintmax(str, len, &val);
+    if (n != len || val > ULONG_MAX) {
+        return false;
+    }
+    *valp = (unsigned long)val;
+    return true;
+}

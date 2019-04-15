@@ -14,9 +14,9 @@ static size_t msg_pos;
 
 FileLocation *file_location_create (
     const char *filename,
-    unsigned int buffer_id,
-    int line,
-    int column
+    unsigned long buffer_id,
+    unsigned long line,
+    unsigned long column
 ) {
     FileLocation *loc = xnew0(FileLocation, 1);
     loc->filename = filename ? xstrdup(filename) : NULL;
@@ -212,7 +212,7 @@ void clear_messages(void)
     msg_pos = 0;
 }
 
-int message_count(void)
+size_t message_count(void)
 {
     return msgs.count;
 }

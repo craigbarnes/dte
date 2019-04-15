@@ -12,5 +12,6 @@ size_t buf_parse_long(const char *str, size_t size, long *valp) NONNULL_ARG(1);
 bool str_to_int(const char *str, int *valp) NONNULL_ARG(1);
 bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARG(1);
 bool str_to_size(const char *str, size_t *valp) NONNULL_ARG(1);
+bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARG(1);
 
 #endif
