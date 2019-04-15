@@ -3,6 +3,7 @@
 #include "util/ptr-array.h"
 #include "util/regexp.h"
 #include "util/string-view.h"
+#include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "spawn.h"
 
@@ -71,14 +72,14 @@ void set_editorconfig_options(Buffer *b)
                 b->options.detect_indent = 0;
             }
         } else if (string_view_equal_literal(&key, "indent_size")) {
-            int n = atoi(val);
-            if (n > 0 && n <= 8) {
+            unsigned int n;
+            if (str_to_uint(val, &n) && n > 0 && n <= 8) {
                 b->options.indent_width = n;
                 b->options.detect_indent = 0;
             }
         } else if (string_view_equal_literal(&key, "tab_width")) {
-            int n = atoi(val);
-            if (n > 0 && n <= 8) {
+            unsigned int n;
+            if (str_to_uint(val, &n) && n > 0 && n <= 8) {
                 b->options.tab_width = n;
             }
         }
