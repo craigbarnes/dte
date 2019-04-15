@@ -44,10 +44,20 @@ size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
 size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
     bool negative = false;
-    if (size && str[0] == '-') {
-        negative = true;
-        str++;
-        size--;
+    size_t skipped = 0;
+    if (size == 0) {
+        return 0;
+    } else {
+        switch (str[0]) {
+        case '-':
+            negative = true;
+            // Fallthrough
+        case '+':
+            skipped = 1;
+            str++;
+            size--;
+            break;
+        }
     }
 
     uintmax_t val;
@@ -57,13 +67,12 @@ size_t buf_parse_long(const char *str, size_t size, long *valp)
     }
 
     if (negative) {
-        n += 1;
         *valp = -((long)val);
     } else {
         *valp = (long)val;
     }
 
-    return n;
+    return n + skipped;
 }
 
 bool str_to_int(const char *str, int *valp)

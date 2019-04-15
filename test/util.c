@@ -243,6 +243,34 @@ static void test_buf_parse_long(void)
         EXPECT_EQ(digits, 0);
         EXPECT_EQ(val, 99);
     }
+
+    long val;
+    EXPECT_TRUE(buf_parse_long("0", 1, &val));
+    EXPECT_EQ(val, 0);
+    EXPECT_TRUE(buf_parse_long("-1", 2, &val));
+    EXPECT_EQ(val, -1);
+    EXPECT_TRUE(buf_parse_long("+1", 2, &val));
+    EXPECT_EQ(val, 1);
+}
+
+static void test_str_to_int(void)
+{
+    int val = 0;
+    EXPECT_TRUE(str_to_int("-1", &val));
+    EXPECT_EQ(val, -1);
+    EXPECT_TRUE(str_to_int("+1", &val));
+    EXPECT_EQ(val, 1);
+    EXPECT_TRUE(str_to_int("0", &val));
+    EXPECT_EQ(val, 0);
+    EXPECT_TRUE(str_to_int("1", &val));
+    EXPECT_EQ(val, 1);
+    EXPECT_TRUE(str_to_int("+00299", &val));
+    EXPECT_EQ(val, 299);
+
+    EXPECT_FALSE(str_to_int("", &val));
+    EXPECT_FALSE(str_to_int("100x", &val));
+    EXPECT_FALSE(str_to_int("+-100", &val));
+    EXPECT_FALSE(str_to_int("99999999999999999999999999999999", &val));
 }
 
 static void test_str_to_size(void)
@@ -716,6 +744,7 @@ void test_util(void)
     test_string_view();
     test_number_width();
     test_buf_parse_long();
+    test_str_to_int();
     test_str_to_size();
     test_u_char_width();
     test_u_to_lower();

@@ -1414,9 +1414,12 @@ static void cmd_setenv(const char* UNUSED_ARG(pf), char **args)
 
 static void cmd_shift(const char* UNUSED_ARG(pf), char **args)
 {
-    int count = atoi(args[0]);
-
-    if (!count) {
+    int count;
+    if (!str_to_int(args[0], &count)) {
+        error_msg("Invalid number: %s", args[0]);
+        return;
+    }
+    if (count == 0) {
         error_msg("Count must be non-zero.");
         return;
     }
@@ -1559,15 +1562,16 @@ static void cmd_up(const char *pf, char** UNUSED_ARG(args))
 
 static void cmd_view(const char* UNUSED_ARG(pf), char **args)
 {
-    int idx;
+    BUG_ON(window->views.count == 0);
+    size_t idx;
     if (streq(args[0], "last")) {
         idx = window->views.count - 1;
     } else {
-        idx = atoi(args[0]) - 1;
-        if (idx < 0) {
-            error_msg("View number must be positive.");
+        if (!str_to_size(args[0], &idx) || idx == 0) {
+            error_msg("Invalid view index: %s", args[0]);
             return;
         }
+        idx--;
         if (idx > window->views.count - 1) {
             idx = window->views.count - 1;
         }
@@ -1638,16 +1642,14 @@ static void cmd_wprev(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_wrap_paragraph(const char * UNUSED_ARG(pf), char **args)
 {
-    int text_width = buffer->options.text_width;
-
+    size_t width = (size_t)buffer->options.text_width;
     if (args[0]) {
-        text_width = atoi(args[0]);
+        if (!str_to_size(args[0], &width) || width == 0 || width > 1000) {
+            error_msg("Invalid paragraph width: %s", args[0]);
+            return;
+        }
     }
-    if (text_width <= 0) {
-        error_msg("Paragraph width must be positive.");
-        return;
-    }
-    format_paragraph(text_width);
+    format_paragraph(width);
 }
 
 static void cmd_wresize(const char *pf, char **args)

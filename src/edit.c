@@ -780,7 +780,7 @@ static size_t paragraph_size(void)
     return size;
 }
 
-void format_paragraph(int text_width)
+void format_paragraph(size_t text_width)
 {
     size_t len;
     if (view->selection) {
