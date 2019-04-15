@@ -199,16 +199,17 @@ static int sub(Frame *f, int count)
 static void subtract_from_sibling_size(const Frame *f, int count)
 {
     const Frame *parent = f->parent;
-    int idx = ptr_array_idx(&parent->frames, f);
+    size_t idx = ptr_array_idx(&parent->frames, f);
 
-    for (int i = idx + 1, n = parent->frames.count; i < n; i++) {
+    for (size_t i = idx + 1, n = parent->frames.count; i < n; i++) {
         count = sub(parent->frames.ptrs[i], count);
         if (count == 0) {
             return;
         }
     }
-    for (int i = idx - 1; i >= 0; i--) {
-        count = sub(parent->frames.ptrs[i], count);
+
+    for (size_t i = idx; i > 0; i--) {
+        count = sub(parent->frames.ptrs[i - 1], count);
         if (count == 0) {
             return;
         }

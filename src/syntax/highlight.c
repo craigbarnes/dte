@@ -104,7 +104,7 @@ static HlColor **highlight_line (
                 goto top;
             case COND_BUFIS:
                 if (sidx >= 0 && is_buffered(cond, line + sidx, i - sidx)) {
-                    for (int idx = sidx; idx < i; idx++) {
+                    for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
                     sidx = -1;
@@ -129,7 +129,7 @@ static HlColor **highlight_line (
                         i - sidx
                     )
                 ) {
-                    for (int idx = sidx; idx < i; idx++) {
+                    for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
                     sidx = -1;

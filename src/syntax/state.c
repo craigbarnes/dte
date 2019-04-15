@@ -8,6 +8,7 @@
 #include "../parse-args.h"
 #include "../terminal/color.h"
 #include "../util/path.h"
+#include "../util/strtonum.h"
 #include "../util/xmalloc.h"
 #include "../util/xsnprintf.h"
 
@@ -360,12 +361,15 @@ static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
     Condition *c;
-    int len = 0;
+    size_t len = 0;
 
     if (args[1]) {
         type = COND_RECOLOR;
-        len = atoi(args[1]);
-        if (len <= 0) {
+        if (!str_to_size(args[1], &len)) {
+            error_msg("invalid number: %s", args[1]);
+            return;
+        }
+        if (len == 0) {
             error_msg("number of bytes must be larger than 0");
             return;
         }
@@ -376,7 +380,7 @@ static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
     }
     c = add_condition(type, NULL, args[0]);
     if (c && type == COND_RECOLOR) {
-        c->u.cond_recolor.len = (size_t)len;
+        c->u.cond_recolor.len = len;
     }
 }
 
