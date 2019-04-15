@@ -215,7 +215,7 @@ bool undo(void)
     }
 
     if (is_change_chain_barrier(change)) {
-        unsigned int count = 0;
+        unsigned long count = 0;
 
         while (1) {
             change = change->next;
@@ -226,7 +226,7 @@ bool undo(void)
             count++;
         }
         if (count > 1) {
-            info_msg("Undid %u changes.", count);
+            info_msg("Undid %lu changes.", count);
         }
     } else {
         reverse_change(change);
@@ -235,7 +235,7 @@ bool undo(void)
     return true;
 }
 
-bool redo(unsigned int change_id)
+bool redo(unsigned long change_id)
 {
     Change *change = buffer->cur_change;
 
@@ -251,7 +251,7 @@ bool redo(unsigned int change_id)
     if (change_id) {
         if (--change_id >= change->nr_prev) {
             error_msg (
-                "There are only %u possible changes to redo.",
+                "There are only %lu possible changes to redo.",
                 change->nr_prev
             );
             return false;
@@ -261,8 +261,8 @@ bool redo(unsigned int change_id)
         change_id = change->nr_prev - 1;
         if (change->nr_prev > 1) {
             info_msg (
-                "Redoing newest (%u) of %u possible changes.",
-                change_id + 1u,
+                "Redoing newest (%lu) of %lu possible changes.",
+                change_id + 1,
                 change->nr_prev
             );
         }
@@ -270,7 +270,7 @@ bool redo(unsigned int change_id)
 
     change = change->prev[change_id];
     if (is_change_chain_barrier(change)) {
-        unsigned int count = 0;
+        unsigned long count = 0;
 
         while (1) {
             change = change->prev[change->nr_prev - 1];
@@ -281,7 +281,7 @@ bool redo(unsigned int change_id)
             count++;
         }
         if (count > 1) {
-            info_msg("Redid %u changes.", count);
+            info_msg("Redid %lu changes.", count);
         }
     } else {
         reverse_change(change);

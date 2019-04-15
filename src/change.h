@@ -14,7 +14,7 @@ typedef enum {
 typedef struct Change {
     struct Change *next;
     struct Change **prev;
-    unsigned int nr_prev;
+    unsigned long nr_prev;
     bool move_after; // Move after inserted text when undoing delete?
     size_t offset;
     size_t del_count;
@@ -27,7 +27,7 @@ void end_change(void);
 void begin_change_chain(void);
 void end_change_chain(void);
 bool undo(void);
-bool redo(unsigned int change_id);
+bool redo(unsigned long change_id);
 void free_changes(Change *head);
 void buffer_insert_bytes(const char *buf, size_t len);
 void buffer_delete_bytes(size_t len);

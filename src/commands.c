@@ -887,9 +887,9 @@ static void cmd_quit(const char *pf, char** UNUSED_ARG(args))
 
 static void cmd_redo(const char* UNUSED_ARG(pf), char **args)
 {
-    unsigned int change_id = 0;
+    unsigned long change_id = 0;
     if (args[0]) {
-        if (!str_to_uint(args[0], &change_id)) {
+        if (!str_to_ulong(args[0], &change_id) || change_id == 0) {
             error_msg("Invalid change id: %s", args[0]);
             return;
         }
