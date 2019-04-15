@@ -1675,8 +1675,11 @@ static void cmd_wresize(const char *pf, char **args)
         return;
     }
     if (arg) {
-        int n = atoi(arg);
-
+        int n;
+        if (!str_to_int(arg, &n)) {
+            error_msg("Invalid resize value: %s", arg);
+            return;
+        }
         if (arg[0] == '+' || arg[0] == '-') {
             add_to_frame_size(window->frame, dir, n);
         } else {
