@@ -215,7 +215,7 @@ bool undo(void)
     }
 
     if (is_change_chain_barrier(change)) {
-        int count = 0;
+        unsigned int count = 0;
 
         while (1) {
             change = change->next;
@@ -226,7 +226,7 @@ bool undo(void)
             count++;
         }
         if (count > 1) {
-            info_msg("Undid %d changes.", count);
+            info_msg("Undid %u changes.", count);
         }
     } else {
         reverse_change(change);
@@ -270,7 +270,7 @@ bool redo(unsigned int change_id)
 
     change = change->prev[change_id];
     if (is_change_chain_barrier(change)) {
-        int count = 0;
+        unsigned int count = 0;
 
         while (1) {
             change = change->prev[change->nr_prev - 1];
@@ -281,7 +281,7 @@ bool redo(unsigned int change_id)
             count++;
         }
         if (count > 1) {
-            info_msg("Redid %d changes.", count);
+            info_msg("Redid %u changes.", count);
         }
     } else {
         reverse_change(change);
