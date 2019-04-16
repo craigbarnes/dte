@@ -6,6 +6,7 @@
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"
+#include "../util/strtonum.h"
 
 #define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
 
@@ -96,6 +97,7 @@ static int32_t parse_color(const char *str)
             return COLOR_INVALID;
         }
         uint8_t r, g, b;
+        // NOLINTNEXTLINE(cert-err34-c): width limit prevents overflow
         int n = sscanf(str + 1, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8, &r, &g, &b);
         if (n != 3) {
             return COLOR_INVALID;
@@ -106,6 +108,7 @@ static int32_t parse_color(const char *str)
     // Parse r/g/b
     if (len == 5 && str[1] == '/') {
         uint8_t r, g, b;
+        // NOLINTNEXTLINE(cert-err34-c):
         int n = sscanf(str, "%1" SCNu8 "/%1" SCNu8 "/%1" SCNu8, &r, &g, &b);
         if (n != 3 || r > 5 || g > 5 || b > 5) {
             return COLOR_INVALID;
@@ -116,9 +119,8 @@ static int32_t parse_color(const char *str)
 
     // Parse -2 .. 255
     if (len <= 3 && (str[0] == '-' || ascii_isdigit(str[0]))) {
-        int32_t x;
-        int n = sscanf(str, "%3" SCNd32, &x);
-        if (n != 1 || x < -2 || x > 255) {
+        int x;
+        if (!str_to_int(str, &x) || x < -2 || x > 255) {
             return COLOR_INVALID;
         }
         return x;
