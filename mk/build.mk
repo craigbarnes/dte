@@ -71,7 +71,7 @@ endif
 ifdef TERMINFO_DISABLE
   build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
-  LDLIBS += -lcurses
+  LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
 CWARNS = $(WARNINGS) $(foreach W,$(WARNINGS_EXTRA),$(call cc-option,$(W)))
