@@ -14,7 +14,7 @@
 #include "util/xsnprintf.h"
 
 typedef struct {
-    int row, col;
+    unsigned long row, col;
     size_t filename_len;
     char filename[];
 } HistoryEntry;
@@ -28,7 +28,7 @@ static bool entry_match(const HistoryEntry *e, const char *filename, size_t len)
     return len == e->filename_len && memcmp(filename, e->filename, len) == 0;
 }
 
-void add_file_history(int row, int col, const char *filename)
+void add_file_history(unsigned long row, unsigned long col, const char *filename)
 {
     const size_t filename_len = strlen(filename);
 
@@ -78,9 +78,9 @@ void load_file_history(const char *filename)
     ssize_t pos = 0;
     while (pos < size) {
         const char *line = buf_next_line(buf, &pos, size);
-        unsigned int row, col;
+        unsigned long row, col;
         int offset;
-        int n = sscanf(line, "%u%*20[ \t]%u%*20[ \t]%n", &row, &col, &offset);
+        int n = sscanf(line, "%lu%*20[ \t]%lu%*20[ \t]%n", &row, &col, &offset);
         if (n != 2 || row > INT_MAX || col > INT_MAX) {
             continue;
         }
@@ -106,7 +106,7 @@ void save_file_history(const char *filename)
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
         wbuf_need_space(&buf, 64);
-        buf.fill += xsnprintf(buf.buf + buf.fill, 64, "%d %d ", e->row, e->col);
+        buf.fill += xsnprintf(buf.buf + buf.fill, 64, "%lu %lu ", e->row, e->col);
         wbuf_write(&buf, e->filename, e->filename_len);
         wbuf_write_ch(&buf, '\n');
     }
@@ -115,7 +115,7 @@ void save_file_history(const char *filename)
     close(buf.fd);
 }
 
-bool find_file_in_history(const char *filename, int *row, int *col)
+bool find_file_in_history(const char *filename, unsigned long *row, unsigned long *col)
 {
     const size_t filename_len = strlen(filename);
     for (size_t i = 0, n = history.count; i < n; i++) {
