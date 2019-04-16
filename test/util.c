@@ -208,49 +208,29 @@ static void test_number_width(void)
     EXPECT_EQ(number_width(-2147483647), 11);
 }
 
-static void test_buf_parse_long(void)
+static void test_buf_parse_ulong(void)
 {
     {
-        // Note: LONG_MIN is typically defined as (-LONG_MAX - 1L), but due to
-        // the way the buf_parse_long() function is implemented, it can only
-        // go down to (-LONG_MAX) and hence why (LONG_MIN + 1) is used here.
-        char long_min[64];
-        size_t long_min_len = xsnprintf(long_min, 64, "%ld", LONG_MIN + 1);
+        char ulong_max[64];
+        size_t ulong_max_len = xsnprintf(ulong_max, 64, "%lu", ULONG_MAX);
 
-        long val = 88;
-        size_t digits = buf_parse_long(long_min, long_min_len, &val);
-        EXPECT_EQ(digits, long_min_len);
-        EXPECT_EQ(val, LONG_MIN + 1);
-
-        val = 88;
-        long_min[long_min_len++] = '1';
-        digits = buf_parse_long(long_min, long_min_len, &val);
-        EXPECT_EQ(digits, 0);
-        EXPECT_EQ(val, 88);
-    }
-    {
-        char long_max[64];
-        size_t long_max_len = xsnprintf(long_max, 64, "%ld", LONG_MAX);
-
-        long val = 88;
-        size_t digits = buf_parse_long(long_max, long_max_len, &val);
-        EXPECT_EQ(digits, long_max_len);
-        EXPECT_EQ(val, LONG_MAX);
+        unsigned long val = 88;
+        size_t digits = buf_parse_ulong(ulong_max, ulong_max_len, &val);
+        EXPECT_EQ(digits, ulong_max_len);
+        EXPECT_EQ(val, ULONG_MAX);
 
         val = 99;
-        long_max[long_max_len++] = '1';
-        digits = buf_parse_long(long_max, long_max_len, &val);
+        ulong_max[ulong_max_len++] = '1';
+        digits = buf_parse_ulong(ulong_max, ulong_max_len, &val);
         EXPECT_EQ(digits, 0);
         EXPECT_EQ(val, 99);
     }
 
-    long val;
-    EXPECT_TRUE(buf_parse_long("0", 1, &val));
+    unsigned long val;
+    EXPECT_TRUE(buf_parse_ulong("0", 1, &val));
     EXPECT_EQ(val, 0);
-    EXPECT_TRUE(buf_parse_long("-1", 2, &val));
-    EXPECT_EQ(val, -1);
-    EXPECT_TRUE(buf_parse_long("+1", 2, &val));
-    EXPECT_EQ(val, 1);
+    EXPECT_TRUE(buf_parse_ulong("9876", 4, &val));
+    EXPECT_EQ(val, 9876);
 }
 
 static void test_str_to_int(void)
@@ -743,7 +723,7 @@ void test_util(void)
     test_string();
     test_string_view();
     test_number_width();
-    test_buf_parse_long();
+    test_buf_parse_ulong();
     test_str_to_int();
     test_str_to_size();
     test_u_char_width();

@@ -42,8 +42,8 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
         return 0;
     }
 
-    long line;
-    size_t i = buf_parse_long(buf, size, &line);
+    unsigned long line;
+    size_t i = buf_parse_ulong(buf, size, &line);
     if (i == 0) {
         return 0;
     }

@@ -7,13 +7,6 @@
 #include "util/ptr-array.h"
 
 typedef struct {
-    char *file;
-    char *msg;
-    int line;
-    int column;
-} CompileError;
-
-typedef struct {
     bool ignore;
     int8_t msg_idx;
     int8_t file_idx;

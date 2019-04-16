@@ -17,7 +17,7 @@ typedef struct {
     char *pattern;
     char *member;
     char *typeref;
-    int line;
+    unsigned long line;
     char kind;
     bool local;
 } Tag;

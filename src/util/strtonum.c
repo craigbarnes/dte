@@ -41,7 +41,18 @@ size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
     return i;
 }
 
-size_t buf_parse_long(const char *str, size_t size, long *valp)
+size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp)
+{
+    uintmax_t val;
+    size_t n = buf_parse_uintmax(str, size, &val);
+    if (n == 0 || val > ULONG_MAX) {
+        return 0;
+    }
+    *valp = (unsigned long)val;
+    return n;
+}
+
+static size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
     bool negative = false;
     size_t skipped = 0;
@@ -126,11 +137,11 @@ bool str_to_ulong(const char *str, unsigned long *valp)
     if (len == 0) {
         return false;
     }
-    uintmax_t val;
-    const size_t n = buf_parse_uintmax(str, len, &val);
-    if (n != len || val > ULONG_MAX) {
+    unsigned long val;
+    const size_t n = buf_parse_ulong(str, len, &val);
+    if (n != len) {
         return false;
     }
-    *valp = (unsigned long)val;
+    *valp = val;
     return true;
 }
