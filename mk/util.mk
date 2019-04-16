@@ -1,11 +1,11 @@
-PKGCONFIG = $(shell command -v pkg-config || command -v pkgconf)
+PKGCONFIG = $(shell command -v pkg-config || command -v pkgconf || echo ':')
 $(call make-lazy,PKGCONFIG)
 
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -x c -o /dev/null /dev/null,$(1),$(2))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
-pkg-libs = $(if $(PKGCONFIG), $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null))
+pkg-libs = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
