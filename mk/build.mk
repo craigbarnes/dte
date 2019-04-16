@@ -28,7 +28,7 @@ BUILTIN_CONFIGS := $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
-    env thai fuzz1 ))
+    env thai crlf fuzz1 ))
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum uchar \

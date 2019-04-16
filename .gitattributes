@@ -32,6 +32,7 @@ GNUmakefile text
 makefile text
 *.mk text
 *.txt text
+test/data/crlf.txt -text diff
 *.dterc dterc
 config/** dterc
 config/README.md -dterc
