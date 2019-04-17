@@ -12,3 +12,6 @@ indent_size = 8
 [docs/*.html]
 indent_style = space
 indent_size = 2
+
+[.git/COMMIT_EDITMSG]
+max_line_length = 72

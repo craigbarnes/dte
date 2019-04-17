@@ -82,6 +82,11 @@ void set_editorconfig_options(Buffer *b)
             if (str_to_uint(val, &n) && n > 0 && n <= 8) {
                 b->options.tab_width = n;
             }
+        } else if (string_view_equal_literal(&key, "max_line_length")) {
+            unsigned int n;
+            if (str_to_uint(val, &n) && n > 0 && n <= 1000) {
+                b->options.text_width = n;
+            }
         }
     }
 
