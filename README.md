@@ -98,6 +98,19 @@ The following optional build variables may be useful when packaging
     make V=1
     make install V=1 prefix=/usr DESTDIR=PKG
 
+**Persistent Configuration**:
+
+Variables can also be configured persistently by adding them to
+a `Config.mk` file, for example:
+
+    prefix = /usr
+    mandir = $(prefix)/man
+    DESTDIR = ~/buildroot
+    V = 1
+
+The `Config.mk` file should be in the project base directory alongside
+`GNUmakefile` and *must* be valid GNU make syntax.
+
 License
 -------
 
