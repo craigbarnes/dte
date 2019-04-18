@@ -1,4 +1,4 @@
-DIST_VERSIONS = 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
+DIST_VERSIONS = 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
 DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk

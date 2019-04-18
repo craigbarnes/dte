@@ -1,8 +1,10 @@
 Releases
 ========
 
-v1.8 (unreleased)
------------------
+v1.8 (latest release)
+---------------------
+
+Released on 2019-04-18.
 
 **Additions:**
 
@@ -48,8 +50,8 @@ v1.8 (unreleased)
   `rxvt` violate the [ECMA-48] specification. Users of such terminals
   are encouraged to configure the key codes to mimic `xterm` instead.
 
-v1.7 (latest release)
----------------------
+v1.7
+----
 
 Released on 2018-05-08.
 

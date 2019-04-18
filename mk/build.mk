@@ -1,8 +1,8 @@
 CC ?= gcc
-CFLAGS ?= -g -O2
+CFLAGS ?= -O2
 LDFLAGS ?=
 AWK = awk
-VERSION = $(shell mk/version.sh 1.7)
+VERSION = 1.8
 
 WARNINGS = \
     -Wall -Wextra -Wformat -Wformat-security \
@@ -114,7 +114,7 @@ else
   # 0: Disable debugging
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 3: Enable expensive sanity checks
-  DEBUG ?= 1
+  DEBUG = 0
 endif
 
 ifeq "$(DEBUG)" "0"
