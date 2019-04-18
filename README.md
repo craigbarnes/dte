@@ -12,7 +12,7 @@ Features
 * Syntax highlighting
 * Customizable color schemes
 * Customizable key bindings
-* Support for all `xterm` Ctrl/Alt/Shift key codes
+* Support for all xterm Ctrl/Alt/Shift key codes
 * Command language with auto-completion
 * Unicode 11 compatible text rendering
 * Support for multiple encodings (using [iconv])
@@ -98,7 +98,7 @@ The following optional build variables may be useful when packaging
     make V=1
     make install V=1 prefix=/usr DESTDIR=PKG
 
-**Persistent Configuration**:
+**Persistent configuration**:
 
 Variables can also be configured persistently by adding them to
 a `Config.mk` file, for example:
