@@ -694,9 +694,9 @@ static void test_path_dirname_and_path_basename(void)
 
 static void test_path_absolute(void)
 {
-    char *abs = path_absolute("./build/../build/test/test-symlink");
-    EXPECT_STREQ(path_basename(abs), "README.md");
-    free(abs);
+    char *path = path_absolute("./build/../build/test/test-symlink");
+    EXPECT_STREQ(path_basename(path), "README.md");
+    free(path);
 }
 
 static void test_regexp_match(void)
