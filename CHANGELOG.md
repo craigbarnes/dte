@@ -50,6 +50,11 @@ Released on 2019-04-18.
   `rxvt` violate the [ECMA-48] specification. Users of such terminals
   are encouraged to configure the key codes to mimic `xterm` instead.
 
+**Downloads:**
+
+* [dte-1.8.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.tar.gz)
+* [dte-1.8.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.tar.gz.sig)
+
 v1.7
 ----
 
