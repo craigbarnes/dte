@@ -114,7 +114,8 @@ Default Key Bindings
 :   Redo last undone action
 
 `Alt`+`j`
-:   Wrap paragraph under the cursor to 72 columns
+:   Wrap paragraph under cursor to value of `text-width` option
+    (72 by default)
 
 `Alt`+`t`
 :   Insert a tab character (useful when using the `expand-tab` option)
