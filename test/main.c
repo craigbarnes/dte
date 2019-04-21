@@ -9,6 +9,7 @@
 #include "../src/util/xmalloc.h"
 
 void test_cmdline(void);
+void test_editorconfig(void);
 void test_encoding(void);
 void test_filetype(void);
 void test_terminal(void);
@@ -74,6 +75,7 @@ int main(void)
     test_relative_filename();
     test_commands_array();
 
+    test_editorconfig();
     test_encoding();
     test_filetype();
     test_util();

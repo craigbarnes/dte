@@ -1,11 +1,12 @@
 #include "file-option.h"
+#include "editorconfig/editorconfig.h"
 #include "options.h"
+#include "spawn.h"
 #include "util/ptr-array.h"
 #include "util/regexp.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
-#include "spawn.h"
 
 typedef struct {
     enum file_options_type type;
@@ -44,53 +45,41 @@ void set_editorconfig_options(Buffer *b)
         path = cwd;
     }
 
-    const char *cmd[] = {"editorconfig", path, NULL};
-    FilterData data = FILTER_DATA_INIT;
-    if (spawn_filter((char**)cmd, &data) != 0 || data.out_len == 0) {
+    EditorConfigOptions opts;
+    if (editorconfig_parse(path, &opts) != 0) {
         return;
     }
 
-    ssize_t pos = 0, size = data.out_len;
-    while (pos < size) {
-        const char *const line = buf_next_line(data.out, &pos, size);
-        const char *const delim = strchr(line, '=');
-        if (delim == NULL || delim == line || delim[1] == '\0') {
-            continue;
-        }
-
-        const StringView key = string_view(line, (size_t)(delim - line));
-        const char *const val = delim + 1;
-
-        if (string_view_equal_literal(&key, "indent_style")) {
-            if (streq(val, "spaces")) {
-                b->options.expand_tab = true;
-                b->options.emulate_tab = true;
-                b->options.detect_indent = 0;
-            } else if (streq(val, "tabs")) {
-                b->options.expand_tab = false;
-                b->options.emulate_tab = false;
-                b->options.detect_indent = 0;
-            }
-        } else if (string_view_equal_literal(&key, "indent_size")) {
-            unsigned int n;
-            if (str_to_uint(val, &n) && n > 0 && n <= 8) {
-                b->options.indent_width = n;
-                b->options.detect_indent = 0;
-            }
-        } else if (string_view_equal_literal(&key, "tab_width")) {
-            unsigned int n;
-            if (str_to_uint(val, &n) && n > 0 && n <= 8) {
-                b->options.tab_width = n;
-            }
-        } else if (string_view_equal_literal(&key, "max_line_length")) {
-            unsigned int n;
-            if (str_to_uint(val, &n) && n > 0 && n <= 1000) {
-                b->options.text_width = n;
-            }
-        }
+    switch (opts.indent_style) {
+    case INDENT_STYLE_SPACE:
+        b->options.expand_tab = true;
+        b->options.emulate_tab = true;
+        b->options.detect_indent = 0;
+        break;
+    case INDENT_STYLE_TAB:
+        b->options.expand_tab = false;
+        b->options.emulate_tab = false;
+        b->options.detect_indent = 0;
+        break;
+    case INDENT_STYLE_UNSPECIFIED:
+        break;
     }
 
-    free(data.out);
+    const unsigned int indent_size = opts.indent_size;
+    if (indent_size > 0 && indent_size <= 8) {
+        b->options.indent_width = indent_size;
+        b->options.detect_indent = 0;
+    }
+
+    const unsigned int tab_width = opts.tab_width;
+    if (tab_width > 0 && tab_width <= 8) {
+        b->options.tab_width = tab_width;
+    }
+
+    const unsigned int max_line_length = opts.max_line_length;
+    if (max_line_length > 0 && max_line_length <= 1000) {
+        b->options.text_width = max_line_length;
+    }
 }
 
 void set_file_options(Buffer *b)

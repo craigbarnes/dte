@@ -64,6 +64,13 @@ char *xstrdup(const char *str)
     return s;
 }
 
+char *xstrndup(const char *str, size_t n)
+{
+    char *s = strndup(str, n);
+    CHECK_ALLOC(s);
+    return s;
+}
+
 char *xstrdup_toupper(const char *str)
 {
     const size_t len = strlen(str);

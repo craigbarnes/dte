@@ -34,6 +34,9 @@ util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum uchar \
     unicode wbuf xmalloc xreadwrite xsnprintf )
 
+editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
+    editorconfig ini match )
+
 encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder encoding )
 
@@ -51,13 +54,14 @@ editor_objects := $(call prefix-obj, build/, \
     mode-search move msg options parse-args parse-command run screen \
     screen-status screen-tabbar screen-view search selection \
     spawn tag view window ) \
+    $(editorconfig_objects) \
     $(encoding_objects) \
     $(syntax_objects) \
     $(terminal_objects) \
     $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
-    cmdline config encoding filetype main terminal test util )
+    cmdline config editorconfig encoding filetype main terminal test util )
 
 all_objects := $(editor_objects) $(test_objects)
 
@@ -143,6 +147,7 @@ endif
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
+$(editorconfig_objects): | build/editorconfig/
 $(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
@@ -189,7 +194,7 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/encoding/ build/syntax/ build/terminal/ build/util/ build/test/: | build/
+build/%/: | build/
 	$(Q) mkdir -p $@
 
 build/:

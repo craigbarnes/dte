@@ -61,18 +61,6 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
     ptr_array_add(&filetypes, ft);
 }
 
-static void *memrchr_(const void *m, int c, size_t n)
-{
-    const unsigned char *s = m;
-    c = (int)(unsigned char)c;
-    while (n--) {
-        if (s[n] == c) {
-            return (void*)(s + n);
-        }
-    }
-    return NULL;
-}
-
 static inline StringView get_ext(const StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;

@@ -18,6 +18,7 @@ Features
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to compiler error
+* [EditorConfig] support
 
 Screenshot
 ----------
@@ -128,6 +129,7 @@ Public License version 2 for more details.
 
 
 [ctags]: https://en.wikipedia.org/wiki/Ctags
+[EditorConfig]: https://editorconfig.org/
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
