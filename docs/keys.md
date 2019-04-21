@@ -96,6 +96,9 @@ Default Key Bindings
 `Ctrl`+`Shift`+`Page Down`, `Ctrl`+`Alt`+`Shift`+`down`
 :   Select whole lines one page down
 
+`Tab`, `Shift`+`Tab`
+:   Increase/decrease indentation level of selected (whole) lines
+
 ### Editing
 
 `Ctrl`+`c`
