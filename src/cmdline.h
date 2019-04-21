@@ -13,14 +13,19 @@ typedef struct {
     char *search_text;
 } CommandLine;
 
-enum {
+typedef enum {
     CMDLINE_UNKNOWN_KEY,
     CMDLINE_KEY_HANDLED,
     CMDLINE_CANCEL,
-};
+} CommandLineResult;
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);
-int cmdline_handle_key(CommandLine *c, PointerArray *history, KeyCode key);
+
+CommandLineResult cmdline_handle_key (
+    CommandLine *c,
+    PointerArray *history,
+    KeyCode key
+);
 
 #endif
