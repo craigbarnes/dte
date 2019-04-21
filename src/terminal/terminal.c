@@ -93,7 +93,7 @@ void term_init(void)
     switch (get_term_type(term)) {
     case TERM_XTERM:
         terminal = xterm;
-        terminal.repeat_byte = &ecma48_repeat_byte;
+        // terminal.repeat_byte = &ecma48_repeat_byte;
         break;
     case TERM_ST:
     case TERM_URXVT:

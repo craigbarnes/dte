@@ -34,7 +34,6 @@ static struct {
     const char *setab;
     const char *setaf;
     const char *sgr;
-    const char *rep;
 } terminfo;
 
 static struct TermKeyMap {
@@ -226,20 +225,6 @@ static void tputs_set_color(const TermColor *color)
     obuf.color = *color;
 }
 
-static void tputs_repeat_byte(char ch, size_t count)
-{
-    if (!ascii_isprint(ch) || count < 6 || count > 30000) {
-        buf_repeat_byte(ch, count);
-        return;
-    }
-    const char *seq = tparm_2(terminfo.rep, ch, count);
-    if (unlikely(!seq)) {
-        buf_repeat_byte(ch, count);
-        return;
-    }
-    tputs(seq, 1, tputs_putc);
-}
-
 bool term_init_terminfo(const char *term)
 {
     // Initialize terminfo database (or call exit(3) on failure)
@@ -269,11 +254,6 @@ bool term_init_terminfo(const char *term)
     terminfo.setab = get_terminfo_string("setab");
     terminfo.setaf = get_terminfo_string("setaf");
     terminfo.sgr = get_terminfo_string("sgr");
-    terminfo.rep = get_terminfo_string("rep");
-
-    if (terminfo.rep) {
-        terminal.repeat_byte = &tputs_repeat_byte;
-    }
 
     terminal.back_color_erase = get_terminfo_flag("bce");
     terminal.width = tigetnum("cols");
