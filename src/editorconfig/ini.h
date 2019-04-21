@@ -11,7 +11,8 @@ typedef int (*IniCallback) (
     void *user,
     const char *section,
     const char *name,
-    const char *value
+    const char *value,
+    unsigned int name_idx
 );
 
 // For each name=value pair parsed, call handler function with given user

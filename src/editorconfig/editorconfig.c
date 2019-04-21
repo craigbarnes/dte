@@ -10,6 +10,7 @@
 #include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/path.h"
+#include "../util/string.h"
 #include "../util/string-view.h"
 #include "../util/strtonum.h"
 #include "../util/xmalloc.h"
@@ -18,6 +19,7 @@ typedef struct {
     const char *full_filename;
     StringView config_file_dir;
     EditorConfigOptions options;
+    String pattern;
 } CallbackData;
 
 static inline bool streq_icase(const char *a, const char *b)
@@ -62,60 +64,60 @@ static int ini_handler (
     void *ud,
     const char *section,
     const char *name,
-    const char *value
+    const char *value,
+    unsigned int name_idx
 ) {
     CallbackData *data = ud;
 
-    if (
-        section[0] == '\0'
-        && streq_icase(name, "root")
-        && streq_icase(value, "true")
-    ) {
-        // root=true, clear all previous values
-        memzero(&data->options);
+    if (section[0] == '\0') {
+        if (streq_icase(name, "root") && streq_icase(value, "true")) {
+            // root=true, clear all previous values
+            memzero(&data->options);
+        }
         return 1;
     }
 
-    const size_t section_len = strlen(section);
-    char *pattern = xmalloc (
-        2 * data->config_file_dir.length
-        + sizeof("**/")
-        + section_len
-    );
+    if (name_idx == 0) {
+        // If name_idx is zero, it indicates that the name/value pair is
+        // the first in the section and the pattern must be rebuilt
+        string_clear(&data->pattern);
 
-    // Escape editorconfig special chars in path
-    const StringView ecfile_dir = data->config_file_dir;
-    size_t j = 0;
-    for (size_t i = 0, n = ecfile_dir.length; i < n; i++) {
-        const char ch = ecfile_dir.data[i];
-        switch (ch) {
-        case '*': case ',': case '-':
-        case '?': case '[': case '\\':
-        case ']': case '{': case '}':
-            pattern[j++] = '\\';
-            // Fallthrough
-        default:
-            pattern[j++] = ch;
+        // Escape editorconfig special chars in path
+        const StringView ecfile_dir = data->config_file_dir;
+        for (size_t i = 0, n = ecfile_dir.length; i < n; i++) {
+            const char ch = ecfile_dir.data[i];
+            switch (ch) {
+            case '*': case ',': case '-':
+            case '?': case '[': case '\\':
+            case ']': case '{': case '}':
+                string_add_byte(&data->pattern, '\\');
+                // Fallthrough
+            default:
+                string_add_byte(&data->pattern, ch);
+            }
         }
+
+        if (strchr(section, '/') == NULL) {
+            // No slash in pattern, append "**/"
+            string_add_literal(&data->pattern, "**/");
+        } else if (section[0] != '/') {
+            // Pattern contains at least one slash but not at the start, add one
+            string_add_byte(&data->pattern, '/');
+        }
+
+        string_add_str(&data->pattern, section);
+        string_ensure_null_terminated(&data->pattern);
+    } else {
+        // Otherwise, the section is the same as was passed in the last
+        // callback invocation and the previously constructed pattern
+        // can be reused
+        BUG_ON(data->pattern.len == 0);
     }
 
-    if (strchr(section, '/') == NULL) {
-        // No slash in pattern, append "**/"
-        pattern[j++] = '*';
-        pattern[j++] = '*';
-        pattern[j++] = '/';
-    } else if (section[0] != '/') {
-        // Pattern contains at least one slash but not at the start, add one
-        pattern[j++] = '/';
-    }
-
-    memcpy(pattern + j, section, section_len + 1); // +1 for NUL
-
-    if (ec_pattern_match(pattern, data->full_filename)) {
+    if (ec_pattern_match(data->pattern.buffer, data->full_filename)) {
         editorconfig_option_set(&data->options, name, value);
     }
 
-    free(pattern);
     return 1;
 }
 
@@ -123,7 +125,9 @@ int editorconfig_parse(const char *full_filename, EditorConfigOptions *opts)
 {
     BUG_ON(full_filename[0] != '/');
     CallbackData data = {
-        .full_filename = full_filename
+        .full_filename = full_filename,
+        .config_file_dir = STRING_VIEW_INIT,
+        .pattern = STRING_INIT
     };
 
     char buf[8192];
@@ -143,6 +147,7 @@ int editorconfig_parse(const char *full_filename, EditorConfigOptions *opts)
         data.config_file_dir = string_view(buf, dir_len);
         int err_num = ini_parse(buf, ini_handler, &data);
         if (err_num > 0) {
+            string_free(&data.pattern);
             return err_num;
         }
 
@@ -154,6 +159,8 @@ int editorconfig_parse(const char *full_filename, EditorConfigOptions *opts)
         dir_len = slash - buf;
         memcpy(buf + dir_len, "/.editorconfig", 15);
     }
+
+    string_free(&data.pattern);
 
     // Set indent_size to "tab" if indent_size is not specified and
     // indent_style is set to "tab".

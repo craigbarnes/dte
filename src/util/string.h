@@ -54,6 +54,7 @@ void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
 char *string_steal(String *s, size_t *len) NONNULL_ARGS;
 char *string_steal_cstring(String *s) NONNULL_ARGS;
 char *string_cstring(const String *s) NONNULL_ARGS;
+void string_ensure_null_terminated(String *s) NONNULL_ARGS;
 void string_make_space(String *s, size_t pos, size_t len) NONNULL_ARGS;
 void string_remove(String *s, size_t pos, size_t len) NONNULL_ARGS;
 

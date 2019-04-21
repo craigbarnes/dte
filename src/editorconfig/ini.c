@@ -111,6 +111,7 @@ int ini_parse_file(FILE *file, IniCallback handler, void *user)
     char *value;
     int lineno = 0;
     int error = 0;
+    unsigned int nameidx = 0;
 
     // Scan through file line by line
     while (fgets(line, sizeof(line), file) != NULL) {
@@ -144,6 +145,7 @@ int ini_parse_file(FILE *file, IniCallback handler, void *user)
                 }
                 strncpy0(section, start + 1, sizeof(section));
                 *prev_name = '\0';
+                nameidx = 0;
             }
             else if (!error) {
                 // No ']' found on section line
@@ -176,7 +178,7 @@ int ini_parse_file(FILE *file, IniCallback handler, void *user)
 
                 // Valid name[=:]value pair found, call handler
                 strncpy0(prev_name, name, sizeof(prev_name));
-                if (!handler(user, section, name, value) && !error) {
+                if (!handler(user, section, name, value, nameidx++) && !error) {
                     error = lineno;
                 }
             }

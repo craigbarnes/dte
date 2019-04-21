@@ -116,6 +116,12 @@ char *string_cstring(const String *s)
     return b;
 }
 
+void string_ensure_null_terminated(String *s)
+{
+    string_grow(s, 1);
+    s->buffer[s->len] = '\0';
+}
+
 void string_make_space(String *s, size_t pos, size_t len)
 {
     BUG_ON(pos > s->len);
