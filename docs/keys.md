@@ -64,16 +64,39 @@ Default Key Bindings
 `Alt`+`Shift`+`f`
 :   Find previous occurence of word under cursor
 
+### Selection
+
+`Shift`+`left`, `Shift`+`right`
+:   Select one character left/right
+
+`Ctrl`+`Shift`+`left`, `Ctrl`+`Shift`+`right`
+:   Select one word left/right
+
+`Shift`+`up`, `Shift`+`down`
+:   Select to column above/below cursor
+
+`Ctrl`+`Shift`+`up`, `Ctrl`+`Shift`+`down`
+:   Select one whole line up/down
+
+`Alt`+`Shift`+`left`, `Shift`+`Home`
+:   Select from cursor to beginning of line
+
+`Alt`+`Shift`+`right`, `Shift`+`End`
+:   Select from cursor to end of line
+
+`Shift`+`Page Up`, `Alt`+`Shift`+`up`
+:   Select one page above cursor
+
+`Shift`+`Page Down`, `Alt`+`Shift`+`down`
+:   Select one page below cursor
+
+`Ctrl`+`Shift`+`Page Up`, `Ctrl`+`Alt`+`Shift`+`up`
+:   Select whole lines one page up
+
+`Ctrl`+`Shift`+`Page Down`, `Ctrl`+`Alt`+`Shift`+`down`
+:   Select whole lines one page down
+
 ### Editing
-
-`Alt`+`s`
-:   Begin selecting characters
-
-`Alt`+`l`
-:   Begin selecting whole lines
-
-`Alt`+`u`, `Esc`
-:   Stop selecting
 
 `Ctrl`+`c`
 :   Copy selection (or line)
