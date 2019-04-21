@@ -906,11 +906,11 @@ static void cmd_refresh(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_repeat(const char *pf, char **args)
 {
-    int count = 0;
-    if (!str_to_int(args[0], &count)) {
-        error_msg("Not a valid integer: %s", args[0]);
+    unsigned int count = 0;
+    if (!str_to_uint(args[0], &count)) {
+        error_msg("Not a valid repeat count: %s", args[0]);
         return;
-    } else if (count <= 0) {
+    } else if (count == 0) {
         return;
     }
 
