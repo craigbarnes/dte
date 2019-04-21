@@ -54,7 +54,7 @@ bind ^L 'command line\ '
 # ^M == Enter
 bind ^N open
 bind ^O 'command open\ '
-bind ^Q quit
+bind ^Q 'quit -p'
 bind ^R 'command replace\ '
 bind ^S 'save -p'
 bind ^T open
