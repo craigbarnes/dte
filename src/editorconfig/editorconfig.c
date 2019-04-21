@@ -127,17 +127,9 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         .pattern = STRING_INIT
     };
 
-    char buf[8192];
-    size_t dir_len;
-    const char *slash = strrchr(pathname, '/');
-    BUG_ON(slash == NULL);
-    if (slash == pathname) {
-        dir_len = 0;
-    } else {
-        dir_len = slash - pathname;
-        memcpy(buf, pathname, dir_len);
-    }
-    memcpy(buf + dir_len, "/.editorconfig", 15);
+    char buf[8192] = "/.editorconfig";
+    const char *ptr = pathname + 1;
+    size_t dir_len = 1;
 
     // Iterate up directory tree, looking for ".editorconfig" at each level
     while (1) {
@@ -148,13 +140,15 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
             return err_num;
         }
 
-        buf[dir_len] = '\0';
-        slash = memrchr_(buf, '/', dir_len);
+        const char *const slash = strchr(ptr, '/');
         if (slash == NULL) {
             break;
         }
-        dir_len = slash - buf;
+
+        dir_len = slash - pathname;
+        memcpy(buf, pathname, dir_len);
         memcpy(buf + dir_len, "/.editorconfig", 15);
+        ptr = slash + 1;
     }
 
     string_free(&data.pattern);
