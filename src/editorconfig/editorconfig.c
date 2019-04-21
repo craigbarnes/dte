@@ -29,31 +29,32 @@ static void editorconfig_option_set (
     const char *name,
     const char *val
 ) {
+    unsigned int n = 0;
     if (streq_icase(name, "indent_style")) {
         if (streq_icase(val, "space")) {
             options->indent_style = INDENT_STYLE_SPACE;
         } else if (streq_icase(val, "tab")) {
             options->indent_style = INDENT_STYLE_TAB;
+        } else {
+            options->indent_style = INDENT_STYLE_UNSPECIFIED;
         }
     } else if (streq_icase(name, "indent_size")) {
-        unsigned int n;
         if (streq_icase(val, "tab")) {
             options->indent_size_is_tab = true;
             options->indent_size = 0;
-        } else if (str_to_uint(val, &n)) {
-            options->indent_size_is_tab = false;
+        } else {
+            str_to_uint(val, &n);
+            // If str_to_uint() failed, n is zero, which is deliberately
+            // used to "reset" the option due to an invalid value
             options->indent_size = n;
+            options->indent_size_is_tab = false;
         }
     } else if (streq_icase(name, "tab_width")) {
-        unsigned int n;
-        if (str_to_uint(val, &n)) {
-            options->tab_width = n;
-        }
+        str_to_uint(val, &n);
+        options->tab_width = n;
     } else if (streq_icase(name, "max_line_length")) {
-        unsigned int n;
-        if (str_to_uint(val, &n)) {
-            options->max_line_length = n;
-        }
+        str_to_uint(val, &n);
+        options->max_line_length = n;
     }
 }
 
