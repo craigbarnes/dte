@@ -46,7 +46,7 @@ void set_editorconfig_options(Buffer *b)
     }
 
     EditorConfigOptions opts;
-    if (editorconfig_parse(path, &opts) != 0) {
+    if (get_editorconfig_options(path, &opts) != 0) {
         return;
     }
 

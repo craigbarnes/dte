@@ -8,15 +8,12 @@
 #include "match.h"
 #include "../common.h"
 #include "../debug.h"
-#include "../util/ascii.h"
-#include "../util/path.h"
 #include "../util/string.h"
 #include "../util/string-view.h"
 #include "../util/strtonum.h"
-#include "../util/xmalloc.h"
 
 typedef struct {
-    const char *full_filename;
+    const char *pathname;
     StringView config_file_dir;
     EditorConfigOptions options;
     String pattern;
@@ -114,31 +111,31 @@ static int ini_handler (
         BUG_ON(data->pattern.len == 0);
     }
 
-    if (ec_pattern_match(data->pattern.buffer, data->full_filename)) {
+    if (ec_pattern_match(data->pattern.buffer, data->pathname)) {
         editorconfig_option_set(&data->options, name, value);
     }
 
     return 1;
 }
 
-int editorconfig_parse(const char *full_filename, EditorConfigOptions *opts)
+int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
 {
-    BUG_ON(full_filename[0] != '/');
+    BUG_ON(pathname[0] != '/');
     CallbackData data = {
-        .full_filename = full_filename,
+        .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,
         .pattern = STRING_INIT
     };
 
     char buf[8192];
     size_t dir_len;
-    const char *slash = strrchr(full_filename, '/');
+    const char *slash = strrchr(pathname, '/');
     BUG_ON(slash == NULL);
-    if (slash == full_filename) {
+    if (slash == pathname) {
         dir_len = 0;
     } else {
-        dir_len = slash - full_filename;
-        memcpy(buf, full_filename, dir_len);
+        dir_len = slash - pathname;
+        memcpy(buf, pathname, dir_len);
     }
     memcpy(buf + dir_len, "/.editorconfig", 15);
 

@@ -2,6 +2,7 @@
 #define EDITORCONFIG_H
 
 #include <stdbool.h>
+#include "../util/macros.h"
 
 typedef enum {
     INDENT_STYLE_UNSPECIFIED,
@@ -17,6 +18,7 @@ typedef struct {
     bool indent_size_is_tab;
 } EditorConfigOptions;
 
-int editorconfig_parse(const char *full_filename, EditorConfigOptions *opts);
+NONNULL_ARG(1)
+int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts);
 
 #endif
