@@ -857,10 +857,18 @@ static void cmd_prev(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_quit(const char *pf, char** UNUSED_ARG(args))
 {
-    if (pf[0]) {
-        editor.status = EDITOR_EXITING;
-        return;
+    bool prompt = false;
+    while (*pf) {
+        switch (*pf++) {
+        case 'f':
+            editor.status = EDITOR_EXITING;
+            return;
+        case 'p':
+            prompt = true;
+            break;
+        }
     }
+
     for (size_t i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];
         if (buffer_modified(b)) {
@@ -875,13 +883,21 @@ static void cmd_quit(const char *pf, char** UNUSED_ARG(args))
                 mark_everything_changed();
             }
             set_view(v);
-            error_msg (
-                "Save modified files or run 'quit -f' to quit"
-                " without saving."
-            );
-            return;
+            if (prompt) {
+                if (get_confirmation("yN", "Quit without saving changes?") == 'y') {
+                    editor.status = EDITOR_EXITING;
+                }
+                return;
+            } else {
+                error_msg (
+                    "Save modified files or run 'quit -f' to quit"
+                    " without saving."
+                );
+                return;
+            }
         }
     }
+
     editor.status = EDITOR_EXITING;
 }
 
@@ -1817,7 +1833,7 @@ const Command commands[] = {
     {"pgdown", "cl", 0, 0, cmd_pgdown},
     {"pgup", "cl", 0, 0, cmd_pgup},
     {"prev", "", 0, 0, cmd_prev},
-    {"quit", "f", 0, 0, cmd_quit},
+    {"quit", "fp", 0, 0, cmd_quit},
     {"redo", "", 0, 1, cmd_redo},
     {"refresh", "", 0, 0, cmd_refresh},
     {"repeat", "", 2, -1, cmd_repeat},

@@ -568,7 +568,10 @@ Display previous file.
 Quit.
 
 `-f`
-:   Force quitting even if there are unsaved files
+:   Force quit, even if there are unsaved files
+
+`-p`
+:   Prompt for confirmation if there are unsaved files
 
 ### **redo** [_choice_]
 
