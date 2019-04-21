@@ -262,9 +262,11 @@ CommandLineResult cmdline_handle_key (
         goto handled;
 
     case KEY_HOME:
+    case MOD_META | KEY_LEFT:
         c->pos = 0;
         goto handled;
     case KEY_END:
+    case MOD_META | KEY_RIGHT:
         c->pos = c->buf.len;
         goto handled;
     case KEY_UP:
