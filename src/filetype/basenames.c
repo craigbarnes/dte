@@ -53,6 +53,7 @@ static const FileBasenameMap dotfiles[] = {
     {"bash_profile", SHELL},
     {"bashrc", SHELL},
     {"clang-format", YAML},
+    {"clang-tidy", YAML},
     {"cshrc", SHELL},
     {"drirc", XML},
     {"editorconfig", INI},
