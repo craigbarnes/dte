@@ -1,8 +1,32 @@
 Releases
 ========
 
-v1.8 (latest release)
----------------------
+v1.8.1 (latest release)
+-----------------------
+
+Released on 2019-04-22.
+
+**Fixes:**
+
+* Fixed parsing of escaped special characters in command arguments
+  (which was causing Lua syntax highlighting to fail).
+* Removed use of `rep` (repeat character) control sequence, due to
+  problems caused by certain terminal emulators that claim to be
+  "xterm" but don't support the full set of features in the xterm
+  `terminfo(5)` entry (notably, the FreeBSD 12 console).
+
+**Additions:**
+
+* Show a confirmation prompt if Ctrl+q (quit) is pressed with unsaved
+  changes, instead of a cryptic error message.
+
+**Downloads:**
+
+* [dte-1.8.1.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.1.tar.gz)
+* [dte-1.8.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.1.tar.gz.sig)
+
+v1.8
+----
 
 Released on 2019-04-18.
 
