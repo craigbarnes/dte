@@ -2,6 +2,7 @@
 #include "config.h"
 #include "common.h"
 #include "completion.h"
+#include "debug.h"
 #include "error.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"

@@ -1,4 +1,6 @@
+#include <unistd.h>
 #include "file-option.h"
+#include "common.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "spawn.h"

@@ -1,10 +1,11 @@
 #include "screen.h"
-#include "util/utf8.h"
-#include "terminal/output.h"
-#include "terminal/terminal.h"
+#include "debug.h"
 #include "editor.h"
 #include "error.h"
 #include "search.h"
+#include "terminal/output.h"
+#include "terminal/terminal.h"
+#include "util/utf8.h"
 
 static void print_message(const char *msg, bool is_error)
 {

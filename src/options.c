@@ -1,6 +1,7 @@
 #include "options.h"
 #include "common.h"
 #include "completion.h"
+#include "debug.h"
 #include "editor.h"
 #include "error.h"
 #include "file-option.h"

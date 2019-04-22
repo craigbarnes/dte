@@ -1,5 +1,6 @@
 #include "change.h"
 #include "buffer.h"
+#include "debug.h"
 #include "error.h"
 #include "util/xmalloc.h"
 #include "view.h"

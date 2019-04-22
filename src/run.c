@@ -2,6 +2,7 @@
 #include "change.h"
 #include "command.h"
 #include "common.h"
+#include "debug.h"
 #include "config.h"
 #include "error.h"
 #include "parse-args.h"

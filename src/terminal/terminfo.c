@@ -1,4 +1,5 @@
 #include "terminfo.h"
+#include "../debug.h"
 #include "../util/macros.h"
 
 #ifndef TERMINFO_DISABLE

@@ -1,4 +1,7 @@
+#include <errno.h>
+#include <unistd.h>
 #include "window.h"
+#include "common.h"
 #include "editor.h"
 #include "error.h"
 #include "file-history.h"

@@ -1,5 +1,6 @@
 #include <string.h>
 #include "test.h"
+#include "../src/debug.h"
 #include "../src/terminal/color.h"
 #include "../src/terminal/key.h"
 #include "../src/terminal/xterm.h"

@@ -6,7 +6,6 @@
 #include <string.h>
 #include "color.h"
 #include "../util/macros.h"
-#include "../util/string-view.h"
 #include "../util/unicode.h"
 
 typedef struct {

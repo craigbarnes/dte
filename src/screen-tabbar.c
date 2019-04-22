@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "debug.h"
 #include "editor.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"

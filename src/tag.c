@@ -1,8 +1,10 @@
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "tag.h"
 #include "common.h"
 #include "completion.h"
+#include "debug.h"
 #include "error.h"
 #include "util/path.h"
 #include "util/xmalloc.h"

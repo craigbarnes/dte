@@ -2,10 +2,13 @@
 #include <locale.h>
 #include <signal.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "editor.h"
 #include "buffer.h"
 #include "command.h"
+#include "common.h"
 #include "config.h"
+#include "debug.h"
 #include "error.h"
 #include "mode.h"
 #include "screen.h"

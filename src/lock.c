@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 #include "lock.h"
 #include "buffer.h"
+#include "common.h"
 #include "editor.h"
 #include "error.h"
 #include "util/ascii.h"

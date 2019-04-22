@@ -1,7 +1,10 @@
 #include <fcntl.h>
+#include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "common.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 size_t count_nl(const char *buf, size_t size)
 {

@@ -1,5 +1,6 @@
 #include "command.h"
 #include "common.h"
+#include "debug.h"
 #include "editor.h"
 #include "env.h"
 #include "error.h"

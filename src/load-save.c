@@ -1,9 +1,13 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "load-save.h"
 #include "block.h"
+#include "common.h"
+#include "debug.h"
 #include "editor.h"
 #include "encoding/bom.h"
 #include "encoding/convert.h"

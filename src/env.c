@@ -1,5 +1,7 @@
 #include "env.h"
+#include "common.h"
 #include "completion.h"
+#include "debug.h"
 #include "editor.h"
 #include "error.h"
 #include "selection.h"

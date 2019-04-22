@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "parse-args.h"
 #include "common.h"
 #include "error.h"

@@ -1,6 +1,7 @@
 #include "test.h"
 #include "../src/common.h"
 #include "../src/config.h"
+#include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/frame.h"
 #include "../src/terminal/terminal.h"

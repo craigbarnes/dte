@@ -1,5 +1,6 @@
 #include <strings.h>
 #include "screen.h"
+#include "debug.h"
 #include "editor.h"
 #include "selection.h"
 #include "syntax/highlight.h"

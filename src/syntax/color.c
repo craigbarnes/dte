@@ -1,6 +1,7 @@
 #include <string.h>
 #include "color.h"
 #include "../common.h"
+#include "../debug.h"
 #include "../completion.h"
 #include "../util/macros.h"
 #include "../util/ptr-array.h"

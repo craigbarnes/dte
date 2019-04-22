@@ -1,5 +1,7 @@
 #include "block.h"
 #include "buffer.h"
+#include "common.h"
+#include "debug.h"
 #include "syntax/highlight.h"
 #include "util/xmalloc.h"
 #include "view.h"

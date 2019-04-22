@@ -4,6 +4,7 @@
 #include "cmdline.h"
 #include "command.h"
 #include "common.h"
+#include "debug.h"
 #include "config.h"
 #include "editor.h"
 #include "env.h"

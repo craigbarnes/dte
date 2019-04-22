@@ -2,6 +2,7 @@
 #define BLOCK_ITER_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "block.h"
 #include "util/macros.h"
 

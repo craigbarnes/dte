@@ -7,11 +7,11 @@
 #include <sys/stat.h>
 #include "block-iter.h"
 #include "change.h"
-#include "common.h"
-#include "options.h"
 #include "encoding/encoding.h"
+#include "options.h"
 #include "syntax/syntax.h"
 #include "util/list.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/unicode.h"
 

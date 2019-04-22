@@ -1,8 +1,13 @@
+#include <errno.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "alias.h"
+#include "common.h"
 #include "config.h"
+#include "debug.h"
 #include "editor.h"
 #include "error.h"
 #include "file-history.h"

@@ -4,7 +4,6 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include "../src/util/macros.h"
-#include "../src/common.h"
 
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)

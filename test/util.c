@@ -1,5 +1,6 @@
 #include <limits.h>
 #include "test.h"
+#include "../src/common.h"
 #include "../src/syntax/hashset.h"
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
@@ -8,8 +9,8 @@
 #include "../src/util/string.h"
 #include "../src/util/string-view.h"
 #include "../src/util/strtonum.h"
-#include "../src/util/utf8.h"
 #include "../src/util/unicode.h"
+#include "../src/util/utf8.h"
 #include "../src/util/xmalloc.h"
 #include "../src/util/xsnprintf.h"
 

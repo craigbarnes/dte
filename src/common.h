@@ -3,14 +3,10 @@
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
-#include "debug.h"
 #include "util/macros.h"
-#include "util/xreadwrite.h"
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 

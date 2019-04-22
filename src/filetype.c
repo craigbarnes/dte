@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "filetype.h"
 #include "common.h"
+#include "debug.h"
 #include "util/macros.h"
 #include "util/path.h"
 #include "util/ptr-array.h"

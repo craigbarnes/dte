@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test.h"
+#include "../src/common.h"
 
 unsigned int failed;
 

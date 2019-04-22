@@ -1,4 +1,6 @@
+#include <unistd.h>
 #include "buffer.h"
+#include "common.h"
 #include "editor.h"
 #include "file-option.h"
 #include "filetype.h"

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "test.h"
 #include "../src/command.h"
+#include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"
