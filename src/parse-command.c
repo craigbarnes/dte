@@ -172,7 +172,7 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde)
             if (pos == len) {
                 goto end;
             }
-            ch = cmd[pos];
+            ch = cmd[pos++];
             // Fallthrough
         default:
             string_add_byte(&buf, ch);
