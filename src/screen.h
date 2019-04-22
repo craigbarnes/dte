@@ -12,7 +12,8 @@ void mask_color(TermColor *color, const TermColor *over);
 
 void print_tabbar(Window *w);
 int print_command(char prefix);
-void print_message(const char *msg, bool is_error);
+void show_message(const char *msg, bool is_error);
+void update_command_line(void);
 void update_term_title(const Buffer *b);
 void update_range(const View *v, int y1, int y2);
 void update_separators(void);

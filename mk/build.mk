@@ -51,9 +51,9 @@ editor_objects := $(call prefix-obj, build/, \
     commands common compiler completion config ctags debug edit editor \
     env error file-history file-option filetype frame history \
     indent load-save lock main mode-command mode-git-open mode-normal \
-    mode-search move msg options parse-args parse-command run screen \
-    screen-status screen-tabbar screen-view search selection \
-    spawn tag view window ) \
+    mode-search move msg options parse-args parse-command run \
+    screen screen-cmdline screen-status screen-tabbar screen-view \
+    search selection spawn tag view window ) \
     $(editorconfig_objects) \
     $(encoding_objects) \
     $(syntax_objects) \

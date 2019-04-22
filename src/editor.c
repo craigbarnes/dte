@@ -129,36 +129,6 @@ void any_key(void)
     }
 }
 
-static void show_message(const char *const msg, bool is_error)
-{
-    buf_reset(0, terminal.width, 0);
-    terminal.move_cursor(0, terminal.height - 1);
-    print_message(msg, is_error);
-    buf_clear_eol();
-}
-
-static void update_command_line(void)
-{
-    char prefix = ':';
-
-    buf_reset(0, terminal.width, 0);
-    terminal.move_cursor(0, terminal.height - 1);
-    switch (editor.input_mode) {
-    case INPUT_NORMAL:
-        print_message(error_ptr, msg_is_error);
-        break;
-    case INPUT_SEARCH:
-        prefix = current_search_direction() == SEARCH_FWD ? '/' : '?';
-        // fallthrough
-    case INPUT_COMMAND:
-        editor.cmdline_x = print_command(prefix);
-        break;
-    case INPUT_GIT_OPEN:
-        break;
-    }
-    buf_clear_eol();
-}
-
 static void update_window_full(Window *w)
 {
     View *v = w->view;
