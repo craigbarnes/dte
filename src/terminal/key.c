@@ -3,7 +3,7 @@
 #include "key.h"
 #include "../debug.h"
 #include "../util/ascii.h"
-#include "../util/uchar.h"
+#include "../util/utf8.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char special_names[][8] = {

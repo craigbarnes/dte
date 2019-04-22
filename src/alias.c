@@ -8,7 +8,7 @@
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 
 typedef struct {

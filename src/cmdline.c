@@ -4,7 +4,7 @@
 #include "history.h"
 #include "terminal/input.h"
 #include "util/ascii.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 
 static void cmdline_delete(CommandLine *c)
 {

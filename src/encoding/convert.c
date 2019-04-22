@@ -7,7 +7,7 @@
 #include "encoding.h"
 #include "../common.h"
 #include "../util/ascii.h"
-#include "../util/uchar.h"
+#include "../util/utf8.h"
 #include "../util/xmalloc.h"
 
 static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF

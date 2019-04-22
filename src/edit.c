@@ -7,7 +7,7 @@
 #include "selection.h"
 #include "util/regexp.h"
 #include "util/string.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "view.h"
 

@@ -2,7 +2,7 @@
 #include "buffer.h"
 #include "indent.h"
 #include "util/ascii.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 
 typedef enum {
     CT_SPACE,

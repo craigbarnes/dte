@@ -8,7 +8,7 @@
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/ptr-array.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 #include "window.h"

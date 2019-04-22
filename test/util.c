@@ -8,7 +8,7 @@
 #include "../src/util/string.h"
 #include "../src/util/string-view.h"
 #include "../src/util/strtonum.h"
-#include "../src/util/uchar.h"
+#include "../src/util/utf8.h"
 #include "../src/util/unicode.h"
 #include "../src/util/xmalloc.h"
 #include "../src/util/xsnprintf.h"

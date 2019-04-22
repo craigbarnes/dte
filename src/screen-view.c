@@ -6,7 +6,7 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 
 typedef struct {
     const View *view;

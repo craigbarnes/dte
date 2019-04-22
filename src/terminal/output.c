@@ -6,7 +6,7 @@
 #include "terminal.h"
 #include "../debug.h"
 #include "../util/ascii.h"
-#include "../util/uchar.h"
+#include "../util/utf8.h"
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 

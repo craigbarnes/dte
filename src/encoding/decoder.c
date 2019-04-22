@@ -2,7 +2,7 @@
 #include "decoder.h"
 #include "convert.h"
 #include "../editor.h"
-#include "../util/uchar.h"
+#include "../util/utf8.h"
 #include "../util/xmalloc.h"
 
 static bool fill(FileDecoder *dec)

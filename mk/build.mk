@@ -31,8 +31,8 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf fuzz1 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec path ptr-array regexp string strtonum uchar \
-    unicode wbuf xmalloc xreadwrite xsnprintf )
+    ascii exec path ptr-array regexp string strtonum unicode utf8 \
+    wbuf xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )

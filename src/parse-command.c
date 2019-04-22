@@ -6,7 +6,7 @@
 #include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 
 static size_t parse_sq(const char *cmd, size_t len, String *buf)

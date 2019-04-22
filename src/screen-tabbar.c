@@ -3,7 +3,7 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/strtonum.h"
-#include "util/uchar.h"
+#include "util/utf8.h"
 #include "util/xsnprintf.h"
 
 static int tab_title_width(int number, const char *filename)

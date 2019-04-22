@@ -1,4 +1,4 @@
-#include "uchar.h"
+#include "utf8.h"
 #include "ascii.h"
 
 static inline CONST_FN int u_seq_len(unsigned int first_byte)
