@@ -15,15 +15,13 @@ static inline PURE bool bisearch (
     const CodepointRange *const range,
     size_t max
 ) {
-    size_t min = 0;
-    size_t mid;
-
     if (u < range[0].first || u > range[max].last) {
         return false;
     }
 
+    size_t min = 0;
     while (max >= min) {
-        mid = (min + max) / 2;
+        const size_t mid = (min + max) / 2;
         if (u > range[mid].last) {
             min = mid + 1;
         } else if (u < range[mid].first) {

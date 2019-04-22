@@ -80,7 +80,7 @@ static bool contains_upper(const char *str)
 
 static void split(PointerArray *words, const char *str)
 {
-    size_t s, i = 0;
+    size_t i = 0;
     while (str[i]) {
         while (ascii_isspace(str[i])) {
             i++;
@@ -88,7 +88,7 @@ static void split(PointerArray *words, const char *str)
         if (!str[i]) {
             break;
         }
-        s = i++;
+        const size_t s = i++;
         while (str[i] && !ascii_isspace(str[i])) {
             i++;
         }

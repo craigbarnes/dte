@@ -324,9 +324,6 @@ static void line_info_set_line (
 
 static void print_line(LineInfo *info)
 {
-    TermColor color;
-    CodePoint u;
-
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char(), which is much faster than
     // buf_skip(screen_next_char(info)).
@@ -341,7 +338,7 @@ static void print_line(LineInfo *info)
 
     while (info->pos < info->size) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
-        u = screen_next_char(info);
+        CodePoint u = screen_next_char(info);
         if (!buf_put_char(u)) {
             // +1 for newline
             info->offset += info->size - info->pos + 1;
@@ -349,6 +346,7 @@ static void print_line(LineInfo *info)
         }
     }
 
+    TermColor color;
     if (editor.options.display_special && obuf.x >= obuf.scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
         color = *builtin_colors[BC_DEFAULT];

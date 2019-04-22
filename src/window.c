@@ -426,9 +426,9 @@ int vertical_tabbar_width(const Window *win)
 
 static int line_numbers_width(const Window *win)
 {
-    int w = 0, min_w = 5;
-
+    int w = 0;
     if (editor.options.show_line_numbers && win->view) {
+        const int min_w = 5;
         w = number_width(win->view->buffer->nl) + 1;
         if (w < min_w) {
             w = min_w;

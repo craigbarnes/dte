@@ -259,10 +259,9 @@ static bool has_prefix(const char *str, const char *prefix_lcase)
 {
     size_t ni = 0;
     size_t hi = 0;
-    CodePoint pc, sc;
-
+    CodePoint pc;
     while ((pc = u_str_get_char(prefix_lcase, &ni))) {
-        sc = u_str_get_char(str, &hi);
+        CodePoint sc = u_str_get_char(str, &hi);
         if (sc != pc && u_to_lower(sc) != pc) {
             return false;
         }

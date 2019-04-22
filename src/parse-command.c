@@ -78,10 +78,9 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
                 break;
             case 'x':
                 if (pos < len) {
-                    int x1, x2;
-                    x1 = hex_decode(cmd[pos]);
+                    const int x1 = hex_decode(cmd[pos]);
                     if (x1 >= 0 && ++pos < len) {
-                        x2 = hex_decode(cmd[pos]);
+                        const int x2 = hex_decode(cmd[pos]);
                         if (x2 >= 0) {
                             pos++;
                             ch = x1 << 4 | x2;
@@ -137,7 +136,7 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
 
 char *parse_command_arg(const char *cmd, size_t len, bool tilde)
 {
-    String buf = STRING_INIT;
+    String buf;
     size_t pos = 0;
 
     if (tilde && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {

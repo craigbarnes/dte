@@ -347,11 +347,10 @@ static void init_completion(void)
             const char *value = find_alias(name);
 
             if (value) {
-                size_t i, save = array.count;
-
+                size_t save = array.count;
                 if (!parse_commands(&array, value, &err)) {
                     error_free(err);
-                    for (i = save; i < array.count; i++) {
+                    for (size_t i = save; i < array.count; i++) {
                         free(array.ptrs[i]);
                         array.ptrs[i] = NULL;
                     }
