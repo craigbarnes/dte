@@ -1,8 +1,23 @@
 Releases
 ========
 
-v1.8.1 (latest release)
+v1.8.2 (latest release)
 -----------------------
+
+Released on 2019-04-23.
+
+**Changes:**
+
+* Fixed makefile to work with GNU Make 3.81 (which is still used
+  by OS X and Ubuntu 14.04).
+
+**Downloads:**
+
+* [dte-1.8.2.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.2.tar.gz)
+* [dte-1.8.2.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.8.2.tar.gz.sig)
+
+v1.8.1
+------
 
 Released on 2019-04-22.
 
