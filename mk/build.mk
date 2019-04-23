@@ -30,6 +30,9 @@ BUILTIN_CONFIGS := $(addprefix config/, \
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf fuzz1 ))
 
+build_subdirs := $(addprefix build/, $(addsuffix /, \
+    editorconfig encoding syntax terminal util test ))
+
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec path ptr-array regexp string strtonum unicode utf8 \
     wbuf xmalloc xreadwrite xsnprintf )
@@ -194,7 +197,7 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/%/: | build/
+$(build_subdirs): | build/
 	$(Q) mkdir -p $@
 
 build/:
