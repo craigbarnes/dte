@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "unicode.h"
 #include "ascii.h"
+#include "../editor.h"
 
 #define BISEARCH(u, arr) bisearch((u), (arr), ARRAY_COUNT(arr) - 1)
 
@@ -66,9 +67,17 @@ bool u_is_word_char(CodePoint u)
     return u >= 0x80 || is_alnum_or_underscore(u);
 }
 
+static bool u_is_default_ignorable(CodePoint u)
+{
+    return BISEARCH(u, default_ignorable);
+}
+
 bool u_is_unprintable(CodePoint u)
 {
     if (BISEARCH(u, unprintable)) {
+        return true;
+    }
+    if (editor.options.display_invisible && u_is_default_ignorable(u)) {
         return true;
     }
     return !u_is_unicode(u);
@@ -79,9 +88,20 @@ bool u_is_special_whitespace(CodePoint u)
     return BISEARCH(u, special_whitespace);
 }
 
-bool u_is_nonspacing_mark(CodePoint u)
+static bool u_is_nonspacing_mark(CodePoint u)
 {
     return BISEARCH(u, nonspacing_mark);
+}
+
+bool u_is_zero_width(CodePoint u)
+{
+    if (u_is_nonspacing_mark(u)) {
+        return true;
+    }
+    if (!editor.options.display_invisible && u_is_default_ignorable(u)) {
+        return true;
+    }
+    return false;
 }
 
 static bool u_is_double_width(CodePoint u)
@@ -96,7 +116,7 @@ unsigned int u_char_width(CodePoint u)
             return 2; // Rendered in caret notation (e.g. ^@)
         }
         return 1;
-    } else if (u_is_nonspacing_mark(u)) {
+    } else if (u_is_zero_width(u)) {
         return 0;
     } else if (u_is_unprintable(u)) {
         return 4; // Rendered as <xx>

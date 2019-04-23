@@ -69,7 +69,7 @@ void move_to_preferred_x(int preferred_x)
     // If cursor stopped on a zero-width char, move to the next spacing char.
     // TODO: Incorporate this cursor fixup into the logic above.
     CodePoint u;
-    if (buffer_get_char(&view->cursor, &u) && u_is_nonspacing_mark(u)) {
+    if (buffer_get_char(&view->cursor, &u) && u_is_zero_width(u)) {
         buffer_next_column(&view->cursor);
     }
 }

@@ -426,6 +426,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("brace-indent", L(brace_indent), NULL),
     ENUM_OPT("case-sensitive-search", G(case_sensitive_search), case_sensitive_search_enum, NULL),
     FLAG_OPT("detect-indent", C(detect_indent), detect_indent_values, NULL),
+    BOOL_OPT("display-invisible", G(display_invisible), NULL),
     BOOL_OPT("display-special", G(display_special), NULL),
     BOOL_OPT("editorconfig", C(editorconfig), NULL),
     BOOL_OPT("emulate-tab", C(emulate_tab), NULL),

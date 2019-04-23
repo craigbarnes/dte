@@ -70,6 +70,7 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only global
+    unsigned int display_invisible;
     unsigned int display_special;
     unsigned int esc_timeout;
     unsigned int filesize_limit;

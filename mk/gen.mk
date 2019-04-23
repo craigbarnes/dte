@@ -1,6 +1,8 @@
 FETCH = curl -LSs -o $@
 LUA = lua
-UCD_FILES = .cache/UnicodeData.txt .cache/EastAsianWidth.txt
+
+UCD_FILES = $(addprefix .cache/, \
+    UnicodeData.txt EastAsianWidth.txt DerivedCoreProperties.txt )
 
 gen-wcwidth: $(UCD_FILES)
 	$(E) GEN src/util/wcwidth.c

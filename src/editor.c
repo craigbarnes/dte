@@ -59,6 +59,7 @@ EditorState editor = {
 
         // Global-only options
         .case_sensitive_search = CSS_TRUE,
+        .display_invisible = false,
         .display_special = false,
         .esc_timeout = 100,
         .lock_files = true,

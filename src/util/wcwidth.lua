@@ -17,6 +17,16 @@ function RangeTable:remove(index)
     self.n = self.n - 1
 end
 
+function RangeTable:contains(codepoint)
+    for i = 1, self.n do
+        local range = self[i]
+        if codepoint >= range.min and codepoint <= range.max then
+            return true
+        end
+    end
+    return false
+end
+
 function RangeTable:merge_adjacent()
     for i = self.n, 1, -1 do
         local cur, prev = self[i], self[i - 1]
@@ -57,10 +67,12 @@ end
 
 local unidata = read_ucd(arg[1], "^0000;")
 local eaw = read_ucd(arg[2], "^# EastAsianWidth")
+local dcp = read_ucd(arg[3], "^# DerivedCoreProperties")
 
 local nonspacing_mark = RangeTable.new()
 local special_whitespace = RangeTable.new()
 local unprintable = RangeTable.new()
+local default_ignorable = RangeTable.new()
 local double_width = RangeTable.new()
 local exclude = RangeTable.new()
 
@@ -69,15 +81,15 @@ local mappings = {
     Zl = special_whitespace, -- Line_Separator (U+2028 only)
     Zp = special_whitespace, -- Paragraph_Separator (U+2029 only)
     Cc = unprintable, -- Control
-    Cf = unprintable, -- Format
     Cs = unprintable, -- Surrogate
     Co = unprintable, -- Private_Use
     Cn = unprintable, -- Unassigned
     Me = nonspacing_mark, -- Enclosing_Mark
     Mn = nonspacing_mark, -- Nonspacing_Mark
 
-    -- This is a "Cf" character, but is included in special_whitespace because
-    -- it looks exactly like a normal space when using a monospace font:
+    -- This is a "default ignorable" character in the "Cf" (Format)
+    -- category, but it's included in special_whitespace because it
+    -- looks exactly like a normal space when using a monospace font:
     [0x00AD] = special_whitespace, -- Soft hyphen
 
     -- These are "Zs" characters, but don't need to be in special_whitespace
@@ -89,6 +101,16 @@ local mappings = {
 -- ASCII
 for u = 0x00, 0x7F do
     mappings[u] = exclude
+end
+
+for min, max, property in dcp:gmatch "\n(%x+)%.*(%x*) *; *([%w_]+)" do
+    if property == "Default_Ignorable_Code_Point" then
+        min = assert(tonumber(min, 16))
+        max = tonumber(max, 16)
+        if not mappings[min] then
+            default_ignorable:insert(min, max or min)
+        end
+    end
 end
 
 local prev_codepoint = -1
@@ -107,7 +129,10 @@ for codepoint, name, category in unidata:gmatch "(%x+);([^;]*);(%u%a);[^\n]*\n" 
 
     local t = mappings[codepoint] or mappings[category]
 
-    if range then
+    if t == unprintable and default_ignorable:contains(codepoint) then
+        -- Don't add codepoints to the unprintable table if they've
+        -- already been added to the default_ignorable table
+    elseif range then
         assert(name:match("^<.*, Last>$"))
         range = false
         if t then
@@ -134,6 +159,7 @@ end
 
 local stdout = io.stdout
 special_whitespace:merge_adjacent():print_ranges("special_whitespace", stdout)
+default_ignorable:merge_adjacent():print_ranges("default_ignorable", stdout)
 nonspacing_mark:merge_adjacent():print_ranges("nonspacing_mark", stdout)
 double_width:merge_adjacent():print_ranges("double_width", stdout)
 unprintable:merge_adjacent():print_ranges("unprintable", stdout)
