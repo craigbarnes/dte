@@ -199,7 +199,7 @@ static void print_vertical_tab_title(const View *v, int idx, int width)
 {
     const char *orig_filename = buffer_filename(v->buffer);
     const char *filename = orig_filename;
-    int max = editor.options.tab_bar_max_components;
+    unsigned int max = editor.options.tab_bar_max_components;
     char buf[16];
     int skip;
 
@@ -211,9 +211,8 @@ static void print_vertical_tab_title(const View *v, int idx, int width)
         buffer_modified(v->buffer) ? "+" : " "
     );
     if (max) {
-        int i, count = 1;
-
-        for (i = 0; filename[i]; i++) {
+        int count = 1;
+        for (size_t i = 0; filename[i]; i++) {
             if (filename[i] == '/') {
                 count++;
             }
@@ -225,6 +224,7 @@ static void print_vertical_tab_title(const View *v, int idx, int width)
 
         if (count > max) {
             // Skip possible first slash
+            size_t i;
             for (i = 1; ; i++) {
                 if (filename[i] == '/' && --count == max) {
                     i++;
