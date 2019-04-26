@@ -45,7 +45,13 @@ static size_t get_last_paired_brace_index(const char *str, size_t len)
             break;
         }
     }
-    return last_paired_index;
+    if (open_braces == 0) {
+        return last_paired_index;
+    } else {
+        // If there are unclosed braces, just return 0 and let
+        // ec_pattern_match() escape all braces
+        return 0;
+    }
 }
 
 static size_t handle_bracket_expression(const char *pat, size_t len, String *buf)
