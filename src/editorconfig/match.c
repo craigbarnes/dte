@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "match.h"
+#include "../common.h"
 #include "../debug.h"
 #include "../util/string.h"
 
@@ -36,6 +37,11 @@ static size_t get_last_paired_brace_index(const char *str, size_t len)
             break;
         case '{':
             open_braces++;
+            if (open_braces >= 32) {
+                // If nesting goes too deep, just return 0 and let
+                // ec_pattern_match() escape all braces
+                return 0;
+            }
             break;
         case '}':
             if (open_braces != 0) {
@@ -48,8 +54,7 @@ static size_t get_last_paired_brace_index(const char *str, size_t len)
     if (open_braces == 0) {
         return last_paired_index;
     } else {
-        // If there are unclosed braces, just return 0 and let
-        // ec_pattern_match() escape all braces
+        // If there are unclosed braces, just return 0
         return 0;
     }
 }
@@ -94,12 +99,25 @@ static size_t handle_bracket_expression(const char *pat, size_t len, String *buf
     return i;
 }
 
+// Skips past empty alternates in brace groups and returns the number
+// of bytes (commas) skipped
+static size_t skip_empty_alternates(const char *str, size_t len)
+{
+    size_t i = 1;
+    while (i < len && str[i] == ',') {
+        i++;
+    }
+    return i - 1;
+}
+
 bool ec_pattern_match(const char *pattern, const char *path)
 {
     const size_t pattern_len = strlen(pattern);
     String buf = STRING_INIT;
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);
+    bool brace_group_has_empty_alternate[32];
+    memzero(brace_group_has_empty_alternate);
 
     for (size_t i = 0; i < pattern_len; i++) {
         char ch = pattern[i];
@@ -132,30 +150,54 @@ bool ec_pattern_match(const char *pattern, const char *path)
             // in that context.
             i += handle_bracket_expression(pattern + i, pattern_len - i, &buf);
             break;
-        case '{':
+        case '{': {
             if (i >= last_paired_brace_index) {
                 string_add_literal(&buf, "\\{");
                 break;
             }
             brace_level++;
-            string_add_byte(&buf, '(');
+            size_t skip = skip_empty_alternates(pattern + i, pattern_len - i);
+            if (skip > 0) {
+                i += skip;
+                brace_group_has_empty_alternate[brace_level] = true;
+            }
+            if (i + 1 < pattern_len && pattern[i + 1] == '}') {
+                // If brace group contains only empty alternates, emit nothing
+                brace_group_has_empty_alternate[brace_level] = false;
+                i++;
+                brace_level--;
+            } else {
+                string_add_byte(&buf, '(');
+            }
             break;
+        }
         case '}':
             if (i > last_paired_brace_index || brace_level == 0) {
                 goto add_byte;
             }
-            brace_level--;
             string_add_byte(&buf, ')');
+            if (brace_group_has_empty_alternate[brace_level]) {
+                string_add_byte(&buf, '?');
+            }
+            brace_group_has_empty_alternate[brace_level] = false;
+            brace_level--;
             break;
-        case ',':
+        case ',': {
             if (i >= last_paired_brace_index || brace_level == 0) {
                 goto add_byte;
             }
-            // TODO: don't emit empty alternates in regex (it's "undefined").
-            // Instead, record that the set contains a null pattern and
-            // emit ")?" instead of ")" as the closing delimiter.
-            string_add_byte(&buf, '|');
+            size_t skip = skip_empty_alternates(pattern + i, pattern_len - i);
+            if (skip > 0) {
+                i += skip;
+                brace_group_has_empty_alternate[brace_level] = true;
+            }
+            if (i + 1 < pattern_len && pattern[i + 1] == '}') {
+                brace_group_has_empty_alternate[brace_level] = true;
+            } else {
+                string_add_byte(&buf, '|');
+            }
             break;
+        }
         case '/':
             if (i + 3 < pattern_len && memcmp(pattern + i, "/**/", 4) == 0) {
                 string_add_literal(&buf, "(/|/.*/)");

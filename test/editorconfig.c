@@ -28,6 +28,17 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_TRUE(ec_pattern_match("*.[a", "foo.[a"));
 
     EXPECT_TRUE(ec_pattern_match("*.[abc]def", "foo.bdef"));
+
+    EXPECT_TRUE(ec_pattern_match("x{{foo,},}", "x"));
+    EXPECT_TRUE(ec_pattern_match("x{{foo,},}", "xfoo"));
+
+    EXPECT_TRUE(ec_pattern_match("file.{,,x,,y,,}", "file.x"));
+    EXPECT_TRUE(ec_pattern_match("file.{,,x,,y,,}", "file."));
+    EXPECT_FALSE(ec_pattern_match("file.{,,x,,y,,}", "file.z"));
+
+    EXPECT_TRUE(ec_pattern_match("file.{{{a,b,{c,,d}}}}", "file.d"));
+    EXPECT_TRUE(ec_pattern_match("file.{{{a,b,{c,,d}}}}", "file."));
+    EXPECT_FALSE(ec_pattern_match("file.{{{a,b,{c,d}}}}", "file."));
 }
 
 void test_editorconfig(void)
