@@ -117,7 +117,7 @@ bool ec_pattern_match(const char *pattern, const char *path)
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);
     bool brace_group_has_empty_alternate[32];
-    memzero(brace_group_has_empty_alternate);
+    memzero(&brace_group_has_empty_alternate);
 
     for (size_t i = 0; i < pattern_len; i++) {
         char ch = pattern[i];

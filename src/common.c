@@ -77,7 +77,7 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
     char *line = buf + pos;
     char *nl = memchr(line, '\n', avail);
     if (nl) {
-        *nl = 0;
+        *nl = '\0';
         *posp += nl - line + 1;
     } else {
         line[avail] = '\0';
