@@ -40,7 +40,6 @@ static bool has_line_continuation(const char *str, int len)
 void exec_config(const Command *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
-    char *cmd;
     String line = STRING_INIT;
 
     while (ptr < buf + size) {
@@ -56,9 +55,8 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
                 string_add_buf(&line, ptr, n - 1);
             } else {
                 string_add_buf(&line, ptr, n);
-                cmd = string_cstring(&line);
-                handle_command(cmds, cmd);
-                free(cmd);
+                string_ensure_null_terminated(&line);
+                handle_command(cmds, line.buffer);
                 string_clear(&line);
             }
         }
@@ -66,9 +64,8 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
         ptr += n + 1;
     }
     if (line.len) {
-        cmd = string_cstring(&line);
-        handle_command(cmds, cmd);
-        free(cmd);
+        string_ensure_null_terminated(&line);
+        handle_command(cmds, line.buffer);
     }
     string_free(&line);
 }
