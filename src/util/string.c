@@ -107,12 +107,13 @@ char *string_steal_cstring(String *s)
 
 char *string_cstring(const String *s)
 {
-    char *b = xnew(char, s->len + 1);
-    if (s->len > 0) {
+    const size_t len = s->len;
+    char *b = xnew(char, len + 1);
+    if (len > 0) {
         BUG_ON(!s->buffer);
-        memcpy(b, s->buffer, s->len);
+        memcpy(b, s->buffer, len);
     }
-    b[s->len] = '\0';
+    b[len] = '\0';
     return b;
 }
 
