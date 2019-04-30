@@ -9,7 +9,7 @@ dte \- A small and flexible text editor
 .SH SYNOPSIS
 .
 .B dte
-.RB [ \-hBKRV ]
+.RB [ \-hBHKRV ]
 [\fB\-c\fR \fIcommand\fR]
 [\fB\-t\fR \fIctag\fR]
 [\fB\-r\fR \fIrcfile\fR]
@@ -41,6 +41,12 @@ and exit.
 .B \-B
 Print a list of all built\-in config names that can be used with the
 \fB\-b\fR option and exit.
+.
+.TP
+.B \-H
+Don't load history files at startup or save history files on exit (see
+\fBFILES\fR section below). History features will work as usual but will
+be in-memory only and not persisted to the filesystem.
 .
 .TP
 .B \-R
