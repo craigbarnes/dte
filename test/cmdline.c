@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "test.h"
 #include "../src/cmdline.h"
 #include "../src/completion.h"
@@ -121,6 +122,9 @@ static void test_cmdline_handle_key(void)
     EXPECT_EQ(c->buf.len, 0);
 }
 
+#define ENV_VAR_PREFIX "D__p_tYmz3_"
+#define ENV_VAR_NAME ENV_VAR_PREFIX "_VAR"
+
 void test_complete_command(void)
 {
     complete_command();
@@ -131,6 +135,23 @@ void test_complete_command(void)
     complete_command();
     EXPECT_STRING_EQ(editor.cmdline.buf, "wrap-paragraph ");
     reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "open test/data/.e");
+    complete_command();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "open test/data/.editorconfig ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "toggle ");
+    complete_command();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "toggle auto-indent");
+    reset_completion();
+
+    ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
+    cmdline_set_text(&editor.cmdline, "insert $" ENV_VAR_PREFIX);
+    complete_command();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "insert $" ENV_VAR_NAME);
+    reset_completion();
+    ASSERT_EQ(unsetenv(ENV_VAR_NAME), 0);
 }
 
 void test_cmdline(void)
