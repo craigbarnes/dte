@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <string.h>
 #include "test.h"
+#include "../src/buffer.h"
 #include "../src/command.h"
 #include "../src/debug.h"
 #include "../src/editor.h"
@@ -60,6 +61,25 @@ static void test_commands_array(void)
     }
 }
 
+static void test_detect_indent(void)
+{
+    EXPECT_FALSE(editor.options.detect_indent);
+    EXPECT_FALSE(editor.options.expand_tab);
+    EXPECT_EQ(editor.options.indent_width, 8);
+
+    handle_command (
+        commands,
+        "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
+        "open test/data/detect-indent.ini"
+    );
+
+    EXPECT_TRUE(buffer->options.detect_indent);
+    EXPECT_TRUE(buffer->options.expand_tab);
+    EXPECT_EQ(buffer->options.indent_width, 2);
+
+    handle_command(commands, "close");
+}
+
 static void test_posix_sanity(void)
 {
     // These assertions are not guaranteed by ISO C99, but they are required
@@ -85,6 +105,7 @@ int main(void)
 
     init_headless_mode();
     test_exec_config();
+    test_detect_indent();
 
     return failed ? 1 : 0;
 }

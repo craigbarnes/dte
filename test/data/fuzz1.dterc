@@ -91,4 +91,5 @@ repeat 6 move-tab left
 repeat 3 move-tab right
 move-tab 17
 open -g ../../docs/*
+cd -
 #suspend
