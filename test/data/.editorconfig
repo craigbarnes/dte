@@ -1,0 +1,10 @@
+# Note: this file serves purely as input data for testing the
+# editorconfig implementation. Any real editorconfig properties
+# should be added to the file in the base directory.
+
+root = true
+
+[*.?{foo,bar}.[xyz]]   # inline comment
+indent_style = space  # another inline comment
+indent_size = 3
+max_line_length = 68

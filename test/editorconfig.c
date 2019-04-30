@@ -1,5 +1,8 @@
+#include <stdlib.h>
 #include "test.h"
+#include "../src/editorconfig/editorconfig.h"
 #include "../src/editorconfig/match.h"
+#include "../src/util/path.h"
 
 static void test_editorconfig_pattern_match(void)
 {
@@ -41,7 +44,30 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_FALSE(ec_pattern_match("file.{{{a,b,{c,d}}}}", "file."));
 }
 
+static void test_get_editorconfig_options(void)
+{
+    EditorConfigOptions opts;
+    char *path = path_absolute("test/data/file.0foo.z");
+    get_editorconfig_options(path, &opts);
+    free(path);
+    EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
+    EXPECT_EQ(opts.indent_size, 3);
+    EXPECT_EQ(opts.tab_width, 3);
+    EXPECT_EQ(opts.max_line_length, 68);
+    EXPECT_FALSE(opts.indent_size_is_tab);
+
+    path = path_absolute("test/data/file.foo");
+    get_editorconfig_options(path, &opts);
+    free(path);
+    EXPECT_EQ(opts.indent_style, INDENT_STYLE_UNSPECIFIED);
+    EXPECT_EQ(opts.indent_size, 0);
+    EXPECT_EQ(opts.tab_width, 0);
+    EXPECT_EQ(opts.max_line_length, 0);
+    EXPECT_FALSE(opts.indent_size_is_tab);
+}
+
 void test_editorconfig(void)
 {
     test_editorconfig_pattern_match();
+    test_get_editorconfig_options();
 }
