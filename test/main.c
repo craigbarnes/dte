@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <string.h>
 #include "test.h"
+#include "../src/bind.h"
 #include "../src/buffer.h"
 #include "../src/command.h"
 #include "../src/debug.h"
@@ -80,6 +81,22 @@ static void test_detect_indent(void)
     handle_command(commands, "close");
 }
 
+static void test_handle_binding(void)
+{
+    handle_command(commands, "bind ^A 'insert zzz'; open");
+    handle_binding(MOD_CTRL | 'A');
+    const Block *block = BLOCK(buffer->blocks.next);
+    ASSERT_NONNULL(block);
+    ASSERT_EQ(block->size, 4);
+    EXPECT_EQ(block->nl, 1);
+    EXPECT_EQ(memcmp(block->data, "zzz\n", 4), 0);
+    EXPECT_TRUE(undo());
+    EXPECT_EQ(block->size, 0);
+    EXPECT_EQ(block->nl, 0);
+    EXPECT_FALSE(undo());
+    handle_command(commands, "close");
+}
+
 static void test_posix_sanity(void)
 {
     // These assertions are not guaranteed by ISO C99, but they are required
@@ -106,6 +123,7 @@ int main(void)
     init_headless_mode();
     test_exec_config();
     test_detect_indent();
+    test_handle_binding();
 
     return failed ? 1 : 0;
 }

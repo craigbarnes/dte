@@ -93,3 +93,11 @@ void assert_eq(const char *file, int line, intmax_t a, intmax_t b)
         abort();
     }
 }
+
+void assert_nonnull(const char *file, int line, const void *ptr)
+{
+    if (unlikely(ptr == NULL)) {
+        test_fail(file, line, "ERROR: Unexpected NULL pointer");
+        abort();
+    }
+}

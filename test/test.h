@@ -22,6 +22,7 @@
 
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
 #define ASSERT_TRUE(x) ASSERT_EQ(!!(x), 1)
+#define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
 
 extern unsigned int failed;
 
@@ -32,6 +33,7 @@ void iexpect_streq(const char *file, int line, size_t i, const char *s1, const c
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
+void assert_nonnull(const char *file, int line, const void *ptr);
 
 #if GNUC_AT_LEAST(4, 2)
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
