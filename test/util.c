@@ -696,6 +696,7 @@ static void test_path_dirname_and_path_basename(void)
 static void test_path_absolute(void)
 {
     char *path = path_absolute("./build/../build/test/test-symlink");
+    ASSERT_NONNULL(path);
     EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
 }

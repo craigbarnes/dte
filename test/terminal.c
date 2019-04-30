@@ -239,7 +239,7 @@ static void test_xterm_parse_key_combo(void)
             memcpy(seq, templates[i].escape_sequence, 8);
             BUG_ON(seq[7] != '\0');
             char *underscore = strchr(seq, '_');
-            BUG_ON(underscore == NULL);
+            ASSERT_NONNULL(underscore);
             *underscore = modifiers[j].ch;
             size_t seq_length = strlen(seq);
             KeyCode key;
@@ -302,7 +302,7 @@ static void test_xterm_parse_key_combo_rxvt(void)
             memcpy(seq, templates[i].escape_sequence, 8);
             BUG_ON(seq[7] != '\0');
             char *underscore = strchr(seq, '_');
-            BUG_ON(underscore == NULL);
+            ASSERT_NONNULL(underscore);
             *underscore = modifiers[j].ch;
             size_t seq_length = strlen(seq);
             KeyCode key;

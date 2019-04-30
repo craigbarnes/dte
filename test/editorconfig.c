@@ -48,6 +48,7 @@ static void test_get_editorconfig_options(void)
 {
     EditorConfigOptions opts = editorconfig_options_init();
     char *path = path_absolute("test/data/file.0foo.z");
+    ASSERT_NONNULL(path);
     EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
@@ -57,6 +58,7 @@ static void test_get_editorconfig_options(void)
     EXPECT_FALSE(opts.indent_size_is_tab);
 
     path = path_absolute("test/data/file.foo");
+    ASSERT_NONNULL(path);
     EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_UNSPECIFIED);
