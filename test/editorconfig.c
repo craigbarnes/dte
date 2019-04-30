@@ -46,9 +46,9 @@ static void test_editorconfig_pattern_match(void)
 
 static void test_get_editorconfig_options(void)
 {
-    EditorConfigOptions opts;
+    EditorConfigOptions opts = editorconfig_options_init();
     char *path = path_absolute("test/data/file.0foo.z");
-    get_editorconfig_options(path, &opts);
+    EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_SPACE);
     EXPECT_EQ(opts.indent_size, 3);
@@ -57,7 +57,7 @@ static void test_get_editorconfig_options(void)
     EXPECT_FALSE(opts.indent_size_is_tab);
 
     path = path_absolute("test/data/file.foo");
-    get_editorconfig_options(path, &opts);
+    EXPECT_EQ(get_editorconfig_options(path, &opts), 0);
     free(path);
     EXPECT_EQ(opts.indent_style, INDENT_STYLE_UNSPECIFIED);
     EXPECT_EQ(opts.indent_size, 0);

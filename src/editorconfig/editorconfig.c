@@ -6,7 +6,6 @@
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
-#include "../common.h"
 #include "../debug.h"
 #include "../util/string.h"
 #include "../util/string-view.h"
@@ -70,7 +69,7 @@ static int ini_handler (
     if (section[0] == '\0') {
         if (streq_icase(name, "root") && streq_icase(value, "true")) {
             // root=true, clear all previous values
-            memzero(&data->options);
+            data->options = editorconfig_options_init();
         }
         return 1;
     }
