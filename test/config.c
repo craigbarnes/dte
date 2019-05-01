@@ -4,6 +4,7 @@
 #include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/frame.h"
+#include "../src/terminal/no-op.h"
 #include "../src/terminal/terminal.h"
 #include "../src/util/string-view.h"
 #include "../src/window.h"
@@ -15,8 +16,6 @@ static const char extra_rc[] =
     "bind M-p \"insert \"$WORD\n"
     "bind M-p \"insert \"$FILE\n"
 ;
-
-static void no_op(void) {}
 
 void init_headless_mode(void)
 {

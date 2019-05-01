@@ -5,6 +5,7 @@
 #include "frame.h"
 #include "search.h"
 #include "terminal/input.h"
+#include "terminal/no-op.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/path.h"
@@ -33,7 +34,7 @@ void set_builtin_color(enum builtin_color c)
 
 void update_term_title(const Buffer *b)
 {
-    if (!terminal.set_title || !editor.options.set_window_title) {
+    if (!editor.options.set_window_title || terminal.set_title == no_op_s) {
         return;
     }
 

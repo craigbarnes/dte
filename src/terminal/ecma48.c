@@ -3,6 +3,7 @@
 #include <unistd.h>
 #undef CTRL // macro from sys/ttydefaults.h clashes with the one in key.h
 #include "ecma48.h"
+#include "no-op.h"
 #include "output.h"
 #include "terminfo.h"
 #include "xterm.h"
@@ -114,9 +115,6 @@ void put_control_code(StringView code)
         buf_add_bytes(code.data, code.length);
     }
 }
-
-static void no_op(void) {}
-static void no_op_s(const char* UNUSED_ARG(s)) {}
 
 Terminal terminal = {
     .color_type = TERM_8_COLOR,
