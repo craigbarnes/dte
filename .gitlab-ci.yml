@@ -39,6 +39,16 @@ build:debian:
         - make clean && make dte CC=arm-linux-gnueabihf-gcc
         - make clean && make dte CC=aarch64-linux-gnu-gcc
 
+build:android:
+    stage: build
+    image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
+    script:
+        - export TERMINFO_DISABLE=1
+        - make clean && make CC="$CC_ARMV7A"
+        - make clean && make CC="$CC_AARCH64"
+        - make clean && make CC="$CC_I686"
+        - make clean && make CC="$CC_X86_64"
+
 build:centos:
     stage: build
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
