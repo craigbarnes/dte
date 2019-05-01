@@ -261,9 +261,7 @@ int main(int argc, char *argv[])
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
     }
 
-    if (terminal.save_title) {
-        terminal.save_title();
-    }
+    terminal.save_title();
 
     exec_reset_colors_rc();
     read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
@@ -385,14 +383,12 @@ int main(int argc, char *argv[])
     }
 
     terminal.put_control_code(terminal.control_codes.init);
-
     editor.resize();
-    main_loop();
-    if (terminal.restore_title) {
-        terminal.restore_title();
-    }
-    editor.ui_end();
 
+    main_loop();
+
+    terminal.restore_title();
+    editor.ui_end();
     terminal.put_control_code(terminal.control_codes.deinit);
     buf_flush();
 

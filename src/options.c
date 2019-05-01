@@ -136,7 +136,7 @@ static void set_window_title_changed(void)
         if (editor.status == EDITOR_RUNNING) {
             update_term_title(window->view->buffer);
         }
-    } else if (terminal.restore_title && terminal.save_title) {
+    } else {
         terminal.restore_title();
         terminal.save_title();
     }
