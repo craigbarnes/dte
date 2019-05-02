@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include <strings.h>
+#include <sys/types.h>
 #include "highlight.h"
 #include "syntax.h"
 #include "../debug.h"
@@ -74,7 +75,7 @@ static HlColor **highlight_line (
     const char *const line = lr->line;
     const size_t len = lr->size;
     size_t i = 0;
-    int sidx = -1;
+    ssize_t sidx = -1;
 
     if (len > alloc) {
         alloc = ROUND_UP(len, 128);
@@ -140,7 +141,7 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_RECOLOR: {
-                int idx = i - cond->u.cond_recolor.len;
+                ssize_t idx = i - cond->u.cond_recolor.len;
                 if (idx < 0) {
                     idx = 0;
                 }
@@ -269,15 +270,14 @@ static void block_iter_move_down(BlockIter *bi, size_t count)
     }
 }
 
-static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
+static ssize_t fill_hole(Buffer *b, BlockIter *bi, ssize_t sidx, ssize_t eidx)
 {
     void **ptrs = b->line_start_states.ptrs;
-    int idx = sidx;
+    ssize_t idx = sidx;
 
     while (idx < eidx) {
         LineRef lr;
         State *st;
-
         fill_line_nl_ref(bi, &lr);
         block_iter_eat_line(bi);
         highlight_line(b->syn, ptrs[idx++], &lr, &st);
@@ -301,14 +301,12 @@ static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
     return idx - sidx;
 }
 
-void hl_fill_start_states(Buffer *b, int line_nr)
+void hl_fill_start_states(Buffer *b, size_t line_nr)
 {
     BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
     PointerArray *s = &b->line_start_states;
-    State **states;
-    int current_line = 0;
-    int idx = 0;
-    int last;
+    ssize_t current_line = 0;
+    ssize_t idx = 0;
 
     if (b->syn == NULL) {
         return;
@@ -316,10 +314,10 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 
     // NOTE: "+ 2" so that you don't have to worry about overflow in fill_hole()
     resize_line_states(s, line_nr + 2);
-    states = (State **)s->ptrs;
+    State **states = (State **)s->ptrs;
 
     // Update invalid
-    last = line_nr;
+    ssize_t last = line_nr;
     if (last >= s->count) {
         last = s->count - 1;
     }
@@ -337,7 +335,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
         current_line = idx;
 
         // NOTE: might not fill entire hole, which is ok
-        int count = fill_hole(b, &bi, idx, last);
+        ssize_t count = fill_hole(b, &bi, idx, last);
         idx += count;
         current_line += count;
     }
@@ -364,17 +362,15 @@ HlColor **hl_line (
     size_t line_nr,
     bool *next_changed
 ) {
-    PointerArray *s = &b->line_start_states;
-    HlColor **colors;
-    State *next;
-
     *next_changed = false;
     if (b->syn == NULL) {
         return NULL;
     }
 
+    PointerArray *s = &b->line_start_states;
     BUG_ON(line_nr >= s->count);
-    colors = highlight_line(b->syn, s->ptrs[line_nr++], lr, &next);
+    State *next;
+    HlColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], lr, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);
