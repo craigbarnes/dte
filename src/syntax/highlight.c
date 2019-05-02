@@ -66,12 +66,13 @@ static State *handle_heredoc (
 static HlColor **highlight_line (
     Syntax *syn,
     State *state,
-    const char *line,
-    size_t len,
+    const LineRef *lr,
     State **ret
 ) {
     static HlColor **colors;
     static size_t alloc;
+    const char *const line = lr->line;
+    const size_t len = lr->size;
     size_t i = 0;
     int sidx = -1;
 
@@ -279,7 +280,7 @@ static int fill_hole(Buffer *b, BlockIter *bi, int sidx, int eidx)
 
         fill_line_nl_ref(bi, &lr);
         block_iter_eat_line(bi);
-        highlight_line(b->syn, ptrs[idx++], lr.line, lr.size, &st);
+        highlight_line(b->syn, ptrs[idx++], &lr, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -345,13 +346,11 @@ void hl_fill_start_states(Buffer *b, int line_nr)
     block_iter_move_down(&bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
         LineRef lr;
-
         fill_line_nl_ref(&bi, &lr);
         highlight_line (
             b->syn,
             states[s->count - 1],
-            lr.line,
-            lr.size,
+            &lr,
             &states[s->count]
         );
         s->count++;
@@ -361,8 +360,7 @@ void hl_fill_start_states(Buffer *b, int line_nr)
 
 HlColor **hl_line (
     Buffer *b,
-    const char *line,
-    size_t len,
+    const LineRef *lr,
     size_t line_nr,
     bool *next_changed
 ) {
@@ -376,7 +374,7 @@ HlColor **hl_line (
     }
 
     BUG_ON(line_nr >= s->count);
-    colors = highlight_line(b->syn, s->ptrs[line_nr++], line, len, &next);
+    colors = highlight_line(b->syn, s->ptrs[line_nr++], lr, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);

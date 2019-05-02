@@ -400,13 +400,7 @@ void update_range(const View *v, int y1, int y2)
         LineRef lr;
         fill_line_nl_ref(&bi, &lr);
         bool next_changed;
-        HlColor **colors = hl_line (
-            v->buffer,
-            lr.line,
-            lr.size,
-            info.line_nr,
-            &next_changed
-        );
+        HlColor **colors = hl_line(v->buffer, &lr, info.line_nr, &next_changed);
         line_info_set_line(&info, &lr, colors);
         print_line(&info);
 
