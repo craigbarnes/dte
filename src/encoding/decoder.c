@@ -29,37 +29,6 @@ static bool fill(FileDecoder *dec)
     return true;
 }
 
-static int set_encoding(FileDecoder *dec, const char *encoding);
-
-static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
-{
-    for (ssize_t i = 0; i < len; i++) {
-        if (line[i] >= 0x80) {
-            size_t idx = i;
-            CodePoint u = u_get_nonascii(line, len, &idx);
-            const char *encoding;
-
-            if (u_is_unicode(u)) {
-                encoding = "UTF-8";
-            } else if (editor.term_utf8) {
-                // UTF-8 terminal, assuming latin1
-                encoding = "ISO-8859-1";
-            } else {
-                // Assuming locale's encoding
-                encoding = encoding_to_string(&editor.charset);
-            }
-            if (set_encoding(dec, encoding)) {
-                // FIXME: error message?
-                set_encoding(dec, "UTF-8");
-            }
-            return true;
-        }
-    }
-
-    // ASCII
-    return false;
-}
-
 static bool decode_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 {
     char *line;
@@ -113,6 +82,50 @@ static bool read_utf8_line(FileDecoder *dec, char **linep, ssize_t *lenp)
     return true;
 }
 
+static int set_encoding(FileDecoder *dec, const char *encoding)
+{
+    if (strcmp(encoding, "UTF-8") == 0) {
+        dec->read_line = read_utf8_line;
+    } else {
+        dec->cconv = cconv_to_utf8(encoding);
+        if (dec->cconv == NULL) {
+            return -1;
+        }
+        dec->read_line = decode_and_read_line;
+    }
+    dec->encoding = xstrdup(encoding);
+    return 0;
+}
+
+static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
+{
+    for (ssize_t i = 0; i < len; i++) {
+        if (line[i] >= 0x80) {
+            size_t idx = i;
+            CodePoint u = u_get_nonascii(line, len, &idx);
+            const char *encoding;
+
+            if (u_is_unicode(u)) {
+                encoding = "UTF-8";
+            } else if (editor.term_utf8) {
+                // UTF-8 terminal, assuming latin1
+                encoding = "ISO-8859-1";
+            } else {
+                // Assuming locale's encoding
+                encoding = encoding_to_string(&editor.charset);
+            }
+            if (set_encoding(dec, encoding)) {
+                // FIXME: error message?
+                set_encoding(dec, "UTF-8");
+            }
+            return true;
+        }
+    }
+
+    // ASCII
+    return false;
+}
+
 static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 {
     char *line = (char *)dec->ibuf + dec->ipos;
@@ -141,21 +154,6 @@ static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
     *linep = line;
     *lenp = len;
     return true;
-}
-
-static int set_encoding(FileDecoder *dec, const char *encoding)
-{
-    if (strcmp(encoding, "UTF-8") == 0) {
-        dec->read_line = read_utf8_line;
-    } else {
-        dec->cconv = cconv_to_utf8(encoding);
-        if (dec->cconv == NULL) {
-            return -1;
-        }
-        dec->read_line = decode_and_read_line;
-    }
-    dec->encoding = xstrdup(encoding);
-    return 0;
 }
 
 FileDecoder *new_file_decoder (
