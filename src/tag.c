@@ -243,10 +243,9 @@ void tag_file_find_tags (
         current_filename = path_relative(filename, dir);
         free(dir);
     }
-    if (tags->count > 1) {
-        BUG_ON(!tags->ptrs);
-        qsort(tags->ptrs, tags->count, sizeof(tags->ptrs[0]), tag_cmp);
-    }
+
+    ptr_array_sort(tags, tag_cmp);
+
     free(current_filename);
     current_filename = NULL;
 }

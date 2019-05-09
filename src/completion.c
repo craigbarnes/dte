@@ -42,11 +42,7 @@ static int strptrcmp(const void *ap, const void *bp)
 
 static void sort_completions(void)
 {
-    PointerArray *a = &completion.completions;
-    if (a->count > 1) {
-        BUG_ON(!a->ptrs);
-        qsort(a->ptrs, a->count, sizeof(*a->ptrs), strptrcmp);
-    }
+    ptr_array_sort(&completion.completions, strptrcmp);
 }
 
 void add_completion(char *str)

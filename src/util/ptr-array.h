@@ -56,11 +56,11 @@ static inline void ptr_array_free(PointerArray *array)
 }
 
 static inline void ptr_array_sort (
-    const PointerArray array,
+    const PointerArray *array,
     CompareFunction compare
 ) {
-    if (array.count >= 2) {
-        qsort(array.ptrs, array.count, sizeof(*array.ptrs), compare);
+    if (array->count >= 2) {
+        qsort(array->ptrs, array->count, sizeof(*array->ptrs), compare);
     }
 }
 

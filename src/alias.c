@@ -80,7 +80,7 @@ static int alias_cmp(const void *const ap, const void *const bp)
 
 void sort_aliases(void)
 {
-    ptr_array_sort(aliases, alias_cmp);
+    ptr_array_sort(&aliases, alias_cmp);
 }
 
 const char *find_alias(const char *const name)
