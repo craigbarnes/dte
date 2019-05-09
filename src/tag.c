@@ -226,10 +226,8 @@ void tag_file_find_tags (
     const char *name,
     PointerArray *tags
 ) {
-    Tag *t;
+    Tag *t = xnew(Tag, 1);
     size_t pos = 0;
-
-    t = xnew(Tag, 1);
     while (next_tag(tf, &pos, name, true, t)) {
         ptr_array_add(tags, t);
         t = xnew(Tag, 1);
@@ -243,9 +241,7 @@ void tag_file_find_tags (
         current_filename = path_relative(filename, dir);
         free(dir);
     }
-
     ptr_array_sort(tags, tag_cmp);
-
     free(current_filename);
     current_filename = NULL;
 }
