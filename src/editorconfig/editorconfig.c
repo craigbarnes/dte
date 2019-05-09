@@ -127,7 +127,10 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         .pattern = STRING_INIT
     };
 
-    char buf[8192] = "/.editorconfig";
+    static const char ecfilename[16] = "/.editorconfig";
+    char buf[8192];
+    memcpy(buf, ecfilename, sizeof ecfilename);
+
     const char *ptr = pathname + 1;
     size_t dir_len = 1;
 
@@ -147,7 +150,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
 
         dir_len = slash - pathname;
         memcpy(buf, pathname, dir_len);
-        memcpy(buf + dir_len, "/.editorconfig", 15);
+        memcpy(buf + dir_len, ecfilename, sizeof ecfilename);
         ptr = slash + 1;
     }
 
