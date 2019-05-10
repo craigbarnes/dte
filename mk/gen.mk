@@ -10,7 +10,7 @@ gen-wcwidth: $(UCD_FILES)
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@
-	$(Q) $(FETCH) https://unicode.org/Public/11.0.0/ucd/$(@F)
+	$(Q) $(FETCH) https://unicode.org/Public/12.1.0/ucd/$(@F)
 
 .cache/:
 	@mkdir -p $@
