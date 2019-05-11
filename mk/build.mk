@@ -160,7 +160,6 @@ build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags
 build/terminal/terminfo.cflags: | build/terminal/
-build/filetype.o: BASIC_CFLAGS += -Wno-unused-label
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
