@@ -90,14 +90,6 @@ char *xstrcut(const char *str, size_t size)
     return s;
 }
 
-void *xmemdup(const void *ptr, size_t size)
-{
-    BUG_ON(size == 0);
-    void *buf = xmalloc(size);
-    memcpy(buf, ptr, size);
-    return buf;
-}
-
 VPRINTF(2)
 static int xvasprintf_(char **strp, const char *format, va_list ap)
 {

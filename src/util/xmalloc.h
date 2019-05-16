@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <string.h>
 #include "macros.h"
 
 #define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
@@ -21,11 +22,18 @@ char *xstrdup(const char *str) XMALLOC NONNULL_ARGS;
 char *xstrndup(const char *str, size_t n) XMALLOC NONNULL_ARGS;
 char *xstrdup_toupper(const char *str) XMALLOC NONNULL_ARGS;
 char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
-void *xmemdup(const void *ptr, size_t size) NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2);
 char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
+
+NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2)
+static inline void *xmemdup(const void *ptr, size_t size)
+{
+    void *buf = xmalloc(size);
+    memcpy(buf, ptr, size);
+    return buf;
+}
 
 // Round x up to a multiple of r (which *must* be a power of 2)
 CONST_FN
