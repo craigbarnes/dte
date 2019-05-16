@@ -12,6 +12,8 @@
     mem = xrealloc(mem, size_multiply(sizeof(*mem), (n))); \
 } while (0)
 
+#define xmemdup_literal(l) xmemdup(l, sizeof("" l ""))
+
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);

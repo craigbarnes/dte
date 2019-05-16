@@ -212,7 +212,7 @@ static char *path_relative(const char *filename, const char *dir)
     }
     if (filename[dlen] == '\0') {
         // Equal strings
-        return xstrdup(".");
+        return xmemdup_literal(".");
     }
     if (filename[dlen] != '/') {
         return NULL;

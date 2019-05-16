@@ -365,7 +365,7 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
     char *ptr = buf;
 
     if (!flags) {
-        return xstrdup("0");
+        return xmemdup_literal("0");
     }
 
     for (size_t i = 0; values[i]; i++) {

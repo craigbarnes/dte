@@ -1463,7 +1463,7 @@ static void cmd_show_bindings(const char* UNUSED_ARG(p), char** UNUSED_ARG(a))
     string_free(&s);
 
     PointerArray a = PTR_ARRAY_INIT;
-    ptr_array_add(&a, xstrdup("run"));
+    ptr_array_add(&a, xmemdup_literal("run"));
     ptr_array_add(&a, xstrdup(editor.pager));
     ptr_array_add(&a, xstrdup(tmp));
     ptr_array_add(&a, NULL);

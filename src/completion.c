@@ -420,7 +420,7 @@ static char *escape(const char *str)
     String buf = STRING_INIT;
 
     if (!str[0]) {
-        return xstrdup("\"\"");
+        return xmemdup_literal("\"\"");
     }
 
     if (str[0] == '~' && !completion.tilde_expanded) {

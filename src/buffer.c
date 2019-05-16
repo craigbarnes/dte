@@ -70,7 +70,7 @@ Buffer *buffer_new(const Encoding *encoding)
 
     memcpy(&b->options, &editor.options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
-    b->options.filetype = xstrdup("none");
+    b->options.filetype = xmemdup_literal("none");
     b->options.indent_regex = NULL;
 
     ptr_array_add(&buffers, b);
@@ -85,7 +85,7 @@ Buffer *open_empty_buffer(void)
     Block *blk = block_new(1);
     list_add_before(&blk->node, &b->blocks);
 
-    set_display_filename(b, xstrdup("(No name)"));
+    set_display_filename(b, xmemdup_literal("(No name)"));
     return b;
 }
 

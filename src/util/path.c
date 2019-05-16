@@ -244,10 +244,10 @@ char *path_dirname(const char *filename)
 {
     char *slash = strrchr(filename, '/');
     if (slash == NULL) {
-        return xstrdup(".");
+        return xmemdup_literal(".");
     }
     if (slash == filename) {
-        return xstrdup("/");
+        return xmemdup_literal("/");
     }
     return xstrcut(filename, slash - filename);
 }

@@ -21,7 +21,7 @@ static char *expand_dte_home(void)
 static char *expand_file(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xstrdup("");
+        return xmemdup_literal("");
     }
 
     BUG_ON(!window);
@@ -29,7 +29,7 @@ static char *expand_file(void)
     BUG_ON(!v);
 
     if (v->buffer->abs_filename == NULL) {
-        return xstrdup("");
+        return xmemdup_literal("");
     }
     return xstrdup(v->buffer->abs_filename);
 }
@@ -37,7 +37,7 @@ static char *expand_file(void)
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xstrdup("");
+        return xmemdup_literal("");
     }
 
     BUG_ON(!window);
@@ -52,7 +52,7 @@ static char *expand_word(void)
     } else {
         str = view_get_word_under_cursor(v);
         if (str == NULL) {
-            str = xstrdup("");
+            str = xmemdup_literal("");
         }
     }
     return str;
@@ -61,7 +61,7 @@ static char *expand_word(void)
 static char *expand_pkgdatadir(void)
 {
     error_msg("The $PKGDATADIR variable was removed in dte v1.4");
-    return xstrdup("");
+    return xmemdup_literal("");
 }
 
 static const BuiltinEnv builtin[] = {

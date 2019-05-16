@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     if (!isatty(STDIN_FILENO)) {
         Buffer *b = buffer_new(&editor.charset);
         if (read_blocks(b, STDIN_FILENO) == 0) {
-            b->display_filename = xstrdup("(stdin)");
+            b->display_filename = xmemdup_literal("(stdin)");
             stdin_buffer = b;
         } else {
             free_buffer(b);
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 
     if (tag) {
         PointerArray array = PTR_ARRAY_INIT;
-        ptr_array_add(&array, xstrdup("tag"));
+        ptr_array_add(&array, xmemdup_literal("tag"));
         ptr_array_add(&array, xstrdup(tag));
         ptr_array_add(&array, NULL);
         run_commands(commands, &array);
