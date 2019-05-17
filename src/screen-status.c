@@ -107,18 +107,18 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
             }
             break;
         case 'y':
-            add_status_format(f, "%d", v->cy + 1);
+            add_status_format(f, "%ld", v->cy + 1);
             break;
         case 'Y':
             add_status_format(f, "%zu", v->buffer->nl);
             break;
         case 'x':
-            add_status_format(f, "%d", v->cx_display + 1);
+            add_status_format(f, "%ld", v->cx_display + 1);
             break;
         case 'X':
-            add_status_format(f, "%d", v->cx_char + 1);
+            add_status_format(f, "%ld", v->cx_char + 1);
             if (v->cx_display != v->cx_char) {
-                add_status_format(f, "-%d", v->cx_display + 1);
+                add_status_format(f, "-%ld", v->cx_display + 1);
             }
             break;
         case 'p':

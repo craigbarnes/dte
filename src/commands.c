@@ -147,7 +147,6 @@ static void cmd_bolsf(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 static void cmd_case(const char *pf, char** UNUSED_ARG(args))
 {
     int mode = 't';
-
     while (*pf) {
         switch (*pf) {
         case 'l':
@@ -307,8 +306,7 @@ static void cmd_copy(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_cut(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    int x = view_get_preferred_x(view);
-
+    const long x = view_get_preferred_x(view);
     if (view->selection) {
         cut(prepare_selection(view), view->selection == SELECT_LINES);
         if (view->selection == SELECT_LINES) {
@@ -575,7 +573,7 @@ static void cmd_left(const char *pf, char** UNUSED_ARG(args))
 
 static void cmd_line(const char* UNUSED_ARG(pf), char **args)
 {
-    int x = view_get_preferred_x(view);
+    const long x = view_get_preferred_x(view);
     size_t line;
     if (!str_to_size(args[0], &line) || line == 0) {
         error_msg("Invalid line number: %s", args[0]);

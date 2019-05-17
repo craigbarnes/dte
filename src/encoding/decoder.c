@@ -162,7 +162,6 @@ FileDecoder *new_file_decoder (
     ssize_t size
 ) {
     FileDecoder *dec = xnew0(FileDecoder, 1);
-
     dec->ibuf = buf;
     dec->isize = size;
     dec->read_line = detect_and_read_line;
@@ -173,6 +172,7 @@ FileDecoder *new_file_decoder (
             return NULL;
         }
     }
+
     return dec;
 }
 

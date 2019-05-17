@@ -165,19 +165,18 @@ void insert_text(const char *text, size_t size)
 
 void paste(bool at_cursor)
 {
-    size_t del_count = 0;
-
     if (!copy_buf) {
         return;
     }
 
+    size_t del_count = 0;
     if (view->selection) {
         del_count = prepare_selection(view);
         unselect();
     }
 
     if (copy_is_lines && !at_cursor) {
-        int x = view_get_preferred_x(view);
+        const long x = view_get_preferred_x(view);
         if (!del_count) {
             block_iter_eat_line(&view->cursor);
         }
@@ -588,8 +587,7 @@ static void do_shift_lines(int count, size_t nr_lines)
 
 void shift_lines(int count)
 {
-    int x = view_get_preferred_x(view) + buffer->options.indent_width * count;
-
+    long x = view_get_preferred_x(view) + buffer->options.indent_width * count;
     if (x < 0) {
         x = 0;
     }

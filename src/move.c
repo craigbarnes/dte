@@ -11,35 +11,30 @@ typedef enum {
     CT_OTHER,
 } CharTypeEnum;
 
-void move_to_preferred_x(int preferred_x)
+void move_to_preferred_x(long preferred_x)
 {
-    unsigned int tw = buffer->options.tab_width;
     LineRef lr;
-    size_t i = 0;
-    unsigned int x = 0;
-
     view->preferred_x = preferred_x;
-
     block_iter_bol(&view->cursor);
     fill_line_ref(&view->cursor, &lr);
 
     if (buffer->options.emulate_tab && view->preferred_x < lr.size) {
-        int iw = buffer->options.indent_width;
-        int ilevel = view->preferred_x / iw;
-
-        for (i = 0; i < lr.size && lr.line[i] == ' '; i++) {
+        const size_t iw = buffer->options.indent_width;
+        const size_t ilevel = view->preferred_x / iw;
+        for (size_t i = 0; i < lr.size && lr.line[i] == ' '; i++) {
             if (i + 1 == (ilevel + 1) * iw) {
                 // Force cursor to beginning of the indentation level
                 view->cursor.offset += ilevel * iw;
                 return;
             }
         }
-        i = 0;
     }
 
+    const unsigned int tw = buffer->options.tab_width;
+    unsigned long x = 0;
+    size_t i = 0;
     while (x < view->preferred_x && i < lr.size) {
         CodePoint u = lr.line[i++];
-
         if (u < 0x80) {
             if (!ascii_iscntrl(u)) {
                 x++;
@@ -51,7 +46,7 @@ void move_to_preferred_x(int preferred_x)
                 x += 2;
             }
         } else {
-            size_t next = i;
+            const size_t next = i;
             i--;
             u = u_get_nonascii(lr.line, lr.size, &i);
             x += u_char_width(u);
@@ -137,8 +132,7 @@ void move_eol(void)
 
 void move_up(int count)
 {
-    int x = view_get_preferred_x(view);
-
+    const long x = view_get_preferred_x(view);
     while (count > 0) {
         if (!block_iter_prev_line(&view->cursor)) {
             break;
@@ -150,8 +144,7 @@ void move_up(int count)
 
 void move_down(int count)
 {
-    int x = view_get_preferred_x(view);
-
+    const long x = view_get_preferred_x(view);
     while (count > 0) {
         if (!block_iter_eat_line(&view->cursor)) {
             break;

@@ -18,19 +18,19 @@ typedef struct View {
     BlockIter cursor;
 
     // Cursor position
-    int cx, cy;
+    long cx, cy;
 
     // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
-    int cx_display;
+    long cx_display;
 
     // Cursor x in characters (invalid UTF-8 character (byte) is one char)
-    int cx_char;
+    long cx_char;
 
     // Top left corner
     int vx, vy;
 
     // Preferred cursor x (preferred value for cx_display)
-    int preferred_x;
+    long preferred_x;
 
     // Tab title
     int tt_width;
@@ -67,7 +67,7 @@ static inline void view_reset_preferred_x(View *v)
 void view_update_cursor_y(View *v);
 void view_update_cursor_x(View *v);
 void view_update(View *v);
-int view_get_preferred_x(View *v);
+long view_get_preferred_x(View *v);
 bool view_can_close(const View *v);
 char *view_get_word_under_cursor(const View *v);
 

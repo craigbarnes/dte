@@ -31,13 +31,12 @@ void view_update_cursor_x(View *v)
     unsigned int tw = v->buffer->options.tab_width;
     size_t idx = 0;
     LineRef lr;
-    int c = 0;
-    int w = 0;
+    long c = 0;
+    long w = 0;
 
     v->cx = fetch_this_line(&v->cursor, &lr);
     while (idx < v->cx) {
         CodePoint u = lr.line[idx++];
-
         c++;
         if (u < 0x80) {
             if (!ascii_iscntrl(u)) {
@@ -125,7 +124,7 @@ void view_update(View *v)
     v->center_on_scroll = false;
 }
 
-int view_get_preferred_x(View *v)
+long view_get_preferred_x(View *v)
 {
     if (v->preferred_x < 0) {
         view_update_cursor_x(v);
