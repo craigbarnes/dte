@@ -104,14 +104,20 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
             size_t idx = i;
             CodePoint u = u_get_nonascii(line, len, &idx);
             const char *encoding;
-
             if (u_is_unicode(u)) {
                 encoding = "UTF-8";
             } else if (editor.term_utf8) {
-                // UTF-8 terminal, assuming latin1
-                encoding = "ISO-8859-1";
+                if (dec->isize <= (32 * 1024 * 1024)) {
+                    // If locale is UTF-8 but file doesn't contain valid
+                    // UTF-8 and is also fairly small, just assume latin1
+                    encoding = "ISO-8859-1";
+                } else {
+                    // Large files are likely binary; just decode as
+                    // UTF-8 to avoid costly charset conversion
+                    encoding = "UTF-8";
+                }
             } else {
-                // Assuming locale's encoding
+                // Assume encoding is same as locale
                 encoding = encoding_to_string(&editor.charset);
             }
             if (set_encoding(dec, encoding)) {
