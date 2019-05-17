@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "checked-arith.h"
 #include "xmalloc.h"
 #include "ascii.h"
