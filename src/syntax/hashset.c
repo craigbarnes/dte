@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include "hashset.h"
+#include "../common.h"
 #include "../util/ascii.h"
 #include "../util/xmalloc.h"
 
@@ -30,11 +30,6 @@ static uint32_t fnv_1a_hash_icase(const char *str, size_t len)
     return hash;
 }
 
-static int memcmp_strings(const char *s1, const char *s2, size_t n)
-{
-    return memcmp(s1, s2, n);
-}
-
 void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
 {
     // Allocate table with 75% load factor (nstrings * 1.33)
@@ -45,10 +40,10 @@ void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
 
     if (icase) {
         set->hash = fnv_1a_hash_icase;
-        set->compare = strncasecmp;
+        set->equal = mem_equal_icase;
     } else {
         set->hash = fnv_1a_hash;
-        set->compare = memcmp_strings;
+        set->equal = mem_equal;
     }
 
     for (size_t i = 0; i < nstrings; i++) {
@@ -82,7 +77,7 @@ bool hashset_contains(HashSet *set, const char *str, size_t str_len)
     uint32_t hash = set->hash(str, str_len);
     HashSetEntry *h = set->table[hash % set->table_size];
     while (h) {
-        if (str_len == h->str_len && !set->compare(str, h->str, str_len)) {
+        if (str_len == h->str_len && set->equal(str, h->str, str_len)) {
             return true;
         }
         h = h->next;

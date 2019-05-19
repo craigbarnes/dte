@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
-#include <strings.h>
+#include "ascii.h"
 #include "macros.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
@@ -89,7 +89,7 @@ static inline bool string_view_has_prefix_icase (
     const char *str,
     size_t length
 ) {
-    return sv->length >= length && strncasecmp(sv->data, str, length) == 0;
+    return sv->length >= length && mem_equal_icase(sv->data, str, length);
 }
 
 #endif

@@ -1,9 +1,9 @@
 #include <inttypes.h>
-#include <strings.h>
 #include <sys/types.h>
 #include "highlight.h"
 #include "syntax.h"
 #include "../debug.h"
+#include "../util/ascii.h"
 #include "../util/xmalloc.h"
 
 static bool state_is_valid(const State *st)
@@ -30,7 +30,7 @@ static bool is_buffered(const Condition *cond, const char *str, size_t len)
     }
 
     if (cond->u.cond_bufis.icase) {
-        return !strncasecmp(cond->u.cond_bufis.str, str, len);
+        return mem_equal_icase(cond->u.cond_bufis.str, str, len);
     }
     return !memcmp(cond->u.cond_bufis.str, str, len);
 }
@@ -177,7 +177,7 @@ static HlColor **highlight_line (
                 size_t end = i + slen;
                 if (
                     len >= end
-                    && !strncasecmp(cond->u.cond_str.str, line + i, slen)
+                    && mem_equal_icase(cond->u.cond_str.str, line + i, slen)
                 ) {
                     while (i < end) {
                         colors[i++] = a->emit_color;

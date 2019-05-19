@@ -15,7 +15,7 @@ typedef struct {
     struct HashSetEntry **table;
     size_t table_size;
     uint32_t (*hash)(const char *str, size_t len);
-    int (*compare)(const char *s1, const char *s2, size_t n);
+    bool (*equal)(const void *s1, const void *s2, size_t n);
 } HashSet;
 
 typedef struct HashSetEntry {

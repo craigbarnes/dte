@@ -45,6 +45,12 @@ static inline PURE NONNULL_ARGS bool str_has_suffix (
     return memcmp(str + l1 - l2, suffix, l2) == 0;
 }
 
+PURE NONNULL_ARGS
+static inline bool mem_equal(const void *s1, const void *s2, size_t n)
+{
+    return memcmp(s1, s2, n) == 0;
+}
+
 static inline PURE NONNULL_ARGS void *memrchr_(const void *m, int c, size_t n)
 {
     const unsigned char *s = m;

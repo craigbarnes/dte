@@ -34,7 +34,7 @@ static PURE FileTypeEnum filetype_from_signature(const char *s, size_t len)
         return NONE;
     }
 
-    if (len >= 14 && strncasecmp(s, "<!DOCTYPE HTML", 14) == 0) {
+    if (len >= 14 && mem_equal_icase(s, "<!DOCTYPE HTML", 14)) {
         return HTML;
     }
 

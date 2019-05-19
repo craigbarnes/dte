@@ -2,6 +2,7 @@
 #define UTIL_ASCII_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "macros.h"
 
@@ -61,6 +62,20 @@ static inline bool ascii_streq_icase(const char *s1, const char *s2) {
         }
     }
     return *s1 == *s2;
+}
+
+PURE NONNULL_ARGS
+static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
+{
+    const unsigned char *s1 = p1;
+    const unsigned char *s2 = p2;
+    while (n) {
+        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
+            return false;
+        }
+        n--;
+    }
+    return true;
 }
 
 int hex_decode(int ch) CONST_FN;

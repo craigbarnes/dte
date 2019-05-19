@@ -122,6 +122,15 @@ static void test_ascii(void)
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "CTRL+"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "Ctr"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "CtrM"));
+
+    const char s1[8] = "Ctrl+Up";
+    const char s2[8] = "CTRL+U_";
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 3));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 4));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 5));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 6));
+    EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
+    EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
 }
 
 static void test_string(void)
