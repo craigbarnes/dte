@@ -1,4 +1,3 @@
-#include <strings.h>
 #include <string.h>
 #include "key.h"
 #include "../debug.h"
@@ -96,21 +95,21 @@ bool parse_key(KeyCode *key, const char *str)
         *key = modifiers | ch;
         return true;
     }
-    if (!strcasecmp(str, "space")) {
+    if (ascii_streq_icase(str, "space")) {
         *key = modifiers | ' ';
         return true;
     }
-    if (!strcasecmp(str, "tab")) {
+    if (ascii_streq_icase(str, "tab")) {
         *key = modifiers | '\t';
         return true;
     }
-    if (!strcasecmp(str, "enter")) {
+    if (ascii_streq_icase(str, "enter")) {
         *key = modifiers | KEY_ENTER;
         return true;
     }
 
     for (i = 0; i < NR_SPECIAL_KEYS; i++) {
-        if (!strcasecmp(str, special_names[i])) {
+        if (ascii_streq_icase(str, special_names[i])) {
             *key = modifiers | (KEY_SPECIAL_MIN + i);
             return true;
         }

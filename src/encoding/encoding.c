@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <strings.h>
 #include "encoding.h"
 #include "../common.h"
 #include "../util/ascii.h"
@@ -41,12 +40,12 @@ static const struct {
 EncodingType lookup_encoding(const char *name)
 {
     for (size_t i = 0; i < ARRAY_COUNT(encoding_names); i++) {
-        if (strcasecmp(name, encoding_names[i]) == 0) {
+        if (ascii_streq_icase(name, encoding_names[i])) {
             return (EncodingType) i;
         }
     }
     for (size_t i = 0; i < ARRAY_COUNT(encoding_aliases); i++) {
-        if (strcasecmp(name, encoding_aliases[i].alias) == 0) {
+        if (ascii_streq_icase(name, encoding_aliases[i].alias)) {
             return encoding_aliases[i].encoding;
         }
     }

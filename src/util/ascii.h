@@ -53,6 +53,16 @@ static inline unsigned char ascii_toupper(unsigned char c)
     return c - ((ascii_table[c] & ASCII_LOWER) << 1);
 }
 
+PURE NONNULL_ARGS
+static inline bool ascii_streq_icase(const char *s1, const char *s2) {
+    while (*s1 && *s2) {
+        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
+            return false;
+        }
+    }
+    return *s1 == *s2;
+}
+
 int hex_decode(int ch) CONST_FN;
 
 #endif

@@ -1,12 +1,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <sys/types.h>
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
 #include "../debug.h"
+#include "../util/ascii.h"
 #include "../util/string.h"
 #include "../util/string-view.h"
 #include "../util/strtonum.h"
@@ -18,27 +18,22 @@ typedef struct {
     String pattern;
 } CallbackData;
 
-static inline bool streq_icase(const char *a, const char *b)
-{
-    return strcasecmp(a, b) == 0;
-}
-
 static void editorconfig_option_set (
     EditorConfigOptions *options,
     const char *name,
     const char *val
 ) {
     unsigned int n = 0;
-    if (streq_icase(name, "indent_style")) {
-        if (streq_icase(val, "space")) {
+    if (ascii_streq_icase(name, "indent_style")) {
+        if (ascii_streq_icase(val, "space")) {
             options->indent_style = INDENT_STYLE_SPACE;
-        } else if (streq_icase(val, "tab")) {
+        } else if (ascii_streq_icase(val, "tab")) {
             options->indent_style = INDENT_STYLE_TAB;
         } else {
             options->indent_style = INDENT_STYLE_UNSPECIFIED;
         }
-    } else if (streq_icase(name, "indent_size")) {
-        if (streq_icase(val, "tab")) {
+    } else if (ascii_streq_icase(name, "indent_size")) {
+        if (ascii_streq_icase(val, "tab")) {
             options->indent_size_is_tab = true;
             options->indent_size = 0;
         } else {
@@ -48,10 +43,10 @@ static void editorconfig_option_set (
             options->indent_size = n;
             options->indent_size_is_tab = false;
         }
-    } else if (streq_icase(name, "tab_width")) {
+    } else if (ascii_streq_icase(name, "tab_width")) {
         str_to_uint(val, &n);
         options->tab_width = n;
-    } else if (streq_icase(name, "max_line_length")) {
+    } else if (ascii_streq_icase(name, "max_line_length")) {
         str_to_uint(val, &n);
         options->max_line_length = n;
     }
@@ -67,7 +62,10 @@ static int ini_handler (
     CallbackData *data = ud;
 
     if (section[0] == '\0') {
-        if (streq_icase(name, "root") && streq_icase(value, "true")) {
+        if (
+            ascii_streq_icase(name, "root")
+            && ascii_streq_icase(value, "true")
+        ) {
             // root=true, clear all previous values
             data->options = editorconfig_options_init();
         }

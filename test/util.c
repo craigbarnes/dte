@@ -115,6 +115,13 @@ static void test_ascii(void)
     EXPECT_EQ(hex_decode(' '), -1);
     EXPECT_EQ(hex_decode('\0'), -1);
     EXPECT_EQ(hex_decode('~'), -1);
+
+    EXPECT_TRUE(ascii_streq_icase("ABC..XYZ", "abc..xyz"));
+    EXPECT_TRUE(ascii_streq_icase("Ctrl", "CTRL"));
+    EXPECT_FALSE(ascii_streq_icase("Ctrl+", "CTRL"));
+    EXPECT_FALSE(ascii_streq_icase("Ctrl", "CTRL+"));
+    EXPECT_FALSE(ascii_streq_icase("Ctrl", "Ctr"));
+    EXPECT_FALSE(ascii_streq_icase("Ctrl", "CtrM"));
 }
 
 static void test_string(void)
