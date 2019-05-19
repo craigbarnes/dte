@@ -6,12 +6,12 @@
 #include "../src/bind.h"
 #include "../src/buffer.h"
 #include "../src/command.h"
-#include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/util/path.h"
 #include "../src/util/xmalloc.h"
 
 void test_cmdline(void);
+void test_command(void);
 void test_editorconfig(void);
 void test_encoding(void);
 void test_filetype(void);
@@ -36,29 +36,6 @@ static void test_relative_filename(void)
         char *result = relative_filename(t->path, t->cwd);
         IEXPECT_STREQ(t->result, result);
         free(result);
-    }
-}
-
-static void test_commands_array(void)
-{
-    static const size_t name_size = ARRAY_COUNT(commands[0].name);
-    static const size_t flags_size = ARRAY_COUNT(commands[0].flags);
-
-    size_t n = 0;
-    while (commands[n].cmd) {
-        n++;
-        BUG_ON(n > 500);
-    }
-
-    for (size_t i = 1; i < n; i++) {
-        const Command *const cmd = &commands[i];
-
-        // Check that fixed-size arrays are null-terminated within bounds
-        ASSERT_EQ(cmd->name[name_size - 1], '\0');
-        ASSERT_EQ(cmd->flags[flags_size - 1], '\0');
-
-        // Check that array is sorted by name field, in binary searchable order
-        IEXPECT_GT(strcmp(cmd->name, commands[i - 1].name), 0);
     }
 }
 
@@ -111,8 +88,8 @@ int main(void)
     init_editor_state();
 
     test_relative_filename();
-    test_commands_array();
 
+    test_command();
     test_editorconfig();
     test_encoding();
     test_filetype();
