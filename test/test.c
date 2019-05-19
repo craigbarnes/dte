@@ -52,6 +52,19 @@ void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
     }
 }
 
+void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b)
+{
+    if (unlikely(a != b)) {
+        test_fail (
+            file,
+            line,
+            "Values not equal: %" PRIuMAX ", %" PRIuMAX,
+            a,
+            b
+        );
+    }
+}
+
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2)
 {
     if (unlikely(!xstreq(s1, s2))) {

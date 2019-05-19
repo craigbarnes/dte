@@ -4,6 +4,7 @@
 #include "../src/syntax/hashset.h"
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
+#include "../src/util/checked-arith.h"
 #include "../src/util/path.h"
 #include "../src/util/regexp.h"
 #include "../src/util/string.h"
@@ -735,6 +736,33 @@ static void test_regexp_match(void)
     ptr_array_free(&a);
 }
 
+static void test_size_multiply_overflows(void)
+{
+    size_t r = 0;
+    EXPECT_FALSE(size_multiply_overflows(10, 20, &r));
+    EXPECT_UINT_EQ(r, 200);
+    EXPECT_FALSE(size_multiply_overflows(0, 0, &r));
+    EXPECT_UINT_EQ(r, 0);
+    EXPECT_FALSE(size_multiply_overflows(1, 0, &r));
+    EXPECT_UINT_EQ(r, 0);
+    EXPECT_FALSE(size_multiply_overflows(0, 1, &r));
+    EXPECT_UINT_EQ(r, 0);
+    EXPECT_FALSE(size_multiply_overflows(0, SIZE_MAX, &r));
+    EXPECT_UINT_EQ(r, 0);
+    EXPECT_FALSE(size_multiply_overflows(SIZE_MAX, 0, &r));
+    EXPECT_UINT_EQ(r, 0);
+    EXPECT_FALSE(size_multiply_overflows(1, SIZE_MAX, &r));
+    EXPECT_UINT_EQ(r, SIZE_MAX);
+    EXPECT_FALSE(size_multiply_overflows(2, SIZE_MAX / 3, &r));
+    EXPECT_UINT_EQ(r, 2 * (SIZE_MAX / 3));
+    EXPECT_TRUE(size_multiply_overflows(SIZE_MAX, 2, &r));
+    EXPECT_TRUE(size_multiply_overflows(2, SIZE_MAX, &r));
+    EXPECT_TRUE(size_multiply_overflows(3, SIZE_MAX / 2, &r));
+    EXPECT_TRUE(size_multiply_overflows(32767, SIZE_MAX, &r));
+    EXPECT_TRUE(size_multiply_overflows(SIZE_MAX, SIZE_MAX, &r));
+    EXPECT_TRUE(size_multiply_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -759,4 +787,5 @@ void test_util(void)
     test_path_dirname_and_path_basename();
     test_path_absolute();
     test_regexp_match();
+    test_size_multiply_overflows();
 }

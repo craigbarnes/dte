@@ -121,30 +121,3 @@ char *xasprintf(const char *format, ...)
     va_end(ap);
     return str;
 }
-
-UNITTEST {
-    size_t r = 0;
-    DEBUG_VAR(r);
-    BUG_ON(size_multiply_overflows(10, 20, &r));
-    BUG_ON(r != 200);
-    BUG_ON(size_multiply_overflows(0, 0, &r));
-    BUG_ON(r != 0);
-    BUG_ON(size_multiply_overflows(1, 0, &r));
-    BUG_ON(r != 0);
-    BUG_ON(size_multiply_overflows(0, 1, &r));
-    BUG_ON(r != 0);
-    BUG_ON(size_multiply_overflows(0, SIZE_MAX, &r));
-    BUG_ON(r != 0);
-    BUG_ON(size_multiply_overflows(SIZE_MAX, 0, &r));
-    BUG_ON(r != 0);
-    BUG_ON(size_multiply_overflows(1, SIZE_MAX, &r));
-    BUG_ON(r != SIZE_MAX);
-    BUG_ON(size_multiply_overflows(2, SIZE_MAX / 3, &r));
-    BUG_ON(r != 2 * (SIZE_MAX / 3));
-    BUG_ON(!size_multiply_overflows(SIZE_MAX, 2, &r));
-    BUG_ON(!size_multiply_overflows(2, SIZE_MAX, &r));
-    BUG_ON(!size_multiply_overflows(3, SIZE_MAX / 2, &r));
-    BUG_ON(!size_multiply_overflows(32767, SIZE_MAX, &r));
-    BUG_ON(!size_multiply_overflows(SIZE_MAX, SIZE_MAX, &r));
-    BUG_ON(!size_multiply_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
-}
