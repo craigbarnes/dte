@@ -14,7 +14,7 @@
     } \
 } while (0)
 
-size_t size_multiply(size_t a, size_t b)
+size_t size_multiply_(size_t a, size_t b)
 {
     size_t result;
     if (unlikely(size_multiply_overflows(a, b, &result))) {

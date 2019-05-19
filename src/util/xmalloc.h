@@ -24,8 +24,20 @@ char *xstrdup_toupper(const char *str) XMALLOC NONNULL_ARGS;
 char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
 char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
-size_t size_multiply(size_t a, size_t b);
+size_t size_multiply_(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
+
+static inline size_t size_multiply(size_t a, size_t b)
+{
+    // If either argument is 1, the multiplication can't overflow
+    // and is thus safe to be inlined without checks.
+    if (a == 1 || b == 1) {
+        return a * b;
+    }
+    // Otherwise, emit a call to the checked implementation (which is
+    // extern, because it may call fatal_error()).
+    return size_multiply_(a, b);
+}
 
 NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2)
 static inline void *xmemdup(const void *ptr, size_t size)
