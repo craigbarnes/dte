@@ -13,6 +13,11 @@ typedef struct {
     char *(*expand)(void);
 } BuiltinEnv;
 
+static char *xstrdup_empty_string(void)
+{
+    return xcalloc(1);
+}
+
 static char *expand_dte_home(void)
 {
     return xstrdup(editor.user_config_dir);
@@ -21,7 +26,7 @@ static char *expand_dte_home(void)
 static char *expand_file(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xmemdup_literal("");
+        return xstrdup_empty_string();
     }
 
     BUG_ON(!window);
@@ -29,7 +34,7 @@ static char *expand_file(void)
     BUG_ON(!v);
 
     if (v->buffer->abs_filename == NULL) {
-        return xmemdup_literal("");
+        return xstrdup_empty_string();
     }
     return xstrdup(v->buffer->abs_filename);
 }
@@ -37,7 +42,7 @@ static char *expand_file(void)
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xmemdup_literal("");
+        return xstrdup_empty_string();
     }
 
     BUG_ON(!window);
@@ -52,7 +57,7 @@ static char *expand_word(void)
     } else {
         str = view_get_word_under_cursor(v);
         if (str == NULL) {
-            str = xmemdup_literal("");
+            str = xstrdup_empty_string();
         }
     }
     return str;
@@ -61,7 +66,7 @@ static char *expand_word(void)
 static char *expand_pkgdatadir(void)
 {
     error_msg("The $PKGDATADIR variable was removed in dte v1.4");
-    return xmemdup_literal("");
+    return xstrdup_empty_string();
 }
 
 static const BuiltinEnv builtin[] = {
