@@ -120,10 +120,12 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
     }
 
     char *name = xstrcut(cmd, n);
-    char *value = expand_builtin_env(name);
-    if (value != NULL) {
-        string_add_str(buf, value);
-        free(value);
+    char *value;
+    if (expand_builtin_env(name, &value)) {
+        if (value != NULL) {
+            string_add_str(buf, value);
+            free(value);
+        }
     } else {
         const char *val = getenv(name);
         if (val != NULL) {

@@ -13,11 +13,6 @@ typedef struct {
     char *(*expand)(void);
 } BuiltinEnv;
 
-static char *xstrdup_empty_string(void)
-{
-    return xcalloc(1);
-}
-
 static char *expand_dte_home(void)
 {
     return xstrdup(editor.user_config_dir);
@@ -26,7 +21,7 @@ static char *expand_dte_home(void)
 static char *expand_file(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xstrdup_empty_string();
+        return NULL;
     }
 
     BUG_ON(!window);
@@ -34,7 +29,7 @@ static char *expand_file(void)
     BUG_ON(!v);
 
     if (v->buffer->abs_filename == NULL) {
-        return xstrdup_empty_string();
+        return NULL;
     }
     return xstrdup(v->buffer->abs_filename);
 }
@@ -42,7 +37,7 @@ static char *expand_file(void)
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
-        return xstrdup_empty_string();
+        return NULL;
     }
 
     BUG_ON(!window);
@@ -57,7 +52,7 @@ static char *expand_word(void)
     } else {
         str = view_get_word_under_cursor(v);
         if (str == NULL) {
-            str = xstrdup_empty_string();
+            str = NULL;
         }
     }
     return str;
@@ -66,7 +61,7 @@ static char *expand_word(void)
 static char *expand_pkgdatadir(void)
 {
     error_msg("The $PKGDATADIR variable was removed in dte v1.4");
-    return xstrdup_empty_string();
+    return NULL;
 }
 
 static const BuiltinEnv builtin[] = {
@@ -87,13 +82,14 @@ void collect_builtin_env(const char *prefix)
 }
 
 // Returns NULL only if name isn't in builtin array
-char *expand_builtin_env(const char *name)
+bool expand_builtin_env(const char *name, char **value)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
         const BuiltinEnv *be = &builtin[i];
         if (streq(be->name, name)) {
-            return be->expand();
+            *value = be->expand();
+            return true;
         }
     }
-    return NULL;
+    return false;
 }
