@@ -55,11 +55,11 @@ static inline unsigned char ascii_toupper(unsigned char c)
 }
 
 PURE NONNULL_ARGS
-static inline bool ascii_streq_icase(const char *s1, const char *s2) {
-    while (*s1 && *s2) {
-        if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
-            return false;
-        }
+static inline bool ascii_streq_icase(const char *s1, const char *s2)
+{
+    while (*s1 && ascii_tolower(*s1) == ascii_tolower(*s2)) {
+        s1++;
+        s2++;
     }
     return *s1 == *s2;
 }
