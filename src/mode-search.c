@@ -9,11 +9,10 @@ static void search_mode_keypress(KeyCode key)
     switch (key) {
     case KEY_ENTER:
         if (editor.cmdline.buf.len > 0) {
-            char *str = string_cstring(&editor.cmdline.buf);
+            const char *str = string_borrow_cstring(&editor.cmdline.buf);
             search_set_regexp(str);
             search_next();
             history_add(&editor.search_history, str, search_history_size);
-            free(str);
         } else {
             search_next();
         }

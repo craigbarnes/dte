@@ -275,7 +275,7 @@ CommandLineResult cmdline_handle_key (
         }
         if (c->search_pos < 0) {
             free(c->search_text);
-            c->search_text = string_cstring(&c->buf);
+            c->search_text = string_clone_cstring(&c->buf);
             c->search_pos = history->count;
         }
         if (history_search_forward(history, &c->search_pos, c->search_text)) {

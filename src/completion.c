@@ -304,7 +304,7 @@ static void collect_completions(char **args, int argc)
 
 static void init_completion(void)
 {
-    char *cmd = string_cstring(&editor.cmdline.buf);
+    const char *cmd = string_borrow_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
     ssize_t semicolon = -1;
     ssize_t completion_pos = -1;
@@ -395,7 +395,6 @@ static void init_completion(void)
             sort_completions();
             free(name);
             ptr_array_free(&array);
-            free(cmd);
             return;
         }
     }
@@ -412,7 +411,6 @@ static void init_completion(void)
     );
     sort_completions();
     ptr_array_free(&array);
-    free(cmd);
 }
 
 static char *escape(const char *str)

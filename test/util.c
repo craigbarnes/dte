@@ -137,37 +137,44 @@ static void test_ascii(void)
 static void test_string(void)
 {
     String s = STRING_INIT;
-    char *cstr = string_cstring(&s);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    EXPECT_PTREQ(s.buffer, NULL);
+
+    char *cstr = string_clone_cstring(&s);
     EXPECT_STREQ(cstr, "");
     free(cstr);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    EXPECT_PTREQ(s.buffer, NULL);
 
     string_insert_ch(&s, 0, 0x1F4AF);
     EXPECT_EQ(s.len, 4);
-    EXPECT_EQ(memcmp(s.buffer, "\xF0\x9F\x92\xAF", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAF");
 
     string_add_str(&s, "test");
     EXPECT_EQ(s.len, 8);
-    EXPECT_EQ(memcmp(s.buffer, "\xF0\x9F\x92\xAFtest", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAFtest");
 
     string_remove(&s, 0, 5);
     EXPECT_EQ(s.len, 3);
-    EXPECT_EQ(memcmp(s.buffer, "est", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "est");
 
     string_make_space(&s, 0, 1);
     EXPECT_EQ(s.len, 4);
     s.buffer[0] = 't';
-    EXPECT_EQ(memcmp(s.buffer, "test", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "test");
 
     string_clear(&s);
     EXPECT_EQ(s.len, 0);
     string_insert_ch(&s, 0, 0x0E01);
     EXPECT_EQ(s.len, 3);
-    EXPECT_EQ(memcmp(s.buffer, "\xE0\xB8\x81", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "\xE0\xB8\x81");
 
     string_clear(&s);
     string_sprintf(&s, "%d %s\n", 88, "test");
     EXPECT_EQ(s.len, 8);
-    EXPECT_EQ(memcmp(s.buffer, "88 test\n", s.len), 0);
+    EXPECT_STREQ(string_borrow_cstring(&s), "88 test\n");
 
     string_free(&s);
     EXPECT_EQ(s.len, 0);

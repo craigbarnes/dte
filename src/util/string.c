@@ -105,7 +105,7 @@ char *string_steal_cstring(String *s)
     return b;
 }
 
-char *string_cstring(const String *s)
+char *string_clone_cstring(const String *s)
 {
     const size_t len = s->len;
     char *b = xmalloc(len + 1);
@@ -121,6 +121,22 @@ void string_ensure_null_terminated(String *s)
 {
     string_grow(s, 1);
     s->buffer[s->len] = '\0';
+}
+
+/*
+ * This method first ensures that the String buffer is null-terminated
+ * and then returns a const pointer to it, without doing any copying.
+ *
+ * NOTE: the returned pointer only remains valid so long as no other
+ * methods are called on the String. There are no exceptions to this
+ * rule. If the buffer is realloc'd, the pointer will be dangling and
+ * using it will invoke undefined behaviour. If unsure, just use
+ * string_clone_cstring() instead.
+ */
+const char *string_borrow_cstring(String *s)
+{
+    string_ensure_null_terminated(s);
+    return s->buffer;
 }
 
 void string_make_space(String *s, size_t pos, size_t len)

@@ -126,7 +126,7 @@ static const char *selected_file(void)
 
 static void git_open_filter(void)
 {
-    char *str = string_cstring(&editor.cmdline.buf);
+    const char *str = string_borrow_cstring(&editor.cmdline.buf);
     char *ptr = git_open.all_files;
     char *end = git_open.all_files + git_open.size;
     bool (*match)(const char*, const PointerArray*) = words_match_icase;
@@ -137,7 +137,6 @@ static void git_open_filter(void)
         match = words_match;
     }
     split(&words, str);
-    free(str);
 
     git_open.files.count = 0;
     while (ptr < end) {
