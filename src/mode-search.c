@@ -19,25 +19,24 @@ static void search_mode_keypress(KeyCode key)
         }
         cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
-        break;
-    case '\t':
-        break;
+        return;
     case MOD_META | 'c':
         editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
-        break;
+        return;
     case MOD_META | 'r':
         search_set_direction(current_search_direction() ^ 1);
-        break;
-    default:
-        switch (cmdline_handle_key(&editor.cmdline, &editor.search_history, key)) {
-        case CMDLINE_UNKNOWN_KEY:
-            break;
-        case CMDLINE_KEY_HANDLED:
-            break;
-        case CMDLINE_CANCEL:
-            set_input_mode(INPUT_NORMAL);
-            break;
-        }
+        return;
+    case '\t':
+        return;
+    }
+
+    switch (cmdline_handle_key(&editor.cmdline, &editor.search_history, key)) {
+    case CMDLINE_CANCEL:
+        set_input_mode(INPUT_NORMAL);
+        return;
+    case CMDLINE_UNKNOWN_KEY:
+    case CMDLINE_KEY_HANDLED:
+        return;
     }
 }
 

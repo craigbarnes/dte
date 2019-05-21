@@ -36,21 +36,21 @@ static void command_mode_keypress(KeyCode key)
     switch (key) {
     case KEY_ENTER:
         command_line_enter();
-        break;
+        return;
     case '\t':
         complete_command();
-        break;
-    default:
-        switch (cmdline_handle_key(&editor.cmdline, &editor.command_history, key)) {
-        case CMDLINE_UNKNOWN_KEY:
-            break;
-        case CMDLINE_KEY_HANDLED:
-            reset_completion();
-            break;
-        case CMDLINE_CANCEL:
-            set_input_mode(INPUT_NORMAL);
-            break;
-        }
+        return;
+    }
+
+    switch (cmdline_handle_key(&editor.cmdline, &editor.command_history, key)) {
+    case CMDLINE_KEY_HANDLED:
+        reset_completion();
+        return;
+    case CMDLINE_CANCEL:
+        set_input_mode(INPUT_NORMAL);
+        return;
+    case CMDLINE_UNKNOWN_KEY:
+        return;
     }
 }
 
