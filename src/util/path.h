@@ -4,8 +4,8 @@
 #include "macros.h"
 
 char *path_absolute(const char *filename) MALLOC NONNULL_ARGS;
-char *relative_filename(const char *f, const char *cwd) XMALLOC NONNULL_ARGS;
-char *path_dirname(const char *filename) XMALLOC NONNULL_ARGS;
-const char *path_basename(const char *filename) NONNULL_ARGS RETURNS_NONNULL;
+char *relative_filename(const char *f, const char *cwd) XSTRDUP;
+char *path_dirname(const char *filename) XSTRDUP;
+const char *path_basename(const char *filename) NONNULL_ARGS_AND_RETURN;
 
 #endif

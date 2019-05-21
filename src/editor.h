@@ -57,7 +57,7 @@ static inline void set_input_mode(InputMode mode)
 }
 
 void init_editor_state(void);
-char *editor_file(const char *name) XMALLOC NONNULL_ARGS;
+char *editor_file(const char *name) XSTRDUP;
 char get_confirmation(const char *choices, const char *format, ...) PRINTF(2);
 void any_key(void);
 void normal_update(void);

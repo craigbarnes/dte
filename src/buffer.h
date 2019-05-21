@@ -75,7 +75,7 @@ static inline bool buffer_modified(const Buffer *b)
 void buffer_mark_lines_changed(Buffer *b, int min, int max);
 const char *buffer_filename(const Buffer *b);
 
-char *short_filename(const char *absolute) XMALLOC NONNULL_ARGS;
+char *short_filename(const char *absolute) XSTRDUP;
 void update_short_filename_cwd(Buffer *b, const char *cwd);
 void update_short_filename(Buffer *b);
 Buffer *find_buffer(const char *abs_filename);

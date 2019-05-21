@@ -18,10 +18,10 @@
 void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
-char *xstrdup(const char *str) XMALLOC NONNULL_ARGS;
-char *xstrndup(const char *str, size_t n) XMALLOC NONNULL_ARGS;
-char *xstrdup_toupper(const char *str) XMALLOC NONNULL_ARGS;
-char *xstrcut(const char *str, size_t size) XMALLOC NONNULL_ARGS;
+char *xstrdup(const char *str) XSTRDUP;
+char *xstrndup(const char *str, size_t n) XSTRDUP;
+char *xstrdup_toupper(const char *str) XSTRDUP;
+char *xstrcut(const char *str, size_t size) XSTRDUP;
 char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply_(size_t a, size_t b);
@@ -39,7 +39,7 @@ static inline size_t size_multiply(size_t a, size_t b)
     return size_multiply_(a, b);
 }
 
-NONNULL_ARGS RETURNS_NONNULL ALLOC_SIZE(2)
+NONNULL_ARGS_AND_RETURN ALLOC_SIZE(2)
 static inline void *xmemdup(const void *ptr, size_t size)
 {
     void *buf = xmalloc(size);
@@ -55,7 +55,7 @@ static inline size_t ROUND_UP(size_t x, size_t r)
     return (x + r) & ~r;
 }
 
-XMALLOC NONNULL_ARGS
+XSTRDUP
 static inline char *xstrslice(const char *str, size_t pos, size_t end)
 {
     return xstrcut(str + pos, end - pos);
