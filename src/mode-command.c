@@ -11,9 +11,7 @@ static void command_mode_handle_enter(void)
     reset_completion();
     set_input_mode(INPUT_NORMAL);
 
-    string_ensure_null_terminated(&editor.cmdline.buf);
-    const char *str = editor.cmdline.buf.buffer;
-
+    const char *str = string_borrow_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
     Error *err = NULL;
     bool ok = parse_commands(&array, str, &err);

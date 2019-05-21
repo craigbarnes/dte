@@ -4,9 +4,8 @@
 #include "../src/completion.h"
 #include "../src/editor.h"
 
-#define EXPECT_STRING_EQ(s_, cstr_) \
-    string_ensure_null_terminated(&(s_)); \
-    EXPECT_STREQ((s_).buffer, (cstr_))
+#define EXPECT_STRING_EQ(s, cstr) \
+    EXPECT_STREQ(string_borrow_cstring(&(s)), (cstr))
 
 static void test_cmdline_handle_key(void)
 {

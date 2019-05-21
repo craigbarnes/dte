@@ -55,8 +55,7 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
                 string_add_buf(&line, ptr, n - 1);
             } else {
                 string_add_buf(&line, ptr, n);
-                string_ensure_null_terminated(&line);
-                handle_command(cmds, line.buffer);
+                handle_command(cmds, string_borrow_cstring(&line));
                 string_clear(&line);
             }
         }
@@ -64,8 +63,7 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
         ptr += n + 1;
     }
     if (line.len) {
-        string_ensure_null_terminated(&line);
-        handle_command(cmds, line.buffer);
+        handle_command(cmds, string_borrow_cstring(&line));
     }
     string_free(&line);
 }
