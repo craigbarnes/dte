@@ -14,14 +14,14 @@ char *make_indent(size_t width)
 
     char *str;
     if (use_spaces_for_indent()) {
-        str = xnew(char, width + 1);
+        str = xmalloc(width + 1);
         memset(str, ' ', width);
         str[width] = '\0';
     } else {
         size_t tw = buffer->options.tab_width;
         size_t nt = width / tw;
         size_t ns = width % tw;
-        str = xnew(char, nt + ns + 1);
+        str = xmalloc(nt + ns + 1);
         memset(str, '\t', nt);
         memset(str + nt, ' ', ns);
         str[nt + ns] = '\0';
@@ -175,11 +175,11 @@ char *alloc_indent(size_t count, size_t *sizep)
     size_t size;
     if (use_spaces_for_indent()) {
         size = buffer->options.indent_width * count;
-        indent = xnew(char, size);
+        indent = xmalloc(size);
         memset(indent, ' ', size);
     } else {
         size = count;
-        indent = xnew(char, size);
+        indent = xmalloc(size);
         memset(indent, '\t', size);
     }
     *sizep = size;

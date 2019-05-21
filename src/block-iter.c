@@ -225,7 +225,7 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
     const Block *blk = bi->blk;
     size_t offset = bi->offset;
     size_t pos = 0;
-    char *buf = xnew(char, len);
+    char *buf = xmalloc(len);
 
     while (pos < len) {
         const size_t avail = blk->size - offset;

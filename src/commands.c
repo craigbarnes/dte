@@ -1300,7 +1300,7 @@ static void cmd_search(const char *pf, char **args)
             return;
         }
         size_t len = strlen(word) + 5;
-        pattern = xnew(char, len);
+        pattern = xmalloc(len);
         xsnprintf(pattern, len, "\\<%s\\>", word);
         free(word);
     }

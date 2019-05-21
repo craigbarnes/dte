@@ -186,7 +186,7 @@ int read_blocks(Buffer *b, int fd)
         ssize_t alloc = map_size;
         ssize_t pos = 0;
 
-        buf = xnew(char, alloc);
+        buf = xmalloc(alloc);
         while (1) {
             rc = xread(fd, buf + pos, alloc - pos);
             if (rc < 0) {

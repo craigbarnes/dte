@@ -11,7 +11,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
     if (ch == '/' || ch == '?') {
         // The search pattern is not a real regular expression.
         // Need to escape special characters.
-        char *pattern = xnew(char, size * 2);
+        char *pattern = xmalloc(size * 2);
         for (size_t i = 1, j = 0; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {
                 i++;

@@ -195,7 +195,7 @@ static char *short_filename_cwd(const char *absolute, const char *cwd)
     ) {
         size_t len = abs_len - home_len + 1;
         if (len < f_len) {
-            char *filename = xnew(char, len + 1);
+            char *filename = xmalloc(len + 1);
             filename[0] = '~';
             memcpy(filename + 1, absolute + home_len, len);
             free(f);

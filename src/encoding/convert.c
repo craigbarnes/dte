@@ -41,7 +41,7 @@ static struct cconv *create(iconv_t cd)
     struct cconv *c = xnew0(struct cconv, 1);
     c->cd = cd;
     c->osize = 8192;
-    c->obuf = xnew(char, c->osize);
+    c->obuf = xmalloc(c->osize);
     return c;
 }
 

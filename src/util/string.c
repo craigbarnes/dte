@@ -108,7 +108,7 @@ char *string_steal_cstring(String *s)
 char *string_cstring(const String *s)
 {
     const size_t len = s->len;
-    char *b = xnew(char, len + 1);
+    char *b = xmalloc(len + 1);
     if (len > 0) {
         BUG_ON(!s->buffer);
         memcpy(b, s->buffer, len);

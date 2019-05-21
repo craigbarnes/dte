@@ -276,7 +276,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
 
 char **copy_string_array(char **src, size_t count)
 {
-    char **dst = xnew(char *, count + 1);
+    char **dst = xnew(char*, count + 1);
     for (size_t i = 0; i < count; i++) {
         dst[i] = xstrdup(src[i]);
     }

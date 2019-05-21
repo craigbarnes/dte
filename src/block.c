@@ -39,7 +39,7 @@ Block *block_new(size_t alloc)
 {
     Block *blk = xnew0(Block, 1);
     alloc = ALLOC_ROUND(alloc);
-    blk->data = xnew(char, alloc);
+    blk->data = xmalloc(alloc);
     blk->alloc = alloc;
     return blk;
 }
@@ -272,7 +272,7 @@ char *do_delete(size_t len)
         saved_prev_node = blk->node.prev;
     }
 
-    char *buf = xnew(char, len);
+    char *buf = xmalloc(len);
     while (pos < len) {
         ListHead *next = blk->node.next;
         size_t avail = blk->size - offset;

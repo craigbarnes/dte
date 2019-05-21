@@ -58,7 +58,7 @@ ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st)
         close(fd);
         return -1;
     }
-    char *buf = xnew(char, st->st_size + 1);
+    char *buf = xmalloc(st->st_size + 1);
     ssize_t r = xread(fd, buf, st->st_size);
     close(fd);
     if (r > 0) {

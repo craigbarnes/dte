@@ -232,7 +232,7 @@ char *relative_filename(const char *f, const char *cwd)
     size_t tlen = strlen(f + clen);
     size_t len = dotdot * 3 + tlen;
 
-    char *filename = xnew(char, len + 1);
+    char *filename = xmalloc(len + 1);
     for (size_t i = 0; i < dotdot; i++) {
         memcpy(filename + i * 3, "../", 3);
     }

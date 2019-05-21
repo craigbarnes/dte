@@ -174,7 +174,7 @@ TagFile *load_tag_file(void)
         return current_tag_file;
     }
 
-    char *buf = xnew(char, st.st_size);
+    char *buf = xmalloc(st.st_size);
     ssize_t size = xread(fd, buf, st.st_size);
     close(fd);
     if (size < 0) {
@@ -251,7 +251,7 @@ char *tag_file_get_tag_filename(const TagFile *tf, const Tag *t)
     char *dir = path_dirname(tf->filename);
     size_t a = strlen(dir);
     size_t b = strlen(t->filename);
-    char *filename = xnew(char, a + b + 2);
+    char *filename = xmalloc(a + b + 2);
 
     memcpy(filename, dir, a);
     filename[a] = '/';
