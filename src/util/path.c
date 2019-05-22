@@ -243,14 +243,8 @@ char *relative_filename(const char *f, const char *cwd)
 
 char *path_dirname(const char *filename)
 {
-    char *slash = strrchr(filename, '/');
-    if (slash == NULL) {
-        return xmemdup_literal(".");
-    }
-    if (slash == filename) {
-        return xmemdup_literal("/");
-    }
-    return xstrcut(filename, slash - filename);
+    const StringView dir = path_slice_dirname(filename);
+    return xstrcut(dir.data, dir.length);
 }
 
 // filename must not contain trailing slashes (but it can be "/")

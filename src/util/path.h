@@ -12,13 +12,21 @@ static inline bool path_is_absolute(const char *path)
     return path[0] == '/';
 }
 
+NONNULL_ARGS
 static inline StringView path_slice_dirname(const char *filename)
 {
+    static const char dot[8] = ".";
+    size_t length;
     const char *const slash = strrchr(filename, '/');
     if (slash == NULL) {
-        return string_view(".", 1);
+        filename = dot;
+        length = 1;
+    } else if (slash == filename) {
+        length = 1;
+    } else {
+        length = slash - filename;
     }
-    return string_view(filename, slash - filename);
+    return string_view(filename, length);
 }
 
 char *path_absolute(const char *filename) MALLOC NONNULL_ARGS;
