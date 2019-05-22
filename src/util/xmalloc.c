@@ -8,11 +8,13 @@
 #include "ascii.h"
 #include "../debug.h"
 
-#define CHECK_ALLOC(x) do { \
-    if (unlikely((x) == NULL)) { \
-        fatal_error(__func__, errno); \
-    } \
-} while (0)
+static void *check_alloc(void *alloc)
+{
+    if (unlikely(alloc == NULL)) {
+        fatal_error(__func__, errno);
+    }
+    return alloc;
+}
 
 size_t size_multiply_(size_t a, size_t b)
 {
@@ -35,39 +37,29 @@ size_t size_add(size_t a, size_t b)
 void *xmalloc(size_t size)
 {
     BUG_ON(size == 0);
-    void *ptr = malloc(size);
-    CHECK_ALLOC(ptr);
-    return ptr;
+    return check_alloc(malloc(size));
 }
 
 void *xcalloc(size_t size)
 {
     BUG_ON(size == 0);
-    void *ptr = calloc(1, size);
-    CHECK_ALLOC(ptr);
-    return ptr;
+    return check_alloc(calloc(1, size));
 }
 
 void *xrealloc(void *ptr, size_t size)
 {
     BUG_ON(size == 0);
-    ptr = realloc(ptr, size);
-    CHECK_ALLOC(ptr);
-    return ptr;
+    return check_alloc(realloc(ptr, size));
 }
 
 char *xstrdup(const char *str)
 {
-    char *s = strdup(str);
-    CHECK_ALLOC(s);
-    return s;
+    return check_alloc(strdup(str));
 }
 
 char *xstrndup(const char *str, size_t n)
 {
-    char *s = strndup(str, n);
-    CHECK_ALLOC(s);
-    return s;
+    return check_alloc(strndup(str, n));
 }
 
 char *xstrdup_toupper(const char *str)
