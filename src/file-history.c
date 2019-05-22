@@ -8,6 +8,7 @@
 #include "file-history.h"
 #include "common.h"
 #include "error.h"
+#include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
@@ -85,8 +86,8 @@ void load_file_history(const char *filename)
             continue;
         }
         const char *path = line + offset;
-        if (path[0] != '/') {
-            continue; // Path must be absolute
+        if (!path_is_absolute(path)) {
+            continue;
         }
         add_file_history(row, col, path);
     }

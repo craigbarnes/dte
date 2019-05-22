@@ -7,6 +7,7 @@
 #include "match.h"
 #include "../debug.h"
 #include "../util/ascii.h"
+#include "../util/path.h"
 #include "../util/string.h"
 #include "../util/string-view.h"
 #include "../util/strtonum.h"
@@ -118,7 +119,7 @@ static int ini_handler (
 
 int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
 {
-    BUG_ON(pathname[0] != '/');
+    BUG_ON(!path_is_absolute(pathname));
     CallbackData data = {
         .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,

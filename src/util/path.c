@@ -8,20 +8,21 @@
 
 static bool make_absolute(char *dst, size_t size, const char *src)
 {
-    const size_t len = strlen(src);
     size_t pos = 0;
-
-    if (src[0] != '/') {
+    if (!path_is_absolute(src)) {
         if (!getcwd(dst, size)) {
             return false;
         }
         pos = strlen(dst);
         dst[pos++] = '/';
     }
+
+    const size_t len = strlen(src);
     if (pos + len + 1 > size) {
         errno = ENAMETOOLONG;
         return false;
     }
+
     memcpy(dst + pos, src, len + 1);
     return true;
 }
