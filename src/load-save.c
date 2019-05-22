@@ -268,13 +268,21 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
 }
 
 XSTRDUP
-static char *tmp_filename(const char *filename)
+static char *temporary_filename_template(const char *filename)
 {
-    char *dir = path_dirname(filename);
-    const char *base = path_basename(filename);
-    char *tmp = xasprintf("%s/.tmp.%s.XXXXXX", dir, base);
-    free(dir);
-    return tmp;
+    const StringView dir = path_slice_dirname(filename);
+    return xasprintf (
+        "%.*s/.tmp.%s.XXXXXX",
+        (int) dir.length,
+        dir.data,
+        path_basename(filename)
+    );
+}
+
+UNITTEST {
+    char *tmp = temporary_filename_template("/foo/bar/file.h");
+    BUG_ON(!streq(tmp, "/foo/bar/.tmp.file.h.XXXXXX"));
+    free(tmp);
 }
 
 static mode_t get_umask(void)
@@ -341,7 +349,7 @@ int save_buffer (
     // crontab command doesn't like the file to be replaced.
     if (!str_has_prefix(filename, "/tmp/")) {
         // Try to use temporary file first (safer)
-        tmp = tmp_filename(filename);
+        tmp = temporary_filename_template(filename);
         fd = mkstemp(tmp);
         if (fd < 0) {
             // No write permission to the directory?

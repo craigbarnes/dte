@@ -246,17 +246,15 @@ void tag_file_find_tags (
     current_filename = NULL;
 }
 
-char *tag_file_get_tag_filename(const TagFile *tf, const Tag *t)
+char *tag_file_get_tag_filename(const TagFile *tagfile, const Tag *tag)
 {
-    char *dir = path_dirname(tf->filename);
-    size_t a = strlen(dir);
-    size_t b = strlen(t->filename);
-    char *filename = xmalloc(a + b + 2);
+    const StringView dir = path_slice_dirname(tagfile->filename);
+    const size_t tag_filename_len = strlen(tag->filename);
 
-    memcpy(filename, dir, a);
-    filename[a] = '/';
-    memcpy(filename + a + 1, t->filename, b + 1);
-    free(dir);
+    char *filename = xmalloc(dir.length + tag_filename_len + 2);
+    memcpy(filename, dir.data, dir.length);
+    filename[dir.length] = '/';
+    memcpy(filename + dir.length + 1, tag->filename, tag_filename_len + 1);
     return filename;
 }
 
