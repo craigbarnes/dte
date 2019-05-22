@@ -51,8 +51,9 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...) {
     va_end(ap);
 
     fputs("'\n", stderr);
+    fflush(stderr);
 
-    abort(); // For core dump
+    abort();
 }
 #endif
 
