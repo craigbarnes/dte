@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,6 +9,7 @@
 #include "error.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
+#include "util/strtonum.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -65,6 +65,18 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
     ptr_array_add(&history, e);
 }
 
+static bool parse_ulong(const char **strp, unsigned long *valp)
+{
+    const char *str = *strp;
+    const size_t len = strlen(str);
+    const size_t ndigits = buf_parse_ulong(str, len, valp);
+    if (ndigits > 0) {
+        *strp = str + ndigits;
+        return true;
+    }
+    return false;
+}
+
 void load_file_history(const char *filename)
 {
     char *buf;
@@ -80,12 +92,13 @@ void load_file_history(const char *filename)
     while (pos < size) {
         const char *line = buf_next_line(buf, &pos, size);
         unsigned long row, col;
-        int offset;
-        int n = sscanf(line, "%lu%*20[ \t]%lu%*20[ \t]%n", &row, &col, &offset);
-        if (n != 2 || row > INT_MAX || col > INT_MAX) {
+        if (!parse_ulong(&line, &row) || row == 0 || *line++ != ' ') {
             continue;
         }
-        const char *path = line + offset;
+        if (!parse_ulong(&line, &col) || col == 0 || *line++ != ' ') {
+            continue;
+        }
+        const char *path = line;
         if (!path_is_absolute(path)) {
             continue;
         }

@@ -8,7 +8,6 @@ Checks: >
     readability-*,
     misc-*,
     -clang-diagnostic-pointer-sign,
-    -cert-err34-c,
     -bugprone-narrowing-conversions,
     -bugprone-macro-parentheses,
     -readability-inconsistent-declaration-parameter-name,
