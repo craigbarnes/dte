@@ -75,12 +75,12 @@ void debug_print(const char *function, const char *fmt, ...)
 
     char buf[4096];
     size_t write_max = ARRAY_COUNT(buf);
-    const int len1 = xsnprintf(buf, write_max, "%s: ", function);
+    const size_t len1 = xsnprintf(buf, write_max, "%s: ", function);
     write_max -= len1;
 
     va_list ap;
     va_start(ap, fmt);
-    const int len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
+    const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     va_end(ap);
 
     xwrite(fd, buf, len1 + len2);

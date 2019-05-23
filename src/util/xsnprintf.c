@@ -4,7 +4,7 @@
 #include "xsnprintf.h"
 #include "../debug.h"
 
-int xvsnprintf (
+size_t xvsnprintf (
     char *restrict buf,
     size_t len,
     const char *restrict format,
@@ -17,14 +17,14 @@ int xvsnprintf (
     if (unlikely(n < 0 || n >= (int)len)) {
         fatal_error(__func__, ERANGE);
     }
-    return n;
+    return (size_t)n;
 }
 
-int xsnprintf(char *restrict buf, size_t len, const char *restrict format, ...)
+size_t xsnprintf(char *restrict buf, size_t len, const char *restrict format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    const int n = xvsnprintf(buf, len, format, ap);
+    const size_t n = xvsnprintf(buf, len, format, ap);
     va_end(ap);
     return n;
 }

@@ -6,9 +6,9 @@
 #include "macros.h"
 
 PRINTF(3) NONNULL_ARGS
-int xsnprintf(char *restrict buf, size_t len, const char *restrict fmt, ...);
+size_t xsnprintf(char *restrict buf, size_t len, const char *restrict fmt, ...);
 
 VPRINTF(3) NONNULL_ARGS
-int xvsnprintf(char *restrict buf, size_t len, const char *restrict fmt, va_list ap);
+size_t xvsnprintf(char *restrict buf, size_t len, const char *restrict fmt, va_list ap);
 
 #endif
