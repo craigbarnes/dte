@@ -17,101 +17,95 @@ typedef struct {
     StringView config_file_dir;
     EditorConfigOptions options;
     String pattern;
-} CallbackData;
+} UserData;
 
 static void editorconfig_option_set (
     EditorConfigOptions *options,
-    const char *name,
-    const char *val
+    const StringView *name,
+    const StringView *val
 ) {
     unsigned int n = 0;
-    if (ascii_streq_icase(name, "indent_style")) {
-        if (ascii_streq_icase(val, "space")) {
+    if (string_view_equal_literal_icase(name, "indent_style")) {
+        if (string_view_equal_literal_icase(val, "space")) {
             options->indent_style = INDENT_STYLE_SPACE;
-        } else if (ascii_streq_icase(val, "tab")) {
+        } else if (string_view_equal_literal_icase(val, "tab")) {
             options->indent_style = INDENT_STYLE_TAB;
         } else {
             options->indent_style = INDENT_STYLE_UNSPECIFIED;
         }
-    } else if (ascii_streq_icase(name, "indent_size")) {
-        if (ascii_streq_icase(val, "tab")) {
+    } else if (string_view_equal_literal_icase(name, "indent_size")) {
+        if (string_view_equal_literal_icase(val, "tab")) {
             options->indent_size_is_tab = true;
             options->indent_size = 0;
         } else {
-            str_to_uint(val, &n);
-            // If str_to_uint() failed, n is zero, which is deliberately
+            buf_parse_uint(val->data, val->length, &n);
+            // If buf_parse_uint() failed, n is zero, which is deliberately
             // used to "reset" the option due to an invalid value
             options->indent_size = n;
             options->indent_size_is_tab = false;
         }
-    } else if (ascii_streq_icase(name, "tab_width")) {
-        str_to_uint(val, &n);
+    } else if (string_view_equal_literal_icase(name, "tab_width")) {
+        buf_parse_uint(val->data, val->length, &n);
         options->tab_width = n;
-    } else if (ascii_streq_icase(name, "max_line_length")) {
-        str_to_uint(val, &n);
+    } else if (string_view_equal_literal_icase(name, "max_line_length")) {
+        buf_parse_uint(val->data, val->length, &n);
         options->max_line_length = n;
     }
 }
 
-static int ini_handler (
-    void *ud,
-    const char *section,
-    const char *name,
-    const char *value,
-    unsigned int name_idx
-) {
-    CallbackData *data = ud;
+static int ini_handler(const IniData *data, void *ud) {
+    UserData *userdata = ud;
 
-    if (section[0] == '\0') {
+    if (data->section.length == 0) {
         if (
-            ascii_streq_icase(name, "root")
-            && ascii_streq_icase(value, "true")
+            string_view_equal_literal_icase(&data->name, "root")
+            && string_view_equal_literal_icase(&data->value, "true")
         ) {
             // root=true, clear all previous values
-            data->options = editorconfig_options_init();
+            userdata->options = editorconfig_options_init();
         }
         return 1;
     }
 
-    if (name_idx == 0) {
+    if (data->name_idx == 0) {
         // If name_idx is zero, it indicates that the name/value pair is
         // the first in the section and the pattern must be rebuilt
-        string_clear(&data->pattern);
+        string_clear(&userdata->pattern);
 
         // Escape editorconfig special chars in path
-        const StringView ecfile_dir = data->config_file_dir;
+        const StringView ecfile_dir = userdata->config_file_dir;
         for (size_t i = 0, n = ecfile_dir.length; i < n; i++) {
             const char ch = ecfile_dir.data[i];
             switch (ch) {
             case '*': case ',': case '-':
             case '?': case '[': case '\\':
             case ']': case '{': case '}':
-                string_add_byte(&data->pattern, '\\');
+                string_add_byte(&userdata->pattern, '\\');
                 // Fallthrough
             default:
-                string_add_byte(&data->pattern, ch);
+                string_add_byte(&userdata->pattern, ch);
             }
         }
 
-        if (strchr(section, '/') == NULL) {
+        if (!string_view_memchr(&data->section, '/')) {
             // No slash in pattern, append "**/"
-            string_add_literal(&data->pattern, "**/");
-        } else if (section[0] != '/') {
+            string_add_literal(&userdata->pattern, "**/");
+        } else if (data->section.data[0] != '/') {
             // Pattern contains at least one slash but not at the start, add one
-            string_add_byte(&data->pattern, '/');
+            string_add_byte(&userdata->pattern, '/');
         }
 
-        string_add_str(&data->pattern, section);
-        string_ensure_null_terminated(&data->pattern);
+        string_add_string_view(&userdata->pattern, &data->section);
+        string_ensure_null_terminated(&userdata->pattern);
     } else {
         // Otherwise, the section is the same as was passed in the last
         // callback invocation and the previously constructed pattern
         // can be reused
-        BUG_ON(data->pattern.len == 0);
+        BUG_ON(userdata->pattern.len == 0);
     }
 
-    if (ec_pattern_match(data->pattern.buffer, data->pathname)) {
-        editorconfig_option_set(&data->options, name, value);
+    if (ec_pattern_match(userdata->pattern.buffer, userdata->pathname)) {
+        editorconfig_option_set(&userdata->options, &data->name, &data->value);
     }
 
     return 1;
@@ -120,7 +114,7 @@ static int ini_handler (
 int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
 {
     BUG_ON(!path_is_absolute(pathname));
-    CallbackData data = {
+    UserData data = {
         .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,
         .pattern = STRING_INIT

@@ -29,6 +29,10 @@ typedef struct {
     string_view_equal_strn((sv), (str), STRLEN(str)) \
 )
 
+#define string_view_equal_literal_icase(sv, str) ( \
+    string_view_equal_strn_icase((sv), (str), STRLEN(str)) \
+)
+
 #define string_view_has_literal_prefix(sv, prefix) ( \
     string_view_has_prefix((sv), (prefix), STRLEN(prefix)) \
 )
@@ -69,6 +73,15 @@ static inline bool string_view_equal_strn (
 }
 
 PURE NONNULL_ARGS
+static inline bool string_view_equal_strn_icase (
+    const StringView *sv,
+    const char *str,
+    size_t len
+) {
+    return len == sv->length && mem_equal_icase(sv->data, str, len);
+}
+
+PURE NONNULL_ARGS
 static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
 {
     return string_view_equal_strn(sv, str, strlen(str));
@@ -90,6 +103,12 @@ static inline bool string_view_has_prefix_icase (
     size_t length
 ) {
     return sv->length >= length && mem_equal_icase(sv->data, str, length);
+}
+
+PURE NONNULL_ARGS
+static inline void *string_view_memchr(const StringView *sv, int c)
+{
+    return memchr(sv->data, c, sv->length);
 }
 
 #endif

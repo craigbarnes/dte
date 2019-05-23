@@ -56,6 +56,11 @@ void string_add_str(String *s, const char *str)
     string_add_buf(s, str, strlen(str));
 }
 
+void string_add_string_view(String *s, const StringView *sv)
+{
+    string_add_buf(s, sv->data, sv->length);
+}
+
 void string_add_buf(String *s, const char *ptr, size_t len)
 {
     if (!len) {

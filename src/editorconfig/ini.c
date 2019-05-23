@@ -13,16 +13,6 @@ static char *trim_left(char *str)
     return str;
 }
 
-static char *trim_right(char *str, size_t len)
-{
-    char *ptr = str + len - 1;
-    while (ptr > str && ascii_isspace(*ptr--)) {
-        len--;
-    }
-    str[len] = '\0';
-    return str;
-}
-
 static size_t strip_inline_comments(char *const str)
 {
     size_t len = strlen(str);
@@ -71,7 +61,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         pos += 3;
     }
 
-    const char *section = "";
+    StringView section = STRING_VIEW_INIT;
     unsigned int nameidx = 0;
 
     while (pos < size) {
@@ -85,22 +75,37 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         case '[':
             line_len = strip_inline_comments(line);
             if (line_len > 1 && line[line_len - 1] == ']') {
-                line[line_len - 1] = '\0';
-                section = line + 1;
+                section = string_view(line + 1, line_len - 2);
                 nameidx = 0;
             }
             continue;
         }
 
-        strip_inline_comments(line);
-        char *delim = strchr(line, '=');
+        line_len = strip_inline_comments(line);
+        char *delim = memchr(line, '=', line_len);
         if (delim) {
-            *delim = '\0';
-            size_t n = delim - line;
-            BUG_ON(strlen(line) != n);
-            char *name = trim_right(line, n);
-            char *value = trim_left(delim + 1);
-            callback(userdata, section, name, value, nameidx++);
+            const size_t before_delim_len = delim - line;
+            size_t name_len = before_delim_len;
+            while (name_len > 0 && ascii_isblank(line[name_len - 1])) {
+                name_len--;
+            }
+            if (name_len == 0) {
+                continue;
+            }
+
+            char *after_delim = delim + 1;
+            char *value = trim_left(after_delim);
+            size_t diff = value - after_delim;
+            size_t value_len = line_len - before_delim_len - 1 - diff;
+
+            const IniData data = {
+                .section = section,
+                .name = string_view(line, name_len),
+                .value = string_view(value, value_len),
+                .name_idx = nameidx++,
+            };
+
+            callback(&data, userdata);
         }
     }
 

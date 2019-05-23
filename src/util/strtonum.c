@@ -52,6 +52,17 @@ size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp)
     return n;
 }
 
+size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp)
+{
+    uintmax_t val;
+    size_t n = buf_parse_uintmax(str, size, &val);
+    if (n == 0 || val > UINT_MAX) {
+        return 0;
+    }
+    *valp = (unsigned int)val;
+    return n;
+}
+
 static size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
     bool negative = false;

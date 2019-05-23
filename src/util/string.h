@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "macros.h"
+#include "string-view.h"
 #include "unicode.h"
 #include "xmalloc.h"
 
@@ -48,6 +49,7 @@ void string_free(String *s) NONNULL_ARGS;
 void string_add_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_add_ch(String *s, CodePoint u) NONNULL_ARGS;
 void string_add_str(String *s, const char *str) NONNULL_ARGS;
+void string_add_string_view(String *s, const StringView *sv) NONNULL_ARGS;
 void string_add_buf(String *s, const char *ptr, size_t len) NONNULL_ARGS;
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
