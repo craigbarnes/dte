@@ -125,10 +125,10 @@ static int32_t parse_color(const char *str)
 
     // Parse r/g/b
     if (len == 5 && str[1] == '/') {
-        uint8_t r, g, b;
-        // NOLINTNEXTLINE(cert-err34-c):
-        int n = sscanf(str, "%1" SCNu8 "/%1" SCNu8 "/%1" SCNu8, &r, &g, &b);
-        if (n != 3 || r > 5 || g > 5 || b > 5) {
+        uint8_t r = ((uint8_t)str[0]) - '0';
+        uint8_t g = ((uint8_t)str[2]) - '0';
+        uint8_t b = ((uint8_t)str[4]) - '0';
+        if (r > 5 || g > 5 || b > 5 || str[3] != '/') {
             return COLOR_INVALID;
         }
         // Convert to color index 16..231 (xterm 6x6x6 color cube)
