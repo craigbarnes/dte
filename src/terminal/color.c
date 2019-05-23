@@ -84,6 +84,30 @@ static int32_t color_join_rgb(uint8_t r, uint8_t g, uint8_t b)
     ;
 }
 
+static int32_t parse_rrggbb(const char *str)
+{
+    uint8_t digits[6];
+    for (size_t i = 0; i < 6; i++) {
+        int val = hex_decode(str[i]);
+        if (val < 0) {
+            return COLOR_INVALID;
+        }
+        digits[i] = val;
+    }
+    uint8_t r = (digits[0] * 16) + digits[1];
+    uint8_t g = (digits[2] * 16) + digits[3];
+    uint8_t b = (digits[4] * 16) + digits[5];
+    return color_join_rgb(r, g, b);
+}
+
+UNITTEST {
+    BUG_ON(parse_rrggbb("f01cff") != (0xf01cff | COLOR_FLAG_RGB));
+    BUG_ON(parse_rrggbb("011011") != (0x011011 | COLOR_FLAG_RGB));
+    BUG_ON(parse_rrggbb("fffffg") != COLOR_INVALID);
+    BUG_ON(parse_rrggbb(".") != COLOR_INVALID);
+    BUG_ON(parse_rrggbb("11223") != COLOR_INVALID);
+}
+
 static int32_t parse_color(const char *str)
 {
     size_t len = strlen(str);
@@ -96,13 +120,7 @@ static int32_t parse_color(const char *str)
         if (len != 7) {
             return COLOR_INVALID;
         }
-        uint8_t r, g, b;
-        // NOLINTNEXTLINE(cert-err34-c): width limit prevents overflow
-        int n = sscanf(str + 1, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8, &r, &g, &b);
-        if (n != 3) {
-            return COLOR_INVALID;
-        }
-        return color_join_rgb(r, g, b);
+        return parse_rrggbb(str + 1);
     }
 
     // Parse r/g/b

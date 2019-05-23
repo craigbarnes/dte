@@ -14,6 +14,7 @@ static void test_parse_term_color(void)
     } tests[] = {
         {{"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
         {{"#ff0000"}, {0xff0000 | COLOR_FLAG_RGB, -1, 0}},
+        {{"#f00a9c", "reverse"}, {0xf00a9c | COLOR_FLAG_RGB, -1, ATTR_REVERSE}},
         {{"black", "#00ffff"}, {COLOR_BLACK, 0x00ffff | COLOR_FLAG_RGB, 0}},
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
         {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
