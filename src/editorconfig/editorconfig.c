@@ -96,7 +96,6 @@ static int ini_handler(const IniData *data, void *ud) {
         }
 
         string_add_string_view(&userdata->pattern, &data->section);
-        string_ensure_null_terminated(&userdata->pattern);
     } else {
         // Otherwise, the section is the same as was passed in the last
         // callback invocation and the previously constructed pattern
