@@ -110,9 +110,8 @@ static size_t skip_empty_alternates(const char *str, size_t len)
     return i - 1;
 }
 
-bool ec_pattern_match(const char *pattern, const char *path)
+bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
 {
-    const size_t pattern_len = strlen(pattern);
     String buf = STRING_INIT;
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);

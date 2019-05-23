@@ -104,7 +104,8 @@ static int ini_handler(const IniData *data, void *ud) {
         BUG_ON(userdata->pattern.len == 0);
     }
 
-    if (ec_pattern_match(userdata->pattern.buffer, userdata->pathname)) {
+    const String *pattern = &userdata->pattern;
+    if (ec_pattern_match(pattern->buffer, pattern->len, userdata->pathname)) {
         editorconfig_option_set(&userdata->options, &data->name, &data->value);
     }
 
