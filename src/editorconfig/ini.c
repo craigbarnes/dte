@@ -13,9 +13,10 @@ static char *trim_left(char *str)
     return str;
 }
 
-static size_t strip_inline_comments(char *const str)
+static void strip_trailing_comments_and_whitespace(StringView *line)
 {
-    size_t len = strlen(str);
+    const char *str = line->data;
+    size_t len = line->length;
 
     // Remove inline comments
     char prev_char = '\0';
@@ -27,24 +28,19 @@ static size_t strip_inline_comments(char *const str)
     }
 
     // Trim trailing whitespace
-    char *ptr = str + len - 1;
+    const char *ptr = str + len - 1;
     while (ptr > str && ascii_isspace(*ptr--)) {
         len--;
     }
 
-    str[len] = '\0';
-    return len;
+    line->length = len;
 }
 
 UNITTEST {
-    char tmp[64] = " \t  key = val   #   inline comment    ";
-    strip_inline_comments(tmp);
-    char *trimmed = trim_left(tmp);
-    DEBUG_VAR(trimmed);
-    BUG_ON(!streq(trimmed, "key = val"));
-    tmp[0] = '\0';
-    strip_inline_comments(tmp);
-    BUG_ON(!streq(tmp, ""));
+    StringView tmp = STRING_VIEW(" \t  key = val   #   inline comment    ");
+    string_view_trim_left(&tmp);
+    strip_trailing_comments_and_whitespace(&tmp);
+    BUG_ON(!string_view_equal_literal(&tmp, "key = val"));
 }
 
 int ini_parse(const char *filename, IniCallback callback, void *userdata)
@@ -65,28 +61,32 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
     unsigned int nameidx = 0;
 
     while (pos < size) {
-        char *line = trim_left(buf_next_line(buf, &pos, size));
-        size_t line_len;
+        StringView line = buf_slice_next_line(buf, &pos, size);
+        string_view_trim_left(&line);
 
-        switch (line[0]) {
+        if (line.length < 2) {
+            continue;
+        }
+
+        switch (line.data[0]) {
         case ';':
         case '#':
             continue;
         case '[':
-            line_len = strip_inline_comments(line);
-            if (line_len > 1 && line[line_len - 1] == ']') {
-                section = string_view(line + 1, line_len - 2);
+            strip_trailing_comments_and_whitespace(&line);
+            if (line.length > 1 && line.data[line.length - 1] == ']') {
+                section = string_view(line.data + 1, line.length - 2);
                 nameidx = 0;
             }
             continue;
         }
 
-        line_len = strip_inline_comments(line);
-        char *delim = memchr(line, '=', line_len);
+        strip_trailing_comments_and_whitespace(&line);
+        char *delim = string_view_memchr(&line, '=');
         if (delim) {
-            const size_t before_delim_len = delim - line;
+            const size_t before_delim_len = delim - line.data;
             size_t name_len = before_delim_len;
-            while (name_len > 0 && ascii_isblank(line[name_len - 1])) {
+            while (name_len > 0 && ascii_isblank(line.data[name_len - 1])) {
                 name_len--;
             }
             if (name_len == 0) {
@@ -96,11 +96,11 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
             char *after_delim = delim + 1;
             char *value = trim_left(after_delim);
             size_t diff = value - after_delim;
-            size_t value_len = line_len - before_delim_len - 1 - diff;
+            size_t value_len = line.length - before_delim_len - 1 - diff;
 
             const IniData data = {
                 .section = section,
-                .name = string_view(line, name_len),
+                .name = string_view(line.data, name_len),
                 .value = string_view(value, value_len),
                 .name_idx = nameidx++,
             };

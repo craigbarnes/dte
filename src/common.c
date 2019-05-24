@@ -85,3 +85,14 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
     }
     return line;
 }
+
+StringView buf_slice_next_line(const char *buf, ssize_t *posp, ssize_t size)
+{
+    ssize_t pos = *posp;
+    ssize_t avail = size - pos;
+    const char *line = buf + pos;
+    const char *nl = memchr(line, '\n', avail);
+    size_t line_length = nl ? (nl - line + 1) : avail;
+    *posp += line_length;
+    return string_view(line, line_length);
+}
