@@ -11,7 +11,7 @@ extern const uint8_t ascii_table[256];
 #define ASCII_SPACE 0x01
 #define ASCII_DIGIT 0x02
 #define ASCII_CNTRL 0x04
-// 0x08
+#define ASCII_XDIGIT 0x08
 #define ASCII_LOWER 0x10
 #define ASCII_UPPER 0x20
 #define ASCII_UNDERSCORE 0x40
@@ -25,6 +25,7 @@ extern const uint8_t ascii_table[256];
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
 #define ascii_isdigit(x) ascii_test(x, ASCII_DIGIT)
 #define ascii_iscntrl(x) ascii_test(x, ASCII_CNTRL)
+#define ascii_isxdigit(x) ascii_test(x, ASCII_XDIGIT)
 #define ascii_islower(x) ascii_test(x, ASCII_LOWER)
 #define ascii_isupper(x) ascii_test(x, ASCII_UPPER)
 #define ascii_isalpha(x) ascii_test(x, ASCII_ALPHA)
@@ -78,6 +79,13 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
     return true;
 }
 
-int hex_decode(int ch) CONST_FN;
+PURE
+static inline int hex_decode(unsigned char c)
+{
+    if (ascii_isxdigit(c)) {
+        return (c & 0xf) + (c >> 6) + ((c >> 6) << 3);
+    }
+    return -1;
+}
 
 #endif

@@ -18,16 +18,20 @@
 static void test_ascii(void)
 {
     EXPECT_EQ(ascii_tolower('A'), 'a');
+    EXPECT_EQ(ascii_tolower('F'), 'f');
     EXPECT_EQ(ascii_tolower('Z'), 'z');
     EXPECT_EQ(ascii_tolower('a'), 'a');
+    EXPECT_EQ(ascii_tolower('f'), 'f');
     EXPECT_EQ(ascii_tolower('z'), 'z');
     EXPECT_EQ(ascii_tolower('9'), '9');
     EXPECT_EQ(ascii_tolower('~'), '~');
     EXPECT_EQ(ascii_tolower('\0'), '\0');
 
     EXPECT_EQ(ascii_toupper('a'), 'A');
+    EXPECT_EQ(ascii_toupper('f'), 'F');
     EXPECT_EQ(ascii_toupper('z'), 'Z');
     EXPECT_EQ(ascii_toupper('A'), 'A');
+    EXPECT_EQ(ascii_toupper('F'), 'F');
     EXPECT_EQ(ascii_toupper('Z'), 'Z');
     EXPECT_EQ(ascii_toupper('9'), '9');
     EXPECT_EQ(ascii_toupper('~'), '~');
