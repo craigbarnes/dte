@@ -63,6 +63,31 @@ static void test_ascii(void)
     EXPECT_FALSE(ascii_iscntrl(0x80));
     EXPECT_FALSE(ascii_iscntrl(0xFF));
 
+    EXPECT_TRUE(ascii_isdigit('0'));
+    EXPECT_TRUE(ascii_isdigit('1'));
+    EXPECT_TRUE(ascii_isdigit('9'));
+    EXPECT_FALSE(ascii_isdigit('a'));
+    EXPECT_FALSE(ascii_isdigit('f'));
+    EXPECT_FALSE(ascii_isdigit('/'));
+    EXPECT_FALSE(ascii_isdigit(':'));
+    EXPECT_FALSE(ascii_isdigit('\0'));
+    EXPECT_FALSE(ascii_isdigit(0xFF));
+
+    EXPECT_TRUE(ascii_isxdigit('0'));
+    EXPECT_TRUE(ascii_isxdigit('1'));
+    EXPECT_TRUE(ascii_isxdigit('9'));
+    EXPECT_TRUE(ascii_isxdigit('a'));
+    EXPECT_TRUE(ascii_isxdigit('A'));
+    EXPECT_TRUE(ascii_isxdigit('f'));
+    EXPECT_TRUE(ascii_isxdigit('F'));
+    EXPECT_FALSE(ascii_isxdigit('g'));
+    EXPECT_FALSE(ascii_isxdigit('G'));
+    EXPECT_FALSE(ascii_isxdigit('@'));
+    EXPECT_FALSE(ascii_isxdigit('/'));
+    EXPECT_FALSE(ascii_isxdigit(':'));
+    EXPECT_FALSE(ascii_isxdigit('\0'));
+    EXPECT_FALSE(ascii_isxdigit(0xFF));
+
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\0'));
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\a'));
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\b'));
