@@ -99,7 +99,6 @@ static void buf_vsprintf(const char *fmt, va_list ap)
         if (n >= sizeof(obuf.buf)) {
             char *tmp = xmalloc(n + 1);
             int wrote = vsnprintf(tmp, n + 1, fmt, ap);
-            DEBUG_VAR(wrote);
             BUG_ON(wrote != n);
             xwrite(STDOUT_FILENO, tmp, n);
             free(tmp);

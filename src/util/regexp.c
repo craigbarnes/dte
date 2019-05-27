@@ -8,7 +8,6 @@ bool regexp_match_nosub(const char *pattern, const char *buf, size_t size)
 {
     regex_t re;
     bool compiled = regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB);
-    DEBUG_VAR(compiled);
     BUG_ON(!compiled);
     regmatch_t m;
     bool ret = regexp_exec(&re, buf, size, 1, &m, 0);
@@ -24,7 +23,6 @@ bool regexp_match (
 ) {
     regex_t re;
     bool compiled = regexp_compile(&re, pattern, REG_NEWLINE);
-    DEBUG_VAR(compiled);
     BUG_ON(!compiled);
     bool ret = regexp_exec_sub(&re, buf, size, m, 0);
     regfree(&re);

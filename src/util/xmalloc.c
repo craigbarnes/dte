@@ -93,7 +93,6 @@ static int xvasprintf_(char **strp, const char *format, va_list ap)
     va_end(ap2);
     *strp = xmalloc(n + 1);
     int m = vsnprintf(*strp, n + 1, format, ap);
-    DEBUG_VAR(m);
     BUG_ON(m != n);
     return n;
 }

@@ -69,7 +69,6 @@ void debug_print(const char *function, const char *fmt, ...)
 
         // Don't leak file descriptor to parent processes
         int r = fcntl(fd, F_SETFD, FD_CLOEXEC);
-        DEBUG_VAR(r);
         BUG_ON(r == -1);
     }
 

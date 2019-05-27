@@ -332,5 +332,8 @@ int32_t convert_color_to_nearest_supported(int32_t color)
     case TERM_TRUE_COLOR: return color;
     }
     BUG("unexpected terminal.color_type value");
-    UNREACHABLE();
+    // This should never be reached, but it silences compiler warnings
+    // when DEBUG == 0 and __builtin_unreachable() isn't supported
+    // (i.e. BUG() expands to nothing).
+    return COLOR_DEFAULT;
 }

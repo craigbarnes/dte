@@ -188,7 +188,6 @@ static size_t split_and_insert(const char *buf, size_t len)
             size_t avail = size3 - offset;
             size_t count = size - copied;
 
-            DEBUG_VAR(avail);
             BUG_ON(count > avail);
             new->nl += copy_count_nl(new->data + copied, buf3 + offset, count);
             copied += count;
