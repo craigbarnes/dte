@@ -45,6 +45,9 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_TRUE(patmatch("file.{{{a,b,{c,,d}}}}", "file."));
     EXPECT_FALSE(patmatch("file.{{{a,b,{c,d}}}}", "file."));
 
+    EXPECT_TRUE(patmatch("a?b.c", "a_b.c"));
+    EXPECT_FALSE(patmatch("a?b.c", "a/b.c"));
+
     #undef patmatch
 }
 

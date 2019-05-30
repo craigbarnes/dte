@@ -133,7 +133,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             }
             break;
         case '?':
-            string_add_byte(&buf, '.');
+            string_add_literal(&buf, "[^/]");
             break;
         case '*':
             if (i + 1 < pattern_len && pattern[i + 1] == '*') {
