@@ -48,6 +48,13 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_TRUE(patmatch("a?b.c", "a_b.c"));
     EXPECT_FALSE(patmatch("a?b.c", "a/b.c"));
 
+    EXPECT_TRUE(patmatch("a\\[.abc", "a[.abc"));
+    EXPECT_TRUE(patmatch("a\\{.abc", "a{.abc"));
+    EXPECT_TRUE(patmatch("a\\*.abc", "a*.abc"));
+    EXPECT_TRUE(patmatch("a\\?.abc", "a?.abc"));
+    EXPECT_FALSE(patmatch("a\\*.abc", "az.abc"));
+    EXPECT_FALSE(patmatch("a\\?.abc", "az.abc"));
+
     #undef patmatch
 }
 
