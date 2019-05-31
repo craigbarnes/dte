@@ -1,4 +1,3 @@
-#include <stddef.h>
 #include "bitset.h"
 
 static void bitset_add(uint8_t *set, unsigned char ch)

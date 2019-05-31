@@ -205,9 +205,7 @@ static void cmd_char(const char *pf, char **args)
 
     bitset_add_pattern(c->u.cond_char.bitset, args[0]);
     if (not) {
-        for (size_t i = 0; i < ARRAY_COUNT(c->u.cond_char.bitset); i++) {
-            c->u.cond_char.bitset[i] = ~c->u.cond_char.bitset[i];
-        }
+        bitset_invert(c->u.cond_char.bitset);
     }
 }
 

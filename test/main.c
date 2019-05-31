@@ -15,6 +15,7 @@ void test_command(void);
 void test_editorconfig(void);
 void test_encoding(void);
 void test_filetype(void);
+void test_syntax(void);
 void test_terminal(void);
 void test_util(void);
 void init_headless_mode(void);
@@ -96,6 +97,7 @@ int main(void)
     test_util();
     test_terminal();
     test_cmdline();
+    test_syntax();
 
     init_headless_mode();
     test_exec_config();
