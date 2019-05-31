@@ -13,10 +13,10 @@
 #include "../util/strtonum.h"
 
 typedef struct {
-    const char *pathname;
+    const char *const pathname;
     StringView config_file_dir;
     EditorConfigOptions options;
-    String pattern;
+    bool match;
 } UserData;
 
 static void editorconfig_option_set (
@@ -69,42 +69,47 @@ static int ini_handler(const IniData *data, void *ud) {
 
     if (data->name_idx == 0) {
         // If name_idx is zero, it indicates that the name/value pair is
-        // the first in the section and the pattern must be rebuilt
-        string_clear(&userdata->pattern);
+        // the first in the section and therefore requires a new pattern
+        // to be built and tested for a match
+        const StringView ecdir = userdata->config_file_dir;
+        String pattern = string_new(ecdir.length + data->section.length + 16);
 
         // Escape editorconfig special chars in path
-        const StringView ecfile_dir = userdata->config_file_dir;
-        for (size_t i = 0, n = ecfile_dir.length; i < n; i++) {
-            const char ch = ecfile_dir.data[i];
+        for (size_t i = 0, n = ecdir.length; i < n; i++) {
+            const char ch = ecdir.data[i];
             switch (ch) {
             case '*': case ',': case '-':
             case '?': case '[': case '\\':
             case ']': case '{': case '}':
-                string_add_byte(&userdata->pattern, '\\');
+                string_add_byte(&pattern, '\\');
                 // Fallthrough
             default:
-                string_add_byte(&userdata->pattern, ch);
+                string_add_byte(&pattern, ch);
             }
         }
 
         if (!string_view_memchr(&data->section, '/')) {
             // No slash in pattern, append "**/"
-            string_add_literal(&userdata->pattern, "**/");
+            string_add_literal(&pattern, "**/");
         } else if (data->section.data[0] != '/') {
             // Pattern contains at least one slash but not at the start, add one
-            string_add_byte(&userdata->pattern, '/');
+            string_add_byte(&pattern, '/');
         }
 
-        string_add_string_view(&userdata->pattern, &data->section);
+        string_add_string_view(&pattern, &data->section);
+        userdata->match = ec_pattern_match (
+            pattern.buffer,
+            pattern.len,
+            userdata->pathname
+        );
+        string_free(&pattern);
     } else {
         // Otherwise, the section is the same as was passed in the last
-        // callback invocation and the previously constructed pattern
-        // can be reused
-        BUG_ON(userdata->pattern.len == 0);
+        // callback invocation and the value of userdata->match can
+        // just be reused
     }
 
-    const String *pattern = &userdata->pattern;
-    if (ec_pattern_match(pattern->buffer, pattern->len, userdata->pathname)) {
+    if (userdata->match) {
         editorconfig_option_set(&userdata->options, &data->name, &data->value);
     }
 
@@ -117,7 +122,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     UserData data = {
         .pathname = pathname,
         .config_file_dir = STRING_VIEW_INIT,
-        .pattern = STRING_INIT
+        .match = false
     };
 
     static const char ecfilename[16] = "/.editorconfig";
@@ -132,7 +137,6 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         data.config_file_dir = string_view(buf, dir_len);
         int err_num = ini_parse(buf, ini_handler, &data);
         if (err_num > 0) {
-            string_free(&data.pattern);
             return err_num;
         }
 
@@ -146,8 +150,6 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         memcpy(buf + dir_len, ecfilename, sizeof ecfilename);
         ptr = slash + 1;
     }
-
-    string_free(&data.pattern);
 
     // Set indent_size to "tab" if indent_size is not specified and
     // indent_style is set to "tab".
