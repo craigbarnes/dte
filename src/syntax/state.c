@@ -181,19 +181,27 @@ static void cmd_bufis(const char *pf, char **args)
 
 static void cmd_char(const char *pf, char **args)
 {
-    ConditionType type = COND_CHAR;
-    bool not = false;
-
+    bool n_flag = false;
+    bool b_flag = false;
     while (*pf) {
         switch (*pf) {
         case 'b':
-            type = COND_CHAR_BUFFER;
+            b_flag = true;
             break;
         case 'n':
-            not = true;
+            n_flag = true;
             break;
         }
         pf++;
+    }
+
+    ConditionType type;
+    if (b_flag) {
+        type = COND_CHAR_BUFFER;
+    } else if (!n_flag && args[0][0] != '\0' && args[0][1] == '\0') {
+        type = COND_CHAR1;
+    } else {
+        type = COND_CHAR;
     }
 
     Condition *c = add_condition(type, args[1], args[2]);
@@ -201,9 +209,13 @@ static void cmd_char(const char *pf, char **args)
         return;
     }
 
-    bitset_add_pattern(c->u.cond_char.bitset, args[0]);
-    if (not) {
-        bitset_invert(c->u.cond_char.bitset);
+    if (type == COND_CHAR1) {
+        c->u.cond_single_char.ch = (unsigned char)args[0][0];
+    } else {
+        bitset_add_pattern(c->u.cond_char.bitset, args[0]);
+        if (n_flag) {
+            bitset_invert(c->u.cond_char.bitset);
+        }
     }
 }
 

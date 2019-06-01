@@ -123,6 +123,14 @@ static HlColor **highlight_line (
                 sidx = -1;
                 state = a->destination;
                 goto top;
+            case COND_CHAR1:
+                if (cond->u.cond_single_char.ch != ch) {
+                    break;
+                }
+                colors[i++] = a->emit_color;
+                sidx = -1;
+                state = a->destination;
+                goto top;
             case COND_INLIST:
                 if (
                     sidx >= 0
