@@ -52,7 +52,6 @@ static void close_state(void)
 static State *find_or_add_state(const char *name)
 {
     State *st = find_state(current_syntax, name);
-
     if (st) {
         return st;
     }
@@ -115,7 +114,6 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
 static bool destination_state(const char *name, State **dest)
 {
     const char *const sep = strchr(name, ':');
-
     if (sep) {
         // subsyntax:returnstate
         char *sub = xstrcut(name, sep - name);
@@ -123,6 +121,7 @@ static bool destination_state(const char *name, State **dest)
         free(sub);
         return success;
     }
+
     if (streq(name, "END")) {
         if (not_subsyntax()) {
             return false;
@@ -130,6 +129,7 @@ static bool destination_state(const char *name, State **dest)
         *dest = NULL;
         return true;
     }
+
     *dest = reference_state(name);
     return true;
 }
@@ -139,18 +139,16 @@ static Condition *add_condition (
     const char *dest,
     const char *emit
 ) {
-    Condition *c;
-    State *d = NULL;
-
     if (no_state()) {
         return NULL;
     }
 
+    State *d = NULL;
     if (dest && !destination_state(dest, &d)) {
         return NULL;
     }
 
-    c = xnew0(Condition, 1);
+    Condition *c = xnew0(Condition, 1);
     c->a.destination = d;
     c->a.emit_name = emit ? xstrdup(emit) : NULL;
     c->type = type;
@@ -161,9 +159,9 @@ static Condition *add_condition (
 static void cmd_bufis(const char *pf, char **args)
 {
     const bool icase = !!*pf;
-    Condition *c;
     const char *str = args[0];
     const size_t len = strlen(str);
+    Condition *c;
 
     if (len > ARRAY_COUNT(c->u.cond_bufis.str)) {
         error_msg (
@@ -172,6 +170,7 @@ static void cmd_bufis(const char *pf, char **args)
         );
         return;
     }
+
     c = add_condition(COND_BUFIS, args[1], args[2]);
     if (c) {
         memcpy(c->u.cond_bufis.str, str, len);
@@ -184,7 +183,6 @@ static void cmd_char(const char *pf, char **args)
 {
     ConditionType type = COND_CHAR;
     bool not = false;
-    Condition *c;
 
     while (*pf) {
         switch (*pf) {
@@ -198,7 +196,7 @@ static void cmd_char(const char *pf, char **args)
         pf++;
     }
 
-    c = add_condition(type, args[1], args[2]);
+    Condition *c = add_condition(type, args[1], args[2]);
     if (!c) {
         return;
     }
@@ -238,15 +236,12 @@ static void cmd_eat(const char* UNUSED_ARG(pf), char **args)
 
 static void cmd_heredocbegin(const char* UNUSED_ARG(pf), char **args)
 {
-    const char *sub;
-    Syntax *subsyn;
-
     if (no_state()) {
         return;
     }
 
-    sub = args[0];
-    subsyn = find_any_syntax(sub);
+    const char *sub = args[0];
+    Syntax *subsyn = find_any_syntax(sub);
     if (!subsyn) {
         error_msg("No such syntax %s", sub);
         return;
@@ -358,7 +353,6 @@ static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
-    Condition *c;
     size_t len = 0;
 
     if (args[1]) {
@@ -376,7 +370,8 @@ static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
             return;
         }
     }
-    c = add_condition(type, NULL, args[0]);
+
+    Condition *c = add_condition(type, NULL, args[0]);
     if (c && type == COND_RECOLOR) {
         c->u.cond_recolor.len = len;
     }
@@ -386,17 +381,18 @@ static void cmd_state(const char* UNUSED_ARG(pf), char **args)
 {
     const char *name = args[0];
     const char *emit = args[1] ? args[1] : args[0];
-    State *s;
 
     close_state();
     if (no_syntax()) {
         return;
     }
+
     if (streq(name, "END") || streq(name, "this")) {
         error_msg("%s is reserved state name", name);
         return;
     }
-    s = find_or_add_state(name);
+
+    State *s = find_or_add_state(name);
     if (s->defined) {
         error_msg("State %s already exists.", name);
         return;
@@ -486,7 +482,6 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 {
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
-    Syntax *syn;
 
     *err = do_read_config(syntax_commands, filename, flags);
     if (*err) {
@@ -501,7 +496,7 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
     config_file = saved_config_file;
     config_line = saved_config_line;
 
-    syn = find_syntax(path_basename(filename));
+    Syntax *syn = find_syntax(path_basename(filename));
     if (syn && editor.status != EDITOR_INITIALIZING) {
         update_syntax_colors(syn);
     }
