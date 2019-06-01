@@ -354,7 +354,7 @@ char get_confirmation(const char *choices, const char *format, ...)
                 term_discard_paste();
                 continue;
             }
-            if (key == CTRL('C') || key == CTRL('G')) {
+            if (key == CTRL('C') || key == CTRL('G') || key == CTRL('[')) {
                 key = 0;
                 break;
             }
