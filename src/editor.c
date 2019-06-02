@@ -169,7 +169,7 @@ static void restore_cursor(void)
 
 static void start_update(void)
 {
-    buf_hide_cursor();
+    term_hide_cursor();
 }
 
 static void clear_update_tabbar(Window *w)
@@ -180,8 +180,8 @@ static void clear_update_tabbar(Window *w)
 static void end_update(void)
 {
     restore_cursor();
-    buf_show_cursor();
-    buf_flush();
+    term_show_cursor();
+    term_output_flush();
 
     window->view->buffer->changed_line_min = INT_MAX;
     window->view->buffer->changed_line_max = -1;
@@ -278,12 +278,12 @@ static void ui_end(void)
     terminal.put_control_code(terminal.control_codes.reset_attrs);
 
     terminal.move_cursor(0, terminal.height - 1);
-    buf_show_cursor();
+    term_show_cursor();
 
     terminal.put_control_code(terminal.control_codes.cup_mode_off);
     terminal.put_control_code(terminal.control_codes.keypad_off);
 
-    buf_flush();
+    term_output_flush();
     terminal.cooked();
 }
 

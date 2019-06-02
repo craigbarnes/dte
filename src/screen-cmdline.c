@@ -17,7 +17,7 @@ static void print_message(const char *msg, bool is_error)
     size_t i = 0;
     while (msg[i]) {
         CodePoint u = u_get_char(msg, i + 4, &i);
-        if (!buf_put_char(u)) {
+        if (!term_put_char(u)) {
             break;
         }
     }
@@ -25,10 +25,10 @@ static void print_message(const char *msg, bool is_error)
 
 void show_message(const char *msg, bool is_error)
 {
-    buf_reset(0, terminal.width, 0);
+    term_output_reset(0, terminal.width, 0);
     terminal.move_cursor(0, terminal.height - 1);
     print_message(msg, is_error);
-    buf_clear_eol();
+    term_clear_eol();
 }
 
 int print_command(char prefix)
@@ -53,12 +53,12 @@ int print_command(char prefix)
 
     set_builtin_color(BC_COMMANDLINE);
     i = 0;
-    buf_put_char(prefix);
+    term_put_char(prefix);
     x = obuf.x - obuf.scroll_x;
     while (i < editor.cmdline.buf.len) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
         u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);
-        if (!buf_put_char(u)) {
+        if (!term_put_char(u)) {
             break;
         }
         if (i <= editor.cmdline.pos) {
@@ -71,7 +71,7 @@ int print_command(char prefix)
 void update_command_line(void)
 {
     char prefix = ':';
-    buf_reset(0, terminal.width, 0);
+    term_output_reset(0, terminal.width, 0);
     terminal.move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL:
@@ -86,5 +86,5 @@ void update_command_line(void)
     case INPUT_GIT_OPEN:
         break;
     }
-    buf_clear_eol();
+    term_clear_eol();
 }

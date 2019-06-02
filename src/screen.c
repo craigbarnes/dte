@@ -72,7 +72,7 @@ static void print_separator(Window *win)
 
     for (int y = 0; y < win->h; y++) {
         terminal.move_cursor(win->x + win->w, win->y + y);
-        buf_add_ch('|');
+        term_add_byte('|');
     }
 }
 
@@ -107,7 +107,7 @@ void update_line_numbers(Window *win, bool force)
     win->line_numbers.first = first;
     win->line_numbers.last = last;
 
-    buf_reset(win->x, win->w, 0);
+    term_output_reset(win->x, win->w, 0);
     set_builtin_color(BC_LINENUMBER);
     for (int i = 0; i < win->edit_h; i++) {
         int line = v->vy + i + 1;
@@ -120,7 +120,7 @@ void update_line_numbers(Window *win, bool force)
             xsnprintf(buf, sizeof(buf), "%*d ", w, line);
         }
         terminal.move_cursor(x, win->edit_y + i);
-        buf_add_bytes(buf, win->line_numbers.width);
+        term_add_bytes(buf, win->line_numbers.width);
     }
 }
 

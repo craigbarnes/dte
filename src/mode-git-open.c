@@ -270,10 +270,10 @@ static void git_open_update_screen(void)
         git_open.scroll += git_open.selected - max_y;
     }
 
-    buf_reset(x, w, 0);
+    term_output_reset(x, w, 0);
     terminal.move_cursor(0, 0);
     editor.cmdline_x = print_command('/');
-    buf_clear_eol();
+    term_clear_eol();
     y++;
 
     for (; i < h; i++) {
@@ -294,25 +294,25 @@ static void git_open_update_screen(void)
             mask_color(&color, builtin_colors[BC_SELECTION]);
         }
         terminal.set_color(&color);
-        buf_add_str(file);
-        buf_clear_eol();
+        term_add_str(file);
+        term_clear_eol();
     }
     set_builtin_color(BC_DEFAULT);
     for (; i < h; i++) {
         obuf.x = 0;
         terminal.move_cursor(x, y + i);
-        buf_clear_eol();
+        term_clear_eol();
     }
 }
 
 static void git_open_update(void)
 {
-    buf_hide_cursor();
+    term_hide_cursor();
     update_term_title(window->view->buffer);
     git_open_update_screen();
     terminal.move_cursor(editor.cmdline_x, 0);
-    buf_show_cursor();
-    buf_flush();
+    term_show_cursor();
+    term_output_flush();
 }
 
 const EditorModeOps git_open_ops = {

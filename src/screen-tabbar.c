@@ -158,19 +158,19 @@ static void print_horizontal_tab_title(const View *v, size_t idx)
         set_builtin_color(BC_INACTIVETAB);
     }
 
-    buf_add_str(buf);
-    buf_add_str(filename);
+    term_add_str(buf);
+    term_add_str(filename);
 
     if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1) {
-        buf_put_char('>');
+        term_put_char('>');
     } else {
-        buf_put_char(' ');
+        term_put_char(' ');
     }
 }
 
 static void print_horizontal_tabbar(Window *win)
 {
-    buf_reset(win->x, win->w, 0);
+    term_output_reset(win->x, win->w, 0);
     terminal.move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
@@ -185,13 +185,13 @@ static void print_horizontal_tabbar(Window *win)
     set_builtin_color(BC_TABBAR);
     if (i != win->views.count) {
         while (obuf.x < obuf.width - 1) {
-            buf_put_char(' ');
+            term_put_char(' ');
         }
         if (obuf.x == obuf.width - 1) {
-            buf_put_char('>');
+            term_put_char('>');
         }
     } else {
-        buf_clear_eol();
+        term_clear_eol();
     }
 }
 
@@ -251,9 +251,9 @@ static void print_vertical_tab_title(const View *v, int idx, int width)
     } else {
         set_builtin_color(BC_INACTIVETAB);
     }
-    buf_add_str(buf);
-    buf_add_str(filename);
-    buf_clear_eol();
+    term_add_str(buf);
+    term_add_str(filename);
+    term_clear_eol();
 }
 
 static void print_vertical_tabbar(Window *win)
@@ -281,7 +281,7 @@ static void print_vertical_tabbar(Window *win)
         }
     }
 
-    buf_reset(win->x, width, 0);
+    term_output_reset(win->x, width, 0);
     int n = h;
     if (n + win->first_tab_idx > win->views.count) {
         n = win->views.count - win->first_tab_idx;
@@ -297,7 +297,7 @@ static void print_vertical_tabbar(Window *win)
     for (; i < h; i++) {
         obuf.x = 0;
         terminal.move_cursor(win->x, win->y + i);
-        buf_clear_eol();
+        term_clear_eol();
     }
 }
 

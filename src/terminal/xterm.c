@@ -5,19 +5,19 @@
 
 void xterm_save_title(void)
 {
-    buf_add_literal("\033[22;2t");
+    term_add_literal("\033[22;2t");
 }
 
 void xterm_restore_title(void)
 {
-    buf_add_literal("\033[23;2t");
+    term_add_literal("\033[23;2t");
 }
 
 void xterm_set_title(const char *title)
 {
-    buf_add_literal("\033]2;");
-    buf_add_bytes(title, strlen(title));
-    buf_add_ch('\007');
+    term_add_literal("\033]2;");
+    term_add_bytes(title, strlen(title));
+    term_add_byte('\007');
 }
 
 static inline void do_set_color(int32_t color, char ch)
@@ -26,17 +26,17 @@ static inline void do_set_color(int32_t color, char ch)
         return;
     }
 
-    buf_add_ch(';');
-    buf_add_ch(ch);
+    term_add_byte(';');
+    term_add_byte(ch);
 
     if (color < 8) {
-        buf_add_ch('0' + color);
+        term_add_byte('0' + color);
     } else if (color < 256) {
-        buf_sprintf("8;5;%hhu", (uint8_t)color);
+        term_sprintf("8;5;%hhu", (uint8_t)color);
     } else {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        buf_sprintf("8;2;%hhu;%hhu;%hhu", r, g, b);
+        term_sprintf("8;2;%hhu;%hhu;%hhu", r, g, b);
     }
 }
 
@@ -60,19 +60,19 @@ void xterm_set_color(const TermColor *color)
         return;
     }
 
-    buf_add_literal("\033[0");
+    term_add_literal("\033[0");
 
     for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
         if (color->attr & attr_map[j].attr) {
-            buf_add_ch(';');
-            buf_add_ch(attr_map[j].code);
+            term_add_byte(';');
+            term_add_byte(attr_map[j].code);
         }
     }
 
     do_set_color(color->fg, '3');
     do_set_color(color->bg, '4');
 
-    buf_add_ch('m');
+    term_add_byte('m');
     obuf.color = *color;
 }
 
@@ -88,7 +88,7 @@ const Terminal xterm = {
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,
-    .repeat_byte = &buf_repeat_byte,
+    .repeat_byte = &term_repeat_byte,
     .save_title = &xterm_save_title,
     .restore_title = &xterm_restore_title,
     .set_title = &xterm_set_title,

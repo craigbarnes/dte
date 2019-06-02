@@ -148,7 +148,7 @@ static bool get_terminfo_flag(const char *capname)
 
 static int tputs_putc(int ch)
 {
-    buf_add_ch(ch);
+    term_add_byte(ch);
     return ch;
 }
 

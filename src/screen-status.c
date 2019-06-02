@@ -217,31 +217,31 @@ void update_status_line(const Window *win)
     sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
-    buf_reset(win->x, win->w, 0);
+    term_output_reset(win->x, win->w, 0);
     terminal.move_cursor(win->x, win->y + win->h - 1);
     set_builtin_color(BC_STATUSLINE);
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
     if (lw + rw <= win->w) {
         // Both fit
-        buf_add_str(lbuf);
-        buf_set_bytes(' ', win->w - lw - rw);
-        buf_add_str(rbuf);
+        term_add_str(lbuf);
+        term_set_bytes(' ', win->w - lw - rw);
+        term_add_str(rbuf);
     } else if (lw <= win->w && rw <= win->w) {
         // Both would fit separately, draw overlapping
-        buf_add_str(lbuf);
+        term_add_str(lbuf);
         obuf.x = win->w - rw;
         terminal.move_cursor(win->x + win->w - rw, win->y + win->h - 1);
-        buf_add_str(rbuf);
+        term_add_str(rbuf);
     } else if (lw <= win->w) {
         // Left fits
-        buf_add_str(lbuf);
-        buf_clear_eol();
+        term_add_str(lbuf);
+        term_clear_eol();
     } else if (rw <= win->w) {
         // Right fits
-        buf_set_bytes(' ', win->w - rw);
-        buf_add_str(rbuf);
+        term_set_bytes(' ', win->w - rw);
+        term_add_str(rbuf);
     } else {
-        buf_clear_eol();
+        term_clear_eol();
     }
 }

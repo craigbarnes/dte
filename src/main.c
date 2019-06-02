@@ -130,15 +130,15 @@ static void showkey_loop(void)
     terminal.raw();
     terminal.put_control_code(terminal.control_codes.init);
     terminal.put_control_code(terminal.control_codes.keypad_on);
-    buf_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
-    buf_flush();
+    term_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
+    term_output_flush();
 
     bool loop = true;
     while (loop) {
         KeyCode key;
         if (!term_read_key(&key)) {
-            buf_add_literal("   UNKNOWN      -\r\n");
-            buf_flush();
+            term_add_literal("   UNKNOWN      -\r\n");
+            term_output_flush();
             continue;
         }
         switch (key) {
@@ -150,13 +150,13 @@ static void showkey_loop(void)
             break;
         }
         const char *str = key_to_string(key);
-        buf_sprintf("   %-12s 0x%-12" PRIX32 "\r\n", str, key);
-        buf_flush();
+        term_sprintf("   %-12s 0x%-12" PRIX32 "\r\n", str, key);
+        term_output_flush();
     }
 
     terminal.put_control_code(terminal.control_codes.keypad_off);
     terminal.put_control_code(terminal.control_codes.deinit);
-    buf_flush();
+    term_output_flush();
     terminal.cooked();
 }
 
@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
     terminal.restore_title();
     editor.ui_end();
     terminal.put_control_code(terminal.control_codes.deinit);
-    buf_flush();
+    term_output_flush();
 
     // Unlock files and add files to file history
     remove_frame(root_frame);

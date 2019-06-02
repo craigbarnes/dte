@@ -10,7 +10,7 @@
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 
-OutputBuffer obuf;
+TermOutputBuffer obuf;
 
 static size_t obuf_avail(void)
 {
@@ -20,11 +20,11 @@ static size_t obuf_avail(void)
 static void obuf_need_space(size_t count)
 {
     if (obuf_avail() < count) {
-        buf_flush();
+        term_output_flush();
     }
 }
 
-void buf_reset(size_t start_x, size_t width, size_t scroll_x)
+void term_output_reset(size_t start_x, size_t width, size_t scroll_x)
 {
     obuf.x = 0;
     obuf.width = width;
@@ -35,10 +35,10 @@ void buf_reset(size_t start_x, size_t width, size_t scroll_x)
 }
 
 // Does not update obuf.x
-void buf_add_bytes(const char *const str, size_t count)
+void term_add_bytes(const char *const str, size_t count)
 {
     if (count > obuf_avail()) {
-        buf_flush();
+        term_output_flush();
         if (count >= sizeof(obuf.buf)) {
             xwrite(STDOUT_FILENO, str, count);
             return;
@@ -48,7 +48,7 @@ void buf_add_bytes(const char *const str, size_t count)
     obuf.count += count;
 }
 
-void buf_repeat_byte(char ch, size_t count)
+void term_repeat_byte(char ch, size_t count)
 {
     while (count) {
         obuf_need_space(1);
@@ -60,7 +60,7 @@ void buf_repeat_byte(char ch, size_t count)
     }
 }
 
-void buf_set_bytes(char ch, size_t count)
+void term_set_bytes(char ch, size_t count)
 {
     if (obuf.x + count > obuf.scroll_x + obuf.width) {
         count = obuf.scroll_x + obuf.width - obuf.x;
@@ -78,14 +78,14 @@ void buf_set_bytes(char ch, size_t count)
 }
 
 // Does not update obuf.x
-void buf_add_ch(char ch)
+void term_add_byte(char ch)
 {
     obuf_need_space(1);
     obuf.buf[obuf.count++] = ch;
 }
 
 VPRINTF(1)
-static void buf_vsprintf(const char *fmt, va_list ap)
+static void term_vsprintf(const char *fmt, va_list ap)
 {
     va_list ap2;
     va_copy(ap2, ap);
@@ -95,7 +95,7 @@ static void buf_vsprintf(const char *fmt, va_list ap)
     BUG_ON(n < 0);
 
     if (n >= obuf_avail()) {
-        buf_flush();
+        term_output_flush();
         if (n >= sizeof(obuf.buf)) {
             char *tmp = xmalloc(n + 1);
             int wrote = vsnprintf(tmp, n + 1, fmt, ap);
@@ -111,35 +111,35 @@ static void buf_vsprintf(const char *fmt, va_list ap)
     obuf.count += wrote;
 }
 
-void buf_sprintf(const char *fmt, ...)
+void term_sprintf(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    buf_vsprintf(fmt, ap);
+    term_vsprintf(fmt, ap);
     va_end(ap);
 }
 
-void buf_add_str(const char *const str)
+void term_add_str(const char *const str)
 {
     size_t i = 0;
     while (str[i]) {
-        if (!buf_put_char(u_str_get_char(str, &i))) {
+        if (!term_put_char(u_str_get_char(str, &i))) {
             break;
         }
     }
 }
 
-void buf_hide_cursor(void)
+void term_hide_cursor(void)
 {
     terminal.put_control_code(terminal.control_codes.hide_cursor);
 }
 
-void buf_show_cursor(void)
+void term_show_cursor(void)
 {
     terminal.put_control_code(terminal.control_codes.show_cursor);
 }
 
-void buf_clear_eol(void)
+void term_clear_eol(void)
 {
     if (obuf.x < obuf.scroll_x + obuf.width) {
         if (
@@ -149,12 +149,12 @@ void buf_clear_eol(void)
             terminal.clear_to_eol();
             obuf.x = obuf.scroll_x + obuf.width;
         } else {
-            buf_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);
+            term_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);
         }
     }
 }
 
-void buf_flush(void)
+void term_output_flush(void)
 {
     if (obuf.count) {
         xwrite(STDOUT_FILENO, obuf.buf, obuf.count);
@@ -227,7 +227,7 @@ static void print_tab(size_t width)
     }
 }
 
-bool buf_put_char(CodePoint u)
+bool term_put_char(CodePoint u)
 {
     size_t space = obuf.scroll_x + obuf.width - obuf.x;
     size_t width;

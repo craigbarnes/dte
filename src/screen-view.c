@@ -339,7 +339,7 @@ static void print_line(LineInfo *info)
     while (info->pos < info->size) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
         CodePoint u = screen_next_char(info);
-        if (!buf_put_char(u)) {
+        if (!term_put_char(u)) {
             // +1 for newline
             info->offset += info->size - info->pos + 1;
             return;
@@ -353,14 +353,14 @@ static void print_line(LineInfo *info)
         mask_color(&color, builtin_colors[BC_NONTEXT]);
         mask_selection_and_current_line(info, &color);
         set_color(&color);
-        buf_put_char('$');
+        term_put_char('$');
     }
 
     color = *builtin_colors[BC_DEFAULT];
     mask_selection_and_current_line(info, &color);
     set_color(&color);
     info->offset++;
-    buf_clear_eol();
+    term_clear_eol();
 }
 
 void update_range(const View *v, int y1, int y2)
@@ -370,7 +370,7 @@ void update_range(const View *v, int y1, int y2)
     const int edit_w = v->window->edit_w;
     const int edit_h = v->window->edit_h;
 
-    buf_reset(edit_x, edit_w, v->vx);
+    term_output_reset(edit_x, edit_w, v->vx);
     obuf.tab_width = v->buffer->options.tab_width;
     obuf.tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
@@ -423,7 +423,7 @@ void update_range(const View *v, int y1, int y2)
         set_color(&color);
 
         terminal.move_cursor(edit_x, edit_y + i++);
-        buf_clear_eol();
+        term_clear_eol();
     }
 
     if (i < y2) {
@@ -432,7 +432,7 @@ void update_range(const View *v, int y1, int y2)
     for (; i < y2; i++) {
         obuf.x = 0;
         terminal.move_cursor(edit_x, edit_y + i);
-        buf_put_char('~');
-        buf_clear_eol();
+        term_put_char('~');
+        term_clear_eol();
     }
 }
