@@ -223,7 +223,7 @@ static void collect_colors_and_attributes(const char *prefix)
     }
 }
 
-static void collect_completions(char **args, int argc)
+static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
         collect_commands(completion.parsed);
@@ -406,7 +406,7 @@ static void init_completion(void)
     completion.add_space = true;
 
     collect_completions (
-        (char **)array.ptrs + semicolon + 1,
+        (char **)array.ptrs + 1 + semicolon,
         array.count - semicolon - 1
     );
     sort_completions();

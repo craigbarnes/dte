@@ -169,7 +169,6 @@ int read_blocks(Buffer *b, int fd)
     size_t map_size = 64 * 1024;
     unsigned char *buf = NULL;
     bool mapped = false;
-    ssize_t rc;
 
     // st_size is zero for some files in /proc.
     // Can't mmap files in /proc and /sys.
@@ -182,13 +181,14 @@ int read_blocks(Buffer *b, int fd)
             mapped = true;
         }
     }
+
     if (!mapped) {
         ssize_t alloc = map_size;
         ssize_t pos = 0;
 
         buf = xmalloc(alloc);
         while (1) {
-            rc = xread(fd, buf + pos, alloc - pos);
+            ssize_t rc = xread(fd, buf + pos, alloc - pos);
             if (rc < 0) {
                 free(buf);
                 return -1;
@@ -204,15 +204,19 @@ int read_blocks(Buffer *b, int fd)
         }
         size = pos;
     }
-    rc = decode_and_add_blocks(b, buf, size);
+
+    int rc = decode_and_add_blocks(b, buf, size);
+
     if (mapped) {
         munmap(buf, size);
     } else {
         free(buf);
     }
+
     if (rc) {
         return rc;
     }
+
     fixup_blocks(b);
     return rc;
 }

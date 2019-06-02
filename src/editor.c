@@ -382,7 +382,7 @@ char get_confirmation(const char *choices, const char *format, ...)
 typedef struct {
     bool is_modified;
     unsigned int id;
-    int cy;
+    long cy;
     int vx;
     int vy;
 } ScreenState;
