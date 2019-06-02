@@ -6,6 +6,7 @@
 #include <string.h>
 #include "color.h"
 #include "../util/macros.h"
+#include "../util/string-view.h"
 #include "../util/unicode.h"
 
 typedef struct {
@@ -41,6 +42,7 @@ void term_add_byte(char ch);
 void term_add_bytes(const char *str, size_t count);
 void term_set_bytes(char ch, size_t count);
 void term_repeat_byte(char ch, size_t count);
+void term_add_string_view(StringView sv);
 void term_sprintf(const char *fmt, ...) PRINTF(1);
 void term_add_str(const char *str);
 void term_hide_cursor(void);

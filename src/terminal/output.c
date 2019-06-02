@@ -84,6 +84,13 @@ void term_add_byte(char ch)
     obuf.buf[obuf.count++] = ch;
 }
 
+void term_add_string_view(StringView sv)
+{
+    if (sv.length) {
+        term_add_bytes(sv.data, sv.length);
+    }
+}
+
 VPRINTF(1)
 static void term_vsprintf(const char *fmt, va_list ap)
 {

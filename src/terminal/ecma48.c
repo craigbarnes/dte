@@ -109,13 +109,6 @@ void ecma48_repeat_byte(char ch, size_t count)
     term_sprintf("%c\033[%zub", ch, count - 1);
 }
 
-void put_control_code(StringView code)
-{
-    if (code.length) {
-        term_add_bytes(code.data, code.length);
-    }
-}
-
 Terminal terminal = {
     .color_type = TERM_8_COLOR,
     .width = 80,
@@ -123,7 +116,7 @@ Terminal terminal = {
     .raw = &term_raw,
     .cooked = &term_cooked,
     .parse_key_sequence = &xterm_parse_key,
-    .put_control_code = &put_control_code,
+    .put_control_code = &term_add_string_view,
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
