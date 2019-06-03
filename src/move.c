@@ -130,7 +130,7 @@ void move_eol(void)
     view_reset_preferred_x(view);
 }
 
-void move_up(int count)
+void move_up(long count)
 {
     const long x = view_get_preferred_x(view);
     while (count > 0) {
@@ -142,7 +142,7 @@ void move_up(int count)
     move_to_preferred_x(x);
 }
 
-void move_down(int count)
+void move_down(long count)
 {
     const long x = view_get_preferred_x(view);
     while (count > 0) {

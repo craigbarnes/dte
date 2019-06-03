@@ -140,7 +140,7 @@ Buffer *find_buffer(const char *abs_filename)
     return NULL;
 }
 
-Buffer *find_buffer_by_id(unsigned int id)
+Buffer *find_buffer_by_id(unsigned long id)
 {
     for (size_t i = 0; i < buffers.count; i++) {
         Buffer *b = buffers.ptrs[i];

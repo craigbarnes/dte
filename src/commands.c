@@ -1222,11 +1222,9 @@ static void cmd_scroll_down(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 
 static void cmd_scroll_pgdown(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
-    int max = buffer->nl - window->edit_h + 1;
-
+    long max = buffer->nl - window->edit_h + 1;
     if (view->vy < max && max > 0) {
-        int count = window->edit_h - 1;
-
+        long count = window->edit_h - 1;
         if (view->vy + count > max) {
             count = max - view->vy;
         }
@@ -1240,8 +1238,7 @@ static void cmd_scroll_pgdown(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args
 static void cmd_scroll_pgup(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
 {
     if (view->vy > 0) {
-        int count = window->edit_h - 1;
-
+        long count = window->edit_h - 1;
         if (count > view->vy) {
             count = view->vy;
         }
@@ -1383,7 +1380,6 @@ static void cmd_set(const char *pf, char **args)
 {
     bool global = false;
     bool local = false;
-    int count = count_strings(args);
 
     while (*pf) {
         switch (*pf) {
@@ -1406,15 +1402,16 @@ static void cmd_set(const char *pf, char **args)
         global = true;
     }
 
+    size_t count = count_strings(args);
     if (count == 1) {
         set_bool_option(args[0], local, global);
         return;
-    }
-    if (count % 2) {
+    } else if (count % 2 != 0) {
         error_msg("One or even number of arguments expected.");
         return;
     }
-    for (size_t i = 0; args[i]; i += 2) {
+
+    for (size_t i = 0; i < count; i += 2) {
         set_option(args[i], args[i + 1], local, global);
     }
 }

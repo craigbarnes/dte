@@ -158,7 +158,7 @@ String dump_bindings(void)
     static_assert(MOD_CTRL == (1 << 24));
     for (KeyCode m = 0; m <= 7; m++) {
         const KeyCode modifiers = m << 24;
-        for (size_t k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
+        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             const size_t mod_offset = m * NR_SPECIAL_KEYS;
             const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
             const char *command = bindings_lookup_table[i];

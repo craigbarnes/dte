@@ -68,7 +68,7 @@ static void add_status_pos(Formatter *f)
     } else if (pos + h - 1 >= lines) {
         add_status_str(f, "Bot");
     } else {
-        int d = lines - (h - 1);
+        const long d = lines - (h - 1);
         add_status_format(f, "%2ld%%", (pos * 100 + d / 2) / d);
     }
 }
