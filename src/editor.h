@@ -36,7 +36,7 @@ typedef struct {
     bool child_controls_terminal;
     bool everything_changed;
     bool term_utf8;
-    int cmdline_x;
+    size_t cmdline_x;
     PointerArray search_history;
     PointerArray command_history;
     const char *const version;

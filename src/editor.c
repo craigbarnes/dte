@@ -198,7 +198,6 @@ static void update_all_windows(void)
 static void update_window(Window *w)
 {
     View *v = w->view;
-    int y1, y2;
 
     if (w->update_tabbar) {
         print_tabbar(w);
@@ -209,8 +208,8 @@ static void update_window(Window *w)
         update_line_numbers(w, v->buffer->changed_line_max == INT_MAX);
     }
 
-    y1 = v->buffer->changed_line_min;
-    y2 = v->buffer->changed_line_max;
+    long y1 = v->buffer->changed_line_min;
+    long y2 = v->buffer->changed_line_max;
     if (y1 < v->vy) {
         y1 = v->vy;
     }
@@ -382,8 +381,8 @@ typedef struct {
     bool is_modified;
     unsigned int id;
     long cy;
-    int vx;
-    int vy;
+    long vx;
+    long vy;
 } ScreenState;
 
 static void update_screen(const ScreenState *const s)

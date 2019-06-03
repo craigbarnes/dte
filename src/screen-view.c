@@ -363,7 +363,7 @@ static void print_line(LineInfo *info)
     term_clear_eol();
 }
 
-void update_range(const View *v, int y1, int y2)
+void update_range(const View *v, long y1, long y2)
 {
     const int edit_x = v->window->edit_x;
     const int edit_y = v->window->edit_y;
@@ -375,10 +375,10 @@ void update_range(const View *v, int y1, int y2)
     obuf.tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     BlockIter bi = v->cursor;
-    for (int i = 0, n = v->cy - y1; i < n; i++) {
+    for (long i = 0, n = v->cy - y1; i < n; i++) {
         block_iter_prev_line(&bi);
     }
-    for (int i = 0, n = y1 - v->cy; i < n; i++) {
+    for (long i = 0, n = y1 - v->cy; i < n; i++) {
         block_iter_eat_line(&bi);
     }
     block_iter_bol(&bi);
@@ -391,7 +391,7 @@ void update_range(const View *v, int y1, int y2)
 
     bool got_line = !block_iter_is_eof(&bi);
     hl_fill_start_states(v->buffer, info.line_nr);
-    int i;
+    long i;
     for (i = y1; got_line && i < y2; i++) {
         obuf.x = 0;
         terminal.move_cursor(edit_x, edit_y + i);

@@ -52,8 +52,8 @@ typedef struct Buffer {
     // Lowest bit of an invalidated value is 1.
     PointerArray line_start_states;
 
-    int changed_line_min;
-    int changed_line_max;
+    long changed_line_min;
+    long changed_line_max;
 } Buffer;
 
 // buffer = view->buffer = window->view->buffer
@@ -72,7 +72,7 @@ static inline bool buffer_modified(const Buffer *b)
     return b->saved_change != b->cur_change;
 }
 
-void buffer_mark_lines_changed(Buffer *b, int min, int max);
+void buffer_mark_lines_changed(Buffer *b, long min, long max);
 const char *buffer_filename(const Buffer *b);
 
 char *short_filename(const char *absolute) XSTRDUP;

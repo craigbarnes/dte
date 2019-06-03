@@ -27,7 +27,7 @@ typedef struct View {
     long cx_char;
 
     // Top left corner
-    int vx, vy;
+    long vx, vy;
 
     // Preferred cursor x (preferred value for cx_display)
     long preferred_x;

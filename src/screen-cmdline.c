@@ -31,15 +31,13 @@ void show_message(const char *msg, bool is_error)
     term_clear_eol();
 }
 
-int print_command(char prefix)
+size_t print_command(char prefix)
 {
-    size_t i, w;
     CodePoint u;
-    int x;
 
     // Width of characters up to and including cursor position
-    w = 1; // ":" (prefix)
-    i = 0;
+    size_t w = 1; // ":" (prefix)
+    size_t i = 0;
     while (i <= editor.cmdline.pos && i < editor.cmdline.buf.len) {
         u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);
         w += u_char_width(u);
@@ -54,7 +52,7 @@ int print_command(char prefix)
     set_builtin_color(BC_COMMANDLINE);
     i = 0;
     term_put_char(prefix);
-    x = obuf.x - obuf.scroll_x;
+    size_t x = obuf.x - obuf.scroll_x;
     while (i < editor.cmdline.buf.len) {
         BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
         u = u_get_char(editor.cmdline.buf.buffer, editor.cmdline.buf.len, &i);

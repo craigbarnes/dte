@@ -55,7 +55,7 @@ static void add_status_pos(Formatter *f)
 {
     size_t lines = f->win->view->buffer->nl;
     int h = f->win->edit_h;
-    int pos = f->win->view->vy;
+    long pos = f->win->view->vy;
 
     if (lines <= h) {
         if (pos) {
@@ -69,7 +69,7 @@ static void add_status_pos(Formatter *f)
         add_status_str(f, "Bot");
     } else {
         int d = lines - (h - 1);
-        add_status_format(f, "%2d%%", (pos * 100 + d / 2) / d);
+        add_status_format(f, "%2ld%%", (pos * 100 + d / 2) / d);
     }
 }
 

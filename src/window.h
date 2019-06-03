@@ -25,8 +25,8 @@ typedef struct Window {
 
     struct {
         int width;
-        int first;
-        int last;
+        long first;
+        long last;
     } line_numbers;
 
     size_t first_tab_idx;

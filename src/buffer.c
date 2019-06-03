@@ -31,10 +31,10 @@ static void set_display_filename(Buffer *b, char *name)
  * Syntax highlighter has different logic. It cares about contents of the
  * lines, not about selection or if the lines have been moved up or down.
  */
-void buffer_mark_lines_changed(Buffer *b, int min, int max)
+void buffer_mark_lines_changed(Buffer *b, long min, long max)
 {
     if (min > max) {
-        int tmp = min;
+        long tmp = min;
         min = max;
         max = tmp;
     }

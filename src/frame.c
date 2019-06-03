@@ -267,7 +267,7 @@ static Frame *new_frame(void)
     return f;
 }
 
-static Frame *add_frame(Frame *parent, Window *w, int idx)
+static Frame *add_frame(Frame *parent, Window *w, size_t idx)
 {
     Frame *f = new_frame();
     f->parent = parent;
