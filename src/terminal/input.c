@@ -252,6 +252,7 @@ char *term_read_paste(size_t *size)
         count = input_buf_fill;
         input_buf_fill = 0;
     }
+
     while (1) {
         struct timeval tv = {
             .tv_sec = 0,
@@ -267,8 +268,7 @@ char *term_read_paste(size_t *size)
         int rc = select(1, &set, NULL, NULL, &tv);
         if (rc < 0 && errno == EINTR) {
             continue;
-        }
-        if (rc <= 0) {
+        } else if (rc <= 0) {
             break;
         }
 
@@ -276,19 +276,24 @@ char *term_read_paste(size_t *size)
             alloc *= 2;
             xrenew(buf, alloc);
         }
+
+        ssize_t n;
         do {
-            rc = read(STDIN_FILENO, buf + count, alloc - count);
-        } while (rc < 0 && errno == EINTR);
-        if (rc <= 0) {
+            n = read(STDIN_FILENO, buf + count, alloc - count);
+        } while (n < 0 && errno == EINTR);
+
+        if (n <= 0) {
             break;
         }
-        count += rc;
+        count += n;
     }
+
     for (size_t i = 0; i < count; i++) {
         if (buf[i] == '\r') {
             buf[i] = '\n';
         }
     }
+
     *size = count;
     return buf;
 }
