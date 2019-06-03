@@ -309,32 +309,30 @@ char *editor_file(const char *name)
 
 char get_confirmation(const char *choices, const char *format, ...)
 {
-    View *v = window->view;
     char buf[4096];
-    KeyCode key;
-    int pos, i, count = strlen(choices);
-    unsigned char def = 0;
     va_list ap;
-
     va_start(ap, format);
     vsnprintf(buf, sizeof(buf), format, ap);
     va_end(ap);
 
-    pos = strlen(buf);
+    size_t pos = strlen(buf);
     buf[pos++] = ' ';
     buf[pos++] = '[';
-    for (i = 0; i < count; i++) {
+
+    unsigned char def = 0;
+    for (size_t i = 0, n = strlen(choices); i < n; i++) {
         if (ascii_isupper(choices[i])) {
             def = ascii_tolower(choices[i]);
         }
         buf[pos++] = choices[i];
         buf[pos++] = '/';
     }
-    pos--;
-    buf[pos++] = ']';
+
+    buf[pos - 1] = ']';
     buf[pos] = '\0';
 
     // update_windows() assumes these have been called for the current view
+    View *v = window->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v);
@@ -348,6 +346,7 @@ char get_confirmation(const char *choices, const char *format, ...)
     show_message(buf, false);
     end_update();
 
+    KeyCode key;
     while (1) {
         if (term_read_key(&key)) {
             if (key == KEY_PASTE) {
