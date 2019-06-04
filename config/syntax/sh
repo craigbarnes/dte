@@ -23,7 +23,7 @@ state special
 syntax .sh-var
 
 state variable
-    char '{' brace
+    char '{' brace1
     char '*@#?$!0-9-' END variable
     char a-zA-Z_ name
     noeat END
@@ -32,9 +32,20 @@ state name variable
     char a-zA-Z_0-9 this
     noeat END
 
-state brace variable
-    char -n "\n}" this
-    eat END variable
+state brace1 variable
+    char } END variable
+    str '${' brace2
+    eat this
+
+state brace2 variable
+    char } brace1 variable
+    str '${' brace3
+    eat this
+
+state brace3 variable
+    char } brace2 variable
+    str '${' END error
+    eat this
 
 # $((expr)) "$((" already eaten
 syntax .sh-expression
