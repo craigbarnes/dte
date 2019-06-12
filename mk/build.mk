@@ -34,7 +34,7 @@ build_subdirs := $(addprefix build/, $(addsuffix /, \
     editorconfig encoding syntax terminal util test ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec path ptr-array regexp string strtonum unicode utf8 \
+    ascii exec path ptr-array string strtonum unicode utf8 \
     wbuf xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
@@ -54,7 +54,7 @@ editor_objects := $(call prefix-obj, build/, \
     commands common compiler completion config ctags debug edit editor \
     env error file-history file-option filetype frame history \
     indent load-save lock main mode-command mode-git-open mode-normal \
-    mode-search move msg options parse-args parse-command run \
+    mode-search move msg options parse-args parse-command regexp run \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection spawn tag view window ) \
     $(editorconfig_objects) \

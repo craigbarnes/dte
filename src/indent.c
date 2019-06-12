@@ -2,7 +2,7 @@
 #include "indent.h"
 #include "buffer.h"
 #include "common.h"
-#include "util/regexp.h"
+#include "regexp.h"
 #include "util/xmalloc.h"
 #include "view.h"
 

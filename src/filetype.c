@@ -2,11 +2,11 @@
 #include "filetype.h"
 #include "common.h"
 #include "debug.h"
+#include "regexp.h"
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
-#include "util/regexp.h"
 #include "util/string-view.h"
 #include "util/xmalloc.h"
 
