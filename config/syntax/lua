@@ -103,7 +103,7 @@ state code
     str '...' this special
     str '..' this operator
     char . dot
-    char !@`$? bad-char
+    char '!@`$?' this error
     eat this
 
 state bracket string
@@ -222,6 +222,3 @@ state double-quote string
     char "\n" code
     char "\\" .lua-escape:this special
     eat this
-
-state bad-char error
-    noeat code
