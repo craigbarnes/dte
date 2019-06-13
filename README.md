@@ -77,8 +77,19 @@ require build system changes.
 Packaging
 ---------
 
-The following optional build variables may be useful when packaging
-`dte`:
+**Stable releases**:
+
+The [releases] page contains a short summary of changes for each
+stable version and links to the corresponding source tarballs.
+
+Note: auto-generated tarballs from GitHub/GitLab can (and
+[do][libgit issue #4343]) change over time and cannot be guaranteed to
+have long-term stable checksums. Use the tarballs from the [releases]
+page, unless you're prepared to deal with future checksum failures.
+
+**Build variables**:
+
+The following build variables may be useful when packaging `dte`:
 
 * `prefix`: Top-level installation prefix (defaults to `/usr/local`).
 * `bindir`: Installation prefix for program binary (defaults to
@@ -94,14 +105,14 @@ The following optional build variables may be useful when packaging
   (and many other `xterm`-compatible terminals) and falls back to
   [ECMA-48] mode for other terminals.
 
-**Example usage**:
+Example usage:
 
     make V=1
     make install V=1 prefix=/usr DESTDIR=PKG
 
 **Persistent configuration**:
 
-Variables can also be configured persistently by adding them to
+Build variables can also be configured persistently by adding them to
 a `Config.mk` file, for example:
 
     prefix = /usr
@@ -146,3 +157,5 @@ Public License version 2 for more details.
 [GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
 [Travis CI]: https://travis-ci.org/craigbarnes/dte
 [General Public License version 2]: https://www.gnu.org/licenses/gpl-2.0.html
+[releases]: https://craigbarnes.gitlab.io/dte/releases.html
+[libgit issue #4343]: https://github.com/libgit2/libgit2/issues/4343
