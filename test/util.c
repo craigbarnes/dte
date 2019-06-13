@@ -146,8 +146,15 @@ static void test_ascii(void)
     EXPECT_EQ(hex_decode('\0'), -1);
     EXPECT_EQ(hex_decode('~'), -1);
 
+    EXPECT_TRUE(ascii_streq_icase("", ""));
+    EXPECT_TRUE(ascii_streq_icase("a", "a"));
+    EXPECT_TRUE(ascii_streq_icase("a", "A"));
+    EXPECT_TRUE(ascii_streq_icase("z", "Z"));
+    EXPECT_TRUE(ascii_streq_icase("cx", "CX"));
     EXPECT_TRUE(ascii_streq_icase("ABC..XYZ", "abc..xyz"));
     EXPECT_TRUE(ascii_streq_icase("Ctrl", "CTRL"));
+    EXPECT_FALSE(ascii_streq_icase("a", ""));
+    EXPECT_FALSE(ascii_streq_icase("", "a"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl+", "CTRL"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "CTRL+"));
     EXPECT_FALSE(ascii_streq_icase("Ctrl", "Ctr"));
@@ -155,6 +162,9 @@ static void test_ascii(void)
 
     const char s1[8] = "Ctrl+Up";
     const char s2[8] = "CTRL+U_";
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 0));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 1));
+    EXPECT_TRUE(mem_equal_icase(s1, s2, 2));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 3));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 4));
     EXPECT_TRUE(mem_equal_icase(s1, s2, 5));
