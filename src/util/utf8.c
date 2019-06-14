@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "utf8.h"
 #include "ascii.h"
 

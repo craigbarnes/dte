@@ -1,6 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
 #include "cmdline.h"
-#include "common.h"
-#include "editor.h"
 #include "history.h"
 #include "terminal/input.h"
 #include "util/ascii.h"
@@ -172,8 +172,9 @@ static void cmdline_insert_paste(CommandLine *c)
 static void set_text(CommandLine *c, const char *text)
 {
     string_clear(&c->buf);
-    string_add_str(&c->buf, text);
-    c->pos = strlen(text);
+    const size_t text_len = strlen(text);
+    string_add_buf(&c->buf, text, text_len);
+    c->pos = text_len;
 }
 
 void cmdline_clear(CommandLine *c)

@@ -1,17 +1,17 @@
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include "block.h"
 #include "buffer.h"
 #include "common.h"
 #include "editor.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "lock.h"
-#include "regexp.h"
-#include "selection.h"
 #include "syntax/state.h"
 #include "util/path.h"
-#include "util/utf8.h"
+#include "util/string-view.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 Buffer *buffer;
 PointerArray buffers = PTR_ARRAY_INIT;

@@ -1,8 +1,5 @@
-#include <stddef.h>
 #include "encoding.h"
-#include "../common.h"
 #include "../util/ascii.h"
-#include "../util/macros.h"
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",

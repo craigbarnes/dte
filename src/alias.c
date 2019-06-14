@@ -1,4 +1,6 @@
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "alias.h"
 #include "command.h"
 #include "common.h"
@@ -8,7 +10,6 @@
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
-#include "util/utf8.h"
 #include "util/xmalloc.h"
 
 typedef struct {

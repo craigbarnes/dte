@@ -1,9 +1,8 @@
 #ifndef ENCODING_ENCODING_H
 #define ENCODING_ENCODING_H
 
-#include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
+#include "../util/macros.h"
 #include "../util/xmalloc.h"
 
 typedef enum {
