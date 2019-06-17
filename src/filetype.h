@@ -5,15 +5,15 @@
 #include <stddef.h>
 #include "util/string-view.h"
 
-enum detect_type {
+typedef enum {
     FT_EXTENSION,
     FT_FILENAME,
     FT_CONTENT,
     FT_INTERPRETER,
     FT_BASENAME,
-};
+} FileDetectionType;
 
-void add_filetype(const char *name, const char *str, enum detect_type type);
+void add_filetype(const char *name, const char *str, FileDetectionType type);
 bool is_ft(const char *name);
 const char *find_ft(const char *filename, StringView line);
 

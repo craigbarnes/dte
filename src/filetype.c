@@ -2,6 +2,7 @@
 #include "filetype.h"
 #include "common.h"
 #include "debug.h"
+#include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
 #include "util/macros.h"
@@ -32,18 +33,34 @@ static int ft_compare(const void *key, const void *elem)
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
 typedef struct {
-    char *name;
-    char *str;
-    enum detect_type type;
+    FileDetectionType type;
+    uint8_t name_len;
+    uint8_t str_len;
+    char data[]; // Contains name followed by str (both null-terminated)
 } UserFileTypeEntry;
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
 
-void add_filetype(const char *name, const char *str, enum detect_type type)
+static const char *ft_get_name(const UserFileTypeEntry *ft)
 {
-    UserFileTypeEntry *ft;
-    regex_t re;
+    return ft->data;
+}
 
+static const char *ft_get_str(const UserFileTypeEntry *ft)
+{
+    return ft->data + ft->name_len + 1;
+}
+
+void add_filetype(const char *name, const char *str, FileDetectionType type)
+{
+    const size_t name_len = strlen(name);
+    const size_t str_len = strlen(str);
+    if (unlikely(name_len >= 256 || str_len >= 256)) {
+        error_msg("ft argument exceeds maximum length (255 bytes)");
+        return;
+    }
+
+    regex_t re;
     switch (type) {
     case FT_CONTENT:
     case FT_FILENAME:
@@ -56,10 +73,13 @@ void add_filetype(const char *name, const char *str, enum detect_type type)
         break;
     }
 
-    ft = xnew(UserFileTypeEntry, 1);
-    ft->name = xstrdup(name);
-    ft->str = xstrdup(str);
+    const size_t data_len = name_len + str_len + 2;
+    UserFileTypeEntry *ft = xmalloc(sizeof(UserFileTypeEntry) + data_len);
     ft->type = type;
+    ft->name_len = (uint8_t) name_len;
+    ft->str_len = (uint8_t) str_len;
+    memcpy(ft->data, name, name_len + 1);
+    memcpy(ft->data + name_len + 1, str, str_len + 1);
     ptr_array_add(&filetypes, ft);
 }
 
@@ -125,6 +145,19 @@ static StringView get_interpreter(const StringView line)
     return sv;
 }
 
+static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
+{
+    const char *str = ft_get_str(ft);
+    const size_t len = (size_t)ft->str_len;
+    return sv.length > 0 && string_view_equal_strn(&sv, str, len);
+}
+
+static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
+{
+    const char *str = ft_get_str(ft);
+    return sv.length > 0 && regexp_match_nosub(str, sv.data, sv.length);
+}
+
 HOT const char *find_ft(const char *filename, StringView line)
 {
     StringView path = STRING_VIEW_INIT;
@@ -147,41 +180,32 @@ HOT const char *find_ft(const char *filename, StringView line)
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         switch (ft->type) {
         case FT_EXTENSION:
-            if (!ext.length || !string_view_equal_cstr(&ext, ft->str)) {
+            if (!ft_str_match(ft, ext)) {
                 continue;
             }
             break;
         case FT_BASENAME:
-            if (!base.length || !string_view_equal_cstr(&base, ft->str)) {
+            if (!ft_str_match(ft, base)) {
                 continue;
             }
             break;
         case FT_FILENAME:
-            if (
-                !path.length
-                || !regexp_match_nosub(ft->str, path.data, path.length)
-            ) {
+            if (!ft_regex_match(ft, path)) {
                 continue;
             }
             break;
         case FT_CONTENT:
-            if (
-                !line.length
-                || !regexp_match_nosub(ft->str, line.data, line.length)
-            ) {
+            if (!ft_regex_match(ft, line)) {
                 continue;
             }
             break;
         case FT_INTERPRETER:
-            if (
-                !interpreter.length
-                || !string_view_equal_cstr(&interpreter, ft->str)
-            ) {
+            if (!ft_str_match(ft, interpreter)) {
                 continue;
             }
             break;
         }
-        return ft->name;
+        return ft_get_name(ft);
     }
 
     // Search built-in lookup tables
@@ -238,7 +262,7 @@ bool is_ft(const char *name)
     }
     for (size_t i = 0; i < filetypes.count; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
-        if (streq(ft->name, name)) {
+        if (streq(ft_get_name(ft), name)) {
             return true;
         }
     }

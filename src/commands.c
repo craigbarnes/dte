@@ -459,7 +459,7 @@ static void cmd_filter(const char* UNUSED_ARG(pf), char **args)
 
 static void cmd_ft(const char *pf, char **args)
 {
-    enum detect_type dt = FT_EXTENSION;
+    FileDetectionType dt = FT_EXTENSION;
 
     while (*pf) {
         switch (*pf) {
