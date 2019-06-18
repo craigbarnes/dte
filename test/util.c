@@ -747,6 +747,7 @@ static void test_path_dirname_and_path_basename(void)
         {"/", "/", ""},
         {".", ".", "."},
         {"..", ".", ".."},
+        {"", ".", ""},
     };
     FOR_EACH_I(i, tests) {
         char *dir = path_dirname(tests[i].path);

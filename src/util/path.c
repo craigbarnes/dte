@@ -251,8 +251,5 @@ char *path_dirname(const char *filename)
 const char *path_basename(const char *filename)
 {
     const char *slash = strrchr(filename, '/');
-    if (slash == NULL) {
-        return filename;
-    }
-    return slash + 1;
+    return slash ? slash + 1 : filename;
 }
