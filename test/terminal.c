@@ -19,11 +19,18 @@ static void test_parse_term_color(void)
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
         {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
         {{"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
-        {{"-1", "-2"}, {COLOR_DEFAULT, -2, 0}},
+        {{"-1", "-2"}, {COLOR_DEFAULT, COLOR_KEEP, 0}},
         {{"keep", "red", "keep"}, {-2, COLOR_RED, ATTR_KEEP}},
         {{"bold", "blink"}, {-1, -1, ATTR_BOLD | ATTR_BLINK}},
-        {{"0", "255"}, {COLOR_BLACK, 255, 0}},
-        {{"white", "green", "underline"}, {15, COLOR_GREEN, ATTR_UNDERLINE}},
+        {{"0", "255", "underline"}, {COLOR_BLACK, 255, ATTR_UNDERLINE}},
+        {{"white", "green", "dim"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
+        {{"lightred", "lightyellow"}, {COLOR_LIGHTRED, COLOR_LIGHTYELLOW, 0}},
+        {{"darkgray", "lightgreen"}, {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
+        {{"lightblue", "lightcyan"}, {COLOR_LIGHTBLUE, COLOR_LIGHTCYAN, 0}},
+        {{"lightmagenta"}, {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
+        {{"keep", "254", "keep"}, {COLOR_KEEP, 254, ATTR_KEEP}},
+        {{"red", "green", "keep"}, {COLOR_RED, COLOR_GREEN, ATTR_KEEP}},
+        {{"1", "2", "invisible"}, {COLOR_RED, COLOR_GREEN, ATTR_INVIS}},
     };
     FOR_EACH_I(i, tests) {
         TermColor parsed_color;
