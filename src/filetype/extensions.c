@@ -167,11 +167,11 @@ static const struct FileExtensionMap {
     {"zsh", SHELL},
 };
 
-static FileTypeEnum filetype_from_extension(const char *s, size_t len)
+static FileTypeEnum filetype_from_extension(const StringView sv)
 {
-    switch (len) {
+    switch (sv.length) {
     case 1:
-        switch (s[0]) {
+        switch (sv.data[0]) {
         case '1': case '2': case '3':
         case '4': case '5': case '6':
         case '7': case '8': case '9':
@@ -197,7 +197,6 @@ static FileTypeEnum filetype_from_extension(const char *s, size_t len)
         return NONE;
     }
 
-    const StringView sv = string_view(s, len);
     const struct FileExtensionMap *e = bsearch (
         &sv,
         extensions,

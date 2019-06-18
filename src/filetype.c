@@ -86,6 +86,10 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
 static inline StringView get_ext(const StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;
+    if (filename.length < 3) {
+        return ext;
+    }
+
     ext.data = memrchr_(filename.data, '.', filename.length);
     if (ext.data == NULL) {
         return ext;
@@ -164,8 +168,7 @@ HOT const char *find_ft(const char *filename, StringView line)
     StringView ext = STRING_VIEW_INIT;
     StringView base = STRING_VIEW_INIT;
     if (filename) {
-        const char *b = path_basename(filename);
-        base = string_view_from_cstring(b);
+        base = string_view_from_cstring(path_basename(filename));
         ext = get_ext(base);
         path = string_view_from_cstring(filename);
     }
@@ -210,28 +213,28 @@ HOT const char *find_ft(const char *filename, StringView line)
 
     // Search built-in lookup tables
     if (interpreter.length) {
-        FileTypeEnum ft = filetype_from_interpreter(interpreter.data, interpreter.length);
+        FileTypeEnum ft = filetype_from_interpreter(interpreter);
         if (ft) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (base.length) {
-        FileTypeEnum ft = filetype_from_basename(base.data, base.length);
+        FileTypeEnum ft = filetype_from_basename(base);
         if (ft) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (line.length) {
-        FileTypeEnum ft = filetype_from_signature(line.data, line.length);
+        FileTypeEnum ft = filetype_from_signature(line);
         if (ft) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (ext.length) {
-        FileTypeEnum ft = filetype_from_extension(ext.data, ext.length);
+        FileTypeEnum ft = filetype_from_extension(ext);
         if (ft) {
             return builtin_filetype_names[ft];
         }

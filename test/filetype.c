@@ -85,6 +85,7 @@ static void test_find_ft_filename(void)
         {"test.c.dpkg-old", "c"},
         {"test.c.rpmnew", "c"},
         {"test.c.rpmsave", "c"},
+        {".c", NULL},
     };
     const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {

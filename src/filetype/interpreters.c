@@ -48,23 +48,22 @@ static const struct FileInterpreterMap {
     {"zsh", SHELL},
 };
 
-static FileTypeEnum filetype_from_interpreter(const char *s, size_t len)
+static FileTypeEnum filetype_from_interpreter(const StringView sv)
 {
-    switch (len) {
+    switch (sv.length) {
     case 2: case 3: case 4:
     case 5: case 6: case 7:
         break;
     case 10:
-        switch (s[0]) {
-        case 'o': return memcmp(s, "openrc-run", len) ? NONE : SHELL;
-        case 'r': return memcmp(s, "runhaskell", len) ? NONE : HASKELL;
+        switch (sv.data[0]) {
+        case 'o': return memcmp(sv.data, "openrc-run", 10) ? NONE : SHELL;
+        case 'r': return memcmp(sv.data, "runhaskell", 10) ? NONE : HASKELL;
         }
         // Fallthrough
     default:
         return NONE;
     }
 
-    const StringView sv = string_view(s, len);
     const struct FileInterpreterMap *e = bsearch (
         &sv,
         interpreters,

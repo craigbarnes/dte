@@ -77,20 +77,19 @@ static const FileBasenameMap dotfiles[] = {
     {"zshrc", SHELL},
 };
 
-static FileTypeEnum filetype_from_basename(const char *s, size_t len)
+static FileTypeEnum filetype_from_basename(StringView sv)
 {
-    switch (len) {
+    switch (sv.length) {
     case  5:  case 6:  case 7:  case 8:
     case  9: case 10: case 11: case 12:
     case 13: case 14: case 15:
         break;
     case 17:
-        return memcmp(s, "meson_options.txt", len) ? NONE : MESON;
+        return memcmp(sv.data, "meson_options.txt", 17) ? NONE : MESON;
     default:
         return NONE;
     }
 
-    StringView sv = string_view(s, len);
     const FileBasenameMap *e = bsearch (
         &sv,
         basenames,
@@ -102,7 +101,7 @@ static FileTypeEnum filetype_from_basename(const char *s, size_t len)
         return e->filetype;
     }
 
-    if (s[0] == '.') {
+    if (sv.data[0] == '.') {
         sv.data++;
         sv.length--;
     }
