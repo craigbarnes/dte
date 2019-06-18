@@ -9,7 +9,7 @@
 static void *check_alloc(void *alloc)
 {
     if (unlikely(alloc == NULL)) {
-        fatal_error(__func__, errno);
+        fatal_error(__func__, ENOMEM);
     }
     return alloc;
 }
