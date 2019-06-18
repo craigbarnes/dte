@@ -1,10 +1,7 @@
 #include <errno.h>
-#include <stdbool.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "path.h"
-#include "xmalloc.h"
 
 static bool make_absolute(char *dst, size_t size, const char *src)
 {
@@ -239,17 +236,4 @@ char *relative_filename(const char *f, const char *cwd)
     }
     memcpy(filename + dotdot * 3, f + clen, tlen + 1);
     return filename;
-}
-
-char *path_dirname(const char *filename)
-{
-    const StringView dir = path_slice_dirname(filename);
-    return xstrcut(dir.data, dir.length);
-}
-
-// filename must not contain trailing slashes (but it can be "/")
-const char *path_basename(const char *filename)
-{
-    const char *slash = strrchr(filename, '/');
-    return slash ? slash + 1 : filename;
 }
