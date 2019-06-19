@@ -763,6 +763,42 @@ static void test_path_absolute(void)
     ASSERT_NONNULL(path);
     EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
+
+    path = path_absolute("///dev///");
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/dev/");
+    free(path);
+}
+
+static void test_path_parent(void)
+{
+    StringView sv = STRING_VIEW("/a/foo/bar/etc/file");
+    EXPECT_EQ(sv.length, 19);
+    EXPECT_TRUE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 14);
+    EXPECT_TRUE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 10);
+    EXPECT_TRUE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 6);
+    EXPECT_TRUE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 2);
+    EXPECT_TRUE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 1);
+    EXPECT_FALSE(path_parent(&sv));
+    EXPECT_EQ(sv.length, 1);
+
+    StringView sv2 = STRING_VIEW("/etc/foo/x/y/");
+    EXPECT_EQ(sv2.length, 13);
+    EXPECT_TRUE(path_parent(&sv2));
+    EXPECT_EQ(sv2.length, 10);
+    EXPECT_TRUE(path_parent(&sv2));
+    EXPECT_EQ(sv2.length, 8);
+    EXPECT_TRUE(path_parent(&sv2));
+    EXPECT_EQ(sv2.length, 4);
+    EXPECT_TRUE(path_parent(&sv2));
+    EXPECT_EQ(sv2.length, 1);
+    EXPECT_FALSE(path_parent(&sv2));
+    EXPECT_EQ(sv2.length, 1);
 }
 
 static void test_size_multiply_overflows(void)
@@ -815,5 +851,6 @@ void test_util(void)
     test_bitop();
     test_path_dirname_and_path_basename();
     test_path_absolute();
+    test_path_parent();
     test_size_multiply_overflows();
 }
