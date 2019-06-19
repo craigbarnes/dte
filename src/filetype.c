@@ -90,7 +90,7 @@ static inline StringView get_ext(const StringView filename)
         return ext;
     }
 
-    ext.data = memrchr_(filename.data, '.', filename.length);
+    ext.data = string_view_memrchr(&filename, '.');
     if (ext.data == NULL) {
         return ext;
     }

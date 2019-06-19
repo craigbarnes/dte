@@ -111,6 +111,20 @@ static inline void *string_view_memchr(const StringView *sv, int c)
     return memchr(sv->data, c, sv->length);
 }
 
+PURE NONNULL_ARGS
+static inline void *string_view_memrchr(const StringView *sv, int c)
+{
+    const unsigned char *s = sv->data;
+    size_t n = sv->length;
+    c = (int)(unsigned char)c;
+    while (n--) {
+        if (s[n] == c) {
+            return (void*)(s + n);
+        }
+    }
+    return NULL;
+}
+
 NONNULL_ARGS
 static inline void string_view_trim_left(StringView *sv)
 {

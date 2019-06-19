@@ -52,18 +52,6 @@ static inline bool mem_equal(const void *s1, const void *s2, size_t n)
     return memcmp(s1, s2, n) == 0;
 }
 
-static inline PURE NONNULL_ARGS void *memrchr_(const void *m, int c, size_t n)
-{
-    const unsigned char *s = m;
-    c = (int)(unsigned char)c;
-    while (n--) {
-        if (s[n] == c) {
-            return (void*)(s + n);
-        }
-    }
-    return NULL;
-}
-
 size_t count_nl(const char *buf, size_t size);
 size_t count_strings(char **strings);
 void free_strings(char **strings);
