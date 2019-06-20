@@ -17,7 +17,7 @@ syntax zig
 
 state start code
     char -b iu maybe-int-type
-    char -b a-z_ ident
+    char -b a-z_@ ident
     char -b A-Z ident-upper
 #    char 0 zero
 #    char 1-9 dec
@@ -32,6 +32,7 @@ state ident
     inlist keyword start
     inlist type start
     inlist constant start
+    inlist builtin start
     noeat start
 
 state ident-upper ident
@@ -76,3 +77,23 @@ list type \
 
 list constant \
     null undefined true false
+
+list builtin \
+    @ArgType @IntType @OpaqueType @TagType @This @Vector \
+    @addWithOverflow @alignCast @alignOf @atomicLoad @atomicRmw \
+    @bitCast @bitOffsetOf @bitreverse @boolToInt @breakpoint \
+    @byteOffsetOf @byteSwap @bytesToSlice @cDefine @cImport \
+    @cInclude @cUndef @canImplicitCast @clz @cmpxchgStrong \
+    @cmpxchgWeak @compileError @compileLog @ctz @divExact @divFloor \
+    @divTrunc @embedFile @enumToInt @errSetCast @errorName \
+    @errorReturnTrace @errorToInt @export @fence @field \
+    @fieldParentPtr @floatCast @floatToInt @frameAddress @handle \
+    @hasDecl @import @inlineCall @intCast @intToEnum @intToError \
+    @intToFloat @intToPtr @maxValue @memberCount @memberName \
+    @memberType @memcpy @memset @minValue @mod @mulWithOverflow \
+    @newStackCall @noInlineCall @panic @popCount @ptrCast @ptrToInt \
+    @rem @returnAddress @setAlignStack @setCold @setEvalBranchQuota \
+    @setFloatMode @setGlobalLinkage @setGlobalSection \
+    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact @sizeOf \
+    @sliceToBytes @sqrt @subWithOverflow @tagName @truncate @typeId \
+    @typeInfo @typeName @typeOf
