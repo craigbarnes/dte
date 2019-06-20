@@ -63,17 +63,16 @@ state long-comment comment
 
 list keyword \
     align allowzero and asm async await break cancel catch comptime \
-    const continue defer else errdefer export extern fn for if inline \
-    linksection nakedcc noalias or orelse packed pub resume return \
-    stdcallcc suspend switch test threadlocal try unreachable \
-    usingnamespace var volatile while \
+    const continue defer else enum errdefer error export extern fn \
+    for if inline linksection nakedcc noalias or orelse packed pub \
+    resume return stdcallcc struct suspend switch test threadlocal \
+    try union unreachable usingnamespace var volatile while
 
 list type \
     bool f16 f32 f64 f128 void noreturn type anyerror promise \
     i0 u0 isize usize comptime_int comptime_float \
     c_short c_ushort c_int c_uint c_long c_ulong c_longlong \
-    c_ulonglong c_longdouble c_void \
-    struct enum union error
+    c_ulonglong c_longdouble c_void
 
 list constant \
     null undefined true false
