@@ -2,33 +2,8 @@
 #include <string.h>
 #include "hashset.h"
 #include "../common.h"
-#include "../util/ascii.h"
+#include "../util/hash.h"
 #include "../util/xmalloc.h"
-
-#define FNV_BASE UINT32_C(2166136261)
-#define FNV_PRIME UINT32_C(16777619)
-
-static uint32_t fnv_1a_hash(const char *str, size_t len)
-{
-    uint32_t hash = FNV_BASE;
-    while (len--) {
-        uint32_t c = *str++;
-        hash ^= c;
-        hash *= FNV_PRIME;
-    }
-    return hash;
-}
-
-static uint32_t fnv_1a_hash_icase(const char *str, size_t len)
-{
-    uint32_t hash = FNV_BASE;
-    while (len--) {
-        uint32_t c = ascii_tolower(*str++);
-        hash ^= c;
-        hash *= FNV_PRIME;
-    }
-    return hash;
-}
 
 void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
 {
