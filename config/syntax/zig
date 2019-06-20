@@ -1,0 +1,78 @@
+syntax .zig-esc
+
+state esc special
+    char "abfnrtv'\\\"" END special
+    noeat END
+
+syntax .zig-string
+
+state string
+    char '"' END string
+    char "\n" END error
+    char "\\" .zig-esc:this
+    eat this
+
+syntax zig
+
+state start code
+    char -b iu maybe-int-type
+    char -b a-z_ ident
+    char -b A-Z ident-upper
+#    char 0 zero
+#    char 1-9 dec
+    char \" .zig-string:this
+#    char \' .c-char:this
+    str '/*' long-comment
+    str '//' line-comment
+    eat this
+
+state ident
+    char -b a-zA-Z0-9_ this
+    inlist keyword start
+    inlist type start
+    inlist constant start
+    noeat start
+
+state ident-upper ident
+    char -b a-z class-name
+    char -b A-Z0-9_ ident
+    noeat start
+
+state class-name
+    recolor class-name
+    char a-zA-Z0-9_ this
+    noeat start
+
+state maybe-int-type type
+    char 1-9 int-type
+    recolor ident 1
+    noeat -b ident
+
+state int-type type
+    char 0-9 this
+    noeat start
+
+state line-comment comment
+    char "\n" start
+    eat this
+
+state long-comment comment
+    str '*/' start comment
+    eat this
+
+list keyword \
+    align allowzero and asm async await break cancel catch comptime \
+    const continue defer else errdefer export extern fn for if inline \
+    linksection nakedcc noalias or orelse packed pub resume return \
+    stdcallcc suspend switch test threadlocal try unreachable \
+    usingnamespace var volatile while \
+
+list type \
+    bool f16 f32 f64 f128 void noreturn type anyerror promise \
+    i0 u0 isize usize comptime_int comptime_float \
+    c_short c_ushort c_int c_uint c_long c_ulong c_longlong \
+    c_ulonglong c_longdouble c_void \
+    struct enum union error
+
+list constant \
+    null undefined true false

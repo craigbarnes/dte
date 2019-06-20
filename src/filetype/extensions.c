@@ -164,6 +164,7 @@ static const struct FileExtensionMap {
     {"xslt", XML},
     {"yaml", YAML},
     {"yml", YAML},
+    {"zig", ZIG},
     {"zsh", SHELL},
 };
 

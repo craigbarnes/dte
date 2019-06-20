@@ -83,6 +83,7 @@ typedef enum {
     XML,
     YACC,
     YAML,
+    ZIG,
     NR_BUILTIN_FILETYPES
 } FileTypeEnum;
 
@@ -171,6 +172,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [XML] = "xml",
     [YACC] = "yacc",
     [YAML] = "yaml",
+    [ZIG] = "zig",
 };
 
 UNITTEST {
