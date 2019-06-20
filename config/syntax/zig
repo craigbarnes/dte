@@ -1,7 +1,8 @@
 syntax .zig-esc
 
+# TODO: \xNN  \uNNNN  \UNNNNNN
 state esc special
-    char "abfnrtv'\\\"" END special
+    char "nrt'\\\"" END special
     noeat END
 
 syntax .zig-string
