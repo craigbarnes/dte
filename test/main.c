@@ -96,9 +96,8 @@ static void test_regexp_match(void)
 
 static void test_posix_sanity(void)
 {
-    // These assertions are not guaranteed by ISO C99, but they are required
-    // by POSIX and are relied upon by this codebase.
-    ASSERT_TRUE(NULL == (void*)0);
+    // This is not guaranteed by ISO C99, but it is required by POSIX
+    // and is relied upon by this codebase:
     ASSERT_EQ(CHAR_BIT, 8);
 }
 
