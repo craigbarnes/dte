@@ -19,13 +19,35 @@ typedef struct {
     bool match;
 } UserData;
 
+typedef enum {
+    EC_INDENT_STYLE,
+    EC_INDENT_SIZE,
+    EC_TAB_WIDTH,
+    EC_MAX_LINE_LENGTH,
+    EC_UNKNOWN_PROPERTY,
+} PropertyType;
+
+#define CMP(s, val) if (!memcmp(name->data, s, STRLEN(s))) return val; break
+
+static PropertyType lookup_property(const StringView *name)
+{
+    switch (name->length) {
+    case  9: CMP("tab_width", EC_TAB_WIDTH);
+    case 11: CMP("indent_size", EC_INDENT_SIZE);
+    case 12: CMP("indent_style", EC_INDENT_STYLE);
+    case 15: CMP("max_line_length", EC_MAX_LINE_LENGTH);
+    }
+    return EC_UNKNOWN_PROPERTY;
+}
+
 static void editorconfig_option_set (
     EditorConfigOptions *options,
     const StringView *name,
     const StringView *val
 ) {
     unsigned int n = 0;
-    if (string_view_equal_literal_icase(name, "indent_style")) {
+    switch (lookup_property(name)) {
+    case EC_INDENT_STYLE:
         if (string_view_equal_literal_icase(val, "space")) {
             options->indent_style = INDENT_STYLE_SPACE;
         } else if (string_view_equal_literal_icase(val, "tab")) {
@@ -33,7 +55,8 @@ static void editorconfig_option_set (
         } else {
             options->indent_style = INDENT_STYLE_UNSPECIFIED;
         }
-    } else if (string_view_equal_literal_icase(name, "indent_size")) {
+        break;
+    case EC_INDENT_SIZE:
         if (string_view_equal_literal_icase(val, "tab")) {
             options->indent_size_is_tab = true;
             options->indent_size = 0;
@@ -44,12 +67,17 @@ static void editorconfig_option_set (
             options->indent_size = n;
             options->indent_size_is_tab = false;
         }
-    } else if (string_view_equal_literal_icase(name, "tab_width")) {
+        break;
+    case EC_TAB_WIDTH:
         buf_parse_uint(val->data, val->length, &n);
         options->tab_width = n;
-    } else if (string_view_equal_literal_icase(name, "max_line_length")) {
+        break;
+    case EC_MAX_LINE_LENGTH:
         buf_parse_uint(val->data, val->length, &n);
         options->max_line_length = n;
+        break;
+    case EC_UNKNOWN_PROPERTY:
+        break;
     }
 }
 
