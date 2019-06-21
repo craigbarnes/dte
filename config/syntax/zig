@@ -23,8 +23,7 @@ state start code
 #    char 1-9 dec
     char \" .zig-string:this
 #    char \' .c-char:this
-    str '/*' long-comment
-    str '//' line-comment
+    str '//' comment
     eat this
 
 state ident
@@ -54,12 +53,8 @@ state int-type type
     char 0-9 this
     noeat start
 
-state line-comment comment
+state comment
     char "\n" start
-    eat this
-
-state long-comment comment
-    str '*/' start comment
     eat this
 
 list keyword \
