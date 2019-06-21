@@ -201,9 +201,12 @@ exits successfully, parsed messages can be navigated using the
 
 See also: `errorfmt` and `msg` commands.
 
-### **copy**
+### **copy** [**-k**]
 
 Copy current line or selection.
+
+`-k`
+:   Keep selection (by default, selections are lost after copying)
 
 ### **cut**
 

@@ -289,13 +289,15 @@ static void cmd_compile(const char *pf, char **args)
     }
 }
 
-static void cmd_copy(const char* UNUSED_ARG(pf), char** UNUSED_ARG(args))
+static void cmd_copy(const char *pf, char** UNUSED_ARG(args))
 {
     BlockIter save = view->cursor;
-
     if (view->selection) {
         copy(prepare_selection(view), view->selection == SELECT_LINES);
-        unselect();
+        bool keep_selection = *pf == 'k';
+        if (!keep_selection) {
+            unselect();
+        }
     } else {
         block_iter_bol(&view->cursor);
         BlockIter tmp = view->cursor;
@@ -1796,7 +1798,7 @@ const Command commands[] = {
     {"close", "fqw", 0, 0, cmd_close},
     {"command", "", 0, 1, cmd_command},
     {"compile", "-1ps", 2, -1, cmd_compile},
-    {"copy", "", 0, 0, cmd_copy},
+    {"copy", "k", 0, 0, cmd_copy},
     {"cut", "", 0, 0, cmd_cut},
     {"delete", "", 0, 0, cmd_delete},
     {"delete-eol", "n", 0, 0, cmd_delete_eol},

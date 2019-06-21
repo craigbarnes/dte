@@ -32,7 +32,7 @@ Commands:
 .br
    \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
 .br
-   \fBcopy\fR
+   \fBcopy\fR [\fB\-k\fR]
 .br
    \fBcut\fR
 .br
@@ -488,10 +488,14 @@ Silent. Both \fBstderr\fR and \fBstdout\fR are redirected to \fB/dev/null\fR
 See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
 .RE
-\fBcopy\fR
+\fBcopy\fR [\fB\-k\fR]
 .RS
 Copy current line or selection.
 .P
+.TP
+\fB\-k\fR
+Keep selection (by default, selections are lost after copying)
+.PP
 .RE
 \fBcut\fR
 .RS
