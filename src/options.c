@@ -11,6 +11,7 @@
 #include "terminal/terminal.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
 
@@ -58,7 +59,7 @@ typedef struct OptionOps {
     OptionValue (*get)(const OptionDesc *desc, void *ptr);
     void (*set)(const OptionDesc *desc, void *ptr, OptionValue value);
     bool (*parse)(const OptionDesc *desc, const char *str, OptionValue *value);
-    char *(*string)(const OptionDesc *desc, OptionValue value);
+    const char *(*string)(const OptionDesc *desc, OptionValue value);
     bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
 } OptionOps;
 
@@ -194,7 +195,7 @@ static bool validate_regex(const char *value)
 static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     OptionValue v;
-    v.str_val = xstrdup(*(char**)ptr);
+    v.str_val = *(char**)ptr;
     return v;
 }
 
@@ -221,9 +222,10 @@ static bool str_parse (
     return true;
 }
 
-static char *str_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
+static const char *str_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
-    return xstrdup(value.str_val);
+    const char *s = value.str_val;
+    return s ? s : "";
 }
 
 static bool str_equals (
@@ -231,7 +233,7 @@ static bool str_equals (
     void *ptr,
     OptionValue value
 ) {
-    return streq(*(char**)ptr, value.str_val);
+    return xstreq(*(char**)ptr, value.str_val);
 }
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
@@ -272,9 +274,11 @@ static bool uint_parse (
     return true;
 }
 
-static char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
+static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
-    return xasprintf("%u", value.uint_val);
+    static char buf[64];
+    xsnprintf(buf, sizeof buf, "%u", value.uint_val);
+    return buf;
 }
 
 static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
@@ -303,9 +307,9 @@ static bool enum_parse (
     return true;
 }
 
-static char *enum_string(const OptionDesc *desc, OptionValue value)
+static const char *enum_string(const OptionDesc *desc, OptionValue value)
 {
-    return xstrdup(desc->u.enum_opt.values[value.uint_val]);
+    return desc->u.enum_opt.values[value.uint_val];
 }
 
 static bool flag_parse (
@@ -354,14 +358,16 @@ static bool flag_parse (
     return true;
 }
 
-static char *flag_string(const OptionDesc *desc, OptionValue value)
+static const char *flag_string(const OptionDesc *desc, OptionValue value)
 {
+    static char buf[256];
     unsigned int flags = value.uint_val;
     if (!flags) {
-        return xmemdup_literal("0");
+        buf[0] = '0';
+        buf[1] = '\0';
+        return buf;
     }
 
-    char buf[1024];
     char *ptr = buf;
     const char **values = desc->u.flag_opt.values;
     for (size_t i = 0; values[i]; i++) {
@@ -374,7 +380,7 @@ static char *flag_string(const OptionDesc *desc, OptionValue value)
     }
 
     ptr[-1] = '\0';
-    return xstrdup(buf);
+    return buf;
 }
 
 static const OptionOps option_ops[] = {
@@ -617,9 +623,8 @@ void toggle_option(const char *name, bool global, bool verbose)
     desc_set(desc, ptr, value);
 
     if (verbose) {
-        char *str = desc->ops->string(desc, value);
+        const char *str = desc->ops->string(desc, value);
         info_msg("%s = %s", desc->name, str);
-        free(str);
     }
 }
 
@@ -655,9 +660,8 @@ void toggle_option_values (
         size_t i = current % count;
         desc_set(desc, ptr, parsed_values[i]);
         if (verbose) {
-            char *str = desc->ops->string(desc, parsed_values[i]);
+            const char *str = desc->ops->string(desc, parsed_values[i]);
             info_msg("%s = %s", desc->name, str);
-            free(str);
         }
     }
 
@@ -731,8 +735,7 @@ void collect_option_values(const char *name, const char *prefix)
             ptr = global_ptr(desc);
         }
         OptionValue value = desc->ops->get(desc, ptr);
-        add_completion(desc->ops->string(desc, value));
-        free_value(desc, value);
+        add_completion(xstrdup(desc->ops->string(desc, value)));
     } else if (desc_is(desc, OPT_ENUM)) {
         // Complete possible values
         for (size_t i = 0; desc->u.enum_opt.values[i]; i++) {
