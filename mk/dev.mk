@@ -4,6 +4,7 @@ GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
+LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '$(PAT)';)
 GENHTML ?= genhtml
 GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 
@@ -47,8 +48,7 @@ show-sizes:
 coverage-report: build/docs/lcov.css
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
 	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
-	$(LCOV) -r build/coverage.info '*/test/test.[ch]' -o build/coverage.info
-	$(LCOV) -r build/coverage.info '*/src/debug.[ch]' -o build/coverage.info
+	$(call LCOV_REMOVE, build/coverage.info, */src/debug.c */test/test.c)
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
 	  xargs $(XARGS_P_FLAG) -- gzip -9 -k -f
