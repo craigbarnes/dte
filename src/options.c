@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "terminal/terminal.h"
 #include "util/intern.h"
+#include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
