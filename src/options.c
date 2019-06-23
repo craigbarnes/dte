@@ -336,23 +336,24 @@ static bool flag_parse (
             len = strlen(ptr);
             end = ptr + len;
         }
-        char *buf = xmemdup(ptr, len + 1);
-        buf[len] = '\0';
+        const StringView flag = string_view(ptr, len);
         ptr = end;
-
         size_t i;
         for (i = 0; values[i]; i++) {
-            if (streq(buf, values[i])) {
+            if (string_view_equal_cstr(&flag, values[i])) {
                 flags |= 1u << i;
                 break;
             }
         }
         if (!values[i]) {
-            error_msg("Invalid flag '%s' for %s.", buf, desc->name);
-            free(buf);
+            error_msg (
+                "Invalid flag '%.*s' for %s.",
+                (int)flag.length,
+                flag.data,
+                desc->name
+            );
             return false;
         }
-        free(buf);
     }
     value->uint_val = flags;
     return true;
