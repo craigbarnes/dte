@@ -10,6 +10,7 @@
 #include "editor.h"
 #include "error.h"
 #include "util/ascii.h"
+#include "util/readfile.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"

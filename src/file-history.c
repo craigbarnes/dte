@@ -4,10 +4,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "file-history.h"
-#include "common.h"
 #include "error.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
+#include "util/readfile.h"
 #include "util/strtonum.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"

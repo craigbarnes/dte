@@ -1,13 +1,10 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <errno.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "util/macros.h"
-#include "util/string-view.h"
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
@@ -55,9 +52,5 @@ static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 size_t count_nl(const char *buf, size_t size);
 size_t count_strings(char **strings);
 void free_strings(char **strings);
-ssize_t read_file(const char *filename, char **bufp);
-ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st);
-char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
-StringView buf_slice_next_line(const char *buf, ssize_t *posp, ssize_t size);
 
 #endif

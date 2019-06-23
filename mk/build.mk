@@ -34,8 +34,8 @@ build_subdirs := $(addprefix build/, $(addsuffix /, \
     editorconfig encoding syntax terminal util test ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec hashmap intern path ptr-array string strtonum unicode utf8 \
-    wbuf xmalloc xreadwrite xsnprintf )
+    ascii exec hashmap intern path ptr-array readfile string strtonum \
+    unicode utf8 wbuf xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )

@@ -1,3 +1,4 @@
+#include <errno.h>
 #include "state.h"
 #include "syntax.h"
 #include "../command.h"

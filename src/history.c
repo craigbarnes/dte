@@ -5,6 +5,7 @@
 #include "common.h"
 #include "error.h"
 #include "util/ptr-array.h"
+#include "util/readfile.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
 

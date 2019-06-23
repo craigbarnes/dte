@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ini.h"
-#include "../common.h"
 #include "../debug.h"
 #include "../util/ascii.h"
+#include "../util/readfile.h"
 
 static char *trim_left(char *str)
 {

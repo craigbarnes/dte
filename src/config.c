@@ -6,6 +6,7 @@
 #include "error.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
+#include "util/readfile.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 #include "../build/builtin-config.h"

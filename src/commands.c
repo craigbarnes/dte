@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <glob.h>
 #include <unistd.h>
 #include "alias.h"
