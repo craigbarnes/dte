@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 typedef struct FileDecoder {
-    char *encoding;
+    const char *encoding;
     const unsigned char *ibuf;
     ssize_t ipos, isize;
     struct cconv *cconv;

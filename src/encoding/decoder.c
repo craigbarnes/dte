@@ -2,6 +2,7 @@
 #include "decoder.h"
 #include "convert.h"
 #include "../editor.h"
+#include "../util/intern.h"
 #include "../util/utf8.h"
 #include "../util/xmalloc.h"
 
@@ -93,7 +94,7 @@ static int set_encoding(FileDecoder *dec, const char *encoding)
         }
         dec->read_line = decode_and_read_line;
     }
-    dec->encoding = xstrdup(encoding);
+    dec->encoding = str_intern(encoding);
     return 0;
 }
 
@@ -118,7 +119,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
                 }
             } else {
                 // Assume encoding is same as locale
-                encoding = encoding_to_string(&editor.charset);
+                encoding = editor.charset.name;
             }
             if (set_encoding(dec, encoding)) {
                 // FIXME: error message?
@@ -187,7 +188,6 @@ void free_file_decoder(FileDecoder *dec)
     if (dec->cconv != NULL) {
         cconv_free(dec->cconv);
     }
-    free(dec->encoding);
     free(dec);
 }
 

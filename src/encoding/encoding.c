@@ -1,5 +1,8 @@
+#include <stdlib.h>
 #include "encoding.h"
 #include "../util/ascii.h"
+#include "../util/intern.h"
+#include "../util/xmalloc.h"
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",
@@ -49,10 +52,28 @@ EncodingType lookup_encoding(const char *name)
     return UNKNOWN_ENCODING;
 }
 
-const char *encoding_type_to_string(EncodingType type)
+static const char *encoding_type_to_string(EncodingType type)
 {
     if (type < NR_ENCODING_TYPES && type != UNKNOWN_ENCODING) {
         return encoding_names[type];
     }
     return NULL;
+}
+
+Encoding encoding_from_name(const char *name)
+{
+    const EncodingType type = lookup_encoding(name);
+    const char *normalized_name;
+    if (type == UNKNOWN_ENCODING) {
+        char *upper = xstrdup_toupper(name);
+        normalized_name = str_intern(upper);
+        free(upper);
+    } else {
+        normalized_name = str_intern(encoding_type_to_string(type));
+    }
+
+    return (Encoding) {
+        .type = type,
+        .name = normalized_name
+    };
 }

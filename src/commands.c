@@ -683,7 +683,6 @@ static void cmd_open(const char *pf, char **args)
         pf++;
     }
 
-    bool dealloc_encoding = true;
     Encoding encoding = {
         .type = ENCODING_AUTODETECT,
         .name = NULL
@@ -715,10 +714,7 @@ static void cmd_open(const char *pf, char **args)
     if (!paths[0]) {
         window_open_new_file(window);
         if (requested_encoding) {
-            free_encoding(&buffer->encoding);
             buffer->encoding = encoding;
-            // buffer now owns encoding -- don't free it below
-            dealloc_encoding = false;
         }
     } else if (!paths[1]) {
         // Previous view is remembered when opening single file
@@ -729,9 +725,6 @@ static void cmd_open(const char *pf, char **args)
         window_open_files(window, paths, &encoding);
     }
 
-    if (dealloc_encoding) {
-        free_encoding(&encoding);
-    }
     if (use_glob) {
         globfree(&globbuf);
     }
@@ -1012,7 +1005,6 @@ static void cmd_save(const char *pf, char **args)
 {
     char *absolute = buffer->abs_filename;
     Encoding encoding = buffer->encoding;
-    bool encoding_alloced = false;
     const char *requested_encoding = NULL;
     bool force = false;
     bool prompt = false;
@@ -1051,7 +1043,6 @@ static void cmd_save(const char *pf, char **args)
             return;
         }
         encoding = encoding_from_name(requested_encoding);
-        encoding_alloced = true;
     }
 
     // The encoding_from_name() call above may have allocated memory,
@@ -1175,8 +1166,7 @@ static void cmd_save(const char *pf, char **args)
     buffer->saved_change = buffer->cur_change;
     buffer->readonly = false;
     buffer->newline = newline;
-    if (encoding_alloced) {
-        free_encoding(&buffer->encoding);
+    if (requested_encoding) {
         buffer->encoding = encoding;
     }
 
@@ -1209,9 +1199,6 @@ error:
     }
     if (absolute != buffer->abs_filename) {
         free(absolute);
-    }
-    if (encoding_alloced) {
-        free_encoding(&encoding);
     }
 }
 

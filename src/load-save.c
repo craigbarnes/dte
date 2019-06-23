@@ -103,7 +103,7 @@ static int decode_and_add_blocks (
         size -= bom_len;
     }
 
-    FileDecoder *dec = new_file_decoder(encoding_to_string(&b->encoding), buf, size);
+    FileDecoder *dec = new_file_decoder(b->encoding.name, buf, size);
     if (dec == NULL) {
         return -1;
     }
@@ -134,7 +134,7 @@ static int decode_and_add_blocks (
         if (dec->encoding) {
             b->encoding = encoding_from_name(dec->encoding);
         } else {
-            b->encoding = encoding_clone(&editor.charset);
+            b->encoding = editor.charset;
         }
     }
 
@@ -265,7 +265,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
-        b->encoding = encoding_clone(&editor.charset);
+        b->encoding = editor.charset;
     }
 
     return 0;

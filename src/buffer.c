@@ -64,7 +64,7 @@ Buffer *buffer_new(const Encoding *encoding)
     b->newline = editor.options.newline;
 
     if (encoding) {
-        b->encoding = encoding_clone(encoding);
+        b->encoding = *encoding;
     } else {
         b->encoding.type = ENCODING_AUTODETECT;
     }
@@ -112,7 +112,6 @@ void free_buffer(Buffer *b)
     free(b->views.ptrs);
     free(b->display_filename);
     free(b->abs_filename);
-    free_encoding(&b->encoding);
     free(b);
 }
 

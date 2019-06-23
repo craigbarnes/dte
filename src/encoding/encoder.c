@@ -14,7 +14,7 @@ FileEncoder *new_file_encoder(const Encoding *encoding, LineEndingType nls, int 
     enc->fd = fd;
 
     if (encoding->type == UTF8) {
-        enc->cconv = cconv_from_utf8(encoding_to_string(encoding));
+        enc->cconv = cconv_from_utf8(encoding->name);
         if (enc->cconv == NULL) {
             free(enc);
             return NULL;
