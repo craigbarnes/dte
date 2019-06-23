@@ -6,6 +6,7 @@
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
 #include "../src/util/checked-arith.h"
+#include "../src/util/intern.h"
 #include "../src/util/path.h"
 #include "../src/util/string.h"
 #include "../src/util/string-view.h"
@@ -828,6 +829,27 @@ static void test_size_multiply_overflows(void)
     EXPECT_TRUE(size_multiply_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
 }
 
+static void test_mem_intern(void)
+{
+    const char *ptrs[256];
+    char str[8];
+    for (size_t i = 0; i < ARRAY_COUNT(ptrs); i++) {
+        size_t len = xsnprintf(str, sizeof str, "%zu", i);
+        ptrs[i] = mem_intern(str, len);
+    }
+
+    EXPECT_STREQ(ptrs[0], "0");
+    EXPECT_STREQ(ptrs[1], "1");
+    EXPECT_STREQ(ptrs[101], "101");
+    EXPECT_STREQ(ptrs[255], "255");
+
+    for (size_t i = 0; i < ARRAY_COUNT(ptrs); i++) {
+        size_t len = xsnprintf(str, sizeof str, "%zu", i);
+        const char *ptr = mem_intern(str, len);
+        EXPECT_PTREQ(ptr, ptrs[i]);
+    }
+}
+
 void test_util(void)
 {
     test_ascii();
@@ -853,4 +875,5 @@ void test_util(void)
     test_path_absolute();
     test_path_parent();
     test_size_multiply_overflows();
+    test_mem_intern();
 }

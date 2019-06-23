@@ -9,6 +9,7 @@
 #include "regexp.h"
 #include "screen.h"
 #include "terminal/terminal.h"
+#include "util/intern.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -50,7 +51,7 @@ typedef struct {
 
 typedef union  {
     // OPT_STR
-    char *str_val;
+    const char *str_val;
     // OPT_UINT, OPT_ENUM, OPT_FLAG
     unsigned int uint_val;
 } OptionValue;
@@ -204,9 +205,8 @@ static void str_set (
     void *ptr,
     OptionValue value
 ) {
-    char **strp = ptr;
-    free(*strp);
-    *strp = xstrdup(value.str_val);
+    const char **strp = ptr;
+    *strp = str_intern(value.str_val);
 }
 
 static bool str_parse (
@@ -218,7 +218,7 @@ static bool str_parse (
         value->str_val = NULL;
         return false;
     }
-    value->str_val = xstrdup(str);
+    value->str_val = str;
     return true;
 }
 
@@ -481,13 +481,6 @@ static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
     }
 }
 
-static void free_value(const OptionDesc *desc, OptionValue value)
-{
-    if (desc_is(desc, OPT_STR)) {
-        free(value.str_val);
-    }
-}
-
 static const OptionDesc *find_option(const char *name)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
@@ -553,7 +546,6 @@ static void do_set_option (
     if (global) {
         desc_set(desc, global_ptr(desc), val);
     }
-    free_value(desc, val);
 }
 
 void set_option(const char *name, const char *value, bool local, bool global)
@@ -665,10 +657,6 @@ void toggle_option_values (
         }
     }
 
-    for (size_t i = 0; i < count; i++) {
-        free_value(desc, parsed_values[i]);
-    }
-
     free(parsed_values);
 }
 
@@ -689,9 +677,7 @@ bool validate_local_options(char **strs)
             valid = false;
         } else {
             OptionValue val;
-            if (desc->ops->parse(desc, value, &val)) {
-                free_value(desc, val);
-            } else {
+            if (!desc->ops->parse(desc, value, &val)) {
                 valid = false;
             }
         }
@@ -759,18 +745,6 @@ void collect_option_values(const char *name, const char *prefix)
                 memcpy(completion + prefix_len, str, str_len + 1);
                 add_completion(completion);
             }
-        }
-    }
-}
-
-void free_local_options(LocalOptions *opt)
-{
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const OptionDesc *desc = &option_desc[i];
-        if (desc->local && desc_is(desc, OPT_STR)) {
-            char **local = (char **)local_ptr(desc, opt);
-            free(*local);
-            *local = NULL;
         }
     }
 }

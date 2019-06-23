@@ -9,6 +9,7 @@
 #include "filetype.h"
 #include "lock.h"
 #include "syntax/state.h"
+#include "util/intern.h"
 #include "util/path.h"
 #include "util/string-view.h"
 #include "util/xmalloc.h"
@@ -70,7 +71,7 @@ Buffer *buffer_new(const Encoding *encoding)
 
     memcpy(&b->options, &editor.options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
-    b->options.filetype = xmemdup_literal("none");
+    b->options.filetype = str_intern("none");
     b->options.indent_regex = NULL;
 
     ptr_array_add(&buffers, b);
@@ -112,7 +113,6 @@ void free_buffer(Buffer *b)
     free(b->display_filename);
     free(b->abs_filename);
     free_encoding(&b->encoding);
-    free_local_options(&b->options);
     free(b);
 }
 
@@ -154,7 +154,6 @@ Buffer *find_buffer_by_id(unsigned long id)
 bool buffer_detect_filetype(Buffer *b)
 {
     const char *ft = NULL;
-
     if (BLOCK(b->blocks.next)->size) {
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
@@ -167,8 +166,7 @@ bool buffer_detect_filetype(Buffer *b)
     }
 
     if (ft && !streq(ft, b->options.filetype)) {
-        free(b->options.filetype);
-        b->options.filetype = xstrdup(ft);
+        b->options.filetype = str_intern(ft);
         return true;
     }
     return false;

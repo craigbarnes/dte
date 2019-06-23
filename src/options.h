@@ -63,8 +63,8 @@ typedef struct {
     COMMON_OPTIONS;
     // Only local
     unsigned int brace_indent;
-    char *filetype;
-    char *indent_regex;
+    const char *filetype;
+    const char *indent_regex;
 } LocalOptions;
 
 typedef struct {
@@ -99,6 +99,5 @@ bool validate_local_options(char **strs);
 void collect_options(const char *prefix);
 void collect_toggleable_options(const char *prefix);
 void collect_option_values(const char *name, const char *prefix);
-void free_local_options(LocalOptions *opt);
 
 #endif
