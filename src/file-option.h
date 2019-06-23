@@ -3,13 +3,13 @@
 
 #include "buffer.h"
 
-enum file_options_type {
+typedef enum {
     FILE_OPTIONS_FILENAME,
     FILE_OPTIONS_FILETYPE,
-};
+} FileOptionType;
 
 void set_file_options(Buffer *b);
-void add_file_options(enum file_options_type type, char *to, char **strs);
+void add_file_options(FileOptionType type, char *to, char **strs);
 
 void set_editorconfig_options(Buffer *b);
 

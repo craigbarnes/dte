@@ -17,6 +17,16 @@ static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
     return regexp_compile_internal(re, pattern, flags | REG_EXTENDED);
 }
 
+static inline bool regexp_is_valid(const char *pattern, int flags)
+{
+    regex_t re;
+    if (!regexp_compile(&re, pattern, flags | REG_NOSUB)) {
+        return false;
+    }
+    regfree(&re);
+    return true;
+}
+
 static inline bool regexp_compile_basic(regex_t *re, const char *pattern, int flags)
 {
     return regexp_compile_internal(re, pattern, flags);

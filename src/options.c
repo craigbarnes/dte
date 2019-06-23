@@ -184,14 +184,7 @@ static bool validate_filetype(const char *value)
 
 static bool validate_regex(const char *value)
 {
-    if (value[0]) {
-        regex_t re;
-        if (!regexp_compile(&re, value, REG_NEWLINE | REG_NOSUB)) {
-            return false;
-        }
-        regfree(&re);
-    }
-    return true;
+    return value[0] == '\0' || regexp_is_valid(value, REG_NEWLINE);
 }
 
 static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
