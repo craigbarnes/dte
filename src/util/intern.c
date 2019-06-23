@@ -17,7 +17,7 @@ static int entry_cmp (
 ) {
     return
         e1->data != keydata
-        && (e1->len != e2->len || memcmp(e1->data, keydata, e1->len));
+        && (e1->len != e2->len || memcmp(e1->data, keydata, e1->len) != 0);
 }
 
 const void *mem_intern(const void *data, size_t len)
