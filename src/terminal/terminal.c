@@ -5,9 +5,9 @@
 #include "ecma48.h"
 #include "terminfo.h"
 #include "xterm.h"
-#include "../common.h"
 #include "../debug.h"
 #include "../util/macros.h"
+#include "../util/str-util.h"
 
 #define S(str) str,STRLEN(str)
 

@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include "window.h"
-#include "common.h"
 #include "editor.h"
 #include "error.h"
 #include "file-history.h"
@@ -9,6 +8,7 @@
 #include "lock.h"
 #include "move.h"
 #include "util/path.h"
+#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 

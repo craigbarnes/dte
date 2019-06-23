@@ -10,8 +10,8 @@
 #include "output.h"
 #include "terminal.h"
 #include "xterm.h"
-#include "../common.h"
 #include "../util/ascii.h"
+#include "../util/str-util.h"
 #include "../util/string-view.h"
 
 #define KEY(c, k) { \

@@ -1,11 +1,11 @@
 #include <unistd.h>
 #include "file-option.h"
-#include "common.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
 #include "spawn.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"

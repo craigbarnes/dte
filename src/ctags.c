@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ctags.h"
-#include "common.h"
+#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 

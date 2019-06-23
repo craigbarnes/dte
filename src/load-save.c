@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "load-save.h"
 #include "block.h"
-#include "common.h"
 #include "debug.h"
 #include "editor.h"
 #include "encoding/bom.h"
@@ -15,6 +14,7 @@
 #include "encoding/encoder.h"
 #include "error.h"
 #include "util/path.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 

@@ -1,10 +1,10 @@
 #include "env.h"
-#include "common.h"
 #include "completion.h"
 #include "debug.h"
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "window.h"
 

@@ -1,10 +1,10 @@
 #include "msg.h"
 #include "buffer.h"
-#include "common.h"
 #include "error.h"
 #include "move.h"
 #include "search.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "window.h"
 

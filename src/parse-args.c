@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "parse-args.h"
-#include "common.h"
 #include "error.h"
+#include "util/str-util.h"
 
 /*
  * Flags and first "--" are removed.

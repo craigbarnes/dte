@@ -3,13 +3,13 @@
 #include <string.h>
 #include "alias.h"
 #include "command.h"
-#include "common.h"
 #include "completion.h"
 #include "editor.h"
 #include "error.h"
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 typedef struct {

@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include "block.h"
 #include "buffer.h"
-#include "common.h"
 #include "editor.h"
 #include "file-option.h"
 #include "filetype.h"
@@ -11,6 +10,7 @@
 #include "syntax/state.h"
 #include "util/intern.h"
 #include "util/path.h"
+#include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/xmalloc.h"
 

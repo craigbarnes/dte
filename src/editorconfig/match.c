@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "match.h"
-#include "../common.h"
 #include "../debug.h"
+#include "../util/str-util.h"
 #include "../util/string.h"
 
 static bool is_regex_special_char(char ch)

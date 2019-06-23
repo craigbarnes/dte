@@ -1,6 +1,6 @@
 #include "block-iter.h"
-#include "common.h"
 #include "debug.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 void block_iter_normalize(BlockIter *bi)

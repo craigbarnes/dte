@@ -1,5 +1,4 @@
 #include "options.h"
-#include "common.h"
 #include "completion.h"
 #include "debug.h"
 #include "editor.h"
@@ -10,6 +9,7 @@
 #include "screen.h"
 #include "terminal/terminal.h"
 #include "util/intern.h"
+#include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"

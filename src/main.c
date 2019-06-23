@@ -5,7 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "alias.h"
-#include "common.h"
 #include "config.h"
 #include "debug.h"
 #include "editor.h"
@@ -22,6 +21,7 @@
 #include "terminal/input.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
+#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"

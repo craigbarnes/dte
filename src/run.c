@@ -1,11 +1,11 @@
 #include "alias.h"
 #include "change.h"
 #include "command.h"
-#include "common.h"
 #include "debug.h"
 #include "config.h"
 #include "error.h"
 #include "parse-args.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 const Command *current_command;

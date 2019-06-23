@@ -5,9 +5,9 @@
 #include <string.h>
 #include "convert.h"
 #include "encoding.h"
-#include "../common.h"
 #include "../debug.h"
 #include "../util/ascii.h"
+#include "../util/str-util.h"
 #include "../util/utf8.h"
 #include "../util/xmalloc.h"
 

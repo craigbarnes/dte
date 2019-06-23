@@ -1,8 +1,8 @@
 #include <sys/types.h>
 #include "indent.h"
 #include "buffer.h"
-#include "common.h"
 #include "regexp.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "view.h"
 

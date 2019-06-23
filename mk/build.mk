@@ -51,7 +51,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer buffer-iter change cmdline \
-    commands common compiler completion config ctags debug edit editor \
+    commands compiler completion config ctags debug edit editor \
     env error file-history file-option filetype frame history \
     indent load-save lock main mode-command mode-git-open mode-normal \
     mode-search move msg options parse-args parse-command regexp run \

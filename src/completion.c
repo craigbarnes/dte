@@ -4,7 +4,6 @@
 #include "alias.h"
 #include "cmdline.h"
 #include "command.h"
-#include "common.h"
 #include "debug.h"
 #include "config.h"
 #include "editor.h"
@@ -15,6 +14,7 @@
 #include "util/ascii.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 

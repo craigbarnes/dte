@@ -1,11 +1,11 @@
 #include <sys/types.h>
 #include "bind.h"
 #include "command.h"
-#include "common.h"
 #include "debug.h"
 #include "error.h"
 #include "util/ascii.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 typedef struct {

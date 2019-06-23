@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include "config.h"
-#include "common.h"
 #include "completion.h"
 #include "debug.h"
 #include "error.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/readfile.h"
+#include "util/str-util.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 #include "../build/builtin-config.h"

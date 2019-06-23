@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashset.h"
-#include "../common.h"
 #include "../util/hash.h"
+#include "../util/str-util.h"
 #include "../util/xmalloc.h"
 
 void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
