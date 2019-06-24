@@ -88,19 +88,14 @@ void set_file_options(Buffer *b)
 {
     for (size_t i = 0; i < file_options.count; i++) {
         const FileOption *opt = file_options.ptrs[i];
-
         if (opt->type == FILE_OPTIONS_FILETYPE) {
             if (streq(opt->type_or_pattern, b->options.filetype)) {
                 set_options(opt->strs);
             }
-        } else if (
-            b->abs_filename
-            && regexp_match_nosub (
-                opt->type_or_pattern,
-                b->abs_filename,
-                strlen(b->abs_filename)
-            )
-        ) {
+            continue;
+        }
+        const char *f = b->abs_filename;
+        if (f && regexp_match_nosub(opt->type_or_pattern, f, strlen(f))) {
             set_options(opt->strs);
         }
     }
