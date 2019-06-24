@@ -67,16 +67,20 @@ Display the version number and exit.
 .
 .SH BASIC USAGE
 .
-Here are some of the default key bindings. \fBM\-x\fR means Alt+x and
-\fB^V\fR is Ctrl+v.
+Here are some of the default key bindings. \fBM\-x\fR is Alt+x,
+\fB^V\fR (or \fBC\-V\fR) is Ctrl+v and \fBS\-left\fR is Shift+left.
 .
 .TP
-.B M\-s
-Select
+.BR S\-up ", " S\-down ", " S\-left ", " S\-right
+Move cursor and select characters
 .
 .TP
-.B M\-l
-Select lines
+.BR C\-S\-left ", " C\-S\-right
+Move cursor and select whole words
+.
+.TP
+.BR C\-S\-up ", " C\-S\-down
+Move cursor and select whole lines
 .
 .TP
 .B ^C
@@ -145,7 +149,7 @@ available commands, see \fBdterc\fR(5).
 The default key bindings for command mode are:
 .
 .TP
-.BR up / down
+.BR up ", " down
 Browse previous command history.
 .
 .TP
