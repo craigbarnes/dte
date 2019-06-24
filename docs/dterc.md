@@ -444,6 +444,9 @@ Read commands from _file_.
 `-b`
 :   Read built-in _file_ instead of reading from the filesystem
 
+Note: "built-in files" are config files bundled into the program binary.
+See the `-B` and `-b` flags in the `dte` man page for more information.
+
 ### **insert** [**-km**] _text_
 
 Insert _text_ into the buffer.
