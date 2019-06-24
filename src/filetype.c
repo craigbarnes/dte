@@ -250,7 +250,11 @@ HOT const char *find_ft(const char *filename, StringView line)
     if (string_view_equal(&ext, &conf)) {
         if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
-        } else if (string_view_has_literal_prefix(&path, "/etc/")) {
+        } else if (
+            string_view_has_literal_prefix(&path, "/etc/")
+            || string_view_has_literal_prefix(&path, "/usr/share/")
+            || string_view_has_literal_prefix(&path, "/usr/local/share/")
+        ) {
             return builtin_filetype_names[CONFIG];
         }
     }
