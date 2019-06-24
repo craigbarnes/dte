@@ -14,10 +14,10 @@ void hashset_init(HashSet *set, char **strings, size_t nstrings, bool icase)
     set->table = table;
 
     if (icase) {
-        set->hash = fnv_1a_hash_icase;
+        set->hash = fnv_1a_32_hash_icase;
         set->equal = mem_equal_icase;
     } else {
-        set->hash = fnv_1a_hash;
+        set->hash = fnv_1a_32_hash;
         set->equal = mem_equal;
     }
 

@@ -28,7 +28,7 @@ const void *mem_intern(const void *data, size_t len)
     }
 
     StringInternEntry key;
-    hashmap_entry_init(&key, fnv_1a_hash(data, len));
+    hashmap_entry_init(&key, fnv_1a_32_hash(data, len));
     key.len = len;
 
     StringInternEntry *e = hashmap_get(&pool, &key, data);
