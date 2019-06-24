@@ -49,6 +49,7 @@ static const FileBasenameMap basenames[] = {
 
 // These are matched with or without a leading dot
 static const FileBasenameMap dotfiles[] = {
+    {"Xresources", XRESOURCES},
     {"bash_logout", SHELL},
     {"bash_profile", SHELL},
     {"bashrc", SHELL},

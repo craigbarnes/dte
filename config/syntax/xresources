@@ -1,0 +1,14 @@
+syntax xresources
+
+state start code
+    char " \t" this
+    char ! comment
+    noeat line
+
+state line code
+    char "\n" start
+    eat this
+
+state comment
+    char "\n" start
+    eat this
