@@ -72,6 +72,7 @@ static const FileBasenameMap dotfiles[] = {
     {"luacov", LUA},
     {"profile", SHELL},
     {"xinitrc", SHELL},
+    {"xprofile", SHELL},
     {"xserverrc", SHELL},
     {"zlogin", SHELL},
     {"zlogout", SHELL},
