@@ -86,7 +86,7 @@ static int xvasprintf_(char **strp, const char *format, va_list ap)
     va_copy(ap2, ap);
     int n = vsnprintf(NULL, 0, format, ap2);
     if (unlikely(n < 0)) {
-        fatal_error("vsnprintf", errno);
+        fatal_error("vsnprintf", EILSEQ);
     }
     va_end(ap2);
     *strp = xmalloc(n + 1);
