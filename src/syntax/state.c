@@ -157,9 +157,10 @@ static Condition *add_condition (
     return c;
 }
 
-static void cmd_bufis(const char *pf, char **args)
+static void cmd_bufis(CommandArgs *a)
 {
-    const bool icase = !!*pf;
+    char **args = a->args;
+    const bool icase = a->flags[0] == 'i';
     const char *str = args[0];
     const size_t len = strlen(str);
     Condition *c;
@@ -180,8 +181,9 @@ static void cmd_bufis(const char *pf, char **args)
     }
 }
 
-static void cmd_char(const char *pf, char **args)
+static void cmd_char(CommandArgs *a)
 {
+    const char *pf = a->flags;
     bool n_flag = false;
     bool b_flag = false;
     while (*pf) {
@@ -196,6 +198,7 @@ static void cmd_char(const char *pf, char **args)
         pf++;
     }
 
+    char **args = a->args;
     ConditionType type;
     if (b_flag) {
         type = COND_CHAR_BUFFER;
@@ -220,7 +223,7 @@ static void cmd_char(const char *pf, char **args)
     }
 }
 
-static void cmd_default(const char* UNUSED_ARG(pf), char **args)
+static void cmd_default(CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -228,32 +231,32 @@ static void cmd_default(const char* UNUSED_ARG(pf), char **args)
     }
     ptr_array_add (
         &current_syntax->default_colors,
-        copy_string_array(args, count_strings(args))
+        copy_string_array(a->args, count_strings(a->args))
     );
 }
 
-static void cmd_eat(const char* UNUSED_ARG(pf), char **args)
+static void cmd_eat(CommandArgs *a)
 {
     if (no_state()) {
         return;
     }
 
-    if (!destination_state(args[0], &current_state->a.destination)) {
+    if (!destination_state(a->args[0], &current_state->a.destination)) {
         return;
     }
 
     current_state->type = STATE_EAT;
-    current_state->a.emit_name = args[1] ? xstrdup(args[1]) : NULL;
+    current_state->a.emit_name = a->args[1] ? xstrdup(a->args[1]) : NULL;
     current_state = NULL;
 }
 
-static void cmd_heredocbegin(const char* UNUSED_ARG(pf), char **args)
+static void cmd_heredocbegin(CommandArgs *a)
 {
     if (no_state()) {
         return;
     }
 
-    const char *sub = args[0];
+    const char *sub = a->args[0];
     Syntax *subsyn = find_any_syntax(sub);
     if (!subsyn) {
         error_msg("No such syntax %s", sub);
@@ -265,7 +268,7 @@ static void cmd_heredocbegin(const char* UNUSED_ARG(pf), char **args)
     }
 
     // a.destination is used as the return state
-    if (!destination_state(args[1], &current_state->a.destination)) {
+    if (!destination_state(a->args[1], &current_state->a.destination)) {
         return;
     }
 
@@ -279,19 +282,20 @@ static void cmd_heredocbegin(const char* UNUSED_ARG(pf), char **args)
     subsyn->used = true;
 }
 
-static void cmd_heredocend(const char* UNUSED_ARG(pf), char **args)
+static void cmd_heredocend(CommandArgs *a)
 {
-    add_condition(COND_HEREDOCEND, args[0], args[1]);
+    add_condition(COND_HEREDOCEND, a->args[0], a->args[1]);
     current_syntax->heredoc = true;
 }
 
-static void cmd_list(const char *pf, char **args)
+static void cmd_list(CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
         return;
     }
 
+    char **args = a->args;
     const char *name = args[0];
     StringList *list = find_string_list(current_syntax, name);
     if (list == NULL) {
@@ -304,12 +308,13 @@ static void cmd_list(const char *pf, char **args)
     }
     list->defined = true;
 
-    bool icase = !!*pf;
+    bool icase = a->flags[0] == 'i';
     hashset_init(&list->strings, args + 1, count_strings(args) - 1, icase);
 }
 
-static void cmd_inlist(const char* UNUSED_ARG(pf), char **args)
+static void cmd_inlist(CommandArgs *a)
 {
+    char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
     StringList *list = find_string_list(current_syntax, name);
@@ -329,15 +334,14 @@ static void cmd_inlist(const char* UNUSED_ARG(pf), char **args)
     c->u.cond_inlist.list = list;
 }
 
-static void cmd_noeat(const char *pf, char **args)
+static void cmd_noeat(CommandArgs *a)
 {
-    int type = *pf ? STATE_NOEAT_BUFFER : STATE_NOEAT;
-
     if (no_state()) {
         return;
     }
 
-    if (streq(args[0], current_state->name)) {
+    const char *arg = a->args[0];
+    if (streq(arg, current_state->name)) {
         error_msg (
             "Using noeat to to jump to parent state causes"
             " infinite loop"
@@ -346,7 +350,7 @@ static void cmd_noeat(const char *pf, char **args)
     }
 
     State *dest;
-    if (!destination_state(args[0], &dest)) {
+    if (!destination_state(arg, &dest)) {
         return;
     }
     if (dest == current_state) {
@@ -358,20 +362,21 @@ static void cmd_noeat(const char *pf, char **args)
 
     current_state->a.destination = dest;
     current_state->a.emit_name = NULL;
-    current_state->type = type;
+    current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
     current_state = NULL;
 }
 
-static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
+static void cmd_recolor(CommandArgs *a)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
     size_t len = 0;
 
-    if (args[1]) {
+    const char *len_str = a->args[1];
+    if (len_str) {
         type = COND_RECOLOR;
-        if (!str_to_size(args[1], &len)) {
-            error_msg("invalid number: %s", args[1]);
+        if (!str_to_size(len_str, &len)) {
+            error_msg("invalid number: %s", len_str);
             return;
         }
         if (len == 0) {
@@ -384,22 +389,20 @@ static void cmd_recolor(const char* UNUSED_ARG(pf), char **args)
         }
     }
 
-    Condition *c = add_condition(type, NULL, args[0]);
+    Condition *c = add_condition(type, NULL, a->args[0]);
     if (c && type == COND_RECOLOR) {
         c->u.cond_recolor.len = len;
     }
 }
 
-static void cmd_state(const char* UNUSED_ARG(pf), char **args)
+static void cmd_state(CommandArgs *a)
 {
-    const char *name = args[0];
-    const char *emit = args[1] ? args[1] : args[0];
-
     close_state();
     if (no_syntax()) {
         return;
     }
 
+    const char *name = a->args[0];
     if (streq(name, "END") || streq(name, "this")) {
         error_msg("%s is reserved state name", name);
         return;
@@ -411,15 +414,15 @@ static void cmd_state(const char* UNUSED_ARG(pf), char **args)
         return;
     }
     s->defined = true;
-    s->emit_name = xstrdup(emit);
+    s->emit_name = xstrdup(a->args[1] ? a->args[1] : a->args[0]);
     current_state = s;
 }
 
-static void cmd_str(const char *pf, char **args)
+static void cmd_str(CommandArgs *a)
 {
-    bool icase = !!*pf;
+    bool icase = a->flags[0] == 'i';
     ConditionType type = icase ? COND_STR_ICASE : COND_STR;
-    const char *str = args[0];
+    const char *str = a->args[0];
     Condition *c;
     size_t len = strlen(str);
 
@@ -435,7 +438,7 @@ static void cmd_str(const char *pf, char **args)
     if (!icase && len == 2) {
         type = COND_STR2;
     }
-    c = add_condition(type, args[1], args[2]);
+    c = add_condition(type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.cond_str.str, str, len);
         c->u.cond_str.len = len;
@@ -449,20 +452,20 @@ static void finish_syntax(void)
     current_syntax = NULL;
 }
 
-static void cmd_syntax(const char* UNUSED_ARG(pf), char **args)
+static void cmd_syntax(CommandArgs *a)
 {
     if (current_syntax) {
         finish_syntax();
     }
 
     current_syntax = xnew0(Syntax, 1);
-    current_syntax->name = xstrdup(args[0]);
+    current_syntax->name = xstrdup(a->args[0]);
     current_state = NULL;
 
     saved_nr_errors = nr_errors;
 }
 
-static void cmd_include(const char *pf, char **args);
+static void cmd_include(CommandArgs *a);
 
 static const Command syntax_commands[] = {
     {"bufis", "i", 2,  3, cmd_bufis},
@@ -482,13 +485,13 @@ static const Command syntax_commands[] = {
     {"", "", 0,  0, NULL}
 };
 
-static void cmd_include(const char *pf, char **args)
+static void cmd_include(CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
-    if (*pf == 'b') {
+    if (a->flags[0] == 'b') {
         flags |= CFG_BUILTIN;
     }
-    read_config(syntax_commands, args[0], flags);
+    read_config(syntax_commands, a->args[0], flags);
 }
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
