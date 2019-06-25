@@ -102,12 +102,12 @@ static void activate_current_message_save(void)
     }
 }
 
-static void cmd_alias(CommandArgs *a)
+static void cmd_alias(const CommandArgs *a)
 {
     add_alias(a->args[0], a->args[1]);
 }
 
-static void cmd_bind(CommandArgs *a)
+static void cmd_bind(const CommandArgs *a)
 {
     const char *key = a->args[0];
     const char *cmd = a->args[1];
@@ -118,12 +118,12 @@ static void cmd_bind(CommandArgs *a)
     }
 }
 
-static void cmd_bof(CommandArgs* UNUSED_ARG(a))
+static void cmd_bof(const CommandArgs* UNUSED_ARG(a))
 {
     move_bof();
 }
 
-static void cmd_bol(CommandArgs *a)
+static void cmd_bol(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     if (strchr(a->flags, 's')) {
@@ -133,7 +133,7 @@ static void cmd_bol(CommandArgs *a)
     }
 }
 
-static void cmd_bolsf(CommandArgs* UNUSED_ARG(a))
+static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
 {
     do_selection(SELECT_NONE);
     if (!block_iter_bol(&view->cursor)) {
@@ -147,7 +147,7 @@ static void cmd_bolsf(CommandArgs* UNUSED_ARG(a))
     view_reset_preferred_x(view);
 }
 
-static void cmd_case(CommandArgs *a)
+static void cmd_case(const CommandArgs *a)
 {
     const char *pf = a->flags;
     int mode = 't';
@@ -163,7 +163,7 @@ static void cmd_case(CommandArgs *a)
     change_case(mode);
 }
 
-static void cmd_cd(CommandArgs *a)
+static void cmd_cd(const CommandArgs *a)
 {
     const char *dir = a->args[0];
     char cwd[8192];
@@ -200,17 +200,17 @@ static void cmd_cd(CommandArgs *a)
     mark_everything_changed();
 }
 
-static void cmd_center_view(CommandArgs* UNUSED_ARG(a))
+static void cmd_center_view(const CommandArgs* UNUSED_ARG(a))
 {
     view->force_center = true;
 }
 
-static void cmd_clear(CommandArgs* UNUSED_ARG(a))
+static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
 {
     clear_lines();
 }
 
-static void cmd_close(CommandArgs *a)
+static void cmd_close(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool force = false;
@@ -253,7 +253,7 @@ static void cmd_close(CommandArgs *a)
     set_view(window->view);
 }
 
-static void cmd_command(CommandArgs *a)
+static void cmd_command(const CommandArgs *a)
 {
     const char *text = a->args[0];
     set_input_mode(INPUT_COMMAND);
@@ -262,7 +262,7 @@ static void cmd_command(CommandArgs *a)
     }
 }
 
-static void cmd_compile(CommandArgs *a)
+static void cmd_compile(const CommandArgs *a)
 {
     const char *pf = a->flags;
     SpawnFlags flags = SPAWN_DEFAULT;
@@ -294,7 +294,7 @@ static void cmd_compile(CommandArgs *a)
     }
 }
 
-static void cmd_copy(CommandArgs *a)
+static void cmd_copy(const CommandArgs *a)
 {
     BlockIter save = view->cursor;
     if (view->selection) {
@@ -311,7 +311,7 @@ static void cmd_copy(CommandArgs *a)
     view->cursor = save;
 }
 
-static void cmd_cut(CommandArgs* UNUSED_ARG(a))
+static void cmd_cut(const CommandArgs* UNUSED_ARG(a))
 {
     const long x = view_get_preferred_x(view);
     if (view->selection) {
@@ -329,12 +329,12 @@ static void cmd_cut(CommandArgs* UNUSED_ARG(a))
     }
 }
 
-static void cmd_delete(CommandArgs* UNUSED_ARG(a))
+static void cmd_delete(const CommandArgs* UNUSED_ARG(a))
 {
     delete_ch();
 }
 
-static void cmd_delete_eol(CommandArgs *a)
+static void cmd_delete_eol(const CommandArgs *a)
 {
     if (view->selection) {
         return;
@@ -353,31 +353,31 @@ static void cmd_delete_eol(CommandArgs *a)
     buffer_delete_bytes(block_iter_eol(&bi));
 }
 
-static void cmd_delete_word(CommandArgs *a)
+static void cmd_delete_word(const CommandArgs *a)
 {
     bool skip_non_word = a->flags[0] == 's';
     BlockIter bi = view->cursor;
     buffer_delete_bytes(word_fwd(&bi, skip_non_word));
 }
 
-static void cmd_down(CommandArgs *a)
+static void cmd_down(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a->flags);
     move_down(1);
 }
 
-static void cmd_eof(CommandArgs* UNUSED_ARG(a))
+static void cmd_eof(const CommandArgs* UNUSED_ARG(a))
 {
     move_eof();
 }
 
-static void cmd_eol(CommandArgs *a)
+static void cmd_eol(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     move_eol();
 }
 
-static void cmd_eolsf(CommandArgs* UNUSED_ARG(a))
+static void cmd_eolsf(const CommandArgs* UNUSED_ARG(a))
 {
     do_selection(SELECT_NONE);
     if (!block_iter_eol(&view->cursor)) {
@@ -391,23 +391,23 @@ static void cmd_eolsf(CommandArgs* UNUSED_ARG(a))
     view_reset_preferred_x(view);
 }
 
-static void cmd_erase(CommandArgs* UNUSED_ARG(a))
+static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
 {
     erase();
 }
 
-static void cmd_erase_bol(CommandArgs* UNUSED_ARG(a))
+static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
 {
     buffer_erase_bytes(block_iter_bol(&view->cursor));
 }
 
-static void cmd_erase_word(CommandArgs *a)
+static void cmd_erase_word(const CommandArgs *a)
 {
     bool skip_non_word = a->flags[0] == 's';
     buffer_erase_bytes(word_bwd(&view->cursor, skip_non_word));
 }
 
-static void cmd_errorfmt(CommandArgs *a)
+static void cmd_errorfmt(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool ignore = false;
@@ -423,7 +423,7 @@ static void cmd_errorfmt(CommandArgs *a)
     add_error_fmt(args[0], ignore, args[1], args + 2);
 }
 
-static void cmd_eval(CommandArgs *a)
+static void cmd_eval(const CommandArgs *a)
 {
     FilterData data = FILTER_DATA_INIT;
     if (spawn_filter(a->args, &data)) {
@@ -433,7 +433,7 @@ static void cmd_eval(CommandArgs *a)
     free(data.out);
 }
 
-static void cmd_filter(CommandArgs *a)
+static void cmd_filter(const CommandArgs *a)
 {
     FilterData data;
     BlockIter save = view->cursor;
@@ -463,7 +463,7 @@ static void cmd_filter(CommandArgs *a)
     unselect();
 }
 
-static void cmd_ft(CommandArgs *a)
+static void cmd_ft(const CommandArgs *a)
 {
     const char *pf = a->flags;
     FileDetectionType dt = FT_EXTENSION;
@@ -496,13 +496,13 @@ static void cmd_ft(CommandArgs *a)
     }
 }
 
-static void cmd_git_open(CommandArgs* UNUSED_ARG(a))
+static void cmd_git_open(const CommandArgs* UNUSED_ARG(a))
 {
     set_input_mode(INPUT_GIT_OPEN);
     git_open_reload();
 }
 
-static void cmd_hi(CommandArgs *a)
+static void cmd_hi(const CommandArgs *a)
 {
     char **args = a->args;
     TermColor color;
@@ -523,7 +523,7 @@ static void cmd_hi(CommandArgs *a)
     }
 }
 
-static void cmd_include(CommandArgs *a)
+static void cmd_include(const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
     if (a->flags[0] == 'b') {
@@ -532,7 +532,7 @@ static void cmd_include(CommandArgs *a)
     read_config(commands, a->args[0], flags);
 }
 
-static void cmd_insert(CommandArgs *a)
+static void cmd_insert(const CommandArgs *a)
 {
     const char *str = a->args[0];
     if (strchr(a->flags, 'k')) {
@@ -555,7 +555,7 @@ static void cmd_insert(CommandArgs *a)
     }
 }
 
-static void cmd_insert_builtin(CommandArgs *a)
+static void cmd_insert_builtin(const CommandArgs *a)
 {
     const char *name = a->args[0];
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -566,18 +566,18 @@ static void cmd_insert_builtin(CommandArgs *a)
     }
 }
 
-static void cmd_join(CommandArgs* UNUSED_ARG(a))
+static void cmd_join(const CommandArgs* UNUSED_ARG(a))
 {
     join_lines();
 }
 
-static void cmd_left(CommandArgs *a)
+static void cmd_left(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     move_cursor_left();
 }
 
-static void cmd_line(CommandArgs *a)
+static void cmd_line(const CommandArgs *a)
 {
     const char *arg = a->args[0];
     const long x = view_get_preferred_x(view);
@@ -590,7 +590,7 @@ static void cmd_line(CommandArgs *a)
     move_to_preferred_x(x);
 }
 
-static void cmd_load_syntax(CommandArgs *a)
+static void cmd_load_syntax(const CommandArgs *a)
 {
     const char *filename = a->args[0];
     const char *filetype = path_basename(filename);
@@ -608,7 +608,7 @@ static void cmd_load_syntax(CommandArgs *a)
     }
 }
 
-static void cmd_move_tab(CommandArgs *a)
+static void cmd_move_tab(const CommandArgs *a)
 {
     const char *str = a->args[0];
     size_t j, i = ptr_array_idx(&window->views, view);
@@ -636,7 +636,7 @@ static void cmd_move_tab(CommandArgs *a)
     window->update_tabbar = true;
 }
 
-static void cmd_msg(CommandArgs *a)
+static void cmd_msg(const CommandArgs *a)
 {
     const char *pf = a->flags;
     char dir = 0;
@@ -659,17 +659,17 @@ static void cmd_msg(CommandArgs *a)
     }
 }
 
-static void cmd_new_line(CommandArgs* UNUSED_ARG(a))
+static void cmd_new_line(const CommandArgs* UNUSED_ARG(a))
 {
     new_line();
 }
 
-static void cmd_next(CommandArgs* UNUSED_ARG(a))
+static void cmd_next(const CommandArgs* UNUSED_ARG(a))
 {
     set_view(ptr_array_next(&window->views, view));
 }
 
-static void cmd_open(CommandArgs *a)
+static void cmd_open(const CommandArgs *a)
 {
     char **args = a->args;
     const char *pf = a->flags;
@@ -734,7 +734,7 @@ static void cmd_open(CommandArgs *a)
     }
 }
 
-static void cmd_option(CommandArgs *a)
+static void cmd_option(const CommandArgs *a)
 {
     char **args = a->args;
     size_t argc = count_strings(args);
@@ -772,7 +772,7 @@ static void cmd_option(CommandArgs *a)
     } while (comma);
 }
 
-static void cmd_pass_through(CommandArgs *a)
+static void cmd_pass_through(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool strip_nl = false;
@@ -813,7 +813,7 @@ static void cmd_pass_through(CommandArgs *a)
     }
 }
 
-static void cmd_paste(CommandArgs *a)
+static void cmd_paste(const CommandArgs *a)
 {
     if (a->flags[0] == 'c') {
         paste(true);
@@ -822,7 +822,7 @@ static void cmd_paste(CommandArgs *a)
     }
 }
 
-static void cmd_pgdown(CommandArgs *a)
+static void cmd_pgdown(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a->flags);
 
@@ -838,7 +838,7 @@ static void cmd_pgdown(CommandArgs *a)
     move_down(count);
 }
 
-static void cmd_pgup(CommandArgs *a)
+static void cmd_pgup(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a->flags);
 
@@ -854,12 +854,12 @@ static void cmd_pgup(CommandArgs *a)
     move_up(count);
 }
 
-static void cmd_prev(CommandArgs* UNUSED_ARG(a))
+static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 {
     set_view(ptr_array_prev(&window->views, view));
 }
 
-static void cmd_quit(CommandArgs *a)
+static void cmd_quit(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool prompt = false;
@@ -906,7 +906,7 @@ static void cmd_quit(CommandArgs *a)
     editor.status = EDITOR_EXITING;
 }
 
-static void cmd_redo(CommandArgs *a)
+static void cmd_redo(const CommandArgs *a)
 {
     char *arg = a->args[0];
     unsigned long change_id = 0;
@@ -921,12 +921,12 @@ static void cmd_redo(CommandArgs *a)
     }
 }
 
-static void cmd_refresh(CommandArgs* UNUSED_ARG(a))
+static void cmd_refresh(const CommandArgs* UNUSED_ARG(a))
 {
     mark_everything_changed();
 }
 
-static void cmd_repeat(CommandArgs *a)
+static void cmd_repeat(const CommandArgs *a)
 {
     char **args = a->args;
     unsigned int count = 0;
@@ -945,7 +945,7 @@ static void cmd_repeat(CommandArgs *a)
 
     args += 2;
     const char *pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-    CommandArgs a2 = {
+    const CommandArgs a2 = {
         .args = args,
         .flags = pf
     };
@@ -956,7 +956,7 @@ static void cmd_repeat(CommandArgs *a)
     }
 }
 
-static void cmd_replace(CommandArgs *a)
+static void cmd_replace(const CommandArgs *a)
 {
     const char *pf = a->flags;
     unsigned int flags = 0;
@@ -979,13 +979,13 @@ static void cmd_replace(CommandArgs *a)
     reg_replace(a->args[0], a->args[1], flags);
 }
 
-static void cmd_right(CommandArgs *a)
+static void cmd_right(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     move_cursor_right();
 }
 
-static void cmd_run(CommandArgs *a)
+static void cmd_run(const CommandArgs *a)
 {
     const char *pf = a->flags;
     int fd[3] = {0, 1, 2};
@@ -1014,7 +1014,7 @@ static bool stat_changed(const struct stat *const a, const struct stat *const b)
         a->st_ino != b->st_ino;
 }
 
-static void cmd_save(CommandArgs *a)
+static void cmd_save(const CommandArgs *a)
 {
     const char *pf = a->flags;
     char **args = a->args;
@@ -1217,7 +1217,7 @@ error:
     }
 }
 
-static void cmd_scroll_down(CommandArgs* UNUSED_ARG(a))
+static void cmd_scroll_down(const CommandArgs* UNUSED_ARG(a))
 {
     view->vy++;
     if (view->cy < view->vy) {
@@ -1225,7 +1225,7 @@ static void cmd_scroll_down(CommandArgs* UNUSED_ARG(a))
     }
 }
 
-static void cmd_scroll_pgdown(CommandArgs* UNUSED_ARG(a))
+static void cmd_scroll_pgdown(const CommandArgs* UNUSED_ARG(a))
 {
     long max = buffer->nl - window->edit_h + 1;
     if (view->vy < max && max > 0) {
@@ -1240,7 +1240,7 @@ static void cmd_scroll_pgdown(CommandArgs* UNUSED_ARG(a))
     }
 }
 
-static void cmd_scroll_pgup(CommandArgs* UNUSED_ARG(a))
+static void cmd_scroll_pgup(const CommandArgs* UNUSED_ARG(a))
 {
     if (view->vy > 0) {
         long count = window->edit_h - 1;
@@ -1254,7 +1254,7 @@ static void cmd_scroll_pgup(CommandArgs* UNUSED_ARG(a))
     }
 }
 
-static void cmd_scroll_up(CommandArgs* UNUSED_ARG(a))
+static void cmd_scroll_up(const CommandArgs* UNUSED_ARG(a))
 {
     if (view->vy) {
         view->vy--;
@@ -1264,7 +1264,7 @@ static void cmd_scroll_up(CommandArgs* UNUSED_ARG(a))
     }
 }
 
-static void cmd_search(CommandArgs *a)
+static void cmd_search(const CommandArgs *a)
 {
     const char *pf = a->flags;
     char *pattern = a->args[0];
@@ -1333,7 +1333,7 @@ static void cmd_search(CommandArgs *a)
     }
 }
 
-static void cmd_select(CommandArgs *a)
+static void cmd_select(const CommandArgs *a)
 {
     const char *pf = a->flags;
     SelectionType sel = SELECT_CHARS;
@@ -1383,7 +1383,7 @@ static void cmd_select(CommandArgs *a)
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
 }
 
-static void cmd_set(CommandArgs *a)
+static void cmd_set(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool global = false;
@@ -1424,7 +1424,7 @@ static void cmd_set(CommandArgs *a)
     }
 }
 
-static void cmd_setenv(CommandArgs *a)
+static void cmd_setenv(const CommandArgs *a)
 {
     char **args = a->args;
     if (setenv(args[0], args[1], 1) < 0) {
@@ -1438,7 +1438,7 @@ static void cmd_setenv(CommandArgs *a)
     }
 }
 
-static void cmd_shift(CommandArgs *a)
+static void cmd_shift(const CommandArgs *a)
 {
     const char *arg = a->args[0];
     int count;
@@ -1453,7 +1453,7 @@ static void cmd_shift(CommandArgs *a)
     shift_lines(count);
 }
 
-static void cmd_show_bindings(CommandArgs* UNUSED_ARG(a))
+static void cmd_show_bindings(const CommandArgs* UNUSED_ARG(a))
 {
     char tmp[32] = "/tmp/.dte.binds.XXXXXX";
     int fd = mkstemp(tmp);
@@ -1478,12 +1478,12 @@ static void cmd_show_bindings(CommandArgs* UNUSED_ARG(a))
     unlink(tmp);
 }
 
-static void cmd_suspend(CommandArgs* UNUSED_ARG(a))
+static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 {
     suspend();
 }
 
-static void cmd_tag(CommandArgs *a)
+static void cmd_tag(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool pop = false;
@@ -1545,7 +1545,7 @@ static void cmd_tag(CommandArgs *a)
     free(word);
 }
 
-static void cmd_toggle(CommandArgs *a)
+static void cmd_toggle(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool global = false;
@@ -1570,25 +1570,25 @@ static void cmd_toggle(CommandArgs *a)
     }
 }
 
-static void cmd_undo(CommandArgs* UNUSED_ARG(a))
+static void cmd_undo(const CommandArgs* UNUSED_ARG(a))
 {
     if (undo()) {
         unselect();
     }
 }
 
-static void cmd_unselect(CommandArgs* UNUSED_ARG(a))
+static void cmd_unselect(const CommandArgs* UNUSED_ARG(a))
 {
     unselect();
 }
 
-static void cmd_up(CommandArgs *a)
+static void cmd_up(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a->flags);
     move_up(1);
 }
 
-static void cmd_view(CommandArgs *a)
+static void cmd_view(const CommandArgs *a)
 {
     BUG_ON(window->views.count == 0);
     const char *arg = a->args[0];
@@ -1608,7 +1608,7 @@ static void cmd_view(CommandArgs *a)
     set_view(window->views.ptrs[idx]);
 }
 
-static void cmd_wclose(CommandArgs *a)
+static void cmd_wclose(const CommandArgs *a)
 {
     View *v = window_find_unclosable_view(window, view_can_close);
     bool force = !!a->flags[0];
@@ -1623,7 +1623,7 @@ static void cmd_wclose(CommandArgs *a)
     window_close_current();
 }
 
-static void cmd_wflip(CommandArgs* UNUSED_ARG(a))
+static void cmd_wflip(const CommandArgs* UNUSED_ARG(a))
 {
     Frame *f = window->frame;
     if (f->parent == NULL) {
@@ -1633,7 +1633,7 @@ static void cmd_wflip(CommandArgs* UNUSED_ARG(a))
     mark_everything_changed();
 }
 
-static void cmd_wnext(CommandArgs* UNUSED_ARG(a))
+static void cmd_wnext(const CommandArgs* UNUSED_ARG(a))
 {
     window = next_window(window);
     set_view(window->view);
@@ -1641,7 +1641,7 @@ static void cmd_wnext(CommandArgs* UNUSED_ARG(a))
     debug_frames();
 }
 
-static void cmd_word_bwd(CommandArgs *a)
+static void cmd_word_bwd(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     bool skip_non_word = strchr(a->flags, 's');
@@ -1649,7 +1649,7 @@ static void cmd_word_bwd(CommandArgs *a)
     view_reset_preferred_x(view);
 }
 
-static void cmd_word_fwd(CommandArgs *a)
+static void cmd_word_fwd(const CommandArgs *a)
 {
     handle_select_chars_flag(a->flags);
     bool skip_non_word = strchr(a->flags, 's');
@@ -1657,7 +1657,7 @@ static void cmd_word_fwd(CommandArgs *a)
     view_reset_preferred_x(view);
 }
 
-static void cmd_wprev(CommandArgs* UNUSED_ARG(a))
+static void cmd_wprev(const CommandArgs* UNUSED_ARG(a))
 {
     window = prev_window(window);
     set_view(window->view);
@@ -1665,7 +1665,7 @@ static void cmd_wprev(CommandArgs* UNUSED_ARG(a))
     debug_frames();
 }
 
-static void cmd_wrap_paragraph(CommandArgs *a)
+static void cmd_wrap_paragraph(const CommandArgs *a)
 {
     const char *arg = a->args[0];
     size_t width = (size_t)buffer->options.text_width;
@@ -1678,7 +1678,7 @@ static void cmd_wrap_paragraph(CommandArgs *a)
     format_paragraph(width);
 }
 
-static void cmd_wresize(CommandArgs *a)
+static void cmd_wresize(const CommandArgs *a)
 {
     if (window->frame->parent == NULL) {
         // Only window
@@ -1718,7 +1718,7 @@ static void cmd_wresize(CommandArgs *a)
     debug_frames();
 }
 
-static void cmd_wsplit(CommandArgs *a)
+static void cmd_wsplit(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool before = false;
@@ -1776,7 +1776,7 @@ static void cmd_wsplit(CommandArgs *a)
     debug_frames();
 }
 
-static void cmd_wswap(CommandArgs* UNUSED_ARG(a))
+static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 {
     Frame *parent = window->frame->parent;
     if (parent == NULL) {

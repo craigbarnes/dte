@@ -17,7 +17,7 @@ typedef struct {
     const char flags[7];
     int8_t min_args;
     int8_t max_args;
-    void (*cmd)(CommandArgs *args);
+    void (*cmd)(const CommandArgs *args);
 } Command;
 
 // parse-command.c

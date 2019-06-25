@@ -157,7 +157,7 @@ static Condition *add_condition (
     return c;
 }
 
-static void cmd_bufis(CommandArgs *a)
+static void cmd_bufis(const CommandArgs *a)
 {
     char **args = a->args;
     const bool icase = a->flags[0] == 'i';
@@ -181,7 +181,7 @@ static void cmd_bufis(CommandArgs *a)
     }
 }
 
-static void cmd_char(CommandArgs *a)
+static void cmd_char(const CommandArgs *a)
 {
     const char *pf = a->flags;
     bool n_flag = false;
@@ -223,7 +223,7 @@ static void cmd_char(CommandArgs *a)
     }
 }
 
-static void cmd_default(CommandArgs *a)
+static void cmd_default(const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -235,7 +235,7 @@ static void cmd_default(CommandArgs *a)
     );
 }
 
-static void cmd_eat(CommandArgs *a)
+static void cmd_eat(const CommandArgs *a)
 {
     if (no_state()) {
         return;
@@ -250,7 +250,7 @@ static void cmd_eat(CommandArgs *a)
     current_state = NULL;
 }
 
-static void cmd_heredocbegin(CommandArgs *a)
+static void cmd_heredocbegin(const CommandArgs *a)
 {
     if (no_state()) {
         return;
@@ -282,13 +282,13 @@ static void cmd_heredocbegin(CommandArgs *a)
     subsyn->used = true;
 }
 
-static void cmd_heredocend(CommandArgs *a)
+static void cmd_heredocend(const CommandArgs *a)
 {
     add_condition(COND_HEREDOCEND, a->args[0], a->args[1]);
     current_syntax->heredoc = true;
 }
 
-static void cmd_list(CommandArgs *a)
+static void cmd_list(const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -312,7 +312,7 @@ static void cmd_list(CommandArgs *a)
     hashset_init(&list->strings, args + 1, count_strings(args) - 1, icase);
 }
 
-static void cmd_inlist(CommandArgs *a)
+static void cmd_inlist(const CommandArgs *a)
 {
     char **args = a->args;
     const char *name = args[0];
@@ -334,7 +334,7 @@ static void cmd_inlist(CommandArgs *a)
     c->u.cond_inlist.list = list;
 }
 
-static void cmd_noeat(CommandArgs *a)
+static void cmd_noeat(const CommandArgs *a)
 {
     if (no_state()) {
         return;
@@ -366,7 +366,7 @@ static void cmd_noeat(CommandArgs *a)
     current_state = NULL;
 }
 
-static void cmd_recolor(CommandArgs *a)
+static void cmd_recolor(const CommandArgs *a)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
@@ -395,7 +395,7 @@ static void cmd_recolor(CommandArgs *a)
     }
 }
 
-static void cmd_state(CommandArgs *a)
+static void cmd_state(const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -418,7 +418,7 @@ static void cmd_state(CommandArgs *a)
     current_state = s;
 }
 
-static void cmd_str(CommandArgs *a)
+static void cmd_str(const CommandArgs *a)
 {
     bool icase = a->flags[0] == 'i';
     ConditionType type = icase ? COND_STR_ICASE : COND_STR;
@@ -452,7 +452,7 @@ static void finish_syntax(void)
     current_syntax = NULL;
 }
 
-static void cmd_syntax(CommandArgs *a)
+static void cmd_syntax(const CommandArgs *a)
 {
     if (current_syntax) {
         finish_syntax();
@@ -465,7 +465,7 @@ static void cmd_syntax(CommandArgs *a)
     saved_nr_errors = nr_errors;
 }
 
-static void cmd_include(CommandArgs *a);
+static void cmd_include(const CommandArgs *a);
 
 static const Command syntax_commands[] = {
     {"bufis", "i", 2,  3, cmd_bufis},
@@ -485,7 +485,7 @@ static const Command syntax_commands[] = {
     {"", "", 0,  0, NULL}
 };
 
-static void cmd_include(CommandArgs *a)
+static void cmd_include(const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
     if (a->flags[0] == 'b') {

@@ -103,7 +103,7 @@ static void run_command(const Command *cmds, char **av)
     current_command = cmd;
     char **args = av + 1;
     const char *pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-    CommandArgs a = {
+    const CommandArgs a = {
         .args = args,
         .flags = pf
     };
