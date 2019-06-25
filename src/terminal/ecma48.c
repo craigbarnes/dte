@@ -45,6 +45,11 @@ void term_cooked(void)
     tcsetattr(STDIN_FILENO, 0, &termios_save);
 }
 
+static void ecma48_clear_screen(void)
+{
+    term_add_literal("\033[H\033[J");
+}
+
 void ecma48_clear_to_eol(void)
 {
     term_add_literal("\033[K");
@@ -117,6 +122,7 @@ Terminal terminal = {
     .cooked = &term_cooked,
     .parse_key_sequence = &xterm_parse_key,
     .put_control_code = &term_add_string_view,
+    .clear_screen = &ecma48_clear_screen,
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,

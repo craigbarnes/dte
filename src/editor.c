@@ -275,6 +275,7 @@ static void ui_end(void)
 {
     terminal.put_control_code(terminal.control_codes.reset_colors);
     terminal.put_control_code(terminal.control_codes.reset_attrs);
+    terminal.clear_screen();
 
     terminal.move_cursor(0, terminal.height - 1);
     term_show_cursor();

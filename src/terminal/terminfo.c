@@ -30,6 +30,7 @@
     KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
 static struct {
+    const char *clear;
     const char *cup;
     const char *el;
     const char *setab;
@@ -159,6 +160,13 @@ static void tputs_control_code(StringView code)
     }
 }
 
+static void tputs_clear_screen(void)
+{
+    if (terminfo.clear) {
+        tputs(terminfo.clear, terminal.height, tputs_putc);
+    }
+}
+
 static void tputs_clear_to_eol(void)
 {
     if (terminfo.el) {
@@ -232,6 +240,7 @@ bool term_init_terminfo(const char *term)
     setupterm(term, 1, (int*)0);
 
     terminal.put_control_code = &tputs_control_code;
+    terminal.clear_screen = &tputs_clear_screen;
     terminal.clear_to_eol = &tputs_clear_to_eol;
     terminal.set_color = &tputs_set_color;
     terminal.move_cursor = &tputs_move_cursor;
@@ -251,6 +260,7 @@ bool term_init_terminfo(const char *term)
         );
     }
 
+    terminfo.clear = get_terminfo_string("clear");
     terminfo.el = get_terminfo_string("el");
     terminfo.setab = get_terminfo_string("setab");
     terminfo.setaf = get_terminfo_string("setaf");

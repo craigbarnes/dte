@@ -30,6 +30,7 @@ typedef struct {
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     void (*put_control_code)(StringView code);
+    void (*clear_screen)(void);
     void (*clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);
