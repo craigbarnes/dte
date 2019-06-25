@@ -43,6 +43,10 @@ the same name.
 
 The filename of the current buffer (or an empty string if unsaved).
 
+### **$FILETYPE**
+
+The value of the `filetype` option for the current buffer.
+
 ### **$WORD**
 
 The selected text or the word under the cursor.

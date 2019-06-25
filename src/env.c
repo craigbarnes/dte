@@ -34,6 +34,14 @@ static char *expand_file(void)
     return xstrdup(v->buffer->abs_filename);
 }
 
+static char *expand_filetype(void)
+{
+    if (editor.status != EDITOR_RUNNING) {
+        return NULL;
+    }
+    return xstrdup(buffer->options.filetype);
+}
+
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
@@ -68,6 +76,7 @@ static const BuiltinEnv builtin[] = {
     {"PKGDATADIR", expand_pkgdatadir},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
+    {"FILETYPE", expand_filetype},
     {"WORD", expand_word},
 };
 
