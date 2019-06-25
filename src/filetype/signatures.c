@@ -14,7 +14,8 @@ static const FileSignatureMap signatures[] = {
     SIG("<!DOCTYPE", XML),
     SIG("<?xml", XML),
     SIG("%YAML", YAML),
-    SIG("[wrap-file]", INI),
+    SIG("[core]", INI), // .git/config file
+    SIG("[wrap-file]", INI), // Meson wrap file
     SIG("diff --git", DIFF),
 };
 

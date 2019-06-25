@@ -23,7 +23,6 @@ alias git-changes "compile -1s gitchanges sh -c \"git diff -U0 | \
 setenv LESS RS
 
 ft -f dte '/\.?dte/(config/)?(rc|((syntax|color|binding|compiler)/.*))$'
-ft -f ini '/\.git/config$'
 ft -f mail '/tmpmsg-.*\.txt$|pico\.[0-9]+|mutt(ng)?-*-\w+|mutt[a-zA-Z0-9_-]{6}'
 
 # Don't remember cursor position for git temporary files
