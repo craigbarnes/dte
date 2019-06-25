@@ -542,7 +542,7 @@ Run external _command_ and insert its output.
 `-s`
 :   Strip newline from end of the command output
 
-### **paste**
+### **paste** [**-c**]
 
 Paste.
 
