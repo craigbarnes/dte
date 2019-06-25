@@ -45,9 +45,12 @@ void term_cooked(void)
     tcsetattr(STDIN_FILENO, 0, &termios_save);
 }
 
-static void ecma48_clear_screen(void)
+void ecma48_clear_screen(void)
 {
-    term_add_literal("\033[H\033[J");
+    term_add_literal (
+        "\033[H"  // Move cursor to 1,1 (done only to mimic terminfo(5) "clear")
+        "\033[2J" // Clear whole screen (regardless of cursor position)
+    );
 }
 
 void ecma48_clear_to_eol(void)

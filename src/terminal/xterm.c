@@ -3,11 +3,6 @@
 #include "ecma48.h"
 #include "output.h"
 
-static void xterm_clear_screen(void)
-{
-    term_add_literal("\033[H\033[2J");
-}
-
 void xterm_save_title(void)
 {
     term_add_literal("\033[22;2t");
@@ -90,7 +85,7 @@ const Terminal xterm = {
     .cooked = &term_cooked,
     .parse_key_sequence = &xterm_parse_key,
     .put_control_code = &term_add_string_view,
-    .clear_screen = &xterm_clear_screen,
+    .clear_screen = &ecma48_clear_screen,
     .clear_to_eol = &ecma48_clear_to_eol,
     .set_color = &xterm_set_color,
     .move_cursor = &ecma48_move_cursor,
