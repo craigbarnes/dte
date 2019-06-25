@@ -110,6 +110,8 @@ Commands:
 .br
    \fBpgup\fR [\fB\-cl\fR]
 .br
+   \fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
+.br
    \fBprev\fR
 .br
    \fBquit\fR [\fB\-f\fR]
@@ -986,6 +988,21 @@ Select characters
 .TP
 \fB\-l\fR
 Select whole lines
+.PP
+.RE
+\fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
+.RS
+Run external \fIcommand\fR and pipe currently selected text (or whole file)
+to its standard input stream.
+.P
+Can be used to e.g. write text to the system clipboard:
+.P
+.IP
+.nf
+\f[C]
+pipe\-to\ xsel\ \-b
+\f[]
+.fi
 .PP
 .RE
 \fBprev\fR

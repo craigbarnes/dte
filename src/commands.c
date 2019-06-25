@@ -854,6 +854,37 @@ static void cmd_pgup(const CommandArgs *a)
     move_up(count);
 }
 
+static void cmd_pipe_to(const CommandArgs *a)
+{
+    const BlockIter saved_cursor = view->cursor;
+    const ssize_t saved_sel_so = view->sel_so;
+    const ssize_t saved_sel_eo = view->sel_eo;
+    FilterData data;
+
+    if (view->selection) {
+        data.in_len = prepare_selection(view);
+    } else {
+        Block *blk;
+        data.in_len = 0;
+        list_for_each_entry(blk, &buffer->blocks, node) {
+            data.in_len += blk->size;
+        }
+        move_bof();
+    }
+
+    data.in = block_iter_get_bytes(&view->cursor, data.in_len);
+    if (spawn_filter(a->args, &data) == 0) {
+        free(data.out);
+    }
+
+    free(data.in);
+
+    // Restore cursor and selection offsets, instead of calling unselect()
+    view->cursor = saved_cursor;
+    view->sel_so = saved_sel_so;
+    view->sel_eo = saved_sel_eo;
+}
+
 static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 {
     set_view(ptr_array_prev(&window->views, view));
@@ -1843,6 +1874,7 @@ const Command commands[] = {
     {"paste", "c", 0, 0, cmd_paste},
     {"pgdown", "cl", 0, 0, cmd_pgdown},
     {"pgup", "cl", 0, 0, cmd_pgup},
+    {"pipe-to", "-", 1, -1, cmd_pipe_to},
     {"prev", "", 0, 0, cmd_prev},
     {"quit", "fp", 0, 0, cmd_quit},
     {"redo", "", 0, 1, cmd_redo},

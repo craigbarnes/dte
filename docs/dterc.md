@@ -569,6 +569,15 @@ Move cursor page up. See also `scroll-pgup`.
 `-l`
 :   Select whole lines
 
+### **pipe-to** _command_ [_parameter_]...
+
+Run external _command_ and pipe currently selected text (or whole file)
+to its standard input stream.
+
+Can be used to e.g. write text to the system clipboard:
+
+    pipe-to xsel -b
+
 ### **prev**
 
 Display previous file.
