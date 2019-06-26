@@ -42,3 +42,4 @@ hi diff.header cyan
 hi diff.chunk magenta
 hi diff.added bold green
 hi diff.removed bold red
+hi zig.builtin cyan

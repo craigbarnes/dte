@@ -76,19 +76,19 @@ list constant \
 list builtin \
     @ArgType @IntType @OpaqueType @TagType @This @Vector \
     @addWithOverflow @alignCast @alignOf @atomicLoad @atomicRmw \
-    @bitCast @bitOffsetOf @bitreverse @boolToInt @breakpoint \
+    @bitCast @bitOffsetOf @bitReverse @boolToInt @breakpoint \
     @byteOffsetOf @byteSwap @bytesToSlice @cDefine @cImport \
-    @cInclude @cUndef @canImplicitCast @clz @cmpxchgStrong \
-    @cmpxchgWeak @compileError @compileLog @ctz @divExact @divFloor \
+    @cInclude @cUndef @ceil @clz @cmpxchgStrong @cmpxchgWeak \
+    @compileError @compileLog @cos @ctz @divExact @divFloor \
     @divTrunc @embedFile @enumToInt @errSetCast @errorName \
-    @errorReturnTrace @errorToInt @export @fence @field \
-    @fieldParentPtr @floatCast @floatToInt @frameAddress @handle \
-    @hasDecl @import @inlineCall @intCast @intToEnum @intToError \
-    @intToFloat @intToPtr @maxValue @memberCount @memberName \
-    @memberType @memcpy @memset @minValue @mod @mulWithOverflow \
-    @newStackCall @noInlineCall @panic @popCount @ptrCast @ptrToInt \
-    @rem @returnAddress @setAlignStack @setCold @setEvalBranchQuota \
-    @setFloatMode @setGlobalLinkage @setGlobalSection \
-    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact @sizeOf \
-    @sliceToBytes @sqrt @subWithOverflow @tagName @truncate @typeId \
-    @typeInfo @typeName @typeOf
+    @errorReturnTrace @errorToInt @exp @exp2 @export @fabs \
+    @fence @field @fieldParentPtr @floatCast @floatToInt @floor \
+    @frameAddress @handle @hasDecl @import @inlineCall @intCast \
+    @intToEnum @intToError @intToFloat @intToPtr @ln @log10 @log2 \
+    @memberCount @memberName @memberType @memcpy @memset @mod \
+    @mulAdd @mulWithOverflow @newStackCall @noInlineCall @panic \
+    @popCount @ptrCast @ptrToInt @rem @returnAddress @round \
+    @setAlignStack @setCold @setEvalBranchQuota @setFloatMode \
+    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact @sin \
+    @sizeOf @sliceToBytes @sqrt @subWithOverflow @tagName @trunc \
+    @truncate @typeId @typeInfo @typeName @typeOf
