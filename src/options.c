@@ -311,15 +311,16 @@ static bool flag_parse (
     const char *str,
     OptionValue *value
 ) {
-    const char **values = desc->u.flag_opt.values;
-    const char *ptr = str;
-    unsigned int val, flags = 0;
-
-    // "0" is allowed for compatibility and is same as ""
-    if (str_to_uint(str, &val) && val == 0) {
-        value->uint_val = val;
+    // "0" is allowed for compatibility and is the same as ""
+    if (str[0] == '0' && str[1] == '\0') {
+        value->uint_val = 0;
         return true;
     }
+
+    const char **values = desc->u.flag_opt.values;
+    const char *ptr = str;
+    unsigned int flags = 0;
+
     while (*ptr) {
         const char *end = strchr(ptr, ',');
         size_t len;
