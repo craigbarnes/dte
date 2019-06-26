@@ -27,6 +27,7 @@ typedef struct {
     const char *name;
 } Encoding;
 
+const char *encoding_type_to_string(EncodingType type);
 Encoding encoding_from_name(const char *name) NONNULL_ARGS;
 EncodingType lookup_encoding(const char *name) NONNULL_ARGS;
 

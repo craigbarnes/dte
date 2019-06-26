@@ -52,10 +52,10 @@ EncodingType lookup_encoding(const char *name)
     return UNKNOWN_ENCODING;
 }
 
-static const char *encoding_type_to_string(EncodingType type)
+const char *encoding_type_to_string(EncodingType type)
 {
     if (type < NR_ENCODING_TYPES && type != UNKNOWN_ENCODING) {
-        return encoding_names[type];
+        return str_intern(encoding_names[type]);
     }
     return NULL;
 }
@@ -69,7 +69,7 @@ Encoding encoding_from_name(const char *name)
         normalized_name = str_intern(upper);
         free(upper);
     } else {
-        normalized_name = str_intern(encoding_type_to_string(type));
+        normalized_name = encoding_type_to_string(type);
     }
 
     return (Encoding) {

@@ -136,6 +136,8 @@ static int decode_and_add_blocks (
         } else {
             b->encoding = editor.charset;
         }
+    } else {
+        b->encoding.name = encoding_type_to_string(b->encoding.type);
     }
 
     free_file_decoder(dec);
