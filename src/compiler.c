@@ -48,6 +48,9 @@ void add_error_fmt (
                 break;
             }
         }
+        if (streq(desc[i], "_")) {
+            continue;
+        }
         if (j == ARRAY_COUNT(names)) {
             error_msg("Unknown substring name %s.", desc[i]);
             return;

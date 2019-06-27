@@ -1851,7 +1851,7 @@ const Command commands[] = {
     {"erase", "", 0, 0, cmd_erase},
     {"erase-bol", "", 0, 0, cmd_erase_bol},
     {"erase-word", "s", 0, 0, cmd_erase_word},
-    {"errorfmt", "i", 2, 6, cmd_errorfmt},
+    {"errorfmt", "i", 2, 18, cmd_errorfmt},
     {"eval", "-", 1, -1, cmd_eval},
     {"filter", "-", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
