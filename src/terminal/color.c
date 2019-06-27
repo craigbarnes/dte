@@ -93,9 +93,9 @@ static int32_t parse_rrggbb(const char *str)
         }
         digits[i] = val;
     }
-    uint8_t r = (digits[0] * 16) + digits[1];
-    uint8_t g = (digits[2] * 16) + digits[3];
-    uint8_t b = (digits[4] * 16) + digits[5];
+    uint8_t r = (digits[0] << 4) + digits[1];
+    uint8_t g = (digits[2] << 4) + digits[3];
+    uint8_t b = (digits[4] << 4) + digits[5];
     return color_join_rgb(r, g, b);
 }
 
