@@ -73,16 +73,6 @@ compare:
     return memcmp(s, cmp_str, len) ? COLOR_INVALID : cmp_val;
 }
 
-static int32_t color_join_rgb(uint8_t r, uint8_t g, uint8_t b)
-{
-    return
-        (((int32_t)((r) & 0xff)) << 16)
-        | (((int32_t)((g) & 0xff)) << 8)
-        | (((int32_t)((b) & 0xff)))
-        | COLOR_FLAG_RGB
-    ;
-}
-
 static int32_t parse_rrggbb(const char *str)
 {
     uint8_t digits[6];
@@ -93,10 +83,10 @@ static int32_t parse_rrggbb(const char *str)
         }
         digits[i] = val;
     }
-    uint8_t r = (digits[0] << 4) + digits[1];
-    uint8_t g = (digits[2] << 4) + digits[3];
-    uint8_t b = (digits[4] << 4) + digits[5];
-    return color_join_rgb(r, g, b);
+    uint32_t r = (digits[0] << 4) + digits[1];
+    uint32_t g = (digits[2] << 4) + digits[3];
+    uint32_t b = (digits[4] << 4) + digits[5];
+    return r << 16 | g << 8 | b | COLOR_FLAG_RGB;
 }
 
 UNITTEST {
