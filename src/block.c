@@ -30,7 +30,7 @@ static void sanity_check(void)
 #endif
 }
 
-static inline size_t ALLOC_ROUND(size_t size)
+static size_t ALLOC_ROUND(size_t size)
 {
     return ROUND_UP(size, 64);
 }

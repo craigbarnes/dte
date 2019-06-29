@@ -20,7 +20,7 @@ void xterm_set_title(const char *title)
     term_add_byte('\007');
 }
 
-static inline void do_set_color(int32_t color, char ch)
+static void do_set_color(int32_t color, char ch)
 {
     if (color < 0) {
         return;

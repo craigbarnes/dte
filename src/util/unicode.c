@@ -11,7 +11,7 @@ typedef struct {
 
 #include "wcwidth.c"
 
-static inline PURE bool bisearch (
+static bool bisearch (
     CodePoint u,
     const CodepointRange *const range,
     size_t max

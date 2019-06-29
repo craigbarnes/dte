@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include "unicode.h"
 
-CONST_FN
 static inline size_t u_char_size(CodePoint uch)
 {
     if (uch <= UINT32_C(0x7f)) {

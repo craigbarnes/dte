@@ -184,7 +184,7 @@ static void tputs_move_cursor(int x, int y)
     }
 }
 
-static inline bool attr_is_set(const TermColor *color, unsigned short attr)
+static bool attr_is_set(const TermColor *color, unsigned short attr)
 {
     if (!(color->attr & attr)) {
         return false;

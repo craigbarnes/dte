@@ -20,7 +20,7 @@ static char *bindings_lookup_table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
 // Fallback for all other keys (Unicode combos etc.)
 static PointerArray bindings_ptr_array = PTR_ARRAY_INIT;
 
-static CONST_FN ssize_t key_lookup_index(KeyCode k)
+static ssize_t key_lookup_index(KeyCode k)
 {
     const KeyCode modifiers = keycode_get_modifiers(k);
     const KeyCode key = keycode_get_key(k);

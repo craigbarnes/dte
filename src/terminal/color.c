@@ -203,7 +203,7 @@ bool parse_term_color(TermColor *color, char **strs)
     return true;
 }
 
-static CONST_FN int color_dist_sq (
+static int color_dist_sq (
     uint8_t R, uint8_t G, uint8_t B,
     uint8_t r, uint8_t g, uint8_t b
 ) {
@@ -211,7 +211,7 @@ static CONST_FN int color_dist_sq (
 }
 
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
-static CONST_FN uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
+static uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
 {
     if (c < 48) {
         return 0;
@@ -232,7 +232,7 @@ static uint8_t cube_index_to_rgb_component(uint8_t idx)
     return color_stops[idx];
 }
 
-static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
+static uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
     uint8_t r_stop = cube_index_to_rgb_component(r_idx);
@@ -264,7 +264,7 @@ static PURE uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
     }
 }
 
-static PURE uint8_t color_256_to_16(uint8_t color)
+static uint8_t color_256_to_16(uint8_t color)
 {
     static const uint8_t table[256] = {
          0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,

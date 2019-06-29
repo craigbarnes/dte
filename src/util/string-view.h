@@ -41,7 +41,7 @@ typedef struct {
     string_view_has_prefix_icase((sv), (prefix), STRLEN(prefix)) \
 )
 
-static inline PURE StringView string_view(const char *str, size_t length)
+static inline StringView string_view(const char *str, size_t length)
 {
     return (StringView) {
         .data = str,
@@ -49,7 +49,7 @@ static inline PURE StringView string_view(const char *str, size_t length)
     };
 }
 
-static inline PURE StringView string_view_from_cstring(const char *str)
+static inline StringView string_view_from_cstring(const char *str)
 {
     return (StringView) {
         .data = str,
@@ -57,13 +57,13 @@ static inline PURE StringView string_view_from_cstring(const char *str)
     };
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_equal(const StringView *a, const StringView *b)
 {
     return a->length == b->length && memcmp(a->data, b->data, a->length) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_equal_strn (
     const StringView *sv,
     const char *str,
@@ -72,7 +72,7 @@ static inline bool string_view_equal_strn (
     return len == sv->length && memcmp(sv->data, str, len) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_equal_strn_icase (
     const StringView *sv,
     const char *str,
@@ -81,13 +81,13 @@ static inline bool string_view_equal_strn_icase (
     return len == sv->length && mem_equal_icase(sv->data, str, len);
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
 {
     return string_view_equal_strn(sv, str, strlen(str));
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_has_prefix (
     const StringView *sv,
     const char *str,
@@ -96,7 +96,7 @@ static inline bool string_view_has_prefix (
     return sv->length >= length && memcmp(sv->data, str, length) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool string_view_has_prefix_icase (
     const StringView *sv,
     const char *str,
@@ -105,13 +105,13 @@ static inline bool string_view_has_prefix_icase (
     return sv->length >= length && mem_equal_icase(sv->data, str, length);
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline void *string_view_memchr(const StringView *sv, int c)
 {
     return memchr(sv->data, c, sv->length);
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline void *string_view_memrchr(const StringView *sv, int c)
 {
     const unsigned char *s = sv->data;

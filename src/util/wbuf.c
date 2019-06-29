@@ -11,7 +11,7 @@
 } while (0)
 
 NONNULL_ARGS
-static inline size_t wbuf_avail(WriteBuffer *wbuf)
+static size_t wbuf_avail(WriteBuffer *wbuf)
 {
     return sizeof(wbuf->buf) - wbuf->fill;
 }

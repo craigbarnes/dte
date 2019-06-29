@@ -9,13 +9,12 @@
 
 #define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {
     return strcmp(a, b) == 0;
 }
 
-PURE
 static inline bool xstreq(const char *a, const char *b)
 {
     if (a == b) {
@@ -26,13 +25,13 @@ static inline bool xstreq(const char *a, const char *b)
     return streq(a, b);
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {
     return strncmp(str, prefix, strlen(prefix)) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool str_has_suffix(const char *str, const char *suffix)
 {
     size_t l1 = strlen(str);
@@ -43,13 +42,13 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
     return memcmp(str + l1 - l2, suffix, l2) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 {
     return memcmp(s1, s2, n) == 0;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline size_t count_nl(const char *buf, size_t size)
 {
     const char *end = buf + size;
@@ -65,7 +64,7 @@ static inline size_t count_nl(const char *buf, size_t size)
     return nl;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline size_t count_strings(char **strings)
 {
     size_t count = 0;

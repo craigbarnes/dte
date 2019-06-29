@@ -83,7 +83,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     ptr_array_add(&filetypes, ft);
 }
 
-static inline StringView get_ext(const StringView filename)
+static StringView get_ext(const StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;
     if (filename.length < 3) {

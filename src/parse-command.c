@@ -49,7 +49,7 @@ static size_t unicode_escape(const char *str, size_t count, String *buf)
     return i;
 }
 
-static inline size_t min(size_t a, size_t b)
+static size_t min(size_t a, size_t b)
 {
     return (a < b) ? a : b;
 }

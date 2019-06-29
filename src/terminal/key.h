@@ -57,13 +57,11 @@ enum {
 
 typedef uint32_t KeyCode;
 
-CONST_FN
 static inline KeyCode keycode_get_key(KeyCode k)
 {
     return k & ~MOD_MASK;
 }
 
-CONST_FN
 static inline KeyCode keycode_get_modifiers(KeyCode k)
 {
     return k & MOD_MASK;

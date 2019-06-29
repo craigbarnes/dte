@@ -37,25 +37,22 @@ extern const uint8_t ascii_table[256];
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
-CONST_FN
 static inline bool ascii_isblank(unsigned char c)
 {
     return c == ' ' || c == '\t';
 }
 
-CONST_FN
 static inline unsigned char ascii_tolower(unsigned char c)
 {
     return c + (ascii_table[c] & ASCII_UPPER);
 }
 
-CONST_FN
 static inline unsigned char ascii_toupper(unsigned char c)
 {
     return c - ((ascii_table[c] & ASCII_LOWER) << 1);
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool ascii_streq_icase(const char *s1, const char *s2)
 {
     unsigned char c1, c2;
@@ -76,7 +73,7 @@ static inline bool ascii_streq_icase(const char *s1, const char *s2)
     return chars_equal;
 }
 
-PURE NONNULL_ARGS
+NONNULL_ARGS
 static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
 {
     const unsigned char *s1 = p1;
@@ -90,7 +87,6 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
     return true;
 }
 
-PURE
 static inline int hex_decode(unsigned char c)
 {
     if (ascii_isxdigit(c)) {

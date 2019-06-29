@@ -56,7 +56,7 @@ static size_t encoding_char_size(const char *encoding)
     return 1;
 }
 
-static inline size_t iconv_wrapper (
+static size_t iconv_wrapper (
     iconv_t cd,
     char **restrict inbuf,
     size_t *restrict inbytesleft,
@@ -300,7 +300,6 @@ char *cconv_consume_line(struct cconv *c, size_t *len)
 char *cconv_consume_all(struct cconv *c, size_t *len)
 {
     char *buf = c->obuf + c->consumed;
-
     *len = c->opos - c->consumed;
     c->consumed = c->opos;
     return buf;

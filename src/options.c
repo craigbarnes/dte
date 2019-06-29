@@ -452,12 +452,12 @@ static const OptionDesc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
 
-static inline char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
+static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
     return (char*)opt + desc->offset;
 }
 
-static inline char *global_ptr(const OptionDesc *desc)
+static char *global_ptr(const OptionDesc *desc)
 {
     return (char*)&editor.options + desc->offset;
 }

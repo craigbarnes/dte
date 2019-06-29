@@ -58,7 +58,7 @@ static void handle_fatal_signal(int signum)
     raise(signum);
 }
 
-static inline void do_sigaction(int sig, const struct sigaction *action)
+static void do_sigaction(int sig, const struct sigaction *action)
 {
     if (sigaction(sig, action, NULL) != 0) {
         BUG("Failed to add handler for signal %d: %s", sig, strerror(errno));

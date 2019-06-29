@@ -19,7 +19,7 @@ static const FileSignatureMap signatures[] = {
     SIG("diff --git", DIFF),
 };
 
-static PURE FileTypeEnum filetype_from_signature(const StringView sv)
+static FileTypeEnum filetype_from_signature(const StringView sv)
 {
     if (sv.length < 5) {
         return NONE;
