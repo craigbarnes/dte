@@ -52,7 +52,7 @@ EncodingType lookup_encoding(const char *name)
     return UNKNOWN_ENCODING;
 }
 
-const char *encoding_type_to_string(EncodingType type)
+static const char *encoding_type_to_string(EncodingType type)
 {
     if (type < NR_ENCODING_TYPES && type != UNKNOWN_ENCODING) {
         return str_intern(encoding_names[type]);
@@ -75,5 +75,13 @@ Encoding encoding_from_name(const char *name)
     return (Encoding) {
         .type = type,
         .name = normalized_name
+    };
+}
+
+Encoding encoding_from_type(EncodingType type)
+{
+    return (Encoding) {
+        .type = type,
+        .name = encoding_type_to_string(type)
     };
 }

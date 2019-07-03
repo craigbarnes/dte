@@ -65,31 +65,31 @@ static int decode_and_add_blocks (
         if (bom_type != UNKNOWN_ENCODING) {
             // UTF-16BE/LE or UTF-32BE/LE
             BUG_ON(b->encoding.name != NULL);
-            b->encoding.type = bom_type;
+            b->encoding = encoding_from_type(bom_type);
         }
         break;
     case UTF16:
         switch (bom_type) {
         case UTF16LE:
         case UTF16BE:
-            b->encoding.type = bom_type;
+            b->encoding = encoding_from_type(bom_type);
             break;
         default:
             // "open -e UTF-16" but incompatible or no BOM.
             // Do what the user wants. Big-endian is default.
-            b->encoding.type = UTF16BE;
+            b->encoding = encoding_from_type(UTF16BE);
         }
         break;
     case UTF32:
         switch (bom_type) {
         case UTF32LE:
         case UTF32BE:
-            b->encoding.type = bom_type;
+            b->encoding = encoding_from_type(bom_type);
             break;
         default:
             // "open -e UTF-32" but incompatible or no BOM.
             // Do what the user wants. Big-endian is default.
-            b->encoding.type = UTF32BE;
+            b->encoding = encoding_from_type(UTF32BE);
         }
         break;
     default:
@@ -136,8 +136,6 @@ static int decode_and_add_blocks (
         } else {
             b->encoding = editor.charset;
         }
-    } else {
-        b->encoding.name = encoding_type_to_string(b->encoding.type);
     }
 
     free_file_decoder(dec);
