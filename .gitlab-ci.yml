@@ -4,6 +4,7 @@ before_script:
     - git fetch --tags
     - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
     - make vars
+    - iconv -l || true
 
 build:alpine:
     stage: build
