@@ -166,10 +166,16 @@ state bol string
     noeat string
 
 state string
+    char \\ esc
     char "\n" bol
     char \` .sh-backtick:this
     char \$ .sh-dollar:this
     eat this
+
+state esc special
+    char "\n\\`$" string special
+    recolor error 1
+    noeat string
 
 state match special
     char "\n" END
