@@ -582,7 +582,7 @@ Can be used to e.g. write text to the system clipboard:
 
 Display previous file.
 
-### **quit** [**-f**]
+### **quit** [**-fp**]
 
 Quit.
 
