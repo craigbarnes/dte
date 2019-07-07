@@ -35,8 +35,8 @@ build_subdirs := $(addprefix build/, $(addsuffix /, \
     editorconfig encoding syntax terminal util test ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec hashmap intern path ptr-array readfile string strtonum \
-    unicode utf8 wbuf xmalloc xreadwrite xsnprintf )
+    ascii exec hashset intern path ptr-array readfile string \
+    strtonum unicode utf8 wbuf xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
@@ -45,7 +45,7 @@ encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder encoding )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
-    bitset color hashset highlight state syntax )
+    bitset color highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key no-op output terminal terminfo xterm xterm-keys )

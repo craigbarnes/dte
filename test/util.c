@@ -1,10 +1,10 @@
 #include <limits.h>
 #include <stdlib.h>
 #include "test.h"
-#include "../src/syntax/hashset.h"
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
 #include "../src/util/checked-arith.h"
+#include "../src/util/hashset.h"
 #include "../src/util/intern.h"
 #include "../src/util/path.h"
 #include "../src/util/str-util.h"
@@ -618,24 +618,24 @@ static void test_hashset(void)
     hashset_init(&set, ARRAY_COUNT(strings), false);
     hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
 
-    EXPECT_TRUE(hashset_contains(&set, "\t\xff\x80\b", 4));
-    EXPECT_TRUE(hashset_contains(&set, "foo", 3));
-    EXPECT_TRUE(hashset_contains(&set, "Foo", 3));
+    EXPECT_NONNULL(hashset_get(&set, "\t\xff\x80\b", 4));
+    EXPECT_NONNULL(hashset_get(&set, "foo", 3));
+    EXPECT_NONNULL(hashset_get(&set, "Foo", 3));
 
-    EXPECT_FALSE(hashset_contains(&set, "FOO", 3));
-    EXPECT_FALSE(hashset_contains(&set, "", 0));
-    EXPECT_FALSE(hashset_contains(&set, NULL, 0));
-    EXPECT_FALSE(hashset_contains(&set, "\0", 1));
+    EXPECT_NULL(hashset_get(&set, "FOO", 3));
+    EXPECT_NULL(hashset_get(&set, "", 0));
+    EXPECT_NULL(hashset_get(&set, NULL, 0));
+    EXPECT_NULL(hashset_get(&set, "\0", 1));
 
     const char *last_string = strings[ARRAY_COUNT(strings) - 1];
-    EXPECT_TRUE(hashset_contains(&set, last_string, strlen(last_string)));
+    EXPECT_NONNULL(hashset_get(&set, last_string, strlen(last_string)));
 
     FOR_EACH_I(i, strings) {
         const char *str = strings[i];
         const size_t len = strlen(str);
-        EXPECT_TRUE(hashset_contains(&set, str, len));
-        EXPECT_FALSE(hashset_contains(&set, str, len - 1));
-        EXPECT_FALSE(hashset_contains(&set, str + 1, len - 1));
+        EXPECT_NONNULL(hashset_get(&set, str, len));
+        EXPECT_NULL(hashset_get(&set, str, len - 1));
+        EXPECT_NULL(hashset_get(&set, str + 1, len - 1));
     }
 
     hashset_free(&set);
@@ -643,9 +643,23 @@ static void test_hashset(void)
 
     hashset_init(&set, ARRAY_COUNT(strings), true);
     hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
-    EXPECT_TRUE(hashset_contains(&set, "foo", 3));
-    EXPECT_TRUE(hashset_contains(&set, "FOO", 3));
-    EXPECT_TRUE(hashset_contains(&set, "fOO", 3));
+    EXPECT_NONNULL(hashset_get(&set, "foo", 3));
+    EXPECT_NONNULL(hashset_get(&set, "FOO", 3));
+    EXPECT_NONNULL(hashset_get(&set, "fOO", 3));
+    hashset_free(&set);
+    memzero(&set);
+
+    // Check that hashset_add() returns existing entries instead of
+    // inserting duplicates
+    hashset_init(&set, 0, false);
+    EXPECT_EQ(set.nr_entries, 0);
+    HashSetEntry *e1 = hashset_add(&set, "foo", 3);
+    EXPECT_EQ(e1->str_len, 3);
+    EXPECT_STREQ(e1->str, "foo");
+    EXPECT_EQ(set.nr_entries, 1);
+    HashSetEntry *e2 = hashset_add(&set, "foo", 3);
+    EXPECT_PTREQ(e1, e2);
+    EXPECT_EQ(set.nr_entries, 1);
     hashset_free(&set);
 }
 

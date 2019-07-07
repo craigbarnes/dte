@@ -51,23 +51,23 @@ void hashset_free(HashSet *set)
     free(set->table);
 }
 
-bool hashset_contains(const HashSet *set, const char *str, size_t str_len)
-{
-    uint32_t hash = set->hash(str, str_len);
-    HashSetEntry *h = set->table[hash % set->table_size];
-    while (h) {
-        if (str_len == h->str_len && set->equal(str, h->str, str_len)) {
-            return true;
-        }
-        h = h->next;
-    }
-    return false;
-}
-
 static size_t get_slot(const HashSet *set, const char *str, size_t str_len)
 {
     const uint32_t hash = set->hash(str, str_len);
     return (size_t)hash & (set->table_size - 1);
+}
+
+HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len)
+{
+    const size_t slot = get_slot(set, str, str_len);
+    HashSetEntry *h = set->table[slot];
+    while (h) {
+        if (str_len == h->str_len && set->equal(str, h->str, str_len)) {
+            return h;
+        }
+        h = h->next;
+    }
+    return NULL;
 }
 
 static void rehash(HashSet *set, size_t newsize)
@@ -88,18 +88,26 @@ static void rehash(HashSet *set, size_t newsize)
     free(oldtable);
 }
 
-void hashset_add(HashSet *set, const char *str, size_t str_len)
+HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
 {
+    HashSetEntry *h = hashset_get(set, str, str_len);
+    if (h) {
+        return h;
+    }
+
     const size_t slot = get_slot(set, str, str_len);
-    HashSetEntry *h = xmalloc(sizeof(*h) + str_len);
+    h = xmalloc(sizeof(*h) + str_len + 1);
     h->next = set->table[slot];
     h->str_len = str_len;
     memcpy(h->str, str, str_len);
+    h->str[str_len] = '\0';
     set->table[slot] = h;
 
     if (++set->nr_entries > set->grow_at) {
         rehash(set, set->table_size << 1);
     }
+
+    return h;
 }
 
 void hashset_add_many(HashSet *set, char **strings, size_t nstrings)

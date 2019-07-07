@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "bitset.h"
 #include "color.h"
-#include "hashset.h"
+#include "../util/hashset.h"
 #include "../util/ptr-array.h"
 
 typedef enum {

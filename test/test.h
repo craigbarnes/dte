@@ -12,6 +12,8 @@
 #define EXPECT_PTREQ(p1, p2) expect_ptreq(__FILE__, __LINE__, p1, p2)
 #define EXPECT_EQ(a, b) expect_eq(__FILE__, __LINE__, a, b)
 #define EXPECT_UINT_EQ(a, b) expect_uint_eq(__FILE__, __LINE__, a, b)
+#define EXPECT_NULL(p) expect_null(__FILE__, __LINE__, p)
+#define EXPECT_NONNULL(p) expect_nonnull(__FILE__, __LINE__, p)
 #define EXPECT_TRUE(x) EXPECT_EQ(!!(x), 1)
 #define EXPECT_FALSE(x) EXPECT_EQ(x, 0)
 
@@ -31,6 +33,8 @@ void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(const char *file, int line, const void *p1, const void *p2);
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
 void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b);
+void expect_null(const char *file, int line, const void *p);
+void expect_nonnull(const char *file, int line, const void *p);
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2);
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 

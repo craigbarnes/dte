@@ -134,7 +134,7 @@ static HlColor **highlight_line (
             case COND_INLIST:
                 if (
                     sidx >= 0
-                    && hashset_contains (
+                    && hashset_get (
                         &cond->u.cond_inlist.list->strings,
                         line + sidx,
                         i - sidx

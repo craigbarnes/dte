@@ -65,6 +65,20 @@ void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b)
     }
 }
 
+void expect_null(const char *file, int line, const void *ptr)
+{
+    if (unlikely(ptr != NULL)) {
+        test_fail(file, line, "Expected NULL, but got: %p", ptr);
+    }
+}
+
+void expect_nonnull(const char *file, int line, const void *ptr)
+{
+    if (unlikely(ptr == NULL)) {
+        test_fail(file, line, "Unexpected NULL pointer");
+    }
+}
+
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2)
 {
     if (unlikely(!xstreq(s1, s2))) {
