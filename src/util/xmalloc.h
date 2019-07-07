@@ -1,6 +1,7 @@
 #ifndef UTIL_XMALLOC_H
 #define UTIL_XMALLOC_H
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
@@ -52,6 +53,15 @@ static inline size_t ROUND_UP(size_t x, size_t r)
 {
     r--;
     return (x + r) & ~r;
+}
+
+static inline size_t round_size_to_next_power_of_2(size_t x)
+{
+    x--;
+    for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
+        x |= x >> i;
+    }
+    return x + 1;
 }
 
 XSTRDUP

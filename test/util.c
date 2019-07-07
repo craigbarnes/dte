@@ -615,7 +615,8 @@ static void test_hashset(void)
     };
 
     HashSet set;
-    hashset_init(&set, (char**)strings, ARRAY_COUNT(strings), false);
+    hashset_init(&set, ARRAY_COUNT(strings), false);
+    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
 
     EXPECT_TRUE(hashset_contains(&set, "\t\xff\x80\b", 4));
     EXPECT_TRUE(hashset_contains(&set, "foo", 3));
@@ -640,7 +641,8 @@ static void test_hashset(void)
     hashset_free(&set);
     memzero(&set);
 
-    hashset_init(&set, (char**)strings, ARRAY_COUNT(strings), true);
+    hashset_init(&set, ARRAY_COUNT(strings), true);
+    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
     EXPECT_TRUE(hashset_contains(&set, "foo", 3));
     EXPECT_TRUE(hashset_contains(&set, "FOO", 3));
     EXPECT_TRUE(hashset_contains(&set, "fOO", 3));
@@ -661,6 +663,24 @@ static void test_round_up(void)
     EXPECT_EQ(ROUND_UP(256, 256), 256);
     EXPECT_EQ(ROUND_UP(257, 256), 512);
     EXPECT_EQ(ROUND_UP(8000, 256), 8192);
+}
+
+static void test_round_size_to_next_power_of_2(void)
+{
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(0), 0);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(1), 1);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(2), 2);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(3), 4);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(4), 4);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(5), 8);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(8), 8);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(9), 16);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(17), 32);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(61), 64);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(64), 64);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(200), 256);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(1000), 1024);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(5500), 8192);
 }
 
 void test_bitop(void)
@@ -870,6 +890,7 @@ void test_util(void)
     test_u_prev_char();
     test_hashset();
     test_round_up();
+    test_round_size_to_next_power_of_2();
     test_bitop();
     test_path_dirname_and_path_basename();
     test_path_absolute();

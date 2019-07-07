@@ -309,7 +309,9 @@ static void cmd_list(const CommandArgs *a)
     list->defined = true;
 
     bool icase = a->flags[0] == 'i';
-    hashset_init(&list->strings, args + 1, count_strings(args) - 1, icase);
+    size_t nstrings = count_strings(args) - 1;
+    hashset_init(&list->strings, nstrings, icase);
+    hashset_add_many(&list->strings, args + 1, nstrings);
 }
 
 static void cmd_inlist(const CommandArgs *a)
