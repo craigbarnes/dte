@@ -292,9 +292,9 @@ static void test_buf_parse_ulong(void)
     }
 
     unsigned long val;
-    EXPECT_TRUE(buf_parse_ulong("0", 1, &val));
+    EXPECT_EQ(buf_parse_ulong("0", 1, &val), 1);
     EXPECT_EQ(val, 0);
-    EXPECT_TRUE(buf_parse_ulong("9876", 4, &val));
+    EXPECT_EQ(buf_parse_ulong("9876", 4, &val), 4);
     EXPECT_EQ(val, 9876);
 }
 

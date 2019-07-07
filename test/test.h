@@ -14,17 +14,17 @@
 #define EXPECT_UINT_EQ(a, b) expect_uint_eq(__FILE__, __LINE__, a, b)
 #define EXPECT_NULL(p) expect_null(__FILE__, __LINE__, p)
 #define EXPECT_NONNULL(p) expect_nonnull(__FILE__, __LINE__, p)
-#define EXPECT_TRUE(x) EXPECT_EQ(!!(x), 1)
-#define EXPECT_FALSE(x) EXPECT_EQ(x, 0)
+#define EXPECT_TRUE(x) EXPECT_EQ(x, true)
+#define EXPECT_FALSE(x) EXPECT_EQ(x, false)
 
 #define IEXPECT_EQ(a, b) iexpect_eq(__FILE__, __LINE__, i, a, b)
 #define IEXPECT_STREQ(s1, s2) iexpect_streq(__FILE__, __LINE__, i, s1, s2)
-#define IEXPECT_TRUE(x) IEXPECT_EQ(!!(x), 1)
-#define IEXPECT_FALSE(x) IEXPECT_EQ(x, 0)
+#define IEXPECT_TRUE(x) IEXPECT_EQ(x, true)
+#define IEXPECT_FALSE(x) IEXPECT_EQ(x, false)
 #define IEXPECT_GT(a, b) IEXPECT_TRUE(a > b)
 
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
-#define ASSERT_TRUE(x) ASSERT_EQ(!!(x), 1)
+#define ASSERT_TRUE(x) ASSERT_EQ(x, true)
 #define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
 
 extern unsigned int failed;
