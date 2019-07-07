@@ -8,7 +8,7 @@
 #include "filetype.h"
 #include "lock.h"
 #include "syntax/state.h"
-#include "util/intern.h"
+#include "util/hashset.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/string-view.h"

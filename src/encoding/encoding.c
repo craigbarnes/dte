@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "encoding.h"
 #include "../util/ascii.h"
-#include "../util/intern.h"
+#include "../util/hashset.h"
 #include "../util/xmalloc.h"
 
 static const char encoding_names[][16] = {

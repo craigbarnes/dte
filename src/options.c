@@ -8,7 +8,7 @@
 #include "regexp.h"
 #include "screen.h"
 #include "terminal/terminal.h"
-#include "util/intern.h"
+#include "util/hashset.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"

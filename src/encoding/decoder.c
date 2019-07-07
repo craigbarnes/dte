@@ -2,7 +2,7 @@
 #include "decoder.h"
 #include "convert.h"
 #include "../editor.h"
-#include "../util/intern.h"
+#include "../util/hashset.h"
 #include "../util/utf8.h"
 #include "../util/xmalloc.h"
 

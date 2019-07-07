@@ -5,7 +5,6 @@
 #include "../src/util/bit.h"
 #include "../src/util/checked-arith.h"
 #include "../src/util/hashset.h"
-#include "../src/util/intern.h"
 #include "../src/util/path.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
