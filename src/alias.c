@@ -72,11 +72,11 @@ void add_alias(const char *name, const char *value)
     }
 }
 
-static int alias_cmp(const void *const ap, const void *const bp)
+static int alias_cmp(const void *ap, const void *bp)
 {
-    const CommandAlias *a = *(const CommandAlias **)ap;
-    const CommandAlias *b = *(const CommandAlias **)bp;
-    return strcmp(a->name, b->name);
+    const CommandAlias *const *a = ap;
+    const CommandAlias *const *b = bp;
+    return strcmp((*a)->name, (*b)->name);
 }
 
 void sort_aliases(void)
