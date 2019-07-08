@@ -33,6 +33,12 @@ by \fBctags\fR(1).
 Read configuration from \fIrcfile\fR instead of \fB~/.dte/rc\fR.
 .
 .TP
+.BI \-s " file"
+Load \fIfile\fR as a \fBdte\-syntax\fR(5) file and exit. Any errors
+encountered are printed to \fBstderr\fR(3) and the exit status is
+set appropriately.
+.
+.TP
 .BI \-b " rcname"
 Dump the contents of the built\-in rc or syntax file named \fIrcname\fR
 and exit.

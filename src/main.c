@@ -16,6 +16,7 @@
 #include "move.h"
 #include "screen.h"
 #include "search.h"
+#include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "terminal/color.h"
 #include "terminal/input.h"
@@ -166,6 +167,7 @@ static const char usage[] =
     "   -c COMMAND  Run COMMAND after editor starts\n"
     "   -t CTAG     Jump to source location of CTAG\n"
     "   -r RCFILE   Read user config from RCFILE instead of ~/.dte/rc\n"
+    "   -s FILE     Validate dte-syntax commands in FILE and exit\n"
     "   -b NAME     Print built-in config matching NAME and exit\n"
     "   -B          Print list of built-in config names and exit\n"
     "   -H          Don't load or save history files\n"
@@ -177,10 +179,11 @@ static const char usage[] =
 
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVb:c:t:r:";
+    static const char optstring[] = "hBHKRVb:c:t:r:s:";
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
+    const char *lint_syntax = NULL;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
@@ -199,6 +202,9 @@ int main(int argc, char *argv[])
         case 'r':
             rc = optarg;
             break;
+        case 's':
+            lint_syntax = optarg;
+            goto loop_break;
         case 'R':
             read_rc = false;
             break;
@@ -212,7 +218,7 @@ int main(int argc, char *argv[])
             break;
         case 'K':
             use_showkey = true;
-            break;
+            goto loop_break;
         case 'V':
             printf("dte %s\n", editor.version);
             puts("(C) 2017-2019 Craig Barnes");
@@ -225,6 +231,21 @@ int main(int argc, char *argv[])
         default:
             return 1;
         }
+    }
+
+loop_break:
+
+    if (lint_syntax) {
+        int err;
+        const Syntax *s = load_syntax_file(lint_syntax, CFG_MUST_EXIST, &err);
+        if (s) {
+            const size_t n = s->states.count;
+            const char *p = (n > 1) ? "s" : "";
+            printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, p);
+        } else if (err == EINVAL) {
+            error_msg("%s: no default syntax found", lint_syntax);
+        }
+        return nr_errors ? 1 : 0;
     }
 
     if (!isatty(STDOUT_FILENO)) {
