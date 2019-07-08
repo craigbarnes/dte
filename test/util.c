@@ -615,8 +615,9 @@ static void test_hashset(void)
 
     HashSet set;
     hashset_init(&set, ARRAY_COUNT(strings), false);
-    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
+    EXPECT_NULL(hashset_get(&set, "foo", 3));
 
+    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
     EXPECT_NONNULL(hashset_get(&set, "\t\xff\x80\b", 4));
     EXPECT_NONNULL(hashset_get(&set, "foo", 3));
     EXPECT_NONNULL(hashset_get(&set, "Foo", 3));

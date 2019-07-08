@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hashset.h"
-#include "../util/hash.h"
-#include "../util/str-util.h"
-#include "../util/xmalloc.h"
+#include "hash.h"
+#include "str-util.h"
+#include "xmalloc.h"
 
 static void alloc_table(HashSet *set, size_t size)
 {
