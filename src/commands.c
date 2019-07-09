@@ -737,8 +737,7 @@ static void cmd_open(const CommandArgs *a)
 static void cmd_option(const CommandArgs *a)
 {
     char **args = a->args;
-    size_t argc = count_strings(args);
-    BUG_ON(argc == 0);
+    size_t argc = a->nr_args;
     char **strs = args + 1;
     size_t count = argc - 1;
 
@@ -1436,7 +1435,7 @@ static void cmd_set(const CommandArgs *a)
     }
 
     char **args = a->args;
-    size_t count = count_strings(args);
+    size_t count = a->nr_args;
     if (count == 1) {
         set_bool_option(args[0], local, global);
         return;
