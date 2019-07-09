@@ -10,6 +10,8 @@
 typedef struct {
     const char *flags;
     char **args;
+    size_t nr_flags;
+    size_t nr_args;
 } CommandArgs;
 
 typedef struct {

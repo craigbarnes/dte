@@ -100,14 +100,9 @@ static void run_command(const Command *cmds, char **av)
     // Any command can override this by calling begin_change() again.
     begin_change(CHANGE_MERGE_NONE);
 
+    CommandArgs a = {.args = av + 1};
     current_command = cmd;
-    char **args = av + 1;
-    const char *pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-    const CommandArgs a = {
-        .args = args,
-        .flags = pf
-    };
-    if (pf) {
+    if (parse_args(cmd, &a)) {
         cmd->cmd(&a);
     }
     current_command = NULL;

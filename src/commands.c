@@ -974,13 +974,8 @@ static void cmd_repeat(const CommandArgs *a)
         return;
     }
 
-    args += 2;
-    const char *pf = parse_args(args, cmd->flags, cmd->min_args, cmd->max_args);
-    const CommandArgs a2 = {
-        .args = args,
-        .flags = pf
-    };
-    if (pf) {
+    CommandArgs a2 = {.args = args + 2};
+    if (parse_args(cmd, &a2)) {
         while (count-- > 0) {
             cmd->cmd(&a2);
         }
