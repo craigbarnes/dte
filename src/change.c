@@ -369,7 +369,7 @@ static void buffer_delete_bytes_internal(size_t len, bool move_after)
     if (would_delete_last_bytes(len)) {
         BlockIter bi = view->cursor;
         CodePoint u;
-        if (buffer_prev_char(&bi, &u) && u != '\n') {
+        if (block_iter_prev_char(&bi, &u) && u != '\n') {
             // No newline before cursor
             if (--len == 0) {
                 begin_change(CHANGE_MERGE_NONE);

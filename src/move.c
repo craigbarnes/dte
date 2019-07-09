@@ -64,8 +64,8 @@ void move_to_preferred_x(long preferred_x)
     // If cursor stopped on a zero-width char, move to the next spacing char.
     // TODO: Incorporate this cursor fixup into the logic above.
     CodePoint u;
-    if (buffer_get_char(&view->cursor, &u) && u_is_zero_width(u)) {
-        buffer_next_column(&view->cursor);
+    if (block_iter_get_char(&view->cursor, &u) && u_is_zero_width(u)) {
+        block_iter_next_column(&view->cursor);
     }
 }
 
@@ -79,7 +79,7 @@ void move_cursor_left(void)
             return;
         }
     }
-    buffer_prev_column(&view->cursor);
+    block_iter_prev_column(&view->cursor);
     view_reset_preferred_x(view);
 }
 
@@ -93,7 +93,7 @@ void move_cursor_right(void)
             return;
         }
     }
-    buffer_next_column(&view->cursor);
+    block_iter_next_column(&view->cursor);
     view_reset_preferred_x(view);
 }
 
@@ -177,11 +177,11 @@ void move_to_column(View *v, size_t column)
     block_iter_bol(&v->cursor);
     while (column-- > 1) {
         CodePoint u;
-        if (!buffer_next_char(&v->cursor, &u)) {
+        if (!block_iter_next_char(&v->cursor, &u)) {
             break;
         }
         if (u == '\n') {
-            buffer_prev_char(&v->cursor, &u);
+            block_iter_prev_char(&v->cursor, &u);
             break;
         }
     }
@@ -205,7 +205,7 @@ static CharTypeEnum get_char_type(CodePoint u)
 static bool get_current_char_type(BlockIter *bi, CharTypeEnum *type)
 {
     CodePoint u;
-    if (!buffer_get_char(bi, &u)) {
+    if (!block_iter_get_char(bi, &u)) {
         return false;
     }
 
@@ -217,9 +217,9 @@ static size_t skip_fwd_char_type(BlockIter *bi, CharTypeEnum type)
 {
     size_t count = 0;
     CodePoint u;
-    while (buffer_next_char(bi, &u)) {
+    while (block_iter_next_char(bi, &u)) {
         if (get_char_type(u) != type) {
-            buffer_prev_char(bi, &u);
+            block_iter_prev_char(bi, &u);
             break;
         }
         count += u_char_size(u);
@@ -231,9 +231,9 @@ static size_t skip_bwd_char_type(BlockIter *bi, CharTypeEnum type)
 {
     size_t count = 0;
     CodePoint u;
-    while (buffer_prev_char(bi, &u)) {
+    while (block_iter_prev_char(bi, &u)) {
         if (get_char_type(u) != type) {
-            buffer_next_char(bi, &u);
+            block_iter_next_char(bi, &u);
             break;
         }
         count += u_char_size(u);
@@ -271,7 +271,7 @@ size_t word_bwd(BlockIter *bi, bool skip_non_word)
 
     do {
         count += skip_bwd_char_type(bi, CT_SPACE);
-        if (!buffer_prev_char(bi, &u)) {
+        if (!block_iter_prev_char(bi, &u)) {
             return count;
         }
 

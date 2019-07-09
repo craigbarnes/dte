@@ -25,14 +25,14 @@ void init_selection(const View *v, SelectionInfo *info)
         if (info->so == info->eo) {
             return;
         }
-        info->eo -= buffer_prev_char(&ei, &u);
+        info->eo -= block_iter_prev_char(&ei, &u);
     }
     if (v->selection == SELECT_LINES) {
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
         // Character under cursor belongs to the selection
-        info->eo += buffer_next_column(&ei);
+        info->eo += block_iter_next_column(&ei);
     }
 }
 
@@ -69,7 +69,7 @@ size_t get_nr_selected_lines(const SelectionInfo *info)
         if (u == '\n') {
             nr_lines++;
         }
-        pos += buffer_next_char(&bi, &u);
+        pos += block_iter_next_char(&bi, &u);
     }
     return nr_lines;
 }
@@ -83,7 +83,7 @@ size_t get_nr_selected_chars(const SelectionInfo *info)
 
     while (pos < info->eo) {
         nr_chars++;
-        pos += buffer_next_char(&bi, &u);
+        pos += block_iter_next_char(&bi, &u);
     }
     return nr_chars;
 }

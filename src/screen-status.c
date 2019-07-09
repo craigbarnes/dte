@@ -83,7 +83,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     f->separator = false;
 
     CodePoint u;
-    bool got_char = buffer_get_char(&v->cursor, &u) > 0;
+    bool got_char = block_iter_get_char(&v->cursor, &u) > 0;
     while (f->pos < f->size && *format) {
         char ch = *format++;
         if (ch != '%') {

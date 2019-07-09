@@ -204,7 +204,7 @@ void delete_ch(void)
         }
         if (size == 0) {
             BlockIter bi = view->cursor;
-            size = buffer_next_column(&bi);
+            size = block_iter_next_column(&bi);
         }
     }
     buffer_delete_bytes(size);
@@ -224,7 +224,7 @@ void erase(void)
         }
         if (size == 0) {
             CodePoint u;
-            size = buffer_prev_char(&view->cursor, &u);
+            size = block_iter_prev_char(&view->cursor, &u);
         }
     }
     buffer_erase_bytes(size);
@@ -239,7 +239,7 @@ static size_t goto_beginning_of_whitespace(void)
     CodePoint u;
 
     // Count spaces and tabs at or after cursor
-    while (buffer_next_char(&bi, &u)) {
+    while (block_iter_next_char(&bi, &u)) {
         if (u != '\t' && u != ' ') {
             break;
         }
@@ -247,9 +247,9 @@ static size_t goto_beginning_of_whitespace(void)
     }
 
     // Count spaces and tabs before cursor
-    while (buffer_prev_char(&view->cursor, &u)) {
+    while (block_iter_prev_char(&view->cursor, &u)) {
         if (u != '\t' && u != ' ') {
-            buffer_next_char(&view->cursor, &u);
+            block_iter_next_char(&view->cursor, &u);
             break;
         }
         count++;
@@ -418,7 +418,7 @@ static void join_selection(void)
             view->cursor = bi;
         }
 
-        count -= buffer_next_char(&bi, &ch);
+        count -= block_iter_next_char(&bi, &ch);
         if (ch == '\t' || ch == ' ') {
             len++;
         } else if (ch == '\n') {
@@ -428,8 +428,8 @@ static void join_selection(void)
             if (join) {
                 buffer_replace_bytes(len, " ", 1);
                 // Skip the space we inserted and the char we read last
-                buffer_next_char(&view->cursor, &ch);
-                buffer_next_char(&view->cursor, &ch);
+                block_iter_next_char(&view->cursor, &ch);
+                block_iter_next_char(&view->cursor, &ch);
                 bi = view->cursor;
             }
             len = 0;
@@ -473,15 +473,15 @@ void join_lines(void)
     BlockIter next = bi;
     CodePoint u;
     size_t count = 1;
-    buffer_prev_char(&bi, &u);
-    while (buffer_prev_char(&bi, &u)) {
+    block_iter_prev_char(&bi, &u);
+    while (block_iter_prev_char(&bi, &u)) {
         if (u != '\t' && u != ' ') {
-            buffer_next_char(&bi, &u);
+            block_iter_next_char(&bi, &u);
             break;
         }
         count++;
     }
-    while (buffer_next_char(&next, &u)) {
+    while (block_iter_next_char(&next, &u)) {
         if (u != '\t' && u != ' ') {
             break;
         }
@@ -863,7 +863,7 @@ void change_case(int mode)
         move = !info.swapped;
     } else {
         CodePoint u;
-        if (!buffer_get_char(&view->cursor, &u)) {
+        if (!block_iter_get_char(&view->cursor, &u)) {
             return;
         }
         text_len = u_char_size(u);

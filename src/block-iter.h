@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "block.h"
 #include "util/macros.h"
+#include "util/unicode.h"
 
 typedef struct {
     Block *blk;
@@ -44,6 +45,11 @@ void block_iter_normalize(BlockIter *bi);
 size_t block_iter_eat_line(BlockIter *bi);
 size_t block_iter_next_line(BlockIter *bi);
 size_t block_iter_prev_line(BlockIter *bi);
+size_t block_iter_get_char(BlockIter *bi, CodePoint *up);
+size_t block_iter_next_char(BlockIter *bi, CodePoint *up);
+size_t block_iter_prev_char(BlockIter *bi, CodePoint *up);
+size_t block_iter_next_column(BlockIter *bi);
+size_t block_iter_prev_column(BlockIter *bi);
 size_t block_iter_bol(BlockIter *bi);
 size_t block_iter_eol(BlockIter *bi);
 void block_iter_back_bytes(BlockIter *bi, size_t count);
