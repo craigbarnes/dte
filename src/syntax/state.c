@@ -469,6 +469,11 @@ static void cmd_syntax(const CommandArgs *a)
 
 static void cmd_include(const CommandArgs *a);
 
+// Prevent Clang whining about .max_args = -1
+#if HAS_WARNING("-Wbitfield-constant-conversion")
+ IGNORE_WARNING("-Wbitfield-constant-conversion")
+#endif
+
 static const Command syntax_commands[] = {
     {"bufis", "i", 2,  3, cmd_bufis},
     {"char", "bn", 2,  3, cmd_char},
@@ -486,6 +491,8 @@ static const Command syntax_commands[] = {
     {"syntax", "", 1,  1, cmd_syntax},
     {"", "", 0,  0, NULL}
 };
+
+UNIGNORE_WARNINGS
 
 static void cmd_include(const CommandArgs *a)
 {

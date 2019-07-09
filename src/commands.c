@@ -1822,6 +1822,11 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
     mark_everything_changed();
 }
 
+// Prevent Clang whining about .max_args = -1
+#if HAS_WARNING("-Wbitfield-constant-conversion")
+ IGNORE_WARNING("-Wbitfield-constant-conversion")
+#endif
+
 const Command commands[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
@@ -1909,3 +1914,5 @@ const Command commands[] = {
     {"wswap", "", 0, 0, cmd_wswap},
     {"", "", 0, 0, NULL}
 };
+
+UNIGNORE_WARNINGS
