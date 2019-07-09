@@ -10,7 +10,7 @@
  *
  * Returns parsed flags (order is preserved).
  */
-const char *parse_args(char **args, const char *flag_desc, int min, int max)
+const char *parse_args(char **args, const char *flag_desc, size_t min, size_t max)
 {
     static char flags[16];
     size_t argc = count_strings(args);
@@ -97,11 +97,11 @@ const char *parse_args(char **args, const char *flag_desc, int min, int max)
     // Don't count arguments to flags as arguments to command
     argc -= nr_flag_args;
 
-    if ((int)argc < min) {
+    if (argc < min) {
         error_msg("Not enough arguments");
         return NULL;
     }
-    if (max >= 0 && (int)argc > max) {
+    if (argc > max) {
         error_msg("Too many arguments");
         return NULL;
     }
