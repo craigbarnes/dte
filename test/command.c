@@ -42,19 +42,12 @@ static void test_commands_array(void)
 
 static void test_command_struct_layout(void)
 {
-    const Command cmd = {
-        .name = "test-command-x",
-        .flags = "abcdef",
-        .min_args = 15,
-        .max_args = -1,
-        .cmd = NULL
-    };
-
-    EXPECT_STREQ(cmd.name, "test-command-x");
-    EXPECT_STREQ(cmd.flags, "abcdef");
-    EXPECT_EQ(cmd.min_args, 15);
-    EXPECT_EQ(cmd.max_args, CMD_ARG_MAX);
-    EXPECT_NULL(cmd.cmd);
+    const Command *cmd = find_command(commands, "filter");
+    EXPECT_STREQ(cmd->name, "filter");
+    EXPECT_STREQ(cmd->flags, "-");
+    EXPECT_EQ(cmd->min_args, 1);
+    EXPECT_EQ(cmd->max_args, CMD_ARG_MAX);
+    EXPECT_NONNULL(cmd->cmd);
 }
 
 void test_command(void)
