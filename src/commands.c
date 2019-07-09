@@ -1587,11 +1587,13 @@ static void cmd_toggle(const CommandArgs *a)
         pf++;
     }
 
-    char **args = a->args;
-    if (args[1]) {
-        toggle_option_values(args[0], global, verbose, args + 1);
+    const char *option_name = a->args[0];
+    size_t nr_values = a->nr_args - 1;
+    if (nr_values) {
+        char **values = a->args + 1;
+        toggle_option_values(option_name, global, verbose, values, nr_values);
     } else {
-        toggle_option(args[0], global, verbose);
+        toggle_option(option_name, global, verbose);
     }
 }
 

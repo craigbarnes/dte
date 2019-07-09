@@ -620,14 +620,14 @@ void toggle_option_values (
     const char *name,
     bool global,
     bool verbose,
-    char **values
+    char **values,
+    size_t count
 ) {
     const OptionDesc *desc = find_toggle_option(name, &global);
     if (!desc) {
         return;
     }
 
-    size_t count = count_strings(values);
     BUG_ON(count == 0);
     size_t current = 0;
     bool error = false;

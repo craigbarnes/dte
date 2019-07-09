@@ -94,7 +94,7 @@ typedef struct {
 void set_option(const char *name, const char *value, bool local, bool global);
 void set_bool_option(const char *name, bool local, bool global);
 void toggle_option(const char *name, bool global, bool verbose);
-void toggle_option_values(const char *name, bool global, bool verbose, char **values);
+void toggle_option_values(const char *name, bool global, bool verbose, char **values, size_t count);
 bool validate_local_options(char **strs);
 void collect_options(const char *prefix);
 void collect_toggleable_options(const char *prefix);

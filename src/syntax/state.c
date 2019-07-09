@@ -231,7 +231,7 @@ static void cmd_default(const CommandArgs *a)
     }
     ptr_array_add (
         &current_syntax->default_colors,
-        copy_string_array(a->args, count_strings(a->args))
+        copy_string_array(a->args, a->nr_args)
     );
 }
 
@@ -309,7 +309,7 @@ static void cmd_list(const CommandArgs *a)
     list->defined = true;
 
     bool icase = a->flags[0] == 'i';
-    size_t nstrings = count_strings(args) - 1;
+    size_t nstrings = a->nr_args - 1;
     hashset_init(&list->strings, nstrings, icase);
     hashset_add_many(&list->strings, args + 1, nstrings);
 }
