@@ -239,7 +239,7 @@ void block_iter_skip_bytes(BlockIter *bi, size_t count)
 void block_iter_goto_offset(BlockIter *bi, size_t offset)
 {
     Block *blk;
-    list_for_each_entry(blk, bi->head, node) {
+    block_for_each(blk, bi->head) {
         if (offset <= blk->size) {
             bi->blk = blk;
             bi->offset = offset;
@@ -272,7 +272,7 @@ size_t block_iter_get_offset(const BlockIter *bi)
 {
     const Block *blk;
     size_t offset = 0;
-    list_for_each_entry(blk, bi->head, node) {
+    block_for_each(blk, bi->head) {
         if (blk == bi->blk) {
             break;
         }

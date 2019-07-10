@@ -312,7 +312,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
         }
     }
 
-    list_for_each_entry(blk, &b->blocks, node) {
+    block_for_each(blk, &b->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
 
         if (rc < 0) {

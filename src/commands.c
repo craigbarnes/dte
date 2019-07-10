@@ -443,7 +443,7 @@ static void cmd_filter(const CommandArgs *a)
     } else {
         Block *blk;
         data.in_len = 0;
-        list_for_each_entry(blk, &buffer->blocks, node) {
+        block_for_each(blk, &buffer->blocks) {
             data.in_len += blk->size;
         }
         move_bof();
@@ -865,7 +865,7 @@ static void cmd_pipe_to(const CommandArgs *a)
     } else {
         Block *blk;
         data.in_len = 0;
-        list_for_each_entry(blk, &buffer->blocks, node) {
+        block_for_each(blk, &buffer->blocks) {
             data.in_len += blk->size;
         }
         move_bof();

@@ -14,7 +14,7 @@ static void sanity_check(void)
     BUG_ON(list_empty(&buffer->blocks));
     bool cursor_seen = false;
     Block *blk;
-    list_for_each_entry(blk, &buffer->blocks, node) {
+    block_for_each(blk, &buffer->blocks) {
         BUG_ON(!blk->size && buffer->blocks.next->next != &buffer->blocks);
         BUG_ON(blk->size > blk->alloc);
         BUG_ON(blk->size && blk->data[blk->size - 1] != '\n');

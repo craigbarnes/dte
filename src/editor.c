@@ -110,7 +110,7 @@ static void sanity_check(void)
 #if DEBUG >= 1
     View *v = window->view;
     Block *blk;
-    list_for_each_entry(blk, &v->buffer->blocks, node) {
+    block_for_each(blk, &v->buffer->blocks) {
         if (blk == v->cursor.blk) {
             BUG_ON(v->cursor.offset > v->cursor.blk->size);
             return;

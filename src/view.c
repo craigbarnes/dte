@@ -15,7 +15,7 @@ void view_update_cursor_y(View *v)
     Block *blk;
     size_t nl = 0;
 
-    list_for_each_entry(blk, &b->blocks, node) {
+    block_for_each(blk, &b->blocks) {
         if (blk == v->cursor.blk) {
             nl += count_nl(blk->data, v->cursor.offset);
             v->cy = nl;
