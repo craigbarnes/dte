@@ -16,6 +16,7 @@ static const FileSignatureMap signatures[] = {
     SIG("%YAML", YAML),
     SIG("[core]", INI), // .git/config file
     SIG("[wrap-file]", INI), // Meson wrap file
+    SIG("[Trigger]", INI), // libalpm hook
     SIG("diff --git", DIFF),
 };
 
