@@ -3,12 +3,16 @@ include -b color/default
 include -b compiler/gcc
 include -b compiler/go
 
-alias help 'run man dte'
-alias man 'run man'
-alias make 'compile gcc make'
-alias read 'pass-through cat'
 alias builtin 'include -b'
-alias trim 'replace "[ \t]+$" ""'
+alias help 'run man dte'
+alias make 'compile gcc make'
+alias man 'run man'
+alias read 'pass-through cat'
+alias reverse-lines 'filter tac'
+alias sort-lines 'filter sh -c "LC_COLLATE=C sort"'
+alias split-words 'replace -g "[ \t]+" "\n"'
+alias trim-lines 'replace "[ \t]+$" ""'
+alias xsel 'pipe-to xsel -b'
 
 errorfmt gitgrep '^([^:]+):([0-9]+):' file line
 alias git-grep 'compile -1s gitgrep git grep -n'
