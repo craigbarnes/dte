@@ -9,10 +9,10 @@
 
 #define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
 
-static unsigned short lookup_attr(const char *s, size_t len)
+static unsigned int lookup_attr(const char *s, size_t len)
 {
     const char *cmp_str;
-    unsigned short cmp_val;
+    unsigned int cmp_val;
     switch (len) {
     case 3: CMP("dim", ATTR_DIM);
     case 5: CMP("blink", ATTR_BLINK);
@@ -159,9 +159,9 @@ static int32_t parse_color(const char *str)
     }
 }
 
-static bool parse_attr(const char *str, unsigned short *attr)
+static bool parse_attr(const char *str, unsigned int *attr)
 {
-    const unsigned short a = lookup_attr(str, strlen(str));
+    const unsigned int a = lookup_attr(str, strlen(str));
     if (a) {
         *attr |= a;
         return true;

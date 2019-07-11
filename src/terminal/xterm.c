@@ -44,7 +44,7 @@ void xterm_set_color(const TermColor *color)
 {
     static const struct {
         char code;
-        unsigned short attr;
+        unsigned int attr;
     } attr_map[] = {
         {'1', ATTR_BOLD},
         {'2', ATTR_DIM},

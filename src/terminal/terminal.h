@@ -26,7 +26,7 @@ typedef struct {
     TermColorCapabilityType color_type;
     int width;
     int height;
-    unsigned short ncv_attributes;
+    unsigned int ncv_attributes;
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     void (*put_control_code)(StringView code);

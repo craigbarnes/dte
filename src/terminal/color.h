@@ -52,7 +52,7 @@ enum {
 typedef struct {
     int32_t fg;
     int32_t bg;
-    unsigned short attr;
+    unsigned int attr;
 } TermColor;
 
 static inline void color_split_rgb(int32_t c, uint8_t *r, uint8_t *g, uint8_t *b)

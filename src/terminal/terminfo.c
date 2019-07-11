@@ -184,7 +184,7 @@ static void tputs_move_cursor(int x, int y)
     }
 }
 
-static bool attr_is_set(const TermColor *color, unsigned short attr)
+static bool attr_is_set(const TermColor *color, unsigned int attr)
 {
     if (!(color->attr & attr)) {
         return false;
@@ -232,6 +232,32 @@ static void tputs_set_color(const TermColor *color)
     }
 
     obuf.color = *color;
+}
+
+static unsigned int convert_ncv_flags_to_attrs(unsigned int ncv)
+{
+    // These flags should have values equal to their terminfo
+    // counterparts:
+    static_assert(ATTR_UNDERLINE == 2);
+    static_assert(ATTR_REVERSE == 4);
+    static_assert(ATTR_BLINK == 8);
+    static_assert(ATTR_DIM == 16);
+    static_assert(ATTR_BOLD == 32);
+    static_assert(ATTR_INVIS == 64);
+
+    // Mask flags to supported, common subset
+    unsigned int attrs = ncv & (
+        ATTR_UNDERLINE | ATTR_REVERSE | ATTR_BLINK
+        | ATTR_DIM | ATTR_BOLD | ATTR_INVIS
+    );
+
+    // Italic is a special case; it occupies bit 16 in terminfo
+    // but bit 7 here
+    if (ncv & 0x8000) {
+        attrs |= ATTR_ITALIC;
+    }
+
+    return attrs;
 }
 
 bool term_init_terminfo(const char *term)
@@ -298,14 +324,7 @@ bool term_init_terminfo(const char *term)
     if (ncv <= 0) {
         terminal.ncv_attributes = 0;
     } else {
-        terminal.ncv_attributes = (unsigned short)ncv;
-        // The ATTR_* bitflag values used in this codebase are mostly
-        // the same as those used by terminfo, with the exception of
-        // ITALIC, which is bit 7 here, but bit 15 in terminfo. It
-        // must therefore be manually converted.
-        if ((ncv & (1 << 15)) && !(ncv & ATTR_ITALIC)) {
-            terminal.ncv_attributes |= ATTR_ITALIC;
-        }
+        terminal.ncv_attributes = convert_ncv_flags_to_attrs(ncv);
     }
 
     terminal.control_codes = (TermControlCodes) {
