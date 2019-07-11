@@ -134,6 +134,34 @@ static void test_ascii(void)
     EXPECT_FALSE(is_word_byte(0x7F));
     EXPECT_FALSE(is_word_byte(0x00));
 
+    EXPECT_TRUE(is_regex_special_char('('));
+    EXPECT_TRUE(is_regex_special_char(')'));
+    EXPECT_TRUE(is_regex_special_char('*'));
+    EXPECT_TRUE(is_regex_special_char('+'));
+    EXPECT_TRUE(is_regex_special_char('.'));
+    EXPECT_TRUE(is_regex_special_char('?'));
+    EXPECT_TRUE(is_regex_special_char('['));
+    EXPECT_TRUE(is_regex_special_char('{'));
+    EXPECT_TRUE(is_regex_special_char('|'));
+    EXPECT_TRUE(is_regex_special_char('\\'));
+    EXPECT_FALSE(is_regex_special_char('"'));
+    EXPECT_FALSE(is_regex_special_char('$'));
+    EXPECT_FALSE(is_regex_special_char('&'));
+    EXPECT_FALSE(is_regex_special_char(','));
+    EXPECT_FALSE(is_regex_special_char('0'));
+    EXPECT_FALSE(is_regex_special_char('@'));
+    EXPECT_FALSE(is_regex_special_char('A'));
+    EXPECT_FALSE(is_regex_special_char('\''));
+    EXPECT_FALSE(is_regex_special_char(']'));
+    EXPECT_FALSE(is_regex_special_char('^'));
+    EXPECT_FALSE(is_regex_special_char('_'));
+    EXPECT_FALSE(is_regex_special_char('z'));
+    EXPECT_FALSE(is_regex_special_char('}'));
+    EXPECT_FALSE(is_regex_special_char('~'));
+    EXPECT_FALSE(is_regex_special_char(0x00));
+    EXPECT_FALSE(is_regex_special_char(0x80));
+    EXPECT_FALSE(is_regex_special_char(0xFF));
+
     EXPECT_EQ(hex_decode('0'), 0);
     EXPECT_EQ(hex_decode('9'), 9);
     EXPECT_EQ(hex_decode('a'), 10);
