@@ -66,10 +66,8 @@ static void test_color_to_nearest(void)
         {88, 88, 88, COLOR_RED},
         {90, 90, 90, COLOR_MAGENTA},
         {96, 96, 96, COLOR_MAGENTA},
-
-        // TODO: why aren't these converted to yellow?
-        // {178, 178, 178, COLOR_YELLOW},
-        // {179, 179, 179, COLOR_YELLOW},
+        {178, 178, 178, COLOR_YELLOW},
+        {179, 179, 179, COLOR_YELLOW},
 
         // RGB colors with exact xterm palette equivalents
         {COLOR_RGB(0x000087),  18,  18, COLOR_BLUE},
@@ -78,7 +76,7 @@ static void test_color_to_nearest(void)
         {COLOR_RGB(0x00FF00),  46,  46, COLOR_LIGHTGREEN},
         {COLOR_RGB(0x870000),  88,  88, COLOR_RED},
         {COLOR_RGB(0xFF0000), 196, 196, COLOR_LIGHTRED},
-        // TODO: {COLOR_RGB(0xFFD700), 220, 220, COLOR_YELLOW},
+        {COLOR_RGB(0xFFD700), 220, 220, COLOR_YELLOW},
         {COLOR_RGB(0xFFFF5F), 227, 227, COLOR_LIGHTYELLOW},
         {COLOR_RGB(0xFFFFFF), 231, 231, COLOR_WHITE},
 

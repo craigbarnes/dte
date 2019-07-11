@@ -317,18 +317,18 @@ static uint8_t color_256_to_16(uint8_t color)
     static const uint8_t table[256] = {
         k, r, g, y, b, m, c, a, A, R, G, Y, B, M, C, W, //   0...15
         k, b, b, b, B, B, g, c, b, b, B, B, g, g, c, b, //  16...31
-        B, B, g, g, g, c, B, B, G, G, G, G, C, B, G, G, //  32...47
-        G, G, G, C, r, m, b, b, B, B, y, A, b, b, B, B, //  48...63
+        B, B, g, g, g, c, B, B, G, G, G, C, C, B, G, G, //  32...47
+        G, G, C, C, r, m, m, m, m, B, y, A, b, b, B, B, //  48...63
         g, g, c, b, B, B, g, g, g, c, B, B, G, G, G, G, //  64...79
-        C, B, G, G, G, G, G, C, r, r, m, b, B, B, r, r, //  80...95
-        m, b, B, B, y, y, A, b, B, B, g, g, g, c, B, B, //  96..111
-        G, G, G, G, C, B, G, G, G, G, G, C, r, r, r, m, // 112..127
-        B, B, r, r, r, m, B, B, r, r, r, m, B, B, y, y, // 128..143
+        C, B, G, G, G, G, G, C, r, m, m, m, m, m, y, r, //  80...95
+        m, m, m, m, y, y, A, b, B, B, g, g, g, c, B, B, //  96..111
+        G, G, G, G, C, B, G, G, G, G, G, C, r, r, m, m, // 112..127
+        m, m, r, r, r, m, M, M, y, y, r, m, M, M, y, y, // 128..143
         y, a, B, B, G, G, G, G, C, B, G, G, G, G, G, C, // 144..159
-        R, R, R, R, M, B, R, R, R, R, M, B, R, R, R, R, // 160..175
-        M, B, R, R, R, R, M, B, Y, Y, Y, Y, a, B, G, G, // 176..191
-        G, G, G, C, R, R, R, R, R, M, R, R, R, R, R, M, // 192..207
-        R, R, R, R, R, M, R, R, R, R, R, M, R, R, R, R, // 208..223
+        R, R, R, m, M, M, R, R, M, M, M, M, R, R, R, R, // 160..175
+        M, M, y, y, y, M, M, M, Y, Y, Y, Y, a, B, Y, G, // 176..191
+        G, G, G, C, R, R, R, M, M, M, R, R, R, R, R, M, // 192..207
+        R, R, R, M, M, M, y, y, y, R, M, M, y, y, Y, Y, // 208..223
         R, M, Y, Y, Y, Y, Y, W, k, k, k, k, k, k, A, A, // 224..239
         A, A, A, A, a, a, a, a, a, a, W, W, W, W, W, W  // 240..255
     };
