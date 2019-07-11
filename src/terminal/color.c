@@ -232,6 +232,36 @@ static uint8_t cube_index_to_rgb_component(uint8_t idx)
     return color_stops[idx];
 }
 
+// Convert a 24-bit RGB color to an xterm palette color if one matches
+// exactly, or otherwise return the original color unchanged. This is
+// mostly useful for reducing the size of SGR escape sequences sent to
+// the terminal.
+static int32_t color_rgb_optimize(int32_t color)
+{
+    if ((color & COLOR_FLAG_RGB) == 0) {
+        return color;
+    }
+
+    uint8_t r, g, b;
+    color_split_rgb(color, &r, &g, &b);
+
+    uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
+    uint8_t r_stop = cube_index_to_rgb_component(r_idx);
+
+    uint8_t g_idx = rgb_component_to_nearest_cube_index(g);
+    uint8_t g_stop = cube_index_to_rgb_component(g_idx);
+
+    uint8_t b_idx = rgb_component_to_nearest_cube_index(b);
+    uint8_t b_stop = cube_index_to_rgb_component(b_idx);
+
+    if (r_stop == r && g_stop == g && b_stop == b) {
+        // Exact match
+        return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
+    }
+
+    return color;
+}
+
 static uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
@@ -306,7 +336,7 @@ static uint8_t color_any_to_16(int32_t color)
 
 static uint8_t color_any_to_8(int32_t color)
 {
-    return color_any_to_16(color) % 8;
+    return color_any_to_16(color) & 7;
 }
 
 int32_t convert_color_to_nearest_supported(int32_t color)
@@ -319,7 +349,7 @@ int32_t convert_color_to_nearest_supported(int32_t color)
     case TERM_8_COLOR: return color_any_to_8(color);
     case TERM_16_COLOR: return color_any_to_16(color);
     case TERM_256_COLOR: return color_any_to_256(color);
-    case TERM_TRUE_COLOR: return color;
+    case TERM_TRUE_COLOR: return color_rgb_optimize(color);
     }
     BUG("unexpected terminal.color_type value");
     // This should never be reached, but it silences compiler warnings
