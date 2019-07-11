@@ -16,6 +16,7 @@ static void test_parse_term_color(void)
         {{"#ff0000"}, {COLOR_RGB(0xff0000), -1, 0}},
         {{"#f00a9c", "reverse"}, {COLOR_RGB(0xf00a9c), -1, ATTR_REVERSE}},
         {{"black", "#00ffff"}, {COLOR_BLACK, COLOR_RGB(0x00ffff), 0}},
+        {{"#123456", "#abcdef"}, {COLOR_RGB(0x123456), COLOR_RGB(0xabcdef), 0}},
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
         {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
         {{"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
@@ -33,11 +34,14 @@ static void test_parse_term_color(void)
         {{"1", "2", "invisible"}, {COLOR_RED, COLOR_GREEN, ATTR_INVIS}},
     };
     FOR_EACH_I(i, tests) {
-        TermColor parsed_color;
-        bool ok = parse_term_color(&parsed_color, (char**)tests[i].strs);
+        TermColor parsed;
+        bool ok = parse_term_color(&parsed, (char**)tests[i].strs);
         IEXPECT_TRUE(ok);
         if (ok) {
-            IEXPECT_TRUE(same_color(&parsed_color, &tests[i].expected_color));
+            const TermColor expected = tests[i].expected_color;
+            IEXPECT_EQ(parsed.fg, expected.fg);
+            IEXPECT_EQ(parsed.bg, expected.bg);
+            IEXPECT_EQ(parsed.attr, expected.attr);
         }
     }
 }
