@@ -1,7 +1,6 @@
 #include <inttypes.h>
 #include <string.h>
 #include "color.h"
-#include "terminal.h"
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"
@@ -90,8 +89,8 @@ static int32_t parse_rrggbb(const char *str)
 }
 
 UNITTEST {
-    BUG_ON(parse_rrggbb("f01cff") != (0xf01cff | COLOR_FLAG_RGB));
-    BUG_ON(parse_rrggbb("011011") != (0x011011 | COLOR_FLAG_RGB));
+    BUG_ON(parse_rrggbb("f01cff") != COLOR_RGB(0xf01cff));
+    BUG_ON(parse_rrggbb("011011") != COLOR_RGB(0x011011));
     BUG_ON(parse_rrggbb("fffffg") != COLOR_INVALID);
     BUG_ON(parse_rrggbb(".") != COLOR_INVALID);
     BUG_ON(parse_rrggbb("11223") != COLOR_INVALID);
@@ -339,19 +338,19 @@ static uint8_t color_any_to_8(int32_t color)
     return color_any_to_16(color) & 7;
 }
 
-int32_t convert_color_to_nearest_supported(int32_t color)
+int32_t color_to_nearest(int32_t color, TermColorCapabilityType type)
 {
     if (color < 0) {
         return color;
     }
-    switch (terminal.color_type) {
+    switch (type) {
     case TERM_0_COLOR: return COLOR_DEFAULT;
     case TERM_8_COLOR: return color_any_to_8(color);
     case TERM_16_COLOR: return color_any_to_16(color);
     case TERM_256_COLOR: return color_any_to_256(color);
     case TERM_TRUE_COLOR: return color_rgb_optimize(color);
     }
-    BUG("unexpected terminal.color_type value");
+    BUG("unexpected TermColorCapabilityType value");
     // This should never be reached, but it silences compiler warnings
     // when DEBUG == 0 and __builtin_unreachable() isn't supported
     // (i.e. BUG() expands to nothing).

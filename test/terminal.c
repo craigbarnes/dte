@@ -13,9 +13,9 @@ static void test_parse_term_color(void)
         const TermColor expected_color;
     } tests[] = {
         {{"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
-        {{"#ff0000"}, {0xff0000 | COLOR_FLAG_RGB, -1, 0}},
-        {{"#f00a9c", "reverse"}, {0xf00a9c | COLOR_FLAG_RGB, -1, ATTR_REVERSE}},
-        {{"black", "#00ffff"}, {COLOR_BLACK, 0x00ffff | COLOR_FLAG_RGB, 0}},
+        {{"#ff0000"}, {COLOR_RGB(0xff0000), -1, 0}},
+        {{"#f00a9c", "reverse"}, {COLOR_RGB(0xf00a9c), -1, ATTR_REVERSE}},
+        {{"black", "#00ffff"}, {COLOR_BLACK, COLOR_RGB(0x00ffff), 0}},
         {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
         {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
         {{"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
@@ -39,6 +39,64 @@ static void test_parse_term_color(void)
         if (ok) {
             IEXPECT_TRUE(same_color(&parsed_color, &tests[i].expected_color));
         }
+    }
+}
+
+static void test_color_to_nearest(void)
+{
+    static const struct {
+        int32_t input;
+        int32_t expected_rgb;
+        int32_t expected_256;
+        int32_t expected_16;
+    } tests[] = {
+        // ECMA-48 colors
+        {0, 0, 0, 0},
+        {5, 5, 5, 5},
+        {7, 7, 7, 7},
+
+        // aixterm-style colors
+        {8, 8, 8, 8},
+        {10, 10, 10, 10},
+        {15, 15, 15, 15},
+
+        // xterm 256 palette colors
+        {25, 25, 25, COLOR_BLUE},
+        {87, 87, 87, COLOR_LIGHTCYAN},
+        {88, 88, 88, COLOR_RED},
+        {90, 90, 90, COLOR_MAGENTA},
+        {96, 96, 96, COLOR_MAGENTA},
+
+        // TODO: why aren't these converted to yellow?
+        // {178, 178, 178, COLOR_YELLOW},
+        // {179, 179, 179, COLOR_YELLOW},
+
+        // RGB colors with exact xterm palette equivalents
+        {COLOR_RGB(0x000087),  18,  18, COLOR_BLUE},
+        {COLOR_RGB(0x0000FF),  21,  21, COLOR_LIGHTBLUE},
+        {COLOR_RGB(0x00AF87),  36,  36, COLOR_GREEN},
+        {COLOR_RGB(0x00FF00),  46,  46, COLOR_LIGHTGREEN},
+        {COLOR_RGB(0x870000),  88,  88, COLOR_RED},
+        {COLOR_RGB(0xFF0000), 196, 196, COLOR_LIGHTRED},
+        // TODO: {COLOR_RGB(0xFFD700), 220, 220, COLOR_YELLOW},
+        {COLOR_RGB(0xFFFF5F), 227, 227, COLOR_LIGHTYELLOW},
+        {COLOR_RGB(0xFFFFFF), 231, 231, COLOR_WHITE},
+
+        // RGB colors with no exact palette equivalents
+        {COLOR_RGB(0xFF0001), COLOR_RGB(0xFF0001), 196, COLOR_LIGHTRED},
+        {COLOR_RGB(0xAABBCC), COLOR_RGB(0xAABBCC), 146, COLOR_LIGHTBLUE},
+
+        // TODO: Make color_rgb_optimize() handle grayscales 232..255
+        // {COLOR_RGB(0x080808), 232, 232, COLOR_BLACK},
+        // {COLOR_RGB(0xEEEEEE), 255, 255, COLOR_WHITE},
+    };
+    FOR_EACH_I(i, tests) {
+        const int32_t c = tests[i].input;
+        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR), tests[i].expected_rgb);
+        IEXPECT_EQ(color_to_nearest(c, TERM_256_COLOR), tests[i].expected_256);
+        IEXPECT_EQ(color_to_nearest(c, TERM_16_COLOR), tests[i].expected_16);
+        IEXPECT_EQ(color_to_nearest(c, TERM_8_COLOR), tests[i].expected_16 & 7);
+        IEXPECT_EQ(color_to_nearest(c, TERM_0_COLOR), COLOR_DEFAULT);
     }
 }
 
@@ -366,6 +424,7 @@ static void test_key_to_string(void)
 void test_terminal(void)
 {
     test_parse_term_color();
+    test_color_to_nearest();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
     test_xterm_parse_key_combo_rxvt();

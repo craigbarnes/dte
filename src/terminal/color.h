@@ -6,6 +6,7 @@
 #include "../util/macros.h"
 
 #define COLOR_FLAG_RGB INT32_C(0x01000000)
+#define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))
 
 typedef enum {
     TERM_0_COLOR,
@@ -72,6 +73,6 @@ static inline bool same_color(const TermColor *c1, const TermColor *c2)
 }
 
 bool parse_term_color(TermColor *color, char **strs);
-int32_t convert_color_to_nearest_supported(int32_t color);
+int32_t color_to_nearest(int32_t color, TermColorCapabilityType type);
 
 #endif

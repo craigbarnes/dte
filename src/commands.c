@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "terminal/color.h"
 #include "terminal/input.h"
+#include "terminal/terminal.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
@@ -510,8 +511,8 @@ static void cmd_hi(const CommandArgs *a)
         exec_reset_colors_rc();
         remove_extra_colors();
     } else if (parse_term_color(&color, args + 1)) {
-        color.fg = convert_color_to_nearest_supported(color.fg);
-        color.bg = convert_color_to_nearest_supported(color.bg);
+        color.fg = color_to_nearest(color.fg, terminal.color_type);
+        color.bg = color_to_nearest(color.bg, terminal.color_type);
         set_highlight_color(args[0], &color);
     }
 
