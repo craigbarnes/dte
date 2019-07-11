@@ -83,9 +83,9 @@ static int32_t parse_rrggbb(const char *str)
         }
         digits[i] = val;
     }
-    int32_t r = (digits[0] << 4) + digits[1];
-    int32_t g = (digits[2] << 4) + digits[3];
-    int32_t b = (digits[4] << 4) + digits[5];
+    int32_t r = (digits[0] << 4) | digits[1];
+    int32_t g = (digits[2] << 4) | digits[3];
+    int32_t b = (digits[4] << 4) | digits[5];
     return r << 16 | g << 8 | b | COLOR_FLAG_RGB;
 }
 
