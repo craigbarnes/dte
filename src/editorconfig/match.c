@@ -7,24 +7,6 @@
 #include "../util/str-util.h"
 #include "../util/string.h"
 
-static bool is_regex_special_char(char ch)
-{
-    switch (ch) {
-    case '(':
-    case ')':
-    case '*':
-    case '+':
-    case '.':
-    case '?':
-    case '[':
-    case '\\':
-    case '{':
-    case '|':
-        return true;
-    }
-    return false;
-}
-
 static size_t get_last_paired_brace_index(const char *str, size_t len)
 {
     size_t last_paired_index = 0;
