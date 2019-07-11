@@ -295,24 +295,44 @@ static uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
 
 static uint8_t color_256_to_16(uint8_t color)
 {
-    static const uint8_t table[256] = {
-         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-         0,  4,  4,  4, 12, 12,  2,  6,  4,  4, 12, 12,  2,  2,  6,  4,
-        12, 12,  2,  2,  2,  6, 12, 12, 10, 10, 10, 10, 14, 12, 10, 10,
-        10, 10, 10, 14,  1,  5,  4,  4, 12, 12,  3,  8,  4,  4, 12, 12,
-         2,  2,  6,  4, 12, 12,  2,  2,  2,  6, 12, 12, 10, 10, 10, 10,
-        14, 12, 10, 10, 10, 10, 10, 14,  1,  1,  5,  4, 12, 12,  1,  1,
-         5,  4, 12, 12,  3,  3,  8,  4, 12, 12,  2,  2,  2,  6, 12, 12,
-        10, 10, 10, 10, 14, 12, 10, 10, 10, 10, 10, 14,  1,  1,  1,  5,
-        12, 12,  1,  1,  1,  5, 12, 12,  1,  1,  1,  5, 12, 12,  3,  3,
-         3,  7, 12, 12, 10, 10, 10, 10, 14, 12, 10, 10, 10, 10, 10, 14,
-         9,  9,  9,  9, 13, 12,  9,  9,  9,  9, 13, 12,  9,  9,  9,  9,
-        13, 12,  9,  9,  9,  9, 13, 12, 11, 11, 11, 11,  7, 12, 10, 10,
-        10, 10, 10, 14,  9,  9,  9,  9,  9, 13,  9,  9,  9,  9,  9, 13,
-         9,  9,  9,  9,  9, 13,  9,  9,  9,  9,  9, 13,  9,  9,  9,  9,
-         9, 13, 11, 11, 11, 11, 11, 15,  0,  0,  0,  0,  0,  0,  8,  8,
-         8,  8,  8,  8,  7,  7,  7,  7,  7,  7, 15, 15, 15, 15, 15, 15
+    enum {
+        k = COLOR_BLACK,
+        r = COLOR_RED,
+        g = COLOR_GREEN,
+        y = COLOR_YELLOW,
+        b = COLOR_BLUE,
+        m = COLOR_MAGENTA,
+        c = COLOR_CYAN,
+        a = COLOR_GRAY,
+        A = COLOR_DARKGRAY,
+        R = COLOR_LIGHTRED,
+        G = COLOR_LIGHTGREEN,
+        Y = COLOR_LIGHTYELLOW,
+        B = COLOR_LIGHTBLUE,
+        M = COLOR_LIGHTMAGENTA,
+        C = COLOR_LIGHTCYAN,
+        W = COLOR_WHITE
     };
+
+    static const uint8_t table[256] = {
+        k, r, g, y, b, m, c, a, A, R, G, Y, B, M, C, W, //   0...15
+        k, b, b, b, B, B, g, c, b, b, B, B, g, g, c, b, //  16...31
+        B, B, g, g, g, c, B, B, G, G, G, G, C, B, G, G, //  32...47
+        G, G, G, C, r, m, b, b, B, B, y, A, b, b, B, B, //  48...63
+        g, g, c, b, B, B, g, g, g, c, B, B, G, G, G, G, //  64...79
+        C, B, G, G, G, G, G, C, r, r, m, b, B, B, r, r, //  80...95
+        m, b, B, B, y, y, A, b, B, B, g, g, g, c, B, B, //  96..111
+        G, G, G, G, C, B, G, G, G, G, G, C, r, r, r, m, // 112..127
+        B, B, r, r, r, m, B, B, r, r, r, m, B, B, y, y, // 128..143
+        y, a, B, B, G, G, G, G, C, B, G, G, G, G, G, C, // 144..159
+        R, R, R, R, M, B, R, R, R, R, M, B, R, R, R, R, // 160..175
+        M, B, R, R, R, R, M, B, Y, Y, Y, Y, a, B, G, G, // 176..191
+        G, G, G, C, R, R, R, R, R, M, R, R, R, R, R, M, // 192..207
+        R, R, R, R, R, M, R, R, R, R, R, M, R, R, R, R, // 208..223
+        R, M, Y, Y, Y, Y, Y, W, k, k, k, k, k, k, A, A, // 224..239
+        A, A, A, A, a, a, a, a, a, a, W, W, W, W, W, W  // 240..255
+    };
+
     return table[color];
 }
 
