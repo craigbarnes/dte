@@ -176,7 +176,8 @@ state ident
     inlist keyword c
     inlist c11-keyword c
     inlist type c
-    inlist posix_type c
+    inlist common-typedef c
+    inlist posix-type c
     inlist constant c
     inlist cpp-keyword c
     noeat c
@@ -276,9 +277,13 @@ list type \
     int16_t uint16_t int_fast16_t uint_fast16_t int_least16_t uint_least16_t \
     int32_t uint32_t int_fast32_t uint_fast32_t int_least32_t uint_least32_t \
     int64_t uint64_t int_fast64_t uint_fast64_t int_least64_t uint_least64_t \
-    intptr_t uintptr_t intmax_t uintmax_t char32_t char16_t
+    intptr_t uintptr_t intmax_t uintmax_t __int128 char32_t char16_t char8_t
 
-list posix_type \
+list common-typedef \
+    u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 s8 s16 s32 s64 s128 \
+    uchar ushort uint ulong ullong u_char u_short u_int u_long u_llong
+
+list posix-type \
     blkcnt_t blksize_t clockid_t dev_t fsblkcnt_t fsfilcnt_t gid_t id_t \
     ino_t key_t mode_t nlink_t off_t pid_t regex_t regmatch_t regoff_t \
     siginfo_t sigjmp_buf sigset_t ssize_t suseconds_t timer_t uid_t DIR \
@@ -315,7 +320,6 @@ list cpp-keyword \
     typeof typename using virtual
 
 default ident class-name
-default keyword c11-keyword
-default keyword cpp-keyword
+default keyword c11-keyword cpp-keyword
 default preproc preproccond
-default type posix_type
+default type posix-type
