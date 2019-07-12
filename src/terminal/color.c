@@ -221,60 +221,39 @@ static uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
     return (c - 35) / 40;
 }
 
-// Convert xterm color cube index to corresponding RGB color component
-static uint8_t cube_index_to_rgb_component(uint8_t idx)
+static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 {
     static const uint8_t color_stops[6] = {
         0x00, 0x5f, 0x87,
         0xaf, 0xd7, 0xff
     };
-    return color_stops[idx];
-}
 
-// Convert a 24-bit RGB color to an xterm palette color if one matches
-// exactly, or otherwise return the original color unchanged. This is
-// mostly useful for reducing the size of SGR escape sequences sent to
-// the terminal.
-static int32_t color_rgb_optimize(int32_t color)
-{
     if ((color & COLOR_FLAG_RGB) == 0) {
+        BUG_ON(color > 255);
+        *exact = true;
         return color;
     }
 
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
-
     uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
-    uint8_t r_stop = cube_index_to_rgb_component(r_idx);
-
+    uint8_t r_stop = color_stops[r_idx];
     uint8_t g_idx = rgb_component_to_nearest_cube_index(g);
-    uint8_t g_stop = cube_index_to_rgb_component(g_idx);
-
+    uint8_t g_stop = color_stops[g_idx];
     uint8_t b_idx = rgb_component_to_nearest_cube_index(b);
-    uint8_t b_stop = cube_index_to_rgb_component(b_idx);
+    uint8_t b_stop = color_stops[b_idx];
 
     if (r_stop == r && g_stop == g && b_stop == b) {
-        // Exact match
+        *exact = true;
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 
-    return color;
-}
-
-static uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
-{
-    uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
-    uint8_t r_stop = cube_index_to_rgb_component(r_idx);
-
-    uint8_t g_idx = rgb_component_to_nearest_cube_index(g);
-    uint8_t g_stop = cube_index_to_rgb_component(g_idx);
-
-    uint8_t b_idx = rgb_component_to_nearest_cube_index(b);
-    uint8_t b_stop = cube_index_to_rgb_component(b_idx);
-
-    if (r_stop == r && g_stop == g && b_stop == b) {
-        // Exact match
-        return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
+    if (r >= 8 && r <= 238 && r == g && r == b) {
+        uint8_t v = r - 8;
+        if (v % 10 == 0) {
+            *exact = true;
+            return (v / 10) + 232;
+        }
     }
 
     // Calculate closest gray
@@ -286,11 +265,23 @@ static uint8_t color_rgb_to_256(uint8_t r, uint8_t g, uint8_t b)
     int gray_distance = color_dist_sq(gray, gray, gray, r, g, b);
     if (gray_distance < rgb_distance) {
         // Gray is closest match
+        *exact = false;
         return 232 + gray_idx;
     } else {
         // RGB cube color is closest match
+        *exact = false;
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
+}
+
+// Convert a 24-bit RGB color to an xterm palette color if one matches
+// exactly, or otherwise return the original color unchanged. This is
+// useful for reducing the size of SGR sequences sent to the terminal.
+static int32_t color_rgb_optimize(int32_t color)
+{
+    bool exact;
+    int32_t new_color = color_rgb_to_256(color, &exact);
+    return exact ? new_color : color;
 }
 
 static uint8_t color_256_to_16(uint8_t color)
@@ -339,13 +330,8 @@ static uint8_t color_256_to_16(uint8_t color)
 static uint8_t color_any_to_256(int32_t color)
 {
     BUG_ON(color < 0);
-    if (color & COLOR_FLAG_RGB) {
-        uint8_t r, g, b;
-        color_split_rgb(color, &r, &g, &b);
-        return color_rgb_to_256(r, g, b);
-    }
-    BUG_ON(color > 255);
-    return color;
+    bool exact;
+    return color_rgb_to_256(color, &exact);
 }
 
 static uint8_t color_any_to_16(int32_t color)

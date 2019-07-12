@@ -73,7 +73,7 @@ static void test_color_to_nearest(void)
         {178, 178, 178, COLOR_YELLOW},
         {179, 179, 179, COLOR_YELLOW},
 
-        // RGB colors with exact xterm palette equivalents
+        // RGB colors with exact xterm 6x6x6 cube equivalents
         {COLOR_RGB(0x000087),  18,  18, COLOR_BLUE},
         {COLOR_RGB(0x0000FF),  21,  21, COLOR_LIGHTBLUE},
         {COLOR_RGB(0x00AF87),  36,  36, COLOR_GREEN},
@@ -84,13 +84,17 @@ static void test_color_to_nearest(void)
         {COLOR_RGB(0xFFFF5F), 227, 227, COLOR_LIGHTYELLOW},
         {COLOR_RGB(0xFFFFFF), 231, 231, COLOR_WHITE},
 
-        // RGB colors with no exact palette equivalents
+        // RGB colors with exact xterm grayscale equivalents
+        {COLOR_RGB(0x080808), 232, 232, COLOR_BLACK},
+        {COLOR_RGB(0x121212), 233, 233, COLOR_BLACK},
+        {COLOR_RGB(0xA8A8A8), 248, 248, COLOR_GRAY},
+        {COLOR_RGB(0xEEEEEE), 255, 255, COLOR_WHITE},
+
+        // RGB colors with NO exact xterm equivalents
         {COLOR_RGB(0xFF0001), COLOR_RGB(0xFF0001), 196, COLOR_LIGHTRED},
         {COLOR_RGB(0xAABBCC), COLOR_RGB(0xAABBCC), 146, COLOR_LIGHTBLUE},
-
-        // TODO: Make color_rgb_optimize() handle grayscales 232..255
-        // {COLOR_RGB(0x080808), 232, 232, COLOR_BLACK},
-        // {COLOR_RGB(0xEEEEEE), 255, 255, COLOR_WHITE},
+        {COLOR_RGB(0x080809), COLOR_RGB(0x080809), 232, COLOR_BLACK},
+        {COLOR_RGB(0xEEEEED), COLOR_RGB(0xEEEEED), 255, COLOR_WHITE},
     };
     FOR_EACH_I(i, tests) {
         const int32_t c = tests[i].input;
