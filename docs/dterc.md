@@ -395,21 +395,21 @@ The _fg-color_ and _bg-color_ arguments can be one of the following:
 * `keep` (`-2`)
 * `default` (`-1`)
 * `black` (`0`)
-* `red`
-* `green`
-* `yellow`
-* `blue`
-* `magenta`
-* `cyan`
-* `gray`
-* `darkgray`
-* `lightred`
-* `lightgreen`
-* `lightyellow`
-* `lightblue`
-* `lightmagenta`
-* `lightcyan`
-* `white`
+* `red` (`1`)
+* `green` (`2`)
+* `yellow` (`3`)
+* `blue` (`4`)
+* `magenta` (`5`)
+* `cyan` (`6`)
+* `gray` (`7`)
+* `darkgray` (`8`)
+* `lightred` (`9`)
+* `lightgreen` (`10`)
+* `lightyellow` (`11`)
+* `lightblue` (`12`)
+* `lightmagenta` (`13`)
+* `lightcyan` (`14`)
+* `white` (`15`)
 
 Colors `16` to `231` correspond to R/G/B colors. Colors `232` to `255`
 are grayscale values.
