@@ -24,20 +24,19 @@ typedef struct {
 
 #define CMD_ARG_MAX 4095 // (1 << 12) - 1
 
-// parse-command.c
+// command-parse.c
 char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, Error **err);
 bool parse_commands(PointerArray *array, const char *cmd, Error **err);
 char **copy_string_array(char **src, size_t count);
 
-// run.c
+// command-run.c
 extern const Command *current_command;
-
 const Command *find_command(const Command *cmds, const char *name);
 void run_commands(const Command *cmds, const PointerArray *array);
 void handle_command(const Command *cmds, const char *cmd);
 
-// commands.c
+// command.c
 extern const Command commands[];
 
 #endif
