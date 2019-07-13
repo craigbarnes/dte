@@ -210,7 +210,7 @@ static int color_dist_sq (
 }
 
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
-static uint8_t rgb_component_to_nearest_cube_index(uint8_t c)
+static uint8_t nearest_cube_index(uint8_t c)
 {
     if (c < 48) {
         return 0;
@@ -236,11 +236,11 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
-    uint8_t r_idx = rgb_component_to_nearest_cube_index(r);
+    uint8_t r_idx = nearest_cube_index(r);
+    uint8_t g_idx = nearest_cube_index(g);
+    uint8_t b_idx = nearest_cube_index(b);
     uint8_t r_stop = color_stops[r_idx];
-    uint8_t g_idx = rgb_component_to_nearest_cube_index(g);
     uint8_t g_stop = color_stops[g_idx];
-    uint8_t b_idx = rgb_component_to_nearest_cube_index(b);
     uint8_t b_stop = color_stops[b_idx];
 
     if (r_stop == r && g_stop == g && b_stop == b) {
