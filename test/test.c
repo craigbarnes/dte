@@ -63,13 +63,13 @@ void expect_nonnull(const char *file, int line, const void *ptr)
     }
 }
 
-void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2)
+void iexpect_streq(const char *f, int l, size_t i, const char *a, const char *b)
 {
-    if (unlikely(!xstreq(s1, s2))) {
-        s1 = s1 ? s1 : "(null)";
-        s2 = s2 ? s2 : "(null)";
+    if (unlikely(!xstreq(a, b))) {
+        a = a ? a : "(null)";
+        b = b ? b : "(null)";
         i++;
-        test_fail(file, line, "Test #%zu: strings not equal: '%s', '%s'", i, s1, s2);
+        test_fail(f, l, "Test #%zu: strings not equal: '%s', '%s'", i, a, b);
     }
 }
 
