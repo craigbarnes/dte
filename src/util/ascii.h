@@ -32,7 +32,6 @@ extern const int8_t hex_table[256];
 #define ascii_isalnum(x) ascii_test(x, ASCII_ALNUM)
 #define ascii_isprint(x) (!ascii_test(x, ASCII_CNTRL | ASCII_NONASCII))
 #define ascii_isxdigit(x) (hex_decode(x) != -1)
-#define ascii_is_nonspace_cntrl(x) (ascii_table[(unsigned char)(x)] == ASCII_CNTRL)
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
@@ -42,6 +41,11 @@ extern const int8_t hex_table[256];
 static inline bool ascii_isblank(unsigned char c)
 {
     return c == ' ' || c == '\t';
+}
+
+static inline bool ascii_is_nonspace_cntrl(unsigned char c)
+{
+    return ascii_table[c] == ASCII_CNTRL;
 }
 
 static inline unsigned char ascii_tolower(unsigned char c)
