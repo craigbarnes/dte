@@ -46,12 +46,13 @@ UNITTEST {
 int ini_parse(const char *filename, IniCallback callback, void *userdata)
 {
     char *buf;
-    ssize_t size = read_file(filename, &buf);
-    if (size < 0) {
+    const ssize_t ssize = read_file(filename, &buf);
+    if (ssize < 0) {
         return -1;
     }
 
-    ssize_t pos = 0;
+    const size_t size = ssize;
+    size_t pos = 0;
     if (size >= 3 && memcmp(buf, "\xEF\xBB\xBF", 3) == 0) {
         // Skip past UTF-8 BOM
         pos += 3;

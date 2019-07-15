@@ -5,6 +5,7 @@
 #include "readfile.h"
 #include "xmalloc.h"
 #include "xreadwrite.h"
+#include "../debug.h"
 
 ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st)
 {
@@ -29,10 +30,11 @@ ssize_t stat_read_file(const char *filename, char **bufp, struct stat *st)
     return r;
 }
 
-char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
+char *buf_next_line(char *buf, size_t *posp, size_t size)
 {
-    ssize_t pos = *posp;
-    ssize_t avail = size - pos;
+    size_t pos = *posp;
+    BUG_ON(pos >= size);
+    size_t avail = size - pos;
     char *line = buf + pos;
     char *nl = memchr(line, '\n', avail);
     if (nl) {
@@ -45,10 +47,11 @@ char *buf_next_line(char *buf, ssize_t *posp, ssize_t size)
     return line;
 }
 
-StringView buf_slice_next_line(const char *buf, ssize_t *posp, ssize_t size)
+StringView buf_slice_next_line(const char *buf, size_t *posp, size_t size)
 {
-    ssize_t pos = *posp;
-    ssize_t avail = size - pos;
+    size_t pos = *posp;
+    BUG_ON(pos >= size);
+    size_t avail = size - pos;
     const char *line = buf + pos;
     const char *nl = memchr(line, '\n', avail);
     size_t line_length = nl ? (nl - line + 1) : avail;

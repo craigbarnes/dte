@@ -63,15 +63,16 @@ bool history_search_backward (
 void history_load(PointerArray *history, const char *filename, size_t max_entries)
 {
     char *buf;
-    ssize_t size = read_file(filename, &buf);
-    if (size < 0) {
+    const ssize_t ssize = read_file(filename, &buf);
+    if (ssize < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
         }
         return;
     }
 
-    ssize_t pos = 0;
+    const size_t size = ssize;
+    size_t pos = 0;
     while (pos < size) {
         history_add(history, buf_next_line(buf, &pos, size), max_entries);
     }

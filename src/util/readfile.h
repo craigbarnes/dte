@@ -17,7 +17,7 @@ static inline ssize_t read_file(const char *filename, char **bufp)
     return stat_read_file(filename, bufp, &st);
 }
 
-char *buf_next_line(char *buf, ssize_t *posp, ssize_t size);
-StringView buf_slice_next_line(const char *buf, ssize_t *posp, ssize_t size);
+char *buf_next_line(char *buf, size_t *posp, size_t size);
+StringView buf_slice_next_line(const char *buf, size_t *posp, size_t size);
 
 #endif
