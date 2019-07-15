@@ -31,10 +31,7 @@ void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
         free_ptr(array->ptrs[i]);
         array->ptrs[i] = NULL;
     }
-    free(array->ptrs);
-    array->ptrs = NULL;
-    array->alloc = 0;
-    array->count = 0;
+    ptr_array_free_array(array);
 }
 
 void ptr_array_remove(PointerArray *array, void *ptr)

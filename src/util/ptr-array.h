@@ -50,10 +50,22 @@ static inline void *ptr_array_prev(const PointerArray *array, const void *ptr)
     return ptr_array_rel(array, ptr, -1);
 }
 
-NONNULL_ARG(1)
+// Free each pointer and then free the array.
+NONNULL_ARGS
 static inline void ptr_array_free(PointerArray *array)
 {
     ptr_array_free_cb(array, free);
+}
+
+// Free the array itself but not the pointers. Useful when the pointers
+// are "borrowed" references.
+NONNULL_ARGS
+static inline void ptr_array_free_array(PointerArray *array)
+{
+    free(array->ptrs);
+    array->ptrs = NULL;
+    array->alloc = 0;
+    array->count = 0;
 }
 
 static inline void ptr_array_sort (
