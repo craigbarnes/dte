@@ -243,7 +243,8 @@ static void collect_completions(char **args, size_t argc)
         || string_view_equal_literal(&cmd_name, "save")
         || string_view_equal_literal(&cmd_name, "compile")
         || string_view_equal_literal(&cmd_name, "run")
-        || string_view_equal_literal(&cmd_name, "pass-through")
+        || string_view_equal_literal(&cmd_name, "pipe-from")
+        || string_view_equal_literal(&cmd_name, "pipe-to")
     ) {
         collect_files(false);
         return;

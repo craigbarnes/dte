@@ -83,7 +83,7 @@ Create an alias _name_ for _command_.
 
 Example:
 
-    alias read "pass-through cat"
+    alias read 'pipe-from cat'
 
 Now you can run `read file.txt` to insert `file.txt` into the current
 buffer.
@@ -532,16 +532,6 @@ are opened.
 
 Add automatic _option_ for filenames that match _regexp_.
 
-### **pass-through** [**-ms**] _command_ [_parameter_]...
-
-Run external _command_ and insert its output.
-
-`-m`
-:   Move after the inserted text
-
-`-s`
-:   Strip newline from end of the command output
-
 ### **paste** [**-c**]
 
 Paste.
@@ -569,10 +559,20 @@ Move cursor page up. See also `scroll-pgup`.
 `-l`
 :   Select whole lines
 
+### **pipe-from** [**-ms**] _command_ [_parameter_]...
+
+Run external _command_ and insert its standard output.
+
+`-m`
+:   Move after the inserted text
+
+`-s`
+:   Strip newline from end of output
+
 ### **pipe-to** _command_ [_parameter_]...
 
-Run external _command_ and pipe currently selected text (or whole file)
-to its standard input stream.
+Run external _command_ and pipe the selected text (or whole file) to
+its standard input.
 
 Can be used to e.g. write text to the system clipboard:
 

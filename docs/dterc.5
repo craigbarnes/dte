@@ -102,13 +102,13 @@ Commands:
 .br
    \fBoption\fR \fB\-r\fR \fIregexp\fR \fIoption\fR \fIvalue\fR...
 .br
-   \fBpass\-through\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
    \fBpaste\fR [\fB\-c\fR]
 .br
    \fBpgdown\fR [\fB\-cl\fR]
 .br
    \fBpgup\fR [\fB\-cl\fR]
+.br
+   \fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
 .br
@@ -332,7 +332,7 @@ Example:
 .IP
 .nf
 \f[C]
-alias\ read\ "pass\-through\ cat"
+alias\ read\ 'pipe\-from\ cat'
 \f[]
 .fi
 .PP
@@ -942,19 +942,6 @@ are opened.
 Add automatic \fIoption\fR for filenames that match \fIregexp\fR.
 .P
 .RE
-\fBpass\-through\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and insert its output.
-.P
-.TP
-\fB\-m\fR
-Move after the inserted text
-.PP
-.TP
-\fB\-s\fR
-Strip newline from end of the command output
-.PP
-.RE
 \fBpaste\fR [\fB\-c\fR]
 .RS
 Paste.
@@ -990,10 +977,23 @@ Select characters
 Select whole lines
 .PP
 .RE
+\fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
+.RS
+Run external \fIcommand\fR and insert its standard output.
+.P
+.TP
+\fB\-m\fR
+Move after the inserted text
+.PP
+.TP
+\fB\-s\fR
+Strip newline from end of output
+.PP
+.RE
 \fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
 .RS
-Run external \fIcommand\fR and pipe currently selected text (or whole file)
-to its standard input stream.
+Run external \fIcommand\fR and pipe the selected text (or whole file) to
+its standard input.
 .P
 Can be used to e.g. write text to the system clipboard:
 .P

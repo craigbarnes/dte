@@ -772,47 +772,6 @@ static void cmd_option(const CommandArgs *a)
     } while (comma);
 }
 
-static void cmd_pass_through(const CommandArgs *a)
-{
-    const char *pf = a->flags;
-    bool strip_nl = false;
-    bool move = false;
-    while (*pf) {
-        switch (*pf++) {
-        case 'm':
-            move = true;
-            break;
-        case 's':
-            strip_nl = true;
-            break;
-        }
-    }
-
-    FilterData data = FILTER_DATA_INIT;
-    if (spawn_filter(a->args, &data)) {
-        return;
-    }
-
-    size_t del_len = 0;
-    if (view->selection) {
-        del_len = prepare_selection(view);
-        unselect();
-    }
-
-    if (strip_nl && data.out_len > 0 && data.out[data.out_len - 1] == '\n') {
-        if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r') {
-            data.out_len--;
-        }
-    }
-
-    buffer_replace_bytes(del_len, data.out, data.out_len);
-    free(data.out);
-
-    if (move) {
-        block_iter_skip_bytes(&view->cursor, data.out_len);
-    }
-}
-
 static void cmd_paste(const CommandArgs *a)
 {
     if (a->flags[0] == 'c') {
@@ -852,6 +811,47 @@ static void cmd_pgup(const CommandArgs *a)
         count = window->edit_h - 1 - margin * 2;
     }
     move_up(count);
+}
+
+static void cmd_pipe_from(const CommandArgs *a)
+{
+    const char *pf = a->flags;
+    bool strip_nl = false;
+    bool move = false;
+    while (*pf) {
+        switch (*pf++) {
+        case 'm':
+            move = true;
+            break;
+        case 's':
+            strip_nl = true;
+            break;
+        }
+    }
+
+    FilterData data = FILTER_DATA_INIT;
+    if (spawn_filter(a->args, &data)) {
+        return;
+    }
+
+    size_t del_len = 0;
+    if (view->selection) {
+        del_len = prepare_selection(view);
+        unselect();
+    }
+
+    if (strip_nl && data.out_len > 0 && data.out[data.out_len - 1] == '\n') {
+        if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r') {
+            data.out_len--;
+        }
+    }
+
+    buffer_replace_bytes(del_len, data.out, data.out_len);
+    free(data.out);
+
+    if (move) {
+        block_iter_skip_bytes(&view->cursor, data.out_len);
+    }
 }
 
 static void cmd_pipe_to(const CommandArgs *a)
@@ -1872,10 +1872,10 @@ const Command commands[] = {
     {"next", "", 0, 0, cmd_next},
     {"open", "e=g", 0, -1, cmd_open},
     {"option", "-r", 3, -1, cmd_option},
-    {"pass-through", "-ms", 1, -1, cmd_pass_through},
     {"paste", "c", 0, 0, cmd_paste},
     {"pgdown", "cl", 0, 0, cmd_pgdown},
     {"pgup", "cl", 0, 0, cmd_pgup},
+    {"pipe-from", "-ms", 1, -1, cmd_pipe_from},
     {"pipe-to", "-", 1, -1, cmd_pipe_to},
     {"prev", "", 0, 0, cmd_prev},
     {"quit", "fp", 0, 0, cmd_quit},
