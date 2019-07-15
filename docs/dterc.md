@@ -282,6 +282,11 @@ Erase word before cursor.
 
 See `compile` and `msg` commands for more information.
 
+### **eval** _command_ [_parameter_]...
+
+Run external _command_ and execute its standard output text as dterc
+commands.
+
 ### **filter** _command_ [_parameter_]...
 
 Filter selected text or whole file through external _command_.

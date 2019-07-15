@@ -58,6 +58,8 @@ Commands:
 .br
    \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message]...
 .br
+   \fBeval\fR \fIcommand\fR [\fIparameter\fR]...
+.br
    \fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBwrap\-paragraph\fR [\fIwidth\fR]
@@ -591,6 +593,12 @@ Be more "aggressive"
 Ignore this error
 .PP
 See \fBcompile\fR and \fBmsg\fR commands for more information.
+.P
+.RE
+\fBeval\fR \fIcommand\fR [\fIparameter\fR]...
+.RS
+Run external \fIcommand\fR and execute its standard output text as dterc
+commands.
 .P
 .RE
 \fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
