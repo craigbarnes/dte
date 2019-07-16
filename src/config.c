@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/types.h>
 #include "config.h"
 #include "completion.h"
 #include "debug.h"
@@ -28,10 +29,9 @@ static bool is_command(const char *str, size_t len)
 }
 
 // Odd number of backslashes at end of line?
-static bool has_line_continuation(const char *str, int len)
+static bool has_line_continuation(const char *str, size_t len)
 {
-    int pos = len - 1;
-
+    ssize_t pos = len - 1;
     while (pos >= 0 && str[pos] == '\\') {
         pos--;
     }
