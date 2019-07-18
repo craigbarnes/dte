@@ -539,7 +539,7 @@ Add automatic _option_ for filenames that match _regexp_.
 
 ### **paste** [**-c**]
 
-Paste.
+Paste text previously copied by the `copy` or `cut` commands.
 
 `-c`
 :   Paste at the cursor position
@@ -582,6 +582,8 @@ its standard input.
 Can be used to e.g. write text to the system clipboard:
 
     pipe-to xsel -b
+
+See also: the `filter` command.
 
 ### **prev**
 
