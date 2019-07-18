@@ -6,47 +6,50 @@
 #include <stdint.h>
 #include "xterm.h"
 #include "../util/ascii.h"
+#include "../util/macros.h"
 #include "../util/unicode.h"
+
+static const KeyCode modifiers[] = {
+    [2] = MOD_SHIFT,
+    [3] = MOD_META,
+    [4] = MOD_SHIFT | MOD_META,
+    [5] = MOD_CTRL,
+    [6] = MOD_SHIFT | MOD_CTRL,
+    [7] = MOD_META | MOD_CTRL,
+    [8] = MOD_SHIFT | MOD_META | MOD_CTRL,
+};
+
+static const KeyCode special_keys[] = {
+    [1] = KEY_HOME,
+    [2] = KEY_INSERT,
+    [3] = KEY_DELETE,
+    [4] = KEY_END,
+    [5] = KEY_PAGE_UP,
+    [6] = KEY_PAGE_DOWN,
+    [7] = KEY_HOME,
+    [8] = KEY_END,
+    [11] = KEY_F1,
+    [12] = KEY_F2,
+    [13] = KEY_F3,
+    [14] = KEY_F4,
+    [15] = KEY_F5,
+    [17] = KEY_F6,
+    [18] = KEY_F7,
+    [19] = KEY_F8,
+    [20] = KEY_F9,
+    [21] = KEY_F10,
+    [23] = KEY_F11,
+    [24] = KEY_F12,
+};
 
 static KeyCode decode_modifiers(uint32_t n)
 {
-    switch (n) {
-    case 2: return MOD_SHIFT;
-    case 3: return MOD_META;
-    case 4: return MOD_SHIFT | MOD_META;
-    case 5: return MOD_CTRL;
-    case 6: return MOD_SHIFT | MOD_CTRL;
-    case 7: return MOD_META | MOD_CTRL;
-    case 8: return MOD_SHIFT | MOD_META | MOD_CTRL;
-    }
-    return 0;
+    return (n >= ARRAY_COUNT(modifiers)) ? 0 : modifiers[n];
 }
 
-static KeyCode decode_special_key(uint32_t code)
+static KeyCode decode_special_key(uint32_t n)
 {
-    switch (code) {
-    case 1: return KEY_HOME;
-    case 2: return KEY_INSERT;
-    case 3: return KEY_DELETE;
-    case 4: return KEY_END;
-    case 5: return KEY_PAGE_UP;
-    case 6: return KEY_PAGE_DOWN;
-    case 7: return KEY_HOME;
-    case 8: return KEY_END;
-    case 11: return KEY_F1;
-    case 12: return KEY_F2;
-    case 13: return KEY_F3;
-    case 14: return KEY_F4;
-    case 15: return KEY_F5;
-    case 17: return KEY_F6;
-    case 18: return KEY_F7;
-    case 19: return KEY_F8;
-    case 20: return KEY_F9;
-    case 21: return KEY_F10;
-    case 23: return KEY_F11;
-    case 24: return KEY_F12;
-    }
-    return 0;
+    return (n >= ARRAY_COUNT(special_keys)) ? 0 : special_keys[n];
 }
 
 static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
