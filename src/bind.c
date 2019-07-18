@@ -115,23 +115,31 @@ void remove_binding(const char *keystr)
     }
 }
 
-void handle_binding(KeyCode key)
+const char *lookup_binding(KeyCode key)
 {
     const ssize_t idx = key_lookup_index(key);
     if (idx >= 0) {
         const char *command = bindings_lookup_table[idx];
         if (command) {
-            handle_command(commands, command);
-            return;
+            return command;
         }
     }
 
     for (size_t i = bindings_ptr_array.count; i > 0; i--) {
         Binding *b = bindings_ptr_array.ptrs[i - 1];
         if (b->key == key) {
-            handle_command(commands, b->command);
-            break;
+            return b->command;
         }
+    }
+
+    return NULL;
+}
+
+void handle_binding(KeyCode key)
+{
+    const char *command = lookup_binding(key);
+    if (command) {
+        handle_command(commands, command);
     }
 }
 

@@ -1479,6 +1479,28 @@ static void cmd_shift(const CommandArgs *a)
     shift_lines(count);
 }
 
+static void cmd_show_binding(const CommandArgs *a)
+{
+    const char *keystr = a->args[0];
+    KeyCode key;
+    if (!parse_key(&key, keystr)) {
+        error_msg("invalid key string: %s", keystr);
+        return;
+    }
+
+    if (u_is_unicode(key)) {
+        info_msg("%s is not a bindable key", keystr);
+        return;
+    }
+
+    const char *command = lookup_binding(key);
+    if (command) {
+        info_msg("%s is bound to: %s", keystr, command);
+    } else {
+        info_msg("%s is not bound to a command", keystr);
+    }
+}
+
 static void cmd_show_bindings(const CommandArgs* UNUSED_ARG(a))
 {
     char tmp[32] = "/tmp/.dte.binds.XXXXXX";
@@ -1895,6 +1917,7 @@ const Command commands[] = {
     {"set", "gl", 1, -1, cmd_set},
     {"setenv", "", 2, 2, cmd_setenv},
     {"shift", "", 1, 1, cmd_shift},
+    {"show-binding", "", 1, 1, cmd_show_binding},
     {"show-bindings", "", 0, 0, cmd_show_bindings},
     {"suspend", "", 0, 0, cmd_suspend},
     {"tag", "r", 0, 1, cmd_tag},

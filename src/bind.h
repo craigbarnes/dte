@@ -6,6 +6,7 @@
 
 void add_binding(const char *keystr, const char *command);
 void remove_binding(const char *keystr);
+const char *lookup_binding(KeyCode key);
 void handle_binding(KeyCode key);
 String dump_bindings(void);
 
