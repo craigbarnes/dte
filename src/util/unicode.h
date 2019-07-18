@@ -16,7 +16,7 @@ static inline bool u_is_unicode(CodePoint u)
 
 static inline bool u_is_cntrl(CodePoint u)
 {
-    return u < 0x20 || u == 0x7f;
+    return (u >= 0x7F) ? (u < 0xA0) : (u < 0x20);
 }
 
 static inline bool u_is_upper(CodePoint u)
