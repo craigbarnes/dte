@@ -76,10 +76,8 @@ function Header(level, s, attr)
             return ".SH DESCRIPTION\n"
         end
         if generate_toc then
-            if s == "Commands" then
+            if s == "Commands" or s == "Options" then
                 toc:write(".P\n", s, ":\n.br\n")
-                in_toc_heading = true
-            elseif s == "Options" then
                 in_toc_heading = true
             else
                 in_toc_heading = false

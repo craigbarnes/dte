@@ -77,6 +77,12 @@ Double quoted strings may contain the following escapes:
 
 # Commands
 
+## Configuration Commands
+
+Configuration commands are used to customize some aspect of editor, for
+example adding key bindings, setting options, etc. These are the only
+commands allowed in user config files.
+
 ### **alias** _name_ _command_
 
 Create an alias _name_ for _command_.
@@ -121,253 +127,41 @@ Alt:
 Shift:
 :   `S-left`
 
-### **bof**
+### **set** [**-gl**] _option_ [_value_] ...
 
-Move to beginning of file.
+Set _value_ for _option_. Value can be omitted for boolean option to set
+it true. Multiple options can be set at once but then _value_ must be
+given for every option.
 
-### **bol** [**-cs**]
+There are three kinds of options.
 
-Move to beginning of line.
+1. Global options.
 
-`-c`
-:   Select characters
+2. Local options. These are file specific options. Each open file has
+   its own copies of the option values.
 
-`-s`
-:   Move to beginning of indented text or beginning of line, depending
-    on current cursor position.
+3. Options that have both global and local values. The Global value is
+   just a default local value for opened files and is never used for
+   anything else. Changing the global value does not affect any already
+   opened files.
 
-### **bolsf**
+By default `set` changes both global and local values.
 
-Incrementally move cursor to beginning of line, then beginning
-of screen, then beginning of file.
-
-### **case** [**-lu**]
-
-Change text case. The default is to change lower case to upper case and
-vice versa.
+`-g`
+:   Change only global option value
 
 `-l`
-:   Lower case
+:   Change only local option value of current file
 
-`-u`
-:   Upper case
+In configuration files only global options can be set (no need
+to specify the `-g` flag).
 
-### **cd** _directory_
+To automatically set options for specific filetypes and filenames use
+the `option` command.
 
-Change the working directory and update `$PWD` and `$OLDPWD`. Running
-`cd -` changes to the previous directory (`$OLDPWD`).
+### **setenv** _name_ _value_
 
-### **center-view**
-
-Center view to cursor.
-
-### **clear**
-
-Clear current line.
-
-### **close** [**-fqw**]
-
-Close file.
-
-`-f`
-:   Close file even if it hasn't been saved after last modification
-
-`-q`
-:   Quit if closing the last open file
-
-`-w`
-:   Close parent window if closing its last contained file
-
-### **command** [_text_]
-
-Enter command mode. If _text_ is given then it is written to the command
-line (see the default `^L` key binding for why this is useful).
-
-### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
-
-Run external _command_ and collect output messages. This can be
-used to run e.g. compilers, build systems, code search utilities,
-etc. and then jump to a file/line position for each message.
-
-The _errorfmt_ argument corresponds to a regex capture pattern
-previously specified by the `errorfmt` command. After _command_
-exits successfully, parsed messages can be navigated using the
-`msg` command.
-
-`-1`
-:   Read error messages from stdout instead of stderr
-
-`-p`
-:   Display "Press any key to continue" prompt
-
-`-s`
-:   Silent. Both `stderr` and `stdout` are redirected to `/dev/null`
-
-See also: `errorfmt` and `msg` commands.
-
-### **copy** [**-k**]
-
-Copy current line or selection.
-
-`-k`
-:   Keep selection (by default, selections are lost after copying)
-
-### **cut**
-
-Cut current line or selection.
-
-### **delete**
-
-Delete character or selection.
-
-### **delete-eol** [**-n**]
-
-Delete to end of line.
-
-`-n`
-:   Delete newline if cursor is at end of line
-
-### **delete-word** [**-s**]
-
-Delete word after cursor.
-
-`-s`
-:   Be more "aggressive"
-
-### **down** [**-cl**]
-
-Move cursor down.
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
-
-### **eof**
-
-Move cursor to end of file.
-
-### **eol** [**-c**]
-
-Move cursor to end of line.
-
-`-c`
-:   Select characters
-
-### **eolsf**
-
-Incrementally move cursor to end of line, then end of screen, then
-end of file.
-
-### **erase**
-
-Erase character before cursor.
-
-### **erase-bol**
-
-Erase to beginning of line.
-
-### **erase-word** [**-s**]
-
-Erase word before cursor.
-
-`-s`
-:   Be more "aggressive"
-
-### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message]...
-
-`-i`
-:   Ignore this error
-
-See `compile` and `msg` commands for more information.
-
-### **eval** _command_ [_parameter_]...
-
-Run external _command_ and execute its standard output text as dterc
-commands.
-
-### **filter** _command_ [_parameter_]...
-
-Filter selected text or whole file through external _command_.
-
-Example:
-
-    filter sort -r
-
-Note that _command_ is executed directly using [`execvp`]. To use shell
-features like pipes or redirection, use a shell interpreter as the
-_command_. For example:
-
-    filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
-
-### **wrap-paragraph** [_width_]
-
-Format the current selection or paragraph under the cursor. If
-paragraph _width_ is not given then the `text-width` option is
-used.
-
-This command merges the selection into one paragraph. To format
-multiple paragraphs use the external `fmt`(1) program with the
-`filter` command, e.g. `filter fmt -w 60`.
-
-### **ft** _filetype_ _extension_...
-
-Associate filename _extension_ with _filetype_.
-
-Filetypes are used to determine which syntax highlighter and local
-options to use when opening files.
-
-Example:
-
-    ft sh sh bash ksh zsh
-
-See also:
-
-* The `option` command (below)
-* The `filetype` option (below)
-* The [`dte-syntax`] man page
-
-### **ft** **-b** _filetype_ _basename_...
-
-Associate file _basename_ with _filetype_.
-
-### **ft** **-c** _filetype_ _contents-regexp_...
-
-Detect _filetype_ by matching _contents-regexp_ against first line of file.
-
-### **ft** **-f** _filetype_ _filename-regexp_...
-
-Detect _filetype_ by matching _filename-regexp_ against filename.
-
-### **ft** **-i** _filetype_ _interpreter_...
-
-Associate _interpreter_ with _filetype_. Interpreters are parsed
-from the `#!` line in many scripts.
-
-### **git-open**
-
-Interactive file opener. Lists all files in a git repository.
-
-Same keys work as in command mode, but with these changes:
-
-`up`
-:   Move up in file list.
-
-`down`
-:   Move down in file list.
-
-`enter`
-:   Open file.
-
-`^O`
-:   Open file but don't close git-open.
-
-`M-e`
-:   Go to end of file list.
-
-`M-t`
-:   Go to top of file list.
+Set environment variable.
 
 ### **hi** _name_ [_fg-color_ [_bg-color_]] [_attribute_]...
 
@@ -446,9 +240,56 @@ Unset fg/bg colors are inherited from highlight color `default`.
 If you don't set fg/bg for the highlight color `default` then
 terminal's default fg/bg is used.
 
+### **ft** [**-bcfi**] _filetype_ _string_...
+
+Add a filetype association. Filetypes are used to determine which
+syntax highlighter and local options to use when opening files.
+
+By default _string_ is interpreted as one or more filename extensions.
+
+`-b`
+:   Interpret _string_ as a file basename
+
+`-c`
+:   Interpret _string_ as a regex pattern and match against the
+    contents of the first line of the file
+
+`-f`
+:   Interpret _string_ as a regex pattern and match against the
+    full (absolute) filename
+
+`-i`
+:   Interpret _string_ as a command interpretter name and match against
+    the Unix shebang line (after removing any path prefix and/or version
+    suffix)
+
+Examples:
+
+    ft c c h
+    ft -b make Makefile GNUmakefile
+    ft -c xml '<\?xml'
+    ft -f mail '/tmpmsg-.*\.txt$'
+    ft -i lua lua luajit
+
+See also:
+
+* The `option` command (below)
+* The `filetype` option (below)
+* The [`dte-syntax`] man page
+
+### **option** [**-r**] _filetype_ _option_ _value_...
+
+Add automatic _option_ for _filetype_ (as previously registered
+with the `ft` command). Automatic options are set when files are
+are opened.
+
+`-r`
+:   Interpret _filetype_ argument as a regex pattern instead of a
+    filetype and match against full filenames
+
 ### **include** [**-b**] _file_
 
-Read commands from _file_.
+Read and execute commands from _file_.
 
 `-b`
 :   Read built-in _file_ instead of reading from the filesystem
@@ -456,30 +297,12 @@ Read commands from _file_.
 Note: "built-in files" are config files bundled into the program binary.
 See the `-B` and `-b` flags in the `dte` man page for more information.
 
-### **insert** [**-km**] _text_
+### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message]...
 
-Insert _text_ into the buffer.
+`-i`
+:   Ignore this error
 
-`-k`
-:   Insert one character at a time as if it has been typed
-
-`-m`
-:   Move after inserted text
-
-### **join**
-
-Join selection or next line to current.
-
-### **left** [**-c**]
-
-Move left.
-
-`-c`
-:   Select characters
-
-### **line** _number_
-
-Go to line.
+See `compile` and `msg` commands for more information.
 
 ### **load-syntax** _filename_|_filetype_
 
@@ -491,107 +314,11 @@ actually apply a syntax highlighter to the current buffer, use the
 `set` command to change the `filetype` of the buffer instead, e.g.
 `set filetype html`.
 
-### **move-tab** _N_|left|right
-
-Move current tab to position _N_ or 1 position left or right.
-
-### **msg** [**-np**]
-
-Show latest, next (`-n`) or previous (`-p`) message. If its location
-is known (compile error or tag message) then the file will be
-opened and cursor moved to the location.
-
-`-n`
-:   Next message
-
-`-p`
-:   Previous message
-
-See also `compile` and `tag` commands.
-
-### **new-line**
-
-Insert empty line under current line.
-
-### **next**
-
-Display next file.
-
-### **open** [**-g**] [**-e** _encoding_] [_file_]...
-
-Open _file_. If filename is omitted, a new file is opened.
-
-`-e` _encoding_
-:   Set file _encoding_. See `iconv -l` for list of supported encodings.
-
-`-g`
-:   Perform [`glob`] expansion on _file_.
-
-### **option** _filetype_ _option_ _value_...
-
-Add automatic _option_ for _filetype_ (as previously registered
-with the `ft` command). Automatic options are set when files are
-are opened.
-
-### **option** **-r** _regexp_ _option_ _value_...
-
-Add automatic _option_ for filenames that match _regexp_.
-
-### **paste** [**-c**]
-
-Paste text previously copied by the `copy` or `cut` commands.
-
-`-c`
-:   Paste at the cursor position
-
-### **pgdown** [**-cl**]
-
-Move cursor page down. See also `scroll-pgdown`.
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
-
-### **pgup** [**-cl**]
-
-Move cursor page up. See also `scroll-pgup`.
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
-
-### **pipe-from** [**-ms**] _command_ [_parameter_]...
-
-Run external _command_ and insert its standard output.
-
-`-m`
-:   Move after the inserted text
-
-`-s`
-:   Strip newline from end of output
-
-### **pipe-to** _command_ [_parameter_]...
-
-Run external _command_ and pipe the selected text (or whole file) to
-its standard input.
-
-Can be used to e.g. write text to the system clipboard:
-
-    pipe-to xsel -b
-
-See also: the `filter` command.
-
-### **prev**
-
-Display previous file.
+## Editor Commands
 
 ### **quit** [**-fp**]
 
-Quit.
+Quit the editor.
 
 `-f`
 :   Force quit, even if there are unsaved files
@@ -599,96 +326,19 @@ Quit.
 `-p`
 :   Prompt for confirmation if there are unsaved files
 
-### **redo** [_choice_]
+### **suspend**
 
-Redo changes done by the `undo` command. If there are multiple
-possibilities an informative message is displayed:
+Suspend the editor (run `fg` in the shell to resume).
 
-    Redoing newest (2) of 2 possible changes.
+### **cd** _directory_
 
-If the change was not the one you wanted, just run `undo` and
-then, for example, `redo 1`.
+Change the working directory and update `$PWD` and `$OLDPWD`. Running
+`cd -` changes to the previous directory (`$OLDPWD`).
 
-### **refresh**
+### **command** [_text_]
 
-Trigger a full redraw of the screen.
-
-### **repeat** _count_ _command_ [_parameters_]...
-
-Run _command_ _count_ times.
-
-### **replace** [**-bcgi**] _pattern_ _replacement_
-
-Replace all instances of text matching _pattern_ with the _replacement_
-text.
-
-The _pattern_ is a POSIX extended **regex**(7).
-
-`-b`
-:   Use basic instead of extended regex syntax
-
-`-c`
-:   Ask for confirmation before each replacement
-
-`-g`
-:   Replace all matches for each line (instead of just the first)
-
-`-i`
-:   Ignore case
-
-### **right** [**-c**]
-
-Move right.
-
-`-c`
-:   Select characters
-
-### **run** [**-ps**] _command_ [_parameters_]...
-
-Run external _command_.
-
-`-p`
-:   Display "Press any key to continue" prompt
-
-`-s`
-:   Silent -- both `stderr` and `stdout` are redirected to `/dev/null`
-
-### **save** [**-dfup**] [**-e** _encoding_] [_filename_]
-
-Save file. By default line-endings (LF vs CRLF) are preserved.
-
-`-d`
-:   Save with DOS/CRLF line-endings
-
-`-f`
-:   Force saving read-only file
-
-`-u`
-:   Save with Unix/LF line-endings
-
-`-p`
-:   Open a command prompt if there's no specified or existing _filename_
-
-`-e` _encoding_
-:   Set file _encoding_. See `iconv -l` for list of supported encodings.
-
-### **scroll-down**
-
-Scroll view down one line. Keeps cursor position unchanged if possible.
-
-### **scroll-pgdown**
-
-Scroll page down. Cursor position relative to top of screen is
-maintained. See also `pgdown`.
-
-### **scroll-pgup**
-
-Scroll page up. Cursor position relative to top of screen is
-maintained. See also `pgup`.
-
-### **scroll-up**
-
-Scroll view up one line. Keeps cursor position unchanged if possible.
+Enter command mode. If _text_ is given then it is written to the command
+line (see the default `^L` key binding for why this is useful).
 
 ### **search** [**-Hnprw**] [_pattern_]
 
@@ -710,116 +360,108 @@ search mode where you can type a regular expression to search.
 `-w`
 :   Search word under cursor
 
-### **select** [**-bkl**]
+### **git-open**
 
-Start selecting an area of text.
+Interactive file opener. Lists all files in a git repository.
 
-`-b`
-:   Select block between opening `{` and closing `}` curly braces
+Same keys work as in command mode, but with these changes:
 
-`-k`
-:   Keep existing selections
+`up`
+:   Move up in file list.
 
-`-l`
-:   Select whole lines
+`down`
+:   Move down in file list.
 
-### **set** [**-gl**] _option_ [_value_] ...
+`enter`
+:   Open file.
 
-Set _value_ for _option_. Value can be omitted for boolean option to set
-it true. Multiple options can be set at once but then _value_ must be
-given for every option.
+`^O`
+:   Open file but don't close git-open.
 
-There are three kinds of options.
+`M-e`
+:   Go to end of file list.
 
-1. Global options.
+`M-t`
+:   Go to top of file list.
 
-2. Local options. These are file specific options. Each open file has
-   its own copies of the option values.
+### **refresh**
 
-3. Options that have both global and local values. The Global value is
-   just a default local value for opened files and is never used for
-   anything else. Changing the global value does not affect any already
-   opened files.
+Trigger a full redraw of the screen.
 
-By default `set` changes both global and local values.
+## Buffer Management Commands
 
-`-g`
-:   Change only global option value
+### **open** [**-g**] [**-e** _encoding_] [_filename_]...
 
-`-l`
-:   Change only local option value of current file
+Open file. If _filename_ is omitted, a new file is opened.
 
-In configuration files only global options can be set (no need
-to specify the `-g` flag).
-
-To automatically set options for specific filetypes and filenames use
-the `option` command.
-
-### **setenv** _name_ _value_
-
-Set environment variable.
-
-### **shift** _count_
-
-Shift current or selected lines by _count_ indentation levels.
-Count is usually `-1` (decrease indent) or `1` (increase indent).
-
-To specify a negative number, it's necessary to first disable
-option parsing with `--`, e.g. `shift -- -1`.
-
-### **suspend**
-
-Suspend program.
-
-### **tag** [**-r**] [_tag_]
-
-Save current location to stack and go to the location of _tag_.
-Requires tags file generated by Exuberant Ctags. If no _tag_ is
-given then word under cursor is used as a tag instead.
-
-`-r`
-:   return back to previous location
-
-Tag files are searched from current working directory and its
-parent directories.
-
-See also `msg` command.
-
-### **toggle** [**-gv**] _option_ [_values_]...
-
-Toggle _option_. If list of _values_ is not given then the option
-must be either boolean or enum.
+`-e` _encoding_
+:   Set file _encoding_. See `iconv -l` for list of supported encodings.
 
 `-g`
-:   toggle global option instead of local
+:   Perform [`glob`] expansion on _filename_.
 
-`-v`
-:   display new value
+### **save** [**-dfup**] [**-e** _encoding_] [_filename_]
 
-If _option_ has both local and global values then local is toggled
-unless `-g` is used.
+Save file. By default line-endings (LF vs CRLF) are preserved.
 
-### **undo**
+`-d`
+:   Save with DOS/CRLF line-endings
 
-Undo latest change.
+`-f`
+:   Force saving read-only file
 
-### **unselect**
+`-u`
+:   Save with Unix/LF line-endings
 
-Unselect.
+`-p`
+:   Open a command prompt if there's no specified or existing _filename_
 
-### **up** [**-cl**]
+`-e` _encoding_
+:   Set file _encoding_. See `iconv -l` for list of supported encodings.
 
-Move cursor up.
+### **close** [**-fqw**]
 
-`-c`
-:   Select characters
+Close file.
 
-`-l`
-:   Select whole lines
+`-f`
+:   Close file even if it hasn't been saved after last modification
+
+`-q`
+:   Quit if closing the last open file
+
+`-w`
+:   Close parent window if closing its last contained file
+
+### **next**
+
+Display next file.
+
+### **prev**
+
+Display previous file.
 
 ### **view** _N_|last
 
 Display _N_th or last open file.
+
+### **move-tab** _N_|left|right
+
+Move current tab to position _N_ or 1 position left or right.
+
+## Window Management Commands
+
+### **wsplit** [**-bhr**] [_file_]...
+
+Like `open` but at first splits current window vertically.
+
+`-b`
+:   Add new window before current instead of after.
+
+`-h`
+:   Split horizontally instead of vertically.
+
+`-r`
+:   Split root instead of current window.
 
 ### **wclose** [**-f**]
 
@@ -828,33 +470,9 @@ Close window.
 `-f`
 :   Close even if there are unsaved files in the window
 
-### **wflip**
-
-Change from vertical layout to horizontal and vice versa.
-
 ### **wnext**
 
 Next window.
-
-### **word-bwd** [**-cs**]
-
-Move cursor backward one word.
-
-`-c`
-:   Select characters
-
-`-s`
-:   Skip special characters
-
-### **word-fwd** [**-cs**]
-
-Move cursor forward one word.
-
-`-c`
-:   Select characters
-
-`-s`
-:   Skip special characters
 
 ### **wprev**
 
@@ -881,22 +499,425 @@ _N_
     prevent the minus symbol being parsed as an option flag, e.g.
     `wresize -- -5`.
 
-### **wsplit** [**-bhr**] [_file_]...
+### **wflip**
 
-Like `open` but at first splits current window vertically.
-
-`-b`
-:   Add new window before current instead of after.
-
-`-h`
-:   Split horizontally instead of vertically.
-
-`-r`
-:   Split root instead of current window.
+Change from vertical layout to horizontal and vice versa.
 
 ### **wswap**
 
 Swap positions of this and next frame.
+
+## Movement Commands
+
+### **left** [**-c**]
+
+Move left.
+
+`-c`
+:   Select characters
+
+### **right** [**-c**]
+
+Move right.
+
+`-c`
+:   Select characters
+
+### **up** [**-cl**]
+
+Move cursor up.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
+
+### **down** [**-cl**]
+
+Move cursor down.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
+
+### **pgup** [**-cl**]
+
+Move cursor page up. See also `scroll-pgup`.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
+
+### **pgdown** [**-cl**]
+
+Move cursor page down. See also `scroll-pgdown`.
+
+`-c`
+:   Select characters
+
+`-l`
+:   Select whole lines
+
+### **word-fwd** [**-cs**]
+
+Move cursor forward one word.
+
+`-c`
+:   Select characters
+
+`-s`
+:   Skip special characters
+
+### **word-bwd** [**-cs**]
+
+Move cursor backward one word.
+
+`-c`
+:   Select characters
+
+`-s`
+:   Skip special characters
+
+### **bol** [**-cs**]
+
+Move to beginning of line.
+
+`-c`
+:   Select characters
+
+`-s`
+:   Move to beginning of indented text or beginning of line, depending
+    on current cursor position.
+
+### **eol** [**-c**]
+
+Move cursor to end of line.
+
+`-c`
+:   Select characters
+
+### **bof**
+
+Move to beginning of file.
+
+### **eof**
+
+Move cursor to end of file.
+
+### **bolsf**
+
+Incrementally move cursor to beginning of line, then beginning
+of screen, then beginning of file.
+
+### **eolsf**
+
+Incrementally move cursor to end of line, then end of screen, then
+end of file.
+
+### **scroll-up**
+
+Scroll view up one line. Keeps cursor position unchanged if possible.
+
+### **scroll-down**
+
+Scroll view down one line. Keeps cursor position unchanged if possible.
+
+### **scroll-pgup**
+
+Scroll page up. Cursor position relative to top of screen is
+maintained. See also `pgup`.
+
+### **scroll-pgdown**
+
+Scroll page down. Cursor position relative to top of screen is
+maintained. See also `pgdown`.
+
+### **center-view**
+
+Center view to cursor.
+
+### **line** _number_
+
+Go to line.
+
+### **tag** [**-r**] [_tag_]
+
+Save current location to stack and go to the location of _tag_.
+Requires tags file generated by Exuberant Ctags. If no _tag_ is
+given then word under cursor is used as a tag instead.
+
+`-r`
+:   return back to previous location
+
+Tag files are searched from current working directory and its
+parent directories.
+
+See also `msg` command.
+
+### **msg** [**-np**]
+
+Show latest, next (`-n`) or previous (`-p`) message. If its location
+is known (compile error or tag message) then the file will be
+opened and cursor moved to the location.
+
+`-n`
+:   Next message
+
+`-p`
+:   Previous message
+
+See also `compile` and `tag` commands.
+
+## Editing Commands
+
+### **select** [**-bkl**]
+
+Start selecting an area of text.
+
+`-b`
+:   Select block between opening `{` and closing `}` curly braces
+
+`-k`
+:   Keep existing selections
+
+`-l`
+:   Select whole lines
+
+### **unselect**
+
+Unselect.
+
+### **cut**
+
+Cut current line or selection.
+
+### **copy** [**-k**]
+
+Copy current line or selection.
+
+`-k`
+:   Keep selection (by default, selections are lost after copying)
+
+### **paste** [**-c**]
+
+Paste text previously copied by the `copy` or `cut` commands.
+
+`-c`
+:   Paste at the cursor position
+
+### **undo**
+
+Undo latest change.
+
+### **redo** [_choice_]
+
+Redo changes done by the `undo` command. If there are multiple
+possibilities a message is displayed:
+
+    Redoing newest (2) of 2 possible changes.
+
+If the change was not the one you wanted, just run `undo` and
+then, for example, `redo 1`.
+
+### **clear**
+
+Clear current line.
+
+### **join**
+
+Join selection or next line to current.
+
+### **new-line**
+
+Insert empty line under current line.
+
+### **delete**
+
+Delete character after cursor (or selection).
+
+### **erase**
+
+Delete character before cursor (or selection).
+
+### **delete-eol** [**-n**]
+
+Delete to end of line.
+
+`-n`
+:   Delete newline if cursor is at end of line
+
+### **erase-bol**
+
+Erase to beginning of line.
+
+### **delete-word** [**-s**]
+
+Delete word after cursor.
+
+`-s`
+:   Be more "aggressive"
+
+### **erase-word** [**-s**]
+
+Erase word before cursor.
+
+`-s`
+:   Be more "aggressive"
+
+### **case** [**-lu**]
+
+Change text case. The default is to change lower case to upper case and
+vice versa.
+
+`-l`
+:   Lower case
+
+`-u`
+:   Upper case
+
+### **insert** [**-km**] _text_
+
+Insert _text_ into the buffer.
+
+`-k`
+:   Insert one character at a time as if it has been typed
+
+`-m`
+:   Move after inserted text
+
+### **replace** [**-bcgi**] _pattern_ _replacement_
+
+Replace all instances of text matching _pattern_ with the _replacement_
+text.
+
+The _pattern_ is a POSIX extended **regex**(7).
+
+`-b`
+:   Use basic instead of extended regex syntax
+
+`-c`
+:   Ask for confirmation before each replacement
+
+`-g`
+:   Replace all matches for each line (instead of just the first)
+
+`-i`
+:   Ignore case
+
+### **shift** _count_
+
+Shift current or selected lines by _count_ indentation levels.
+Count is usually `-1` (decrease indent) or `1` (increase indent).
+
+To specify a negative number, it's necessary to first disable
+option parsing with `--`, e.g. `shift -- -1`.
+
+### **wrap-paragraph** [_width_]
+
+Format the current selection or paragraph under the cursor. If
+paragraph _width_ is not given then the `text-width` option is
+used.
+
+This command merges the selection into one paragraph. To format
+multiple paragraphs use the external `fmt`(1) program with the
+`filter` command, e.g. `filter fmt -w 60`.
+
+## External Commands
+
+### **filter** _command_ [_parameter_]...
+
+Filter selected text or whole file through external _command_.
+
+Example:
+
+    filter sort -r
+
+Note that _command_ is executed directly using [`execvp`]. To use shell
+features like pipes or redirection, use a shell interpreter as the
+_command_. For example:
+
+    filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
+
+### **pipe-from** [**-ms**] _command_ [_parameter_]...
+
+Run external _command_ and insert its standard output.
+
+`-m`
+:   Move after the inserted text
+
+`-s`
+:   Strip newline from end of output
+
+### **pipe-to** _command_ [_parameter_]...
+
+Run external _command_ and pipe the selected text (or whole file) to
+its standard input.
+
+Can be used to e.g. write text to the system clipboard:
+
+    pipe-to xsel -b
+
+### **run** [**-ps**] _command_ [_parameters_]...
+
+Run external _command_.
+
+`-p`
+:   Display "Press any key to continue" prompt
+
+`-s`
+:   Silent -- both `stderr` and `stdout` are redirected to `/dev/null`
+
+### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
+
+Run external _command_ and collect output messages. This can be
+used to run e.g. compilers, build systems, code search utilities,
+etc. and then jump to a file/line position for each message.
+
+The _errorfmt_ argument corresponds to a regex capture pattern
+previously specified by the `errorfmt` command. After _command_
+exits successfully, parsed messages can be navigated using the
+`msg` command.
+
+`-1`
+:   Read error messages from stdout instead of stderr
+
+`-p`
+:   Display "Press any key to continue" prompt
+
+`-s`
+:   Silent. Both `stderr` and `stdout` are redirected to `/dev/null`
+
+See also: `errorfmt` and `msg` commands.
+
+### **eval** _command_ [_parameter_]...
+
+Run external _command_ and execute its standard output text as dterc
+commands.
+
+## Other Commands
+
+### **repeat** _count_ _command_ [_parameters_]...
+
+Run _command_ _count_ times.
+
+### **toggle** [**-gv**] _option_ [_values_]...
+
+Toggle _option_. If list of _values_ is not given then the option
+must be either boolean or enum.
+
+`-g`
+:   toggle global option instead of local
+
+`-v`
+:   display new value
+
+If _option_ has both local and global values then local is toggled
+unless `-g` is used.
 
 # Options
 
