@@ -675,23 +675,6 @@ See also `compile` and `tag` commands.
 
 ## Editing Commands
 
-### **select** [**-bkl**]
-
-Start selecting an area of text.
-
-`-b`
-:   Select block between opening `{` and closing `}` curly braces
-
-`-k`
-:   Keep existing selections
-
-`-l`
-:   Select whole lines
-
-### **unselect**
-
-Unselect.
-
 ### **cut**
 
 Cut current line or selection.
@@ -826,6 +809,28 @@ used.
 This command merges the selection into one paragraph. To format
 multiple paragraphs use the external `fmt`(1) program with the
 `filter` command, e.g. `filter fmt -w 60`.
+
+### **select** [**-bkl**]
+
+Enter selection mode. All movement commands while in this mode extend
+the selected area.
+
+Note: A better way to create selections is to hold the Shift key whilst
+moving the cursor. The `select` command exists mostly as a fallback,
+for terminals with limited key binding support.
+
+`-b`
+:   Select block between opening `{` and closing `}` curly braces
+
+`-k`
+:   Keep existing selections
+
+`-l`
+:   Select whole lines
+
+### **unselect**
+
+Unselect.
 
 ## External Commands
 

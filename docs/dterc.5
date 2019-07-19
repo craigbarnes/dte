@@ -132,10 +132,6 @@ Movement Commands:
 .P
 Editing Commands:
 .br
-   \fBselect\fR [\fB\-bkl\fR]
-.br
-   \fBunselect\fR
-.br
    \fBcut\fR
 .br
    \fBcopy\fR [\fB\-k\fR]
@@ -173,6 +169,10 @@ Editing Commands:
    \fBshift\fR \fIcount\fR
 .br
    \fBwrap\-paragraph\fR [\fIwidth\fR]
+.br
+   \fBselect\fR [\fB\-bkl\fR]
+.br
+   \fBunselect\fR
 .br
 .P
 External Commands:
@@ -1130,28 +1130,6 @@ See also \fBcompile\fR and \fBtag\fR commands.
 .P
 .RE
 .SS Editing Commands
-\fBselect\fR [\fB\-bkl\fR]
-.RS
-Start selecting an area of text.
-.P
-.TP
-\fB\-b\fR
-Select block between opening \fB{\fR and closing \fB}\fR curly braces
-.PP
-.TP
-\fB\-k\fR
-Keep existing selections
-.PP
-.TP
-\fB\-l\fR
-Select whole lines
-.PP
-.RE
-\fBunselect\fR
-.RS
-Unselect.
-.P
-.RE
 \fBcut\fR
 .RS
 Cut current line or selection.
@@ -1322,6 +1300,33 @@ used.
 This command merges the selection into one paragraph. To format
 multiple paragraphs use the external \fBfmt\fR(1) program with the
 \fBfilter\fR command, e.g. \fBfilter fmt \-w 60\fR.
+.P
+.RE
+\fBselect\fR [\fB\-bkl\fR]
+.RS
+Enter selection mode. All movement commands while in this mode extend
+the selected area.
+.P
+Note: A better way to create selections is to hold the Shift key whilst
+moving the cursor. The \fBselect\fR command exists mostly as a fallback,
+for terminals with limited key binding support.
+.P
+.TP
+\fB\-b\fR
+Select block between opening \fB{\fR and closing \fB}\fR curly braces
+.PP
+.TP
+\fB\-k\fR
+Keep existing selections
+.PP
+.TP
+\fB\-l\fR
+Select whole lines
+.PP
+.RE
+\fBunselect\fR
+.RS
+Unselect.
 .P
 .RE
 .SS External Commands
