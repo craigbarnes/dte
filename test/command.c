@@ -41,6 +41,18 @@ static void test_parse_commands(void)
     EXPECT_STREQ(array.ptrs[6], "-q");
     EXPECT_NULL(array.ptrs[7]);
     ptr_array_free(&array);
+
+    EXPECT_TRUE(parse_commands(&array, "\n ; ; \t\n ", &err));
+    EXPECT_EQ(array.count, 3);
+    EXPECT_NULL(array.ptrs[0]);
+    EXPECT_NULL(array.ptrs[1]);
+    EXPECT_NULL(array.ptrs[2]);
+    ptr_array_free(&array);
+
+    EXPECT_TRUE(parse_commands(&array, "", &err));
+    EXPECT_EQ(array.count, 1);
+    EXPECT_NULL(array.ptrs[0]);
+    ptr_array_free(&array);
 }
 
 static void test_commands_array(void)
