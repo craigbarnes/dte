@@ -17,6 +17,32 @@ static void test_parse_command_arg(void)
     #undef PARSE_ARG_LITERAL
 }
 
+static void test_parse_commands(void)
+{
+    PointerArray array = PTR_ARRAY_INIT;
+    Error *err = NULL;
+    EXPECT_TRUE(parse_commands(&array, " left  -c;;", &err));
+    EXPECT_EQ(array.count, 5);
+    EXPECT_STREQ(array.ptrs[0], "left");
+    EXPECT_STREQ(array.ptrs[1], "-c");
+    EXPECT_NULL(array.ptrs[2]);
+    EXPECT_NULL(array.ptrs[3]);
+    EXPECT_NULL(array.ptrs[4]);
+    ptr_array_free(&array);
+
+    EXPECT_TRUE(parse_commands(&array, "save -e UTF-8 file.c; close -q", &err));
+    EXPECT_EQ(array.count, 8);
+    EXPECT_STREQ(array.ptrs[0], "save");
+    EXPECT_STREQ(array.ptrs[1], "-e");
+    EXPECT_STREQ(array.ptrs[2], "UTF-8");
+    EXPECT_STREQ(array.ptrs[3], "file.c");
+    EXPECT_NULL(array.ptrs[4]);
+    EXPECT_STREQ(array.ptrs[5], "close");
+    EXPECT_STREQ(array.ptrs[6], "-q");
+    EXPECT_NULL(array.ptrs[7]);
+    ptr_array_free(&array);
+}
+
 static void test_commands_array(void)
 {
     static const size_t name_size = ARRAY_COUNT(commands[0].name);
@@ -53,6 +79,7 @@ static void test_command_struct_layout(void)
 void test_command(void)
 {
     test_parse_command_arg();
+    test_parse_commands();
     test_commands_array();
     test_command_struct_layout();
 }
