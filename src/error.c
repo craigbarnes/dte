@@ -9,6 +9,7 @@ static char error_buf[256];
 const char *const error_ptr = error_buf;
 unsigned int nr_errors;
 bool msg_is_error;
+bool supress_error_msg;
 
 static Error *error_new(char *msg)
 {
@@ -55,8 +56,11 @@ void clear_error(void)
 
 void error_msg(const char *format, ...)
 {
-    int pos = 0;
+    if (supress_error_msg) {
+        return;
+    }
 
+    int pos = 0;
     if (config_file) {
         if (current_command) {
             pos = snprintf (

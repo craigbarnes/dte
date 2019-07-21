@@ -63,6 +63,16 @@ static void test_detect_indent(void)
 static void test_handle_binding(void)
 {
     handle_command(commands, "bind ^A 'insert zzz'; open");
+
+    // Bound command should be cached
+    const KeyBinding *binding = lookup_binding(MOD_CTRL | 'A');
+    ASSERT_NONNULL(binding);
+    EXPECT_PTREQ(binding->cmd, find_command(commands, "insert"));
+    EXPECT_EQ(binding->a.nr_flags, 0);
+    EXPECT_EQ(binding->a.nr_args, 1);
+    EXPECT_STREQ(binding->a.args[0], "zzz");
+    EXPECT_NULL(binding->a.args[1]);
+
     handle_binding(MOD_CTRL | 'A');
     const Block *block = BLOCK(buffer->blocks.next);
     ASSERT_NONNULL(block);

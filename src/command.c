@@ -1493,9 +1493,9 @@ static void cmd_show_binding(const CommandArgs *a)
         return;
     }
 
-    const char *command = lookup_binding(key);
-    if (command) {
-        info_msg("%s is bound to: %s", keystr, command);
+    const KeyBinding *b = lookup_binding(key);
+    if (b) {
+        info_msg("%s is bound to: %s", keystr, b->cmd_str);
     } else {
         info_msg("%s is not bound to a command", keystr);
     }

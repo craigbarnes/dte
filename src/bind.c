@@ -1,21 +1,23 @@
 #include <sys/types.h>
 #include "bind.h"
+#include "change.h"
 #include "command.h"
 #include "debug.h"
 #include "error.h"
+#include "parse-args.h"
 #include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
 typedef struct {
-    char *command;
     KeyCode key;
-} Binding;
+    KeyBinding *bind;
+} KeyBindingEntry;
 
 // Fast lookup table for most common key combinations (Ctrl or Meta
 // with ASCII keys or any combination of modifiers with special keys)
-static char *bindings_lookup_table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
+static KeyBinding *bindings_lookup_table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
 
 // Fallback for all other keys (Unicode combos etc.)
 static PointerArray bindings_ptr_array = PTR_ARRAY_INIT;
@@ -62,6 +64,66 @@ UNITTEST {
     BUG_ON(key_lookup_index(MOD_META | 0x0E01) != -1);
 }
 
+static KeyBinding *key_binding_new(const char *cmd_str)
+{
+    const size_t cmd_str_len = strlen(cmd_str);
+    KeyBinding *b = xmalloc(sizeof(*b) + cmd_str_len + 1);
+    b->cmd = NULL;
+    memcpy(b->cmd_str, cmd_str, cmd_str_len + 1);
+
+    PointerArray array = PTR_ARRAY_INIT;
+    Error *err = NULL;
+    if (!parse_commands(&array, cmd_str, &err)) {
+        error_free(err);
+        goto out;
+    }
+
+    ptr_array_trim_nulls(&array);
+    if (array.count < 2 || ptr_array_idx(&array, NULL) != (array.count - 1)) {
+        // Only single commands can be cached
+        goto out;
+    }
+
+    const Command *cmd = find_command(commands, array.ptrs[0]);
+    if (!cmd) {
+        // Aliases or non-existent commands can't be cached
+        goto out;
+    }
+
+    if (memchr(cmd_str, '$', cmd_str_len)) {
+        // Commands containing variables can't be cached
+        goto out;
+    }
+
+    free(ptr_array_remove_idx(&array, 0));
+    CommandArgs a = {.args = (char**)array.ptrs};
+    supress_error_msg = true;
+    bool ok = parse_args(cmd, &a);
+    supress_error_msg = false;
+    if (!ok) {
+        goto out;
+    }
+
+    // Command can be cached; binding takes ownership of args array
+    b->cmd = cmd;
+    b->a = a;
+    return b;
+
+out:
+    ptr_array_free(&array);
+    return b;
+}
+
+static void key_binding_free(KeyBinding *binding)
+{
+    if (binding) {
+        if (binding->cmd) {
+            free_strings(binding->a.args);
+        }
+        free(binding);
+    }
+}
+
 void add_binding(const char *keystr, const char *command)
 {
     KeyCode key;
@@ -72,17 +134,14 @@ void add_binding(const char *keystr, const char *command)
 
     const ssize_t idx = key_lookup_index(key);
     if (idx >= 0) {
-        char *old_command = bindings_lookup_table[idx];
-        if (old_command) {
-            free(old_command);
-        }
-        bindings_lookup_table[idx] = xstrdup(command);
+        key_binding_free(bindings_lookup_table[idx]);
+        bindings_lookup_table[idx] = key_binding_new(command);
         return;
     }
 
-    Binding *b = xnew(Binding, 1);
+    KeyBindingEntry *b = xnew(KeyBindingEntry, 1);
     b->key = key;
-    b->command = xstrdup(command);
+    b->bind = key_binding_new(command);
     ptr_array_add(&bindings_ptr_array, b);
 }
 
@@ -95,40 +154,37 @@ void remove_binding(const char *keystr)
 
     const ssize_t idx = key_lookup_index(key);
     if (idx >= 0) {
-        char *command = bindings_lookup_table[idx];
-        if (command) {
-            free(command);
-            bindings_lookup_table[idx] = NULL;
-        }
+        key_binding_free(bindings_lookup_table[idx]);
+        bindings_lookup_table[idx] = NULL;
         return;
     }
 
     size_t i = bindings_ptr_array.count;
     while (i > 0) {
-        Binding *b = bindings_ptr_array.ptrs[--i];
+        KeyBindingEntry *b = bindings_ptr_array.ptrs[--i];
         if (b->key == key) {
             ptr_array_remove_idx(&bindings_ptr_array, i);
-            free(b->command);
+            key_binding_free(b->bind);
             free(b);
             return;
         }
     }
 }
 
-const char *lookup_binding(KeyCode key)
+const KeyBinding *lookup_binding(KeyCode key)
 {
     const ssize_t idx = key_lookup_index(key);
     if (idx >= 0) {
-        const char *command = bindings_lookup_table[idx];
-        if (command) {
-            return command;
+        const KeyBinding *b = bindings_lookup_table[idx];
+        if (b) {
+            return b;
         }
     }
 
     for (size_t i = bindings_ptr_array.count; i > 0; i--) {
-        Binding *b = bindings_ptr_array.ptrs[i - 1];
+        KeyBindingEntry *b = bindings_ptr_array.ptrs[i - 1];
         if (b->key == key) {
-            return b->command;
+            return b->bind;
         }
     }
 
@@ -137,10 +193,21 @@ const char *lookup_binding(KeyCode key)
 
 void handle_binding(KeyCode key)
 {
-    const char *command = lookup_binding(key);
-    if (command) {
-        handle_command(commands, command);
+    const KeyBinding *b = lookup_binding(key);
+    if (!b) {
+        return;
     }
+
+    if (!b->cmd) {
+        // Command isn't cached; parse and run command string
+        handle_command(commands, b->cmd_str);
+        return;
+    }
+
+    // Command is cached; call it directly
+    begin_change(CHANGE_MERGE_NONE);
+    b->cmd->cmd(&b->a);
+    end_change();
 }
 
 String dump_bindings(void)
@@ -148,18 +215,18 @@ String dump_bindings(void)
     String buf = STRING_INIT;
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
-        const char *command = bindings_lookup_table[k];
-        if (command) {
+        const KeyBinding *b = bindings_lookup_table[k];
+        if (b) {
             const char *keystr = key_to_string(MOD_CTRL | k);
-            string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+            string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
         }
     }
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
-        const char *command = bindings_lookup_table[k + 128];
-        if (command) {
+        const KeyBinding *b = bindings_lookup_table[k + 128];
+        if (b) {
             const char *keystr = key_to_string(MOD_META | k);
-            string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+            string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
         }
     }
 
@@ -169,18 +236,18 @@ String dump_bindings(void)
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             const size_t mod_offset = m * NR_SPECIAL_KEYS;
             const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
-            const char *command = bindings_lookup_table[i];
-            if (command) {
+            const KeyBinding *b = bindings_lookup_table[i];
+            if (b) {
                 const char *keystr = key_to_string(modifiers | k);
-                string_sprintf(&buf, "   %-10s  %s\n", keystr, command);
+                string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
             }
         }
     }
 
     for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
-        const Binding *b = bindings_ptr_array.ptrs[i];
+        const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
         const char *keystr = key_to_string(b->key);
-        string_sprintf(&buf, "   %-10s  %s\n", keystr, b->command);
+        string_sprintf(&buf, "   %-10s  %s\n", keystr, b->bind->cmd_str);
     }
 
     return buf;

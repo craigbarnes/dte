@@ -12,6 +12,7 @@ typedef struct {
 extern const char *const error_ptr;
 extern unsigned int nr_errors;
 extern bool msg_is_error;
+extern bool supress_error_msg;
 
 Error *error_create(const char *format, ...) PRINTF(1);
 Error *error_create_errno(int code, const char *format, ...) PRINTF(2);
