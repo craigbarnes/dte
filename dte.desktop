@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name = dte
+GenericName = Text Editor
+Comment = Edit text files
+Icon = text-editor
+Categories = Utility;TextEditor;
+Keywords = text;editor;
+Type = Application
+Terminal = true
+StartupNotify = false
+TryExec = dte
+Exec = dte %F
+MimeType = text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;

@@ -12,6 +12,7 @@ datadir ?= $(prefix)/share
 mandir ?= $(datadir)/man
 man1dir ?= $(mandir)/man1
 man5dir ?= $(mandir)/man5
+appdir ?= $(datadir)/applications
 
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
@@ -49,6 +50,19 @@ uninstall:
 	$(RM) '$(DESTDIR)$(man5dir)/dterc.5'
 	$(RM) '$(DESTDIR)$(man5dir)/dte-syntax.5'
 
+install-desktop-file:
+	$(E) INSTALL '$(DESTDIR)$(appdir)/dte.desktop'
+	$(Q) desktop-file-install \
+	  --dir='$(DESTDIR)$(appdir)' \
+	  --set-key=TryExec --set-value='$(bindir)/$(dte)' \
+	  --set-key=Exec --set-value='$(bindir)/$(dte) %F' \
+	  $(if $(DESTDIR),, --rebuild-mime-info-cache) \
+	  dte.desktop
+
+uninstall-desktop-file:
+	$(RM) '$(DESTDIR)$(appdir)/dte.desktop'
+	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
+
 tags:
 	ctags $$(find src/ test/ -type f -name '*.[ch]')
 
@@ -59,4 +73,5 @@ clean:
 
 .DEFAULT_GOAL = all
 .PHONY: all check install uninstall tags clean
+.PHONY: install-desktop-file uninstall-desktop-file
 .DELETE_ON_ERROR:
