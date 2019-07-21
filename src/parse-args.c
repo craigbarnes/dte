@@ -17,7 +17,6 @@ bool parse_args(const Command *cmd, CommandArgs *a)
     char **args = a->args;
     BUG_ON(!args);
 
-    static char flags[16];
     const char *flag_desc = cmd->flags;
     size_t argc = count_strings(args);
     size_t nr_flags = 0;
@@ -57,8 +56,8 @@ bool parse_args(const Command *cmd, CommandArgs *a)
                 error_msg("Invalid option -%c", flag);
                 return false;
             }
-            flags[nr_flags++] = flag;
-            if (nr_flags == ARRAY_COUNT(flags)) {
+            a->flags[nr_flags++] = flag;
+            if (nr_flags == ARRAY_COUNT(a->flags)) {
                 error_msg("Too many options given.");
                 return false;
             }
@@ -111,9 +110,8 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         error_msg("Too many arguments");
         return false;
     }
-    flags[nr_flags] = '\0';
+    a->flags[nr_flags] = '\0';
 
-    a->flags = flags;
     a->nr_args = argc;
     a->nr_flags = nr_flags;
     return true;

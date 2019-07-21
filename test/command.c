@@ -1,6 +1,7 @@
 #include "test.h"
 #include "../src/command.h"
 #include "../src/debug.h"
+#include "../src/parse-args.h"
 
 static void test_parse_command_arg(void)
 {
@@ -55,6 +56,34 @@ static void test_parse_commands(void)
     ptr_array_free(&array);
 }
 
+static void test_parse_args(void)
+{
+    const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
+    PointerArray array = PTR_ARRAY_INIT;
+    Error *err = NULL;
+    ASSERT_TRUE(parse_commands(&array, cmd_str, &err));
+    ASSERT_EQ(array.count, 8);
+
+    const Command *cmd = find_command(commands, array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "open");
+
+    CommandArgs a = {.args = (char**)array.ptrs + 1};
+    ASSERT_TRUE(parse_args(cmd, &a));
+    EXPECT_EQ(a.nr_flags, 2);
+    EXPECT_EQ(a.flags[0], 'g');
+    EXPECT_EQ(a.flags[1], 'e');
+    EXPECT_EQ(a.flags[2], '\0');
+    EXPECT_EQ(a.nr_args, 3);
+    EXPECT_STREQ(a.args[0], "UTF-8");
+    EXPECT_STREQ(a.args[1], "file.c");
+    EXPECT_STREQ(a.args[2], "file.h");
+    EXPECT_STREQ(a.args[3], "*.mk");
+    EXPECT_NULL(a.args[4]);
+
+    ptr_array_free(&array);
+}
+
 static void test_commands_array(void)
 {
     static const size_t name_size = ARRAY_COUNT(commands[0].name);
@@ -92,6 +121,7 @@ void test_command(void)
 {
     test_parse_command_arg();
     test_parse_commands();
+    test_parse_args();
     test_commands_array();
     test_command_struct_layout();
 }

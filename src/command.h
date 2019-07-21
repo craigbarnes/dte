@@ -8,7 +8,7 @@
 #include "util/ptr-array.h"
 
 typedef struct {
-    const char *flags;
+    char flags[8];
     char **args;
     size_t nr_flags;
     size_t nr_args;
