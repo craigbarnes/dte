@@ -28,6 +28,7 @@ void ptr_array_remove(PointerArray *array, void *ptr) NONNULL_ARG(1);
 void *ptr_array_remove_idx(PointerArray *array, size_t pos) NONNULL_ARG(1);
 size_t ptr_array_idx(const PointerArray *array, const void *ptr) NONNULL_ARG(1);
 void *ptr_array_rel(const PointerArray *array, const void *ptr, size_t offset) NONNULL_ARG(1);
+void ptr_array_trim_nulls(PointerArray *array) NONNULL_ARGS;
 
 NONNULL_ARGS
 static inline void ptr_array_init(PointerArray *array, size_t capacity)

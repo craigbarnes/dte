@@ -6,6 +6,7 @@
 #include "../src/util/checked-arith.h"
 #include "../src/util/hashset.h"
 #include "../src/util/path.h"
+#include "../src/util/ptr-array.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
 #include "../src/util/string.h"
@@ -649,6 +650,33 @@ static void test_u_prev_char(void)
     EXPECT_EQ(idx, 0);
 }
 
+static void test_ptr_array(void)
+{
+    PointerArray a = PTR_ARRAY_INIT;
+    ptr_array_add(&a, NULL);
+    ptr_array_add(&a, NULL);
+    ptr_array_add(&a, xstrdup("foo"));
+    ptr_array_add(&a, NULL);
+    ptr_array_add(&a, xstrdup("bar"));
+    ptr_array_add(&a, NULL);
+    ptr_array_add(&a, NULL);
+    EXPECT_EQ(a.count, 7);
+
+    ptr_array_trim_nulls(&a);
+    EXPECT_EQ(a.count, 4);
+    EXPECT_STREQ(a.ptrs[0], "foo");
+    EXPECT_NULL(a.ptrs[1]);
+    EXPECT_STREQ(a.ptrs[2], "bar");
+    EXPECT_NULL(a.ptrs[3]);
+    ptr_array_trim_nulls(&a);
+    EXPECT_EQ(a.count, 4);
+
+    ptr_array_free(&a);
+    EXPECT_EQ(a.count, 0);
+    ptr_array_trim_nulls(&a);
+    EXPECT_EQ(a.count, 0);
+}
+
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -951,6 +979,7 @@ void test_util(void)
     test_u_set_char();
     test_u_set_ctrl();
     test_u_prev_char();
+    test_ptr_array();
     test_hashset();
     test_round_up();
     test_round_size_to_next_power_of_2();
