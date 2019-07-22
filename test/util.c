@@ -456,6 +456,30 @@ static void test_u_is_cntrl(void)
     EXPECT_FALSE(u_is_cntrl(0xFF));
 }
 
+static void test_u_is_zero_width(void)
+{
+    // Default ignorable codepoints:
+    EXPECT_TRUE(u_is_zero_width(0x034F));
+    EXPECT_TRUE(u_is_zero_width(0x061C));
+    EXPECT_TRUE(u_is_zero_width(0x115F));
+    EXPECT_TRUE(u_is_zero_width(0x1160));
+    EXPECT_TRUE(u_is_zero_width(0x180B));
+    EXPECT_TRUE(u_is_zero_width(0x200B));
+    EXPECT_TRUE(u_is_zero_width(0x202E));
+    EXPECT_TRUE(u_is_zero_width(0xFEFF));
+    EXPECT_TRUE(u_is_zero_width(0xE0000));
+    EXPECT_TRUE(u_is_zero_width(0xE0FFF));
+    // Non-spacing marks:
+    EXPECT_TRUE(u_is_zero_width(0x0300));
+    EXPECT_TRUE(u_is_zero_width(0x0730));
+    EXPECT_TRUE(u_is_zero_width(0x11839));
+    EXPECT_TRUE(u_is_zero_width(0x1183A));
+    EXPECT_TRUE(u_is_zero_width(0xE01EF));
+    // Not zero-width:
+    EXPECT_FALSE(u_is_zero_width(0x0000));
+    EXPECT_FALSE(u_is_zero_width('Z'));
+}
+
 static void test_u_is_special_whitespace(void)
 {
     EXPECT_FALSE(u_is_special_whitespace(' '));
@@ -973,6 +997,7 @@ void test_util(void)
     test_u_to_lower();
     test_u_is_upper();
     test_u_is_cntrl();
+    test_u_is_zero_width();
     test_u_is_special_whitespace();
     test_u_is_unprintable();
     test_u_str_width();
