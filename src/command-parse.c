@@ -186,7 +186,7 @@ end:
     return string_steal_cstring(&buf);
 }
 
-size_t find_end(const char *cmd, const size_t startpos, Error **err)
+size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
 {
     size_t pos = startpos;
     while (1) {
@@ -198,7 +198,7 @@ size_t find_end(const char *cmd, const size_t startpos, Error **err)
                     break;
                 }
                 if (cmd[pos] == '\0') {
-                    *err = error_create("Missing '");
+                    *err = CMDERR_UNCLOSED_SINGLE_QUOTE;
                     return 0;
                 }
                 pos++;
@@ -211,7 +211,7 @@ size_t find_end(const char *cmd, const size_t startpos, Error **err)
                     break;
                 }
                 if (cmd[pos] == '\0') {
-                    *err = error_create("Missing \"");
+                    *err = CMDERR_UNCLOSED_DOUBLE_QUOTE;
                     return 0;
                 }
                 if (cmd[pos++] == '\\') {
@@ -239,11 +239,11 @@ size_t find_end(const char *cmd, const size_t startpos, Error **err)
     }
     BUG("Unexpected break of outer loop");
 unexpected_eof:
-    *err = error_create("Unexpected EOF");
+    *err = CMDERR_UNEXPECTED_EOF;
     return 0;
 }
 
-bool parse_commands(PointerArray *array, const char *cmd, Error **err)
+bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err)
 {
     size_t pos = 0;
 
@@ -263,7 +263,7 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
         }
 
         size_t end = find_end(cmd, pos, err);
-        if (*err != NULL) {
+        if (*err != CMDERR_NONE) {
             return false;
         }
 
@@ -272,6 +272,21 @@ bool parse_commands(PointerArray *array, const char *cmd, Error **err)
     }
     ptr_array_add(array, NULL);
     return true;
+}
+
+const char *command_parse_error_to_string(CommandParseError err)
+{
+    switch (err) {
+    case CMDERR_UNCLOSED_SINGLE_QUOTE:
+        return "Missing '";
+    case CMDERR_UNCLOSED_DOUBLE_QUOTE:
+        return "Missing \"";
+    case CMDERR_UNEXPECTED_EOF:
+        return "Unexpected EOF";
+    case CMDERR_NONE:
+        break;
+    }
+    return NULL;
 }
 
 char **copy_string_array(char **src, size_t count)

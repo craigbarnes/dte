@@ -13,7 +13,7 @@ static void command_mode_handle_enter(void)
 
     const char *str = string_borrow_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
-    Error *err = NULL;
+    CommandParseError err = 0;
     bool ok = parse_commands(&array, str, &err);
 
     // This is done before run_commands() because "command [text]"
@@ -24,8 +24,7 @@ static void command_mode_handle_enter(void)
     if (ok) {
         run_commands(commands, &array);
     } else {
-        error_msg("Parsing command: %s", err->msg);
-        error_free(err);
+        error_msg("Parsing command: %s", command_parse_error_to_string(err));
     }
 
     ptr_array_free(&array);

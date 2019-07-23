@@ -65,15 +65,15 @@ static void run_command(const Command *cmds, char **av)
         PointerArray array = PTR_ARRAY_INIT;
         const char *alias_name = av[0];
         const char *alias_value = find_alias(alias_name);
-        Error *err = NULL;
+        CommandParseError err = 0;
 
         if (alias_value == NULL) {
             error_msg("No such command or alias: %s", alias_name);
             return;
         }
         if (!parse_commands(&array, alias_value, &err)) {
-            error_msg("Parsing alias %s: %s", alias_name, err->msg);
-            error_free(err);
+            const char *err_msg = command_parse_error_to_string(err);
+            error_msg("Parsing alias %s: %s", alias_name, err_msg);
             ptr_array_free(&array);
             return;
         }
@@ -129,12 +129,11 @@ void run_commands(const Command *cmds, const PointerArray *array)
 
 void handle_command(const Command *cmds, const char *cmd)
 {
-    Error *err = NULL;
+    CommandParseError err = 0;
     PointerArray array = PTR_ARRAY_INIT;
 
     if (!parse_commands(&array, cmd, &err)) {
-        error_msg("%s", err->msg);
-        error_free(err);
+        error_msg("%s", command_parse_error_to_string(err));
         ptr_array_free(&array);
         return;
     }

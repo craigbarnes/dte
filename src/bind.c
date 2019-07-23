@@ -72,9 +72,8 @@ static KeyBinding *key_binding_new(const char *cmd_str)
     memcpy(b->cmd_str, cmd_str, cmd_str_len + 1);
 
     PointerArray array = PTR_ARRAY_INIT;
-    Error *err = NULL;
+    CommandParseError err = 0;
     if (!parse_commands(&array, cmd_str, &err)) {
-        error_free(err);
         goto out;
     }
 

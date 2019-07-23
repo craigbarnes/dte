@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "error.h"
 #include "util/ptr-array.h"
 
 typedef struct {
@@ -22,12 +21,20 @@ typedef struct {
     void (*cmd)(const CommandArgs *args);
 } Command;
 
+typedef enum {
+    CMDERR_NONE,
+    CMDERR_UNCLOSED_SINGLE_QUOTE,
+    CMDERR_UNCLOSED_DOUBLE_QUOTE,
+    CMDERR_UNEXPECTED_EOF,
+} CommandParseError;
+
 #define CMD_ARG_MAX 4095 // (1 << 12) - 1
 
 // command-parse.c
 char *parse_command_arg(const char *cmd, size_t len, bool tilde);
-size_t find_end(const char *cmd, size_t pos, Error **err);
-bool parse_commands(PointerArray *array, const char *cmd, Error **err);
+size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
+bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err);
+const char *command_parse_error_to_string(CommandParseError err);
 char **copy_string_array(char **src, size_t count);
 
 // command-run.c

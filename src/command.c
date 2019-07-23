@@ -12,6 +12,7 @@
 #include "editor.h"
 #include "encoding/convert.h"
 #include "encoding/encoding.h"
+#include "error.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"

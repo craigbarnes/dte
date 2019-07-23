@@ -21,7 +21,7 @@ static void test_parse_command_arg(void)
 static void test_parse_commands(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
-    Error *err = NULL;
+    CommandParseError err = 0;
     EXPECT_TRUE(parse_commands(&array, " left  -c;;", &err));
     EXPECT_EQ(array.count, 5);
     EXPECT_STREQ(array.ptrs[0], "left");
@@ -60,7 +60,7 @@ static void test_parse_args(void)
 {
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
     PointerArray array = PTR_ARRAY_INIT;
-    Error *err = NULL;
+    CommandParseError err = 0;
     ASSERT_TRUE(parse_commands(&array, cmd_str, &err));
     ASSERT_EQ(array.count, 8);
 
