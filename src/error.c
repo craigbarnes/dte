@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "error.h"
 #include "config.h"
+#include "debug.h"
 #include "editor.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -11,42 +12,24 @@ unsigned int nr_errors;
 bool msg_is_error;
 bool supress_error_msg;
 
-static Error *error_new(char *msg)
-{
-    Error *err = xnew0(Error, 1);
-    err->msg = msg;
-    return err;
-}
-
-Error *error_create(const char *format, ...)
-{
-    Error *err;
-    va_list ap;
-
-    va_start(ap, format);
-    err = error_new(xvasprintf(format, ap));
-    va_end(ap);
-    return err;
-}
-
 Error *error_create_errno(int code, const char *format, ...)
 {
-    Error *err;
+    char buf[256];
     va_list ap;
-
     va_start(ap, format);
-    err = error_new(xvasprintf(format, ap));
+    int n = vsnprintf(buf, sizeof buf, format, ap);
     va_end(ap);
+    BUG_ON(n < 0);
+
+    Error *err = xmalloc(sizeof(Error) + n + 1);
+    memcpy(err->msg, buf, n + 1);
     err->code = code;
     return err;
 }
 
 void error_free(Error *err)
 {
-    if (err != NULL) {
-        free(err->msg);
-        free(err);
-    }
+    free(err);
 }
 
 void clear_error(void)
