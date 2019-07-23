@@ -341,8 +341,9 @@ static void cmd_delete_eol(const CommandArgs *a)
         return;
     }
 
+    bool delete_newline_if_at_eol = a->flags[0] == 'n';
     BlockIter bi = view->cursor;
-    if (a->flags[0]) {
+    if (delete_newline_if_at_eol) {
         CodePoint ch;
         block_iter_get_char(&view->cursor, &ch);
         if (ch == '\n') {
@@ -410,18 +411,8 @@ static void cmd_erase_word(const CommandArgs *a)
 
 static void cmd_errorfmt(const CommandArgs *a)
 {
-    const char *pf = a->flags;
-    bool ignore = false;
-    while (*pf) {
-        switch (*pf) {
-        case 'i':
-            ignore = true;
-            break;
-        }
-        pf++;
-    }
-    char **args = a->args;
-    add_error_fmt(args[0], ignore, args[1], args + 2);
+    bool ignore = a->flags[0] == 'i';
+    add_error_fmt(a->args[0], ignore, a->args[1], a->args + 2);
 }
 
 static void cmd_eval(const CommandArgs *a)
@@ -750,7 +741,7 @@ static void cmd_option(const CommandArgs *a)
         return;
     }
 
-    if (a->flags[0]) {
+    if (a->flags[0] == 'r') {
         add_file_options (
             FILE_OPTIONS_FILENAME,
             xstrdup(args[0]),
@@ -774,11 +765,8 @@ static void cmd_option(const CommandArgs *a)
 
 static void cmd_paste(const CommandArgs *a)
 {
-    if (a->flags[0] == 'c') {
-        paste(true);
-    } else {
-        paste(false);
-    }
+    bool at_cursor = a->flags[0] == 'c';
+    paste(at_cursor);
 }
 
 static void cmd_pgdown(const CommandArgs *a)
@@ -1533,18 +1521,7 @@ static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_tag(const CommandArgs *a)
 {
-    const char *pf = a->flags;
-    bool pop = false;
-    while (*pf) {
-        switch (*pf) {
-        case 'r':
-            pop = true;
-            break;
-        }
-        pf++;
-    }
-
-    if (pop) {
+    if (a->flags[0] == 'r') {
         pop_file_location();
         return;
     }
@@ -1661,7 +1638,7 @@ static void cmd_view(const CommandArgs *a)
 static void cmd_wclose(const CommandArgs *a)
 {
     View *v = window_find_unclosable_view(window, view_can_close);
-    bool force = !!a->flags[0];
+    bool force = a->flags[0] == 'f';
     if (v != NULL && !force) {
         set_view(v);
         error_msg (
