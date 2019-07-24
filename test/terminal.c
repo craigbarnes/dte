@@ -74,6 +74,7 @@ static void test_color_to_nearest(void)
         {179, 179, 179, COLOR_YELLOW},
 
         // RGB colors with exact xterm 6x6x6 cube equivalents
+        {COLOR_RGB(0x000000),  16,  16, COLOR_BLACK},
         {COLOR_RGB(0x000087),  18,  18, COLOR_BLUE},
         {COLOR_RGB(0x0000FF),  21,  21, COLOR_LIGHTBLUE},
         {COLOR_RGB(0x00AF87),  36,  36, COLOR_GREEN},
@@ -87,13 +88,18 @@ static void test_color_to_nearest(void)
         // RGB colors with exact xterm grayscale equivalents
         {COLOR_RGB(0x080808), 232, 232, COLOR_BLACK},
         {COLOR_RGB(0x121212), 233, 233, COLOR_BLACK},
+        {COLOR_RGB(0x6C6C6C), 242, 242, COLOR_DARKGRAY},
         {COLOR_RGB(0xA8A8A8), 248, 248, COLOR_GRAY},
+        {COLOR_RGB(0xB2B2B2), 249, 249, COLOR_GRAY},
+        {COLOR_RGB(0xBCBCBC), 250, 250, COLOR_WHITE},
         {COLOR_RGB(0xEEEEEE), 255, 255, COLOR_WHITE},
 
         // RGB colors with NO exact xterm equivalents
+        {COLOR_RGB(0x00FF88), COLOR_RGB(0x00FF88),  48, COLOR_LIGHTGREEN},
         {COLOR_RGB(0xFF0001), COLOR_RGB(0xFF0001), 196, COLOR_LIGHTRED},
         {COLOR_RGB(0xAABBCC), COLOR_RGB(0xAABBCC), 146, COLOR_LIGHTBLUE},
         {COLOR_RGB(0x080809), COLOR_RGB(0x080809), 232, COLOR_BLACK},
+        {COLOR_RGB(0xBABABA), COLOR_RGB(0xBABABA), 250, COLOR_WHITE},
         {COLOR_RGB(0xEEEEED), COLOR_RGB(0xEEEEED), 255, COLOR_WHITE},
     };
     FOR_EACH_I(i, tests) {
