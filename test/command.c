@@ -29,6 +29,7 @@ static void test_parse_commands(void)
     EXPECT_NULL(array.ptrs[2]);
     EXPECT_NULL(array.ptrs[3]);
     EXPECT_NULL(array.ptrs[4]);
+    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
     EXPECT_TRUE(parse_commands(&array, "save -e UTF-8 file.c; close -q", &err));
@@ -41,6 +42,7 @@ static void test_parse_commands(void)
     EXPECT_STREQ(array.ptrs[5], "close");
     EXPECT_STREQ(array.ptrs[6], "-q");
     EXPECT_NULL(array.ptrs[7]);
+    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
     EXPECT_TRUE(parse_commands(&array, "\n ; ; \t\n ", &err));
@@ -48,11 +50,32 @@ static void test_parse_commands(void)
     EXPECT_NULL(array.ptrs[0]);
     EXPECT_NULL(array.ptrs[1]);
     EXPECT_NULL(array.ptrs[2]);
+    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
     EXPECT_TRUE(parse_commands(&array, "", &err));
     EXPECT_EQ(array.count, 1);
     EXPECT_NULL(array.ptrs[0]);
+    EXPECT_EQ(err, 0);
+    ptr_array_free(&array);
+
+    EXPECT_FALSE(parse_commands(&array, "insert '... ", &err));
+    EXPECT_EQ(err, CMDERR_UNCLOSED_SINGLE_QUOTE);
+    ptr_array_free(&array);
+
+    err = 0;
+    EXPECT_FALSE(parse_commands(&array, "insert \" ", &err));
+    EXPECT_EQ(err, CMDERR_UNCLOSED_DOUBLE_QUOTE);
+    ptr_array_free(&array);
+
+    err = 0;
+    EXPECT_FALSE(parse_commands(&array, "insert \"\\\" ", &err));
+    EXPECT_EQ(err, CMDERR_UNCLOSED_DOUBLE_QUOTE);
+    ptr_array_free(&array);
+
+    err = 0;
+    EXPECT_FALSE(parse_commands(&array, "insert \\", &err));
+    EXPECT_EQ(err, CMDERR_UNEXPECTED_EOF);
     ptr_array_free(&array);
 }
 
