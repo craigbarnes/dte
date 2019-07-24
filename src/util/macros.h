@@ -211,6 +211,12 @@
     #define static_assert(x)
 #endif
 
+#if GNUC_AT_LEAST(4, 2) || defined(__clang__)
+    #define DISABLE_WARNING(wflag) DO_PRAGMA(GCC diagnostic ignored wflag)
+#else
+    #define DISABLE_WARNING(wflag)
+#endif
+
 #ifdef __clang__
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \

@@ -41,10 +41,4 @@ void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 void assert_nonnull(const char *file, int line, const void *ptr);
 
-#if GNUC_AT_LEAST(4, 2)
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#elif defined(__clang__) && HAS_WARNING("-Wmissing-prototypes")
-# pragma clang diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 #endif

@@ -82,6 +82,8 @@ static void test_get_editorconfig_options(void)
     EXPECT_FALSE(opts.indent_size_is_tab);
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_editorconfig(void)
 {
     test_editorconfig_pattern_match();

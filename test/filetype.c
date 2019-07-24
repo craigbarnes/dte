@@ -176,6 +176,8 @@ static void test_find_ft_firstline(void)
     }
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_filetype(void)
 {
     test_find_ft_filename();

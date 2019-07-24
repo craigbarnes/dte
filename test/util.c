@@ -797,7 +797,7 @@ static void test_round_size_to_next_power_of_2(void)
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(5500), 8192);
 }
 
-void test_bitop(void)
+static void test_bitop(void)
 {
     EXPECT_EQ(bit_popcount_u32(0), 0);
     EXPECT_EQ(bit_popcount_u32(1), 1);
@@ -983,6 +983,8 @@ static void test_mem_intern(void)
         EXPECT_PTREQ(ptr, ptrs[i]);
     }
 }
+
+DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_util(void)
 {

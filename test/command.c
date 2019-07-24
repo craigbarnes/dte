@@ -140,6 +140,8 @@ static void test_command_struct_layout(void)
     EXPECT_NONNULL(cmd->cmd);
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_command(void)
 {
     test_parse_command_arg();

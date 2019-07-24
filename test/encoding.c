@@ -47,6 +47,8 @@ static void test_lookup_encoding(void)
     }
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_encoding(void)
 {
     test_detect_encoding_from_bom();

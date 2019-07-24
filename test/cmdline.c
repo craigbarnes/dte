@@ -124,7 +124,7 @@ static void test_cmdline_handle_key(void)
 #define ENV_VAR_PREFIX "D__p_tYmz3_"
 #define ENV_VAR_NAME ENV_VAR_PREFIX "_VAR"
 
-void test_complete_command(void)
+static void test_complete_command(void)
 {
     complete_command();
     EXPECT_STRING_EQ(editor.cmdline.buf, "alias");
@@ -152,6 +152,8 @@ void test_complete_command(void)
     reset_completion();
     ASSERT_EQ(unsetenv(ENV_VAR_NAME), 0);
 }
+
+DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_cmdline(void)
 {

@@ -10,6 +10,8 @@
 #include "../src/window.h"
 #include "../build/test/data.h"
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 static const char extra_rc[] =
     "set lock-files false\n"
     // Regression test for unquoted variables in rc files

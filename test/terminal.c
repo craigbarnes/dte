@@ -427,6 +427,8 @@ static void test_key_to_string(void)
     }
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_terminal(void)
 {
     test_parse_term_color();

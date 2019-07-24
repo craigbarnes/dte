@@ -19,6 +19,8 @@ static void test_bitset_invert(void)
     }
 }
 
+DISABLE_WARNING("-Wmissing-prototypes")
+
 void test_syntax(void)
 {
     test_bitset_invert();
