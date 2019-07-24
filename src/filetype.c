@@ -127,6 +127,11 @@ static StringView get_ext(const StringView filename)
 // For example, if line is "#!/usr/bin/env python2", "python" is returned.
 static StringView get_interpreter(const StringView line)
 {
+    StringView sv = STRING_VIEW_INIT;
+    if (line.length < 4 || line.data[0] != '#' || line.data[1] != '!') {
+        return sv;
+    }
+
     static const char pat[] = "^#! */.*(/env +|/)([a-zA-Z0-9_-]+)[0-9.]*( |$)";
     static regex_t re;
     static bool compiled;
@@ -136,7 +141,6 @@ static StringView get_interpreter(const StringView line)
         BUG_ON(re.re_nsub < 2);
     }
 
-    StringView sv = STRING_VIEW_INIT;
     regmatch_t m[3];
     if (!regexp_exec(&re, line.data, line.length, ARRAY_COUNT(m), m, 0)) {
         return sv;
@@ -164,19 +168,11 @@ static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
 
 HOT const char *find_ft(const char *filename, StringView line)
 {
-    StringView path = STRING_VIEW_INIT;
-    StringView ext = STRING_VIEW_INIT;
-    StringView base = STRING_VIEW_INIT;
-    if (filename) {
-        base = string_view_from_cstring(path_basename(filename));
-        ext = get_ext(base);
-        path = string_view_from_cstring(filename);
-    }
-
-    StringView interpreter = STRING_VIEW_INIT;
-    if (line.length >= 4 && line.data[0] == '#' && line.data[1] == '!') {
-        interpreter = get_interpreter(line);
-    }
+    const char *b = filename ? path_basename(filename) : NULL;
+    const StringView base = string_view_from_cstring(b);
+    const StringView ext = get_ext(base);
+    const StringView path = string_view_from_cstring(filename);
+    const StringView interpreter = get_interpreter(line);
 
     // Search user `ft` entries
     for (size_t i = 0; i < filetypes.count; i++) {
