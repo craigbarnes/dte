@@ -175,7 +175,7 @@ static bool validate_statusline_format(const char *value)
 
 static bool validate_filetype(const char *value)
 {
-    if (!streq(value, "none") && !is_ft(value)) {
+    if (!is_ft(value)) {
         error_msg("No such file type %s", value);
         return false;
     }

@@ -269,7 +269,7 @@ bool is_ft(const char *name)
             return true;
         }
     }
-    for (size_t i = 1; i < ARRAY_COUNT(builtin_filetype_names); i++) {
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
         if (streq(builtin_filetype_names[i], name)) {
             return true;
         }
