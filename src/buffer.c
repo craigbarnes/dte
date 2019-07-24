@@ -157,10 +157,10 @@ bool buffer_detect_filetype(Buffer *b)
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
         fill_line_ref(&bi, &lr);
-        StringView line = string_view(lr.line, lr.size);
+        const StringView line = string_view(lr.line, lr.size);
         ft = find_ft(b->abs_filename, line);
     } else if (b->abs_filename) {
-        StringView line = STRING_VIEW_INIT;
+        const StringView line = STRING_VIEW_INIT;
         ft = find_ft(b->abs_filename, line);
     }
 

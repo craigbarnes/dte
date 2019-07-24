@@ -260,9 +260,6 @@ HOT const char *find_ft(const char *filename, StringView line)
 
 bool is_ft(const char *name)
 {
-    if (name[0] == '\0') {
-        return false;
-    }
     for (size_t i = 0; i < filetypes.count; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         if (streq(ft_get_name(ft), name)) {
