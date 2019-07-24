@@ -34,11 +34,11 @@ static struct {
     bool tilde_expanded;
 } completion;
 
-static int strptrcmp(const void *ap, const void *bp)
+static int strptrcmp(const void *v1, const void *v2)
 {
-    const char *a = *(const char **)ap;
-    const char *b = *(const char **)bp;
-    return strcmp(a, b);
+    const char *const *s1 = v1;
+    const char *const *s2 = v2;
+    return strcmp(*s1, *s2);
 }
 
 static void sort_completions(void)
