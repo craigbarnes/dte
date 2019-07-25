@@ -209,37 +209,33 @@ void handle_binding(KeyCode key)
     end_change();
 }
 
+static void append_lookup_table_binding(String *buf, KeyCode key)
+{
+    const ssize_t i = key_lookup_index(key);
+    BUG_ON(i < 0);
+    const KeyBinding *b = bindings_lookup_table[i];
+    if (b) {
+        const char *keystr = key_to_string(key);
+        string_sprintf(buf, "   %-10s  %s\n", keystr, b->cmd_str);
+    }
+}
+
 String dump_bindings(void)
 {
-    String buf = STRING_INIT;
+    String buf = string_new(4096);
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
-        const KeyBinding *b = bindings_lookup_table[k];
-        if (b) {
-            const char *keystr = key_to_string(MOD_CTRL | k);
-            string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
-        }
+        append_lookup_table_binding(&buf, MOD_CTRL | k);
     }
 
     for (KeyCode k = 0x20; k < 0x7E; k++) {
-        const KeyBinding *b = bindings_lookup_table[k + 128];
-        if (b) {
-            const char *keystr = key_to_string(MOD_META | k);
-            string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
-        }
+        append_lookup_table_binding(&buf, MOD_META | k);
     }
 
     static_assert(MOD_CTRL == (1 << 24));
-    for (KeyCode m = 0; m <= 7; m++) {
-        const KeyCode modifiers = m << 24;
+    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << 24) {
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
-            const size_t mod_offset = m * NR_SPECIAL_KEYS;
-            const size_t i = (2 * 128) + mod_offset + (k - KEY_SPECIAL_MIN);
-            const KeyBinding *b = bindings_lookup_table[i];
-            if (b) {
-                const char *keystr = key_to_string(modifiers | k);
-                string_sprintf(&buf, "   %-10s  %s\n", keystr, b->cmd_str);
-            }
+            append_lookup_table_binding(&buf, modifiers | k);
         }
     }
 
