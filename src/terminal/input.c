@@ -145,24 +145,7 @@ static bool read_simple(KeyCode *key)
         } while (--count);
         *key = u;
     } else {
-        switch (ch) {
-        case '\t':
-            *key = ch;
-            break;
-        case '\r':
-            *key = KEY_ENTER;
-            break;
-        case 0x7f:
-            *key = MOD_CTRL | '?';
-            break;
-        default:
-            if (ch < 0x20) {
-                // Control character
-                *key = MOD_CTRL | ch | 0x40;
-            } else {
-                *key = ch;
-            }
-        }
+        *key = keycode_normalize(ch);
     }
     return true;
 }

@@ -151,7 +151,21 @@ exit_loop:
             if (mods == 0) {
                 return 0;
             }
-            *k = mods | params[2];
+            key = params[2];
+            if (key > 0x20 && key < 0x80) {
+                // The Shift modifier is never appropriate with the
+                // printable ASCII range, since pressing Shift causes
+                // the base key itself to change (i.e. "r" becomes "R',
+                // "." becomes ">", etc.)
+                mods &= ~MOD_SHIFT;
+                if (mods & MOD_CTRL) {
+                    // The Ctrl modifier should always cause letters to
+                    // be uppercase -- this assumption is too ingrained
+                    // and causes too much breakage if not enforced
+                    key = ascii_toupper(key);
+                }
+            }
+            *k = mods | keycode_normalize(key);
             return i;
         }
         return 0;
