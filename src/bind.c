@@ -49,11 +49,15 @@ static ssize_t key_lookup_index(KeyCode k)
 }
 
 UNITTEST {
-    BUG_ON(key_lookup_index(MOD_MASK | KEY_SPECIAL_MAX) != 256 + (8 * NR_SPECIAL_KEYS) - 1);
-    BUG_ON(key_lookup_index(KEY_SPECIAL_MIN) != 256);
-    BUG_ON(key_lookup_index(KEY_SPECIAL_MAX) != 256 + NR_SPECIAL_KEYS - 1);
-    BUG_ON(key_lookup_index(MOD_CTRL | KEY_SPECIAL_MIN) != 256 + NR_SPECIAL_KEYS);
-    BUG_ON(key_lookup_index(MOD_SHIFT | KEY_SPECIAL_MAX) != 256 + (5 * NR_SPECIAL_KEYS) - 1);
+    const size_t size = ARRAY_COUNT(bindings_lookup_table);
+    const KeyCode min = KEY_SPECIAL_MIN;
+    const KeyCode max = KEY_SPECIAL_MAX;
+    const KeyCode nsk = NR_SPECIAL_KEYS;
+    BUG_ON(key_lookup_index(MOD_MASK | max) != size - 1);
+    BUG_ON(key_lookup_index(min) != 256);
+    BUG_ON(key_lookup_index(max) != 256 + nsk - 1);
+    BUG_ON(key_lookup_index(MOD_CTRL | min) != 256 + nsk);
+    BUG_ON(key_lookup_index(MOD_SHIFT | max) != 256 + (5 * nsk) - 1);
 
     BUG_ON(key_lookup_index(MOD_CTRL | ' ') != 32);
     BUG_ON(key_lookup_index(MOD_META | ' ') != 32 + 128);
