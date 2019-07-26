@@ -67,6 +67,9 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'H': // Home
         *k = KEY_UP + (ch - 'A');
         return i;
+    case 'M':
+        *k = KEY_ENTER;
+        return i;
     case 'P': // F1
     case 'Q': // F2
     case 'R': // F3
@@ -90,7 +93,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'p': case 'q': case 'r':
     case 's': case 't': case 'u':
     case 'v': case 'w': case 'x':
-    case 'y': case 'I': case 'M':
+    case 'y': case 'I':
         *k = ch - 64;
         return i;
     }

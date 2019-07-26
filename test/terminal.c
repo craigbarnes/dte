@@ -164,7 +164,7 @@ static void test_xterm_parse_key(void)
         {"\033OF", 3, KEY_END},
         {"\033OH", 3, KEY_HOME},
         {"\033OI", 3, '\t'},
-        {"\033OM", 3, '\r'},
+        {"\033OM", 3, KEY_ENTER},
         {"\033OP", 3, KEY_F1},
         {"\033OQ", 3, KEY_F2},
         {"\033OR", 3, KEY_F3},
