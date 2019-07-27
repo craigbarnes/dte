@@ -123,6 +123,21 @@ a `Config.mk` file, for example:
 The `Config.mk` file should be in the project base directory alongside
 `GNUmakefile` and *must* be valid GNU make syntax.
 
+**Desktop menu entry**:
+
+A desktop menu entry for `dte` can be added by running:
+
+    make install-desktop-file
+
+Any variable overrides specified for `make install` must also be specified
+for `make install-desktop-file`. The easiest way to do this is simply to
+run both at the same time, e.g.:
+
+    make install install-desktop-file V=1 prefix=/usr DESTDIR=PKG
+
+**Note**: the `install-desktop-file` target requires [desktop-file-utils]
+to be installed.
+
 License
 -------
 
@@ -147,6 +162,7 @@ Public License version 2 for more details.
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm "ANSI X3.64 / ECMA-48 / ISO/IEC 6429"
+[desktop-file-utils]: https://www.freedesktop.org/wiki/Software/desktop-file-utils
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
 [syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
