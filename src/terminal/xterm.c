@@ -96,11 +96,13 @@ const Terminal xterm = {
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .init = STRING_VIEW (
-            "\033[?1036s" // Save "metaSendsEscape"
-            "\033[?1036h" // Enable "metaSendsEscape"
+            // 1036 = metaSendsEscape
+            // 1039 = altSendsEscape
+            "\033[?1036;1039s" // Save
+            "\033[?1036;1039h" // Enable
         ),
         .deinit = STRING_VIEW (
-            "\033[?1036r" // Restore "metaSendsEscape"
+            "\033[?1036;1039r" // Restore
         ),
         .reset_colors = STRING_VIEW("\033[39;49m"),
         .reset_attrs = STRING_VIEW("\033[0m"),
