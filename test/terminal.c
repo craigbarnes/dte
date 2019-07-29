@@ -238,11 +238,10 @@ static void test_xterm_parse_key(void)
         {"\033[27;999999999999999999999;123~", 0, 0},
         {"\033[27;123;99999999999999999~", 0, 0},
         // www.leonerd.org.uk/hacks/fixterms/
-        {"\033[0;3u", 6, MOD_META | 0},
-        {"\033[1;3u", 6, MOD_META | 1},
-        {"\033[2;3u", 6, MOD_META | 2},
+        {"\033[13;3u", 7, MOD_META | KEY_ENTER},
         {"\033[9;5u", 6, MOD_CTRL | '\t'},
         {"\033[65;3u", 7, MOD_META | 'A'},
+        {"\033[108;5u", 8, MOD_CTRL | 'L'},
         {"\033[127765;3u", 11, MOD_META | 127765ul},
         {"\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
         {"\033[1114112;3u", 0, 0},

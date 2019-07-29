@@ -52,6 +52,25 @@ static KeyCode decode_special_key(uint32_t n)
     return (n >= ARRAY_COUNT(special_keys)) ? 0 : special_keys[n];
 }
 
+// Fix quirky key codes sent when "modifyOtherKeys" is enabled
+static KeyCode normalize_modified_other_key(KeyCode mods, KeyCode key)
+{
+    if (key > 0x20 && key < 0x80) {
+        // The Shift modifier is never appropriate with the
+        // printable ASCII range, since pressing Shift causes
+        // the base key itself to change (i.e. "r" becomes "R',
+        // "." becomes ">", etc.)
+        mods &= ~MOD_SHIFT;
+        if (mods & MOD_CTRL) {
+            // The Ctrl modifier should always cause letters to
+            // be uppercase -- this assumption is too ingrained
+            // and causes too much breakage if not enforced
+            key = ascii_toupper(key);
+        }
+    }
+    return mods | keycode_normalize(key);
+}
+
 static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 {
     if (i >= length) {
@@ -154,21 +173,7 @@ exit_loop:
             if (mods == 0) {
                 return 0;
             }
-            key = params[2];
-            if (key > 0x20 && key < 0x80) {
-                // The Shift modifier is never appropriate with the
-                // printable ASCII range, since pressing Shift causes
-                // the base key itself to change (i.e. "r" becomes "R',
-                // "." becomes ">", etc.)
-                mods &= ~MOD_SHIFT;
-                if (mods & MOD_CTRL) {
-                    // The Ctrl modifier should always cause letters to
-                    // be uppercase -- this assumption is too ingrained
-                    // and causes too much breakage if not enforced
-                    key = ascii_toupper(key);
-                }
-            }
-            *k = mods | keycode_normalize(key);
+            *k = normalize_modified_other_key(mods, params[2]);
             return i;
         }
         return 0;
@@ -181,8 +186,8 @@ exit_loop:
         case '~':
             goto check_first_param_is_special_key;
         case 'u':
-            key = params[0];
-            goto set_k_and_return_i;
+            *k = normalize_modified_other_key(mods, params[0]);
+            return i;
         case 'A': // Up
         case 'B': // Down
         case 'C': // Right
