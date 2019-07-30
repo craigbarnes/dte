@@ -1,10 +1,27 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include "exec.h"
+
+void close_on_exec(int fd)
+{
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+}
+
+int pipe_close_on_exec(int fd[2])
+{
+    int ret = pipe(fd);
+    if (ret == 0) {
+        close_on_exec(fd[0]);
+        close_on_exec(fd[1]);
+    }
+    return ret;
+}
 
 static int dup_close_on_exec(int oldfd, int newfd)
 {
@@ -88,7 +105,7 @@ pid_t fork_exec(char **argv, int fd[3])
     int error = 0;
     int ep[2];
 
-    if (xpipe2(ep, FD_CLOEXEC)) {
+    if (pipe_close_on_exec(ep)) {
         return -1;
     }
 

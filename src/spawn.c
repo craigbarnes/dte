@@ -181,7 +181,7 @@ int spawn_filter(char **argv, FilterData *data)
     data->out = NULL;
     data->out_len = 0;
 
-    if (xpipe2(p0, FD_CLOEXEC) || xpipe2(p1, FD_CLOEXEC)) {
+    if (pipe_close_on_exec(p0) || pipe_close_on_exec(p1)) {
         error_msg("pipe: %s", strerror(errno));
         goto error;
     }
@@ -233,7 +233,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         close(fd[0]);
         return;
     }
-    if (xpipe2(p, FD_CLOEXEC)) {
+    if (pipe_close_on_exec(p)) {
         error_msg("pipe: %s", strerror(errno));
         close(dev_null);
         close(fd[0]);
