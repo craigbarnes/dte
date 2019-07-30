@@ -154,7 +154,7 @@ int wait_child(pid_t pid)
         return -errno;
     }
     if (WIFEXITED(status)) {
-        return (unsigned char)WEXITSTATUS(status);
+        return WEXITSTATUS(status) & 0xFF;
     }
     if (WIFSIGNALED(status)) {
         return WTERMSIG(status) << 8;

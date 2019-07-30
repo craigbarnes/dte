@@ -162,7 +162,6 @@ static int open_dev_null(int flags)
 static int handle_child_error(pid_t pid)
 {
     int ret = wait_child(pid);
-
     if (ret < 0) {
         error_msg("waitpid: %s", strerror(errno));
     } else if (ret >= 256) {
