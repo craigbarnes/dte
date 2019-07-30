@@ -7,6 +7,7 @@
 #include "../src/util/hashset.h"
 #include "../src/util/path.h"
 #include "../src/util/ptr-array.h"
+#include "../src/util/readfile.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
 #include "../src/util/string.h"
@@ -984,6 +985,31 @@ static void test_mem_intern(void)
     }
 }
 
+static void test_read_file(void)
+{
+    char *buf = NULL;
+    ssize_t size = read_file("/dev", &buf);
+    EXPECT_EQ(size, -1);
+    EXPECT_NULL(buf);
+
+    size = read_file("test/data/3lines.txt", &buf);
+    ASSERT_NONNULL(buf);
+    EXPECT_EQ(size, 26);
+
+    size_t pos = 0;
+    const char *line = buf_next_line(buf, &pos, size);
+    EXPECT_STREQ(line, "line #1");
+    EXPECT_EQ(pos, 8);
+    line = buf_next_line(buf, &pos, size);
+    EXPECT_STREQ(line, " line #2");
+    EXPECT_EQ(pos, 17);
+    line = buf_next_line(buf, &pos, size);
+    EXPECT_STREQ(line, "  line #3");
+    EXPECT_EQ(pos, 26);
+
+    free(buf);
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_util(void)
@@ -1016,4 +1042,5 @@ void test_util(void)
     test_path_parent();
     test_size_multiply_overflows();
     test_mem_intern();
+    test_read_file();
 }
