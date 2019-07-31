@@ -9,17 +9,17 @@
 FileEncoder *new_file_encoder(const Encoding *encoding, LineEndingType nls, int fd)
 {
     FileEncoder *enc = xnew0(FileEncoder, 1);
-
     enc->nls = nls;
     enc->fd = fd;
 
-    if (encoding->type == UTF8) {
+    if (encoding->type != UTF8) {
         enc->cconv = cconv_from_utf8(encoding->name);
         if (enc->cconv == NULL) {
             free(enc);
             return NULL;
         }
     }
+
     return enc;
 }
 
@@ -37,13 +37,12 @@ static ssize_t unix_to_dos (
     const unsigned char *buf,
     ssize_t size
 ) {
-    ssize_t s, d;
-
     if (enc->nsize < size * 2) {
         enc->nsize = size * 2;
         xrenew(enc->nbuf, enc->nsize);
     }
 
+    ssize_t s, d;
     for (s = 0, d = 0; s < size; s++) {
         unsigned char ch = buf[s];
         if (ch == '\n') {
@@ -51,6 +50,7 @@ static ssize_t unix_to_dos (
         }
         enc->nbuf[d++] = ch;
     }
+
     return d;
 }
 
