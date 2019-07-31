@@ -13,10 +13,12 @@
 #include "encoding/decoder.h"
 #include "encoding/encoder.h"
 #include "error.h"
+#include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+#include "util/xsnprintf.h"
 
 static void add_block(Buffer *b, Block *blk)
 {
@@ -271,24 +273,6 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     return 0;
 }
 
-XSTRDUP
-static char *temporary_filename_template(const char *filename)
-{
-    const StringView dir = path_slice_dirname(filename);
-    return xasprintf (
-        "%.*s/.tmp.%s.XXXXXX",
-        (int) dir.length,
-        dir.data,
-        path_basename(filename)
-    );
-}
-
-UNITTEST {
-    char *tmp = temporary_filename_template("/foo/bar/file.h");
-    BUG_ON(!streq(tmp, "/foo/bar/.tmp.file.h.XXXXXX"));
-    free(tmp);
-}
-
 static mode_t get_umask(void)
 {
     // Wonderful get-and-set API
@@ -346,37 +330,33 @@ int save_buffer (
     LineEndingType newline
 ) {
     FileEncoder *enc;
-    char *tmp = NULL;
-    int fd;
+    int fd = -1;
+    char tmp[8192];
+    tmp[0] = '\0';
 
     // Don't use temporary file when saving file in /tmp because
     // crontab command doesn't like the file to be replaced.
     if (!str_has_prefix(filename, "/tmp/")) {
         // Try to use temporary file first (safer)
-        tmp = temporary_filename_template(filename);
+        const char *base = path_basename(filename);
+        const StringView dir = path_slice_dirname(filename);
+        const int dlen = (int)dir.length;
+        xsnprintf(tmp, sizeof tmp, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
         fd = mkstemp(tmp);
         if (fd < 0) {
             // No write permission to the directory?
-            free(tmp);
-            tmp = NULL;
+            tmp[0] = '\0';
         } else if (b->st.st_mode) {
             // Preserve ownership and mode of the original file if possible.
-
-            // "ignoring return value of 'fchown', declared with attribute
-            // warn_unused_result"
-            //
-            // Casting to void does not hide this warning when
-            // using GCC and clang does not like this:
-            //     int ignore = fchown(...); ignore = ignore;
-            if (fchown(fd, b->st.st_uid, b->st.st_gid)) {
-            }
-            fchmod(fd, b->st.st_mode);
+            UNUSED int u1 = fchown(fd, b->st.st_uid, b->st.st_gid);
+            UNUSED int u2 = fchmod(fd, b->st.st_mode);
         } else {
             // New file
             fchmod(fd, 0666 & ~get_umask());
         }
     }
-    if (tmp == NULL) {
+
+    if (fd < 0) {
         // Overwrite the original file (if exists) directly.
         // Ownership is preserved automatically if the file exists.
         mode_t mode = b->st.st_mode;
@@ -406,21 +386,19 @@ int save_buffer (
         error_msg("Close failed: %s", strerror(errno));
         goto error;
     }
-    if (tmp != NULL && rename(tmp, filename)) {
+    if (*tmp && rename(tmp, filename)) {
         error_msg("Rename failed: %s", strerror(errno));
         goto error;
     }
     free_file_encoder(enc);
-    free(tmp);
     stat(filename, &b->st);
     return 0;
 error:
     if (enc != NULL) {
         free_file_encoder(enc);
     }
-    if (tmp != NULL) {
+    if (*tmp) {
         unlink(tmp);
-        free(tmp);
     } else {
         // Not using temporary file therefore mtime may have changed.
         // Update stat to avoid "File has been modified by someone else"
