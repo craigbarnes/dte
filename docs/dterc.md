@@ -66,8 +66,8 @@ Double quoted strings may contain the following escapes:
 :   Escaped backslash
 
 `\x0a`
-:   Hexadecimal byte value 0x0a. Note that `\x00` is not supported because
-    strings are NUL-terminated.
+:   Hexadecimal byte value 0x0a. Note that `\x00` is not supported
+    because strings are NUL-terminated.
 
 `\u20ac`
 :   Four hex digit Unicode code point U+20AC.
@@ -79,9 +79,9 @@ Double quoted strings may contain the following escapes:
 
 ## Configuration Commands
 
-Configuration commands are used to customize some aspect of editor, for
-example adding key bindings, setting options, etc. These are the only
-commands allowed in user config files.
+Configuration commands are used to customize certain aspects of the
+editor, for example adding key bindings, setting options, etc. These
+are the only commands allowed in user config files.
 
 ### **alias** _name_ _command_
 
