@@ -70,6 +70,9 @@ Use the `inlist` command to test if a buffered string is in a list.
 Test if buffered bytes are same as _string_. If they are, emit
 _emit-name_ and jump to _destination_ state.
 
+`-i`
+:   Case-insensitive.
+
 ### **char** [**-bn**] _characters_ _destination_ [_emit-name_]
 
 Test if current byte is in the _characters_ list. If it is then emit
@@ -97,7 +100,7 @@ _emit-name_ and jump to _destination_ state.
 
 ### **str** [**-i**] _string_ _destination_ [_emit-name_]
 
-See if following bytes are same as _string_. If they are emit
+See if following bytes are same as _string_. If they are, emit
 _emit-name_ and jump to _destination_ state.
 
 `-i`

@@ -13,7 +13,6 @@
 
 static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
 
-
 struct cconv {
     iconv_t cd;
 

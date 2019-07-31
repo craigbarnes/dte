@@ -125,6 +125,10 @@ Make list case\-insensitive.
 Test if buffered bytes are same as \fIstring\fR. If they are, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
+.TP
+\fB\-i\fR
+Case\-insensitive.
+.PP
 .RE
 \fBchar\fR [\fB\-bn\fR] \fIcharacters\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
@@ -158,7 +162,7 @@ Test if buffered bytes are found in \fIlist\fR. If found, emit
 .RE
 \fBstr\fR [\fB\-i\fR] \fIstring\fR \fIdestination\fR [\fIemit\-name\fR]
 .RS
-See if following bytes are same as \fIstring\fR. If they are emit
+See if following bytes are same as \fIstring\fR. If they are, emit
 \fIemit\-name\fR and jump to \fIdestination\fR state.
 .P
 .TP
