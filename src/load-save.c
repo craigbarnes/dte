@@ -33,16 +33,13 @@ static Block *add_utf8_line (
     size_t len
 ) {
     size_t size = len + 1;
-
     if (blk) {
         size_t avail = blk->alloc - blk->size;
         if (size <= avail) {
             goto copy;
         }
-
         add_block(b, blk);
     }
-
     if (size < 8192) {
         size = 8192;
     }
@@ -117,14 +114,11 @@ static int decode_and_add_blocks (
     char *line;
     ssize_t len;
     if (file_decoder_read_line(dec, &line, &len)) {
-        Block *blk = NULL;
-
         if (len && line[len - 1] == '\r') {
             b->newline = NEWLINE_DOS;
             len--;
         }
-        blk = add_utf8_line(b, blk, line, len);
-
+        Block *blk = add_utf8_line(b, NULL, line, len);
         while (file_decoder_read_line(dec, &line, &len)) {
             if (b->newline == NEWLINE_DOS && len && line[len - 1] == '\r') {
                 len--;
