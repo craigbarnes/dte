@@ -6,8 +6,7 @@
 
 unsigned int failed;
 
-PRINTF(3)
-static void test_fail(const char *file, int line, const char *format, ...)
+void test_fail(const char *file, int line, const char *format, ...)
 {
     fprintf(stderr, "%s:%d: ", file, line);
     va_list ap;

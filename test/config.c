@@ -1,10 +1,14 @@
+#include <stdlib.h>
+#include <string.h>
 #include "test.h"
 #include "../src/config.h"
 #include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/frame.h"
+#include "../src/encoding/convert.h"
 #include "../src/terminal/no-op.h"
 #include "../src/terminal/terminal.h"
+#include "../src/util/readfile.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
 #include "../src/window.h"
@@ -39,11 +43,44 @@ void init_headless_mode(void)
     set_view(window_open_empty_buffer(window));
 }
 
+static void expect_files_equal(const char *path1, const char *path2)
+{
+    char *buf1;
+    ssize_t size1 = read_file(path1, &buf1);
+    if (size1 < 0) {
+        TEST_FAIL("Error reading '%s': %s", path1, strerror(errno));
+        return;
+    }
+
+    char *buf2;
+    ssize_t size2 = read_file(path2, &buf2);
+    if (size2 < 0) {
+        free(buf1);
+        TEST_FAIL("Error reading '%s': %s", path2, strerror(errno));
+        return;
+    }
+
+    if (size1 != size2 || memcmp(buf1, buf2, size1) != 0) {
+        TEST_FAIL("Files differ: '%s', '%s'", path1, path2);
+    }
+
+    free(buf1);
+    free(buf2);
+}
+
 void test_exec_config(void)
 {
-    BUG_ON(!window);
+    ASSERT_NONNULL(window);
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
         exec_config(commands, config.text.data, config.text.length);
+    }
+
+    expect_files_equal("build/test/env.txt", "test/data/env.txt");
+    expect_files_equal("build/test/crlf.txt", "test/data/crlf.txt");
+    expect_files_equal("build/test/thai-utf8.txt", "test/data/thai-utf8.txt");
+
+    if (encoding_supported_by_iconv("TIS-620")) {
+        expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 }

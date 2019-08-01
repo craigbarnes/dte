@@ -8,6 +8,8 @@
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)
 
+#define TEST_FAIL(...) test_fail(__FILE__, __LINE__, __VA_ARGS__)
+
 #define EXPECT_STREQ(s1, s2) expect_streq(__FILE__, __LINE__, s1, s2)
 #define EXPECT_PTREQ(p1, p2) expect_ptreq(__FILE__, __LINE__, p1, p2)
 #define EXPECT_EQ(a, b) expect_eq(__FILE__, __LINE__, a, b)
@@ -28,6 +30,8 @@
 #define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
 
 extern unsigned int failed;
+
+void test_fail(const char *file, int line, const char *format, ...) PRINTF(3);
 
 void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(const char *file, int line, const void *p1, const void *p2);
