@@ -1,11 +1,15 @@
 #include <errno.h>
+#include "convert.h"
+#include "../debug.h"
+#include "../util/macros.h"
+
+#ifndef ICONV_DISABLE
+
 #include <iconv.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
-#include "convert.h"
 #include "encoding.h"
-#include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/str-util.h"
 #include "../util/utf8.h"
@@ -320,3 +324,35 @@ bool encoding_supported_by_iconv(const char *encoding)
     iconv_close(cd);
     return true;
 }
+
+#else // Not using iconv -- replace conversion routines with stubs
+
+DISABLE_WARNING("-Wunused-parameter")
+
+bool encoding_supported_by_iconv(const char *encoding)
+{
+    return false;
+}
+
+struct cconv *cconv_to_utf8(const char *encoding)
+{
+    errno = EILSEQ;
+    return NULL;
+}
+
+struct cconv *cconv_from_utf8(const char *encoding)
+{
+    errno = EILSEQ;
+    return NULL;
+}
+
+#define FAIL() BUG("unsupported"); fatal_error(__func__, ENOTSUP)
+
+void cconv_process(struct cconv *c, const char *input, size_t len) {FAIL();}
+void cconv_flush(struct cconv *c) {FAIL();}
+size_t cconv_nr_errors(const struct cconv *c) {FAIL();}
+char *cconv_consume_line(struct cconv *c, size_t *len) {FAIL();}
+char *cconv_consume_all(struct cconv *c, size_t *len) {FAIL();}
+void cconv_free(struct cconv *c) {FAIL();}
+
+#endif

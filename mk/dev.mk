@@ -42,6 +42,7 @@ show-sizes:
 	$(MAKE) dte=build/dte-static LDFLAGS=-static
 	$(MAKE) dte=build/dte-dynamic-tiny CFLAGS='-Os -pipe' LDFLAGS=-fwhole-program BUILTIN_SYNTAX_FILES=
 	-$(MAKE) dte=build/dte-musl-static CC=musl-gcc LDFLAGS=-static
+	-$(MAKE) dte=build/dte-musl-static-tiny CC=musl-gcc CFLAGS='-Os -pipe' LDFLAGS=-static ICONV_DISABLE=1 BUILTIN_SYNTAX_FILES=
 	@strip build/dte-*
 	@du -h build/dte-*
 

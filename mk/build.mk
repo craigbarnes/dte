@@ -77,32 +77,38 @@ ifdef WERROR
   WARNINGS += -Werror
 endif
 
-ifdef TERMINFO_DISABLE
-  build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
-else
-  LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
-endif
-
 CWARNS = $(WARNINGS) $(foreach W,$(WARNINGS_EXTRA),$(call cc-option,$(W)))
 CSTD = $(call cc-option,-std=gnu11,-std=gnu99)
 $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
 
 ifeq "$(KERNEL)" "Darwin"
-  LDLIBS += -liconv
+  LDLIBS_ICONV += -liconv
 else ifeq "$(OS)" "Cygwin"
-  LDLIBS += -liconv
+  LDLIBS_ICONV += -liconv
   EXEC_SUFFIX = .exe
 else ifeq "$(KERNEL)" "OpenBSD"
-  LDLIBS += -liconv
+  LDLIBS_ICONV += -liconv
   BASIC_CFLAGS += -I/usr/local/include
   BASIC_LDFLAGS += -L/usr/local/lib
 else ifeq "$(KERNEL)" "NetBSD"
   ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
-    LDLIBS += -liconv
+    LDLIBS_ICONV += -liconv
   endif
   BASIC_CFLAGS += -I/usr/pkg/include
   BASIC_LDFLAGS += -L/usr/pkg/lib
+endif
+
+ifdef ICONV_DISABLE
+  build/encoding/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
+else
+  LDLIBS += $(LDLIBS_ICONV)
+endif
+
+ifdef TERMINFO_DISABLE
+  build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
+else
+  LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
 dte = dte$(EXEC_SUFFIX)
@@ -161,7 +167,9 @@ build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags
+build/encoding/convert.o: build/encoding/convert.cflags
 build/terminal/terminfo.cflags: | build/terminal/
+build/encoding/convert.cflags: | build/encoding/
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)

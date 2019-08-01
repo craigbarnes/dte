@@ -41,4 +41,5 @@ done
 
 $MAKE check
 $MAKE check TERMINFO_DISABLE=1
+$MAKE check ICONV_DISABLE=1
 $MAKE check DEBUG=0
