@@ -23,7 +23,6 @@ all: $(dte)
 
 check: $(test) all
 	$(E) TEST $<
-	$(Q) ln -sf ../../README.md build/test/test-symlink
 	$(Q) ./$<
 	$(Q) $(RM) build/test/thai-*.txt
 

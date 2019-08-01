@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "test.h"
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
@@ -895,7 +896,12 @@ static void test_path_dirname_and_path_basename(void)
 
 static void test_path_absolute(void)
 {
-    char *path = path_absolute("./build/../build/test/test-symlink");
+    const char *linkpath = "./build/../build/test/test-symlink";
+    if (symlink("../../README.md", linkpath) != 0 && errno != EEXIST) {
+        TEST_FAIL("symlink() failed: %s", strerror(errno));
+    }
+
+    char *path = path_absolute(linkpath);
     ASSERT_NONNULL(path);
     EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
