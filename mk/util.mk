@@ -7,6 +7,7 @@ cc-option = $(call try-run,$(CC) $(1) -Werror -c -x c -o /dev/null /dev/null,$(1
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 pkg-libs = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
 
+MAKEFLAGS += -r
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
