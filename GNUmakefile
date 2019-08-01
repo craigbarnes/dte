@@ -24,7 +24,6 @@ all: $(dte)
 check: $(test) all
 	$(E) TEST $<
 	$(Q) ./$<
-	$(Q) $(RM) build/test/thai-*.txt
 
 install: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'

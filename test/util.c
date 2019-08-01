@@ -896,19 +896,21 @@ static void test_path_dirname_and_path_basename(void)
 
 static void test_path_absolute(void)
 {
-    const char *linkpath = "./build/../build/test/test-symlink";
-    if (symlink("../../README.md", linkpath) != 0 && errno != EEXIST) {
-        TEST_FAIL("symlink() failed: %s", strerror(errno));
-    }
-
-    char *path = path_absolute(linkpath);
-    ASSERT_NONNULL(path);
-    EXPECT_STREQ(path_basename(path), "README.md");
-    free(path);
-
-    path = path_absolute("///dev///");
+    char *path = path_absolute("///dev///");
     ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/dev/");
+    free(path);
+
+    const char *linkpath = "./build/../build/test/test-symlink";
+    if (symlink("../../README.md", linkpath) != 0) {
+        TEST_FAIL("symlink() failed: %s", strerror(errno));
+        return;
+    }
+
+    path = path_absolute(linkpath);
+    EXPECT_EQ(unlink(linkpath), 0);
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
 }
 
