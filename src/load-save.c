@@ -65,9 +65,13 @@ static int decode_and_add_blocks (
     switch (b->encoding.type) {
     case ENCODING_AUTODETECT:
         if (bom_type != UNKNOWN_ENCODING) {
-            // UTF-16BE/LE or UTF-32BE/LE
             BUG_ON(b->encoding.name != NULL);
-            b->encoding = encoding_from_type(bom_type);
+            Encoding e = encoding_from_type(bom_type);
+            if (encoding_supported_by_iconv(e.name)) {
+                b->encoding = e;
+            } else {
+                b->encoding = encoding_from_type(UTF8);
+            }
         }
         break;
     case UTF16:
