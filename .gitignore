@@ -2,6 +2,7 @@
 /public/
 /.cache/
 /dte
+/dte.exe
 /dte-*.tar.gz
 /tags
 callgrind.out.*
