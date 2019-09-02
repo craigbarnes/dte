@@ -49,7 +49,11 @@ static void handle_fatal_signal(int signum)
 {
     term_cleanup();
 
-    set_signal_handler(signum, SIG_DFL);
+    struct sigaction sa;
+    memzero(&sa);
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = SIG_DFL;
+    sigaction(signum, &sa, NULL);
 
     sigset_t mask;
     sigemptyset(&mask);

@@ -63,7 +63,6 @@ void any_key(void);
 void normal_update(void);
 void handle_sigwinch(int signum);
 void suspend(void);
-void set_signal_handler(int signum, void (*handler)(int signum));
 void main_loop(void);
 
 #endif

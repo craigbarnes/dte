@@ -430,15 +430,6 @@ static void update_screen(const ScreenState *const s)
     end_update();
 }
 
-void set_signal_handler(int signum, void (*handler)(int signum))
-{
-    struct sigaction act;
-    memzero(&act);
-    sigemptyset(&act.sa_mask);
-    act.sa_handler = handler;
-    sigaction(signum, &act, NULL);
-}
-
 void main_loop(void)
 {
     while (editor.status == EDITOR_RUNNING) {
