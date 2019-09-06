@@ -50,7 +50,7 @@ typedef struct {
     void (*on_change)(void);
 } OptionDesc;
 
-typedef union  {
+typedef union {
     // OPT_STR
     const char *str_val;
     // OPT_UINT, OPT_ENUM, OPT_FLAG

@@ -475,21 +475,21 @@ static void cmd_include(const CommandArgs *a);
 #endif
 
 static const Command syntax_commands[] = {
-    {"bufis", "i", 2,  3, cmd_bufis},
-    {"char", "bn", 2,  3, cmd_char},
+    {"bufis", "i", 2, 3, cmd_bufis},
+    {"char", "bn", 2, 3, cmd_char},
     {"default", "", 2, -1, cmd_default},
-    {"eat", "", 1,  2, cmd_eat},
-    {"heredocbegin","", 2,  2, cmd_heredocbegin},
-    {"heredocend", "", 1,  2, cmd_heredocend},
-    {"include", "b", 1,  1, cmd_include},
-    {"inlist", "", 2,  3, cmd_inlist},
+    {"eat", "", 1, 2, cmd_eat},
+    {"heredocbegin", "", 2, 2, cmd_heredocbegin},
+    {"heredocend", "", 1, 2, cmd_heredocend},
+    {"include", "b", 1, 1, cmd_include},
+    {"inlist", "", 2, 3, cmd_inlist},
     {"list", "i", 2, -1, cmd_list},
-    {"noeat", "b", 1,  1, cmd_noeat},
-    {"recolor", "", 1,  2, cmd_recolor},
-    {"state", "", 1,  2, cmd_state},
-    {"str", "i", 2,  3, cmd_str},
-    {"syntax", "", 1,  1, cmd_syntax},
-    {"", "", 0,  0, NULL}
+    {"noeat", "b", 1, 1, cmd_noeat},
+    {"recolor", "", 1, 2, cmd_recolor},
+    {"state", "", 1, 2, cmd_state},
+    {"str", "i", 2, 3, cmd_str},
+    {"syntax", "", 1, 1, cmd_syntax},
+    {"", "", 0, 0, NULL}
 };
 
 UNIGNORE_WARNINGS
