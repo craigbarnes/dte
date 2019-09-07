@@ -4,15 +4,15 @@
 #include <sys/types.h>
 #include "unicode.h"
 
-static inline size_t u_char_size(CodePoint uch)
+static inline size_t u_char_size(CodePoint u)
 {
-    if (uch <= UINT32_C(0x7f)) {
+    if (u <= UINT32_C(0x7f)) {
         return 1;
-    } else if (uch <= UINT32_C(0x7ff)) {
+    } else if (u <= UINT32_C(0x7ff)) {
         return 2;
-    } else if (uch <= UINT32_C(0xffff)) {
+    } else if (u <= UINT32_C(0xffff)) {
         return 3;
-    } else if (uch <= UINT32_C(0x10ffff)) {
+    } else if (u <= UINT32_C(0x10ffff)) {
         return 4;
     }
 
@@ -36,9 +36,9 @@ CodePoint u_str_get_char(const unsigned char *str, size_t *idx);
 CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx);
 CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx);
 
-void u_set_char_raw(char *str, size_t *idx, CodePoint uch);
-void u_set_char(char *str, size_t *idx, CodePoint uch);
-void u_set_hex(char *str, size_t *idx, CodePoint uch);
+void u_set_char_raw(char *str, size_t *idx, CodePoint u);
+void u_set_char(char *str, size_t *idx, CodePoint u);
+void u_set_hex(char *str, size_t *idx, CodePoint u);
 
 /*
  * Total width of skipped characters is stored back to @width.

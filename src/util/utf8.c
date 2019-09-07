@@ -24,14 +24,14 @@ static int u_seq_len(unsigned int first_byte)
     return -1;
 }
 
-static bool u_is_continuation(CodePoint uch)
+static bool u_is_continuation(CodePoint u)
 {
-    return (uch & 0xc0) == 0x80;
+    return (u & 0xc0) == 0x80;
 }
 
-static bool u_seq_len_ok(CodePoint uch, int len)
+static bool u_seq_len_ok(CodePoint u, int len)
 {
-    return u_char_size(uch) == len;
+    return u_char_size(u) == len;
 }
 
 /*
@@ -163,76 +163,76 @@ invalid:
     return -first;
 }
 
-void u_set_char_raw(char *str, size_t *idx, CodePoint uch)
+void u_set_char_raw(char *str, size_t *idx, CodePoint u)
 {
     size_t i = *idx;
-    if (uch <= 0x7f) {
-        str[i++] = uch;
-    } else if (uch <= 0x7ff) {
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xc0;
+    if (u <= 0x7f) {
+        str[i++] = u;
+    } else if (u <= 0x7ff) {
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xc0;
         i += 2;
-    } else if (uch <= 0xffff) {
-        str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xe0;
+    } else if (u <= 0xffff) {
+        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xe0;
         i += 3;
-    } else if (uch <= 0x10ffff) {
-        str[i + 3] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xf0;
+    } else if (u <= 0x10ffff) {
+        str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xf0;
         i += 4;
     } else {
         // Invalid byte value
-        str[i++] = uch & 0xff;
+        str[i++] = u & 0xff;
     }
     *idx = i;
 }
 
-void u_set_char(char *str, size_t *idx, CodePoint uch)
+void u_set_char(char *str, size_t *idx, CodePoint u)
 {
     size_t i = *idx;
-    if (uch < 0x80) {
-        if (ascii_iscntrl(uch)) {
-            u_set_ctrl(str, idx, uch);
+    if (u < 0x80) {
+        if (ascii_iscntrl(u)) {
+            u_set_ctrl(str, idx, u);
         } else {
-            str[i++] = uch;
+            str[i++] = u;
             *idx = i;
         }
-    } else if (u_is_unprintable(uch)) {
-        u_set_hex(str, idx, uch);
-    } else if (uch <= 0x7ff) {
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xc0;
+    } else if (u_is_unprintable(u)) {
+        u_set_hex(str, idx, u);
+    } else if (u <= 0x7ff) {
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xc0;
         i += 2;
         *idx = i;
-    } else if (uch <= 0xffff) {
-        str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xe0;
+    } else if (u <= 0xffff) {
+        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xe0;
         i += 3;
         *idx = i;
-    } else if (uch <= 0x10ffff) {
-        str[i + 3] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 2] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 1] = (uch & 0x3f) | 0x80; uch >>= 6;
-        str[i + 0] = uch | 0xf0;
+    } else if (u <= 0x10ffff) {
+        str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
+        str[i + 0] = u | 0xf0;
         i += 4;
         *idx = i;
     }
 }
 
-void u_set_hex(char *str, size_t *idx, CodePoint uch)
+void u_set_hex(char *str, size_t *idx, CodePoint u)
 {
     static const char hex_tab[16] = "0123456789abcdef";
     char *p = str + *idx;
     p[0] = '<';
-    if (!u_is_unicode(uch)) {
+    if (!u_is_unicode(u)) {
         // Invalid byte (negated)
-        uch *= -1;
-        p[1] = hex_tab[(uch >> 4) & 0x0f];
-        p[2] = hex_tab[uch & 0x0f];
+        u *= -1;
+        p[1] = hex_tab[(u >> 4) & 0x0f];
+        p[2] = hex_tab[u & 0x0f];
     } else {
         p[1] = '?';
         p[2] = '?';
