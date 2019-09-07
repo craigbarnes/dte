@@ -122,9 +122,8 @@ static void sanity_check(void)
 
 void any_key(void)
 {
-    KeyCode key;
-
     fputs("Press any key to continue\r\n", stderr);
+    KeyCode key;
     while (!term_read_key(&key)) {
         ;
     }
@@ -136,7 +135,6 @@ void any_key(void)
 static void update_window_full(Window *w)
 {
     View *v = w->view;
-
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v);
@@ -197,12 +195,11 @@ static void update_all_windows(void)
 
 static void update_window(Window *w)
 {
-    View *v = w->view;
-
     if (w->update_tabbar) {
         print_tabbar(w);
     }
 
+    View *v = w->view;
     if (editor.options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
         update_line_numbers(w, v->buffer->changed_line_max == INT_MAX);
@@ -388,19 +385,18 @@ typedef struct {
 
 static void update_screen(const ScreenState *const s)
 {
-    View *v = window->view;
-    Buffer *b = v->buffer;
-
     if (editor.everything_changed) {
         editor.mode_ops[editor.input_mode]->update();
         editor.everything_changed = false;
         return;
     }
 
+    View *v = window->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v);
 
+    Buffer *b = v->buffer;
     if (s->id == b->id) {
         if (s->vx != v->vx || s->vy != v->vy) {
             mark_all_lines_changed(b);
@@ -433,11 +429,11 @@ static void update_screen(const ScreenState *const s)
 void main_loop(void)
 {
     while (editor.status == EDITOR_RUNNING) {
-        KeyCode key;
-
         if (terminal_resized) {
             resize();
         }
+
+        KeyCode key;
         if (!term_read_key(&key)) {
             continue;
         }
@@ -458,7 +454,7 @@ void main_loop(void)
             editor.mode_ops[editor.input_mode]->keypress(key);
             sanity_check();
             if (editor.input_mode == INPUT_GIT_OPEN) {
-                editor.mode_ops[editor.input_mode]->update();
+                editor.mode_ops[INPUT_GIT_OPEN]->update();
             } else {
                 update_screen(&s);
             }
