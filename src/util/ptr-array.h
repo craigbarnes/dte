@@ -64,9 +64,7 @@ NONNULL_ARGS
 static inline void ptr_array_free_array(PointerArray *array)
 {
     free(array->ptrs);
-    array->ptrs = NULL;
-    array->alloc = 0;
-    array->count = 0;
+    *array = (PointerArray) PTR_ARRAY_INIT;
 }
 
 static inline void ptr_array_sort (

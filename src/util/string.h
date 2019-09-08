@@ -25,9 +25,7 @@ typedef struct {
 
 static inline NONNULL_ARGS void string_init(String *s)
 {
-    s->buffer = NULL;
-    s->alloc = 0;
-    s->len = 0;
+    *s = (String) STRING_INIT;
 }
 
 static inline String string_new(size_t size)
