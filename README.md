@@ -104,6 +104,10 @@ The following build variables may be useful when packaging `dte`:
   terminal support currently works with `tmux`, `screen`, `st`, `xterm`
   (and many other `xterm`-compatible terminals) and falls back to
   [ECMA-48] mode for other terminals.
+* `ICONV_DISABLE=1`: Disable support for all file encodings except
+  UTF-8, to avoid the need to link with the system [iconv] library.
+  This can significantly reduce the size of statically linked builds,
+  but is generally not recommended.
 
 Example usage:
 
