@@ -50,7 +50,7 @@ static void handle_fatal_signal(int signum)
     term_cleanup();
 
     struct sigaction sa;
-    memzero(&sa);
+    MEMZERO(&sa);
     sigemptyset(&sa.sa_mask);
     sa.sa_handler = SIG_DFL;
     sigaction(signum, &sa, NULL);
@@ -98,7 +98,7 @@ static void set_signal_handlers(void)
     };
 
     struct sigaction action;
-    memzero(&action);
+    MEMZERO(&action);
     sigfillset(&action.sa_mask);
 
     action.sa_handler = handle_fatal_signal;

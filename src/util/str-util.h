@@ -7,7 +7,7 @@
 #include <string.h>
 #include "macros.h"
 
-#define memzero(ptr) memset((ptr), 0, sizeof(*(ptr)))
+#define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
 NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)

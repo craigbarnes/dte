@@ -64,7 +64,7 @@ void get_indent_info(const char *buf, size_t len, IndentInfo *info)
     size_t tabs = 0;
     size_t pos = 0;
 
-    memzero(info);
+    MEMZERO(info);
     info->sane = true;
     while (pos < len) {
         if (buf[pos] == ' ') {

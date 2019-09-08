@@ -485,5 +485,5 @@ void reset_completion(void)
     free(completion.head);
     free(completion.tail);
     ptr_array_free(&completion.completions);
-    memzero(&completion);
+    MEMZERO(&completion);
 }

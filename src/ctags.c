@@ -58,7 +58,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 
 static bool parse_line(Tag *t, const char *buf, size_t size)
 {
-    memzero(t);
+    MEMZERO(t);
     const char *end = memchr(buf, '\t', size);
     if (!end) {
         goto error;

@@ -26,7 +26,7 @@ static const char extra_rc[] =
 
 void init_headless_mode(void)
 {
-    memzero(&terminal.control_codes);
+    MEMZERO(&terminal.control_codes);
     terminal.cooked = &no_op;
     terminal.raw = &no_op;
     editor.resize = &no_op;

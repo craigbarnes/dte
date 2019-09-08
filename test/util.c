@@ -564,7 +564,7 @@ static void test_u_set_char(void)
 {
     char buf[16];
     size_t i;
-    memzero(&buf);
+    MEMZERO(&buf);
 
     i = 0;
     u_set_char(buf, &i, 'a');
@@ -597,7 +597,7 @@ static void test_u_set_ctrl(void)
 {
     char buf[16];
     size_t i;
-    memzero(&buf);
+    MEMZERO(&buf);
 
     i = 0;
     u_set_ctrl(buf, &i, '\0');
@@ -741,7 +741,7 @@ static void test_hashset(void)
     }
 
     hashset_free(&set);
-    memzero(&set);
+    MEMZERO(&set);
 
     hashset_init(&set, ARRAY_COUNT(strings), true);
     hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
@@ -749,7 +749,7 @@ static void test_hashset(void)
     EXPECT_NONNULL(hashset_get(&set, "FOO", 3));
     EXPECT_NONNULL(hashset_get(&set, "fOO", 3));
     hashset_free(&set);
-    memzero(&set);
+    MEMZERO(&set);
 
     // Check that hashset_add() returns existing entries instead of
     // inserting duplicates
