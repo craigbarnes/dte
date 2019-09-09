@@ -17,8 +17,12 @@ bool parse_args(const Command *cmd, CommandArgs *a)
     char **args = a->args;
     BUG_ON(!args);
 
+    size_t argc = 0;
+    while (args[argc]) {
+        argc++;
+    }
+
     const char *flag_desc = cmd->flags;
-    size_t argc = count_strings(args);
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
     bool flags_after_arg = true;

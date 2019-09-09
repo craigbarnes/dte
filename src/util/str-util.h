@@ -65,16 +65,6 @@ static inline size_t count_nl(const char *buf, size_t size)
 }
 
 NONNULL_ARGS
-static inline size_t count_strings(char **strings)
-{
-    size_t count = 0;
-    while (strings[count]) {
-        count++;
-    }
-    return count;
-}
-
-NONNULL_ARGS
 static inline void free_strings(char **strings)
 {
     for (size_t i = 0; strings[i]; i++) {
