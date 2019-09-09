@@ -23,15 +23,8 @@ static char *expand_file(void)
     if (editor.status != EDITOR_RUNNING) {
         return NULL;
     }
-
-    BUG_ON(!window);
-    View *v = window->view;
-    BUG_ON(!v);
-
-    if (v->buffer->abs_filename == NULL) {
-        return NULL;
-    }
-    return xstrdup(v->buffer->abs_filename);
+    const char *filename = buffer->abs_filename;
+    return filename ? xstrdup(filename) : NULL;
 }
 
 static char *expand_filetype(void)
@@ -55,18 +48,13 @@ static char *expand_word(void)
     if (editor.status != EDITOR_RUNNING) {
         return NULL;
     }
-
-    BUG_ON(!window);
-    View *v = window->view;
-    BUG_ON(!v);
-
     size_t size;
-    char *str = view_get_selection(v, &size);
+    char *str = view_get_selection(view, &size);
     if (str != NULL) {
         xrenew(str, size + 1);
         str[size] = '\0';
     } else {
-        str = view_get_word_under_cursor(v);
+        str = view_get_word_under_cursor(view);
         if (str == NULL) {
             str = NULL;
         }
