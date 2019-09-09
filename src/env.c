@@ -42,6 +42,14 @@ static char *expand_filetype(void)
     return xstrdup(buffer->options.filetype);
 }
 
+static char *expand_lineno(void)
+{
+    if (editor.status != EDITOR_RUNNING) {
+        return NULL;
+    }
+    return xasprintf("%ld", view->cy + 1);
+}
+
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
@@ -77,6 +85,7 @@ static const BuiltinEnv builtin[] = {
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"FILETYPE", expand_filetype},
+    {"LINENO", expand_lineno},
     {"WORD", expand_word},
 };
 

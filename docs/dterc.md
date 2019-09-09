@@ -47,6 +47,10 @@ The filename of the current buffer (or an empty string if unsaved).
 
 The value of the `filetype` option for the current buffer.
 
+### **$LINENO**
+
+The line number of the cursor in the current buffer.
+
 ### **$WORD**
 
 The selected text or the word under the cursor.
