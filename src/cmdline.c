@@ -122,11 +122,8 @@ static void cmdline_next_word(CommandLine *c)
 
 static void cmdline_prev_word(CommandLine *c)
 {
-    switch (c->pos) {
-    case 1:
+    if (c->pos <= 1) {
         c->pos = 0;
-        return;
-    case 0:
         return;
     }
 
