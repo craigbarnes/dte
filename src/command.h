@@ -35,7 +35,6 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
 bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err);
 const char *command_parse_error_to_string(CommandParseError err);
-char **copy_string_array(char **src, size_t count);
 
 // command-run.c
 extern const Command *current_command;

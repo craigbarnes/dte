@@ -288,13 +288,3 @@ const char *command_parse_error_to_string(CommandParseError err)
     }
     return NULL;
 }
-
-char **copy_string_array(char **src, size_t count)
-{
-    char **dst = xnew(char*, count + 1);
-    for (size_t i = 0; i < count; i++) {
-        dst[i] = xstrdup(src[i]);
-    }
-    dst[count] = NULL;
-    return dst;
-}

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "macros.h"
+#include "xmalloc.h"
 
 #define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
@@ -64,8 +65,18 @@ static inline size_t count_nl(const char *buf, size_t size)
     return nl;
 }
 
+static inline char **copy_string_array(char **src, size_t count)
+{
+    char **dst = xnew(char*, count + 1);
+    for (size_t i = 0; i < count; i++) {
+        dst[i] = xstrdup(src[i]);
+    }
+    dst[count] = NULL;
+    return dst;
+}
+
 NONNULL_ARGS
-static inline void free_strings(char **strings)
+static inline void free_string_array(char **strings)
 {
     for (size_t i = 0; strings[i]; i++) {
         free(strings[i]);

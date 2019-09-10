@@ -105,7 +105,7 @@ void add_file_options(FileOptionType type, char *to, char **strs)
 {
     if (type == FILE_OPTIONS_FILENAME && !regexp_is_valid(to, REG_NEWLINE)) {
         free(to);
-        free_strings(strs);
+        free_string_array(strs);
         return;
     }
 

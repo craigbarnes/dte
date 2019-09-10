@@ -121,7 +121,7 @@ static void key_binding_free(KeyBinding *binding)
 {
     if (binding) {
         if (binding->cmd) {
-            free_strings(binding->a.args);
+            free_string_array(binding->a.args);
         }
         free(binding);
     }

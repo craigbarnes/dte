@@ -202,7 +202,7 @@ static void free_syntax(Syntax *syn)
 {
     ptr_array_free_cb(&syn->states, FREE_FUNC(free_state));
     ptr_array_free_cb(&syn->string_lists, FREE_FUNC(free_string_list));
-    ptr_array_free_cb(&syn->default_colors, FREE_FUNC(free_strings));
+    ptr_array_free_cb(&syn->default_colors, FREE_FUNC(free_string_array));
 
     free(syn->name);
     free(syn);
