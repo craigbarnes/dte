@@ -14,6 +14,7 @@
 #include "util/string.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 static void handle_error_msg(const Compiler *c, char *str)
 {
@@ -213,6 +214,47 @@ error:
     close(p0[1]);
     close(p1[0]);
     close(p1[1]);
+    close(dev_null);
+    return -1;
+}
+
+int spawn_writer(char **argv, const char *text, size_t length)
+{
+    if (length == 0) {
+        return 0;
+    }
+
+    int p[2] = {-1, -1};
+    int dev_null = -1;
+    if (pipe_close_on_exec(p)) {
+        error_msg("pipe: %s", strerror(errno));
+        goto error;
+    }
+    dev_null = open_dev_null(O_WRONLY);
+    if (dev_null < 0) {
+        goto error;
+    }
+
+    int fd[3] = {p[0], dev_null, dev_null};
+    const pid_t pid = fork_exec(argv, fd);
+    if (pid < 0) {
+        error_msg("Error: %s", strerror(errno));
+        goto error;
+    }
+
+    close(dev_null);
+    close(p[0]);
+    if (xwrite(p[1], text, length) < 0) {
+        error_msg("write: %s", strerror(errno));
+        close(p[1]);
+        return -1;
+    }
+    close(p[1]);
+    return handle_child_error(pid) ? -1 : 0;
+
+error:
+    close(p[0]);
+    close(p[1]);
     close(dev_null);
     return -1;
 }

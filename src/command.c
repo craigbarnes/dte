@@ -848,25 +848,21 @@ static void cmd_pipe_to(const CommandArgs *a)
     const BlockIter saved_cursor = view->cursor;
     const ssize_t saved_sel_so = view->sel_so;
     const ssize_t saved_sel_eo = view->sel_eo;
-    FilterData data;
 
+    size_t input_len = 0;
     if (view->selection) {
-        data.in_len = prepare_selection(view);
+        input_len = prepare_selection(view);
     } else {
         Block *blk;
-        data.in_len = 0;
         block_for_each(blk, &buffer->blocks) {
-            data.in_len += blk->size;
+            input_len += blk->size;
         }
         move_bof();
     }
 
-    data.in = block_iter_get_bytes(&view->cursor, data.in_len);
-    if (spawn_filter(a->args, &data) == 0) {
-        free(data.out);
-    }
-
-    free(data.in);
+    char *input = block_iter_get_bytes(&view->cursor, input_len);
+    spawn_writer(a->args, input, input_len);
+    free(input);
 
     // Restore cursor and selection offsets, instead of calling unselect()
     view->cursor = saved_cursor;

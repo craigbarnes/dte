@@ -25,6 +25,7 @@ typedef struct {
 }
 
 int spawn_filter(char **argv, FilterData *data);
+int spawn_writer(char **argv, const char *text, size_t length);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);
 void spawn(char **args, int fd[3], bool prompt);
 
