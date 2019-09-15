@@ -151,10 +151,7 @@ static int32_t parse_color(const char *str)
     case COLOR_CYAN:
         return light ? c + 8 : c;
     default:
-        if (light) {
-            return COLOR_INVALID;
-        }
-        return c;
+        return light ? COLOR_INVALID : c;
     }
 }
 
