@@ -50,6 +50,7 @@ static inline void *xmemdup(const void *ptr, size_t size)
 
 // Round x up to a multiple of r (which *must* be a power of 2)
 static inline size_t ROUND_UP(size_t x, size_t r)
+DIAGNOSE_IF(!IS_POWER_OF_2(r))
 {
     r--;
     return (x + r) & ~r;

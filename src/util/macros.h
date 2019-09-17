@@ -9,6 +9,7 @@
 #define PASTE(a, b) a##b
 #define XPASTE(a, b) PASTE(a, b)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define IS_POWER_OF_2(x) ((x > 0) && ((x & (x - 1)) == 0))
 #define DO_PRAGMA(x) _Pragma(#x)
 
 // Calculate the number of elements in an array.
@@ -182,6 +183,12 @@
     #define NONSTRING __attribute__((__nonstring__))
 #else
     #define NONSTRING
+#endif
+
+#if HAS_ATTRIBUTE(diagnose_if)
+    #define DIAGNOSE_IF(x) __attribute__((diagnose_if((x), (#x), "error")))
+#else
+    #define DIAGNOSE_IF(x)
 #endif
 
 #if defined(__x86_64__) && !defined(__SSE4_2__)
