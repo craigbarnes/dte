@@ -216,10 +216,9 @@ static void test_ascii(void)
         EXPECT_EQ(!!ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(!!ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(!!ascii_isprint(i), !!isprint(i));
-        EXPECT_EQ(!!ascii_isascii(i), !!isascii(i));
         EXPECT_EQ(!!ascii_isxdigit(i), !!isxdigit(i));
         if (i != '\v' && i != '\f') {
-            IEXPECT_EQ(!!ascii_isspace(i), !!isspace(i));
+            EXPECT_EQ(!!ascii_isspace(i), !!isspace(i));
         }
     }
     setlocale(LC_CTYPE, saved_locale);
