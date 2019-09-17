@@ -55,6 +55,9 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_FALSE(patmatch("a\\*.abc", "az.abc"));
     EXPECT_FALSE(patmatch("a\\?.abc", "az.abc"));
 
+    EXPECT_TRUE(patmatch("{{{a}}}", "a"));
+    EXPECT_FALSE(patmatch("{{{a}}", "a"));
+
     #undef patmatch
 }
 
