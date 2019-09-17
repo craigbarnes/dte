@@ -912,6 +912,14 @@ static void test_path_absolute(void)
     ASSERT_NONNULL(path);
     EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
+
+    char buf[8192 + 1];
+    memset(buf, 'a', sizeof(buf));
+    buf[0] = '/';
+    buf[8192] = '\0';
+    errno = 0;
+    EXPECT_NULL(path_absolute(buf));
+    EXPECT_EQ(errno, ENAMETOOLONG);
 }
 
 static void test_path_parent(void)
