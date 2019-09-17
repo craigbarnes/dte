@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "test.h"
@@ -202,6 +204,26 @@ static void test_ascii(void)
     EXPECT_TRUE(mem_equal_icase(s1, s2, 6));
     EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
     EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
+
+    const char *saved_locale = setlocale(LC_CTYPE, "POSIX");
+    if (saved_locale != NULL) {
+        for (int i = -1; i < 256; i++) {
+            EXPECT_EQ(!!ascii_isalpha(i), !!isalpha(i));
+            EXPECT_EQ(!!ascii_isalnum(i), !!isalnum(i));
+            EXPECT_EQ(!!ascii_islower(i), !!islower(i));
+            EXPECT_EQ(!!ascii_isupper(i), !!isupper(i));
+            EXPECT_EQ(!!ascii_iscntrl(i), !!iscntrl(i));
+            EXPECT_EQ(!!ascii_isdigit(i), !!isdigit(i));
+            EXPECT_EQ(!!ascii_isblank(i), !!isblank(i));
+            EXPECT_EQ(!!ascii_isprint(i), !!isprint(i));
+            EXPECT_EQ(!!ascii_isascii(i), !!isascii(i));
+            EXPECT_EQ(!!ascii_isxdigit(i), !!isxdigit(i));
+            if (i != '\v' && i != '\f') {
+                IEXPECT_EQ(!!ascii_isspace(i), !!isspace(i));
+            }
+        }
+        setlocale(LC_CTYPE, saved_locale);
+    }
 }
 
 static void test_string(void)
