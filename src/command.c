@@ -1475,7 +1475,11 @@ static void cmd_show_alias(const CommandArgs *a)
     const char *alias_name = a->args[0];
     const char *cmd_str = find_alias(alias_name);
     if (cmd_str == NULL) {
-        info_msg("%s is not a known alias", alias_name);
+        if (find_command(commands, alias_name)) {
+            info_msg("%s is a built-in command, not an alias", alias_name);
+        } else {
+            info_msg("%s is not a known alias", alias_name);
+        }
         return;
     }
 
@@ -1483,7 +1487,7 @@ static void cmd_show_alias(const CommandArgs *a)
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, cmd_str);
     } else {
-        info_msg("%s is bound to: %s", alias_name, cmd_str);
+        info_msg("%s is aliased to: %s", alias_name, cmd_str);
     }
 }
 
