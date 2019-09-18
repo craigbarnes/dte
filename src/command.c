@@ -1466,6 +1466,12 @@ static void cmd_shift(const CommandArgs *a)
 
 static void cmd_show_binding(const CommandArgs *a)
 {
+    bool write_to_cmdline = false;
+    if (a->nr_flags) {
+        BUG_ON(a->flags[0] != 'c');
+        write_to_cmdline = true;
+    }
+
     const char *keystr = a->args[0];
     KeyCode key;
     if (!parse_key(&key, keystr)) {
@@ -1479,10 +1485,16 @@ static void cmd_show_binding(const CommandArgs *a)
     }
 
     const KeyBinding *b = lookup_binding(key);
-    if (b) {
-        info_msg("%s is bound to: %s", keystr, b->cmd_str);
-    } else {
+    if (b == NULL) {
         info_msg("%s is not bound to a command", keystr);
+        return;
+    }
+
+    if (write_to_cmdline) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, b->cmd_str);
+    } else {
+        info_msg("%s is bound to: %s", keystr, b->cmd_str);
     }
 }
 
@@ -1891,7 +1903,7 @@ const Command commands[] = {
     {"set", "gl", 1, -1, cmd_set},
     {"setenv", "", 2, 2, cmd_setenv},
     {"shift", "", 1, 1, cmd_shift},
-    {"show-binding", "", 1, 1, cmd_show_binding},
+    {"show-binding", "c", 1, 1, cmd_show_binding},
     {"show-bindings", "", 0, 0, cmd_show_bindings},
     {"suspend", "", 0, 0, cmd_suspend},
     {"tag", "r", 0, 1, cmd_tag},
