@@ -1539,13 +1539,9 @@ static void cmd_show_bindings(const CommandArgs* UNUSED_ARG(a))
     close(fd);
     string_free(&s);
 
-    PointerArray arr = PTR_ARRAY_INIT;
-    ptr_array_add(&arr, xmemdup_literal("run"));
-    ptr_array_add(&arr, xstrdup(editor.pager));
-    ptr_array_add(&arr, xstrdup(tmp));
-    ptr_array_add(&arr, NULL);
-    run_commands(commands, &arr);
-    ptr_array_free(&arr);
+    const char *argv[] = {editor.pager, tmp, NULL};
+    int child_fds[3] = {0, 1, 2};
+    spawn((char**)argv, child_fds, false);
 
     unlink(tmp);
 }
