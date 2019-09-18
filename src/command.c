@@ -1464,6 +1464,29 @@ static void cmd_shift(const CommandArgs *a)
     shift_lines(count);
 }
 
+static void cmd_show_alias(const CommandArgs *a)
+{
+    bool write_to_cmdline = false;
+    if (a->nr_flags) {
+        BUG_ON(a->flags[0] != 'c');
+        write_to_cmdline = true;
+    }
+
+    const char *alias_name = a->args[0];
+    const char *cmd_str = find_alias(alias_name);
+    if (cmd_str == NULL) {
+        info_msg("%s is not a known alias", alias_name);
+        return;
+    }
+
+    if (write_to_cmdline) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, cmd_str);
+    } else {
+        info_msg("%s is bound to: %s", alias_name, cmd_str);
+    }
+}
+
 static void cmd_show_binding(const CommandArgs *a)
 {
     bool write_to_cmdline = false;
@@ -1903,6 +1926,7 @@ const Command commands[] = {
     {"set", "gl", 1, -1, cmd_set},
     {"setenv", "", 2, 2, cmd_setenv},
     {"shift", "", 1, 1, cmd_shift},
+    {"show-alias", "c", 1, 1, cmd_show_alias},
     {"show-binding", "c", 1, 1, cmd_show_binding},
     {"show-bindings", "", 0, 0, cmd_show_bindings},
     {"suspend", "", 0, 0, cmd_suspend},

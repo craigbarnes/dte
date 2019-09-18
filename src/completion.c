@@ -302,6 +302,10 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
+    if (string_view_equal_literal(&cmd_name, "show-alias")) {
+        collect_aliases(completion.parsed);
+        return;
+    }
 }
 
 static void init_completion(void)
