@@ -58,7 +58,7 @@ const Command *find_command(const Command *cmds, const char *name)
     return NULL;
 }
 
-static void run_command(const Command *cmds, char **av)
+void run_command(const Command *cmds, char **av)
 {
     const Command *cmd = find_command(cmds, av[0]);
     if (!cmd) {

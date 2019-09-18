@@ -387,12 +387,8 @@ loop_break:
     }
 
     if (tag) {
-        PointerArray array = PTR_ARRAY_INIT;
-        ptr_array_add(&array, xmemdup_literal("tag"));
-        ptr_array_add(&array, xstrdup(tag));
-        ptr_array_add(&array, NULL);
-        run_commands(commands, &array);
-        ptr_array_free(&array);
+        const char *tag_command[] = {"tag", tag, NULL};
+        run_command(commands, (char**)tag_command);
     }
 
     if (

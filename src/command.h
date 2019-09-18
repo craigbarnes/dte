@@ -40,6 +40,7 @@ const char *command_parse_error_to_string(CommandParseError err);
 extern const Command *current_command;
 const Command *find_command(const Command *cmds, const char *name);
 void run_commands(const Command *cmds, const PointerArray *array);
+void run_command(const Command *cmds, char **argv);
 void handle_command(const Command *cmds, const char *cmd);
 
 // command.c
