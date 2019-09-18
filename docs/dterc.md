@@ -160,8 +160,7 @@ By default `set` changes both global and local values.
 In configuration files only global options can be set (no need
 to specify the `-g` flag).
 
-To automatically set options for specific filetypes and filenames use
-the `option` command.
+See also: `toggle` and `option` commands.
 
 ### **setenv** _name_ _value_
 
