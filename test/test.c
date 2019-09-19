@@ -48,6 +48,20 @@ void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b)
     }
 }
 
+void expect_true(const char *file, int line, bool x)
+{
+    if (unlikely(!x)) {
+        test_fail(file, line, "Unexpected false value");
+    }
+}
+
+void expect_false(const char *file, int line, bool x)
+{
+    if (unlikely(x)) {
+        test_fail(file, line, "Unexpected true value");
+    }
+}
+
 void expect_null(const char *file, int line, const void *ptr)
 {
     if (unlikely(ptr != NULL)) {
@@ -77,6 +91,14 @@ void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b)
     if (unlikely(a != b)) {
         i++;
         test_fail(file, line, "Test #%zu: values not equal: %jd, %jd", i, a, b);
+    }
+}
+
+void iexpect_true(const char *file, int line, size_t i, bool x)
+{
+    if (unlikely(!x)) {
+        i++;
+        test_fail(file, line, "Test #%zu: unexpected false value", i);
     }
 }
 

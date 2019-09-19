@@ -2,6 +2,7 @@
 #define TEST_TEST_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include "../src/util/macros.h"
 
@@ -16,14 +17,12 @@
 #define EXPECT_UINT_EQ(a, b) expect_uint_eq(__FILE__, __LINE__, a, b)
 #define EXPECT_NULL(p) expect_null(__FILE__, __LINE__, p)
 #define EXPECT_NONNULL(p) expect_nonnull(__FILE__, __LINE__, p)
-#define EXPECT_TRUE(x) EXPECT_EQ(x, true)
-#define EXPECT_FALSE(x) EXPECT_EQ(x, false)
+#define EXPECT_TRUE(x) expect_true(__FILE__, __LINE__, x)
+#define EXPECT_FALSE(x) expect_false(__FILE__, __LINE__, x)
 
 #define IEXPECT_EQ(a, b) iexpect_eq(__FILE__, __LINE__, i, a, b)
 #define IEXPECT_STREQ(s1, s2) iexpect_streq(__FILE__, __LINE__, i, s1, s2)
-#define IEXPECT_TRUE(x) IEXPECT_EQ(x, true)
-#define IEXPECT_FALSE(x) IEXPECT_EQ(x, false)
-#define IEXPECT_GT(a, b) IEXPECT_TRUE(a > b)
+#define IEXPECT_TRUE(x) iexpect_true(__FILE__, __LINE__, i, x)
 
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
 #define ASSERT_TRUE(x) ASSERT_EQ(x, true)
@@ -37,10 +36,14 @@ void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(const char *file, int line, const void *p1, const void *p2);
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
 void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b);
+void expect_true(const char *file, int line, bool x);
+void expect_false(const char *file, int line, bool x);
 void expect_null(const char *file, int line, const void *p);
 void expect_nonnull(const char *file, int line, const void *p);
+
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2);
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
+void iexpect_true(const char *file, int line, size_t i, bool x);
 
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 void assert_nonnull(const char *file, int line, const void *ptr);

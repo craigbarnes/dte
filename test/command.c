@@ -126,7 +126,7 @@ static void test_commands_array(void)
         ASSERT_EQ(cmd->flags[flags_size - 1], '\0');
 
         // Check that array is sorted by name field, in binary searchable order
-        IEXPECT_GT(strcmp(cmd->name, commands[i - 1].name), 0);
+        IEXPECT_TRUE(strcmp(cmd->name, commands[i - 1].name) > 0);
     }
 }
 
