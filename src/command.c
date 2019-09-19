@@ -1535,14 +1535,19 @@ static void cmd_show_bindings(const CommandArgs* UNUSED_ARG(a))
     }
 
     String s = dump_bindings();
-    xwrite(fd, s.buffer, s.len);
+    ssize_t rc = xwrite(fd, s.buffer, s.len);
+    int err = errno;
     close(fd);
     string_free(&s);
+    if (rc < 0) {
+        error_msg("write() failed: %s", strerror(err));
+        unlink(tmp);
+        return;
+    }
 
     const char *argv[] = {editor.pager, tmp, NULL};
     int child_fds[3] = {0, 1, 2};
     spawn((char**)argv, child_fds, false);
-
     unlink(tmp);
 }
 
