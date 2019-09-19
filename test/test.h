@@ -25,7 +25,7 @@
 #define IEXPECT_TRUE(x) iexpect_true(__FILE__, __LINE__, i, x)
 
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
-#define ASSERT_TRUE(x) ASSERT_EQ(x, true)
+#define ASSERT_TRUE(x) assert_true(__FILE__, __LINE__, x)
 #define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
 
 extern unsigned int failed;
@@ -46,6 +46,7 @@ void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 void iexpect_true(const char *file, int line, size_t i, bool x);
 
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
+void assert_true(const char *file, int line, bool x);
 void assert_nonnull(const char *file, int line, const void *ptr);
 
 #endif

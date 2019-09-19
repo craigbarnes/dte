@@ -110,6 +110,14 @@ void assert_eq(const char *file, int line, intmax_t a, intmax_t b)
     }
 }
 
+void assert_true(const char *file, int line, bool x)
+{
+    if (unlikely(!x)) {
+        test_fail(file, line, "ERROR: Unexpected false value");
+        abort();
+    }
+}
+
 void assert_nonnull(const char *file, int line, const void *ptr)
 {
     if (unlikely(ptr == NULL)) {
