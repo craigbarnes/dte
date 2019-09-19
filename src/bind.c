@@ -100,9 +100,9 @@ static KeyBinding *key_binding_new(const char *cmd_str)
 
     free(ptr_array_remove_idx(&array, 0));
     CommandArgs a = {.args = (char**)array.ptrs};
-    supress_error_msg = true;
+    suppress_error_msg();
     bool ok = parse_args(cmd, &a);
-    supress_error_msg = false;
+    unsuppress_error_msg();
     if (!ok) {
         goto out;
     }

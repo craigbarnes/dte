@@ -236,7 +236,7 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         error_msg("Syntax %s already exists", syn->name);
     }
 
-    if (nr_errors != saved_nr_errors) {
+    if (get_nr_errors() != saved_nr_errors) {
         free_syntax(syn);
         return;
     }

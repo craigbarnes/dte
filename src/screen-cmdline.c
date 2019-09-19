@@ -72,9 +72,12 @@ void update_command_line(void)
     term_output_reset(0, terminal.width, 0);
     terminal.move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
-    case INPUT_NORMAL:
-        print_message(error_ptr, msg_is_error);
+    case INPUT_NORMAL: {
+        bool msg_is_error;
+        const char *msg = get_msg(&msg_is_error);
+        print_message(msg, msg_is_error);
         break;
+    }
     case INPUT_SEARCH:
         prefix = current_search_direction() == SEARCH_FWD ? '/' : '?';
         // fallthrough

@@ -464,7 +464,7 @@ static void cmd_syntax(const CommandArgs *a)
     current_syntax->name = xstrdup(a->args[0]);
     current_state = NULL;
 
-    saved_nr_errors = nr_errors;
+    saved_nr_errors = get_nr_errors();
 }
 
 static void cmd_include(const CommandArgs *a);

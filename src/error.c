@@ -4,10 +4,9 @@
 #include "editor.h"
 
 static char error_buf[256];
-const char *const error_ptr = error_buf;
-unsigned int nr_errors;
-bool msg_is_error;
-bool supress_error_msg;
+static unsigned int nr_errors;
+static bool msg_is_error;
+static bool supress_errors;
 
 void clear_error(void)
 {
@@ -16,7 +15,7 @@ void clear_error(void)
 
 void error_msg(const char *format, ...)
 {
-    if (supress_error_msg) {
+    if (supress_errors) {
         return;
     }
 
@@ -65,4 +64,25 @@ void info_msg(const char *format, ...)
     vsnprintf(error_buf, sizeof(error_buf), format, ap);
     va_end(ap);
     msg_is_error = false;
+}
+
+const char *get_msg(bool *is_error)
+{
+    *is_error = msg_is_error;
+    return error_buf;
+}
+
+unsigned int get_nr_errors(void)
+{
+    return nr_errors;
+}
+
+void suppress_error_msg(void)
+{
+    supress_errors = true;
+}
+
+void unsuppress_error_msg(void)
+{
+    supress_errors = false;
 }

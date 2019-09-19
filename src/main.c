@@ -249,7 +249,7 @@ loop_break:
         } else if (err == EINVAL) {
             error_msg("%s: no default syntax found", lint_syntax);
         }
-        return nr_errors ? 1 : 0;
+        return get_nr_errors() ? 1 : 0;
     }
 
     if (!isatty(STDOUT_FILENO)) {
@@ -344,7 +344,7 @@ loop_break:
     // "Press any key to continue" prompt if there were any errors
     // during reading configuration files.
     terminal.raw();
-    if (nr_errors) {
+    if (get_nr_errors()) {
         any_key();
         clear_error();
     }
