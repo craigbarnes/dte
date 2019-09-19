@@ -17,10 +17,6 @@ alias xsel 'pipe-to xsel -b'
 errorfmt gitgrep '^([^:]+):([0-9]+):' file line
 alias git-grep 'compile -1s gitgrep git grep -n'
 
-errorfmt gitchanges '^([^:]+): \+([0-9]+).*' file line
-alias git-changes "compile -1s gitchanges sh -c \"git diff -U0 | \
-    awk '/^[+]{3} b\\// {f = substr($2, 3)} /^@@/ {print f \\\": \\\" $3}'\""
-
 # Remove possible 'F' from $LESS so that less will always wait
 # for keypress and "run" can be used without "-p".
 # ('R' = allow ANSI colors, 'S' = chop long lines)
