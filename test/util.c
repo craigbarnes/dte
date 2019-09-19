@@ -20,6 +20,33 @@
 #include "../src/util/xmalloc.h"
 #include "../src/util/xsnprintf.h"
 
+static void test_macros(void)
+{
+    EXPECT_EQ(STRLEN(""), 0);
+    EXPECT_EQ(STRLEN("a"), 1);
+    EXPECT_EQ(STRLEN("123456789"), 9);
+
+    EXPECT_EQ(ARRAY_COUNT(""), 1);
+    EXPECT_EQ(ARRAY_COUNT("a"), 2);
+    EXPECT_EQ(ARRAY_COUNT("123456789"), 10);
+
+    EXPECT_EQ(MIN(0, 1), 0);
+    EXPECT_EQ(MIN(99, 100), 99);
+    EXPECT_EQ(MIN(-10, 10), -10);
+
+    EXPECT_TRUE(IS_POWER_OF_2(1));
+    EXPECT_TRUE(IS_POWER_OF_2(2));
+    EXPECT_TRUE(IS_POWER_OF_2(4));
+    EXPECT_TRUE(IS_POWER_OF_2(8));
+    EXPECT_TRUE(IS_POWER_OF_2(4096));
+    EXPECT_TRUE(IS_POWER_OF_2(8192));
+    EXPECT_TRUE(IS_POWER_OF_2(1ULL << 63));
+    EXPECT_FALSE(IS_POWER_OF_2(0));
+    EXPECT_FALSE(IS_POWER_OF_2(3));
+    EXPECT_FALSE(IS_POWER_OF_2(12));
+    EXPECT_FALSE(IS_POWER_OF_2(-10));
+}
+
 static void test_ascii(void)
 {
     EXPECT_EQ(ascii_tolower('A'), 'a');
@@ -1052,6 +1079,7 @@ DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_util(void)
 {
+    test_macros();
     test_ascii();
     test_string();
     test_string_view();
