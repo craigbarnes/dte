@@ -38,11 +38,6 @@ extern const int8_t hex_table[256];
 #define is_regex_special_char(x) ascii_test(x, ASCII_REGEX)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
 
-static inline bool ascii_isascii(unsigned char c)
-{
-    return c < 128;
-}
-
 static inline bool ascii_isblank(unsigned char c)
 {
     return c == ' ' || c == '\t';
