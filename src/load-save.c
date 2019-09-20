@@ -282,26 +282,27 @@ static mode_t get_umask(void)
 static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
 {
     ssize_t size = 0;
-    Block *blk;
-
     if (bom_type != UTF8) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
             size = bom->len;
             if (xwrite(enc->fd, bom->bytes, size) < 0) {
-                goto write_error;
+                error_msg("Write error: %s", strerror(errno));
+                return -1;
             }
         }
     }
 
+    Block *blk;
     block_for_each(blk, &b->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
-
         if (rc < 0) {
-            goto write_error;
+            error_msg("Write error: %s", strerror(errno));
+            return -1;
         }
         size += rc;
     }
+
     if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
         // Any real error hides this message
         error_msg (
@@ -316,9 +317,6 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
         return -1;
     }
     return 0;
-write_error:
-    error_msg("Write error: %s", strerror(errno));
-    return -1;
 }
 
 int save_buffer (

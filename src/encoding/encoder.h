@@ -13,13 +13,13 @@ typedef enum {
 typedef struct {
     struct cconv *cconv;
     unsigned char *nbuf;
-    ssize_t nsize;
+    size_t nsize;
     LineEndingType nls;
     int fd;
 } FileEncoder;
 
 FileEncoder *new_file_encoder(const Encoding *encoding, LineEndingType nls, int fd) NONNULL_ARGS;
 void free_file_encoder(FileEncoder *enc);
-ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, ssize_t size) NONNULL_ARGS;
+ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t size) NONNULL_ARGS;
 
 #endif
