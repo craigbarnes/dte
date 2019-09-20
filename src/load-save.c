@@ -112,7 +112,7 @@ static int decode_and_add_blocks (
     }
 
     char *line;
-    ssize_t len;
+    size_t len;
     if (file_decoder_read_line(dec, &line, &len)) {
         if (len && line[len - 1] == '\r') {
             b->newline = NEWLINE_DOS;
@@ -183,8 +183,8 @@ int read_blocks(Buffer *b, int fd)
     }
 
     if (!mapped) {
-        ssize_t alloc = map_size;
-        ssize_t pos = 0;
+        size_t alloc = map_size;
+        size_t pos = 0;
 
         buf = xmalloc(alloc);
         while (1) {
@@ -281,7 +281,7 @@ static mode_t get_umask(void)
 
 static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
 {
-    ssize_t size = 0;
+    size_t size = 0;
     if (bom_type != UTF8) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {

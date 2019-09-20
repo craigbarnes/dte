@@ -30,10 +30,10 @@ static bool fill(FileDecoder *dec)
     return true;
 }
 
-static bool decode_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
+static bool decode_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
 {
     char *line;
-    ssize_t len;
+    size_t len;
 
     while (1) {
         line = cconv_consume_line(dec->cconv, &len);
@@ -61,11 +61,11 @@ static bool decode_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
     return true;
 }
 
-static bool read_utf8_line(FileDecoder *dec, char **linep, ssize_t *lenp)
+static bool read_utf8_line(FileDecoder *dec, char **linep, size_t *lenp)
 {
     char *line = (char *)dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
-    ssize_t len;
+    size_t len;
 
     if (nl) {
         len = nl - line;
@@ -98,9 +98,9 @@ static int set_encoding(FileDecoder *dec, const char *encoding)
     return 0;
 }
 
-static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
+static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
 {
-    for (ssize_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
         if (line[i] >= 0x80) {
             size_t idx = i;
             CodePoint u = u_get_nonascii(line, len, &idx);
@@ -133,11 +133,11 @@ static bool detect(FileDecoder *dec, const unsigned char *line, ssize_t len)
     return false;
 }
 
-static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
+static bool detect_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
 {
     char *line = (char *)dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
-    ssize_t len;
+    size_t len;
 
     if (nl) {
         len = nl - line;
@@ -166,7 +166,7 @@ static bool detect_and_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
 FileDecoder *new_file_decoder (
     const char *encoding,
     const unsigned char *buf,
-    ssize_t size
+    size_t size
 ) {
     FileDecoder *dec = xnew0(FileDecoder, 1);
     dec->ibuf = buf;
@@ -191,7 +191,7 @@ void free_file_decoder(FileDecoder *dec)
     free(dec);
 }
 
-bool file_decoder_read_line(FileDecoder *dec, char **linep, ssize_t *lenp)
+bool file_decoder_read_line(FileDecoder *dec, char **linep, size_t *lenp)
 {
     return dec->read_line(dec, linep, lenp);
 }
