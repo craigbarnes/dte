@@ -17,6 +17,7 @@ appdir ?= $(datadir)/applications
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
+INSTALL_DESKTOP_FILE = desktop-file-install
 RM = rm -f
 
 all: $(dte)
@@ -46,7 +47,7 @@ uninstall:
 
 install-desktop-file:
 	$(E) INSTALL '$(DESTDIR)$(appdir)/dte.desktop'
-	$(Q) desktop-file-install \
+	$(Q) $(INSTALL_DESKTOP_FILE) \
 	  --dir='$(DESTDIR)$(appdir)' \
 	  --set-key=TryExec --set-value='$(bindir)/$(dte)' \
 	  --set-key=Exec --set-value='$(bindir)/$(dte) %F' \
