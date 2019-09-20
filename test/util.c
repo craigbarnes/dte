@@ -1028,6 +1028,19 @@ static void test_size_multiply_overflows(void)
     EXPECT_TRUE(size_multiply_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
 }
 
+static void test_size_add_overflows(void)
+{
+    size_t r = 0;
+    EXPECT_FALSE(size_add_overflows(10, 20, &r));
+    EXPECT_UINT_EQ(r, 30);
+    EXPECT_FALSE(size_add_overflows(SIZE_MAX, 0, &r));
+    EXPECT_UINT_EQ(r, SIZE_MAX);
+    EXPECT_TRUE(size_add_overflows(SIZE_MAX, 1, &r));
+    EXPECT_TRUE(size_add_overflows(SIZE_MAX, 16, &r));
+    EXPECT_TRUE(size_add_overflows(SIZE_MAX, SIZE_MAX, &r));
+    EXPECT_TRUE(size_add_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
+}
+
 static void test_mem_intern(void)
 {
     const char *ptrs[256];
@@ -1107,6 +1120,7 @@ void test_util(void)
     test_path_absolute();
     test_path_parent();
     test_size_multiply_overflows();
+    test_size_add_overflows();
     test_mem_intern();
     test_read_file();
 }
