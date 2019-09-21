@@ -1,6 +1,41 @@
 Releases
 ========
 
+v1.9 (unreleased)
+-----------------
+
+**Additions:**
+
+* Added a new `pipe-to` command, to complement the existing `pipe-from`
+  and `filter` commands.
+* Added a new `show` command, which can be used to introspect the
+  current values of aliases and bindings.
+* Added a `-k` flag to the `copy` command, to allow keeping the current
+  selection after copying.
+* Added a man page entry for the (previously undocumented) `eval`
+  command.
+* Added new `$FILETYPE` and `$LINENO` special variables.
+* Added a `display-invisible` global option, to allow visible rendering
+  of otherwise invisible Unicode characters.
+* Added an `-s` command-line flag, for validating custom syntax files.
+* Added a compile-time `ICONV_DISABLE=1` option, which disables linking
+  to the system iconv library (but makes the editor UTF-8 only).
+* Added a Desktop Entry file, which can be installed using
+  `make install-desktop-file`.
+
+**Improvements:**
+
+* Updated Unicode support to version 12.1.
+* Modified the `errorfmt` command, to allow sub-match groups in the
+  regexp pattern to be ignored.
+* Various improvements to syntax highlighting and filetype detection.
+* Various performance optimizations.
+
+**Fixes:**
+
+* Fixed a bug that would sometimes cause files to be saved as UTF-8,
+  even if another encoding was specified.
+
 v1.8.2 (latest release)
 -----------------------
 
