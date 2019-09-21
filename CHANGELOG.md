@@ -1,8 +1,10 @@
 Releases
 ========
 
-v1.9 (unreleased)
------------------
+v1.9 (latest release)
+---------------------
+
+Released on 2019-09-21.
 
 **Additions:**
 
@@ -36,8 +38,13 @@ v1.9 (unreleased)
 * Fixed a bug that would sometimes cause files to be saved as UTF-8,
   even if another encoding was specified.
 
-v1.8.2 (latest release)
------------------------
+**Downloads:**
+
+* [dte-1.9.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.9.tar.gz)
+* [dte-1.9.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.9.tar.gz.sig)
+
+v1.8.2
+------
 
 Released on 2019-04-23.
 
