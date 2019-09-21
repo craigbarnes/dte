@@ -196,6 +196,8 @@ Other Commands:
 .br
    \fBtoggle\fR [\fB\-gv\fR] \fIoption\fR [\fIvalues\fR]...
 .br
+   \fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
+.br
 .P
 Options:
 .br
@@ -1454,6 +1456,30 @@ display new value
 If \fIoption\fR has both local and global values then local is toggled
 unless \fB\-g\fR is used.
 .P
+.RE
+\fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
+.RS
+Display current values for various configurable types.
+.P
+The \fItype\fR argument can be one of:
+.P
+.TP
+\fBalias\fR
+show command aliases
+.PP
+.TP
+\fBbind\fR
+show key bindings
+.PP
+The \fIkey\fR argument is the name of the entry to lookup (i.e. alias
+name or key string). If this argument is specified, the value will
+be displayed in the status line. If omitted, a pager will be opened
+displaying all entries of the specified type.
+.P
+.TP
+\fB\-c\fR
+write value to command line instead of status line
+.PP
 .RE
 .SH OPTIONS
 Options can be changed using the \fBset\fR command. Enumerated options can

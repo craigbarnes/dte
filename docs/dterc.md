@@ -927,6 +927,26 @@ must be either boolean or enum.
 If _option_ has both local and global values then local is toggled
 unless `-g` is used.
 
+### **show** [**-c**] _type_ [_key_]
+
+Display current values for various configurable types.
+
+The _type_ argument can be one of:
+
+`alias`
+:   show command aliases
+
+`bind`
+:   show key bindings
+
+The _key_ argument is the name of the entry to lookup (i.e. alias
+name or key string). If this argument is specified, the value will
+be displayed in the status line. If omitted, a pager will be opened
+displaying all entries of the specified type.
+
+`-c`
+:   write value to command line instead of status line
+
 # Options
 
 Options can be changed using the `set` command. Enumerated options can
