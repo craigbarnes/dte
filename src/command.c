@@ -1464,15 +1464,8 @@ static void cmd_shift(const CommandArgs *a)
     shift_lines(count);
 }
 
-static void cmd_show_alias(const CommandArgs *a)
+static void show_alias(const char *alias_name, bool write_to_cmdline)
 {
-    bool write_to_cmdline = false;
-    if (a->nr_flags) {
-        BUG_ON(a->flags[0] != 'c');
-        write_to_cmdline = true;
-    }
-
-    const char *alias_name = a->args[0];
     const char *cmd_str = find_alias(alias_name);
     if (cmd_str == NULL) {
         if (find_command(commands, alias_name)) {
@@ -1491,15 +1484,8 @@ static void cmd_show_alias(const CommandArgs *a)
     }
 }
 
-static void cmd_show_binding(const CommandArgs *a)
+static void show_binding(const char *keystr, bool write_to_cmdline)
 {
-    bool write_to_cmdline = false;
-    if (a->nr_flags) {
-        BUG_ON(a->flags[0] != 'c');
-        write_to_cmdline = true;
-    }
-
-    const char *keystr = a->args[0];
     KeyCode key;
     if (!parse_key(&key, keystr)) {
         error_msg("invalid key string: %s", keystr);
@@ -1525,16 +1511,59 @@ static void cmd_show_binding(const CommandArgs *a)
     }
 }
 
-static void cmd_show_bindings(const CommandArgs* UNUSED_ARG(a))
+static void cmd_show(const CommandArgs *a)
 {
-    char tmp[32] = "/tmp/.dte.binds.XXXXXX";
+    typedef enum {
+        CMD_ALIAS,
+        CMD_BIND,
+    } CommandType;
+
+    CommandType cmdtype;
+    if (streq(a->args[0], "alias")) {
+        cmdtype = CMD_ALIAS;
+    } else if (streq(a->args[0], "bind")) {
+        cmdtype = CMD_BIND;
+    } else {
+        error_msg("argument #1 must be: 'alias' or 'bind'");
+        return;
+    }
+
+    const bool cflag = a->nr_flags != 0;
+    if (a->nr_args == 2) {
+        const char *str = a->args[1];
+        switch (cmdtype) {
+        case CMD_ALIAS:
+            show_alias(str, cflag);
+            break;
+        case CMD_BIND:
+            show_binding(str, cflag);
+            break;
+        }
+        return;
+    }
+
+    if (cflag) {
+        error_msg("\"show -c\" requires 2 arguments");
+        return;
+    }
+
+    char tmp[32] = "/tmp/.dte.XXXXXX";
     int fd = mkstemp(tmp);
     if (fd < 0) {
         error_msg("mkstemp() failed: %s", strerror(errno));
         return;
     }
 
-    String s = dump_bindings();
+    String s;
+    switch (cmdtype) {
+    case CMD_ALIAS:
+        s = dump_aliases();
+        break;
+    case CMD_BIND:
+        s = dump_bindings();
+        break;
+    }
+
     ssize_t rc = xwrite(fd, s.buffer, s.len);
     int err = errno;
     close(fd);
@@ -1931,9 +1960,7 @@ const Command commands[] = {
     {"set", "gl", 1, -1, cmd_set},
     {"setenv", "", 2, 2, cmd_setenv},
     {"shift", "", 1, 1, cmd_shift},
-    {"show-alias", "c", 1, 1, cmd_show_alias},
-    {"show-binding", "c", 1, 1, cmd_show_binding},
-    {"show-bindings", "", 0, 0, cmd_show_bindings},
+    {"show", "c", 1, 2, cmd_show},
     {"suspend", "", 0, 0, cmd_suspend},
     {"tag", "r", 0, 1, cmd_tag},
     {"toggle", "glv", 1, -1, cmd_toggle},

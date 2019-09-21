@@ -302,8 +302,30 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
-    if (string_view_equal_literal(&cmd_name, "show-alias")) {
-        collect_aliases(completion.parsed);
+    if (string_view_equal_literal(&cmd_name, "show")) {
+        switch (argc) {
+        case 1:
+            if (str_has_prefix("alias", completion.parsed)) {
+                add_completion(xstrdup("alias"));
+            }
+            if (str_has_prefix("bind", completion.parsed)) {
+                add_completion(xstrdup("bind"));
+            }
+            break;
+        case 2:
+            if (streq(args[1], "alias")) {
+                collect_aliases(completion.parsed);
+            }
+            break;
+        case 3:
+            if (
+                (streq(args[1], "alias") && streq(args[2], "-c"))
+                || (streq(args[1], "-c") && streq(args[2], "alias"))
+            ) {
+                collect_aliases(completion.parsed);
+            }
+            break;
+        }
         return;
     }
 }

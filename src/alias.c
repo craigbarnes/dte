@@ -104,3 +104,13 @@ void collect_aliases(const char *const prefix)
         }
     }
 }
+
+String dump_aliases(void)
+{
+    String buf = string_new(4096);
+    for (size_t i = 0; i < aliases.count; i++) {
+        const CommandAlias *alias = aliases.ptrs[i];
+        string_sprintf(&buf, " %s  ->  %s\n", alias->name, alias->value);
+    }
+    return buf;
+}
