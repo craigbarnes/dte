@@ -1,8 +1,22 @@
 Releases
 ========
 
-v1.9 (latest release)
----------------------
+v1.9.1 (latest release)
+-----------------------
+
+Released on 2019-09-29.
+
+**Changes:**
+
+* Fixed `make check` when running from a release tarball.
+
+**Downloads:**
+
+* [dte-1.9.1.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.9.1.tar.gz)
+* [dte-1.9.1.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.9.1.tar.gz.sig)
+
+v1.9
+----
 
 Released on 2019-09-21.
 
