@@ -262,7 +262,7 @@ By default _string_ is interpreted as one or more filename extensions.
     full (absolute) filename
 
 `-i`
-:   Interpret _string_ as a command interpretter name and match against
+:   Interpret _string_ as a command interpreter name and match against
     the Unix shebang line (after removing any path prefix and/or version
     suffix)
 
