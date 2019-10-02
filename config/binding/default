@@ -54,7 +54,7 @@ bind C-M-S-delete 'delete-eol'
 bind ^H erase
 bind ^? erase
 
-bind ^C copy
+bind ^C 'copy -k'
 bind ^F search
 bind ^G 'search -n'
 # ^I == Tab
