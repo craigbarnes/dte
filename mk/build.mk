@@ -83,17 +83,17 @@ $(call make-lazy,CWARNS)
 $(call make-lazy,CSTD)
 
 ifeq "$(KERNEL)" "Darwin"
-  LDLIBS_ICONV += -liconv
+  LDLIBS_ICONV = -liconv
 else ifeq "$(OS)" "Cygwin"
-  LDLIBS_ICONV += -liconv
+  LDLIBS_ICONV = -liconv
   EXEC_SUFFIX = .exe
 else ifeq "$(KERNEL)" "OpenBSD"
-  LDLIBS_ICONV += -liconv
+  LDLIBS_ICONV = -liconv
   BASIC_CFLAGS += -I/usr/local/include
   BASIC_LDFLAGS += -L/usr/local/lib
 else ifeq "$(KERNEL)" "NetBSD"
   ifeq ($(shell expr "`uname -r`" : '[01]\.'),2)
-    LDLIBS_ICONV += -liconv
+    LDLIBS_ICONV = -liconv
   endif
   BASIC_CFLAGS += -I/usr/pkg/include
   BASIC_LDFLAGS += -L/usr/pkg/lib
