@@ -7,14 +7,14 @@
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
-static int tab_title_width(int number, const char *filename)
+static size_t tab_title_width(size_t tab_number, const char *filename)
 {
-    return 3 + number_width(number) + u_str_width(filename);
+    return 3 + size_str_width(tab_number) + u_str_width(filename);
 }
 
-static void update_tab_title_width(View *v, int tab_number)
+static void update_tab_title_width(View *v, size_t tab_number)
 {
-    int w = tab_title_width(tab_number, buffer_filename(v->buffer));
+    size_t w = tab_title_width(tab_number, buffer_filename(v->buffer));
     v->tt_width = w;
     v->tt_truncated_width = w;
 }

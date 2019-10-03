@@ -342,13 +342,15 @@ static void test_string_view(void)
     EXPECT_FALSE(string_view_equal_cstr(&sv5, "foo"));
 }
 
-static void test_number_width(void)
+static void test_size_str_width(void)
 {
-    EXPECT_EQ(number_width(0), 1);
-    EXPECT_EQ(number_width(-1), 2);
-    EXPECT_EQ(number_width(420), 3);
-    EXPECT_EQ(number_width(2147483647), 10);
-    EXPECT_EQ(number_width(-2147483647), 11);
+    EXPECT_EQ(size_str_width(0), 1);
+    EXPECT_EQ(size_str_width(1), 1);
+    EXPECT_EQ(size_str_width(9), 1);
+    EXPECT_EQ(size_str_width(19), 2);
+    EXPECT_EQ(size_str_width(425), 3);
+    EXPECT_EQ(size_str_width(12345), 5);
+    EXPECT_EQ(size_str_width(2147483647), 10);
 }
 
 static void test_buf_parse_ulong(void)
@@ -1096,7 +1098,7 @@ void test_util(void)
     test_ascii();
     test_string();
     test_string_view();
-    test_number_width();
+    test_size_str_width();
     test_buf_parse_ulong();
     test_str_to_int();
     test_str_to_size();

@@ -4,21 +4,6 @@
 #include "ascii.h"
 #include "checked-arith.h"
 
-int number_width(long n)
-{
-    int width = 0;
-
-    if (n < 0) {
-        n *= -1;
-        width++;
-    }
-    do {
-        n /= 10;
-        width++;
-    } while (n);
-    return width;
-}
-
 size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
 {
     if (size == 0 || !ascii_isdigit(str[0])) {
@@ -155,4 +140,14 @@ bool str_to_ulong(const char *str, unsigned long *valp)
     }
     *valp = val;
     return true;
+}
+
+size_t size_str_width(size_t x)
+{
+    size_t width = 0;
+    do {
+        x /= 10;
+        width++;
+    } while (x);
+    return width;
 }
