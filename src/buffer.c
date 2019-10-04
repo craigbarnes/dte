@@ -248,8 +248,7 @@ void buffer_update_syntax(Buffer *b)
         // Start state of first line is constant
         PointerArray *s = &b->line_start_states;
         if (!s->alloc) {
-            s->alloc = 64;
-            s->ptrs = xnew(void *, s->alloc);
+            ptr_array_init(s, 64);
         }
         s->ptrs[0] = syn->states.ptrs[0];
         s->count = 1;
