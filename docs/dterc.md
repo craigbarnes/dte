@@ -443,11 +443,11 @@ Display next file.
 
 Display previous file.
 
-### **view** _N_|last
+### **view** _N_|**last**
 
-Display _N_th or last open file.
+Display *N*th or last open file.
 
-### **move-tab** _N_|left|right
+### **move-tab** _N_|**left**|**right**
 
 Move current tab to position _N_ or 1 position left or right.
 
