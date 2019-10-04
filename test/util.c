@@ -278,9 +278,8 @@ static void test_string(void)
     EXPECT_EQ(s.len, 3);
     EXPECT_STREQ(string_borrow_cstring(&s), "est");
 
-    string_make_space(&s, 0, 1);
+    string_insert_ch(&s, 0, 't');
     EXPECT_EQ(s.len, 4);
-    s.buffer[0] = 't';
     EXPECT_STREQ(string_borrow_cstring(&s), "test");
 
     string_clear(&s);

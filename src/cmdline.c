@@ -145,14 +145,6 @@ static void cmdline_prev_word(CommandLine *c)
     c->pos = i;
 }
 
-static void cmdline_insert_bytes(CommandLine *c, const char *buf, size_t size)
-{
-    string_make_space(&c->buf, c->pos, size);
-    for (size_t i = 0; i < size; i++) {
-        c->buf.buffer[c->pos++] = buf[i];
-    }
-}
-
 static void cmdline_insert_paste(CommandLine *c)
 {
     size_t size;
@@ -162,7 +154,8 @@ static void cmdline_insert_paste(CommandLine *c)
             text[i] = ' ';
         }
     }
-    cmdline_insert_bytes(c, text, size);
+    string_insert_buf(&c->buf, c->pos, text, size);
+    c->pos += size;
     free(text);
 }
 

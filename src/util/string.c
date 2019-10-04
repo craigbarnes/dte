@@ -42,12 +42,29 @@ size_t string_add_ch(String *s, CodePoint u)
     return len;
 }
 
+static void string_make_space(String *s, size_t pos, size_t len)
+{
+    BUG_ON(pos > s->len);
+    string_grow(s, len);
+    memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
+    s->len += len;
+}
+
 size_t string_insert_ch(String *s, size_t pos, CodePoint u)
 {
     size_t len = u_char_size(u);
     string_make_space(s, pos, len);
     u_set_char_raw(s->buffer, &pos, u);
     return len;
+}
+
+void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
+{
+    if (!len) {
+        return;
+    }
+    string_make_space(s, pos, len);
+    memcpy(s->buffer + pos, buf, len);
 }
 
 void string_add_str(String *s, const char *str)
@@ -141,14 +158,6 @@ const char *string_borrow_cstring(String *s)
 {
     string_ensure_null_terminated(s);
     return s->buffer;
-}
-
-void string_make_space(String *s, size_t pos, size_t len)
-{
-    BUG_ON(pos > s->len);
-    string_grow(s, len);
-    memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
-    s->len += len;
 }
 
 void string_remove(String *s, size_t pos, size_t len)
