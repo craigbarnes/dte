@@ -23,16 +23,20 @@ static bool states_equal(void **ptrs, size_t idx, const State *b)
     return a == b;
 }
 
-static bool is_buffered(const Condition *cond, const char *str, size_t len)
+static bool bufis(const Condition *cond, const char *buf, size_t len)
 {
-    if (len != (size_t)cond->u.cond_bufis.len) {
+    if (len != (size_t)cond->u.cond_str.len) {
         return false;
     }
+    return memcmp(cond->u.cond_str.str, buf, len) == 0;
+}
 
-    if (cond->u.cond_bufis.icase) {
-        return mem_equal_icase(cond->u.cond_bufis.str, str, len);
+static bool bufis_icase(const Condition *cond, const char *buf, size_t len)
+{
+    if (len != (size_t)cond->u.cond_str.len) {
+        return false;
     }
-    return !memcmp(cond->u.cond_bufis.str, str, len);
+    return mem_equal_icase(cond->u.cond_str.str, buf, len);
 }
 
 static State *handle_heredoc (
@@ -106,7 +110,17 @@ static HlColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_BUFIS:
-                if (sidx >= 0 && is_buffered(cond, line + sidx, i - sidx)) {
+                if (sidx >= 0 && bufis(cond, line + sidx, i - sidx)) {
+                    for (size_t idx = sidx; idx < i; idx++) {
+                        colors[idx] = a->emit_color;
+                    }
+                    sidx = -1;
+                    state = a->destination;
+                    goto top;
+                }
+                break;
+            case COND_BUFIS_ICASE:
+                if (sidx >= 0 && bufis_icase(cond, line + sidx, i - sidx)) {
                     for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }

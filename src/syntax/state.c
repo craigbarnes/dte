@@ -159,25 +159,22 @@ static Condition *add_condition (
 
 static void cmd_bufis(const CommandArgs *a)
 {
-    char **args = a->args;
-    const bool icase = a->flags[0] == 'i';
-    const char *str = args[0];
+    const char *str = a->args[0];
     const size_t len = strlen(str);
     Condition *c;
-
-    if (len > ARRAY_COUNT(c->u.cond_bufis.str)) {
+    if (len > ARRAY_COUNT(c->u.cond_str.str)) {
         error_msg (
             "Maximum length of string is %zu bytes",
-            ARRAY_COUNT(c->u.cond_bufis.str)
+            ARRAY_COUNT(c->u.cond_str.str)
         );
         return;
     }
 
-    c = add_condition(COND_BUFIS, args[1], args[2]);
+    ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
+    c = add_condition(type, a->args[1], a->args[2]);
     if (c) {
-        memcpy(c->u.cond_bufis.str, str, len);
-        c->u.cond_bufis.len = len;
-        c->u.cond_bufis.icase = icase;
+        memcpy(c->u.cond_str.str, str, len);
+        c->u.cond_str.len = len;
     }
 }
 

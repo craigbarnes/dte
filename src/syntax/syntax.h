@@ -11,6 +11,7 @@
 
 typedef enum {
     COND_BUFIS,
+    COND_BUFIS_ICASE,
     COND_CHAR,
     COND_CHAR_BUFFER,
     COND_CHAR1,
@@ -43,11 +44,6 @@ typedef struct {
 
 typedef struct {
     union {
-        struct {
-            uint8_t len;
-            bool icase;
-            char str[30];
-        } cond_bufis;
         struct {
             BitSet bitset;
         } cond_char;
