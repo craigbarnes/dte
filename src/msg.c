@@ -109,7 +109,7 @@ static bool file_location_return(const FileLocation *loc)
 
 void push_file_location(FileLocation *loc)
 {
-    ptr_array_add(&file_locations, loc);
+    ptr_array_append(&file_locations, loc);
 }
 
 void pop_file_location(void)
@@ -167,7 +167,7 @@ void add_message(Message *m)
     if (is_duplicate(m)) {
         free_message(m);
     } else {
-        ptr_array_add(&msgs, m);
+        ptr_array_append(&msgs, m);
     }
 }
 

@@ -80,7 +80,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     ft->str_len = (uint8_t) str_len;
     memcpy(ft->data, name, name_len + 1);
     memcpy(ft->data + name_len + 1, str, str_len + 1);
-    ptr_array_add(&filetypes, ft);
+    ptr_array_append(&filetypes, ft);
 }
 
 static StringView get_ext(const StringView filename)

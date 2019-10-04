@@ -257,7 +257,7 @@ bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err
         }
 
         if (cmd[pos] == ';') {
-            ptr_array_add(array, NULL);
+            ptr_array_append(array, NULL);
             pos++;
             continue;
         }
@@ -267,10 +267,10 @@ bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err
             return false;
         }
 
-        ptr_array_add(array, parse_command_arg(cmd + pos, end - pos, true));
+        ptr_array_append(array, parse_command_arg(cmd + pos, end - pos, true));
         pos = end;
     }
-    ptr_array_add(array, NULL);
+    ptr_array_append(array, NULL);
     return true;
 }
 

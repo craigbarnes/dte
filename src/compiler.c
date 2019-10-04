@@ -16,7 +16,7 @@ static Compiler *add_compiler(const char *name)
 
     c = xnew0(Compiler, 1);
     c->name = xstrdup(name);
-    ptr_array_add(&compilers, c);
+    ptr_array_append(&compilers, c);
     return c;
 }
 
@@ -78,5 +78,5 @@ void add_error_fmt (
         }
     }
 
-    ptr_array_add(&add_compiler(compiler)->error_formats, f);
+    ptr_array_append(&add_compiler(compiler)->error_formats, f);
 }

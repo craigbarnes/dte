@@ -59,7 +59,7 @@ static State *handle_heredoc (
     s->state = merge_syntax(syn, &m);
     s->delim = xmemdup(delim, len);
     s->len = len;
-    ptr_array_add(&state->heredoc.states, s);
+    ptr_array_append(&state->heredoc.states, s);
     return s->state;
 }
 

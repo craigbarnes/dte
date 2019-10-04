@@ -728,13 +728,13 @@ static void test_u_prev_char(void)
 static void test_ptr_array(void)
 {
     PointerArray a = PTR_ARRAY_INIT;
-    ptr_array_add(&a, NULL);
-    ptr_array_add(&a, NULL);
-    ptr_array_add(&a, xstrdup("foo"));
-    ptr_array_add(&a, NULL);
-    ptr_array_add(&a, xstrdup("bar"));
-    ptr_array_add(&a, NULL);
-    ptr_array_add(&a, NULL);
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, xstrdup("foo"));
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, xstrdup("bar"));
+    ptr_array_append(&a, NULL);
+    ptr_array_append(&a, NULL);
     EXPECT_EQ(a.count, 7);
 
     ptr_array_trim_nulls(&a);

@@ -48,7 +48,7 @@ static void sort_completions(void)
 
 void add_completion(char *str)
 {
-    ptr_array_add(&completion.completions, str);
+    ptr_array_append(&completion.completions, str);
 }
 
 static void collect_commands(const char *prefix)
@@ -354,7 +354,7 @@ static void init_completion(void)
 
         if (cmd[pos] == ';') {
             semicolon = array.count;
-            ptr_array_add(&array, NULL);
+            ptr_array_append(&array, NULL);
             pos++;
             continue;
         }
@@ -378,17 +378,17 @@ static void init_completion(void)
                         array.ptrs[i] = NULL;
                     }
                     array.count = save;
-                    ptr_array_add(&array, parse_command_arg(name, end - pos, true));
+                    ptr_array_append(&array, parse_command_arg(name, end - pos, true));
                 } else {
                     // Remove NULL
                     array.count--;
                 }
             } else {
-                ptr_array_add(&array, parse_command_arg(name, end - pos, true));
+                ptr_array_append(&array, parse_command_arg(name, end - pos, true));
             }
             free(name);
         } else {
-            ptr_array_add(&array, parse_command_arg(cmd + pos, end - pos, true));
+            ptr_array_append(&array, parse_command_arg(cmd + pos, end - pos, true));
         }
         pos = end;
     }

@@ -113,5 +113,5 @@ void add_file_options(FileOptionType type, char *to, char **strs)
     opt->type = type;
     opt->type_or_pattern = to;
     opt->strs = strs;
-    ptr_array_add(&file_options, opt);
+    ptr_array_append(&file_options, opt);
 }

@@ -145,7 +145,7 @@ void add_binding(const char *keystr, const char *command)
     KeyBindingEntry *b = xnew(KeyBindingEntry, 1);
     b->key = key;
     b->bind = key_binding_new(command);
-    ptr_array_add(&bindings_ptr_array, b);
+    ptr_array_append(&bindings_ptr_array, b);
 }
 
 void remove_binding(const char *keystr)

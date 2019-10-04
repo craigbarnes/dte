@@ -82,7 +82,7 @@ bool regexp_exec_sub (
         if (m[i].rm_so == -1) {
             break;
         }
-        ptr_array_add(matches, xstrslice(buf, m[i].rm_so, m[i].rm_eo));
+        ptr_array_append(matches, xstrslice(buf, m[i].rm_so, m[i].rm_eo));
     }
     return true;
 }

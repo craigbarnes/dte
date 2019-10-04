@@ -230,7 +230,7 @@ void tag_file_find_tags (
     Tag *t = xnew(Tag, 1);
     size_t pos = 0;
     while (next_tag(tf, &pos, name, true, t)) {
-        ptr_array_add(tags, t);
+        ptr_array_append(tags, t);
         t = xnew(Tag, 1);
     }
     free(t);

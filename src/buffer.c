@@ -74,7 +74,7 @@ Buffer *buffer_new(const Encoding *encoding)
     b->options.filetype = str_intern("none");
     b->options.indent_regex = NULL;
 
-    ptr_array_add(&buffers, b);
+    ptr_array_append(&buffers, b);
     return b;
 }
 

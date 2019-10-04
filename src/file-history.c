@@ -50,7 +50,7 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
             e->row = row;
             e->col = col;
             // Re-insert at end of array
-            ptr_array_add(&history, e);
+            ptr_array_append(&history, e);
         } else {
             free(e);
         }
@@ -70,7 +70,7 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
     e->col = col;
     e->filename_len = filename_len;
     memcpy(e->filename, filename, filename_len);
-    ptr_array_add(&history, e);
+    ptr_array_append(&history, e);
 }
 
 static bool parse_ulong(const char **strp, unsigned long *valp)

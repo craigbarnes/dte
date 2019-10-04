@@ -28,8 +28,8 @@ View *window_add_buffer(Window *w, Buffer *b)
     v->cursor.head = &b->blocks;
     v->cursor.blk = BLOCK(b->blocks.next);
 
-    ptr_array_add(&b->views, v);
-    ptr_array_add(&w->views, v);
+    ptr_array_append(&b->views, v);
+    ptr_array_append(&w->views, v);
     w->update_tabbar = true;
     return v;
 }
@@ -542,7 +542,7 @@ UNIGNORE_WARNINGS
 
 static void collect_window(Window *w, void *data)
 {
-    ptr_array_add(data, w);
+    ptr_array_append(data, w);
 }
 
 Window *prev_window(Window *w)

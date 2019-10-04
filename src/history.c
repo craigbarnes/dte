@@ -20,14 +20,14 @@ void history_add(PointerArray *history, const char *text, size_t max_entries)
     for (size_t i = 0, n = history->count; i < n; i++) {
         if (streq(history->ptrs[i], text)) {
             // Move identical entry to end
-            ptr_array_add(history, ptr_array_remove_idx(history, i));
+            ptr_array_append(history, ptr_array_remove_idx(history, i));
             return;
         }
     }
     if (history->count == max_entries) {
         free(ptr_array_remove_idx(history, 0));
     }
-    ptr_array_add(history, xstrdup(text));
+    ptr_array_append(history, xstrdup(text));
 }
 
 bool history_search_forward (

@@ -61,7 +61,7 @@ static State *find_or_add_state(const char *name)
     st->name = xstrdup(name);
     st->defined = false;
     st->type = STATE_INVALID;
-    ptr_array_add(&current_syntax->states, st);
+    ptr_array_append(&current_syntax->states, st);
     return st;
 }
 
@@ -153,7 +153,7 @@ static Condition *add_condition (
     c->a.destination = d;
     c->a.emit_name = emit ? xstrdup(emit) : NULL;
     c->type = type;
-    ptr_array_add(&current_state->conds, c);
+    ptr_array_append(&current_state->conds, c);
     return c;
 }
 
@@ -229,7 +229,7 @@ static void cmd_default(const CommandArgs *a)
     if (no_syntax()) {
         return;
     }
-    ptr_array_add (
+    ptr_array_append (
         &current_syntax->default_colors,
         copy_string_array(a->args, a->nr_args)
     );
@@ -301,7 +301,7 @@ static void cmd_list(const CommandArgs *a)
     if (list == NULL) {
         list = xnew0(StringList, 1);
         list->name = xstrdup(name);
-        ptr_array_add(&current_syntax->string_lists, list);
+        ptr_array_append(&current_syntax->string_lists, list);
     } else if (list->defined) {
         error_msg("List %s already exists.", name);
         return;
@@ -330,7 +330,7 @@ static void cmd_inlist(const CommandArgs *a)
         // Add undefined list
         list = xnew0(StringList, 1);
         list->name = xstrdup(name);
-        ptr_array_add(&current_syntax->string_lists, list);
+        ptr_array_append(&current_syntax->string_lists, list);
     }
     list->used = true;
     c->u.cond_inlist.list = list;

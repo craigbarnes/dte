@@ -1,7 +1,7 @@
 #include <string.h>
 #include "ptr-array.h"
 
-void ptr_array_add(PointerArray *array, void *ptr)
+void ptr_array_append(PointerArray *array, void *ptr)
 {
     size_t alloc = array->alloc;
     if (alloc == array->count) {
@@ -20,7 +20,7 @@ void ptr_array_add(PointerArray *array, void *ptr)
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
 {
     size_t count = array->count - pos;
-    ptr_array_add(array, NULL);
+    ptr_array_append(array, NULL);
     memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void *));
     array->ptrs[pos] = ptr;
 }

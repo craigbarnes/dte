@@ -82,9 +82,9 @@ void run_command(const Command *cmds, char **av)
         array.count--;
 
         for (size_t i = 1; av[i]; i++) {
-            ptr_array_add(&array, xstrdup(av[i]));
+            ptr_array_append(&array, xstrdup(av[i]));
         }
-        ptr_array_add(&array, NULL);
+        ptr_array_append(&array, NULL);
 
         run_commands(cmds, &array);
         ptr_array_free(&array);

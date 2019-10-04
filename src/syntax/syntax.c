@@ -256,7 +256,7 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         }
     }
 
-    ptr_array_add(&syntaxes, syn);
+    ptr_array_append(&syntaxes, syn);
 }
 
 Syntax *find_syntax(const char *name)

@@ -60,7 +60,7 @@ HlColor *set_highlight_color(const char *name, const TermColor *color)
     HlColor *c = xnew(HlColor, 1);
     c->name = xstrdup(name);
     c->color = *color;
-    ptr_array_add(&hl_colors, c);
+    ptr_array_append(&hl_colors, c);
     return c;
 }
 

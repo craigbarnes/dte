@@ -427,11 +427,11 @@ Frame *split_root(bool vertical, bool before)
     f->window = new_window();
     f->window->frame = f;
     if (before) {
-        ptr_array_add(&new_root->frames, f);
-        ptr_array_add(&new_root->frames, root_frame);
+        ptr_array_append(&new_root->frames, f);
+        ptr_array_append(&new_root->frames, root_frame);
     } else {
-        ptr_array_add(&new_root->frames, root_frame);
-        ptr_array_add(&new_root->frames, f);
+        ptr_array_append(&new_root->frames, root_frame);
+        ptr_array_append(&new_root->frames, f);
     }
 
     root_frame->parent = new_root;

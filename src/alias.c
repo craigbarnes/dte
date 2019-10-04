@@ -65,7 +65,7 @@ void add_alias(const char *name, const char *value)
     CommandAlias *alias = xnew(CommandAlias, 1);
     alias->name = xstrdup(name);
     alias->value = xstrdup(value);
-    ptr_array_add(&aliases, alias);
+    ptr_array_append(&aliases, alias);
 
     if (editor.status != EDITOR_INITIALIZING) {
         sort_aliases();

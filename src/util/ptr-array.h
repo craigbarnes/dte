@@ -21,7 +21,7 @@ typedef int (*CompareFunction)(const void *, const void *);
 typedef void (*FreeFunction)(void *ptr);
 #define FREE_FUNC(f) (FreeFunction)f
 
-void ptr_array_add(PointerArray *array, void *ptr) NONNULL_ARG(1);
+void ptr_array_append(PointerArray *array, void *ptr) NONNULL_ARG(1);
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos) NONNULL_ARG(1);
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr) NONNULL_ARGS;
 void ptr_array_remove(PointerArray *array, void *ptr) NONNULL_ARG(1);

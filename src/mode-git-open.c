@@ -92,7 +92,7 @@ static void split(PointerArray *words, const char *str)
         while (str[i] && !ascii_isspace(str[i])) {
             i++;
         }
-        ptr_array_add(words, xstrslice(str, s, i));
+        ptr_array_append(words, xstrslice(str, s, i));
     }
 }
 
@@ -145,7 +145,7 @@ static void git_open_filter(void)
             break;
         }
         if (match(ptr, &words)) {
-            ptr_array_add(&git_open.files, ptr);
+            ptr_array_append(&git_open.files, ptr);
         }
         ptr = zero + 1;
     }
