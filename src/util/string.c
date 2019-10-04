@@ -28,13 +28,13 @@ void string_free(String *s)
     string_init(s);
 }
 
-void string_add_byte(String *s, unsigned char byte)
+void string_append_byte(String *s, unsigned char byte)
 {
     string_grow(s, 1);
     s->buffer[s->len++] = byte;
 }
 
-size_t string_add_ch(String *s, CodePoint u)
+size_t string_append_codepoint(String *s, CodePoint u)
 {
     size_t len = u_char_size(u);
     string_grow(s, len);
@@ -67,17 +67,17 @@ void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
     memcpy(s->buffer + pos, buf, len);
 }
 
-void string_add_str(String *s, const char *str)
+void string_append_str(String *s, const char *str)
 {
-    string_add_buf(s, str, strlen(str));
+    string_append_buf(s, str, strlen(str));
 }
 
-void string_add_string_view(String *s, const StringView *sv)
+void string_append_string_view(String *s, const StringView *sv)
 {
-    string_add_buf(s, sv->data, sv->length);
+    string_append_buf(s, sv->data, sv->length);
 }
 
-void string_add_buf(String *s, const char *ptr, size_t len)
+void string_append_buf(String *s, const char *ptr, size_t len)
 {
     if (!len) {
         return;
@@ -120,7 +120,7 @@ char *string_steal(String *s, size_t *len)
 
 char *string_steal_cstring(String *s)
 {
-    string_add_byte(s, '\0');
+    string_append_byte(s, '\0');
     char *b = s->buffer;
     string_init(s);
     return b;

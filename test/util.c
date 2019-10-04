@@ -270,7 +270,7 @@ static void test_string(void)
     EXPECT_EQ(s.len, 4);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAF");
 
-    string_add_str(&s, "test");
+    string_append_str(&s, "test");
     EXPECT_EQ(s.len, 8);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAFtest");
 
@@ -299,7 +299,7 @@ static void test_string(void)
     EXPECT_PTREQ(s.buffer, NULL);
 
     for (size_t i = 0; i < 40; i++) {
-        string_add_byte(&s, 'a');
+        string_append_byte(&s, 'a');
     }
 
     EXPECT_EQ(s.len, 40);

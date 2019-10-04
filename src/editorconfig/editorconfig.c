@@ -109,22 +109,22 @@ static int ini_handler(const IniData *data, void *ud) {
             case '*': case ',': case '-':
             case '?': case '[': case '\\':
             case ']': case '{': case '}':
-                string_add_byte(&pattern, '\\');
+                string_append_byte(&pattern, '\\');
                 // Fallthrough
             default:
-                string_add_byte(&pattern, ch);
+                string_append_byte(&pattern, ch);
             }
         }
 
         if (!string_view_memchr(&data->section, '/')) {
             // No slash in pattern, append "**/"
-            string_add_literal(&pattern, "**/");
+            string_append_literal(&pattern, "**/");
         } else if (data->section.data[0] != '/') {
             // Pattern contains at least one slash but not at the start, add one
-            string_add_byte(&pattern, '/');
+            string_append_byte(&pattern, '/');
         }
 
-        string_add_string_view(&pattern, &data->section);
+        string_append_string_view(&pattern, &data->section);
         userdata->match = ec_pattern_match (
             pattern.buffer,
             pattern.len,

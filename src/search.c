@@ -280,18 +280,18 @@ static void build_replacement (
                 int n = format[i++] - '0';
                 int len = m[n].rm_eo - m[n].rm_so;
                 if (len > 0) {
-                    string_add_buf(buf, line + m[n].rm_so, len);
+                    string_append_buf(buf, line + m[n].rm_so, len);
                 }
             } else if (format[i] != '\0') {
-                string_add_byte(buf, format[i++]);
+                string_append_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
             int len = m[0].rm_eo - m[0].rm_so;
             if (len > 0) {
-                string_add_buf(buf, line + m[0].rm_so, len);
+                string_append_buf(buf, line + m[0].rm_so, len);
             }
         } else {
-            string_add_byte(buf, ch);
+            string_append_byte(buf, ch);
         }
     }
 }

@@ -21,7 +21,7 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
         }
         pos++;
     }
-    string_add_buf(buf, cmd, pos);
+    string_append_buf(buf, cmd, pos);
     if (ch == '\'') {
         pos++;
     }
@@ -44,7 +44,7 @@ static size_t unicode_escape(const char *str, size_t count, String *buf)
         u = u << 4 | x;
     }
     if (u_is_unicode(u)) {
-        string_add_ch(buf, u);
+        string_append_codepoint(buf, u);
     }
     return i;
 }
@@ -97,12 +97,12 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
                 pos += unicode_escape(cmd + pos, min(8, len - pos), buf);
                 continue;
             default:
-                string_add_byte(buf, '\\');
+                string_append_byte(buf, '\\');
                 break;
             }
         }
 
-        string_add_byte(buf, ch);
+        string_append_byte(buf, ch);
     }
 
     return pos;
@@ -123,13 +123,13 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
     char *value;
     if (expand_builtin_env(name, &value)) {
         if (value != NULL) {
-            string_add_str(buf, value);
+            string_append_str(buf, value);
             free(value);
         }
     } else {
         const char *val = getenv(name);
         if (val != NULL) {
-            string_add_str(buf, val);
+            string_append_str(buf, val);
         }
     }
 
@@ -145,8 +145,8 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde)
     if (tilde && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
         const size_t home_dir_len = strlen(editor.home_dir);
         buf = string_new(len + home_dir_len);
-        string_add_buf(&buf, editor.home_dir, home_dir_len);
-        string_add_byte(&buf, '/');
+        string_append_buf(&buf, editor.home_dir, home_dir_len);
+        string_append_byte(&buf, '/');
         pos += 2;
     } else {
         buf = string_new(len);
@@ -177,7 +177,7 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde)
             ch = cmd[pos++];
             // Fallthrough
         default:
-            string_add_byte(&buf, ch);
+            string_append_byte(&buf, ch);
             break;
         }
     }

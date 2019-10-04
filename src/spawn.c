@@ -128,7 +128,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
                 }
                 break;
             }
-            string_add_buf(&buf, data, (size_t) rc);
+            string_append_buf(&buf, data, (size_t) rc);
         }
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
             ssize_t rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);

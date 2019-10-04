@@ -19,8 +19,8 @@ typedef struct {
     .len = 0 \
 }
 
-#define string_add_literal(s, l) ( \
-    string_add_buf(s, l, STRLEN(l)) \
+#define string_append_literal(s, l) ( \
+    string_append_buf(s, l, STRLEN(l)) \
 )
 
 static inline NONNULL_ARGS void string_init(String *s)
@@ -44,11 +44,11 @@ static inline NONNULL_ARGS void string_clear(String *s)
 }
 
 void string_free(String *s) NONNULL_ARGS;
-void string_add_byte(String *s, unsigned char byte) NONNULL_ARGS;
-size_t string_add_ch(String *s, CodePoint u) NONNULL_ARGS;
-void string_add_str(String *s, const char *str) NONNULL_ARGS;
-void string_add_string_view(String *s, const StringView *sv) NONNULL_ARGS;
-void string_add_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1);
+void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
+size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;
+void string_append_str(String *s, const char *str) NONNULL_ARGS;
+void string_append_string_view(String *s, const StringView *sv) NONNULL_ARGS;
+void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1);
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len) NONNULL_ARG(1);
 void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;

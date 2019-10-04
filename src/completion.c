@@ -124,14 +124,14 @@ static void do_collect_files (
 
         String buf = STRING_INIT;
         if (dirprefix[0]) {
-            string_add_str(&buf, dirprefix);
+            string_append_str(&buf, dirprefix);
             if (!str_has_suffix(dirprefix, "/")) {
-                string_add_byte(&buf, '/');
+                string_append_byte(&buf, '/');
             }
         }
-        string_add_str(&buf, name);
+        string_append_str(&buf, name);
         if (is_dir) {
-            string_add_byte(&buf, '/');
+            string_append_byte(&buf, '/');
         }
         add_completion(string_steal_cstring(&buf));
     }
@@ -448,7 +448,7 @@ static char *escape(const char *str)
     }
 
     if (str[0] == '~' && !completion.tilde_expanded) {
-        string_add_byte(&buf, '\\');
+        string_append_byte(&buf, '\\');
     }
 
     for (size_t i = 0; str[i]; i++) {
@@ -460,10 +460,10 @@ static char *escape(const char *str)
         case '\'':
         case ';':
         case '\\':
-            string_add_byte(&buf, '\\');
+            string_append_byte(&buf, '\\');
             // Fallthrough
         default:
-            string_add_byte(&buf, ch);
+            string_append_byte(&buf, ch);
             break;
         }
     }

@@ -163,7 +163,7 @@ static void set_text(CommandLine *c, const char *text)
 {
     string_clear(&c->buf);
     const size_t text_len = strlen(text);
-    string_add_buf(&c->buf, text, text_len);
+    string_append_buf(&c->buf, text, text_len);
     c->pos = text_len;
 }
 

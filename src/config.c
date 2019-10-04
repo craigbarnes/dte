@@ -53,9 +53,9 @@ void exec_config(const Command *cmds, const char *buf, size_t size)
 
         if (line.len || is_command(ptr, n)) {
             if (has_line_continuation(ptr, n)) {
-                string_add_buf(&line, ptr, n - 1);
+                string_append_buf(&line, ptr, n - 1);
             } else {
-                string_add_buf(&line, ptr, n);
+                string_append_buf(&line, ptr, n);
                 handle_command(cmds, string_borrow_cstring(&line));
                 string_clear(&line);
             }

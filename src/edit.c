@@ -702,21 +702,21 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     }
 
     if (pf->cur_width && pf->cur_width + 1 + word_width > pf->text_width) {
-        string_add_byte(&pf->buf, '\n');
+        string_append_byte(&pf->buf, '\n');
         pf->cur_width = 0;
     }
 
     if (pf->cur_width == 0) {
         if (pf->indent_len) {
-            string_add_buf(&pf->buf, pf->indent, pf->indent_len);
+            string_append_buf(&pf->buf, pf->indent, pf->indent_len);
         }
         pf->cur_width = pf->indent_width;
     } else {
-        string_add_byte(&pf->buf, ' ');
+        string_append_byte(&pf->buf, ' ');
         pf->cur_width++;
     }
 
-    string_add_buf(&pf->buf, word, len);
+    string_append_buf(&pf->buf, word, len);
     pf->cur_width += word_width;
 }
 
@@ -832,7 +832,7 @@ void format_paragraph(size_t text_width)
     }
 
     if (pf.buf.len) {
-        string_add_byte(&pf.buf, '\n');
+        string_append_byte(&pf.buf, '\n');
     }
     buffer_replace_bytes(len, pf.buf.buffer, pf.buf.len);
     if (pf.buf.len) {
@@ -873,7 +873,6 @@ void change_case(int mode)
     i = 0;
     while (i < text_len) {
         CodePoint u = u_get_char(src, text_len, &i);
-
         switch (mode) {
         case 't':
             if (iswupper(u)) {
@@ -889,7 +888,7 @@ void change_case(int mode)
             u = towupper(u);
             break;
         }
-        string_add_ch(&dst, u);
+        string_append_codepoint(&dst, u);
     }
 
     buffer_replace_bytes(text_len, dst.buffer, dst.len);
