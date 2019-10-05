@@ -2,6 +2,7 @@
 #define OPTIONS_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "encoding/encoder.h"
 
 enum {

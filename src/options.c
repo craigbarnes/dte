@@ -154,7 +154,7 @@ static void syntax_changed(void)
 
 static bool validate_statusline_format(const char *value)
 {
-    static const char chars[] = "fmryYxXpEMnstu%";
+    static const StringView chars = STRING_VIEW("fmryYxXpEMnstu%");
     size_t i = 0;
     while (value[i]) {
         char ch = value[i++];
@@ -164,7 +164,7 @@ static bool validate_statusline_format(const char *value)
                 error_msg("Format character expected after '%%'.");
                 return false;
             }
-            if (!strchr(chars, ch)) {
+            if (!string_view_memchr(&chars, ch)) {
                 error_msg("Invalid format character '%c'.", ch);
                 return false;
             }
@@ -582,10 +582,7 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
 
 static unsigned int toggle(unsigned int value, const char **values)
 {
-    if (!values[++value]) {
-        value = 0;
-    }
-    return value;
+    return values[++value] ? value : 0;
 }
 
 void toggle_option(const char *name, bool global, bool verbose)
