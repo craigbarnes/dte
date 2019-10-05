@@ -14,7 +14,7 @@ WARNINGS = \
 WARNINGS_EXTRA = \
     -Wformat-signedness -Wformat-truncation -Wformat-overflow \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
-    -Wframe-larger-than=32768 -Wvla
+    -Wframe-larger-than=32768 -Wvla -Wcast-align -Wcast-align=strict
 
 BUILTIN_SYNTAX_FILES := \
     awk c config css d diff docker dte gitcommit gitrebase go html \

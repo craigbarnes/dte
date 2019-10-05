@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "options.h"
 #include "completion.h"
 #include "debug.h"
@@ -596,15 +597,9 @@ void toggle_option(const char *name, bool global, bool verbose)
         return;
     }
 
-    char *ptr;
-    if (global) {
-        ptr = global_ptr(desc);
-    } else {
-        ptr = local_ptr(desc, &buffer->options);
-    }
-
-    OptionValue value;
-    value.uint_val = toggle(*(unsigned int *)ptr, desc->u.enum_opt.values);
+    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
+    unsigned int ptr_val = *(unsigned int *)(void *)ptr;
+    OptionValue value = {.uint_val = toggle(ptr_val, desc->u.enum_opt.values)};
     desc_set(desc, ptr, value);
 
     if (verbose) {
