@@ -193,8 +193,8 @@ static void cmd_cd(const CommandArgs *a)
         cwdp = cwd;
     }
 
-    for (size_t i = 0; i < buffers.count; i++) {
-        Buffer *b = buffers.ptrs[i];
+    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
+        Buffer *b = editor.buffers.ptrs[i];
         update_short_filename_cwd(b, cwdp);
     }
 
@@ -241,7 +241,7 @@ static void cmd_close(const CommandArgs *a)
         return;
     }
 
-    if (allow_quit && buffers.count == 1 && root_frame->frames.count <= 1) {
+    if (allow_quit && editor.buffers.count == 1 && root_frame->frames.count <= 1) {
         editor.status = EDITOR_EXITING;
         return;
     }
@@ -890,8 +890,8 @@ static void cmd_quit(const CommandArgs *a)
         }
     }
 
-    for (size_t i = 0; i < buffers.count; i++) {
-        Buffer *b = buffers.ptrs[i];
+    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
+        Buffer *b = editor.buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
             View *v = window_find_view(window, b);

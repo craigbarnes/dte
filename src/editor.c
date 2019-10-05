@@ -32,6 +32,7 @@ EditorState editor = {
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .everything_changed = false,
+    .buffers = PTR_ARRAY_INIT,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
     .version = version,

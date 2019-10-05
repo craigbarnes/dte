@@ -22,7 +22,6 @@ Window *new_window(void)
 View *window_add_buffer(Window *w, Buffer *b)
 {
     View *v = xnew0(View, 1);
-
     v->buffer = b;
     v->window = w;
     v->cursor.head = &b->blocks;
@@ -127,7 +126,6 @@ View *window_open_buffer (
 View *window_get_view(Window *w, Buffer *b)
 {
     View *v = window_find_view(w, b);
-
     if (v == NULL) {
         // Open the buffer in other window to this window
         v = window_add_buffer(w, b);
@@ -210,8 +208,6 @@ void remove_view(View *v)
 
 void window_close_current(void)
 {
-    Window *next;
-
     if (window->frame->parent == NULL) {
         // Don't close last window
         window_remove_views(window);
@@ -219,7 +215,7 @@ void window_close_current(void)
         return;
     }
 
-    next = next_window(window);
+    Window *next = next_window(window);
     remove_frame(window->frame);
     window = NULL;
     set_view(next->view);
@@ -231,7 +227,6 @@ void window_close_current(void)
 void window_close_current_view(Window *w)
 {
     size_t idx = ptr_array_idx(&w->views, w->view);
-
     remove_view(w->view);
     if (w->prev_view != NULL) {
         w->view = w->prev_view;

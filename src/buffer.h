@@ -59,7 +59,6 @@ typedef struct Buffer {
 // buffer = view->buffer = window->view->buffer
 extern struct View *view;
 extern Buffer *buffer;
-extern PointerArray buffers;
 
 static inline void mark_all_lines_changed(Buffer *b)
 {

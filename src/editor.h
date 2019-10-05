@@ -37,6 +37,7 @@ typedef struct {
     bool everything_changed;
     bool term_utf8;
     size_t cmdline_x;
+    PointerArray buffers;
     PointerArray search_history;
     PointerArray command_history;
     const char *const version;

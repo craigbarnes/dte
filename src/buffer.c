@@ -15,7 +15,6 @@
 #include "util/xmalloc.h"
 
 Buffer *buffer;
-PointerArray buffers = PTR_ARRAY_INIT;
 
 static void set_display_filename(Buffer *b, char *name)
 {
@@ -74,7 +73,7 @@ Buffer *buffer_new(const Encoding *encoding)
     b->options.filetype = str_intern("none");
     b->options.indent_regex = NULL;
 
-    ptr_array_append(&buffers, b);
+    ptr_array_append(&editor.buffers, b);
     return b;
 }
 
@@ -92,7 +91,7 @@ Buffer *open_empty_buffer(void)
 
 void free_buffer(Buffer *b)
 {
-    ptr_array_remove(&buffers, b);
+    ptr_array_remove(&editor.buffers, b);
 
     if (b->locked) {
         unlock_file(b->abs_filename);
@@ -125,8 +124,8 @@ Buffer *find_buffer(const char *abs_filename)
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
 
-    for (size_t i = 0; i < buffers.count; i++) {
-        Buffer *b = buffers.ptrs[i];
+    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
+        Buffer *b = editor.buffers.ptrs[i];
         const char *f = b->abs_filename;
 
         if (
@@ -141,8 +140,8 @@ Buffer *find_buffer(const char *abs_filename)
 
 Buffer *find_buffer_by_id(unsigned long id)
 {
-    for (size_t i = 0; i < buffers.count; i++) {
-        Buffer *b = buffers.ptrs[i];
+    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
+        Buffer *b = editor.buffers.ptrs[i];
         if (b->id == id) {
             return b;
         }
