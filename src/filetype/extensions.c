@@ -115,6 +115,7 @@ static const struct FileExtensionMap {
     {"rake", RUBY},
     {"rb", RUBY},
     {"rdf", XML},
+    {"re", C}, // re2c
     {"rkt", RACKET},
     {"rktd", RACKET},
     {"rktl", RACKET},

@@ -15,6 +15,7 @@ static void test_find_ft_filename(void)
         {"test.rs", "rust"},
         {"test.C", "c"},
         {"test.H", "c"},
+        {"test.re", "c"},
         {"test.S", "asm"},
         {"test.s", "asm"},
         {"test.d", "d"},
