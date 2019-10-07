@@ -96,9 +96,8 @@ UNITTEST {
     BUG_ON(parse_rrggbb("11223") != COLOR_INVALID);
 }
 
-static int32_t parse_color(const char *str)
+static int32_t parse_color(const char *str, size_t len)
 {
-    size_t len = strlen(str);
     if (len == 0) {
         return COLOR_INVALID;
     }
@@ -155,17 +154,6 @@ static int32_t parse_color(const char *str)
     }
 }
 
-static bool parse_attr(const char *str, unsigned int *attr)
-{
-    const unsigned int a = lookup_attr(str, strlen(str));
-    if (a) {
-        *attr |= a;
-        return true;
-    }
-
-    return false;
-}
-
 bool parse_term_color(TermColor *color, char **strs)
 {
     color->fg = COLOR_DEFAULT;
@@ -173,7 +161,8 @@ bool parse_term_color(TermColor *color, char **strs)
     color->attr = 0;
     for (size_t i = 0, count = 0; strs[i]; i++) {
         const char *const str = strs[i];
-        const int32_t val = parse_color(str);
+        const size_t len = strlen(str);
+        const int32_t val = parse_color(str, len);
         if (val != COLOR_INVALID) {
             if (count > 1) {
                 if (val == COLOR_KEEP) {
@@ -191,10 +180,15 @@ bool parse_term_color(TermColor *color, char **strs)
                 }
                 count++;
             }
-        } else if (!parse_attr(str, &color->attr)) {
-            error_msg("invalid color or attribute %s", str);
-            return false;
+            continue;
         }
+        const unsigned int attr = lookup_attr(str, len);
+        if (attr) {
+            color->attr |= attr;
+            continue;
+        }
+        error_msg("invalid color or attribute %s", str);
+        return false;
     }
     return true;
 }
