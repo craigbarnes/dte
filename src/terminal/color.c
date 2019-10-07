@@ -74,18 +74,15 @@ compare:
 
 static int32_t parse_rrggbb(const char *str)
 {
-    uint8_t digits[6];
+    int32_t color = 0;
     for (size_t i = 0; i < 6; i++) {
-        int val = hex_decode(str[i]);
-        if (val < 0) {
+        int32_t digit = hex_decode(str[i]);
+        if (digit < 0) {
             return COLOR_INVALID;
         }
-        digits[i] = val;
+        color = (color << 4) | digit;
     }
-    int32_t r = (digits[0] << 4) | digits[1];
-    int32_t g = (digits[2] << 4) | digits[3];
-    int32_t b = (digits[4] << 4) | digits[5];
-    return r << 16 | g << 8 | b | COLOR_FLAG_RGB;
+    return COLOR_RGB(color);
 }
 
 UNITTEST {
