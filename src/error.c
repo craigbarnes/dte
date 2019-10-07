@@ -1,5 +1,7 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include "error.h"
+#include "command.h"
 #include "config.h"
 #include "editor.h"
 

@@ -1,6 +1,9 @@
 #ifndef SELECTION_H
 #define SELECTION_H
 
+#include <stdbool.h>
+#include <stddef.h>
+#include "block-iter.h"
 #include "view.h"
 
 typedef struct {

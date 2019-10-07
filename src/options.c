@@ -1,5 +1,5 @@
-#include <stdint.h>
 #include "options.h"
+#include "buffer.h"
 #include "completion.h"
 #include "debug.h"
 #include "editor.h"

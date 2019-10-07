@@ -1,5 +1,5 @@
 #include "selection.h"
-#include "buffer.h"
+#include "util/unicode.h"
 
 void init_selection(const View *v, SelectionInfo *info)
 {

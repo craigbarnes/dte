@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "buffer.h"
+#include "syntax/color.h"
 #include "terminal/color.h"
 #include "view.h"
 #include "window.h"
