@@ -2,7 +2,6 @@
 #define FILETYPE_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include "util/string-view.h"
 
 typedef enum {

@@ -6,7 +6,6 @@
 #include "mode.h"
 #include "options.h"
 #include "encoding/encoding.h"
-#include "terminal/color.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

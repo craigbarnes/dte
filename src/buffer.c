@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "block.h"
+#include "block-iter.h"
 #include "buffer.h"
 #include "editor.h"
 #include "file-option.h"

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command.h"
+#include "util/macros.h"
 #include "util/string-view.h"
 
 typedef enum {

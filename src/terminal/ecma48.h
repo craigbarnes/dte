@@ -1,8 +1,8 @@
 #ifndef TERMINAL_ECMA48_H
 #define TERMINAL_ECMA48_H
 
+#include <stddef.h>
 #include "color.h"
-#include "../util/string-view.h"
 
 void ecma48_clear_screen(void);
 void ecma48_clear_to_eol(void);

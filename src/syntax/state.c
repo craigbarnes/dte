@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdbool.h>
 #include "state.h"
 #include "syntax.h"
 #include "../command.h"

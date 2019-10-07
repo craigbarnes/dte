@@ -4,6 +4,7 @@
 #include <string.h>
 #include "test.h"
 #include "../src/bind.h"
+#include "../src/block.h"
 #include "../src/buffer.h"
 #include "../src/command.h"
 #include "../src/editor.h"

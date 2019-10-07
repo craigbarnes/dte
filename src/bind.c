@@ -5,7 +5,6 @@
 #include "debug.h"
 #include "error.h"
 #include "parse-args.h"
-#include "util/ascii.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

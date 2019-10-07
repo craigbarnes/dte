@@ -1,7 +1,6 @@
 #ifndef SYNTAX_STATE_H
 #define SYNTAX_STATE_H
 
-#include <stdbool.h>
 #include "syntax.h"
 #include "../config.h"
 

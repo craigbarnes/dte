@@ -1,6 +1,7 @@
 #ifndef TEST_TEST_H
 #define TEST_TEST_H
 
+#include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>

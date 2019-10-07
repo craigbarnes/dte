@@ -3,8 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "color.h"
 #include "../buffer.h"
-#include "../terminal/color.h"
+#include "../block-iter.h"
 
 HlColor **hl_line(Buffer *b, const LineRef *lr, size_t line_nr, bool *next_changed);
 void hl_fill_start_states(Buffer *b, size_t line_nr);

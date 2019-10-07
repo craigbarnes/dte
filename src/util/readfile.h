@@ -1,7 +1,6 @@
 #ifndef UTIL_READFILE_H
 #define UTIL_READFILE_H
 
-#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "macros.h"

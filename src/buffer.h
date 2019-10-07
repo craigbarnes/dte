@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/stat.h>
-#include "block-iter.h"
 #include "change.h"
 #include "encoding/encoding.h"
 #include "options.h"
@@ -13,7 +12,6 @@
 #include "util/list.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
-#include "util/unicode.h"
 
 typedef struct Buffer {
     ListHead blocks;
