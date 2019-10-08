@@ -1,9 +1,10 @@
 stages: [build, dist]
 
-before_script:
-    - git fetch --tags
-    - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
-    - make vars
+default:
+    before_script:
+        - git fetch --tags
+        - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
+        - make vars
 
 build:alpine:
     stage: build
@@ -70,13 +71,12 @@ build:void-musl:
         name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
         entrypoint: []
 
-pages:
+.pages:
     stage: dist
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     artifacts: {paths: [public]}
-    only: [master]
     coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
-    script: &PAGES_SCRIPT
+    script:
         - make docs
         - make coverage-report
         - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
@@ -88,11 +88,11 @@ pages:
         - ln -s "$TARNAME.tar.gz" public/dte-master-linux-$(uname -m).tar.gz
         - tree public/
 
-# Same as "pages" but for non-master branches
+pages:
+    extends: .pages
+    only: [master]
+
 pages:non-master:
-    stage: dist
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
-    artifacts: {paths: [public], expire_in: 1 week}
+    extends: .pages
     except: [master]
-    coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
-    script: *PAGES_SCRIPT
+    artifacts: {expire_in: 1 week}
