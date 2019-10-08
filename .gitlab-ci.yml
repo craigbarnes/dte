@@ -1,4 +1,4 @@
-stages: [build, dist]
+stages: [test, dist]
 
 default:
     before_script:
@@ -6,10 +6,9 @@ default:
         - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
         - make vars
 
-build:alpine:
-    stage: build
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
-    script: &SCRIPT
+.test:
+    stage: test
+    script:
         - make check TERMINFO_DISABLE=1
         - ldd dte
         - make clean && make check TERMINFO_DISABLE=1 LDFLAGS=-static
@@ -21,8 +20,26 @@ build:alpine:
         - strip dte && du -k -h dte
         - tools/objsize.sh dte
 
-build:debian:
-    stage: build
+alpine:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
+
+centos:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
+
+ubuntu:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
+
+void-musl:
+    extends: .test
+    image:
+        name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
+        entrypoint: []
+
+debian:
+    extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
     script:
         - make check && make install && dte -V
@@ -44,8 +61,8 @@ build:debian:
         - make -C dte-head/ check install prefix=/usr DESTDIR=pkg
         - dte-head/pkg/usr/bin/dte -V
 
-build:android:
-    stage: build
+android:
+    extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
     script:
         - export TERMINFO_DISABLE=1
@@ -53,23 +70,6 @@ build:android:
         - make clean && make CC="$CC_AARCH64"
         - make clean && make CC="$CC_I686"
         - make clean && make CC="$CC_X86_64"
-
-build:centos:
-    stage: build
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
-    script: *SCRIPT
-
-build:ubuntu:
-    stage: build
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
-    script: *SCRIPT
-
-build:void-musl:
-    stage: build
-    script: *SCRIPT
-    image:
-        name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
-        entrypoint: []
 
 .pages:
     stage: dist
