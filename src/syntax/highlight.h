@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "color.h"
 #include "../buffer.h"
-#include "../block-iter.h"
+#include "../util/string-view.h"
 
 HlColor **hl_line(Buffer *b, const StringView *line, size_t line_nr, bool *next_changed);
 void hl_fill_start_states(Buffer *b, size_t line_nr);
