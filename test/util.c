@@ -725,6 +725,14 @@ static void test_u_prev_char(void)
     EXPECT_EQ(idx, 0);
 }
 
+static void test_u_str_index(void)
+{
+    const char *buf = "你好，世界";
+    EXPECT_EQ(u_str_index(buf, "你好"), 0);
+    EXPECT_EQ(u_str_index(buf, "，"), 6);
+    EXPECT_EQ(u_str_index(buf, "世界"), 9);
+}
+
 static void test_ptr_array(void)
 {
     PointerArray a = PTR_ARRAY_INIT;
@@ -1112,6 +1120,7 @@ void test_util(void)
     test_u_set_char();
     test_u_set_ctrl();
     test_u_prev_char();
+    test_u_str_index();
     test_ptr_array();
     test_hashset();
     test_round_up();
