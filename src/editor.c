@@ -318,7 +318,8 @@ char get_confirmation(const char *choices, const char *format, ...)
     buf[pos++] = '[';
 
     unsigned char def = 0;
-    for (size_t i = 0, n = strlen(choices); i < n; i++) {
+    const size_t nr_choices = strlen(choices);
+    for (size_t i = 0; i < nr_choices; i++) {
         if (ascii_isupper(choices[i])) {
             def = ascii_tolower(choices[i]);
         }
@@ -347,33 +348,32 @@ char get_confirmation(const char *choices, const char *format, ...)
     KeyCode key;
     while (1) {
         if (term_read_key(&key)) {
-            if (key == KEY_PASTE) {
+            switch (key) {
+            case KEY_PASTE:
                 term_discard_paste();
                 continue;
-            }
-            if (key == CTRL('C') || key == CTRL('G') || key == CTRL('[')) {
-                key = 0;
-                break;
-            }
-            if (key == KEY_ENTER && def) {
-                key = def;
-                break;
+            case CTRL('C'):
+            case CTRL('G'):
+            case CTRL('['):
+                return 0;
+            case KEY_ENTER:
+                if (def) {
+                    return def;
+                }
             }
             if (key > 127) {
                 continue;
             }
-            key = ascii_tolower(key);
-            if (strchr(choices, key)) {
-                break;
-            }
-            if (key == def) {
-                break;
+            const unsigned char ch = ascii_tolower(key);
+            if (memchr(choices, ch, nr_choices) || ch == def) {
+                return ch;
             }
         } else if (terminal_resized) {
             resize();
         }
     }
-    return key;
+    BUG("unreachable");
+    return 0;
 }
 
 typedef struct {
