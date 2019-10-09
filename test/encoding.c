@@ -47,10 +47,21 @@ static void test_lookup_encoding(void)
     }
 }
 
+static void test_encoding_from_type(void)
+{
+    const Encoding a = encoding_from_type(UTF8);
+    EXPECT_EQ(a.type, UTF8);
+    EXPECT_STREQ(a.name, "UTF-8");
+    // Ensure Encoding::name is an interned string
+    EXPECT_PTREQ(encoding_from_type(UTF8).name, a.name);
+    EXPECT_PTREQ(encoding_from_name("utf8").name, a.name);
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_encoding(void)
 {
     test_detect_encoding_from_bom();
     test_lookup_encoding();
+    test_encoding_from_type();
 }
