@@ -6,6 +6,7 @@
 #include "block.h"
 #include "util/list.h"
 #include "util/macros.h"
+#include "util/string-view.h"
 #include "util/unicode.h"
 
 typedef struct {
@@ -13,11 +14,6 @@ typedef struct {
     ListHead *head;
     size_t offset;
 } BlockIter;
-
-typedef struct {
-    const unsigned char NONSTRING *line;
-    size_t size;
-} LineRef;
 
 #define BLOCK_ITER_INIT(head_) { \
     .blk = BLOCK((head_)->next), \
@@ -61,8 +57,8 @@ size_t block_iter_get_offset(const BlockIter *bi);
 bool block_iter_is_bol(const BlockIter *bi);
 char *block_iter_get_bytes(const BlockIter *bi, size_t len);
 
-void fill_line_ref(BlockIter *bi, LineRef *lr);
-void fill_line_nl_ref(BlockIter *bi, LineRef *lr);
-size_t fetch_this_line(const BlockIter *bi, LineRef *lr);
+void fill_line_ref(BlockIter *bi, StringView *line);
+void fill_line_nl_ref(BlockIter *bi, StringView *line);
+size_t fetch_this_line(const BlockIter *bi, StringView *line);
 
 #endif

@@ -289,14 +289,14 @@ static void line_info_init (
 
 static void line_info_set_line (
     LineInfo *info,
-    const LineRef *lr,
+    const StringView *line,
     HlColor **colors
 ) {
-    BUG_ON(lr->size == 0);
-    BUG_ON(lr->line[lr->size - 1] != '\n');
+    BUG_ON(line->length == 0);
+    BUG_ON(line->data[line->length - 1] != '\n');
 
-    info->line = lr->line;
-    info->size = lr->size - 1;
+    info->line = line->data;
+    info->size = line->length - 1;
     info->pos = 0;
     info->colors = colors;
 
@@ -395,11 +395,11 @@ void update_range(const View *v, long y1, long y2)
         obuf.x = 0;
         terminal.move_cursor(edit_x, edit_y + i);
 
-        LineRef lr;
-        fill_line_nl_ref(&bi, &lr);
+        StringView line;
+        fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        HlColor **colors = hl_line(v->buffer, &lr, info.line_nr, &next_changed);
-        line_info_set_line(&info, &lr, colors);
+        HlColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
+        line_info_set_line(&info, &line, colors);
         print_line(&info);
 
         got_line = !!block_iter_next_line(&bi);

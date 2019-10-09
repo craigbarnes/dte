@@ -83,7 +83,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         }
 
         strip_trailing_comments_and_whitespace(&line);
-        char *delim = string_view_memchr(&line, '=');
+        unsigned char *delim = string_view_memchr(&line, '=');
         if (delim) {
             const size_t before_delim_len = delim - line.data;
             size_t name_len = before_delim_len;

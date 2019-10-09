@@ -71,13 +71,13 @@ static State *handle_heredoc (
 static HlColor **highlight_line (
     Syntax *syn,
     State *state,
-    const LineRef *lr,
+    const StringView *line_sv,
     State **ret
 ) {
     static HlColor **colors;
     static size_t alloc;
-    const char *const line = lr->line;
-    const size_t len = lr->size;
+    const char *const line = line_sv->data;
+    const size_t len = line_sv->length;
     size_t i = 0;
     ssize_t sidx = -1;
 
@@ -298,11 +298,11 @@ static ssize_t fill_hole(Buffer *b, BlockIter *bi, ssize_t sidx, ssize_t eidx)
     ssize_t idx = sidx;
 
     while (idx < eidx) {
-        LineRef lr;
+        StringView line;
         State *st;
-        fill_line_nl_ref(bi, &lr);
+        fill_line_nl_ref(bi, &line);
         block_iter_eat_line(bi);
-        highlight_line(b->syn, ptrs[idx++], &lr, &st);
+        highlight_line(b->syn, ptrs[idx++], &line, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -365,12 +365,12 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
     // Add new
     block_iter_move_down(&bi, s->count - 1 - current_line);
     while (s->count - 1 < line_nr) {
-        LineRef lr;
-        fill_line_nl_ref(&bi, &lr);
+        StringView line;
+        fill_line_nl_ref(&bi, &line);
         highlight_line (
             b->syn,
             states[s->count - 1],
-            &lr,
+            &line,
             &states[s->count]
         );
         s->count++;
@@ -380,7 +380,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
 
 HlColor **hl_line (
     Buffer *b,
-    const LineRef *lr,
+    const StringView *line,
     size_t line_nr,
     bool *next_changed
 ) {
@@ -392,7 +392,7 @@ HlColor **hl_line (
     PointerArray *s = &b->line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    HlColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], lr, &next);
+    HlColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);

@@ -19,25 +19,25 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
 
     do {
         regmatch_t match;
-        LineRef lr;
+        StringView line;
 
         if (block_iter_is_eof(bi)) {
             return false;
         }
 
-        fill_line_ref(bi, &lr);
+        fill_line_ref(bi, &line);
 
-        // NOTE: If this is the first iteration then lr.line contains
+        // NOTE: If this is the first iteration then line.data contains
         // partial line (text starting from the cursor position) and
         // if match.rm_so is 0 then match is at beginning of the text
         // which is same as the cursor position.
-        if (regexp_exec(regex, lr.line, lr.size, 1, &match, flags)) {
+        if (regexp_exec(regex, line.data, line.length, 1, &match, flags)) {
             if (skip && match.rm_so == 0) {
                 // Ignore match at current cursor position
                 regoff_t count = match.rm_eo;
                 if (count == 0) {
                     // It is safe to skip one byte because every line
-                    // has one extra byte (newline) that is not in lr.line
+                    // has one extra byte (newline) that is not in line.data
                     count = 1;
                 }
                 block_iter_skip_bytes(bi, (size_t)count);
@@ -64,15 +64,15 @@ static bool do_search_bwd(regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
 
     do {
         regmatch_t match;
-        LineRef lr;
+        StringView line;
         int flags = 0;
         regoff_t offset = -1;
         regoff_t pos = 0;
 
-        fill_line_ref(bi, &lr);
+        fill_line_ref(bi, &line);
         while (
-            pos <= lr.size
-            && regexp_exec(regex, lr.line + pos, lr.size - pos, 1, &match, flags)
+            pos <= line.length
+            && regexp_exec(regex, line.data + pos, line.length - pos, 1, &match, flags)
         ) {
             flags = REG_NOTBOL;
             if (cx >= 0) {
@@ -305,13 +305,13 @@ static void build_replacement (
  * "foo x bar abc baz"   " bar abc baz"
  */
 static unsigned int replace_on_line (
-    LineRef *lr,
+    StringView *line,
     regex_t *re,
     const char *format,
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
-    unsigned char *buf = (unsigned char *)lr->line;
+    unsigned char *buf = (unsigned char *)line->data;
     ReplaceFlags flags = *flagsp;
     regmatch_t m[MAX_SUBSTRINGS];
     size_t pos = 0;
@@ -321,7 +321,7 @@ static unsigned int replace_on_line (
     while (regexp_exec (
         re,
         buf + pos,
-        lr->size - pos,
+        line->length - pos,
         MAX_SUBSTRINGS,
         m,
         eflags
@@ -362,9 +362,9 @@ static unsigned int replace_on_line (
 
             build_replacement(&b, buf + pos, format, m);
 
-            // lineref is invalidated by modification
-            if (buf == lr->line && lr->size != 0) {
-                buf = xmemdup(buf, lr->size);
+            // line ref is invalidated by modification
+            if (buf == line->data && line->length != 0) {
+                buf = xmemdup(buf, line->length);
             }
 
             buffer_replace_bytes(match_len, b.buffer, b.len);
@@ -396,7 +396,7 @@ static unsigned int replace_on_line (
         eflags = REG_NOTBOL;
     }
 out:
-    if (buf != lr->line) {
+    if (buf != line->data) {
         free(buf);
     }
     return nr;
@@ -453,17 +453,17 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     while (1) {
         // Number of bytes to process
         size_t count;
-        LineRef lr;
+        StringView line;
         unsigned int nr;
 
-        fill_line_ref(&bi, &lr);
-        count = lr.size;
-        if (lr.size > nr_bytes) {
+        fill_line_ref(&bi, &line);
+        count = line.length;
+        if (line.length > nr_bytes) {
             // End of selection is not full line
-            lr.size = nr_bytes;
+            line.length = nr_bytes;
         }
 
-        nr = replace_on_line(&lr, &re, format, &bi, &flags);
+        nr = replace_on_line(&line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

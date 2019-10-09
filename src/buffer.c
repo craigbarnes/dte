@@ -155,9 +155,7 @@ bool buffer_detect_filetype(Buffer *b)
     StringView line = STRING_VIEW_INIT;
     if (BLOCK(b->blocks.next)->size) {
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
-        LineRef lr;
-        fill_line_ref(&bi, &lr);
-        line = string_view(lr.line, lr.size);
+        fill_line_ref(&bi, &line);
     } else if (!b->abs_filename) {
         return false;
     }
@@ -320,12 +318,10 @@ static bool detect_indent(Buffer *b)
     int space_count = 0;
 
     for (unsigned int i = 0; i < 200; i++) {
-        LineRef lr;
-        int indent;
+        StringView line;
+        fill_line_ref(&bi, &line);
         bool tab;
-
-        fill_line_ref(&bi, &lr);
-        indent = indent_len(b, lr.line, lr.size, &tab);
+        int indent = indent_len(b, line.data, line.length, &tab);
         if (indent == -2) {
             // Ignore mixed indent because tab width might not be 8
         } else if (indent == -1) {

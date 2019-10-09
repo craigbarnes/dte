@@ -129,29 +129,28 @@ static ssize_t get_current_indent_bytes(const char *buf, size_t cursor_offset)
 
 size_t get_indent_level_bytes_left(void)
 {
-    LineRef lr;
-    size_t cursor_offset = fetch_this_line(&view->cursor, &lr);
+    StringView line;
+    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
     if (!cursor_offset) {
         return 0;
     }
-    ssize_t ibytes = get_current_indent_bytes(lr.line, cursor_offset);
+    ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset);
     return (ibytes < 0) ? 0 : (size_t)ibytes;
 }
 
 size_t get_indent_level_bytes_right(void)
 {
-    LineRef lr;
-    size_t cursor_offset = fetch_this_line(&view->cursor, &lr);
-
-    ssize_t ibytes = get_current_indent_bytes(lr.line, cursor_offset);
+    StringView line;
+    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    ssize_t ibytes = get_current_indent_bytes(line.data, cursor_offset);
     if (ibytes < 0) {
         return 0;
     }
 
     size_t tw = buffer->options.tab_width;
     size_t iwidth = 0;
-    for (size_t i = cursor_offset, n = lr.size; i < n; i++) {
-        switch (lr.line[i]) {
+    for (size_t i = cursor_offset, n = line.length; i < n; i++) {
+        switch (line.data[i]) {
         case '\t':
             iwidth = (iwidth + tw) / tw * tw;
             break;

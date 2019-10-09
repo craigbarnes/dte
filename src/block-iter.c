@@ -320,46 +320,46 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
 }
 
 // bi should be at bol
-void fill_line_ref(BlockIter *bi, LineRef *lr)
+void fill_line_ref(BlockIter *bi, StringView *line)
 {
     block_iter_normalize(bi);
-    lr->line = bi->blk->data + bi->offset;
+    line->data = bi->blk->data + bi->offset;
     const size_t max = bi->blk->size - bi->offset;
     if (max == 0) {
         // Cursor at end of last block
-        lr->size = 0;
+        line->length = 0;
         return;
     }
     if (bi->blk->nl == 1) {
-        lr->size = max - 1;
+        line->length = max - 1;
         return;
     }
-    const unsigned char *nl = memchr(lr->line, '\n', max);
-    lr->size = nl - lr->line;
+    const unsigned char *nl = memchr(line->data, '\n', max);
+    line->length = nl - line->data;
 }
 
-void fill_line_nl_ref(BlockIter *bi, LineRef *lr)
+void fill_line_nl_ref(BlockIter *bi, StringView *line)
 {
     block_iter_normalize(bi);
-    lr->line = bi->blk->data + bi->offset;
+    line->data = bi->blk->data + bi->offset;
     const size_t max = bi->blk->size - bi->offset;
     if (max == 0) {
         // Cursor at end of last block
-        lr->size = 0;
+        line->length = 0;
         return;
     }
     if (bi->blk->nl == 1) {
-        lr->size = max;
+        line->length = max;
         return;
     }
-    const unsigned char *nl = memchr(lr->line, '\n', max);
-    lr->size = nl - lr->line + 1;
+    const unsigned char *nl = memchr(line->data, '\n', max);
+    line->length = nl - line->data + 1;
 }
 
-size_t fetch_this_line(const BlockIter *bi, LineRef *lr)
+size_t fetch_this_line(const BlockIter *bi, StringView *line)
 {
     BlockIter tmp = *bi;
     const size_t count = block_iter_bol(&tmp);
-    fill_line_ref(&tmp, lr);
+    fill_line_ref(&tmp, line);
     return count;
 }
