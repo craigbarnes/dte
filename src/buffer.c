@@ -152,22 +152,22 @@ Buffer *find_buffer_by_id(unsigned long id)
 
 bool buffer_detect_filetype(Buffer *b)
 {
-    const char *ft = NULL;
+    StringView line = STRING_VIEW_INIT;
     if (BLOCK(b->blocks.next)->size) {
         BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
         LineRef lr;
         fill_line_ref(&bi, &lr);
-        const StringView line = string_view(lr.line, lr.size);
-        ft = find_ft(b->abs_filename, line);
-    } else if (b->abs_filename) {
-        const StringView line = STRING_VIEW_INIT;
-        ft = find_ft(b->abs_filename, line);
+        line = string_view(lr.line, lr.size);
+    } else if (!b->abs_filename) {
+        return false;
     }
 
+    const char *ft = find_ft(b->abs_filename, line);
     if (ft && !streq(ft, b->options.filetype)) {
         b->options.filetype = str_intern(ft);
         return true;
     }
+
     return false;
 }
 
