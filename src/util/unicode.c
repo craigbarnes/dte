@@ -9,7 +9,7 @@ typedef struct {
     CodePoint first, last;
 } CodepointRange;
 
-#include "wcwidth.c"
+#include "unidata.c"
 
 static bool bisearch (
     CodePoint u,

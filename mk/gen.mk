@@ -4,9 +4,9 @@ LUA = lua
 UCD_FILES = $(addprefix .cache/, \
     UnicodeData.txt EastAsianWidth.txt DerivedCoreProperties.txt )
 
-gen-wcwidth: $(UCD_FILES)
-	$(E) GEN src/util/wcwidth.c
-	$(Q) $(LUA) src/util/wcwidth.lua $(UCD_FILES) > src/util/wcwidth.c
+gen-unidata: $(UCD_FILES)
+	$(E) GEN src/util/unidata.c
+	$(Q) $(LUA) src/util/unidata.lua $(UCD_FILES) > src/util/unidata.c
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@
@@ -16,4 +16,4 @@ $(UCD_FILES): | .cache/
 	@mkdir -p $@
 
 
-.PHONY: gen-wcwidth
+.PHONY: gen-unidata
