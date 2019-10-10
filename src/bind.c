@@ -21,7 +21,7 @@ static KeyBinding *bindings_lookup_table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
 // Fallback for all other keys (Unicode combos etc.)
 static PointerArray bindings_ptr_array = PTR_ARRAY_INIT;
 
-static ssize_t key_lookup_index(KeyCode k)
+static ssize_t get_lookup_table_index(KeyCode k)
 {
     const KeyCode modifiers = keycode_get_modifiers(k);
     const KeyCode key = keycode_get_key(k);
@@ -52,19 +52,19 @@ UNITTEST {
     const KeyCode min = KEY_SPECIAL_MIN;
     const KeyCode max = KEY_SPECIAL_MAX;
     const KeyCode nsk = NR_SPECIAL_KEYS;
-    BUG_ON(key_lookup_index(MOD_MASK | max) != size - 1);
-    BUG_ON(key_lookup_index(min) != 256);
-    BUG_ON(key_lookup_index(max) != 256 + nsk - 1);
-    BUG_ON(key_lookup_index(MOD_CTRL | min) != 256 + nsk);
-    BUG_ON(key_lookup_index(MOD_SHIFT | max) != 256 + (5 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_MASK | max) != size - 1);
+    BUG_ON(get_lookup_table_index(min) != 256);
+    BUG_ON(get_lookup_table_index(max) != 256 + nsk - 1);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | min) != 256 + nsk);
+    BUG_ON(get_lookup_table_index(MOD_SHIFT | max) != 256 + (5 * nsk) - 1);
 
-    BUG_ON(key_lookup_index(MOD_CTRL | ' ') != 32);
-    BUG_ON(key_lookup_index(MOD_META | ' ') != 32 + 128);
-    BUG_ON(key_lookup_index(MOD_CTRL | '~') != 126);
-    BUG_ON(key_lookup_index(MOD_META | '~') != 126 + 128);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | ' ') != 32);
+    BUG_ON(get_lookup_table_index(MOD_META | ' ') != 32 + 128);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | '~') != 126);
+    BUG_ON(get_lookup_table_index(MOD_META | '~') != 126 + 128);
 
-    BUG_ON(key_lookup_index(MOD_CTRL | MOD_META | 'a') != -1);
-    BUG_ON(key_lookup_index(MOD_META | 0x0E01) != -1);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | MOD_META | 'a') != -1);
+    BUG_ON(get_lookup_table_index(MOD_META | 0x0E01) != -1);
 }
 
 static KeyBinding *key_binding_new(const char *cmd_str)
@@ -134,7 +134,7 @@ void add_binding(const char *keystr, const char *command)
         return;
     }
 
-    const ssize_t idx = key_lookup_index(key);
+    const ssize_t idx = get_lookup_table_index(key);
     if (idx >= 0) {
         key_binding_free(bindings_lookup_table[idx]);
         bindings_lookup_table[idx] = key_binding_new(command);
@@ -154,7 +154,7 @@ void remove_binding(const char *keystr)
         return;
     }
 
-    const ssize_t idx = key_lookup_index(key);
+    const ssize_t idx = get_lookup_table_index(key);
     if (idx >= 0) {
         key_binding_free(bindings_lookup_table[idx]);
         bindings_lookup_table[idx] = NULL;
@@ -175,7 +175,7 @@ void remove_binding(const char *keystr)
 
 const KeyBinding *lookup_binding(KeyCode key)
 {
-    const ssize_t idx = key_lookup_index(key);
+    const ssize_t idx = get_lookup_table_index(key);
     if (idx >= 0) {
         const KeyBinding *b = bindings_lookup_table[idx];
         if (b) {
@@ -214,7 +214,7 @@ void handle_binding(KeyCode key)
 
 static void append_lookup_table_binding(String *buf, KeyCode key)
 {
-    const ssize_t i = key_lookup_index(key);
+    const ssize_t i = get_lookup_table_index(key);
     BUG_ON(i < 0);
     const KeyBinding *b = bindings_lookup_table[i];
     if (b) {
