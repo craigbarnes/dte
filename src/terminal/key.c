@@ -63,7 +63,7 @@ end:
     return i;
 }
 
-bool parse_key(KeyCode *key, const char *str)
+bool parse_key_string(KeyCode *key, const char *str)
 {
     KeyCode modifiers;
     if (str[0] == '^' && str[1] != '\0') {
@@ -120,7 +120,7 @@ bool parse_key(KeyCode *key, const char *str)
 
 #define COPY(dest, src) memcpy(dest, src, STRLEN(src) + 1)
 
-const char *key_to_string(KeyCode k)
+const char *keycode_to_string(KeyCode k)
 {
     static char buf[32];
     size_t i = 0;

@@ -1487,7 +1487,7 @@ static void show_alias(const char *alias_name, bool write_to_cmdline)
 static void show_binding(const char *keystr, bool write_to_cmdline)
 {
     KeyCode key;
-    if (!parse_key(&key, keystr)) {
+    if (!parse_key_string(&key, keystr)) {
         error_msg("invalid key string: %s", keystr);
         return;
     }

@@ -129,7 +129,7 @@ static void key_binding_free(KeyBinding *binding)
 void add_binding(const char *keystr, const char *command)
 {
     KeyCode key;
-    if (!parse_key(&key, keystr)) {
+    if (!parse_key_string(&key, keystr)) {
         error_msg("invalid key string: %s", keystr);
         return;
     }
@@ -150,7 +150,7 @@ void add_binding(const char *keystr, const char *command)
 void remove_binding(const char *keystr)
 {
     KeyCode key;
-    if (!parse_key(&key, keystr)) {
+    if (!parse_key_string(&key, keystr)) {
         return;
     }
 
@@ -218,7 +218,7 @@ static void append_lookup_table_binding(String *buf, KeyCode key)
     BUG_ON(i < 0);
     const KeyBinding *b = bindings_lookup_table[i];
     if (b) {
-        const char *keystr = key_to_string(key);
+        const char *keystr = keycode_to_string(key);
         string_sprintf(buf, "   %-10s  %s\n", keystr, b->cmd_str);
     }
 }
@@ -244,7 +244,7 @@ String dump_bindings(void)
 
     for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
         const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
-        const char *keystr = key_to_string(b->key);
+        const char *keystr = keycode_to_string(b->key);
         string_sprintf(&buf, "   %-10s  %s\n", keystr, b->bind->cmd_str);
     }
 

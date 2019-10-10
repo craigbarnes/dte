@@ -82,7 +82,7 @@ static inline KeyCode keycode_normalize(KeyCode k)
 
 #define CTRL(x) (MOD_CTRL | (x))
 
-bool parse_key(KeyCode *key, const char *str);
-const char *key_to_string(KeyCode key) RETURNS_NONNULL;
+bool parse_key_string(KeyCode *key, const char *str);
+const char *keycode_to_string(KeyCode key) RETURNS_NONNULL;
 
 #endif

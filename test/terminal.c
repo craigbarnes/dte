@@ -402,9 +402,9 @@ static void test_xterm_parse_key_combo_rxvt(void)
     }
 }
 
-static void test_key_to_string(void)
+static void test_keycode_to_string(void)
 {
-    static const struct key_to_string_test {
+    static const struct keycode_to_string_test {
         const char *str;
         KeyCode key;
     } tests[] = {
@@ -439,7 +439,7 @@ static void test_key_to_string(void)
         {"C-home", MOD_CTRL | KEY_HOME},
     };
     FOR_EACH_I(i, tests) {
-        const char *str = key_to_string(tests[i].key);
+        const char *str = keycode_to_string(tests[i].key);
         IEXPECT_STREQ(str, tests[i].str);
     }
 }
@@ -453,5 +453,5 @@ void test_terminal(void)
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
     test_xterm_parse_key_combo_rxvt();
-    test_key_to_string();
+    test_keycode_to_string();
 }
