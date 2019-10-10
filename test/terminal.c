@@ -42,6 +42,7 @@ static void test_parse_term_color(void)
             IEXPECT_EQ(parsed.fg, expected.fg);
             IEXPECT_EQ(parsed.bg, expected.bg);
             IEXPECT_EQ(parsed.attr, expected.attr);
+            IEXPECT_TRUE(same_color(&parsed, &expected));
         }
     }
 }
@@ -378,7 +379,7 @@ static void test_xterm_parse_key_combo_rxvt(void)
         {'$', MOD_SHIFT},
         {'@', MOD_SHIFT | MOD_CTRL},
 
-        For the rxvt developers to invent a new key encoding schemes where
+        For the rxvt developers to invent a new key encoding scheme where
         a perfectly good, de facto standard (xterm) already existed was
         foolish. To then violate the spec in the process was pure stupidity.
         */
