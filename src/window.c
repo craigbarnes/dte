@@ -501,7 +501,7 @@ static void frame_for_each_window (
     void (*func)(Window *, void *),
     void *data
 ) {
-    if (f->window != NULL) {
+    if (f->window) {
         func(f->window, data);
         return;
     }
@@ -535,25 +535,47 @@ void for_each_window(void (*func)(Window *w))
 
 UNIGNORE_WARNINGS
 
-static void collect_window(Window *w, void *data)
+typedef struct {
+    const Window *const target; // Window to search for (set at init.)
+    Window *first; // Window passed in first callback invocation
+    Window *last; // Window passed in last callback invocation
+    Window *prev; // Window immediately before target (if any)
+    Window *next; // Window immediately after target (if any)
+    bool found; // Set to true when target is found
+} WindowCallbackData;
+
+static void find_prev_and_next(Window *w, void *ud)
 {
-    ptr_array_append(data, w);
+    WindowCallbackData *data = ud;
+    data->last = w;
+    if (data->found) {
+        if (!data->next) {
+            data->next = w;
+        }
+        return;
+    }
+    if (!data->first) {
+        data->first = w;
+    }
+    if (w == data->target) {
+        data->found = true;
+        return;
+    }
+    data->prev = w;
 }
 
 Window *prev_window(Window *w)
 {
-    PointerArray windows = PTR_ARRAY_INIT;
-    for_each_window_data(collect_window, &windows);
-    w = ptr_array_prev(&windows, w);
-    free(windows.ptrs);
-    return w;
+    WindowCallbackData data = {.target = w};
+    for_each_window_data(find_prev_and_next, &data);
+    BUG_ON(!data.found);
+    return data.prev ? data.prev : data.last;
 }
 
 Window *next_window(Window *w)
 {
-    PointerArray windows = PTR_ARRAY_INIT;
-    for_each_window_data(collect_window, &windows);
-    w = ptr_array_next(&windows, w);
-    free(windows.ptrs);
-    return w;
+    WindowCallbackData data = {.target = w};
+    for_each_window_data(find_prev_and_next, &data);
+    BUG_ON(!data.found);
+    return data.next ? data.next : data.first;
 }
