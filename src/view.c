@@ -14,7 +14,6 @@ void view_update_cursor_y(View *v)
     Buffer *b = v->buffer;
     Block *blk;
     size_t nl = 0;
-
     block_for_each(blk, &b->blocks) {
         if (blk == v->cursor.blk) {
             nl += count_nl(blk->data, v->cursor.offset);
@@ -23,7 +22,7 @@ void view_update_cursor_y(View *v)
         }
         nl += blk->nl;
     }
-    BUG_ON(1);
+    BUG("unreachable");
 }
 
 void view_update_cursor_x(View *v)
