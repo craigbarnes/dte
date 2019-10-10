@@ -441,7 +441,35 @@ static void test_keycode_to_string(void)
     FOR_EACH_I(i, tests) {
         const char *str = keycode_to_string(tests[i].key);
         IEXPECT_STREQ(str, tests[i].str);
+        KeyCode key = 0;
+        IEXPECT_TRUE(parse_key_string(&key, tests[i].str));
+        IEXPECT_EQ(key, tests[i].key);
     }
+    EXPECT_STREQ(keycode_to_string(KEY_PASTE), "paste");
+    EXPECT_STREQ(keycode_to_string(UINT32_MAX), "C-M-S-???");
+}
+
+static void test_parse_key_string(void)
+{
+    KeyCode key = 0;
+    EXPECT_TRUE(parse_key_string(&key, "^I"));
+    EXPECT_EQ(key, '\t');
+    EXPECT_TRUE(parse_key_string(&key, "^M"));
+    EXPECT_EQ(key, KEY_ENTER);
+    EXPECT_TRUE(parse_key_string(&key, "C-I"));
+    EXPECT_EQ(key, '\t');
+    EXPECT_TRUE(parse_key_string(&key, "C-M"));
+    EXPECT_EQ(key, KEY_ENTER);
+
+    key = 0x18;
+    EXPECT_FALSE(parse_key_string(&key, "C-"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "C-M-"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "paste"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "???"));
+    EXPECT_EQ(key, 0x18);
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")
@@ -454,4 +482,5 @@ void test_terminal(void)
     test_xterm_parse_key_combo();
     test_xterm_parse_key_combo_rxvt();
     test_keycode_to_string();
+    test_parse_key_string();
 }
