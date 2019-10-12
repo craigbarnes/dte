@@ -25,6 +25,7 @@ static void test_parse_term_color(void)
         {{"bold", "blink"}, {-1, -1, ATTR_BOLD | ATTR_BLINK}},
         {{"0", "255", "underline"}, {COLOR_BLACK, 255, ATTR_UNDERLINE}},
         {{"white", "green", "dim"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
+        {{"white", "green", "lowintensity"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
         {{"lightred", "lightyellow"}, {COLOR_LIGHTRED, COLOR_LIGHTYELLOW, 0}},
         {{"darkgray", "lightgreen"}, {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
         {{"lightblue", "lightcyan"}, {COLOR_LIGHTBLUE, COLOR_LIGHTCYAN, 0}},

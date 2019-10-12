@@ -90,6 +90,7 @@ UNITTEST {
     BUG_ON(parse_rrggbb("011011") != COLOR_RGB(0x011011));
     BUG_ON(parse_rrggbb("fffffg") != COLOR_INVALID);
     BUG_ON(parse_rrggbb(".") != COLOR_INVALID);
+    BUG_ON(parse_rrggbb("") != COLOR_INVALID);
     BUG_ON(parse_rrggbb("11223") != COLOR_INVALID);
 }
 
