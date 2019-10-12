@@ -16,13 +16,13 @@ WARNINGS_EXTRA = \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
     -Wframe-larger-than=32768 -Wvla -Wcast-align -Wcast-align=strict
 
-BUILTIN_SYNTAX_FILES := \
+BUILTIN_SYNTAX_FILES ?= \
     awk c config css d diff docker dte gitcommit gitrebase go html \
     ini java javascript lua mail make markdown meson nginx ninja php \
     python robotstxt roff ruby sed sh sql tex texmfcnf vala xml \
     xresources zig
 
-BUILTIN_CONFIGS := $(addprefix config/, \
+BUILTIN_CONFIGS = $(addprefix config/, \
     rc compiler/gcc compiler/go \
     binding/default binding/shift-select \
     $(addprefix color/, reset reset-basic default darkgray) \
