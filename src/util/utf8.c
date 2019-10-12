@@ -61,10 +61,7 @@ size_t u_str_width(const unsigned char *str)
 CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 {
     size_t i = *idx;
-    unsigned int count, shift;
-    CodePoint u;
-
-    u = buf[--i];
+    CodePoint u = buf[--i];
     if (u < 0x80) {
         *idx = i;
         return u;
@@ -75,12 +72,11 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
     }
 
     u &= 0x3f;
-    count = 1;
-    shift = 6;
+    unsigned int count = 1;
+    unsigned int shift = 6;
     while (i) {
         unsigned int ch = buf[--i];
         unsigned int len = u_seq_len(ch);
-
         count++;
         if (len == 0) {
             if (count == 4) {
@@ -97,7 +93,6 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
             if (!u_seq_len_ok(u, len)) {
                 break;
             }
-
             *idx = i;
             return u;
         }
@@ -133,17 +128,14 @@ CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx)
 CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
 {
     size_t i = *idx;
-    int len, c;
-    unsigned int first, u;
-
-    first = buf[i++];
-    len = u_seq_len(first);
+    unsigned int first = buf[i++];
+    int len = u_seq_len(first);
     if (unlikely(len < 2 || len > size - i + 1)) {
         goto invalid;
     }
 
-    u = first & u_get_first_byte_mask(len);
-    c = len - 1;
+    unsigned int u = first & u_get_first_byte_mask(len);
+    int c = len - 1;
     do {
         CodePoint ch = buf[i++];
         if (!u_is_continuation(ch)) {
@@ -245,7 +237,6 @@ size_t u_skip_chars(const char *str, int *width)
 {
     int w = *width;
     size_t idx = 0;
-
     while (str[idx] && w > 0) {
         w -= u_char_width(u_str_get_char(str, &idx));
     }
@@ -275,11 +266,9 @@ ssize_t u_str_index(const char *haystack, const char *needle_lcase)
     size_t hi = 0;
     size_t ni = 0;
     CodePoint nc = u_str_get_char(needle_lcase, &ni);
-
     if (!nc) {
         return 0;
     }
-
     while (haystack[hi]) {
         size_t prev = hi;
         CodePoint hc = u_str_get_char(haystack, &hi);
