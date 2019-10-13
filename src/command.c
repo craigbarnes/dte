@@ -861,7 +861,7 @@ static void cmd_pipe_to(const CommandArgs *a)
     }
 
     char *input = block_iter_get_bytes(&view->cursor, input_len);
-    spawn_writer(a->args, input, input_len);
+    spawn_sink(a->args, input, input_len);
     free(input);
 
     // Restore cursor and selection offsets, instead of calling unselect()

@@ -218,7 +218,7 @@ error:
     return -1;
 }
 
-int spawn_writer(char **argv, const char *text, size_t length)
+int spawn_sink(char **argv, const char *text, size_t length)
 {
     if (length == 0) {
         return 0;
