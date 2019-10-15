@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "completion.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/str-util.h"
@@ -79,4 +80,14 @@ void add_error_fmt (
     }
 
     ptr_array_append(&add_compiler(compiler)->error_formats, f);
+}
+
+void collect_compilers(const char *prefix)
+{
+    for (size_t i = 0, n = compilers.count; i < n; i++) {
+        const Compiler *c = compilers.ptrs[i];
+        if (str_has_prefix(c->name, prefix)) {
+            add_completion(xstrdup(c->name));
+        }
+    }
 }

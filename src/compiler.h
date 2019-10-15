@@ -22,5 +22,6 @@ typedef struct {
 
 void add_error_fmt(const char *compiler, bool ignore, const char *format, char **desc);
 Compiler *find_compiler(const char *name);
+void collect_compilers(const char *prefix);
 
 #endif

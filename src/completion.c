@@ -4,8 +4,9 @@
 #include "alias.h"
 #include "cmdline.h"
 #include "command.h"
-#include "debug.h"
+#include "compiler.h"
 #include "config.h"
+#include "debug.h"
 #include "editor.h"
 #include "env.h"
 #include "options.h"
@@ -224,6 +225,17 @@ static void collect_colors_and_attributes(const char *prefix)
     }
 }
 
+static size_t get_nonflag_argc(char **args, size_t argc)
+{
+    size_t nonflag_argc = 0;
+    for (size_t i = 0; i < argc; i++) {
+        if (args[i][0] != '-') {
+            nonflag_argc++;
+        }
+    }
+    return nonflag_argc;
+}
+
 static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
@@ -241,7 +253,6 @@ static void collect_completions(char **args, size_t argc)
         string_view_equal_literal(&cmd_name, "open")
         || string_view_equal_literal(&cmd_name, "wsplit")
         || string_view_equal_literal(&cmd_name, "save")
-        || string_view_equal_literal(&cmd_name, "compile")
         || string_view_equal_literal(&cmd_name, "run")
         || string_view_equal_literal(&cmd_name, "pipe-from")
         || string_view_equal_literal(&cmd_name, "pipe-to")
@@ -299,6 +310,12 @@ static void collect_completions(char **args, size_t argc)
         TagFile *tf = load_tag_file();
         if (tf != NULL) {
             collect_tags(tf, completion.parsed);
+        }
+        return;
+    }
+    if (string_view_equal_literal(&cmd_name, "compile")) {
+        if (get_nonflag_argc(args, argc) == 1) {
+            collect_compilers(completion.parsed);
         }
         return;
     }
