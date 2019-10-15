@@ -3,14 +3,6 @@
 #include "wbuf.h"
 #include "xreadwrite.h"
 
-#define XFLUSH(buf) do { \
-    ssize_t rc_ = wbuf_flush(buf); \
-    if (unlikely(rc_ < 0)) { \
-        return rc_; \
-    } \
-} while (0)
-
-NONNULL_ARGS
 static size_t wbuf_avail(WriteBuffer *wbuf)
 {
     return sizeof(wbuf->buf) - wbuf->fill;
@@ -38,9 +30,12 @@ void wbuf_need_space(WriteBuffer *wbuf, size_t count)
 ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count)
 {
     if (count > wbuf_avail(wbuf)) {
-        XFLUSH(wbuf);
+        ssize_t rc = wbuf_flush(wbuf);
+        if (unlikely(rc < 0)) {
+            return rc;
+        }
         if (unlikely(count >= sizeof(wbuf->buf))) {
-            ssize_t rc = xwrite(wbuf->fd, buf, count);
+            rc = xwrite(wbuf->fd, buf, count);
             if (unlikely(rc < 0)) {
                 return rc;
             }
@@ -60,7 +55,10 @@ ssize_t wbuf_write_str(WriteBuffer *wbuf, const char *str)
 ssize_t wbuf_write_ch(WriteBuffer *wbuf, char ch)
 {
     if (wbuf_avail(wbuf) == 0) {
-        XFLUSH(wbuf);
+        ssize_t rc = wbuf_flush(wbuf);
+        if (unlikely(rc < 0)) {
+            return rc;
+        }
     }
     wbuf->buf[wbuf->fill++] = ch;
     return 0;
