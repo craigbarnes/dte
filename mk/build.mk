@@ -31,9 +31,6 @@ BUILTIN_CONFIGS = $(addprefix config/, \
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf fuzz1 ))
 
-build_subdirs := $(addprefix build/, $(addsuffix /, \
-    editorconfig encoding syntax terminal util test ))
-
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec hashset path ptr-array readfile string strtonum \
     unicode utf8 wbuf xmalloc xreadwrite xsnprintf )
@@ -69,6 +66,7 @@ test_objects := $(call prefix-obj, build/test/, \
     syntax terminal test util )
 
 all_objects := $(editor_objects) $(test_objects)
+build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects))))
 
 editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
 test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
