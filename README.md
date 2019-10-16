@@ -66,10 +66,10 @@ Testing
 | Void Linux (musl) | GitLab CI             |
 | Mac OS X          | [Travis CI]           |
 | Ubuntu            | GitLab CI + Travis CI |
-| FreeBSD           | Manual testing        |
-| NetBSD            | Manual testing        |
-| OpenBSD           | Manual testing        |
-| Cygwin            | Manual testing        |
+| FreeBSD           | Manual                |
+| NetBSD            | Manual                |
+| OpenBSD           | Manual                |
+| Cygwin            | Manual                |
 
 Other [POSIX] 2008 compatible platforms should also work, but may
 require build system changes.

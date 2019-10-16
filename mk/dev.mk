@@ -31,9 +31,9 @@ distcheck: build/dte-$(DISTVER).tar.gz | build/
 	$(E) TEST $(TARDIR)pkg/usr/bin/dte
 	$(Q) $(TARDIR)pkg/usr/bin/dte -V | grep '^dte [1-9]' >/dev/null
 	$(E) RM $(TARDIR)
-	$(Q) $(RM) -r $(TARDIR)
+	$(Q) $(RM) -r '$(TARDIR)'
 	$(E) RM $<
-	$(Q) $(RM) $<
+	$(Q) $(RM) '$<'
 
 check-release-digests: dist-all-releases
 	@sha256sum -c mk/sha256sums.txt

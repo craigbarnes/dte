@@ -17,6 +17,8 @@ Linux)
         yum -y install make gcc binutils ncurses-devel;;
     debian|ubuntu)
         apt-get update && apt-get -qy install make gcc libncurses5-dev;;
+    void)
+        xbps-install -S make gcc ncurses ncurses-devel;;
     *)
         error 'Unrecognized Linux distro; install GNU Make, GCC and ncurses manually';;
     esac;;
