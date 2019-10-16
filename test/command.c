@@ -2,6 +2,7 @@
 #include "../src/command.h"
 #include "../src/debug.h"
 #include "../src/parse-args.h"
+#include "../src/util/ascii.h"
 
 static void test_parse_command_arg(void)
 {
@@ -109,8 +110,12 @@ static void test_parse_args(void)
 
 static void test_commands_array(void)
 {
-    static const size_t name_size = ARRAY_COUNT(commands[0].name);
-    static const size_t flags_size = ARRAY_COUNT(commands[0].flags);
+    const size_t cmd_name_size = ARRAY_COUNT(commands[0].name);
+    const size_t cmd_flags_size = ARRAY_COUNT(commands[0].flags);
+    const size_t cmdargs_flags_size = ARRAY_COUNT((CommandArgs){}.flags);
+    EXPECT_EQ(cmd_name_size, 15);
+    EXPECT_EQ(cmd_flags_size, 7);
+    EXPECT_EQ(cmdargs_flags_size, 8);
 
     size_t n = 0;
     while (commands[n].cmd) {
@@ -122,11 +127,23 @@ static void test_commands_array(void)
         const Command *const cmd = &commands[i];
 
         // Check that fixed-size arrays are null-terminated within bounds
-        ASSERT_EQ(cmd->name[name_size - 1], '\0');
-        ASSERT_EQ(cmd->flags[flags_size - 1], '\0');
+        ASSERT_EQ(cmd->name[cmd_name_size - 1], '\0');
+        ASSERT_EQ(cmd->flags[cmd_flags_size - 1], '\0');
 
         // Check that array is sorted by name field, in binary searchable order
         IEXPECT_TRUE(strcmp(cmd->name, commands[i - 1].name) > 0);
+
+        // Count number of real flags (i.e. not including '-' or '=')
+        size_t nr_real_flags = 0;
+        for (size_t j = 0; cmd->flags[j]; j++) {
+            if (ascii_isalnum(cmd->flags[j])) {
+                nr_real_flags++;
+            }
+        }
+
+        // Check that max. number of real flags fits in CommandArgs::flags
+        // array (and also leaves 1 byte for null-terminator)
+        IEXPECT_TRUE(nr_real_flags < cmdargs_flags_size);
     }
 }
 
