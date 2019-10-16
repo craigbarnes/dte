@@ -7,7 +7,7 @@
 /^Installation$/, /^Documentation$/ {
     /^    ./ {
         s/^    //
-        s|^curl .*/dte-[0-9.]\+.tar.gz$|make dist|
+        s|^curl .*/dte-[0-9.]\+.tar.gz$|make dist-latest-release|
         s/sudo *//g
         p
     }
