@@ -4,7 +4,7 @@ dte Release Checklist
 1. Create release commit
    1. Update `CHANGELOG.md`
    2. Hard code `VERSION` variable in `mk/build.mk` to release version
-   3. Update `DIST_VERSIONS` in `mk/dev.mk`
+   3. Update `RELEASE_VERSIONS` in `mk/dev.mk`
    4. Change default value of `DEBUG` to `0`
    5. Remove `-g` from default `CFLAGS`
    6. Update tarball name in `README.md`

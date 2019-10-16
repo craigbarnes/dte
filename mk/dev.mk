@@ -1,5 +1,6 @@
-DIST_VERSIONS = 1.9.1 1.9 1.8.2 1.8.1 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
-DIST_ALL = $(addprefix dte-, $(addsuffix .tar.gz, $(DIST_VERSIONS)))
+RELEASE_VERSIONS = 1.9.1 1.9 1.8.2 1.8.1 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
+RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
+DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
 LCOV ?= lcov
@@ -10,8 +11,9 @@ GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(editor_sources) $(test_sources))
 
-dist: $(firstword $(DIST_ALL))
-dist-all: $(DIST_ALL)
+dist: dte-$(DISTVER).tar.gz
+dist-latest-release: $(firstword $(RELEASE_DIST))
+dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
 
@@ -20,12 +22,37 @@ check-syntax-files:
 	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
 	$(Q) ! $(SYNTAX_LINT) test/data/syntax-lint.dterc 2>/dev/null
 
-check-dist: dist-all
+distcheck: private TARDIR = build/dte-$(DISTVER)/
+distcheck: build/dte-$(DISTVER).tar.gz | build/
+	$(E) EXTRACT $(TARDIR)
+	$(Q) cd $(<D) && tar -xzf $(<F)
+	$(E) MAKE $(TARDIR)
+	$(Q) $(MAKE) -B -j$(NPROC) -C$(TARDIR) check install prefix=/usr DESTDIR=pkg
+	$(E) TEST $(TARDIR)pkg/usr/bin/dte
+	$(Q) $(TARDIR)pkg/usr/bin/dte -V | grep '^dte [1-9]' >/dev/null
+	$(E) RM $(TARDIR)
+	$(Q) $(RM) -r $(TARDIR)
+	$(E) RM $<
+	$(Q) $(RM) $<
+
+check-release-digests: dist-all-releases
 	@sha256sum -c mk/sha256sums.txt
 
-$(DIST_ALL): dte-%.tar.gz:
+$(RELEASE_DIST): dte-%.tar.gz:
 	$(E) ARCHIVE $@
 	$(Q) git archive --prefix='dte-$*/' -o '$@' 'v$*'
+
+dte-v%.tar.gz:
+	@echo 'ERROR: tarballs should be named "dte-*", not "dte-v*"'
+	@false
+
+dte-%.tar.gz:
+	$(E) ARCHIVE $@
+	$(Q) git archive --prefix='dte-$*/' -o '$@' '$*'
+
+build/dte-%.tar.gz: dte-%.tar.gz | build/
+	$(E) CP $@
+	$(Q) cp $< $@
 
 $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
@@ -70,5 +97,6 @@ clang-tidy-test/config.c: build/test/data.h
 CLEANFILES += dte-*.tar.gz
 
 .PHONY: \
-    check-syntax-files check-dist dist dist-all git-hooks \
+    dist distcheck dist-latest-release dist-all-releases \
+    check-release-digests check-syntax-files git-hooks \
     show-sizes coverage-report clang-tidy $(clang_tidy_targets)
