@@ -16,9 +16,6 @@
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 
-static char *file_locks;
-static char *file_locks_lock;
-
 static bool process_exists(pid_t pid)
 {
     return !kill(pid, 0);
@@ -80,6 +77,8 @@ static pid_t rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
 
 static int lock_or_unlock(const char *filename, bool lock)
 {
+    static char *file_locks;
+    static char *file_locks_lock;
     if (!file_locks) {
         file_locks = editor_file("file-locks");
         file_locks_lock = editor_file("file-locks.lock");
