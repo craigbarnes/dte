@@ -112,7 +112,8 @@ static void test_commands_array(void)
 {
     const size_t cmd_name_size = ARRAY_COUNT(commands[0].name);
     const size_t cmd_flags_size = ARRAY_COUNT(commands[0].flags);
-    const size_t cmdargs_flags_size = ARRAY_COUNT((CommandArgs){}.flags);
+    const CommandArgs a;
+    const size_t cmdargs_flags_size = ARRAY_COUNT(a.flags);
     EXPECT_EQ(cmd_name_size, 15);
     EXPECT_EQ(cmd_flags_size, 7);
     EXPECT_EQ(cmdargs_flags_size, 8);
