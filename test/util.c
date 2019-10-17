@@ -1074,7 +1074,7 @@ static void test_mem_intern(void)
 static void test_read_file(void)
 {
     char *buf = NULL;
-    ssize_t size = read_file("/dev", &buf);
+    ssize_t size = read_file("test", &buf);
     EXPECT_EQ(size, -1);
     EXPECT_EQ(errno, EISDIR);
     EXPECT_NULL(buf);
