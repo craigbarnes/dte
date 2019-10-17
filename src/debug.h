@@ -4,9 +4,11 @@
 #include "util/macros.h"
 
 #define BUG_ON(a) do { \
+    IGNORE_WARNING_TAUTOLOGICAL_COMPARE \
     if (unlikely(a)) { \
         BUG("%s", #a); \
     } \
+    UNIGNORE_WARNINGS \
 } while (0)
 
 #if DEBUG >= 1

@@ -227,4 +227,10 @@
     #define UNIGNORE_WARNINGS
 #endif
 
+#if GNUC_AT_LEAST(6, 0) || HAS_WARNING("-Wtautological-compare")
+    #define IGNORE_WARNING_TAUTOLOGICAL_COMPARE IGNORE_WARNING("-Wtautological-compare")
+#else
+    #define IGNORE_WARNING_TAUTOLOGICAL_COMPARE
+#endif
+
 #endif
