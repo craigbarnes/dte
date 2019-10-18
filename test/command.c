@@ -114,8 +114,8 @@ static void test_commands_array(void)
     const size_t cmd_flags_size = ARRAY_COUNT(commands[0].flags);
     const CommandArgs a;
     const size_t cmdargs_flags_size = ARRAY_COUNT(a.flags);
-    EXPECT_EQ(cmd_name_size, 15);
-    EXPECT_EQ(cmd_flags_size, 7);
+    EXPECT_EQ(cmd_name_size, 16);
+    EXPECT_EQ(cmd_flags_size, 8);
     EXPECT_EQ(cmdargs_flags_size, 8);
 
     size_t n = 0;
@@ -154,7 +154,7 @@ static void test_command_struct_layout(void)
     EXPECT_STREQ(cmd->name, "filter");
     EXPECT_STREQ(cmd->flags, "-");
     EXPECT_EQ(cmd->min_args, 1);
-    EXPECT_EQ(cmd->max_args, CMD_ARG_MAX);
+    EXPECT_EQ(cmd->max_args, UINT_MAX);
     EXPECT_NONNULL(cmd->cmd);
 }
 

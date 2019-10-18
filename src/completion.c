@@ -247,7 +247,7 @@ static void collect_completions(char **args, size_t argc)
     if (!cmd) {
         return;
     }
-    const StringView cmd_name = string_view_from_cstring(cmd->name);
+    const StringView cmd_name = string_view_from_cstring(args[0]);
 
     if (
         string_view_equal_literal(&cmd_name, "open")

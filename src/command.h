@@ -14,10 +14,10 @@ typedef struct {
 } CommandArgs;
 
 typedef struct {
-    const char name[15];
-    const char flags[7];
-    uint16_t min_args : 4;
-    uint16_t max_args : 12;
+    const char name[16];
+    const char flags[8];
+    unsigned int min_args;
+    unsigned int max_args;
     void (*cmd)(const CommandArgs *args);
 } Command;
 
@@ -27,8 +27,6 @@ typedef enum {
     CMDERR_UNCLOSED_DOUBLE_QUOTE,
     CMDERR_UNEXPECTED_EOF,
 } CommandParseError;
-
-#define CMD_ARG_MAX 4095 // (1 << 12) - 1
 
 // command-parse.c
 char *parse_command_arg(const char *cmd, size_t len, bool tilde);
