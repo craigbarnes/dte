@@ -42,12 +42,12 @@ static void command_mode_keypress(KeyCode key)
     }
 
     switch (cmdline_handle_key(&editor.cmdline, &editor.command_history, key)) {
-    case CMDLINE_KEY_HANDLED:
-        reset_completion();
-        return;
     case CMDLINE_CANCEL:
         set_input_mode(INPUT_NORMAL);
-        return;
+        // Fallthrough
+    case CMDLINE_KEY_HANDLED:
+        reset_completion();
+        // Fallthrough
     case CMDLINE_UNKNOWN_KEY:
         return;
     }
