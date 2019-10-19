@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 
@@ -32,6 +33,13 @@ typedef enum {
     CMDERR_UNCLOSED_DOUBLE_QUOTE,
     CMDERR_UNEXPECTED_EOF,
 } CommandParseError;
+
+static inline int command_cmp(const void *key, const void *elem)
+{
+    const char *name = key;
+    const Command *cmd = elem;
+    return strcmp(name, cmd->name);
+}
 
 // command-parse.c
 char *parse_command_arg(const char *cmd, size_t len, bool tilde);

@@ -486,13 +486,7 @@ static const Command cmds[] = {
 
 static const Command *find_syntax_command(const char *name)
 {
-    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
-        const Command *cmd = &cmds[i];
-        if (streq(name, cmd->name)) {
-            return cmd;
-        }
-    }
-    return NULL;
+    return bsearch(name, cmds, ARRAY_COUNT(cmds), sizeof(cmds[0]), command_cmp);
 }
 
 static const CommandSet syntax_commands = {
