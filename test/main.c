@@ -49,7 +49,7 @@ static void test_detect_indent(void)
     EXPECT_EQ(editor.options.indent_width, 8);
 
     handle_command (
-        commands,
+        &commands,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
         "open test/data/detect-indent.ini"
     );
@@ -58,17 +58,17 @@ static void test_detect_indent(void)
     EXPECT_TRUE(buffer->options.expand_tab);
     EXPECT_EQ(buffer->options.indent_width, 2);
 
-    handle_command(commands, "close");
+    handle_command(&commands, "close");
 }
 
 static void test_handle_binding(void)
 {
-    handle_command(commands, "bind ^A 'insert zzz'; open");
+    handle_command(&commands, "bind ^A 'insert zzz'; open");
 
     // Bound command should be cached
     const KeyBinding *binding = lookup_binding(MOD_CTRL | 'A');
     ASSERT_NONNULL(binding);
-    EXPECT_PTREQ(binding->cmd, find_command(commands, "insert"));
+    EXPECT_PTREQ(binding->cmd, find_normal_command("insert"));
     EXPECT_EQ(binding->a.nr_flags, 0);
     EXPECT_EQ(binding->a.nr_args, 1);
     EXPECT_STREQ(binding->a.args[0], "zzz");
@@ -84,7 +84,7 @@ static void test_handle_binding(void)
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
     EXPECT_FALSE(undo());
-    handle_command(commands, "close");
+    handle_command(&commands, "close");
 }
 
 static void test_regexp_match(void)

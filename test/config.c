@@ -33,13 +33,13 @@ void init_headless_mode(void)
     editor.ui_end = &no_op;
 
     exec_reset_colors_rc();
-    read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
     fill_builtin_colors();
 
     window = new_window();
     root_frame = new_root_frame(window);
 
-    exec_config(commands, extra_rc, sizeof(extra_rc) - 1);
+    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
 
     set_view(window_open_empty_buffer(window));
 }
@@ -74,7 +74,7 @@ void test_exec_config(void)
     ASSERT_NONNULL(window);
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
-        exec_config(commands, config.text.data, config.text.length);
+        exec_config(&commands, config.text.data, config.text.length);
     }
 
     expect_files_equal("build/test/env.txt", "test/data/env.txt");

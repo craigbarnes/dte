@@ -39,7 +39,7 @@ static bool has_line_continuation(const char *str, size_t len)
     return (len - 1 - pos) % 2;
 }
 
-void exec_config(const Command *cmds, const char *buf, size_t size)
+void exec_config(const CommandSet *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
     String line = STRING_INIT;
@@ -100,7 +100,7 @@ const BuiltinConfig *get_builtin_config(const char *const name)
     return NULL;
 }
 
-int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
+int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
 {
     const bool must_exist = flags & CFG_MUST_EXIST;
     const bool builtin = flags & CFG_BUILTIN;
@@ -142,7 +142,7 @@ int do_read_config(const Command *cmds, const char *filename, ConfigFlags flags)
     return 0;
 }
 
-int read_config(const Command *cmds, const char *filename, ConfigFlags flags)
+int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
 {
     // Recursive
     const char *saved_config_file = config_file;
@@ -157,7 +157,7 @@ void exec_reset_colors_rc(void)
 {
     bool colors = terminal.color_type >= TERM_8_COLOR;
     const char *cfg = colors ? "color/reset" : "color/reset-basic";
-    read_config(commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
+    read_config(&commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 UNITTEST {

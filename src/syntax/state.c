@@ -467,7 +467,7 @@ static void cmd_syntax(const CommandArgs *a)
 
 static void cmd_include(const CommandArgs *a);
 
-static const Command syntax_commands[] = {
+static const Command cmds[] = {
     {"bufis", "i", 2, 3, cmd_bufis},
     {"char", "bn", 2, 3, cmd_char},
     {"default", "", 2, -1, cmd_default},
@@ -482,7 +482,21 @@ static const Command syntax_commands[] = {
     {"state", "", 1, 2, cmd_state},
     {"str", "i", 2, 3, cmd_str},
     {"syntax", "", 1, 1, cmd_syntax},
-    {"", "", 0, 0, NULL}
+};
+
+static const Command *find_syntax_command(const char *name)
+{
+    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+        const Command *cmd = &cmds[i];
+        if (streq(name, cmd->name)) {
+            return cmd;
+        }
+    }
+    return NULL;
+}
+
+static const CommandSet syntax_commands = {
+    .lookup = find_syntax_command
 };
 
 static void cmd_include(const CommandArgs *a)
@@ -491,7 +505,7 @@ static void cmd_include(const CommandArgs *a)
     if (a->flags[0] == 'b') {
         flags |= CFG_BUILTIN;
     }
-    read_config(syntax_commands, a->args[0], flags);
+    read_config(&syntax_commands, a->args[0], flags);
 }
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
@@ -499,7 +513,7 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
     const char *saved_config_file = config_file;
     int saved_config_line = config_line;
 
-    *err = do_read_config(syntax_commands, filename, flags);
+    *err = do_read_config(&syntax_commands, filename, flags);
     if (*err) {
         config_file = saved_config_file;
         config_line = saved_config_line;

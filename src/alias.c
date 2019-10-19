@@ -47,7 +47,7 @@ void add_alias(const char *name, const char *value)
     if (!is_valid_alias_name(name)) {
         return;
     }
-    if (find_command(commands, name)) {
+    if (find_normal_command(name)) {
         error_msg("Can't replace existing command %s with an alias", name);
         return;
     }

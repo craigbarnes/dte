@@ -47,20 +47,9 @@ UNITTEST {
     BUG_ON(allowed_command("cD"));
 }
 
-const Command *find_command(const Command *cmds, const char *name)
+void run_command(const CommandSet *cmds, char **av)
 {
-    for (size_t i = 0; cmds[i].cmd; i++) {
-        const Command *cmd = &cmds[i];
-        if (streq(name, cmd->name)) {
-            return cmd;
-        }
-    }
-    return NULL;
-}
-
-void run_command(const Command *cmds, char **av)
-{
-    const Command *cmd = find_command(cmds, av[0]);
+    const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
         PointerArray array = PTR_ARRAY_INIT;
         const char *alias_name = av[0];
@@ -91,7 +80,7 @@ void run_command(const Command *cmds, char **av)
         return;
     }
 
-    if (config_file && cmds == commands && !allowed_command(cmd->name)) {
+    if (config_file && cmds == &commands && !allowed_command(cmd->name)) {
         error_msg("Command %s not allowed in config file.", cmd->name);
         return;
     }
@@ -110,7 +99,7 @@ void run_command(const Command *cmds, char **av)
     end_change();
 }
 
-void run_commands(const Command *cmds, const PointerArray *array)
+void run_commands(const CommandSet *cmds, const PointerArray *array)
 {
     size_t s = 0;
     while (s < array->count) {
@@ -127,7 +116,7 @@ void run_commands(const Command *cmds, const PointerArray *array)
     }
 }
 
-void handle_command(const Command *cmds, const char *cmd)
+void handle_command(const CommandSet *cmds, const char *cmd)
 {
     CommandParseError err = 0;
     PointerArray array = PTR_ARRAY_INIT;

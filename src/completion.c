@@ -52,17 +52,6 @@ void add_completion(char *str)
     ptr_array_append(&completion.completions, str);
 }
 
-static void collect_commands(const char *prefix)
-{
-    for (size_t i = 0; commands[i].cmd; i++) {
-        const Command *c = &commands[i];
-        if (str_has_prefix(c->name, prefix)) {
-            add_completion(xstrdup(c->name));
-        }
-    }
-    collect_aliases(prefix);
-}
-
 static void do_collect_files (
     const char *dirname,
     const char *dirprefix,
@@ -239,11 +228,11 @@ static size_t get_nonflag_argc(char **args, size_t argc)
 static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
-        collect_commands(completion.parsed);
+        collect_normal_commands(completion.parsed);
         return;
     }
 
-    const Command *cmd = find_command(commands, args[0]);
+    const Command *cmd = find_normal_command(args[0]);
     if (!cmd) {
         return;
     }

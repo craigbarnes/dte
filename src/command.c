@@ -6,6 +6,7 @@
 #include "change.h"
 #include "cmdline.h"
 #include "command.h"
+#include "completion.h"
 #include "config.h"
 #include "debug.h"
 #include "edit.h"
@@ -422,7 +423,7 @@ static void cmd_eval(const CommandArgs *a)
     if (spawn_filter(a->args, &data)) {
         return;
     }
-    exec_config(commands, data.out, data.out_len);
+    exec_config(&commands, data.out, data.out_len);
     free(data.out);
 }
 
@@ -522,7 +523,7 @@ static void cmd_include(const CommandArgs *a)
     if (a->flags[0] == 'b') {
         flags |= CFG_BUILTIN;
     }
-    read_config(commands, a->args[0], flags);
+    read_config(&commands, a->args[0], flags);
 }
 
 static void cmd_insert(const CommandArgs *a)
@@ -953,7 +954,7 @@ static void cmd_repeat(const CommandArgs *a)
         return;
     }
 
-    const Command *cmd = find_command(commands, args[1]);
+    const Command *cmd = find_normal_command(args[1]);
     if (!cmd) {
         error_msg("No such command: %s", args[1]);
         return;
@@ -1468,7 +1469,7 @@ static void show_alias(const char *alias_name, bool write_to_cmdline)
 {
     const char *cmd_str = find_alias(alias_name);
     if (cmd_str == NULL) {
-        if (find_command(commands, alias_name)) {
+        if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
         } else {
             info_msg("%s is not a known alias", alias_name);
@@ -1888,7 +1889,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
     mark_everything_changed();
 }
 
-const Command commands[] = {
+static const Command cmds[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
     {"bof", "", 0, 0, cmd_bof},
@@ -1973,5 +1974,55 @@ const Command commands[] = {
     {"wresize", "hv", 0, 1, cmd_wresize},
     {"wsplit", "bhr", 0, -1, cmd_wsplit},
     {"wswap", "", 0, 0, cmd_wswap},
-    {"", "", 0, 0, NULL}
 };
+
+const Command *find_normal_command(const char *name)
+{
+    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+        const Command *cmd = &cmds[i];
+        if (streq(name, cmd->name)) {
+            return cmd;
+        }
+    }
+    return NULL;
+}
+
+const CommandSet commands = {
+    .lookup = find_normal_command
+};
+
+void collect_normal_commands(const char *prefix)
+{
+    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+        const Command *c = &cmds[i];
+        if (str_has_prefix(c->name, prefix)) {
+            add_completion(xstrdup(c->name));
+        }
+    }
+    collect_aliases(prefix);
+}
+
+UNITTEST {
+    for (size_t i = 1, n = ARRAY_COUNT(cmds); i < n; i++) {
+        // Check that fixed-size arrays are null-terminated within bounds
+        const Command *const cmd = &cmds[i];
+        BUG_ON(cmd->name[ARRAY_COUNT(cmds[0].name) - 1] != '\0');
+        BUG_ON(cmd->flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
+
+        // Check that array is sorted by name field, in binary searchable order
+        BUG_ON(strcmp(cmd->name, cmds[i - 1].name) <= 0);
+
+        // Count number of real flags (i.e. not including '-' or '=')
+        size_t nr_real_flags = 0;
+        for (size_t j = 0; cmd->flags[j]; j++) {
+            if (ascii_isalnum(cmd->flags[j])) {
+                nr_real_flags++;
+            }
+        }
+
+        // Check that max. number of real flags fits in CommandArgs::flags
+        // array (and also leaves 1 byte for null-terminator)
+        CommandArgs a;
+        BUG_ON(nr_real_flags >= ARRAY_COUNT(a.flags));
+    }
+}

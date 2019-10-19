@@ -22,7 +22,7 @@ static void command_mode_handle_enter(void)
     cmdline_clear(&editor.cmdline);
 
     if (ok) {
-        run_commands(commands, &array);
+        run_commands(&commands, &array);
     } else {
         error_msg("Parsing command: %s", command_parse_error_to_string(err));
     }

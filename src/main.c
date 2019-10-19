@@ -288,7 +288,7 @@ loop_break:
     terminal.save_title();
 
     exec_reset_colors_rc();
-    read_config(commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
     fill_builtin_colors();
 
     // NOTE: syntax_changed() uses window. Should possibly create
@@ -298,10 +298,10 @@ loop_break:
 
     if (read_rc) {
         if (rc) {
-            read_config(commands, rc, CFG_MUST_EXIST);
+            read_config(&commands, rc, CFG_MUST_EXIST);
         } else {
             char *filename = editor_file("rc");
-            read_config(commands, filename, CFG_NOFLAGS);
+            read_config(&commands, filename, CFG_NOFLAGS);
             free(filename);
         }
     }
@@ -382,12 +382,12 @@ loop_break:
     }
 
     if (command) {
-        handle_command(commands, command);
+        handle_command(&commands, command);
     }
 
     if (tag) {
         const char *tag_command[] = {"tag", tag, NULL};
-        run_command(commands, (char**)tag_command);
+        run_command(&commands, (char**)tag_command);
     }
 
     if (

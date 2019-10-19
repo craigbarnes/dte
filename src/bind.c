@@ -86,7 +86,7 @@ static KeyBinding *key_binding_new(const char *cmd_str)
         goto out;
     }
 
-    const Command *cmd = find_command(commands, array.ptrs[0]);
+    const Command *cmd = find_normal_command(array.ptrs[0]);
     if (!cmd) {
         // Aliases or non-existent commands can't be cached
         goto out;
@@ -202,7 +202,7 @@ void handle_binding(KeyCode key)
 
     if (!b->cmd) {
         // Command isn't cached; parse and run command string
-        handle_command(commands, b->cmd_str);
+        handle_command(&commands, b->cmd_str);
         return;
     }
 
