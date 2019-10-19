@@ -1,7 +1,7 @@
 dte
 ===
 
-dte is a small and easy to use console text editor.
+A small and easy to use console text editor.
 
 Features
 --------
@@ -25,8 +25,26 @@ Screenshot
 
 ![dte screenshot](https://craigbarnes.gitlab.io/dte/screenshot.png)
 
-Requirements
-------------
+Installing
+----------
+
+`dte` can be installed via package manager on the following platforms:
+
+| OS                 | Install command                            |
+|--------------------|--------------------------------------------|
+| [Debian Testing]   | `apt-get install dte`                      |
+| Arch Linux ([AUR]) | `$AUR_HELPER -S dte`                       |
+| [Void Linux]       | `xbps-install -S dte`                      |
+| [FreeBSD]          | `pkg install dte`                          |
+| [OpenBSD]          | `pkg_add dte`                              |
+| NetBSD ([pkgsrc])  | `pkg_add dte`                              |
+| OS X ([Homebrew])  | `brew tap yumitsu/dte && brew install dte` |
+| Android ([Termux]) | `pkg install dte`                          |
+
+Building
+--------
+
+To build from source, first install the following dependencies:
 
 * [GCC] 4.6+ or [Clang]
 * [GNU Make] 3.81+
@@ -34,15 +52,14 @@ Requirements
 * [iconv] library (may be included in libc, depending on OS)
 * [POSIX]-compatible [`sh`] and [`awk`]
 
-Installation
-------------
-
-To build `dte` from source, first install the requirements listed above,
-then use the following commands:
+...then download and unpack the latest release tarball:
 
     curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.9.1.tar.gz
     tar -xzf dte-1.9.1.tar.gz
     cd dte-1.9.1
+
+...and compile and install:
+
     make -j8 && sudo make install
 
 Documentation
@@ -52,27 +69,6 @@ After installing, you can access the documentation in man page format
 via `man 1 dte`, `man 5 dterc` and `man 5 dte-syntax`.
 
 Online documentation is also available at <https://craigbarnes.gitlab.io/dte/>.
-
-Testing
--------
-
-`dte` is tested on the following platforms:
-
-| Platform          | Testing Method        |
-|-------------------|-----------------------|
-| Debian            | [GitLab CI]           |
-| CentOS            | GitLab CI             |
-| Alpine Linux      | GitLab CI             |
-| Void Linux (musl) | GitLab CI             |
-| Mac OS X          | [Travis CI]           |
-| Ubuntu            | GitLab CI + Travis CI |
-| FreeBSD           | Manual                |
-| NetBSD            | Manual                |
-| OpenBSD           | Manual                |
-| Cygwin            | Manual                |
-
-Other [POSIX] 2008 compatible platforms should also work, but may
-require build system changes.
 
 Packaging
 ---------
@@ -185,8 +181,14 @@ Public License version 2 for more details.
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [`sh`]:  https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
 [`awk`]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html
-[GitLab CI]: https://gitlab.com/craigbarnes/dte/pipelines
-[Travis CI]: https://travis-ci.org/craigbarnes/dte
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html
 [libgit issue #4343]: https://github.com/libgit2/libgit2/issues/4343
+[Debian Testing]: https://packages.debian.org/testing/dte
+[AUR]: https://aur.archlinux.org/packages/dte/
+[Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
+[FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
+[OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
+[pkgsrc]: http://pkgsrc.se/editors/dte
+[Homebrew]: https://github.com/yumitsu/homebrew-dte
+[Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
