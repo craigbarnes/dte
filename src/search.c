@@ -111,13 +111,15 @@ next:
 
 bool search_tag(const char *pattern, bool *err)
 {
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     regex_t regex;
     bool found = false;
-
     if (!regexp_compile_basic(&regex, pattern, REG_NEWLINE)) {
         *err = true;
-    } else if (do_search_fwd(&regex, &bi, false)) {
+        return found;
+    }
+
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    if (do_search_fwd(&regex, &bi, false)) {
         view->center_on_scroll = true;
         found = true;
     } else {
@@ -126,6 +128,7 @@ bool search_tag(const char *pattern, bool *err)
         error_msg("Tag not found.");
         *err = true;
     }
+
     regfree(&regex);
     return found;
 }
