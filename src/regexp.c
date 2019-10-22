@@ -32,7 +32,6 @@ bool regexp_match (
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 {
     int err = regcomp(re, pattern, flags);
-
     if (err) {
         char msg[1024];
         regerror(err, re, msg, sizeof(msg));

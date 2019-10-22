@@ -60,14 +60,12 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
         return;
     }
 
-    regex_t re;
     switch (type) {
     case FT_CONTENT:
     case FT_FILENAME:
-        if (!regexp_compile(&re, str, REG_NEWLINE | REG_NOSUB)) {
+        if (!regexp_is_valid(str, REG_NEWLINE)) {
             return;
         }
-        regfree(&re);
         break;
     default:
         break;
