@@ -225,6 +225,19 @@ static size_t get_nonflag_argc(char **args, size_t argc)
     return nonflag_argc;
 }
 
+static const char *get_nonflag_arg(size_t idx, char **args, size_t argc)
+{
+    size_t nonflag_argc = 0;
+    for (size_t i = 0; i < argc; i++) {
+        if (args[i][0] != '-') {
+            if (nonflag_argc++ == idx) {
+                return args[i];
+            }
+        }
+    }
+    return NULL;
+}
+
 static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
@@ -309,26 +322,23 @@ static void collect_completions(char **args, size_t argc)
         return;
     }
     if (string_view_equal_literal(&cmd_name, "show")) {
-        switch (argc) {
+        static const char opts[][8] = {"alias", "bind", "option"};
+        const size_t nonflag_argc = get_nonflag_argc(args, argc);
+        const char *arg1;
+        switch (nonflag_argc) {
         case 1:
-            if (str_has_prefix("alias", completion.parsed)) {
-                add_completion(xstrdup("alias"));
-            }
-            if (str_has_prefix("bind", completion.parsed)) {
-                add_completion(xstrdup("bind"));
+            for (size_t i = 0; i < ARRAY_COUNT(opts); i++) {
+                if (str_has_prefix(opts[i], completion.parsed)) {
+                    add_completion(xstrdup(opts[i]));
+                }
             }
             break;
         case 2:
-            if (streq(args[1], "alias")) {
+            arg1 = get_nonflag_arg(1, args, argc);
+            if (streq(arg1, "alias")) {
                 collect_aliases(completion.parsed);
-            }
-            break;
-        case 3:
-            if (
-                (streq(args[1], "alias") && streq(args[2], "-c"))
-                || (streq(args[1], "-c") && streq(args[2], "alias"))
-            ) {
-                collect_aliases(completion.parsed);
+            } else if (streq(arg1, "option")) {
+                collect_options(completion.parsed);
             }
             break;
         }

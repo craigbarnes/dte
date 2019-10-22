@@ -939,10 +939,13 @@ The _type_ argument can be one of:
 `bind`
 :   show key bindings
 
-The _key_ argument is the name of the entry to lookup (i.e. alias
-name or key string). If this argument is specified, the value will
-be displayed in the status line. If omitted, a pager will be opened
-displaying all entries of the specified type.
+`option`
+:   show option values
+
+The _key_ argument is the name of the entry to look up (e.g. the alias
+name). If this argument is specified, the value will be displayed in
+the status line. If omitted, a pager will be opened displaying all
+entries of the specified type.
 
 `-c`
 :   write value to command line instead of status line

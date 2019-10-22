@@ -736,3 +736,40 @@ void collect_option_values(const char *name, const char *prefix)
         }
     }
 }
+
+String dump_options(void)
+{
+    String buf = string_new(4096);
+    string_sprintf(&buf, "\n%23s\n", "Global Options:");
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *desc = &option_desc[i];
+        if (desc->global) {
+            char *ptr = global_ptr(desc);
+            const OptionValue value = desc->ops->get(desc, ptr);
+            const char *str = desc->ops->string(desc, value);
+            string_sprintf(&buf, "%23s  %s\n", desc->name, str);
+        }
+    }
+    string_sprintf(&buf, "\n%23s\n", "Local Options:");
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *desc = &option_desc[i];
+        if (desc->local) {
+            char *ptr = local_ptr(desc, &buffer->options);
+            const OptionValue value = desc->ops->get(desc, ptr);
+            const char *str = desc->ops->string(desc, value);
+            string_sprintf(&buf, "%23s  %s\n", desc->name, str);
+        }
+    }
+    return buf;
+}
+
+const char *get_option_value_string(const char *name)
+{
+    const OptionDesc *desc = find_option(name);
+    if (!desc) {
+        return NULL;
+    }
+    bool local = desc->local;
+    char *ptr = local ? local_ptr(desc, &buffer->options) : global_ptr(desc);
+    return desc->ops->string(desc, desc->ops->get(desc, ptr));
+}

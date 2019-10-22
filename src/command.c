@@ -1512,20 +1512,39 @@ static void show_binding(const char *keystr, bool write_to_cmdline)
     }
 }
 
+static void show_option(const char *name, bool write_to_cmdline)
+{
+    const char *value = get_option_value_string(name);
+    if (!value) {
+        error_msg("invalid option name: %s", name);
+        return;
+    }
+    if (write_to_cmdline) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, value);
+    } else {
+        info_msg("%s is set to: %s", name, value);
+    }
+}
+
 static void cmd_show(const CommandArgs *a)
 {
-    typedef enum {
-        CMD_ALIAS,
-        CMD_BIND,
-    } CommandType;
+    enum {CMD_ALIAS, CMD_BIND, CMD_OPTION};
+    static const char types[][8] = {
+        [CMD_ALIAS] = "alias",
+        [CMD_BIND] = "bind",
+        [CMD_OPTION] = "option",
+    };
 
-    CommandType cmdtype;
-    if (streq(a->args[0], "alias")) {
-        cmdtype = CMD_ALIAS;
-    } else if (streq(a->args[0], "bind")) {
-        cmdtype = CMD_BIND;
-    } else {
-        error_msg("argument #1 must be: 'alias' or 'bind'");
+    int cmdtype = -1;
+    for (int i = 0; i < ARRAY_COUNT(types); i++) {
+        if (streq(a->args[0], types[i])) {
+            cmdtype = i;
+            break;
+        }
+    }
+    if (cmdtype < 0) {
+        error_msg("invalid argument: '%s'", a->args[0]);
         return;
     }
 
@@ -1538,6 +1557,9 @@ static void cmd_show(const CommandArgs *a)
             break;
         case CMD_BIND:
             show_binding(str, cflag);
+            break;
+        case CMD_OPTION:
+            show_option(str, cflag);
             break;
         }
         return;
@@ -1562,6 +1584,9 @@ static void cmd_show(const CommandArgs *a)
         break;
     case CMD_BIND:
         s = dump_bindings();
+        break;
+    case CMD_OPTION:
+        s = dump_options();
         break;
     }
 
