@@ -5,6 +5,7 @@
 #include "completion.h"
 #include "debug.h"
 #include "error.h"
+#include "syntax/color.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/readfile.h"
@@ -153,11 +154,18 @@ int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
     return ret;
 }
 
-void exec_reset_colors_rc(void)
+void exec_builtin_color_reset(void)
 {
     bool colors = terminal.color_type >= TERM_8_COLOR;
     const char *cfg = colors ? "color/reset" : "color/reset-basic";
     read_config(&commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
+}
+
+void exec_builtin_rc(void)
+{
+    exec_builtin_color_reset();
+    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    fill_builtin_colors();
 }
 
 UNITTEST {

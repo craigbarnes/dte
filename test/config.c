@@ -32,9 +32,7 @@ void init_headless_mode(void)
     editor.resize = &no_op;
     editor.ui_end = &no_op;
 
-    exec_reset_colors_rc();
-    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
-    fill_builtin_colors();
+    exec_builtin_rc();
 
     window = new_window();
     root_frame = new_root_frame(window);

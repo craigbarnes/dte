@@ -15,7 +15,6 @@
 #include "load-save.h"
 #include "move.h"
 #include "search.h"
-#include "syntax/color.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "terminal/input.h"
@@ -286,10 +285,7 @@ loop_break:
     }
 
     terminal.save_title();
-
-    exec_reset_colors_rc();
-    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
-    fill_builtin_colors();
+    exec_builtin_rc();
 
     // NOTE: syntax_changed() uses window. Should possibly create
     // window after reading rc.

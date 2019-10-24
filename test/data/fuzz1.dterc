@@ -58,6 +58,7 @@ select
 repeat 5 right
 cut
 paste -c
+set syntax true
 set set-window-title true
 setenv SETENVTEST 1111
 insert $SETENVTEST

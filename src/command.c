@@ -501,7 +501,7 @@ static void cmd_hi(const CommandArgs *a)
     char **args = a->args;
     TermColor color;
     if (args[0] == NULL) {
-        exec_reset_colors_rc();
+        exec_builtin_color_reset();
         remove_extra_colors();
     } else if (parse_term_color(&color, args + 1)) {
         color.fg = color_to_nearest(color.fg, terminal.color_type);
