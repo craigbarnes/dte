@@ -206,6 +206,9 @@ int spawn_filter(char **argv, FilterData *data)
     close(p0[1]);
 
     if (handle_child_error(pid)) {
+        free(data->out);
+        data->out = NULL;
+        data->out_len = 0;
         return -1;
     }
     return 0;

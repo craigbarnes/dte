@@ -429,7 +429,7 @@ static void cmd_eval(const CommandArgs *a)
 
 static void cmd_filter(const CommandArgs *a)
 {
-    FilterData data = FILTER_DATA_INIT;
+    FilterData data;
     BlockIter save = view->cursor;
 
     if (view->selection) {
@@ -446,7 +446,6 @@ static void cmd_filter(const CommandArgs *a)
     data.in = block_iter_get_bytes(&view->cursor, data.in_len);
     if (spawn_filter(a->args, &data)) {
         free(data.in);
-        free(data.out);
         view->cursor = save;
         return;
     }
