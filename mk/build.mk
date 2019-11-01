@@ -161,6 +161,7 @@ $(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 build/builtin-config.h: build/builtin-config.mk
+build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
@@ -195,6 +196,9 @@ build/version.h: FORCE | build/
 
 build/builtin-config.mk: FORCE | build/
 	@$(OPTCHECK) '$(@:.mk=.h): $(BUILTIN_CONFIGS)' $@
+
+build/test/data.mk: FORCE | build/test/
+	@$(OPTCHECK) '$(@:.mk=.h): $(TEST_CONFIGS)' $@
 
 build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 	$(E) GEN $@
