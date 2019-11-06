@@ -14,10 +14,10 @@ size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
     size_t i = 1;
 
     while (i < size && ascii_isdigit(str[i])) {
-        if (umax_multiply_overflows(val, 10, &val)) {
+        if (unlikely(umax_multiply_overflows(val, 10, &val))) {
             return 0;
         }
-        if (umax_add_overflows(val, str[i++] - '0', &val)) {
+        if (unlikely(umax_add_overflows(val, str[i++] - '0', &val))) {
             return 0;
         }
     }
