@@ -117,13 +117,13 @@ static void add_replacement(struct cconv *c)
 
 static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
 {
-    d_print("%zu %zu\n", c->char_size, count);
+    DEBUG_LOG("%zu %zu\n", c->char_size, count);
     add_replacement(c);
     if (c->char_size == 0) {
         // Converting from UTF-8
         size_t idx = 0;
         CodePoint u = u_get_char(buf, count, &idx);
-        d_print("U+%04" PRIX32 "\n", u);
+        DEBUG_LOG("U+%04" PRIX32 "\n", u);
         return idx;
     }
     if (c->char_size > count) {
@@ -192,7 +192,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
             skip = handle_invalid(c, c->tbuf, c->tcount);
             c->tcount -= skip;
             if (c->tcount > 0) {
-                d_print("tcount=%zu, skip=%zu\n", c->tcount, skip);
+                DEBUG_LOG("tcount=%zu, skip=%zu\n", c->tcount, skip);
                 memmove(c->tbuf, c->tbuf + skip, c->tcount);
                 continue;
             }
@@ -200,7 +200,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
         }
         break;
     }
-    d_print("%zu %zu\n", ipos, c->tcount);
+    DEBUG_LOG("%zu %zu\n", ipos, c->tcount);
     return ipos;
 }
 
@@ -273,7 +273,7 @@ void cconv_flush(struct cconv *c)
 {
     if (c->tcount > 0) {
         // Replace incomplete character at end of input buffer.
-        d_print("incomplete character at EOF\n");
+        DEBUG_LOG("incomplete character at EOF\n");
         add_replacement(c);
         c->tcount = 0;
     }

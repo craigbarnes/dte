@@ -58,7 +58,7 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...) {
 #endif
 
 #ifdef DEBUG_PRINT
-void debug_print(const char *function, const char *fmt, ...)
+void debug_log(const char *function, const char *fmt, ...)
 {
     static int fd = -1;
     if (fd < 0) {

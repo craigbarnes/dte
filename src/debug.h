@@ -21,13 +21,13 @@
 #endif
 
 #ifdef DEBUG_PRINT
-  #define d_print(...) debug_print(__func__, __VA_ARGS__)
+  #define DEBUG_LOG(...) debug_log(__func__, __VA_ARGS__)
 
   PRINTF(2)
-  void debug_print(const char *function, const char *fmt, ...);
+  void debug_log(const char *function, const char *fmt, ...);
 #else
   PRINTF(1)
-  static inline void d_print(const char* UNUSED_ARG(fmt), ...) {}
+  static inline void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
 void term_cleanup(void);

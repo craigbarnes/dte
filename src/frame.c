@@ -491,7 +491,7 @@ void remove_frame(Frame *f)
 #ifdef DEBUG_FRAMES
 static void debug_frame(const Frame *f, int level)
 {
-    d_print (
+    DEBUG_LOG (
         "%*s%dx%d %d %d %zu\n",
         level * 4, "",
         f->w, f->h,
@@ -500,7 +500,7 @@ static void debug_frame(const Frame *f, int level)
     );
 
     if (f->window) {
-        d_print (
+        DEBUG_LOG (
             "%*swindow %d,%d %dx%d\n",
             (level + 1) * 4, "",
             f->window->x,
