@@ -50,21 +50,21 @@ size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp)
 
 static size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
-    bool negative = false;
-    size_t skipped = 0;
     if (size == 0) {
         return 0;
-    } else {
-        switch (str[0]) {
-        case '-':
-            negative = true;
-            // Fallthrough
-        case '+':
-            skipped = 1;
-            str++;
-            size--;
-            break;
-        }
+    }
+
+    bool negative = false;
+    size_t skipped = 0;
+    switch (str[0]) {
+    case '-':
+        negative = true;
+        // Fallthrough
+    case '+':
+        skipped = 1;
+        str++;
+        size--;
+        break;
     }
 
     uintmax_t val;
