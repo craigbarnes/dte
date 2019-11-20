@@ -77,7 +77,7 @@ void ecma48_set_color(const TermColor *const color)
         return;
     }
 
-    char buf[32] = "\033[0";
+    char buf[16] = "\033[0";
     size_t i = 3;
     static_assert(sizeof(buf) >= STRLEN("\033[0;1;7;30;40m"));
 
