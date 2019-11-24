@@ -486,15 +486,8 @@ static char *escape(const char *str)
     return string_steal_cstring(&buf);
 }
 
-void complete_command(void)
+static void do_complete_command(void)
 {
-    if (!completion.head) {
-        init_completion();
-    }
-    if (!completion.completions.count) {
-        return;
-    }
-
     char *middle = escape(completion.completions.ptrs[completion.idx]);
     size_t middle_len = strlen(middle);
     size_t head_len = strlen(completion.head);
@@ -514,10 +507,47 @@ void complete_command(void)
 
     free(middle);
     free(str);
-    completion.idx = (completion.idx + 1) % completion.completions.count;
     if (completion.completions.count == 1) {
         reset_completion();
     }
+}
+
+void complete_command_next(void)
+{
+    const bool init = !completion.head;
+    if (init) {
+        init_completion();
+    }
+    if (!completion.completions.count) {
+        return;
+    }
+    if (!init) {
+        if (completion.idx >= completion.completions.count - 1) {
+            completion.idx = 0;
+        } else {
+            completion.idx++;
+        }
+    }
+    do_complete_command();
+}
+
+void complete_command_prev(void)
+{
+    const bool init = !completion.head;
+    if (init) {
+        init_completion();
+    }
+    if (!completion.completions.count) {
+        return;
+    }
+    if (!init) {
+        if (completion.idx == 0) {
+            completion.idx = completion.completions.count - 1;
+        } else {
+            completion.idx--;
+        }
+    }
+    do_complete_command();
 }
 
 void reset_completion(void)

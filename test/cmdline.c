@@ -126,31 +126,40 @@ static void test_cmdline_handle_key(void)
 
 static void test_complete_command(void)
 {
-    complete_command();
+    complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "alias");
     reset_completion();
 
     cmdline_set_text(&editor.cmdline, "wrap");
-    complete_command();
+    complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "wrap-paragraph ");
     reset_completion();
 
     cmdline_set_text(&editor.cmdline, "open test/data/.e");
-    complete_command();
+    complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "open test/data/.editorconfig ");
     reset_completion();
 
     cmdline_set_text(&editor.cmdline, "toggle ");
-    complete_command();
+    complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "toggle auto-indent");
     reset_completion();
 
     ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
     cmdline_set_text(&editor.cmdline, "insert $" ENV_VAR_PREFIX);
-    complete_command();
+    complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "insert $" ENV_VAR_NAME);
     reset_completion();
     ASSERT_EQ(unsetenv(ENV_VAR_NAME), 0);
+
+    cmdline_clear(&editor.cmdline);
+    complete_command_prev();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "alias");
+    complete_command_prev();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "wswap");
+    complete_command_prev();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "wsplit");
+    reset_completion();
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")

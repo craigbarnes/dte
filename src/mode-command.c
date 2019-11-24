@@ -37,7 +37,10 @@ static void command_mode_keypress(KeyCode key)
         command_mode_handle_enter();
         return;
     case '\t':
-        complete_command();
+        complete_command_next();
+        return;
+    case MOD_SHIFT | '\t':
+        complete_command_prev();
         return;
     }
 
