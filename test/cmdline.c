@@ -160,6 +160,24 @@ static void test_complete_command(void)
     complete_command_prev();
     EXPECT_STRING_EQ(editor.cmdline.buf, "wsplit");
     reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "hi default ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default black");
+    complete_command_prev();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default yellow");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default black");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default blink");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "show op");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show option ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show option auto-indent");
+    reset_completion();
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")
