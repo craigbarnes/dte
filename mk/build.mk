@@ -29,7 +29,7 @@ BUILTIN_CONFIGS = $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
-    env thai crlf fuzz1 ))
+    env thai crlf pipe fuzz1 ))
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec hashset path ptr-array readfile string strtonum \

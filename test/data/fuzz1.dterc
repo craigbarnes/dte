@@ -77,7 +77,6 @@ wresize
 wsplit
 wswap
 save -f out
-pipe-from echo pipe-from-test
 select
 pgdown
 unselect

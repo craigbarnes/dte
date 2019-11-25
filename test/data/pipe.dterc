@@ -1,0 +1,9 @@
+open
+insert "pipe-to\ntest"
+pipe-to sh -c 'cat > build/test/pipe-to.txt'
+close -f
+
+open
+pipe-from sh -c 'printf "pipe-from\ntest\n"'
+save -f build/test/pipe-from.txt
+close -f

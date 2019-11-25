@@ -78,9 +78,13 @@ void test_exec_config(void)
     expect_files_equal("build/test/env.txt", "test/data/env.txt");
     expect_files_equal("build/test/crlf.txt", "test/data/crlf.txt");
     expect_files_equal("build/test/thai-utf8.txt", "test/data/thai-utf8.txt");
+    expect_files_equal("build/test/pipe-from.txt", "test/data/pipe-from.txt");
+    expect_files_equal("build/test/pipe-to.txt", "test/data/pipe-to.txt");
     EXPECT_EQ(unlink("build/test/env.txt"), 0);
     EXPECT_EQ(unlink("build/test/crlf.txt"), 0);
     EXPECT_EQ(unlink("build/test/thai-utf8.txt"), 0);
+    EXPECT_EQ(unlink("build/test/pipe-from.txt"), 0);
+    EXPECT_EQ(unlink("build/test/pipe-to.txt"), 0);
 
     if (encoding_supported_by_iconv("TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
