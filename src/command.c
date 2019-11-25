@@ -1071,10 +1071,6 @@ static void cmd_save(const CommandArgs *a)
         encoding = encoding_from_name(requested_encoding);
     }
 
-    // The encoding_from_name() call above may have allocated memory,
-    // so use "goto error" instead of early return beyond this point, to
-    // ensure correct de-allocation.
-
     if (args[0]) {
         if (args[0][0] == '\0') {
             error_msg("Empty filename not allowed");
