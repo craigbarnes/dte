@@ -223,10 +223,6 @@ error:
 
 int spawn_sink(char **argv, const char *text, size_t length)
 {
-    if (length == 0) {
-        return 0;
-    }
-
     int p[2] = {-1, -1};
     int dev_null = -1;
     if (pipe_close_on_exec(p)) {
@@ -247,7 +243,7 @@ int spawn_sink(char **argv, const char *text, size_t length)
 
     close(dev_null);
     close(p[0]);
-    if (xwrite(p[1], text, length) < 0) {
+    if (length && xwrite(p[1], text, length) < 0) {
         error_msg("write: %s", strerror(errno));
         close(p[1]);
         return -1;
