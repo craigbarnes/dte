@@ -818,8 +818,8 @@ static void cmd_pipe_from(const CommandArgs *a)
         }
     }
 
-    FilterData data = FILTER_DATA_INIT;
-    if (spawn_filter(a->args, &data)) {
+    String output = STRING_INIT;
+    if (spawn_source(a->args, &output)) {
         return;
     }
 
@@ -829,17 +829,21 @@ static void cmd_pipe_from(const CommandArgs *a)
         unselect();
     }
 
-    if (strip_nl && data.out_len > 0 && data.out[data.out_len - 1] == '\n') {
-        if (--data.out_len > 0 && data.out[data.out_len - 1] == '\r') {
-            data.out_len--;
+    size_t ins_len = output.len;
+    if (strip_nl) {
+        if (ins_len && output.buffer[ins_len - 1] == '\n') {
+            ins_len--;
+            if (ins_len && output.buffer[ins_len - 1] == '\r') {
+                ins_len--;
+            }
         }
     }
 
-    buffer_replace_bytes(del_len, data.out, data.out_len);
-    free(data.out);
+    buffer_replace_bytes(del_len, output.buffer, ins_len);
+    string_free(&output);
 
     if (move) {
-        block_iter_skip_bytes(&view->cursor, data.out_len);
+        block_iter_skip_bytes(&view->cursor, ins_len);
     }
 }
 

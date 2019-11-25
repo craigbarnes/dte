@@ -2,6 +2,7 @@
 #define SPAWN_H
 
 #include "compiler.h"
+#include "util/string.h"
 
 typedef enum {
     SPAWN_DEFAULT = 0,
@@ -24,8 +25,9 @@ typedef struct {
     .out_len = 0 \
 }
 
-int spawn_filter(char **argv, FilterData *data);
+int spawn_source(char **argv, String *output);
 int spawn_sink(char **argv, const char *text, size_t length);
+int spawn_filter(char **argv, FilterData *data);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);
 void spawn(char **args, int fd[3], bool prompt);
 

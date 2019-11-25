@@ -221,6 +221,64 @@ error:
     return -1;
 }
 
+int spawn_source(char **argv, String *output)
+{
+    int p[2] = {-1, -1};
+    int dev_null_r = -1;
+    int dev_null_w = -1;
+    if (pipe_close_on_exec(p)) {
+        error_msg("pipe: %s", strerror(errno));
+        goto error;
+    }
+    dev_null_r = open_dev_null(O_RDONLY);
+    if (dev_null_r < 0) {
+        goto error;
+    }
+    dev_null_w = open_dev_null(O_WRONLY);
+    if (dev_null_w < 0) {
+        goto error;
+    }
+
+    int fd[3] = {dev_null_r, p[1], dev_null_w};
+    const pid_t pid = fork_exec(argv, fd);
+    if (pid < 0) {
+        error_msg("Error: %s", strerror(errno));
+        goto error;
+    }
+    close(dev_null_r);
+    close(dev_null_w);
+    close(p[1]);
+
+    while (1) {
+        char buf[8192];
+        ssize_t rc = xread(p[0], buf, sizeof(buf));
+        if (unlikely(rc < 0)) {
+            error_msg("read: %s", strerror(errno));
+            close(p[0]);
+            string_free(output);
+            return -1;
+        }
+        if (rc == 0) {
+            break;
+        }
+        string_append_buf(output, buf, (size_t) rc);
+    }
+
+    close(p[0]);
+    if (handle_child_error(pid)) {
+        string_free(output);
+        return -1;
+    }
+    return 0;
+
+error:
+    close(p[0]);
+    close(p[1]);
+    close(dev_null_r);
+    close(dev_null_w);
+    return -1;
+}
+
 int spawn_sink(char **argv, const char *text, size_t length)
 {
     int p[2] = {-1, -1};
