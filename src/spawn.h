@@ -1,6 +1,8 @@
 #ifndef SPAWN_H
 #define SPAWN_H
 
+#include <stdbool.h>
+#include <stddef.h>
 #include "compiler.h"
 #include "util/string.h"
 
@@ -29,6 +31,6 @@ int spawn_source(char **argv, String *output);
 int spawn_sink(char **argv, const char *text, size_t length);
 int spawn_filter(char **argv, FilterData *data);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);
-void spawn(char **args, int fd[3], bool prompt);
+void spawn(char **args, bool quiet, bool prompt);
 
 #endif

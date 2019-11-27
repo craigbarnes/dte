@@ -1003,22 +1003,20 @@ static void cmd_right(const CommandArgs *a)
 static void cmd_run(const CommandArgs *a)
 {
     const char *pf = a->flags;
-    int fd[3] = {0, 1, 2};
     bool prompt = false;
+    bool quiet = false;
     while (*pf) {
         switch (*pf) {
         case 'p':
             prompt = true;
             break;
         case 's':
-            fd[0] = -1;
-            fd[1] = -1;
-            fd[2] = -1;
+            quiet = true;
             break;
         }
         pf++;
     }
-    spawn(a->args, fd, prompt);
+    spawn(a->args, quiet, prompt);
 }
 
 static bool stat_changed(const struct stat *const a, const struct stat *const b)
@@ -1600,8 +1598,7 @@ static void cmd_show(const CommandArgs *a)
     }
 
     const char *argv[] = {editor.pager, tmp, NULL};
-    int child_fds[3] = {0, 1, 2};
-    spawn((char**)argv, child_fds, false);
+    spawn((char**)argv, false, false);
     unlink(tmp);
 }
 

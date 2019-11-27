@@ -377,33 +377,19 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     close(fd[0]);
 }
 
-void spawn(char **args, int fd[3], bool prompt)
+void spawn(char **args, bool quiet, bool prompt)
 {
-    const int dev_null = open_dev_null(O_WRONLY);
-    if (dev_null < 0) {
-        return;
-    }
-
-    unsigned int redir_count = 0;
-    if (fd[0] < 0) {
-        fd[0] = open_dev_null(O_RDONLY);
-        if (fd[0] < 0) {
-            close(dev_null);
+    int fd[3] = {0, 1, 2};
+    if (quiet) {
+        if ((fd[0] = open_dev_null(O_RDONLY)) < 0) {
             return;
         }
-        redir_count++;
-    }
-    if (fd[1] < 0) {
-        fd[1] = dev_null;
-        redir_count++;
-    }
-    if (fd[2] < 0) {
-        fd[2] = dev_null;
-        redir_count++;
-    }
-
-    const bool quiet = (redir_count == 3);
-    if (!quiet) {
+        if ((fd[1] = open_dev_null(O_WRONLY)) < 0) {
+            close(fd[0]);
+            return;
+        }
+        fd[2] = fd[1];
+    } else {
         editor.child_controls_terminal = true;
         editor.ui_end();
     }
@@ -415,15 +401,16 @@ void spawn(char **args, int fd[3], bool prompt)
     } else {
         handle_child_error(pid);
     }
-    if (!quiet) {
+
+    if (quiet) {
+        close(fd[0]);
+        close(fd[1]);
+    } else {
         terminal.raw();
         if (prompt) {
             any_key();
         }
         editor.resize();
         editor.child_controls_terminal = false;
-    }
-    if (dev_null >= 0) {
-        close(dev_null);
     }
 }
