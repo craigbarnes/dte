@@ -37,12 +37,12 @@ void term_raw(void)
     // Read blocks until there are MIN(VMIN, requested) bytes available
     termios.c_cc[VTIME] = 0;
 
-    tcsetattr(STDIN_FILENO, 0, &termios);
+    tcsetattr(STDIN_FILENO, TCSANOW, &termios);
 }
 
 void term_cooked(void)
 {
-    tcsetattr(STDIN_FILENO, 0, &termios_save);
+    tcsetattr(STDIN_FILENO, TCSANOW, &termios_save);
 }
 
 void ecma48_clear_screen(void)
