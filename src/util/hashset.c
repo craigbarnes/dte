@@ -110,15 +110,6 @@ HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
     return h;
 }
 
-void hashset_add_many(HashSet *set, char **strings, size_t nstrings)
-{
-    for (size_t i = 0; i < nstrings; i++) {
-        const char *str = strings[i];
-        const size_t str_len = strlen(str);
-        hashset_add(set, str, str_len);
-    }
-}
-
 const void *mem_intern(const void *data, size_t len)
 {
     static HashSet pool;

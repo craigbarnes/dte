@@ -29,7 +29,6 @@ void hashset_init(HashSet *set, size_t initial_size, bool icase);
 void hashset_free(HashSet *set);
 HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len);
 HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len);
-void hashset_add_many(HashSet *set, char **strings, size_t nstrings);
 
 const void *mem_intern(const void *data, size_t len) NONNULL_ARGS_AND_RETURN;
 

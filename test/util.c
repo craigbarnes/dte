@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "test.h"
 #include "../src/util/ascii.h"
@@ -774,9 +775,13 @@ static void test_hashset(void)
 
     HashSet set;
     hashset_init(&set, ARRAY_COUNT(strings), false);
+    EXPECT_EQ(set.nr_entries, 0);
     EXPECT_NULL(hashset_get(&set, "foo", 3));
+    FOR_EACH_I(i, strings) {
+        hashset_add(&set, strings[i], strlen(strings[i]));
+    }
 
-    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
+    EXPECT_EQ(set.nr_entries, ARRAY_COUNT(strings));
     EXPECT_NONNULL(hashset_get(&set, "\t\xff\x80\b", 4));
     EXPECT_NONNULL(hashset_get(&set, "foo", 3));
     EXPECT_NONNULL(hashset_get(&set, "Foo", 3));
@@ -800,8 +805,11 @@ static void test_hashset(void)
     hashset_free(&set);
     MEMZERO(&set);
 
-    hashset_init(&set, ARRAY_COUNT(strings), true);
-    hashset_add_many(&set, (char**)strings, ARRAY_COUNT(strings));
+    hashset_init(&set, 0, true);
+    EXPECT_EQ(set.nr_entries, 0);
+    hashset_add(&set, "foo", 3);
+    hashset_add(&set, "Foo", 3);
+    EXPECT_EQ(set.nr_entries, 1);
     EXPECT_NONNULL(hashset_get(&set, "foo", 3));
     EXPECT_NONNULL(hashset_get(&set, "FOO", 3));
     EXPECT_NONNULL(hashset_get(&set, "fOO", 3));

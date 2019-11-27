@@ -308,8 +308,12 @@ static void cmd_list(const CommandArgs *a)
 
     bool icase = a->flags[0] == 'i';
     size_t nstrings = a->nr_args - 1;
-    hashset_init(&list->strings, nstrings, icase);
-    hashset_add_many(&list->strings, args + 1, nstrings);
+    HashSet *set = &list->strings;
+    hashset_init(set, nstrings, icase);
+    for (size_t i = 1; i < nstrings; i++) {
+        const char *str = args[i];
+        hashset_add(set, str, strlen(str));
+    }
 }
 
 static void cmd_inlist(const CommandArgs *a)
