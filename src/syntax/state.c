@@ -307,10 +307,9 @@ static void cmd_list(const CommandArgs *a)
     list->defined = true;
 
     bool icase = a->flags[0] == 'i';
-    size_t nstrings = a->nr_args - 1;
     HashSet *set = &list->strings;
-    hashset_init(set, nstrings, icase);
-    for (size_t i = 1; i < nstrings; i++) {
+    hashset_init(set, a->nr_args - 1, icase);
+    for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *str = args[i];
         hashset_add(set, str, strlen(str));
     }
