@@ -420,7 +420,7 @@ static void cmd_errorfmt(const CommandArgs *a)
 static void cmd_eval(const CommandArgs *a)
 {
     FilterData data = FILTER_DATA_INIT;
-    if (spawn_filter(a->args, &data)) {
+    if (!spawn_filter(a->args, &data)) {
         return;
     }
     exec_config(&commands, data.out, data.out_len);
@@ -444,7 +444,7 @@ static void cmd_filter(const CommandArgs *a)
     }
 
     data.in = block_iter_get_bytes(&view->cursor, data.in_len);
-    if (spawn_filter(a->args, &data)) {
+    if (!spawn_filter(a->args, &data)) {
         free(data.in);
         view->cursor = save;
         return;
@@ -819,7 +819,7 @@ static void cmd_pipe_from(const CommandArgs *a)
     }
 
     String output = STRING_INIT;
-    if (spawn_source(a->args, &output)) {
+    if (!spawn_source(a->args, &output)) {
         return;
     }
 

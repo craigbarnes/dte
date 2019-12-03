@@ -173,7 +173,7 @@ static int handle_child_error(pid_t pid)
     return ret;
 }
 
-int spawn_filter(char **argv, FilterData *data)
+bool spawn_filter(char **argv, FilterData *data)
 {
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
@@ -209,19 +209,19 @@ int spawn_filter(char **argv, FilterData *data)
         free(data->out);
         data->out = NULL;
         data->out_len = 0;
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 error:
     close(p0[0]);
     close(p0[1]);
     close(p1[0]);
     close(p1[1]);
     close(dev_null);
-    return -1;
+    return false;
 }
 
-int spawn_source(char **argv, String *output)
+bool spawn_source(char **argv, String *output)
 {
     int p[2] = {-1, -1};
     int dev_null_r = -1;
@@ -256,7 +256,7 @@ int spawn_source(char **argv, String *output)
             error_msg("read: %s", strerror(errno));
             close(p[0]);
             string_free(output);
-            return -1;
+            return false;
         }
         if (rc == 0) {
             break;
@@ -267,19 +267,19 @@ int spawn_source(char **argv, String *output)
     close(p[0]);
     if (handle_child_error(pid)) {
         string_free(output);
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 
 error:
     close(p[0]);
     close(p[1]);
     close(dev_null_r);
     close(dev_null_w);
-    return -1;
+    return false;
 }
 
-int spawn_sink(char **argv, const char *text, size_t length)
+bool spawn_sink(char **argv, const char *text, size_t length)
 {
     int p[2] = {-1, -1};
     int dev_null = -1;
@@ -304,16 +304,16 @@ int spawn_sink(char **argv, const char *text, size_t length)
     if (length && xwrite(p[1], text, length) < 0) {
         error_msg("write: %s", strerror(errno));
         close(p[1]);
-        return -1;
+        return false;
     }
     close(p[1]);
-    return handle_child_error(pid) ? -1 : 0;
+    return !handle_child_error(pid);
 
 error:
     close(p[0]);
     close(p[1]);
     close(dev_null);
-    return -1;
+    return false;
 }
 
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
