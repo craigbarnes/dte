@@ -133,7 +133,7 @@ static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
             num = (num * 10) + (ch - '0');
-            if (num > UNICODE_MAX_VALID_CODEPOINT) {
+            if (unlikely(num > UNICODE_MAX_VALID_CODEPOINT)) {
                 return 0;
             }
             digits++;
