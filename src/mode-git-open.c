@@ -34,31 +34,26 @@ static void git_open_clear(void)
 static char *cdup(void)
 {
     static const char *const cmd[] = {"git", "rev-parse", "--show-cdup", NULL};
-    FilterData data = FILTER_DATA_INIT;
-
-    if (!spawn_filter((char **)cmd, &data)) {
+    String output = STRING_INIT;
+    if (!spawn_source((char **)cmd, &output)) {
         return NULL;
     }
-
-    const size_t len = data.out_len;
-    if (len > 1 && data.out[len - 1] == '\n') {
-        data.out[len - 1] = '\0';
-        return data.out;
+    if (output.len > 1 && output.buffer[output.len - 1] == '\n') {
+        output.len--;
+        return string_steal_cstring(&output);
     }
-    free(data.out);
+    string_free(&output);
     return NULL;
 }
 
 static void git_open_load(void)
 {
     static const char *cmd[] = {"git", "ls-files", "-z", NULL, NULL};
-    FilterData data = FILTER_DATA_INIT;
+    String output = STRING_INIT;
     char *dir = cdup();
     cmd[3] = dir;
-
-    if (spawn_filter((char **)cmd, &data)) {
-        git_open.all_files = data.out;
-        git_open.size = data.out_len;
+    if (spawn_source((char **)cmd, &output)) {
+        git_open.all_files = string_steal(&output, &git_open.size);
     } else {
         set_input_mode(INPUT_NORMAL);
         error_msg("git-open: 'git ls-files' command failed");
