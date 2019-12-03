@@ -1658,6 +1658,23 @@ static void cmd_tag(const CommandArgs *a)
     free(word);
 }
 
+static void cmd_title(const CommandArgs *a)
+{
+    if (buffer->abs_filename) {
+        error_msg("saved buffers can't be retitled");
+        return;
+    }
+
+    free(buffer->display_filename);
+    buffer->display_filename = xstrdup(a->args[0]);
+
+    // Mark all windows containing buffer for a tabbar redraw
+    for (size_t i = 0, n = buffer->views.count; i < n; i++) {
+        const View *v = buffer->views.ptrs[i];
+        v->window->update_tabbar = true;
+    }
+}
+
 static void cmd_toggle(const CommandArgs *a)
 {
     const char *pf = a->flags;
@@ -1980,6 +1997,7 @@ static const Command cmds[] = {
     {"show", "c", 1, 2, cmd_show},
     {"suspend", "", 0, 0, cmd_suspend},
     {"tag", "r", 0, 1, cmd_tag},
+    {"title", "", 1, 1, cmd_title},
     {"toggle", "glv", 1, -1, cmd_toggle},
     {"undo", "", 0, 0, cmd_undo},
     {"unselect", "", 0, 0, cmd_unselect},
