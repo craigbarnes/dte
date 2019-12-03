@@ -70,6 +70,7 @@ static const FileBasenameMap dotfiles[] = {
     {"lcovrc", CONFIG},
     {"luacheckrc", LUA},
     {"luacov", LUA},
+    {"nanorc", CONFIG},
     {"profile", SHELL},
     {"xinitrc", SHELL},
     {"xprofile", SHELL},
