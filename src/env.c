@@ -4,6 +4,7 @@
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
+#include "terminal/terminal.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -11,6 +12,11 @@ typedef struct {
     const char *name;
     char *(*expand)(void);
 } BuiltinEnv;
+
+static char *expand_columns(void)
+{
+    return xasprintf("%d", terminal.width);
+}
 
 static char *expand_dte_home(void)
 {
@@ -42,6 +48,11 @@ static char *expand_lineno(void)
     return xasprintf("%ld", view->cy + 1);
 }
 
+static char *expand_lines(void)
+{
+    return xasprintf("%d", terminal.height);
+}
+
 static char *expand_word(void)
 {
     if (editor.status != EDITOR_RUNNING) {
@@ -69,10 +80,12 @@ static char *expand_pkgdatadir(void)
 
 static const BuiltinEnv builtin[] = {
     {"PKGDATADIR", expand_pkgdatadir},
+    {"COLUMNS", expand_columns},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
+    {"LINES", expand_lines},
     {"WORD", expand_word},
 };
 
