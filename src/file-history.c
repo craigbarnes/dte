@@ -66,7 +66,7 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
         free(ptr_array_remove_idx(&history, 0));
     }
 
-    HistoryEntry *e = xmalloc(sizeof(HistoryEntry) + filename_len);
+    HistoryEntry *e = xmalloc(sizeof(*e) + filename_len);
     e->row = row;
     e->col = col;
     e->filename_len = filename_len;

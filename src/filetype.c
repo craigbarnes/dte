@@ -72,7 +72,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     }
 
     const size_t data_len = name_len + str_len + 2;
-    UserFileTypeEntry *ft = xmalloc(sizeof(UserFileTypeEntry) + data_len);
+    UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + data_len);
     ft->type = type;
     ft->name_len = (uint8_t) name_len;
     ft->str_len = (uint8_t) str_len;
