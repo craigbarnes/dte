@@ -7,7 +7,7 @@
 
 typedef struct {
     // The cached command and parsed arguments (NULL if not cached)
-    const Command *cmd;
+    void (*cmd)(const CommandArgs *a);
     CommandArgs a;
     // The original command string
     char cmd_str[];

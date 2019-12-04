@@ -107,7 +107,7 @@ static KeyBinding *key_binding_new(const char *cmd_str)
     }
 
     // Command can be cached; binding takes ownership of args array
-    b->cmd = cmd;
+    b->cmd = cmd->cmd;
     b->a = a;
     return b;
 
@@ -208,7 +208,7 @@ void handle_binding(KeyCode key)
 
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
-    b->cmd->cmd(&b->a);
+    b->cmd(&b->a);
     end_change();
 }
 
