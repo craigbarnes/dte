@@ -173,6 +173,22 @@ static int handle_child_error(pid_t pid)
     return ret;
 }
 
+static void yield_terminal(void)
+{
+    editor.child_controls_terminal = true;
+    editor.ui_end();
+}
+
+static void resume_terminal(bool prompt)
+{
+    terminal.raw();
+    if (prompt) {
+        any_key();
+    }
+    editor.resize();
+    editor.child_controls_terminal = false;
+}
+
 bool spawn_filter(char **argv, FilterData *data)
 {
     int p0[2] = {-1, -1};
@@ -348,8 +364,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     }
 
     if (!quiet) {
-        editor.child_controls_terminal = true;
-        editor.ui_end();
+        yield_terminal();
     }
 
     const pid_t pid = fork_exec(args, fd);
@@ -365,12 +380,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         handle_child_error(pid);
     }
     if (!quiet) {
-        terminal.raw();
-        if (prompt) {
-            any_key();
-        }
-        editor.resize();
-        editor.child_controls_terminal = false;
+        resume_terminal(prompt);
     }
     close(p[0]);
     close(dev_null);
@@ -390,8 +400,7 @@ void spawn(char **args, bool quiet, bool prompt)
         }
         fd[2] = fd[1];
     } else {
-        editor.child_controls_terminal = true;
-        editor.ui_end();
+        yield_terminal();
     }
 
     const pid_t pid = fork_exec(args, fd);
@@ -406,11 +415,6 @@ void spawn(char **args, bool quiet, bool prompt)
         close(fd[0]);
         close(fd[1]);
     } else {
-        terminal.raw();
-        if (prompt) {
-            any_key();
-        }
-        editor.resize();
-        editor.child_controls_terminal = false;
+        resume_terminal(prompt);
     }
 }
