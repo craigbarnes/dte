@@ -305,28 +305,16 @@ char *editor_file(const char *name)
     return xasprintf("%s/%s", editor.user_config_dir, name);
 }
 
-char get_confirmation(const char *choices, const char *prompt)
+char get_confirmation(const char *question, const char *choices)
 {
-    char buf[256];
-    size_t pos = strlen(prompt);
-    size_t nr_choices = strlen(choices);
-    BUG_ON(pos + (nr_choices * 2) + 4 >= sizeof(buf));
-
-    memcpy(buf, prompt, pos);
-    buf[pos++] = ' ';
-    buf[pos++] = '[';
-
     unsigned char def = 0;
-    for (size_t i = 0; i < nr_choices; i++) {
-        if (ascii_isupper(choices[i])) {
-            def = ascii_tolower(choices[i]);
+    size_t nchoices = 0;
+    while (choices[nchoices]) {
+        unsigned char c = choices[nchoices++];
+        if (ascii_isupper(c)) {
+            def = ascii_tolower(c);
         }
-        buf[pos++] = choices[i];
-        buf[pos++] = '/';
     }
-
-    buf[pos - 1] = ']';
-    buf[pos] = '\0';
 
     // update_windows() assumes these have been called for the current view
     View *v = window->view;
@@ -340,7 +328,7 @@ char get_confirmation(const char *choices, const char *prompt)
     start_update();
     update_term_title(v->buffer);
     update_buffer_windows(v->buffer);
-    show_message(buf, false);
+    show_message(question, false);
     end_update();
 
     KeyCode key;
@@ -363,7 +351,7 @@ char get_confirmation(const char *choices, const char *prompt)
                 continue;
             }
             const unsigned char ch = ascii_tolower(key);
-            if (memchr(choices, ch, nr_choices) || ch == def) {
+            if (memchr(choices, ch, nchoices) || ch == def) {
                 return ch;
             }
         } else if (terminal_resized) {

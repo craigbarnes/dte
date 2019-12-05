@@ -58,7 +58,7 @@ static inline void set_input_mode(InputMode mode)
 
 void init_editor_state(void);
 char *editor_file(const char *name) XSTRDUP;
-char get_confirmation(const char *choices, const char *prompt) NONNULL_ARGS;
+char get_confirmation(const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);
 void normal_update(void);
 void handle_sigwinch(int signum);
