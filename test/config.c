@@ -12,6 +12,7 @@
 #include "../src/util/readfile.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
+#include "../src/util/xsnprintf.h"
 #include "../src/window.h"
 #include "../build/test/data.h"
 
@@ -75,16 +76,22 @@ void test_exec_config(void)
         exec_config(&commands, config.text.data, config.text.length);
     }
 
-    expect_files_equal("build/test/env.txt", "test/data/env.txt");
-    expect_files_equal("build/test/crlf.txt", "test/data/crlf.txt");
-    expect_files_equal("build/test/thai-utf8.txt", "test/data/thai-utf8.txt");
-    expect_files_equal("build/test/pipe-from.txt", "test/data/pipe-from.txt");
-    expect_files_equal("build/test/pipe-to.txt", "test/data/pipe-to.txt");
-    EXPECT_EQ(unlink("build/test/env.txt"), 0);
-    EXPECT_EQ(unlink("build/test/crlf.txt"), 0);
-    EXPECT_EQ(unlink("build/test/thai-utf8.txt"), 0);
-    EXPECT_EQ(unlink("build/test/pipe-from.txt"), 0);
-    EXPECT_EQ(unlink("build/test/pipe-to.txt"), 0);
+    const char *outfiles[] = {
+        "env.txt",
+        "crlf.txt",
+        "thai-utf8.txt",
+        "pipe-from.txt",
+        "pipe-to.txt",
+    };
+
+    // Check that files created by configs have expected contents
+    FOR_EACH_I(i, outfiles) {
+        char out[64], ref[64];
+        xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
+        xsnprintf(ref, sizeof ref, "test/data/%s", outfiles[i]);
+        expect_files_equal(out, ref);
+        EXPECT_EQ(unlink(out), 0);
+    }
 
     if (encoding_supported_by_iconv("TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
