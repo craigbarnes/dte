@@ -305,20 +305,18 @@ char *editor_file(const char *name)
     return xasprintf("%s/%s", editor.user_config_dir, name);
 }
 
-char get_confirmation(const char *choices, const char *format, ...)
+char get_confirmation(const char *choices, const char *prompt)
 {
-    char buf[4096];
-    va_list ap;
-    va_start(ap, format);
-    vsnprintf(buf, sizeof(buf), format, ap);
-    va_end(ap);
+    char buf[256];
+    size_t pos = strlen(prompt);
+    size_t nr_choices = strlen(choices);
+    BUG_ON(pos + (nr_choices * 2) + 4 >= sizeof(buf));
 
-    size_t pos = strlen(buf);
+    memcpy(buf, prompt, pos);
     buf[pos++] = ' ';
     buf[pos++] = '[';
 
     unsigned char def = 0;
-    const size_t nr_choices = strlen(choices);
     for (size_t i = 0; i < nr_choices; i++) {
         if (ascii_isupper(choices[i])) {
             def = ascii_tolower(choices[i]);
