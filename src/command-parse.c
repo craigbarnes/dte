@@ -123,13 +123,13 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
     char *value;
     if (expand_builtin_env(name, &value)) {
         if (value != NULL) {
-            string_append_str(buf, value);
+            string_append_cstring(buf, value);
             free(value);
         }
     } else {
         const char *val = getenv(name);
         if (val != NULL) {
-            string_append_str(buf, val);
+            string_append_cstring(buf, val);
         }
     }
 

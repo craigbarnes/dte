@@ -114,12 +114,12 @@ static void do_collect_files (
 
         String buf = STRING_INIT;
         if (dirprefix[0]) {
-            string_append_str(&buf, dirprefix);
+            string_append_cstring(&buf, dirprefix);
             if (!str_has_suffix(dirprefix, "/")) {
                 string_append_byte(&buf, '/');
             }
         }
-        string_append_str(&buf, name);
+        string_append_cstring(&buf, name);
         if (is_dir) {
             string_append_byte(&buf, '/');
         }

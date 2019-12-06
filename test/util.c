@@ -271,7 +271,7 @@ static void test_string(void)
     EXPECT_EQ(s.len, 4);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAF");
 
-    string_append_str(&s, "test");
+    string_append_cstring(&s, "test");
     EXPECT_EQ(s.len, 8);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAFtest");
 

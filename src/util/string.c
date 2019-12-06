@@ -67,9 +67,14 @@ void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
     memcpy(s->buffer + pos, buf, len);
 }
 
-void string_append_str(String *s, const char *str)
+void string_append_cstring(String *s, const char *cstr)
 {
-    string_append_buf(s, str, strlen(str));
+    string_append_buf(s, cstr, strlen(cstr));
+}
+
+void string_append_string(String *s1, const String *s2)
+{
+    string_append_buf(s1, s2->buffer, s2->len);
 }
 
 void string_append_string_view(String *s, const StringView *sv)
