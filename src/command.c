@@ -690,7 +690,7 @@ static void cmd_open(const CommandArgs *a)
             lookup_encoding(requested_encoding) != UTF8
             && !encoding_supported_by_iconv(requested_encoding)
         ) {
-            error_msg("Unsupported encoding %s", requested_encoding);
+            error_msg("Unsupported encoding: '%s'", requested_encoding);
             return;
         }
         encoding = encoding_from_name(requested_encoding);

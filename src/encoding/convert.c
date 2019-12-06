@@ -317,6 +317,9 @@ void cconv_free(struct cconv *c)
 
 bool encoding_supported_by_iconv(const char *encoding)
 {
+    if (encoding[0] == '\0') {
+        return false;
+    }
     iconv_t cd = iconv_open("UTF-8", encoding);
     if (cd == (iconv_t) -1) {
         return false;
