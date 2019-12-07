@@ -69,17 +69,22 @@ static void do_selection(SelectionType sel)
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
 }
 
-static void handle_select_chars_flag(const char *pf)
+static bool has_flag(const CommandArgs *a, int flag)
 {
-    do_selection(strchr(pf, 'c') ? SELECT_CHARS : SELECT_NONE);
+    return !!strchr(a->flags, flag);
 }
 
-static void handle_select_chars_or_lines_flags(const char *pf)
+static void handle_select_chars_flag(const CommandArgs *a)
+{
+    do_selection(has_flag(a, 'c') ? SELECT_CHARS : SELECT_NONE);
+}
+
+static void handle_select_chars_or_lines_flags(const CommandArgs *a)
 {
     SelectionType sel = SELECT_NONE;
-    if (strchr(pf, 'l')) {
+    if (has_flag(a, 'l')) {
         sel = SELECT_LINES;
-    } else if (strchr(pf, 'c')) {
+    } else if (has_flag(a, 'c')) {
         sel = SELECT_CHARS;
     }
     do_selection(sel);
@@ -128,8 +133,8 @@ static void cmd_bof(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_bol(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
-    if (strchr(a->flags, 's')) {
+    handle_select_chars_flag(a);
+    if (has_flag(a, 's')) {
         move_bol_smart();
     } else {
         move_bol();
@@ -366,7 +371,7 @@ static void cmd_delete_word(const CommandArgs *a)
 
 static void cmd_down(const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(a->flags);
+    handle_select_chars_or_lines_flags(a);
     move_down(1);
 }
 
@@ -377,7 +382,7 @@ static void cmd_eof(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_eol(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
+    handle_select_chars_flag(a);
     move_eol();
 }
 
@@ -528,7 +533,7 @@ static void cmd_include(const CommandArgs *a)
 static void cmd_insert(const CommandArgs *a)
 {
     const char *str = a->args[0];
-    if (strchr(a->flags, 'k')) {
+    if (has_flag(a, 'k')) {
         for (size_t i = 0; str[i]; i++) {
             insert_ch(str[i]);
         }
@@ -543,7 +548,7 @@ static void cmd_insert(const CommandArgs *a)
     }
     buffer_replace_bytes(del_len, str, ins_len);
 
-    if (strchr(a->flags, 'm')) {
+    if (has_flag(a, 'm')) {
         block_iter_skip_bytes(&view->cursor, ins_len);
     }
 }
@@ -566,7 +571,7 @@ static void cmd_join(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_left(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
+    handle_select_chars_flag(a);
     move_cursor_left();
 }
 
@@ -772,7 +777,7 @@ static void cmd_paste(const CommandArgs *a)
 
 static void cmd_pgdown(const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(a->flags);
+    handle_select_chars_or_lines_flags(a);
 
     long margin = window_get_scroll_margin(window);
     long bottom = view->vy + window->edit_h - 1 - margin;
@@ -788,7 +793,7 @@ static void cmd_pgdown(const CommandArgs *a)
 
 static void cmd_pgup(const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(a->flags);
+    handle_select_chars_or_lines_flags(a);
 
     long margin = window_get_scroll_margin(window);
     long top = view->vy + margin;
@@ -996,7 +1001,7 @@ static void cmd_replace(const CommandArgs *a)
 
 static void cmd_right(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
+    handle_select_chars_flag(a);
     move_cursor_right();
 }
 
@@ -1716,7 +1721,7 @@ static void cmd_unselect(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_up(const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(a->flags);
+    handle_select_chars_or_lines_flags(a);
     move_up(1);
 }
 
@@ -1775,16 +1780,16 @@ static void cmd_wnext(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_word_bwd(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
-    bool skip_non_word = strchr(a->flags, 's');
+    handle_select_chars_flag(a);
+    bool skip_non_word = has_flag(a, 's');
     word_bwd(&view->cursor, skip_non_word);
     view_reset_preferred_x(view);
 }
 
 static void cmd_word_fwd(const CommandArgs *a)
 {
-    handle_select_chars_flag(a->flags);
-    bool skip_non_word = strchr(a->flags, 's');
+    handle_select_chars_flag(a);
+    bool skip_non_word = has_flag(a, 's');
     word_fwd(&view->cursor, skip_non_word);
     view_reset_preferred_x(view);
 }
