@@ -290,12 +290,15 @@ are opened.
 :   Interpret _filetype_ argument as a regex pattern instead of a
     filetype and match against full filenames
 
-### **include** [**-b**] _file_
+### **include** [**-bq**] _file_
 
 Read and execute commands from _file_.
 
 `-b`
 :   Read built-in _file_ instead of reading from the filesystem
+
+`-q`
+:   Don't show an error message if _file_ doesn't exist
 
 Note: "built-in files" are config files bundled into the program binary.
 See the `-B` and `-b` flags in the `dte` man page for more information.

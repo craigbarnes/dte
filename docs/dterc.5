@@ -25,7 +25,7 @@ Configuration Commands:
 .br
    \fBoption\fR [\fB\-r\fR] \fIfiletype\fR \fIoption\fR \fIvalue\fR...
 .br
-   \fBinclude\fR [\fB\-b\fR] \fIfile\fR
+   \fBinclude\fR [\fB\-bq\fR] \fIfile\fR
 .br
    \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message]...
 .br
@@ -653,13 +653,17 @@ Interpret \fIfiletype\fR argument as a regex pattern instead of a
 filetype and match against full filenames
 .PP
 .RE
-\fBinclude\fR [\fB\-b\fR] \fIfile\fR
+\fBinclude\fR [\fB\-bq\fR] \fIfile\fR
 .RS
 Read and execute commands from \fIfile\fR.
 .P
 .TP
 \fB\-b\fR
 Read built\-in \fIfile\fR instead of reading from the filesystem
+.PP
+.TP
+\fB\-q\fR
+Don't show an error message if \fIfile\fR doesn't exist
 .PP
 Note: "built\-in files" are config files bundled into the program binary.
 See the \fB\-B\fR and \fB\-b\fR flags in the \fBdte\fR(1) man page for more information.

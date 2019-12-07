@@ -524,8 +524,15 @@ static void cmd_hi(const CommandArgs *a)
 static void cmd_include(const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
-    if (a->flags[0] == 'b') {
-        flags |= CFG_BUILTIN;
+    for (const char *pf = a->flags; *pf; pf++) {
+        switch (*pf) {
+        case 'b':
+            flags |= CFG_BUILTIN;
+            break;
+        case 'q':
+            flags &= ~CFG_MUST_EXIST;
+            break;
+        }
     }
     read_config(&commands, a->args[0], flags);
 }
@@ -1963,7 +1970,7 @@ static const Command cmds[] = {
     {"ft", "-bcfi", 2, -1, cmd_ft},
     {"git-open", "", 0, 0, cmd_git_open},
     {"hi", "-", 0, -1, cmd_hi},
-    {"include", "b", 1, 1, cmd_include},
+    {"include", "bq", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
     {"insert-builtin", "", 1, 1, cmd_insert_builtin},
     {"join", "", 0, 0, cmd_join},
