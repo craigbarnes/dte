@@ -84,7 +84,7 @@ void test_exec_config(void)
         "pipe-to.txt",
     };
 
-    // Check that files created by configs have expected contents
+    // Check that files created by test configs have expected contents
     FOR_EACH_I(i, outfiles) {
         char out[64], ref[64];
         xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
@@ -96,5 +96,24 @@ void test_exec_config(void)
     if (encoding_supported_by_iconv("TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
         EXPECT_EQ(unlink("build/test/thai-tis620.txt"), 0);
+    }
+
+    const char *builtins[] = {
+        "config/rc",
+        "config/color/reset",
+        "config/color/reset-basic",
+    };
+
+    // Check that built-in configs are identical to their source files
+    FOR_EACH_I(i, builtins) {
+        const char *path = builtins[i];
+        const char *name = path + STRLEN("config/");
+        const BuiltinConfig *cfg = get_builtin_config(name);
+        ASSERT_NONNULL(cfg);
+        char *src;
+        ssize_t size = read_file(path, &src);
+        ASSERT_EQ(size, cfg->text.length);
+        EXPECT_EQ(memcmp(src, cfg->text.data, size), 0);
+        free(src);
     }
 }
