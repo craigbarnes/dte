@@ -6,6 +6,7 @@
 #endif
 
 #define STRLEN(x) (sizeof("" x "") - 1)
+#define STRN(x) x,STRLEN(x)
 #define PASTE(a, b) a##b
 #define XPASTE(a, b) PASTE(a, b)
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

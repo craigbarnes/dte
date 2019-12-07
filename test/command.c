@@ -6,17 +6,13 @@
 
 static void test_parse_command_arg(void)
 {
-    #define PARSE_ARG_LITERAL(s) parse_command_arg(s, STRLEN(s), false)
-
-    char *arg = PARSE_ARG_LITERAL("");
+    char *arg = parse_command_arg("", 0, false);
     EXPECT_STREQ(arg, "");
     free(arg);
 
-    arg = PARSE_ARG_LITERAL("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\tbar");
+    arg = parse_command_arg(STRN("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\tbar"), false);
     EXPECT_STREQ(arg, "\xE1\x92\x8AxyzfooZ;");
     free(arg);
-
-    #undef PARSE_ARG_LITERAL
 }
 
 static void test_parse_commands(void)

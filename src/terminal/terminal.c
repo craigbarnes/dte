@@ -9,8 +9,6 @@
 #include "../util/macros.h"
 #include "../util/str-util.h"
 
-#define S(str) str,STRLEN(str)
-
 typedef enum {
     TERM_OTHER,
     TERM_LINUX,
@@ -29,14 +27,14 @@ static TerminalType get_term_type(const char *term)
         uint8_t name_len;
         uint8_t type;
     } builtin_terminals[] = {
-        {S("xterm-kitty"), TERM_KITTY},
-        {S("xterm"), TERM_XTERM},
-        {S("st"), TERM_ST},
-        {S("stterm"), TERM_ST},
-        {S("tmux"), TERM_TMUX},
-        {S("screen"), TERM_SCREEN},
-        {S("linux"), TERM_LINUX},
-        {S("rxvt-unicode"), TERM_URXVT},
+        {STRN("xterm-kitty"), TERM_KITTY},
+        {STRN("xterm"), TERM_XTERM},
+        {STRN("st"), TERM_ST},
+        {STRN("stterm"), TERM_ST},
+        {STRN("tmux"), TERM_TMUX},
+        {STRN("screen"), TERM_SCREEN},
+        {STRN("linux"), TERM_LINUX},
+        {STRN("rxvt-unicode"), TERM_URXVT},
     };
     const size_t term_len = strlen(term);
     for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
