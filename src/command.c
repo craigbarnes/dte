@@ -157,16 +157,14 @@ static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_case(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     int mode = 't';
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'l':
         case 'u':
             mode = *pf;
             break;
         }
-        pf++;
     }
     change_case(mode);
 }
@@ -220,11 +218,10 @@ static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_close(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool force = false;
     bool allow_quit = false;
     bool allow_wclose = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'f':
             force = true;
@@ -236,7 +233,6 @@ static void cmd_close(const CommandArgs *a)
             allow_wclose = true;
             break;
         }
-        pf++;
     }
 
     if (!view_can_close(view) && !force) {
@@ -272,9 +268,8 @@ static void cmd_command(const CommandArgs *a)
 
 static void cmd_compile(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     SpawnFlags flags = SPAWN_DEFAULT;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case '1':
             flags |= SPAWN_READ_STDOUT;
@@ -286,7 +281,6 @@ static void cmd_compile(const CommandArgs *a)
             flags |= SPAWN_QUIET;
             break;
         }
-        pf++;
     }
 
     const char *name = a->args[0];
@@ -463,9 +457,8 @@ static void cmd_filter(const CommandArgs *a)
 
 static void cmd_ft(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     FileDetectionType dt = FT_EXTENSION;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             dt = FT_BASENAME;
@@ -480,7 +473,6 @@ static void cmd_ft(const CommandArgs *a)
             dt = FT_INTERPRETER;
             break;
         }
-        pf++;
     }
 
     char **args = a->args;
@@ -643,16 +635,14 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     char dir = 0;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'n':
         case 'p':
             dir = *pf;
             break;
         }
-        pf++;
     }
 
     if (dir == 'n') {
@@ -677,10 +667,9 @@ static void cmd_next(const CommandArgs* UNUSED_ARG(a))
 static void cmd_open(const CommandArgs *a)
 {
     char **args = a->args;
-    const char *pf = a->flags;
     const char *requested_encoding = NULL;
     bool use_glob = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'e':
             requested_encoding = *args++;
@@ -689,7 +678,6 @@ static void cmd_open(const CommandArgs *a)
             use_glob = args[0] ? true : false;
             break;
         }
-        pf++;
     }
 
     Encoding encoding = {
@@ -816,11 +804,10 @@ static void cmd_pgup(const CommandArgs *a)
 
 static void cmd_pipe_from(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool strip_nl = false;
     bool move = false;
-    while (*pf) {
-        switch (*pf++) {
+    for (const char *pf = a->flags; *pf; pf++) {
+        switch (*pf) {
         case 'm':
             move = true;
             break;
@@ -893,10 +880,9 @@ static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_quit(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool prompt = false;
-    while (*pf) {
-        switch (*pf++) {
+    for (const char *pf = a->flags; *pf; pf++) {
+        switch (*pf) {
         case 'f':
             editor.status = EDITOR_EXITING;
             return;
@@ -985,10 +971,9 @@ static void cmd_repeat(const CommandArgs *a)
 
 static void cmd_replace(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     unsigned int flags = 0;
-    for (size_t i = 0; pf[i]; i++) {
-        switch (pf[i]) {
+    for (const char *pf = a->flags; *pf; pf++) {
+        switch (*pf) {
         case 'b':
             flags |= REPLACE_BASIC;
             break;
@@ -1014,10 +999,9 @@ static void cmd_right(const CommandArgs *a)
 
 static void cmd_run(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool prompt = false;
     bool quiet = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'p':
             prompt = true;
@@ -1026,7 +1010,6 @@ static void cmd_run(const CommandArgs *a)
             quiet = true;
             break;
         }
-        pf++;
     }
     spawn(a->args, quiet, prompt);
 }
@@ -1041,7 +1024,6 @@ static bool stat_changed(const struct stat *const a, const struct stat *const b)
 
 static void cmd_save(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     char **args = a->args;
     char *absolute = buffer->abs_filename;
     Encoding encoding = buffer->encoding;
@@ -1053,7 +1035,7 @@ static void cmd_save(const CommandArgs *a)
     struct stat st;
     bool new_locked = false;
 
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'd':
             newline = NEWLINE_DOS;
@@ -1071,7 +1053,6 @@ static void cmd_save(const CommandArgs *a)
             newline = NEWLINE_UNIX;
             break;
         }
-        pf++;
     }
 
     if (requested_encoding) {
@@ -1287,14 +1268,13 @@ static void cmd_scroll_up(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_search(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     char *pattern = a->args[0];
     bool history = true;
     char cmd = 0;
     bool w = false;
     SearchDirection dir = SEARCH_FWD;
 
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'H':
             history = false;
@@ -1314,7 +1294,6 @@ static void cmd_search(const CommandArgs *a)
             }
             break;
         }
-        pf++;
     }
 
     if (w) {
@@ -1356,12 +1335,11 @@ static void cmd_search(const CommandArgs *a)
 
 static void cmd_select(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     SelectionType sel = SELECT_CHARS;
     bool block = false;
     bool keep = false;
 
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             block = true;
@@ -1374,7 +1352,6 @@ static void cmd_select(const CommandArgs *a)
             sel = SELECT_LINES;
             break;
         }
-        pf++;
     }
 
     view->next_movement_cancels_selection = false;
@@ -1406,10 +1383,9 @@ static void cmd_select(const CommandArgs *a)
 
 static void cmd_set(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool global = false;
     bool local = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'g':
             global = true;
@@ -1418,7 +1394,6 @@ static void cmd_set(const CommandArgs *a)
             local = true;
             break;
         }
-        pf++;
     }
 
     // You can set only global values in config file
@@ -1689,10 +1664,9 @@ static void cmd_title(const CommandArgs *a)
 
 static void cmd_toggle(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool global = false;
     bool verbose = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'g':
             global = true;
@@ -1701,7 +1675,6 @@ static void cmd_toggle(const CommandArgs *a)
             verbose = true;
             break;
         }
-        pf++;
     }
 
     const char *option_name = a->args[0];
@@ -1829,9 +1802,8 @@ static void cmd_wresize(const CommandArgs *a)
         return;
     }
 
-    const char *pf = a->flags;
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'h':
             dir = RESIZE_DIRECTION_HORIZONTAL;
@@ -1840,7 +1812,6 @@ static void cmd_wresize(const CommandArgs *a)
             dir = RESIZE_DIRECTION_VERTICAL;
             break;
         }
-        pf++;
     }
 
     const char *arg = a->args[0];
@@ -1864,12 +1835,11 @@ static void cmd_wresize(const CommandArgs *a)
 
 static void cmd_wsplit(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool before = false;
     bool vertical = false;
     bool root = false;
 
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             // Add new window before current window
@@ -1884,7 +1854,6 @@ static void cmd_wsplit(const CommandArgs *a)
             root = true;
             break;
         }
-        pf++;
     }
 
     Frame *f;
