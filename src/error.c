@@ -8,7 +8,6 @@
 static char error_buf[256];
 static unsigned int nr_errors;
 static bool msg_is_error;
-static bool supress_errors;
 
 void clear_error(void)
 {
@@ -17,10 +16,6 @@ void clear_error(void)
 
 void error_msg(const char *format, ...)
 {
-    if (supress_errors) {
-        return;
-    }
-
     int pos = 0;
     if (config_file) {
         if (current_command) {
@@ -77,14 +72,4 @@ const char *get_msg(bool *is_error)
 unsigned int get_nr_errors(void)
 {
     return nr_errors;
-}
-
-void suppress_error_msg(void)
-{
-    supress_errors = true;
-}
-
-void unsuppress_error_msg(void)
-{
-    supress_errors = false;
 }
