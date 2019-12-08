@@ -49,6 +49,8 @@ static void test_find_ft_filename(void)
         {".gitmodules", "ini"},
         {".jshintrc", "json"},
         {".zshrc", "sh"},
+        {".XCompose", "config"},
+        {".tmux.conf", "config"},
         {"zshrc", "sh"},
         {"file.flatpakref", "ini"},
         {"file.flatpakrepo", "ini"},
