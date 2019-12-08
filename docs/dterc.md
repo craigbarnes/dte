@@ -456,12 +456,15 @@ Move current tab to position _N_ or 1 position left or right.
 
 ## Window Management Commands
 
-### **wsplit** [**-bhr**] [_file_]...
+### **wsplit** [**-bghr**] [_filename_]...
 
 Like `open` but at first splits current window vertically.
 
 `-b`
 :   Add new window before current instead of after.
+
+`-g`
+:   Perform [`glob`] expansion on _filename_.
 
 `-h`
 :   Split horizontally instead of vertically.

@@ -68,7 +68,7 @@ Buffer Management Commands:
 .P
 Window Management Commands:
 .br
-   \fBwsplit\fR [\fB\-bhr\fR] [\fIfile\fR]...
+   \fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
 .br
    \fBwclose\fR [\fB\-f\fR]
 .br
@@ -859,13 +859,17 @@ Move current tab to position \fIN\fR or 1 position left or right.
 .P
 .RE
 .SS Window Management Commands
-\fBwsplit\fR [\fB\-bhr\fR] [\fIfile\fR]...
+\fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
 .RS
 Like \fBopen\fR but at first splits current window vertically.
 .P
 .TP
 \fB\-b\fR
 Add new window before current instead of after.
+.PP
+.TP
+\fB\-g\fR
+Perform \fBglob\fR(3) expansion on \fIfilename\fR.
 .PP
 .TP
 \fB\-h\fR

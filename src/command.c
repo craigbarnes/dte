@@ -1858,14 +1858,18 @@ static void cmd_wresize(const CommandArgs *a)
 static void cmd_wsplit(const CommandArgs *a)
 {
     bool before = false;
+    bool use_glob = false;
     bool vertical = false;
     bool root = false;
-
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             // Add new window before current window
             before = true;
+            break;
+        case 'g':
+            // Perform glob(3) expansion on arguments
+            use_glob = !!a->args[0];
             break;
         case 'h':
             // Split horizontally to get vertical layout
@@ -1876,6 +1880,15 @@ static void cmd_wsplit(const CommandArgs *a)
             root = true;
             break;
         }
+    }
+
+    char **paths = a->args;
+    glob_t globbuf;
+    if (use_glob) {
+        if (!xglob(a->args, &globbuf)) {
+            return;
+        }
+        paths = globbuf.gl_pathv;
     }
 
     Frame *f;
@@ -1891,12 +1904,16 @@ static void cmd_wsplit(const CommandArgs *a)
     buffer = NULL;
     mark_everything_changed();
 
-    if (a->args[0]) {
-        window_open_files(window, a->args, NULL);
+    if (paths[0]) {
+        window_open_files(window, paths, NULL);
     } else {
         View *new = window_add_buffer(window, save->buffer);
         new->cursor = save->cursor;
         set_view(new);
+    }
+
+    if (use_glob) {
+        globfree(&globbuf);
     }
 
     if (window->views.count == 0) {
@@ -2014,7 +2031,7 @@ static const Command cmds[] = {
     {"wprev", "", 0, 0, cmd_wprev},
     {"wrap-paragraph", "", 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", 0, 1, cmd_wresize},
-    {"wsplit", "bhr", 0, -1, cmd_wsplit},
+    {"wsplit", "bghr", 0, -1, cmd_wsplit},
     {"wswap", "", 0, 0, cmd_wswap},
 };
 
