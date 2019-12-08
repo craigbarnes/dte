@@ -128,6 +128,7 @@ static void cmd_bind(const CommandArgs *a)
 
 static void cmd_bof(const CommandArgs* UNUSED_ARG(a))
 {
+    do_selection(SELECT_NONE);
     move_bof();
 }
 
@@ -371,6 +372,7 @@ static void cmd_down(const CommandArgs *a)
 
 static void cmd_eof(const CommandArgs* UNUSED_ARG(a))
 {
+    do_selection(SELECT_NONE);
     move_eof();
 }
 
@@ -583,6 +585,8 @@ static void cmd_line(const CommandArgs *a)
         error_msg("Invalid line number: %s", arg);
         return;
     }
+
+    do_selection(SELECT_NONE);
     move_to_line(view, line);
     move_to_preferred_x(x);
 }
@@ -645,6 +649,7 @@ static void cmd_msg(const CommandArgs *a)
         }
     }
 
+    do_selection(SELECT_NONE);
     if (dir == 'n') {
         activate_next_message();
     } else if (dir == 'p') {
@@ -1308,6 +1313,8 @@ static void cmd_search(const CommandArgs *a)
         free(word);
     }
 
+    do_selection(SELECT_NONE);
+
     if (pattern) {
         search_set_direction(dir);
         search_set_regexp(pattern);
@@ -1596,6 +1603,8 @@ static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_tag(const CommandArgs *a)
 {
+    do_selection(SELECT_NONE);
+
     if (a->flags[0] == 'r') {
         pop_file_location();
         return;
