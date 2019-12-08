@@ -669,6 +669,22 @@ static void cmd_next(const CommandArgs* UNUSED_ARG(a))
     set_view(ptr_array_next(&window->views, view));
 }
 
+static bool xglob(char **args, glob_t *globbuf)
+{
+    BUG_ON(!args);
+    BUG_ON(!*args);
+    int err = glob(*args, GLOB_NOCHECK, NULL, globbuf);
+    while (err == 0 && *++args) {
+        err = glob(*args, GLOB_NOCHECK | GLOB_APPEND, NULL, globbuf);
+    }
+    if (likely(err == 0 && globbuf->gl_pathc > 0)) {
+        return true;
+    }
+    error_msg("glob: %s", (err == GLOB_NOSPACE) ? strerror(ENOMEM) : "failed");
+    globfree(globbuf);
+    return false;
+}
+
 static void cmd_open(const CommandArgs *a)
 {
     char **args = a->args;
@@ -704,13 +720,10 @@ static void cmd_open(const CommandArgs *a)
     char **paths = args;
     glob_t globbuf;
     if (use_glob) {
-        int err = glob(args[0], GLOB_NOCHECK, NULL, &globbuf);
-        while (err == 0 && *++args) {
-            err = glob(*args, GLOB_NOCHECK | GLOB_APPEND, NULL, &globbuf);
+        if (!xglob(args, &globbuf)) {
+            return;
         }
-        if (globbuf.gl_pathc > 0) {
-            paths = globbuf.gl_pathv;
-        }
+        paths = globbuf.gl_pathv;
     }
 
     if (!paths[0]) {
