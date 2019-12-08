@@ -106,6 +106,18 @@ static inline bool string_view_has_prefix_icase (
 }
 
 NONNULL_ARGS
+static inline bool string_view_isblank(StringView *sv)
+{
+    const char *data = sv->data;
+    const size_t len = sv->length;
+    size_t i = 0;
+    while (i < len && ascii_isblank(data[i])) {
+        i++;
+    }
+    return (i == len);
+}
+
+NONNULL_ARGS
 static inline void *string_view_memchr(const StringView *sv, int c)
 {
     return memchr(sv->data, c, sv->length);

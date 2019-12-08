@@ -782,6 +782,70 @@ static void cmd_option(const CommandArgs *a)
     } while (comma);
 }
 
+static void cmd_blkdown(const CommandArgs *a)
+{
+    handle_select_chars_or_lines_flags(a);
+
+    // If current line is blank, skip past consecutive blank lines
+    StringView line;
+    fetch_this_line(&view->cursor, &line);
+    if (string_view_isblank(&line)) {
+        while (block_iter_next_line(&view->cursor)) {
+            fill_line_ref(&view->cursor, &line);
+            if (!string_view_isblank(&line)) {
+                break;
+            }
+        }
+    }
+
+    // Skip past non-blank lines
+    while (block_iter_next_line(&view->cursor)) {
+        fill_line_ref(&view->cursor, &line);
+        if (string_view_isblank(&line)) {
+            break;
+        }
+    }
+
+    // If we reach the last populated line in the buffer, move down one line
+    BlockIter tmp = view->cursor;
+    block_iter_eol(&tmp);
+    block_iter_skip_bytes(&tmp, 1);
+    if (block_iter_is_eof(&tmp)) {
+        view->cursor = tmp;
+    }
+}
+
+static void cmd_blkup(const CommandArgs *a)
+{
+    handle_select_chars_or_lines_flags(a);
+
+    // If cursor is on the first line, just move to bol
+    if (view->cy == 0) {
+        block_iter_bol(&view->cursor);
+        return;
+    }
+
+    // If current line is blank, skip past consecutive blank lines
+    StringView line;
+    fetch_this_line(&view->cursor, &line);
+    if (string_view_isblank(&line)) {
+        while (block_iter_prev_line(&view->cursor)) {
+            fill_line_ref(&view->cursor, &line);
+            if (!string_view_isblank(&line)) {
+                break;
+            }
+        }
+    }
+
+    // Skip past non-blank lines
+    while (block_iter_prev_line(&view->cursor)) {
+        fill_line_ref(&view->cursor, &line);
+        if (string_view_isblank(&line)) {
+            break;
+        }
+    }
+}
+
 static void cmd_paste(const CommandArgs *a)
 {
     bool at_cursor = a->flags[0] == 'c';
@@ -1950,6 +2014,8 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 static const Command cmds[] = {
     {"alias", "", 2, 2, cmd_alias},
     {"bind", "", 1, 2, cmd_bind},
+    {"blkdown", "cl", 0, 0, cmd_blkdown},
+    {"blkup", "cl", 0, 0, cmd_blkup},
     {"bof", "", 0, 0, cmd_bof},
     {"bol", "cs", 0, 0, cmd_bol},
     {"bolsf", "", 0, 0, cmd_bolsf},
