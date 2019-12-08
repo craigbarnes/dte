@@ -340,6 +340,17 @@ static void test_string_view(void)
     EXPECT_TRUE(string_view_equal_literal(&sv5, "foobar"));
     EXPECT_TRUE(string_view_has_literal_prefix(&sv5, "foo"));
     EXPECT_FALSE(string_view_equal_cstr(&sv5, "foo"));
+
+    StringView sv6 = string_view_from_cstring("\t  \t\t ");
+    EXPECT_TRUE(string_view_isblank(&sv6));
+    sv6.length = 0;
+    EXPECT_TRUE(string_view_isblank(&sv6));
+    sv6 = string_view_from_cstring("    \t .  ");
+    EXPECT_FALSE(string_view_isblank(&sv6));
+    sv6 = string_view_from_cstring("\n");
+    EXPECT_FALSE(string_view_isblank(&sv6));
+    sv6 = string_view_from_cstring("  \r ");
+    EXPECT_FALSE(string_view_isblank(&sv6));
 }
 
 static void test_size_str_width(void)

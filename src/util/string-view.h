@@ -106,7 +106,7 @@ static inline bool string_view_has_prefix_icase (
 }
 
 NONNULL_ARGS
-static inline bool string_view_isblank(StringView *sv)
+static inline bool string_view_isblank(const StringView *sv)
 {
     const char *data = sv->data;
     const size_t len = sv->length;
