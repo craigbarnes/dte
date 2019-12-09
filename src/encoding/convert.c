@@ -349,7 +349,7 @@ struct cconv *cconv_from_utf8(const char *encoding)
     return NULL;
 }
 
-#define FAIL() BUG("unsupported"); fatal_error(__func__, ENOTSUP)
+#define FAIL() BUG("unsupported"); fatal_error(__func__, ENOSYS)
 
 void cconv_process(struct cconv *c, const char *input, size_t len) {FAIL();}
 void cconv_flush(struct cconv *c) {FAIL();}
