@@ -600,7 +600,7 @@ static void cmd_load_syntax(const CommandArgs *a)
             error_msg("Syntax for filetype %s already loaded", filetype);
         } else {
             int err;
-            load_syntax_file(filename, true, &err);
+            load_syntax_file(filename, CFG_MUST_EXIST, &err);
         }
     } else {
         if (!find_syntax(filetype)) {
