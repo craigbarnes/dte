@@ -159,27 +159,28 @@ void u_set_char_raw(char *str, size_t *idx, CodePoint u)
 {
     size_t i = *idx;
     if (u <= 0x7f) {
-        str[i++] = u;
+        str[i] = u;
+        *idx = i + 1;
     } else if (u <= 0x7ff) {
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xc0;
-        i += 2;
+        *idx = i + 2;
     } else if (u <= 0xffff) {
         str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xe0;
-        i += 3;
+        *idx = i + 3;
     } else if (u <= 0x10ffff) {
         str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xf0;
-        i += 4;
+        *idx = i + 4;
     } else {
         // Invalid byte value
         str[i++] = u & 0xff;
+        *idx = i + 1;
     }
-    *idx = i;
 }
 
 void u_set_char(char *str, size_t *idx, CodePoint u)
@@ -189,29 +190,26 @@ void u_set_char(char *str, size_t *idx, CodePoint u)
         if (ascii_iscntrl(u)) {
             u_set_ctrl(str, idx, u);
         } else {
-            str[i++] = u;
-            *idx = i;
+            str[i] = u;
+            *idx = i + 1;
         }
     } else if (u_is_unprintable(u)) {
         u_set_hex(str, idx, u);
     } else if (u <= 0x7ff) {
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xc0;
-        i += 2;
-        *idx = i;
+        *idx = i + 2;
     } else if (u <= 0xffff) {
         str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xe0;
-        i += 3;
-        *idx = i;
+        *idx = i + 3;
     } else if (u <= 0x10ffff) {
         str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
         str[i + 0] = u | 0xf0;
-        i += 4;
-        *idx = i;
+        *idx = i + 4;
     }
 }
 
