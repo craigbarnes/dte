@@ -683,7 +683,7 @@ static void test_u_set_ctrl(void)
 
 static void test_u_prev_char(void)
 {
-    const unsigned char *buf = "深圳市";
+    const unsigned char *buf = "\xE6\xB7\xB1\xE5\x9C\xB3\xE5\xB8\x82"; // 深圳市
     size_t idx = 9;
     CodePoint c = u_prev_char(buf, &idx);
     EXPECT_EQ(c, 0x5E02);
@@ -709,7 +709,7 @@ static void test_u_prev_char(void)
     EXPECT_EQ(c, 'e');
     EXPECT_EQ(idx, 6);
 
-    buf = "🥣🥤";
+    buf = "\xF0\x9F\xA5\xA3\xF0\x9F\xA5\xA4"; // 🥣🥤
     idx = 8;
     c = u_prev_char(buf, &idx);
     EXPECT_EQ(c, 0x1F964);
@@ -739,10 +739,12 @@ static void test_u_prev_char(void)
 
 static void test_u_str_index(void)
 {
-    const char *buf = "你好，世界";
-    EXPECT_EQ(u_str_index(buf, "你好"), 0);
-    EXPECT_EQ(u_str_index(buf, "，"), 6);
-    EXPECT_EQ(u_str_index(buf, "世界"), 9);
+#if __STDC_VERSION__ >= 201112L
+    const char *buf = u8"你好，世界";
+    EXPECT_EQ(u_str_index(buf, u8"你好"), 0);
+    EXPECT_EQ(u_str_index(buf, u8"，"), 6);
+    EXPECT_EQ(u_str_index(buf, u8"世界"), 9);
+#endif
 }
 
 static void test_ptr_array(void)
