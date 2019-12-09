@@ -1,4 +1,4 @@
-run mkdir -p build/test/
+run -s mkdir -p build/test/
 cd build/test/
 insert -km "1\n2\n3\n"
 bof
@@ -46,7 +46,7 @@ refresh
 insert "hello world\n"
 repeat 2 replace l r
 right
-run true
+run -s true
 scroll-down
 scroll-pgdown
 scroll-pgup
