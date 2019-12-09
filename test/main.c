@@ -21,7 +21,7 @@ void test_syntax(void);
 void test_terminal(void);
 void test_util(void);
 void init_headless_mode(void);
-void test_exec_config(void);
+void test_config(void);
 
 static void test_relative_filename(void)
 {
@@ -132,7 +132,7 @@ int main(void)
     test_syntax();
 
     init_headless_mode();
-    test_exec_config();
+    test_config();
     test_detect_indent();
     test_handle_binding();
 

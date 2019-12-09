@@ -23,6 +23,7 @@ extern int config_line;
 void list_builtin_configs(void);
 void collect_builtin_configs(const char *prefix, bool syntaxes);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
+const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
 void exec_config(const CommandSet *cmds, const char *buf, size_t size);
 int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags f);
 int read_config(const CommandSet *cmds, const char *filename, ConfigFlags f);

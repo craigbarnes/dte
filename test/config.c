@@ -5,10 +5,13 @@
 #include "../src/config.h"
 #include "../src/debug.h"
 #include "../src/editor.h"
-#include "../src/frame.h"
 #include "../src/encoding/convert.h"
+#include "../src/error.h"
+#include "../src/frame.h"
+#include "../src/syntax/state.h"
 #include "../src/terminal/no-op.h"
 #include "../src/terminal/terminal.h"
+#include "../src/util/path.h"
 #include "../src/util/readfile.h"
 #include "../src/util/str-util.h"
 #include "../src/util/string-view.h"
@@ -43,6 +46,34 @@ void init_headless_mode(void)
     set_view(window_open_empty_buffer(window));
 }
 
+static void test_builtin_configs(void)
+{
+    size_t n;
+    const BuiltinConfig *editor_builtin_configs = get_builtin_configs_array(&n);
+    for (size_t i = 0; i < n; i++) {
+        const BuiltinConfig cfg = editor_builtin_configs[i];
+        if (str_has_prefix(cfg.name, "syntax/")) {
+            // Check that built-in syntax files load without errors
+            EXPECT_NULL(find_syntax(path_basename(cfg.name)));
+            int err;
+            ConfigFlags flags = CFG_BUILTIN | CFG_MUST_EXIST;
+            unsigned int saved_nr_errs = get_nr_errors();
+            EXPECT_NONNULL(load_syntax_file(cfg.name, flags, &err));
+            EXPECT_EQ(get_nr_errors(), saved_nr_errs);
+            EXPECT_NONNULL(find_syntax(path_basename(cfg.name)));
+        } else {
+            // Check that built-in configs are identical to their source files
+            const char *name = cfg.name;
+            char *src, *path = xasprintf("config/%s", name);
+            ssize_t size = read_file(path, &src);
+            free(path);
+            ASSERT_EQ(size, cfg.text.length);
+            EXPECT_EQ(memcmp(src, cfg.text.data, size), 0);
+            free(src);
+        }
+    }
+}
+
 static void expect_files_equal(const char *path1, const char *path2)
 {
     char *buf1;
@@ -68,9 +99,8 @@ static void expect_files_equal(const char *path1, const char *path2)
     free(buf2);
 }
 
-void test_exec_config(void)
+static void test_exec_config(void)
 {
-    ASSERT_NONNULL(window);
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
         exec_config(&commands, config.text.data, config.text.length);
@@ -97,23 +127,13 @@ void test_exec_config(void)
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
         EXPECT_EQ(unlink("build/test/thai-tis620.txt"), 0);
     }
+}
 
-    const char *builtins[] = {
-        "config/rc",
-        "config/color/reset",
-        "config/color/reset-basic",
-    };
+DISABLE_WARNING("-Wmissing-prototypes")
 
-    // Check that built-in configs are identical to their source files
-    FOR_EACH_I(i, builtins) {
-        const char *path = builtins[i];
-        const char *name = path + STRLEN("config/");
-        const BuiltinConfig *cfg = get_builtin_config(name);
-        ASSERT_NONNULL(cfg);
-        char *src;
-        ssize_t size = read_file(path, &src);
-        ASSERT_EQ(size, cfg->text.length);
-        EXPECT_EQ(memcmp(src, cfg->text.data, size), 0);
-        free(src);
-    }
+void test_config(void)
+{
+    ASSERT_NONNULL(window);
+    test_builtin_configs();
+    test_exec_config();
 }

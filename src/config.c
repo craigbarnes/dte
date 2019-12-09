@@ -101,6 +101,12 @@ const BuiltinConfig *get_builtin_config(const char *const name)
     return NULL;
 }
 
+const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
+{
+    *nconfigs = ARRAY_COUNT(builtin_configs);
+    return &builtin_configs[0];
+}
+
 int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
 {
     const bool must_exist = flags & CFG_MUST_EXIST;
