@@ -469,7 +469,7 @@ static void cmd_syntax(const CommandArgs *a)
 }
 
 static void cmd_include(const CommandArgs *a);
-static void cmd_mixin(const CommandArgs *a);
+static void cmd_require(const CommandArgs *a);
 
 static const Command cmds[] = {
     {"bufis", "i", 2, 3, cmd_bufis},
@@ -481,9 +481,9 @@ static const Command cmds[] = {
     {"include", "b", 1, 1, cmd_include},
     {"inlist", "", 2, 3, cmd_inlist},
     {"list", "i", 2, -1, cmd_list},
-    {"mixin", "b", 1, 1, cmd_mixin},
     {"noeat", "b", 1, 1, cmd_noeat},
     {"recolor", "", 1, 2, cmd_recolor},
+    {"require", "b", 1, 1, cmd_require},
     {"state", "", 1, 2, cmd_state},
     {"str", "i", 2, 3, cmd_str},
     {"syntax", "", 1, 1, cmd_syntax},
@@ -507,7 +507,7 @@ static void cmd_include(const CommandArgs *a)
     read_config(&syntax_commands, a->args[0], flags);
 }
 
-static void cmd_mixin(const CommandArgs *a)
+static void cmd_require(const CommandArgs *a)
 {
     static HashSet loaded_files;
     static HashSet loaded_builtins;

@@ -1,4 +1,4 @@
-mixin -b syntax/mixins/c-comment
+require -b syntax/inc/c-comment
 
 # Eat erroneous statement; stop at ; or \n
 syntax .css-statementerror
