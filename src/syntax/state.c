@@ -483,7 +483,7 @@ static const Command cmds[] = {
     {"list", "i", 2, -1, cmd_list},
     {"noeat", "b", 1, 1, cmd_noeat},
     {"recolor", "", 1, 2, cmd_recolor},
-    {"require", "b", 1, 1, cmd_require},
+    {"require", "f", 1, 1, cmd_require},
     {"state", "", 1, 2, cmd_state},
     {"str", "i", 2, 3, cmd_str},
     {"syntax", "", 1, 1, cmd_syntax},
@@ -516,22 +516,29 @@ static void cmd_require(const CommandArgs *a)
         hashset_init(&loaded_builtins, 8, false);
     }
 
+    char *path;
+    HashSet *set;
     ConfigFlags flags = CFG_MUST_EXIST;
-    HashSet *set = &loaded_files;
-    if (a->flags[0] == 'b') {
-        flags |= CFG_BUILTIN;
+    if (a->flags[0] == 'f') {
+        set = &loaded_files;
+        path = xstrdup(a->args[0]);
+    } else {
         set = &loaded_builtins;
+        path = xasprintf("syntax/inc/%s", a->args[0]);
+        flags |= CFG_BUILTIN;
     }
 
-    const char *path = a->args[0];
     const size_t len = strlen(path);
     if (hashset_get(set, path, len)) {
-        return;
+        goto out;
     }
 
     if (read_config(&syntax_commands, path, flags) == 0) {
         hashset_add(set, path, len);
     }
+
+out:
+    free(path);
 }
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)

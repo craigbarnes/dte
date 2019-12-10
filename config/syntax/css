@@ -1,4 +1,4 @@
-require -b syntax/inc/c-comment
+require c-comment
 
 # Eat erroneous statement; stop at ; or \n
 syntax .css-statementerror

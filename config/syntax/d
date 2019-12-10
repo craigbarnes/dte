@@ -1,4 +1,4 @@
-require -b syntax/inc/c-comment
+require c-comment
 
 syntax .d-esc
 
