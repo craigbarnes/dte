@@ -21,6 +21,9 @@
 #define USE_BUILTIN(fn, arg)
 #endif
 
+const uint8_t debruijn64[64];
+const uint8_t debruijn32[32];
+
 static inline unsigned int bit_popcount_u64(uint64_t n)
 {
     USE_BUILTIN(popcount, n);
@@ -49,7 +52,8 @@ static inline unsigned int bit_count_leading_zeros_u64(uint64_t n)
     n |= (n >> 8);
     n |= (n >> 16);
     n |= (n >> 32);
-    return bit_popcount_u64(~n);
+    n++;
+    return debruijn64[n * U64(0X022FDD63CC95386D) >> 58];
 }
 
 static inline unsigned int bit_count_leading_zeros_u32(uint32_t n)
@@ -61,7 +65,8 @@ static inline unsigned int bit_count_leading_zeros_u32(uint32_t n)
     n |= (n >> 4);
     n |= (n >> 8);
     n |= (n >> 16);
-    return bit_popcount_u32(~n);
+    n++;
+    return debruijn32[n * U32(0x076BE629) >> 27];
 }
 
 static inline unsigned int bit_count_trailing_zeros_u64(uint64_t n)

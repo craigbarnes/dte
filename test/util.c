@@ -7,6 +7,7 @@
 #include "test.h"
 #include "../src/util/ascii.h"
 #include "../src/util/bit.h"
+#include "../src/util/bit.c"
 #include "../src/util/checked-arith.h"
 #include "../src/util/hashset.h"
 #include "../src/util/path.h"
@@ -901,6 +902,7 @@ static void test_bitop(void)
     EXPECT_EQ(bit_count_leading_zeros_u64(128), 56);
     EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX), 0);
     EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX - 1), 0);
+    EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX >> 1), 1);
 
     EXPECT_EQ(bit_count_leading_zeros_u32(1), 31);
     EXPECT_EQ(bit_count_leading_zeros_u32(4), 29);
