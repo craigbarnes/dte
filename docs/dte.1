@@ -148,11 +148,11 @@ Quit
 .
 .SH COMMAND MODE
 .
-Command mode allows you to run various editor commands by using a
-language similar to Unix shell. The \fBnext\fR and \fBprev\fR commands
-switch to the next/previous file. The \fBopen\fR, \fBsave\fR and
-\fBquit\fR commands should be self\-explanatory. For a full list of
-available commands, see \fBdterc\fR(5).
+Command mode allows running various editor commands using a language
+similar to Unix shell. The \fBnext\fR and \fBprev\fR commands switch
+to the next/previous file. The \fBopen\fR, \fBsave\fR and \fBquit\fR
+commands should be self\-explanatory. For a full list of available
+commands, see \fBdterc\fR(5).
 .P
 The default key bindings for command mode are:
 .
@@ -206,8 +206,8 @@ Exit command mode
 .
 .SH SEARCH MODE
 .
-Search mode allows you to enter an extended regular expression to search
-in the current buffer.
+Search mode allows entering a regular expression to search in the
+current buffer.
 .P
 The key bindings for search mode are mostly the same as in command mode,
 plus these additional keys:
@@ -240,20 +240,20 @@ terminal support to use.
 .
 .TP
 .B $DTE_HOME/rc
-Your personal configuration file. See \fBdterc\fR(5) for a full list of
+User configuration file. See \fBdterc\fR(5) for a full list of
 available commands and options or run "dte \-b rc" to see the built\-in,
 default config.
 .
 .TP
 .B $DTE_HOME/syntax/*
-Your personal syntax files. These override the syntax files that come
+User syntax files. These override the syntax files that come
 with the program. See \fBdte\-syntax\fR(5) for more information or run
 "dte \-b syntax/dte" for a basic example.
 .
 .TP
 .B $DTE_HOME/file\-locks
-Records open files to protect you from accidentally editing files opened
-in another process. Used only if the \fBlock\-files\fR option is
+Records open files, to prevent accidentally editing files opened in
+another dte process. Used only if the \fBlock\-files\fR option is
 enabled.
 .
 .TP
