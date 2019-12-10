@@ -1,12 +1,4 @@
-syntax .css-comment
-
-state comment
-    char "*" star
-    eat this
-
-state star comment
-    char / END comment
-    noeat comment
+mixin -b syntax/mixins/c-comment
 
 # Eat erroneous statement; stop at ; or \n
 syntax .css-statementerror
@@ -238,7 +230,7 @@ state start code
     char [ .css-attributeselector:this
     char { block
     char 0-9_- .css-selectorerror:this
-    str "/*" .css-comment:this
+    str "/*" .c-comment:this
     char -b @ atrule
     eat this
 
@@ -312,7 +304,7 @@ state block code
     char -b a-zA-Z- property
     char 0-9_- property-error
     char } start
-    str "/*" .css-comment:this
+    str "/*" .c-comment:this
     eat this
 
 state property code
@@ -341,7 +333,7 @@ state values code
     str -i "url(" .css-url:this
     char -b a-zA-Z_ value
     char } start
-    str "/*" .css-comment:this
+    str "/*" .c-comment:this
     eat this
 
 state minus numeric

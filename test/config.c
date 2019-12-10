@@ -53,6 +53,9 @@ static void test_builtin_configs(void)
     for (size_t i = 0; i < n; i++) {
         const BuiltinConfig cfg = editor_builtin_configs[i];
         if (str_has_prefix(cfg.name, "syntax/")) {
+            if (str_has_prefix(cfg.name, "syntax/mixins/")) {
+                continue;
+            }
             // Check that built-in syntax files load without errors
             EXPECT_NULL(find_syntax(path_basename(cfg.name)));
             int err;

@@ -469,6 +469,7 @@ static void cmd_syntax(const CommandArgs *a)
 }
 
 static void cmd_include(const CommandArgs *a);
+static void cmd_mixin(const CommandArgs *a);
 
 static const Command cmds[] = {
     {"bufis", "i", 2, 3, cmd_bufis},
@@ -480,6 +481,7 @@ static const Command cmds[] = {
     {"include", "b", 1, 1, cmd_include},
     {"inlist", "", 2, 3, cmd_inlist},
     {"list", "i", 2, -1, cmd_list},
+    {"mixin", "b", 1, 1, cmd_mixin},
     {"noeat", "b", 1, 1, cmd_noeat},
     {"recolor", "", 1, 2, cmd_recolor},
     {"state", "", 1, 2, cmd_state},
@@ -503,6 +505,33 @@ static void cmd_include(const CommandArgs *a)
         flags |= CFG_BUILTIN;
     }
     read_config(&syntax_commands, a->args[0], flags);
+}
+
+static void cmd_mixin(const CommandArgs *a)
+{
+    static HashSet loaded_files;
+    static HashSet loaded_builtins;
+    if (!loaded_files.table_size) {
+        hashset_init(&loaded_files, 8, false);
+        hashset_init(&loaded_builtins, 8, false);
+    }
+
+    ConfigFlags flags = CFG_MUST_EXIST;
+    HashSet *set = &loaded_files;
+    if (a->flags[0] == 'b') {
+        flags |= CFG_BUILTIN;
+        set = &loaded_builtins;
+    }
+
+    const char *path = a->args[0];
+    const size_t len = strlen(path);
+    if (hashset_get(set, path, len)) {
+        return;
+    }
+
+    if (read_config(&syntax_commands, path, flags) == 0) {
+        hashset_add(set, path, len);
+    }
 }
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)

@@ -1,0 +1,9 @@
+syntax .c-comment
+
+state comment
+    char '*' star
+    eat this
+
+state star comment
+    char / END comment
+    noeat comment

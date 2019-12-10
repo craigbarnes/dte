@@ -1,3 +1,5 @@
+mixin -b syntax/mixins/c-comment
+
 syntax .c-esc
 
 # TODO: C11 Unicode escapes (e.g. "\u00ff" and "\U00ff99cc")
@@ -52,16 +54,6 @@ state char
 state char-end char
     char "'" END char
     eat END error
-
-syntax .c-comment
-
-state comment
-    char '*' star
-    eat this
-
-state star comment
-    char / END comment
-    noeat comment
 
 syntax .cpp-comment
 
