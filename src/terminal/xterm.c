@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "xterm.h"
 #include "ecma48.h"
+#include "mode.h"
 #include "output.h"
 
 void xterm_save_title(void)
