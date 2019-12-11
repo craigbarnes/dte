@@ -1,8 +1,10 @@
+#include <inttypes.h>
 #include <string.h>
 #include "key.h"
 #include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/utf8.h"
+#include "../util/xsnprintf.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char special_names[][8] = {
@@ -165,7 +167,7 @@ const char *keycode_to_string(KeyCode k)
     } else if (key == KEY_PASTE) {
         COPY(ptr, "paste");
     } else {
-        COPY(ptr, "???");
+        xsnprintf(buf, sizeof buf, "INVALID (0x%08" PRIX32 ")", k);
     }
 
     return buf;

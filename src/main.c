@@ -140,7 +140,7 @@ static void showkey_loop(void)
     while (loop) {
         KeyCode key;
         if (!term_read_key(&key)) {
-            term_add_literal("   UNKNOWN      -\r\n");
+            term_add_literal("  UNKNOWN\r\n");
             term_output_flush();
             continue;
         }
@@ -152,8 +152,7 @@ static void showkey_loop(void)
             loop = false;
             break;
         }
-        const char *str = keycode_to_string(key);
-        term_sprintf("   %-12s 0x%-12" PRIX32 "\r\n", str, key);
+        term_sprintf("  %s\r\n", keycode_to_string(key));
         term_output_flush();
     }
 
