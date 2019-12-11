@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -7,17 +8,38 @@
 #include "output.h"
 #include "terminfo.h"
 #include "xterm.h"
+#include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/macros.h"
 #include "../util/xsnprintf.h"
 
 static struct termios termios_save;
 
+static void xtcgetattr(struct termios *t)
+{
+    int ret = tcgetattr(STDIN_FILENO, t);
+    if (unlikely(ret != 0)) {
+        fatal_error("tcgetattr", errno);
+    }
+}
+
+static void xtcsetattr(const struct termios *t)
+{
+    int ret;
+    do {
+        ret = tcsetattr(STDIN_FILENO, TCSANOW, t);
+    } while (ret != 0 && errno == EINTR);
+
+    if (unlikely(ret != 0)) {
+        fatal_error("tcsetattr", errno);
+    }
+}
+
 void term_raw(void)
 {
     static bool saved;
     struct termios termios;
-    tcgetattr(STDIN_FILENO, &termios);
+    xtcgetattr(&termios);
     if (!saved) {
         termios_save = termios;
         saved = true;
@@ -40,12 +62,12 @@ void term_raw(void)
     // Read blocks until there are MIN(VMIN, requested) bytes available
     termios.c_cc[VTIME] = 0;
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &termios);
+    xtcsetattr(&termios);
 }
 
 void term_cooked(void)
 {
-    tcsetattr(STDIN_FILENO, TCSANOW, &termios_save);
+    xtcsetattr(&termios_save);
 }
 
 void ecma48_clear_screen(void)
