@@ -293,6 +293,7 @@ static void cmd_compile(const CommandArgs *a)
     clear_messages();
     spawn_compiler(a->args + 1, flags, c);
     if (message_count()) {
+        do_selection(SELECT_NONE);
         activate_current_message_save();
     }
 }
