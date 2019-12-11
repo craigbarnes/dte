@@ -265,7 +265,7 @@ loop_break:
             error_msg("Unable to read redirected stdin");
         }
         if (!freopen("/dev/tty", "r", stdin)) {
-            fputs("Cannot reopen input tty\n", stderr);
+            perror("Unable to reopen input tty");
             return 1;
         }
     }
