@@ -185,7 +185,7 @@ static void cmd_cd(const CommandArgs *a)
         }
     }
     if (chdir(dir)) {
-        error_msg("cd: %s", strerror(errno));
+        perror_msg("cd");
         return;
     }
 
@@ -1513,7 +1513,7 @@ static void cmd_setenv(const CommandArgs *a)
             error_msg("Invalid environment variable name '%s'", args[0]);
             break;
         default:
-            error_msg("%s", strerror(errno));
+            perror_msg("setenv");
         }
     }
 }
@@ -1641,7 +1641,7 @@ static void cmd_show(const CommandArgs *a)
     char tmp[32] = "/tmp/.dte.XXXXXX";
     int fd = mkstemp(tmp);
     if (fd < 0) {
-        error_msg("mkstemp() failed: %s", strerror(errno));
+        perror_msg("mkstemp");
         return;
     }
 
@@ -1663,7 +1663,7 @@ static void cmd_show(const CommandArgs *a)
     close(fd);
     string_free(&s);
     if (rc < 0) {
-        error_msg("write() failed: %s", strerror(err));
+        error_msg("write: %s", strerror(err));
         unlink(tmp);
         return;
     }

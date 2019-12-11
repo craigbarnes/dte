@@ -287,7 +287,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
         if (bom) {
             size = bom->len;
             if (xwrite(enc->fd, bom->bytes, size) < 0) {
-                error_msg("Write error: %s", strerror(errno));
+                perror_msg("write");
                 return -1;
             }
         }
@@ -297,7 +297,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
     block_for_each(blk, &b->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
-            error_msg("Write error: %s", strerror(errno));
+            perror_msg("write");
             return -1;
         }
         size += rc;
@@ -313,7 +313,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
 
     // Need to truncate if writing to existing file
     if (ftruncate(enc->fd, size)) {
-        error_msg("Truncate failed: %s", strerror(errno));
+        perror_msg("ftruncate");
         return -1;
     }
     return 0;
@@ -362,7 +362,7 @@ int save_buffer (
         }
         fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY, mode);
         if (fd < 0) {
-            error_msg("Error opening file: %s", strerror(errno));
+            perror_msg("open");
             return -1;
         }
     }
@@ -370,7 +370,7 @@ int save_buffer (
     enc = new_file_encoder(encoding, newline, fd);
     if (enc == NULL) {
         // This should never happen because encoding is validated early
-        error_msg("iconv_open: %s", strerror(errno));
+        perror_msg("iconv_open");
         close(fd);
         goto error;
     }
@@ -379,11 +379,11 @@ int save_buffer (
         goto error;
     }
     if (close(fd)) {
-        error_msg("Close failed: %s", strerror(errno));
+        perror_msg("close");
         goto error;
     }
     if (*tmp && rename(tmp, filename)) {
-        error_msg("Rename failed: %s", strerror(errno));
+        perror_msg("rename");
         goto error;
     }
     free_file_encoder(enc);

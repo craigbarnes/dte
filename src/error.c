@@ -1,5 +1,7 @@
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include "error.h"
 #include "command.h"
 #include "config.h"
@@ -52,6 +54,11 @@ void error_msg(const char *format, ...)
         fputs(error_buf, stderr);
         fputc('\n', stderr);
     }
+}
+
+void perror_msg(const char *prefix)
+{
+    error_msg("%s: %s", prefix, strerror(errno));
 }
 
 void info_msg(const char *format, ...)

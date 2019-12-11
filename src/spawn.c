@@ -110,7 +110,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             if (errno == EINTR) {
                 continue;
             }
-            error_msg("select: %s", strerror(errno));
+            perror_msg("select");
             break;
         }
 
@@ -119,7 +119,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
 
             ssize_t rc = read(rfd, data, sizeof(data));
             if (rc < 0) {
-                error_msg("read: %s", strerror(errno));
+                perror_msg("read");
                 break;
             }
             if (!rc) {
@@ -133,13 +133,13 @@ static void filter(int rfd, int wfd, FilterData *fdata)
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
             ssize_t rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
             if (rc < 0) {
-                error_msg("write: %s", strerror(errno));
+                perror_msg("write");
                 break;
             }
             wlen += (size_t) rc;
             if (wlen == fdata->in_len) {
                 if (close(wfd)) {
-                    error_msg("close: %s", strerror(errno));
+                    perror_msg("close");
                     break;
                 }
                 wfd = -1;
@@ -164,7 +164,7 @@ static int handle_child_error(pid_t pid)
 {
     int ret = wait_child(pid);
     if (ret < 0) {
-        error_msg("waitpid: %s", strerror(errno));
+        perror_msg("waitpid");
     } else if (ret >= 256) {
         error_msg("Child received signal %d", ret >> 8);
     } else if (ret) {
@@ -199,7 +199,7 @@ bool spawn_filter(char **argv, FilterData *data)
     data->out_len = 0;
 
     if (pipe_close_on_exec(p0) || pipe_close_on_exec(p1)) {
-        error_msg("pipe: %s", strerror(errno));
+        perror_msg("pipe");
         goto error;
     }
     dev_null = open_dev_null(O_WRONLY);
@@ -210,7 +210,7 @@ bool spawn_filter(char **argv, FilterData *data)
     int fd[3] = {p0[0], p1[1], dev_null};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        error_msg("Error: %s", strerror(errno));
+        perror_msg("fork_exec");
         goto error;
     }
 
@@ -243,7 +243,7 @@ bool spawn_source(char **argv, String *output)
     int dev_null_r = -1;
     int dev_null_w = -1;
     if (pipe_close_on_exec(p)) {
-        error_msg("pipe: %s", strerror(errno));
+        perror_msg("pipe");
         goto error;
     }
     dev_null_r = open_dev_null(O_RDONLY);
@@ -258,7 +258,7 @@ bool spawn_source(char **argv, String *output)
     int fd[3] = {dev_null_r, p[1], dev_null_w};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        error_msg("Error: %s", strerror(errno));
+        perror_msg("fork_exec");
         goto error;
     }
     close(dev_null_r);
@@ -269,7 +269,7 @@ bool spawn_source(char **argv, String *output)
         char buf[8192];
         ssize_t rc = xread(p[0], buf, sizeof(buf));
         if (unlikely(rc < 0)) {
-            error_msg("read: %s", strerror(errno));
+            perror_msg("read");
             close(p[0]);
             string_free(output);
             return false;
@@ -300,7 +300,7 @@ bool spawn_sink(char **argv, const char *text, size_t length)
     int p[2] = {-1, -1};
     int dev_null = -1;
     if (pipe_close_on_exec(p)) {
-        error_msg("pipe: %s", strerror(errno));
+        perror_msg("pipe");
         goto error;
     }
     dev_null = open_dev_null(O_WRONLY);
@@ -311,14 +311,14 @@ bool spawn_sink(char **argv, const char *text, size_t length)
     int fd[3] = {p[0], dev_null, dev_null};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        error_msg("Error: %s", strerror(errno));
+        perror_msg("fork_exec");
         goto error;
     }
 
     close(dev_null);
     close(p[0]);
     if (length && xwrite(p[1], text, length) < 0) {
-        error_msg("write: %s", strerror(errno));
+        perror_msg("write");
         close(p[1]);
         return false;
     }
@@ -349,7 +349,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         return;
     }
     if (pipe_close_on_exec(p)) {
-        error_msg("pipe: %s", strerror(errno));
+        perror_msg("pipe");
         close(dev_null);
         close(fd[0]);
         return;
@@ -369,7 +369,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
 
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
-        error_msg("Error: %s", strerror(errno));
+        perror_msg("fork_exec");
         close(p[1]);
         prompt = false;
     } else {
@@ -405,7 +405,7 @@ void spawn(char **args, bool quiet, bool prompt)
 
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
-        error_msg("Error: %s", strerror(errno));
+        perror_msg("fork_exec");
         prompt = false;
     } else {
         handle_child_error(pid);
