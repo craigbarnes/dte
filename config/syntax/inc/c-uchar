@@ -1,0 +1,35 @@
+syntax .c-uchar4
+
+state d1
+    char 0-9a-fA-F d2 special
+    eat END error
+
+state d2
+    char 0-9a-fA-F d3 special
+    eat END error
+
+state d3
+    char 0-9a-fA-F d4 special
+    eat END error
+
+state d4
+    char 0-9a-fA-F END special
+    eat END error
+
+syntax .c-uchar8
+
+state d1
+    char 0-9a-fA-F d2 special
+    eat END error
+
+state d2
+    char 0-9a-fA-F d3 special
+    eat END error
+
+state d3
+    char 0-9a-fA-F d4 special
+    eat END error
+
+state d4
+    char 0-9a-fA-F .c-uchar4:END special
+    eat END error

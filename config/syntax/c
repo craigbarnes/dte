@@ -1,13 +1,15 @@
 require c-comment
+require c-uchar
 
 syntax .c-esc
 
-# TODO: C11 Unicode escapes (e.g. "\u00ff" and "\U00ff99cc")
 state start special
     char "abfnrtv'\\\"" END special
     char 0-3 oct1
     char 4-7 oct2
     char x hex0
+    char u .c-uchar4:END special
+    char U .c-uchar8:END special
     # Anything but \n
     char -n "\n" END error
     # Don't eat \n
