@@ -15,10 +15,13 @@ static struct termios termios_save;
 
 void term_raw(void)
 {
-    // Get and save current attributes
+    static bool saved;
     struct termios termios;
     tcgetattr(STDIN_FILENO, &termios);
-    termios_save = termios;
+    if (!saved) {
+        termios_save = termios;
+        saved = true;
+    }
 
     // Enter "raw" mode (roughly equivalent to cfmakeraw(3) on Linux/BSD)
     termios.c_iflag &= ~(
