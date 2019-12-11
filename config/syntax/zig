@@ -1,6 +1,6 @@
 syntax .zig-esc
 
-# TODO: \xNN  \uNNNN  \UNNNNNN
+# TODO: \xNN  \u{...}
 state esc special
     char "nrt'\\\"" END special
     noeat END

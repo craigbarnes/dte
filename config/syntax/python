@@ -1,10 +1,14 @@
+require c-uchar
+
 syntax .python-esc
 
-# TODO: \N{name}  \uxxxx  \Uxxxxxxxx
+# TODO: \N{name}
 state esc special
     char "abfnrtv'\\\"" END special
     char 0-7 oct1
     char x hex0
+    char u .c-uchar4:END special
+    char U .c-uchar8:END special
     noeat END
 
 state oct1 special
