@@ -1,35 +1,35 @@
 syntax .c-uchar4
 
-state d1
-    char 0-9a-fA-F d2 special
+state 4left
+    char 0-9a-fA-F 3left special
     eat END error
 
-state d2
-    char 0-9a-fA-F d3 special
+state 3left
+    char 0-9a-fA-F 2left special
     eat END error
 
-state d3
-    char 0-9a-fA-F d4 special
+state 2left
+    char 0-9a-fA-F 1left special
     eat END error
 
-state d4
+state 1left
     char 0-9a-fA-F END special
     eat END error
 
 syntax .c-uchar8
 
-state d1
-    char 0-9a-fA-F d2 special
+state 8left
+    char 0-9a-fA-F 7left special
     eat END error
 
-state d2
-    char 0-9a-fA-F d3 special
+state 7left
+    char 0-9a-fA-F 6left special
     eat END error
 
-state d3
-    char 0-9a-fA-F d4 special
+state 6left
+    char 0-9a-fA-F 5left special
     eat END error
 
-state d4
+state 5left
     char 0-9a-fA-F .c-uchar4:END special
     eat END error
