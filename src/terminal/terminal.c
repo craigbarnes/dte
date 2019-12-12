@@ -1,8 +1,11 @@
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "terminal.h"
 #include "ecma48.h"
+#include "mode.h"
 #include "terminfo.h"
 #include "xterm.h"
 #include "../debug.h"
@@ -87,6 +90,10 @@ void term_init(void)
         } else {
             term_init_fail("'DTE_FORCE_TERMINFO' set but terminfo not linked");
         }
+    }
+
+    if (!term_mode_init()) {
+        term_init_fail("tcgetattr: %s", strerror(errno));
     }
 
     switch (get_term_type(term)) {

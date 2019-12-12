@@ -35,8 +35,6 @@ typedef struct {
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(int x, int y);
     void (*repeat_byte)(char ch, size_t count);
-    void (*raw)(void);
-    void (*cooked)(void);
     void (*save_title)(void);
     void (*restore_title)(void);
     void (*set_title)(const char *title);

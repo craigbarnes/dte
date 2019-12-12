@@ -13,6 +13,7 @@
 #include "screen.h"
 #include "search.h"
 #include "terminal/input.h"
+#include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
@@ -282,7 +283,7 @@ static void ui_end(void)
     terminal.put_control_code(terminal.control_codes.keypad_off);
 
     term_output_flush();
-    terminal.cooked();
+    term_cooked();
 }
 
 void suspend(void)

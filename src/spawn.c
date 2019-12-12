@@ -9,6 +9,7 @@
 #include "error.h"
 #include "msg.h"
 #include "regexp.h"
+#include "terminal/mode.h"
 #include "terminal/terminal.h"
 #include "util/exec.h"
 #include "util/string.h"
@@ -181,7 +182,7 @@ static void yield_terminal(void)
 
 static void resume_terminal(bool prompt)
 {
-    terminal.raw();
+    term_raw();
     if (prompt) {
         any_key();
     }

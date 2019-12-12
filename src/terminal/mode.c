@@ -1,19 +1,36 @@
 #include <errno.h>
-#include <stdbool.h>
 #include <termios.h>
 #include <unistd.h>
 #include "mode.h"
 #include "../debug.h"
 #include "../util/macros.h"
 
-static struct termios termios_save;
+static bool initialized;
+static struct termios raw, cooked;
 
-static void xtcgetattr(struct termios *t)
+bool term_mode_init(void)
 {
-    int ret = tcgetattr(STDIN_FILENO, t);
-    if (unlikely(ret != 0)) {
-        fatal_error("tcgetattr", errno);
+    BUG_ON(initialized);
+    if (unlikely(tcgetattr(STDIN_FILENO, &cooked) != 0)) {
+        return false;
     }
+
+    // Set up "raw" mode (roughly equivalent to cfmakeraw(3) on Linux/BSD)
+    raw = cooked;
+    raw.c_iflag &= ~(
+        ICRNL | IXON | IXOFF
+        | IGNBRK | BRKINT | PARMRK
+        | ISTRIP | INLCR | IGNCR
+    );
+    raw.c_oflag &= ~OPOST;
+    raw.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+    raw.c_cflag &= ~(CSIZE | PARENB);
+    raw.c_cflag |= CS8;
+    raw.c_cc[VMIN] = 1;
+    raw.c_cc[VTIME] = 0;
+
+    initialized = true;
+    return true;
 }
 
 static void xtcsetattr(const struct termios *t)
@@ -30,35 +47,14 @@ static void xtcsetattr(const struct termios *t)
 
 void term_raw(void)
 {
-    static bool saved;
-    struct termios termios;
-    xtcgetattr(&termios);
-    if (!saved) {
-        termios_save = termios;
-        saved = true;
+    if (initialized) {
+        xtcsetattr(&raw);
     }
-
-    // Enter "raw" mode (roughly equivalent to cfmakeraw(3) on Linux/BSD)
-    termios.c_iflag &= ~(
-        ICRNL | IXON | IXOFF
-        | IGNBRK | BRKINT | PARMRK
-        | ISTRIP | INLCR | IGNCR
-    );
-    termios.c_oflag &= ~OPOST;
-    termios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    termios.c_cflag &= ~(CSIZE | PARENB);
-    termios.c_cflag |= CS8;
-
-    // Read at least 1 char on each read()
-    termios.c_cc[VMIN] = 1;
-
-    // Read blocks until there are MIN(VMIN, requested) bytes available
-    termios.c_cc[VTIME] = 0;
-
-    xtcsetattr(&termios);
 }
 
 void term_cooked(void)
 {
-    xtcsetattr(&termios_save);
+    if (initialized) {
+        xtcsetattr(&cooked);
+    }
 }

@@ -18,6 +18,7 @@
 #include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "terminal/input.h"
+#include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/str-util.h"
@@ -38,7 +39,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
         !editor.child_controls_terminal
         && editor.status != EDITOR_INITIALIZING
     ) {
-        terminal.raw();
+        term_raw();
         editor.resize();
     }
 }
@@ -130,7 +131,7 @@ static int dump_builtin_config(const char *const name)
 
 static void showkey_loop(void)
 {
-    terminal.raw();
+    term_raw();
     terminal.put_control_code(terminal.control_codes.init);
     terminal.put_control_code(terminal.control_codes.keypad_on);
     term_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
@@ -159,7 +160,7 @@ static void showkey_loop(void)
     terminal.put_control_code(terminal.control_codes.keypad_off);
     terminal.put_control_code(terminal.control_codes.deinit);
     term_output_flush();
-    terminal.cooked();
+    term_cooked();
 }
 
 static const char usage[] =
@@ -337,7 +338,7 @@ loop_break:
     // Initialize terminal but don't update screen yet. Also display
     // "Press any key to continue" prompt if there were any errors
     // during reading configuration files.
-    terminal.raw();
+    term_raw();
     if (get_nr_errors()) {
         any_key();
         clear_error();
