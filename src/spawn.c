@@ -199,7 +199,7 @@ bool spawn_filter(char **argv, FilterData *data)
     data->out = NULL;
     data->out_len = 0;
 
-    if (pipe_close_on_exec(p0) || pipe_close_on_exec(p1)) {
+    if (!pipe_close_on_exec(p0) || !pipe_close_on_exec(p1)) {
         perror_msg("pipe");
         goto error;
     }
@@ -243,7 +243,7 @@ bool spawn_source(char **argv, String *output)
     int p[2] = {-1, -1};
     int dev_null_r = -1;
     int dev_null_w = -1;
-    if (pipe_close_on_exec(p)) {
+    if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         goto error;
     }
@@ -300,7 +300,7 @@ bool spawn_sink(char **argv, const char *text, size_t length)
 {
     int p[2] = {-1, -1};
     int dev_null = -1;
-    if (pipe_close_on_exec(p)) {
+    if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         goto error;
     }
@@ -349,7 +349,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         close(fd[0]);
         return;
     }
-    if (pipe_close_on_exec(p)) {
+    if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         close(dev_null);
         close(fd[0]);
