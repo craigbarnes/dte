@@ -83,7 +83,6 @@ unselect
 repeat 1000 undo
 redo
 undo
-compile -1s gitgrep sh -c 'grep -n ^# ../../mk/*'
 close
 wclose
 repeat 20 open

@@ -1,3 +1,4 @@
+#include "../../build/feature.h" // Must be first include
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -22,21 +23,34 @@ bool close_on_exec(int fd)
 
 bool pipe_close_on_exec(int fd[2])
 {
+#ifdef HAVE_PIPE2
+    return (pipe2(fd, O_CLOEXEC) == 0);
+#else
     if (pipe(fd) != 0) {
         return false;
     }
     close_on_exec(fd[0]);
     close_on_exec(fd[1]);
     return true;
+#endif
 }
 
 static int dup_close_on_exec(int oldfd, int newfd)
 {
+#ifdef HAVE_DUP3
+    return dup3(oldfd, newfd, O_CLOEXEC);
+#else
+    if (oldfd == newfd) {
+        // Replicate dup3() behaviour:
+        errno = EINVAL;
+        return -1;
+    }
     if (dup2(oldfd, newfd) < 0) {
         return -1;
     }
     close_on_exec(newfd);
     return newfd;
+#endif
 }
 
 static void reset_signal_handler(int signum)

@@ -66,6 +66,9 @@ test_objects := $(call prefix-obj, build/test/, \
     cmdline command config editorconfig encoding filetype main \
     syntax terminal test util )
 
+feature_tests := $(addprefix mk/feature-test/, $(addsuffix .c, \
+    dup3 pipe2 ))
+
 all_objects := $(editor_objects) $(test_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects))))
 
@@ -136,7 +139,7 @@ ifeq "$(DEBUG)" "0"
   $(call make-lazy,UNWIND)
 endif
 
-$(all_objects): BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS) $(UNWIND)
+BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS) $(UNWIND)
 
 # If "make install*" with no other named targets
 ifeq "" "$(filter-out install install-desktop-file,$(or $(MAKECMDGOALS),all))"
@@ -166,6 +169,7 @@ build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
+build/util/exec.o: build/feature.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags
 build/encoding/convert.o: build/encoding/convert.cflags
 build/terminal/terminfo.cflags: | build/terminal/
@@ -208,6 +212,15 @@ build/builtin-config.h: $(BUILTIN_CONFIGS) mk/config2c.awk | build/
 build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
+
+build/feature.h: $(feature_tests) build/all.cflags | build/
+	$(E) GEN $@
+	$(Q) cat mk/feature-test/defs.h > '$@'
+	$(Q) for test in $(feature_tests); do \
+	  if $(CC) $(CFLAGS_ALL) -c -o /dev/null 2>/dev/null "$$test"; then \
+	    cat "$${test%.c}.h" >> '$@' ; \
+	  fi \
+	done
 
 $(build_subdirs): | build/
 	$(Q) mkdir -p $@
