@@ -8,14 +8,17 @@
 #include <unistd.h>
 #include "exec.h"
 
-static UNUSED bool close_on_exec(int fd)
+static bool close_on_exec(int fd, bool cloexec)
 {
     int flags = fcntl(fd, F_GETFD);
     if (flags < 0) {
         return false;
     }
-    flags |= FD_CLOEXEC;
-    if (fcntl(fd, F_SETFD, flags) == -1) {
+    int new_flags = cloexec ? (flags | FD_CLOEXEC) : (flags & ~FD_CLOEXEC);
+    if (new_flags == flags) {
+        return true;
+    }
+    if (fcntl(fd, F_SETFD, new_flags) == -1) {
         return false;
     }
     return true;
@@ -29,8 +32,8 @@ bool pipe_close_on_exec(int fd[2])
     if (pipe(fd) != 0) {
         return false;
     }
-    close_on_exec(fd[0]);
-    close_on_exec(fd[1]);
+    close_on_exec(fd[0], true);
+    close_on_exec(fd[1], true);
     return true;
 #endif
 }
@@ -48,7 +51,7 @@ static int dup_close_on_exec(int oldfd, int newfd)
     if (dup2(oldfd, newfd) < 0) {
         return -1;
     }
-    close_on_exec(newfd);
+    close_on_exec(newfd, true);
     return newfd;
 #endif
 }
@@ -102,7 +105,7 @@ static void handle_child(char **argv, int fd[3], int error_fd)
     for (int i = 0; i < nr_fds; i++) {
         if (i == fd[i]) {
             // Clear FD_CLOEXEC flag
-            fcntl(fd[i], F_SETFD, 0);
+            close_on_exec(fd[i], false);
         } else {
             if (dup2(fd[i], i) < 0) {
                 goto out;
