@@ -63,13 +63,9 @@ void debug_log(const char *function, const char *fmt, ...)
     static int fd = -1;
     if (fd < 0) {
         char *filename = editor_file("debug.log");
-        fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0666);
+        fd = open(filename, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
         free(filename);
         BUG_ON(fd < 0);
-
-        // Don't leak file descriptor to parent processes
-        int r = fcntl(fd, F_SETFD, FD_CLOEXEC);
-        BUG_ON(r == -1);
     }
 
     char buf[4096];
