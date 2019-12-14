@@ -152,11 +152,9 @@ static void filter(int rfd, int wfd, FilterData *fdata)
 
 static int open_dev_null(int flags)
 {
-    int fd = open("/dev/null", flags);
+    int fd = open("/dev/null", flags | O_CLOEXEC);
     if (fd < 0) {
         error_msg("Error opening /dev/null: %s", strerror(errno));
-    } else {
-        close_on_exec(fd);
     }
     return fd;
 }
