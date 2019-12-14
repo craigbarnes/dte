@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "exec.h"
 
-static inline bool close_on_exec(int fd)
+static UNUSED bool close_on_exec(int fd)
 {
     int flags = fcntl(fd, F_GETFD);
     if (flags < 0) {
