@@ -282,6 +282,8 @@ loop_break:
     const char *const editor_dir = editor.user_config_dir;
     if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
+        load_and_save_history = false;
+        editor.options.lock_files = false;
     }
 
     terminal.save_title();
