@@ -524,7 +524,7 @@ static void cmd_require(const CommandArgs *a)
         path = xstrdup(a->args[0]);
     } else {
         set = &loaded_builtins;
-        path = xasprintf("syntax/inc/%s", a->args[0]);
+        path = path_join("syntax/inc/", a->args[0]);
         flags |= CFG_BUILTIN;
     }
 

@@ -42,6 +42,21 @@ static inline char *path_dirname(const char *filename)
     return xstrcut(dir.data, dir.length);
 }
 
+XSTRDUP
+static inline char *path_join(const char *s1, const char *s2)
+{
+    size_t n1 = strlen(s1);
+    size_t n2 = strlen(s2);
+    char *path = xmalloc(n1 + n2 + 2);
+    memcpy(path, s1, n1);
+    char *ptr = path + n1;
+    if (n1 && n2 && s1[n1 - 1] != '/') {
+        *ptr++ = '/';
+    }
+    memcpy(ptr, s2, n2 + 1);
+    return path;
+}
+
 // If path is the root directory, return false. Otherwise, mutate
 // the path argument to become its parent directory and return true.
 // Note: path *must* be canonical (i.e. as returned by path_absolute()).

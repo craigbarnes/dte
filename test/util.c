@@ -1002,6 +1002,40 @@ static void test_path_absolute(void)
     EXPECT_EQ(errno, ENAMETOOLONG);
 }
 
+static void test_path_join(void)
+{
+    char *p = path_join("/", "file");
+    EXPECT_STREQ(p, "/file");
+    free(p);
+    p = path_join("foo", "bar");
+    EXPECT_STREQ(p, "foo/bar");
+    free(p);
+    p = path_join("foo/", "bar");
+    EXPECT_STREQ(p, "foo/bar");
+    free(p);
+    p = path_join("", "bar");
+    EXPECT_STREQ(p, "bar");
+    free(p);
+    p = path_join("foo", "");
+    EXPECT_STREQ(p, "foo");
+    free(p);
+    p = path_join("", "");
+    EXPECT_STREQ(p, "");
+    free(p);
+    p = path_join("/", "");
+    EXPECT_STREQ(p, "/");
+    free(p);
+    p = path_join("/home/user", ".dte");
+    EXPECT_STREQ(p, "/home/user/.dte");
+    free(p);
+    p = path_join("/home/user/", ".dte");
+    EXPECT_STREQ(p, "/home/user/.dte");
+    free(p);
+    p = path_join("/home/user//", ".dte");
+    EXPECT_STREQ(p, "/home/user//.dte");
+    free(p);
+}
+
 static void test_path_parent(void)
 {
     StringView sv = STRING_VIEW("/a/foo/bar/etc/file");
@@ -1151,6 +1185,7 @@ void test_util(void)
     test_bitop();
     test_path_dirname_and_path_basename();
     test_path_absolute();
+    test_path_join();
     test_path_parent();
     test_size_multiply_overflows();
     test_size_add_overflows();
