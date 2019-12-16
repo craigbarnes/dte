@@ -218,9 +218,10 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 
 build/feature.h: $(feature_tests) build/all.cflags | build/
 	$(E) GEN $@
+	$(Q) $(RM) '$@.log'
 	$(Q) cat mk/feature-test/defs.h > '$@'
 	$(Q) for test in $(feature_tests); do \
-	  if $(CC) $(CFLAGS_ALL) -c -o /dev/null 2>/dev/null "$$test"; then \
+	  if $(CC) $(CFLAGS_ALL) -o /dev/null "$$test" 2>>'$@.log'; then \
 	    cat "$${test%.c}.h" >> '$@' ; \
 	  fi \
 	done

@@ -7,3 +7,8 @@ int feature_test_dup3(int oldfd, int newfd)
 {
     return dup3(oldfd, newfd, O_CLOEXEC);
 }
+
+int main(void)
+{
+    return feature_test_dup3(1, 2);
+}
