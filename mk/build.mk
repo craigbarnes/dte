@@ -121,7 +121,7 @@ ifdef USE_SANITIZER
     -fsanitize=address,undefined -fsanitize-address-use-after-scope \
     -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-common
   CC_SANITIZER_FLAGS := $(or \
-    $(call cc-option, $(SANITIZER_FLAGS)), \
+    $(call cc-option,$(SANITIZER_FLAGS)), \
     $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
   $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
   $(dte) $(test): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
@@ -139,7 +139,10 @@ ifeq "$(DEBUG)" "0"
   $(call make-lazy,UNWIND)
 endif
 
-BASIC_CFLAGS += $(CSTD) -DDEBUG=$(DEBUG) $(CWARNS) $(UNWIND)
+BASIC_CFLAGS += \
+    $(CSTD) $(CWARNS) $(UNWIND) \
+    -DDEBUG=$(DEBUG) \
+    -D_FILE_OFFSET_BITS=64
 
 # If "make install*" with no other named targets
 ifeq "" "$(filter-out install install-desktop-file,$(or $(MAKECMDGOALS),all))"
