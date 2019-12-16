@@ -44,13 +44,13 @@ Installing
 Building
 --------
 
-To build from source, first install the following dependencies:
+To build from source, first ensure the following dependencies are
+installed:
 
 * [GCC] 4.6+ or [Clang]
 * [GNU Make] 3.81+
-* [terminfo] library (may be provided by [ncurses], depending on OS)
-* [iconv] library (may be included in libc, depending on OS)
-* [POSIX]-compatible [`sh`] and [`awk`]
+* [terminfo] library (usually provided by [ncurses])
+* [iconv] library (usually provided by libc on Linux/FreeBSD)
 
 ...then download and unpack the latest release tarball:
 
@@ -99,10 +99,7 @@ Public License version 2 for more details.
 [ncurses]: https://www.gnu.org/software/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
-[POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
-[`sh`]:  https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html
-[`awk`]: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 [Debian Testing]: https://packages.debian.org/testing/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
