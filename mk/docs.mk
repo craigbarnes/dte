@@ -60,7 +60,7 @@ public/:
 build/docs/: build/
 	$(Q) mkdir -p $@
 
-check-docs: README.md CHANGELOG.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
+check-docs: README.md CHANGELOG.md docs/packaging.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
 	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
