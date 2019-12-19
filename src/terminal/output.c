@@ -172,7 +172,6 @@ void term_output_flush(void)
 static void skipped_too_much(CodePoint u)
 {
     size_t n = obuf.x - obuf.scroll_x;
-
     obuf_need_space(8);
     if (u == '\t' && obuf.tab != TAB_CONTROL) {
         char ch = ' ';
@@ -261,12 +260,12 @@ bool term_put_char(CodePoint u)
             }
             print_tab(width);
         } else {
-            u_set_ctrl(obuf.buf, &obuf.count, u);
-            obuf.x += 2;
-            if (unlikely(space == 1)) {
-                // Wrote too much
-                obuf.count--;
-                obuf.x--;
+            // Use caret notation for control chars:
+            obuf.buf[obuf.count++] = '^';
+            obuf.x++;
+            if (space > 1) {
+                obuf.buf[obuf.count++] = (u == 0x7f) ? '?' : u | 0x40;
+                obuf.x++;
             }
         }
     } else {

@@ -653,33 +653,26 @@ static void test_u_set_char(void)
     EXPECT_EQ(i, 4);
     // Note: string separated to prevent "-Wtrigraphs" warning
     EXPECT_EQ(memcmp(buf, "<" "?" "?" ">", 4), 0);
-}
-
-static void test_u_set_ctrl(void)
-{
-    char buf[16];
-    size_t i;
-    MEMZERO(&buf);
 
     i = 0;
-    u_set_ctrl(buf, &i, '\0');
+    u_set_char(buf, &i, '\0');
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^@", 3), 0);
+    EXPECT_EQ(memcmp(buf, "^@", 2), 0);
 
     i = 0;
-    u_set_ctrl(buf, &i, '\t');
+    u_set_char(buf, &i, '\t');
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^I", 3), 0);
+    EXPECT_EQ(memcmp(buf, "^I", 2), 0);
 
     i = 0;
-    u_set_ctrl(buf, &i, 0x1F);
+    u_set_char(buf, &i, 0x1F);
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^_", 3), 0);
+    EXPECT_EQ(memcmp(buf, "^_", 2), 0);
 
     i = 0;
-    u_set_ctrl(buf, &i, 0x7F);
+    u_set_char(buf, &i, 0x7F);
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^?", 3), 0);
+    EXPECT_EQ(memcmp(buf, "^?", 2), 0);
 }
 
 static void test_u_prev_char(void)
@@ -1175,7 +1168,6 @@ void test_util(void)
     test_u_is_unprintable();
     test_u_str_width();
     test_u_set_char();
-    test_u_set_ctrl();
     test_u_prev_char();
     test_u_str_index();
     test_ptr_array();

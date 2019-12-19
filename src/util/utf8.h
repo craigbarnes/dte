@@ -20,15 +20,6 @@ static inline size_t u_char_size(CodePoint u)
     return 1;
 }
 
-NONNULL_ARGS
-static inline void u_set_ctrl(char *buf, size_t *idx, CodePoint u)
-{
-    size_t i = *idx;
-    buf[i++] = '^';
-    buf[i++] = (u == 0x7F) ? '?' : u | 0x40;
-    *idx = i;
-}
-
 size_t u_str_width(const unsigned char *str);
 
 CodePoint u_prev_char(const unsigned char *buf, size_t *idx);
