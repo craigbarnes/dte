@@ -20,7 +20,6 @@
 static void handle_error_msg(const Compiler *c, char *str)
 {
     size_t i, len;
-
     for (i = 0; str[i]; i++) {
         if (str[i] == '\n') {
             str[i] = '\0';
@@ -38,7 +37,6 @@ static void handle_error_msg(const Compiler *c, char *str)
     for (i = 0; i < c->error_formats.count; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
         PointerArray m = PTR_ARRAY_INIT;
-
         if (!regexp_exec_sub(&p->re, str, len, &m, 0)) {
             continue;
         }
@@ -59,19 +57,17 @@ static void handle_error_msg(const Compiler *c, char *str)
         ptr_array_free(&m);
         return;
     }
+
     add_message(new_message(str));
 }
 
 static void read_errors(const Compiler *c, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
-    char line[4096];
-
-    if (!f) {
-        // Should not happen
+    if (unlikely(f == NULL)) {
         return;
     }
-
+    char line[4096];
     while (fgets(line, sizeof(line), f)) {
         if (!quiet) {
             fputs(line, stderr);
@@ -117,7 +113,6 @@ static void filter(int rfd, int wfd, FilterData *fdata)
 
         if (FD_ISSET(rfd, &rfds)) {
             char data[8192];
-
             ssize_t rc = read(rfd, data, sizeof(data));
             if (rc < 0) {
                 perror_msg("read");
@@ -131,6 +126,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             }
             string_append_buf(&buf, data, (size_t) rc);
         }
+
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
             ssize_t rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
             if (rc < 0) {
@@ -147,6 +143,7 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             }
         }
     }
+
     fdata->out = string_steal(&buf, &fdata->out_len);
 }
 
@@ -193,7 +190,6 @@ bool spawn_filter(char **argv, FilterData *data)
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
     int dev_null = -1;
-
     data->out = NULL;
     data->out_len = 0;
 
@@ -201,6 +197,7 @@ bool spawn_filter(char **argv, FilterData *data)
         perror_msg("pipe");
         goto error;
     }
+
     dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         goto error;
@@ -227,6 +224,7 @@ bool spawn_filter(char **argv, FilterData *data)
         return false;
     }
     return true;
+
 error:
     close(p0[0]);
     close(p0[1]);
@@ -241,14 +239,17 @@ bool spawn_source(char **argv, String *output)
     int p[2] = {-1, -1};
     int dev_null_r = -1;
     int dev_null_w = -1;
+
     if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         goto error;
     }
+
     dev_null_r = open_dev_null(O_RDONLY);
     if (dev_null_r < 0) {
         goto error;
     }
+
     dev_null_w = open_dev_null(O_WRONLY);
     if (dev_null_w < 0) {
         goto error;
@@ -298,10 +299,12 @@ bool spawn_sink(char **argv, const char *text, size_t length)
 {
     int p[2] = {-1, -1};
     int dev_null = -1;
+
     if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         goto error;
     }
+
     dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         goto error;
@@ -333,20 +336,19 @@ error:
 
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
 {
-    const bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
-    const bool quiet = !!(flags & SPAWN_QUIET);
-    bool prompt = !!(flags & SPAWN_PROMPT);
-    int p[2], fd[3];
-
+    int fd[3];
     fd[0] = open_dev_null(O_RDONLY);
     if (fd[0] < 0) {
         return;
     }
+
     const int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         close(fd[0]);
         return;
     }
+
+    int p[2];
     if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
         close(dev_null);
@@ -354,6 +356,9 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         return;
     }
 
+    const bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
+    const bool quiet = !!(flags & SPAWN_QUIET);
+    bool prompt = !!(flags & SPAWN_PROMPT);
     if (read_stdout) {
         fd[1] = p[1];
         fd[2] = quiet ? dev_null : 2;
@@ -378,6 +383,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         read_errors(c, p[0], quiet);
         handle_child_error(pid);
     }
+
     if (!quiet) {
         resume_terminal(prompt);
     }
