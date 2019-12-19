@@ -172,26 +172,26 @@ void term_output_flush(void)
 static void skipped_too_much(CodePoint u)
 {
     size_t n = obuf.x - obuf.scroll_x;
+    char *buf = obuf.buf + obuf.count;
     obuf_need_space(8);
     if (u == '\t' && obuf.tab != TAB_CONTROL) {
-        char ch = ' ';
-        if (obuf.tab == TAB_SPECIAL) {
-            ch = '-';
-        }
-        memset(obuf.buf + obuf.count, ch, n);
+        memset(buf, (obuf.tab == TAB_SPECIAL) ? '-' : ' ', n);
         obuf.count += n;
     } else if (u < 0x20) {
-        obuf.buf[obuf.count++] = u | 0x40;
+        *buf = u | 0x40;
+        obuf.count++;
     } else if (u == 0x7f) {
-        obuf.buf[obuf.count++] = '?';
+        *buf = '?';
+        obuf.count++;
     } else if (u_is_unprintable(u)) {
         char tmp[4];
         size_t idx = 0;
         u_set_hex(tmp, &idx, u);
-        memcpy(obuf.buf + obuf.count, tmp + 4 - n, n);
+        memcpy(buf, tmp + 4 - n, n);
         obuf.count += n;
     } else {
-        obuf.buf[obuf.count++] = '>';
+        *buf = '>';
+        obuf.count++;
     }
 }
 
