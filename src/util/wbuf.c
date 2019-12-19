@@ -30,12 +30,11 @@ bool wbuf_reserve_space(WriteBuffer *wbuf, size_t count)
 bool wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count)
 {
     if (count > wbuf_avail(wbuf)) {
-        ssize_t rc = wbuf_flush(wbuf);
-        if (unlikely(rc < 0)) {
+        if (unlikely(!wbuf_flush(wbuf))) {
             return false;
         }
         if (unlikely(count >= sizeof(wbuf->buf))) {
-            rc = xwrite(wbuf->fd, buf, count);
+            ssize_t rc = xwrite(wbuf->fd, buf, count);
             if (unlikely(rc < 0)) {
                 return false;
             }
@@ -55,8 +54,7 @@ bool wbuf_write_str(WriteBuffer *wbuf, const char *str)
 bool wbuf_write_ch(WriteBuffer *wbuf, char ch)
 {
     if (wbuf_avail(wbuf) == 0) {
-        ssize_t rc = wbuf_flush(wbuf);
-        if (unlikely(rc < 0)) {
+        if (unlikely(!wbuf_flush(wbuf))) {
             return false;
         }
     }
