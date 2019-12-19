@@ -1,7 +1,8 @@
 #ifndef UTIL_WBUF_H
 #define UTIL_WBUF_H
 
-#include <sys/types.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "macros.h"
 
 typedef struct {
@@ -15,10 +16,10 @@ typedef struct {
     .fd = -1 \
 }
 
-ssize_t wbuf_flush(WriteBuffer *wbuf) NONNULL_ARGS;
-ssize_t wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count) NONNULL_ARGS;
-ssize_t wbuf_write_str(WriteBuffer *wbuf, const char *str) NONNULL_ARGS;
-ssize_t wbuf_write_ch(WriteBuffer *wbuf, char ch) NONNULL_ARGS;
-void wbuf_need_space(WriteBuffer *wbuf, size_t count) NONNULL_ARGS;
+bool wbuf_flush(WriteBuffer *wbuf) NONNULL_ARGS;
+bool wbuf_write(WriteBuffer *wbuf, const char *buf, size_t count) NONNULL_ARGS;
+bool wbuf_write_str(WriteBuffer *wbuf, const char *str) NONNULL_ARGS;
+bool wbuf_write_ch(WriteBuffer *wbuf, char ch) NONNULL_ARGS;
+bool wbuf_reserve_space(WriteBuffer *wbuf, size_t count) NONNULL_ARGS;
 
 #endif
