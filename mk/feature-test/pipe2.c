@@ -5,5 +5,5 @@
 int main(void)
 {
     int fd[2] = {-1, -1};
-    return pipe2(fd, O_CLOEXEC);
+    return (pipe2)(fd, O_CLOEXEC);
 }

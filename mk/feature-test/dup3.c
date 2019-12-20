@@ -4,5 +4,5 @@
 
 int main(void)
 {
-    return dup3(2, 1, O_CLOEXEC);
+    return (dup3)(2, 1, O_CLOEXEC);
 }
