@@ -6,8 +6,6 @@
 #include <unistd.h>
 #include "test.h"
 #include "../src/util/ascii.h"
-#include "../src/util/bit.h"
-#include "../src/util/bit.c"
 #include "../src/util/checked-arith.h"
 #include "../src/util/hashset.h"
 #include "../src/util/path.h"
@@ -871,75 +869,6 @@ static void test_round_size_to_next_power_of_2(void)
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(5500), 8192);
 }
 
-static void test_bitop(void)
-{
-    EXPECT_EQ(bit_popcount_u32(0), 0);
-    EXPECT_EQ(bit_popcount_u32(1), 1);
-    EXPECT_EQ(bit_popcount_u32(11), 3);
-    EXPECT_EQ(bit_popcount_u32(128), 1);
-    EXPECT_EQ(bit_popcount_u32(255), 8);
-    EXPECT_EQ(bit_popcount_u32(UINT32_MAX), 32);
-    EXPECT_EQ(bit_popcount_u32(UINT32_MAX - 1), 31);
-
-    EXPECT_EQ(bit_popcount_u64(0), 0);
-    EXPECT_EQ(bit_popcount_u64(1), 1);
-    EXPECT_EQ(bit_popcount_u64(255), 8);
-    EXPECT_EQ(bit_popcount_u64(UINT64_MAX), 64);
-    EXPECT_EQ(bit_popcount_u64(UINT64_MAX - 1), 63);
-    EXPECT_EQ(bit_popcount_u64(U64(0xFFFFFFFFFF)), 40);
-    EXPECT_EQ(bit_popcount_u64(U64(0x10000000000)), 1);
-
-    EXPECT_EQ(bit_count_leading_zeros_u64(1), 63);
-    EXPECT_EQ(bit_count_leading_zeros_u64(4), 61);
-    EXPECT_EQ(bit_count_leading_zeros_u64(127), 57);
-    EXPECT_EQ(bit_count_leading_zeros_u64(128), 56);
-    EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX), 0);
-    EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX - 1), 0);
-    EXPECT_EQ(bit_count_leading_zeros_u64(UINT64_MAX >> 1), 1);
-
-    EXPECT_EQ(bit_count_leading_zeros_u32(1), 31);
-    EXPECT_EQ(bit_count_leading_zeros_u32(4), 29);
-    EXPECT_EQ(bit_count_leading_zeros_u32(127), 25);
-    EXPECT_EQ(bit_count_leading_zeros_u32(128), 24);
-    EXPECT_EQ(bit_count_leading_zeros_u32(UINT32_MAX), 0);
-    EXPECT_EQ(bit_count_leading_zeros_u32(UINT32_MAX - 1), 0);
-
-    EXPECT_EQ(bit_count_trailing_zeros_u32(1), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(2), 1);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(3), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(4), 2);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(8), 3);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(13), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(16), 4);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(U32(0xFFFFFFFE)), 1);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(U32(0x10000000)), 28);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(UINT32_MAX), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u32(UINT32_MAX - 0xFF), 8);
-
-    EXPECT_EQ(bit_count_trailing_zeros_u64(1), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(2), 1);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(3), 0);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(16), 4);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(U64(0xFFFFFFFE)), 1);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(U64(0x10000000)), 28);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(U64(0x100000000000)), 44);
-    EXPECT_EQ(bit_count_trailing_zeros_u64(UINT64_MAX), 0);
-
-    EXPECT_EQ(bit_find_first_set_u32(0), 0);
-    EXPECT_EQ(bit_find_first_set_u32(1), 1);
-    EXPECT_EQ(bit_find_first_set_u32(2), 2);
-    EXPECT_EQ(bit_find_first_set_u32(3), 1);
-    EXPECT_EQ(bit_find_first_set_u32(64), 7);
-    EXPECT_EQ(bit_find_first_set_u32(U32(1) << 31), 32);
-
-    EXPECT_EQ(bit_find_first_set_u64(0), 0);
-    EXPECT_EQ(bit_find_first_set_u64(1), 1);
-    EXPECT_EQ(bit_find_first_set_u64(2), 2);
-    EXPECT_EQ(bit_find_first_set_u64(3), 1);
-    EXPECT_EQ(bit_find_first_set_u64(64), 7);
-    EXPECT_EQ(bit_find_first_set_u64(U64(1) << 63), 64);
-}
-
 static void test_path_dirname_and_path_basename(void)
 {
     static const struct {
@@ -1174,7 +1103,6 @@ void test_util(void)
     test_hashset();
     test_round_up();
     test_round_size_to_next_power_of_2();
-    test_bitop();
     test_path_dirname_and_path_basename();
     test_path_absolute();
     test_path_join();
