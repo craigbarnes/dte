@@ -257,14 +257,14 @@ static void test_string(void)
     String s = STRING_INIT;
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(s.alloc, 0);
-    EXPECT_PTREQ(s.buffer, NULL);
+    EXPECT_NULL(s.buffer);
 
     char *cstr = string_clone_cstring(&s);
     EXPECT_STREQ(cstr, "");
     free(cstr);
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(s.alloc, 0);
-    EXPECT_PTREQ(s.buffer, NULL);
+    EXPECT_NULL(s.buffer);
 
     string_insert_ch(&s, 0, 0x1F4AF);
     EXPECT_EQ(s.len, 4);
@@ -296,7 +296,7 @@ static void test_string(void)
     string_free(&s);
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(s.alloc, 0);
-    EXPECT_PTREQ(s.buffer, NULL);
+    EXPECT_NULL(s.buffer);
 
     for (size_t i = 0; i < 40; i++) {
         string_append_byte(&s, 'a');
@@ -306,7 +306,7 @@ static void test_string(void)
     cstr = string_steal_cstring(&s);
     EXPECT_EQ(s.len, 0);
     EXPECT_EQ(s.alloc, 0);
-    EXPECT_PTREQ(s.buffer, NULL);
+    EXPECT_NULL(s.buffer);
     EXPECT_STREQ(cstr, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     free(cstr);
 }
