@@ -2,13 +2,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int feature_test_dup3(int oldfd, int newfd);
-int feature_test_dup3(int oldfd, int newfd)
-{
-    return dup3(oldfd, newfd, O_CLOEXEC);
-}
-
 int main(void)
 {
-    return feature_test_dup3(1, 2);
+    return dup3(2, 1, O_CLOEXEC);
 }
