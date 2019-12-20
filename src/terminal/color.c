@@ -4,6 +4,7 @@
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"
+#include "../util/str-util.h"
 #include "../util/strtonum.h"
 
 #define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
@@ -34,7 +35,7 @@ static unsigned int lookup_attr(const char *s, size_t len)
     }
     return 0;
 compare:
-    return memcmp(s, cmp_str, len) ? 0 : cmp_val;
+    return mem_equal(s, cmp_str, len) ? cmp_val : 0;
 }
 
 static int32_t lookup_color(const char *s, size_t len)
@@ -69,7 +70,7 @@ static int32_t lookup_color(const char *s, size_t len)
     }
     return COLOR_INVALID;
 compare:
-    return memcmp(s, cmp_str, len) ? COLOR_INVALID : cmp_val;
+    return mem_equal(s, cmp_str, len) ? cmp_val : COLOR_INVALID;
 }
 
 static int32_t parse_rrggbb(const char *str)
@@ -130,7 +131,7 @@ static int32_t parse_color(const char *str, size_t len)
     }
 
     bool light = false;
-    if (len >= 8 && memcmp(str, "light", 5) == 0) {
+    if (len >= 8 && mem_equal(str, "light", 5)) {
         light = true;
         str += 5;
         len -= 5;

@@ -55,9 +55,10 @@ static FileTypeEnum filetype_from_interpreter(const StringView sv)
     case 5: case 6: case 7:
         break;
     case 10:
-        switch (sv.data[0]) {
-        case 'o': return memcmp(sv.data, "openrc-run", 10) ? NONE : SHELL;
-        case 'r': return memcmp(sv.data, "runhaskell", 10) ? NONE : HASKELL;
+        if (mem_equal(sv.data, "openrc-run", 10)) {
+            return SHELL;
+        } else if (mem_equal(sv.data, "runhaskell", 10)) {
+            return HASKELL;
         }
         // Fallthrough
     default:

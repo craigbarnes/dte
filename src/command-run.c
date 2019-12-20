@@ -14,12 +14,12 @@ static bool allowed_command(const char *name)
 {
     size_t len = strlen(name);
     switch (len) {
-    case 3: return !memcmp(name, "set", len);
-    case 4: return !memcmp(name, "bind", len);
-    case 5: return !memcmp(name, "alias", len);
-    case 7: return !memcmp(name, "include", len);
-    case 8: return !memcmp(name, "errorfmt", len);
-    case 11: return !memcmp(name, "load-syntax", len);
+    case 3: return mem_equal(name, "set", len);
+    case 4: return mem_equal(name, "bind", len);
+    case 5: return mem_equal(name, "alias", len);
+    case 7: return mem_equal(name, "include", len);
+    case 8: return mem_equal(name, "errorfmt", len);
+    case 11: return mem_equal(name, "load-syntax", len);
     case 2:
         switch (name[0]) {
         case 'c': return name[1] == 'd';
@@ -29,8 +29,8 @@ static bool allowed_command(const char *name)
         return false;
     case 6:
         switch (name[0]) {
-        case 'o': return !memcmp(name, "option", len);
-        case 's': return !memcmp(name, "setenv", len);
+        case 'o': return mem_equal(name, "option", len);
+        case 's': return mem_equal(name, "setenv", len);
         }
         return false;
     }

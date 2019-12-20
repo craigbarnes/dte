@@ -10,6 +10,7 @@
 #include "../src/editor.h"
 #include "../src/regexp.h"
 #include "../src/util/path.h"
+#include "../src/util/str-util.h"
 #include "../src/util/xmalloc.h"
 
 void test_cmdline(void);
@@ -81,7 +82,7 @@ static void test_handle_binding(void)
     ASSERT_NONNULL(block);
     ASSERT_EQ(block->size, 4);
     EXPECT_EQ(block->nl, 1);
-    EXPECT_EQ(memcmp(block->data, "zzz\n", 4), 0);
+    EXPECT_TRUE(mem_equal(block->data, "zzz\n", 4));
     EXPECT_TRUE(undo());
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);

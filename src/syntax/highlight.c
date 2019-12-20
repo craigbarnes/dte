@@ -5,6 +5,7 @@
 #include "../block-iter.h"
 #include "../debug.h"
 #include "../util/ascii.h"
+#include "../util/str-util.h"
 #include "../util/xmalloc.h"
 
 static bool state_is_valid(const State *st)
@@ -29,7 +30,7 @@ static bool bufis(const Condition *cond, const char *buf, size_t len)
     if (len != (size_t)cond->u.cond_str.len) {
         return false;
     }
-    return memcmp(cond->u.cond_str.str, buf, len) == 0;
+    return mem_equal(cond->u.cond_str.str, buf, len);
 }
 
 static bool bufis_icase(const Condition *cond, const char *buf, size_t len)
@@ -48,7 +49,7 @@ static State *handle_heredoc (
 ) {
     for (size_t i = 0, n = state->heredoc.states.count; i < n; i++) {
         HeredocState *s = state->heredoc.states.ptrs[i];
-        if (s->len == len && !memcmp(s->delim, delim, len)) {
+        if (s->len == len && mem_equal(s->delim, delim, len)) {
             return s->state;
         }
     }
@@ -185,7 +186,7 @@ static HlColor **highlight_line (
                 size_t end = i + slen;
                 if (
                     len >= end
-                    && !memcmp(cond->u.cond_str.str, line + i, slen)
+                    && mem_equal(cond->u.cond_str.str, line + i, slen)
                 ) {
                     while (i < end) {
                         colors[i++] = a->emit_color;
@@ -228,7 +229,7 @@ static HlColor **highlight_line (
                 const char *str = cond->u.cond_heredocend.str;
                 size_t slen = cond->u.cond_heredocend.len;
                 size_t end = i + slen;
-                if (len >= end && (slen == 0 || !memcmp(str, line + i, slen))) {
+                if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
                     while (i < end) {
                         colors[i++] = a->emit_color;
                     }

@@ -42,7 +42,7 @@ static TerminalType get_term_type(const char *term)
     const size_t term_len = strlen(term);
     for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
         const size_t n = builtin_terminals[i].name_len;
-        if (term_len >= n && memcmp(term, builtin_terminals[i].name, n) == 0) {
+        if (term_len >= n && mem_equal(term, builtin_terminals[i].name, n)) {
             if (term[n] == '-' || term[n] == '\0') {
                 return builtin_terminals[i].type;
             }

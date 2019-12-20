@@ -9,6 +9,7 @@
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/readfile.h"
+#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/wbuf.h"
 #include "util/xmalloc.h"
@@ -26,7 +27,7 @@ static PointerArray history = PTR_ARRAY_INIT;
 
 static bool entry_match(const HistoryEntry *e, const char *filename, size_t len)
 {
-    return len == e->filename_len && memcmp(filename, e->filename, len) == 0;
+    return len == e->filename_len && mem_equal(filename, e->filename, len);
 }
 
 static ssize_t lookup_entry_index(const char *filename, size_t filename_len)

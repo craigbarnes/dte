@@ -46,7 +46,7 @@ static pid_t rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
 
         bool same =
             filename_len == next_bol - 1 - pos
-            && !memcmp(buf + pos, filename, filename_len)
+            && mem_equal(buf + pos, filename, filename_len)
         ;
         if (pid == my_pid) {
             if (same) {

@@ -6,6 +6,7 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
+#include "util/str-util.h"
 #include "util/utf8.h"
 
 typedef struct {
@@ -204,9 +205,9 @@ static void screen_skip_char(LineInfo *info)
 static bool is_notice(const char *word, size_t len)
 {
     switch (len) {
-    case 3: return !memcmp(word, "XXX", 3);
-    case 4: return !memcmp(word, "TODO", 4);
-    case 5: return !memcmp(word, "FIXME", 5);
+    case 3: return mem_equal(word, "XXX", 3);
+    case 4: return mem_equal(word, "TODO", 4);
+    case 5: return mem_equal(word, "FIXME", 5);
     }
     return false;
 }

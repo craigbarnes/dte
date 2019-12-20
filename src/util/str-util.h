@@ -27,6 +27,12 @@ static inline bool xstreq(const char *a, const char *b)
 }
 
 NONNULL_ARGS
+static inline bool mem_equal(const void *s1, const void *s2, size_t n)
+{
+    return memcmp(s1, s2, n) == 0;
+}
+
+NONNULL_ARGS
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {
     return strncmp(str, prefix, strlen(prefix)) == 0;
@@ -40,13 +46,7 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
     if (l2 > l1) {
         return false;
     }
-    return memcmp(str + l1 - l2, suffix, l2) == 0;
-}
-
-NONNULL_ARGS
-static inline bool mem_equal(const void *s1, const void *s2, size_t n)
-{
-    return memcmp(s1, s2, n) == 0;
+    return mem_equal(str + l1 - l2, suffix, l2);
 }
 
 NONNULL_ARGS

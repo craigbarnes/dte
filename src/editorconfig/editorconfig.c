@@ -11,6 +11,7 @@
 #include "../util/string.h"
 #include "../util/string-view.h"
 #include "../util/strtonum.h"
+#include "../util/str-util.h"
 
 typedef struct {
     const char *const pathname;
@@ -27,7 +28,7 @@ typedef enum {
     EC_UNKNOWN_PROPERTY,
 } PropertyType;
 
-#define CMP(s, val) if (!memcmp(name->data, s, STRLEN(s))) return val; break
+#define CMP(s, val) if (mem_equal(name->data, s, STRLEN(s))) return val; break
 
 static PropertyType lookup_property(const StringView *name)
 {

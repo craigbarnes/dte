@@ -185,7 +185,7 @@ static char *short_filename_cwd(const char *absolute, const char *cwd)
 
     if (
         abs_len > home_len
-        && !memcmp(absolute, editor.home_dir, home_len)
+        && mem_equal(absolute, editor.home_dir, home_len)
         && absolute[home_len] == '/'
     ) {
         size_t len = abs_len - home_len + 1;

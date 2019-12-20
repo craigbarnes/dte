@@ -69,7 +69,7 @@ static void test_builtin_configs(void)
             ssize_t size = read_file(path, &src);
             free(path);
             ASSERT_EQ(size, cfg.text.length);
-            EXPECT_EQ(memcmp(src, cfg.text.data, size), 0);
+            EXPECT_TRUE(mem_equal(src, cfg.text.data, size));
             free(src);
         }
     }
@@ -92,7 +92,7 @@ static void expect_files_equal(const char *path1, const char *path2)
         return;
     }
 
-    if (size1 != size2 || memcmp(buf1, buf2, size1) != 0) {
+    if (size1 != size2 || !mem_equal(buf1, buf2, size1)) {
         TEST_FAIL("Files differ: '%s', '%s'", path1, path2);
     }
 

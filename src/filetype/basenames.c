@@ -93,12 +93,15 @@ static const FileBasenameMap dotfiles[] = {
 static FileTypeEnum filetype_from_basename(StringView sv)
 {
     switch (sv.length) {
-    case  5:  case 6:  case 7:  case 8:
-    case  9: case 10: case 11: case 12:
-    case 13: case 14: case 15:
+    case  4: case  5: case  6: case  7:
+    case  8: case  9: case 10: case 11:
+    case 12: case 13: case 14: case 15:
         break;
     case 17:
-        return memcmp(sv.data, "meson_options.txt", 17) ? NONE : MESON;
+        if (mem_equal(sv.data, "meson_options.txt", 17)) {
+            return MESON;
+        }
+        // Fallthrough
     default:
         return NONE;
     }

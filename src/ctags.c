@@ -115,7 +115,7 @@ static bool parse_line(Tag *t, const char *buf, size_t size)
         len = ei - si;
         if (len == 1) {
             t->kind = buf[si];
-        } else if (len == 5 && !memcmp(buf + si, "file:", 5)) {
+        } else if (len == 5 && mem_equal(buf + si, "file:", 5)) {
             t->local = true;
         }
         // FIXME: struct/union/typeref
@@ -151,7 +151,7 @@ bool next_tag (
             continue;
         }
 
-        if (len <= prefix_len || memcmp(line, prefix, prefix_len) != 0) {
+        if (len <= prefix_len || !mem_equal(line, prefix, prefix_len)) {
             continue;
         }
 

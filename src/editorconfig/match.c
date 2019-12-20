@@ -1,7 +1,6 @@
 #include <regex.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 #include "match.h"
 #include "../debug.h"
 #include "../util/str-util.h"
@@ -180,7 +179,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
             break;
         }
         case '/':
-            if (i + 3 < pattern_len && memcmp(pattern + i, "/**/", 4) == 0) {
+            if (i + 3 < pattern_len && mem_equal(pattern + i, "/**/", 4)) {
                 string_append_literal(&buf, "(/|/.*/)");
                 i += 3;
                 break;

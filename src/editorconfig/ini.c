@@ -1,9 +1,9 @@
 #include <stdlib.h>
-#include <string.h>
 #include "ini.h"
 #include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/readfile.h"
+#include "../util/str-util.h"
 
 static char *trim_left(char *str)
 {
@@ -53,7 +53,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
 
     const size_t size = ssize;
     size_t pos = 0;
-    if (size >= 3 && memcmp(buf, "\xEF\xBB\xBF", 3) == 0) {
+    if (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) {
         // Skip past UTF-8 BOM
         pos += 3;
     }

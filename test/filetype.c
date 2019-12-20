@@ -52,6 +52,7 @@ static void test_find_ft_filename(void)
         {".XCompose", "config"},
         {".tmux.conf", "config"},
         {"zshrc", "sh"},
+        {"gnus", "elisp"},
         {"file.flatpakref", "ini"},
         {"file.flatpakrepo", "ini"},
         {"file.automount", "ini"},

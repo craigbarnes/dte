@@ -634,43 +634,43 @@ static void test_u_set_char(void)
     i = 0;
     u_set_char(buf, &i, 0x00DF);
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "\xC3\x9F", 2), 0);
+    EXPECT_TRUE(mem_equal(buf, "\xC3\x9F", 2));
 
     i = 0;
     u_set_char(buf, &i, 0x0E01);
     EXPECT_EQ(i, 3);
-    EXPECT_EQ(memcmp(buf, "\xE0\xB8\x81", 3), 0);
+    EXPECT_TRUE(mem_equal(buf, "\xE0\xB8\x81", 3));
 
     i = 0;
     u_set_char(buf, &i, 0x1F914);
     EXPECT_EQ(i, 4);
-    EXPECT_EQ(memcmp(buf, "\xF0\x9F\xA4\x94", 4), 0);
+    EXPECT_TRUE(mem_equal(buf, "\xF0\x9F\xA4\x94", 4));
 
     i = 0;
     u_set_char(buf, &i, 0x10FFFF);
     EXPECT_EQ(i, 4);
     // Note: string separated to prevent "-Wtrigraphs" warning
-    EXPECT_EQ(memcmp(buf, "<" "?" "?" ">", 4), 0);
+    EXPECT_TRUE(mem_equal(buf, "<" "?" "?" ">", 4));
 
     i = 0;
     u_set_char(buf, &i, '\0');
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^@", 2), 0);
+    EXPECT_TRUE(mem_equal(buf, "^@", 2));
 
     i = 0;
     u_set_char(buf, &i, '\t');
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^I", 2), 0);
+    EXPECT_TRUE(mem_equal(buf, "^I", 2));
 
     i = 0;
     u_set_char(buf, &i, 0x1F);
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^_", 2), 0);
+    EXPECT_TRUE(mem_equal(buf, "^_", 2));
 
     i = 0;
     u_set_char(buf, &i, 0x7F);
     EXPECT_EQ(i, 2);
-    EXPECT_EQ(memcmp(buf, "^?", 2), 0);
+    EXPECT_TRUE(mem_equal(buf, "^?", 2));
 }
 
 static void test_u_prev_char(void)

@@ -94,13 +94,13 @@ static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
             // This might be a truncated escape sequence
             if (
                 possibly_truncated == false
-                && memcmp(keycode, buf, fill) == 0
+                && mem_equal(keycode, buf, fill)
             ) {
                 possibly_truncated = true;
             }
             continue;
         }
-        if (memcmp(keycode, buf, len) != 0) {
+        if (!mem_equal(keycode, buf, len)) {
             continue;
         }
         *key = km->key;
