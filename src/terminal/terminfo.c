@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "input.h"
 #include "key.h"
 #include "output.h"
 #include "terminal.h"
@@ -291,10 +292,18 @@ bool term_init_terminfo(const char *term)
     terminfo.setab = get_terminfo_string("setab");
     terminfo.setaf = get_terminfo_string("setaf");
     terminfo.sgr = get_terminfo_string("sgr");
-
     terminal.back_color_erase = get_terminfo_flag("bce");
-    terminal.width = tigetnum("cols");
-    terminal.height = tigetnum("lines");
+
+    int width = tigetnum("cols");
+    int height = tigetnum("lines");
+    if (width > 0 && height > 0) {
+        terminal.width = (unsigned int)width;
+        terminal.height = (unsigned int)height;
+    } else {
+        if (!term_get_size(&terminal.width, &terminal.height)) {
+            term_init_fail("Unable to determine terminal size");
+        }
+    }
 
     switch (tigetnum("colors")) {
     case 16777216:

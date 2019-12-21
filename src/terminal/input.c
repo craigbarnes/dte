@@ -287,7 +287,7 @@ void term_discard_paste(void)
     free(term_read_paste(&size));
 }
 
-bool term_get_size(int *w, int *h)
+bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
     if (ioctl(0, TIOCGWINSZ, &ws) != -1) {

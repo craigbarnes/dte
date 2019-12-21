@@ -24,8 +24,8 @@ typedef struct {
 typedef struct {
     bool back_color_erase;
     TermColorCapabilityType color_type;
-    int width;
-    int height;
+    unsigned int width;
+    unsigned int height;
     unsigned int ncv_attributes;
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);

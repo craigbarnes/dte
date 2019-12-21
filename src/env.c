@@ -15,7 +15,7 @@ typedef struct {
 
 static char *expand_columns(void)
 {
-    return xasprintf("%d", terminal.width);
+    return xasprintf("%u", terminal.width);
 }
 
 static char *expand_dte_home(void)
@@ -50,7 +50,7 @@ static char *expand_lineno(void)
 
 static char *expand_lines(void)
 {
-    return xasprintf("%d", terminal.height);
+    return xasprintf("%u", terminal.height);
 }
 
 static char *expand_word(void)
