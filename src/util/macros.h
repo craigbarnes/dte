@@ -130,6 +130,18 @@
     #define PREFETCH(addr, ...)
 #endif
 
+#if GNUC_AT_LEAST(3, 1) || HAS_ATTRIBUTE(noinline)
+    #define NOINLINE __attribute__((__noinline__))
+#else
+    #define NOINLINE
+#endif
+
+#if GNUC_AT_LEAST(3, 1) || HAS_ATTRIBUTE(always_inline)
+    #define ALWAYS_INLINE __attribute__((__always_inline__))
+#else
+    #define ALWAYS_INLINE
+#endif
+
 #if GNUC_AT_LEAST(3, 3) || HAS_ATTRIBUTE(nonnull)
     #define NONNULL_ARGS __attribute__((__nonnull__))
     #define NONNULL_ARG(...) __attribute__((__nonnull__(__VA_ARGS__)))
@@ -142,6 +154,18 @@
     #define WARN_UNUSED_RESULT __attribute__((__warn_unused_result__))
 #else
     #define WARN_UNUSED_RESULT
+#endif
+
+#if GNUC_AT_LEAST(4, 0) || HAS_ATTRIBUTE(sentinel)
+    #define SENTINEL __attribute__((__sentinel__))
+#else
+    #define SENTINEL
+#endif
+
+#if GNUC_AT_LEAST(4, 1) || HAS_ATTRIBUTE(flatten)
+    #define FLATTEN __attribute__((__flatten__))
+#else
+    #define FLATTEN
 #endif
 
 #if GNUC_AT_LEAST(4, 3) || HAS_ATTRIBUTE(alloc_size)
