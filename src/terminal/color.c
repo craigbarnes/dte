@@ -118,7 +118,7 @@ static int32_t parse_color(const char *str, size_t len)
             return COLOR_INVALID;
         }
         // Convert to color index 16..231 (xterm 6x6x6 color cube)
-        return 16 + r * 36 + g * 6 + b;
+        return 16 + (r * 36) + (g * 6) + b;
     }
 
     // Parse -2 .. 255
@@ -139,8 +139,6 @@ static int32_t parse_color(const char *str, size_t len)
 
     const int32_t c = lookup_color(str, len);
     switch (c) {
-    case COLOR_INVALID:
-        return COLOR_INVALID;
     case COLOR_RED:
     case COLOR_GREEN:
     case COLOR_YELLOW:
@@ -148,9 +146,36 @@ static int32_t parse_color(const char *str, size_t len)
     case COLOR_MAGENTA:
     case COLOR_CYAN:
         return light ? c + 8 : c;
-    default:
-        return light ? COLOR_INVALID : c;
     }
+    return light ? COLOR_INVALID : c;
+}
+
+UNITTEST {
+    BUG_ON(parse_color(STRN("-2")) != COLOR_KEEP);
+    BUG_ON(parse_color(STRN("-1")) != COLOR_DEFAULT);
+    BUG_ON(parse_color(STRN("0")) != COLOR_BLACK);
+    BUG_ON(parse_color(STRN("1")) != COLOR_RED);
+    BUG_ON(parse_color(STRN("255")) != 255);
+    BUG_ON(parse_color(STRN("0/0/0")) != 16);
+    BUG_ON(parse_color(STRN("2/3/4")) != 110);
+    BUG_ON(parse_color(STRN("5/5/5")) != 231);
+    BUG_ON(parse_color(STRN("black")) != COLOR_BLACK);
+    BUG_ON(parse_color(STRN("white")) != COLOR_WHITE);
+    BUG_ON(parse_color(STRN("keep")) != COLOR_KEEP);
+    BUG_ON(parse_color(STRN("default")) != COLOR_DEFAULT);
+    BUG_ON(parse_color(STRN("#abcdef")) != COLOR_RGB(0xABCDEF));
+    BUG_ON(parse_color(STRN("#a1b2c3")) != COLOR_RGB(0xA1B2C3));
+    BUG_ON(parse_color(STRN("-3")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("256")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("//0/0")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("0/0/:")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("lightblack")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("lightwhite")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("light_")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN(".")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("#11223")) != COLOR_INVALID);
+    BUG_ON(parse_color(STRN("#fffffg")) != COLOR_INVALID);
 }
 
 bool parse_term_color(TermColor *color, char **strs)
