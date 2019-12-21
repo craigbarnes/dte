@@ -39,7 +39,7 @@ void term_add_bytes(const char *const str, size_t count)
 {
     if (count > obuf_avail()) {
         term_output_flush();
-        if (count >= sizeof(obuf.buf)) {
+        if (unlikely(count >= sizeof(obuf.buf))) {
             xwrite(STDOUT_FILENO, str, count);
             return;
         }
@@ -103,7 +103,7 @@ static void term_vsprintf(const char *fmt, va_list ap)
 
     if (n >= obuf_avail()) {
         term_output_flush();
-        if (n >= sizeof(obuf.buf)) {
+        if (unlikely(n >= sizeof(obuf.buf))) {
             char *tmp = xmalloc(n + 1);
             int wrote = vsnprintf(tmp, n + 1, fmt, ap);
             BUG_ON(wrote != n);
