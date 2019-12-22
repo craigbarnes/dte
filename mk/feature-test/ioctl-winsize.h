@@ -1,0 +1,1 @@
+#define HAVE_IOCTL_WINSIZE
