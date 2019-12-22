@@ -50,7 +50,7 @@ static void test_find_ft_filename(void)
         {".jshintrc", "json"},
         {".zshrc", "sh"},
         {".XCompose", "config"},
-        {".tmux.conf", "config"},
+        {".tmux.conf", "tmux"},
         {"zshrc", "sh"},
         {"gnus", "elisp"},
         {"file.flatpakref", "ini"},

@@ -1,0 +1,14 @@
+syntax tmux
+
+state start code
+    char " \t" this
+    char # comment
+    noeat command
+
+state comment
+    char "\n" start
+    eat this
+
+state command code
+    char "\n" start
+    eat this
