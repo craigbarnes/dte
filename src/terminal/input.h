@@ -9,6 +9,4 @@ bool term_read_key(KeyCode *key);
 char *term_read_paste(size_t *size);
 void term_discard_paste(void);
 
-bool term_get_size(unsigned int *w, unsigned int *h);
-
 #endif

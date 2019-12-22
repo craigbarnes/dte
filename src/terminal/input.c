@@ -1,11 +1,9 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <unistd.h>
-#undef CTRL // undef glibc macro pollution from sys/ttydefaults.h
 #include "input.h"
 #include "terminal.h"
 #include "../editor.h"
@@ -285,15 +283,4 @@ void term_discard_paste(void)
 {
     size_t size;
     free(term_read_paste(&size));
-}
-
-bool term_get_size(unsigned int *w, unsigned int *h)
-{
-    struct winsize ws;
-    if (ioctl(0, TIOCGWINSZ, &ws) != -1) {
-        *w = ws.ws_col;
-        *h = ws.ws_row;
-        return true;
-    }
-    return false;
 }

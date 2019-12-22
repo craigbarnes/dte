@@ -46,7 +46,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key mode no-op output terminal terminfo \
-    xterm xterm-keys )
+    winsize xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer change cmdline command \
