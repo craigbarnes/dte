@@ -489,12 +489,6 @@ static void cmd_ft(const CommandArgs *a)
     }
 }
 
-static void cmd_git_open(const CommandArgs* UNUSED_ARG(a))
-{
-    set_input_mode(INPUT_GIT_OPEN);
-    git_open_reload();
-}
-
 static void cmd_hi(const CommandArgs *a)
 {
     char **args = a->args;
@@ -608,6 +602,12 @@ static void cmd_load_syntax(const CommandArgs *a)
             load_syntax_by_filetype(filetype);
         }
     }
+}
+
+static void cmd_menu_open(const CommandArgs *a)
+{
+    set_input_mode(INPUT_MENU);
+    menu_reload(a->args, has_flag(a, 'z'));
 }
 
 static void cmd_move_tab(const CommandArgs *a)
@@ -2043,7 +2043,6 @@ static const Command cmds[] = {
     {"eval", "-", 1, -1, cmd_eval},
     {"filter", "-", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
-    {"git-open", "", 0, 0, cmd_git_open},
     {"hi", "-", 0, -1, cmd_hi},
     {"include", "bq", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
@@ -2052,6 +2051,7 @@ static const Command cmds[] = {
     {"left", "c", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
+    {"menu-open", "-z", 1, -1, cmd_menu_open},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},

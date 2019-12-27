@@ -366,30 +366,6 @@ search mode where you can type a regular expression to search.
 `-w`
 :   Search word under cursor
 
-### **git-open**
-
-Interactive file opener. Lists all files in a git repository.
-
-Same keys work as in command mode, but with these changes:
-
-`up`
-:   Move up in file list.
-
-`down`
-:   Move down in file list.
-
-`enter`
-:   Open file.
-
-`^O`
-:   Open file but don't close git-open.
-
-`M-e`
-:   Go to end of file list.
-
-`M-t`
-:   Go to top of file list.
-
 ### **refresh**
 
 Trigger a full redraw of the screen.
@@ -912,6 +888,38 @@ See also: `errorfmt` and `msg` commands.
 
 Run external _command_ and execute its standard output text as dterc
 commands.
+
+### **menu-open** [**-z**] _command_ [_parameter_]...
+
+Run _command_ and display all files from its standard output as an
+interactive file menu.
+
+`-z`
+:   Interpret null character as line delimiter (instead of newline)
+
+Key bindings are the same as in command mode, except for the following:
+
+`up`
+:   Move up in file list.
+
+`down`
+:   Move down in file list.
+
+`enter`
+:   Open file.
+
+`^O`
+:   Open file (without exiting the menu).
+
+`M-e`
+:   Go to end of file list.
+
+`M-t`
+:   Go to top of file list.
+
+Example usage:
+
+    menu-open -z find . -type f -print0
 
 ## Other Commands
 

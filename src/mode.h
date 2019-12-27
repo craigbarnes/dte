@@ -1,6 +1,7 @@
 #ifndef MODE_H
 #define MODE_H
 
+#include <stdbool.h>
 #include "terminal/key.h"
 
 typedef struct {
@@ -11,8 +12,8 @@ typedef struct {
 extern const EditorModeOps normal_mode_ops;
 extern const EditorModeOps command_mode_ops;
 extern const EditorModeOps search_mode_ops;
-extern const EditorModeOps git_open_ops;
+extern const EditorModeOps menu_ops;
 
-void git_open_reload(void);
+void menu_reload(char **argv, bool null_delimited);
 
 #endif

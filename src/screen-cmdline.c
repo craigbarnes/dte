@@ -84,7 +84,7 @@ void update_command_line(void)
     case INPUT_COMMAND:
         editor.cmdline_x = print_command(prefix);
         break;
-    case INPUT_GIT_OPEN:
+    case INPUT_MENU:
         break;
     }
     term_clear_eol();

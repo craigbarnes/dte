@@ -80,7 +80,7 @@ EditorState editor = {
         [INPUT_NORMAL] = &normal_mode_ops,
         [INPUT_COMMAND] = &command_mode_ops,
         [INPUT_SEARCH] = &search_mode_ops,
-        [INPUT_GIT_OPEN] = &git_open_ops
+        [INPUT_MENU] = &menu_ops
     }
 };
 
@@ -162,7 +162,7 @@ static void restore_cursor(void)
     case INPUT_SEARCH:
         terminal.move_cursor(editor.cmdline_x, terminal.height - 1);
         break;
-    case INPUT_GIT_OPEN:
+    case INPUT_MENU:
         break;
     }
 }
@@ -427,7 +427,7 @@ void main_loop(void)
         }
 
         clear_error();
-        if (editor.input_mode == INPUT_GIT_OPEN) {
+        if (editor.input_mode == INPUT_MENU) {
             editor.mode_ops[editor.input_mode]->keypress(key);
             editor.mode_ops[editor.input_mode]->update();
         } else {
@@ -441,8 +441,8 @@ void main_loop(void)
             };
             editor.mode_ops[editor.input_mode]->keypress(key);
             sanity_check();
-            if (editor.input_mode == INPUT_GIT_OPEN) {
-                editor.mode_ops[INPUT_GIT_OPEN]->update();
+            if (editor.input_mode == INPUT_MENU) {
+                editor.mode_ops[INPUT_MENU]->update();
             } else {
                 update_screen(&s);
             }

@@ -19,46 +19,29 @@ static struct {
     size_t size;
     size_t selected;
     size_t scroll;
-} git_open;
+    char line_ending;
+} menu;
 
-static void git_open_clear(void)
+static void menu_clear(void)
 {
-    free(git_open.all_files);
-    git_open.all_files = NULL;
-    git_open.size = 0;
-    git_open.files.count = 0;
-    git_open.selected = 0;
-    git_open.scroll = 0;
+    free(menu.all_files);
+    menu.all_files = NULL;
+    menu.size = 0;
+    menu.files.count = 0;
+    menu.selected = 0;
+    menu.scroll = 0;
+    menu.line_ending = '\n';
 }
 
-static char *cdup(void)
+static void menu_load(char **argv, bool null_delimited)
 {
-    static const char *const cmd[] = {"git", "rev-parse", "--show-cdup", NULL};
     String output = STRING_INIT;
-    if (!spawn_source((char **)cmd, &output)) {
-        return NULL;
-    }
-    if (output.len > 1 && output.buffer[output.len - 1] == '\n') {
-        output.len--;
-        return string_steal_cstring(&output);
-    }
-    string_free(&output);
-    return NULL;
-}
-
-static void git_open_load(void)
-{
-    static const char *cmd[] = {"git", "ls-files", "-z", NULL, NULL};
-    String output = STRING_INIT;
-    char *dir = cdup();
-    cmd[3] = dir;
-    if (spawn_source((char **)cmd, &output)) {
-        git_open.all_files = string_steal(&output, &git_open.size);
-    } else {
+    if (!spawn_source(argv, &output)) {
         set_input_mode(INPUT_NORMAL);
-        error_msg("git-open: 'git ls-files' command failed");
+        return;
     }
-    free(dir);
+    menu.all_files = string_steal(&output, &menu.size);
+    menu.line_ending = null_delimited ? '\0' : '\n';
 }
 
 static bool contains_upper(const char *str)
@@ -112,17 +95,18 @@ static bool words_match_icase(const char *name, const PointerArray *words)
 
 static const char *selected_file(void)
 {
-    if (git_open.files.count == 0) {
+    if (menu.files.count == 0) {
         return NULL;
     }
-    return git_open.files.ptrs[git_open.selected];
+    return menu.files.ptrs[menu.selected];
 }
 
-static void git_open_filter(void)
+static void menu_filter(void)
 {
     const char *str = string_borrow_cstring(&editor.cmdline.buf);
-    char *ptr = git_open.all_files;
-    char *end = git_open.all_files + git_open.size;
+    const char line_ending = menu.line_ending;
+    char *ptr = menu.all_files;
+    char *end = menu.all_files + menu.size;
     bool (*match)(const char*, const PointerArray*) = words_match_icase;
     PointerArray words = PTR_ARRAY_INIT;
 
@@ -132,37 +116,38 @@ static void git_open_filter(void)
     }
     split(&words, str);
 
-    git_open.files.count = 0;
+    menu.files.count = 0;
     while (ptr < end) {
-        char *zero = memchr(ptr, 0, end - ptr);
-        if (zero == NULL) {
+        char *eol = memchr(ptr, line_ending, end - ptr);
+        if (eol == NULL) {
             break;
         }
+        *eol = '\0';
         if (match(ptr, &words)) {
-            ptr_array_append(&git_open.files, ptr);
+            ptr_array_append(&menu.files, ptr);
         }
-        ptr = zero + 1;
+        ptr = eol + 1;
     }
     ptr_array_free(&words);
-    git_open.selected = 0;
-    git_open.scroll = 0;
+    menu.selected = 0;
+    menu.scroll = 0;
 }
 
 static void up(size_t count)
 {
-    if (count >= git_open.selected) {
-        git_open.selected = 0;
+    if (count >= menu.selected) {
+        menu.selected = 0;
     } else {
-        git_open.selected -= count;
+        menu.selected -= count;
     }
 }
 
 static void down(size_t count)
 {
-    if (git_open.files.count > 1) {
-        git_open.selected += count;
-        if (git_open.selected >= git_open.files.count) {
-            git_open.selected = git_open.files.count - 1;
+    if (menu.files.count > 1) {
+        menu.selected += count;
+        if (menu.selected >= menu.files.count) {
+            menu.selected = menu.files.count - 1;
         }
     }
 }
@@ -175,11 +160,11 @@ static void open_selected(void)
     }
 }
 
-void git_open_reload(void)
+void menu_reload(char **argv, bool null_delimited)
 {
-    git_open_clear();
-    git_open_load();
-    git_open_filter();
+    menu_clear();
+    menu_load(argv, null_delimited);
+    menu_filter();
 }
 
 static size_t terminal_page_height(void)
@@ -191,7 +176,7 @@ static size_t terminal_page_height(void)
     }
 }
 
-static void git_open_keypress(KeyCode key)
+static void menu_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:
@@ -204,12 +189,12 @@ static void git_open_keypress(KeyCode key)
         down(1);
         break;
     case MOD_META | 'e':
-        if (git_open.files.count > 1) {
-            git_open.selected = git_open.files.count - 1;
+        if (menu.files.count > 1) {
+            menu.selected = menu.files.count - 1;
         }
         break;
     case MOD_META | 't':
-        git_open.selected = 0;
+        menu.selected = 0;
         break;
     case KEY_UP:
         up(1);
@@ -224,8 +209,8 @@ static void git_open_keypress(KeyCode key)
         down(terminal_page_height());
         break;
     case '\t':
-        if (git_open.selected + 1 >= git_open.files.count) {
-            git_open.selected = 0;
+        if (menu.selected + 1 >= menu.files.count) {
+            menu.selected = 0;
         } else {
             down(1);
         }
@@ -235,7 +220,7 @@ static void git_open_keypress(KeyCode key)
         case CMDLINE_UNKNOWN_KEY:
             break;
         case CMDLINE_KEY_HANDLED:
-            git_open_filter();
+            menu_filter();
             break;
         case CMDLINE_CANCEL:
             set_input_mode(INPUT_NORMAL);
@@ -245,23 +230,23 @@ static void git_open_keypress(KeyCode key)
     mark_everything_changed();
 }
 
-static void git_open_update_screen(void)
+static void menu_update_screen(void)
 {
     int x = 0;
     int y = 0;
     int w = terminal.width;
     int h = terminal.height - 1;
-    int max_y = git_open.scroll + h - 1;
+    int max_y = menu.scroll + h - 1;
     int i = 0;
 
-    if (h >= git_open.files.count) {
-        git_open.scroll = 0;
+    if (h >= menu.files.count) {
+        menu.scroll = 0;
     }
-    if (git_open.scroll > git_open.selected) {
-        git_open.scroll = git_open.selected;
+    if (menu.scroll > menu.selected) {
+        menu.scroll = menu.selected;
     }
-    if (git_open.selected > max_y) {
-        git_open.scroll += git_open.selected - max_y;
+    if (menu.selected > max_y) {
+        menu.scroll += menu.selected - max_y;
     }
 
     term_output_reset(x, w, 0);
@@ -271,20 +256,20 @@ static void git_open_update_screen(void)
     y++;
 
     for (; i < h; i++) {
-        int file_idx = git_open.scroll + i;
+        int file_idx = menu.scroll + i;
         char *file;
         TermColor color;
 
-        if (file_idx >= git_open.files.count) {
+        if (file_idx >= menu.files.count) {
             break;
         }
 
-        file = git_open.files.ptrs[file_idx];
+        file = menu.files.ptrs[file_idx];
         obuf.x = 0;
         terminal.move_cursor(x, y + i);
 
         color = *builtin_colors[BC_DEFAULT];
-        if (file_idx == git_open.selected) {
+        if (file_idx == menu.selected) {
             mask_color(&color, builtin_colors[BC_SELECTION]);
         }
         terminal.set_color(&color);
@@ -299,17 +284,17 @@ static void git_open_update_screen(void)
     }
 }
 
-static void git_open_update(void)
+static void menu_update(void)
 {
     term_hide_cursor();
     update_term_title(window->view->buffer);
-    git_open_update_screen();
+    menu_update_screen();
     terminal.move_cursor(editor.cmdline_x, 0);
     term_show_cursor();
     term_output_flush();
 }
 
-const EditorModeOps git_open_ops = {
-    .keypress = git_open_keypress,
-    .update = git_open_update,
+const EditorModeOps menu_ops = {
+    .keypress = menu_keypress,
+    .update = menu_update,
 };
