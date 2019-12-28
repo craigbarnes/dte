@@ -84,7 +84,6 @@ static void handle_child(char **argv, int fd[3], int error_fd)
 
     if (move) {
         int next_free = max + 1;
-
         if (error_fd < nr_fds) {
             error_fd = dup_close_on_exec(error_fd, next_free++);
             if (error_fd < 0) {

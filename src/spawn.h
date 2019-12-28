@@ -27,7 +27,7 @@ typedef struct {
     .out_len = 0 \
 }
 
-bool spawn_source(char **argv, String *output);
+bool spawn_source(char **argv, String *output, bool quiet);
 bool spawn_sink(char **argv, const char *text, size_t length);
 bool spawn_filter(char **argv, FilterData *data);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);

@@ -234,7 +234,7 @@ error:
     return false;
 }
 
-bool spawn_source(char **argv, String *output)
+bool spawn_source(char **argv, String *output, bool quiet)
 {
     int p[2] = {-1, -1};
     int dev_null_r = -1;
@@ -242,37 +242,45 @@ bool spawn_source(char **argv, String *output)
 
     if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
-        goto error;
+        return false;
     }
 
-    dev_null_r = open_dev_null(O_RDONLY);
-    if (dev_null_r < 0) {
-        goto error;
+    int fd[3] = {0, p[1], 2};
+    if (quiet) {
+        dev_null_r = open_dev_null(O_RDONLY);
+        if (dev_null_r < 0) {
+            goto error;
+        }
+        fd[0] = dev_null_r;
+        dev_null_w = open_dev_null(O_WRONLY);
+        if (dev_null_w < 0) {
+            goto error;
+        }
+        fd[2] = dev_null_w;
+    } else {
+        yield_terminal();
     }
 
-    dev_null_w = open_dev_null(O_WRONLY);
-    if (dev_null_w < 0) {
-        goto error;
-    }
-
-    int fd[3] = {dev_null_r, p[1], dev_null_w};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
         perror_msg("fork_exec");
         goto error;
     }
-    close(dev_null_r);
-    close(dev_null_w);
+
+    if (quiet) {
+        close(dev_null_r);
+        close(dev_null_w);
+        dev_null_r = dev_null_w = -1;
+    }
     close(p[1]);
+    p[1] = -1;
 
     while (1) {
         char buf[8192];
         ssize_t rc = xread(p[0], buf, sizeof(buf));
         if (unlikely(rc < 0)) {
             perror_msg("read");
-            close(p[0]);
-            string_free(output);
-            return false;
+            goto error;
         }
         if (rc == 0) {
             break;
@@ -281,6 +289,10 @@ bool spawn_source(char **argv, String *output)
     }
 
     close(p[0]);
+    if (!quiet) {
+        resume_terminal(false);
+    }
+
     if (handle_child_error(pid)) {
         string_free(output);
         return false;
@@ -288,10 +300,15 @@ bool spawn_source(char **argv, String *output)
     return true;
 
 error:
+    string_free(output);
     close(p[0]);
     close(p[1]);
-    close(dev_null_r);
-    close(dev_null_w);
+    if (quiet) {
+        close(dev_null_r);
+        close(dev_null_w);
+    } else if (editor.child_controls_terminal) {
+        resume_terminal(false);
+    }
     return false;
 }
 

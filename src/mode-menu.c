@@ -36,7 +36,7 @@ static void menu_clear(void)
 static void menu_load(char **argv, bool null_delimited)
 {
     String output = STRING_INIT;
-    if (!spawn_source(argv, &output)) {
+    if (!spawn_source(argv, &output, true)) {
         set_input_mode(INPUT_NORMAL);
         return;
     }

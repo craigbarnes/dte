@@ -33,6 +33,7 @@
 #include "terminal/input.h"
 #include "terminal/terminal.h"
 #include "util/path.h"
+#include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -427,6 +428,27 @@ static void cmd_eval(const CommandArgs *a)
     }
     exec_config(&commands, data.out, data.out_len);
     free(data.out);
+}
+
+static void cmd_exec_open(const CommandArgs *a)
+{
+    String output = STRING_INIT;
+    if (!spawn_source(a->args, &output, has_flag(a, 's'))) {
+        return;
+    }
+
+    PointerArray filenames = PTR_ARRAY_INIT;
+    for (size_t pos = 0, size = output.len; pos < size; ) {
+        char *filename = buf_next_line(output.buffer, &pos, size);
+        if (filename[0] != '\0') {
+            ptr_array_append(&filenames, filename);
+        }
+    }
+
+    ptr_array_append(&filenames, NULL);
+    window_open_files(window, (char**)filenames.ptrs, NULL);
+    ptr_array_free_array(&filenames);
+    string_free(&output);
 }
 
 static void cmd_filter(const CommandArgs *a)
@@ -901,7 +923,7 @@ static void cmd_pipe_from(const CommandArgs *a)
     }
 
     String output = STRING_INIT;
-    if (!spawn_source(a->args, &output)) {
+    if (!spawn_source(a->args, &output, true)) {
         return;
     }
 
@@ -2041,6 +2063,7 @@ static const Command cmds[] = {
     {"erase-word", "s", 0, 0, cmd_erase_word},
     {"errorfmt", "i", 2, 18, cmd_errorfmt},
     {"eval", "-", 1, -1, cmd_eval},
+    {"exec-open", "-s", 1, -1, cmd_exec_open},
     {"filter", "-", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
     {"hi", "-", 0, -1, cmd_hi},
