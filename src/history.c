@@ -1,5 +1,8 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "history.h"
@@ -7,7 +10,6 @@
 #include "util/ptr-array.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
-#include "util/wbuf.h"
 #include "util/xmalloc.h"
 
 // Add item to end of array
@@ -81,20 +83,33 @@ void history_load(PointerArray *history, const char *filename, size_t max_entrie
     free(buf);
 }
 
+// Like fopen(), but also sets the file mode
+FILE *history_fopen(const char *filename)
+{
+    int fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    if (fd < 0) {
+        goto error;
+    }
+    FILE *file = fdopen(fd, "w");
+    if (!file) {
+        close(fd);
+        goto error;
+    }
+    return file;
+error:
+    error_msg("Error creating %s: %s", filename, strerror(errno));
+    return NULL;
+}
+
 void history_save(const PointerArray *history, const char *filename)
 {
-    WriteBuffer buf = WBUF_INIT;
-    buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
-    if (buf.fd < 0) {
-        error_msg("Error creating %s: %s", filename, strerror(errno));
+    FILE *f = history_fopen(filename);
+    if (!f) {
         return;
     }
-
     for (size_t i = 0, n = history->count; i < n; i++) {
-        wbuf_write_str(&buf, history->ptrs[i]);
-        wbuf_write_ch(&buf, '\n');
+        fputs(history->ptrs[i], f);
+        fputc('\n', f);
     }
-
-    wbuf_flush(&buf);
-    close(buf.fd);
+    fclose(f);
 }

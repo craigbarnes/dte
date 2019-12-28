@@ -2,12 +2,13 @@
 #define HISTORY_H
 
 #include <stdbool.h>
-#include <sys/types.h>
+#include <stdio.h>
 #include "util/ptr-array.h"
 
 #define search_history_size 100
 #define command_history_size 500
 
+FILE *history_fopen(const char *filename);
 void history_add(PointerArray *history, const char *text, size_t max_entries);
 bool history_search_forward(const PointerArray *history, ssize_t *pos, const char *text);
 bool history_search_backward(const PointerArray *history, ssize_t *pos, const char *text);

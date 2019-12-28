@@ -1,19 +1,16 @@
 #include <errno.h>
-#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include "file-history.h"
 #include "error.h"
+#include "history.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
-#include "util/wbuf.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 
 typedef struct {
     unsigned long row, col;
@@ -67,11 +64,11 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
         free(ptr_array_remove_idx(&history, 0));
     }
 
-    HistoryEntry *e = xmalloc(sizeof(*e) + filename_len);
+    HistoryEntry *e = xmalloc(sizeof(*e) + filename_len + 1);
     e->row = row;
     e->col = col;
     e->filename_len = filename_len;
-    memcpy(e->filename, filename, filename_len);
+    memcpy(e->filename, filename, filename_len + 1);
     ptr_array_append(&history, e);
 }
 
@@ -121,23 +118,17 @@ void load_file_history(const char *filename)
 
 void save_file_history(const char *filename)
 {
-    WriteBuffer buf = WBUF_INIT;
-    buf.fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
-    if (buf.fd < 0) {
-        error_msg("Error creating %s: %s", filename, strerror(errno));
+    FILE *f = history_fopen(filename);
+    if (!f) {
         return;
     }
 
     for (size_t i = 0, n = history.count; i < n; i++) {
         const HistoryEntry *e = history.ptrs[i];
-        wbuf_reserve_space(&buf, 64);
-        buf.fill += xsnprintf(buf.buf + buf.fill, 64, "%lu %lu ", e->row, e->col);
-        wbuf_write(&buf, e->filename, e->filename_len);
-        wbuf_write_ch(&buf, '\n');
+        fprintf(f, "%lu %lu %s\n", e->row, e->col, e->filename);
     }
 
-    wbuf_flush(&buf);
-    close(buf.fd);
+    fclose(f);
 }
 
 bool find_file_in_history(const char *filename, unsigned long *row, unsigned long *col)

@@ -33,7 +33,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii exec hashset path ptr-array readfile string strtonum \
-    unicode utf8 wbuf xmalloc xreadwrite xsnprintf )
+    unicode utf8 xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
