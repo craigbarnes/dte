@@ -185,6 +185,11 @@ static void resume_terminal(bool prompt)
     editor.child_controls_terminal = false;
 }
 
+static void exec_error(const char *argv0)
+{
+    error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
+}
+
 bool spawn_filter(char **argv, FilterData *data)
 {
     int p0[2] = {-1, -1};
@@ -206,7 +211,7 @@ bool spawn_filter(char **argv, FilterData *data)
     int fd[3] = {p0[0], p1[1], dev_null};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        perror_msg("fork_exec");
+        exec_error(argv[0]);
         goto error;
     }
 
@@ -263,7 +268,7 @@ bool spawn_source(char **argv, String *output, bool quiet)
 
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        perror_msg("fork_exec");
+        exec_error(argv[0]);
         goto error;
     }
 
@@ -330,7 +335,7 @@ bool spawn_sink(char **argv, const char *text, size_t length)
     int fd[3] = {p[0], dev_null, dev_null};
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
-        perror_msg("fork_exec");
+        exec_error(argv[0]);
         goto error;
     }
 
@@ -390,7 +395,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
 
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
-        perror_msg("fork_exec");
+        exec_error(args[0]);
         close(p[1]);
         prompt = false;
     } else {
@@ -427,7 +432,7 @@ void spawn(char **args, bool quiet, bool prompt)
 
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
-        perror_msg("fork_exec");
+        exec_error(args[0]);
         prompt = false;
     } else {
         handle_child_error(pid);
