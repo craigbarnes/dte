@@ -80,7 +80,6 @@ EditorState editor = {
         [INPUT_NORMAL] = &normal_mode_ops,
         [INPUT_COMMAND] = &command_mode_ops,
         [INPUT_SEARCH] = &search_mode_ops,
-        [INPUT_MENU] = &menu_ops
     }
 };
 
@@ -161,8 +160,6 @@ static void restore_cursor(void)
     case INPUT_COMMAND:
     case INPUT_SEARCH:
         terminal.move_cursor(editor.cmdline_x, terminal.height - 1);
-        break;
-    case INPUT_MENU:
         break;
     }
 }
@@ -427,25 +424,16 @@ void main_loop(void)
         }
 
         clear_error();
-        if (editor.input_mode == INPUT_MENU) {
-            editor.mode_ops[editor.input_mode]->keypress(key);
-            editor.mode_ops[editor.input_mode]->update();
-        } else {
-            const View *v = window->view;
-            const ScreenState s = {
-                .is_modified = buffer_modified(v->buffer),
-                .id = v->buffer->id,
-                .cy = v->cy,
-                .vx = v->vx,
-                .vy = v->vy
-            };
-            editor.mode_ops[editor.input_mode]->keypress(key);
-            sanity_check();
-            if (editor.input_mode == INPUT_MENU) {
-                editor.mode_ops[INPUT_MENU]->update();
-            } else {
-                update_screen(&s);
-            }
-        }
+        const View *v = window->view;
+        const ScreenState s = {
+            .is_modified = buffer_modified(v->buffer),
+            .id = v->buffer->id,
+            .cy = v->cy,
+            .vx = v->vx,
+            .vy = v->vy
+        };
+        editor.mode_ops[editor.input_mode]->keypress(key);
+        sanity_check();
+        update_screen(&s);
     }
 }

@@ -626,12 +626,6 @@ static void cmd_load_syntax(const CommandArgs *a)
     }
 }
 
-static void cmd_menu_open(const CommandArgs *a)
-{
-    set_input_mode(INPUT_MENU);
-    menu_reload(a->args, has_flag(a, 'z'));
-}
-
 static void cmd_move_tab(const CommandArgs *a)
 {
     const char *str = a->args[0];
@@ -2074,7 +2068,6 @@ static const Command cmds[] = {
     {"left", "c", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
-    {"menu-open", "-z", 1, -1, cmd_menu_open},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},

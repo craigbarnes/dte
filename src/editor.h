@@ -19,7 +19,6 @@ typedef enum {
     INPUT_NORMAL,
     INPUT_COMMAND,
     INPUT_SEARCH,
-    INPUT_MENU,
 } InputMode;
 
 typedef struct {

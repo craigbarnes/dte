@@ -52,7 +52,7 @@ editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer change cmdline command \
     command-parse command-run compiler completion config ctags debug \
     edit editor env error file-history file-option filetype frame \
-    history indent load-save lock main mode-command mode-menu \
+    history indent load-save lock main mode-command \
     mode-normal mode-search move msg options parse-args regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection spawn tag view window ) \

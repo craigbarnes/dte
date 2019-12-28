@@ -58,4 +58,4 @@ option diff,mail ws-error 0
 # Aliases for renamed built-in commands (for backwards compatibility)
 alias format-paragraph wrap-paragraph
 alias pass-through pipe-from
-alias git-open 'menu-open -z sh -c "git ls-files -z $(git rev-parse --show-cdup)"'
+alias git-open 'exec-open sh -c "git ls-files $(git rev-parse --show-cdup) | fzf -m --reverse"'

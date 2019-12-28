@@ -889,37 +889,19 @@ See also: `errorfmt` and `msg` commands.
 Run external _command_ and execute its standard output text as dterc
 commands.
 
-### **menu-open** [**-z**] _command_ [_parameter_]...
+### **exec-open** [**-q**] _command_ [_parameter_]...
 
-Run _command_ and display all files from its standard output as an
-interactive file menu.
+Run external _command_ and open all filenames listed on its standard
+output.
 
-`-z`
-:   Interpret null character as line delimiter (instead of newline)
+`-q`
+:   Don't yield terminal control to the child process
 
-Key bindings are the same as in command mode, except for the following:
+Example uses:
 
-`up`
-:   Move up in file list.
-
-`down`
-:   Move down in file list.
-
-`enter`
-:   Open file.
-
-`^O`
-:   Open file (without exiting the menu).
-
-`M-e`
-:   Go to end of file list.
-
-`M-t`
-:   Go to top of file list.
-
-Example usage:
-
-    menu-open -z find . -type f -print0
+    exec-open find . -type f -name *.h
+    exec-open git ls-files --modified
+    exec-open fzf --reverse
 
 ## Other Commands
 

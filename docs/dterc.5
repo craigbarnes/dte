@@ -187,7 +187,7 @@ External Commands:
 .br
    \fBeval\fR \fIcommand\fR [\fIparameter\fR]...
 .br
-   \fBmenu\-open\fR [\fB\-z\fR] \fIcommand\fR [\fIparameter\fR]...
+   \fBexec\-open\fR [\fB\-q\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
 .P
 Other Commands:
@@ -1411,47 +1411,23 @@ Run external \fIcommand\fR and execute its standard output text as dterc
 commands.
 .P
 .RE
-\fBmenu\-open\fR [\fB\-z\fR] \fIcommand\fR [\fIparameter\fR]...
+\fBexec\-open\fR [\fB\-q\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
-Run \fIcommand\fR and display all files from its standard output as an
-interactive file menu.
+Run external \fIcommand\fR and open all filenames listed on its standard
+output.
 .P
 .TP
-\fB\-z\fR
-Interpret null character as line delimiter (instead of newline)
+\fB\-q\fR
+Don't yield terminal control to the child process
 .PP
-Key bindings are the same as in command mode, except for the following:
-.P
-.TP
-\fBup\fR
-Move up in file list.
-.PP
-.TP
-\fBdown\fR
-Move down in file list.
-.PP
-.TP
-\fBenter\fR
-Open file.
-.PP
-.TP
-\fB^O\fR
-Open file (without exiting the menu).
-.PP
-.TP
-\fBM\-e\fR
-Go to end of file list.
-.PP
-.TP
-\fBM\-t\fR
-Go to top of file list.
-.PP
-Example usage:
+Example uses:
 .P
 .IP
 .nf
 \f[C]
-menu\-open\ \-z\ find\ .\ \-type\ f\ \-print0
+exec\-open\ find\ .\ \-type\ f\ \-name\ *.h
+exec\-open\ git\ ls\-files\ \-\-modified
+exec\-open\ fzf\ \-\-reverse
 \f[]
 .fi
 .PP
