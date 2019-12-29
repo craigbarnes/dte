@@ -33,7 +33,7 @@ typedef struct {
     void (*clear_screen)(void);
     void (*clear_to_eol)(void);
     void (*set_color)(const TermColor *color);
-    void (*move_cursor)(int x, int y);
+    void (*move_cursor)(unsigned int x, unsigned int y);
     void (*repeat_byte)(char ch, size_t count);
     void (*save_title)(void);
     void (*restore_title)(void);

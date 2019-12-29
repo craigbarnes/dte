@@ -20,17 +20,18 @@ void ecma48_clear_to_eol(void)
     term_add_literal("\033[K");
 }
 
-void ecma48_move_cursor(int x, int y)
+void ecma48_move_cursor(unsigned int x, unsigned int y)
 {
-    if (x < 0 || x >= 999 || y < 0 || y >= 999) {
-        return;
-    }
-    term_sprintf (
+    char buf[64];
+    size_t n = xsnprintf (
+        buf,
+        sizeof buf,
         "\033[%u;%uH",
         // x and y are zero-based
         ((unsigned int)y) + 1,
         ((unsigned int)x) + 1
     );
+    term_add_bytes(buf, n);
 }
 
 void ecma48_set_color(const TermColor *const color)

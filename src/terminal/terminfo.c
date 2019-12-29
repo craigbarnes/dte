@@ -174,10 +174,10 @@ static void tputs_clear_to_eol(void)
     }
 }
 
-static void tputs_move_cursor(int x, int y)
+static void tputs_move_cursor(unsigned int x, unsigned int y)
 {
     if (terminfo.cup) {
-        const char *seq = tparm_2(terminfo.cup, y, x);
+        const char *seq = tparm_2(terminfo.cup, (long)y, (long)x);
         if (seq) {
             tputs(seq, 1, tputs_putc);
         }
