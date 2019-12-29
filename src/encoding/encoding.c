@@ -65,13 +65,12 @@ Encoding encoding_from_name(const char *name)
     const EncodingType type = lookup_encoding(name);
     const char *normalized_name;
     if (type == UNKNOWN_ENCODING) {
-        const size_t len = strlen(name);
-        char *upper = xmalloc(len);
+        char upper[256];
+        const size_t len = strnlen(name, sizeof upper);
         for (size_t i = 0; i < len; i++) {
             upper[i] = ascii_toupper(name[i]);
         }
         normalized_name = mem_intern(upper, len);
-        free(upper);
     } else {
         normalized_name = encoding_type_to_string(type);
     }
