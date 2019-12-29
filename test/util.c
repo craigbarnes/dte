@@ -864,9 +864,14 @@ static void test_round_size_to_next_power_of_2(void)
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(17), 32);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(61), 64);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(64), 64);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(65), 128);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(200), 256);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(1000), 1024);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(5500), 8192);
+    const size_t size_max = (size_t)-1;
+    const size_t pow2_max = size_max & ~(size_max >> 1);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max >> 1), pow2_max);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max), pow2_max);
 }
 
 static void test_path_dirname_and_path_basename(void)
