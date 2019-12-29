@@ -2,7 +2,6 @@
 #include "encoding.h"
 #include "../util/ascii.h"
 #include "../util/hashset.h"
-#include "../util/xmalloc.h"
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",
@@ -66,7 +65,7 @@ Encoding encoding_from_name(const char *name)
     const char *normalized_name;
     if (type == UNKNOWN_ENCODING) {
         char upper[256];
-        const size_t len = strnlen(name, sizeof upper);
+        size_t len = strnlen(name, sizeof upper);
         for (size_t i = 0; i < len; i++) {
             upper[i] = ascii_toupper(name[i]);
         }
@@ -74,7 +73,10 @@ Encoding encoding_from_name(const char *name)
     } else {
         normalized_name = encoding_type_to_string(type);
     }
-    return (Encoding){.type = type, .name = normalized_name};
+    return (Encoding) {
+        .type = type,
+        .name = normalized_name
+    };
 }
 
 Encoding encoding_from_type(EncodingType type)
