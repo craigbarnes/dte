@@ -77,7 +77,9 @@ void ecma48_repeat_byte(char ch, size_t count)
         term_repeat_byte(ch, count);
         return;
     }
-    term_sprintf("%c\033[%zub", ch, count - 1);
+    char buf[64];
+    size_t n = xsnprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
+    term_add_bytes(buf, n);
 }
 
 Terminal terminal = {

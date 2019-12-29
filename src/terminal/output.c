@@ -91,41 +91,6 @@ void term_add_string_view(StringView sv)
     }
 }
 
-VPRINTF(1)
-static void term_vsprintf(const char *fmt, va_list ap)
-{
-    va_list ap2;
-    va_copy(ap2, ap);
-    // Calculate the required size
-    int n = vsnprintf(NULL, 0, fmt, ap2);
-    va_end(ap2);
-    BUG_ON(n < 0);
-
-    if (n >= obuf_avail()) {
-        term_output_flush();
-        if (unlikely(n >= sizeof(obuf.buf))) {
-            char *tmp = xmalloc(n + 1);
-            int wrote = vsnprintf(tmp, n + 1, fmt, ap);
-            BUG_ON(wrote != n);
-            xwrite(STDOUT_FILENO, tmp, n);
-            free(tmp);
-            return;
-        }
-    }
-
-    int wrote = vsnprintf(obuf.buf + obuf.count, n + 1, fmt, ap);
-    BUG_ON(wrote != n);
-    obuf.count += wrote;
-}
-
-void term_sprintf(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    term_vsprintf(fmt, ap);
-    va_end(ap);
-}
-
 void term_add_str(const char *const str)
 {
     size_t i = 0;

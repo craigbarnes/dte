@@ -3,6 +3,7 @@
 #include "ecma48.h"
 #include "mode.h"
 #include "output.h"
+#include "../util/xsnprintf.h"
 
 void xterm_save_title(void)
 {
@@ -27,18 +28,22 @@ static void do_set_color(int32_t color, char ch)
         return;
     }
 
-    term_add_byte(';');
-    term_add_byte(ch);
+    char buf[32];
+    size_t n = 0;
+    buf[n++] = ';';
+    buf[n++] = ch;
 
     if (color < 8) {
-        term_add_byte('0' + color);
+        buf[n++] = '0' + color;
     } else if (color < 256) {
-        term_sprintf("8;5;%hhu", (uint8_t)color);
+        n += xsnprintf(buf + n, sizeof(buf) - n, "8;5;%hhu", (uint8_t)color);
     } else {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        term_sprintf("8;2;%hhu;%hhu;%hhu", r, g, b);
+        n += xsnprintf(buf + n, sizeof(buf) - n, "8;2;%hhu;%hhu;%hhu", r, g, b);
     }
+
+    term_add_bytes(buf, n);
 }
 
 void xterm_set_color(const TermColor *color)
