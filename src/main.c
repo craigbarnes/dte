@@ -153,7 +153,10 @@ static void showkey_loop(void)
             loop = false;
             break;
         }
-        term_sprintf("  %s\r\n", keycode_to_string(key));
+        const char *str = keycode_to_string(key);
+        term_add_literal("  ");
+        term_add_bytes(str, strlen(str));
+        term_add_literal("\r\n");
         term_output_flush();
     }
 
