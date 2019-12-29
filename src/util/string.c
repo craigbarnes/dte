@@ -17,7 +17,7 @@ static void string_grow(String *s, size_t more)
     while (alloc < len) {
         alloc = (alloc * 3 + 2) / 2;
     }
-    alloc = ROUND_UP(alloc, 16);
+    alloc = round_size_to_next_multiple(alloc, 16);
     xrenew(s->buffer, alloc);
     s->alloc = alloc;
 }

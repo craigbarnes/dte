@@ -30,7 +30,7 @@ static inline NONNULL_ARGS void string_init(String *s)
 
 static inline String string_new(size_t size)
 {
-    size = ROUND_UP(size, 16);
+    size = round_size_to_next_multiple(size, 16);
     return (String) {
         .buffer = size ? xmalloc(size) : NULL,
         .alloc = size,

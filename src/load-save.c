@@ -153,7 +153,7 @@ static void fixup_blocks(Buffer *b)
         Block *blk = BLOCK(b->blocks.prev);
         if (blk->size && blk->data[blk->size - 1] != '\n') {
             if (blk->size == blk->alloc) {
-                blk->alloc = ROUND_UP(blk->size + 1, 64);
+                blk->alloc = round_size_to_next_multiple(blk->size + 1, 64);
                 xrenew(blk->data, blk->alloc);
             }
             blk->data[blk->size++] = '\n';

@@ -835,20 +835,20 @@ static void test_hashset(void)
     hashset_free(&set);
 }
 
-static void test_round_up(void)
+static void test_round_size_to_next_multiple(void)
 {
-    EXPECT_EQ(ROUND_UP(3, 8), 8);
-    EXPECT_EQ(ROUND_UP(8, 8), 8);
-    EXPECT_EQ(ROUND_UP(9, 8), 16);
-    EXPECT_EQ(ROUND_UP(0, 8), 0);
-    EXPECT_EQ(ROUND_UP(0, 16), 0);
-    EXPECT_EQ(ROUND_UP(1, 16), 16);
-    EXPECT_EQ(ROUND_UP(123, 16), 128);
-    EXPECT_EQ(ROUND_UP(4, 64), 64);
-    EXPECT_EQ(ROUND_UP(80, 64), 128);
-    EXPECT_EQ(ROUND_UP(256, 256), 256);
-    EXPECT_EQ(ROUND_UP(257, 256), 512);
-    EXPECT_EQ(ROUND_UP(8000, 256), 8192);
+    EXPECT_EQ(round_size_to_next_multiple(3, 8), 8);
+    EXPECT_EQ(round_size_to_next_multiple(8, 8), 8);
+    EXPECT_EQ(round_size_to_next_multiple(9, 8), 16);
+    EXPECT_EQ(round_size_to_next_multiple(0, 8), 0);
+    EXPECT_EQ(round_size_to_next_multiple(0, 16), 0);
+    EXPECT_EQ(round_size_to_next_multiple(1, 16), 16);
+    EXPECT_EQ(round_size_to_next_multiple(123, 16), 128);
+    EXPECT_EQ(round_size_to_next_multiple(4, 64), 64);
+    EXPECT_EQ(round_size_to_next_multiple(80, 64), 128);
+    EXPECT_EQ(round_size_to_next_multiple(256, 256), 256);
+    EXPECT_EQ(round_size_to_next_multiple(257, 256), 512);
+    EXPECT_EQ(round_size_to_next_multiple(8000, 256), 8192);
 }
 
 static void test_round_size_to_next_power_of_2(void)
@@ -1101,7 +1101,7 @@ void test_util(void)
     test_u_str_index();
     test_ptr_array();
     test_hashset();
-    test_round_up();
+    test_round_size_to_next_multiple();
     test_round_size_to_next_power_of_2();
     test_path_dirname_and_path_basename();
     test_path_absolute();

@@ -84,7 +84,7 @@ static HlColor **highlight_line (
     ssize_t sidx = -1;
 
     if (len > alloc) {
-        alloc = ROUND_UP(len, 128);
+        alloc = round_size_to_next_multiple(len, 128);
         xrenew(colors, alloc);
     }
 
@@ -273,7 +273,7 @@ static HlColor **highlight_line (
 static void resize_line_states(PointerArray *s, size_t count)
 {
     if (s->alloc < count) {
-        s->alloc = ROUND_UP(count, 64);
+        s->alloc = round_size_to_next_multiple(count, 64);
         xrenew(s->ptrs, s->alloc);
     }
 }

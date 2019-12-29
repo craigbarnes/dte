@@ -224,7 +224,7 @@ bool term_read_key(KeyCode *key)
 
 char *term_read_paste(size_t *size)
 {
-    size_t alloc = ROUND_UP(input_buf_fill + 1, 1024);
+    size_t alloc = round_size_to_next_multiple(input_buf_fill + 1, 1024);
     size_t count = 0;
     char *buf = xmalloc(alloc);
 

@@ -32,7 +32,7 @@ static void sanity_check(void)
 
 static size_t ALLOC_ROUND(size_t size)
 {
-    return ROUND_UP(size, 64);
+    return round_size_to_next_multiple(size, 64);
 }
 
 Block *block_new(size_t alloc)
