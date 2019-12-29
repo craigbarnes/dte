@@ -286,9 +286,10 @@ static bool enum_parse (
     const char *str,
     OptionValue *value
 ) {
+    const char **values = desc->u.enum_opt.values;
     unsigned int i;
-    for (i = 0; desc->u.enum_opt.values[i]; i++) {
-        if (streq(desc->u.enum_opt.values[i], str)) {
+    for (i = 0; values[i]; i++) {
+        if (streq(values[i], str)) {
             value->uint_val = i;
             return true;
         }
@@ -712,9 +713,10 @@ void collect_option_values(const char *name, const char *prefix)
         add_completion(xstrdup(desc->ops->string(desc, value)));
     } else if (desc_is(desc, OPT_ENUM)) {
         // Complete possible values
-        for (size_t i = 0; desc->u.enum_opt.values[i]; i++) {
-            if (str_has_prefix(desc->u.enum_opt.values[i], prefix)) {
-                add_completion(xstrdup(desc->u.enum_opt.values[i]));
+        const char **values = desc->u.enum_opt.values;
+        for (size_t i = 0; values[i]; i++) {
+            if (str_has_prefix(values[i], prefix)) {
+                add_completion(xstrdup(values[i]));
             }
         }
     } else if (desc_is(desc, OPT_FLAG)) {
@@ -724,8 +726,9 @@ void collect_option_values(const char *name, const char *prefix)
         if (comma) {
             prefix_len = ++comma - prefix;
         }
-        for (size_t i = 0; desc->u.flag_opt.values[i]; i++) {
-            const char *str = desc->u.flag_opt.values[i];
+        const char **values = desc->u.flag_opt.values;
+        for (size_t i = 0; values[i]; i++) {
+            const char *str = values[i];
             if (str_has_prefix(str, prefix + prefix_len)) {
                 size_t str_len = strlen(str);
                 char *completion = xmalloc(prefix_len + str_len + 1);

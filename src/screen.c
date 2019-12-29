@@ -69,8 +69,7 @@ static void print_separator(Window *win)
     if (win->x + win->w == terminal.width) {
         return;
     }
-
-    for (int y = 0; y < win->h; y++) {
+    for (int y = 0, h = win->h; y < h; y++) {
         terminal.move_cursor(win->x + win->w, win->y + y);
         term_add_byte('|');
     }
