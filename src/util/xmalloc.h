@@ -34,8 +34,7 @@ static inline size_t size_multiply(size_t a, size_t b)
     if (a == 1 || b == 1) {
         return a * b;
     }
-    // Otherwise, emit a call to the checked implementation (which is
-    // extern, because it may call fatal_error()).
+    // Otherwise, emit a call to the checked implementation
     return size_multiply_(a, b);
 }
 

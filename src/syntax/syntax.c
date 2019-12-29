@@ -43,7 +43,7 @@ static bool has_destination(ConditionType type)
 
 Syntax *find_any_syntax(const char *name)
 {
-    for (size_t i = 0; i < syntaxes.count; i++) {
+    for (size_t i = 0, n = syntaxes.count; i < n; i++) {
         Syntax *syn = syntaxes.ptrs[i];
         if (streq(syn->name, name)) {
             return syn;
@@ -105,7 +105,7 @@ static const char *get_prefix(void)
 
 static void update_state_colors(const Syntax *syn, State *s);
 
-State *merge_syntax(Syntax *syn, SyntaxMerge *m)
+State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
 {
     // NOTE: string_lists is owned by Syntax so there's no need to
     // copy it. Freeing Condition does not free any string lists.
@@ -113,20 +113,19 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
     PointerArray *states = &syn->states;
     size_t old_count = states->count;
 
-    states->count += m->subsyn->states.count;
+    states->count += merge->subsyn->states.count;
     if (states->count > states->alloc) {
         states->alloc = states->count;
         xrenew(states->ptrs, states->alloc);
     }
     memcpy (
         states->ptrs + old_count,
-        m->subsyn->states.ptrs,
-        sizeof(*states->ptrs) * m->subsyn->states.count
+        merge->subsyn->states.ptrs,
+        sizeof(*states->ptrs) * merge->subsyn->states.count
     );
 
-    for (size_t i = old_count; i < states->count; i++) {
+    for (size_t i = old_count, n = states->count; i < n; i++) {
         State *s = xmemdup(states->ptrs[i], sizeof(State));
-
         states->ptrs[i] = s;
         s->name = xstrdup(fix_name(s->name, prefix));
         s->emit_name = xstrdup(s->emit_name);
@@ -135,7 +134,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
                 s->conds.ptrs,
                 sizeof(void *) * s->conds.alloc
             );
-            for (size_t j = 0; j < s->conds.count; j++) {
+            for (size_t j = 0, n2 = s->conds.count; j < n2; j++) {
                 s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
             }
         }
@@ -148,14 +147,14 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *m)
         s->copied = true;
     }
 
-    for (size_t i = old_count; i < states->count; i++) {
-        fix_conditions(syn, states->ptrs[i], m, prefix);
-        if (m->delim) {
+    for (size_t i = old_count, n = states->count; i < n; i++) {
+        fix_conditions(syn, states->ptrs[i], merge, prefix);
+        if (merge->delim) {
             update_state_colors(syn, states->ptrs[i]);
         }
     }
 
-    m->subsyn->used = true;
+    merge->subsyn->used = true;
     return states->ptrs[old_count];
 }
 
@@ -326,7 +325,7 @@ void update_syntax_colors(Syntax *syn)
 
 void update_all_syntax_colors(void)
 {
-    for (size_t i = 0; i < syntaxes.count; i++) {
+    for (size_t i = 0, n = syntaxes.count; i < n; i++) {
         update_syntax_colors(syntaxes.ptrs[i]);
     }
 }
@@ -336,7 +335,7 @@ void find_unused_subsyntaxes(void)
     // Don't complain multiple times about same unused subsyntaxes
     static size_t i;
 
-    for (; i < syntaxes.count; i++) {
+    for (size_t n = syntaxes.count; i < n; i++) {
         const Syntax *s = syntaxes.ptrs[i];
         if (!s->used && is_subsyntax(s)) {
             error_msg("Subsyntax %s is unused", s->name);

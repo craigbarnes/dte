@@ -17,24 +17,29 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-static void handle_error_msg(const Compiler *c, char *str)
+static size_t sanitize_error_msg(char *str)
 {
-    size_t i, len;
-    for (i = 0; str[i]; i++) {
-        if (str[i] == '\n') {
-            str[i] = '\0';
+    size_t n = 0;
+    for (char c; (c = str[n]); n++) {
+        if (c == '\n') {
+            str[n] = '\0';
             break;
         }
-        if (str[i] == '\t') {
-            str[i] = ' ';
+        if (c == '\t') {
+            str[n] = ' ';
         }
     }
-    len = i;
+    return n;
+}
+
+static void handle_error_msg(const Compiler *c, char *str)
+{
+    const size_t len = sanitize_error_msg(str);
     if (len == 0) {
         return;
     }
 
-    for (i = 0; i < c->error_formats.count; i++) {
+    for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
         PointerArray m = PTR_ARRAY_INIT;
         if (!regexp_exec_sub(&p->re, str, len, &m, 0)) {

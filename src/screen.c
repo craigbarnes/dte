@@ -109,7 +109,7 @@ void update_line_numbers(Window *win, bool force)
 
     term_output_reset(win->x, win->w, 0);
     set_builtin_color(BC_LINENUMBER);
-    for (int i = 0; i < win->edit_h; i++) {
+    for (int i = 0, n = win->edit_h; i < n; i++) {
         long line = v->vy + i + 1;
         int w = win->line_numbers.width - 1;
         char buf[32];

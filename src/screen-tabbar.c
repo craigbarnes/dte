@@ -169,8 +169,8 @@ static void print_horizontal_tabbar(Window *win)
     terminal.move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
-    size_t i;
-    for (i = win->first_tab_idx; i < win->views.count; i++) {
+    size_t i = win->first_tab_idx;
+    for (size_t n = win->views.count; i < n; i++) {
         const View *v = win->views.ptrs[i];
         if (obuf.x + v->tt_truncated_width > win->w) {
             break;
@@ -256,7 +256,7 @@ static void print_vertical_tabbar(Window *win)
     int h = win->edit_h;
     size_t cur_idx = 0;
 
-    for (size_t i = 0; i < win->views.count; i++) {
+    for (size_t i = 0, n = win->views.count; i < n; i++) {
         if (win->view == win->views.ptrs[i]) {
             cur_idx = i;
             break;

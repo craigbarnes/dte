@@ -505,7 +505,7 @@ static void frame_for_each_window (
         func(f->window, data);
         return;
     }
-    for (size_t i = 0; i < f->frames.count; i++) {
+    for (size_t i = 0, n = f->frames.count; i < n; i++) {
         frame_for_each_window(f->frames.ptrs[i], func, data);
     }
 }
