@@ -1113,7 +1113,7 @@ static void cmd_run(const CommandArgs *a)
     spawn(a->args, quiet, prompt);
 }
 
-static bool stat_changed(const struct stat *const a, const struct stat *const b)
+static bool stat_changed(const struct stat *a, const struct stat *b)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
     return a->st_mtime != b->st_mtime ||

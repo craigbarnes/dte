@@ -79,7 +79,7 @@ void term_init_fail(const char *fmt, ...)
 
 void term_init(void)
 {
-    const char *const term = getenv("TERM");
+    const char *term = getenv("TERM");
     if (term == NULL || term[0] == '\0') {
         term_init_fail("'TERM' not set");
     }

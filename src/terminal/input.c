@@ -148,7 +148,7 @@ static bool read_simple(KeyCode *key)
     return true;
 }
 
-static bool is_text(const char *const str, size_t len)
+static bool is_text(const char *str, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
         if (ascii_is_nonspace_cntrl(str[i])) {

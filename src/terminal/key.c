@@ -33,7 +33,7 @@ static const char special_names[][8] = {
 };
 static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
 
-static size_t parse_modifiers(const char *const str, KeyCode *modifiersp)
+static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
     KeyCode modifiers = 0;
     size_t i = 0;

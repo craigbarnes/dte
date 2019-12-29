@@ -85,9 +85,9 @@ EditorState editor = {
 
 void init_editor_state(void)
 {
-    const char *const pager = getenv("PAGER");
-    const char *const home = getenv("HOME");
-    const char *const dte_home = getenv("DTE_HOME");
+    const char *pager = getenv("PAGER");
+    const char *home = getenv("HOME");
+    const char *dte_home = getenv("DTE_HOME");
 
     editor.pager = xstrdup(pager ? pager : "less");
     editor.home_dir = xstrdup(home ? home : "");
@@ -218,7 +218,7 @@ static void update_window(Window *w)
 }
 
 // Update all visible views containing this buffer
-static void update_buffer_windows(const Buffer *const b)
+static void update_buffer_windows(const Buffer *b)
 {
     for (size_t i = 0, n = b->views.count; i < n; i++) {
         View *v = b->views.ptrs[i];
@@ -368,7 +368,7 @@ typedef struct {
     long vy;
 } ScreenState;
 
-static void update_screen(const ScreenState *const s)
+static void update_screen(const ScreenState *s)
 {
     if (editor.everything_changed) {
         editor.mode_ops[editor.input_mode]->update();

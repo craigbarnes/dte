@@ -79,7 +79,7 @@ void list_builtin_configs(void)
     }
 }
 
-void collect_builtin_configs(const char *const prefix, bool syntaxes)
+void collect_builtin_configs(const char *prefix, bool syntaxes)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         const BuiltinConfig *cfg = &builtin_configs[i];
@@ -91,7 +91,7 @@ void collect_builtin_configs(const char *const prefix, bool syntaxes)
     }
 }
 
-const BuiltinConfig *get_builtin_config(const char *const name)
+const BuiltinConfig *get_builtin_config(const char *name)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         if (streq(name, builtin_configs[i].name)) {

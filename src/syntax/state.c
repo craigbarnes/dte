@@ -115,7 +115,7 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
 
 static bool destination_state(const char *name, State **dest)
 {
-    const char *const sep = strchr(name, ':');
+    const char *sep = strchr(name, ':');
     if (sep) {
         // subsyntax:returnstate
         char *sub = xstrcut(name, sep - name);

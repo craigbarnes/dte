@@ -35,7 +35,7 @@ void term_output_reset(size_t start_x, size_t width, size_t scroll_x)
 }
 
 // Does not update obuf.x
-void term_add_bytes(const char *const str, size_t count)
+void term_add_bytes(const char *str, size_t count)
 {
     if (count > obuf_avail()) {
         term_output_flush();
@@ -91,7 +91,7 @@ void term_add_string_view(StringView sv)
     }
 }
 
-void term_add_str(const char *const str)
+void term_add_str(const char *str)
 {
     size_t i = 0;
     while (str[i]) {

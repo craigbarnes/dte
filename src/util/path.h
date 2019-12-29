@@ -26,7 +26,7 @@ static inline const char *path_basename(const char *filename)
 NONNULL_ARGS
 static inline StringView path_slice_dirname(const char *filename)
 {
-    const char *const slash = strrchr(filename, '/');
+    const char *slash = strrchr(filename, '/');
     if (slash == NULL) {
         return string_view(".", 1);
     }

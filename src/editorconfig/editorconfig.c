@@ -169,7 +169,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
             return err_num;
         }
 
-        const char *const slash = strchr(ptr, '/');
+        const char *slash = strchr(ptr, '/');
         if (slash == NULL) {
             break;
         }

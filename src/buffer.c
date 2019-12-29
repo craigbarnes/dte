@@ -115,9 +115,9 @@ void free_buffer(Buffer *b)
     free(b);
 }
 
-static bool same_file(const struct stat *const a, const struct stat *const b)
+static bool same_file(const struct stat *a, const struct stat *b)
 {
-    return a->st_dev == b->st_dev && a->st_ino == b->st_ino;
+    return (a->st_dev == b->st_dev) && (a->st_ino == b->st_ino);
 }
 
 Buffer *find_buffer(const char *abs_filename)

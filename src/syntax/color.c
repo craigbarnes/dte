@@ -30,7 +30,7 @@ static const char builtin_color_names[NR_BC][16] = {
 
 UNITTEST {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_color_names); i++) {
-        const char *const name = builtin_color_names[i];
+        const char *name = builtin_color_names[i];
         if (name[0] == '\0') {
             BUG("missing string at builtin_color_names[%zu]", i);
         }

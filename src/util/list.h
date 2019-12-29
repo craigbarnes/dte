@@ -41,7 +41,7 @@ static inline void list_del(ListHead *entry)
     entry->prev = (void*)0x00200200;
 }
 
-static inline bool list_empty(const ListHead *const head)
+static inline bool list_empty(const ListHead *head)
 {
     return head->next == head;
 }

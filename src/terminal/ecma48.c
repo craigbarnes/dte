@@ -34,7 +34,7 @@ void ecma48_move_cursor(unsigned int x, unsigned int y)
     term_add_bytes(buf, n);
 }
 
-void ecma48_set_color(const TermColor *const color)
+void ecma48_set_color(const TermColor *color)
 {
     if (same_color(color, &obuf.color)) {
         return;

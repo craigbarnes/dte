@@ -11,11 +11,8 @@ typedef struct {
 
 #include "unidata.c"
 
-static bool bisearch (
-    CodePoint u,
-    const CodepointRange *const range,
-    size_t max
-) {
+static bool bisearch(CodePoint u, const CodepointRange *range, size_t max)
+{
     if (u < range[0].first || u > range[max].last) {
         return false;
     }

@@ -117,7 +117,7 @@ static void set_signal_handlers(void)
     }
 }
 
-static int dump_builtin_config(const char *const name)
+static int dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (cfg) {
@@ -282,7 +282,7 @@ loop_break:
     }
 
     // Create this early. Needed if lock-files is true.
-    const char *const editor_dir = editor.user_config_dir;
+    const char *editor_dir = editor.user_config_dir;
     if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
         load_and_save_history = false;
