@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "checked-arith.h"
 #include "xmalloc.h"
-#include "ascii.h"
 #include "../debug.h"
 
 static void *check_alloc(void *alloc)
@@ -58,17 +57,6 @@ char *xstrdup(const char *str)
 char *xstrndup(const char *str, size_t n)
 {
     return check_alloc(strndup(str, n));
-}
-
-char *xstrdup_toupper(const char *str)
-{
-    const size_t len = strlen(str);
-    char *upper_str = xmalloc(len + 1);
-    for (size_t i = 0; i < len; i++) {
-        upper_str[i] = ascii_toupper(str[i]);
-    }
-    upper_str[len] = '\0';
-    return upper_str;
 }
 
 char *xstrcut(const char *str, size_t size)

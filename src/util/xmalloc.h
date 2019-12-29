@@ -21,7 +21,6 @@ void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
 char *xstrndup(const char *str, size_t n) XSTRDUP;
-char *xstrdup_toupper(const char *str) XSTRDUP;
 char *xstrcut(const char *str, size_t size) XSTRDUP;
 char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;

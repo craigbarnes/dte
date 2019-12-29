@@ -65,17 +65,17 @@ Encoding encoding_from_name(const char *name)
     const EncodingType type = lookup_encoding(name);
     const char *normalized_name;
     if (type == UNKNOWN_ENCODING) {
-        char *upper = xstrdup_toupper(name);
-        normalized_name = str_intern(upper);
+        const size_t len = strlen(name);
+        char *upper = xmalloc(len);
+        for (size_t i = 0; i < len; i++) {
+            upper[i] = ascii_toupper(name[i]);
+        }
+        normalized_name = mem_intern(upper, len);
         free(upper);
     } else {
         normalized_name = encoding_type_to_string(type);
     }
-
-    return (Encoding) {
-        .type = type,
-        .name = normalized_name
-    };
+    return (Encoding){.type = type, .name = normalized_name};
 }
 
 Encoding encoding_from_type(EncodingType type)
