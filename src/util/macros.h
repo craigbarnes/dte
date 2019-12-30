@@ -22,12 +22,18 @@
     / ((size_t)(!(sizeof(x) % sizeof((x)[0])))) \
 )
 
-#ifdef __GNUC__
-    #define GNUC_AT_LEAST(major, minor) ( \
-        (__GNUC__ > major) \
-        || ((__GNUC__ == major) && (__GNUC_MINOR__ >= minor)) )
+#define VERCMP(x, y, cx, cy) ((cx > x) || ((cx == x) && (cy >= y)))
+
+#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+    #define GNUC_AT_LEAST(x, y) VERCMP(x, y, __GNUC__, __GNUC_MINOR__)
 #else
-    #define GNUC_AT_LEAST(major, minor) 0
+    #define GNUC_AT_LEAST(x, y) 0
+#endif
+
+#if defined(__clang_major__) && defined(__clang_minor__)
+    #define CLANG_AT_LEAST(x, y) VERCMP(x, y, __clang_major__, __clang_minor__)
+#else
+    #define CLANG_AT_LEAST(x, y) 0
 #endif
 
 // __has_extension is a Clang macro used to determine if a feature is
@@ -235,6 +241,14 @@
     #define DISABLE_WARNING(wflag) DO_PRAGMA(GCC diagnostic ignored wflag)
 #else
     #define DISABLE_WARNING(wflag)
+#endif
+
+#if CLANG_AT_LEAST(3, 6)
+    #define UNROLL_LOOP(n) DO_PRAGMA(clang loop unroll_count(n))
+#elif GNUC_AT_LEAST(8, 0)
+    #define UNROLL_LOOP(n) DO_PRAGMA(GCC unroll (n))
+#else
+    #define UNROLL_LOOP(n)
 #endif
 
 #ifdef __clang__

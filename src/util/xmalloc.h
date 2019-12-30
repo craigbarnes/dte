@@ -57,6 +57,7 @@ DIAGNOSE_IF(!IS_POWER_OF_2(r))
 static inline size_t round_size_to_next_power_of_2(size_t x)
 {
     x--;
+    UNROLL_LOOP(8)
     for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
         x |= x >> i;
     }
