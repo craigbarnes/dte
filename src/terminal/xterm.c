@@ -62,10 +62,6 @@ void xterm_set_color(const TermColor *color)
         {'9', ATTR_STRIKETHROUGH}
     };
 
-    if (same_color(color, &obuf.color)) {
-        return;
-    }
-
     term_add_literal("\033[0");
 
     for (size_t j = 0; j < ARRAY_COUNT(attr_map); j++) {
@@ -77,9 +73,7 @@ void xterm_set_color(const TermColor *color)
 
     do_set_color(color->fg, '3');
     do_set_color(color->bg, '4');
-
     term_add_byte('m');
-    obuf.color = *color;
 }
 
 const Terminal xterm = {

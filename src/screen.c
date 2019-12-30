@@ -16,7 +16,6 @@
 void set_color(const TermColor *color)
 {
     TermColor tmp = *color;
-
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
         tmp.fg = builtin_colors[BC_DEFAULT]->fg;
@@ -24,7 +23,11 @@ void set_color(const TermColor *color)
     if (tmp.bg < 0) {
         tmp.bg = builtin_colors[BC_DEFAULT]->bg;
     }
+    if (same_color(&tmp, &obuf.color)) {
+        return;
+    }
     terminal.set_color(&tmp);
+    obuf.color = tmp;
 }
 
 void set_builtin_color(enum builtin_color c)

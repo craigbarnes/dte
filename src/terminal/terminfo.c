@@ -197,10 +197,6 @@ static bool attr_is_set(const TermColor *color, unsigned int attr)
 
 static void tputs_set_color(const TermColor *color)
 {
-    if (same_color(color, &obuf.color)) {
-        return;
-    }
-
     if (terminfo.sgr) {
         const char *attrs = tparm (
             terminfo.sgr,
@@ -230,8 +226,6 @@ static void tputs_set_color(const TermColor *color)
             tputs(seq, 1, tputs_putc);
         }
     }
-
-    obuf.color = *color;
 }
 
 static unsigned int convert_ncv_flags_to_attrs(unsigned int ncv)

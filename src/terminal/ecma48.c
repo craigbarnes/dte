@@ -36,10 +36,6 @@ void ecma48_move_cursor(unsigned int x, unsigned int y)
 
 void ecma48_set_color(const TermColor *color)
 {
-    if (same_color(color, &obuf.color)) {
-        return;
-    }
-
     char buf[16] = "\033[0";
     size_t i = 3;
     static_assert(sizeof(buf) >= STRLEN("\033[0;1;7;30;40m"));
@@ -68,7 +64,6 @@ void ecma48_set_color(const TermColor *color)
 
     buf[i++] = 'm';
     term_add_bytes(buf, i);
-    obuf.color = *color;
 }
 
 void ecma48_repeat_byte(char ch, size_t count)
