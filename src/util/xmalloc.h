@@ -26,6 +26,7 @@ char *xvasprintf(const char *format, va_list ap) VPRINTF(1) XMALLOC;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply_(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
+size_t round_size_to_next_power_of_2(size_t x);
 
 static inline size_t size_multiply(size_t a, size_t b)
 {
@@ -52,16 +53,6 @@ DIAGNOSE_IF(!IS_POWER_OF_2(r))
 {
     r--;
     return (x + r) & ~r;
-}
-
-static inline size_t round_size_to_next_power_of_2(size_t x)
-{
-    x--;
-    UNROLL_LOOP(8)
-    for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
-        x |= x >> i;
-    }
-    return x + 1;
 }
 
 XSTRDUP

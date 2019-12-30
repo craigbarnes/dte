@@ -853,7 +853,7 @@ static void test_round_size_to_next_multiple(void)
 
 static void test_round_size_to_next_power_of_2(void)
 {
-    EXPECT_UINT_EQ(round_size_to_next_power_of_2(0), 0);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(0), 1);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(1), 1);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(2), 2);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(3), 4);
@@ -872,6 +872,7 @@ static void test_round_size_to_next_power_of_2(void)
     const size_t pow2_max = size_max & ~(size_max >> 1);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max >> 1), pow2_max);
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max), pow2_max);
+    EXPECT_UINT_EQ(round_size_to_next_power_of_2(pow2_max - 1), pow2_max);
 }
 
 static void test_path_dirname_and_path_basename(void)
