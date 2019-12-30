@@ -13,6 +13,11 @@ static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
 
 EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
 {
+    // Skip exhaustive checks if there's clearly no BOM
+    if (size < 2 || ((unsigned int)buf[0]) - 1 < 0xEE) {
+        return UNKNOWN_ENCODING;
+    }
+
     // Iterate array backwards to ensure UTF32LE is checked before UTF16LE
     for (int i = NR_ENCODING_TYPES - 1; i >= 0; i--) {
         const unsigned int bom_len = boms[i].len;
