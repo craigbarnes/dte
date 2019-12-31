@@ -2,7 +2,8 @@
 #define TERMINAL_TERMINFO_H
 
 #include <stdbool.h>
+#include "../util/macros.h"
 
-bool term_init_terminfo(const char *term);
+bool term_init_terminfo(const char *term) NONNULL_ARGS;
 
 #endif

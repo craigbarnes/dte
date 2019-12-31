@@ -1,15 +1,16 @@
 #include "terminfo.h"
-#include "../debug.h"
-#include "../util/macros.h"
 
 #ifndef TERMINFO_DISABLE
 
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include "key.h"
+#include "no-op.h"
 #include "output.h"
 #include "terminal.h"
 #include "xterm.h"
+#include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/str-util.h"
 #include "../util/string-view.h"
@@ -92,10 +93,7 @@ static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
         BUG_ON(len == 0);
         if (len > fill) {
             // This might be a truncated escape sequence
-            if (
-                possibly_truncated == false
-                && mem_equal(keycode, buf, fill)
-            ) {
+            if (!possibly_truncated && mem_equal(keycode, buf, fill)) {
                 possibly_truncated = true;
             }
             continue;
@@ -228,7 +226,7 @@ static void tputs_set_color(const TermColor *color)
     }
 }
 
-static unsigned int convert_ncv_flags_to_attrs(unsigned int ncv)
+static unsigned int get_ncv_flags_as_attrs(void)
 {
     // These flags should have values equal to their terminfo
     // counterparts:
@@ -238,6 +236,11 @@ static unsigned int convert_ncv_flags_to_attrs(unsigned int ncv)
     static_assert(ATTR_DIM == 16);
     static_assert(ATTR_BOLD == 32);
     static_assert(ATTR_INVIS == 64);
+
+    const int ncv = tigetnum("ncv");
+    if (ncv <= 0) {
+        return 0;
+    }
 
     // Mask flags to supported, common subset
     unsigned int attrs = ncv & (
@@ -257,15 +260,9 @@ static unsigned int convert_ncv_flags_to_attrs(unsigned int ncv)
 bool term_init_terminfo(const char *term)
 {
     // Initialize terminfo database (or call exit(3) on failure)
-    setupterm(term, 1, (int*)0);
+    setupterm(term, STDOUT_FILENO, NULL);
 
-    terminal.put_control_code = &tputs_control_code;
-    terminal.clear_screen = &tputs_clear_screen;
-    terminal.clear_to_eol = &tputs_clear_to_eol;
-    terminal.set_color = &tputs_set_color;
-    terminal.move_cursor = &tputs_move_cursor;
-
-    if (get_terminfo_flag("nxon")) {
+    if (unlikely(get_terminfo_flag("nxon"))) {
         term_init_fail (
             "TERM type '%s' not supported: 'nxon' flag is set",
             term
@@ -273,26 +270,50 @@ bool term_init_terminfo(const char *term)
     }
 
     terminfo.cup = get_terminfo_string("cup");
-    if (terminfo.cup == NULL) {
+    if (unlikely(terminfo.cup == NULL)) {
         term_init_fail (
             "TERM type '%s' not supported: no 'cup' capability",
             term
         );
     }
 
+    const int width = tigetnum("cols");
+    const int height = tigetnum("lines");
     terminfo.clear = get_terminfo_string("clear");
     terminfo.el = get_terminfo_string("el");
     terminfo.setab = get_terminfo_string("setab");
     terminfo.setaf = get_terminfo_string("setaf");
     terminfo.sgr = get_terminfo_string("sgr");
-    terminal.back_color_erase = get_terminfo_flag("bce");
 
-    int width = tigetnum("cols");
-    int height = tigetnum("lines");
-    if (width > 2 && height > 2) {
-        terminal.width = (unsigned int)width;
-        terminal.height = (unsigned int)height;
-    }
+    terminal = (Terminal) {
+        .back_color_erase = get_terminfo_flag("bce"),
+        .color_type = TERM_0_COLOR,
+        .width = (width > 2) ? width : 80,
+        .height = (height > 2) ? height : 24,
+        .ncv_attributes = get_ncv_flags_as_attrs(),
+        .parse_key_sequence = &xterm_parse_key,
+        .put_control_code = &tputs_control_code,
+        .clear_screen = &tputs_clear_screen,
+        .clear_to_eol = &tputs_clear_to_eol,
+        .set_color = &tputs_set_color,
+        .move_cursor = &tputs_move_cursor,
+        .repeat_byte = &term_repeat_byte,
+        .save_title = &no_op,
+        .restore_title = &no_op,
+        .set_title = &no_op_s,
+        .control_codes = {
+            .init = STRING_VIEW_INIT,
+            .deinit = STRING_VIEW_INIT,
+            .reset_colors = get_terminfo_string_view("op"),
+            .reset_attrs = get_terminfo_string_view("sgr0"),
+            .keypad_off = get_terminfo_string_view("rmkx"),
+            .keypad_on = get_terminfo_string_view("smkx"),
+            .cup_mode_off = get_terminfo_string_view("rmcup"),
+            .cup_mode_on = get_terminfo_string_view("smcup"),
+            .show_cursor = get_terminfo_string_view("cnorm"),
+            .hide_cursor = get_terminfo_string_view("civis")
+        }
+    };
 
     switch (tigetnum("colors")) {
     case 16777216:
@@ -318,26 +339,6 @@ bool term_init_terminfo(const char *term)
         break;
     }
 
-    const int ncv = tigetnum("ncv");
-    if (ncv <= 0) {
-        terminal.ncv_attributes = 0;
-    } else {
-        terminal.ncv_attributes = convert_ncv_flags_to_attrs(ncv);
-    }
-
-    terminal.control_codes = (TermControlCodes) {
-        .reset_colors = get_terminfo_string_view("op"),
-        .reset_attrs = get_terminfo_string_view("sgr0"),
-        .keypad_off = get_terminfo_string_view("rmkx"),
-        .keypad_on = get_terminfo_string_view("smkx"),
-        .cup_mode_off = get_terminfo_string_view("rmcup"),
-        .cup_mode_on = get_terminfo_string_view("smcup"),
-        .show_cursor = get_terminfo_string_view("cnorm"),
-        .hide_cursor = get_terminfo_string_view("civis")
-    };
-
-    bool xterm_compatible_key_codes = true;
-
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
         const char *const code = get_terminfo_string(keymap[i].code);
         if (code && code[0] != '\0') {
@@ -351,13 +352,9 @@ bool term_init_terminfo(const char *term)
             KeyCode parsed_key;
             const ssize_t parsed_len = xterm_parse_key(code, code_len, &parsed_key);
             if (parsed_len <= 0 || parsed_key != key) {
-                xterm_compatible_key_codes = false;
+                terminal.parse_key_sequence = &parse_key_from_keymap;
             }
         }
-    }
-
-    if (!xterm_compatible_key_codes) {
-        terminal.parse_key_sequence = &parse_key_from_keymap;
     }
 
     return true; // Initialization succeeded
