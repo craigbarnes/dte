@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "debug.h"
 #include "editor.h"
 #include "selection.h"
 #include "terminal/output.h"
@@ -182,6 +183,8 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         case '\0':
             f->buf[f->pos] = '\0';
             return;
+        default:
+            BUG("should be unreachable, due to validate_statusline_format()");
         }
     }
     f->buf[f->pos] = '\0';

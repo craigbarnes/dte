@@ -411,7 +411,8 @@ TabBarMode tabbar_visibility(const Window *win)
         }
         return TAB_BAR_VERTICAL;
     }
-    return 0;
+    BUG("unhandled tab-bar mode");
+    return TAB_BAR_HIDDEN;
 }
 
 int vertical_tabbar_width(const Window *win)

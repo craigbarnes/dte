@@ -79,6 +79,8 @@ static void editorconfig_option_set (
         break;
     case EC_UNKNOWN_PROPERTY:
         break;
+    default:
+        BUG("unhandled property type");
     }
 }
 

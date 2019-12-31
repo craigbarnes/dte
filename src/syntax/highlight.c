@@ -238,6 +238,8 @@ static HlColor **highlight_line (
                     goto top;
                 }
                 } break;
+            default:
+                BUG("unhandled condition type");
             }
         }
 
@@ -260,7 +262,7 @@ static HlColor **highlight_line (
             break;
         case STATE_INVALID:
         default:
-            BUG("Invalid default action type should never make it here");
+            BUG("unhandled default action type");
         }
     }
 

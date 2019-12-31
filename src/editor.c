@@ -161,6 +161,8 @@ static void restore_cursor(void)
     case INPUT_SEARCH:
         terminal.move_cursor(editor.cmdline_x, terminal.height - 1);
         break;
+    default:
+        BUG("unhandled input mode");
     }
 }
 

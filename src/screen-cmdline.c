@@ -84,6 +84,8 @@ void update_command_line(void)
     case INPUT_COMMAND:
         editor.cmdline_x = print_command(prefix);
         break;
+    default:
+        BUG("unhandled input mode");
     }
     term_clear_eol();
 }

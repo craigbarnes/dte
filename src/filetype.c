@@ -201,6 +201,8 @@ HOT const char *find_ft(const char *filename, StringView line)
                 continue;
             }
             break;
+        default:
+            BUG("unhandled detection type");
         }
         return ft_get_name(ft);
     }
