@@ -57,9 +57,10 @@ HlColor *set_highlight_color(const char *name, const TermColor *color)
         }
     }
 
-    HlColor *c = xnew(HlColor, 1);
-    c->name = xstrdup(name);
+    size_t name_len = strlen(name);
+    HlColor *c = xmalloc(sizeof(*c) + name_len + 1);
     c->color = *color;
+    memcpy(c->name, name, name_len + 1);
     ptr_array_append(&hl_colors, c);
     return c;
 }
@@ -94,17 +95,8 @@ HlColor *find_color(const char *name)
 void remove_extra_colors(void)
 {
     BUG_ON(hl_colors.count < NR_BC);
-    for (size_t i = NR_BC; i < hl_colors.count; i++) {
-        HlColor *c = hl_colors.ptrs[i];
-
-        // Make possible use after free error easy to see
-        c->color.fg = COLOR_RED;
-        c->color.bg = COLOR_YELLOW;
-        c->color.attr = ATTR_BOLD;
-        free(c->name);
-        c->name = NULL;
-        free(c);
-
+    for (size_t i = NR_BC, n = hl_colors.count; i < n; i++) {
+        free(hl_colors.ptrs[i]);
         hl_colors.ptrs[i] = NULL;
     }
     hl_colors.count = NR_BC;

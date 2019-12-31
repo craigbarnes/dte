@@ -22,8 +22,8 @@ enum builtin_color {
 };
 
 typedef struct {
-    char *name;
     TermColor color;
+    char name[];
 } HlColor;
 
 extern TermColor *builtin_colors[NR_BC];
