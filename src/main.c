@@ -121,12 +121,14 @@ static int dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (cfg) {
-        xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length);
-        return 0;
+        if (xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length) >= 0) {
+            return 0;
+        }
+        perror("write");
     } else {
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
-        return 1;
     }
+    return 1;
 }
 
 static void showkey_loop(void)
