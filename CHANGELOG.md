@@ -345,8 +345,23 @@ Checksums
 A list of SHA256 checksums for all release tarballs and signatures is
 available at <https://craigbarnes.gitlab.io/dist/dte/dte-sha256sums.txt>.
 
+Portable Builds for Linux
+=========================
+
+Some pre-built, portable binaries are available for Linux. They're
+statically-linked with [musl] libc and require nothing of the host
+system except a somewhat recent kernel.
+
+* [`dte-master-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dte/dte-master-linux-x86_64.tar.gz)
+* [`dte-1.9.1-linux-x86_64.tar.gz`](https://craigbarnes.gitlab.io/dist/dte/dte-1.9.1-linux-x86_64.tar.gz)
+
+*Note*: only `x86_64` builds are available for now. Feel free to open an
+[issue] if you need builds for other architectures.
+
 
 [website]: https://craigbarnes.gitlab.io/dte/
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
+[musl]: https://www.musl-libc.org/
+[issue]: https://gitlab.com/craigbarnes/dte/issues/new
