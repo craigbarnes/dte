@@ -84,16 +84,16 @@ void term_init(void)
         term_init_fail("'TERM' not set");
     }
 
+    if (!term_mode_init()) {
+        term_init_fail("tcgetattr: %s", strerror(errno));
+    }
+
     if (getenv("DTE_FORCE_TERMINFO")) {
         if (term_init_terminfo(term)) {
             return;
         } else {
             term_init_fail("'DTE_FORCE_TERMINFO' set but terminfo not linked");
         }
-    }
-
-    if (!term_mode_init()) {
-        term_init_fail("tcgetattr: %s", strerror(errno));
     }
 
     switch (get_term_type(term)) {
