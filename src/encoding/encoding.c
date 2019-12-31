@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <stddef.h>
 #include "encoding.h"
 #include "../util/ascii.h"
 #include "../util/hashset.h"
@@ -65,11 +65,11 @@ Encoding encoding_from_name(const char *name)
     const char *normalized_name;
     if (type == UNKNOWN_ENCODING) {
         char upper[256];
-        size_t len = strnlen(name, sizeof upper);
-        for (size_t i = 0; i < len; i++) {
-            upper[i] = ascii_toupper(name[i]);
+        size_t n;
+        for (n = 0; n < sizeof(upper) && name[n]; n++) {
+            upper[n] = ascii_toupper(name[n]);
         }
-        normalized_name = mem_intern(upper, len);
+        normalized_name = mem_intern(upper, n);
     } else {
         normalized_name = encoding_type_to_string(type);
     }
