@@ -30,7 +30,7 @@
     KEY(p "7", key | MOD_META | MOD_CTRL), \
     KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
-static struct {
+static struct TermInfo {
     const char *clear;
     const char *cup;
     const char *el;
@@ -86,8 +86,8 @@ static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
 {
     bool possibly_truncated = false;
     for (size_t i = 0; i < keymap_length; i++) {
-        const struct TermKeyMap *const km = &keymap[i];
-        const char *const keycode = km->code;
+        const struct TermKeyMap *km = &keymap[i];
+        const char *keycode = km->code;
         const size_t len = km->code_length;
         BUG_ON(keycode == NULL);
         BUG_ON(len == 0);
@@ -107,9 +107,10 @@ static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
     return possibly_truncated ? -1 : 0;
 }
 
-// These are normally declared in the <curses.h> and <term.h> headers.
-// They are not included here because of the insane number of unprefixed
-// symbols they declare and because of previous bugs caused by using them.
+// These functions are normally declared in the <curses.h> and <term.h>
+// headers. They aren't included here because of the insane number of
+// unhygienic macros they contain and because of previous bugs caused
+// by using them.
 int setupterm(const char *term, int filedes, int *errret);
 int tigetflag(const char *capname);
 int tigetnum(const char *capname);
@@ -119,15 +120,10 @@ char *tparm(const char*, long, long, long, long, long, long, long, long, long);
 #define tparm_1(str, p1) tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0)
 #define tparm_2(str, p1, p2) tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0)
 
-static char *get_terminfo_string(const char *capname)
+static const char *get_terminfo_string(const char *capname)
 {
-    char *str = tigetstr(capname);
-    if (str == (char *)-1) {
-        // Not a string cap (bug?)
-        return NULL;
-    }
-    // NULL = canceled or absent
-    return str;
+    const char *str = tigetstr(capname);
+    return (str == (char*)-1) ? NULL : str;
 }
 
 static StringView get_terminfo_string_view(const char *capname)
@@ -145,40 +141,39 @@ static bool get_terminfo_flag(const char *capname)
     return true;
 }
 
-static int tputs_putc(int ch)
+static int xtputs_putc(int ch)
 {
     term_add_byte(ch);
     return ch;
 }
 
-static void tputs_control_code(StringView code)
+static void xtputs(const char *str, int lines_affected)
 {
-    if (code.length) {
-        tputs(code.data, 1, tputs_putc);
+    if (str) {
+        tputs(str, lines_affected, xtputs_putc);
     }
 }
 
-static void tputs_clear_screen(void)
+static void put_control_code(StringView code)
 {
-    if (terminfo.clear) {
-        tputs(terminfo.clear, terminal.height, tputs_putc);
-    }
+    xtputs(code.data, 1);
 }
 
-static void tputs_clear_to_eol(void)
+static void clear_screen(void)
 {
-    if (terminfo.el) {
-        tputs(terminfo.el, 1, tputs_putc);
-    }
+    xtputs(terminfo.clear, terminal.height);
 }
 
-static void tputs_move_cursor(unsigned int x, unsigned int y)
+static void clear_to_eol(void)
+{
+    xtputs(terminfo.el, 1);
+}
+
+static void move_cursor(unsigned int x, unsigned int y)
 {
     if (terminfo.cup) {
         const char *seq = tparm_2(terminfo.cup, (long)y, (long)x);
-        if (seq) {
-            tputs(seq, 1, tputs_putc);
-        }
+        xtputs(seq, 1);
     }
 }
 
@@ -193,7 +188,7 @@ static bool attr_is_set(const TermColor *color, unsigned int attr)
     return true;
 }
 
-static void tputs_set_color(const TermColor *color)
+static void set_color(const TermColor *color)
 {
     if (terminfo.sgr) {
         const char *attrs = tparm (
@@ -208,21 +203,17 @@ static void tputs_set_color(const TermColor *color)
             0, // p8 = "protect" (unused)
             0  // p9 = "altcharset" (unused)
         );
-        tputs(attrs, 1, tputs_putc);
+        xtputs(attrs, 1);
     }
 
     TermColor c = *color;
     if (terminfo.setaf && c.fg >= 0) {
         const char *seq = tparm_1(terminfo.setaf, c.fg);
-        if (seq) {
-            tputs(seq, 1, tputs_putc);
-        }
+        xtputs(seq, 1);
     }
     if (terminfo.setab && c.bg >= 0) {
         const char *seq = tparm_1(terminfo.setab, c.bg);
-        if (seq) {
-            tputs(seq, 1, tputs_putc);
-        }
+        xtputs(seq, 1);
     }
 }
 
@@ -262,28 +253,25 @@ bool term_init_terminfo(const char *term)
     // Initialize terminfo database (or call exit(3) on failure)
     setupterm(term, STDOUT_FILENO, NULL);
 
-    if (unlikely(get_terminfo_flag("nxon"))) {
-        term_init_fail (
-            "TERM type '%s' not supported: 'nxon' flag is set",
-            term
-        );
+    terminfo = (struct TermInfo) {
+        .clear = get_terminfo_string("clear"),
+        .cup = get_terminfo_string("cup"),
+        .el = get_terminfo_string("el"),
+        .setab = get_terminfo_string("setab"),
+        .setaf = get_terminfo_string("setaf"),
+        .sgr = get_terminfo_string("sgr"),
+    };
+
+    if (get_terminfo_flag("nxon")) {
+        term_init_fail("TERM='%s' not supported: 'nxon' flag is set", term);
     }
 
-    terminfo.cup = get_terminfo_string("cup");
-    if (unlikely(terminfo.cup == NULL)) {
-        term_init_fail (
-            "TERM type '%s' not supported: no 'cup' capability",
-            term
-        );
+    if (terminfo.cup == NULL) {
+        term_init_fail("TERM='%s' not supported: no 'cup' capability", term);
     }
 
-    const int width = tigetnum("cols");
-    const int height = tigetnum("lines");
-    terminfo.clear = get_terminfo_string("clear");
-    terminfo.el = get_terminfo_string("el");
-    terminfo.setab = get_terminfo_string("setab");
-    terminfo.setaf = get_terminfo_string("setaf");
-    terminfo.sgr = get_terminfo_string("sgr");
+    int width = tigetnum("cols");
+    int height = tigetnum("lines");
 
     terminal = (Terminal) {
         .back_color_erase = get_terminfo_flag("bce"),
@@ -292,11 +280,11 @@ bool term_init_terminfo(const char *term)
         .height = (height > 2) ? height : 24,
         .ncv_attributes = get_ncv_flags_as_attrs(),
         .parse_key_sequence = &xterm_parse_key,
-        .put_control_code = &tputs_control_code,
-        .clear_screen = &tputs_clear_screen,
-        .clear_to_eol = &tputs_clear_to_eol,
-        .set_color = &tputs_set_color,
-        .move_cursor = &tputs_move_cursor,
+        .put_control_code = &put_control_code,
+        .clear_screen = &clear_screen,
+        .clear_to_eol = &clear_to_eol,
+        .set_color = &set_color,
+        .move_cursor = &move_cursor,
         .repeat_byte = &term_repeat_byte,
         .save_title = &no_op,
         .restore_title = &no_op,
@@ -334,13 +322,10 @@ bool term_init_terminfo(const char *term)
     case 8:
         terminal.color_type = TERM_8_COLOR;
         break;
-    default:
-        terminal.color_type = TERM_0_COLOR;
-        break;
     }
 
     for (size_t i = 0; i < ARRAY_COUNT(keymap); i++) {
-        const char *const code = get_terminfo_string(keymap[i].code);
+        const char *code = get_terminfo_string(keymap[i].code);
         if (code && code[0] != '\0') {
             const size_t code_len = strlen(code);
             const KeyCode key = keymap[i].key;
