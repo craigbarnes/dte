@@ -1,27 +1,24 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include "utf8.h"
 #include "ascii.h"
 
-static int u_seq_len(unsigned int first_byte)
-{
-    if (first_byte < 0x80) {
-        return 1;
-    }
-    if (first_byte < 0xc0) {
-        return 0;
-    }
-    if (first_byte < 0xe0) {
-        return 2;
-    }
-    if (first_byte < 0xf0) {
-        return 3;
-    }
+static const int8_t seq_len_table[256] = {
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // 00..1F
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // 20..3F
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // 40..5F
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // 60..7F
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 80..9F
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // A0..BF
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, // C0..DF
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3, // E0..EF
+    4,4,4,4,4,                       // F0..F4
+    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 // F5..FF
+};
 
-    // Could be 0xf8 but RFC 3629 doesn't allow codepoints above 0x10ffff
-    if (first_byte < 0xf5) {
-        return 4;
-    }
-    return -1;
+static int u_seq_len(unsigned char first_byte)
+{
+    return seq_len_table[first_byte];
 }
 
 static bool u_is_continuation(CodePoint u)
