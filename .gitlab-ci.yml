@@ -44,7 +44,6 @@ debian:
     script:
         - make check && make install && dte -V
         - make check-syntax-files
-        - sed -f tools/extract-readme-code.sed README.md | sh -e
         - export TERMINFO_DISABLE=1
         - make clean && make check CC=gcc
         - make clean && make check CC=clang
