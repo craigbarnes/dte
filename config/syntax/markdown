@@ -51,14 +51,22 @@ state line-start
 
 state text
     char "\n" line-start
+    char " \t" space
     char '`' code-span
     char [ reference
     str '**' double-asterisk
-    str '__' double-underline
     char * asterisk
-    char _ underscore
     char "\\" .markdown-escape:this
     eat this
+
+# Underscores only begin emphasis if preceded by whitespace.
+# This is to avoid mis-highlighting intra-word underscores
+# as emphasis (e.g. "x86_64").
+state space
+    char " \t" this
+    str '__' double-underscore
+    char _ underscore
+    noeat text
 
 state bullet
     char "\n" line-start
@@ -123,7 +131,7 @@ state underscore emphasis
     char -n "\n" this
     noeat line-start
 
-state double-underline strong-emphasis
+state double-underscore strong-emphasis
     char "\n" line-start
     str '__' text strong-emphasis
     eat this
