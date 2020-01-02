@@ -255,7 +255,7 @@ loop_break:
         return get_nr_errors() ? 1 : 0;
     }
 
-    if (!isatty(STDOUT_FILENO)) {
+    if (unlikely(!isatty(STDOUT_FILENO))) {
         fputs("stdout doesn't refer to a terminal\n", stderr);
         return 1;
     }
@@ -272,6 +272,15 @@ loop_break:
         }
         if (!freopen("/dev/tty", "r", stdin)) {
             perror("Unable to reopen input tty");
+            return 1;
+        }
+        int fd = fileno(stdin);
+        if (fd != STDIN_FILENO) {
+            // This should never happen in a single-threaded program.
+            // freopen() should call fclose() followed by open() and
+            // POSIX requires a successful call to open() to return the
+            // lowest available file descriptor.
+            fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
             return 1;
         }
     }
