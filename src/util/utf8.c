@@ -54,7 +54,7 @@ static bool u_seq_len_ok(CodePoint u, int len)
  */
 static unsigned int u_get_first_byte_mask(unsigned int len)
 {
-    return (1U << 7U >> len) - 1;
+    return (0x80 >> len) - 1;
 }
 
 size_t u_str_width(const unsigned char *str)
