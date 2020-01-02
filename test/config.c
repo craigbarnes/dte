@@ -19,31 +19,6 @@
 #include "../src/window.h"
 #include "../build/test/data.h"
 
-DISABLE_WARNING("-Wmissing-prototypes")
-
-static const char extra_rc[] =
-    "set lock-files false\n"
-    // Regression test for unquoted variables in rc files
-    "bind M-p \"insert \"$WORD\n"
-    "bind M-p \"insert \"$FILE\n"
-;
-
-void init_headless_mode(void)
-{
-    MEMZERO(&terminal.control_codes);
-    editor.resize = &no_op;
-    editor.ui_end = &no_op;
-
-    exec_builtin_rc();
-
-    window = new_window();
-    root_frame = new_root_frame(window);
-
-    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
-
-    set_view(window_open_empty_buffer(window));
-}
-
 static void test_builtin_configs(void)
 {
     size_t n;
@@ -131,6 +106,25 @@ static void test_exec_config(void)
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")
+
+void init_headless_mode(void)
+{
+    const char extra_rc[] =
+        "set lock-files false\n"
+        // Regression test for unquoted variables in rc files
+        "bind M-p \"insert \"$WORD\n"
+        "bind M-p \"insert \"$FILE\n"
+    ;
+
+    MEMZERO(&terminal.control_codes);
+    editor.resize = &no_op;
+    editor.ui_end = &no_op;
+    exec_builtin_rc();
+    window = new_window();
+    root_frame = new_root_frame(window);
+    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
+    set_view(window_open_empty_buffer(window));
+}
 
 void test_config(void)
 {
