@@ -145,12 +145,12 @@ static bool get_terminfo_flag(const char *capname)
 
 static const char *xtparm1(const char *str, long p1)
 {
-    return tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0);
+    return str ? tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0) : NULL;
 }
 
 static const char *xtparm2(const char *str, long p1, long p2)
 {
-    return tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0);
+    return str ? tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0) : NULL;
 }
 
 static int xtputs_putc(int ch)
@@ -183,10 +183,7 @@ static void clear_to_eol(void)
 
 static void move_cursor(unsigned int x, unsigned int y)
 {
-    if (terminfo.cup) {
-        const char *seq = xtparm2(terminfo.cup, (long)y, (long)x);
-        xtputs(seq, 1);
-    }
+    xtputs(xtparm2(terminfo.cup, (long)y, (long)x), 1);
 }
 
 static bool attr_is_set(const TermColor *color, unsigned int attr)
@@ -219,13 +216,11 @@ static void set_color(const TermColor *color)
     }
 
     TermColor c = *color;
-    if (terminfo.setaf && c.fg >= 0) {
-        const char *seq = xtparm1(terminfo.setaf, c.fg);
-        xtputs(seq, 1);
+    if (c.fg >= 0) {
+        xtputs(xtparm1(terminfo.setaf, c.fg), 1);
     }
-    if (terminfo.setab && c.bg >= 0) {
-        const char *seq = xtparm1(terminfo.setab, c.bg);
-        xtputs(seq, 1);
+    if (c.bg >= 0) {
+        xtputs(xtparm1(terminfo.setab, c.bg), 1);
     }
 }
 
