@@ -138,12 +138,13 @@ static int lock_or_unlock(const char *filename, bool lock)
     pid_t pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
-            const size_t n = strlen(filename) + 32;
+            size_t n = strlen(filename) + (4 * sizeof(pid_t));
             xrenew(buf, size + n);
-            xsnprintf(buf + size, n, "%d %s\n", getpid(), filename);
+            xsnprintf(buf + size, n, "%jd %s\n", (intmax_t)getpid(), filename);
             size += strlen(buf + size);
         } else {
-            error_msg("File is locked (%s) by process %d", file_locks, pid);
+            intmax_t xpid = (intmax_t)pid;
+            error_msg("File is locked (%s) by process %jd", file_locks, xpid);
         }
     }
     if (xwrite(wfd, buf, size) < 0) {
