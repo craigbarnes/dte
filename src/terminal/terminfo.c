@@ -15,9 +15,20 @@
 #include "../util/str-util.h"
 #include "../util/string-view.h"
 
+static struct TermInfo {
+    const char *clear;
+    const char *cup;
+    const char *el;
+    const char *setab;
+    const char *setaf;
+    const char *sgr;
+} terminfo;
+
+static size_t keymap_length = 0;
+
 #define KEY(c, k) { \
     .code = (c), \
-    .code_length = (sizeof(c) - 1), \
+    .code_length = STRLEN(c), \
     .key = (k) \
 }
 
@@ -30,15 +41,11 @@
     KEY(p "7", key | MOD_META | MOD_CTRL), \
     KEY(p "8", key | MOD_SHIFT | MOD_META | MOD_CTRL)
 
-static struct TermInfo {
-    const char *clear;
-    const char *cup;
-    const char *el;
-    const char *setab;
-    const char *setaf;
-    const char *sgr;
-} terminfo;
-
+// This array initially contains mappings of terminfo(5) key names
+// to KeyCode values. During initialization, each name is queried
+// from the terminfo database and the array is overwritten with the
+// corresponding escape sequences. The keymap_length variable above
+// stores the resulting number of entries.
 static struct TermKeyMap {
     const char *code;
     uint32_t code_length;
@@ -78,12 +85,9 @@ static struct TermKeyMap {
     XKEYS("kEND", KEY_END),
 };
 
-static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
-
-static size_t keymap_length = 0;
-
 static ssize_t parse_key_from_keymap(const char *buf, size_t fill, KeyCode *key)
 {
+    static_assert(ARRAY_COUNT(keymap) == 23 + (9 * 7));
     bool possibly_truncated = false;
     for (size_t i = 0; i < keymap_length; i++) {
         const struct TermKeyMap *km = &keymap[i];
@@ -117,8 +121,6 @@ int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
 int tputs(const char *str, int affcnt, int (*putc_fn)(int));
 char *tparm(const char*, long, long, long, long, long, long, long, long, long);
-#define tparm_1(str, p1) tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0)
-#define tparm_2(str, p1, p2) tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0)
 
 static const char *get_terminfo_string(const char *capname)
 {
@@ -139,6 +141,16 @@ static bool get_terminfo_flag(const char *capname)
         return false;
     }
     return true;
+}
+
+static const char *xtparm1(const char *str, long p1)
+{
+    return tparm(str, p1, 0, 0, 0, 0, 0, 0, 0, 0);
+}
+
+static const char *xtparm2(const char *str, long p1, long p2)
+{
+    return tparm(str, p1, p2, 0, 0, 0, 0, 0, 0, 0);
 }
 
 static int xtputs_putc(int ch)
@@ -172,7 +184,7 @@ static void clear_to_eol(void)
 static void move_cursor(unsigned int x, unsigned int y)
 {
     if (terminfo.cup) {
-        const char *seq = tparm_2(terminfo.cup, (long)y, (long)x);
+        const char *seq = xtparm2(terminfo.cup, (long)y, (long)x);
         xtputs(seq, 1);
     }
 }
@@ -208,11 +220,11 @@ static void set_color(const TermColor *color)
 
     TermColor c = *color;
     if (terminfo.setaf && c.fg >= 0) {
-        const char *seq = tparm_1(terminfo.setaf, c.fg);
+        const char *seq = xtparm1(terminfo.setaf, c.fg);
         xtputs(seq, 1);
     }
     if (terminfo.setab && c.bg >= 0) {
-        const char *seq = tparm_1(terminfo.setab, c.bg);
+        const char *seq = xtparm1(terminfo.setab, c.bg);
         xtputs(seq, 1);
     }
 }
