@@ -221,12 +221,16 @@ static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
 static void cmd_close(const CommandArgs *a)
 {
     bool force = false;
+    bool prompt = false;
     bool allow_quit = false;
     bool allow_wclose = false;
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'f':
             force = true;
+            break;
+        case 'p':
+            prompt = true;
             break;
         case 'q':
             allow_quit = true;
@@ -238,11 +242,17 @@ static void cmd_close(const CommandArgs *a)
     }
 
     if (!view_can_close(view) && !force) {
-        error_msg (
-            "The buffer is modified. "
-            "Save or run 'close -f' to close without saving."
-        );
-        return;
+        if (prompt) {
+            if (dialog_prompt("Close without saving changes? [y/N]", "ny") != 'y') {
+                return;
+            }
+        } else {
+            error_msg (
+                "The buffer is modified. "
+                "Save or run 'close -f' to close without saving."
+            );
+            return;
+        }
     }
 
     if (allow_quit && editor.buffers.count == 1 && root_frame->frames.count <= 1) {
@@ -1830,15 +1840,22 @@ static void cmd_view(const CommandArgs *a)
 
 static void cmd_wclose(const CommandArgs *a)
 {
+    bool force = has_flag(a, 'f');
+    bool prompt = has_flag(a, 'p');
     View *v = window_find_unclosable_view(window, view_can_close);
-    bool force = a->flags[0] == 'f';
-    if (v != NULL && !force) {
+    if (v && !force) {
         set_view(v);
-        error_msg (
-            "Save modified files or run 'wclose -f' to close "
-            "window without saving."
-        );
-        return;
+        if (prompt) {
+            if (dialog_prompt("Close window without saving? [y/N]", "ny") != 'y') {
+                return;
+            }
+        } else {
+            error_msg (
+                "Save modified files or run 'wclose -f' to close "
+                "window without saving."
+            );
+            return;
+        }
     }
     window_close_current();
 }
@@ -2040,7 +2057,7 @@ static const Command cmds[] = {
     {"cd", "", 1, 1, cmd_cd},
     {"center-view", "", 0, 0, cmd_center_view},
     {"clear", "", 0, 0, cmd_clear},
-    {"close", "fqw", 0, 0, cmd_close},
+    {"close", "fpqw", 0, 0, cmd_close},
     {"command", "", 0, 1, cmd_command},
     {"compile", "-1ps", 2, -1, cmd_compile},
     {"copy", "k", 0, 0, cmd_copy},
@@ -2106,7 +2123,7 @@ static const Command cmds[] = {
     {"unselect", "", 0, 0, cmd_unselect},
     {"up", "cl", 0, 0, cmd_up},
     {"view", "", 1, 1, cmd_view},
-    {"wclose", "f", 0, 0, cmd_wclose},
+    {"wclose", "fp", 0, 0, cmd_wclose},
     {"wflip", "", 0, 0, cmd_wflip},
     {"wnext", "", 0, 0, cmd_wnext},
     {"word-bwd", "cs", 0, 0, cmd_word_bwd},

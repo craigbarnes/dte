@@ -798,7 +798,11 @@ Close file.
 .P
 .TP
 \fB\-f\fR
-Close file even if it hasn't been saved after last modification
+Force close file, even if it has unsaved changes
+.PP
+.TP
+\fB\-p\fR
+Prompt for confirmation if the file has unsaved changes
 .PP
 .TP
 \fB\-q\fR
@@ -857,7 +861,11 @@ Close window.
 .P
 .TP
 \fB\-f\fR
-Close even if there are unsaved files in the window
+Force close window, even if it contains unsaved files
+.PP
+.TP
+\fB\-p\fR
+Prompt for confirmation if there are unsaved files in the window
 .PP
 .RE
 \fBwnext\fR

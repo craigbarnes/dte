@@ -407,7 +407,10 @@ Save file. By default line-endings (LF vs CRLF) are preserved.
 Close file.
 
 `-f`
-:   Close file even if it hasn't been saved after last modification
+:   Force close file, even if it has unsaved changes
+
+`-p`
+:   Prompt for confirmation if the file has unsaved changes
 
 `-q`
 :   Quit if closing the last open file
@@ -454,7 +457,10 @@ Like `open` but at first splits current window vertically.
 Close window.
 
 `-f`
-:   Close even if there are unsaved files in the window
+:   Force close window, even if it contains unsaved files
+
+`-p`
+:   Prompt for confirmation if there are unsaved files in the window
 
 ### **wnext**
 
