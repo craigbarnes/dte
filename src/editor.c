@@ -305,11 +305,36 @@ char *editor_file(const char *name)
     return xasprintf("%s/%s", editor.user_config_dir, name);
 }
 
+static char get_choice(const char *choices)
+{
+    KeyCode key;
+    if (!term_read_key(&key)) {
+        return 0;
+    }
+
+    switch (key) {
+    case KEY_PASTE:
+        term_discard_paste();
+        return 0;
+    case CTRL('C'):
+    case CTRL('G'):
+    case CTRL('['):
+        return 0x18; // Cancel
+    case KEY_ENTER:
+        return choices[0]; // Default
+    }
+
+    if (key < 128) {
+        char ch = ascii_tolower(key);
+        if (strchr(choices, ch)) {
+            return ch;
+        }
+    }
+    return 0;
+}
+
 char get_confirmation(const char *question, const char *choices)
 {
-    unsigned char default_choice = choices[0];
-    BUG_ON(!ascii_islower(default_choice));
-
     // update_windows() assumes these have been called for the current view
     View *v = window->view;
     view_update_cursor_x(v);
@@ -325,31 +350,16 @@ char get_confirmation(const char *question, const char *choices)
     show_message(question, false);
     end_update();
 
-    KeyCode key;
     while (1) {
-        if (term_read_key(&key)) {
-            switch (key) {
-            case KEY_PASTE:
-                term_discard_paste();
-                continue;
-            case CTRL('C'):
-            case CTRL('G'):
-            case CTRL('['):
-                return 0;
-            case KEY_ENTER:
-                return default_choice;
-            }
-            if (key > 127) {
-                continue;
-            }
-            const unsigned char ch = ascii_tolower(key);
-            if (strchr(choices, ch)) {
-                return ch;
-            }
-        } else if (terminal_resized) {
+        char c = get_choice(choices);
+        if (c) {
+            return (c >= 'a') ? c : 0;
+        }
+        if (terminal_resized) {
             resize();
         }
     }
+
     BUG("unreachable");
     return 0;
 }
