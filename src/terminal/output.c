@@ -117,6 +117,7 @@ void term_clear_eol(void)
         if (
             obuf.can_clear
             && (obuf.color.bg < 0 || terminal.back_color_erase)
+            && !(obuf.color.attr & ATTR_REVERSE)
         ) {
             terminal.clear_to_eol();
             obuf.x = obuf.scroll_x + obuf.width;

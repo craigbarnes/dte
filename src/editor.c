@@ -346,25 +346,15 @@ static void show_dialog(const char *question)
     unsigned int top = mid - (height / 2);
     unsigned int bot = top + height;
 
-    const TermColor *color = builtin_colors[BC_DIALOG];
-    bool attr_reverse = (color->attr & ATTR_REVERSE);
-    set_color(color);
-
+    set_builtin_color(BC_DIALOG);
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(0, terminal.width, 0);
         terminal.move_cursor(0, y);
-        unsigned int x = 0;
         if (y == mid) {
-            x = (terminal.width - question_width) / 2;
-            term_set_bytes(' ', x);
-            x += question_width;
+            term_set_bytes(' ', (terminal.width - question_width) / 2);
             term_add_str(question);
         }
-        if (attr_reverse) {
-            term_set_bytes(' ', terminal.width - x);
-        } else {
-            term_clear_eol();
-        }
+        term_clear_eol();
     }
 }
 
