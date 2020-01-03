@@ -7,7 +7,7 @@ Default Key Bindings
 :   Enter command mode (see [`dterc`] for available commands)
 
 `Ctrl`+`q`
-:   Quit editor (use `quit -f` in command mode to quit with unsaved buffers)
+:   Quit editor
 
 `Alt`+`z`
 :   Suspend editor (resume by running `fg` in the shell)
