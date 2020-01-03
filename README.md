@@ -78,7 +78,7 @@ See [`docs/packaging.md`](https://gitlab.com/craigbarnes/dte/blob/master/docs/pa
 License
 -------
 
-Copyright (C) 2017-2019 Craig Barnes.  
+Copyright (C) 2017-2020 Craig Barnes.  
 Copyright (C) 2010-2015 Timo Hirvonen.
 
 This program is free software; you can redistribute it and/or modify it
