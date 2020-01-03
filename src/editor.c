@@ -346,13 +346,21 @@ static void show_dialog(const char *question)
     unsigned int top = mid - (height / 2);
     unsigned int bot = top + height;
 
-    set_builtin_color(BC_DIALOG);
+    // The "underline" and "strikethrough" attributes should only apply
+    // to the text, not the whole dialog background:
+    const TermColor *text_color = builtin_colors[BC_DIALOG];
+    TermColor dialog_color = *text_color;
+    dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
+    set_color(&dialog_color);
+
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(0, terminal.width, 0);
         terminal.move_cursor(0, y);
         if (y == mid) {
             term_set_bytes(' ', (terminal.width - question_width) / 2);
+            set_color(text_color);
             term_add_str(question);
+            set_color(&dialog_color);
         }
         term_clear_eol();
     }
