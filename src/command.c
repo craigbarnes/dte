@@ -1245,8 +1245,8 @@ static void cmd_save(const CommandArgs *a)
             && stat_changed(&buffer->st, &st)
         ) {
             error_msg (
-                "File has been modified by someone else."
-                " Use -f to force overwrite."
+                "File has been modified by another process."
+                " Use 'save -f' to force overwrite."
             );
             goto error;
         }
