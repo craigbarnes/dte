@@ -10,40 +10,40 @@
 #include "../util/ascii.h"
 #include "../util/xmalloc.h"
 
-static char input_buf[256];
-static size_t input_buf_fill;
-static bool input_can_be_truncated;
+static struct {
+    char buf[256];
+    size_t len;
+    bool can_be_truncated;
+} input;
 
 static void consume_input(size_t len)
 {
-    input_buf_fill -= len;
-    if (input_buf_fill) {
-        memmove(input_buf, input_buf + len, input_buf_fill);
+    input.len -= len;
+    if (input.len) {
+        memmove(input.buf, input.buf + len, input.len);
 
         // Keys are sent faster than we can read
-        input_can_be_truncated = true;
+        input.can_be_truncated = true;
     }
 }
 
 static bool fill_buffer(void)
 {
-    if (input_buf_fill == sizeof(input_buf)) {
+    if (input.len == sizeof(input.buf)) {
         return false;
     }
 
-    if (!input_buf_fill) {
-        input_can_be_truncated = false;
+    if (!input.len) {
+        input.can_be_truncated = false;
     }
 
-    ssize_t rc = read (
-        STDIN_FILENO,
-        input_buf + input_buf_fill,
-        sizeof(input_buf) - input_buf_fill
-    );
+    size_t avail = sizeof(input.buf) - input.len;
+    ssize_t rc = read(STDIN_FILENO, input.buf + input.len, avail);
     if (rc <= 0) {
         return false;
     }
-    input_buf_fill += (size_t)rc;
+
+    input.len += (size_t)rc;
     return true;
 }
 
@@ -73,17 +73,17 @@ static bool fill_buffer_timeout(void)
 
 static bool input_get_byte(unsigned char *ch)
 {
-    if (!input_buf_fill && !fill_buffer()) {
+    if (!input.len && !fill_buffer()) {
         return false;
     }
-    *ch = input_buf[0];
+    *ch = input.buf[0];
     consume_input(1);
     return true;
 }
 
 static bool read_special(KeyCode *key)
 {
-    ssize_t len = terminal.parse_key_sequence(input_buf, input_buf_fill, key);
+    ssize_t len = terminal.parse_key_sequence(input.buf, input.len, key);
     switch (len) {
     case -1:
         // Possibly truncated
@@ -97,7 +97,7 @@ static bool read_special(KeyCode *key)
         return true;
     }
 
-    if (input_can_be_truncated && fill_buffer()) {
+    if (input.can_be_truncated && fill_buffer()) {
         return read_special(key);
     }
 
@@ -160,26 +160,25 @@ static bool is_text(const char *str, size_t len)
 
 bool term_read_key(KeyCode *key)
 {
-    if (!input_buf_fill && !fill_buffer()) {
+    if (!input.len && !fill_buffer()) {
         return false;
     }
 
-    if (input_buf_fill > 4 && is_text(input_buf, input_buf_fill)) {
+    if (input.len > 4 && is_text(input.buf, input.len)) {
         *key = KEY_PASTE;
         return true;
     }
 
-    if (input_buf[0] == '\033') {
-        if (input_buf_fill > 1 || input_can_be_truncated) {
+    if (input.buf[0] == '\033') {
+        if (input.len > 1 || input.can_be_truncated) {
             if (read_special(key)) {
                 return true;
             }
         }
-        if (input_buf_fill == 1) {
+        if (input.len == 1) {
             // Sometimes alt-key gets split into two reads
             fill_buffer_timeout();
-
-            if (input_buf_fill > 1 && input_buf[1] == '\033') {
+            if (input.len > 1 && input.buf[1] == '\033') {
                 /*
                  * Double-esc (+ maybe some other characters)
                  *
@@ -196,7 +195,7 @@ bool term_read_key(KeyCode *key)
                 return read_simple(key);
             }
         }
-        if (input_buf_fill > 1) {
+        if (input.len > 1) {
             // Unknown escape sequence or 'esc key' / 'alt-key'
 
             // Throw escape away
@@ -207,14 +206,14 @@ bool term_read_key(KeyCode *key)
                 return false;
             }
 
-            if (input_buf_fill == 0 || input_buf[0] == '\033') {
+            if (input.len == 0 || input.buf[0] == '\033') {
                 // 'esc key' or 'alt-key'
                 *key |= MOD_META;
                 return true;
             }
 
             // Unknown escape sequence; avoid inserting it
-            input_buf_fill = 0;
+            input.len = 0;
             return false;
         }
     }
@@ -224,14 +223,14 @@ bool term_read_key(KeyCode *key)
 
 char *term_read_paste(size_t *size)
 {
-    size_t alloc = round_size_to_next_multiple(input_buf_fill + 1, 1024);
+    size_t alloc = round_size_to_next_multiple(input.len + 1, 1024);
     size_t count = 0;
     char *buf = xmalloc(alloc);
 
-    if (input_buf_fill) {
-        memcpy(buf, input_buf, input_buf_fill);
-        count = input_buf_fill;
-        input_buf_fill = 0;
+    if (input.len) {
+        memcpy(buf, input.buf, input.len);
+        count = input.len;
+        input.len = 0;
     }
 
     while (1) {
