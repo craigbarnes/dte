@@ -13,3 +13,4 @@ hi infomsg
 hi tabbar reverse
 hi activetab bold
 hi inactivetab reverse
+hi dialog reverse

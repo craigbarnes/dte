@@ -26,6 +26,7 @@ static const char builtin_color_names[NR_BC][16] = {
     [BC_TABBAR] = "tabbar",
     [BC_ACTIVETAB] = "activetab",
     [BC_INACTIVETAB] = "inactivetab",
+    [BC_DIALOG] = "dialog",
 };
 
 UNITTEST {

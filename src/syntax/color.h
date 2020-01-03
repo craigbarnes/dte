@@ -18,6 +18,7 @@ enum builtin_color {
     BC_TABBAR,
     BC_ACTIVETAB,
     BC_INACTIVETAB,
+    BC_DIALOG,
     NR_BC
 };
 

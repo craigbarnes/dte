@@ -187,6 +187,7 @@ or one of the following, built-in highlight names:
 * `tabbar`
 * `activetab`
 * `inactivetab`
+* `dialog`
 
 The _fg-color_ and _bg-color_ arguments can be one of the following:
 

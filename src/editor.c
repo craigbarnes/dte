@@ -18,6 +18,7 @@
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/str-util.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "view.h"
 #include "window.h"
@@ -333,7 +334,68 @@ static char get_choice(const char *choices)
     return 0;
 }
 
-char get_confirmation(const char *question, const char *choices)
+static void show_dialog(const char *question)
+{
+    size_t question_width = u_str_width(question);
+    if (terminal.height < 10 || terminal.width < (question_width + 2)) {
+        return;
+    }
+
+    unsigned int height = terminal.height / 4;
+    unsigned int mid = terminal.height / 2;
+    unsigned int top = mid - (height / 2);
+    unsigned int bot = top + height;
+
+    const TermColor *color = builtin_colors[BC_DIALOG];
+    bool attr_reverse = (color->attr & ATTR_REVERSE);
+    set_color(color);
+
+    for (unsigned int y = top; y < bot; y++) {
+        term_output_reset(0, terminal.width, 0);
+        terminal.move_cursor(0, y);
+        unsigned int x = 0;
+        if (y == mid) {
+            x = (terminal.width - question_width) / 2;
+            term_set_bytes(' ', x);
+            x += question_width;
+            term_add_str(question);
+        }
+        if (attr_reverse) {
+            term_set_bytes(' ', terminal.width - x);
+        } else {
+            term_clear_eol();
+        }
+    }
+}
+
+char dialog_prompt(const char *question, const char *choices)
+{
+    normal_update();
+    term_hide_cursor();
+    show_dialog(question);
+    show_message(question, false);
+    term_output_flush();
+
+    while (1) {
+        char c = get_choice(choices);
+        if (c) {
+            mark_everything_changed();
+            return (c >= 'a') ? c : 0;
+        }
+        if (terminal_resized) {
+            resize();
+            term_hide_cursor();
+            show_dialog(question);
+            show_message(question, false);
+            term_output_flush();
+        }
+    }
+
+    BUG("unreachable");
+    return 0;
+}
+
+char status_prompt(const char *question, const char *choices)
 {
     // update_windows() assumes these have been called for the current view
     View *v = window->view;
