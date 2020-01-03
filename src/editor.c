@@ -307,14 +307,8 @@ char *editor_file(const char *name)
 
 char get_confirmation(const char *question, const char *choices)
 {
-    unsigned char def = 0;
-    size_t nchoices = 0;
-    while (choices[nchoices]) {
-        unsigned char c = choices[nchoices++];
-        if (ascii_isupper(c)) {
-            def = ascii_tolower(c);
-        }
-    }
+    unsigned char default_choice = choices[0];
+    BUG_ON(!ascii_islower(default_choice));
 
     // update_windows() assumes these have been called for the current view
     View *v = window->view;
@@ -343,15 +337,13 @@ char get_confirmation(const char *question, const char *choices)
             case CTRL('['):
                 return 0;
             case KEY_ENTER:
-                if (def) {
-                    return def;
-                }
+                return default_choice;
             }
             if (key > 127) {
                 continue;
             }
             const unsigned char ch = ascii_tolower(key);
-            if (memchr(choices, ch, nchoices) || ch == def) {
+            if (strchr(choices, ch)) {
                 return ch;
             }
         } else if (terminal_resized) {

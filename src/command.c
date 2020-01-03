@@ -1006,7 +1006,7 @@ static void cmd_quit(const CommandArgs *a)
             }
             set_view(v);
             if (prompt) {
-                if (get_confirmation("Quit without saving changes? [y/N]", "yN") == 'y') {
+                if (get_confirmation("Quit without saving changes? [y/N]", "ny") == 'y') {
                     editor.status = EDITOR_EXITING;
                 }
                 return;

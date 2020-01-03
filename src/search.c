@@ -337,7 +337,7 @@ static unsigned int replace_on_line (
         view->cursor = *bi;
 
         if (flags & REPLACE_CONFIRM) {
-            switch (get_confirmation("Replace? [Y/n/a/q]", "Ynaq")) {
+            switch (get_confirmation("Replace? [Y/n/a/q]", "ynaq")) {
             case 'y':
                 break;
             case 'n':
