@@ -337,7 +337,8 @@ static char get_choice(const char *choices)
 static void show_dialog(const char *question)
 {
     size_t question_width = u_str_width(question);
-    if (terminal.height < 10 || terminal.width < (question_width + 2)) {
+    size_t min_width = question_width + 2;
+    if (terminal.height < 12 || terminal.width < min_width) {
         return;
     }
 
@@ -345,6 +346,14 @@ static void show_dialog(const char *question)
     unsigned int mid = terminal.height / 2;
     unsigned int top = mid - (height / 2);
     unsigned int bot = top + height;
+
+    unsigned int x, width = terminal.width / 2;
+    if (width <= min_width) {
+        width = terminal.width;
+        x = 0;
+    } else {
+        x = width / 2;
+    }
 
     // The "underline" and "strikethrough" attributes should only apply
     // to the text, not the whole dialog background:
@@ -354,10 +363,10 @@ static void show_dialog(const char *question)
     set_color(&dialog_color);
 
     for (unsigned int y = top; y < bot; y++) {
-        term_output_reset(0, terminal.width, 0);
-        terminal.move_cursor(0, y);
+        term_output_reset(x, width, 0);
+        terminal.move_cursor(x, y);
         if (y == mid) {
-            term_set_bytes(' ', (terminal.width - question_width) / 2);
+            term_set_bytes(' ', (width - question_width) / 2);
             set_color(text_color);
             term_add_str(question);
             set_color(&dialog_color);
