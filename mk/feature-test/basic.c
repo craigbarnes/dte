@@ -1,5 +1,5 @@
 /*
- This file serves a minimal, valid input that can be passed to
+ This file serves as a minimal, valid input that can be passed to
  a compiler in order to make it run in C mode (like "gcc -xc").
 
  The behaviour for a file argument matching "*.c" is specified by

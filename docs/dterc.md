@@ -67,7 +67,10 @@ Double quoted strings may contain the following escapes:
 :   Control characters (same as in C)
 
 `\\`
-:   Escaped backslash
+:   Backslash
+
+`\"`
+:   Double quote
 
 `\x0a`
 :   Hexadecimal byte value 0x0a. Note that `\x00` is not supported
