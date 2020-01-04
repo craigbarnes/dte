@@ -6,11 +6,97 @@
 
 static void test_parse_command_arg(void)
 {
-    char *arg = parse_command_arg("", 0, false);
+    // Single, unquoted argument
+    char *arg = parse_command_arg(STRN("arg"), false);
+    EXPECT_STREQ(arg, "arg");
+    free(arg);
+
+    // Two unquoted, space-separated arguments
+    arg = parse_command_arg(STRN("hello world"), false);
+    EXPECT_STREQ(arg, "hello");
+    free(arg);
+
+    // Two unquoted, tab-separated arguments
+    arg = parse_command_arg(STRN("hello\tworld"), false);
+    EXPECT_STREQ(arg, "hello");
+    free(arg);
+
+    // Unquoted argument preceded by whitespace
+    arg = parse_command_arg(STRN(" x"), false);
     EXPECT_STREQ(arg, "");
     free(arg);
 
-    arg = parse_command_arg(STRN("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\tbar"), false);
+    // Single-quoted argument, including whitespace
+    arg = parse_command_arg(STRN("'  foo ' .."), false);
+    EXPECT_STREQ(arg, "  foo ");
+    free(arg);
+
+    // Several adjacent, quoted strings forming a single argument
+    arg = parse_command_arg(STRN("\"foo\"'bar'' baz '\"etc\"."), false);
+    EXPECT_STREQ(arg, "foobar baz etc.");
+    free(arg);
+
+    // Control character escapes in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\a\\b\\t\\n\\v\\f\\r\""), false);
+    EXPECT_STREQ(arg, "\a\b\t\n\v\f\r");
+    free(arg);
+
+    // Backslash escape sequence in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\\\\""), false);
+    EXPECT_STREQ(arg, "\\");
+    free(arg);
+
+    // Double-quote escape sequence in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\\"\""), false);
+    EXPECT_STREQ(arg, "\"");
+    free(arg);
+
+    // Unrecognized escape sequence in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\z\""), false);
+    EXPECT_STREQ(arg, "\\z");
+    free(arg);
+
+    // 4-digit Unicode escape sequence
+    arg = parse_command_arg(STRN("\"\\u148A\""), false);
+    EXPECT_STREQ(arg, "\xE1\x92\x8A");
+    free(arg);
+
+    // 8-digit Unicode escape sequence
+    arg = parse_command_arg(STRN("\"\\U0001F4A4\""), false);
+    EXPECT_STREQ(arg, "\xF0\x9F\x92\xA4");
+    free(arg);
+
+    // "\U" escape sequence terminated by non-hexadecimal character
+    arg = parse_command_arg(STRN("\"\\U1F4A4...\""), false);
+    EXPECT_STREQ(arg, "\xF0\x9F\x92\xA4...");
+    free(arg);
+
+    // Unsupported, escape-like sequences in a single-quoted string
+    arg = parse_command_arg(STRN("'\\t\\n'"), false);
+    EXPECT_STREQ(arg, "\\t\\n");
+    free(arg);
+
+    // Single-quoted, empty string
+    arg = parse_command_arg(STRN("''"), false);
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    // Double-quoted, empty string
+    arg = parse_command_arg(STRN("\"\""), false);
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    // NULL input with zero length
+    arg = parse_command_arg(NULL, 0, false);
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    // Empty input
+    arg = parse_command_arg("", 1, false);
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    arg = parse_command_arg(STRN("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\t."), false);
     EXPECT_STREQ(arg, "\xE1\x92\x8AxyzfooZ;");
     free(arg);
 }
