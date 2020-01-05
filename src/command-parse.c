@@ -49,11 +49,6 @@ static size_t unicode_escape(const char *str, size_t count, String *buf)
     return i;
 }
 
-static size_t min(size_t a, size_t b)
-{
-    return (a < b) ? a : b;
-}
-
 static size_t parse_dq(const char *cmd, size_t len, String *buf)
 {
     size_t pos = 0;
@@ -91,10 +86,10 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
                 }
                 continue;
             case 'u':
-                pos += unicode_escape(cmd + pos, min(4, len - pos), buf);
+                pos += unicode_escape(cmd + pos, MIN(4, len - pos), buf);
                 continue;
             case 'U':
-                pos += unicode_escape(cmd + pos, min(8, len - pos), buf);
+                pos += unicode_escape(cmd + pos, MIN(8, len - pos), buf);
                 continue;
             default:
                 string_append_byte(buf, '\\');
