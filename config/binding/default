@@ -67,7 +67,7 @@ bind ^R 'command replace\ '
 bind ^S 'save -p'
 bind ^T open
 bind ^V 'paste -c'
-bind ^W 'close -wq'
+bind ^W 'close -pwq'
 bind ^X cut
 bind ^Y redo
 bind ^Z undo
