@@ -382,6 +382,7 @@ int save_buffer (
 
 #ifdef HAVE_FSYNC
     if (editor.options.fsync) {
+        retry:
         if (fsync(fd) != 0) {
             switch (errno) {
             // EINVAL is ignored because it just means "operation not
@@ -391,6 +392,8 @@ int save_buffer (
             case ENOTSUP:
             case ENOSYS:
                 break;
+            case EINTR:
+                goto retry;
             default:
                 perror_msg("fsync");
                 close(fd);
