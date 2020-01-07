@@ -383,16 +383,22 @@ static bool detect_indent(Buffer *b)
 
 void buffer_setup(Buffer *b)
 {
-    b->setup = true;
-    if (b->abs_filename && !str_has_prefix(b->abs_filename, "/home/")) {
-        // Always enable fsync for system files, to ensure atomic saves
-        b->options.fsync = true;
+    const char *filename = b->abs_filename;
+    if (filename) {
+        if (
+            str_has_prefix(filename, "/etc/")
+            || str_has_prefix(filename, "/root/")
+        ) {
+            // Enable fsync by default for system and root configs
+            b->options.fsync = true;
+        }
     }
+    b->setup = true;
     buffer_detect_filetype(b);
     set_file_options(b);
     set_editorconfig_options(b);
     buffer_update_syntax(b);
-    if (b->options.detect_indent && b->abs_filename) {
+    if (b->options.detect_indent && filename) {
         detect_indent(b);
     }
 }
