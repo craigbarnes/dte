@@ -87,6 +87,8 @@ static void test_find_ft_filename(void)
         {"test.c.pacsave", "c"},
         {"test.c.dpkg-dist", "c"},
         {"test.c.dpkg-old", "c"},
+        {"test.c.dpkg-backup", "c"},
+        {"test.c.dpkg-remove", "c"},
         {"test.c.rpmnew", "c"},
         {"test.c.rpmsave", "c"},
         {".c", NULL},

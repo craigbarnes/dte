@@ -103,7 +103,7 @@ static StringView get_ext(const StringView filename)
         return ext;
     }
 
-    if (is_ignored_extension(ext.data, ext.length)) {
+    if (is_ignored_extension(ext)) {
         int idx = -2;
         while (ext.data + idx >= filename.data) {
             if (ext.data[idx] == '.') {

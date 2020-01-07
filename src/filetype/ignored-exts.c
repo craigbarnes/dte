@@ -1,33 +1,37 @@
-static bool is_ignored_extension(const char *s, size_t len)
+static const char ignored_extensions[][12] = {
+    "bak",
+    "dpkg-backup",
+    "dpkg-bak",
+    "dpkg-dist",
+    "dpkg-new",
+    "dpkg-old",
+    "dpkg-remove",
+    "dpkg-tmp",
+    "new",
+    "old",
+    "orig",
+    "pacnew",
+    "pacorig",
+    "pacsave",
+    "rpmnew",
+    "rpmorig",
+    "rpmsave",
+    "ucf-dist",
+    "ucf-new",
+    "ucf-old",
+};
+
+static bool is_ignored_extension(const StringView sv)
 {
-    switch (len) {
-    case 3:
-        switch (s[0]) {
-        case 'b': return mem_equal(s, "bak", len);
-        case 'n': return mem_equal(s, "new", len);
-        case 'o': return mem_equal(s, "old", len);
-        }
-        break;
-    case 4: return mem_equal(s, "orig", len);
-    case 6:
-        switch (s[0]) {
-        case 'p': return mem_equal(s, "pacnew", len);
-        case 'r': return mem_equal(s, "rpmnew", len);
-        }
-        break;
-    case 7:
-        switch (s[0]) {
-        case 'r': return mem_equal(s, "rpmsave", len);
-        case 'p':
-            switch (s[3]) {
-            case 'o': return mem_equal(s, "pacorig", len);
-            case 's': return mem_equal(s, "pacsave", len);
-            }
-            break;
-        }
-        break;
-    case 8: return mem_equal(s, "dpkg-old", len);
-    case 9: return mem_equal(s, "dpkg-dist", len);
+    if (sv.length < 3 || sv.length >= sizeof(ignored_extensions[0])) {
+        return false;
     }
-    return false;
+    const char *e = bsearch (
+        &sv,
+        ignored_extensions,
+        ARRAY_COUNT(ignored_extensions),
+        sizeof(ignored_extensions[0]),
+        ft_compare
+    );
+    return e != NULL;
 }
