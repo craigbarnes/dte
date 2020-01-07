@@ -436,6 +436,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("file-history", C(file_history), NULL),
     UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
+    BOOL_OPT("fsync", G(fsync), NULL),
     UINT_OPT("indent-width", C(indent_width), 1, 8, NULL),
     STR_OPT("indent-regex", L(indent_regex), validate_regex, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),

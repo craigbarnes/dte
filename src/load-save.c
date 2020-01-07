@@ -1,3 +1,4 @@
+#include "../build/feature.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -378,6 +379,27 @@ int save_buffer (
         close(fd);
         goto error;
     }
+
+#ifdef HAVE_FSYNC
+    if (editor.options.fsync) {
+        if (fsync(fd) != 0) {
+            switch (errno) {
+            // EINVAL is ignored because it just means "operation not
+            // possible on this descriptor" rather than indicating an
+            // actual error
+            case EINVAL:
+            case ENOTSUP:
+            case ENOSYS:
+                break;
+            default:
+                perror_msg("fsync");
+                close(fd);
+                goto error;
+            }
+        }
+    }
+#endif
+
     if (close(fd)) {
         perror_msg("close");
         goto error;

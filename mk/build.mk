@@ -67,7 +67,7 @@ test_objects := $(call prefix-obj, build/test/, \
     syntax terminal test util )
 
 feature_tests := $(addprefix mk/feature-test/, $(addsuffix .c, \
-    dup3 pipe2 ioctl-winsize ))
+    dup3 pipe2 fsync ioctl-winsize ))
 
 all_objects := $(editor_objects) $(test_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects))))
@@ -172,6 +172,7 @@ build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
+build/load-save.o: build/feature.h
 build/util/exec.o: build/feature.h
 build/terminal/winsize.o: build/feature.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags

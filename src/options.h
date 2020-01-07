@@ -76,6 +76,7 @@ typedef struct {
     unsigned int display_special;
     unsigned int esc_timeout;
     unsigned int filesize_limit;
+    unsigned int fsync;
     unsigned int lock_files;
     unsigned int scroll_margin;
     unsigned int set_window_title;
