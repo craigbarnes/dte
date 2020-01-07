@@ -381,7 +381,7 @@ int save_buffer (
     }
 
 #ifdef HAVE_FSYNC
-    if (editor.options.fsync) {
+    if (b->options.fsync) {
         retry:
         if (fsync(fd) != 0) {
             switch (errno) {
