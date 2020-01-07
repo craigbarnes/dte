@@ -101,6 +101,13 @@ void run_command(const CommandSet *cmds, char **av)
 
 void run_commands(const CommandSet *cmds, const PointerArray *array)
 {
+    static unsigned int recursion_count;
+    if (unlikely(recursion_count++ > 16)) {
+        error_msg("alias recursion overflow");
+        recursion_count--;
+        return;
+    }
+
     size_t s = 0;
     while (s < array->count) {
         size_t e = s;
@@ -113,6 +120,10 @@ void run_commands(const CommandSet *cmds, const PointerArray *array)
         }
 
         s = e + 1;
+    }
+
+    if (recursion_count) {
+        recursion_count--;
     }
 }
 
