@@ -190,22 +190,18 @@ static void print_horizontal_tabbar(Window *win)
     }
 }
 
-static void print_vertical_tab_title(const View *v, int idx, int width)
+static void print_vertical_tab_title(const View *v, size_t idx, int width)
 {
     const char *orig_filename = buffer_filename(v->buffer);
     const char *filename = orig_filename;
-    unsigned int max = editor.options.tab_bar_max_components;
-    char buf[16];
+    const unsigned int max = editor.options.tab_bar_max_components;
 
-    xsnprintf (
-        buf,
-        sizeof(buf),
-        "%2d%s",
-        idx + 1,
-        buffer_modified(v->buffer) ? "+" : " "
-    );
+    char prefix[32];
+    char ch = buffer_modified(v->buffer) ? '+' : ' ';
+    size_t prefix_len = xsnprintf(prefix, sizeof prefix, "%2zu%c", idx + 1, ch);
+
     if (max) {
-        int count = 1;
+        unsigned int count = 1;
         for (size_t i = 0; filename[i]; i++) {
             if (filename[i] == '/') {
                 count++;
@@ -215,37 +211,33 @@ static void print_vertical_tab_title(const View *v, int idx, int width)
         if (filename[0] == '/') {
             count--;
         }
-
         if (count > max) {
             // Skip possible first slash
-            size_t i;
-            for (i = 1; ; i++) {
+            size_t i = 1;
+            while (1) {
                 if (filename[i] == '/' && --count == max) {
                     i++;
                     break;
                 }
+                i++;
             }
             filename += i;
         }
     } else {
-        int skip = strlen(buf) + u_str_width(filename) - width + 1;
+        int skip = prefix_len + u_str_width(filename) - width + 1;
         if (skip > 0) {
             filename += u_skip_chars(filename, &skip);
         }
     }
+
     if (filename != orig_filename) {
-        // filename was shortened. Add "<<" symbol.
-        size_t i = strlen(buf);
-        u_set_char(buf, &i, 0xab);
-        buf[i] = '\0';
+        // Filename was shortened; add "<<" symbol
+        u_set_char(prefix, &prefix_len, 0x00AB);
+        prefix[prefix_len] = '\0';
     }
 
-    if (v == v->window->view) {
-        set_builtin_color(BC_ACTIVETAB);
-    } else {
-        set_builtin_color(BC_INACTIVETAB);
-    }
-    term_add_str(buf);
+    set_builtin_color((v == v->window->view) ? BC_ACTIVETAB : BC_INACTIVETAB);
+    term_add_str(prefix);
     term_add_str(filename);
     term_clear_eol();
 }
