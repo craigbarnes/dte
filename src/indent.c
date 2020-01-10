@@ -29,43 +29,46 @@ char *make_indent(size_t width)
     return str;
 }
 
-static bool indent_inc(const char *line, size_t len)
+static bool indent_inc(const StringView *line)
 {
     const char *re1 = "\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
     const char *re2 = "\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
 
     if (buffer->options.brace_indent) {
-        if (regexp_match_nosub(re1, line, len)) {
+        if (regexp_match_nosub(re1, line)) {
             return true;
         }
-        if (regexp_match_nosub(re2, line, len)) {
+        if (regexp_match_nosub(re2, line)) {
             return false;
         }
     }
 
     re1 = buffer->options.indent_regex;
-    return re1 && *re1 && regexp_match_nosub(re1, line, len);
+    return re1 && *re1 && regexp_match_nosub(re1, line);
 }
 
-char *get_indent_for_next_line(const char *line, size_t len)
+char *get_indent_for_next_line(const StringView *line)
 {
     IndentInfo info;
-    get_indent_info(line, len, &info);
-    if (indent_inc(line, len)) {
+    get_indent_info(line, &info);
+    if (indent_inc(line)) {
         size_t w = buffer->options.indent_width;
         info.width = (info.width + w) / w * w;
     }
     return make_indent(info.width);
 }
 
-void get_indent_info(const char *buf, size_t len, IndentInfo *info)
+void get_indent_info(const StringView *line, IndentInfo *info)
 {
+    const char *buf = line->data;
+    const size_t len = line->length;
     size_t spaces = 0;
     size_t tabs = 0;
     size_t pos = 0;
 
     MEMZERO(info);
     info->sane = true;
+
     while (pos < len) {
         if (buf[pos] == ' ') {
             info->width++;
@@ -79,11 +82,11 @@ void get_indent_info(const char *buf, size_t len, IndentInfo *info)
         }
         info->bytes++;
         pos++;
-
         if (info->width % buffer->options.indent_width == 0 && info->sane) {
             info->sane = use_spaces_for_indent() ? !tabs : !spaces;
         }
     }
+
     info->level = info->width / buffer->options.indent_width;
     info->wsonly = pos == len;
 }

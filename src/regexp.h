@@ -4,8 +4,9 @@
 #include <regex.h>
 #include <stdbool.h>
 #include "util/ptr-array.h"
+#include "util/string-view.h"
 
-bool regexp_match_nosub(const char *pattern, const char *buf, size_t size);
+bool regexp_match_nosub(const char *pattern, const StringView *buf);
 bool regexp_match(const char *pattern, const char *buf, size_t size, PointerArray *m);
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags);

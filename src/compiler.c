@@ -10,11 +10,9 @@ static PointerArray compilers = PTR_ARRAY_INIT;
 static Compiler *add_compiler(const char *name)
 {
     Compiler *c = find_compiler(name);
-
     if (c) {
         return c;
     }
-
     c = xnew0(Compiler, 1);
     c->name = xstrdup(name);
     ptr_array_append(&compilers, c);

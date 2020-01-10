@@ -4,13 +4,13 @@
 #include "error.h"
 #include "util/xmalloc.h"
 
-bool regexp_match_nosub(const char *pattern, const char *buf, size_t size)
+bool regexp_match_nosub(const char *pattern, const StringView *buf)
 {
     regex_t re;
     bool compiled = regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB);
     BUG_ON(!compiled);
     regmatch_t m;
-    bool ret = regexp_exec(&re, buf, size, 1, &m, 0);
+    bool ret = regexp_exec(&re, buf->data, buf->length, 1, &m, 0);
     regfree(&re);
     return ret;
 }

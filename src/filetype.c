@@ -161,7 +161,7 @@ static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
 static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
 {
     const char *str = ft_get_str(ft);
-    return sv.length > 0 && regexp_match_nosub(str, sv.data, sv.length);
+    return sv.length > 0 && regexp_match_nosub(str, &sv);
 }
 
 HOT const char *find_ft(const char *filename, StringView line)

@@ -7,6 +7,7 @@
 #include "regexp.h"
 #include "selection.h"
 #include "util/string.h"
+#include "util/string-view.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "view.h"
@@ -45,22 +46,22 @@ void select_block(void)
     // cursor is likely at end of the block you want to select.
     fetch_this_line(&bi, &line);
     if (
-        !regexp_match_nosub(spattern, line.data, line.length)
-        && regexp_match_nosub(epattern, line.data, line.length)
+        !regexp_match_nosub(spattern, &line)
+        && regexp_match_nosub(epattern, &line)
     ) {
         block_iter_prev_line(&bi);
     }
 
     while (1) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(spattern, line.data, line.length)) {
+        if (regexp_match_nosub(spattern, &line)) {
             if (level++ == 0) {
                 sbi = bi;
                 block_iter_next_line(&bi);
                 break;
             }
         }
-        if (regexp_match_nosub(epattern, line.data, line.length)) {
+        if (regexp_match_nosub(epattern, &line)) {
             level--;
         }
 
@@ -71,13 +72,13 @@ void select_block(void)
 
     while (1) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(epattern, line.data, line.length)) {
+        if (regexp_match_nosub(epattern, &line)) {
             if (--level == 0) {
                 ebi = bi;
                 break;
             }
         }
-        if (regexp_match_nosub(spattern, line.data, line.length)) {
+        if (regexp_match_nosub(spattern, &line)) {
             level++;
         }
 
@@ -102,14 +103,14 @@ static int get_indent_of_matching_brace(void)
 
     while (block_iter_prev_line(&bi)) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(spattern, line.data, line.length)) {
+        if (regexp_match_nosub(spattern, &line)) {
             if (level++ == 0) {
                 IndentInfo info;
-                get_indent_info(line.data, line.length, &info);
+                get_indent_info(&line, &info);
                 return info.width;
             }
         }
-        if (regexp_match_nosub(epattern, line.data, line.length)) {
+        if (regexp_match_nosub(epattern, &line)) {
             level--;
         }
     }
@@ -154,7 +155,6 @@ void copy(size_t len, bool is_lines)
 void insert_text(const char *text, size_t size)
 {
     size_t del_count = 0;
-
     if (view->selection) {
         del_count = prepare_selection(view);
         unselect();
@@ -310,10 +310,10 @@ static void insert_nl(void)
             // Find previous non whitespace only line.
             if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
                 fill_line_ref(&bi, &line);
-                ins = get_indent_for_next_line(line.data, line.length);
+                ins = get_indent_for_next_line(&line);
             }
         } else {
-            ins = get_indent_for_next_line(line.data, line.length);
+            ins = get_indent_for_next_line(&line);
         }
     }
 
@@ -502,7 +502,7 @@ static void shift_right(size_t nr_lines, size_t count)
         IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(line.data, line.length, &info);
+        get_indent_info(&line, &info);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -533,7 +533,7 @@ static void shift_left(size_t nr_lines, size_t count)
         IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(line.data, line.length, &info);
+        get_indent_info(&line, &info);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -623,7 +623,7 @@ void clear_lines(void)
         if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
             StringView line;
             fill_line_ref(&bi, &line);
-            indent = get_indent_for_next_line(line.data, line.length);
+            indent = get_indent_for_next_line(&line);
         }
     }
 
@@ -665,7 +665,7 @@ void new_line(void)
         if (find_non_empty_line_bwd(&bi)) {
             StringView line;
             fill_line_ref(&bi, &line);
-            ins = get_indent_for_next_line(line.data, line.length);
+            ins = get_indent_for_next_line(&line);
         }
     }
 
@@ -710,24 +710,24 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
     pf->cur_width += word_width;
 }
 
-static bool is_paragraph_separator(const char *line, size_t size)
+static bool is_paragraph_separator(const StringView *line)
 {
-    return regexp_match_nosub("^[ \t]*(/\\*|\\*/)?[ \t]*$", line, size);
+    return regexp_match_nosub("^[ \t]*(/\\*|\\*/)?[ \t]*$", line);
 }
 
-static size_t get_indent_width(const char *line, size_t size)
+static size_t get_indent_width(const StringView *line)
 {
     IndentInfo info;
-    get_indent_info(line, size, &info);
+    get_indent_info(line, &info);
     return info.width;
 }
 
-static bool in_paragraph(const char *line, size_t size, size_t indent_width)
+static bool in_paragraph(const StringView *line, size_t indent_width)
 {
-    if (get_indent_width(line, size) != indent_width) {
+    if (get_indent_width(line) != indent_width) {
         return false;
     }
-    return !is_paragraph_separator(line, size);
+    return !is_paragraph_separator(line);
 }
 
 static size_t paragraph_size(void)
@@ -736,16 +736,16 @@ static size_t paragraph_size(void)
     StringView line;
     block_iter_bol(&bi);
     fill_line_ref(&bi, &line);
-    if (is_paragraph_separator(line.data, line.length)) {
+    if (is_paragraph_separator(&line)) {
         // Not in paragraph
         return 0;
     }
-    size_t indent_width = get_indent_width(line.data, line.length);
+    size_t indent_width = get_indent_width(&line);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
         fill_line_ref(&bi, &line);
-        if (!in_paragraph(line.data, line.length, indent_width)) {
+        if (!in_paragraph(&line, indent_width)) {
             block_iter_eat_line(&bi);
             break;
         }
@@ -761,7 +761,7 @@ static size_t paragraph_size(void)
         }
         size += bytes;
         fill_line_ref(&bi, &line);
-    } while (in_paragraph(line.data, line.length, indent_width));
+    } while (in_paragraph(&line, indent_width));
     return size;
 }
 
@@ -779,7 +779,8 @@ void format_paragraph(size_t text_width)
     }
 
     char *sel = block_iter_get_bytes(&view->cursor, len);
-    size_t indent_width = get_indent_width(sel, len);
+    StringView sv = string_view(sel, len);
+    size_t indent_width = get_indent_width(&sv);
     char *indent = make_indent(indent_width);
 
     ParagraphFormatter pf = {

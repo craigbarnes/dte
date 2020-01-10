@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "file-option.h"
+#include "debug.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
@@ -85,15 +86,22 @@ void set_file_options(Buffer *b)
 {
     for (size_t i = 0; i < file_options.count; i++) {
         const FileOption *opt = file_options.ptrs[i];
-        if (opt->type == FILE_OPTIONS_FILETYPE) {
+        switch (opt->type) {
+        case FILE_OPTIONS_FILETYPE:
             if (streq(opt->type_or_pattern, b->options.filetype)) {
                 set_options(opt->strs);
             }
-            continue;
-        }
-        const char *f = b->abs_filename;
-        if (f && regexp_match_nosub(opt->type_or_pattern, f, strlen(f))) {
-            set_options(opt->strs);
+            break;
+        case FILE_OPTIONS_FILENAME:
+            if (b->abs_filename) {
+                const StringView f = string_view_from_cstring(b->abs_filename);
+                if (regexp_match_nosub(opt->type_or_pattern, &f)) {
+                    set_options(opt->strs);
+                }
+            }
+            break;
+        default:
+            BUG("unhandled file option type");
         }
     }
 }
