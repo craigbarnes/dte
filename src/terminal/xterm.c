@@ -102,8 +102,6 @@ const Terminal xterm = {
         .deinit = STRING_VIEW (
             "\033[?1036;1039r" // Restore
         ),
-        .reset_colors = STRING_VIEW("\033[39;49m"),
-        .reset_attrs = STRING_VIEW("\033[0m"),
         .keypad_off = STRING_VIEW("\033[?1l\033>"),
         .keypad_on = STRING_VIEW("\033[?1h\033="),
         .cup_mode_off = STRING_VIEW("\033[?1049l"),

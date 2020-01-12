@@ -11,8 +11,6 @@
 typedef struct {
     StringView init;
     StringView deinit;
-    StringView reset_colors;
-    StringView reset_attrs;
     StringView keypad_off;
     StringView keypad_on;
     StringView cup_mode_off;

@@ -10,6 +10,7 @@
 void ecma48_clear_screen(void)
 {
     term_add_literal (
+        "\033[0m" // Reset colors and attributes
         "\033[H"  // Move cursor to 1,1 (done only to mimic terminfo(5) "clear")
         "\033[2J" // Clear whole screen (regardless of cursor position)
     );
@@ -94,8 +95,6 @@ Terminal terminal = {
     .control_codes = {
         .init = STRING_VIEW_INIT,
         .deinit = STRING_VIEW_INIT,
-        .reset_colors = STRING_VIEW("\033[39;49m"),
-        .reset_attrs = STRING_VIEW("\033[0m"),
         .keypad_off = STRING_VIEW_INIT,
         .keypad_on = STRING_VIEW_INIT,
         .cup_mode_off = STRING_VIEW_INIT,

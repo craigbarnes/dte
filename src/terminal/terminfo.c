@@ -22,6 +22,7 @@ static struct TermInfo {
     const char *setab;
     const char *setaf;
     const char *sgr;
+    const char *sgr0;
 } terminfo;
 
 static size_t keymap_length = 0;
@@ -173,6 +174,7 @@ static void put_control_code(StringView code)
 
 static void clear_screen(void)
 {
+    xtputs(terminfo.sgr0, 1);
     xtputs(terminfo.clear, terminal.height);
 }
 
@@ -267,6 +269,7 @@ bool term_init_terminfo(const char *term)
         .setab = get_terminfo_string("setab"),
         .setaf = get_terminfo_string("setaf"),
         .sgr = get_terminfo_string("sgr"),
+        .sgr0 = get_terminfo_string("sgr0"),
     };
 
     if (get_terminfo_flag("nxon")) {
@@ -299,8 +302,6 @@ bool term_init_terminfo(const char *term)
         .control_codes = {
             .init = STRING_VIEW_INIT,
             .deinit = STRING_VIEW_INIT,
-            .reset_colors = get_terminfo_string_view("op"),
-            .reset_attrs = get_terminfo_string_view("sgr0"),
             .keypad_off = get_terminfo_string_view("rmkx"),
             .keypad_on = get_terminfo_string_view("smkx"),
             .cup_mode_off = get_terminfo_string_view("rmcup"),
