@@ -8,6 +8,13 @@ LCOVFLAGS ?= --config-file mk/lcovrc
 LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '$(PAT)';)
 GENHTML ?= genhtml
 GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
+FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
+CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
+XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
+
+MARKDOWN_FILES = \
+    README.md CHANGELOG.md docs/dterc.md docs/dte-syntax.md \
+    docs/packaging.md docs/contributing.md
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(editor_sources) $(test_sources))
 
@@ -16,6 +23,9 @@ dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
+
+check-docs: $(MARKDOWN_FILES)
+	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'
@@ -98,5 +108,5 @@ CLEANFILES += dte-*.tar.gz
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-release-digests check-syntax-files git-hooks \
+    check-docs check-release-digests check-syntax-files git-hooks \
     show-sizes coverage-report clang-tidy $(clang_tidy_targets)

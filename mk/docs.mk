@@ -2,9 +2,6 @@ PANDOC = pandoc
 PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
 PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html -Voutput_basename=$(@F)
-FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
-CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
 
 html-man = public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)
@@ -60,9 +57,7 @@ public/:
 build/docs/: build/
 	$(Q) mkdir -p $@
 
-check-docs: README.md CHANGELOG.md docs/packaging.md docs/contributing.md docs/dterc.md docs/dte-syntax.md
-	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 
 CLEANDIRS += public/
-.PHONY: docs man html pdf gz check-docs
+.PHONY: docs man html pdf gz
