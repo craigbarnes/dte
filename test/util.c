@@ -578,7 +578,7 @@ static void test_u_is_unprintable(void)
     EXPECT_TRUE(u_is_unprintable(0xF0000));
     EXPECT_TRUE(u_is_unprintable(0xFFFFD));
     EXPECT_TRUE(u_is_unprintable(0x100000));
-    EXPECT_TRUE(u_is_unprintable(0x10FFFd));
+    EXPECT_TRUE(u_is_unprintable(0x10FFFD));
 
     // Non-characters --------------------------------------------------
     // (https://www.unicode.org/faq/private_use.html#noncharacters)
