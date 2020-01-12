@@ -189,64 +189,61 @@ CommandLineResult cmdline_handle_key (
         c->pos += string_insert_ch(&c->buf, c->pos, key);
         return CMDLINE_KEY_HANDLED;
     }
+
     switch (key) {
     case CTRL('['): // ESC
     case CTRL('C'):
     case CTRL('G'):
         cmdline_clear(c);
         return CMDLINE_CANCEL;
+
+    case KEY_DELETE:
     case CTRL('D'):
         cmdline_delete(c);
         goto reset_search_pos;
+
     case CTRL('K'):
         cmdline_delete_eol(c);
         goto reset_search_pos;
+
     case CTRL('H'):
     case CTRL('?'):
         if (c->buf.len > 0) {
             cmdline_backspace(c);
         }
         goto reset_search_pos;
+
     case CTRL('U'):
         cmdline_delete_bol(c);
         goto reset_search_pos;
+
     case CTRL('W'):
     case MOD_META | MOD_CTRL | 'H':
     case MOD_META | MOD_CTRL | '?':
         cmdline_erase_word(c);
         goto reset_search_pos;
+
     case MOD_CTRL | KEY_DELETE:
     case MOD_META | KEY_DELETE:
     case MOD_META | 'd':
         cmdline_delete_word(c);
         goto reset_search_pos;
 
-    case CTRL('A'):
-        c->pos = 0;
-        goto handled;
+    case KEY_LEFT:
     case CTRL('B'):
         cmdline_prev_char(c);
         goto handled;
-    case CTRL('E'):
-        c->pos = c->buf.len;
-        goto handled;
+
+    case KEY_RIGHT:
     case CTRL('F'):
         cmdline_next_char(c);
         goto handled;
-    case KEY_DELETE:
-        cmdline_delete(c);
-        goto reset_search_pos;
 
-    case KEY_LEFT:
-        cmdline_prev_char(c);
-        goto handled;
-    case KEY_RIGHT:
-        cmdline_next_char(c);
-        goto handled;
     case CTRL(KEY_LEFT):
     case MOD_META | 'b':
         cmdline_prev_word(c);
         goto handled;
+
     case CTRL(KEY_RIGHT):
     case MOD_META | 'f':
         cmdline_next_word(c);
@@ -254,12 +251,16 @@ CommandLineResult cmdline_handle_key (
 
     case KEY_HOME:
     case MOD_META | KEY_LEFT:
+    case CTRL('A'):
         c->pos = 0;
         goto handled;
+
     case KEY_END:
     case MOD_META | KEY_RIGHT:
+    case CTRL('E'):
         c->pos = c->buf.len;
         goto handled;
+
     case KEY_UP:
         if (history == NULL) {
             return CMDLINE_UNKNOWN_KEY;
@@ -273,6 +274,7 @@ CommandLineResult cmdline_handle_key (
             set_text(c, history->ptrs[c->search_pos]);
         }
         goto handled;
+
     case KEY_DOWN:
         if (history == NULL) {
             return CMDLINE_UNKNOWN_KEY;
@@ -287,9 +289,11 @@ CommandLineResult cmdline_handle_key (
             c->search_pos = -1;
         }
         goto handled;
+
     case KEY_PASTE:
         cmdline_insert_paste(c);
         goto reset_search_pos;
+
     default:
         return CMDLINE_UNKNOWN_KEY;
     }
