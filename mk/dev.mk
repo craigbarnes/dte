@@ -12,10 +12,6 @@ FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
 
-MARKDOWN_FILES = \
-    README.md CHANGELOG.md docs/dterc.md docs/dte-syntax.md \
-    docs/packaging.md docs/contributing.md
-
 clang_tidy_targets = $(addprefix clang-tidy-, $(editor_sources) $(test_sources))
 
 dist: dte-$(DISTVER).tar.gz
@@ -24,8 +20,9 @@ dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
 
-check-docs: $(MARKDOWN_FILES)
-	@$(FINDLINKS) $^ | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
+check-docs:
+	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
+	@$(FINDLINKS) `git ls-files '*.md'` | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 check-syntax-files:
 	$(E) LINT 'config/syntax/*'
