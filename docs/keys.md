@@ -129,5 +129,52 @@ Default Key Bindings
 `Alt`+`=`
 :   Increase indent level of selection (or line)
 
+### Command Mode
+
+`Esc`, `Ctrl`+`c`, `Ctrl`+`g`
+:   Exit command mode
+
+`left`, `Ctrl`+`b`
+:   Move one character left
+
+`Ctrl`+`left`, `Alt`+`b`
+:   Move one word left
+
+`Home`, `Alt`+`left`, `Ctrl`+`a`
+:   Move to beginning of line
+
+`right`, `Ctrl`+`f`
+:   Move one character right
+
+`Ctrl`+`right`, `Alt`+`f`
+:   Move one word right
+
+`End`, `Alt`+`right`, `Ctrl`+`e`
+:   Move to end of line
+
+`Delete`, `Ctrl`+`d`
+:   Delete character
+
+`Alt`+`d`, `Alt`+`Delete`
+:   Delete whole word
+
+`Ctrl`+`k`
+:   Delete to end of line
+
+`Backspace`
+:   Erase character
+
+`Ctrl`+`w`, `Alt`+`Backspace`
+:   Erase whole word
+
+`Ctrl`+`u`
+:   Erase to beginning of line
+
+`Tab`
+:   Auto-complete current command or argument
+
+`up`, `down`
+:   Go to next/previous history entry (matching current prefix)
+
 
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
