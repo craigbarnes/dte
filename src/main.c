@@ -21,6 +21,7 @@
 #include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
+#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -51,7 +52,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
     }
 }
 
-static void handle_fatal_signal(int signum)
+static NORETURN COLD void handle_fatal_signal(int signum)
 {
     term_cleanup();
 
@@ -67,6 +68,11 @@ static void handle_fatal_signal(int signum)
     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
     raise(signum);
+
+    // This is here just to make extra certain the handler never returns.
+    // If everything is working correctly, this code should be unreachable.
+    raise(SIGKILL);
+    _exit(EX_OSERR);
 }
 
 static void do_sigaction(int sig, const struct sigaction *action)
@@ -76,14 +82,17 @@ static void do_sigaction(int sig, const struct sigaction *action)
     }
 }
 
+// Signals not handled by this function:
+// * SIGURG, SIGCHLD (already ignored by default)
+// * SIGKILL, SIGSTOP (can't be caught or ignored)
+// * SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
+// * SIGABRT (cleanup is done before calling abort())
 static void set_signal_handlers(void)
 {
-    // SIGABRT is not included here, since we can always call
-    // term_cleanup() explicitly, before calling abort().
     static const int fatal_signals[] = {
         SIGBUS, SIGFPE, SIGILL, SIGSEGV,
         SIGSYS, SIGTRAP, SIGXCPU, SIGXFSZ,
-        SIGALRM, SIGPROF, SIGVTALRM,
+        SIGALRM, SIGVTALRM,
         SIGHUP, SIGTERM,
     };
 
