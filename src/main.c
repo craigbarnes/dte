@@ -28,6 +28,13 @@
 #include "view.h"
 #include "window.h"
 
+// Semantic exit codes, as defined by BSD sysexits(3)
+enum {
+    EX_USAGE = 64, // Command line usage error
+    EX_OSERR = 71, // Operating system error
+    EX_IOERR = 74, // Input/output error
+};
+
 static void handle_sigtstp(int UNUSED_ARG(signum))
 {
     suspend();
@@ -120,15 +127,15 @@ static void set_signal_handlers(void)
 static int dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
-    if (cfg) {
-        if (xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length) >= 0) {
-            return 0;
-        }
-        perror("write");
-    } else {
+    if (!cfg) {
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
+        return EX_USAGE;
     }
-    return 1;
+    if (xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length) < 0) {
+        perror("write");
+        return EX_IOERR;
+    }
+    return 0;
 }
 
 static void showkey_loop(void)
@@ -236,7 +243,7 @@ int main(int argc, char *argv[])
             return 0;
         case '?':
         default:
-            return 1;
+            return EX_USAGE;
         }
     }
 
@@ -257,7 +264,7 @@ loop_break:
 
     if (unlikely(!isatty(STDOUT_FILENO))) {
         fputs("stdout doesn't refer to a terminal\n", stderr);
-        return 1;
+        return EX_IOERR;
     }
 
     Buffer *stdin_buffer = NULL;
@@ -272,7 +279,7 @@ loop_break:
         }
         if (!freopen("/dev/tty", "r", stdin)) {
             perror("Unable to reopen input tty");
-            return 1;
+            return EX_IOERR;
         }
         int fd = fileno(stdin);
         if (fd != STDIN_FILENO) {
@@ -281,7 +288,7 @@ loop_break:
             // POSIX requires a successful call to open() to return the
             // lowest available file descriptor.
             fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
-            return 1;
+            return EX_OSERR;
         }
     }
 
