@@ -34,6 +34,10 @@ static void test_macros(void)
     EXPECT_EQ(MIN(99, 100), 99);
     EXPECT_EQ(MIN(-10, 10), -10);
 
+    EXPECT_EQ(MAX(0, 1), 1);
+    EXPECT_EQ(MAX(99, 100), 100);
+    EXPECT_EQ(MAX(-10, 10), 10);
+
     EXPECT_TRUE(IS_POWER_OF_2(1));
     EXPECT_TRUE(IS_POWER_OF_2(2));
     EXPECT_TRUE(IS_POWER_OF_2(4));
