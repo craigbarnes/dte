@@ -198,22 +198,6 @@ static void collect_env(const char *prefix)
     collect_builtin_env(prefix);
 }
 
-static void collect_colors_and_attributes(const char *prefix)
-{
-    static const char names[][16] = {
-        "keep", "default", "black", "red", "green", "yellow",
-        "blue", "magenta", "cyan", "gray", "darkgray", "lightred",
-        "lightgreen", "lightyellow", "lightblue", "lightmagenta",
-        "lightcyan", "white", "underline", "reverse", "blink",
-        "dim", "bold", "invisible", "italic", "strikethrough"
-    };
-    for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
-        if (str_has_prefix(names[i], prefix)) {
-            add_completion(xstrdup(names[i]));
-        }
-    }
-}
-
 static size_t get_nonflag_argc(char **args, size_t argc)
 {
     size_t nonflag_argc = 0;

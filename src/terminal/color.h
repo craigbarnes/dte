@@ -75,4 +75,6 @@ static inline bool same_color(const TermColor *c1, const TermColor *c2)
 bool parse_term_color(TermColor *color, char **strs);
 int32_t color_to_nearest(int32_t color, TermColorCapabilityType type);
 
+void collect_colors_and_attributes(const char *prefix);
+
 #endif

@@ -1,76 +1,67 @@
 #include <inttypes.h>
 #include <string.h>
 #include "color.h"
+#include "../completion.h"
 #include "../debug.h"
 #include "../error.h"
 #include "../util/ascii.h"
 #include "../util/str-util.h"
 #include "../util/strtonum.h"
 
-#define CMP(str, val) cmp_str = str; cmp_val = val; goto compare
+static const char attr_names[][16] = {
+    "keep",
+    "underline",
+    "reverse",
+    "blink",
+    "dim",
+    "bold",
+    "invisible",
+    "italic",
+    "strikethrough"
+};
 
-static unsigned int lookup_attr(const char *s, size_t len)
+static const char color_names[][16] = {
+    "keep",
+    "default",
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "magenta",
+    "cyan",
+    "gray",
+    "darkgray",
+    "lightred",
+    "lightgreen",
+    "lightyellow",
+    "lightblue",
+    "lightmagenta",
+    "lightcyan",
+    "white"
+};
+
+static unsigned int lookup_attr(const char *s)
 {
-    const char *cmp_str;
-    unsigned int cmp_val;
-    switch (len) {
-    case 3: CMP("dim", ATTR_DIM);
-    case 5: CMP("blink", ATTR_BLINK);
-    case 6: CMP("italic", ATTR_ITALIC);
-    case 7: CMP("reverse", ATTR_REVERSE);
-    case 12: CMP("lowintensity", ATTR_DIM);
-    case 13: CMP("strikethrough", ATTR_STRIKETHROUGH);
-    case 4:
-        switch (s[0]) {
-        case 'b': CMP("bold", ATTR_BOLD);
-        case 'k': CMP("keep", ATTR_KEEP);
+    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+        if (streq(s, attr_names[i])) {
+            return 1U << i;
         }
-        break;
-    case 9:
-        switch (s[0]) {
-        case 'i': CMP("invisible", ATTR_INVIS);
-        case 'u': CMP("underline", ATTR_UNDERLINE);
-        }
-        break;
+    }
+    if (streq(s, "lowintensity")) {
+        return ATTR_DIM;
     }
     return 0;
-compare:
-    return mem_equal(s, cmp_str, len) ? cmp_val : 0;
 }
 
-static int32_t lookup_color(const char *s, size_t len)
+static int32_t lookup_color(const char *s)
 {
-    const char *cmp_str;
-    int32_t cmp_val;
-    switch (len) {
-    case 3: CMP("red", COLOR_RED);
-    case 6: CMP("yellow", COLOR_YELLOW);
-    case 8: CMP("darkgray", 8);
-    case 4:
-        switch (s[0]) {
-        case 'b': CMP("blue", COLOR_BLUE);
-        case 'c': CMP("cyan", COLOR_CYAN);
-        case 'g': CMP("gray", COLOR_GRAY);
-        case 'k': CMP("keep", COLOR_KEEP);
+    for (size_t i = 0; i < ARRAY_COUNT(color_names); i++) {
+        if (streq(s, color_names[i])) {
+            return i - 2;
         }
-        break;
-    case 5:
-        switch (s[0]) {
-        case 'b': CMP("black", COLOR_BLACK);
-        case 'g': CMP("green", COLOR_GREEN);
-        case 'w': CMP("white", 15);
-        }
-        break;
-    case 7:
-        switch (s[0]) {
-        case 'd': CMP("default", COLOR_DEFAULT);
-        case 'm': CMP("magenta", COLOR_MAGENTA);
-        }
-        break;
     }
     return COLOR_INVALID;
-compare:
-    return mem_equal(s, cmp_str, len) ? cmp_val : COLOR_INVALID;
 }
 
 static int32_t parse_rrggbb(const char *str)
@@ -130,24 +121,7 @@ static int32_t parse_color(const char *str, size_t len)
         return x;
     }
 
-    bool light = false;
-    if (len >= 8 && mem_equal(str, "light", 5)) {
-        light = true;
-        str += 5;
-        len -= 5;
-    }
-
-    const int32_t c = lookup_color(str, len);
-    switch (c) {
-    case COLOR_RED:
-    case COLOR_GREEN:
-    case COLOR_YELLOW:
-    case COLOR_BLUE:
-    case COLOR_MAGENTA:
-    case COLOR_CYAN:
-        return light ? c + 8 : c;
-    }
-    return light ? COLOR_INVALID : c;
+    return lookup_color(str);
 }
 
 UNITTEST {
@@ -206,7 +180,7 @@ bool parse_term_color(TermColor *color, char **strs)
             }
             continue;
         }
-        const unsigned int attr = lookup_attr(str, len);
+        const unsigned int attr = lookup_attr(str);
         if (attr) {
             color->attr |= attr;
             continue;
@@ -373,4 +347,18 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type)
     // when DEBUG == 0 and __builtin_unreachable() isn't supported
     // (i.e. BUG() expands to nothing).
     return COLOR_DEFAULT;
+}
+
+void collect_colors_and_attributes(const char *prefix)
+{
+    for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {
+        if (str_has_prefix(color_names[i], prefix)) {
+            add_completion(xstrdup(color_names[i]));
+        }
+    }
+    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+        if (str_has_prefix(attr_names[i], prefix)) {
+            add_completion(xstrdup(attr_names[i]));
+        }
+    }
 }
