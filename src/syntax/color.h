@@ -2,6 +2,7 @@
 #define SYNTAX_COLOR_H
 
 #include "../terminal/color.h"
+#include "../util/string.h"
 
 enum builtin_color {
     BC_DEFAULT,
@@ -34,5 +35,6 @@ HlColor *set_highlight_color(const char *name, const TermColor *color);
 HlColor *find_color(const char *name);
 void remove_extra_colors(void);
 void collect_hl_colors(const char *prefix);
+String dump_hl_colors(void);
 
 #endif

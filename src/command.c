@@ -1607,6 +1607,23 @@ static void show_binding(const char *keystr, bool write_to_cmdline)
     }
 }
 
+static void show_color(const char *color_name, bool write_to_cmdline)
+{
+    const HlColor *hl = find_color(color_name);
+    if (!hl) {
+        error_msg("no color entry with name '%s'", color_name);
+        return;
+    }
+
+    const char *color_str = term_color_to_string(&hl->color);
+    if (write_to_cmdline) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, color_str);
+    } else {
+        info_msg("color '%s' is set to: %s", color_name, color_str);
+    }
+}
+
 static void show_option(const char *name, bool write_to_cmdline)
 {
     const char *value = get_option_value_string(name);
@@ -1624,10 +1641,11 @@ static void show_option(const char *name, bool write_to_cmdline)
 
 static void cmd_show(const CommandArgs *a)
 {
-    enum {CMD_ALIAS, CMD_BIND, CMD_OPTION};
+    enum {CMD_ALIAS, CMD_BIND, CMD_COLOR, CMD_OPTION};
     static const char types[][8] = {
         [CMD_ALIAS] = "alias",
         [CMD_BIND] = "bind",
+        [CMD_COLOR] = "color",
         [CMD_OPTION] = "option",
     };
 
@@ -1652,6 +1670,9 @@ static void cmd_show(const CommandArgs *a)
             break;
         case CMD_BIND:
             show_binding(str, cflag);
+            break;
+        case CMD_COLOR:
+            show_color(str, cflag);
             break;
         case CMD_OPTION:
             show_option(str, cflag);
@@ -1679,6 +1700,9 @@ static void cmd_show(const CommandArgs *a)
         break;
     case CMD_BIND:
         s = dump_bindings();
+        break;
+    case CMD_COLOR:
+        s = dump_hl_colors();
         break;
     case CMD_OPTION:
         s = dump_options();

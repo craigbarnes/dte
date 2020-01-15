@@ -112,3 +112,16 @@ void collect_hl_colors(const char *prefix)
         }
     }
 }
+
+String dump_hl_colors(void)
+{
+    String buf = string_new(4096);
+    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
+        const HlColor *c = hl_colors.ptrs[i];
+        string_append_cstring(&buf, c->name);
+        string_append_byte(&buf, ' ');
+        string_append_cstring(&buf, term_color_to_string(&c->color));
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
+}

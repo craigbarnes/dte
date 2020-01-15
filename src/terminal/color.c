@@ -7,6 +7,7 @@
 #include "../util/ascii.h"
 #include "../util/str-util.h"
 #include "../util/strtonum.h"
+#include "../util/xsnprintf.h"
 
 static const char attr_names[][16] = {
     "keep",
@@ -361,4 +362,41 @@ void collect_colors_and_attributes(const char *prefix)
             add_completion(xstrdup(attr_names[i]));
         }
     }
+}
+
+static size_t append_color(char *buf, int32_t color)
+{
+    if (color < 16) {
+        BUG_ON(color <= COLOR_INVALID);
+        const char *name = color_names[color + 2];
+        size_t len = strlen(name);
+        memcpy(buf, name, len);
+        return len;
+    } else if (color < 256) {
+        return xsnprintf(buf, 4, "%u", (unsigned int)color);
+    }
+    BUG_ON((color & COLOR_FLAG_RGB) == 0);
+    uint8_t r, g, b;
+    color_split_rgb(color, &r, &g, &b);
+    return xsnprintf(buf, 8, "#%hhx%hhx%hhx", r, g, b);
+}
+
+const char *term_color_to_string(const TermColor *color)
+{
+    static char buf[128];
+    size_t pos = append_color(buf, color->fg);
+    if (color->bg != COLOR_DEFAULT || (color->attr & ATTR_KEEP) != 0) {
+        buf[pos++] = ' ';
+        pos += append_color(buf + pos, color->bg);
+    }
+    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+        if (color->attr & (1U << i)) {
+            buf[pos++] = ' ';
+            size_t len = strlen(attr_names[i]);
+            memcpy(buf + pos, attr_names[i], len);
+            pos += len;
+        }
+    }
+    buf[pos] = '\0';
+    return buf;
 }
