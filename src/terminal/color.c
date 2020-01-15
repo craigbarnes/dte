@@ -227,11 +227,8 @@ static int color_dist_sq (
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
 static uint8_t nearest_cube_index(uint8_t c)
 {
-    if (c < 48) {
-        return 0;
-    }
-    if (c < 114) {
-        return 1;
+    if (c < 75) {
+        c += 27;
     }
     return (c - 35) / 40;
 }
