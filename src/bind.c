@@ -55,8 +55,8 @@ UNITTEST {
     BUG_ON(get_lookup_table_index(MOD_MASK | max) != size - 1);
     BUG_ON(get_lookup_table_index(min) != 256);
     BUG_ON(get_lookup_table_index(max) != 256 + nsk - 1);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | min) != 256 + nsk);
-    BUG_ON(get_lookup_table_index(MOD_SHIFT | max) != 256 + (5 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_SHIFT | min) != 256 + nsk);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | max) != 256 + (5 * nsk) - 1);
 
     BUG_ON(get_lookup_table_index(MOD_CTRL | ' ') != 32);
     BUG_ON(get_lookup_table_index(MOD_META | ' ') != 32 + 128);
@@ -232,7 +232,7 @@ String dump_bindings(void)
         append_lookup_table_binding(&buf, MOD_META | k);
     }
 
-    static_assert(MOD_CTRL == (1 << 24));
+    static_assert(MOD_SHIFT == (1 << 24));
     for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << 24) {
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             append_lookup_table_binding(&buf, modifiers | k);

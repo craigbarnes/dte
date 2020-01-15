@@ -47,10 +47,10 @@ enum {
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
 
     // Modifier bit flags (as described above)
-    MOD_CTRL  = 0x1000000,
+    MOD_SHIFT = 0x1000000,
     MOD_META  = 0x2000000,
-    MOD_SHIFT = 0x4000000,
-    MOD_MASK  = MOD_CTRL | MOD_META | MOD_SHIFT,
+    MOD_CTRL  = 0x4000000,
+    MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL,
 
     KEY_PASTE = 0x8000000,
 };

@@ -9,16 +9,6 @@
 #include "../util/macros.h"
 #include "../util/unicode.h"
 
-static const KeyCode modifiers[] = {
-    [2] = MOD_SHIFT,
-    [3] = MOD_META,
-    [4] = MOD_SHIFT | MOD_META,
-    [5] = MOD_CTRL,
-    [6] = MOD_SHIFT | MOD_CTRL,
-    [7] = MOD_META | MOD_CTRL,
-    [8] = MOD_SHIFT | MOD_META | MOD_CTRL,
-};
-
 static const KeyCode special_keys[] = {
     [1] = KEY_HOME,
     [2] = KEY_INSERT,
@@ -44,7 +34,11 @@ static const KeyCode special_keys[] = {
 
 static KeyCode decode_modifiers(uint32_t n)
 {
-    return (n >= ARRAY_COUNT(modifiers)) ? 0 : modifiers[n];
+    static_assert(1 << 24 == MOD_SHIFT);
+    static_assert(2 << 24 == MOD_META);
+    static_assert(4 << 24 == MOD_CTRL);
+    n--;
+    return (n > 7) ? 0 : n << 24;
 }
 
 static KeyCode decode_special_key(uint32_t n)
