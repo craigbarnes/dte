@@ -260,9 +260,9 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 
-    if (r >= 8 && r <= 238 && r == g && r == b) {
+    if (r == g && r == b) {
         uint8_t v = r - 8;
-        if (v % 10 == 0) {
+        if (v <= 230 && v % 10 == 0) {
             *exact = true;
             return (v / 10) + 232;
         }
