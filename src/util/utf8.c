@@ -32,7 +32,7 @@ static int u_seq_len(unsigned char first_byte)
     return seq_len_table[first_byte];
 }
 
-static bool u_is_continuation(CodePoint u)
+static bool u_is_continuation_byte(unsigned char u)
 {
     return (u & 0xc0) == 0x80;
 }
@@ -69,21 +69,21 @@ size_t u_str_width(const unsigned char *str)
 CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 {
     size_t i = *idx;
-    CodePoint u = buf[--i];
-    if (u < 0x80) {
+    unsigned char ch = buf[--i];
+    if (ch < 0x80) {
         *idx = i;
-        return u;
+        return (CodePoint)ch;
     }
 
-    if (!u_is_continuation(u)) {
+    if (!u_is_continuation_byte(ch)) {
         goto invalid;
     }
 
-    u &= 0x3f;
+    CodePoint u = ch & 0x3f;
     unsigned int count = 1;
     unsigned int shift = 6;
     while (i) {
-        unsigned int ch = buf[--i];
+        ch = buf[--i];
         unsigned int len = u_seq_len(ch);
         count++;
         if (len == 0) {
@@ -142,11 +142,11 @@ CodePoint u_get_nonascii(const unsigned char *buf, size_t size, size_t *idx)
         goto invalid;
     }
 
-    unsigned int u = first & u_get_first_byte_mask(len);
+    CodePoint u = first & u_get_first_byte_mask(len);
     int c = len - 1;
     do {
-        CodePoint ch = buf[i++];
-        if (!u_is_continuation(ch)) {
+        unsigned char ch = buf[i++];
+        if (!u_is_continuation_byte(ch)) {
             goto invalid;
         }
         u = (u << 6) | (ch & 0x3f);
