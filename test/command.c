@@ -51,9 +51,19 @@ static void test_parse_command_arg(void)
     EXPECT_STREQ(arg, "\"");
     free(arg);
 
+    // Escape character escape sequence in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\e[0m\""), false);
+    EXPECT_STREQ(arg, "\033[0m");
+    free(arg);
+
     // Unrecognized escape sequence in a double-quoted string
     arg = parse_command_arg(STRN("\"\\z\""), false);
     EXPECT_STREQ(arg, "\\z");
+    free(arg);
+
+    // Hexadecimal escape sequences in a double-quoted string
+    arg = parse_command_arg(STRN("\"\\x1B[31m\\x7E\\x2f\\x1b[0m\""), false);
+    EXPECT_STREQ(arg, "\x1B[31m~/\x1B[0m");
     free(arg);
 
     // 4-digit Unicode escape sequence
