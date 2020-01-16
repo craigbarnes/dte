@@ -3,6 +3,7 @@
 #include "../src/debug.h"
 #include "../src/terminal/color.h"
 #include "../src/terminal/key.h"
+#include "../src/terminal/rxvt.h"
 #include "../src/terminal/xterm.h"
 #include "../src/util/unicode.h"
 
@@ -360,7 +361,7 @@ static void test_xterm_parse_key_combo(void)
     }
 }
 
-static void test_xterm_parse_key_combo_rxvt(void)
+static void test_rxvt_parse_key(void)
 {
     static const struct {
         char escape_sequence[8];
@@ -378,19 +379,9 @@ static void test_xterm_parse_key_combo_rxvt(void)
         KeyCode mask;
     } modifiers[] = {
         {'~', 0},
-        /*
-        Note: the tests for these non-standard rxvt modifiers have been
-        disabled, because using '$' as a final byte is a violation of the
-        ECMA-48 spec:
-
         {'^', MOD_CTRL},
         {'$', MOD_SHIFT},
         {'@', MOD_SHIFT | MOD_CTRL},
-
-        For the rxvt developers to invent a new key encoding scheme where
-        a perfectly good, de facto standard (xterm) already existed was
-        foolish. To then violate the spec in the process was pure stupidity.
-        */
     };
 
     FOR_EACH_I(i, templates) {
@@ -403,11 +394,17 @@ static void test_xterm_parse_key_combo_rxvt(void)
             *underscore = modifiers[j].ch;
             size_t seq_length = strlen(seq);
             KeyCode key;
-            ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+            ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
             EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
         }
     }
+
+    // Check that rxvt_parse_key() falls back to xterm_parse_key()
+    KeyCode key;
+    ssize_t n = rxvt_parse_key(STRN("\033[1;5A"), &key);
+    EXPECT_EQ(n, 6);
+    EXPECT_EQ(key, MOD_CTRL | KEY_UP);
 }
 
 static void test_keycode_to_string(void)
@@ -488,7 +485,7 @@ void test_terminal(void)
     test_color_to_nearest();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
-    test_xterm_parse_key_combo_rxvt();
+    test_rxvt_parse_key();
     test_keycode_to_string();
     test_parse_key_string();
 }

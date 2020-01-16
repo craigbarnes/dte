@@ -45,7 +45,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     bitset color highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color ecma48 input key mode no-op output terminal terminfo \
+    color ecma48 input key mode no-op output rxvt terminal terminfo \
     winsize xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \

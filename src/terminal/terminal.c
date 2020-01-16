@@ -6,6 +6,7 @@
 #include "terminal.h"
 #include "ecma48.h"
 #include "mode.h"
+#include "rxvt.h"
 #include "terminfo.h"
 #include "xterm.h"
 #include "../debug.h"
@@ -102,8 +103,11 @@ void term_init(void)
         // terminal.repeat_byte = &ecma48_repeat_byte;
         break;
     case TERM_ST:
+        terminal = xterm;
+        break;
     case TERM_URXVT:
         terminal = xterm;
+        terminal.parse_key_sequence = rxvt_parse_key;
         break;
     case TERM_TMUX:
     case TERM_SCREEN:
