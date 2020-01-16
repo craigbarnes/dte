@@ -236,19 +236,19 @@ HOT const char *find_ft(const char *filename, StringView line)
         }
     }
 
-    if (string_view_has_literal_prefix(&path, "/etc/default/")) {
+    if (string_view_has_prefix(&path, "/etc/default/")) {
         return builtin_filetype_names[SHELL];
-    } else if (string_view_has_literal_prefix(&path, "/etc/nginx/")) {
+    } else if (string_view_has_prefix(&path, "/etc/nginx/")) {
         return builtin_filetype_names[NGINX];
     }
 
     if (string_view_equal_cstring(&ext, "conf")) {
-        if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
+        if (string_view_has_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
         } else if (
-            string_view_has_literal_prefix(&path, "/etc/")
-            || string_view_has_literal_prefix(&path, "/usr/share/")
-            || string_view_has_literal_prefix(&path, "/usr/local/share/")
+            string_view_has_prefix(&path, "/etc/")
+            || string_view_has_prefix(&path, "/usr/share/")
+            || string_view_has_prefix(&path, "/usr/local/share/")
         ) {
             return builtin_filetype_names[CONFIG];
         }

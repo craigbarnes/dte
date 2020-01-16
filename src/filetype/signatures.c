@@ -36,13 +36,14 @@ static FileTypeEnum filetype_from_signature(const StringView sv)
         return NONE;
     }
 
-    if (string_view_has_literal_prefix_icase(&sv, "<!DOCTYPE HTML")) {
+    if (string_view_has_prefix_icase(&sv, "<!DOCTYPE HTML")) {
         return HTML;
     }
 
     for (size_t i = 0; i < ARRAY_COUNT(signatures); i++) {
         const FileSignatureMap *sig = &signatures[i];
-        if (string_view_has_prefix(&sv, sig->bytes, sig->length)) {
+        const size_t len = sig->length;
+        if (sv.length >= len && mem_equal(sv.data, sig->bytes, len)) {
             return sig->filetype;
         }
     }

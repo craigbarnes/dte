@@ -321,26 +321,23 @@ static void test_string_view(void)
     EXPECT_TRUE(string_view_equal_cstring(&sv1, "testing"));
     EXPECT_FALSE(string_view_equal_cstring(&sv1, "testin"));
     EXPECT_FALSE(string_view_equal_cstring(&sv1, "TESTING"));
-    EXPECT_TRUE(string_view_has_literal_prefix(&sv1, "test"));
-    EXPECT_TRUE(string_view_has_literal_prefix_icase(&sv1, "TEst"));
-    EXPECT_FALSE(string_view_has_literal_prefix(&sv1, "TEst"));
-    EXPECT_FALSE(string_view_has_literal_prefix_icase(&sv1, "TEst_"));
+    EXPECT_TRUE(string_view_has_prefix(&sv1, "test"));
+    EXPECT_TRUE(string_view_has_prefix_icase(&sv1, "TEst"));
+    EXPECT_FALSE(string_view_has_prefix(&sv1, "TEst"));
+    EXPECT_FALSE(string_view_has_prefix_icase(&sv1, "TEst_"));
 
     const StringView sv2 = string_view(sv1.data, sv1.length);
     EXPECT_TRUE(string_view_equal(&sv1, &sv2));
 
     const StringView sv3 = STRING_VIEW("\0test\0 ...");
     EXPECT_TRUE(string_view_equal_strn(&sv3, "\0test\0 ...", 10));
-    EXPECT_TRUE(string_view_has_prefix(&sv3, "\0test", 5));
-    EXPECT_TRUE(string_view_has_literal_prefix(&sv3, "\0test\0"));
-    EXPECT_FALSE(string_view_equal_cstring(&sv3, "\0test\0 ..."));
 
     const StringView sv4 = sv3;
     EXPECT_TRUE(string_view_equal(&sv4, &sv3));
 
     const StringView sv5 = string_view_from_cstring("foobar");
     EXPECT_TRUE(string_view_equal_cstring(&sv5, "foobar"));
-    EXPECT_TRUE(string_view_has_literal_prefix(&sv5, "foo"));
+    EXPECT_TRUE(string_view_has_prefix(&sv5, "foo"));
     EXPECT_FALSE(string_view_equal_cstring(&sv5, "foo"));
 
     StringView sv6 = string_view_from_cstring("\t  \t\t ");

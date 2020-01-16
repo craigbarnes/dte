@@ -25,14 +25,6 @@ typedef struct {
     .length = STRLEN(s) \
 }
 
-#define string_view_has_literal_prefix(sv, prefix) ( \
-    string_view_has_prefix((sv), (prefix), STRLEN(prefix)) \
-)
-
-#define string_view_has_literal_prefix_icase(sv, prefix) ( \
-    string_view_has_prefix_icase((sv), (prefix), STRLEN(prefix)) \
-)
-
 static inline StringView string_view(const char *str, size_t length)
 {
     return (StringView) {
@@ -86,21 +78,17 @@ static inline bool string_view_equal_cstring_icase(const StringView *sv, const c
 }
 
 NONNULL_ARGS
-static inline bool string_view_has_prefix (
-    const StringView *sv,
-    const char *str,
-    size_t length
-) {
-    return sv->length >= length && memcmp(sv->data, str, length) == 0;
+static inline bool string_view_has_prefix(const StringView *sv, const char *p)
+{
+    size_t length = strlen(p);
+    return sv->length >= length && memcmp(sv->data, p, length) == 0;
 }
 
 NONNULL_ARGS
-static inline bool string_view_has_prefix_icase (
-    const StringView *sv,
-    const char *str,
-    size_t length
-) {
-    return sv->length >= length && mem_equal_icase(sv->data, str, length);
+static inline bool string_view_has_prefix_icase(const StringView *sv, const char *p)
+{
+    size_t length = strlen(p);
+    return sv->length >= length && mem_equal_icase(sv->data, p, length);
 }
 
 NONNULL_ARGS
