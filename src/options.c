@@ -337,7 +337,7 @@ static bool flag_parse (
         ptr = end;
         size_t i;
         for (i = 0; values[i]; i++) {
-            if (string_view_equal_cstr(&flag, values[i])) {
+            if (string_view_equal_cstring(&flag, values[i])) {
                 flags |= 1u << i;
                 break;
             }

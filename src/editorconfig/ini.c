@@ -40,7 +40,7 @@ UNITTEST {
     StringView tmp = STRING_VIEW(" \t  key = val   #   inline comment    ");
     string_view_trim_left(&tmp);
     strip_trailing_comments_and_whitespace(&tmp);
-    BUG_ON(!string_view_equal_literal(&tmp, "key = val"));
+    BUG_ON(!string_view_equal_cstring(&tmp, "key = val"));
 }
 
 int ini_parse(const char *filename, IniCallback callback, void *userdata)

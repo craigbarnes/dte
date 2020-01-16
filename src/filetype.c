@@ -242,7 +242,7 @@ HOT const char *find_ft(const char *filename, StringView line)
         return builtin_filetype_names[NGINX];
     }
 
-    if (string_view_equal_literal(&ext, "conf")) {
+    if (string_view_equal_cstring(&ext, "conf")) {
         if (string_view_has_literal_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
         } else if (

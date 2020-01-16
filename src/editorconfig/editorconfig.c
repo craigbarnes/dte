@@ -49,16 +49,16 @@ static void editorconfig_option_set (
     unsigned int n = 0;
     switch (lookup_property(name)) {
     case EC_INDENT_STYLE:
-        if (string_view_equal_literal_icase(val, "space")) {
+        if (string_view_equal_cstring_icase(val, "space")) {
             options->indent_style = INDENT_STYLE_SPACE;
-        } else if (string_view_equal_literal_icase(val, "tab")) {
+        } else if (string_view_equal_cstring_icase(val, "tab")) {
             options->indent_style = INDENT_STYLE_TAB;
         } else {
             options->indent_style = INDENT_STYLE_UNSPECIFIED;
         }
         break;
     case EC_INDENT_SIZE:
-        if (string_view_equal_literal_icase(val, "tab")) {
+        if (string_view_equal_cstring_icase(val, "tab")) {
             options->indent_size_is_tab = true;
             options->indent_size = 0;
         } else {
@@ -89,8 +89,8 @@ static int ini_handler(const IniData *data, void *ud) {
 
     if (data->section.length == 0) {
         if (
-            string_view_equal_literal_icase(&data->name, "root")
-            && string_view_equal_literal_icase(&data->value, "true")
+            string_view_equal_cstring_icase(&data->name, "root")
+            && string_view_equal_cstring_icase(&data->value, "true")
         ) {
             // root=true, clear all previous values
             userdata->options = editorconfig_options_init();

@@ -25,14 +25,6 @@ typedef struct {
     .length = STRLEN(s) \
 }
 
-#define string_view_equal_literal(sv, str) ( \
-    string_view_equal_strn((sv), (str), STRLEN(str)) \
-)
-
-#define string_view_equal_literal_icase(sv, str) ( \
-    string_view_equal_strn_icase((sv), (str), STRLEN(str)) \
-)
-
 #define string_view_has_literal_prefix(sv, prefix) ( \
     string_view_has_prefix((sv), (prefix), STRLEN(prefix)) \
 )
@@ -82,9 +74,15 @@ static inline bool string_view_equal_strn_icase (
 }
 
 NONNULL_ARGS
-static inline bool string_view_equal_cstr(const StringView *sv, const char *str)
+static inline bool string_view_equal_cstring(const StringView *sv, const char *str)
 {
     return string_view_equal_strn(sv, str, strlen(str));
+}
+
+NONNULL_ARGS
+static inline bool string_view_equal_cstring_icase(const StringView *sv, const char *str)
+{
+    return string_view_equal_strn_icase(sv, str, strlen(str));
 }
 
 NONNULL_ARGS
