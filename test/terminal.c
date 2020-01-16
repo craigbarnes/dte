@@ -367,6 +367,7 @@ static void test_rxvt_parse_key(void)
         char escape_sequence[8];
         KeyCode key;
     } templates[] = {
+        {"\033[2_", KEY_INSERT},
         {"\033[3_", KEY_DELETE},
         {"\033[5_", KEY_PAGE_UP},
         {"\033[6_", KEY_PAGE_DOWN},

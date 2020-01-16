@@ -20,6 +20,7 @@ ssize_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
         default: goto xterm;
         }
         switch (buf[2]) {
+        case '2': key |= KEY_INSERT; break;
         case '3': key |= KEY_DELETE; break;
         case '5': key |= KEY_PAGE_UP; break;
         case '6': key |= KEY_PAGE_DOWN; break;
