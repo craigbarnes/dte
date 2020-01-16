@@ -77,7 +77,7 @@ static inline bool path_parent(StringView *path)
         BUG_ON(data[length - 1] == '/');
     }
 
-    const char *slash = string_view_memrchr(path, '/');
+    const char *slash = strview_memrchr(path, '/');
     BUG_ON(slash == NULL);
 
     length = (size_t)(slash - data);

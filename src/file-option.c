@@ -94,7 +94,7 @@ void set_file_options(Buffer *b)
             break;
         case FILE_OPTIONS_FILENAME:
             if (b->abs_filename) {
-                const StringView f = string_view_from_cstring(b->abs_filename);
+                const StringView f = strview_from_cstring(b->abs_filename);
                 if (regexp_match_nosub(opt->type_or_pattern, &f)) {
                     set_options(opt->strs);
                 }

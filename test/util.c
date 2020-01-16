@@ -318,38 +318,38 @@ static void test_string(void)
 static void test_string_view(void)
 {
     const StringView sv1 = STRING_VIEW("testing");
-    EXPECT_TRUE(string_view_equal_cstring(&sv1, "testing"));
-    EXPECT_FALSE(string_view_equal_cstring(&sv1, "testin"));
-    EXPECT_FALSE(string_view_equal_cstring(&sv1, "TESTING"));
-    EXPECT_TRUE(string_view_has_prefix(&sv1, "test"));
-    EXPECT_TRUE(string_view_has_prefix_icase(&sv1, "TEst"));
-    EXPECT_FALSE(string_view_has_prefix(&sv1, "TEst"));
-    EXPECT_FALSE(string_view_has_prefix_icase(&sv1, "TEst_"));
+    EXPECT_TRUE(strview_equal_cstring(&sv1, "testing"));
+    EXPECT_FALSE(strview_equal_cstring(&sv1, "testin"));
+    EXPECT_FALSE(strview_equal_cstring(&sv1, "TESTING"));
+    EXPECT_TRUE(strview_has_prefix(&sv1, "test"));
+    EXPECT_TRUE(strview_has_prefix_icase(&sv1, "TEst"));
+    EXPECT_FALSE(strview_has_prefix(&sv1, "TEst"));
+    EXPECT_FALSE(strview_has_prefix_icase(&sv1, "TEst_"));
 
     const StringView sv2 = string_view(sv1.data, sv1.length);
-    EXPECT_TRUE(string_view_equal(&sv1, &sv2));
+    EXPECT_TRUE(strview_equal(&sv1, &sv2));
 
     const StringView sv3 = STRING_VIEW("\0test\0 ...");
-    EXPECT_TRUE(string_view_equal_strn(&sv3, "\0test\0 ...", 10));
+    EXPECT_TRUE(strview_equal_strn(&sv3, "\0test\0 ...", 10));
 
     const StringView sv4 = sv3;
-    EXPECT_TRUE(string_view_equal(&sv4, &sv3));
+    EXPECT_TRUE(strview_equal(&sv4, &sv3));
 
-    const StringView sv5 = string_view_from_cstring("foobar");
-    EXPECT_TRUE(string_view_equal_cstring(&sv5, "foobar"));
-    EXPECT_TRUE(string_view_has_prefix(&sv5, "foo"));
-    EXPECT_FALSE(string_view_equal_cstring(&sv5, "foo"));
+    const StringView sv5 = strview_from_cstring("foobar");
+    EXPECT_TRUE(strview_equal_cstring(&sv5, "foobar"));
+    EXPECT_TRUE(strview_has_prefix(&sv5, "foo"));
+    EXPECT_FALSE(strview_equal_cstring(&sv5, "foo"));
 
-    StringView sv6 = string_view_from_cstring("\t  \t\t ");
-    EXPECT_TRUE(string_view_isblank(&sv6));
+    StringView sv6 = strview_from_cstring("\t  \t\t ");
+    EXPECT_TRUE(strview_isblank(&sv6));
     sv6.length = 0;
-    EXPECT_TRUE(string_view_isblank(&sv6));
-    sv6 = string_view_from_cstring("    \t .  ");
-    EXPECT_FALSE(string_view_isblank(&sv6));
-    sv6 = string_view_from_cstring("\n");
-    EXPECT_FALSE(string_view_isblank(&sv6));
-    sv6 = string_view_from_cstring("  \r ");
-    EXPECT_FALSE(string_view_isblank(&sv6));
+    EXPECT_TRUE(strview_isblank(&sv6));
+    sv6 = strview_from_cstring("    \t .  ");
+    EXPECT_FALSE(strview_isblank(&sv6));
+    sv6 = strview_from_cstring("\n");
+    EXPECT_FALSE(strview_isblank(&sv6));
+    sv6 = strview_from_cstring("  \r ");
+    EXPECT_FALSE(strview_isblank(&sv6));
 }
 
 static void test_size_str_width(void)

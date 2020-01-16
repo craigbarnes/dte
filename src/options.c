@@ -165,7 +165,7 @@ static bool validate_statusline_format(const char *value)
                 error_msg("Format character expected after '%%'.");
                 return false;
             }
-            if (!string_view_memchr(&chars, ch)) {
+            if (!strview_memchr(&chars, ch)) {
                 error_msg("Invalid format character '%c'.", ch);
                 return false;
             }
@@ -337,7 +337,7 @@ static bool flag_parse (
         ptr = end;
         size_t i;
         for (i = 0; values[i]; i++) {
-            if (string_view_equal_cstring(&flag, values[i])) {
+            if (strview_equal_cstring(&flag, values[i])) {
                 flags |= 1u << i;
                 break;
             }

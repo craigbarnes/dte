@@ -88,7 +88,7 @@ static StringView get_ext(const StringView filename)
         return ext;
     }
 
-    ext.data = string_view_memrchr(&filename, '.');
+    ext.data = strview_memrchr(&filename, '.');
     if (ext.data == NULL) {
         return ext;
     }
@@ -155,7 +155,7 @@ static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
 {
     const char *str = ft_get_str(ft);
     const size_t len = (size_t)ft->str_len;
-    return sv.length > 0 && string_view_equal_strn(&sv, str, len);
+    return sv.length > 0 && strview_equal_strn(&sv, str, len);
 }
 
 static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
@@ -167,9 +167,9 @@ static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
 HOT const char *find_ft(const char *filename, StringView line)
 {
     const char *b = filename ? path_basename(filename) : NULL;
-    const StringView base = string_view_from_cstring(b);
+    const StringView base = strview_from_cstring(b);
     const StringView ext = get_ext(base);
-    const StringView path = string_view_from_cstring(filename);
+    const StringView path = strview_from_cstring(filename);
     const StringView interpreter = get_interpreter(line);
 
     // Search user `ft` entries
@@ -236,19 +236,19 @@ HOT const char *find_ft(const char *filename, StringView line)
         }
     }
 
-    if (string_view_has_prefix(&path, "/etc/default/")) {
+    if (strview_has_prefix(&path, "/etc/default/")) {
         return builtin_filetype_names[SHELL];
-    } else if (string_view_has_prefix(&path, "/etc/nginx/")) {
+    } else if (strview_has_prefix(&path, "/etc/nginx/")) {
         return builtin_filetype_names[NGINX];
     }
 
-    if (string_view_equal_cstring(&ext, "conf")) {
-        if (string_view_has_prefix(&path, "/etc/systemd/")) {
+    if (strview_equal_cstring(&ext, "conf")) {
+        if (strview_has_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
         } else if (
-            string_view_has_prefix(&path, "/etc/")
-            || string_view_has_prefix(&path, "/usr/share/")
-            || string_view_has_prefix(&path, "/usr/local/share/")
+            strview_has_prefix(&path, "/etc/")
+            || strview_has_prefix(&path, "/usr/share/")
+            || strview_has_prefix(&path, "/usr/local/share/")
         ) {
             return builtin_filetype_names[CONFIG];
         }

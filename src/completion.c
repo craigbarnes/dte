@@ -233,24 +233,24 @@ static void collect_completions(char **args, size_t argc)
     if (!cmd) {
         return;
     }
-    const StringView cmd_name = string_view_from_cstring(args[0]);
+    const StringView cmd_name = strview_from_cstring(args[0]);
 
     if (
-        string_view_equal_cstring(&cmd_name, "open")
-        || string_view_equal_cstring(&cmd_name, "wsplit")
-        || string_view_equal_cstring(&cmd_name, "save")
-        || string_view_equal_cstring(&cmd_name, "run")
-        || string_view_equal_cstring(&cmd_name, "pipe-from")
-        || string_view_equal_cstring(&cmd_name, "pipe-to")
+        strview_equal_cstring(&cmd_name, "open")
+        || strview_equal_cstring(&cmd_name, "wsplit")
+        || strview_equal_cstring(&cmd_name, "save")
+        || strview_equal_cstring(&cmd_name, "run")
+        || strview_equal_cstring(&cmd_name, "pipe-from")
+        || strview_equal_cstring(&cmd_name, "pipe-to")
     ) {
         collect_files(false);
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "cd")) {
+    if (strview_equal_cstring(&cmd_name, "cd")) {
         collect_files(true);
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "include")) {
+    if (strview_equal_cstring(&cmd_name, "include")) {
         switch (argc) {
         case 1:
             collect_files(false);
@@ -263,13 +263,13 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "insert-builtin")) {
+    if (strview_equal_cstring(&cmd_name, "insert-builtin")) {
         if (argc == 1) {
             collect_builtin_configs(completion.parsed, true);
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "hi")) {
+    if (strview_equal_cstring(&cmd_name, "hi")) {
         switch (argc) {
         case 1:
             collect_hl_colors(completion.parsed);
@@ -280,7 +280,7 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "set")) {
+    if (strview_equal_cstring(&cmd_name, "set")) {
         if (argc % 2) {
             collect_options(completion.parsed);
         } else {
@@ -288,24 +288,24 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "toggle") && argc == 1) {
+    if (strview_equal_cstring(&cmd_name, "toggle") && argc == 1) {
         collect_toggleable_options(completion.parsed);
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "tag") && argc == 1) {
+    if (strview_equal_cstring(&cmd_name, "tag") && argc == 1) {
         TagFile *tf = load_tag_file();
         if (tf != NULL) {
             collect_tags(tf, completion.parsed);
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "compile")) {
+    if (strview_equal_cstring(&cmd_name, "compile")) {
         if (get_nonflag_argc(args, argc) == 1) {
             collect_compilers(completion.parsed);
         }
         return;
     }
-    if (string_view_equal_cstring(&cmd_name, "show")) {
+    if (strview_equal_cstring(&cmd_name, "show")) {
         static const char opts[][8] = {"alias", "bind", "color", "option"};
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
         const char *arg1;

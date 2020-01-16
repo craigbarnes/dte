@@ -36,7 +36,7 @@ static FileTypeEnum filetype_from_signature(const StringView sv)
         return NONE;
     }
 
-    if (string_view_has_prefix_icase(&sv, "<!DOCTYPE HTML")) {
+    if (strview_has_prefix_icase(&sv, "<!DOCTYPE HTML")) {
         return HTML;
     }
 

@@ -38,9 +38,9 @@ static void strip_trailing_comments_and_whitespace(StringView *line)
 
 UNITTEST {
     StringView tmp = STRING_VIEW(" \t  key = val   #   inline comment    ");
-    string_view_trim_left(&tmp);
+    strview_trim_left(&tmp);
     strip_trailing_comments_and_whitespace(&tmp);
-    BUG_ON(!string_view_equal_cstring(&tmp, "key = val"));
+    BUG_ON(!strview_equal_cstring(&tmp, "key = val"));
 }
 
 int ini_parse(const char *filename, IniCallback callback, void *userdata)
@@ -63,7 +63,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
 
     while (pos < size) {
         StringView line = buf_slice_next_line(buf, &pos, size);
-        string_view_trim_left(&line);
+        strview_trim_left(&line);
 
         if (line.length < 2) {
             continue;
@@ -83,7 +83,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         }
 
         strip_trailing_comments_and_whitespace(&line);
-        unsigned char *delim = string_view_memchr(&line, '=');
+        unsigned char *delim = strview_memchr(&line, '=');
         if (delim) {
             const size_t before_delim_len = delim - line.data;
             size_t name_len = before_delim_len;

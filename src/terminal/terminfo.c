@@ -131,7 +131,7 @@ static const char *get_terminfo_string(const char *capname)
 
 static StringView get_terminfo_string_view(const char *capname)
 {
-    return string_view_from_cstring(get_terminfo_string(capname));
+    return strview_from_cstring(get_terminfo_string(capname));
 }
 
 static bool get_terminfo_flag(const char *capname)
