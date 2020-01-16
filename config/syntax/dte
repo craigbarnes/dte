@@ -32,7 +32,7 @@ state dq string
     eat this
 
 state dq-escape special
-    char "abfnrtv'\\\"" dq special
+    char "abefnrtv'\\\"" dq special
     char x hex1
     char u .c-uchar4:dq special
     char U .c-uchar8:dq special

@@ -64,6 +64,7 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
             switch (ch) {
             case 'a': ch = '\a'; break;
             case 'b': ch = '\b'; break;
+            case 'e': ch = '\033'; break;
             case 'f': ch = '\f'; break;
             case 'n': ch = '\n'; break;
             case 'r': ch = '\r'; break;

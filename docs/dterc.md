@@ -66,6 +66,9 @@ Double quoted strings may contain the following escapes:
 `\a`, `\b`, `\t`, `\n`, `\v`, `\f`, `\r`
 :   Control characters (same as in C)
 
+`\e`
+:   Escape character
+
 `\\`
 :   Backslash
 
