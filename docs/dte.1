@@ -222,6 +222,8 @@ Reverse search direction.
 .
 .SH ENVIRONMENT
 .
+The following environment variables are inspected at startup:
+.
 .TP
 .B DTE_HOME
 User configuration directory. Defaults to \fB$HOME/.dte\fR if not set.
@@ -232,9 +234,18 @@ Force \fBdte\fR to use \fBterminfo\fR(5) database, even for terminals
 with built-in support. Enabled if set.
 .
 .TP
+.B HOME
+User home directory. Used when expanding \fB~/\fR in filenames and also
+to determine the default value for \fBDTE_HOME\fR.
+.
+.TP
 .B TERM
-Identifier used to determine which \fBterminfo\fR(5) entry or built-in
-terminal support to use.
+Terminal identifier. Used to determine which \fBterminfo\fR(5) entry or
+built-in terminal support to use.
+.
+.TP
+.B COLORTERM
+Enables 24-bit color output, if set to \fBtruecolor\fR.
 .
 .SH FILES
 .
