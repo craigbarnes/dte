@@ -164,10 +164,22 @@ static void fixup_blocks(Buffer *b)
     }
 }
 
+static int xmadvise_sequential(void *addr, size_t len)
+{
+#ifdef HAVE_POSIX_MADVISE
+    return posix_madvise(addr, len, POSIX_MADV_SEQUENTIAL);
+#else
+    // "The posix_madvise() function shall have no effect on the semantics
+    // of access to memory in the specified range, although it may affect
+    // the performance of access". Ergo, doing nothing is a valid fallback.
+    return 0;
+#endif
+}
+
 int read_blocks(Buffer *b, int fd)
 {
+    const size_t map_size = 64 * 1024;
     size_t size = b->st.st_size;
-    size_t map_size = 64 * 1024;
     unsigned char *buf = NULL;
     bool mapped = false;
 
@@ -179,6 +191,7 @@ int read_blocks(Buffer *b, int fd)
         if (buf == MAP_FAILED) {
             buf = NULL;
         } else {
+            xmadvise_sequential(buf, size);
             mapped = true;
         }
     }
@@ -186,7 +199,6 @@ int read_blocks(Buffer *b, int fd)
     if (!mapped) {
         size_t alloc = map_size;
         size_t pos = 0;
-
         buf = xmalloc(alloc);
         while (1) {
             ssize_t rc = xread(fd, buf + pos, alloc - pos);

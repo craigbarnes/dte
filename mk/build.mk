@@ -67,7 +67,7 @@ test_objects := $(call prefix-obj, build/test/, \
     syntax terminal test util )
 
 feature_tests := $(addprefix mk/feature-test/, $(addsuffix .c, \
-    dup3 pipe2 fsync ioctl-winsize ))
+    dup3 pipe2 fsync ioctl-winsize posix_madvise ))
 
 all_objects := $(editor_objects) $(test_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects))))
