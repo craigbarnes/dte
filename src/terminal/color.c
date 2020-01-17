@@ -378,7 +378,7 @@ static size_t append_color(char *buf, int32_t color)
     BUG_ON((color & COLOR_FLAG_RGB) == 0);
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
-    return xsnprintf(buf, 8, "#%hhx%hhx%hhx", r, g, b);
+    return xsnprintf(buf, 8, "#%02hhx%02hhx%02hhx", r, g, b);
 }
 
 const char *term_color_to_string(const TermColor *color)

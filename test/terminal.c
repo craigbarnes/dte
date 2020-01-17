@@ -118,6 +118,35 @@ static void test_color_to_nearest(void)
     }
 }
 
+static void test_term_color_to_string(void)
+{
+    static const struct {
+        const char *expected_string;
+        const TermColor color;
+    } tests[] = {
+        {"red yellow bold", {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
+        {"#ff0000", {COLOR_RGB(0xff0000), -1, 0}},
+        {"#f00a9c reverse", {COLOR_RGB(0xf00a9c), -1, ATTR_REVERSE}},
+        {"black #00ffff", {COLOR_BLACK, COLOR_RGB(0x00ffff), 0}},
+        {"#010900", {COLOR_RGB(0x010900), COLOR_DEFAULT, 0}},
+        {"red strikethrough", {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
+        {"231", {231, COLOR_DEFAULT, 0}},
+        {"70 48 italic", {70, 48, ATTR_ITALIC}},
+        {"default keep", {COLOR_DEFAULT, COLOR_KEEP, 0}},
+        {"keep red keep", {COLOR_KEEP, COLOR_RED, ATTR_KEEP}},
+        {"88 16 blink bold", {88, 16, ATTR_BOLD | ATTR_BLINK}},
+        {"black 255 underline", {COLOR_BLACK, 255, ATTR_UNDERLINE}},
+        {"white green dim", {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
+        {"darkgray lightgreen", {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
+        {"lightmagenta", {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
+        {"keep 254 keep", {COLOR_KEEP, 254, ATTR_KEEP}},
+    };
+    FOR_EACH_I(i, tests) {
+        const char *str = term_color_to_string(&tests[i].color);
+        EXPECT_STREQ(str, tests[i].expected_string);
+    }
+}
+
 static void test_xterm_parse_key(void)
 {
     static const struct xterm_key_test {
@@ -484,6 +513,7 @@ void test_terminal(void)
 {
     test_parse_term_color();
     test_color_to_nearest();
+    test_term_color_to_string();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();
     test_rxvt_parse_key();
