@@ -286,7 +286,7 @@ static void ui_end(void)
 void suspend(void)
 {
     if (getpid() == getsid(0)) {
-        // Session leader can't suspend
+        error_msg("Session leader can't suspend");
         return;
     }
     if (
