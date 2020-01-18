@@ -417,6 +417,11 @@ char status_prompt(const char *question, const char *choices)
         }
         if (terminal_resized) {
             resize();
+            term_hide_cursor();
+            show_message(question, false);
+            restore_cursor();
+            term_show_cursor();
+            term_output_flush();
         }
     }
 
