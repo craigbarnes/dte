@@ -273,9 +273,9 @@ bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err
 const char *command_parse_error_to_string(CommandParseError err)
 {
     static const char error_strings[][16] = {
-        [CMDERR_UNCLOSED_SINGLE_QUOTE] = "Missing '",
-        [CMDERR_UNCLOSED_DOUBLE_QUOTE] = "Missing \"",
-        [CMDERR_UNEXPECTED_EOF] = "Unexpected EOF",
+        [CMDERR_UNCLOSED_SINGLE_QUOTE] = "unclosed '",
+        [CMDERR_UNCLOSED_DOUBLE_QUOTE] = "unclosed \"",
+        [CMDERR_UNEXPECTED_EOF] = "unexpected EOF",
     };
     BUG_ON(err <= CMDERR_NONE);
     BUG_ON(err >= ARRAY_COUNT(error_strings));

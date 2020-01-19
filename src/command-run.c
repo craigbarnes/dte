@@ -131,13 +131,11 @@ void handle_command(const CommandSet *cmds, const char *cmd)
 {
     CommandParseError err = 0;
     PointerArray array = PTR_ARRAY_INIT;
-
-    if (!parse_commands(&array, cmd, &err)) {
-        error_msg("%s", command_parse_error_to_string(err));
-        ptr_array_free(&array);
-        return;
+    if (parse_commands(&array, cmd, &err)) {
+        run_commands(cmds, &array);
+    } else {
+        const char *str = command_parse_error_to_string(err);
+        error_msg("Command syntax error: %s", str);
     }
-
-    run_commands(cmds, &array);
     ptr_array_free(&array);
 }

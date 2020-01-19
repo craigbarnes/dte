@@ -10,24 +10,14 @@ static void command_mode_handle_enter(void)
 {
     reset_completion();
     set_input_mode(INPUT_NORMAL);
-
     const char *str = string_borrow_cstring(&editor.cmdline.buf);
-    PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = 0;
-    bool ok = parse_commands(&array, str, &err);
-
-    // This is done before run_commands() because "command [text]"
-    // can modify the contents of the command-line
-    history_add(&editor.command_history, str, command_history_size);
     cmdline_clear(&editor.cmdline);
-
-    if (ok) {
-        run_commands(&commands, &array);
-    } else {
-        error_msg("Parsing command: %s", command_parse_error_to_string(err));
+    if (str[0] != ' ') {
+        // This is done before handle_command() because "command [text]"
+        // can modify the contents of the command-line
+        history_add(&editor.command_history, str, command_history_size);
     }
-
-    ptr_array_free(&array);
+    handle_command(&commands, str);
 }
 
 static void command_mode_keypress(KeyCode key)
