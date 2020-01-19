@@ -65,17 +65,17 @@ EditorState editor = {
         .display_invisible = false,
         .display_special = false,
         .esc_timeout = 100,
+        .filesize_limit = 250,
         .lock_files = true,
         .newline = NEWLINE_UNIX,
         .scroll_margin = 0,
         .set_window_title = false,
         .show_line_numbers = false,
-        .statusline_left = NULL,
-        .statusline_right = NULL,
+        .statusline_left = " %f%s%m%r%s%M",
+        .statusline_right = " %y,%X   %u   %E %n %t   %p ",
         .tab_bar = TAB_BAR_HORIZONTAL,
         .tab_bar_max_components = 0,
         .tab_bar_width = 25,
-        .filesize_limit = 250,
     },
     .mode_ops = {
         [INPUT_NORMAL] = &normal_mode_ops,
@@ -102,9 +102,6 @@ void init_editor_state(void)
     setlocale(LC_CTYPE, "");
     editor.charset = encoding_from_name(nl_langinfo(CODESET));
     editor.term_utf8 = (editor.charset.type == UTF8);
-
-    editor.options.statusline_left = " %f%s%m%r%s%M";
-    editor.options.statusline_right = " %y,%X   %u   %E %n %t   %p ";
 }
 
 static void sanity_check(void)
