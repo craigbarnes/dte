@@ -113,17 +113,19 @@ void term_show_cursor(void)
 
 void term_clear_eol(void)
 {
-    if (obuf.x < obuf.scroll_x + obuf.width) {
-        if (
-            obuf.can_clear
-            && (obuf.color.bg < 0 || terminal.back_color_erase)
-            && !(obuf.color.attr & ATTR_REVERSE)
-        ) {
-            terminal.clear_to_eol();
-            obuf.x = obuf.scroll_x + obuf.width;
-        } else {
-            term_set_bytes(' ', obuf.scroll_x + obuf.width - obuf.x);
-        }
+    const size_t end = obuf.scroll_x + obuf.width;
+    if (obuf.x >= end) {
+        return;
+    }
+    if (
+        obuf.can_clear
+        && (obuf.color.bg < 0 || terminal.back_color_erase)
+        && !(obuf.color.attr & ATTR_REVERSE)
+    ) {
+        terminal.clear_to_eol();
+        obuf.x = end;
+    } else {
+        term_set_bytes(' ', end - obuf.x);
     }
 }
 
