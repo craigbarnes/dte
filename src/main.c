@@ -184,6 +184,14 @@ static void showkey_loop(void)
     term_cooked();
 }
 
+static const char copyright[] =
+    "(C) 2017-2020 Craig Barnes\n"
+    "(C) 2010-2015 Timo Hirvonen\n"
+    "This program is free software; you can redistribute and/or modify\n"
+    "it under the terms of the GNU General Public License version 2\n"
+    "<https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>.\n"
+    "There is NO WARRANTY, to the extent permitted by law.";
+
 static const char usage[] =
     "Usage: %s [OPTIONS] [[+LINE] FILE]...\n\n"
     "Options:\n"
@@ -244,8 +252,7 @@ int main(int argc, char *argv[])
             goto loop_break;
         case 'V':
             printf("dte %s\n", editor.version);
-            puts("(C) 2017-2020 Craig Barnes");
-            puts("(C) 2010-2015 Timo Hirvonen");
+            puts(copyright);
             return 0;
         case 'h':
             printf(usage, argv[0]);
