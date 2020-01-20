@@ -32,6 +32,7 @@
 // Semantic exit codes, as defined by BSD sysexits(3)
 enum {
     EX_USAGE = 64, // Command line usage error
+    EX_DATAERR = 65, // Input data error
     EX_OSERR = 71, // Operating system error
     EX_IOERR = 74, // Input/output error
 };
@@ -275,7 +276,7 @@ loop_break:
         } else if (err == EINVAL) {
             error_msg("%s: no default syntax found", lint_syntax);
         }
-        return get_nr_errors() ? 1 : 0;
+        return get_nr_errors() ? EX_DATAERR : 0;
     }
 
     if (unlikely(!isatty(STDOUT_FILENO))) {
