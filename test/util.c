@@ -902,6 +902,26 @@ static void test_path_dirname_and_path_basename(void)
     }
 }
 
+static void test_relative_filename(void)
+{
+    static const struct rel_test {
+        const char *cwd;
+        const char *path;
+        const char *result;
+    } tests[] = { // NOTE: at most 2 ".." components allowed in relative name
+        { "/", "/", "/" },
+        { "/", "/file", "file" },
+        { "/a/b/c/d", "/a/b/file", "../../file" },
+        { "/a/b/c/d/e", "/a/b/file", "/a/b/file" },
+        { "/a/foobar", "/a/foo/file", "../foo/file" },
+    };
+    FOR_EACH_I(i, tests) {
+        char *result = relative_filename(tests[i].path, tests[i].cwd);
+        IEXPECT_STREQ(tests[i].result, result);
+        free(result);
+    }
+}
+
 static void test_path_absolute(void)
 {
     char *path = path_absolute("///dev///");
@@ -1110,6 +1130,7 @@ void test_util(void)
     test_round_size_to_next_multiple();
     test_round_size_to_next_power_of_2();
     test_path_dirname_and_path_basename();
+    test_relative_filename();
     test_path_absolute();
     test_path_join();
     test_path_parent();

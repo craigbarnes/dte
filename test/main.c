@@ -24,44 +24,6 @@ void test_util(void);
 void init_headless_mode(void);
 void test_config(void);
 
-static void test_relative_filename(void)
-{
-    static const struct rel_test {
-        const char *cwd, *path, *result;
-    } tests[] = { // NOTE: at most 2 ".." components allowed in relative name
-        { "/", "/", "/" },
-        { "/", "/file", "file" },
-        { "/a/b/c/d", "/a/b/file", "../../file" },
-        { "/a/b/c/d/e", "/a/b/file", "/a/b/file" },
-        { "/a/foobar", "/a/foo/file", "../foo/file" },
-    };
-    FOR_EACH_I(i, tests) {
-        const struct rel_test *t = &tests[i];
-        char *result = relative_filename(t->path, t->cwd);
-        IEXPECT_STREQ(t->result, result);
-        free(result);
-    }
-}
-
-static void test_detect_indent(void)
-{
-    EXPECT_FALSE(editor.options.detect_indent);
-    EXPECT_FALSE(editor.options.expand_tab);
-    EXPECT_EQ(editor.options.indent_width, 8);
-
-    handle_command (
-        &commands,
-        "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
-        "open test/data/detect-indent.ini"
-    );
-
-    EXPECT_EQ(buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
-    EXPECT_TRUE(buffer->options.expand_tab);
-    EXPECT_EQ(buffer->options.indent_width, 2);
-
-    handle_command(&commands, "close");
-}
-
 static void test_handle_binding(void)
 {
     handle_command(&commands, "bind ^A 'insert zzz'; open");
@@ -120,8 +82,6 @@ int main(void)
     test_posix_sanity();
     init_editor_state();
 
-    test_relative_filename();
-
     test_command();
     test_editorconfig();
     test_encoding();
@@ -134,7 +94,6 @@ int main(void)
 
     init_headless_mode();
     test_config();
-    test_detect_indent();
     test_handle_binding();
 
     return failed ? 1 : 0;

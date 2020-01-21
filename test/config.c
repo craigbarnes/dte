@@ -105,6 +105,25 @@ static void test_exec_config(void)
     }
 }
 
+static void test_detect_indent(void)
+{
+    EXPECT_FALSE(editor.options.detect_indent);
+    EXPECT_FALSE(editor.options.expand_tab);
+    EXPECT_EQ(editor.options.indent_width, 8);
+
+    handle_command (
+        &commands,
+        "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
+        "open test/data/detect-indent.ini"
+    );
+
+    EXPECT_EQ(buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
+    EXPECT_TRUE(buffer->options.expand_tab);
+    EXPECT_EQ(buffer->options.indent_width, 2);
+
+    handle_command(&commands, "close");
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void init_headless_mode(void)
@@ -129,4 +148,5 @@ void test_config(void)
     ASSERT_NONNULL(window);
     test_builtin_configs();
     test_exec_config();
+    test_detect_indent();
 }
