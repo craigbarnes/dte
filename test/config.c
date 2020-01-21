@@ -117,8 +117,6 @@ void init_headless_mode(void)
     ;
 
     MEMZERO(&terminal.control_codes);
-    editor.resize = &no_op;
-    editor.ui_end = &no_op;
     exec_builtin_rc();
     window = new_window();
     root_frame = new_root_frame(window);

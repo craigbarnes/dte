@@ -177,7 +177,7 @@ static int handle_child_error(pid_t pid)
 static void yield_terminal(void)
 {
     editor.child_controls_terminal = true;
-    editor.ui_end();
+    ui_end();
 }
 
 static void resume_terminal(bool prompt)
@@ -186,7 +186,7 @@ static void resume_terminal(bool prompt)
     if (prompt) {
         any_key();
     }
-    editor.resize();
+    ui_start();
     editor.child_controls_terminal = false;
 }
 

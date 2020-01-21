@@ -26,9 +26,6 @@
 
 static volatile sig_atomic_t terminal_resized;
 
-static void resize(void);
-static void ui_end(void);
-
 EditorState editor = {
     .status = EDITOR_INITIALIZING,
     .input_mode = INPUT_NORMAL,
@@ -39,8 +36,6 @@ EditorState editor = {
     .command_history = PTR_ARRAY_INIT,
     .version = version,
     .cmdline_x = 0,
-    .resize = resize,
-    .ui_end = ui_end,
     .cmdline = {
         .buf = STRING_INIT,
         .pos = 0,
@@ -253,29 +248,38 @@ void handle_sigwinch(int UNUSED_ARG(signum))
     terminal_resized = true;
 }
 
-static void resize(void)
+void ui_resize(void)
 {
+    if (editor.status == EDITOR_INITIALIZING) {
+        return;
+    }
     terminal_resized = false;
     update_screen_size();
-
-    // Turn keypad on (makes cursor keys work)
-    terminal.put_control_code(terminal.control_codes.keypad_on);
-
-    // Use alternate buffer if possible
-    terminal.put_control_code(terminal.control_codes.cup_mode_on);
-
     editor.mode_ops[editor.input_mode]->update();
 }
 
-static void ui_end(void)
+void ui_start(void)
 {
+    if (editor.status == EDITOR_INITIALIZING) {
+        return;
+    }
+    terminal.put_control_code(terminal.control_codes.init);
+    terminal.put_control_code(terminal.control_codes.keypad_on);
+    terminal.put_control_code(terminal.control_codes.cup_mode_on);
+    ui_resize();
+}
+
+void ui_end(void)
+{
+    if (editor.status == EDITOR_INITIALIZING) {
+        return;
+    }
     terminal.clear_screen();
     terminal.move_cursor(0, terminal.height - 1);
     term_show_cursor();
-
     terminal.put_control_code(terminal.control_codes.cup_mode_off);
     terminal.put_control_code(terminal.control_codes.keypad_off);
-
+    terminal.put_control_code(terminal.control_codes.deinit);
     term_output_flush();
     term_cooked();
 }
@@ -378,7 +382,7 @@ char dialog_prompt(const char *question, const char *choices)
             return (c >= 'a') ? c : 0;
         }
         if (terminal_resized) {
-            resize();
+            ui_resize();
             term_hide_cursor();
             show_dialog(question);
             show_message(question, false);
@@ -413,7 +417,7 @@ char status_prompt(const char *question, const char *choices)
             return (c >= 'a') ? c : 0;
         }
         if (terminal_resized) {
-            resize();
+            ui_resize();
             term_hide_cursor();
             show_message(question, false);
             restore_cursor();
@@ -481,7 +485,7 @@ void main_loop(void)
 {
     while (editor.status == EDITOR_RUNNING) {
         if (terminal_resized) {
-            resize();
+            ui_resize();
         }
 
         KeyCode key;

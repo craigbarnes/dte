@@ -18,7 +18,7 @@ void term_cleanup(void)
         return;
     }
     if (!editor.child_controls_terminal) {
-        editor.ui_end();
+        ui_end();
     }
     if (terminal.control_codes.deinit.length) {
         xwrite (

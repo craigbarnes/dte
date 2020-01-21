@@ -49,7 +49,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
         && editor.status != EDITOR_INITIALIZING
     ) {
         term_raw();
-        editor.resize();
+        ui_start();
     }
 }
 
@@ -412,10 +412,7 @@ loop_break:
     }
 
     set_view(window->views.ptrs[0]);
-
-    if (command || tag) {
-        editor.resize();
-    }
+    ui_start();
 
     if (command) {
         handle_command(&commands, command);
@@ -438,14 +435,10 @@ loop_break:
         remove_view(window->views.ptrs[0]);
     }
 
-    terminal.put_control_code(terminal.control_codes.init);
-    editor.resize();
-
     main_loop();
 
     terminal.restore_title();
-    editor.ui_end();
-    terminal.put_control_code(terminal.control_codes.deinit);
+    ui_end();
     term_output_flush();
 
     // Unlock files and add files to file history
