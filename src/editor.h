@@ -62,7 +62,6 @@ void normal_update(void);
 void handle_sigwinch(int signum);
 void suspend(void);
 void main_loop(void);
-void ui_resize(void);
 void ui_start(void);
 void ui_end(void);
 

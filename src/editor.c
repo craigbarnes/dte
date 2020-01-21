@@ -248,7 +248,7 @@ void handle_sigwinch(int UNUSED_ARG(signum))
     terminal_resized = true;
 }
 
-void ui_resize(void)
+static void ui_resize(void)
 {
     if (editor.status == EDITOR_INITIALIZING) {
         return;
