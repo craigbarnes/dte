@@ -1,6 +1,5 @@
 #include <langinfo.h>
 #include <locale.h>
-#include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
 #include "editor.h"
@@ -24,13 +23,12 @@
 #include "window.h"
 #include "../build/version.h"
 
-static volatile sig_atomic_t terminal_resized;
-
 EditorState editor = {
     .status = EDITOR_INITIALIZING,
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .everything_changed = false,
+    .resized = false,
     .buffers = PTR_ARRAY_INIT,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
@@ -243,17 +241,12 @@ void normal_update(void)
     end_update();
 }
 
-void handle_sigwinch(int UNUSED_ARG(signum))
-{
-    terminal_resized = true;
-}
-
 static void ui_resize(void)
 {
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    terminal_resized = false;
+    editor.resized = false;
     update_screen_size();
     editor.mode_ops[editor.input_mode]->update();
 }
@@ -381,7 +374,7 @@ char dialog_prompt(const char *question, const char *choices)
             mark_everything_changed();
             return (c >= 'a') ? c : 0;
         }
-        if (terminal_resized) {
+        if (editor.resized) {
             ui_resize();
             term_hide_cursor();
             show_dialog(question);
@@ -416,7 +409,7 @@ char status_prompt(const char *question, const char *choices)
         if (c) {
             return (c >= 'a') ? c : 0;
         }
-        if (terminal_resized) {
+        if (editor.resized) {
             ui_resize();
             term_hide_cursor();
             show_message(question, false);
@@ -484,7 +477,7 @@ static void update_screen(const ScreenState *s)
 void main_loop(void)
 {
     while (editor.status == EDITOR_RUNNING) {
-        if (terminal_resized) {
+        if (editor.resized) {
             ui_resize();
         }
 

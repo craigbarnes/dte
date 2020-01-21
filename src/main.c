@@ -53,6 +53,13 @@ static void handle_sigcont(int UNUSED_ARG(signum))
     }
 }
 
+#ifdef SIGWINCH
+static void handle_sigwinch(int UNUSED_ARG(signum))
+{
+    editor.resized = true;
+}
+#endif
+
 static NORETURN COLD void handle_fatal_signal(int signum)
 {
     term_cleanup();

@@ -1,6 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include <signal.h>
 #include <stdbool.h>
 #include "cmdline.h"
 #include "mode.h"
@@ -23,14 +24,14 @@ typedef enum {
 
 typedef struct {
     EditorStatus status;
-    const EditorModeOps *mode_ops[4];
     InputMode input_mode;
+    const EditorModeOps *mode_ops[4];
     CommandLine cmdline;
     GlobalOptions options;
     const char *home_dir;
     const char *user_config_dir;
-    Encoding charset;
     const char *pager;
+    Encoding charset;
     bool child_controls_terminal;
     bool everything_changed;
     bool term_utf8;
@@ -39,6 +40,7 @@ typedef struct {
     PointerArray search_history;
     PointerArray command_history;
     const char *const version;
+    volatile sig_atomic_t resized;
 } EditorState;
 
 extern EditorState editor;
@@ -59,7 +61,6 @@ char status_prompt(const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);
 void normal_update(void);
-void handle_sigwinch(int signum);
 void suspend(void);
 void main_loop(void);
 void ui_start(void);
