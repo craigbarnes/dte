@@ -20,7 +20,7 @@ static void command_mode_handle_enter(void)
     handle_command(&commands, str);
 }
 
-static void command_mode_keypress(KeyCode key)
+void command_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:
@@ -45,8 +45,3 @@ static void command_mode_keypress(KeyCode key)
         return;
     }
 }
-
-const EditorModeOps command_mode_ops = {
-    .keypress = command_mode_keypress,
-    .update = normal_update,
-};

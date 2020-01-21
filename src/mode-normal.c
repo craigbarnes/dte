@@ -22,7 +22,7 @@ static void insert_paste(void)
     free(text);
 }
 
-static void normal_mode_keypress(KeyCode key)
+void normal_mode_keypress(KeyCode key)
 {
     switch (key) {
     case '\t':
@@ -48,8 +48,3 @@ static void normal_mode_keypress(KeyCode key)
         handle_binding(key);
     }
 }
-
-const EditorModeOps normal_mode_ops = {
-    .keypress = normal_mode_keypress,
-    .update = normal_update,
-};

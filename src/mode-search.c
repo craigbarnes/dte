@@ -4,7 +4,7 @@
 #include "mode.h"
 #include "search.h"
 
-static void search_mode_keypress(KeyCode key)
+void search_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:
@@ -38,8 +38,3 @@ static void search_mode_keypress(KeyCode key)
         return;
     }
 }
-
-const EditorModeOps search_mode_ops = {
-    .keypress = search_mode_keypress,
-    .update = normal_update,
-};

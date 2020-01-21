@@ -25,7 +25,6 @@ typedef enum {
 typedef struct {
     EditorStatus status;
     InputMode input_mode;
-    const EditorModeOps *mode_ops[4];
     CommandLine cmdline;
     GlobalOptions options;
     const char *home_dir;

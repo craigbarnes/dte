@@ -3,13 +3,8 @@
 
 #include "terminal/key.h"
 
-typedef struct {
-    void (*keypress)(KeyCode key);
-    void (*update)(void);
-} EditorModeOps;
-
-extern const EditorModeOps normal_mode_ops;
-extern const EditorModeOps command_mode_ops;
-extern const EditorModeOps search_mode_ops;
+void normal_mode_keypress(KeyCode key);
+void command_mode_keypress(KeyCode key);
+void search_mode_keypress(KeyCode key);
 
 #endif

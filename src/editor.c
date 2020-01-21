@@ -69,11 +69,6 @@ EditorState editor = {
         .tab_bar = TAB_BAR_HORIZONTAL,
         .tab_bar_max_components = 0,
         .tab_bar_width = 25,
-    },
-    .mode_ops = {
-        [INPUT_NORMAL] = &normal_mode_ops,
-        [INPUT_COMMAND] = &command_mode_ops,
-        [INPUT_SEARCH] = &search_mode_ops,
     }
 };
 
@@ -248,7 +243,7 @@ static void ui_resize(void)
     }
     editor.resized = false;
     update_screen_size();
-    editor.mode_ops[editor.input_mode]->update();
+    normal_update();
 }
 
 void ui_start(void)
@@ -434,7 +429,7 @@ typedef struct {
 static void update_screen(const ScreenState *s)
 {
     if (editor.everything_changed) {
-        editor.mode_ops[editor.input_mode]->update();
+        normal_update();
         editor.everything_changed = false;
         return;
     }
@@ -495,7 +490,21 @@ void main_loop(void)
             .vx = v->vx,
             .vy = v->vy
         };
-        editor.mode_ops[editor.input_mode]->keypress(key);
+
+        switch (editor.input_mode) {
+        case INPUT_NORMAL:
+            normal_mode_keypress(key);
+            break;
+        case INPUT_COMMAND:
+            command_mode_keypress(key);
+            break;
+        case INPUT_SEARCH:
+            search_mode_keypress(key);
+            break;
+        default:
+            BUG("unhandled input mode");
+        }
+
         sanity_check();
         update_screen(&s);
     }
