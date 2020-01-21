@@ -442,6 +442,10 @@ loop_break:
         remove_view(window->views.ptrs[0]);
     }
 
+    if (command || tag) {
+        normal_update();
+    }
+
     main_loop();
 
     terminal.restore_title();
