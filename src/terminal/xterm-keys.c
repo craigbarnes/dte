@@ -67,7 +67,7 @@ static KeyCode normalize_modified_other_key(KeyCode mods, KeyCode key)
 
 static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 {
-    if (i >= length) {
+    if (unlikely(i >= length)) {
         return -1;
     }
     const char ch = buf[i++];
@@ -134,7 +134,7 @@ static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
             continue;
         case ';':
             params[nparams++] = num;
-            if (nparams > 2) {
+            if (unlikely(nparams > 2)) {
                 return 0;
             }
             num = 0;
@@ -153,7 +153,7 @@ static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
     }
 exit_loop:
 
-    if (final_byte == 0) {
+    if (unlikely(final_byte == 0)) {
         return (i >= len) ? -1 : 0;
     }
 
@@ -164,7 +164,7 @@ exit_loop:
     case 3:
         if (params[0] == 27 && final_byte == '~') {
             mods = decode_modifiers(params[1]);
-            if (mods == 0) {
+            if (unlikely(mods == 0)) {
                 return 0;
             }
             *k = normalize_modified_other_key(mods, params[2]);
@@ -173,7 +173,7 @@ exit_loop:
         return 0;
     case 2:
         mods = decode_modifiers(params[1]);
-        if (mods == 0) {
+        if (unlikely(mods == 0)) {
             return 0;
         }
         switch (final_byte) {
@@ -208,12 +208,12 @@ exit_loop:
 
 check_first_param_is_special_key:
     key = decode_special_key(params[0]);
-    if (key == 0) {
+    if (unlikely(key == 0)) {
         return 0;
     }
     goto set_k_and_return_i;
 check_first_param_is_1:
-    if (params[0] != 1) {
+    if (unlikely(params[0] != 1)) {
         return 0;
     }
 set_k_and_return_i:
@@ -223,7 +223,7 @@ set_k_and_return_i:
 
 static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
 {
-    if (i >= length) {
+    if (unlikely(i >= length)) {
         return -1;
     }
     char ch = buf[i++];
@@ -252,7 +252,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case '5': case '6': case '7': case '8': case '9':
         return parse_csi_num(buf, length, i - 1, k);
     case '[':
-        if (i >= length) {
+        if (unlikely(i >= length)) {
             return -1;
         }
         switch (ch = buf[i++]) {
@@ -272,9 +272,9 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
 
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
 {
-    if (length == 0 || buf[0] != '\033') {
+    if (unlikely(length == 0 || buf[0] != '\033')) {
         return 0;
-    } else if (length == 1) {
+    } else if (unlikely(length == 1)) {
         return -1;
     }
     switch (buf[1]) {
