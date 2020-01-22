@@ -142,6 +142,7 @@ endif
 BASIC_CFLAGS += \
     $(CSTD) $(CWARNS) $(UNWIND) \
     -DDEBUG=$(DEBUG) \
+    -D_POSIX_C_SOURCE=200809L \
     -D_FILE_OFFSET_BITS=64
 
 # If "make install*" with no other named targets

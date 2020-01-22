@@ -15,7 +15,7 @@ default:
         - ldd dte || true
         - make clean && make check
         - ldd dte
-        - make clean && make check CSTD='-std=c99 -D_POSIX_C_SOURCE=200809L'
+        - make clean && make check CSTD='-std=c99'
         - make clean && make DEBUG=0 && make install && dte -V
         - strip dte && du -k -h dte
         - tools/objsize.sh dte
