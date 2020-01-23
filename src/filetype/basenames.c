@@ -78,6 +78,7 @@ static const FileBasenameMap dotfiles[] = {
     {"muttrc", CONFIG},
     {"nanorc", CONFIG},
     {"profile", SHELL},
+    {"shellcheckrc", CONFIG},
     {"tigrc", CONFIG},
     {"tmux.conf", TMUX},
     {"xinitrc", SHELL},
