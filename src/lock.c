@@ -75,7 +75,7 @@ static pid_t rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
     return other_pid;
 }
 
-static int lock_or_unlock(const char *filename, bool lock)
+static bool lock_or_unlock(const char *filename, bool lock)
 {
     static char *file_locks;
     static char *file_locks_lock;
@@ -85,7 +85,7 @@ static int lock_or_unlock(const char *filename, bool lock)
     }
 
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
-        return 0;
+        return true;
     }
 
     int tries = 0;
@@ -102,7 +102,7 @@ static int lock_or_unlock(const char *filename, bool lock)
                 file_locks_lock,
                 strerror(errno)
             );
-            return -1;
+            return false;
         }
         if (++tries == 3) {
             if (unlink(file_locks_lock)) {
@@ -111,7 +111,7 @@ static int lock_or_unlock(const char *filename, bool lock)
                     file_locks_lock,
                     strerror(errno)
                 );
-                return -1;
+                return false;
             }
             error_msg("Stale lock file %s removed.", file_locks_lock);
         } else {
@@ -165,15 +165,15 @@ static int lock_or_unlock(const char *filename, bool lock)
         goto error;
     }
     free(buf);
-    return pid == 0 ? 0 : -1;
+    return (pid == 0);
 error:
     unlink(file_locks_lock);
     free(buf);
     close(wfd);
-    return -1;
+    return false;
 }
 
-int lock_file(const char *filename)
+bool lock_file(const char *filename)
 {
     return lock_or_unlock(filename, true);
 }

@@ -110,7 +110,7 @@ View *window_open_buffer (
     update_short_filename(b);
 
     if (editor.options.lock_files) {
-        if (lock_file(b->abs_filename)) {
+        if (!lock_file(b->abs_filename)) {
             b->readonly = true;
         } else {
             b->locked = true;

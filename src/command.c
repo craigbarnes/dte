@@ -1228,7 +1228,7 @@ static void cmd_save(const CommandArgs *a)
         if (editor.options.lock_files) {
             if (absolute == buffer->abs_filename) {
                 if (!buffer->locked) {
-                    if (lock_file(absolute)) {
+                    if (!lock_file(absolute)) {
                         if (!force) {
                             error_msg("Can't lock file %s", absolute);
                             goto error;
@@ -1238,7 +1238,7 @@ static void cmd_save(const CommandArgs *a)
                     }
                 }
             } else {
-                if (lock_file(absolute)) {
+                if (!lock_file(absolute)) {
                     if (!force) {
                         error_msg("Can't lock file %s", absolute);
                         goto error;
@@ -1267,7 +1267,7 @@ static void cmd_save(const CommandArgs *a)
         if (editor.options.lock_files) {
             if (absolute == buffer->abs_filename) {
                 if (!buffer->locked) {
-                    if (lock_file(absolute)) {
+                    if (!lock_file(absolute)) {
                         if (!force) {
                             error_msg("Can't lock file %s", absolute);
                             goto error;
@@ -1277,7 +1277,7 @@ static void cmd_save(const CommandArgs *a)
                     }
                 }
             } else {
-                if (lock_file(absolute)) {
+                if (!lock_file(absolute)) {
                     if (!force) {
                         error_msg("Can't lock file %s", absolute);
                         goto error;
