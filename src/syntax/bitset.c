@@ -1,13 +1,13 @@
 #include "bitset.h"
 
-static void bitset_add(uint8_t *set, unsigned char ch)
+static void bitset_add(BitSetWord *set, unsigned char ch)
 {
-    unsigned int byte = ch / 8;
-    unsigned int bit = ch & 7;
-    set[byte] |= 1u << bit;
+    unsigned int word = ch / BITSET_WORD_BITS;
+    unsigned int bit = ch & BITSET_BIT_MASK;
+    set[word] |= ((BitSetWord)1) << bit;
 }
 
-void bitset_add_pattern(uint8_t *set, const unsigned char *pattern)
+void bitset_add_pattern(BitSetWord *set, const unsigned char *pattern)
 {
     for (size_t i = 0; pattern[i]; i++) {
         unsigned int ch = pattern[i];

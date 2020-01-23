@@ -6,7 +6,7 @@ static void test_bitset(void)
 {
     BitSet set;
     ASSERT_EQ(sizeof(set), 32);
-    ASSERT_EQ(ARRAY_COUNT(set), 32);
+    ASSERT_EQ(ARRAY_COUNT(set), BITSET_NR_WORDS);
 
     memset(set, 0, sizeof(set));
     EXPECT_FALSE(bitset_contains(set, '0'));
@@ -63,16 +63,7 @@ static void test_bitset(void)
     }
     bitset_invert(set);
     FOR_EACH_I(i, set) {
-        EXPECT_UINT_EQ(set[i], 255);
-    }
-
-    memset(set, 170, sizeof(set));
-    FOR_EACH_I(i, set) {
-        EXPECT_UINT_EQ(set[i], 170);
-    }
-    bitset_invert(set);
-    FOR_EACH_I(i, set) {
-        EXPECT_UINT_EQ(set[i], 85);
+        EXPECT_UINT_EQ(set[i], ((BitSetWord)-1));
     }
 }
 
