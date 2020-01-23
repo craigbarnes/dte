@@ -832,7 +832,7 @@ Unselect.
 
 ## External Commands
 
-### **filter** _command_ [_parameter_]...
+### **filter** [**-l**] _command_ [_parameter_]...
 
 Filter selected text or whole file through external _command_.
 
@@ -846,6 +846,9 @@ _command_. For example:
 
     filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
 
+`-l`
+:   Operate on current line instead of whole file, if there's no selection
+
 ### **pipe-from** [**-ms**] _command_ [_parameter_]...
 
 Run external _command_ and insert its standard output.
@@ -856,7 +859,7 @@ Run external _command_ and insert its standard output.
 `-s`
 :   Strip newline from end of output
 
-### **pipe-to** _command_ [_parameter_]...
+### **pipe-to** [**-l**] _command_ [_parameter_]...
 
 Run external _command_ and pipe the selected text (or whole file) to
 its standard input.
@@ -864,6 +867,9 @@ its standard input.
 Can be used to e.g. write text to the system clipboard:
 
     pipe-to xsel -b
+
+`-l`
+:   Operate on current line instead of whole file, if there's no selection
 
 ### **run** [**-ps**] _command_ [_parameters_]...
 

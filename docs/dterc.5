@@ -175,11 +175,11 @@ Editing Commands:
 .P
 External Commands:
 .br
-   \fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
+   \fBfilter\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
-   \fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
+   \fBpipe\-to\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBrun\fR [\fB\-ps\fR] \fIcommand\fR [\fIparameters\fR]...
 .br
@@ -1331,7 +1331,7 @@ Unselect.
 .P
 .RE
 .SS External Commands
-\fBfilter\fR \fIcommand\fR [\fIparameter\fR]...
+\fBfilter\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
 Filter selected text or whole file through external \fIcommand\fR.
 .P
@@ -1355,6 +1355,10 @@ filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
 \f[]
 .fi
 .PP
+.TP
+\fB\-l\fR
+Operate on current line instead of whole file, if there's no selection
+.PP
 .RE
 \fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
@@ -1369,7 +1373,7 @@ Move after the inserted text
 Strip newline from end of output
 .PP
 .RE
-\fBpipe\-to\fR \fIcommand\fR [\fIparameter\fR]...
+\fBpipe\-to\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
 Run external \fIcommand\fR and pipe the selected text (or whole file) to
 its standard input.
@@ -1382,6 +1386,10 @@ Can be used to e.g. write text to the system clipboard:
 pipe\-to\ xsel\ \-b
 \f[]
 .fi
+.PP
+.TP
+\fB\-l\fR
+Operate on current line instead of whole file, if there's no selection
 .PP
 .RE
 \fBrun\fR [\fB\-ps\fR] \fIcommand\fR [\fIparameters\fR]...

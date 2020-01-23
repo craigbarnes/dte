@@ -204,7 +204,7 @@ static void test_command_struct_layout(void)
 {
     const Command *cmd = find_normal_command("filter");
     EXPECT_STREQ(cmd->name, "filter");
-    EXPECT_STREQ(cmd->flags, "-");
+    EXPECT_STREQ(cmd->flags, "-l");
     EXPECT_EQ(cmd->min_args, 1);
     EXPECT_EQ(cmd->max_args, UINT_MAX);
     EXPECT_NONNULL(cmd->cmd);

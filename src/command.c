@@ -468,6 +468,11 @@ static void cmd_filter(const CommandArgs *a)
 
     if (view->selection) {
         data.in_len = prepare_selection(view);
+    } else if (has_flag(a, 'l')) {
+        StringView line;
+        move_bol();
+        fill_line_ref(&view->cursor, &line);
+        data.in_len = line.length;
     } else {
         Block *blk;
         data.in_len = 0;
@@ -964,6 +969,11 @@ static void cmd_pipe_to(const CommandArgs *a)
     size_t input_len = 0;
     if (view->selection) {
         input_len = prepare_selection(view);
+    } else if (has_flag(a, 'l')) {
+        StringView line;
+        move_bol();
+        fill_line_ref(&view->cursor, &line);
+        input_len = line.length;
     } else {
         Block *blk;
         block_for_each(blk, &buffer->blocks) {
@@ -2099,7 +2109,7 @@ static const Command cmds[] = {
     {"errorfmt", "i", 2, 18, cmd_errorfmt},
     {"eval", "-", 1, -1, cmd_eval},
     {"exec-open", "-s", 1, -1, cmd_exec_open},
-    {"filter", "-", 1, -1, cmd_filter},
+    {"filter", "-l", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
     {"hi", "-", 0, -1, cmd_hi},
     {"include", "bq", 1, 1, cmd_include},
@@ -2119,7 +2129,7 @@ static const Command cmds[] = {
     {"pgdown", "cl", 0, 0, cmd_pgdown},
     {"pgup", "cl", 0, 0, cmd_pgup},
     {"pipe-from", "-ms", 1, -1, cmd_pipe_from},
-    {"pipe-to", "-", 1, -1, cmd_pipe_to},
+    {"pipe-to", "-l", 1, -1, cmd_pipe_to},
     {"prev", "", 0, 0, cmd_prev},
     {"quit", "fp", 0, 0, cmd_quit},
     {"redo", "", 0, 1, cmd_redo},
