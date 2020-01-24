@@ -1,7 +1,9 @@
 #include "bitset.h"
+#include "../util/macros.h"
 
 static void bitset_add(BitSetWord *set, unsigned char ch)
 {
+    static_assert(256 % BITSET_WORD_BITS == 0);
     unsigned int word = ch / BITSET_WORD_BITS;
     unsigned int bit = ch & BITSET_BIT_MASK;
     set[word] |= ((BitSetWord)1) << bit;

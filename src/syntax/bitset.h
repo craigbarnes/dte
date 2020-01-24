@@ -4,7 +4,6 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 // This is a container type for storing a *set* of chars (bytes).
 // It uses an array of 256 bits (32 bytes) for lookups, with each
@@ -15,7 +14,7 @@
 #define BITSET_BIT_MASK (BITSET_WORD_BITS - 1)
 #define BITSET_NR_WORDS (256 / BITSET_WORD_BITS)
 
-typedef uint32_t BitSetWord;
+typedef unsigned long BitSetWord;
 typedef BitSetWord BitSet[BITSET_NR_WORDS];
 
 static inline bool bitset_contains(const BitSetWord *set, unsigned char ch)
