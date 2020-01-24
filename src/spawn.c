@@ -174,20 +174,26 @@ static int handle_child_error(pid_t pid)
     return ret;
 }
 
-static void yield_terminal(void)
+static void yield_terminal(bool quiet)
 {
-    editor.child_controls_terminal = true;
-    ui_end();
+    if (quiet) {
+        term_raw_isig();
+    } else {
+        editor.child_controls_terminal = true;
+        ui_end();
+    }
 }
 
-static void resume_terminal(bool prompt)
+static void resume_terminal(bool quiet, bool prompt)
 {
     term_raw();
-    if (prompt) {
-        any_key();
-    }
-    ui_start();
-    editor.child_controls_terminal = false;
+    if (!quiet && editor.child_controls_terminal) {
+        if (prompt) {
+            any_key();
+        }
+        ui_start();
+        editor.child_controls_terminal = false;
+     }
 }
 
 static void exec_error(const char *argv0)
@@ -214,6 +220,7 @@ bool spawn_filter(char **argv, FilterData *data)
     }
 
     int fd[3] = {p0[0], p1[1], dev_null};
+    term_raw_isig();
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
         exec_error(argv[0]);
@@ -227,7 +234,9 @@ bool spawn_filter(char **argv, FilterData *data)
     close(p1[0]);
     close(p0[1]);
 
-    if (handle_child_error(pid)) {
+    int err = handle_child_error(pid);
+    term_raw();
+    if (err) {
         free(data->out);
         data->out = NULL;
         data->out_len = 0;
@@ -236,6 +245,7 @@ bool spawn_filter(char **argv, FilterData *data)
     return true;
 
 error:
+    term_raw();
     close(p0[0]);
     close(p0[1]);
     close(p1[0]);
@@ -267,10 +277,9 @@ bool spawn_source(char **argv, String *output, bool quiet)
             goto error;
         }
         fd[2] = dev_null_w;
-    } else {
-        yield_terminal();
     }
 
+    yield_terminal(quiet);
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
         exec_error(argv[0]);
@@ -299,14 +308,12 @@ bool spawn_source(char **argv, String *output, bool quiet)
     }
 
     close(p[0]);
-    if (!quiet) {
-        resume_terminal(false);
+    p[0] = -1;
+    if (handle_child_error(pid)) {
+        goto error;
     }
 
-    if (handle_child_error(pid)) {
-        string_free(output);
-        return false;
-    }
+    resume_terminal(quiet, false);
     return true;
 
 error:
@@ -316,9 +323,8 @@ error:
     if (quiet) {
         close(dev_null_r);
         close(dev_null_w);
-    } else if (editor.child_controls_terminal) {
-        resume_terminal(false);
     }
+    resume_terminal(quiet, false);
     return false;
 }
 
@@ -338,6 +344,7 @@ bool spawn_sink(char **argv, const char *text, size_t length)
     }
 
     int fd[3] = {p[0], dev_null, dev_null};
+    term_raw_isig();
     const pid_t pid = fork_exec(argv, fd);
     if (pid < 0) {
         exec_error(argv[0]);
@@ -346,15 +353,18 @@ bool spawn_sink(char **argv, const char *text, size_t length)
 
     close(dev_null);
     close(p[0]);
+    p[0] = dev_null = -1;
     if (length && xwrite(p[1], text, length) < 0) {
         perror_msg("write");
-        close(p[1]);
-        return false;
+        goto error;
     }
     close(p[1]);
-    return !handle_child_error(pid);
+    int err = handle_child_error(pid);
+    term_raw();
+    return !err;
 
 error:
+    term_raw();
     close(p[0]);
     close(p[1]);
     close(dev_null);
@@ -394,10 +404,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         fd[2] = p[1];
     }
 
-    if (!quiet) {
-        yield_terminal();
-    }
-
+    yield_terminal(quiet);
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
         exec_error(args[0]);
@@ -410,10 +417,8 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         read_errors(c, p[0], quiet);
         handle_child_error(pid);
     }
+    resume_terminal(quiet, prompt);
 
-    if (!quiet) {
-        resume_terminal(prompt);
-    }
     close(p[0]);
     close(dev_null);
     close(fd[0]);
@@ -431,10 +436,9 @@ void spawn(char **args, bool quiet, bool prompt)
             return;
         }
         fd[2] = fd[1];
-    } else {
-        yield_terminal();
     }
 
+    yield_terminal(quiet);
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
         exec_error(args[0]);
@@ -442,11 +446,10 @@ void spawn(char **args, bool quiet, bool prompt)
     } else {
         handle_child_error(pid);
     }
+    resume_terminal(quiet, prompt);
 
     if (quiet) {
         close(fd[0]);
         close(fd[1]);
-    } else {
-        resume_terminal(prompt);
     }
 }

@@ -6,7 +6,7 @@
 #include "../util/macros.h"
 
 static bool initialized;
-static struct termios raw, cooked;
+static struct termios cooked, raw, raw_isig;
 
 bool term_mode_init(void)
 {
@@ -29,6 +29,10 @@ bool term_mode_init(void)
     raw.c_cc[VMIN] = 1;
     raw.c_cc[VTIME] = 0;
 
+    // Set up raw+ISIG mode
+    raw_isig = raw;
+    raw_isig.c_lflag |= ISIG;
+
     initialized = true;
     return true;
 }
@@ -49,6 +53,13 @@ void term_raw(void)
 {
     if (initialized) {
         xtcsetattr(&raw);
+    }
+}
+
+void term_raw_isig(void)
+{
+    if (initialized) {
+        xtcsetattr(&raw_isig);
     }
 }
 
