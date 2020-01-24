@@ -47,25 +47,20 @@ void normal_mode_keypress(KeyCode key)
     }
 }
 
-static void command_mode_handle_enter(void)
-{
-    reset_completion();
-    set_input_mode(INPUT_NORMAL);
-    const char *str = string_borrow_cstring(&editor.cmdline.buf);
-    cmdline_clear(&editor.cmdline);
-    if (str[0] != ' ') {
-        // This is done before handle_command() because "command [text]"
-        // can modify the contents of the command-line
-        history_add(&editor.command_history, str, command_history_size);
-    }
-    handle_command(&commands, str);
-}
-
 void command_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:
-        command_mode_handle_enter();
+        reset_completion();
+        set_input_mode(INPUT_NORMAL);
+        const char *str = string_borrow_cstring(&editor.cmdline.buf);
+        cmdline_clear(&editor.cmdline);
+        if (str[0] != ' ') {
+            // This is done before handle_command() because "command [text]"
+            // can modify the contents of the command-line
+            history_add(&editor.command_history, str, command_history_size);
+        }
+        handle_command(&commands, str);
         return;
     case '\t':
         complete_command_next();
