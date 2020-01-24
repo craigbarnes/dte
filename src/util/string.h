@@ -57,7 +57,6 @@ char *string_steal(String *s, size_t *len) NONNULL_ARGS;
 char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN;
 char *string_clone_cstring(const String *s) XSTRDUP;
 const char *string_borrow_cstring(String *s) NONNULL_ARGS_AND_RETURN;
-void string_ensure_null_terminated(String *s) NONNULL_ARGS;
 void string_remove(String *s, size_t pos, size_t len) NONNULL_ARGS;
 
 #endif

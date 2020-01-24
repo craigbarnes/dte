@@ -143,7 +143,7 @@ char *string_clone_cstring(const String *s)
     return b;
 }
 
-void string_ensure_null_terminated(String *s)
+static void string_ensure_null_terminated(String *s)
 {
     string_grow(s, 1);
     s->buffer[s->len] = '\0';
