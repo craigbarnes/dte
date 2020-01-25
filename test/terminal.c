@@ -396,12 +396,12 @@ static void test_rxvt_parse_key(void)
         char escape_sequence[8];
         KeyCode key;
     } templates[] = {
-        {"\033[2_", KEY_INSERT},
-        {"\033[3_", KEY_DELETE},
-        {"\033[5_", KEY_PAGE_UP},
-        {"\033[6_", KEY_PAGE_DOWN},
-        {"\033[7_", KEY_HOME},
-        {"\033[8_", KEY_END},
+        {"\033\033[2_", KEY_INSERT},
+        {"\033\033[3_", KEY_DELETE},
+        {"\033\033[5_", KEY_PAGE_UP},
+        {"\033\033[6_", KEY_PAGE_DOWN},
+        {"\033\033[7_", KEY_HOME},
+        {"\033\033[8_", KEY_END},
     };
 
     static const struct {
@@ -418,15 +418,26 @@ static void test_rxvt_parse_key(void)
         FOR_EACH_I(j, modifiers) {
             char seq[8];
             memcpy(seq, templates[i].escape_sequence, 8);
-            BUG_ON(seq[7] != '\0');
+            ASSERT_EQ(seq[7], '\0');
             char *underscore = strchr(seq, '_');
             ASSERT_NONNULL(underscore);
             *underscore = modifiers[j].ch;
             size_t seq_length = strlen(seq);
             KeyCode key;
+
             ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
             EXPECT_EQ(parsed_length, seq_length);
+            EXPECT_EQ(key, modifiers[j].mask | templates[i].key | MOD_META);
+
+            parsed_length = rxvt_parse_key(seq + 1, seq_length - 1, &key);
+            EXPECT_EQ(parsed_length, seq_length - 1);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
+
+            parsed_length = rxvt_parse_key(seq, seq_length - 1, &key);
+            EXPECT_EQ(parsed_length, -1);
+
+            parsed_length = rxvt_parse_key(seq + 1, seq_length - 2, &key);
+            EXPECT_EQ(parsed_length, -1);
         }
     }
 
