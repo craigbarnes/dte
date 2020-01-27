@@ -40,6 +40,10 @@ bool term_mode_init(void)
 
 static void xtcsetattr(const struct termios *t)
 {
+    if (unlikely(!initialized)) {
+        return;
+    }
+
     int ret;
     do {
         ret = tcsetattr(STDIN_FILENO, TCSANOW, t);
@@ -52,21 +56,15 @@ static void xtcsetattr(const struct termios *t)
 
 void term_raw(void)
 {
-    if (initialized) {
-        xtcsetattr(&raw);
-    }
+    xtcsetattr(&raw);
 }
 
 void term_raw_isig(void)
 {
-    if (initialized) {
-        xtcsetattr(&raw_isig);
-    }
+    xtcsetattr(&raw_isig);
 }
 
 void term_cooked(void)
 {
-    if (initialized) {
-        xtcsetattr(&cooked);
-    }
+    xtcsetattr(&cooked);
 }
