@@ -146,15 +146,15 @@ View *window_find_view(Window *w, Buffer *b)
     return NULL;
 }
 
-View *window_find_unclosable_view(Window *w, bool (*can_close)(const View *))
+View *window_find_unclosable_view(Window *w)
 {
     // Check active view first
-    if (w->view != NULL && !can_close(w->view)) {
+    if (w->view != NULL && !view_can_close(w->view)) {
         return w->view;
     }
     for (size_t i = 0, n = w->views.count; i < n; i++) {
         View *v = w->views.ptrs[i];
-        if (!can_close(v)) {
+        if (!view_can_close(v)) {
             return v;
         }
     }

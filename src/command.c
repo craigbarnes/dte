@@ -1871,7 +1871,7 @@ static void cmd_wclose(const CommandArgs *a)
 {
     bool force = has_flag(a, 'f');
     bool prompt = has_flag(a, 'p');
-    View *v = window_find_unclosable_view(window, view_can_close);
+    View *v = window_find_unclosable_view(window);
     if (v && !force) {
         set_view(v);
         if (prompt) {
