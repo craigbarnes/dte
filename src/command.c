@@ -1801,12 +1801,7 @@ static void cmd_title(const CommandArgs *a)
 
     free(buffer->display_filename);
     buffer->display_filename = xstrdup(a->args[0]);
-
-    // Mark all windows containing buffer for a tabbar redraw
-    for (size_t i = 0, n = buffer->views.count; i < n; i++) {
-        const View *v = buffer->views.ptrs[i];
-        v->window->update_tabbar = true;
-    }
+    mark_buffer_tabbars_changed(buffer);
 }
 
 static void cmd_toggle(const CommandArgs *a)
