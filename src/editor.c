@@ -1,6 +1,8 @@
+#include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "editor.h"
 #include "buffer.h"
@@ -90,6 +92,11 @@ void init_editor_state(void)
     setlocale(LC_CTYPE, "");
     editor.charset = encoding_from_name(nl_langinfo(CODESET));
     editor.term_utf8 = (editor.charset.type == UTF8);
+
+    // Allow child processes to detect that they're running under dte
+    if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
+        fatal_error("setenv", errno);
+    }
 }
 
 static void sanity_check(void)

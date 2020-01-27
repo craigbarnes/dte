@@ -1543,11 +1543,17 @@ static void cmd_set(const CommandArgs *a)
 
 static void cmd_setenv(const CommandArgs *a)
 {
-    char **args = a->args;
-    if (setenv(args[0], args[1], 1) < 0) {
+    const char *name = a->args[0];
+    const char *value = a->args[1];
+    if (streq(name, "DTE_VERSION")) {
+        error_msg("$DTE_VERSION cannot be changed");
+        return;
+    }
+
+    if (setenv(name, value, true) != 0) {
         switch (errno) {
         case EINVAL:
-            error_msg("Invalid environment variable name '%s'", args[0]);
+            error_msg("Invalid environment variable name '%s'", name);
             break;
         default:
             perror_msg("setenv");

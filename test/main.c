@@ -1,6 +1,7 @@
 #include <langinfo.h>
 #include <limits.h>
 #include <locale.h>
+#include <stdlib.h>
 #include <string.h>
 #include "test.h"
 #include "../src/bind.h"
@@ -81,6 +82,10 @@ int main(void)
 {
     test_posix_sanity();
     init_editor_state();
+
+    const char *ver = getenv("DTE_VERSION");
+    EXPECT_NONNULL(ver);
+    EXPECT_STREQ(ver, editor.version);
 
     test_command();
     test_editorconfig();
