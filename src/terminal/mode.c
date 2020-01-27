@@ -32,6 +32,7 @@ bool term_mode_init(void)
     // Set up raw+ISIG mode
     raw_isig = raw;
     raw_isig.c_lflag |= ISIG;
+    raw_isig.c_cc[VSUSP] = _POSIX_VDISABLE;
 
     initialized = true;
     return true;
