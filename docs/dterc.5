@@ -187,7 +187,7 @@ External Commands:
 .br
    \fBeval\fR \fIcommand\fR [\fIparameter\fR]...
 .br
-   \fBexec\-open\fR [\fB\-q\fR] \fIcommand\fR [\fIparameter\fR]...
+   \fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
 .P
 Other Commands:
@@ -1437,13 +1437,13 @@ Run external \fIcommand\fR and execute its standard output text as dterc
 commands.
 .P
 .RE
-\fBexec\-open\fR [\fB\-q\fR] \fIcommand\fR [\fIparameter\fR]...
+\fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
 Run external \fIcommand\fR and open all filenames listed on its standard
 output.
 .P
 .TP
-\fB\-q\fR
+\fB\-s\fR
 Don't yield terminal control to the child process
 .PP
 Example uses:

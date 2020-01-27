@@ -908,12 +908,12 @@ See also: `errorfmt` and `msg` commands.
 Run external _command_ and execute its standard output text as dterc
 commands.
 
-### **exec-open** [**-q**] _command_ [_parameter_]...
+### **exec-open** [**-s**] _command_ [_parameter_]...
 
 Run external _command_ and open all filenames listed on its standard
 output.
 
-`-q`
+`-s`
 :   Don't yield terminal control to the child process
 
 Example uses:
