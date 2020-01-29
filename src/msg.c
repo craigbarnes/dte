@@ -12,20 +12,6 @@ static PointerArray file_locations = PTR_ARRAY_INIT;
 static PointerArray msgs = PTR_ARRAY_INIT;
 static size_t msg_pos;
 
-FileLocation *file_location_create (
-    const char *filename,
-    unsigned long buffer_id,
-    unsigned long line,
-    unsigned long column
-) {
-    FileLocation *loc = xnew0(FileLocation, 1);
-    loc->filename = filename ? xstrdup(filename) : NULL;
-    loc->buffer_id = buffer_id;
-    loc->line = line;
-    loc->column = column;
-    return loc;
-}
-
 void file_location_free(FileLocation *loc)
 {
     free(loc->filename);
@@ -204,6 +190,28 @@ void activate_prev_message(void)
         msg_pos--;
     }
     activate_current_message();
+}
+
+void activate_current_message_save(void)
+{
+    const char *filename = view->buffer->abs_filename;
+    FileLocation *loc = xmalloc(sizeof(*loc));
+    *loc = (FileLocation) {
+        .filename = filename ? xstrdup(filename) : NULL,
+        .buffer_id = view->buffer->id,
+        .line = view->cy + 1,
+        .column = view->cx_char + 1
+    };
+
+    BlockIter save = view->cursor;
+    activate_current_message();
+
+    // Save position if file changed or cursor moved
+    if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
+        push_file_location(loc);
+    } else {
+        file_location_free(loc);
+    }
 }
 
 void clear_messages(void)

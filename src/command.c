@@ -91,26 +91,6 @@ static void handle_select_chars_or_lines_flags(const CommandArgs *a)
     do_selection(sel);
 }
 
-// Go to compiler error saving position if file changed or cursor moved
-static void activate_current_message_save(void)
-{
-    FileLocation *loc = file_location_create (
-        view->buffer->abs_filename,
-        view->buffer->id,
-        view->cy + 1,
-        view->cx_char + 1
-    );
-
-    BlockIter save = view->cursor;
-
-    activate_current_message();
-    if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
-        push_file_location(loc);
-    } else {
-        file_location_free(loc);
-    }
-}
-
 static void cmd_alias(const CommandArgs *a)
 {
     add_alias(a->args[0], a->args[1]);
