@@ -3,12 +3,12 @@ local Buffer = {}
 Buffer.__index = Buffer
 
 function Buffer:write(...)
-    local length = self.length
+    local n = self.n
     for i = 1, select("#", ...) do
-        length = length + 1
-        self[length] = select(i, ...)
+        n = n + 1
+        self[n] = select(i, ...)
     end
-    self.length = length
+    self.n = n
 end
 
 function Buffer:tostring()
@@ -16,7 +16,7 @@ function Buffer:tostring()
 end
 
 local function new_buffer()
-    return setmetatable({length = 0}, Buffer)
+    return setmetatable({n = 0}, Buffer)
 end
 
 setmetatable(Buffer, {__call = new_buffer})
@@ -190,25 +190,25 @@ setmetatable(_G, {
     end
 })
 
---[[ Not implemented:
-
-function Subscript(s)
-function Superscript(s)
-function SmallCaps(s)
-function Strikeout(s)
-function Image(s, src, tit, attr)
-function InlineMath(s)
-function DisplayMath(s)
-function Note(s)
-function Span(s, attr)
-function RawInline(format, str)
-function Table(caption, aligns, widths, headers, rows)
-function BlockQuote(s)
-function HorizontalRule()
-function LineBlock(ls)
-function CaptionedImage(src, tit, caption, attr)
-function RawBlock(output_format, str)
-function Div(s, attr)
-function Cite(s, cs)
-function DoubleQuoted(s)
+--[[
+Not implemented:
+* Subscript(s)
+* Superscript(s)
+* SmallCaps(s)
+* Strikeout(s)
+* Image(s, src, title, attr)
+* InlineMath(s)
+* DisplayMath(s)
+* Note(s)
+* Span(s, attr)
+* RawInline(format, str)
+* Table(caption, aligns, widths, headers, rows)
+* BlockQuote(s)
+* HorizontalRule()
+* LineBlock(ls)
+* CaptionedImage(src, title, caption, attr)
+* RawBlock(output_format, str)
+* Div(s, attr)
+* Cite(s, cs)
+* DoubleQuoted(s)
 --]]
