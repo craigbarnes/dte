@@ -307,25 +307,16 @@ View *window_open_new_file(Window *w)
     return v;
 }
 
-/*
-If window contains only one buffer and it is untouched then it will be
-closed after opening another file. This is done because closing last
-buffer causes an empty buffer to be opened (window must contain at least
-one buffer).
-*/
-static bool is_useless_empty_view(View *v)
+// If window contains only one untouched buffer it'll be closed after
+// opening another file. This is done because closing the last buffer
+// causes an empty buffer to be opened (windows must contain at least
+// one buffer).
+static bool is_useless_empty_view(const View *v)
 {
-    if (v == NULL) {
+    if (v == NULL || v->window->views.count != 1) {
         return false;
     }
-    if (v->window->views.count != 1) {
-        return false;
-    }
-    // Touched?
-    if (
-        v->buffer->abs_filename != NULL
-        || v->buffer->change_head.nr_prev != 0
-    ) {
+    if (v->buffer->abs_filename || v->buffer->change_head.nr_prev != 0) {
         return false;
     }
     return true;
