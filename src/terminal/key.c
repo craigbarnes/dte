@@ -31,7 +31,6 @@ static const char special_names[][8] = {
     "F11",
     "F12",
 };
-static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
 
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
@@ -110,6 +109,7 @@ bool parse_key_string(KeyCode *key, const char *str)
         return true;
     }
 
+    static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
     for (i = 0; i < NR_SPECIAL_KEYS; i++) {
         if (ascii_streq_icase(str, special_names[i])) {
             *key = modifiers | (KEY_SPECIAL_MIN + i);

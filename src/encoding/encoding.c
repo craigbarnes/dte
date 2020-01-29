@@ -13,8 +13,6 @@ static const char encoding_names[][16] = {
     [UTF32LE] = "UTF-32LE",
 };
 
-static_assert(ARRAY_COUNT(encoding_names) == NR_ENCODING_TYPES - 1);
-
 static const struct {
     const char alias[8];
     EncodingType encoding;
@@ -38,6 +36,7 @@ static const struct {
 
 EncodingType lookup_encoding(const char *name)
 {
+    static_assert(ARRAY_COUNT(encoding_names) == NR_ENCODING_TYPES - 1);
     for (size_t i = 0; i < ARRAY_COUNT(encoding_names); i++) {
         if (ascii_streq_icase(name, encoding_names[i])) {
             return (EncodingType) i;
