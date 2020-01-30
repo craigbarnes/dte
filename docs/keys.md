@@ -59,10 +59,10 @@ Default Key Bindings
 :   Find previous
 
 `Alt`+`f`
-:   Find next occurence of word under cursor
+:   Find next occurrence of word under cursor
 
 `Alt`+`Shift`+`f`
-:   Find previous occurence of word under cursor
+:   Find previous occurrence of word under cursor
 
 ### Selection
 

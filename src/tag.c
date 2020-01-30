@@ -52,11 +52,11 @@ static int visibility_cmp(const Tag *a, const Tag *b)
         if (b->local && b_this_file) {
             return 0;
         }
-        // a is more interesting bacause it is local symbol
+        // a is more interesting because it is local symbol
         return -1;
     }
     if (b->local && b_this_file) {
-        // b is more interesting bacause it is local symbol
+        // b is more interesting because it is local symbol
         return 1;
     }
     return 0;

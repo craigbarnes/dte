@@ -1110,7 +1110,7 @@ Set to `0` to disable.
 
 Width of vertical tab bar. Note that width of tab bar is
 automatically reduced to keep editing area at least 80
-characters wide. Vertical tab bar is shown only if there's
+columns wide. Vertical tab bar is shown only if there's
 enough space.
 
 ## Local options

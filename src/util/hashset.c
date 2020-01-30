@@ -18,7 +18,7 @@ void hashset_init(HashSet *set, size_t size, bool icase)
         size = 8;
     }
 
-    // Accomodate the 75% load factor in the table size, to allow filling
+    // Accommodate the 75% load factor in the table size, to allow filling
     // the set to the requested size without needing to rehash()
     size += size / 3;
 

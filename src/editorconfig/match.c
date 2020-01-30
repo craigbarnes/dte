@@ -67,7 +67,7 @@ static size_t handle_bracket_expression(const char *pat, size_t len, String *buf
     }
 
     // TODO: interpret characters according to editorconfig instead
-    // of just copying the bracket expression to be interpretted as
+    // of just copying the bracket expression to be interpreted as
     // regex
 
     string_append_byte(buf, '[');
