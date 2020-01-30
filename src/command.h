@@ -29,8 +29,8 @@ typedef struct {
 
 typedef enum {
     CMDERR_NONE,
-    CMDERR_UNCLOSED_SINGLE_QUOTE,
-    CMDERR_UNCLOSED_DOUBLE_QUOTE,
+    CMDERR_UNCLOSED_SQUOTE,
+    CMDERR_UNCLOSED_DQUOTE,
     CMDERR_UNEXPECTED_EOF,
 } CommandParseError;
 
@@ -44,7 +44,7 @@ static inline int command_cmp(const void *key, const void *elem)
 // command-parse.c
 char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
-bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err);
+CommandParseError parse_commands(PointerArray *array, const char *cmd);
 const char *command_parse_error_to_string(CommandParseError err);
 
 // command-run.c

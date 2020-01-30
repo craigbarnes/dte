@@ -114,18 +114,16 @@ static void test_parse_command_arg(void)
 static void test_parse_commands(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = 0;
-    EXPECT_TRUE(parse_commands(&array, " left  -c;;", &err));
+    EXPECT_EQ(parse_commands(&array, " left  -c;;"), CMDERR_NONE);
     EXPECT_EQ(array.count, 5);
     EXPECT_STREQ(array.ptrs[0], "left");
     EXPECT_STREQ(array.ptrs[1], "-c");
     EXPECT_NULL(array.ptrs[2]);
     EXPECT_NULL(array.ptrs[3]);
     EXPECT_NULL(array.ptrs[4]);
-    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
-    EXPECT_TRUE(parse_commands(&array, "save -e UTF-8 file.c; close -q", &err));
+    EXPECT_EQ(parse_commands(&array, "save -e UTF-8 file.c; close -q"), CMDERR_NONE);
     EXPECT_EQ(array.count, 8);
     EXPECT_STREQ(array.ptrs[0], "save");
     EXPECT_STREQ(array.ptrs[1], "-e");
@@ -135,40 +133,30 @@ static void test_parse_commands(void)
     EXPECT_STREQ(array.ptrs[5], "close");
     EXPECT_STREQ(array.ptrs[6], "-q");
     EXPECT_NULL(array.ptrs[7]);
-    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
-    EXPECT_TRUE(parse_commands(&array, "\n ; ; \t\n ", &err));
+    EXPECT_EQ(parse_commands(&array, "\n ; ; \t\n "), CMDERR_NONE);
     EXPECT_EQ(array.count, 3);
     EXPECT_NULL(array.ptrs[0]);
     EXPECT_NULL(array.ptrs[1]);
     EXPECT_NULL(array.ptrs[2]);
-    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
-    EXPECT_TRUE(parse_commands(&array, "", &err));
+    EXPECT_EQ(parse_commands(&array, ""), CMDERR_NONE);
     EXPECT_EQ(array.count, 1);
     EXPECT_NULL(array.ptrs[0]);
-    EXPECT_EQ(err, 0);
     ptr_array_free(&array);
 
-    EXPECT_FALSE(parse_commands(&array, "insert '... ", &err));
-    EXPECT_EQ(err, CMDERR_UNCLOSED_SINGLE_QUOTE);
+    EXPECT_EQ(parse_commands(&array, "insert '... "), CMDERR_UNCLOSED_SQUOTE);
     ptr_array_free(&array);
 
-    err = 0;
-    EXPECT_FALSE(parse_commands(&array, "insert \" ", &err));
-    EXPECT_EQ(err, CMDERR_UNCLOSED_DOUBLE_QUOTE);
+    EXPECT_EQ(parse_commands(&array, "insert \" "), CMDERR_UNCLOSED_DQUOTE);
     ptr_array_free(&array);
 
-    err = 0;
-    EXPECT_FALSE(parse_commands(&array, "insert \"\\\" ", &err));
-    EXPECT_EQ(err, CMDERR_UNCLOSED_DOUBLE_QUOTE);
+    EXPECT_EQ(parse_commands(&array, "insert \"\\\" "), CMDERR_UNCLOSED_DQUOTE);
     ptr_array_free(&array);
 
-    err = 0;
-    EXPECT_FALSE(parse_commands(&array, "insert \\", &err));
-    EXPECT_EQ(err, CMDERR_UNEXPECTED_EOF);
+    EXPECT_EQ(parse_commands(&array, "insert \\"), CMDERR_UNEXPECTED_EOF);
     ptr_array_free(&array);
 }
 
@@ -176,8 +164,7 @@ static void test_parse_args(void)
 {
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
     PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = 0;
-    ASSERT_TRUE(parse_commands(&array, cmd_str, &err));
+    ASSERT_EQ(parse_commands(&array, cmd_str), CMDERR_NONE);
     ASSERT_EQ(array.count, 8);
 
     const Command *cmd = find_normal_command(array.ptrs[0]);

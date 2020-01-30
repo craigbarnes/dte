@@ -75,8 +75,7 @@ static KeyBinding *key_binding_new(const char *cmd_str)
     memcpy(b->cmd_str, cmd_str, cmd_str_len + 1);
 
     PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = 0;
-    if (!parse_commands(&array, cmd_str, &err)) {
+    if (parse_commands(&array, cmd_str) != CMDERR_NONE) {
         goto out;
     }
 
@@ -232,7 +231,7 @@ String dump_bindings(void)
         append_lookup_table_binding(&buf, MOD_META | k);
     }
 
-    static_assert(MOD_SHIFT == (1 << 24));
+    static_assert((MOD_MASK >> 24) == 7);
     for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << 24) {
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             append_lookup_table_binding(&buf, modifiers | k);

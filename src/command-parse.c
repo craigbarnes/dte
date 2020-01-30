@@ -194,7 +194,7 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
                     break;
                 }
                 if (cmd[pos] == '\0') {
-                    *err = CMDERR_UNCLOSED_SINGLE_QUOTE;
+                    *err = CMDERR_UNCLOSED_SQUOTE;
                     return 0;
                 }
                 pos++;
@@ -207,7 +207,7 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
                     break;
                 }
                 if (cmd[pos] == '\0') {
-                    *err = CMDERR_UNCLOSED_DOUBLE_QUOTE;
+                    *err = CMDERR_UNCLOSED_DQUOTE;
                     return 0;
                 }
                 if (cmd[pos++] == '\\') {
@@ -230,6 +230,7 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
         case '\r':
         case ' ':
         case ';':
+            *err = CMDERR_NONE;
             return pos - 1;
         }
     }
@@ -239,10 +240,9 @@ unexpected_eof:
     return 0;
 }
 
-bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err)
+CommandParseError parse_commands(PointerArray *array, const char *cmd)
 {
     size_t pos = 0;
-
     while (1) {
         while (ascii_isspace(cmd[pos])) {
             pos++;
@@ -258,23 +258,24 @@ bool parse_commands(PointerArray *array, const char *cmd, CommandParseError *err
             continue;
         }
 
-        size_t end = find_end(cmd, pos, err);
-        if (*err != CMDERR_NONE) {
-            return false;
+        CommandParseError err;
+        size_t end = find_end(cmd, pos, &err);
+        if (err != CMDERR_NONE) {
+            return err;
         }
 
         ptr_array_append(array, parse_command_arg(cmd + pos, end - pos, true));
         pos = end;
     }
     ptr_array_append(array, NULL);
-    return true;
+    return CMDERR_NONE;
 }
 
 const char *command_parse_error_to_string(CommandParseError err)
 {
     static const char error_strings[][16] = {
-        [CMDERR_UNCLOSED_SINGLE_QUOTE] = "unclosed '",
-        [CMDERR_UNCLOSED_DOUBLE_QUOTE] = "unclosed \"",
+        [CMDERR_UNCLOSED_SQUOTE] = "unclosed '",
+        [CMDERR_UNCLOSED_DQUOTE] = "unclosed \"",
         [CMDERR_UNEXPECTED_EOF] = "unexpected EOF",
     };
     BUG_ON(err <= CMDERR_NONE);

@@ -51,16 +51,16 @@ void run_command(const CommandSet *cmds, char **av)
 {
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
-        PointerArray array = PTR_ARRAY_INIT;
         const char *alias_name = av[0];
         const char *alias_value = find_alias(alias_name);
-        CommandParseError err = 0;
-
         if (alias_value == NULL) {
             error_msg("No such command or alias: %s", alias_name);
             return;
         }
-        if (!parse_commands(&array, alias_value, &err)) {
+
+        PointerArray array = PTR_ARRAY_INIT;
+        CommandParseError err = parse_commands(&array, alias_value);
+        if (err != CMDERR_NONE) {
             const char *err_msg = command_parse_error_to_string(err);
             error_msg("Parsing alias %s: %s", alias_name, err_msg);
             ptr_array_free(&array);
@@ -129,9 +129,9 @@ void run_commands(const CommandSet *cmds, const PointerArray *array)
 
 void handle_command(const CommandSet *cmds, const char *cmd)
 {
-    CommandParseError err = 0;
     PointerArray array = PTR_ARRAY_INIT;
-    if (parse_commands(&array, cmd, &err)) {
+    CommandParseError err = parse_commands(&array, cmd);
+    if (err == CMDERR_NONE) {
         run_commands(cmds, &array);
     } else {
         const char *str = command_parse_error_to_string(err);

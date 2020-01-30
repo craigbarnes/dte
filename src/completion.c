@@ -361,9 +361,9 @@ static void init_completion(void)
             continue;
         }
 
-        CommandParseError err = 0;
+        CommandParseError err;
         size_t end = find_end(cmd, pos, &err);
-        if (err || end >= editor.cmdline.pos) {
+        if (err != CMDERR_NONE || end >= editor.cmdline.pos) {
             completion_pos = pos;
             break;
         }
@@ -374,7 +374,7 @@ static void init_completion(void)
 
             if (value) {
                 size_t save = array.count;
-                if (!parse_commands(&array, value, &err)) {
+                if (parse_commands(&array, value) != CMDERR_NONE) {
                     for (size_t i = save; i < array.count; i++) {
                         free(array.ptrs[i]);
                         array.ptrs[i] = NULL;
