@@ -306,7 +306,9 @@ static void collect_completions(char **args, size_t argc)
         return;
     }
     if (strview_equal_cstring(&cmd_name, "show")) {
-        static const char opts[][8] = {"alias", "bind", "color", "option"};
+        static const char opts[][8] = {
+            "alias", "bind", "color", "option", "wsplit"
+        };
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
         const char *arg1;
         switch (nonflag_argc) {
@@ -325,6 +327,10 @@ static void collect_completions(char **args, size_t argc)
                 collect_hl_colors(completion.parsed);
             } else if (streq(arg1, "option")) {
                 collect_options(completion.parsed);
+            } else if (streq(arg1, "wsplit")) {
+                if (str_has_prefix("this", completion.parsed)) {
+                    add_completion(xstrdup("this"));
+                }
             }
             break;
         }

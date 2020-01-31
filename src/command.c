@@ -1635,14 +1635,34 @@ static void show_option(const char *name, bool write_to_cmdline)
     }
 }
 
+static void show_wsplit(const char *name, bool write_to_cmdline)
+{
+    if (!streq(name, "this")) {
+        error_msg("invalid window: %s", name);
+        return;
+    }
+
+    const Window *w = window;
+    char buf[128];
+    xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
+
+    if (write_to_cmdline) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, buf);
+    } else {
+        info_msg("current window dimensions: %s", buf);
+    }
+}
+
 static void cmd_show(const CommandArgs *a)
 {
-    enum {CMD_ALIAS, CMD_BIND, CMD_COLOR, CMD_OPTION};
+    enum {CMD_ALIAS, CMD_BIND, CMD_COLOR, CMD_OPTION, CMD_WSPLIT};
     static const char types[][8] = {
         [CMD_ALIAS] = "alias",
         [CMD_BIND] = "bind",
         [CMD_COLOR] = "color",
         [CMD_OPTION] = "option",
+        [CMD_WSPLIT] = "wsplit",
     };
 
     int cmdtype = -1;
@@ -1673,6 +1693,9 @@ static void cmd_show(const CommandArgs *a)
         case CMD_OPTION:
             show_option(str, cflag);
             break;
+        case CMD_WSPLIT:
+            show_wsplit(str, cflag);
+            break;
         }
         return;
     }
@@ -1702,6 +1725,9 @@ static void cmd_show(const CommandArgs *a)
         break;
     case CMD_OPTION:
         s = dump_options();
+        break;
+    case CMD_WSPLIT:
+        s = dump_frames();
         break;
     }
 

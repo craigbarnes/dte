@@ -418,11 +418,9 @@ Frame *split_frame(Window *w, bool vertical, bool before)
 // Doesn't really split root but adds new frame between root and its contents
 Frame *split_root(bool vertical, bool before)
 {
-    Frame *new_root, *f;
-
-    new_root = new_frame();
+    Frame *new_root = new_frame();
     new_root->vertical = vertical;
-    f = new_frame();
+    Frame *f = new_frame();
     f->parent = new_root;
     f->window = new_window();
     f->window->frame = f;
@@ -456,7 +454,6 @@ static void free_frame(Frame *f)
 void remove_frame(Frame *f)
 {
     Frame *parent = f->parent;
-
     if (parent == NULL) {
         free_frame(f);
         return;
@@ -488,33 +485,47 @@ void remove_frame(Frame *f)
     update_window_coordinates();
 }
 
+static void string_append_frame(String *str, const Frame *f, int level)
+{
+    string_sprintf(str, "%*s%dx%d", level * 4, "", f->w, f->h);
+
+    const Window *w = f->window;
+    if (w) {
+        string_sprintf (
+            str, "\n%*s%d,%d %dx%d %s\n",
+            (level + 1) * 4, "",
+            w->x, w->y,
+            w->w, w->h,
+            w->view->buffer->display_filename
+        );
+        return;
+    }
+
+    string_append_cstring(str, f->vertical ? " V" : " H");
+    string_append_cstring(str, f->equal_size ? "\n" : " !\n");
+
+    const size_t n = f->frames.count;
+    BUG_ON(n == 0);
+    for (size_t i = 0; i < n; i++) {
+        const Frame *c = f->frames.ptrs[i];
+        string_append_frame(str, c, level + 1);
+    }
+}
+
+String dump_frames(void)
+{
+    String str = string_new(4096);
+    string_append_frame(&str, root_frame, 0);
+    return str;
+}
+
 #ifdef DEBUG_FRAMES
 static void debug_frame(const Frame *f, int level)
 {
-    DEBUG_LOG (
-        "%*s%dx%d %d %d %zu\n",
-        level * 4, "",
-        f->w, f->h,
-        f->vertical, f->equal_size,
-        f->frames.count
-    );
-
-    if (f->window) {
-        DEBUG_LOG (
-            "%*swindow %d,%d %dx%d\n",
-            (level + 1) * 4, "",
-            f->window->x,
-            f->window->y,
-            f->window->w,
-            f->window->h
-        );
-    }
-
     BUG_ON(f->window && f->frames.count);
     if (f->window) {
         BUG_ON(f != f->window->frame);
     }
-
     for (size_t i = 0, n = f->frames.count; i < n; i++) {
         const Frame *c = f->frames.ptrs[i];
         BUG_ON(c->parent != f);
