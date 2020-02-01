@@ -5,7 +5,6 @@ dte Release Checklist
    1. Update `CHANGELOG.md`
    2. Hard code `VERSION` variable in `mk/build.mk` to release version
    3. Update `RELEASE_VERSIONS` in `mk/dev.mk`
-   4. Change default value of `DEBUG` to `0`
    5. Remove `-g` from default `CFLAGS`
    6. Update tarball name in `README.md`
    7. Check `make vars` output
@@ -21,4 +20,4 @@ dte Release Checklist
 
 3. Create post-release commit
    1. Update `mk/sha256sums.txt`
-   2. Reset `VERSION`, `DEBUG` and `CFLAGS`
+   2. Reset `VERSION` and `CFLAGS`

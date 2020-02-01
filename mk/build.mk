@@ -131,7 +131,7 @@ else
   # 0: Disable debugging
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 3: Enable expensive sanity checks
-  DEBUG ?= 1
+  DEBUG ?= 0
 endif
 
 ifeq "$(DEBUG)" "0"
