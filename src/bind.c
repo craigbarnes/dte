@@ -35,12 +35,8 @@ static ssize_t get_lookup_table_index(KeyCode k)
 
     if (key >= 0x20 && key <= 0x7E) {
         switch (modifiers) {
-        case MOD_CTRL:
-            return key;
-        case MOD_META:
-            return key + 128;
-        default:
-            break;
+        case MOD_CTRL: return key;
+        case MOD_META: return key + 128;
         }
     }
 
@@ -215,7 +211,7 @@ static void append_lookup_table_binding(String *buf, KeyCode key)
     const KeyBinding *b = bindings_lookup_table[i];
     if (b) {
         const char *keystr = keycode_to_string(key);
-        string_sprintf(buf, "   %-10s  %s\n", keystr, b->cmd_str);
+        string_sprintf(buf, "   %-12s  %s\n", keystr, b->cmd_str);
     }
 }
 
@@ -241,7 +237,7 @@ String dump_bindings(void)
     for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
         const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
         const char *keystr = keycode_to_string(b->key);
-        string_sprintf(&buf, "   %-10s  %s\n", keystr, b->bind->cmd_str);
+        string_sprintf(&buf, "   %-12s  %s\n", keystr, b->bind->cmd_str);
     }
 
     return buf;
