@@ -1656,18 +1656,21 @@ static void show_wsplit(const char *name, bool write_to_cmdline)
 
 static void cmd_show(const CommandArgs *a)
 {
-    enum {CMD_ALIAS, CMD_BIND, CMD_COLOR, CMD_OPTION, CMD_WSPLIT};
-    static const char types[][8] = {
-        [CMD_ALIAS] = "alias",
-        [CMD_BIND] = "bind",
-        [CMD_COLOR] = "color",
-        [CMD_OPTION] = "option",
-        [CMD_WSPLIT] = "wsplit",
+    static const struct {
+        const char name[8];
+        void (*show)(const char *name, bool cmdline);
+        String (*dump)(void);
+    } handlers[] = {
+        {"alias", show_alias, dump_aliases},
+        {"bind", show_binding, dump_bindings},
+        {"color", show_color, dump_hl_colors},
+        {"option", show_option, dump_options},
+        {"wsplit", show_wsplit, dump_frames},
     };
 
-    int cmdtype = -1;
-    for (int i = 0; i < ARRAY_COUNT(types); i++) {
-        if (streq(a->args[0], types[i])) {
+    ssize_t cmdtype = -1;
+    for (ssize_t i = 0; i < ARRAY_COUNT(handlers); i++) {
+        if (streq(a->args[0], handlers[i].name)) {
             cmdtype = i;
             break;
         }
@@ -1679,27 +1682,9 @@ static void cmd_show(const CommandArgs *a)
 
     const bool cflag = a->nr_flags != 0;
     if (a->nr_args == 2) {
-        const char *str = a->args[1];
-        switch (cmdtype) {
-        case CMD_ALIAS:
-            show_alias(str, cflag);
-            break;
-        case CMD_BIND:
-            show_binding(str, cflag);
-            break;
-        case CMD_COLOR:
-            show_color(str, cflag);
-            break;
-        case CMD_OPTION:
-            show_option(str, cflag);
-            break;
-        case CMD_WSPLIT:
-            show_wsplit(str, cflag);
-            break;
-        }
+        handlers[cmdtype].show(a->args[1], cflag);
         return;
     }
-
     if (cflag) {
         error_msg("\"show -c\" requires 2 arguments");
         return;
@@ -1712,25 +1697,7 @@ static void cmd_show(const CommandArgs *a)
         return;
     }
 
-    String s;
-    switch (cmdtype) {
-    case CMD_ALIAS:
-        s = dump_aliases();
-        break;
-    case CMD_BIND:
-        s = dump_bindings();
-        break;
-    case CMD_COLOR:
-        s = dump_hl_colors();
-        break;
-    case CMD_OPTION:
-        s = dump_options();
-        break;
-    case CMD_WSPLIT:
-        s = dump_frames();
-        break;
-    }
-
+    String s = handlers[cmdtype].dump();
     ssize_t rc = xwrite(fd, s.buffer, s.len);
     int err = errno;
     close(fd);
