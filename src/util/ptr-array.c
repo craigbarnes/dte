@@ -59,12 +59,6 @@ size_t ptr_array_idx(const PointerArray *array, const void *ptr)
     return -1;
 }
 
-void *ptr_array_rel(const PointerArray *array, const void *ptr, size_t offset)
-{
-    size_t i = ptr_array_idx(array, ptr);
-    return array->ptrs[(i + offset + array->count) % array->count];
-}
-
 // Trim all leading NULLs and all but one trailing NULL (if any)
 void ptr_array_trim_nulls(PointerArray *array)
 {

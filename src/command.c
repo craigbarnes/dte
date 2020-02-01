@@ -678,7 +678,10 @@ static void cmd_new_line(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_next(const CommandArgs* UNUSED_ARG(a))
 {
-    set_view(ptr_array_next(&window->views, view));
+    size_t i = ptr_array_idx(&window->views, view);
+    size_t n = window->views.count;
+    BUG_ON(i >= n);
+    set_view(window->views.ptrs[(i + 1) % n]);
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -974,7 +977,10 @@ static void cmd_pipe_to(const CommandArgs *a)
 
 static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 {
-    set_view(ptr_array_prev(&window->views, view));
+    size_t i = ptr_array_idx(&window->views, view);
+    size_t n = window->views.count;
+    BUG_ON(i >= n);
+    set_view(window->views.ptrs[(i ? i : n) - 1]);
 }
 
 static void cmd_quit(const CommandArgs *a)

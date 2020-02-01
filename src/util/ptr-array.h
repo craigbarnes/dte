@@ -39,18 +39,6 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
     array->alloc = capacity;
 }
 
-NONNULL_ARG(1)
-static inline void *ptr_array_next(const PointerArray *array, const void *ptr)
-{
-    return ptr_array_rel(array, ptr, 1);
-}
-
-NONNULL_ARG(1)
-static inline void *ptr_array_prev(const PointerArray *array, const void *ptr)
-{
-    return ptr_array_rel(array, ptr, -1);
-}
-
 // Free each pointer and then free the array.
 NONNULL_ARGS
 static inline void ptr_array_free(PointerArray *array)
