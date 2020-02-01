@@ -519,7 +519,7 @@ String dump_frames(void)
     return str;
 }
 
-#ifdef DEBUG_FRAMES
+#if DEBUG >= 1
 static void debug_frame(const Frame *f, int level)
 {
     BUG_ON(f->window && f->frames.count);

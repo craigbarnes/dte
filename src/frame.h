@@ -38,7 +38,7 @@ Frame *split_root(bool vertical, bool before);
 void remove_frame(Frame *f);
 String dump_frames(void);
 
-#ifdef DEBUG_FRAMES
+#if DEBUG >= 1
   void debug_frames(void);
 #else
   static inline void debug_frames(void) {}
