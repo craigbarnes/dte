@@ -54,7 +54,7 @@ const char *buffer_filename(const Buffer *b)
 
 Buffer *buffer_new(const Encoding *encoding)
 {
-    static unsigned int id;
+    static unsigned long id;
 
     Buffer *b = xnew0(Buffer, 1);
     list_init(&b->blocks);

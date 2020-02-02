@@ -427,7 +427,7 @@ char status_prompt(const char *question, const char *choices)
 
 typedef struct {
     bool is_modified;
-    unsigned int id;
+    unsigned long id;
     long cy;
     long vx;
     long vy;
