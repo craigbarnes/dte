@@ -206,24 +206,6 @@ void remove_view(View *v)
     free(v);
 }
 
-void window_close_current(void)
-{
-    if (window->frame->parent == NULL) {
-        // Don't close last window
-        window_remove_views(window);
-        set_view(window_open_empty_buffer(window));
-        return;
-    }
-
-    Window *next = next_window(window);
-    remove_frame(window->frame);
-    window = NULL;
-    set_view(next->view);
-
-    mark_everything_changed();
-    debug_frames();
-}
-
 void window_close_current_view(Window *w)
 {
     size_t idx = ptr_array_idx(&w->views, w->view);
@@ -570,4 +552,27 @@ Window *next_window(Window *w)
     for_each_window_data(find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.next ? data.next : data.first;
+}
+
+void window_close_current(void)
+{
+    if (window->frame->parent == NULL) {
+        // Don't close last window
+        window_remove_views(window);
+        set_view(window_open_empty_buffer(window));
+        return;
+    }
+
+    WindowCallbackData data = {.target = window};
+    for_each_window_data(find_prev_and_next, &data);
+    BUG_ON(!data.found);
+    Window *next_or_prev = data.next ? data.next : data.prev;
+    BUG_ON(!next_or_prev);
+
+    remove_frame(window->frame);
+    window = NULL;
+    set_view(next_or_prev->view);
+
+    mark_everything_changed();
+    debug_frames();
 }
