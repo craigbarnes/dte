@@ -83,8 +83,8 @@ typedef struct {
     unsigned int tab_bar_max_components;
     unsigned int tab_bar_width;
     unsigned int crlf_newlines; // Default value for new files
-    SearchCaseSensitivity case_sensitive_search;
-    TabBarMode tab_bar;
+    unsigned int case_sensitive_search;
+    unsigned int tab_bar;
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;
