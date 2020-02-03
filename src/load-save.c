@@ -116,12 +116,12 @@ static int decode_and_add_blocks (
     size_t len;
     if (file_decoder_read_line(dec, &line, &len)) {
         if (len && line[len - 1] == '\r') {
-            b->newline = NEWLINE_DOS;
+            b->crlf_newlines = true;
             len--;
         }
         Block *blk = add_utf8_line(b, NULL, line, len);
         while (file_decoder_read_line(dec, &line, &len)) {
-            if (b->newline == NEWLINE_DOS && len && line[len - 1] == '\r') {
+            if (b->crlf_newlines && len && line[len - 1] == '\r') {
                 len--;
             }
             blk = add_utf8_line(b, blk, line, len);
@@ -336,7 +336,7 @@ int save_buffer (
     Buffer *b,
     const char *filename,
     const Encoding *encoding,
-    LineEndingType newline
+    bool crlf
 ) {
     FileEncoder *enc;
     int fd = -1;
@@ -380,7 +380,7 @@ int save_buffer (
         }
     }
 
-    enc = new_file_encoder(encoding, newline, fd);
+    enc = new_file_encoder(encoding, crlf, fd);
     if (enc == NULL) {
         // This should never happen because encoding is validated early
         perror_msg("iconv_open");

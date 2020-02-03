@@ -37,8 +37,7 @@ typedef struct Buffer {
     bool readonly;
     bool locked;
     bool setup;
-
-    LineEndingType newline;
+    bool crlf_newlines;
 
     // Encoding of the file. Buffer always contains UTF-8.
     Encoding encoding;

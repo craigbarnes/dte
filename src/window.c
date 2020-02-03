@@ -187,7 +187,6 @@ void remove_view(View *v)
     if (v == w->prev_view) {
         w->prev_view = NULL;
     }
-    // FIXME: globals
     if (v == view) {
         view = NULL;
         buffer = NULL;

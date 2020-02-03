@@ -1135,7 +1135,7 @@ static void cmd_save(const CommandArgs *a)
     const char *requested_encoding = NULL;
     bool force = false;
     bool prompt = false;
-    LineEndingType newline = buffer->newline;
+    bool crlf = buffer->crlf_newlines;
     mode_t old_mode = buffer->st.st_mode;
     struct stat st;
     bool new_locked = false;
@@ -1143,7 +1143,7 @@ static void cmd_save(const CommandArgs *a)
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'd':
-            newline = NEWLINE_DOS;
+            crlf = true;
             break;
         case 'e':
             requested_encoding = *args++;
@@ -1155,7 +1155,7 @@ static void cmd_save(const CommandArgs *a)
             prompt = true;
             break;
         case 'u':
-            newline = NEWLINE_UNIX;
+            crlf = false;
             break;
         }
     }
@@ -1281,13 +1281,13 @@ static void cmd_save(const CommandArgs *a)
         // Allow chmod 755 etc.
         buffer->st.st_mode = st.st_mode;
     }
-    if (save_buffer(buffer, absolute, &encoding, newline)) {
+    if (save_buffer(buffer, absolute, &encoding, crlf)) {
         goto error;
     }
 
     buffer->saved_change = buffer->cur_change;
     buffer->readonly = false;
-    buffer->newline = newline;
+    buffer->crlf_newlines = crlf;
     if (requested_encoding) {
         buffer->encoding = encoding;
     }

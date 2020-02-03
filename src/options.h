@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "encoding/encoder.h"
 #include "util/string.h"
 
 enum {
@@ -83,7 +82,7 @@ typedef struct {
     unsigned int show_line_numbers;
     unsigned int tab_bar_max_components;
     unsigned int tab_bar_width;
-    LineEndingType newline; // Default value for new files
+    unsigned int crlf_newlines; // Default value for new files
     SearchCaseSensitivity case_sensitive_search;
     TabBarMode tab_bar;
     const char *statusline_left;

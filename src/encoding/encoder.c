@@ -6,10 +6,10 @@
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 
-FileEncoder *new_file_encoder(const Encoding *encoding, LineEndingType nls, int fd)
+FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
 {
     FileEncoder *enc = xnew0(FileEncoder, 1);
-    enc->nls = nls;
+    enc->crlf = crlf;
     enc->fd = fd;
 
     if (encoding->type != UTF8) {
@@ -58,7 +58,7 @@ ssize_t file_encoder_write (
     const unsigned char *buf,
     size_t size
 ) {
-    if (enc->nls == NEWLINE_DOS) {
+    if (enc->crlf) {
         size = unix_to_dos(enc, buf, size);
         buf = enc->nbuf;
     }

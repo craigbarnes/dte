@@ -152,13 +152,10 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
             break;
         }
         case 'n':
-            switch (v->buffer->newline) {
-            case NEWLINE_UNIX:
-                add_status_literal(f, "LF");
-                break;
-            case NEWLINE_DOS:
+            if (v->buffer->crlf_newlines) {
                 add_status_literal(f, "CRLF");
-                break;
+            } else {
+                add_status_literal(f, "LF");
             }
             break;
         case 's':

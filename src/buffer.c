@@ -61,7 +61,7 @@ Buffer *buffer_new(const Encoding *encoding)
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
     b->id = ++id;
-    b->newline = editor.options.newline;
+    b->crlf_newlines = editor.options.crlf_newlines;
 
     if (encoding) {
         b->encoding = *encoding;
