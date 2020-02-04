@@ -44,18 +44,18 @@ typedef enum {
 } TabBarMode;
 
 #define COMMON_OPTIONS \
-    unsigned int auto_indent; \
     unsigned int detect_indent; \
     unsigned int editorconfig; \
-    unsigned int emulate_tab; \
-    unsigned int expand_tab; \
-    unsigned int file_history; \
     unsigned int fsync; \
     unsigned int indent_width; \
-    unsigned int syntax; \
     unsigned int tab_width; \
     unsigned int text_width; \
-    unsigned int ws_error
+    unsigned int ws_error; \
+    bool auto_indent; \
+    bool emulate_tab; \
+    bool expand_tab; \
+    bool file_history; \
+    bool syntax
 
 typedef struct {
     COMMON_OPTIONS;
@@ -64,7 +64,7 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only local
-    unsigned int brace_indent;
+    bool brace_indent;
     const char *filetype;
     const char *indent_regex;
 } LocalOptions;
@@ -72,14 +72,14 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only global
-    unsigned int display_invisible;
-    unsigned int display_special;
+    bool display_invisible;
+    bool display_special;
+    bool lock_files;
+    bool set_window_title;
+    bool show_line_numbers;
     unsigned int esc_timeout;
     unsigned int filesize_limit;
-    unsigned int lock_files;
     unsigned int scroll_margin;
-    unsigned int set_window_title;
-    unsigned int show_line_numbers;
     unsigned int tab_bar_max_components;
     unsigned int tab_bar_width;
     unsigned int crlf_newlines; // Default value for new files

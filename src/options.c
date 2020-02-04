@@ -22,6 +22,7 @@ typedef enum {
     OPT_STR,
     OPT_UINT,
     OPT_ENUM,
+    OPT_BOOL,
     OPT_FLAG,
 } OptionType;
 
@@ -56,6 +57,8 @@ typedef union {
     const char *str_val;
     // OPT_UINT, OPT_ENUM, OPT_FLAG
     unsigned int uint_val;
+    // OPT_BOOL
+    bool bool_val;
 } OptionValue;
 
 typedef struct OptionOps {
@@ -107,9 +110,8 @@ typedef struct OptionOps {
     .on_change = _on_change, \
 }
 
-// Can't reuse ENUM_OPT() because of weird macro expansion rules
 #define BOOL_OPT(_name, OLG, _on_change) { \
-    .ops = &option_ops[OPT_ENUM], \
+    .ops = &option_ops[OPT_BOOL], \
     .name = _name, \
     OLG \
     .u = { .enum_opt = { \
@@ -281,6 +283,41 @@ static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionVal
     return *(unsigned int*)ptr == value.uint_val;
 }
 
+static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
+{
+    OptionValue v;
+    v.bool_val = *(bool*)ptr;
+    return v;
+}
+
+static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    *(bool*)ptr = v.bool_val;
+}
+
+static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
+{
+    if (streq(str, "true")) {
+        v->bool_val = true;
+        return true;
+    } else if (streq(str, "false")) {
+        v->bool_val = false;
+        return true;
+    }
+    error_msg("Invalid value for %s.", d->name);
+    return false;
+}
+
+static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
+{
+    return v.bool_val ? "true" : "false";
+}
+
+static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    return *(bool*)ptr == v.bool_val;
+}
+
 static bool enum_parse (
     const OptionDesc *desc,
     const char *str,
@@ -385,6 +422,7 @@ static const OptionOps option_ops[] = {
     [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals},
     [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string, uint_equals},
     [OPT_ENUM] = {uint_get, uint_set, enum_parse, enum_string, uint_equals},
+    [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
     [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
 };
 
@@ -562,7 +600,7 @@ void set_bool_option(const char *name, bool local, bool global)
     if (!desc) {
         return;
     }
-    if (!desc_is(desc, OPT_ENUM) || desc->u.enum_opt.values != bool_enum) {
+    if (!desc_is(desc, OPT_BOOL)) {
         error_msg("Option %s is not boolean.", desc->name);
         return;
     }
@@ -583,27 +621,29 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
     return desc;
 }
 
-static unsigned int toggle(unsigned int value, const char **values)
-{
-    return values[++value] ? value : 0;
-}
-
 void toggle_option(const char *name, bool global, bool verbose)
 {
     const OptionDesc *desc = find_toggle_option(name, &global);
     if (!desc) {
         return;
     }
-    if (!desc_is(desc, OPT_ENUM)) {
-        error_msg("Option %s is not toggleable.", name);
+
+    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
+    OptionValue value = desc->ops->get(desc, ptr);
+    if (desc_is(desc, OPT_ENUM)) {
+        if (desc->u.enum_opt.values[value.uint_val + 1]) {
+            value.uint_val++;
+        } else {
+            value.uint_val = 0;
+        }
+    } else if (desc_is(desc, OPT_BOOL)) {
+        value.bool_val = !value.bool_val;
+    } else {
+        error_msg("Toggling %s requires arguments", name);
         return;
     }
 
-    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
-    unsigned int ptr_val = *(unsigned int *)(void *)ptr;
-    OptionValue value = {.uint_val = toggle(ptr_val, desc->u.enum_opt.values)};
     desc_set(desc, ptr, value);
-
     if (verbose) {
         const char *str = desc->ops->string(desc, value);
         info_msg("%s = %s", desc->name, str);
@@ -689,7 +729,8 @@ void collect_toggleable_options(const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        if (desc_is(desc, OPT_ENUM) && str_has_prefix(desc->name, prefix)) {
+        bool toggleable = desc_is(desc, OPT_ENUM) || desc_is(desc, OPT_BOOL);
+        if (toggleable && str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
         }
     }
@@ -712,7 +753,7 @@ void collect_option_values(const char *name, const char *prefix)
         }
         OptionValue value = desc->ops->get(desc, ptr);
         add_completion(xstrdup(desc->ops->string(desc, value)));
-    } else if (desc_is(desc, OPT_ENUM)) {
+    } else if (desc_is(desc, OPT_ENUM) || desc_is(desc, OPT_BOOL)) {
         // Complete possible values
         const char **values = desc->u.enum_opt.values;
         for (size_t i = 0; values[i]; i++) {

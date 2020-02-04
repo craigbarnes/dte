@@ -145,6 +145,16 @@ static void test_complete_command(void)
     EXPECT_STRING_EQ(editor.cmdline.buf, "toggle auto-indent");
     reset_completion();
 
+    cmdline_set_text(&editor.cmdline, "set expand-tab f");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set expand-tab false ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "set case-sensitive-search a");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set case-sensitive-search auto ");
+    reset_completion();
+
     ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
     cmdline_set_text(&editor.cmdline, "insert $" ENV_VAR_PREFIX);
     complete_command_next();
