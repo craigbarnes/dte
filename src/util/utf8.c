@@ -198,12 +198,10 @@ void u_set_char(char *str, size_t *idx, CodePoint u)
         if (ascii_iscntrl(u)) {
             // Use caret notation for control chars:
             str[i++] = '^';
-            str[i++] = (u == 0x7f) ? '?' : u | 0x40;
-            *idx = i;
-        } else {
-            str[i++] = u;
-            *idx = i;
+            u = (u + 64) & 0x7F;
         }
+        str[i++] = u;
+        *idx = i;
     } else if (u_is_unprintable(u)) {
         u_set_hex(str, idx, u);
     } else if (u <= 0x7ff) {

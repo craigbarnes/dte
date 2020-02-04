@@ -232,7 +232,7 @@ bool term_put_char(CodePoint u)
             obuf.buf[obuf.count++] = '^';
             obuf.x++;
             if (space > 1) {
-                obuf.buf[obuf.count++] = (u == 0x7f) ? '?' : u | 0x40;
+                obuf.buf[obuf.count++] = (u + 64) & 0x7F;
                 obuf.x++;
             }
         }

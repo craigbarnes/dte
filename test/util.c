@@ -671,6 +671,21 @@ static void test_u_set_char(void)
     u_set_char(buf, &i, 0x7F);
     EXPECT_EQ(i, 2);
     EXPECT_TRUE(mem_equal(buf, "^?", 2));
+
+    i = 0;
+    u_set_char(buf, &i, 0x80);
+    EXPECT_EQ(i, 4);
+    EXPECT_TRUE(mem_equal(buf, "<" "?" "?" ">", 4));
+
+    i = 0;
+    u_set_char(buf, &i, 0x7E);
+    EXPECT_EQ(i, 1);
+    EXPECT_TRUE(mem_equal(buf, "~", 1));
+
+    i = 0;
+    u_set_char(buf, &i, 0x20);
+    EXPECT_EQ(i, 1);
+    EXPECT_TRUE(mem_equal(buf, " ", 1));
 }
 
 static void test_u_prev_char(void)
