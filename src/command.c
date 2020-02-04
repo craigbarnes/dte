@@ -705,7 +705,7 @@ static void cmd_open(const CommandArgs *a)
     char **args = a->args;
     const char *requested_encoding = NULL;
     bool use_glob = false;
-    bool tmp = false;
+    bool temporary = false;
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'e':
@@ -715,12 +715,12 @@ static void cmd_open(const CommandArgs *a)
             use_glob = args[0] ? true : false;
             break;
         case 't':
-            tmp = true;
+            temporary = true;
             break;
         }
     }
 
-    if (tmp && a->nr_args > 0) {
+    if (temporary && a->nr_args > 0) {
         error_msg("'open -t' can't be used with filename arguments");
         return;
     }
@@ -752,11 +752,9 @@ static void cmd_open(const CommandArgs *a)
 
     if (!paths[0]) {
         window_open_new_file(window);
+        buffer->temporary = temporary;
         if (requested_encoding) {
             buffer->encoding = encoding;
-        }
-        if (tmp) {
-            buffer->temporary = true;
         }
     } else if (!paths[1]) {
         // Previous view is remembered when opening single file
@@ -1974,11 +1972,16 @@ static void cmd_wsplit(const CommandArgs *a)
     bool use_glob = false;
     bool vertical = false;
     bool root = false;
+    bool empty = false;
+    bool temporary = false;
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             // Add new window before current window
             before = true;
+            break;
+        case 'e':
+            empty = true;
             break;
         case 'g':
             // Perform glob(3) expansion on arguments
@@ -1992,7 +1995,16 @@ static void cmd_wsplit(const CommandArgs *a)
             // Split root frame instead of current window
             root = true;
             break;
+        case 't':
+            temporary = true;
+            empty = true;
+            break;
         }
+    }
+
+    if (empty && a->nr_args > 0) {
+        error_msg("flags -e and -t can't be used with filename arguments");
+        return;
     }
 
     char **paths = a->args;
@@ -2017,7 +2029,10 @@ static void cmd_wsplit(const CommandArgs *a)
     buffer = NULL;
     mark_everything_changed();
 
-    if (paths[0]) {
+    if (empty) {
+        window_open_new_file(window);
+        buffer->temporary = temporary;
+    } else if (paths[0]) {
         window_open_files(window, paths, NULL);
     } else {
         View *new = window_add_buffer(window, save->buffer);
@@ -2146,7 +2161,7 @@ static const Command cmds[] = {
     {"wprev", "", 0, 0, cmd_wprev},
     {"wrap-paragraph", "", 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", 0, 1, cmd_wresize},
-    {"wsplit", "bghr", 0, -1, cmd_wsplit},
+    {"wsplit", "beghrt", 0, -1, cmd_wsplit},
     {"wswap", "", 0, 0, cmd_wswap},
 };
 
