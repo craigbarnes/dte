@@ -35,6 +35,7 @@ typedef struct Buffer {
     char *abs_filename;
 
     bool readonly;
+    bool temporary;
     bool locked;
     bool setup;
     bool crlf_newlines;
@@ -65,7 +66,7 @@ static inline void mark_all_lines_changed(Buffer *b)
 
 static inline bool buffer_modified(const Buffer *b)
 {
-    return b->saved_change != b->cur_change;
+    return b->saved_change != b->cur_change && !b->temporary;
 }
 
 void buffer_mark_lines_changed(Buffer *b, long min, long max);

@@ -705,6 +705,7 @@ static void cmd_open(const CommandArgs *a)
     char **args = a->args;
     const char *requested_encoding = NULL;
     bool use_glob = false;
+    bool tmp = false;
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'e':
@@ -713,7 +714,15 @@ static void cmd_open(const CommandArgs *a)
         case 'g':
             use_glob = args[0] ? true : false;
             break;
+        case 't':
+            tmp = true;
+            break;
         }
+    }
+
+    if (tmp && a->nr_args > 0) {
+        error_msg("'open -t' can't be used with filename arguments");
+        return;
     }
 
     Encoding encoding = {
@@ -745,6 +754,9 @@ static void cmd_open(const CommandArgs *a)
         window_open_new_file(window);
         if (requested_encoding) {
             buffer->encoding = encoding;
+        }
+        if (tmp) {
+            buffer->temporary = true;
         }
     } else if (!paths[1]) {
         // Previous view is remembered when opening single file
@@ -1287,6 +1299,7 @@ static void cmd_save(const CommandArgs *a)
 
     buffer->saved_change = buffer->cur_change;
     buffer->readonly = false;
+    buffer->temporary = false;
     buffer->crlf_newlines = crlf;
     if (requested_encoding) {
         buffer->encoding = encoding;
@@ -1696,27 +1709,15 @@ static void cmd_show(const CommandArgs *a)
         return;
     }
 
-    char tmp[32] = "/tmp/.dte.XXXXXX";
-    int fd = mkstemp(tmp);
-    if (fd < 0) {
-        perror_msg("mkstemp");
-        return;
-    }
+    window_open_new_file(window);
+    free(buffer->display_filename);
+    buffer->display_filename = xasprintf("(show %s)", a->args[0]);
+    buffer->temporary = true;
+    buffer->encoding = encoding_from_type(UTF8);
 
     String s = handlers[cmdtype].dump();
-    ssize_t rc = xwrite(fd, s.buffer, s.len);
-    int err = errno;
-    close(fd);
+    do_insert(s.buffer, s.len);
     string_free(&s);
-    if (rc < 0) {
-        error_msg("write: %s", strerror(err));
-        unlink(tmp);
-        return;
-    }
-
-    const char *argv[] = {editor.pager, tmp, NULL};
-    spawn((char**)argv, false, false);
-    unlink(tmp);
 }
 
 static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
@@ -2103,7 +2104,7 @@ static const Command cmds[] = {
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},
     {"next", "", 0, 0, cmd_next},
-    {"open", "e=g", 0, -1, cmd_open},
+    {"open", "e=gt", 0, -1, cmd_open},
     {"option", "-r", 3, -1, cmd_option},
     {"paste", "c", 0, 0, cmd_paste},
     {"pgdown", "cl", 0, 0, cmd_pgdown},

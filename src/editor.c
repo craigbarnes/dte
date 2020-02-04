@@ -76,11 +76,9 @@ EditorState editor = {
 
 void init_editor_state(void)
 {
-    const char *pager = getenv("PAGER");
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
 
-    editor.pager = xstrdup(pager ? pager : "less");
     editor.home_dir = xstrdup(home ? home : "");
 
     if (dte_home) {

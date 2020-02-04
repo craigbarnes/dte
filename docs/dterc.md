@@ -959,8 +959,8 @@ The _type_ argument can be one of:
 
 The _key_ argument is the name of the entry to look up (e.g. the alias
 name). If this argument is specified, the value will be displayed in
-the status line. If omitted, a pager will be opened displaying all
-entries of the specified type.
+the status line. If omitted, a new, temporary buffer will be opened
+displaying all entries of the specified type.
 
 `-c`
 :   write value to command line instead of status line

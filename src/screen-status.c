@@ -122,6 +122,8 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         case 'r':
             if (v->buffer->readonly) {
                 add_status_literal(f, "RO");
+            } else if (v->buffer->temporary) {
+                add_status_literal(f, "TMP");
             }
             break;
         case 'y':
