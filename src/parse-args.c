@@ -4,13 +4,6 @@
 #include "error.h"
 #include "util/str-util.h"
 
-static void set_error(ArgParseError *err, ArgParseErrorType type, char flag)
-{
-    if (err) {
-        *err = (ArgParseError){.type = type, .flag = flag};
-    }
-}
-
 /*
  * Flags and first "--" are removed.
  * Flag arguments are moved to beginning.
@@ -30,6 +23,8 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
     }
 
     const char *flag_desc = cmd->flags;
+    ArgParseErrorType err_type;
+    char flag = '\0';
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
     bool flags_after_arg = true;
@@ -59,31 +54,31 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
         }
 
         for (size_t j = 1; arg[j]; j++) {
-            char flag = arg[j];
+            flag = arg[j];
             char *flag_arg;
             char *flagp = strchr(flag_desc, flag);
 
             if (!flagp || flag == '=') {
-                set_error(err, ARGERR_INVALID_OPTION, flag);
-                return false;
+                err_type = ARGERR_INVALID_OPTION;
+                goto error;
             }
             a->flags[nr_flags++] = flag;
             if (nr_flags == ARRAY_COUNT(a->flags)) {
-                set_error(err, ARGERR_TOO_MANY_OPTIONS, '\0');
-                return false;
+                err_type = ARGERR_TOO_MANY_OPTIONS;
+                goto error;
             }
             if (flagp[1] != '=') {
                 continue;
             }
 
             if (j > 1 || arg[j + 1]) {
-                set_error(err, ARGERR_OPTION_ARGUMENT_NOT_SEPARATE, flag);
-                return false;
+                err_type = ARGERR_OPTION_ARGUMENT_NOT_SEPARATE;
+                goto error;
             }
             flag_arg = args[i + 1];
             if (!flag_arg) {
-                set_error(err, ARGERR_OPTION_ARGUMENT_MISSING, flag);
-                return false;
+                err_type = ARGERR_OPTION_ARGUMENT_MISSING;
+                goto error;
             }
 
             // Move flag argument before any other arguments
@@ -91,11 +86,8 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
                 // farg1 arg1  arg2 -f   farg2 arg3
                 // farg1 farg2 arg1 arg2 arg3
                 size_t count = i - nr_flag_args;
-                memmove (
-                    args + nr_flag_args + 1,
-                    args + nr_flag_args,
-                    count * sizeof(*args)
-                );
+                char **ptr = args + nr_flag_args;
+                memmove(ptr + 1, ptr, count * sizeof(*args));
             }
             args[nr_flag_args++] = flag_arg;
             i++;
@@ -110,18 +102,24 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
     argc -= nr_flag_args;
 
     if (argc < cmd->min_args) {
-        set_error(err, ARGERR_TOO_FEW_ARGUMENTS, '\0');
-        return false;
+        err_type = ARGERR_TOO_FEW_ARGUMENTS;
+        goto error;
     }
     if (argc > cmd->max_args) {
-        set_error(err, ARGERR_TOO_MANY_ARGUMENTS, '\0');
-        return false;
+        err_type = ARGERR_TOO_MANY_ARGUMENTS;
+        goto error;
     }
     a->flags[nr_flags] = '\0';
 
     a->nr_args = argc;
     a->nr_flags = nr_flags;
     return true;
+
+error:
+    if (err) {
+        *err = (ArgParseError){.type = err_type, .flag = flag};
+    }
+    return false;
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a)
