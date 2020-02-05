@@ -9,6 +9,7 @@
 #include "../util/utf8.h"
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
+#include "../util/xsnprintf.h"
 
 TermOutputBuffer obuf;
 
@@ -99,6 +100,18 @@ void term_add_str(const char *str)
             break;
         }
     }
+}
+
+size_t term_xnprintf(size_t maxlen, const char *format, ...)
+{
+    BUG_ON(maxlen > sizeof(obuf.buf));
+    obuf_need_space(maxlen);
+    va_list ap;
+    va_start(ap, format);
+    size_t n = xvsnprintf(obuf.buf + obuf.count, maxlen, format, ap);
+    va_end(ap);
+    obuf.count += n;
+    return n;
 }
 
 void term_hide_cursor(void)

@@ -44,6 +44,7 @@ void term_set_bytes(char ch, size_t count);
 void term_repeat_byte(char ch, size_t count);
 void term_add_string_view(StringView sv);
 void term_add_str(const char *str);
+size_t term_xnprintf(size_t maxlen, const char *format, ...) PRINTF(2);
 void term_hide_cursor(void);
 void term_show_cursor(void);
 void term_clear_eol(void);

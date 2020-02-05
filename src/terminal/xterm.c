@@ -28,22 +28,17 @@ static void do_set_color(int32_t color, char ch)
         return;
     }
 
-    char buf[32];
-    size_t n = 0;
-    buf[n++] = ';';
-    buf[n++] = ch;
-
     if (color < 8) {
-        buf[n++] = '0' + color;
+        term_add_byte(';');
+        term_add_byte(ch);
+        term_add_byte('0' + color);
     } else if (color < 256) {
-        n += xsnprintf(buf + n, sizeof(buf) - n, "8;5;%hhu", (uint8_t)color);
+        term_xnprintf(16, ";%c8;5;%hhu", ch, (uint8_t)color);
     } else {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        n += xsnprintf(buf + n, sizeof(buf) - n, "8;2;%hhu;%hhu;%hhu", r, g, b);
+        term_xnprintf(32, ";%c8;2;%hhu;%hhu;%hhu", ch, r, g, b);
     }
-
-    term_add_bytes(buf, n);
 }
 
 void xterm_set_color(const TermColor *color)

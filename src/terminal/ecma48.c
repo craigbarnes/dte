@@ -5,7 +5,6 @@
 #include "xterm.h"
 #include "../util/ascii.h"
 #include "../util/macros.h"
-#include "../util/xsnprintf.h"
 
 void ecma48_clear_screen(void)
 {
@@ -23,16 +22,7 @@ void ecma48_clear_to_eol(void)
 
 void ecma48_move_cursor(unsigned int x, unsigned int y)
 {
-    char buf[64];
-    size_t n = xsnprintf (
-        buf,
-        sizeof buf,
-        "\033[%u;%uH",
-        // x and y are zero-based
-        ((unsigned int)y) + 1,
-        ((unsigned int)x) + 1
-    );
-    term_add_bytes(buf, n);
+    term_xnprintf(64, "\033[%u;%uH", y + 1, x + 1);
 }
 
 void ecma48_set_color(const TermColor *color)
@@ -73,9 +63,7 @@ void ecma48_repeat_byte(char ch, size_t count)
         term_repeat_byte(ch, count);
         return;
     }
-    char buf[64];
-    size_t n = xsnprintf(buf, sizeof buf, "%c\033[%zub", ch, count - 1);
-    term_add_bytes(buf, n);
+    term_xnprintf(16, "%c\033[%zub", ch, count - 1);
 }
 
 Terminal terminal = {
