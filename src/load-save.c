@@ -179,7 +179,7 @@ static int xmadvise_sequential(void *addr, size_t len)
 int read_blocks(Buffer *b, int fd)
 {
     const size_t map_size = 64 * 1024;
-    size_t size = b->st.st_size;
+    size_t size = b->file.size;
     unsigned char *buf = NULL;
     bool mapped = false;
 
@@ -249,17 +249,17 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         }
         fixup_blocks(b);
     } else {
-        if (fstat(fd, &b->st) != 0) {
+        if (!buffer_fstat(b, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
             close(fd);
             return -1;
         }
-        if (!S_ISREG(b->st.st_mode)) {
+        if (!S_ISREG(b->file.mode)) {
             error_msg("Not a regular file %s", filename);
             close(fd);
             return -1;
         }
-        if (b->st.st_size / 1024 / 1024 > editor.options.filesize_limit) {
+        if (b->file.size / 1024 / 1024 > editor.options.filesize_limit) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
                 editor.options.filesize_limit,
@@ -355,10 +355,10 @@ int save_buffer (
         if (fd < 0) {
             // No write permission to the directory?
             tmp[0] = '\0';
-        } else if (b->st.st_mode) {
+        } else if (b->file.mode) {
             // Preserve ownership and mode of the original file if possible.
-            UNUSED int u1 = fchown(fd, b->st.st_uid, b->st.st_gid);
-            UNUSED int u2 = fchmod(fd, b->st.st_mode);
+            UNUSED int u1 = fchown(fd, b->file.uid, b->file.gid);
+            UNUSED int u2 = fchmod(fd, b->file.mode);
         } else {
             // New file
             fchmod(fd, 0666 & ~get_umask());
@@ -368,7 +368,7 @@ int save_buffer (
     if (fd < 0) {
         // Overwrite the original file (if exists) directly.
         // Ownership is preserved automatically if the file exists.
-        mode_t mode = b->st.st_mode;
+        mode_t mode = b->file.mode;
         if (mode == 0) {
             // New file.
             mode = 0666 & ~get_umask();
@@ -424,7 +424,7 @@ int save_buffer (
         goto error;
     }
     free_file_encoder(enc);
-    stat(filename, &b->st);
+    buffer_stat(b, filename);
     return 0;
 error:
     if (enc != NULL) {
@@ -436,7 +436,7 @@ error:
         // Not using temporary file therefore mtime may have changed.
         // Update stat to avoid "File has been modified by someone else"
         // error later when saving the file again.
-        stat(filename, &b->st);
+        buffer_stat(b, filename);
     }
     return -1;
 }

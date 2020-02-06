@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <sys/stat.h>
+#include <sys/types.h>
 #include "change.h"
 #include "encoding/encoding.h"
 #include "options.h"
@@ -12,6 +12,18 @@
 #include "util/list.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+
+// Subset of stat(3) struct
+typedef struct {
+    off_t size;
+    mode_t mode;
+    gid_t gid;
+    uid_t uid;
+    time_t mtime_sec;
+    long mtime_nsec;
+    dev_t dev;
+    ino_t ino;
+} FileInfo;
 
 typedef struct Buffer {
     ListHead blocks;
@@ -21,7 +33,7 @@ typedef struct Buffer {
     // Used to determine if buffer is modified
     Change *saved_change;
 
-    struct stat st;
+    FileInfo file;
 
     // Needed for identifying buffers whose filename is NULL
     unsigned long id;
@@ -75,6 +87,8 @@ const char *buffer_filename(const Buffer *b);
 char *short_filename(const char *absolute) XSTRDUP;
 void update_short_filename_cwd(Buffer *b, const char *cwd);
 void update_short_filename(Buffer *b);
+bool buffer_stat(Buffer *b, const char *filename);
+bool buffer_fstat(Buffer *b, int fd);
 Buffer *find_buffer(const char *abs_filename);
 Buffer *find_buffer_by_id(unsigned long id);
 Buffer *buffer_new(const Encoding *encoding);

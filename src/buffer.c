@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "block.h"
 #include "block-iter.h"
@@ -115,9 +116,43 @@ void free_buffer(Buffer *b)
     free(b);
 }
 
-static bool same_file(const struct stat *a, const struct stat *b)
+static void update_file_info(Buffer *b, struct stat *st)
 {
-    return (a->st_dev == b->st_dev) && (a->st_ino == b->st_ino);
+    b->file = (FileInfo) {
+        .size = st->st_size,
+        .mode = st->st_mode,
+        .gid = st->st_gid,
+        .uid = st->st_uid,
+        .mtime_sec = st->st_mtim.tv_sec,
+        .mtime_nsec = st->st_mtim.tv_nsec,
+        .dev = st->st_dev,
+        .ino = st->st_ino,
+    };
+}
+
+bool buffer_stat(Buffer *b, const char *filename)
+{
+    struct stat st;
+    if (stat(filename, &st) != 0) {
+        return false;
+    }
+    update_file_info(b, &st);
+    return true;
+}
+
+bool buffer_fstat(Buffer *b, int fd)
+{
+    struct stat st;
+    if (fstat(fd, &st) != 0) {
+        return false;
+    }
+    update_file_info(b, &st);
+    return true;
+}
+
+static bool same_file(const Buffer *b, const struct stat *st)
+{
+    return (st->st_dev == b->file.dev) && (st->st_ino == b->file.ino);
 }
 
 Buffer *find_buffer(const char *abs_filename)
@@ -131,7 +166,7 @@ Buffer *find_buffer(const char *abs_filename)
 
         if (
             (f != NULL && streq(f, abs_filename))
-            || (st_ok && same_file(&st, &b->st))
+            || (st_ok && same_file(b, &st))
         ) {
             return b;
         }

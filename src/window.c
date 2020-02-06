@@ -95,7 +95,7 @@ View *window_open_buffer (
         free(absolute);
         return NULL;
     }
-    if (b->st.st_mode == 0 && dir_missing) {
+    if (b->file.mode == 0 && dir_missing) {
         // New file in non-existing directory. This is usually a mistake.
         error_msg("Error opening %s: Directory does not exist", filename);
         free_buffer(b);
@@ -116,7 +116,7 @@ View *window_open_buffer (
             b->locked = true;
         }
     }
-    if (b->st.st_mode != 0 && !b->readonly && access(filename, W_OK)) {
+    if (b->file.mode != 0 && !b->readonly && access(filename, W_OK)) {
         error_msg("No write permission to %s, marking read-only.", filename);
         b->readonly = true;
     }

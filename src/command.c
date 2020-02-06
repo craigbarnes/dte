@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <glob.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "alias.h"
 #include "bind.h"
@@ -1129,12 +1130,12 @@ static void cmd_run(const CommandArgs *a)
     spawn(a->args, quiet, prompt);
 }
 
-static bool stat_changed(const struct stat *a, const struct stat *b)
+static bool stat_changed(const Buffer *b, const struct stat *st)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
-    return a->st_mtime != b->st_mtime ||
-        a->st_dev != b->st_dev ||
-        a->st_ino != b->st_ino;
+    return st->st_mtim.tv_sec != b->file.mtime_sec
+        || st->st_dev != b->file.dev
+        || st->st_ino != b->file.ino;
 }
 
 static void cmd_save(const CommandArgs *a)
@@ -1146,7 +1147,7 @@ static void cmd_save(const CommandArgs *a)
     bool force = false;
     bool prompt = false;
     bool crlf = buffer->crlf_newlines;
-    mode_t old_mode = buffer->st.st_mode;
+    mode_t old_mode = buffer->file.mode;
     struct stat st;
     bool new_locked = false;
 
@@ -1248,7 +1249,7 @@ static void cmd_save(const CommandArgs *a)
         if (
             absolute == buffer->abs_filename
             && !force
-            && stat_changed(&buffer->st, &st)
+            && stat_changed(buffer, &st)
         ) {
             error_msg (
                 "File has been modified by another process."
@@ -1289,7 +1290,7 @@ static void cmd_save(const CommandArgs *a)
         }
 
         // Allow chmod 755 etc.
-        buffer->st.st_mode = st.st_mode;
+        buffer->file.mode = st.st_mode;
     }
     if (save_buffer(buffer, absolute, &encoding, crlf)) {
         goto error;
