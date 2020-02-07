@@ -204,10 +204,10 @@ void handle_binding(KeyCode key)
     end_change();
 }
 
-static void append_binding(String *s, const char *key, const char *cmd)
+static void append_binding(String *s, KeyCode key, const char *cmd)
 {
     string_append_literal(s, "bind ");
-    string_append_escaped_arg(s, key, false);
+    string_append_escaped_arg(s, keycode_to_string(key), false);
     string_append_byte(s, ' ');
     string_append_escaped_arg(s, cmd, false);
     string_append_byte(s, '\n');
@@ -219,7 +219,7 @@ static void append_lookup_table_binding(String *buf, KeyCode key)
     BUG_ON(i < 0);
     const KeyBinding *b = bindings_lookup_table[i];
     if (b) {
-        append_binding(buf, keycode_to_string(key), b->cmd_str);
+        append_binding(buf, key, b->cmd_str);
     }
 }
 
@@ -244,7 +244,7 @@ String dump_bindings(void)
 
     for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
         const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
-        append_binding(&buf, keycode_to_string(b->key), b->bind->cmd_str);
+        append_binding(&buf, b->key, b->bind->cmd_str);
     }
 
     return buf;
