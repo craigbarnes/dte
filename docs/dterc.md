@@ -1069,7 +1069,10 @@ Format string for the left aligned part of status line.
 :   Miscellaneous status information.
 
 `%n`
-:   Line-ending (LF or CRLF).
+:   Line-ending (`LF` or `CRLF`).
+
+`%N`
+:   Line-ending (only if `CRLF`)
 
 `%s`
 :   Add separator.

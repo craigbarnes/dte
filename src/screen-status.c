@@ -153,6 +153,11 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
             }
             break;
         }
+        case 'N':
+            if (v->buffer->crlf_newlines) {
+                add_status_literal(f, "CRLF");
+            }
+            break;
         case 'n':
             if (v->buffer->crlf_newlines) {
                 add_status_literal(f, "CRLF");
