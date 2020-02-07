@@ -283,6 +283,11 @@ const char *command_parse_error_to_string(CommandParseError err)
 
 void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
 {
+    if (!arg[0]) {
+        string_append_literal(s, "''");
+        return;
+    }
+
     if (arg[0] == '~' && escape_tilde) {
         string_append_byte(s, '\\');
     }
