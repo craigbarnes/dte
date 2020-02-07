@@ -110,7 +110,11 @@ String dump_aliases(void)
     String buf = string_new(4096);
     for (size_t i = 0; i < aliases.count; i++) {
         const CommandAlias *alias = aliases.ptrs[i];
-        string_sprintf(&buf, " %s  ->  %s\n", alias->name, alias->value);
+        string_append_literal(&buf, "alias ");
+        string_append_escaped_arg(&buf, alias->name, false);
+        string_append_byte(&buf, ' ');
+        string_append_escaped_arg(&buf, alias->value, false);
+        string_append_byte(&buf, '\n');
     }
     return buf;
 }

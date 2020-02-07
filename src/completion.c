@@ -447,40 +447,10 @@ static void init_completion(void)
     ptr_array_free(&array);
 }
 
-static char *escape(const char *str)
-{
-    String buf = STRING_INIT;
-
-    if (!str[0]) {
-        return xmemdup_literal("\"\"");
-    }
-
-    if (str[0] == '~' && !completion.tilde_expanded) {
-        string_append_byte(&buf, '\\');
-    }
-
-    for (size_t i = 0; str[i]; i++) {
-        const char ch = str[i];
-        switch (ch) {
-        case ' ':
-        case '"':
-        case '$':
-        case '\'':
-        case ';':
-        case '\\':
-            string_append_byte(&buf, '\\');
-            // Fallthrough
-        default:
-            string_append_byte(&buf, ch);
-            break;
-        }
-    }
-    return string_steal_cstring(&buf);
-}
-
 static void do_complete_command(void)
 {
-    char *middle = escape(completion.completions.ptrs[completion.idx]);
+    const char *arg = completion.completions.ptrs[completion.idx];
+    char *middle = escape_command_arg(arg, !completion.tilde_expanded);
     size_t middle_len = strlen(middle);
     size_t head_len = strlen(completion.head);
     size_t tail_len = strlen(completion.tail);

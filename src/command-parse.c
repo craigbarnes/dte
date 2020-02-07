@@ -4,9 +4,7 @@
 #include "env.h"
 #include "error.h"
 #include "util/ascii.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
-#include "util/string.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 
@@ -281,4 +279,63 @@ const char *command_parse_error_to_string(CommandParseError err)
     BUG_ON(err <= CMDERR_NONE);
     BUG_ON(err >= ARRAY_COUNT(error_strings));
     return error_strings[err];
+}
+
+void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
+{
+    if (arg[0] == '~' && escape_tilde) {
+        string_append_byte(s, '\\');
+    }
+
+    size_t len = strlen(arg);
+    bool squote = false;
+    for (size_t i = 0; i < len; i++) {
+        char c = arg[i];
+        switch (c) {
+        case ' ':
+        case '"':
+        case '$':
+        case ';':
+        case '\\':
+            squote = true;
+            continue;
+        case '\'':
+            goto escape;
+        }
+        if (ascii_is_nonspace_cntrl(c)) {
+            goto escape;
+        }
+    }
+
+    if (squote) {
+        string_append_byte(s, '\'');
+        string_append_buf(s, arg, len);
+        string_append_byte(s, '\'');
+        return;
+    }
+
+escape:
+    for (size_t i = 0; i < len; i++) {
+        const char ch = arg[i];
+        switch (ch) {
+        case ' ':
+        case '"':
+        case '$':
+        case '\'':
+        case ';':
+        case '\\':
+            string_append_byte(s, '\\');
+            // Fallthrough
+        default:
+            string_append_byte(s, ch);
+            break;
+        }
+    }
+}
+
+char *escape_command_arg(const char *arg, bool escape_tilde)
+{
+    String buf = STRING_INIT;
+    string_append_escaped_arg(&buf, arg, escape_tilde);
+    return string_steal_cstring(&buf);
 }

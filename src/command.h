@@ -7,6 +7,7 @@
 #include <string.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/string.h"
 
 typedef struct {
     char flags[8];
@@ -46,6 +47,8 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
 CommandParseError parse_commands(PointerArray *array, const char *cmd);
 const char *command_parse_error_to_string(CommandParseError err);
+void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde);
+char *escape_command_arg(const char *arg, bool escape_tilde);
 
 // command-run.c
 extern const Command *current_command;
