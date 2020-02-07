@@ -70,11 +70,6 @@ char *xstrdup(const char *str)
     return check_alloc(strdup(str));
 }
 
-char *xstrndup(const char *str, size_t n)
-{
-    return check_alloc(strndup(str, n));
-}
-
 char *xstrcut(const char *str, size_t size)
 {
     char *s = xmalloc(size + 1);
@@ -99,7 +94,8 @@ static int xvasprintf_(char **strp, const char *format, va_list ap)
     return n;
 }
 
-char *xvasprintf(const char *format, va_list ap)
+VPRINTF(1)
+static char *xvasprintf(const char *format, va_list ap)
 {
     char *str;
     xvasprintf_(&str, format, ap);
