@@ -19,10 +19,9 @@ typedef struct {
     mode_t mode;
     gid_t gid;
     uid_t uid;
-    time_t mtime_sec;
-    long mtime_nsec;
     dev_t dev;
     ino_t ino;
+    time_t mtime;
 } FileInfo;
 
 typedef struct Buffer {

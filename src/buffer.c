@@ -123,10 +123,9 @@ static void update_file_info(Buffer *b, struct stat *st)
         .mode = st->st_mode,
         .gid = st->st_gid,
         .uid = st->st_uid,
-        .mtime_sec = st->st_mtim.tv_sec,
-        .mtime_nsec = st->st_mtim.tv_nsec,
         .dev = st->st_dev,
         .ino = st->st_ino,
+        .mtime = st->st_mtime,
     };
 }
 

@@ -1133,7 +1133,7 @@ static void cmd_run(const CommandArgs *a)
 static bool stat_changed(const Buffer *b, const struct stat *st)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
-    return st->st_mtim.tv_sec != b->file.mtime_sec
+    return st->st_mtime != b->file.mtime
         || st->st_dev != b->file.dev
         || st->st_ino != b->file.ino;
 }
