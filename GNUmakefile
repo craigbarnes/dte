@@ -70,3 +70,11 @@ clean:
 .PHONY: all check install uninstall tags clean
 .PHONY: install-desktop-file uninstall-desktop-file
 .DELETE_ON_ERROR:
+
+NON_PARALLEL_TARGETS += clean
+
+ifeq "" "$(filter $(NON_PARALLEL_TARGETS), $(or $(MAKECMDGOALS),all))"
+  ifeq "" "$(filter -j%, $(MAKEFLAGS))"
+    MAKEFLAGS += -j$(NPROC)
+  endif
+endif

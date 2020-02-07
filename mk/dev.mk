@@ -102,6 +102,7 @@ clang-tidy-test/config.c: build/test/data.h
 
 
 CLEANFILES += dte-*.tar.gz
+NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
