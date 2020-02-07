@@ -1,7 +1,8 @@
 #include <string.h>
 #include "color.h"
-#include "../debug.h"
+#include "../command.h"
 #include "../completion.h"
+#include "../debug.h"
 #include "../util/macros.h"
 #include "../util/ptr-array.h"
 #include "../util/str-util.h"
@@ -118,7 +119,8 @@ String dump_hl_colors(void)
     String buf = string_new(4096);
     for (size_t i = 0, n = hl_colors.count; i < n; i++) {
         const HlColor *c = hl_colors.ptrs[i];
-        string_append_cstring(&buf, c->name);
+        string_append_literal(&buf, "hi ");
+        string_append_escaped_arg(&buf, c->name, false);
         string_append_byte(&buf, ' ');
         string_append_cstring(&buf, term_color_to_string(&c->color));
         string_append_byte(&buf, '\n');
