@@ -164,11 +164,11 @@ static bool validate_statusline_format(const char *value)
         if (ch == '%') {
             ch = value[i++];
             if (!ch) {
-                error_msg("Format character expected after '%%'.");
+                error_msg("Format character expected after '%%'");
                 return false;
             }
             if (!strview_memchr(&chars, ch)) {
-                error_msg("Invalid format character '%c'.", ch);
+                error_msg("Invalid format character '%c'", ch);
                 return false;
             }
         }
@@ -197,40 +197,31 @@ static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
     return v;
 }
 
-static void str_set (
-    const OptionDesc* UNUSED_ARG(desc),
-    void *ptr,
-    OptionValue value
-) {
+static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
     const char **strp = ptr;
-    *strp = str_intern(value.str_val);
+    *strp = str_intern(v.str_val);
 }
 
-static bool str_parse (
-    const OptionDesc *desc,
-    const char *str,
-    OptionValue *value
-) {
-    if (desc->u.str_opt.validate && !desc->u.str_opt.validate(str)) {
-        value->str_val = NULL;
+static bool str_parse(const OptionDesc *d, const char *str, OptionValue *v)
+{
+    if (d->u.str_opt.validate && !d->u.str_opt.validate(str)) {
+        v->str_val = NULL;
         return false;
     }
-    value->str_val = str;
+    v->str_val = str;
     return true;
 }
 
-static const char *str_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
+static const char *str_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
 {
-    const char *s = value.str_val;
+    const char *s = v.str_val;
     return s ? s : "";
 }
 
-static bool str_equals (
-    const OptionDesc* UNUSED_ARG(desc),
-    void *ptr,
-    OptionValue value
-) {
-    return xstreq(*(char**)ptr, value.str_val);
+static bool str_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    return xstreq(*(char**)ptr, v.str_val);
 }
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
@@ -240,34 +231,25 @@ static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
     return v;
 }
 
-static void uint_set (
-    const OptionDesc* UNUSED_ARG(desc),
-    void *ptr,
-    OptionValue value
-) {
-    *(unsigned int*)ptr = value.uint_val;
+static void uint_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    *(unsigned int*)ptr = v.uint_val;
 }
 
-static bool uint_parse (
-    const OptionDesc *desc,
-    const char *str,
-    OptionValue *value
-) {
+static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
+{
     unsigned int val;
     if (!str_to_uint(str, &val)) {
-        error_msg("Integer value for %s expected.", desc->name);
+        error_msg("Integer value for %s expected", d->name);
         return false;
     }
-    if (val < desc->u.uint_opt.min || val > desc->u.uint_opt.max) {
-        error_msg (
-            "Value for %s must be in %u-%u range.",
-            desc->name,
-            desc->u.uint_opt.min,
-            desc->u.uint_opt.max
-        );
+    const unsigned int min = d->u.uint_opt.min;
+    const unsigned int max = d->u.uint_opt.max;
+    if (val < min || val > max) {
+        error_msg("Value for %s must be in %u-%u range", d->name, min, max);
         return false;
     }
-    value->uint_val = val;
+    v->uint_val = val;
     return true;
 }
 
@@ -304,7 +286,7 @@ static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
         v->bool_val = false;
         return true;
     }
-    error_msg("Invalid value for %s.", d->name);
+    error_msg("Invalid value for %s", d->name);
     return false;
 }
 
@@ -318,25 +300,22 @@ static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue 
     return *(bool*)ptr == v.bool_val;
 }
 
-static bool enum_parse (
-    const OptionDesc *desc,
-    const char *str,
-    OptionValue *value
-) {
-    const char **values = desc->u.enum_opt.values;
+static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
+{
+    const char **values = d->u.enum_opt.values;
     unsigned int i;
     for (i = 0; values[i]; i++) {
         if (streq(values[i], str)) {
-            value->uint_val = i;
+            v->uint_val = i;
             return true;
         }
     }
     unsigned int val;
     if (!str_to_uint(str, &val) || val >= i) {
-        error_msg("Invalid value for %s.", desc->name);
+        error_msg("Invalid value for %s", d->name);
         return false;
     }
-    value->uint_val = val;
+    v->uint_val = val;
     return true;
 }
 
@@ -345,18 +324,15 @@ static const char *enum_string(const OptionDesc *desc, OptionValue value)
     return desc->u.enum_opt.values[value.uint_val];
 }
 
-static bool flag_parse (
-    const OptionDesc *desc,
-    const char *str,
-    OptionValue *value
-) {
+static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
+{
     // "0" is allowed for compatibility and is the same as ""
     if (str[0] == '0' && str[1] == '\0') {
-        value->uint_val = 0;
+        v->uint_val = 0;
         return true;
     }
 
-    const char **values = desc->u.flag_opt.values;
+    const char **values = d->u.flag_opt.values;
     const char *ptr = str;
     unsigned int flags = 0;
 
@@ -381,15 +357,15 @@ static bool flag_parse (
         }
         if (!values[i]) {
             error_msg (
-                "Invalid flag '%.*s' for %s.",
+                "Invalid flag '%.*s' for %s",
                 (int)flag.length,
                 flag.data,
-                desc->name
+                d->name
             );
             return false;
         }
     }
-    value->uint_val = flags;
+    v->uint_val = flags;
     return true;
 }
 
@@ -601,7 +577,7 @@ void set_bool_option(const char *name, bool local, bool global)
         return;
     }
     if (!desc_is(desc, OPT_BOOL)) {
-        error_msg("Option %s is not boolean.", desc->name);
+        error_msg("Option %s is not boolean", desc->name);
         return;
     }
     do_set_option(desc, "true", local, global);
