@@ -53,7 +53,6 @@ void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1);
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len) NONNULL_ARG(1);
 void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
-char *string_steal(String *s, size_t *len) NONNULL_ARGS;
 char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN;
 char *string_clone_cstring(const String *s) XSTRDUP;
 const char *string_borrow_cstring(String *s) NONNULL_ARGS_AND_RETURN;

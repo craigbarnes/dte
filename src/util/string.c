@@ -115,14 +115,6 @@ void string_sprintf(String *s, const char *fmt, ...)
     va_end(ap);
 }
 
-char *string_steal(String *s, size_t *len)
-{
-    char *b = s->buffer;
-    *len = s->len;
-    string_init(s);
-    return b;
-}
-
 char *string_steal_cstring(String *s)
 {
     string_append_byte(s, '\0');
