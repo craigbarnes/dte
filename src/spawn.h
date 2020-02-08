@@ -14,23 +14,16 @@ typedef enum {
 } SpawnFlags;
 
 typedef struct {
-    char *in;
-    char *out;
-    size_t in_len;
-    size_t out_len;
-} FilterData;
+    char **argv;
+    StringView input;
+    String output;
+    SpawnFlags flags;
+} SpawnContext;
 
-#define FILTER_DATA_INIT { \
-    .in = NULL, \
-    .out = NULL, \
-    .in_len = 0, \
-    .out_len = 0 \
-}
-
-bool spawn_source(char **argv, String *output, bool quiet);
-bool spawn_sink(char **argv, const char *text, size_t length);
-bool spawn_filter(char **argv, FilterData *data);
+bool spawn_source(SpawnContext *ctx);
+bool spawn_sink(SpawnContext *ctx);
+bool spawn_filter(SpawnContext *ctx);
+void spawn(SpawnContext *ctx);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);
-void spawn(char **args, bool quiet, bool prompt);
 
 #endif

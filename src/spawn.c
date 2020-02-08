@@ -82,12 +82,10 @@ static void read_errors(const Compiler *c, int fd, bool quiet)
     fclose(f);
 }
 
-static void filter(int rfd, int wfd, FilterData *fdata)
+static void filter(int rfd, int wfd, SpawnContext *ctx)
 {
     size_t wlen = 0;
-    String buf = STRING_INIT;
-
-    if (!fdata->in_len) {
+    if (!ctx->input.length) {
         close(wfd);
         wfd = -1;
     }
@@ -124,22 +122,22 @@ static void filter(int rfd, int wfd, FilterData *fdata)
                 break;
             }
             if (!rc) {
-                if (wlen < fdata->in_len) {
+                if (wlen < ctx->input.length) {
                     error_msg("Command did not read all data.");
                 }
                 break;
             }
-            string_append_buf(&buf, data, (size_t) rc);
+            string_append_buf(&ctx->output, data, (size_t) rc);
         }
 
         if (wfdsp && FD_ISSET(wfd, &wfds)) {
-            ssize_t rc = write(wfd, fdata->in + wlen, fdata->in_len - wlen);
+            ssize_t rc = write(wfd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (rc < 0) {
                 perror_msg("write");
                 break;
             }
             wlen += (size_t) rc;
-            if (wlen == fdata->in_len) {
+            if (wlen == ctx->input.length) {
                 if (close(wfd)) {
                     perror_msg("close");
                     break;
@@ -148,8 +146,6 @@ static void filter(int rfd, int wfd, FilterData *fdata)
             }
         }
     }
-
-    fdata->out = string_steal(&buf, &fdata->out_len);
 }
 
 static int open_dev_null(int flags)
@@ -201,14 +197,11 @@ static void exec_error(const char *argv0)
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
 }
 
-bool spawn_filter(char **argv, FilterData *data)
+bool spawn_filter(SpawnContext *ctx)
 {
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
     int dev_null = -1;
-    data->out = NULL;
-    data->out_len = 0;
-
     if (!pipe_close_on_exec(p0) || !pipe_close_on_exec(p1)) {
         perror_msg("pipe");
         goto error;
@@ -221,25 +214,23 @@ bool spawn_filter(char **argv, FilterData *data)
 
     int fd[3] = {p0[0], p1[1], dev_null};
     term_raw_isig();
-    const pid_t pid = fork_exec(argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, fd);
     if (pid < 0) {
-        exec_error(argv[0]);
+        exec_error(ctx->argv[0]);
         goto error;
     }
 
     close(dev_null);
     close(p0[0]);
     close(p1[1]);
-    filter(p1[0], p0[1], data);
+    filter(p1[0], p0[1], ctx);
     close(p1[0]);
     close(p0[1]);
 
     int err = handle_child_error(pid);
     term_raw();
     if (err) {
-        free(data->out);
-        data->out = NULL;
-        data->out_len = 0;
+        string_free(&ctx->output);
         return false;
     }
     return true;
@@ -254,8 +245,9 @@ error:
     return false;
 }
 
-bool spawn_source(char **argv, String *output, bool quiet)
+bool spawn_source(SpawnContext *ctx)
 {
+    bool quiet = !!(ctx->flags & SPAWN_QUIET);
     int p[2] = {-1, -1};
     int dev_null_r = -1;
     int dev_null_w = -1;
@@ -280,9 +272,9 @@ bool spawn_source(char **argv, String *output, bool quiet)
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, fd);
     if (pid < 0) {
-        exec_error(argv[0]);
+        exec_error(ctx->argv[0]);
         goto error;
     }
 
@@ -304,7 +296,7 @@ bool spawn_source(char **argv, String *output, bool quiet)
         if (rc == 0) {
             break;
         }
-        string_append_buf(output, buf, (size_t) rc);
+        string_append_buf(&ctx->output, buf, (size_t) rc);
     }
 
     close(p[0]);
@@ -317,7 +309,7 @@ bool spawn_source(char **argv, String *output, bool quiet)
     return true;
 
 error:
-    string_free(output);
+    string_free(&ctx->output);
     close(p[0]);
     close(p[1]);
     if (quiet) {
@@ -328,7 +320,7 @@ error:
     return false;
 }
 
-bool spawn_sink(char **argv, const char *text, size_t length)
+bool spawn_sink(SpawnContext *ctx)
 {
     int p[2] = {-1, -1};
     int dev_null = -1;
@@ -345,16 +337,17 @@ bool spawn_sink(char **argv, const char *text, size_t length)
 
     int fd[3] = {p[0], dev_null, dev_null};
     term_raw_isig();
-    const pid_t pid = fork_exec(argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, fd);
     if (pid < 0) {
-        exec_error(argv[0]);
+        exec_error(ctx->argv[0]);
         goto error;
     }
 
     close(dev_null);
     close(p[0]);
     p[0] = dev_null = -1;
-    if (length && xwrite(p[1], text, length) < 0) {
+    size_t input_len = ctx->input.length;
+    if (input_len && xwrite(p[1], ctx->input.data, input_len) < 0) {
         perror_msg("write");
         goto error;
     }
@@ -424,8 +417,10 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     close(fd[0]);
 }
 
-void spawn(char **args, bool quiet, bool prompt)
+void spawn(SpawnContext *ctx)
 {
+    bool quiet = !!(ctx->flags & SPAWN_QUIET);
+    bool prompt = !!(ctx->flags & SPAWN_PROMPT);
     int fd[3] = {0, 1, 2};
     if (quiet) {
         if ((fd[0] = open_dev_null(O_RDONLY)) < 0) {
@@ -439,9 +434,9 @@ void spawn(char **args, bool quiet, bool prompt)
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(args, fd);
+    const pid_t pid = fork_exec(ctx->argv, fd);
     if (pid < 0) {
-        exec_error(args[0]);
+        exec_error(ctx->argv[0]);
         prompt = false;
     } else {
         handle_child_error(pid);

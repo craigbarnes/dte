@@ -413,24 +413,33 @@ static void cmd_errorfmt(const CommandArgs *a)
 
 static void cmd_eval(const CommandArgs *a)
 {
-    FilterData data = FILTER_DATA_INIT;
-    if (!spawn_filter(a->args, &data)) {
+    SpawnContext ctx = {
+        .argv = a->args,
+        .input = STRING_VIEW_INIT,
+        .output = STRING_INIT,
+        .flags = SPAWN_DEFAULT
+    };
+    if (!spawn_filter(&ctx)) {
         return;
     }
-    exec_config(&commands, data.out, data.out_len);
-    free(data.out);
+    exec_config(&commands, ctx.output.buffer, ctx.output.len);
+    string_free(&ctx.output);
 }
 
 static void cmd_exec_open(const CommandArgs *a)
 {
-    String output = STRING_INIT;
-    if (!spawn_source(a->args, &output, has_flag(a, 's'))) {
+    SpawnContext ctx = {
+        .argv = a->args,
+        .output = STRING_INIT,
+        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
+    };
+    if (!spawn_source(&ctx)) {
         return;
     }
 
     PointerArray filenames = PTR_ARRAY_INIT;
-    for (size_t pos = 0, size = output.len; pos < size; ) {
-        char *filename = buf_next_line(output.buffer, &pos, size);
+    for (size_t pos = 0, size = ctx.output.len; pos < size; ) {
+        char *filename = buf_next_line(ctx.output.buffer, &pos, size);
         if (filename[0] != '\0') {
             ptr_array_append(&filenames, filename);
         }
@@ -439,40 +448,45 @@ static void cmd_exec_open(const CommandArgs *a)
     ptr_array_append(&filenames, NULL);
     window_open_files(window, (char**)filenames.ptrs, NULL);
     ptr_array_free_array(&filenames);
-    string_free(&output);
+    string_free(&ctx.output);
 }
 
 static void cmd_filter(const CommandArgs *a)
 {
-    FilterData data;
     BlockIter save = view->cursor;
+    SpawnContext ctx = {
+        .argv = a->args,
+        .input = STRING_VIEW_INIT,
+        .output = STRING_INIT,
+        .flags = SPAWN_DEFAULT
+    };
 
     if (view->selection) {
-        data.in_len = prepare_selection(view);
+        ctx.input.length = prepare_selection(view);
     } else if (has_flag(a, 'l')) {
         StringView line;
         move_bol();
         fill_line_ref(&view->cursor, &line);
-        data.in_len = line.length;
+        ctx.input.length = line.length;
     } else {
         Block *blk;
-        data.in_len = 0;
         block_for_each(blk, &buffer->blocks) {
-            data.in_len += blk->size;
+            ctx.input.length += blk->size;
         }
         move_bof();
     }
 
-    data.in = block_iter_get_bytes(&view->cursor, data.in_len);
-    if (!spawn_filter(a->args, &data)) {
-        free(data.in);
+    char *input = block_iter_get_bytes(&view->cursor, ctx.input.length);
+    ctx.input.data = input;
+    if (!spawn_filter(&ctx)) {
+        free(input);
         view->cursor = save;
         return;
     }
 
-    free(data.in);
-    buffer_replace_bytes(data.in_len, data.out, data.out_len);
-    free(data.out);
+    free(input);
+    buffer_replace_bytes(ctx.input.length, ctx.output.buffer, ctx.output.len);
+    string_free(&ctx.output);
     unselect();
 }
 
@@ -925,8 +939,12 @@ static void cmd_pipe_from(const CommandArgs *a)
         }
     }
 
-    String output = STRING_INIT;
-    if (!spawn_source(a->args, &output, true)) {
+    SpawnContext ctx = {
+        .argv = a->args,
+        .output = STRING_INIT,
+        .flags = SPAWN_QUIET
+    };
+    if (!spawn_source(&ctx)) {
         return;
     }
 
@@ -936,18 +954,18 @@ static void cmd_pipe_from(const CommandArgs *a)
         unselect();
     }
 
-    size_t ins_len = output.len;
+    size_t ins_len = ctx.output.len;
     if (strip_nl) {
-        if (ins_len && output.buffer[ins_len - 1] == '\n') {
+        if (ins_len && ctx.output.buffer[ins_len - 1] == '\n') {
             ins_len--;
-            if (ins_len && output.buffer[ins_len - 1] == '\r') {
+            if (ins_len && ctx.output.buffer[ins_len - 1] == '\r') {
                 ins_len--;
             }
         }
     }
 
-    buffer_replace_bytes(del_len, output.buffer, ins_len);
-    string_free(&output);
+    buffer_replace_bytes(del_len, ctx.output.buffer, ins_len);
+    string_free(&ctx.output);
 
     if (move) {
         block_iter_skip_bytes(&view->cursor, ins_len);
@@ -977,7 +995,12 @@ static void cmd_pipe_to(const CommandArgs *a)
     }
 
     char *input = block_iter_get_bytes(&view->cursor, input_len);
-    spawn_sink(a->args, input, input_len);
+    SpawnContext ctx = {
+        .argv = a->args,
+        .input = string_view(input, input_len),
+        .flags = SPAWN_DEFAULT
+    };
+    spawn_sink(&ctx);
     free(input);
 
     // Restore cursor and selection offsets, instead of calling unselect()
@@ -1115,19 +1138,21 @@ static void cmd_right(const CommandArgs *a)
 
 static void cmd_run(const CommandArgs *a)
 {
-    bool prompt = false;
-    bool quiet = false;
+    SpawnContext ctx = {
+        .argv = a->args,
+        .flags = SPAWN_DEFAULT
+    };
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'p':
-            prompt = true;
+            ctx.flags |= SPAWN_PROMPT;
             break;
         case 's':
-            quiet = true;
+            ctx.flags |= SPAWN_QUIET;
             break;
         }
     }
-    spawn(a->args, quiet, prompt);
+    spawn(&ctx);
 }
 
 static bool stat_changed(const Buffer *b, const struct stat *st)
