@@ -1708,15 +1708,14 @@ static void cmd_show(const CommandArgs *a)
         return;
     }
 
-    window_open_new_file(window);
-    free(buffer->display_filename);
-    buffer->display_filename = xasprintf("(show %s)", a->args[0]);
-    buffer->temporary = true;
-    buffer->encoding = encoding_from_type(UTF8);
-
     String s = handlers[cmdtype].dump();
+    View *v = window_open_new_file(window);
+    v->buffer->temporary = true;
     do_insert(s.buffer, s.len);
     string_free(&s);
+    free(v->buffer->display_filename);
+    v->buffer->display_filename = xasprintf("(show %s)", a->args[0]);
+    v->buffer->encoding = encoding_from_type(UTF8);
 }
 
 static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
