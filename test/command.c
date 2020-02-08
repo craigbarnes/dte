@@ -197,6 +197,14 @@ static void test_escape_command_arg(void)
     EXPECT_STREQ(str, "arg-x.y:z");
     free(str);
 
+    str = escape_command_arg("", false);
+    EXPECT_STREQ(str, "''");
+    free(str);
+
+    str = escape_command_arg(" ", false);
+    EXPECT_STREQ(str, "' '");
+    free(str);
+
     str = escape_command_arg("hello world", false);
     EXPECT_STREQ(str, "'hello world'");
     free(str);
