@@ -187,6 +187,41 @@ static void test_parse_args(void)
     ptr_array_free(&array);
 }
 
+static void test_escape_command_arg(void)
+{
+    char *str = escape_command_arg("arg", false);
+    EXPECT_STREQ(str, "arg");
+    free(str);
+
+    str = escape_command_arg("arg-x.y:z", false);
+    EXPECT_STREQ(str, "arg-x.y:z");
+    free(str);
+
+    str = escape_command_arg("hello world", false);
+    EXPECT_STREQ(str, "'hello world'");
+    free(str);
+
+    str = escape_command_arg("line1\nline2\n", false);
+    EXPECT_STREQ(str, "\"line1\\nline2\\n\"");
+    free(str);
+
+    str = escape_command_arg(" \t\r\n\x1F\x7F", false);
+    EXPECT_STREQ(str, "\" \\t\\r\\n\\x1F\\x7F\"");
+    free(str);
+
+    str = escape_command_arg("x ' y", false);
+    EXPECT_STREQ(str, "\"x ' y\"");
+    free(str);
+
+    str = escape_command_arg("\033[P", false);
+    EXPECT_STREQ(str, "\"\\e[P\"");
+    free(str);
+
+    str = escape_command_arg("\"''\"", false);
+    EXPECT_STREQ(str, "\"\\\"''\\\"\"");
+    free(str);
+}
+
 static void test_command_struct_layout(void)
 {
     const Command *cmd = find_normal_command("filter");
@@ -204,5 +239,6 @@ void test_command(void)
     test_parse_command_arg();
     test_parse_commands();
     test_parse_args();
+    test_escape_command_arg();
     test_command_struct_layout();
 }

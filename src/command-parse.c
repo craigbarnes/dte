@@ -283,16 +283,19 @@ const char *command_parse_error_to_string(CommandParseError err)
 
 void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
 {
-    if (!arg[0]) {
+    static const char escmap[32] = {
+        [0x07] = 'a', [0x08] = 'b',
+        [0x09] = 't', [0x0A] = 'n',
+        [0x0B] = 'v', [0x0C] = 'f',
+        [0x0D] = 'r', [0x1B] = 'e',
+    };
+
+    size_t len = strlen(arg);
+    if (len == 0) {
         string_append_literal(s, "''");
         return;
     }
 
-    if (arg[0] == '~' && escape_tilde) {
-        string_append_byte(s, '\\');
-    }
-
-    size_t len = strlen(arg);
     bool squote = false;
     for (size_t i = 0; i < len; i++) {
         char c = arg[i];
@@ -305,10 +308,10 @@ void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
             squote = true;
             continue;
         case '\'':
-            goto escape;
+            goto dquote;
         }
-        if (ascii_is_nonspace_cntrl(c)) {
-            goto escape;
+        if (ascii_iscntrl(c)) {
+            goto dquote;
         }
     }
 
@@ -316,26 +319,35 @@ void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
         string_append_byte(s, '\'');
         string_append_buf(s, arg, len);
         string_append_byte(s, '\'');
-        return;
-    }
-
-escape:
-    for (size_t i = 0; i < len; i++) {
-        const char ch = arg[i];
-        switch (ch) {
-        case ' ':
-        case '"':
-        case '$':
-        case '\'':
-        case ';':
-        case '\\':
+    } else {
+        if (arg[0] == '~' && arg[1] == '/' && escape_tilde) {
             string_append_byte(s, '\\');
-            // Fallthrough
-        default:
+        }
+        string_append_buf(s, arg, len);
+    }
+    return;
+
+dquote:
+    string_append_byte(s, '"');
+    for (size_t i = 0; i < len; i++) {
+        const unsigned char ch = arg[i];
+        if (ch < sizeof(escmap)) {
+            if (escmap[ch]) {
+                string_append_byte(s, '\\');
+                string_append_byte(s, escmap[ch]);
+            } else {
+                string_sprintf(s, "\\x%02hhX", ch);
+            }
+        } else if (ch == 0x7F) {
+            string_append_literal(s, "\\x7F");
+        } else if (ch == '"' || ch == '\\') {
+            string_append_byte(s, '\\');
             string_append_byte(s, ch);
-            break;
+        } else {
+            string_append_byte(s, ch);
         }
     }
+    string_append_byte(s, '"');
 }
 
 char *escape_command_arg(const char *arg, bool escape_tilde)
