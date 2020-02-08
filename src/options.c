@@ -1,5 +1,6 @@
 #include "options.h"
 #include "buffer.h"
+#include "command.h"
 #include "completion.h"
 #include "debug.h"
 #include "editor.h"
@@ -758,27 +759,37 @@ void collect_option_values(const char *name, const char *prefix)
     }
 }
 
+static void append_option(String *s, const OptionDesc *desc, void *ptr)
+{
+    const OptionValue value = desc->ops->get(desc, ptr);
+    const char *value_str = desc->ops->string(desc, value);
+    string_append_cstring(s, desc->name);
+    string_append_byte(s, ' ');
+    string_append_escaped_arg(s, value_str, false);
+    string_append_byte(s, '\n');
+}
+
 String dump_options(void)
 {
     String buf = string_new(4096);
-    string_sprintf(&buf, "\n%23s\n", "Global Options:");
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        if (desc->global) {
-            char *ptr = global_ptr(desc);
-            const OptionValue value = desc->ops->get(desc, ptr);
-            const char *str = desc->ops->string(desc, value);
-            string_sprintf(&buf, "%23s  %s\n", desc->name, str);
-        }
-    }
-    string_sprintf(&buf, "\n%23s\n", "Local Options:");
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const OptionDesc *desc = &option_desc[i];
-        if (desc->local) {
-            char *ptr = local_ptr(desc, &buffer->options);
-            const OptionValue value = desc->ops->get(desc, ptr);
-            const char *str = desc->ops->string(desc, value);
-            string_sprintf(&buf, "%23s  %s\n", desc->name, str);
+        void *local = desc->local ? local_ptr(desc, &buffer->options) : NULL;
+        void *global = desc->global ? global_ptr(desc) : NULL;
+        if (local && global) {
+            const OptionValue global_value = desc->ops->get(desc, global);
+            if (desc->ops->equals(desc, local, global_value)) {
+                string_append_literal(&buf, "set ");
+                append_option(&buf, desc, local);
+            } else {
+                string_append_literal(&buf, "set -g ");
+                append_option(&buf, desc, global);
+                string_append_literal(&buf, "set -l ");
+                append_option(&buf, desc, local);
+            }
+        } else {
+            string_append_literal(&buf, "set ");
+            append_option(&buf, desc, local ? local : global);
         }
     }
     return buf;
