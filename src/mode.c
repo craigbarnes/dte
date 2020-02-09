@@ -85,6 +85,24 @@ void command_mode_keypress(KeyCode key)
 void search_mode_keypress(KeyCode key)
 {
     switch (key) {
+    case MOD_META | KEY_ENTER:
+        if (editor.cmdline.buf.len == 0) {
+            return;
+        } else {
+            // Escape the regex; to match as plain text
+            char *original = string_clone_cstring(&editor.cmdline.buf);
+            size_t len = editor.cmdline.buf.len;
+            string_clear(&editor.cmdline.buf);
+            for (size_t i = 0; i < len; i++) {
+                char ch = original[i];
+                if (is_regex_special_char(ch)) {
+                    string_append_byte(&editor.cmdline.buf, '\\');
+                }
+                string_append_byte(&editor.cmdline.buf, ch);
+            }
+            free(original);
+        }
+        // Fallthrough
     case KEY_ENTER:
         if (editor.cmdline.buf.len > 0) {
             const char *str = string_borrow_cstring(&editor.cmdline.buf);
