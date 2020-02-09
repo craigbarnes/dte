@@ -56,15 +56,6 @@ static int dup_close_on_exec(int oldfd, int newfd)
 #endif
 }
 
-static void reset_signal_handler(int signum)
-{
-    struct sigaction act;
-    memset(&act, 0, sizeof(struct sigaction));
-    sigemptyset(&act.sa_mask);
-    act.sa_handler = SIG_DFL;
-    sigaction(signum, &act, NULL);
-}
-
 static void handle_child(char **argv, int fd[3], int error_fd)
 {
     int error;
@@ -87,14 +78,14 @@ static void handle_child(char **argv, int fd[3], int error_fd)
         if (error_fd < nr_fds) {
             error_fd = dup_close_on_exec(error_fd, next_free++);
             if (error_fd < 0) {
-                goto out;
+                goto error;
             }
         }
         for (int i = 0; i < nr_fds; i++) {
             if (fd[i] < i) {
                 fd[i] = dup_close_on_exec(fd[i], next_free++);
                 if (fd[i] < 0) {
-                    goto out;
+                    goto error;
                 }
             }
         }
@@ -107,17 +98,22 @@ static void handle_child(char **argv, int fd[3], int error_fd)
             close_on_exec(fd[i], false);
         } else {
             if (dup2(fd[i], i) < 0) {
-                goto out;
+                goto error;
             }
         }
     }
 
-    // Unignore signals (see man page exec(3p) for more information)
-    reset_signal_handler(SIGINT);
-    reset_signal_handler(SIGQUIT);
+    // Unignore SIGINT and SIGQUIT (see exec(3p))
+    struct sigaction act;
+    memset(&act, 0, sizeof(struct sigaction));
+    sigemptyset(&act.sa_mask);
+    act.sa_handler = SIG_DFL;
+    sigaction(SIGINT, &act, NULL);
+    sigaction(SIGQUIT, &act, NULL);
 
     execvp(argv[0], argv);
-out:
+
+error:
     error = errno;
     error = write(error_fd, &error, sizeof(error));
     exit(42);
