@@ -349,52 +349,6 @@ void mark_buffer_tabbars_changed(Buffer *b)
     }
 }
 
-static int calc_vertical_tabbar_width(const Window *win)
-{
-    // Line numbers are included in min_edit_w
-    int min_edit_w = 80;
-    int w = editor.options.tab_bar_width;
-
-    if (win->w - w < min_edit_w) {
-        w = win->w - min_edit_w;
-    }
-    if (w < TAB_BAR_MIN_WIDTH) {
-        w = 0;
-    }
-    return w;
-}
-
-TabBarMode tabbar_visibility(const Window *win)
-{
-    switch (editor.options.tab_bar) {
-    case TAB_BAR_HIDDEN:
-    case TAB_BAR_HORIZONTAL:
-        return editor.options.tab_bar;
-    case TAB_BAR_VERTICAL:
-        if (calc_vertical_tabbar_width(win) == 0) {
-            // Not enough space
-            return TAB_BAR_HIDDEN;
-        }
-        return TAB_BAR_VERTICAL;
-    case TAB_BAR_AUTO:
-        if (calc_vertical_tabbar_width(win) == 0) {
-            // Not enough space
-            return TAB_BAR_HORIZONTAL;
-        }
-        return TAB_BAR_VERTICAL;
-    }
-    BUG("unhandled tab-bar mode");
-    return TAB_BAR_HIDDEN;
-}
-
-int vertical_tabbar_width(const Window *win)
-{
-    if (tabbar_visibility(win) == TAB_BAR_VERTICAL) {
-        return calc_vertical_tabbar_width(win);
-    }
-    return 0;
-}
-
 static int line_numbers_width(const Window *win)
 {
     int w = 0;
@@ -410,21 +364,18 @@ static int line_numbers_width(const Window *win)
 
 static int edit_x_offset(const Window *win)
 {
-    return line_numbers_width(win) + vertical_tabbar_width(win);
+    return line_numbers_width(win);
 }
 
-static int edit_y_offset(const Window *win)
+static int edit_y_offset(void)
 {
-    if (tabbar_visibility(win) == TAB_BAR_HORIZONTAL) {
-        return 1;
-    }
-    return 0;
+    return editor.options.tab_bar ? 1 : 0;
 }
 
 static void set_edit_size(Window *win)
 {
     int xo = edit_x_offset(win);
-    int yo = edit_y_offset(win);
+    int yo = edit_y_offset();
 
     win->edit_w = win->w - xo;
     win->edit_h = win->h - yo - 1; // statusline
@@ -449,7 +400,7 @@ void set_window_coordinates(Window *win, int x, int y)
     win->x = x;
     win->y = y;
     win->edit_x = x + edit_x_offset(win);
-    win->edit_y = y + edit_y_offset(win);
+    win->edit_y = y + edit_y_offset();
 }
 
 void set_window_size(Window *win, int w, int h)

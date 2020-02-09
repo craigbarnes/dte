@@ -36,13 +36,6 @@ typedef enum {
     CSS_AUTO,
 } SearchCaseSensitivity;
 
-typedef enum {
-    TAB_BAR_HIDDEN,
-    TAB_BAR_HORIZONTAL,
-    TAB_BAR_VERTICAL,
-    TAB_BAR_AUTO,
-} TabBarMode;
-
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
     unsigned int editorconfig; \
@@ -77,21 +70,17 @@ typedef struct {
     bool lock_files;
     bool set_window_title;
     bool show_line_numbers;
+    bool tab_bar;
     unsigned int esc_timeout;
     unsigned int filesize_limit;
     unsigned int scroll_margin;
-    unsigned int tab_bar_max_components;
-    unsigned int tab_bar_width;
     unsigned int crlf_newlines; // Default value for new files
     unsigned int case_sensitive_search;
-    unsigned int tab_bar;
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;
 
 #undef COMMON_OPTIONS
-
-#define TAB_BAR_MIN_WIDTH 12
 
 void set_option(const char *name, const char *value, bool local, bool global);
 void set_bool_option(const char *name, bool local, bool global);

@@ -1090,31 +1090,9 @@ Format string for the left aligned part of status line.
 
 Format string for the right aligned part of status line.
 
-### **tab-bar** [horizontal]
+### **tab-bar** [true]
 
-`hidden`
-:   Hide tab bar.
-
-`horizontal`
-:   Show tab bar on top.
-
-`vertical`
-:   Show tab bar on left if there's enough space, hide otherwise.
-
-`auto`
-:   Show tab bar on left if there's enough space, on top otherwise.
-
-### **tab-bar-max-components** [0]
-
-Maximum number of path components displayed in vertical tab bar.
-Set to `0` to disable.
-
-### **tab-bar-width** [25]
-
-Width of vertical tab bar. Note that width of tab bar is
-automatically reduced to keep editing area at least 80
-columns wide. Vertical tab bar is shown only if there's
-enough space.
+Whether to show the tab-bar at the top of each window.
 
 ## Local options
 

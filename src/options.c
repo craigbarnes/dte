@@ -418,14 +418,6 @@ static const char *detect_indent_values[] = {
     NULL
 };
 
-static const char *tab_bar_enum[] = {
-    "hidden",
-    "horizontal",
-    "vertical",
-    "auto",
-    NULL
-};
-
 static const char *ws_error_values[] = {
     "trailing",
     "space-indent",
@@ -462,9 +454,7 @@ static const OptionDesc option_desc[] = {
     STR_OPT("statusline-left", G(statusline_left), validate_statusline_format, NULL),
     STR_OPT("statusline-right", G(statusline_right), validate_statusline_format, NULL),
     BOOL_OPT("syntax", C(syntax), syntax_changed),
-    ENUM_OPT("tab-bar", G(tab_bar), tab_bar_enum, NULL),
-    UINT_OPT("tab-bar-max-components", G(tab_bar_max_components), 0, 10, NULL),
-    UINT_OPT("tab-bar-width", G(tab_bar_width), TAB_BAR_MIN_WIDTH, 100, NULL),
+    BOOL_OPT("tab-bar", G(tab_bar), NULL),
     UINT_OPT("tab-width", C(tab_width), 1, 8, NULL),
     UINT_OPT("text-width", C(text_width), 1, 1000, NULL),
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),

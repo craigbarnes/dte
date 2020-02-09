@@ -129,7 +129,7 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_horizontal_tab_title(const View *v, size_t idx)
+static void print_tab_title(const View *v, size_t idx)
 {
     int skip = v->tt_width - v->tt_truncated_width;
     const char *filename = buffer_filename(v->buffer);
@@ -163,8 +163,12 @@ static void print_horizontal_tab_title(const View *v, size_t idx)
     }
 }
 
-static void print_horizontal_tabbar(Window *win)
+void print_tabbar(Window *win)
 {
+    if (!editor.options.tab_bar) {
+        return;
+    }
+
     term_output_reset(win->x, win->w, 0);
     terminal.move_cursor(win->x, win->y);
 
@@ -175,7 +179,7 @@ static void print_horizontal_tabbar(Window *win)
         if (obuf.x + v->tt_truncated_width > win->w) {
             break;
         }
-        print_horizontal_tab_title(v, i);
+        print_tab_title(v, i);
     }
     set_builtin_color(BC_TABBAR);
     if (i != win->views.count) {
@@ -187,116 +191,5 @@ static void print_horizontal_tabbar(Window *win)
         }
     } else {
         term_clear_eol();
-    }
-}
-
-static void print_vertical_tab_title(const View *v, size_t idx, int width)
-{
-    const char *orig_filename = buffer_filename(v->buffer);
-    const char *filename = orig_filename;
-    const unsigned int max = editor.options.tab_bar_max_components;
-
-    char prefix[32];
-    char ch = buffer_modified(v->buffer) ? '+' : ' ';
-    size_t prefix_len = xsnprintf(prefix, sizeof prefix, "%2zu%c", idx + 1, ch);
-
-    if (max) {
-        unsigned int count = 1;
-        for (size_t i = 0; filename[i]; i++) {
-            if (filename[i] == '/') {
-                count++;
-            }
-        }
-        // Ignore first slash because it does not separate components
-        if (filename[0] == '/') {
-            count--;
-        }
-        if (count > max) {
-            // Skip possible first slash
-            size_t i = 1;
-            while (1) {
-                if (filename[i] == '/' && --count == max) {
-                    i++;
-                    break;
-                }
-                i++;
-            }
-            filename += i;
-        }
-    } else {
-        int skip = prefix_len + u_str_width(filename) - width + 1;
-        if (skip > 0) {
-            filename += u_skip_chars(filename, &skip);
-        }
-    }
-
-    if (filename != orig_filename) {
-        // Filename was shortened; add "<<" symbol
-        u_set_char(prefix, &prefix_len, 0x00AB);
-        prefix[prefix_len] = '\0';
-    }
-
-    set_builtin_color((v == v->window->view) ? BC_ACTIVETAB : BC_INACTIVETAB);
-    term_add_str(prefix);
-    term_add_str(filename);
-    term_clear_eol();
-}
-
-static void print_vertical_tabbar(Window *win)
-{
-    int width = vertical_tabbar_width(win);
-    int h = win->edit_h;
-    size_t cur_idx = 0;
-
-    for (size_t i = 0, n = win->views.count; i < n; i++) {
-        if (win->view == win->views.ptrs[i]) {
-            cur_idx = i;
-            break;
-        }
-    }
-    if (win->views.count <= h) {
-        // All tabs fit
-        win->first_tab_idx = 0;
-    } else {
-        size_t max_y = win->first_tab_idx + h - 1;
-        if (win->first_tab_idx > cur_idx) {
-            win->first_tab_idx = cur_idx;
-        }
-        if (cur_idx > max_y) {
-            win->first_tab_idx += cur_idx - max_y;
-        }
-    }
-
-    term_output_reset(win->x, width, 0);
-    int n = h;
-    if (n + win->first_tab_idx > win->views.count) {
-        n = win->views.count - win->first_tab_idx;
-    }
-    size_t i;
-    for (i = 0; i < n; i++) {
-        size_t idx = win->first_tab_idx + i;
-        obuf.x = 0;
-        terminal.move_cursor(win->x, win->y + i);
-        print_vertical_tab_title(win->views.ptrs[idx], idx, width);
-    }
-    set_builtin_color(BC_TABBAR);
-    for (; i < h; i++) {
-        obuf.x = 0;
-        terminal.move_cursor(win->x, win->y + i);
-        term_clear_eol();
-    }
-}
-
-void print_tabbar(Window *win)
-{
-    switch (tabbar_visibility(win)) {
-    case TAB_BAR_HORIZONTAL:
-        print_horizontal_tabbar(win);
-        break;
-    case TAB_BAR_VERTICAL:
-        print_vertical_tabbar(win);
-        break;
-    default:
-        break;
     }
 }

@@ -88,7 +88,7 @@ void update_line_numbers(Window *win, bool force)
 {
     const View *v = win->view;
     size_t lines = v->buffer->nl;
-    int x = win->x + vertical_tabbar_width(win);
+    int x = win->x;
 
     calculate_line_numbers(win);
 

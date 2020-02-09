@@ -52,8 +52,6 @@ View *window_open_new_file(Window *w);
 View *window_open_file(Window *w, const char *filename, const Encoding *encoding);
 void window_open_files(Window *w, char **filenames, const Encoding *encoding);
 void mark_buffer_tabbars_changed(Buffer *b);
-TabBarMode tabbar_visibility(const Window *win);
-int vertical_tabbar_width(const Window *win);
 void calculate_line_numbers(Window *win);
 void set_window_coordinates(Window *win, int x, int y);
 void set_window_size(Window *win, int w, int h);

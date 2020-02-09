@@ -228,11 +228,7 @@ Global options:
 .br
    \fBstatusline\-right\fR [" %y,%X %u %E %n %t %p "]
 .br
-   \fBtab\-bar\fR [horizontal]
-.br
-   \fBtab\-bar\-max\-components\fR [0]
-.br
-   \fBtab\-bar\-width\fR [25]
+   \fBtab\-bar\fR [true]
 .br
 .P
 Local options:
@@ -1663,37 +1659,9 @@ Literal \fB%\fR.
 Format string for the right aligned part of status line.
 .P
 .RE
-\fBtab\-bar\fR [horizontal]
+\fBtab\-bar\fR [true]
 .RS
-.TP
-\fBhidden\fR
-Hide tab bar.
-.PP
-.TP
-\fBhorizontal\fR
-Show tab bar on top.
-.PP
-.TP
-\fBvertical\fR
-Show tab bar on left if there's enough space, hide otherwise.
-.PP
-.TP
-\fBauto\fR
-Show tab bar on left if there's enough space, on top otherwise.
-.PP
-.RE
-\fBtab\-bar\-max\-components\fR [0]
-.RS
-Maximum number of path components displayed in vertical tab bar.
-Set to \fB0\fR to disable.
-.P
-.RE
-\fBtab\-bar\-width\fR [25]
-.RS
-Width of vertical tab bar. Note that width of tab bar is
-automatically reduced to keep editing area at least 80
-columns wide. Vertical tab bar is shown only if there's
-enough space.
+Whether to show the tab\-bar at the top of each window.
 .P
 .RE
 .SS Local options
