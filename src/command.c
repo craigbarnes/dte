@@ -71,6 +71,17 @@ static void do_selection(SelectionType sel)
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
 }
 
+static char last_flag_or_default(const CommandArgs *a, char def)
+{
+    size_t n = a->nr_flags;
+    return n ? a->flags[n - 1] : def;
+}
+
+static char last_flag(const CommandArgs *a)
+{
+    return last_flag_or_default(a, 0);
+}
+
 static bool has_flag(const CommandArgs *a, int flag)
 {
     return !!strchr(a->flags, flag);
@@ -140,15 +151,7 @@ static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_case(const CommandArgs *a)
 {
-    int mode = 't';
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'l':
-        case 'u':
-            mode = *pf;
-            break;
-        }
-    }
+    int mode = last_flag_or_default(a, 't');
     change_case(mode);
 }
 
@@ -493,8 +496,8 @@ static void cmd_filter(const CommandArgs *a)
 static void cmd_ft(const CommandArgs *a)
 {
     FileDetectionType dt = FT_EXTENSION;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
+    if (a->nr_flags) {
+        switch (a->flags[a->nr_flags - 1]) {
         case 'b':
             dt = FT_BASENAME;
             break;
@@ -666,16 +669,7 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    char dir = 0;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'n':
-        case 'p':
-            dir = *pf;
-            break;
-        }
-    }
-
+    char dir = last_flag(a);;
     do_selection(SELECT_NONE);
     if (dir == 'n') {
         activate_next_message();
@@ -1019,16 +1013,8 @@ static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_quit(const CommandArgs *a)
 {
-    bool prompt = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'f':
-            editor.status = EDITOR_EXITING;
-            return;
-        case 'p':
-            prompt = true;
-            break;
-        }
+    if (has_flag(a, 'f')) {
+        goto exit;
     }
 
     for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
@@ -1045,9 +1031,9 @@ static void cmd_quit(const CommandArgs *a)
                 mark_everything_changed();
             }
             set_view(v);
-            if (prompt) {
+            if (has_flag(a, 'p')) {
                 if (dialog_prompt("Quit without saving changes? [y/N]", "ny") == 'y') {
-                    editor.status = EDITOR_EXITING;
+                    goto exit;
                 }
                 return;
             } else {
@@ -1060,6 +1046,7 @@ static void cmd_quit(const CommandArgs *a)
         }
     }
 
+exit:
     editor.status = EDITOR_EXITING;
 }
 
@@ -1527,20 +1514,8 @@ static void cmd_select(const CommandArgs *a)
 
 static void cmd_set(const CommandArgs *a)
 {
-    bool global = false;
-    bool local = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'g':
-            global = true;
-            break;
-        case 'l':
-            local = true;
-            break;
-        }
-    }
-
-    // You can set only global values in config file
+    bool global = has_flag(a, 'g');
+    bool local = has_flag(a, 'l');
     if (buffer == NULL) {
         if (local) {
             error_msg("Flag -l makes no sense in config file.");
@@ -1815,19 +1790,8 @@ static void cmd_title(const CommandArgs *a)
 
 static void cmd_toggle(const CommandArgs *a)
 {
-    bool global = false;
-    bool verbose = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'g':
-            global = true;
-            break;
-        case 'v':
-            verbose = true;
-            break;
-        }
-    }
-
+    bool global = has_flag(a, 'g');
+    bool verbose = has_flag(a, 'v');
     const char *option_name = a->args[0];
     size_t nr_values = a->nr_args - 1;
     if (nr_values) {
@@ -1961,8 +1925,8 @@ static void cmd_wresize(const CommandArgs *a)
     }
 
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
+    if (a->nr_flags) {
+        switch (a->flags[a->nr_flags - 1]) {
         case 'h':
             dir = RESIZE_DIRECTION_HORIZONTAL;
             break;
