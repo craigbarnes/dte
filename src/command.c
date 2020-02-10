@@ -84,7 +84,8 @@ static char last_flag(const CommandArgs *a)
 
 static bool has_flag(const CommandArgs *a, int flag)
 {
-    return !!strchr(a->flags, flag);
+    size_t n = a->nr_flags;
+    return n ? !!memchr(a->flags, flag, n) : false;
 }
 
 static void handle_select_chars_flag(const CommandArgs *a)
@@ -669,7 +670,7 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    char dir = last_flag(a);;
+    char dir = last_flag(a);
     do_selection(SELECT_NONE);
     if (dir == 'n') {
         activate_next_message();
