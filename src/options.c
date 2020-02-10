@@ -30,7 +30,7 @@ typedef enum {
 typedef struct {
     const struct OptionOps *ops;
     const char *name;
-    size_t offset;
+    unsigned int offset;
     bool local;
     bool global;
     union {
