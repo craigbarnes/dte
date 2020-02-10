@@ -38,16 +38,16 @@ typedef enum {
 
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
-    unsigned int editorconfig; \
-    unsigned int fsync; \
     unsigned int indent_width; \
     unsigned int tab_width; \
     unsigned int text_width; \
     unsigned int ws_error; \
     bool auto_indent; \
+    bool editorconfig; \
     bool emulate_tab; \
     bool expand_tab; \
     bool file_history; \
+    bool fsync; \
     bool syntax
 
 typedef struct {
