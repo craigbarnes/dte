@@ -1,0 +1,15 @@
+set statusline-left '%f %m %r %y %Y %x %X %p %E %M %N %n %s %t %u %%'
+toggle auto-indent
+toggle editorconfig
+toggle emulate-tab
+toggle expand-tab
+toggle file-history
+toggle fsync
+toggle syntax
+toggle brace-indent
+toggle display-invisible
+toggle display-special
+toggle lock-files
+toggle set-window-title
+toggle show-line-numbers
+toggle tab-bar

@@ -91,5 +91,4 @@ repeat 3 move-tab right
 move-tab 17
 open -g ../../docs/*
 cd -
-set statusline-left '%f %m %r %y %Y %x %X %p %E %M %n %s %t %u %%'
 #suspend
