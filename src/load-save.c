@@ -172,6 +172,8 @@ static int xmadvise_sequential(void *addr, size_t len)
     // "The posix_madvise() function shall have no effect on the semantics
     // of access to memory in the specified range, although it may affect
     // the performance of access". Ergo, doing nothing is a valid fallback.
+    (void)addr;
+    (void)len;
     return 0;
 #endif
 }

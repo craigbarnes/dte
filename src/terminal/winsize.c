@@ -19,7 +19,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 
 #else
 
-bool term_get_size(unsigned int *w, unsigned int *h)
+bool term_get_size(unsigned int* UNUSED_ARG(w), unsigned int* UNUSED_ARG(h))
 {
     return false;
 }
