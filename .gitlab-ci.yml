@@ -13,7 +13,7 @@ default:
         - ldd dte
         - make clean && make check TERMINFO_DISABLE=1 LDFLAGS=-static
         - ldd dte || true
-        - make clean && make check USE_SANITIZER=1
+        - make clean && make check
         - ldd dte
         - make clean && make check CSTD='-std=c99'
         - make clean && make DEBUG=0 && make install && dte -V
