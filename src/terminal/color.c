@@ -87,8 +87,9 @@ UNITTEST {
     BUG_ON(parse_rrggbb("11223") != COLOR_INVALID);
 }
 
-static int32_t parse_color(const char *str, size_t len)
+static int32_t parse_color(const char *str)
 {
+    size_t len = strlen(str);
     if (len == 0) {
         return COLOR_INVALID;
     }
@@ -126,31 +127,31 @@ static int32_t parse_color(const char *str, size_t len)
 }
 
 UNITTEST {
-    BUG_ON(parse_color(STRN("-2")) != COLOR_KEEP);
-    BUG_ON(parse_color(STRN("-1")) != COLOR_DEFAULT);
-    BUG_ON(parse_color(STRN("0")) != COLOR_BLACK);
-    BUG_ON(parse_color(STRN("1")) != COLOR_RED);
-    BUG_ON(parse_color(STRN("255")) != 255);
-    BUG_ON(parse_color(STRN("0/0/0")) != 16);
-    BUG_ON(parse_color(STRN("2/3/4")) != 110);
-    BUG_ON(parse_color(STRN("5/5/5")) != 231);
-    BUG_ON(parse_color(STRN("black")) != COLOR_BLACK);
-    BUG_ON(parse_color(STRN("white")) != COLOR_WHITE);
-    BUG_ON(parse_color(STRN("keep")) != COLOR_KEEP);
-    BUG_ON(parse_color(STRN("default")) != COLOR_DEFAULT);
-    BUG_ON(parse_color(STRN("#abcdef")) != COLOR_RGB(0xABCDEF));
-    BUG_ON(parse_color(STRN("#a1b2c3")) != COLOR_RGB(0xA1B2C3));
-    BUG_ON(parse_color(STRN("-3")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("256")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("//0/0")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("0/0/:")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("lightblack")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("lightwhite")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("light_")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN(".")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("#11223")) != COLOR_INVALID);
-    BUG_ON(parse_color(STRN("#fffffg")) != COLOR_INVALID);
+    BUG_ON(parse_color("-2") != COLOR_KEEP);
+    BUG_ON(parse_color("-1") != COLOR_DEFAULT);
+    BUG_ON(parse_color("0") != COLOR_BLACK);
+    BUG_ON(parse_color("1") != COLOR_RED);
+    BUG_ON(parse_color("255") != 255);
+    BUG_ON(parse_color("0/0/0") != 16);
+    BUG_ON(parse_color("2/3/4") != 110);
+    BUG_ON(parse_color("5/5/5") != 231);
+    BUG_ON(parse_color("black") != COLOR_BLACK);
+    BUG_ON(parse_color("white") != COLOR_WHITE);
+    BUG_ON(parse_color("keep") != COLOR_KEEP);
+    BUG_ON(parse_color("default") != COLOR_DEFAULT);
+    BUG_ON(parse_color("#abcdef") != COLOR_RGB(0xABCDEF));
+    BUG_ON(parse_color("#a1b2c3") != COLOR_RGB(0xA1B2C3));
+    BUG_ON(parse_color("-3") != COLOR_INVALID);
+    BUG_ON(parse_color("256") != COLOR_INVALID);
+    BUG_ON(parse_color("//0/0") != COLOR_INVALID);
+    BUG_ON(parse_color("0/0/:") != COLOR_INVALID);
+    BUG_ON(parse_color("lightblack") != COLOR_INVALID);
+    BUG_ON(parse_color("lightwhite") != COLOR_INVALID);
+    BUG_ON(parse_color("light_") != COLOR_INVALID);
+    BUG_ON(parse_color("") != COLOR_INVALID);
+    BUG_ON(parse_color(".") != COLOR_INVALID);
+    BUG_ON(parse_color("#11223") != COLOR_INVALID);
+    BUG_ON(parse_color("#fffffg") != COLOR_INVALID);
 }
 
 bool parse_term_color(TermColor *color, char **strs)
@@ -160,8 +161,7 @@ bool parse_term_color(TermColor *color, char **strs)
     color->attr = 0;
     for (size_t i = 0, count = 0; strs[i]; i++) {
         const char *const str = strs[i];
-        const size_t len = strlen(str);
-        const int32_t val = parse_color(str, len);
+        const int32_t val = parse_color(str);
         if (val != COLOR_INVALID) {
             if (count > 1) {
                 if (val == COLOR_KEEP) {
