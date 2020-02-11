@@ -41,6 +41,11 @@ static void test_editorconfig_pattern_match(void)
     EXPECT_TRUE(patmatch("file.{,,x,,y,,}", "file."));
     EXPECT_FALSE(patmatch("file.{,,x,,y,,}", "file.z"));
 
+    EXPECT_TRUE(patmatch("*.x,y,z", "file.x,y,z"));
+    EXPECT_TRUE(patmatch("*.{x,y,z}", "file.y"));
+    EXPECT_FALSE(patmatch("*.{x,y,z}", "file.x,y,z"));
+    EXPECT_FALSE(patmatch("*.{x,y,z}", "file.{x,y,z}"));
+
     EXPECT_TRUE(patmatch("file.{{{a,b,{c,,d}}}}", "file.d"));
     EXPECT_TRUE(patmatch("file.{{{a,b,{c,,d}}}}", "file."));
     EXPECT_FALSE(patmatch("file.{{{a,b,{c,d}}}}", "file."));
@@ -62,6 +67,11 @@ static void test_editorconfig_pattern_match(void)
 
     EXPECT_TRUE(patmatch("{{{a}}}", "a"));
     EXPECT_FALSE(patmatch("{{{a}}", "a"));
+
+    // It's debatable whether this edge case behavior is sensible,
+    // but it's tested here anyway for the sake of UBSan coverage
+    EXPECT_TRUE(patmatch("*.xyz\\", "file.xyz\\"));
+    EXPECT_FALSE(patmatch("*.xyz\\", "file.xyz"));
 
     #undef patmatch
 }
