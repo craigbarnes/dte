@@ -181,10 +181,9 @@ static void cmd_bufis(const CommandArgs *a)
 
 static void cmd_char(const CommandArgs *a)
 {
-    const char *pf = a->flags;
     bool n_flag = false;
     bool b_flag = false;
-    while (*pf) {
+    for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'b':
             b_flag = true;
@@ -193,28 +192,32 @@ static void cmd_char(const CommandArgs *a)
             n_flag = true;
             break;
         }
-        pf++;
     }
 
-    char **args = a->args;
+    const char *chars = a->args[0];
+    if (chars[0] == '\0') {
+        error_msg("char argument can't be empty");
+        return;
+    }
+
     ConditionType type;
     if (b_flag) {
         type = COND_CHAR_BUFFER;
-    } else if (!n_flag && args[0][0] != '\0' && args[0][1] == '\0') {
+    } else if (!n_flag && chars[1] == '\0') {
         type = COND_CHAR1;
     } else {
         type = COND_CHAR;
     }
 
-    Condition *c = add_condition(type, args[1], args[2]);
+    Condition *c = add_condition(type, a->args[1], a->args[2]);
     if (!c) {
         return;
     }
 
     if (type == COND_CHAR1) {
-        c->u.cond_single_char.ch = (unsigned char)args[0][0];
+        c->u.cond_single_char.ch = (unsigned char)chars[0];
     } else {
-        bitset_add_pattern(c->u.cond_char.bitset, args[0]);
+        bitset_add_pattern(c->u.cond_char.bitset, chars);
         if (n_flag) {
             bitset_invert(c->u.cond_char.bitset);
         }
@@ -345,10 +348,7 @@ static void cmd_noeat(const CommandArgs *a)
 
     const char *arg = a->args[0];
     if (streq(arg, current_state->name)) {
-        error_msg (
-            "Using noeat to to jump to parent state causes"
-            " infinite loop"
-        );
+        error_msg("Using noeat to jump to parent state causes infinite loop");
         return;
     }
 
