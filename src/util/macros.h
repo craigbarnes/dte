@@ -256,6 +256,7 @@
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \
         DO_PRAGMA(clang diagnostic ignored "-Wunknown-pragmas") \
+        DO_PRAGMA(clang diagnostic ignored "-Wunknown-warning-option") \
         DO_PRAGMA(clang diagnostic ignored wflag)
     #define UNIGNORE_WARNINGS DO_PRAGMA(clang diagnostic pop)
 #elif GNUC_AT_LEAST(4, 6)
