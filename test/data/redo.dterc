@@ -1,0 +1,14 @@
+open
+insert -m "line #1\n"
+insert -m "line #2\n"
+insert -m "line #3\n"
+undo
+undo
+insert -m "...\n"
+undo
+redo 1
+save -f build/test/redo1.txt
+undo
+redo 2
+save -f build/test/redo2.txt
+close

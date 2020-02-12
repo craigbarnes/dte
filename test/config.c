@@ -77,31 +77,40 @@ static void expect_files_equal(const char *path1, const char *path2)
 
 static void test_exec_config(void)
 {
-    FOR_EACH_I(i, builtin_configs) {
-        const BuiltinConfig config = builtin_configs[i];
-        exec_config(&commands, config.text.data, config.text.length);
-    }
-
-    const char *outfiles[] = {
+    static const char *const outfiles[] = {
         "env.txt",
         "crlf.txt",
         "thai-utf8.txt",
         "pipe-from.txt",
         "pipe-to.txt",
+        "redo1.txt",
+        "redo2.txt",
     };
 
-    // Check that files created by test configs have expected contents
+    // Delete output files left over from previous runs
+    unlink("build/test/thai-tis620.txt");
+    FOR_EACH_I(i, outfiles) {
+        char out[64];
+        xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
+        unlink(out);
+    }
+
+    // Execute *.dterc files
+    FOR_EACH_I(i, builtin_configs) {
+        const BuiltinConfig config = builtin_configs[i];
+        exec_config(&commands, config.text.data, config.text.length);
+    }
+
+    // Check that output files have expected contents
     FOR_EACH_I(i, outfiles) {
         char out[64], ref[64];
         xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
         xsnprintf(ref, sizeof ref, "test/data/%s", outfiles[i]);
         expect_files_equal(out, ref);
-        EXPECT_EQ(unlink(out), 0);
     }
 
     if (encoding_supported_by_iconv("TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
-        EXPECT_EQ(unlink("build/test/thai-tis620.txt"), 0);
     }
 }
 
