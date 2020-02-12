@@ -273,4 +273,10 @@
     #define IGNORE_WARNING_TAUTOLOGICAL_COMPARE
 #endif
 
+#if GNUC_AT_LEAST(7, 0) || HAS_WARNING("-Wformat-truncation")
+    #define IGNORE_WARNING_FORMAT_TRUNCATION IGNORE_WARNING("-Wformat-truncation")
+#else
+    #define IGNORE_WARNING_FORMAT_TRUNCATION
+#endif
+
 #endif

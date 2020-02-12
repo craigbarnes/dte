@@ -1,6 +1,7 @@
 #include <langinfo.h>
 #include <limits.h>
 #include <locale.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "test.h"
@@ -76,6 +77,23 @@ static void test_posix_sanity(void)
     // This is not guaranteed by ISO C99, but it is required by POSIX
     // and is relied upon by this codebase:
     ASSERT_EQ(CHAR_BIT, 8);
+
+    IGNORE_WARNING_FORMAT_TRUNCATION
+
+    // Some snprintf(3) implementations historically returned -1 in case of
+    // truncation. C99 and POSIX 2001 both require that it return the full
+    // size of the formatted string, as if there had been enough space.
+    char buf[8] = "........";
+    ASSERT_EQ(snprintf(buf, 8, "0123456789"), 10);
+    ASSERT_EQ(buf[7], '\0');
+    EXPECT_STREQ(buf, "0123456");
+
+    // C99 and POSIX 2001 also require the same behavior as above when the
+    // size argument is 0 (and allow the buffer argument to be NULL).
+    ASSERT_EQ(snprintf(NULL, 0, "987654321"), 9);
+    EXPECT_STREQ(buf, "0123456");
+
+    UNIGNORE_WARNINGS
 }
 
 int main(void)
