@@ -516,29 +516,30 @@ static void cmd_require(const CommandArgs *a)
         hashset_init(&loaded_builtins, 8, false);
     }
 
+    char buf[4096];
     char *path;
+    size_t path_len;
     HashSet *set;
     ConfigFlags flags = CFG_MUST_EXIST;
+
     if (a->flags[0] == 'f') {
         set = &loaded_files;
-        path = xstrdup(a->args[0]);
+        path = a->args[0];
+        path_len = strlen(path);
     } else {
         set = &loaded_builtins;
-        path = path_join("syntax/inc/", a->args[0]);
+        path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
+        path = buf;
         flags |= CFG_BUILTIN;
     }
 
-    const size_t len = strlen(path);
-    if (hashset_get(set, path, len)) {
-        goto out;
+    if (hashset_get(set, path, path_len)) {
+        return;
     }
 
     if (read_config(&syntax_commands, path, flags) == 0) {
-        hashset_add(set, path, len);
+        hashset_add(set, path, path_len);
     }
-
-out:
-    free(path);
 }
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
