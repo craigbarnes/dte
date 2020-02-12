@@ -66,8 +66,7 @@ UNITTEST {
     BUG_ON(get_term_type("xtermz") != TERM_OTHER);
 }
 
-NORETURN
-void term_init_fail(const char *fmt, ...)
+noreturn void term_init_fail(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

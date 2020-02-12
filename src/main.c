@@ -61,7 +61,7 @@ static void handle_sigwinch(int UNUSED_ARG(signum))
 }
 #endif
 
-static NORETURN COLD void handle_fatal_signal(int signum)
+static noreturn COLD void handle_fatal_signal(int signum)
 {
     term_cleanup();
 

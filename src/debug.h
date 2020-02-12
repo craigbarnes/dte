@@ -14,7 +14,7 @@
 #if DEBUG >= 1
   #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
 
-  NORETURN COLD PRINTF(4)
+  noreturn COLD PRINTF(4)
   void bug(const char *file, int line, const char *func, const char *fmt, ...);
 #else
   #define BUG(...) UNREACHABLE()
@@ -32,7 +32,6 @@
 
 void term_cleanup(void);
 
-NORETURN COLD NONNULL_ARGS
-void fatal_error(const char *msg, int err);
+noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
 
 #endif

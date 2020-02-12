@@ -223,13 +223,13 @@
 
 #if __STDC_VERSION__ >= 201112L
     #define alignof(t) _Alignof(t)
-    #define NORETURN _Noreturn
+    #define noreturn _Noreturn
 #elif GNUC_AT_LEAST(3, 0)
     #define alignof(t) __alignof__(t)
-    #define NORETURN __attribute__((__noreturn__))
+    #define noreturn __attribute__((__noreturn__))
 #else
     #define alignof(t) MIN(sizeof(t), offsetof(struct{char c; t x;}, x))
-    #define NORETURN
+    #define noreturn
 #endif
 
 #if (__STDC_VERSION__ >= 201112L) || HAS_EXTENSION(c_static_assert)

@@ -19,8 +19,7 @@ void term_cleanup(void)
     }
 }
 
-NORETURN
-void fatal_error(const char *msg, int err)
+noreturn void fatal_error(const char *msg, int err)
 {
     term_cleanup();
     errno = err;
@@ -29,7 +28,7 @@ void fatal_error(const char *msg, int err)
 }
 
 #if DEBUG >= 1
-NORETURN
+noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...) {
     term_cleanup();
 
