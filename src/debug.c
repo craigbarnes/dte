@@ -14,18 +14,8 @@
 
 void term_cleanup(void)
 {
-    if (editor.status == EDITOR_INITIALIZING) {
-        return;
-    }
     if (!editor.child_controls_terminal) {
         ui_end();
-    }
-    if (terminal.control_codes.deinit.length) {
-        xwrite (
-            STDOUT_FILENO,
-            terminal.control_codes.deinit.data,
-            terminal.control_codes.deinit.length
-        );
     }
 }
 
