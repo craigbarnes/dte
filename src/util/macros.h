@@ -255,28 +255,18 @@
 #ifdef __clang__
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(clang diagnostic push) \
+        DO_PRAGMA(clang diagnostic ignored "-Wunknown-pragmas") \
         DO_PRAGMA(clang diagnostic ignored wflag)
     #define UNIGNORE_WARNINGS DO_PRAGMA(clang diagnostic pop)
 #elif GNUC_AT_LEAST(4, 6)
     #define IGNORE_WARNING(wflag) \
         DO_PRAGMA(GCC diagnostic push) \
+        DO_PRAGMA(GCC diagnostic ignored "-Wpragmas") \
         DO_PRAGMA(GCC diagnostic ignored wflag)
     #define UNIGNORE_WARNINGS DO_PRAGMA(GCC diagnostic pop)
 #else
     #define IGNORE_WARNING(wflag)
     #define UNIGNORE_WARNINGS
-#endif
-
-#if GNUC_AT_LEAST(6, 0) || HAS_WARNING("-Wtautological-compare")
-    #define IGNORE_WARNING_TAUTOLOGICAL_COMPARE IGNORE_WARNING("-Wtautological-compare")
-#else
-    #define IGNORE_WARNING_TAUTOLOGICAL_COMPARE
-#endif
-
-#if GNUC_AT_LEAST(7, 0) || HAS_WARNING("-Wformat-truncation")
-    #define IGNORE_WARNING_FORMAT_TRUNCATION IGNORE_WARNING("-Wformat-truncation")
-#else
-    #define IGNORE_WARNING_FORMAT_TRUNCATION
 #endif
 
 #endif

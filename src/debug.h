@@ -4,7 +4,7 @@
 #include "util/macros.h"
 
 #define BUG_ON(a) do { \
-    IGNORE_WARNING_TAUTOLOGICAL_COMPARE \
+    IGNORE_WARNING("-Wtautological-compare") \
     if (unlikely(a)) { \
         BUG("%s", #a); \
     } \

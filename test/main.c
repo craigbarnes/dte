@@ -78,7 +78,7 @@ static void test_posix_sanity(void)
     // and is relied upon by this codebase:
     ASSERT_EQ(CHAR_BIT, 8);
 
-    IGNORE_WARNING_FORMAT_TRUNCATION
+    IGNORE_WARNING("-Wformat-truncation")
 
     // Some snprintf(3) implementations historically returned -1 in case of
     // truncation. C99 and POSIX 2001 both require that it return the full
