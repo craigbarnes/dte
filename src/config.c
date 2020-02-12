@@ -71,6 +71,16 @@ void exec_config(const CommandSet *cmds, const char *buf, size_t size)
     string_free(&line);
 }
 
+String dump_builtin_configs(void)
+{
+    String str = STRING_INIT;
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+        string_append_cstring(&str, builtin_configs[i].name);
+        string_append_byte(&str, '\n');
+    }
+    return str;
+}
+
 void list_builtin_configs(void)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {

@@ -263,12 +263,6 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
-    if (strview_equal_cstring(&cmd_name, "insert-builtin")) {
-        if (argc == 1) {
-            collect_builtin_configs(completion.parsed, true);
-        }
-        return;
-    }
     if (strview_equal_cstring(&cmd_name, "hi")) {
         switch (argc) {
         case 1:
@@ -307,7 +301,7 @@ static void collect_completions(char **args, size_t argc)
     }
     if (strview_equal_cstring(&cmd_name, "show")) {
         static const char opts[][8] = {
-            "alias", "bind", "color", "option", "wsplit"
+            "alias", "bind", "color", "include", "option", "wsplit"
         };
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
         const char *arg1;
@@ -325,6 +319,8 @@ static void collect_completions(char **args, size_t argc)
                 collect_aliases(completion.parsed);
             } else if (streq(arg1, "color")) {
                 collect_hl_colors(completion.parsed);
+            } else if (streq(arg1, "include")) {
+                collect_builtin_configs(completion.parsed, false);
             } else if (streq(arg1, "option")) {
                 collect_options(completion.parsed);
             } else if (streq(arg1, "wsplit")) {

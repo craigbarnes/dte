@@ -22,8 +22,6 @@ erase-word
 filter sort -r
 ft ext filetype
 hi default red black bold
-include -b binding/shift-select
-insert-builtin syntax/dte
 bof
 select
 eof

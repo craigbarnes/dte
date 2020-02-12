@@ -585,17 +585,6 @@ static void cmd_insert(const CommandArgs *a)
     }
 }
 
-static void cmd_insert_builtin(const CommandArgs *a)
-{
-    const char *name = a->args[0];
-    const BuiltinConfig *cfg = get_builtin_config(name);
-    if (cfg) {
-        buffer_insert_bytes(cfg->text.data, cfg->text.length);
-    } else {
-        error_msg("No built-in config with name '%s'", name);
-    }
-}
-
 static void cmd_join(const CommandArgs* UNUSED_ARG(a))
 {
     join_lines();
@@ -1575,7 +1564,7 @@ static void cmd_shift(const CommandArgs *a)
     shift_lines(count);
 }
 
-static void show_alias(const char *alias_name, bool write_to_cmdline)
+static void show_alias(const char *alias_name, bool cflag)
 {
     const char *cmd_str = find_alias(alias_name);
     if (cmd_str == NULL) {
@@ -1587,7 +1576,7 @@ static void show_alias(const char *alias_name, bool write_to_cmdline)
         return;
     }
 
-    if (write_to_cmdline) {
+    if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, cmd_str);
     } else {
@@ -1595,7 +1584,7 @@ static void show_alias(const char *alias_name, bool write_to_cmdline)
     }
 }
 
-static void show_binding(const char *keystr, bool write_to_cmdline)
+static void show_binding(const char *keystr, bool cflag)
 {
     KeyCode key;
     if (!parse_key_string(&key, keystr)) {
@@ -1614,7 +1603,7 @@ static void show_binding(const char *keystr, bool write_to_cmdline)
         return;
     }
 
-    if (write_to_cmdline) {
+    if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, b->cmd_str);
     } else {
@@ -1622,7 +1611,7 @@ static void show_binding(const char *keystr, bool write_to_cmdline)
     }
 }
 
-static void show_color(const char *color_name, bool write_to_cmdline)
+static void show_color(const char *color_name, bool cflag)
 {
     const HlColor *hl = find_color(color_name);
     if (!hl) {
@@ -1631,7 +1620,7 @@ static void show_color(const char *color_name, bool write_to_cmdline)
     }
 
     const char *color_str = term_color_to_string(&hl->color);
-    if (write_to_cmdline) {
+    if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, color_str);
     } else {
@@ -1639,14 +1628,34 @@ static void show_color(const char *color_name, bool write_to_cmdline)
     }
 }
 
-static void show_option(const char *name, bool write_to_cmdline)
+static void show_include(const char *name, bool cflag)
+{
+    const BuiltinConfig *cfg = get_builtin_config(name);
+    if (!cfg) {
+        error_msg("no built-in config with name '%s'", name);
+        return;
+    }
+
+    if (cflag) {
+        buffer_insert_bytes(cfg->text.data, cfg->text.length);
+        return;
+    }
+
+    View *v = window_open_new_file(window);
+    v->buffer->temporary = true;
+    do_insert(cfg->text.data, cfg->text.length);
+    free(v->buffer->display_filename);
+    v->buffer->display_filename = xasprintf("(builtin %s)", name);
+}
+
+static void show_option(const char *name, bool cflag)
 {
     const char *value = get_option_value_string(name);
     if (!value) {
         error_msg("invalid option name: %s", name);
         return;
     }
-    if (write_to_cmdline) {
+    if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, value);
     } else {
@@ -1654,7 +1663,7 @@ static void show_option(const char *name, bool write_to_cmdline)
     }
 }
 
-static void show_wsplit(const char *name, bool write_to_cmdline)
+static void show_wsplit(const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
         error_msg("invalid window: %s", name);
@@ -1665,7 +1674,7 @@ static void show_wsplit(const char *name, bool write_to_cmdline)
     char buf[128];
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
-    if (write_to_cmdline) {
+    if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, buf);
     } else {
@@ -1683,6 +1692,7 @@ static void cmd_show(const CommandArgs *a)
         {"alias", show_alias, dump_aliases},
         {"bind", show_binding, dump_bindings},
         {"color", show_color, dump_hl_colors},
+        {"include", show_include, dump_builtin_configs},
         {"option", show_option, dump_options},
         {"wsplit", show_wsplit, dump_frames},
     };
@@ -2100,7 +2110,6 @@ static const Command cmds[] = {
     {"hi", "-", 0, -1, cmd_hi},
     {"include", "bq", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
-    {"insert-builtin", "", 1, 1, cmd_insert_builtin},
     {"join", "", 0, 0, cmd_join},
     {"left", "c", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},

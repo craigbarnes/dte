@@ -5,6 +5,7 @@
 #include "command.h"
 #include "util/macros.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef enum {
     CFG_NOFLAGS = 0,
@@ -21,6 +22,7 @@ extern const char *config_file;
 extern int config_line;
 
 void list_builtin_configs(void);
+String dump_builtin_configs(void);
 void collect_builtin_configs(const char *prefix, bool syntaxes);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
