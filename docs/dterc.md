@@ -949,21 +949,29 @@ Display current values for various configurable types.
 The _type_ argument can be one of:
 
 `alias`
-:   show command aliases
+:   command aliases
 
 `bind`
-:   show key bindings
+:   key bindings
+
+`color`
+:   highlight colors
+
+`include`
+:   built-in configs
 
 `option`
-:   show option values
+:   option values
+
+`wsplit`
+:   window dimensions
 
 The _key_ argument is the name of the entry to look up (e.g. the alias
-name). If this argument is specified, the value will be displayed in
-the status line. If omitted, a new, temporary buffer will be opened
-displaying all entries of the specified type.
+name). If this argument is omitted, the full list of entries of the
+specified _type_ will be displayed in a new buffer.
 
 `-c`
-:   write value to command line instead of status line
+:   write value to command line (if possible)
 
 # Options
 

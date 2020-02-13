@@ -1485,24 +1485,35 @@ The \fItype\fR argument can be one of:
 .P
 .TP
 \fBalias\fR
-show command aliases
+command aliases
 .PP
 .TP
 \fBbind\fR
-show key bindings
+key bindings
+.PP
+.TP
+\fBcolor\fR
+highlight colors
+.PP
+.TP
+\fBinclude\fR
+built\-in configs
 .PP
 .TP
 \fBoption\fR
-show option values
+option values
+.PP
+.TP
+\fBwsplit\fR
+window dimensions
 .PP
 The \fIkey\fR argument is the name of the entry to look up (e.g. the alias
-name). If this argument is specified, the value will be displayed in
-the status line. If omitted, a new, temporary buffer will be opened
-displaying all entries of the specified type.
+name). If this argument is omitted, the full list of entries of the
+specified \fItype\fR will be displayed in a new buffer.
 .P
 .TP
 \fB\-c\fR
-write value to command line instead of status line
+write value to command line (if possible)
 .PP
 .RE
 .SH OPTIONS
