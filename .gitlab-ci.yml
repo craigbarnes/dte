@@ -24,6 +24,10 @@ alpine:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
 
+arch:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
+
 centos:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
