@@ -32,12 +32,6 @@ ubuntu:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
 
-void-musl:
-    extends: .test
-    image:
-        name: registry.gitlab.com/craigbarnes/dockerfiles/cdev-void-musl
-        entrypoint: []
-
 debian:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
