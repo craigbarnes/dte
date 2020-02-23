@@ -11,7 +11,6 @@
 #include "terminal.h"
 #include "xterm.h"
 #include "../debug.h"
-#include "../util/ascii.h"
 #include "../util/str-util.h"
 #include "../util/string-view.h"
 

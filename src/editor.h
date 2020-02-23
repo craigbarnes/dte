@@ -3,8 +3,8 @@
 
 #include <signal.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "cmdline.h"
-#include "mode.h"
 #include "options.h"
 #include "encoding/encoding.h"
 #include "util/macros.h"

@@ -2,10 +2,8 @@
 #include "debug.h"
 #include "editor.h"
 #include "env.h"
-#include "error.h"
 #include "util/ascii.h"
-#include "util/str-util.h"
-#include "util/utf8.h"
+#include "util/unicode.h"
 #include "util/xmalloc.h"
 
 static size_t parse_sq(const char *cmd, size_t len, String *buf)

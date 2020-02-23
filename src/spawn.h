@@ -2,9 +2,9 @@
 #define SPAWN_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include "compiler.h"
 #include "util/string.h"
+#include "util/string-view.h"
 
 typedef enum {
     SPAWN_DEFAULT = 0,

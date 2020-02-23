@@ -1,7 +1,6 @@
 #include "search.h"
 #include "buffer.h"
 #include "change.h"
-#include "edit.h"
 #include "editor.h"
 #include "error.h"
 #include "regexp.h"

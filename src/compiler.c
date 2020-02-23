@@ -4,6 +4,7 @@
 #include "regexp.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "util/macros.h"
 
 static PointerArray compilers = PTR_ARRAY_INIT;
 

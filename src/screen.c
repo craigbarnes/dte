@@ -1,15 +1,11 @@
 #include <stdio.h>
 #include "screen.h"
-#include "cmdline.h"
 #include "editor.h"
 #include "frame.h"
-#include "search.h"
 #include "terminal/no-op.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
-#include "util/path.h"
-#include "util/utf8.h"
 #include "util/xsnprintf.h"
 #include "view.h"
 

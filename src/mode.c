@@ -1,18 +1,17 @@
 #include "mode.h"
 #include "bind.h"
+#include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
 #include "command.h"
 #include "completion.h"
 #include "edit.h"
 #include "editor.h"
-#include "error.h"
 #include "history.h"
 #include "search.h"
 #include "terminal/input.h"
 #include "util/unicode.h"
 #include "view.h"
-#include "window.h"
 
 void normal_mode_keypress(KeyCode key)
 {

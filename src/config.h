@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "command.h"
 #include "util/macros.h"

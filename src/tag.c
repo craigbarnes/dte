@@ -4,8 +4,6 @@
 #include <unistd.h>
 #include "tag.h"
 #include "completion.h"
-#include "debug.h"
-#include "error.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
