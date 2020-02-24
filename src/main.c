@@ -166,20 +166,18 @@ static void showkey_loop(void)
     bool loop = true;
     while (loop) {
         KeyCode key;
+        const char *str;
         if (!term_read_key(&key)) {
-            term_add_literal("  UNKNOWN\r\n");
-            term_output_flush();
-            continue;
-        }
-        switch (key) {
-        case KEY_PASTE:
+            str = "UNKNOWN";
+        } else if (key == KEY_PASTE) {
             term_discard_paste();
             continue;
-        case CTRL('D'):
-            loop = false;
-            break;
+        } else {
+            if (key == CTRL('D')) {
+                loop = false;
+            }
+            str = keycode_to_string(key);
         }
-        const char *str = keycode_to_string(key);
         term_add_literal("  ");
         term_add_bytes(str, strlen(str));
         term_add_literal("\r\n");
