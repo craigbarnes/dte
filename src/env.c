@@ -86,7 +86,6 @@ void collect_builtin_env(const char *prefix)
     }
 }
 
-// Returns NULL only if name isn't in builtin array
 bool expand_builtin_env(const char *name, char **value)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
