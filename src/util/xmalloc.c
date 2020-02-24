@@ -73,14 +73,6 @@ char *xstrdup(const char *str)
     return check_alloc(strdup(str));
 }
 
-char *xstrcut(const char *str, size_t size)
-{
-    char *s = xmalloc(size + 1);
-    memcpy(s, str, size);
-    s[size] = '\0';
-    return s;
-}
-
 VPRINTF(2)
 static int xvasprintf_(char **strp, const char *format, va_list ap)
 {

@@ -18,7 +18,6 @@ void *xmalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xcalloc(size_t size) XMALLOC ALLOC_SIZE(1);
 void *xrealloc(void *ptr, size_t size) RETURNS_NONNULL ALLOC_SIZE(2);
 char *xstrdup(const char *str) XSTRDUP;
-char *xstrcut(const char *str, size_t size) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply_(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
@@ -47,6 +46,14 @@ DIAGNOSE_IF(!IS_POWER_OF_2(r))
 {
     r--;
     return (x + r) & ~r;
+}
+
+XSTRDUP
+static inline char *xstrcut(const char *str, size_t size)
+{
+    char *s = xmalloc(size + 1);
+    s[size] = '\0';
+    return memcpy(s, str, size);
 }
 
 XSTRDUP
