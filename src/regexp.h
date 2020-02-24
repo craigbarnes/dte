@@ -3,6 +3,7 @@
 
 #include <regex.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 

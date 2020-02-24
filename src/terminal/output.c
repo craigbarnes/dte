@@ -1,13 +1,11 @@
 #include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "output.h"
 #include "terminal.h"
 #include "../debug.h"
 #include "../util/ascii.h"
 #include "../util/utf8.h"
-#include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 #include "../util/xsnprintf.h"
 

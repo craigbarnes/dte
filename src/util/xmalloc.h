@@ -1,8 +1,6 @@
 #ifndef UTIL_XMALLOC_H
 #define UTIL_XMALLOC_H
 
-#include <limits.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 #include "macros.h"

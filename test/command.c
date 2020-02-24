@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "test.h"
 #include "../src/command.h"
 #include "../src/debug.h"

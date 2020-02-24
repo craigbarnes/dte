@@ -2,6 +2,7 @@
 #define MOVE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "block-iter.h"
 #include "view.h"
 

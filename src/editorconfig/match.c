@@ -1,5 +1,4 @@
 #include <regex.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include "match.h"
 #include "../debug.h"

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "utf8.h"
 #include "ascii.h"
+#include "macros.h"
 
 enum {
     I = -1, // Invalid byte

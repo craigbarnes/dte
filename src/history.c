@@ -1,13 +1,11 @@
 #include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "history.h"
 #include "error.h"
-#include "util/ptr-array.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

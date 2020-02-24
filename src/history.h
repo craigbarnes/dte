@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include "util/ptr-array.h"
 
 #define search_history_size 100

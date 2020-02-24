@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 #include "color.h"
 #include "../util/macros.h"
 #include "../util/string-view.h"
