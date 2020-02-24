@@ -38,9 +38,7 @@ static inline size_t size_multiply(size_t a, size_t b)
 NONNULL_ARGS_AND_RETURN ALLOC_SIZE(2)
 static inline void *xmemdup(const void *ptr, size_t size)
 {
-    void *buf = xmalloc(size);
-    memcpy(buf, ptr, size);
-    return buf;
+    return memcpy(xmalloc(size), ptr, size);
 }
 
 // Round x up to a multiple of r (which *must* be a power of 2)
