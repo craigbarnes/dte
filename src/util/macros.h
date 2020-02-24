@@ -129,6 +129,12 @@
     #define unlikely(x) (x)
 #endif
 
+#if GNUC_AT_LEAST(3, 0) || HAS_BUILTIN(__builtin_constant_p) || defined(__TINYC__)
+    #define IS_CT_CONSTANT(x) __builtin_constant_p(x)
+#else
+    #define IS_CT_CONSTANT(x) 0
+#endif
+
 #if (GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(section)) && defined(__ELF__)
     #define SECTION(x) __attribute__((__section__(x)))
 #else
