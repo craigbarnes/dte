@@ -77,47 +77,51 @@
     #define CLANG_ASAN_ENABLED 1
 #endif
 
-#if GNUC_AT_LEAST(3, 0) || defined(__TINYC__)
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
 #else
     #define UNUSED
 #endif
 
-#if GNUC_AT_LEAST(3, 0)
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(aligned)
     #define ALIGNED(x) __attribute__((__aligned__(x)))
-    #define MALLOC __attribute__((__malloc__))
-    #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
-    #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
-    #define PURE __attribute__((__pure__))
-    #define CONST_FN __attribute__((__const__))
-    #define CONSTRUCTOR __attribute__((__constructor__))
-    #define DESTRUCTOR __attribute__((__destructor__))
 #else
     #define ALIGNED(x)
+#endif
+
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(malloc)
+    #define MALLOC __attribute__((__malloc__))
+#else
     #define MALLOC
+#endif
+
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(pure)
+    #define PURE __attribute__((__pure__))
+#else
+    #define PURE
+#endif
+
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(const)
+    #define CONST_FN __attribute__((__const__))
+#else
+    #define CONST_FN
+#endif
+
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(constructor)
+    #define CONSTRUCTOR __attribute__((__constructor__))
+#else
+    #define CONSTRUCTOR UNUSED
+#endif
+
+#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(format)
+    #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
+    #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
+#else
     #define PRINTF(x)
     #define VPRINTF(x)
-    #define PURE
-    #define CONST_FN
-    #define CONSTRUCTOR UNUSED
-    #define DESTRUCTOR UNUSED
 #endif
 
-#define UNUSED_ARG(x) unused__ ## x UNUSED
-
-#ifdef __COUNTER__ // Supported by GCC 4.3+ and Clang
-    #define COUNTER_ __COUNTER__
-#else
-    #define COUNTER_ __LINE__
-#endif
-
-#if defined(DEBUG) && (DEBUG > 0)
-    #define UNITTEST static void CONSTRUCTOR XPASTE(unittest_, COUNTER_)(void)
-#else
-    #define UNITTEST static void UNUSED XPASTE(unittest_, COUNTER_)(void)
-#endif
-
-#if GNUC_AT_LEAST(3, 0) && defined(__OPTIMIZE__)
+#if (GNUC_AT_LEAST(3, 0) || HAS_BUILTIN(__builtin_expect)) && defined(__OPTIMIZE__)
     #define likely(x) __builtin_expect(!!(x), 1)
     #define unlikely(x) __builtin_expect(!!(x), 0)
 #else
@@ -125,7 +129,7 @@
     #define unlikely(x) (x)
 #endif
 
-#if GNUC_AT_LEAST(3, 0) && defined(__ELF__)
+#if (GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(section)) && defined(__ELF__)
     #define SECTION(x) __attribute__((__section__(x)))
 #else
     #define SECTION(x)
@@ -217,6 +221,7 @@
     #define DIAGNOSE_IF(x)
 #endif
 
+#define UNUSED_ARG(x) unused__ ## x UNUSED
 #define XMALLOC MALLOC RETURNS_NONNULL WARN_UNUSED_RESULT
 #define XSTRDUP XMALLOC NONNULL_ARGS
 #define NONNULL_ARGS_AND_RETURN RETURNS_NONNULL NONNULL_ARGS
@@ -250,6 +255,18 @@
     #define UNROLL_LOOP(n) DO_PRAGMA(GCC unroll (n))
 #else
     #define UNROLL_LOOP(n)
+#endif
+
+#ifdef __COUNTER__ // Supported by GCC 4.3+ and Clang
+    #define COUNTER_ __COUNTER__
+#else
+    #define COUNTER_ __LINE__
+#endif
+
+#if defined(DEBUG) && (DEBUG > 0)
+    #define UNITTEST static void CONSTRUCTOR XPASTE(unittest_, COUNTER_)(void)
+#else
+    #define UNITTEST static void UNUSED XPASTE(unittest_, COUNTER_)(void)
 #endif
 
 #ifdef __clang__
