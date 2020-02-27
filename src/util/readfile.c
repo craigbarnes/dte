@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "readfile.h"
-#include "xmalloc.h"
 #include "xreadwrite.h"
 #include "../debug.h"
 
@@ -28,7 +27,11 @@ ssize_t read_file(const char *filename, char **bufp)
         return -1;
     }
 
-    char *buf = xmalloc(st.st_size + 1);
+    char *buf = malloc(st.st_size + 1);
+    if (unlikely(!buf)) {
+        return -1;
+    }
+
     ssize_t r = xread(fd, buf, st.st_size);
     close(fd);
     if (r > 0) {
