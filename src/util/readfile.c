@@ -27,6 +27,7 @@ ssize_t read_file(const char *filename, char **bufp)
 
     char *buf = malloc(st.st_size + 1);
     if (unlikely(!buf)) {
+        close(fd);
         return -1;
     }
 
