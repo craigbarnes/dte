@@ -8,6 +8,7 @@
 #include "../src/util/ascii.h"
 #include "../src/util/checked-arith.h"
 #include "../src/util/hashset.h"
+#include "../src/util/line-iter.h"
 #include "../src/util/path.h"
 #include "../src/util/ptr-array.h"
 #include "../src/util/readfile.h"

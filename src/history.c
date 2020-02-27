@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "history.h"
 #include "error.h"
+#include "util/line-iter.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

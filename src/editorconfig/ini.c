@@ -2,6 +2,7 @@
 #include "ini.h"
 #include "../debug.h"
 #include "../util/ascii.h"
+#include "../util/line-iter.h"
 #include "../util/readfile.h"
 #include "../util/str-util.h"
 

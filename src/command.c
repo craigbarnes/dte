@@ -32,6 +32,7 @@
 #include "tag.h"
 #include "terminal/color.h"
 #include "terminal/terminal.h"
+#include "util/line-iter.h"
 #include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"

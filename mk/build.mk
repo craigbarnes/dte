@@ -32,8 +32,8 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf pipe redo fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec hashset path ptr-array readfile string strtonum \
-    unicode utf8 xmalloc xreadwrite xsnprintf )
+    ascii exec hashset line-iter path ptr-array readfile string \
+    strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
