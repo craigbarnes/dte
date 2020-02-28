@@ -113,6 +113,10 @@ else
   LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
+ifdef SANE_WCTYPE
+  BASIC_CFLAGS += -DSANE_WCTYPE=1
+endif
+
 dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
 

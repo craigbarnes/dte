@@ -508,7 +508,6 @@ static void test_u_is_lower(void)
 #ifdef SANE_WCTYPE
     EXPECT_TRUE(u_is_lower(0x00E0));
     EXPECT_TRUE(u_is_lower(0x00E7));
-    EXPECT_TRUE(u_is_lower(0x1D499));
 #endif
 }
 
@@ -530,7 +529,6 @@ static void test_u_is_upper(void)
     EXPECT_FALSE(u_is_upper(0x10ffff));
     EXPECT_FALSE(u_is_upper(0x00E0));
     EXPECT_FALSE(u_is_upper(0x00E7));
-    EXPECT_FALSE(u_is_upper(0x1D499));
 }
 
 static void test_u_is_cntrl(void)

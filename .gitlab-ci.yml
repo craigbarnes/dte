@@ -73,7 +73,7 @@ android:
     script:
         - make docs
         - make coverage-report
-        - make vars check CC=musl-gcc LDFLAGS=-static TERMINFO_DISABLE=1 DEBUG=0
+        - make vars check CC=musl-gcc LDFLAGS=-static DEBUG=0 TERMINFO_DISABLE=1 SANE_WCTYPE=1
         - strip dte
         - tools/objsize.sh dte
         - ldd dte || true
