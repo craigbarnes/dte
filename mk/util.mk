@@ -7,6 +7,7 @@ try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -o /dev/null $(CFILE),$(1),$(2))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 pkg-libs = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
+echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
 MAKEFLAGS += -r
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
@@ -28,8 +29,8 @@ AUTOVARS = \
     VERSION KERNEL \
     $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
-    TERM SHELL PKGCONFIG TPUT TPUT-V \
-    MAKE_VERSION MAKEFLAGS CC_VERSION
+    TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) \
+    PKGCONFIG TPUT TPUT-V MAKE_VERSION MAKEFLAGS CC_VERSION
 
 vars:
 	@echo
