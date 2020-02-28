@@ -77,6 +77,7 @@ static void test_posix_sanity(void)
     // This is not guaranteed by ISO C99, but it is required by POSIX
     // and is relied upon by this codebase:
     ASSERT_EQ(CHAR_BIT, 8);
+    ASSERT_TRUE(sizeof(int) >= 4);
 
     IGNORE_WARNING("-Wformat-truncation")
 

@@ -1,4 +1,3 @@
-#include <wctype.h>
 #include "edit.h"
 #include "buffer.h"
 #include "change.h"
@@ -863,17 +862,13 @@ void change_case(int mode)
         CodePoint u = u_get_char(src, text_len, &i);
         switch (mode) {
         case 't':
-            if (iswupper(u)) {
-                u = towlower(u);
-            } else {
-                u = towupper(u);
-            }
+            u = u_is_upper(u) ? u_to_lower(u) : u_to_upper(u);
             break;
         case 'l':
-            u = towlower(u);
+            u = u_to_lower(u);
             break;
         case 'u':
-            u = towupper(u);
+            u = u_to_upper(u);
             break;
         }
         string_append_codepoint(&dst, u);

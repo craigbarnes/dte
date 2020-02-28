@@ -478,6 +478,40 @@ static void test_u_to_lower(void)
     EXPECT_EQ(u_to_lower('\0'), '\0');
 }
 
+static void test_u_to_upper(void)
+{
+    EXPECT_EQ(u_to_upper('a'), 'A');
+    EXPECT_EQ(u_to_upper('z'), 'Z');
+    EXPECT_EQ(u_to_upper('A'), 'A');
+    EXPECT_EQ(u_to_upper('0'), '0');
+    EXPECT_EQ(u_to_upper('~'), '~');
+    EXPECT_EQ(u_to_upper('@'), '@');
+    EXPECT_EQ(u_to_upper('\0'), '\0');
+}
+
+static void test_u_is_lower(void)
+{
+    EXPECT_TRUE(u_is_lower('a'));
+    EXPECT_TRUE(u_is_lower('z'));
+    EXPECT_FALSE(u_is_lower('A'));
+    EXPECT_FALSE(u_is_lower('Z'));
+    EXPECT_FALSE(u_is_lower('0'));
+    EXPECT_FALSE(u_is_lower('9'));
+    EXPECT_FALSE(u_is_lower('@'));
+    EXPECT_FALSE(u_is_lower('['));
+    EXPECT_FALSE(u_is_lower('{'));
+    EXPECT_FALSE(u_is_lower('\0'));
+    EXPECT_FALSE(u_is_lower('\t'));
+    EXPECT_FALSE(u_is_lower(' '));
+    EXPECT_FALSE(u_is_lower(0x1F315));
+    EXPECT_FALSE(u_is_lower(0x10ffff));
+#ifdef SANE_WCTYPE
+    EXPECT_TRUE(u_is_lower(0x00E0));
+    EXPECT_TRUE(u_is_lower(0x00E7));
+    EXPECT_TRUE(u_is_lower(0x1D499));
+#endif
+}
+
 static void test_u_is_upper(void)
 {
     EXPECT_TRUE(u_is_upper('A'));
@@ -492,11 +526,11 @@ static void test_u_is_upper(void)
     EXPECT_FALSE(u_is_upper('\0'));
     EXPECT_FALSE(u_is_upper('\t'));
     EXPECT_FALSE(u_is_upper(' '));
+    EXPECT_FALSE(u_is_upper(0x1F315));
+    EXPECT_FALSE(u_is_upper(0x10ffff));
     EXPECT_FALSE(u_is_upper(0x00E0));
     EXPECT_FALSE(u_is_upper(0x00E7));
     EXPECT_FALSE(u_is_upper(0x1D499));
-    EXPECT_FALSE(u_is_upper(0x1F315));
-    EXPECT_FALSE(u_is_upper(0x10ffff));
 }
 
 static void test_u_is_cntrl(void)
@@ -1122,6 +1156,8 @@ void test_util(void)
     test_str_to_size();
     test_u_char_width();
     test_u_to_lower();
+    test_u_to_upper();
+    test_u_is_lower();
     test_u_is_upper();
     test_u_is_cntrl();
     test_u_is_zero_width();
