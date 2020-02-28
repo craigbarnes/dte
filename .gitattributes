@@ -41,4 +41,4 @@ config/README.md -dterc
 
 lib/** vendored
 docs/*.[15] code generated
-src/util/unidata.c generated
+src/util/unidata.h generated

@@ -158,6 +158,7 @@ for min, max in eaw:gmatch "\n(%x+)%.*(%x*);[WF]" do
 end
 
 local stdout = io.stdout
+stdout:write("typedef struct {CodePoint first, last;} CodepointRange;\n\n")
 special_whitespace:merge_adjacent():print_ranges("special_whitespace", stdout)
 default_ignorable:merge_adjacent():print_ranges("default_ignorable", stdout)
 nonspacing_mark:merge_adjacent():print_ranges("nonspacing_mark", stdout)

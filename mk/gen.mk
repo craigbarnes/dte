@@ -5,8 +5,8 @@ UCD_FILES = $(addprefix .cache/, \
     UnicodeData.txt EastAsianWidth.txt DerivedCoreProperties.txt )
 
 gen-unidata: $(UCD_FILES)
-	$(E) GEN src/util/unidata.c
-	$(Q) $(LUA) src/util/unidata.lua $(UCD_FILES) > src/util/unidata.c
+	$(E) GEN src/util/unidata.h
+	$(Q) $(LUA) src/util/unidata.lua $(UCD_FILES) > src/util/unidata.h
 
 $(UCD_FILES): | .cache/
 	$(E) FETCH $@

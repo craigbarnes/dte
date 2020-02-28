@@ -1,15 +1,10 @@
 #include <stddef.h>
 #include "unicode.h"
+#include "unidata.h"
 #include "ascii.h"
 #include "../editor.h"
 
 #define BISEARCH(u, arr) bisearch((u), (arr), ARRAY_COUNT(arr) - 1)
-
-typedef struct {
-    CodePoint first, last;
-} CodepointRange;
-
-#include "unidata.c"
 
 static bool bisearch(CodePoint u, const CodepointRange *range, size_t max)
 {
