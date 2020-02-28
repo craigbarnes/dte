@@ -1,7 +1,7 @@
 #ifndef UTIL_UCHAR_H
 #define UTIL_UCHAR_H
 
-#include <sys/types.h>
+#include <stddef.h>
 #include "unicode.h"
 
 static inline size_t u_char_size(CodePoint u)
@@ -41,7 +41,5 @@ void u_set_hex(char *str, size_t *idx, CodePoint u);
  * Returns number of bytes skipped.
  */
 size_t u_skip_chars(const char *str, int *width);
-
-ssize_t u_str_index(const char *haystack, const char *needle_lcase);
 
 #endif

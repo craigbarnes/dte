@@ -254,38 +254,3 @@ size_t u_skip_chars(const char *str, int *width)
     *width -= w;
     return idx;
 }
-
-static bool has_prefix(const char *str, const char *prefix_lcase)
-{
-    size_t ni = 0;
-    size_t hi = 0;
-    CodePoint pc;
-    while ((pc = u_str_get_char(prefix_lcase, &ni))) {
-        CodePoint sc = u_str_get_char(str, &hi);
-        if (sc != pc && u_to_lower(sc) != pc) {
-            return false;
-        }
-    }
-    return true;
-}
-
-ssize_t u_str_index(const char *haystack, const char *needle_lcase)
-{
-    size_t hi = 0;
-    size_t ni = 0;
-    CodePoint nc = u_str_get_char(needle_lcase, &ni);
-    if (!nc) {
-        return 0;
-    }
-    while (haystack[hi]) {
-        size_t prev = hi;
-        CodePoint hc = u_str_get_char(haystack, &hi);
-        if (
-            (hc == nc || u_to_lower(hc) == nc)
-            && has_prefix(haystack + hi, needle_lcase + ni)
-        ) {
-            return prev;
-        }
-    }
-    return -1;
-}
