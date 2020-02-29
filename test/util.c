@@ -505,10 +505,16 @@ static void test_u_is_lower(void)
     EXPECT_FALSE(u_is_lower(' '));
     EXPECT_FALSE(u_is_lower(0x1F315));
     EXPECT_FALSE(u_is_lower(0x10ffff));
-#ifdef SANE_WCTYPE
+
+    /*
+    Even if SANE_WCTYPE is defined, we still can't make many assumptions
+    about the iswlower(3) implementation, since it depends on all kinds
+    of factors out of our control. Otherwise it'd be reasonable to test
+    something like:
+
     EXPECT_TRUE(u_is_lower(0x00E0));
     EXPECT_TRUE(u_is_lower(0x00E7));
-#endif
+    */
 }
 
 static void test_u_is_upper(void)
