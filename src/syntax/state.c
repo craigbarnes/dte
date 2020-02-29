@@ -163,10 +163,10 @@ static void cmd_bufis(const CommandArgs *a)
     const char *str = a->args[0];
     const size_t len = strlen(str);
     Condition *c;
-    if (len > ARRAY_COUNT(c->u.cond_str.str)) {
+    if (len > ARRAY_COUNT(c->u.str.buf)) {
         error_msg (
             "Maximum length of string is %zu bytes",
-            ARRAY_COUNT(c->u.cond_str.str)
+            ARRAY_COUNT(c->u.str.buf)
         );
         return;
     }
@@ -174,8 +174,8 @@ static void cmd_bufis(const CommandArgs *a)
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
     c = add_condition(type, a->args[1], a->args[2]);
     if (c) {
-        memcpy(c->u.cond_str.str, str, len);
-        c->u.cond_str.len = len;
+        memcpy(c->u.str.buf, str, len);
+        c->u.str.len = len;
     }
 }
 
@@ -215,11 +215,11 @@ static void cmd_char(const CommandArgs *a)
     }
 
     if (type == COND_CHAR1) {
-        c->u.cond_single_char.ch = (unsigned char)chars[0];
+        c->u.ch = (unsigned char)chars[0];
     } else {
-        bitset_add_pattern(c->u.cond_char.bitset, chars);
+        bitset_add_pattern(c->u.bitset, chars);
         if (n_flag) {
-            bitset_invert(c->u.cond_char.bitset);
+            bitset_invert(c->u.bitset);
         }
     }
 }
@@ -337,7 +337,7 @@ static void cmd_inlist(const CommandArgs *a)
         ptr_array_append(&current_syntax->string_lists, list);
     }
     list->used = true;
-    c->u.cond_inlist.list = list;
+    c->u.str_list = list;
 }
 
 static void cmd_noeat(const CommandArgs *a)
@@ -394,7 +394,7 @@ static void cmd_recolor(const CommandArgs *a)
 
     Condition *c = add_condition(type, NULL, a->args[0]);
     if (c && type == COND_RECOLOR) {
-        c->u.cond_recolor.len = len;
+        c->u.recolor_len = len;
     }
 }
 
@@ -429,10 +429,10 @@ static void cmd_str(const CommandArgs *a)
     Condition *c;
     size_t len = strlen(str);
 
-    if (len > ARRAY_COUNT(c->u.cond_str.str)) {
+    if (len > ARRAY_COUNT(c->u.str.buf)) {
         error_msg (
             "Maximum length of string is %zu bytes",
-            ARRAY_COUNT(c->u.cond_str.str)
+            ARRAY_COUNT(c->u.str.buf)
         );
         return;
     }
@@ -443,8 +443,8 @@ static void cmd_str(const CommandArgs *a)
     }
     c = add_condition(type, a->args[1], a->args[2]);
     if (c) {
-        memcpy(c->u.cond_str.str, str, len);
-        c->u.cond_str.len = len;
+        memcpy(c->u.str.buf, str, len);
+        c->u.str.len = len;
     }
 }
 

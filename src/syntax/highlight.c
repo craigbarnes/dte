@@ -25,20 +25,20 @@ static bool states_equal(void **ptrs, size_t idx, const State *b)
     return a == b;
 }
 
-static bool bufis(const Condition *cond, const char *buf, size_t len)
+static bool bufis(const ConditionData *u, const char *buf, size_t len)
 {
-    if (len != (size_t)cond->u.cond_str.len) {
+    if (len != (size_t)u->str.len) {
         return false;
     }
-    return mem_equal(cond->u.cond_str.str, buf, len);
+    return mem_equal(u->str.buf, buf, len);
 }
 
-static bool bufis_icase(const Condition *cond, const char *buf, size_t len)
+static bool bufis_icase(const ConditionData *u, const char *buf, size_t len)
 {
-    if (len != (size_t)cond->u.cond_str.len) {
+    if (len != (size_t)u->str.len) {
         return false;
     }
-    return mem_equal_icase(cond->u.cond_str.str, buf, len);
+    return mem_equal_icase(u->str.buf, buf, len);
 }
 
 static State *handle_heredoc (
@@ -90,6 +90,7 @@ static HlColor **highlight_line (
 
     while (1) {
         const Condition *cond;
+        const ConditionData *u;
         const Action *a;
         unsigned char ch;
     top:
@@ -99,10 +100,11 @@ static HlColor **highlight_line (
         ch = line[i];
         for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
             cond = state->conds.ptrs[ci];
+            u = &cond->u;
             a = &cond->a;
             switch (cond->type) {
             case COND_CHAR_BUFFER:
-                if (!bitset_contains(cond->u.cond_char.bitset, ch)) {
+                if (!bitset_contains(u->bitset, ch)) {
                     break;
                 }
                 if (sidx < 0) {
@@ -112,7 +114,7 @@ static HlColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_BUFIS:
-                if (sidx >= 0 && bufis(cond, line + sidx, i - sidx)) {
+                if (sidx >= 0 && bufis(u, line + sidx, i - sidx)) {
                     for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
@@ -122,7 +124,7 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_BUFIS_ICASE:
-                if (sidx >= 0 && bufis_icase(cond, line + sidx, i - sidx)) {
+                if (sidx >= 0 && bufis_icase(u, line + sidx, i - sidx)) {
                     for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
                     }
@@ -132,7 +134,7 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_CHAR:
-                if (!bitset_contains(cond->u.cond_char.bitset, ch)) {
+                if (!bitset_contains(u->bitset, ch)) {
                     break;
                 }
                 colors[i++] = a->emit_color;
@@ -140,7 +142,7 @@ static HlColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_CHAR1:
-                if (cond->u.cond_single_char.ch != ch) {
+                if (u->ch != ch) {
                     break;
                 }
                 colors[i++] = a->emit_color;
@@ -150,11 +152,7 @@ static HlColor **highlight_line (
             case COND_INLIST:
                 if (
                     sidx >= 0
-                    && hashset_get (
-                        &cond->u.cond_inlist.list->strings,
-                        line + sidx,
-                        i - sidx
-                    )
+                    && hashset_get(&u->str_list->strings, line + sidx, i - sidx)
                 ) {
                     for (size_t idx = sidx; idx < i; idx++) {
                         colors[idx] = a->emit_color;
@@ -165,7 +163,7 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_RECOLOR: {
-                ssize_t idx = i - cond->u.cond_recolor.len;
+                ssize_t idx = i - u->recolor_len;
                 if (idx < 0) {
                     idx = 0;
                 }
@@ -182,41 +180,37 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_STR: {
-                size_t slen = cond->u.cond_str.len;
+                size_t slen = u->str.len;
                 size_t end = i + slen;
-                if (
-                    len >= end
-                    && mem_equal(cond->u.cond_str.str, line + i, slen)
-                ) {
-                    while (i < end) {
-                        colors[i++] = a->emit_color;
-                    }
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
+                    break;
                 }
-                } break;
+                while (i < end) {
+                    colors[i++] = a->emit_color;
+                }
+                sidx = -1;
+                state = a->destination;
+                goto top;
+                }
             case COND_STR_ICASE: {
-                size_t slen = cond->u.cond_str.len;
+                size_t slen = u->str.len;
                 size_t end = i + slen;
-                if (
-                    len >= end
-                    && mem_equal_icase(cond->u.cond_str.str, line + i, slen)
-                ) {
-                    while (i < end) {
-                        colors[i++] = a->emit_color;
-                    }
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
+                    break;
                 }
-                } break;
+                while (i < end) {
+                    colors[i++] = a->emit_color;
+                }
+                sidx = -1;
+                state = a->destination;
+                goto top;
+                }
             case COND_STR2:
                 // Optimized COND_STR (length 2, case sensitive)
                 if (
-                    ch == cond->u.cond_str.str[0]
+                    ch == u->str.buf[0]
                     && len - i > 1
-                    && line[i + 1] == cond->u.cond_str.str[1]
+                    && line[i + 1] == u->str.buf[1]
                 ) {
                     colors[i++] = a->emit_color;
                     colors[i++] = a->emit_color;
@@ -226,8 +220,8 @@ static HlColor **highlight_line (
                 }
                 break;
             case COND_HEREDOCEND: {
-                const char *str = cond->u.cond_heredocend.str;
-                size_t slen = cond->u.cond_heredocend.len;
+                const char *str = u->heredocend.data;
+                size_t slen = u->heredocend.length;
                 size_t end = i + slen;
                 if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
                     while (i < end) {

@@ -84,8 +84,8 @@ static void fix_conditions (
         }
 
         if (m->delim && c->type == COND_HEREDOCEND) {
-            c->u.cond_heredocend.str = xmemdup(m->delim, m->delim_len);
-            c->u.cond_heredocend.len = m->delim_len;
+            c->u.heredocend.data = xmemdup(m->delim, m->delim_len);
+            c->u.heredocend.length = m->delim_len;
         }
     }
 

@@ -42,31 +42,22 @@ typedef struct {
     bool defined;
 } StringList;
 
+typedef union {
+    BitSet bitset;
+    StringView heredocend;
+    StringList *str_list;
+    unsigned char ch;
+    size_t recolor_len;
+    struct {
+        uint8_t len;
+        char buf[31];
+    } str;
+} ConditionData;
+
 typedef struct {
-    union {
-        struct {
-            BitSet bitset;
-        } cond_char;
-        struct {
-            unsigned char ch;
-        } cond_single_char;
-        struct {
-            StringList *list;
-        } cond_inlist;
-        struct {
-            size_t len;
-        } cond_recolor;
-        struct {
-            uint8_t len;
-            char str[31];
-        } cond_str;
-        struct {
-            size_t len;
-            char *str;
-        } cond_heredocend;
-    } u;
-    Action a;
     ConditionType type;
+    ConditionData u;
+    Action a;
 } Condition;
 
 typedef struct {
