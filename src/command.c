@@ -84,7 +84,7 @@ static char last_flag(const CommandArgs *a)
 static bool has_flag(const CommandArgs *a, int flag)
 {
     size_t n = a->nr_flags;
-    return n ? !!memchr(a->flags, flag, n) : false;
+    return n && !!memchr(a->flags, flag, n);
 }
 
 static void handle_select_chars_flag(const CommandArgs *a)
