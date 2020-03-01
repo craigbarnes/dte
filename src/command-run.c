@@ -47,7 +47,9 @@ UNITTEST {
     BUG_ON(allowed_command("cD"));
 }
 
-void run_command(const CommandSet *cmds, char **av)
+static void run_commands(const CommandSet *cmds, const PointerArray *array);
+
+static void run_command(const CommandSet *cmds, char **av)
 {
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
@@ -99,7 +101,7 @@ void run_command(const CommandSet *cmds, char **av)
     end_change();
 }
 
-void run_commands(const CommandSet *cmds, const PointerArray *array)
+static void run_commands(const CommandSet *cmds, const PointerArray *array)
 {
     static unsigned int recursion_count;
     if (unlikely(recursion_count++ > 16)) {

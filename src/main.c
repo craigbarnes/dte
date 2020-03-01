@@ -424,8 +424,11 @@ loop_break:
     }
 
     if (tag) {
-        const char *tag_command[] = {"tag", tag, NULL};
-        run_command(&commands, (char**)tag_command);
+        String s = STRING_INIT;
+        string_append_literal(&s, "tag ");
+        string_append_escaped_arg(&s, tag, true);
+        handle_command(&commands, string_borrow_cstring(&s));
+        string_free(&s);
     }
 
     if (

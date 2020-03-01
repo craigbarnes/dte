@@ -51,8 +51,6 @@ char *escape_command_arg(const char *arg, bool escape_tilde);
 
 // command-run.c
 extern const Command *current_command;
-void run_commands(const CommandSet *cmds, const PointerArray *array);
-void run_command(const CommandSet *cmds, char **argv);
 void handle_command(const CommandSet *cmds, const char *cmd);
 
 // command.c
