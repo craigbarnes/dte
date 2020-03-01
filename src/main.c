@@ -1,10 +1,12 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "alias.h"
+#include "block.h"
 #include "config.h"
 #include "debug.h"
 #include "editor.h"
@@ -284,9 +286,35 @@ loop_break:
         return get_nr_errors() ? EX_DATAERR : 0;
     }
 
-    if (unlikely(!isatty(STDOUT_FILENO))) {
-        fputs("stdout doesn't refer to a terminal\n", stderr);
-        return EX_IOERR;
+    Buffer *stdout_buffer = NULL;
+    int old_stdout_fd = -1;
+    if (!isatty(STDOUT_FILENO)) {
+        old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
+        if (old_stdout_fd == -1 && errno != EBADF) {
+            perror("fcntl");
+            return EX_OSERR;
+        }
+        if (!freopen("/dev/tty", "w", stdout)) {
+            perror("Unable to open /dev/tty");
+            return EX_OSERR;
+        }
+        int fd = fileno(stdout);
+        if (fd != STDOUT_FILENO) {
+            // This should never happen in a single-threaded program.
+            // freopen() should call fclose() followed by open() and
+            // POSIX requires a successful call to open() to return the
+            // lowest available file descriptor.
+            fprintf(stderr, "freopen() changed stdout fd from 1 to %d\n", fd);
+            return EX_OSERR;
+        }
+        if (old_stdout_fd == -1) {
+            // The call to fcntl(3) above failed with EBADF, meaning stdout was
+            // most likely closed and there's no point opening a buffer for it
+        } else {
+            stdout_buffer = open_empty_buffer("(stdout)");
+            stdout_buffer->stdout_buffer = true;
+            stdout_buffer->temporary = true;
+        }
     }
 
     Buffer *stdin_buffer = NULL;
@@ -305,10 +333,6 @@ loop_break:
         }
         int fd = fileno(stdin);
         if (fd != STDIN_FILENO) {
-            // This should never happen in a single-threaded program.
-            // freopen() should call fclose() followed by open() and
-            // POSIX requires a successful call to open() to return the
-            // lowest available file descriptor.
             fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
             return EX_OSERR;
         }
@@ -410,6 +434,9 @@ loop_break:
     if (stdin_buffer) {
         window_add_buffer(window, stdin_buffer);
     }
+    if (stdout_buffer) {
+        window_add_buffer(window, stdout_buffer);
+    }
 
     const View *empty_buffer = NULL;
     if (window->views.count == 0) {
@@ -465,6 +492,18 @@ loop_break:
 
         save_file_history(file_history_filename);
         free(file_history_filename);
+    }
+
+    if (stdout_buffer) {
+        Block *blk;
+        block_for_each(blk, &stdout_buffer->blocks) {
+            if (xwrite(old_stdout_fd, blk->data, blk->size) < 0) {
+                perror_msg("write");
+                return EX_IOERR;
+            }
+        }
+        free_blocks(stdout_buffer);
+        free(stdout_buffer);
     }
 
     return 0;

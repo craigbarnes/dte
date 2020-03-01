@@ -1141,6 +1141,11 @@ static bool stat_changed(const Buffer *b, const struct stat *st)
 
 static void cmd_save(const CommandArgs *a)
 {
+    if (buffer->stdout_buffer) {
+        error_msg("special (stdout) buffer can't be saved");
+        return;
+    }
+
     char **args = a->args;
     char *absolute = buffer->abs_filename;
     Encoding encoding = buffer->encoding;

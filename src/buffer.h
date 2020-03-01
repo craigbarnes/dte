@@ -47,6 +47,7 @@ typedef struct Buffer {
 
     bool readonly;
     bool temporary;
+    bool stdout_buffer;
     bool locked;
     bool setup;
     bool crlf_newlines;
@@ -91,8 +92,9 @@ bool buffer_fstat(Buffer *b, int fd);
 Buffer *find_buffer(const char *abs_filename);
 Buffer *find_buffer_by_id(unsigned long id);
 Buffer *buffer_new(const Encoding *encoding);
-Buffer *open_empty_buffer(void);
+Buffer *open_empty_buffer(const char *display_name);
 void free_buffer(Buffer *b);
+void free_blocks(Buffer *b);
 bool buffer_detect_filetype(Buffer *b);
 void buffer_update_syntax(Buffer *b);
 void buffer_setup(Buffer *b);

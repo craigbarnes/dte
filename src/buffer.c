@@ -79,7 +79,7 @@ Buffer *buffer_new(const Encoding *encoding)
     return b;
 }
 
-Buffer *open_empty_buffer(void)
+Buffer *open_empty_buffer(const char *display_name)
 {
     Buffer *b = buffer_new(&editor.charset);
 
@@ -87,8 +87,24 @@ Buffer *open_empty_buffer(void)
     Block *blk = block_new(1);
     list_add_before(&blk->node, &b->blocks);
 
-    set_display_filename(b, xmemdup_literal("(No name)"));
+    if (!display_name) {
+        display_name = "(No name)";
+    }
+
+    set_display_filename(b, xstrdup(display_name));
     return b;
+}
+
+void free_blocks(Buffer *b)
+{
+    ListHead *item = b->blocks.next;
+    while (item != &b->blocks) {
+        ListHead *next = item->next;
+        Block *blk = BLOCK(item);
+        free(blk->data);
+        free(blk);
+        item = next;
+    }
 }
 
 void free_buffer(Buffer *b)
@@ -99,20 +115,17 @@ void free_buffer(Buffer *b)
         unlock_file(b->abs_filename);
     }
 
-    ListHead *item = b->blocks.next;
-    while (item != &b->blocks) {
-        ListHead *next = item->next;
-        Block *blk = BLOCK(item);
-
-        free(blk->data);
-        free(blk);
-        item = next;
-    }
     free_changes(&b->change_head);
     free(b->line_start_states.ptrs);
     free(b->views.ptrs);
     free(b->display_filename);
     free(b->abs_filename);
+
+    if (b->stdout_buffer) {
+        return;
+    }
+
+    free_blocks(b);
     free(b);
 }
 
