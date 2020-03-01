@@ -20,7 +20,8 @@ MAKE="$MAKE --no-print-directory -C $TMPDIR -j$(mk/nproc.sh)"
 export MAKEFLAGS='DEBUG=3 WERROR=1'
 export CFLAGS='-g -Og -pipe'
 
-git checkout-index --prefix="$TMPDIR/" -a || exit 1
+set -e
+git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT
 
 GENERATED=''
