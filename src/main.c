@@ -286,6 +286,30 @@ loop_break:
         return get_nr_errors() ? EX_DATAERR : 0;
     }
 
+    Buffer *stdin_buffer = NULL;
+    if (!isatty(STDIN_FILENO)) {
+        Buffer *b = buffer_new(&editor.charset);
+        if (read_blocks(b, STDIN_FILENO) == 0) {
+            b->display_filename = xmemdup_literal("(stdin)");
+            stdin_buffer = b;
+            stdin_buffer->temporary = true;
+        } else {
+            if (errno != EBADF) {
+                error_msg("Unable to read redirected stdin");
+            }
+            free_buffer(b);
+        }
+        if (!freopen("/dev/tty", "r", stdin)) {
+            perror("Unable to reopen input tty");
+            return EX_IOERR;
+        }
+        int fd = fileno(stdin);
+        if (fd != STDIN_FILENO) {
+            fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
+            return EX_OSERR;
+        }
+    }
+
     Buffer *stdout_buffer = NULL;
     int old_stdout_fd = -1;
     if (!isatty(STDOUT_FILENO)) {
@@ -310,31 +334,15 @@ loop_break:
         if (old_stdout_fd == -1) {
             // The call to fcntl(3) above failed with EBADF, meaning stdout was
             // most likely closed and there's no point opening a buffer for it
+        } else if (stdin_buffer) {
+            stdout_buffer = stdin_buffer;
+            stdout_buffer->stdout_buffer = true;
+            free(stdout_buffer->display_filename);
+            stdout_buffer->display_filename = xmemdup_literal("(stdin|stdout)");
         } else {
             stdout_buffer = open_empty_buffer("(stdout)");
             stdout_buffer->stdout_buffer = true;
             stdout_buffer->temporary = true;
-        }
-    }
-
-    Buffer *stdin_buffer = NULL;
-    if (!isatty(STDIN_FILENO)) {
-        Buffer *b = buffer_new(&editor.charset);
-        if (read_blocks(b, STDIN_FILENO) == 0) {
-            b->display_filename = xmemdup_literal("(stdin)");
-            stdin_buffer = b;
-        } else {
-            free_buffer(b);
-            error_msg("Unable to read redirected stdin");
-        }
-        if (!freopen("/dev/tty", "r", stdin)) {
-            perror("Unable to reopen input tty");
-            return EX_IOERR;
-        }
-        int fd = fileno(stdin);
-        if (fd != STDIN_FILENO) {
-            fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
-            return EX_OSERR;
         }
     }
 
@@ -434,7 +442,7 @@ loop_break:
     if (stdin_buffer) {
         window_add_buffer(window, stdin_buffer);
     }
-    if (stdout_buffer) {
+    if (stdout_buffer && stdout_buffer != stdin_buffer) {
         window_add_buffer(window, stdout_buffer);
     }
 
