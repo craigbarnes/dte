@@ -454,6 +454,32 @@ static void cmd_exec_open(const CommandArgs *a)
     string_free(&ctx.output);
 }
 
+static void cmd_exec_tag(const CommandArgs *a)
+{
+    SpawnContext ctx = {
+        .argv = a->args,
+        .output = STRING_INIT,
+        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
+    };
+    if (!spawn_source(&ctx)) {
+        return;
+    }
+
+    const char *tag = string_borrow_cstring(&ctx.output);
+    const char *nl = memchr(tag, '\n', ctx.output.len);
+    if (nl) {
+        // If there are multiple lines, null-terminate and use the first
+        string_insert_buf(&ctx.output, (size_t)(nl - tag), "\0", 1);
+    }
+
+    String s = STRING_INIT;
+    string_append_literal(&s, "tag ");
+    string_append_escaped_arg(&s, tag, true);
+    string_free(&ctx.output);
+    handle_command(&commands, string_borrow_cstring(&s));
+    string_free(&s);
+}
+
 static void cmd_filter(const CommandArgs *a)
 {
     BlockIter save = view->cursor;
@@ -1766,7 +1792,7 @@ static void cmd_tag(const CommandArgs *a)
     // Filename helps to find correct tags
     tag_file_find_tags(tf, buffer->abs_filename, name, &tags);
     if (tags.count == 0) {
-        error_msg("Tag %s not found.", name);
+        error_msg("Tag '%s' not found", name);
     } else {
         for (size_t i = 0; i < tags.count; i++) {
             Tag *t = tags.ptrs[i];
@@ -2105,6 +2131,7 @@ static const Command cmds[] = {
     {"errorfmt", "i", 2, 18, cmd_errorfmt},
     {"eval", "-", 1, -1, cmd_eval},
     {"exec-open", "-s", 1, -1, cmd_exec_open},
+    {"exec-tag", "-s", 1, -1, cmd_exec_tag},
     {"filter", "-l", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
     {"hi", "-", 0, -1, cmd_hi},
