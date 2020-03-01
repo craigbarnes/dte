@@ -84,6 +84,7 @@ static inline bool buffer_modified(const Buffer *b)
 void buffer_mark_lines_changed(Buffer *b, long min, long max);
 const char *buffer_filename(const Buffer *b);
 
+void set_display_filename(Buffer *b, char *name) NONNULL_ARGS;
 char *short_filename(const char *absolute) XSTRDUP;
 void update_short_filename_cwd(Buffer *b, const char *cwd);
 void update_short_filename(Buffer *b);

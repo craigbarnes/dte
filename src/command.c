@@ -1648,8 +1648,7 @@ static void show_include(const char *name, bool cflag)
     View *v = window_open_new_file(window);
     v->buffer->temporary = true;
     do_insert(cfg->text.data, cfg->text.length);
-    free(v->buffer->display_filename);
-    v->buffer->display_filename = xasprintf("(builtin %s)", name);
+    set_display_filename(v->buffer, xasprintf("(builtin %s)", name));
 }
 
 static void show_option(const char *name, bool cflag)
@@ -1728,8 +1727,7 @@ static void cmd_show(const CommandArgs *a)
     v->buffer->temporary = true;
     do_insert(s.buffer, s.len);
     string_free(&s);
-    free(v->buffer->display_filename);
-    v->buffer->display_filename = xasprintf("(show %s)", a->args[0]);
+    set_display_filename(v->buffer, xasprintf("(show %s)", a->args[0]));
     v->buffer->encoding = encoding_from_type(UTF8);
 }
 
@@ -1797,9 +1795,7 @@ static void cmd_title(const CommandArgs *a)
         error_msg("saved buffers can't be retitled");
         return;
     }
-
-    free(buffer->display_filename);
-    buffer->display_filename = xstrdup(a->args[0]);
+    set_display_filename(buffer, xstrdup(a->args[0]));
     mark_buffer_tabbars_changed(buffer);
 }
 

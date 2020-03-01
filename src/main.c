@@ -290,7 +290,7 @@ loop_break:
     if (!isatty(STDIN_FILENO)) {
         Buffer *b = buffer_new(&editor.charset);
         if (read_blocks(b, STDIN_FILENO) == 0) {
-            b->display_filename = xmemdup_literal("(stdin)");
+            set_display_filename(b, xmemdup_literal("(stdin)"));
             stdin_buffer = b;
             stdin_buffer->temporary = true;
         } else {
@@ -337,8 +337,7 @@ loop_break:
         } else if (stdin_buffer) {
             stdout_buffer = stdin_buffer;
             stdout_buffer->stdout_buffer = true;
-            free(stdout_buffer->display_filename);
-            stdout_buffer->display_filename = xmemdup_literal("(stdin|stdout)");
+            set_display_filename(stdout_buffer, xmemdup_literal("(stdin|stdout)"));
         } else {
             stdout_buffer = open_empty_buffer("(stdout)");
             stdout_buffer->stdout_buffer = true;

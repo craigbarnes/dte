@@ -18,7 +18,7 @@
 
 Buffer *buffer;
 
-static void set_display_filename(Buffer *b, char *name)
+void set_display_filename(Buffer *b, char *name)
 {
     free(b->display_filename);
     b->display_filename = name;
