@@ -22,7 +22,7 @@ export CFLAGS='-g -Og -pipe'
 
 set -e
 git checkout-index --prefix="$TMPDIR/" -a
-trap "rm -rf '$TMPDIR'" EXIT
+trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
 GENERATED=''
 for G in $(git ls-files --error-unmatch ':(attr:is-generated)'); do
