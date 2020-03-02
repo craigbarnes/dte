@@ -4,8 +4,9 @@
 
 static void test_find_ft_filename(void)
 {
-    static const struct ft_filename_test {
-        const char *filename, *expected_filetype;
+    static const struct {
+        const char *filename;
+        const char *expected_filetype;
     } tests[] = {
         {"/usr/local/include/lib.h", "c"},
         {"test.cc~", "c"},
@@ -97,16 +98,16 @@ static void test_find_ft_filename(void)
     };
     const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {
-        const struct ft_filename_test *t = &tests[i];
-        const char *result = find_ft(t->filename, empty_line);
-        IEXPECT_STREQ(result, t->expected_filetype);
+        const char *ft = find_ft(tests[i].filename, empty_line);
+        IEXPECT_STREQ(ft, tests[i].expected_filetype);
     }
 }
 
 static void test_find_ft_firstline(void)
 {
-    static const struct ft_firstline_test {
-        const char *line, *expected_filetype;
+    static const struct {
+        const char *line;
+        const char *expected_filetype;
     } tests[] = {
         {"<!DOCTYPE html>", "html"},
         {"<!doctype HTML", "html"},
@@ -177,9 +178,8 @@ static void test_find_ft_firstline(void)
         {"#!/usr/bin/unknown", NULL},
     };
     FOR_EACH_I(i, tests) {
-        const struct ft_firstline_test *t = &tests[i];
-        const char *result = find_ft(NULL, strview_from_cstring(t->line));
-        IEXPECT_STREQ(result, t->expected_filetype);
+        const char *ft = find_ft(NULL, strview_from_cstring(tests[i].line));
+        IEXPECT_STREQ(ft, tests[i].expected_filetype);
     }
 }
 
