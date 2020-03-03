@@ -49,7 +49,7 @@ scroll-down
 scroll-pgdown
 scroll-pgup
 scroll-up
-search -H '^ *b'
+search -H '^ *h'
 search -n
 search -p
 select

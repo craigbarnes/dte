@@ -104,9 +104,13 @@ void macro_insert_text_hook(const char *text, size_t size)
 void macro_run(void)
 {
     begin_change_chain();
+    unsigned int saved_nr_errors = get_nr_errors();
     for (size_t i = 0, n = macro.count; i < n; i++) {
         const char *cmd_str = macro.ptrs[i];
         handle_command(&commands, cmd_str, false);
+        if (get_nr_errors() != saved_nr_errors) {
+            break;
+        }
     }
     end_change_chain();
 }

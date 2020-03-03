@@ -232,7 +232,7 @@ static void do_search_next(bool skip)
         if (do_search_fwd(&current_search.regex, &bi, false)) {
             info_msg("Continuing at top.");
         } else {
-            info_msg("Pattern '%s' not found.", current_search.pattern);
+            error_msg("Pattern '%s' not found.", current_search.pattern);
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
@@ -244,7 +244,7 @@ static void do_search_next(bool skip)
         if (do_search_bwd(&current_search.regex, &bi, -1, false)) {
             info_msg("Continuing at bottom.");
         } else {
-            info_msg("Pattern '%s' not found.", current_search.pattern);
+            error_msg("Pattern '%s' not found.", current_search.pattern);
         }
     }
 }
@@ -490,7 +490,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     if (nr_substitutions) {
         info_msg("%u substitutions on %zu lines.", nr_substitutions, nr_lines);
     } else if (!(flags & REPLACE_CANCEL)) {
-        info_msg("Pattern '%s' not found.", pattern);
+        error_msg("Pattern '%s' not found.", pattern);
     }
 
     if (view->selection) {
