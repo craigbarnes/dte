@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include "config.h"
@@ -89,11 +90,11 @@ void list_builtin_configs(void)
     }
 }
 
-void collect_builtin_configs(const char *prefix, bool syntaxes)
+void collect_builtin_configs(const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         const BuiltinConfig *cfg = &builtin_configs[i];
-        if (syntaxes == false && str_has_prefix(cfg->name, "syntax/")) {
+        if (str_has_prefix(cfg->name, "syntax/")) {
             return;
         } else if (str_has_prefix(cfg->name, prefix)) {
             add_completion(xstrdup(cfg->name));

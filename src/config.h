@@ -1,7 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "command.h"
 #include "util/macros.h"
@@ -24,7 +23,7 @@ extern int config_line;
 
 void list_builtin_configs(void);
 String dump_builtin_configs(void);
-void collect_builtin_configs(const char *prefix, bool syntaxes);
+void collect_builtin_configs(const char *prefix);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
 void exec_config(const CommandSet *cmds, const char *buf, size_t size);

@@ -257,7 +257,7 @@ static void collect_completions(char **args, size_t argc)
             break;
         case 2:
             if (streq(args[1], "-b")) {
-                collect_builtin_configs(completion.parsed, false);
+                collect_builtin_configs(completion.parsed);
             }
             break;
         }
@@ -300,35 +300,36 @@ static void collect_completions(char **args, size_t argc)
         return;
     }
     if (strview_equal_cstring(&cmd_name, "show")) {
-        static const char opts[][8] = {
-            "alias", "bind", "color", "include", "option", "wsplit"
+        static const struct {
+            char name[8];
+            void (*handler)(const char *prefix);
+        } opts[] = {
+            {"alias", collect_aliases},
+            {"bind", NULL},
+            {"color", collect_hl_colors},
+            {"include", collect_builtin_configs},
+            {"macro", NULL},
+            {"option", collect_options},
+            {"wsplit", NULL},
         };
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
-        const char *arg1;
-        switch (nonflag_argc) {
-        case 1:
+        if (nonflag_argc == 1) {
             for (size_t i = 0; i < ARRAY_COUNT(opts); i++) {
-                if (str_has_prefix(opts[i], completion.parsed)) {
-                    add_completion(xstrdup(opts[i]));
+                if (str_has_prefix(opts[i].name, completion.parsed)) {
+                    add_completion(xstrdup(opts[i].name));
                 }
             }
-            break;
-        case 2:
-            arg1 = get_nonflag_arg(1, args, argc);
-            if (streq(arg1, "alias")) {
-                collect_aliases(completion.parsed);
-            } else if (streq(arg1, "color")) {
-                collect_hl_colors(completion.parsed);
-            } else if (streq(arg1, "include")) {
-                collect_builtin_configs(completion.parsed, false);
-            } else if (streq(arg1, "option")) {
-                collect_options(completion.parsed);
-            } else if (streq(arg1, "wsplit")) {
-                if (str_has_prefix("this", completion.parsed)) {
-                    add_completion(xstrdup("this"));
+        } else if (nonflag_argc == 2) {
+            const char *arg1 = get_nonflag_arg(1, args, argc);
+            BUG_ON(!arg1);
+            for (size_t i = 0; i < ARRAY_COUNT(opts); i++) {
+                if (streq(arg1, opts[i].name)) {
+                    if (opts[i].handler) {
+                        opts[i].handler(completion.parsed);
+                    }
+                    break;
                 }
             }
-            break;
         }
         return;
     }
