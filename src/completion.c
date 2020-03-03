@@ -332,6 +332,19 @@ static void collect_completions(char **args, size_t argc)
         }
         return;
     }
+    if (strview_equal_cstring(&cmd_name, "macro")) {
+        static const char verbs[][8] = {
+            "record", "stop", "toggle", "run"
+        };
+        if (argc == 1) {
+            for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
+                if (str_has_prefix(verbs[i], completion.parsed)) {
+                    add_completion(xstrdup(verbs[i]));
+                }
+            }
+        }
+        return;
+    }
 }
 
 static void init_completion(void)
