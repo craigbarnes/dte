@@ -657,18 +657,24 @@ static void cmd_load_syntax(const CommandArgs *a)
 
 static void cmd_macro(const CommandArgs *a)
 {
-    const char *verb = a->args[0];
-    if (streq(verb, "record")) {
-        macro_record();
-    } else if (streq(verb, "stop")) {
-        macro_stop();
-    } else if (streq(verb, "toggle")) {
-        macro_toggle();
-    } else if (streq(verb, "run")) {
-        macro_run();
-    } else {
-        error_msg("Unknown action '%s'", verb);
+    static const struct {
+        const char name[8];
+        void (*handler)(void);
+    } actions[] = {
+        {"record", macro_record},
+        {"stop", macro_stop},
+        {"toggle", macro_toggle},
+        {"cancel", macro_cancel},
+        {"run", macro_run},
+    };
+    const char *action = a->args[0];
+    for (size_t i = 0; i < ARRAY_COUNT(actions); i++) {
+        if (streq(action, actions[i].name)) {
+            actions[i].handler();
+            return;
+        }
     }
+    error_msg("Unknown action '%s'", action);
 }
 
 static void cmd_move_tab(const CommandArgs *a)

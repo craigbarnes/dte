@@ -6,6 +6,7 @@
 #include "util/str-util.h"
 
 static PointerArray macro = PTR_ARRAY_INIT;
+static PointerArray prev_macro = PTR_ARRAY_INIT;
 static String insert_buffer = STRING_INIT;
 static bool recording_macro = false;
 
@@ -33,7 +34,9 @@ void macro_record(void)
         info_msg("Already recording");
         return;
     }
-    ptr_array_free(&macro);
+    ptr_array_free(&prev_macro);
+    prev_macro = macro;
+    macro = (PointerArray) PTR_ARRAY_INIT;
     info_msg("Recording macro");
     recording_macro = true;
 }
@@ -56,6 +59,19 @@ void macro_toggle(void)
     } else {
         macro_record();
     }
+}
+
+void macro_cancel(void)
+{
+    if (!recording_macro) {
+        info_msg("Not recording");
+        return;
+    }
+    ptr_array_free(&macro);
+    macro = prev_macro;
+    prev_macro = (PointerArray) PTR_ARRAY_INIT;
+    info_msg("Macro recording cancelled");
+    recording_macro = false;
 }
 
 static bool command_is_recordable(const char *name)
