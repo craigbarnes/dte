@@ -129,7 +129,7 @@ void free_buffer(Buffer *b)
     free(b);
 }
 
-static void update_file_info(Buffer *b, struct stat *st)
+static void update_file_info(Buffer *b, const struct stat *st)
 {
     b->file = (FileInfo) {
         .size = st->st_size,
