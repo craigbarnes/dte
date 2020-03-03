@@ -65,6 +65,15 @@ static inline size_t count_nl(const char *buf, size_t size)
     return nl;
 }
 
+static inline size_t string_array_length(char **strings)
+{
+    size_t n = 0;
+    while (strings[n]) {
+        n++;
+    }
+    return n;
+}
+
 static inline char **copy_string_array(char **src, size_t count)
 {
     char **dst = xnew(char*, count + 1);

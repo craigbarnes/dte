@@ -112,8 +112,12 @@ static void search_mode_keypress(KeyCode key)
             search_set_regexp(str);
             search_next();
             history_add(&editor.search_history, str, search_history_size);
+            const char *args[] = {str, NULL};
+            macro_command_hook("search", (char**)args);
         } else {
             search_next();
+            const char *args[] = {"-n", NULL};
+            macro_command_hook("search", (char**)args);
         }
         cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
