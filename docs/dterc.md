@@ -768,7 +768,10 @@ vice versa.
 Insert _text_ into the buffer.
 
 `-k`
-:   Insert one character at a time as if it has been typed
+:   Insert one character at a time, as if manually typed. Normally
+    _text_ is inserted exactly as specified, but this option allows
+    it to be affected by special input handling like auto-indents,
+    whitespace trimming, line-by-line undo, etc.
 
 `-m`
 :   Move after inserted text
