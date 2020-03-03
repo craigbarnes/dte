@@ -21,6 +21,7 @@
 #include "history.h"
 #include "load-save.h"
 #include "lock.h"
+#include "macro.h"
 #include "move.h"
 #include "msg.h"
 #include "parse-args.h"
@@ -476,7 +477,7 @@ static void cmd_exec_tag(const CommandArgs *a)
     string_append_literal(&s, "tag ");
     string_append_escaped_arg(&s, tag, true);
     string_free(&ctx.output);
-    handle_command(&commands, string_borrow_cstring(&s));
+    handle_command(&commands, string_borrow_cstring(&s), false);
     string_free(&s);
 }
 
@@ -651,6 +652,22 @@ static void cmd_load_syntax(const CommandArgs *a)
         if (!find_syntax(filetype)) {
             load_syntax_by_filetype(filetype);
         }
+    }
+}
+
+static void cmd_macro(const CommandArgs *a)
+{
+    const char *verb = a->args[0];
+    if (streq(verb, "record")) {
+        macro_record();
+    } else if (streq(verb, "stop")) {
+        macro_stop();
+    } else if (streq(verb, "toggle")) {
+        macro_toggle();
+    } else if (streq(verb, "run")) {
+        macro_run();
+    } else {
+        error_msg("Unknown action '%s'", verb);
     }
 }
 
@@ -1711,6 +1728,11 @@ static void show_wsplit(const char *name, bool cflag)
     }
 }
 
+static void show_macro(const char* UNUSED_ARG(name), bool UNUSED_ARG(cflag))
+{
+    error_msg("'show macro' doesn't take extra arguments");
+}
+
 static void cmd_show(const CommandArgs *a)
 {
     static const struct {
@@ -1722,6 +1744,7 @@ static void cmd_show(const CommandArgs *a)
         {"bind", show_binding, dump_bindings},
         {"color", show_color, dump_hl_colors},
         {"include", show_include, dump_builtin_configs},
+        {"macro", show_macro, dump_macro},
         {"option", show_option, dump_options},
         {"wsplit", show_wsplit, dump_frames},
     };
@@ -2141,6 +2164,7 @@ static const Command cmds[] = {
     {"left", "c", 0, 0, cmd_left},
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
+    {"macro", "", 1, 1, cmd_macro},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},

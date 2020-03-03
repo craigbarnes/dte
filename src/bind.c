@@ -4,6 +4,7 @@
 #include "command.h"
 #include "debug.h"
 #include "error.h"
+#include "macro.h"
 #include "parse-args.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
@@ -192,9 +193,10 @@ void handle_binding(KeyCode key)
         return;
     }
 
-    if (!b->cmd) {
-        // Command isn't cached; parse and run command string
-        handle_command(&commands, b->cmd_str);
+    // If the command isn't cached or a macro is being recorded
+    if (!b->cmd || macro_is_recording()) {
+        // Parse and run command string
+        handle_command(&commands, b->cmd_str, true);
         return;
     }
 

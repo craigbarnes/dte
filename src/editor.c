@@ -67,7 +67,7 @@ EditorState editor = {
         .set_window_title = false,
         .show_line_numbers = false,
         .statusline_left = " %f%s%m%r%s%M",
-        .statusline_right = " %y,%X   %u   %E %n %t   %p ",
+        .statusline_right = " %R%S%y,%X   %u   %E %n %t   %p ",
         .tab_bar = true,
     }
 };

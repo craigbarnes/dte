@@ -46,16 +46,21 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
 CommandParseError parse_commands(PointerArray *array, const char *cmd);
 const char *command_parse_error_to_string(CommandParseError err);
-void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde);
+void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde);
 char *escape_command_arg(const char *arg, bool escape_tilde);
 
 // command-run.c
 extern const Command *current_command;
-void handle_command(const CommandSet *cmds, const char *cmd);
+void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recording);
 
 // command.c
 extern const CommandSet commands;
 const Command *find_normal_command(const char *name) NONNULL_ARGS;
 void collect_normal_commands(const char *prefix) NONNULL_ARGS;
+
+static inline void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
+{
+    return string_append_escaped_arg_sv(s, strview_from_cstring(arg), escape_tilde);
+}
 
 #endif

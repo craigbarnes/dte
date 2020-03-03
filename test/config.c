@@ -123,14 +123,15 @@ static void test_detect_indent(void)
     handle_command (
         &commands,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
-        "open test/data/detect-indent.ini"
+        "open test/data/detect-indent.ini",
+        false
     );
 
     EXPECT_EQ(buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
     EXPECT_TRUE(buffer->options.expand_tab);
     EXPECT_EQ(buffer->options.indent_width, 2);
 
-    handle_command(&commands, "close");
+    handle_command(&commands, "close", false);
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")

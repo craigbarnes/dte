@@ -158,7 +158,7 @@ static void syntax_changed(void)
 
 static bool validate_statusline_format(const char *value)
 {
-    static const StringView chars = STRING_VIEW("fmryYxXpEMNnstu%");
+    static const StringView chars = STRING_VIEW("fmryYxXpEMNRSnstu%");
     size_t i = 0;
     while (value[i]) {
         char ch = value[i++];

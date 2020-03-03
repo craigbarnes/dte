@@ -454,14 +454,14 @@ loop_break:
     ui_start();
 
     if (command) {
-        handle_command(&commands, command);
+        handle_command(&commands, command, false);
     }
 
     if (tag) {
         String s = STRING_INIT;
         string_append_literal(&s, "tag ");
         string_append_escaped_arg(&s, tag, true);
-        handle_command(&commands, string_borrow_cstring(&s));
+        handle_command(&commands, string_borrow_cstring(&s), false);
         string_free(&s);
     }
 

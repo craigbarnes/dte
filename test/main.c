@@ -28,7 +28,7 @@ void test_config(void);
 
 static void test_handle_binding(void)
 {
-    handle_command(&commands, "bind ^A 'insert zzz'; open");
+    handle_command(&commands, "bind ^A 'insert zzz'; open", false);
 
     // Bound command should be cached
     const KeyBinding *binding = lookup_binding(MOD_CTRL | 'A');
@@ -51,7 +51,7 @@ static void test_handle_binding(void)
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
     EXPECT_FALSE(undo());
-    handle_command(&commands, "close");
+    handle_command(&commands, "close", false);
 }
 
 static void test_regexp_match(void)

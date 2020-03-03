@@ -1,9 +1,10 @@
 #include "alias.h"
 #include "change.h"
 #include "command.h"
-#include "debug.h"
 #include "config.h"
+#include "debug.h"
 #include "error.h"
+#include "macro.h"
 #include "parse-args.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -47,9 +48,9 @@ UNITTEST {
     BUG_ON(allowed_command("cD"));
 }
 
-static void run_commands(const CommandSet *cmds, const PointerArray *array);
+static void run_commands(const CommandSet *cmds, const PointerArray *array, bool allow_recording);
 
-static void run_command(const CommandSet *cmds, char **av)
+static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
 {
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
@@ -77,7 +78,7 @@ static void run_command(const CommandSet *cmds, char **av)
         }
         ptr_array_append(&array, NULL);
 
-        run_commands(cmds, &array);
+        run_commands(cmds, &array, allow_recording);
         ptr_array_free(&array);
         return;
     }
@@ -85,6 +86,12 @@ static void run_command(const CommandSet *cmds, char **av)
     if (config_file && cmds == &commands && !allowed_command(cmd->name)) {
         error_msg("Command %s not allowed in config file.", cmd->name);
         return;
+    }
+
+    // Record command in macro buffer, if recording (this needs to be done
+    // before parse_args() mutates the array)
+    if (allow_recording) {
+        macro_command_hook(cmd->name, av + 1);
     }
 
     // By default change can't be merged with previous one.
@@ -101,7 +108,7 @@ static void run_command(const CommandSet *cmds, char **av)
     end_change();
 }
 
-static void run_commands(const CommandSet *cmds, const PointerArray *array)
+static void run_commands(const CommandSet *cmds, const PointerArray *array, bool allow_recording)
 {
     static unsigned int recursion_count;
     if (unlikely(recursion_count++ > 16)) {
@@ -117,7 +124,7 @@ static void run_commands(const CommandSet *cmds, const PointerArray *array)
         }
 
         if (e > s) {
-            run_command(cmds, (char **)array->ptrs + s);
+            run_command(cmds, (char **)array->ptrs + s, allow_recording);
         }
 
         s = e + 1;
@@ -128,12 +135,12 @@ out:
     recursion_count--;
 }
 
-void handle_command(const CommandSet *cmds, const char *cmd)
+void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recording)
 {
     PointerArray array = PTR_ARRAY_INIT;
     CommandParseError err = parse_commands(&array, cmd);
     if (err == CMDERR_NONE) {
-        run_commands(cmds, &array);
+        run_commands(cmds, &array, allow_recording);
     } else {
         const char *str = command_parse_error_to_string(err);
         error_msg("Command syntax error: %s", str);

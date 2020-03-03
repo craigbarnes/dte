@@ -9,6 +9,7 @@
 #include "edit.h"
 #include "editor.h"
 #include "history.h"
+#include "macro.h"
 #include "search.h"
 #include "terminal/input.h"
 #include "util/unicode.h"
@@ -35,6 +36,7 @@ static void normal_mode_keypress(KeyCode key)
         begin_change(CHANGE_MERGE_NONE);
         insert_text(text, size);
         end_change();
+        macro_insert_text_hook(text, size);
         free(text);
         return;
         }
@@ -42,6 +44,7 @@ static void normal_mode_keypress(KeyCode key)
 
     if (u_is_unicode(key)) {
         insert_ch(key);
+        macro_insert_char_hook(key);
     } else {
         handle_binding(key);
     }
@@ -60,7 +63,7 @@ static void command_mode_keypress(KeyCode key)
             // can modify the contents of the command-line
             history_add(&editor.command_history, str, command_history_size);
         }
-        handle_command(&commands, str);
+        handle_command(&commands, str, true);
         return;
     case '\t':
         complete_command_next();

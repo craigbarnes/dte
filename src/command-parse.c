@@ -279,7 +279,7 @@ const char *command_parse_error_to_string(CommandParseError err)
     return error_strings[err];
 }
 
-void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
+void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 {
     static const char escmap[32] = {
         [0x07] = 'a', [0x08] = 'b',
@@ -288,7 +288,8 @@ void string_append_escaped_arg(String *s, const char *arg, bool escape_tilde)
         [0x0D] = 'r', [0x1B] = 'e',
     };
 
-    size_t len = strlen(arg);
+    const char *arg = sv.data;
+    size_t len = sv.length;
     if (len == 0) {
         string_append_literal(s, "''");
         return;

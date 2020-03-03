@@ -1,6 +1,7 @@
 #include "screen.h"
 #include "debug.h"
 #include "editor.h"
+#include "macro.h"
 #include "selection.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
@@ -11,7 +12,7 @@ typedef struct {
     char *buf;
     size_t size;
     size_t pos;
-    bool separator;
+    size_t separator;
     const Window *win;
     const char *misc_status;
 } Formatter;
@@ -25,10 +26,10 @@ static void add_ch(Formatter *f, char ch)
 
 static void add_separator(Formatter *f)
 {
-    if (f->separator && f->pos < f->size) {
+    while (f->separator && f->pos < f->size) {
         add_ch(f, ' ');
+        f->separator--;
     }
-    f->separator = false;
 }
 
 static void add_status_str(Formatter *f, const char *str)
@@ -97,7 +98,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     f->buf = buf;
     f->size = size - 5; // Max length of char and terminating NUL
     f->pos = 0;
-    f->separator = false;
+    f->separator = 0;
 
     CodePoint u;
     bool got_char = block_iter_get_char(&v->cursor, &u) > 0;
@@ -124,6 +125,11 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_literal(f, "RO");
             } else if (v->buffer->temporary) {
                 add_status_literal(f, "TMP");
+            }
+            break;
+        case 'R':
+            if (macro_is_recording()) {
+                add_status_literal(f, "[Recording]");
             }
             break;
         case 'y':
@@ -165,8 +171,11 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_literal(f, "LF");
             }
             break;
+        case 'S':
+            f->separator = 3;
+            break;
         case 's':
-            f->separator = true;
+            f->separator = 1;
             break;
         case 't':
             add_status_str(f, v->buffer->options.filetype);
