@@ -1778,6 +1778,10 @@ static void cmd_show(const CommandArgs *a)
     string_free(&s);
     set_display_filename(v->buffer, xasprintf("(show %s)", a->args[0]));
     v->buffer->encoding = encoding_from_type(UTF8);
+    if (handlers[cmdtype].show != show_wsplit) {
+        v->buffer->options.filetype = str_intern("dte");
+        buffer_update_syntax(v->buffer);
+    }
 }
 
 static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
