@@ -335,7 +335,7 @@ static void collect_completions(char **args, size_t argc)
     }
     if (strview_equal_cstring(&cmd_name, "macro")) {
         static const char verbs[][8] = {
-            "record", "stop", "toggle", "run"
+            "record", "stop", "toggle", "cancel", "run"
         };
         if (argc == 1) {
             for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
