@@ -5,6 +5,7 @@
 #include "cmdline.h"
 #include "command.h"
 #include "completion.h"
+#include "debug.h"
 #include "edit.h"
 #include "editor.h"
 #include "history.h"
@@ -13,7 +14,7 @@
 #include "util/unicode.h"
 #include "view.h"
 
-void normal_mode_keypress(KeyCode key)
+static void normal_mode_keypress(KeyCode key)
 {
     switch (key) {
     case '\t':
@@ -46,7 +47,7 @@ void normal_mode_keypress(KeyCode key)
     }
 }
 
-void command_mode_keypress(KeyCode key)
+static void command_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_ENTER:
@@ -81,7 +82,7 @@ void command_mode_keypress(KeyCode key)
     }
 }
 
-void search_mode_keypress(KeyCode key)
+static void search_mode_keypress(KeyCode key)
 {
     switch (key) {
     case MOD_META | KEY_ENTER:
@@ -131,5 +132,22 @@ void search_mode_keypress(KeyCode key)
     case CMDLINE_UNKNOWN_KEY:
     case CMDLINE_KEY_HANDLED:
         return;
+    }
+}
+
+void handle_input(KeyCode key)
+{
+    switch (editor.input_mode) {
+    case INPUT_NORMAL:
+        normal_mode_keypress(key);
+        break;
+    case INPUT_COMMAND:
+        command_mode_keypress(key);
+        break;
+    case INPUT_SEARCH:
+        search_mode_keypress(key);
+        break;
+    default:
+        BUG("unhandled input mode");
     }
 }

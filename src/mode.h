@@ -3,8 +3,6 @@
 
 #include "terminal/key.h"
 
-void normal_mode_keypress(KeyCode key);
-void command_mode_keypress(KeyCode key);
-void search_mode_keypress(KeyCode key);
+void handle_input(KeyCode key);
 
 #endif

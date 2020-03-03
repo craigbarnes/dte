@@ -494,20 +494,7 @@ void main_loop(void)
             .vy = v->vy
         };
 
-        switch (editor.input_mode) {
-        case INPUT_NORMAL:
-            normal_mode_keypress(key);
-            break;
-        case INPUT_COMMAND:
-            command_mode_keypress(key);
-            break;
-        case INPUT_SEARCH:
-            search_mode_keypress(key);
-            break;
-        default:
-            BUG("unhandled input mode");
-        }
-
+        handle_input(key);
         sanity_check();
         update_screen(&s);
     }
