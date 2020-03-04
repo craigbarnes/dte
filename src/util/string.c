@@ -25,7 +25,7 @@ static void string_grow(String *s, size_t more)
 void string_free(String *s)
 {
     free(s->buffer);
-    string_init(s);
+    *s = (String) STRING_INIT;
 }
 
 void string_append_byte(String *s, unsigned char byte)
@@ -115,11 +115,17 @@ void string_sprintf(String *s, const char *fmt, ...)
     va_end(ap);
 }
 
+static void null_terminate(String *s)
+{
+    string_grow(s, 1);
+    s->buffer[s->len] = '\0';
+}
+
 char *string_steal_cstring(String *s)
 {
-    string_append_byte(s, '\0');
+    null_terminate(s);
     char *b = s->buffer;
-    string_init(s);
+    *s = (String) STRING_INIT;
     return b;
 }
 
@@ -135,12 +141,6 @@ char *string_clone_cstring(const String *s)
     return b;
 }
 
-static void string_ensure_null_terminated(String *s)
-{
-    string_grow(s, 1);
-    s->buffer[s->len] = '\0';
-}
-
 /*
  * This method first ensures that the String buffer is null-terminated
  * and then returns a const pointer to it, without doing any copying.
@@ -153,7 +153,7 @@ static void string_ensure_null_terminated(String *s)
  */
 const char *string_borrow_cstring(String *s)
 {
-    string_ensure_null_terminated(s);
+    null_terminate(s);
     return s->buffer;
 }
 

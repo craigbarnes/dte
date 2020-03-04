@@ -23,11 +23,6 @@ typedef struct {
     string_append_buf(s, l, STRLEN(l)) \
 )
 
-static inline NONNULL_ARGS void string_init(String *s)
-{
-    *s = (String) STRING_INIT;
-}
-
 static inline String string_new(size_t size)
 {
     size = round_size_to_next_multiple(size, 16);
