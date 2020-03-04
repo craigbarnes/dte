@@ -836,10 +836,7 @@ void change_case(int mode)
 {
     bool was_selecting = false;
     bool move = true;
-    size_t text_len, i;
-    char *src;
-    String dst = STRING_INIT;
-
+    size_t text_len;
     if (view->selection) {
         SelectionInfo info;
         init_selection(view, &info);
@@ -856,8 +853,9 @@ void change_case(int mode)
         text_len = u_char_size(u);
     }
 
-    src = block_iter_get_bytes(&view->cursor, text_len);
-    i = 0;
+    String dst = string_new(text_len);
+    char *src = block_iter_get_bytes(&view->cursor, text_len);
+    size_t i = 0;
     while (i < text_len) {
         CodePoint u = u_get_char(src, text_len, &i);
         switch (mode) {

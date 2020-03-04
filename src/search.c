@@ -273,10 +273,8 @@ static void build_replacement (
     regmatch_t *m
 ) {
     size_t i = 0;
-
     while (format[i]) {
         int ch = format[i++];
-
         if (ch == '\\') {
             if (format[i] >= '1' && format[i] <= '9') {
                 int n = format[i++] - '0';
@@ -361,7 +359,6 @@ static unsigned int replace_on_line (
             block_iter_skip_bytes(&view->cursor, match_len);
         } else {
             String b = STRING_INIT;
-
             build_replacement(&b, buf + pos, format, m);
 
             // line ref is invalidated by modification

@@ -468,14 +468,11 @@ static void cmd_exec_tag(const CommandArgs *a)
 
     const char *tag = string_borrow_cstring(&ctx.output);
     const char *nl = memchr(tag, '\n', ctx.output.len);
-    if (nl) {
-        // If there are multiple lines, null-terminate and use the first
-        string_insert_buf(&ctx.output, (size_t)(nl - tag), "\0", 1);
-    }
+    size_t tag_len = nl ? (size_t)(nl - tag) : ctx.output.len;
 
-    String s = STRING_INIT;
+    String s = string_new(tag_len + 16);
     string_append_literal(&s, "tag ");
-    string_append_escaped_arg(&s, tag, true);
+    string_append_escaped_arg_sv(&s, string_view(tag, tag_len), true);
     string_free(&ctx.output);
     handle_command(&commands, string_borrow_cstring(&s), false);
     string_free(&s);
