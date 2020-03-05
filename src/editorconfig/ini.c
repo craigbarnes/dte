@@ -6,7 +6,7 @@
 #include "../util/readfile.h"
 #include "../util/str-util.h"
 
-static char *trim_left(char *str)
+static const char *trim_left(const char *str)
 {
     while (ascii_isspace(*str)) {
         str++;
@@ -84,7 +84,7 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         }
 
         strip_trailing_comments_and_whitespace(&line);
-        unsigned char *delim = strview_memchr(&line, '=');
+        const unsigned char *delim = strview_memchr(&line, '=');
         if (delim) {
             const size_t before_delim_len = delim - line.data;
             size_t name_len = before_delim_len;
@@ -95,8 +95,8 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
                 continue;
             }
 
-            char *after_delim = delim + 1;
-            char *value = trim_left(after_delim);
+            const char *after_delim = delim + 1;
+            const char *value = trim_left(after_delim);
             size_t diff = value - after_delim;
             size_t value_len = line.length - before_delim_len - 1 - diff;
 

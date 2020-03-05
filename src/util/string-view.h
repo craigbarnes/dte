@@ -94,7 +94,7 @@ static inline bool strview_has_prefix_icase(const StringView *sv, const char *p)
 NONNULL_ARGS
 static inline bool strview_isblank(const StringView *sv)
 {
-    const char *data = sv->data;
+    const unsigned char *data = sv->data;
     const size_t len = sv->length;
     size_t i = 0;
     while (i < len && ascii_isblank(data[i])) {
@@ -104,20 +104,20 @@ static inline bool strview_isblank(const StringView *sv)
 }
 
 NONNULL_ARGS
-static inline void *strview_memchr(const StringView *sv, int c)
+static inline const unsigned char *strview_memchr(const StringView *sv, int c)
 {
     return memchr(sv->data, c, sv->length);
 }
 
 NONNULL_ARGS
-static inline void *strview_memrchr(const StringView *sv, int c)
+static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
 {
     const unsigned char *s = sv->data;
     size_t n = sv->length;
     c = (int)(unsigned char)c;
     while (n--) {
         if (s[n] == c) {
-            return (void*)(s + n);
+            return (s + n);
         }
     }
     return NULL;
@@ -126,7 +126,7 @@ static inline void *strview_memrchr(const StringView *sv, int c)
 NONNULL_ARGS
 static inline void strview_trim_left(StringView *sv)
 {
-    const char *data = sv->data;
+    const unsigned char *data = sv->data;
     const size_t len = sv->length;
     size_t i = 0;
     while (i < len && ascii_isblank(data[i])) {
