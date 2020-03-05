@@ -674,6 +674,73 @@ static void cmd_macro(const CommandArgs *a)
     error_msg("Unknown action '%s'", action);
 }
 
+static void cmd_match_bracket(const CommandArgs* UNUSED_ARG(a))
+{
+    CodePoint cursor_char;
+    if (!block_iter_get_char(&view->cursor, &cursor_char)) {
+        error_msg("No character under cursor");
+        return;
+    }
+
+    CodePoint target = cursor_char;
+    BlockIter bi = view->cursor;
+    size_t level = 0;
+    CodePoint u = 0;
+
+    switch (cursor_char) {
+    case '[':
+    case '{':
+        target++;
+        // Fallthrough
+    case '(':
+        target++;
+        goto search_fwd;
+    case ']':
+    case '}':
+        target--;
+        // Fallthrough
+    case ')':
+        target--;
+        goto search_bwd;
+    default:
+        error_msg("Character under cursor not matchable");
+        return;
+    }
+
+search_fwd:
+    block_iter_next_char(&bi, &u);
+    BUG_ON(u != cursor_char);
+    while (block_iter_next_char(&bi, &u)) {
+        if (u == target) {
+            if (level == 0) {
+                bi.offset--;
+                view->cursor = bi;
+                return; // Found
+            }
+            level--;
+        } else if (u == cursor_char) {
+            level++;
+        }
+    }
+    goto not_found;
+
+search_bwd:
+    while (block_iter_prev_char(&bi, &u)) {
+        if (u == target) {
+            if (level == 0) {
+                view->cursor = bi;
+                return; // Found
+            }
+            level--;
+        } else if (u == cursor_char) {
+            level++;
+        }
+    }
+
+not_found:
+    error_msg("No matching bracket found");
+}
+
 static void cmd_move_tab(const CommandArgs *a)
 {
     const char *str = a->args[0];
@@ -2172,6 +2239,7 @@ static const Command cmds[] = {
     {"line", "", 1, 1, cmd_line},
     {"load-syntax", "", 1, 1, cmd_load_syntax},
     {"macro", "", 1, 1, cmd_macro},
+    {"match-bracket", "", 0, 0, cmd_match_bracket},
     {"move-tab", "", 1, 1, cmd_move_tab},
     {"msg", "np", 0, 0, cmd_msg},
     {"new-line", "", 0, 0, cmd_new_line},
