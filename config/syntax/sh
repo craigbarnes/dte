@@ -52,12 +52,8 @@ syntax .sh-expression
 
 state expression special
     # FIXME: there can be almost anything in $(( ... ))
-    char ')' expression-end
+    str '))' END special
     eat this
-
-state expression-end special
-    char ')' END special
-    eat END error
 
 # Double quoted string. $(cmd) and $((expr) not properly parsed
 syntax .sh-simple-dq
