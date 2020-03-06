@@ -1574,14 +1574,15 @@ files, which can take a long time on some systems.
 .RE
 \fBlock\-files\fR [true]
 .RS
-Lock files using \fB$DTE_HOME/file\-locks\fR. Only protects from your
-own mistakes (two processes editing same file).
+Keep a record of open files in \fB$DTE_HOME/file\-locks\fR, so that a
+warning can be shown if the same file is accidentally opened in
+multiple dte processes.
 .P
 .RE
 \fBnewline\fR [unix]
 .RS
-Whether to use LF (\fIunix\fR) or CRLF (\fIdos\fR) line\-endings. This is
-just a default value for new files.
+Whether to use LF (\fBunix\fR) or CRLF (\fBdos\fR) line\-endings. This
+is just a default value for new files.
 .P
 .RE
 \fBscroll\-margin\fR [0]

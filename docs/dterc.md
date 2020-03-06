@@ -1025,13 +1025,14 @@ files, which can take a long time on some systems.
 
 ### **lock-files** [true]
 
-Lock files using `$DTE_HOME/file-locks`. Only protects from your
-own mistakes (two processes editing same file).
+Keep a record of open files in `$DTE_HOME/file-locks`, so that a
+warning can be shown if the same file is accidentally opened in
+multiple dte processes.
 
 ### **newline** [unix]
 
-Whether to use LF (_unix_) or CRLF (_dos_) line-endings. This is
-just a default value for new files.
+Whether to use LF (**unix**) or CRLF (**dos**) line-endings. This
+is just a default value for new files.
 
 ### **scroll-margin** [0]
 
