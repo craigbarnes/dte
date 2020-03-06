@@ -1,4 +1,5 @@
 #include "selection.h"
+#include "editor.h"
 #include "util/unicode.h"
 
 void init_selection(const View *v, SelectionInfo *info)
@@ -31,8 +32,10 @@ void init_selection(const View *v, SelectionInfo *info)
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
-        // Character under cursor belongs to the selection
-        info->eo += block_iter_next_column(&ei);
+        if (editor.options.select_cursor_char) {
+            // Character under cursor belongs to the selection
+            info->eo += block_iter_next_column(&ei);
+        }
     }
 }
 

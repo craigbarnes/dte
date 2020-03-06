@@ -64,6 +64,7 @@ EditorState editor = {
         .lock_files = true,
         .crlf_newlines = false,
         .scroll_margin = 0,
+        .select_cursor_char = true,
         .set_window_title = false,
         .show_line_numbers = false,
         .statusline_left = " %f%s%m%r%s%M",

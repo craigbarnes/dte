@@ -448,6 +448,7 @@ static const OptionDesc option_desc[] = {
     STR_OPT("indent-regex", L(indent_regex), validate_regex, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
+    BOOL_OPT("select-cursor-char", G(select_cursor_char), NULL),
     UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, NULL),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
     BOOL_OPT("show-line-numbers", G(show_line_numbers), NULL),
