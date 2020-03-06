@@ -16,11 +16,9 @@ static Change *alloc_change(void)
 static void add_change(Change *change)
 {
     Change *head = buffer->cur_change;
-
     change->next = head;
     xrenew(head->prev, head->nr_prev + 1);
     head->prev[head->nr_prev++] = change;
-
     buffer->cur_change = change;
 }
 
@@ -61,7 +59,6 @@ static size_t buffer_offset(void)
 static void record_insert(size_t len)
 {
     Change *change = buffer->cur_change;
-
     BUG_ON(!len);
     if (
         change_merge == prev_change_merge
@@ -191,7 +188,6 @@ static void reverse_change(Change *change)
         size_t del_count = change->ins_count;
         size_t ins_count = change->del_count;
         char *buf = do_replace(del_count, change->buf, ins_count);
-
         free(change->buf);
         change->buf = buf;
         change->ins_count = ins_count;
@@ -207,7 +203,6 @@ static void reverse_change(Change *change)
 bool undo(void)
 {
     Change *change = buffer->cur_change;
-
     view_reset_preferred_x(view);
     if (!change->next) {
         return false;
@@ -215,7 +210,6 @@ bool undo(void)
 
     if (is_change_chain_barrier(change)) {
         unsigned long count = 0;
-
         while (1) {
             change = change->next;
             if (is_change_chain_barrier(change)) {
@@ -230,6 +224,7 @@ bool undo(void)
     } else {
         reverse_change(change);
     }
+
     buffer->cur_change = change->next;
     return true;
 }
@@ -237,7 +232,6 @@ bool undo(void)
 bool redo(unsigned long change_id)
 {
     Change *change = buffer->cur_change;
-
     view_reset_preferred_x(view);
     if (!change->prev) {
         // Don't complain if change_id is 0
@@ -270,7 +264,6 @@ bool redo(unsigned long change_id)
     change = change->prev[change_id];
     if (is_change_chain_barrier(change)) {
         unsigned long count = 0;
-
         while (1) {
             change = change->prev[change->nr_prev - 1];
             if (is_change_chain_barrier(change)) {
@@ -285,6 +278,7 @@ bool redo(unsigned long change_id)
     } else {
         reverse_change(change);
     }
+
     buffer->cur_change = change;
     return true;
 }
@@ -299,7 +293,6 @@ top:
     // ch is leaf now
     while (ch->next) {
         Change *next = ch->next;
-
         free(ch->buf);
         free(ch);
 
@@ -315,13 +308,12 @@ top:
 
 void buffer_insert_bytes(const char *buf, const size_t len)
 {
-    size_t rec_len = len;
-
     view_reset_preferred_x(view);
     if (len == 0) {
         return;
     }
 
+    size_t rec_len = len;
     if (buf[len - 1] != '\n' && block_iter_is_eof(&view->cursor)) {
         // Force newline at EOF
         do_insert("\n", 1);
@@ -343,7 +335,6 @@ static bool would_delete_last_bytes(size_t count)
 
     while (1) {
         size_t avail = blk->size - offset;
-
         if (avail > count) {
             return false;
         }
@@ -394,14 +385,11 @@ void buffer_erase_bytes(size_t len)
     buffer_delete_bytes_internal(len, true);
 }
 
-void buffer_replace_bytes (
-    size_t del_count,
-    const char *const inserted,
-    size_t ins_count
-) {
+void buffer_replace_bytes(size_t del_count, const char *ins, size_t ins_count)
+{
     view_reset_preferred_x(view);
     if (del_count == 0) {
-        buffer_insert_bytes(inserted, ins_count);
+        buffer_insert_bytes(ins, ins_count);
         return;
     }
     if (ins_count == 0) {
@@ -411,16 +399,16 @@ void buffer_replace_bytes (
 
     // Check if all newlines from EOF would be deleted
     if (would_delete_last_bytes(del_count)) {
-        if (inserted[ins_count - 1] != '\n') {
+        if (ins[ins_count - 1] != '\n') {
             // Don't replace last newline
             if (--del_count == 0) {
-                buffer_insert_bytes(inserted, ins_count);
+                buffer_insert_bytes(ins, ins_count);
                 return;
             }
         }
     }
 
-    char *deleted = do_replace(del_count, inserted, ins_count);
+    char *deleted = do_replace(del_count, ins, ins_count);
     record_replace(deleted, del_count, ins_count);
 
     if (buffer->views.count > 1) {
