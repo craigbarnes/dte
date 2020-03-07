@@ -32,6 +32,7 @@ static TerminalType get_term_type(const char *term)
         uint8_t type;
     } builtin_terminals[] = {
         {STRN("xterm-kitty"), TERM_KITTY},
+        {STRN("kitty"), TERM_KITTY},
         {STRN("xterm"), TERM_XTERM},
         {STRN("st"), TERM_ST},
         {STRN("stterm"), TERM_ST},
