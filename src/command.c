@@ -688,6 +688,7 @@ static void cmd_match_bracket(const CommandArgs* UNUSED_ARG(a))
     CodePoint u = 0;
 
     switch (cursor_char) {
+    case '<':
     case '[':
     case '{':
         target++;
@@ -695,6 +696,7 @@ static void cmd_match_bracket(const CommandArgs* UNUSED_ARG(a))
     case '(':
         target++;
         goto search_fwd;
+    case '>':
     case ']':
     case '}':
         target--;
