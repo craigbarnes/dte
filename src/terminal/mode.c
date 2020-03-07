@@ -47,7 +47,7 @@ static void xtcsetattr(const struct termios *t)
     int ret;
     do {
         ret = tcsetattr(STDIN_FILENO, TCSANOW, t);
-    } while (ret != 0 && errno == EINTR);
+    } while (unlikely(ret != 0 && errno == EINTR));
 
     if (unlikely(ret != 0)) {
         fatal_error("tcsetattr", errno);
