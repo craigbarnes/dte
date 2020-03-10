@@ -79,6 +79,7 @@ static const FileBasenameMap dotfiles[] = {
     {"nanorc", CONFIG},
     {"profile", SHELL},
     {"shellcheckrc", CONFIG},
+    {"sxhkdrc", CONFIG},
     {"tigrc", CONFIG},
     {"tmux.conf", TMUX},
     {"xinitrc", SHELL},
