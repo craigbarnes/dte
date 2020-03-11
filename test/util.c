@@ -457,9 +457,9 @@ static void test_u_char_width(void)
     // Double width (2 columns)
     EXPECT_EQ(u_char_width(0x2757), 2);
     EXPECT_EQ(u_char_width(0x312F), 2);
+    EXPECT_EQ(u_char_width(0x30000), 2);
 
     // Double width but unassigned (rendered as <xx> -- 4 columns)
-    EXPECT_EQ(u_char_width(0x30000), 4);
     EXPECT_EQ(u_char_width(0x3A009), 4);
     EXPECT_EQ(u_char_width(0x3FFFD), 4);
 
