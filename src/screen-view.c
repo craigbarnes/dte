@@ -83,14 +83,19 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     const View *v = info->view;
     const unsigned int flags = get_ws_error_option(v->buffer);
 
-    if (i >= info->trailing_ws_offset && flags & WSE_TRAILING) {
+    const unsigned int trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
+    if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
-        if (info->line_nr != v->cy || v->cx < info->trailing_ws_offset) {
+        if (
+            // Cursor is not on this line
+            info->line_nr != v->cy
+            // or is positioned before any trailing whitespace
+            || v->cx < info->trailing_ws_offset
+            // or user explicitly wants trailing space under cursor highlighted
+            || flags & WSE_ALL_TRAILING
+        ) {
             return true;
         }
-        // Cursor is on this line and on the whitespace or at eol. It would
-        // be annoying if the line you are editing displays trailing
-        // whitespace as an error.
     }
 
     if (u == '\t') {

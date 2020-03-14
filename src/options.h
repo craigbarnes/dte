@@ -6,28 +6,33 @@
 #include "util/string.h"
 
 enum {
-    // Trailing whitespace
-    WSE_TRAILING = 1 << 0,
-
     // Spaces in indentation.
     // Does not include less than tab-width spaces at end of indentation.
-    WSE_SPACE_INDENT = 1 << 1,
+    WSE_SPACE_INDENT = 1 << 0,
 
     // Less than tab-width spaces at end of indentation
-    WSE_SPACE_ALIGN = 1 << 2,
+    WSE_SPACE_ALIGN = 1 << 1,
 
     // Tab in indentation
-    WSE_TAB_INDENT = 1 << 3,
+    WSE_TAB_INDENT = 1 << 2,
 
     // Tab anywhere but in indentation
-    WSE_TAB_AFTER_INDENT = 1 << 4,
+    WSE_TAB_AFTER_INDENT = 1 << 3,
 
     // Special whitespace characters
-    WSE_SPECIAL = 1 << 5,
+    WSE_SPECIAL = 1 << 4,
 
     // expand-tab = false: WSE_SPACE_INDENT
     // expand-tab = true:  WSE_TAB_AFTER_INDENT | WSE_TAB_INDENT
-    WSE_AUTO_INDENT = 1 << 6,
+    WSE_AUTO_INDENT = 1 << 5,
+
+    // Trailing whitespace
+    WSE_TRAILING = 1 << 6,
+
+    // Like WSE_TRAILING, but also includes runs of whitespace adjacent
+    // to the cursor (where the presence of trailing whitespace is usually
+    // obvious and highlighting can be annoying)
+    WSE_ALL_TRAILING = 1 << 7,
 };
 
 typedef enum {

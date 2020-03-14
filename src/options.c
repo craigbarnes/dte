@@ -420,13 +420,14 @@ static const char *detect_indent_values[] = {
 };
 
 static const char *ws_error_values[] = {
-    "trailing",
     "space-indent",
     "space-align",
     "tab-indent",
     "tab-after-indent",
     "special",
     "auto-indent",
+    "trailing",
+    "all-trailing",
     NULL
 };
 
