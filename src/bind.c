@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include "bind.h"
 #include "change.h"
@@ -6,6 +8,7 @@
 #include "error.h"
 #include "macro.h"
 #include "parse-args.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

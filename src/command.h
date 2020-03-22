@@ -7,6 +7,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
+#include "util/string-view.h"
 
 typedef struct {
     char flags[8];

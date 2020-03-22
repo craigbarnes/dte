@@ -1,7 +1,7 @@
-#include <string.h>
 #include "regexp.h"
 #include "debug.h"
 #include "error.h"
+#include "util/macros.h"
 #include "util/xmalloc.h"
 
 bool regexp_match_nosub(const char *pattern, const StringView *buf)

@@ -1,6 +1,6 @@
+#include <string.h>
 #include "block-iter.h"
 #include "debug.h"
-#include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 

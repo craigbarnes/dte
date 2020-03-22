@@ -8,6 +8,7 @@
 #include "color.h"
 #include "../util/hashset.h"
 #include "../util/ptr-array.h"
+#include "../util/string-view.h"
 
 typedef enum {
     COND_BUFIS,

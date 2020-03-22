@@ -1,12 +1,9 @@
 #include <stddef.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
 #include "../debug.h"
-#include "../util/ascii.h"
 #include "../util/path.h"
 #include "../util/string.h"
 #include "../util/string-view.h"

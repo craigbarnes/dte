@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "util/string.h"
+#include "util/unicode.h"
 
 bool macro_is_recording(void);
 void macro_record(void);

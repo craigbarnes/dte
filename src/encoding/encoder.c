@@ -1,8 +1,6 @@
 #include <stdlib.h>
-#include <string.h>
 #include "encoder.h"
 #include "convert.h"
-#include "../util/utf8.h"
 #include "../util/xmalloc.h"
 #include "../util/xreadwrite.h"
 

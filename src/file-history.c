@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include "file-history.h"
 #include "error.h"
 #include "history.h"
@@ -135,11 +136,11 @@ void save_file_history(const char *filename)
 bool find_file_in_history(const char *filename, unsigned long *row, unsigned long *col)
 {
     const ssize_t idx = lookup_entry_index(filename, strlen(filename));
-    if (idx >= 0) {
-        const HistoryEntry *e = history.ptrs[idx];
-        *row = e->row;
-        *col = e->col;
-        return true;
+    if (idx < 0) {
+        return false;
     }
-    return false;
+    const HistoryEntry *e = history.ptrs[idx];
+    *row = e->row;
+    *col = e->col;
+    return true;
 }
