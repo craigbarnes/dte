@@ -1,0 +1,14 @@
+syntax scheme
+
+state start code
+    char ";" comment
+    char '"' string
+    eat this
+
+state comment
+    char "\n" start
+    eat this
+
+state string
+    char "\"" start string
+    eat this
