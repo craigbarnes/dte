@@ -77,6 +77,14 @@
     #define CLANG_ASAN_ENABLED 1
 #endif
 
+#if defined(__clang__) && HAS_FEATURE(memory_sanitizer)
+    #define CLANG_MSAN_ENABLED 1
+#endif
+
+#if defined(CLANG_ASAN_ENABLED) || defined(CLANG_MSAN_ENABLED)
+    #define CLANG_ASAN_OR_MSAN_ENABLED 1
+#endif
+
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
 #else
