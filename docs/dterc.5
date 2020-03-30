@@ -53,7 +53,7 @@ Buffer Management Commands:
 .br
    \fBsave\fR [\fB\-dfup\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .br
-   \fBclose\fR [\fB\-fqw\fR]
+   \fBclose\fR [\fB\-fpqw\fR]
 .br
    \fBnext\fR
 .br
@@ -68,7 +68,7 @@ Window Management Commands:
 .br
    \fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
 .br
-   \fBwclose\fR [\fB\-f\fR]
+   \fBwclose\fR [\fB\-fp\fR]
 .br
    \fBwnext\fR
 .br
@@ -796,7 +796,7 @@ Open a command prompt if there's no specified or existing \fIfilename\fR
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .PP
 .RE
-\fBclose\fR [\fB\-fqw\fR]
+\fBclose\fR [\fB\-fpqw\fR]
 .RS
 Close file.
 .P
@@ -859,7 +859,7 @@ Split horizontally instead of vertically.
 Split root instead of current window.
 .PP
 .RE
-\fBwclose\fR [\fB\-f\fR]
+\fBwclose\fR [\fB\-fp\fR]
 .RS
 Close window.
 .P

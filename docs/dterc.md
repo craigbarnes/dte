@@ -408,7 +408,7 @@ Save file. By default line-endings (LF vs CRLF) are preserved.
 `-e` _encoding_
 :   Set file _encoding_. See `iconv -l` for list of supported encodings.
 
-### **close** [**-fqw**]
+### **close** [**-fpqw**]
 
 Close file.
 
@@ -458,7 +458,7 @@ Like `open` but at first splits current window vertically.
 `-r`
 :   Split root instead of current window.
 
-### **wclose** [**-f**]
+### **wclose** [**-fp**]
 
 Close window.
 
