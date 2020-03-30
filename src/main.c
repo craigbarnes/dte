@@ -1,3 +1,10 @@
+// NetBSD fcntl.h doesn't expose F_DUPFD_CLOEXEC unless _NETBSD_SOURCE
+// is defined, despite the fact that F_DUPFD_CLOEXEC is part of the
+// POSIX 2008 Base spec.
+#ifdef __NetBSD__
+#define _NETBSD_SOURCE 1
+#endif
+
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
