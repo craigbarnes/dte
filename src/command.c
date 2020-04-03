@@ -1024,19 +1024,6 @@ static void cmd_pgup(const CommandArgs *a)
 
 static void cmd_pipe_from(const CommandArgs *a)
 {
-    bool strip_nl = false;
-    bool move = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'm':
-            move = true;
-            break;
-        case 's':
-            strip_nl = true;
-            break;
-        }
-    }
-
     SpawnContext ctx = {
         .argv = a->args,
         .output = STRING_INIT,
@@ -1052,6 +1039,8 @@ static void cmd_pipe_from(const CommandArgs *a)
         unselect();
     }
 
+    bool strip_nl = has_flag(a, 's');
+    bool move = has_flag(a, 'm');
     size_t ins_len = ctx.output.len;
     if (strip_nl) {
         if (ins_len && ctx.output.buffer[ins_len - 1] == '\n') {
