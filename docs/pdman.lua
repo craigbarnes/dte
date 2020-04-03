@@ -139,7 +139,7 @@ function Code(s, attr)
         dterc = "(5)",
         ["dte-syntax"] = "(5)",
         execvp = "(3)",
-        glob = "(3)"
+        glob = "(7)"
     }
     return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
 end
