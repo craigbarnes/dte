@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "filetype.h"
 #include "debug.h"
 #include "error.h"
@@ -33,9 +32,9 @@ static int ft_compare(const void *key, const void *elem)
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
 typedef struct {
-    FileDetectionType type;
-    uint8_t name_len;
-    uint8_t str_len;
+    FileDetectionType type : 8;
+    unsigned int name_len : 8;
+    unsigned int str_len : 16;
     char data[]; // Contains name followed by str (both null-terminated)
 } UserFileTypeEntry;
 
@@ -55,8 +54,8 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
 {
     const size_t name_len = strlen(name);
     const size_t str_len = strlen(str);
-    if (unlikely(name_len >= 256 || str_len >= 256)) {
-        error_msg("ft argument exceeds maximum length (255 bytes)");
+    if (unlikely(name_len > 0xFF || str_len > 0xFFFF)) {
+        error_msg("ft argument exceeds maximum length");
         return;
     }
 
@@ -74,8 +73,8 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     const size_t data_len = name_len + str_len + 2;
     UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + data_len);
     ft->type = type;
-    ft->name_len = (uint8_t) name_len;
-    ft->str_len = (uint8_t) str_len;
+    ft->name_len = name_len;
+    ft->str_len = str_len;
     memcpy(ft->data, name, name_len + 1);
     memcpy(ft->data + name_len + 1, str, str_len + 1);
     ptr_array_append(&filetypes, ft);
