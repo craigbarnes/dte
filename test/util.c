@@ -856,12 +856,12 @@ static void test_hashset(void)
 
     hashset_init(&set, 0, true);
     EXPECT_EQ(set.nr_entries, 0);
-    hashset_add(&set, "foo", 3);
-    hashset_add(&set, "Foo", 3);
+    hashset_add(&set, STRN("foo"));
+    hashset_add(&set, STRN("Foo"));
     EXPECT_EQ(set.nr_entries, 1);
-    EXPECT_NONNULL(hashset_get(&set, "foo", 3));
-    EXPECT_NONNULL(hashset_get(&set, "FOO", 3));
-    EXPECT_NONNULL(hashset_get(&set, "fOO", 3));
+    EXPECT_NONNULL(hashset_get(&set, STRN("foo")));
+    EXPECT_NONNULL(hashset_get(&set, STRN("FOO")));
+    EXPECT_NONNULL(hashset_get(&set, STRN("fOO")));
     hashset_free(&set);
     MEMZERO(&set);
 
@@ -869,13 +869,31 @@ static void test_hashset(void)
     // inserting duplicates
     hashset_init(&set, 0, false);
     EXPECT_EQ(set.nr_entries, 0);
-    HashSetEntry *e1 = hashset_add(&set, "foo", 3);
+    HashSetEntry *e1 = hashset_add(&set, STRN("foo"));
     EXPECT_EQ(e1->str_len, 3);
     EXPECT_STREQ(e1->str, "foo");
     EXPECT_EQ(set.nr_entries, 1);
-    HashSetEntry *e2 = hashset_add(&set, "foo", 3);
+    HashSetEntry *e2 = hashset_add(&set, STRN("foo"));
     EXPECT_PTREQ(e1, e2);
     EXPECT_EQ(set.nr_entries, 1);
+    hashset_free(&set);
+
+    hashset_init(&set, 0, false);
+    // Initial table size should be 16 (minimum + load factor + rounding)
+    EXPECT_EQ(set.table_size, 16);
+    for (size_t i = 1; i <= 80; i++) {
+        char buf[4];
+        size_t n = xsnprintf(buf, sizeof buf, "%zu", i);
+        hashset_add(&set, buf, n);
+    }
+    EXPECT_EQ(set.nr_entries, 80);
+    EXPECT_NONNULL(hashset_get(&set, STRN("1")));
+    EXPECT_NONNULL(hashset_get(&set, STRN("80")));
+    EXPECT_NULL(hashset_get(&set, STRN("0")));
+    EXPECT_NULL(hashset_get(&set, STRN("81")));
+    // Table size should be the first power of 2 larger than the number
+    // of entries (including load factor adjustment)
+    EXPECT_EQ(set.table_size, 128);
     hashset_free(&set);
 }
 
