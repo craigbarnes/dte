@@ -39,6 +39,7 @@ bool u_is_breakable_whitespace(CodePoint u)
     case '\f':
     case '\r':
     case ' ':
+    case 0x1680: // Ogham space mark
     case 0x2000: // En quad
     case 0x2001: // Em quad
     case 0x2002: // En space
@@ -46,8 +47,11 @@ bool u_is_breakable_whitespace(CodePoint u)
     case 0x2004: // 3-per-em space
     case 0x2005: // 4-per-em space
     case 0x2006: // 6-per-em space
+    case 0x2008: // Punctuation space
     case 0x2009: // Thin space
-    case 0x200a: // Hair space
+    case 0x200A: // Hair space
+    case 0x200B: // Zero width space
+    case 0x205F: // Medium mathematical space
     case 0x3000: // Ideographic space
         return true;
     }
