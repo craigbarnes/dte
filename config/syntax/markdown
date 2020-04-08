@@ -52,7 +52,7 @@ state block-start
     str "    " code-block
     char "\t" code-block
     char "\n " this
-    noeat text
+    noeat line-start
 
 state text
     char "\n" line-start
