@@ -5,10 +5,10 @@ dte Release Checklist
    1. Update `CHANGELOG.md`
    2. Hard code `VERSION` variable in `mk/build.mk` to release version
    3. Update `RELEASE_VERSIONS` in `mk/dev.mk`
-   5. Remove `-g` from default `CFLAGS`
-   6. Update tarball name in `README.md`
-   7. Check `make vars` output
-   8. `git commit -m "Prepare v${VER} release"`
+   4. Remove `-g` from default `CFLAGS`
+   5. Update tarball name in `README.md`
+   6. Check `make vars` output
+   7. `git commit -m "Prepare v${VER} release"`
 
 2. Tag and upload
    1. `git tag -s -m "Release v${VER}" v${VER} ${COMMIT}`
