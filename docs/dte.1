@@ -1,300 +1,308 @@
-.TH DTE 1 "November 2017"
+.TH DTE 1 "April 2020"
 .nh
 .ad l
 .
 .SH NAME
-.
-dte \- A small and flexible text editor
-.
+dte \- A small, configurable text editor
 .SH SYNOPSIS
-.
-.B dte
-.RB [ \-HR ]
+\fBdte\fR
+[\fB\-HR\fR]
 [\fB\-c\fR \fIcommand\fR]
 [\fB\-t\fR \fIctag\fR]
 [\fB\-r\fR \fIrcfile\fR]
-.RI [[\fB+\fR line ] " file" ]...
+[[\fB+\fRline] \fIfile\fR]...
 .br
-.B dte
-.RB [ \-h | \-B | \-K | \-V | "\-b \fIrcname\fR" | "\-s \fIfile\fR" ]
-.
+\fBdte\fR [\fB\-h\fR|\fB\-B\fR|\fB\-K\fR|\fB\-V\fR|\fB\-b\fR \fIrcname\fR|\fB\-s\fR \fIfile\fR]
+.P
 .SH OPTIONS
-.
 .TP
-.BI \-c " command"
+\fB\-c\fR \fIcommand\fR
 Run \fIcommand\fR, after reading the rc file and opening any \fIfile\fR
 arguments. See \fBdterc\fR(5) for available commands.
-.
+.PP
 .TP
-.BI \-t " ctag"
+\fB\-t\fR \fIctag\fR
 Jump to source location of \fIctag\fR. Requires \fBtags\fR file generated
 by \fBctags\fR(1).
-.
+.PP
 .TP
-.BI \-r " rcfile"
+\fB\-r\fR \fIrcfile\fR
 Read configuration from \fIrcfile\fR instead of \fB~/.dte/rc\fR.
-.
+.PP
 .TP
-.BI \-s " file"
+\fB\-s\fR \fIfile\fR
 Load \fIfile\fR as a \fBdte\-syntax\fR(5) file and exit. Any errors
 encountered are printed to \fBstderr\fR(3) and the exit status is
 set appropriately.
-.
+.PP
 .TP
-.BI \-b " rcname"
+\fB\-b\fR \fIrcname\fR
 Dump the contents of the built\-in rc or syntax file named \fIrcname\fR
 and exit.
-.
+.P
+
+.PP
 .TP
-.B \-B
+\fB\-B\fR
 Print a list of all built\-in config names that can be used with the
 \fB\-b\fR option and exit.
-.
+.PP
 .TP
-.B \-H
+\fB\-H\fR
 Don't load history files at startup or save history files on exit (see
 \fBFILES\fR section below). History features will work as usual but will
-be in-memory only and not persisted to the filesystem.
-.
+be in\-memory only and not persisted to the filesystem.
+.PP
 .TP
-.B \-R
+\fB\-R\fR
 Don't read the rc file.
-.
+.PP
 .TP
-.B \-K
+\fB\-K\fR
 Start in a special mode that continuously reads input and prints the
 symbolic name of each pressed key.
-.
+.PP
 .TP
-.B \-h
+\fB\-h\fR
 Display the help summary and exit.
-.
+.PP
 .TP
-.B \-V
+\fB\-V\fR
 Display the version number and exit.
-.
-.SH BASIC USAGE
-.
-Here are some of the default key bindings. \fBM\-x\fR is Alt+x,
-\fB^V\fR (or \fBC\-V\fR) is Ctrl+v and \fBS\-left\fR is Shift+left.
-.
+.PP
+.SH KEY BINDINGS
+There are 3 editor modes, each having a different set of key bindings.
+Normal mode bindings can be customized by using the \fBbind\fR command
+(see \fBdterc\fR(5)) or displayed using the \fBshow bind\fR command.
+.P
+The key bindings listed below are in the same format as accepted by
+the \fBbind\fR command. In particular, key combinations are represented
+as follows:
+.P
+\(bu \fBM\-x\fR is Alt+x
+.br
+\(bu \fBC\-V\fR (or \fB^V\fR) is Ctrl+v
+.br
+\(bu \fBS\-left\fR is Shift+left
+.br
+\(bu \fBC\-M\-S\-left\fR is Ctrl+Alt+Shift+left
+.br
+.P
+.SS Normal Mode
+Normal mode is the mode the editor starts in. Pressing basic keys
+(i.e. without modifiers) simply inserts text into the buffer. There
+are also various key combinations bound by default:
+.P
 .TP
-.BR S\-up ", " S\-down ", " S\-left ", " S\-right
+\fBS\-up\fR, \fBS\-down\fR, \fBS\-left\fR, \fBS\-right\fR
 Move cursor and select characters
-.
+.PP
 .TP
-.BR C\-S\-left ", " C\-S\-right
+\fBC\-S\-left\fR, \fBC\-S\-right\fR
 Move cursor and select whole words
-.
+.PP
 .TP
-.BR C\-S\-up ", " C\-S\-down
+\fBC\-S\-up\fR, \fBC\-S\-down\fR
 Move cursor and select whole lines
-.
+.PP
 .TP
-.B ^C
+\fB^C\fR
 Copy current line or selection
-.
+.PP
 .TP
-.B ^X
+\fB^X\fR
 Cut current line or selection
-.
+.PP
 .TP
-.B ^V
+\fB^V\fR
 Paste
-.
+.PP
 .TP
-.B ^Z
+\fB^Z\fR
 Undo
-.
+.PP
 .TP
-.B ^Y
+\fB^Y\fR
 Redo
-.
+.PP
 .TP
-.B M\-x
+\fBM\-x\fR
 Enter command mode
-.
+.PP
 .TP
-.B ^F
+\fB^F\fR
 Enter search mode
-.
+.PP
 .TP
-.B F3
+\fBF3\fR
 Search next
-.
+.PP
 .TP
-.B F4
+\fBF4\fR
 Search previous
-.
+.PP
 .TP
-.B ^T
-Open new tab
-.
+\fB^T\fR
+Open new buffer
+.PP
 .TP
-.BI M\- N
-Activate \fIN\fRth tab
-.
+\fBM\-1\fR, \fBM\-2\fR ... \fBM\-9\fR
+Switch to buffer 1 (or 2, 3, 4, etc.)
+.PP
 .TP
-.B ^W
-Close tab
-.
+\fB^W\fR
+Close current buffer
+.PP
 .TP
-.B ^S
-Save file
-.
+\fB^S\fR
+Save
+.PP
 .TP
-.B ^Q
+\fB^Q\fR
 Quit
-.
-.SH COMMAND MODE
-.
+.PP
+.SS Command Mode
 Command mode allows running various editor commands using a language
 similar to Unix shell. The \fBnext\fR and \fBprev\fR commands switch
 to the next/previous file. The \fBopen\fR, \fBsave\fR and \fBquit\fR
 commands should be self\-explanatory. For a full list of available
 commands, see \fBdterc\fR(5).
 .P
-The default key bindings for command mode are:
-.
+The key bindings for command mode are:
+.P
 .TP
-.BR up ", " down
+\fBup\fR, \fBdown\fR
 Browse previous command history.
-.
+.PP
 .TP
-.B tab
+\fBtab\fR
 Auto\-complete current command or argument
-.
+.PP
 .TP
-.B ^A
+\fB^A\fR
 Go to beginning of command line
-.
+.PP
 .TP
-.B ^B
+\fB^B\fR
 Move left
-.
+.PP
 .TP
-.B ^C
+\fB^C\fR
 Exit command mode
-.
+.PP
 .TP
-.B ^D
+\fB^D\fR
 Delete
-.
+.PP
 .TP
-.B ^E
+\fB^E\fR
 Go to end of command line
-.
+.PP
 .TP
-.B ^F
+\fB^F\fR
 Move right
-.
+.PP
 .TP
-.B ^K
+\fB^K\fR
 Delete to end of command line
-.
+.PP
 .TP
-.B ^U
+\fB^U\fR
 Delete to beginning of command line
-.
+.PP
 .TP
-.B ^W
+\fB^W\fR
 Erase word
-.
+.PP
 .TP
-.B Esc
+\fBEsc\fR
 Exit command mode
-.
-.SH SEARCH MODE
-.
+.PP
+.SS Search Mode
 Search mode allows entering a regular expression to search in the
 current buffer.
 .P
 The key bindings for search mode are mostly the same as in command mode,
 plus these additional keys:
-.
+.P
 .TP
-.B M\-c
+\fBM\-c\fR
 Toggle case sensitive search option.
-.
+.PP
 .TP
-.B M\-r
+\fBM\-r\fR
 Reverse search direction.
-.
+.PP
 .TP
-.B Enter
+\fBEnter\fR
 Perform regex search.
-.
+.PP
 .TP
-.B M\-Enter
-Perform plain-text search (escapes the regex).
-.
+\fBM\-Enter\fR
+Perform plain\-text search (escapes the regex).
+.PP
 .SH ENVIRONMENT
-.
 The following environment variables are inspected at startup:
-.
+.P
 .TP
-.B DTE_HOME
+\fBDTE_HOME\fR
 User configuration directory. Defaults to \fB$HOME/.dte\fR if not set.
-.
+.PP
 .TP
-.B DTE_FORCE_TERMINFO
-Force \fBdte\fR to use \fBterminfo\fR(5) database, even for terminals
-with built-in support. Enabled if set.
-.
+\fBDTE_FORCE_TERMINFO\fR
+Force dte to use \fBterminfo\fR(5) database, even for terminals
+with built\-in support. Enabled if set.
+.PP
 .TP
-.B HOME
+\fBHOME\fR
 User home directory. Used when expanding \fB~/\fR in filenames and also
 to determine the default value for \fBDTE_HOME\fR.
-.
+.PP
 .TP
-.B TERM
+\fBTERM\fR
 Terminal identifier. Used to determine which \fBterminfo\fR(5) entry or
-built-in terminal support to use.
-.
+built\-in terminal support to use.
+.PP
 .TP
-.B COLORTERM
-Enables 24-bit color output, if set to \fBtruecolor\fR.
-.
+\fBCOLORTERM\fR
+Enables 24\-bit color output, if set to \fBtruecolor\fR.
+.PP
 .SH FILES
-.
 .TP
-.B $DTE_HOME/rc
+\fB$DTE_HOME/rc\fR
 User configuration file. See \fBdterc\fR(5) for a full list of
 available commands and options or run "dte \-b rc" to see the built\-in,
 default config.
-.
+.PP
 .TP
-.B $DTE_HOME/syntax/*
-User syntax files. These override the syntax files that come
-with the program. See \fBdte\-syntax\fR(5) for more information or run
+\fB$DTE_HOME/syntax/*\fR
+User syntax files. These override the syntax files that come with
+the program. See \fBdte\-syntax\fR(5) for more information or run
 "dte \-b syntax/dte" for a basic example.
-.
+.PP
 .TP
-.B $DTE_HOME/file\-locks
+\fB$DTE_HOME/file\-locks\fR
 Records open files, to prevent accidentally editing files opened in
-another dte process. Used only if the \fBlock\-files\fR option is
-enabled.
-.
+another dte process. Used only if the \fBlock\-files\fR option is enabled.
+.PP
 .TP
-.B $DTE_HOME/file\-history
+\fB$DTE_HOME/file\-history\fR
 History of edited files and cursor positions. Used only if the
 \fBfile\-history\fR option is enabled.
-.
+.PP
 .TP
-.B $DTE_HOME/command\-history
+\fB$DTE_HOME/command\-history\fR
 History of \fBdterc\fR(5) commands used while in command mode.
-.
+.PP
 .TP
-.B $DTE_HOME/search\-history
+\fB$DTE_HOME/search\-history\fR
 History of search patterns used while in search mode.
+.PP
 .
 .SH SEE ALSO
-.
-.BR dterc (5),
-.BR dte\-syntax (5)
-.
+\fBdterc\fR(5),
+\fBdte\-syntax\fR(5)
 .SH AUTHORS
-.
-Craig Barnes <cr@igbarn.es>
+Craig Barnes
 .br
-Timo Hirvonen <tihirvon@gmail.com>
+Timo Hirvonen

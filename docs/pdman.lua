@@ -34,7 +34,6 @@ local template = [[
 .
 .SH NAME
 %s \- %s
-.SH SYNOPSIS
 %s%s.
 .SH SEE ALSO
 %s
@@ -73,6 +72,7 @@ function Header(level, s, attr)
     if level == 1 then
         if s == "dterc" or s == "dte\\-syntax" then
             generate_toc = true
+            toc:write(".SH SYNOPSIS\n")
             return ".SH DESCRIPTION\n"
         end
         if generate_toc then
@@ -139,7 +139,11 @@ function Code(s, attr)
         dterc = "(5)",
         ["dte-syntax"] = "(5)",
         execvp = "(3)",
-        glob = "(7)"
+        glob = "(7)",
+        stdout = "(3)",
+        stderr = "(3)",
+        ctags = "(1)",
+        terminfo = "(5)",
     }
     return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
 end

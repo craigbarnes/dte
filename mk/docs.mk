@@ -3,22 +3,23 @@ PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadat
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
 PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html -Voutput_basename=$(@F)
 
-html-man = public/dterc.html public/dte-syntax.html
+man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
+html-man = public/dte.html public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)
 
 docs: man html gz
-man: docs/dterc.5 docs/dte-syntax.5
+man: $(man)
 html: $(html)
 pdf: public/dte.pdf
 gz: $(patsubst %, %.gz, $(html) public/style.css)
 
 $(html): docs/template.html | public/style.css
 
-docs/%.5: docs/%.md docs/pdman.lua
+docs/%.1 docs/%.5: docs/%.md docs/pdman.lua
 	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
-public/dte.pdf: docs/dte.1 docs/dterc.5 docs/dte-syntax.5 | public/
+public/dte.pdf: $(man) | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Tpdf $^ > $@
 
