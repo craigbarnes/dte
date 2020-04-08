@@ -275,6 +275,10 @@ bool term_init_terminfo(const char *term)
         term_init_fail("TERM='%s' not supported: 'nxon' flag is set", term);
     }
 
+    if (get_terminfo_flag("hz")) {
+        term_init_fail("TERM='%s' not supported: 'hz' flag is set", term);
+    }
+
     if (terminfo.cup == NULL) {
         term_init_fail("TERM='%s' not supported: no 'cup' capability", term);
     }
