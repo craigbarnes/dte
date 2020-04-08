@@ -1,9 +1,7 @@
-#include <stdio.h>
+#include <string.h>
 #include "xterm.h"
-#include "ecma48.h"
-#include "mode.h"
 #include "output.h"
-#include "../util/xsnprintf.h"
+#include "../util/macros.h"
 
 void xterm_save_title(void)
 {

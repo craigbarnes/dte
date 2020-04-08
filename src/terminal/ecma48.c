@@ -1,8 +1,5 @@
 #include "ecma48.h"
-#include "mode.h"
-#include "no-op.h"
 #include "output.h"
-#include "xterm.h"
 #include "../util/ascii.h"
 #include "../util/macros.h"
 
