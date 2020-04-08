@@ -35,8 +35,7 @@ state yaml
     eat this
 
 state line-start
-    str "\t" code-block
-    str "    " code-block
+    char "\n" block-start
     char " " this
     char # hash-heading
     char > block-quote
@@ -47,6 +46,12 @@ state line-start
     char +- bullet
     char -b "~" tilde
     char -b "`" backtick
+    noeat text
+
+state block-start
+    str "    " code-block
+    char "\t" code-block
+    char "\n " this
     noeat text
 
 state text
@@ -81,7 +86,7 @@ state bullet-asterisk
     noeat text
 
 state code-block
-    char "\n" line-start
+    char "\n" block-start
     eat this
 
 state backtick code-block
