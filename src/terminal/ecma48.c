@@ -65,29 +65,3 @@ void ecma48_repeat_byte(char ch, size_t count)
     }
     term_xnprintf(16, "%c\033[%zub", ch, count - 1);
 }
-
-Terminal terminal = {
-    .color_type = TERM_8_COLOR,
-    .width = 80,
-    .height = 24,
-    .parse_key_sequence = &xterm_parse_key,
-    .put_control_code = &term_add_string_view,
-    .clear_screen = &ecma48_clear_screen,
-    .clear_to_eol = &ecma48_clear_to_eol,
-    .set_color = &ecma48_set_color,
-    .move_cursor = &ecma48_move_cursor,
-    .repeat_byte = &term_repeat_byte,
-    .save_title = &no_op,
-    .restore_title = &no_op,
-    .set_title = &no_op_s,
-    .control_codes = {
-        .init = STRING_VIEW_INIT,
-        .deinit = STRING_VIEW_INIT,
-        .keypad_off = STRING_VIEW_INIT,
-        .keypad_on = STRING_VIEW_INIT,
-        .cup_mode_off = STRING_VIEW_INIT,
-        .cup_mode_on = STRING_VIEW_INIT,
-        .show_cursor = STRING_VIEW_INIT,
-        .hide_cursor = STRING_VIEW_INIT,
-    }
-};

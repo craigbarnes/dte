@@ -7,12 +7,49 @@
 #include "terminal.h"
 #include "ecma48.h"
 #include "mode.h"
+#include "no-op.h"
+#include "output.h"
 #include "rxvt.h"
 #include "terminfo.h"
 #include "xterm.h"
 #include "../debug.h"
 #include "../util/macros.h"
 #include "../util/str-util.h"
+
+Terminal terminal = {
+    .back_color_erase = false,
+    .color_type = TERM_8_COLOR,
+    .width = 80,
+    .height = 24,
+    .parse_key_sequence = &xterm_parse_key,
+    .put_control_code = &term_add_string_view,
+    .clear_screen = &ecma48_clear_screen,
+    .clear_to_eol = &ecma48_clear_to_eol,
+    .set_color = &ecma48_set_color,
+    .move_cursor = &ecma48_move_cursor,
+    .repeat_byte = &term_repeat_byte,
+    .save_title = &no_op,
+    .restore_title = &no_op,
+    .set_title = &no_op_s,
+    .control_codes = {
+        // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+        .init = STRING_VIEW (
+            // 1036 = metaSendsEscape
+            // 1039 = altSendsEscape
+            "\033[?1036;1039s" // Save
+            "\033[?1036;1039h" // Enable
+        ),
+        .deinit = STRING_VIEW (
+            "\033[?1036;1039r" // Restore
+        ),
+        .keypad_off = STRING_VIEW("\033[?1l\033>"),
+        .keypad_on = STRING_VIEW("\033[?1h\033="),
+        .cup_mode_off = STRING_VIEW("\033[?1049l"),
+        .cup_mode_on = STRING_VIEW("\033[?1049h"),
+        .hide_cursor = STRING_VIEW("\033[?25l"),
+        .show_cursor = STRING_VIEW("\033[?25h"),
+    }
+};
 
 typedef enum {
     TERM_OTHER,
@@ -99,27 +136,22 @@ void term_init(void)
     }
 
     switch (get_term_type(term)) {
-    case TERM_XTERM:
-        terminal = xterm;
-        // terminal.repeat_byte = &ecma48_repeat_byte;
-        break;
-    case TERM_ST:
-        terminal = xterm;
-        break;
     case TERM_URXVT:
-        terminal = xterm;
         terminal.parse_key_sequence = rxvt_parse_key;
-        break;
+        // Fallthrough
+    case TERM_ST:
+    case TERM_XTERM:
+        terminal.back_color_erase = true;
+        // Fallthrough
     case TERM_TMUX:
     case TERM_SCREEN:
     case TERM_KITTY:
-        terminal = xterm;
-        terminal.back_color_erase = false;
+        terminal.set_color = &xterm_set_color;
+        terminal.save_title = &xterm_save_title;
+        terminal.restore_title = &xterm_restore_title;
+        terminal.set_title = &xterm_set_title;
         break;
     case TERM_LINUX:
-        // Use the default Terminal and just change the control codes
-        terminal.control_codes.hide_cursor = xterm.control_codes.hide_cursor;
-        terminal.control_codes.show_cursor = xterm.control_codes.show_cursor;
         break;
     case TERM_OTHER:
         if (term_init_terminfo(term)) {
