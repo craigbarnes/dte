@@ -106,6 +106,6 @@ Public License version 2 for more details.
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
 [FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
-[pkgsrc]: http://pkgsrc.se/editors/dte
+[pkgsrc]: https://pkgsrc.se/editors/dte
 [Homebrew]: https://github.com/yumitsu/homebrew-dte
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
