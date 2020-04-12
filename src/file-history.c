@@ -45,8 +45,7 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
     const size_t filename_len = strlen(filename);
     const ssize_t idx = lookup_entry_index(filename, filename_len);
     if (idx >= 0) {
-        HistoryEntry *e = history.ptrs[idx];
-        ptr_array_remove_idx(&history, (size_t)idx);
+        HistoryEntry *e = ptr_array_remove_idx(&history, (size_t)idx);
         if (row > 1 || col > 1) {
             e->row = row;
             e->col = col;
