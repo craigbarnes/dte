@@ -773,15 +773,16 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    char dir = last_flag(a);
     do_selection(SELECT_NONE);
-    if (dir == 'n') {
+    switch (last_flag(a)) {
+    case 'n':
         activate_next_message();
-    } else if (dir == 'p') {
+        return;
+    case 'p':
         activate_prev_message();
-    } else {
-        activate_current_message();
+        return;
     }
+    activate_current_message();
 }
 
 static void cmd_new_line(const CommandArgs* UNUSED_ARG(a))
