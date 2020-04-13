@@ -19,26 +19,20 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-static size_t sanitize_error_msg(char *str)
-{
-    size_t n = 0;
-    for (char c; (c = str[n]); n++) {
-        if (c == '\n') {
-            str[n] = '\0';
-            break;
-        }
-        if (c == '\t') {
-            str[n] = ' ';
-        }
-    }
-    return n;
-}
-
 static void handle_error_msg(const Compiler *c, char *str)
 {
-    const size_t len = sanitize_error_msg(str);
-    if (len == 0) {
+    if (*str == '\0' || *str == '\n') {
         return;
+    }
+
+    size_t len = 0;
+    for (char ch; (ch = str[len]); len++) {
+        if (ch == '\t') {
+            str[len] = ' ';
+        }
+    }
+    if (str[len - 1] == '\n') {
+        str[--len] = '\0';
     }
 
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
