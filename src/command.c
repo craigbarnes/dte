@@ -550,15 +550,16 @@ static void cmd_ft(const CommandArgs *a)
 
 static void cmd_hi(const CommandArgs *a)
 {
-    char **args = a->args;
     TermColor color;
-    if (args[0] == NULL) {
+    if (a->nr_args == 0) {
         exec_builtin_color_reset();
         remove_extra_colors();
-    } else if (parse_term_color(&color, args + 1)) {
-        color.fg = color_to_nearest(color.fg, terminal.color_type);
-        color.bg = color_to_nearest(color.bg, terminal.color_type);
-        set_highlight_color(args[0], &color);
+    } else if (parse_term_color(&color, a->args + 1)) {
+        bool no_fallback = has_flag(a, 'c');
+        if (term_color_constrain(&color, terminal.color_type) && no_fallback) {
+            return;
+        }
+        set_highlight_color(a->args[0], &color);
     }
 
     // Don't call update_all_syntax_colors() needlessly.
@@ -2219,7 +2220,7 @@ static const Command cmds[] = {
     {"exec-tag", "-s", 1, -1, cmd_exec_tag},
     {"filter", "-l", 1, -1, cmd_filter},
     {"ft", "-bcfi", 2, -1, cmd_ft},
-    {"hi", "-", 0, -1, cmd_hi},
+    {"hi", "-c", 0, -1, cmd_hi},
     {"include", "bq", 1, 1, cmd_include},
     {"insert", "km", 1, 1, cmd_insert},
     {"join", "", 0, 0, cmd_join},

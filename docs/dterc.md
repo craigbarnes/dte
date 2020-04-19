@@ -172,7 +172,7 @@ See also: `toggle` and `option` commands.
 
 Set environment variable.
 
-### **hi** _name_ [_fg-color_ [_bg-color_]] [_attribute_]...
+### **hi** [**-c**] _name_ [_fg-color_ [_bg-color_]] [_attribute_]...
 
 Set highlight color.
 
@@ -224,8 +224,8 @@ Colors `16` to `231` correspond to R/G/B colors. Colors `232` to `255`
 are grayscale values.
 
 If the terminal has limited support for rendering colors, the _fg-color_
-and _bg-color_ arguments will fall back to the nearest supported color,
-which may be less precise than the value specified.
+and _bg-color_ arguments will fall back to the nearest supported color
+(unless the `-c` flag is used).
 
 The _attribute_ argument(s) can be any combination of the following:
 
@@ -249,6 +249,10 @@ _attribute_.
 Unset fg/bg colors are inherited from highlight color `default`.
 If you don't set fg/bg for the highlight color `default` then
 terminal's default fg/bg is used.
+
+`-c`
+:   Do nothing at all if the terminal can't display _fg-color_ and/or
+    _bg-color_ with full precision
 
 ### **ft** [**-bcfi**] _filetype_ _string_...
 

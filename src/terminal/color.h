@@ -72,9 +72,10 @@ static inline bool same_color(const TermColor *c1, const TermColor *c2)
     ;
 }
 
-bool parse_term_color(TermColor *color, char **strs);
+bool parse_term_color(TermColor *color, char **strs) NONNULL_ARGS;
 int32_t color_to_nearest(int32_t color, TermColorCapabilityType type);
-const char *term_color_to_string(const TermColor *color);
-void collect_colors_and_attributes(const char *prefix);
+bool term_color_constrain(TermColor *c, TermColorCapabilityType type) NONNULL_ARGS;
+const char *term_color_to_string(const TermColor *color) NONNULL_ARGS_AND_RETURN;
+void collect_colors_and_attributes(const char *prefix) NONNULL_ARGS;
 
 #endif

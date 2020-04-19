@@ -19,7 +19,7 @@ Configuration Commands:
 .br
    \fBsetenv\fR \fIname\fR \fIvalue\fR
 .br
-   \fBhi\fR \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
+   \fBhi\fR [\fB\-c\fR] \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
 .br
    \fBft\fR [\fB\-bcfi\fR] \fIfiletype\fR \fIstring\fR...
 .br
@@ -472,7 +472,7 @@ See also: \fBtoggle\fR and \fBoption\fR commands.
 Set environment variable.
 .P
 .RE
-\fBhi\fR \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
+\fBhi\fR [\fB\-c\fR] \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
 .RS
 Set highlight color.
 .P
@@ -561,8 +561,8 @@ Colors \fB16\fR to \fB231\fR correspond to R/G/B colors. Colors \fB232\fR to \fB
 are grayscale values.
 .P
 If the terminal has limited support for rendering colors, the \fIfg\-color\fR
-and \fIbg\-color\fR arguments will fall back to the nearest supported color,
-which may be less precise than the value specified.
+and \fIbg\-color\fR arguments will fall back to the nearest supported color
+(unless the \fB\-c\fR flag is used).
 .P
 The \fIattribute\fR argument(s) can be any combination of the following:
 .P
@@ -596,6 +596,11 @@ Unset fg/bg colors are inherited from highlight color \fBdefault\fR.
 If you don't set fg/bg for the highlight color \fBdefault\fR then
 terminal's default fg/bg is used.
 .P
+.TP
+\fB\-c\fR
+Do nothing at all if the terminal can't display \fIfg\-color\fR and/or
+\fIbg\-color\fR with full precision
+.PP
 .RE
 \fBft\fR [\fB\-bcfi\fR] \fIfiletype\fR \fIstring\fR...
 .RS

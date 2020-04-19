@@ -118,6 +118,37 @@ static void test_color_to_nearest(void)
     }
 }
 
+static void test_term_color_constrain(void)
+{
+    {
+        const TermColor orig = {.fg = COLOR_RGB(0x00AF87), .bg = COLOR_RED};
+        TermColor c = orig;
+        // This color doesn't need to be "constrained" on a true color terminal:
+        EXPECT_FALSE(term_color_constrain(&c, TERM_TRUE_COLOR));
+        // ... but it still gets "optimized" to an xterm palette color
+        EXPECT_FALSE(same_color(&c, &orig));
+        EXPECT_EQ(c.fg, 36);
+        EXPECT_EQ(c.bg, COLOR_RED);
+    }
+
+    {
+        const TermColor orig = {.fg = COLOR_RGB(0x00AF88), .attr = ATTR_BOLD};
+        TermColor c = orig;
+        EXPECT_FALSE(term_color_constrain(&c, TERM_TRUE_COLOR));
+        EXPECT_TRUE(same_color(&c, &orig));
+    }
+
+    {
+        const TermColor orig = {.fg = COLOR_RGB(0x0000FE)};
+        TermColor c = orig;
+        EXPECT_TRUE(term_color_constrain(&c, TERM_8_COLOR));
+        EXPECT_FALSE(same_color(&c, &orig));
+        EXPECT_EQ(c.fg, COLOR_BLUE);
+        EXPECT_EQ(c.bg, orig.bg);
+        EXPECT_EQ(c.attr, orig.attr);
+    }
+}
+
 static void test_term_color_to_string(void)
 {
     static const struct {
@@ -524,6 +555,7 @@ void test_terminal(void)
 {
     test_parse_term_color();
     test_color_to_nearest();
+    test_term_color_constrain();
     test_term_color_to_string();
     test_xterm_parse_key();
     test_xterm_parse_key_combo();

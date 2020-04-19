@@ -36,7 +36,6 @@ seealso: ["`dterc`", "`dte-syntax`"]
     set appropriately.
 
 `-b` _rcname_
-
 :   Dump the contents of the built-in rc or syntax file named _rcname_
     and exit.
 
