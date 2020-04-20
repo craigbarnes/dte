@@ -350,26 +350,6 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type)
     return COLOR_DEFAULT;
 }
 
-// Mutate a TermColor value to one that's compatible with the specified
-// terminal type and return true if the value had to be "constrained"
-// or false otherwise.
-bool term_color_constrain(TermColor *c, TermColorCapabilityType type)
-{
-    TermColor cnew = {
-        .fg = color_to_nearest(c->fg, type),
-        .bg = color_to_nearest(c->bg, type),
-        .attr = c->attr
-    };
-    bool same = same_color(c, &cnew);
-    *c = cnew;
-    if (type == TERM_TRUE_COLOR) {
-        // Colors are never "constrained" for true color terminals, but
-        // they may still be changed ("optimized") by color_rgb_optimize()
-        return false;
-    }
-    return !same;
-}
-
 void collect_colors_and_attributes(const char *prefix)
 {
     for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {

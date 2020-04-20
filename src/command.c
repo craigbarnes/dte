@@ -555,10 +555,17 @@ static void cmd_hi(const CommandArgs *a)
         exec_builtin_color_reset();
         remove_extra_colors();
     } else if (parse_term_color(&color, a->args + 1)) {
-        bool no_fallback = has_flag(a, 'c');
-        if (term_color_constrain(&color, terminal.color_type) && no_fallback) {
+        int32_t fg = color_to_nearest(color.fg, terminal.color_type);
+        int32_t bg = color_to_nearest(color.bg, terminal.color_type);
+        if (
+            terminal.color_type != TERM_TRUE_COLOR
+            && has_flag(a, 'c')
+            && (fg != color.fg || bg != color.bg)
+        ) {
             return;
         }
+        color.fg = fg;
+        color.bg = bg;
         set_highlight_color(a->args[0], &color);
     }
 

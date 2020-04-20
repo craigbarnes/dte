@@ -146,7 +146,6 @@ void term_init(void)
     case TERM_TMUX:
     case TERM_SCREEN:
     case TERM_KITTY:
-        terminal.set_color = &xterm_set_color;
         terminal.save_title = &xterm_save_title;
         terminal.restore_title = &xterm_restore_title;
         terminal.set_title = &xterm_set_title;
