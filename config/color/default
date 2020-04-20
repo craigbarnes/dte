@@ -11,7 +11,7 @@ hi code
 hi ident
 hi keyword bold
 hi type green
-hi comment darkgray
+hi comment cyan
 hi numeric blue
 hi string yellow
 hi variable bold yellow
@@ -21,6 +21,7 @@ hi char magenta
 hi label bold red
 hi notice bold red
 hi error black yellow
+hi -c comment 245
 
 hi tex.macro bold yellow
 hi ini.section bold
