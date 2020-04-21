@@ -3,12 +3,14 @@
 #include <unistd.h>
 #include "test.h"
 #include "../src/config.h"
+#include "../src/alias.h"
 #include "../src/debug.h"
 #include "../src/editor.h"
 #include "../src/encoding/convert.h"
 #include "../src/error.h"
 #include "../src/frame.h"
 #include "../src/syntax/state.h"
+#include "../src/syntax/syntax.h"
 #include "../src/terminal/no-op.h"
 #include "../src/terminal/terminal.h"
 #include "../src/util/path.h"
@@ -147,9 +149,11 @@ void init_headless_mode(void)
 
     MEMZERO(&terminal.control_codes);
     exec_builtin_rc();
+    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
+    update_all_syntax_colors();
+    sort_aliases();
     window = new_window();
     root_frame = new_root_frame(window);
-    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
     set_view(window_open_empty_buffer(window));
 }
 

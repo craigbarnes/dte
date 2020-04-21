@@ -132,6 +132,7 @@ typedef struct OptionOps {
 
 static void filetype_changed(void)
 {
+    BUG_ON(window == NULL);
     Buffer *b = window->view->buffer;
     set_file_options(b);
     buffer_update_syntax(b);
@@ -151,8 +152,8 @@ static void set_window_title_changed(void)
 
 static void syntax_changed(void)
 {
-    if (window->view != NULL) {
-        buffer_update_syntax(window->view->buffer);
+    if (buffer) {
+        buffer_update_syntax(buffer);
     }
 }
 

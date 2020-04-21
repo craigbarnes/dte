@@ -370,11 +370,6 @@ loop_break:
     terminal.save_title();
     exec_builtin_rc();
 
-    // NOTE: syntax_changed() uses window. Should possibly create
-    // window after reading rc.
-    window = new_window();
-    root_frame = new_root_frame(window);
-
     if (read_rc) {
         if (rc) {
             read_config(&commands, rc, CFG_MUST_EXIST);
@@ -387,6 +382,8 @@ loop_break:
 
     update_all_syntax_colors();
     sort_aliases();
+    window = new_window();
+    root_frame = new_root_frame(window);
 
     set_signal_handlers();
 
