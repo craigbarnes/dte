@@ -12,26 +12,20 @@
 } while (0)
 
 #if DEBUG >= 1
-  #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
-
-  noreturn COLD PRINTF(4)
-  void bug(const char *file, int line, const char *func, const char *fmt, ...);
+    #define BUG(...) bug(__FILE__, __LINE__, __func__, __VA_ARGS__)
+    noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
-  #define BUG(...) UNREACHABLE()
+    #define BUG(...) UNREACHABLE()
 #endif
 
 #ifdef DEBUG_PRINT
-  #define DEBUG_LOG(...) debug_log(__func__, __VA_ARGS__)
-
-  PRINTF(2)
-  void debug_log(const char *function, const char *fmt, ...);
+    #define DEBUG_LOG(...) debug_log(__func__, __VA_ARGS__)
+    void debug_log(const char *function, const char *fmt, ...) PRINTF(2);
 #else
-  PRINTF(1)
-  static inline void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
+    static inline PRINTF(1) void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
-void term_cleanup(void);
-
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
+void term_cleanup(void);
 
 #endif
