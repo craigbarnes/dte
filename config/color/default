@@ -28,7 +28,7 @@ hi ini.section bold
 hi make.builtin bold magenta
 hi make.special-target green
 hi markdown.heading bold magenta
-hi markdown.emphasis italic cyan
+hi markdown.emphasis cyan
 hi markdown.strong-emphasis bold cyan
 hi markdown.code-block yellow
 hi markdown.code-span yellow
