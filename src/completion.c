@@ -184,10 +184,8 @@ static void collect_files(bool directories_only)
 static void collect_env(const char *prefix)
 {
     extern char **environ;
-
     for (size_t i = 0; environ[i]; i++) {
         const char *e = environ[i];
-
         if (str_has_prefix(e, prefix)) {
             const char *end = strchr(e, '=');
             if (end) {

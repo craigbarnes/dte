@@ -55,7 +55,7 @@ editor_objects := $(call prefix-obj, build/, \
     history indent load-save lock macro main mode \
     move msg options parse-args regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
-    search selection spawn tag view window ) \
+    search selection show spawn tag view window ) \
     $(editorconfig_objects) \
     $(encoding_objects) \
     $(syntax_objects) \
