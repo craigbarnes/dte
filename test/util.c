@@ -52,6 +52,19 @@ static void test_macros(void)
     EXPECT_FALSE(IS_POWER_OF_2(-10));
 }
 
+static void test_xstreq(void)
+{
+    EXPECT_TRUE(xstreq("foo", "foo"));
+    EXPECT_TRUE(xstreq("foo\0\n", "foo\0\0"));
+    EXPECT_TRUE(xstreq("\0foo", "\0bar"));
+    EXPECT_TRUE(xstreq(NULL, NULL));
+    EXPECT_FALSE(xstreq("foo", "bar"));
+    EXPECT_FALSE(xstreq("abc", "abcd"));
+    EXPECT_FALSE(xstreq("abcd", "abc"));
+    EXPECT_FALSE(xstreq(NULL, ""));
+    EXPECT_FALSE(xstreq("", NULL));
+}
+
 static void test_ascii(void)
 {
     EXPECT_EQ(ascii_tolower('A'), 'a');
@@ -1169,6 +1182,7 @@ DISABLE_WARNING("-Wmissing-prototypes")
 void test_util(void)
 {
     test_macros();
+    test_xstreq();
     test_ascii();
     test_string();
     test_string_view();

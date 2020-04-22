@@ -18,12 +18,7 @@ static inline bool streq(const char *a, const char *b)
 
 static inline bool xstreq(const char *a, const char *b)
 {
-    if (a == b) {
-        return true;
-    } else if (a == NULL || b == NULL) {
-        return false;
-    }
-    return streq(a, b);
+    return (a == b) || (a && b && streq(a, b));
 }
 
 NONNULL_ARGS
