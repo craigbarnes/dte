@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <sys/types.h>
 #include "show.h"
 #include "alias.h"
@@ -89,6 +90,33 @@ static void show_color(const char *color_name, bool cflag)
     }
 }
 
+static void show_env(const char *name, bool cflag)
+{
+    const char *value = getenv(name);
+    if (!value) {
+        error_msg("no environment variable with name '%s'", name);
+        return;
+    }
+
+    if (cflag) {
+        set_input_mode(INPUT_COMMAND);
+        cmdline_set_text(&editor.cmdline, value);
+    } else {
+        info_msg("$%s is set to: %s", name, value);
+    }
+}
+
+static String dump_env(void)
+{
+    extern char **environ;
+    String buf = string_new(4096);
+    for (size_t i = 0; environ[i]; i++) {
+        string_append_cstring(&buf, environ[i]);
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
+}
+
 static void show_include(const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -157,6 +185,7 @@ void show(const char *type, const char *key, bool cflag)
         {"alias", show_alias, dump_aliases},
         {"bind", show_binding, dump_bindings},
         {"color", show_color, dump_hl_colors},
+        {"env", show_env, dump_env},
         {"include", show_include, dump_builtin_configs},
         {"macro", show_macro, dump_macro},
         {"option", show_option, dump_options},

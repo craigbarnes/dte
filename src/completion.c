@@ -193,7 +193,6 @@ static void collect_env(const char *prefix)
             }
         }
     }
-    collect_builtin_env(prefix);
 }
 
 static size_t get_nonflag_argc(char **args, size_t argc)
@@ -305,6 +304,7 @@ static void collect_completions(char **args, size_t argc)
             {"alias", collect_aliases},
             {"bind", NULL},
             {"color", collect_hl_colors},
+            {"env", collect_env},
             {"include", collect_builtin_configs},
             {"macro", NULL},
             {"option", collect_options},
@@ -434,6 +434,7 @@ static void init_completion(void)
             completion.head = xstrcut(cmd, completion_pos);
             completion.tail = xstrdup(cmd + editor.cmdline.pos);
             collect_env(name);
+            collect_builtin_env(name);
             sort_completions();
             free(name);
             ptr_array_free(&array);

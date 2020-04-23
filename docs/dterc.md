@@ -966,6 +966,9 @@ The _type_ argument can be one of:
 `color`
 :   highlight colors
 
+`env`
+:   environment variables
+
 `include`
 :   built-in configs
 
