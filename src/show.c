@@ -12,6 +12,7 @@
 #include "editor.h"
 #include "encoding/encoding.h"
 #include "error.h"
+#include "file-option.h"
 #include "frame.h"
 #include "macro.h"
 #include "options.h"
@@ -181,15 +182,16 @@ void show(const char *type, const char *key, bool cflag)
         const char name[8];
         void (*show)(const char *name, bool cmdline);
         String (*dump)(void);
+        bool dumps_dterc_syntax;
     } handlers[] = {
-        {"alias", show_alias, dump_aliases},
-        {"bind", show_binding, dump_bindings},
-        {"color", show_color, dump_hl_colors},
-        {"env", show_env, dump_env},
-        {"include", show_include, dump_builtin_configs},
-        {"macro", show_macro, dump_macro},
-        {"option", show_option, dump_options},
-        {"wsplit", show_wsplit, dump_frames},
+        {"alias", show_alias, dump_aliases, true},
+        {"bind", show_binding, dump_bindings, true},
+        {"color", show_color, dump_hl_colors, true},
+        {"env", show_env, dump_env, false},
+        {"include", show_include, dump_builtin_configs, false},
+        {"macro", show_macro, dump_macro, true},
+        {"option", show_option, dump_options, true},
+        {"wsplit", show_wsplit, dump_frames, false},
     };
 
     ssize_t cmdtype = -1;
@@ -216,8 +218,9 @@ void show(const char *type, const char *key, bool cflag)
     string_free(&s);
     set_display_filename(v->buffer, xasprintf("(show %s)", type));
     v->buffer->encoding = encoding_from_type(UTF8);
-    if (handlers[cmdtype].show != show_wsplit) {
+    if (handlers[cmdtype].dumps_dterc_syntax) {
         v->buffer->options.filetype = str_intern("dte");
+        set_file_options(v->buffer);
         buffer_update_syntax(v->buffer);
     }
 }
