@@ -13,3 +13,11 @@ toggle lock-files
 toggle set-window-title
 toggle show-line-numbers
 toggle tab-bar
+option 'x' syntax true
+option ',x' syntax true
+option 'x,y' syntax true
+option 'x,y,' syntax true
+option '' syntax true
+option ',' syntax true
+option ',-' syntax true
+option ',,zzz,,zzz,' syntax true

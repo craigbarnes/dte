@@ -108,7 +108,10 @@ void set_file_options(Buffer *b)
 
 void add_file_options(FileOptionType type, char *to, char **strs)
 {
-    if (type == FILE_OPTIONS_FILENAME && !regexp_is_valid(to, REG_NEWLINE)) {
+    if (
+        (type == FILE_OPTIONS_FILENAME && !regexp_is_valid(to, REG_NEWLINE))
+        || (type == FILE_OPTIONS_FILETYPE && to[0] == '\0')
+    ) {
         free(to);
         free_string_array(strs);
         return;

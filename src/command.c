@@ -891,41 +891,36 @@ static void cmd_open(const CommandArgs *a)
 
 static void cmd_option(const CommandArgs *a)
 {
-    char **args = a->args;
-    size_t argc = a->nr_args;
-    char **strs = args + 1;
-    size_t count = argc - 1;
-
-    if (argc % 2 == 0) {
+    size_t nstrs = a->nr_args - 1;
+    if (unlikely(nstrs % 2 != 0)) {
         error_msg("Missing option value");
         return;
     }
-    if (!validate_local_options(strs)) {
+
+    char **strs = a->args + 1;
+    if (unlikely(!validate_local_options(strs))) {
         return;
     }
 
     if (a->flags[0] == 'r') {
-        add_file_options (
-            FILE_OPTIONS_FILENAME,
-            xstrdup(args[0]),
-            copy_string_array(strs, count)
-        );
+        char *regex = xstrdup(a->args[0]);
+        char **opts = copy_string_array(strs, nstrs);
+        add_file_options(FILE_OPTIONS_FILENAME, regex, opts);
         return;
     }
 
-    char *comma, *list = args[0];
-    do {
-        char **strs_copy = copy_string_array(strs, count);
-        char *filetype;
-        comma = strchr(list, ',');
-        if (comma) {
-            filetype = xstrcut(list, (size_t)(comma - list));
-            list = comma + 1;
-        } else {
-            filetype = xstrdup(list);
+    const char *ft_list = a->args[0];
+    while (1) {
+        char **opts = copy_string_array(strs, nstrs);
+        const char *comma = strchr(ft_list, ',');
+        if (!comma) {
+            add_file_options(FILE_OPTIONS_FILETYPE, xstrdup(ft_list), opts);
+            break;
         }
-        add_file_options(FILE_OPTIONS_FILETYPE, filetype, strs_copy);
-    } while (comma);
+        char *ft = xstrcut(ft_list, (size_t)(comma - ft_list));
+        add_file_options(FILE_OPTIONS_FILETYPE, ft, opts);
+        ft_list = comma + 1;
+    }
 }
 
 static void cmd_blkdown(const CommandArgs *a)
