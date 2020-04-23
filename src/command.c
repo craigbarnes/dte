@@ -915,14 +915,16 @@ static void cmd_option(const CommandArgs *a)
 
     char *comma, *list = args[0];
     do {
+        char **strs_copy = copy_string_array(strs, count);
+        char *filetype;
         comma = strchr(list, ',');
-        size_t len = comma ? comma - list : strlen(list);
-        add_file_options (
-            FILE_OPTIONS_FILETYPE,
-            xstrcut(list, len),
-            copy_string_array(strs, count)
-        );
-        list = comma + 1;
+        if (comma) {
+            filetype = xstrcut(list, (size_t)(comma - list));
+            list = comma + 1;
+        } else {
+            filetype = xstrdup(list);
+        }
+        add_file_options(FILE_OPTIONS_FILETYPE, filetype, strs_copy);
     } while (comma);
 }
 
