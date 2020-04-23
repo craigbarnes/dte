@@ -784,6 +784,8 @@ String dump_options(void)
             append_option(&buf, desc, local ? local : global);
         }
     }
+    string_append_literal(&buf, "\n\n");
+    dump_file_options(&buf);
     return buf;
 }
 

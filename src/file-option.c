@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "file-option.h"
+#include "command.h"
 #include "debug.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
@@ -122,4 +123,23 @@ void add_file_options(FileOptionType type, char *to, char **strs)
     opt->type_or_pattern = to;
     opt->strs = strs;
     ptr_array_append(&file_options, opt);
+}
+
+void dump_file_options(String *buf)
+{
+    for (size_t i = 0; i < file_options.count; i++) {
+        const FileOption *opt = file_options.ptrs[i];
+        string_append_literal(buf, "option ");
+        if (opt->type == FILE_OPTIONS_FILENAME) {
+            string_append_literal(buf, "-r ");
+        }
+        string_append_escaped_arg(buf, opt->type_or_pattern, false);
+        string_append_byte(buf, ' ');
+        for (size_t j = 0; opt->strs[j]; j += 2) {
+            string_append_cstring(buf, opt->strs[j]);
+            string_append_byte(buf, ' ');
+            string_append_escaped_arg(buf, opt->strs[j + 1], false);
+        }
+        string_append_byte(buf, '\n');
+    }
 }
