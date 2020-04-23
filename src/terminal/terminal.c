@@ -51,59 +51,71 @@ Terminal terminal = {
     }
 };
 
-typedef enum {
-    TERM_OTHER,
-    TERM_LINUX,
-    TERM_SCREEN,
-    TERM_ST,
-    TERM_TMUX,
-    TERM_URXVT,
-    TERM_XTERM,
-    TERM_KITTY,
-} TerminalType;
+static const struct {
+    const char name[12];
+    uint8_t name_len;
+    uint8_t color_type;
+    uint8_t ncv_attributes;
+    bool back_color_erase;
+} terms[] = {
+    {"Eterm", 5, TERM_8_COLOR, 0, true},
+    {"alacritty", 9, TERM_8_COLOR, 0, true},
+    {"ansi", 4, TERM_8_COLOR, 3, false},
+    {"ansiterm", 8, TERM_0_COLOR, 0, false},
+    {"aterm", 5, TERM_8_COLOR, 0, true},
+    {"cx", 2, TERM_8_COLOR, 0, false},
+    {"cx100", 5, TERM_8_COLOR, 0, false},
+    {"cygwin", 6, TERM_8_COLOR, 0, false},
+    {"cygwinB19", 9, TERM_8_COLOR, 3, false},
+    {"cygwinDBG", 9, TERM_8_COLOR, 3, false},
+    {"decansi", 7, TERM_8_COLOR, 0, false},
+    {"dtterm", 6, TERM_8_COLOR, 0, false},
+    {"dvtm", 4, TERM_8_COLOR, 0, false},
+    {"fbterm", 6, TERM_256_COLOR, 18, true},
+    {"hurd", 4, TERM_8_COLOR, 18, true},
+    {"iTerm.app", 9, TERM_256_COLOR, 0, true},
+    {"iTerm2.app", 10, TERM_256_COLOR, 0, true},
+    {"iterm", 5, TERM_256_COLOR, 0, true},
+    {"iterm2", 6, TERM_256_COLOR, 0, true},
+    {"jfbterm", 7, TERM_8_COLOR, 18, true},
+    {"kitty", 5, TERM_256_COLOR, 0, false},
+    {"kon", 3, TERM_8_COLOR, 18, true},
+    {"kon2", 4, TERM_8_COLOR, 18, true},
+    {"konsole", 7, TERM_8_COLOR, 0, true},
+    {"kterm", 5, TERM_8_COLOR, 0, false},
+    {"linux", 5, TERM_8_COLOR, 18, true},
+    {"mgt", 3, TERM_8_COLOR, 0, true},
+    {"mintty", 6, TERM_8_COLOR, 0, true},
+    {"mlterm", 6, TERM_8_COLOR, 0, false},
+    {"mlterm2", 7, TERM_8_COLOR, 0, false},
+    {"mlterm3", 7, TERM_8_COLOR, 0, false},
+    {"mrxvt", 5, TERM_8_COLOR, 0, true},
+    {"pcansi", 6, TERM_8_COLOR, 3, false},
+    {"putty", 5, TERM_8_COLOR, 22, true},
+    {"rxvt", 4, TERM_8_COLOR, 0, true},
+    {"screen", 6, TERM_8_COLOR, 0, false},
+    {"st", 2, TERM_8_COLOR, 0, true},
+    {"stterm", 6, TERM_8_COLOR, 0, true},
+    {"teken", 5, TERM_8_COLOR, 21, true},
+    {"terminator", 10, TERM_256_COLOR, 0, true},
+    {"termite", 7, TERM_8_COLOR, 0, false},
+    {"tmux", 4, TERM_8_COLOR, 0, false},
+    {"xfce", 4, TERM_8_COLOR, 0, true},
+    {"xterm-kitty", 11, TERM_256_COLOR, 0, false},
+    {"xterm", 5, TERM_8_COLOR, 0, true},
+};
 
-static TerminalType get_term_type(const char *term)
-{
-    static const struct {
-        const char name[14];
-        uint8_t name_len;
-        uint8_t type;
-    } builtin_terminals[] = {
-        {STRN("xterm-kitty"), TERM_KITTY},
-        {STRN("kitty"), TERM_KITTY},
-        {STRN("xterm"), TERM_XTERM},
-        {STRN("st"), TERM_ST},
-        {STRN("stterm"), TERM_ST},
-        {STRN("tmux"), TERM_TMUX},
-        {STRN("screen"), TERM_SCREEN},
-        {STRN("linux"), TERM_LINUX},
-        {STRN("rxvt-unicode"), TERM_URXVT},
-    };
-    const size_t term_len = strlen(term);
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_terminals); i++) {
-        const size_t n = builtin_terminals[i].name_len;
-        if (term_len >= n && mem_equal(term, builtin_terminals[i].name, n)) {
-            if (term[n] == '-' || term[n] == '\0') {
-                return builtin_terminals[i].type;
-            }
-        }
-    }
-    return TERM_OTHER;
-}
-
-UNITTEST {
-    BUG_ON(get_term_type("xterm") != TERM_XTERM);
-    BUG_ON(get_term_type("xterm-kitty") != TERM_KITTY);
-    BUG_ON(get_term_type("tmux") != TERM_TMUX);
-    BUG_ON(get_term_type("st") != TERM_ST);
-    BUG_ON(get_term_type("stterm") != TERM_ST);
-    BUG_ON(get_term_type("linux") != TERM_LINUX);
-    BUG_ON(get_term_type("xterm-256color") != TERM_XTERM);
-    BUG_ON(get_term_type("screen-256color") != TERM_SCREEN);
-    BUG_ON(get_term_type("x") != TERM_OTHER);
-    BUG_ON(get_term_type("xter") != TERM_OTHER);
-    BUG_ON(get_term_type("xtermz") != TERM_OTHER);
-}
+static const struct {
+    const char suffix[11];
+    uint8_t suffix_len;
+    TermColorCapabilityType color_type;
+} color_suffixes[] = {
+    {"-direct", 7, TERM_TRUE_COLOR},
+    {"-256color", 9, TERM_256_COLOR},
+    {"-16color", 8, TERM_16_COLOR},
+    {"-mono", 5, TERM_0_COLOR},
+    {"-m", 2, TERM_0_COLOR},
+};
 
 noreturn void term_init_fail(const char *fmt, ...)
 {
@@ -135,42 +147,43 @@ void term_init(void)
         }
     }
 
-    switch (get_term_type(term)) {
-    case TERM_URXVT:
+    if (str_has_prefix(term, "rxvt-unicode")) {
         terminal.parse_key_sequence = rxvt_parse_key;
-        // Fallthrough
-    case TERM_ST:
-    case TERM_XTERM:
+        terminal.ncv_attributes = 0;
+        terminal.color_type = TERM_8_COLOR;
         terminal.back_color_erase = true;
-        // Fallthrough
-    case TERM_TMUX:
-    case TERM_SCREEN:
-    case TERM_KITTY:
-        terminal.save_title = &xterm_save_title;
-        terminal.restore_title = &xterm_restore_title;
-        terminal.set_title = &xterm_set_title;
-        break;
-    case TERM_LINUX:
-        break;
-    case TERM_OTHER:
-        if (term_init_terminfo(term)) {
-            return;
-        }
-        break;
+        goto out;
     }
 
-    const char *colorterm = getenv("COLORTERM");
-    if (colorterm && streq(colorterm, "truecolor")) {
-        terminal.color_type = TERM_TRUE_COLOR;
+    const size_t term_len = strlen(term);
+    for (size_t i = 0; i < ARRAY_COUNT(terms); i++) {
+        const size_t n = terms[i].name_len;
+        if (term_len >= n && mem_equal(term, terms[i].name, n)) {
+            if (term[n] == '-' || term[n] == '\0') {
+                terminal.ncv_attributes = terms[i].ncv_attributes;
+                terminal.color_type = terms[i].color_type;
+                terminal.back_color_erase = terms[i].back_color_erase;
+                goto out;
+            }
+        }
+    }
+
+    if (term_init_terminfo(term)) {
         return;
     }
 
-    if (
-        terminal.color_type < TERM_256_COLOR
-        && str_has_suffix(term, "256color")
-    ) {
-        terminal.color_type = TERM_256_COLOR;
-    } else if (str_has_suffix(term, "-direct")) {
+out:
+    if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
+    } else {
+        for (size_t i = 0; i < ARRAY_COUNT(color_suffixes); i++) {
+            const char *suffix = color_suffixes[i].suffix;
+            const char *substr = strstr(term, suffix);
+            const size_t n = color_suffixes[i].suffix_len;
+            if (substr && (substr[n] == '-' || substr[n] == '\0')) {
+                terminal.color_type = color_suffixes[i].color_type;
+                break;
+            }
+        }
     }
 }
