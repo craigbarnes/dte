@@ -447,10 +447,14 @@ static void init_completion(void)
     completion.tail = xstrdup(cmd + editor.cmdline.pos);
     completion.add_space = true;
 
-    collect_completions (
-        (char **)array.ptrs + 1 + semicolon,
-        array.count - semicolon - 1
-    );
+    char **args = NULL;
+    size_t argc = 0;
+    if (array.count) {
+        args = (char**)array.ptrs + 1 + semicolon;
+        argc = array.count - semicolon - 1;
+    }
+
+    collect_completions(args, argc);
     sort_completions();
     ptr_array_free(&array);
 }
