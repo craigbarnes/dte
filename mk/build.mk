@@ -175,6 +175,7 @@ $(editorconfig_objects): | build/editorconfig/
 $(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
+$(build_subdirs): | build/
 build/builtin-config.h: build/builtin-config.mk
 build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
@@ -236,10 +237,7 @@ build/feature.h: $(feature_tests) build/all.cflags | build/
 	  fi \
 	done
 
-$(build_subdirs): | build/
-	$(Q) mkdir -p $@
-
-build/:
+build/ $(build_subdirs):
 	$(Q) mkdir -p $@
 
 
