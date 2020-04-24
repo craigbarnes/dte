@@ -19,6 +19,6 @@ void shift_lines(int count);
 void clear_lines(void);
 void new_line(void);
 void format_paragraph(size_t text_width);
-void change_case(int mode);
+void change_case(char mode);
 
 #endif

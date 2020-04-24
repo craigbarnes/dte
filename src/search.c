@@ -274,7 +274,7 @@ static void build_replacement (
 ) {
     size_t i = 0;
     while (format[i]) {
-        int ch = format[i++];
+        char ch = format[i++];
         if (ch == '\\') {
             if (format[i] >= '1' && format[i] <= '9') {
                 int n = format[i++] - '0';

@@ -153,8 +153,7 @@ static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_case(const CommandArgs *a)
 {
-    int mode = last_flag_or_default(a, 't');
-    change_case(mode);
+    change_case(last_flag_or_default(a, 't'));
 }
 
 static void cmd_cd(const CommandArgs *a)

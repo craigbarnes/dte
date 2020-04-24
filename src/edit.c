@@ -832,7 +832,7 @@ void format_paragraph(size_t text_width)
     unselect();
 }
 
-void change_case(int mode)
+void change_case(char mode)
 {
     bool was_selecting = false;
     bool move = true;

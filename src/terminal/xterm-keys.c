@@ -93,7 +93,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
         *k = '=';
         return i;
     case ' ':
-        *k = ch;
+        *k = ' ';
         return i;
     case 'a': // Ctrl+Up (rxvt)
     case 'b': // Ctrl+Down (rxvt)
