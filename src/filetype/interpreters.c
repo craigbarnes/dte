@@ -50,18 +50,14 @@ static const struct FileInterpreterMap {
 
 static FileTypeEnum filetype_from_interpreter(const StringView sv)
 {
-    switch (sv.length) {
-    case 2: case 3: case 4:
-    case 5: case 6: case 7:
-        break;
-    case 10:
-        if (mem_equal(sv.data, "openrc-run", 10)) {
+    if (sv.length < 2) {
+        return NONE;
+    } else if (sv.length >= ARRAY_COUNT(interpreters[0].key)) {
+        if (strview_equal_cstring(&sv, "openrc-run")) {
             return SHELL;
-        } else if (mem_equal(sv.data, "runhaskell", 10)) {
+        } else if (strview_equal_cstring(&sv, "runhaskell")) {
             return HASKELL;
         }
-        // Fallthrough
-    default:
         return NONE;
     }
 
