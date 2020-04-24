@@ -2,7 +2,7 @@
 #include "unicode.h"
 #include "unidata.h"
 #include "ascii.h"
-#include "../editor.h"
+#include "editor.h"
 
 #define BISEARCH(u, arr) bisearch((u), (arr), ARRAY_COUNT(arr) - 1)
 

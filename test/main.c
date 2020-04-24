@@ -5,15 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "test.h"
-#include "../src/bind.h"
-#include "../src/block.h"
-#include "../src/buffer.h"
-#include "../src/command.h"
-#include "../src/editor.h"
-#include "../src/regexp.h"
-#include "../src/util/path.h"
-#include "../src/util/str-util.h"
-#include "../src/util/xmalloc.h"
+#include "bind.h"
+#include "block.h"
+#include "buffer.h"
+#include "command.h"
+#include "editor.h"
+#include "regexp.h"
+#include "util/path.h"
+#include "util/str-util.h"
+#include "util/xmalloc.h"
 
 void test_cmdline(void);
 void test_command(void);

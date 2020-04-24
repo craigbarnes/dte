@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "color.h"
-#include "../command.h"
-#include "../completion.h"
-#include "../debug.h"
-#include "../util/macros.h"
-#include "../util/ptr-array.h"
-#include "../util/str-util.h"
-#include "../util/xmalloc.h"
+#include "command.h"
+#include "completion.h"
+#include "debug.h"
+#include "util/macros.h"
+#include "util/ptr-array.h"
+#include "util/str-util.h"
+#include "util/xmalloc.h"
 
 TermColor *builtin_colors[NR_BC];
 

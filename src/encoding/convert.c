@@ -1,7 +1,7 @@
 #include <errno.h>
 #include "convert.h"
-#include "../debug.h"
-#include "../util/macros.h"
+#include "debug.h"
+#include "util/macros.h"
 
 #ifndef ICONV_DISABLE
 
@@ -10,10 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "encoding.h"
-#include "../util/ascii.h"
-#include "../util/str-util.h"
-#include "../util/utf8.h"
-#include "../util/xmalloc.h"
+#include "util/ascii.h"
+#include "util/str-util.h"
+#include "util/utf8.h"
+#include "util/xmalloc.h"
 
 static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
 

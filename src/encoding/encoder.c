@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include "encoder.h"
 #include "convert.h"
-#include "../util/xmalloc.h"
-#include "../util/xreadwrite.h"
+#include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
 {

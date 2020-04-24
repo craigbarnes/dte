@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "../util/macros.h"
+#include "util/macros.h"
 
 enum {
     KEY_ENTER = '\n',

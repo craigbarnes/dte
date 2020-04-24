@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include "input.h"
 #include "terminal.h"
-#include "../editor.h"
-#include "../util/ascii.h"
-#include "../util/xmalloc.h"
+#include "editor.h"
+#include "util/ascii.h"
+#include "util/xmalloc.h"
 
 static struct {
     char buf[256];

@@ -5,8 +5,8 @@
 #include <sys/types.h>
 #include "color.h"
 #include "key.h"
-#include "../util/macros.h"
-#include "../util/string-view.h"
+#include "util/macros.h"
+#include "util/string-view.h"
 
 typedef struct {
     StringView init;

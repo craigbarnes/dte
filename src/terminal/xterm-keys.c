@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 #include "xterm.h"
-#include "../util/ascii.h"
-#include "../util/macros.h"
-#include "../util/unicode.h"
+#include "util/ascii.h"
+#include "util/macros.h"
+#include "util/unicode.h"
 
 static const KeyCode special_keys[] = {
     [1] = KEY_HOME,

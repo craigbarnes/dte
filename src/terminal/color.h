@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "../util/macros.h"
+#include "util/macros.h"
 
 #define COLOR_FLAG_RGB INT32_C(0x01000000)
 #define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))

@@ -7,7 +7,7 @@
 #include "macros.h"
 #include "string-view.h"
 #include "xmalloc.h"
-#include "../debug.h"
+#include "debug.h"
 
 NONNULL_ARGS
 static inline bool path_is_absolute(const char *path)

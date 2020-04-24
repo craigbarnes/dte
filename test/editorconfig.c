@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include "test.h"
-#include "../src/editorconfig/editorconfig.h"
-#include "../src/editorconfig/match.h"
-#include "../src/util/path.h"
+#include "editorconfig/editorconfig.h"
+#include "editorconfig/match.h"
+#include "util/path.h"
 
 static void test_editorconfig_pattern_match(void)
 {

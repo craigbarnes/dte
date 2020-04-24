@@ -1,9 +1,9 @@
 #include <limits.h>
 #include "test.h"
-#include "../src/command.h"
-#include "../src/debug.h"
-#include "../src/parse-args.h"
-#include "../src/util/ascii.h"
+#include "command.h"
+#include "debug.h"
+#include "parse-args.h"
+#include "util/ascii.h"
 
 static void test_parse_command_arg(void)
 {

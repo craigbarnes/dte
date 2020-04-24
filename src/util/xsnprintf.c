@@ -2,7 +2,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include "xsnprintf.h"
-#include "../debug.h"
+#include "debug.h"
 
 size_t xvsnprintf (
     char *restrict buf,

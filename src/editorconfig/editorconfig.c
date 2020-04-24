@@ -3,12 +3,12 @@
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
-#include "../debug.h"
-#include "../util/path.h"
-#include "../util/string.h"
-#include "../util/string-view.h"
-#include "../util/strtonum.h"
-#include "../util/str-util.h"
+#include "debug.h"
+#include "util/path.h"
+#include "util/string.h"
+#include "util/string-view.h"
+#include "util/strtonum.h"
+#include "util/str-util.h"
 
 typedef struct {
     const char *const pathname;

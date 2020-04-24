@@ -1,6 +1,6 @@
 #include "test.h"
-#include "../src/encoding/bom.h"
-#include "../src/encoding/encoding.h"
+#include "encoding/bom.h"
+#include "encoding/encoding.h"
 
 static void test_detect_encoding_from_bom(void)
 {

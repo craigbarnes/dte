@@ -1,10 +1,10 @@
 #include <regex.h>
 #include <stdlib.h>
 #include "match.h"
-#include "../debug.h"
-#include "../util/ascii.h"
-#include "../util/str-util.h"
-#include "../util/string.h"
+#include "debug.h"
+#include "util/ascii.h"
+#include "util/str-util.h"
+#include "util/string.h"
 
 static size_t get_last_paired_brace_index(const char *str, size_t len)
 {

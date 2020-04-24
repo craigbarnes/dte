@@ -3,11 +3,11 @@
 #include <unistd.h>
 #include "output.h"
 #include "terminal.h"
-#include "../debug.h"
-#include "../util/ascii.h"
-#include "../util/utf8.h"
-#include "../util/xreadwrite.h"
-#include "../util/xsnprintf.h"
+#include "debug.h"
+#include "util/ascii.h"
+#include "util/utf8.h"
+#include "util/xreadwrite.h"
+#include "util/xsnprintf.h"
 
 TermOutputBuffer obuf;
 

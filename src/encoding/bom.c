@@ -1,7 +1,7 @@
 #include "bom.h"
-#include "../debug.h"
-#include "../util/macros.h"
-#include "../util/str-util.h"
+#include "debug.h"
+#include "util/macros.h"
+#include "util/str-util.h"
 
 static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
     [UTF8] = {{0xef, 0xbb, 0xbf}, 3},

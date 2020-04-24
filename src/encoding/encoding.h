@@ -1,7 +1,7 @@
 #ifndef ENCODING_ENCODING_H
 #define ENCODING_ENCODING_H
 
-#include "../util/macros.h"
+#include "util/macros.h"
 
 typedef enum {
     UTF8,

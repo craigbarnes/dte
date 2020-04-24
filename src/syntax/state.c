@@ -2,17 +2,17 @@
 #include <stdbool.h>
 #include "state.h"
 #include "syntax.h"
-#include "../command.h"
-#include "../config.h"
-#include "../editor.h"
-#include "../error.h"
-#include "../parse-args.h"
-#include "../terminal/color.h"
-#include "../util/path.h"
-#include "../util/str-util.h"
-#include "../util/strtonum.h"
-#include "../util/xmalloc.h"
-#include "../util/xsnprintf.h"
+#include "command.h"
+#include "config.h"
+#include "editor.h"
+#include "error.h"
+#include "parse-args.h"
+#include "terminal/color.h"
+#include "util/path.h"
+#include "util/str-util.h"
+#include "util/strtonum.h"
+#include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 
 static Syntax *current_syntax;
 static State *current_state;

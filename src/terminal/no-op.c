@@ -1,5 +1,5 @@
 #include "no-op.h"
-#include "../util/macros.h"
+#include "util/macros.h"
 
 void no_op(void)
 {

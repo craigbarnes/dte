@@ -1,5 +1,5 @@
 #include "bitset.h"
-#include "../util/macros.h"
+#include "util/macros.h"
 
 static void bitset_add(BitSetWord *set, unsigned char ch)
 {

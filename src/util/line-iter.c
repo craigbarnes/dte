@@ -1,6 +1,6 @@
 #include <string.h>
 #include "line-iter.h"
-#include "../debug.h"
+#include "debug.h"
 
 char *buf_next_line(char *buf, size_t *posp, size_t size)
 {

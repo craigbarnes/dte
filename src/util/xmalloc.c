@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "checked-arith.h"
 #include "xmalloc.h"
-#include "../debug.h"
+#include "debug.h"
 
 static void *check_alloc(void *alloc)
 {

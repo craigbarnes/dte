@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include "encoding.h"
-#include "../util/ascii.h"
-#include "../util/hashset.h"
+#include "util/ascii.h"
+#include "util/hashset.h"
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",

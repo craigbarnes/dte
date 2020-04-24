@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "../src/util/macros.h"
+#include "util/macros.h"
 
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)

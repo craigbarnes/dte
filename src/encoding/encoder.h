@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#include "../util/macros.h"
-#include "../encoding/encoding.h"
+#include "util/macros.h"
+#include "encoding/encoding.h"
 
 typedef struct {
     struct cconv *cconv;

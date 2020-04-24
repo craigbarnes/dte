@@ -1,6 +1,6 @@
 #include <string.h>
 #include "test.h"
-#include "../src/filetype.h"
+#include "filetype.h"
 
 static void test_find_ft_filename(void)
 {

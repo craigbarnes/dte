@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "syntax.h"
 #include "state.h"
-#include "../error.h"
-#include "../util/ascii.h"
-#include "../util/str-util.h"
-#include "../util/xmalloc.h"
+#include "error.h"
+#include "util/ascii.h"
+#include "util/str-util.h"
+#include "util/xmalloc.h"
 
 static PointerArray syntaxes = PTR_ARRAY_INIT;
 

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "test.h"
-#include "../src/util/str-util.h"
+#include "util/str-util.h"
 
 unsigned int failed;
 

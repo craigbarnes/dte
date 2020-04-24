@@ -2,7 +2,7 @@
 #define EDITORCONFIG_H
 
 #include <stdbool.h>
-#include "../util/macros.h"
+#include "util/macros.h"
 
 typedef enum {
     INDENT_STYLE_UNSPECIFIED,

@@ -12,9 +12,9 @@
 #include "output.h"
 #include "terminal.h"
 #include "xterm.h"
-#include "../debug.h"
-#include "../util/str-util.h"
-#include "../util/string-view.h"
+#include "debug.h"
+#include "util/str-util.h"
+#include "util/string-view.h"
 
 static struct TermInfo {
     const char *clear;

@@ -12,9 +12,9 @@
 #include "rxvt.h"
 #include "terminfo.h"
 #include "xterm.h"
-#include "../debug.h"
-#include "../util/macros.h"
-#include "../util/str-util.h"
+#include "debug.h"
+#include "util/macros.h"
+#include "util/str-util.h"
 
 Terminal terminal = {
     .back_color_erase = false,

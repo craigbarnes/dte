@@ -1,13 +1,13 @@
 #include <inttypes.h>
 #include <string.h>
 #include "color.h"
-#include "../completion.h"
-#include "../debug.h"
-#include "../error.h"
-#include "../util/ascii.h"
-#include "../util/str-util.h"
-#include "../util/strtonum.h"
-#include "../util/xsnprintf.h"
+#include "completion.h"
+#include "debug.h"
+#include "error.h"
+#include "util/ascii.h"
+#include "util/str-util.h"
+#include "util/strtonum.h"
+#include "util/xsnprintf.h"
 
 static const char attr_names[][16] = {
     "keep",

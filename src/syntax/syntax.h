@@ -6,9 +6,9 @@
 #include <stdint.h>
 #include "bitset.h"
 #include "color.h"
-#include "../util/hashset.h"
-#include "../util/ptr-array.h"
-#include "../util/string-view.h"
+#include "util/hashset.h"
+#include "util/ptr-array.h"
+#include "util/string-view.h"
 
 typedef enum {
     COND_BUFIS,

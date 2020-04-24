@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include "test.h"
-#include "../src/cmdline.h"
-#include "../src/completion.h"
-#include "../src/editor.h"
+#include "cmdline.h"
+#include "completion.h"
+#include "editor.h"
 
 #define EXPECT_STRING_EQ(s, cstr) \
     EXPECT_STREQ(string_borrow_cstring(&(s)), (cstr))

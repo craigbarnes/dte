@@ -2,10 +2,10 @@
 #include <string.h>
 #include "decoder.h"
 #include "convert.h"
-#include "../editor.h"
-#include "../util/hashset.h"
-#include "../util/utf8.h"
-#include "../util/xmalloc.h"
+#include "editor.h"
+#include "util/hashset.h"
+#include "util/utf8.h"
+#include "util/xmalloc.h"
 
 static bool fill(FileDecoder *dec)
 {

@@ -2,11 +2,11 @@
 #include <sys/types.h>
 #include "highlight.h"
 #include "syntax.h"
-#include "../block-iter.h"
-#include "../debug.h"
-#include "../util/ascii.h"
-#include "../util/str-util.h"
-#include "../util/xmalloc.h"
+#include "block-iter.h"
+#include "debug.h"
+#include "util/ascii.h"
+#include "util/str-util.h"
+#include "util/xmalloc.h"
 
 static bool state_is_valid(const State *st)
 {

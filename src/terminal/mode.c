@@ -2,8 +2,8 @@
 #include <termios.h>
 #include <unistd.h>
 #include "mode.h"
-#include "../debug.h"
-#include "../util/macros.h"
+#include "debug.h"
+#include "util/macros.h"
 
 static bool initialized;
 static struct termios cooked, raw, raw_isig;

@@ -1,7 +1,7 @@
 #include "ecma48.h"
 #include "output.h"
-#include "../util/ascii.h"
-#include "../util/macros.h"
+#include "util/ascii.h"
+#include "util/macros.h"
 
 void ecma48_clear_screen(void)
 {

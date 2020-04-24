@@ -150,6 +150,8 @@ BASIC_CFLAGS += \
     -D_XOPEN_SOURCE=700 \
     -D_FILE_OFFSET_BITS=64
 
+$(all_objects): BASIC_CFLAGS += -Isrc
+
 # If "make install*" with no other named targets
 ifeq "" "$(filter-out install install-desktop-file,$(or $(MAKECMDGOALS),all))"
   OPTCHECK = :

@@ -5,7 +5,7 @@
 #include "string.h"
 #include "utf8.h"
 #include "xmalloc.h"
-#include "../debug.h"
+#include "debug.h"
 
 static void string_grow(String *s, size_t more)
 {

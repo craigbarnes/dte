@@ -1,8 +1,8 @@
 #ifndef SYNTAX_COLOR_H
 #define SYNTAX_COLOR_H
 
-#include "../terminal/color.h"
-#include "../util/string.h"
+#include "terminal/color.h"
+#include "util/string.h"
 
 enum builtin_color {
     BC_DEFAULT,

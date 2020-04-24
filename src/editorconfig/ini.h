@@ -1,7 +1,7 @@
 #ifndef EDITORCONFIG_INI_H
 #define EDITORCONFIG_INI_H
 
-#include "../util/string-view.h"
+#include "util/string-view.h"
 
 typedef struct {
     StringView section;

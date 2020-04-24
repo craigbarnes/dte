@@ -1,7 +1,7 @@
 #include <string.h>
 #include "xterm.h"
 #include "output.h"
-#include "../util/macros.h"
+#include "util/macros.h"
 
 void xterm_save_title(void)
 {
