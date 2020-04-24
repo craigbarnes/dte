@@ -43,7 +43,7 @@ static const struct FileExtensionMap {
     {"dtx", TEX},
     {"ebuild", SHELL},
     {"el", LISP},
-    {"emacs", EMACSLISP},
+    {"emacs", LISP},
     {"eml", MAIL},
     {"eps", POSTSCRIPT},
     {"flatpakref", INI},
