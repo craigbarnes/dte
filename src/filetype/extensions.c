@@ -199,12 +199,6 @@ static FileTypeEnum filetype_from_extension(const StringView sv)
         return NONE;
     }
 
-    const struct FileExtensionMap *e = bsearch (
-        &sv,
-        extensions,
-        ARRAY_COUNT(extensions),
-        sizeof(extensions[0]),
-        ft_compare
-    );
+    const struct FileExtensionMap *e = BSEARCH(&sv, extensions, ft_compare);
     return e ? e->filetype : NONE;
 }

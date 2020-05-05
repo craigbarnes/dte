@@ -26,12 +26,6 @@ static bool is_ignored_extension(const StringView sv)
     if (sv.length < 3 || sv.length >= sizeof(ignored_extensions[0])) {
         return false;
     }
-    const char *e = bsearch (
-        &sv,
-        ignored_extensions,
-        ARRAY_COUNT(ignored_extensions),
-        sizeof(ignored_extensions[0]),
-        ft_compare
-    );
+    const char *e = BSEARCH(&sv, ignored_extensions, ft_compare);
     return e != NULL;
 }

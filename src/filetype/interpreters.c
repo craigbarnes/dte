@@ -61,12 +61,6 @@ static FileTypeEnum filetype_from_interpreter(const StringView sv)
         return NONE;
     }
 
-    const struct FileInterpreterMap *e = bsearch (
-        &sv,
-        interpreters,
-        ARRAY_COUNT(interpreters),
-        sizeof(interpreters[0]),
-        ft_compare
-    );
+    const struct FileInterpreterMap *e = BSEARCH(&sv, interpreters, ft_compare);
     return e ? e->filetype : NONE;
 }

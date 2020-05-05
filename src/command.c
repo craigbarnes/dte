@@ -2123,7 +2123,7 @@ static const Command cmds[] = {
 
 const Command *find_normal_command(const char *name)
 {
-    return bsearch(name, cmds, ARRAY_COUNT(cmds), sizeof(cmds[0]), command_cmp);
+    return BSEARCH(name, cmds, command_cmp);
 }
 
 const CommandSet commands = {

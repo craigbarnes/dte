@@ -103,13 +103,7 @@ static FileTypeEnum filetype_from_basename(StringView sv)
         return NONE;
     }
 
-    const FileBasenameMap *e = bsearch (
-        &sv,
-        basenames,
-        ARRAY_COUNT(basenames),
-        sizeof(basenames[0]),
-        ft_compare
-    );
+    const FileBasenameMap *e = BSEARCH(&sv, basenames, ft_compare);
     if (e) {
         return e->filetype;
     }
@@ -118,12 +112,6 @@ static FileTypeEnum filetype_from_basename(StringView sv)
         sv.data++;
         sv.length--;
     }
-    e = bsearch (
-        &sv,
-        dotfiles,
-        ARRAY_COUNT(dotfiles),
-        sizeof(dotfiles[0]),
-        ft_compare
-    );
+    e = BSEARCH(&sv, dotfiles, ft_compare);
     return e ? e->filetype : NONE;
 }
