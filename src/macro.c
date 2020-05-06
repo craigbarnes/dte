@@ -1,9 +1,10 @@
 #include "macro.h"
 #include "change.h"
-#include "command.h"
+#include "command/args.h"
+#include "command/serialize.h"
+#include "commands.h"
 #include "debug.h"
 #include "error.h"
-#include "parse-args.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 

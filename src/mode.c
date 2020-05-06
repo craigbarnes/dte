@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
-#include "command.h"
+#include "commands.h"
 #include "completion.h"
 #include "debug.h"
 #include "edit.h"

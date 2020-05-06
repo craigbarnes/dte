@@ -35,6 +35,9 @@ util_objects := $(call prefix-obj, build/util/, \
     ascii exec hashset line-iter path ptr-array readfile string \
     strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
+command_objects := $(call prefix-obj, build/command/, \
+    args env parse run serialize )
+
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
 
@@ -49,13 +52,13 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
     winsize xterm xterm-keys )
 
 editor_objects := $(call prefix-obj, build/, \
-    alias bind block block-iter buffer change cmdline command \
-    command-parse command-run compiler completion config ctags debug \
-    edit editor env error file-history file-option filetype frame \
-    history indent load-save lock macro main mode \
-    move msg options parse-args regexp \
+    alias bind block block-iter buffer change cmdline commands \
+    compiler completion config ctags debug edit editor error \
+    file-history file-option filetype frame history indent \
+    load-save lock macro main mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection show spawn tag view window ) \
+    $(command_objects) \
     $(editorconfig_objects) \
     $(encoding_objects) \
     $(syntax_objects) \
@@ -171,6 +174,7 @@ endif
 $(dte): $(editor_objects)
 $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
+$(command_objects): | build/command/
 $(editorconfig_objects): | build/editorconfig/
 $(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/

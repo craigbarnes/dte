@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include "alias.h"
 #include "block.h"
+#include "command/serialize.h"
+#include "commands.h"
 #include "config.h"
 #include "debug.h"
 #include "editor.h"

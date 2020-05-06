@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "editor.h"
 #include "buffer.h"
-#include "command.h"
 #include "config.h"
 #include "debug.h"
 #include "error.h"

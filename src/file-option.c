@@ -1,6 +1,6 @@
 #include <unistd.h>
 #include "file-option.h"
-#include "command.h"
+#include "command/serialize.h"
 #include "debug.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"

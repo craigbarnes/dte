@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "alias.h"
-#include "command.h"
+#include "command/serialize.h"
+#include "commands.h"
 #include "completion.h"
 #include "editor.h"
 #include "error.h"

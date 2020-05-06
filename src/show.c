@@ -7,7 +7,7 @@
 #include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
-#include "command.h"
+#include "commands.h"
 #include "config.h"
 #include "editor.h"
 #include "encoding/encoding.h"

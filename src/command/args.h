@@ -1,8 +1,8 @@
-#ifndef PARSE_ARGS_H
-#define PARSE_ARGS_H
+#ifndef COMMAND_ARGS_H
+#define COMMAND_ARGS_H
 
 #include <stdbool.h>
-#include "command.h"
+#include "run.h"
 #include "util/macros.h"
 
 typedef enum {

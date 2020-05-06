@@ -4,6 +4,7 @@
 #include "test.h"
 #include "config.h"
 #include "alias.h"
+#include "commands.h"
 #include "debug.h"
 #include "editor.h"
 #include "encoding/convert.h"

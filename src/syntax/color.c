@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "color.h"
-#include "command.h"
+#include "command/serialize.h"
 #include "completion.h"
 #include "debug.h"
 #include "util/macros.h"

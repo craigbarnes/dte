@@ -1,6 +1,6 @@
 #include "options.h"
 #include "buffer.h"
-#include "command.h"
+#include "command/serialize.h"
 #include "completion.h"
 #include "debug.h"
 #include "editor.h"

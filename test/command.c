@@ -1,8 +1,11 @@
 #include <limits.h>
 #include "test.h"
-#include "command.h"
+#include "command/args.h"
+#include "command/parse.h"
+#include "command/run.h"
+#include "command/serialize.h"
+#include "commands.h"
 #include "debug.h"
-#include "parse-args.h"
 #include "util/ascii.h"
 
 static void test_parse_command_arg(void)
@@ -236,8 +239,8 @@ static void test_command_struct_layout(void)
     const Command *cmd = find_normal_command("filter");
     EXPECT_STREQ(cmd->name, "filter");
     EXPECT_STREQ(cmd->flags, "-l");
-    EXPECT_EQ(cmd->min_args, 1);
-    EXPECT_EQ(cmd->max_args, UINT_MAX);
+    EXPECT_UINT_EQ(cmd->min_args, 1);
+    EXPECT_UINT_EQ(cmd->max_args, UINT_MAX);
     EXPECT_NONNULL(cmd->cmd);
 }
 

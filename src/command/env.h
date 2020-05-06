@@ -1,5 +1,5 @@
-#ifndef ENV_H
-#define ENV_H
+#ifndef COMMAND_ENV_H
+#define COMMAND_ENV_H
 
 #include <stdbool.h>
 #include "util/macros.h"

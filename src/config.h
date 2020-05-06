@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #include <stddef.h>
-#include "command.h"
+#include "command/run.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 #include "util/string.h"

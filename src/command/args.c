@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "parse-args.h"
+#include "args.h"
 #include "debug.h"
 #include "error.h"
 #include "util/str-util.h"

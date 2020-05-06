@@ -8,7 +8,7 @@
 #include "bind.h"
 #include "block.h"
 #include "buffer.h"
-#include "command.h"
+#include "commands.h"
 #include "editor.h"
 #include "regexp.h"
 #include "util/path.h"

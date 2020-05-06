@@ -2,11 +2,13 @@
 #include <glob.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "commands.h"
 #include "alias.h"
 #include "bind.h"
 #include "change.h"
 #include "cmdline.h"
-#include "command.h"
+#include "command/args.h"
+#include "command/serialize.h"
 #include "completion.h"
 #include "config.h"
 #include "debug.h"
@@ -24,7 +26,6 @@
 #include "macro.h"
 #include "move.h"
 #include "msg.h"
-#include "parse-args.h"
 #include "search.h"
 #include "selection.h"
 #include "show.h"

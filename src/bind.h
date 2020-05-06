@@ -1,7 +1,7 @@
 #ifndef BIND_H
 #define BIND_H
 
-#include "command.h"
+#include "command/run.h"
 #include "terminal/key.h"
 #include "util/string.h"
 

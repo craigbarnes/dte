@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "error.h"
-#include "command.h"
+#include "command/run.h"
 #include "config.h"
 #include "editor.h"
 

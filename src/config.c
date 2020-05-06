@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include "config.h"
+#include "commands.h"
 #include "completion.h"
 #include "debug.h"
 #include "error.h"
