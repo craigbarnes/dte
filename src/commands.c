@@ -108,7 +108,26 @@ static void handle_select_chars_or_lines_flags(const CommandArgs *a)
 
 static void cmd_alias(const CommandArgs *a)
 {
-    add_alias(a->args[0], a->args[1]);
+    const char *const name = a->args[0];
+    if (unlikely(name[0] == '\0')) {
+        error_msg("Empty alias name not allowed");
+        return;
+    }
+
+    for (size_t i = 0; name[i]; i++) {
+        unsigned char c = name[i];
+        if (!(is_word_byte(c) || c == '-' || c == '?' || c == '!')) {
+            error_msg("Invalid byte in alias name: %c (0x%02hhX)", c, c);
+            return;
+        }
+    }
+
+    if (find_normal_command(name)) {
+        error_msg("Can't replace existing command %s with an alias", name);
+        return;
+    }
+
+    add_alias(name, a->args[1]);
 }
 
 static void cmd_bind(const CommandArgs *a)

@@ -3,10 +3,8 @@
 #include <string.h>
 #include "alias.h"
 #include "command/serialize.h"
-#include "commands.h"
 #include "completion.h"
 #include "editor.h"
-#include "error.h"
 #include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -25,34 +23,8 @@ static void CONSTRUCTOR prealloc(void)
     ptr_array_init(&aliases, 32);
 }
 
-static bool is_valid_alias_name(const char *name)
-{
-    if (unlikely(name[0] == '\0')) {
-        error_msg("Empty alias name not allowed");
-        return false;
-    }
-
-    for (unsigned char c; (c = *name); name++) {
-        if (is_word_byte(c) || c == '-' || c == '?' || c == '!') {
-            continue;
-        }
-        error_msg("Invalid byte in alias name: 0x%02x", (unsigned int)c);
-        return false;
-    }
-
-    return true;
-}
-
 void add_alias(const char *name, const char *value)
 {
-    if (!is_valid_alias_name(name)) {
-        return;
-    }
-    if (find_normal_command(name)) {
-        error_msg("Can't replace existing command %s with an alias", name);
-        return;
-    }
-
     // Replace existing alias
     for (size_t i = 0; i < aliases.count; i++) {
         CommandAlias *alias = aliases.ptrs[i];
