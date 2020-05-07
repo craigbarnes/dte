@@ -69,11 +69,11 @@ test_objects := $(call prefix-obj, build/test/, \
     cmdline command config editorconfig encoding filetype main \
     syntax terminal test util )
 
-feature_tests := $(addprefix mk/feature-test/, $(addsuffix .c, \
+feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     dup3 pipe2 fsync ioctl-winsize posix_madvise ))
 
 all_objects := $(editor_objects) $(test_objects)
-build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects))))
+build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/
 
 editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
 test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
@@ -180,6 +180,7 @@ $(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
+$(feature_tests): mk/feature-test/defs.h build/all.cflags | build/feature/
 build/builtin-config.h: build/builtin-config.mk
 build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
@@ -231,15 +232,17 @@ build/test/data.h: $(TEST_CONFIGS) mk/config2c.awk | build/test/
 	$(E) GEN $@
 	$(Q) $(AWK) -f mk/config2c.awk $(TEST_CONFIGS) > $@
 
-build/feature.h: $(feature_tests) build/all.cflags | build/
+build/feature.h: mk/feature-test/defs.h $(feature_tests)
 	$(E) GEN $@
-	$(Q) $(RM) '$@.log'
-	$(Q) cat mk/feature-test/defs.h > '$@'
-	$(Q) for test in $(feature_tests); do \
-	  if $(CC) $(CFLAGS_ALL) -o /dev/null "$$test" 2>>'$@.log'; then \
-	    cat "$${test%.c}.h" >> '$@' ; \
-	  fi \
-	done
+	$(Q) cat $^ > $@
+
+$(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature-test/%.h
+	$(E) DETECT $*
+	$(Q) if $(CC) $(CFLAGS_ALL) -o $(@:.h=.o) $< 2>>$(@:.h=.log); then \
+	  cp $(<:.c=.h) $@ ; \
+	else \
+	  echo > $@ ; \
+	fi
 
 build/ $(build_subdirs):
 	$(Q) mkdir -p $@
