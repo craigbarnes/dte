@@ -38,7 +38,7 @@ public/releases.html: CHANGELOG.md | public/
 
 $(html-man): public/%.html: docs/%.md
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -o $@ $<
+	$(Q) $(PDHTML) --lua-filter=docs/fix-anchors.lua -o $@ $<
 
 public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
