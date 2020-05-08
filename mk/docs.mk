@@ -36,7 +36,7 @@ public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
-$(html-man): public/%.html: docs/%.md
+$(html-man): public/%.html: docs/%.md docs/fix-anchors.lua
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) --lua-filter=docs/fix-anchors.lua -o $@ $<
 
