@@ -45,7 +45,7 @@ The filename of the current buffer (or an empty string if unsaved).
 
 ### **$FILETYPE**
 
-The value of the `filetype` option for the current buffer.
+The value of the [`filetype`] option for the current buffer.
 
 ### **$LINENO**
 
@@ -166,7 +166,7 @@ By default `set` changes both global and local values.
 In configuration files only global options can be set (no need
 to specify the `-g` flag).
 
-See also: `toggle` and `option` commands.
+See also: [`toggle`] and [`option`] commands.
 
 ### **setenv** _name_ _value_
 
@@ -265,11 +265,11 @@ By default _string_ is interpreted as one or more filename extensions.
 :   Interpret _string_ as a file basename
 
 `-c`
-:   Interpret _string_ as a regex pattern and match against the
+:   Interpret _string_ as a [`regex`] pattern and match against the
     contents of the first line of the file
 
 `-f`
-:   Interpret _string_ as a regex pattern and match against the
+:   Interpret _string_ as a [`regex`] pattern and match against the
     full (absolute) filename
 
 `-i`
@@ -287,18 +287,18 @@ Examples:
 
 See also:
 
-* The `option` command (below)
-* The `filetype` option (below)
+* The [`option`] command (below)
+* The [`filetype`] option (below)
 * The [`dte-syntax`] man page
 
 ### **option** [**-r**] _filetype_ _option_ _value_...
 
 Add automatic _option_ for _filetype_ (as previously registered
-with the `ft` command). Automatic options are set when files are
+with the [`ft`] command). Automatic options are set when files are
 are opened.
 
 `-r`
-:   Interpret _filetype_ argument as a regex pattern instead of a
+:   Interpret _filetype_ argument as a [`regex`] pattern instead of a
     filetype and match against full filenames
 
 ### **include** [**-bq**] _file_
@@ -312,11 +312,11 @@ Read and execute commands from _file_.
 :   Don't show an error message if _file_ doesn't exist
 
 Note: "built-in files" are config files bundled into the program binary.
-See the `-B` and `-b` flags in the `dte` man page for more information.
+See the `-B` and `-b` flags in the [`dte`] man page for more information.
 
 ### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message|_]...
 
-Register a `regex` pattern, for later use with the `compile` command.
+Register a [`regex`] pattern, for later use with the [`compile`] command.
 
 When the `compile` command is invoked with a specific _compiler_ name,
 the _regexp_ pattern(s) previously registered with that name are used to
@@ -339,12 +339,12 @@ For a basic example of usage, see the output of `dte -b compiler/go`.
 
 ### **load-syntax** _filename_|_filetype_
 
-Load a `dte-syntax` file into the editor. If the argument contains a
+Load a [`dte-syntax`] file into the editor. If the argument contains a
 `/` character it's considered a filename.
 
 Note: this command only loads a syntax file ready for later use. To
 actually apply a syntax highlighter to the current buffer, use the
-`set` command to change the `filetype` of the buffer instead, e.g.
+[`set`] command to change the [`filetype`] of the buffer instead, e.g.
 `set filetype html`.
 
 ## Editor Commands
@@ -464,7 +464,7 @@ Move current tab to position _N_ or 1 position left or right.
 
 ### **wsplit** [**-bghr**] [_filename_]...
 
-Like `open` but at first splits current window vertically.
+Like [`open`] but at first splits current window vertically.
 
 `-b`
 :   Add new window before current instead of after.
@@ -563,7 +563,7 @@ Move cursor down.
 
 ### **pgup** [**-cl**]
 
-Move cursor page up. See also `scroll-pgup`.
+Move cursor page up. See also [`scroll-pgup`].
 
 `-c`
 :   Select characters
@@ -573,7 +573,7 @@ Move cursor page up. See also `scroll-pgup`.
 
 ### **pgdown** [**-cl**]
 
-Move cursor page down. See also `scroll-pgdown`.
+Move cursor page down. See also [`scroll-pgdown`].
 
 `-c`
 :   Select characters
@@ -648,12 +648,12 @@ Scroll view down one line. Keeps cursor position unchanged if possible.
 ### **scroll-pgup**
 
 Scroll page up. Cursor position relative to top of screen is
-maintained. See also `pgup`.
+maintained. See also [`pgup`].
 
 ### **scroll-pgdown**
 
 Scroll page down. Cursor position relative to top of screen is
-maintained. See also `pgdown`.
+maintained. See also [`pgdown`].
 
 ### **center-view**
 
@@ -675,7 +675,7 @@ given then word under cursor is used as a tag instead.
 Tag files are searched from current working directory and its
 parent directories.
 
-See also `msg` command.
+See also: [`msg`] command.
 
 ### **msg** [**-np**]
 
@@ -689,7 +689,7 @@ opened and cursor moved to the location.
 `-p`
 :   Previous message
 
-See also `compile` and `tag` commands.
+See also: [`compile`] and [`tag`] commands.
 
 ## Editing Commands
 
@@ -706,7 +706,7 @@ Copy current line or selection.
 
 ### **paste** [**-c**]
 
-Paste text previously copied by the `copy` or `cut` commands.
+Paste text previously copied by the [`copy`] or [`cut`] commands.
 
 `-c`
 :   Paste at the cursor position, even when the text was copied as
@@ -719,7 +719,7 @@ Undo latest change.
 
 ### **redo** [_choice_]
 
-Redo changes done by the `undo` command. If there are multiple
+Redo changes done by the [`undo`] command. If there are multiple
 possibilities a message is displayed:
 
     Redoing newest (2) of 2 possible changes.
@@ -801,7 +801,7 @@ Insert _text_ into the buffer.
 Replace all instances of text matching _pattern_ with the _replacement_
 text.
 
-The _pattern_ is a POSIX extended **regex**(7).
+The _pattern_ is a POSIX extended [`regex`].
 
 `-b`
 :   Use basic instead of extended regex syntax
@@ -826,12 +826,12 @@ option parsing with `--`, e.g. `shift -- -1`.
 ### **wrap-paragraph** [_width_]
 
 Format the current selection or paragraph under the cursor. If
-paragraph _width_ is not given then the `text-width` option is
+paragraph _width_ is not given then the [`text-width`] option is
 used.
 
 This command merges the selection into one paragraph. To format
-multiple paragraphs use the external `fmt`(1) program with the
-`filter` command, e.g. `filter fmt -w 60`.
+multiple paragraphs use the external `fmt` program with the
+[`filter`] command, e.g. `filter fmt -w 60`.
 
 ### **select** [**-bkl**]
 
@@ -913,9 +913,9 @@ used to run e.g. compilers, build systems, code search utilities,
 etc. and then jump to a file/line position for each message.
 
 The _errorfmt_ argument corresponds to a regex capture pattern
-previously specified by the `errorfmt` command. After _command_
+previously specified by the [`errorfmt`] command. After _command_
 exits successfully, parsed messages can be navigated using the
-`msg` command.
+[`msg`] command.
 
 `-1`
 :   Read error messages from stdout instead of stderr
@@ -926,7 +926,7 @@ exits successfully, parsed messages can be navigated using the
 `-s`
 :   Silent. Both `stderr` and `stdout` are redirected to `/dev/null`
 
-See also: `errorfmt` and `msg` commands.
+See also: [`errorfmt`] and [`msg`] commands.
 
 ### **eval** _command_ [_parameter_]...
 
@@ -1003,9 +1003,9 @@ specified _type_ will be displayed in a new buffer.
 
 # Options
 
-Options can be changed using the `set` command. Enumerated options can
-also be `toggle`d. To see which options are enumerated, type "toggle "
-in command mode and press the tab key. You can also use the `option`
+Options can be changed using the [`set`] command. Enumerated options can
+also be [`toggle`]d. To see which options are enumerated, type "toggle "
+in command mode and press the tab key. You can also use the [`option`]
 command to set default options for specific file types.
 
 ## Global options
@@ -1136,17 +1136,17 @@ Whether to show the tab-bar at the top of each window.
 ### **brace-indent** [false]
 
 Scan for `{` and `}` characters when calculating indentation size.
-Depends on the `auto-indent` option.
+Depends on the [`auto-indent`] option.
 
 ### **filetype** [none]
 
-Type of file. Value must be previously registered using the `ft`
+Type of file. Value must be previously registered using the [`ft`]
 command.
 
 ### **indent-regex** [""]
 
-If this regular expression matches current line when enter is
-pressed and `auto-indent` is true then indentation is increased.
+If this [`regex`] pattern matches the current line when enter is
+pressed and [`auto-indent`] is true then indentation is increased.
 Set to `""` to disable.
 
 ## Local and global options
@@ -1158,7 +1158,7 @@ local (per-file) options.
 
 Automatically insert indentation when pressing enter.
 Indentation is copied from previous non-empty line. If also the
-`indent-regex` local option is set then indentation is
+[`indent-regex`] local option is set then indentation is
 automatically increased if the regular expression matches
 current line.
 
@@ -1167,8 +1167,8 @@ current line.
 Comma-separated list of indent widths (`1`-`8`) to detect automatically
 when a file is opened. Set to `""` to disable. Tab indentation is
 detected if the value is not `""`. Adjusts the following options if
-indentation style is detected: `emulate-tab`, `expand-tab`,
-`indent-width`.
+indentation style is detected: [`emulate-tab`], [`expand-tab`],
+[`indent-width`].
 
 Example:
 
@@ -1176,7 +1176,7 @@ Example:
 
 ### **emulate-tab** [false]
 
-Make `delete`, `erase` and moving `left` and `right` inside
+Make [`delete`], [`erase`] and moving [`left`] and [`right`] inside
 indentation feel as if there were tabs instead of spaces.
 
 ### **expand-tab** [false]
@@ -1203,7 +1203,7 @@ indentation size than `8` you should use spaces to indent.
 ### **text-width** [72]
 
 Preferred width of text. Used as the default argument for the
-`wrap-paragraph` command.
+[`wrap-paragraph`] command.
 
 ### **ws-error** [special]
 
@@ -1211,7 +1211,7 @@ Comma-separated list of flags that describe which whitespace
 errors should be highlighted. Set to `""` to disable.
 
 `auto-indent`
-:   If the `expand-tab` option is enabled then this is the
+:   If the [`expand-tab`] option is enabled then this is the
     same as `tab-after-indent,tab-indent`. Otherwise it's
     the same as `space-indent`.
 
@@ -1221,7 +1221,7 @@ errors should be highlighted. Set to `""` to disable.
 
 `space-indent`
 :   Highlight space indents as errors. Note that this still allows
-    using less than `tab-width` spaces at the end of indentation
+    using less than [`tab-width`] spaces at the end of indentation
     for alignment.
 
 `tab-after-indent`
@@ -1241,7 +1241,41 @@ errors should be highlighted. Set to `""` to disable.
     errors.
 
 
+[`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
+[`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`xterm`]: https://invisible-island.net/xterm/
+
+[`compile`]: #compile
+[`copy`]: #copy
+[`cut`]: #cut
+[`delete`]: #delete
+[`erase`]: #erase
+[`errorfmt`]: #errorfmt
+[`filetype`]: #filetype
+[`filter`]: #filter
+[`ft`]: #ft
+[`left`]: #left
+[`message`]: #message
+[`msg`]: #msg
+[`option`]: #option
+[`pgdown`]: #pgdown
+[`pgup`]: #pgup
+[`right`]: #right
+[`scroll-pgdown`]: #scroll-pgdown
+[`scroll-pgup`]: #scroll-pgup
+[`set`]: #set
+[`tag`]: #tag
+[`toggle`]: #toggle
+[`undo`]: #undo
+[`wrap-paragraph`]: #wrap-paragraph
+
+[`auto-indent`]: #auto-indent
+[`emulate-tab`]: #emulate-tab
+[`expand-tab`]: #expand-tab
+[`indent-regex`]: #indent-regex
+[`indent-width`]: #indent-width
+[`tab-width`]: #tab-width
+[`text-width`]: #text-width

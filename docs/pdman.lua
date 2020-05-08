@@ -144,6 +144,7 @@ function Code(s, attr)
         stdout = "(3)",
         stderr = "(3)",
         ctags = "(1)",
+        fmt = "(1)",
         terminfo = "(5)",
     }
     return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")

@@ -615,12 +615,12 @@ Interpret \fIstring\fR as a file basename
 .PP
 .TP
 \fB\-c\fR
-Interpret \fIstring\fR as a regex pattern and match against the
+Interpret \fIstring\fR as a \fBregex\fR(7) pattern and match against the
 contents of the first line of the file
 .PP
 .TP
 \fB\-f\fR
-Interpret \fIstring\fR as a regex pattern and match against the
+Interpret \fIstring\fR as a \fBregex\fR(7) pattern and match against the
 full (absolute) filename
 .PP
 .TP
@@ -660,7 +660,7 @@ are opened.
 .P
 .TP
 \fB\-r\fR
-Interpret \fIfiletype\fR argument as a regex pattern instead of a
+Interpret \fIfiletype\fR argument as a \fBregex\fR(7) pattern instead of a
 filetype and match against full filenames
 .PP
 .RE
@@ -861,7 +861,7 @@ Move current tab to position \fIN\fR or 1 position left or right.
 .SS Window Management Commands
 \fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
 .RS
-Like \fBopen\fR but at first splits current window vertically.
+Like [\fBopen\fR] but at first splits current window vertically.
 .P
 .TP
 \fB\-b\fR
@@ -1127,7 +1127,7 @@ return back to previous location
 Tag files are searched from current working directory and its
 parent directories.
 .P
-See also \fBmsg\fR command.
+See also: \fBmsg\fR command.
 .P
 .RE
 \fBmsg\fR [\fB\-np\fR]
@@ -1144,7 +1144,7 @@ Next message
 \fB\-p\fR
 Previous message
 .PP
-See also \fBcompile\fR and \fBtag\fR commands.
+See also: \fBcompile\fR and \fBtag\fR commands.
 .P
 .RE
 .SS Editing Commands
@@ -1721,7 +1721,7 @@ command.
 .RE
 \fBindent\-regex\fR [""]
 .RS
-If this regular expression matches current line when enter is
+If this \fBregex\fR(7) pattern matches the current line when enter is
 pressed and \fBauto\-indent\fR is true then indentation is increased.
 Set to \fB""\fR to disable.
 .P
