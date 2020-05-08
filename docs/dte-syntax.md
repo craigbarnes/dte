@@ -58,7 +58,7 @@ Example:
 
     list keyword if else for while do continue switch case
 
-Use the `inlist` command to test if a buffered string is in a list.
+Use the [`inlist`] command to test if a buffered string is in a list.
 
 `-i`
 :   Make list case-insensitive.
@@ -191,3 +191,4 @@ sub-syntax whose name is `END` are replaced with `c`.
 
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 [built-in syntax files]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
+[`inlist`]: #inlist
