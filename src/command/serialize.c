@@ -18,6 +18,14 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
         return;
     }
 
+    bool has_tilde_slash_prefix = strview_has_prefix(&sv, "~/");
+    if (has_tilde_slash_prefix && !escape_tilde) {
+        // Print "~/" and skip past it, so it doesn't get quoted
+        string_append_literal(s, "~/");
+        arg += 2;
+        len -= 2;
+    }
+
     bool squote = false;
     for (size_t i = 0; i < len; i++) {
         char c = arg[i];
@@ -42,7 +50,7 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
         string_append_buf(s, arg, len);
         string_append_byte(s, '\'');
     } else {
-        if (arg[0] == '~' && arg[1] == '/' && escape_tilde) {
+        if (has_tilde_slash_prefix && escape_tilde) {
             string_append_byte(s, '\\');
         }
         string_append_buf(s, arg, len);

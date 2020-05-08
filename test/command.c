@@ -232,6 +232,34 @@ static void test_escape_command_arg(void)
     str = escape_command_arg("\"''\"", false);
     EXPECT_STREQ(str, "\"\\\"''\\\"\"");
     free(str);
+
+    str = escape_command_arg("~/file with spaces", false);
+    EXPECT_STREQ(str, "~/'file with spaces'");
+    free(str);
+    str = escape_command_arg("~/file with spaces", true);
+    EXPECT_STREQ(str, "'~/file with spaces'");
+    free(str);
+
+    str = escape_command_arg("~/need \t\ndquotes", false);
+    EXPECT_STREQ(str, "~/\"need \\t\\ndquotes\"");
+    free(str);
+    str = escape_command_arg("~/need \t\ndquotes", true);
+    EXPECT_STREQ(str, "\"~/need \\t\\ndquotes\"");
+    free(str);
+
+    str = escape_command_arg("~/file-with-no-spaces", false);
+    EXPECT_STREQ(str, "~/file-with-no-spaces");
+    free(str);
+    str = escape_command_arg("~/file-with-no-spaces", true);
+    EXPECT_STREQ(str, "\\~/file-with-no-spaces");
+    free(str);
+
+    str = escape_command_arg("~/", false);
+    EXPECT_STREQ(str, "~/");
+    free(str);
+    str = escape_command_arg("~/", true);
+    EXPECT_STREQ(str, "\\~/");
+    free(str);
 }
 
 static void test_command_struct_layout(void)
