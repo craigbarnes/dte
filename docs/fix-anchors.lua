@@ -16,6 +16,7 @@ local function Header(header)
             end
         end
     end
+    return header
 end
 
 return {
