@@ -64,11 +64,11 @@ seealso: ["`dterc`", "`dte-syntax`"]
 # Key Bindings
 
 There are 3 editor modes, each having a different set of key bindings.
-Normal mode bindings can be customized by using the `bind` command
-(see [`dterc`]) or displayed using the `show bind` command.
+Normal mode bindings can be customized by using the [`bind`] command
+(see [`dterc`]) or displayed using the [`show bind`] command.
 
 The key bindings listed below are in the same format as accepted by
-the `bind` command. In particular, key combinations are represented
+the [`bind`] command. In particular, key combinations are represented
 as follows:
 
 * `M-x` is Alt+x
@@ -136,8 +136,8 @@ are also various key combinations bound by default:
 ## Command Mode
 
 Command mode allows running various editor commands using a language
-similar to Unix shell. The `next` and `prev` commands switch
-to the next/previous file. The `open`, `save` and `quit`
+similar to Unix shell. The [`next`] and [`prev`] commands switch
+to the next/previous file. The [`open`], [`save`] and [`quit`]
 commands should be self-explanatory. For a full list of available
 commands, see [`dterc`].
 
@@ -235,11 +235,11 @@ The following environment variables are inspected at startup:
 
 `$DTE_HOME/file-locks`
 :   Records open files, to prevent accidentally editing files opened in
-    another dte process. Used only if the `lock-files` option is enabled.
+    another dte process. Used only if the [`lock-files`] option is enabled.
 
 `$DTE_HOME/file-history`
 :   History of edited files and cursor positions. Used only if the
-    `file-history` option is enabled.
+    [`file-history`] option is enabled.
 
 `$DTE_HOME/command-history`
 :   History of `dterc` commands used while in command mode.
@@ -250,4 +250,13 @@ The following environment variables are inspected at startup:
 
 [`dterc`]: dterc.html
 [`dte-syntax`]: dte-syntax.html
+[`bind`]: dterc.html#bind
+[`show bind`]: dterc.html#show
+[`next`]: dterc.html#next
+[`prev`]: dterc.html#prev
+[`open`]: dterc.html#open
+[`save`]: dterc.html#save
+[`quit`]: dterc.html#quit
+[`lock-files`]: dterc.html#lock-files
+[`file-history`]: dterc.html#file-history
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
