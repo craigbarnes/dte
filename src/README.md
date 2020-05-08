@@ -8,11 +8,12 @@ little else.
 The main editor code is in the base directory and various other
 (somewhat reusable) parts are in sub-directories:
 
+* `command/` - command language parsing and execution
 * `editorconfig/` - [EditorConfig] implementation
 * `encoding/` - charset encoding/decoding/conversion
 * `filetype/` - filetype detection
 * `syntax/` - syntax highlighting
-* `terminal/` - terminal control and response parsing
+* `terminal/` - terminal input/output handling
 * `util/` - data structures, string utilities, etc.
 
 
