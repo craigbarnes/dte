@@ -27,7 +27,7 @@ Configuration Commands:
 .br
    \fBinclude\fR [\fB\-bq\fR] \fIfile\fR
 .br
-   \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message]...
+   \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message|_]...
 .br
    \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
 .br
@@ -680,14 +680,30 @@ Note: "built\-in files" are config files bundled into the program binary.
 See the \fB\-B\fR and \fB\-b\fR flags in the \fBdte\fR(1) man page for more information.
 .P
 .RE
-\fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message]...
+\fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message|_]...
 .RS
+Register a \fBregex\fR(7) pattern, for later use with the \fBcompile\fR command.
+.P
+When the \fBcompile\fR command is invoked with a specific \fIcompiler\fR name,
+the \fIregexp\fR pattern(s) previously registered with that name are used to
+parse messages from it's program output.
+.P
+The \fIregexp\fR pattern should contain as many capture groups as there are
+extra arguments. These capture groups are used to parse the file, line,
+message, etc. from the output and, if possible, jump to the corresponding
+file position. To use parentheses in \fIregexp\fR but ignore the capture, use
+\fB_\fR as the extra argument.
+.P
+Running \fBerrorfmt\fR multiple times with the same \fIcompiler\fR name appends
+each \fIregexp\fR to a list. When running \fBcompile\fR, the entries in the
+specified list are checked for a match in the same order they were added.
+.P
+For a basic example of usage, see the output of \fBdte \-b compiler/go\fR.
+.P
 .TP
 \fB\-i\fR
 Ignore this error
 .PP
-See \fBcompile\fR and \fBmsg\fR commands for more information.
-.P
 .RE
 \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
 .RS

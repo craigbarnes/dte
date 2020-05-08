@@ -140,6 +140,7 @@ function Code(s, attr)
         ["dte-syntax"] = "(5)",
         execvp = "(3)",
         glob = "(7)",
+        regex = "(7)",
         stdout = "(3)",
         stderr = "(3)",
         ctags = "(1)",

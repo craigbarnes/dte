@@ -314,12 +314,28 @@ Read and execute commands from _file_.
 Note: "built-in files" are config files bundled into the program binary.
 See the `-B` and `-b` flags in the `dte` man page for more information.
 
-### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message]...
+### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message|_]...
+
+Register a `regex` pattern, for later use with the `compile` command.
+
+When the `compile` command is invoked with a specific _compiler_ name,
+the _regexp_ pattern(s) previously registered with that name are used to
+parse messages from it's program output.
+
+The _regexp_ pattern should contain as many capture groups as there are
+extra arguments. These capture groups are used to parse the file, line,
+message, etc. from the output and, if possible, jump to the corresponding
+file position. To use parentheses in _regexp_ but ignore the capture, use
+`_` as the extra argument.
+
+Running `errorfmt` multiple times with the same _compiler_ name appends
+each _regexp_ to a list. When running `compile`, the entries in the
+specified list are checked for a match in the same order they were added.
+
+For a basic example of usage, see the output of `dte -b compiler/go`.
 
 `-i`
 :   Ignore this error
-
-See `compile` and `msg` commands for more information.
 
 ### **load-syntax** _filename_|_filetype_
 
