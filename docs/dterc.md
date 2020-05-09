@@ -254,7 +254,7 @@ terminal's default fg/bg is used.
 :   Do nothing at all if the terminal can't display _fg-color_ and/or
     _bg-color_ with full precision
 
-### **ft** [**-bcfi**] _filetype_ _string_...
+### **ft** [**-b**|**-c**|**-f**|**-i**] _filetype_ _string_...
 
 Add a filetype association. Filetypes are used to determine which
 syntax highlighter and local options to use when opening files.
@@ -349,7 +349,7 @@ actually apply a syntax highlighter to the current buffer, use the
 
 ## Editor Commands
 
-### **quit** [**-fp**]
+### **quit** [**-f**|**-p**]
 
 Quit the editor.
 
@@ -409,7 +409,7 @@ Open file. If _filename_ is omitted, a new file is opened.
 `-g`
 :   Perform [`glob`] expansion on _filename_.
 
-### **save** [**-dfup**] [**-e** _encoding_] [_filename_]
+### **save** [**-fp**] [**-d**|**-u**] [**-e** _encoding_] [_filename_]
 
 Save file. By default line-endings (LF vs CRLF) are preserved.
 
@@ -428,7 +428,7 @@ Save file. By default line-endings (LF vs CRLF) are preserved.
 `-e` _encoding_
 :   Set file _encoding_. See `iconv -l` for list of supported encodings.
 
-### **close** [**-fpqw**]
+### **close** [**-qw**] [**-f**|**-p**]
 
 Close file.
 
@@ -478,7 +478,7 @@ Like [`open`] but at first splits current window vertically.
 `-r`
 :   Split root instead of current window.
 
-### **wclose** [**-fp**]
+### **wclose** [**-f**|**-p**]
 
 Close window.
 
@@ -496,7 +496,7 @@ Next window.
 
 Previous window.
 
-### **wresize** [**-hv**] [_N_|+_N_|-- -_N_]
+### **wresize** [**-h**|**-v**] [_N_|+_N_|-- -_N_]
 
 If no parameter given, equalize window sizes in current frame.
 
@@ -541,7 +541,7 @@ Move right.
 `-c`
 :   Select characters
 
-### **up** [**-cl**]
+### **up** [**-c**|**-l**]
 
 Move cursor up.
 
@@ -551,7 +551,7 @@ Move cursor up.
 `-l`
 :   Select whole lines
 
-### **down** [**-cl**]
+### **down** [**-c**|**-l**]
 
 Move cursor down.
 
@@ -561,7 +561,7 @@ Move cursor down.
 `-l`
 :   Select whole lines
 
-### **pgup** [**-cl**]
+### **pgup** [**-c**|**-l**]
 
 Move cursor page up. See also [`scroll-pgup`].
 
@@ -571,7 +571,7 @@ Move cursor page up. See also [`scroll-pgup`].
 `-l`
 :   Select whole lines
 
-### **pgdown** [**-cl**]
+### **pgdown** [**-c**|**-l**]
 
 Move cursor page down. See also [`scroll-pgdown`].
 
@@ -677,7 +677,7 @@ parent directories.
 
 See also: [`msg`] command.
 
-### **msg** [**-np**]
+### **msg** [**-n**|**-p**]
 
 Show latest, next (`-n`) or previous (`-p`) message. If its location
 is known (compile error or tag message) then the file will be
@@ -772,7 +772,7 @@ Erase word before cursor.
 `-s`
 :   Be more "aggressive"
 
-### **case** [**-lu**]
+### **case** [**-l**|**-u**]
 
 Change text case. The default is to change lower case to upper case and
 vice versa.

@@ -21,7 +21,7 @@ Configuration Commands:
 .br
    \fBhi\fR [\fB\-c\fR] \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
 .br
-   \fBft\fR [\fB\-bcfi\fR] \fIfiletype\fR \fIstring\fR...
+   \fBft\fR [\fB\-b\fR|\fB\-c\fR|\fB\-f\fR|\fB\-i\fR] \fIfiletype\fR \fIstring\fR...
 .br
    \fBoption\fR [\fB\-r\fR] \fIfiletype\fR \fIoption\fR \fIvalue\fR...
 .br
@@ -34,7 +34,7 @@ Configuration Commands:
 .P
 Editor Commands:
 .br
-   \fBquit\fR [\fB\-fp\fR]
+   \fBquit\fR [\fB\-f\fR|\fB\-p\fR]
 .br
    \fBsuspend\fR
 .br
@@ -51,9 +51,9 @@ Buffer Management Commands:
 .br
    \fBopen\fR [\fB\-g\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
 .br
-   \fBsave\fR [\fB\-dfup\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
+   \fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .br
-   \fBclose\fR [\fB\-fpqw\fR]
+   \fBclose\fR [\fB\-qw\fR] [\fB\-f\fR|\fB\-p\fR]
 .br
    \fBnext\fR
 .br
@@ -68,13 +68,13 @@ Window Management Commands:
 .br
    \fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
 .br
-   \fBwclose\fR [\fB\-fp\fR]
+   \fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
 .br
    \fBwnext\fR
 .br
    \fBwprev\fR
 .br
-   \fBwresize\fR [\fB\-hv\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
+   \fBwresize\fR [\fB\-h\fR|\fB\-v\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
 .br
    \fBwflip\fR
 .br
@@ -87,13 +87,13 @@ Movement Commands:
 .br
    \fBright\fR [\fB\-c\fR]
 .br
-   \fBup\fR [\fB\-cl\fR]
+   \fBup\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBdown\fR [\fB\-cl\fR]
+   \fBdown\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBpgup\fR [\fB\-cl\fR]
+   \fBpgup\fR [\fB\-c\fR|\fB\-l\fR]
 .br
-   \fBpgdown\fR [\fB\-cl\fR]
+   \fBpgdown\fR [\fB\-c\fR|\fB\-l\fR]
 .br
    \fBword\-fwd\fR [\fB\-cs\fR]
 .br
@@ -125,7 +125,7 @@ Movement Commands:
 .br
    \fBtag\fR [\fB\-r\fR] [\fItag\fR]
 .br
-   \fBmsg\fR [\fB\-np\fR]
+   \fBmsg\fR [\fB\-n\fR|\fB\-p\fR]
 .br
 .P
 Editing Commands:
@@ -158,7 +158,7 @@ Editing Commands:
 .br
    \fBerase\-word\fR [\fB\-s\fR]
 .br
-   \fBcase\fR [\fB\-lu\fR]
+   \fBcase\fR [\fB\-l\fR|\fB\-u\fR]
 .br
    \fBinsert\fR [\fB\-km\fR] \fItext\fR
 .br
@@ -602,7 +602,7 @@ Do nothing at all if the terminal can't display \fIfg\-color\fR and/or
 \fIbg\-color\fR with full precision
 .PP
 .RE
-\fBft\fR [\fB\-bcfi\fR] \fIfiletype\fR \fIstring\fR...
+\fBft\fR [\fB\-b\fR|\fB\-c\fR|\fB\-f\fR|\fB\-i\fR] \fIfiletype\fR \fIstring\fR...
 .RS
 Add a filetype association. Filetypes are used to determine which
 syntax highlighter and local options to use when opening files.
@@ -717,7 +717,7 @@ actually apply a syntax highlighter to the current buffer, use the
 .P
 .RE
 .SS Editor Commands
-\fBquit\fR [\fB\-fp\fR]
+\fBquit\fR [\fB\-f\fR|\fB\-p\fR]
 .RS
 Quit the editor.
 .P
@@ -792,7 +792,7 @@ Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 Perform \fBglob\fR(7) expansion on \fIfilename\fR.
 .PP
 .RE
-\fBsave\fR [\fB\-dfup\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
+\fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .RS
 Save file. By default line\-endings (LF vs CRLF) are preserved.
 .P
@@ -817,7 +817,7 @@ Open a command prompt if there's no specified or existing \fIfilename\fR
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .PP
 .RE
-\fBclose\fR [\fB\-fpqw\fR]
+\fBclose\fR [\fB\-qw\fR] [\fB\-f\fR|\fB\-p\fR]
 .RS
 Close file.
 .P
@@ -880,7 +880,7 @@ Split horizontally instead of vertically.
 Split root instead of current window.
 .PP
 .RE
-\fBwclose\fR [\fB\-fp\fR]
+\fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
 .RS
 Close window.
 .P
@@ -903,7 +903,7 @@ Next window.
 Previous window.
 .P
 .RE
-\fBwresize\fR [\fB\-hv\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
+\fBwresize\fR [\fB\-h\fR|\fB\-v\fR] [\fIN\fR|+\fIN\fR|\-\- \-\fIN\fR]
 .RS
 If no parameter given, equalize window sizes in current frame.
 .P
@@ -959,7 +959,7 @@ Move right.
 Select characters
 .PP
 .RE
-\fBup\fR [\fB\-cl\fR]
+\fBup\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move cursor up.
 .P
@@ -972,7 +972,7 @@ Select characters
 Select whole lines
 .PP
 .RE
-\fBdown\fR [\fB\-cl\fR]
+\fBdown\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move cursor down.
 .P
@@ -985,7 +985,7 @@ Select characters
 Select whole lines
 .PP
 .RE
-\fBpgup\fR [\fB\-cl\fR]
+\fBpgup\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move cursor page up. See also \fBscroll\-pgup\fR.
 .P
@@ -998,7 +998,7 @@ Select characters
 Select whole lines
 .PP
 .RE
-\fBpgdown\fR [\fB\-cl\fR]
+\fBpgdown\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move cursor page down. See also \fBscroll\-pgdown\fR.
 .P
@@ -1130,7 +1130,7 @@ parent directories.
 See also: \fBmsg\fR command.
 .P
 .RE
-\fBmsg\fR [\fB\-np\fR]
+\fBmsg\fR [\fB\-n\fR|\fB\-p\fR]
 .RS
 Show latest, next (\fB\-n\fR) or previous (\fB\-p\fR) message. If its location
 is known (compile error or tag message) then the file will be
@@ -1251,7 +1251,7 @@ Erase word before cursor.
 Be more "aggressive"
 .PP
 .RE
-\fBcase\fR [\fB\-lu\fR]
+\fBcase\fR [\fB\-l\fR|\fB\-u\fR]
 .RS
 Change text case. The default is to change lower case to upper case and
 vice versa.
