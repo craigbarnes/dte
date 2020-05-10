@@ -179,11 +179,9 @@ void window_free(Window *w)
 }
 
 // Remove view from v->window and v->buffer->views and free it.
-void remove_view(View *v)
+size_t remove_view(View *v)
 {
     Window *w = v->window;
-    Buffer *b = v->buffer;
-
     if (v == w->prev_view) {
         w->prev_view = NULL;
     }
@@ -192,9 +190,11 @@ void remove_view(View *v)
         buffer = NULL;
     }
 
-    ptr_array_remove(&w->views, v);
+    size_t idx = ptr_array_idx(&w->views, v);
+    ptr_array_remove_idx(&w->views, idx);
     w->update_tabbar = true;
 
+    Buffer *b = v->buffer;
     ptr_array_remove(&b->views, v);
     if (b->views.count == 0) {
         if (b->options.file_history && b->abs_filename) {
@@ -202,13 +202,14 @@ void remove_view(View *v)
         }
         free_buffer(b);
     }
+
     free(v);
+    return idx;
 }
 
 void window_close_current_view(Window *w)
 {
-    size_t idx = ptr_array_idx(&w->views, w->view);
-    remove_view(w->view);
+    size_t idx = remove_view(w->view);
     if (w->prev_view != NULL) {
         w->view = w->prev_view;
         w->prev_view = NULL;
