@@ -191,6 +191,7 @@ size_t remove_view(View *v)
     }
 
     size_t idx = ptr_array_idx(&w->views, v);
+    BUG_ON(idx >= w->views.count);
     ptr_array_remove_idx(&w->views, idx);
     w->update_tabbar = true;
 

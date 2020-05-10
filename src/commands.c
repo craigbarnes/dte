@@ -776,6 +776,7 @@ static void cmd_move_tab(const CommandArgs *a)
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
     size_t j, i = ptr_array_idx(&window->views, view);
+    BUG_ON(i >= ntabs);
     if (streq(str, "left")) {
         j = ((i - 1) + ntabs) % ntabs;
     } else if (streq(str, "right")) {
@@ -2038,6 +2039,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
     }
 
     size_t i = ptr_array_idx(&parent->frames, window->frame);
+    BUG_ON(i >= parent->frames.count);
     size_t j = i + 1;
     if (j == parent->frames.count) {
         j = 0;

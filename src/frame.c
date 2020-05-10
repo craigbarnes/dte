@@ -171,6 +171,7 @@ static void add_to_sibling_size(Frame *f, int count)
 {
     const Frame *parent = f->parent;
     size_t idx = ptr_array_idx(&parent->frames, f);
+    BUG_ON(idx >= parent->frames.count);
     if (idx == parent->frames.count - 1) {
         f = parent->frames.ptrs[idx - 1];
     } else {
@@ -197,6 +198,7 @@ static void subtract_from_sibling_size(const Frame *f, int count)
 {
     const Frame *parent = f->parent;
     size_t idx = ptr_array_idx(&parent->frames, f);
+    BUG_ON(idx >= parent->frames.count);
 
     for (size_t i = idx + 1, n = parent->frames.count; i < n; i++) {
         count = sub(parent->frames.ptrs[i], count);
@@ -402,6 +404,7 @@ Frame *split_frame(Window *w, bool vertical, bool before)
     }
 
     size_t idx = ptr_array_idx(&parent->frames, w->frame);
+    BUG_ON(idx >= parent->frames.count);
     if (!before) {
         idx++;
     }
@@ -471,6 +474,7 @@ void remove_frame(Frame *f)
         c->h = parent->h;
         if (gp) {
             size_t idx = ptr_array_idx(&gp->frames, parent);
+            BUG_ON(idx >= gp->frames.count);
             gp->frames.ptrs[idx] = c;
         } else {
             root_frame = c;
