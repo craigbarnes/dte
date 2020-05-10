@@ -81,7 +81,8 @@ static void editorconfig_option_set (
     }
 }
 
-static int ini_handler(const IniData *data, void *ud) {
+static int ini_handler(const IniData *data, void *ud)
+{
     UserData *userdata = ud;
 
     if (data->section.length == 0) {

@@ -29,9 +29,9 @@ noreturn void fatal_error(const char *msg, int err)
 
 #if DEBUG >= 1
 noreturn
-void bug(const char *file, int line, const char *func, const char *fmt, ...) {
+void bug(const char *file, int line, const char *func, const char *fmt, ...)
+{
     term_cleanup();
-
     fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
 
     va_list ap;
@@ -41,7 +41,6 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...) {
 
     fputs("'\n", stderr);
     fflush(stderr);
-
     abort();
 }
 #endif
