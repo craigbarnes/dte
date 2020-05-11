@@ -493,7 +493,8 @@ static const Command *find_syntax_command(const char *name)
 }
 
 static const CommandSet syntax_commands = {
-    .lookup = find_syntax_command
+    .lookup = find_syntax_command,
+    .allow_recording = NULL,
 };
 
 static void cmd_include(const CommandArgs *a)

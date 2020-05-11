@@ -2143,13 +2143,39 @@ static const Command cmds[] = {
     {"wswap", "", false, 0, 0, cmd_wswap},
 };
 
+static bool allow_macro_recording(const char *cmd_name, char **args)
+{
+    if (streq(cmd_name, "macro") || streq(cmd_name, "command")) {
+        return false;
+    }
+    if (streq(cmd_name, "search")) {
+        const Command *cmd = find_normal_command(cmd_name);
+        BUG_ON(!cmd);
+        char **args_copy = copy_string_array(args, string_array_length(args));
+        CommandArgs a = {.args = args_copy};
+        bool ret = true;
+        if (do_parse_args(cmd, &a, NULL)) {
+            if (a.nr_args == 0 && !strpbrk(a.flags, "npw")) {
+                // If command is "search" with no pattern argument and without
+                // flags -n, -p or -w, the command would put the editor into
+                // search mode, which shouldn't be recorded.
+                ret = false;
+            }
+        }
+        free_string_array(args_copy);
+        return ret;
+    }
+    return true;
+}
+
 const Command *find_normal_command(const char *name)
 {
     return BSEARCH(name, cmds, command_cmp);
 }
 
 const CommandSet commands = {
-    .lookup = find_normal_command
+    .lookup = find_normal_command,
+    .allow_recording = allow_macro_recording,
 };
 
 void collect_normal_commands(const char *prefix)

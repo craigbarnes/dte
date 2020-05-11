@@ -77,34 +77,9 @@ void macro_cancel(void)
     recording_macro = false;
 }
 
-static bool command_is_recordable(const char *name, char **args)
-{
-    if (streq(name, "macro") || streq(name, "command")) {
-        return false;
-    }
-    if (streq(name, "search")) {
-        const Command *cmd = find_normal_command(name);
-        BUG_ON(!cmd);
-        char **args_copy = copy_string_array(args, string_array_length(args));
-        CommandArgs a = {.args = args_copy};
-        bool ret = true;
-        if (do_parse_args(cmd, &a, NULL)) {
-            if (a.nr_args == 0 && !strpbrk(a.flags, "npw")) {
-                // If command is "search" with no pattern argument and without
-                // flags -n, -p or -w, the command would put the editor into
-                // search mode, which shouldn't be recorded.
-                ret = false;
-            }
-        }
-        free_string_array(args_copy);
-        return ret;
-    }
-    return true;
-}
-
 void macro_command_hook(const char *cmd_name, char **args)
 {
-    if (!recording_macro || !command_is_recordable(cmd_name, args)) {
+    if (!recording_macro) {
         return;
     }
     String buf = STRING_INIT;
