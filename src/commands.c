@@ -691,7 +691,8 @@ static void cmd_macro(const CommandArgs *a)
         {"stop", macro_stop},
         {"toggle", macro_toggle},
         {"cancel", macro_cancel},
-        {"run", macro_run},
+        {"play", macro_play},
+        {"run", macro_play},
     };
     const char *action = a->args[0];
     for (size_t i = 0; i < ARRAY_COUNT(actions); i++) {

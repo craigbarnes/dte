@@ -112,7 +112,7 @@ void macro_insert_text_hook(const char *text, size_t size)
     ptr_array_append(&macro, string_steal_cstring(&buf));
 }
 
-void macro_run(void)
+void macro_play(void)
 {
     begin_change_chain();
     unsigned int saved_nr_errors = get_nr_errors();
