@@ -21,32 +21,25 @@ static char *expand_dte_home(void)
 
 static char *expand_file(void)
 {
-    if (editor.status != EDITOR_RUNNING) {
+    if (!buffer || !buffer->abs_filename) {
         return NULL;
     }
-    const char *filename = buffer->abs_filename;
-    return filename ? xstrdup(filename) : NULL;
+    return xstrdup(buffer->abs_filename);
 }
 
 static char *expand_filetype(void)
 {
-    if (editor.status != EDITOR_RUNNING) {
-        return NULL;
-    }
-    return xstrdup(buffer->options.filetype);
+    return buffer ? xstrdup(buffer->options.filetype) : NULL;
 }
 
 static char *expand_lineno(void)
 {
-    if (editor.status != EDITOR_RUNNING) {
-        return NULL;
-    }
-    return xasprintf("%ld", view->cy + 1);
+    return view ? xasprintf("%ld", view->cy + 1) : NULL;
 }
 
 static char *expand_word(void)
 {
-    if (editor.status != EDITOR_RUNNING) {
+    if (!view) {
         return NULL;
     }
     size_t size;
