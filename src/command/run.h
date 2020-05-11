@@ -13,8 +13,9 @@ typedef struct {
 } CommandArgs;
 
 typedef struct {
-    const char name[16];
+    const char name[15];
     const char flags[8];
+    bool allow_in_rc;
     unsigned int min_args;
     unsigned int max_args;
     void (*cmd)(const CommandArgs *args);

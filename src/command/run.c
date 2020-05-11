@@ -3,53 +3,13 @@
 #include "parse.h"
 #include "alias.h"
 #include "change.h"
-#include "commands.h"
 #include "config.h"
-#include "debug.h"
 #include "error.h"
 #include "macro.h"
 #include "util/ptr-array.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 const Command *current_command;
-
-static bool allowed_command(const char *name)
-{
-    size_t len = strlen(name);
-    switch (len) {
-    case 3: return mem_equal(name, "set", len);
-    case 4: return mem_equal(name, "bind", len);
-    case 5: return mem_equal(name, "alias", len);
-    case 7: return mem_equal(name, "include", len);
-    case 8: return mem_equal(name, "errorfmt", len);
-    case 11: return mem_equal(name, "load-syntax", len);
-    case 2:
-        switch (name[0]) {
-        case 'c': return name[1] == 'd';
-        case 'f': return name[1] == 't';
-        case 'h': return name[1] == 'i';
-        }
-        return false;
-    case 6:
-        switch (name[0]) {
-        case 'o': return mem_equal(name, "option", len);
-        case 's': return mem_equal(name, "setenv", len);
-        }
-        return false;
-    }
-    return false;
-}
-
-UNITTEST {
-    BUG_ON(!allowed_command("alias"));
-    BUG_ON(!allowed_command("cd"));
-    BUG_ON(!allowed_command("include"));
-    BUG_ON(!allowed_command("set"));
-    BUG_ON(allowed_command("alias_"));
-    BUG_ON(allowed_command("c"));
-    BUG_ON(allowed_command("cD"));
-}
 
 static void run_commands(const CommandSet *cmds, const PointerArray *array, bool allow_recording);
 
@@ -86,7 +46,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
         return;
     }
 
-    if (config_file && cmds == &commands && !allowed_command(cmd->name)) {
+    if (config_file && !cmd->allow_in_rc) {
         error_msg("Command %s not allowed in config file.", cmd->name);
         return;
     }
@@ -134,7 +94,6 @@ static void run_commands(const CommandSet *cmds, const PointerArray *array, bool
     }
 
 out:
-    BUG_ON(recursion_count == 0);
     recursion_count--;
 }
 

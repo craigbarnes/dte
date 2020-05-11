@@ -470,21 +470,21 @@ static void cmd_include(const CommandArgs *a);
 static void cmd_require(const CommandArgs *a);
 
 static const Command cmds[] = {
-    {"bufis", "i", 2, 3, cmd_bufis},
-    {"char", "bn", 2, 3, cmd_char},
-    {"default", "", 2, -1, cmd_default},
-    {"eat", "", 1, 2, cmd_eat},
-    {"heredocbegin", "", 2, 2, cmd_heredocbegin},
-    {"heredocend", "", 1, 2, cmd_heredocend},
-    {"include", "b", 1, 1, cmd_include},
-    {"inlist", "", 2, 3, cmd_inlist},
-    {"list", "i", 2, -1, cmd_list},
-    {"noeat", "b", 1, 1, cmd_noeat},
-    {"recolor", "", 1, 2, cmd_recolor},
-    {"require", "f", 1, 1, cmd_require},
-    {"state", "", 1, 2, cmd_state},
-    {"str", "i", 2, 3, cmd_str},
-    {"syntax", "", 1, 1, cmd_syntax},
+    {"bufis", "i", true, 2, 3, cmd_bufis},
+    {"char", "bn", true, 2, 3, cmd_char},
+    {"default", "", true, 2, -1, cmd_default},
+    {"eat", "", true, 1, 2, cmd_eat},
+    {"heredocbegin", "", true, 2, 2, cmd_heredocbegin},
+    {"heredocend", "", true, 1, 2, cmd_heredocend},
+    {"include", "b", true, 1, 1, cmd_include},
+    {"inlist", "", true, 2, 3, cmd_inlist},
+    {"list", "i", true, 2, -1, cmd_list},
+    {"noeat", "b", true, 1, 1, cmd_noeat},
+    {"recolor", "", true, 1, 2, cmd_recolor},
+    {"require", "f", true, 1, 1, cmd_require},
+    {"state", "", true, 1, 2, cmd_state},
+    {"str", "i", true, 2, 3, cmd_str},
+    {"syntax", "", true, 1, 1, cmd_syntax},
 };
 
 static const Command *find_syntax_command(const char *name)
