@@ -53,7 +53,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
-    if (allow_recording && cmds->allow_recording(cmd->name, av + 1)) {
+    if (allow_recording && cmds->allow_recording(cmd, av + 1)) {
         macro_command_hook(cmd->name, av + 1);
     }
 

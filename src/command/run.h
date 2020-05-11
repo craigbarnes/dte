@@ -23,7 +23,7 @@ typedef struct {
 
 typedef struct {
     const Command* (*lookup)(const char *name);
-    bool (*allow_recording)(const char *name, char **args);
+    bool (*allow_recording)(const Command *cmd, char **args);
 } CommandSet;
 
 extern const Command *current_command;

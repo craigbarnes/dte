@@ -471,6 +471,7 @@ static void cmd_exec_open(const CommandArgs *a)
 
     ptr_array_append(&filenames, NULL);
     window_open_files(window, (char**)filenames.ptrs, NULL);
+    macro_command_hook("open", (char**)filenames.ptrs);
     ptr_array_free_array(&filenames);
     string_free(&ctx.output);
 }
@@ -494,7 +495,7 @@ static void cmd_exec_tag(const CommandArgs *a)
     string_append_literal(&s, "tag ");
     string_append_escaped_arg_sv(&s, string_view(tag, tag_len), true);
     string_free(&ctx.output);
-    handle_command(&commands, string_borrow_cstring(&s), false);
+    handle_command(&commands, string_borrow_cstring(&s), true);
     string_free(&s);
 }
 
@@ -2143,14 +2144,17 @@ static const Command cmds[] = {
     {"wswap", "", false, 0, 0, cmd_wswap},
 };
 
-static bool allow_macro_recording(const char *cmd_name, char **args)
+static bool allow_macro_recording(const Command *cmd, char **args)
 {
-    if (streq(cmd_name, "macro") || streq(cmd_name, "command")) {
-        return false;
+    static const void *const non_recordable[] = {
+        cmd_macro, cmd_command, cmd_exec_open, cmd_exec_tag,
+    };
+    for (size_t i = 0; i < ARRAY_COUNT(non_recordable); i++) {
+        if (cmd->cmd == non_recordable[i]) {
+            return false;
+        }
     }
-    if (streq(cmd_name, "search")) {
-        const Command *cmd = find_normal_command(cmd_name);
-        BUG_ON(!cmd);
+    if (cmd->cmd == cmd_search) {
         char **args_copy = copy_string_array(args, string_array_length(args));
         CommandArgs a = {.args = args_copy};
         bool ret = true;
