@@ -1,5 +1,5 @@
-#ifndef MACRO_H
-#define MACRO_H
+#ifndef COMMAND_MACRO_H
+#define COMMAND_MACRO_H
 
 #include <stdbool.h>
 #include <stddef.h>

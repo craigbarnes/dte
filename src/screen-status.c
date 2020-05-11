@@ -1,7 +1,7 @@
 #include "screen.h"
+#include "command/macro.h"
 #include "debug.h"
 #include "editor.h"
-#include "macro.h"
 #include "selection.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"

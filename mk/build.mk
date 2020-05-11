@@ -36,7 +36,7 @@ util_objects := $(call prefix-obj, build/util/, \
     strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
-    args env parse run serialize )
+    args env macro parse run serialize )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
@@ -55,7 +55,7 @@ editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer change cmdline commands \
     compiler completion config ctags debug edit editor error \
     file-history file-option filetype frame history indent \
-    load-save lock macro main mode move msg options regexp \
+    load-save lock main mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection show spawn tag view window ) \
     $(command_objects) \
