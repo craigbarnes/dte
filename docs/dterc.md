@@ -988,6 +988,9 @@ The _type_ argument can be one of:
 `include`
 :   built-in configs
 
+`macro`
+:   command macros
+
 `option`
 :   option values
 
@@ -1000,6 +1003,30 @@ specified _type_ will be displayed in a new buffer.
 
 `-c`
 :   write value to command line (if possible)
+
+### **macro** _action_
+
+Record and replay command macros.
+
+The _action_ argument can be one of:
+
+`record`
+:   Begin recording
+
+`stop`
+:   Stop recording
+
+`toggle`
+:   Toggle recording on/off
+
+`cancel`
+:   Stop recording, without overwriting the previous macro
+
+`play`
+:   Replay the previously recorded macro
+
+Once a macro has been recorded, it can be viewed in text form
+by running [`show macro`].
 
 # Options
 
@@ -1267,6 +1294,7 @@ errors should be highlighted. Set to `""` to disable.
 [`scroll-pgdown`]: #scroll-pgdown
 [`scroll-pgup`]: #scroll-pgup
 [`set`]: #set
+[`show macro`]: #show
 [`tag`]: #tag
 [`toggle`]: #toggle
 [`undo`]: #undo

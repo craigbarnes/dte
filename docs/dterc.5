@@ -198,6 +198,8 @@ Other Commands:
 .br
    \fBshow\fR [\fB\-c\fR] \fItype\fR [\fIkey\fR]
 .br
+   \fBmacro\fR \fIaction\fR
+.br
 .P
 Options:
 .br
@@ -1530,6 +1532,10 @@ environment variables
 built\-in configs
 .PP
 .TP
+\fBmacro\fR
+command macros
+.PP
+.TP
 \fBoption\fR
 option values
 .PP
@@ -1545,6 +1551,36 @@ specified \fItype\fR will be displayed in a new buffer.
 \fB\-c\fR
 write value to command line (if possible)
 .PP
+.RE
+\fBmacro\fR \fIaction\fR
+.RS
+Record and replay command macros.
+.P
+The \fIaction\fR argument can be one of:
+.P
+.TP
+\fBrecord\fR
+Begin recording
+.PP
+.TP
+\fBstop\fR
+Stop recording
+.PP
+.TP
+\fBtoggle\fR
+Toggle recording on/off
+.PP
+.TP
+\fBcancel\fR
+Stop recording, without overwriting the previous macro
+.PP
+.TP
+\fBplay\fR
+Replay the previously recorded macro
+.PP
+Once a macro has been recorded, it can be viewed in text form
+by running \fBshow macro\fR.
+.P
 .RE
 .SH OPTIONS
 Options can be changed using the \fBset\fR command. Enumerated options can
