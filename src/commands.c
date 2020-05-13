@@ -2159,7 +2159,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         char **args_copy = copy_string_array(args, string_array_length(args));
         CommandArgs a = {.args = args_copy};
         bool ret = true;
-        if (do_parse_args(cmd, &a, NULL)) {
+        if (do_parse_args(cmd, &a) == 0) {
             if (a.nr_args == 0 && !strpbrk(a.flags, "npw")) {
                 // If command is "search" with no pattern argument and without
                 // flags -n, -p or -w, the command would put the editor into

@@ -100,7 +100,7 @@ static KeyBinding *key_binding_new(const char *cmd_str)
 
     free(ptr_array_remove_idx(&array, 0));
     CommandArgs a = {.args = (char**)array.ptrs};
-    if (!do_parse_args(cmd, &a, NULL)) {
+    if (do_parse_args(cmd, &a) != 0) {
         goto out;
     }
 

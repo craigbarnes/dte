@@ -6,7 +6,7 @@
 #include "util/macros.h"
 
 typedef enum {
-    ARGERR_INVALID_OPTION,
+    ARGERR_INVALID_OPTION = 1,
     ARGERR_TOO_MANY_OPTIONS,
     ARGERR_OPTION_ARGUMENT_NOT_SEPARATE,
     ARGERR_OPTION_ARGUMENT_MISSING,
@@ -14,12 +14,7 @@ typedef enum {
     ARGERR_TOO_MANY_ARGUMENTS,
 } ArgParseErrorType;
 
-typedef struct {
-    ArgParseErrorType type;
-    char flag;
-} ArgParseError;
-
 bool parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
-bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err) NONNULL_ARG(1, 2);
+unsigned int do_parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
 
 #endif

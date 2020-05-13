@@ -10,9 +10,9 @@
  * Other arguments come right after flag arguments.
  *
  * a->args field should be set before calling.
- * If parsing succeeds, the other field are set and true is returned.
+ * If parsing succeeds, the other fields are set and 0 is returned.
  */
-bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
+unsigned int do_parse_args(const Command *cmd, CommandArgs *a)
 {
     char **args = a->args;
     BUG_ON(!args);
@@ -23,7 +23,6 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
     }
 
     const char *flag_desc = cmd->flags;
-    ArgParseErrorType err_type;
     char flag = '\0';
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
@@ -59,26 +58,22 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
             char *flagp = strchr(flag_desc, flag);
 
             if (!flagp || flag == '=') {
-                err_type = ARGERR_INVALID_OPTION;
-                goto error;
+                return ARGERR_INVALID_OPTION | (flag << 8);
             }
             a->flags[nr_flags++] = flag;
             if (nr_flags == ARRAY_COUNT(a->flags)) {
-                err_type = ARGERR_TOO_MANY_OPTIONS;
-                goto error;
+                return ARGERR_TOO_MANY_OPTIONS;
             }
             if (flagp[1] != '=') {
                 continue;
             }
 
             if (j > 1 || arg[j + 1]) {
-                err_type = ARGERR_OPTION_ARGUMENT_NOT_SEPARATE;
-                goto error;
+                return ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | (flag << 8);
             }
             flag_arg = args[i + 1];
             if (!flag_arg) {
-                err_type = ARGERR_OPTION_ARGUMENT_MISSING;
-                goto error;
+                return ARGERR_OPTION_ARGUMENT_MISSING | (flag << 8);
             }
 
             // Move flag argument before any other arguments
@@ -102,35 +97,30 @@ bool do_parse_args(const Command *cmd, CommandArgs *a, ArgParseError *err)
     argc -= nr_flag_args;
 
     if (argc < cmd->min_args) {
-        err_type = ARGERR_TOO_FEW_ARGUMENTS;
-        goto error;
+        return ARGERR_TOO_FEW_ARGUMENTS;
     }
     if (argc > cmd->max_args) {
-        err_type = ARGERR_TOO_MANY_ARGUMENTS;
-        goto error;
+        return ARGERR_TOO_MANY_ARGUMENTS;
     }
     a->flags[nr_flags] = '\0';
 
     a->nr_args = argc;
     a->nr_flags = nr_flags;
-    return true;
-
-error:
-    if (err) {
-        *err = (ArgParseError){.type = err_type, .flag = flag};
-    }
-    return false;
+    return 0;
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
-    ArgParseError err;
-    if (do_parse_args(cmd, a, &err)) {
+    unsigned int err = do_parse_args(cmd, a);
+    if (err == 0) {
         return true;
     }
-    switch (err.type) {
+
+    ArgParseErrorType err_type = err & 0xFF;
+    char flag = (err >> 8) & 0xFF;
+    switch (err_type) {
     case ARGERR_INVALID_OPTION:
-        error_msg("Invalid option -%c", err.flag);
+        error_msg("Invalid option -%c", flag);
         break;
     case ARGERR_TOO_MANY_OPTIONS:
         error_msg("Too many options given");
@@ -139,11 +129,11 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         error_msg (
             "Flag -%c must be given separately because it"
             " requires an argument",
-            err.flag
+            flag
         );
         break;
     case ARGERR_OPTION_ARGUMENT_MISSING:
-        error_msg("Option -%c requires an argument", err.flag);
+        error_msg("Option -%c requires an argument", flag);
         break;
     case ARGERR_TOO_FEW_ARGUMENTS:
         error_msg("Not enough arguments");
