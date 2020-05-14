@@ -50,8 +50,8 @@ bool regexp_exec (
     int flags
 ) {
     BUG_ON(!nr_m);
-// Clang ASan/MSan doesn't seem to take REG_STARTEND into account
-#if defined(REG_STARTEND) && !defined(CLANG_ASAN_OR_MSAN_ENABLED)
+// ASan/MSan don't seem to take REG_STARTEND into account
+#if defined(REG_STARTEND) && !(defined(ASAN_ENABLED) || defined(MSAN_ENABLED))
     m[0].rm_so = 0;
     m[0].rm_eo = size;
     return !regexec(re, buf, nr_m, m, flags | REG_STARTEND);

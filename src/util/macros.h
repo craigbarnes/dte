@@ -73,16 +73,8 @@
     #define ASAN_ENABLED 1
 #endif
 
-#if defined(__clang__) && HAS_FEATURE(address_sanitizer)
-    #define CLANG_ASAN_ENABLED 1
-#endif
-
-#if defined(__clang__) && HAS_FEATURE(memory_sanitizer)
-    #define CLANG_MSAN_ENABLED 1
-#endif
-
-#if defined(CLANG_ASAN_ENABLED) || defined(CLANG_MSAN_ENABLED)
-    #define CLANG_ASAN_OR_MSAN_ENABLED 1
+#if defined(__SANITIZE_MEMORY__) || HAS_FEATURE(memory_sanitizer)
+    #define MSAN_ENABLED 1
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
