@@ -1,3 +1,0 @@
-# This file is kept for backwards compatibility purposes.
-# It was used to bind Shift+move selection keys, until they were
-# integrated into the editor as a built-in feature (e.g `left -c`).

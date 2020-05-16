@@ -23,8 +23,7 @@ BUILTIN_SYNTAX_FILES ?= \
     vala xml xresources zig inc/c-comment inc/c-uchar
 
 BUILTIN_CONFIGS = $(addprefix config/, \
-    rc compiler/gcc compiler/go \
-    binding/default binding/shift-select \
+    rc binding/default compiler/gcc compiler/go \
     $(addprefix color/, reset reset-basic default darkgray) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
