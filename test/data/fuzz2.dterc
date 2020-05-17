@@ -9,7 +9,6 @@ toggle syntax
 toggle brace-indent
 toggle display-invisible
 toggle display-special
-toggle lock-files
 toggle set-window-title
 toggle show-line-numbers
 toggle tab-bar
