@@ -1,0 +1,7 @@
+image: openbsd/latest
+packages: [gmake, gcc]
+sources: [https://git.sr.ht/~xcb/dte]
+tasks:
+    - build: |
+        cd dte
+        make check DEBUG=3 V=1
