@@ -445,12 +445,12 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     BOOL_OPT("fsync", C(fsync), NULL),
-    UINT_OPT("indent-width", C(indent_width), 1, 8, NULL),
     STR_OPT("indent-regex", L(indent_regex), validate_regex, NULL),
+    UINT_OPT("indent-width", C(indent_width), 1, 8, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
-    BOOL_OPT("select-cursor-char", G(select_cursor_char), NULL),
     UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, NULL),
+    BOOL_OPT("select-cursor-char", G(select_cursor_char), NULL),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
     BOOL_OPT("show-line-numbers", G(show_line_numbers), NULL),
     STR_OPT("statusline-left", G(statusline_left), validate_statusline_format, NULL),
@@ -461,6 +461,16 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("text-width", C(text_width), 1, 1000, NULL),
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
+
+UNITTEST {
+    for (size_t i = 1; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *curr = &option_desc[i];
+        const OptionDesc *prev = &option_desc[i - 1];
+        if (strcmp(curr->name, prev->name) <= 0) {
+            BUG("Not in sorted order: %s, %s", prev->name, curr->name);
+        }
+    }
+}
 
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
@@ -487,15 +497,16 @@ static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
     }
 }
 
+static int option_cmp(const void *key, const void *elem)
+{
+    const char *name = key;
+    const OptionDesc *desc = elem;
+    return strcmp(name, desc->name);
+}
+
 static const OptionDesc *find_option(const char *name)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
-        const OptionDesc *desc = &option_desc[i];
-        if (streq(name, desc->name)) {
-            return desc;
-        }
-    }
-    return NULL;
+    return BSEARCH(name, option_desc, option_cmp);
 }
 
 static const OptionDesc *must_find_option(const char *name)
