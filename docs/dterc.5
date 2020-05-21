@@ -49,7 +49,7 @@ Editor Commands:
 .P
 Buffer Management Commands:
 .br
-   \fBopen\fR [\fB\-g\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
+   \fBopen\fR [\fB\-g\fR|\fB\-t\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
 .br
    \fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .br
@@ -66,7 +66,7 @@ Buffer Management Commands:
 .P
 Window Management Commands:
 .br
-   \fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
+   \fBwsplit\fR [\fB\-bhr\fR] [\fB\-g\fR|\fB\-t\fR] [\fIfilename\fR]...
 .br
    \fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
 .br
@@ -781,7 +781,7 @@ Trigger a full redraw of the screen.
 .P
 .RE
 .SS Buffer Management Commands
-\fBopen\fR [\fB\-g\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
+\fBopen\fR [\fB\-g\fR|\fB\-t\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
 .RS
 Open file. If \fIfilename\fR is omitted, a new file is opened.
 .P
@@ -792,6 +792,11 @@ Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .TP
 \fB\-g\fR
 Perform \fBglob\fR(7) expansion on \fIfilename\fR.
+.PP
+.TP
+\fB\-t\fR
+Mark buffer as "temporary" (always closeable, without warnings for
+"unsaved changes")
 .PP
 .RE
 \fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
@@ -861,7 +866,7 @@ Move current tab to position \fIN\fR or 1 position left or right.
 .P
 .RE
 .SS Window Management Commands
-\fBwsplit\fR [\fB\-bghr\fR] [\fIfilename\fR]...
+\fBwsplit\fR [\fB\-bhr\fR] [\fB\-g\fR|\fB\-t\fR] [\fIfilename\fR]...
 .RS
 Like [\fBopen\fR] but at first splits current window vertically.
 .P
@@ -880,6 +885,11 @@ Split horizontally instead of vertically.
 .TP
 \fB\-r\fR
 Split root instead of current window.
+.PP
+.TP
+\fB\-t\fR
+Mark buffer as "temporary" (always closeable, without warnings
+for "unsaved changes")
 .PP
 .RE
 \fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
@@ -1676,7 +1686,7 @@ Prints \fB*\fR if file is has been modified since last save.
 .PP
 .TP
 \fB%r\fR
-Prints \fBRO\fR if file is read\-only.
+Prints \fBRO\fR for read\-only buffers or \fBTMP\fR for temporary buffers.
 .PP
 .TP
 \fB%y\fR

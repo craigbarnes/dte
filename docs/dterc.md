@@ -399,7 +399,7 @@ Trigger a full redraw of the screen.
 
 ## Buffer Management Commands
 
-### **open** [**-g**] [**-e** _encoding_] [_filename_]...
+### **open** [**-g**|**-t**] [**-e** _encoding_] [_filename_]...
 
 Open file. If _filename_ is omitted, a new file is opened.
 
@@ -408,6 +408,10 @@ Open file. If _filename_ is omitted, a new file is opened.
 
 `-g`
 :   Perform [`glob`] expansion on _filename_.
+
+`-t`
+:   Mark buffer as "temporary" (always closeable, without warnings for
+    "unsaved changes")
 
 ### **save** [**-fp**] [**-d**|**-u**] [**-e** _encoding_] [_filename_]
 
@@ -462,7 +466,7 @@ Move current tab to position _N_ or 1 position left or right.
 
 ## Window Management Commands
 
-### **wsplit** [**-bghr**] [_filename_]...
+### **wsplit** [**-bhr**] [**-g**|**-t**] [_filename_]...
 
 Like [`open`] but at first splits current window vertically.
 
@@ -477,6 +481,10 @@ Like [`open`] but at first splits current window vertically.
 
 `-r`
 :   Split root instead of current window.
+
+`-t`
+:   Mark buffer as "temporary" (always closeable, without warnings
+    for "unsaved changes")
 
 ### **wclose** [**-f**|**-p**]
 
@@ -1108,7 +1116,7 @@ Format string for the left aligned part of status line.
 :   Prints `*` if file is has been modified since last save.
 
 `%r`
-:   Prints `RO` if file is read-only.
+:   Prints `RO` for read-only buffers or `TMP` for temporary buffers.
 
 `%y`
 :   Cursor row.
