@@ -1689,6 +1689,10 @@ Prints \fB*\fR if file is has been modified since last save.
 Prints \fBRO\fR for read\-only buffers or \fBTMP\fR for temporary buffers.
 .PP
 .TP
+\fB%R\fR
+Prints \fB[Recording]\fR if recording a macro.
+.PP
+.TP
 \fB%y\fR
 Cursor row.
 .PP
@@ -1723,11 +1727,16 @@ Line\-ending (\fBLF\fR or \fBCRLF\fR).
 .PP
 .TP
 \fB%N\fR
-Line\-ending (only if \fBCRLF\fR)
+Line\-ending (only if \fBCRLF\fR).
 .PP
 .TP
 \fB%s\fR
-Add separator.
+Separator (a single space, unless the preceding format character
+expanded to an empty string).
+.PP
+.TP
+\fB%S\fR
+Like \fB%s\fR, but 3 spaces instead of 1.
 .PP
 .TP
 \fB%t\fR

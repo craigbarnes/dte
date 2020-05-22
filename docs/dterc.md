@@ -1118,6 +1118,9 @@ Format string for the left aligned part of status line.
 `%r`
 :   Prints `RO` for read-only buffers or `TMP` for temporary buffers.
 
+`%R`
+:   Prints `[Recording]` if recording a [macro](#macro).
+
 `%y`
 :   Cursor row.
 
@@ -1144,10 +1147,14 @@ Format string for the left aligned part of status line.
 :   Line-ending (`LF` or `CRLF`).
 
 `%N`
-:   Line-ending (only if `CRLF`)
+:   Line-ending (only if `CRLF`).
 
 `%s`
-:   Add separator.
+:   Separator (a single space, unless the preceding format character
+    expanded to an empty string).
+
+`%S`
+:   Like `%s`, but 3 spaces instead of 1.
 
 `%t`
 :   File type.
