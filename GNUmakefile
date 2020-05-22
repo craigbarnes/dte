@@ -59,7 +59,7 @@ uninstall-desktop-file:
 	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
 
 tags:
-	ctags $$(find src/ test/ -type f -name '*.[ch]')
+	ctags src/*.[ch] src/*/*.[ch] test/*.[ch]
 
 clean:
 	$(RM) $(CLEANFILES)
