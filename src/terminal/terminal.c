@@ -56,10 +56,8 @@ static const TermEntry terms[] = {
     {"mlterm", 6, TERM_8_COLOR, 0, false},
     {"mlterm2", 7, TERM_8_COLOR, 0, false},
     {"mlterm3", 7, TERM_8_COLOR, 0, false},
-    {"mrxvt", 5, TERM_8_COLOR, 0, true},
     {"pcansi", 6, TERM_8_COLOR, 3, false},
     {"putty", 5, TERM_8_COLOR, 22, true},
-    {"rxvt", 4, TERM_8_COLOR, 0, true},
     {"screen", 6, TERM_8_COLOR, 0, false},
     {"st", 2, TERM_8_COLOR, 0, true},
     {"stterm", 6, TERM_8_COLOR, 0, true},
@@ -182,8 +180,8 @@ void term_init(void)
         }
     }
 
-    if (str_has_prefix(term, "rxvt-unicode")) {
-        // urxvt can't be handled by the lookup table because it's a
+    if (str_has_prefix(term, "rxvt") || str_has_prefix(term, "mrxvt")) {
+        // rxvt can't be handled by the lookup table because it's a
         // special case and requires a custom KeyCode parser
         terminal.parse_key_sequence = rxvt_parse_key;
         terminal.ncv_attributes = 0;
