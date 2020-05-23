@@ -81,23 +81,23 @@ static inline bool buffer_modified(const Buffer *b)
     return b->saved_change != b->cur_change && !b->temporary;
 }
 
-void buffer_mark_lines_changed(Buffer *b, long min, long max);
-const char *buffer_filename(const Buffer *b);
+void buffer_mark_lines_changed(Buffer *b, long min, long max) NONNULL_ARGS;
+const char *buffer_filename(const Buffer *b) NONNULL_ARGS;
 
 void set_display_filename(Buffer *b, char *name) NONNULL_ARGS;
 char *short_filename(const char *absolute) XSTRDUP;
-void update_short_filename_cwd(Buffer *b, const char *cwd);
-void update_short_filename(Buffer *b);
-bool buffer_stat(Buffer *b, const char *filename);
-bool buffer_fstat(Buffer *b, int fd);
-Buffer *find_buffer(const char *abs_filename);
+void update_short_filename_cwd(Buffer *b, const char *cwd) NONNULL_ARG(1);
+void update_short_filename(Buffer *b) NONNULL_ARGS;
+bool buffer_stat(Buffer *b, const char *filename) NONNULL_ARGS;
+bool buffer_fstat(Buffer *b, int fd) NONNULL_ARGS;
+Buffer *find_buffer(const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(unsigned long id);
-Buffer *buffer_new(const Encoding *encoding);
-Buffer *open_empty_buffer(const char *display_name);
-void free_buffer(Buffer *b);
-void free_blocks(Buffer *b);
-bool buffer_detect_filetype(Buffer *b);
-void buffer_update_syntax(Buffer *b);
-void buffer_setup(Buffer *b);
+Buffer *buffer_new(const Encoding *encoding) RETURNS_NONNULL;
+Buffer *open_empty_buffer(const char *display_name) NONNULL_ARGS_AND_RETURN;
+void free_buffer(Buffer *b) NONNULL_ARGS;
+void free_blocks(Buffer *b) NONNULL_ARGS;
+bool buffer_detect_filetype(Buffer *b) NONNULL_ARGS;
+void buffer_update_syntax(Buffer *b) NONNULL_ARGS;
+void buffer_setup(Buffer *b) NONNULL_ARGS;
 
 #endif

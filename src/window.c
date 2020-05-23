@@ -35,7 +35,7 @@ View *window_add_buffer(Window *w, Buffer *b)
 
 View *window_open_empty_buffer(Window *w)
 {
-    return window_add_buffer(w, open_empty_buffer(NULL));
+    return window_add_buffer(w, open_empty_buffer("(No name)"));
 }
 
 View *window_open_buffer (

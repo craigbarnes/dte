@@ -82,16 +82,12 @@ Buffer *buffer_new(const Encoding *encoding)
 Buffer *open_empty_buffer(const char *display_name)
 {
     Buffer *b = buffer_new(&editor.charset);
+    set_display_filename(b, xstrdup(display_name));
 
     // At least one block required
     Block *blk = block_new(1);
     list_add_before(&blk->node, &b->blocks);
 
-    if (!display_name) {
-        display_name = "(No name)";
-    }
-
-    set_display_filename(b, xstrdup(display_name));
     return b;
 }
 
