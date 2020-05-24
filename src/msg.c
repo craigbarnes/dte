@@ -19,26 +19,6 @@ void file_location_free(FileLocation *loc)
     free(loc);
 }
 
-static bool file_location_equals(const FileLocation *a, const FileLocation *b)
-{
-    if (!xstreq(a->filename, b->filename)) {
-        return false;
-    }
-    if (a->buffer_id != b->buffer_id) {
-        return false;
-    }
-    if (!xstreq(a->pattern, b->pattern)) {
-        return false;
-    }
-    if (a->line != b->line) {
-        return false;
-    }
-    if (a->column != b->column) {
-        return false;
-    }
-    return true;
-}
-
 static bool file_location_go(const FileLocation *loc)
 {
     Window *w = window;
@@ -117,30 +97,6 @@ static void free_message(Message *m)
     free(m);
 }
 
-static bool message_equals(const Message *a, const Message *b)
-{
-    if (!streq(a->msg, b->msg)) {
-        return false;
-    }
-    if (a->loc == NULL) {
-        return b->loc == NULL;
-    }
-    if (b->loc == NULL) {
-        return false;
-    }
-    return file_location_equals(a->loc, b->loc);
-}
-
-static bool is_duplicate(const Message *m)
-{
-    for (size_t i = 0; i < msgs.count; i++) {
-        if (message_equals(m, msgs.ptrs[i])) {
-            return true;
-        }
-    }
-    return false;
-}
-
 Message *new_message(const char *msg)
 {
     Message *m = xnew0(Message, 1);
@@ -150,11 +106,7 @@ Message *new_message(const char *msg)
 
 void add_message(Message *m)
 {
-    if (is_duplicate(m)) {
-        free_message(m);
-    } else {
-        ptr_array_append(&msgs, m);
-    }
+    ptr_array_append(&msgs, m);
 }
 
 void activate_current_message(void)
