@@ -4,20 +4,14 @@ typedef struct {
     FileTypeEnum filetype;
 } FileSignatureMap;
 
-#define SIG(str, ft) { \
-    .bytes = str, \
-    .length = STRLEN(str), \
-    .filetype = ft \
-}
-
 static const FileSignatureMap signatures[] = {
-    SIG("<!DOCTYPE", XML),
-    SIG("<?xml", XML),
-    SIG("%YAML", YAML),
-    SIG("[core]", INI), // .git/config file
-    SIG("[wrap-file]", INI), // Meson wrap file
-    SIG("[Trigger]", INI), // libalpm hook
-    SIG("diff --git", DIFF),
+    {STRN("<!DOCTYPE"), XML},
+    {STRN("<?xml"), XML},
+    {STRN("%YAML"), YAML},
+    {STRN("[core]"), INI}, // .git/config file
+    {STRN("[wrap-file]"), INI}, // Meson wrap file
+    {STRN("[Trigger]"), INI}, // libalpm hook
+    {STRN("diff --git"), DIFF},
 };
 
 static FileTypeEnum filetype_from_signature(const StringView sv)
