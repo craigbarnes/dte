@@ -1131,6 +1131,18 @@ static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_quit(const CommandArgs *a)
 {
+    int exit_code = 0;
+    if (a->nr_args) {
+        if (!str_to_int(a->args[0], &exit_code)) {
+            error_msg("Not a valid integer argument: '%s'", a->args[0]);
+            return;
+        }
+        if (exit_code < 0 || exit_code > 125) {
+            error_msg("Exit code should be between 0 and 125");
+            return;
+        }
+    }
+
     if (has_flag(a, 'f')) {
         goto exit;
     }
@@ -1140,7 +1152,6 @@ static void cmd_quit(const CommandArgs *a)
         if (buffer_modified(b)) {
             // Activate modified buffer
             View *v = window_find_view(window, b);
-
             if (v == NULL) {
                 // Buffer isn't open in current window.
                 // Activate first window of the buffer.
@@ -1166,6 +1177,7 @@ static void cmd_quit(const CommandArgs *a)
 
 exit:
     editor.status = EDITOR_EXITING;
+    editor.exit_code = exit_code;
 }
 
 static void cmd_redo(const CommandArgs *a)
@@ -2107,7 +2119,7 @@ static const Command cmds[] = {
     {"pipe-from", "-ms", false, 1, -1, cmd_pipe_from},
     {"pipe-to", "-l", false, 1, -1, cmd_pipe_to},
     {"prev", "", false, 0, 0, cmd_prev},
-    {"quit", "fp", false, 0, 0, cmd_quit},
+    {"quit", "fp", false, 0, 1, cmd_quit},
     {"redo", "", false, 0, 1, cmd_redo},
     {"refresh", "", false, 0, 0, cmd_refresh},
     {"repeat", "", false, 2, -1, cmd_repeat},

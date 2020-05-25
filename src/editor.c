@@ -30,6 +30,7 @@ EditorState editor = {
     .child_controls_terminal = false,
     .everything_changed = false,
     .resized = false,
+    .exit_code = 0,
     .buffers = PTR_ARRAY_INIT,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,

@@ -33,6 +33,7 @@ typedef struct {
     bool child_controls_terminal;
     bool everything_changed;
     bool term_utf8;
+    int exit_code;
     size_t cmdline_x;
     PointerArray buffers;
     PointerArray search_history;

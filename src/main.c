@@ -512,5 +512,5 @@ loop_break:
         free(stdout_buffer);
     }
 
-    return 0;
+    return editor.exit_code;
 }

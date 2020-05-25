@@ -349,7 +349,7 @@ actually apply a syntax highlighter to the current buffer, use the
 
 ## Editor Commands
 
-### **quit** [**-f**|**-p**]
+### **quit** [**-f**|**-p**] [_exitcode_]
 
 Quit the editor.
 
