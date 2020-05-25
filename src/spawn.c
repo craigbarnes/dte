@@ -25,41 +25,62 @@ static void handle_error_msg(const Compiler *c, char *str)
         return;
     }
 
-    size_t len = 0;
-    for (char ch; (ch = str[len]); len++) {
+    size_t str_len = 0;
+    for (char ch; (ch = str[str_len]); str_len++) {
         if (ch == '\t') {
-            str[len] = ' ';
+            str[str_len] = ' ';
         }
     }
-    if (str[len - 1] == '\n') {
-        str[--len] = '\0';
+    if (str[str_len - 1] == '\n') {
+        str[--str_len] = '\0';
     }
 
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
-        PointerArray m = PTR_ARRAY_INIT;
-        if (!regexp_exec_sub(&p->re, str, len, &m, 0)) {
+        regmatch_t m[16];
+        if (!regexp_exec(&p->re, str, str_len, ARRAY_COUNT(m), m, 0)) {
             continue;
         }
-        if (!p->ignore) {
-            Message *msg = new_message(m.ptrs[p->msg_idx]);
-            msg->loc = xnew0(FileLocation, 1);
-            if (p->file_idx >= 0) {
-                msg->loc->filename = xstrdup(m.ptrs[p->file_idx]);
-                if (p->line_idx >= 0) {
-                    str_to_ulong(m.ptrs[p->line_idx], &msg->loc->line);
-                }
-                if (p->column_idx >= 0) {
-                    str_to_ulong(m.ptrs[p->column_idx], &msg->loc->column);
+
+        if (p->ignore) {
+            return;
+        }
+
+        int8_t mi = p->msg_idx;
+        if (m[mi].rm_so < 0) {
+            mi = 0;
+        }
+        Message *msg = new_message(str + m[mi].rm_so, m[mi].rm_eo - m[mi].rm_so);
+        msg->loc = xnew0(FileLocation, 1);
+
+        int8_t fi = p->file_idx;
+        if (fi >= 0 && m[fi].rm_so >= 0) {
+            msg->loc->filename = xstrslice(str, m[fi].rm_so, m[fi].rm_eo);
+            int8_t li = p->line_idx;
+            if (li >= 0 && m[li].rm_so >= 0) {
+                size_t len = m[li].rm_eo - m[li].rm_so;
+                unsigned long val;
+                size_t parsed_len = buf_parse_ulong(str + m[li].rm_so, len, &val);
+                if (parsed_len == len) {
+                    msg->loc->line = val;
                 }
             }
-            add_message(msg);
+            int8_t ci = p->column_idx;
+            if (ci >= 0 && m[ci].rm_so >= 0) {
+                size_t len = m[ci].rm_eo - m[ci].rm_so;
+                unsigned long val;
+                size_t parsed_len = buf_parse_ulong(str + m[ci].rm_so, len, &val);
+                if (parsed_len == len) {
+                    msg->loc->column = val;
+                }
+            }
         }
-        ptr_array_free(&m);
+
+        add_message(msg);
         return;
     }
 
-    add_message(new_message(str));
+    add_message(new_message(str, str_len));
 }
 
 static void read_errors(const Compiler *c, int fd, bool quiet)

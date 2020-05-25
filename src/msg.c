@@ -97,10 +97,10 @@ static void free_message(Message *m)
     free(m);
 }
 
-Message *new_message(const char *msg)
+Message *new_message(const char *msg, size_t len)
 {
     Message *m = xnew0(Message, 1);
-    m->msg = xstrdup(msg);
+    m->msg = xstrcut(msg, len);
     return m;
 }
 

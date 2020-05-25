@@ -54,24 +54,6 @@ static void test_handle_binding(void)
     handle_command(&commands, "close", false);
 }
 
-static void test_regexp_match(void)
-{
-    static const char buf[] = "fn(a);\n";
-
-    PointerArray a = PTR_ARRAY_INIT;
-    bool matched = regexp_match("^[a-z]+\\(", buf, sizeof(buf) - 1, &a);
-    EXPECT_TRUE(matched);
-    EXPECT_EQ(a.count, 1);
-    EXPECT_STREQ(a.ptrs[0], "fn(");
-    ptr_array_free(&a);
-
-    ptr_array_init(&a, 0);
-    matched = regexp_match("^[a-z]+\\([0-9]", buf, sizeof(buf) - 1, &a);
-    EXPECT_FALSE(matched);
-    EXPECT_EQ(a.count, 0);
-    ptr_array_free(&a);
-}
-
 static void test_posix_sanity(void)
 {
     // This is not guaranteed by ISO C99, but it is required by POSIX
@@ -113,7 +95,6 @@ int main(void)
     test_util();
     test_terminal();
     test_cmdline();
-    test_regexp_match();
     test_syntax();
 
     init_headless_mode();

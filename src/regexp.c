@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "regexp.h"
 #include "debug.h"
 #include "error.h"
@@ -11,20 +12,6 @@ bool regexp_match_nosub(const char *pattern, const StringView *buf)
     BUG_ON(!compiled);
     regmatch_t m;
     bool ret = regexp_exec(&re, buf->data, buf->length, 1, &m, 0);
-    regfree(&re);
-    return ret;
-}
-
-bool regexp_match (
-    const char *pattern,
-    const char *buf,
-    size_t size,
-    PointerArray *m
-) {
-    regex_t re;
-    bool compiled = regexp_compile(&re, pattern, REG_NEWLINE);
-    BUG_ON(!compiled);
-    bool ret = regexp_exec_sub(&re, buf, size, m, 0);
     regfree(&re);
     return ret;
 }
@@ -62,25 +49,4 @@ bool regexp_exec (
     free(tmp);
     return ret;
 #endif
-}
-
-bool regexp_exec_sub (
-    const regex_t *re,
-    const char *buf,
-    size_t size,
-    PointerArray *matches,
-    int flags
-) {
-    regmatch_t m[16];
-    bool ret = regexp_exec(re, buf, size, ARRAY_COUNT(m), m, flags);
-    if (!ret) {
-        return false;
-    }
-    for (size_t i = 0; i < ARRAY_COUNT(m); i++) {
-        if (m[i].rm_so == -1) {
-            break;
-        }
-        ptr_array_append(matches, xstrslice(buf, m[i].rm_so, m[i].rm_eo));
-    }
-    return true;
 }

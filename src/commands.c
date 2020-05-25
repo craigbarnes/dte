@@ -1748,8 +1748,8 @@ static void cmd_tag(const CommandArgs *a)
         for (size_t i = 0; i < tags.count; i++) {
             Tag *t = tags.ptrs[i];
             char buf[512];
-            xsnprintf(buf, sizeof(buf), "Tag %s", name);
-            Message *m = new_message(buf);
+            size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
+            Message *m = new_message(buf, len);
             m->loc = xnew0(FileLocation, 1);
             m->loc->filename = tag_file_get_tag_filename(tf, t);
             if (t->pattern) {

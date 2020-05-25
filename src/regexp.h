@@ -4,15 +4,12 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "util/ptr-array.h"
 #include "util/string-view.h"
 
 bool regexp_match_nosub(const char *pattern, const StringView *buf);
-bool regexp_match(const char *pattern, const char *buf, size_t size, PointerArray *m);
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags);
 bool regexp_exec(const regex_t *re, const char *buf, size_t size, size_t nr_m, regmatch_t *m, int flags);
-bool regexp_exec_sub(const regex_t *re, const char *buf, size_t size, PointerArray *matches, int flags);
 
 static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
 {
