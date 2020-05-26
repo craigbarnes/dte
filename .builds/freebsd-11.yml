@@ -4,4 +4,5 @@ sources: [https://git.sr.ht/~xcb/dte]
 tasks:
     - build: |
         cd dte
+        make vars
         make check DEBUG=3 V=1
