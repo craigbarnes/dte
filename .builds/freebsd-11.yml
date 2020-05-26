@@ -1,8 +1,8 @@
 image: freebsd/11.x
-packages: [gmake, gcc]
 sources: [https://git.sr.ht/~xcb/dte]
 tasks:
+    - deps: |
+        tools/install-deps.sh
     - build: |
-        cd dte
         make vars
         make check DEBUG=3 V=1
