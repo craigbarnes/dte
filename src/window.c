@@ -44,30 +44,28 @@ View *window_open_buffer (
     bool must_exist,
     const Encoding *encoding
 ) {
-    char *absolute;
-    bool dir_missing = false;
-    Buffer *b = NULL;
-
     if (filename[0] == '\0') {
         error_msg("Empty filename not allowed");
         return NULL;
     }
-    absolute = path_absolute(filename);
-    if (absolute == NULL) {
-        // Let load_buffer() create error message
-        dir_missing = errno == ENOENT;
-    } else {
+
+    bool dir_missing = false;
+    char *absolute = path_absolute(filename);
+    if (absolute) {
         // Already open?
-        b = find_buffer(absolute);
-    }
-    if (b) {
-        if (!streq(absolute, b->abs_filename)) {
-            char *s = short_filename(absolute);
-            info_msg("%s and %s are the same file", s, b->display_filename);
-            free(s);
+        Buffer *b = find_buffer(absolute);
+        if (b) {
+            if (!streq(absolute, b->abs_filename)) {
+                char *s = short_filename(absolute);
+                info_msg("%s and %s are the same file", s, b->display_filename);
+                free(s);
+            }
+            free(absolute);
+            return window_get_view(w, b);
         }
-        free(absolute);
-        return window_get_view(w, b);
+    } else {
+        // Let load_buffer() create error message
+        dir_missing = (errno == ENOENT);
     }
 
     /*
@@ -89,7 +87,8 @@ View *window_open_buffer (
     # this should still succeed
     dte /proc/$(pidof tail)/fd/3
     */
-    b = buffer_new(encoding);
+
+    Buffer *b = buffer_new(encoding);
     if (load_buffer(b, must_exist, filename)) {
         free_buffer(b);
         free(absolute);
@@ -102,8 +101,10 @@ View *window_open_buffer (
         free(absolute);
         return NULL;
     }
-    b->abs_filename = absolute;
-    if (b->abs_filename == NULL) {
+
+    if (absolute) {
+        b->abs_filename = absolute;
+    } else {
         // FIXME: obviously wrong
         b->abs_filename = xstrdup(filename);
     }
@@ -116,10 +117,12 @@ View *window_open_buffer (
             b->locked = true;
         }
     }
+
     if (b->file.mode != 0 && !b->readonly && access(filename, W_OK)) {
         error_msg("No write permission to %s, marking read-only.", filename);
         b->readonly = true;
     }
+
     return window_add_buffer(w, b);
 }
 
