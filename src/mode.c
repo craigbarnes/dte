@@ -34,7 +34,7 @@ static void normal_mode_keypress(KeyCode key)
         size_t size;
         char *text = term_read_paste(&size);
         begin_change(CHANGE_MERGE_NONE);
-        insert_text(text, size);
+        insert_text(text, size, true);
         end_change();
         macro_insert_text_hook(text, size);
         free(text);

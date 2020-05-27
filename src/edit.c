@@ -151,7 +151,7 @@ void copy(size_t len, bool is_lines)
     }
 }
 
-void insert_text(const char *text, size_t size)
+void insert_text(const char *text, size_t size, bool move_after)
 {
     size_t del_count = 0;
     if (view->selection) {
@@ -159,7 +159,9 @@ void insert_text(const char *text, size_t size)
         unselect();
     }
     buffer_replace_bytes(del_count, text, size);
-    block_iter_skip_bytes(&view->cursor, size);
+    if (move_after) {
+        block_iter_skip_bytes(&view->cursor, size);
+    }
 }
 
 void paste(bool at_cursor)

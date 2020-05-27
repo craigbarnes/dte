@@ -624,17 +624,8 @@ static void cmd_insert(const CommandArgs *a)
         return;
     }
 
-    size_t del_len = 0;
-    size_t ins_len = strlen(str);
-    if (view->selection) {
-        del_len = prepare_selection(view);
-        unselect();
-    }
-    buffer_replace_bytes(del_len, str, ins_len);
-
-    if (has_flag(a, 'm')) {
-        block_iter_skip_bytes(&view->cursor, ins_len);
-    }
+    bool move_after = has_flag(a, 'm');
+    insert_text(str, strlen(str), move_after);
 }
 
 static void cmd_join(const CommandArgs* UNUSED_ARG(a))
