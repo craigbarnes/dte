@@ -35,6 +35,7 @@
 #include "tag.h"
 #include "terminal/color.h"
 #include "terminal/terminal.h"
+#include "util/checked-arith.h"
 #include "util/line-iter.h"
 #include "util/path.h"
 #include "util/readfile.h"
@@ -1193,26 +1194,53 @@ static void cmd_refresh(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_repeat(const CommandArgs *a)
 {
-    char **args = a->args;
     unsigned int count = 0;
-    if (!str_to_uint(args[0], &count)) {
-        error_msg("Not a valid repeat count: %s", args[0]);
+    if (!str_to_uint(a->args[0], &count)) {
+        error_msg("Not a valid repeat count: %s", a->args[0]);
         return;
     } else if (count == 0) {
         return;
     }
 
-    const Command *cmd = find_normal_command(args[1]);
+    const Command *cmd = find_normal_command(a->args[1]);
     if (!cmd) {
-        error_msg("No such command: %s", args[1]);
+        error_msg("No such command: %s", a->args[1]);
         return;
     }
 
-    CommandArgs a2 = {.args = args + 2};
-    if (parse_args(cmd, &a2)) {
-        while (count-- > 0) {
-            cmd->cmd(&a2);
+    CommandArgs a2 = {.args = a->args + 2};
+    if (!parse_args(cmd, &a2)) {
+        return;
+    }
+
+    // Optimized special case for "insert" command
+    if (cmd->cmd == cmd_insert && !has_flag(&a2, 'k')) {
+        const char *str = a2.args[0];
+        size_t str_len = strlen(str);
+        size_t bufsize;
+        if (size_multiply_overflows(count, str_len, &bufsize)) {
+            error_msg("Repeated insert would overflow");
+            return;
         }
+        char *buf = malloc(bufsize);
+        if (!buf) {
+            perror_msg("malloc");
+            return;
+        }
+        // TODO: for many repeats of small strings, fill in the first 4K
+        // and then use that to batch copy larger blocks (making sure to
+        // handle any unaligned remainder).
+        for (size_t i = 0; i < count; i++) {
+            memcpy(buf + (i * str_len), str, str_len);
+        }
+        bool move_after = has_flag(&a2, 'm');
+        insert_text(buf, bufsize, move_after);
+        free(buf);
+        return;
+    }
+
+    while (count--) {
+        cmd->cmd(&a2);
     }
 }
 
@@ -2113,7 +2141,7 @@ static const Command cmds[] = {
     {"quit", "fp", false, 0, 1, cmd_quit},
     {"redo", "", false, 0, 1, cmd_redo},
     {"refresh", "", false, 0, 0, cmd_refresh},
-    {"repeat", "", false, 2, -1, cmd_repeat},
+    {"repeat", "-", false, 2, -1, cmd_repeat},
     {"replace", "bcgi", false, 2, 2, cmd_replace},
     {"right", "c", false, 0, 0, cmd_right},
     {"run", "-ps", false, 1, -1, cmd_run},
