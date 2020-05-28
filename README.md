@@ -30,16 +30,17 @@ Installing
 
 `dte` can be installed via package manager on the following platforms:
 
-| OS                 | Install command                            |
-|--------------------|--------------------------------------------|
-| [Debian Testing]   | `apt-get install dte`                      |
-| Arch Linux ([AUR]) | `$AUR_HELPER -S dte`                       |
-| [Void Linux]       | `xbps-install -S dte`                      |
-| [FreeBSD]          | `pkg install dte`                          |
-| [OpenBSD]          | `pkg_add dte`                              |
-| NetBSD ([pkgsrc])  | `pkg_add dte`                              |
-| OS X ([Homebrew])  | `brew tap yumitsu/dte && brew install dte` |
-| Android ([Termux]) | `pkg install dte`                          |
+| OS                        | Install command                            |
+|---------------------------|--------------------------------------------|
+| [Debian Testing]          | `apt-get install dte`                      |
+| Arch Linux ([AUR])        | `$AUR_HELPER -S dte`                       |
+| [Void Linux]              | `xbps-install -S dte`                      |
+| Slackware ([Slackbuilds]) | [SlackBuild Usage HOWTO]                   | 
+| [FreeBSD]                 | `pkg install dte`                          |
+| [OpenBSD]                 | `pkg_add dte`                              |
+| NetBSD ([pkgsrc])         | `pkg_add dte`                              |
+| OS X ([Homebrew])         | `brew tap yumitsu/dte && brew install dte` |
+| Android ([Termux])        | `pkg install dte`                          |
 
 Building
 --------
@@ -104,6 +105,8 @@ Public License version 2 for more details.
 [Debian Testing]: https://packages.debian.org/testing/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
+[Slackbuilds]: https://slackbuilds.org/repository/14.2/development/dte/
+[SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
 [FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://pkgsrc.se/editors/dte
