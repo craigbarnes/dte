@@ -4,6 +4,10 @@ git: {depth: false}
 os: [linux, osx]
 arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
+
+addons:
+    homebrew: {packages: make}
+
 script:
     - git fetch --tags
     - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
