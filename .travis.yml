@@ -10,9 +10,10 @@ addons:
 
 script:
     - git fetch --tags
+    - export MAKE="$(command -v gmake || command -v make)"
     - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
-    - make vars
-    - make check
+    - $MAKE vars
+    - $MAKE check
     - ./dte -V
-    - make check TERMINFO_DISABLE=1
-    - make distcheck
+    - $MAKE check TERMINFO_DISABLE=1
+    - $MAKE distcheck
