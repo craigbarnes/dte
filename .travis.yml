@@ -5,10 +5,8 @@ os: [linux, osx]
 arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 
-addons:
-    homebrew:
-        taps: homebrew/dupes
-        packages: [make]
+install:
+    - if test "$TRAVIS_OS_NAME" = osx; then brew install --with-default-names make; fi
 
 script:
     - git fetch --tags
