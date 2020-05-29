@@ -6,7 +6,7 @@ arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 
 install:
-    - if test "$TRAVIS_OS_NAME" = osx; then brew install --with-default-names make; fi
+    - if test "$TRAVIS_OS_NAME" = osx; then brew install make; fi
 
 script:
     - git fetch --tags
