@@ -6,7 +6,9 @@ arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 
 addons:
-    homebrew: {packages: make}
+    homebrew:
+        taps: homebrew/dupes
+        packages: [make]
 
 script:
     - git fetch --tags
