@@ -2,6 +2,7 @@ language: c
 sudo: false
 git: {depth: false}
 os: [linux, osx]
+arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 script:
     - git fetch --tags
