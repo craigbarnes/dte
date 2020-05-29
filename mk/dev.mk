@@ -29,7 +29,7 @@ check-syntax-files:
 	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
 	$(Q) ! $(SYNTAX_LINT) test/data/syntax-lint.dterc 2>/dev/null
 
-distcheck: private TARDIR = build/dte-$(DISTVER)/
+distcheck: TARDIR = build/dte-$(DISTVER)/
 distcheck: build/dte-$(DISTVER).tar.gz | build/
 	$(E) EXTRACT $(TARDIR)
 	$(Q) cd $(<D) && tar -xzf $(<F)
