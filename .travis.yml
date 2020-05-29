@@ -6,10 +6,9 @@ arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 script:
     - git fetch --tags
+    - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
     - make vars
-    - make -j`mk/nproc.sh` check V=1
-    - make install DESTDIR="$PWD/pkgdir"
-    - pkgdir/usr/local/bin/dte -V
-    - make clean
-    - make -j`mk/nproc.sh` check V=1 TERMINFO_DISABLE=1
+    - make check
     - ./dte -V
+    - make check TERMINFO_DISABLE=1
+    - make distcheck
