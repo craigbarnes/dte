@@ -33,9 +33,10 @@ Installing
 | OS                        | Install command                            |
 |---------------------------|--------------------------------------------|
 | [Debian Testing]          | `apt-get install dte`                      |
+| Ubuntu                    | `apt-get install dte`                      |
 | Arch Linux ([AUR])        | `$AUR_HELPER -S dte`                       |
 | [Void Linux]              | `xbps-install -S dte`                      |
-| Slackware ([Slackbuilds]) | [SlackBuild Usage HOWTO]                   |
+| Slackware ([Slackbuilds]) | See: [SlackBuild Usage HOWTO]              |
 | [FreeBSD]                 | `pkg install dte`                          |
 | [OpenBSD]                 | `pkg_add dte`                              |
 | NetBSD ([pkgsrc])         | `pkg_add dte`                              |
