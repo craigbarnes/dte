@@ -364,4 +364,4 @@ system except a somewhat recent kernel.
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
 [musl]: https://www.musl-libc.org/
-[issue]: https://gitlab.com/craigbarnes/dte/issues
+[issue]: https://gitlab.com/craigbarnes/dte/-/issues

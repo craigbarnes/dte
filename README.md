@@ -98,7 +98,7 @@ Public License version 2 for more details.
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
-[ncurses]: https://www.gnu.org/software/ncurses/
+[ncurses]: https://invisible-island.net/ncurses/
 [terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
