@@ -33,10 +33,10 @@ Installing
 | OS                        | Install command                            |
 |---------------------------|--------------------------------------------|
 | [Debian Testing]          | `apt-get install dte`                      |
-| Ubuntu                    | `apt-get install dte`                      |
+| [Ubuntu]                  | `apt-get install dte`                      |
 | Arch Linux ([AUR])        | `$AUR_HELPER -S dte`                       |
 | [Void Linux]              | `xbps-install -S dte`                      |
-| Slackware ([Slackbuilds]) | See: [SlackBuild Usage HOWTO]              |
+| Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO]              |
 | [FreeBSD]                 | `pkg install dte`                          |
 | [OpenBSD]                 | `pkg_add dte`                              |
 | NetBSD ([pkgsrc])         | `pkg_add dte`                              |
@@ -104,9 +104,10 @@ Public License version 2 for more details.
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 [Debian Testing]: https://packages.debian.org/testing/dte
+[Ubuntu]: https://launchpad.net/ubuntu/+source/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
-[Slackbuilds]: https://slackbuilds.org/repository/14.2/development/dte/
+[SlackBuilds]: https://slackbuilds.org/repository/14.2/development/dte/
 [SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
 [FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
