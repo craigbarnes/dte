@@ -39,7 +39,6 @@ void add_error_fmt (
 ) {
     static const char names[][8] = {"file", "line", "column", "message"};
     int idx[ARRAY_COUNT(names)] = {-1, -1, -1, 0};
-    ErrorFormat *f;
 
     for (size_t i = 0, j = 0; desc[i]; i++) {
         for (j = 0; j < ARRAY_COUNT(names); j++) {
@@ -57,7 +56,7 @@ void add_error_fmt (
         }
     }
 
-    f = xnew0(ErrorFormat, 1);
+    ErrorFormat *f = xnew(ErrorFormat, 1);
     f->ignore = ignore;
     f->msg_idx = idx[3];
     f->file_idx = idx[0];
@@ -68,6 +67,7 @@ void add_error_fmt (
         free(f);
         return;
     }
+
     for (size_t i = 0; i < ARRAY_COUNT(idx); i++) {
         // NOTE: -1 is larger than 0UL
         if (idx[i] > (int)f->re.re_nsub) {

@@ -182,11 +182,14 @@ TagFile *load_tag_file(void)
         return NULL;
     }
 
-    TagFile *tf = xnew0(TagFile, 1);
-    tf->filename = xstrdup(path);
-    tf->buf = buf;
-    tf->size = size;
-    tf->mtime = st.st_mtime;
+    TagFile *tf = xnew(TagFile, 1);
+    *tf = (TagFile) {
+        .filename = xstrdup(path),
+        .buf = buf,
+        .size = size,
+        .mtime = st.st_mtime,
+    };
+
     current_tag_file = tf;
     return current_tag_file;
 }

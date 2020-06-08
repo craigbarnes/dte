@@ -91,14 +91,14 @@ static void divide_equally(const Frame *f)
     size_t count = f->frames.count;
     BUG_ON(count == 0);
 
-    int *size = xnew0(int, count);
     int *min = xnew(int, count);
     for (size_t i = 0; i < count; i++) {
         min[i] = get_min(f->frames.ptrs[i]);
     }
 
-    int q, r, used;
+    int *size = xnew0(int, count);
     int s = get_container_size(f);
+    int q, r, used;
     size_t n = count;
 
     // Consume q and r as equally as possible
@@ -131,7 +131,7 @@ static void divide_equally(const Frame *f)
 static void fix_size(const Frame *f)
 {
     size_t count = f->frames.count;
-    int *size = xnew0(int, count);
+    int *size = xnew(int, count);
     int *min = xnew(int, count);
     int total = 0;
     for (size_t i = 0; i < count; i++) {
