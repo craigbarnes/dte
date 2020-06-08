@@ -215,7 +215,7 @@ static void cmd_char(const CommandArgs *a)
     if (type == COND_CHAR1) {
         c->u.ch = (unsigned char)chars[0];
     } else {
-        bitset_add_pattern(c->u.bitset, chars);
+        bitset_add_char_range(c->u.bitset, chars);
         if (n_flag) {
             bitset_invert(c->u.bitset);
         }

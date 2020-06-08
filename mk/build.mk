@@ -44,7 +44,7 @@ encoding_objects := $(call prefix-obj, build/encoding/, \
     bom convert decoder encoder encoding )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
-    bitset color highlight state syntax )
+    color highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key mode no-op output rxvt terminal terminfo \

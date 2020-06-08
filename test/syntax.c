@@ -4,9 +4,8 @@
 
 static void test_bitset(void)
 {
-    BitSet set;
-    ASSERT_EQ(sizeof(set), 32);
-    ASSERT_EQ(ARRAY_COUNT(set), BITSET_NR_WORDS);
+    BitSetWord set[BITSET_NR_WORDS];
+    ASSERT_TRUE(sizeof(set) >= 32);
 
     memset(set, 0, sizeof(set));
     EXPECT_FALSE(bitset_contains(set, '0'));
@@ -15,7 +14,7 @@ static void test_bitset(void)
     EXPECT_FALSE(bitset_contains(set, '!'));
     EXPECT_FALSE(bitset_contains(set, '\0'));
 
-    bitset_add_pattern(set, "0-9a-fxy");
+    bitset_add_char_range(set, "0-9a-fxy");
     EXPECT_TRUE(bitset_contains(set, '0'));
     EXPECT_TRUE(bitset_contains(set, '8'));
     EXPECT_TRUE(bitset_contains(set, '9'));

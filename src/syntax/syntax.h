@@ -44,7 +44,7 @@ typedef struct {
 } StringList;
 
 typedef union {
-    BitSet bitset;
+    BitSetWord bitset[BITSET_NR_WORDS];
     StringView heredocend;
     StringList *str_list;
     unsigned char ch;
