@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "tag.h"
@@ -10,7 +11,7 @@
 #include "util/xreadwrite.h"
 
 static TagFile *current_tag_file;
-static char *current_filename; // For sorting tags
+static const char *current_filename; // For sorting tags
 
 static int visibility_cmp(const Tag *a, const Tag *b)
 {
@@ -202,21 +203,19 @@ void free_tags(PointerArray *tags)
 }
 
 // Both parameters must be absolute and clean
-static char *path_relative(const char *filename, const char *dir)
+static const char *path_relative(const char *filename, const StringView dir)
 {
-    size_t dlen = strlen(dir);
-
-    if (!str_has_prefix(filename, dir)) {
+    if (strncmp(filename, dir.data, dir.length) != 0) {
+        // Filename doesn't start with dir
         return NULL;
     }
-    if (filename[dlen] == '\0') {
-        // Equal strings
-        return xmemdup_literal(".");
+    switch (filename[dir.length]) {
+    case '\0': // Equal strings
+        return ".";
+    case '/':
+        return filename + dir.length + 1;
     }
-    if (filename[dlen] != '/') {
-        return NULL;
-    }
-    return xstrdup(filename + dlen + 1);
+    return NULL;
 }
 
 void tag_file_find_tags (
@@ -236,12 +235,10 @@ void tag_file_find_tags (
     if (filename == NULL) {
         current_filename = NULL;
     } else {
-        char *dir = path_dirname(tf->filename);
+        StringView dir = path_slice_dirname(tf->filename);
         current_filename = path_relative(filename, dir);
-        free(dir);
     }
     ptr_array_sort(tags, tag_cmp);
-    free(current_filename);
     current_filename = NULL;
 }
 
