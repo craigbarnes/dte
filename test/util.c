@@ -21,7 +21,7 @@
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
-static void test_macros(void)
+static void test_util_macros(void)
 {
     EXPECT_EQ(STRLEN(""), 0);
     EXPECT_EQ(STRLEN("a"), 1);
@@ -38,7 +38,10 @@ static void test_macros(void)
     EXPECT_EQ(MAX(0, 1), 1);
     EXPECT_EQ(MAX(99, 100), 100);
     EXPECT_EQ(MAX(-10, 10), 10);
+}
 
+static void test_IS_POWER_OF_2(void)
+{
     EXPECT_TRUE(IS_POWER_OF_2(1));
     EXPECT_TRUE(IS_POWER_OF_2(2));
     EXPECT_TRUE(IS_POWER_OF_2(4));
@@ -46,10 +49,29 @@ static void test_macros(void)
     EXPECT_TRUE(IS_POWER_OF_2(4096));
     EXPECT_TRUE(IS_POWER_OF_2(8192));
     EXPECT_TRUE(IS_POWER_OF_2(1ULL << 63));
+
     EXPECT_FALSE(IS_POWER_OF_2(0));
     EXPECT_FALSE(IS_POWER_OF_2(3));
+    EXPECT_FALSE(IS_POWER_OF_2(5));
+    EXPECT_FALSE(IS_POWER_OF_2(6));
+    EXPECT_FALSE(IS_POWER_OF_2(7));
     EXPECT_FALSE(IS_POWER_OF_2(12));
+    EXPECT_FALSE(IS_POWER_OF_2(15));
+    EXPECT_FALSE(IS_POWER_OF_2(-2));
     EXPECT_FALSE(IS_POWER_OF_2(-10));
+
+    const uintmax_t max_pow2 = UINTMAX_MAX & ~(UINTMAX_MAX >> 1);
+    EXPECT_TRUE(max_pow2 >= 1ULL << 63);
+    EXPECT_TRUE(IS_POWER_OF_2(max_pow2));
+    EXPECT_UINT_EQ(max_pow2 << 1, 0);
+
+    for (uintmax_t i = max_pow2; i > 4; i >>= 1) {
+        EXPECT_TRUE(IS_POWER_OF_2(i));
+        for (uintmax_t j = 1; j < 4; j++) {
+            EXPECT_FALSE(IS_POWER_OF_2(i + j));
+            EXPECT_FALSE(IS_POWER_OF_2(i - j));
+        }
+    }
 }
 
 static void test_xstreq(void)
@@ -1181,7 +1203,8 @@ DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_util(void)
 {
-    test_macros();
+    test_util_macros();
+    test_IS_POWER_OF_2();
     test_xstreq();
     test_ascii();
     test_string();
