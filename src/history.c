@@ -10,6 +10,7 @@
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 // Add item to end of array
 void history_add(PointerArray *history, const char *text, size_t max_entries)
@@ -91,7 +92,7 @@ FILE *history_fopen(const char *filename)
     }
     FILE *file = fdopen(fd, "w");
     if (!file) {
-        close(fd);
+        xclose(fd);
         goto error;
     }
     return file;

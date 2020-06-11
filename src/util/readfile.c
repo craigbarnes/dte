@@ -16,23 +16,23 @@ ssize_t read_file(const char *filename, char **bufp)
 
     struct stat st;
     if (fstat(fd, &st) == -1) {
-        close(fd);
+        xclose(fd);
         return -1;
     }
     if (S_ISDIR(st.st_mode)) {
-        close(fd);
+        xclose(fd);
         errno = EISDIR;
         return -1;
     }
 
     char *buf = malloc(st.st_size + 1);
     if (unlikely(!buf)) {
-        close(fd);
+        xclose(fd);
         return -1;
     }
 
     ssize_t r = xread(fd, buf, st.st_size);
-    close(fd);
+    xclose(fd);
     if (r > 0) {
         buf[r] = '\0';
         *bufp = buf;

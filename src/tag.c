@@ -158,7 +158,7 @@ TagFile *load_tag_file(void)
 
     struct stat st;
     if (fstat(fd, &st) != 0 || st.st_size <= 0) {
-        close(fd);
+        xclose(fd);
         return NULL;
     }
 
@@ -170,13 +170,13 @@ TagFile *load_tag_file(void)
         current_tag_file = NULL;
     }
     if (current_tag_file != NULL) {
-        close(fd);
+        xclose(fd);
         return current_tag_file;
     }
 
     char *buf = xmalloc(st.st_size);
     ssize_t size = xread(fd, buf, st.st_size);
-    close(fd);
+    xclose(fd);
     if (size < 0) {
         free(buf);
         return NULL;

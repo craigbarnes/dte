@@ -151,7 +151,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
         error_msg("Error writing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
-    if (close(wfd)) {
+    if (xclose(wfd)) {
         error_msg("Error closing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
@@ -169,7 +169,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
 error:
     unlink(file_locks_lock);
     free(buf);
-    close(wfd);
+    xclose(wfd);
     return false;
 }
 

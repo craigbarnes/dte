@@ -253,12 +253,12 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
     } else {
         if (!buffer_fstat(b, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
-            close(fd);
+            xclose(fd);
             return -1;
         }
         if (!S_ISREG(b->file.mode)) {
             error_msg("Not a regular file %s", filename);
-            close(fd);
+            xclose(fd);
             return -1;
         }
         if (b->file.size / 1024 / 1024 > editor.options.filesize_limit) {
@@ -267,16 +267,16 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
                 editor.options.filesize_limit,
                 filename
             );
-            close(fd);
+            xclose(fd);
             return -1;
         }
 
         if (read_blocks(b, fd)) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
-            close(fd);
+            xclose(fd);
             return -1;
         }
-        close(fd);
+        xclose(fd);
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
@@ -386,11 +386,11 @@ int save_buffer (
     if (enc == NULL) {
         // This should never happen because encoding is validated early
         perror_msg("iconv_open");
-        close(fd);
+        xclose(fd);
         goto error;
     }
     if (write_buffer(b, enc, encoding->type)) {
-        close(fd);
+        xclose(fd);
         goto error;
     }
 
@@ -410,14 +410,14 @@ int save_buffer (
                 goto retry;
             default:
                 perror_msg("fsync");
-                close(fd);
+                xclose(fd);
                 goto error;
             }
         }
     }
 #endif
 
-    if (close(fd)) {
+    if (xclose(fd)) {
         perror_msg("close");
         goto error;
     }

@@ -103,7 +103,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
 {
     size_t wlen = 0;
     if (!ctx->input.length) {
-        close(wfd);
+        xclose(wfd);
         wfd = -1;
     }
     while (1) {
@@ -155,7 +155,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
-                if (close(wfd)) {
+                if (xclose(wfd)) {
                     perror_msg("close");
                     break;
                 }
@@ -237,12 +237,12 @@ bool spawn_filter(SpawnContext *ctx)
         goto error;
     }
 
-    close(dev_null);
-    close(p0[0]);
-    close(p1[1]);
+    xclose(dev_null);
+    xclose(p0[0]);
+    xclose(p1[1]);
     filter(p1[0], p0[1], ctx);
-    close(p1[0]);
-    close(p0[1]);
+    xclose(p1[0]);
+    xclose(p0[1]);
 
     int err = handle_child_error(pid);
     term_raw();
@@ -254,11 +254,11 @@ bool spawn_filter(SpawnContext *ctx)
 
 error:
     term_raw();
-    close(p0[0]);
-    close(p0[1]);
-    close(p1[0]);
-    close(p1[1]);
-    close(dev_null);
+    xclose(p0[0]);
+    xclose(p0[1]);
+    xclose(p1[0]);
+    xclose(p1[1]);
+    xclose(dev_null);
     return false;
 }
 
@@ -296,11 +296,11 @@ bool spawn_source(SpawnContext *ctx)
     }
 
     if (quiet) {
-        close(dev_null_r);
-        close(dev_null_w);
+        xclose(dev_null_r);
+        xclose(dev_null_w);
         dev_null_r = dev_null_w = -1;
     }
-    close(p[1]);
+    xclose(p[1]);
     p[1] = -1;
 
     while (1) {
@@ -316,7 +316,7 @@ bool spawn_source(SpawnContext *ctx)
         string_append_buf(&ctx->output, buf, (size_t) rc);
     }
 
-    close(p[0]);
+    xclose(p[0]);
     p[0] = -1;
     if (handle_child_error(pid)) {
         goto error;
@@ -327,11 +327,11 @@ bool spawn_source(SpawnContext *ctx)
 
 error:
     string_free(&ctx->output);
-    close(p[0]);
-    close(p[1]);
+    xclose(p[0]);
+    xclose(p[1]);
     if (quiet) {
-        close(dev_null_r);
-        close(dev_null_w);
+        xclose(dev_null_r);
+        xclose(dev_null_w);
     }
     resume_terminal(quiet, false);
     return false;
@@ -360,24 +360,24 @@ bool spawn_sink(SpawnContext *ctx)
         goto error;
     }
 
-    close(dev_null);
-    close(p[0]);
+    xclose(dev_null);
+    xclose(p[0]);
     p[0] = dev_null = -1;
     size_t input_len = ctx->input.length;
     if (input_len && xwrite(p[1], ctx->input.data, input_len) < 0) {
         perror_msg("write");
         goto error;
     }
-    close(p[1]);
+    xclose(p[1]);
     int err = handle_child_error(pid);
     term_raw();
     return !err;
 
 error:
     term_raw();
-    close(p[0]);
-    close(p[1]);
-    close(dev_null);
+    xclose(p[0]);
+    xclose(p[1]);
+    xclose(dev_null);
     return false;
 }
 
@@ -391,15 +391,15 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
 
     const int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
-        close(fd[0]);
+        xclose(fd[0]);
         return;
     }
 
     int p[2];
     if (!pipe_close_on_exec(p)) {
         perror_msg("pipe");
-        close(dev_null);
-        close(fd[0]);
+        xclose(dev_null);
+        xclose(fd[0]);
         return;
     }
 
@@ -418,20 +418,20 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     const pid_t pid = fork_exec(args, fd);
     if (pid < 0) {
         exec_error(args[0]);
-        close(p[1]);
+        xclose(p[1]);
         prompt = false;
     } else {
         // Must close write end of the pipe before read_errors() or
         // the read end never gets EOF!
-        close(p[1]);
+        xclose(p[1]);
         read_errors(c, p[0], quiet);
         handle_child_error(pid);
     }
     resume_terminal(quiet, prompt);
 
-    close(p[0]);
-    close(dev_null);
-    close(fd[0]);
+    xclose(p[0]);
+    xclose(dev_null);
+    xclose(fd[0]);
 }
 
 void spawn(SpawnContext *ctx)
@@ -444,7 +444,7 @@ void spawn(SpawnContext *ctx)
             return;
         }
         if ((fd[1] = open_dev_null(O_WRONLY)) < 0) {
-            close(fd[0]);
+            xclose(fd[0]);
             return;
         }
         fd[2] = fd[1];
@@ -461,7 +461,7 @@ void spawn(SpawnContext *ctx)
     resume_terminal(quiet, prompt);
 
     if (quiet) {
-        close(fd[0]);
-        close(fd[1]);
+        xclose(fd[0]);
+        xclose(fd[1]);
     }
 }

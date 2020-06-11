@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "exec.h"
+#include "xreadwrite.h"
 
 static bool close_on_exec(int fd, bool cloexec)
 {
@@ -131,8 +132,8 @@ pid_t fork_exec(char **argv, int fd[3])
     const pid_t pid = fork();
     if (pid < 0) {
         error = errno;
-        close(ep[0]);
-        close(ep[1]);
+        xclose(ep[0]);
+        xclose(ep[1]);
         errno = error;
         return pid;
     }
@@ -140,7 +141,7 @@ pid_t fork_exec(char **argv, int fd[3])
         handle_child(argv, fd, ep[1]);
     }
 
-    close(ep[1]);
+    xclose(ep[1]);
     const ssize_t rc = read(ep[0], &error, sizeof(error));
     if (rc > 0 && rc != sizeof(error)) {
         error = EPIPE;
@@ -148,7 +149,7 @@ pid_t fork_exec(char **argv, int fd[3])
     if (rc < 0) {
         error = errno;
     }
-    close(ep[0]);
+    xclose(ep[0]);
 
     if (!rc) {
         // Child exec was successful
