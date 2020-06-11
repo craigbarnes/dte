@@ -113,7 +113,7 @@ static int open_tag_file(char *path)
             path[len++] = '/';
         }
         memcpy(path + len, tags, sizeof(tags));
-        int fd = open(path, O_RDONLY);
+        int fd = xopen(path, O_RDONLY);
         if (fd >= 0) {
             return fd;
         }

@@ -9,7 +9,7 @@
 ssize_t read_file(const char *filename, char **bufp)
 {
     *bufp = NULL;
-    int fd = open(filename, O_RDONLY);
+    int fd = xopen(filename, O_RDONLY);
     if (fd == -1) {
         return -1;
     }

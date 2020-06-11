@@ -51,7 +51,7 @@ void debug_log(const char *function, const char *fmt, ...)
     static int fd = -1;
     if (fd < 0) {
         char *filename = editor_file("debug.log");
-        fd = open(filename, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
+        fd = xopen(filename, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
         free(filename);
         BUG_ON(fd < 0);
     }

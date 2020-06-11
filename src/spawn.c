@@ -167,7 +167,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
 
 static int open_dev_null(int flags)
 {
-    int fd = open("/dev/null", flags | O_CLOEXEC);
+    int fd = xopen("/dev/null", flags | O_CLOEXEC);
     if (fd < 0) {
         error_msg("Error opening /dev/null: %s", strerror(errno));
     }

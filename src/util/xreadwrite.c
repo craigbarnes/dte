@@ -1,4 +1,7 @@
 #include <errno.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "xreadwrite.h"
 
@@ -39,6 +42,21 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
         count -= rc;
     } while (count > 0);
     return count_save;
+}
+
+int xopen(const char *path, int flags, ...)
+{
+    va_list ap;
+    va_start(ap, flags);
+    mode_t mode = (flags & O_CREAT) ? va_arg(ap, mode_t) : 0;
+    va_end(ap);
+
+    int fd;
+    do {
+        fd = open(path, flags, mode);
+    } while (fd < 0 && errno == EINTR);
+
+    return fd;
 }
 
 int xclose(int fd)
