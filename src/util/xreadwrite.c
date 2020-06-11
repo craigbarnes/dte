@@ -1,7 +1,5 @@
 #include <errno.h>
-#include <fcntl.h>
 #include <stdarg.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include "xreadwrite.h"
 
