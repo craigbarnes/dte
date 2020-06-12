@@ -250,7 +250,7 @@ The following environment variables are inspected at startup:
 # Exit Status
 
 `0`
-:   Success.
+:   Program exited normally.
 
 `64`
 :   Command-line usage error (see "synopsis" above).
