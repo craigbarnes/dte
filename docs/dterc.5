@@ -723,6 +723,9 @@ actually apply a syntax highlighter to the current buffer, use the
 .RS
 Quit the editor.
 .P
+The exit status of the process is set to \fIexitcode\fR, which can be
+in the range \fB0\fR..\fB125\fR, or defaults to \fB0\fR if unspecified.
+.P
 .TP
 \fB\-f\fR
 Force quit, even if there are unsaved files

@@ -353,6 +353,9 @@ actually apply a syntax highlighter to the current buffer, use the
 
 Quit the editor.
 
+The exit status of the process is set to _exitcode_, which can be
+in the range `0`..`125`, or defaults to `0` if unspecified.
+
 `-f`
 :   Force quit, even if there are unsaved files
 
