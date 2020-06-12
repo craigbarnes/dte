@@ -143,6 +143,7 @@ function Code(s, attr)
         regex = "(7)",
         stdout = "(3)",
         stderr = "(3)",
+        sysexits = "(3)",
         ctags = "(1)",
         fmt = "(1)",
         terminfo = "(5)",

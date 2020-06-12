@@ -247,6 +247,27 @@ The following environment variables are inspected at startup:
 `$DTE_HOME/search-history`
 :   History of search patterns used while in search mode.
 
+# Exit Status
+
+`0`
+:   Success.
+
+`64`
+:   Command-line usage error (see "synopsis" above).
+
+`65`
+:   Input data error (e.g. data specified by the `-s` option).
+
+`71`
+:   Operating system error.
+
+`74`
+:   Input/output error.
+
+Note: the above exit codes are set by the editor itself, with values in
+accordance with [`sysexits`]. The exit code may also be set to values
+in the range `0`..`125` by the [`quit`] command.
+
 
 [`dterc`]: dterc.html
 [`dte-syntax`]: dte-syntax.html
@@ -260,3 +281,4 @@ The following environment variables are inspected at startup:
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
+[`sysexits`]: https://man.openbsd.org/sysexits.3
