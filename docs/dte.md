@@ -1,7 +1,7 @@
 ---
 title: dte
 section: 1
-date: April 2020
+date: June 2020
 description: A small, configurable text editor
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dterc`", "`dte-syntax`"]

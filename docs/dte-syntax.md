@@ -1,7 +1,7 @@
 ---
 title: dte-syntax
 section: 5
-date: November 2017
+date: May 2020
 description: Format of syntax highlighting files used by `dte`
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dterc`"]
