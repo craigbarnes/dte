@@ -3,6 +3,7 @@
 
 // Semantic exit codes, as defined by BSD sysexits(3)
 enum {
+    EX_OK = 0, // Exited normally
     EX_USAGE = 64, // Command line usage error
     EX_DATAERR = 65, // Input data error
     EX_OSERR = 71, // Operating system error

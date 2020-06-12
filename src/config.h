@@ -21,7 +21,6 @@ typedef struct {
 extern const char *config_file;
 extern int config_line;
 
-void list_builtin_configs(void);
 String dump_builtin_configs(void);
 void collect_builtin_configs(const char *prefix);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;

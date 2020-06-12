@@ -1,6 +1,5 @@
 #include <errno.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include "config.h"
 #include "commands.h"
@@ -81,14 +80,6 @@ String dump_builtin_configs(void)
         string_append_byte(&str, '\n');
     }
     return str;
-}
-
-void list_builtin_configs(void)
-{
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
-        fputs(builtin_configs[i].name, stdout);
-        fputc('\n', stdout);
-    }
 }
 
 void collect_builtin_configs(const char *prefix)

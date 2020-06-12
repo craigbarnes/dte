@@ -138,6 +138,18 @@ static void set_signal_handlers(void)
     }
 }
 
+static int list_builtin_configs(void)
+{
+    String str = dump_builtin_configs();
+    ssize_t n = xwrite(STDOUT_FILENO, str.buffer, str.len);
+    string_free(&str);
+    if (n < 0) {
+        perror("write");
+        return EX_IOERR;
+    }
+    return EX_OK;
+}
+
 static int dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -149,7 +161,7 @@ static int dump_builtin_config(const char *name)
         perror("write");
         return EX_IOERR;
     }
-    return 0;
+    return EX_OK;
 }
 
 static void showkey_loop(void)
@@ -245,8 +257,7 @@ int main(int argc, char *argv[])
         case 'b':
             return dump_builtin_config(optarg);
         case 'B':
-            list_builtin_configs();
-            return 0;
+            return list_builtin_configs();
         case 'H':
             load_and_save_history = false;
             break;
@@ -256,10 +267,10 @@ int main(int argc, char *argv[])
         case 'V':
             printf("dte %s\n", editor.version);
             puts(copyright);
-            return 0;
+            return EX_OK;
         case 'h':
             printf(usage, argv[0]);
-            return 0;
+            return EX_OK;
         case '?':
         default:
             return EX_USAGE;
@@ -278,7 +289,7 @@ loop_break:
         } else if (err == EINVAL) {
             error_msg("%s: no default syntax found", lint_syntax);
         }
-        return get_nr_errors() ? EX_DATAERR : 0;
+        return get_nr_errors() ? EX_DATAERR : EX_OK;
     }
 
     Buffer *stdin_buffer = NULL;
@@ -344,7 +355,7 @@ loop_break:
 
     if (use_showkey) {
         showkey_loop();
-        return 0;
+        return EX_OK;
     }
 
     // Create this early. Needed if lock-files is true.
