@@ -46,12 +46,19 @@ int xopen(const char *path, int flags, ...)
 {
     va_list ap;
     va_start(ap, flags);
-    mode_t mode = (flags & O_CREAT) ? va_arg(ap, mode_t) : 0;
+    unsigned int mode = 0;
+    if (flags & O_CREAT) {
+        // Note: "int" is used (instead of "mode_t") to prevent the following:
+        // "error: second argument to 'va_arg' is of promotable type 'mode_t'
+        // (aka 'unsigned short'); this va_arg has undefined behavior because
+        // arguments will be promoted to 'int' [-Werror,-Wvarargs]"
+        mode = va_arg(ap, unsigned int);
+    }
     va_end(ap);
 
     int fd;
     do {
-        fd = open(path, flags, mode);
+        fd = open(path, flags, (mode_t)mode);
     } while (fd < 0 && errno == EINTR);
 
     return fd;
