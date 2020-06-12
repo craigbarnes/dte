@@ -237,7 +237,7 @@ int read_blocks(Buffer *b, int fd)
 
 int load_buffer(Buffer *b, bool must_exist, const char *filename)
 {
-    int fd = xopen(filename, O_RDONLY);
+    int fd = xopen(filename, O_RDONLY, 0);
 
     if (fd < 0) {
         if (errno != ENOENT) {

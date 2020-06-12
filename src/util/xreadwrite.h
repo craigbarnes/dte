@@ -1,13 +1,24 @@
 #ifndef UTIL_XREADWRITE_H
 #define UTIL_XREADWRITE_H
 
-#include <fcntl.h> // For open() O_* flags
+#include <errno.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include "macros.h"
 
+NONNULL_ARGS
+static inline int xopen(const char *path, int flags, mode_t mode)
+{
+    int fd;
+    do {
+        fd = open(path, flags, mode);
+    } while (fd < 0 && errno == EINTR);
+
+    return fd;
+}
+
 ssize_t xread(int fd, void *buf, size_t count) NONNULL_ARGS;
 ssize_t xwrite(int fd, const void *buf, size_t count) NONNULL_ARGS;
-int xopen(const char *path, int flags, ...) NONNULL_ARG(1);
 int xclose(int fd);
 
 #endif

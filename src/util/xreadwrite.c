@@ -42,28 +42,6 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
     return count_save;
 }
 
-int xopen(const char *path, int flags, ...)
-{
-    va_list ap;
-    va_start(ap, flags);
-    unsigned int mode = 0;
-    if (flags & O_CREAT) {
-        // Note: "int" is used (instead of "mode_t") to prevent the following:
-        // "error: second argument to 'va_arg' is of promotable type 'mode_t'
-        // (aka 'unsigned short'); this va_arg has undefined behavior because
-        // arguments will be promoted to 'int' [-Werror,-Wvarargs]"
-        mode = va_arg(ap, unsigned int);
-    }
-    va_end(ap);
-
-    int fd;
-    do {
-        fd = open(path, flags, (mode_t)mode);
-    } while (fd < 0 && errno == EINTR);
-
-    return fd;
-}
-
 int xclose(int fd)
 {
     int r = close(fd);
