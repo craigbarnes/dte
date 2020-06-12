@@ -25,6 +25,7 @@
 #include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
+#include "util/exitcode.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
@@ -32,14 +33,6 @@
 #include "util/xreadwrite.h"
 #include "view.h"
 #include "window.h"
-
-// Semantic exit codes, as defined by BSD sysexits(3)
-enum {
-    EX_USAGE = 64, // Command line usage error
-    EX_DATAERR = 65, // Input data error
-    EX_OSERR = 71, // Operating system error
-    EX_IOERR = 74, // Input/output error
-};
 
 static void handle_sigtstp(int UNUSED_ARG(signum))
 {
