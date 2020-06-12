@@ -17,6 +17,7 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
+#include "util/exitcode.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -30,7 +31,7 @@ EditorState editor = {
     .child_controls_terminal = false,
     .everything_changed = false,
     .resized = false,
-    .exit_code = 0,
+    .exit_code = EX_OK,
     .buffers = PTR_ARRAY_INIT,
     .search_history = PTR_ARRAY_INIT,
     .command_history = PTR_ARRAY_INIT,
