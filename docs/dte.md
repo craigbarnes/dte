@@ -281,4 +281,4 @@ in the range `0`..`125` by the [`quit`] command.
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
-[`sysexits`]: https://man.openbsd.org/sysexits.3
+[`sysexits`]: https://www.freebsd.org/cgi/man.cgi?query=sysexits
