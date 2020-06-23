@@ -6,16 +6,29 @@ local function get_canonical_id(header)
     return header.content[1].content[1].text
 end
 
+local section
+
 local function Header(header)
-    local old_id = header.attr.identifier
-    if old_id and header.level == 3 and old_id:find("%-") then
-        local ok, id = pcall(get_canonical_id, header)
-        if ok then
-            if #old_id >= #id and id == old_id:sub(1, #id) then
-                header.attr.identifier = id
-            end
+    local level = assert(header.level)
+    local id = header.attr.identifier
+
+    if level == 2 then
+        section = assert(id)
+        return header
+    end
+
+    if level == 3 and section == "special-variables" then
+        header.attr.identifier = id:upper()
+        return header
+    end
+
+    if level == 3 and id:find("%-") then
+        local ok, new_id = pcall(get_canonical_id, header)
+        if ok and #new_id < #id and new_id == id:sub(1, #new_id) then
+            header.attr.identifier = new_id
         end
     end
+
     return header
 end
 
