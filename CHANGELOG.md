@@ -1,6 +1,57 @@
 Releases
 ========
 
+v1.10 (not yet released)
+------------------------
+
+**Additions:**
+
+* Added a [`macro`] command.
+* Added an optional "exitcode" argument to the [`quit`] command.
+* Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
+  command.
+* Added a `-q` (quiet) flag to the [`include`] command.
+* Added a `-c` (color constraint) flag to the [`hi`] command.
+* Added an `-l` (line) flag to the [`filter`] and [`pipe-to`] commands.
+* Added a `-p` (prompt) flag to the [`close`] and [`wclose`] commands.
+* Added a `-t` (temporary) flag to the [`open`] command.
+* Added `-g` (glob) and `-t` (temporary) flags to the [`wsplit`] command.
+* Added support for the `\e` escape sequence in double-quoted command
+  arguments.
+* Added syntax highlighting for Lisp and Scheme files.
+* Added an Alt+Enter key binding to search mode, for performing
+  plain-text searches.
+* Added a Shift+Tab key binding to command mode, for iteratating
+  auto-completions in reverse order.
+* Added `%N`, `%R` and `%S` [statusline] format specifiers.
+* Added a large confirmation dialog, shown when `quit -p` is run
+  with unsaved changes.
+
+**Improvements:**
+
+* Updated Unicode support to version 13.
+* Bound Ctrl+c to [`copy -k`][`copy`] by default.
+* Re-introduced built-in support for rxvt Ctrl/Alt/Shift key combinations.
+* Added built-in support for many additional terminals.
+* Fixed the interaction between selections and certain other commands.
+* Fixed the handling of optional capture groups in [`errorfmt`] patterns.
+* Improved the legibility of the default color scheme on a wider range
+  of terminals.
+* Clarified which command flags in the [`dterc`] man page are mutually
+  exclusive (by separating them with `|`).
+* Excluded commands beginning with a space character from the command
+  history.
+* Fixed signal handling, to allow interrupting unresponsive/deadlocked
+  child processes with Ctrl+c.
+* Various syntax highlighting improvements.
+* Various terminal compatibility improvements.
+* Various performance improvements.
+
+**Breaking changes:**
+
+* Removed support for vertical tab bars (the `tab-bar` option was
+  changed from an enum to a Boolean).
+
 v1.9.1 (latest release)
 -----------------------
 
@@ -365,3 +416,21 @@ system except a somewhat recent kernel.
 [ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
+[`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
+
+[`close`]: https://craigbarnes.gitlab.io/dte/dterc.html#close
+[`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
+[`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
+[`filter`]: https://craigbarnes.gitlab.io/dte/dterc.html#filter
+[`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
+[`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
+[`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
+[`match-bracket`]: https://craigbarnes.gitlab.io/dte/dterc.html#match-bracket
+[`open`]: https://craigbarnes.gitlab.io/dte/dterc.html#open
+[`pipe-to`]: https://craigbarnes.gitlab.io/dte/dterc.html#pipe-to
+[`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
+[`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
+[`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
+[`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
+
+[statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
