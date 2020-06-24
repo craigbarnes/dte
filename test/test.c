@@ -44,7 +44,7 @@ void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
 void expect_uint_eq(const char *file, int line, uintmax_t a, uintmax_t b)
 {
     if (unlikely(a != b)) {
-        test_fail(file, line, "Values not equal: %ju, %ju", a, b);
+        test_fail(file, line, "Values not equal: 0x%jx, 0x%jx", a, b);
     }
 }
 

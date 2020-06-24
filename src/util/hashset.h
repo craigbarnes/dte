@@ -15,7 +15,7 @@ typedef struct {
     size_t table_size;
     size_t nr_entries;
     size_t grow_at;
-    uint32_t (*hash)(const char *str, size_t len);
+    uint32_t (*hash)(const unsigned char *str, size_t len);
     bool (*equal)(const void *s1, const void *s2, size_t n);
 } HashSet;
 

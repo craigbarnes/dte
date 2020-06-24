@@ -866,6 +866,11 @@ static void test_hash(void)
     n = strlen(s);
     EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), fnv_1a_32_hash_icase(s, n));
     EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), fnv_1a_64_hash_icase(s, n));
+
+    s = "\x80\b\t\r\n\x01\xfe\xff";
+    n = strlen(s);
+    EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), 0xcb9e00f5);
+    EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), 0xf9a1754aa1678335);
 }
 
 static void test_hashset(void)
