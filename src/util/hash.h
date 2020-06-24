@@ -14,8 +14,7 @@ static inline uint32_t fnv_1a_32_hash(const unsigned char *str, size_t n)
 {
     uint32_t hash = FNV_32_INIT;
     while (n--) {
-        uint32_t c = *str++;
-        hash ^= c;
+        hash ^= *str++;
         hash *= FNV_32_PRIME;
     }
     return hash;
@@ -25,8 +24,7 @@ static inline uint32_t fnv_1a_32_hash_icase(const unsigned char *str, size_t n)
 {
     uint32_t hash = FNV_32_INIT;
     while (n--) {
-        uint32_t c = ascii_tolower(*str++);
-        hash ^= c;
+        hash ^= ascii_tolower(*str++);
         hash *= FNV_32_PRIME;
     }
     return hash;
@@ -36,8 +34,7 @@ static inline uint64_t fnv_1a_64_hash(const unsigned char *str, size_t n)
 {
     uint64_t hash = FNV_64_INIT;
     while (n--) {
-        uint64_t c = *str++;
-        hash ^= c;
+        hash ^= *str++;
         hash *= FNV_64_PRIME;
     }
     return hash;
@@ -47,8 +44,7 @@ static inline uint64_t fnv_1a_64_hash_icase(const unsigned char *str, size_t n)
 {
     uint64_t hash = FNV_64_INIT;
     while (n--) {
-        uint64_t c = ascii_tolower(*str++);
-        hash ^= c;
+        hash ^= ascii_tolower(*str++);
         hash *= FNV_64_PRIME;
     }
     return hash;
