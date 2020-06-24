@@ -237,7 +237,7 @@ int read_blocks(Buffer *b, int fd)
 
 int load_buffer(Buffer *b, bool must_exist, const char *filename)
 {
-    int fd = xopen(filename, O_RDONLY, 0);
+    int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
 
     if (fd < 0) {
         if (errno != ENOENT) {
@@ -374,7 +374,7 @@ int save_buffer (
             // New file.
             mode = 0666 & ~get_umask();
         }
-        fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY, mode);
+        fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
             perror_msg("open");
             return -1;

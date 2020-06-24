@@ -8,7 +8,7 @@
 ssize_t read_file(const char *filename, char **bufp)
 {
     *bufp = NULL;
-    int fd = xopen(filename, O_RDONLY, 0);
+    int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd == -1) {
         return -1;
     }

@@ -89,7 +89,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
     int tries = 0;
     int wfd;
     while (1) {
-        wfd = xopen(file_locks_lock, O_WRONLY | O_CREAT | O_EXCL, 0666);
+        wfd = xopen(file_locks_lock, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0666);
         if (wfd >= 0) {
             break;
         }

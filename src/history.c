@@ -81,10 +81,9 @@ void history_load(PointerArray *history, const char *filename, size_t max_entrie
     free(buf);
 }
 
-// Like fopen(), but also sets the file mode
 FILE *history_fopen(const char *filename)
 {
-    int fd = xopen(filename, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    int fd = xopen(filename, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0666);
     if (fd < 0) {
         goto error;
     }
