@@ -137,16 +137,14 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         break;
     case ARGERR_TOO_FEW_ARGUMENTS:
         error_msg (
-            "Too few arguments given to '%s' (got: %zu, minimum: %u)",
-            cmd->name,
+            "Too few arguments (got: %zu, minimum: %u)",
             a->nr_args,
             cmd->min_args
         );
         break;
     case ARGERR_TOO_MANY_ARGUMENTS:
         error_msg (
-            "Too many arguments given to '%s' (got: %zu, maximum: %u)",
-            cmd->name,
+            "Too many arguments (got: %zu, maximum: %u)",
             a->nr_args,
             cmd->max_args
         );

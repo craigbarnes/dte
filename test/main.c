@@ -35,7 +35,7 @@ static void test_handle_binding(void)
     const Command *insert = find_normal_command("insert");
     ASSERT_NONNULL(binding);
     ASSERT_NONNULL(insert);
-    EXPECT_PTREQ(binding->cmd, insert->cmd);
+    EXPECT_PTREQ(binding->cmd, insert);
     EXPECT_EQ(binding->a.nr_flags, 0);
     EXPECT_EQ(binding->a.nr_args, 1);
     EXPECT_STREQ(binding->a.args[0], "zzz");

@@ -1209,7 +1209,10 @@ static void cmd_repeat(const CommandArgs *a)
     }
 
     CommandArgs a2 = {.args = a->args + 2};
-    if (!parse_args(cmd, &a2)) {
+    current_command = cmd;
+    bool ok = parse_args(cmd, &a2);
+    current_command = NULL;
+    if (!ok) {
         return;
     }
 
