@@ -176,7 +176,7 @@ static void test_parse_args(void)
     EXPECT_STREQ(cmd->name, "open");
 
     CommandArgs a = {.args = (char**)array.ptrs + 1};
-    ASSERT_TRUE(parse_args(cmd, &a));
+    ASSERT_EQ(do_parse_args(cmd, &a), 0);
     EXPECT_EQ(a.nr_flags, 2);
     EXPECT_EQ(a.flags[0], 'g');
     EXPECT_EQ(a.flags[1], 'e');
@@ -188,6 +188,30 @@ static void test_parse_args(void)
     EXPECT_STREQ(a.args[3], "*.mk");
     EXPECT_NULL(a.args[4]);
 
+    ptr_array_free(&array);
+    EXPECT_NULL(array.ptrs);
+    EXPECT_EQ(array.alloc, 0);
+    EXPECT_EQ(array.count, 0);
+
+    cmd_str = "bind 1 2 3 4 5 -6";
+    ASSERT_EQ(parse_commands(&array, cmd_str), CMDERR_NONE);
+    ASSERT_EQ(array.count, 8);
+    EXPECT_STREQ(array.ptrs[0], "bind");
+    EXPECT_STREQ(array.ptrs[1], "1");
+    EXPECT_STREQ(array.ptrs[6], "-6");
+    EXPECT_NULL(array.ptrs[7]);
+
+    cmd = find_normal_command(array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "bind");
+    EXPECT_EQ(cmd->max_args, 2);
+    EXPECT_EQ(cmd->flags[0], '-');
+
+    a = (CommandArgs){.args = (char**)array.ptrs + 1, .flags = "TEST"};
+    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_TOO_MANY_ARGUMENTS);
+    EXPECT_EQ(a.nr_args, 6);
+    EXPECT_EQ(a.nr_flags, 0);
+    EXPECT_EQ(a.flags[0], '\0');
     ptr_array_free(&array);
 }
 

@@ -2083,8 +2083,8 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 }
 
 static const Command cmds[] = {
-    {"alias", "", true, 2, 2, cmd_alias},
-    {"bind", "", true, 1, 2, cmd_bind},
+    {"alias", "-", true, 2, 2, cmd_alias},
+    {"bind", "-", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "", false, 0, 0, cmd_bof},
@@ -2095,7 +2095,7 @@ static const Command cmds[] = {
     {"center-view", "", false, 0, 0, cmd_center_view},
     {"clear", "", false, 0, 0, cmd_clear},
     {"close", "fpqw", false, 0, 0, cmd_close},
-    {"command", "", false, 0, 1, cmd_command},
+    {"command", "-", false, 0, 1, cmd_command},
     {"compile", "-1ps", false, 2, -1, cmd_compile},
     {"copy", "k", false, 0, 0, cmd_copy},
     {"cut", "", false, 0, 0, cmd_cut},

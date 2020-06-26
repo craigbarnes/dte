@@ -93,19 +93,19 @@ unsigned int do_parse_args(const Command *cmd, CommandArgs *a)
         argc--;
     }
 
-    // Don't count arguments to flags as arguments to command
-    argc -= nr_flag_args;
+    a->flags[nr_flags] = '\0';
+    a->nr_flags = nr_flags;
 
-    if (argc < cmd->min_args) {
+    // Don't count arguments to flags as arguments to command
+    a->nr_args = argc - nr_flag_args;
+
+    if (a->nr_args < cmd->min_args) {
         return ARGERR_TOO_FEW_ARGUMENTS;
     }
-    if (argc > cmd->max_args) {
+    if (a->nr_args > cmd->max_args) {
         return ARGERR_TOO_MANY_ARGUMENTS;
     }
-    a->flags[nr_flags] = '\0';
 
-    a->nr_args = argc;
-    a->nr_flags = nr_flags;
     return 0;
 }
 
@@ -136,10 +136,20 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         error_msg("Option -%c requires an argument", flag);
         break;
     case ARGERR_TOO_FEW_ARGUMENTS:
-        error_msg("Not enough arguments");
+        error_msg (
+            "Too few arguments given to '%s' (got: %zu, minimum: %u)",
+            cmd->name,
+            a->nr_args,
+            cmd->min_args
+        );
         break;
     case ARGERR_TOO_MANY_ARGUMENTS:
-        error_msg("Too many arguments");
+        error_msg (
+            "Too many arguments given to '%s' (got: %zu, maximum: %u)",
+            cmd->name,
+            a->nr_args,
+            cmd->max_args
+        );
         break;
     default:
         BUG("unhandled error type");
