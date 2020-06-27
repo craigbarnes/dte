@@ -3,6 +3,8 @@ PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadat
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
 PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html -Voutput_basename=$(@F)
 
+public/dte.html: PANDOC_FLAGS += --indented-code-classes=sh
+
 man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 html-man = public/dte.html public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)

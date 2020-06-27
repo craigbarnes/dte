@@ -321,6 +321,43 @@ Note: the above exit codes are set by the editor itself, with values in
 accordance with \fBsysexits\fR(3). The exit code may also be set to values
 in the range \fB0\fR..\fB125\fR by the \fBquit\fR command.
 .P
+.SH EXAMPLES
+Open \fB/etc/passwd\fR with cursor on line 3:
+.P
+.IP
+.nf
+\f[C]
+dte\ +3\ /etc/passwd
+\f[]
+.fi
+.PP
+Run several commands at startup:
+.P
+.IP
+.nf
+\f[C]
+dte\ \-c\ 'set\ filetype\ sh;\ insert\ \-m\ "#!/bin/sh\\n"'
+\f[]
+.fi
+.PP
+Read a buffer from standard input:
+.P
+.IP
+.nf
+\f[C]
+echo\ 'Hello,\ World!'\ |\ dte
+\f[]
+.fi
+.PP
+Interactively filter a shell pipeline:
+.P
+.IP
+.nf
+\f[C]
+printf\ 'A\ B\ C\ D\ E\ F'\ |\ tr\ '\ '\ '\\n'\ |\ dte\ |\ tac
+\f[]
+.fi
+.PP
 .
 .SH SEE ALSO
 \fBdterc\fR(5),

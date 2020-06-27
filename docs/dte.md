@@ -268,6 +268,24 @@ Note: the above exit codes are set by the editor itself, with values in
 accordance with [`sysexits`]. The exit code may also be set to values
 in the range `0`..`125` by the [`quit`] command.
 
+# Examples
+
+Open `/etc/passwd` with cursor on line 3:
+
+    dte +3 /etc/passwd
+
+Run several commands at startup:
+
+    dte -c 'set filetype sh; insert -m "#!/bin/sh\n"'
+
+Read a buffer from standard input:
+
+    echo 'Hello, World!' | dte
+
+Interactively filter a shell pipeline:
+
+    printf 'A B C D E F' | tr ' ' '\n' | dte | tac
+
 
 [`dterc`]: dterc.html
 [`dte-syntax`]: dte-syntax.html
