@@ -16,7 +16,7 @@ v1.10 (not yet released)
 * Added a `-p` (prompt) flag to the [`close`] and [`wclose`] commands.
 * Added a `-t` (temporary) flag to the [`open`] command.
 * Added `-g` (glob) and `-t` (temporary) flags to the [`wsplit`] command.
-* Added support for the `\e` escape sequence in double-quoted command
+* Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
 * Added an Alt+Enter key binding to search mode, for performing
@@ -24,8 +24,8 @@ v1.10 (not yet released)
 * Added a Shift+Tab key binding to command mode, for iteratating
   auto-completions in reverse order.
 * Added `%N`, `%R` and `%S` [statusline] format specifiers.
-* Added a large confirmation dialog, shown when `quit -p` is run
-  with unsaved changes.
+* Added a large confirmation dialog, shown when [`quit -p`][`quit`] is
+  run with unsaved changes.
 
 **Improvements:**
 
@@ -433,4 +433,5 @@ system except a somewhat recent kernel.
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
+[double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
