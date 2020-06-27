@@ -132,6 +132,7 @@ static void set_signal_handlers(void)
     }
 
     sigemptyset(&action.sa_mask);
+    action.sa_flags = SA_RESTART;
     for (size_t i = 0; i < ARRAY_COUNT(handled_signals); i++) {
         action.sa_handler = handled_signals[i].handler;
         do_sigaction(handled_signals[i].signum, &action);
