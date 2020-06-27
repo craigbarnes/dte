@@ -284,7 +284,7 @@ Read a buffer from standard input:
 
 Interactively filter a shell pipeline:
 
-    printf 'A B C D E F' | tr ' ' '\n' | dte | tac
+    echo 'A B C D E F' | tr ' ' '\n' | dte | tac
 
 
 [`dterc`]: dterc.html
