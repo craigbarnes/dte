@@ -38,6 +38,7 @@ Installing
 | [Void Linux]              | `xbps-install -S dte`                      |
 | Slackware ([SlackBuilds]) | See: [SlackBuild Usage HOWTO]              |
 | [FreeBSD]                 | `pkg install dte`                          |
+| DragonFly BSD ([DPorts])  | `pkg install dte`                          |
 | [OpenBSD]                 | `pkg_add dte`                              |
 | NetBSD ([pkgsrc])         | `pkg_add dte`                              |
 | OS X ([Homebrew])         | `brew tap yumitsu/dte && brew install dte` |
@@ -110,6 +111,7 @@ Public License version 2 for more details.
 [SlackBuilds]: https://slackbuilds.org/repository/14.2/development/dte/
 [SlackBuild Usage HOWTO]: https://slackbuilds.org/howto/
 [FreeBSD]: https://svnweb.freebsd.org/ports/head/editors/dte/
+[DPorts]: https://gitweb.dragonflybsd.org/dports.git/tree/HEAD:/editors/dte
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://pkgsrc.se/editors/dte
 [Homebrew]: https://github.com/yumitsu/homebrew-dte
