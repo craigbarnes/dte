@@ -94,7 +94,7 @@ build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -DDEBUG=3 1>&2
+	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 1>&2
 
 clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h
