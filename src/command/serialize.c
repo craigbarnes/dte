@@ -4,14 +4,14 @@
 
 void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 {
-    static const char escmap[32] = {
+    static const unsigned char escmap[32] = {
         [0x07] = 'a', [0x08] = 'b',
         [0x09] = 't', [0x0A] = 'n',
         [0x0B] = 'v', [0x0C] = 'f',
         [0x0D] = 'r', [0x1B] = 'e',
     };
 
-    const char *arg = sv.data;
+    const unsigned char *arg = sv.data;
     size_t len = sv.length;
     if (len == 0) {
         string_append_literal(s, "''");
@@ -28,7 +28,7 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 
     bool squote = false;
     for (size_t i = 0; i < len; i++) {
-        char c = arg[i];
+        const unsigned char c = arg[i];
         switch (c) {
         case ' ':
         case '"':
