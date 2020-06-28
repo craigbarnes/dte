@@ -11,12 +11,12 @@ Linux)
     case $(. /etc/os-release && echo "$ID") in
     alpine)
         apk --update add make gcc binutils ncurses ncurses-dev libc-dev;;
-    arch)
+    arch|manjaro|artix)
         pacman -S --needed --noconfirm make gcc ncurses;;
     centos|fedora)
         yum -y install make gcc binutils ncurses-devel;;
-    debian|ubuntu)
-        apt-get update && apt-get -qy install make gcc libncurses5-dev;;
+    debian|ubuntu|linuxmint)
+        apt-get update && apt-get -qy install make gcc libncurses-dev;;
     void)
         xbps-install -S make gcc ncurses ncurses-devel;;
     *)
@@ -24,8 +24,10 @@ Linux)
     esac;;
 OpenBSD)
     pkg_add -IU gmake gcc;;
-FreeBSD)
-    pkg install gmake gcc;; # TODO: test this
+NetBSD)
+    pkg_add gmake gcc;;
+FreeBSD|DragonFly)
+    pkg install gmake gcc;;
 *)
     error 'Unrecognized OS; install GNU Make, GCC and curses manually';;
 esac
