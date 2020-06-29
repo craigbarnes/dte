@@ -12,7 +12,7 @@
  * a->args field should be set before calling.
  * If parsing succeeds, the other fields are set and 0 is returned.
  */
-unsigned int do_parse_args(const Command *cmd, CommandArgs *a)
+ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 {
     char **args = a->args;
     BUG_ON(!args);
@@ -111,7 +111,7 @@ unsigned int do_parse_args(const Command *cmd, CommandArgs *a)
 
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
-    unsigned int err = do_parse_args(cmd, a);
+    ArgParseError err = do_parse_args(cmd, a);
     if (err == 0) {
         return true;
     }

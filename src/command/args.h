@@ -14,7 +14,11 @@ typedef enum {
     ARGERR_TOO_MANY_ARGUMENTS,
 } ArgParseErrorType;
 
+// Success: 0
+// Failure: (ARGERR_* | (flag << 8))
+typedef unsigned int ArgParseError;
+
 bool parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
-unsigned int do_parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
+ArgParseError do_parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
 
 #endif
