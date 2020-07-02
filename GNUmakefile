@@ -26,10 +26,7 @@ check: $(test) all
 	$(E) TEST $<
 	$(Q) ./$<
 
-install: all
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man1dir)'
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man5dir)'
+install: all installdirs
 	$(E) INSTALL '$(DESTDIR)$(bindir)/$(dte)'
 	$(Q) $(INSTALL_PROGRAM) '$(dte)' '$(DESTDIR)$(bindir)'
 	$(E) INSTALL '$(DESTDIR)$(man1dir)/dte.1'
@@ -38,6 +35,11 @@ install: all
 	$(Q) $(INSTALL_DATA) docs/dterc.5 '$(DESTDIR)$(man5dir)'
 	$(E) INSTALL '$(DESTDIR)$(man5dir)/dte-syntax.5'
 	$(Q) $(INSTALL_DATA) docs/dte-syntax.5 '$(DESTDIR)$(man5dir)'
+
+installdirs:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man1dir)'
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man5dir)'
 
 uninstall:
 	$(RM) '$(DESTDIR)$(bindir)/$(dte)'
@@ -67,7 +69,7 @@ clean:
 
 
 .DEFAULT_GOAL = all
-.PHONY: all check install uninstall tags clean
+.PHONY: all check install installdirs uninstall tags clean
 .PHONY: install-desktop-file uninstall-desktop-file
 .DELETE_ON_ERROR:
 
