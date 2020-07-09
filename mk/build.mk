@@ -153,7 +153,7 @@ BASIC_CFLAGS += \
 $(all_objects): BASIC_CFLAGS += -Isrc
 
 # If "make install*" with no other named targets
-ifeq "" "$(filter-out install install-desktop-file,$(or $(MAKECMDGOALS),all))"
+ifeq "" "$(filter-out install%,$(or $(MAKECMDGOALS),all))"
   OPTCHECK = :
 else
   OPTCHECK = SILENT_BUILD='$(MAKE_S)' mk/optcheck.sh
