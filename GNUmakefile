@@ -6,13 +6,15 @@ include mk/docs.mk
 include mk/gen.mk
 -include mk/dev.mk
 
+# https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 prefix ?= /usr/local
-bindir ?= $(prefix)/bin
-datadir ?= $(prefix)/share
-mandir ?= $(datadir)/man
+datarootdir ?= $(prefix)/share
+exec_prefix ?= $(prefix)
+bindir ?= $(exec_prefix)/bin
+mandir ?= $(datarootdir)/man
 man1dir ?= $(mandir)/man1
 man5dir ?= $(mandir)/man5
-appdir ?= $(datadir)/applications
+appdir ?= $(datarootdir)/applications
 
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
@@ -21,10 +23,6 @@ INSTALL_DESKTOP_FILE = desktop-file-install
 RM = rm -f
 
 all: $(dte)
-
-check: $(test) all
-	$(E) TEST $<
-	$(Q) ./$<
 
 install: all installdirs
 	$(E) INSTALL '$(DESTDIR)$(bindir)/$(dte)'
@@ -60,6 +58,14 @@ uninstall-desktop-file:
 	$(RM) '$(DESTDIR)$(appdir)/dte.desktop'
 	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
 
+check: $(test) all
+	$(E) TEST $<
+	$(Q) ./$<
+
+installcheck: install
+	$(E) TEST '$(DESTDIR)$(bindir)/$(dte)'
+	$(Q) '$(DESTDIR)$(bindir)/$(dte)' -V >/dev/null
+
 tags:
 	ctags src/*.[ch] src/*/*.[ch] test/*.[ch]
 
@@ -69,7 +75,7 @@ clean:
 
 
 .DEFAULT_GOAL = all
-.PHONY: all check install installdirs uninstall tags clean
+.PHONY: all check install installdirs uninstall installcheck tags clean
 .PHONY: install-desktop-file uninstall-desktop-file
 .DELETE_ON_ERROR:
 

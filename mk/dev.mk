@@ -34,9 +34,7 @@ distcheck: build/dte-$(DISTVER).tar.gz | build/
 	$(E) EXTRACT $(TARDIR)
 	$(Q) cd $(<D) && tar -xzf $(<F)
 	$(E) MAKE $(TARDIR)
-	$(Q) $(MAKE) -B -j$(NPROC) -C$(TARDIR) check install prefix=/usr DESTDIR=pkg
-	$(E) TEST $(TARDIR)pkg/usr/bin/dte
-	$(Q) $(TARDIR)pkg/usr/bin/dte -V | grep '^dte [1-9]' >/dev/null
+	$(Q) $(MAKE) -B -C$(TARDIR) check installcheck prefix=/usr DESTDIR=pkg
 	$(E) RM $(TARDIR)
 	$(Q) $(RM) -r '$(TARDIR)'
 	$(E) RM $<
