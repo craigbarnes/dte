@@ -134,8 +134,8 @@ void dump_file_options(String *buf)
             string_append_literal(buf, "-r ");
         }
         string_append_escaped_arg(buf, opt->type_or_pattern, false);
-        string_append_byte(buf, ' ');
         for (size_t j = 0; opt->strs[j]; j += 2) {
+            string_append_byte(buf, ' ');
             string_append_cstring(buf, opt->strs[j]);
             string_append_byte(buf, ' ');
             string_append_escaped_arg(buf, opt->strs[j + 1], false);
