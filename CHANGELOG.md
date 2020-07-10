@@ -6,16 +6,20 @@ v1.10 (not yet released)
 
 **Additions:**
 
-* Added a [`macro`] command.
-* Added an optional "exitcode" argument to the [`quit`] command.
+* Added support for [`macro`] recording.
+* Added an optional *exitcode* argument to the [`quit`] command.
 * Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
   command.
-* Added a `-q` (quiet) flag to the [`include`] command.
-* Added a `-c` (color constraint) flag to the [`hi`] command.
-* Added an `-l` (line) flag to the [`filter`] and [`pipe-to`] commands.
-* Added a `-p` (prompt) flag to the [`close`] and [`wclose`] commands.
-* Added a `-t` (temporary) flag to the [`open`] command.
-* Added `-g` (glob) and `-t` (temporary) flags to the [`wsplit`] command.
+* Added various, new command flags:
+  * [`include -q`][`include`]
+  * [`hi -c`][`hi`]
+  * [`filter -l`][`filter`]
+  * [`pipe-to -l`][`pipe-to`]
+  * [`close -p`][`close`]
+  * [`wclose -p`][`wclose`]
+  * [`open -t`][`open`]
+  * [`wsplit -t`][`wsplit`]
+  * [`wsplit -g`][`wsplit`]
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
@@ -33,7 +37,6 @@ v1.10 (not yet released)
 * Bound Ctrl+c to [`copy -k`][`copy`] by default.
 * Re-introduced built-in support for rxvt Ctrl/Alt/Shift key combinations.
 * Added built-in support for many additional terminals.
-* Fixed the interaction between selections and certain other commands.
 * Fixed the handling of optional capture groups in [`errorfmt`] patterns.
 * Improved the legibility of the default color scheme on a wider range
   of terminals.
