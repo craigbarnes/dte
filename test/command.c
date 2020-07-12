@@ -213,6 +213,24 @@ static void test_parse_args(void)
     EXPECT_EQ(a.nr_flags, 0);
     EXPECT_EQ(a.flags[0], '\0');
     ptr_array_free(&array);
+
+    cmd_str = "open \"-\\xff\"";
+    ASSERT_EQ(parse_commands(&array, cmd_str), CMDERR_NONE);
+    ASSERT_EQ(array.count, 3);
+    EXPECT_STREQ(array.ptrs[0], "open");
+    EXPECT_STREQ(array.ptrs[1], "-\xff");
+    EXPECT_NULL(array.ptrs[2]);
+
+    cmd = find_normal_command(array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "open");
+
+    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_INVALID_OPTION | 0xFF00);
+    EXPECT_EQ(a.nr_args, 0);
+    EXPECT_EQ(a.nr_flags, 0);
+    EXPECT_EQ(a.flags[0], '\0');
+    ptr_array_free(&array);
 }
 
 static void test_escape_command_arg(void)
