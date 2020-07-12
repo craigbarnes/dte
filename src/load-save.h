@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include "buffer.h"
-#include "encoding/encoding.h"
+#include "encoding.h"
 
 int load_buffer(Buffer *b, bool must_exist, const char *filename);
 int save_buffer(Buffer *b, const char *filename, const Encoding *encoding, bool crlf);

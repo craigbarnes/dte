@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "cmdline.h"
+#include "encoding.h"
 #include "options.h"
-#include "encoding/encoding.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 

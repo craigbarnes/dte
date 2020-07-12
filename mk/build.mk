@@ -40,9 +40,6 @@ command_objects := $(call prefix-obj, build/command/, \
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
 
-encoding_objects := $(call prefix-obj, build/encoding/, \
-    convert encoding )
-
 syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight state syntax )
 
@@ -52,14 +49,13 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer change cmdline commands \
-    compiler completion config ctags debug edit editor error \
-    file-history file-option filetype frame history indent \
-    load-save lock main mode move msg options regexp \
+    convert compiler completion config ctags debug edit editor \
+    encoding error file-history file-option filetype frame history \
+    indent load-save lock main mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection show spawn tag view window ) \
     $(command_objects) \
     $(editorconfig_objects) \
-    $(encoding_objects) \
     $(syntax_objects) \
     $(terminal_objects) \
     $(util_objects)
@@ -104,7 +100,7 @@ else ifeq "$(KERNEL)" "NetBSD"
 endif
 
 ifdef ICONV_DISABLE
-  build/encoding/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
+  build/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
 else
   LDLIBS += $(LDLIBS_ICONV)
 endif
@@ -173,7 +169,6 @@ $(test): $(filter-out build/main.o, $(all_objects))
 $(util_objects): | build/util/
 $(command_objects): | build/command/
 $(editorconfig_objects): | build/editorconfig/
-$(encoding_objects): | build/encoding/
 $(syntax_objects): | build/syntax/
 $(terminal_objects): | build/terminal/
 $(build_subdirs): | build/
@@ -187,9 +182,8 @@ build/load-save.o: build/feature.h
 build/util/exec.o: build/feature.h
 build/terminal/winsize.o: build/feature.h
 build/terminal/terminfo.o: build/terminal/terminfo.cflags
-build/encoding/convert.o: build/encoding/convert.cflags
+build/convert.o: build/convert.cflags
 build/terminal/terminfo.cflags: | build/terminal/
-build/encoding/convert.cflags: | build/encoding/
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)

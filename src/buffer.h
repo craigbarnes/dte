@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include "change.h"
-#include "encoding/encoding.h"
+#include "encoding.h"
 #include "options.h"
 #include "syntax/syntax.h"
 #include "util/list.h"

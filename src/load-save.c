@@ -6,10 +6,10 @@
 #include <unistd.h>
 #include "load-save.h"
 #include "block.h"
+#include "convert.h"
 #include "debug.h"
 #include "editor.h"
-#include "encoding/convert.h"
-#include "encoding/encoding.h"
+#include "encoding.h"
 #include "error.h"
 #include "util/macros.h"
 #include "util/path.h"

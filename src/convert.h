@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#include "encoding/encoding.h"
+#include "encoding.h"
 #include "util/macros.h"
 
 typedef struct FileDecoder FileDecoder;

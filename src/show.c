@@ -11,7 +11,7 @@
 #include "commands.h"
 #include "config.h"
 #include "editor.h"
-#include "encoding/encoding.h"
+#include "encoding.h"
 #include "error.h"
 #include "file-option.h"
 #include "frame.h"
