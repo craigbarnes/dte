@@ -2,6 +2,7 @@
 #include "encoding.h"
 #include "util/ascii.h"
 #include "util/hashset.h"
+#include "util/str-util.h"
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",
@@ -32,6 +33,14 @@ static const struct {
     {"UCS-4", UTF32},
     {"UCS-4BE", UTF32BE},
     {"UCS-4LE", UTF32LE},
+};
+
+static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
+    [UTF8] = {{0xef, 0xbb, 0xbf}, 3},
+    [UTF16BE] = {{0xfe, 0xff}, 2},
+    [UTF16LE] = {{0xff, 0xfe}, 2},
+    [UTF32BE] = {{0x00, 0x00, 0xfe, 0xff}, 4},
+    [UTF32LE] = {{0xff, 0xfe, 0x00, 0x00}, 4},
 };
 
 EncodingType lookup_encoding(const char *name)
@@ -84,4 +93,28 @@ Encoding encoding_from_type(EncodingType type)
         .type = type,
         .name = encoding_type_to_string(type)
     };
+}
+
+EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
+{
+    // Skip exhaustive checks if there's clearly no BOM
+    if (size < 2 || ((unsigned int)buf[0]) - 1 < 0xEE) {
+        return UNKNOWN_ENCODING;
+    }
+
+    // Iterate array backwards to ensure UTF32LE is checked before UTF16LE
+    for (int i = NR_ENCODING_TYPES - 1; i >= 0; i--) {
+        const unsigned int bom_len = boms[i].len;
+        if (bom_len > 0 && size >= bom_len && mem_equal(buf, boms[i].bytes, bom_len)) {
+            return (EncodingType) i;
+        }
+    }
+    return UNKNOWN_ENCODING;
+}
+
+const ByteOrderMark *get_bom_for_encoding(EncodingType encoding)
+{
+    static_assert(ARRAY_COUNT(boms) == NR_ENCODING_TYPES);
+    const ByteOrderMark *bom = &boms[encoding];
+    return bom->len ? bom : NULL;
 }

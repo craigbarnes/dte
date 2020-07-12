@@ -1,6 +1,7 @@
 #ifndef ENCODING_ENCODING_H
 #define ENCODING_ENCODING_H
 
+#include <stddef.h>
 #include "util/macros.h"
 
 typedef enum {
@@ -27,8 +28,15 @@ typedef struct {
     const char *name;
 } Encoding;
 
+typedef struct {
+    const unsigned char bytes[4];
+    unsigned int len;
+} ByteOrderMark;
+
 Encoding encoding_from_type(EncodingType type);
 Encoding encoding_from_name(const char *name) NONNULL_ARGS;
 EncodingType lookup_encoding(const char *name) NONNULL_ARGS;
+EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size);
+const ByteOrderMark *get_bom_for_encoding(EncodingType encoding);
 
 #endif

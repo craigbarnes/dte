@@ -1,5 +1,4 @@
 #include "test.h"
-#include "encoding/bom.h"
 #include "encoding/encoding.h"
 
 static void test_detect_encoding_from_bom(void)
