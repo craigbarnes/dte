@@ -2,19 +2,30 @@
 #define ENCODING_CONVERT_H
 
 #include <stdbool.h>
-#include <stddef.h>
+#include <sys/types.h>
+#include "encoding/encoding.h"
+#include "util/macros.h"
 
-struct cconv;
+typedef struct FileDecoder FileDecoder;
 
-struct cconv *cconv_to_utf8(const char *encoding);
-struct cconv *cconv_from_utf8(const char *encoding);
-void cconv_process(struct cconv *c, const char *input, size_t len);
-void cconv_flush(struct cconv *c);
-size_t cconv_nr_errors(const struct cconv *c);
-char *cconv_consume_line(struct cconv *c, size_t *len);
-char *cconv_consume_all(struct cconv *c, size_t *len);
-void cconv_free(struct cconv *c);
+typedef struct {
+    struct cconv *cconv;
+    unsigned char *nbuf;
+    size_t nsize;
+    bool crlf;
+    int fd;
+} FileEncoder;
 
 bool encoding_supported_by_iconv(const char *encoding);
+
+FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t size);
+void free_file_decoder(FileDecoder *dec);
+bool file_decoder_read_line(FileDecoder *dec, char **line, size_t *len) NONNULL_ARGS;
+const char *file_decoder_get_encoding(const FileDecoder *dec) NONNULL_ARGS;
+
+FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd) NONNULL_ARGS;
+void free_file_encoder(FileEncoder *enc);
+ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t size) NONNULL_ARGS;
+size_t file_encoder_get_nr_errors(const FileEncoder *enc) NONNULL_ARGS;
 
 #endif

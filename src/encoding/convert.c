@@ -1,19 +1,136 @@
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include "convert.h"
 #include "debug.h"
-#include "util/macros.h"
+#include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
-#ifndef ICONV_DISABLE
+struct FileDecoder {
+    const char *encoding;
+    const unsigned char *ibuf;
+    ssize_t ipos, isize;
+    struct cconv *cconv;
+    bool (*read_line)(struct FileDecoder *dec, char **linep, size_t *lenp);
+};
+
+const char *file_decoder_get_encoding(const FileDecoder *dec)
+{
+    return dec->encoding;
+}
+
+static bool read_utf8_line(FileDecoder *dec, char **linep, size_t *lenp)
+{
+    char *line = (char *)dec->ibuf + dec->ipos;
+    const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
+    size_t len;
+
+    if (nl) {
+        len = nl - line;
+        dec->ipos += len + 1;
+    } else {
+        len = dec->isize - dec->ipos;
+        if (len == 0) {
+            return false;
+        }
+        dec->ipos += len;
+    }
+
+    *linep = line;
+    *lenp = len;
+    return true;
+}
+
+static size_t unix_to_dos (
+    FileEncoder *enc,
+    const unsigned char *buf,
+    size_t size
+) {
+    if (enc->nsize < size * 2) {
+        enc->nsize = size * 2;
+        xrenew(enc->nbuf, enc->nsize);
+    }
+    size_t d = 0;
+    for (size_t s = 0; s < size; s++) {
+        unsigned char ch = buf[s];
+        if (ch == '\n') {
+            enc->nbuf[d++] = '\r';
+        }
+        enc->nbuf[d++] = ch;
+    }
+    return d;
+}
+
+#ifdef ICONV_DISABLE // iconv not available; use basic, UTF-8 implementation:
+
+bool encoding_supported_by_iconv(const char* UNUSED_ARG(encoding))
+{
+    return false;
+}
+
+FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
+{
+    if (unlikely(encoding->type != UTF8)) {
+        errno = EINVAL;
+        return NULL;
+    }
+    FileEncoder *enc = xnew0(FileEncoder, 1);
+    enc->crlf = crlf;
+    enc->fd = fd;
+    return enc;
+}
+
+void free_file_encoder(FileEncoder *enc)
+{
+    free(enc->nbuf);
+    free(enc);
+}
+
+ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t n)
+{
+    if (enc->crlf) {
+        n = unix_to_dos(enc, buf, n);
+        buf = enc->nbuf;
+    }
+    return xwrite(enc->fd, buf, n);
+}
+
+size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
+{
+    return 0;
+}
+
+FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t n)
+{
+    if (unlikely(encoding != NULL)) {
+        errno = EINVAL;
+        return NULL;
+    }
+    FileDecoder *dec = xnew0(FileDecoder, 1);
+    dec->ibuf = buf;
+    dec->isize = n;
+    return dec;
+}
+
+void free_file_decoder(FileDecoder *dec)
+{
+    free(dec);
+}
+
+bool file_decoder_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+{
+    return read_utf8_line(dec, linep, lenp);
+}
+
+#else // ICONV_DISABLE is undefined; use full iconv implementation:
 
 #include <iconv.h>
 #include <inttypes.h>
-#include <stdlib.h>
-#include <string.h>
-#include "encoding.h"
+#include "editor.h"
 #include "util/ascii.h"
+#include "util/hashset.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
-#include "util/xmalloc.h"
 
 static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
 
@@ -204,7 +321,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
     return ipos;
 }
 
-void cconv_process(struct cconv *c, const char *input, size_t len)
+static void cconv_process(struct cconv *c, const char *input, size_t len)
 {
     if (c->consumed > 0) {
         size_t fill = c->opos - c->consumed;
@@ -245,7 +362,7 @@ void cconv_process(struct cconv *c, const char *input, size_t len)
     }
 }
 
-struct cconv *cconv_to_utf8(const char *encoding)
+static struct cconv *cconv_to_utf8(const char *encoding)
 {
     iconv_t cd = iconv_open("UTF-8", encoding);
     if (cd == (iconv_t)-1) {
@@ -258,7 +375,7 @@ struct cconv *cconv_to_utf8(const char *encoding)
     return c;
 }
 
-struct cconv *cconv_from_utf8(const char *encoding)
+static struct cconv *cconv_from_utf8(const char *encoding)
 {
     iconv_t cd = iconv_open(encoding, "UTF-8");
     if (cd == (iconv_t)-1) {
@@ -269,7 +386,7 @@ struct cconv *cconv_from_utf8(const char *encoding)
     return c;
 }
 
-void cconv_flush(struct cconv *c)
+static void cconv_flush(struct cconv *c)
 {
     if (c->tcount > 0) {
         // Replace incomplete character at end of input buffer.
@@ -279,12 +396,7 @@ void cconv_flush(struct cconv *c)
     }
 }
 
-size_t cconv_nr_errors(const struct cconv *c)
-{
-    return c->errors;
-}
-
-char *cconv_consume_line(struct cconv *c, size_t *len)
+static char *cconv_consume_line(struct cconv *c, size_t *len)
 {
     char *line = c->obuf + c->consumed;
     char *nl = memchr(line, '\n', c->opos - c->consumed);
@@ -300,7 +412,7 @@ char *cconv_consume_line(struct cconv *c, size_t *len)
     return line;
 }
 
-char *cconv_consume_all(struct cconv *c, size_t *len)
+static char *cconv_consume_all(struct cconv *c, size_t *len)
 {
     char *buf = c->obuf + c->consumed;
     *len = c->opos - c->consumed;
@@ -308,7 +420,7 @@ char *cconv_consume_all(struct cconv *c, size_t *len)
     return buf;
 }
 
-void cconv_free(struct cconv *c)
+static void cconv_free(struct cconv *c)
 {
     iconv_close(c->cd);
     free(c->obuf);
@@ -328,34 +440,221 @@ bool encoding_supported_by_iconv(const char *encoding)
     return true;
 }
 
-#else // Not using iconv -- replace conversion routines with stubs
-
-DISABLE_WARNING("-Wunused-parameter")
-
-bool encoding_supported_by_iconv(const char *encoding)
+FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
 {
+    FileEncoder *enc = xnew0(FileEncoder, 1);
+    enc->crlf = crlf;
+    enc->fd = fd;
+
+    if (encoding->type != UTF8) {
+        enc->cconv = cconv_from_utf8(encoding->name);
+        if (enc->cconv == NULL) {
+            free(enc);
+            return NULL;
+        }
+    }
+
+    return enc;
+}
+
+void free_file_encoder(FileEncoder *enc)
+{
+    if (enc->cconv != NULL) {
+        cconv_free(enc->cconv);
+    }
+    free(enc->nbuf);
+    free(enc);
+}
+
+// NOTE: buf must contain whole characters!
+ssize_t file_encoder_write (
+    FileEncoder *enc,
+    const unsigned char *buf,
+    size_t size
+) {
+    if (enc->crlf) {
+        size = unix_to_dos(enc, buf, size);
+        buf = enc->nbuf;
+    }
+    if (enc->cconv == NULL) {
+        return xwrite(enc->fd, buf, size);
+    }
+    cconv_process(enc->cconv, buf, size);
+    cconv_flush(enc->cconv);
+    buf = cconv_consume_all(enc->cconv, &size);
+    return xwrite(enc->fd, buf, size);
+}
+
+size_t file_encoder_get_nr_errors(const FileEncoder *enc)
+{
+    return enc->cconv ? enc->cconv->errors : 0;
+}
+
+static bool fill(FileDecoder *dec)
+{
+    size_t icount = dec->isize - dec->ipos;
+
+    // Smaller than cconv.obuf to make realloc less likely
+    size_t max = 7 * 1024;
+
+    if (icount > max) {
+        icount = max;
+    }
+
+    if (dec->ipos == dec->isize) {
+        return false;
+    }
+
+    cconv_process(dec->cconv, dec->ibuf + dec->ipos, icount);
+    dec->ipos += icount;
+    if (dec->ipos == dec->isize) {
+        // Must be flushed after all input has been fed
+        cconv_flush(dec->cconv);
+    }
+    return true;
+}
+
+static bool decode_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+{
+    char *line;
+    size_t len;
+    while (1) {
+        line = cconv_consume_line(dec->cconv, &len);
+        if (line) {
+            break;
+        }
+
+        if (!fill(dec)) {
+            break;
+        }
+    }
+
+    if (line) {
+        // Newline not wanted
+        len--;
+    } else {
+        line = cconv_consume_all(dec->cconv, &len);
+        if (len == 0) {
+            return false;
+        }
+    }
+
+    *linep = line;
+    *lenp = len;
+    return true;
+}
+
+static int set_encoding(FileDecoder *dec, const char *encoding)
+{
+    if (strcmp(encoding, "UTF-8") == 0) {
+        dec->read_line = read_utf8_line;
+    } else {
+        dec->cconv = cconv_to_utf8(encoding);
+        if (dec->cconv == NULL) {
+            return -1;
+        }
+        dec->read_line = decode_and_read_line;
+    }
+    dec->encoding = str_intern(encoding);
+    return 0;
+}
+
+static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
+{
+    for (size_t i = 0; i < len; i++) {
+        if (line[i] >= 0x80) {
+            size_t idx = i;
+            CodePoint u = u_get_nonascii(line, len, &idx);
+            const char *encoding;
+            if (u_is_unicode(u)) {
+                encoding = "UTF-8";
+            } else if (editor.term_utf8) {
+                if (dec->isize <= (32 * 1024 * 1024)) {
+                    // If locale is UTF-8 but file doesn't contain valid
+                    // UTF-8 and is also fairly small, just assume latin1
+                    encoding = "ISO-8859-1";
+                } else {
+                    // Large files are likely binary; just decode as
+                    // UTF-8 to avoid costly charset conversion
+                    encoding = "UTF-8";
+                }
+            } else {
+                // Assume encoding is same as locale
+                encoding = editor.charset.name;
+            }
+            if (set_encoding(dec, encoding)) {
+                // FIXME: error message?
+                set_encoding(dec, "UTF-8");
+            }
+            return true;
+        }
+    }
+
+    // ASCII
     return false;
 }
 
-struct cconv *cconv_to_utf8(const char *encoding)
+static bool detect_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
 {
-    errno = EILSEQ;
-    return NULL;
+    char *line = (char *)dec->ibuf + dec->ipos;
+    const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
+    size_t len;
+
+    if (nl) {
+        len = nl - line;
+    } else {
+        len = dec->isize - dec->ipos;
+        if (len == 0) {
+            return false;
+        }
+    }
+
+    if (detect(dec, line, len)) {
+        // Encoding detected
+        return dec->read_line(dec, linep, lenp);
+    }
+
+    // Only ASCII so far
+    dec->ipos += len;
+    if (nl) {
+        dec->ipos++;
+    }
+    *linep = line;
+    *lenp = len;
+    return true;
 }
 
-struct cconv *cconv_from_utf8(const char *encoding)
-{
-    errno = EILSEQ;
-    return NULL;
+FileDecoder *new_file_decoder (
+    const char *encoding,
+    const unsigned char *buf,
+    size_t size
+) {
+    FileDecoder *dec = xnew0(FileDecoder, 1);
+    dec->ibuf = buf;
+    dec->isize = size;
+    dec->read_line = detect_and_read_line;
+
+    if (encoding) {
+        if (set_encoding(dec, encoding)) {
+            free_file_decoder(dec);
+            return NULL;
+        }
+    }
+
+    return dec;
 }
 
-#define FAIL() BUG("unsupported"); fatal_error(__func__, ENOSYS)
+void free_file_decoder(FileDecoder *dec)
+{
+    if (dec->cconv != NULL) {
+        cconv_free(dec->cconv);
+    }
+    free(dec);
+}
 
-void cconv_process(struct cconv *c, const char *input, size_t len) {FAIL();}
-void cconv_flush(struct cconv *c) {FAIL();}
-size_t cconv_nr_errors(const struct cconv *c) {FAIL();}
-char *cconv_consume_line(struct cconv *c, size_t *len) {FAIL();}
-char *cconv_consume_all(struct cconv *c, size_t *len) {FAIL();}
-void cconv_free(struct cconv *c) {FAIL();}
+bool file_decoder_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+{
+    return dec->read_line(dec, linep, lenp);
+}
 
 #endif

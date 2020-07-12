@@ -10,8 +10,6 @@
 #include "editor.h"
 #include "encoding/bom.h"
 #include "encoding/convert.h"
-#include "encoding/decoder.h"
-#include "encoding/encoder.h"
 #include "error.h"
 #include "util/macros.h"
 #include "util/path.h"
@@ -131,8 +129,9 @@ static int decode_and_add_blocks (
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
-        if (dec->encoding) {
-            b->encoding = encoding_from_name(dec->encoding);
+        const char *enc = file_decoder_get_encoding(dec);
+        if (enc) {
+            b->encoding = encoding_from_name(enc);
         } else {
             b->encoding = editor.charset;
         }
@@ -317,11 +316,12 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
         size += rc;
     }
 
-    if (enc->cconv != NULL && cconv_nr_errors(enc->cconv)) {
+    size_t nr_errors = file_encoder_get_nr_errors(enc);
+    if (nr_errors > 0) {
         // Any real error hides this message
         error_msg (
             "Warning: %zu nonreversible character conversions. File saved.",
-            cconv_nr_errors(enc->cconv)
+            nr_errors
         );
     }
 
@@ -382,9 +382,9 @@ int save_buffer (
     }
 
     enc = new_file_encoder(encoding, crlf, fd);
-    if (enc == NULL) {
+    if (unlikely(!enc)) {
         // This should never happen because encoding is validated early
-        perror_msg("iconv_open");
+        perror_msg("new_file_encoder");
         xclose(fd);
         goto error;
     }

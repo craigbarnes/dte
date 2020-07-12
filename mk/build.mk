@@ -41,7 +41,7 @@ editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
 
 encoding_objects := $(call prefix-obj, build/encoding/, \
-    bom convert decoder encoder encoding )
+    bom convert encoding )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight state syntax )
