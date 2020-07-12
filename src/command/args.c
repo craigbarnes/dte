@@ -23,7 +23,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     }
 
     const char *flag_desc = cmd->flags;
-    char flag = '\0';
+    unsigned char flag = '\0';
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
     bool flags_after_arg = true;
@@ -117,7 +117,7 @@ bool parse_args(const Command *cmd, CommandArgs *a)
     }
 
     ArgParseErrorType err_type = err & 0xFF;
-    char flag = (err >> 8) & 0xFF;
+    unsigned char flag = (err >> 8) & 0xFF;
     switch (err_type) {
     case ARGERR_INVALID_OPTION:
         error_msg("Invalid option -%c", flag);
