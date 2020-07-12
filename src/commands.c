@@ -858,20 +858,19 @@ static void cmd_open(const CommandArgs *a)
         return;
     }
 
-    Encoding encoding = {
-        .type = ENCODING_AUTODETECT,
-        .name = NULL
-    };
-
+    Encoding encoding;
     if (requested_encoding) {
-        if (
-            lookup_encoding(requested_encoding) != UTF8
-            && !encoding_supported_by_iconv(requested_encoding)
-        ) {
+        EncodingType e = lookup_encoding(requested_encoding);
+        if (e == UTF8) {
+            encoding = encoding_from_type(e);
+        } else if (encoding_supported_by_iconv(requested_encoding)) {
+            encoding = encoding_from_name(requested_encoding);
+        } else {
             error_msg("Unsupported encoding: '%s'", requested_encoding);
             return;
         }
-        encoding = encoding_from_name(requested_encoding);
+    } else {
+        encoding = (Encoding){.type = ENCODING_AUTODETECT};
     }
 
     char **paths = args;
@@ -1342,14 +1341,15 @@ static void cmd_save(const CommandArgs *a)
     }
 
     if (requested_encoding) {
-        if (
-            lookup_encoding(requested_encoding) != UTF8
-            && !encoding_supported_by_iconv(requested_encoding)
-        ) {
-            error_msg("Unsupported encoding %s", requested_encoding);
+        EncodingType e = lookup_encoding(requested_encoding);
+        if (e == UTF8) {
+            encoding = encoding_from_type(e);
+        } else if (encoding_supported_by_iconv(requested_encoding)) {
+            encoding = encoding_from_name(requested_encoding);
+        } else {
+            error_msg("Unsupported encoding: '%s'", requested_encoding);
             return;
         }
-        encoding = encoding_from_name(requested_encoding);
     }
 
     if (args[0]) {
