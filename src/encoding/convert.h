@@ -7,14 +7,7 @@
 #include "util/macros.h"
 
 typedef struct FileDecoder FileDecoder;
-
-typedef struct {
-    struct cconv *cconv;
-    unsigned char *nbuf;
-    size_t nsize;
-    bool crlf;
-    int fd;
-} FileEncoder;
+typedef struct FileEncoder FileEncoder;
 
 bool encoding_supported_by_iconv(const char *encoding);
 

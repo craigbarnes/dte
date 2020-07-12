@@ -292,14 +292,14 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
+static int write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_type)
 {
     size_t size = 0;
     if (bom_type != UTF8) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
             size = bom->len;
-            if (xwrite(enc->fd, bom->bytes, size) < 0) {
+            if (xwrite(fd, bom->bytes, size) < 0) {
                 perror_msg("write");
                 return -1;
             }
@@ -326,7 +326,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, EncodingType bom_type)
     }
 
     // Need to truncate if writing to existing file
-    if (ftruncate(enc->fd, size)) {
+    if (ftruncate(fd, size)) {
         perror_msg("ftruncate");
         return -1;
     }
@@ -388,7 +388,7 @@ int save_buffer (
         xclose(fd);
         goto error;
     }
-    if (write_buffer(b, enc, encoding->type)) {
+    if (write_buffer(b, enc, fd, encoding->type)) {
         xclose(fd);
         goto error;
     }

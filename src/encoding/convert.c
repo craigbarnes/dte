@@ -6,6 +6,14 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
+struct FileEncoder {
+    struct cconv *cconv;
+    unsigned char *nbuf;
+    size_t nsize;
+    bool crlf;
+    int fd;
+};
+
 struct FileDecoder {
     const char *encoding;
     const unsigned char *ibuf;
