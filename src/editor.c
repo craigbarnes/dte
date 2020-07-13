@@ -173,7 +173,7 @@ static void end_update(void)
     term_show_cursor();
     term_output_flush();
 
-    window->view->buffer->changed_line_min = INT_MAX;
+    window->view->buffer->changed_line_min = LONG_MAX;
     window->view->buffer->changed_line_max = -1;
     for_each_window(clear_update_tabbar);
 }
@@ -194,7 +194,7 @@ static void update_window(Window *w)
     View *v = w->view;
     if (editor.options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        update_line_numbers(w, v->buffer->changed_line_max == INT_MAX);
+        update_line_numbers(w, v->buffer->changed_line_max == LONG_MAX);
     }
 
     long y1 = v->buffer->changed_line_min;

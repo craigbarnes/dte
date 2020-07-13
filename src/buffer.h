@@ -73,7 +73,7 @@ extern Buffer *buffer;
 static inline void mark_all_lines_changed(Buffer *b)
 {
     b->changed_line_min = 0;
-    b->changed_line_max = INT_MAX;
+    b->changed_line_max = LONG_MAX;
 }
 
 static inline bool buffer_modified(const Buffer *b)
