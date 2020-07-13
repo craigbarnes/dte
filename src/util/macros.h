@@ -245,8 +245,21 @@
 
 #if (__STDC_VERSION__ >= 201112L) || HAS_EXTENSION(c_static_assert)
     #define static_assert(x) _Static_assert((x), #x)
+    #define HAS_STATIC_ASSERT 1
 #else
     #define static_assert(x)
+#endif
+
+#if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_types_compatible_p)
+    #define HAS_BUILTIN_TYPES_COMPATIBLE_P 1
+#endif
+
+#if defined(HAS_STATIC_ASSERT) && defined(HAS_BUILTIN_TYPES_COMPATIBLE_P)
+    #define static_assert_compatible_types(a, b) static_assert ( \
+        __builtin_types_compatible_p(__typeof__(a), __typeof__(b)) \
+    )
+#else
+    #define static_assert_compatible_types(a, b)
 #endif
 
 #if GNUC_AT_LEAST(4, 2) || defined(__clang__)

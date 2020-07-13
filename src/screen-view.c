@@ -317,7 +317,8 @@ static void line_info_set_line (
         info->indent_size = i;
     }
 
-    info->trailing_ws_offset = INT_MAX;
+    static_assert_compatible_types(info->trailing_ws_offset, size_t);
+    info->trailing_ws_offset = SIZE_MAX;
     for (ssize_t i = info->size - 1; i >= 0; i--) {
         char ch = info->line[i];
         if (ch != '\t' && ch != ' ') {
