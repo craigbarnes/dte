@@ -39,11 +39,6 @@ if `$FILE` contains whitespace.
 These variables are always defined and override environment variables of
 the same name.
 
-### **$DTE_HOME**
-
-The user configuration directory. This is either the value of [`$DTE_HOME`]
-when the editor first started, or the default value (`$HOME/.dte`).
-
 ### **$FILE**
 
 The filename of the current buffer (or an empty string if unsaved).
@@ -59,6 +54,11 @@ The line number of the cursor in the current buffer.
 ### **$WORD**
 
 The selected text or the word under the cursor.
+
+### **$DTE_HOME**
+
+The user configuration directory. This is either the value of [`$DTE_HOME`]
+when the editor first started, or the default value (`$HOME/.dte`).
 
 ## Single quoted strings
 
