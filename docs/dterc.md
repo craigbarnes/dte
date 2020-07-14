@@ -986,28 +986,28 @@ Display current values for various configurable types.
 The _type_ argument can be one of:
 
 `alias`
-:   command aliases
+:   Show [command aliases][`alias`]
 
 `bind`
-:   key bindings
+:   Show [key bindings][`bind`]
 
 `color`
-:   highlight colors
+:   Show [highlight colors][`hi`]
 
 `env`
-:   environment variables
+:   Show environment variables
 
 `include`
-:   built-in configs
+:   Show [built-in configs][`include`]
 
 `macro`
-:   command macros
+:   Show last recorded [macro][`macro`]
 
 `option`
-:   option values
+:   Show [option values](#options)
 
 `wsplit`
-:   window dimensions
+:   Show [window dimensions][`wsplit`]
 
 The _key_ argument is the name of the entry to look up (e.g. the alias
 name). If this argument is omitted, the full list of entries of the
@@ -1294,6 +1294,8 @@ errors should be highlighted. Set to `""` to disable.
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`xterm`]: https://invisible-island.net/xterm/
 
+[`alias`]: #alias
+[`bind`]: #bind
 [`compile`]: #compile
 [`copy`]: #copy
 [`cut`]: #cut
@@ -1303,9 +1305,13 @@ errors should be highlighted. Set to `""` to disable.
 [`filetype`]: #filetype
 [`filter`]: #filter
 [`ft`]: #ft
+[`hi`]: #hi
+[`include`]: #include
 [`left`]: #left
+[`macro`]: #macro
 [`message`]: #message
 [`msg`]: #msg
+[`open`]: #open
 [`option`]: #option
 [`pgdown`]: #pgdown
 [`pgup`]: #pgup
@@ -1318,6 +1324,7 @@ errors should be highlighted. Set to `""` to disable.
 [`toggle`]: #toggle
 [`undo`]: #undo
 [`wrap-paragraph`]: #wrap-paragraph
+[`wsplit`]: #wsplit
 
 [`auto-indent`]: #auto-indent
 [`emulate-tab`]: #emulate-tab
