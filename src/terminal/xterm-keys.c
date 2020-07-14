@@ -76,6 +76,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'B': // Down
     case 'C': // Right
     case 'D': // Left
+    case 'E': // Begin (keypad '5')
     case 'F': // End
     case 'H': // Home
         *k = KEY_UP + (ch - 'A');
@@ -140,9 +141,9 @@ static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
             num = 0;
             digits = 0;
             continue;
-        case 'A': case 'B': case 'C': case 'D': case 'F':
-        case 'H': case 'P': case 'Q': case 'R': case 'S':
-        case 'u': case '~':
+        case 'A': case 'B': case 'C': case 'D': case 'E':
+        case 'F': case 'H': case 'P': case 'Q': case 'R':
+        case 'S': case 'u': case '~':
             final_byte = ch;
             if (digits > 0) {
                 params[nparams++] = num;
@@ -186,6 +187,7 @@ exit_loop:
         case 'B': // Down
         case 'C': // Right
         case 'D': // Left
+        case 'E': // Begin (keypad '5')
         case 'F': // End
         case 'H': // Home
             key = KEY_UP + (final_byte - 'A');
@@ -232,6 +234,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'B': // Down
     case 'C': // Right
     case 'D': // Left
+    case 'E': // Begin (keypad '5')
     case 'F': // End
     case 'H': // Home
         *k = KEY_UP + (ch - 'A');

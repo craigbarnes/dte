@@ -121,6 +121,7 @@ Special keys:
 * `end`
 * `pgup`
 * `pgdown`
+* `begin` (keypad "5" with Num Lock off)
 * `enter`
 * `tab`
 * `space`
