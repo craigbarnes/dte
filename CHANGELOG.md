@@ -40,6 +40,8 @@ v1.10 (not yet released)
 * Fixed the handling of optional capture groups in [`errorfmt`] patterns.
 * Improved the legibility of the default color scheme on a wider range
   of terminals.
+* Changed the `filter` and `pipe-from` commands to set `$LINES`/`$COLUMNS`
+  to the current window height/width, before running the specified program.
 * Clarified which command flags in the [`dterc`] man page are mutually
   exclusive (by separating them with `|`).
 * Excluded commands beginning with a space character from the command

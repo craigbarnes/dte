@@ -500,11 +500,29 @@ static void cmd_exec_tag(const CommandArgs *a)
     string_free(&s);
 }
 
+static const char **lines_and_columns_env(void)
+{
+    static char lines[DECIMAL_STR_MAX(window->edit_h)];
+    static char columns[DECIMAL_STR_MAX(window->edit_w)];
+    static const char *vars[] = {
+        "LINES", NULL,
+        "COLUMNS", NULL,
+        NULL,
+    };
+
+    xsnprintf(lines, sizeof lines, "%d", window->edit_h);
+    xsnprintf(columns, sizeof columns, "%d", window->edit_w);
+    vars[1] = lines;
+    vars[3] = columns;
+    return vars;
+}
+
 static void cmd_filter(const CommandArgs *a)
 {
     BlockIter save = view->cursor;
     SpawnContext ctx = {
         .argv = a->args,
+        .env = lines_and_columns_env(),
         .input = STRING_VIEW_INIT,
         .output = STRING_INIT,
         .flags = SPAWN_DEFAULT
@@ -1042,6 +1060,7 @@ static void cmd_pipe_from(const CommandArgs *a)
 {
     SpawnContext ctx = {
         .argv = a->args,
+        .env = lines_and_columns_env(),
         .output = STRING_INIT,
         .flags = SPAWN_QUIET
     };

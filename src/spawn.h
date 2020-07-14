@@ -15,6 +15,7 @@ typedef enum {
 
 typedef struct {
     char **argv;
+    const char **env;
     StringView input;
     String output;
     SpawnFlags flags;

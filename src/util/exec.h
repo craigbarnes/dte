@@ -6,7 +6,7 @@
 #include "macros.h"
 
 bool pipe_close_on_exec(int fd[2]);
-pid_t fork_exec(char **argv, int fd[3]) NONNULL_ARGS;
+pid_t fork_exec(char **argv, const char **env, int fd[3]) NONNULL_ARG(1);
 int wait_child(pid_t pid);
 
 #endif

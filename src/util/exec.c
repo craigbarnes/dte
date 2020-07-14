@@ -57,7 +57,7 @@ static int dup_close_on_exec(int oldfd, int newfd)
 #endif
 }
 
-static void handle_child(char **argv, int fd[3], int error_fd)
+static void handle_child(char **argv, const char **env, int fd[3], int error_fd)
 {
     int error;
     int nr_fds = 3;
@@ -104,6 +104,22 @@ static void handle_child(char **argv, int fd[3], int error_fd)
         }
     }
 
+    if (env) {
+        for (size_t i = 0; env[i]; i += 2) {
+            const char *name = env[i];
+            const char *value = env[i + 1];
+            if (value) {
+                if (unlikely(setenv(name, value, true) != 0)) {
+                    goto error;
+                }
+            } else {
+                if (unlikely(unsetenv(name) != 0)) {
+                    goto error;
+                }
+            }
+        }
+    }
+
     // Unignore SIGINT and SIGQUIT (see exec(3p))
     struct sigaction act;
     memset(&act, 0, sizeof(struct sigaction));
@@ -120,7 +136,7 @@ error:
     exit(42);
 }
 
-pid_t fork_exec(char **argv, int fd[3])
+pid_t fork_exec(char **argv, const char **env, int fd[3])
 {
     int error = 0;
     int ep[2];
@@ -138,7 +154,7 @@ pid_t fork_exec(char **argv, int fd[3])
         return pid;
     }
     if (!pid) {
-        handle_child(argv, fd, ep[1]);
+        handle_child(argv, env, fd, ep[1]);
     }
 
     xclose(ep[1]);

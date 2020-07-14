@@ -230,7 +230,7 @@ bool spawn_filter(SpawnContext *ctx)
 
     int fd[3] = {p0[0], p1[1], dev_null};
     term_raw_isig();
-    const pid_t pid = fork_exec(ctx->argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         goto error;
@@ -288,7 +288,7 @@ bool spawn_source(SpawnContext *ctx)
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         goto error;
@@ -353,7 +353,7 @@ bool spawn_sink(SpawnContext *ctx)
 
     int fd[3] = {p[0], dev_null, dev_null};
     term_raw_isig();
-    const pid_t pid = fork_exec(ctx->argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         goto error;
@@ -414,7 +414,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(args, fd);
+    const pid_t pid = fork_exec(args, NULL, fd);
     if (pid < 0) {
         exec_error(args[0]);
         xclose(p[1]);
@@ -450,7 +450,7 @@ void spawn(SpawnContext *ctx)
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, fd);
+    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         prompt = false;
