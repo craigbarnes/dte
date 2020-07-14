@@ -39,6 +39,11 @@ if `$FILE` contains whitespace.
 These variables are always defined and override environment variables of
 the same name.
 
+### **$DTE_HOME**
+
+The user configuration directory. This is either the value of [`$DTE_HOME`]
+when the editor first started, or the default value (`$HOME/.dte`).
+
 ### **$FILE**
 
 The filename of the current buffer (or an empty string if unsaved).
@@ -1289,6 +1294,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
+[`$DTE_HOME`]: dte.html#environment
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
