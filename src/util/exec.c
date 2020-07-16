@@ -108,14 +108,9 @@ static void handle_child(char **argv, const char **env, int fd[3], int error_fd)
         for (size_t i = 0; env[i]; i += 2) {
             const char *name = env[i];
             const char *value = env[i + 1];
-            if (value) {
-                if (unlikely(setenv(name, value, true) != 0)) {
-                    goto error;
-                }
-            } else {
-                if (unlikely(unsetenv(name) != 0)) {
-                    goto error;
-                }
+            int r = value ? setenv(name, value, true) : unsetenv(name);
+            if (unlikely(r != 0)) {
+                goto error;
             }
         }
     }
