@@ -84,11 +84,10 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
 {
     const unsigned char *s1 = p1;
     const unsigned char *s2 = p2;
-    while (n) {
+    while (n--) {
         if (ascii_tolower(*s1++) != ascii_tolower(*s2++)) {
             return false;
         }
-        n--;
     }
     return true;
 }
