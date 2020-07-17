@@ -1482,7 +1482,7 @@ static void cmd_save(const CommandArgs *a)
         // Allow chmod 755 etc.
         buffer->file.mode = st.st_mode;
     }
-    if (save_buffer(buffer, absolute, &encoding, crlf)) {
+    if (!save_buffer(buffer, absolute, &encoding, crlf)) {
         goto error;
     }
 

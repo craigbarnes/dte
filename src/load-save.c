@@ -50,7 +50,7 @@ copy:
     return blk;
 }
 
-static int decode_and_add_blocks (
+static bool decode_and_add_blocks (
     Buffer *b,
     const unsigned char *buf,
     size_t size
@@ -106,7 +106,7 @@ static int decode_and_add_blocks (
 
     FileDecoder *dec = new_file_decoder(b->encoding.name, buf, size);
     if (dec == NULL) {
-        return -1;
+        return false;
     }
 
     char *line;
@@ -138,7 +138,7 @@ static int decode_and_add_blocks (
     }
 
     free_file_decoder(dec);
-    return 0;
+    return true;
 }
 
 static void fixup_blocks(Buffer *b)
@@ -176,7 +176,7 @@ static int xmadvise_sequential(void *addr, size_t len)
 #endif
 }
 
-int read_blocks(Buffer *b, int fd)
+bool read_blocks(Buffer *b, int fd)
 {
     const size_t map_size = 64 * 1024;
     size_t size = b->file.size;
@@ -204,7 +204,7 @@ int read_blocks(Buffer *b, int fd)
             ssize_t rc = xread(fd, buf + pos, alloc - pos);
             if (rc < 0) {
                 free(buf);
-                return -1;
+                return false;
             }
             if (rc == 0) {
                 break;
@@ -218,7 +218,7 @@ int read_blocks(Buffer *b, int fd)
         size = pos;
     }
 
-    int rc = decode_and_add_blocks(b, buf, size);
+    bool r = decode_and_add_blocks(b, buf, size);
 
     if (mapped) {
         munmap(buf, size);
@@ -226,38 +226,37 @@ int read_blocks(Buffer *b, int fd)
         free(buf);
     }
 
-    if (rc) {
-        return rc;
+    if (r) {
+        fixup_blocks(b);
     }
 
-    fixup_blocks(b);
-    return rc;
+    return r;
 }
 
-int load_buffer(Buffer *b, bool must_exist, const char *filename)
+bool load_buffer(Buffer *b, bool must_exist, const char *filename)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
 
     if (fd < 0) {
         if (errno != ENOENT) {
             error_msg("Error opening %s: %s", filename, strerror(errno));
-            return -1;
+            return false;
         }
         if (must_exist) {
             error_msg("File %s does not exist.", filename);
-            return -1;
+            return false;
         }
         fixup_blocks(b);
     } else {
         if (!buffer_fstat(b, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
             xclose(fd);
-            return -1;
+            return false;
         }
         if (!S_ISREG(b->file.mode)) {
             error_msg("Not a regular file %s", filename);
             xclose(fd);
-            return -1;
+            return false;
         }
         if (b->file.size / 1024 / 1024 > editor.options.filesize_limit) {
             error_msg (
@@ -266,13 +265,13 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
                 filename
             );
             xclose(fd);
-            return -1;
+            return false;
         }
 
-        if (read_blocks(b, fd)) {
+        if (!read_blocks(b, fd)) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
             xclose(fd);
-            return -1;
+            return false;
         }
         xclose(fd);
     }
@@ -281,7 +280,7 @@ int load_buffer(Buffer *b, bool must_exist, const char *filename)
         b->encoding = editor.charset;
     }
 
-    return 0;
+    return true;
 }
 
 static mode_t get_umask(void)
@@ -292,7 +291,7 @@ static mode_t get_umask(void)
     return old;
 }
 
-static int write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_type)
+static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_type)
 {
     size_t size = 0;
     if (bom_type != UTF8) {
@@ -301,7 +300,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_ty
             size = bom->len;
             if (xwrite(fd, bom->bytes, size) < 0) {
                 perror_msg("write");
-                return -1;
+                return false;
             }
         }
     }
@@ -311,7 +310,7 @@ static int write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_ty
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
             perror_msg("write");
-            return -1;
+            return false;
         }
         size += rc;
     }
@@ -328,12 +327,13 @@ static int write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_ty
     // Need to truncate if writing to existing file
     if (ftruncate(fd, size)) {
         perror_msg("ftruncate");
-        return -1;
+        return false;
     }
-    return 0;
+
+    return true;
 }
 
-int save_buffer (
+bool save_buffer (
     Buffer *b,
     const char *filename,
     const Encoding *encoding,
@@ -377,7 +377,7 @@ int save_buffer (
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
             perror_msg("open");
-            return -1;
+            return false;
         }
     }
 
@@ -388,7 +388,7 @@ int save_buffer (
         xclose(fd);
         goto error;
     }
-    if (write_buffer(b, enc, fd, encoding->type)) {
+    if (!write_buffer(b, enc, fd, encoding->type)) {
         xclose(fd);
         goto error;
     }
@@ -426,7 +426,8 @@ int save_buffer (
     }
     free_file_encoder(enc);
     buffer_stat(b, filename);
-    return 0;
+    return true;
+
 error:
     if (enc != NULL) {
         free_file_encoder(enc);
@@ -439,5 +440,5 @@ error:
         // error later when saving the file again.
         buffer_stat(b, filename);
     }
-    return -1;
+    return false;
 }

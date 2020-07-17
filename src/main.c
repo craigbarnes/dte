@@ -295,7 +295,7 @@ loop_break:
     Buffer *stdin_buffer = NULL;
     if (!isatty(STDIN_FILENO)) {
         Buffer *b = buffer_new(&editor.charset);
-        if (read_blocks(b, STDIN_FILENO) == 0) {
+        if (read_blocks(b, STDIN_FILENO)) {
             set_display_filename(b, xmemdup_literal("(stdin)"));
             stdin_buffer = b;
             stdin_buffer->temporary = true;
