@@ -1324,7 +1324,8 @@ static bool stat_changed(const Buffer *b, const struct stat *st)
 static void cmd_save(const CommandArgs *a)
 {
     if (buffer->stdout_buffer) {
-        error_msg("special (stdout) buffer can't be saved");
+        const char *f = buffer->display_filename;
+        info_msg("%s can't be saved; it will be piped to stdout on exit", f);
         return;
     }
 
