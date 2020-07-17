@@ -29,9 +29,9 @@ public/index.html: build/docs/index.md | public/screenshot.png
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
-build/docs/index.md: README.md | build/docs/
+build/docs/index.md: README.md docs/gitlab.md | build/docs/
 	$(E) GEN $@
-	$(Q) sed '/^Online documentation is/,/^Public License/d' README.md > $@
+	$(Q) sed '/^Online documentation is/,/^Public License/d' $^ > $@
 
 public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
@@ -58,7 +58,6 @@ public/:
 
 build/docs/: build/
 	$(Q) mkdir -p $@
-
 
 
 CLEANDIRS += public/
