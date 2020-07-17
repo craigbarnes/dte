@@ -1,7 +1,9 @@
 Source Code
 -----------
 
-The primary location for the source code is at
-<https://gitlab.com/craigbarnes/dte>. The code is also hosted in
-various other places, but these are considered secondary mirrors
-and may occasionally lag behind GitLab by a few hours.
+The primary git repository and issue tracker is hosted at
+<https://gitlab.com/craigbarnes/dte>.
+
+The project is also available on various other code hosting sites, but
+these are only secondary mirrors and may sometimes lag behind GitLab by
+a few hours.

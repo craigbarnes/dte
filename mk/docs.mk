@@ -29,9 +29,15 @@ public/index.html: build/docs/index.md | public/screenshot.png
 	$(E) PANDOC $@
 	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
 
-build/docs/index.md: README.md docs/gitlab.md | build/docs/
+build/docs/index.md: docs/index.sed README.md docs/gitlab.md | build/docs/ build/test/index.md
 	$(E) GEN $@
-	$(Q) sed '/^Online documentation is/,/^Public License/d' $^ > $@
+	$(Q) sed -f $^ > $@
+	@# Check that index.sed actually matched something:
+	$(Q) ! diff $@ build/test/index.md >/dev/null
+
+build/test/index.md: README.md docs/gitlab.md | build/test/
+	$(E) GEN $@
+	$(Q) cat $^ > $@
 
 public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
