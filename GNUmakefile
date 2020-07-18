@@ -86,7 +86,7 @@ clean:
 .PHONY: check installcheck tags clean
 .DELETE_ON_ERROR:
 
-NON_PARALLEL_TARGETS += clean
+NON_PARALLEL_TARGETS += clean install% uninstall%
 
 ifeq "" "$(filter $(NON_PARALLEL_TARGETS), $(or $(MAKECMDGOALS),all))"
   ifeq "" "$(filter -j%, $(MAKEFLAGS))"
