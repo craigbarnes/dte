@@ -7,6 +7,7 @@ try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -o /dev/null $(CFILE),$(1),$(2))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 pkg-libs = $(shell $(PKGCONFIG) --libs $(1) 2>/dev/null)
+pkg-var = $(shell $(PKGCONFIG) --variable='$(strip $(2))' $(1))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
 MAKEFLAGS += -r
