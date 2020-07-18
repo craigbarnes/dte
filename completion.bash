@@ -30,7 +30,7 @@ _dte() {
         return;;
     esac
 
-    compopt -o default
+    compopt -o bashdefault -o default
 }
 
 complete -F _dte dte
