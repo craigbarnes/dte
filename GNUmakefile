@@ -93,6 +93,7 @@ clean:
 .DEFAULT_GOAL = all
 .PHONY: all install install-bin install-man
 .PHONY: uninstall uninstall-bin uninstall-man
+.PHONY: install-bash-completion uninstall-bash-completion
 .PHONY: install-desktop-file uninstall-desktop-file
 .PHONY: check installcheck tags clean
 .DELETE_ON_ERROR:

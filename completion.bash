@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 _dte() {
+    local dte="$1"
     local cur="$2"
     local prev="$3"
 
@@ -17,7 +18,8 @@ _dte() {
 
     case "$prev" in
     -b)
-        COMPREPLY=($(compgen -W "$(dte -B)" -- "$cur"))
+        local rcnames="$($dte -B)"
+        COMPREPLY=($(compgen -W "$rcnames" -- "$cur"))
         return;;
     -t)
         COMPREPLY=($(
