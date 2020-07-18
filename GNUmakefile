@@ -24,9 +24,17 @@ RM = rm -f
 
 all: $(dte)
 
-install: all installdirs
+install: install-bin install-man
+uninstall: uninstall-bin uninstall-man
+
+install-bin: all
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
 	$(E) INSTALL '$(DESTDIR)$(bindir)/$(dte)'
 	$(Q) $(INSTALL_PROGRAM) '$(dte)' '$(DESTDIR)$(bindir)'
+
+install-man:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man1dir)'
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man5dir)'
 	$(E) INSTALL '$(DESTDIR)$(man1dir)/dte.1'
 	$(Q) $(INSTALL_DATA) docs/dte.1 '$(DESTDIR)$(man1dir)'
 	$(E) INSTALL '$(DESTDIR)$(man5dir)/dterc.5'
@@ -34,13 +42,10 @@ install: all installdirs
 	$(E) INSTALL '$(DESTDIR)$(man5dir)/dte-syntax.5'
 	$(Q) $(INSTALL_DATA) docs/dte-syntax.5 '$(DESTDIR)$(man5dir)'
 
-installdirs:
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man1dir)'
-	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(man5dir)'
-
-uninstall:
+uninstall-bin:
 	$(RM) '$(DESTDIR)$(bindir)/$(dte)'
+
+uninstall-man:
 	$(RM) '$(DESTDIR)$(man1dir)/dte.1'
 	$(RM) '$(DESTDIR)$(man5dir)/dterc.5'
 	$(RM) '$(DESTDIR)$(man5dir)/dte-syntax.5'
@@ -75,8 +80,10 @@ clean:
 
 
 .DEFAULT_GOAL = all
-.PHONY: all check install installdirs uninstall installcheck tags clean
+.PHONY: all install install-bin install-man
+.PHONY: uninstall uninstall-bin uninstall-man
 .PHONY: install-desktop-file uninstall-desktop-file
+.PHONY: check installcheck tags clean
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean
