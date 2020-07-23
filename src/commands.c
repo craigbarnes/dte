@@ -505,15 +505,13 @@ static const char **lines_and_columns_env(void)
     static char lines[DECIMAL_STR_MAX(window->edit_h)];
     static char columns[DECIMAL_STR_MAX(window->edit_w)];
     static const char *vars[] = {
-        "LINES", NULL,
-        "COLUMNS", NULL,
+        "LINES", lines,
+        "COLUMNS", columns,
         NULL,
     };
 
     xsnprintf(lines, sizeof lines, "%d", window->edit_h);
     xsnprintf(columns, sizeof columns, "%d", window->edit_w);
-    vars[1] = lines;
-    vars[3] = columns;
     return vars;
 }
 
