@@ -94,7 +94,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 Public License version 2 for more details.
 
 
-[ctags]: https://en.wikipedia.org/wiki/Ctags
+[ctags]: https://ctags.io/
 [EditorConfig]: https://editorconfig.org/
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
