@@ -23,7 +23,6 @@ syntax markdown
 
 # TODO: All variations of links and references
 # TODO: Underlined headings
-# TODO: Escapes
 
 state file-start
     str -- "---\n" yaml

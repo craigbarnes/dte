@@ -19,7 +19,8 @@ void ecma48_clear_to_eol(void)
 
 void ecma48_move_cursor(unsigned int x, unsigned int y)
 {
-    term_xnprintf(64, "\033[%u;%uH", y + 1, x + 1);
+    size_t n = sizeof("e[;H") + DECIMAL_STR_MAX(x) + DECIMAL_STR_MAX(y);
+    term_xnprintf(n, "\033[%u;%uH", y + 1, x + 1);
 }
 
 void ecma48_repeat_byte(char ch, size_t count)
