@@ -42,7 +42,9 @@ state line-start
     char [ maybe-link-def
     char -b 0-9 digit
     str "**" double-asterisk
+    str '__' double-underscore
     char * bullet-asterisk emphasis
+    char _ underscore
     char +- bullet
     char -b "~" tilde
     char -b "`" backtick
