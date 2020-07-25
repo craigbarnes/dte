@@ -557,32 +557,31 @@ static void cmd_filter(const CommandArgs *a)
 
 static void cmd_ft(const CommandArgs *a)
 {
-    FileDetectionType dt = FT_EXTENSION;
-    if (a->nr_flags) {
-        switch (a->flags[a->nr_flags - 1]) {
-        case 'b':
-            dt = FT_BASENAME;
-            break;
-        case 'c':
-            dt = FT_CONTENT;
-            break;
-        case 'f':
-            dt = FT_FILENAME;
-            break;
-        case 'i':
-            dt = FT_INTERPRETER;
-            break;
-        }
-    }
-
     char **args = a->args;
-    if (args[0][0] == '\0') {
+    const char *filetype = args[0];
+    if (unlikely(filetype[0] == '\0')) {
         error_msg("Filetype can't be blank");
         return;
     }
 
-    for (size_t i = 1; args[i]; i++) {
-        add_filetype(args[0], args[i], dt);
+    FileDetectionType dt = FT_EXTENSION;
+    switch (last_flag(a)) {
+    case 'b':
+        dt = FT_BASENAME;
+        break;
+    case 'c':
+        dt = FT_CONTENT;
+        break;
+    case 'f':
+        dt = FT_FILENAME;
+        break;
+    case 'i':
+        dt = FT_INTERPRETER;
+        break;
+    }
+
+    for (size_t i = 1, n = a->nr_args; i < n; i++) {
+        add_filetype(filetype, args[i], dt);
     }
 }
 
@@ -2013,7 +2012,7 @@ static void cmd_wsplit(const CommandArgs *a)
             break;
         case 'g':
             // Perform glob(3) expansion on arguments
-            use_glob = !!a->args[0];
+            use_glob = (a->nr_args > 0);
             break;
         case 'h':
             // Split horizontally to get vertical layout
