@@ -221,7 +221,7 @@ static const char *format_misc_status(const Window *win)
         return NULL;
     }
 
-    static char buf[32];
+    static char buf[sizeof("[n chars]") + DECIMAL_STR_MAX(size_t)];
     SelectionInfo si;
     init_selection(win->view, &si);
 

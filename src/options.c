@@ -257,7 +257,7 @@ static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
 
 static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
-    static char buf[64];
+    static char buf[DECIMAL_STR_MAX(value.uint_val)];
     xsnprintf(buf, sizeof buf, "%u", value.uint_val);
     return buf;
 }

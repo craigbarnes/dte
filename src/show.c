@@ -160,7 +160,7 @@ static void show_wsplit(const char *name, bool cflag)
     }
 
     const Window *w = window;
-    char buf[128];
+    char buf[(4 * DECIMAL_STR_MAX(w->x)) + 4];
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
     if (cflag) {
