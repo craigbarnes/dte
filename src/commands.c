@@ -1606,9 +1606,7 @@ static void cmd_search(const CommandArgs *a)
             // Error message would not be very useful here
             return;
         }
-        size_t len = strlen(word) + 5;
-        pattern = xmalloc(len);
-        xsnprintf(pattern, len, "\\<%s\\>", word);
+        pattern = xasprintf("\\<%s\\>", word);
         free(word);
     }
 
