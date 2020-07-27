@@ -113,6 +113,7 @@ void macro_insert_text_hook(const char *text, size_t size)
 
 void macro_play(void)
 {
+    begin_change_chain();
     unsigned int saved_nr_errors = get_nr_errors();
     for (size_t i = 0, n = macro.count; i < n; i++) {
         const char *cmd_str = macro.ptrs[i];
@@ -121,6 +122,7 @@ void macro_play(void)
             break;
         }
     }
+    end_change_chain();
 }
 
 String dump_macro(void)
