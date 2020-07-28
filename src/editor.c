@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "error.h"
 #include "mode.h"
+#include "regexp.h"
 #include "screen.h"
 #include "search.h"
 #include "terminal/input.h"
@@ -95,6 +96,8 @@ void init_editor_state(void)
     if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
         fatal_error("setenv", errno);
     }
+
+    regexp_init_word_boundary_tokens();
 }
 
 static void sanity_check(void)

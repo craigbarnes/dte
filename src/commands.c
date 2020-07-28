@@ -26,6 +26,7 @@
 #include "lock.h"
 #include "move.h"
 #include "msg.h"
+#include "regexp.h"
 #include "search.h"
 #include "selection.h"
 #include "show.h"
@@ -1606,7 +1607,12 @@ static void cmd_search(const CommandArgs *a)
             // Error message would not be very useful here
             return;
         }
-        pattern = xasprintf("\\<%s\\>", word);
+        pattern = xasprintf (
+            "%s%s%s",
+            regexp_word_boundary_start,
+            word,
+            regexp_word_boundary_end
+        );
         free(word);
     }
 

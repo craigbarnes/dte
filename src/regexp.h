@@ -6,10 +6,10 @@
 #include <stddef.h>
 #include "util/string-view.h"
 
-bool regexp_match_nosub(const char *pattern, const StringView *buf);
+extern char regexp_word_boundary_start[8];
+extern char regexp_word_boundary_end[8];
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags);
-bool regexp_exec(const regex_t *re, const char *buf, size_t size, size_t nr_m, regmatch_t *m, int flags);
 
 static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
 {
@@ -30,5 +30,9 @@ static inline bool regexp_compile_basic(regex_t *re, const char *pattern, int fl
 {
     return regexp_compile_internal(re, pattern, flags);
 }
+
+bool regexp_match_nosub(const char *pattern, const StringView *buf);
+bool regexp_exec(const regex_t *re, const char *buf, size_t size, size_t nr_m, regmatch_t *m, int flags);
+void regexp_init_word_boundary_tokens(void);
 
 #endif
