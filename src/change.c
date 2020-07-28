@@ -7,8 +7,6 @@
 
 static ChangeMergeEnum change_merge;
 static ChangeMergeEnum prev_change_merge;
-static Change *change_barrier;
-static unsigned int change_barrier_level;
 
 static Change *alloc_change(void)
 {
@@ -23,6 +21,9 @@ static void add_change(Change *change)
     head->prev[head->nr_prev++] = change;
     buffer->cur_change = change;
 }
+
+// This doesn't need to be local to buffer because commands are atomic
+static Change *change_barrier;
 
 static bool is_change_chain_barrier(const Change *change)
 {
@@ -130,10 +131,6 @@ void end_change(void)
 
 void begin_change_chain(void)
 {
-    if (++change_barrier_level != 1) {
-        return;
-    }
-
     BUG_ON(change_barrier);
 
     // Allocate change chain barrier but add it to the change tree only if
@@ -144,11 +141,6 @@ void begin_change_chain(void)
 
 void end_change_chain(void)
 {
-    BUG_ON(change_barrier_level == 0);
-    if (--change_barrier_level != 0) {
-        return;
-    }
-
     if (change_barrier) {
         // There were no changes in this change chain.
         free(change_barrier);
