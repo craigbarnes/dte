@@ -56,8 +56,10 @@ static const TermEntry terms[] = {
     {"mlterm", 6, TERM_8_COLOR, 0, false},
     {"mlterm2", 7, TERM_8_COLOR, 0, false},
     {"mlterm3", 7, TERM_8_COLOR, 0, false},
+    {"mrxvt", 5, TERM_8_COLOR, 0, true},
     {"pcansi", 6, TERM_8_COLOR, 3, false},
     {"putty", 5, TERM_8_COLOR, 22, true},
+    {"rxvt", 4, TERM_8_COLOR, 0, true},
     {"screen", 6, TERM_8_COLOR, 0, false},
     {"st", 2, TERM_8_COLOR, 0, true},
     {"stterm", 6, TERM_8_COLOR, 0, true},
@@ -161,9 +163,15 @@ noreturn void term_init_fail(const char *fmt, ...)
     exit(1);
 }
 
+static StringView str_split(const char *str, unsigned char delim)
+{
+    const char *end = strchr(str, delim);
+    return string_view(str, end ? (size_t)(end - str) : strlen(str));
+}
+
 void term_init(void)
 {
-    const char *term = getenv("TERM");
+    const char *const term = getenv("TERM");
     if (term == NULL || term[0] == '\0') {
         term_init_fail("'TERM' not set");
     }
@@ -180,35 +188,28 @@ void term_init(void)
         }
     }
 
-    if (str_has_prefix(term, "rxvt") || str_has_prefix(term, "mrxvt")) {
-        // rxvt can't be handled by the lookup table because it's a
-        // special case and requires a custom KeyCode parser
-        terminal.parse_key_sequence = rxvt_parse_key;
-        terminal.ncv_attributes = 0;
-        terminal.color_type = TERM_8_COLOR;
-        terminal.back_color_erase = true;
-        goto out;
-    } else if (str_has_prefix(term, "xterm-kitty")) {
-        // Having a hyphen in the "root" name goes against longstanding
-        // naming conventions and precludes bsearch() by prefix
-        terminal.color_type = TERM_256_COLOR;
-        terminal.ncv_attributes = 0;
-        terminal.back_color_erase = false;
-        goto out;
+    // Strip phony "xterm-" prefix used by certain terminals
+    const char *real_term = term;
+    if (str_has_prefix(term, "xterm-")) {
+        const char *str = term + STRLEN("xterm-");
+        if (str_has_prefix(str, "kitty") || str_has_prefix(str, "termite")) {
+            real_term = str;
+        }
     }
 
     // Extract the "root name" from $TERM, as defined by terminfo(5).
     // This is the initial part of the string up to the first hyphen.
-    const char *dash = strchr(term, '-');
-    size_t prefix_len = dash ? (size_t)(dash - term) : strlen(term);
-    StringView prefix = string_view(term, prefix_len);
+    StringView name = str_split(real_term, '-');
 
     // Look up the root name in the list of known terminals
-    const TermEntry *entry = BSEARCH(&prefix, terms, term_name_compare);
+    const TermEntry *entry = BSEARCH(&name, terms, term_name_compare);
     if (entry) {
         terminal.color_type = entry->color_type;
         terminal.ncv_attributes = entry->ncv_attributes;
         terminal.back_color_erase = entry->back_color_erase;
+        if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
+            terminal.parse_key_sequence = rxvt_parse_key;
+        }
         goto out;
     }
 
