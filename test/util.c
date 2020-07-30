@@ -1058,8 +1058,31 @@ static void test_path_absolute(void)
 {
     char *path = path_absolute("///dev///");
     ASSERT_NONNULL(path);
-    EXPECT_STREQ(path, "/dev/");
+    EXPECT_STREQ(path, "/dev");
     free(path);
+
+    path = path_absolute("///dev///..///dev//null");
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/dev/null");
+    free(path);
+
+    path = path_absolute("///dev//n0nexist3nt-file");
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/dev/n0nexist3nt-file");
+    free(path);
+
+    path = path_absolute("///../..//./");
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/");
+    free(path);
+
+    path = path_absolute("/");
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/");
+    free(path);
+
+    path = path_absolute("");
+    EXPECT_STREQ(path, NULL);
 
     const char *linkpath = "./build/../build/test/test-symlink";
     if (symlink("../../README.md", linkpath) != 0) {
@@ -1072,14 +1095,6 @@ static void test_path_absolute(void)
     ASSERT_NONNULL(path);
     EXPECT_STREQ(path_basename(path), "README.md");
     free(path);
-
-    char buf[8192 + 1];
-    memset(buf, 'a', sizeof(buf));
-    buf[0] = '/';
-    buf[8192] = '\0';
-    errno = 0;
-    EXPECT_NULL(path_absolute(buf));
-    EXPECT_EQ(errno, ENAMETOOLONG);
 }
 
 static void test_path_join(void)

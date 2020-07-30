@@ -61,6 +61,13 @@ static void test_posix_sanity(void)
     ASSERT_EQ(CHAR_BIT, 8);
     ASSERT_TRUE(sizeof(int) >= 4);
 
+    // POSIX 2008 allows the second argument of realpath(3) to be NULL,
+    // which causes any non-NULL return value to be an allocated buffer.
+    char *path = realpath("///dev///null", NULL);
+    ASSERT_NONNULL(path);
+    EXPECT_STREQ(path, "/dev/null");
+    free(path);
+
     IGNORE_WARNING("-Wformat-truncation")
 
     // Some snprintf(3) implementations historically returned -1 in case of
