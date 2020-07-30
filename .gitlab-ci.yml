@@ -28,17 +28,21 @@ arch:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
 
-centos:
+centos-7:
     extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos-7
+
+centos-8:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos-8
 
 ubuntu:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
 
-debian:
+debian-9:
     extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-9
     script:
         - make check
         - make installcheck
@@ -54,6 +58,10 @@ debian:
         - make clean && make CC=arm-linux-gnueabihf-gcc
         - make clean && make CC=aarch64-linux-gnu-gcc
         - make clean && make distcheck
+
+debian-10:
+    extends: debian-9
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
 
 android:
     extends: .test
