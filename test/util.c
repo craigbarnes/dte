@@ -1057,32 +1057,28 @@ static void test_relative_filename(void)
 static void test_path_absolute(void)
 {
     char *path = path_absolute("///dev///");
-    ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/dev");
     free(path);
 
     path = path_absolute("///dev///..///dev//null");
-    ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/dev/null");
     free(path);
 
     path = path_absolute("///dev//n0nexist3nt-file");
-    ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/dev/n0nexist3nt-file");
     free(path);
 
     path = path_absolute("///../..//./");
-    ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/");
     free(path);
 
     path = path_absolute("/");
-    ASSERT_NONNULL(path);
     EXPECT_STREQ(path, "/");
     free(path);
 
     path = path_absolute("");
     EXPECT_STREQ(path, NULL);
+    free(path);
 
     const char *linkpath = "./build/../build/test/test-symlink";
     if (symlink("../../README.md", linkpath) != 0) {
