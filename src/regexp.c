@@ -86,8 +86,9 @@ void regexp_init_word_boundary_tokens(void)
             && m[0].rm_so == expected_match_start
             && m[0].rm_eo == expected_match_end
         ) {
-            strncpy(regexp_word_boundary_start, pairs[i][0], 8);
-            strncpy(regexp_word_boundary_end, pairs[i][1], 8);
+            static_assert(sizeof(pairs[0][0]) == 8);
+            memcpy(regexp_word_boundary_start, pairs[i][0], 8);
+            memcpy(regexp_word_boundary_end, pairs[i][1], 8);
             break;
         }
     }
