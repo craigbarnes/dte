@@ -124,32 +124,6 @@ state close
     char ) END url
     eat END error
 
-# List of words
-syntax .css-medialist
-
-state list code
-    char "\t\n " this
-    char -b a-zA-Z0-9_- name
-    noeat END
-
-state name code
-    char -b a-zA-Z0-9_ this
-    inlist mediatype next
-    noeat next
-
-state next code
-    char "\t\n " this
-    char , must
-    noeat END
-
-state must code
-    char "\t\n " this
-    char -b a-zA-Z0-9_ name
-    eat END error
-
-list -i mediatype \
-    all braille embossed handheld print projection screen speech tty tv
-
 syntax .css-import
 
 state import atkeyword
@@ -164,11 +138,8 @@ state arg code
     noeat error
 
 state medialist
-    noeat .css-medialist:mediaend
-
-state mediaend
     char \; END code
-    noeat error
+    eat this
 
 state error
     noeat .css-statementerror:END
@@ -287,17 +258,12 @@ state atrule code
     bufis -i "@import" .css-import:start atkeyword
     # @namespace [prefix] { URI | string };
     bufis -i "@namespace" .css-namespace:start atkeyword
-    # FIXME: @media not allowed inside @media
     bufis -i @media mediatypes atkeyword
     noeat start
 
-state mediatypes
-    noeat .css-medialist:mediablock
-
-state mediablock code
-    char "\t\n " this
+state mediatypes code
     char { start
-    eat start error
+    eat this
 
 state block code
     char " \t\n;" this
@@ -595,5 +561,5 @@ list -i atkeyword @page @font-face
 default keyword property
 default type class id pseudoclass pseudoelement attribute
 default special expr
-default constant value color url mediatype
+default constant value color url
 default special atkeyword
