@@ -32,9 +32,9 @@ static void test_util_macros(void)
     EXPECT_EQ(ARRAY_COUNT("a"), 2);
     EXPECT_EQ(ARRAY_COUNT("123456789"), 10);
 
-    const char a2[] = {1, 2};
-    const int a3[] = {1, 2, 3};
-    const long long a4[] = {1, 2, 3, 4};
+    const UNUSED char a2[] = {1, 2};
+    const UNUSED int a3[] = {1, 2, 3};
+    const UNUSED long long a4[] = {1, 2, 3, 4};
     EXPECT_EQ(ARRAY_COUNT(a2), 2);
     EXPECT_EQ(ARRAY_COUNT(a3), 3);
     EXPECT_EQ(ARRAY_COUNT(a4), 4);

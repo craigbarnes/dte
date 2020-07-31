@@ -88,7 +88,7 @@ static HlColor **highlight_line (
 
     if (len > alloc) {
         alloc = round_size_to_next_multiple(len, 128);
-        xrenew(colors, alloc); // NOLINT(bugprone-sizeof-expression)
+        xrenew(colors, alloc);
     }
 
     while (1) {

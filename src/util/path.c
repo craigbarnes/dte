@@ -90,7 +90,6 @@ char *relative_filename(const char *f, const char *cwd)
 
     char *filename = xmalloc(len + 1);
     for (size_t i = 0; i < dotdot; i++) {
-        // NOLINTNEXTLINE(bugprone-not-null-terminated-result)
         memcpy(filename + i * 3, "../", 3);
     }
     memcpy(filename + dotdot * 3, f + clen, tlen + 1);

@@ -74,7 +74,7 @@ static void do_collect_files (
         return;
     }
 
-    memcpy(path, dirname, plen); // NOLINT(bugprone-not-null-terminated-result)
+    memcpy(path, dirname, plen);
     if (path[plen - 1] != '/') {
         path[plen++] = '/';
     }
@@ -472,7 +472,7 @@ static void do_complete_command(void)
 
     char *str = xmalloc(head_len + middle_len + tail_len + 2);
     memcpy(str, completion.head, head_len);
-    memcpy(str + head_len, middle, middle_len); // NOLINT(bugprone-not-null-terminated-result)
+    memcpy(str + head_len, middle, middle_len);
     if (completion.completions.count == 1 && completion.add_space) {
         str[head_len + middle_len] = ' ';
         middle_len++;

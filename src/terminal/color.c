@@ -370,7 +370,7 @@ static size_t append_color(char *buf, int32_t color)
         BUG_ON(color <= COLOR_INVALID);
         const char *name = color_names[color + 2];
         size_t len = strlen(name);
-        memcpy(buf, name, len); // NOLINT(bugprone-not-null-terminated-result)
+        memcpy(buf, name, len);
         return len;
     } else if (color < 256) {
         return xsnprintf(buf, 4, "%u", (unsigned int)color);

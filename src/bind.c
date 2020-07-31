@@ -50,7 +50,6 @@ static ssize_t get_lookup_table_index(KeyCode k)
 }
 
 UNITTEST {
-    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     const size_t size = ARRAY_COUNT(bindings_lookup_table);
     const KeyCode min = KEY_SPECIAL_MIN;
     const KeyCode max = KEY_SPECIAL_MAX;

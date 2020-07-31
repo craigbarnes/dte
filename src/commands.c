@@ -1250,7 +1250,6 @@ static void cmd_repeat(const CommandArgs *a)
         // and then use that to batch copy larger blocks (making sure to
         // handle any unaligned remainder).
         for (size_t i = 0; i < count; i++) {
-            // NOLINTNEXTLINE(bugprone-not-null-terminated-result)
             memcpy(buf + (i * str_len), str, str_len);
         }
         bool move_after = has_flag(&a2, 'm');
