@@ -130,11 +130,7 @@ static bool decode_and_add_blocks (
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
         const char *enc = file_decoder_get_encoding(dec);
-        if (enc) {
-            b->encoding = encoding_from_name(enc);
-        } else {
-            b->encoding = editor.charset;
-        }
+        b->encoding = enc ? encoding_from_name(enc) : editor.charset;
     }
 
     free_file_decoder(dec);
