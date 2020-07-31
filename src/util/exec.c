@@ -39,21 +39,28 @@ bool pipe_close_on_exec(int fd[2])
 #endif
 }
 
-static int dup_close_on_exec(int oldfd, int newfd)
+static int xdup3(int oldfd, int newfd, int flags)
 {
 #ifdef HAVE_DUP3
-    return dup3(oldfd, newfd, O_CLOEXEC);
+    int fd;
+    do {
+        fd = dup3(oldfd, newfd, flags);
+    } while (unlikely(fd < 0 && errno == EINTR));
+    return fd;
 #else
     if (oldfd == newfd) {
         // Replicate dup3() behaviour:
         errno = EINVAL;
         return -1;
     }
-    if (dup2(oldfd, newfd) < 0) {
-        return -1;
+    int fd;
+    do {
+        fd = dup2(oldfd, newfd);
+    } while (unlikely(fd < 0 && errno == EINTR));
+    if (fd >= 0 && (flags & O_CLOEXEC)) {
+        close_on_exec(fd, true);
     }
-    close_on_exec(newfd, true);
-    return newfd;
+    return fd;
 #endif
 }
 
@@ -77,14 +84,14 @@ static void handle_child(char **argv, const char **env, int fd[3], int error_fd)
     if (move) {
         int next_free = max + 1;
         if (error_fd < nr_fds) {
-            error_fd = dup_close_on_exec(error_fd, next_free++);
+            error_fd = xdup3(error_fd, next_free++, O_CLOEXEC);
             if (error_fd < 0) {
                 goto error;
             }
         }
         for (int i = 0; i < nr_fds; i++) {
             if (fd[i] < i) {
-                fd[i] = dup_close_on_exec(fd[i], next_free++);
+                fd[i] = xdup3(fd[i], next_free++, O_CLOEXEC);
                 if (fd[i] < 0) {
                     goto error;
                 }
@@ -98,7 +105,7 @@ static void handle_child(char **argv, const char **env, int fd[3], int error_fd)
             // Clear FD_CLOEXEC flag
             close_on_exec(fd[i], false);
         } else {
-            if (dup2(fd[i], i) < 0) {
+            if (xdup3(fd[i], i, 0) < 0) {
                 goto error;
             }
         }
