@@ -5,6 +5,9 @@
 
 #main-grid > header {
     grid-area: header;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     padding: 10px;
     margin-bottom: 1em;
     border-bottom: 1px solid #ddd;
@@ -18,12 +21,11 @@
 }
 
 #top-title {
-    float: left;
     font-size: 1.4em;
 }
 
 #top-nav {
-    float: right;
+    line-height: 2.5;
     user-select: none;
 }
 
