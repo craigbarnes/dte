@@ -2,7 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>dte text editor</title>
+$if(section)$
+  <title>$title$($section$)</title>
+$else$
+  <title>$title$</title>
+$endif$
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link href="style.css" rel="stylesheet"/>
   <style>#top-nav a[href="$output_basename$"] {color: darkblue}</style>

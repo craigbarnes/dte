@@ -27,7 +27,7 @@ public/dte.pdf: $(man) | public/
 
 public/index.html: build/docs/index.md | public/screenshot.png
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
+	$(Q) $(PDHTML) -Mtitle='dte' -o $@ $<
 
 build/docs/index.md: docs/index.sed README.md docs/gitlab.md | build/docs/ build/test/index.md
 	$(E) GEN $@
@@ -41,7 +41,7 @@ build/test/index.md: README.md docs/gitlab.md | build/test/
 
 public/releases.html: CHANGELOG.md | public/
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle=_ -o $@ $<
+	$(Q) $(PDHTML) -Mtitle='dte Releases' -o $@ $<
 
 $(html-man): public/%.html: docs/%.md docs/fix-anchors.lua
 	$(E) PANDOC $@
