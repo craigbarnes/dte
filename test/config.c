@@ -137,6 +137,36 @@ static void test_detect_indent(void)
     handle_command(&commands, "close", false);
 }
 
+static void test_global_state(void)
+{
+    ASSERT_NONNULL(window);
+    ASSERT_NONNULL(root_frame);
+    ASSERT_NONNULL(buffer);
+    ASSERT_NONNULL(view);
+    ASSERT_PTREQ(window->view, view);
+    ASSERT_PTREQ(window->frame, root_frame);
+    ASSERT_PTREQ(view->buffer, buffer);
+    ASSERT_PTREQ(view->window, window);
+    ASSERT_PTREQ(root_frame->window, window);
+    ASSERT_PTREQ(root_frame->parent, NULL);
+
+    ASSERT_EQ(window->views.count, 1);
+    ASSERT_EQ(buffer->views.count, 1);
+    ASSERT_EQ(editor.buffers.count, 1);
+    ASSERT_PTREQ(window->views.ptrs[0], view);
+    ASSERT_PTREQ(buffer->views.ptrs[0], view);
+    ASSERT_PTREQ(editor.buffers.ptrs[0], buffer);
+
+    ASSERT_NONNULL(buffer->display_filename);
+    ASSERT_NONNULL(buffer->encoding.name);
+    ASSERT_NONNULL(buffer->blocks.next);
+    ASSERT_PTREQ(&buffer->blocks, view->cursor.head);
+    ASSERT_PTREQ(buffer->blocks.next, view->cursor.blk);
+    ASSERT_PTREQ(buffer->cur_change, &buffer->change_head);
+    ASSERT_PTREQ(buffer->saved_change, buffer->cur_change);
+    EXPECT_EQ(buffer->id, 1);
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void init_headless_mode(void)
@@ -160,7 +190,7 @@ void init_headless_mode(void)
 
 void test_config(void)
 {
-    ASSERT_NONNULL(window);
+    test_global_state();
     test_builtin_configs();
     test_exec_config();
     test_detect_indent();

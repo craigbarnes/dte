@@ -25,6 +25,7 @@
 #define IEXPECT_STREQ(s1, s2) iexpect_streq(__FILE__, __LINE__, i, s1, s2)
 #define IEXPECT_TRUE(x) iexpect_true(__FILE__, __LINE__, i, x)
 
+#define ASSERT_PTREQ(p1, p2) assert_ptreq(__FILE__, __LINE__, p1, p2)
 #define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
 #define ASSERT_TRUE(x) assert_true(__FILE__, __LINE__, x)
 #define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
@@ -46,6 +47,7 @@ void iexpect_streq(const char *file, int line, size_t i, const char *s1, const c
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 void iexpect_true(const char *file, int line, size_t i, bool x);
 
+void assert_ptreq(const char *file, int line, const void *p1, const void *p2);
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(const char *file, int line, bool x);
 void assert_nonnull(const char *file, int line, const void *ptr);

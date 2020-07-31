@@ -102,6 +102,14 @@ void iexpect_true(const char *file, int line, size_t i, bool x)
     }
 }
 
+void assert_ptreq(const char *file, int line, const void *p1, const void *p2)
+{
+    if (unlikely(p1 != p2)) {
+        test_fail(file, line, "ERROR: Pointers not equal: %p, %p", p1, p2);
+        abort();
+    }
+}
+
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b)
 {
     if (unlikely(a != b)) {
