@@ -137,7 +137,6 @@ img {
 main code {
     margin: 0 2px;
     padding: 0 5px;
-    white-space: nowrap;
     border: 1px solid #eaeaea;
     background-color: #f8f8f8;
     border-radius: 3px;
@@ -148,13 +147,13 @@ pre code {
     margin: 0;
     padding: 0;
     white-space: pre-wrap;
+    word-break: break-all;
     background: transparent;
 }
 
 pre {
     background-color: #f8f8f8;
     border: 1px solid #cccccc;
-    overflow: auto;
     padding: 6px 10px;
     border-radius: 3px;
 }
@@ -162,6 +161,13 @@ pre {
 pre code {
     background-color: transparent;
     border: none;
+}
+
+/* Make word-break more aggressive if page is narrow, to avoid scrolling: */
+p > a {word-break: break-all}
+@media (min-width: 400px) {
+    p > a {word-break: normal}
+    p code {white-space: nowrap}
 }
 
 kbd {
