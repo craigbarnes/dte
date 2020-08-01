@@ -75,3 +75,9 @@
         margin-top: 0;
     }
 }
+
+@media only print {
+    #main-grid > header, #main-grid > footer, #toc {
+        display: none;
+    }
+}
