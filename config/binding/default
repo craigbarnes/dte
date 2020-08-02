@@ -16,6 +16,8 @@ bind M-left bol
 bind M-right eol
 bind M-up pgup
 bind M-down pgdown
+bind M-delete 'delete-word -s'
+bind M-C-delete 'delete-line'
 
 bind S-left 'left -c'
 bind S-right 'right -c'
@@ -48,11 +50,14 @@ bind C-M-S-pgup 'pgup -l'
 bind C-M-S-pgdown 'pgdown -l'
 bind C-M-S-delete 'delete-eol'
 
-# Either of these 2 may be equivalent to Backspace, depending on the
-# terminal, so they're both bound to erase by default for portability.
-# On some terminals one may be Backspace and the other Ctrl+Backspace.
-bind ^H erase
-bind ^? erase
+# Either Ctrl+H or Ctrl+? may be equivalent to Backspace, depending
+# on the terminal, so they're both bound to "erase" by default for
+# portability. On some terminals one may be equivalent to Backspace
+# and the other Ctrl+Backspace.
+bind C-H erase
+bind C-? erase
+bind M-C-H 'erase-word -s'
+bind M-C-? 'erase-word -s'
 
 bind ^C 'copy -k'
 bind ^F search
@@ -103,8 +108,6 @@ bind M-< wprev
 bind M-> wnext
 bind M-- 'shift -- -1'
 bind M-= 'shift +1'
-bind M-C-? 'erase-word -s'
-bind M-delete 'delete-word -s'
 bind M-\; command
 bind M-: command
 bind M-/ search

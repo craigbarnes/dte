@@ -789,6 +789,10 @@ Erase word before cursor.
 `-s`
 :   Be more "aggressive"
 
+### **delete-line**
+
+Delete current line.
+
 ### **case** [**-l**|**-u**]
 
 Change text case. The default is to change lower case to upper case and

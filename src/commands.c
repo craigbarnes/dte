@@ -376,6 +376,11 @@ static void cmd_delete_eol(const CommandArgs *a)
     buffer_delete_bytes(block_iter_eol(&bi));
 }
 
+static void cmd_delete_line(const CommandArgs* UNUSED_ARG(a))
+{
+    delete_lines();
+}
+
 static void cmd_delete_word(const CommandArgs *a)
 {
     bool skip_non_word = a->flags[0] == 's';
@@ -2125,6 +2130,7 @@ static const Command cmds[] = {
     {"cut", "", false, 0, 0, cmd_cut},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "n", false, 0, 0, cmd_delete_eol},
+    {"delete-line", "", false, 0, 0, cmd_delete_line},
     {"delete-word", "s", false, 0, 0, cmd_delete_word},
     {"down", "cl", false, 0, 0, cmd_down},
     {"eof", "", false, 0, 0, cmd_eof},

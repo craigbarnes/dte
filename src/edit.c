@@ -654,6 +654,23 @@ void clear_lines(void)
     block_iter_skip_bytes(&view->cursor, ins_count);
 }
 
+void delete_lines(void)
+{
+    long x = view_get_preferred_x(view);
+    size_t del_count;
+    if (view->selection) {
+        view->selection = SELECT_LINES;
+        del_count = prepare_selection(view);
+        unselect();
+    } else {
+        block_iter_bol(&view->cursor);
+        BlockIter tmp = view->cursor;
+        del_count = block_iter_eat_line(&tmp);
+    }
+    buffer_delete_bytes(del_count);
+    move_to_preferred_x(x);
+}
+
 void new_line(void)
 {
     size_t ins_count = 1;

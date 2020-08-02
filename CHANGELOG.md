@@ -7,6 +7,7 @@ v1.10 (not yet released)
 **Additions:**
 
 * Added support for [`macro`] recording.
+* Added a [`delete-line`] command.
 * Added an optional *exitcode* argument to the [`quit`] command.
 * Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
   command.
