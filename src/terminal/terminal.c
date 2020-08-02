@@ -46,6 +46,7 @@ static const TermEntry terms[] = {
     {"dtterm", 6, TERM_8_COLOR, 0, 0},
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
     {"fbterm", 6, TERM_256_COLOR, 18, BCE},
+    {"foot", 4, TERM_256_COLOR, 0, BCE | REP | TITLE},
     {"hurd", 4, TERM_8_COLOR, 18, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
     {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE},
