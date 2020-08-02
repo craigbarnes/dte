@@ -205,7 +205,7 @@ static void resume_terminal(bool quiet, bool prompt)
         }
         ui_start();
         editor.child_controls_terminal = false;
-     }
+    }
 }
 
 static void exec_error(const char *argv0)
