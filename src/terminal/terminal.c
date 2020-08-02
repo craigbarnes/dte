@@ -16,59 +16,67 @@
 #include "util/macros.h"
 #include "util/str-util.h"
 
+typedef enum {
+    BCE = 0x01, // Can erase with specific background color (back color erase)
+    REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
+    TITLE = 0x04, // Supports xterm control codes for setting window title
+} TermFlags;
+
 typedef struct {
     const char name[12];
     uint8_t name_len;
     uint8_t color_type;
     uint8_t ncv_attributes;
-    bool back_color_erase;
+    uint8_t flags;
 } TermEntry;
 
 static const TermEntry terms[] = {
-    {"Eterm", 5, TERM_8_COLOR, 0, true},
-    {"alacritty", 9, TERM_8_COLOR, 0, true},
-    {"ansi", 4, TERM_8_COLOR, 3, false},
-    {"ansiterm", 8, TERM_0_COLOR, 0, false},
-    {"aterm", 5, TERM_8_COLOR, 0, true},
-    {"cx", 2, TERM_8_COLOR, 0, false},
-    {"cx100", 5, TERM_8_COLOR, 0, false},
-    {"cygwin", 6, TERM_8_COLOR, 0, false},
-    {"cygwinB19", 9, TERM_8_COLOR, 3, false},
-    {"cygwinDBG", 9, TERM_8_COLOR, 3, false},
-    {"decansi", 7, TERM_8_COLOR, 0, false},
-    {"dtterm", 6, TERM_8_COLOR, 0, false},
-    {"dvtm", 4, TERM_8_COLOR, 0, false},
-    {"fbterm", 6, TERM_256_COLOR, 18, true},
-    {"hurd", 4, TERM_8_COLOR, 18, true},
-    {"iTerm.app", 9, TERM_256_COLOR, 0, true},
-    {"iTerm2.app", 10, TERM_256_COLOR, 0, true},
-    {"iterm", 5, TERM_256_COLOR, 0, true},
-    {"iterm2", 6, TERM_256_COLOR, 0, true},
-    {"jfbterm", 7, TERM_8_COLOR, 18, true},
-    {"kitty", 5, TERM_256_COLOR, 0, false},
-    {"kon", 3, TERM_8_COLOR, 18, true},
-    {"kon2", 4, TERM_8_COLOR, 18, true},
-    {"konsole", 7, TERM_8_COLOR, 0, true},
-    {"kterm", 5, TERM_8_COLOR, 0, false},
-    {"linux", 5, TERM_8_COLOR, 18, true},
-    {"mgt", 3, TERM_8_COLOR, 0, true},
-    {"mintty", 6, TERM_8_COLOR, 0, true},
-    {"mlterm", 6, TERM_8_COLOR, 0, false},
-    {"mlterm2", 7, TERM_8_COLOR, 0, false},
-    {"mlterm3", 7, TERM_8_COLOR, 0, false},
-    {"mrxvt", 5, TERM_8_COLOR, 0, true},
-    {"pcansi", 6, TERM_8_COLOR, 3, false},
-    {"putty", 5, TERM_8_COLOR, 22, true},
-    {"rxvt", 4, TERM_8_COLOR, 0, true},
-    {"screen", 6, TERM_8_COLOR, 0, false},
-    {"st", 2, TERM_8_COLOR, 0, true},
-    {"stterm", 6, TERM_8_COLOR, 0, true},
-    {"teken", 5, TERM_8_COLOR, 21, true},
-    {"terminator", 10, TERM_256_COLOR, 0, true},
-    {"termite", 7, TERM_8_COLOR, 0, false},
-    {"tmux", 4, TERM_8_COLOR, 0, false},
-    {"xfce", 4, TERM_8_COLOR, 0, true},
-    {"xterm", 5, TERM_8_COLOR, 0, true},
+    {"Eterm", 5, TERM_8_COLOR, 0, BCE},
+    {"alacritty", 9, TERM_8_COLOR, 0, BCE | REP},
+    {"ansi", 4, TERM_8_COLOR, 3, 0},
+    {"ansiterm", 8, TERM_0_COLOR, 0, 0},
+    {"aterm", 5, TERM_8_COLOR, 0, BCE},
+    {"cx", 2, TERM_8_COLOR, 0, 0},
+    {"cx100", 5, TERM_8_COLOR, 0, 0},
+    {"cygwin", 6, TERM_8_COLOR, 0, 0},
+    {"cygwinB19", 9, TERM_8_COLOR, 3, 0},
+    {"cygwinDBG", 9, TERM_8_COLOR, 3, 0},
+    {"decansi", 7, TERM_8_COLOR, 0, 0},
+    {"domterm", 7, TERM_8_COLOR, 0, BCE},
+    {"dtterm", 6, TERM_8_COLOR, 0, 0},
+    {"dvtm", 4, TERM_8_COLOR, 0, 0},
+    {"fbterm", 6, TERM_256_COLOR, 18, BCE},
+    {"hurd", 4, TERM_8_COLOR, 18, BCE},
+    {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
+    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE},
+    {"iterm", 5, TERM_256_COLOR, 0, BCE},
+    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE},
+    {"jfbterm", 7, TERM_8_COLOR, 18, BCE},
+    {"kitty", 5, TERM_256_COLOR, 0, TITLE},
+    {"kon", 3, TERM_8_COLOR, 18, BCE},
+    {"kon2", 4, TERM_8_COLOR, 18, BCE},
+    {"konsole", 7, TERM_8_COLOR, 0, BCE},
+    {"kterm", 5, TERM_8_COLOR, 0, 0},
+    {"linux", 5, TERM_8_COLOR, 18, BCE},
+    {"mgt", 3, TERM_8_COLOR, 0, BCE},
+    {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE},
+    {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
+    {"mlterm2", 7, TERM_8_COLOR, 0, TITLE},
+    {"mlterm3", 7, TERM_8_COLOR, 0, TITLE},
+    {"mrxvt", 5, TERM_8_COLOR, 0, BCE | TITLE},
+    {"pcansi", 6, TERM_8_COLOR, 3, 0},
+    {"putty", 5, TERM_8_COLOR, 22, BCE},
+    {"rxvt", 4, TERM_8_COLOR, 0, BCE | TITLE},
+    {"screen", 6, TERM_8_COLOR, 0, TITLE},
+    {"st", 2, TERM_8_COLOR, 0, BCE},
+    {"stterm", 6, TERM_8_COLOR, 0, BCE},
+    {"teken", 5, TERM_8_COLOR, 21, BCE},
+    {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
+    {"termite", 7, TERM_8_COLOR, 0, TITLE},
+    {"tmux", 4, TERM_8_COLOR, 0, TITLE},
+    {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
+    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE},
+    {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
 
 static const struct {
@@ -206,7 +214,15 @@ void term_init(void)
     if (entry) {
         terminal.color_type = entry->color_type;
         terminal.ncv_attributes = entry->ncv_attributes;
-        terminal.back_color_erase = entry->back_color_erase;
+        terminal.back_color_erase = !!(entry->flags & BCE);
+        if (entry->flags & REP) {
+            terminal.repeat_byte = ecma48_repeat_byte;
+        }
+        if (entry->flags & TITLE) {
+            terminal.save_title = &xterm_save_title;
+            terminal.restore_title = &xterm_restore_title;
+            terminal.set_title = &xterm_set_title;
+        }
         if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
             terminal.parse_key_sequence = rxvt_parse_key;
         }
