@@ -29,21 +29,15 @@ public/dte.pdf: $(man) | public/
 
 public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md | public/
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -o $@ $^
+	$(Q) $(PDHTML) -o $@ $(filter-out docs/template.html, $^)
 
-build/docs/index.md: docs/index.sed README.md | build/docs/ build/test/index.md
+build/docs/index.md: docs/index.sed README.md | build/docs/
 	$(E) GEN $@
 	$(Q) sed -f $^ > $@
-	@# Check that index.sed actually matched something:
-	$(Q) ! diff $@ build/test/index.md >/dev/null
-
-build/test/index.md: README.md | build/test/
-	$(E) GEN $@
-	$(Q) cat $^ > $@
 
 public/releases.html: docs/releases.yml CHANGELOG.md | public/
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -o $@ $^
+	$(Q) $(PDHTML) -o $@ $(filter-out docs/template.html, $^)
 
 $(html-man): public/%.html: docs/%.md docs/fix-anchors.lua
 	$(E) PANDOC $@
