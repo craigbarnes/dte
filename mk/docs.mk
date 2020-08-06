@@ -14,7 +14,7 @@ img = public/screenshot.png public/favicon.ico
 docs: man html htmlgz
 man: $(man)
 html: $(html) $(css) $(img)
-htmlgz: $(patsubst %, %.gz, $(html) $(css))
+htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
 $(html): docs/template.html | public/style.css
