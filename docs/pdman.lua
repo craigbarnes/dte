@@ -49,7 +49,7 @@ function Doc(body, metadata, variables)
     local authors = assert(metadata.author)
     return template:format (
         title:upper(), section, date,
-        title, description,
+        title, description:gsub(" dte", " \\fBdte\\fR(1)"),
         toc:tostring(), body,
         concat(seealso, ",\n"),
         concat(authors, "\n.br\n")

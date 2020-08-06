@@ -2,7 +2,7 @@
 title: dterc
 section: 5
 date: June 2020
-description: Command and configuration language used by `dte`
+description: Command and configuration language used by dte
 author: [Craig Barnes, Timo Hirvonen]
 seealso: ["`dte`", "`dte-syntax`"]
 ---

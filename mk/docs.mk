@@ -27,23 +27,23 @@ public/dte.pdf: $(man) | public/
 	$(E) GROFF $@
 	$(Q) groff -mandoc -Tpdf $^ > $@
 
-public/index.html: build/docs/index.md | public/screenshot.png
+public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md | public/
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle='dte' -o $@ $<
+	$(Q) $(PDHTML) -o $@ $^
 
-build/docs/index.md: docs/index.sed README.md docs/gitlab.md | build/docs/ build/test/index.md
+build/docs/index.md: docs/index.sed README.md | build/docs/ build/test/index.md
 	$(E) GEN $@
 	$(Q) sed -f $^ > $@
 	@# Check that index.sed actually matched something:
 	$(Q) ! diff $@ build/test/index.md >/dev/null
 
-build/test/index.md: README.md docs/gitlab.md | build/test/
+build/test/index.md: README.md | build/test/
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 
-public/releases.html: CHANGELOG.md | public/
+public/releases.html: docs/releases.yml CHANGELOG.md | public/
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -Mtitle='dte Releases' -o $@ $<
+	$(Q) $(PDHTML) -o $@ $^
 
 $(html-man): public/%.html: docs/%.md docs/fix-anchors.lua
 	$(E) PANDOC $@
