@@ -8,12 +8,14 @@ public/dte.html: PANDOC_FLAGS += --indented-code-classes=sh
 man = docs/dte.1 docs/dterc.5 docs/dte-syntax.5
 html-man = public/dte.html public/dterc.html public/dte-syntax.html
 html = public/index.html public/releases.html $(html-man)
+css = public/style.css
+img = public/screenshot.png public/favicon.ico
 
-docs: man html gz
+docs: man html htmlgz
 man: $(man)
-html: $(html)
+html: $(html) $(css) $(img)
+htmlgz: $(patsubst %, %.gz, $(html) $(css))
 pdf: public/dte.pdf
-gz: $(patsubst %, %.gz, $(html) public/style.css)
 
 $(html): docs/template.html | public/style.css
 
@@ -51,7 +53,7 @@ public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
-public/screenshot.png: docs/screenshot.png | public/
+$(img): public/%: docs/% | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
@@ -67,4 +69,4 @@ build/docs/: build/
 
 
 CLEANDIRS += public/
-.PHONY: docs man html pdf gz
+.PHONY: docs man html htmlgz pdf
