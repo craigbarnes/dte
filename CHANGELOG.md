@@ -426,6 +426,7 @@ system except a somewhat recent kernel.
 
 [`close`]: https://craigbarnes.gitlab.io/dte/dterc.html#close
 [`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
+[`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
 [`filter`]: https://craigbarnes.gitlab.io/dte/dterc.html#filter
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
