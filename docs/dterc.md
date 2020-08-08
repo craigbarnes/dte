@@ -964,8 +964,8 @@ output.
 
 Example uses:
 
-    exec-open find . -type f -name *.h
-    exec-open git ls-files --modified
+    exec-open -s find . -type f -name *.h
+    exec-open -s git ls-files --modified
     exec-open fzf --reverse
 
 ## Other Commands
