@@ -42,18 +42,17 @@ static char *expand_word(void)
     if (!view) {
         return NULL;
     }
+
     size_t size;
-    char *str = view_get_selection(view, &size);
-    if (str != NULL) {
-        xrenew(str, size + 1);
-        str[size] = '\0';
-    } else {
-        str = view_get_word_under_cursor(view);
-        if (str == NULL) {
-            str = NULL;
-        }
+    char *selection = view_get_selection(view, &size);
+    if (selection) {
+        xrenew(selection, size + 1);
+        selection[size] = '\0';
+        return selection;
     }
-    return str;
+
+    StringView word = view_get_word_under_cursor(view);
+    return word.length ? xstrcut(word.data, word.length) : NULL;
 }
 
 static char *expand_pkgdatadir(void)

@@ -141,7 +141,7 @@ bool view_can_close(const View *v)
     return v->buffer->views.count > 1;
 }
 
-char *view_get_word_under_cursor(const View *v)
+StringView view_get_word_under_cursor(const View *v)
 {
     StringView line;
     size_t i, ei, si = fetch_this_line(&v->cursor, &line);
@@ -154,7 +154,7 @@ char *view_get_word_under_cursor(const View *v)
         si = i;
     }
     if (si == line.length) {
-        return NULL;
+        return string_view(NULL, 0);
     }
 
     ei = si;
@@ -172,5 +172,5 @@ char *view_get_word_under_cursor(const View *v)
         }
         ei = i;
     }
-    return xstrslice(line.data, si, ei);
+    return string_view(line.data + si, ei - si);
 }

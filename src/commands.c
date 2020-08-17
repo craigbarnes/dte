@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <glob.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "commands.h"
@@ -1605,19 +1606,23 @@ static void cmd_search(const CommandArgs *a)
         }
     }
 
+    char pattbuf[4096];
     if (w) {
-        char *word = view_get_word_under_cursor(view);
-        if (word == NULL) {
+        StringView word = view_get_word_under_cursor(view);
+        if (word.length == 0) {
             // Error message would not be very useful here
             return;
         }
-        pattern = xasprintf (
-            "%s%s%s",
-            regexp_word_boundary.start,
-            word,
-            regexp_word_boundary.end
-        );
-        free(word);
+        const size_t bmax = sizeof(regexp_word_boundary.start);
+        static_assert(bmax == 8);
+        if (word.length >= sizeof(pattbuf) - (bmax * 2)) {
+            error_msg("word under cursor too long");
+            return;
+        }
+        char *ptr = stpncpy(pattbuf, regexp_word_boundary.start, bmax);
+        memcpy(ptr, word.data, word.length);
+        memcpy(ptr + word.length, regexp_word_boundary.end, bmax);
+        pattern = pattbuf;
     }
 
     do_selection(SELECT_NONE);
@@ -1632,10 +1637,6 @@ static void cmd_search(const CommandArgs *a)
         }
         if (history) {
             history_add(&editor.search_history, pattern, search_history_size);
-        }
-
-        if (pattern != a->args[0]) {
-            free(pattern);
         }
     } else if (cmd == 'n') {
         search_next();
@@ -1790,10 +1791,11 @@ static void cmd_tag(const CommandArgs *a)
     const char *name = a->args[0];
     char *word = NULL;
     if (!name) {
-        word = view_get_word_under_cursor(view);
-        if (!word) {
+        StringView w = view_get_word_under_cursor(view);
+        if (w.length == 0) {
             return;
         }
+        word = xstrcut(w.data, w.length);
         name = word;
     }
 

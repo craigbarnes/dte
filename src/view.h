@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include "block-iter.h"
+#include "util/string-view.h"
 
 typedef enum {
     SELECT_NONE,
@@ -69,6 +70,6 @@ void view_update_cursor_x(View *v);
 void view_update(View *v);
 long view_get_preferred_x(View *v);
 bool view_can_close(const View *v);
-char *view_get_word_under_cursor(const View *v);
+StringView view_get_word_under_cursor(const View *v);
 
 #endif
