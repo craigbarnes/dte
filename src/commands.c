@@ -1615,7 +1615,7 @@ static void cmd_search(const CommandArgs *a)
         }
         const size_t bmax = sizeof(regexp_word_boundary.start);
         static_assert_compatible_types(regexp_word_boundary.start, char[8]);
-        if (word.length >= sizeof(pattbuf) - (bmax * 2)) {
+        if (unlikely(word.length >= sizeof(pattbuf) - (bmax * 2))) {
             error_msg("word under cursor too long");
             return;
         }
