@@ -4,7 +4,7 @@
 #include "terminal/color.h"
 #include "util/string.h"
 
-enum builtin_color {
+typedef enum {
     BC_DEFAULT,
     BC_NONTEXT,
     BC_NOLINE,
@@ -21,7 +21,7 @@ enum builtin_color {
     BC_INACTIVETAB,
     BC_DIALOG,
     NR_BC
-};
+} BuiltinColorEnum;
 
 typedef struct {
     TermColor color;

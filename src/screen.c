@@ -26,7 +26,7 @@ void set_color(const TermColor *color)
     obuf.color = tmp;
 }
 
-void set_builtin_color(enum builtin_color c)
+void set_builtin_color(BuiltinColorEnum c)
 {
     set_color(builtin_colors[c]);
 }

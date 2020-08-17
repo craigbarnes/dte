@@ -9,13 +9,12 @@
 
 static void print_message(const char *msg, bool is_error)
 {
-    enum builtin_color c = BC_COMMANDLINE;
+    BuiltinColorEnum c = BC_COMMANDLINE;
     if (msg[0]) {
         c = is_error ? BC_ERRORMSG : BC_INFOMSG;
     }
     set_builtin_color(c);
-    size_t i = 0;
-    while (msg[i]) {
+    for (size_t i = 0; msg[i];) {
         CodePoint u = u_get_char(msg, i + 4, &i);
         if (!term_put_char(u)) {
             break;

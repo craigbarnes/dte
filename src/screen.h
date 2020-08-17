@@ -16,7 +16,7 @@ void update_window_sizes(void);
 void update_line_numbers(Window *win, bool force);
 void update_screen_size(void);
 void set_color(const TermColor *color);
-void set_builtin_color(enum builtin_color c);
+void set_builtin_color(BuiltinColorEnum c);
 void mask_color(TermColor *color, const TermColor *over);
 
 // screen-cmdline.c
