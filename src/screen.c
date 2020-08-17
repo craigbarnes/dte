@@ -69,7 +69,7 @@ static void print_separator(Window *win)
         return;
     }
     for (int y = 0, h = win->h; y < h; y++) {
-        terminal.move_cursor(win->x + win->w, win->y + y);
+        term_move_cursor(win->x + win->w, win->y + y);
         term_add_byte('|');
     }
 }
@@ -117,7 +117,7 @@ void update_line_numbers(Window *win, bool force)
         } else {
             xsnprintf(buf, sizeof(buf), "%*ld ", w, line);
         }
-        terminal.move_cursor(x, win->edit_y + i);
+        term_move_cursor(x, win->edit_y + i);
         term_add_bytes(buf, win->line_numbers.width);
     }
 }

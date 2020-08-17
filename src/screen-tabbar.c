@@ -170,7 +170,7 @@ void print_tabbar(Window *win)
     }
 
     term_output_reset(win->x, win->w, 0);
-    terminal.move_cursor(win->x, win->y);
+    term_move_cursor(win->x, win->y);
 
     calculate_tabbar(win);
     size_t i = win->first_tab_idx;

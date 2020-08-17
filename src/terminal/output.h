@@ -46,6 +46,7 @@ void term_add_str(const char *str);
 size_t term_xnprintf(size_t maxlen, const char *format, ...) PRINTF(2);
 void term_hide_cursor(void);
 void term_show_cursor(void);
+void term_move_cursor(unsigned int x, unsigned int y);
 void term_clear_eol(void);
 void term_output_flush(void);
 bool term_put_char(CodePoint u);

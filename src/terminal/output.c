@@ -122,6 +122,11 @@ void term_show_cursor(void)
     terminal.put_control_code(terminal.control_codes.show_cursor);
 }
 
+void term_move_cursor(unsigned int x, unsigned int y)
+{
+    terminal.move_cursor(x, y);
+}
+
 void term_clear_eol(void)
 {
     const size_t end = obuf.scroll_x + obuf.width;

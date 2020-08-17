@@ -146,14 +146,14 @@ static void restore_cursor(void)
     View *v = window->view;
     switch (editor.input_mode) {
     case INPUT_NORMAL:
-        terminal.move_cursor (
+        term_move_cursor (
             window->edit_x + v->cx_display - v->vx,
             window->edit_y + v->cy - v->vy
         );
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        terminal.move_cursor(editor.cmdline_x, terminal.height - 1);
+        term_move_cursor(editor.cmdline_x, terminal.height - 1);
         break;
     default:
         BUG("unhandled input mode");
@@ -271,7 +271,7 @@ void ui_end(void)
         return;
     }
     terminal.clear_screen();
-    terminal.move_cursor(0, terminal.height - 1);
+    term_move_cursor(0, terminal.height - 1);
     term_show_cursor();
     terminal.put_control_code(terminal.control_codes.cup_mode_off);
     terminal.put_control_code(terminal.control_codes.keypad_off);
@@ -352,7 +352,7 @@ static void show_dialog(const char *question)
 
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(x, width, 0);
-        terminal.move_cursor(x, y);
+        term_move_cursor(x, y);
         if (y == mid) {
             term_set_bytes(' ', (width - question_width) / 2);
             set_color(text_color);

@@ -25,7 +25,7 @@ static void print_message(const char *msg, bool is_error)
 void show_message(const char *msg, bool is_error)
 {
     term_output_reset(0, terminal.width, 0);
-    terminal.move_cursor(0, terminal.height - 1);
+    term_move_cursor(0, terminal.height - 1);
     print_message(msg, is_error);
     term_clear_eol();
 }
@@ -69,7 +69,7 @@ void update_command_line(void)
 {
     char prefix = ':';
     term_output_reset(0, terminal.width, 0);
-    terminal.move_cursor(0, terminal.height - 1);
+    term_move_cursor(0, terminal.height - 1);
     switch (editor.input_mode) {
     case INPUT_NORMAL: {
         bool msg_is_error;

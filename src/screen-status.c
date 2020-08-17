@@ -251,7 +251,7 @@ void update_status_line(const Window *win)
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
     term_output_reset(win->x, win->w, 0);
-    terminal.move_cursor(win->x, win->y + win->h - 1);
+    term_move_cursor(win->x, win->y + win->h - 1);
     set_builtin_color(BC_STATUSLINE);
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
@@ -264,7 +264,7 @@ void update_status_line(const Window *win)
         // Both would fit separately, draw overlapping
         term_add_str(lbuf);
         obuf.x = win->w - rw;
-        terminal.move_cursor(win->x + win->w - rw, win->y + win->h - 1);
+        term_move_cursor(win->x + win->w - rw, win->y + win->h - 1);
         term_add_str(rbuf);
     } else if (lw <= win->w) {
         // Left fits

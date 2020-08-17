@@ -400,7 +400,7 @@ void update_range(const View *v, long y1, long y2)
     long i;
     for (i = y1; got_line && i < y2; i++) {
         obuf.x = 0;
-        terminal.move_cursor(edit_x, edit_y + i);
+        term_move_cursor(edit_x, edit_y + i);
 
         StringView line;
         fill_line_nl_ref(&bi, &line);
@@ -428,7 +428,7 @@ void update_range(const View *v, long y1, long y2)
         mask_color2(&color, builtin_colors[BC_CURRENTLINE]);
         set_color(&color);
 
-        terminal.move_cursor(edit_x, edit_y + i++);
+        term_move_cursor(edit_x, edit_y + i++);
         term_clear_eol();
     }
 
@@ -437,7 +437,7 @@ void update_range(const View *v, long y1, long y2)
     }
     for (; i < y2; i++) {
         obuf.x = 0;
-        terminal.move_cursor(edit_x, edit_y + i);
+        term_move_cursor(edit_x, edit_y + i);
         term_put_char('~');
         term_clear_eol();
     }
