@@ -1613,9 +1613,9 @@ static void cmd_search(const CommandArgs *a)
         }
         pattern = xasprintf (
             "%s%s%s",
-            regexp_word_boundary_start,
+            regexp_word_boundary.start,
             word,
-            regexp_word_boundary_end
+            regexp_word_boundary.end
         );
         free(word);
     }

@@ -6,8 +6,12 @@
 #include <stddef.h>
 #include "util/string-view.h"
 
-extern char regexp_word_boundary_start[8];
-extern char regexp_word_boundary_end[8];
+typedef struct {
+    char start[8];
+    char end[8];
+} RegexpWordBoundaryTokens;
+
+extern RegexpWordBoundaryTokens regexp_word_boundary;
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags);
 
