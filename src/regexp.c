@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #include "regexp.h"
 #include "debug.h"
 #include "error.h"
@@ -80,7 +79,7 @@ void regexp_init_word_boundary_tokens(void)
         bool match = !regexec(&re, text, ARRAY_COUNT(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
-            memcpy(&regexp_word_boundary, &pairs[i], sizeof(pairs[i]));
+            regexp_word_boundary = pairs[i];
             break;
         }
     }
