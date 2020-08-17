@@ -12,6 +12,12 @@ abort() {
     exit 1
 }
 
+for cmd in git gcc clang ccache awk pandoc; do
+    if ! command -v "$cmd" >/dev/null; then
+        abort "'$cmd' is required but couldn't be found"
+    fi
+done
+
 test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists" $LINENO
 
 MAKE="$(command -v gmake || command -v make)"
@@ -40,7 +46,10 @@ for F in $GENERATED; do
     fi
 done
 
-$MAKE check
-$MAKE check TERMINFO_DISABLE=1
-$MAKE check ICONV_DISABLE=1
-$MAKE check DEBUG=0
+for CC in gcc clang; do
+    export CC="ccache $CC"
+    $MAKE check
+    $MAKE check TERMINFO_DISABLE=1
+    $MAKE check ICONV_DISABLE=1
+    $MAKE check DEBUG=0
+done
