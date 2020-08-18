@@ -32,13 +32,7 @@ State *find_state(const Syntax *syn, const char *name)
 
 static bool has_destination(ConditionType type)
 {
-    switch (type) {
-    case COND_RECOLOR:
-    case COND_RECOLOR_BUFFER:
-        return false;
-    default:
-        return true;
-    }
+    return !(type == COND_RECOLOR || type == COND_RECOLOR_BUFFER);
 }
 
 Syntax *find_any_syntax(const char *name)
