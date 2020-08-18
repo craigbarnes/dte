@@ -279,6 +279,11 @@ int main(int argc, char *argv[])
 
 loop_break:
 
+    if (!log_init()) {
+        fprintf(stderr, "failed to initialize logging: %s\n", strerror(errno));
+        return EX_IOERR;
+    }
+
     if (lint_syntax) {
         int err;
         const Syntax *s = load_syntax_file(lint_syntax, CFG_MUST_EXIST, &err);

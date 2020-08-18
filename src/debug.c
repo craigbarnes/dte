@@ -43,15 +43,23 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 }
 #endif
 
-#ifdef DEBUG_PRINT
+#if DEBUG >= 2
+static int logfd = -1;
+
+bool log_init(void)
+{
+    const char *path = getenv("DTE_LOG");
+    if (!path || path[0] == '\0') {
+        return true;
+    }
+    logfd = xopen(path, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
+    return (logfd >= 0);
+}
+
 void debug_log(const char *function, const char *fmt, ...)
 {
-    static int fd = -1;
-    if (fd < 0) {
-        char *filename = editor_file("debug.log");
-        fd = xopen(filename, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
-        free(filename);
-        BUG_ON(fd < 0);
+    if (logfd < 0) {
+        return;
     }
 
     char buf[4096];
@@ -64,8 +72,8 @@ void debug_log(const char *function, const char *fmt, ...)
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     va_end(ap);
 
-    const size_t n = len1 + len2;
+    size_t n = len1 + len2;
     buf[n++] = '\n';
-    xwrite(fd, buf, n);
+    xwrite(logfd, buf, n);
 }
 #endif

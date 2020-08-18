@@ -1,6 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stdbool.h>
 #include "util/macros.h"
 
 #define BUG_ON(a) do { \
@@ -18,11 +19,13 @@
     #define BUG(...) UNREACHABLE()
 #endif
 
-#ifdef DEBUG_PRINT
+#if DEBUG >= 2
     #define DEBUG_LOG(...) debug_log(__func__, __VA_ARGS__)
     void debug_log(const char *function, const char *fmt, ...) PRINTF(2);
+    bool log_init(void);
 #else
     static inline PRINTF(1) void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
+    static inline bool log_init(void) {return true;}
 #endif
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
