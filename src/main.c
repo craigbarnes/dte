@@ -138,7 +138,7 @@ static void set_signal_handlers(void)
     }
 }
 
-static int list_builtin_configs(void)
+static ExitCode list_builtin_configs(void)
 {
     String str = dump_builtin_configs();
     ssize_t n = xwrite(STDOUT_FILENO, str.buffer, str.len);
@@ -150,7 +150,7 @@ static int list_builtin_configs(void)
     return EX_OK;
 }
 
-static int dump_builtin_config(const char *name)
+static ExitCode dump_builtin_config(const char *name)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {

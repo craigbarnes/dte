@@ -10,4 +10,6 @@ enum {
     EX_IOERR = 74, // Input/output error
 };
 
+typedef int ExitCode;
+
 #endif
