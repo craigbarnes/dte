@@ -484,12 +484,11 @@ ssize_t file_encoder_write (
         size = unix_to_dos(enc, buf, size);
         buf = enc->nbuf;
     }
-    if (enc->cconv == NULL) {
-        return xwrite(enc->fd, buf, size);
+    if (enc->cconv) {
+        cconv_process(enc->cconv, buf, size);
+        cconv_flush(enc->cconv);
+        buf = cconv_consume_all(enc->cconv, &size);
     }
-    cconv_process(enc->cconv, buf, size);
-    cconv_flush(enc->cconv);
-    buf = cconv_consume_all(enc->cconv, &size);
     return xwrite(enc->fd, buf, size);
 }
 
