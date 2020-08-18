@@ -55,7 +55,7 @@ void debug_log(const char *function, const char *fmt, ...)
     }
 
     char buf[4096];
-    size_t write_max = ARRAY_COUNT(buf);
+    size_t write_max = ARRAY_COUNT(buf) - 1;
     const size_t len1 = xsnprintf(buf, write_max, "%s: ", function);
     write_max -= len1;
 
@@ -64,6 +64,8 @@ void debug_log(const char *function, const char *fmt, ...)
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     va_end(ap);
 
-    xwrite(fd, buf, len1 + len2);
+    const size_t n = len1 + len2;
+    buf[n++] = '\n';
+    xwrite(fd, buf, n);
 }
 #endif
