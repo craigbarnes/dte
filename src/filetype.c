@@ -59,15 +59,10 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
         return;
     }
 
-    switch (type) {
-    case FT_CONTENT:
-    case FT_FILENAME:
+    if (type == FT_CONTENT || type == FT_FILENAME) {
         if (!regexp_is_valid(str, REG_NEWLINE)) {
             return;
         }
-        break;
-    default:
-        break;
     }
 
     const size_t data_len = name_len + str_len + 2;
