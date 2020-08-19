@@ -391,7 +391,7 @@ static void init_completion(void)
             if (value) {
                 size_t save = array.count;
                 if (parse_commands(&array, value) != CMDERR_NONE) {
-                    for (size_t i = save; i < array.count; i++) {
+                    for (size_t i = save, n = array.count; i < n; i++) {
                         free(array.ptrs[i]);
                         array.ptrs[i] = NULL;
                     }

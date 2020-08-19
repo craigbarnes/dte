@@ -70,7 +70,7 @@ HlColor *set_highlight_color(const char *name, const TermColor *color)
 
 static HlColor *find_real_color(const char *name)
 {
-    for (size_t i = 0; i < hl_colors.count; i++) {
+    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
         HlColor *c = hl_colors.ptrs[i];
         if (streq(c->name, name)) {
             return c;

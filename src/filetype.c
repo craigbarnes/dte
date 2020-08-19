@@ -167,7 +167,7 @@ HOT const char *find_ft(const char *filename, StringView line)
     const StringView interpreter = get_interpreter(line);
 
     // Search user `ft` entries
-    for (size_t i = 0; i < filetypes.count; i++) {
+    for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         switch (ft->type) {
         case FT_EXTENSION:
@@ -253,7 +253,7 @@ HOT const char *find_ft(const char *filename, StringView line)
 
 bool is_ft(const char *name)
 {
-    for (size_t i = 0; i < filetypes.count; i++) {
+    for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         if (streq(ft_get_name(ft), name)) {
             return true;

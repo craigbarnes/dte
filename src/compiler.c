@@ -22,7 +22,7 @@ static Compiler *add_compiler(const char *name)
 
 Compiler *find_compiler(const char *name)
 {
-    for (size_t i = 0; i < compilers.count; i++) {
+    for (size_t i = 0, n = compilers.count; i < n; i++) {
         Compiler *c = compilers.ptrs[i];
         if (streq(c->name, name)) {
             return c;

@@ -26,7 +26,7 @@ static void CONSTRUCTOR prealloc(void)
 void add_alias(const char *name, const char *value)
 {
     // Replace existing alias
-    for (size_t i = 0; i < aliases.count; i++) {
+    for (size_t i = 0, n = aliases.count; i < n; i++) {
         CommandAlias *alias = aliases.ptrs[i];
         if (streq(alias->name, name)) {
             free(alias->value);
@@ -70,7 +70,7 @@ const char *find_alias(const char *const name)
 
 void collect_aliases(const char *const prefix)
 {
-    for (size_t i = 0; i < aliases.count; i++) {
+    for (size_t i = 0, n = aliases.count; i < n; i++) {
         const CommandAlias *const alias = aliases.ptrs[i];
         if (str_has_prefix(alias->name, prefix)) {
             add_completion(xstrdup(alias->name));
@@ -81,7 +81,7 @@ void collect_aliases(const char *const prefix)
 String dump_aliases(void)
 {
     String buf = string_new(4096);
-    for (size_t i = 0; i < aliases.count; i++) {
+    for (size_t i = 0, n = aliases.count; i < n; i++) {
         const CommandAlias *alias = aliases.ptrs[i];
         string_append_literal(&buf, "alias ");
         string_append_escaped_arg(&buf, alias->name, false);

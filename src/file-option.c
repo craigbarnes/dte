@@ -85,7 +85,7 @@ void set_editorconfig_options(Buffer *b)
 
 void set_file_options(Buffer *b)
 {
-    for (size_t i = 0; i < file_options.count; i++) {
+    for (size_t i = 0, n = file_options.count; i < n; i++) {
         const FileOption *opt = file_options.ptrs[i];
         switch (opt->type) {
         case FILE_OPTIONS_FILETYPE:
@@ -127,7 +127,7 @@ void add_file_options(FileOptionType type, char *to, char **strs)
 
 void dump_file_options(String *buf)
 {
-    for (size_t i = 0; i < file_options.count; i++) {
+    for (size_t i = 0, n = file_options.count; i < n; i++) {
         const FileOption *opt = file_options.ptrs[i];
         string_append_literal(buf, "option ");
         if (opt->type == FILE_OPTIONS_FILENAME) {

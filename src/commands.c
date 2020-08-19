@@ -1805,7 +1805,7 @@ static void cmd_tag(const CommandArgs *a)
     if (tags.count == 0) {
         error_msg("Tag '%s' not found", name);
     } else {
-        for (size_t i = 0; i < tags.count; i++) {
+        for (size_t i = 0, n = tags.count; i < n; i++) {
             Tag *t = tags.ptrs[i];
             char buf[512];
             size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
