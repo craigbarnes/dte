@@ -6,7 +6,7 @@ VERSION = $(shell mk/version.sh 1.9.1)
 
 WARNINGS = \
     -Wall -Wextra -Wformat -Wformat-security \
-    -Wmissing-prototypes -Wstrict-prototypes \
+    -Wmissing-prototypes -Wstrict-prototypes -Wswitch-enum \
     -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
