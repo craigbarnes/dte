@@ -50,17 +50,13 @@ copy:
     return blk;
 }
 
-static bool decode_and_add_blocks (
-    Buffer *b,
-    const unsigned char *buf,
-    size_t size
-) {
+static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size)
+{
     EncodingType bom_type = detect_encoding_from_bom(buf, size);
-
-    switch (b->encoding.type) {
-    case ENCODING_AUTODETECT:
+    EncodingType enc_type = b->encoding.type;
+    if (enc_type == ENCODING_AUTODETECT) {
         if (bom_type != UNKNOWN_ENCODING) {
-            BUG_ON(b->encoding.name != NULL);
+            BUG_ON(b->encoding.name);
             Encoding e = encoding_from_type(bom_type);
             if (encoding_supported_by_iconv(e.name)) {
                 b->encoding = e;
@@ -68,33 +64,10 @@ static bool decode_and_add_blocks (
                 b->encoding = encoding_from_type(UTF8);
             }
         }
-        break;
-    case UTF16:
-        switch (bom_type) {
-        case UTF16LE:
-        case UTF16BE:
-            b->encoding = encoding_from_type(bom_type);
-            break;
-        default:
-            // "open -e UTF-16" but incompatible or no BOM.
-            // Do what the user wants. Big-endian is default.
-            b->encoding = encoding_from_type(UTF16BE);
-        }
-        break;
-    case UTF32:
-        switch (bom_type) {
-        case UTF32LE:
-        case UTF32BE:
-            b->encoding = encoding_from_type(bom_type);
-            break;
-        default:
-            // "open -e UTF-32" but incompatible or no BOM.
-            // Do what the user wants. Big-endian is default.
-            b->encoding = encoding_from_type(UTF32BE);
-        }
-        break;
-    default:
-        break;
+    } else if (enc_type == UTF16) {
+        b->encoding = encoding_from_type(bom_type == UTF16LE ? UTF16LE : UTF16BE);
+    } else if (enc_type == UTF32) {
+        b->encoding = encoding_from_type(bom_type == UTF32LE ? UTF32LE : UTF32BE);
     }
 
     // Skip BOM only if it matches the specified file encoding.
@@ -105,7 +78,7 @@ static bool decode_and_add_blocks (
     }
 
     FileDecoder *dec = new_file_decoder(b->encoding.name, buf, size);
-    if (dec == NULL) {
+    if (!dec) {
         return false;
     }
 
