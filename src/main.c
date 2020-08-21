@@ -164,7 +164,21 @@ static ExitCode dump_builtin_config(const char *name)
     return EX_OK;
 }
 
-static void showkey_loop(void)
+static ExitCode lint_syntax(const char *filename)
+{
+    int err;
+    const Syntax *s = load_syntax_file(filename, CFG_MUST_EXIST, &err);
+    if (s) {
+        const size_t n = s->states.count;
+        const char *p = (n > 1) ? "s" : "";
+        printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, p);
+    } else if (err == EINVAL) {
+        error_msg("%s: no default syntax found", filename);
+    }
+    return get_nr_errors() ? EX_DATAERR : EX_OK;
+}
+
+static ExitCode showkey_loop(void)
 {
     term_raw();
     terminal.put_control_code(terminal.control_codes.init);
@@ -197,6 +211,7 @@ static void showkey_loop(void)
     terminal.put_control_code(terminal.control_codes.deinit);
     term_output_flush();
     term_cooked();
+    return EX_OK;
 }
 
 static const char copyright[] =
@@ -229,7 +244,6 @@ int main(int argc, char *argv[])
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
-    const char *lint_syntax = NULL;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
@@ -247,8 +261,7 @@ int main(int argc, char *argv[])
             rc = optarg;
             break;
         case 's':
-            lint_syntax = optarg;
-            goto loop_break;
+            return lint_syntax(optarg);
         case 'R':
             read_rc = false;
             break;
@@ -278,19 +291,6 @@ int main(int argc, char *argv[])
 loop_break:
 
     init_editor_state();
-
-    if (lint_syntax) {
-        int err;
-        const Syntax *s = load_syntax_file(lint_syntax, CFG_MUST_EXIST, &err);
-        if (s) {
-            const size_t n = s->states.count;
-            const char *p = (n > 1) ? "s" : "";
-            printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, p);
-        } else if (err == EINVAL) {
-            error_msg("%s: no default syntax found", lint_syntax);
-        }
-        return get_nr_errors() ? EX_DATAERR : EX_OK;
-    }
 
     Buffer *stdin_buffer = NULL;
     if (!isatty(STDIN_FILENO)) {
@@ -354,8 +354,7 @@ loop_break:
     term_init();
 
     if (use_showkey) {
-        showkey_loop();
-        return EX_OK;
+        return showkey_loop();
     }
 
     // Create this early. Needed if lock-files is true.
