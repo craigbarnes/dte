@@ -22,8 +22,8 @@ git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
 
 check-shell-scripts:
-	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh tools/*.sh
-	$(E) TEST 'mk/*.sh tools/*.sh'
+	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh test/*.sh tools/*.sh
+	$(E) TEST 'mk/*.sh test/*.sh tools/*.sh'
 
 check-docs:
 	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
