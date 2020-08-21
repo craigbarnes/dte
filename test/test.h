@@ -11,29 +11,29 @@
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)
 
 #define TEST_FAIL(...) test_fail(__FILE__, __LINE__, __VA_ARGS__)
+#define EXPECT(fn, ...) expect_##fn(__FILE__, __LINE__, __VA_ARGS__)
+#define IEXPECT(fn, ...) iexpect_##fn(__FILE__, __LINE__, i, __VA_ARGS__)
+#define ASSERT(fn, ...) assert_##fn(__FILE__, __LINE__, __VA_ARGS__)
 
-#define EXPECT_STREQ(s1, s2) expect_streq(__FILE__, __LINE__, s1, s2)
-#define EXPECT_PTREQ(p1, p2) expect_ptreq(__FILE__, __LINE__, p1, p2)
-#define EXPECT_EQ(a, b) expect_eq(__FILE__, __LINE__, a, b)
-#define EXPECT_UINT_EQ(a, b) expect_uint_eq(__FILE__, __LINE__, a, b)
-#define EXPECT_NULL(p) expect_null(__FILE__, __LINE__, p)
-#define EXPECT_NONNULL(p) expect_nonnull(__FILE__, __LINE__, p)
-#define EXPECT_TRUE(x) expect_true(__FILE__, __LINE__, x)
-#define EXPECT_FALSE(x) expect_false(__FILE__, __LINE__, x)
-
-#define IEXPECT_EQ(a, b) iexpect_eq(__FILE__, __LINE__, i, a, b)
-#define IEXPECT_STREQ(s1, s2) iexpect_streq(__FILE__, __LINE__, i, s1, s2)
-#define IEXPECT_TRUE(x) iexpect_true(__FILE__, __LINE__, i, x)
-
-#define ASSERT_PTREQ(p1, p2) assert_ptreq(__FILE__, __LINE__, p1, p2)
-#define ASSERT_EQ(a, b) assert_eq(__FILE__, __LINE__, a, b)
-#define ASSERT_TRUE(x) assert_true(__FILE__, __LINE__, x)
-#define ASSERT_NONNULL(ptr) assert_nonnull(__FILE__, __LINE__, ptr)
+#define EXPECT_STREQ(s1, s2) EXPECT(streq, s1, s2)
+#define EXPECT_PTREQ(p1, p2) EXPECT(ptreq, p1, p2)
+#define EXPECT_EQ(a, b) EXPECT(eq, a, b)
+#define EXPECT_UINT_EQ(a, b) EXPECT(uint_eq, a, b)
+#define EXPECT_NULL(p) EXPECT(null, p)
+#define EXPECT_NONNULL(p) EXPECT(nonnull, p)
+#define EXPECT_TRUE(x) EXPECT(true, x)
+#define EXPECT_FALSE(x) EXPECT(false, x)
+#define IEXPECT_EQ(a, b) IEXPECT(eq, a, b)
+#define IEXPECT_STREQ(s1, s2) IEXPECT(streq, s1, s2)
+#define IEXPECT_TRUE(x) IEXPECT(true, x)
+#define ASSERT_PTREQ(p1, p2) ASSERT(ptreq, p1, p2)
+#define ASSERT_EQ(a, b) ASSERT(eq, a, b)
+#define ASSERT_TRUE(x) ASSERT(true, x)
+#define ASSERT_NONNULL(ptr) ASSERT(nonnull, ptr)
 
 extern unsigned int failed;
 
 void test_fail(const char *file, int line, const char *format, ...) PRINTF(3);
-
 void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(const char *file, int line, const void *p1, const void *p2);
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b);
@@ -42,11 +42,9 @@ void expect_true(const char *file, int line, bool x);
 void expect_false(const char *file, int line, bool x);
 void expect_null(const char *file, int line, const void *p);
 void expect_nonnull(const char *file, int line, const void *p);
-
 void iexpect_streq(const char *file, int line, size_t i, const char *s1, const char *s2);
 void iexpect_eq(const char *file, int line, size_t i, intmax_t a, intmax_t b);
 void iexpect_true(const char *file, int line, size_t i, bool x);
-
 void assert_ptreq(const char *file, int line, const void *p1, const void *p2);
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(const char *file, int line, bool x);
