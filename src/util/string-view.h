@@ -35,10 +35,7 @@ static inline StringView string_view(const char *str, size_t length)
 
 static inline StringView strview_from_cstring(const char *str)
 {
-    return (StringView) {
-        .data = str,
-        .length = str ? strlen(str) : 0
-    };
+    return string_view(str, str ? strlen(str) : 0);
 }
 
 NONNULL_ARGS
