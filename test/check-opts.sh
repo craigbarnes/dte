@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+# Bash doesn't expand aliases in non-interactive shells, unless the
+# expand_aliases option is enabled or it's running in posix mode:
+export POSIXLY_CORRECT=1
+
 error() {
     echo "$0:$1: Error: $2" >&2
     exit 1
