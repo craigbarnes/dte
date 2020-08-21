@@ -9,20 +9,20 @@
 extern const uint8_t ascii_table[256];
 extern const int8_t hex_table[256];
 
-#define ASCII_SPACE 0x01
-#define ASCII_DIGIT 0x02
-#define ASCII_CNTRL 0x04
-#define ASCII_REGEX 0x08
-#define ASCII_LOWER 0x10
-#define ASCII_UPPER 0x20
-#define ASCII_UNDERSCORE 0x40
-#define ASCII_NONASCII 0x80
+typedef enum {
+    ASCII_SPACE = 0x01,
+    ASCII_DIGIT = 0x02,
+    ASCII_CNTRL = 0x04,
+    ASCII_REGEX = 0x08,
+    ASCII_LOWER = 0x10,
+    ASCII_UPPER = 0x20,
+    ASCII_UNDERSCORE = 0x40,
+    ASCII_NONASCII = 0x80,
+    ASCII_ALPHA = ASCII_LOWER | ASCII_UPPER,
+    ASCII_ALNUM = ASCII_ALPHA | ASCII_DIGIT,
+    ASCII_WORDBYTE = ASCII_ALNUM | ASCII_UNDERSCORE | ASCII_NONASCII,
+} AsciiCharType;
 
-#define ASCII_ALPHA (ASCII_LOWER | ASCII_UPPER)
-#define ASCII_ALNUM (ASCII_ALPHA | ASCII_DIGIT)
-#define ASCII_WORDBYTE (ASCII_ALNUM | ASCII_UNDERSCORE | ASCII_NONASCII)
-
-#define ascii_test(x, mask) ((ascii_table[(unsigned char)(x)] & (mask)) != 0)
 #define ascii_isspace(x) ascii_test(x, ASCII_SPACE)
 #define ascii_isdigit(x) ascii_test(x, ASCII_DIGIT)
 #define ascii_iscntrl(x) ascii_test(x, ASCII_CNTRL)
@@ -37,6 +37,11 @@ extern const int8_t hex_table[256];
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
 #define is_regex_special_char(x) ascii_test(x, ASCII_REGEX)
 #define is_word_byte(x) ascii_test(x, ASCII_WORDBYTE)
+
+static inline bool ascii_test(unsigned char c, AsciiCharType mask)
+{
+    return (ascii_table[c] & mask) != 0;
+}
 
 static inline bool ascii_isblank(unsigned char c)
 {
