@@ -7,6 +7,8 @@
 #include <stddef.h>
 #include "util/macros.h"
 
+extern unsigned int failed;
+
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)
 
@@ -30,8 +32,6 @@
 #define ASSERT_EQ(a, b) ASSERT(eq, a, b)
 #define ASSERT_TRUE(x) ASSERT(true, x)
 #define ASSERT_NONNULL(ptr) ASSERT(nonnull, ptr)
-
-extern unsigned int failed;
 
 void test_fail(const char *file, int line, const char *format, ...) PRINTF(3);
 void expect_streq(const char *file, int line, const char *s1, const char *s2);

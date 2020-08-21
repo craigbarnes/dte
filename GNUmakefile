@@ -24,7 +24,7 @@ INSTALL_DESKTOP_FILE = desktop-file-install
 RM = rm -f
 
 all: $(dte)
-
+check: check-tests check-opts
 install: install-bin install-man
 uninstall: uninstall-bin uninstall-man
 
@@ -74,9 +74,13 @@ uninstall-desktop-file:
 	$(RM) '$(DESTDIR)$(appdir)/dte.desktop'
 	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
 
-check: $(test) all
+check-tests: $(test) all
 	$(E) TEST $<
 	$(Q) ./$<
+
+check-opts: test/check-opts.sh all
+	$(E) TEST $<
+	$(Q) $< './$(dte)' '$(VERSION)'
 
 installcheck: install
 	$(E) TEST '$(DESTDIR)$(bindir)/$(dte)'
@@ -95,7 +99,7 @@ clean:
 .PHONY: uninstall uninstall-bin uninstall-man
 .PHONY: install-bash-completion uninstall-bash-completion
 .PHONY: install-desktop-file uninstall-desktop-file
-.PHONY: check installcheck tags clean
+.PHONY: check check-tests check-opts installcheck tags clean
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
