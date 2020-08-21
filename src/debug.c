@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "editor.h"
 #include "terminal/terminal.h"
+#include "util/exitcode.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 
@@ -46,14 +47,18 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 #if DEBUG >= 2
 static int logfd = -1;
 
-bool log_init(void)
+void log_init(void)
 {
     const char *path = getenv("DTE_LOG");
     if (!path || path[0] == '\0') {
-        return true;
+        return;
     }
     logfd = xopen(path, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
-    return (logfd >= 0);
+    if (logfd < 0) {
+        const char *err = strerror(errno);
+        fprintf(stderr, "Failed to open '%s' ($DTE_LOG): %s\n", path, err);
+        exit(EX_IOERR);
+    }
 }
 
 void debug_log(const char *function, const char *fmt, ...)

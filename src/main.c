@@ -235,8 +235,6 @@ int main(int argc, char *argv[])
     bool load_and_save_history = true;
     int ch;
 
-    init_editor_state();
-
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
         case 'c':
@@ -279,10 +277,7 @@ int main(int argc, char *argv[])
 
 loop_break:
 
-    if (!log_init()) {
-        fprintf(stderr, "failed to initialize logging: %s\n", strerror(errno));
-        return EX_IOERR;
-    }
+    init_editor_state();
 
     if (lint_syntax) {
         int err;

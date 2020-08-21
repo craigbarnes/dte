@@ -97,6 +97,7 @@ void init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
+    log_init();
     regexp_init_word_boundary_tokens();
 }
 
