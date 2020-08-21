@@ -4,10 +4,10 @@
 # (in KiB) in an object file, sorted from largest to smallest.
 
 if test ! -t 1; then
-    PAGER=cat
+    PAGER='cat'
 fi
 
-${NM:-nm} -Ptd ${@:-dte} | sort -k4 -nr | awk '
+${NM:-nm} -Ptd "${@:-dte}" | sort -k4 -nr | awk '
 {
     name = $1
     type = $2

@@ -5,11 +5,11 @@
 set -eu
 export VPREFIX="$1"
 
-# These values are filled automatically for git-archive(1) tarballs.
-# See: "export-subst" in gitattributes(5).
-distinfo_commit_full='$Format:%H$'
+# This value is filled automatically for git-archive(1) tarballs.
+# See also: "export-subst" in gitattributes(5).
+# shellcheck disable=SC2016
 distinfo_commit_short='$Format:%h$'
-distinfo_author_date='$Format:%ai$'
+
 if expr "$distinfo_commit_short" : '[0-9a-f]\{7,40\}$' >/dev/null; then
     echo "${VPREFIX}-g${distinfo_commit_short}-dist"
     exit 0

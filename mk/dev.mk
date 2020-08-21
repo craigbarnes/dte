@@ -3,6 +3,7 @@ RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
 DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
+SHELLCHECK ?= shellcheck
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
 LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '$(PAT)';)
@@ -19,6 +20,10 @@ dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
+
+check-shell-scripts:
+	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh tools/*.sh
+	$(E) TEST 'mk/*.sh tools/*.sh'
 
 check-docs:
 	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
@@ -107,5 +112,5 @@ NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-docs check-release-digests check-syntax-files git-hooks \
-    show-sizes coverage-report clang-tidy $(clang_tidy_targets)
+    check-docs check-shell-scripts check-release-digests check-syntax-files \
+    git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)
