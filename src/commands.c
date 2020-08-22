@@ -228,26 +228,10 @@ static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_close(const CommandArgs *a)
 {
-    bool force = false;
-    bool prompt = false;
-    bool allow_quit = false;
-    bool allow_wclose = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'f':
-            force = true;
-            break;
-        case 'p':
-            prompt = true;
-            break;
-        case 'q':
-            allow_quit = true;
-            break;
-        case 'w':
-            allow_wclose = true;
-            break;
-        }
-    }
+    bool force = has_flag(a, 'f');
+    bool prompt = has_flag(a, 'p');
+    bool allow_quit = has_flag(a, 'q');
+    bool allow_wclose = has_flag(a, 'w');
 
     if (!view_can_close(view) && !force) {
         if (prompt) {
@@ -623,16 +607,9 @@ static void cmd_hi(const CommandArgs *a)
 
 static void cmd_include(const CommandArgs *a)
 {
-    ConfigFlags flags = CFG_MUST_EXIST;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'b':
-            flags |= CFG_BUILTIN;
-            break;
-        case 'q':
-            flags &= ~CFG_MUST_EXIST;
-            break;
-        }
+    ConfigFlags flags = has_flag(a, 'q') ? CFG_NOFLAGS : CFG_MUST_EXIST;
+    if (has_flag(a, 'b')) {
+        flags |= CFG_BUILTIN;
     }
     read_config(&commands, a->args[0], flags);
 }
@@ -1650,25 +1627,9 @@ static void cmd_search(const CommandArgs *a)
 
 static void cmd_select(const CommandArgs *a)
 {
-    SelectionType sel = SELECT_CHARS;
-    bool block = false;
-    bool keep = false;
-
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'b':
-            block = true;
-            break;
-        case 'k':
-            keep = true;
-            break;
-        case 'l':
-            block = false;
-            sel = SELECT_LINES;
-            break;
-        }
-    }
-
+    SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
+    bool block = has_flag(a, 'b');
+    bool keep = has_flag(a, 'k');
     view->next_movement_cancels_selection = false;
 
     if (block) {
