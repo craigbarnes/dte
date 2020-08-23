@@ -87,10 +87,9 @@ static char last_flag(const CommandArgs *a)
     return last_flag_or_default(a, 0);
 }
 
-static bool has_flag(const CommandArgs *a, int flag)
+static bool has_flag(const CommandArgs *a, unsigned char flag)
 {
-    size_t n = a->nr_flags;
-    return n && !!memchr(a->flags, flag, n);
+    return bitset_contains(a->flag_set, flag);
 }
 
 static void handle_select_chars_flag(const CommandArgs *a)

@@ -217,7 +217,7 @@ static void cmd_char(const CommandArgs *a)
     } else {
         bitset_add_char_range(c->u.bitset, chars);
         if (n_flag) {
-            bitset_invert(c->u.bitset);
+            BITSET_INVERT(c->u.bitset);
         }
     }
 }

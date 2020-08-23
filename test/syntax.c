@@ -1,10 +1,10 @@
 #include <string.h>
 #include "test.h"
-#include "syntax/bitset.h"
+#include "util/bitset.h"
 
 static void test_bitset(void)
 {
-    BitSetWord set[BITSET_NR_WORDS];
+    BitSetWord set[BITSET_NR_WORDS(256)];
     ASSERT_TRUE(sizeof(set) >= 32);
 
     memset(set, 0, sizeof(set));
@@ -35,7 +35,7 @@ static void test_bitset(void)
     EXPECT_FALSE(bitset_contains(set, ':'));
     EXPECT_FALSE(bitset_contains(set, '\0'));
 
-    bitset_invert(set);
+    BITSET_INVERT(set);
     EXPECT_FALSE(bitset_contains(set, '0'));
     EXPECT_FALSE(bitset_contains(set, '8'));
     EXPECT_FALSE(bitset_contains(set, '9'));
@@ -60,7 +60,7 @@ static void test_bitset(void)
     FOR_EACH_I(i, set) {
         EXPECT_UINT_EQ(set[i], 0);
     }
-    bitset_invert(set);
+    BITSET_INVERT(set);
     FOR_EACH_I(i, set) {
         EXPECT_UINT_EQ(set[i], ((BitSetWord)-1));
     }

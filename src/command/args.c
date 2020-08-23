@@ -61,6 +61,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
                 return ARGERR_INVALID_OPTION | (flag << 8);
             }
             a->flags[nr_flags++] = flag;
+            bitset_add(a->flag_set, flag);
             if (nr_flags == ARRAY_COUNT(a->flags)) {
                 return ARGERR_TOO_MANY_OPTIONS;
             }
