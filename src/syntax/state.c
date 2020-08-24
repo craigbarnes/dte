@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include "state.h"
+#include "command/args.h"
 #include "command/run.h"
 #include "editor.h"
 #include "error.h"
@@ -179,29 +180,18 @@ static void cmd_bufis(const CommandArgs *a)
 
 static void cmd_char(const CommandArgs *a)
 {
-    bool n_flag = false;
-    bool b_flag = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'b':
-            b_flag = true;
-            break;
-        case 'n':
-            n_flag = true;
-            break;
-        }
-    }
-
     const char *chars = a->args[0];
     if (chars[0] == '\0') {
         error_msg("char argument can't be empty");
         return;
     }
 
+    bool add_to_buffer = cmdargs_has_flag(a, 'b');
+    bool invert = cmdargs_has_flag(a, 'n');
     ConditionType type;
-    if (b_flag) {
+    if (add_to_buffer) {
         type = COND_CHAR_BUFFER;
-    } else if (!n_flag && chars[1] == '\0') {
+    } else if (!invert && chars[1] == '\0') {
         type = COND_CHAR1;
     } else {
         type = COND_CHAR;
@@ -216,7 +206,7 @@ static void cmd_char(const CommandArgs *a)
         c->u.ch = (unsigned char)chars[0];
     } else {
         bitset_add_char_range(c->u.bitset, chars);
-        if (n_flag) {
+        if (invert) {
             BITSET_INVERT(c->u.bitset);
         }
     }

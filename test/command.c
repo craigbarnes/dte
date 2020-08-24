@@ -181,6 +181,11 @@ static void test_parse_args(void)
     EXPECT_EQ(a.flags[0], 'g');
     EXPECT_EQ(a.flags[1], 'e');
     EXPECT_EQ(a.flags[2], '\0');
+    EXPECT_TRUE(cmdargs_has_flag(&a, 'g'));
+    EXPECT_TRUE(cmdargs_has_flag(&a, 'e'));
+    EXPECT_FALSE(cmdargs_has_flag(&a, 'f'));
+    EXPECT_FALSE(cmdargs_has_flag(&a, '\0'));
+    EXPECT_FALSE(cmdargs_has_flag(&a, '\xFF'));
     EXPECT_EQ(a.nr_args, 3);
     EXPECT_STREQ(a.args[0], "UTF-8");
     EXPECT_STREQ(a.args[1], "file.c");
@@ -212,6 +217,7 @@ static void test_parse_args(void)
     EXPECT_EQ(a.nr_args, 6);
     EXPECT_EQ(a.nr_flags, 0);
     EXPECT_EQ(a.flags[0], '\0');
+    EXPECT_EQ(a.flag_set, 0);
     ptr_array_free(&array);
 
     cmd_str = "open \"-\\xff\"";
@@ -230,6 +236,7 @@ static void test_parse_args(void)
     EXPECT_EQ(a.nr_args, 0);
     EXPECT_EQ(a.nr_flags, 0);
     EXPECT_EQ(a.flags[0], '\0');
+    EXPECT_EQ(a.flag_set, 0);
     ptr_array_free(&array);
 }
 
@@ -314,6 +321,19 @@ static void test_command_struct_layout(void)
     EXPECT_NONNULL(cmd->cmd);
 }
 
+static void test_cmdargs_flagset_idx(void)
+{
+    EXPECT_EQ(cmdargs_flagset_idx('0'), 1);
+    EXPECT_EQ(cmdargs_flagset_idx('1'), 2);
+    EXPECT_EQ(cmdargs_flagset_idx('9'), 10);
+    EXPECT_EQ(cmdargs_flagset_idx('A'), 11);
+    EXPECT_EQ(cmdargs_flagset_idx('Z'), 36);
+    EXPECT_EQ(cmdargs_flagset_idx('a'), 37);
+    EXPECT_EQ(cmdargs_flagset_idx('z'), 62);
+    EXPECT_EQ(cmdargs_flagset_idx('\0'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('\xFF'), 0);
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_command(void)
@@ -323,4 +343,5 @@ void test_command(void)
     test_parse_args();
     test_escape_command_arg();
     test_command_struct_layout();
+    test_cmdargs_flagset_idx();
 }

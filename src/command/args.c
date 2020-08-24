@@ -1,8 +1,22 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include "args.h"
 #include "debug.h"
 #include "error.h"
+#include "util/ascii.h"
 #include "util/str-util.h"
+
+// Maps ASCII alphanumeric characters to an index between 1 and 62
+const uint8_t flagset_map[128] = {
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+     1,  2,  3,  4,  5,  6,  7,  8,  9, 10,  0,  0,  0,  0,  0,  0,
+     0, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,  0,  0,  0,  0,  0,
+     0, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,  0,  0,  0,  0,  0,
+};
 
 /*
  * Flags and first "--" are removed.
@@ -23,7 +37,6 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     }
 
     const char *flag_desc = cmd->flags;
-    unsigned char flag = '\0';
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
     bool flags_after_arg = true;
@@ -53,26 +66,27 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
         }
 
         for (size_t j = 1; arg[j]; j++) {
-            flag = arg[j];
-            char *flag_arg;
-            char *flagp = strchr(flag_desc, flag);
-
+            unsigned char flag = arg[j];
+            const char *flagp = strchr(flag_desc, flag);
             if (!flagp || flag == '=') {
                 return ARGERR_INVALID_OPTION | (flag << 8);
             }
+
+            BUG_ON(!ascii_isalnum(flag));
+            a->flag_set |= UINT64_C(1) << cmdargs_flagset_idx(flag);
             a->flags[nr_flags++] = flag;
-            bitset_add(a->flag_set, flag);
-            if (nr_flags == ARRAY_COUNT(a->flags)) {
+            if (unlikely(nr_flags == ARRAY_COUNT(a->flags))) {
                 return ARGERR_TOO_MANY_OPTIONS;
             }
+
             if (flagp[1] != '=') {
                 continue;
             }
-
             if (j > 1 || arg[j + 1]) {
                 return ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | (flag << 8);
             }
-            flag_arg = args[i + 1];
+
+            char *flag_arg = args[i + 1];
             if (!flag_arg) {
                 return ARGERR_OPTION_ARGUMENT_MISSING | (flag << 8);
             }

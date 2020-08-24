@@ -89,7 +89,7 @@ static char last_flag(const CommandArgs *a)
 
 static bool has_flag(const CommandArgs *a, unsigned char flag)
 {
-    return bitset_contains(a->flag_set, flag);
+    return cmdargs_has_flag(a, flag);
 }
 
 static void handle_select_chars_flag(const CommandArgs *a)
@@ -2218,18 +2218,21 @@ void collect_normal_commands(const char *prefix)
 UNITTEST {
     for (size_t i = 1, n = ARRAY_COUNT(cmds); i < n; i++) {
         // Check that fixed-size arrays are null-terminated within bounds
-        const Command *const cmd = &cmds[i];
-        BUG_ON(cmd->name[ARRAY_COUNT(cmds[0].name) - 1] != '\0');
-        BUG_ON(cmd->flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
+        const char *const name = cmds[i].name;
+        const char *const flags = cmds[i].flags;
+        BUG_ON(name[ARRAY_COUNT(cmds[0].name) - 1] != '\0');
+        BUG_ON(flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
 
         // Check that array is sorted by name field, in binary searchable order
-        BUG_ON(strcmp(cmd->name, cmds[i - 1].name) <= 0);
+        BUG_ON(strcmp(name, cmds[i - 1].name) <= 0);
 
         // Count number of real flags (i.e. not including '-' or '=')
         size_t nr_real_flags = 0;
-        for (size_t j = 0; cmd->flags[j]; j++) {
-            if (ascii_isalnum(cmd->flags[j])) {
+        for (size_t j = (flags[0] == '-' ? 1 : 0); flags[j]; j++) {
+            if (ascii_isalnum(flags[j])) {
                 nr_real_flags++;
+            } else {
+                BUG_ON(flags[j] != '=');
             }
         }
 

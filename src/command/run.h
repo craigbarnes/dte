@@ -3,11 +3,11 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-#include "util/bitset.h"
 
 typedef struct {
-    BitSetWord flag_set[BITSET_NR_WORDS(128)]; // BitSet of used flags
+    uint64_t flag_set; // Bitset of used flags
     char flags[8]; // Flags in parsed order
     char **args; // Positional args, with flag args moved to the front
     size_t nr_flags;
