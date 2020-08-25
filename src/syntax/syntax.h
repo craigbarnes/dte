@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "bitset.h"
 #include "color.h"
-#include "util/bitset.h"
 #include "util/hashset.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"

@@ -1,6 +1,6 @@
 #include <string.h>
 #include "test.h"
-#include "util/bitset.h"
+#include "syntax/bitset.h"
 
 static void test_bitset(void)
 {

@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "macros.h"
+#include "util/macros.h"
 
 #define BITSET_WORD_BITS (sizeof(BitSetWord) * CHAR_BIT)
 #define BITSET_BIT_MASK (BITSET_WORD_BITS - 1)
