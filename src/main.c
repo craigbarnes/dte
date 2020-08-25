@@ -57,6 +57,13 @@ static void handle_sigwinch(int UNUSED_ARG(signum))
 }
 #endif
 
+static void term_cleanup(void)
+{
+    if (!editor.child_controls_terminal) {
+        ui_end();
+    }
+}
+
 static noreturn COLD void handle_fatal_signal(int signum)
 {
     term_cleanup();
@@ -384,6 +391,7 @@ loop_break:
     root_frame = new_root_frame(window);
 
     set_signal_handlers();
+    set_fatal_error_cleanup_handler(term_cleanup);
 
     char *file_history_filename = NULL;
     char *command_history_filename = NULL;

@@ -21,13 +21,13 @@
 #if DEBUG >= 2
     #define DEBUG_LOG(...) debug_log(__func__, __VA_ARGS__)
     void debug_log(const char *function, const char *fmt, ...) PRINTF(2);
-    void log_init(void);
+    void log_init(const char *varname);
 #else
     static inline PRINTF(1) void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
-    static inline void log_init(void) {}
+    static inline void log_init(const char* UNUSED_ARG(varname)) {}
 #endif
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
-void term_cleanup(void);
+void set_fatal_error_cleanup_handler(void (*handler)(void));
 
 #endif

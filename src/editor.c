@@ -97,7 +97,7 @@ void init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
-    log_init();
+    log_init("DTE_LOG");
     regexp_init_word_boundary_tokens();
 }
 

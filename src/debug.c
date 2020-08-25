@@ -5,22 +5,21 @@
 #include <string.h>
 #include <unistd.h>
 #include "debug.h"
-#include "editor.h"
-#include "terminal/terminal.h"
 #include "util/exitcode.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 
-void term_cleanup(void)
+static void no_op(void) {}
+static void (*cleanup_handler)(void) = no_op;
+
+void set_fatal_error_cleanup_handler(void (*handler)(void))
 {
-    if (!editor.child_controls_terminal) {
-        ui_end();
-    }
+    cleanup_handler = handler;
 }
 
 noreturn void fatal_error(const char *msg, int err)
 {
-    term_cleanup();
+    cleanup_handler();
     errno = err;
     perror(msg);
     abort();
@@ -30,7 +29,7 @@ noreturn void fatal_error(const char *msg, int err)
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {
-    term_cleanup();
+    cleanup_handler();
     fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
 
     va_list ap;
@@ -47,16 +46,16 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 #if DEBUG >= 2
 static int logfd = -1;
 
-void log_init(void)
+void log_init(const char *varname)
 {
-    const char *path = getenv("DTE_LOG");
+    const char *path = getenv(varname);
     if (!path || path[0] == '\0') {
         return;
     }
     logfd = xopen(path, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
     if (logfd < 0) {
         const char *err = strerror(errno);
-        fprintf(stderr, "Failed to open '%s' ($DTE_LOG): %s\n", path, err);
+        fprintf(stderr, "Failed to open '%s' ($%s): %s\n", path, varname, err);
         exit(EX_IOERR);
     }
 }
