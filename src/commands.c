@@ -1555,31 +1555,19 @@ static void cmd_scroll_up(const CommandArgs* UNUSED_ARG(a))
 static void cmd_search(const CommandArgs *a)
 {
     char *pattern = a->args[0];
-    bool history = true;
-    char cmd = 0;
-    bool w = false;
-    SearchDirection dir = SEARCH_FWD;
+    bool history = !has_flag(a, 'H');
+    bool next = has_flag(a, 'n');
+    bool prev = has_flag(a, 'p');
+    bool w = has_flag(a, 'w');
+    SearchDirection dir = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
 
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'H':
-            history = false;
-            break;
-        case 'n':
-        case 'p':
-            cmd = *pf;
-            break;
-        case 'r':
-            dir = SEARCH_BWD;
-            break;
-        case 'w':
-            w = true;
-            if (pattern) {
-                error_msg("Flag -w can't be used with search pattern.");
-                return;
-            }
-            break;
-        }
+    if (unlikely(w && pattern)) {
+        error_msg("flag -w can't be used with search pattern.");
+        return;
+    }
+    if (unlikely(next && prev)) {
+        error_msg("flags -n and -p can't be used together");
+        return;
     }
 
     char pattbuf[4096];
@@ -1614,9 +1602,9 @@ static void cmd_search(const CommandArgs *a)
         if (history) {
             history_add(&editor.search_history, pattern, search_history_size);
         }
-    } else if (cmd == 'n') {
+    } else if (next) {
         search_next();
-    } else if (cmd == 'p') {
+    } else if (prev) {
         search_prev();
     } else {
         set_input_mode(INPUT_SEARCH);
