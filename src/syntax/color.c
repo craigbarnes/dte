@@ -3,7 +3,7 @@
 #include "color.h"
 #include "command/serialize.h"
 #include "completion.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"

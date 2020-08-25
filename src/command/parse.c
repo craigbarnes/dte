@@ -1,9 +1,9 @@
 #include <string.h>
 #include "parse.h"
 #include "env.h"
-#include "debug.h"
 #include "editor.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"

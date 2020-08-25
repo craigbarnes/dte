@@ -3,7 +3,7 @@
 #include "editorconfig.h"
 #include "ini.h"
 #include "match.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/path.h"
 #include "util/string.h"
 #include "util/string-view.h"

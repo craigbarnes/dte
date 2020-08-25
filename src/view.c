@@ -1,7 +1,7 @@
 #include "view.h"
 #include "buffer.h"
-#include "debug.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"

@@ -6,12 +6,12 @@
 #include "command/macro.h"
 #include "commands.h"
 #include "completion.h"
-#include "debug.h"
 #include "edit.h"
 #include "editor.h"
 #include "history.h"
 #include "search.h"
 #include "terminal/input.h"
+#include "util/debug.h"
 #include "util/unicode.h"
 #include "view.h"
 

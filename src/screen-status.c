@@ -1,10 +1,10 @@
 #include "screen.h"
 #include "command/macro.h"
-#include "debug.h"
 #include "editor.h"
 #include "selection.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
+#include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 

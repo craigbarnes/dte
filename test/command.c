@@ -5,8 +5,8 @@
 #include "command/run.h"
 #include "command/serialize.h"
 #include "commands.h"
-#include "debug.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 
 static void test_parse_command_arg(void)
 {

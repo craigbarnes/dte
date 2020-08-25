@@ -1,10 +1,10 @@
 #include <unistd.h>
 #include "file-option.h"
 #include "command/serialize.h"
-#include "debug.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
+#include "util/debug.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

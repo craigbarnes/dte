@@ -1,8 +1,8 @@
 #include <inttypes.h>
 #include <string.h>
 #include "key.h"
-#include "debug.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 

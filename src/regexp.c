@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "regexp.h"
-#include "debug.h"
 #include "error.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

@@ -1,5 +1,5 @@
 #include "frame.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/xmalloc.h"
 #include "window.h"
 

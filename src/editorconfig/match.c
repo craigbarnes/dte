@@ -1,8 +1,8 @@
 #include <regex.h>
 #include <stdlib.h>
 #include "match.h"
-#include "debug.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/string.h"
 

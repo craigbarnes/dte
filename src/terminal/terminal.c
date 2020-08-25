@@ -12,7 +12,7 @@
 #include "rxvt.h"
 #include "terminfo.h"
 #include "xterm.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 

@@ -12,7 +12,7 @@
 #include "output.h"
 #include "terminal.h"
 #include "xterm.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 

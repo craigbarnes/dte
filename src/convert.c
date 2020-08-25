@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "convert.h"
-#include "debug.h"
+#include "util/debug.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 

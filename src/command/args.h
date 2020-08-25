@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "debug.h"
 #include "run.h"
+#include "util/debug.h"
 #include "util/macros.h"
 
 typedef enum {

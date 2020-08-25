@@ -1,10 +1,10 @@
 #include <string.h>
 #include "test.h"
-#include "debug.h"
 #include "terminal/color.h"
 #include "terminal/key.h"
 #include "terminal/rxvt.h"
 #include "terminal/xterm.h"
+#include "util/debug.h"
 #include "util/unicode.h"
 
 static void test_parse_term_color(void)

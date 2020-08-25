@@ -1,11 +1,11 @@
 #include "screen.h"
-#include "debug.h"
 #include "editor.h"
 #include "selection.h"
 #include "syntax/highlight.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 

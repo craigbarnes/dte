@@ -31,7 +31,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf pipe redo fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii exec hashset line-iter path ptr-array readfile string \
+    ascii debug exec hashset line-iter path ptr-array readfile string \
     strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
@@ -49,7 +49,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     alias bind block block-iter buffer change cmdline commands \
-    convert compiler completion config ctags debug edit editor \
+    convert compiler completion config ctags edit editor \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
