@@ -1,7 +1,7 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef UTIL_DEBUG_H
+#define UTIL_DEBUG_H
 
-#include "util/macros.h"
+#include "macros.h"
 
 #define BUG_ON(a) do { \
     IGNORE_WARNING("-Wtautological-compare") \

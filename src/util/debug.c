@@ -5,9 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 #include "debug.h"
-#include "util/exitcode.h"
-#include "util/xreadwrite.h"
-#include "util/xsnprintf.h"
+#include "exitcode.h"
+#include "xreadwrite.h"
+#include "xsnprintf.h"
 
 static void no_op(void) {}
 static void (*cleanup_handler)(void) = no_op;
