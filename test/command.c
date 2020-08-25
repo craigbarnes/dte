@@ -330,8 +330,26 @@ static void test_cmdargs_flagset_idx(void)
     EXPECT_EQ(cmdargs_flagset_idx('Z'), 36);
     EXPECT_EQ(cmdargs_flagset_idx('a'), 37);
     EXPECT_EQ(cmdargs_flagset_idx('z'), 62);
+    EXPECT_EQ(cmdargs_flagset_idx('/'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx(':'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('@'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('['), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('_'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('`'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('{'), 0);
     EXPECT_EQ(cmdargs_flagset_idx('\0'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('\x7F'), 0);
     EXPECT_EQ(cmdargs_flagset_idx('\xFF'), 0);
+
+    for (unsigned char c = 0; c < 255; c++) {
+        const uint8_t idx = cmdargs_flagset_idx(c);
+        EXPECT_TRUE(idx < 63);
+        if (ascii_isalnum(c)) {
+            EXPECT_TRUE(idx > 0);
+        } else {
+            EXPECT_EQ(idx, 0);
+        }
+    }
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")
