@@ -1965,39 +1965,12 @@ static void cmd_wresize(const CommandArgs *a)
 
 static void cmd_wsplit(const CommandArgs *a)
 {
-    bool before = false;
-    bool use_glob = false;
-    bool vertical = false;
-    bool root = false;
-    bool empty = false;
-    bool temporary = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'b':
-            // Add new window before current window
-            before = true;
-            break;
-        case 'e':
-            empty = true;
-            break;
-        case 'g':
-            // Perform glob(3) expansion on arguments
-            use_glob = (a->nr_args > 0);
-            break;
-        case 'h':
-            // Split horizontally to get vertical layout
-            vertical = true;
-            break;
-        case 'r':
-            // Split root frame instead of current window
-            root = true;
-            break;
-        case 't':
-            temporary = true;
-            empty = true;
-            break;
-        }
-    }
+    bool before = has_flag(a, 'b');
+    bool use_glob = has_flag(a, 'g') && a->nr_args > 0;
+    bool vertical = has_flag(a, 'h');
+    bool root = has_flag(a, 'r');
+    bool empty = has_flag(a, 'e');
+    bool temporary = has_flag(a, 't');
 
     if (empty && a->nr_args > 0) {
         error_msg("flags -e and -t can't be used with filename arguments");
