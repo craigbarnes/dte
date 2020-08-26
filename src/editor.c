@@ -79,6 +79,7 @@ void init_editor_state(void)
 {
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
+    editor.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
 
     editor.home_dir = xstrdup(home ? home : "");
 

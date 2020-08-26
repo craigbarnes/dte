@@ -214,6 +214,9 @@ The following environment variables are inspected at startup:
 :   User home directory. Used when expanding `~/` in filenames and also
     to determine the default value for `DTE_HOME`.
 
+`XDG_RUNTIME_DIR`
+:   Directory used to store lock files. Defaults to `$DTE_HOME` if not set.
+
 `TERM`
 :   Terminal identifier. Used to determine which `terminfo` entry or
     built-in terminal support to use.
@@ -233,10 +236,6 @@ The following environment variables are inspected at startup:
     the program. See [`dte-syntax`] for more information or run
     "dte -b syntax/dte" for a basic example.
 
-`$DTE_HOME/file-locks`
-:   Records open files, to prevent accidentally editing files opened in
-    another dte process. Used only if the [`lock-files`] option is enabled.
-
 `$DTE_HOME/file-history`
 :   History of edited files and cursor positions. Used only if the
     [`file-history`] option is enabled.
@@ -246,6 +245,10 @@ The following environment variables are inspected at startup:
 
 `$DTE_HOME/search-history`
 :   History of search patterns used while in search mode.
+
+`$XDG_RUNTIME_DIR/dte-locks`
+:   List of files currently open in a dte process (if the [`lock-files`]
+    option is enabled).
 
 # Exit Status
 

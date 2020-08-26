@@ -8,6 +8,7 @@
 #include "editor.h"
 #include "error.h"
 #include "util/ascii.h"
+#include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -77,9 +78,19 @@ static bool lock_or_unlock(const char *filename, bool lock)
 {
     static char *file_locks;
     static char *file_locks_lock;
+    static mode_t mode = 0666;
     if (!file_locks) {
-        file_locks = editor_file("file-locks");
-        file_locks_lock = editor_file("file-locks.lock");
+        const char *dir = editor.xdg_runtime_dir;
+        if (dir && path_is_absolute(dir)) {
+            // Set sticky bit (see XDG Base Directory Specification)
+            #ifdef S_ISVTX
+                mode |= S_ISVTX;
+            #endif
+        } else {
+            dir = editor.user_config_dir;
+        }
+        file_locks = path_join(dir, "dte-locks");
+        file_locks_lock = path_join(dir, "dte-locks.lock");
     }
 
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
@@ -89,7 +100,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
     int tries = 0;
     int wfd;
     while (1) {
-        wfd = xopen(file_locks_lock, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0666);
+        wfd = xopen(file_locks_lock, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, mode);
         if (wfd >= 0) {
             break;
         }

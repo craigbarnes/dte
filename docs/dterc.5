@@ -1663,9 +1663,10 @@ files, which can take a long time on some systems.
 .RE
 \fBlock\-files\fR [true]
 .RS
-Keep a record of open files in \fB$DTE_HOME/file\-locks\fR, so that a
-warning can be shown if the same file is accidentally opened in
-multiple dte processes.
+Keep a record of open files, so that a warning can be shown if the
+same file is accidentally opened in multiple dte processes.
+.P
+See also: the \fBFILES\fR section in the \fBdte\fR(1) man page.
 .P
 .RE
 \fBnewline\fR [unix]
@@ -1843,7 +1844,9 @@ Convert tab to spaces on insert.
 .RE
 \fBfile\-history\fR [true]
 .RS
-Save line and column for each file to \fB$DTE_HOME/file\-history\fR.
+Save and restore cursor positions for previously opened files.
+.P
+See also: the \fBFILES\fR section in the \fBdte\fR(1) man page.
 .P
 .RE
 \fBindent\-width\fR [8]

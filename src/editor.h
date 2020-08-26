@@ -29,6 +29,7 @@ typedef struct {
     GlobalOptions options;
     const char *home_dir;
     const char *user_config_dir;
+    const char *xdg_runtime_dir;
     Encoding charset;
     bool child_controls_terminal;
     bool everything_changed;

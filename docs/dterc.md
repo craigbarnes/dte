@@ -1096,9 +1096,10 @@ files, which can take a long time on some systems.
 
 ### **lock-files** [true]
 
-Keep a record of open files in `$DTE_HOME/file-locks`, so that a
-warning can be shown if the same file is accidentally opened in
-multiple dte processes.
+Keep a record of open files, so that a warning can be shown if the
+same file is accidentally opened in multiple dte processes.
+
+See also: the `FILES` section in the [`dte`] man page.
 
 ### **newline** [unix]
 
@@ -1240,7 +1241,9 @@ Convert tab to spaces on insert.
 
 ### **file-history** [true]
 
-Save line and column for each file to `$DTE_HOME/file-history`.
+Save and restore cursor positions for previously opened files.
+
+See also: the `FILES` section in the [`dte`] man page.
 
 ### **indent-width** [8]
 

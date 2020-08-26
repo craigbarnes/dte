@@ -257,6 +257,10 @@ User home directory. Used when expanding \fB~/\fR in filenames and also
 to determine the default value for \fBDTE_HOME\fR.
 .PP
 .TP
+\fBXDG_RUNTIME_DIR\fR
+Directory used to store lock files. Defaults to \fB$DTE_HOME\fR if not set.
+.PP
+.TP
 \fBTERM\fR
 Terminal identifier. Used to determine which \fBterminfo\fR(5) entry or
 built\-in terminal support to use.
@@ -279,11 +283,6 @@ the program. See \fBdte\-syntax\fR(5) for more information or run
 "dte \-b syntax/dte" for a basic example.
 .PP
 .TP
-\fB$DTE_HOME/file\-locks\fR
-Records open files, to prevent accidentally editing files opened in
-another dte process. Used only if the \fBlock\-files\fR option is enabled.
-.PP
-.TP
 \fB$DTE_HOME/file\-history\fR
 History of edited files and cursor positions. Used only if the
 \fBfile\-history\fR option is enabled.
@@ -295,6 +294,11 @@ History of \fBdterc\fR(5) commands used while in command mode.
 .TP
 \fB$DTE_HOME/search\-history\fR
 History of search patterns used while in search mode.
+.PP
+.TP
+\fB$XDG_RUNTIME_DIR/dte\-locks\fR
+List of files currently open in a dte process (if the \fBlock\-files\fR
+option is enabled).
 .PP
 .SH EXIT STATUS
 .TP
