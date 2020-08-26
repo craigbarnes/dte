@@ -40,7 +40,8 @@ void set_editorconfig_options(Buffer *b)
         if (!getcwd(cwd, sizeof(cwd) - sizeof(suffix))) {
             return;
         }
-        path = memcpy(cwd + strlen(cwd), suffix, sizeof(suffix));
+        memcpy(cwd + strlen(cwd), suffix, sizeof(suffix));
+        path = cwd;
     }
 
     EditorConfigOptions opts;
