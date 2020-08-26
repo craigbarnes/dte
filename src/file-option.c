@@ -32,18 +32,15 @@ void set_editorconfig_options(Buffer *b)
 
     const char *path = b->abs_filename;
     char cwd[8192];
-    if (path == NULL) {
+    if (!path) {
         // For buffers with no associated filename, use a dummy path of
-        // "$PWD/_", to obtain generic settings for the working directory
+        // "$PWD/__", to obtain generic settings for the working directory
         // or the user's default settings.
-        if (getcwd(cwd, sizeof(cwd) - 2) == NULL) {
+        static const char suffix[] = "/__";
+        if (!getcwd(cwd, sizeof(cwd) - sizeof(suffix))) {
             return;
         }
-        size_t n = strlen(cwd);
-        cwd[n++] = '/';
-        cwd[n++] = '_';
-        cwd[n] = '\0';
-        path = cwd;
+        path = memcpy(cwd + strlen(cwd), suffix, sizeof(suffix));
     }
 
     EditorConfigOptions opts;
