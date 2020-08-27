@@ -78,9 +78,9 @@ check-tests: $(test) all
 	$(E) TEST $<
 	$(Q) ./$<
 
-check-opts: test/check-opts.sh all
-	$(E) TEST $<
-	$(Q) $< './$(dte)' '$(VERSION)'
+check-opts: $(dte)
+	$(E) TEST '$<'
+	$(Q) test/check-opts.sh './$<' '$(VERSION)'
 
 installcheck: install
 	$(E) TEST '$(DESTDIR)$(bindir)/$(dte)'
