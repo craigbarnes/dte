@@ -1957,8 +1957,8 @@ static void cmd_wsplit(const CommandArgs *a)
     bool use_glob = has_flag(a, 'g') && a->nr_args > 0;
     bool vertical = has_flag(a, 'h');
     bool root = has_flag(a, 'r');
-    bool empty = has_flag(a, 'e');
     bool temporary = has_flag(a, 't');
+    bool empty = temporary || has_flag(a, 'e');
 
     if (empty && a->nr_args > 0) {
         error_msg("flags -e and -t can't be used with filename arguments");
