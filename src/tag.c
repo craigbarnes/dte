@@ -90,24 +90,17 @@ static int tag_cmp(const void *ap, const void *bp)
 {
     const Tag *a = *(const Tag **)ap;
     const Tag *b = *(const Tag **)bp;
-
-    int ret = visibility_cmp(a, b);
-    if (ret) {
-        return ret;
-    }
-
-    return kind_cmp(a, b);
+    int r = visibility_cmp(a, b);
+    return r ? r : kind_cmp(a, b);
 }
 
 // Find "tags" file from directory path and its parent directories
 static int open_tag_file(char *path)
 {
-    const char tags[] = "tags";
-
+    static const char tags[] = "tags";
     while (*path) {
         size_t len = strlen(path);
         char *slash = strrchr(path, '/');
-
         if (slash != path + len - 1) {
             path[len++] = '/';
         }
@@ -119,7 +112,7 @@ static int open_tag_file(char *path)
         if (errno != ENOENT) {
             return -1;
         }
-        *slash = 0;
+        *slash = '\0';
     }
     errno = ENOENT;
     return -1;
@@ -130,10 +123,7 @@ static bool tag_file_changed (
     const char *filename,
     const struct stat *st
 ) {
-    if (tf->mtime != st->st_mtime) {
-        return true;
-    }
-    return !streq(tf->filename, filename);
+    return tf->mtime != st->st_mtime || !streq(tf->filename, filename);
 }
 
 static void tag_file_free(TagFile *tf)
@@ -146,7 +136,7 @@ static void tag_file_free(TagFile *tf)
 TagFile *load_tag_file(void)
 {
     char path[4096];
-    if (!getcwd(path, sizeof(path) - 5)) { // 5 = length of "/tags"
+    if (!getcwd(path, sizeof(path) - STRLEN("/tags"))) {
         return NULL;
     }
 
@@ -259,7 +249,6 @@ void collect_tags(const TagFile *tf, const char *prefix)
     Tag t;
     size_t pos = 0;
     char *prev = NULL;
-
     while (next_tag(tf, &pos, prefix, false, &t)) {
         if (!prev || !streq(prev, t.name)) {
             add_completion(t.name);
