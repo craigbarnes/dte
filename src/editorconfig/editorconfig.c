@@ -170,7 +170,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
         }
 
         const char *slash = strchr(ptr, '/');
-        if (slash == NULL) {
+        if (!slash) {
             break;
         }
 

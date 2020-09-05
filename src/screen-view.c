@@ -223,7 +223,7 @@ static void hl_words(const LineInfo *info)
     HlColor *cc = find_color("comment");
     HlColor *nc = find_color("notice");
 
-    if (info->colors == NULL || cc == NULL || nc == NULL) {
+    if (!info->colors || !cc || !nc) {
         return;
     }
 

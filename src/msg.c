@@ -34,7 +34,7 @@ static bool file_location_go(const FileLocation *loc)
         // Force centering view to the cursor because file changed
         v->force_center = true;
     }
-    if (loc->pattern != NULL) {
+    if (loc->pattern) {
         bool err = false;
         search_tag(loc->pattern, &err);
         ok = !err;
@@ -53,20 +53,22 @@ static bool file_location_return(const FileLocation *loc)
     Buffer *b = find_buffer_by_id(loc->buffer_id);
     View *v;
 
-    if (b != NULL) {
+    if (b) {
         v = window_get_view(w, b);
     } else {
-        if (loc->filename == NULL) {
+        if (!loc->filename) {
             // Can't restore closed buffer that had no filename.
             // Try again.
             return false;
         }
         v = window_open_buffer(w, loc->filename, true, NULL);
     }
-    if (v == NULL) {
+
+    if (!v) {
         // Open failed. Don't try again.
         return true;
     }
+
     set_view(v);
     move_to_line(v, loc->line);
     move_to_column(v, loc->column);
@@ -91,7 +93,7 @@ void pop_file_location(void)
 static void free_message(Message *m)
 {
     free(m->msg);
-    if (m->loc != NULL) {
+    if (m->loc) {
         file_location_free(m->loc);
     }
     free(m);
@@ -115,7 +117,7 @@ void activate_current_message(void)
         return;
     }
     const Message *m = msgs.ptrs[msg_pos];
-    if (m->loc != NULL && m->loc->filename != NULL) {
+    if (m->loc && m->loc->filename) {
         if (!file_location_go(m->loc)) {
             // Error message is visible
             return;

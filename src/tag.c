@@ -161,16 +161,14 @@ TagFile *load_tag_file(void)
         return NULL;
     }
 
-    if (
-        current_tag_file != NULL
-        && tag_file_changed(current_tag_file, path, &st)
-    ) {
-        tag_file_free(current_tag_file);
-        current_tag_file = NULL;
-    }
-    if (current_tag_file != NULL) {
-        xclose(fd);
-        return current_tag_file;
+    if (current_tag_file) {
+        if (tag_file_changed(current_tag_file, path, &st)) {
+            tag_file_free(current_tag_file);
+            current_tag_file = NULL;
+        } else {
+            xclose(fd);
+            return current_tag_file;
+        }
     }
 
     char *buf = xmalloc(st.st_size);
@@ -234,7 +232,7 @@ void tag_file_find_tags (
     }
     free(t);
 
-    if (filename == NULL) {
+    if (!filename) {
         current_filename = NULL;
     } else {
         StringView dir = path_slice_dirname(tf->filename);

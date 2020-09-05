@@ -250,8 +250,7 @@ static void resize_to(Frame *f, int size)
 static bool rightmost_frame(const Frame *f)
 {
     const Frame *parent = f->parent;
-
-    if (parent == NULL) {
+    if (!parent) {
         return true;
     }
     if (!parent->vertical) {
@@ -275,7 +274,7 @@ static Frame *add_frame(Frame *parent, Window *w, size_t idx)
     f->parent = parent;
     f->window = w;
     w->frame = f;
-    if (parent != NULL) {
+    if (parent) {
         BUG_ON(idx > parent->frames.count);
         ptr_array_insert(&parent->frames, f, idx);
         parent->window = NULL;
@@ -344,7 +343,7 @@ void equalize_frame_sizes(Frame *parent)
 void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
 {
     f = find_resizable(f, dir);
-    if (f == NULL) {
+    if (!f) {
         return;
     }
 
@@ -360,7 +359,7 @@ void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
 void resize_frame(Frame *f, ResizeDirection dir, int size)
 {
     f = find_resizable(f, dir);
-    if (f == NULL) {
+    if (!f) {
         return;
     }
 
@@ -396,7 +395,7 @@ Frame *split_frame(Window *w, bool vertical, bool before)
 {
     Frame *f = w->frame;
     Frame *parent = f->parent;
-    if (parent == NULL || parent->vertical != vertical) {
+    if (!parent || parent->vertical != vertical) {
         // Reparent w
         f->vertical = vertical;
         add_frame(f, w, 0);
@@ -447,7 +446,7 @@ static void free_frame(Frame *f)
 {
     f->parent = NULL;
     ptr_array_free_cb(&f->frames, FREE_FUNC(free_frame));
-    if (f->window != NULL) {
+    if (f->window) {
         window_free(f->window);
         f->window = NULL;
     }
@@ -457,7 +456,7 @@ static void free_frame(Frame *f)
 void remove_frame(Frame *f)
 {
     Frame *parent = f->parent;
-    if (parent == NULL) {
+    if (!parent) {
         free_frame(f);
         return;
     }

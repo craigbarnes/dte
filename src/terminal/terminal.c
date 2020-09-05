@@ -181,7 +181,7 @@ static StringView str_split(const char *str, unsigned char delim)
 void term_init(void)
 {
     const char *const term = getenv("TERM");
-    if (term == NULL || term[0] == '\0') {
+    if (!term || term[0] == '\0') {
         term_init_fail("'TERM' not set");
     }
 

@@ -83,7 +83,7 @@ static StringView get_ext(const StringView filename)
     }
 
     ext.data = strview_memrchr(&filename, '.');
-    if (ext.data == NULL) {
+    if (!ext.data) {
         return ext;
     }
 

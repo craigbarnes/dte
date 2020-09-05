@@ -30,7 +30,7 @@
 static void show_alias(const char *alias_name, bool cflag)
 {
     const char *cmd_str = find_alias(alias_name);
-    if (cmd_str == NULL) {
+    if (!cmd_str) {
         if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
         } else {
@@ -61,7 +61,7 @@ static void show_binding(const char *keystr, bool cflag)
     }
 
     const KeyBinding *b = lookup_binding(key);
-    if (b == NULL) {
+    if (!b) {
         info_msg("%s is not bound to a command", keystr);
         return;
     }

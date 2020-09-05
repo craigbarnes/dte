@@ -187,7 +187,7 @@ static void cmd_cd(const CommandArgs *a)
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
-        if (dir == NULL || dir[0] == '\0') {
+        if (!dir || dir[0] == '\0') {
             error_msg("cd: OLDPWD not set");
             return;
         }
@@ -1142,7 +1142,7 @@ static void cmd_quit(const CommandArgs *a)
         if (buffer_modified(b)) {
             // Activate modified buffer
             View *v = window_find_view(window, b);
-            if (v == NULL) {
+            if (!v) {
                 // Buffer isn't open in current window.
                 // Activate first window of the buffer.
                 v = b->views.ptrs[0];
@@ -1648,7 +1648,7 @@ static void cmd_set(const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool local = has_flag(a, 'l');
-    if (buffer == NULL) {
+    if (!buffer) {
         if (local) {
             error_msg("Flag -l makes no sense in config file.");
             return;
@@ -1706,7 +1706,7 @@ static void cmd_shift(const CommandArgs *a)
 
 static void cmd_show(const CommandArgs *a)
 {
-    BUG_ON(a->nr_args == 1 && a->args[1] != NULL);
+    BUG_ON(a->nr_args == 1 && a->args[1]);
     bool cflag = a->nr_flags != 0;
     if (cflag && a->nr_args < 2) {
         error_msg("\"show -c\" requires 2 arguments");
@@ -1731,7 +1731,7 @@ static void cmd_tag(const CommandArgs *a)
 
     clear_messages();
     TagFile *tf = load_tag_file();
-    if (tf == NULL) {
+    if (!tf) {
         error_msg("No tag file.");
         return;
     }
@@ -1861,7 +1861,7 @@ static void cmd_wclose(const CommandArgs *a)
 static void cmd_wflip(const CommandArgs* UNUSED_ARG(a))
 {
     Frame *f = window->frame;
-    if (f->parent == NULL) {
+    if (!f->parent) {
         return;
     }
     f->parent->vertical ^= 1;
@@ -1915,7 +1915,7 @@ static void cmd_wrap_paragraph(const CommandArgs *a)
 
 static void cmd_wresize(const CommandArgs *a)
 {
-    if (window->frame->parent == NULL) {
+    if (!window->frame->parent) {
         // Only window
         return;
     }
@@ -2016,7 +2016,7 @@ static void cmd_wsplit(const CommandArgs *a)
 static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 {
     Frame *parent = window->frame->parent;
-    if (parent == NULL) {
+    if (!parent) {
         return;
     }
 

@@ -186,7 +186,7 @@ UNITTEST {
             BUG("missing value at builtin_filetype_names[%zu]", i);
         }
         // Ensure fixed-size char arrays are null-terminated
-        BUG_ON(memchr(name, '\0', sizeof(builtin_filetype_names[0])) == NULL);
+        BUG_ON(!memchr(name, '\0', sizeof(builtin_filetype_names[0])));
         // Ensure FileTypeEnum values are sorted according to their name
         // string (to allow name -> value lookups via binary search).
         const char *const prev = builtin_filetype_names[i - 1];

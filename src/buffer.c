@@ -167,15 +167,10 @@ Buffer *find_buffer(const char *abs_filename)
 {
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
-
     for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
         Buffer *b = editor.buffers.ptrs[i];
         const char *f = b->abs_filename;
-
-        if (
-            (f != NULL && streq(f, abs_filename))
-            || (st_ok && same_file(b, &st))
-        ) {
+        if ((f && streq(f, abs_filename)) || (st_ok && same_file(b, &st))) {
             return b;
         }
     }

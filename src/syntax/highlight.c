@@ -331,7 +331,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
     ssize_t current_line = 0;
     ssize_t idx = 0;
 
-    if (b->syn == NULL) {
+    if (!b->syn) {
         return;
     }
 
@@ -386,7 +386,7 @@ HlColor **hl_line (
     bool *next_changed
 ) {
     *next_changed = false;
-    if (b->syn == NULL) {
+    if (!b->syn) {
         return NULL;
     }
 

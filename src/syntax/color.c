@@ -37,7 +37,7 @@ UNITTEST {
         if (name[0] == '\0') {
             BUG("missing string at builtin_color_names[%zu]", i);
         }
-        if (memchr(name, '\0', sizeof(builtin_color_names[0])) == NULL) {
+        if (!memchr(name, '\0', sizeof(builtin_color_names[0]))) {
             BUG("builtin_color_names[%zu] missing null-terminator", i);
         }
     }

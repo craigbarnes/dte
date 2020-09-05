@@ -73,7 +73,7 @@ static void fix_conditions (
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix);
-        if (c->a.destination == NULL && has_destination(c->type)) {
+        if (!c->a.destination && has_destination(c->type)) {
             c->a.destination = m->return_state;
         }
 
@@ -84,7 +84,7 @@ static void fix_conditions (
     }
 
     fix_action(syn, &s->a, prefix);
-    if (s->a.destination == NULL) {
+    if (!s->a.destination) {
         s->a.destination = m->return_state;
     }
 }

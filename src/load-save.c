@@ -398,7 +398,7 @@ bool save_buffer (
     return true;
 
 error:
-    if (enc != NULL) {
+    if (enc) {
         free_file_encoder(enc);
     }
     if (*tmp) {

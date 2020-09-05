@@ -27,7 +27,7 @@ NONNULL_ARGS
 static inline StringView path_slice_dirname(const char *filename)
 {
     const char *slash = strrchr(filename, '/');
-    if (slash == NULL) {
+    if (!slash) {
         return string_view(".", 1);
     }
     bool slash_is_root_dir = (slash == filename);

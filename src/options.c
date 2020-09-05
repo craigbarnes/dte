@@ -513,7 +513,7 @@ static const OptionDesc *find_option(const char *name)
 static const OptionDesc *must_find_option(const char *name)
 {
     const OptionDesc *desc = find_option(name);
-    if (desc == NULL) {
+    if (!desc) {
         error_msg("No such option %s", name);
     }
     return desc;
@@ -678,7 +678,7 @@ bool validate_local_options(char **strs)
         const char *name = strs[i];
         const char *value = strs[i + 1];
         const OptionDesc *desc = must_find_option(name);
-        if (desc == NULL) {
+        if (!desc) {
             valid = false;
         } else if (!desc->local) {
             error_msg("Option %s is not local", name);

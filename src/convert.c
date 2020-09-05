@@ -409,7 +409,7 @@ static char *cconv_consume_line(struct cconv *c, size_t *len)
     char *line = c->obuf + c->consumed;
     char *nl = memchr(line, '\n', c->opos - c->consumed);
 
-    if (nl == NULL) {
+    if (!nl) {
         *len = 0;
         return NULL;
     }
@@ -456,7 +456,7 @@ FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
 
     if (encoding->type != UTF8) {
         enc->cconv = cconv_from_utf8(encoding->name);
-        if (enc->cconv == NULL) {
+        if (!enc->cconv) {
             free(enc);
             return NULL;
         }
@@ -467,7 +467,7 @@ FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd)
 
 void free_file_encoder(FileEncoder *enc)
 {
-    if (enc->cconv != NULL) {
+    if (enc->cconv) {
         cconv_free(enc->cconv);
     }
     free(enc->nbuf);
@@ -557,7 +557,7 @@ static int set_encoding(FileDecoder *dec, const char *encoding)
         dec->read_line = read_utf8_line;
     } else {
         dec->cconv = cconv_to_utf8(encoding);
-        if (dec->cconv == NULL) {
+        if (!dec->cconv) {
             return -1;
         }
         dec->read_line = decode_and_read_line;
@@ -653,7 +653,7 @@ FileDecoder *new_file_decoder (
 
 void free_file_decoder(FileDecoder *dec)
 {
-    if (dec->cconv != NULL) {
+    if (dec->cconv) {
         cconv_free(dec->cconv);
     }
     free(dec);

@@ -262,7 +262,7 @@ CommandLineResult cmdline_handle_key (
         goto handled;
 
     case KEY_UP:
-        if (history == NULL) {
+        if (!history) {
             return CMDLINE_UNKNOWN_KEY;
         }
         if (c->search_pos < 0) {
@@ -276,7 +276,7 @@ CommandLineResult cmdline_handle_key (
         goto handled;
 
     case KEY_DOWN:
-        if (history == NULL) {
+        if (!history) {
             return CMDLINE_UNKNOWN_KEY;
         }
         if (c->search_pos < 0) {

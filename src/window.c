@@ -129,7 +129,7 @@ View *window_open_buffer (
 View *window_get_view(Window *w, Buffer *b)
 {
     View *v = window_find_view(w, b);
-    if (v == NULL) {
+    if (!v) {
         // Open the buffer in other window to this window
         v = window_add_buffer(w, b);
         v->cursor = ((View *)b->views.ptrs[0])->cursor;
@@ -152,7 +152,7 @@ View *window_find_view(Window *w, Buffer *b)
 View *window_find_unclosable_view(Window *w)
 {
     // Check active view first
-    if (w->view != NULL && !view_can_close(w->view)) {
+    if (w->view && !view_can_close(w->view)) {
         return w->view;
     }
     for (size_t i = 0, n = w->views.count; i < n; i++) {
@@ -214,7 +214,7 @@ size_t remove_view(View *v)
 void window_close_current_view(Window *w)
 {
     size_t idx = remove_view(w->view);
-    if (w->prev_view != NULL) {
+    if (w->prev_view) {
         w->view = w->prev_view;
         w->prev_view = NULL;
         return;
@@ -255,10 +255,7 @@ void set_view(View *v)
 
     if (!v->buffer->setup) {
         buffer_setup(v->buffer);
-        if (
-            v->buffer->options.file_history
-            && v->buffer->abs_filename != NULL
-        ) {
+        if (v->buffer->options.file_history && v->buffer->abs_filename) {
             restore_cursor_from_history(v);
         }
     }
@@ -503,7 +500,7 @@ Window *next_window(Window *w)
 
 void window_close_current(void)
 {
-    if (window->frame->parent == NULL) {
+    if (!window->frame->parent) {
         // Don't close last window
         window_remove_views(window);
         set_view(window_open_empty_buffer(window));

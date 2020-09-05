@@ -85,7 +85,7 @@ static void handle_error_msg(const Compiler *c, char *str)
 static void read_errors(const Compiler *c, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
-    if (unlikely(f == NULL)) {
+    if (unlikely(!f)) {
         return;
     }
     char line[4096];

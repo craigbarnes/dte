@@ -281,7 +281,7 @@ bool term_init_terminfo(const char *term)
         term_init_fail("TERM='%s' not supported: 'hz' flag is set", term);
     }
 
-    if (terminfo.cup == NULL) {
+    if (!terminfo.cup) {
         term_init_fail("TERM='%s' not supported: no 'cup' capability", term);
     }
 

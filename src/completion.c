@@ -287,7 +287,7 @@ static void collect_completions(char **args, size_t argc)
     }
     if (strview_equal_cstring(&cmd_name, "tag") && argc == 1) {
         TagFile *tf = load_tag_file();
-        if (tf != NULL) {
+        if (tf) {
             collect_tags(tf, completion.parsed);
         }
         return;

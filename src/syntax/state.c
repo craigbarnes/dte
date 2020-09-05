@@ -287,7 +287,7 @@ static void cmd_list(const CommandArgs *a)
     char **args = a->args;
     const char *name = args[0];
     StringList *list = find_string_list(current_syntax, name);
-    if (list == NULL) {
+    if (!list) {
         list = xnew0(StringList, 1);
         list->name = xstrdup(name);
         ptr_array_append(&current_syntax->string_lists, list);
@@ -314,11 +314,11 @@ static void cmd_inlist(const CommandArgs *a)
     StringList *list = find_string_list(current_syntax, name);
     Condition *c = add_condition(COND_INLIST, args[1], emit);
 
-    if (c == NULL) {
+    if (!c) {
         return;
     }
 
-    if (list == NULL) {
+    if (!list) {
         // Add undefined list
         list = xnew0(StringList, 1);
         list->name = xstrdup(name);
@@ -553,7 +553,7 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
     if (syn && editor.status != EDITOR_INITIALIZING) {
         update_syntax_colors(syn);
     }
-    if (syn == NULL) {
+    if (!syn) {
         *err = EINVAL;
     }
     return syn;
