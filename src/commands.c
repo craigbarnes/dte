@@ -2005,7 +2005,6 @@ static void cmd_wsplit(const CommandArgs *a)
     if (window->views.count == 0) {
         // Open failed, remove new window
         remove_frame(window->frame);
-
         view = save;
         buffer = view->buffer;
         window = view->window;

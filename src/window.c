@@ -244,14 +244,13 @@ void set_view(View *v)
     }
 
     // Forget previous view when changing view using any other command but open
-    if (window != NULL) {
+    if (window) {
         window->prev_view = NULL;
     }
 
     view = v;
     buffer = v->buffer;
     window = v->window;
-
     window->view = v;
 
     if (!v->buffer->setup) {
@@ -286,8 +285,6 @@ View *window_open_new_file(Window *w)
 {
     View *prev = w->view;
     View *v = window_open_empty_buffer(w);
-
-    // FIXME: should not call set_view()
     set_view(v);
     w->prev_view = prev;
     return v;
@@ -313,17 +310,13 @@ View *window_open_file(Window *w, const char *filename, const Encoding *encoding
     View *prev = w->view;
     bool useless = is_useless_empty_view(prev);
     View *v = window_open_buffer(w, filename, false, encoding);
-
-    if (v == NULL) {
-        return NULL;
-    }
-
-    // FIXME: should not call set_view()
-    set_view(v);
-    if (useless) {
-        remove_view(prev);
-    } else {
-        w->prev_view = prev;
+    if (v) {
+        set_view(v);
+        if (useless) {
+            remove_view(prev);
+        } else {
+            w->prev_view = prev;
+        }
     }
     return v;
 }
@@ -336,7 +329,6 @@ void window_open_files(Window *w, char **filenames, const Encoding *encoding)
     for (size_t i = 0; filenames[i]; i++) {
         View *v = window_open_buffer(w, filenames[i], false, encoding);
         if (v && first) {
-            // FIXME: should not call set_view()
             set_view(v);
             first = false;
         }
