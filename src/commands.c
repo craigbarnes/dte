@@ -1958,7 +1958,7 @@ static void cmd_wsplit(const CommandArgs *a)
     bool vertical = has_flag(a, 'h');
     bool root = has_flag(a, 'r');
     bool temporary = has_flag(a, 't');
-    bool empty = temporary || has_flag(a, 'e');
+    bool empty = temporary || has_flag(a, 'n');
 
     if (empty && a->nr_args > 0) {
         error_msg("flags -e and -t can't be used with filename arguments");
@@ -2122,7 +2122,7 @@ static const Command cmds[] = {
     {"wprev", "", false, 0, 0, cmd_wprev},
     {"wrap-paragraph", "", false, 0, 1, cmd_wrap_paragraph},
     {"wresize", "hv", false, 0, 1, cmd_wresize},
-    {"wsplit", "beghrt", false, 0, -1, cmd_wsplit},
+    {"wsplit", "bghnrt", false, 0, -1, cmd_wsplit},
     {"wswap", "", false, 0, 0, cmd_wswap},
 };
 

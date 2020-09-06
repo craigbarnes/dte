@@ -21,6 +21,7 @@ v1.10 (not yet released)
   * [`open -t`][`open`]
   * [`wsplit -t`][`wsplit`]
   * [`wsplit -g`][`wsplit`]
+  * [`wsplit -n`][`wsplit`]
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
