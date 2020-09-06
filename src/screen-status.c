@@ -127,11 +127,6 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_literal(f, "TMP");
             }
             break;
-        case 'R':
-            if (macro_is_recording()) {
-                add_status_literal(f, "[Recording]");
-            }
-            break;
         case 'y':
             add_status_format(f, "%ld", v->cy + 1);
             break;

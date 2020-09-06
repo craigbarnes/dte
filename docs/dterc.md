@@ -1132,9 +1132,6 @@ Format string for the left aligned part of status line.
 `%r`
 :   Prints `RO` for read-only buffers or `TMP` for temporary buffers.
 
-`%R`
-:   Prints `[Recording]` if recording a [macro](#macro).
-
 `%y`
 :   Cursor row.
 

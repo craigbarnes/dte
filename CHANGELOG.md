@@ -28,7 +28,7 @@ v1.10 (not yet released)
   plain-text searches.
 * Added a Shift+Tab key binding to command mode, for iteratating
   auto-completions in reverse order.
-* Added `%N`, `%R` and `%S` [statusline] format specifiers.
+* Added `%N` and `%S` [statusline] format specifiers.
 * Added a large confirmation dialog, shown when [`quit -p`][`quit`] is
   run with unsaved changes.
 
