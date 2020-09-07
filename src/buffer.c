@@ -209,16 +209,16 @@ bool buffer_detect_filetype(Buffer *b)
 
 static char *short_filename_cwd(const char *absolute, const char *cwd)
 {
-    char *f = relative_filename(absolute, cwd);
+    char *relative = relative_filename(absolute, cwd);
     size_t home_len = strlen(editor.home_dir);
     size_t abs_len = strlen(absolute);
-    size_t f_len = strlen(f);
+    size_t rel_len = strlen(relative);
 
-    if (f_len >= abs_len) {
+    if (rel_len >= abs_len) {
         // Prefer absolute if relative isn't shorter
-        free(f);
-        f = xstrdup(absolute);
-        f_len = abs_len;
+        free(relative);
+        relative = xstrdup(absolute);
+        rel_len = abs_len;
     }
 
     if (
@@ -227,15 +227,16 @@ static char *short_filename_cwd(const char *absolute, const char *cwd)
         && absolute[home_len] == '/'
     ) {
         size_t len = abs_len - home_len + 1;
-        if (len < f_len) {
+        if (len < rel_len) {
             char *filename = xmalloc(len + 1);
             filename[0] = '~';
             memcpy(filename + 1, absolute + home_len, len);
-            free(f);
+            free(relative);
             return filename;
         }
     }
-    return f;
+
+    return relative;
 }
 
 char *short_filename(const char *absolute)
