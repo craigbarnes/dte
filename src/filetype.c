@@ -236,6 +236,21 @@ HOT const char *find_ft(const char *filename, StringView line)
         return builtin_filetype_names[NGINX];
     }
 
+    strview_trim_right(&line);
+    if (line.length >= 4) {
+        const char *data = line.data;
+        const size_t n = line.length;
+        if (data[0] == '[' && data[n - 1] == ']' && is_word_byte(data[1])) {
+            size_t i = 2;
+            while (i < n && !ascii_iscntrl(data[i])) {
+                i++;
+            }
+            if (i == n) {
+                return builtin_filetype_names[INI];
+            }
+        }
+    }
+
     if (strview_equal_cstring(&ext, "conf")) {
         if (strview_has_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];

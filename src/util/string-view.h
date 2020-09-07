@@ -133,4 +133,15 @@ static inline void strview_trim_left(StringView *sv)
     sv->length = len - i;
 }
 
+NONNULL_ARGS
+static inline void strview_trim_right(StringView *sv)
+{
+    const unsigned char *data = sv->data;
+    size_t n = sv->length;
+    while (n && ascii_isblank(data[n - 1])) {
+        n--;
+    }
+    sv->length = n;
+}
+
 #endif
