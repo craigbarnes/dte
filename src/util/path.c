@@ -29,13 +29,8 @@ char *path_absolute(const char *path)
     // If the full path doesn't exist but the directory part does,
     // return the concatenation of the real directory and the
     // non-existent filename
-    size_t dir_len = strlen(dir);
-    size_t base_len = strlen(base);
-    abs = xmalloc(dir_len + base_len + 2);
-    memcpy(abs, dir, dir_len);
+    abs = path_join(dir, base);
     free(dir);
-    abs[dir_len] = '/';
-    memcpy(abs + dir_len + 1, base, base_len + 1);
     return abs;
 }
 
