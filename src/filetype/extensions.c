@@ -171,8 +171,11 @@ static const struct FileExtensionMap {
 
 static FileTypeEnum filetype_from_extension(const StringView sv)
 {
-    switch (sv.length) {
-    case 1:
+    if (sv.length >= sizeof(extensions[0].ext)) {
+        return NONE;
+    }
+
+    if (sv.length == 1) {
         switch (sv.data[0]) {
         case '1': case '2': case '3':
         case '4': case '5': case '6':
@@ -190,12 +193,6 @@ static FileTypeEnum filetype_from_extension(const StringView sv)
         case 'v': return VERILOG;
         case 'y': return YACC;
         }
-        return NONE;
-    case 2: case 3: case 4: case 5:
-    case 6: case 7: case 8: case 9:
-    case 10: case 11:
-        break;
-    default:
         return NONE;
     }
 
