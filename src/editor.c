@@ -19,6 +19,7 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
+#include "util/hashset.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -81,12 +82,12 @@ void init_editor_state(void)
     const char *dte_home = getenv("DTE_HOME");
     editor.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
 
-    editor.home_dir = xstrdup(home ? home : "");
+    editor.home_dir = strview_intern(home ? home : "");
 
     if (dte_home) {
         editor.user_config_dir = xstrdup(dte_home);
     } else {
-        editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir);
+        editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
     }
 
     setlocale(LC_CTYPE, "");

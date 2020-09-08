@@ -210,7 +210,7 @@ bool buffer_detect_filetype(Buffer *b)
 static char *short_filename_cwd(const char *absolute, const char *cwd)
 {
     char *relative = relative_filename(absolute, cwd);
-    size_t home_len = strlen(editor.home_dir);
+    size_t home_len = editor.home_dir.length;
     size_t abs_len = strlen(absolute);
     size_t rel_len = strlen(relative);
 
@@ -223,7 +223,7 @@ static char *short_filename_cwd(const char *absolute, const char *cwd)
 
     if (
         abs_len > home_len
-        && mem_equal(absolute, editor.home_dir, home_len)
+        && mem_equal(absolute, editor.home_dir.data, home_len)
         && absolute[home_len] == '/'
     ) {
         size_t len = abs_len - home_len + 1;

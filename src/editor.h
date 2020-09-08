@@ -9,6 +9,7 @@
 #include "options.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/string-view.h"
 
 typedef enum {
     EDITOR_INITIALIZING,
@@ -27,7 +28,7 @@ typedef struct {
     InputMode input_mode;
     CommandLine cmdline;
     GlobalOptions options;
-    const char *home_dir;
+    StringView home_dir;
     const char *user_config_dir;
     const char *xdg_runtime_dir;
     Encoding charset;

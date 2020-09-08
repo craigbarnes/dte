@@ -137,9 +137,8 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde)
     size_t pos = 0;
 
     if (tilde && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
-        const size_t home_dir_len = strlen(editor.home_dir);
-        buf = string_new(len + home_dir_len);
-        string_append_buf(&buf, editor.home_dir, home_dir_len);
+        buf = string_new(len + editor.home_dir.length);
+        string_append_string_view(&buf, &editor.home_dir);
         string_append_byte(&buf, '/');
         pos += 2;
     } else {
