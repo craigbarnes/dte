@@ -125,7 +125,7 @@ static int ini_handler(const IniData *data, void *ud)
             string_append_byte(&pattern, '/');
         }
 
-        string_append_string_view(&pattern, &data->section);
+        string_append_strview(&pattern, &data->section);
         userdata->match = ec_pattern_match (
             pattern.buffer,
             pattern.len,

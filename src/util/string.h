@@ -43,7 +43,7 @@ void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;
 void string_append_cstring(String *s, const char *cstr) NONNULL_ARGS;
 void string_append_string(String *s1, const String *s2) NONNULL_ARGS;
-void string_append_string_view(String *s, const StringView *sv) NONNULL_ARGS;
+void string_append_strview(String *s, const StringView *sv) NONNULL_ARGS;
 void string_append_buf(String *s, const char *ptr, size_t len) NONNULL_ARG(1);
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len) NONNULL_ARG(1);

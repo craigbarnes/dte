@@ -77,7 +77,7 @@ void string_append_string(String *s1, const String *s2)
     string_append_buf(s1, s2->buffer, s2->len);
 }
 
-void string_append_string_view(String *s, const StringView *sv)
+void string_append_strview(String *s, const StringView *sv)
 {
     string_append_buf(s, sv->data, sv->length);
 }
