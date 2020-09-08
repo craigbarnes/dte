@@ -5,6 +5,7 @@
 #include "move.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/debug.h"
 #include "util/string.h"
 #include "util/string-view.h"
 #include "util/utf8.h"
@@ -887,6 +888,8 @@ void change_case(char mode)
         case 'u':
             u = u_to_upper(u);
             break;
+        default:
+            BUG("unhandled case mode");
         }
         string_append_codepoint(&dst, u);
     }

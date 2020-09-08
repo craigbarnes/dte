@@ -10,7 +10,6 @@ The main editor code is in the base directory and various other
 
 * `command/` - command language parsing and execution
 * `editorconfig/` - [EditorConfig] implementation
-* `encoding/` - charset encoding/decoding/conversion
 * `filetype/` - filetype detection
 * `syntax/` - syntax highlighting
 * `terminal/` - terminal input/output handling
