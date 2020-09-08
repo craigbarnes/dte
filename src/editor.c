@@ -3,15 +3,14 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "editor.h"
 #include "buffer.h"
-#include "config.h"
 #include "error.h"
 #include "mode.h"
 #include "regexp.h"
 #include "screen.h"
-#include "search.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
@@ -20,7 +19,6 @@
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/hashset.h"
-#include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "view.h"

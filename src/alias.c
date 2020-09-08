@@ -5,7 +5,6 @@
 #include "command/serialize.h"
 #include "completion.h"
 #include "editor.h"
-#include "util/ascii.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"

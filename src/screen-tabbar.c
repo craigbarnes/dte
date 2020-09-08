@@ -1,7 +1,6 @@
 #include "screen.h"
 #include "editor.h"
 #include "terminal/output.h"
-#include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/strtonum.h"
 #include "util/utf8.h"

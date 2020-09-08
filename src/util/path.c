@@ -1,8 +1,6 @@
 #define _XOPEN_SOURCE 700
 #include <errno.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include "path.h"
 
 char *path_absolute(const char *path)

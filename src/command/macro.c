@@ -1,11 +1,10 @@
 #include "macro.h"
-#include "args.h"
-#include "change.h"
 #include "commands.h"
 #include "error.h"
+#include "run.h"
 #include "serialize.h"
 #include "util/ptr-array.h"
-#include "util/str-util.h"
+#include "util/string-view.h"
 
 static PointerArray macro = PTR_ARRAY_INIT;
 static PointerArray prev_macro = PTR_ARRAY_INIT;

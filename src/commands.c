@@ -40,7 +40,6 @@
 #include "util/debug.h"
 #include "util/line-iter.h"
 #include "util/path.h"
-#include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"

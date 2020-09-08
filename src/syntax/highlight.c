@@ -1,4 +1,5 @@
-#include <inttypes.h>
+#include <stdint.h>
+#include <string.h>
 #include <sys/types.h>
 #include "highlight.h"
 #include "syntax.h"

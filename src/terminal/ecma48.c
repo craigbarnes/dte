@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "ecma48.h"
 #include "output.h"
 #include "util/ascii.h"

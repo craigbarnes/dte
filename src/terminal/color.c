@@ -1,4 +1,3 @@
-#include <inttypes.h>
 #include <string.h>
 #include "color.h"
 #include "completion.h"
@@ -7,6 +6,7 @@
 #include "util/debug.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
+#include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
 static const char attr_names[][16] = {

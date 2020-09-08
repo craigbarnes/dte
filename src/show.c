@@ -17,6 +17,7 @@
 #include "frame.h"
 #include "options.h"
 #include "syntax/color.h"
+#include "terminal/color.h"
 #include "terminal/key.h"
 #include "util/hashset.h"
 #include "util/str-util.h"

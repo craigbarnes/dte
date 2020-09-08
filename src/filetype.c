@@ -1,3 +1,4 @@
+#include <string.h>
 #include "filetype.h"
 #include "error.h"
 #include "regexp.h"

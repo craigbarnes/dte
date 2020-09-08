@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include "history.h"
 #include "error.h"
 #include "util/line-iter.h"

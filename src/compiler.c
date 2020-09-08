@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "compiler.h"
 #include "completion.h"
 #include "error.h"

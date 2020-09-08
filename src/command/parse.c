@@ -1,10 +1,11 @@
-#include <string.h>
+#include <stdlib.h>
 #include "parse.h"
 #include "env.h"
 #include "editor.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/macros.h"
+#include "util/string.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 

@@ -3,6 +3,7 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/line-iter.h"
+#include "util/macros.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 

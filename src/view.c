@@ -4,7 +4,6 @@
 #include "util/debug.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
-#include "util/xmalloc.h"
 #include "window.h"
 
 View *view;

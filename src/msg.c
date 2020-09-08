@@ -1,11 +1,13 @@
+#include <stdbool.h>
+#include <stdlib.h>
 #include "msg.h"
 #include "buffer.h"
 #include "error.h"
 #include "move.h"
 #include "search.h"
 #include "util/ptr-array.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "view.h"
 #include "window.h"
 
 static PointerArray file_locations = PTR_ARRAY_INIT;

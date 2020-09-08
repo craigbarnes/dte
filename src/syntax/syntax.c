@@ -1,8 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "syntax.h"
-#include "state.h"
 #include "error.h"
-#include "util/ascii.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
