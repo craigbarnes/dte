@@ -95,6 +95,10 @@ Movement Commands:
 .br
    \fBpgdown\fR [\fB\-c\fR|\fB\-l\fR]
 .br
+   \fBblkup\fR [\fB\-c\fR|\fB\-l\fR]
+.br
+   \fBblkdown\fR [\fB\-c\fR|\fB\-l\fR]
+.br
    \fBword\-fwd\fR [\fB\-cs\fR]
 .br
    \fBword\-bwd\fR [\fB\-cs\fR]
@@ -1020,6 +1024,19 @@ Move one page up.
 \fBpgdown\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
 Move one page down.
+.P
+.RE
+\fBblkup\fR [\fB\-c\fR|\fB\-l\fR]
+.RS
+Move one block up.
+.P
+Note: a "block", in this context, is somewhat akin to a paragraph.
+Blocks are delimited by one or more blank lines
+.P
+.RE
+\fBblkdown\fR [\fB\-c\fR|\fB\-l\fR]
+.RS
+Move one block down.
 .P
 .RE
 \fBword\-fwd\fR [\fB\-cs\fR]

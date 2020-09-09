@@ -9,6 +9,7 @@ v1.10 (not yet released)
 * Added support for [`macro`] recording.
 * Added a [`delete-line`] command.
 * Added a [`match-bracket`] command.
+* Added [`blkup`] and [`blkdown`] commands.
 * Added an optional *exitcode* argument to the [`quit`] command.
 * Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
   command.
@@ -427,6 +428,8 @@ system except a somewhat recent kernel.
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 
+[`blkdown`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkdown
+[`blkup`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkup
 [`close`]: https://craigbarnes.gitlab.io/dte/dterc.html#close
 [`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line

@@ -587,6 +587,17 @@ Move one page up.
 
 Move one page down.
 
+### **blkup** [**-c**|**-l**]
+
+Move one block up.
+
+Note: a "block", in this context, is somewhat akin to a paragraph.
+Blocks are delimited by one or more blank lines
+
+### **blkdown** [**-c**|**-l**]
+
+Move one block down.
+
 ### **word-fwd** [**-cs**]
 
 Move forward one word.
