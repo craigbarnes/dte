@@ -551,86 +551,59 @@ Swap positions of this and next frame.
 
 ## Movement Commands
 
-### **left** [**-c**]
+Movement commands are used to move the cursor position.
 
-Move left.
+Several of these commands also have `-c` and `-l` flags to allow
+creating character/line selections. These 2 flags are noted in the
+command summaries below, but are only described once, as follows:
 
 `-c`
 :   Select characters
+
+`-l`
+:   Select whole lines
+
+### **left** [**-c**]
+
+Move one column left.
 
 ### **right** [**-c**]
 
-Move right.
-
-`-c`
-:   Select characters
+Move one column right.
 
 ### **up** [**-c**|**-l**]
 
-Move cursor up.
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
+Move one line up.
 
 ### **down** [**-c**|**-l**]
 
-Move cursor down.
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
+Move one line down.
 
 ### **pgup** [**-c**|**-l**]
 
-Move cursor page up. See also [`scroll-pgup`].
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
+Move one page up.
 
 ### **pgdown** [**-c**|**-l**]
 
-Move cursor page down. See also [`scroll-pgdown`].
-
-`-c`
-:   Select characters
-
-`-l`
-:   Select whole lines
+Move one page down.
 
 ### **word-fwd** [**-cs**]
 
-Move cursor forward one word.
-
-`-c`
-:   Select characters
+Move forward one word.
 
 `-s`
 :   Skip special characters
 
 ### **word-bwd** [**-cs**]
 
-Move cursor backward one word.
-
-`-c`
-:   Select characters
+Move backward one word.
 
 `-s`
 :   Skip special characters
 
 ### **bol** [**-cs**]
 
-Move to beginning of line.
-
-`-c`
-:   Select characters
+Move to beginning of current line.
 
 `-s`
 :   Move to beginning of indented text or beginning of line, depending
@@ -638,10 +611,7 @@ Move to beginning of line.
 
 ### **eol** [**-c**]
 
-Move cursor to end of line.
-
-`-c`
-:   Select characters
+Move to end of current line.
 
 ### **bof**
 
@@ -649,17 +619,16 @@ Move to beginning of file.
 
 ### **eof**
 
-Move cursor to end of file.
+Move to end of file.
 
 ### **bolsf**
 
-Incrementally move cursor to beginning of line, then beginning
-of screen, then beginning of file.
+Incrementally move to beginning of line, then beginning of screen, then
+beginning of file.
 
 ### **eolsf**
 
-Incrementally move cursor to end of line, then end of screen, then
-end of file.
+Incrementally move to end of line, then end of screen, then end of file.
 
 ### **scroll-up**
 
@@ -671,12 +640,12 @@ Scroll view down one line. Keeps cursor position unchanged if possible.
 
 ### **scroll-pgup**
 
-Scroll page up. Cursor position relative to top of screen is
+Scroll one page up. Cursor position relative to top of screen is
 maintained. See also [`pgup`].
 
 ### **scroll-pgdown**
 
-Scroll page down. Cursor position relative to top of screen is
+Scroll one page down. Cursor position relative to top of screen is
 maintained. See also [`pgdown`].
 
 ### **center-view**

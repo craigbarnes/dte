@@ -978,84 +978,54 @@ Swap positions of this and next frame.
 .P
 .RE
 .SS Movement Commands
-\fBleft\fR [\fB\-c\fR]
-.RS
-Move left.
+Movement commands are used to move the cursor position.
+.P
+Several of these commands also have \fB\-c\fR and \fB\-l\fR flags to allow
+creating character/line selections. These 2 flags are noted in the
+command summaries below, but are only described once, as follows:
 .P
 .TP
 \fB\-c\fR
 Select characters
 .PP
+.TP
+\fB\-l\fR
+Select whole lines
+.PP
+\fBleft\fR [\fB\-c\fR]
+.RS
+Move one column left.
+.P
 .RE
 \fBright\fR [\fB\-c\fR]
 .RS
-Move right.
+Move one column right.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
 .RE
 \fBup\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
-Move cursor up.
+Move one line up.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
-.TP
-\fB\-l\fR
-Select whole lines
-.PP
 .RE
 \fBdown\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
-Move cursor down.
+Move one line down.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
-.TP
-\fB\-l\fR
-Select whole lines
-.PP
 .RE
 \fBpgup\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
-Move cursor page up. See also \fBscroll\-pgup\fR.
+Move one page up.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
-.TP
-\fB\-l\fR
-Select whole lines
-.PP
 .RE
 \fBpgdown\fR [\fB\-c\fR|\fB\-l\fR]
 .RS
-Move cursor page down. See also \fBscroll\-pgdown\fR.
+Move one page down.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
-.TP
-\fB\-l\fR
-Select whole lines
-.PP
 .RE
 \fBword\-fwd\fR [\fB\-cs\fR]
 .RS
-Move cursor forward one word.
+Move forward one word.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
 .TP
 \fB\-s\fR
 Skip special characters
@@ -1063,12 +1033,8 @@ Skip special characters
 .RE
 \fBword\-bwd\fR [\fB\-cs\fR]
 .RS
-Move cursor backward one word.
+Move backward one word.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
 .TP
 \fB\-s\fR
 Skip special characters
@@ -1076,12 +1042,8 @@ Skip special characters
 .RE
 \fBbol\fR [\fB\-cs\fR]
 .RS
-Move to beginning of line.
+Move to beginning of current line.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
 .TP
 \fB\-s\fR
 Move to beginning of indented text or beginning of line, depending
@@ -1090,12 +1052,8 @@ on current cursor position.
 .RE
 \fBeol\fR [\fB\-c\fR]
 .RS
-Move cursor to end of line.
+Move to end of current line.
 .P
-.TP
-\fB\-c\fR
-Select characters
-.PP
 .RE
 \fBbof\fR
 .RS
@@ -1104,19 +1062,18 @@ Move to beginning of file.
 .RE
 \fBeof\fR
 .RS
-Move cursor to end of file.
+Move to end of file.
 .P
 .RE
 \fBbolsf\fR
 .RS
-Incrementally move cursor to beginning of line, then beginning
-of screen, then beginning of file.
+Incrementally move to beginning of line, then beginning of screen, then
+beginning of file.
 .P
 .RE
 \fBeolsf\fR
 .RS
-Incrementally move cursor to end of line, then end of screen, then
-end of file.
+Incrementally move to end of line, then end of screen, then end of file.
 .P
 .RE
 \fBscroll\-up\fR
@@ -1131,13 +1088,13 @@ Scroll view down one line. Keeps cursor position unchanged if possible.
 .RE
 \fBscroll\-pgup\fR
 .RS
-Scroll page up. Cursor position relative to top of screen is
+Scroll one page up. Cursor position relative to top of screen is
 maintained. See also \fBpgup\fR.
 .P
 .RE
 \fBscroll\-pgdown\fR
 .RS
-Scroll page down. Cursor position relative to top of screen is
+Scroll one page down. Cursor position relative to top of screen is
 maintained. See also \fBpgdown\fR.
 .P
 .RE
