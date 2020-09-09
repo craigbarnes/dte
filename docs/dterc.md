@@ -683,6 +683,11 @@ maintained. See also [`pgdown`].
 
 Center view to cursor.
 
+### **match-bracket**
+
+Move to the bracket character paired with the one under the cursor.
+The character under the cursor should be one of `{}[]()<>`.
+
 ### **line** _number_
 
 Go to line.
