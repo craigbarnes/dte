@@ -23,6 +23,7 @@ v1.10 (not yet released)
   * [`wsplit -t`][`wsplit`]
   * [`wsplit -g`][`wsplit`]
   * [`wsplit -n`][`wsplit`]
+* Added a [`select-cursor-char`] global option.
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
@@ -443,4 +444,5 @@ system except a somewhat recent kernel.
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
+[select-cursor-char]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left

@@ -1118,6 +1118,10 @@ See also: the `FILES` section in the [`dte`] man page.
 Whether to use LF (**unix**) or CRLF (**dos**) line-endings. This
 is just a default value for new files.
 
+### **select-cursor-char** [true]
+
+Whether to include the character under the cursor in selections.
+
 ### **scroll-margin** [0]
 
 Minimum number of lines to keep visible before and after cursor.
