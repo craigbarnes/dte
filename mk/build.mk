@@ -73,7 +73,7 @@ build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/featu
 editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
 test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
 
-ifdef WERROR
+ifeq "$(WERROR)" "1"
   WARNINGS += -Werror
 endif
 
@@ -99,26 +99,26 @@ else ifeq "$(KERNEL)" "NetBSD"
   BASIC_LDFLAGS += -L/usr/pkg/lib
 endif
 
-ifdef ICONV_DISABLE
+ifeq "$(ICONV_DISABLE)" "1"
   build/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
 else
   LDLIBS += $(LDLIBS_ICONV)
 endif
 
-ifdef TERMINFO_DISABLE
+ifeq "$(TERMINFO_DISABLE)" "1"
   build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
 else
   LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
-ifdef SANE_WCTYPE
+ifeq "$(SANE_WCTYPE)" "1"
   BASIC_CFLAGS += -DSANE_WCTYPE=1
 endif
 
 dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
 
-ifdef USE_SANITIZER
+ifeq "$(USE_SANITIZER)" "1"
   SANITIZER_FLAGS := \
     -fsanitize=address,undefined -fsanitize-address-use-after-scope \
     -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-common
