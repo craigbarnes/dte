@@ -16,7 +16,6 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
-#include "util/xsnprintf.h"
 
 static void add_block(Buffer *b, Block *blk)
 {
@@ -320,18 +319,20 @@ bool save_buffer (
         const char *base = path_basename(filename);
         const StringView dir = path_slice_dirname(filename);
         const int dlen = (int)dir.length;
-        xsnprintf(tmp, sizeof tmp, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
-        fd = mkstemp(tmp);
-        if (fd < 0) {
-            // No write permission to the directory?
-            tmp[0] = '\0';
-        } else if (b->file.mode) {
-            // Preserve ownership and mode of the original file if possible.
-            UNUSED int u1 = fchown(fd, b->file.uid, b->file.gid);
-            UNUSED int u2 = fchmod(fd, b->file.mode);
-        } else {
-            // New file
-            fchmod(fd, 0666 & ~get_umask());
+        int n = snprintf(tmp, sizeof tmp, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
+        if (likely(n > 0 && n < sizeof(tmp))) {
+            fd = mkstemp(tmp);
+            if (fd < 0) {
+                // No write permission to the directory?
+                tmp[0] = '\0';
+            } else if (b->file.mode) {
+                // Preserve ownership and mode of the original file if possible.
+                UNUSED int u1 = fchown(fd, b->file.uid, b->file.gid);
+                UNUSED int u2 = fchmod(fd, b->file.mode);
+            } else {
+                // New file
+                fchmod(fd, 0666 & ~get_umask());
+            }
         }
     }
 
