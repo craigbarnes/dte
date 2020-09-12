@@ -1,6 +1,7 @@
 #include "../build/feature.h"
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -150,55 +151,79 @@ bool read_blocks(Buffer *b, int fd)
     size_t size = b->file.size;
     unsigned char *buf = NULL;
     bool mapped = false;
+    bool ret = false;
 
-    // st_size is zero for some files in /proc.
-    // Can't mmap files in /proc and /sys.
     if (size >= map_size) {
         // NOTE: size must be greater than 0
         buf = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-        if (buf == MAP_FAILED) {
-            buf = NULL;
-        } else {
+        if (buf != MAP_FAILED) {
             xmadvise_sequential(buf, size);
             mapped = true;
+            goto decode;
         }
+        buf = NULL;
     }
 
-    if (!mapped) {
+    if (likely(size > 0)) {
+        buf = malloc(size);
+        if (unlikely(!buf)) {
+            goto error;
+        }
+        ssize_t rc = xread(fd, buf, size);
+        if (unlikely(rc < 0)) {
+            goto error;
+        }
+        size = rc;
+    } else {
+        // st_size is zero for some files in /proc
         size_t alloc = map_size;
+        BUG_ON(!IS_POWER_OF_2(alloc));
+        buf = malloc(alloc);
+        if (unlikely(!buf)) {
+            goto error;
+        }
         size_t pos = 0;
-        buf = xmalloc(alloc);
         while (1) {
             ssize_t rc = xread(fd, buf + pos, alloc - pos);
             if (rc < 0) {
-                free(buf);
-                return false;
+                goto error;
             }
             if (rc == 0) {
                 break;
             }
             pos += rc;
             if (pos == alloc) {
-                alloc *= 2;
-                xrenew(buf, alloc);
+                size_t new_alloc = alloc << 1;
+                if (unlikely(alloc >= new_alloc)) {
+                    errno = EOVERFLOW;
+                    goto error;
+                }
+                alloc = new_alloc;
+                char *new_buf = realloc(buf, alloc);
+                if (unlikely(!new_buf)) {
+                    goto error;
+                }
+                buf = new_buf;
             }
         }
         size = pos;
     }
 
-    bool r = decode_and_add_blocks(b, buf, size);
+decode:
+    ret = decode_and_add_blocks(b, buf, size);
 
+error:
     if (mapped) {
         munmap(buf, size);
     } else {
         free(buf);
     }
 
-    if (r) {
+    if (ret) {
         fixup_blocks(b);
     }
 
-    return r;
+    return ret;
 }
 
 bool load_buffer(Buffer *b, bool must_exist, const char *filename)
