@@ -550,19 +550,19 @@ static bool decode_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
     return true;
 }
 
-static int set_encoding(FileDecoder *dec, const char *encoding)
+static bool set_encoding(FileDecoder *dec, const char *encoding)
 {
     if (strcmp(encoding, "UTF-8") == 0) {
         dec->read_line = read_utf8_line;
     } else {
         dec->cconv = cconv_to_utf8(encoding);
         if (!dec->cconv) {
-            return -1;
+            return false;
         }
         dec->read_line = decode_and_read_line;
     }
     dec->encoding = str_intern(encoding);
-    return 0;
+    return true;
 }
 
 static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
@@ -588,7 +588,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
                 // Assume encoding is same as locale
                 encoding = editor.charset.name;
             }
-            if (set_encoding(dec, encoding)) {
+            if (!set_encoding(dec, encoding)) {
                 // FIXME: error message?
                 set_encoding(dec, "UTF-8");
             }
@@ -641,7 +641,7 @@ FileDecoder *new_file_decoder (
     dec->read_line = detect_and_read_line;
 
     if (encoding) {
-        if (set_encoding(dec, encoding)) {
+        if (!set_encoding(dec, encoding)) {
             free_file_decoder(dec);
             return NULL;
         }
