@@ -75,6 +75,7 @@ bool conversion_supported_by_iconv (
     const char* UNUSED_ARG(from),
     const char* UNUSED_ARG(to)
 ) {
+    errno = EINVAL;
     return false;
 }
 
@@ -439,6 +440,7 @@ static void cconv_free(struct cconv *c)
 bool conversion_supported_by_iconv(const char *from, const char *to)
 {
     if (unlikely(from[0] == '\0' || to[0] == '\0')) {
+        errno = EINVAL;
         return false;
     }
     iconv_t cd = iconv_open(to, from);

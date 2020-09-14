@@ -863,7 +863,15 @@ static void cmd_open(const CommandArgs *a)
         } else if (conversion_supported_by_iconv(requested_encoding, "UTF-8")) {
             encoding = encoding_from_name(requested_encoding);
         } else {
-            error_msg("Unsupported encoding: '%s'", requested_encoding);
+            if (errno == EINVAL) {
+                error_msg("Unsupported encoding '%s'", requested_encoding);
+            } else {
+                error_msg (
+                    "iconv conversion from '%s' failed: %s",
+                    requested_encoding,
+                    strerror(errno)
+                );
+            }
             return;
         }
     } else {
@@ -1345,7 +1353,15 @@ static void cmd_save(const CommandArgs *a)
         } else if (conversion_supported_by_iconv("UTF-8", requested_encoding)) {
             encoding = encoding_from_name(requested_encoding);
         } else {
-            error_msg("Unsupported encoding: '%s'", requested_encoding);
+            if (errno == EINVAL) {
+                error_msg("Unsupported encoding '%s'", requested_encoding);
+            } else {
+                error_msg (
+                    "iconv conversion to '%s' failed: %s",
+                    requested_encoding,
+                    strerror(errno)
+                );
+            }
             return;
         }
     }
