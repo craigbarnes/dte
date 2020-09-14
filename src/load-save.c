@@ -58,7 +58,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
         if (bom_type != UNKNOWN_ENCODING) {
             BUG_ON(b->encoding.name);
             Encoding e = encoding_from_type(bom_type);
-            if (encoding_supported_by_iconv(e.name)) {
+            if (conversion_supported_by_iconv(e.name, "UTF-8")) {
                 b->encoding = e;
             } else {
                 b->encoding = encoding_from_type(UTF8);

@@ -71,8 +71,10 @@ static size_t unix_to_dos (
 
 #ifdef ICONV_DISABLE // iconv not available; use basic, UTF-8 implementation:
 
-bool encoding_supported_by_iconv(const char* UNUSED_ARG(encoding))
-{
+bool conversion_supported_by_iconv (
+    const char* UNUSED_ARG(from),
+    const char* UNUSED_ARG(to)
+) {
     return false;
 }
 
@@ -434,13 +436,13 @@ static void cconv_free(struct cconv *c)
     free(c);
 }
 
-bool encoding_supported_by_iconv(const char *encoding)
+bool conversion_supported_by_iconv(const char *from, const char *to)
 {
-    if (encoding[0] == '\0') {
+    if (unlikely(from[0] == '\0' || to[0] == '\0')) {
         return false;
     }
-    iconv_t cd = iconv_open("UTF-8", encoding);
-    if (cd == (iconv_t) -1) {
+    iconv_t cd = iconv_open(to, from);
+    if (cd == (iconv_t)-1) {
         return false;
     }
     iconv_close(cd);

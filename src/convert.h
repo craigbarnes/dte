@@ -9,7 +9,7 @@
 typedef struct FileDecoder FileDecoder;
 typedef struct FileEncoder FileEncoder;
 
-bool encoding_supported_by_iconv(const char *encoding);
+bool conversion_supported_by_iconv(const char *from, const char *to) NONNULL_ARGS;
 
 FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t size);
 void free_file_decoder(FileDecoder *dec);

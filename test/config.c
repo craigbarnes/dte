@@ -112,7 +112,7 @@ static void test_exec_config(void)
         expect_files_equal(out, ref);
     }
 
-    if (encoding_supported_by_iconv("TIS-620")) {
+    if (conversion_supported_by_iconv("UTF-8", "TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 }

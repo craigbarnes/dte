@@ -860,7 +860,7 @@ static void cmd_open(const CommandArgs *a)
         EncodingType e = lookup_encoding(requested_encoding);
         if (e == UTF8) {
             encoding = encoding_from_type(e);
-        } else if (encoding_supported_by_iconv(requested_encoding)) {
+        } else if (conversion_supported_by_iconv(requested_encoding, "UTF-8")) {
             encoding = encoding_from_name(requested_encoding);
         } else {
             error_msg("Unsupported encoding: '%s'", requested_encoding);
@@ -1342,7 +1342,7 @@ static void cmd_save(const CommandArgs *a)
         EncodingType e = lookup_encoding(requested_encoding);
         if (e == UTF8) {
             encoding = encoding_from_type(e);
-        } else if (encoding_supported_by_iconv(requested_encoding)) {
+        } else if (conversion_supported_by_iconv("UTF-8", requested_encoding)) {
             encoding = encoding_from_name(requested_encoding);
         } else {
             error_msg("Unsupported encoding: '%s'", requested_encoding);
