@@ -222,7 +222,7 @@ The following environment variables are inspected at startup:
     built-in terminal support to use.
 
 `COLORTERM`
-:   Enables 24-bit color output, if set to `truecolor`.
+:   Enables support for 24-bit terminal colors, if set to `truecolor`.
 
 # Files
 
