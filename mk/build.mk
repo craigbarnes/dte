@@ -127,7 +127,6 @@ ifeq "$(USE_SANITIZER)" "1"
     $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
   $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
   $(dte) $(test): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
-  export ASAN_OPTIONS=detect_leaks=1:detect_stack_use_after_return=1
   DEBUG = 3
 else
   # 0: Disable debugging

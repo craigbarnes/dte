@@ -8,6 +8,14 @@
 #include "xreadwrite.h"
 #include "xsnprintf.h"
 
+#ifdef ASAN_ENABLED
+#include <sanitizer/asan_interface.h>
+const char *__asan_default_options(void)
+{
+    return "detect_leaks=1:detect_stack_use_after_return=1";
+}
+#endif
+
 static void no_op(void) {}
 static void (*cleanup_handler)(void) = no_op;
 
