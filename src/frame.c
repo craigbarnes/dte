@@ -523,7 +523,7 @@ String dump_frames(void)
 }
 
 #if DEBUG >= 1
-static void debug_frame(const Frame *f, int level)
+static void debug_frame(const Frame *f)
 {
     BUG_ON(f->window && f->frames.count);
     if (f->window) {
@@ -532,12 +532,12 @@ static void debug_frame(const Frame *f, int level)
     for (size_t i = 0, n = f->frames.count; i < n; i++) {
         const Frame *c = f->frames.ptrs[i];
         BUG_ON(c->parent != f);
-        debug_frame(c, level + 1);
+        debug_frame(c);
     }
 }
 
 void debug_frames(void)
 {
-    debug_frame(root_frame, 0);
+    debug_frame(root_frame);
 }
 #endif
