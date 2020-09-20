@@ -293,7 +293,10 @@ void suspend(void)
     ) {
         ui_end();
     }
-    kill(0, SIGSTOP);
+    int r = kill(0, SIGSTOP);
+    if (unlikely(r != 0)) {
+        perror_msg("kill");
+    }
 }
 
 char *editor_file(const char *name)
