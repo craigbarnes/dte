@@ -8,6 +8,9 @@
 #include "xreadwrite.h"
 #include "xsnprintf.h"
 
+static void no_op(void) {}
+static void (*cleanup_handler)(void) = no_op;
+
 #ifdef ASAN_ENABLED
 #include <sanitizer/asan_interface.h>
 const char *__asan_default_options(void)
@@ -16,8 +19,13 @@ const char *__asan_default_options(void)
 }
 #endif
 
-static void no_op(void) {}
-static void (*cleanup_handler)(void) = no_op;
+static void print_stack_trace(void)
+{
+    #ifdef ASAN_ENABLED
+        fputs("\nStack trace:\n", stderr);
+        __sanitizer_print_stack_trace();
+    #endif
+}
 
 void set_fatal_error_cleanup_handler(void (*handler)(void))
 {
@@ -29,6 +37,7 @@ noreturn void fatal_error(const char *msg, int err)
     cleanup_handler();
     errno = err;
     perror(msg);
+    print_stack_trace();
     abort();
 }
 
@@ -45,6 +54,7 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
     va_end(ap);
 
     fputs("'\n", stderr);
+    print_stack_trace();
     fflush(stderr);
     abort();
 }
