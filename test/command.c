@@ -328,6 +328,12 @@ static void test_escape_command_arg(void)
     str = escape_command_arg("~/", true);
     EXPECT_STREQ(str, "\\~/");
     free(str);
+
+    String s = STRING_INIT;
+    string_append_escaped_arg(&s, "~/", true);
+    str = string_steal_cstring(&s);
+    EXPECT_STREQ(str, "\\~/");
+    free(str);
 }
 
 static void test_command_struct_layout(void)
