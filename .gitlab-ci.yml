@@ -76,8 +76,11 @@ android:
 .pages:
     stage: dist
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
-    artifacts: {paths: [public]}
     coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
+    artifacts:
+        paths: [public]
+        expire_in: 60 days
+        name: dte-$CI_JOB_NAME-$CI_COMMIT_SHORT_SHA
     script:
         - make docs
         - make coverage-report
@@ -97,4 +100,3 @@ pages:
 pages:non-master:
     extends: .pages
     except: [master]
-    artifacts: {expire_in: 1 week}
