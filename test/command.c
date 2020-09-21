@@ -1,10 +1,12 @@
 #include <limits.h>
 #include "test.h"
 #include "command/args.h"
+#include "command/env.h"
 #include "command/parse.h"
 #include "command/run.h"
 #include "command/serialize.h"
 #include "commands.h"
+#include "editor.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 
@@ -162,6 +164,23 @@ static void test_parse_commands(void)
 
     EXPECT_EQ(parse_commands(&array, "insert \\"), CMDERR_UNEXPECTED_EOF);
     ptr_array_free(&array);
+}
+
+static void test_expand_builtin_env(void)
+{
+    char *value = NULL;
+    EXPECT_TRUE(expand_builtin_env("DTE_HOME", &value));
+    EXPECT_STREQ(value, editor.user_config_dir);
+    free(value);
+
+    EXPECT_TRUE(expand_builtin_env("FILE", &value));
+    EXPECT_NULL(value);
+    EXPECT_TRUE(expand_builtin_env("FILETYPE", &value));
+    EXPECT_NULL(value);
+    EXPECT_TRUE(expand_builtin_env("LINENO", &value));
+    EXPECT_NULL(value);
+    EXPECT_TRUE(expand_builtin_env("WORD", &value));
+    EXPECT_NULL(value);
 }
 
 static void test_parse_args(void)
@@ -358,6 +377,7 @@ void test_command(void)
 {
     test_parse_command_arg();
     test_parse_commands();
+    test_expand_builtin_env();
     test_parse_args();
     test_escape_command_arg();
     test_command_struct_layout();
