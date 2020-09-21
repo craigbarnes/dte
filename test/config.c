@@ -171,15 +171,11 @@ DISABLE_WARNING("-Wmissing-prototypes")
 
 void init_headless_mode(void)
 {
-    const char extra_rc[] =
-        "set lock-files false\n"
-    ;
-
     MEMZERO(&terminal.control_codes);
     exec_builtin_rc();
-    exec_config(&commands, extra_rc, sizeof(extra_rc) - 1);
     update_all_syntax_colors();
     sort_aliases();
+    editor.options.lock_files = false;
     window = new_window();
     root_frame = new_root_frame(window);
     set_view(window_open_empty_buffer(window));
