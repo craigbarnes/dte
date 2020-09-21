@@ -173,9 +173,6 @@ void init_headless_mode(void)
 {
     const char extra_rc[] =
         "set lock-files false\n"
-        // Regression test for unquoted variables in rc files
-        "bind M-p \"insert \"$WORD\n"
-        "bind M-p \"insert \"$FILE\n"
     ;
 
     MEMZERO(&terminal.control_codes);
