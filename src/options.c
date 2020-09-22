@@ -43,10 +43,10 @@ typedef struct {
             unsigned int max;
         } uint_opt;
         struct {
-            const char **values;
+            const char *const *values;
         } enum_opt;
         struct {
-            const char **values;
+            const char *const *values;
         } flag_opt;
     } u;
     // Optional
@@ -68,6 +68,7 @@ typedef struct OptionOps {
     bool (*parse)(const OptionDesc *desc, const char *str, OptionValue *value);
     const char *(*string)(const OptionDesc *desc, OptionValue value);
     bool (*equals)(const OptionDesc *desc, void *ptr, OptionValue value);
+    OptionType type;
 } OptionOps;
 
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
@@ -165,7 +166,7 @@ static bool validate_statusline_format(const char *value)
         char ch = value[i++];
         if (ch == '%') {
             ch = value[i++];
-            if (!ch) {
+            if (ch == '\0') {
                 error_msg("Format character expected after '%%'");
                 return false;
             }
@@ -304,7 +305,7 @@ static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue 
 
 static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
 {
-    const char **values = d->u.enum_opt.values;
+    const char *const *values = d->u.enum_opt.values;
     unsigned int i;
     for (i = 0; values[i]; i++) {
         if (streq(values[i], str)) {
@@ -334,7 +335,7 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
         return true;
     }
 
-    const char **values = d->u.flag_opt.values;
+    const char *const *values = d->u.flag_opt.values;
     const char *ptr = str;
     unsigned int flags = 0;
 
@@ -382,7 +383,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     }
 
     char *ptr = buf;
-    const char **values = desc->u.flag_opt.values;
+    const char *const *values = desc->u.flag_opt.values;
     for (size_t i = 0; values[i]; i++) {
         if (flags & (1 << i)) {
             size_t len = strlen(values[i]);
@@ -397,29 +398,29 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
 }
 
 static const OptionOps option_ops[] = {
-    [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals},
-    [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string, uint_equals},
-    [OPT_ENUM] = {uint_get, uint_set, enum_parse, enum_string, uint_equals},
-    [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
-    [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
+    [OPT_STR] = {str_get, str_set, str_parse, str_string, str_equals, OPT_STR},
+    [OPT_UINT] = {uint_get, uint_set, uint_parse, uint_string, uint_equals, OPT_UINT},
+    [OPT_ENUM] = {uint_get, uint_set, enum_parse, enum_string, uint_equals, OPT_ENUM},
+    [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals, OPT_BOOL},
+    [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals, OPT_FLAG},
 };
 
-static const char *bool_enum[] = {"false", "true", NULL};
-static const char *newline_enum[] = {"unix", "dos", NULL};
+static const char *const bool_enum[] = {"false", "true", NULL};
+static const char *const newline_enum[] = {"unix", "dos", NULL};
 
-static const char *case_sensitive_search_enum[] = {
+static const char *const case_sensitive_search_enum[] = {
     "false",
     "true",
     "auto",
     NULL
 };
 
-static const char *detect_indent_values[] = {
+static const char *const detect_indent_values[] = {
     "1", "2", "3", "4", "5", "6", "7", "8",
     NULL
 };
 
-static const char *ws_error_values[] = {
+static const char *const ws_error_values[] = {
     "space-indent",
     "space-align",
     "tab-indent",
@@ -463,16 +464,6 @@ static const OptionDesc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
 
-UNITTEST {
-    for (size_t i = 1; i < ARRAY_COUNT(option_desc); i++) {
-        const OptionDesc *curr = &option_desc[i];
-        const OptionDesc *prev = &option_desc[i - 1];
-        if (strcmp(curr->name, prev->name) <= 0) {
-            BUG("Not in sorted order: %s, %s", prev->name, curr->name);
-        }
-    }
-}
-
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
     return (char*)opt + desc->offset;
@@ -483,9 +474,42 @@ static char *global_ptr(const OptionDesc *desc)
     return (char*)&editor.options + desc->offset;
 }
 
-static bool desc_is(const OptionDesc *desc, OptionType type)
-{
-    return desc->ops == &option_ops[type];
+UNITTEST {
+    static const size_t alignments[] = {
+        [OPT_STR] = alignof(const char*),
+        [OPT_UINT] = alignof(unsigned int),
+        [OPT_ENUM] = alignof(unsigned int),
+        [OPT_BOOL] = alignof(bool),
+        [OPT_FLAG] = alignof(unsigned int),
+    };
+
+    // Check offset alignments
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *desc = &option_desc[i];
+        size_t alignment = alignments[desc->ops->type];
+        if (desc->global) {
+            uintptr_t ptr_val = (uintptr_t)global_ptr(desc);
+            BUG_ON(ptr_val % alignment != 0);
+        }
+        if (desc->local) {
+            const UNUSED Buffer b;
+            uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &b.options);
+            BUG_ON(ptr_val % alignment != 0);
+        }
+    }
+
+    // Ensure option_desc[] is properly sorted
+    for (size_t i = 1; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *curr = &option_desc[i];
+        const OptionDesc *prev = &option_desc[i - 1];
+        if (strcmp(curr->name, prev->name) <= 0) {
+            BUG("Not in sorted order: %s, %s", prev->name, curr->name);
+        }
+    }
+
+    // Validate default statusline formats
+    BUG_ON(!validate_statusline_format(editor.options.statusline_left));
+    BUG_ON(!validate_statusline_format(editor.options.statusline_right));
 }
 
 static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
@@ -581,7 +605,7 @@ void set_bool_option(const char *name, bool local, bool global)
     if (!desc) {
         return;
     }
-    if (!desc_is(desc, OPT_BOOL)) {
+    if (desc->ops->type != OPT_BOOL) {
         error_msg("Option %s is not boolean", desc->name);
         return;
     }
@@ -611,13 +635,14 @@ void toggle_option(const char *name, bool global, bool verbose)
 
     char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
     OptionValue value = desc->ops->get(desc, ptr);
-    if (desc_is(desc, OPT_ENUM)) {
+    OptionType type = desc->ops->type;
+    if (type == OPT_ENUM) {
         if (desc->u.enum_opt.values[value.uint_val + 1]) {
             value.uint_val++;
         } else {
             value.uint_val = 0;
         }
-    } else if (desc_is(desc, OPT_BOOL)) {
+    } else if (type == OPT_BOOL) {
         value.bool_val = !value.bool_val;
     } else {
         error_msg("Toggling %s requires arguments", name);
@@ -710,22 +735,22 @@ void collect_toggleable_options(const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        bool toggleable = desc_is(desc, OPT_ENUM) || desc_is(desc, OPT_BOOL);
+        OptionType type = desc->ops->type;
+        bool toggleable = (type == OPT_ENUM || type == OPT_BOOL);
         if (toggleable && str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
         }
     }
 }
 
-void collect_option_values(const char *name, const char *prefix)
+void collect_option_values(const char *option, const char *prefix)
 {
-    const OptionDesc *desc = find_option(name);
+    const OptionDesc *desc = find_option(option);
     if (!desc) {
         return;
     }
 
-    if (!*prefix) {
-        // Complete value
+    if (prefix[0] == '\0') {
         char *ptr;
         if (desc->local) {
             ptr = local_ptr(desc, &buffer->options);
@@ -734,22 +759,27 @@ void collect_option_values(const char *name, const char *prefix)
         }
         OptionValue value = desc->ops->get(desc, ptr);
         add_completion(xstrdup(desc->ops->string(desc, value)));
-    } else if (desc_is(desc, OPT_ENUM) || desc_is(desc, OPT_BOOL)) {
-        // Complete possible values
-        const char **values = desc->u.enum_opt.values;
+        return;
+    }
+
+    const char *const *values;
+    const char *comma;
+    size_t prefix_len;
+
+    switch (desc->ops->type) {
+    case OPT_ENUM:
+    case OPT_BOOL:
+        values = desc->u.enum_opt.values;
         for (size_t i = 0; values[i]; i++) {
             if (str_has_prefix(values[i], prefix)) {
                 add_completion(xstrdup(values[i]));
             }
         }
-    } else if (desc_is(desc, OPT_FLAG)) {
-        // Complete possible values
-        const char *comma = strrchr(prefix, ',');
-        size_t prefix_len = 0;
-        if (comma) {
-            prefix_len = ++comma - prefix;
-        }
-        const char **values = desc->u.flag_opt.values;
+        break;
+    case OPT_FLAG:
+        values = desc->u.flag_opt.values;
+        comma = strrchr(prefix, ',');
+        prefix_len = comma ? ++comma - prefix : 0;
         for (size_t i = 0; values[i]; i++) {
             const char *str = values[i];
             if (str_has_prefix(str, prefix + prefix_len)) {
@@ -760,6 +790,12 @@ void collect_option_values(const char *name, const char *prefix)
                 add_completion(completion);
             }
         }
+        break;
+    case OPT_STR:
+    case OPT_UINT:
+        break;
+    default:
+        BUG("unhandled option type");
     }
 }
 
