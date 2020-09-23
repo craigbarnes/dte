@@ -188,6 +188,20 @@ static void test_complete_command(void)
     complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "show option auto-indent");
     reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "set ws-error tr");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error trailing ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "set ws-error special,tab-");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-indent");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
+    reset_completion();
 }
 
 DISABLE_WARNING("-Wmissing-prototypes")
