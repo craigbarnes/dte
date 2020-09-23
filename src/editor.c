@@ -296,6 +296,8 @@ void suspend(void)
     int r = kill(0, SIGSTOP);
     if (unlikely(r != 0)) {
         perror_msg("kill");
+        term_raw();
+        ui_start();
     }
 }
 
