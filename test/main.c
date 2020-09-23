@@ -20,6 +20,7 @@ void test_command(void);
 void test_editorconfig(void);
 void test_encoding(void);
 void test_filetype(void);
+void test_options(void);
 void test_syntax(void);
 void test_terminal(void);
 void test_util(void);
@@ -89,6 +90,7 @@ int main(void)
     EXPECT_STREQ(ver, editor.version);
 
     test_command();
+    test_options();
     test_editorconfig();
     test_encoding();
     test_filetype();
