@@ -464,37 +464,54 @@ static const OptionDesc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
 };
 
-static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
+static char *local_ptr(const OptionDesc *desc, const LocalOptions *opts)
 {
-    return (char*)opt + desc->offset;
+    return (char*)opts + desc->offset;
+}
+
+static char *global_ptr__(const OptionDesc *desc, const GlobalOptions *opts)
+{
+    return (char*)opts + desc->offset;
 }
 
 static char *global_ptr(const OptionDesc *desc)
 {
-    return (char*)&editor.options + desc->offset;
+    return global_ptr__(desc, &editor.options);
 }
 
 UNITTEST {
-    static const size_t alignments[] = {
-        [OPT_STR] = alignof(const char*),
-        [OPT_UINT] = alignof(unsigned int),
-        [OPT_ENUM] = alignof(unsigned int),
-        [OPT_BOOL] = alignof(bool),
-        [OPT_FLAG] = alignof(unsigned int),
+    static const struct {
+        size_t alignment;
+        OptionValue test_value;
+    } data[] = {
+        [OPT_STR] = {alignof(const char*), {.str_val = "test ..."}},
+        [OPT_UINT] = {alignof(unsigned int), {.uint_val = UINT_MAX}},
+        [OPT_ENUM] = {alignof(unsigned int), {.uint_val = 2}},
+        [OPT_BOOL] = {alignof(bool), {.bool_val = true}},
+        [OPT_FLAG] = {alignof(unsigned int), {.uint_val = 511}},
     };
 
-    // Check offset alignments
+    // Check accessor methods and offset alignments
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        size_t alignment = alignments[desc->ops->type];
-        if (desc->global) {
-            uintptr_t ptr_val = (uintptr_t)global_ptr(desc);
-            BUG_ON(ptr_val % alignment != 0);
-        }
-        if (desc->local) {
-            const UNUSED Buffer b;
-            uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &b.options);
-            BUG_ON(ptr_val % alignment != 0);
+        const size_t alignment = data[desc->ops->type].alignment;
+        const GlobalOptions global_opts = {.lock_files = false};
+        const LocalOptions local_opts = {.brace_indent = false};
+        void *ptrs[2] = {
+            desc->global ? global_ptr__(desc, &global_opts) : NULL,
+            desc->local ? local_ptr(desc, &local_opts) : NULL
+        };
+        for (size_t j = 0; j < ARRAY_COUNT(ptrs); j++) {
+            void *ptr = ptrs[j];
+            if (!ptr) {
+                continue;
+            }
+            BUG_ON((uintptr_t)ptr % alignment != 0);
+            const OptionValue val = data[desc->ops->type].test_value;
+            BUG_ON(desc->ops->equals(desc, ptr, val));
+            desc->ops->set(desc, ptr, val);
+            BUG_ON(!desc->ops->equals(desc, ptr, val));
+            BUG_ON(!desc->ops->equals(desc, ptr, desc->ops->get(desc, ptr)));
         }
     }
 
