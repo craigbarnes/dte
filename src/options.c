@@ -196,7 +196,8 @@ static bool validate_regex(const char *value)
 static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     OptionValue v;
-    v.str_val = *(char**)ptr;
+    const char **strp = ptr;
+    v.str_val = *strp;
     return v;
 }
 
@@ -224,19 +225,22 @@ static const char *str_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
 
 static bool str_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
-    return xstreq(*(char**)ptr, v.str_val);
+    const char **strp = ptr;
+    return xstreq(*strp, v.str_val);
 }
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     OptionValue v;
-    v.uint_val = *(unsigned int*)ptr;
+    unsigned int *valp = ptr;
+    v.uint_val = *valp;
     return v;
 }
 
 static void uint_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
-    *(unsigned int*)ptr = v.uint_val;
+    unsigned int *valp = ptr;
+    *valp = v.uint_val;
 }
 
 static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
@@ -265,19 +269,22 @@ static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue v
 
 static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
 {
-    return *(unsigned int*)ptr == value.uint_val;
+    unsigned int *valp = ptr;
+    return *valp == value.uint_val;
 }
 
 static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
 {
     OptionValue v;
-    v.bool_val = *(bool*)ptr;
+    bool *valp = ptr;
+    v.bool_val = *valp;
     return v;
 }
 
 static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
-    *(bool*)ptr = v.bool_val;
+    bool *valp = ptr;
+    *valp = v.bool_val;
 }
 
 static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
@@ -300,7 +307,8 @@ static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
 
 static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
-    return *(bool*)ptr == v.bool_val;
+    bool *valp = ptr;
+    return *valp == v.bool_val;
 }
 
 static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
