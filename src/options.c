@@ -50,7 +50,7 @@ typedef struct {
         } flag_opt;
     } u;
     // Optional
-    void (*on_change)(void);
+    void (*on_change)(bool global);
 } OptionDesc;
 
 typedef union {
@@ -131,7 +131,7 @@ typedef struct OptionOps {
 #define G(member) OLG(offsetof(GlobalOptions, member), false, true)
 #define C(member) OLG(offsetof(CommonOptions, member), true, true)
 
-static void filetype_changed(void)
+static void filetype_changed(bool UNUSED_ARG(global))
 {
     BUG_ON(window == NULL);
     Buffer *b = window->view->buffer;
@@ -139,7 +139,7 @@ static void filetype_changed(void)
     buffer_update_syntax(b);
 }
 
-static void set_window_title_changed(void)
+static void set_window_title_changed(bool UNUSED_ARG(global))
 {
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
@@ -151,11 +151,23 @@ static void set_window_title_changed(void)
     }
 }
 
-static void syntax_changed(void)
+static void syntax_changed(bool global)
 {
-    if (buffer) {
+    if (buffer && !global) {
         buffer_update_syntax(buffer);
     }
+}
+
+static void redraw_buffer(bool global)
+{
+    if (buffer && !global) {
+        mark_all_lines_changed(buffer);
+    }
+}
+
+static void redraw_screen(bool UNUSED_ARG(global))
+{
+    mark_everything_changed();
 }
 
 static bool validate_statusline_format(const char *value)
@@ -445,12 +457,12 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("brace-indent", L(brace_indent), NULL),
     ENUM_OPT("case-sensitive-search", G(case_sensitive_search), case_sensitive_search_enum, NULL),
     FLAG_OPT("detect-indent", C(detect_indent), detect_indent_values, NULL),
-    BOOL_OPT("display-invisible", G(display_invisible), NULL),
-    BOOL_OPT("display-special", G(display_special), NULL),
+    BOOL_OPT("display-invisible", G(display_invisible), redraw_screen),
+    BOOL_OPT("display-special", G(display_special), redraw_screen),
     BOOL_OPT("editorconfig", C(editorconfig), NULL),
     BOOL_OPT("emulate-tab", C(emulate_tab), NULL),
     UINT_OPT("esc-timeout", G(esc_timeout), 0, 2000, NULL),
-    BOOL_OPT("expand-tab", C(expand_tab), NULL),
+    BOOL_OPT("expand-tab", C(expand_tab), redraw_buffer),
     BOOL_OPT("file-history", C(file_history), NULL),
     UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
@@ -459,17 +471,17 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("indent-width", C(indent_width), 1, 8, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
-    UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, NULL),
-    BOOL_OPT("select-cursor-char", G(select_cursor_char), NULL),
+    UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
+    BOOL_OPT("select-cursor-char", G(select_cursor_char), redraw_screen),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
-    BOOL_OPT("show-line-numbers", G(show_line_numbers), NULL),
+    BOOL_OPT("show-line-numbers", G(show_line_numbers), redraw_screen),
     STR_OPT("statusline-left", G(statusline_left), validate_statusline_format, NULL),
     STR_OPT("statusline-right", G(statusline_right), validate_statusline_format, NULL),
     BOOL_OPT("syntax", C(syntax), syntax_changed),
-    BOOL_OPT("tab-bar", G(tab_bar), NULL),
-    UINT_OPT("tab-width", C(tab_width), 1, 8, NULL),
+    BOOL_OPT("tab-bar", G(tab_bar), redraw_screen),
+    UINT_OPT("tab-width", C(tab_width), 1, 8, redraw_buffer),
     UINT_OPT("text-width", C(text_width), 1, 1000, NULL),
-    FLAG_OPT("ws-error", C(ws_error), ws_error_values, NULL),
+    FLAG_OPT("ws-error", C(ws_error), ws_error_values, redraw_buffer),
 };
 
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
@@ -520,13 +532,11 @@ UNITTEST {
     BUG_ON(!validate_statusline_format(editor.options.statusline_right));
 }
 
-static void desc_set(const OptionDesc *desc, void *ptr, OptionValue value)
+static void desc_set(const OptionDesc *desc, void *ptr, bool global, OptionValue value)
 {
     desc->ops->set(desc, ptr, value);
     if (desc->on_change) {
-        desc->on_change();
-    } else {
-        mark_everything_changed();
+        desc->on_change(global);
     }
 }
 
@@ -591,10 +601,10 @@ static void do_set_option (
     }
 
     if (local) {
-        desc_set(desc, local_ptr(desc, &buffer->options), val);
+        desc_set(desc, local_ptr(desc, &buffer->options), false, val);
     }
     if (global) {
-        desc_set(desc, global_ptr(desc), val);
+        desc_set(desc, global_ptr(desc), true, val);
     }
 }
 
@@ -657,7 +667,7 @@ void toggle_option(const char *name, bool global, bool verbose)
         return;
     }
 
-    desc_set(desc, ptr, value);
+    desc_set(desc, ptr, global, value);
     if (verbose) {
         const char *str = desc->ops->string(desc, value);
         info_msg("%s = %s", desc->name, str);
@@ -694,7 +704,7 @@ void toggle_option_values (
 
     if (!error) {
         size_t i = current % count;
-        desc_set(desc, ptr, parsed_values[i]);
+        desc_set(desc, ptr, global, parsed_values[i]);
         if (verbose) {
             const char *str = desc->ops->string(desc, parsed_values[i]);
             info_msg("%s = %s", desc->name, str);
