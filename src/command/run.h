@@ -15,11 +15,11 @@ typedef struct {
 } CommandArgs;
 
 typedef struct {
-    const char name[15];
-    const char flags[8];
+    const char name[16];
+    const char flags[12];
     bool allow_in_rc;
-    unsigned int min_args;
-    unsigned int max_args;
+    uint8_t min_args;
+    uint8_t max_args; // 0xFF here means "no limit" (effectively SIZE_MAX)
     void (*cmd)(const CommandArgs *args);
 } Command;
 

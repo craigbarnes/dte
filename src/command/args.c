@@ -115,7 +115,9 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     if (a->nr_args < cmd->min_args) {
         return ARGERR_TOO_FEW_ARGUMENTS;
     }
-    if (a->nr_args > cmd->max_args) {
+
+    static_assert_compatible_types(cmd->max_args, uint8_t);
+    if (a->nr_args > cmd->max_args && cmd->max_args != 0xFF) {
         return ARGERR_TOO_MANY_ARGUMENTS;
     }
 
@@ -152,14 +154,14 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         error_msg (
             "Too few arguments (got: %zu, minimum: %u)",
             a->nr_args,
-            cmd->min_args
+            (unsigned int)cmd->min_args
         );
         break;
     case ARGERR_TOO_MANY_ARGUMENTS:
         error_msg (
             "Too many arguments (got: %zu, maximum: %u)",
             a->nr_args,
-            cmd->max_args
+            (unsigned int)cmd->max_args
         );
         break;
     default:
