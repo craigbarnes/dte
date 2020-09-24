@@ -240,7 +240,7 @@ void do_insert(const char *buf, size_t len)
     sanity_check();
 
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, nl ? LONG_MAX : view->cy);
+    buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
     if (buffer->syn) {
         hl_insert(buffer, view->cy, nl);
     }
@@ -335,11 +335,7 @@ char *do_delete(size_t len)
     sanity_check();
 
     view_update_cursor_y(view);
-    buffer_mark_lines_changed (
-        view->buffer,
-        view->cy,
-        deleted_nl ? LONG_MAX : view->cy
-    );
+    buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
     if (buffer->syn) {
         hl_delete(buffer, view->cy, deleted_nl);
     }
@@ -392,9 +388,9 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     view_update_cursor_y(view);
     if (del_nl == ins_nl) {
         // Some line(s) changed but lines after them did not move up or down
-        buffer_mark_lines_changed(view->buffer, view->cy, view->cy + del_nl);
+        buffer_mark_lines_changed(buffer, view->cy, view->cy + del_nl);
     } else {
-        buffer_mark_lines_changed(view->buffer, view->cy, LONG_MAX);
+        buffer_mark_lines_changed(buffer, view->cy, LONG_MAX);
     }
     if (buffer->syn) {
         hl_delete(buffer, view->cy, del_nl);

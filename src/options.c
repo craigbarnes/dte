@@ -133,17 +133,16 @@ typedef struct OptionOps {
 
 static void filetype_changed(bool UNUSED_ARG(global))
 {
-    BUG_ON(window == NULL);
-    Buffer *b = window->view->buffer;
-    set_file_options(b);
-    buffer_update_syntax(b);
+    BUG_ON(!buffer);
+    set_file_options(buffer);
+    buffer_update_syntax(buffer);
 }
 
 static void set_window_title_changed(bool UNUSED_ARG(global))
 {
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
-            update_term_title(window->view->buffer);
+            update_term_title(buffer);
         }
     } else {
         terminal.restore_title();

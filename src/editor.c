@@ -144,12 +144,11 @@ static void update_window_full(Window *w)
 
 static void restore_cursor(void)
 {
-    View *v = window->view;
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         term_move_cursor (
-            window->edit_x + v->cx_display - v->vx,
-            window->edit_y + v->cy - v->vy
+            window->edit_x + view->cx_display - view->vx,
+            window->edit_y + view->cy - view->vy
         );
         break;
     case INPUT_COMMAND:
@@ -177,8 +176,8 @@ static void end_update(void)
     term_show_cursor();
     term_output_flush();
 
-    window->view->buffer->changed_line_min = LONG_MAX;
-    window->view->buffer->changed_line_max = -1;
+    buffer->changed_line_min = LONG_MAX;
+    buffer->changed_line_max = -1;
     for_each_window(clear_update_tabbar);
 }
 
@@ -239,7 +238,7 @@ static void update_buffer_windows(const Buffer *b)
 void normal_update(void)
 {
     start_update();
-    update_term_title(window->view->buffer);
+    update_term_title(buffer);
     update_all_windows();
     update_command_line();
     end_update();
@@ -399,17 +398,16 @@ char dialog_prompt(const char *question, const char *choices)
 char status_prompt(const char *question, const char *choices)
 {
     // update_windows() assumes these have been called for the current view
-    View *v = window->view;
-    view_update_cursor_x(v);
-    view_update_cursor_y(v);
-    view_update(v);
+    view_update_cursor_x(view);
+    view_update_cursor_y(view);
+    view_update(view);
 
     // Set changed_line_min and changed_line_max before calling update_range()
-    mark_all_lines_changed(v->buffer);
+    mark_all_lines_changed(buffer);
 
     start_update();
-    update_term_title(v->buffer);
-    update_buffer_windows(v->buffer);
+    update_term_title(buffer);
+    update_buffer_windows(buffer);
     show_message(question, false);
     end_update();
 
@@ -448,15 +446,13 @@ static void update_screen(const ScreenState *s)
         return;
     }
 
-    View *v = window->view;
-    view_update_cursor_x(v);
-    view_update_cursor_y(v);
-    view_update(v);
+    view_update_cursor_x(view);
+    view_update_cursor_y(view);
+    view_update(view);
 
-    Buffer *b = v->buffer;
-    if (s->id == b->id) {
-        if (s->vx != v->vx || s->vy != v->vy) {
-            mark_all_lines_changed(b);
+    if (s->id == buffer->id) {
+        if (s->vx != view->vx || s->vy != view->vy) {
+            mark_all_lines_changed(buffer);
         } else {
             // Because of trailing whitespace highlighting and
             // highlighting current line in different color
@@ -464,21 +460,21 @@ static void update_screen(const ScreenState *s)
             // to be updated.
             //
             // Always update at least current line.
-            buffer_mark_lines_changed(b, s->cy, v->cy);
+            buffer_mark_lines_changed(buffer, s->cy, view->cy);
         }
-        if (s->is_modified != buffer_modified(b)) {
-            mark_buffer_tabbars_changed(b);
+        if (s->is_modified != buffer_modified(buffer)) {
+            mark_buffer_tabbars_changed(buffer);
         }
     } else {
         window->update_tabbar = true;
-        mark_all_lines_changed(b);
+        mark_all_lines_changed(buffer);
     }
 
     start_update();
     if (window->update_tabbar) {
-        update_term_title(b);
+        update_term_title(buffer);
     }
-    update_buffer_windows(b);
+    update_buffer_windows(buffer);
     update_command_line();
     end_update();
 }
@@ -496,13 +492,12 @@ void main_loop(void)
         }
 
         clear_error();
-        const View *v = window->view;
         const ScreenState s = {
-            .is_modified = buffer_modified(v->buffer),
-            .id = v->buffer->id,
-            .cy = v->cy,
-            .vx = v->vx,
-            .vy = v->vy
+            .is_modified = buffer_modified(buffer),
+            .id = buffer->id,
+            .cy = view->cy,
+            .vx = view->vx,
+            .vy = view->vy
         };
 
         handle_input(key);

@@ -72,7 +72,7 @@ static void do_selection(SelectionType sel)
     // Need to mark current line changed because cursor might
     // move up or down before screen is updated
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+    buffer_mark_lines_changed(buffer, view->cy, view->cy);
 }
 
 static char last_flag_or_default(const CommandArgs *a, char def)
@@ -1656,7 +1656,7 @@ static void cmd_select(const CommandArgs *a)
     // Need to mark current line changed because cursor might
     // move up or down before screen is updated
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+    buffer_mark_lines_changed(buffer, view->cy, view->cy);
 }
 
 static void cmd_set(const CommandArgs *a)

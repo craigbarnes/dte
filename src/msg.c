@@ -150,11 +150,11 @@ void activate_prev_message(void)
 
 void activate_current_message_save(void)
 {
-    const char *filename = view->buffer->abs_filename;
+    const char *filename = buffer->abs_filename;
     FileLocation *loc = xmalloc(sizeof(*loc));
     *loc = (FileLocation) {
         .filename = filename ? xstrdup(filename) : NULL,
-        .buffer_id = view->buffer->id,
+        .buffer_id = buffer->id,
         .line = view->cy + 1,
         .column = view->cx_char + 1
     };
