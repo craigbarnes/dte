@@ -183,6 +183,30 @@ static void test_expand_builtin_env(void)
     EXPECT_NULL(value);
 }
 
+static void test_find_normal_command(void)
+{
+    const Command *cmd = find_normal_command("alias");
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "alias");
+
+    cmd = find_normal_command("bind");
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "bind");
+
+    cmd = find_normal_command("wswap");
+    ASSERT_NONNULL(cmd);
+    EXPECT_STREQ(cmd->name, "wswap");
+
+    EXPECT_NULL(find_normal_command("alia"));
+    EXPECT_NULL(find_normal_command("aliass"));
+    EXPECT_NULL(find_normal_command("Alias"));
+    EXPECT_NULL(find_normal_command("bin "));
+    EXPECT_NULL(find_normal_command("bind "));
+    EXPECT_NULL(find_normal_command(" bind"));
+    EXPECT_NULL(find_normal_command("bind!"));
+    EXPECT_NULL(find_normal_command("bind\n"));
+}
+
 static void test_parse_args(void)
 {
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
@@ -384,6 +408,7 @@ void test_command(void)
     test_parse_command_arg();
     test_parse_commands();
     test_expand_builtin_env();
+    test_find_normal_command();
     test_parse_args();
     test_escape_command_arg();
     test_command_struct_layout();
