@@ -38,14 +38,6 @@
     #define CLANG_AT_LEAST(x, y) 0
 #endif
 
-// __has_extension is a Clang macro used to determine if a feature is
-// available even if not standardized in the current "-std" mode.
-#ifdef __has_extension
-    #define HAS_EXTENSION(x) __has_extension(x)
-#else
-    #define HAS_EXTENSION(x) 0
-#endif
-
 #ifdef __has_attribute
     #define HAS_ATTRIBUTE(x) __has_attribute(x)
 #else
@@ -68,6 +60,15 @@
     #define HAS_FEATURE(x) __has_feature(x)
 #else
     #define HAS_FEATURE(x) 0
+#endif
+
+// __has_extension() is a Clang macro used to determine if a feature is
+// available even if not standardized in the current "-std" mode.
+#ifdef __has_extension
+    #define HAS_EXTENSION(x) __has_extension(x)
+#else
+    // Clang versions prior to 3.0 only supported __has_feature()
+    #define HAS_EXTENSION(x) HAS_FEATURE(x)
 #endif
 
 #if defined(__SANITIZE_ADDRESS__) || HAS_FEATURE(address_sanitizer)
