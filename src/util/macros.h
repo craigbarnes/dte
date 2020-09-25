@@ -142,6 +142,10 @@
     #define SECTION(x)
 #endif
 
+#if GNUC_AT_LEAST(3, 0) || HAS_EXTENSION(typeof) || defined(__TINYC__)
+    #define HAS_TYPEOF 1
+#endif
+
 #if GNUC_AT_LEAST(3, 1) || HAS_BUILTIN(__builtin_prefetch)
     #define PREFETCH(addr, ...) __builtin_prefetch(addr, __VA_ARGS__)
 #else

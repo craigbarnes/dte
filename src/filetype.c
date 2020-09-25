@@ -30,6 +30,14 @@ static int ft_compare(const void *key, const void *elem)
 #include "filetype/ignored-exts.c"
 #include "filetype/signatures.c"
 
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(basenames, key);
+    CHECK_BSEARCH_ARRAY(dotfiles, key);
+    CHECK_BSEARCH_ARRAY(extensions, ext);
+    CHECK_BSEARCH_ARRAY(interpreters, key);
+    CHECK_BSEARCH_STR_ARRAY(ignored_extensions);
+}
+
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
 typedef struct {
