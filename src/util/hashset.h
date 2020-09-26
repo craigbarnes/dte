@@ -41,8 +41,7 @@ static inline const char *str_intern(const char *str)
 static inline StringView strview_intern(const char *str)
 {
     size_t len = strlen(str);
-    const char *data = mem_intern(str, len);
-    return string_view(data, len);;
+    return string_view(mem_intern(str, len), len);
 }
 
 #endif
