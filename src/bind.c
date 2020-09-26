@@ -32,10 +32,10 @@ static ssize_t get_lookup_table_index(KeyCode k)
     const KeyCode modifiers = keycode_get_modifiers(k);
     const KeyCode key = keycode_get_key(k);
 
-    static_assert(MOD_MASK >> 24 == (1 | 2 | 4));
+    static_assert(MOD_MASK >> MOD_OFFSET == (1 | 2 | 4));
 
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        const size_t mod_offset = (modifiers >> 24) * NR_SPECIAL_KEYS;
+        const size_t mod_offset = (modifiers >> MOD_OFFSET) * NR_SPECIAL_KEYS;
         return (2 * 128) + mod_offset + (key - KEY_SPECIAL_MIN);
     }
 
@@ -245,8 +245,8 @@ String dump_bindings(void)
         append_lookup_table_binding(&buf, MOD_META | k);
     }
 
-    static_assert((MOD_MASK >> 24) == 7);
-    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << 24) {
+    static_assert(MOD_MASK >> MOD_OFFSET == 7);
+    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << MOD_OFFSET) {
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
             append_lookup_table_binding(&buf, modifiers | k);
         }

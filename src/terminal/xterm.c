@@ -8,6 +8,7 @@
 #include "xterm.h"
 #include "output.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/macros.h"
 #include "util/unicode.h"
 
@@ -36,11 +37,16 @@ static const KeyCode special_keys[] = {
 
 static KeyCode decode_modifiers(uint32_t n)
 {
-    static_assert(1 << 24 == MOD_SHIFT);
-    static_assert(2 << 24 == MOD_META);
-    static_assert(4 << 24 == MOD_CTRL);
     n--;
-    return (n > 7) ? 0 : n << 24;
+    if (unlikely(n > 15)) {
+        return 0;
+    }
+
+    // Decode Meta (bit 4) and/or Alt (bit 2) as just Meta
+    KeyCode mods = (n & 7) | ((n & 8) >> 2);
+    BUG_ON(mods > 7);
+
+    return mods << MOD_OFFSET;
 }
 
 static KeyCode decode_special_key(uint32_t n)

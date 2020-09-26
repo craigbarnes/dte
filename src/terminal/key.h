@@ -46,11 +46,12 @@ enum {
 
     KEY_SPECIAL_MAX = KEY_F12,
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
+    MOD_OFFSET = 24,
 
     // Modifier bit flags (as described above)
-    MOD_SHIFT = 0x1000000,
-    MOD_META  = 0x2000000,
-    MOD_CTRL  = 0x4000000,
+    MOD_SHIFT = 1 << MOD_OFFSET,
+    MOD_META  = 2 << MOD_OFFSET,
+    MOD_CTRL  = 4 << MOD_OFFSET,
     MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL,
 
     KEY_PASTE = 0x8000000,

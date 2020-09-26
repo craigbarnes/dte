@@ -6,6 +6,7 @@
 #include "terminal/xterm.h"
 #include "util/debug.h"
 #include "util/unicode.h"
+#include "util/xsnprintf.h"
 
 static void test_parse_term_color(void)
 {
@@ -319,73 +320,94 @@ static void test_xterm_parse_key(void)
 static void test_xterm_parse_key_combo(void)
 {
     static const struct {
-        char escape_sequence[8];
+        char key_str[3];
+        char final_byte;
         KeyCode key;
     } templates[] = {
-        {"\033[1;_A", KEY_UP},
-        {"\033[1;_B", KEY_DOWN},
-        {"\033[1;_C", KEY_RIGHT},
-        {"\033[1;_D", KEY_LEFT},
-        {"\033[1;_E", KEY_BEGIN},
-        {"\033[1;_F", KEY_END},
-        {"\033[1;_H", KEY_HOME},
-        {"\033[2;_~", KEY_INSERT},
-        {"\033[3;_~", KEY_DELETE},
-        {"\033[5;_~", KEY_PAGE_UP},
-        {"\033[6;_~", KEY_PAGE_DOWN},
-        {"\033[1;_P", KEY_F1},
-        {"\033[1;_Q", KEY_F2},
-        {"\033[1;_R", KEY_F3},
-        {"\033[1;_S", KEY_F4},
-        {"\033[11;_~", KEY_F1},
-        {"\033[12;_~", KEY_F2},
-        {"\033[13;_~", KEY_F3},
-        {"\033[14;_~", KEY_F4},
-        {"\033[15;_~", KEY_F5},
-        {"\033[17;_~", KEY_F6},
-        {"\033[18;_~", KEY_F7},
-        {"\033[19;_~", KEY_F8},
-        {"\033[20;_~", KEY_F9},
-        {"\033[21;_~", KEY_F10},
-        {"\033[23;_~", KEY_F11},
-        {"\033[24;_~", KEY_F12},
+        {"1", 'A', KEY_UP},
+        {"1", 'B', KEY_DOWN},
+        {"1", 'C', KEY_RIGHT},
+        {"1", 'D', KEY_LEFT},
+        {"1", 'E', KEY_BEGIN},
+        {"1", 'F', KEY_END},
+        {"1", 'H', KEY_HOME},
+        {"1", 'P', KEY_F1},
+        {"1", 'Q', KEY_F2},
+        {"1", 'R', KEY_F3},
+        {"1", 'S', KEY_F4},
+        {"2", '~', KEY_INSERT},
+        {"3", '~', KEY_DELETE},
+        {"5", '~', KEY_PAGE_UP},
+        {"6", '~', KEY_PAGE_DOWN},
+        {"11", '~', KEY_F1},
+        {"12", '~', KEY_F2},
+        {"13", '~', KEY_F3},
+        {"14", '~', KEY_F4},
+        {"15", '~', KEY_F5},
+        {"17", '~', KEY_F6},
+        {"18", '~', KEY_F7},
+        {"19", '~', KEY_F8},
+        {"20", '~', KEY_F9},
+        {"21", '~', KEY_F10},
+        {"23", '~', KEY_F11},
+        {"24", '~', KEY_F12},
     };
 
     static const struct {
-        char ch;
+        char mod_str[4];
         KeyCode mask;
     } modifiers[] = {
-        {'2', MOD_SHIFT},
-        {'3', MOD_META},
-        {'4', MOD_SHIFT | MOD_META},
-        {'5', MOD_CTRL},
-        {'6', MOD_SHIFT | MOD_CTRL},
-        {'7', MOD_META | MOD_CTRL},
-        {'8', MOD_SHIFT | MOD_META | MOD_CTRL}
+        {"0", 0},
+        {"1", 0},
+        {"2", MOD_SHIFT},
+        {"3", MOD_META},
+        {"4", MOD_SHIFT | MOD_META},
+        {"5", MOD_CTRL},
+        {"6", MOD_SHIFT | MOD_CTRL},
+        {"7", MOD_META | MOD_CTRL},
+        {"8", MOD_SHIFT | MOD_META | MOD_CTRL},
+        {"9", MOD_META},
+        {"10", MOD_META | MOD_SHIFT},
+        {"11", MOD_META},
+        {"12", MOD_META | MOD_SHIFT},
+        {"13", MOD_META | MOD_CTRL},
+        {"14", MOD_META | MOD_CTRL | MOD_SHIFT},
+        {"15", MOD_META | MOD_CTRL},
+        {"16", MOD_META | MOD_CTRL | MOD_SHIFT},
+        {"17", 0},
+        {"18", 0},
+        {"400", 0},
     };
 
     FOR_EACH_I(i, templates) {
         FOR_EACH_I(j, modifiers) {
-            char seq[8];
-            memcpy(seq, templates[i].escape_sequence, 8);
-            BUG_ON(seq[7] != '\0');
-            char *underscore = strchr(seq, '_');
-            ASSERT_NONNULL(underscore);
-            *underscore = modifiers[j].ch;
-            size_t seq_length = strlen(seq);
-            KeyCode key;
+            char seq[16];
+            size_t seq_length = xsnprintf (
+                seq,
+                sizeof seq,
+                "\033[%s;%s%c",
+                templates[i].key_str,
+                modifiers[j].mod_str,
+                templates[i].final_byte
+            );
+            KeyCode key = 24;
             ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+            if (modifiers[j].mask == 0) {
+                EXPECT_EQ(parsed_length, 0);
+                EXPECT_EQ(key, 24);
+                continue;
+            }
             EXPECT_EQ(parsed_length, seq_length);
             EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
             // Truncated
-            key = 0x18;
+            key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
                 parsed_length = xterm_parse_key(seq, n, &key);
                 EXPECT_EQ(parsed_length, -1);
-                EXPECT_EQ(key, 0x18);
+                EXPECT_EQ(key, 25);
             }
             // Overlength
-            key = 0x18;
+            key = 26;
             seq[seq_length] = '~';
             parsed_length = xterm_parse_key(seq, seq_length + 1, &key);
             EXPECT_EQ(parsed_length, seq_length);
