@@ -958,7 +958,7 @@ Example uses:
 
     exec-open -s find . -type f -name *.h
     exec-open -s git ls-files --modified
-    exec-open fzf --reverse
+    exec-open fzf -m --reverse
 
 ## Other Commands
 
