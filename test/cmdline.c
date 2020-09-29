@@ -10,7 +10,7 @@
 static void test_cmdline_handle_key(void)
 {
     CommandLine *c = &editor.cmdline;
-    PointerArray *h = &editor.command_history;
+    History *h = &editor.command_history;
 
     int ret = cmdline_handle_key(c, h, 'a');
     EXPECT_EQ(ret, CMDLINE_KEY_HANDLED);

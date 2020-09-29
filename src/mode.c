@@ -61,7 +61,7 @@ static void command_mode_keypress(KeyCode key)
         if (str[0] != ' ') {
             // This is done before handle_command() because "command [text]"
             // can modify the contents of the command-line
-            history_add(&editor.command_history, str, command_history_size);
+            history_add(&editor.command_history, str);
         }
         handle_command(&commands, str, true);
         return;
@@ -111,7 +111,7 @@ static void search_mode_keypress(KeyCode key)
             const char *str = string_borrow_cstring(&editor.cmdline.buf);
             search_set_regexp(str);
             search_next();
-            history_add(&editor.search_history, str, search_history_size);
+            history_add(&editor.search_history, str);
             const char *args[] = {str, NULL};
             macro_command_hook("search", (char**)args);
         } else {

@@ -6,14 +6,17 @@
 #include <sys/types.h>
 #include "util/ptr-array.h"
 
-#define search_history_size 100
-#define command_history_size 500
+typedef struct {
+    const char *filename;
+    size_t max_entries;
+    PointerArray entries;
+} History;
 
 FILE *history_fopen(const char *filename);
-void history_add(PointerArray *history, const char *text, size_t max_entries);
-bool history_search_forward(const PointerArray *history, ssize_t *pos, const char *text);
-bool history_search_backward(const PointerArray *history, ssize_t *pos, const char *text);
-void history_load(PointerArray *history, const char *filename, size_t max_entries);
-void history_save(const PointerArray *history, const char *filename);
+void history_add(History *history, const char *text);
+bool history_search_forward(const History *history, ssize_t *pos, const char *text);
+bool history_search_backward(const History *history, ssize_t *pos, const char *text);
+void history_load(History *history, const char *filename);
+void history_save(const History *history);
 
 #endif

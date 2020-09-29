@@ -180,11 +180,8 @@ void cmdline_set_text(CommandLine *c, const char *text)
     c->search_pos = -1;
 }
 
-CommandLineResult cmdline_handle_key (
-    CommandLine *c,
-    PointerArray *history,
-    KeyCode key
-) {
+CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key)
+{
     if (key <= KEY_UNICODE_MAX) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
         return CMDLINE_KEY_HANDLED;
@@ -262,28 +259,28 @@ CommandLineResult cmdline_handle_key (
         goto handled;
 
     case KEY_UP:
-        if (!history) {
+        if (!hist) {
             return CMDLINE_UNKNOWN_KEY;
         }
         if (c->search_pos < 0) {
             free(c->search_text);
             c->search_text = string_clone_cstring(&c->buf);
-            c->search_pos = history->count;
+            c->search_pos = hist->entries.count;
         }
-        if (history_search_forward(history, &c->search_pos, c->search_text)) {
-            set_text(c, history->ptrs[c->search_pos]);
+        if (history_search_forward(hist, &c->search_pos, c->search_text)) {
+            set_text(c, hist->entries.ptrs[c->search_pos]);
         }
         goto handled;
 
     case KEY_DOWN:
-        if (!history) {
+        if (!hist) {
             return CMDLINE_UNKNOWN_KEY;
         }
         if (c->search_pos < 0) {
             goto handled;
         }
-        if (history_search_backward(history, &c->search_pos, c->search_text)) {
-            set_text(c, history->ptrs[c->search_pos]);
+        if (history_search_backward(hist, &c->search_pos, c->search_text)) {
+            set_text(c, hist->entries.ptrs[c->search_pos]);
         } else {
             set_text(c, c->search_text);
             c->search_pos = -1;

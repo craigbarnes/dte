@@ -379,9 +379,7 @@ loop_break:
         if (rc) {
             read_config(&commands, rc, CFG_MUST_EXIST);
         } else {
-            char *filename = editor_file("rc");
-            read_config(&commands, filename, CFG_NOFLAGS);
-            free(filename);
+            read_config(&commands, editor_file("rc"), CFG_NOFLAGS);
         }
     }
 
@@ -393,31 +391,15 @@ loop_break:
     set_signal_handlers();
     set_fatal_error_cleanup_handler(term_cleanup);
 
-    char *file_history_filename = NULL;
-    char *command_history_filename = NULL;
-    char *search_history_filename = NULL;
+    const char *file_history_filename = NULL;
     if (load_and_save_history) {
         file_history_filename = editor_file("file-history");
-        command_history_filename = editor_file("command-history");
-        search_history_filename = editor_file("search-history");
-
         load_file_history(file_history_filename);
-
-        history_load (
-            &editor.command_history,
-            command_history_filename,
-            command_history_size
-        );
-
-        history_load (
-            &editor.search_history,
-            search_history_filename,
-            search_history_size
-        );
-        if (editor.search_history.count) {
-            search_set_regexp (
-                editor.search_history.ptrs[editor.search_history.count - 1]
-            );
+        history_load(&editor.command_history, editor_file("command-history"));
+        history_load(&editor.search_history, editor_file("search-history"));
+        size_t n = editor.search_history.entries.count;
+        if (n > 0) {
+            search_set_regexp(editor.search_history.entries.ptrs[n - 1]);
         }
     }
 
@@ -501,14 +483,9 @@ loop_break:
     remove_frame(root_frame);
 
     if (load_and_save_history) {
-        history_save(&editor.command_history, command_history_filename);
-        free(command_history_filename);
-
-        history_save(&editor.search_history, search_history_filename);
-        free(search_history_filename);
-
+        history_save(&editor.command_history);
+        history_save(&editor.search_history);
         save_file_history(file_history_filename);
-        free(file_history_filename);
     }
 
     if (stdout_buffer) {

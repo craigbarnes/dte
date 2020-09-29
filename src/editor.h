@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include "cmdline.h"
 #include "encoding.h"
+#include "history.h"
 #include "options.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -38,8 +39,8 @@ typedef struct {
     int exit_code;
     size_t cmdline_x;
     PointerArray buffers;
-    PointerArray search_history;
-    PointerArray command_history;
+    History search_history;
+    History command_history;
     const char *const version;
     volatile sig_atomic_t resized;
 } EditorState;
@@ -57,7 +58,7 @@ static inline void set_input_mode(InputMode mode)
 }
 
 void init_editor_state(void);
-char *editor_file(const char *name) XSTRDUP;
+const char *editor_file(const char *name) NONNULL_ARGS_AND_RETURN;
 char status_prompt(const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);

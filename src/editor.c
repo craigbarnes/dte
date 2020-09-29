@@ -21,6 +21,7 @@
 #include "util/hashset.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
 #include "../build/version.h"
@@ -33,8 +34,6 @@ EditorState editor = {
     .resized = false,
     .exit_code = EX_OK,
     .buffers = PTR_ARRAY_INIT,
-    .search_history = PTR_ARRAY_INIT,
-    .command_history = PTR_ARRAY_INIT,
     .version = version,
     .cmdline_x = 0,
     .cmdline = {
@@ -42,6 +41,16 @@ EditorState editor = {
         .pos = 0,
         .search_pos = -1,
         .search_text = NULL
+    },
+    .command_history = {
+        .filename = NULL,
+        .max_entries = 512,
+        .entries = PTR_ARRAY_INIT
+    },
+    .search_history = {
+        .filename = NULL,
+        .max_entries = 128,
+        .entries = PTR_ARRAY_INIT
     },
     .options = {
         .auto_indent = true,
@@ -300,9 +309,11 @@ void suspend(void)
     }
 }
 
-char *editor_file(const char *name)
+const char *editor_file(const char *name)
 {
-    return xasprintf("%s/%s", editor.user_config_dir, name);
+    char buf[4096];
+    size_t n = xsnprintf(buf, sizeof buf, "%s/%s", editor.user_config_dir, name);
+    return mem_intern(buf, n);
 }
 
 static char get_choice(const char *choices)

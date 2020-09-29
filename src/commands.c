@@ -1615,7 +1615,7 @@ static void cmd_search(const CommandArgs *a)
             search_next();
         }
         if (history) {
-            history_add(&editor.search_history, pattern, search_history_size);
+            history_add(&editor.search_history, pattern);
         }
     } else if (next) {
         search_next();
