@@ -31,10 +31,10 @@ void hashset_init(HashSet *set, size_t size, bool icase)
     set->nr_entries = 0;
 
     if (icase) {
-        set->hash = fnv_1a_32_hash_icase;
+        set->hash = fnv_1a_hash_icase;
         set->equal = mem_equal_icase;
     } else {
-        set->hash = fnv_1a_32_hash;
+        set->hash = fnv_1a_hash;
         set->equal = mem_equal;
     }
 }
@@ -54,8 +54,8 @@ void hashset_free(HashSet *set)
 
 static size_t get_slot(const HashSet *set, const char *str, size_t str_len)
 {
-    const uint32_t hash = set->hash(str, str_len);
-    return (size_t)hash & (set->table_size - 1);
+    const size_t hash = set->hash(str, str_len);
+    return hash & (set->table_size - 1);
 }
 
 HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len)

@@ -10,42 +10,34 @@
 #define FNV_32_PRIME UINT32_C(16777619)
 #define FNV_64_PRIME UINT64_C(1099511628211)
 
-static inline uint32_t fnv_1a_32_hash(const unsigned char *str, size_t n)
+static inline size_t fnv_1a_init(void)
 {
-    uint32_t hash = FNV_32_INIT;
+    return (sizeof(size_t) > 4) ? FNV_64_INIT : FNV_32_INIT;
+}
+
+static inline size_t fnv_1a_prime(void)
+{
+    return (sizeof(size_t) > 4) ? FNV_64_PRIME : FNV_32_PRIME;
+}
+
+static inline size_t fnv_1a_hash(const unsigned char *str, size_t n)
+{
+    const size_t prime = fnv_1a_prime();
+    size_t hash = fnv_1a_init();
     while (n--) {
         hash ^= *str++;
-        hash *= FNV_32_PRIME;
+        hash *= prime;
     }
     return hash;
 }
 
-static inline uint32_t fnv_1a_32_hash_icase(const unsigned char *str, size_t n)
+static inline size_t fnv_1a_hash_icase(const unsigned char *str, size_t n)
 {
-    uint32_t hash = FNV_32_INIT;
+    const size_t prime = fnv_1a_prime();
+    size_t hash = fnv_1a_init();
     while (n--) {
         hash ^= ascii_tolower(*str++);
-        hash *= FNV_32_PRIME;
-    }
-    return hash;
-}
-
-static inline uint64_t fnv_1a_64_hash(const unsigned char *str, size_t n)
-{
-    uint64_t hash = FNV_64_INIT;
-    while (n--) {
-        hash ^= *str++;
-        hash *= FNV_64_PRIME;
-    }
-    return hash;
-}
-
-static inline uint64_t fnv_1a_64_hash_icase(const unsigned char *str, size_t n)
-{
-    uint64_t hash = FNV_64_INIT;
-    while (n--) {
-        hash ^= ascii_tolower(*str++);
-        hash *= FNV_64_PRIME;
+        hash *= prime;
     }
     return hash;
 }

@@ -853,33 +853,6 @@ static void test_ptr_array(void)
     EXPECT_EQ(a.count, 0);
 }
 
-static void test_hash(void)
-{
-    const char *s = "";
-    size_t n = 0;
-    EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), FNV_32_INIT);
-    EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), FNV_64_INIT);
-    EXPECT_UINT_EQ(fnv_1a_32_hash_icase(s, n), FNV_32_INIT);
-    EXPECT_UINT_EQ(fnv_1a_64_hash_icase(s, n), FNV_64_INIT);
-
-    s = "Hello, World!";
-    n = strlen(s);
-    EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), 0x5aecf734);
-    EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), 0x6ef05bd7cc857c54);
-    EXPECT_UINT_EQ(fnv_1a_32_hash_icase(s, n), 0x8a0c8a74);
-    EXPECT_UINT_EQ(fnv_1a_64_hash_icase(s, n), 0xe60e63e648826894);
-
-    s = "hello, world!";
-    n = strlen(s);
-    EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), fnv_1a_32_hash_icase(s, n));
-    EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), fnv_1a_64_hash_icase(s, n));
-
-    s = "\x80\b\t\r\n\x01\xfe\xff";
-    n = strlen(s);
-    EXPECT_UINT_EQ(fnv_1a_32_hash(s, n), 0xcb9e00f5);
-    EXPECT_UINT_EQ(fnv_1a_64_hash(s, n), 0xf9a1754aa1678335);
-}
-
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -1272,7 +1245,6 @@ void test_util(void)
     test_u_set_char();
     test_u_prev_char();
     test_ptr_array();
-    test_hash();
     test_hashset();
     test_round_size_to_next_multiple();
     test_round_size_to_next_power_of_2();
