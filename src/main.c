@@ -352,7 +352,8 @@ loop_break:
             stdout_buffer->stdout_buffer = true;
             set_display_filename(stdout_buffer, xmemdup_literal("(stdin|stdout)"));
         } else {
-            stdout_buffer = open_empty_buffer("(stdout)");
+            stdout_buffer = open_empty_buffer();
+            set_display_filename(stdout_buffer, xmemdup_literal("(stdout)"));
             stdout_buffer->stdout_buffer = true;
             stdout_buffer->temporary = true;
         }

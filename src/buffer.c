@@ -79,13 +79,9 @@ Buffer *buffer_new(const Encoding *encoding)
     return b;
 }
 
-Buffer *open_empty_buffer(const char *display_name)
+Buffer *open_empty_buffer(void)
 {
     Buffer *b = buffer_new(&editor.charset);
-    BUG_ON(b->display_filename);
-    if (display_name) {
-        b->display_filename = xstrdup(display_name);
-    }
 
     // At least one block required
     Block *blk = block_new(1);

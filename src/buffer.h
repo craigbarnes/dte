@@ -93,7 +93,7 @@ bool buffer_fstat(Buffer *b, int fd) NONNULL_ARGS;
 Buffer *find_buffer(const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(unsigned long id);
 Buffer *buffer_new(const Encoding *encoding) RETURNS_NONNULL;
-Buffer *open_empty_buffer(const char *display_name) RETURNS_NONNULL;
+Buffer *open_empty_buffer(void) RETURNS_NONNULL;
 void free_buffer(Buffer *b) NONNULL_ARGS;
 void free_blocks(Buffer *b) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *b) NONNULL_ARGS;

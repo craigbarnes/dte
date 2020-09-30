@@ -35,7 +35,7 @@ View *window_add_buffer(Window *w, Buffer *b)
 
 View *window_open_empty_buffer(Window *w)
 {
-    return window_add_buffer(w, open_empty_buffer(NULL));
+    return window_add_buffer(w, open_empty_buffer());
 }
 
 View *window_open_buffer (
@@ -56,8 +56,9 @@ View *window_open_buffer (
         Buffer *b = find_buffer(absolute);
         if (b) {
             if (!streq(absolute, b->abs_filename)) {
+                const char *bufname = buffer_filename(b);
                 char *s = short_filename(absolute);
-                info_msg("%s and %s are the same file", s, b->display_filename);
+                info_msg("%s and %s are the same file", s, bufname);
                 free(s);
             }
             free(absolute);

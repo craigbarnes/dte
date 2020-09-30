@@ -499,7 +499,7 @@ static void string_append_frame(String *str, const Frame *f, int level)
             (level + 1) * 4, "",
             w->x, w->y,
             w->w, w->h,
-            w->view->buffer->display_filename
+            buffer_filename(w->view->buffer)
         );
         return;
     }
