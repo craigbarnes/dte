@@ -35,7 +35,7 @@ View *window_add_buffer(Window *w, Buffer *b)
 
 View *window_open_empty_buffer(Window *w)
 {
-    return window_add_buffer(w, open_empty_buffer("(No name)"));
+    return window_add_buffer(w, open_empty_buffer(NULL));
 }
 
 View *window_open_buffer (
@@ -297,6 +297,9 @@ static bool is_useless_empty_view(const View *v)
         return false;
     }
     if (v->buffer->abs_filename || v->buffer->change_head.nr_prev != 0) {
+        return false;
+    }
+    if (v->buffer->display_filename) {
         return false;
     }
     return true;

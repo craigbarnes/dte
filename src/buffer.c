@@ -50,7 +50,7 @@ void buffer_mark_lines_changed(Buffer *b, long min, long max)
 
 const char *buffer_filename(const Buffer *b)
 {
-    return b->display_filename;
+    return b->display_filename ? b->display_filename : "(No name)";
 }
 
 Buffer *buffer_new(const Encoding *encoding)
@@ -82,7 +82,10 @@ Buffer *buffer_new(const Encoding *encoding)
 Buffer *open_empty_buffer(const char *display_name)
 {
     Buffer *b = buffer_new(&editor.charset);
-    set_display_filename(b, xstrdup(display_name));
+    BUG_ON(b->display_filename);
+    if (display_name) {
+        b->display_filename = xstrdup(display_name);
+    }
 
     // At least one block required
     Block *blk = block_new(1);

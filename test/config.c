@@ -157,13 +157,13 @@ static void test_global_state(void)
     ASSERT_PTREQ(buffer->views.ptrs[0], view);
     ASSERT_PTREQ(editor.buffers.ptrs[0], buffer);
 
-    ASSERT_NONNULL(buffer->display_filename);
     ASSERT_NONNULL(buffer->encoding.name);
     ASSERT_NONNULL(buffer->blocks.next);
     ASSERT_PTREQ(&buffer->blocks, view->cursor.head);
     ASSERT_PTREQ(buffer->blocks.next, view->cursor.blk);
     ASSERT_PTREQ(buffer->cur_change, &buffer->change_head);
     ASSERT_PTREQ(buffer->saved_change, buffer->cur_change);
+    EXPECT_NULL(buffer->display_filename);
     EXPECT_EQ(buffer->id, 1);
 }
 
