@@ -243,13 +243,15 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
     } else {
         if (!buffer_fstat(b, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
-            xclose(fd);
-            return false;
+            goto error;
         }
         if (!S_ISREG(b->file.mode)) {
             error_msg("Not a regular file %s", filename);
-            xclose(fd);
-            return false;
+            goto error;
+        }
+        if (unlikely(b->file.size < 0)) {
+            error_msg("Invalid file size: %jd", (intmax_t)b->file.size);
+            goto error;
         }
         if (b->file.size / 1024 / 1024 > editor.options.filesize_limit) {
             error_msg (
@@ -257,14 +259,11 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
                 editor.options.filesize_limit,
                 filename
             );
-            xclose(fd);
-            return false;
+            goto error;
         }
-
         if (!read_blocks(b, fd)) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
-            xclose(fd);
-            return false;
+            goto error;
         }
         xclose(fd);
     }
@@ -274,6 +273,10 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     return true;
+
+error:
+    xclose(fd);
+    return false;
 }
 
 static mode_t get_umask(void)
