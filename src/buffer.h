@@ -51,8 +51,9 @@ typedef struct Buffer {
     bool locked;
     bool setup;
     bool crlf_newlines;
+    bool existing_file_had_utf8_bom;
 
-    // Encoding of the file. Buffer always contains UTF-8.
+    // Encoding of the file (buffer always contains UTF-8)
     Encoding encoding;
 
     LocalOptions options;

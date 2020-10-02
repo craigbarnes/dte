@@ -75,6 +75,9 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
         const size_t bom_len = get_bom_for_encoding(bom_type)->len;
         buf += bom_len;
         size -= bom_len;
+        if (bom_type == UTF8) {
+            b->existing_file_had_utf8_bom = true;
+        }
     }
 
     FileDecoder *dec = new_file_decoder(b->encoding.name, buf, size);
@@ -290,7 +293,7 @@ static mode_t get_umask(void)
 static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_type)
 {
     size_t size = 0;
-    if (bom_type != UTF8) {
+    if (bom_type != UTF8 || b->existing_file_had_utf8_bom) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
             size = bom->len;
