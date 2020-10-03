@@ -33,7 +33,9 @@ static inline uint8_t cmdargs_flagset_idx(unsigned char flag)
 
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 {
-    return (a->flag_set & (UINT64_C(1) << cmdargs_flagset_idx(flag))) != 0;
+    uint64_t bitmask = UINT64_C(1) << cmdargs_flagset_idx(flag);
+    static_assert_compatible_types(bitmask, a->flag_set);
+    return (a->flag_set & bitmask) != 0;
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
