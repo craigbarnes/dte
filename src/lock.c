@@ -140,10 +140,10 @@ static bool lock_or_unlock(const char *filename, bool lock)
             goto error;
         }
         size = 0;
-    }
-    if (size > 0 && buf[size - 1] != '\n') {
+    } else if (size > 0 && buf[size - 1] != '\n') {
         buf[size++] = '\n';
     }
+
     pid_t pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
@@ -156,29 +156,34 @@ static bool lock_or_unlock(const char *filename, bool lock)
             error_msg("File is locked (%s) by process %jd", file_locks, xpid);
         }
     }
+
     if (xwrite(wfd, buf, size) < 0) {
         error_msg("Error writing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
-    if (xclose(wfd)) {
+
+    int r = xclose(wfd);
+    wfd = -1;
+    if (r != 0) {
         error_msg("Error closing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }
+
     if (rename(file_locks_lock, file_locks)) {
-        error_msg (
-            "Renaming %s to %s: %s",
-            file_locks_lock,
-            file_locks,
-            strerror(errno)
-        );
+        const char *err = strerror(errno);
+        error_msg("Renaming %s to %s: %s", file_locks_lock, file_locks, err);
         goto error;
     }
+
     free(buf);
     return (pid == 0);
+
 error:
     unlink(file_locks_lock);
     free(buf);
-    xclose(wfd);
+    if (wfd >= 0) {
+        xclose(wfd);
+    }
     return false;
 }
 
