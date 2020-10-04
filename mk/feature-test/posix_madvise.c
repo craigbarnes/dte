@@ -2,5 +2,6 @@
 
 int main(void)
 {
-    return (posix_madvise)(main, 64, POSIX_MADV_SEQUENTIAL);
+    static char buf[256];
+    return (posix_madvise)(buf, sizeof buf, POSIX_MADV_SEQUENTIAL);
 }
