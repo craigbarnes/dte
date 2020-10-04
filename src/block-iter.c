@@ -109,7 +109,6 @@ size_t block_iter_get_char(BlockIter *bi, CodePoint *up)
 size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
-
     if (offset == bi->blk->size) {
         if (bi->blk->node.next == bi->head) {
             return 0;

@@ -349,8 +349,7 @@ static void cmd_delete_eol(const CommandArgs *a)
     BlockIter bi = view->cursor;
     if (delete_newline_if_at_eol) {
         CodePoint ch;
-        block_iter_get_char(&view->cursor, &ch);
-        if (ch == '\n') {
+        if (block_iter_get_char(&view->cursor, &ch) == 1 && ch == '\n') {
             delete_ch();
             return;
         }
