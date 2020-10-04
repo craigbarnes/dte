@@ -21,8 +21,6 @@ static void string_grow(String *s, size_t more)
     alloc = round_size_to_next_multiple(alloc, 16);
     xrenew(s->buffer, alloc);
     s->alloc = alloc;
-    // Pointless assertion; to silence certain static analysis tools
-    BUG_ON(!s->buffer);
 }
 
 void string_free(String *s)
