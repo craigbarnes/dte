@@ -9,6 +9,7 @@
 
 static void string_grow(String *s, size_t more)
 {
+    BUG_ON(more == 0);
     const size_t len = s->len + more;
     size_t alloc = s->alloc;
     if (alloc >= len) {
@@ -20,6 +21,8 @@ static void string_grow(String *s, size_t more)
     alloc = round_size_to_next_multiple(alloc, 16);
     xrenew(s->buffer, alloc);
     s->alloc = alloc;
+    // Pointless assertion; to silence certain static analysis tools
+    BUG_ON(!s->buffer);
 }
 
 void string_free(String *s)
@@ -45,6 +48,7 @@ size_t string_append_codepoint(String *s, CodePoint u)
 static void string_make_space(String *s, size_t pos, size_t len)
 {
     BUG_ON(pos > s->len);
+    BUG_ON(len == 0);
     string_grow(s, len);
     memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
     s->len += len;
@@ -60,7 +64,7 @@ size_t string_insert_ch(String *s, size_t pos, CodePoint u)
 
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
 {
-    if (!len) {
+    if (len == 0) {
         return;
     }
     string_make_space(s, pos, len);
