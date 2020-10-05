@@ -10,8 +10,6 @@
 
 #define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
-#define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
-
 NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {

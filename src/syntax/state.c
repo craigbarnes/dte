@@ -5,6 +5,7 @@
 #include "command/run.h"
 #include "editor.h"
 #include "error.h"
+#include "util/bsearch.h"
 #include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"

@@ -3,6 +3,7 @@
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
+#include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/path.h"

@@ -36,6 +36,7 @@
 #include "tag.h"
 #include "terminal/color.h"
 #include "terminal/terminal.h"
+#include "util/bsearch.h"
 #include "util/checked-arith.h"
 #include "util/debug.h"
 #include "util/line-iter.h"
