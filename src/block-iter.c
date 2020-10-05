@@ -100,7 +100,7 @@ size_t block_iter_prev_line(BlockIter *bi)
     return start - offset;
 }
 
-size_t block_iter_get_char(BlockIter *bi, CodePoint *up)
+size_t block_iter_get_char(const BlockIter *bi, CodePoint *up)
 {
     BlockIter tmp = *bi;
     return block_iter_next_char(&tmp, up);
@@ -278,15 +278,6 @@ size_t block_iter_get_offset(const BlockIter *bi)
         offset += blk->size;
     }
     return offset + bi->offset;
-}
-
-bool block_iter_is_bol(const BlockIter *bi)
-{
-    const size_t offset = bi->offset;
-    if (offset == 0) {
-        return true;
-    }
-    return bi->blk->data[offset - 1] == '\n';
 }
 
 char *block_iter_get_bytes(const BlockIter *bi, size_t len)
