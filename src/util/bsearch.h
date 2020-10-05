@@ -9,16 +9,14 @@
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 
 #if DEBUG >= 1 && defined(HAS_TYPEOF)
-    #define CHECK_BSEARCH_ARRAY(arr, field) do { \
-        static_assert_compatible_types(arr[0].field[0], char); \
+    #define CHECK_BSEARCH_ARRAY(a, field) do { \
+        static_assert_compatible_types(a[0].field[0], char); \
         check_bsearch_array ( \
-            arr, \
-            #arr, \
-            #field, \
-            ARRAY_COUNT(arr), \
-            sizeof(arr[0]), \
-            offsetof(__typeof__(*arr), field), \
-            sizeof(arr[0].field) \
+            a, #a, #field, \
+            ARRAY_COUNT(a), \
+            sizeof(a[0]), \
+            offsetof(__typeof__(*a), field), \
+            sizeof(a[0].field) \
         ); \
     } while (0)
 #else
@@ -26,17 +24,9 @@
 #endif
 
 #if DEBUG >= 1
-    #define CHECK_BSEARCH_STR_ARRAY(arr) do { \
-        static_assert_compatible_types(arr[0][0], char); \
-        check_bsearch_array ( \
-            arr, \
-            #arr, \
-            "", \
-            ARRAY_COUNT(arr), \
-            sizeof(arr[0]), \
-            0, \
-            sizeof(arr[0]) \
-        ); \
+    #define CHECK_BSEARCH_STR_ARRAY(a) do { \
+        static_assert_compatible_types(a[0][0], char); \
+        check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), 0, sizeof(a[0])); \
     } while (0)
 #else
     #define CHECK_BSEARCH_STR_ARRAY(arr)
