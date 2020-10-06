@@ -576,25 +576,32 @@ static void cmd_ft(const CommandArgs *a)
 
 static void cmd_hi(const CommandArgs *a)
 {
-    TermColor color;
     if (a->nr_args == 0) {
         exec_builtin_color_reset();
         remove_extra_colors();
-    } else if (parse_term_color(&color, a->args + 1)) {
-        int32_t fg = color_to_nearest(color.fg, terminal.color_type);
-        int32_t bg = color_to_nearest(color.bg, terminal.color_type);
-        if (
-            terminal.color_type != TERM_TRUE_COLOR
-            && has_flag(a, 'c')
-            && (fg != color.fg || bg != color.bg)
-        ) {
-            return;
-        }
-        color.fg = fg;
-        color.bg = bg;
-        set_highlight_color(a->args[0], &color);
+        goto update;
     }
 
+    TermColor color;
+    if (!parse_term_color(&color, a->args + 1)) {
+        return;
+    }
+
+    int32_t fg = color_to_nearest(color.fg, terminal.color_type);
+    int32_t bg = color_to_nearest(color.bg, terminal.color_type);
+    if (
+        terminal.color_type != TERM_TRUE_COLOR
+        && has_flag(a, 'c')
+        && (fg != color.fg || bg != color.bg)
+    ) {
+        return;
+    }
+
+    color.fg = fg;
+    color.bg = bg;
+    set_highlight_color(a->args[0], &color);
+
+update:
     // Don't call update_all_syntax_colors() needlessly.
     // It is called right after config has been loaded.
     if (editor.status != EDITOR_INITIALIZING) {
@@ -832,27 +839,18 @@ static bool xglob(char **args, glob_t *globbuf)
 
 static void cmd_open(const CommandArgs *a)
 {
-    char **args = a->args;
-    const char *requested_encoding = NULL;
-    bool use_glob = false;
-    bool temporary = false;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'e':
-            requested_encoding = *args++;
-            break;
-        case 'g':
-            use_glob = args[0] ? true : false;
-            break;
-        case 't':
-            temporary = true;
-            break;
-        }
-    }
-
-    if (temporary && a->nr_args > 0) {
+    bool temporary = has_flag(a, 't');
+    if (unlikely(temporary && a->nr_args > 0)) {
         error_msg("'open -t' can't be used with filename arguments");
         return;
+    }
+
+    const char *requested_encoding = NULL;
+    char **args = a->args;
+    for (const char *pf = a->flags; *pf; pf++) {
+        if (*pf == 'e') {
+            requested_encoding = *args++;
+        }
     }
 
     Encoding encoding;
@@ -880,6 +878,7 @@ static void cmd_open(const CommandArgs *a)
 
     char **paths = args;
     glob_t globbuf;
+    bool use_glob = has_flag(a, 'g') && a->nr_args > 0;
     if (use_glob) {
         if (!xglob(args, &globbuf)) {
             return;
@@ -1309,23 +1308,23 @@ static bool stat_changed(const Buffer *b, const struct stat *st)
 
 static void cmd_save(const CommandArgs *a)
 {
-    if (buffer->stdout_buffer) {
+    if (unlikely(buffer->stdout_buffer)) {
         const char *f = buffer_filename(buffer);
         info_msg("%s can't be saved; it will be piped to stdout on exit", f);
         return;
     }
 
-    char **args = a->args;
     char *absolute = buffer->abs_filename;
     Encoding encoding = buffer->encoding;
-    const char *requested_encoding = NULL;
-    bool force = false;
-    bool prompt = false;
-    bool crlf = buffer->crlf_newlines;
+    bool force = has_flag(a, 'f');
+    bool prompt = has_flag(a, 'p');
     mode_t old_mode = buffer->file.mode;
     struct stat st;
     bool new_locked = false;
 
+    const char *requested_encoding = NULL;
+    bool crlf = buffer->crlf_newlines;
+    char **args = a->args;
     for (const char *pf = a->flags; *pf; pf++) {
         switch (*pf) {
         case 'd':
@@ -1333,12 +1332,6 @@ static void cmd_save(const CommandArgs *a)
             break;
         case 'e':
             requested_encoding = *args++;
-            break;
-        case 'f':
-            force = true;
-            break;
-        case 'p':
-            prompt = true;
             break;
         case 'u':
             crlf = false;
