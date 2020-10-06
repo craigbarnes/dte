@@ -82,7 +82,6 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
     const View *v = info->view;
     const unsigned int flags = get_ws_error_option(v->buffer);
-
     const unsigned int trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
@@ -98,48 +97,39 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
         }
     }
 
+    bool in_indent = (i < info->indent_size);
     if (u == '\t') {
-        if (i < info->indent_size) {
-            // In indentation
-            if (flags & WSE_TAB_INDENT) {
-                return true;
-            }
-        } else {
-            if (flags & WSE_TAB_AFTER_INDENT) {
-                return true;
-            }
-        }
-    } else if (i < info->indent_size) {
-        // Space in indentation
-        const char *line = info->line;
-        int count = 0, pos = i;
-
-        while (pos > 0 && line[pos - 1] == ' ') {
-            pos--;
-        }
-        while (pos < info->size && line[pos] == ' ') {
-            pos++;
-            count++;
-        }
-
-        if (count >= v->buffer->options.tab_width) {
-            // Spaces used instead of tab
-            if (flags & WSE_SPACE_INDENT) {
-                return true;
-            }
-        } else if (pos < info->size && line[pos] == '\t') {
-            // Space before tab
-            if (flags & WSE_SPACE_INDENT) {
-                return true;
-            }
-        } else {
-            // Less than tab width spaces at end of indentation
-            if (flags & WSE_SPACE_ALIGN) {
-                return true;
-            }
-        }
+        unsigned int mask = in_indent ? WSE_TAB_INDENT : WSE_TAB_AFTER_INDENT;
+        return (flags & mask) != 0;
     }
-    return false;
+    if (!in_indent) {
+        // All checks below here only apply to indentation
+        return false;
+    }
+
+    const char *line = info->line;
+    size_t pos = i;
+    size_t count = 0;
+    while (pos > 0 && line[pos - 1] == ' ') {
+        pos--;
+    }
+    while (pos < info->size && line[pos] == ' ') {
+        pos++;
+        count++;
+    }
+
+    unsigned int mask;
+    if (count >= v->buffer->options.tab_width) {
+        // Spaces used instead of tab
+        mask = WSE_SPACE_INDENT;
+    } else if (pos < info->size && line[pos] == '\t') {
+        // Space before tab
+        mask = WSE_SPACE_INDENT;
+    } else {
+        // Less than tab width spaces at end of indentation
+        mask = WSE_SPACE_ALIGN;
+    }
+    return (flags & mask) != 0;
 }
 
 static CodePoint screen_next_char(LineInfo *info)
