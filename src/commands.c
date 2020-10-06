@@ -847,10 +847,12 @@ static void cmd_open(const CommandArgs *a)
 
     const char *requested_encoding = NULL;
     char **args = a->args;
-    for (const char *pf = a->flags; *pf; pf++) {
-        if (*pf == 'e') {
-            requested_encoding = *args++;
-        }
+    if (a->nr_flag_args > 0) {
+        // The "-e" flag is the only one that takes an argument, so the
+        // above condition implies it was used
+        BUG_ON(!has_flag(a, 'e'));
+        requested_encoding = args[a->nr_flag_args - 1];
+        args += a->nr_flag_args;
     }
 
     Encoding encoding;
@@ -1314,31 +1316,27 @@ static void cmd_save(const CommandArgs *a)
         return;
     }
 
-    char *absolute = buffer->abs_filename;
-    Encoding encoding = buffer->encoding;
-    bool force = has_flag(a, 'f');
-    bool prompt = has_flag(a, 'p');
-    mode_t old_mode = buffer->file.mode;
-    struct stat st;
-    bool new_locked = false;
-
-    const char *requested_encoding = NULL;
+    bool dos_nl = has_flag(a, 'd');
+    bool unix_nl = has_flag(a, 'u');
     bool crlf = buffer->crlf_newlines;
-    char **args = a->args;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'd':
-            crlf = true;
-            break;
-        case 'e':
-            requested_encoding = *args++;
-            break;
-        case 'u':
-            crlf = false;
-            break;
-        }
+    if (unlikely(dos_nl && unix_nl)) {
+        error_msg("flags -d and -u can't be used together");
+        return;
+    } else if (dos_nl) {
+        crlf = true;
+    } else if (unix_nl) {
+        crlf = false;
     }
 
+    const char *requested_encoding = NULL;
+    char **args = a->args;
+    if (a->nr_flag_args > 0) {
+        BUG_ON(!has_flag(a, 'e'));
+        requested_encoding = args[a->nr_flag_args - 1];
+        args += a->nr_flag_args;
+    }
+
+    Encoding encoding = buffer->encoding;
     if (requested_encoding) {
         EncodingType e = lookup_encoding(requested_encoding);
         if (e == UTF8) {
@@ -1359,6 +1357,9 @@ static void cmd_save(const CommandArgs *a)
         }
     }
 
+    char *absolute = buffer->abs_filename;
+    bool force = has_flag(a, 'f');
+    bool new_locked = false;
     if (args[0]) {
         if (args[0][0] == '\0') {
             error_msg("Empty filename not allowed");
@@ -1376,6 +1377,7 @@ static void cmd_save(const CommandArgs *a)
         }
     } else {
         if (!absolute) {
+            bool prompt = has_flag(a, 'p');
             if (prompt) {
                 set_input_mode(INPUT_COMMAND);
                 cmdline_set_text(&editor.cmdline, "save ");
@@ -1394,6 +1396,8 @@ static void cmd_save(const CommandArgs *a)
         }
     }
 
+    mode_t old_mode = buffer->file.mode;
+    struct stat st;
     if (stat(absolute, &st)) {
         if (errno != ENOENT) {
             error_msg("stat failed for %s: %s", absolute, strerror(errno));
