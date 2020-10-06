@@ -229,8 +229,9 @@ static void test_parse_args(void)
     EXPECT_FALSE(cmdargs_has_flag(&a, 'f'));
     EXPECT_FALSE(cmdargs_has_flag(&a, '\0'));
     EXPECT_FALSE(cmdargs_has_flag(&a, '\xFF'));
-    EXPECT_EQ(a.nr_args, 3);
+    EXPECT_EQ(a.nr_flag_args, 1);
     EXPECT_STREQ(a.args[0], "UTF-8");
+    EXPECT_EQ(a.nr_args, 3);
     EXPECT_STREQ(a.args[1], "file.c");
     EXPECT_STREQ(a.args[2], "file.h");
     EXPECT_STREQ(a.args[3], "*.mk");
@@ -259,6 +260,7 @@ static void test_parse_args(void)
     ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_TOO_MANY_ARGUMENTS);
     EXPECT_EQ(a.nr_args, 6);
     EXPECT_EQ(a.nr_flags, 0);
+    EXPECT_EQ(a.nr_flag_args, 0);
     EXPECT_EQ(a.flags[0], '\0');
     EXPECT_EQ(a.flag_set, 0);
     ptr_array_free(&array);
@@ -278,6 +280,7 @@ static void test_parse_args(void)
     ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_INVALID_OPTION | 0xFF00);
     EXPECT_EQ(a.nr_args, 0);
     EXPECT_EQ(a.nr_flags, 0);
+    EXPECT_EQ(a.nr_flag_args, 0);
     EXPECT_EQ(a.flags[0], '\0');
     EXPECT_EQ(a.flag_set, 0);
     ptr_array_free(&array);
