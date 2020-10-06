@@ -108,9 +108,8 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 
     a->flags[nr_flags] = '\0';
     a->nr_flags = nr_flags;
-
-    // Don't count arguments to flags as arguments to command
     a->nr_args = argc - nr_flag_args;
+    a->nr_flag_args = nr_flag_args;
 
     if (a->nr_args < cmd->min_args) {
         return ARGERR_TOO_FEW_ARGUMENTS;
