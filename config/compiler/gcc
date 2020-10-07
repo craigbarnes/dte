@@ -2,10 +2,15 @@ errorfmt -i gcc 'error: \(Each undeclared identifier is reported only once'
 errorfmt -i gcc 'error: for each function it appears in.\)'
 errorfmt -i gcc '^([^:]+):([0-9]+): (error|warning): \(near '
 errorfmt -i gcc '^([^:]+):([0-9]+):([0-9]+):$'
+
 errorfmt gcc '^([^:]+):([0-9]+):([0-9]+): (.*)' file line column message
 errorfmt gcc '^([^:]+):([0-9]+): (.*)' file line message
 errorfmt gcc '^.* at (.+):([0-9]+):$' file line
 errorfmt gcc " *inlined from '.*' at (.*):([0-9]+):" file line
+
+# ASan stack trace (e.g. " #12 0x55af25320630 in func_name src/filename.c:1142")
+errorfmt gcc '^ *(#[0-9]+ 0x[0-9A-Fa-f]+ in [[:alnum:]_]+) ([^:]+):([0-9]+)$' message file line
+
 errorfmt -i gcc '^In file included from (.+):([0-9]+)[,:]'
 errorfmt -i gcc '^ +from (.+):([0-9]+)[,:]'
 errorfmt -i gcc '^([^:]+): (In function .*:)$'
