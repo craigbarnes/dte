@@ -13,9 +13,19 @@ static void (*cleanup_handler)(void) = no_op;
 
 #ifdef ASAN_ENABLED
 #include <sanitizer/asan_interface.h>
+
 const char *__asan_default_options(void)
 {
     return "detect_leaks=1:detect_stack_use_after_return=1";
+}
+
+void __asan_on_error(void)
+{
+    // This function is called when ASan detects an error. Unlike
+    // callbacks set with __sanitizer_set_death_callback(), it runs
+    // before the error report is printed and so allows us to clean
+    // up the terminal state and avoid clobbering the stderr output.
+    cleanup_handler();
 }
 #endif
 
