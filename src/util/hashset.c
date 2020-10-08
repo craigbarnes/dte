@@ -1,13 +1,17 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include "hashset.h"
 #include "ascii.h"
+#include "debug.h"
 #include "hash.h"
 #include "str-util.h"
 #include "xmalloc.h"
 
 static void alloc_table(HashSet *set, size_t size)
 {
+    BUG_ON(size < 8);
+    BUG_ON(!IS_POWER_OF_2(size));
     set->table_size = size;
     set->table = xnew0(HashSetEntry*, size);
     set->grow_at = size - (size / 4); // 75% load factor (size * 0.75)
@@ -105,7 +109,11 @@ HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
     set->table[slot] = h;
 
     if (++set->nr_entries > set->grow_at) {
-        rehash(set, set->table_size << 1);
+        size_t new_size = set->table_size << 1;
+        if (unlikely(new_size == 0)) {
+            fatal_error(__func__, EOVERFLOW);
+        }
+        rehash(set, new_size);
     }
 
     return h;
