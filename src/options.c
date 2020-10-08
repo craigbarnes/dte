@@ -132,15 +132,17 @@ typedef struct OptionOps {
 #define G(member) OLG(offsetof(GlobalOptions, member), false, true)
 #define C(member) OLG(offsetof(CommonOptions, member), true, true)
 
-static void filetype_changed(bool UNUSED_ARG(global))
+static void filetype_changed(bool global)
 {
     BUG_ON(!buffer);
+    BUG_ON(global);
     set_file_options(buffer);
     buffer_update_syntax(buffer);
 }
 
-static void set_window_title_changed(bool UNUSED_ARG(global))
+static void set_window_title_changed(bool global)
 {
+    BUG_ON(!global);
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
             update_term_title(buffer);
