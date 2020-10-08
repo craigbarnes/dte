@@ -283,17 +283,17 @@ static void test_ascii(void)
     char *saved_locale = xstrdup(setlocale(LC_CTYPE, NULL));
     setlocale(LC_CTYPE, "C");
     for (int i = -1; i < 256; i++) {
-        EXPECT_EQ(!!ascii_isalpha(i), !!isalpha(i));
-        EXPECT_EQ(!!ascii_isalnum(i), !!isalnum(i));
-        EXPECT_EQ(!!ascii_islower(i), !!islower(i));
-        EXPECT_EQ(!!ascii_isupper(i), !!isupper(i));
-        EXPECT_EQ(!!ascii_iscntrl(i), !!iscntrl(i));
-        EXPECT_EQ(!!ascii_isdigit(i), !!isdigit(i));
-        EXPECT_EQ(!!ascii_isblank(i), !!isblank(i));
-        EXPECT_EQ(!!ascii_isprint(i), !!isprint(i));
-        EXPECT_EQ(!!ascii_isxdigit(i), !!isxdigit(i));
+        EXPECT_EQ(ascii_isalpha(i), !!isalpha(i));
+        EXPECT_EQ(ascii_isalnum(i), !!isalnum(i));
+        EXPECT_EQ(ascii_islower(i), !!islower(i));
+        EXPECT_EQ(ascii_isupper(i), !!isupper(i));
+        EXPECT_EQ(ascii_iscntrl(i), !!iscntrl(i));
+        EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
+        EXPECT_EQ(ascii_isblank(i), !!isblank(i));
+        EXPECT_EQ(ascii_isprint(i), !!isprint(i));
+        EXPECT_EQ(ascii_isxdigit(i), !!isxdigit(i));
         if (i != '\v' && i != '\f') {
-            EXPECT_EQ(!!ascii_isspace(i), !!isspace(i));
+            EXPECT_EQ(ascii_isspace(i), !!isspace(i));
         }
     }
     setlocale(LC_CTYPE, saved_locale);
