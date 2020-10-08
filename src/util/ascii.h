@@ -31,7 +31,6 @@ typedef enum {
 #define ascii_isalpha(x) ascii_test(x, ASCII_ALPHA)
 #define ascii_isalnum(x) ascii_test(x, ASCII_ALNUM)
 #define ascii_isprint(x) (!ascii_test(x, ASCII_CNTRL | ASCII_NONASCII))
-#define ascii_isxdigit(x) (hex_decode(x) != -1)
 
 #define is_alpha_or_underscore(x) ascii_test(x, ASCII_ALPHA | ASCII_UNDERSCORE)
 #define is_alnum_or_underscore(x) ascii_test(x, ASCII_ALNUM | ASCII_UNDERSCORE)
@@ -51,6 +50,16 @@ static inline bool ascii_isblank(unsigned char c)
 static inline bool ascii_is_nonspace_cntrl(unsigned char c)
 {
     return ascii_table[c] == ASCII_CNTRL;
+}
+
+static inline bool ascii_isxdigit(unsigned char c)
+{
+    return hex_table[c] != -1;
+}
+
+static inline int hex_decode(unsigned char c)
+{
+    return hex_table[c];
 }
 
 static inline unsigned char ascii_tolower(unsigned char c)
@@ -95,11 +104,6 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
         }
     }
     return true;
-}
-
-static inline int hex_decode(unsigned char c)
-{
-    return hex_table[c];
 }
 
 #endif
