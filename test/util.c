@@ -288,8 +288,16 @@ static void test_ascii(void)
     EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
     EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
 
-    char *saved_locale = xstrdup(setlocale(LC_CTYPE, NULL));
-    setlocale(LC_CTYPE, "C");
+    // Query the current locale
+    const char *locale = setlocale(LC_CTYPE, NULL);
+    ASSERT_NONNULL(locale);
+
+    // Copy the locale string (which may be in static storage)
+    char *saved_locale = xstrdup(locale);
+
+    // Check that the ascii_is*() functions behave like their corresponding
+    // <ctype.h> macros, when in the standard "C" locale
+    ASSERT_NONNULL(setlocale(LC_CTYPE, "C"));
     for (int i = -1; i < 256; i++) {
         EXPECT_EQ(ascii_isalpha(i), !!isalpha(i));
         EXPECT_EQ(ascii_isalnum(i), !!isalnum(i));
@@ -304,6 +312,8 @@ static void test_ascii(void)
             EXPECT_EQ(ascii_isspace(i), !!isspace(i));
         }
     }
+
+    // Restore the original locale
     setlocale(LC_CTYPE, saved_locale);
     free(saved_locale);
 }
