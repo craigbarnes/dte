@@ -370,7 +370,10 @@ static void test_command_struct_layout(void)
     EXPECT_STREQ(cmd->flags, "-l");
     EXPECT_UINT_EQ(cmd->min_args, 1);
     EXPECT_UINT_EQ(cmd->max_args, 0xFF);
+
+    IGNORE_WARNING("-Wpedantic")
     EXPECT_NONNULL(cmd->cmd);
+    UNIGNORE_WARNINGS
 }
 
 static void test_cmdargs_flagset_idx(void)

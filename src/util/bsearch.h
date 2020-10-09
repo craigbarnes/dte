@@ -48,13 +48,13 @@ static inline void check_bsearch_array (
     BUG_ON(array_element_size == 0);
     BUG_ON(name_size == 0);
 
-    const char *first_name = array_base + name_offset;
+    const char *first_name = (const char*)array_base + name_offset;
     if (first_name[name_size - 1] != '\0') {
         BUG("String sentinel missing from %s[0].%s", array_name, name_field_name);
     }
 
     for (size_t i = 1; i < array_length; i++) {
-        const char *curr_name = array_base + (i * array_element_size) + name_offset;
+        const char *curr_name = first_name + (i * array_element_size);
         const char *prev_name = curr_name - array_element_size;
         if (curr_name[name_size - 1] != '\0') {
             BUG("String sentinel missing from %s[%zu].%s", array_name, i, name_field_name);
