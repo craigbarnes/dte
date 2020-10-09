@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <locale.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -46,6 +47,13 @@ static void test_util_macros(void)
     EXPECT_EQ(MAX(0, 1), 1);
     EXPECT_EQ(MAX(99, 100), 100);
     EXPECT_EQ(MAX(-10, 10), 10);
+
+    int n = snprintf(NULL, 0, "%d", INT_MIN);
+    EXPECT_TRUE(n >= STRLEN("-2147483647"));
+    EXPECT_TRUE(DECIMAL_STR_MAX(int) > n);
+    n = snprintf(NULL, 0, "%llu", ULLONG_MAX);
+    EXPECT_TRUE(n >= STRLEN("18446744073709551615"));
+    EXPECT_TRUE(DECIMAL_STR_MAX(unsigned long long) > n);
 }
 
 static void test_IS_POWER_OF_2(void)
