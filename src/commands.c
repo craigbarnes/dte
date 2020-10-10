@@ -824,14 +824,20 @@ static void cmd_next(const CommandArgs* UNUSED_ARG(a))
 static bool xglob(char **args, glob_t *globbuf)
 {
     BUG_ON(!args);
-    BUG_ON(!*args);
+    BUG_ON(!args[0]);
     int err = glob(*args, GLOB_NOCHECK, NULL, globbuf);
     while (err == 0 && *++args) {
         err = glob(*args, GLOB_NOCHECK | GLOB_APPEND, NULL, globbuf);
     }
-    if (likely(err == 0 && globbuf->gl_pathc > 0)) {
+
+    if (likely(err == 0)) {
+        BUG_ON(globbuf->gl_pathc == 0);
+        BUG_ON(!globbuf->gl_pathv);
+        BUG_ON(!globbuf->gl_pathv[0]);
         return true;
     }
+
+    BUG_ON(err == GLOB_NOMATCH);
     error_msg("glob: %s", (err == GLOB_NOSPACE) ? strerror(ENOMEM) : "failed");
     globfree(globbuf);
     return false;
@@ -878,9 +884,18 @@ static void cmd_open(const CommandArgs *a)
         encoding = (Encoding){.type = ENCODING_AUTODETECT};
     }
 
+    if (a->nr_args == 0) {
+        View *v = window_open_new_file(window);
+        v->buffer->temporary = temporary;
+        if (requested_encoding) {
+            v->buffer->encoding = encoding;
+        }
+        return;
+    }
+
     char **paths = args;
     glob_t globbuf;
-    bool use_glob = has_flag(a, 'g') && a->nr_args > 0;
+    bool use_glob = has_flag(a, 'g');
     if (use_glob) {
         if (!xglob(args, &globbuf)) {
             return;
@@ -888,13 +903,7 @@ static void cmd_open(const CommandArgs *a)
         paths = globbuf.gl_pathv;
     }
 
-    if (!paths[0]) {
-        window_open_new_file(window);
-        buffer->temporary = temporary;
-        if (requested_encoding) {
-            buffer->encoding = encoding;
-        }
-    } else if (!paths[1]) {
+    if (!paths[1]) {
         // Previous view is remembered when opening single file
         window_open_file(window, paths[0], &encoding);
     } else {
