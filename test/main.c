@@ -75,7 +75,6 @@ static void test_posix_sanity(void)
     // C99 and POSIX 2001 also require the same behavior as above when the
     // size argument is 0 (and allow the buffer argument to be NULL).
     ASSERT_EQ(snprintf(NULL, 0, "987654321"), 9);
-    EXPECT_STREQ(buf, "0123456");
 
     UNIGNORE_WARNINGS
 }
