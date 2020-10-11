@@ -1,4 +1,3 @@
-#include "../../build/feature.h" // Must be first include
 #include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -77,9 +76,6 @@ char *xstrdup(const char *str)
 VPRINTF(2)
 static int vasprintf_(char **strp, const char *format, va_list ap)
 {
-#ifdef HAVE_VASPRINTF
-    return vasprintf(strp, format, ap);
-#else
     va_list ap2;
     va_copy(ap2, ap);
     int n = vsnprintf(NULL, 0, format, ap2);
@@ -103,7 +99,6 @@ static int vasprintf_(char **strp, const char *format, va_list ap)
     BUG_ON(m != n);
     *strp = str;
     return n;
-#endif
 }
 
 VPRINTF(1)
@@ -113,7 +108,6 @@ static char *xvasprintf(const char *format, va_list ap)
     if (unlikely(vasprintf_(&str, format, ap) < 0)) {
         fatal_error(__func__, errno);
     }
-    BUG_ON(!str);
     return str;
 }
 
