@@ -73,42 +73,34 @@ char *xstrdup(const char *str)
     return check_alloc(strdup(str));
 }
 
-VPRINTF(2)
-static int vasprintf_(char **strp, const char *format, va_list ap)
+VPRINTF(1)
+static char *xvasprintf(const char *format, va_list ap)
 {
     va_list ap2;
     va_copy(ap2, ap);
     int n = vsnprintf(NULL, 0, format, ap2);
     va_end(ap2);
     if (unlikely(n < 0)) {
-        // POSIX requires vsnprintf(3) to set errno (unlike ISO C99)
-        return -1;
+        goto error;
     } else if (unlikely(n >= INT_MAX)) {
         errno = EOVERFLOW;
-        return -1;
+        goto error;
     }
+
     char *str = malloc(n + 1);
     if (unlikely(!str)) {
-        return -1;
+        goto error;
     }
+
     int m = vsnprintf(str, n + 1, format, ap);
-    if (unlikely(n < 0)) {
-        free(str);
-        return -1;
+    if (unlikely(m < 0)) {
+        goto error;
     }
     BUG_ON(m != n);
-    *strp = str;
-    return n;
-}
-
-VPRINTF(1)
-static char *xvasprintf(const char *format, va_list ap)
-{
-    char *str;
-    if (unlikely(vasprintf_(&str, format, ap) < 0)) {
-        fatal_error(__func__, errno);
-    }
     return str;
+
+error:
+    fatal_error(__func__, errno);
 }
 
 char *xasprintf(const char *format, ...)
