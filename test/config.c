@@ -42,10 +42,10 @@ static void test_builtin_configs(void)
             EXPECT_NONNULL(find_syntax(path_basename(cfg.name)));
         } else {
             // Check that built-in configs are identical to their source files
-            const char *name = cfg.name;
-            char *src, *path = xasprintf("config/%s", name);
+            char path[4096];
+            xsnprintf(path, sizeof path, "config/%s", cfg.name);
+            char *src;
             ssize_t size = read_file(path, &src);
-            free(path);
             ASSERT_EQ(size, cfg.text.length);
             EXPECT_TRUE(mem_equal(src, cfg.text.data, size));
             free(src);
