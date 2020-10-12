@@ -75,6 +75,7 @@ static int logfd = -1;
 
 void log_init(const char *varname)
 {
+    BUG_ON(logfd != -1);
     const char *path = getenv(varname);
     if (!path || path[0] == '\0') {
         return;
