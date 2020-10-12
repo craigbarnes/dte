@@ -55,7 +55,10 @@ const char *buffer_filename(const Buffer *b)
 
 void buffer_set_encoding(Buffer *b, Encoding encoding)
 {
-    if (b->encoding.name != encoding.name) {
+    if (
+        b->encoding.type != encoding.type
+        || b->encoding.name != encoding.name
+    ) {
         const EncodingType type = encoding.type;
         if (type == UTF8) {
             b->bom = editor.options.utf8_bom;
