@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "encoding.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/hashset.h"
 #include "util/str-util.h"
 
@@ -115,6 +116,7 @@ EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
 const ByteOrderMark *get_bom_for_encoding(EncodingType encoding)
 {
     static_assert(ARRAY_COUNT(boms) == NR_ENCODING_TYPES);
+    BUG_ON(encoding >= ARRAY_COUNT(boms));
     const ByteOrderMark *bom = &boms[encoding];
     return bom->len ? bom : NULL;
 }

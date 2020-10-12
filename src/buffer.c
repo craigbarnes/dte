@@ -53,6 +53,19 @@ const char *buffer_filename(const Buffer *b)
     return b->display_filename ? b->display_filename : "(No name)";
 }
 
+void buffer_set_encoding(Buffer *b, Encoding encoding)
+{
+    if (b->encoding.name != encoding.name) {
+        const EncodingType type = encoding.type;
+        if (type == UTF8) {
+            b->bom = editor.options.utf8_bom;
+        } else {
+            b->bom = type < NR_ENCODING_TYPES && get_bom_for_encoding(type);
+        }
+        b->encoding = encoding;
+    }
+}
+
 Buffer *buffer_new(const Encoding *encoding)
 {
     static unsigned long id;
@@ -65,7 +78,7 @@ Buffer *buffer_new(const Encoding *encoding)
     b->crlf_newlines = editor.options.crlf_newlines;
 
     if (encoding) {
-        b->encoding = *encoding;
+        buffer_set_encoding(b, *encoding);
     } else {
         b->encoding.type = ENCODING_AUTODETECT;
     }

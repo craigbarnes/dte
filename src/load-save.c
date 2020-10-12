@@ -59,24 +59,27 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
             BUG_ON(b->encoding.name);
             Encoding e = encoding_from_type(bom_type);
             if (conversion_supported_by_iconv(e.name, "UTF-8")) {
-                b->encoding = e;
+                buffer_set_encoding(b, e);
             } else {
-                b->encoding = encoding_from_type(UTF8);
+                buffer_set_encoding(b, encoding_from_type(UTF8));
             }
         }
     } else if (enc_type == UTF16) {
-        b->encoding = encoding_from_type(bom_type == UTF16LE ? UTF16LE : UTF16BE);
+        Encoding e = encoding_from_type(bom_type == UTF16LE ? UTF16LE : UTF16BE);
+        buffer_set_encoding(b, e);
     } else if (enc_type == UTF32) {
-        b->encoding = encoding_from_type(bom_type == UTF32LE ? UTF32LE : UTF32BE);
+        Encoding e = encoding_from_type(bom_type == UTF32LE ? UTF32LE : UTF32BE);
+        buffer_set_encoding(b, e);
     }
 
     // Skip BOM only if it matches the specified file encoding.
     if (bom_type != UNKNOWN_ENCODING && bom_type == b->encoding.type) {
-        const size_t bom_len = get_bom_for_encoding(bom_type)->len;
-        buf += bom_len;
-        size -= bom_len;
-        if (bom_type == UTF8) {
-            b->existing_file_had_utf8_bom = true;
+        const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
+        if (bom) {
+            const size_t bom_len = bom->len;
+            buf += bom_len;
+            size -= bom_len;
+            b->bom = true;
         }
     }
 
@@ -106,7 +109,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
         const char *enc = file_decoder_get_encoding(dec);
-        b->encoding = enc ? encoding_from_name(enc) : editor.charset;
+        buffer_set_encoding(b, enc ? encoding_from_name(enc) : editor.charset);
     }
 
     free_file_decoder(dec);
@@ -272,7 +275,7 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
-        b->encoding = editor.charset;
+        buffer_set_encoding(b, editor.charset);
     }
 
     return true;
@@ -293,14 +296,13 @@ static mode_t get_umask(void)
 static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_type)
 {
     size_t size = 0;
-    if (bom_type != UTF8 || b->existing_file_had_utf8_bom) {
-        const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
-        if (bom) {
-            size = bom->len;
-            if (xwrite(fd, bom->bytes, size) < 0) {
-                perror_msg("write");
-                return false;
-            }
+    const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
+    if (bom) {
+        size = bom->len;
+        BUG_ON(size == 0);
+        if (xwrite(fd, bom->bytes, size) < 0) {
+            perror_msg("write");
+            return false;
         }
     }
 
@@ -336,7 +338,8 @@ bool save_buffer (
     Buffer *b,
     const char *filename,
     const Encoding *encoding,
-    bool crlf
+    bool crlf,
+    bool write_bom
 ) {
     FileEncoder *enc;
     int fd = -1;
@@ -389,7 +392,9 @@ bool save_buffer (
         xclose(fd);
         goto error;
     }
-    if (!write_buffer(b, enc, fd, encoding->type)) {
+
+    EncodingType bom_type = write_bom ? encoding->type : UNKNOWN_ENCODING;
+    if (!write_buffer(b, enc, fd, bom_type)) {
         xclose(fd);
         goto error;
     }

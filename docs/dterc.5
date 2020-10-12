@@ -51,7 +51,7 @@ Buffer Management Commands:
 .br
    \fBopen\fR [\fB\-g\fR|\fB\-t\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]...
 .br
-   \fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
+   \fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-b\fR|\fB\-B\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .br
    \fBclose\fR [\fB\-qw\fR] [\fB\-f\fR|\fB\-p\fR]
 .br
@@ -241,6 +241,8 @@ Global options:
    \fBstatusline\-right\fR [" %y,%X %u %E %n %t %p "]
 .br
    \fBtab\-bar\fR [true]
+.br
+   \fButf8\-bom\fR [false]
 .br
 .P
 Local options:
@@ -820,10 +822,18 @@ Mark buffer as "temporary" (always closeable, without warnings for
 "unsaved changes")
 .PP
 .RE
-\fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
+\fBsave\fR [\fB\-fp\fR] [\fB\-d\fR|\fB\-u\fR] [\fB\-b\fR|\fB\-B\fR] [\fB\-e\fR \fIencoding\fR] [\fIfilename\fR]
 .RS
-Save file. By default line\-endings (LF vs CRLF) are preserved.
+Save current buffer.
 .P
+.TP
+\fB\-b\fR
+Write byte order mark (BOM)
+.PP
+.TP
+\fB\-B\fR
+Don't write byte order mark
+.PP
 .TP
 \fB\-d\fR
 Save with DOS/CRLF line\-endings
@@ -844,6 +854,8 @@ Open a command prompt if there's no specified or existing \fIfilename\fR
 \fB\-e\fR \fIencoding\fR
 Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
 .PP
+See also: \fBnewline\fR and \fButf8\-bom\fR global options
+.P
 .RE
 \fBclose\fR [\fB\-qw\fR] [\fB\-f\fR|\fB\-p\fR]
 .RS
@@ -1663,8 +1675,11 @@ See also: the \fBFILES\fR section in the \fBdte\fR(1) man page.
 .RE
 \fBnewline\fR [unix]
 .RS
-Whether to use LF (\fBunix\fR) or CRLF (\fBdos\fR) line\-endings. This
-is just a default value for new files.
+Whether to use LF (\fBunix\fR) or CRLF (\fBdos\fR) line\-endings in newly
+created files.
+.P
+Note: buffers opened from existing files will have their newline
+type detected automatically.
 .P
 .RE
 \fBselect\-cursor\-char\fR [true]
@@ -1771,6 +1786,16 @@ Format string for the right aligned part of status line.
 \fBtab\-bar\fR [true]
 .RS
 Whether to show the tab\-bar at the top of each window.
+.P
+.RE
+\fButf8\-bom\fR [false]
+.RS
+Whether to write a byte order mark (BOM) in new newly created UTF\-8
+files.
+.P
+Note: buffers opened from existing UTF\-8 files will have their BOM
+(or lack thereof) preserved as it was, unless overridden by the
+\fBsave\fR command.
 .P
 .RE
 .SS Local options

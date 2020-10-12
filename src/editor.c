@@ -67,19 +67,20 @@ EditorState editor = {
 
         // Global-only options
         .case_sensitive_search = CSS_TRUE,
+        .crlf_newlines = false,
         .display_invisible = false,
         .display_special = false,
         .esc_timeout = 100,
         .filesize_limit = 250,
         .lock_files = true,
-        .crlf_newlines = false,
         .scroll_margin = 0,
         .select_cursor_char = true,
         .set_window_title = false,
         .show_line_numbers = false,
         .statusline_left = " %f%s%m%r%s%M",
-        .statusline_right = " %y,%X   %u   %E %n %t   %p ",
+        .statusline_right = " %y,%X   %u   %E%s%b%s%n %t   %p ",
         .tab_bar = true,
+        .utf8_bom = false,
     }
 };
 

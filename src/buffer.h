@@ -51,7 +51,7 @@ typedef struct Buffer {
     bool locked;
     bool setup;
     bool crlf_newlines;
-    bool existing_file_had_utf8_bom;
+    bool bom;
 
     // Encoding of the file (buffer always contains UTF-8)
     Encoding encoding;
@@ -83,8 +83,8 @@ static inline bool buffer_modified(const Buffer *b)
 }
 
 void buffer_mark_lines_changed(Buffer *b, long min, long max) NONNULL_ARGS;
+void buffer_set_encoding(Buffer *b, Encoding encoding) NONNULL_ARGS;
 const char *buffer_filename(const Buffer *b) NONNULL_ARGS_AND_RETURN;
-
 void set_display_filename(Buffer *b, char *name) NONNULL_ARG(1);
 char *short_filename(const char *absolute) XSTRDUP;
 void update_short_filename_cwd(Buffer *b, const char *cwd) NONNULL_ARG(1);

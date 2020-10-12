@@ -888,7 +888,7 @@ static void cmd_open(const CommandArgs *a)
         View *v = window_open_new_file(window);
         v->buffer->temporary = temporary;
         if (requested_encoding) {
-            v->buffer->encoding = encoding;
+            buffer_set_encoding(v->buffer, encoding);
         }
         return;
     }
@@ -1346,12 +1346,21 @@ static void cmd_save(const CommandArgs *a)
     }
 
     Encoding encoding = buffer->encoding;
+    bool bom = buffer->bom;
     if (requested_encoding) {
         EncodingType e = lookup_encoding(requested_encoding);
         if (e == UTF8) {
-            encoding = encoding_from_type(e);
+            if (encoding.type != UTF8) {
+                // Encoding changed
+                encoding = encoding_from_type(e);
+                bom = editor.options.utf8_bom;
+            }
         } else if (conversion_supported_by_iconv("UTF-8", requested_encoding)) {
             encoding = encoding_from_name(requested_encoding);
+            if (encoding.name != buffer->encoding.name) {
+                // Encoding changed
+                bom = !!get_bom_for_encoding(encoding.type);
+            }
         } else {
             if (errno == EINVAL) {
                 error_msg("Unsupported encoding '%s'", requested_encoding);
@@ -1366,10 +1375,21 @@ static void cmd_save(const CommandArgs *a)
         }
     }
 
+    bool b = has_flag(a, 'b');
+    bool B = has_flag(a, 'B');
+    if (unlikely(b && B)) {
+        error_msg("flags -b and -B can't be used together");
+        return;
+    } else if (b) {
+        bom = true;
+    } else if (B) {
+        bom = false;
+    }
+
     char *absolute = buffer->abs_filename;
     bool force = has_flag(a, 'f');
     bool new_locked = false;
-    if (args[0]) {
+    if (a->nr_args > 0) {
         if (args[0][0] == '\0') {
             error_msg("Empty filename not allowed");
             goto error;
@@ -1482,7 +1502,8 @@ static void cmd_save(const CommandArgs *a)
         // Allow chmod 755 etc.
         buffer->file.mode = st.st_mode;
     }
-    if (!save_buffer(buffer, absolute, &encoding, crlf)) {
+
+    if (!save_buffer(buffer, absolute, &encoding, crlf, bom)) {
         goto error;
     }
 
@@ -1490,6 +1511,7 @@ static void cmd_save(const CommandArgs *a)
     buffer->readonly = false;
     buffer->temporary = false;
     buffer->crlf_newlines = crlf;
+    buffer->bom = bom;
     if (requested_encoding) {
         buffer->encoding = encoding;
     }
@@ -2116,7 +2138,7 @@ static const Command cmds[] = {
     {"replace", "bcgi", false, 2, 2, cmd_replace},
     {"right", "c", false, 0, 0, cmd_right},
     {"run", "-ps", false, 1, -1, cmd_run},
-    {"save", "de=fpu", false, 0, 1, cmd_save},
+    {"save", "Bbde=fpu", false, 0, 1, cmd_save},
     {"scroll-down", "", false, 0, 0, cmd_scroll_down},
     {"scroll-pgdown", "", false, 0, 0, cmd_scroll_pgdown},
     {"scroll-pgup", "", false, 0, 0, cmd_scroll_pgup},

@@ -109,6 +109,11 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         }
         ch = *format++;
         switch (ch) {
+        case 'b':
+            if (v->buffer->bom) {
+                add_status_literal(f, "BOM");
+            }
+            break;
         case 'f':
             add_status_str(f, buffer_filename(v->buffer));
             break;

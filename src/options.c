@@ -174,7 +174,7 @@ static void redraw_screen(bool UNUSED_ARG(global))
 
 static bool validate_statusline_format(const char *value)
 {
-    static const StringView chars = STRING_VIEW("fmryYxXpEMNSnstu%");
+    static const StringView chars = STRING_VIEW("bfmryYxXpEMNSnstu%");
     size_t i = 0;
     while (value[i]) {
         char ch = value[i++];
@@ -483,6 +483,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("tab-bar", G(tab_bar), redraw_screen),
     UINT_OPT("tab-width", C(tab_width), 1, 8, redraw_buffer),
     UINT_OPT("text-width", C(text_width), 1, 1000, NULL),
+    BOOL_OPT("utf8-bom", G(utf8_bom), NULL),
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, redraw_buffer),
 };
 

@@ -77,6 +77,7 @@ typedef struct {
     bool set_window_title;
     bool show_line_numbers;
     bool tab_bar;
+    bool utf8_bom; // Default value for new files
     unsigned int esc_timeout;
     unsigned int filesize_limit;
     unsigned int scroll_margin;

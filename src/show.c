@@ -218,7 +218,7 @@ void show(const char *type, const char *key, bool cflag)
     do_insert(s.buffer, s.len);
     string_free(&s);
     set_display_filename(v->buffer, xasprintf("(show %s)", type));
-    v->buffer->encoding = encoding_from_type(UTF8);
+    buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
     if (handlers[cmdtype].dumps_dterc_syntax) {
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(v->buffer);

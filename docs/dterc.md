@@ -422,9 +422,15 @@ Open file. If _filename_ is omitted, a new file is opened.
 :   Mark buffer as "temporary" (always closeable, without warnings for
     "unsaved changes")
 
-### **save** [**-fp**] [**-d**|**-u**] [**-e** _encoding_] [_filename_]
+### **save** [**-fp**] [**-d**|**-u**] [**-b**|**-B**] [**-e** _encoding_] [_filename_]
 
-Save file. By default line-endings (LF vs CRLF) are preserved.
+Save current buffer.
+
+`-b`
+:   Write byte order mark (BOM)
+
+`-B`
+:   Don't write byte order mark
 
 `-d`
 :   Save with DOS/CRLF line-endings
@@ -440,6 +446,8 @@ Save file. By default line-endings (LF vs CRLF) are preserved.
 
 `-e` _encoding_
 :   Set file _encoding_. See `iconv -l` for list of supported encodings.
+
+See also: [`newline`] and [`utf8-bom`] global options
 
 ### **close** [**-qw**] [**-f**|**-p**]
 
@@ -1095,8 +1103,11 @@ See also: the `FILES` section in the [`dte`] man page.
 
 ### **newline** [unix]
 
-Whether to use LF (**unix**) or CRLF (**dos**) line-endings. This
-is just a default value for new files.
+Whether to use LF (**unix**) or CRLF (**dos**) line-endings in newly
+created files.
+
+Note: buffers opened from existing files will have their newline
+type detected automatically.
 
 ### **select-cursor-char** [true]
 
@@ -1179,6 +1190,15 @@ Format string for the right aligned part of status line.
 ### **tab-bar** [true]
 
 Whether to show the tab-bar at the top of each window.
+
+### **utf8-bom** [false]
+
+Whether to write a byte order mark (BOM) in new newly created UTF-8
+files.
+
+Note: buffers opened from existing UTF-8 files will have their BOM
+(or lack thereof) preserved as it was, unless overridden by the
+[`save`] command.
 
 ## Local options
 
@@ -1323,6 +1343,7 @@ errors should be highlighted. Set to `""` to disable.
 [`pgdown`]: #pgdown
 [`pgup`]: #pgup
 [`right`]: #right
+[`save`]: #save
 [`scroll-pgdown`]: #scroll-pgdown
 [`scroll-pgup`]: #scroll-pgup
 [`set`]: #set
@@ -1338,5 +1359,7 @@ errors should be highlighted. Set to `""` to disable.
 [`expand-tab`]: #expand-tab
 [`indent-regex`]: #indent-regex
 [`indent-width`]: #indent-width
+[`newline`]: #newline
 [`tab-width`]: #tab-width
 [`text-width`]: #text-width
+[`utf8-bom`]: #utf8-bom
