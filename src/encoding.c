@@ -7,10 +7,8 @@
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",
-    [UTF16] = "UTF-16",
     [UTF16BE] = "UTF-16BE",
     [UTF16LE] = "UTF-16LE",
-    [UTF32] = "UTF-32",
     [UTF32BE] = "UTF-32BE",
     [UTF32LE] = "UTF-32LE",
 };
@@ -20,18 +18,20 @@ static const struct {
     EncodingType encoding;
 } encoding_aliases[] = {
     {"UTF8", UTF8},
-    {"UTF16", UTF16},
+    {"UTF16", UTF16BE},
+    {"UTF-16", UTF16BE},
     {"UTF16BE", UTF16BE},
     {"UTF16LE", UTF16LE},
-    {"UTF32", UTF32},
+    {"UTF32", UTF32BE},
+    {"UTF-32", UTF32BE},
     {"UTF32BE", UTF32BE},
     {"UTF32LE", UTF32LE},
-    {"UCS2", UTF16},
-    {"UCS-2", UTF16},
+    {"UCS2", UTF16BE},
+    {"UCS-2", UTF16BE},
     {"UCS-2BE", UTF16BE},
     {"UCS-2LE", UTF16LE},
-    {"UCS4", UTF32},
-    {"UCS-4", UTF32},
+    {"UCS4", UTF32BE},
+    {"UCS-4", UTF32BE},
     {"UCS-4BE", UTF32BE},
     {"UCS-4LE", UTF32LE},
 };
