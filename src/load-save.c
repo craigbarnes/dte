@@ -64,12 +64,6 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
                 buffer_set_encoding(b, encoding_from_type(UTF8));
             }
         }
-    } else if (enc_type == UTF16) {
-        Encoding e = encoding_from_type(bom_type == UTF16LE ? UTF16LE : UTF16BE);
-        buffer_set_encoding(b, e);
-    } else if (enc_type == UTF32) {
-        Encoding e = encoding_from_type(bom_type == UTF32LE ? UTF32LE : UTF32BE);
-        buffer_set_encoding(b, e);
     }
 
     // Skip BOM only if it matches the specified file encoding.
