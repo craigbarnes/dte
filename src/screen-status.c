@@ -32,7 +32,8 @@ static void add_separator(Formatter *f)
 
 static void add_status_str(Formatter *f, const char *str)
 {
-    if (!*str) {
+    BUG_ON(!str);
+    if (!str[0]) {
         return;
     }
     add_separator(f);

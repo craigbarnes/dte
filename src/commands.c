@@ -919,6 +919,7 @@ static void cmd_open(const CommandArgs *a)
 
 static void cmd_option(const CommandArgs *a)
 {
+    BUG_ON(a->nr_args < 3);
     size_t nstrs = a->nr_args - 1;
     if (unlikely(nstrs % 2 != 0)) {
         error_msg("Missing option value");

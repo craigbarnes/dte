@@ -64,11 +64,13 @@ static inline int hex_decode(unsigned char c)
 
 static inline unsigned char ascii_tolower(unsigned char c)
 {
+    static_assert(ASCII_UPPER == 0x20);
     return c + (ascii_table[c] & ASCII_UPPER);
 }
 
 static inline unsigned char ascii_toupper(unsigned char c)
 {
+    static_assert(ASCII_LOWER << 1 == 0x20);
     return c - ((ascii_table[c] & ASCII_LOWER) << 1);
 }
 
