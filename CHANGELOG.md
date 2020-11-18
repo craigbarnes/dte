@@ -6,13 +6,13 @@ v1.10 (not yet released)
 
 **Additions:**
 
-* Added support for [`macro`] recording.
-* Added a [`delete-line`] command.
-* Added a [`match-bracket`] command.
-* Added [`blkup`] and [`blkdown`] commands.
-* Added an optional *exitcode* argument to the [`quit`] command.
-* Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
-  command.
+* Added 6 new commands:
+  * [`blkdown`]
+  * [`blkup`]
+  * [`delete-line`]
+  * [`exec-open`]
+  * [`macro`]
+  * [`match-bracket`]
 * Added various, new command flags:
   * [`include -q`][`include`]
   * [`hi -c`][`hi`]
@@ -21,10 +21,17 @@ v1.10 (not yet released)
   * [`close -p`][`close`]
   * [`wclose -p`][`wclose`]
   * [`open -t`][`open`]
+  * [`save -b`][`save`]
+  * [`save -B`][`save`]
   * [`wsplit -t`][`wsplit`]
   * [`wsplit -g`][`wsplit`]
   * [`wsplit -n`][`wsplit`]
-* Added a [`select-cursor-char`] global option.
+* Added 2 new global options:
+  * [`select-cursor-char`]
+  * [`utf8-bom`]
+* Added an optional *exitcode* argument to the [`quit`] command.
+* Added `color`, `env`, `option` and `wsplit` arguments to the [`show`]
+  command.
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
@@ -49,8 +56,6 @@ v1.10 (not yet released)
   to the current window height/width, before running the specified program.
 * Clarified which command flags in the [`dterc`] man page are mutually
   exclusive (by separating them with `|`).
-* Excluded commands beginning with a space character from the command
-  history.
 * Fixed signal handling, to allow interrupting unresponsive/deadlocked
   child processes with Ctrl+c.
 * Various syntax highlighting improvements.
@@ -434,6 +439,7 @@ system except a somewhat recent kernel.
 [`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
+[`exec-open`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec-open
 [`filter`]: https://craigbarnes.gitlab.io/dte/dterc.html#filter
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
@@ -442,10 +448,12 @@ system except a somewhat recent kernel.
 [`open`]: https://craigbarnes.gitlab.io/dte/dterc.html#open
 [`pipe-to`]: https://craigbarnes.gitlab.io/dte/dterc.html#pipe-to
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
+[`save`]: https://craigbarnes.gitlab.io/dte/dterc.html#save
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
-[select-cursor-char]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
+[`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
+[`utf8-bom`]: https://craigbarnes.gitlab.io/dte/dterc.html#utf8-bom
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left

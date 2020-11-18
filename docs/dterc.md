@@ -1183,7 +1183,7 @@ Format string for the left aligned part of status line.
 `%%`
 :   Literal `%`.
 
-### **statusline-right** [" %y,%X   %u   %E %n %t   %p "]
+### **statusline-right** [" %y,%X   %u   %E%s%b%s%n %t   %p "]
 
 Format string for the right aligned part of status line.
 
