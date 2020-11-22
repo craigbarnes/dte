@@ -120,3 +120,8 @@ bind F1 'run man dterc'
 bind F3 'search -n'
 bind F4 'search -p'
 bind F5 refresh
+
+# Most terminals don't support sending these modifer+key combinations
+# as distinct sequences, so don't be surprised if they don't work.
+bind C-tab next
+bind C-S-tab prev
