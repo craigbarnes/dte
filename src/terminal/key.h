@@ -12,7 +12,7 @@ enum {
     // When stored in a 32-bit integer, it only requires the first
     // 21 low-order bits, leaving 11 high-order bits available to
     // be used as bit flags.
-    KEY_UNICODE_MAX = 0x010FFFF,
+    KEY_UNICODE_MAX = 0x10FFFF,
 
     // In addition to the 11 unused, high-order bits, there are also
     // some unused values in the range from KEY_UNICODE_MAX + 1 to
