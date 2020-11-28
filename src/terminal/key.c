@@ -166,6 +166,8 @@ const char *keycode_to_string(KeyCode k)
         );
     } else if (key == KEY_PASTE) {
         COPY(ptr, "paste");
+    } else if (key == KEY_IGNORE) {
+        COPY(buf, "ignore");
     } else {
         static_assert(sizeof(buf) >= sizeof("INVALID (0xFFFFFFFF)"));
         xsnprintf(buf, sizeof buf, "INVALID (0x%08" PRIX32 ")", k);

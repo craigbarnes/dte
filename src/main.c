@@ -202,6 +202,8 @@ static ExitCode showkey_loop(void)
         } else if (key == KEY_PASTE) {
             term_discard_paste();
             continue;
+        } else if (key == KEY_IGNORE) {
+            continue;
         } else {
             if (key == CTRL('D')) {
                 loop = false;

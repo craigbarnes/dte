@@ -55,6 +55,7 @@ enum {
     MOD_MASK  = MOD_SHIFT | MOD_META | MOD_CTRL,
 
     KEY_PASTE = 0x8000000,
+    KEY_IGNORE = 0x8000001,
 };
 
 typedef uint32_t KeyCode;

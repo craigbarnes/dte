@@ -31,8 +31,8 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf pipe redo fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii debug exec hashset line-iter path ptr-array readfile string \
-    strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
+    ascii base64 debug exec hashset line-iter path ptr-array readfile \
+    string strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
     args env macro parse run serialize )
@@ -44,7 +44,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color ecma48 input key mode no-op output rxvt terminal terminfo \
+    color ecma48 input key kitty mode no-op output rxvt terminal terminfo \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \

@@ -42,6 +42,7 @@ v1.10 (not yet released)
 * Added `%N` and `%S` [statusline] format specifiers.
 * Added a large confirmation dialog, shown when [`quit -p`][`quit`] is
   run with unsaved changes.
+* Added support for [kitty's extended keyboard protocol]
 
 **Improvements:**
 
@@ -432,6 +433,7 @@ system except a somewhat recent kernel.
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
+[kitty's extended keyboard protocol]: https://sw.kovidgoyal.net/kitty/protocol-extensions.html#extended-key-protocol
 
 [`blkdown`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkdown
 [`blkup`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkup
