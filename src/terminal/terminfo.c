@@ -191,13 +191,14 @@ static void move_cursor(unsigned int x, unsigned int y)
 
 static bool attr_is_set(const TermColor *color, unsigned int attr)
 {
-    if (!(color->attr & attr)) {
-        return false;
-    } else if (terminal.ncv_attributes & attr) {
-        // Terminal only allows attr when not using colors
-        return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+    if (color->attr & attr) {
+        if (unlikely(terminal.ncv_attributes & attr)) {
+            // Terminal only allows attr when not using colors
+            return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 static void set_color(const TermColor *color)
