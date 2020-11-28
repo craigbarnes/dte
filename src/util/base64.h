@@ -3,10 +3,16 @@
 
 #include <stdint.h>
 
-extern const uint8_t base64_table[256];
+enum {
+    BASE64_INVALID = 64, // Return value for invalid bytes ([^A-Za-z0-9+/=])
+    BASE64_PADDING = 65, // Return value for padding bytes (=)
+};
 
+// Decodes a single, base64 digit and returns a numerical value between 0-63,
+// or one of the special enum values above.
 static inline unsigned int base64_decode(unsigned char c)
 {
+    extern const uint8_t base64_table[256];
     return base64_table[c];
 }
 
