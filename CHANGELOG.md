@@ -13,7 +13,7 @@ v1.10 (not yet released)
   * [`exec-open`]
   * [`macro`]
   * [`match-bracket`]
-* Added various, new command flags:
+* Added 12 new command flags:
   * [`include -q`][`include`]
   * [`hi -c`][`hi`]
   * [`filter -l`][`filter`]
@@ -49,7 +49,6 @@ v1.10 (not yet released)
 * Updated Unicode support to version 13.
 * Bound Ctrl+c to [`copy -k`][`copy`] by default.
 * Re-introduced built-in support for rxvt Ctrl/Alt/Shift key combinations.
-* Added built-in support for many additional terminals.
 * Fixed the handling of optional capture groups in [`errorfmt`] patterns.
 * Improved the legibility of the default color scheme on a wider range
   of terminals.
