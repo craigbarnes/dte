@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 enum {
-    BASE64_INVALID = 64, // Return value for invalid bytes ([^A-Za-z0-9+/=])
-    BASE64_PADDING = 65, // Return value for padding bytes (=)
+    BASE64_PADDING = 1 << 6, // Return value for padding bytes (=)
+    BASE64_INVALID = 1 << 7, // Return value for invalid bytes ([^A-Za-z0-9+/=])
 };
 
 // Decodes a single, base64 digit and returns a numerical value between 0-63,

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "test.h"
 #include "util/ascii.h"
+#include "util/base64.h"
 #include "util/checked-arith.h"
 #include "util/hash.h"
 #include "util/hashset.h"
@@ -316,6 +317,42 @@ static void test_ascii(void)
     // Restore the original locale
     setlocale(LC_CTYPE, saved_locale);
     free(saved_locale);
+}
+
+static void test_base64(void)
+{
+    EXPECT_EQ(base64_decode('A'), 0);
+    EXPECT_EQ(base64_decode('Z'), 25);
+    EXPECT_EQ(base64_decode('a'), 26);
+    EXPECT_EQ(base64_decode('z'), 51);
+    EXPECT_EQ(base64_decode('0'), 52);
+    EXPECT_EQ(base64_decode('9'), 61);
+    EXPECT_EQ(base64_decode('+'), 62);
+    EXPECT_EQ(base64_decode('/'), 63);
+    EXPECT_EQ(base64_decode('='), BASE64_PADDING);
+    EXPECT_EQ(base64_decode(0x00), BASE64_INVALID);
+    EXPECT_EQ(base64_decode(0xFF), BASE64_INVALID);
+
+    for (unsigned char i = 'A'; i <= 'Z'; i++) {
+        IEXPECT_EQ(base64_decode(i), i - 'A');
+    }
+
+    for (unsigned char i = 'a'; i <= 'z'; i++) {
+        IEXPECT_EQ(base64_decode(i), (i - 'a') + 26);
+    }
+
+    for (unsigned char i = '0'; i <= '9'; i++) {
+        IEXPECT_EQ(base64_decode(i), (i - '0') + 52);
+    }
+
+    for (unsigned int i = 0; i < 256; i++) {
+        unsigned int val = base64_decode(i);
+        if (ascii_isalnum(i) || i == '+' || i == '/') {
+            IEXPECT_EQ(val, val & 63);
+        } else {
+            IEXPECT_EQ(val, val & 192);
+        }
+    }
 }
 
 static void test_string(void)
@@ -1244,6 +1281,7 @@ void test_util(void)
     test_IS_POWER_OF_2();
     test_xstreq();
     test_ascii();
+    test_base64();
     test_string();
     test_string_view();
     test_size_str_width();
