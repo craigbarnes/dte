@@ -2,8 +2,8 @@
 #define COMMAND_ARGS_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include "run.h"
+#include "util/base64.h"
 #include "util/debug.h"
 #include "util/macros.h"
 
@@ -20,15 +20,12 @@ typedef enum {
 // Failure: (ARGERR_* | (flag << 8))
 typedef unsigned int ArgParseError;
 
-static inline uint8_t cmdargs_flagset_idx(unsigned char flag)
+// Map ASCII alphanumeric characters to values between 1 and 62,
+// for use as bitset indices in CommandArgs::flag_set
+static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
 {
-    extern const uint8_t flagset_map[128];
-    if (unlikely(flag >= sizeof(flagset_map))) {
-        return 0;
-    }
-    uint8_t idx = flagset_map[flag];
-    BUG_ON(idx > 62);
-    return idx;
+    unsigned int i = base64_decode(flag);
+    return likely(i < 62) ? i + 1 : 0;
 }
 
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)

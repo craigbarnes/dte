@@ -378,14 +378,16 @@ static void test_command_struct_layout(void)
 
 static void test_cmdargs_flagset_idx(void)
 {
-    EXPECT_EQ(cmdargs_flagset_idx('0'), 1);
-    EXPECT_EQ(cmdargs_flagset_idx('1'), 2);
-    EXPECT_EQ(cmdargs_flagset_idx('9'), 10);
-    EXPECT_EQ(cmdargs_flagset_idx('A'), 11);
-    EXPECT_EQ(cmdargs_flagset_idx('Z'), 36);
-    EXPECT_EQ(cmdargs_flagset_idx('a'), 37);
-    EXPECT_EQ(cmdargs_flagset_idx('z'), 62);
+    EXPECT_EQ(cmdargs_flagset_idx('A'), 1);
+    EXPECT_EQ(cmdargs_flagset_idx('Z'), 26);
+    EXPECT_EQ(cmdargs_flagset_idx('a'), 27);
+    EXPECT_EQ(cmdargs_flagset_idx('z'), 52);
+    EXPECT_EQ(cmdargs_flagset_idx('0'), 53);
+    EXPECT_EQ(cmdargs_flagset_idx('1'), 54);
+    EXPECT_EQ(cmdargs_flagset_idx('9'), 62);
+    EXPECT_EQ(cmdargs_flagset_idx('+'), 0);
     EXPECT_EQ(cmdargs_flagset_idx('/'), 0);
+    EXPECT_EQ(cmdargs_flagset_idx('='), 0);
     EXPECT_EQ(cmdargs_flagset_idx(':'), 0);
     EXPECT_EQ(cmdargs_flagset_idx('@'), 0);
     EXPECT_EQ(cmdargs_flagset_idx('['), 0);
@@ -397,10 +399,10 @@ static void test_cmdargs_flagset_idx(void)
     EXPECT_EQ(cmdargs_flagset_idx('\xFF'), 0);
 
     for (unsigned char c = 0; c < 255; c++) {
-        const uint8_t idx = cmdargs_flagset_idx(c);
+        const unsigned int idx = cmdargs_flagset_idx(c);
         EXPECT_TRUE(idx < 63);
         if (ascii_isalnum(c)) {
-            EXPECT_TRUE(idx > 0);
+            EXPECT_EQ(idx, base64_decode(c) + 1);
         } else {
             EXPECT_EQ(idx, 0);
         }
