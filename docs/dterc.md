@@ -1193,7 +1193,7 @@ Whether to show the tab-bar at the top of each window.
 
 ### **utf8-bom** [false]
 
-Whether to write a byte order mark (BOM) in new newly created UTF-8
+Whether to write a byte order mark (BOM) in newly created UTF-8
 files.
 
 Note: buffers opened from existing UTF-8 files will have their BOM
