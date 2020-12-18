@@ -20,7 +20,7 @@
 
 static void handle_error_msg(const Compiler *c, char *str)
 {
-    if (*str == '\0' || *str == '\n') {
+    if (str[0] == '\0' || str[0] == '\n') {
         return;
     }
 

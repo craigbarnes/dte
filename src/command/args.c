@@ -27,7 +27,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     size_t nr_flag_args = 0;
     bool flags_after_arg = true;
 
-    if (*flag_desc == '-') {
+    if (flag_desc[0] == '-') {
         flag_desc++;
         flags_after_arg = false;
     }
