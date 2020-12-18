@@ -9,12 +9,12 @@
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
-    if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1) {
-        *w = ws.ws_col;
-        *h = ws.ws_row;
-        return true;
+    if (unlikely(ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)) {
+        return false;
     }
-    return false;
+    *w = ws.ws_col;
+    *h = ws.ws_row;
+    return true;
 }
 
 #elif defined(HAVE_TCGETWINSIZE)
@@ -24,12 +24,12 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
-    if (tcgetwinsize(STDIN_FILENO, &ws) != -1) {
-        *w = ws.ws_col;
-        *h = ws.ws_row;
-        return true;
+    if (unlikely(tcgetwinsize(STDIN_FILENO, &ws) != 0)) {
+        return false;
     }
-    return false;
+    *w = ws.ws_col;
+    *h = ws.ws_row;
+    return true;
 }
 
 #else
