@@ -13,7 +13,7 @@ img = public/screenshot.png public/favicon.ico
 
 docs: man html htmlgz
 man: $(man)
-html: $(html) $(css) $(img)
+html: $(html) $(css) $(img) public/robots.txt
 htmlgz: $(patsubst %, %.gz, $(html) $(css) public/favicon.ico)
 pdf: public/dte.pdf
 
@@ -47,7 +47,7 @@ public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
-$(img): public/%: docs/% | public/
+$(img) public/robots.txt: public/%: docs/% | public/
 	$(E) CP $@
 	$(Q) cp $< $@
 
