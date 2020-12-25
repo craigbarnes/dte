@@ -9,7 +9,7 @@ ssize_t xread(int fd, void *buf, size_t count)
     size_t pos = 0;
     do {
         ssize_t rc = read(fd, b + pos, count - pos);
-        if (rc == -1) {
+        if (unlikely(rc == -1)) {
             if (errno == EINTR) {
                 continue;
             }
@@ -30,7 +30,7 @@ ssize_t xwrite(int fd, const void *buf, size_t count)
     const size_t count_save = count;
     do {
         ssize_t rc = write(fd, b, count);
-        if (rc == -1) {
+        if (unlikely(rc == -1)) {
             if (errno == EINTR) {
                 continue;
             }
