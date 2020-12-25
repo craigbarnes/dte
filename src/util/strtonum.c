@@ -6,7 +6,7 @@
 
 size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
 {
-    if (size == 0 || !ascii_isdigit(str[0])) {
+    if (unlikely(size == 0 || !ascii_isdigit(str[0]))) {
         return 0;
     }
 
@@ -50,7 +50,7 @@ size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp)
 
 static size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
-    if (size == 0) {
+    if (unlikely(size == 0)) {
         return 0;
     }
 
@@ -85,7 +85,7 @@ static size_t buf_parse_long(const char *str, size_t size, long *valp)
 bool str_to_int(const char *str, int *valp)
 {
     const size_t len = strlen(str);
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return false;
     }
     long val;
@@ -100,7 +100,7 @@ bool str_to_int(const char *str, int *valp)
 bool str_to_uint(const char *str, unsigned int *valp)
 {
     const size_t len = strlen(str);
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return false;
     }
     uintmax_t val;
@@ -115,7 +115,7 @@ bool str_to_uint(const char *str, unsigned int *valp)
 bool str_to_size(const char *str, size_t *valp)
 {
     const size_t len = strlen(str);
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return false;
     }
     uintmax_t val;
@@ -130,7 +130,7 @@ bool str_to_size(const char *str, size_t *valp)
 bool str_to_ulong(const char *str, unsigned long *valp)
 {
     const size_t len = strlen(str);
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return false;
     }
     unsigned long val;

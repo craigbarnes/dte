@@ -122,7 +122,7 @@ HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
 const void *mem_intern(const void *data, size_t len)
 {
     static HashSet pool;
-    if (!pool.table_size) {
+    if (unlikely(pool.table_size == 0)) {
         hashset_init(&pool, 32, false);
     }
 
