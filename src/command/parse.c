@@ -6,6 +6,7 @@
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/string.h"
+#include "util/strtonum.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 

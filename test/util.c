@@ -162,21 +162,6 @@ static void test_ascii(void)
     EXPECT_FALSE(ascii_isdigit('\0'));
     EXPECT_FALSE(ascii_isdigit(0xFF));
 
-    EXPECT_TRUE(ascii_isxdigit('0'));
-    EXPECT_TRUE(ascii_isxdigit('1'));
-    EXPECT_TRUE(ascii_isxdigit('9'));
-    EXPECT_TRUE(ascii_isxdigit('a'));
-    EXPECT_TRUE(ascii_isxdigit('A'));
-    EXPECT_TRUE(ascii_isxdigit('f'));
-    EXPECT_TRUE(ascii_isxdigit('F'));
-    EXPECT_FALSE(ascii_isxdigit('g'));
-    EXPECT_FALSE(ascii_isxdigit('G'));
-    EXPECT_FALSE(ascii_isxdigit('@'));
-    EXPECT_FALSE(ascii_isxdigit('/'));
-    EXPECT_FALSE(ascii_isxdigit(':'));
-    EXPECT_FALSE(ascii_isxdigit('\0'));
-    EXPECT_FALSE(ascii_isxdigit(0xFF));
-
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\0'));
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\a'));
     EXPECT_TRUE(ascii_is_nonspace_cntrl('\b'));
@@ -252,6 +237,7 @@ static void test_ascii(void)
     EXPECT_FALSE(is_regex_special_char(0xFF));
 
     EXPECT_EQ(hex_decode('0'), 0);
+    EXPECT_EQ(hex_decode('1'), 1);
     EXPECT_EQ(hex_decode('9'), 9);
     EXPECT_EQ(hex_decode('a'), 10);
     EXPECT_EQ(hex_decode('A'), 10);
@@ -259,9 +245,13 @@ static void test_ascii(void)
     EXPECT_EQ(hex_decode('F'), 15);
     EXPECT_EQ(hex_decode('g'), -1);
     EXPECT_EQ(hex_decode('G'), -1);
+    EXPECT_EQ(hex_decode('@'), -1);
+    EXPECT_EQ(hex_decode('/'), -1);
+    EXPECT_EQ(hex_decode(':'), -1);
     EXPECT_EQ(hex_decode(' '), -1);
-    EXPECT_EQ(hex_decode('\0'), -1);
     EXPECT_EQ(hex_decode('~'), -1);
+    EXPECT_EQ(hex_decode('\0'), -1);
+    EXPECT_EQ(hex_decode(0xFF), -1);
 
     EXPECT_TRUE(ascii_streq_icase("", ""));
     EXPECT_TRUE(ascii_streq_icase("a", "a"));
@@ -308,7 +298,7 @@ static void test_ascii(void)
         EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
-        EXPECT_EQ(ascii_isxdigit(i), !!isxdigit(i));
+        EXPECT_EQ(hex_decode(i) != -1, !!isxdigit(i));
         if (i != '\v' && i != '\f') {
             EXPECT_EQ(ascii_isspace(i), !!isspace(i));
         }

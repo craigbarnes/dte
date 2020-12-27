@@ -7,7 +7,6 @@
 #include "macros.h"
 
 extern const uint8_t ascii_table[256];
-extern const int8_t hex_table[256];
 
 typedef enum {
     ASCII_SPACE = 0x01,
@@ -50,16 +49,6 @@ static inline bool ascii_isblank(unsigned char c)
 static inline bool ascii_is_nonspace_cntrl(unsigned char c)
 {
     return ascii_table[c] == ASCII_CNTRL;
-}
-
-static inline bool ascii_isxdigit(unsigned char c)
-{
-    return hex_table[c] != -1;
-}
-
-static inline int hex_decode(unsigned char c)
-{
-    return hex_table[c];
 }
 
 static inline unsigned char ascii_tolower(unsigned char c)
