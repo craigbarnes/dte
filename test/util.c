@@ -898,6 +898,77 @@ static void test_ptr_array(void)
     EXPECT_EQ(a.count, 0);
 }
 
+static void test_ptr_array_move(void)
+{
+    PointerArray a = PTR_ARRAY_INIT;
+    ptr_array_append(&a, xstrdup("A"));
+    ptr_array_append(&a, xstrdup("B"));
+    ptr_array_append(&a, xstrdup("C"));
+    ptr_array_append(&a, xstrdup("D"));
+    ptr_array_append(&a, xstrdup("E"));
+    ptr_array_append(&a, xstrdup("F"));
+    EXPECT_EQ(a.count, 6);
+
+    ptr_array_move(&a, 0, 1);
+    EXPECT_STREQ(a.ptrs[0], "B");
+    EXPECT_STREQ(a.ptrs[1], "A");
+
+    ptr_array_move(&a, 1, 0);
+    EXPECT_STREQ(a.ptrs[0], "A");
+    EXPECT_STREQ(a.ptrs[1], "B");
+
+    ptr_array_move(&a, 1, 5);
+    EXPECT_STREQ(a.ptrs[0], "A");
+    EXPECT_STREQ(a.ptrs[1], "C");
+    EXPECT_STREQ(a.ptrs[2], "D");
+    EXPECT_STREQ(a.ptrs[3], "E");
+    EXPECT_STREQ(a.ptrs[4], "F");
+    EXPECT_STREQ(a.ptrs[5], "B");
+
+    ptr_array_move(&a, 5, 1);
+    EXPECT_STREQ(a.ptrs[0], "A");
+    EXPECT_STREQ(a.ptrs[1], "B");
+    EXPECT_STREQ(a.ptrs[2], "C");
+    EXPECT_STREQ(a.ptrs[3], "D");
+    EXPECT_STREQ(a.ptrs[4], "E");
+    EXPECT_STREQ(a.ptrs[5], "F");
+
+    ptr_array_move(&a, 0, 5);
+    EXPECT_STREQ(a.ptrs[0], "B");
+    EXPECT_STREQ(a.ptrs[1], "C");
+    EXPECT_STREQ(a.ptrs[2], "D");
+    EXPECT_STREQ(a.ptrs[3], "E");
+    EXPECT_STREQ(a.ptrs[4], "F");
+    EXPECT_STREQ(a.ptrs[5], "A");
+
+    ptr_array_move(&a, 5, 0);
+    EXPECT_STREQ(a.ptrs[0], "A");
+    EXPECT_STREQ(a.ptrs[1], "B");
+    EXPECT_STREQ(a.ptrs[2], "C");
+    EXPECT_STREQ(a.ptrs[3], "D");
+    EXPECT_STREQ(a.ptrs[4], "E");
+    EXPECT_STREQ(a.ptrs[5], "F");
+
+    ptr_array_move(&a, 5, 0);
+    EXPECT_STREQ(a.ptrs[0], "F");
+    EXPECT_STREQ(a.ptrs[1], "A");
+    EXPECT_STREQ(a.ptrs[2], "B");
+    EXPECT_STREQ(a.ptrs[3], "C");
+    EXPECT_STREQ(a.ptrs[4], "D");
+    EXPECT_STREQ(a.ptrs[5], "E");
+
+    ptr_array_move(&a, 4, 5);
+    EXPECT_STREQ(a.ptrs[4], "E");
+    EXPECT_STREQ(a.ptrs[5], "D");
+
+    ptr_array_move(&a, 1, 3);
+    EXPECT_STREQ(a.ptrs[1], "B");
+    EXPECT_STREQ(a.ptrs[2], "C");
+    EXPECT_STREQ(a.ptrs[3], "A");
+
+    ptr_array_free(&a);
+}
+
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -1291,6 +1362,7 @@ void test_util(void)
     test_u_set_char();
     test_u_prev_char();
     test_ptr_array();
+    test_ptr_array_move();
     test_hashset();
     test_round_size_to_next_multiple();
     test_round_size_to_next_power_of_2();

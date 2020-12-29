@@ -773,24 +773,23 @@ static void cmd_move_tab(const CommandArgs *a)
 {
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
-    size_t j, i = ptr_array_idx(&window->views, view);
-    BUG_ON(i >= ntabs);
+    size_t to, from = ptr_array_idx(&window->views, view);
+    BUG_ON(from >= ntabs);
     if (streq(str, "left")) {
-        j = ((i - 1) + ntabs) % ntabs;
+        to = ((from - 1) + ntabs) % ntabs;
     } else if (streq(str, "right")) {
-        j = (i + 1) % ntabs;
+        to = (from + 1) % ntabs;
     } else {
-        if (!str_to_size(str, &j) || j == 0) {
+        if (!str_to_size(str, &to) || to == 0) {
             error_msg("Invalid tab position %s", str);
             return;
         }
-        j--;
-        if (j >= ntabs) {
-            j = ntabs - 1;
+        to--;
+        if (to >= ntabs) {
+            to = ntabs - 1;
         }
     }
-    void *ptr = ptr_array_remove_idx(&window->views, i);
-    ptr_array_insert(&window->views, ptr, j);
+    ptr_array_move(&window->views, from, to);
     window->update_tabbar = true;
 }
 

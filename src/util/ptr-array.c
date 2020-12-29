@@ -1,5 +1,6 @@
 #include <string.h>
 #include "ptr-array.h"
+#include "debug.h"
 
 void ptr_array_append(PointerArray *array, void *ptr)
 {
@@ -23,6 +24,37 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
     ptr_array_append(array, NULL);
     memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void *));
     array->ptrs[pos] = ptr;
+}
+
+// Move a pointer from one index to another
+void ptr_array_move(PointerArray *array, size_t from, size_t to)
+{
+    BUG_ON(from >= array->count);
+    BUG_ON(to >= array->count);
+    if (unlikely(from == to)) {
+        return;
+    }
+
+    void **p = array->ptrs;
+    void *tmp = p[from];
+    size_t difference = (from < to) ? (to - from) : (from - to);
+    if (difference == 1) {
+        // Adjacent pointers can be moved with a simple swap
+        p[from] = p[to];
+        p[to] = tmp;
+        return;
+    }
+
+    void *dest, *src;
+    if (from < to) {
+        dest = p + from;
+        src = p + from + 1;
+    } else {
+        dest = p + to + 1;
+        src = p + to;
+    }
+    memmove(dest, src, difference * sizeof(void*));
+    p[to] = tmp;
 }
 
 void ptr_array_free_cb(PointerArray *array, FreeFunction free_ptr)
