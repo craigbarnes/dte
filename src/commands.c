@@ -776,7 +776,7 @@ static void cmd_move_tab(const CommandArgs *a)
     size_t to, from = ptr_array_idx(&window->views, view);
     BUG_ON(from >= ntabs);
     if (streq(str, "left")) {
-        to = ((from - 1) + ntabs) % ntabs;
+        to = (from ? from : ntabs) - 1;
     } else if (streq(str, "right")) {
         to = (from + 1) % ntabs;
     } else {
