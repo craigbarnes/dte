@@ -252,7 +252,13 @@ String dump_bindings(void)
         }
     }
 
-    for (size_t i = 0, nbinds = bindings_ptr_array.count; i < nbinds; i++) {
+    size_t n = bindings_ptr_array.count;
+    if (DEBUG && n) {
+        // Show a blank line divider in debug mode, to make it easier to
+        // see which bindings are in the fallback PointerArray
+        string_append_byte(&buf, '\n');
+    }
+    for (size_t i = 0; i < n; i++) {
         const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
         append_binding(&buf, b->key, b->bind->cmd_str);
     }
