@@ -3,7 +3,7 @@
 # compatibility and remain suitable for both light and dark terminals.
 
 hi
-hi linenumber gray darkgray
+hi linenumber reverse
 hi selection default blue
 
 hi text
@@ -22,6 +22,7 @@ hi label bold red
 hi notice bold red
 hi error black yellow
 hi -c comment 245
+hi -c linenumber 250 237
 
 hi tex.macro bold yellow
 hi ini.section bold
