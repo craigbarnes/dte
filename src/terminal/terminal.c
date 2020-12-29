@@ -178,6 +178,18 @@ static StringView str_split(const char *str, unsigned char delim)
     return string_view(str, end ? (size_t)(end - str) : strlen(str));
 }
 
+static bool has_special_suffix(const char *term, const char *suf, size_t suflen)
+{
+    BUG_ON(suflen < 2);
+    BUG_ON(suf[0] != '-');
+    const char *substr = strstr(term, suf);
+    if (!substr) {
+        return false;
+    }
+    char c = substr[suflen];
+    return (c == '-' || c == '\0');
+}
+
 void term_init(void)
 {
     const char *const term = getenv("TERM");
@@ -227,26 +239,29 @@ void term_init(void)
         if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
             terminal.parse_key_sequence = rxvt_parse_key;
         }
-        goto out;
-    }
-
-    // Fall back to using the terminfo database, if available
-    if (term_init_terminfo(term)) {
+    } else if (term_init_terminfo(term)) {
+        // Fall back to using the terminfo database, if available
         return;
     }
 
-out:
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
     } else {
         for (size_t i = 0; i < ARRAY_COUNT(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
-            const char *substr = strstr(term, suffix);
-            const size_t n = color_suffixes[i].suffix_len;
-            if (substr && (substr[n] == '-' || substr[n] == '\0')) {
+            size_t suffix_len = color_suffixes[i].suffix_len;
+            if (has_special_suffix(term, suffix, suffix_len)) {
                 terminal.color_type = color_suffixes[i].color_type;
                 break;
             }
         }
+    }
+
+    if (has_special_suffix(term, STRN("-bce"))) {
+        terminal.back_color_erase = true;
+    }
+
+    if (has_special_suffix(term, STRN("-w"))) {
+        terminal.width = 132;
     }
 }
