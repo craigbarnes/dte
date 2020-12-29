@@ -5,7 +5,7 @@
 void ptr_array_append(PointerArray *array, void *ptr)
 {
     size_t alloc = array->alloc;
-    if (alloc == array->count) {
+    if (unlikely(alloc == array->count)) {
         // NOTE: if alloc was 1 then new alloc would be 1*3/2 = 1!
         alloc *= 3;
         alloc /= 2;
@@ -20,6 +20,7 @@ void ptr_array_append(PointerArray *array, void *ptr)
 
 void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
 {
+    BUG_ON(pos > array->count);
     size_t count = array->count - pos;
     ptr_array_append(array, NULL);
     memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void *));
@@ -74,6 +75,7 @@ void ptr_array_remove(PointerArray *array, void *ptr)
 
 void *ptr_array_remove_idx(PointerArray *array, size_t pos)
 {
+    BUG_ON(pos >= array->count);
     void **ptrs = array->ptrs;
     void *removed = ptrs[pos];
     array->count--;

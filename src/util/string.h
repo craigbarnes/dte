@@ -19,9 +19,7 @@ typedef struct {
     .len = 0 \
 }
 
-#define string_append_literal(s, l) ( \
-    string_append_buf(s, l, STRLEN(l)) \
-)
+#define string_append_literal(s, x) string_append_buf(s, x, STRLEN(x))
 
 static inline String string_new(size_t size)
 {
