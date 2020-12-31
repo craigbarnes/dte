@@ -5,7 +5,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include "debug.h"
 #include "macros.h"
+#include "string-view.h"
 #include "xmalloc.h"
 
 #define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
@@ -42,6 +44,23 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
         return false;
     }
     return mem_equal(str + l1 - l2, suffix, l2);
+}
+
+NONNULL_ARGS
+static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
+{
+    size_t pos = *posp;
+    BUG_ON(pos >= size);
+    size_t len = size - pos;
+    size_t delim_len = 0;
+    const char *ptr = buf + pos;
+    const char *found = memchr(ptr, delim, len);
+    if (found) {
+        len = (size_t)(found - ptr);
+        delim_len = 1;
+    }
+    *posp += len + delim_len;
+    return string_view(ptr, len);
 }
 
 NONNULL_ARGS

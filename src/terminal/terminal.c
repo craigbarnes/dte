@@ -81,18 +81,6 @@ static const TermEntry terms[] = {
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
 
-static const struct {
-    const char suffix[11];
-    uint8_t suffix_len;
-    TermColorCapabilityType color_type;
-} color_suffixes[] = {
-    {"-direct", 7, TERM_TRUE_COLOR},
-    {"-256color", 9, TERM_256_COLOR},
-    {"-16color", 8, TERM_16_COLOR},
-    {"-mono", 5, TERM_0_COLOR},
-    {"-m", 2, TERM_0_COLOR},
-};
-
 Terminal terminal = {
     .back_color_erase = false,
     .color_type = TERM_8_COLOR,
@@ -172,24 +160,6 @@ noreturn void term_init_fail(const char *fmt, ...)
     exit(1);
 }
 
-static StringView str_split(const char *str, unsigned char delim)
-{
-    const char *end = strchr(str, delim);
-    return string_view(str, end ? (size_t)(end - str) : strlen(str));
-}
-
-static bool has_special_suffix(const char *term, const char *suf, size_t suflen)
-{
-    BUG_ON(suflen < 2);
-    BUG_ON(suf[0] != '-');
-    const char *substr = strstr(term, suf);
-    if (!substr) {
-        return false;
-    }
-    char c = substr[suflen];
-    return (c == '-' || c == '\0');
-}
-
 void term_init(void)
 {
     const char *const term = getenv("TERM");
@@ -220,7 +190,9 @@ void term_init(void)
 
     // Extract the "root name" from $TERM, as defined by terminfo(5).
     // This is the initial part of the string up to the first hyphen.
-    StringView name = str_split(real_term, '-');
+    size_t pos = 0;
+    size_t rtlen = strlen(real_term);
+    StringView name = get_delim(real_term, &pos, rtlen, '-');
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&name, terms, term_name_compare);
@@ -246,22 +218,26 @@ void term_init(void)
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
-    } else {
-        for (size_t i = 0; i < ARRAY_COUNT(color_suffixes); i++) {
-            const char *suffix = color_suffixes[i].suffix;
-            size_t suffix_len = color_suffixes[i].suffix_len;
-            if (has_special_suffix(term, suffix, suffix_len)) {
-                terminal.color_type = color_suffixes[i].color_type;
-                break;
-            }
+    }
+
+    while (pos < rtlen) {
+        StringView suffix = get_delim(real_term, &pos, rtlen, '-');
+        if (strview_equal_cstring(&suffix, "bce")) {
+            terminal.back_color_erase = true;
+        } else if (strview_equal_cstring(&suffix, "w")) {
+            terminal.width = 132;
+        } else if (terminal.color_type == TERM_TRUE_COLOR) {
+            continue;
+        } else if (strview_equal_cstring(&suffix, "m")) {
+            terminal.color_type = TERM_0_COLOR;
+        } else if (strview_equal_cstring(&suffix, "mono")) {
+            terminal.color_type = TERM_0_COLOR;
+        } else if (strview_equal_cstring(&suffix, "16color")) {
+            terminal.color_type = TERM_16_COLOR;
+        } else if (strview_equal_cstring(&suffix, "256color")) {
+            terminal.color_type = TERM_256_COLOR;
+        } else if (strview_equal_cstring(&suffix, "direct")) {
+            terminal.color_type = TERM_TRUE_COLOR;
         }
-    }
-
-    if (has_special_suffix(term, STRN("-bce"))) {
-        terminal.back_color_erase = true;
-    }
-
-    if (has_special_suffix(term, STRN("-w"))) {
-        terminal.width = 132;
     }
 }
