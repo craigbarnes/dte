@@ -33,7 +33,7 @@ typedef struct {
 
 static const TermEntry terms[] = {
     {"Eterm", 5, TERM_8_COLOR, 0, BCE},
-    {"alacritty", 9, TERM_8_COLOR, 0, BCE | REP},
+    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP},
     {"ansi", 4, TERM_8_COLOR, 3, 0},
     {"ansiterm", 8, TERM_0_COLOR, 0, 0},
     {"aterm", 5, TERM_8_COLOR, 0, BCE},
@@ -47,14 +47,14 @@ static const TermEntry terms[] = {
     {"dtterm", 6, TERM_8_COLOR, 0, 0},
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
     {"fbterm", 6, TERM_256_COLOR, 18, BCE},
-    {"foot", 4, TERM_256_COLOR, 0, BCE | REP | TITLE},
+    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
     {"hurd", 4, TERM_8_COLOR, 18, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
     {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
     {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE},
     {"jfbterm", 7, TERM_8_COLOR, 18, BCE},
-    {"kitty", 5, TERM_256_COLOR, 0, TITLE},
+    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE},
     {"kon", 3, TERM_8_COLOR, 18, BCE},
     {"kon2", 4, TERM_8_COLOR, 18, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
@@ -228,9 +228,10 @@ void term_init(void)
         return;
     }
 
-    const char *colorterm = getenv("COLORTERM");
-    if (terminal.color_type != TERM_TRUE_COLOR && xstreq(colorterm, "truecolor")) {
+    if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
+    }
+    if (terminal.color_type == TERM_TRUE_COLOR) {
         return;
     }
 
