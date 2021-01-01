@@ -81,6 +81,18 @@ static const TermEntry terms[] = {
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
 
+static const struct {
+    const char suffix[11];
+    uint8_t suffix_len;
+    TermColorCapabilityType color_type;
+} color_suffixes[] = {
+    {"direct", 6, TERM_TRUE_COLOR},
+    {"256color", 8, TERM_256_COLOR},
+    {"16color", 7, TERM_16_COLOR},
+    {"mono", 4, TERM_0_COLOR},
+    {"m", 1, TERM_0_COLOR},
+};
+
 Terminal terminal = {
     .back_color_erase = false,
     .color_type = TERM_8_COLOR,
@@ -216,28 +228,21 @@ void term_init(void)
         return;
     }
 
-    if (xstreq(getenv("COLORTERM"), "truecolor")) {
+    const char *colorterm = getenv("COLORTERM");
+    if (terminal.color_type != TERM_TRUE_COLOR && xstreq(colorterm, "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
+        return;
     }
 
     while (pos < rtlen) {
-        StringView suffix = get_delim(real_term, &pos, rtlen, '-');
-        if (strview_equal_cstring(&suffix, "bce")) {
-            terminal.back_color_erase = true;
-        } else if (strview_equal_cstring(&suffix, "w")) {
-            terminal.width = 132;
-        } else if (terminal.color_type == TERM_TRUE_COLOR) {
-            continue;
-        } else if (strview_equal_cstring(&suffix, "m")) {
-            terminal.color_type = TERM_0_COLOR;
-        } else if (strview_equal_cstring(&suffix, "mono")) {
-            terminal.color_type = TERM_0_COLOR;
-        } else if (strview_equal_cstring(&suffix, "16color")) {
-            terminal.color_type = TERM_16_COLOR;
-        } else if (strview_equal_cstring(&suffix, "256color")) {
-            terminal.color_type = TERM_256_COLOR;
-        } else if (strview_equal_cstring(&suffix, "direct")) {
-            terminal.color_type = TERM_TRUE_COLOR;
+        const StringView str = get_delim(real_term, &pos, rtlen, '-');
+        for (size_t i = 0; i < ARRAY_COUNT(color_suffixes); i++) {
+            const char *suffix = color_suffixes[i].suffix;
+            size_t len = color_suffixes[i].suffix_len;
+            if (strview_equal_strn(&str, suffix, len)) {
+                terminal.color_type = color_suffixes[i].color_type;
+                return;
+            }
         }
     }
 }
