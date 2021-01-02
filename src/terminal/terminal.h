@@ -42,6 +42,4 @@ extern Terminal terminal;
 
 void term_init(void);
 
-noreturn void term_init_fail(const char *fmt, ...) COLD PRINTF(1);
-
 #endif

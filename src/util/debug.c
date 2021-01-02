@@ -42,15 +42,6 @@ void set_fatal_error_cleanup_handler(void (*handler)(void))
     cleanup_handler = handler;
 }
 
-noreturn void fatal_error(const char *msg, int err)
-{
-    cleanup_handler();
-    errno = err;
-    perror(msg);
-    print_stack_trace();
-    abort();
-}
-
 #if DEBUG >= 1
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
@@ -86,26 +77,65 @@ void log_init(const char *varname)
         fprintf(stderr, "Failed to open '%s' ($%s): %s\n", path, varname, err);
         exit(EX_IOERR);
     }
+    xwrite(logfd, "\n", 1);
+    DEBUG_LOG("initialization done; writing messages to %s", path);
 }
 
-void debug_log(const char *function, const char *fmt, ...)
+VPRINTF(2)
+static void debug_logv(const char *function, const char *fmt, va_list ap)
 {
     if (logfd < 0) {
         return;
     }
-
     char buf[4096];
     size_t write_max = ARRAY_COUNT(buf) - 1;
     const size_t len1 = xsnprintf(buf, write_max, "%s: ", function);
     write_max -= len1;
-
-    va_list ap;
-    va_start(ap, fmt);
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
-    va_end(ap);
-
     size_t n = len1 + len2;
     buf[n++] = '\n';
     xwrite(logfd, buf, n);
 }
+
+void debug_log(const char *function, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    debug_logv(function, fmt, ap);
+    va_end(ap);
+}
 #endif
+
+// Error handler for unrecoverable system errors during runtime
+// (e.g. ENOMEM)
+noreturn void fatal_error(const char *msg, int err)
+{
+    DEBUG_LOG("%s: %s", msg, strerror(err));
+    cleanup_handler();
+    errno = err;
+    perror(msg);
+    print_stack_trace();
+    abort();
+}
+
+// Error handler for problems encountered during initialization
+// (e.g. unsupported $TERM)
+noreturn void init_error(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+#if DEBUG >= 2
+    va_list ap2;
+    va_copy(ap2, ap);
+    debug_logv(__func__, fmt, ap2);
+    va_end(ap2);
+#endif
+
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    putc('\n', stderr);
+    fflush(stderr);
+
+    exit(1);
+}

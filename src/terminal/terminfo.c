@@ -275,15 +275,15 @@ bool term_init_terminfo(const char *term)
     };
 
     if (get_terminfo_flag("nxon")) {
-        term_init_fail("TERM='%s' not supported: 'nxon' flag is set", term);
+        init_error("TERM='%s' not supported: 'nxon' flag is set", term);
     }
 
     if (get_terminfo_flag("hz")) {
-        term_init_fail("TERM='%s' not supported: 'hz' flag is set", term);
+        init_error("TERM='%s' not supported: 'hz' flag is set", term);
     }
 
     if (!terminfo.cup) {
-        term_init_fail("TERM='%s' not supported: no 'cup' capability", term);
+        init_error("TERM='%s' not supported: no 'cup' capability", term);
     }
 
     int width = tigetnum("cols");

@@ -161,33 +161,22 @@ UNITTEST {
     }
 }
 
-noreturn void term_init_fail(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    putc('\n', stderr);
-    fflush(stderr);
-    exit(1);
-}
-
 void term_init(void)
 {
     const char *const term = getenv("TERM");
     if (!term || term[0] == '\0') {
-        term_init_fail("'TERM' not set");
+        init_error("'TERM' not set");
     }
 
     if (!term_mode_init()) {
-        term_init_fail("tcgetattr: %s", strerror(errno));
+        init_error("tcgetattr: %s", strerror(errno));
     }
 
     if (getenv("DTE_FORCE_TERMINFO")) {
         if (term_init_terminfo(term)) {
             return;
         } else {
-            term_init_fail("'DTE_FORCE_TERMINFO' set but terminfo not linked");
+            init_error("'DTE_FORCE_TERMINFO' set but terminfo not linked");
         }
     }
 
