@@ -173,11 +173,11 @@ void term_init(void)
     }
 
     if (getenv("DTE_FORCE_TERMINFO")) {
-        if (term_init_terminfo(term)) {
-            return;
-        } else {
-            init_error("'DTE_FORCE_TERMINFO' set but terminfo not linked");
+        DEBUG_LOG("$DTE_FORCE_TERMINFO variable is set");
+        if (!term_init_terminfo(term)) {
+            init_error("$DTE_FORCE_TERMINFO set but libterminfo unavailable");
         }
+        return;
     }
 
     // Strip phony "xterm-" prefix used by certain terminals
@@ -212,6 +212,8 @@ void term_init(void)
         if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
             terminal.parse_key_sequence = rxvt_parse_key;
         }
+        const int n = (int)name.length;
+        DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
     } else if (term_init_terminfo(term)) {
         // Fall back to using the terminfo database, if available
         return;
@@ -219,6 +221,7 @@ void term_init(void)
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
+        DEBUG_LOG("true color support detected ($COLORTERM)");
     }
     if (terminal.color_type == TERM_TRUE_COLOR) {
         return;
@@ -231,6 +234,7 @@ void term_init(void)
             size_t len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, len)) {
                 terminal.color_type = color_suffixes[i].color_type;
+                DEBUG_LOG("color type detected from $TERM suffix '-%s'", suffix);
                 return;
             }
         }

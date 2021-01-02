@@ -77,8 +77,11 @@ void log_init(const char *varname)
         fprintf(stderr, "Failed to open '%s' ($%s): %s\n", path, varname, err);
         exit(EX_IOERR);
     }
-    xwrite(logfd, "\n", 1);
-    DEBUG_LOG("initialization done; writing messages to %s", path);
+    if (xwrite(logfd, "\n", 1) != 1) {
+        fprintf(stderr, "Failed to write to log: %s\n", strerror(errno));
+        exit(EX_IOERR);
+    }
+    DEBUG_LOG("log initialization done; writing messages to '%s'", path);
 }
 
 VPRINTF(2)

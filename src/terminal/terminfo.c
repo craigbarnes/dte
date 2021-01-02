@@ -277,11 +277,9 @@ bool term_init_terminfo(const char *term)
     if (get_terminfo_flag("nxon")) {
         init_error("TERM='%s' not supported: 'nxon' flag is set", term);
     }
-
     if (get_terminfo_flag("hz")) {
         init_error("TERM='%s' not supported: 'hz' flag is set", term);
     }
-
     if (!terminfo.cup) {
         init_error("TERM='%s' not supported: no 'cup' capability", term);
     }
@@ -317,6 +315,8 @@ bool term_init_terminfo(const char *term)
         }
     };
 
+    DEBUG_LOG("using terminfo entry '%s'", term);
+
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         // Just use the built-in ecma48_set_color() function if true color
         // support is indicated. This bypasses tputs(3), but no true color
@@ -324,6 +324,7 @@ bool term_init_terminfo(const char *term)
         // features (like e.g. baudrate-dependant padding).
         terminal.color_type = TERM_TRUE_COLOR;
         terminal.set_color = &ecma48_set_color;
+        DEBUG_LOG("true color support detected ($COLORTERM)");
     } else {
         switch (tigetnum("colors")) {
         case 16777216:
