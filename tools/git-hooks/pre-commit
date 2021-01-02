@@ -49,7 +49,6 @@ done
 for CC in gcc clang; do
     export CC="ccache $CC"
     $MAKE check
-    $MAKE check TERMINFO_DISABLE=1
     $MAKE check ICONV_DISABLE=1
     $MAKE check DEBUG=0
 done

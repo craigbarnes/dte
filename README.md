@@ -52,7 +52,6 @@ installed:
 
 * [GCC] 4.6+ or [Clang]
 * [GNU Make] 3.81+
-* [terminfo] library (usually provided by [ncurses])
 * [iconv] library (usually provided by libc on Linux/FreeBSD)
 
 ...then download and unpack the latest release tarball:
@@ -99,8 +98,6 @@ Public License version 2 for more details.
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
-[ncurses]: https://invisible-island.net/ncurses/
-[terminfo]: https://en.wikipedia.org/wiki/Terminfo
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html

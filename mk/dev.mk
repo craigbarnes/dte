@@ -71,7 +71,6 @@ $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 show-sizes: MAKEFLAGS += \
     -j$(NPROC) --no-print-directory \
     CFLAGS=-O2\ -pipe \
-    TERMINFO_DISABLE=1 \
     DEBUG=0 USE_SANITIZER=
 
 show-sizes:

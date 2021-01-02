@@ -1,6 +1,6 @@
 image: debian/unstable
 arch: arm64
-packages: [make, gcc, libncurses-dev]
+packages: [make, gcc]
 sources: [https://git.sr.ht/~xcb/dte]
 tasks:
     - build: |

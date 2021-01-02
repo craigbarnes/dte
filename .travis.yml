@@ -14,7 +14,6 @@ script:
     - $MAKE vars
     - $MAKE check
     - ./dte -V
-    - $MAKE check TERMINFO_DISABLE=1
     - $MAKE check ICONV_DISABLE=1
     - $MAKE distcheck
     - if test "$TRAVIS_OS_NAME" = osx; then brew install yumitsu/dte/dte; fi

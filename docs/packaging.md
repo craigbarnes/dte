@@ -25,12 +25,6 @@ Other variables
 There are some other variables that may be useful in certain cases
 (but typically shouldn't be used for general packaging):
 
-* `TERMINFO_DISABLE=1`: Use built-in terminal support, instead of
-  linking to the system [terminfo]/curses library. This makes it much
-  easier to build a portable, statically linked binary. The built-in
-  terminal support currently works with `tmux`, `screen`, `st`, `xterm`
-  (and many other `xterm`-compatible terminals) and falls back to
-  [ECMA-48] mode for other terminals.
 * `ICONV_DISABLE=1`: Disable support for all file encodings except
   UTF-8, to avoid the need to link with the system [iconv] library.
   This can significantly reduce the size of statically linked builds.
@@ -40,7 +34,7 @@ There are some other variables that may be useful in certain cases
 
 Example usage:
 
-    make TERMINFO_DISABLE=1 BUILTIN_SYNTAX_FILES='dte config ini sh'
+    make ICONV_DISABLE=1 BUILTIN_SYNTAX_FILES='dte config ini sh'
 
 Persistent configuration
 ------------------------
@@ -84,8 +78,6 @@ to be installed.
 
 
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
-[terminfo]: https://en.wikipedia.org/wiki/Terminfo
-[ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [syntax highlighters]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html

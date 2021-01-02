@@ -247,11 +247,6 @@ The following environment variables are inspected at startup:
 User configuration directory. Defaults to \fB$HOME/.dte\fR if not set.
 .PP
 .TP
-\fBDTE_FORCE_TERMINFO\fR
-Force dte to use \fBterminfo\fR(5) database, even for terminals
-with built\-in support. Enabled if set.
-.PP
-.TP
 \fBHOME\fR
 User home directory. Used when expanding \fB~/\fR in filenames and also
 to determine the default value for \fBDTE_HOME\fR.
@@ -262,8 +257,8 @@ Directory used to store lock files. Defaults to \fB$DTE_HOME\fR if not set.
 .PP
 .TP
 \fBTERM\fR
-Terminal identifier. Used to determine which \fBterminfo\fR(5) entry or
-built\-in terminal support to use.
+Terminal identifier. Used to determine which terminal capabilities are
+supported.
 .PP
 .TP
 \fBCOLORTERM\fR

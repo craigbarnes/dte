@@ -44,7 +44,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color ecma48 input key kitty mode no-op output rxvt terminal terminfo \
+    color ecma48 input key kitty mode no-op output rxvt terminal \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \
@@ -103,12 +103,6 @@ ifeq "$(ICONV_DISABLE)" "1"
   build/convert.o: BASIC_CFLAGS += -DICONV_DISABLE=1
 else
   LDLIBS += $(LDLIBS_ICONV)
-endif
-
-ifeq "$(TERMINFO_DISABLE)" "1"
-  build/terminal/terminfo.o: BASIC_CFLAGS += -DTERMINFO_DISABLE=1
-else
-  LDLIBS += $(or $(call pkg-libs, tinfo), $(call pkg-libs, ncurses), -lcurses)
 endif
 
 ifeq "$(SANE_WCTYPE)" "1"
@@ -181,9 +175,7 @@ build/editor.o: build/version.h
 build/load-save.o: build/feature.h
 build/util/exec.o: build/feature.h
 build/terminal/winsize.o: build/feature.h
-build/terminal/terminfo.o: build/terminal/terminfo.cflags
 build/convert.o: build/convert.cflags
-build/terminal/terminfo.cflags: | build/terminal/
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)

@@ -10,17 +10,17 @@ case "$(uname)" in
 Linux)
     case $(. /etc/os-release && echo "$ID") in
     alpine)
-        apk --update add make gcc binutils ncurses ncurses-dev libc-dev;;
+        apk --update add make gcc binutils libc-dev;;
     arch|manjaro|artix)
-        pacman -S --needed --noconfirm make gcc ncurses;;
+        pacman -S --needed --noconfirm make gcc;;
     centos|fedora)
-        yum -y install make gcc binutils ncurses-devel;;
+        yum -y install make gcc binutils;;
     debian|ubuntu|linuxmint)
-        apt-get update && apt-get -qy install make gcc libncurses-dev;;
+        apt-get update && apt-get -qy install make gcc;;
     void)
-        xbps-install -S make gcc ncurses ncurses-devel;;
+        xbps-install -S make gcc;;
     *)
-        error 'Unrecognized Linux distro; install GNU Make, GCC and ncurses manually';;
+        error 'Unrecognized Linux distro; install GNU Make and GCC manually';;
     esac;;
 OpenBSD)
     pkg_add -IU gmake gcc;;
@@ -29,5 +29,5 @@ NetBSD)
 FreeBSD|DragonFly)
     pkg install gmake gcc;;
 *)
-    error 'Unrecognized OS; install GNU Make, GCC and curses manually';;
+    error 'Unrecognized OS; install GNU Make and GCC manually';;
 esac

@@ -206,10 +206,6 @@ The following environment variables are inspected at startup:
 `DTE_HOME`
 :   User configuration directory. Defaults to `$HOME/.dte` if not set.
 
-`DTE_FORCE_TERMINFO`
-:   Force dte to use `terminfo` database, even for terminals
-    with built-in support. Enabled if set.
-
 `HOME`
 :   User home directory. Used when expanding `~/` in filenames and also
     to determine the default value for `DTE_HOME`.
@@ -218,8 +214,8 @@ The following environment variables are inspected at startup:
 :   Directory used to store lock files. Defaults to `$DTE_HOME` if not set.
 
 `TERM`
-:   Terminal identifier. Used to determine which `terminfo` entry or
-    built-in terminal support to use.
+:   Terminal identifier. Used to determine which terminal capabilities are
+    supported.
 
 `COLORTERM`
 :   Enables support for 24-bit terminal colors, if set to `truecolor`.

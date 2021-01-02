@@ -10,7 +10,6 @@
 #include "no-op.h"
 #include "output.h"
 #include "rxvt.h"
-#include "terminfo.h"
 #include "xterm.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
@@ -172,14 +171,6 @@ void term_init(void)
         init_error("tcgetattr: %s", strerror(errno));
     }
 
-    if (getenv("DTE_FORCE_TERMINFO")) {
-        DEBUG_LOG("$DTE_FORCE_TERMINFO variable is set");
-        if (!term_init_terminfo(term)) {
-            init_error("$DTE_FORCE_TERMINFO set but libterminfo unavailable");
-        }
-        return;
-    }
-
     // Strip phony "xterm-" prefix used by certain terminals
     const char *real_term = term;
     if (str_has_prefix(term, "xterm-")) {
@@ -214,9 +205,6 @@ void term_init(void)
         }
         const int n = (int)name.length;
         DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
-    } else if (term_init_terminfo(term)) {
-        // Fall back to using the terminfo database, if available
-        return;
     }
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
