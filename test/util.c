@@ -23,6 +23,7 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "util/xstdio.h"
 
 static void test_util_macros(void)
 {
@@ -1334,6 +1335,18 @@ static void test_read_file(void)
     free(buf);
 }
 
+static void test_xfopen(void)
+{
+    static const char modes[][4] = {"a", "a+", "r", "r+", "w", "w+"};
+    FOR_EACH_I(i, modes) {
+        FILE *f = xfopen("/dev/null", modes[i], O_CLOEXEC, 0666);
+        EXPECT_NONNULL(f);
+        if (likely(f)) {
+            EXPECT_EQ(fclose(f), 0);
+        }
+    }
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_util(void)
@@ -1375,4 +1388,5 @@ void test_util(void)
     test_size_add_overflows();
     test_mem_intern();
     test_read_file();
+    test_xfopen();
 }
