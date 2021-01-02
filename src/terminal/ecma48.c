@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "ecma48.h"
 #include "output.h"
+#include "terminal.h"
 #include "util/ascii.h"
 #include "util/macros.h"
 
@@ -56,6 +57,18 @@ static void do_set_color(int32_t color, char ch)
     }
 }
 
+static bool attr_is_set(const TermColor *color, unsigned int attr)
+{
+    if (color->attr & attr) {
+        if (unlikely(terminal.ncv_attributes & attr)) {
+            // Terminal only allows attr when not using colors
+            return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
+        }
+        return true;
+    }
+    return false;
+}
+
 void ecma48_set_color(const TermColor *color)
 {
     static const struct {
@@ -75,7 +88,7 @@ void ecma48_set_color(const TermColor *color)
     term_add_literal("\033[0");
 
     for (size_t i = 0; i < ARRAY_COUNT(attr_map); i++) {
-        if (color->attr & attr_map[i].attr) {
+        if (attr_is_set(color, attr_map[i].attr)) {
             term_add_byte(';');
             term_add_byte(attr_map[i].code);
         }
