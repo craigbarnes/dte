@@ -64,6 +64,14 @@ v1.10 (not yet released)
 
 **Breaking changes:**
 
+* Removed support for linking to the system terminfo library. The
+  terminfo database has only been used as a last resort source of
+  information for several releases now. Most terminals that people
+  are likely to be using already have built-in support in the editor,
+  including several capabilities not available from terminfo. This is
+  listed as a breaking change because it may break support for a few
+  archaic hardware terminals (primarily those that aren't ECMA-48
+  compatible or whose terminfo strings contain mandatory padding).
 * Removed support for vertical tab bars (the `tab-bar` option was
   changed from an enum to a Boolean).
 
