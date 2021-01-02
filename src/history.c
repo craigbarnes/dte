@@ -8,7 +8,7 @@
 #include "util/readfile.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
-#include "util/xreadwrite.h"
+#include "util/xstdio.h"
 
 void history_add(History *history, const char *text)
 {
@@ -89,23 +89,6 @@ void history_load(History *history, const char *filename)
     history->filename = filename;
 }
 
-FILE *history_fopen(const char *filename)
-{
-    int fd = xopen(filename, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0666);
-    if (fd < 0) {
-        goto error;
-    }
-    FILE *file = fdopen(fd, "w");
-    if (!file) {
-        xclose(fd);
-        goto error;
-    }
-    return file;
-error:
-    error_msg("Error creating %s: %s", filename, strerror(errno));
-    return NULL;
-}
-
 void history_save(const History *history)
 {
     const char *filename = history->filename;
@@ -113,8 +96,9 @@ void history_save(const History *history)
         return;
     }
 
-    FILE *f = history_fopen(filename);
+    FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
+        error_msg("Error creating %s: %s", filename, strerror(errno));
         return;
     }
 

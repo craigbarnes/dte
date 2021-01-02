@@ -12,7 +12,6 @@ typedef struct {
     PointerArray entries;
 } History;
 
-FILE *history_fopen(const char *filename);
 void history_add(History *history, const char *text);
 bool history_search_forward(const History *history, ssize_t *pos, const char *text);
 bool history_search_backward(const History *history, ssize_t *pos, const char *text);

@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -13,6 +12,7 @@
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
+#include "util/xstdio.h"
 
 typedef struct {
     unsigned long row, col;
@@ -119,8 +119,9 @@ void load_file_history(const char *filename)
 
 void save_file_history(const char *filename)
 {
-    FILE *f = history_fopen(filename);
+    FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
+        error_msg("Error creating %s: %s", filename, strerror(errno));
         return;
     }
 
