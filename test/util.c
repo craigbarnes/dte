@@ -403,6 +403,37 @@ static void test_string(void)
     EXPECT_NULL(s.buffer);
     EXPECT_STREQ(cstr, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     free(cstr);
+
+    s = string_new(12);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 16);
+    ASSERT_NONNULL(s.buffer);
+
+    string_append_cstring(&s, "123");
+    EXPECT_STREQ(string_borrow_cstring(&s), "123");
+    EXPECT_EQ(s.len, 3);
+
+    string_append_string(&s, &s);
+    EXPECT_STREQ(string_borrow_cstring(&s), "123123");
+    EXPECT_EQ(s.len, 6);
+
+    string_insert_buf(&s, 2, STRN("foo"));
+    EXPECT_STREQ(string_borrow_cstring(&s), "12foo3123");
+    EXPECT_EQ(s.len, 9);
+
+    cstr = string_clone_cstring(&s);
+    EXPECT_STREQ(cstr, "12foo3123");
+
+    EXPECT_EQ(string_insert_ch(&s, 0, '>'), 1);
+    EXPECT_STREQ(string_borrow_cstring(&s), ">12foo3123");
+    EXPECT_EQ(s.len, 10);
+
+    string_free(&s);
+    EXPECT_NULL(s.buffer);
+    EXPECT_EQ(s.len, 0);
+    EXPECT_EQ(s.alloc, 0);
+    EXPECT_STREQ(cstr, "12foo3123");
+    free(cstr);
 }
 
 static void test_string_view(void)
