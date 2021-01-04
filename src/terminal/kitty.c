@@ -97,7 +97,7 @@ ssize_t kitty_parse_full_mode_key(const char *buf, size_t length, size_t i, KeyC
         return -1;
     }
     KeyCode mods = base64_decode(buf[i++]);
-    if (unlikely(mods > 7)) {
+    if (unlikely(mods > 15)) {
         return 0;
     }
 
@@ -168,7 +168,7 @@ ssize_t kitty_parse_full_mode_key(const char *buf, size_t length, size_t i, KeyC
         return 0;
     }
 
-    if (is_key_release || key == KEY_IGNORE) {
+    if (is_key_release || key == KEY_IGNORE || mods > 7) {
         *k = KEY_IGNORE;
         return i;
     }
