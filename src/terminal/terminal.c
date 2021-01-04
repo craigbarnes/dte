@@ -153,7 +153,7 @@ UNITTEST {
         STRING_VIEW("stterm"),
         STRING_VIEW("xterm"),
     };
-    CHECK_BSEARCH_ARRAY(terms, name);
+    CHECK_BSEARCH_ARRAY(terms, name, strcmp);
     for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
         const TermEntry *entry = BSEARCH(&tests[i], terms, term_name_compare);
         BUG_ON(!strview_equal_strn(&tests[i], entry->name, entry->name_len));

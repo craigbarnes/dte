@@ -1,9 +1,15 @@
 #include <stddef.h>
 #include "encoding.h"
 #include "util/ascii.h"
+#include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/hashset.h"
 #include "util/str-util.h"
+
+typedef struct {
+    const char alias[8];
+    EncodingType encoding;
+} EncodingAlias;
 
 static const char encoding_names[][16] = {
     [UTF8] = "UTF-8",
@@ -13,27 +19,24 @@ static const char encoding_names[][16] = {
     [UTF32LE] = "UTF-32LE",
 };
 
-static const struct {
-    const char alias[8];
-    EncodingType encoding;
-} encoding_aliases[] = {
-    {"UTF8", UTF8},
-    {"UTF16", UTF16BE},
-    {"UTF-16", UTF16BE},
-    {"UTF16BE", UTF16BE},
-    {"UTF16LE", UTF16LE},
-    {"UTF32", UTF32BE},
-    {"UTF-32", UTF32BE},
-    {"UTF32BE", UTF32BE},
-    {"UTF32LE", UTF32LE},
-    {"UCS2", UTF16BE},
+static const EncodingAlias encoding_aliases[] = {
     {"UCS-2", UTF16BE},
     {"UCS-2BE", UTF16BE},
     {"UCS-2LE", UTF16LE},
-    {"UCS4", UTF32BE},
     {"UCS-4", UTF32BE},
     {"UCS-4BE", UTF32BE},
     {"UCS-4LE", UTF32LE},
+    {"UCS2", UTF16BE},
+    {"UCS4", UTF32BE},
+    {"UTF-16", UTF16BE},
+    {"UTF-32", UTF32BE},
+    {"UTF16", UTF16BE},
+    {"UTF16BE", UTF16BE},
+    {"UTF16LE", UTF16LE},
+    {"UTF32", UTF32BE},
+    {"UTF32BE", UTF32BE},
+    {"UTF32LE", UTF32LE},
+    {"UTF8", UTF8},
 };
 
 static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
@@ -44,6 +47,10 @@ static const ByteOrderMark boms[NR_ENCODING_TYPES] = {
     [UTF32LE] = {{0xff, 0xfe, 0x00, 0x00}, 4},
 };
 
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(encoding_aliases, alias, ascii_strcmp_icase);
+}
+
 EncodingType lookup_encoding(const char *name)
 {
     static_assert(ARRAY_COUNT(encoding_names) == NR_ENCODING_TYPES - 1);
@@ -52,12 +59,14 @@ EncodingType lookup_encoding(const char *name)
             return (EncodingType) i;
         }
     }
-    for (size_t i = 0; i < ARRAY_COUNT(encoding_aliases); i++) {
-        if (ascii_streq_icase(name, encoding_aliases[i].alias)) {
-            return encoding_aliases[i].encoding;
-        }
-    }
-    return UNKNOWN_ENCODING;
+
+    static_assert(offsetof(EncodingAlias, alias) == 0);
+    const EncodingAlias *a = BSEARCH (
+        name,
+        encoding_aliases,
+        (SearchCmpFnVoid)ascii_strcmp_icase
+    );
+    return a ? a->encoding : UNKNOWN_ENCODING;
 }
 
 static const char *encoding_type_to_string(EncodingType type)

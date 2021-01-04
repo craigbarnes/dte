@@ -6,30 +6,34 @@
 #include "debug.h"
 #include "macros.h"
 
+typedef int (*SearchCmpFn)(const char *key, const char *elem);
+typedef int (*SearchCmpFnVoid)(const void *key, const void *elem);
+
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 
 #if DEBUG >= 1 && defined(HAS_TYPEOF)
-    #define CHECK_BSEARCH_ARRAY(a, field) do { \
+    #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
         static_assert_compatible_types(a[0].field[0], char); \
         check_bsearch_array ( \
             a, #a, #field, \
             ARRAY_COUNT(a), \
             sizeof(a[0]), \
             offsetof(__typeof__(*a), field), \
-            sizeof(a[0].field) \
+            sizeof(a[0].field), \
+            cmp \
         ); \
     } while (0)
 #else
-    #define CHECK_BSEARCH_ARRAY(arr, field)
+    #define CHECK_BSEARCH_ARRAY(arr, field, cmp)
 #endif
 
 #if DEBUG >= 1
-    #define CHECK_BSEARCH_STR_ARRAY(a) do { \
+    #define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
         static_assert_compatible_types(a[0][0], char); \
-        check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), 0, sizeof(a[0])); \
+        check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), 0, sizeof(a[0]), cmp); \
     } while (0)
 #else
-    #define CHECK_BSEARCH_STR_ARRAY(arr)
+    #define CHECK_BSEARCH_STR_ARRAY(arr, cmp)
 #endif
 
 static inline void check_bsearch_array (
@@ -39,7 +43,8 @@ static inline void check_bsearch_array (
     size_t array_length,
     size_t array_element_size,
     size_t name_offset,
-    size_t name_size
+    size_t name_size,
+    SearchCmpFn cmp
 ) {
     BUG_ON(!array_base);
     BUG_ON(!array_name);
@@ -59,7 +64,7 @@ static inline void check_bsearch_array (
         if (curr_name[name_size - 1] != '\0') {
             BUG("String sentinel missing from %s[%zu].%s", array_name, i, name_field_name);
         }
-        if (strcmp(curr_name, prev_name) <= 0) {
+        if (cmp(curr_name, prev_name) <= 0) {
             BUG (
                 "String at %s[%zu].%s not in sorted order: \"%s\" (prev: \"%s\")",
                 array_name, i, name_field_name,

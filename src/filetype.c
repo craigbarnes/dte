@@ -32,11 +32,11 @@ static int ft_compare(const void *key, const void *elem)
 #include "filetype/signatures.c"
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(basenames, key);
-    CHECK_BSEARCH_ARRAY(dotfiles, key);
-    CHECK_BSEARCH_ARRAY(extensions, ext);
-    CHECK_BSEARCH_ARRAY(interpreters, key);
-    CHECK_BSEARCH_STR_ARRAY(ignored_extensions);
+    CHECK_BSEARCH_ARRAY(basenames, key, strcmp);
+    CHECK_BSEARCH_ARRAY(dotfiles, key, strcmp);
+    CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
+    CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
+    CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
 }
 
 // Filetypes dynamically added via the `ft` command.
