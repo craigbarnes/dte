@@ -6,8 +6,8 @@
 #include "debug.h"
 #include "macros.h"
 
-typedef int (*SearchCmpFn)(const char *key, const char *elem);
-typedef int (*SearchCmpFnVoid)(const void *key, const void *elem);
+typedef int (*CompareFunction)(const void *key, const void *elem);
+typedef int (*StringCompareFunction)(const char *key, const char *elem);
 
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 
@@ -44,7 +44,7 @@ static inline void check_bsearch_array (
     size_t array_element_size,
     size_t name_offset,
     size_t name_size,
-    SearchCmpFn cmp
+    StringCompareFunction cmp
 ) {
     BUG_ON(!array_base);
     BUG_ON(!array_name);

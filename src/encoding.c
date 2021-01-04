@@ -64,7 +64,7 @@ EncodingType lookup_encoding(const char *name)
     const EncodingAlias *a = BSEARCH (
         name,
         encoding_aliases,
-        (SearchCmpFnVoid)ascii_strcmp_icase
+        (CompareFunction)ascii_strcmp_icase
     );
     return a ? a->encoding : UNKNOWN_ENCODING;
 }

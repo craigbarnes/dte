@@ -279,7 +279,7 @@ HOT const char *find_ft(const char *filename, StringView line)
 
 bool is_ft(const char *name)
 {
-    if (BSEARCH(name, builtin_filetype_names, (SearchCmpFnVoid)strcmp)) {
+    if (BSEARCH(name, builtin_filetype_names, (CompareFunction)strcmp)) {
         return true;
     }
 
