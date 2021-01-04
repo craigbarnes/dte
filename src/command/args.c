@@ -35,15 +35,15 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     size_t i = 0;
     while (args[i]) {
         char *arg = args[i];
-
-        if (streq(arg, "--")) {
+        if (unlikely(streq(arg, "--"))) {
             // Move the NULL too
             memmove(args + i, args + i + 1, (argc - i) * sizeof(*args));
             free(arg);
             argc--;
             break;
         }
-        if (arg[0] != '-' || !arg[1]) {
+
+        if (arg[0] != '-' || arg[1] == '\0') {
             if (!flags_after_arg) {
                 break;
             }
@@ -54,7 +54,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
         for (size_t j = 1; arg[j]; j++) {
             unsigned char flag = arg[j];
             const char *flagp = strchr(flag_desc, flag);
-            if (!flagp || flag == '=') {
+            if (unlikely(!flagp || flag == '=')) {
                 return ARGERR_INVALID_OPTION | (flag << 8);
             }
 
@@ -65,15 +65,16 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
                 return ARGERR_TOO_MANY_OPTIONS;
             }
 
-            if (flagp[1] != '=') {
+            if (likely(flagp[1] != '=')) {
                 continue;
             }
-            if (j > 1 || arg[j + 1]) {
+
+            if (unlikely(j > 1 || arg[j + 1])) {
                 return ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | (flag << 8);
             }
 
             char *flag_arg = args[i + 1];
-            if (!flag_arg) {
+            if (unlikely(!flag_arg)) {
                 return ARGERR_OPTION_ARGUMENT_MISSING | (flag << 8);
             }
 
@@ -99,12 +100,12 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     a->nr_args = argc - nr_flag_args;
     a->nr_flag_args = nr_flag_args;
 
-    if (a->nr_args < cmd->min_args) {
+    if (unlikely(a->nr_args < cmd->min_args)) {
         return ARGERR_TOO_FEW_ARGUMENTS;
     }
 
     static_assert_compatible_types(cmd->max_args, uint8_t);
-    if (a->nr_args > cmd->max_args && cmd->max_args != 0xFF) {
+    if (unlikely(a->nr_args > cmd->max_args && cmd->max_args != 0xFF)) {
         return ARGERR_TOO_MANY_ARGUMENTS;
     }
 
@@ -114,7 +115,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
     ArgParseError err = do_parse_args(cmd, a);
-    if (err == 0) {
+    if (likely(err == 0)) {
         return true;
     }
 
