@@ -105,6 +105,26 @@ static void test_xstreq(void)
     EXPECT_FALSE(xstreq("", NULL));
 }
 
+static void test_hex_decode(void)
+{
+    EXPECT_EQ(hex_decode('0'), 0);
+    EXPECT_EQ(hex_decode('1'), 1);
+    EXPECT_EQ(hex_decode('9'), 9);
+    EXPECT_EQ(hex_decode('a'), 10);
+    EXPECT_EQ(hex_decode('A'), 10);
+    EXPECT_EQ(hex_decode('f'), 15);
+    EXPECT_EQ(hex_decode('F'), 15);
+    EXPECT_EQ(hex_decode('g'), -1);
+    EXPECT_EQ(hex_decode('G'), -1);
+    EXPECT_EQ(hex_decode('@'), -1);
+    EXPECT_EQ(hex_decode('/'), -1);
+    EXPECT_EQ(hex_decode(':'), -1);
+    EXPECT_EQ(hex_decode(' '), -1);
+    EXPECT_EQ(hex_decode('~'), -1);
+    EXPECT_EQ(hex_decode('\0'), -1);
+    EXPECT_EQ(hex_decode(0xFF), -1);
+}
+
 static void test_ascii(void)
 {
     EXPECT_EQ(ascii_tolower('A'), 'a');
@@ -236,23 +256,6 @@ static void test_ascii(void)
     EXPECT_FALSE(is_regex_special_char(0x00));
     EXPECT_FALSE(is_regex_special_char(0x80));
     EXPECT_FALSE(is_regex_special_char(0xFF));
-
-    EXPECT_EQ(hex_decode('0'), 0);
-    EXPECT_EQ(hex_decode('1'), 1);
-    EXPECT_EQ(hex_decode('9'), 9);
-    EXPECT_EQ(hex_decode('a'), 10);
-    EXPECT_EQ(hex_decode('A'), 10);
-    EXPECT_EQ(hex_decode('f'), 15);
-    EXPECT_EQ(hex_decode('F'), 15);
-    EXPECT_EQ(hex_decode('g'), -1);
-    EXPECT_EQ(hex_decode('G'), -1);
-    EXPECT_EQ(hex_decode('@'), -1);
-    EXPECT_EQ(hex_decode('/'), -1);
-    EXPECT_EQ(hex_decode(':'), -1);
-    EXPECT_EQ(hex_decode(' '), -1);
-    EXPECT_EQ(hex_decode('~'), -1);
-    EXPECT_EQ(hex_decode('\0'), -1);
-    EXPECT_EQ(hex_decode(0xFF), -1);
 
     EXPECT_TRUE(ascii_streq_icase("", ""));
     EXPECT_TRUE(ascii_streq_icase("a", "a"));
@@ -1385,6 +1388,7 @@ void test_util(void)
     test_util_macros();
     test_IS_POWER_OF_2();
     test_xstreq();
+    test_hex_decode();
     test_ascii();
     test_base64();
     test_string();
