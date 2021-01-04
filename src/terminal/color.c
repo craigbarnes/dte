@@ -70,7 +70,7 @@ static int32_t parse_rrggbb(const char *str)
     int32_t color = 0;
     for (size_t i = 0; i < 6; i++) {
         int32_t digit = hex_decode(str[i]);
-        if (digit < 0) {
+        if (unlikely(digit < 0)) {
             return COLOR_INVALID;
         }
         color = (color << 4) | digit;
@@ -90,13 +90,13 @@ UNITTEST {
 static int32_t parse_color(const char *str)
 {
     size_t len = strlen(str);
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return COLOR_INVALID;
     }
 
     // Parse #rrggbb
     if (str[0] == '#') {
-        if (len != 7) {
+        if (unlikely(len != 7)) {
             return COLOR_INVALID;
         }
         return parse_rrggbb(str + 1);
@@ -107,7 +107,7 @@ static int32_t parse_color(const char *str)
         uint8_t r = ((uint8_t)str[0]) - '0';
         uint8_t g = ((uint8_t)str[2]) - '0';
         uint8_t b = ((uint8_t)str[4]) - '0';
-        if (r > 5 || g > 5 || b > 5 || str[3] != '/') {
+        if (unlikely(r > 5 || g > 5 || b > 5 || str[3] != '/')) {
             return COLOR_INVALID;
         }
         // Convert to color index 16..231 (xterm 6x6x6 color cube)
@@ -117,7 +117,7 @@ static int32_t parse_color(const char *str)
     // Parse -2 .. 255
     if (len <= 3 && (str[0] == '-' || ascii_isdigit(str[0]))) {
         int x;
-        if (!str_to_int(str, &x) || x < -2 || x > 255) {
+        if (unlikely(!str_to_int(str, &x) || x < -2 || x > 255)) {
             return COLOR_INVALID;
         }
         return x;

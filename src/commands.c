@@ -118,13 +118,13 @@ static void cmd_alias(const CommandArgs *a)
 
     for (size_t i = 0; name[i]; i++) {
         unsigned char c = name[i];
-        if (!(is_word_byte(c) || c == '-' || c == '?' || c == '!')) {
+        if (unlikely(!(is_word_byte(c) || c == '-' || c == '?' || c == '!'))) {
             error_msg("Invalid byte in alias name: %c (0x%02hhX)", c, c);
             return;
         }
     }
 
-    if (find_normal_command(name)) {
+    if (unlikely(find_normal_command(name))) {
         error_msg("Can't replace existing command %s with an alias", name);
         return;
     }
@@ -576,14 +576,14 @@ static void cmd_ft(const CommandArgs *a)
 
 static void cmd_hi(const CommandArgs *a)
 {
-    if (a->nr_args == 0) {
+    if (unlikely(a->nr_args == 0)) {
         exec_builtin_color_reset();
         remove_extra_colors();
         goto update;
     }
 
     TermColor color;
-    if (!parse_term_color(&color, a->args + 1)) {
+    if (unlikely(!parse_term_color(&color, a->args + 1))) {
         return;
     }
 

@@ -51,7 +51,7 @@ void add_error_fmt (
         if (streq(desc[i], "_")) {
             continue;
         }
-        if (j == ARRAY_COUNT(names)) {
+        if (unlikely(j == ARRAY_COUNT(names))) {
             error_msg("Unknown substring name %s.", desc[i]);
             return;
         }
@@ -71,7 +71,7 @@ void add_error_fmt (
 
     for (size_t i = 0; i < ARRAY_COUNT(idx); i++) {
         // NOTE: -1 is larger than 0UL
-        if (idx[i] > (int)f->re.re_nsub) {
+        if (unlikely(idx[i] > (int)f->re.re_nsub)) {
             error_msg("Invalid substring count.");
             regfree(&f->re);
             free(f);
