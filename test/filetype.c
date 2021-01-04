@@ -188,10 +188,37 @@ static void test_find_ft_firstline(void)
     }
 }
 
+static void test_is_ft(void)
+{
+    EXPECT_TRUE(is_ft("ada"));
+    EXPECT_TRUE(is_ft("asm"));
+    EXPECT_TRUE(is_ft("awk"));
+    EXPECT_TRUE(is_ft("c"));
+    EXPECT_TRUE(is_ft("d"));
+    EXPECT_TRUE(is_ft("dte"));
+    EXPECT_TRUE(is_ft("java"));
+    EXPECT_TRUE(is_ft("javascript"));
+    EXPECT_TRUE(is_ft("lua"));
+    EXPECT_TRUE(is_ft("mail"));
+    EXPECT_TRUE(is_ft("make"));
+    EXPECT_TRUE(is_ft("pkg-config"));
+    EXPECT_TRUE(is_ft("rst"));
+    EXPECT_TRUE(is_ft("sh"));
+    EXPECT_TRUE(is_ft("yaml"));
+    EXPECT_TRUE(is_ft("zig"));
+
+    EXPECT_FALSE(is_ft(""));
+    EXPECT_FALSE(is_ft("-"));
+    EXPECT_FALSE(is_ft("a"));
+    EXPECT_FALSE(is_ft("C"));
+    EXPECT_FALSE(is_ft("MAKE"));
+}
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_filetype(void)
 {
     test_find_ft_filename();
     test_find_ft_firstline();
+    test_is_ft();
 }

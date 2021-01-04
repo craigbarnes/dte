@@ -1,12 +1,10 @@
 typedef enum {
-    NONE = 0,
     ADA,
-    ASSEMBLY,
+    ASM,
     AWK,
-    BATCHFILE,
+    BATCH,
     BIBTEX,
-    C,
-    CPLUSPLUS,
+    C, CPLUSPLUS = C,
     CLOJURE,
     CMAKE,
     COFFEESCRIPT,
@@ -19,7 +17,7 @@ typedef enum {
     DIFF,
     DOCKER,
     DOT,
-    DTERC,
+    DTE,
     GETTEXT,
     GITCOMMIT,
     GITREBASE,
@@ -49,7 +47,8 @@ typedef enum {
     NIM,
     NINJA,
     NIX,
-    OBJECTIVEC,
+    NONE,
+    OBJC,
     PERL,
     PHP,
     PKGCONFIG,
@@ -59,14 +58,14 @@ typedef enum {
     RACKET,
     ROBOTSTXT,
     ROFF,
-    RESTRUCTUREDTEXT,
+    RST,
     RUBY,
     RUST,
     SCALA,
     SCHEME,
     SCSS,
     SED,
-    SHELL,
+    SH,
     SQL,
     TCL,
     TEX,
@@ -89,14 +88,12 @@ typedef enum {
 } FileTypeEnum;
 
 static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
-    [NONE] = "none",
     [ADA] = "ada",
-    [ASSEMBLY] = "asm",
+    [ASM] = "asm",
     [AWK] = "awk",
-    [BATCHFILE] = "batch",
+    [BATCH] = "batch",
     [BIBTEX] = "bibtex",
     [C] = "c",
-    [CPLUSPLUS] = "c",
     [CLOJURE] = "clojure",
     [CMAKE] = "cmake",
     [COFFEESCRIPT] = "coffeescript",
@@ -104,12 +101,12 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [CSHARP] = "csharp",
     [CSS] = "css",
     [CSV] = "csv",
-    [DART] = "dart",
     [D] = "d",
+    [DART] = "dart",
     [DIFF] = "diff",
     [DOCKER] = "docker",
     [DOT] = "dot",
-    [DTERC] = "dte",
+    [DTE] = "dte",
     [GETTEXT] = "gettext",
     [GITCOMMIT] = "gitcommit",
     [GITREBASE] = "gitrebase",
@@ -139,7 +136,8 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [NIM] = "nim",
     [NINJA] = "ninja",
     [NIX] = "nix",
-    [OBJECTIVEC] = "objc",
+    [NONE] = "none",
+    [OBJC] = "objc",
     [PERL] = "perl",
     [PHP] = "php",
     [PKGCONFIG] = "pkg-config",
@@ -147,16 +145,16 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [PROTOBUF] = "protobuf",
     [PYTHON] = "python",
     [RACKET] = "racket",
-    [RESTRUCTUREDTEXT] = "rst",
     [ROBOTSTXT] = "robotstxt",
     [ROFF] = "roff",
+    [RST] = "rst",
     [RUBY] = "ruby",
     [RUST] = "rust",
     [SCALA] = "scala",
     [SCHEME] = "scheme",
     [SCSS] = "scss",
     [SED] = "sed",
-    [SHELL] = "sh",
+    [SH] = "sh",
     [SQL] = "sql",
     [TCL] = "tcl",
     [TEXINFO] = "texinfo",
@@ -176,22 +174,3 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [YAML] = "yaml",
     [ZIG] = "zig",
 };
-
-UNITTEST {
-    BUG_ON(strcmp(builtin_filetype_names[0], "none") != 0);
-    BUG_ON(strcmp(builtin_filetype_names[1], "ada") != 0);
-    for (size_t i = 2; i < ARRAY_COUNT(builtin_filetype_names); i++) {
-        const char *const name = builtin_filetype_names[i];
-        if (name[0] == '\0') {
-            BUG("missing value at builtin_filetype_names[%zu]", i);
-        }
-        // Ensure fixed-size char arrays are null-terminated
-        BUG_ON(!memchr(name, '\0', sizeof(builtin_filetype_names[0])));
-        // Ensure FileTypeEnum values are sorted according to their name
-        // string (to allow name -> value lookups via binary search).
-        const char *const prev = builtin_filetype_names[i - 1];
-        if (memcmp(name, prev, 16) < 0) {
-            BUG("Filetype names not in sorted order: %s, %s", prev, name);
-        }
-    }
-}

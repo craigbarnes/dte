@@ -36,6 +36,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(dotfiles, key, strcmp);
     CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
     CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
+    CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names, strcmp);
     CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
 }
 
@@ -214,34 +215,34 @@ HOT const char *find_ft(const char *filename, StringView line)
     // Search built-in lookup tables
     if (interpreter.length) {
         FileTypeEnum ft = filetype_from_interpreter(interpreter);
-        if (ft) {
+        if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (base.length) {
         FileTypeEnum ft = filetype_from_basename(base);
-        if (ft) {
+        if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (line.length) {
         FileTypeEnum ft = filetype_from_signature(line);
-        if (ft) {
+        if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (ext.length) {
         FileTypeEnum ft = filetype_from_extension(ext);
-        if (ft) {
+        if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
     }
 
     if (strview_has_prefix(&path, "/etc/default/")) {
-        return builtin_filetype_names[SHELL];
+        return builtin_filetype_names[SH];
     } else if (strview_has_prefix(&path, "/etc/nginx/")) {
         return builtin_filetype_names[NGINX];
     }
@@ -278,16 +279,16 @@ HOT const char *find_ft(const char *filename, StringView line)
 
 bool is_ft(const char *name)
 {
+    if (BSEARCH(name, builtin_filetype_names, (SearchCmpFnVoid)strcmp)) {
+        return true;
+    }
+
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         if (streq(ft_get_name(ft), name)) {
             return true;
         }
     }
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
-        if (streq(builtin_filetype_names[i], name)) {
-            return true;
-        }
-    }
+
     return false;
 }

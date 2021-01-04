@@ -6,22 +6,22 @@ static const struct FileExtensionMap {
     {"adb", ADA},
     {"ads", ADA},
     {"asd", LISP},
-    {"asm", ASSEMBLY},
+    {"asm", ASM},
     {"auk", AWK},
     {"automount", INI},
     {"awk", AWK},
-    {"bash", SHELL},
-    {"bat", BATCHFILE},
+    {"bash", SH},
+    {"bat", BATCH},
     {"bbl", TEX},
     {"bib", BIBTEX},
-    {"btm", BATCHFILE},
+    {"btm", BATCH},
     {"c++", CPLUSPLUS},
     {"cc", CPLUSPLUS},
     {"cl", LISP},
     {"clj", CLOJURE},
     {"cls", TEX},
     {"cmake", CMAKE},
-    {"cmd", BATCHFILE},
+    {"cmd", BATCH},
     {"coffee", COFFEESCRIPT},
     {"cpp", CPLUSPLUS},
     {"cr", RUBY},
@@ -39,9 +39,9 @@ static const struct FileExtensionMap {
     {"docker", DOCKER},
     {"dot", DOT},
     {"doxy", CONFIG},
-    {"dterc", DTERC},
+    {"dterc", DTE},
     {"dtx", TEX},
-    {"ebuild", SHELL},
+    {"ebuild", SH},
     {"el", LISP},
     {"emacs", LISP},
     {"eml", MAIL},
@@ -74,7 +74,7 @@ static const struct FileExtensionMap {
     {"java", JAVA},
     {"js", JAVASCRIPT},
     {"json", JSON},
-    {"ksh", SHELL},
+    {"ksh", SH},
     {"lsp", LISP},
     {"ltx", TEX},
     {"lua", LUA},
@@ -121,13 +121,13 @@ static const struct FileExtensionMap {
     {"rktl", RACKET},
     {"rockspec", LUA},
     {"rs", RUST},
-    {"rst", RESTRUCTUREDTEXT},
+    {"rst", RST},
     {"scala", SCALA},
     {"scm", SCHEME},
     {"scss", SCSS},
     {"sed", SED},
     {"service", INI},
-    {"sh", SHELL},
+    {"sh", SH},
     {"sld", SCHEME},
     {"slice", INI},
     {"sls", SCHEME},
@@ -166,7 +166,7 @@ static const struct FileExtensionMap {
     {"yaml", YAML},
     {"yml", YAML},
     {"zig", ZIG},
-    {"zsh", SHELL},
+    {"zsh", SH},
 };
 
 static FileTypeEnum filetype_from_extension(const StringView sv)
@@ -186,10 +186,10 @@ static FileTypeEnum filetype_from_extension(const StringView sv)
         case 'C': case 'H':
             return CPLUSPLUS;
         case 'S': case 's':
-            return ASSEMBLY;
+            return ASM;
         case 'd': return D;
         case 'l': return LEX;
-        case 'm': return OBJECTIVEC;
+        case 'm': return OBJC;
         case 'v': return VERILOG;
         case 'y': return YACC;
         }

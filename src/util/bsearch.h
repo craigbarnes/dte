@@ -54,20 +54,27 @@ static inline void check_bsearch_array (
     BUG_ON(name_size == 0);
 
     const char *first_name = (const char*)array_base + name_offset;
-    if (first_name[name_size - 1] != '\0') {
-        BUG("String sentinel missing from %s[0].%s", array_name, name_field_name);
-    }
+    UNUSED const char *sep = (name_field_name[0] == '\0') ? "" : ".";
 
-    for (size_t i = 1; i < array_length; i++) {
+    for (size_t i = 0; i < array_length; i++) {
         const char *curr_name = first_name + (i * array_element_size);
-        const char *prev_name = curr_name - array_element_size;
-        if (curr_name[name_size - 1] != '\0') {
-            BUG("String sentinel missing from %s[%zu].%s", array_name, i, name_field_name);
+        if (curr_name[0] == '\0') {
+            BUG("Empty string at %s[%zu]%s%s", array_name, i, sep, name_field_name);
         }
+        if (curr_name[name_size - 1] != '\0') {
+            BUG("String sentinel missing from %s[%zu]%s%s", array_name, i, sep, name_field_name);
+        }
+
+        // Skip sort order check for index 0; there's no prev_name to compare
+        if (i == 0) {
+            continue;
+        }
+
+        const char *prev_name = curr_name - array_element_size;
         if (cmp(curr_name, prev_name) <= 0) {
             BUG (
-                "String at %s[%zu].%s not in sorted order: \"%s\" (prev: \"%s\")",
-                array_name, i, name_field_name,
+                "String at %s[%zu]%s%s not in sorted order: \"%s\" (prev: \"%s\")",
+                array_name, i, sep, name_field_name,
                 curr_name, prev_name
             );
         }

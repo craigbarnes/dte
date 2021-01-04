@@ -2,16 +2,16 @@ static const struct FileInterpreterMap {
     const char key[8];
     const FileTypeEnum filetype;
 } interpreters[] = {
-    {"ash", SHELL},
+    {"ash", SH},
     {"awk", AWK},
-    {"bash", SHELL},
+    {"bash", SH},
     {"bigloo", SCHEME},
     {"ccl", LISP},
     {"chicken", SCHEME},
     {"clisp", LISP},
     {"coffee", COFFEESCRIPT},
     {"crystal", RUBY},
-    {"dash", SHELL},
+    {"dash", SH},
     {"ecl", LISP},
     {"gawk", AWK},
     {"gmake", MAKE},
@@ -20,18 +20,18 @@ static const struct FileInterpreterMap {
     {"gsed", SED},
     {"guile", SCHEME},
     {"jruby", RUBY},
-    {"ksh", SHELL},
+    {"ksh", SH},
     {"lisp", LISP},
     {"lua", LUA},
     {"luajit", LUA},
     {"macruby", RUBY},
     {"make", MAKE},
     {"mawk", AWK},
-    {"mksh", SHELL},
+    {"mksh", SH},
     {"moon", MOONSCRIPT},
     {"nawk", AWK},
     {"node", JAVASCRIPT},
-    {"pdksh", SHELL},
+    {"pdksh", SH},
     {"perl", PERL},
     {"php", PHP},
     {"python", PYTHON},
@@ -41,11 +41,11 @@ static const struct FileInterpreterMap {
     {"ruby", RUBY},
     {"sbcl", LISP},
     {"sed", SED},
-    {"sh", SHELL},
+    {"sh", SH},
     {"tcc", C},
     {"tclsh", TCL},
     {"wish", TCL},
-    {"zsh", SHELL},
+    {"zsh", SH},
 };
 
 static FileTypeEnum filetype_from_interpreter(const StringView sv)
@@ -54,7 +54,7 @@ static FileTypeEnum filetype_from_interpreter(const StringView sv)
         return NONE;
     } else if (sv.length >= ARRAY_COUNT(interpreters[0].key)) {
         if (strview_equal_cstring(&sv, "openrc-run")) {
-            return SHELL;
+            return SH;
         } else if (strview_equal_cstring(&sv, "runhaskell")) {
             return HASKELL;
         }
