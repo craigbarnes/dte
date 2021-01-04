@@ -476,6 +476,24 @@ static void test_string_view(void)
     EXPECT_FALSE(strview_isblank(&sv6));
 }
 
+static void test_get_delim(void)
+{
+    static const char input[] = "-x-y-foo--bar--";
+    static const char parts[][4] = {"", "x", "y", "foo", "", "bar", "", ""};
+    const size_t nparts = ARRAY_COUNT(parts);
+    const size_t part_size = ARRAY_COUNT(parts[0]);
+
+    size_t idx = 0;
+    for (size_t pos = 0, len = sizeof(input) - 1; pos < len; idx++) {
+        const StringView sv = get_delim(input, &pos, len, '-');
+        ASSERT_TRUE(idx < nparts);
+        ASSERT_TRUE(parts[idx][part_size - 1] == '\0');
+        EXPECT_TRUE(strview_equal_cstring(&sv, parts[idx]));
+    }
+
+    EXPECT_EQ(idx, nparts - 1);
+}
+
 static void test_size_str_width(void)
 {
     EXPECT_EQ(size_str_width(0), 1);
@@ -1393,6 +1411,7 @@ void test_util(void)
     test_base64();
     test_string();
     test_string_view();
+    test_get_delim();
     test_size_str_width();
     test_buf_parse_ulong();
     test_str_to_int();
