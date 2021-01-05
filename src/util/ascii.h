@@ -64,27 +64,6 @@ static inline unsigned char ascii_toupper(unsigned char c)
 }
 
 NONNULL_ARGS
-static inline bool ascii_streq_icase(const char *s1, const char *s2)
-{
-    unsigned char c1, c2;
-    bool chars_equal;
-    size_t i = 0;
-
-    // Iterate to the index where the strings differ or a NUL byte is found
-    do {
-        c1 = ascii_tolower(s1[i]);
-        c2 = ascii_tolower(s2[i]);
-        chars_equal = (c1 == c2);
-        i++;
-    } while (c1 && chars_equal);
-
-    // If the loop terminated because a NUL byte was found and the
-    // last characters were the same, both strings terminate in the
-    // same place and are therefore equal
-    return chars_equal;
-}
-
-NONNULL_ARGS
 static inline int ascii_strcmp_icase(const char *s1, const char *s2)
 {
     unsigned char c1, c2;
@@ -99,6 +78,12 @@ static inline int ascii_strcmp_icase(const char *s1, const char *s2)
     } while (c1 && result == 0);
 
     return result;
+}
+
+NONNULL_ARGS
+static inline bool ascii_streq_icase(const char *s1, const char *s2)
+{
+    return ascii_strcmp_icase(s1, s2) == 0;
 }
 
 NONNULL_ARGS
