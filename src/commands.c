@@ -2222,15 +2222,12 @@ void collect_normal_commands(const char *prefix)
 }
 
 UNITTEST {
-    for (size_t i = 1, n = ARRAY_COUNT(cmds); i < n; i++) {
-        // Check that fixed-size arrays are null-terminated within bounds
-        const char *const name = cmds[i].name;
-        const char *const flags = cmds[i].flags;
-        BUG_ON(name[ARRAY_COUNT(cmds[0].name) - 1] != '\0');
-        BUG_ON(flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
+    CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
 
-        // Check that array is sorted by name field, in binary searchable order
-        BUG_ON(strcmp(name, cmds[i - 1].name) <= 0);
+    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+        // Check that flags arrays is null-terminated within bounds
+        const char *const flags = cmds[i].flags;
+        BUG_ON(flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
 
         // Count number of real flags (i.e. not including '-' or '=')
         size_t nr_real_flags = 0;

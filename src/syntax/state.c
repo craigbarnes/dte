@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stdbool.h>
+#include <string.h>
 #include "state.h"
 #include "command/args.h"
 #include "command/run.h"
@@ -476,6 +477,10 @@ static const Command cmds[] = {
     {"str", "i", true, 2, 3, cmd_str},
     {"syntax", "", true, 1, 1, cmd_syntax},
 };
+
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
+}
 
 static const Command *find_syntax_command(const char *name)
 {
