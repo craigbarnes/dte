@@ -303,8 +303,15 @@ static void test_ascii(void)
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
         EXPECT_EQ(hex_decode(i) != -1, !!isxdigit(i));
+        EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha(i) || i == '_');
+        EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
         if (i != '\v' && i != '\f') {
             EXPECT_EQ(ascii_isspace(i), !!isspace(i));
+            EXPECT_EQ(ascii_is_nonspace_cntrl(i), !!iscntrl(i) && !isspace(i));
+        }
+        if (i != -1) {
+            EXPECT_EQ(ascii_tolower(i), tolower(i));
+            EXPECT_EQ(ascii_toupper(i), toupper(i));
         }
     }
 
