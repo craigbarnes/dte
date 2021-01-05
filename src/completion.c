@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include "completion.h"
 #include "alias.h"
+#include "bind.h"
 #include "cmdline.h"
 #include "command/env.h"
 #include "command/parse.h"
@@ -304,7 +305,7 @@ static void collect_completions(char **args, size_t argc)
             void (*handler)(const char *prefix);
         } opts[] = {
             {"alias", collect_aliases},
-            {"bind", NULL},
+            {"bind", collect_bound_keys},
             {"color", collect_hl_colors},
             {"env", collect_env},
             {"include", collect_builtin_configs},

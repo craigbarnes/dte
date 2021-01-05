@@ -17,6 +17,7 @@ void add_binding(const char *keystr, const char *command);
 void remove_binding(const char *keystr);
 const KeyBinding *lookup_binding(KeyCode key);
 void handle_binding(KeyCode key);
+void collect_bound_keys(const char *keystr_prefix);
 String dump_bindings(void);
 
 #endif

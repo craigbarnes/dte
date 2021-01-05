@@ -8,6 +8,7 @@
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
+#include "completion.h"
 #include "error.h"
 #include "util/debug.h"
 #include "util/macros.h"
@@ -212,6 +213,46 @@ void handle_binding(KeyCode key)
     b->cmd->cmd(&b->a);
     current_command = NULL;
     end_change();
+}
+
+static void maybe_add_key_completion(const char *prefix, KeyCode k)
+{
+    const char *str = keycode_to_string(k);
+    if (str_has_prefix(str, prefix)) {
+        add_completion(xstrdup(str));
+    }
+}
+
+static void maybe_add_lt_key_completion(const char *prefix, KeyCode k)
+{
+    const ssize_t idx = get_lookup_table_index(k);
+    BUG_ON(idx < 0);
+    if (bindings_lookup_table[idx]) {
+        maybe_add_key_completion(prefix, k);
+    }
+}
+
+void collect_bound_keys(const char *prefix)
+{
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        maybe_add_lt_key_completion(prefix, MOD_CTRL | k);
+    }
+
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        maybe_add_lt_key_completion(prefix, MOD_META | k);
+    }
+
+    static_assert(MOD_MASK >> MOD_OFFSET == 7);
+    for (KeyCode m = 0, mods = 0; m <= 7; mods = ++m << MOD_OFFSET) {
+        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
+            maybe_add_lt_key_completion(prefix, mods | k);
+        }
+    }
+
+    for (size_t i = 0, n = bindings_ptr_array.count; i < n; i++) {
+        const KeyBindingEntry *b = bindings_ptr_array.ptrs[i];
+        maybe_add_key_completion(prefix, b->key);
+    }
 }
 
 static void append_binding(String *s, KeyCode key, const char *cmd)
