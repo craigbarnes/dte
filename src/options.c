@@ -30,10 +30,10 @@ typedef enum {
 
 typedef struct {
     const struct OptionOps *ops;
-    const char *name;
-    unsigned int offset;
+    const char name[22];
     bool local;
     bool global;
+    unsigned int offset;
     union {
         struct {
             // Optional
@@ -522,13 +522,7 @@ UNITTEST {
     }
 
     // Ensure option_desc[] is properly sorted
-    for (size_t i = 1; i < ARRAY_COUNT(option_desc); i++) {
-        const OptionDesc *curr = &option_desc[i];
-        const OptionDesc *prev = &option_desc[i - 1];
-        if (strcmp(curr->name, prev->name) <= 0) {
-            BUG("Not in sorted order: %s, %s", prev->name, curr->name);
-        }
-    }
+    CHECK_BSEARCH_ARRAY(option_desc, name, strcmp);
 
     // Validate default statusline formats
     BUG_ON(!validate_statusline_format(editor.options.statusline_left));
