@@ -31,6 +31,8 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 
 #if DEBUG >= 1
     #define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
+        static_assert_incompatible_types(a[0], const char*); \
+        static_assert_incompatible_types(a[0], char*); \
         static_assert_compatible_types(a[0][0], char); \
         check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), 0, sizeof(a[0]), cmp); \
     } while (0)
