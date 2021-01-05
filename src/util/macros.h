@@ -267,8 +267,12 @@
     #define static_assert_compatible_types(a, b) static_assert ( \
         __builtin_types_compatible_p(__typeof__(a), __typeof__(b)) \
     )
+    #define static_assert_incompatible_types(a, b) static_assert ( \
+        !__builtin_types_compatible_p(__typeof__(a), __typeof__(b)) \
+    )
 #else
     #define static_assert_compatible_types(a, b)
+    #define static_assert_incompatible_types(a, b)
 #endif
 
 #if GNUC_AT_LEAST(4, 2) || defined(__clang__)

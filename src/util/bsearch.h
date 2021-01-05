@@ -13,6 +13,8 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 
 #if DEBUG >= 1 && defined(HAS_TYPEOF)
     #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
+        static_assert_incompatible_types(a[0].field, const char*); \
+        static_assert_incompatible_types(a[0].field, char*); \
         static_assert_compatible_types(a[0].field[0], char); \
         check_bsearch_array ( \
             a, #a, #field, \
