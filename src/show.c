@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include "show.h"
 #include "alias.h"
@@ -19,6 +20,7 @@
 #include "syntax/color.h"
 #include "terminal/color.h"
 #include "terminal/key.h"
+#include "util/bsearch.h"
 #include "util/hashset.h"
 #include "util/str-util.h"
 #include "util/string.h"
@@ -177,49 +179,49 @@ static void show_macro(const char* UNUSED_ARG(name), bool UNUSED_ARG(cflag))
     error_msg("'show macro' doesn't take extra arguments");
 }
 
+typedef struct {
+    const char name[8];
+    void (*show)(const char *name, bool cmdline);
+    String (*dump)(void);
+    bool dumps_dterc_syntax;
+} ShowHandler;
+
+static const ShowHandler handlers[] = {
+    {"alias", show_alias, dump_aliases, true},
+    {"bind", show_binding, dump_bindings, true},
+    {"color", show_color, dump_hl_colors, true},
+    {"env", show_env, dump_env, false},
+    {"include", show_include, dump_builtin_configs, false},
+    {"macro", show_macro, dump_macro, true},
+    {"option", show_option, dump_options, true},
+    {"wsplit", show_wsplit, dump_frames, false},
+};
+
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(handlers, name, strcmp);
+}
+
 void show(const char *type, const char *key, bool cflag)
 {
-    static const struct {
-        const char name[8];
-        void (*show)(const char *name, bool cmdline);
-        String (*dump)(void);
-        bool dumps_dterc_syntax;
-    } handlers[] = {
-        {"alias", show_alias, dump_aliases, true},
-        {"bind", show_binding, dump_bindings, true},
-        {"color", show_color, dump_hl_colors, true},
-        {"env", show_env, dump_env, false},
-        {"include", show_include, dump_builtin_configs, false},
-        {"macro", show_macro, dump_macro, true},
-        {"option", show_option, dump_options, true},
-        {"wsplit", show_wsplit, dump_frames, false},
-    };
-
-    ssize_t cmdtype = -1;
-    for (ssize_t i = 0; i < ARRAY_COUNT(handlers); i++) {
-        if (streq(type, handlers[i].name)) {
-            cmdtype = i;
-            break;
-        }
-    }
-    if (cmdtype < 0) {
+    const ShowHandler *handler = BSEARCH(type, handlers, (CompareFunction)strcmp);
+    if (!handler) {
         error_msg("invalid argument: '%s'", type);
         return;
     }
 
     if (key) {
-        handlers[cmdtype].show(key, cflag);
+        handler->show(key, cflag);
         return;
     }
 
-    String s = handlers[cmdtype].dump();
+    String s = handler->dump();
     View *v = window_open_new_file(window);
     v->buffer->temporary = true;
     do_insert(s.buffer, s.len);
     string_free(&s);
     set_display_filename(v->buffer, xasprintf("(show %s)", type));
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
-    if (handlers[cmdtype].dumps_dterc_syntax) {
+    if (handler->dumps_dterc_syntax) {
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(v->buffer);
         buffer_update_syntax(v->buffer);
