@@ -17,7 +17,8 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
         static_assert_incompatible_types(a[0].field, char*); \
         static_assert_compatible_types(a[0].field[0], char); \
         check_bsearch_array ( \
-            a, #a, #field, \
+            a, #a, \
+            "." #field, \
             ARRAY_COUNT(a), \
             sizeof(a[0]), \
             offsetof(__typeof__(*a), field), \
@@ -53,20 +54,20 @@ static inline void check_bsearch_array (
     BUG_ON(!array_base);
     BUG_ON(!array_name);
     BUG_ON(!name_field_name);
+    BUG_ON(name_field_name[0] != '\0' && name_field_name[0] != '.');
     BUG_ON(array_length == 0);
     BUG_ON(array_element_size == 0);
     BUG_ON(name_size == 0);
 
     const char *first_name = (const char*)array_base + name_offset;
-    UNUSED const char *sep = (name_field_name[0] == '\0') ? "" : ".";
 
     for (size_t i = 0; i < array_length; i++) {
         const char *curr_name = first_name + (i * array_element_size);
         if (curr_name[0] == '\0') {
-            BUG("Empty string at %s[%zu]%s%s", array_name, i, sep, name_field_name);
+            BUG("Empty string at %s[%zu]%s", array_name, i, name_field_name);
         }
         if (curr_name[name_size - 1] != '\0') {
-            BUG("String sentinel missing from %s[%zu]%s%s", array_name, i, sep, name_field_name);
+            BUG("String sentinel missing from %s[%zu]%s", array_name, i, name_field_name);
         }
 
         // Skip sort order check for index 0; there's no prev_name to compare
@@ -77,8 +78,8 @@ static inline void check_bsearch_array (
         const char *prev_name = curr_name - array_element_size;
         if (cmp(curr_name, prev_name) <= 0) {
             BUG (
-                "String at %s[%zu]%s%s not in sorted order: \"%s\" (prev: \"%s\")",
-                array_name, i, sep, name_field_name,
+                "String at %s[%zu]%s not in sorted order: \"%s\" (prev: \"%s\")",
+                array_name, i, name_field_name,
                 curr_name, prev_name
             );
         }
