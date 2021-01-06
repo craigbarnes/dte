@@ -17,23 +17,18 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     char **args = a->args;
     BUG_ON(!args);
 
-    size_t argc = 0;
-    while (args[argc]) {
-        argc++;
-    }
-
-    const char *flag_desc = cmd->flags;
+    size_t argc = string_array_length(args);
     size_t nr_flags = 0;
     size_t nr_flag_args = 0;
-    bool flags_after_arg = true;
 
+    const char *flag_desc = cmd->flags;
+    bool flags_after_arg = true;
     if (flag_desc[0] == '-') {
         flag_desc++;
         flags_after_arg = false;
     }
 
-    size_t i = 0;
-    while (args[i]) {
+    for (size_t i = 0; args[i]; ) {
         char *arg = args[i];
         if (unlikely(streq(arg, "--"))) {
             // Move the NULL too
