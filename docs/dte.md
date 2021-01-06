@@ -149,35 +149,32 @@ The key bindings for command mode are:
 `tab`
 :   Auto-complete current command or argument
 
-`^A`
+`^A`, `home`
 :   Go to beginning of command line
 
-`^B`
+`^B`, `left`
 :   Move left
 
-`^C`
+`^C`, `^G`, `Esc`
 :   Exit command mode
 
-`^D`
+`^D`, `delete`
 :   Delete
 
-`^E`
+`^E`, `end`
 :   Go to end of command line
 
-`^F`
+`^F`, `right`
 :   Move right
 
-`^K`
+`^K`, `M-delete`
 :   Delete to end of command line
 
 `^U`
 :   Delete to beginning of command line
 
-`^W`
+`^W`, `M-C-?` (Alt+Backspace)
 :   Erase word
-
-`Esc`
-:   Exit command mode
 
 ## Search Mode
 
