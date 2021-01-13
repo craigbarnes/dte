@@ -174,9 +174,9 @@ to specify the `-g` flag).
 
 See also: [`toggle`] and [`option`] commands.
 
-### **setenv** _name_ _value_
+### **setenv** _name_ [_value_]
 
-Set environment variable.
+Set (or unset) environment variable.
 
 ### **hi** [**-c**] _name_ [_fg-color_ [_bg-color_]] [_attribute_]...
 

@@ -1717,17 +1717,27 @@ static void cmd_set(const CommandArgs *a)
 static void cmd_setenv(const CommandArgs *a)
 {
     const char *name = a->args[0];
-    const char *value = a->args[1];
     if (unlikely(streq(name, "DTE_VERSION"))) {
         error_msg("$DTE_VERSION cannot be changed");
         return;
     }
 
-    if (setenv(name, value, true) != 0) {
+    const char *op;
+    int res;
+    if (a->nr_args == 2) {
+        op = "setenv";
+        res = setenv(name, a->args[1], true);
+    } else {
+        BUG_ON(a->nr_args != 1);
+        op = "unsetenv";
+        res = unsetenv(name);
+    }
+
+    if (unlikely(res != 0)) {
         if (errno == EINVAL) {
             error_msg("Invalid environment variable name '%s'", name);
         } else {
-            perror_msg("setenv");
+            perror_msg(op);
         }
     }
 }
@@ -2146,7 +2156,7 @@ static const Command cmds[] = {
     {"search", "Hnprw", false, 0, 1, cmd_search},
     {"select", "bkl", false, 0, 0, cmd_select},
     {"set", "gl", true, 1, -1, cmd_set},
-    {"setenv", "", true, 2, 2, cmd_setenv},
+    {"setenv", "", true, 1, 2, cmd_setenv},
     {"shift", "", false, 1, 1, cmd_shift},
     {"show", "c", false, 1, 2, cmd_show},
     {"suspend", "", false, 0, 0, cmd_suspend},
