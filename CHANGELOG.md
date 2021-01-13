@@ -44,6 +44,8 @@ v1.10 (not yet released)
 * Added a large confirmation dialog, shown when [`quit -p`][`quit`] is
   run with unsaved changes.
 * Added support for [kitty's extended keyboard protocol]
+* Added the ability to exclude individual commands from command history
+  (by prepending a space character when in command mode).
 
 **Improvements:**
 
