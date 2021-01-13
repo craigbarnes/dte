@@ -197,6 +197,8 @@ External Commands:
 .br
    \fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
+   \fBexec\-tag\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
+.br
 .P
 Other Commands:
 .br
@@ -1510,6 +1512,26 @@ Example uses:
 exec\-open\ \-s\ find\ .\ \-type\ f\ \-name\ *.h
 exec\-open\ \-s\ git\ ls\-files\ \-\-modified
 exec\-open\ fzf\ \-m\ \-\-reverse
+\f[]
+.fi
+.PP
+.RE
+\fBexec\-tag\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
+.RS
+Run external \fIcommand\fR and then execute the \fBtag\fR command with its
+first line of standard output as the argument.
+.P
+.TP
+\fB\-s\fR
+Don't yield terminal control to the child process
+.PP
+Example uses:
+.P
+.IP
+.nf
+\f[C]
+exec\-tag\ \-s\ echo\ main
+exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse'
 \f[]
 .fi
 .PP

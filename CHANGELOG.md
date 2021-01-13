@@ -11,6 +11,7 @@ v1.10 (not yet released)
   * [`blkup`]
   * [`delete-line`]
   * [`exec-open`]
+  * [`exec-tag`]
   * [`macro`]
   * [`match-bracket`]
 * Added 12 new command flags:
@@ -449,6 +450,7 @@ system except a somewhat recent kernel.
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
 [`exec-open`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec-open
+[`exec-tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec-tag
 [`filter`]: https://craigbarnes.gitlab.io/dte/dterc.html#filter
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include

@@ -968,6 +968,19 @@ Example uses:
     exec-open -s git ls-files --modified
     exec-open fzf -m --reverse
 
+### **exec-tag** [**-s**] _command_ [_parameter_]...
+
+Run external _command_ and then execute the `tag` command with its
+first line of standard output as the argument.
+
+`-s`
+:   Don't yield terminal control to the child process
+
+Example uses:
+
+    exec-tag -s echo main
+    exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf --reverse'
+
 ## Other Commands
 
 ### **repeat** _count_ _command_ [_parameters_]...
