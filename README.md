@@ -62,7 +62,7 @@ installed:
 
 ...and compile and install:
 
-    make -j8 && sudo make install
+    make && sudo make install
 
 Documentation
 -------------
