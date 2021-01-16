@@ -6,7 +6,7 @@ v1.10 (not yet released)
 
 **Additions:**
 
-* Added 6 new commands:
+* Added 7 new commands:
   * [`blkdown`]
   * [`blkup`]
   * [`delete-line`]
