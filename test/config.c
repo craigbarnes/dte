@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include "test.h"
 #include "config.h"
-#include "alias.h"
 #include "commands.h"
 #include "convert.h"
 #include "editor.h"
@@ -174,7 +173,6 @@ void init_headless_mode(void)
     MEMZERO(&terminal.control_codes);
     exec_builtin_rc();
     update_all_syntax_colors();
-    sort_aliases();
     editor.options.lock_files = false;
     window = new_window();
     root_frame = new_root_frame(window);

@@ -5,7 +5,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "alias.h"
 #include "block.h"
 #include "command/serialize.h"
 #include "commands.h"
@@ -387,7 +386,6 @@ loop_break:
     }
 
     update_all_syntax_colors();
-    sort_aliases();
     window = new_window();
     root_frame = new_root_frame(window);
 

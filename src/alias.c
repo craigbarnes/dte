@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,88 +6,94 @@
 #include "command/serialize.h"
 #include "completion.h"
 #include "editor.h"
+#include "util/hashmap.h"
 #include "util/macros.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-typedef struct {
-    char *name;
-    char *value;
-} CommandAlias;
+static HashMap aliases;
 
-static PointerArray aliases = PTR_ARRAY_INIT;
-
-static void CONSTRUCTOR prealloc(void)
+void init_aliases(void)
 {
-    ptr_array_init(&aliases, 32);
+    BUG_ON(aliases.entries);
+    if (!hashmap_init(&aliases, 64)) {
+        fatal_error(__func__, errno);
+    }
+    BUG_ON(!aliases.entries);
 }
 
 void add_alias(const char *name, const char *value)
 {
-    // Replace existing alias
-    for (size_t i = 0, n = aliases.count; i < n; i++) {
-        CommandAlias *alias = aliases.ptrs[i];
-        if (streq(alias->name, name)) {
-            free(alias->value);
-            alias->value = xstrdup(value);
-            return;
-        }
+    char *value_copy = xstrdup(value);
+    HashMapEntry *e = hashmap_find(&aliases, name);
+    if (e) {
+        free(e->value);
+        e->value = value_copy;
+        return;
     }
 
-    CommandAlias *alias = xnew(CommandAlias, 1);
-    alias->name = xstrdup(name);
-    alias->value = xstrdup(value);
-    ptr_array_append(&aliases, alias);
-
-    if (editor.status != EDITOR_INITIALIZING) {
-        sort_aliases();
+    char *name_copy = xstrdup(name);
+    if (!hashmap_insert(&aliases, name_copy, value_copy)) {
+        fatal_error(__func__, errno);
     }
-}
-
-static int alias_cmp(const void *ap, const void *bp)
-{
-    const CommandAlias *const *a = ap;
-    const CommandAlias *const *b = bp;
-    return strcmp((*a)->name, (*b)->name);
-}
-
-void sort_aliases(void)
-{
-    ptr_array_sort(&aliases, alias_cmp);
 }
 
 const char *find_alias(const char *const name)
 {
-    const CommandAlias key = {.name = (char*) name};
-    const void *ptr = ptr_array_bsearch(aliases, &key, alias_cmp);
-    if (ptr) {
-        const CommandAlias *alias = *(const CommandAlias **) ptr;
-        return alias->value;
-    }
-    return NULL;
+    HashMapEntry *e = hashmap_find(&aliases, name);
+    return e ? e->value : NULL;
 }
 
 void collect_aliases(const char *const prefix)
 {
-    for (size_t i = 0, n = aliases.count; i < n; i++) {
-        const CommandAlias *const alias = aliases.ptrs[i];
-        if (str_has_prefix(alias->name, prefix)) {
-            add_completion(xstrdup(alias->name));
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&aliases, &it); ) {
+        const char *name = it.entry->key;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
         }
     }
 }
 
+typedef struct {
+    const char *name;
+    const char *value;
+} CommandAlias;
+
+static int alias_cmp(const void *ap, const void *bp)
+{
+    const CommandAlias *a = ap;
+    const CommandAlias *b = bp;
+    return strcmp(a->name, b->name);
+}
+
 String dump_aliases(void)
 {
+    const size_t count = aliases.count;
+    CommandAlias *array = xnew(CommandAlias, count);
+
+    // Clone the contents of the HashMap as an array of name/value pairs
+    size_t n = 0;
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&aliases, &it); ) {
+        array[n++] = (CommandAlias) {
+            .name = it.entry->key,
+            .value = it.entry->value,
+        };
+    }
+
+    // Sort the array
+    BUG_ON(n != count);
+    qsort(array, count, sizeof(CommandAlias), alias_cmp);
+
+    // Serialize the aliases in sorted order
     String buf = string_new(4096);
-    for (size_t i = 0, n = aliases.count; i < n; i++) {
-        const CommandAlias *alias = aliases.ptrs[i];
+    for (size_t i = 0; i < count; i++) {
         string_append_literal(&buf, "alias ");
-        string_append_escaped_arg(&buf, alias->name, false);
+        string_append_escaped_arg(&buf, array[i].name, false);
         string_append_byte(&buf, ' ');
-        string_append_escaped_arg(&buf, alias->value, false);
+        string_append_escaped_arg(&buf, array[i].value, false);
         string_append_byte(&buf, '\n');
     }
+
+    free(array);
     return buf;
 }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "editor.h"
+#include "alias.h"
 #include "buffer.h"
 #include "error.h"
 #include "mode.h"
@@ -109,6 +110,7 @@ void init_editor_state(void)
 
     log_init("DTE_LOG");
     regexp_init_word_boundary_tokens();
+    init_aliases();
 }
 
 static void sanity_check(void)

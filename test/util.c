@@ -10,6 +10,7 @@
 #include "util/base64.h"
 #include "util/checked-arith.h"
 #include "util/hash.h"
+#include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/line-iter.h"
 #include "util/path.h"
@@ -1029,6 +1030,108 @@ static void test_ptr_array_move(void)
     ptr_array_free(&a);
 }
 
+static void test_hashmap(void)
+{
+    static const char strings[][8] = {
+        "foo", "bar", "quux", "etc", "",
+        "A", "B", "C", "D", "E", "F", "G",
+        "a", "b", "c", "d", "e", "f", "g",
+        "test", "1234567", "..", "...",
+        "\x01\x02\x03 \t\xfe\xff",
+    };
+
+    HashMap map;
+    ASSERT_TRUE(hashmap_init(&map, ARRAY_COUNT(strings)));
+    ASSERT_NONNULL(map.entries);
+    EXPECT_EQ(map.mask, 31);
+    EXPECT_EQ(map.count, 0);
+    EXPECT_NULL(hashmap_find(&map, "foo"));
+
+    static const char value[] = "VALUE";
+    FOR_EACH_I(i, strings) {
+        const char *key = strings[i];
+        ASSERT_EQ(key[sizeof(strings[0]) - 1], '\0');
+        ASSERT_TRUE(hashmap_insert(&map, xstrdup(key), (void*)value));
+        HashMapEntry *e = hashmap_find(&map, key);
+        ASSERT_NONNULL(e);
+        EXPECT_STREQ(e->key, key);
+        EXPECT_PTREQ(e->value, value);
+    }
+
+    EXPECT_EQ(map.count, 24);
+    EXPECT_EQ(map.mask, 31);
+
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&map, &it); ) {
+        ASSERT_NONNULL(it.entry);
+        ASSERT_NONNULL(it.entry->key);
+        EXPECT_PTREQ(it.entry->value, value);
+    }
+
+    FOR_EACH_I(i, strings) {
+        const char *key = strings[i];
+        HashMapEntry *e = hashmap_find(&map, key);
+        ASSERT_NONNULL(e);
+        EXPECT_STREQ(e->key, key);
+        EXPECT_PTREQ(e->value, value);
+
+        EXPECT_PTREQ(hashmap_remove(&map, key), value);
+        EXPECT_STREQ(e->key, "TOMBSTONE");
+        EXPECT_NULL(hashmap_find(&map, key));
+    }
+
+    EXPECT_EQ(map.count, 0);
+    EXPECT_EQ(map.mask, 31);
+
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&map, &it); ) {
+        TEST_FAIL("Unexpected loop iteration");
+        break;
+    }
+
+    ASSERT_TRUE(hashmap_insert(&map, xstrdup("new"), (void*)value));
+    ASSERT_NONNULL(hashmap_find(&map, "new"));
+    EXPECT_STREQ(hashmap_find(&map, "new")->key, "new");
+    EXPECT_EQ(map.count, 1);
+    EXPECT_EQ(map.mask, 31);
+
+    FOR_EACH_I(i, strings) {
+        const char *key = strings[i];
+        ASSERT_TRUE(hashmap_insert(&map, xstrdup(key), (void*)value));
+        HashMapEntry *e = hashmap_find(&map, key);
+        ASSERT_NONNULL(e);
+        EXPECT_STREQ(e->key, key);
+        EXPECT_PTREQ(e->value, value);
+    }
+
+    EXPECT_EQ(map.count, 25);
+    EXPECT_EQ(map.mask, 63);
+
+    FOR_EACH_I(i, strings) {
+        const char *key = strings[i];
+        HashMapEntry *e = hashmap_find(&map, key);
+        ASSERT_NONNULL(e);
+        EXPECT_STREQ(e->key, key);
+        EXPECT_PTREQ(hashmap_remove(&map, key), value);
+        EXPECT_STREQ(e->key, "TOMBSTONE");
+        EXPECT_NULL(hashmap_find(&map, key));
+    }
+
+    EXPECT_EQ(map.count, 1);
+    EXPECT_EQ(map.mask, 63);
+    EXPECT_NULL(hashmap_remove(&map, "non-existent-key"));
+    EXPECT_EQ(map.count, 1);
+    EXPECT_EQ(map.mask, 63);
+    EXPECT_PTREQ(hashmap_remove(&map, "new"), value);
+    EXPECT_EQ(map.count, 0);
+    EXPECT_EQ(map.mask, 63);
+
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&map, &it); ) {
+        TEST_FAIL("Unexpected loop iteration");
+        break;
+    }
+
+    hashmap_free(&map);
+}
+
 static void test_hashset(void)
 {
     static const char *const strings[] = {
@@ -1437,6 +1540,7 @@ void test_util(void)
     test_u_prev_char();
     test_ptr_array();
     test_ptr_array_move();
+    test_hashmap();
     test_hashset();
     test_round_size_to_next_multiple();
     test_round_size_to_next_power_of_2();
