@@ -63,7 +63,8 @@ typedef struct {
 
 typedef struct {
     char *name;
-    PointerArray states;
+    HashMap states;
+    struct State *start_state;
     HashMap string_lists;
     PointerArray default_colors;
     bool heredoc;

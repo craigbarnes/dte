@@ -62,7 +62,12 @@ static State *find_or_add_state(const char *name)
     st->name = xstrdup(name);
     st->defined = false;
     st->type = STATE_INVALID;
-    ptr_array_append(&current_syntax->states, st);
+
+    hashmap_xinsert(&current_syntax->states, st->name, st);
+    if (current_syntax->states.count == 1) {
+        current_syntax->start_state = st;
+    }
+
     return st;
 }
 

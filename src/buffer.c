@@ -302,7 +302,7 @@ void buffer_update_syntax(Buffer *b)
         if (!s->alloc) {
             ptr_array_init(s, 64);
         }
-        s->ptrs[0] = syn->states.ptrs[0];
+        s->ptrs[0] = syn->start_state;
         s->count = 1;
     }
 

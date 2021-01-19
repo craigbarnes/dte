@@ -20,8 +20,8 @@ typedef struct {
 } HashMap;
 
 typedef struct {
-    HashMapEntry *entry;
     size_t idx;
+    HashMapEntry *entry;
 } HashMapIter;
 
 #define HASHMAP_INIT { \
@@ -31,8 +31,8 @@ typedef struct {
 }
 
 #define HASHMAP_ITER { \
+    .idx = 0, \
     .entry = NULL, \
-    .idx = 0 \
 }
 
 bool hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS WARN_UNUSED_RESULT;
@@ -41,8 +41,13 @@ bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUS
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
 HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool hashmap_next(const HashMap *map, HashMapIter *iter) NONNULL_ARGS WARN_UNUSED_RESULT;
-
 void hashmap_xinit(HashMap *map, size_t capacity) NONNULL_ARGS;
 void hashmap_xinsert(HashMap *map, char *key, void *value) NONNULL_ARGS;
+
+static inline void *hashmap_get(const HashMap *map, const char *key)
+{
+    HashMapEntry *e = hashmap_find(map, key);
+    return e ? e->value : NULL;
+}
 
 #endif
