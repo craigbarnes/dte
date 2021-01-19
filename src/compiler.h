@@ -16,7 +16,6 @@ typedef struct {
 } ErrorFormat;
 
 typedef struct {
-    char *name;
     PointerArray error_formats;
 } Compiler;
 

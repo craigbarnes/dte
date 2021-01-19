@@ -3,11 +3,12 @@
 #include "completion.h"
 #include "error.h"
 #include "regexp.h"
+#include "util/hashmap.h"
+#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
-#include "util/macros.h"
 
-static PointerArray compilers = PTR_ARRAY_INIT;
+static HashMap compilers = HASHMAP_INIT;
 
 static Compiler *add_compiler(const char *name)
 {
@@ -16,20 +17,13 @@ static Compiler *add_compiler(const char *name)
         return c;
     }
     c = xnew0(Compiler, 1);
-    c->name = xstrdup(name);
-    ptr_array_append(&compilers, c);
+    hashmap_xinsert(&compilers, xstrdup(name), c);
     return c;
 }
 
 Compiler *find_compiler(const char *name)
 {
-    for (size_t i = 0, n = compilers.count; i < n; i++) {
-        Compiler *c = compilers.ptrs[i];
-        if (streq(c->name, name)) {
-            return c;
-        }
-    }
-    return NULL;
+    return hashmap_get(&compilers, name);
 }
 
 void add_error_fmt (
@@ -84,10 +78,10 @@ void add_error_fmt (
 
 void collect_compilers(const char *prefix)
 {
-    for (size_t i = 0, n = compilers.count; i < n; i++) {
-        const Compiler *c = compilers.ptrs[i];
-        if (str_has_prefix(c->name, prefix)) {
-            add_completion(xstrdup(c->name));
+    for (HashMapIter it = {0}; hashmap_next(&compilers, &it); ) {
+        const char *name = it.entry->key;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
         }
     }
 }
