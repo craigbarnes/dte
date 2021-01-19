@@ -85,7 +85,7 @@ void hashmap_free(HashMap *map, FreeFunction free_value)
     }
 
     size_t n = 0;
-    for (HashMapIter it = HASHMAP_ITER; hashmap_next(map, &it); n++) {
+    for (HashMapIter it = {0}; hashmap_next(map, &it); n++) {
         free(it.entry->key);
         if (free_value) {
             free_value(it.entry->value);

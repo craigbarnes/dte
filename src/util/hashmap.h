@@ -30,11 +30,6 @@ typedef struct {
     .count = 0 \
 }
 
-#define HASHMAP_ITER { \
-    .idx = 0, \
-    .entry = NULL, \
-}
-
 bool hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS WARN_UNUSED_RESULT;
 void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUSED_RESULT;
