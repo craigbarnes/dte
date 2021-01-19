@@ -24,6 +24,12 @@ typedef struct {
     size_t idx;
 } HashMapIter;
 
+#define HASHMAP_INIT { \
+    .entries = NULL, \
+    .mask = 0, \
+    .count = 0 \
+}
+
 #define HASHMAP_ITER { \
     .entry = NULL, \
     .idx = 0 \
@@ -35,5 +41,8 @@ bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUS
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
 HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 bool hashmap_next(const HashMap *map, HashMapIter *iter) NONNULL_ARGS WARN_UNUSED_RESULT;
+
+void hashmap_xinit(HashMap *map, size_t capacity) NONNULL_ARGS;
+void hashmap_xinsert(HashMap *map, char *key, void *value) NONNULL_ARGS;
 
 #endif

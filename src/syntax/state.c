@@ -290,8 +290,7 @@ static void cmd_list(const CommandArgs *a)
     StringList *list = find_string_list(current_syntax, name);
     if (!list) {
         list = xnew0(StringList, 1);
-        list->name = xstrdup(name);
-        ptr_array_append(&current_syntax->string_lists, list);
+        hashmap_xinsert(&current_syntax->string_lists, xstrdup(name), list);
     } else if (list->defined) {
         error_msg("List %s already exists.", name);
         return;
@@ -322,8 +321,7 @@ static void cmd_inlist(const CommandArgs *a)
     if (!list) {
         // Add undefined list
         list = xnew0(StringList, 1);
-        list->name = xstrdup(name);
-        ptr_array_append(&current_syntax->string_lists, list);
+        hashmap_xinsert(&current_syntax->string_lists, xstrdup(name), list);
     }
     list->used = true;
     c->u.str_list = list;

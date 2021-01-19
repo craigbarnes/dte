@@ -67,12 +67,23 @@ bool hashmap_init(HashMap *map, size_t size)
         return false;
     }
 
-    *map = (HashMap){.entries = NULL};
+    *map = (HashMap)HASHMAP_INIT;
     return hashmap_resize(map, size);
+}
+
+void hashmap_xinit(HashMap *map, size_t size)
+{
+    if (unlikely(!hashmap_init(map, size))) {
+        fatal_error(__func__, errno);
+    }
 }
 
 void hashmap_free(HashMap *map, FreeFunction free_value)
 {
+    if (unlikely(!map->entries)) {
+        return;
+    }
+
     size_t n = 0;
     for (HashMapIter it = HASHMAP_ITER; hashmap_next(map, &it); n++) {
         free(it.entry->key);
@@ -82,20 +93,15 @@ void hashmap_free(HashMap *map, FreeFunction free_value)
     }
     BUG_ON(n != map->count);
     free(map->entries);
-    *map = (HashMap){.entries = NULL};
-}
-
-static void hashmap_sanity_check(const HashMap *map)
-{
-    BUG_ON(!map);
-    BUG_ON(!map->entries);
-    BUG_ON(map->mask + 1 < MIN_SIZE);
-    BUG_ON(map->count > map->mask);
+    *map = (HashMap)HASHMAP_INIT;
 }
 
 HashMapEntry *hashmap_find(const HashMap *map, const char *key)
 {
-    hashmap_sanity_check(map);
+    if (unlikely(!map->entries)) {
+        return NULL;
+    }
+
     size_t hash = fnv_1a_hash(key, strlen(key));
     HashMapEntry *e;
     for (size_t i = hash, j = 1; ; i += j++) {
@@ -128,7 +134,12 @@ void *hashmap_remove(HashMap *map, const char *key)
 
 bool hashmap_insert(HashMap *map, char *key, void *value)
 {
-    hashmap_sanity_check(map);
+    if (unlikely(!map->entries)) {
+        if (unlikely(!hashmap_init(map, 0))) {
+            return false;
+        }
+    }
+
     size_t hash = fnv_1a_hash(key, strlen(key));
     HashMapEntry *e;
     for (size_t i = hash, j = 1; ; i += j++) {
@@ -138,6 +149,7 @@ bool hashmap_insert(HashMap *map, char *key, void *value)
         }
         if (e->hash == hash && streq(e->key, key)) {
             // Don't replace existing values
+            errno = EINVAL;
             return false;
         }
     }
@@ -165,8 +177,19 @@ error:
     return false;
 }
 
+void hashmap_xinsert(HashMap *map, char *key, void *value)
+{
+    if (!hashmap_insert(map, key, value) && errno != EINVAL) {
+        fatal_error(__func__, errno);
+    }
+}
+
 bool hashmap_next(const HashMap *map, HashMapIter *iter)
 {
+    if (unlikely(!map->entries)) {
+        return false;
+    }
+
     for (size_t i = iter->idx, n = map->mask + 1; i < n; i++) {
         HashMapEntry *e = map->entries + i;
         if (e->key && e->key != tombstone) {

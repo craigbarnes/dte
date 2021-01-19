@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "bitset.h"
 #include "color.h"
+#include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -37,7 +38,6 @@ typedef struct {
 } Action;
 
 typedef struct {
-    char *name;
     HashSet strings;
     bool used;
     bool defined;
@@ -64,7 +64,7 @@ typedef struct {
 typedef struct {
     char *name;
     PointerArray states;
-    PointerArray string_lists;
+    HashMap string_lists;
     PointerArray default_colors;
     bool heredoc;
     bool used;

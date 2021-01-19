@@ -10,13 +10,8 @@ static PointerArray syntaxes = PTR_ARRAY_INIT;
 
 StringList *find_string_list(const Syntax *syn, const char *name)
 {
-    for (size_t i = 0, n = syn->string_lists.count; i < n; i++) {
-        StringList *list = syn->string_lists.ptrs[i];
-        if (streq(list->name, name)) {
-            return list;
-        }
-    }
-    return NULL;
+    HashMapEntry *e = hashmap_find(&syn->string_lists, name);
+    return e ? e->value : NULL;
 }
 
 State *find_state(const Syntax *syn, const char *name)
@@ -187,14 +182,13 @@ static void free_state(State *s)
 static void free_string_list(StringList *list)
 {
     hashset_free(&list->strings);
-    free(list->name);
     free(list);
 }
 
 static void free_syntax(Syntax *syn)
 {
     ptr_array_free_cb(&syn->states, FREE_FUNC(free_state));
-    ptr_array_free_cb(&syn->string_lists, FREE_FUNC(free_string_list));
+    hashmap_free(&syn->string_lists, FREE_FUNC(free_string_list));
     ptr_array_free_cb(&syn->default_colors, FREE_FUNC(free_string_array));
 
     free(syn->name);
@@ -214,10 +208,10 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
             error_msg("No such state %s", s->name);
         }
     }
-    for (size_t i = 0, n = syn->string_lists.count; i < n; i++) {
-        const StringList *list = syn->string_lists.ptrs[i];
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&syn->string_lists, &it); ) {
+        const StringList *list = it.entry->value;
         if (!list->defined) {
-            error_msg("No such list %s", list->name);
+            error_msg("No such list %s", it.entry->key);
         }
     }
 
@@ -242,10 +236,10 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
             error_msg("State %s is unreachable", s->name);
         }
     }
-    for (size_t i = 0, n = syn->string_lists.count; i < n; i++) {
-        const StringList *list = syn->string_lists.ptrs[i];
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(&syn->string_lists, &it); ) {
+        const StringList *list = it.entry->value;
         if (!list->used) {
-            error_msg("List %s never used", list->name);
+            error_msg("List %s never used", it.entry->key);
         }
     }
 
