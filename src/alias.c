@@ -40,8 +40,7 @@ void add_alias(const char *name, const char *value)
 
 const char *find_alias(const char *const name)
 {
-    HashMapEntry *e = hashmap_find(&aliases, name);
-    return e ? e->value : NULL;
+    return hashmap_get(&aliases, name);
 }
 
 void collect_aliases(const char *const prefix)
