@@ -34,22 +34,6 @@ size_t size_add(size_t a, size_t b)
     return result;
 }
 
-size_t round_size_to_next_power_of_2(size_t x)
-{
-    if (unlikely(x == 0)) {
-        return 1;
-    }
-    x--;
-    UNROLL_LOOP(8)
-    for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
-        x |= x >> i;
-    }
-    if (unlikely(x == SIZE_MAX)) {
-        fatal_error(__func__, EOVERFLOW);
-    }
-    return x + 1;
-}
-
 void *xmalloc(size_t size)
 {
     BUG_ON(size == 0);

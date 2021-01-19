@@ -45,4 +45,18 @@ static inline size_t fnv_1a_hash_icase(const unsigned char *str, size_t n)
     return hash;
 }
 
+// NOTE: returns 0 if x is greater than the largest size_t power of 2
+static inline size_t round_size_to_next_power_of_2(size_t x)
+{
+    if (unlikely(x == 0)) {
+        return 1;
+    }
+    x--;
+    UNROLL_LOOP(8)
+    for (size_t i = 1, n = sizeof(size_t) * CHAR_BIT; i < n; i <<= 1) {
+        x |= x >> i;
+    }
+    return x + 1;
+}
+
 #endif

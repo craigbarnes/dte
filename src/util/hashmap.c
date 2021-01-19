@@ -62,6 +62,10 @@ bool hashmap_init(HashMap *map, size_t size)
     // bitwise ops (instead of modulo) to wrap the hash value and also
     // to allow quadratic probing with triangular numbers
     size = round_size_to_next_power_of_2(size);
+    if (unlikely(size == 0)) {
+        errno = EOVERFLOW;
+        return false;
+    }
 
     *map = (HashMap){.entries = NULL};
     return hashmap_resize(map, size);

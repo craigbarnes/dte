@@ -21,7 +21,6 @@ char *xstrdup(const char *str) XSTRDUP;
 char *xasprintf(const char *format, ...) PRINTF(1) XMALLOC;
 size_t size_multiply_(size_t a, size_t b);
 size_t size_add(size_t a, size_t b);
-size_t round_size_to_next_power_of_2(size_t x);
 
 static inline size_t size_multiply(size_t a, size_t b)
 {
