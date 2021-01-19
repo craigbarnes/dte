@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,33 +10,24 @@
 static char tombstone[16] = "TOMBSTONE";
 
 enum {
-    MIN_SIZE = 8,
-    MAX_SIZE = (SIZE_MAX / 2) + 1
+    MIN_SIZE = 8
 };
 
-static bool resize(HashMap *map, size_t capacity)
+static bool hashmap_resize(HashMap *map, size_t size)
 {
-    static_assert(IS_POWER_OF_2(MIN_SIZE));
-    static_assert(IS_POWER_OF_2(MAX_SIZE));
-    if (capacity > MAX_SIZE) {
-        capacity = MAX_SIZE;
-    }
-
-    size_t newsize = MIN_SIZE;
-    while (newsize < capacity) {
-        newsize *= 2;
-    }
-
+    BUG_ON(size < MIN_SIZE);
+    BUG_ON(size <= map->count);
+    BUG_ON(!IS_POWER_OF_2(size));
     HashMapEntry *oldtab = map->entries;
     HashMapEntry *oldend = map->entries + map->mask + 1;
-    map->entries = calloc(newsize, sizeof(*map->entries));
-    if (!map->entries) {
+
+    map->entries = calloc(size, sizeof(*map->entries));
+    if (unlikely(!map->entries)) {
         map->entries = oldtab;
         return false;
     }
 
-    map->mask = newsize - 1;
-
+    map->mask = size - 1;
     if (!oldtab) {
         return true;
     }
@@ -56,19 +48,37 @@ static bool resize(HashMap *map, size_t capacity)
     return true;
 }
 
-bool hashmap_init(HashMap *map, size_t capacity)
+bool hashmap_init(HashMap *map, size_t size)
 {
-    *map = (HashMap) {
-        .entries = NULL,
-        .mask = 0,
-        .count = 0,
-    };
-    return resize(map, capacity);
+    // Accommodate the 75% load factor in the table size, to allow
+    // filling to the requested size without needing to resize()
+    size += size / 3;
+
+    if (unlikely(size < MIN_SIZE)) {
+        size = MIN_SIZE;
+    }
+
+    // Round up the size to the next power of 2, to allow using simple
+    // bitwise ops (instead of modulo) to wrap the hash value and also
+    // to allow quadratic probing with triangular numbers
+    size = round_size_to_next_power_of_2(size);
+
+    *map = (HashMap){.entries = NULL};
+    return hashmap_resize(map, size);
 }
 
-void hashmap_free(HashMap *map)
+void hashmap_free(HashMap *map, FreeFunction free_value)
 {
+    size_t n = 0;
+    for (HashMapIter it = HASHMAP_ITER; hashmap_next(map, &it); n++) {
+        free(it.entry->key);
+        if (free_value) {
+            free_value(it.entry->value);
+        }
+    }
+    BUG_ON(n != map->count);
     free(map->entries);
+    *map = (HashMap){.entries = NULL};
 }
 
 static void hashmap_sanity_check(const HashMap *map)
@@ -133,14 +143,22 @@ bool hashmap_insert(HashMap *map, char *key, void *value)
     e->hash = hash;
 
     if (++map->count > map->mask - (map->mask / 4)) {
-        if (unlikely(!resize(map, 2 * map->count))) {
-            map->count--;
-            e->key = NULL;
-            return false;
+        size_t new_size = (map->mask + 1) << 1;
+        if (unlikely(new_size == 0)) {
+            errno = EOVERFLOW;
+            goto error;
+        }
+        if (unlikely(!hashmap_resize(map, new_size))) {
+            goto error;
         }
     }
 
     return true;
+
+error:
+    map->count--;
+    e->key = NULL;
+    return false;
 }
 
 bool hashmap_next(const HashMap *map, HashMapIter *iter)

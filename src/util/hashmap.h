@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include "macros.h"
 
+typedef void (*FreeFunction)(void *ptr);
+
 typedef struct {
     char *key;
     void *value;
@@ -28,7 +30,7 @@ typedef struct {
 }
 
 bool hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS WARN_UNUSED_RESULT;
-void hashmap_free(HashMap *map) NONNULL_ARGS;
+void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUSED_RESULT;
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
 HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
