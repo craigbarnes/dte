@@ -16,7 +16,7 @@ static HashMap aliases;
 void init_aliases(void)
 {
     BUG_ON(aliases.entries);
-    if (!hashmap_init(&aliases, 64)) {
+    if (!hashmap_init(&aliases, 32)) {
         fatal_error(__func__, errno);
     }
     BUG_ON(!aliases.entries);
