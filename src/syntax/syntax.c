@@ -95,7 +95,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
     const HashMap *subsyn_states = &merge->subsyn->states;
     HashMap *states = &syn->states;
 
-    for (HashMapIter it = {0}; hashmap_next(subsyn_states, &it); ) {
+    for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
         s->name = xstrdup(fix_name(s->name, prefix));
         s->emit_name = xstrdup(s->emit_name);
@@ -120,7 +120,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
     }
 
     // Fix conditions and update colors for newly merged states
-    for (HashMapIter it = {0}; hashmap_next(subsyn_states, &it); ) {
+    for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         const State *subsyn_state = it.entry->value;
         BUG_ON(!subsyn_state);
         const char *new_name = fix_name(subsyn_state->name, prefix);
@@ -192,14 +192,14 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         error_msg("Empty syntax");
     }
 
-    for (HashMapIter it = {0}; hashmap_next(&syn->states, &it); ) {
+    for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
         if (!s->defined) {
             // This state has been referenced but not defined
             error_msg("No such state %s", it.entry->key);
         }
     }
-    for (HashMapIter it = {0}; hashmap_next(&syn->string_lists, &it); ) {
+    for (HashMapIter it = hashmap_iter(&syn->string_lists); hashmap_next(&it); ) {
         const StringList *list = it.entry->value;
         if (!list->defined) {
             error_msg("No such list %s", it.entry->key);
@@ -221,13 +221,13 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
 
     // Unused states and lists cause warning only
     visit(syn->start_state);
-    for (HashMapIter it = {0}; hashmap_next(&syn->states, &it); ) {
+    for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;
         if (!s->visited && !s->copied) {
             error_msg("State %s is unreachable", it.entry->key);
         }
     }
-    for (HashMapIter it = {0}; hashmap_next(&syn->string_lists, &it); ) {
+    for (HashMapIter it = hashmap_iter(&syn->string_lists); hashmap_next(&it); ) {
         const StringList *list = it.entry->value;
         if (!list->used) {
             error_msg("List %s never used", it.entry->key);
@@ -297,7 +297,7 @@ void update_syntax_colors(Syntax *syn)
         // No point to update colors of a sub-syntax
         return;
     }
-    for (HashMapIter it = {0}; hashmap_next(&syn->states, &it); ) {
+    for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         update_state_colors(syn, it.entry->value);
     }
 }

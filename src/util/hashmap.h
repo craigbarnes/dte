@@ -20,8 +20,9 @@ typedef struct {
 } HashMap;
 
 typedef struct {
-    size_t idx;
+    const HashMap *map;
     HashMapEntry *entry;
+    size_t idx;
 } HashMapIter;
 
 #define HASHMAP_INIT { \
@@ -30,12 +31,35 @@ typedef struct {
     .count = 0 \
 }
 
+static inline HashMapIter hashmap_iter(const HashMap *map)
+{
+    return (HashMapIter){.map = map};
+}
+
+static inline bool hashmap_next(HashMapIter *iter)
+{
+    const HashMap *map = iter->map;
+    if (unlikely(!map->entries)) {
+        return false;
+    }
+
+    extern char tombstone[16];
+    for (size_t i = iter->idx, n = map->mask + 1; i < n; i++) {
+        HashMapEntry *e = map->entries + i;
+        if (e->key && e->key != tombstone) {
+            iter->entry = e;
+            iter->idx = i + 1;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS WARN_UNUSED_RESULT;
 void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUSED_RESULT;
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
 HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
-bool hashmap_next(const HashMap *map, HashMapIter *iter) NONNULL_ARGS WARN_UNUSED_RESULT;
 void hashmap_xinit(HashMap *map, size_t capacity) NONNULL_ARGS;
 void hashmap_xinsert(HashMap *map, char *key, void *value) NONNULL_ARGS;
 

@@ -7,7 +7,7 @@
 #include "hash.h"
 #include "str-util.h"
 
-static char tombstone[16] = "TOMBSTONE";
+char tombstone[16] = "TOMBSTONE";
 
 enum {
     MIN_SIZE = 8
@@ -85,7 +85,7 @@ void hashmap_free(HashMap *map, FreeFunction free_value)
     }
 
     size_t n = 0;
-    for (HashMapIter it = {0}; hashmap_next(map, &it); n++) {
+    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); n++) {
         free(it.entry->key);
         if (free_value) {
             free_value(it.entry->value);
@@ -182,21 +182,4 @@ void hashmap_xinsert(HashMap *map, char *key, void *value)
     if (!hashmap_insert(map, key, value) && errno != EINVAL) {
         fatal_error(__func__, errno);
     }
-}
-
-bool hashmap_next(const HashMap *map, HashMapIter *iter)
-{
-    if (unlikely(!map->entries)) {
-        return false;
-    }
-
-    for (size_t i = iter->idx, n = map->mask + 1; i < n; i++) {
-        HashMapEntry *e = map->entries + i;
-        if (e->key && e->key != tombstone) {
-            iter->entry = e;
-            iter->idx = i + 1;
-            return true;
-        }
-    }
-    return false;
 }

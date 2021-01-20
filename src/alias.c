@@ -45,7 +45,7 @@ const char *find_alias(const char *const name)
 
 void collect_aliases(const char *const prefix)
 {
-    for (HashMapIter it = {0}; hashmap_next(&aliases, &it); ) {
+    for (HashMapIter it = hashmap_iter(&aliases); hashmap_next(&it); ) {
         const char *name = it.entry->key;
         if (str_has_prefix(name, prefix)) {
             add_completion(xstrdup(name));
@@ -72,7 +72,7 @@ String dump_aliases(void)
 
     // Clone the contents of the HashMap as an array of name/value pairs
     size_t n = 0;
-    for (HashMapIter it = {0}; hashmap_next(&aliases, &it); ) {
+    for (HashMapIter it = hashmap_iter(&aliases); hashmap_next(&it); ) {
         array[n++] = (CommandAlias) {
             .name = it.entry->key,
             .value = it.entry->value,

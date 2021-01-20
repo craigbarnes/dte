@@ -1061,7 +1061,7 @@ static void test_hashmap(void)
     EXPECT_EQ(map.count, 24);
     EXPECT_EQ(map.mask, 31);
 
-    for (HashMapIter it = {0}; hashmap_next(&map, &it); ) {
+    for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
         ASSERT_NONNULL(it.entry);
         ASSERT_NONNULL(it.entry->key);
         EXPECT_PTREQ(it.entry->value, value);
@@ -1082,7 +1082,7 @@ static void test_hashmap(void)
     EXPECT_EQ(map.count, 0);
     EXPECT_EQ(map.mask, 31);
 
-    for (HashMapIter it = {0}; hashmap_next(&map, &it); ) {
+    for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
         TEST_FAIL("Unexpected loop iteration");
         break;
     }
@@ -1124,7 +1124,7 @@ static void test_hashmap(void)
     EXPECT_EQ(map.count, 0);
     EXPECT_EQ(map.mask, 63);
 
-    for (HashMapIter it = {0}; hashmap_next(&map, &it); ) {
+    for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
         TEST_FAIL("Unexpected loop iteration");
         break;
     }

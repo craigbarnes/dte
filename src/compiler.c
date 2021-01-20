@@ -78,7 +78,7 @@ void add_error_fmt (
 
 void collect_compilers(const char *prefix)
 {
-    for (HashMapIter it = {0}; hashmap_next(&compilers, &it); ) {
+    for (HashMapIter it = hashmap_iter(&compilers); hashmap_next(&it); ) {
         const char *name = it.entry->key;
         if (str_has_prefix(name, prefix)) {
             add_completion(xstrdup(name));
