@@ -69,6 +69,7 @@ typedef struct {
     PointerArray default_colors;
     bool heredoc;
     bool used;
+    bool warned_unused_subsyntax;
 } Syntax;
 
 typedef struct State {

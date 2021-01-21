@@ -6,7 +6,7 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-static PointerArray syntaxes = PTR_ARRAY_INIT;
+static HashMap syntaxes = HASHMAP_INIT;
 
 StringList *find_string_list(const Syntax *syn, const char *name)
 {
@@ -25,13 +25,7 @@ static bool has_destination(ConditionType type)
 
 Syntax *find_any_syntax(const char *name)
 {
-    for (size_t i = 0, n = syntaxes.count; i < n; i++) {
-        Syntax *syn = syntaxes.ptrs[i];
-        if (streq(syn->name, name)) {
-            return syn;
-        }
-    }
-    return NULL;
+    return hashmap_get(&syntaxes, name);
 }
 
 static const char *fix_name(const char *name, const char *prefix)
@@ -234,7 +228,7 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         }
     }
 
-    ptr_array_append(&syntaxes, syn);
+    hashmap_xinsert(&syntaxes, syn->name, syn);
 }
 
 Syntax *find_syntax(const char *name)
@@ -304,20 +298,19 @@ void update_syntax_colors(Syntax *syn)
 
 void update_all_syntax_colors(void)
 {
-    for (size_t i = 0, n = syntaxes.count; i < n; i++) {
-        update_syntax_colors(syntaxes.ptrs[i]);
+    for (HashMapIter it = hashmap_iter(&syntaxes); hashmap_next(&it); ) {
+        update_syntax_colors(it.entry->value);
     }
 }
 
 void find_unused_subsyntaxes(void)
 {
-    // Don't complain multiple times about same unused subsyntaxes
-    static size_t i;
-
-    for (size_t n = syntaxes.count; i < n; i++) {
-        const Syntax *s = syntaxes.ptrs[i];
-        if (!s->used && is_subsyntax(s)) {
+    for (HashMapIter it = hashmap_iter(&syntaxes); hashmap_next(&it); ) {
+        Syntax *s = it.entry->value;
+        if (!s->used && !s->warned_unused_subsyntax && is_subsyntax(s)) {
             error_msg("Subsyntax %s is unused", s->name);
+            // Don't complain multiple times about the same unused subsyntaxes
+            s->warned_unused_subsyntax = true;
         }
     }
 }
