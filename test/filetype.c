@@ -71,6 +71,7 @@ static void test_find_ft_filename(void)
         {"Makefile.a_", NULL},
         {"Makefile._m", NULL},
         {"M_______.am", NULL},
+        {".Makefile", NULL},
         {"file.glslf", "glsl"},
         {"file.glslv", "glsl"},
         {"file.gl_lv", NULL},
