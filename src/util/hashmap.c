@@ -18,30 +18,34 @@ static bool hashmap_resize(HashMap *map, size_t size)
     BUG_ON(size < MIN_SIZE);
     BUG_ON(size <= map->count);
     BUG_ON(!IS_POWER_OF_2(size));
-    HashMapEntry *oldtab = map->entries;
-    HashMapEntry *oldend = map->entries + map->mask + 1;
 
-    map->entries = calloc(size, sizeof(*map->entries));
-    if (unlikely(!map->entries)) {
-        map->entries = oldtab;
+    HashMapEntry *newtab = calloc(size, sizeof(*newtab));
+    if (unlikely(!newtab)) {
         return false;
     }
 
+    HashMapEntry *oldtab = map->entries;
+    size_t oldlen = map->mask + 1;
+    map->entries = newtab;
     map->mask = size - 1;
+
     if (!oldtab) {
         return true;
     }
 
-    for (HashMapEntry *e = oldtab, *newe; e < oldend; e++) {
-        if (e->key && e->key != tombstone) {
-            for (size_t i = e->hash, j = 1; ; i += j++) {
-                newe = map->entries + (i & map->mask);
-                if (!newe->key) {
-                    break;
-                }
-            }
-            *newe = *e;
+    // Copy the entries to the new table
+    for (const HashMapEntry *e = oldtab, *end = e + oldlen; e < end; e++) {
+        if (!e->key || e->key == tombstone) {
+            continue;
         }
+        HashMapEntry *newe;
+        for (size_t i = e->hash, j = 1; ; i += j++) {
+            newe = newtab + (i & map->mask);
+            if (!newe->key) {
+                break;
+            }
+        }
+        *newe = *e;
     }
 
     free(oldtab);
