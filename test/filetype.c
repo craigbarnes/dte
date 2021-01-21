@@ -61,7 +61,6 @@ static void test_find_ft_filename(void)
         {"zshrc", "sh"},
         {"gnus", "lisp"},
         {"file.flatpakref", "ini"},
-        {"file.flatpakrepo", "ini"},
         {"file.automount", "ini"},
         {"file.nginxconf", "nginx"},
         {"meson_options.txt", "meson"},

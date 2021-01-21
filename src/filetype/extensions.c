@@ -1,6 +1,6 @@
 static const struct FileExtensionMap {
-    const char ext[12];
-    const FileTypeEnum filetype;
+    const char ext[11];
+    const uint8_t filetype; // FileTypeEnum
 } extensions[] = {
     {"ada", ADA},
     {"adb", ADA},
@@ -47,7 +47,6 @@ static const struct FileExtensionMap {
     {"eml", MAIL},
     {"eps", POSTSCRIPT},
     {"flatpakref", INI},
-    {"flatpakrepo", INI},
     {"frag", GLSL},
     {"gawk", AWK},
     {"gcode", GCODE},
