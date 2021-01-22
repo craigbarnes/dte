@@ -174,7 +174,7 @@ static void free_syntax(Syntax *syn)
 {
     hashmap_free(&syn->states, FREE_FUNC(free_state));
     hashmap_free(&syn->string_lists, FREE_FUNC(free_string_list));
-    ptr_array_free_cb(&syn->default_colors, FREE_FUNC(free_string_array));
+    hashmap_free(&syn->default_colors, NULL);
 
     free(syn->name);
     free(syn);
@@ -242,15 +242,7 @@ Syntax *find_syntax(const char *name)
 
 static const char *find_default_color(const Syntax *syn, const char *name)
 {
-    for (size_t i = 0, n = syn->default_colors.count; i < n; i++) {
-        char **strs = syn->default_colors.ptrs[i];
-        for (size_t j = 1; strs[j]; j++) {
-            if (streq(strs[j], name)) {
-                return strs[0];
-            }
-        }
-    }
-    return NULL;
+    return hashmap_get(&syn->default_colors, name);
 }
 
 static void update_action_color(const Syntax *syn, Action *a)

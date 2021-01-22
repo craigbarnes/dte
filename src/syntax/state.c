@@ -224,10 +224,13 @@ static void cmd_default(const CommandArgs *a)
     if (no_syntax()) {
         return;
     }
-    ptr_array_append (
-        &current_syntax->default_colors,
-        copy_string_array(a->args, a->nr_args)
-    );
+
+    const char *value = str_intern(a->args[0]);
+    HashMap *default_colors = &current_syntax->default_colors;
+    for (size_t i = 1, n = a->nr_args; i < n; i++) {
+        char *name = xstrdup(a->args[i]);
+        hashmap_xinsert(default_colors, name, (char*)value);
+    }
 }
 
 static void cmd_eat(const CommandArgs *a)

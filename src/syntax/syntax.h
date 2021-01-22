@@ -66,7 +66,7 @@ typedef struct {
     HashMap states;
     struct State *start_state;
     HashMap string_lists;
-    PointerArray default_colors;
+    HashMap default_colors;
     bool heredoc;
     bool used;
     bool warned_unused_subsyntax;

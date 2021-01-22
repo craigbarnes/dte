@@ -50,6 +50,7 @@ static void test_builtin_configs(void)
             free(src);
         }
     }
+    update_all_syntax_colors();
 }
 
 static void expect_files_equal(const char *path1, const char *path2)
