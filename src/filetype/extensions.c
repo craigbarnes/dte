@@ -147,6 +147,7 @@ static const struct FileExtensionMap {
     {"sql", SQL},
     {"ss", SCHEME},
     {"sty", TEX},
+    {"supp", CONFIG},
     {"svg", XML},
     {"target", INI},
     {"tcl", TCL},
