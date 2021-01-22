@@ -2,7 +2,9 @@
 #define UTIL_BSEARCH_H
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include "debug.h"
 #include "macros.h"
 
@@ -10,6 +12,7 @@ typedef int (*CompareFunction)(const void *key, const void *elem);
 typedef int (*StringCompareFunction)(const char *key, const char *elem);
 
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
+#define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 
 #if DEBUG >= 1 && defined(HAS_TYPEOF)
     #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
@@ -84,6 +87,23 @@ static inline void check_bsearch_array (
             );
         }
     }
+}
+
+// Like bsearch(3), but returning the index of the element instead of
+// a pointer to it (or -1 if not found)
+static inline ssize_t bisearch_idx (
+    const void *key,
+    const void *base,
+    size_t nmemb,
+    size_t size,
+    CompareFunction compare
+) {
+    const char *found = bsearch(key, base, nmemb, size, compare);
+    if (!found) {
+        return -1;
+    }
+    const char *char_base = base;
+    return (size_t)(found - char_base) / size;
 }
 
 #endif

@@ -34,7 +34,7 @@ typedef struct {
     char *emit_name;
 
     // Set after all colors have been added (config loaded).
-    HlColor *emit_color;
+    TermColor *emit_color;
 } Action;
 
 typedef struct {

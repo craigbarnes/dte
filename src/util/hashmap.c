@@ -82,24 +82,6 @@ void hashmap_xinit(HashMap *map, size_t size)
     }
 }
 
-void hashmap_free(HashMap *map, FreeFunction free_value)
-{
-    if (unlikely(!map->entries)) {
-        return;
-    }
-
-    size_t n = 0;
-    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); n++) {
-        free(it.entry->key);
-        if (free_value) {
-            free_value(it.entry->value);
-        }
-    }
-    BUG_ON(n != map->count);
-    free(map->entries);
-    *map = (HashMap)HASHMAP_INIT;
-}
-
 HashMapEntry *hashmap_find(const HashMap *map, const char *key)
 {
     if (unlikely(!map->entries)) {
@@ -186,4 +168,32 @@ void hashmap_xinsert(HashMap *map, char *key, void *value)
     if (!hashmap_insert(map, key, value) && errno != EINVAL) {
         fatal_error(__func__, errno);
     }
+}
+
+// Remove all entries without freeing the table
+void hashmap_clear(HashMap *map, FreeFunction free_value)
+{
+    if (unlikely(!map->entries)) {
+        return;
+    }
+
+    size_t count = 0;
+    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); count++) {
+        free(it.entry->key);
+        if (free_value) {
+            free_value(it.entry->value);
+        }
+    }
+
+    BUG_ON(count != map->count);
+    size_t len = map->mask + 1;
+    memset(map->entries, 0, len * sizeof(*map->entries));
+    map->count = 0;
+}
+
+void hashmap_free(HashMap *map, FreeFunction free_value)
+{
+    hashmap_clear(map, free_value);
+    free(map->entries);
+    *map = (HashMap)HASHMAP_INIT;
 }

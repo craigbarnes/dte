@@ -14,10 +14,10 @@ void set_color(const TermColor *color)
     TermColor tmp = *color;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = builtin_colors[BC_DEFAULT]->fg;
+        tmp.fg = builtin_colors[BC_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = builtin_colors[BC_DEFAULT]->bg;
+        tmp.bg = builtin_colors[BC_DEFAULT].bg;
     }
     if (same_color(&tmp, &obuf.color)) {
         return;
@@ -28,7 +28,7 @@ void set_color(const TermColor *color)
 
 void set_builtin_color(BuiltinColorEnum c)
 {
-    set_color(builtin_colors[c]);
+    set_color(&builtin_colors[c]);
 }
 
 void update_term_title(const Buffer *b)

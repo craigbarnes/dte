@@ -3,128 +3,146 @@
 #include "color.h"
 #include "command/serialize.h"
 #include "completion.h"
+#include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/hashmap.h"
 #include "util/macros.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-TermColor *builtin_colors[NR_BC];
+TermColor builtin_colors[NR_BC];
 
-static PointerArray hl_colors = PTR_ARRAY_INIT;
+static HashMap hl_colors = HASHMAP_INIT;
 
 static const char builtin_color_names[NR_BC][16] = {
-    [BC_DEFAULT] = "default",
-    [BC_NONTEXT] = "nontext",
-    [BC_NOLINE] = "noline",
-    [BC_WSERROR] = "wserror",
-    [BC_SELECTION] = "selection",
-    [BC_CURRENTLINE] = "currentline",
-    [BC_LINENUMBER] = "linenumber",
-    [BC_STATUSLINE] = "statusline",
-    [BC_COMMANDLINE] = "commandline",
-    [BC_ERRORMSG] = "errormsg",
-    [BC_INFOMSG] = "infomsg",
-    [BC_TABBAR] = "tabbar",
     [BC_ACTIVETAB] = "activetab",
-    [BC_INACTIVETAB] = "inactivetab",
+    [BC_COMMANDLINE] = "commandline",
+    [BC_CURRENTLINE] = "currentline",
+    [BC_DEFAULT] = "default",
     [BC_DIALOG] = "dialog",
+    [BC_ERRORMSG] = "errormsg",
+    [BC_INACTIVETAB] = "inactivetab",
+    [BC_INFOMSG] = "infomsg",
+    [BC_LINENUMBER] = "linenumber",
+    [BC_NOLINE] = "noline",
+    [BC_NONTEXT] = "nontext",
+    [BC_SELECTION] = "selection",
+    [BC_STATUSLINE] = "statusline",
+    [BC_TABBAR] = "tabbar",
+    [BC_WSERROR] = "wserror",
 };
 
 UNITTEST {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_color_names); i++) {
-        const char *name = builtin_color_names[i];
-        if (name[0] == '\0') {
-            BUG("missing string at builtin_color_names[%zu]", i);
-        }
-        if (!memchr(name, '\0', sizeof(builtin_color_names[0]))) {
-            BUG("builtin_color_names[%zu] missing null-terminator", i);
-        }
-    }
+    CHECK_BSEARCH_STR_ARRAY(builtin_color_names, strcmp);
 }
 
-void fill_builtin_colors(void)
+static TermColor *find_real_color(const char *name)
 {
-    for (size_t i = 0; i < NR_BC; i++) {
-        builtin_colors[i] = &find_color(builtin_color_names[i])->color;
-    }
-}
-
-HlColor *set_highlight_color(const char *name, const TermColor *color)
-{
-    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
-        HlColor *c = hl_colors.ptrs[i];
-        if (streq(name, c->name)) {
-            c->color = *color;
-            return c;
-        }
+    ssize_t idx = BSEARCH_IDX(name, builtin_color_names, (CompareFunction)strcmp);
+    if (idx >= 0) {
+        BUG_ON(idx >= ARRAY_COUNT(builtin_color_names));
+        return &builtin_colors[(BuiltinColorEnum)idx];
     }
 
-    size_t name_len = strlen(name);
-    HlColor *c = xmalloc(sizeof(*c) + name_len + 1);
-    c->color = *color;
-    memcpy(c->name, name, name_len + 1);
-    ptr_array_append(&hl_colors, c);
-    return c;
+    return hashmap_get(&hl_colors, name);
 }
 
-static HlColor *find_real_color(const char *name)
+void set_highlight_color(const char *name, const TermColor *color)
 {
-    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
-        HlColor *c = hl_colors.ptrs[i];
-        if (streq(c->name, name)) {
-            return c;
-        }
+    TermColor *c = find_real_color(name);
+    if (c) {
+        *c = *color;
+        return;
     }
-    return NULL;
+
+    c = xnew(TermColor, 1);
+    *c = *color;
+    hashmap_xinsert(&hl_colors, xstrdup(name), c);
 }
 
-HlColor *find_color(const char *name)
+TermColor *find_color(const char *name)
 {
-    HlColor *color = find_real_color(name);
-    if (color) {
-        return color;
+    TermColor *c = find_real_color(name);
+    if (c) {
+        return c;
     }
 
     const char *dot = strchr(name, '.');
-    if (dot) {
-        return find_real_color(dot + 1);
-    }
-
-    return NULL;
+    return dot ? find_real_color(dot + 1) : NULL;
 }
 
-// NOTE: you have to call update_all_syntax_colors() after this
-void remove_extra_colors(void)
+void clear_hl_colors(void)
 {
-    BUG_ON(hl_colors.count < NR_BC);
-    for (size_t i = NR_BC, n = hl_colors.count; i < n; i++) {
-        free(hl_colors.ptrs[i]);
-        hl_colors.ptrs[i] = NULL;
-    }
-    hl_colors.count = NR_BC;
+    hashmap_clear(&hl_colors, free);
 }
 
 void collect_hl_colors(const char *prefix)
 {
-    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
-        const HlColor *c = hl_colors.ptrs[i];
-        if (str_has_prefix(c->name, prefix)) {
-            add_completion(xstrdup(c->name));
+    for (size_t i = 0; i < NR_BC; i++) {
+        const char *name = builtin_color_names[i];
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
         }
     }
+    for (HashMapIter it = hashmap_iter(&hl_colors); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
+}
+
+typedef struct {
+    const char *name;
+    TermColor color;
+} HlColor;
+
+static int hlcolor_cmp(const void *ap, const void *bp)
+{
+    const HlColor *a = ap;
+    const HlColor *b = bp;
+    return strcmp(a->name, b->name);
+}
+
+static void append_color(String *s, const char *name, const TermColor *color)
+{
+    string_append_literal(s, "hi ");
+    string_append_escaped_arg(s, name, false);
+    string_append_byte(s, ' ');
+    string_append_cstring(s, term_color_to_string(color));
+    string_append_byte(s, '\n');
 }
 
 String dump_hl_colors(void)
 {
     String buf = string_new(4096);
-    for (size_t i = 0, n = hl_colors.count; i < n; i++) {
-        const HlColor *c = hl_colors.ptrs[i];
-        string_append_literal(&buf, "hi ");
-        string_append_escaped_arg(&buf, c->name, false);
-        string_append_byte(&buf, ' ');
-        string_append_cstring(&buf, term_color_to_string(&c->color));
-        string_append_byte(&buf, '\n');
+    string_append_literal(&buf, "# UI colors:\n");
+    for (size_t i = 0; i < NR_BC; i++) {
+        append_color(&buf, builtin_color_names[i], &builtin_colors[i]);
     }
+
+    const size_t count = hl_colors.count;
+    HlColor *array = xnew(HlColor, count);
+    size_t n = 0;
+
+    // Copy the HashMap entries into an array
+    for (HashMapIter it = hashmap_iter(&hl_colors); hashmap_next(&it); ) {
+        const TermColor *c = it.entry->value;
+        array[n++] = (HlColor) {
+            .name = it.entry->key,
+            .color = *c,
+        };
+    }
+
+    // Sort the array
+    BUG_ON(n != count);
+    qsort(array, count, sizeof(*array), hlcolor_cmp);
+
+    string_append_literal(&buf, "\n# Syntax colors:\n");
+    for (size_t i = 0; i < count; i++) {
+        append_color(&buf, array[i].name, &array[i].color);
+    }
+
+    free(array);
     return buf;
 }

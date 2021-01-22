@@ -21,12 +21,12 @@ typedef struct {
     size_t pos;
     size_t indent_size;
     size_t trailing_ws_offset;
-    HlColor **colors;
+    TermColor **colors;
 } LineInfo;
 
 static bool is_default_bg_color(int32_t color)
 {
-    return color == builtin_colors[BC_DEFAULT]->bg || color < 0;
+    return color == builtin_colors[BC_DEFAULT].bg || color < 0;
 }
 
 // Like mask_color() but can change bg color only if it has not been changed yet
@@ -48,9 +48,9 @@ static void mask_selection_and_current_line (
     TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
-        mask_color(color, builtin_colors[BC_SELECTION]);
+        mask_color(color, &builtin_colors[BC_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        mask_color2(color, builtin_colors[BC_CURRENTLINE]);
+        mask_color2(color, &builtin_colors[BC_CURRENTLINE]);
     }
 }
 
@@ -158,15 +158,15 @@ static CodePoint screen_next_char(LineInfo *info)
     }
 
     if (info->colors && info->colors[pos]) {
-        color = info->colors[pos]->color;
+        color = *info->colors[pos];
     } else {
-        color = *builtin_colors[BC_DEFAULT];
+        color = builtin_colors[BC_DEFAULT];
     }
     if (is_non_text(u)) {
-        mask_color(&color, builtin_colors[BC_NONTEXT]);
+        mask_color(&color, &builtin_colors[BC_NONTEXT]);
     }
     if (ws_error) {
-        mask_color(&color, builtin_colors[BC_WSERROR]);
+        mask_color(&color, &builtin_colors[BC_WSERROR]);
     }
     mask_selection_and_current_line(info, &color);
     set_color(&color);
@@ -210,8 +210,8 @@ static bool is_notice(const char *word, size_t len)
 // Highlight certain words inside comments
 static void hl_words(const LineInfo *info)
 {
-    HlColor *cc = find_color("comment");
-    HlColor *nc = find_color("notice");
+    TermColor *cc = find_color("comment");
+    TermColor *nc = find_color("notice");
 
     if (!info->colors || !cc || !nc) {
         return;
@@ -286,7 +286,7 @@ static void line_info_init (
 static void line_info_set_line (
     LineInfo *info,
     const StringView *line,
-    HlColor **colors
+    TermColor **colors
 ) {
     BUG_ON(line->length == 0);
     BUG_ON(line->data[line->length - 1] != '\n');
@@ -345,14 +345,14 @@ static void print_line(LineInfo *info)
     TermColor color;
     if (editor.options.display_special && obuf.x >= obuf.scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
-        color = *builtin_colors[BC_DEFAULT];
-        mask_color(&color, builtin_colors[BC_NONTEXT]);
+        color = builtin_colors[BC_DEFAULT];
+        mask_color(&color, &builtin_colors[BC_NONTEXT]);
         mask_selection_and_current_line(info, &color);
         set_color(&color);
         term_put_char('$');
     }
 
-    color = *builtin_colors[BC_DEFAULT];
+    color = builtin_colors[BC_DEFAULT];
     mask_selection_and_current_line(info, &color);
     set_color(&color);
     info->offset++;
@@ -395,7 +395,7 @@ void update_range(const View *v, long y1, long y2)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        HlColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
+        TermColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
         print_line(&info);
 
@@ -412,10 +412,10 @@ void update_range(const View *v, long y1, long y2)
 
     if (i < y2 && info.line_nr == v->cy) {
         // Dummy empty line is shown only if cursor is on it
-        TermColor color = *builtin_colors[BC_DEFAULT];
+        TermColor color = builtin_colors[BC_DEFAULT];
 
         obuf.x = 0;
-        mask_color2(&color, builtin_colors[BC_CURRENTLINE]);
+        mask_color2(&color, &builtin_colors[BC_CURRENTLINE]);
         set_color(&color);
 
         term_move_cursor(edit_x, edit_y + i++);

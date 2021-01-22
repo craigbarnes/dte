@@ -74,13 +74,13 @@ static State *handle_heredoc (
 }
 
 // Line should be terminated with \n unless it's the last line
-static HlColor **highlight_line (
+static TermColor **highlight_line (
     Syntax *syn,
     State *state,
     const StringView *line_sv,
     State **ret
 ) {
-    static HlColor **colors;
+    static TermColor **colors;
     static size_t alloc;
     const char *const line = line_sv->data;
     const size_t len = line_sv->length;
@@ -380,7 +380,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
     }
 }
 
-HlColor **hl_line (
+TermColor **hl_line (
     Buffer *b,
     const StringView *line,
     size_t line_nr,
@@ -394,7 +394,7 @@ HlColor **hl_line (
     PointerArray *s = &b->line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    HlColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], line, &next);
+    TermColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);

@@ -578,7 +578,6 @@ static void cmd_hi(const CommandArgs *a)
 {
     if (unlikely(a->nr_args == 0)) {
         exec_builtin_color_reset();
-        remove_extra_colors();
         goto update;
     }
 

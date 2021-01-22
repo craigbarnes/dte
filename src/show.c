@@ -79,13 +79,13 @@ static void show_binding(const char *keystr, bool cflag)
 
 static void show_color(const char *color_name, bool cflag)
 {
-    const HlColor *hl = find_color(color_name);
+    const TermColor *hl = find_color(color_name);
     if (!hl) {
         error_msg("no color entry with name '%s'", color_name);
         return;
     }
 
-    const char *color_str = term_color_to_string(&hl->color);
+    const char *color_str = term_color_to_string(hl);
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
         cmdline_set_text(&editor.cmdline, color_str);
