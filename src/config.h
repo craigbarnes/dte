@@ -18,8 +18,12 @@ typedef struct {
     const StringView text;
 } BuiltinConfig;
 
-extern const char *config_file;
-extern int config_line;
+typedef struct {
+    const char *file;
+    int line;
+} ConfigState;
+
+extern ConfigState current_config;
 
 String dump_builtin_configs(void);
 void collect_builtin_configs(const char *prefix);

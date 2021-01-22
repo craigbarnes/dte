@@ -15,8 +15,7 @@
 #include "util/xmalloc.h"
 #include "../build/builtin-config.h"
 
-const char *config_file;
-int config_line;
+ConfigState current_config;
 
 static bool is_command(const char *str, size_t len)
 {
@@ -63,7 +62,7 @@ void exec_config(const CommandSet *cmds, const char *buf, size_t size)
                 string_clear(&line);
             }
         }
-        config_line++;
+        current_config.line++;
         ptr += n + 1;
     }
     if (line.len) {
@@ -118,8 +117,8 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
     if (builtin) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
         if (cfg) {
-            config_file = filename;
-            config_line = 1;
+            current_config.file = filename;
+            current_config.line = 1;
             exec_config(cmds, cfg->text.data, cfg->text.length);
             return 0;
         } else if (must_exist) {
@@ -144,8 +143,8 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
         return err;
     }
 
-    config_file = filename;
-    config_line = 1;
+    current_config.file = filename;
+    current_config.line = 1;
 
     exec_config(cmds, buf, size);
     free(buf);
@@ -155,11 +154,9 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
 {
     // Recursive
-    const char *saved_config_file = config_file;
-    int saved_config_line = config_line;
+    const ConfigState saved = current_config;
     int ret = do_read_config(cmds, filename, flags);
-    config_file = saved_config_file;
-    config_line = saved_config_line;
+    current_config = saved;
     return ret;
 }
 

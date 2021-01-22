@@ -47,7 +47,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
         return;
     }
 
-    if (config_file && !cmd->allow_in_rc) {
+    if (current_config.file && !cmd->allow_in_rc) {
         error_msg("Command %s not allowed in config file.", cmd->name);
         return;
     }

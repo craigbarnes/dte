@@ -541,21 +541,17 @@ static void cmd_require(const CommandArgs *a)
 
 Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 {
-    const char *saved_config_file = config_file;
-    int saved_config_line = config_line;
-
+    const ConfigState saved = current_config;
     *err = do_read_config(&syntax_commands, filename, flags);
     if (*err) {
-        config_file = saved_config_file;
-        config_line = saved_config_line;
+        current_config = saved;
         return NULL;
     }
     if (current_syntax) {
         finish_syntax();
         find_unused_subsyntaxes();
     }
-    config_file = saved_config_file;
-    config_line = saved_config_line;
+    current_config = saved;
 
     Syntax *syn = find_syntax(path_basename(filename));
     if (syn && editor.status != EDITOR_INITIALIZING) {

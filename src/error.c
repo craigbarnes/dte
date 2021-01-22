@@ -19,8 +19,8 @@ void clear_error(void)
 void error_msg(const char *format, ...)
 {
     const char *cmd = current_command ? current_command->name : NULL;
-    const char *file = config_file;
-    const int line = config_line;
+    const char *file = current_config.file;
+    const int line = current_config.line;
     const size_t size = sizeof(error_buf);
     int pos = 0;
 
