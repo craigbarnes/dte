@@ -1041,7 +1041,7 @@ static void test_hashmap(void)
     };
 
     HashMap map;
-    ASSERT_TRUE(hashmap_init(&map, ARRAY_COUNT(strings)));
+    hashmap_init(&map, ARRAY_COUNT(strings));
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);
@@ -1051,7 +1051,7 @@ static void test_hashmap(void)
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
         ASSERT_EQ(key[sizeof(strings[0]) - 1], '\0');
-        ASSERT_TRUE(hashmap_insert(&map, xstrdup(key), (void*)value));
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1087,7 +1087,7 @@ static void test_hashmap(void)
         break;
     }
 
-    ASSERT_TRUE(hashmap_insert(&map, xstrdup("new"), (void*)value));
+    hashmap_insert(&map, xstrdup("new"), (void*)value);
     ASSERT_NONNULL(hashmap_find(&map, "new"));
     EXPECT_STREQ(hashmap_find(&map, "new")->key, "new");
     EXPECT_EQ(map.count, 1);
@@ -1095,7 +1095,7 @@ static void test_hashmap(void)
 
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
-        ASSERT_TRUE(hashmap_insert(&map, xstrdup(key), (void*)value));
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1134,14 +1134,14 @@ static void test_hashmap(void)
     EXPECT_EQ(map.count, 0);
     EXPECT_EQ(map.mask, 0);
 
-    ASSERT_TRUE(hashmap_init(&map, 0));
+    hashmap_init(&map, 0);
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 7);
     EXPECT_EQ(map.count, 0);
     hashmap_free(&map, NULL);
     EXPECT_NULL(map.entries);
 
-    ASSERT_TRUE(hashmap_init(&map, 13));
+    hashmap_init(&map, 13);
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);
@@ -1149,7 +1149,7 @@ static void test_hashmap(void)
     for (size_t i = 1; i <= 380; i++) {
         char key[4];
         EXPECT_EQ(xsnprintf(key, sizeof key, "%zu", i), size_str_width(i));
-        ASSERT_TRUE(hashmap_insert(&map, xstrdup(key), (void*)value));
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);

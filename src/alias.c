@@ -11,15 +11,12 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-static HashMap aliases;
+static HashMap aliases = HASHMAP_INIT;
 
 void init_aliases(void)
 {
     BUG_ON(aliases.entries);
-    if (!hashmap_init(&aliases, 32)) {
-        fatal_error(__func__, errno);
-    }
-    BUG_ON(!aliases.entries);
+    hashmap_init(&aliases, 32);
 }
 
 void add_alias(const char *name, const char *value)
@@ -27,15 +24,13 @@ void add_alias(const char *name, const char *value)
     char *value_copy = xstrdup(value);
     HashMapEntry *e = hashmap_find(&aliases, name);
     if (e) {
+        // Alias exists; just update the value
         free(e->value);
         e->value = value_copy;
         return;
     }
 
-    char *name_copy = xstrdup(name);
-    if (!hashmap_insert(&aliases, name_copy, value_copy)) {
-        fatal_error(__func__, errno);
-    }
+    hashmap_insert(&aliases, xstrdup(name), value_copy);
 }
 
 const char *find_alias(const char *const name)

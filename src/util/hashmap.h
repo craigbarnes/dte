@@ -55,14 +55,12 @@ static inline bool hashmap_next(HashMapIter *iter)
     return false;
 }
 
-bool hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS WARN_UNUSED_RESULT;
-void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
-bool hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS WARN_UNUSED_RESULT;
+void hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS;
+void hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS;
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
-HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 void hashmap_clear(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
-void hashmap_xinit(HashMap *map, size_t capacity) NONNULL_ARGS;
-void hashmap_xinsert(HashMap *map, char *key, void *value) NONNULL_ARGS;
+void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
+HashMapEntry *hashmap_find(const HashMap *map, const char *key) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 static inline void *hashmap_get(const HashMap *map, const char *key)
 {

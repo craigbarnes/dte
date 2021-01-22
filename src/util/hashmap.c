@@ -13,6 +13,7 @@ enum {
     MIN_SIZE = 8
 };
 
+WARN_UNUSED_RESULT
 static bool hashmap_resize(HashMap *map, size_t size)
 {
     BUG_ON(size < MIN_SIZE);
@@ -52,7 +53,8 @@ static bool hashmap_resize(HashMap *map, size_t size)
     return true;
 }
 
-bool hashmap_init(HashMap *map, size_t size)
+WARN_UNUSED_RESULT
+static bool hashmap_do_init(HashMap *map, size_t size)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
@@ -75,9 +77,9 @@ bool hashmap_init(HashMap *map, size_t size)
     return hashmap_resize(map, size);
 }
 
-void hashmap_xinit(HashMap *map, size_t size)
+void hashmap_init(HashMap *map, size_t size)
 {
-    if (unlikely(!hashmap_init(map, size))) {
+    if (unlikely(!hashmap_do_init(map, size))) {
         fatal_error(__func__, errno);
     }
 }
@@ -118,10 +120,11 @@ void *hashmap_remove(HashMap *map, const char *key)
     return e->value;
 }
 
-bool hashmap_insert(HashMap *map, char *key, void *value)
+WARN_UNUSED_RESULT
+static bool hashmap_do_insert(HashMap *map, char *key, void *value)
 {
     if (unlikely(!map->entries)) {
-        if (unlikely(!hashmap_init(map, 0))) {
+        if (unlikely(!hashmap_do_init(map, 0))) {
             return false;
         }
     }
@@ -163,9 +166,9 @@ error:
     return false;
 }
 
-void hashmap_xinsert(HashMap *map, char *key, void *value)
+void hashmap_insert(HashMap *map, char *key, void *value)
 {
-    if (!hashmap_insert(map, key, value) && errno != EINVAL) {
+    if (!hashmap_do_insert(map, key, value) && errno != EINVAL) {
         fatal_error(__func__, errno);
     }
 }
