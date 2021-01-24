@@ -390,23 +390,20 @@ char dialog_prompt(const char *question, const char *choices)
     show_message(question, false);
     term_output_flush();
 
-    while (1) {
-        char c = get_choice(choices);
-        if (c) {
-            mark_everything_changed();
-            return (c >= 'a') ? c : 0;
+    char choice;
+    while ((choice = get_choice(choices)) == 0) {
+        if (!editor.resized) {
+            continue;
         }
-        if (editor.resized) {
-            ui_resize();
-            term_hide_cursor();
-            show_dialog(question);
-            show_message(question, false);
-            term_output_flush();
-        }
+        ui_resize();
+        term_hide_cursor();
+        show_dialog(question);
+        show_message(question, false);
+        term_output_flush();
     }
 
-    BUG("unreachable");
-    return 0;
+    mark_everything_changed();
+    return (choice >= 'a') ? choice : 0;
 }
 
 char status_prompt(const char *question, const char *choices)
@@ -425,23 +422,20 @@ char status_prompt(const char *question, const char *choices)
     show_message(question, false);
     end_update();
 
-    while (1) {
-        char c = get_choice(choices);
-        if (c) {
-            return (c >= 'a') ? c : 0;
+    char choice;
+    while ((choice = get_choice(choices)) == 0) {
+        if (!editor.resized) {
+            continue;
         }
-        if (editor.resized) {
-            ui_resize();
-            term_hide_cursor();
-            show_message(question, false);
-            restore_cursor();
-            term_show_cursor();
-            term_output_flush();
-        }
+        ui_resize();
+        term_hide_cursor();
+        show_message(question, false);
+        restore_cursor();
+        term_show_cursor();
+        term_output_flush();
     }
 
-    BUG("unreachable");
-    return 0;
+    return (choice >= 'a') ? choice : 0;
 }
 
 typedef struct {
