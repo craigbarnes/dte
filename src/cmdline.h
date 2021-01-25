@@ -9,7 +9,7 @@
 typedef struct {
     String buf;
     size_t pos;
-    ssize_t search_pos;
+    const HistoryEntry *search_pos;
     char *search_text;
 } CommandLine;
 

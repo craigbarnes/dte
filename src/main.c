@@ -398,9 +398,8 @@ loop_break:
         load_file_history(file_history_filename);
         history_load(&editor.command_history, editor_file("command-history"));
         history_load(&editor.search_history, editor_file("search-history"));
-        size_t n = editor.search_history.entries.count;
-        if (n > 0) {
-            search_set_regexp(editor.search_history.entries.ptrs[n - 1]);
+        if (editor.search_history.last) {
+            search_set_regexp(editor.search_history.last->text);
         }
     }
 

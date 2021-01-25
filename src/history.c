@@ -15,29 +15,66 @@ void history_add(History *history, const char *text)
     if (text[0] == '\0') {
         return;
     }
-    PointerArray *entries = &history->entries;
-    for (size_t i = 0, n = entries->count; i < n; i++) {
-        if (streq(entries->ptrs[i], text)) {
-            // Move identical entry to end
-            ptr_array_append(entries, ptr_array_remove_idx(entries, i));
+
+    HashMap *map = &history->entries;
+    const HashMapEntry *map_entry = hashmap_find(map, text);
+    HistoryEntry *e;
+
+    if (map_entry) {
+        e = map_entry->value;
+        BUG_ON(!e);
+        if (e == history->last) {
             return;
         }
+        BUG_ON(!e->next);
+        BUG_ON(map->count < 2);
+        if (unlikely(e == history->first)) {
+            HistoryEntry *new_first = e->next;
+            new_first->prev = NULL;
+            history->first = new_first;
+        } else {
+            BUG_ON(!e->prev);
+            e->prev->next = e->next;
+            e->next->prev = e->prev;
+        }
+    } else {
+        e = xnew(HistoryEntry, 1);
+        e->text = xstrdup(text);
+        hashmap_insert(map, e->text, e);
+        if (unlikely(map->count == 1)) {
+            e->next = NULL;
+            e->prev = NULL;
+            history->first = e;
+            history->last = e;
+            return;
+        }
+        if (map->count == history->max_entries) {
+            HistoryEntry *old_first = history->first;
+            HistoryEntry *new_first = old_first->next;
+            new_first->prev = NULL;
+            history->first = new_first;
+            HistoryEntry *removed = hashmap_remove(map, old_first->text);
+            BUG_ON(removed != old_first);
+            free(removed);
+        }
     }
-    if (entries->count == history->max_entries) {
-        free(ptr_array_remove_idx(entries, 0));
-    }
-    ptr_array_append(entries, xstrdup(text));
+
+    HistoryEntry *old_last = history->last;
+    e->next = NULL;
+    e->prev = old_last;
+    history->last = e;
+    old_last->next = e;
 }
 
 bool history_search_forward (
     const History *history,
-    ssize_t *pos,
+    const HistoryEntry **pos,
     const char *text
 ) {
-    ssize_t i = *pos;
-    while (--i >= 0) {
-        if (str_has_prefix(history->entries.ptrs[i], text)) {
-            *pos = i;
+    const HistoryEntry *start = *pos ? (*pos)->prev : history->last;
+    for (const HistoryEntry *e = start; e; e = e->prev) {
+        if (str_has_prefix(e->text, text)) {
+            *pos = e;
             return true;
         }
     }
@@ -46,13 +83,13 @@ bool history_search_forward (
 
 bool history_search_backward (
     const History *history,
-    ssize_t *pos,
+    const HistoryEntry **pos,
     const char *text
 ) {
-    ssize_t i = *pos;
-    while (++i < history->entries.count) {
-        if (str_has_prefix(history->entries.ptrs[i], text)) {
-            *pos = i;
+    const HistoryEntry *start = *pos ? (*pos)->next : history->first;
+    for (const HistoryEntry *e = start; e; e = e->next) {
+        if (str_has_prefix(e->text, text)) {
+            *pos = e;
             return true;
         }
     }
@@ -65,9 +102,6 @@ void history_load(History *history, const char *filename)
     BUG_ON(!filename);
     BUG_ON(history->filename);
     BUG_ON(history->max_entries < 32);
-    BUG_ON(history->entries.count > 0);
-    BUG_ON(history->entries.alloc > 0);
-    BUG_ON(history->entries.ptrs);
 
     char *buf;
     const ssize_t ssize = read_file(filename, &buf);
@@ -78,7 +112,7 @@ void history_load(History *history, const char *filename)
         return;
     }
 
-    ptr_array_init(&history->entries, history->max_entries);
+    hashmap_init(&history->entries, history->max_entries);
     const size_t size = ssize;
     size_t pos = 0;
     while (pos < size) {
@@ -102,8 +136,8 @@ void history_save(const History *history)
         return;
     }
 
-    for (size_t i = 0, n = history->entries.count; i < n; i++) {
-        fputs(history->entries.ptrs[i], f);
+    for (const HistoryEntry *e = history->first; e; e = e->next) {
+        fputs(e->text, f);
         fputc('\n', f);
     }
 

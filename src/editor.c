@@ -40,18 +40,18 @@ EditorState editor = {
     .cmdline = {
         .buf = STRING_INIT,
         .pos = 0,
-        .search_pos = -1,
+        .search_pos = NULL,
         .search_text = NULL
     },
     .command_history = {
         .filename = NULL,
         .max_entries = 512,
-        .entries = PTR_ARRAY_INIT
+        .entries = HASHMAP_INIT
     },
     .search_history = {
         .filename = NULL,
         .max_entries = 128,
-        .entries = PTR_ARRAY_INIT
+        .entries = HASHMAP_INIT
     },
     .options = {
         .auto_indent = true,

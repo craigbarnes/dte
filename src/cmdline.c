@@ -171,13 +171,13 @@ void cmdline_clear(CommandLine *c)
 {
     string_clear(&c->buf);
     c->pos = 0;
-    c->search_pos = -1;
+    c->search_pos = NULL;
 }
 
 void cmdline_set_text(CommandLine *c, const char *text)
 {
     set_text(c, text);
-    c->search_pos = -1;
+    c->search_pos = NULL;
 }
 
 CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key)
@@ -262,13 +262,12 @@ CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key)
         if (!hist) {
             return CMDLINE_UNKNOWN_KEY;
         }
-        if (c->search_pos < 0) {
+        if (!c->search_pos) {
             free(c->search_text);
             c->search_text = string_clone_cstring(&c->buf);
-            c->search_pos = hist->entries.count;
         }
         if (history_search_forward(hist, &c->search_pos, c->search_text)) {
-            set_text(c, hist->entries.ptrs[c->search_pos]);
+            set_text(c, c->search_pos->text);
         }
         goto handled;
 
@@ -276,14 +275,14 @@ CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key)
         if (!hist) {
             return CMDLINE_UNKNOWN_KEY;
         }
-        if (c->search_pos < 0) {
+        if (!c->search_pos) {
             goto handled;
         }
         if (history_search_backward(hist, &c->search_pos, c->search_text)) {
-            set_text(c, hist->entries.ptrs[c->search_pos]);
+            set_text(c, c->search_pos->text);
         } else {
             set_text(c, c->search_text);
-            c->search_pos = -1;
+            c->search_pos = NULL;
         }
         goto handled;
 
@@ -296,7 +295,7 @@ CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key)
     }
 
 reset_search_pos:
-    c->search_pos = -1;
+    c->search_pos = NULL;
 handled:
     return CMDLINE_KEY_HANDLED;
 }
