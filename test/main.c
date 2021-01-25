@@ -20,6 +20,7 @@ void test_command(void);
 void test_editorconfig(void);
 void test_encoding(void);
 void test_filetype(void);
+void test_history(void);
 void test_options(void);
 void test_syntax(void);
 void test_terminal(void);
@@ -96,6 +97,7 @@ int main(void)
     test_util();
     test_terminal();
     test_cmdline();
+    test_history();
     test_syntax();
 
     init_headless_mode();

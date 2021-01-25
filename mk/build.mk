@@ -61,8 +61,8 @@ editor_objects := $(call prefix-obj, build/, \
     $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
-    cmdline command config editorconfig encoding filetype main \
-    options syntax terminal test util )
+    cmdline command config editorconfig encoding filetype history \
+    main options syntax terminal test util )
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     dup3 pipe2 fsync ioctl-winsize tcgetwinsize posix_madvise ))
