@@ -174,9 +174,28 @@ static void show_wsplit(const char *name, bool cflag)
     }
 }
 
-static void show_macro(const char* UNUSED_ARG(name), bool UNUSED_ARG(cflag))
+static String do_history_dump(const History *history)
 {
-    error_msg("'show macro' doesn't take extra arguments");
+    const size_t nr_entries = history->entries.count;
+    const size_t size = round_size_to_next_multiple(16 * nr_entries, 4096);
+    String buf = string_new(size);
+    size_t n = 0;
+    for (HistoryEntry *e = history->first; e; e = e->next, n++) {
+        string_append_cstring(&buf, e->text);
+        string_append_byte(&buf, '\n');
+    }
+    BUG_ON(n != nr_entries);
+    return buf;
+}
+
+static String dump_command_history(void)
+{
+    return do_history_dump(&editor.command_history);
+}
+
+static String dump_search_history(void)
+{
+    return do_history_dump(&editor.search_history);
 }
 
 typedef struct {
@@ -190,10 +209,12 @@ static const ShowHandler handlers[] = {
     {"alias", show_alias, dump_aliases, true},
     {"bind", show_binding, dump_bindings, true},
     {"color", show_color, dump_hl_colors, true},
+    {"command", NULL, dump_command_history, true},
     {"env", show_env, dump_env, false},
     {"include", show_include, dump_builtin_configs, false},
-    {"macro", show_macro, dump_macro, true},
+    {"macro", NULL, dump_macro, true},
     {"option", show_option, dump_options, true},
+    {"search", NULL, dump_search_history, false},
     {"wsplit", show_wsplit, dump_frames, false},
 };
 
@@ -210,7 +231,11 @@ void show(const char *type, const char *key, bool cflag)
     }
 
     if (key) {
-        handler->show(key, cflag);
+        if (handler->show) {
+            handler->show(key, cflag);
+        } else {
+            error_msg("'show %s' doesn't take extra arguments", type);
+        }
         return;
     }
 

@@ -307,10 +307,12 @@ static void collect_completions(char **args, size_t argc)
             {"alias", collect_aliases},
             {"bind", collect_bound_keys},
             {"color", collect_hl_colors},
+            {"command", NULL},
             {"env", collect_env},
             {"include", collect_builtin_configs},
             {"macro", NULL},
             {"option", collect_options},
+            {"search", NULL},
             {"wsplit", NULL},
         };
         const size_t nonflag_argc = get_nonflag_argc(args, argc);

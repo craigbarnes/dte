@@ -1016,6 +1016,9 @@ The _type_ argument can be one of:
 `color`
 :   Show [highlight colors][`hi`]
 
+`command`
+:   Show [command history][`command`]
+
 `env`
 :   Show environment variables
 
@@ -1027,6 +1030,9 @@ The _type_ argument can be one of:
 
 `option`
 :   Show [option values](#options)
+
+`search`
+:   Show [search history][`search`]
 
 `wsplit`
 :   Show [window dimensions][`wsplit`]
@@ -1336,6 +1342,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`alias`]: #alias
 [`bind`]: #bind
+[`command`]: #command
 [`compile`]: #compile
 [`copy`]: #copy
 [`cut`]: #cut
@@ -1359,6 +1366,7 @@ errors should be highlighted. Set to `""` to disable.
 [`save`]: #save
 [`scroll-pgdown`]: #scroll-pgdown
 [`scroll-pgup`]: #scroll-pgup
+[`search`]: #search
 [`set`]: #set
 [`show macro`]: #show
 [`tag`]: #tag
