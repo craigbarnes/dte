@@ -6,7 +6,7 @@ DISABLE_WARNING("-Wmissing-prototypes")
 
 void test_history(void)
 {
-    History h = {.max_entries = 8};
+    History h = {.max_entries = 7};
     history_add(&h, "A");
     EXPECT_EQ(h.entries.count, 1);
     EXPECT_STREQ(h.first->text, "A");
@@ -82,6 +82,25 @@ void test_history(void)
     EXPECT_STREQ(h.last->text, "I");
     EXPECT_STREQ(h.first->text, "C");
     EXPECT_STREQ(h.last->prev->text, "H");
+
+    hashmap_free(&h.entries, free);
+    h = (History){.max_entries = 2};
+    EXPECT_EQ(h.entries.count, 0);
+
+    history_add(&h, "1");
+    EXPECT_EQ(h.entries.count, 1);
+    EXPECT_STREQ(h.last->text, "1");
+    EXPECT_STREQ(h.first->text, "1");
+
+    history_add(&h, "2");
+    EXPECT_EQ(h.entries.count, 2);
+    EXPECT_STREQ(h.last->text, "2");
+    EXPECT_STREQ(h.first->text, "1");
+
+    history_add(&h, "3");
+    EXPECT_EQ(h.entries.count, 2);
+    EXPECT_STREQ(h.last->text, "3");
+    EXPECT_STREQ(h.first->text, "2");
 
     hashmap_free(&h.entries, free);
 }

@@ -12,6 +12,7 @@
 
 void history_add(History *history, const char *text)
 {
+    BUG_ON(history->max_entries < 2);
     if (text[0] == '\0') {
         return;
     }
@@ -38,16 +39,6 @@ void history_add(History *history, const char *text)
             e->next->prev = e->prev;
         }
     } else {
-        e = xnew(HistoryEntry, 1);
-        e->text = xstrdup(text);
-        hashmap_insert(map, e->text, e);
-        if (unlikely(map->count == 1)) {
-            e->next = NULL;
-            e->prev = NULL;
-            history->first = e;
-            history->last = e;
-            return;
-        }
         if (map->count == history->max_entries) {
             HistoryEntry *old_first = history->first;
             HistoryEntry *new_first = old_first->next;
@@ -55,7 +46,21 @@ void history_add(History *history, const char *text)
             history->first = new_first;
             HistoryEntry *removed = hashmap_remove(map, old_first->text);
             BUG_ON(removed != old_first);
-            free(removed);
+            // Recycle the removed entry:
+            e = removed;
+            e->text = xstrdup(text);
+            hashmap_insert(map, e->text, e);
+        } else {
+            e = xnew(HistoryEntry, 1);
+            e->text = xstrdup(text);
+            hashmap_insert(map, e->text, e);
+            if (unlikely(map->count == 1)) {
+                e->next = NULL;
+                e->prev = NULL;
+                history->first = e;
+                history->last = e;
+                return;
+            }
         }
     }
 
@@ -101,7 +106,7 @@ void history_load(History *history, const char *filename)
     BUG_ON(!history);
     BUG_ON(!filename);
     BUG_ON(history->filename);
-    BUG_ON(history->max_entries < 32);
+    BUG_ON(history->max_entries < 2);
 
     char *buf;
     const ssize_t ssize = read_file(filename, &buf);
