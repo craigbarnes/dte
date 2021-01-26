@@ -22,39 +22,49 @@ void history_add(History *history, const char *text)
     HistoryEntry *e;
 
     if (map_entry) {
+        // Existing entry found
         e = map_entry->value;
         BUG_ON(!e);
         if (e == history->last) {
+            // Entry is already at the end of the list; nothing more to do
             return;
         }
         BUG_ON(!e->next);
         BUG_ON(map->count < 2);
         if (unlikely(e == history->first)) {
+            // Entry is at the start of the list, remove it
             HistoryEntry *new_first = e->next;
             new_first->prev = NULL;
             history->first = new_first;
         } else {
+            // Entry is in the middle of the list, remove it
             BUG_ON(!e->prev);
             e->prev->next = e->next;
             e->next->prev = e->prev;
         }
     } else {
         if (map->count == history->max_entries) {
+            // Adding a new entry to a full history; remove the oldest
+            // entry to make space
             HistoryEntry *old_first = history->first;
             HistoryEntry *new_first = old_first->next;
             new_first->prev = NULL;
             history->first = new_first;
             HistoryEntry *removed = hashmap_remove(map, old_first->text);
             BUG_ON(removed != old_first);
-            // Recycle the removed entry:
+            // Instead of freeing the removed entry, just recycle the
+            // allocation for the new entry
             e = removed;
             e->text = xstrdup(text);
             hashmap_insert(map, e->text, e);
         } else {
+            // Adding a new entry to non-full history
             e = xnew(HistoryEntry, 1);
             e->text = xstrdup(text);
             hashmap_insert(map, e->text, e);
             if (unlikely(map->count == 1)) {
+                // Special case; history is completely empty, so the new entry
+                // is both the first and last entry with no prev or next
                 e->next = NULL;
                 e->prev = NULL;
                 history->first = e;
@@ -64,6 +74,7 @@ void history_add(History *history, const char *text)
         }
     }
 
+    // Insert the entry at the end of the list
     HistoryEntry *old_last = history->last;
     e->next = NULL;
     e->prev = old_last;
