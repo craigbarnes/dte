@@ -106,6 +106,7 @@ static const struct FileExtensionMap {
     {"nix", NIX},
     {"opml", XML},
     {"page", XML},
+    {"pas", PASCAL},
     {"patch", DIFF},
     {"path", INI},
     {"pc", PKGCONFIG},
