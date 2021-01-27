@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "msg.h"
 #include "buffer.h"
+#include "edit.h"
 #include "error.h"
 #include "move.h"
 #include "search.h"
@@ -25,17 +26,18 @@ static bool file_location_go(const FileLocation *loc)
 {
     Window *w = window;
     View *v = window_open_buffer(w, loc->filename, true, NULL);
-    bool ok = true;
-
     if (!v) {
         // Failed to open file. Error message should be visible.
         return false;
     }
+
     if (w->view != v) {
         set_view(v);
         // Force centering view to the cursor because file changed
         v->force_center = true;
     }
+
+    bool ok = true;
     if (loc->pattern) {
         bool err = false;
         search_tag(loc->pattern, &err);
@@ -45,6 +47,9 @@ static bool file_location_go(const FileLocation *loc)
         if (loc->column > 0) {
             move_to_column(v, loc->column);
         }
+    }
+    if (ok) {
+        unselect();
     }
     return ok;
 }
@@ -72,6 +77,7 @@ static bool file_location_return(const FileLocation *loc)
     }
 
     set_view(v);
+    unselect();
     move_to_line(v, loc->line);
     move_to_column(v, loc->column);
     return true;

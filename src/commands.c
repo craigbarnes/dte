@@ -295,7 +295,6 @@ static void cmd_compile(const CommandArgs *a)
     clear_messages();
     spawn_compiler(a->args + 1, flags, c);
     if (message_count()) {
-        do_selection(SELECT_NONE);
         activate_current_message_save();
     }
 }
@@ -794,7 +793,6 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    do_selection(SELECT_NONE);
     switch (last_flag(a)) {
     case 'n':
         activate_next_message();
@@ -1774,8 +1772,6 @@ static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_tag(const CommandArgs *a)
 {
-    do_selection(SELECT_NONE);
-
     if (a->flags[0] == 'r') {
         pop_file_location();
         return;
