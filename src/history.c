@@ -119,6 +119,9 @@ void history_load(History *history, const char *filename)
     BUG_ON(history->filename);
     BUG_ON(history->max_entries < 2);
 
+    hashmap_init(&history->entries, history->max_entries);
+    history->filename = filename;
+
     char *buf;
     const ssize_t ssize = read_file(filename, &buf);
     if (ssize < 0) {
@@ -128,15 +131,11 @@ void history_load(History *history, const char *filename)
         return;
     }
 
-    hashmap_init(&history->entries, history->max_entries);
-    const size_t size = ssize;
-    size_t pos = 0;
-    while (pos < size) {
+    for (size_t pos = 0, size = ssize; pos < size; ) {
         history_add(history, buf_next_line(buf, &pos, size));
     }
 
     free(buf);
-    history->filename = filename;
 }
 
 void history_save(const History *history)
