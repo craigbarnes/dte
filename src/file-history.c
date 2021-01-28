@@ -36,12 +36,8 @@ static FileHistory history;
 void add_file_history(unsigned long row, unsigned long col, const char *filename)
 {
     HashMap *map = &history.entries;
-    const HashMapEntry *map_entry = hashmap_find(map, filename);
-    FileHistoryEntry *e;
-
-    if (map_entry) {
-        // Existing entry found
-        e = map_entry->value;
+    FileHistoryEntry *e = hashmap_get(map, filename);
+    if (e) {
         if (e == history.last) {
             e->row = row;
             e->col = col;
@@ -143,11 +139,10 @@ void save_file_history(const char *filename)
 
 bool find_file_in_history(const char *filename, unsigned long *row, unsigned long *col)
 {
-    const HashMapEntry *map_entry = hashmap_find(&history.entries, filename);
-    if (!map_entry) {
+    const FileHistoryEntry *e = hashmap_get(&history.entries, filename);
+    if (!e) {
         return false;
     }
-    const FileHistoryEntry *e = map_entry->value;
     *row = e->row;
     *col = e->col;
     return true;
