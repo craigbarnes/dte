@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "test.h"
 #include "bind.h"
 #include "block.h"
@@ -80,14 +81,37 @@ static void test_posix_sanity(void)
     UNIGNORE_WARNINGS
 }
 
-int main(void)
+static void init_test_environment(void)
 {
-    test_posix_sanity();
+    char *home = path_absolute("build/test/HOME");
+    char *dte_home = path_absolute("build/test/DTE_HOME");
+    ASSERT_NONNULL(home);
+    ASSERT_NONNULL(dte_home);
+
+    ASSERT_TRUE(mkdir(home, 0755) == 0 || errno == EEXIST);
+    ASSERT_TRUE(mkdir(dte_home, 0755) == 0 || errno == EEXIST);
+
+    ASSERT_EQ(setenv("HOME", home, true), 0);
+    ASSERT_EQ(setenv("DTE_HOME", dte_home, true), 0);
+    ASSERT_EQ(setenv("XDG_RUNTIME_DIR", dte_home, true), 0);
+
+    free(home);
+    free(dte_home);
+
+    ASSERT_EQ(unsetenv("TERM"), 0);
+    ASSERT_EQ(unsetenv("COLORTERM"), 0);
+
     init_editor_state();
 
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
     EXPECT_STREQ(ver, editor.version);
+}
+
+int main(void)
+{
+    test_posix_sanity();
+    init_test_environment();
 
     test_command();
     test_options();
