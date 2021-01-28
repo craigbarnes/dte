@@ -8,8 +8,10 @@
 #include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
+#include "command/env.h"
 #include "command/macro.h"
 #include "commands.h"
+#include "completion.h"
 #include "config.h"
 #include "editor.h"
 #include "encoding.h"
@@ -202,20 +204,21 @@ typedef struct {
     const char name[8];
     void (*show)(const char *name, bool cmdline);
     String (*dump)(void);
+    void (*complete_arg)(const char *prefix);
     bool dumps_dterc_syntax;
 } ShowHandler;
 
 static const ShowHandler handlers[] = {
-    {"alias", show_alias, dump_aliases, true},
-    {"bind", show_binding, dump_bindings, true},
-    {"color", show_color, dump_hl_colors, true},
-    {"command", NULL, dump_command_history, true},
-    {"env", show_env, dump_env, false},
-    {"include", show_include, dump_builtin_configs, false},
-    {"macro", NULL, dump_macro, true},
-    {"option", show_option, dump_options, true},
-    {"search", NULL, dump_search_history, false},
-    {"wsplit", show_wsplit, dump_frames, false},
+    {"alias", show_alias, dump_aliases, collect_aliases, true},
+    {"bind", show_binding, dump_bindings, collect_bound_keys, true},
+    {"color", show_color, dump_hl_colors, collect_hl_colors, true},
+    {"command", NULL, dump_command_history, NULL, true},
+    {"env", show_env, dump_env, collect_env, false},
+    {"include", show_include, dump_builtin_configs, collect_builtin_configs, false},
+    {"macro", NULL, dump_macro, NULL, true},
+    {"option", show_option, dump_options, collect_options, true},
+    {"search", NULL, dump_search_history, NULL, false},
+    {"wsplit", show_wsplit, dump_frames, NULL, false},
 };
 
 UNITTEST {
@@ -250,5 +253,22 @@ void show(const char *type, const char *key, bool cflag)
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(v->buffer);
         buffer_update_syntax(v->buffer);
+    }
+}
+
+void collect_show_subcommands(const char *prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
+        if (str_has_prefix(handlers[i].name, prefix)) {
+            add_completion(xstrdup(handlers[i].name));
+        }
+    }
+}
+
+void collect_show_subcommand_args(const char *name, const char *arg_prefix)
+{
+    const ShowHandler *handler = BSEARCH(name, handlers, (CompareFunction)strcmp);
+    if (handler) {
+        handler->complete_arg(arg_prefix);
     }
 }

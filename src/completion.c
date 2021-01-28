@@ -12,6 +12,7 @@
 #include "config.h"
 #include "editor.h"
 #include "options.h"
+#include "show.h"
 #include "syntax/color.h"
 #include "tag.h"
 #include "util/ascii.h"
@@ -184,20 +185,6 @@ static void collect_files(bool directories_only)
     }
 }
 
-static void collect_env(const char *prefix)
-{
-    extern char **environ;
-    for (size_t i = 0; environ[i]; i++) {
-        const char *e = environ[i];
-        if (str_has_prefix(e, prefix)) {
-            const char *end = strchr(e, '=');
-            if (end) {
-                add_completion(xstrcut(e, end - e));
-            }
-        }
-    }
-}
-
 static size_t get_nonflag_argc(char **args, size_t argc)
 {
     size_t nonflag_argc = 0;
@@ -300,39 +287,13 @@ static void collect_completions(char **args, size_t argc)
         return;
     }
     if (strview_equal_cstring(&cmd_name, "show")) {
-        static const struct {
-            char name[8];
-            void (*handler)(const char *prefix);
-        } opts[] = {
-            {"alias", collect_aliases},
-            {"bind", collect_bound_keys},
-            {"color", collect_hl_colors},
-            {"command", NULL},
-            {"env", collect_env},
-            {"include", collect_builtin_configs},
-            {"macro", NULL},
-            {"option", collect_options},
-            {"search", NULL},
-            {"wsplit", NULL},
-        };
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
         if (nonflag_argc == 1) {
-            for (size_t i = 0; i < ARRAY_COUNT(opts); i++) {
-                if (str_has_prefix(opts[i].name, completion.parsed)) {
-                    add_completion(xstrdup(opts[i].name));
-                }
-            }
+            collect_show_subcommands(completion.parsed);
         } else if (nonflag_argc == 2) {
             const char *arg1 = get_nonflag_arg(1, args, argc);
             BUG_ON(!arg1);
-            for (size_t i = 0; i < ARRAY_COUNT(opts); i++) {
-                if (streq(arg1, opts[i].name)) {
-                    if (opts[i].handler) {
-                        opts[i].handler(completion.parsed);
-                    }
-                    break;
-                }
-            }
+            collect_show_subcommand_args(arg1, completion.parsed);
         }
         return;
     }
