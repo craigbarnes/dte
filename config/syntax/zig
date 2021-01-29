@@ -58,9 +58,10 @@ state comment
     eat this
 
 list keyword \
-    align allowzero and asm async await break cancel catch comptime \
-    const continue defer else enum errdefer error export extern fn \
-    for if inline linksection nakedcc noalias or orelse packed pub \
+    align allowzero and anyframe anytype asm async await break \
+    cancel catch comptime const continue defer \
+    else enum errdefer error export extern fn \
+    for if inline linksection nakedcc noalias nosuspend or orelse packed pub \
     resume return stdcallcc struct suspend switch test threadlocal \
     try union unreachable usingnamespace var volatile while
 
@@ -74,8 +75,9 @@ list constant \
     null undefined true false
 
 list builtin \
-    @ArgType @IntType @OpaqueType @TagType @This @Vector \
-    @addWithOverflow @alignCast @alignOf @atomicLoad @atomicRmw \
+    @ArgType @Frame @IntType @OpaqueType @TagType @This @Type @TypeOf @Vector \
+    @addWithOverflow @alignCast @alignOf @as @asyncCall \
+    @atomicLoad @atomicRmw @atomicStore \
     @bitCast @bitOffsetOf @bitReverse @boolToInt @breakpoint \
     @byteOffsetOf @byteSwap @bytesToSlice @cDefine @cImport \
     @cInclude @cUndef @ceil @clz @cmpxchgStrong @cmpxchgWeak \
@@ -83,12 +85,14 @@ list builtin \
     @divTrunc @embedFile @enumToInt @errSetCast @errorName \
     @errorReturnTrace @errorToInt @exp @exp2 @export @fabs \
     @fence @field @fieldParentPtr @floatCast @floatToInt @floor \
-    @frameAddress @handle @hasDecl @import @inlineCall @intCast \
-    @intToEnum @intToError @intToFloat @intToPtr @ln @log10 @log2 \
+    @frameAddress @handle @hasDecl @hasField @import @inlineCall @intCast \
+    @intToEnum @intToError @intToFloat @intToPtr @ln @log @log2 @log10 \
     @memberCount @memberName @memberType @memcpy @memset @mod \
     @mulAdd @mulWithOverflow @newStackCall @noInlineCall @panic \
-    @popCount @ptrCast @ptrToInt @rem @returnAddress @round \
+    @popCount @ptrCast @ptrToInt @reduce @rem @returnAddress @round \
     @setAlignStack @setCold @setEvalBranchQuota @setFloatMode \
-    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact @sin \
+    @setRuntimeSafety @shlExact @shlWithOverflow @shrExact \
+    @shuffle @splat @sin @src \
     @sizeOf @sliceToBytes @sqrt @subWithOverflow @tagName @trunc \
-    @truncate @typeId @typeInfo @typeName @typeOf
+    @truncate @typeId @typeInfo @typeName @typeOf @unionInit \
+    @wasmMemorySize @wasmMemoryGrow
