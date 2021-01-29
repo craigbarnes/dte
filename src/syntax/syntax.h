@@ -124,5 +124,6 @@ Syntax *find_syntax(const char *name);
 void update_syntax_colors(Syntax *syn);
 void update_all_syntax_colors(void);
 void find_unused_subsyntaxes(void);
+void free_syntaxes(void);
 
 #endif

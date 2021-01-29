@@ -170,14 +170,31 @@ static void free_string_list(StringList *list)
     free(list);
 }
 
-static void free_syntax(Syntax *syn)
+static void free_syntax_contents(Syntax *syn)
 {
     hashmap_free(&syn->states, FREE_FUNC(free_state));
     hashmap_free(&syn->string_lists, FREE_FUNC(free_string_list));
     hashmap_free(&syn->default_colors, NULL);
+}
 
+static void free_syntax(Syntax *syn)
+{
+    free_syntax_contents(syn);
     free(syn->name);
     free(syn);
+}
+
+static void free_syntax_cb(Syntax *syn)
+{
+    free_syntax_contents(syn);
+    free(syn);
+}
+
+// This function is only called by the test binary, just to ensure
+// the various free_*() functions get exercised by ASan/UBSan
+void free_syntaxes(void)
+{
+    hashmap_free(&syntaxes, FREE_FUNC(free_syntax_cb));
 }
 
 void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)

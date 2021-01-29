@@ -127,6 +127,7 @@ int main(void)
     init_headless_mode();
     test_config();
     test_handle_binding();
+    free_syntaxes();
 
     return failed ? 1 : 0;
 }
