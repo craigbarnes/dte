@@ -255,13 +255,12 @@ state error-ident error
 
 list keyword \
     if else for while do continue switch case break default return goto \
-    asm const static inline register export extern volatile auto restrict \
-    sizeof typedef
+    asm const static inline register extern volatile auto restrict sizeof \
+    typedef
 
 list c11-keyword \
-    _Alignas _Alignof _Bool _Complex _Generic _Imaginary \
-    _Noreturn _Static_assert _Thread_local \
-    alignas alignof noreturn static_assert thread_local
+    _Alignas _Alignof _Noreturn \
+    alignas alignof noreturn
 
 list type \
     char short int long float double void signed unsigned enum struct union \
@@ -312,7 +311,7 @@ list cpp-keyword \
     and and_eq bitand bitor catch class compl const_cast concept \
     consteval constexpr constinit const_cast \
     co_await co_return co_yield \
-    decltype delete dynamic_cast explicit friend \
+    decltype delete dynamic_cast explicit export friend \
     mutable namespace new noexcept not not_eq nullptr \
     operator or or_eq \
     private protected public \
