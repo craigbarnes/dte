@@ -59,11 +59,11 @@ state comment
 
 list keyword \
     align allowzero and anyframe anytype asm async await break \
-    cancel catch comptime const continue defer \
-    else enum errdefer error export extern fn \
-    for if inline linksection nakedcc noalias nosuspend or orelse packed pub \
-    resume return stdcallcc struct suspend switch test threadlocal \
-    try union unreachable usingnamespace var volatile while
+    catch comptime const continue defer else enum errdefer error \
+    export extern fn for if inline linksection noalias nosuspend \
+    or orelse packed pub resume return struct suspend switch test \
+    threadlocal try union unreachable usingnamespace \
+    var volatile while
 
 list type \
     bool f16 f32 f64 f128 void noreturn type anyerror promise \
@@ -75,24 +75,22 @@ list constant \
     null undefined true false
 
 list builtin \
-    @ArgType @Frame @IntType @OpaqueType @TagType @This @Type @TypeOf @Vector \
+    @Frame @TagType @This @Type @TypeOf @Vector \
     @addWithOverflow @alignCast @alignOf @as @asyncCall \
     @atomicLoad @atomicRmw @atomicStore \
     @bitCast @bitOffsetOf @bitReverse @boolToInt @breakpoint \
     @byteOffsetOf @byteSwap @bytesToSlice @cDefine @cImport \
-    @cInclude @cUndef @ceil @clz @cmpxchgStrong @cmpxchgWeak \
+    @cInclude @cUndef @call @ceil @clz @cmpxchgStrong @cmpxchgWeak \
     @compileError @compileLog @cos @ctz @divExact @divFloor \
     @divTrunc @embedFile @enumToInt @errSetCast @errorName \
     @errorReturnTrace @errorToInt @exp @exp2 @export @fabs \
     @fence @field @fieldParentPtr @floatCast @floatToInt @floor \
-    @frameAddress @handle @hasDecl @hasField @import @inlineCall @intCast \
-    @intToEnum @intToError @intToFloat @intToPtr @ln @log @log2 @log10 \
-    @memberCount @memberName @memberType @memcpy @memset @mod \
-    @mulAdd @mulWithOverflow @newStackCall @noInlineCall @panic \
+    @frame @frameAddress @hasDecl @hasField @import @intCast \
+    @intToEnum @intToError @intToFloat @intToPtr @log @log2 @log10 \
+    @memcpy @memset @mod @mulAdd @mulWithOverflow @panic \
     @popCount @ptrCast @ptrToInt @reduce @rem @returnAddress @round \
     @setAlignStack @setCold @setEvalBranchQuota @setFloatMode \
     @setRuntimeSafety @shlExact @shlWithOverflow @shrExact \
-    @shuffle @splat @sin @src \
-    @sizeOf @sliceToBytes @sqrt @subWithOverflow @tagName @trunc \
-    @truncate @typeId @typeInfo @typeName @typeOf @unionInit \
-    @wasmMemorySize @wasmMemoryGrow
+    @shuffle @splat @sin @src @sizeOf @sliceToBytes @sqrt \
+    @subWithOverflow @tagName @trunc @truncate \
+    @typeInfo @typeName @unionInit @wasmMemorySize @wasmMemoryGrow
