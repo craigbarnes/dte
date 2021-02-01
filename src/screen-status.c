@@ -152,12 +152,11 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         case 'E':
             add_status_str(f, v->buffer->encoding.name);
             break;
-        case 'M': {
+        case 'M':
             if (f->misc_status) {
                 add_status_str(f, f->misc_status);
             }
             break;
-        }
         case 'N':
             if (v->buffer->crlf_newlines) {
                 add_status_literal(f, "CRLF");
