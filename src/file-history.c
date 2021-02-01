@@ -28,7 +28,7 @@ typedef struct {
 } FileHistory;
 
 enum {
-    MAX_ENTRIES = 380
+    MAX_ENTRIES = 512
 };
 
 static FileHistory history;
