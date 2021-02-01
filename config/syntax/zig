@@ -28,6 +28,9 @@ state start code
 
 state ident
     char -b a-zA-Z0-9_ this
+    noeat -b check-reserved
+
+state check-reserved
     inlist keyword start
     inlist type start
     inlist constant start
@@ -35,12 +38,15 @@ state ident
     noeat start
 
 state ident-upper ident
-    char -b a-z class-name
+    char -b a-z class-name-start
     char -b A-Z0-9_ ident
     noeat start
 
-state class-name
+state class-name-start
     recolor class-name
+    noeat class-name
+
+state class-name
     char a-zA-Z0-9_ this
     noeat start
 
