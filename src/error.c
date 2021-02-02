@@ -6,6 +6,7 @@
 #include "command/run.h"
 #include "config.h"
 #include "editor.h"
+#include "util/debug.h"
 
 static char error_buf[256];
 static unsigned int nr_errors;
@@ -46,6 +47,8 @@ void error_msg(const char *format, ...)
         fputs(error_buf, stderr);
         fputc('\n', stderr);
     }
+
+    DEBUG_LOG("%s", error_buf);
 }
 
 void perror_msg(const char *prefix)
