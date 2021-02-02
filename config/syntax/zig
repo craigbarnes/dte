@@ -28,9 +28,6 @@ state start code
 
 state ident
     char -b a-zA-Z0-9_ this
-    noeat -b check-reserved
-
-state check-reserved
     inlist keyword start
     inlist type start
     inlist constant start
