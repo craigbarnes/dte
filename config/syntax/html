@@ -142,20 +142,19 @@ state sq string
     eat this
 
 list -i tag \
-    a abbr acronym address area b base bdo big blockquote body br \
-    button caption cite code col colgroup dd del dfn div dl dt em \
-    fieldset form h1 h2 h3 h4 h5 h6 head hr html i iframe img input \
-    ins kbd label legend li link map meta noscript object ol optgroup \
-    option p param pre q samp script select small span strong style \
-    sub sup table tbody td textarea tfoot th thead title tr tt ul var \
-\
-    article aside audio canvas command datalist details embed figure \
-    footer header hgroup keygen main mark meter nav output progress ruby \
-    section time video wbr
+    abbr acronym address area article aside audio b base bdi bdo blockquote \
+    body br button canvas caption cite code col colgroup command data datalist \
+    dd del details dfn dialog div dl dt em embed fieldset figcaption figure \
+    footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img \
+    input ins kbd keygen label legend li link main map mark meta meter nav \
+    noscript object ol optgroup option output p param picture pre q progress \
+    rp rt ruby s samp script section select small source span strong style sub \
+    summary sup svg table tag a tbody td template textarea tfoot th thead \
+    time title tr track tt u ul var video wbr
 
 list -i tag-deprecated \
-    acronym applet basefont big blink center dir font frame frameset \
-    isindex marquee menu noframes s strike tt u
+    acronym applet basefont big blink center dir font frame frameset isindex \
+    marquee menu noframes s strike tt u
 
 default code tag-unknown
 default error tag-deprecated
