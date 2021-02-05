@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include "test.h"
 #include "history.h"
+#include "util/xsnprintf.h"
 
-DISABLE_WARNING("-Wmissing-prototypes")
-
-void test_history(void)
+static void test_history_add(void)
 {
     History h = {.max_entries = 7};
     history_add(&h, "A");
@@ -103,4 +102,30 @@ void test_history(void)
     EXPECT_STREQ(h.first->text, "2");
 
     hashmap_free(&h.entries, free);
+}
+
+// This test is done to ensure the HashMap can handle the constant
+// churn from insertions and removals (i.e. that it rehashes the
+// table to clean out tombstones, even when the number of real
+// entries stops growing).
+static void test_history_tombstone_pressure(void)
+{
+    History h = {.max_entries = 512};
+    for (unsigned int i = 0; i < 12000; i++) {
+        char str[32];
+        xsnprintf(str, sizeof(str), "%u", i);
+        history_add(&h, str);
+    }
+
+    EXPECT_EQ(h.entries.count, h.max_entries);
+    EXPECT_TRUE(h.entries.mask + 1 <= 2048);
+    hashmap_free(&h.entries, free);
+}
+
+DISABLE_WARNING("-Wmissing-prototypes")
+
+void test_history(void)
+{
+    test_history_add();
+    test_history_tombstone_pressure();
 }

@@ -29,6 +29,7 @@ static bool hashmap_resize(HashMap *map, size_t size)
     size_t oldlen = map->mask + 1;
     map->entries = newtab;
     map->mask = size - 1;
+    map->tombstones = 0;
 
     if (!oldtab) {
         return true;
@@ -117,6 +118,7 @@ void *hashmap_remove(HashMap *map, const char *key)
     free(e->key);
     e->key = tombstone;
     map->count--;
+    map->tombstones++;
     return e->value;
 }
 
@@ -143,26 +145,41 @@ static bool hashmap_do_insert(HashMap *map, char *key, void *value)
         }
     }
 
+    const size_t max_load = map->mask - (map->mask / 4);
+    const bool replacing_tombstone = (e->key == tombstone);
     e->key = key;
     e->value = value;
     e->hash = hash;
+    map->count++;
 
-    if (++map->count > map->mask - (map->mask / 4)) {
-        size_t new_size = (map->mask + 1) << 1;
-        if (unlikely(new_size == 0)) {
-            errno = EOVERFLOW;
-            goto error;
+    if (unlikely(map->count + map->tombstones > max_load)) {
+        size_t new_size = map->mask + 1;
+        if (map->count > map->tombstones || new_size <= 256) {
+            // Only increase the size of the table when the number of
+            // real entries is higher than the number of tombstones.
+            // If the number of real entries is lower, the table is
+            // most likely being filled with tombstones from repeated
+            // insert/remove churn; so we just rehash at the same size
+            // to clean out the tombstones.
+            new_size <<= 1;
+            if (unlikely(new_size == 0)) {
+                errno = EOVERFLOW;
+                goto error;
+            }
         }
         if (unlikely(!hashmap_resize(map, new_size))) {
             goto error;
         }
+    } else if (replacing_tombstone) {
+        BUG_ON(map->tombstones == 0);
+        map->tombstones--;
     }
 
     return true;
 
 error:
     map->count--;
-    e->key = NULL;
+    e->key = replacing_tombstone ? tombstone : NULL;
     return false;
 }
 

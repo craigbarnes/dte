@@ -17,6 +17,7 @@ typedef struct {
     HashMapEntry *entries;
     size_t mask; // Length of entries (which is always a power of 2) minus 1
     size_t count; // Number of active entries
+    size_t tombstones; // Number of tombstones
 } HashMap;
 
 typedef struct {

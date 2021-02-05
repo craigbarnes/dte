@@ -1080,8 +1080,6 @@ static void test_hashmap(void)
     }
 
     EXPECT_EQ(map.count, 0);
-    EXPECT_EQ(map.mask, 31);
-
     for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
         TEST_FAIL("Unexpected loop iteration");
         break;
@@ -1091,7 +1089,6 @@ static void test_hashmap(void)
     ASSERT_NONNULL(hashmap_find(&map, "new"));
     EXPECT_STREQ(hashmap_find(&map, "new")->key, "new");
     EXPECT_EQ(map.count, 1);
-    EXPECT_EQ(map.mask, 31);
 
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
@@ -1103,7 +1100,6 @@ static void test_hashmap(void)
     }
 
     EXPECT_EQ(map.count, 25);
-    EXPECT_EQ(map.mask, 63);
 
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
@@ -1116,13 +1112,10 @@ static void test_hashmap(void)
     }
 
     EXPECT_EQ(map.count, 1);
-    EXPECT_EQ(map.mask, 63);
     EXPECT_NULL(hashmap_remove(&map, "non-existent-key"));
     EXPECT_EQ(map.count, 1);
-    EXPECT_EQ(map.mask, 63);
     EXPECT_PTREQ(hashmap_remove(&map, "new"), value);
     EXPECT_EQ(map.count, 0);
-    EXPECT_EQ(map.mask, 63);
 
     for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
         TEST_FAIL("Unexpected loop iteration");
