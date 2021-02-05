@@ -40,6 +40,8 @@ static const struct FileExtensionMap {
     {"dot", DOT},
     {"doxy", CONFIG},
     {"dterc", DTE},
+    {"dts", DEVICETREE},
+    {"dtsi", DEVICETREE},
     {"dtx", TEX},
     {"ebuild", SH},
     {"el", LISP},
