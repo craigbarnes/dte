@@ -63,7 +63,10 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 
 #if DEBUG >= 2
 #include <sys/utsname.h>
+#include <unistd.h> // isatty
 
+static const char *dim = "";
+static const char *sgr0 = "";
 static int logfd = -1;
 
 void log_init(const char *varname)
@@ -73,6 +76,7 @@ void log_init(const char *varname)
     if (!path || path[0] == '\0') {
         return;
     }
+
     logfd = xopen(path, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
     if (logfd < 0) {
         const char *err = strerror(errno);
@@ -83,6 +87,12 @@ void log_init(const char *varname)
         fprintf(stderr, "Failed to write to log: %s\n", strerror(errno));
         exit(EX_IOERR);
     }
+
+    if (isatty(logfd)) {
+        dim = "\033[2m";
+        sgr0 = "\033[0m";
+    }
+
     struct utsname u;
     if (uname(&u) >= 0) {
         DEBUG_LOG("system: %s/%s %s", u.sysname, u.machine, u.release);
@@ -91,15 +101,15 @@ void log_init(const char *varname)
     }
 }
 
-VPRINTF(2)
-static void debug_logv(const char *function, const char *fmt, va_list ap)
+VPRINTF(3)
+static void debug_logv(const char *file, int line, const char *fmt, va_list ap)
 {
     if (logfd < 0) {
         return;
     }
     char buf[4096];
     size_t write_max = ARRAY_COUNT(buf) - 1;
-    const size_t len1 = xsnprintf(buf, write_max, "%s: ", function);
+    const size_t len1 = xsnprintf(buf, write_max, "%s%s:%d:%s ", dim, file, line, sgr0);
     write_max -= len1;
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     size_t n = len1 + len2;
@@ -107,11 +117,11 @@ static void debug_logv(const char *function, const char *fmt, va_list ap)
     xwrite(logfd, buf, n);
 }
 
-void debug_log(const char *function, const char *fmt, ...)
+void debug_log(const char *file, int line, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    debug_logv(function, fmt, ap);
+    debug_logv(file, line, fmt, ap);
     va_end(ap);
 }
 #endif
@@ -138,7 +148,7 @@ noreturn void init_error(const char *fmt, ...)
 #if DEBUG >= 2
     va_list ap2;
     va_copy(ap2, ap);
-    debug_logv(__func__, fmt, ap2);
+    debug_logv(__FILE__, __LINE__, fmt, ap2);
     va_end(ap2);
 #endif
 
