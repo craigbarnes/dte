@@ -69,8 +69,10 @@ void regexp_init_word_boundary_tokens(void)
     BUG_ON(!mem_equal(text + match_start - 1, " foo ", 5));
 
     for (size_t i = 0; i < ARRAY_COUNT(pairs); i++) {
+        const char *start = pairs[i].start;
+        const char *end = pairs[i].end;
         char patt[32];
-        xsnprintf(patt, sizeof patt, "%s(foo)%s", pairs[i].start, pairs[i].end);
+        xsnprintf(patt, sizeof(patt), "%s(foo)%s", start, end);
         regex_t re;
         if (regcomp(&re, patt, REG_EXTENDED) != 0) {
             continue;
@@ -79,6 +81,7 @@ void regexp_init_word_boundary_tokens(void)
         bool match = !regexec(&re, text, ARRAY_COUNT(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
+            DEBUG_LOG("regexp word boundary tokens detected: %s %s", start, end);
             regexp_word_boundary = pairs[i];
             break;
         }
