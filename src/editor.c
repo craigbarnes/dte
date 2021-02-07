@@ -99,7 +99,15 @@ void init_editor_state(void)
         editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
     }
 
-    setlocale(LC_CTYPE, "");
+    log_init("DTE_LOG");
+    DEBUG_LOG("version: %s", version);
+
+    const char *locale = setlocale(LC_CTYPE, "");
+    if (unlikely(!locale)) {
+        fatal_error("setlocale", errno);
+    }
+
+    DEBUG_LOG("locale: %s", locale);
     editor.charset = encoding_from_name(nl_langinfo(CODESET));
     editor.term_utf8 = (editor.charset.type == UTF8);
 
@@ -108,7 +116,6 @@ void init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
-    log_init("DTE_LOG");
     regexp_init_word_boundary_tokens();
     init_aliases();
 }

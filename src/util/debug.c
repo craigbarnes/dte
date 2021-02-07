@@ -62,6 +62,8 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 #endif
 
 #if DEBUG >= 2
+#include <sys/utsname.h>
+
 static int logfd = -1;
 
 void log_init(const char *varname)
@@ -81,7 +83,12 @@ void log_init(const char *varname)
         fprintf(stderr, "Failed to write to log: %s\n", strerror(errno));
         exit(EX_IOERR);
     }
-    DEBUG_LOG("log initialization done; writing messages to '%s'", path);
+    struct utsname u;
+    if (uname(&u) >= 0) {
+        DEBUG_LOG("system: %s/%s %s", u.sysname, u.machine, u.release);
+    } else {
+        DEBUG_LOG("uname() failed: %s", strerror(errno));
+    }
 }
 
 VPRINTF(2)

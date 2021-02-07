@@ -112,7 +112,7 @@ static void test_history_tombstone_pressure(void)
 {
     History h = {.max_entries = 512};
     for (unsigned int i = 0; i < 12000; i++) {
-        char str[32];
+        char str[8];
         xsnprintf(str, sizeof(str), "%u", i);
         history_add(&h, str);
     }

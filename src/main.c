@@ -384,6 +384,7 @@ loop_break:
         } else {
             rc = editor_file("rc");
         }
+        DEBUG_LOG("loading configuration from %s", rc);
         read_config(&commands, rc, flags);
     }
 
