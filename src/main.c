@@ -378,11 +378,13 @@ loop_break:
     exec_builtin_rc();
 
     if (read_rc) {
+        ConfigFlags flags = CFG_NOFLAGS;
         if (rc) {
-            read_config(&commands, rc, CFG_MUST_EXIST);
+            flags |= CFG_MUST_EXIST;
         } else {
-            read_config(&commands, editor_file("rc"), CFG_NOFLAGS);
+            rc = editor_file("rc");
         }
+        read_config(&commands, rc, flags);
     }
 
     update_all_syntax_colors();
