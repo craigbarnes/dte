@@ -93,7 +93,7 @@ static size_t skip_empty_alternates(const char *str, size_t len)
 
 bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
 {
-    String buf = STRING_INIT;
+    String buf = string_new(pattern_len * 2);
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);
     bool brace_group_has_empty_alternate[32];

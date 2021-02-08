@@ -116,7 +116,7 @@ static void do_collect_files (
             continue;
         }
 
-        String buf = STRING_INIT;
+        String buf = string_new(strlen(dirprefix) + len + 4);
         if (dirprefix[0]) {
             string_append_cstring(&buf, dirprefix);
             if (!str_has_suffix(dirprefix, "/")) {

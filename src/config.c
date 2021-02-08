@@ -43,12 +43,11 @@ static bool has_line_continuation(const char *str, size_t len)
 void exec_config(const CommandSet *cmds, const char *buf, size_t size)
 {
     const char *ptr = buf;
-    String line = STRING_INIT;
+    String line = string_new(1024);
 
     while (ptr < buf + size) {
         size_t n = buf + size - ptr;
         char *end = memchr(ptr, '\n', n);
-
         if (end) {
             n = end - ptr;
         }
@@ -62,12 +61,15 @@ void exec_config(const CommandSet *cmds, const char *buf, size_t size)
                 string_clear(&line);
             }
         }
+
         current_config.line++;
         ptr += n + 1;
     }
+
     if (line.len) {
         handle_command(cmds, string_borrow_cstring(&line), false);
     }
+
     string_free(&line);
 }
 

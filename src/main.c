@@ -453,7 +453,7 @@ loop_break:
     }
 
     if (tag) {
-        String s = STRING_INIT;
+        String s = string_new(8 + strlen(tag));
         string_append_literal(&s, "tag ");
         string_append_escaped_arg(&s, tag, true);
         handle_command(&commands, string_borrow_cstring(&s), false);

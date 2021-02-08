@@ -17,7 +17,7 @@ static void merge_insert_buffer(void)
     if (len == 0) {
         return;
     }
-    String s = STRING_INIT;
+    String s = string_new(32 + len);
     string_append_cstring(&s, "insert -km ");
     string_append_escaped_arg_sv(&s, string_view(insert_buffer.buffer, len), true);
     string_clear(&insert_buffer);
@@ -80,7 +80,7 @@ void macro_command_hook(const char *cmd_name, char **args)
     if (!recording_macro) {
         return;
     }
-    String buf = STRING_INIT;
+    String buf = string_new(512);
     string_append_cstring(&buf, cmd_name);
     for (size_t i = 0; args[i]; i++) {
         string_append_byte(&buf, ' ');
@@ -103,7 +103,7 @@ void macro_insert_text_hook(const char *text, size_t size)
     if (!recording_macro) {
         return;
     }
-    String buf = STRING_INIT;
+    String buf = string_new(512);
     string_append_cstring(&buf, "insert -m ");
     string_append_escaped_arg_sv(&buf, string_view(text, size), true);
     merge_insert_buffer();
@@ -124,7 +124,7 @@ void macro_play(void)
 
 String dump_macro(void)
 {
-    String buf = STRING_INIT;
+    String buf = string_new(4096);
     for (size_t i = 0, n = macro.count; i < n; i++) {
         const char *cmd_str = macro.ptrs[i];
         string_append_cstring(&buf, cmd_str);
