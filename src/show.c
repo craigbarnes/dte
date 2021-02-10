@@ -11,6 +11,7 @@
 #include "command/env.h"
 #include "command/macro.h"
 #include "commands.h"
+#include "compiler.h"
 #include "completion.h"
 #include "config.h"
 #include "editor.h"
@@ -32,6 +33,25 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
+
+static void open_temporary_buffer (
+    const char *text,
+    size_t text_len,
+    const char *cmd,
+    const char *cmd_arg,
+    bool dterc_syntax
+) {
+    View *v = window_open_new_file(window);
+    v->buffer->temporary = true;
+    do_insert(text, text_len);
+    set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
+    buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
+    if (dterc_syntax) {
+        v->buffer->options.filetype = str_intern("dte");
+        set_file_options(v->buffer);
+        buffer_update_syntax(v->buffer);
+    }
+}
 
 static void show_alias(const char *alias_name, bool cflag)
 {
@@ -132,15 +152,29 @@ static void show_include(const char *name, bool cflag)
         return;
     }
 
+    const StringView sv = cfg->text;
     if (cflag) {
-        buffer_insert_bytes(cfg->text.data, cfg->text.length);
+        buffer_insert_bytes(sv.data, sv.length);
+    } else {
+        open_temporary_buffer(sv.data, sv.length, "builtin", name, false);
+    }
+}
+
+static void show_compiler(const char *name, bool cflag)
+{
+    const Compiler *compiler = find_compiler(name);
+    if (!compiler) {
+        error_msg("no errorfmt entry found for '%s'", name);
         return;
     }
 
-    View *v = window_open_new_file(window);
-    v->buffer->temporary = true;
-    do_insert(cfg->text.data, cfg->text.length);
-    set_display_filename(v->buffer, xasprintf("(builtin %s)", name));
+    String str = dump_compiler(compiler, name);
+    if (cflag) {
+        buffer_insert_bytes(str.buffer, str.len);
+    } else {
+        open_temporary_buffer(str.buffer, str.len, "errorfmt", name, true);
+    }
+    string_free(&str);
 }
 
 static void show_option(const char *name, bool cflag)
@@ -202,7 +236,7 @@ static String dump_search_history(void)
 }
 
 typedef struct {
-    const char name[8];
+    const char name[12];
     void (*show)(const char *name, bool cmdline);
     String (*dump)(void);
     void (*complete_arg)(const char *prefix);
@@ -215,6 +249,7 @@ static const ShowHandler handlers[] = {
     {"color", show_color, dump_hl_colors, collect_hl_colors, true},
     {"command", NULL, dump_command_history, NULL, true},
     {"env", show_env, dump_env, collect_env, false},
+    {"errorfmt", show_compiler, dump_compilers, collect_compilers, true},
     {"ft", NULL, dump_ft, NULL, true},
     {"include", show_include, dump_builtin_configs, collect_builtin_configs, false},
     {"macro", NULL, dump_macro, NULL, true},
@@ -244,18 +279,10 @@ void show(const char *type, const char *key, bool cflag)
         return;
     }
 
-    String s = handler->dump();
-    View *v = window_open_new_file(window);
-    v->buffer->temporary = true;
-    do_insert(s.buffer, s.len);
-    string_free(&s);
-    set_display_filename(v->buffer, xasprintf("(show %s)", type));
-    buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
-    if (handler->dumps_dterc_syntax) {
-        v->buffer->options.filetype = str_intern("dte");
-        set_file_options(v->buffer);
-        buffer_update_syntax(v->buffer);
-    }
+    String str = handler->dump();
+    bool dte_syntax = handler->dumps_dterc_syntax;
+    open_temporary_buffer(str.buffer, str.len, "show", type, dte_syntax);
+    string_free(&str);
 }
 
 void collect_show_subcommands(const char *prefix)

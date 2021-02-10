@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include "compiler.h"
+#include "command/serialize.h"
 #include "completion.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/hashmap.h"
-#include "util/macros.h"
+#include "util/hashset.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -73,6 +74,7 @@ void add_error_fmt (
         }
     }
 
+    f->pattern = str_intern(format);
     ptr_array_append(&add_compiler(compiler)->error_formats, f);
 }
 
@@ -84,4 +86,58 @@ void collect_compilers(const char *prefix)
             add_completion(xstrdup(name));
         }
     }
+}
+
+static void append_compiler(String *s, const Compiler *c, const char *name)
+{
+    for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
+        ErrorFormat *e = c->error_formats.ptrs[i];
+        string_append_cstring(s, "errorfmt ");
+        if (e->ignore) {
+            string_append_cstring(s, "-i ");
+        }
+
+        string_append_escaped_arg(s, name, true);
+        string_append_byte(s, ' ');
+        string_append_escaped_arg(s, e->pattern, true);
+
+        int max_idx = MAX4(e->file_idx, e->line_idx, e->column_idx, e->msg_idx);
+        BUG_ON(max_idx > 16);
+
+        for (int j = 1; j <= max_idx; j++) {
+            const char *idx_type = "_";
+            if (j == e->file_idx) {
+                idx_type = "file";
+            } else if (j == e->line_idx) {
+                idx_type = "line";
+            } else if (j == e->column_idx) {
+                idx_type = "column";
+            } else if (j == e->msg_idx) {
+                idx_type = "message";
+            }
+            string_append_byte(s, ' ');
+            string_append_cstring(s, idx_type);
+        }
+
+        string_append_byte(s, '\n');
+    }
+}
+
+String dump_compiler(const Compiler *c, const char *name)
+{
+    String buf = string_new(512);
+    append_compiler(&buf, c, name);
+    return buf;
+}
+
+String dump_compilers(void)
+{
+    String buf = string_new(4096);
+    for (HashMapIter it = hashmap_iter(&compilers); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        const Compiler *c = it.entry->value;
+        append_compiler(&buf, c, name);
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
 }

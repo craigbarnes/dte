@@ -1022,6 +1022,9 @@ The _type_ argument can be one of:
 `env`
 :   Show environment variables
 
+`errorfmt`
+:   Show [compiler error formats][`errorfmt`]
+
 `ft`
 :   Show [filetype associations][`ft`]
 
