@@ -5,11 +5,12 @@
 void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 {
     static const char hexmap[16] = "0123456789ABCDEF";
-    static const char escmap[32] = {
+    static const char escmap[] = {
         [0x07] = 'a', [0x08] = 'b',
         [0x09] = 't', [0x0A] = 'n',
         [0x0B] = 'v', [0x0C] = 'f',
         [0x0D] = 'r', [0x1B] = 'e',
+        ['"']  = '"', ['\\'] = '\\',
     };
 
     const unsigned char *arg = sv.data;
@@ -62,20 +63,13 @@ dquote:
     string_append_byte(s, '"');
     for (size_t i = 0; i < len; i++) {
         const unsigned char ch = arg[i];
-        if (unlikely(ch < ARRAY_COUNT(escmap))) {
+        if (unlikely(ch < sizeof(escmap) && escmap[ch])) {
             string_append_byte(s, '\\');
-            if (escmap[ch]) {
-                string_append_byte(s, escmap[ch]);
-            } else {
-                string_append_byte(s, 'x');
-                string_append_byte(s, hexmap[(ch >> 4) & 15]);
-                string_append_byte(s, hexmap[ch & 15]);
-            }
-        } else if (unlikely(ch == 0x7F)) {
-            string_append_literal(s, "\\x7F");
-        } else if (unlikely(ch == '"' || ch == '\\')) {
-            string_append_byte(s, '\\');
-            string_append_byte(s, ch);
+            string_append_byte(s, escmap[ch]);
+        } else if (unlikely(ascii_iscntrl(ch))) {
+            string_append_cstring(s, "\\x");
+            string_append_byte(s, hexmap[(ch >> 4) & 15]);
+            string_append_byte(s, hexmap[ch & 15]);
         } else {
             string_append_byte(s, ch);
         }
