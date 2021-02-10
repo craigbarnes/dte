@@ -82,9 +82,9 @@ String dump_aliases(void)
     String buf = string_new(4096);
     for (size_t i = 0; i < count; i++) {
         string_append_literal(&buf, "alias ");
-        string_append_escaped_arg(&buf, array[i].name, false);
+        string_append_escaped_arg(&buf, array[i].name, true);
         string_append_byte(&buf, ' ');
-        string_append_escaped_arg(&buf, array[i].value, false);
+        string_append_escaped_arg(&buf, array[i].value, true);
         string_append_byte(&buf, '\n');
     }
 

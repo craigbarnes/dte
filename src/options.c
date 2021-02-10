@@ -820,7 +820,7 @@ static void append_option(String *s, const OptionDesc *desc, void *ptr)
     const char *value_str = desc->ops->string(desc, value);
     string_append_cstring(s, desc->name);
     string_append_byte(s, ' ');
-    string_append_escaped_arg(s, value_str, false);
+    string_append_escaped_arg(s, value_str, true);
     string_append_byte(s, '\n');
 }
 

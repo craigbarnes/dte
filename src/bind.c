@@ -258,9 +258,9 @@ void collect_bound_keys(const char *prefix)
 static void append_binding(String *s, KeyCode key, const char *cmd)
 {
     string_append_literal(s, "bind ");
-    string_append_escaped_arg(s, keycode_to_string(key), false);
+    string_append_escaped_arg(s, keycode_to_string(key), true);
     string_append_byte(s, ' ');
-    string_append_escaped_arg(s, cmd, false);
+    string_append_escaped_arg(s, cmd, true);
     string_append_byte(s, '\n');
 }
 
