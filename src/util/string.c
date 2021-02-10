@@ -12,7 +12,7 @@ static void string_grow(String *s, size_t more)
     BUG_ON(more == 0);
     const size_t len = s->len + more;
     size_t alloc = s->alloc;
-    if (alloc >= len) {
+    if (likely(alloc >= len)) {
         return;
     }
     while (alloc < len) {
