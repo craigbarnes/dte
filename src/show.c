@@ -268,7 +268,7 @@ void collect_show_subcommands(const char *prefix)
 void collect_show_subcommand_args(const char *name, const char *arg_prefix)
 {
     const ShowHandler *handler = BSEARCH(name, handlers, (CompareFunction)strcmp);
-    if (handler) {
+    if (handler && handler->complete_arg) {
         handler->complete_arg(arg_prefix);
     }
 }
