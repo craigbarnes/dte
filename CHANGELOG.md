@@ -31,7 +31,7 @@ v1.10 (not yet released)
   * [`select-cursor-char`]
   * [`utf8-bom`]
 * Added an optional *exitcode* argument to the [`quit`] command.
-* Added `color`, `command`, `env`, `option`, `search` and `wsplit`
+* Added `color`, `command`, `env`, `ft`, `option`, `search` and `wsplit`
   arguments to the [`show`] command.
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.

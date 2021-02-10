@@ -17,6 +17,7 @@
 #include "encoding.h"
 #include "error.h"
 #include "file-option.h"
+#include "filetype.h"
 #include "frame.h"
 #include "options.h"
 #include "syntax/color.h"
@@ -214,6 +215,7 @@ static const ShowHandler handlers[] = {
     {"color", show_color, dump_hl_colors, collect_hl_colors, true},
     {"command", NULL, dump_command_history, NULL, true},
     {"env", show_env, dump_env, collect_env, false},
+    {"ft", NULL, dump_ft, NULL, true},
     {"include", show_include, dump_builtin_configs, collect_builtin_configs, false},
     {"macro", NULL, dump_macro, NULL, true},
     {"option", show_option, dump_options, collect_options, true},

@@ -1022,6 +1022,9 @@ The _type_ argument can be one of:
 `env`
 :   Show environment variables
 
+`ft`
+:   Show [filetype associations][`ft`]
+
 `include`
 :   Show [built-in configs][`include`]
 

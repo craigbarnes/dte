@@ -1,5 +1,6 @@
 #include <string.h>
 #include "filetype.h"
+#include "command/serialize.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
@@ -9,7 +10,6 @@
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
-#include "util/string-view.h"
 #include "util/xmalloc.h"
 
 static int ft_compare(const void *key, const void *elem)
@@ -290,4 +290,28 @@ bool is_ft(const char *name)
     }
 
     return false;
+}
+
+String dump_ft(void)
+{
+    static const char flags[][4] = {
+        [FT_FILENAME] = "-f ",
+        [FT_CONTENT] = "-c ",
+        [FT_INTERPRETER] = "-i ",
+        [FT_BASENAME] = "-b ",
+    };
+
+    String s = string_new(4096);
+    for (size_t i = 0, n = filetypes.count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+        string_append_cstring(&s, "ft ");
+        if (ft->type != FT_EXTENSION) {
+            string_append_cstring(&s, flags[ft->type]);
+        }
+        string_append_escaped_arg(&s, ft_get_name(ft), true);
+        string_append_byte(&s, ' ');
+        string_append_escaped_arg(&s, ft_get_str(ft), true);
+        string_append_byte(&s, '\n');
+    }
+    return s;
 }

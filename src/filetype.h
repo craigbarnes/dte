@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef enum {
     FT_EXTENSION,
@@ -15,5 +16,6 @@ typedef enum {
 void add_filetype(const char *name, const char *str, FileDetectionType type);
 bool is_ft(const char *name);
 const char *find_ft(const char *filename, StringView line);
+String dump_ft(void);
 
 #endif
