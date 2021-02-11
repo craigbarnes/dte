@@ -155,7 +155,8 @@ static int hashmap_do_insert(HashMap *map, char *key, void *value, void **old_va
             BUG_ON(!old_value);
             BUG_ON(!e->value);
             *old_value = e->value;
-            free(e->key);
+            free(key);
+            key = e->key;
             map->count--;
             break;
         }
@@ -205,12 +206,14 @@ void hashmap_insert(HashMap *map, char *key, void *value)
     }
 }
 
-void hashmap_insert_or_replace(HashMap *map, char *key, void *value, void **old_value)
+void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)
 {
-    int err = hashmap_do_insert(map, key, value, old_value);
+    void *replaced_value = NULL;
+    int err = hashmap_do_insert(map, key, value, &replaced_value);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }
+    return replaced_value;
 }
 
 // Remove all entries without freeing the table

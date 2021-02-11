@@ -1153,19 +1153,17 @@ static void test_hashmap(void)
     EXPECT_EQ(map.mask, 511);
     hashmap_free(&map, NULL);
 
-    const char *val = "VALUE";
+    const char *val = "VAL";
     char *key = xstrdup("KEY");
-    void *old_val = NULL;
-    hashmap_insert_or_replace(&map, key, (char*)val, &old_val);
+    EXPECT_NULL(hashmap_insert_or_replace(&map, key, (char*)val));
     EXPECT_EQ(map.count, 1);
-    EXPECT_NULL(old_val);
     EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
 
+    const char *new_val = "NEW";
     char *duplicate_key = xstrdup(key);
-    hashmap_insert_or_replace(&map, duplicate_key, (char*)val, &old_val);
+    EXPECT_PTREQ(val, hashmap_insert_or_replace(&map, duplicate_key, (char*)new_val));
     EXPECT_EQ(map.count, 1);
-    EXPECT_PTREQ(old_val, val);
-    EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
+    EXPECT_STREQ(hashmap_get(&map, "KEY"), new_val);
     hashmap_free(&map, NULL);
 }
 
