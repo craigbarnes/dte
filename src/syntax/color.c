@@ -57,7 +57,7 @@ void set_highlight_color(const char *name, const TermColor *color)
 
     c = xnew(TermColor, 1);
     *c = *color;
-    hashmap_insert(&hl_colors, xstrdup(name), c, NULL);
+    hashmap_insert(&hl_colors, xstrdup(name), c);
 }
 
 TermColor *find_color(const char *name)

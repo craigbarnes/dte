@@ -63,7 +63,7 @@ static State *find_or_add_state(const char *name)
     st->defined = false;
     st->type = STATE_INVALID;
 
-    hashmap_insert(&current_syntax->states, st->name, st, NULL);
+    hashmap_insert(&current_syntax->states, st->name, st);
     if (current_syntax->states.count == 1) {
         current_syntax->start_state = st;
     }
@@ -229,7 +229,7 @@ static void cmd_default(const CommandArgs *a)
     HashMap *default_colors = &current_syntax->default_colors;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         char *name = xstrdup(a->args[i]);
-        hashmap_insert(default_colors, name, (char*)value, NULL);
+        hashmap_insert(default_colors, name, (char*)value);
     }
 }
 
@@ -298,7 +298,7 @@ static void cmd_list(const CommandArgs *a)
     StringList *list = find_string_list(current_syntax, name);
     if (!list) {
         list = xnew0(StringList, 1);
-        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list, NULL);
+        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
     } else if (list->defined) {
         error_msg("List %s already exists.", name);
         return;
@@ -329,7 +329,7 @@ static void cmd_inlist(const CommandArgs *a)
     if (!list) {
         // Add undefined list
         list = xnew0(StringList, 1);
-        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list, NULL);
+        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
     }
     list->used = true;
     c->u.str_list = list;

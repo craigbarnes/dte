@@ -57,7 +57,8 @@ static inline bool hashmap_next(HashMapIter *iter)
 }
 
 void hashmap_init(HashMap *map, size_t capacity) NONNULL_ARGS;
-void hashmap_insert(HashMap *map, char *key, void *value, void **old_value) NONNULL_ARG(1, 2, 3);
+void hashmap_insert(HashMap *map, char *key, void *value) NONNULL_ARGS;
+void hashmap_insert_or_replace(HashMap *map, char *key, void *value, void **old_value) NONNULL_ARGS;
 void *hashmap_remove(HashMap *map, const char *key) NONNULL_ARGS;
 void hashmap_clear(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);
 void hashmap_free(HashMap *map, FreeFunction free_value) NONNULL_ARG(1);

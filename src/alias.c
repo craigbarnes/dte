@@ -22,7 +22,7 @@ void init_aliases(void)
 void add_alias(const char *name, const char *value)
 {
     void *old_value = NULL;
-    hashmap_insert(&aliases, xstrdup(name), xstrdup(value), &old_value);
+    hashmap_insert_or_replace(&aliases, xstrdup(name), xstrdup(value), &old_value);
     free(old_value);
 }
 

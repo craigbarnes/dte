@@ -62,7 +62,7 @@ void add_file_history(unsigned long row, unsigned long col, const char *filename
             e = xnew(FileHistoryEntry, 1);
         }
         e->filename = xstrdup(filename);
-        hashmap_insert(map, e->filename, e, NULL);
+        hashmap_insert(map, e->filename, e);
     }
 
     // Insert the entry at the end of the list

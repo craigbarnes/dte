@@ -1051,7 +1051,7 @@ static void test_hashmap(void)
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
         ASSERT_EQ(key[sizeof(strings[0]) - 1], '\0');
-        hashmap_insert(&map, xstrdup(key), (void*)value, NULL);
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1085,14 +1085,14 @@ static void test_hashmap(void)
         break;
     }
 
-    hashmap_insert(&map, xstrdup("new"), (void*)value, NULL);
+    hashmap_insert(&map, xstrdup("new"), (void*)value);
     ASSERT_NONNULL(hashmap_find(&map, "new"));
     EXPECT_STREQ(hashmap_find(&map, "new")->key, "new");
     EXPECT_EQ(map.count, 1);
 
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
-        hashmap_insert(&map, xstrdup(key), (void*)value, NULL);
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1142,7 +1142,7 @@ static void test_hashmap(void)
     for (size_t i = 1; i <= 380; i++) {
         char key[4];
         EXPECT_EQ(xsnprintf(key, sizeof key, "%zu", i), size_str_width(i));
-        hashmap_insert(&map, xstrdup(key), (void*)value, NULL);
+        hashmap_insert(&map, xstrdup(key), (void*)value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1156,13 +1156,13 @@ static void test_hashmap(void)
     const char *val = "VALUE";
     char *key = xstrdup("KEY");
     void *old_val = NULL;
-    hashmap_insert(&map, key, (char*)val, &old_val);
+    hashmap_insert_or_replace(&map, key, (char*)val, &old_val);
     EXPECT_EQ(map.count, 1);
     EXPECT_NULL(old_val);
     EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
 
     char *duplicate_key = xstrdup(key);
-    hashmap_insert(&map, duplicate_key, (char*)val, &old_val);
+    hashmap_insert_or_replace(&map, duplicate_key, (char*)val, &old_val);
     EXPECT_EQ(map.count, 1);
     EXPECT_PTREQ(old_val, val);
     EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
