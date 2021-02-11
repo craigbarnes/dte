@@ -226,10 +226,18 @@ static void cmd_default(const CommandArgs *a)
     }
 
     const char *value = str_intern(a->args[0]);
-    HashMap *default_colors = &current_syntax->default_colors;
+    HashMap *map = &current_syntax->default_colors;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        char *name = xstrdup(a->args[i]);
-        hashmap_insert(default_colors, name, (char*)value);
+        const char *name = a->args[i];
+        void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
+        if (unlikely(oldval)) {
+            DEBUG_LOG (
+                "duplicate 'default' argument in %s:%d: '%s'",
+                current_config.file,
+                current_config.line,
+                name
+            );
+        }
     }
 }
 
