@@ -21,16 +21,9 @@ void init_aliases(void)
 
 void add_alias(const char *name, const char *value)
 {
-    char *value_copy = xstrdup(value);
-    HashMapEntry *e = hashmap_find(&aliases, name);
-    if (e) {
-        // Alias exists; just update the value
-        free(e->value);
-        e->value = value_copy;
-        return;
-    }
-
-    hashmap_insert(&aliases, xstrdup(name), value_copy);
+    void *old_value = NULL;
+    hashmap_insert(&aliases, xstrdup(name), xstrdup(value), &old_value);
+    free(old_value);
 }
 
 const char *find_alias(const char *const name)

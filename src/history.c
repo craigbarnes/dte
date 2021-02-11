@@ -45,7 +45,7 @@ void history_add(History *history, const char *text)
             e = xnew(HistoryEntry, 1);
         }
         e->text = xstrdup(text);
-        hashmap_insert(map, e->text, e);
+        hashmap_insert(map, e->text, e, NULL);
     }
 
     // Insert entry at end of list

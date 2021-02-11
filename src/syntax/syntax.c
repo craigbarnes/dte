@@ -93,7 +93,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
         State *s = xmemdup(it.entry->value, sizeof(State));
         s->name = xstrdup(fix_name(s->name, prefix));
         s->emit_name = xstrdup(s->emit_name);
-        hashmap_insert(states, s->name, s);
+        hashmap_insert(states, s->name, s, NULL);
 
         if (s->conds.count > 0) {
             s->conds.ptrs = xmemdup (
@@ -245,7 +245,7 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         }
     }
 
-    hashmap_insert(&syntaxes, syn->name, syn);
+    hashmap_insert(&syntaxes, syn->name, syn, NULL);
 }
 
 Syntax *find_syntax(const char *name)

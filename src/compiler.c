@@ -18,7 +18,7 @@ static Compiler *add_compiler(const char *name)
         return c;
     }
     c = xnew0(Compiler, 1);
-    hashmap_insert(&compilers, xstrdup(name), c);
+    hashmap_insert(&compilers, xstrdup(name), c, NULL);
     return c;
 }
 

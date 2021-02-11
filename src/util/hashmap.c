@@ -14,7 +14,7 @@ enum {
 };
 
 WARN_UNUSED_RESULT
-static bool hashmap_resize(HashMap *map, size_t size)
+static int hashmap_resize(HashMap *map, size_t size)
 {
     BUG_ON(size < MIN_SIZE);
     BUG_ON(size <= map->count);
@@ -22,7 +22,7 @@ static bool hashmap_resize(HashMap *map, size_t size)
 
     HashMapEntry *newtab = calloc(size, sizeof(*newtab));
     if (unlikely(!newtab)) {
-        return false;
+        return ENOMEM;
     }
 
     HashMapEntry *oldtab = map->entries;
@@ -32,7 +32,7 @@ static bool hashmap_resize(HashMap *map, size_t size)
     map->tombstones = 0;
 
     if (!oldtab) {
-        return true;
+        return 0;
     }
 
     // Copy the entries to the new table
@@ -51,11 +51,11 @@ static bool hashmap_resize(HashMap *map, size_t size)
     }
 
     free(oldtab);
-    return true;
+    return 0;
 }
 
 WARN_UNUSED_RESULT
-static bool hashmap_do_init(HashMap *map, size_t size)
+static int hashmap_do_init(HashMap *map, size_t size)
 {
     // Accommodate the 75% load factor in the table size, to allow
     // filling to the requested size without needing to resize()
@@ -70,8 +70,7 @@ static bool hashmap_do_init(HashMap *map, size_t size)
     // to allow quadratic probing with triangular numbers
     size = round_size_to_next_power_of_2(size);
     if (unlikely(size == 0)) {
-        errno = EOVERFLOW;
-        return false;
+        return EOVERFLOW;
     }
 
     *map = (HashMap)HASHMAP_INIT;
@@ -80,8 +79,9 @@ static bool hashmap_do_init(HashMap *map, size_t size)
 
 void hashmap_init(HashMap *map, size_t size)
 {
-    if (unlikely(!hashmap_do_init(map, size))) {
-        fatal_error(__func__, errno);
+    int err = hashmap_do_init(map, size);
+    if (unlikely(err)) {
+        fatal_error(__func__, err);
     }
 }
 
@@ -123,36 +123,52 @@ void *hashmap_remove(HashMap *map, const char *key)
 }
 
 WARN_UNUSED_RESULT
-static bool hashmap_do_insert(HashMap *map, char *key, void *value)
+static int hashmap_do_insert(HashMap *map, char *key, void *value, void **old_value)
 {
+    int err = 0;
     if (unlikely(!map->entries)) {
-        if (unlikely(!hashmap_do_init(map, 0))) {
-            return false;
+        err = hashmap_do_init(map, 0);
+        if (unlikely(err)) {
+            return err;
         }
     }
 
     size_t hash = fnv_1a_hash(key, strlen(key));
+    bool replacing_tombstone_or_existing_value = false;
     HashMapEntry *e;
     for (size_t i = hash, j = 1; ; i += j++) {
         e = map->entries + (i & map->mask);
-        if (!e->key || e->key == tombstone) {
+        if (!e->key) {
             break;
         }
-        if (e->hash == hash && streq(e->key, key)) {
-            // Don't replace existing values
-            errno = EINVAL;
-            return false;
+        if (e->key == tombstone) {
+            replacing_tombstone_or_existing_value = true;
+            BUG_ON(map->tombstones == 0);
+            map->tombstones--;
+            break;
+        }
+        if (unlikely(e->hash == hash && streq(e->key, key))) {
+            replacing_tombstone_or_existing_value = true;
+            // When a caller passes NULL as the "old_value" return param,
+            // it implies there can be no existing entry with the same key
+            // as the one to be inserted.
+            BUG_ON(!old_value);
+            BUG_ON(!e->value);
+            *old_value = e->value;
+            free(e->key);
+            map->count--;
+            break;
         }
     }
 
     const size_t max_load = map->mask - (map->mask / 4);
-    const bool replacing_tombstone = (e->key == tombstone);
     e->key = key;
     e->value = value;
     e->hash = hash;
     map->count++;
 
     if (unlikely(map->count + map->tombstones > max_load)) {
+        BUG_ON(replacing_tombstone_or_existing_value);
         size_t new_size = map->mask + 1;
         if (map->count > map->tombstones || new_size <= 256) {
             // Only increase the size of the table when the number of
@@ -163,30 +179,29 @@ static bool hashmap_do_insert(HashMap *map, char *key, void *value)
             // to clean out the tombstones.
             new_size <<= 1;
             if (unlikely(new_size == 0)) {
-                errno = EOVERFLOW;
+                err = EOVERFLOW;
                 goto error;
             }
         }
-        if (unlikely(!hashmap_resize(map, new_size))) {
+        err = hashmap_resize(map, new_size);
+        if (unlikely(err)) {
             goto error;
         }
-    } else if (replacing_tombstone) {
-        BUG_ON(map->tombstones == 0);
-        map->tombstones--;
     }
 
-    return true;
+    return 0;
 
 error:
     map->count--;
-    e->key = replacing_tombstone ? tombstone : NULL;
-    return false;
+    e->key = NULL;
+    return err;
 }
 
-void hashmap_insert(HashMap *map, char *key, void *value)
+void hashmap_insert(HashMap *map, char *key, void *value, void **old_value)
 {
-    if (!hashmap_do_insert(map, key, value) && errno != EINVAL) {
-        fatal_error(__func__, errno);
+    int err = hashmap_do_insert(map, key, value, old_value);
+    if (unlikely(err)) {
+        fatal_error(__func__, err);
     }
 }
 
