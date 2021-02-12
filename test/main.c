@@ -110,18 +110,22 @@ static void init_test_environment(void)
 
 static void run_tests(const TestGroup *g)
 {
-    const unsigned int prev_failed = failed;
     ASSERT_TRUE(g->nr_tests != 0);
     ASSERT_NONNULL(g->tests);
+
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         ASSERT_NONNULL(t->func);
         ASSERT_NONNULL(t->name);
         ASSERT_TRUE(str_has_prefix(t->name, "test_"));
-        t->func();
         const char *name = t->name + STRLEN("test_");
-        const unsigned int new_failed = failed - prev_failed;
+
+        unsigned int prev_failed = failed;
+        t->func();
+        unsigned int new_failed = failed - prev_failed;
+
         if (unlikely(new_failed)) {
-            fprintf(stderr, "  FAILED  %s  [%u failures]\n", name, new_failed);
+            const char *plural = (new_failed > 1) ? "s" : "";
+            fprintf(stderr, "  FAILED  %s  [%u failure%s]\n", name, new_failed, plural);
         } else {
             fprintf(stderr, "  PASSED  %s\n", name);
         }
