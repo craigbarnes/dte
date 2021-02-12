@@ -167,6 +167,15 @@ static void test_global_state(void)
     EXPECT_EQ(buffer->id, 1);
 }
 
+static const TestEntry tests[] = {
+    TEST(test_global_state),
+    TEST(test_builtin_configs),
+    TEST(test_exec_config),
+    TEST(test_detect_indent),
+};
+
+const TestGroup config_tests = TEST_GROUP(tests);
+
 DISABLE_WARNING("-Wmissing-prototypes")
 
 void init_headless_mode(void)
@@ -178,12 +187,4 @@ void init_headless_mode(void)
     window = new_window();
     root_frame = new_root_frame(window);
     set_view(window_open_empty_buffer(window));
-}
-
-void test_config(void)
-{
-    test_global_state();
-    test_builtin_configs();
-    test_exec_config();
-    test_detect_indent();
 }

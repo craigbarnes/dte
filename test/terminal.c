@@ -571,16 +571,15 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, 0x18);
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_parse_term_color),
+    TEST(test_color_to_nearest),
+    TEST(test_term_color_to_string),
+    TEST(test_xterm_parse_key),
+    TEST(test_xterm_parse_key_combo),
+    TEST(test_rxvt_parse_key),
+    TEST(test_keycode_to_string),
+    TEST(test_parse_key_string),
+};
 
-void test_terminal(void)
-{
-    test_parse_term_color();
-    test_color_to_nearest();
-    test_term_color_to_string();
-    test_xterm_parse_key();
-    test_xterm_parse_key_combo();
-    test_rxvt_parse_key();
-    test_keycode_to_string();
-    test_parse_key_string();
-}
+const TestGroup terminal_tests = TEST_GROUP(tests);

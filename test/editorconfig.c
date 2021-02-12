@@ -100,10 +100,9 @@ static void test_get_editorconfig_options(void)
     EXPECT_FALSE(opts.indent_size_is_tab);
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_editorconfig_pattern_match),
+    TEST(test_get_editorconfig_options),
+};
 
-void test_editorconfig(void)
-{
-    test_editorconfig_pattern_match();
-    test_get_editorconfig_options();
-}
+const TestGroup editorconfig_tests = TEST_GROUP(tests);

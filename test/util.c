@@ -1548,49 +1548,48 @@ static void test_xfopen(void)
     }
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_util_macros),
+    TEST(test_IS_POWER_OF_2),
+    TEST(test_xstreq),
+    TEST(test_hex_decode),
+    TEST(test_ascii),
+    TEST(test_base64),
+    TEST(test_string),
+    TEST(test_string_view),
+    TEST(test_get_delim),
+    TEST(test_size_str_width),
+    TEST(test_buf_parse_ulong),
+    TEST(test_str_to_int),
+    TEST(test_str_to_size),
+    TEST(test_u_char_width),
+    TEST(test_u_to_lower),
+    TEST(test_u_to_upper),
+    TEST(test_u_is_lower),
+    TEST(test_u_is_upper),
+    TEST(test_u_is_cntrl),
+    TEST(test_u_is_zero_width),
+    TEST(test_u_is_special_whitespace),
+    TEST(test_u_is_unprintable),
+    TEST(test_u_str_width),
+    TEST(test_u_set_char),
+    TEST(test_u_prev_char),
+    TEST(test_ptr_array),
+    TEST(test_ptr_array_move),
+    TEST(test_hashmap),
+    TEST(test_hashset),
+    TEST(test_round_size_to_next_multiple),
+    TEST(test_round_size_to_next_power_of_2),
+    TEST(test_path_dirname_and_path_basename),
+    TEST(test_relative_filename),
+    TEST(test_path_absolute),
+    TEST(test_path_join),
+    TEST(test_path_parent),
+    TEST(test_size_multiply_overflows),
+    TEST(test_size_add_overflows),
+    TEST(test_mem_intern),
+    TEST(test_read_file),
+    TEST(test_xfopen),
+};
 
-void test_util(void)
-{
-    test_util_macros();
-    test_IS_POWER_OF_2();
-    test_xstreq();
-    test_hex_decode();
-    test_ascii();
-    test_base64();
-    test_string();
-    test_string_view();
-    test_get_delim();
-    test_size_str_width();
-    test_buf_parse_ulong();
-    test_str_to_int();
-    test_str_to_size();
-    test_u_char_width();
-    test_u_to_lower();
-    test_u_to_upper();
-    test_u_is_lower();
-    test_u_is_upper();
-    test_u_is_cntrl();
-    test_u_is_zero_width();
-    test_u_is_special_whitespace();
-    test_u_is_unprintable();
-    test_u_str_width();
-    test_u_set_char();
-    test_u_prev_char();
-    test_ptr_array();
-    test_ptr_array_move();
-    test_hashmap();
-    test_hashset();
-    test_round_size_to_next_multiple();
-    test_round_size_to_next_power_of_2();
-    test_path_dirname_and_path_basename();
-    test_relative_filename();
-    test_path_absolute();
-    test_path_join();
-    test_path_parent();
-    test_size_multiply_overflows();
-    test_size_add_overflows();
-    test_mem_intern();
-    test_read_file();
-    test_xfopen();
-}
+const TestGroup util_tests = TEST_GROUP(tests);

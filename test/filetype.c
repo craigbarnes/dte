@@ -220,11 +220,10 @@ static void test_is_ft(void)
     EXPECT_FALSE(is_ft("MAKE"));
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_find_ft_filename),
+    TEST(test_find_ft_firstline),
+    TEST(test_is_ft),
+};
 
-void test_filetype(void)
-{
-    test_find_ft_filename();
-    test_find_ft_firstline();
-    test_is_ft();
-}
+const TestGroup filetype_tests = TEST_GROUP(tests);

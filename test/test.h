@@ -7,7 +7,27 @@
 #include <stddef.h>
 #include "util/macros.h"
 
-extern unsigned int failed;
+extern unsigned int passed, failed;
+
+typedef struct {
+    const char *name;
+    void (*func)(void);
+} TestEntry;
+
+typedef struct {
+    const TestEntry *tests;
+    size_t nr_tests;
+} TestGroup;
+
+#define TEST(e) (TestEntry) { \
+    .name = #e, \
+    .func = e \
+}
+
+#define TEST_GROUP(t) { \
+    .tests = t, \
+    .nr_tests = ARRAY_COUNT(t) \
+}
 
 #define FOR_EACH_I(i, array) \
     for (size_t i = 0; i < ARRAY_COUNT(array); i++)

@@ -409,16 +409,15 @@ static void test_cmdargs_flagset_idx(void)
     }
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_parse_command_arg),
+    TEST(test_parse_commands),
+    TEST(test_expand_builtin_env),
+    TEST(test_find_normal_command),
+    TEST(test_parse_args),
+    TEST(test_escape_command_arg),
+    TEST(test_command_struct_layout),
+    TEST(test_cmdargs_flagset_idx),
+};
 
-void test_command(void)
-{
-    test_parse_command_arg();
-    test_parse_commands();
-    test_expand_builtin_env();
-    test_find_normal_command();
-    test_parse_args();
-    test_escape_command_arg();
-    test_command_struct_layout();
-    test_cmdargs_flagset_idx();
-}
+const TestGroup command_tests = TEST_GROUP(tests);

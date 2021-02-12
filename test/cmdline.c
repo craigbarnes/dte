@@ -204,10 +204,9 @@ static void test_complete_command(void)
     reset_completion();
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_cmdline_handle_key),
+    TEST(test_complete_command),
+};
 
-void test_cmdline(void)
-{
-    test_cmdline_handle_key();
-    test_complete_command();
-}
+const TestGroup cmdline_tests = TEST_GROUP(tests);

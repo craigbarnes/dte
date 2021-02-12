@@ -122,10 +122,9 @@ static void test_history_tombstone_pressure(void)
     hashmap_free(&h.entries, free);
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_history_add),
+    TEST(test_history_tombstone_pressure),
+};
 
-void test_history(void)
-{
-    test_history_add();
-    test_history_tombstone_pressure();
-}
+const TestGroup history_tests = TEST_GROUP(tests);

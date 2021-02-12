@@ -72,11 +72,10 @@ static void test_encoding_from_type(void)
     EXPECT_PTREQ(encoding_from_name("utf8").name, a.name);
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_detect_encoding_from_bom),
+    TEST(test_lookup_encoding),
+    TEST(test_encoding_from_type),
+};
 
-void test_encoding(void)
-{
-    test_detect_encoding_from_bom();
-    test_lookup_encoding();
-    test_encoding_from_type();
-}
+const TestGroup encoding_tests = TEST_GROUP(tests);

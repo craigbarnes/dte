@@ -66,9 +66,8 @@ static void test_bitset(void)
     }
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_bitset),
+};
 
-void test_syntax(void)
-{
-    test_bitset();
-}
+const TestGroup syntax_tests = TEST_GROUP(tests);

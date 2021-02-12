@@ -16,18 +16,18 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-void test_cmdline(void);
-void test_command(void);
-void test_editorconfig(void);
-void test_encoding(void);
-void test_filetype(void);
-void test_history(void);
-void test_options(void);
-void test_syntax(void);
-void test_terminal(void);
-void test_util(void);
 void init_headless_mode(void);
-void test_config(void);
+extern const TestGroup cmdline_tests;
+extern const TestGroup command_tests;
+extern const TestGroup config_tests;
+extern const TestGroup editorconfig_tests;
+extern const TestGroup encoding_tests;
+extern const TestGroup filetype_tests;
+extern const TestGroup history_tests;
+extern const TestGroup option_tests;
+extern const TestGroup syntax_tests;
+extern const TestGroup terminal_tests;
+extern const TestGroup util_tests;
 
 static void test_handle_binding(void)
 {
@@ -108,26 +108,47 @@ static void init_test_environment(void)
     EXPECT_STREQ(ver, editor.version);
 }
 
+static void run_tests(const TestGroup *g)
+{
+    const unsigned int prev_failed = failed;
+    ASSERT_TRUE(g->nr_tests != 0);
+    ASSERT_NONNULL(g->tests);
+    for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
+        ASSERT_NONNULL(t->func);
+        ASSERT_NONNULL(t->name);
+        ASSERT_TRUE(str_has_prefix(t->name, "test_"));
+        t->func();
+        const char *name = t->name + STRLEN("test_");
+        const unsigned int new_failed = failed - prev_failed;
+        if (unlikely(new_failed)) {
+            fprintf(stderr, "  FAILED  %s  [%u failures]\n", name, new_failed);
+        } else {
+            fprintf(stderr, "  PASSED  %s\n", name);
+        }
+    }
+}
+
 int main(void)
 {
     test_posix_sanity();
     init_test_environment();
 
-    test_command();
-    test_options();
-    test_editorconfig();
-    test_encoding();
-    test_filetype();
-    test_util();
-    test_terminal();
-    test_cmdline();
-    test_history();
-    test_syntax();
+    run_tests(&command_tests);
+    run_tests(&option_tests);
+    run_tests(&editorconfig_tests);
+    run_tests(&encoding_tests);
+    run_tests(&filetype_tests);
+    run_tests(&util_tests);
+    run_tests(&terminal_tests);
+    run_tests(&cmdline_tests);
+    run_tests(&history_tests);
+    run_tests(&syntax_tests);
 
     init_headless_mode();
-    test_config();
+    run_tests(&config_tests);
     test_handle_binding();
     free_syntaxes();
 
+    fprintf(stderr, "\n  Passed: %u\n  Failed: %u\n\n", passed, failed);
     return failed ? 1 : 0;
 }

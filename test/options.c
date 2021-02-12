@@ -21,9 +21,8 @@ static void test_common_options_offsets(void)
     CHECK_OFFSETS(syntax);
 }
 
-DISABLE_WARNING("-Wmissing-prototypes")
+static const TestEntry tests[] = {
+    TEST(test_common_options_offsets),
+};
 
-void test_options(void)
-{
-    test_common_options_offsets();
-}
+const TestGroup option_tests = TEST_GROUP(tests);
