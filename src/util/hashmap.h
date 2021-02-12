@@ -29,7 +29,8 @@ typedef struct {
 #define HASHMAP_INIT { \
     .entries = NULL, \
     .mask = 0, \
-    .count = 0 \
+    .count = 0, \
+    .tombstones = 0 \
 }
 
 static inline HashMapIter hashmap_iter(const HashMap *map)
