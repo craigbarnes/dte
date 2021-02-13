@@ -1061,7 +1061,12 @@ static void test_hashmap(void)
     EXPECT_EQ(map.count, 24);
     EXPECT_EQ(map.mask, 31);
 
-    for (HashMapIter it = hashmap_iter(&map); hashmap_next(&it); ) {
+    HashMapIter it = hashmap_iter(&map);
+    EXPECT_PTREQ(it.map, &map);
+    EXPECT_NULL(it.entry);
+    EXPECT_EQ(it.idx, 0);
+
+    while (hashmap_next(&it)) {
         ASSERT_NONNULL(it.entry);
         ASSERT_NONNULL(it.entry->key);
         EXPECT_PTREQ(it.entry->value, value);
@@ -1080,7 +1085,7 @@ static void test_hashmap(void)
     }
 
     EXPECT_EQ(map.count, 0);
-    HashMapIter it = hashmap_iter(&map);
+    it = hashmap_iter(&map);
     EXPECT_FALSE(hashmap_next(&it));
 
     hashmap_insert(&map, xstrdup("new"), (void*)value);
