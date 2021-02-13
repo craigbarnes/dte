@@ -119,12 +119,12 @@ static void run_tests(const TestGroup *g)
         unsigned int prev_failed = failed;
         unsigned int prev_passed = passed;
         t->func();
-        unsigned int new_failed = failed - prev_failed;
-        unsigned int new_passed = passed - prev_passed;
-        if (unlikely(new_failed)) {
-            fprintf(stderr, "   CHECK  %s [%u FAILED, %u passed]\n", t->name, new_failed, new_passed);
+        unsigned int f = failed - prev_failed;
+        unsigned int p = passed - prev_passed;
+        if (unlikely(f > 0)) {
+            fprintf(stderr, "   CHECK  %-35s  %4u passed %4u FAILED\n", t->name, p, f);
         } else {
-            fprintf(stderr, "   CHECK  %s [passed: %u]\n", t->name, new_passed);
+            fprintf(stderr, "   CHECK  %-35s  %4u passed\n", t->name, p);
         }
     }
 }
