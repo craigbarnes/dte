@@ -116,18 +116,15 @@ static void run_tests(const TestGroup *g)
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         ASSERT_NONNULL(t->func);
         ASSERT_NONNULL(t->name);
-        ASSERT_TRUE(str_has_prefix(t->name, "test_"));
-        const char *name = t->name + STRLEN("test_");
-
         unsigned int prev_failed = failed;
+        unsigned int prev_passed = passed;
         t->func();
         unsigned int new_failed = failed - prev_failed;
-
+        unsigned int new_passed = passed - prev_passed;
         if (unlikely(new_failed)) {
-            const char *plural = (new_failed > 1) ? "s" : "";
-            fprintf(stderr, "  FAILED  %s  [%u failure%s]\n", name, new_failed, plural);
+            fprintf(stderr, "   CHECK  %s [%u FAILED, %u passed]\n", t->name, new_failed, new_passed);
         } else {
-            fprintf(stderr, "  PASSED  %s\n", name);
+            fprintf(stderr, "   CHECK  %s [passed: %u]\n", t->name, new_passed);
         }
     }
 }
@@ -153,6 +150,6 @@ int main(void)
     test_handle_binding();
     free_syntaxes();
 
-    fprintf(stderr, "\n  Passed: %u\n  Failed: %u\n\n", passed, failed);
+    fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", passed, failed);
     return failed ? 1 : 0;
 }

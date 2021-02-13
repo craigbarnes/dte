@@ -61,6 +61,7 @@ static void expect_files_equal(const char *path1, const char *path2)
         TEST_FAIL("Error reading '%s': %s", path1, strerror(errno));
         return;
     }
+    passed++;
 
     char *buf2;
     ssize_t size2 = read_file(path2, &buf2);
@@ -69,9 +70,12 @@ static void expect_files_equal(const char *path1, const char *path2)
         TEST_FAIL("Error reading '%s': %s", path2, strerror(errno));
         return;
     }
+    passed++;
 
     if (size1 != size2 || !mem_equal(buf1, buf2, size1)) {
         TEST_FAIL("Files differ: '%s', '%s'", path1, path2);
+    } else {
+        passed++;
     }
 
     free(buf1);

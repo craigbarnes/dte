@@ -1377,6 +1377,7 @@ static void test_path_absolute(void)
         TEST_FAIL("symlink() failed: %s", strerror(errno));
         return;
     }
+    passed++;
 
     path = path_absolute(linkpath);
     EXPECT_EQ(unlink(linkpath), 0);

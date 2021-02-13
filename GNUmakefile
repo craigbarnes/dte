@@ -75,15 +75,15 @@ uninstall-desktop-file:
 	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
 
 check-tests: $(test) all
-	$(E) TEST $<
-	$(Q) ./$<
+	$(E) EXEC '$(test)'
+	$(Q) ./$(test)
 
 check-opts: $(dte)
-	$(E) TEST '$<'
+	$(E) EXEC 'test/check-opts.sh'
 	$(Q) test/check-opts.sh './$<' '$(VERSION)'
 
 installcheck: install
-	$(E) TEST '$(DESTDIR)$(bindir)/$(dte)'
+	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte)'
 	$(Q) '$(DESTDIR)$(bindir)/$(dte)' -V >/dev/null
 
 tags:
