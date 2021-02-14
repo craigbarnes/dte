@@ -353,6 +353,21 @@ echo\ 'A\ B\ C\ D\ E\ F'\ |\ tr\ '\ '\ '\\n'\ |\ dte\ |\ tac
 \f[]
 .fi
 .PP
+.SH NOTES
+It's advised to NOT run shell pipelines with multiple interactive
+programs that try to control the terminal. For example:
+.P
+.IP
+.nf
+\f[C]
+echo\ 'Don't\ run\ this\ example!!'\ |\ dte\ |\ less
+\f[]
+.fi
+.PP
+A shell will run these processes in parallel and both \fBdte\fR(1) and \fBless\fR
+will then try to control the terminal at the same time; clobbering the
+input/output of both.
+.P
 .
 .SH SEE ALSO
 \fBdterc\fR(5),
