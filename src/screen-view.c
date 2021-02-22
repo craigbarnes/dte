@@ -56,13 +56,10 @@ static void mask_selection_and_current_line (
 
 static bool is_non_text(CodePoint u)
 {
-    if (u < 0x20) {
-        return u != '\t' || editor.options.display_special;
+    if (u == '\t') {
+        return editor.options.display_special;
     }
-    if (u == 0x7f) {
-        return true;
-    }
-    return u_is_unprintable(u);
+    return u < 0x20 || u == 0x7F || u_is_unprintable(u);
 }
 
 static unsigned int get_ws_error_option(const Buffer *b)
