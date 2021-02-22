@@ -808,6 +808,67 @@ static void test_u_str_width(void)
     );
 }
 
+static void test_u_set_char_raw(void)
+{
+    unsigned char buf[16];
+    size_t i;
+    MEMZERO(&buf);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 'a');
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 'a');
+
+    i = 0;
+    u_set_char_raw(buf, &i, '\0');
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], '\0');
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0x1F);
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 0x1F);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0x7F);
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 0x7F);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0x7FF);
+    EXPECT_EQ(i, 2);
+    EXPECT_EQ(buf[0], 0xDF);
+    EXPECT_EQ(buf[1], 0xBF);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0xFF45);
+    EXPECT_EQ(i, 3);
+    EXPECT_EQ(buf[0], 0xEF);
+    EXPECT_EQ(buf[1], 0xBD);
+    EXPECT_EQ(buf[2], 0x85);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0x1F311);
+    EXPECT_EQ(i, 4);
+    EXPECT_EQ(buf[0], 0xF0);
+    EXPECT_EQ(buf[1], 0x9F);
+    EXPECT_EQ(buf[2], 0x8C);
+    EXPECT_EQ(buf[3], 0x91);
+
+    i = 0;
+    buf[1] = 0x88;
+    u_set_char_raw(buf, &i, 0x110000);
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 0);
+    EXPECT_EQ(buf[1], 0x88);
+
+    i = 0;
+    u_set_char_raw(buf, &i, 0x110042);
+    EXPECT_EQ(i, 1);
+    EXPECT_EQ(buf[0], 0x42);
+    EXPECT_EQ(buf[1], 0x88);
+}
+
 static void test_u_set_char(void)
 {
     char buf[16];
@@ -1574,6 +1635,7 @@ static const TestEntry tests[] = {
     TEST(test_u_is_special_whitespace),
     TEST(test_u_is_unprintable),
     TEST(test_u_str_width),
+    TEST(test_u_set_char_raw),
     TEST(test_u_set_char),
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
