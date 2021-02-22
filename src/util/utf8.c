@@ -187,7 +187,7 @@ void u_set_char_raw(char *str, size_t *idx, CodePoint u)
         *idx = i + 4;
     } else {
         // Invalid byte value
-        str[i++] = u & 0xff;
+        str[i] = u & 0xff;
         *idx = i + 1;
     }
 }
