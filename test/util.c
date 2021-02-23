@@ -871,7 +871,7 @@ static void test_u_set_char_raw(void)
 
 static void test_u_set_char(void)
 {
-    char buf[16];
+    unsigned char buf[16];
     size_t i;
     MEMZERO(&buf);
 
@@ -883,58 +883,73 @@ static void test_u_set_char(void)
     i = 0;
     u_set_char(buf, &i, 0x00DF);
     EXPECT_EQ(i, 2);
-    EXPECT_TRUE(mem_equal(buf, "\xC3\x9F", 2));
+    EXPECT_EQ(buf[0], 0xC3);
+    EXPECT_EQ(buf[1], 0x9F);
 
     i = 0;
     u_set_char(buf, &i, 0x0E01);
     EXPECT_EQ(i, 3);
-    EXPECT_TRUE(mem_equal(buf, "\xE0\xB8\x81", 3));
+    EXPECT_EQ(buf[0], 0xE0);
+    EXPECT_EQ(buf[1], 0xB8);
+    EXPECT_EQ(buf[2], 0x81);
 
     i = 0;
     u_set_char(buf, &i, 0x1F914);
     EXPECT_EQ(i, 4);
-    EXPECT_TRUE(mem_equal(buf, "\xF0\x9F\xA4\x94", 4));
+    EXPECT_EQ(buf[0], 0xF0);
+    EXPECT_EQ(buf[1], 0x9F);
+    EXPECT_EQ(buf[2], 0xA4);
+    EXPECT_EQ(buf[3], 0x94);
 
     i = 0;
     u_set_char(buf, &i, 0x10FFFF);
     EXPECT_EQ(i, 4);
-    // Note: string separated to prevent "-Wtrigraphs" warning
-    EXPECT_TRUE(mem_equal(buf, "<" "?" "?" ">", 4));
+    EXPECT_EQ(buf[0], '<');
+    EXPECT_EQ(buf[1], '?');
+    EXPECT_EQ(buf[2], '?');
+    EXPECT_EQ(buf[3], '>');
 
     i = 0;
     u_set_char(buf, &i, '\0');
     EXPECT_EQ(i, 2);
-    EXPECT_TRUE(mem_equal(buf, "^@", 2));
+    EXPECT_EQ(buf[0], '^');
+    EXPECT_EQ(buf[1], '@');
 
     i = 0;
     u_set_char(buf, &i, '\t');
     EXPECT_EQ(i, 2);
-    EXPECT_TRUE(mem_equal(buf, "^I", 2));
+    EXPECT_EQ(buf[0], '^');
+    EXPECT_EQ(buf[1], 'I');
 
     i = 0;
     u_set_char(buf, &i, 0x1F);
     EXPECT_EQ(i, 2);
-    EXPECT_TRUE(mem_equal(buf, "^_", 2));
+    EXPECT_EQ(buf[0], '^');
+    EXPECT_EQ(buf[1], '_');
 
     i = 0;
     u_set_char(buf, &i, 0x7F);
     EXPECT_EQ(i, 2);
-    EXPECT_TRUE(mem_equal(buf, "^?", 2));
+    EXPECT_EQ(buf[0], '^');
+    EXPECT_EQ(buf[1], '?');
 
     i = 0;
     u_set_char(buf, &i, 0x80);
     EXPECT_EQ(i, 4);
-    EXPECT_TRUE(mem_equal(buf, "<" "?" "?" ">", 4));
+    EXPECT_EQ(buf[0], '<');
+    EXPECT_EQ(buf[1], '?');
+    EXPECT_EQ(buf[2], '?');
+    EXPECT_EQ(buf[3], '>');
 
     i = 0;
     u_set_char(buf, &i, 0x7E);
     EXPECT_EQ(i, 1);
-    EXPECT_TRUE(mem_equal(buf, "~", 1));
+    EXPECT_EQ(buf[0], '~');
 
     i = 0;
     u_set_char(buf, &i, 0x20);
     EXPECT_EQ(i, 1);
-    EXPECT_TRUE(mem_equal(buf, " ", 1));
+    EXPECT_EQ(buf[0], ' ');
 }
 
 static void test_u_prev_char(void)
