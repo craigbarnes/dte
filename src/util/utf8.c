@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "utf8.h"
 #include "ascii.h"
+#include "debug.h"
 #include "macros.h"
 
 enum {
@@ -195,8 +196,8 @@ void u_set_char_raw(char *str, size_t *idx, CodePoint u)
 void u_set_char(char *str, size_t *idx, CodePoint u)
 {
     size_t i = *idx;
-    if (u <= 0x7f) {
-        if (ascii_iscntrl(u)) {
+    if (likely(u <= 0x7F)) {
+        if (unlikely(ascii_iscntrl(u))) {
             // Use caret notation for control chars:
             str[i++] = '^';
             u = (u + 64) & 0x7F;
@@ -205,21 +206,9 @@ void u_set_char(char *str, size_t *idx, CodePoint u)
         *idx = i;
     } else if (u_is_unprintable(u)) {
         u_set_hex(str, idx, u);
-    } else if (u <= 0x7ff) {
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xc0;
-        *idx = i + 2;
-    } else if (u <= 0xffff) {
-        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xe0;
-        *idx = i + 3;
-    } else if (u <= 0x10ffff) {
-        str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xf0;
-        *idx = i + 4;
+    } else {
+        BUG_ON(u > 0x10FFFF); // (implied by !u_is_unprintable(u))
+        u_set_char_raw(str, idx, u);
     }
 }
 
