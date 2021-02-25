@@ -233,8 +233,8 @@ bool term_put_char(CodePoint u)
     }
 
     obuf_need_space(8);
-    if (u < 0x80) {
-        if (!ascii_iscntrl(u)) {
+    if (likely(u < 0x80)) {
+        if (likely(!ascii_iscntrl(u))) {
             obuf.buf[obuf.count++] = u;
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {

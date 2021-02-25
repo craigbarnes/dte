@@ -36,8 +36,8 @@ void view_update_cursor_x(View *v)
     while (idx < v->cx) {
         CodePoint u = line.data[idx++];
         c++;
-        if (u < 0x80) {
-            if (!ascii_iscntrl(u)) {
+        if (likely(u < 0x80)) {
+            if (likely(!ascii_iscntrl(u))) {
                 w++;
             } else if (u == '\t') {
                 w = (w + tw) / tw * tw;

@@ -35,8 +35,8 @@ void move_to_preferred_x(long preferred_x)
     size_t i = 0;
     while (x < view->preferred_x && i < line.length) {
         CodePoint u = line.data[i++];
-        if (u < 0x80) {
-            if (!ascii_iscntrl(u)) {
+        if (likely(u < 0x80)) {
+            if (likely(!ascii_iscntrl(u))) {
                 x++;
             } else if (u == '\t') {
                 x = (x + tw) / tw * tw;

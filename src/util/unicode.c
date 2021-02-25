@@ -107,8 +107,8 @@ static bool u_is_double_width(CodePoint u)
 
 unsigned int u_char_width(CodePoint u)
 {
-    if (u < 0x80) {
-        if (ascii_iscntrl(u)) {
+    if (likely(u < 0x80)) {
+        if (unlikely(ascii_iscntrl(u))) {
             return 2; // Rendered in caret notation (e.g. ^@)
         }
         return 1;

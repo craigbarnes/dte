@@ -71,7 +71,7 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
 {
     size_t i = *idx;
     unsigned char ch = buf[--i];
-    if (ch < 0x80) {
+    if (likely(ch < 0x80)) {
         *idx = i;
         return (CodePoint)ch;
     }
@@ -116,7 +116,7 @@ CodePoint u_str_get_char(const unsigned char *str, size_t *idx)
 {
     size_t i = *idx;
     CodePoint u = str[i];
-    if (u < 0x80) {
+    if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
     }
@@ -127,7 +127,7 @@ CodePoint u_get_char(const unsigned char *buf, size_t size, size_t *idx)
 {
     size_t i = *idx;
     CodePoint u = buf[i];
-    if (u < 0x80) {
+    if (likely(u < 0x80)) {
         *idx = i + 1;
         return u;
     }

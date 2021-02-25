@@ -119,7 +119,7 @@ size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 
     // Note: this block can't be empty
     *up = bi->blk->data[offset];
-    if (*up < 0x80) {
+    if (likely(*up < 0x80)) {
         bi->offset++;
         return 1;
     }
@@ -142,7 +142,7 @@ size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
 
     // Note: this block can't be empty
     *up = bi->blk->data[offset - 1];
-    if (*up < 0x80) {
+    if (likely(*up < 0x80)) {
         bi->offset--;
         return 1;
     }
