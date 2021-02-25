@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include "winsize.h"
 
-#if defined(HAVE_IOCTL_WINSIZE)
+#if defined(HAVE_TIOCGWINSZ)
 
 #include <sys/ioctl.h>
 
