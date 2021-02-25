@@ -83,7 +83,7 @@ check-opts: $(dte)
 	$(Q) test/check-opts.sh './$<' '$(VERSION)'
 
 installcheck: install
-	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte)'
+	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte) -V'
 	$(Q) '$(DESTDIR)$(bindir)/$(dte)' -V >/dev/null
 
 tags:
