@@ -3,7 +3,6 @@
 #include "utf8.h"
 #include "ascii.h"
 #include "debug.h"
-#include "macros.h"
 
 enum {
     I = -1, // Invalid byte
@@ -167,29 +166,30 @@ invalid:
 
 void u_set_char_raw(char *str, size_t *idx, CodePoint u)
 {
-    size_t i = *idx;
-    if (u <= 0x7f) {
-        str[i] = u;
-        *idx = i + 1;
-    } else if (u <= 0x7ff) {
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xc0;
-        *idx = i + 2;
-    } else if (u <= 0xffff) {
-        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xe0;
-        *idx = i + 3;
-    } else if (u <= 0x10ffff) {
-        str[i + 3] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 2] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 1] = (u & 0x3f) | 0x80; u >>= 6;
-        str[i + 0] = u | 0xf0;
-        *idx = i + 4;
-    } else {
-        // Invalid byte value
-        str[i] = u & 0xff;
-        *idx = i + 1;
+    static const uint8_t prefixes[] = {0, 0, 0xC0, 0xE0, 0xF0};
+    const size_t len = u_char_size(u);
+    const uint8_t first_byte_prefix = prefixes[len];
+    const size_t i = *idx;
+
+    switch (len) {
+    case 4:
+        str[i + 3] = (u & 0x3F) | 0x80;
+        u >>= 6;
+        // Fallthrough
+    case 3:
+        str[i + 2] = (u & 0x3F) | 0x80;
+        u >>= 6;
+        // Fallthrough
+    case 2:
+        str[i + 1] = (u & 0x3F) | 0x80;
+        u >>= 6;
+        // Fallthrough
+    case 1:
+        str[i] = (u & 0xFF) | first_byte_prefix;
+        *idx = i + len;
+        break;
+    default:
+        BUG("unexpected UTF-8 sequence length: %zu", len);
     }
 }
 

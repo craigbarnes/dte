@@ -2,11 +2,12 @@
 #define UTIL_UTF8_H
 
 #include <stddef.h>
+#include "macros.h"
 #include "unicode.h"
 
 static inline size_t u_char_size(CodePoint u)
 {
-    if (u <= 0x7f) {
+    if (likely(u <= 0x7f)) {
         return 1;
     } else if (u <= 0x7ff) {
         return 2;
