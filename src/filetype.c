@@ -304,7 +304,7 @@ String dump_ft(void)
     String s = string_new(4096);
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
-        string_append_cstring(&s, "ft ");
+        string_append_literal(&s, "ft ");
         if (ft->type != FT_EXTENSION) {
             string_append_cstring(&s, flags[ft->type]);
         }

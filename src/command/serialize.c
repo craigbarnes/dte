@@ -67,7 +67,7 @@ dquote:
             string_append_byte(s, '\\');
             string_append_byte(s, escmap[ch]);
         } else if (unlikely(ascii_iscntrl(ch))) {
-            string_append_cstring(s, "\\x");
+            string_append_literal(s, "\\x");
             string_append_byte(s, hexmap[(ch >> 4) & 15]);
             string_append_byte(s, hexmap[ch & 15]);
         } else {

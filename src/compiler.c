@@ -92,9 +92,9 @@ static void append_compiler(String *s, const Compiler *c, const char *name)
 {
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         ErrorFormat *e = c->error_formats.ptrs[i];
-        string_append_cstring(s, "errorfmt ");
+        string_append_literal(s, "errorfmt ");
         if (e->ignore) {
-            string_append_cstring(s, "-i ");
+            string_append_literal(s, "-i ");
         }
 
         string_append_escaped_arg(s, name, true);

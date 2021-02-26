@@ -18,7 +18,7 @@ static void merge_insert_buffer(void)
         return;
     }
     String s = string_new(32 + len);
-    string_append_cstring(&s, "insert -km ");
+    string_append_literal(&s, "insert -km ");
     string_append_escaped_arg_sv(&s, string_view(insert_buffer.buffer, len), true);
     string_clear(&insert_buffer);
     ptr_array_append(&macro, string_steal_cstring(&s));
@@ -104,7 +104,7 @@ void macro_insert_text_hook(const char *text, size_t size)
         return;
     }
     String buf = string_new(512);
-    string_append_cstring(&buf, "insert -m ");
+    string_append_literal(&buf, "insert -m ");
     string_append_escaped_arg_sv(&buf, string_view(text, size), true);
     merge_insert_buffer();
     ptr_array_append(&macro, string_steal_cstring(&buf));
