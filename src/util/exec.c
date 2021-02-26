@@ -123,13 +123,16 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
         }
     }
 
-    // Unignore SIGINT and SIGQUIT (see exec(3p))
+    // Reset ignored signals to SIG_DFL (see exec(3p))
     struct sigaction act;
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_handler = SIG_DFL;
     sigaction(SIGINT, &act, NULL);
     sigaction(SIGQUIT, &act, NULL);
+    sigaction(SIGPIPE, &act, NULL);
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
 
     execvp(argv[0], argv);
 
