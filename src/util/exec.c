@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "exec.h"
+#include "debug.h"
 #include "xreadwrite.h"
 
 static bool close_on_exec(int fd, bool cloexec)
@@ -48,7 +49,7 @@ static int xdup3(int oldfd, int newfd, int flags)
     } while (unlikely(fd < 0 && errno == EINTR));
     return fd;
 #else
-    if (oldfd == newfd) {
+    if (unlikely(oldfd == newfd)) {
         // Replicate dup3() behaviour:
         errno = EINVAL;
         return -1;
@@ -64,7 +65,7 @@ static int xdup3(int oldfd, int newfd, int flags)
 #endif
 }
 
-static void handle_child(char **argv, const char **env, int fd[3], int error_fd)
+static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd)
 {
     int error;
     int nr_fds = 3;
@@ -140,36 +141,40 @@ error:
 
 pid_t fork_exec(char **argv, const char **env, int fd[3])
 {
-    int error = 0;
     int ep[2];
-
     if (!pipe_close_on_exec(ep)) {
         return -1;
     }
 
     const pid_t pid = fork();
-    if (pid < 0) {
-        error = errno;
+    if (unlikely(pid < 0)) {
+        const int saved_errno = errno;
         xclose(ep[0]);
         xclose(ep[1]);
-        errno = error;
+        errno = saved_errno;
         return pid;
     }
-    if (!pid) {
+
+    if (pid == 0) {
+        // Child
         handle_child(argv, env, fd, ep[1]);
+        BUG("handle_child() should never return");
     }
 
+    // Parent
     xclose(ep[1]);
+    int error = 0;
     const ssize_t rc = read(ep[0], &error, sizeof(error));
+    const int saved_errno = errno;
+    xclose(ep[0]);
+
     if (rc > 0 && rc != sizeof(error)) {
         error = EPIPE;
     }
     if (rc < 0) {
-        error = errno;
+        error = saved_errno;
     }
-    xclose(ep[0]);
-
-    if (!rc) {
+    if (rc == 0) {
         // Child exec was successful
         return pid;
     }
@@ -191,19 +196,24 @@ int wait_child(pid_t pid)
         }
         return -errno;
     }
+
     if (WIFEXITED(status)) {
         return WEXITSTATUS(status) & 0xFF;
     }
+
     if (WIFSIGNALED(status)) {
         return WTERMSIG(status) << 8;
     }
+
     if (WIFSTOPPED(status)) {
         return WSTOPSIG(status) << 8;
     }
+
 #if defined(WIFCONTINUED)
     if (WIFCONTINUED(status)) {
         return SIGCONT << 8;
     }
 #endif
+
     return -EINVAL;
 }
