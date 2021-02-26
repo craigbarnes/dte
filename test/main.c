@@ -1,22 +1,14 @@
-#include <langinfo.h>
 #include <limits.h>
-#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include "test.h"
-#include "bind.h"
-#include "block.h"
-#include "buffer.h"
-#include "commands.h"
 #include "editor.h"
-#include "regexp.h"
+#include "syntax/syntax.h"
 #include "util/path.h"
-#include "util/str-util.h"
-#include "util/xmalloc.h"
 
 void init_headless_mode(void);
+extern const TestGroup bind_tests;
 extern const TestGroup cmdline_tests;
 extern const TestGroup command_tests;
 extern const TestGroup config_tests;
@@ -28,34 +20,6 @@ extern const TestGroup option_tests;
 extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
 extern const TestGroup util_tests;
-
-static void test_handle_binding(void)
-{
-    handle_command(&commands, "bind ^A 'insert zzz'; open", false);
-
-    // Bound command should be cached
-    const KeyBinding *binding = lookup_binding(MOD_CTRL | 'A');
-    const Command *insert = find_normal_command("insert");
-    ASSERT_NONNULL(binding);
-    ASSERT_NONNULL(insert);
-    EXPECT_PTREQ(binding->cmd, insert);
-    EXPECT_EQ(binding->a.nr_flags, 0);
-    EXPECT_EQ(binding->a.nr_args, 1);
-    EXPECT_STREQ(binding->a.args[0], "zzz");
-    EXPECT_NULL(binding->a.args[1]);
-
-    handle_binding(MOD_CTRL | 'A');
-    const Block *block = BLOCK(buffer->blocks.next);
-    ASSERT_NONNULL(block);
-    ASSERT_EQ(block->size, 4);
-    EXPECT_EQ(block->nl, 1);
-    EXPECT_TRUE(mem_equal(block->data, "zzz\n", 4));
-    EXPECT_TRUE(undo());
-    EXPECT_EQ(block->size, 0);
-    EXPECT_EQ(block->nl, 0);
-    EXPECT_FALSE(undo());
-    handle_command(&commands, "close", false);
-}
 
 static void test_posix_sanity(void)
 {
@@ -81,7 +45,7 @@ static void test_posix_sanity(void)
     UNIGNORE_WARNINGS
 }
 
-static void init_test_environment(void)
+static void test_init(void)
 {
     char *home = path_absolute("build/test/HOME");
     char *dte_home = path_absolute("build/test/DTE_HOME");
@@ -121,19 +85,24 @@ static void run_tests(const TestGroup *g)
         t->func();
         unsigned int f = failed - prev_failed;
         unsigned int p = passed - prev_passed;
+        fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, p);
         if (unlikely(f > 0)) {
-            fprintf(stderr, "   CHECK  %-35s  %4u passed %4u FAILED\n", t->name, p, f);
-        } else {
-            fprintf(stderr, "   CHECK  %-35s  %4u passed\n", t->name, p);
+            fprintf(stderr, " %4u FAILED", f);
         }
+        fputc('\n', stderr);
     }
 }
 
+static const TestEntry tests[] = {
+    TEST(test_posix_sanity),
+    TEST(test_init),
+};
+
+const TestGroup init_tests = TEST_GROUP(tests);
+
 int main(void)
 {
-    test_posix_sanity();
-    init_test_environment();
-
+    run_tests(&init_tests);
     run_tests(&command_tests);
     run_tests(&option_tests);
     run_tests(&editorconfig_tests);
@@ -147,7 +116,7 @@ int main(void)
 
     init_headless_mode();
     run_tests(&config_tests);
-    test_handle_binding();
+    run_tests(&bind_tests);
     free_syntaxes();
 
     fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", passed, failed);

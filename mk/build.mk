@@ -61,7 +61,7 @@ editor_objects := $(call prefix-obj, build/, \
     $(util_objects)
 
 test_objects := $(call prefix-obj, build/test/, \
-    cmdline command config editorconfig encoding filetype history \
+    bind cmdline command config editorconfig encoding filetype history \
     main options syntax terminal test util )
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
