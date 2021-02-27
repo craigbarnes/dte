@@ -212,6 +212,7 @@ static const char *format_misc_status(const Window *win)
         case CSS_AUTO:
             return "[case-sensitive = auto]";
         }
+        BUG("unhandled case sensitivity type");
         return NULL;
     }
 
@@ -231,9 +232,11 @@ static const char *format_misc_status(const Window *win)
         xsnprintf(buf, sizeof(buf), "[%zu lines]", get_nr_selected_lines(&si));
         return buf;
     case SELECT_NONE:
+        // Already handled above
         break;
     }
 
+    BUG("unhandled selection type");
     return NULL;
 }
 

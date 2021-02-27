@@ -15,7 +15,7 @@ WARNINGS = \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
 
-# These options are only used if $CC appears to support them
+# These options are only used if $(CC) appears to support them
 WARNINGS_EXTRA = \
     -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
