@@ -4,17 +4,23 @@ LDFLAGS ?=
 AWK = awk
 VERSION = $(shell mk/version.sh 1.9.1)
 
+# These options are used unconditionally, since they've been supported
+# by GCC since at least the minimum required version (GCC 4.6).
+# <https://gcc.gnu.org/onlinedocs/gcc-4.6.4/gcc/Warning-Options.html>
 WARNINGS = \
-    -Wall -Wextra -Wformat -Wformat-security \
-    -Wmissing-prototypes -Wstrict-prototypes -Wswitch-enum \
-    -Wold-style-definition -Wwrite-strings -Wundef -Wshadow \
+    -Wall -Wextra -Wformat -Wformat-security -Wformat-nonliteral \
+    -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings \
+    -Wundef -Wshadow -Wcast-align -Wredundant-decls -Wswitch-enum \
+    -Wvla -Wold-style-definition -Wframe-larger-than=32768 \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
 
+# These options are only used if $CC appears to support them
 WARNINGS_EXTRA = \
-    -Wformat-signedness -Wformat-truncation -Wformat-overflow \
+    -Walloca -Walloc-zero -Wnull-dereference -Wformat-signedness \
     -Wstringop-truncation -Wstringop-overflow -Wshift-overflow=2 \
-    -Wframe-larger-than=32768 -Wvla -Wcast-align -Wcast-align=strict
+    -Wcast-align=strict -Wduplicated-branches -Wduplicated-cond \
+    -Wlogical-op
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c config css d diff docker dte gitcommit gitrebase go html \
