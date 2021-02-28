@@ -116,7 +116,7 @@ unsigned int u_char_width(CodePoint u)
         return 0;
     } else if (u_is_unprintable(u)) {
         return 4; // Rendered as <xx>
-    } else if (u < 0x1100U) {
+    } else if (u < 0x1100) {
         return 1;
     } else if (u_is_double_width(u)) {
         return 2;
