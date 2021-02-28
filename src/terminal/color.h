@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include "util/macros.h"
 
-#define COLOR_FLAG_RGB INT32_C(0x01000000)
 #define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))
 
 typedef enum {
@@ -35,7 +34,11 @@ enum {
     COLOR_LIGHTBLUE = 12,
     COLOR_LIGHTMAGENTA = 13,
     COLOR_LIGHTCYAN = 14,
-    COLOR_WHITE = 15
+    COLOR_WHITE = 15,
+
+    // This bit flag is used to allow 24-bit RGB colors to be differentiated
+    // from basic colors (e.g. #000004 vs. COLOR_BLUE).
+    COLOR_FLAG_RGB = INT32_C(1) << 24
 };
 
 enum {
