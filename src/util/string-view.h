@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "ascii.h"
+#include "debug.h"
 #include "macros.h"
 
 // A non-owning, length-bounded "view" into another string, similar to
@@ -142,6 +143,13 @@ static inline void strview_trim_right(StringView *sv)
         n--;
     }
     sv->length = n;
+}
+
+static inline void strview_remove_prefix(StringView *sv, size_t len)
+{
+    BUG_ON(len > sv->length);
+    sv->data += len;
+    sv->length -= len;
 }
 
 #endif
