@@ -94,7 +94,6 @@ static void do_sigaction(int sig, const struct sigaction *action)
 }
 
 // Signals not handled by this function:
-// * SIGURG, SIGCHLD (already ignored by default)
 // * SIGKILL, SIGSTOP (can't be caught or ignored)
 // * SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
 // * SIGABRT (cleanup is done before calling abort())
@@ -110,6 +109,11 @@ static void set_signal_handlers(void)
     static const int ignored_signals[] = {
         SIGINT, SIGQUIT, SIGPIPE,
         SIGUSR1, SIGUSR2,
+    };
+
+    static const int default_signals[] = {
+        SIGCHLD, SIGURG,
+        SIGTTIN, SIGTTOU,
     };
 
     static const struct {
@@ -135,6 +139,11 @@ static void set_signal_handlers(void)
     action.sa_handler = SIG_IGN;
     for (size_t i = 0; i < ARRAY_COUNT(ignored_signals); i++) {
         do_sigaction(ignored_signals[i], &action);
+    }
+
+    action.sa_handler = SIG_DFL;
+    for (size_t i = 0; i < ARRAY_COUNT(default_signals); i++) {
+        do_sigaction(default_signals[i], &action);
     }
 
     sigemptyset(&action.sa_mask);
