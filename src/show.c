@@ -236,26 +236,26 @@ static String dump_search_history(void)
 }
 
 typedef struct {
-    const char name[12];
+    const char name[11];
+    bool dumps_dterc_syntax;
     void (*show)(const char *name, bool cmdline);
     String (*dump)(void);
     void (*complete_arg)(const char *prefix);
-    bool dumps_dterc_syntax;
 } ShowHandler;
 
 static const ShowHandler handlers[] = {
-    {"alias", show_alias, dump_aliases, collect_aliases, true},
-    {"bind", show_binding, dump_bindings, collect_bound_keys, true},
-    {"color", show_color, dump_hl_colors, collect_hl_colors, true},
-    {"command", NULL, dump_command_history, NULL, true},
-    {"env", show_env, dump_env, collect_env, false},
-    {"errorfmt", show_compiler, dump_compilers, collect_compilers, true},
-    {"ft", NULL, dump_ft, NULL, true},
-    {"include", show_include, dump_builtin_configs, collect_builtin_configs, false},
-    {"macro", NULL, dump_macro, NULL, true},
-    {"option", show_option, dump_options, collect_options, true},
-    {"search", NULL, dump_search_history, NULL, false},
-    {"wsplit", show_wsplit, dump_frames, NULL, false},
+    {"alias", true, show_alias, dump_aliases, collect_aliases},
+    {"bind", true, show_binding, dump_bindings, collect_bound_keys},
+    {"color", true, show_color, dump_hl_colors, collect_hl_colors},
+    {"command", true, NULL, dump_command_history, NULL},
+    {"env", false, show_env, dump_env, collect_env},
+    {"errorfmt", true, show_compiler, dump_compilers, collect_compilers},
+    {"ft", true, NULL, dump_ft, NULL},
+    {"include", false, show_include, dump_builtin_configs, collect_builtin_configs},
+    {"macro", true, NULL, dump_macro, NULL},
+    {"option", true, show_option, dump_options, collect_options},
+    {"search", false, NULL, dump_search_history, NULL},
+    {"wsplit", false, show_wsplit, dump_frames, NULL},
 };
 
 UNITTEST {
