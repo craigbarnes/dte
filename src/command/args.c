@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "args.h"
 #include "error.h"
-#include "util/ascii.h"
 #include "util/str-util.h"
 
 /*
