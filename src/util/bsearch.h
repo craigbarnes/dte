@@ -66,9 +66,11 @@ static inline void check_bsearch_array (
 
     for (size_t i = 0; i < array_length; i++) {
         const char *curr_name = first_name + (i * array_element_size);
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
         if (curr_name[0] == '\0') {
             BUG("Empty string at %s[%zu]%s", array_name, i, name_field_name);
         }
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
         if (curr_name[name_size - 1] != '\0') {
             BUG("String sentinel missing from %s[%zu]%s", array_name, i, name_field_name);
         }
