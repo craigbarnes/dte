@@ -335,15 +335,15 @@ static void test_base64(void)
     EXPECT_EQ(base64_decode(0x00), BASE64_INVALID);
     EXPECT_EQ(base64_decode(0xFF), BASE64_INVALID);
 
-    for (unsigned char i = 'A'; i <= 'Z'; i++) {
+    for (unsigned int i = 'A'; i <= 'Z'; i++) {
         IEXPECT_EQ(base64_decode(i), i - 'A');
     }
 
-    for (unsigned char i = 'a'; i <= 'z'; i++) {
+    for (unsigned int i = 'a'; i <= 'z'; i++) {
         IEXPECT_EQ(base64_decode(i), (i - 'a') + 26);
     }
 
-    for (unsigned char i = '0'; i <= '9'; i++) {
+    for (unsigned int i = '0'; i <= '9'; i++) {
         IEXPECT_EQ(base64_decode(i), (i - '0') + 52);
     }
 

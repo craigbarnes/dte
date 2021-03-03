@@ -82,7 +82,7 @@ static TermColor **highlight_line (
 ) {
     static TermColor **colors;
     static size_t alloc;
-    const char *const line = line_sv->data;
+    const unsigned char *const line = line_sv->data;
     const size_t len = line_sv->length;
     size_t i = 0;
     ssize_t sidx = -1;

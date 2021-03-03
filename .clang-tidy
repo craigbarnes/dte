@@ -19,3 +19,4 @@ Checks: >
     -readability-uppercase-literal-suffix,
     -readability-else-after-return,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+    -misc-no-recursion,

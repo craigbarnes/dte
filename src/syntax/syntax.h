@@ -51,7 +51,7 @@ typedef union {
     size_t recolor_len;
     struct {
         uint8_t len;
-        char buf[31];
+        unsigned char buf[31];
     } str;
 } ConditionData;
 
