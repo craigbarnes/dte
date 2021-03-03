@@ -227,8 +227,8 @@ static void test_parse_args(void)
     EXPECT_TRUE(cmdargs_has_flag(&a, 'g'));
     EXPECT_TRUE(cmdargs_has_flag(&a, 'e'));
     EXPECT_FALSE(cmdargs_has_flag(&a, 'f'));
-    EXPECT_FALSE(cmdargs_has_flag(&a, '\0'));
-    EXPECT_FALSE(cmdargs_has_flag(&a, '\xFF'));
+    EXPECT_FALSE(cmdargs_has_flag(&a, 'E'));
+    EXPECT_FALSE(cmdargs_has_flag(&a, '0'));
     EXPECT_EQ(a.nr_flag_args, 1);
     EXPECT_STREQ(a.args[0], "UTF-8");
     EXPECT_EQ(a.nr_args, 3);
@@ -385,26 +385,12 @@ static void test_cmdargs_flagset_idx(void)
     EXPECT_EQ(cmdargs_flagset_idx('0'), 53);
     EXPECT_EQ(cmdargs_flagset_idx('1'), 54);
     EXPECT_EQ(cmdargs_flagset_idx('9'), 62);
-    EXPECT_EQ(cmdargs_flagset_idx('+'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('/'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('='), 0);
-    EXPECT_EQ(cmdargs_flagset_idx(':'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('@'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('['), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('_'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('`'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('{'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('\0'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('\x7F'), 0);
-    EXPECT_EQ(cmdargs_flagset_idx('\xFF'), 0);
 
-    for (unsigned char c = 0; c < 255; c++) {
-        const unsigned int idx = cmdargs_flagset_idx(c);
-        EXPECT_TRUE(idx < 63);
+    for (unsigned char c = '0', z = 'z'; c <= z; c++) {
         if (ascii_isalnum(c)) {
+            const unsigned int idx = cmdargs_flagset_idx(c);
+            EXPECT_TRUE(idx < 63);
             EXPECT_EQ(idx, base64_decode(c) + 1);
-        } else {
-            EXPECT_EQ(idx, 0);
         }
     }
 }

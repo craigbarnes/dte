@@ -53,7 +53,6 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
                 return ARGERR_INVALID_OPTION | (flag << 8);
             }
 
-            BUG_ON(!ascii_isalnum(flag));
             a->flag_set |= UINT64_C(1) << cmdargs_flagset_idx(flag);
             a->flags[nr_flags++] = flag;
             if (unlikely(nr_flags == ARRAY_COUNT(a->flags))) {

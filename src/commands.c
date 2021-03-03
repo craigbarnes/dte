@@ -2237,10 +2237,11 @@ UNITTEST {
         // Count number of real flags (i.e. not including '-' or '=')
         size_t nr_real_flags = 0;
         for (size_t j = (flags[0] == '-' ? 1 : 0); flags[j]; j++) {
-            if (ascii_isalnum(flags[j])) {
+            unsigned char flag = flags[j];
+            if (ascii_isalnum(flag)) {
                 nr_real_flags++;
-            } else {
-                BUG_ON(flags[j] != '=');
+            } else if (flag != '=') {
+                BUG("invalid command flag: 0x%02hhX", flag);
             }
         }
 
