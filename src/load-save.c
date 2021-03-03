@@ -145,6 +145,39 @@ static int xmadvise_sequential(void *addr, size_t len)
 #endif
 }
 
+static void update_file_info(Buffer *b, const struct stat *st)
+{
+    b->file = (FileInfo) {
+        .size = st->st_size,
+        .mode = st->st_mode,
+        .gid = st->st_gid,
+        .uid = st->st_uid,
+        .dev = st->st_dev,
+        .ino = st->st_ino,
+        .mtime = st->st_mtime,
+    };
+}
+
+static bool buffer_stat(Buffer *b, const char *filename)
+{
+    struct stat st;
+    if (stat(filename, &st) != 0) {
+        return false;
+    }
+    update_file_info(b, &st);
+    return true;
+}
+
+static bool buffer_fstat(Buffer *b, int fd)
+{
+    struct stat st;
+    if (fstat(fd, &st) != 0) {
+        return false;
+    }
+    update_file_info(b, &st);
+    return true;
+}
+
 bool read_blocks(Buffer *b, int fd)
 {
     const size_t map_size = 64 * 1024;

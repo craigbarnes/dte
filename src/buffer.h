@@ -89,8 +89,6 @@ void set_display_filename(Buffer *b, char *name) NONNULL_ARG(1);
 char *short_filename(const char *absolute) XSTRDUP;
 void update_short_filename_cwd(Buffer *b, const char *cwd) NONNULL_ARG(1);
 void update_short_filename(Buffer *b) NONNULL_ARGS;
-bool buffer_stat(Buffer *b, const char *filename) NONNULL_ARGS;
-bool buffer_fstat(Buffer *b, int fd) NONNULL_ARGS;
 Buffer *find_buffer(const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(unsigned long id);
 Buffer *buffer_new(const Encoding *encoding) RETURNS_NONNULL;

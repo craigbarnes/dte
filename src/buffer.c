@@ -140,39 +140,6 @@ void free_buffer(Buffer *b)
     free(b);
 }
 
-static void update_file_info(Buffer *b, const struct stat *st)
-{
-    b->file = (FileInfo) {
-        .size = st->st_size,
-        .mode = st->st_mode,
-        .gid = st->st_gid,
-        .uid = st->st_uid,
-        .dev = st->st_dev,
-        .ino = st->st_ino,
-        .mtime = st->st_mtime,
-    };
-}
-
-bool buffer_stat(Buffer *b, const char *filename)
-{
-    struct stat st;
-    if (stat(filename, &st) != 0) {
-        return false;
-    }
-    update_file_info(b, &st);
-    return true;
-}
-
-bool buffer_fstat(Buffer *b, int fd)
-{
-    struct stat st;
-    if (fstat(fd, &st) != 0) {
-        return false;
-    }
-    update_file_info(b, &st);
-    return true;
-}
-
 static bool same_file(const Buffer *b, const struct stat *st)
 {
     return (st->st_dev == b->file.dev) && (st->st_ino == b->file.ino);
