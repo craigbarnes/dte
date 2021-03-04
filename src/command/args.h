@@ -24,6 +24,9 @@ typedef unsigned int ArgParseError;
 // for use as bitset indices in CommandArgs::flag_set
 static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
 {
+    // We use base64_decode() here simply because it does a similar byte
+    // mapping to the one we want and allows us to share the lookup table.
+    // There's no "real" base64 encoding involved.
     unsigned int idx = base64_decode(flag) + 1;
     BUG_ON(idx > 62);
     return idx;
