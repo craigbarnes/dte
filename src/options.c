@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "options.h"
 #include "buffer.h"
 #include "command/serialize.h"
@@ -29,11 +32,11 @@ typedef enum {
 } OptionType;
 
 typedef struct {
-    const struct OptionOps *ops;
     const char name[22];
-    bool local;
-    bool global;
-    unsigned int offset;
+    uint_least16_t offset : 14;
+    uint_least16_t local : 1;
+    uint_least16_t global : 1;
+    const struct OptionOps *ops;
     union {
         struct {
             // Optional
@@ -489,12 +492,12 @@ static const OptionDesc option_desc[] = {
 
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
-    return (char*)opt + desc->offset;
+    return (char*)opt + (size_t)desc->offset;
 }
 
 static char *global_ptr(const OptionDesc *desc)
 {
-    return (char*)&editor.options + desc->offset;
+    return (char*)&editor.options + (size_t)desc->offset;
 }
 
 UNITTEST {
