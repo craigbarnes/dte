@@ -277,6 +277,13 @@
     #define static_assert_incompatible_types(a, b)
 #endif
 
+#if defined(HAS_STATIC_ASSERT) && defined(HAS_TYPEOF)
+    #define static_assert_offsetof(obj, field, offset) \
+        static_assert(offsetof(__typeof__(obj), field) == offset)
+#else
+    #define static_assert_offsetof(obj, field, offset)
+#endif
+
 #if GNUC_AT_LEAST(4, 2) || defined(__clang__)
     #define DISABLE_WARNING(wflag) DO_PRAGMA(GCC diagnostic ignored wflag)
 #else

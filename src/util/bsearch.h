@@ -14,35 +14,24 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 #define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 #define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
 
-#if DEBUG >= 1 && defined(HAS_TYPEOF)
-    #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
-        static_assert_incompatible_types(a[0].field, const char*); \
-        static_assert_incompatible_types(a[0].field, char*); \
-        static_assert_compatible_types(a[0].field[0], char); \
-        check_bsearch_array ( \
-            a, #a, \
-            "." #field, \
-            ARRAY_COUNT(a), \
-            sizeof(a[0]), \
-            offsetof(__typeof__(*a), field), \
-            sizeof(a[0].field), \
-            cmp \
-        ); \
-    } while (0)
-#else
-    #define CHECK_BSEARCH_ARRAY(arr, field, cmp)
-#endif
+#define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
+    static_assert_offsetof(a[0], field, 0); \
+    static_assert_incompatible_types(a[0].field, const char*); \
+    static_assert_incompatible_types(a[0].field, char*); \
+    static_assert_compatible_types(a[0].field[0], char); \
+    check_bsearch_array ( \
+        a, #a, "." #field, ARRAY_COUNT(a), sizeof(a[0]), sizeof(a[0].field), cmp \
+    ); \
+} while (0)
 
-#if DEBUG >= 1
-    #define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
-        static_assert_incompatible_types(a[0], const char*); \
-        static_assert_incompatible_types(a[0], char*); \
-        static_assert_compatible_types(a[0][0], char); \
-        check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), 0, sizeof(a[0]), cmp); \
-    } while (0)
-#else
-    #define CHECK_BSEARCH_STR_ARRAY(arr, cmp)
-#endif
+#define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
+    static_assert_incompatible_types(a[0], const char*); \
+    static_assert_incompatible_types(a[0], char*); \
+    static_assert_compatible_types(a[0][0], char); \
+    check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), sizeof(a[0]), cmp); \
+} while (0)
+
+IGNORE_WARNING("-Wunused-parameter")
 
 static inline void check_bsearch_array (
     const void *array_base,
@@ -50,10 +39,10 @@ static inline void check_bsearch_array (
     const char *name_field_name,
     size_t array_length,
     size_t array_element_size,
-    size_t name_offset,
     size_t name_size,
     StringCompareFunction cmp
 ) {
+#if DEBUG >= 1
     BUG_ON(!array_base);
     BUG_ON(!array_name);
     BUG_ON(!name_field_name);
@@ -62,7 +51,7 @@ static inline void check_bsearch_array (
     BUG_ON(array_element_size == 0);
     BUG_ON(name_size == 0);
 
-    const char *first_name = (const char*)array_base + name_offset;
+    const char *first_name = array_base;
 
     for (size_t i = 0; i < array_length; i++) {
         const char *curr_name = first_name + (i * array_element_size);
@@ -89,7 +78,10 @@ static inline void check_bsearch_array (
             );
         }
     }
+#endif
 }
+
+UNIGNORE_WARNINGS
 
 // Like bsearch(3), but returning the index of the element instead of
 // a pointer to it (or -1 if not found)
