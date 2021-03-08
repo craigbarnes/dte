@@ -429,13 +429,7 @@ static const struct {
 
 static const char *const bool_enum[] = {"false", "true", NULL};
 static const char *const newline_enum[] = {"unix", "dos", NULL};
-
-static const char *const case_sensitive_search_enum[] = {
-    "false",
-    "true",
-    "auto",
-    NULL
-};
+static const char *const tristate_enum[] = {"false", "true", "auto", NULL};
 
 static const char *const detect_indent_values[] = {
     "1", "2", "3", "4", "5", "6", "7", "8",
@@ -457,7 +451,7 @@ static const char *const ws_error_values[] = {
 static const OptionDesc option_desc[] = {
     BOOL_OPT("auto-indent", C(auto_indent), NULL),
     BOOL_OPT("brace-indent", L(brace_indent), NULL),
-    ENUM_OPT("case-sensitive-search", G(case_sensitive_search), case_sensitive_search_enum, NULL),
+    ENUM_OPT("case-sensitive-search", G(case_sensitive_search), tristate_enum, NULL),
     FLAG_OPT("detect-indent", C(detect_indent), detect_indent_values, NULL),
     BOOL_OPT("display-invisible", G(display_invisible), redraw_screen),
     BOOL_OPT("display-special", G(display_special), redraw_screen),
@@ -489,12 +483,12 @@ static const OptionDesc option_desc[] = {
 
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
-    return (char*)opt + (size_t)desc->offset;
+    return (char*)opt + desc->offset;
 }
 
 static char *global_ptr(const OptionDesc *desc)
 {
-    return (char*)&editor.options + (size_t)desc->offset;
+    return (char*)&editor.options + desc->offset;
 }
 
 UNITTEST {
@@ -786,12 +780,8 @@ void collect_option_values(const char *option, const char *prefix)
     }
 
     if (prefix[0] == '\0') {
-        char *ptr;
-        if (desc->local) {
-            ptr = local_ptr(desc, &buffer->options);
-        } else {
-            ptr = global_ptr(desc);
-        }
+        bool local = desc->local;
+        char *ptr = local ? local_ptr(desc, &buffer->options) : global_ptr(desc);
         OptionValue value = desc_get(desc, ptr);
         add_completion(xstrdup(desc_string(desc, value)));
         return;
