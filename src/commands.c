@@ -1632,7 +1632,7 @@ static void cmd_search(const CommandArgs *a)
     do_selection(SELECT_NONE);
 
     if (pattern) {
-        search_set_direction(dir);
+        set_search_direction(dir);
         search_set_regexp(pattern);
         if (w) {
             search_next_word();
@@ -1648,7 +1648,7 @@ static void cmd_search(const CommandArgs *a)
         search_prev();
     } else {
         set_input_mode(INPUT_SEARCH);
-        search_set_direction(dir);
+        set_search_direction(dir);
     }
 }
 

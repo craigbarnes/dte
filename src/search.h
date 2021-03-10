@@ -17,16 +17,16 @@ typedef enum {
     REPLACE_CANCEL = 1 << 4,
 } ReplaceFlags;
 
-bool search_tag(const char *pattern, bool *err);
+SearchDirection get_search_direction(void) PURE;
+void set_search_direction(SearchDirection dir);
+void toggle_search_direction(void);
 
-void search_set_direction(SearchDirection dir);
-SearchDirection current_search_direction(void) PURE;
+bool search_tag(const char *pattern, bool *err);
 void search_set_regexp(const char *pattern);
 void search_prev(void);
 void search_next(void);
 void search_next_word(void);
 
-NONNULL_ARGS
-void reg_replace(const char *pattern, const char *format, ReplaceFlags flags);
+void reg_replace(const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
 
 #endif

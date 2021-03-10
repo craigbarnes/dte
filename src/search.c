@@ -10,7 +10,12 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
-#define MAX_SUBSTRINGS 32
+static struct {
+    regex_t regex;
+    char *pattern;
+    SearchDirection direction;
+    int re_flags; // If zero, regex hasn't been compiled
+} current_search;
 
 static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
 {
@@ -132,23 +137,19 @@ bool search_tag(const char *pattern, bool *err)
     return found;
 }
 
-static struct {
-    regex_t regex;
-    char *pattern;
-    SearchDirection direction;
-
-    // If zero then regex hasn't been compiled
-    int re_flags;
-} current_search;
-
-void search_set_direction(SearchDirection dir)
+void set_search_direction(SearchDirection dir)
 {
     current_search.direction = dir;
 }
 
-SearchDirection current_search_direction(void)
+SearchDirection get_search_direction(void)
 {
     return current_search.direction;
+}
+
+void toggle_search_direction(void)
+{
+    current_search.direction ^= 1;
 }
 
 static void free_regex(void)
@@ -311,6 +312,10 @@ static unsigned int replace_on_line (
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
+    enum {
+        MAX_SUBSTRINGS = 32
+    };
+
     unsigned char *buf = (unsigned char *)line->data;
     ReplaceFlags flags = *flagsp;
     regmatch_t m[MAX_SUBSTRINGS];

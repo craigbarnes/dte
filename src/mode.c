@@ -126,7 +126,7 @@ static void search_mode_keypress(KeyCode key)
         editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
         return;
     case MOD_META | 'r':
-        search_set_direction(current_search_direction() ^ 1);
+        toggle_search_direction();
         return;
     case '\t':
         return;
