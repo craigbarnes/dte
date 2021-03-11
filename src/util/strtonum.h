@@ -6,9 +6,15 @@
 #include <stdint.h>
 #include "macros.h"
 
-static inline int hex_decode(unsigned char c)
+enum {
+    HEX_INVALID = 0xF0,
+};
+
+// Decodes a single, hexadecimal digit and returns a numerical value
+// between 0-15, or HEX_INVALID for invalid digits
+static inline unsigned int hex_decode(unsigned char c)
 {
-    extern const int8_t hex_table[256];
+    extern const uint8_t hex_table[256];
     return hex_table[c];
 }
 

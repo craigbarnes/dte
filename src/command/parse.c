@@ -30,20 +30,20 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
 
 static size_t unicode_escape(const char *str, size_t count, String *buf)
 {
-    if (count == 0) {
+    if (unlikely(count == 0)) {
         return 0;
     }
 
     CodePoint u = 0;
     size_t i;
     for (i = 0; i < count; i++) {
-        int x = hex_decode(str[i]);
-        if (x < 0) {
+        unsigned int x = hex_decode(str[i]);
+        if (unlikely(x > 0xF)) {
             break;
         }
         u = u << 4 | x;
     }
-    if (u_is_unicode(u)) {
+    if (likely(u_is_unicode(u))) {
         string_append_codepoint(buf, u);
     }
     return i;
@@ -75,10 +75,10 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
                 break;
             case 'x':
                 if (pos < len) {
-                    const int x1 = hex_decode(cmd[pos]);
-                    if (x1 >= 0 && ++pos < len) {
-                        const int x2 = hex_decode(cmd[pos]);
-                        if (x2 >= 0) {
+                    unsigned int x1 = hex_decode(cmd[pos]);
+                    if (x1 <= 0xF && ++pos < len) {
+                        unsigned int x2 = hex_decode(cmd[pos]);
+                        if (x2 <= 0xF) {
                             pos++;
                             ch = x1 << 4 | x2;
                             break;

@@ -115,15 +115,15 @@ static void test_hex_decode(void)
     EXPECT_EQ(hex_decode('A'), 10);
     EXPECT_EQ(hex_decode('f'), 15);
     EXPECT_EQ(hex_decode('F'), 15);
-    EXPECT_EQ(hex_decode('g'), -1);
-    EXPECT_EQ(hex_decode('G'), -1);
-    EXPECT_EQ(hex_decode('@'), -1);
-    EXPECT_EQ(hex_decode('/'), -1);
-    EXPECT_EQ(hex_decode(':'), -1);
-    EXPECT_EQ(hex_decode(' '), -1);
-    EXPECT_EQ(hex_decode('~'), -1);
-    EXPECT_EQ(hex_decode('\0'), -1);
-    EXPECT_EQ(hex_decode(0xFF), -1);
+    EXPECT_EQ(hex_decode('g'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('G'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('@'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('/'), HEX_INVALID);
+    EXPECT_EQ(hex_decode(':'), HEX_INVALID);
+    EXPECT_EQ(hex_decode(' '), HEX_INVALID);
+    EXPECT_EQ(hex_decode('~'), HEX_INVALID);
+    EXPECT_EQ(hex_decode('\0'), HEX_INVALID);
+    EXPECT_EQ(hex_decode(0xFF), HEX_INVALID);
 }
 
 static void test_ascii(void)
@@ -303,7 +303,7 @@ static void test_ascii(void)
         EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
-        EXPECT_EQ(hex_decode(i) != -1, !!isxdigit(i));
+        EXPECT_EQ(hex_decode(i) <= 0xF, !!isxdigit(i));
         EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha(i) || i == '_');
         EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
         if (i != '\v' && i != '\f') {

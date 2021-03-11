@@ -69,8 +69,8 @@ static int32_t parse_rrggbb(const char *str)
 {
     int32_t color = 0;
     for (size_t i = 0; i < 6; i++) {
-        int32_t digit = hex_decode(str[i]);
-        if (unlikely(digit < 0)) {
+        unsigned int digit = hex_decode(str[i]);
+        if (unlikely(digit > 0xF)) {
             return COLOR_INVALID;
         }
         color = (color << 4) | digit;
