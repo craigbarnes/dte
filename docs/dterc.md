@@ -822,7 +822,22 @@ Insert _text_ into the buffer.
 Replace all instances of text matching _pattern_ with the _replacement_
 text.
 
-The _pattern_ is a POSIX extended [`regex`].
+The _pattern_ argument is a POSIX extended [`regex`].
+
+The _replacement_ argument is treated like a template and may contain
+several, special substitutions:
+
+* Backslash sequences `\1` through `\9` are replaced by sub-strings
+  that were "captured" (via parentheses) in the _pattern_.
+* The special character `&` is replaced by the full string that was
+  matched by _pattern_.
+* Literal `\` and `&` characters can be inserted in _replacement_
+  by escaping them (as `\\` and `\&`).
+* All other characters in _replacement_ represent themselves.
+
+Note: extra care must be taken when using [double quotes] for the
+_pattern_ argument, since double quoted arguments have their own
+(higher precedence) backslash sequences.
 
 `-b`
 :   Use basic instead of extended regex syntax
@@ -835,6 +850,12 @@ The _pattern_ is a POSIX extended [`regex`].
 
 `-i`
 :   Ignore case
+
+Examples:
+
+    replace 'Hello World' '& (Hallo Welt)'
+    replace "[ \t]+$" ''
+    replace -cg '([^ ]+) +([^ ]+)' '\2 \1'
 
 ### **shift** _count_
 
@@ -1345,6 +1366,7 @@ errors should be highlighted. Set to `""` to disable.
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`xterm`]: https://invisible-island.net/xterm/
 [`ctags`]: https://ctags.io/
+[double quotes]: #double-quoted-strings
 
 [`alias`]: #alias
 [`bind`]: #bind
