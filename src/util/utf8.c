@@ -81,9 +81,7 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
     }
 
     CodePoint u = ch & 0x3f;
-    unsigned int count = 1;
-    unsigned int shift = 6;
-    while (i) {
+    for (unsigned int count = 1, shift = 6; i > 0; ) {
         ch = buf[--i];
         unsigned int len = u_seq_len(ch);
         count++;
@@ -106,6 +104,7 @@ CodePoint u_prev_char(const unsigned char *buf, size_t *idx)
             return u;
         }
     }
+
 invalid:
     *idx = *idx - 1;
     u = buf[*idx];
