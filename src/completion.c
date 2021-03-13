@@ -274,6 +274,16 @@ static void collect_completions(char **args, size_t argc)
         } else {
             collect_option_values(a.args[a.nr_args - 1], completion.parsed);
         }
+    } else if (strview_equal_cstring(&cmd_name, "setenv")) {
+        if (a.nr_args == 0) {
+            collect_env(completion.parsed);
+        } else if (a.nr_args == 1 && completion.parsed[0] == '\0') {
+            BUG_ON(!a.args[0]);
+            const char *value = getenv(a.args[0]);
+            if (value) {
+                add_completion(xstrdup(value));
+            }
+        }
     } else if (strview_equal_cstring(&cmd_name, "toggle")) {
         if (a.nr_args == 0) {
             bool global = cmdargs_has_flag(&a, 'g');
