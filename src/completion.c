@@ -202,7 +202,10 @@ static void collect_completions(char **args, size_t argc)
     char **args_copy = copy_string_array(args + 1, argc - 1);
     CommandArgs a = {.args = args_copy};
     ArgParseError err = do_parse_args(cmd, &a);
-    if (err != 0 && err != ARGERR_TOO_FEW_ARGUMENTS) {
+    if (
+        (err != 0 && err != ARGERR_TOO_FEW_ARGUMENTS)
+        || (a.nr_args >= cmd->max_args && cmd->max_args != 0xFF)
+    ) {
         goto out;
     }
 
@@ -276,6 +279,19 @@ static void collect_completions(char **args, size_t argc)
     } else if (strview_equal_cstring(&cmd_name, "compile")) {
         if (a.nr_args == 0) {
             collect_compilers(completion.parsed);
+        }
+    } else if (strview_equal_cstring(&cmd_name, "errorfmt")) {
+        static const char names[][8] = {
+            "file", "line", "column", "message", "_"
+        };
+        if (a.nr_args == 0) {
+            collect_compilers(completion.parsed);
+        } else if (a.nr_args >= 2 && !cmdargs_has_flag(&a, 'i')) {
+            for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
+                if (str_has_prefix(names[i], completion.parsed)) {
+                    add_completion(xstrdup(names[i]));
+                }
+            }
         }
     } else if (strview_equal_cstring(&cmd_name, "show")) {
         if (a.nr_args == 0) {
