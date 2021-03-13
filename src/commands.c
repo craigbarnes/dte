@@ -2009,7 +2009,7 @@ static void cmd_wsplit(const CommandArgs *a)
     bool empty = temporary || has_flag(a, 'n');
 
     if (empty && a->nr_args > 0) {
-        error_msg("flags -e and -t can't be used with filename arguments");
+        error_msg("flags -n and -t can't be used with filename arguments");
         return;
     }
 
