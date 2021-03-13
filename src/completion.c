@@ -208,14 +208,20 @@ static void collect_completions(char **args, size_t argc)
     const StringView cmd_name = strview_from_cstring(args[0]);
 
     if (
-        strview_equal_cstring(&cmd_name, "open")
-        || strview_equal_cstring(&cmd_name, "wsplit")
-        || strview_equal_cstring(&cmd_name, "save")
+        strview_equal_cstring(&cmd_name, "save")
         || strview_equal_cstring(&cmd_name, "run")
         || strview_equal_cstring(&cmd_name, "pipe-from")
         || strview_equal_cstring(&cmd_name, "pipe-to")
     ) {
         collect_files(false);
+    } else if (strview_equal_cstring(&cmd_name, "open")) {
+        if (!cmdargs_has_flag(&a, 't')) {
+            collect_files(false);
+        }
+    } else if (strview_equal_cstring(&cmd_name, "wsplit")) {
+        if (!cmdargs_has_flag(&a, 't') && !cmdargs_has_flag(&a, 'n')) {
+            collect_files(false);
+        }
     } else if (strview_equal_cstring(&cmd_name, "cd")) {
         collect_files(true);
     } else if (strview_equal_cstring(&cmd_name, "include")) {
