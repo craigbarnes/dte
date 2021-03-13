@@ -187,6 +187,15 @@ static void collect_files(bool directories_only)
     }
 }
 
+static void collect_str(const char *const strs[], size_t n, const char *prefix)
+{
+    for (size_t i = 0; i < n; i++) {
+        if (str_has_prefix(strs[i], prefix)) {
+            add_completion(xstrdup(strs[i]));
+        }
+    }
+}
+
 static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
@@ -282,17 +291,13 @@ static void collect_completions(char **args, size_t argc)
             collect_compilers(completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "errorfmt")) {
-        static const char names[][8] = {
+        static const char *const names[] = {
             "file", "line", "column", "message", "_"
         };
         if (a.nr_args == 0) {
             collect_compilers(completion.parsed);
         } else if (a.nr_args >= 2 && !cmdargs_has_flag(&a, 'i')) {
-            for (size_t i = 0; i < ARRAY_COUNT(names); i++) {
-                if (str_has_prefix(names[i], completion.parsed)) {
-                    add_completion(xstrdup(names[i]));
-                }
-            }
+            collect_str(names, ARRAY_COUNT(names), completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "repeat")) {
         if (a.nr_args == 1) {
@@ -308,15 +313,11 @@ static void collect_completions(char **args, size_t argc)
             collect_show_subcommand_args(a.args[0], completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "macro")) {
-        static const char verbs[][8] = {
+        static const char *const verbs[] = {
             "record", "stop", "toggle", "cancel", "play"
         };
         if (a.nr_args == 0) {
-            for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
-                if (str_has_prefix(verbs[i], completion.parsed)) {
-                    add_completion(xstrdup(verbs[i]));
-                }
-            }
+            collect_str(verbs, ARRAY_COUNT(verbs), completion.parsed);
         }
     }
 
