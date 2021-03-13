@@ -12,6 +12,7 @@
 #include "compiler.h"
 #include "config.h"
 #include "editor.h"
+#include "filetype.h"
 #include "options.h"
 #include "show.h"
 #include "syntax/color.h"
@@ -232,11 +233,25 @@ static void collect_completions(char **args, size_t argc)
                 collect_files(false);
             }
         }
+    } else if (strview_equal_cstring(&cmd_name, "ft")) {
+        if (a.nr_args == 0) {
+            collect_ft(completion.parsed);
+        }
     } else if (strview_equal_cstring(&cmd_name, "hi")) {
         if (a.nr_args == 0) {
             collect_hl_colors(completion.parsed);
         } else {
             collect_colors_and_attributes(completion.parsed);
+        }
+    } else if (strview_equal_cstring(&cmd_name, "option")) {
+        if (a.nr_args == 0) {
+            if (!cmdargs_has_flag(&a, 'r')) {
+                collect_ft(completion.parsed);
+            }
+        } else if (a.nr_args & 1) {
+            collect_auto_options(completion.parsed);
+        } else {
+            collect_option_values(a.args[a.nr_args - 1], completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "set")) {
         if ((a.nr_args + 1) & 1) {

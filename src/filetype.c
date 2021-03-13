@@ -1,6 +1,7 @@
 #include <string.h>
 #include "filetype.h"
 #include "command/serialize.h"
+#include "completion.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
@@ -290,6 +291,23 @@ bool is_ft(const char *name)
     }
 
     return false;
+}
+
+void collect_ft(const char *prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
+        const char *name = builtin_filetype_names[i];
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
+    for (size_t i = 0, n = filetypes.count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+        const char *name = ft_get_name(ft);
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
 }
 
 String dump_ft(void)

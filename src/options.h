@@ -95,6 +95,7 @@ void toggle_option(const char *name, bool global, bool verbose);
 void toggle_option_values(const char *name, bool global, bool verbose, char **values, size_t count);
 bool validate_local_options(char **strs);
 void collect_options(const char *prefix, bool local, bool global);
+void collect_auto_options(const char *prefix);
 void collect_toggleable_options(const char *prefix, bool global);
 void collect_option_values(const char *option, const char *prefix);
 String dump_options(void);

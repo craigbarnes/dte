@@ -763,6 +763,20 @@ void collect_options(const char *prefix, bool local, bool global)
     }
 }
 
+// Collect options that can be set via the "option" command
+void collect_auto_options(const char *prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+        const OptionDesc *desc = &option_desc[i];
+        if (!desc->local || desc->on_change == filetype_changed) {
+            continue;
+        }
+        if (str_has_prefix(desc->name, prefix)) {
+            add_completion(xstrdup(desc->name));
+        }
+    }
+}
+
 void collect_toggleable_options(const char *prefix, bool global)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
