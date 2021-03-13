@@ -191,6 +191,7 @@ static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
         collect_normal_commands(completion.parsed);
+        collect_aliases(completion.parsed);
         return;
     }
 
@@ -292,6 +293,12 @@ static void collect_completions(char **args, size_t argc)
                     add_completion(xstrdup(names[i]));
                 }
             }
+        }
+    } else if (strview_equal_cstring(&cmd_name, "repeat")) {
+        if (a.nr_args == 1) {
+            collect_normal_commands(completion.parsed);
+        } else if (a.nr_args >= 2) {
+            collect_completions(args + 2, argc - 2);
         }
     } else if (strview_equal_cstring(&cmd_name, "show")) {
         if (a.nr_args == 0) {

@@ -2223,7 +2223,6 @@ void collect_normal_commands(const char *prefix)
             add_completion(xstrdup(c->name));
         }
     }
-    collect_aliases(prefix);
 }
 
 UNITTEST {
