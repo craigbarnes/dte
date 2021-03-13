@@ -4,6 +4,7 @@
 #include "alias.h"
 #include "bind.h"
 #include "cmdline.h"
+#include "command/args.h"
 #include "command/env.h"
 #include "command/parse.h"
 #include "command/serialize.h"
@@ -217,9 +218,17 @@ static void collect_completions(char **args, size_t argc)
     }
 
     const Command *cmd = find_normal_command(args[0]);
-    if (!cmd) {
+    if (!cmd || cmd->max_args == 0) {
         return;
     }
+
+    char **args_copy = copy_string_array(args + 1, argc - 1);
+    CommandArgs a = {.args = args_copy};
+    ArgParseError err = do_parse_args(cmd, &a);
+    if (err != 0 && err != ARGERR_TOO_FEW_ARGUMENTS) {
+        goto out;
+    }
+
     const StringView cmd_name = strview_from_cstring(args[0]);
 
     if (
@@ -231,13 +240,9 @@ static void collect_completions(char **args, size_t argc)
         || strview_equal_cstring(&cmd_name, "pipe-to")
     ) {
         collect_files(false);
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "cd")) {
+    } else if (strview_equal_cstring(&cmd_name, "cd")) {
         collect_files(true);
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "include")) {
+    } else if (strview_equal_cstring(&cmd_name, "include")) {
         switch (argc) {
         case 1:
             collect_files(false);
@@ -248,9 +253,7 @@ static void collect_completions(char **args, size_t argc)
             }
             break;
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "hi")) {
+    } else if (strview_equal_cstring(&cmd_name, "hi")) {
         switch (argc) {
         case 1:
             collect_hl_colors(completion.parsed);
@@ -259,34 +262,31 @@ static void collect_completions(char **args, size_t argc)
             collect_colors_and_attributes(completion.parsed);
             break;
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "set")) {
-        if (argc % 2) {
-            collect_options(completion.parsed);
+    } else if (strview_equal_cstring(&cmd_name, "set")) {
+        if ((a.nr_args + 1) & 1) {
+            bool local = cmdargs_has_flag(&a, 'l');
+            bool global = cmdargs_has_flag(&a, 'g');
+            collect_options(completion.parsed, local, global);
         } else {
-            collect_option_values(args[argc - 1], completion.parsed);
+            collect_option_values(a.args[a.nr_args - 1], completion.parsed);
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "toggle") && argc == 1) {
-        collect_toggleable_options(completion.parsed);
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "tag") && argc == 1) {
-        TagFile *tf = load_tag_file();
-        if (tf) {
-            collect_tags(tf, completion.parsed);
+    } else if (strview_equal_cstring(&cmd_name, "toggle")) {
+        if (a.nr_args == 0) {
+            bool global = cmdargs_has_flag(&a, 'g');
+            collect_toggleable_options(completion.parsed, global);
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "compile")) {
+    } else if (strview_equal_cstring(&cmd_name, "tag")) {
+        if (a.nr_args == 0 && !cmdargs_has_flag(&a, 'r')) {
+            TagFile *tf = load_tag_file();
+            if (tf) {
+                collect_tags(tf, completion.parsed);
+            }
+        }
+    } else if (strview_equal_cstring(&cmd_name, "compile")) {
         if (get_nonflag_argc(args, argc) == 1) {
             collect_compilers(completion.parsed);
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "show")) {
+    } else if (strview_equal_cstring(&cmd_name, "show")) {
         const size_t nonflag_argc = get_nonflag_argc(args, argc);
         if (nonflag_argc == 1) {
             collect_show_subcommands(completion.parsed);
@@ -295,9 +295,7 @@ static void collect_completions(char **args, size_t argc)
             BUG_ON(!arg1);
             collect_show_subcommand_args(arg1, completion.parsed);
         }
-        return;
-    }
-    if (strview_equal_cstring(&cmd_name, "macro")) {
+    } else if (strview_equal_cstring(&cmd_name, "macro")) {
         static const char verbs[][8] = {
             "record", "stop", "toggle", "cancel", "play"
         };
@@ -308,8 +306,10 @@ static void collect_completions(char **args, size_t argc)
                 }
             }
         }
-        return;
     }
+
+out:
+    free_string_array(args_copy);
 }
 
 static void init_completion(void)

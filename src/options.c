@@ -750,20 +750,26 @@ bool validate_local_options(char **strs)
     return !invalid;
 }
 
-void collect_options(const char *prefix)
+void collect_options(const char *prefix, bool local, bool global)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
+        if ((local && !desc->local) || (global && !desc->global)) {
+            continue;
+        }
         if (str_has_prefix(desc->name, prefix)) {
             add_completion(xstrdup(desc->name));
         }
     }
 }
 
-void collect_toggleable_options(const char *prefix)
+void collect_toggleable_options(const char *prefix, bool global)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
+        if (global && !desc->global) {
+            continue;
+        }
         OptionType type = desc->type;
         bool toggleable = (type == OPT_ENUM || type == OPT_BOOL);
         if (toggleable && str_has_prefix(desc->name, prefix)) {

@@ -192,6 +192,11 @@ static void show_option(const char *name, bool cflag)
     }
 }
 
+static void collect_all_options(const char *prefix)
+{
+    collect_options(prefix, false, false);
+}
+
 static void show_wsplit(const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
@@ -253,7 +258,7 @@ static const ShowHandler handlers[] = {
     {"ft", true, NULL, dump_ft, NULL},
     {"include", false, show_include, dump_builtin_configs, collect_builtin_configs},
     {"macro", true, NULL, dump_macro, NULL},
-    {"option", true, show_option, dump_options, collect_options},
+    {"option", true, show_option, dump_options, collect_all_options},
     {"search", false, NULL, dump_search_history, NULL},
     {"wsplit", false, show_wsplit, dump_frames, NULL},
 };
