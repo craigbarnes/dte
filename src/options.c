@@ -727,27 +727,27 @@ void toggle_option_values (
 
 bool validate_local_options(char **strs)
 {
-    bool valid = true;
+    size_t invalid = 0;
     for (size_t i = 0; strs[i]; i += 2) {
         const char *name = strs[i];
         const char *value = strs[i + 1];
         const OptionDesc *desc = must_find_option(name);
-        if (!desc) {
-            valid = false;
-        } else if (!desc->local) {
-            error_msg("Option %s is not local", name);
-            valid = false;
-        } else if (streq(name, "filetype")) {
+        if (unlikely(!desc)) {
+            invalid++;
+        } else if (unlikely(!desc->local)) {
+            error_msg("%s is not local", name);
+            invalid++;
+        } else if (unlikely(desc->on_change == filetype_changed)) {
             error_msg("filetype cannot be set via option command");
-            valid = false;
+            invalid++;
         } else {
             OptionValue val;
-            if (!desc_parse(desc, value, &val)) {
-                valid = false;
+            if (unlikely(!desc_parse(desc, value, &val))) {
+                invalid++;
             }
         }
     }
-    return valid;
+    return !invalid;
 }
 
 void collect_options(const char *prefix)
