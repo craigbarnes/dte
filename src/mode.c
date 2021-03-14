@@ -106,22 +106,27 @@ static void search_mode_keypress(KeyCode key)
             free(original);
         }
         // Fallthrough
-    case KEY_ENTER:
+    case KEY_ENTER: {
+        const char *args[3] = {NULL, NULL, NULL};
         if (editor.cmdline.buf.len > 0) {
             const char *str = string_borrow_cstring(&editor.cmdline.buf);
             search_set_regexp(str);
-            search_next();
             history_add(&editor.search_history, str);
-            const char *args[] = {str, NULL};
-            macro_command_hook("search", (char**)args);
+            if (unlikely(str[0] == '-')) {
+                args[0] = "--";
+                args[1] = str;
+            } else {
+                args[0] = str;
+            }
         } else {
-            search_next();
-            const char *args[] = {"-n", NULL};
-            macro_command_hook("search", (char**)args);
+            args[0] = "-n";
         }
+        search_next();
+        macro_command_hook("search", (char**)args);
         cmdline_clear(&editor.cmdline);
         set_input_mode(INPUT_NORMAL);
         return;
+    }
     case MOD_META | 'c':
         editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
         return;
