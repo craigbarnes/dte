@@ -20,7 +20,7 @@ static void merge_insert_buffer(void)
     String s = string_new(32 + len);
     StringView ibuf = strview_from_string(&insert_buffer);
     string_append_literal(&s, "insert -km ");
-    if (unlikely(strview_has_prefix(&ibuf, "--"))) {
+    if (unlikely(strview_has_prefix(&ibuf, "-"))) {
         string_append_literal(&s, "-- ");
     }
     string_append_escaped_arg_sv(&s, ibuf, true);
@@ -110,7 +110,7 @@ void macro_insert_text_hook(const char *text, size_t size)
     String buf = string_new(512);
     StringView sv = string_view(text, size);
     string_append_literal(&buf, "insert -m ");
-    if (unlikely(strview_has_prefix(&sv, "--"))) {
+    if (unlikely(strview_has_prefix(&sv, "-"))) {
         string_append_literal(&buf, "-- ");
     }
     string_append_escaped_arg_sv(&buf, sv, true);
