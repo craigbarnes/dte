@@ -36,6 +36,11 @@ static inline NONNULL_ARGS void string_clear(String *s)
     s->len = 0;
 }
 
+static inline StringView strview_from_string(const String *s)
+{
+    return string_view(s->buffer, s->len);
+}
+
 void string_free(String *s) NONNULL_ARGS;
 void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;

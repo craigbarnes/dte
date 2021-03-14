@@ -18,8 +18,12 @@ static void merge_insert_buffer(void)
         return;
     }
     String s = string_new(32 + len);
+    StringView ibuf = strview_from_string(&insert_buffer);
     string_append_literal(&s, "insert -km ");
-    string_append_escaped_arg_sv(&s, string_view(insert_buffer.buffer, len), true);
+    if (unlikely(strview_has_prefix(&ibuf, "--"))) {
+        string_append_literal(&s, "-- ");
+    }
+    string_append_escaped_arg_sv(&s, ibuf, true);
     string_clear(&insert_buffer);
     ptr_array_append(&macro, string_steal_cstring(&s));
 }
@@ -104,8 +108,12 @@ void macro_insert_text_hook(const char *text, size_t size)
         return;
     }
     String buf = string_new(512);
+    StringView sv = string_view(text, size);
     string_append_literal(&buf, "insert -m ");
-    string_append_escaped_arg_sv(&buf, string_view(text, size), true);
+    if (unlikely(strview_has_prefix(&sv, "--"))) {
+        string_append_literal(&buf, "-- ");
+    }
+    string_append_escaped_arg_sv(&buf, sv, true);
     merge_insert_buffer();
     ptr_array_append(&macro, string_steal_cstring(&buf));
 }
