@@ -322,11 +322,17 @@ String dump_ft(void)
     String s = string_new(4096);
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
+        const char *name = ft_get_name(ft);
+        FileDetectionType type = ft->type;
+        BUG_ON(type >= ARRAY_COUNT(flags));
         string_append_literal(&s, "ft ");
-        if (ft->type != FT_EXTENSION) {
-            string_append_cstring(&s, flags[ft->type]);
+        if (type != FT_EXTENSION) {
+            string_append_cstring(&s, flags[type]);
         }
-        string_append_escaped_arg(&s, ft_get_name(ft), true);
+        if (unlikely(name[0] == '-')) {
+            string_append_cstring(&s, "-- ");
+        }
+        string_append_escaped_arg(&s, name, true);
         string_append_byte(&s, ' ');
         string_append_escaped_arg(&s, ft_get_str(ft), true);
         string_append_byte(&s, '\n');

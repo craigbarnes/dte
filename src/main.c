@@ -464,6 +464,9 @@ loop_break:
     if (tag) {
         String s = string_new(8 + strlen(tag));
         string_append_literal(&s, "tag ");
+        if (unlikely(tag[0] == '-')) {
+            string_append_literal(&s, "-- ");
+        }
         string_append_escaped_arg(&s, tag, true);
         handle_command(&commands, string_borrow_cstring(&s), false);
         string_free(&s);

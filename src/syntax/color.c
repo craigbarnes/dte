@@ -109,6 +109,9 @@ static void append_color(String *s, const char *name, const TermColor *color)
     string_append_literal(s, "hi ");
     string_append_escaped_arg(s, name, true);
     string_append_byte(s, ' ');
+    if (unlikely(name[0] == '-')) {
+        string_append_literal(s, "-- ");
+    }
     string_append_cstring(s, term_color_to_string(color));
     string_append_byte(s, '\n');
 }

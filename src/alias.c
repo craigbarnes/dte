@@ -72,8 +72,12 @@ String dump_aliases(void)
     // Serialize the aliases in sorted order
     String buf = string_new(4096);
     for (size_t i = 0; i < count; i++) {
+        const char *name = array[i].name;
         string_append_literal(&buf, "alias ");
-        string_append_escaped_arg(&buf, array[i].name, true);
+        if (unlikely(name[0] == '-')) {
+            string_append_literal(&buf, "-- ");
+        }
+        string_append_escaped_arg(&buf, name, true);
         string_append_byte(&buf, ' ');
         string_append_escaped_arg(&buf, array[i].value, true);
         string_append_byte(&buf, '\n');

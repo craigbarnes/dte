@@ -96,7 +96,9 @@ static void append_compiler(String *s, const Compiler *c, const char *name)
         if (e->ignore) {
             string_append_literal(s, "-i ");
         }
-
+        if (unlikely(name[0] == '-' || e->pattern[0] == '-')) {
+            string_append_literal(s, "-- ");
+        }
         string_append_escaped_arg(s, name, true);
         string_append_byte(s, ' ');
         string_append_escaped_arg(s, e->pattern, true);

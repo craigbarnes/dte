@@ -482,6 +482,9 @@ static void cmd_exec_tag(const CommandArgs *a)
 
     String s = string_new(tag_len + 16);
     string_append_literal(&s, "tag ");
+    if (unlikely(tag[0] == '-')) {
+        string_append_literal(&s, "-- ");
+    }
     string_append_escaped_arg_sv(&s, string_view(tag, tag_len), true);
     string_free(&ctx.output);
     handle_command(&commands, string_borrow_cstring(&s), true);
