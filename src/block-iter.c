@@ -20,9 +20,8 @@ void block_iter_normalize(BlockIter *bi)
 size_t block_iter_eat_line(BlockIter *bi)
 {
     block_iter_normalize(bi);
-
     const size_t offset = bi->offset;
-    if (offset == bi->blk->size) {
+    if (unlikely(offset == bi->blk->size)) {
         return 0;
     }
 
@@ -47,9 +46,8 @@ size_t block_iter_eat_line(BlockIter *bi)
 size_t block_iter_next_line(BlockIter *bi)
 {
     block_iter_normalize(bi);
-
     const size_t offset = bi->offset;
-    if (offset == bi->blk->size) {
+    if (unlikely(offset == bi->blk->size)) {
         return 0;
     }
 
@@ -111,8 +109,8 @@ size_t block_iter_get_char(const BlockIter *bi, CodePoint *up)
 size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
-    if (offset == bi->blk->size) {
-        if (bi->blk->node.next == bi->head) {
+    if (unlikely(offset == bi->blk->size)) {
+        if (unlikely(bi->blk->node.next == bi->head)) {
             return 0;
         }
         bi->blk = BLOCK(bi->blk->node.next);
@@ -133,9 +131,8 @@ size_t block_iter_next_char(BlockIter *bi, CodePoint *up)
 size_t block_iter_prev_char(BlockIter *bi, CodePoint *up)
 {
     size_t offset = bi->offset;
-
-    if (!offset) {
-        if (bi->blk->node.prev == bi->head) {
+    if (unlikely(offset == 0)) {
+        if (unlikely(bi->blk->node.prev == bi->head)) {
             return 0;
         }
         bi->blk = BLOCK(bi->blk->node.prev);
@@ -177,9 +174,8 @@ size_t block_iter_prev_column(BlockIter *bi)
 size_t block_iter_bol(BlockIter *bi)
 {
     block_iter_normalize(bi);
-
     size_t offset = bi->offset;
-    if (!offset || offset == bi->blk->size) {
+    if (offset == 0 || offset == bi->blk->size) {
         return 0;
     }
 
@@ -201,7 +197,7 @@ size_t block_iter_eol(BlockIter *bi)
     block_iter_normalize(bi);
     const Block *blk = bi->blk;
     const size_t offset = bi->offset;
-    if (offset == blk->size) {
+    if (unlikely(offset == blk->size)) {
         // Cursor at end of last block
         return 0;
     }
@@ -296,13 +292,11 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
     while (pos < len) {
         const size_t avail = blk->size - offset;
         size_t count = len - pos;
-
         if (count > avail) {
             count = avail;
         }
         memcpy(buf + pos, blk->data + offset, count);
         pos += count;
-
         BUG_ON(pos < len && blk->node.next == bi->head);
         blk = BLOCK(blk->node.next);
         offset = 0;
@@ -317,7 +311,7 @@ void fill_line_ref(BlockIter *bi, StringView *line)
     block_iter_normalize(bi);
     line->data = bi->blk->data + bi->offset;
     const size_t max = bi->blk->size - bi->offset;
-    if (max == 0) {
+    if (unlikely(max == 0)) {
         // Cursor at end of last block
         line->length = 0;
         return;
@@ -336,7 +330,7 @@ void fill_line_nl_ref(BlockIter *bi, StringView *line)
     block_iter_normalize(bi);
     line->data = bi->blk->data + bi->offset;
     const size_t max = bi->blk->size - bi->offset;
-    if (max == 0) {
+    if (unlikely(max == 0)) {
         // Cursor at end of last block
         line->length = 0;
         return;
