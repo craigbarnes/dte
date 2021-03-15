@@ -352,21 +352,10 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
     }
 
     const char *const *values = d->u.flag_opt.values;
-    const char *ptr = str;
     unsigned int flags = 0;
 
-    while (*ptr) {
-        const char *end = strchr(ptr, ',');
-        size_t len;
-        if (end) {
-            len = end - ptr;
-            end++;
-        } else {
-            len = strlen(ptr);
-            end = ptr + len;
-        }
-        const StringView flag = string_view(ptr, len);
-        ptr = end;
+    for (size_t pos = 0, len = strlen(str); pos < len; ) {
+        const StringView flag = get_delim(str, &pos, len, ',');
         size_t i;
         for (i = 0; values[i]; i++) {
             if (strview_equal_cstring(&flag, values[i])) {
@@ -374,16 +363,13 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
                 break;
             }
         }
-        if (!values[i]) {
-            error_msg (
-                "Invalid flag '%.*s' for %s",
-                (int)flag.length,
-                flag.data,
-                d->name
-            );
+        if (unlikely(!values[i])) {
+            int flen = (int)flag.length;
+            error_msg("Invalid flag '%.*s' for %s", flen, flag.data, d->name);
             return false;
         }
     }
+
     v->uint_val = flags;
     return true;
 }
@@ -401,7 +387,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     char *ptr = buf;
     const char *const *values = desc->u.flag_opt.values;
     for (size_t i = 0; values[i]; i++) {
-        if (flags & (1 << i)) {
+        if (flags & (1u << i)) {
             size_t len = strlen(values[i]);
             memcpy(ptr, values[i], len);
             ptr += len;
