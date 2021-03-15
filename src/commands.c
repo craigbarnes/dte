@@ -173,6 +173,24 @@ static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
     view_reset_preferred_x(view);
 }
 
+static void cmd_bookmark(const CommandArgs *a)
+{
+    if (has_flag(a, 'r')) {
+        pop_file_location();
+        return;
+    }
+
+    const char *filename = buffer->abs_filename;
+    FileLocation *loc = xmalloc(sizeof(*loc));
+    *loc = (FileLocation) {
+        .filename = filename ? xstrdup(filename) : NULL,
+        .buffer_id = buffer->id,
+        .line = view->cy + 1,
+        .column = view->cx_char + 1
+    };
+    push_file_location(loc);
+}
+
 static void cmd_case(const CommandArgs *a)
 {
     change_case(last_flag_or_default(a, 't'));
@@ -2087,6 +2105,7 @@ static const Command cmds[] = {
     {"bof", "", false, 0, 0, cmd_bof},
     {"bol", "cs", false, 0, 0, cmd_bol},
     {"bolsf", "", false, 0, 0, cmd_bolsf},
+    {"bookmark", "r", false, 0, 0, cmd_bookmark},
     {"case", "lu", false, 0, 0, cmd_case},
     {"cd", "", true, 1, 1, cmd_cd},
     {"center-view", "", false, 0, 0, cmd_center_view},
