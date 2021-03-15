@@ -927,7 +927,7 @@ static void cmd_option(const CommandArgs *a)
         return;
     }
 
-    if (a->flags[0] == 'r') {
+    if (has_flag(a, 'r')) {
         char *regex = xstrdup(a->args[0]);
         char **opts = copy_string_array(strs, nstrs);
         add_file_options(FILE_OPTIONS_FILENAME, regex, opts);
@@ -935,16 +935,11 @@ static void cmd_option(const CommandArgs *a)
     }
 
     const char *ft_list = a->args[0];
-    while (1) {
+    for (size_t pos = 0, len = strlen(ft_list); pos < len; ) {
+        const StringView sv = get_delim(ft_list, &pos, len, ',');
+        char *filetype = xstrcut(sv.data, sv.length);
         char **opts = copy_string_array(strs, nstrs);
-        const char *comma = strchr(ft_list, ',');
-        if (!comma) {
-            add_file_options(FILE_OPTIONS_FILETYPE, xstrdup(ft_list), opts);
-            break;
-        }
-        char *ft = xstrcut(ft_list, (size_t)(comma - ft_list));
-        add_file_options(FILE_OPTIONS_FILETYPE, ft, opts);
-        ft_list = comma + 1;
+        add_file_options(FILE_OPTIONS_FILETYPE, filetype, opts);
     }
 }
 
