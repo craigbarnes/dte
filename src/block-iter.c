@@ -32,7 +32,8 @@ size_t block_iter_eat_line(BlockIter *bi)
     } else {
         const unsigned char *end;
         end = memchr(bi->blk->data + offset, '\n', bi->blk->size - offset);
-        bi->offset = end + 1 - bi->blk->data;
+        BUG_ON(!end);
+        bi->offset = (size_t)(end + 1 - bi->blk->data);
     }
 
     return bi->offset - offset;
@@ -59,7 +60,8 @@ size_t block_iter_next_line(BlockIter *bi)
     } else {
         const unsigned char *end;
         end = memchr(bi->blk->data + offset, '\n', bi->blk->size - offset);
-        new_offset = end + 1 - bi->blk->data;
+        BUG_ON(!end);
+        new_offset = (size_t)(end + 1 - bi->blk->data);
     }
     if (new_offset == bi->blk->size && bi->blk->node.next == bi->head) {
         return 0;
@@ -207,9 +209,9 @@ size_t block_iter_eol(BlockIter *bi)
         bi->offset = blk->size - 1;
         return bi->offset - offset;
     }
-    const unsigned char *end;
-    end = memchr(blk->data + offset, '\n', blk->size - offset);
-    bi->offset = end - blk->data;
+    const unsigned char *end = memchr(blk->data + offset, '\n', blk->size - offset);
+    BUG_ON(!end);
+    bi->offset = (size_t)(end - blk->data);
     return bi->offset - offset;
 }
 
@@ -325,7 +327,8 @@ void fill_line_ref(BlockIter *bi, StringView *line)
         return;
     }
     const unsigned char *nl = memchr(line->data, '\n', max);
-    line->length = nl - line->data;
+    BUG_ON(!nl);
+    line->length = (size_t)(nl - line->data);
 }
 
 void fill_line_nl_ref(BlockIter *bi, StringView *line)
@@ -343,7 +346,8 @@ void fill_line_nl_ref(BlockIter *bi, StringView *line)
         return;
     }
     const unsigned char *nl = memchr(line->data, '\n', max);
-    line->length = nl - line->data + 1;
+    BUG_ON(!nl);
+    line->length = (size_t)(nl - line->data + 1);
 }
 
 size_t fetch_this_line(const BlockIter *bi, StringView *line)
