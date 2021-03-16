@@ -834,6 +834,9 @@ static void append_option(String *s, const OptionDesc *desc, void *ptr)
 {
     const OptionValue value = desc_get(desc, ptr);
     const char *value_str = desc_string(desc, value);
+    if (unlikely(value_str[0] == '-')) {
+        string_append_literal(s, "-- ");
+    }
     string_append_cstring(s, desc->name);
     string_append_byte(s, ' ');
     string_append_escaped_arg(s, value_str, true);

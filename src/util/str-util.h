@@ -88,6 +88,16 @@ static inline size_t string_array_length(char **strings)
     return n;
 }
 
+static inline bool string_array_contains_prefix(char **strs, const char *prefix)
+{
+    for (size_t i = 0; strs[i]; i++) {
+        if (str_has_prefix(strs[i], prefix)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static inline char **copy_string_array(char **src, size_t count)
 {
     char **dst = xnew(char*, count + 1);

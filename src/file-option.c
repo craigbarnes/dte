@@ -127,16 +127,21 @@ void dump_file_options(String *buf)
 {
     for (size_t i = 0, n = file_options.count; i < n; i++) {
         const FileOption *opt = file_options.ptrs[i];
+        const char *tp = opt->type_or_pattern;
+        char **strs = opt->strs;
         string_append_literal(buf, "option ");
         if (opt->type == FILE_OPTIONS_FILENAME) {
             string_append_literal(buf, "-r ");
         }
-        string_append_escaped_arg(buf, opt->type_or_pattern, true);
-        for (size_t j = 0; opt->strs[j]; j += 2) {
+        if (str_has_prefix(tp, "-") || string_array_contains_prefix(strs, "-")) {
+            string_append_literal(buf, "-- ");
+        }
+        string_append_escaped_arg(buf, tp, true);
+        for (size_t j = 0; strs[j]; j += 2) {
             string_append_byte(buf, ' ');
-            string_append_cstring(buf, opt->strs[j]);
+            string_append_cstring(buf, strs[j]);
             string_append_byte(buf, ' ');
-            string_append_escaped_arg(buf, opt->strs[j + 1], true);
+            string_append_escaped_arg(buf, strs[j + 1], true);
         }
         string_append_byte(buf, '\n');
     }
