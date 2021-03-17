@@ -2,9 +2,9 @@
 #include "editor.h"
 #include "terminal/output.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/strtonum.h"
 #include "util/utf8.h"
-#include "util/xsnprintf.h"
 
 static size_t tab_title_width(size_t tab_number, const char *filename)
 {
@@ -130,36 +130,26 @@ static void calculate_tabbar(Window *win)
 
 static void print_tab_title(const View *v, size_t idx)
 {
-    int skip = v->tt_width - v->tt_truncated_width;
     const char *filename = buffer_filename(v->buffer);
+    int skip = v->tt_width - v->tt_truncated_width;
     if (skip > 0) {
         filename += u_skip_chars(filename, &skip);
     }
 
-    char buf[16];
-    xsnprintf (
-        buf,
-        sizeof(buf),
-        "%c%zu%c",
-        obuf.x == 0 && idx > 0 ? '<' : ' ',
-        idx + 1,
-        buffer_modified(v->buffer) ? '+' : ':'
-    );
+    const char *tab_number = uint_to_str((unsigned int)idx + 1);
+    bool is_active_tab = (v == v->window->view);
+    bool is_modified = buffer_modified(v->buffer);
+    bool left_overflow = (obuf.x == 0 && idx > 0);
 
-    if (v == v->window->view) {
-        set_builtin_color(BC_ACTIVETAB);
-    } else {
-        set_builtin_color(BC_INACTIVETAB);
-    }
-
-    term_add_str(buf);
+    set_builtin_color(is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
+    term_put_char(left_overflow ? '<' : ' ');
+    term_add_str(tab_number);
+    term_put_char(is_modified ? '+' : ':');
     term_add_str(filename);
 
-    if (obuf.x == obuf.width - 1 && idx < v->window->views.count - 1) {
-        term_put_char('>');
-    } else {
-        term_put_char(' ');
-    }
+    size_t ntabs = v->window->views.count;
+    bool right_overflow = (obuf.x == (obuf.width - 1) && idx < (ntabs - 1));
+    term_put_char(right_overflow ? '>' : ' ');
 }
 
 void print_tabbar(Window *win)
