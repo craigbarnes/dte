@@ -18,7 +18,7 @@ static size_t obuf_avail(void)
 
 static void obuf_need_space(size_t count)
 {
-    if (obuf_avail() < count) {
+    if (unlikely(obuf_avail() < count)) {
         term_output_flush();
     }
 }
@@ -36,7 +36,7 @@ void term_output_reset(size_t start_x, size_t width, size_t scroll_x)
 // Does not update obuf.x
 void term_add_bytes(const char *str, size_t count)
 {
-    if (count > obuf_avail()) {
+    if (unlikely(count > obuf_avail())) {
         term_output_flush();
         if (unlikely(count >= sizeof(obuf.buf))) {
             xwrite(STDOUT_FILENO, str, count);
@@ -203,8 +203,7 @@ static void buf_skip(CodePoint u)
 static void print_tab(size_t width)
 {
     char ch = ' ';
-
-    if (obuf.tab == TAB_SPECIAL) {
+    if (unlikely(obuf.tab == TAB_SPECIAL)) {
         obuf.buf[obuf.count++] = '>';
         obuf.x++;
         width--;
@@ -219,15 +218,13 @@ static void print_tab(size_t width)
 
 bool term_put_char(CodePoint u)
 {
-    size_t space = obuf.scroll_x + obuf.width - obuf.x;
-    size_t width;
-
     if (obuf.x < obuf.scroll_x) {
         // Scrolled, char (at least partially) invisible
         buf_skip(u);
         return true;
     }
 
+    const size_t space = obuf.scroll_x + obuf.width - obuf.x;
     if (!space) {
         return false;
     }
@@ -238,7 +235,9 @@ bool term_put_char(CodePoint u)
             obuf.buf[obuf.count++] = u;
             obuf.x++;
         } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
-            width = (obuf.x + obuf.tab_width) / obuf.tab_width * obuf.tab_width - obuf.x;
+            const size_t tw = obuf.tab_width;
+            const size_t x = obuf.x;
+            size_t width = (x + tw) / tw * tw - x;
             if (width > space) {
                 width = space;
             }
@@ -253,7 +252,7 @@ bool term_put_char(CodePoint u)
             }
         }
     } else {
-        width = u_char_width(u);
+        const size_t width = u_char_width(u);
         if (width <= space) {
             obuf.x += width;
             u_set_char(obuf.buf, &obuf.count, u);
@@ -270,5 +269,6 @@ bool term_put_char(CodePoint u)
             obuf.x++;
         }
     }
+
     return true;
 }
