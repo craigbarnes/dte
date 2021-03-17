@@ -13,6 +13,7 @@
 #include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/line-iter.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/readfile.h"
@@ -574,6 +575,26 @@ static void test_str_to_size(void)
     EXPECT_FALSE(str_to_size("100x", &val));
     EXPECT_FALSE(str_to_size("-100", &val));
     EXPECT_FALSE(str_to_size("99999999999999999999999999999999", &val));
+}
+
+static void test_uint_to_str(void)
+{
+    EXPECT_STREQ(uint_to_str(0), "0");
+    EXPECT_STREQ(uint_to_str(1), "1");
+    EXPECT_STREQ(uint_to_str(9), "9");
+    EXPECT_STREQ(uint_to_str(10), "10");
+    EXPECT_STREQ(uint_to_str(11), "11");
+    EXPECT_STREQ(uint_to_str(99), "99");
+    EXPECT_STREQ(uint_to_str(100), "100");
+    EXPECT_STREQ(uint_to_str(101), "101");
+    EXPECT_STREQ(uint_to_str(21904), "21904");
+
+    // See test_posix_sanity()
+    static_assert(sizeof(unsigned int) >= 4);
+    static_assert(CHAR_BIT == 8);
+    static_assert(UINT_MAX >= 4294967295u);
+    static_assert(4294967295u == 0xFFFFFFFF);
+    EXPECT_STREQ(uint_to_str(4294967295u), "4294967295");
 }
 
 static void test_u_char_width(void)
@@ -1640,6 +1661,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_parse_ulong),
     TEST(test_str_to_int),
     TEST(test_str_to_size),
+    TEST(test_uint_to_str),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
     TEST(test_u_to_upper),

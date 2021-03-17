@@ -15,11 +15,11 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/hashset.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
 
@@ -270,9 +270,7 @@ static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
 
 static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue value)
 {
-    static char buf[DECIMAL_STR_MAX(value.uint_val)];
-    xsnprintf(buf, sizeof buf, "%u", value.uint_val);
-    return buf;
+    return uint_to_str(value.uint_val);
 }
 
 static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
