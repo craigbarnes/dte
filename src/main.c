@@ -232,7 +232,7 @@ static ExitCode showkey_loop(void)
 }
 
 static const char copyright[] =
-    "(C) 2017-2020 Craig Barnes\n"
+    "(C) 2017-2021 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
     "This program is free software; you can redistribute and/or modify\n"
     "it under the terms of the GNU General Public License version 2\n"
