@@ -313,6 +313,7 @@ void collect_ft(const char *prefix)
 String dump_ft(void)
 {
     static const char flags[][4] = {
+        [FT_EXTENSION] = "",
         [FT_FILENAME] = "-f ",
         [FT_CONTENT] = "-c ",
         [FT_INTERPRETER] = "-i ",
@@ -326,9 +327,7 @@ String dump_ft(void)
         FileDetectionType type = ft->type;
         BUG_ON(type >= ARRAY_COUNT(flags));
         string_append_literal(&s, "ft ");
-        if (type != FT_EXTENSION) {
-            string_append_cstring(&s, flags[type]);
-        }
+        string_append_cstring(&s, flags[type]);
         if (unlikely(name[0] == '-')) {
             string_append_cstring(&s, "-- ");
         }
