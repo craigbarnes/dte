@@ -21,12 +21,13 @@ void ecma48_clear_to_eol(void)
 
 void ecma48_move_cursor(unsigned int x, unsigned int y)
 {
-    const size_t n = sizeof("e[;H") + (DECIMAL_STR_MAX(x) * 2);
-    if (x == 0) {
-        term_xnprintf(n, "\033[%uH", y + 1);
-    } else {
-        term_xnprintf(n, "\033[%u;%uH", y + 1, x + 1);
+    term_add_literal("\033[");
+    term_add_uint(y + 1);
+    if (x != 0) {
+        term_add_byte(';');
+        term_add_uint(x + 1);
     }
+    term_add_byte('H');
 }
 
 void ecma48_repeat_byte(char ch, size_t count)
@@ -35,7 +36,10 @@ void ecma48_repeat_byte(char ch, size_t count)
         term_repeat_byte(ch, count);
         return;
     }
-    term_xnprintf(16, "%c\033[%zub", ch, count - 1);
+    term_add_byte(ch);
+    term_add_literal("\033[");
+    term_add_uint(count - 1);
+    term_add_byte('b');
 }
 
 static void do_set_color(int32_t color, char ch)
@@ -44,16 +48,23 @@ static void do_set_color(int32_t color, char ch)
         return;
     }
 
-    if (color < 8) {
-        term_add_byte(';');
-        term_add_byte(ch);
+    term_add_byte(';');
+    term_add_byte(ch);
+
+    if (likely(color < 8)) {
         term_add_byte('0' + color);
     } else if (color < 256) {
-        term_xnprintf(16, ";%c8;5;%hhu", ch, (uint8_t)color);
+        term_add_literal("8;5;");
+        term_add_uint(color);
     } else {
         uint8_t r, g, b;
         color_split_rgb(color, &r, &g, &b);
-        term_xnprintf(32, ";%c8;2;%hhu;%hhu;%hhu", ch, r, g, b);
+        term_add_literal("8;2;");
+        term_add_uint(r);
+        term_add_byte(';');
+        term_add_uint(g);
+        term_add_byte(';');
+        term_add_uint(b);
     }
 }
 

@@ -5,9 +5,9 @@
 #include "terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/utf8.h"
 #include "util/xreadwrite.h"
-#include "util/xsnprintf.h"
 
 TermOutputBuffer obuf;
 
@@ -100,16 +100,11 @@ void term_add_str(const char *str)
     }
 }
 
-size_t term_xnprintf(size_t maxlen, const char *format, ...)
+// Does not update obuf.x
+void term_add_uint(unsigned int x)
 {
-    BUG_ON(maxlen > sizeof(obuf.buf));
-    obuf_need_space(maxlen);
-    va_list ap;
-    va_start(ap, format);
-    size_t n = xvsnprintf(obuf.buf + obuf.count, maxlen, format, ap);
-    va_end(ap);
-    obuf.count += n;
-    return n;
+    obuf_need_space(DECIMAL_STR_MAX(x));
+    obuf.count += buf_uint_to_str(x, obuf.buf + obuf.count);
 }
 
 void term_hide_cursor(void)

@@ -597,6 +597,24 @@ static void test_uint_to_str(void)
     EXPECT_STREQ(uint_to_str(4294967295u), "4294967295");
 }
 
+static void test_buf_uint_to_str(void)
+{
+    char buf[DECIMAL_STR_MAX(unsigned int)];
+    EXPECT_EQ(buf_uint_to_str(0, buf), 1);
+    EXPECT_STREQ(buf, "0");
+    EXPECT_EQ(buf_uint_to_str(1, buf), 1);
+    EXPECT_STREQ(buf, "1");
+    EXPECT_EQ(buf_uint_to_str(9, buf), 1);
+    EXPECT_STREQ(buf, "9");
+    EXPECT_EQ(buf_uint_to_str(129, buf), 3);
+    EXPECT_STREQ(buf, "129");
+    EXPECT_EQ(buf_uint_to_str(21904, buf), 5);
+    EXPECT_STREQ(buf, "21904");
+    static_assert(sizeof(buf) > 10);
+    EXPECT_EQ(buf_uint_to_str(4294967295u, buf), 10);
+    EXPECT_STREQ(buf, "4294967295");
+}
+
 static void test_u_char_width(void)
 {
     // ASCII (1 column)
@@ -1662,6 +1680,7 @@ static const TestEntry tests[] = {
     TEST(test_str_to_int),
     TEST(test_str_to_size),
     TEST(test_uint_to_str),
+    TEST(test_buf_uint_to_str),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
     TEST(test_u_to_upper),
