@@ -2,7 +2,6 @@
 #define SCREEN_H
 
 #include <stdbool.h>
-#include <stddef.h>
 #include "buffer.h"
 #include "syntax/color.h"
 #include "terminal/color.h"
@@ -21,7 +20,6 @@ void mask_color(TermColor *color, const TermColor *over);
 
 // screen-cmdline.c
 void update_command_line(void);
-size_t print_command(char prefix);
 void show_message(const char *msg, bool is_error);
 
 // screen-tabbar.c

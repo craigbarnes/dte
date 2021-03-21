@@ -30,7 +30,7 @@ void show_message(const char *msg, bool is_error)
     term_clear_eol();
 }
 
-size_t print_command(char prefix)
+static size_t print_command(char prefix)
 {
     CodePoint u;
 
