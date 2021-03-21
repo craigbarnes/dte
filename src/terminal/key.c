@@ -1,4 +1,3 @@
-#include <inttypes.h>
 #include <string.h>
 #include "key.h"
 #include "util/ascii.h"
@@ -157,21 +156,15 @@ const char *keycode_to_string(KeyCode k)
             u_set_char(buf, &i, key);
             buf[i] = '\0';
         }
-    } else if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        static_assert(sizeof(special_names[0]) == 8);
-        memcpy (
-            ptr,
-            special_names[key - KEY_SPECIAL_MIN],
-            sizeof(special_names[0])
-        );
-    } else if (key == KEY_PASTE) {
-        COPY(ptr, "paste");
-    } else if (key == KEY_IGNORE) {
-        COPY(buf, "ignore");
-    } else {
-        static_assert(sizeof(buf) >= sizeof("INVALID (0xFFFFFFFF)"));
-        xsnprintf(buf, sizeof buf, "INVALID (0x%08" PRIX32 ")", k);
+        return buf;
     }
 
+    if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
+        const char *name = special_names[key - KEY_SPECIAL_MIN];
+        memcpy(ptr, name, sizeof(special_names[0]));
+        return buf;
+    }
+
+    xsnprintf(buf, sizeof buf, "INVALID (0x%08X)", (unsigned int)k);
     return buf;
 }

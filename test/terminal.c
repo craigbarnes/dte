@@ -544,7 +544,7 @@ static void test_keycode_to_string(void)
         IEXPECT_TRUE(parse_key_string(&key, tests[i].str));
         IEXPECT_EQ(key, tests[i].key);
     }
-    EXPECT_STREQ(keycode_to_string(KEY_PASTE), "paste");
+    EXPECT_STREQ(keycode_to_string(KEY_PASTE), "INVALID (0x08000000)");
     EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
 }
 
