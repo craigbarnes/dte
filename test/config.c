@@ -3,11 +3,15 @@
 #include <unistd.h>
 #include "test.h"
 #include "config.h"
+#include "command/macro.h"
+#include "command/run.h"
 #include "commands.h"
 #include "convert.h"
+#include "edit.h"
 #include "editor.h"
 #include "error.h"
 #include "frame.h"
+#include "mode.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
 #include "terminal/no-op.h"
@@ -171,11 +175,55 @@ static void test_global_state(void)
     EXPECT_EQ(buffer->id, 1);
 }
 
+static void test_macro_record(void)
+{
+    EXPECT_EQ(editor.input_mode, INPUT_NORMAL);
+    EXPECT_FALSE(macro_is_recording());
+    macro_record();
+    EXPECT_TRUE(macro_is_recording());
+
+    handle_command(&commands, "open", false);
+    handle_input('x');
+    handle_input('y');
+    handle_command(&commands, "bol", true);
+    handle_input('-');
+    handle_input('z');
+    handle_command(&commands, "eol; right; insert -m .; new-line", true);
+
+    const StringView t1 = STRING_VIEW("test 1\n");
+    insert_text(t1.data, t1.length, true);
+    macro_insert_text_hook(t1.data, t1.length);
+
+    const StringView t2 = STRING_VIEW("-- test 2");
+    insert_text(t2.data, t2.length, true);
+    macro_insert_text_hook(t2.data, t2.length);
+
+    EXPECT_TRUE(macro_is_recording());
+    macro_stop();
+    EXPECT_FALSE(macro_is_recording());
+
+    handle_command (
+        &commands,
+        "save -f build/test/macro-rec.txt;"
+        "close -f;"
+        "open;"
+        "macro play;"
+        "save -f build/test/macro-out.txt;"
+        "close -f;"
+        "show macro;"
+        "close -f;",
+        true
+    );
+
+    expect_files_equal("build/test/macro-rec.txt", "build/test/macro-out.txt");
+}
+
 static const TestEntry tests[] = {
     TEST(test_global_state),
     TEST(test_builtin_configs),
     TEST(test_exec_config),
     TEST(test_detect_indent),
+    TEST(test_macro_record),
 };
 
 const TestGroup config_tests = TEST_GROUP(tests);
