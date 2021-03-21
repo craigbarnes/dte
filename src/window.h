@@ -40,6 +40,11 @@ typedef struct Window {
 
 extern Window *window;
 
+enum {
+    // Minimum width of line numbers bar (including padding)
+    LINE_NUMBERS_MIN_WIDTH = 5
+};
+
 Window *new_window(void);
 View *window_add_buffer(Window *w, Buffer *b);
 View *window_open_empty_buffer(Window *w);

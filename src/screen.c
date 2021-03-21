@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "screen.h"
 #include "editor.h"
 #include "frame.h"
@@ -6,7 +7,6 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
-#include "util/xsnprintf.h"
 #include "view.h"
 
 void set_color(const TermColor *color)
@@ -87,7 +87,6 @@ void update_line_numbers(Window *win, bool force)
     int x = win->x;
 
     calculate_line_numbers(win);
-
     long first = v->vy + 1;
     long last = v->vy + win->edit_h;
     if (last > lines) {
@@ -105,20 +104,24 @@ void update_line_numbers(Window *win, bool force)
     win->line_numbers.first = first;
     win->line_numbers.last = last;
 
+    char buf[DECIMAL_STR_MAX(unsigned long) + 1];
+    size_t width = win->line_numbers.width;
+    BUG_ON(width > sizeof(buf));
+    BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
     term_output_reset(win->x, win->w, 0);
     set_builtin_color(BC_LINENUMBER);
-    for (int i = 0, n = win->edit_h; i < n; i++) {
-        long line = v->vy + i + 1;
-        int w = win->line_numbers.width - 1;
-        char buf[32];
 
-        if (line > lines) {
-            xsnprintf(buf, sizeof(buf), "%*s ", w, "");
-        } else {
-            xsnprintf(buf, sizeof(buf), "%*ld ", w, line);
+    for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
+        unsigned long line = v->vy + y + 1;
+        memset(buf, ' ', width);
+        if (line <= lines) {
+            size_t i = width - 2;
+            do {
+                buf[i--] = (line % 10) + '0';
+            } while (line /= 10);
         }
-        term_move_cursor(x, win->edit_y + i);
-        term_add_bytes(buf, win->line_numbers.width);
+        term_move_cursor(x, edit_y + y);
+        term_add_bytes(buf, width);
     }
 }
 
