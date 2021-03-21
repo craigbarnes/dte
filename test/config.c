@@ -14,7 +14,6 @@
 #include "mode.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
-#include "terminal/no-op.h"
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/path.h"

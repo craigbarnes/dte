@@ -4,10 +4,8 @@
 // See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
 #include <stdint.h>
-#include <string.h>
 #include "xterm.h"
 #include "kitty.h"
-#include "output.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/macros.h"
@@ -306,21 +304,4 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
     case '_': return parse_apc(buf, length, 2, k);
     }
     return 0;
-}
-
-void xterm_save_title(void)
-{
-    term_add_literal("\033[22;2t");
-}
-
-void xterm_restore_title(void)
-{
-    term_add_literal("\033[23;2t");
-}
-
-void xterm_set_title(const char *title)
-{
-    term_add_literal("\033]2;");
-    term_add_bytes(title, strlen(title));
-    term_add_byte('\007');
 }

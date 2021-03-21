@@ -383,7 +383,7 @@ loop_break:
         editor.options.lock_files = false;
     }
 
-    terminal.save_title();
+    term_save_title();
     exec_builtin_rc();
 
     if (read_rc) {
@@ -490,7 +490,7 @@ loop_break:
 
     main_loop();
 
-    terminal.restore_title();
+    term_restore_title();
     ui_end();
     term_output_flush();
 

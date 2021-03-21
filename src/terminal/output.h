@@ -47,6 +47,8 @@ void term_add_uint(unsigned int x);
 void term_hide_cursor(void);
 void term_show_cursor(void);
 void term_move_cursor(unsigned int x, unsigned int y);
+void term_save_title(void);
+void term_restore_title(void);
 void term_clear_eol(void);
 void term_output_flush(void);
 bool term_put_char(CodePoint u);

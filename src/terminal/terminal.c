@@ -7,7 +7,6 @@
 #include "terminal.h"
 #include "ecma48.h"
 #include "mode.h"
-#include "no-op.h"
 #include "output.h"
 #include "rxvt.h"
 #include "xterm.h"
@@ -104,9 +103,6 @@ Terminal terminal = {
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
     .repeat_byte = &term_repeat_byte,
-    .save_title = &no_op,
-    .restore_title = &no_op,
-    .set_title = &no_op_s,
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .init = STRING_VIEW (
@@ -126,6 +122,10 @@ Terminal terminal = {
         .cup_mode_on = STRING_VIEW("\033[?1049h"),
         .hide_cursor = STRING_VIEW("\033[?25l"),
         .show_cursor = STRING_VIEW("\033[?25h"),
+        .set_title_begin = STRING_VIEW_INIT,
+        .set_title_end = STRING_VIEW_INIT,
+        .save_title = STRING_VIEW_INIT,
+        .restore_title = STRING_VIEW_INIT,
     }
 };
 
@@ -197,9 +197,10 @@ void term_init(void)
             terminal.repeat_byte = ecma48_repeat_byte;
         }
         if (entry->flags & TITLE) {
-            terminal.save_title = &xterm_save_title;
-            terminal.restore_title = &xterm_restore_title;
-            terminal.set_title = &xterm_set_title;
+            terminal.control_codes.save_title = strview_from_cstring("\033[22;2t");
+            terminal.control_codes.restore_title = strview_from_cstring("\033[23;2t");
+            terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
+            terminal.control_codes.set_title_end = strview_from_cstring("\007");
         }
         if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
             terminal.parse_key_sequence = rxvt_parse_key;

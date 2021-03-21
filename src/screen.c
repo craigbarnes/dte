@@ -3,7 +3,6 @@
 #include "screen.h"
 #include "editor.h"
 #include "frame.h"
-#include "terminal/no-op.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
@@ -33,21 +32,21 @@ void set_builtin_color(BuiltinColorEnum c)
 
 void update_term_title(const Buffer *b)
 {
-    if (!editor.options.set_window_title || terminal.set_title == no_op_s) {
+    if (
+        !editor.options.set_window_title
+        || terminal.control_codes.set_title_begin.length == 0
+    ) {
         return;
     }
 
     // FIXME: title must not contain control characters
-    char title[1024];
-    snprintf (
-        title,
-        sizeof title,
-        "%s %c dte",
-        buffer_filename(b),
-        buffer_modified(b) ? '+' : '-'
-    );
-
-    terminal.set_title(title);
+    const char *filename = buffer_filename(b);
+    terminal.put_control_code(terminal.control_codes.set_title_begin);
+    term_add_bytes(filename, strlen(filename));
+    term_add_byte(' ');
+    term_add_byte(buffer_modified(b) ? '+' : '-');
+    term_add_bytes(STRN(" dte"));
+    terminal.put_control_code(terminal.control_codes.set_title_end);
 }
 
 void mask_color(TermColor *color, const TermColor *over)

@@ -122,6 +122,16 @@ void term_move_cursor(unsigned int x, unsigned int y)
     terminal.move_cursor(x, y);
 }
 
+void term_save_title(void)
+{
+    terminal.put_control_code(terminal.control_codes.save_title);
+}
+
+void term_restore_title(void)
+{
+    terminal.put_control_code(terminal.control_codes.restore_title);
+}
+
 void term_clear_eol(void)
 {
     const size_t end = obuf.scroll_x + obuf.width;

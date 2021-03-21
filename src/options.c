@@ -11,7 +11,7 @@
 #include "filetype.h"
 #include "regexp.h"
 #include "screen.h"
-#include "terminal/terminal.h"
+#include "terminal/output.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/hashset.h"
@@ -142,8 +142,8 @@ static void set_window_title_changed(bool global)
             update_term_title(buffer);
         }
     } else {
-        terminal.restore_title();
-        terminal.save_title();
+        term_restore_title();
+        term_save_title();
     }
 }
 
