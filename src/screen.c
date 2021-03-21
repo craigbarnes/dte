@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include "screen.h"
 #include "editor.h"
@@ -6,7 +5,6 @@
 #include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
-#include "view.h"
 
 void set_color(const TermColor *color)
 {
