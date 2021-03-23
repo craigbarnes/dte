@@ -31,8 +31,8 @@ v1.10 (not yet released)
   * [`select-cursor-char`]
   * [`utf8-bom`]
 * Added an optional *exitcode* argument to the [`quit`] command.
-* Added `color`, `command`, `env`, `errorfmt`, `ft`, `option`, `search`
-  and `wsplit` arguments to the [`show`] command.
+* Added `color`, `command`, `env`, `errorfmt`, `ft`, `macro`, `option`,
+  `search` and `wsplit` arguments to the [`show`] command.
 * Added support for the `\e` escape sequence in [double-quoted] command
   arguments.
 * Added syntax highlighting for Lisp and Scheme files.
@@ -60,6 +60,9 @@ v1.10 (not yet released)
   exclusive (by separating them with `|`).
 * Fixed signal handling, to allow interrupting unresponsive/deadlocked
   child processes with Ctrl+c.
+* Fixed command-line auto-completion to work properly when option flags
+  are present.
+* Improved the documentation for [`tag`], [`replace`], and [`errorfmt`].
 * Various syntax highlighting improvements.
 * Various terminal compatibility improvements.
 * Various performance improvements.
@@ -459,8 +462,10 @@ system except a somewhat recent kernel.
 [`open`]: https://craigbarnes.gitlab.io/dte/dterc.html#open
 [`pipe-to`]: https://craigbarnes.gitlab.io/dte/dterc.html#pipe-to
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
+[`replace`]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
 [`save`]: https://craigbarnes.gitlab.io/dte/dterc.html#save
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
+[`tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#tag
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
