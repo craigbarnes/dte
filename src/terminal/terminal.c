@@ -200,7 +200,7 @@ void term_init(void)
             terminal.control_codes.save_title = strview_from_cstring("\033[22;2t");
             terminal.control_codes.restore_title = strview_from_cstring("\033[23;2t");
             terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
-            terminal.control_codes.set_title_end = strview_from_cstring("\007");
+            terminal.control_codes.set_title_end = strview_from_cstring("\033\\");
         }
         if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
             terminal.parse_key_sequence = rxvt_parse_key;
