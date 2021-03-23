@@ -160,25 +160,29 @@ void print_tabbar(Window *win)
 
     term_output_reset(win->x, win->w, 0);
     term_move_cursor(win->x, win->y);
-
     calculate_tabbar(win);
+
     size_t i = win->first_tab_idx;
-    for (size_t n = win->views.count; i < n; i++) {
+    size_t n = win->views.count;
+    for (; i < n; i++) {
         const View *v = win->views.ptrs[i];
         if (obuf.x + v->tt_truncated_width > win->w) {
             break;
         }
         print_tab_title(v, i);
     }
+
     set_builtin_color(BC_TABBAR);
-    if (i != win->views.count) {
-        while (obuf.x < obuf.width - 1) {
-            term_put_char(' ');
-        }
-        if (obuf.x == obuf.width - 1) {
-            term_put_char('>');
-        }
-    } else {
+
+    if (i == n) {
         term_clear_eol();
+        return;
+    }
+
+    while (obuf.x < obuf.width - 1) {
+        term_put_char(' ');
+    }
+    if (obuf.x == obuf.width - 1) {
+        term_put_char('>');
     }
 }
