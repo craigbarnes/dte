@@ -322,7 +322,7 @@ static void cmd_copy(const CommandArgs *a)
     BlockIter save = view->cursor;
     if (view->selection) {
         copy(prepare_selection(view), view->selection == SELECT_LINES);
-        bool keep_selection = a->flags[0] == 'k';
+        bool keep_selection = has_flag(a, 'k');
         if (!keep_selection) {
             unselect();
         }
@@ -363,7 +363,7 @@ static void cmd_delete_eol(const CommandArgs *a)
         return;
     }
 
-    bool delete_newline_if_at_eol = a->flags[0] == 'n';
+    bool delete_newline_if_at_eol = has_flag(a, 'n');
     BlockIter bi = view->cursor;
     if (delete_newline_if_at_eol) {
         CodePoint ch;
@@ -383,7 +383,7 @@ static void cmd_delete_line(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_delete_word(const CommandArgs *a)
 {
-    bool skip_non_word = a->flags[0] == 's';
+    bool skip_non_word = has_flag(a, 's');
     BlockIter bi = view->cursor;
     buffer_delete_bytes(word_fwd(&bi, skip_non_word));
 }
@@ -432,13 +432,13 @@ static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_erase_word(const CommandArgs *a)
 {
-    bool skip_non_word = a->flags[0] == 's';
+    bool skip_non_word = has_flag(a, 's');
     buffer_erase_bytes(word_bwd(&view->cursor, skip_non_word));
 }
 
 static void cmd_errorfmt(const CommandArgs *a)
 {
-    bool ignore = a->flags[0] == 'i';
+    bool ignore = has_flag(a, 'i');
     add_error_fmt(a->args[0], ignore, a->args[1], a->args + 2);
 }
 
@@ -1030,7 +1030,7 @@ static void cmd_blkup(const CommandArgs *a)
 
 static void cmd_paste(const CommandArgs *a)
 {
-    bool at_cursor = a->flags[0] == 'c';
+    bool at_cursor = has_flag(a, 'c');
     paste(at_cursor);
 }
 
@@ -1786,7 +1786,7 @@ static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_tag(const CommandArgs *a)
 {
-    if (a->flags[0] == 'r') {
+    if (has_flag(a, 'r')) {
         pop_file_location();
         return;
     }
