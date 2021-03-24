@@ -1,6 +1,12 @@
 #include <string.h>
 #include "test.h"
+#include "block-iter.h"
+#include "config.h"
 #include "syntax/bitset.h"
+#include "syntax/highlight.h"
+#include "util/debug.h"
+#include "util/utf8.h"
+#include "window.h"
 
 static void test_bitset(void)
 {
@@ -66,8 +72,70 @@ static void test_bitset(void)
     }
 }
 
+static void test_hl_line(void)
+{
+    if (!get_builtin_config("syntax/c")) {
+        DEBUG_LOG("syntax/c not available; skipping %s()", __func__);
+        return;
+    }
+
+    Encoding enc = {.type = ENCODING_AUTODETECT};
+    View *v = window_open_file(window, "test/data/test.c", &enc);
+    ASSERT_NONNULL(v);
+
+    const size_t line_nr = 5;
+    ASSERT_TRUE(v->buffer->nl >= line_nr);
+    hl_fill_start_states(v->buffer, v->buffer->nl);
+    block_iter_goto_line(&v->cursor, line_nr - 1);
+    view_update_cursor_x(v);
+    view_update_cursor_y(v);
+    view_update(v);
+    ASSERT_EQ(v->cx, 0);
+    ASSERT_EQ(v->cy, line_nr - 1);
+
+    StringView line;
+    fetch_this_line(&v->cursor, &line);
+    ASSERT_EQ(line.length, 56);
+
+    bool next_changed;
+    TermColor **colors = hl_line(buffer, &line, line_nr, &next_changed);
+    EXPECT_TRUE(next_changed);
+
+    const TermColor *t = find_color("text");
+    const TermColor *c = find_color("constant");
+    const TermColor *s = find_color("string");
+    const TermColor *x = find_color("special");
+    const TermColor *n = find_color("numeric");
+    ASSERT_NONNULL(t);
+    ASSERT_NONNULL(c);
+    ASSERT_NONNULL(s);
+    ASSERT_NONNULL(x);
+    ASSERT_NONNULL(n);
+
+    const TermColor *const expected_colors[] = {
+        t, t, t, t, t, t, t, t, t, t, t, t, c, c, c, c,
+        c, c, t, t, s, s, s, s, s, s, s, s, s, s, s, s,
+        s, s, s, x, x, s, t, t, s, s, s, s, s, t, t, x,
+        x, x, t, t, n, n, t, t
+    };
+
+    size_t i = 0;
+    for (size_t pos = 0; pos < line.length; i++) {
+        CodePoint u = u_get_char(line.data, line.length, &pos);
+        IEXPECT_EQ(u, line.data[i]);
+        if (i >= ARRAY_COUNT(expected_colors)) {
+            continue;
+        }
+        IEXPECT_TRUE(same_color(colors[i], expected_colors[i]));
+    }
+
+    EXPECT_EQ(i, ARRAY_COUNT(expected_colors));
+    window_close_current();
+}
+
 static const TestEntry tests[] = {
     TEST(test_bitset),
+    TEST(test_hl_line),
 };
 
 const TestGroup syntax_tests = TEST_GROUP(tests);

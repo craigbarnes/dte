@@ -113,11 +113,11 @@ int main(void)
     run_tests(&terminal_tests);
     run_tests(&cmdline_tests);
     run_tests(&history_tests);
-    run_tests(&syntax_tests);
 
     init_headless_mode();
     run_tests(&config_tests);
     run_tests(&bind_tests);
+    run_tests(&syntax_tests);
     run_tests(&dump_tests);
     free_syntaxes();
 
