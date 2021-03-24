@@ -12,6 +12,7 @@ extern const TestGroup bind_tests;
 extern const TestGroup cmdline_tests;
 extern const TestGroup command_tests;
 extern const TestGroup config_tests;
+extern const TestGroup dump_tests;
 extern const TestGroup editorconfig_tests;
 extern const TestGroup encoding_tests;
 extern const TestGroup filetype_tests;
@@ -117,6 +118,7 @@ int main(void)
     init_headless_mode();
     run_tests(&config_tests);
     run_tests(&bind_tests);
+    run_tests(&dump_tests);
     free_syntaxes();
 
     fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", passed, failed);
