@@ -1735,14 +1735,12 @@ static void cmd_setenv(const CommandArgs *a)
         return;
     }
 
-    const char *op;
+    const size_t nr_args = a->nr_args;
     int res;
-    if (a->nr_args == 2) {
-        op = "setenv";
+    if (nr_args == 2) {
         res = setenv(name, a->args[1], true);
     } else {
-        BUG_ON(a->nr_args != 1);
-        op = "unsetenv";
+        BUG_ON(nr_args != 1);
         res = unsetenv(name);
     }
 
@@ -1750,7 +1748,7 @@ static void cmd_setenv(const CommandArgs *a)
         if (errno == EINVAL) {
             error_msg("Invalid environment variable name '%s'", name);
         } else {
-            perror_msg(op);
+            perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
         }
     }
 }
