@@ -20,14 +20,14 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
     if (!cmd) {
         const char *alias_name = av[0];
         const char *alias_value = find_alias(alias_name);
-        if (!alias_value) {
+        if (unlikely(!alias_value)) {
             error_msg("No such command or alias: %s", alias_name);
             return;
         }
 
         PointerArray array = PTR_ARRAY_INIT;
         CommandParseError err = parse_commands(&array, alias_value);
-        if (err != CMDERR_NONE) {
+        if (unlikely(err != CMDERR_NONE)) {
             const char *err_msg = command_parse_error_to_string(err);
             error_msg("Parsing alias %s: %s", alias_name, err_msg);
             ptr_array_free(&array);
@@ -47,7 +47,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
         return;
     }
 
-    if (current_config.file && !cmd->allow_in_rc) {
+    if (unlikely(current_config.file && !cmd->allow_in_rc)) {
         error_msg("Command %s not allowed in config file.", cmd->name);
         return;
     }
@@ -64,7 +64,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
 
     CommandArgs a = {.args = av + 1};
     current_command = cmd;
-    if (parse_args(cmd, &a)) {
+    if (likely(parse_args(cmd, &a))) {
         cmd->cmd(&a);
     }
     current_command = NULL;
@@ -102,7 +102,7 @@ void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recordin
 {
     PointerArray array = PTR_ARRAY_INIT;
     CommandParseError err = parse_commands(&array, cmd);
-    if (err == CMDERR_NONE) {
+    if (likely(err == CMDERR_NONE)) {
         run_commands(cmds, &array, allow_recording);
     } else {
         const char *str = command_parse_error_to_string(err);
