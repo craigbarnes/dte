@@ -294,6 +294,22 @@ static void test_parse_args(void)
     EXPECT_EQ(a.flags[0], '\0');
     EXPECT_EQ(a.flag_set, 0);
     ptr_array_free(&array);
+
+    ASSERT_EQ(parse_commands(&array, "save -e"), CMDERR_NONE);
+    ASSERT_EQ(array.count, 3);
+    cmd = find_normal_command(array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_MISSING | 0x6500);
+    ptr_array_free(&array);
+
+    ASSERT_EQ(parse_commands(&array, "save -eUTF-8"), CMDERR_NONE);
+    ASSERT_EQ(array.count, 3);
+    cmd = find_normal_command(array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | 0x6500);
+    ptr_array_free(&array);
 }
 
 static void test_escape_command_arg(void)
