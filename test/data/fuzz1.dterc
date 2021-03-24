@@ -60,6 +60,7 @@ set syntax true
 set set-window-title true
 setenv SETENVTEST 1111
 insert $SETENVTEST
+setenv SETENVTEST
 shift +2
 clear
 #tag

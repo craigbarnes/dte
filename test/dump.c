@@ -20,9 +20,9 @@ static const struct {
 } handlers[] = {
     {"alias", true, true, dump_aliases},
     {"bind", true, true, dump_bindings},
-    {"hi", true, true, dump_hl_colors},
     {"errorfmt", true, true, dump_compilers},
     {"ft", true, true, dump_ft},
+    {"hi", true, true, dump_hl_colors},
     {"include", false, false, dump_builtin_configs},
     {"option", true, false, dump_options},
     {"wsplit", false, false, dump_frames},
