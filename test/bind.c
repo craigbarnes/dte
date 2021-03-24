@@ -34,8 +34,32 @@ static void test_handle_binding(void)
     handle_command(&commands, "close", false);
 }
 
+static void test_add_binding(void)
+{
+    KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F12;
+    const KeyBinding *bind = lookup_binding(key);
+    EXPECT_NULL(bind);
+
+    const Command *insert_cmd = find_normal_command("insert");
+    ASSERT_NONNULL(insert_cmd);
+
+    const char *key_str = "C-S-F12";
+    add_binding(key_str, "insert xyz");
+    bind = lookup_binding(key);
+    ASSERT_NONNULL(bind);
+    EXPECT_PTREQ(bind->cmd, insert_cmd);
+    EXPECT_EQ(bind->a.nr_args, 1);
+    EXPECT_EQ(bind->a.nr_flags, 0);
+    EXPECT_STREQ(bind->cmd_str, "insert xyz");
+
+    remove_binding(key_str);
+    bind = lookup_binding(key);
+    EXPECT_NULL(bind);
+}
+
 static const TestEntry tests[] = {
     TEST(test_handle_binding),
+    TEST(test_add_binding),
 };
 
 const TestGroup bind_tests = TEST_GROUP(tests);
