@@ -2,7 +2,9 @@
 #include "test.h"
 #include "terminal/color.h"
 #include "terminal/key.h"
+#include "terminal/output.h"
 #include "terminal/rxvt.h"
+#include "terminal/terminal.h"
 #include "terminal/xterm.h"
 #include "util/debug.h"
 #include "util/unicode.h"
@@ -571,6 +573,31 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, 0x18);
 }
 
+static void test_term_add_str(void)
+{
+    EXPECT_EQ(obuf.count, 0);
+    EXPECT_EQ(obuf.tab, TAB_NORMAL);
+    term_output_reset(0, 80, 0);
+    EXPECT_EQ(obuf.tab, TAB_CONTROL);
+    EXPECT_EQ(obuf.tab_width, 8);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_EQ(obuf.width, 80);
+    EXPECT_EQ(obuf.scroll_x, 0);
+    EXPECT_EQ(terminal.width, 80);
+    EXPECT_EQ(obuf.can_clear, true);
+
+    term_add_str("1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
+    EXPECT_EQ(obuf.count, 20);
+    EXPECT_STREQ(obuf.buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");
+
+    EXPECT_TRUE(term_put_char(0x10FFFF));
+    EXPECT_EQ(obuf.count, 24);
+    EXPECT_STREQ(obuf.buf + 20, "<" "??" ">");
+
+    memset(obuf.buf, '\0', obuf.count);
+    obuf.count = 0;
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_term_color),
     TEST(test_color_to_nearest),
@@ -580,6 +607,7 @@ static const TestEntry tests[] = {
     TEST(test_rxvt_parse_key),
     TEST(test_keycode_to_string),
     TEST(test_parse_key_string),
+    TEST(test_term_add_str),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);
