@@ -125,10 +125,13 @@ String dump_hl_colors(void)
     }
 
     const size_t count = hl_colors.count;
-    HlColor *array = xnew(HlColor, count);
-    size_t n = 0;
+    if (unlikely(count == 0)) {
+        return buf;
+    }
 
     // Copy the HashMap entries into an array
+    HlColor *array = xnew(HlColor, count);
+    size_t n = 0;
     for (HashMapIter it = hashmap_iter(&hl_colors); hashmap_next(&it); ) {
         const TermColor *c = it.entry->value;
         array[n++] = (HlColor) {

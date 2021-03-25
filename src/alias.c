@@ -54,9 +54,12 @@ static int alias_cmp(const void *ap, const void *bp)
 String dump_aliases(void)
 {
     const size_t count = aliases.count;
-    CommandAlias *array = xnew(CommandAlias, count);
+    if (unlikely(count == 0)) {
+        return string_new(0);
+    }
 
     // Clone the contents of the HashMap as an array of name/value pairs
+    CommandAlias *array = xnew(CommandAlias, count);
     size_t n = 0;
     for (HashMapIter it = hashmap_iter(&aliases); hashmap_next(&it); ) {
         array[n++] = (CommandAlias) {
