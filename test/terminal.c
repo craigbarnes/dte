@@ -588,14 +588,17 @@ static void test_term_add_str(void)
 
     term_add_str("1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
     EXPECT_EQ(obuf.count, 20);
+    EXPECT_EQ(obuf.x, 17);
     EXPECT_STREQ(obuf.buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");
 
     EXPECT_TRUE(term_put_char(0x10FFFF));
     EXPECT_EQ(obuf.count, 24);
+    EXPECT_EQ(obuf.x, 21);
     EXPECT_STREQ(obuf.buf + 20, "<" "??" ">");
 
     memset(obuf.buf, '\0', obuf.count);
     obuf.count = 0;
+    obuf.x = 0;
 }
 
 static const TestEntry tests[] = {
