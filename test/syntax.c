@@ -79,7 +79,9 @@ static void test_hl_line(void)
         return;
     }
 
-    Encoding enc = {.type = ENCODING_AUTODETECT};
+    const Encoding enc = encoding_from_type(UTF8);
+    EXPECT_EQ(enc.type, UTF8);
+    EXPECT_STREQ(enc.name, "UTF-8");
     View *v = window_open_file(window, "test/data/test.c", &enc);
     ASSERT_NONNULL(v);
 

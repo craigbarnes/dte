@@ -3,6 +3,7 @@
 #include <string.h>
 #include "convert.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
@@ -113,7 +114,7 @@ size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
 
 FileDecoder *new_file_decoder(const char *encoding, const unsigned char *buf, size_t n)
 {
-    if (unlikely(encoding != NULL)) {
+    if (unlikely(encoding && !streq(encoding, "UTF-8"))) {
         errno = EINVAL;
         return NULL;
     }
