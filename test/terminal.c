@@ -575,8 +575,16 @@ static void test_parse_key_string(void)
 
 static void test_term_add_str(void)
 {
-    EXPECT_EQ(obuf.count, 0);
     EXPECT_EQ(obuf.tab, TAB_NORMAL);
+    EXPECT_EQ(obuf.count, 0);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_EQ(obuf.scroll_x, 0);
+    EXPECT_EQ(obuf.width, 0);
+
+    term_add_str("this should write nothing because obuf.width == 0");
+    EXPECT_EQ(obuf.count, 0);
+    EXPECT_EQ(obuf.x, 0);
+
     term_output_reset(0, 80, 0);
     EXPECT_EQ(obuf.tab, TAB_CONTROL);
     EXPECT_EQ(obuf.tab_width, 8);
