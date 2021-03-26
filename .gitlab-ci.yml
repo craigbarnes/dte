@@ -46,6 +46,7 @@ debian-9:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-9
     script:
         - make check
+        - cat build/feature.h
         - make installcheck
         - make check-syntax-files
         - make clean && make check CC='ccache gcc'
@@ -67,8 +68,9 @@ android:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
     script:
-        - make clean && make CC="$CC_ARMV7A"
         - make clean && make CC="$CC_AARCH64"
+        - cat build/feature.h
+        - make clean && make CC="$CC_ARMV7A"
         - make clean && make CC="$CC_I686"
         - make clean && make CC="$CC_X86_64"
 
