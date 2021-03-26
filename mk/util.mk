@@ -17,7 +17,10 @@ ARCH = $(shell uname -m 2>/dev/null)
 NPROC = $(or $(shell sh mk/nproc.sh), 1)
 _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
-CC_VERSION = $(shell $(CC) --version 2>/dev/null | head -n1)
+CC_VERSION = $(or \
+    $(shell $(CC) --version 2>/dev/null | head -n1), \
+    $(shell $(CC) -v 2>&1 | grep version) )
+CC_TARGET = $(shell $(CC) -dumpmachine 2>/dev/null)
 MAKE_S = $(findstring s,$(firstword -$(MAKEFLAGS)))$(filter -s,$(MAKEFLAGS))
 PRINTVAR = printf '\033[1m%15s\033[0m = %s$(2)\n' '$(1)' '$(strip $($(1)))' $(3)
 PRINTVARX = $(call PRINTVAR,$(1), \033[32m(%s)\033[0m, '$(origin $(1))')
@@ -28,7 +31,7 @@ AUTOVARS = \
     $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
     TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) \
-    PKGCONFIG MAKE_VERSION MAKEFLAGS CC_VERSION
+    PKGCONFIG MAKE_VERSION MAKEFLAGS CC_VERSION CC_TARGET
 
 vars:
 	@echo
