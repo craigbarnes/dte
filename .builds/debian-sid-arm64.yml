@@ -6,4 +6,6 @@ tasks:
     - build: |
         cd dte
         make vars
-        make check DEBUG=3 V=1
+        make check DEBUG=3 WERROR=1 V=1
+        cat build/feature.h
+        ./dte -V

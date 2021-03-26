@@ -10,8 +10,10 @@ default:
     stage: test
     script:
         - export CC="ccache ${CC:-gcc}"
-        - make check
+        - make
+        - cat build/feature.h
         - ldd dte
+        - make check
         - make clean && make check LDFLAGS=-static
         - ldd dte || true
         - make clean && make check CSTD='-std=c99 -D_POSIX_C_SOURCE=200809L'
@@ -43,7 +45,7 @@ debian-9:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-9
     script:
-        - make check CC="ccache ${CC:-gcc}"
+        - make check
         - make installcheck
         - make check-syntax-files
         - make clean && make check CC='ccache gcc'
@@ -55,7 +57,7 @@ debian-9:
         - make clean && make check CC='ccache clang'
         - make clean && make CC='ccache arm-linux-gnueabihf-gcc'
         - make clean && make CC='ccache aarch64-linux-gnu-gcc'
-        - make clean && make distcheck CC="ccache ${CC:-gcc}"
+        - make clean && make distcheck
 
 debian-10:
     extends: debian-9

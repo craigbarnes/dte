@@ -13,6 +13,7 @@ script:
     - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
     - $MAKE vars
     - $MAKE check
+    - cat build/feature.h
     - ./dte -V
     - $MAKE check ICONV_DISABLE=1
     - $MAKE distcheck
