@@ -22,6 +22,19 @@ void file_location_free(FileLocation *loc)
     free(loc);
 }
 
+FileLocation *get_current_file_location(void)
+{
+    const char *filename = buffer->abs_filename;
+    FileLocation *loc = xmalloc(sizeof(*loc));
+    *loc = (FileLocation) {
+        .filename = filename ? xstrdup(filename) : NULL,
+        .buffer_id = buffer->id,
+        .line = view->cy + 1,
+        .column = view->cx_char + 1
+    };
+    return loc;
+}
+
 static bool file_location_go(const FileLocation *loc)
 {
     Window *w = window;
@@ -156,16 +169,8 @@ void activate_prev_message(void)
 
 void activate_current_message_save(void)
 {
-    const char *filename = buffer->abs_filename;
-    FileLocation *loc = xmalloc(sizeof(*loc));
-    *loc = (FileLocation) {
-        .filename = filename ? xstrdup(filename) : NULL,
-        .buffer_id = buffer->id,
-        .line = view->cy + 1,
-        .column = view->cx_char + 1
-    };
-
-    BlockIter save = view->cursor;
+    const BlockIter save = view->cursor;
+    FileLocation *loc = get_current_file_location();
     activate_current_message();
 
     // Save position if file changed or cursor moved

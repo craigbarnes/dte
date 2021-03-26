@@ -180,15 +180,7 @@ static void cmd_bookmark(const CommandArgs *a)
         return;
     }
 
-    const char *filename = buffer->abs_filename;
-    FileLocation *loc = xmalloc(sizeof(*loc));
-    *loc = (FileLocation) {
-        .filename = filename ? xstrdup(filename) : NULL,
-        .buffer_id = buffer->id,
-        .line = view->cy + 1,
-        .column = view->cx_char + 1
-    };
-    push_file_location(loc);
+    push_file_location(get_current_file_location());
 }
 
 static void cmd_case(const CommandArgs *a)
