@@ -241,23 +241,19 @@ bool redo(unsigned long change_id)
         return false;
     }
 
-    if (change_id) {
-        if (--change_id >= change->nr_prev) {
-            error_msg (
-                "There are only %lu possible changes to redo.",
-                change->nr_prev
-            );
-            return false;
+    const unsigned long nr_prev = change->nr_prev;
+    BUG_ON(nr_prev == 0);
+    if (change_id == 0) {
+        // Default to newest change
+        change_id = nr_prev - 1;
+        if (nr_prev > 1) {
+            unsigned long i = change_id + 1;
+            info_msg("Redoing newest (%lu) of %lu possible changes.", i, nr_prev);
         }
     } else {
-        // Default to newest change
-        change_id = change->nr_prev - 1;
-        if (change->nr_prev > 1) {
-            info_msg (
-                "Redoing newest (%lu) of %lu possible changes.",
-                change_id + 1,
-                change->nr_prev
-            );
+        if (--change_id >= nr_prev) {
+            error_msg("There are only %lu possible changes to redo.", nr_prev);
+            return false;
         }
     }
 
