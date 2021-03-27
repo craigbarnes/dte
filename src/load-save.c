@@ -347,8 +347,9 @@ static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_t
     if (nr_errors > 0) {
         // Any real error hides this message
         error_msg (
-            "Warning: %zu nonreversible character conversions. File saved.",
-            nr_errors
+            "Warning: %zu non-reversible character conversion%s. File saved.",
+            nr_errors,
+            (nr_errors > 1) ? "s" : ""
         );
     }
 
