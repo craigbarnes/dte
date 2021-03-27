@@ -6,6 +6,7 @@
 #include "error.h"
 #include "move.h"
 #include "search.h"
+#include "util/debug.h"
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 #include "view.h"
@@ -98,6 +99,11 @@ static bool file_location_return(const FileLocation *loc)
 
 void push_file_location(FileLocation *loc)
 {
+    const size_t max_entries = 256;
+    if (file_locations.count == max_entries) {
+        free(ptr_array_remove_idx(&file_locations, 0));
+    }
+    BUG_ON(file_locations.count >= max_entries);
     ptr_array_append(&file_locations, loc);
 }
 
