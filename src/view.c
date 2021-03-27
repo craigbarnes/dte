@@ -143,33 +143,35 @@ bool view_can_close(const View *v)
 StringView view_get_word_under_cursor(const View *v)
 {
     StringView line;
-    size_t i, ei, si = fetch_this_line(&v->cursor, &line);
-
+    size_t si = fetch_this_line(&v->cursor, &line);
     while (si < line.length) {
-        i = si;
+        size_t i = si;
         if (u_is_word_char(u_get_char(line.data, line.length, &i))) {
             break;
         }
         si = i;
     }
+
     if (si == line.length) {
         return string_view(NULL, 0);
     }
 
-    ei = si;
+    size_t ei = si;
     while (si > 0) {
-        i = si;
+        size_t i = si;
         if (!u_is_word_char(u_prev_char(line.data, &i))) {
             break;
         }
         si = i;
     }
+
     while (ei < line.length) {
-        i = ei;
+        size_t i = ei;
         if (!u_is_word_char(u_get_char(line.data, line.length, &i))) {
             break;
         }
         ei = i;
     }
+
     return string_view(line.data + si, ei - si);
 }
