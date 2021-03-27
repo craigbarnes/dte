@@ -31,8 +31,6 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
     check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), sizeof(a[0]), cmp); \
 } while (0)
 
-IGNORE_WARNING("-Wunused-parameter")
-
 static inline void check_bsearch_array (
     const void *array_base,
     const char *array_name,
@@ -42,7 +40,6 @@ static inline void check_bsearch_array (
     size_t name_size,
     StringCompareFunction cmp
 ) {
-#if DEBUG >= 1
     BUG_ON(!array_base);
     BUG_ON(!array_name);
     BUG_ON(!name_field_name);
@@ -50,7 +47,9 @@ static inline void check_bsearch_array (
     BUG_ON(array_length == 0);
     BUG_ON(array_element_size == 0);
     BUG_ON(name_size == 0);
+    BUG_ON(!cmp);
 
+#if DEBUG >= 1
     const char *first_name = array_base;
 
     for (size_t i = 0; i < array_length; i++) {
@@ -80,8 +79,6 @@ static inline void check_bsearch_array (
     }
 #endif
 }
-
-UNIGNORE_WARNINGS
 
 // Like bsearch(3), but returning the index of the element instead of
 // a pointer to it (or -1 if not found)
