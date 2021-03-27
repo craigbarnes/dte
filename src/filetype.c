@@ -249,14 +249,10 @@ HOT const char *find_ft(const char *filename, StringView line)
 
     strview_trim_right(&line);
     if (line.length >= 4) {
-        const char *data = line.data;
+        const char *s = line.data;
         const size_t n = line.length;
-        if (data[0] == '[' && data[n - 1] == ']' && is_word_byte(data[1])) {
-            size_t i = 2;
-            while (i < n && !ascii_iscntrl(data[i])) {
-                i++;
-            }
-            if (i == n) {
+        if (s[0] == '[' && s[n - 1] == ']' && is_word_byte(s[1])) {
+            if (!strview_contains_char_type(&line, ASCII_CNTRL)) {
                 return builtin_filetype_names[INI];
             }
         }
