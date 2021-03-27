@@ -36,6 +36,11 @@ extern TermOutputBuffer obuf;
 
 #define term_add_literal(s) term_add_bytes(s, STRLEN(s))
 
+static inline size_t obuf_avail(void)
+{
+    return sizeof(obuf.buf) - obuf.count;
+}
+
 void term_output_reset(size_t start_x, size_t width, size_t scroll_x);
 void term_add_byte(char ch);
 void term_add_bytes(const char *str, size_t count);

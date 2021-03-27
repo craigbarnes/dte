@@ -1,6 +1,7 @@
 #include <string.h>
 #include "test.h"
 #include "terminal/color.h"
+#include "terminal/ecma48.h"
 #include "terminal/key.h"
 #include "terminal/output.h"
 #include "terminal/rxvt.h"
@@ -573,6 +574,14 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, 0x18);
 }
 
+static void clear_obuf(void)
+{
+    ASSERT_TRUE(obuf_avail() > 8);
+    memset(obuf.buf, '\0', obuf.count + 8);
+    obuf.count = 0;
+    obuf.x = 0;
+}
+
 static void test_term_add_str(void)
 {
     EXPECT_EQ(obuf.tab, TAB_NORMAL);
@@ -603,10 +612,90 @@ static void test_term_add_str(void)
     EXPECT_EQ(obuf.count, 24);
     EXPECT_EQ(obuf.x, 21);
     EXPECT_STREQ(obuf.buf + 20, "<" "??" ">");
+    clear_obuf();
+}
 
-    memset(obuf.buf, '\0', obuf.count);
-    obuf.count = 0;
-    obuf.x = 0;
+static void test_ecma48_clear_to_eol(void)
+{
+    ecma48_clear_to_eol();
+    EXPECT_EQ(obuf.count, 3);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[K", 3);
+    clear_obuf();
+}
+
+static void test_ecma48_move_cursor(void)
+{
+    ecma48_move_cursor(12, 5);
+    EXPECT_EQ(obuf.count, 7);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
+    clear_obuf();
+
+    ecma48_move_cursor(0, 22);
+    EXPECT_EQ(obuf.count, 5);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
+    clear_obuf();
+}
+
+static void test_ecma48_repeat_byte(void)
+{
+    ecma48_repeat_byte('x', 40);
+    EXPECT_EQ(obuf.count, 6);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "x\033[39b", 6);
+    clear_obuf();
+
+    ecma48_repeat_byte('-', 5);
+    EXPECT_EQ(obuf.count, 5);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "-----", 5);
+    clear_obuf();
+
+    ecma48_repeat_byte('\n', 8);
+    EXPECT_EQ(obuf.count, 8);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\n\n\n\n\n\n\n\n", 8);
+    clear_obuf();
+}
+
+static void test_ecma48_set_color(void)
+{
+    const TermColorCapabilityType color_type = terminal.color_type;
+    EXPECT_EQ(color_type, TERM_8_COLOR);
+    EXPECT_EQ(terminal.ncv_attributes, 0);
+    terminal.color_type = TERM_TRUE_COLOR;
+
+    TermColor c = {
+        .fg = COLOR_RED,
+        .bg = COLOR_YELLOW,
+        .attr = ATTR_BOLD | ATTR_REVERSE,
+    };
+
+    ecma48_set_color(&c);
+    EXPECT_EQ(obuf.count, 14);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[0;1;7;31;43m", 14);
+    clear_obuf();
+
+    c.attr = 0;
+    c.fg = COLOR_RGB(0x12ef46);
+    ecma48_set_color(&c);
+    EXPECT_EQ(obuf.count, 22);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[0;38;2;18;239;70;43m", 22);
+    clear_obuf();
+
+    c.fg = 144;
+    c.bg = COLOR_DEFAULT;
+    ecma48_set_color(&c);
+    EXPECT_EQ(obuf.count, 13);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033[0;38;5;144m", 13);
+    clear_obuf();
+
+    terminal.color_type = color_type;
 }
 
 static const TestEntry tests[] = {
@@ -619,6 +708,10 @@ static const TestEntry tests[] = {
     TEST(test_keycode_to_string),
     TEST(test_parse_key_string),
     TEST(test_term_add_str),
+    TEST(test_ecma48_clear_to_eol),
+    TEST(test_ecma48_move_cursor),
+    TEST(test_ecma48_repeat_byte),
+    TEST(test_ecma48_set_color),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);

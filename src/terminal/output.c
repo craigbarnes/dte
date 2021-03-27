@@ -11,11 +11,6 @@
 
 TermOutputBuffer obuf;
 
-static size_t obuf_avail(void)
-{
-    return sizeof(obuf.buf) - obuf.count;
-}
-
 static void obuf_need_space(size_t count)
 {
     if (unlikely(obuf_avail() < count)) {

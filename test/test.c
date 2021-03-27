@@ -38,6 +38,15 @@ void expect_ptreq(const char *file, int line, const void *p1, const void *p2)
     }
 }
 
+void expect_memeq(const char *file, int line, const void *m1, const void *m2, size_t len)
+{
+    if (unlikely(!mem_equal(m1, m2, len))) {
+        test_fail(file, line, "Bytes not equal");
+    } else {
+        passed++;
+    }
+}
+
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
 {
     if (unlikely(a != b)) {
