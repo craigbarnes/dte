@@ -87,25 +87,25 @@ static const struct FileBasenameMap {
     {"zshrc", SH, true},
 };
 
-static FileTypeEnum filetype_from_basename(StringView sv)
+static FileTypeEnum filetype_from_basename(StringView name)
 {
-    if (sv.length < 4) {
+    if (name.length < 4) {
         return NONE;
     }
 
-    if (sv.length >= ARRAY_COUNT(basenames[0].name)) {
-        if (strview_equal_cstring(&sv, "meson_options.txt")) {
+    if (name.length >= ARRAY_COUNT(basenames[0].name)) {
+        if (strview_equal_cstring(&name, "meson_options.txt")) {
             return MESON;
         }
         return NONE;
     }
 
-    bool dot = (sv.data[0] == '.');
+    bool dot = (name.data[0] == '.');
     if (dot) {
-        strview_remove_prefix(&sv, 1);
+        strview_remove_prefix(&name, 1);
     }
 
-    const struct FileBasenameMap *e = BSEARCH(&sv, basenames, ft_compare);
+    const struct FileBasenameMap *e = BSEARCH(&name, basenames, ft_compare);
     if (e && (!dot || e->dotfile)) {
         return e->filetype;
     }

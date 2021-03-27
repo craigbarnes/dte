@@ -187,14 +187,14 @@ static const struct FileExtensionMap {
     {"zsh", SH},
 };
 
-static FileTypeEnum filetype_from_extension(const StringView sv)
+static FileTypeEnum filetype_from_extension(const StringView ext)
 {
-    if (sv.length >= sizeof(extensions[0].ext)) {
+    if (ext.length >= sizeof(extensions[0].ext)) {
         return NONE;
     }
 
-    if (sv.length == 1) {
-        switch (sv.data[0]) {
+    if (ext.length == 1) {
+        switch (ext.data[0]) {
         case '1': case '2': case '3':
         case '4': case '5': case '6':
         case '7': case '8': case '9':
@@ -214,6 +214,6 @@ static FileTypeEnum filetype_from_extension(const StringView sv)
         return NONE;
     }
 
-    const struct FileExtensionMap *e = BSEARCH(&sv, extensions, ft_compare);
+    const struct FileExtensionMap *e = BSEARCH(&ext, extensions, ft_compare);
     return e ? e->filetype : NONE;
 }

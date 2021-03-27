@@ -48,19 +48,21 @@ static const struct FileInterpreterMap {
     {"zsh", SH},
 };
 
-static FileTypeEnum filetype_from_interpreter(const StringView sv)
+static FileTypeEnum filetype_from_interpreter(const StringView name)
 {
-    if (sv.length < 2) {
+    if (name.length < 2) {
         return NONE;
-    } else if (sv.length >= ARRAY_COUNT(interpreters[0].key)) {
-        if (strview_equal_cstring(&sv, "openrc-run")) {
+    }
+
+    if (name.length >= ARRAY_COUNT(interpreters[0].key)) {
+        if (strview_equal_cstring(&name, "openrc-run")) {
             return SH;
-        } else if (strview_equal_cstring(&sv, "runhaskell")) {
+        } else if (strview_equal_cstring(&name, "runhaskell")) {
             return HASKELL;
         }
         return NONE;
     }
 
-    const struct FileInterpreterMap *e = BSEARCH(&sv, interpreters, ft_compare);
+    const struct FileInterpreterMap *e = BSEARCH(&name, interpreters, ft_compare);
     return e ? e->filetype : NONE;
 }
