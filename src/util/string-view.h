@@ -121,6 +121,13 @@ static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
     return NULL;
 }
 
+static inline void strview_remove_prefix(StringView *sv, size_t len)
+{
+    BUG_ON(len > sv->length);
+    sv->data += len;
+    sv->length -= len;
+}
+
 NONNULL_ARGS
 static inline void strview_trim_left(StringView *sv)
 {
@@ -130,8 +137,7 @@ static inline void strview_trim_left(StringView *sv)
     while (i < len && ascii_isblank(data[i])) {
         i++;
     }
-    sv->data = data + i;
-    sv->length = len - i;
+    strview_remove_prefix(sv, i);
 }
 
 NONNULL_ARGS
@@ -143,13 +149,6 @@ static inline void strview_trim_right(StringView *sv)
         n--;
     }
     sv->length = n;
-}
-
-static inline void strview_remove_prefix(StringView *sv, size_t len)
-{
-    BUG_ON(len > sv->length);
-    sv->data += len;
-    sv->length -= len;
 }
 
 #endif

@@ -91,7 +91,9 @@ static FileTypeEnum filetype_from_basename(StringView sv)
 {
     if (sv.length < 4) {
         return NONE;
-    } else if (sv.length >= ARRAY_COUNT(basenames[0].name)) {
+    }
+
+    if (sv.length >= ARRAY_COUNT(basenames[0].name)) {
         if (strview_equal_cstring(&sv, "meson_options.txt")) {
             return MESON;
         }
@@ -100,8 +102,7 @@ static FileTypeEnum filetype_from_basename(StringView sv)
 
     bool dot = (sv.data[0] == '.');
     if (dot) {
-        sv.data++;
-        sv.length--;
+        strview_remove_prefix(&sv, 1);
     }
 
     const struct FileBasenameMap *e = BSEARCH(&sv, basenames, ft_compare);
