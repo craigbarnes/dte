@@ -142,7 +142,7 @@ String dump_hl_colors(void)
 
     // Sort the array
     BUG_ON(n != count);
-    qsort(array, count, sizeof(*array), hlcolor_cmp);
+    qsort(array, count, sizeof(array[0]), hlcolor_cmp);
 
     string_append_literal(&buf, "\n# Syntax colors:\n");
     for (size_t i = 0; i < count; i++) {

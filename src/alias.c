@@ -70,7 +70,7 @@ String dump_aliases(void)
 
     // Sort the array
     BUG_ON(n != count);
-    qsort(array, count, sizeof(CommandAlias), alias_cmp);
+    qsort(array, count, sizeof(array[0]), alias_cmp);
 
     // Serialize the aliases in sorted order
     String buf = string_new(4096);
