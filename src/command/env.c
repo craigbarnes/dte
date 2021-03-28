@@ -5,9 +5,9 @@
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 #include "view.h"
 
 typedef struct {
@@ -35,13 +35,7 @@ static char *expand_filetype(void)
 
 static char *expand_lineno(void)
 {
-    if (!view) {
-        return NULL;
-    }
-    size_t maxlen = DECIMAL_STR_MAX(view->cy);
-    char *str = xmalloc(maxlen);
-    xsnprintf(str, maxlen, "%ld", view->cy + 1);
-    return str;
+    return view ? xstrdup(umax_to_str(view->cy + 1)) : NULL;
 }
 
 static char *expand_word(void)

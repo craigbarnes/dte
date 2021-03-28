@@ -577,6 +577,25 @@ static void test_str_to_size(void)
     EXPECT_FALSE(str_to_size("99999999999999999999999999999999", &val));
 }
 
+static void test_umax_to_str(void)
+{
+    EXPECT_STREQ(umax_to_str(0), "0");
+    EXPECT_STREQ(umax_to_str(1), "1");
+    EXPECT_STREQ(umax_to_str(7), "7");
+    EXPECT_STREQ(umax_to_str(99), "99");
+    EXPECT_STREQ(umax_to_str(111), "111");
+    EXPECT_STREQ(umax_to_str(1000), "1000");
+    EXPECT_STREQ(umax_to_str(20998), "20998");
+
+    uintmax_t x = UINTMAX_MAX;
+    char ref[DECIMAL_STR_MAX(x)];
+    xsnprintf(ref, sizeof ref, "%ju", x);
+    EXPECT_STREQ(umax_to_str(x), ref);
+    x--;
+    xsnprintf(ref, sizeof ref, "%ju", x);
+    EXPECT_STREQ(umax_to_str(x), ref);
+}
+
 static void test_uint_to_str(void)
 {
     EXPECT_STREQ(uint_to_str(0), "0");
@@ -1679,6 +1698,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_parse_ulong),
     TEST(test_str_to_int),
     TEST(test_str_to_size),
+    TEST(test_umax_to_str),
     TEST(test_uint_to_str),
     TEST(test_buf_uint_to_str),
     TEST(test_u_char_width),
