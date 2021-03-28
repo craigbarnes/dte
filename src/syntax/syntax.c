@@ -96,13 +96,15 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
         hashmap_insert(states, s->name, s);
 
         if (s->conds.count > 0) {
-            s->conds.ptrs = xmemdup (
-                s->conds.ptrs,
-                sizeof(void *) * s->conds.alloc
-            );
-            for (size_t j = 0, n2 = s->conds.count; j < n2; j++) {
-                s->conds.ptrs[j] = xmemdup(s->conds.ptrs[j], sizeof(Condition));
+            // Deep copy conds PointerArray
+            BUG_ON(s->conds.alloc < s->conds.count);
+            void **ptrs = xnew(void*, s->conds.alloc);
+            for (size_t i = 0, n = s->conds.count; i < n; i++) {
+                ptrs[i] = xmemdup(s->conds.ptrs[i], sizeof(Condition));
             }
+            s->conds.ptrs = ptrs;
+        } else {
+            BUG_ON(s->conds.alloc != 0);
         }
 
         // Mark unvisited so that state that is used only as a return
