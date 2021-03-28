@@ -20,7 +20,7 @@ struct FileDecoder {
     const unsigned char *ibuf;
     ssize_t ipos, isize;
     struct cconv *cconv;
-    bool (*read_line)(struct FileDecoder *dec, char **linep, size_t *lenp);
+    bool (*read_line)(struct FileDecoder *dec, const char **linep, size_t *lenp);
 };
 
 const char *file_decoder_get_encoding(const FileDecoder *dec)
@@ -28,7 +28,7 @@ const char *file_decoder_get_encoding(const FileDecoder *dec)
     return dec->encoding;
 }
 
-static bool read_utf8_line(FileDecoder *dec, char **linep, size_t *lenp)
+static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
     char *line = (char *)dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
@@ -129,7 +129,7 @@ void free_file_decoder(FileDecoder *dec)
     free(dec);
 }
 
-bool file_decoder_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
     return read_utf8_line(dec, linep, lenp);
 }
@@ -525,7 +525,7 @@ static bool fill(FileDecoder *dec)
     return true;
 }
 
-static bool decode_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
     char *line;
     size_t len;
@@ -605,7 +605,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
     return false;
 }
 
-static bool detect_and_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+static bool detect_and_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
     char *line = (char *)dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
@@ -663,7 +663,7 @@ void free_file_decoder(FileDecoder *dec)
     free(dec);
 }
 
-bool file_decoder_read_line(FileDecoder *dec, char **linep, size_t *lenp)
+bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
     return dec->read_line(dec, linep, lenp);
 }

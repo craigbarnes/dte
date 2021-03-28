@@ -82,7 +82,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
         return false;
     }
 
-    char *line;
+    const char *line;
     size_t len;
     if (file_decoder_read_line(dec, &line, &len)) {
         if (len && line[len - 1] == '\r') {
