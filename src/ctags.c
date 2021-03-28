@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ctags.h"
+#include "util/line-iter.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -134,35 +135,21 @@ bool next_tag (
     bool exact,
     Tag *t
 ) {
-    size_t prefix_len = strlen(prefix);
-    size_t pos = *posp;
-
-    while (pos < tf->size) {
-        size_t len = tf->size - pos;
-        char *line = tf->buf + pos;
-        char *end = memchr(line, '\n', len);
-
-        if (end) {
-            len = end - line;
-        }
-        pos += len + 1;
-
-        if (!len || line[0] == '!') {
+    size_t pflen = strlen(prefix);
+    for (size_t pos = *posp, size = tf->size; pos < size; ) {
+        StringView line = buf_slice_next_line(tf->buf, &pos, size);
+        if (line.length == 0 || line.data[0] == '!') {
             continue;
         }
-
-        if (len <= prefix_len || !mem_equal(line, prefix, prefix_len)) {
+        if (line.length <= pflen || !mem_equal(line.data, prefix, pflen)) {
             continue;
         }
-
-        if (exact && line[prefix_len] != '\t') {
+        if (exact && line.data[pflen] != '\t') {
             continue;
         }
-
-        if (!parse_line(t, line, len)) {
+        if (!parse_line(t, line.data, line.length)) {
             continue;
         }
-
         *posp = pos;
         return true;
     }
