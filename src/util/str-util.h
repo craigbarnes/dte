@@ -64,6 +64,36 @@ static inline StringView get_delim(const char *buf, size_t *posp, size_t size, i
 }
 
 NONNULL_ARGS
+static inline char *get_delim_str(char *buf, size_t *posp, size_t size, int delim)
+{
+    size_t pos = *posp;
+    BUG_ON(pos >= size);
+    size_t len = size - pos;
+    char *start = buf + pos;
+    char *found = memchr(start, delim, len);
+    if (found) {
+        *found = '\0';
+        *posp += (size_t)(found - start) + 1;
+    } else {
+        start[len] = '\0';
+        *posp += len;
+    }
+    return start;
+}
+
+NONNULL_ARGS
+static inline StringView buf_slice_next_line(const char *buf, size_t *posp, size_t size)
+{
+    return get_delim(buf, posp, size, '\n');
+}
+
+NONNULL_ARGS
+static inline char *buf_next_line(char *buf, size_t *posp, size_t size)
+{
+    return get_delim_str(buf, posp, size, '\n');
+}
+
+NONNULL_ARGS
 static inline size_t count_nl(const char *buf, size_t size)
 {
     const char *end = buf + size;

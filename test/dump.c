@@ -10,7 +10,7 @@
 #include "frame.h"
 #include "options.h"
 #include "syntax/color.h"
-#include "util/line-iter.h"
+#include "util/str-util.h"
 
 static const struct {
     const char name[10];

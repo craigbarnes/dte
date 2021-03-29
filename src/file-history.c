@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include "file-history.h"
 #include "error.h"
-#include "util/line-iter.h"
 #include "util/path.h"
 #include "util/hashmap.h"
 #include "util/readfile.h"

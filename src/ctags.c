@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ctags.h"
-#include "util/line-iter.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"

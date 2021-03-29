@@ -12,7 +12,6 @@
 #include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
-#include "util/line-iter.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/ptr-array.h"

@@ -39,7 +39,6 @@
 #include "util/bsearch.h"
 #include "util/checked-arith.h"
 #include "util/debug.h"
-#include "util/line-iter.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
