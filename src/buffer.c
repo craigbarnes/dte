@@ -376,44 +376,39 @@ static bool detect_indent(Buffer *b)
             break;
         }
     }
+
     if (tab_count == 0 && space_count == 0) {
         return false;
     }
+
     if (tab_count > space_count) {
         b->options.emulate_tab = false;
         b->options.expand_tab = false;
         b->options.indent_width = b->options.tab_width;
-    } else {
-        size_t m = 0;
-        for (size_t i = 1; i < ARRAY_COUNT(counts); i++) {
-            if (b->options.detect_indent & 1 << (i - 1)) {
-                if (counts[i] > counts[m]) {
-                    m = i;
-                }
-            }
-        }
-        if (m == 0) {
-            return false;
-        }
-        b->options.emulate_tab = true;
-        b->options.expand_tab = true;
-        b->options.indent_width = m;
+        return true;
     }
+
+    size_t m = 0;
+    for (size_t i = 1; i < ARRAY_COUNT(counts); i++) {
+        unsigned int bit = 1u << (i - 1);
+        if ((b->options.detect_indent & bit) && counts[i] > counts[m]) {
+            m = i;
+        }
+    }
+
+    if (m == 0) {
+        return false;
+    }
+
+    b->options.emulate_tab = true;
+    b->options.expand_tab = true;
+    b->options.indent_width = m;
     return true;
 }
 
 void buffer_setup(Buffer *b)
 {
     const char *filename = b->abs_filename;
-    if (filename) {
-        if (
-            str_has_prefix(filename, "/etc/")
-            || str_has_prefix(filename, "/root/")
-        ) {
-            // Enable fsync by default for system and root configs
-            b->options.fsync = true;
-        }
-    }
     b->setup = true;
     buffer_detect_filetype(b);
     set_file_options(b);
