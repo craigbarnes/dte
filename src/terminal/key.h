@@ -6,7 +6,9 @@
 #include "util/macros.h"
 
 enum {
+    KEY_TAB = '\t',
     KEY_ENTER = '\n',
+    KEY_SPACE = ' ',
 
     // This is the maximum Unicode codepoint allowed by RFC 3629.
     // When stored in a 32-bit integer, it only requires the first
@@ -73,7 +75,7 @@ static inline KeyCode keycode_get_modifiers(KeyCode k)
 static inline KeyCode keycode_normalize(KeyCode k)
 {
     switch (k) {
-    case '\t': return k;
+    case '\t': return KEY_TAB;
     case '\r': return KEY_ENTER;
     case 0x7F: return MOD_CTRL | '?';
     }

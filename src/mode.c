@@ -18,13 +18,13 @@
 static void normal_mode_keypress(KeyCode key)
 {
     switch (key) {
-    case '\t':
+    case KEY_TAB:
         if (view->selection == SELECT_LINES) {
             shift_lines(1);
             return;
         }
         break;
-    case MOD_SHIFT | '\t':
+    case MOD_SHIFT | KEY_TAB:
         if (view->selection == SELECT_LINES) {
             shift_lines(-1);
             return;
@@ -65,10 +65,10 @@ static void command_mode_keypress(KeyCode key)
         }
         handle_command(&commands, str, true);
         return;
-    case '\t':
+    case KEY_TAB:
         complete_command_next();
         return;
-    case MOD_SHIFT | '\t':
+    case MOD_SHIFT | KEY_TAB:
         complete_command_prev();
         return;
     }
@@ -133,7 +133,7 @@ static void search_mode_keypress(KeyCode key)
     case MOD_META | 'r':
         toggle_search_direction();
         return;
-    case '\t':
+    case KEY_TAB:
         return;
     }
 

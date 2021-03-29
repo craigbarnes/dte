@@ -158,7 +158,7 @@ static void test_xterm_parse_key(void)
         ssize_t expected_length;
         KeyCode expected_key;
     } tests[] = {
-        {"\033[Z", 3, MOD_SHIFT | '\t'},
+        {"\033[Z", 3, MOD_SHIFT | KEY_TAB},
         {"\033[1;2A", 6, MOD_SHIFT | KEY_UP},
         {"\033[1;2B", 6, MOD_SHIFT | KEY_DOWN},
         {"\033[1;2C", 6, MOD_SHIFT | KEY_RIGHT},
@@ -197,7 +197,7 @@ static void test_xterm_parse_key(void)
         {"\033[4~", 4, KEY_END},
         {"\033[5~", 4, KEY_PAGE_UP},
         {"\033[6~", 4, KEY_PAGE_DOWN},
-        {"\033O ", 3, ' '},
+        {"\033O ", 3, KEY_SPACE},
         {"\033OA", 3, KEY_UP},
         {"\033OB", 3, KEY_DOWN},
         {"\033OC", 3, KEY_RIGHT},
@@ -205,7 +205,7 @@ static void test_xterm_parse_key(void)
         {"\033OE", 3, KEY_BEGIN},
         {"\033OF", 3, KEY_END},
         {"\033OH", 3, KEY_HOME},
-        {"\033OI", 3, '\t'},
+        {"\033OI", 3, KEY_TAB},
         {"\033OM", 3, KEY_ENTER},
         {"\033OP", 3, KEY_F1},
         {"\033OQ", 3, KEY_F2},
@@ -263,7 +263,7 @@ static void test_xterm_parse_key(void)
         {"\033[c", 3, MOD_SHIFT | KEY_RIGHT},
         {"\033[d", 3, MOD_SHIFT | KEY_LEFT},
         // xterm + `modifyOtherKeys` option
-        {"\033[27;5;9~", 9, MOD_CTRL | '\t'},
+        {"\033[27;5;9~", 9, MOD_CTRL | KEY_TAB},
         {"\033[27;5;13~", 10, MOD_CTRL | KEY_ENTER},
         {"\033[27;6;13~", 10, MOD_CTRL | MOD_SHIFT |KEY_ENTER},
         {"\033[27;2;127~", 11, MOD_CTRL | '?'},
@@ -281,7 +281,7 @@ static void test_xterm_parse_key(void)
         {"\033[27;123;99999999999999999~", 0, 0},
         // www.leonerd.org.uk/hacks/fixterms/
         {"\033[13;3u", 7, MOD_META | KEY_ENTER},
-        {"\033[9;5u", 6, MOD_CTRL | '\t'},
+        {"\033[9;5u", 6, MOD_CTRL | KEY_TAB},
         {"\033[65;3u", 7, MOD_META | 'A'},
         {"\033[108;5u", 8, MOD_CTRL | 'L'},
         {"\033[127765;3u", 11, MOD_META | 127765ul},
@@ -513,9 +513,9 @@ static void test_keycode_to_string(void)
         {"Z", 'Z'},
         {"0", '0'},
         {"{", '{'},
-        {"space", ' '},
+        {"space", KEY_SPACE},
         {"enter", KEY_ENTER},
-        {"tab", '\t'},
+        {"tab", KEY_TAB},
         {"insert", KEY_INSERT},
         {"delete", KEY_DELETE},
         {"home", KEY_HOME},
@@ -533,8 +533,8 @@ static void test_keycode_to_string(void)
         {"F1", KEY_F1},
         {"F12", KEY_F12},
         {"M-enter", MOD_META | KEY_ENTER},
-        {"M-space", MOD_META | ' '},
-        {"S-tab", MOD_SHIFT | '\t'},
+        {"M-space", MOD_META | KEY_SPACE},
+        {"S-tab", MOD_SHIFT | KEY_TAB},
         {"C-M-S-F12", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F12},
         {"C-M-S-up", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
         {"C-M-delete", MOD_CTRL | MOD_META | KEY_DELETE},
@@ -555,11 +555,11 @@ static void test_parse_key_string(void)
 {
     KeyCode key = 0;
     EXPECT_TRUE(parse_key_string(&key, "^I"));
-    EXPECT_EQ(key, '\t');
+    EXPECT_EQ(key, KEY_TAB);
     EXPECT_TRUE(parse_key_string(&key, "^M"));
     EXPECT_EQ(key, KEY_ENTER);
     EXPECT_TRUE(parse_key_string(&key, "C-I"));
-    EXPECT_EQ(key, '\t');
+    EXPECT_EQ(key, KEY_TAB);
     EXPECT_TRUE(parse_key_string(&key, "C-M"));
     EXPECT_EQ(key, KEY_ENTER);
 

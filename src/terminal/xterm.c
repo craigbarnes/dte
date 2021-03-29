@@ -101,7 +101,7 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
         *k = '=';
         return i;
     case ' ':
-        *k = ' ';
+        *k = KEY_SPACE;
         return i;
     case 'a': // Ctrl+Up (rxvt)
     case 'b': // Ctrl+Down (rxvt)
@@ -256,7 +256,7 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
         *k = KEY_INSERT;
         return i;
     case 'Z':
-        *k = MOD_SHIFT | '\t';
+        *k = MOD_SHIFT | KEY_TAB;
         return i;
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':

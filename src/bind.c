@@ -62,8 +62,8 @@ UNITTEST {
     BUG_ON(get_lookup_table_index(MOD_SHIFT | min) != 256 + nsk);
     BUG_ON(get_lookup_table_index(MOD_CTRL | max) != 256 + (5 * nsk) - 1);
 
-    BUG_ON(get_lookup_table_index(MOD_CTRL | ' ') != 32);
-    BUG_ON(get_lookup_table_index(MOD_META | ' ') != 32 + 128);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | KEY_SPACE) != 32);
+    BUG_ON(get_lookup_table_index(MOD_META | KEY_SPACE) != 32 + 128);
     BUG_ON(get_lookup_table_index(MOD_CTRL | '~') != 126);
     BUG_ON(get_lookup_table_index(MOD_META | '~') != 126 + 128);
 

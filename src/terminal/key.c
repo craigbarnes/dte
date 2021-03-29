@@ -82,7 +82,7 @@ bool parse_key_string(KeyCode *key, const char *str)
             switch (ch) {
             case 'i':
             case 'I':
-                ch = '\t';
+                ch = KEY_TAB;
                 modifiers = 0;
                 break;
             case 'm':
@@ -96,11 +96,11 @@ bool parse_key_string(KeyCode *key, const char *str)
         return true;
     }
     if (ascii_streq_icase(str, "space")) {
-        *key = modifiers | ' ';
+        *key = modifiers | KEY_SPACE;
         return true;
     }
     if (ascii_streq_icase(str, "tab")) {
-        *key = modifiers | '\t';
+        *key = modifiers | KEY_TAB;
         return true;
     }
     if (ascii_streq_icase(str, "enter")) {
@@ -143,13 +143,13 @@ const char *keycode_to_string(KeyCode k)
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
         switch (key) {
-        case '\t':
+        case KEY_TAB:
             COPY(ptr, "tab");
             break;
         case KEY_ENTER:
             COPY(ptr, "enter");
             break;
-        case ' ':
+        case KEY_SPACE:
             COPY(ptr, "space");
             break;
         default:

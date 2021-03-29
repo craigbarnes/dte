@@ -14,7 +14,7 @@
  See: https://sw.kovidgoyal.net/kitty/key-encoding.html
 */
 static const KeyCode kitty_1digit_keys[] = {
-    ['0'] = '\t',
+    ['0'] = KEY_TAB,
     ['1'] = MOD_CTRL | '?', // Backspace
     ['2'] = KEY_INSERT,
     ['3'] = KEY_DELETE,
@@ -48,8 +48,8 @@ static const KeyCode kitty_1digit_keys[] = {
     ['='] = KEY_IGNORE, // Num Lock
     ['^'] = KEY_IGNORE, // Print Screen
 
-    ['A'] = ' ', ['B'] = '\'', ['C'] = ',', ['D'] = '-', ['E'] = '.',
-    ['F'] = '/',
+    ['A'] = KEY_SPACE,
+    ['B'] = '\'', ['C'] = ',', ['D'] = '-', ['E'] = '.', ['F'] = '/',
 
     ['G'] = '0', ['H'] = '1', ['I'] = '2', ['J'] = '3', ['K'] = '4',
     ['L'] = '5', ['M'] = '6', ['N'] = '7', ['O'] = '8', ['P'] = '9',
