@@ -80,12 +80,7 @@ void add_error_fmt (
 
 void collect_compilers(const char *prefix)
 {
-    for (HashMapIter it = hashmap_iter(&compilers); hashmap_next(&it); ) {
-        const char *name = it.entry->key;
-        if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
-        }
-    }
+    collect_hashmap_keys(&compilers, prefix);
 }
 
 static void append_compiler(String *s, const Compiler *c, const char *name)

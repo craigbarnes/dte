@@ -58,6 +58,16 @@ void add_completion(char *str)
     ptr_array_append(&completion.completions, str);
 }
 
+void collect_hashmap_keys(const HashMap *map, const char *prefix)
+{
+    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
+}
+
 static void do_collect_files (
     const char *dirname,
     const char *dirprefix,

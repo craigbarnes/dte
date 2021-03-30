@@ -84,12 +84,7 @@ void collect_hl_colors(const char *prefix)
             add_completion(xstrdup(name));
         }
     }
-    for (HashMapIter it = hashmap_iter(&hl_colors); hashmap_next(&it); ) {
-        const char *name = it.entry->key;
-        if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
-        }
-    }
+    collect_hashmap_keys(&hl_colors, prefix);
 }
 
 typedef struct {
