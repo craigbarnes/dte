@@ -56,9 +56,9 @@ installed:
 
 ...then download and unpack the latest release tarball:
 
-    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.9.1.tar.gz
-    tar -xzf dte-1.9.1.tar.gz
-    cd dte-1.9.1
+    curl -LO https://craigbarnes.gitlab.io/dist/dte/dte-1.10.tar.gz
+    tar -xzf dte-1.10.tar.gz
+    cd dte-1.10
 
 ...and compile and install:
 
