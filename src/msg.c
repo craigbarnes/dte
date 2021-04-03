@@ -101,7 +101,7 @@ void push_file_location(FileLocation *loc)
 {
     const size_t max_entries = 256;
     if (file_locations.count == max_entries) {
-        free(ptr_array_remove_idx(&file_locations, 0));
+        file_location_free(ptr_array_remove_idx(&file_locations, 0));
     }
     BUG_ON(file_locations.count >= max_entries);
     ptr_array_append(&file_locations, loc);
