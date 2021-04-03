@@ -1,8 +1,10 @@
 Releases
 ========
 
-v1.10 (not yet released)
-------------------------
+v1.10 (latest release)
+----------------------
+
+Released on 2021-04-03.
 
 **Additions:**
 
@@ -80,8 +82,8 @@ v1.10 (not yet released)
 * Removed support for vertical tab bars (the `tab-bar` option was
   changed from an enum to a Boolean).
 
-v1.9.1 (latest release)
------------------------
+v1.9.1
+------
 
 Released on 2019-09-29.
 
