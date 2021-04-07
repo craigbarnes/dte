@@ -4,10 +4,10 @@
 #include "error.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 
 static const char attr_names[][16] = {
     "keep",
@@ -373,12 +373,20 @@ static size_t append_color(char *buf, int32_t color)
         memcpy(buf, name, len);
         return len;
     } else if (color < 256) {
-        return xsnprintf(buf, 4, "%u", (unsigned int)color);
+        return buf_uint_to_str((unsigned int)color, buf);
     }
+
     BUG_ON((color & COLOR_FLAG_RGB) == 0);
-    uint8_t r, g, b;
-    color_split_rgb(color, &r, &g, &b);
-    return xsnprintf(buf, 8, "#%02hhx%02hhx%02hhx", r, g, b);
+    size_t n = 0;
+    buf[n++] = '#';
+
+    static const char hextab[] = "0123456789abcdef";
+    for (unsigned int shift = 20; shift <= 20; shift -= 4) {
+        buf[n++] = hextab[(color >> shift) & 0xF];
+    }
+
+    BUG_ON(n != 7);
+    return n;
 }
 
 const char *term_color_to_string(const TermColor *color)
