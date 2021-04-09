@@ -167,12 +167,14 @@ void move_eof(void)
 
 void move_to_line(View *v, size_t line)
 {
+    BUG_ON(line == 0);
     block_iter_goto_line(&v->cursor, line - 1);
     v->center_on_scroll = true;
 }
 
 void move_to_column(View *v, size_t column)
 {
+    BUG_ON(column == 0);
     block_iter_bol(&v->cursor);
     while (column-- > 1) {
         CodePoint u;
