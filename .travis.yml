@@ -4,9 +4,6 @@ os: [linux, osx]
 arch: [amd64, arm64, ppc64le, s390x]
 compiler: [clang, gcc]
 
-install:
-    - if test "$TRAVIS_OS_NAME" = osx; then brew install make; fi
-
 script:
     - git fetch --tags
     - export MAKE="$(command -v gmake || command -v make)"
@@ -17,4 +14,3 @@ script:
     - ./dte -V
     - $MAKE check ICONV_DISABLE=1
     - $MAKE distcheck
-    - if test "$TRAVIS_OS_NAME" = osx; then brew install yumitsu/dte/dte; fi
