@@ -13,4 +13,6 @@ script:
     - cat build/feature.h
     - ./dte -V
     - $MAKE check ICONV_DISABLE=1
-    - $MAKE distcheck
+    # This test fails on the default OS X runner due to an obsolete
+    # version of GNU Make (3.81):
+    - if test "$TRAVIS_OS_NAME" != osx; then make distcheck; fi
