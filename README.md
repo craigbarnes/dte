@@ -77,6 +77,26 @@ Packaging
 
 See [`docs/packaging.md`](https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md).
 
+For linux user, you can always try play with the newest version from [here](https://craigbarnes.gitlab.io/dte/dte-master-linux-x86_64.tar.gz).
+
+Limits
+-------
+
+At the moment, bindings that include `Ctrl` must use uppercase letters. e.g. 
+`bind C-y 'paste -c'` should change to `bind C-Y 'paste -c'`.
+
+I've been thinking about this problem for a long time, but it's hard to fix 
+without breaking backwards compatibility,  It's been this way since the code
+was forked from dex.
+
+Until I fix the problem, I think `dte -K` is the most useful way to see how 
+to bind key combinations.
+
+For now, copying and pasting in dte use the primary selection, in the future, 
+I will be adding a new option to the `copy` and `paste` commands to allow 
+copying and pasting from the system (X11/Wayland/Mac) clipboard, as did in
+emacs since 24.1.
+
 License
 -------
 
