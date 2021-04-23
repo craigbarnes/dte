@@ -83,6 +83,8 @@ static void command_mode_keypress(KeyCode key)
     case CMDLINE_UNKNOWN_KEY:
         return;
     }
+
+    BUG("unhandled cmdline_handle_key() return value");
 }
 
 static void search_mode_keypress(KeyCode key)
@@ -145,6 +147,8 @@ static void search_mode_keypress(KeyCode key)
     case CMDLINE_KEY_HANDLED:
         return;
     }
+
+    BUG("unhandled cmdline_handle_key() return value");
 }
 
 void handle_input(KeyCode key)
@@ -152,14 +156,14 @@ void handle_input(KeyCode key)
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         normal_mode_keypress(key);
-        break;
+        return;
     case INPUT_COMMAND:
         command_mode_keypress(key);
-        break;
+        return;
     case INPUT_SEARCH:
         search_mode_keypress(key);
-        break;
-    default:
-        BUG("unhandled input mode");
+        return;
     }
+
+    BUG("unhandled input mode");
 }
