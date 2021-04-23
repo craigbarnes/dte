@@ -49,7 +49,7 @@ static void test_builtin_configs(void)
             char *src;
             ssize_t size = read_file(path, &src);
             ASSERT_EQ(size, cfg.text.length);
-            EXPECT_TRUE(mem_equal(src, cfg.text.data, size));
+            EXPECT_MEMEQ(src, cfg.text.data, size);
             free(src);
         }
     }
