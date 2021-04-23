@@ -203,7 +203,7 @@ size_t remove_view(View *v)
     ptr_array_remove(&b->views, v);
     if (b->views.count == 0) {
         if (b->options.file_history && b->abs_filename) {
-            add_file_history(v->cy + 1, v->cx_char + 1, b->abs_filename);
+            file_history_add(v->cy + 1, v->cx_char + 1, b->abs_filename);
         }
         free_buffer(b);
     }
@@ -232,7 +232,7 @@ void window_close_current_view(Window *w)
 static void restore_cursor_from_history(View *v)
 {
     unsigned long row, col;
-    if (find_file_in_history(v->buffer->abs_filename, &row, &col)) {
+    if (file_history_find(v->buffer->abs_filename, &row, &col)) {
         move_to_line(v, row);
         move_to_column(v, col);
     }

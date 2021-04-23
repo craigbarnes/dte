@@ -407,7 +407,7 @@ loop_break:
     const char *file_history_filename = NULL;
     if (load_and_save_history) {
         file_history_filename = editor_file("file-history");
-        load_file_history(file_history_filename);
+        file_history_load(file_history_filename);
         history_load(&editor.command_history, editor_file("command-history"));
         history_load(&editor.search_history, editor_file("search-history"));
         if (editor.search_history.last) {
@@ -500,7 +500,7 @@ loop_break:
     if (load_and_save_history) {
         history_save(&editor.command_history);
         history_save(&editor.search_history);
-        save_file_history(file_history_filename);
+        file_history_save(file_history_filename);
     }
 
     if (stdout_buffer) {

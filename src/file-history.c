@@ -32,7 +32,7 @@ enum {
 
 static FileHistory history;
 
-void add_file_history(unsigned long row, unsigned long col, const char *filename)
+void file_history_add(unsigned long row, unsigned long col, const char *filename)
 {
     HashMap *map = &history.entries;
     FileHistoryEntry *e = hashmap_get(map, filename);
@@ -90,7 +90,7 @@ static bool parse_ulong(const char **strp, unsigned long *valp)
     return false;
 }
 
-void load_file_history(const char *filename)
+void file_history_load(const char *filename)
 {
     char *buf;
     const ssize_t ssize = read_file(filename, &buf);
@@ -115,13 +115,13 @@ void load_file_history(const char *filename)
         if (!path_is_absolute(path)) {
             continue;
         }
-        add_file_history(row, col, path);
+        file_history_add(row, col, path);
     }
 
     free(buf);
 }
 
-void save_file_history(const char *filename)
+void file_history_save(const char *filename)
 {
     FILE *f = xfopen(filename, "w", O_CLOEXEC, 0666);
     if (!f) {
@@ -136,7 +136,7 @@ void save_file_history(const char *filename)
     fclose(f);
 }
 
-bool find_file_in_history(const char *filename, unsigned long *row, unsigned long *col)
+bool file_history_find(const char *filename, unsigned long *row, unsigned long *col)
 {
     const FileHistoryEntry *e = hashmap_get(&history.entries, filename);
     if (!e) {
