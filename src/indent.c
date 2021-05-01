@@ -62,6 +62,8 @@ void get_indent_info(const StringView *line, IndentInfo *info)
 {
     const char *buf = line->data;
     const size_t len = line->length;
+    const size_t tw = buffer->options.tab_width;
+    const size_t iw = buffer->options.indent_width;
     size_t spaces = 0;
     size_t tabs = 0;
     size_t pos = 0;
@@ -74,7 +76,6 @@ void get_indent_info(const StringView *line, IndentInfo *info)
             info->width++;
             spaces++;
         } else if (buf[pos] == '\t') {
-            size_t tw = buffer->options.tab_width;
             info->width = (info->width + tw) / tw * tw;
             tabs++;
         } else {
@@ -82,12 +83,12 @@ void get_indent_info(const StringView *line, IndentInfo *info)
         }
         info->bytes++;
         pos++;
-        if (info->width % buffer->options.indent_width == 0 && info->sane) {
+        if (info->width % iw == 0 && info->sane) {
             info->sane = use_spaces_for_indent() ? !tabs : !spaces;
         }
     }
 
-    info->level = info->width / buffer->options.indent_width;
+    info->level = info->width / iw;
     info->wsonly = pos == len;
 }
 
@@ -100,12 +101,13 @@ bool use_spaces_for_indent(void)
 
 static ssize_t get_current_indent_bytes(const char *buf, size_t cursor_offset)
 {
-    size_t tw = buffer->options.tab_width;
+    const size_t tw = buffer->options.tab_width;
+    const size_t iw = buffer->options.indent_width;
     size_t ibytes = 0;
     size_t iwidth = 0;
 
     for (size_t i = 0; i < cursor_offset; i++) {
-        if (iwidth % buffer->options.indent_width == 0) {
+        if (iwidth % iw == 0) {
             ibytes = 0;
             iwidth = 0;
         }
@@ -123,10 +125,11 @@ static ssize_t get_current_indent_bytes(const char *buf, size_t cursor_offset)
         ibytes++;
     }
 
-    if (iwidth % buffer->options.indent_width) {
+    if (iwidth % iw) {
         // Cursor at middle of indentation level
         return -1;
     }
+
     return (ssize_t)ibytes;
 }
 
@@ -150,7 +153,8 @@ size_t get_indent_level_bytes_right(void)
         return 0;
     }
 
-    size_t tw = buffer->options.tab_width;
+    const size_t tw = buffer->options.tab_width;
+    const size_t iw = buffer->options.indent_width;
     size_t iwidth = 0;
     for (size_t i = cursor_offset, n = line.length; i < n; i++) {
         switch (line.data[i]) {
@@ -164,7 +168,7 @@ size_t get_indent_level_bytes_right(void)
             // No full indentation level at cursor position
             return 0;
         }
-        if (iwidth % buffer->options.indent_width == 0) {
+        if (iwidth % iw == 0) {
             return i - cursor_offset + 1;
         }
     }
@@ -176,7 +180,7 @@ char *alloc_indent(size_t count, size_t *sizep)
     char *indent;
     size_t size;
     if (use_spaces_for_indent()) {
-        size = buffer->options.indent_width * count;
+        size = count * buffer->options.indent_width;
         indent = xmalloc(size);
         memset(indent, ' ', size);
     } else {

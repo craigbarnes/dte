@@ -26,16 +26,14 @@ void view_update_cursor_y(View *v)
 
 void view_update_cursor_x(View *v)
 {
-    unsigned int tw = v->buffer->options.tab_width;
-    size_t idx = 0;
     StringView line;
-    long c = 0;
+    const unsigned int tw = v->buffer->options.tab_width;
+    const size_t cx = fetch_this_line(&v->cursor, &line);
+    long cx_char = 0;
     long w = 0;
 
-    v->cx = fetch_this_line(&v->cursor, &line);
-    while (idx < v->cx) {
+    for (size_t idx = 0; idx < cx; cx_char++) {
         CodePoint u = line.data[idx++];
-        c++;
         if (likely(u < 0x80)) {
             if (likely(!ascii_iscntrl(u))) {
                 w++;
@@ -50,7 +48,9 @@ void view_update_cursor_x(View *v)
             w += u_char_width(u);
         }
     }
-    v->cx_char = c;
+
+    v->cx = cx;
+    v->cx_char = cx_char;
     v->cx_display = w;
 }
 
