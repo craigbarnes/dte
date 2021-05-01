@@ -13,7 +13,7 @@ char *make_indent(size_t width)
     }
 
     char *str;
-    if (use_spaces_for_indent()) {
+    if (use_spaces_for_indent(buffer)) {
         str = xmalloc(width + 1);
         memset(str, ' ', width);
         str[width] = '\0';
@@ -64,6 +64,7 @@ void get_indent_info(const StringView *line, IndentInfo *info)
     const size_t len = line->length;
     const size_t tw = buffer->options.tab_width;
     const size_t iw = buffer->options.indent_width;
+    const bool space_indent = use_spaces_for_indent(buffer);
     size_t spaces = 0;
     size_t tabs = 0;
     size_t pos = 0;
@@ -84,19 +85,12 @@ void get_indent_info(const StringView *line, IndentInfo *info)
         info->bytes++;
         pos++;
         if (info->width % iw == 0 && info->sane) {
-            info->sane = use_spaces_for_indent() ? !tabs : !spaces;
+            info->sane = space_indent ? !tabs : !spaces;
         }
     }
 
     info->level = info->width / iw;
     info->wsonly = pos == len;
-}
-
-bool use_spaces_for_indent(void)
-{
-    return
-        buffer->options.expand_tab == true
-        || buffer->options.indent_width != buffer->options.tab_width;
 }
 
 static ssize_t get_current_indent_bytes(const char *buf, size_t cursor_offset)
@@ -179,7 +173,7 @@ char *alloc_indent(size_t count, size_t *sizep)
 {
     char *indent;
     size_t size;
-    if (use_spaces_for_indent()) {
+    if (use_spaces_for_indent(buffer)) {
         size = count * buffer->options.indent_width;
         indent = xmalloc(size);
         memset(indent, ' ', size);

@@ -531,7 +531,7 @@ static void shift_right(size_t nr_lines, size_t count)
 static void shift_left(size_t nr_lines, size_t count)
 {
     const size_t indent_width = buffer->options.indent_width;
-    const bool space_indent = use_spaces_for_indent();
+    const bool space_indent = use_spaces_for_indent(buffer);
     size_t i = 0;
     while (1) {
         IndentInfo info;
