@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <string.h>
 #include "color.h"
 #include "completion.h"
@@ -192,10 +193,10 @@ bool parse_term_color(TermColor *color, char **strs)
     return true;
 }
 
-static int color_dist_sq (
-    uint8_t R, uint8_t G, uint8_t B,
-    uint8_t r, uint8_t g, uint8_t b
-) {
+// Calculate squared Euclidean distance between 2 RGB colors
+static int color_dist_sq(int R, int G, int B, int r, int g, int b)
+{
+    static_assert(INT_MAX >= 3 * 255 * 255);
     return (R - r) * (R - r) + (G - g) * (G - g) + (B - b) * (B - b);
 }
 
@@ -210,17 +211,14 @@ static uint8_t nearest_cube_index(uint8_t c)
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
 {
-    static const uint8_t color_stops[6] = {
-        0x00, 0x5f, 0x87,
-        0xaf, 0xd7, 0xff
-    };
-
-    if ((color & COLOR_FLAG_RGB) == 0) {
+    if (!(color & COLOR_FLAG_RGB)) {
         BUG_ON(color > 255);
         *exact = true;
         return color;
     }
 
+    // Calculate closest 6x6x6 RGB cube color
+    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
     uint8_t r_idx = nearest_cube_index(r);
@@ -230,33 +228,22 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
     uint8_t g_stop = color_stops[g_idx];
     uint8_t b_stop = color_stops[b_idx];
 
-    if (r_stop == r && g_stop == g && b_stop == b) {
-        *exact = true;
-        return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
-    }
-
-    if (r == g && r == b) {
-        uint8_t v = r - 8;
-        if (v <= 230 && v % 10 == 0) {
-            *exact = true;
-            return (v / 10) + 232;
-        }
-    }
-
     // Calculate closest gray
     int gray_avg = (r + g + b) / 3;
     int gray_idx = (gray_avg > 238) ? 23 : ((gray_avg - 3) / 10);
     int gray = 8 + (10 * gray_idx);
 
+    // Calculate differences
     int rgb_distance = color_dist_sq(r_stop, g_stop, b_stop, r, g, b);
     int gray_distance = color_dist_sq(gray, gray, gray, r, g, b);
+
     if (gray_distance < rgb_distance) {
         // Gray is closest match
-        *exact = false;
+        *exact = (gray_distance == 0);
         return 232 + gray_idx;
     } else {
         // RGB cube color is closest match
-        *exact = false;
+        *exact = (rgb_distance == 0);
         return 16 + (36 * r_idx) + (6 * g_idx) + b_idx;
     }
 }
