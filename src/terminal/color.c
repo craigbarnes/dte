@@ -217,10 +217,11 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
         return color;
     }
 
-    // Calculate closest 6x6x6 RGB cube color
-    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
     uint8_t r, g, b;
     color_split_rgb(color, &r, &g, &b);
+
+    // Calculate closest 6x6x6 RGB cube color
+    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
     uint8_t r_idx = nearest_cube_index(r);
     uint8_t g_idx = nearest_cube_index(g);
     uint8_t b_idx = nearest_cube_index(b);
