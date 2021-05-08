@@ -751,7 +751,7 @@ search_fwd:
     while (block_iter_next_char(&bi, &u)) {
         if (u == target) {
             if (level == 0) {
-                bi.offset--;
+                block_iter_prev_char(&bi, &u);
                 view->cursor = bi;
                 return; // Found
             }
