@@ -1155,6 +1155,20 @@ created files.
 Note: buffers opened from existing files will have their newline
 type detected automatically.
 
+### **optimize-true-color** [true]
+
+If set to `true`, this option will cause the [`hi`] command to
+automatically replace 24-bit #RRGGBB colors with palette colors 16-255,
+but only if there's an exact color match among the default, extended
+palette colors.
+
+This allows defining color schemes in #RRGGBB notation while still
+sending the shortest possible escape sequence to the terminal.
+
+Note: this optimization only works if the terminal has not been
+configured with custom values for colors 16-255. If you have changed
+these extended palette colors, you should set this option to `false`.
+
 ### **select-cursor-char** [true]
 
 Whether to include the character under the cursor in selections.

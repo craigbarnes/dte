@@ -73,6 +73,7 @@ typedef struct {
     bool display_invisible;
     bool display_special;
     bool lock_files;
+    bool optimize_true_color;
     bool select_cursor_char;
     bool set_window_title;
     bool show_line_numbers;

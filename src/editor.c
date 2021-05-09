@@ -74,6 +74,7 @@ EditorState editor = {
         .esc_timeout = 100,
         .filesize_limit = 250,
         .lock_files = true,
+        .optimize_true_color = true,
         .scroll_margin = 0,
         .select_cursor_char = true,
         .set_window_title = false,

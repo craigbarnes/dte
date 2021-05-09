@@ -319,7 +319,7 @@ static uint8_t color_any_to_8(int32_t color)
     return color_any_to_16(color) & 7;
 }
 
-int32_t color_to_nearest(int32_t color, TermColorCapabilityType type)
+int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optimize)
 {
     if (color < 0) {
         return color;
@@ -329,7 +329,7 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type)
     case TERM_8_COLOR: return color_any_to_8(color);
     case TERM_16_COLOR: return color_any_to_16(color);
     case TERM_256_COLOR: return color_any_to_256(color);
-    case TERM_TRUE_COLOR: return color_rgb_optimize(color);
+    case TERM_TRUE_COLOR: return optimize ? color_rgb_optimize(color) : color;
     }
     BUG("unexpected TermColorCapabilityType value");
     // This should never be reached, but it silences compiler warnings

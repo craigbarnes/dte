@@ -118,11 +118,12 @@ static void test_color_to_nearest(void)
     };
     FOR_EACH_I(i, tests) {
         const int32_t c = tests[i].input;
-        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR), tests[i].expected_rgb);
-        IEXPECT_EQ(color_to_nearest(c, TERM_256_COLOR), tests[i].expected_256);
-        IEXPECT_EQ(color_to_nearest(c, TERM_16_COLOR), tests[i].expected_16);
-        IEXPECT_EQ(color_to_nearest(c, TERM_8_COLOR), tests[i].expected_16 & 7);
-        IEXPECT_EQ(color_to_nearest(c, TERM_0_COLOR), COLOR_DEFAULT);
+        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR, false), c);
+        IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR, true), tests[i].expected_rgb);
+        IEXPECT_EQ(color_to_nearest(c, TERM_256_COLOR, false), tests[i].expected_256);
+        IEXPECT_EQ(color_to_nearest(c, TERM_16_COLOR, false), tests[i].expected_16);
+        IEXPECT_EQ(color_to_nearest(c, TERM_8_COLOR, false), tests[i].expected_16 & 7);
+        IEXPECT_EQ(color_to_nearest(c, TERM_0_COLOR, false), COLOR_DEFAULT);
     }
 }
 

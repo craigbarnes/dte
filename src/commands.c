@@ -597,8 +597,9 @@ static void cmd_hi(const CommandArgs *a)
         return;
     }
 
-    int32_t fg = color_to_nearest(color.fg, terminal.color_type);
-    int32_t bg = color_to_nearest(color.bg, terminal.color_type);
+    bool optimize = editor.options.optimize_true_color;
+    int32_t fg = color_to_nearest(color.fg, terminal.color_type, optimize);
+    int32_t bg = color_to_nearest(color.bg, terminal.color_type, optimize);
     if (
         terminal.color_type != TERM_TRUE_COLOR
         && has_flag(a, 'c')
