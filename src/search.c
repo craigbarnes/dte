@@ -271,7 +271,7 @@ static void build_replacement (
     String *buf,
     const char *line,
     const char *format,
-    regmatch_t *m
+    regmatch_t *matches
 ) {
     size_t i = 0;
     while (format[i]) {
@@ -279,17 +279,17 @@ static void build_replacement (
         if (ch == '\\') {
             if (format[i] >= '1' && format[i] <= '9') {
                 int n = format[i++] - '0';
-                int len = m[n].rm_eo - m[n].rm_so;
+                int len = matches[n].rm_eo - matches[n].rm_so;
                 if (len > 0) {
-                    string_append_buf(buf, line + m[n].rm_so, len);
+                    string_append_buf(buf, line + matches[n].rm_so, len);
                 }
             } else if (format[i] != '\0') {
                 string_append_byte(buf, format[i++]);
             }
         } else if (ch == '&') {
-            int len = m[0].rm_eo - m[0].rm_so;
+            int len = matches[0].rm_eo - matches[0].rm_so;
             if (len > 0) {
-                string_append_buf(buf, line + m[0].rm_so, len);
+                string_append_buf(buf, line + matches[0].rm_so, len);
             }
         } else {
             string_append_byte(buf, ch);
@@ -312,13 +312,9 @@ static unsigned int replace_on_line (
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
-    enum {
-        MAX_SUBSTRINGS = 32
-    };
-
     unsigned char *buf = (unsigned char *)line->data;
     ReplaceFlags flags = *flagsp;
-    regmatch_t m[MAX_SUBSTRINGS];
+    regmatch_t matches[32];
     size_t pos = 0;
     int eflags = 0;
     unsigned int nr = 0;
@@ -327,15 +323,15 @@ static unsigned int replace_on_line (
         re,
         buf + pos,
         line->length - pos,
-        MAX_SUBSTRINGS,
-        m,
+        ARRAY_COUNT(matches),
+        matches,
         eflags
     )) {
-        regoff_t match_len = m[0].rm_eo - m[0].rm_so;
+        regoff_t match_len = matches[0].rm_eo - matches[0].rm_so;
         bool skip = false;
 
         // Move cursor to beginning of the text to replace
-        block_iter_skip_bytes(bi, m[0].rm_so);
+        block_iter_skip_bytes(bi, matches[0].rm_so);
         view->cursor = *bi;
 
         if (flags & REPLACE_CONFIRM) {
@@ -364,7 +360,7 @@ static unsigned int replace_on_line (
             block_iter_skip_bytes(&view->cursor, match_len);
         } else {
             String b = STRING_INIT;
-            build_replacement(&b, buf + pos, format, m);
+            build_replacement(&b, buf + pos, format, matches);
 
             // line ref is invalidated by modification
             if (buf == line->data && line->length != 0) {
@@ -394,7 +390,7 @@ static unsigned int replace_on_line (
             break;
         }
 
-        pos += m[0].rm_so + match_len;
+        pos += matches[0].rm_so + match_len;
 
         // Don't match beginning of line again
         eflags = REG_NOTBOL;
@@ -455,19 +451,17 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     }
 
     while (1) {
-        // Number of bytes to process
-        size_t count;
         StringView line;
-        unsigned int nr;
-
         fill_line_ref(&bi, &line);
-        count = line.length;
+
+        // Number of bytes to process
+        size_t count = line.length;
         if (line.length > nr_bytes) {
             // End of selection is not full line
             line.length = nr_bytes;
         }
 
-        nr = replace_on_line(&line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(&line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;
@@ -490,7 +484,13 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     regfree(&re);
 
     if (nr_substitutions) {
-        info_msg("%u substitutions on %zu lines.", nr_substitutions, nr_lines);
+        info_msg (
+            "%u substitution%s on %zu line%s",
+            nr_substitutions,
+            (nr_substitutions > 1) ? "s" : "",
+            nr_lines,
+            (nr_lines > 1) ? "s" : ""
+        );
     } else if (!(flags & REPLACE_CANCEL)) {
         error_msg("Pattern '%s' not found.", pattern);
     }
