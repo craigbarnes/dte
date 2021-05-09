@@ -204,9 +204,35 @@ static int color_dist_sq(int R, int G, int B, int r, int g, int b)
 static uint8_t nearest_cube_index(uint8_t c)
 {
     if (c < 75) {
-        c += 27;
+        c += 28;
     }
     return (c - 35) / 40;
+}
+
+UNITTEST {
+    BUG_ON(nearest_cube_index(0) != 0);
+    BUG_ON(nearest_cube_index(46) != 0);
+    BUG_ON(nearest_cube_index(47) != 1);
+    BUG_ON(nearest_cube_index(0x72) != 1);
+    BUG_ON(nearest_cube_index(0x73) != 2);
+    BUG_ON(nearest_cube_index(0xaa) != 3);
+    BUG_ON(nearest_cube_index(0xff) != 5);
+
+    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
+    size_t count = 0;
+    for (size_t i = 1; i < ARRAY_COUNT(color_stops); i++) {
+        uint8_t min = color_stops[i - 1];
+        uint8_t max = color_stops[i];
+        uint8_t mid = min + ((max - min) / 2);
+        for (unsigned int c = min; c <= max; c++, count++) {
+            unsigned int ni = nearest_cube_index(c);
+            unsigned int e = (c < mid) ? i - 1 : i;
+            if (ni != e) {
+                BUG("nearest_cube_index(%u) returned %u (expected %u)", c, ni, e);
+            }
+        }
+    }
+    BUG_ON(count != 255 + ARRAY_COUNT(color_stops) - 1);
 }
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
