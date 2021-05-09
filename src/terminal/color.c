@@ -66,6 +66,24 @@ static int32_t lookup_color(const char *s)
     return COLOR_INVALID;
 }
 
+UNITTEST {
+    BUG_ON(lookup_attr("keep") != ATTR_KEEP);
+    BUG_ON(lookup_attr("dim") != ATTR_DIM);
+    BUG_ON(lookup_attr("bold") != ATTR_BOLD);
+    BUG_ON(lookup_attr("strikethrough") != ATTR_STRIKETHROUGH);
+    BUG_ON(lookup_attr("") != 0);
+    BUG_ON(lookup_color("keep") != COLOR_KEEP);
+    BUG_ON(lookup_color("default") != COLOR_DEFAULT);
+    BUG_ON(lookup_color("black") != COLOR_BLACK);
+    BUG_ON(lookup_color("magenta") != COLOR_MAGENTA);
+    BUG_ON(lookup_color("gray") != COLOR_GRAY);
+    BUG_ON(lookup_color("darkgray") != COLOR_DARKGRAY);
+    BUG_ON(lookup_color("lightblue") != COLOR_LIGHTBLUE);
+    BUG_ON(lookup_color("white") != COLOR_WHITE);
+    BUG_ON(lookup_color("lightblack") != COLOR_INVALID);
+    BUG_ON(lookup_color("") != COLOR_INVALID);
+}
+
 static int32_t parse_rrggbb(const char *str)
 {
     int32_t color = 0;
@@ -82,6 +100,8 @@ static int32_t parse_rrggbb(const char *str)
 UNITTEST {
     BUG_ON(parse_rrggbb("f01cff") != COLOR_RGB(0xf01cff));
     BUG_ON(parse_rrggbb("011011") != COLOR_RGB(0x011011));
+    BUG_ON(parse_rrggbb("12aC90") != COLOR_RGB(0x12ac90));
+    BUG_ON(parse_rrggbb("fffffF") != COLOR_RGB(0xffffff));
     BUG_ON(parse_rrggbb("fffffg") != COLOR_INVALID);
     BUG_ON(parse_rrggbb(".") != COLOR_INVALID);
     BUG_ON(parse_rrggbb("") != COLOR_INVALID);
@@ -194,10 +214,20 @@ bool parse_term_color(TermColor *color, char **strs)
 }
 
 // Calculate squared Euclidean distance between 2 RGB colors
-static int color_dist_sq(int R, int G, int B, int r, int g, int b)
-{
+static int color_dist_sq (
+    uint8_t R, uint8_t G, uint8_t B,
+    uint8_t r, uint8_t g, uint8_t b
+) {
     static_assert(INT_MAX >= 3 * 255 * 255);
     return (R - r) * (R - r) + (G - g) * (G - g) + (B - b) * (B - b);
+}
+
+UNITTEST {
+    BUG_ON(color_dist_sq(1,1,1, 1,0,1) != 1);
+    BUG_ON(color_dist_sq(100,0,0, 80,0,0) != 400);
+    BUG_ON(color_dist_sq(0,5,10, 5,0,2) != 25 + 25 + 64);
+    BUG_ON(color_dist_sq(0,0,0, 255,0,0) != 255 * 255);
+    BUG_ON(color_dist_sq(255,255,255, 0,0,0) != 255 * 255 * 3);
 }
 
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
