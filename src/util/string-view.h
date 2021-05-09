@@ -141,7 +141,7 @@ static inline void strview_remove_prefix(StringView *sv, size_t len)
 }
 
 NONNULL_ARGS
-static inline void strview_trim_left(StringView *sv)
+static inline size_t strview_trim_left(StringView *sv)
 {
     const unsigned char *data = sv->data;
     const size_t len = sv->length;
@@ -150,6 +150,7 @@ static inline void strview_trim_left(StringView *sv)
         i++;
     }
     strview_remove_prefix(sv, i);
+    return i;
 }
 
 NONNULL_ARGS

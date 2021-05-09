@@ -31,7 +31,7 @@ static void strip_trailing_comments_and_whitespace(StringView *line)
 
 UNITTEST {
     StringView tmp = STRING_VIEW(" \t  key = val   #   inline comment    ");
-    strview_trim_left(&tmp);
+    BUG_ON(strview_trim_left(&tmp) != 4);
     strip_trailing_comments_and_whitespace(&tmp);
     BUG_ON(!strview_equal_cstring(&tmp, "key = val"));
 }
