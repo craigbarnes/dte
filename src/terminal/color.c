@@ -180,41 +180,39 @@ bool parse_term_color(TermColor *color, char **strs)
     color->fg = COLOR_DEFAULT;
     color->bg = COLOR_DEFAULT;
     color->attr = 0;
-    for (size_t i = 0, count = 0; strs[i]; i++) {
-        const char *const str = strs[i];
-        const int32_t val = parse_color(str);
-        if (val != COLOR_INVALID) {
-            if (count > 1) {
-                if (val == COLOR_KEEP) {
-                    // "keep" is also a valid attribute
-                    color->attr |= ATTR_KEEP;
-                } else {
-                    error_msg("too many colors");
-                    return false;
-                }
-            } else {
-                if (!count) {
-                    color->fg = val;
-                } else {
-                    color->bg = val;
-                }
-                count++;
+
+    for (size_t i = 0, nr_colors = 0; strs[i]; i++) {
+        const char *str = strs[i];
+        int32_t c = parse_color(str);
+        if (c == COLOR_INVALID) {
+            unsigned int attr = lookup_attr(str);
+            if (attr) {
+                color->attr |= attr;
+                continue;
             }
-            continue;
+            error_msg("invalid color or attribute %s", str);
+            return false;
         }
-        const unsigned int attr = lookup_attr(str);
-        if (attr) {
-            color->attr |= attr;
-            continue;
+        if (nr_colors == 0) {
+            color->fg = c;
+            nr_colors++;
+        } else if (nr_colors == 1) {
+            color->bg = c;
+            nr_colors++;
+        } else if (c == COLOR_KEEP) {
+            // "keep" is also a valid attribute
+            color->attr |= ATTR_KEEP;
+        } else {
+            error_msg("too many colors");
+            return false;
         }
-        error_msg("invalid color or attribute %s", str);
-        return false;
     }
+
     return true;
 }
 
 // Calculate squared Euclidean distance between 2 RGB colors
-static int color_dist_sq (
+static int color_distance (
     uint8_t R, uint8_t G, uint8_t B,
     uint8_t r, uint8_t g, uint8_t b
 ) {
@@ -223,11 +221,11 @@ static int color_dist_sq (
 }
 
 UNITTEST {
-    BUG_ON(color_dist_sq(1,1,1, 1,0,1) != 1);
-    BUG_ON(color_dist_sq(100,0,0, 80,0,0) != 400);
-    BUG_ON(color_dist_sq(0,5,10, 5,0,2) != 25 + 25 + 64);
-    BUG_ON(color_dist_sq(0,0,0, 255,0,0) != 255 * 255);
-    BUG_ON(color_dist_sq(255,255,255, 0,0,0) != 255 * 255 * 3);
+    BUG_ON(color_distance(1,1,1, 1,0,1) != 1);
+    BUG_ON(color_distance(100,0,0, 80,0,0) != 400);
+    BUG_ON(color_distance(0,5,10, 5,0,2) != 25 + 25 + 64);
+    BUG_ON(color_distance(0,0,0, 255,0,0) != 255 * 255);
+    BUG_ON(color_distance(255,255,255, 0,0,0) != 255 * 255 * 3);
 }
 
 // Convert RGB color component (0-255) to nearest xterm color cube index (0-5)
@@ -291,8 +289,8 @@ static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
     int gray = 8 + (10 * gray_idx);
 
     // Calculate differences
-    int rgb_distance = color_dist_sq(r_stop, g_stop, b_stop, r, g, b);
-    int gray_distance = color_dist_sq(gray, gray, gray, r, g, b);
+    int rgb_distance = color_distance(r_stop, g_stop, b_stop, r, g, b);
+    int gray_distance = color_distance(gray, gray, gray, r, g, b);
 
     if (gray_distance < rgb_distance) {
         // Gray is closest match
