@@ -486,6 +486,7 @@ UNITTEST {
     };
 
     // Check offset alignments
+    const LocalOptions opts = {.filetype = NULL};
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         size_t alignment = alignments[desc->type];
@@ -494,8 +495,7 @@ UNITTEST {
             BUG_ON(ptr_val % alignment != 0);
         }
         if (desc->local) {
-            const UNUSED Buffer b;
-            uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &b.options);
+            uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &opts);
             BUG_ON(ptr_val % alignment != 0);
         }
     }
