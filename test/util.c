@@ -106,6 +106,35 @@ static void test_xstreq(void)
     EXPECT_FALSE(xstreq("", NULL));
 }
 
+static void test_str_has_prefix(void)
+{
+    EXPECT_TRUE(str_has_prefix("foo", "foo"));
+    EXPECT_TRUE(str_has_prefix("foobar", "foo"));
+    EXPECT_TRUE(str_has_prefix("xyz", "xy"));
+    EXPECT_TRUE(str_has_prefix("a", "a"));
+    EXPECT_FALSE(str_has_prefix("foobar", "bar"));
+    EXPECT_FALSE(str_has_prefix("foo", "foobar"));
+    EXPECT_FALSE(str_has_prefix("xyz", "xyz."));
+    EXPECT_FALSE(str_has_prefix("ab", "b"));
+    EXPECT_FALSE(str_has_prefix("123", "xyz"));
+}
+
+static void test_str_has_suffix(void)
+{
+    EXPECT_TRUE(str_has_suffix("foo", "foo"));
+    EXPECT_TRUE(str_has_suffix("foobar", "bar"));
+    EXPECT_TRUE(str_has_suffix("1234", "234"));
+    EXPECT_TRUE(str_has_suffix("x", "x"));
+    EXPECT_TRUE(str_has_suffix("aa", "a"));
+    EXPECT_FALSE(str_has_suffix("foobar.", "bar"));
+    EXPECT_FALSE(str_has_suffix("foo", "foobar"));
+    EXPECT_FALSE(str_has_suffix("bar", "foobar"));
+    EXPECT_FALSE(str_has_suffix("foo", "bar"));
+    EXPECT_FALSE(str_has_suffix("bar", "foo"));
+    EXPECT_FALSE(str_has_suffix("123", "1234"));
+    EXPECT_FALSE(str_has_suffix("a", "aa"));
+}
+
 static void test_hex_decode(void)
 {
     EXPECT_EQ(hex_decode('0'), 0);
@@ -1694,6 +1723,8 @@ static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
     TEST(test_xstreq),
+    TEST(test_str_has_prefix),
+    TEST(test_str_has_suffix),
     TEST(test_hex_decode),
     TEST(test_ascii),
     TEST(test_base64),

@@ -40,10 +40,7 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
 {
     size_t l1 = strlen(str);
     size_t l2 = strlen(suffix);
-    if (l2 > l1) {
-        return false;
-    }
-    return mem_equal(str + l1 - l2, suffix, l2);
+    return (l1 >= l2) && mem_equal(str + l1 - l2, suffix, l2);
 }
 
 NONNULL_ARGS
