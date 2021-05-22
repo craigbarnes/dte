@@ -23,7 +23,7 @@ static bool process_exists(pid_t pid)
 static pid_t rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
 {
     size_t filename_len = strlen(filename);
-    pid_t my_pid = getpid();
+    pid_t my_pid = editor.pid;
     ssize_t size = *sizep;
     ssize_t pos = 0;
     pid_t other_pid = 0;
@@ -147,7 +147,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
     pid_t pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
-            intmax_t p = (intmax_t)getpid();
+            intmax_t p = (intmax_t)editor.pid;
             size_t n = strlen(filename) + DECIMAL_STR_MAX(pid) + 4;
             xrenew(buf, size + n);
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);

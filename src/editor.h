@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <sys/types.h>
 #include "cmdline.h"
 #include "encoding.h"
 #include "history.h"
@@ -36,6 +37,8 @@ typedef struct {
     bool child_controls_terminal;
     bool everything_changed;
     bool term_utf8;
+    bool session_leader;
+    pid_t pid;
     int exit_code;
     size_t cmdline_x;
     PointerArray buffers;

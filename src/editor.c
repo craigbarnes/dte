@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,7 +92,6 @@ void init_editor_state(void)
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
     editor.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-
     editor.home_dir = strview_intern(home ? home : "");
 
     if (dte_home) {
@@ -103,11 +103,16 @@ void init_editor_state(void)
     log_init("DTE_LOG");
     DEBUG_LOG("version: %s", version);
 
+    pid_t pid = getpid();
+    bool leader = pid == getsid(0);
+    DEBUG_LOG("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
+    editor.pid = pid;
+    editor.session_leader = leader;
+
     const char *locale = setlocale(LC_CTYPE, "");
     if (unlikely(!locale)) {
         fatal_error("setlocale", errno);
     }
-
     DEBUG_LOG("locale: %s", locale);
     editor.charset = encoding_from_name(nl_langinfo(CODESET));
     editor.term_utf8 = (editor.charset.type == UTF8);
@@ -302,7 +307,7 @@ void ui_end(void)
 
 void suspend(void)
 {
-    if (getpid() == getsid(0)) {
+    if (editor.session_leader) {
         error_msg("Session leader can't suspend");
         return;
     }
