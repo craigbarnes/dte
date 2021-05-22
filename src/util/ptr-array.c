@@ -37,23 +37,19 @@ void ptr_array_move(PointerArray *array, size_t from, size_t to)
     }
 
     void **p = array->ptrs;
-    void *tmp = p[from];
-    size_t difference = (from < to) ? (to - from) : (from - to);
-    if (difference == 1) {
-        // Adjacent pointers can be moved with a simple swap
-        p[from] = p[to];
-        p[to] = tmp;
-        return;
-    }
-
     void *dest, *src;
+    size_t difference;
     if (from < to) {
         dest = p + from;
         src = p + from + 1;
+        difference = to - from;
     } else {
         dest = p + to + 1;
         src = p + to;
+        difference = from - to;
     }
+
+    void *tmp = p[from];
     memmove(dest, src, difference * sizeof(void*));
     p[to] = tmp;
 }

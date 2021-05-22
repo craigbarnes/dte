@@ -1160,6 +1160,13 @@ static void test_ptr_array_move(void)
     EXPECT_STREQ(a.ptrs[2], "C");
     EXPECT_STREQ(a.ptrs[3], "A");
 
+    ptr_array_move(&a, 3, 3);
+    EXPECT_STREQ(a.ptrs[3], "A");
+    ptr_array_move(&a, 1, 1);
+    EXPECT_STREQ(a.ptrs[1], "B");
+    ptr_array_move(&a, 0, 0);
+    EXPECT_STREQ(a.ptrs[0], "F");
+
     ptr_array_free(&a);
 }
 
