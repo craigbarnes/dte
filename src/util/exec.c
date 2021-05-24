@@ -130,6 +130,7 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
     act.sa_handler = SIG_DFL;
     sigaction(SIGINT, &act, NULL);
     sigaction(SIGQUIT, &act, NULL);
+    sigaction(SIGTSTP, &act, NULL);
     sigaction(SIGPIPE, &act, NULL);
     sigaction(SIGUSR1, &act, NULL);
     sigaction(SIGUSR2, &act, NULL);

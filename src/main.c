@@ -33,11 +33,6 @@
 #include "view.h"
 #include "window.h"
 
-static void handle_sigtstp(int UNUSED_ARG(signum))
-{
-    suspend();
-}
-
 static void handle_sigcont(int UNUSED_ARG(signum))
 {
     if (
@@ -107,8 +102,8 @@ static void set_signal_handlers(void)
     };
 
     static const int ignored_signals[] = {
-        SIGINT, SIGQUIT, SIGPIPE,
-        SIGUSR1, SIGUSR2,
+        SIGINT, SIGQUIT, SIGTSTP,
+        SIGPIPE, SIGUSR1, SIGUSR2,
     };
 
     static const int default_signals[] = {
@@ -120,7 +115,6 @@ static void set_signal_handlers(void)
         int signum;
         void (*handler)(int);
     } handled_signals[] = {
-        {SIGTSTP, handle_sigtstp},
         {SIGCONT, handle_sigcont},
 #ifdef SIGWINCH
         {SIGWINCH, handle_sigwinch},
