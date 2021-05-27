@@ -14,8 +14,8 @@ dte Release Checklist
 2. Tag and upload
    1. `git tag -s -m "Release v${VER}" v${VER} ${COMMIT}`
    2. `make dist`
-   3. Upload tarball and detached GPG signature to GitLab pages
-   4. Wait for GitLab pages job to finish
+   3. Upload tarball and detached GPG signature to [releases repo]
+   4. Wait for [GitLab Pages job] to finish
    5. Check tarball link in `README.md` works
    6. Push tag to remotes
 
@@ -23,3 +23,7 @@ dte Release Checklist
    1. Add link to GPG signature in `CHANGELOG.md`
    2. Update `mk/sha256sums.txt`
    3. Reset `VERSION` and `CFLAGS`
+
+
+[releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte
+[GitLab Pages job]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/pipelines
