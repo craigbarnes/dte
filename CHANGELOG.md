@@ -82,6 +82,11 @@ Released on 2021-04-03.
 * Removed support for vertical tab bars (the `tab-bar` option was
   changed from an enum to a Boolean).
 
+**Downloads:**
+
+* [dte-1.10.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.10.tar.gz)
+* [dte-1.10.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.10.tar.gz.sig)
+
 v1.9.1
 ------
 
