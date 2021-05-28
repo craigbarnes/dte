@@ -501,9 +501,12 @@ static const Command *find_syntax_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
+static HashMap syntax_aliases = HASHMAP_INIT;
+
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
     .allow_recording = NULL,
+    .aliases = &syntax_aliases,
 };
 
 static void cmd_include(const CommandArgs *a)
