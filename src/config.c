@@ -167,13 +167,13 @@ void exec_builtin_color_reset(void)
     clear_hl_colors();
     bool colors = terminal.color_type >= TERM_8_COLOR;
     const char *cfg = colors ? "color/reset" : "color/reset-basic";
-    read_config(&commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
+    read_config(&normal_commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 void exec_builtin_rc(void)
 {
     exec_builtin_color_reset();
-    read_config(&commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    read_config(&normal_commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 UNITTEST {

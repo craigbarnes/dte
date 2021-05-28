@@ -125,7 +125,7 @@ void macro_play(void)
     unsigned int saved_nr_errors = get_nr_errors();
     for (size_t i = 0, n = macro.count; i < n; i++) {
         const char *cmd_str = macro.ptrs[i];
-        handle_command(&commands, cmd_str, false);
+        handle_command(&normal_commands, cmd_str, false);
         if (get_nr_errors() != saved_nr_errors) {
             break;
         }

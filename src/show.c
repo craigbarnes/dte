@@ -55,7 +55,7 @@ static void open_temporary_buffer (
 
 static void show_alias(const char *alias_name, bool cflag)
 {
-    const char *cmd_str = find_alias(alias_name);
+    const char *cmd_str = find_alias(normal_commands.aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
@@ -86,7 +86,7 @@ static void show_binding(const char *keystr, bool cflag)
         return;
     }
 
-    const KeyBinding *b = lookup_binding(key);
+    const KeyBinding *b = lookup_binding(INPUT_NORMAL, key);
     if (!b) {
         info_msg("%s is not bound to a command", keystr);
         return;

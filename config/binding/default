@@ -125,3 +125,36 @@ bind F5 refresh
 # as distinct sequences, so don't be surprised if they don't work.
 bind C-tab next
 bind C-S-tab prev
+
+# Command mode bindings:
+bind -c left left
+bind -c right right
+bind -c up history-prev
+bind -c down history-next
+bind -c home bol
+bind -c end eol
+bind -c delete delete
+bind -c C-left word-bwd
+bind -c C-right word-fwd
+bind -c M-left bol
+bind -c M-right eol
+bind -c C-delete delete-word
+bind -c M-delete delete-word
+bind -c C-M-H erase-word
+bind -c C-M-? erase-word
+bind -c ^A bol
+bind -c ^B left
+bind -c ^C cancel
+bind -c ^D delete
+bind -c ^E eol
+bind -c ^F right
+bind -c ^G cancel
+bind -c ^H erase
+bind -c ^K delete-eol
+bind -c ^U erase-bol
+bind -c ^W erase-word
+bind -c ^? erase
+bind -c ^[ cancel
+bind -c M-b word-bwd
+bind -c M-d delete-word
+bind -c M-f word-fwd

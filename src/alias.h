@@ -1,11 +1,12 @@
 #ifndef ALIAS_H
 #define ALIAS_H
 
+#include "util/hashmap.h"
+#include "util/macros.h"
 #include "util/string.h"
 
-void init_aliases(void);
-void add_alias(const char *name, const char *value);
-const char *find_alias(const char *name);
+void add_alias(HashMap *aliases, const char *name, const char *value) NONNULL_ARGS;
+const char *find_alias(const HashMap *aliases, const char *name) NONNULL_ARGS;
 void collect_aliases(const char *prefix);
 String dump_aliases(void);
 

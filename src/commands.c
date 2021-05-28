@@ -128,17 +128,31 @@ static void cmd_alias(const CommandArgs *a)
         return;
     }
 
-    add_alias(name, a->args[1]);
+    add_alias(normal_commands.aliases, name, a->args[1]);
 }
 
 static void cmd_bind(const CommandArgs *a)
 {
+    bool command_mode = has_flag(a, 'c');
+    bool search_mode = has_flag(a, 's');
+    if (unlikely(command_mode && search_mode)) {
+        error_msg("flags -c and -s can't be used together");
+        return;
+    }
+
+    InputMode mode = INPUT_NORMAL;
+    if (command_mode) {
+        mode = INPUT_COMMAND;
+    } else if (search_mode) {
+        mode = INPUT_SEARCH;
+    }
+
     const char *key = a->args[0];
     const char *cmd = a->args[1];
     if (cmd) {
-        add_binding(key, cmd);
+        add_binding(mode, key, cmd);
     } else {
-        remove_binding(key);
+        remove_binding(mode, key);
     }
 }
 
@@ -444,7 +458,7 @@ static void cmd_eval(const CommandArgs *a)
     if (!spawn_filter(&ctx)) {
         return;
     }
-    exec_config(&commands, ctx.output.buffer, ctx.output.len);
+    exec_config(&normal_commands, ctx.output.buffer, ctx.output.len);
     string_free(&ctx.output);
 }
 
@@ -496,7 +510,7 @@ static void cmd_exec_tag(const CommandArgs *a)
     }
     string_append_escaped_arg_sv(&s, string_view(tag, tag_len), true);
     string_free(&ctx.output);
-    handle_command(&commands, string_borrow_cstring(&s), true);
+    handle_command(&normal_commands, string_borrow_cstring(&s), true);
     string_free(&s);
 }
 
@@ -627,7 +641,7 @@ static void cmd_include(const CommandArgs *a)
     if (has_flag(a, 'b')) {
         flags |= CFG_BUILTIN;
     }
-    read_config(&commands, a->args[0], flags);
+    read_config(&normal_commands, a->args[0], flags);
 }
 
 static void cmd_insert(const CommandArgs *a)
@@ -2089,7 +2103,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 
 static const Command cmds[] = {
     {"alias", "-", true, 2, 2, cmd_alias},
-    {"bind", "-", true, 1, 2, cmd_bind},
+    {"bind", "-cs", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "", false, 0, 0, cmd_bof},
@@ -2217,9 +2231,12 @@ const Command *find_normal_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-const CommandSet commands = {
+static HashMap normal_aliases = HASHMAP_INIT;
+
+const CommandSet normal_commands = {
     .lookup = find_normal_command,
     .allow_recording = allow_macro_recording,
+    .aliases = &normal_aliases,
 };
 
 void collect_normal_commands(const char *prefix)

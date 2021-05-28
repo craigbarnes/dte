@@ -388,7 +388,7 @@ loop_break:
             rc = editor_file("rc");
         }
         DEBUG_LOG("loading configuration from %s", rc);
-        read_config(&commands, rc, flags);
+        read_config(&normal_commands, rc, flags);
     }
 
     update_all_syntax_colors();
@@ -452,7 +452,7 @@ loop_break:
     ui_start();
 
     if (command) {
-        handle_command(&commands, command, false);
+        handle_command(&normal_commands, command, false);
     }
 
     if (tag) {
@@ -462,7 +462,7 @@ loop_break:
             string_append_literal(&s, "-- ");
         }
         string_append_escaped_arg(&s, tag, true);
-        handle_command(&commands, string_borrow_cstring(&s), false);
+        handle_command(&normal_commands, string_borrow_cstring(&s), false);
         string_free(&s);
     }
 

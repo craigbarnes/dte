@@ -108,7 +108,7 @@ static void test_exec_config(void)
     // Execute *.dterc files
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
-        exec_config(&commands, config.text.data, config.text.length);
+        exec_config(&normal_commands, config.text.data, config.text.length);
     }
 
     // Check that output files have expected contents
@@ -131,7 +131,7 @@ static void test_detect_indent(void)
     EXPECT_EQ(editor.options.indent_width, 8);
 
     handle_command (
-        &commands,
+        &normal_commands,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
         "open test/data/detect-indent.ini",
         false
@@ -141,7 +141,7 @@ static void test_detect_indent(void)
     EXPECT_TRUE(buffer->options.expand_tab);
     EXPECT_EQ(buffer->options.indent_width, 2);
 
-    handle_command(&commands, "close", false);
+    handle_command(&normal_commands, "close", false);
 }
 
 static void test_global_state(void)
@@ -181,13 +181,14 @@ static void test_macro_record(void)
     macro_record();
     EXPECT_TRUE(macro_is_recording());
 
-    handle_command(&commands, "open", false);
+    const CommandSet *cmds = &normal_commands;
+    handle_command(cmds, "open", false);
     handle_input('x');
     handle_input('y');
-    handle_command(&commands, "bol", true);
+    handle_command(cmds, "bol", true);
     handle_input('-');
     handle_input('z');
-    handle_command(&commands, "eol; right; insert -m .; new-line", true);
+    handle_command(cmds, "eol; right; insert -m .; new-line", true);
 
     const StringView t1 = STRING_VIEW("test 1\n");
     insert_text(t1.data, t1.length, true);
@@ -202,7 +203,7 @@ static void test_macro_record(void)
     EXPECT_FALSE(macro_is_recording());
 
     handle_command (
-        &commands,
+        cmds,
         "save -f build/test/macro-rec.txt;"
         "close -f;"
         "open;"

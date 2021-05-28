@@ -9,6 +9,7 @@
 #include "editor.h"
 #include "alias.h"
 #include "buffer.h"
+#include "commands.h"
 #include "error.h"
 #include "mode.h"
 #include "regexp.h"
@@ -20,6 +21,7 @@
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
+#include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -123,7 +125,7 @@ void init_editor_state(void)
     }
 
     regexp_init_word_boundary_tokens();
-    init_aliases();
+    hashmap_init(normal_commands.aliases, 32);
 }
 
 static void sanity_check(void)

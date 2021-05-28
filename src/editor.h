@@ -8,6 +8,7 @@
 #include "cmdline.h"
 #include "encoding.h"
 #include "history.h"
+#include "mode.h"
 #include "options.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -18,12 +19,6 @@ typedef enum {
     EDITOR_RUNNING,
     EDITOR_EXITING,
 } EditorStatus;
-
-typedef enum {
-    INPUT_NORMAL,
-    INPUT_COMMAND,
-    INPUT_SEARCH,
-} InputMode;
 
 typedef struct {
     EditorStatus status;

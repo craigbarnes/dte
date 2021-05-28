@@ -2,6 +2,7 @@
 #define CMDLINE_H
 
 #include <sys/types.h>
+#include "command/run.h"
 #include "history.h"
 #include "terminal/key.h"
 #include "util/string.h"
@@ -19,8 +20,9 @@ typedef enum {
     CMDLINE_CANCEL,
 } CommandLineResult;
 
+extern const CommandSet cmd_mode_commands;
+
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);
-CommandLineResult cmdline_handle_key(CommandLine *c, History *hist, KeyCode key);
 
 #endif

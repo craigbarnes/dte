@@ -1,37 +1,24 @@
-#include <errno.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include "alias.h"
 #include "command/serialize.h"
+#include "commands.h"
 #include "completion.h"
-#include "editor.h"
-#include "util/hashmap.h"
-#include "util/macros.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 
-static HashMap aliases = HASHMAP_INIT;
-
-void init_aliases(void)
+void add_alias(HashMap *aliases, const char *name, const char *value)
 {
-    BUG_ON(aliases.entries);
-    hashmap_init(&aliases, 32);
+    free(hashmap_insert_or_replace(aliases, xstrdup(name), xstrdup(value)));
 }
 
-void add_alias(const char *name, const char *value)
+const char *find_alias(const HashMap *aliases, const char *name)
 {
-    free(hashmap_insert_or_replace(&aliases, xstrdup(name), xstrdup(value)));
-}
-
-const char *find_alias(const char *const name)
-{
-    return hashmap_get(&aliases, name);
+    return hashmap_get(aliases, name);
 }
 
 void collect_aliases(const char *const prefix)
 {
-    collect_hashmap_keys(&aliases, prefix);
+    collect_hashmap_keys(normal_commands.aliases, prefix);
 }
 
 typedef struct {
@@ -48,7 +35,8 @@ static int alias_cmp(const void *ap, const void *bp)
 
 String dump_aliases(void)
 {
-    const size_t count = aliases.count;
+    const HashMap *aliases = normal_commands.aliases;
+    const size_t count = aliases->count;
     if (unlikely(count == 0)) {
         return string_new(0);
     }
@@ -56,7 +44,7 @@ String dump_aliases(void)
     // Clone the contents of the HashMap as an array of name/value pairs
     CommandAlias *array = xnew(CommandAlias, count);
     size_t n = 0;
-    for (HashMapIter it = hashmap_iter(&aliases); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(aliases); hashmap_next(&it); ) {
         array[n++] = (CommandAlias) {
             .name = it.entry->key,
             .value = it.entry->value,

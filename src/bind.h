@@ -1,7 +1,9 @@
 #ifndef BIND_H
 #define BIND_H
 
+#include <stdbool.h>
 #include "command/run.h"
+#include "mode.h"
 #include "terminal/key.h"
 #include "util/string.h"
 
@@ -13,10 +15,10 @@ typedef struct {
     char cmd_str[];
 } KeyBinding;
 
-void add_binding(const char *keystr, const char *command);
-void remove_binding(const char *keystr);
-const KeyBinding *lookup_binding(KeyCode key);
-void handle_binding(KeyCode key);
+void add_binding(InputMode mode, const char *keystr, const char *command);
+void remove_binding(InputMode mode, const char *keystr);
+const KeyBinding *lookup_binding(InputMode mode, KeyCode key);
+bool handle_binding(InputMode mode, KeyCode key);
 void collect_bound_keys(const char *keystr_prefix);
 String dump_bindings(void);
 

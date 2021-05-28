@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include "util/hashmap.h"
 
 typedef struct {
     char **args; // Positional args, with flag args moved to the front
@@ -27,6 +28,7 @@ typedef struct {
 typedef struct {
     const Command* (*lookup)(const char *name);
     bool (*allow_recording)(const Command *cmd, char **args);
+    HashMap *aliases;
 } CommandSet;
 
 extern const Command *current_command;

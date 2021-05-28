@@ -46,24 +46,39 @@ static void normal_mode_keypress(KeyCode key)
         insert_ch(key);
         macro_insert_char_hook(key);
     } else {
-        handle_binding(key);
+        handle_binding(INPUT_NORMAL, key);
     }
+}
+
+static void cmdline_insert_paste(CommandLine *c)
+{
+    size_t size;
+    char *text = term_read_paste(&size);
+    for (size_t i = 0; i < size; i++) {
+        if (text[i] == '\n') {
+            text[i] = ' ';
+        }
+    }
+    string_insert_buf(&c->buf, c->pos, text, size);
+    c->pos += size;
+    free(text);
 }
 
 static void command_mode_keypress(KeyCode key)
 {
+    CommandLine *c = &editor.cmdline;
     switch (key) {
     case KEY_ENTER:
         reset_completion();
         set_input_mode(INPUT_NORMAL);
-        const char *str = string_borrow_cstring(&editor.cmdline.buf);
-        cmdline_clear(&editor.cmdline);
+        const char *str = string_borrow_cstring(&c->buf);
+        cmdline_clear(c);
         if (str[0] != ' ') {
             // This is done before handle_command() because "command [text]"
             // can modify the contents of the command-line
             history_add(&editor.command_history, str);
         }
-        handle_command(&commands, str, true);
+        handle_command(&normal_commands, str, true);
         return;
     case KEY_TAB:
         complete_command_next();
@@ -71,47 +86,47 @@ static void command_mode_keypress(KeyCode key)
     case MOD_SHIFT | KEY_TAB:
         complete_command_prev();
         return;
-    }
-
-    switch (cmdline_handle_key(&editor.cmdline, &editor.command_history, key)) {
-    case CMDLINE_CANCEL:
-        set_input_mode(INPUT_NORMAL);
-        // Fallthrough
-    case CMDLINE_KEY_HANDLED:
+    case KEY_PASTE:
+        cmdline_insert_paste(c);
+        c->search_pos = NULL;
         reset_completion();
-        // Fallthrough
-    case CMDLINE_UNKNOWN_KEY:
         return;
     }
 
-    BUG("unhandled cmdline_handle_key() return value");
+    if (u_is_unicode(key)) {
+        c->pos += string_insert_ch(&c->buf, c->pos, key);
+        reset_completion();
+    } else {
+        handle_binding(INPUT_COMMAND, key);
+    }
 }
 
 static void search_mode_keypress(KeyCode key)
 {
+    CommandLine *c = &editor.cmdline;
     switch (key) {
     case MOD_META | KEY_ENTER:
-        if (editor.cmdline.buf.len == 0) {
+        if (c->buf.len == 0) {
             return;
         } else {
             // Escape the regex; to match as plain text
-            char *original = string_clone_cstring(&editor.cmdline.buf);
-            size_t len = editor.cmdline.buf.len;
-            string_clear(&editor.cmdline.buf);
+            char *original = string_clone_cstring(&c->buf);
+            size_t len = c->buf.len;
+            string_clear(&c->buf);
             for (size_t i = 0; i < len; i++) {
                 char ch = original[i];
                 if (is_regex_special_char(ch)) {
-                    string_append_byte(&editor.cmdline.buf, '\\');
+                    string_append_byte(&c->buf, '\\');
                 }
-                string_append_byte(&editor.cmdline.buf, ch);
+                string_append_byte(&c->buf, ch);
             }
             free(original);
         }
         // Fallthrough
     case KEY_ENTER: {
         const char *args[3] = {NULL, NULL, NULL};
-        if (editor.cmdline.buf.len > 0) {
-            const char *str = string_borrow_cstring(&editor.cmdline.buf);
+        if (c->buf.len > 0) {
+            const char *str = string_borrow_cstring(&c->buf);
             search_set_regexp(str);
             history_add(&editor.search_history, str);
             if (unlikely(str[0] == '-')) {
@@ -125,7 +140,7 @@ static void search_mode_keypress(KeyCode key)
         }
         search_next();
         macro_command_hook("search", (char**)args);
-        cmdline_clear(&editor.cmdline);
+        cmdline_clear(c);
         set_input_mode(INPUT_NORMAL);
         return;
     }
@@ -137,18 +152,19 @@ static void search_mode_keypress(KeyCode key)
         return;
     case KEY_TAB:
         return;
-    }
-
-    switch (cmdline_handle_key(&editor.cmdline, &editor.search_history, key)) {
-    case CMDLINE_CANCEL:
-        set_input_mode(INPUT_NORMAL);
-        return;
-    case CMDLINE_UNKNOWN_KEY:
-    case CMDLINE_KEY_HANDLED:
+    case KEY_PASTE:
+        cmdline_insert_paste(c);
+        c->search_pos = NULL;
         return;
     }
 
-    BUG("unhandled cmdline_handle_key() return value");
+    if (u_is_unicode(key)) {
+        c->pos += string_insert_ch(&c->buf, c->pos, key);
+    } else {
+        if (!handle_binding(INPUT_SEARCH, key)) {
+            handle_binding(INPUT_COMMAND, key);
+        }
+    }
 }
 
 void handle_input(KeyCode key)
