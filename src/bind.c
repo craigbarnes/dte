@@ -270,55 +270,74 @@ void collect_bound_keys(const char *prefix)
     }
 }
 
-static void append_binding(String *s, KeyCode key, const char *cmd)
+static void append_binding(String *s, KeyCode key, const char *flag, const char *cmd)
 {
     string_append_literal(s, "bind ");
+    string_append_cstring(s, flag);
     string_append_escaped_arg(s, keycode_to_string(key), true);
     string_append_byte(s, ' ');
     string_append_escaped_arg(s, cmd, true);
     string_append_byte(s, '\n');
 }
 
-static void append_lookup_table_binding(String *buf, KeyCode key)
+static void append_lookup_table_binding(String *s, InputMode mode, const char *flag, KeyCode key)
 {
     const ssize_t i = get_lookup_table_index(key);
     BUG_ON(i < 0);
-    const KeyBinding *b = bindings[INPUT_NORMAL].table[i];
+    const KeyBinding *b = bindings[mode].table[i];
     if (b) {
-        append_binding(buf, key, b->cmd_str);
+        append_binding(s, key, flag, b->cmd_str);
+    }
+}
+
+static void append_binding_group(String *buf, InputMode mode)
+{
+    static const char mode_flags[][4] = {
+        [INPUT_NORMAL] = "",
+        [INPUT_COMMAND] = "-c ",
+        [INPUT_SEARCH] = "-s ",
+    };
+
+    const char *flag = mode_flags[mode];
+    const size_t prev_buf_len = buf->len;
+
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        append_lookup_table_binding(buf, mode, flag, MOD_CTRL | k);
+    }
+
+    for (KeyCode k = 0x20; k < 0x7E; k++) {
+        append_lookup_table_binding(buf, mode, flag, MOD_META | k);
+    }
+
+    static_assert(MOD_MASK >> MOD_OFFSET == 7);
+    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << MOD_OFFSET) {
+        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
+            append_lookup_table_binding(buf, mode, flag, modifiers | k);
+        }
+    }
+
+    const PointerArray *array = &bindings[mode].ptr_array;
+    size_t n = array->count;
+    if (DEBUG && n) {
+        // Show a blank line divider in debug mode, to make it easier to
+        // see which bindings are in the fallback PointerArray
+        string_append_byte(buf, '\n');
+    }
+    for (size_t i = 0; i < n; i++) {
+        const KeyBindingEntry *b = array->ptrs[i];
+        append_binding(buf, b->key, flag, b->bind->cmd_str);
+    }
+
+    if (buf->len > prev_buf_len) {
+        string_append_byte(buf, '\n');
     }
 }
 
 String dump_bindings(void)
 {
     String buf = string_new(4096);
-
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
-        append_lookup_table_binding(&buf, MOD_CTRL | k);
+    for (InputMode mode = 0; mode < ARRAY_COUNT(bindings); mode++) {
+        append_binding_group(&buf, mode);
     }
-
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
-        append_lookup_table_binding(&buf, MOD_META | k);
-    }
-
-    static_assert(MOD_MASK >> MOD_OFFSET == 7);
-    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << MOD_OFFSET) {
-        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
-            append_lookup_table_binding(&buf, modifiers | k);
-        }
-    }
-
-    const PointerArray *array = &bindings[INPUT_NORMAL].ptr_array;
-    size_t n = array->count;
-    if (DEBUG && n) {
-        // Show a blank line divider in debug mode, to make it easier to
-        // see which bindings are in the fallback PointerArray
-        string_append_byte(&buf, '\n');
-    }
-    for (size_t i = 0; i < n; i++) {
-        const KeyBindingEntry *b = array->ptrs[i];
-        append_binding(&buf, b->key, b->bind->cmd_str);
-    }
-
     return buf;
 }
