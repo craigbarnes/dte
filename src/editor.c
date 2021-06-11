@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "editor.h"
 #include "alias.h"
+#include "bind.h"
 #include "buffer.h"
 #include "commands.h"
 #include "error.h"
@@ -126,6 +127,7 @@ void init_editor_state(void)
 
     regexp_init_word_boundary_tokens();
     hashmap_init(normal_commands.aliases, 32);
+    bindings_init();
 }
 
 static void sanity_check(void)

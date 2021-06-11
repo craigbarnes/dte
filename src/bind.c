@@ -17,44 +17,59 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
+enum {
+    ASCII_RANGE_START = 0x20, // ' '
+    ASCII_RANGE_END = 0x7E, // '~'
+    ASCII_RANGE_LEN = (ASCII_RANGE_END - ASCII_RANGE_START) + 1,
+};
+
 typedef struct {
     KeyCode key;
     KeyBinding *bind;
 } KeyBindingEntry;
 
 typedef struct {
-    const CommandSet *const cmds;
+    const CommandSet *cmds;
 
     // Fast lookup table for most common key combinations (Ctrl or Meta
     // with ASCII keys or any combination of modifiers with special keys)
-    KeyBinding *table[(2 * 128) + (8 * NR_SPECIAL_KEYS)];
+    KeyBinding *table[(2 * ASCII_RANGE_LEN) + (8 * NR_SPECIAL_KEYS)];
 
     // Fallback for all other keys (Unicode combos etc.)
     PointerArray ptr_array;
 } KeyBindingGroup;
 
-static KeyBindingGroup bindings[] = {
-    [INPUT_NORMAL] = {.cmds = &normal_commands},
-    [INPUT_COMMAND] = {.cmds = &cmd_mode_commands},
-    [INPUT_SEARCH] = {.cmds = &cmd_mode_commands},
-};
+static KeyBindingGroup bindings[3];
+
+void bindings_init(void)
+{
+    // This is done here instead of as a static initializer to allow
+    // `bindings` to live in the .bss section and thus avoid placing
+    // the whole thing (including the large lookup tables) in the
+    // .data section
+    bindings[INPUT_NORMAL].cmds = &normal_commands;
+    bindings[INPUT_COMMAND].cmds = &cmd_mode_commands;
+    bindings[INPUT_SEARCH].cmds = &cmd_mode_commands;
+}
 
 static ssize_t get_lookup_table_index(KeyCode k)
 {
-    const KeyCode modifiers = keycode_get_modifiers(k);
-    const KeyCode key = keycode_get_key(k);
-
+    static_assert(ASCII_RANGE_LEN == 95);
     static_assert(MOD_MASK >> MOD_OFFSET == (1 | 2 | 4));
+
+    KeyCode modifiers = keycode_get_modifiers(k);
+    KeyCode key = keycode_get_key(k);
 
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
         const size_t mod_offset = (modifiers >> MOD_OFFSET) * NR_SPECIAL_KEYS;
-        return (2 * 128) + mod_offset + (key - KEY_SPECIAL_MIN);
+        return (2 * ASCII_RANGE_LEN) + mod_offset + (key - KEY_SPECIAL_MIN);
     }
 
-    if (key >= 0x20 && key <= 0x7E) {
+    if (key >= ASCII_RANGE_START && key <= ASCII_RANGE_END) {
+        key -= ASCII_RANGE_START;
         switch (modifiers) {
         case MOD_CTRL: return key;
-        case MOD_META: return key + 128;
+        case MOD_META: return key + ASCII_RANGE_LEN;
         }
     }
 
@@ -66,17 +81,26 @@ UNITTEST {
     const KeyCode min = KEY_SPECIAL_MIN;
     const KeyCode max = KEY_SPECIAL_MAX;
     const KeyCode nsk = NR_SPECIAL_KEYS;
-    BUG_ON(size != 256 + (8 * NR_SPECIAL_KEYS));
-    BUG_ON(get_lookup_table_index(MOD_MASK | max) != size - 1);
-    BUG_ON(get_lookup_table_index(min) != 256);
-    BUG_ON(get_lookup_table_index(max) != 256 + nsk - 1);
-    BUG_ON(get_lookup_table_index(MOD_SHIFT | min) != 256 + nsk);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | max) != 256 + (5 * nsk) - 1);
+    const KeyCode arl = ASCII_RANGE_LEN;
+    const KeyCode ax2 = ASCII_RANGE_LEN * 2;
+    BUG_ON(size != ax2 + (8 * nsk));
 
-    BUG_ON(get_lookup_table_index(MOD_CTRL | KEY_SPACE) != 32);
-    BUG_ON(get_lookup_table_index(MOD_META | KEY_SPACE) != 32 + 128);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | '~') != 126);
-    BUG_ON(get_lookup_table_index(MOD_META | '~') != 126 + 128);
+    BUG_ON(get_lookup_table_index(min) != ax2);
+    BUG_ON(get_lookup_table_index(max) != ax2 + nsk - 1);
+    BUG_ON(get_lookup_table_index(MOD_SHIFT | min) != ax2 + nsk);
+    BUG_ON(get_lookup_table_index(MOD_SHIFT | max) != ax2 + (2 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_META | min) != ax2 + (2 * nsk));
+    BUG_ON(get_lookup_table_index(MOD_META | max) != ax2 + (3 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | min) != ax2 + (4 * nsk));
+    BUG_ON(get_lookup_table_index(MOD_CTRL | max) != ax2 + (5 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_MASK | min) != ax2 + (7 * nsk));
+    BUG_ON(get_lookup_table_index(MOD_MASK | max) != ax2 + (8 * nsk) - 1);
+    BUG_ON(get_lookup_table_index(MOD_MASK | max) != size - 1);
+
+    BUG_ON(get_lookup_table_index(MOD_CTRL | ASCII_RANGE_START) != 0);
+    BUG_ON(get_lookup_table_index(MOD_META | ASCII_RANGE_START) != arl);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | ASCII_RANGE_END) != arl - 1);
+    BUG_ON(get_lookup_table_index(MOD_META | ASCII_RANGE_END) != ax2 - 1);
 
     BUG_ON(get_lookup_table_index(MOD_CTRL | MOD_META | 'a') != -1);
     BUG_ON(get_lookup_table_index(MOD_META | 0x0E01) != -1);
@@ -248,11 +272,11 @@ static void maybe_add_lt_key_completion(const char *prefix, KeyCode k)
 
 void collect_bound_keys(const char *prefix)
 {
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
+    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
         maybe_add_lt_key_completion(prefix, MOD_CTRL | k);
     }
 
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
+    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
         maybe_add_lt_key_completion(prefix, MOD_META | k);
     }
 
@@ -301,11 +325,11 @@ static void append_binding_group(String *buf, InputMode mode)
     const char *flag = mode_flags[mode];
     const size_t prev_buf_len = buf->len;
 
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
+    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
         append_lookup_table_binding(buf, mode, flag, MOD_CTRL | k);
     }
 
-    for (KeyCode k = 0x20; k < 0x7E; k++) {
+    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
         append_lookup_table_binding(buf, mode, flag, MOD_META | k);
     }
 
