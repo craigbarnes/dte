@@ -499,16 +499,21 @@ static void cmd_exec_tag(const CommandArgs *a)
         return;
     }
 
-    const char *tag = string_borrow_cstring(&ctx.output);
-    const char *nl = memchr(tag, '\n', ctx.output.len);
-    size_t tag_len = nl ? (size_t)(nl - tag) : ctx.output.len;
+    if (unlikely(ctx.output.len == 0)) {
+        error_msg("child produced no output");
+        return;
+    }
 
-    String s = string_new(tag_len + 16);
+    size_t pos = 0;
+    StringView tag = buf_slice_next_line(ctx.output.buffer, &pos, ctx.output.len);
+
+    String s = string_new(tag.length + 16);
     string_append_literal(&s, "tag ");
-    if (unlikely(tag[0] == '-')) {
+    if (unlikely(tag.length > 0 && tag.data[0] == '-')) {
         string_append_literal(&s, "-- ");
     }
-    string_append_escaped_arg_sv(&s, string_view(tag, tag_len), true);
+
+    string_append_escaped_arg_sv(&s, tag, true);
     string_free(&ctx.output);
     handle_command(&normal_commands, string_borrow_cstring(&s), true);
     string_free(&s);
