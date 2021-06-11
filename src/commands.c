@@ -133,26 +133,27 @@ static void cmd_alias(const CommandArgs *a)
 
 static void cmd_bind(const CommandArgs *a)
 {
-    bool command_mode = has_flag(a, 'c');
-    bool search_mode = has_flag(a, 's');
-    if (unlikely(command_mode && search_mode)) {
-        error_msg("flags -c and -s can't be used together");
-        return;
-    }
-
-    InputMode mode = INPUT_NORMAL;
-    if (command_mode) {
-        mode = INPUT_COMMAND;
-    } else if (search_mode) {
-        mode = INPUT_SEARCH;
-    }
-
     const char *key = a->args[0];
     const char *cmd = a->args[1];
+
+    const bool modes[] = {
+        [INPUT_NORMAL] = a->nr_flags == 0 || has_flag(a, 'n'),
+        [INPUT_COMMAND] = has_flag(a, 'c'),
+        [INPUT_SEARCH] = has_flag(a, 's'),
+    };
+
     if (cmd) {
-        add_binding(mode, key, cmd);
+        for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
+            if (modes[mode]) {
+                add_binding(mode, key, cmd);
+            }
+        }
     } else {
-        remove_binding(mode, key);
+        for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
+            if (modes[mode]) {
+                remove_binding(mode, key);
+            }
+        }
     }
 }
 
@@ -2108,7 +2109,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 
 static const Command cmds[] = {
     {"alias", "-", true, 2, 2, cmd_alias},
-    {"bind", "-cs", true, 1, 2, cmd_bind},
+    {"bind", "-cns", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "", false, 0, 0, cmd_bof},

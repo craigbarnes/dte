@@ -161,9 +161,7 @@ static void search_mode_keypress(KeyCode key)
     if (u_is_unicode(key)) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
     } else {
-        if (!handle_binding(INPUT_SEARCH, key)) {
-            handle_binding(INPUT_COMMAND, key);
-        }
+        handle_binding(INPUT_SEARCH, key);
     }
 }
 

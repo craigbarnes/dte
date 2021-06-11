@@ -109,7 +109,7 @@ Example:
 Now you can run `read file.txt` to insert `file.txt` into the current
 buffer.
 
-### **bind** [**-c**|**-s**] _key_ [_command_]
+### **bind** [**-cns**] _key_ [_command_]
 
 Bind _command_ to _key_. If no _command_ is given then any existing
 binding for _key_ is removed.
@@ -143,11 +143,14 @@ Alt:
 Shift:
 :   `S-left`
 
-The _key_ is bound in normal mode by default, unless the `-c` or `-s`
-flag is used:
+The _key_ is bound in normal mode by default, unless one or more of the
+following flags are used:
 
 `-c`
 :   Add binding for [`command`] mode
+
+`-n`
+:   Add binding for normal mode
 
 `-s`
 :   Add binding for [`search`] mode

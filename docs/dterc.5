@@ -13,7 +13,7 @@ Configuration Commands:
 .br
    \fBalias\fR \fIname\fR \fIcommand\fR
 .br
-   \fBbind\fR [\fB\-c\fR|\fB\-s\fR] \fIkey\fR [\fIcommand\fR]
+   \fBbind\fR [\fB\-cns\fR] \fIkey\fR [\fIcommand\fR]
 .br
    \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...
 .br
@@ -399,7 +399,7 @@ Now you can run \fBread file.txt\fR to insert \fBfile.txt\fR into the current
 buffer.
 .P
 .RE
-\fBbind\fR [\fB\-c\fR|\fB\-s\fR] \fIkey\fR [\fIcommand\fR]
+\fBbind\fR [\fB\-cns\fR] \fIkey\fR [\fIcommand\fR]
 .RS
 Bind \fIcommand\fR to \fIkey\fR. If no \fIcommand\fR is given then any existing
 binding for \fIkey\fR is removed.
@@ -451,12 +451,16 @@ Alt:
 Shift:
 \fBS\-left\fR
 .PP
-The \fIkey\fR is bound in normal mode by default, unless the \fB\-c\fR or \fB\-s\fR
-flag is used:
+The \fIkey\fR is bound in normal mode by default, unless one or more of the
+following flags are used:
 .P
 .TP
 \fB\-c\fR
 Add binding for \fBcommand\fR mode
+.PP
+.TP
+\fB\-n\fR
+Add binding for normal mode
 .PP
 .TP
 \fB\-s\fR
