@@ -109,7 +109,7 @@ Example:
 Now you can run `read file.txt` to insert `file.txt` into the current
 buffer.
 
-### **bind** _key_ [_command_]
+### **bind** [**-c**|**-s**] _key_ [_command_]
 
 Bind _command_ to _key_. If no _command_ is given then any existing
 binding for _key_ is removed.
@@ -142,6 +142,41 @@ Alt:
 
 Shift:
 :   `S-left`
+
+The _key_ is bound in normal mode by default, unless the `-c` or `-s`
+flag is used:
+
+`-c`
+:   Add binding for [`command`] mode
+
+`-s`
+:   Add binding for [`search`] mode
+
+The commands available in normal mode are the ones listed in the main
+sections of this manual.
+
+The commands avilable in [`command`]/[`search`] modes are as follows:
+
+* `left`
+* `right`
+* `word-bwd`
+* `word-fwd`
+* `bol`
+* `eol`
+* `delete`
+* `delete-word`
+* `delete-eol`
+* `erase`
+* `erase-word`
+* `erase-bol`
+* `cancel`
+* `history-next`
+* `history-prev`
+
+Most of these commands behave in a similar fashion to the normal mode
+commands of the same name. The exceptions are `cancel`, which returns
+back to normal mode and `history-next`/`history-prev` which can be used
+to navigate command/search history.
 
 ### **set** [**-gl**] _option_ [_value_] ...
 

@@ -13,7 +13,7 @@ Configuration Commands:
 .br
    \fBalias\fR \fIname\fR \fIcommand\fR
 .br
-   \fBbind\fR \fIkey\fR [\fIcommand\fR]
+   \fBbind\fR [\fB\-c\fR|\fB\-s\fR] \fIkey\fR [\fIcommand\fR]
 .br
    \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...
 .br
@@ -399,7 +399,7 @@ Now you can run \fBread file.txt\fR to insert \fBfile.txt\fR into the current
 buffer.
 .P
 .RE
-\fBbind\fR \fIkey\fR [\fIcommand\fR]
+\fBbind\fR [\fB\-c\fR|\fB\-s\fR] \fIkey\fR [\fIcommand\fR]
 .RS
 Bind \fIcommand\fR to \fIkey\fR. If no \fIcommand\fR is given then any existing
 binding for \fIkey\fR is removed.
@@ -451,6 +451,58 @@ Alt:
 Shift:
 \fBS\-left\fR
 .PP
+The \fIkey\fR is bound in normal mode by default, unless the \fB\-c\fR or \fB\-s\fR
+flag is used:
+.P
+.TP
+\fB\-c\fR
+Add binding for \fBcommand\fR mode
+.PP
+.TP
+\fB\-s\fR
+Add binding for \fBsearch\fR mode
+.PP
+The commands available in normal mode are the ones listed in the main
+sections of this manual.
+.P
+The commands avilable in \fBcommand\fR/\fBsearch\fR modes are as follows:
+.P
+\(bu \fBleft\fR
+.br
+\(bu \fBright\fR
+.br
+\(bu \fBword\-bwd\fR
+.br
+\(bu \fBword\-fwd\fR
+.br
+\(bu \fBbol\fR
+.br
+\(bu \fBeol\fR
+.br
+\(bu \fBdelete\fR
+.br
+\(bu \fBdelete\-word\fR
+.br
+\(bu \fBdelete\-eol\fR
+.br
+\(bu \fBerase\fR
+.br
+\(bu \fBerase\-word\fR
+.br
+\(bu \fBerase\-bol\fR
+.br
+\(bu \fBcancel\fR
+.br
+\(bu \fBhistory\-next\fR
+.br
+\(bu \fBhistory\-prev\fR
+.br
+.P
+Most of these commands behave in a similar fashion to the normal mode
+commands of the same name. The exceptions are \fBcancel\fR, which returns
+back to normal mode and \fBhistory\-next\fR/\fBhistory\-prev\fR which can be used
+to navigate command/search history.
+.P
 .RE
 \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...
 .RS
