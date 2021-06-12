@@ -34,7 +34,7 @@ static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
 
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 {
-    uint64_t bitmask = UINT64_C(1) << cmdargs_flagset_idx(flag);
+    uint_least64_t bitmask = UINT64_C(1) << cmdargs_flagset_idx(flag);
     static_assert_compatible_types(bitmask, a->flag_set);
     return (a->flag_set & bitmask) != 0;
 }
