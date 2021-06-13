@@ -1826,26 +1826,29 @@ static void cmd_tag(const CommandArgs *a)
     tag_file_find_tags(tf, buffer->abs_filename, name, &tags);
     if (tags.count == 0) {
         error_msg("Tag '%s' not found", name);
-    } else {
-        for (size_t i = 0, n = tags.count; i < n; i++) {
-            Tag *t = tags.ptrs[i];
-            char buf[512];
-            size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
-            Message *m = new_message(buf, len);
-            m->loc = xnew0(FileLocation, 1);
-            m->loc->filename = tag_file_get_tag_filename(tf, t);
-            if (t->pattern) {
-                m->loc->pattern = t->pattern;
-                t->pattern = NULL;
-            } else {
-                m->loc->line = t->line;
-            }
-            add_message(m);
-        }
-        free_tags(&tags);
-        activate_current_message_save();
+        free(word);
+        return;
     }
+
+    for (size_t i = 0, n = tags.count; i < n; i++) {
+        Tag *t = tags.ptrs[i];
+        char buf[512];
+        size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
+        Message *m = new_message(buf, len);
+        m->loc = xnew0(FileLocation, 1);
+        m->loc->filename = tag_file_get_tag_filename(tf, t);
+        if (t->pattern) {
+            m->loc->pattern = t->pattern;
+            t->pattern = NULL;
+        } else {
+            m->loc->line = t->line;
+        }
+        add_message(m);
+    }
+
     free(word);
+    free_tags(&tags);
+    activate_current_message_save();
 }
 
 static void cmd_title(const CommandArgs *a)
