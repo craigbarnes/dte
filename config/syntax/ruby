@@ -115,7 +115,13 @@ state symbol-dq symbol
 
 state symbol-sq symbol
     char "'" start symbol
+    char -b "\\" symbol-sq-esc symbol
     eat this
+
+state symbol-sq-esc special
+    char -b "'\\" symbol-sq special
+    recolor symbol
+    noeat symbol-sq
 
 state symbol-end
     char !? start symbol
@@ -167,8 +173,13 @@ state dq string
 
 state sq string
     char "'" start string
-    char -b "\\" .ruby-esc:this
+    char -b "\\" sq-esc
     eat this
+
+state sq-esc special
+    char "'\\" sq special
+    recolor string
+    noeat sq
 
 list keyword \
     __ENCODING__ __LINE__ __FILE__ BEGIN END \
