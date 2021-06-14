@@ -110,6 +110,8 @@ static void handle_select_chars_or_lines_flags(const CommandArgs *a)
 static void cmd_alias(const CommandArgs *a)
 {
     const char *const name = a->args[0];
+    const char *const cmd = a->args[1];
+
     if (unlikely(name[0] == '\0')) {
         error_msg("Empty alias name not allowed");
         return;
@@ -128,7 +130,11 @@ static void cmd_alias(const CommandArgs *a)
         return;
     }
 
-    add_alias(normal_commands.aliases, name, a->args[1]);
+    if (cmd) {
+        add_alias(normal_commands.aliases, name, cmd);
+    } else {
+        remove_alias(normal_commands.aliases, name);
+    }
 }
 
 static void cmd_bind(const CommandArgs *a)
@@ -2111,7 +2117,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
 }
 
 static const Command cmds[] = {
-    {"alias", "-", true, 2, 2, cmd_alias},
+    {"alias", "-", true, 1, 2, cmd_alias},
     {"bind", "-cns", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},

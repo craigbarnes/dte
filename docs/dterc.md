@@ -100,7 +100,8 @@ are the only commands allowed in user config files.
 
 ### **alias** _name_ _command_
 
-Create an alias _name_ for _command_.
+Create an alias _name_ for _command_. If no _command_ is given then the
+alias for _name_ is removed.
 
 Example:
 
