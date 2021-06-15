@@ -203,10 +203,8 @@ static bool validate_regex(const char *value)
 
 static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
-    OptionValue v;
-    const char **strp = ptr;
-    v.str_val = *strp;
-    return v;
+    const char *const *strp = ptr;
+    return (OptionValue){.str_val = *strp};
 }
 
 static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
@@ -217,12 +215,9 @@ static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 
 static bool str_parse(const OptionDesc *d, const char *str, OptionValue *v)
 {
-    if (d->u.str_opt.validate && !d->u.str_opt.validate(str)) {
-        v->str_val = NULL;
-        return false;
-    }
-    v->str_val = str;
-    return true;
+    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(str);
+    v->str_val = valid ? str : NULL;
+    return valid;
 }
 
 static const char *str_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
@@ -239,10 +234,8 @@ static bool str_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
-    OptionValue v;
-    unsigned int *valp = ptr;
-    v.uint_val = *valp;
-    return v;
+    const unsigned int *valp = ptr;
+    return (OptionValue){.uint_val = *valp};
 }
 
 static void uint_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
@@ -258,12 +251,14 @@ static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
         error_msg("Integer value for %s expected", d->name);
         return false;
     }
+
     const unsigned int min = d->u.uint_opt.min;
     const unsigned int max = d->u.uint_opt.max;
     if (val < min || val > max) {
         error_msg("Value for %s must be in %u-%u range", d->name, min, max);
         return false;
     }
+
     v->uint_val = val;
     return true;
 }
@@ -275,16 +270,14 @@ static const char *uint_string(const OptionDesc* UNUSED_ARG(desc), OptionValue v
 
 static bool uint_equals(const OptionDesc* UNUSED_ARG(desc), void *ptr, OptionValue value)
 {
-    unsigned int *valp = ptr;
+    const unsigned int *valp = ptr;
     return *valp == value.uint_val;
 }
 
 static OptionValue bool_get(const OptionDesc* UNUSED_ARG(d), void *ptr)
 {
-    OptionValue v;
-    bool *valp = ptr;
-    v.bool_val = *valp;
-    return v;
+    const bool *valp = ptr;
+    return (OptionValue){.bool_val = *valp};
 }
 
 static void bool_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
@@ -313,7 +306,7 @@ static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
 
 static bool bool_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 {
-    bool *valp = ptr;
+    const bool *valp = ptr;
     return *valp == v.bool_val;
 }
 
@@ -327,11 +320,13 @@ static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
             return true;
         }
     }
+
     unsigned int val;
     if (!str_to_uint(str, &val) || val >= i) {
         error_msg("Invalid value for %s", d->name);
         return false;
     }
+
     v->uint_val = val;
     return true;
 }
