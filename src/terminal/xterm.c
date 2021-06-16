@@ -250,6 +250,12 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     case 'H': // Home
         *k = KEY_UP + (ch - 'A');
         return i;
+    case 'P': // F1
+    case 'Q': // F2
+    case 'R': // F3
+    case 'S': // F4
+        *k = KEY_F1 + (ch - 'P');
+        return i;
     case 'a': // Shift+Up (rxvt)
     case 'b': // Shift+Down (rxvt)
     case 'c': // Shift+Right (rxvt)
