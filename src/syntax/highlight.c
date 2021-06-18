@@ -57,7 +57,7 @@ static State *handle_heredoc (
 
     SyntaxMerge m = {
         .subsyn = state->heredoc.subsyntax,
-        .return_state = state->a.destination,
+        .return_state = state->default_action.destination,
         .delim = delim,
         .delim_len = len
     };
@@ -243,13 +243,13 @@ static TermColor **highlight_line (
 
         switch (state->type) {
         case STATE_EAT:
-            colors[i++] = state->a.emit_color;
+            colors[i++] = state->default_action.emit_color;
             // fallthrough
         case STATE_NOEAT:
             sidx = -1;
             // fallthrough
         case STATE_NOEAT_BUFFER:
-            a = &state->a;
+            a = &state->default_action;
             state = a->destination;
             break;
         case STATE_HEREDOCBEGIN:

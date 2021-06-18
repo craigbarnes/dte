@@ -65,9 +65,9 @@ static void fix_conditions (
         }
     }
 
-    fix_action(syn, &s->a, prefix);
-    if (!s->a.destination) {
-        s->a.destination = m->return_state;
+    fix_action(syn, &s->default_action, prefix);
+    if (!s->default_action.destination) {
+        s->default_action.destination = m->return_state;
     }
 }
 
@@ -147,8 +147,8 @@ static void visit(State *s)
             visit(cond->a.destination);
         }
     }
-    if (s->a.destination) {
-        visit(s->a.destination);
+    if (s->default_action.destination) {
+        visit(s->default_action.destination);
     }
 }
 
@@ -162,7 +162,7 @@ static void free_state(State *s)
 {
     free(s->emit_name);
     ptr_array_free_cb(&s->conds, FREE_FUNC(free_condition));
-    free(s->a.emit_name);
+    free(s->default_action.emit_name);
     free(s);
 }
 
@@ -293,7 +293,7 @@ static void update_state_colors(const Syntax *syn, State *s)
         Condition *c = s->conds.ptrs[i];
         update_action_color(syn, &c->a);
     }
-    update_action_color(syn, &s->a);
+    update_action_color(syn, &s->default_action);
 }
 
 void update_syntax_colors(Syntax *syn)

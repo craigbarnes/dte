@@ -41,7 +41,10 @@ static bool no_state(void)
 
 static void close_state(void)
 {
-    if (current_state && current_state->type == STATE_INVALID) {
+    if (!current_state) {
+        return;
+    }
+    if (current_state->type == STATE_INVALID) {
         // Command prefix in error message makes no sense
         const Command *save = current_command;
         current_command = NULL;
@@ -247,12 +250,14 @@ static void cmd_eat(const CommandArgs *a)
         return;
     }
 
-    if (!destination_state(a->args[0], &current_state->a.destination)) {
+    const char *dest = a->args[0];
+    if (!destination_state(dest, &current_state->default_action.destination)) {
         return;
     }
 
+    const char *emit = a->args[1];
+    current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
     current_state->type = STATE_EAT;
-    current_state->a.emit_name = a->args[1] ? xstrdup(a->args[1]) : NULL;
     current_state = NULL;
 }
 
@@ -273,12 +278,13 @@ static void cmd_heredocbegin(const CommandArgs *a)
         return;
     }
 
-    // a.destination is used as the return state
-    if (!destination_state(a->args[1], &current_state->a.destination)) {
+    // default_action.destination is used as the return state
+    const char *ret = a->args[1];
+    if (!destination_state(ret, &current_state->default_action.destination)) {
         return;
     }
 
-    current_state->a.emit_name = NULL;
+    current_state->default_action.emit_name = NULL;
     current_state->type = STATE_HEREDOCBEGIN;
     current_state->heredoc.subsyntax = subsyn;
     current_state = NULL;
@@ -366,8 +372,8 @@ static void cmd_noeat(const CommandArgs *a)
         return;
     }
 
-    current_state->a.destination = dest;
-    current_state->a.emit_name = NULL;
+    current_state->default_action.destination = dest;
+    current_state->default_action.emit_name = NULL;
     current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
     current_state = NULL;
 }
