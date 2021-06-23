@@ -33,6 +33,10 @@ static const char special_names[][8] = {
     "F14",
     "F15",
     "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
 };
 
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)

@@ -36,6 +36,10 @@ static const KeyCode special_keys[] = {
     [26] = KEY_F14,
     [28] = KEY_F15,
     [29] = KEY_F16,
+    [31] = KEY_F17,
+    [32] = KEY_F18,
+    [33] = KEY_F19,
+    [34] = KEY_F20,
 };
 
 static KeyCode decode_modifiers(uint32_t n)

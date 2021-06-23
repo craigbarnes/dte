@@ -131,7 +131,7 @@ Special keys:
 * `enter`
 * `tab`
 * `space`
-* `F1`..`F16`
+* `F1`..`F20`
 
 Modifiers:
 

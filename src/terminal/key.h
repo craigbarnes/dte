@@ -49,8 +49,12 @@ enum {
     KEY_F14,
     KEY_F15,
     KEY_F16,
+    KEY_F17,
+    KEY_F18,
+    KEY_F19,
+    KEY_F20,
 
-    KEY_SPECIAL_MAX = KEY_F16,
+    KEY_SPECIAL_MAX = KEY_F20,
     NR_SPECIAL_KEYS = KEY_SPECIAL_MAX - KEY_SPECIAL_MIN + 1,
     MOD_OFFSET = 24,
 
