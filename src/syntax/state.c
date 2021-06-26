@@ -351,24 +351,13 @@ static void cmd_inlist(const CommandArgs *a)
 
 static void cmd_noeat(const CommandArgs *a)
 {
-    if (no_state()) {
-        return;
-    }
-
-    const char *arg = a->args[0];
-    if (streq(arg, current_state->name)) {
-        error_msg("Using noeat to jump to parent state causes infinite loop");
-        return;
-    }
-
     State *dest;
-    if (!destination_state(arg, &dest)) {
+    if (unlikely(no_state() || !destination_state(a->args[0], &dest))) {
         return;
     }
-    if (dest == current_state) {
-        // The noeat command doesn't consume anything, so jumping to
-        // the same state will always produce an infinite loop.
-        current_state->type = STATE_INVALID;
+
+    if (unlikely(dest == current_state)) {
+        error_msg("using noeat to jump to same state causes infinite loop");
         return;
     }
 
