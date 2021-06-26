@@ -11,12 +11,13 @@
 
 static HashMap compilers = HASHMAP_INIT;
 
-static Compiler *add_compiler(const char *name)
+static Compiler *find_or_add_compiler(const char *name)
 {
     Compiler *c = find_compiler(name);
     if (c) {
         return c;
     }
+
     c = xnew0(Compiler, 1);
     hashmap_insert(&compilers, xstrdup(name), c);
     return c;
@@ -75,7 +76,7 @@ void add_error_fmt (
     }
 
     f->pattern = str_intern(format);
-    ptr_array_append(&add_compiler(compiler)->error_formats, f);
+    ptr_array_append(&find_or_add_compiler(compiler)->error_formats, f);
 }
 
 void collect_compilers(const char *prefix)
