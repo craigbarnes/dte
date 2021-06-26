@@ -101,6 +101,7 @@ static void test_hl_line(void)
 
     bool next_changed;
     TermColor **colors = hl_line(buffer, &line, line_nr, &next_changed);
+    ASSERT_NONNULL(colors);
     EXPECT_TRUE(next_changed);
 
     const TermColor *t = find_color("text");
