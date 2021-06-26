@@ -48,7 +48,6 @@ debian-9:
         - make check
         - cat build/feature.h
         - make installcheck
-        - make check-syntax-files
         - make clean && make check CC='ccache gcc'
         - make clean && make check CC='ccache clang'
         - make clean && make CC='ccache arm-linux-gnueabihf-gcc'

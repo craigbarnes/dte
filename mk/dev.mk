@@ -2,7 +2,6 @@ RELEASE_VERSIONS = 1.10 1.9.1 1.9 1.8.2 1.8.1 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.
 RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
 DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
-SYNTAX_LINT = $(AWK) -f tools/syntax-lint.awk
 SHELLCHECK ?= shellcheck
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
@@ -28,11 +27,6 @@ check-shell-scripts:
 check-docs:
 	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
 	@$(FINDLINKS) `git ls-files '*.md'` | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
-
-check-syntax-files:
-	$(E) LINT 'config/syntax/*'
-	$(Q) $(SYNTAX_LINT) $(addprefix config/syntax/, $(BUILTIN_SYNTAX_FILES))
-	$(Q) ! $(SYNTAX_LINT) test/data/syntax-lint.dterc 2>/dev/null
 
 distcheck: TARDIR = build/dte-$(DISTVER)/
 distcheck: build/dte-$(DISTVER).tar.gz | build/
@@ -111,5 +105,5 @@ NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-docs check-shell-scripts check-release-digests check-syntax-files \
+    check-docs check-shell-scripts check-release-digests \
     git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)

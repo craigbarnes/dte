@@ -37,7 +37,7 @@ done
 
 mkdir -p "$TMPDIR/GEN/"
 cp $GENERATED "$TMPDIR/GEN/"
-$MAKE -B man check-syntax-files
+$MAKE -B man
 
 for F in $GENERATED; do
     B="$(basename $F)"
