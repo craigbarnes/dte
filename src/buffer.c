@@ -192,10 +192,8 @@ bool buffer_detect_filetype(Buffer *b)
 static char *short_filename_cwd(const char *absolute, const char *cwd)
 {
     char *relative = relative_filename(absolute, cwd);
-    size_t home_len = editor.home_dir.length;
     size_t abs_len = strlen(absolute);
     size_t rel_len = strlen(relative);
-
     if (rel_len >= abs_len) {
         // Prefer absolute if relative isn't shorter
         free(relative);
@@ -203,18 +201,21 @@ static char *short_filename_cwd(const char *absolute, const char *cwd)
         rel_len = abs_len;
     }
 
+    size_t home_len = editor.home_dir.length;
     if (
         abs_len > home_len
         && mem_equal(absolute, editor.home_dir.data, home_len)
         && absolute[home_len] == '/'
     ) {
-        size_t len = abs_len - home_len + 1;
-        if (len < rel_len) {
-            char *filename = xmalloc(len + 1);
-            filename[0] = '~';
-            memcpy(filename + 1, absolute + home_len, len);
+        size_t suffix_len = (abs_len - home_len) + 1;
+        if (suffix_len < rel_len) {
+            // Prefer absolute path in tilde notation (e.g. "~/abs/path")
+            // if shorter than relative
             free(relative);
-            return filename;
+            char *tilde = xmalloc(suffix_len + 1);
+            tilde[0] = '~';
+            memcpy(tilde + 1, absolute + home_len, suffix_len);
+            return tilde;
         }
     }
 
