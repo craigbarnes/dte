@@ -1,10 +1,10 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "syntax.h"
 #include "error.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
+#include "util/xsnprintf.h"
 
 static HashMap syntaxes = HASHMAP_INIT;
 
@@ -30,8 +30,8 @@ Syntax *find_any_syntax(const char *name)
 
 static const char *fix_name(const char *name, const char *prefix)
 {
-    static char buf[64];
-    snprintf(buf, sizeof(buf), "%s%s", prefix, name);
+    static char buf[256];
+    xsnprintf(buf, sizeof(buf), "%s%s", prefix, name);
     return buf;
 }
 
@@ -71,21 +71,19 @@ static void fix_conditions (
     }
 }
 
-static const char *get_prefix(void)
-{
-    static unsigned int counter;
-    static char prefix[32];
-    snprintf(prefix, sizeof(prefix), "%u-", counter++);
-    return prefix;
-}
-
 static void update_state_colors(const Syntax *syn, State *s);
 
+// Merge a sub-syntax into another syntax, copying or updating
+// pointers and strings as appropriate.
+// NOTE: string_lists is owned by Syntax, so there's no need to
+// copy it. Freeing Condition does not free any string lists.
 State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
 {
-    // NOTE: string_lists is owned by Syntax so there's no need to
-    // copy it. Freeing Condition does not free any string lists.
-    const char *prefix = get_prefix();
+    // Generate a prefix for merged state names, to avoid clashes
+    static unsigned int counter;
+    char prefix[DECIMAL_STR_MAX(counter) + 2];
+    xsnprintf(prefix, sizeof prefix, "m%u-", counter++);
+
     const HashMap *subsyn_states = &merge->subsyn->states;
     HashMap *states = &syn->states;
 
@@ -271,8 +269,8 @@ static void update_action_color(const Syntax *syn, Action *a)
         name = a->destination->emit_name;
     }
 
-    char full[64];
-    snprintf(full, sizeof(full), "%s.%s", syn->name, name);
+    char full[256];
+    xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
     a->emit_color = find_color(full);
     if (a->emit_color) {
         return;
@@ -283,7 +281,7 @@ static void update_action_color(const Syntax *syn, Action *a)
         return;
     }
 
-    snprintf(full, sizeof(full), "%s.%s", syn->name, def);
+    xsnprintf(full, sizeof full, "%s.%s", syn->name, def);
     a->emit_color = find_color(full);
 }
 
