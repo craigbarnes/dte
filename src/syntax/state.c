@@ -6,6 +6,7 @@
 #include "command/run.h"
 #include "editor.h"
 #include "error.h"
+#include "syntax/merge.h"
 #include "util/bsearch.h"
 #include "util/macros.h"
 #include "util/path.h"

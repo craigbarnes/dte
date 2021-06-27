@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "color.h"
 #include "buffer.h"
+#include "syntax/color.h"
 #include "util/string-view.h"
 
 TermColor **hl_line(Buffer *b, const StringView *line, size_t line_nr, bool *next_changed);

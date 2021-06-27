@@ -47,7 +47,7 @@ editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
 
 syntax_objects := $(call prefix-obj, build/syntax/, \
-    color highlight state syntax )
+    color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
     color ecma48 input key kitty mode output rxvt terminal \

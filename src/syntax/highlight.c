@@ -2,8 +2,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include "highlight.h"
-#include "syntax.h"
 #include "block-iter.h"
+#include "syntax/merge.h"
+#include "syntax/syntax.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"

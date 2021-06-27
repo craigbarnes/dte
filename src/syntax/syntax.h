@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "bitset.h"
-#include "color.h"
+#include "syntax/bitset.h"
+#include "syntax/color.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/ptr-array.h"
@@ -104,12 +104,6 @@ typedef struct {
     size_t len;
 } HeredocState;
 
-typedef struct {
-    Syntax *subsyn;
-    State *return_state;
-    const char *delim;
-    size_t delim_len;
-} SyntaxMerge;
 
 static inline bool is_subsyntax(const Syntax *syn)
 {
@@ -118,11 +112,11 @@ static inline bool is_subsyntax(const Syntax *syn)
 
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
-State *merge_syntax(Syntax *syn, SyntaxMerge *m);
 void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors);
 
 Syntax *find_any_syntax(const char *name);
 Syntax *find_syntax(const char *name);
+void update_state_colors(const Syntax *syn, State *s);
 void update_syntax_colors(Syntax *syn);
 void update_all_syntax_colors(void);
 void find_unused_subsyntaxes(void);
