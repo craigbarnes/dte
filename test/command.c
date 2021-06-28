@@ -121,7 +121,7 @@ static void test_parse_commands(void)
 {
     PointerArray array = PTR_ARRAY_INIT;
     EXPECT_EQ(parse_commands(&array, " left  -c;;"), CMDERR_NONE);
-    EXPECT_EQ(array.count, 5);
+    ASSERT_EQ(array.count, 5);
     EXPECT_STREQ(array.ptrs[0], "left");
     EXPECT_STREQ(array.ptrs[1], "-c");
     EXPECT_NULL(array.ptrs[2]);
@@ -130,7 +130,7 @@ static void test_parse_commands(void)
     ptr_array_free(&array);
 
     EXPECT_EQ(parse_commands(&array, "save -e UTF-8 file.c; close -q"), CMDERR_NONE);
-    EXPECT_EQ(array.count, 8);
+    ASSERT_EQ(array.count, 8);
     EXPECT_STREQ(array.ptrs[0], "save");
     EXPECT_STREQ(array.ptrs[1], "-e");
     EXPECT_STREQ(array.ptrs[2], "UTF-8");
@@ -142,14 +142,14 @@ static void test_parse_commands(void)
     ptr_array_free(&array);
 
     EXPECT_EQ(parse_commands(&array, "\n ; ; \t\n "), CMDERR_NONE);
-    EXPECT_EQ(array.count, 3);
+    ASSERT_EQ(array.count, 3);
     EXPECT_NULL(array.ptrs[0]);
     EXPECT_NULL(array.ptrs[1]);
     EXPECT_NULL(array.ptrs[2]);
     ptr_array_free(&array);
 
     EXPECT_EQ(parse_commands(&array, ""), CMDERR_NONE);
-    EXPECT_EQ(array.count, 1);
+    ASSERT_EQ(array.count, 1);
     EXPECT_NULL(array.ptrs[0]);
     ptr_array_free(&array);
 
