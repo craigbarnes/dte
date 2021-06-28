@@ -448,7 +448,7 @@ system except a somewhat recent kernel.
 [website]: https://craigbarnes.gitlab.io/dte/
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
-[ECMA-48]: https://www.ecma-international.org/publications/standards/Ecma-048.htm
+[ECMA-48]: https://www.ecma-international.org/publications-and-standards/standards/ecma-48/
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
