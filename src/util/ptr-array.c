@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <string.h>
 #include "ptr-array.h"
 #include "debug.h"
@@ -6,11 +7,10 @@ void ptr_array_append(PointerArray *array, void *ptr)
 {
     size_t alloc = array->alloc;
     if (unlikely(alloc == array->count)) {
-        // NOTE: if alloc was 1 then new alloc would be 1*3/2 = 1!
-        alloc *= 3;
-        alloc /= 2;
-        if (alloc < 8) {
-            alloc = 8;
+        const size_t ALLOC_MIN = 8;
+        alloc = MAX((alloc * 3) / 2, ALLOC_MIN);
+        if (unlikely(alloc <= array->count)) {
+            fatal_error(__func__, EOVERFLOW);
         }
         xrenew(array->ptrs, alloc);
         array->alloc = alloc;
