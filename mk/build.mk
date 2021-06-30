@@ -41,7 +41,7 @@ util_objects := $(call prefix-obj, build/util/, \
     readfile string strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
-    args env macro parse run serialize )
+    alias args env macro parse run serialize )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )
@@ -54,7 +54,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \
-    alias bind block block-iter buffer change cmdline commands \
+    bind block block-iter buffer change cmdline commands \
     convert compiler completion config ctags edit editor \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main mode move msg options regexp \

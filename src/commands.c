@@ -4,10 +4,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "commands.h"
-#include "alias.h"
 #include "bind.h"
 #include "change.h"
 #include "cmdline.h"
+#include "command/alias.h"
 #include "command/args.h"
 #include "command/macro.h"
 #include "command/serialize.h"

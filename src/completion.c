@@ -1,9 +1,9 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "completion.h"
-#include "alias.h"
 #include "bind.h"
 #include "cmdline.h"
+#include "command/alias.h"
 #include "command/args.h"
 #include "command/env.h"
 #include "command/parse.h"
@@ -210,7 +210,7 @@ static void collect_completions(char **args, size_t argc)
 {
     if (!argc) {
         collect_normal_commands(completion.parsed);
-        collect_aliases(completion.parsed);
+        collect_normal_aliases(completion.parsed);
         return;
     }
 

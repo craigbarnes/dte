@@ -2,14 +2,15 @@
 #include <string.h>
 #include <sys/types.h>
 #include "show.h"
-#include "alias.h"
 #include "bind.h"
 #include "block.h"
 #include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
+#include "command/alias.h"
 #include "command/env.h"
 #include "command/macro.h"
+#include "command/serialize.h"
 #include "commands.h"
 #include "compiler.h"
 #include "completion.h"
@@ -27,7 +28,6 @@
 #include "util/bsearch.h"
 #include "util/hashset.h"
 #include "util/str-util.h"
-#include "util/string.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -53,7 +53,7 @@ static void open_temporary_buffer (
     }
 }
 
-static void show_alias(const char *alias_name, bool cflag)
+static void show_normal_alias(const char *alias_name, bool cflag)
 {
     const char *cmd_str = find_alias(normal_commands.aliases, alias_name);
     if (!cmd_str) {
@@ -241,6 +241,63 @@ static String dump_search_history(void)
 }
 
 typedef struct {
+    const char *name;
+    const char *value;
+} CommandAlias;
+
+static int alias_cmp(const void *ap, const void *bp)
+{
+    const CommandAlias *a = ap;
+    const CommandAlias *b = bp;
+    return strcmp(a->name, b->name);
+}
+
+String dump_normal_aliases(void)
+{
+    const HashMap *aliases = normal_commands.aliases;
+    const size_t count = aliases->count;
+    if (unlikely(count == 0)) {
+        return string_new(0);
+    }
+
+    // Clone the contents of the HashMap as an array of name/value pairs
+    CommandAlias *array = xnew(CommandAlias, count);
+    size_t n = 0;
+    for (HashMapIter it = hashmap_iter(aliases); hashmap_next(&it); ) {
+        array[n++] = (CommandAlias) {
+            .name = it.entry->key,
+            .value = it.entry->value,
+        };
+    }
+
+    // Sort the array
+    BUG_ON(n != count);
+    qsort(array, count, sizeof(array[0]), alias_cmp);
+
+    // Serialize the aliases in sorted order
+    String buf = string_new(4096);
+    for (size_t i = 0; i < count; i++) {
+        const char *name = array[i].name;
+        string_append_literal(&buf, "alias ");
+        if (unlikely(name[0] == '-')) {
+            string_append_literal(&buf, "-- ");
+        }
+        string_append_escaped_arg(&buf, name, true);
+        string_append_byte(&buf, ' ');
+        string_append_escaped_arg(&buf, array[i].value, true);
+        string_append_byte(&buf, '\n');
+    }
+
+    free(array);
+    return buf;
+}
+
+void collect_normal_aliases(const char *prefix)
+{
+    collect_hashmap_keys(normal_commands.aliases, prefix);
+}
+
+typedef struct {
     const char name[11];
     bool dumps_dterc_syntax;
     void (*show)(const char *name, bool cmdline);
@@ -249,7 +306,7 @@ typedef struct {
 } ShowHandler;
 
 static const ShowHandler handlers[] = {
-    {"alias", true, show_alias, dump_aliases, collect_aliases},
+    {"alias", true, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
     {"bind", true, show_binding, dump_bindings, collect_bound_keys},
     {"color", true, show_color, dump_hl_colors, collect_hl_colors},
     {"command", true, NULL, dump_command_history, NULL},

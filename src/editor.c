@@ -7,7 +7,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "editor.h"
-#include "alias.h"
 #include "bind.h"
 #include "buffer.h"
 #include "commands.h"

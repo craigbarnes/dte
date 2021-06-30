@@ -1,5 +1,4 @@
 #include "test.h"
-#include "alias.h"
 #include "bind.h"
 #include "command/args.h"
 #include "command/parse.h"
@@ -9,6 +8,7 @@
 #include "filetype.h"
 #include "frame.h"
 #include "options.h"
+#include "show.h"
 #include "syntax/color.h"
 #include "util/str-util.h"
 
@@ -18,7 +18,7 @@ static const struct {
     bool check_name;
     String (*dump)(void);
 } handlers[] = {
-    {"alias", true, true, dump_aliases},
+    {"alias", true, true, dump_normal_aliases},
     {"bind", true, true, dump_bindings},
     {"errorfmt", true, true, dump_compilers},
     {"ft", true, true, dump_ft},
