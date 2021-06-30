@@ -19,7 +19,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
         const char *alias_name = av[0];
-        const char *alias_value = find_alias(cmds->aliases, alias_name);
+        const char *alias_value = find_alias(&cmds->aliases, alias_name);
         if (unlikely(!alias_value)) {
             error_msg("No such command or alias: %s", alias_name);
             return;

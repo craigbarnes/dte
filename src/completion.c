@@ -383,7 +383,7 @@ static void init_completion(void)
 
         if (semicolon + 1 == array.count) {
             char *name = xstrslice(cmd, pos, end);
-            const char *value = find_alias(normal_commands.aliases, name);
+            const char *value = find_alias(&normal_commands.aliases, name);
 
             if (value) {
                 size_t save = array.count;

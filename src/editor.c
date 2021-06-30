@@ -125,7 +125,7 @@ void init_editor_state(void)
     }
 
     regexp_init_word_boundary_tokens();
-    hashmap_init(normal_commands.aliases, 32);
+    hashmap_init(&normal_commands.aliases, 32);
     bindings_init();
 }
 

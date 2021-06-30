@@ -55,7 +55,7 @@ static void open_temporary_buffer (
 
 static void show_normal_alias(const char *alias_name, bool cflag)
 {
-    const char *cmd_str = find_alias(normal_commands.aliases, alias_name);
+    const char *cmd_str = find_alias(&normal_commands.aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
@@ -254,7 +254,7 @@ static int alias_cmp(const void *ap, const void *bp)
 
 String dump_normal_aliases(void)
 {
-    const HashMap *aliases = normal_commands.aliases;
+    const HashMap *aliases = &normal_commands.aliases;
     const size_t count = aliases->count;
     if (unlikely(count == 0)) {
         return string_new(0);
@@ -294,7 +294,7 @@ String dump_normal_aliases(void)
 
 void collect_normal_aliases(const char *prefix)
 {
-    collect_hashmap_keys(normal_commands.aliases, prefix);
+    collect_hashmap_keys(&normal_commands.aliases, prefix);
 }
 
 typedef struct {

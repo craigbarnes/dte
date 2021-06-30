@@ -131,9 +131,9 @@ static void cmd_alias(const CommandArgs *a)
     }
 
     if (cmd) {
-        add_alias(normal_commands.aliases, name, cmd);
+        add_alias(&normal_commands.aliases, name, cmd);
     } else {
-        remove_alias(normal_commands.aliases, name);
+        remove_alias(&normal_commands.aliases, name);
     }
 }
 
@@ -2246,12 +2246,10 @@ const Command *find_normal_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-static HashMap normal_aliases = HASHMAP_INIT;
-
-const CommandSet normal_commands = {
+CommandSet normal_commands = {
     .lookup = find_normal_command,
     .allow_recording = allow_macro_recording,
-    .aliases = &normal_aliases,
+    .aliases = HASHMAP_INIT,
 };
 
 void collect_normal_commands(const char *prefix)

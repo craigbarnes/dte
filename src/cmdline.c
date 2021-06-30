@@ -303,10 +303,8 @@ static const Command *find_cmd_mode_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-static HashMap cmd_mode_aliases = HASHMAP_INIT;
-
 const CommandSet cmd_mode_commands = {
     .lookup = find_cmd_mode_command,
     .allow_recording = NULL,
-    .aliases = &cmd_mode_aliases,
+    .aliases = HASHMAP_INIT,
 };

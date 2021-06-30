@@ -28,7 +28,7 @@ typedef struct {
 typedef struct {
     const Command* (*lookup)(const char *name);
     bool (*allow_recording)(const Command *cmd, char **args);
-    HashMap *aliases;
+    HashMap aliases;
 } CommandSet;
 
 extern const Command *current_command;
