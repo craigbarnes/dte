@@ -150,10 +150,20 @@ static void test_term_color_to_string(void)
         {"lightmagenta", {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
         {"keep 254 keep", {COLOR_KEEP, 254, ATTR_KEEP}},
     };
+
     FOR_EACH_I(i, tests) {
         const char *str = term_color_to_string(&tests[i].color);
         EXPECT_STREQ(str, tests[i].expected_string);
     }
+
+    // Ensure longest possible color string doesn't overflow the
+    // static buffer in term_color_to_string()
+    const TermColor color = {
+        .fg = COLOR_LIGHTMAGENTA,
+        .bg = COLOR_LIGHTMAGENTA,
+        .attr = ~0U
+    };
+    EXPECT_EQ(strlen(term_color_to_string(&color)), 94);
 }
 
 static void test_xterm_parse_key(void)

@@ -441,8 +441,9 @@ const char *term_color_to_string(const TermColor *color)
     }
     for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
         if (color->attr & (1U << i)) {
-            buf[pos++] = ' ';
             size_t len = strlen(attr_names[i]);
+            BUG_ON(pos + len + 2 >= sizeof(buf));
+            buf[pos++] = ' ';
             memcpy(buf + pos, attr_names[i], len);
             pos += len;
         }
