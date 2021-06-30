@@ -81,14 +81,15 @@ static void run_commands(const CommandSet *cmds, const PointerArray *array, bool
     }
 
     void **ptrs = array->ptrs;
-    for (size_t e, s = 0, n = array->count; s < n; s = e + 1) {
+    size_t len = array->count;
+    BUG_ON(len == 0);
+    BUG_ON(ptrs[len - 1] != NULL);
+
+    for (size_t s = 0, e = 0; s < len; ) {
         // Iterate over strings, until a terminating NULL is encountered
-        e = s;
         while (ptrs[e]) {
             e++;
-            if (unlikely(e >= n)) {
-                BUG("array is missing final NULL sentinel");
-            }
+            BUG_ON(e >= len);
         }
 
         // If the value of `e` (end) changed, there's a run of at least
@@ -96,6 +97,9 @@ static void run_commands(const CommandSet *cmds, const PointerArray *array, bool
         if (e != s) {
             run_command(cmds, (char**)ptrs + s, allow_recording);
         }
+
+        // Skip past the NULL, onto the next command (if any)
+        s = ++e;
     }
 
 out:
