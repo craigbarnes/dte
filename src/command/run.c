@@ -80,18 +80,22 @@ static void run_commands(const CommandSet *cmds, const PointerArray *array, bool
         goto out;
     }
 
-    size_t s = 0;
-    while (s < array->count) {
-        size_t e = s;
-        while (e < array->count && array->ptrs[e]) {
+    void **ptrs = array->ptrs;
+    for (size_t e, s = 0, n = array->count; s < n; s = e + 1) {
+        // Iterate over strings, until a terminating NULL is encountered
+        e = s;
+        while (ptrs[e]) {
             e++;
+            if (unlikely(e >= n)) {
+                BUG("array is missing final NULL sentinel");
+            }
         }
 
-        if (e > s) {
-            run_command(cmds, (char **)array->ptrs + s, allow_recording);
+        // If the value of `e` (end) changed, there's a run of at least
+        // 1 string, which is a command followed by 0 or more arguments
+        if (e != s) {
+            run_command(cmds, (char**)ptrs + s, allow_recording);
         }
-
-        s = e + 1;
     }
 
 out:
