@@ -41,7 +41,7 @@ util_objects := $(call prefix-obj, build/util/, \
     readfile string strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
-    alias args macro parse run serialize )
+    args macro parse run serialize )
 
 editorconfig_objects := $(call prefix-obj, build/editorconfig/, \
     editorconfig ini match )

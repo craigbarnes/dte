@@ -1,7 +1,6 @@
 #include "run.h"
 #include "args.h"
 #include "parse.h"
-#include "alias.h"
 #include "change.h"
 #include "config.h"
 #include "error.h"

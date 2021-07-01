@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <glob.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -7,7 +8,6 @@
 #include "bind.h"
 #include "change.h"
 #include "cmdline.h"
-#include "command/alias.h"
 #include "command/args.h"
 #include "command/macro.h"
 #include "command/serialize.h"
@@ -39,6 +39,7 @@
 #include "util/bsearch.h"
 #include "util/checked-arith.h"
 #include "util/debug.h"
+#include "util/hashmap.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
@@ -131,11 +132,14 @@ static void cmd_alias(const CommandArgs *a)
         return;
     }
 
+    HashMap *aliases = &normal_commands.aliases;
+    char *oldval;
     if (cmd) {
-        add_alias(&normal_commands.aliases, name, cmd);
+        oldval = hashmap_insert_or_replace(aliases, xstrdup(name), xstrdup(cmd));
     } else {
-        remove_alias(&normal_commands.aliases, name);
+        oldval = hashmap_remove(aliases, name);
     }
+    free(oldval);
 }
 
 static void cmd_bind(const CommandArgs *a)

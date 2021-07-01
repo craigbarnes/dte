@@ -34,6 +34,11 @@ typedef struct {
 
 extern const Command *current_command;
 
+static inline const char *find_alias(const HashMap *aliases, const char *name)
+{
+    return hashmap_get(aliases, name);
+}
+
 static inline int command_cmp(const void *key, const void *elem)
 {
     const char *name = key;
