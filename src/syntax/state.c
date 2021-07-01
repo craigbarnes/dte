@@ -14,6 +14,7 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "vars.h"
 
 static Syntax *current_syntax;
 static State *current_state;
@@ -500,6 +501,7 @@ static const Command *find_syntax_command(const char *name)
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
     .allow_recording = NULL,
+    .expand_variable = expand_syntax_var,
     .aliases = HASHMAP_INIT,
 };
 

@@ -44,6 +44,7 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "vars.h"
 #include "view.h"
 #include "window.h"
 
@@ -2249,6 +2250,7 @@ const Command *find_normal_command(const char *name)
 CommandSet normal_commands = {
     .lookup = find_normal_command,
     .allow_recording = allow_macro_recording,
+    .expand_variable = expand_normal_var,
     .aliases = HASHMAP_INIT,
 };
 

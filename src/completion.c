@@ -5,7 +5,6 @@
 #include "cmdline.h"
 #include "command/alias.h"
 #include "command/args.h"
-#include "command/env.h"
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
@@ -24,6 +23,7 @@
 #include "util/str-util.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
+#include "vars.h"
 
 static struct {
     // Part of string that is to be replaced
@@ -147,6 +147,7 @@ static void do_collect_files (
 static void collect_files(bool directories_only)
 {
     char *str = parse_command_arg (
+        &normal_commands,
         completion.escaped,
         strlen(completion.escaped),
         false
@@ -347,6 +348,7 @@ out:
 
 static void init_completion(void)
 {
+    const CommandSet *cmds = &normal_commands;
     const char *cmd = string_borrow_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
     ssize_t semicolon = -1;
@@ -387,23 +389,23 @@ static void init_completion(void)
 
             if (value) {
                 size_t save = array.count;
-                if (parse_commands(&array, value) != CMDERR_NONE) {
+                if (parse_commands(cmds, &array, value) != CMDERR_NONE) {
                     for (size_t i = save, n = array.count; i < n; i++) {
                         free(array.ptrs[i]);
                         array.ptrs[i] = NULL;
                     }
                     array.count = save;
-                    ptr_array_append(&array, parse_command_arg(name, end - pos, true));
+                    ptr_array_append(&array, parse_command_arg(cmds, name, end - pos, true));
                 } else {
                     // Remove NULL
                     array.count--;
                 }
             } else {
-                ptr_array_append(&array, parse_command_arg(name, end - pos, true));
+                ptr_array_append(&array, parse_command_arg(cmds, name, end - pos, true));
             }
             free(name);
         } else {
-            ptr_array_append(&array, parse_command_arg(cmd + pos, end - pos, true));
+            ptr_array_append(&array, parse_command_arg(cmds, cmd + pos, end - pos, true));
         }
         pos = end;
     }
@@ -433,7 +435,7 @@ static void init_completion(void)
             completion.head = xstrcut(cmd, completion_pos);
             completion.tail = xstrdup(cmd + editor.cmdline.pos);
             collect_env(name);
-            collect_builtin_env(name);
+            collect_normal_vars(name);
             sort_completions();
             free(name);
             ptr_array_free(&array);
@@ -442,7 +444,7 @@ static void init_completion(void)
     }
 
     completion.escaped = xstrcut(str, len);
-    completion.parsed = parse_command_arg(completion.escaped, len, true);
+    completion.parsed = parse_command_arg(cmds, completion.escaped, len, true);
     completion.head = xstrcut(cmd, completion_pos);
     completion.tail = xstrdup(cmd + editor.cmdline.pos);
     completion.add_space = true;

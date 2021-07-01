@@ -8,7 +8,6 @@
 #include "change.h"
 #include "cmdline.h"
 #include "command/alias.h"
-#include "command/env.h"
 #include "command/macro.h"
 #include "command/serialize.h"
 #include "commands.h"
@@ -33,6 +32,8 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
+
+extern char **environ;
 
 static void open_temporary_buffer (
     const char *text,
@@ -135,13 +136,25 @@ static void show_env(const char *name, bool cflag)
 
 static String dump_env(void)
 {
-    extern char **environ;
     String buf = string_new(4096);
     for (size_t i = 0; environ[i]; i++) {
         string_append_cstring(&buf, environ[i]);
         string_append_byte(&buf, '\n');
     }
     return buf;
+}
+
+void collect_env(const char *prefix)
+{
+    for (size_t i = 0; environ[i]; i++) {
+        const char *var = environ[i];
+        if (str_has_prefix(var, prefix)) {
+            const char *delim = strchr(var, '=');
+            if (likely(delim)) {
+                add_completion(xstrcut(var, delim - var));
+            }
+        }
+    }
 }
 
 static void show_include(const char *name, bool cflag)

@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
     const Command* (*lookup)(const char *name);
     bool (*allow_recording)(const Command *cmd, char **args);
+    bool (*expand_variable)(const char *name, char **value);
     HashMap aliases;
 } CommandSet;
 

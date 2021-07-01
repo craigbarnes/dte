@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "env.h"
+#include "vars.h"
 #include "buffer.h"
 #include "completion.h"
 #include "editor.h"
@@ -13,7 +13,7 @@
 typedef struct {
     const char *name;
     char *(*expand)(void);
-} BuiltinEnv;
+} BuiltinVar;
 
 static char *expand_dte_home(void)
 {
@@ -62,7 +62,7 @@ static char *expand_pkgdatadir(void)
     return NULL;
 }
 
-static const BuiltinEnv builtin[] = {
+static const BuiltinVar normal_vars[] = {
     {"PKGDATADIR", expand_pkgdatadir},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
@@ -71,38 +71,32 @@ static const BuiltinEnv builtin[] = {
     {"WORD", expand_word},
 };
 
-void collect_builtin_env(const char *prefix)
+bool expand_normal_var(const char *name, char **value)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
-        const char *name = builtin[i].name;
-        if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
-        }
-    }
-}
-
-void collect_env(const char *prefix)
-{
-    extern char **environ;
-    for (size_t i = 0; environ[i]; i++) {
-        const char *e = environ[i];
-        if (str_has_prefix(e, prefix)) {
-            const char *end = strchr(e, '=');
-            if (end) {
-                add_completion(xstrcut(e, end - e));
-            }
-        }
-    }
-}
-
-bool expand_builtin_env(const char *name, char **value)
-{
-    for (size_t i = 0; i < ARRAY_COUNT(builtin); i++) {
-        const BuiltinEnv *be = &builtin[i];
-        if (streq(be->name, name)) {
-            *value = be->expand();
+    for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
+        if (streq(name, normal_vars[i].name)) {
+            *value = normal_vars[i].expand();
             return true;
         }
     }
     return false;
+}
+
+bool expand_syntax_var(const char *name, char **value)
+{
+    if (streq(name, "DTE_HOME")) {
+        *value = expand_dte_home();
+        return true;
+    }
+    return false;
+}
+
+void collect_normal_vars(const char *prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
+        const char *name = normal_vars[i].name;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
 }

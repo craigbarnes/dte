@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "parse.h"
-#include "env.h"
 #include "editor.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -104,7 +103,7 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
     return pos;
 }
 
-static size_t parse_var(const char *cmd, size_t len, String *buf)
+static size_t parse_var(const CommandSet *cmds, const char *cmd, size_t len, String *buf)
 {
     if (len == 0 || !is_alpha_or_underscore(cmd[0])) {
         return 0;
@@ -117,7 +116,7 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
 
     char *name = xstrcut(cmd, n);
     char *value;
-    if (expand_builtin_env(name, &value)) {
+    if (cmds->expand_variable && cmds->expand_variable(name, &value)) {
         if (value) {
             string_append_cstring(buf, value);
             free(value);
@@ -133,7 +132,7 @@ static size_t parse_var(const char *cmd, size_t len, String *buf)
     return n;
 }
 
-char *parse_command_arg(const char *cmd, size_t len, bool tilde)
+char *parse_command_arg(const CommandSet *cmds, const char *cmd, size_t len, bool tilde)
 {
     String buf;
     size_t pos = 0;
@@ -163,7 +162,7 @@ char *parse_command_arg(const char *cmd, size_t len, bool tilde)
             pos += parse_dq(cmd + pos, len - pos, &buf);
             break;
         case '$':
-            pos += parse_var(cmd + pos, len - pos, &buf);
+            pos += parse_var(cmds, cmd + pos, len - pos, &buf);
             break;
         case '\\':
             if (pos == len) {
@@ -239,7 +238,7 @@ unexpected_eof:
     return 0;
 }
 
-CommandParseError parse_commands(PointerArray *array, const char *cmd)
+CommandParseError parse_commands(const CommandSet *cmds, PointerArray *array, const char *cmd)
 {
     size_t pos = 0;
     while (1) {
@@ -263,7 +262,7 @@ CommandParseError parse_commands(PointerArray *array, const char *cmd)
             return err;
         }
 
-        ptr_array_append(array, parse_command_arg(cmd + pos, end - pos, true));
+        ptr_array_append(array, parse_command_arg(cmds, cmd + pos, end - pos, true));
         pos = end;
     }
     ptr_array_append(array, NULL);

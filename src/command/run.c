@@ -26,7 +26,7 @@ static void run_command(const CommandSet *cmds, char **av, bool allow_recording)
         }
 
         PointerArray array = PTR_ARRAY_INIT;
-        CommandParseError err = parse_commands(&array, alias_value);
+        CommandParseError err = parse_commands(cmds, &array, alias_value);
         if (unlikely(err != CMDERR_NONE)) {
             const char *err_msg = command_parse_error_to_string(err);
             error_msg("Parsing alias %s: %s", alias_name, err_msg);
@@ -109,7 +109,7 @@ out:
 void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recording)
 {
     PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = parse_commands(&array, cmd);
+    CommandParseError err = parse_commands(cmds, &array, cmd);
     if (likely(err == CMDERR_NONE)) {
         run_commands(cmds, &array, allow_recording);
     } else {

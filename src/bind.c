@@ -113,8 +113,9 @@ static KeyBinding *key_binding_new(InputMode mode, const char *cmd_str)
     binding->cmd = NULL;
     memcpy(binding->cmd_str, cmd_str, cmd_str_len + 1);
 
+    const CommandSet *cmds = bindings[mode].cmds;
     PointerArray array = PTR_ARRAY_INIT;
-    if (parse_commands(&array, cmd_str) != CMDERR_NONE) {
+    if (parse_commands(cmds, &array, cmd_str) != CMDERR_NONE) {
         goto out;
     }
 
@@ -124,7 +125,7 @@ static KeyBinding *key_binding_new(InputMode mode, const char *cmd_str)
         goto out;
     }
 
-    const Command *cmd = bindings[mode].cmds->lookup(array.ptrs[0]);
+    const Command *cmd = cmds->lookup(array.ptrs[0]);
     if (!cmd) {
         // Aliases or non-existent commands can't be cached
         goto out;

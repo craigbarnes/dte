@@ -42,7 +42,7 @@ static void test_dump_handlers(void)
             }
 
             PointerArray arr = PTR_ARRAY_INIT;
-            CommandParseError parse_err = parse_commands(&arr, line);
+            CommandParseError parse_err = parse_commands(&normal_commands, &arr, line);
             EXPECT_EQ(parse_err, CMDERR_NONE);
             EXPECT_TRUE(arr.count >= 2);
             if (parse_err != CMDERR_NONE || arr.count < 2) {
