@@ -1,5 +1,5 @@
-#ifndef ALIAS_H
-#define ALIAS_H
+#ifndef COMMAND_ALIAS_H
+#define COMMAND_ALIAS_H
 
 #include "util/hashmap.h"
 #include "util/macros.h"
