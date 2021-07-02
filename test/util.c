@@ -51,6 +51,12 @@ static void test_util_macros(void)
     EXPECT_EQ(MAX(99, 100), 100);
     EXPECT_EQ(MAX(-10, 10), 10);
 
+    EXPECT_EQ(MAX4(1, 2, 3, 4), 4);
+    EXPECT_EQ(MAX4(4, 3, 2, 1), 4);
+    EXPECT_EQ(MAX4(-10, 10, 0, -20), 10);
+    EXPECT_EQ(MAX4(40, 41, 42, 41), 42);
+    EXPECT_EQ(MAX4(-10, -20, -50, -80), -10);
+
     int n = snprintf(NULL, 0, "%d", INT_MIN);
     EXPECT_TRUE(n >= STRLEN("-2147483647"));
     EXPECT_TRUE(DECIMAL_STR_MAX(int) > n);
