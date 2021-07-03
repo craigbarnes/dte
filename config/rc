@@ -3,7 +3,6 @@ include -b color/default
 include -b compiler/gcc
 include -b compiler/go
 
-alias builtin 'include -b'
 alias help 'run man dterc'
 alias make 'compile gcc make'
 alias man 'run man'
