@@ -8,8 +8,10 @@
 #include "bind.h"
 #include "change.h"
 #include "cmdline.h"
+#include "command/alias.h"
 #include "command/args.h"
 #include "command/macro.h"
+#include "command/run.h"
 #include "command/serialize.h"
 #include "completion.h"
 #include "config.h"
@@ -133,13 +135,11 @@ static void cmd_alias(const CommandArgs *a)
     }
 
     HashMap *aliases = &normal_commands.aliases;
-    char *oldval;
     if (cmd) {
-        oldval = hashmap_insert_or_replace(aliases, xstrdup(name), xstrdup(cmd));
+        add_alias(aliases, name, cmd);
     } else {
-        oldval = hashmap_remove(aliases, name);
+        remove_alias(aliases, name);
     }
-    free(oldval);
 }
 
 static void cmd_bind(const CommandArgs *a)

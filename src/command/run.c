@@ -1,4 +1,5 @@
 #include "run.h"
+#include "alias.h"
 #include "args.h"
 #include "parse.h"
 #include "change.h"
