@@ -1772,13 +1772,12 @@ static void cmd_shift(const CommandArgs *a)
 
 static void cmd_show(const CommandArgs *a)
 {
-    BUG_ON(a->nr_args == 1 && a->args[1]);
-    bool cflag = a->nr_flags != 0;
-    if (cflag && a->nr_args < 2) {
+    bool write_to_cmdline = has_flag(a, 'c');
+    if (write_to_cmdline && a->nr_args < 2) {
         error_msg("\"show -c\" requires 2 arguments");
         return;
     }
-    show(a->args[0], a->args[1], cflag);
+    show(a->args[0], a->args[1], write_to_cmdline);
 }
 
 static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
