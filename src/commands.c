@@ -306,20 +306,11 @@ static void cmd_command(const CommandArgs *a)
 
 static void cmd_compile(const CommandArgs *a)
 {
-    SpawnFlags flags = SPAWN_DEFAULT;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case '1':
-            flags |= SPAWN_READ_STDOUT;
-            break;
-        case 'p':
-            flags |= SPAWN_PROMPT;
-            break;
-        case 's':
-            flags |= SPAWN_QUIET;
-            break;
-        }
-    }
+    static const FlagMapping map[] = {
+        {'1', SPAWN_READ_STDOUT},
+        {'p', SPAWN_PROMPT},
+        {'s', SPAWN_QUIET},
+    };
 
     const char *name = a->args[0];
     Compiler *c = find_compiler(name);
@@ -327,6 +318,8 @@ static void cmd_compile(const CommandArgs *a)
         error_msg("No such error parser %s", name);
         return;
     }
+
+    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
     clear_messages();
     spawn_compiler(a->args + 1, flags, c);
     if (message_count()) {
@@ -1300,23 +1293,14 @@ static void cmd_repeat(const CommandArgs *a)
 
 static void cmd_replace(const CommandArgs *a)
 {
-    unsigned int flags = 0;
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'b':
-            flags |= REPLACE_BASIC;
-            break;
-        case 'c':
-            flags |= REPLACE_CONFIRM;
-            break;
-        case 'g':
-            flags |= REPLACE_GLOBAL;
-            break;
-        case 'i':
-            flags |= REPLACE_IGNORE_CASE;
-            break;
-        }
-    }
+    static const FlagMapping map[] = {
+        {'b', REPLACE_BASIC},
+        {'c', REPLACE_CONFIRM},
+        {'g', REPLACE_GLOBAL},
+        {'i', REPLACE_IGNORE_CASE},
+    };
+
+    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
     reg_replace(a->args[0], a->args[1], flags);
 }
 
@@ -1328,20 +1312,15 @@ static void cmd_right(const CommandArgs *a)
 
 static void cmd_run(const CommandArgs *a)
 {
+    static const FlagMapping map[] = {
+        {'p', SPAWN_PROMPT},
+        {'s', SPAWN_QUIET},
+    };
+
     SpawnContext ctx = {
         .argv = a->args,
-        .flags = SPAWN_DEFAULT
+        .flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0),
     };
-    for (const char *pf = a->flags; *pf; pf++) {
-        switch (*pf) {
-        case 'p':
-            ctx.flags |= SPAWN_PROMPT;
-            break;
-        case 's':
-            ctx.flags |= SPAWN_QUIET;
-            break;
-        }
-    }
     spawn(&ctx);
 }
 

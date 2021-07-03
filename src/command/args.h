@@ -20,6 +20,11 @@ typedef enum {
 // Failure: (ARGERR_* | (flag << 8))
 typedef unsigned int ArgParseError;
 
+typedef struct {
+    char ch;
+    unsigned int val;
+} FlagMapping;
+
 // Map ASCII alphanumeric characters to values between 1 and 62,
 // for use as bitset indices in CommandArgs::flag_set
 static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
@@ -37,6 +42,22 @@ static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
     uint_least64_t bitmask = UINT64_C(1) << cmdargs_flagset_idx(flag);
     static_assert_compatible_types(bitmask, a->flag_set);
     return (a->flag_set & bitmask) != 0;
+}
+
+// Convert CommandArgs::flag_set to bit flags of a different format,
+// by using a set of mappings
+static inline unsigned int cmdargs_convert_flags (
+    const CommandArgs *a,
+    const FlagMapping *map,
+    size_t map_len,
+    unsigned int val
+) {
+    for (size_t i = 0; i < map_len; i++, map++) {
+        if (cmdargs_has_flag(a, map->ch)) {
+            val |= map->val;
+        }
+    }
+    return val;
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a) NONNULL_ARGS;
