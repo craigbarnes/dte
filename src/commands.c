@@ -1987,15 +1987,13 @@ static void cmd_wresize(const CommandArgs *a)
     }
 
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
-    if (a->nr_flags) {
-        switch (a->flags[a->nr_flags - 1]) {
-        case 'h':
-            dir = RESIZE_DIRECTION_HORIZONTAL;
-            break;
-        case 'v':
-            dir = RESIZE_DIRECTION_VERTICAL;
-            break;
-        }
+    switch (last_flag(a)) {
+    case 'h':
+        dir = RESIZE_DIRECTION_HORIZONTAL;
+        break;
+    case 'v':
+        dir = RESIZE_DIRECTION_VERTICAL;
+        break;
     }
 
     const char *arg = a->args[0];
