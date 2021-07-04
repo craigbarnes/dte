@@ -843,7 +843,7 @@ vice versa.
 `-u`
 :   Upper case
 
-### **insert** [**-km**] _text_
+### **insert** [**-k**|**-m**] _text_
 
 Insert _text_ into the buffer.
 
