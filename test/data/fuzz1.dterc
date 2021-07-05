@@ -1,6 +1,6 @@
 run -s mkdir -p build/test/
 cd build/test/
-insert -km "1\n2\n3\n"
+insert -k "1\n2\n3\n"
 bof
 bol
 bolsf

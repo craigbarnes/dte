@@ -19,7 +19,7 @@ static void merge_insert_buffer(void)
     }
     String s = string_new(32 + len);
     StringView ibuf = strview_from_string(&insert_buffer);
-    string_append_literal(&s, "insert -km ");
+    string_append_literal(&s, "insert -k ");
     if (unlikely(strview_has_prefix(&ibuf, "-"))) {
         string_append_literal(&s, "-- ");
     }
