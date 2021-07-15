@@ -285,18 +285,11 @@ static void test_parse_args(void)
     EXPECT_STREQ(array.ptrs[0], "open");
     EXPECT_STREQ(array.ptrs[1], "-\xff");
     EXPECT_NULL(array.ptrs[2]);
-
     cmd = find_normal_command(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
-    EXPECT_STREQ(cmd->name, "open");
-
     a = (CommandArgs){.args = (char**)array.ptrs + 1};
-    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_INVALID_OPTION | 0xFF00);
-    EXPECT_EQ(a.nr_args, 0);
-    EXPECT_EQ(a.nr_flags, 0);
-    EXPECT_EQ(a.nr_flag_args, 0);
-    EXPECT_EQ(a.flags[0], '\0');
-    EXPECT_EQ(a.flag_set, 0);
+    EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_INVALID_OPTION);
+    EXPECT_EQ(a.flags[0], '\xff');
     ptr_array_free(&array);
 
     ASSERT_EQ(parse_commands(nc, &array, "save -e"), CMDERR_NONE);
@@ -304,7 +297,8 @@ static void test_parse_args(void)
     cmd = find_normal_command(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
     a = (CommandArgs){.args = (char**)array.ptrs + 1};
-    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_MISSING | 0x6500);
+    EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_MISSING);
+    EXPECT_EQ(a.flags[0], 'e');
     ptr_array_free(&array);
 
     ASSERT_EQ(parse_commands(nc, &array, "save -eUTF-8"), CMDERR_NONE);
@@ -312,7 +306,8 @@ static void test_parse_args(void)
     cmd = find_normal_command(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
     a = (CommandArgs){.args = (char**)array.ptrs + 1};
-    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | 0x6500);
+    EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_NOT_SEPARATE);
+    EXPECT_EQ(a.flags[0], 'e');
     ptr_array_free(&array);
 }
 

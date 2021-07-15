@@ -49,7 +49,8 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
             unsigned char flag = arg[j];
             const char *flagp = strchr(flag_desc, flag);
             if (unlikely(!flagp || flag == '=')) {
-                return ARGERR_INVALID_OPTION | (flag << 8);
+                a->flags[0] = flag;
+                return ARGERR_INVALID_OPTION;
             }
 
             a->flag_set |= UINT64_C(1) << cmdargs_flagset_idx(flag);
@@ -63,12 +64,14 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
             }
 
             if (unlikely(j > 1 || arg[j + 1])) {
-                return ARGERR_OPTION_ARGUMENT_NOT_SEPARATE | (flag << 8);
+                a->flags[0] = flag;
+                return ARGERR_OPTION_ARGUMENT_NOT_SEPARATE;
             }
 
             char *flag_arg = args[i + 1];
             if (unlikely(!flag_arg)) {
-                return ARGERR_OPTION_ARGUMENT_MISSING | (flag << 8);
+                a->flags[0] = flag;
+                return ARGERR_OPTION_ARGUMENT_MISSING;
             }
 
             // Move flag argument before any other arguments
@@ -107,16 +110,11 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
-    ArgParseError err = do_parse_args(cmd, a);
-    if (likely(err == 0)) {
+    switch (do_parse_args(cmd, a)) {
+    case ARGERR_NONE:
         return true;
-    }
-
-    ArgParseErrorType err_type = err & 0xFF;
-    unsigned char flag = (err >> 8) & 0xFF;
-    switch (err_type) {
     case ARGERR_INVALID_OPTION:
-        error_msg("Invalid option -%c", flag);
+        error_msg("Invalid option -%c", a->flags[0]);
         break;
     case ARGERR_TOO_MANY_OPTIONS:
         error_msg("Too many options given");
@@ -125,11 +123,11 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         error_msg (
             "Flag -%c must be given separately because it"
             " requires an argument",
-            flag
+            a->flags[0]
         );
         break;
     case ARGERR_OPTION_ARGUMENT_MISSING:
-        error_msg("Option -%c requires an argument", flag);
+        error_msg("Option -%c requires an argument", a->flags[0]);
         break;
     case ARGERR_TOO_FEW_ARGUMENTS:
         error_msg (
