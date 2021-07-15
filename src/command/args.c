@@ -110,7 +110,7 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
-    switch (do_parse_args(cmd, a)) {
+    switch (BUILTIN_EXPECT(do_parse_args(cmd, a), ARGERR_NONE)) {
     case ARGERR_NONE:
         return true;
     case ARGERR_INVALID_OPTION:

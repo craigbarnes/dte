@@ -128,9 +128,11 @@
 #if (GNUC_AT_LEAST(3, 0) || HAS_BUILTIN(__builtin_expect)) && defined(__OPTIMIZE__)
     #define likely(x) __builtin_expect(!!(x), 1)
     #define unlikely(x) __builtin_expect(!!(x), 0)
+    #define BUILTIN_EXPECT(x, expected) __builtin_expect(x, expected)
 #else
     #define likely(x) (x)
     #define unlikely(x) (x)
+    #define BUILTIN_EXPECT(x, expected) (x)
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_BUILTIN(__builtin_constant_p) || defined(__TINYC__)
