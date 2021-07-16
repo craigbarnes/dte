@@ -5,26 +5,28 @@
 #include "checked-arith.h"
 
 enum {
+    A = 0xA, B = 0xB, C = 0xC,
+    D = 0xD, E = 0xE, F = 0xF,
     I = HEX_INVALID
 };
 
 const uint8_t hex_table[256] = {
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  I,  I,  I,  I,  I,  I,
-     I, 10, 11, 12, 13, 14, 15,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I, 10, 11, 12, 13, 14, 15,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
-     I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, I, I, I, I, I, I,
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, A, B, C, D, E, F, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
+    I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I
 };
 
 size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp)
