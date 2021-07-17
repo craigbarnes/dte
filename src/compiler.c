@@ -93,6 +93,18 @@ void collect_compilers(const char *prefix)
     collect_hashmap_keys(&compilers, prefix);
 }
 
+void collect_errorfmt_capture_names(const char *prefix)
+{
+    for (size_t i = 0; i < ARRAY_COUNT(capture_names); i++) {
+        if (str_has_prefix(capture_names[i], prefix)) {
+            add_completion(xstrdup(capture_names[i]));
+        }
+    }
+    if (str_has_prefix("_", prefix)) {
+        add_completion(xstrdup("_"));
+    }
+}
+
 static void append_compiler(String *s, const Compiler *c, const char *name)
 {
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {

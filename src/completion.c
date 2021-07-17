@@ -312,13 +312,10 @@ static void collect_completions(char **args, size_t argc)
             collect_compilers(completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "errorfmt")) {
-        static const char *const names[] = {
-            "file", "line", "column", "message", "_"
-        };
         if (a.nr_args == 0) {
             collect_compilers(completion.parsed);
         } else if (a.nr_args >= 2 && !cmdargs_has_flag(&a, 'i')) {
-            collect_str(names, ARRAY_COUNT(names), completion.parsed);
+            collect_errorfmt_capture_names(completion.parsed);
         }
     } else if (strview_equal_cstring(&cmd_name, "repeat")) {
         if (a.nr_args == 1) {
