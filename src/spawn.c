@@ -44,32 +44,32 @@ static void handle_error_msg(const Compiler *c, char *str)
             return;
         }
 
-        int8_t mi = p->msg_idx;
+        int8_t mi = p->capture_index[ERRFMT_MESSAGE];
         if (m[mi].rm_so < 0) {
             mi = 0;
         }
+
         Message *msg = new_message(str + m[mi].rm_so, m[mi].rm_eo - m[mi].rm_so);
         msg->loc = xnew0(FileLocation, 1);
 
-        int8_t fi = p->file_idx;
+        int8_t fi = p->capture_index[ERRFMT_FILE];
         if (fi >= 0 && m[fi].rm_so >= 0) {
             msg->loc->filename = xstrslice(str, m[fi].rm_so, m[fi].rm_eo);
-            int8_t li = p->line_idx;
-            if (li >= 0 && m[li].rm_so >= 0) {
-                size_t len = m[li].rm_eo - m[li].rm_so;
-                unsigned long val;
-                size_t parsed_len = buf_parse_ulong(str + m[li].rm_so, len, &val);
-                if (parsed_len == len) {
-                    msg->loc->line = val;
-                }
-            }
-            int8_t ci = p->column_idx;
-            if (ci >= 0 && m[ci].rm_so >= 0) {
-                size_t len = m[ci].rm_eo - m[ci].rm_so;
-                unsigned long val;
-                size_t parsed_len = buf_parse_ulong(str + m[ci].rm_so, len, &val);
-                if (parsed_len == len) {
-                    msg->loc->column = val;
+
+            unsigned long *const ptrs[] = {
+                [ERRFMT_LINE] = &msg->loc->line,
+                [ERRFMT_COLUMN] = &msg->loc->column,
+            };
+
+            static_assert(ARRAY_COUNT(ptrs) == 3);
+            for (size_t j = ERRFMT_LINE; j < ARRAY_COUNT(ptrs); j++) {
+                int8_t ci = p->capture_index[j];
+                if (ci >= 0 && m[ci].rm_so >= 0) {
+                    size_t len = m[ci].rm_eo - m[ci].rm_so;
+                    unsigned long val;
+                    if (len == buf_parse_ulong(str + m[ci].rm_so, len, &val)) {
+                        *ptrs[j] = val;
+                    }
                 }
             }
         }

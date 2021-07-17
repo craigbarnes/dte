@@ -12,12 +12,16 @@ enum {
     ERRORFMT_CAPTURE_MAX = 16
 };
 
+enum {
+    ERRFMT_FILE,
+    ERRFMT_LINE,
+    ERRFMT_COLUMN,
+    ERRFMT_MESSAGE,
+};
+
 typedef struct {
+    int8_t capture_index[4];
     bool ignore;
-    int8_t msg_idx;
-    int8_t file_idx;
-    int8_t line_idx;
-    int8_t column_idx;
     const char *pattern; // Original pattern string (interned)
     regex_t re; // Compiled pattern
 } ErrorFormat;
