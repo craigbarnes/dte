@@ -36,11 +36,10 @@ static void handle_error_msg(const Compiler *c, char *str)
 
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
-        regmatch_t m[16];
+        regmatch_t m[ERRORFMT_CAPTURE_MAX];
         if (!regexp_exec(&p->re, str, str_len, ARRAY_COUNT(m), m, 0)) {
             continue;
         }
-
         if (p->ignore) {
             return;
         }

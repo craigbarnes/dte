@@ -8,6 +8,10 @@
 #include "util/ptr-array.h"
 #include "util/string.h"
 
+enum {
+    ERRORFMT_CAPTURE_MAX = 16
+};
+
 typedef struct {
     bool ignore;
     int8_t msg_idx;

@@ -100,7 +100,7 @@ static void append_compiler(String *s, const Compiler *c, const char *name)
         string_append_escaped_arg(s, e->pattern, true);
 
         int max_idx = MAX4(e->file_idx, e->line_idx, e->column_idx, e->msg_idx);
-        BUG_ON(max_idx > 16);
+        BUG_ON(max_idx > ERRORFMT_CAPTURE_MAX);
 
         for (int j = 1; j <= max_idx; j++) {
             const char *idx_type = "_";
