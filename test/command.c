@@ -6,6 +6,7 @@
 #include "command/serialize.h"
 #include "commands.h"
 #include "editor.h"
+#include "search.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/path.h"
@@ -420,6 +421,26 @@ static void test_cmdargs_flagset_idx(void)
     }
 }
 
+static void test_cmdargs_convert_flags(void)
+{
+    static const FlagMapping map[] = {
+        {'b', REPLACE_BASIC},
+        {'c', REPLACE_CONFIRM},
+        {'g', REPLACE_GLOBAL},
+        {'i', REPLACE_IGNORE_CASE},
+    };
+
+    const CommandArgs a = {
+        .flag_set = 1ULL << cmdargs_flagset_idx('c') | 1ULL << cmdargs_flagset_idx('g')
+    };
+
+    ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAY_COUNT(map), 0);
+    EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL);
+
+    flags = cmdargs_convert_flags(&a, map, ARRAY_COUNT(map), REPLACE_BASIC);
+    EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL | REPLACE_BASIC);
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
@@ -429,6 +450,7 @@ static const TestEntry tests[] = {
     TEST(test_escape_command_arg),
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
+    TEST(test_cmdargs_convert_flags),
 };
 
 const TestGroup command_tests = TEST_GROUP(tests);
