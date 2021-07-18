@@ -1,5 +1,6 @@
 #include <limits.h>
 #include "test.h"
+#include "command/alias.h"
 #include "command/args.h"
 #include "command/parse.h"
 #include "command/run.h"
@@ -451,6 +452,22 @@ static void test_cmdargs_convert_flags(void)
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL | REPLACE_BASIC);
 }
 
+static void test_add_alias(void)
+{
+    HashMap m = HASHMAP_INIT;
+    const char *name = "insert-foo";
+    const char *cmd = "insert -m foo";
+
+    add_alias(&m, name, cmd);
+    EXPECT_STREQ(find_alias(&m, name), cmd);
+    EXPECT_EQ(m.count, 1);
+
+    remove_alias(&m, "insert-foo");
+    EXPECT_NULL(find_alias(&m, name));
+    EXPECT_EQ(m.count, 0);
+    hashmap_free(&m, free);
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
@@ -461,6 +478,7 @@ static const TestEntry tests[] = {
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
     TEST(test_cmdargs_convert_flags),
+    TEST(test_add_alias),
 };
 
 const TestGroup command_tests = TEST_GROUP(tests);
