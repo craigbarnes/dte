@@ -76,6 +76,11 @@ static void test_parse_command_arg(void)
     EXPECT_STREQ(arg, "\x1B[31m~/\x1B[0m");
     free(arg);
 
+    // Incomplete/invalid hexadecimal escape sequences
+    arg = parse_command_arg(nc, STRN("\"\\x\\x1\\xFG\\xz1\""), false);
+    EXPECT_STREQ(arg, "Gz1");
+    free(arg);
+
     // 4-digit Unicode escape sequence
     arg = parse_command_arg(nc, STRN("\"\\u148A\""), false);
     EXPECT_STREQ(arg, "\xE1\x92\x8A");
@@ -130,6 +135,11 @@ static void test_parse_command_arg(void)
     // Environment var (via getenv(3))
     arg = parse_command_arg(nc, STRN("$DTE_VERSION"), false);
     EXPECT_STREQ(arg, editor.version);
+    free(arg);
+
+    // Tilde expansion
+    arg = parse_command_arg(nc, STRN("~/filename"), true);
+    EXPECT_TRUE(str_has_suffix(arg, "/build/test/HOME/filename"));
     free(arg);
 
     arg = parse_command_arg(nc, STRN("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\t."), false);
