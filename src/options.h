@@ -6,6 +6,12 @@
 #include "util/string.h"
 
 enum {
+    INDENT_WIDTH_MAX = 8,
+    TAB_WIDTH_MAX = 8,
+    TEXT_WIDTH_MAX = 1000,
+};
+
+enum {
     // Spaces in indentation.
     // Does not include less than tab-width spaces at end of indentation.
     WSE_SPACE_INDENT = 1 << 0,

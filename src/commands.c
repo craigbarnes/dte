@@ -1969,10 +1969,10 @@ static void cmd_wprev(const CommandArgs* UNUSED_ARG(a))
 static void cmd_wrap_paragraph(const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    size_t width = (size_t)buffer->options.text_width;
+    unsigned int width = buffer->options.text_width;
     if (arg) {
-        if (!str_to_size(arg, &width) || width == 0 || width > 1000) {
-            error_msg("Invalid paragraph width: %s", arg);
+        if (!str_to_uint(arg, &width) || width < 1 || width > TEXT_WIDTH_MAX) {
+            error_msg("invalid paragraph width: %s", arg);
             return;
         }
     }

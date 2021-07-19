@@ -65,18 +65,18 @@ void set_editorconfig_options(Buffer *b)
     }
 
     const unsigned int indent_size = opts.indent_size;
-    if (indent_size > 0 && indent_size <= 8) {
+    if (indent_size > 0 && indent_size <= INDENT_WIDTH_MAX) {
         b->options.indent_width = indent_size;
         b->options.detect_indent = 0;
     }
 
     const unsigned int tab_width = opts.tab_width;
-    if (tab_width > 0 && tab_width <= 8) {
+    if (tab_width > 0 && tab_width <= TAB_WIDTH_MAX) {
         b->options.tab_width = tab_width;
     }
 
     const unsigned int max_line_length = opts.max_line_length;
-    if (max_line_length > 0 && max_line_length <= 1000) {
+    if (max_line_length > 0 && max_line_length <= TEXT_WIDTH_MAX) {
         b->options.text_width = max_line_length;
     }
 }
