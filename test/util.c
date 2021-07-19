@@ -1669,6 +1669,23 @@ static void test_size_add_overflows(void)
     EXPECT_TRUE(size_add_overflows(SIZE_MAX, SIZE_MAX / 2, &r));
 }
 
+static void test_size_multiply(void)
+{
+    const size_t halfmax = SIZE_MAX / 2;
+    EXPECT_UINT_EQ(size_multiply(2, halfmax), 2 * halfmax);
+    EXPECT_UINT_EQ(size_multiply(8, 8), 64);
+    EXPECT_UINT_EQ(size_multiply(1, SIZE_MAX), SIZE_MAX);
+    EXPECT_UINT_EQ(size_multiply(2000, 1), 2000);
+}
+
+static void test_size_add(void)
+{
+    const size_t nearmax = SIZE_MAX - 1;
+    EXPECT_UINT_EQ(size_add(nearmax, 1), nearmax + 1);
+    EXPECT_UINT_EQ(size_add(8, 8), 16);
+    EXPECT_UINT_EQ(size_add(0, 0), 0);
+}
+
 static void test_mem_intern(void)
 {
     const char *ptrs[256];
@@ -1773,6 +1790,8 @@ static const TestEntry tests[] = {
     TEST(test_path_parent),
     TEST(test_size_multiply_overflows),
     TEST(test_size_add_overflows),
+    TEST(test_size_multiply),
+    TEST(test_size_add),
     TEST(test_mem_intern),
     TEST(test_read_file),
     TEST(test_xfopen),
