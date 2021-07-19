@@ -684,8 +684,11 @@ static void test_u_char_width(void)
 
     // Rendered in caret notation (2 columns)
     EXPECT_EQ(u_char_width('\0'), 2);
+    EXPECT_EQ(u_char_width('\t'), 2);
+    EXPECT_EQ(u_char_width('\n'), 2);
     EXPECT_EQ(u_char_width('\r'), 2);
     EXPECT_EQ(u_char_width(0x1F), 2);
+    EXPECT_EQ(u_char_width(0x7F), 2);
 
     // Unprintable (rendered as <xx> -- 4 columns)
     EXPECT_EQ(u_char_width(0x0080), 4);
