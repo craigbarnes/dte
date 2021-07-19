@@ -54,8 +54,7 @@ typedef struct View {
     // Force centering view to cursor
     bool force_center;
 
-    // These are used to save cursor state when there are multiple views
-    // sharing same buffer.
+    // Used to save cursor state when multiple views share same buffer
     bool restore_cursor;
     size_t saved_cursor_offset;
 } View;

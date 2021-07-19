@@ -1045,6 +1045,17 @@ static void test_u_set_char(void)
     u_set_char(buf, &i, 0x20);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], ' ');
+
+    unsigned char c = 0xA5;
+    i = 0;
+    u_set_char(buf, &i, 0x110000 + c);
+    EXPECT_EQ(i, 4);
+    EXPECT_EQ(buf[0], '<');
+    EXPECT_EQ(buf[1], '5');
+    EXPECT_EQ(buf[2], 'b');
+    EXPECT_EQ(buf[3], '>');
+    c = -c;
+    EXPECT_UINT_EQ(c, 0x5b);
 }
 
 static void test_u_prev_char(void)
