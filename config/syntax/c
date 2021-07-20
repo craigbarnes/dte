@@ -198,6 +198,7 @@ state class-name-label class-name
     noeat -b class-name
 
 state zero numeric
+    char bB bin
     char xX hex
     char 0-7 oct
     char . float
@@ -211,6 +212,10 @@ state dec numeric
     char 0-9 this
     char eE exp
     char . float
+    noeat check-suffix
+
+state bin numeric
+    char 01 this
     noeat check-suffix
 
 state hex numeric
