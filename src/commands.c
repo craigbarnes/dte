@@ -954,7 +954,7 @@ static void cmd_option(const CommandArgs *a)
 {
     BUG_ON(a->nr_args < 3);
     size_t nstrs = a->nr_args - 1;
-    if (unlikely(nstrs % 2 != 0)) {
+    if (unlikely(nstrs & 1)) {
         error_msg("Missing option value");
         return;
     }
@@ -1719,7 +1719,7 @@ static void cmd_set(const CommandArgs *a)
     if (count == 1) {
         set_bool_option(args[0], local, global);
         return;
-    } else if (count % 2 != 0) {
+    } else if (count & 1) {
         error_msg("One or even number of arguments expected.");
         return;
     }

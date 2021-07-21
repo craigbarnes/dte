@@ -37,7 +37,7 @@ static bool has_line_continuation(const char *str, size_t len)
     while (pos >= 0 && str[pos] == '\\') {
         pos--;
     }
-    return (len - 1 - pos) % 2;
+    return (len - 1 - pos) & 1;
 }
 
 void exec_config(const CommandSet *cmds, const char *buf, size_t size)

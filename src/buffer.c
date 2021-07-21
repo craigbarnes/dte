@@ -324,7 +324,7 @@ static int indent_len(const Buffer *b, const char *line, int len, bool *tab_inde
     }
     if (len > spaces && line[spaces] == '*') {
         // '*' after indent, could be long C style comment
-        if (spaces % 2 || allow_odd_indent(b)) {
+        if (spaces & 1 || allow_odd_indent(b)) {
             return spaces - 1;
         }
     }
