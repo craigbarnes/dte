@@ -522,7 +522,7 @@ Move current tab to position _N_ or 1 position left or right.
 
 ## Window Management Commands
 
-### **wsplit** [**-bghnrt**] [_filename_]...
+### **wsplit** [**-bhr**] [**-g**|**-n**|**-t**] [_filename_]...
 
 Split the current window.
 
