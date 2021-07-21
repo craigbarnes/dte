@@ -277,54 +277,53 @@ void buffer_update_syntax(Buffer *b)
     mark_all_lines_changed(b);
 }
 
-static bool allow_odd_indent(const Buffer *b)
+static bool allow_odd_indent(unsigned int indents_bitmask)
 {
-    // 1, 3, 5 and 7 space indent
+    // 1, 3, 5 or 7 space indents
     const unsigned int odd = 1 << 0 | 1 << 2 | 1 << 4 | 1 << 6;
-    return (b->options.detect_indent & odd) ? true : false;
+    return !!(indents_bitmask & odd);
 }
 
-static int indent_len(const Buffer *b, const char *line, int len, bool *tab_indent)
+static int indent_len(StringView line, unsigned int indents_bitmask, bool *tab_indent)
 {
     bool space_before_tab = false;
-    int spaces = 0;
-    int tabs = 0;
-    int pos = 0;
+    size_t spaces = 0;
+    size_t tabs = 0;
+    size_t pos = 0;
 
-    while (pos < len) {
-        if (line[pos] == ' ') {
-            spaces++;
-        } else if (line[pos] == '\t') {
+    for (size_t n = line.length; pos < n; pos++) {
+        switch (line.data[pos]) {
+        case '\t':
             tabs++;
             if (spaces) {
                 space_before_tab = true;
             }
-        } else {
-            break;
+            continue;
+        case ' ':
+            spaces++;
+            continue;
         }
-        pos++;
+        break;
     }
+
     *tab_indent = false;
-    if (pos == len) {
-        // Whitespace only
-        return -1;
+    if (pos == line.length) {
+        return -1; // Whitespace only
     }
     if (pos == 0) {
-        // Not indented
-        return 0;
+        return 0; // Not indented
     }
     if (space_before_tab) {
-        // Mixed indent
-        return -2;
+        return -2; // Mixed indent
     }
     if (tabs) {
         // Tabs and possible spaces after tab for alignment
         *tab_indent = true;
         return tabs * 8;
     }
-    if (len > spaces && line[spaces] == '*') {
+    if (line.length > spaces && line.data[spaces] == '*') {
         // '*' after indent, could be long C style comment
-        if (spaces & 1 || allow_odd_indent(b)) {
+        if (spaces & 1 || allow_odd_indent(indents_bitmask)) {
             return spaces - 1;
         }
     }
@@ -332,41 +331,31 @@ static int indent_len(const Buffer *b, const char *line, int len, bool *tab_inde
 }
 
 UNITTEST {
-    Buffer b = {.options = {.detect_indent = 0}};
     bool tab;
-    StringView line = strview_from_cstring("    4 space indent");
-    int len = indent_len(&b, line.data, line.length, &tab);
+    int len = indent_len(strview_from_cstring("    4 space"), 0, &tab);
     BUG_ON(len != 4);
     BUG_ON(tab);
 
-    line = strview_from_cstring("\t  \t "); // Whitespace only
-    len = indent_len(&b, line.data, line.length, &tab);
-    BUG_ON(len != -1);
-    BUG_ON(tab);
-
-    line = strview_from_cstring("\t\t2 tab indent");
-    len = indent_len(&b, line.data, line.length, &tab);
+    len = indent_len(strview_from_cstring("\t\t2 tab"), 0, &tab);
     BUG_ON(len != 16);
     BUG_ON(!tab);
 
-    line = strview_from_cstring(" \t mixed indent");
-    len = indent_len(&b, line.data, line.length, &tab);
-    BUG_ON(len != -2);
-    BUG_ON(tab);
-
-    line = strview_from_cstring("no indent");
-    len = indent_len(&b, line.data, line.length, &tab);
+    len = indent_len(strview_from_cstring("no indent"), 0, &tab);
     BUG_ON(len != 0);
 
-    line = strview_from_cstring("     * 5 space indent with asterisk");
-    len = indent_len(&b, line.data, line.length, &tab);
+    len = indent_len(strview_from_cstring(" \t mixed indent"), 0, &tab);
+    BUG_ON(len != -2);
+
+    len = indent_len(strview_from_cstring("\t  \t "), 0, &tab);
+    BUG_ON(len != -1); // whitespace only
+
+    len = indent_len(strview_from_cstring("     * 5 space"), 0, &tab);
     BUG_ON(len != 4);
 
-    line = strview_from_cstring("    * 4 space indent with asterisk");
-    len = indent_len(&b, line.data, line.length, &tab);
+    StringView line = strview_from_cstring("    * 4 space");
+    len = indent_len(line, 0, &tab);
     BUG_ON(len != 4);
-    b.options.detect_indent = 1 << 2;
-    len = indent_len(&b, line.data, line.length, &tab);
+    len = indent_len(line, 1 << 2, &tab);
     BUG_ON(len != 3);
 }
 
@@ -382,7 +371,7 @@ static bool detect_indent(Buffer *b)
         StringView line;
         fill_line_ref(&bi, &line);
         bool tab;
-        int indent = indent_len(b, line.data, line.length, &tab);
+        int indent = indent_len(line, buffer->options.detect_indent, &tab);
         if (indent == -2) {
             // Ignore mixed indent because tab width might not be 8
         } else if (indent == -1) {
