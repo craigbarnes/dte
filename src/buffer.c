@@ -331,6 +331,45 @@ static int indent_len(const Buffer *b, const char *line, int len, bool *tab_inde
     return spaces;
 }
 
+UNITTEST {
+    Buffer b = {.options = {.detect_indent = 0}};
+    bool tab;
+    StringView line = strview_from_cstring("    4 space indent");
+    int len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 4);
+    BUG_ON(tab);
+
+    line = strview_from_cstring("\t  \t "); // Whitespace only
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != -1);
+    BUG_ON(tab);
+
+    line = strview_from_cstring("\t\t2 tab indent");
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 16);
+    BUG_ON(!tab);
+
+    line = strview_from_cstring(" \t mixed indent");
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != -2);
+    BUG_ON(tab);
+
+    line = strview_from_cstring("no indent");
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 0);
+
+    line = strview_from_cstring("     * 5 space indent with asterisk");
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 4);
+
+    line = strview_from_cstring("    * 4 space indent with asterisk");
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 4);
+    b.options.detect_indent = 1 << 2;
+    len = indent_len(&b, line.data, line.length, &tab);
+    BUG_ON(len != 3);
+}
+
 static bool detect_indent(Buffer *b)
 {
     BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
