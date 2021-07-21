@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -277,14 +278,13 @@ void buffer_update_syntax(Buffer *b)
     mark_all_lines_changed(b);
 }
 
-static bool allow_odd_indent(unsigned int indents_bitmask)
+static bool allow_odd_indent(uint8_t indents_bitmask)
 {
-    // 1, 3, 5 or 7 space indents
-    const unsigned int odd = 1 << 0 | 1 << 2 | 1 << 4 | 1 << 6;
-    return !!(indents_bitmask & odd);
+    static_assert(INDENT_WIDTH_MAX == 8);
+    return !!(indents_bitmask & 0x55); // 0x55 == 0b01010101
 }
 
-static int indent_len(StringView line, unsigned int indents_bitmask, bool *tab_indent)
+static int indent_len(StringView line, uint8_t indents_bitmask, bool *tab_indent)
 {
     bool space_before_tab = false;
     size_t spaces = 0;
@@ -343,7 +343,7 @@ UNITTEST {
     len = indent_len(strview_from_cstring("no indent"), 0, &tab);
     BUG_ON(len != 0);
 
-    len = indent_len(strview_from_cstring(" \t mixed indent"), 0, &tab);
+    len = indent_len(strview_from_cstring(" \t mixed"), 0, &tab);
     BUG_ON(len != -2);
 
     len = indent_len(strview_from_cstring("\t  \t "), 0, &tab);
@@ -362,48 +362,38 @@ UNITTEST {
 static bool detect_indent(Buffer *b)
 {
     BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
+    unsigned int tab_count = 0;
+    unsigned int space_count = 0;
     int current_indent = 0;
     int counts[9] = {0};
-    int tab_count = 0;
-    int space_count = 0;
 
-    for (unsigned int i = 0; i < 200; i++) {
+    for (size_t i = 0, j = 1; i < 200 && j > 0; i++, j = block_iter_next_line(&bi)) {
         StringView line;
         fill_line_ref(&bi, &line);
+
         bool tab;
         int indent = indent_len(line, buffer->options.detect_indent, &tab);
-        if (indent == -2) {
-            // Ignore mixed indent because tab width might not be 8
-        } else if (indent == -1) {
-            // Empty line, no change in indent
-        } else if (indent == 0) {
+        switch (indent) {
+        case -2: // Ignore mixed indent because tab width might not be 8
+        case -1: // Empty line; no change in indent
+            continue;
+        case 0:
             current_indent = 0;
+            continue;
+        }
+
+        BUG_ON(indent <= 0);
+        int change = indent - current_indent;
+        if (change >= 1 && change <= 8) {
+            counts[change]++;
+        }
+
+        if (tab) {
+            tab_count++;
         } else {
-            // Indented line
-            int change;
-
-            // Count only increase in indentation because indentation
-            // almost always grows one level at time, whereas it can
-            // can decrease multiple levels all at once.
-            if (current_indent == -1) {
-                current_indent = 0;
-            }
-            change = indent - current_indent;
-            if (change > 0 && change <= 8) {
-                counts[change]++;
-            }
-
-            if (tab) {
-                tab_count++;
-            } else {
-                space_count++;
-            }
-            current_indent = indent;
+            space_count++;
         }
-
-        if (!block_iter_next_line(&bi)) {
-            break;
-        }
+        current_indent = indent;
     }
 
     if (tab_count == 0 && space_count == 0) {

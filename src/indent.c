@@ -69,8 +69,7 @@ void get_indent_info(const StringView *line, IndentInfo *info)
     size_t tabs = 0;
     size_t pos = 0;
 
-    MEMZERO(info);
-    info->sane = true;
+    *info = (IndentInfo){.sane = true};
 
     while (pos < len) {
         if (buf[pos] == ' ') {
