@@ -22,7 +22,7 @@ static unsigned int saved_nr_errors; // Used to check if nr_errors changed
 
 static bool no_syntax(void)
 {
-    if (current_syntax) {
+    if (likely(current_syntax)) {
         return false;
     }
     error_msg("No syntax started");
@@ -31,10 +31,10 @@ static bool no_syntax(void)
 
 static bool no_state(void)
 {
-    if (no_syntax()) {
+    if (unlikely(no_syntax())) {
         return true;
     }
-    if (current_state) {
+    if (likely(current_state)) {
         return false;
     }
     error_msg("No state started");
@@ -46,7 +46,7 @@ static void close_state(void)
     if (!current_state) {
         return;
     }
-    if (current_state->type == STATE_INVALID) {
+    if (unlikely(current_state->type == STATE_INVALID)) {
         // Command prefix in error message makes no sense
         const Command *save = current_command;
         current_command = NULL;
@@ -86,7 +86,7 @@ static State *reference_state(const char *name)
 
 static bool not_subsyntax(void)
 {
-    if (is_subsyntax(current_syntax)) {
+    if (likely(is_subsyntax(current_syntax))) {
         return false;
     }
     error_msg("Destination state END allowed only in a subsyntax.");
@@ -101,15 +101,16 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
         .delim = NULL,
         .delim_len = 0,
     };
-    bool ok = true;
 
-    if (!m.subsyn) {
+    bool ok = true;
+    if (unlikely(!m.subsyn)) {
         error_msg("No such syntax %s", name);
         ok = false;
-    } else if (!is_subsyntax(m.subsyn)) {
+    } else if (unlikely(!is_subsyntax(m.subsyn))) {
         error_msg("Syntax %s is not subsyntax", name);
         ok = false;
     }
+
     if (streq(ret, "END")) {
         if (not_subsyntax()) {
             ok = false;
@@ -173,7 +174,7 @@ static void cmd_bufis(const CommandArgs *a)
     const char *str = a->args[0];
     const size_t len = strlen(str);
     Condition *c;
-    if (len > ARRAY_COUNT(c->u.str.buf)) {
+    if (unlikely(len > ARRAY_COUNT(c->u.str.buf))) {
         error_msg (
             "Maximum length of string is %zu bytes",
             ARRAY_COUNT(c->u.str.buf)
@@ -192,7 +193,7 @@ static void cmd_bufis(const CommandArgs *a)
 static void cmd_char(const CommandArgs *a)
 {
     const char *chars = a->args[0];
-    if (chars[0] == '\0') {
+    if (unlikely(chars[0] == '\0')) {
         error_msg("char argument can't be empty");
         return;
     }
@@ -271,11 +272,11 @@ static void cmd_heredocbegin(const CommandArgs *a)
 
     const char *sub = a->args[0];
     Syntax *subsyn = find_any_syntax(sub);
-    if (!subsyn) {
+    if (unlikely(!subsyn)) {
         error_msg("No such syntax %s", sub);
         return;
     }
-    if (!is_subsyntax(subsyn)) {
+    if (unlikely(!is_subsyntax(subsyn))) {
         error_msg("Syntax %s is not subsyntax", sub);
         return;
     }
@@ -315,7 +316,7 @@ static void cmd_list(const CommandArgs *a)
     if (!list) {
         list = xnew0(StringList, 1);
         hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
-    } else if (list->defined) {
+    } else if (unlikely(list->defined)) {
         error_msg("List %s already exists.", name);
         return;
     }
@@ -378,16 +379,12 @@ static void cmd_recolor(const CommandArgs *a)
     const char *len_str = a->args[1];
     if (len_str) {
         type = COND_RECOLOR;
-        if (!str_to_size(len_str, &len)) {
+        if (unlikely(!str_to_size(len_str, &len))) {
             error_msg("invalid number: %s", len_str);
             return;
         }
-        if (len == 0) {
-            error_msg("number of bytes must be larger than 0");
-            return;
-        }
-        if (len > 2500) {
-            error_msg("number of bytes cannot be larger than 2500");
+        if (unlikely(len < 1 || len > 2500)) {
+            error_msg("number of bytes must be between 1-2500 (got %zu)", len);
             return;
         }
     }
@@ -406,13 +403,13 @@ static void cmd_state(const CommandArgs *a)
     }
 
     const char *name = a->args[0];
-    if (streq(name, "END") || streq(name, "this")) {
+    if (unlikely(streq(name, "END") || streq(name, "this"))) {
         error_msg("%s is reserved state name", name);
         return;
     }
 
     State *s = find_or_add_state(name);
-    if (s->defined) {
+    if (unlikely(s->defined)) {
         error_msg("State %s already exists.", name);
         return;
     }
@@ -429,7 +426,7 @@ static void cmd_str(const CommandArgs *a)
     Condition *c;
     size_t len = strlen(str);
 
-    if (len > ARRAY_COUNT(c->u.str.buf)) {
+    if (unlikely(len > ARRAY_COUNT(c->u.str.buf))) {
         error_msg (
             "Maximum length of string is %zu bytes",
             ARRAY_COUNT(c->u.str.buf)

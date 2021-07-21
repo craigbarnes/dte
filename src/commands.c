@@ -135,7 +135,7 @@ static void cmd_alias(const CommandArgs *a)
     }
 
     HashMap *aliases = &normal_commands.aliases;
-    if (cmd) {
+    if (likely(cmd)) {
         add_alias(aliases, name, cmd);
     } else {
         remove_alias(aliases, name);
@@ -153,7 +153,7 @@ static void cmd_bind(const CommandArgs *a)
         [INPUT_SEARCH] = has_flag(a, 's'),
     };
 
-    if (cmd) {
+    if (likely(cmd)) {
         for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
             if (modes[mode]) {
                 add_binding(mode, key, cmd);
@@ -1265,12 +1265,12 @@ static void cmd_repeat(const CommandArgs *a)
         const char *str = a2.args[0];
         size_t str_len = strlen(str);
         size_t bufsize;
-        if (size_multiply_overflows(count, str_len, &bufsize)) {
+        if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
             error_msg("Repeated insert would overflow");
             return;
         }
         char *buf = malloc(bufsize);
-        if (!buf) {
+        if (unlikely(!buf)) {
             perror_msg("malloc");
             return;
         }
@@ -2024,7 +2024,7 @@ static void cmd_wsplit(const CommandArgs *a)
     bool temporary = has_flag(a, 't');
     bool empty = temporary || has_flag(a, 'n');
 
-    if (empty && a->nr_args > 0) {
+    if (unlikely(empty && a->nr_args > 0)) {
         error_msg("flags -n and -t can't be used with filename arguments");
         return;
     }
