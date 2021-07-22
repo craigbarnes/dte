@@ -50,6 +50,11 @@ static inline bool ascii_isdigit(unsigned char c)
     return (unsigned int)c - '0' <= 9;
 }
 
+static inline bool ascii_is_digit_or_dot(unsigned char c)
+{
+    return ascii_isdigit(c) || c == '.';
+}
+
 static inline bool ascii_is_nonspace_cntrl(unsigned char c)
 {
     return ascii_table[c] == ASCII_CNTRL;

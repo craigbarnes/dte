@@ -128,31 +128,37 @@ static StringView get_ext(const StringView filename)
 
 // Parse hashbang and return interpreter name, without version number.
 // For example, if line is "#!/usr/bin/env python2", "python" is returned.
-static StringView get_interpreter(const StringView line)
+static StringView get_interpreter(StringView line)
 {
     StringView sv = STRING_VIEW_INIT;
-    if (line.length < 4 || line.data[0] != '#' || line.data[1] != '!') {
+    if (!strview_has_prefix(&line, "#!")) {
         return sv;
     }
 
-    static const char pat[] = "^#! */.*(/env +|/)([a-zA-Z0-9_-]+)[0-9.]*( |$)";
-    static regex_t re;
-    static bool compiled;
-    if (!compiled) {
-        regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE);
-        BUG_ON(re.re_nsub < 2);
-        compiled = true;
-    }
-
-    regmatch_t m[3];
-    if (!regexp_exec(&re, line.data, line.length, ARRAY_COUNT(m), m, 0)) {
+    strview_remove_prefix(&line, 2);
+    strview_trim_left(&line);
+    if (line.length < 2 || line.data[0] != '/') {
         return sv;
     }
 
-    regoff_t start = m[2].rm_so;
-    regoff_t end = m[2].rm_eo;
-    BUG_ON(start < 0 || end < 0);
-    sv = string_view(line.data + start, end - start);
+    size_t pos = 0;
+    sv = get_delim(line.data, &pos, line.length, ' ');
+    if (pos < line.length && strview_equal_cstring(&sv, "/usr/bin/env")) {
+        while (pos + 1 < line.length && line.data[pos] == ' ') {
+            pos++;
+        }
+        sv = get_delim(line.data, &pos, line.length, ' ');
+    }
+
+    const unsigned char *last_slash = strview_memrchr(&sv, '/');
+    if (last_slash) {
+        strview_remove_prefix(&sv, (last_slash - sv.data) + 1);
+    }
+
+    while (sv.length && ascii_is_digit_or_dot(sv.data[sv.length - 1])) {
+        sv.length--;
+    }
+
     return sv;
 }
 
