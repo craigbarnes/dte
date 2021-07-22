@@ -12,6 +12,8 @@ typedef struct {
     char end[8];
 } RegexpWordBoundaryTokens;
 
+// Platform-specific patterns for matching word boundaries, as detected
+// and initialized by regexp_init_word_boundary_tokens()
 extern RegexpWordBoundaryTokens regexp_word_boundary;
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags) WARN_UNUSED_RESULT;
@@ -41,7 +43,15 @@ static inline bool regexp_is_valid(const char *pattern, int flags)
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
 bool regexp_match_nosub(const char *pattern, const StringView *buf) WARN_UNUSED_RESULT;
-bool regexp_exec(const regex_t *re, const char *buf, size_t size, size_t nr_m, regmatch_t *m, int flags) WARN_UNUSED_RESULT;
 void regexp_init_word_boundary_tokens(void);
+
+bool regexp_exec (
+    const regex_t *re,
+    const char *buf,
+    size_t size,
+    size_t nmatch,
+    regmatch_t *pmatch,
+    int flags
+) WARN_UNUSED_RESULT;
 
 #endif

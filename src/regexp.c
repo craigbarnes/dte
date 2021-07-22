@@ -15,7 +15,7 @@ bool regexp_match_nosub(const char *pattern, const StringView *buf)
     bool compiled = regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB);
     BUG_ON(!compiled);
     regmatch_t m;
-    bool ret = regexp_exec(&re, buf->data, buf->length, 1, &m, 0);
+    bool ret = regexp_exec(&re, buf->data, buf->length, 0, &m, 0);
     regfree(&re);
     return ret;
 }
@@ -46,20 +46,25 @@ bool regexp_exec (
     const regex_t *re,
     const char *buf,
     size_t size,
-    size_t nr_m,
-    regmatch_t *m,
+    size_t nmatch,
+    regmatch_t *pmatch,
     int flags
 ) {
-    BUG_ON(!nr_m);
-// ASan/MSan don't seem to take REG_STARTEND into account
+    // "If REG_STARTEND is specified, pmatch must point to at least one
+    // regmatch_t (even if nmatch is 0 or REG_NOSUB was specified), to
+    // hold the input offsets for REG_STARTEND."
+    // -- https://man.openbsd.org/regex.3
+    BUG_ON(!pmatch);
+
+// ASan's __interceptor_regexec() doesn't support REG_STARTEND
 #if defined(REG_STARTEND) && !defined(ASAN_ENABLED) && !defined(MSAN_ENABLED)
-    m[0].rm_so = 0;
-    m[0].rm_eo = size;
-    return !regexec(re, buf, nr_m, m, flags | REG_STARTEND);
+    pmatch[0].rm_so = 0;
+    pmatch[0].rm_eo = size;
+    return !regexec(re, buf, nmatch, pmatch, flags | REG_STARTEND);
 #else
     // Buffer must be null-terminated if REG_STARTEND isn't supported
     char *tmp = xstrcut(buf, size);
-    int ret = !regexec(re, tmp, nr_m, m, flags);
+    int ret = !regexec(re, tmp, nmatch, pmatch, flags);
     free(tmp);
     return ret;
 #endif
