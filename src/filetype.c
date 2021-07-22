@@ -139,9 +139,9 @@ static StringView get_interpreter(const StringView line)
     static regex_t re;
     static bool compiled;
     if (!compiled) {
-        compiled = regexp_compile(&re, pat, REG_NEWLINE);
-        BUG_ON(!compiled);
+        regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE);
         BUG_ON(re.re_nsub < 2);
+        compiled = true;
     }
 
     regmatch_t m[3];

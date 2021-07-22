@@ -1,8 +1,8 @@
+#include <errno.h>
 #include <stdlib.h>
 #include "regexp.h"
 #include "error.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -30,6 +30,16 @@ bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
         return false;
     }
     return true;
+}
+
+void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)
+{
+    int err = regcomp(re, pattern, flags | REG_EXTENDED);
+    if (unlikely(err)) {
+        char msg[1024];
+        regerror(err, re, msg, sizeof(msg));
+        fatal_error(msg, EINVAL);
+    }
 }
 
 bool regexp_exec (
