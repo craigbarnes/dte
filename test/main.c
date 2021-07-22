@@ -9,6 +9,7 @@
 
 void init_headless_mode(void);
 extern const TestGroup bind_tests;
+extern const TestGroup buffer_tests;
 extern const TestGroup cmdline_tests;
 extern const TestGroup command_tests;
 extern const TestGroup config_tests;
@@ -117,6 +118,7 @@ int main(void)
     init_headless_mode();
     run_tests(&config_tests);
     run_tests(&bind_tests);
+    run_tests(&buffer_tests);
     run_tests(&syntax_tests);
     run_tests(&dump_tests);
     free_syntaxes();
