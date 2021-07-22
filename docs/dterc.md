@@ -934,7 +934,7 @@ for terminals with limited key binding support.
 
 ### **unselect**
 
-Unselect.
+Cancel selection.
 
 ## External Commands
 
