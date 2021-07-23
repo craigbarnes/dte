@@ -31,20 +31,29 @@ char *make_indent(size_t width)
 
 static bool indent_inc(const StringView *line)
 {
-    const char *re1 = "\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
-    const char *re2 = "\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
+    static regex_t re1, re2;
+    static bool compiled;
+    if (!compiled) {
+        // TODO: Make these patterns configurable via a local option
+        static const char pat1[] = "\\{[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
+        static const char pat2[] = "\\}[\t ]*(//.*|/\\*.*\\*/[\t ]*)?$";
+        regexp_compile_or_fatal_error(&re1, pat1, REG_NEWLINE | REG_NOSUB);
+        regexp_compile_or_fatal_error(&re2, pat2, REG_NEWLINE | REG_NOSUB);
+        compiled = true;
+    }
 
     if (buffer->options.brace_indent) {
-        if (regexp_match_nosub(re1, line)) {
+        regmatch_t m;
+        if (regexp_exec(&re1, line->data, line->length, 0, &m, 0)) {
             return true;
         }
-        if (regexp_match_nosub(re2, line)) {
+        if (regexp_exec(&re2, line->data, line->length, 0, &m, 0)) {
             return false;
         }
     }
 
-    re1 = buffer->options.indent_regex;
-    return re1 && *re1 && regexp_match_nosub(re1, line);
+    const char *pat = buffer->options.indent_regex;
+    return pat && pat[0] && regexp_match_nosub(pat, line);
 }
 
 char *get_indent_for_next_line(const StringView *line)

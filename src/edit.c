@@ -31,7 +31,7 @@ static bool line_has_opening_brace(StringView line)
     static bool compiled;
     if (!compiled) {
         // TODO: Reimplement without using regex
-        static char pat[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
+        static const char pat[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
         regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE | REG_NOSUB);
         compiled = true;
     }
