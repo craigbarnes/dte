@@ -54,7 +54,7 @@ typedef struct {
 #define ASSERT_TRUE(x) ASSERT(true, x)
 #define ASSERT_NONNULL(ptr) ASSERT(nonnull, ptr)
 
-void test_fail(const char *file, int line, const char *format, ...) PRINTF(3);
+void test_fail(const char *file, int line, const char *format, ...) COLD PRINTF(3);
 void expect_streq(const char *file, int line, const char *s1, const char *s2);
 void expect_ptreq(const char *file, int line, const void *p1, const void *p2);
 void expect_memeq(const char *file, int line, const void *m1, const void *m2, size_t len);
