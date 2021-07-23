@@ -732,7 +732,15 @@ static void add_word(ParagraphFormatter *pf, const char *word, size_t len)
 
 static bool is_paragraph_separator(const StringView *line)
 {
-    return regexp_match_nosub("^[ \t]*(/\\*|\\*/)?[ \t]*$", line);
+    StringView trimmed = *line;
+    strview_trim(&trimmed);
+
+    return
+        trimmed.length == 0
+        // TODO: make this configurable
+        || strview_equal_cstring(&trimmed, "/*")
+        || strview_equal_cstring(&trimmed, "*/")
+    ;
 }
 
 static size_t get_indent_width(const StringView *line)

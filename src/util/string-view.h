@@ -164,4 +164,11 @@ static inline void strview_trim_right(StringView *sv)
     sv->length = n;
 }
 
+NONNULL_ARGS
+static inline void strview_trim(StringView *sv)
+{
+    strview_trim_left(sv);
+    strview_trim_right(sv);
+}
+
 #endif
