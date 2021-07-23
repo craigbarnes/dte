@@ -44,7 +44,7 @@ View *window_open_buffer (
     bool must_exist,
     const Encoding *encoding
 ) {
-    if (filename[0] == '\0') {
+    if (unlikely(filename[0] == '\0')) {
         error_msg("Empty filename not allowed");
         return NULL;
     }
@@ -95,7 +95,7 @@ View *window_open_buffer (
         free(absolute);
         return NULL;
     }
-    if (b->file.mode == 0 && dir_missing) {
+    if (unlikely(b->file.mode == 0 && dir_missing)) {
         // New file in non-existing directory. This is usually a mistake.
         error_msg("Error opening %s: Directory does not exist", filename);
         free_buffer(b);

@@ -314,7 +314,7 @@ static void cmd_compile(const CommandArgs *a)
 
     const char *name = a->args[0];
     Compiler *c = find_compiler(name);
-    if (!c) {
+    if (unlikely(!c)) {
         error_msg("No such error parser %s", name);
         return;
     }
@@ -684,7 +684,7 @@ static void cmd_line(const CommandArgs *a)
     const char *arg = a->args[0];
     const long x = view_get_preferred_x(view);
     size_t line;
-    if (!str_to_size(arg, &line) || line == 0) {
+    if (unlikely(!str_to_size(arg, &line) || line == 0)) {
         error_msg("Invalid line number: %s", arg);
         return;
     }
@@ -886,7 +886,7 @@ static void cmd_open(const CommandArgs *a)
 
     const char *requested_encoding = NULL;
     char **args = a->args;
-    if (a->nr_flag_args > 0) {
+    if (unlikely(a->nr_flag_args > 0)) {
         // The "-e" flag is the only one that takes an argument, so the
         // above condition implies it was used
         BUG_ON(!has_flag(a, 'e'));
@@ -894,7 +894,7 @@ static void cmd_open(const CommandArgs *a)
         args += a->nr_flag_args;
     }
 
-    Encoding encoding;
+    Encoding encoding = {.type = ENCODING_AUTODETECT};
     if (requested_encoding) {
         EncodingType e = lookup_encoding(requested_encoding);
         if (e == UTF8) {
@@ -913,8 +913,6 @@ static void cmd_open(const CommandArgs *a)
             }
             return;
         }
-    } else {
-        encoding = (Encoding){.type = ENCODING_AUTODETECT};
     }
 
     if (a->nr_args == 0) {
@@ -1354,7 +1352,7 @@ static void cmd_save(const CommandArgs *a)
 
     const char *requested_encoding = NULL;
     char **args = a->args;
-    if (a->nr_flag_args > 0) {
+    if (unlikely(a->nr_flag_args > 0)) {
         BUG_ON(!has_flag(a, 'e'));
         requested_encoding = args[a->nr_flag_args - 1];
         args += a->nr_flag_args;
@@ -1707,7 +1705,7 @@ static void cmd_set(const CommandArgs *a)
     bool global = has_flag(a, 'g');
     bool local = has_flag(a, 'l');
     if (!buffer) {
-        if (local) {
+        if (unlikely(local)) {
             error_msg("Flag -l makes no sense in config file.");
             return;
         }

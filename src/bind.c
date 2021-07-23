@@ -165,7 +165,7 @@ static void key_binding_free(KeyBinding *binding)
 void add_binding(InputMode mode, const char *keystr, const char *command)
 {
     KeyCode key;
-    if (!parse_key_string(&key, keystr)) {
+    if (unlikely(!parse_key_string(&key, keystr))) {
         error_msg("invalid key string: %s", keystr);
         return;
     }
