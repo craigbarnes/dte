@@ -25,8 +25,26 @@ static char *copy_buf;
 static size_t copy_len;
 static bool copy_is_lines;
 
-static const char spattern[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
-static const char epattern[] = "^[ \t]*\\}";
+static bool line_has_opening_brace(StringView line)
+{
+    static regex_t re;
+    static bool compiled;
+    if (!compiled) {
+        // TODO: Reimplement without using regex
+        static char pat[] = "\\{[ \t]*(//.*|/\\*.*\\*/[ \t]*)?$";
+        regexp_compile_or_fatal_error(&re, pat, REG_NEWLINE | REG_NOSUB);
+        compiled = true;
+    }
+
+    regmatch_t m;
+    return regexp_exec(&re, line.data, line.length, 0, &m, 0);
+}
+
+static bool line_has_closing_brace(StringView line)
+{
+    strview_trim_left(&line);
+    return line.length > 0 && line.data[0] == '}';
+}
 
 /*
  * Stupid { ... } block selector.
@@ -45,23 +63,20 @@ void select_block(void)
     // If current line does not match \{\s*$ but matches ^\s*\} then
     // cursor is likely at end of the block you want to select.
     fetch_this_line(&bi, &line);
-    if (
-        !regexp_match_nosub(spattern, &line)
-        && regexp_match_nosub(epattern, &line)
-    ) {
+    if (!line_has_opening_brace(line) && line_has_closing_brace(line)) {
         block_iter_prev_line(&bi);
     }
 
     while (1) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(spattern, &line)) {
+        if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 sbi = bi;
                 block_iter_next_line(&bi);
                 break;
             }
         }
-        if (regexp_match_nosub(epattern, &line)) {
+        if (line_has_closing_brace(line)) {
             level--;
         }
 
@@ -72,13 +87,13 @@ void select_block(void)
 
     while (1) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(epattern, &line)) {
+        if (line_has_closing_brace(line)) {
             if (--level == 0) {
                 ebi = bi;
                 break;
             }
         }
-        if (regexp_match_nosub(spattern, &line)) {
+        if (line_has_opening_brace(line)) {
             level++;
         }
 
@@ -103,14 +118,14 @@ static int get_indent_of_matching_brace(void)
 
     while (block_iter_prev_line(&bi)) {
         fetch_this_line(&bi, &line);
-        if (regexp_match_nosub(spattern, &line)) {
+        if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 IndentInfo info;
                 get_indent_info(&line, &info);
                 return info.width;
             }
         }
-        if (regexp_match_nosub(epattern, &line)) {
+        if (line_has_closing_brace(line)) {
             level--;
         }
     }
