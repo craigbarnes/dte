@@ -12,8 +12,7 @@ RegexpWordBoundaryTokens regexp_word_boundary;
 bool regexp_match_nosub(const char *pattern, const StringView *buf)
 {
     regex_t re;
-    bool compiled = regexp_compile(&re, pattern, REG_NEWLINE | REG_NOSUB);
-    BUG_ON(!compiled);
+    regexp_compile_or_fatal_error(&re, pattern, REG_NEWLINE | REG_NOSUB);
     regmatch_t m;
     bool ret = regexp_exec(&re, buf->data, buf->length, 0, &m, 0);
     regfree(&re);
