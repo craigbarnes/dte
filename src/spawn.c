@@ -138,7 +138,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
             }
             if (!rc) {
                 if (wlen < ctx->input.length) {
-                    error_msg("Command did not read all data.");
+                    error_msg("Command did not read all data");
                 }
                 break;
             }

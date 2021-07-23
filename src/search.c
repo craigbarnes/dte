@@ -129,7 +129,7 @@ bool search_tag(const char *pattern, bool *err)
     } else {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
-        error_msg("Tag not found.");
+        error_msg("Tag not found");
         *err = true;
     }
 
@@ -218,7 +218,7 @@ static void do_search_next(bool skip)
     BlockIter bi = view->cursor;
 
     if (!current_search.pattern) {
-        error_msg("No previous search pattern.");
+        error_msg("No previous search pattern");
         return;
     }
     if (!update_regex()) {
@@ -231,9 +231,9 @@ static void do_search_next(bool skip)
 
         block_iter_bof(&bi);
         if (do_search_fwd(&current_search.regex, &bi, false)) {
-            info_msg("Continuing at top.");
+            info_msg("Continuing at top");
         } else {
-            error_msg("Pattern '%s' not found.", current_search.pattern);
+            error_msg("Pattern '%s' not found", current_search.pattern);
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
@@ -243,9 +243,9 @@ static void do_search_next(bool skip)
 
         block_iter_eof(&bi);
         if (do_search_bwd(&current_search.regex, &bi, -1, false)) {
-            info_msg("Continuing at bottom.");
+            info_msg("Continuing at bottom");
         } else {
-            error_msg("Pattern '%s' not found.", current_search.pattern);
+            error_msg("Pattern '%s' not found", current_search.pattern);
         }
     }
 }
@@ -492,7 +492,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
             (nr_lines > 1) ? "s" : ""
         );
     } else if (!(flags & REPLACE_CANCEL)) {
-        error_msg("Pattern '%s' not found.", pattern);
+        error_msg("Pattern '%s' not found", pattern);
     }
 
     if (view->selection) {

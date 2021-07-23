@@ -219,7 +219,7 @@ bool undo(void)
             count++;
         }
         if (count > 1) {
-            info_msg("Undid %lu changes.", count);
+            info_msg("Undid %lu changes", count);
         }
     } else {
         reverse_change(change);
@@ -236,7 +236,7 @@ bool redo(unsigned long change_id)
     if (!change->prev) {
         // Don't complain if change_id is 0
         if (change_id) {
-            error_msg("Nothing to redo.");
+            error_msg("Nothing to redo");
         }
         return false;
     }
@@ -248,11 +248,11 @@ bool redo(unsigned long change_id)
         change_id = nr_prev - 1;
         if (nr_prev > 1) {
             unsigned long i = change_id + 1;
-            info_msg("Redoing newest (%lu) of %lu possible changes.", i, nr_prev);
+            info_msg("Redoing newest (%lu) of %lu possible changes", i, nr_prev);
         }
     } else {
         if (--change_id >= nr_prev) {
-            error_msg("There are only %lu possible changes to redo.", nr_prev);
+            error_msg("There are only %lu possible changes to redo", nr_prev);
             return false;
         }
     }
@@ -269,7 +269,7 @@ bool redo(unsigned long change_id)
             count++;
         }
         if (count > 1) {
-            info_msg("Redid %lu changes.", count);
+            info_msg("Redid %lu changes", count);
         }
     } else {
         reverse_change(change);

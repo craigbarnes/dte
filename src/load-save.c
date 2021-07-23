@@ -269,7 +269,7 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
             return false;
         }
         if (must_exist) {
-            error_msg("File %s does not exist.", filename);
+            error_msg("File %s does not exist", filename);
             return false;
         }
         fixup_blocks(b);

@@ -1428,12 +1428,12 @@ static void cmd_save(const CommandArgs *a)
                 // that's all it's used for currently.
                 goto error;
             } else {
-                error_msg("No filename.");
+                error_msg("No filename");
                 goto error;
             }
         }
         if (buffer->readonly && !force) {
-            error_msg("Use -f to force saving read-only file.");
+            error_msg("Use -f to force saving read-only file");
             goto error;
         }
     }
@@ -1508,7 +1508,7 @@ static void cmd_save(const CommandArgs *a)
             }
         }
         if (absolute != buffer->abs_filename && !force) {
-            error_msg("Use -f to overwrite %s.", absolute);
+            error_msg("Use -f to overwrite %s", absolute);
             goto error;
         }
 
@@ -1618,7 +1618,7 @@ static void cmd_search(const CommandArgs *a)
     SearchDirection dir = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
 
     if (unlikely(w && pattern)) {
-        error_msg("flag -w can't be used with search pattern.");
+        error_msg("flag -w can't be used with search pattern");
         return;
     }
     if (unlikely(next && prev)) {
@@ -1706,7 +1706,7 @@ static void cmd_set(const CommandArgs *a)
     bool local = has_flag(a, 'l');
     if (!buffer) {
         if (unlikely(local)) {
-            error_msg("Flag -l makes no sense in config file.");
+            error_msg("Flag -l makes no sense in config file");
             return;
         }
         global = true;
@@ -1718,7 +1718,7 @@ static void cmd_set(const CommandArgs *a)
         set_bool_option(args[0], local, global);
         return;
     } else if (count & 1) {
-        error_msg("One or even number of arguments expected.");
+        error_msg("One or even number of arguments expected");
         return;
     }
 
@@ -1762,7 +1762,7 @@ static void cmd_shift(const CommandArgs *a)
         return;
     }
     if (count == 0) {
-        error_msg("Count must be non-zero.");
+        error_msg("Count must be non-zero");
         return;
     }
     shift_lines(count);
@@ -1793,7 +1793,7 @@ static void cmd_tag(const CommandArgs *a)
     clear_messages();
     TagFile *tf = load_tag_file();
     if (!tf) {
-        error_msg("No tag file.");
+        error_msg("No tags file");
         return;
     }
 

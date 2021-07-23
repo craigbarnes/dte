@@ -122,7 +122,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
                 );
                 return false;
             }
-            error_msg("Stale lock file %s removed.", file_locks_lock);
+            error_msg("Stale lock file %s removed", file_locks_lock);
         } else {
             const struct timespec req = {
                 .tv_sec = 0,

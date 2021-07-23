@@ -89,7 +89,7 @@ static bool not_subsyntax(void)
     if (likely(is_subsyntax(current_syntax))) {
         return false;
     }
-    error_msg("Destination state END allowed only in a subsyntax.");
+    error_msg("Destination state END allowed only in a subsyntax");
     return true;
 }
 
@@ -317,7 +317,7 @@ static void cmd_list(const CommandArgs *a)
         list = xnew0(StringList, 1);
         hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
-        error_msg("List %s already exists.", name);
+        error_msg("List %s already exists", name);
         return;
     }
     list->defined = true;
@@ -410,7 +410,7 @@ static void cmd_state(const CommandArgs *a)
 
     State *s = find_or_add_state(name);
     if (unlikely(s->defined)) {
-        error_msg("State %s already exists.", name);
+        error_msg("State %s already exists", name);
         return;
     }
     s->defined = true;

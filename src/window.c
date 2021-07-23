@@ -120,7 +120,7 @@ View *window_open_buffer (
     }
 
     if (b->file.mode != 0 && !b->readonly && access(filename, W_OK)) {
-        error_msg("No write permission to %s, marking read-only.", filename);
+        error_msg("No write permission to %s, marking read-only", filename);
         b->readonly = true;
     }
 
