@@ -169,7 +169,7 @@ static void show_include(const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(sv.data, sv.length);
     } else {
-        open_temporary_buffer(sv.data, sv.length, "builtin", name, false);
+        open_temporary_buffer(sv.data, sv.length, "builtin", name, true);
     }
 }
 
