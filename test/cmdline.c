@@ -191,9 +191,27 @@ static void test_complete_command(void)
     reset_completion();
 }
 
+// This should be run after init_headless_mode() because it
+// depends on the default key bindings being initialized
+static void test_complete_show_bind(void)
+{
+    cmdline_set_text(&editor.cmdline, "show bi");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind C-?");
+    complete_command_prev();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind up");
+}
+
 static const TestEntry tests[] = {
     TEST(test_command_mode),
     TEST(test_complete_command),
 };
 
+static const TestEntry tests_late[] = {
+    TEST(test_complete_show_bind),
+};
+
 const TestGroup cmdline_tests = TEST_GROUP(tests);
+const TestGroup cmdline_tests_late = TEST_GROUP(tests_late);
