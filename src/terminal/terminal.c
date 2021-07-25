@@ -15,62 +15,69 @@
 #include "util/macros.h"
 #include "util/str-util.h"
 
-typedef enum {
+enum FeatureFlags {
     BCE = 0x01, // Can erase with specific background color (back color erase)
     REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
     TITLE = 0x04, // Supports xterm control codes for setting window title
-} TermFlags;
+};
+
+// See terminfo(5) for the meaning of "ncv"
+enum NcvFlags {
+    UL = ATTR_UNDERLINE, // 0x02
+    REV = ATTR_REVERSE, // 0x04
+    DIM = ATTR_DIM, // 0x10
+};
 
 typedef struct {
     const char name[12];
     uint8_t name_len;
-    uint8_t color_type;
-    uint8_t ncv_attributes;
-    uint8_t flags;
+    uint8_t color_type; // TermColorCapabilityType
+    uint8_t ncv_attributes; // NcvFlags
+    uint8_t flags; // FeatureFlags
 } TermEntry;
 
 static const TermEntry terms[] = {
     {"Eterm", 5, TERM_8_COLOR, 0, BCE},
     {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP},
-    {"ansi", 4, TERM_8_COLOR, 3, 0},
+    {"ansi", 4, TERM_8_COLOR, UL, 0},
     {"ansiterm", 8, TERM_0_COLOR, 0, 0},
     {"aterm", 5, TERM_8_COLOR, 0, BCE},
     {"cx", 2, TERM_8_COLOR, 0, 0},
     {"cx100", 5, TERM_8_COLOR, 0, 0},
     {"cygwin", 6, TERM_8_COLOR, 0, 0},
-    {"cygwinB19", 9, TERM_8_COLOR, 3, 0},
-    {"cygwinDBG", 9, TERM_8_COLOR, 3, 0},
+    {"cygwinB19", 9, TERM_8_COLOR, UL, 0},
+    {"cygwinDBG", 9, TERM_8_COLOR, UL, 0},
     {"decansi", 7, TERM_8_COLOR, 0, 0},
     {"domterm", 7, TERM_8_COLOR, 0, BCE},
     {"dtterm", 6, TERM_8_COLOR, 0, 0},
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
-    {"fbterm", 6, TERM_256_COLOR, 18, BCE},
+    {"fbterm", 6, TERM_256_COLOR, DIM | UL, BCE},
     {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
-    {"hurd", 4, TERM_8_COLOR, 18, BCE},
+    {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
     {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
     {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE},
-    {"jfbterm", 7, TERM_8_COLOR, 18, BCE},
+    {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
     {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE},
-    {"kon", 3, TERM_8_COLOR, 18, BCE},
-    {"kon2", 4, TERM_8_COLOR, 18, BCE},
+    {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
+    {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
     {"kterm", 5, TERM_8_COLOR, 0, 0},
-    {"linux", 5, TERM_8_COLOR, 18, BCE},
+    {"linux", 5, TERM_8_COLOR, DIM | UL, BCE},
     {"mgt", 3, TERM_8_COLOR, 0, BCE},
     {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE},
     {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
     {"mlterm2", 7, TERM_8_COLOR, 0, TITLE},
     {"mlterm3", 7, TERM_8_COLOR, 0, TITLE},
     {"mrxvt", 5, TERM_8_COLOR, 0, BCE | TITLE},
-    {"pcansi", 6, TERM_8_COLOR, 3, 0},
-    {"putty", 5, TERM_8_COLOR, 22, BCE},
+    {"pcansi", 6, TERM_8_COLOR, UL, 0},
+    {"putty", 5, TERM_8_COLOR, DIM | REV | UL, BCE},
     {"rxvt", 4, TERM_8_COLOR, 0, BCE | TITLE},
     {"screen", 6, TERM_8_COLOR, 0, TITLE},
     {"st", 2, TERM_8_COLOR, 0, BCE},
     {"stterm", 6, TERM_8_COLOR, 0, BCE},
-    {"teken", 5, TERM_8_COLOR, 21, BCE},
+    {"teken", 5, TERM_8_COLOR, DIM | REV, BCE},
     {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"termite", 7, TERM_8_COLOR, 0, TITLE},
     {"tmux", 4, TERM_8_COLOR, 0, TITLE},
