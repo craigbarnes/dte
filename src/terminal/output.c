@@ -218,14 +218,14 @@ static void print_tab(size_t width)
 
 bool term_put_char(CodePoint u)
 {
-    if (obuf.x < obuf.scroll_x) {
+    if (unlikely(obuf.x < obuf.scroll_x)) {
         // Scrolled, char (at least partially) invisible
         buf_skip(u);
         return true;
     }
 
     const size_t space = obuf.scroll_x + obuf.width - obuf.x;
-    if (!space) {
+    if (unlikely(!space)) {
         return false;
     }
 
@@ -238,7 +238,7 @@ bool term_put_char(CodePoint u)
             const size_t tw = obuf.tab_width;
             const size_t x = obuf.x;
             size_t width = (x + tw) / tw * tw - x;
-            if (width > space) {
+            if (unlikely(width > space)) {
                 width = space;
             }
             print_tab(width);
@@ -246,14 +246,14 @@ bool term_put_char(CodePoint u)
             // Use caret notation for control chars:
             obuf.buf[obuf.count++] = '^';
             obuf.x++;
-            if (space > 1) {
+            if (likely(space > 1)) {
                 obuf.buf[obuf.count++] = (u + 64) & 0x7F;
                 obuf.x++;
             }
         }
     } else {
         const size_t width = u_char_width(u);
-        if (width <= space) {
+        if (likely(width <= space)) {
             obuf.x += width;
             u_set_char(obuf.buf, &obuf.count, u);
         } else if (u_is_unprintable(u)) {
