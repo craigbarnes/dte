@@ -2172,7 +2172,7 @@ static const Command cmds[] = {
     {"suspend", "", false, 0, 0, cmd_suspend},
     {"tag", "r", false, 0, 1, cmd_tag},
     {"title", "", false, 1, 1, cmd_title},
-    {"toggle", "glv", false, 1, -1, cmd_toggle},
+    {"toggle", "gv", false, 1, -1, cmd_toggle},
     {"undo", "", false, 0, 0, cmd_undo},
     {"unselect", "", false, 0, 0, cmd_unselect},
     {"up", "cl", false, 0, 0, cmd_up},
