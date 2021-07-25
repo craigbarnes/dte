@@ -158,3 +158,7 @@ bind -cs ^[ cancel
 bind -cs M-b word-bwd
 bind -cs M-d delete-word
 bind -cs M-f word-fwd
+bind -c tab complete-next
+bind -c S-tab complete-prev
+bind -s M-c case
+bind -s M-r direction

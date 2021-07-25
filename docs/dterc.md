@@ -176,11 +176,18 @@ The commands avilable in [`command`]/[`search`] modes are as follows:
 * `cancel`
 * `history-next`
 * `history-prev`
+* `complete-next` (command mode)
+* `complete-prev` (command mode)
+* `case` (search mode)
+* `direction` (search mode)
 
 Most of these commands behave in a similar fashion to the normal mode
-commands of the same name. The exceptions are `cancel`, which returns
-back to normal mode and `history-next`/`history-prev` which can be used
-to navigate command/search history.
+commands of the same name. The exceptions should be self-explanatory.
+
+See also:
+
+* The ["key bindings"] section in the [`dte`] man page
+* The [`show bind`] command (below)
 
 ### **set** [**-gl**] _option_ [_value_] ...
 
@@ -1413,6 +1420,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`dte`]: dte.html
 [`dte-syntax`]: dte-syntax.html
+["key bindings"]: dte.html#key-bindings
 [`$DTE_HOME`]: dte.html#environment
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
@@ -1449,6 +1457,7 @@ errors should be highlighted. Set to `""` to disable.
 [`scroll-pgup`]: #scroll-pgup
 [`search`]: #search
 [`set`]: #set
+[`show bind`]: #show
 [`show macro`]: #show
 [`tag`]: #tag
 [`toggle`]: #toggle

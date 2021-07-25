@@ -49,7 +49,7 @@ void bindings_init(void)
     // .data section
     bindings[INPUT_NORMAL].cmds = &normal_commands;
     bindings[INPUT_COMMAND].cmds = &cmd_mode_commands;
-    bindings[INPUT_SEARCH].cmds = &cmd_mode_commands;
+    bindings[INPUT_SEARCH].cmds = &search_mode_commands;
 }
 
 static ssize_t get_lookup_table_index(KeyCode k)

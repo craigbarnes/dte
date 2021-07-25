@@ -80,12 +80,6 @@ static void command_mode_keypress(KeyCode key)
         }
         handle_command(&normal_commands, str, true);
         return;
-    case KEY_TAB:
-        complete_command_next();
-        return;
-    case MOD_SHIFT | KEY_TAB:
-        complete_command_prev();
-        return;
     case KEY_PASTE:
         cmdline_insert_paste(c);
         c->search_pos = NULL;
@@ -93,7 +87,7 @@ static void command_mode_keypress(KeyCode key)
         return;
     }
 
-    if (u_is_unicode(key)) {
+    if (u_is_unicode(key) && key != KEY_TAB) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
         reset_completion();
     } else {
@@ -144,21 +138,13 @@ static void search_mode_keypress(KeyCode key)
         set_input_mode(INPUT_NORMAL);
         return;
     }
-    case MOD_META | 'c':
-        editor.options.case_sensitive_search = (editor.options.case_sensitive_search + 1) % 3;
-        return;
-    case MOD_META | 'r':
-        toggle_search_direction();
-        return;
-    case KEY_TAB:
-        return;
     case KEY_PASTE:
         cmdline_insert_paste(c);
         c->search_pos = NULL;
         return;
     }
 
-    if (u_is_unicode(key)) {
+    if (u_is_unicode(key) && key != KEY_TAB) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
     } else {
         handle_binding(INPUT_SEARCH, key);

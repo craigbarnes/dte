@@ -502,11 +502,24 @@ The commands avilable in \fBcommand\fR/\fBsearch\fR modes are as follows:
 .br
 \(bu \fBhistory\-prev\fR
 .br
+\(bu \fBcomplete\-next\fR (command mode)
+.br
+\(bu \fBcomplete\-prev\fR (command mode)
+.br
+\(bu \fBcase\fR (search mode)
+.br
+\(bu \fBdirection\fR (search mode)
+.br
 .P
 Most of these commands behave in a similar fashion to the normal mode
-commands of the same name. The exceptions are \fBcancel\fR, which returns
-back to normal mode and \fBhistory\-next\fR/\fBhistory\-prev\fR which can be used
-to navigate command/search history.
+commands of the same name. The exceptions should be self\-explanatory.
+.P
+See also:
+.P
+\(bu The "key bindings" section in the \fBdte\fR(1) man page
+.br
+\(bu The \fBshow bind\fR command (below)
+.br
 .P
 .RE
 \fBset\fR [\fB\-gl\fR] \fIoption\fR [\fIvalue\fR] ...

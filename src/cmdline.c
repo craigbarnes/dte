@@ -4,6 +4,7 @@
 #include "completion.h"
 #include "editor.h"
 #include "history.h"
+#include "search.h"
 #include "terminal/input.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
@@ -280,7 +281,28 @@ static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
     reset_completion();
 }
 
-static const Command cmds[] = {
+static void cmd_complete_next(const CommandArgs* UNUSED_ARG(a))
+{
+    complete_command_next();
+}
+
+static void cmd_complete_prev(const CommandArgs* UNUSED_ARG(a))
+{
+    complete_command_prev();
+}
+
+static void cmd_case(const CommandArgs* UNUSED_ARG(a))
+{
+    unsigned int *css = &editor.options.case_sensitive_search;
+    *css = (*css + 1) % 3;
+}
+
+static void cmd_direction(const CommandArgs* UNUSED_ARG(a))
+{
+    toggle_search_direction();
+}
+
+static const Command common_cmds[] = {
     {"bol", "", false, 0, 0, cmd_bol},
     {"cancel", "", false, 0, 0, cmd_cancel},
     {"delete", "", false, 0, 0, cmd_delete},
@@ -298,13 +320,36 @@ static const Command cmds[] = {
     {"word-fwd", "", false, 0, 0, cmd_word_fwd},
 };
 
+static const Command search_cmds[] = {
+    {"case", "", false, 0, 0, cmd_case},
+    {"direction", "", false, 0, 0, cmd_direction},
+};
+
+static const Command command_cmds[] = {
+    {"complete-next", "", false, 0, 0, cmd_complete_next},
+    {"complete-prev", "", false, 0, 0, cmd_complete_prev},
+};
+
 static const Command *find_cmd_mode_command(const char *name)
 {
-    return BSEARCH(name, cmds, command_cmp);
+    const Command *cmd = BSEARCH(name, common_cmds, command_cmp);
+    return cmd ? cmd : BSEARCH(name, command_cmds, command_cmp);
+}
+
+static const Command *find_search_mode_command(const char *name)
+{
+    const Command *cmd = BSEARCH(name, common_cmds, command_cmp);
+    return cmd ? cmd : BSEARCH(name, search_cmds, command_cmp);
 }
 
 const CommandSet cmd_mode_commands = {
     .lookup = find_cmd_mode_command,
+    .allow_recording = NULL,
+    .aliases = HASHMAP_INIT,
+};
+
+const CommandSet search_mode_commands = {
+    .lookup = find_search_mode_command,
     .allow_recording = NULL,
     .aliases = HASHMAP_INIT,
 };

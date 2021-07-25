@@ -21,6 +21,7 @@ typedef enum {
 } CommandLineResult;
 
 extern const CommandSet cmd_mode_commands;
+extern const CommandSet search_mode_commands;
 
 void cmdline_clear(CommandLine *c);
 void cmdline_set_text(CommandLine *c, const char *text);
