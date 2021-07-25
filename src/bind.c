@@ -116,30 +116,31 @@ static KeyBinding *key_binding_new(InputMode mode, const char *cmd_str)
     const CommandSet *cmds = bindings[mode].cmds;
     PointerArray array = PTR_ARRAY_INIT;
     if (parse_commands(cmds, &array, cmd_str) != CMDERR_NONE) {
-        goto out;
+        goto nocache;
     }
 
     ptr_array_trim_nulls(&array);
-    if (array.count < 2 || ptr_array_idx(&array, NULL) != (array.count - 1)) {
+    size_t n = array.count;
+    if (n < 2 || ptr_array_idx(&array, NULL) != n - 1) {
         // Only single commands can be cached
-        goto out;
+        goto nocache;
     }
 
     const Command *cmd = cmds->lookup(array.ptrs[0]);
     if (!cmd) {
         // Aliases or non-existent commands can't be cached
-        goto out;
+        goto nocache;
     }
 
     if (memchr(cmd_str, '$', cmd_str_len)) {
         // Commands containing variables can't be cached
-        goto out;
+        goto nocache;
     }
 
     free(ptr_array_remove_idx(&array, 0));
     CommandArgs cmdargs = {.args = (char**)array.ptrs};
     if (do_parse_args(cmd, &cmdargs) != 0) {
-        goto out;
+        goto nocache;
     }
 
     // Command can be cached; binding takes ownership of args array
@@ -147,7 +148,7 @@ static KeyBinding *key_binding_new(InputMode mode, const char *cmd_str)
     binding->a = cmdargs;
     return binding;
 
-out:
+nocache:
     ptr_array_free(&array);
     return binding;
 }
