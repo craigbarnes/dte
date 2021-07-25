@@ -143,23 +143,13 @@ static int term_name_compare(const void *key, const void *elem)
 }
 
 UNITTEST {
-    static const StringView tests[] = {
-        STRING_VIEW("Eterm"),
-        STRING_VIEW("alacritty"),
-        STRING_VIEW("ansi"),
-        STRING_VIEW("mlterm"),
-        STRING_VIEW("mlterm2"),
-        STRING_VIEW("mlterm3"),
-        STRING_VIEW("st"),
-        STRING_VIEW("stterm"),
-        STRING_VIEW("xterm"),
-    };
     CHECK_BSEARCH_ARRAY(terms, name, strcmp);
-    for (size_t i = 0; i < ARRAY_COUNT(tests); i++) {
-        const TermEntry *entry = BSEARCH(&tests[i], terms, term_name_compare);
-        BUG_ON(!entry);
-        BUG_ON(!strview_equal_strn(&tests[i], entry->name, entry->name_len));
-    }
+    StringView k = STRING_VIEW("xtermz");
+    BUG_ON(BSEARCH(&k, terms, term_name_compare));
+    k.length--;
+    BUG_ON(!BSEARCH(&k, terms, term_name_compare));
+    k.length--;
+    BUG_ON(BSEARCH(&k, terms, term_name_compare));
 }
 
 void term_init(void)
