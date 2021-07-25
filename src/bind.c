@@ -172,7 +172,7 @@ void add_binding(InputMode mode, const char *keystr, const char *command)
     }
 
     const ssize_t idx = get_lookup_table_index(key);
-    if (idx >= 0) {
+    if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;
         key_binding_free(table[idx]);
         table[idx] = key_binding_new(mode, command);
@@ -193,7 +193,7 @@ void remove_binding(InputMode mode, const char *keystr)
     }
 
     const ssize_t idx = get_lookup_table_index(key);
-    if (idx >= 0) {
+    if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;
         key_binding_free(table[idx]);
         table[idx] = NULL;
@@ -216,7 +216,7 @@ void remove_binding(InputMode mode, const char *keystr)
 const KeyBinding *lookup_binding(InputMode mode, KeyCode key)
 {
     const ssize_t idx = get_lookup_table_index(key);
-    if (idx >= 0) {
+    if (likely(idx >= 0)) {
         return bindings[mode].table[idx];
     }
 
