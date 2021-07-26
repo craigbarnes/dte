@@ -3,6 +3,7 @@
 #include "block.h"
 #include "buffer.h"
 #include "change.h"
+#include "command/args.h"
 #include "commands.h"
 #include "util/str-util.h"
 
@@ -33,17 +34,21 @@ static void test_handle_binding(void)
     const Command *insert = find_normal_command("insert");
     ASSERT_NONNULL(insert);
 
-    handle_command(&normal_commands, "bind C-S-F11 'insert zzz'; open", false);
+    const CommandSet *cmds = &normal_commands;
+    handle_command(cmds, "open; bind C-S-F11 'insert -m zzz'", false);
 
     // Bound command should be cached
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F11;
     const KeyBinding *binding = lookup_binding(INPUT_NORMAL, key);
     ASSERT_NONNULL(binding);
     EXPECT_PTREQ(binding->cmd, insert);
-    EXPECT_EQ(binding->a.nr_flags, 0);
+    EXPECT_EQ(binding->a.nr_flags, 1);
     EXPECT_EQ(binding->a.nr_args, 1);
     EXPECT_STREQ(binding->a.args[0], "zzz");
     EXPECT_NULL(binding->a.args[1]);
+    EXPECT_EQ(binding->a.flags[0], 'm');
+    EXPECT_EQ(binding->a.flags[1], '\0');
+    EXPECT_TRUE(cmdargs_has_flag(&binding->a, 'm'));
 
     handle_binding(INPUT_NORMAL, key);
     const Block *block = BLOCK(buffer->blocks.next);
@@ -52,11 +57,19 @@ static void test_handle_binding(void)
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "zzz\n", 4);
 
+    handle_binding(INPUT_NORMAL, MOD_CTRL | '?');
+    ASSERT_EQ(block->size, 3);
+    EXPECT_EQ(block->nl, 1);
+    EXPECT_MEMEQ(block->data, "zz\n", 3);
+
     EXPECT_TRUE(undo());
+    EXPECT_TRUE(undo());
+    EXPECT_FALSE(undo());
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
     EXPECT_FALSE(undo());
-    handle_command(&normal_commands, "close", false);
+    handle_command(cmds, "close", false);
+
 }
 
 static const TestEntry tests[] = {
