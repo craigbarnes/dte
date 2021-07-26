@@ -900,22 +900,28 @@ void change_case(char mode)
     String dst = string_new(text_len);
     char *src = block_iter_get_bytes(&view->cursor, text_len);
     size_t i = 0;
-    while (i < text_len) {
-        CodePoint u = u_get_char(src, text_len, &i);
-        switch (mode) {
-        case 't':
-            u = u_is_upper(u) ? u_to_lower(u) : u_to_upper(u);
-            break;
-        case 'l':
-            u = u_to_lower(u);
-            break;
-        case 'u':
-            u = u_to_upper(u);
-            break;
-        default:
-            BUG("unhandled case mode");
+    switch (mode) {
+    case 'l':
+        while (i < text_len) {
+            CodePoint u = u_to_lower(u_get_char(src, text_len, &i));
+            string_append_codepoint(&dst, u);
         }
-        string_append_codepoint(&dst, u);
+        break;
+    case 'u':
+        while (i < text_len) {
+            CodePoint u = u_to_upper(u_get_char(src, text_len, &i));
+            string_append_codepoint(&dst, u);
+        }
+        break;
+    case 't':
+        while (i < text_len) {
+            CodePoint u = u_get_char(src, text_len, &i);
+            u = u_is_upper(u) ? u_to_lower(u) : u_to_upper(u);
+            string_append_codepoint(&dst, u);
+        }
+        break;
+    default:
+        BUG("unhandled case mode");
     }
 
     buffer_replace_bytes(text_len, dst.buffer, dst.len);
