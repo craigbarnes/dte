@@ -8,27 +8,37 @@
 
 #define BLOCK_EDIT_SIZE 512
 
-static void sanity_check(bool check_newlines)
+static void sanity_check_blocks(bool check_newlines)
 {
 #if DEBUG >= 1
     BUG_ON(list_empty(&buffer->blocks));
-    const Block *blk;
+    BUG_ON(view->cursor.offset > view->cursor.blk->size);
+
+    const Block *blk = BLOCK(buffer->blocks.next);
+    if (blk->size == 0) {
+        // The only time a zero-sized block is valid is when it's the
+        // first and only block
+        BUG_ON(buffer->blocks.next->next != &buffer->blocks);
+        BUG_ON(view->cursor.blk != blk);
+        return;
+    }
+
     bool cursor_seen = false;
     block_for_each(blk, &buffer->blocks) {
-        BUG_ON(!blk->size && buffer->blocks.next->next != &buffer->blocks);
-        BUG_ON(blk->size > blk->alloc);
-        if (check_newlines) {
-            BUG_ON(blk->size && blk->data[blk->size - 1] != '\n');
-        }
+        const size_t size = blk->size;
+        BUG_ON(size == 0);
+        BUG_ON(size > blk->alloc);
         if (blk == view->cursor.blk) {
             cursor_seen = true;
         }
+        if (check_newlines) {
+            BUG_ON(blk->data[size - 1] != '\n');
+        }
         if (DEBUG > 2) {
-            BUG_ON(count_nl(blk->data, blk->size) != blk->nl);
+            BUG_ON(count_nl(blk->data, size) != blk->nl);
         }
     }
     BUG_ON(!cursor_seen);
-    BUG_ON(view->cursor.offset > view->cursor.blk->size);
 #else
     // Silence "unused parameter" warning
     (void)check_newlines;
@@ -242,7 +252,7 @@ void do_insert(const char *buf, size_t len)
 {
     size_t nl = insert_bytes(buf, len);
     buffer->nl += nl;
-    sanity_check(true);
+    sanity_check_blocks(true);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
@@ -337,7 +347,7 @@ char *do_delete(size_t len, bool sanity_check_newlines)
         delete_block(next);
     }
 
-    sanity_check(sanity_check_newlines);
+    sanity_check_blocks(sanity_check_newlines);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
@@ -388,7 +398,7 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     buffer->nl += ins_nl;
     blk->size = new_size;
 
-    sanity_check(true);
+    sanity_check_blocks(true);
 
     view_update_cursor_y(view);
     if (del_nl == ins_nl) {
