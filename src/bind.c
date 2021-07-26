@@ -10,7 +10,6 @@
 #include "command/serialize.h"
 #include "commands.h"
 #include "completion.h"
-#include "error.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -163,14 +162,8 @@ static void key_binding_free(KeyBinding *binding)
     }
 }
 
-void add_binding(InputMode mode, const char *keystr, const char *command)
+void add_binding(InputMode mode, KeyCode key, const char *command)
 {
-    KeyCode key;
-    if (unlikely(!parse_key_string(&key, keystr))) {
-        error_msg("invalid key string: %s", keystr);
-        return;
-    }
-
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;
@@ -185,13 +178,8 @@ void add_binding(InputMode mode, const char *keystr, const char *command)
     ptr_array_append(&bindings[mode].ptr_array, entry);
 }
 
-void remove_binding(InputMode mode, const char *keystr)
+void remove_binding(InputMode mode, KeyCode key)
 {
-    KeyCode key;
-    if (!parse_key_string(&key, keystr)) {
-        return;
-    }
-
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;

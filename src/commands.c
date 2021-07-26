@@ -144,8 +144,15 @@ static void cmd_alias(const CommandArgs *a)
 
 static void cmd_bind(const CommandArgs *a)
 {
-    const char *key = a->args[0];
+    const char *keystr = a->args[0];
     const char *cmd = a->args[1];
+    KeyCode key;
+    if (unlikely(!parse_key_string(&key, keystr))) {
+        if (cmd) {
+            error_msg("invalid key string: %s", keystr);
+        }
+        return;
+    }
 
     const bool modes[] = {
         [INPUT_NORMAL] = a->nr_flags == 0 || has_flag(a, 'n'),

@@ -15,9 +15,8 @@ static void test_add_binding(void)
     const Command *insert_cmd = find_normal_command("insert");
     ASSERT_NONNULL(insert_cmd);
 
-    const char *key_str = "C-S-F12";
     const char *cmd_str = "insert xyz";
-    add_binding(INPUT_NORMAL, key_str, cmd_str);
+    add_binding(INPUT_NORMAL, key, cmd_str);
     bind = lookup_binding(INPUT_NORMAL, key);
     ASSERT_NONNULL(bind);
     EXPECT_PTREQ(bind->cmd, insert_cmd);
@@ -25,7 +24,7 @@ static void test_add_binding(void)
     EXPECT_EQ(bind->a.nr_flags, 0);
     EXPECT_STREQ(bind->cmd_str, cmd_str);
 
-    remove_binding(INPUT_NORMAL, key_str);
+    remove_binding(INPUT_NORMAL, key);
     EXPECT_NULL(lookup_binding(INPUT_NORMAL, key));
 }
 

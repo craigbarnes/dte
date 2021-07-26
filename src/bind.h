@@ -16,8 +16,8 @@ typedef struct {
 } KeyBinding;
 
 void bindings_init(void);
-void add_binding(InputMode mode, const char *keystr, const char *command);
-void remove_binding(InputMode mode, const char *keystr);
+void add_binding(InputMode mode, KeyCode key, const char *command);
+void remove_binding(InputMode mode, KeyCode key);
 const KeyBinding *lookup_binding(InputMode mode, KeyCode key);
 bool handle_binding(InputMode mode, KeyCode key);
 void collect_bound_keys(const char *keystr_prefix);
