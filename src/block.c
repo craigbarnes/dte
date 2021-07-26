@@ -8,16 +8,18 @@
 
 #define BLOCK_EDIT_SIZE 512
 
-static void sanity_check(void)
+static void sanity_check(bool check_newlines)
 {
 #if DEBUG >= 1
     BUG_ON(list_empty(&buffer->blocks));
+    const Block *blk;
     bool cursor_seen = false;
-    Block *blk;
     block_for_each(blk, &buffer->blocks) {
         BUG_ON(!blk->size && buffer->blocks.next->next != &buffer->blocks);
         BUG_ON(blk->size > blk->alloc);
-        BUG_ON(blk->size && blk->data[blk->size - 1] != '\n');
+        if (check_newlines) {
+            BUG_ON(blk->size && blk->data[blk->size - 1] != '\n');
+        }
         if (blk == view->cursor.blk) {
             cursor_seen = true;
         }
@@ -27,6 +29,9 @@ static void sanity_check(void)
     }
     BUG_ON(!cursor_seen);
     BUG_ON(view->cursor.offset > view->cursor.blk->size);
+#else
+    // Silence "unused parameter" warning
+    (void)check_newlines;
 #endif
 }
 
@@ -237,7 +242,7 @@ void do_insert(const char *buf, size_t len)
 {
     size_t nl = insert_bytes(buf, len);
     buffer->nl += nl;
-    sanity_check();
+    sanity_check(true);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
@@ -253,7 +258,7 @@ static bool only_block(const Block *blk)
         && blk->node.next == &buffer->blocks;
 }
 
-char *do_delete(size_t len)
+char *do_delete(size_t len, bool sanity_check_newlines)
 {
     ListHead *saved_prev_node = NULL;
     Block *blk = view->cursor.blk;
@@ -332,7 +337,7 @@ char *do_delete(size_t len)
         delete_block(next);
     }
 
-    sanity_check();
+    sanity_check(sanity_check_newlines);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
@@ -383,7 +388,7 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     buffer->nl += ins_nl;
     blk->size = new_size;
 
-    sanity_check();
+    sanity_check(true);
 
     view_update_cursor_y(view);
     if (del_nl == ins_nl) {
@@ -397,8 +402,12 @@ char *do_replace(size_t del, const char *buf, size_t ins)
         hl_insert(buffer, view->cy, ins_nl);
     }
     return deleted;
+
 slow:
-    deleted = do_delete(del);
+    // The "sanity_check_newlines" argument of do_delete() is false here
+    // because it may be removing a terminating newline that do_insert()
+    // is going to insert again at a different position:
+    deleted = do_delete(del, false);
     do_insert(buf, ins);
     return deleted;
 }

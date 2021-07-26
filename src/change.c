@@ -194,7 +194,7 @@ static void reverse_change(Change *change)
         change->del_count = del_count;
     } else {
         // Convert insert to delete
-        change->buf = do_delete(change->ins_count);
+        change->buf = do_delete(change->ins_count, true);
         change->del_count = change->ins_count;
         change->ins_count = 0;
     }
@@ -364,7 +364,7 @@ static void buffer_delete_bytes_internal(size_t len, bool move_after)
             }
         }
     }
-    record_delete(do_delete(len), len, move_after);
+    record_delete(do_delete(len, true), len, move_after);
 
     if (buffer->views.count > 1) {
         fix_cursors(block_iter_get_offset(&view->cursor), len, 0);
