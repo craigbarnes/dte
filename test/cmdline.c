@@ -190,6 +190,18 @@ static void test_complete_command(void)
     EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
     reset_completion();
 
+    cmdline_set_text(&editor.cmdline, "set esc-timeout ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set esc-timeout 100 ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "set x y tab-b");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set x y tab-bar ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "set x y tab-bar true ");
+    reset_completion();
+
     cmdline_set_text(&editor.cmdline, "save -u test/data/");
     complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "save -u test/data/3lines.txt");
@@ -205,6 +217,13 @@ static void test_complete_command(void)
     EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit ");
     complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit auto-indent");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "errorfmt c r ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r _");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r column");
     reset_completion();
 
     cmdline_set_text(&editor.cmdline, "repeat 3 ");
@@ -239,13 +258,6 @@ static void test_complete_command_extra(void)
     cmdline_set_text(&editor.cmdline, "show errorfmt gc");
     complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "show errorfmt gcc ");
-    reset_completion();
-
-    cmdline_set_text(&editor.cmdline, "errorfmt c r ");
-    complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r _");
-    complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r column");
     reset_completion();
 
     cmdline_set_text(&editor.cmdline, "option c expand-tab ");
