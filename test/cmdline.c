@@ -189,11 +189,43 @@ static void test_complete_command(void)
     complete_command_next();
     EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
     reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "save -u test/data/");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "save -u test/data/3lines.txt");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "include -b r");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "include -b rc ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "option gitcom");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit auto-indent");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "repeat 3 ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "repeat 3 alias");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "repeat 3 hi ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "repeat 3 hi activetab");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "left; right; word-");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "left; right; word-bwd");
+    reset_completion();
 }
 
-// This should be run after init_headless_mode() because it
-// depends on the default key bindings being initialized
-static void test_complete_show_bind(void)
+// This should only be run after init_headless_mode() because the completions
+// depend on the buffer and default config being initialized
+static void test_complete_command_extra(void)
 {
     cmdline_set_text(&editor.cmdline, "show bi");
     complete_command_next();
@@ -202,6 +234,24 @@ static void test_complete_show_bind(void)
     EXPECT_STRING_EQ(editor.cmdline.buf, "show bind C-?");
     complete_command_prev();
     EXPECT_STRING_EQ(editor.cmdline.buf, "show bind up");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "show errorfmt gc");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "show errorfmt gcc ");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "errorfmt c r ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r _");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r column");
+    reset_completion();
+
+    cmdline_set_text(&editor.cmdline, "option c expand-tab ");
+    complete_command_next();
+    EXPECT_STRING_EQ(editor.cmdline.buf, "option c expand-tab true ");
+    reset_completion();
 }
 
 static const TestEntry tests[] = {
@@ -210,7 +260,7 @@ static const TestEntry tests[] = {
 };
 
 static const TestEntry tests_late[] = {
-    TEST(test_complete_show_bind),
+    TEST(test_complete_command_extra),
 };
 
 const TestGroup cmdline_tests = TEST_GROUP(tests);
