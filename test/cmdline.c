@@ -113,132 +113,133 @@ static void test_command_mode(void)
 
 static void test_complete_command(void)
 {
+    CommandLine *c = &editor.cmdline;
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "alias");
+    EXPECT_STRING_EQ(c->buf, "alias");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "wrap");
+    cmdline_set_text(c, "wrap");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "wrap-paragraph ");
+    EXPECT_STRING_EQ(c->buf, "wrap-paragraph ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "open test/data/.e");
+    cmdline_set_text(c, "open test/data/.e");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "open test/data/.editorconfig ");
+    EXPECT_STRING_EQ(c->buf, "open test/data/.editorconfig ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "toggle ");
+    cmdline_set_text(c, "toggle ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "toggle auto-indent");
+    EXPECT_STRING_EQ(c->buf, "toggle auto-indent");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set expand-tab f");
+    cmdline_set_text(c, "set expand-tab f");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set expand-tab false ");
+    EXPECT_STRING_EQ(c->buf, "set expand-tab false ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set case-sensitive-search a");
+    cmdline_set_text(c, "set case-sensitive-search a");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set case-sensitive-search auto ");
+    EXPECT_STRING_EQ(c->buf, "set case-sensitive-search auto ");
     reset_completion();
 
     ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
-    cmdline_set_text(&editor.cmdline, "insert $" ENV_VAR_PREFIX);
+    cmdline_set_text(c, "insert $" ENV_VAR_PREFIX);
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "insert $" ENV_VAR_NAME);
+    EXPECT_STRING_EQ(c->buf, "insert $" ENV_VAR_NAME);
     reset_completion();
     ASSERT_EQ(unsetenv(ENV_VAR_NAME), 0);
 
-    cmdline_clear(&editor.cmdline);
+    cmdline_clear(c);
     complete_command_prev();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "alias");
+    EXPECT_STRING_EQ(c->buf, "alias");
     complete_command_prev();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "wswap");
+    EXPECT_STRING_EQ(c->buf, "wswap");
     complete_command_prev();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "wsplit");
+    EXPECT_STRING_EQ(c->buf, "wsplit");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "hi default ");
+    cmdline_set_text(c, "hi default ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default black");
+    EXPECT_STRING_EQ(c->buf, "hi default black");
     complete_command_prev();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default yellow");
+    EXPECT_STRING_EQ(c->buf, "hi default yellow");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default black");
+    EXPECT_STRING_EQ(c->buf, "hi default black");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "hi default blink");
+    EXPECT_STRING_EQ(c->buf, "hi default blink");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "show op");
+    cmdline_set_text(c, "show op");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show option ");
+    EXPECT_STRING_EQ(c->buf, "show option ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show option auto-indent");
+    EXPECT_STRING_EQ(c->buf, "show option auto-indent");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set ws-error tr");
+    cmdline_set_text(c, "set ws-error tr");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error trailing ");
+    EXPECT_STRING_EQ(c->buf, "set ws-error trailing ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set ws-error special,tab-");
+    cmdline_set_text(c, "set ws-error special,tab-");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
+    EXPECT_STRING_EQ(c->buf, "set ws-error special,tab-after-indent");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-indent");
+    EXPECT_STRING_EQ(c->buf, "set ws-error special,tab-indent");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set ws-error special,tab-after-indent");
+    EXPECT_STRING_EQ(c->buf, "set ws-error special,tab-after-indent");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set esc-timeout ");
+    cmdline_set_text(c, "set esc-timeout ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set esc-timeout 100 ");
+    EXPECT_STRING_EQ(c->buf, "set esc-timeout 100 ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "set x y tab-b");
+    cmdline_set_text(c, "set x y tab-b");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set x y tab-bar ");
+    EXPECT_STRING_EQ(c->buf, "set x y tab-bar ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "set x y tab-bar true ");
+    EXPECT_STRING_EQ(c->buf, "set x y tab-bar true ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "save -u test/data/");
+    cmdline_set_text(c, "save -u test/data/");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "save -u test/data/3lines.txt");
+    EXPECT_STRING_EQ(c->buf, "save -u test/data/3lines.txt");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "include -b r");
+    cmdline_set_text(c, "include -b r");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "include -b rc ");
+    EXPECT_STRING_EQ(c->buf, "include -b rc ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "option gitcom");
+    cmdline_set_text(c, "option gitcom");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit ");
+    EXPECT_STRING_EQ(c->buf, "option gitcommit ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "option gitcommit auto-indent");
+    EXPECT_STRING_EQ(c->buf, "option gitcommit auto-indent");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "errorfmt c r ");
+    cmdline_set_text(c, "errorfmt c r ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r _");
+    EXPECT_STRING_EQ(c->buf, "errorfmt c r _");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "errorfmt c r column");
+    EXPECT_STRING_EQ(c->buf, "errorfmt c r column");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "repeat 3 ");
+    cmdline_set_text(c, "repeat 3 ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "repeat 3 alias");
+    EXPECT_STRING_EQ(c->buf, "repeat 3 alias");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "repeat 3 hi ");
+    cmdline_set_text(c, "repeat 3 hi ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "repeat 3 hi activetab");
+    EXPECT_STRING_EQ(c->buf, "repeat 3 hi activetab");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "left; right; word-");
+    cmdline_set_text(c, "left; right; word-");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "left; right; word-bwd");
+    EXPECT_STRING_EQ(c->buf, "left; right; word-bwd");
     reset_completion();
 }
 
@@ -246,23 +247,24 @@ static void test_complete_command(void)
 // depend on the buffer and default config being initialized
 static void test_complete_command_extra(void)
 {
-    cmdline_set_text(&editor.cmdline, "show bi");
+    CommandLine *c = &editor.cmdline;
+    cmdline_set_text(c, "show bi");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind ");
+    EXPECT_STRING_EQ(c->buf, "show bind ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind C-?");
+    EXPECT_STRING_EQ(c->buf, "show bind C-?");
     complete_command_prev();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show bind up");
+    EXPECT_STRING_EQ(c->buf, "show bind up");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "show errorfmt gc");
+    cmdline_set_text(c, "show errorfmt gc");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "show errorfmt gcc ");
+    EXPECT_STRING_EQ(c->buf, "show errorfmt gcc ");
     reset_completion();
 
-    cmdline_set_text(&editor.cmdline, "option c expand-tab ");
+    cmdline_set_text(c, "option c expand-tab ");
     complete_command_next();
-    EXPECT_STRING_EQ(editor.cmdline.buf, "option c expand-tab true ");
+    EXPECT_STRING_EQ(c->buf, "option c expand-tab true ");
     reset_completion();
 }
 
