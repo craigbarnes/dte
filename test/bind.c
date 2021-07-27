@@ -62,14 +62,20 @@ static void test_handle_binding(void)
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "zz\n", 3);
 
+    handle_binding(INPUT_NORMAL, MOD_CTRL | MOD_META | '?');
+    ASSERT_EQ(block->size, 1);
+    EXPECT_EQ(block->nl, 1);
+    EXPECT_MEMEQ(block->data, "\n", 1);
+
     EXPECT_TRUE(undo());
+    ASSERT_EQ(block->size, 3);
     EXPECT_TRUE(undo());
-    EXPECT_FALSE(undo());
+    ASSERT_EQ(block->size, 4);
+    EXPECT_TRUE(undo());
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
     EXPECT_FALSE(undo());
     handle_command(cmds, "close", false);
-
 }
 
 static const TestEntry tests[] = {
