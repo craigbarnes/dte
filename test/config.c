@@ -122,6 +122,13 @@ static void test_exec_config(void)
     if (conversion_supported_by_iconv("UTF-8", "TIS-620")) {
         expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
+
+    const StringView s = STRING_VIEW("toggle utf8-bom \\");
+    EXPECT_FALSE(editor.options.utf8_bom);
+    exec_config(&normal_commands, s.data, s.length);
+    EXPECT_TRUE(editor.options.utf8_bom);
+    exec_config(&normal_commands, s.data, s.length);
+    EXPECT_FALSE(editor.options.utf8_bom);
 }
 
 static void test_detect_indent(void)

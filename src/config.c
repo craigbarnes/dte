@@ -57,7 +57,8 @@ void exec_config(const CommandSet *cmds, const char *text, size_t size)
         }
     }
 
-    if (buf.len) {
+    if (unlikely(buf.len)) {
+        // This can only happen if the last line had a line continuation
         handle_command(cmds, string_borrow_cstring(&buf), false);
     }
 
