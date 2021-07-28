@@ -17,60 +17,51 @@
 
 ConfigState current_config;
 
-static bool is_command(const char *str, size_t len)
-{
-    for (size_t i = 0; i < len; i++) {
-        if (str[i] == '#') {
-            return false;
-        }
-        if (!ascii_isspace(str[i])) {
-            return true;
-        }
-    }
-    return false;
-}
-
 // Odd number of backslashes at end of line?
-static bool has_line_continuation(const char *str, size_t len)
+static bool has_line_continuation(const StringView line)
 {
-    ssize_t pos = len - 1;
-    while (pos >= 0 && str[pos] == '\\') {
+    ssize_t pos = line.length - 1;
+    while (pos >= 0 && line.data[pos] == '\\') {
         pos--;
     }
-    return (len - 1 - pos) & 1;
+    return (line.length - 1 - pos) & 1;
 }
 
-void exec_config(const CommandSet *cmds, const char *buf, size_t size)
+UNITTEST {
+    BUG_ON(has_line_continuation(string_view(NULL, 0)));
+    BUG_ON(has_line_continuation(strview_from_cstring("0")));
+    BUG_ON(!has_line_continuation(strview_from_cstring("1 \\")));
+    BUG_ON(has_line_continuation(strview_from_cstring("2 \\\\")));
+    BUG_ON(!has_line_continuation(strview_from_cstring("3 \\\\\\")));
+    BUG_ON(has_line_continuation(strview_from_cstring("4 \\\\\\\\")));
+}
+
+void exec_config(const CommandSet *cmds, const char *text, size_t size)
 {
-    const char *ptr = buf;
-    String line = string_new(1024);
+    String buf = string_new(1024);
 
-    while (ptr < buf + size) {
-        size_t n = buf + size - ptr;
-        char *end = memchr(ptr, '\n', n);
-        if (end) {
-            n = end - ptr;
+    for (size_t pos = 0; pos < size; current_config.line++) {
+        StringView line = buf_slice_next_line(text, &pos, size);
+        strview_trim_left(&line);
+        if (buf.len == 0 && strview_has_prefix(&line, "#")) {
+            // Comment line
+            continue;
         }
-
-        if (line.len || is_command(ptr, n)) {
-            if (has_line_continuation(ptr, n)) {
-                string_append_buf(&line, ptr, n - 1);
-            } else {
-                string_append_buf(&line, ptr, n);
-                handle_command(cmds, string_borrow_cstring(&line), false);
-                string_clear(&line);
-            }
+        if (has_line_continuation(line)) {
+            line.length--;
+            string_append_strview(&buf, &line);
+        } else {
+            string_append_strview(&buf, &line);
+            handle_command(cmds, string_borrow_cstring(&buf), false);
+            string_clear(&buf);
         }
-
-        current_config.line++;
-        ptr += n + 1;
     }
 
-    if (line.len) {
-        handle_command(cmds, string_borrow_cstring(&line), false);
+    if (buf.len) {
+        handle_command(cmds, string_borrow_cstring(&buf), false);
     }
 
-    string_free(&line);
+    string_free(&buf);
 }
 
 String dump_builtin_configs(void)
