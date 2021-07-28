@@ -128,9 +128,8 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 
     char *buf;
     ssize_t size = read_file(filename, &buf);
-    int err = errno;
-
     if (size < 0) {
+        int err = errno;
         if (err != ENOENT || must_exist) {
             error_msg("Error reading %s: %s", filename, strerror(err));
         }
@@ -139,7 +138,6 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 
     current_config.file = filename;
     current_config.line = 1;
-
     exec_config(cmds, buf, size);
     free(buf);
     return 0;
