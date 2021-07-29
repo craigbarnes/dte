@@ -110,35 +110,41 @@ static void test_history_search(void)
     History h = {.max_entries = 64};
     history_load(&h, "test/data/history");
     EXPECT_EQ(h.entries.count, 3);
-    EXPECT_STREQ(h.first->text, "entry #1");
-    EXPECT_STREQ(h.last->text, "entry #3");
-    EXPECT_STREQ(h.first->next->text, "entry #2");
-    EXPECT_STREQ(h.last->prev->text, "entry #2");
+    EXPECT_STREQ(h.first->text, "one");
+    EXPECT_STREQ(h.last->text, "three");
+    EXPECT_STREQ(h.first->next->text, "two");
+    EXPECT_STREQ(h.last->prev->text, "two");
     EXPECT_NULL(h.first->prev);
     EXPECT_NULL(h.last->next);
 
     const HistoryEntry *e = h.last;
-    EXPECT_STREQ(e->text, "entry #3");
+    EXPECT_STREQ(e->text, "three");
     EXPECT_TRUE(history_search_forward(&h, &e, ""));
-    EXPECT_STREQ(e->text, "entry #2");
+    EXPECT_STREQ(e->text, "two");
     EXPECT_TRUE(history_search_forward(&h, &e, ""));
-    EXPECT_STREQ(e->text, "entry #1");
+    EXPECT_STREQ(e->text, "one");
     EXPECT_FALSE(history_search_forward(&h, &e, ""));
 
-    EXPECT_STREQ(e->text, "entry #1");
+    EXPECT_STREQ(e->text, "one");
     EXPECT_TRUE(history_search_backward(&h, &e, ""));
-    EXPECT_STREQ(e->text, "entry #2");
+    EXPECT_STREQ(e->text, "two");
     EXPECT_TRUE(history_search_backward(&h, &e, ""));
-    EXPECT_STREQ(e->text, "entry #3");
+    EXPECT_STREQ(e->text, "three");
     EXPECT_FALSE(history_search_backward(&h, &e, ""));
+
+    EXPECT_STREQ(e->text, "three");
+    EXPECT_TRUE(history_search_forward(&h, &e, "o"));
+    EXPECT_STREQ(e->text, "one");
+    EXPECT_TRUE(history_search_backward(&h, &e, "th"));
+    EXPECT_STREQ(e->text, "three");
 
     h.filename = "build/test/saved_history";
     history_save(&h);
     hashmap_free(&h.entries, free);
     char *buf = NULL;
     ssize_t n = read_file(h.filename, &buf);
-    EXPECT_EQ(n, 27);
-    EXPECT_STREQ(buf, "entry #1\nentry #2\nentry #3\n");
+    EXPECT_EQ(n, 14);
+    EXPECT_STREQ(buf, "one\ntwo\nthree\n");
     free(buf);
 }
 
