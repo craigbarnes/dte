@@ -108,7 +108,7 @@ static void test_exec_config(void)
     // Execute *.dterc files
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
-        exec_config(&normal_commands, config.text.data, config.text.length);
+        exec_config(&normal_commands, config.text);
     }
 
     // Check that output files have expected contents
@@ -125,9 +125,9 @@ static void test_exec_config(void)
 
     const StringView s = STRING_VIEW("toggle utf8-bom \\");
     EXPECT_FALSE(editor.options.utf8_bom);
-    exec_config(&normal_commands, s.data, s.length);
+    exec_config(&normal_commands, s);
     EXPECT_TRUE(editor.options.utf8_bom);
-    exec_config(&normal_commands, s.data, s.length);
+    exec_config(&normal_commands, s);
     EXPECT_FALSE(editor.options.utf8_bom);
 }
 

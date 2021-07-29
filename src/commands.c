@@ -470,7 +470,7 @@ static void cmd_eval(const CommandArgs *a)
     if (!spawn_filter(&ctx)) {
         return;
     }
-    exec_config(&normal_commands, ctx.output.buffer, ctx.output.len);
+    exec_config(&normal_commands, strview_from_string(&ctx.output));
     string_free(&ctx.output);
 }
 

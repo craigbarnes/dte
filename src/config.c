@@ -18,7 +18,7 @@
 ConfigState current_config;
 
 // Odd number of backslashes at end of line?
-static bool has_line_continuation(const StringView line)
+static bool has_line_continuation(StringView line)
 {
     ssize_t pos = line.length - 1;
     while (pos >= 0 && line.data[pos] == '\\') {
@@ -36,12 +36,12 @@ UNITTEST {
     BUG_ON(has_line_continuation(strview_from_cstring("4 \\\\\\\\")));
 }
 
-void exec_config(const CommandSet *cmds, const char *text, size_t size)
+void exec_config(const CommandSet *cmds, StringView config)
 {
     String buf = string_new(1024);
 
-    for (size_t pos = 0; pos < size; current_config.line++) {
-        StringView line = buf_slice_next_line(text, &pos, size);
+    for (size_t i = 0, n = config.length; i < n; current_config.line++) {
+        StringView line = buf_slice_next_line(config.data, &i, n);
         strview_trim_left(&line);
         if (buf.len == 0 && strview_has_prefix(&line, "#")) {
             // Comment line
@@ -113,7 +113,7 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
         if (cfg) {
             current_config.file = filename;
             current_config.line = 1;
-            exec_config(cmds, cfg->text.data, cfg->text.length);
+            exec_config(cmds, cfg->text);
             return 0;
         } else if (must_exist) {
             error_msg (
@@ -138,7 +138,7 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 
     current_config.file = filename;
     current_config.line = 1;
-    exec_config(cmds, buf, size);
+    exec_config(cmds, string_view(buf, size));
     free(buf);
     return 0;
 }
