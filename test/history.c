@@ -2,6 +2,7 @@
 #include "test.h"
 #include "history.h"
 #include "util/numtostr.h"
+#include "util/readfile.h"
 
 static void test_history_add(void)
 {
@@ -104,6 +105,43 @@ static void test_history_add(void)
     hashmap_free(&h.entries, free);
 }
 
+static void test_history_search(void)
+{
+    History h = {.max_entries = 64};
+    history_load(&h, "test/data/history");
+    EXPECT_EQ(h.entries.count, 3);
+    EXPECT_STREQ(h.first->text, "entry #1");
+    EXPECT_STREQ(h.last->text, "entry #3");
+    EXPECT_STREQ(h.first->next->text, "entry #2");
+    EXPECT_STREQ(h.last->prev->text, "entry #2");
+    EXPECT_NULL(h.first->prev);
+    EXPECT_NULL(h.last->next);
+
+    const HistoryEntry *e = h.last;
+    EXPECT_STREQ(e->text, "entry #3");
+    EXPECT_TRUE(history_search_forward(&h, &e, ""));
+    EXPECT_STREQ(e->text, "entry #2");
+    EXPECT_TRUE(history_search_forward(&h, &e, ""));
+    EXPECT_STREQ(e->text, "entry #1");
+    EXPECT_FALSE(history_search_forward(&h, &e, ""));
+
+    EXPECT_STREQ(e->text, "entry #1");
+    EXPECT_TRUE(history_search_backward(&h, &e, ""));
+    EXPECT_STREQ(e->text, "entry #2");
+    EXPECT_TRUE(history_search_backward(&h, &e, ""));
+    EXPECT_STREQ(e->text, "entry #3");
+    EXPECT_FALSE(history_search_backward(&h, &e, ""));
+
+    h.filename = "build/test/saved_history";
+    history_save(&h);
+    hashmap_free(&h.entries, free);
+    char *buf = NULL;
+    ssize_t n = read_file(h.filename, &buf);
+    EXPECT_EQ(n, 27);
+    EXPECT_STREQ(buf, "entry #1\nentry #2\nentry #3\n");
+    free(buf);
+}
+
 // This test is done to ensure the HashMap can handle the constant
 // churn from insertions and removals (i.e. that it rehashes the
 // table to clean out tombstones, even when the number of real
@@ -122,6 +160,7 @@ static void test_history_tombstone_pressure(void)
 
 static const TestEntry tests[] = {
     TEST(test_history_add),
+    TEST(test_history_search),
     TEST(test_history_tombstone_pressure),
 };
 
