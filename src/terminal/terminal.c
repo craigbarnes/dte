@@ -118,8 +118,10 @@ Terminal terminal = {
             // 1039 = altSendsEscape
             "\033[?1036;1039s" // Save
             "\033[?1036;1039h" // Enable
+            "\033[>4;1m" // Enable modifyOtherKeys
         ),
         .deinit = STRING_VIEW (
+            "\033[>4m" // Reset modifyOtherKeys to initial value
             "\033[?1036;1039r" // Restore
         ),
         .keypad_off = STRING_VIEW("\033[?1l\033>"),
