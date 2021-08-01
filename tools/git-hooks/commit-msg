@@ -4,6 +4,12 @@
     next
 }
 
+# Exclude long URLs from maximum line length check
+/^ *https?:/ {
+    LINES++
+    next
+}
+
 /^.{73}/ {
     printf("%s:%d: Line exceeds 72 columns\n", FILENAME, FNR)
     exit 1
