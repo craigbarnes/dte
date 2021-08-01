@@ -1,7 +1,7 @@
 syntax .js-esc
 
 state special
-    char "'\"\\bfnrtv" END special
+    char "'\"`\\bfnrtv" END special
     char 0 3n
     char x 2left
     char u 4left
@@ -105,6 +105,7 @@ state code
     str "/*" long-comment
     char \' sq
     char \" dq
+    char ` bt
     char "(;:,=*/%&|!?+-" foo
     eat this
 
@@ -186,6 +187,11 @@ state sq string
 state dq string
     char \" code string
     char "\n" code
+    char "\\" .js-esc:this
+    eat this
+
+state bt string
+    char ` code string
     char "\\" .js-esc:this
     eat this
 
