@@ -5,7 +5,6 @@
 
 #include <stdint.h>
 #include "xterm.h"
-#include "kitty.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/macros.h"
@@ -294,17 +293,6 @@ static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
     return 0;
 }
 
-static ssize_t parse_apc(const char *buf, size_t length, size_t i, KeyCode *k)
-{
-    if (unlikely(i >= length)) {
-        return -1;
-    }
-    if (buf[i] == 'K') {
-        return kitty_parse_full_mode_key(buf, length, i + 1, k);
-    }
-    return 0;
-}
-
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length == 0 || buf[0] != '\033')) {
@@ -315,7 +303,6 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
     switch (buf[1]) {
     case 'O': return parse_ss3(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
-    case '_': return parse_apc(buf, length, 2, k);
     }
     return 0;
 }

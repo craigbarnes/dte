@@ -116,13 +116,11 @@ Terminal terminal = {
         .init = STRING_VIEW (
             // 1036 = metaSendsEscape
             // 1039 = altSendsEscape
-            // 2017 = kitty "full" keyboard mode
             "\033[?1036;1039s" // Save
-            "\033[?1036;1039;2017h" // Enable
+            "\033[?1036;1039h" // Enable
         ),
         .deinit = STRING_VIEW (
             "\033[?1036;1039r" // Restore
-            "\033[?2017l" // Disable
         ),
         .keypad_off = STRING_VIEW("\033[?1l\033>"),
         .keypad_on = STRING_VIEW("\033[?1h\033="),

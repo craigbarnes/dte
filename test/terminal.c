@@ -322,32 +322,6 @@ static void test_xterm_parse_key(void)
         {"\033[4294967296;3u", 0, 0}, // UINT32_MAX + 1
         {"\033[-1;3u", 0, 0},
         {"\033[-2;3u", 0, 0},
-        // kitty "full mode"
-        {"\033_KpA>\033\\", 8, KEY_F6},
-        {"\033_KtA>\033\\", 8, KEY_F6}, // 't' = repeat
-        {"\033_KrA>\033\\", 8, KEY_IGNORE}, // 'r' = release
-        {"\033_KzA>\033\\", 0, 0}, // 'z' = invalid event type
-        {"\033_KpH>\033\\", 8, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F6},
-        {"\033_KpI>\033\\", 8, KEY_IGNORE}, // Super bit (0x8) set in mods ('I')
-        {"\033_KpA>?\\", 0, 0}, // Invalid string terminator
-        {"\033_KpA>\033?", 0, 0}, // Invalid string terminator
-        {"\033_KpFe\033\\", 8, MOD_CTRL | 'M'}, // Ctrl+Shift+m (Shift stripped)
-        {"\033_KpAB\033\\", 8, '\''},
-        {"\033_KpA-\033\\", 8, KEY_END},
-        {"\033_KpA:\033\\", 8, KEY_IGNORE},
-        {"\033_KpA'\033\\", 0, 0},
-        {"\033_KpA~\033\\", 0, 0},
-        {"\033_KpABA\033\\", 9, KEY_IGNORE},
-        {"\033_KpABJ\033\\", 9, '0'},
-        {"\033_KpABS\033\\", 9, '9'},
-        {"\033_KpABT\033\\", 9, '.'},
-        {"\033_KpABU\033\\", 9, '/'},
-        {"\033_KpABV\033\\", 9, '*'},
-        {"\033_KpABW\033\\", 9, '-'},
-        {"\033_KpABX\033\\", 9, '+'},
-        {"\033_KpABY\033\\", 9, KEY_ENTER},
-        {"\033_KpABZ\033\\", 9, '='},
-        {"\033_KpAB1\033\\", 0, 0},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
