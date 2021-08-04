@@ -517,6 +517,10 @@ static void test_string_view(void)
     EXPECT_FALSE(strview_isblank(&sv6));
     sv6 = strview_from_cstring("  \r ");
     EXPECT_FALSE(strview_isblank(&sv6));
+
+    StringView sv7 = strview_from_cstring("  \t\t \ttrim test \t\t");
+    strview_trim(&sv7);
+    EXPECT_TRUE(strview_equal_cstring(&sv7, "trim test"));
 }
 
 static void test_get_delim(void)
