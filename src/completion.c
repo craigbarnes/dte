@@ -17,6 +17,7 @@
 #include "syntax/color.h"
 #include "tag.h"
 #include "util/ascii.h"
+#include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
@@ -198,13 +199,188 @@ static void collect_files(bool directories_only)
     }
 }
 
-static void collect_str(const char *const strs[], size_t n, const char *prefix)
+static void complete_files(const char* UNUSED_ARG(str), const CommandArgs* UNUSED_ARG(a))
 {
-    for (size_t i = 0; i < n; i++) {
-        if (str_has_prefix(strs[i], prefix)) {
-            add_completion(xstrdup(strs[i]));
+    collect_files(false);
+}
+
+static void complete_dirs(const char* UNUSED_ARG(str), const CommandArgs* UNUSED_ARG(a))
+{
+    collect_files(true);
+}
+
+static void complete_compile(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_compilers(str);
+    }
+}
+
+static void complete_errorfmt(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_compilers(str);
+    } else if (a->nr_args >= 2 && !cmdargs_has_flag(a, 'i')) {
+        collect_errorfmt_capture_names(str);
+    }
+}
+
+static void complete_ft(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_ft(str);
+    }
+}
+
+static void complete_hi(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_hl_colors(str);
+    } else {
+        collect_colors_and_attributes(str);
+    }
+}
+
+static void complete_include(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        if (cmdargs_has_flag(a, 'b')) {
+            collect_builtin_configs(str);
+        } else {
+            collect_files(false);
         }
     }
+}
+
+static void complete_macro(const char *str, const CommandArgs *a)
+{
+    static const char verbs[][8] = {
+        "cancel",
+        "play",
+        "record",
+        "stop",
+        "toggle",
+    };
+
+    if (a->nr_args != 0) {
+        return;
+    }
+
+    for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
+        if (str_has_prefix(verbs[i], str)) {
+            add_completion(xstrdup(verbs[i]));
+        }
+    }
+}
+
+static void complete_open(const char* UNUSED_ARG(str), const CommandArgs *a)
+{
+    if (!cmdargs_has_flag(a, 't')) {
+        collect_files(false);
+    }
+}
+
+static void complete_option(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        if (!cmdargs_has_flag(a, 'r')) {
+            collect_ft(str);
+        }
+    } else if (a->nr_args & 1) {
+        collect_auto_options(str);
+    } else {
+        collect_option_values(a->args[a->nr_args - 1], str);
+    }
+}
+
+static void complete_set(const char *str, const CommandArgs *a)
+{
+    if ((a->nr_args + 1) & 1) {
+        bool local = cmdargs_has_flag(a, 'l');
+        bool global = cmdargs_has_flag(a, 'g');
+        collect_options(str, local, global);
+    } else {
+        collect_option_values(a->args[a->nr_args - 1], str);
+    }
+}
+
+static void complete_setenv(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_env(str);
+    } else if (a->nr_args == 1 && str[0] == '\0') {
+        BUG_ON(!a->args[0]);
+        const char *value = getenv(a->args[0]);
+        if (value) {
+            add_completion(xstrdup(value));
+        }
+    }
+}
+
+static void complete_show(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        collect_show_subcommands(str);
+    } else if (a->nr_args == 1) {
+        BUG_ON(!a->args[0]);
+        collect_show_subcommand_args(a->args[0], str);
+    }
+}
+
+static void complete_tag(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
+        TagFile *tf = load_tag_file();
+        if (tf) {
+            collect_tags(tf, str);
+        }
+    }
+}
+
+static void complete_toggle(const char *str, const CommandArgs *a)
+{
+    if (a->nr_args == 0) {
+        bool global = cmdargs_has_flag(a, 'g');
+        collect_toggleable_options(str, global);
+    }
+}
+
+static void complete_wsplit(const char* UNUSED_ARG(str), const CommandArgs *a)
+{
+    if (!cmdargs_has_flag(a, 't') && !cmdargs_has_flag(a, 'n')) {
+        collect_files(false);
+    }
+}
+
+typedef struct {
+    char cmd_name[12];
+    void (*complete)(const char *str, const CommandArgs *a);
+} CompletionHandler;
+
+static const CompletionHandler handlers[] = {
+    {"cd", complete_dirs},
+    {"compile", complete_compile},
+    {"errorfmt", complete_errorfmt},
+    {"ft", complete_ft},
+    {"hi", complete_hi},
+    {"include", complete_include},
+    {"macro", complete_macro},
+    {"open", complete_open},
+    {"option", complete_option},
+    {"pipe-from", complete_files},
+    {"pipe-to", complete_files},
+    {"run", complete_files},
+    {"save", complete_files},
+    {"set", complete_set},
+    {"setenv", complete_setenv},
+    {"show", complete_show},
+    {"tag", complete_tag},
+    {"toggle", complete_toggle},
+    {"wsplit", complete_wsplit},
+};
+
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(handlers, cmd_name, strcmp);
 }
 
 static void collect_completions(char **args, size_t argc)
@@ -230,112 +406,14 @@ static void collect_completions(char **args, size_t argc)
         goto out;
     }
 
-    const StringView cmd_name = strview_from_cstring(args[0]);
-
-    if (
-        strview_equal_cstring(&cmd_name, "save")
-        || strview_equal_cstring(&cmd_name, "run")
-        || strview_equal_cstring(&cmd_name, "pipe-from")
-        || strview_equal_cstring(&cmd_name, "pipe-to")
-    ) {
-        collect_files(false);
-    } else if (strview_equal_cstring(&cmd_name, "open")) {
-        if (!cmdargs_has_flag(&a, 't')) {
-            collect_files(false);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "wsplit")) {
-        if (!cmdargs_has_flag(&a, 't') && !cmdargs_has_flag(&a, 'n')) {
-            collect_files(false);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "cd")) {
-        collect_files(true);
-    } else if (strview_equal_cstring(&cmd_name, "include")) {
-        if (a.nr_args == 0) {
-            if (cmdargs_has_flag(&a, 'b')) {
-                collect_builtin_configs(completion.parsed);
-            } else {
-                collect_files(false);
-            }
-        }
-    } else if (strview_equal_cstring(&cmd_name, "ft")) {
-        if (a.nr_args == 0) {
-            collect_ft(completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "hi")) {
-        if (a.nr_args == 0) {
-            collect_hl_colors(completion.parsed);
-        } else {
-            collect_colors_and_attributes(completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "option")) {
-        if (a.nr_args == 0) {
-            if (!cmdargs_has_flag(&a, 'r')) {
-                collect_ft(completion.parsed);
-            }
-        } else if (a.nr_args & 1) {
-            collect_auto_options(completion.parsed);
-        } else {
-            collect_option_values(a.args[a.nr_args - 1], completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "set")) {
-        if ((a.nr_args + 1) & 1) {
-            bool local = cmdargs_has_flag(&a, 'l');
-            bool global = cmdargs_has_flag(&a, 'g');
-            collect_options(completion.parsed, local, global);
-        } else {
-            collect_option_values(a.args[a.nr_args - 1], completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "setenv")) {
-        if (a.nr_args == 0) {
-            collect_env(completion.parsed);
-        } else if (a.nr_args == 1 && completion.parsed[0] == '\0') {
-            BUG_ON(!a.args[0]);
-            const char *value = getenv(a.args[0]);
-            if (value) {
-                add_completion(xstrdup(value));
-            }
-        }
-    } else if (strview_equal_cstring(&cmd_name, "toggle")) {
-        if (a.nr_args == 0) {
-            bool global = cmdargs_has_flag(&a, 'g');
-            collect_toggleable_options(completion.parsed, global);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "tag")) {
-        if (a.nr_args == 0 && !cmdargs_has_flag(&a, 'r')) {
-            TagFile *tf = load_tag_file();
-            if (tf) {
-                collect_tags(tf, completion.parsed);
-            }
-        }
-    } else if (strview_equal_cstring(&cmd_name, "compile")) {
-        if (a.nr_args == 0) {
-            collect_compilers(completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "errorfmt")) {
-        if (a.nr_args == 0) {
-            collect_compilers(completion.parsed);
-        } else if (a.nr_args >= 2 && !cmdargs_has_flag(&a, 'i')) {
-            collect_errorfmt_capture_names(completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "repeat")) {
+    const CompletionHandler *h = BSEARCH(args[0], handlers, (CompareFunction)strcmp);
+    if (h) {
+        h->complete(completion.parsed, &a);
+    } else if (streq(args[0], "repeat")) {
         if (a.nr_args == 1) {
             collect_normal_commands(completion.parsed);
         } else if (a.nr_args >= 2) {
             collect_completions(args + 2, argc - 2);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "show")) {
-        if (a.nr_args == 0) {
-            collect_show_subcommands(completion.parsed);
-        } else if (a.nr_args == 1) {
-            BUG_ON(!a.args[0]);
-            collect_show_subcommand_args(a.args[0], completion.parsed);
-        }
-    } else if (strview_equal_cstring(&cmd_name, "macro")) {
-        static const char *const verbs[] = {
-            "record", "stop", "toggle", "cancel", "play"
-        };
-        if (a.nr_args == 0) {
-            collect_str(verbs, ARRAY_COUNT(verbs), completion.parsed);
         }
     }
 
