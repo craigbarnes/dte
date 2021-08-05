@@ -128,6 +128,11 @@ static void test_complete_command(void)
     EXPECT_STRING_EQ(c->buf, "open test/data/.editorconfig ");
     reset_completion();
 
+    cmdline_set_text(c, "wsplit -bhr test/data/.e");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "wsplit -bhr test/data/.editorconfig ");
+    reset_completion();
+
     cmdline_set_text(c, "toggle ");
     complete_command_next();
     EXPECT_STRING_EQ(c->buf, "toggle auto-indent");
@@ -144,10 +149,19 @@ static void test_complete_command(void)
     reset_completion();
 
     ASSERT_EQ(setenv(ENV_VAR_NAME, "xyz", true), 0);
+
     cmdline_set_text(c, "insert $" ENV_VAR_PREFIX);
     complete_command_next();
     EXPECT_STRING_EQ(c->buf, "insert $" ENV_VAR_NAME);
     reset_completion();
+
+    cmdline_set_text(c, "setenv " ENV_VAR_PREFIX);
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "setenv " ENV_VAR_NAME " ");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "setenv " ENV_VAR_NAME " xyz ");
+    reset_completion();
+
     ASSERT_EQ(unsetenv(ENV_VAR_NAME), 0);
 
     cmdline_clear(c);
@@ -225,6 +239,16 @@ static void test_complete_command(void)
     EXPECT_STRING_EQ(c->buf, "errorfmt c r _");
     complete_command_next();
     EXPECT_STRING_EQ(c->buf, "errorfmt c r column");
+    reset_completion();
+
+    cmdline_set_text(c, "ft javasc");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "ft javascript ");
+    reset_completion();
+
+    cmdline_set_text(c, "macro rec");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "macro record ");
     reset_completion();
 
     cmdline_set_text(c, "repeat 3 ");
