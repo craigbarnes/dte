@@ -13,9 +13,7 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
         ['"']  = '"', ['\\'] = '\\',
     };
 
-    const unsigned char *arg = sv.data;
-    size_t len = sv.length;
-    if (len == 0) {
+    if (sv.length == 0) {
         string_append_literal(s, "''");
         return;
     }
@@ -24,13 +22,12 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
     if (has_tilde_slash_prefix && !escape_tilde) {
         // Print "~/" and skip past it, so it doesn't get quoted
         string_append_literal(s, "~/");
-        arg += 2;
-        len -= 2;
+        strview_remove_prefix(&sv, 2);
     }
 
     bool squote = false;
-    for (size_t i = 0; i < len; i++) {
-        const unsigned char c = arg[i];
+    for (size_t i = 0, n = sv.length; i < n; i++) {
+        const unsigned char c = sv.data[i];
         switch (c) {
         case ' ':
         case '"':
@@ -49,20 +46,20 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 
     if (squote) {
         string_append_byte(s, '\'');
-        string_append_buf(s, arg, len);
+        string_append_strview(s, &sv);
         string_append_byte(s, '\'');
     } else {
         if (has_tilde_slash_prefix && escape_tilde) {
             string_append_byte(s, '\\');
         }
-        string_append_buf(s, arg, len);
+        string_append_strview(s, &sv);
     }
     return;
 
 dquote:
     string_append_byte(s, '"');
-    for (size_t i = 0; i < len; i++) {
-        const unsigned char ch = arg[i];
+    for (size_t i = 0, n = sv.length; i < n; i++) {
+        const unsigned char ch = sv.data[i];
         if (unlikely(ch < sizeof(escmap) && escmap[ch])) {
             string_append_byte(s, '\\');
             string_append_byte(s, escmap[ch]);
