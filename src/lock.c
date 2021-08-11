@@ -7,10 +7,11 @@
 #include "lock.h"
 #include "editor.h"
 #include "error.h"
-#include "util/ascii.h"
 #include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
+#include "util/string-view.h"
+#include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
@@ -20,56 +21,47 @@ static bool process_exists(pid_t pid)
     return !kill(pid, 0);
 }
 
-static pid_t rewrite_lock_file(char *buf, ssize_t *sizep, const char *filename)
+static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 {
-    size_t filename_len = strlen(filename);
-    pid_t my_pid = editor.pid;
-    ssize_t size = *sizep;
-    ssize_t pos = 0;
+    const size_t filename_len = strlen(filename);
+    const pid_t my_pid = editor.pid;
+    size_t size = *sizep;
     pid_t other_pid = 0;
 
-    while (pos < size) {
-        ssize_t bol = pos;
-        bool remove_line = false;
-        pid_t pid = 0;
-
-        while (pos < size && ascii_isdigit(buf[pos])) {
-            pid *= 10;
-            pid += buf[pos++] - '0';
+    for (size_t pos = 0, bol = 0; pos < size; bol = pos) {
+        StringView line = buf_slice_next_line(buf, &pos, size);
+        uintmax_t num;
+        size_t numlen = buf_parse_uintmax(line.data, line.length, &num);
+        if (unlikely(numlen == 0 || num != (pid_t)num)) {
+            goto remove_line;
         }
-        while (pos < size && (buf[pos] == ' ' || buf[pos] == '\t')) {
-            pos++;
-        }
-        char *nl = memchr(buf + pos, '\n', size - pos);
-        ssize_t next_bol = nl - buf + 1;
 
-        bool same =
-            filename_len == next_bol - 1 - pos
-            && mem_equal(buf + pos, filename, filename_len)
-        ;
+        strview_remove_prefix(&line, numlen);
+        if (unlikely(!strview_has_prefix(&line, " /"))) {
+            goto remove_line;
+        }
+        strview_remove_prefix(&line, 1);
+
+        bool same = strview_equal_strn(&line, filename, filename_len);
+        pid_t pid = (pid_t)num;
         if (pid == my_pid) {
             if (same) {
-                // lock = 1 => pid conflict. lock must be stale
-                // lock = 0 => normal unlock case
-                remove_line = true;
+                goto remove_line;
             }
+            continue;
         } else if (process_exists(pid)) {
             if (same) {
                 other_pid = pid;
             }
-        } else {
-            // Release lock from dead process
-            remove_line = true;
+            continue;
         }
 
-        if (remove_line) {
-            memmove(buf + bol, buf + next_bol, size - next_bol);
-            size -= next_bol - bol;
-            pos = bol;
-        } else {
-            pos = next_bol;
-        }
+        remove_line:
+        memmove(buf + bol, buf + pos, size - pos);
+        size -= pos - bol;
+        pos = bol;
     }
+
     *sizep = size;
     return other_pid;
 }
@@ -106,11 +98,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
         }
 
         if (errno != EEXIST) {
-            error_msg (
-                "Error creating %s: %s",
-                file_locks_lock,
-                strerror(errno)
-            );
+            error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));
             return false;
         }
         if (++tries == 3) {
@@ -133,17 +121,16 @@ static bool lock_or_unlock(const char *filename, bool lock)
     }
 
     char *buf = NULL;
-    ssize_t size = read_file(file_locks, &buf);
-    if (size < 0) {
+    ssize_t ssize = read_file(file_locks, &buf);
+    if (ssize < 0) {
         if (errno != ENOENT) {
             error_msg("Error reading %s: %s", file_locks, strerror(errno));
             goto error;
         }
-        size = 0;
-    } else if (size > 0 && buf[size - 1] != '\n') {
-        buf[size++] = '\n';
+        ssize = 0;
     }
 
+    size_t size = (size_t)ssize;
     pid_t pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
