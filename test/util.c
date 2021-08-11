@@ -554,25 +554,22 @@ static void test_size_str_width(void)
 
 static void test_buf_parse_ulong(void)
 {
-    {
-        char ulong_max[64];
-        size_t ulong_max_len = xsnprintf(ulong_max, 64, "%lu", ULONG_MAX);
-
-        unsigned long val = 88;
-        size_t digits = buf_parse_ulong(ulong_max, ulong_max_len, &val);
-        EXPECT_EQ(digits, ulong_max_len);
-        EXPECT_EQ(val, ULONG_MAX);
-
-        val = 99;
-        ulong_max[ulong_max_len++] = '1';
-        digits = buf_parse_ulong(ulong_max, ulong_max_len, &val);
-        EXPECT_EQ(digits, 0);
-        EXPECT_EQ(val, 99);
-    }
-
     unsigned long val;
+    char max[DECIMAL_STR_MAX(val) + 1];
+    size_t max_len = xsnprintf(max, sizeof max, "%lu", ULONG_MAX);
+
+    val = 88;
+    EXPECT_EQ(buf_parse_ulong(max, max_len, &val), max_len);
+    EXPECT_EQ(val, ULONG_MAX);
+
+    val = 99;
+    max[max_len++] = '1';
+    EXPECT_EQ(buf_parse_ulong(max, max_len, &val), 0);
+    EXPECT_EQ(val, 99);
+
     EXPECT_EQ(buf_parse_ulong("0", 1, &val), 1);
     EXPECT_EQ(val, 0);
+
     EXPECT_EQ(buf_parse_ulong("9876", 4, &val), 4);
     EXPECT_EQ(val, 9876);
 }
