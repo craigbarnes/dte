@@ -463,11 +463,10 @@ static void cmd_eval(const CommandArgs *a)
 {
     SpawnContext ctx = {
         .argv = a->args,
-        .input = STRING_VIEW_INIT,
         .output = STRING_INIT,
-        .flags = SPAWN_DEFAULT
+        .flags = SPAWN_QUIET
     };
-    if (!spawn_filter(&ctx)) {
+    if (!spawn_source(&ctx)) {
         return;
     }
     exec_config(&normal_commands, strview_from_string(&ctx.output));
