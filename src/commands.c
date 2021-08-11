@@ -836,15 +836,36 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
-    switch (last_flag(a)) {
-    case 'n':
-        activate_next_message();
-        return;
-    case 'p':
-        activate_prev_message();
+    const char *arg = a->args[0];
+    if (!arg) {
+        switch (last_flag(a)) {
+        case 0:
+            activate_current_message();
+            break;
+        case 'n':
+            activate_next_message();
+            break;
+        case 'p':
+            activate_prev_message();
+            break;
+        default:
+            BUG("unexpected flag");
+        }
         return;
     }
-    activate_current_message();
+
+    if (a->nr_flags != 0) {
+        error_msg("flags (-n|-p) and arguments are mutually exclusive");
+        return;
+    }
+
+    size_t idx;
+    if (!str_to_size(arg, &idx) || idx == 0) {
+        error_msg("invalid message index: %s", arg);
+        return;
+    }
+
+    activate_message(idx - 1);
 }
 
 static void cmd_new_line(const CommandArgs* UNUSED_ARG(a))
@@ -2146,7 +2167,7 @@ static const Command cmds[] = {
     {"macro", "", false, 1, 1, cmd_macro},
     {"match-bracket", "", false, 0, 0, cmd_match_bracket},
     {"move-tab", "", false, 1, 1, cmd_move_tab},
-    {"msg", "np", false, 0, 0, cmd_msg},
+    {"msg", "np", false, 0, 1, cmd_msg},
     {"new-line", "", false, 0, 0, cmd_new_line},
     {"next", "", false, 0, 0, cmd_next},
     {"open", "e=gt", false, 0, -1, cmd_open},

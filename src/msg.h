@@ -29,6 +29,7 @@ void pop_file_location(void);
 
 Message *new_message(const char *msg, size_t len) RETURNS_NONNULL;
 void add_message(Message *m);
+void activate_message(size_t idx);
 void activate_current_message(void);
 void activate_next_message(void);
 void activate_prev_message(void);

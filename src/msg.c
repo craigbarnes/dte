@@ -157,6 +157,15 @@ void activate_current_message(void)
     }
 }
 
+void activate_message(size_t idx)
+{
+    if (msgs.count == 0) {
+        return;
+    }
+    msg_pos = (idx < msgs.count) ? idx : msgs.count - 1;
+    activate_current_message();
+}
+
 void activate_next_message(void)
 {
     if (msg_pos + 1 < msgs.count) {
