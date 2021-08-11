@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "msg.h"
 #include "buffer.h"
 #include "edit.h"
@@ -7,6 +8,8 @@
 #include "move.h"
 #include "search.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
+#include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 #include "view.h"
@@ -205,4 +208,57 @@ void clear_messages(void)
 size_t message_count(void)
 {
     return msgs.count;
+}
+
+String dump_messages(void)
+{
+    String buf = string_new(4096);
+    char cwd[8192];
+    if (unlikely(!getcwd(cwd, sizeof cwd))) {
+        return buf;
+    }
+
+    for (size_t i = 0, n = msgs.count; i < n; i++) {
+        const Message *m = msgs.ptrs[i];
+        string_sprintf(&buf, "%zu: ", i + 1);
+
+        const FileLocation *loc = m->loc;
+        if (!loc || !loc->filename) {
+            goto append_msg;
+        }
+
+        if (path_is_absolute(loc->filename)) {
+            char *rel = relative_filename(loc->filename, cwd);
+            string_append_cstring(&buf, rel);
+            free(rel);
+        } else {
+            string_append_cstring(&buf, loc->filename);
+        }
+
+        string_append_byte(&buf, ':');
+
+        if (loc->pattern) {
+            string_append_literal(&buf, "  /");
+            string_append_cstring(&buf, loc->pattern);
+            string_append_literal(&buf, "/\n");
+            continue;
+        }
+
+        if (loc->line != 0) {
+            string_append_cstring(&buf, ulong_to_str(loc->line));
+            string_append_byte(&buf, ':');
+            if (loc->column != 0) {
+                string_append_cstring(&buf, ulong_to_str(loc->column));
+                string_append_byte(&buf, ':');
+            }
+        }
+
+        string_append_literal(&buf, "  ");
+
+        append_msg:
+        string_append_cstring(&buf, m->msg);
+        string_append_byte(&buf, '\n');
+    }
+
+    return buf;
 }

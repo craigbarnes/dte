@@ -20,6 +20,7 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
+#include "msg.h"
 #include "options.h"
 #include "syntax/color.h"
 #include "terminal/color.h"
@@ -328,6 +329,7 @@ static const ShowHandler handlers[] = {
     {"ft", true, NULL, dump_ft, NULL},
     {"include", false, show_include, dump_builtin_configs, collect_builtin_configs},
     {"macro", true, NULL, dump_macro, NULL},
+    {"msg", false, NULL, dump_messages, NULL},
     {"option", true, show_option, dump_options, collect_all_options},
     {"search", false, NULL, dump_search_history, NULL},
     {"wsplit", false, show_wsplit, dump_frames, NULL},

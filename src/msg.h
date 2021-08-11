@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "util/macros.h"
+#include "util/string.h"
 
 typedef struct {
     // Needed after buffer is closed
@@ -36,5 +37,6 @@ void activate_prev_message(void);
 void activate_current_message_save(void);
 void clear_messages(void);
 size_t message_count(void) PURE;
+String dump_messages(void);
 
 #endif
