@@ -473,6 +473,30 @@ static void cmd_eval(const CommandArgs *a)
     string_free(&ctx.output);
 }
 
+static void cmd_exec_msg(const CommandArgs *a)
+{
+    String messages = dump_messages();
+    SpawnContext ctx = {
+        .argv = a->args,
+        .input = strview_from_string(&messages),
+        .output = STRING_INIT,
+        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
+    };
+
+    bool spawned = spawn_filter(&ctx);
+    string_free(&messages);
+    if (!spawned) {
+        return;
+    }
+
+    size_t i;
+    if (buf_parse_size(ctx.output.buffer, ctx.output.len, &i) > 0 && i > 0) {
+        activate_message(i - 1);
+    }
+
+    string_free(&ctx.output);
+}
+
 static void cmd_exec_open(const CommandArgs *a)
 {
     SpawnContext ctx = {
@@ -2153,6 +2177,7 @@ static const Command cmds[] = {
     {"erase-word", "s", false, 0, 0, cmd_erase_word},
     {"errorfmt", "i", true, 2, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
     {"eval", "-", false, 1, -1, cmd_eval},
+    {"exec-msg", "-s", false, 1, -1, cmd_exec_msg},
     {"exec-open", "-s", false, 1, -1, cmd_exec_open},
     {"exec-tag", "-s", false, 1, -1, cmd_exec_tag},
     {"filter", "-l", false, 1, -1, cmd_filter},

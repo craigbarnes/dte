@@ -73,6 +73,17 @@ size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp)
     return n;
 }
 
+size_t buf_parse_size(const char *str, size_t len, size_t *valp)
+{
+    uintmax_t val;
+    size_t n = buf_parse_uintmax(str, len, &val);
+    if (n == 0 || val > SIZE_MAX) {
+        return 0;
+    }
+    *valp = (size_t)val;
+    return n;
+}
+
 static size_t buf_parse_long(const char *str, size_t size, long *valp)
 {
     if (unlikely(size == 0)) {
