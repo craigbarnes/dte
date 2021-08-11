@@ -552,6 +552,33 @@ static void test_size_str_width(void)
     EXPECT_EQ(size_str_width(2147483647), 10);
 }
 
+static void test_buf_parse_uintmax(void)
+{
+    uintmax_t val;
+    char max[DECIMAL_STR_MAX(val) + 2];
+    size_t max_len = xsnprintf(max, sizeof max, "%ju", UINTMAX_MAX);
+
+    val = 11;
+    EXPECT_EQ(buf_parse_uintmax(max, max_len, &val), max_len);
+    EXPECT_UINT_EQ(val, UINTMAX_MAX);
+
+    val = 22;
+    max[max_len++] = '9';
+    EXPECT_EQ(buf_parse_uintmax(max, max_len, &val), 0);
+    EXPECT_EQ(val, 22);
+
+    val = 33;
+    max[max_len++] = '7';
+    EXPECT_EQ(buf_parse_uintmax(max, max_len, &val), 0);
+    EXPECT_EQ(val, 33);
+
+    EXPECT_EQ(buf_parse_uintmax("0", 1, &val), 1);
+    EXPECT_EQ(val, 0);
+
+    EXPECT_EQ(buf_parse_uintmax("0019817", 8, &val), 7);
+    EXPECT_EQ(val, 19817);
+}
+
 static void test_buf_parse_ulong(void)
 {
     unsigned long val;
@@ -560,7 +587,7 @@ static void test_buf_parse_ulong(void)
 
     val = 88;
     EXPECT_EQ(buf_parse_ulong(max, max_len, &val), max_len);
-    EXPECT_EQ(val, ULONG_MAX);
+    EXPECT_UINT_EQ(val, ULONG_MAX);
 
     val = 99;
     max[max_len++] = '1';
@@ -1773,6 +1800,7 @@ static const TestEntry tests[] = {
     TEST(test_string_view),
     TEST(test_get_delim),
     TEST(test_size_str_width),
+    TEST(test_buf_parse_uintmax),
     TEST(test_buf_parse_ulong),
     TEST(test_str_to_int),
     TEST(test_str_to_size),
