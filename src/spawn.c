@@ -214,28 +214,35 @@ static void exec_error(const char *argv0)
 
 bool spawn_filter(SpawnContext *ctx)
 {
+    bool quiet = !!(ctx->flags & SPAWN_QUIET);
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
-    int dev_null = -1;
+    int errfd = -1;
     if (!pipe_close_on_exec(p0) || !pipe_close_on_exec(p1)) {
         perror_msg("pipe");
         goto error;
     }
 
-    dev_null = open_dev_null(O_WRONLY);
-    if (dev_null < 0) {
-        goto error;
+    if (quiet) {
+        errfd = open_dev_null(O_WRONLY);
+        if (errfd < 0) {
+            goto error;
+        }
+    } else {
+        errfd = 2;
     }
 
-    int fd[3] = {p0[0], p1[1], dev_null};
-    term_raw_isig();
+    int fd[3] = {p0[0], p1[1], errfd};
+    yield_terminal(quiet);
     const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         goto error;
     }
 
-    xclose(dev_null);
+    if (quiet) {
+        xclose(errfd);
+    }
     xclose(p0[0]);
     xclose(p1[1]);
     filter(p1[0], p0[1], ctx);
@@ -243,7 +250,7 @@ bool spawn_filter(SpawnContext *ctx)
     xclose(p0[1]);
 
     int err = handle_child_error(pid);
-    term_raw();
+    resume_terminal(quiet, false);
     if (err) {
         string_free(&ctx->output);
         return false;
@@ -251,12 +258,14 @@ bool spawn_filter(SpawnContext *ctx)
     return true;
 
 error:
-    term_raw();
+    resume_terminal(quiet, false);
     xclose(p0[0]);
     xclose(p0[1]);
     xclose(p1[0]);
     xclose(p1[1]);
-    xclose(dev_null);
+    if (quiet) {
+        xclose(errfd);
+    }
     return false;
 }
 

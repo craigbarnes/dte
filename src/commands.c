@@ -553,7 +553,7 @@ static void cmd_filter(const CommandArgs *a)
         .env = lines_and_columns_env(),
         .input = STRING_VIEW_INIT,
         .output = STRING_INIT,
-        .flags = SPAWN_DEFAULT
+        .flags = SPAWN_QUIET
     };
 
     if (view->selection) {
