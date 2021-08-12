@@ -4,27 +4,40 @@
 #include "xsnprintf.h"
 #include "debug.h"
 
-size_t xvsnprintf (
-    char *restrict buf,
-    size_t len,
-    const char *restrict format,
-    va_list ap
-) {
-    if (unlikely(len > INT_MAX)) {
-        fatal_error(__func__, EOVERFLOW);
+/*
+Note: ISO C doesn't require vsnprintf(3) to set errno, but POSIX does:
+
+> If an output error was encountered, these functions shall return
+> a negative value [CX] and set errno to indicate the error.
+
+ - https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+ - https://pubs.opengroup.org/onlinepubs/9699919799/functions/snprintf.html
+
+Errors applicable to snprintf(3)/vsnprintf(3):
+
+ - EILSEQ: A wide character does not correspond to a valid character
+ - EOVERFLOW: The value to be returned is greater than INT_MAX
+ - EOVERFLOW: The value of n is greater than INT_MAX
+*/
+
+size_t xvsnprintf(char *restrict s, size_t n, const char *restrict fmt, va_list v)
+{
+    int ret = vsnprintf(s, n, fmt, v);
+    if (unlikely(ret < 0)) {
+        fatal_error(__func__, errno);
     }
-    const int n = vsnprintf(buf, len, format, ap);
-    if (unlikely(n < 0 || n >= (int)len)) {
-        fatal_error(__func__, ERANGE);
+    if (unlikely(ret >= (int)n)) {
+        // Output truncated (insufficient buffer space)
+        fatal_error(__func__, ENOBUFS);
     }
-    return (size_t)n;
+    return (size_t)ret;
 }
 
-size_t xsnprintf(char *restrict buf, size_t len, const char *restrict format, ...)
+size_t xsnprintf(char *restrict s, size_t n, const char *restrict fmt, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    const size_t n = xvsnprintf(buf, len, format, ap);
-    va_end(ap);
-    return n;
+    va_list v;
+    va_start(v, fmt);
+    size_t ret = xvsnprintf(s, n, fmt, v);
+    va_end(v);
+    return ret;
 }
