@@ -94,9 +94,9 @@
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(malloc)
-    #define MALLOC __attribute__((__malloc__))
+    #define MALLOC WARN_UNUSED_RESULT __attribute__((__malloc__))
 #else
-    #define MALLOC
+    #define MALLOC WARN_UNUSED_RESULT
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(pure)
@@ -238,7 +238,7 @@
 #endif
 
 #define UNUSED_ARG(x) unused__ ## x UNUSED
-#define XMALLOC MALLOC RETURNS_NONNULL WARN_UNUSED_RESULT
+#define XMALLOC MALLOC RETURNS_NONNULL
 #define XSTRDUP XMALLOC NONNULL_ARGS
 #define NONNULL_ARGS_AND_RETURN RETURNS_NONNULL NONNULL_ARGS
 
