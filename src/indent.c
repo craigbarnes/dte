@@ -13,20 +13,21 @@ char *make_indent(size_t width)
         return NULL;
     }
 
+    size_t ntabs, nspaces;
     if (use_spaces_for_indent(buffer)) {
-        char *str = xmalloc(width + 1);
-        memset(str, ' ', width);
-        str[width] = '\0';
-        return str;
+        ntabs = 0;
+        nspaces = width;
+    } else {
+        size_t tw = buffer->options.tab_width;
+        ntabs = width / tw;
+        nspaces = width % tw;
     }
 
-    size_t tw = buffer->options.tab_width;
-    size_t nt = width / tw;
-    size_t ns = width % tw;
-    char *str = xmalloc(nt + ns + 1);
-    memset(str, '\t', nt);
-    memset(str + nt, ' ', ns);
-    str[nt + ns] = '\0';
+    size_t n = ntabs + nspaces;
+    char *str = xmalloc(n + 1);
+    memset(str, '\t', ntabs);
+    memset(str + ntabs, ' ', nspaces);
+    str[n] = '\0';
     return str;
 }
 
