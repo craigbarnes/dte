@@ -11,20 +11,20 @@ char *make_indent(size_t width)
         return NULL;
     }
 
-    char *str;
     if (use_spaces_for_indent(buffer)) {
-        str = xmalloc(width + 1);
+        char *str = xmalloc(width + 1);
         memset(str, ' ', width);
         str[width] = '\0';
-    } else {
-        size_t tw = buffer->options.tab_width;
-        size_t nt = width / tw;
-        size_t ns = width % tw;
-        str = xmalloc(nt + ns + 1);
-        memset(str, '\t', nt);
-        memset(str + nt, ' ', ns);
-        str[nt + ns] = '\0';
+        return str;
     }
+
+    size_t tw = buffer->options.tab_width;
+    size_t nt = width / tw;
+    size_t ns = width % tw;
+    char *str = xmalloc(nt + ns + 1);
+    memset(str, '\t', nt);
+    memset(str + nt, ' ', ns);
+    str[nt + ns] = '\0';
     return str;
 }
 
