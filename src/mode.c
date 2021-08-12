@@ -10,6 +10,7 @@
 #include "editor.h"
 #include "history.h"
 #include "search.h"
+#include "shift.h"
 #include "terminal/input.h"
 #include "util/debug.h"
 #include "util/unicode.h"

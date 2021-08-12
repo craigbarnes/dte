@@ -59,7 +59,7 @@ editor_objects := $(call prefix-obj, build/, \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
-    search selection show spawn tag vars view window ) \
+    search selection shift show spawn tag vars view window ) \
     $(command_objects) \
     $(editorconfig_objects) \
     $(syntax_objects) \

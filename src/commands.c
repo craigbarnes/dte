@@ -31,6 +31,7 @@
 #include "regexp.h"
 #include "search.h"
 #include "selection.h"
+#include "shift.h"
 #include "show.h"
 #include "spawn.h"
 #include "syntax/state.h"

@@ -1,5 +1,7 @@
+#include <string.h>
 #include <sys/types.h>
 #include "indent.h"
+#include "block-iter.h"
 #include "buffer.h"
 #include "regexp.h"
 #include "util/xmalloc.h"
@@ -174,22 +176,4 @@ size_t get_indent_level_bytes_right(void)
         }
     }
     return 0;
-}
-
-char *alloc_indent(size_t count, size_t *sizep)
-{
-    size_t size;
-    int ch;
-    if (use_spaces_for_indent(buffer)) {
-        ch = ' ';
-        size = count * buffer->options.indent_width;
-    } else {
-        ch = '\t';
-        size = count;
-    }
-
-    char *indent = xmalloc(size);
-    memset(indent, ch, size);
-    *sizep = size;
-    return indent;
 }

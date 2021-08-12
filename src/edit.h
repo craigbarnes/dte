@@ -15,7 +15,6 @@ void delete_ch(void);
 void erase(void);
 void insert_ch(CodePoint ch);
 void join_lines(void);
-void shift_lines(int count);
 void clear_lines(void);
 void delete_lines(void);
 void new_line(void);
