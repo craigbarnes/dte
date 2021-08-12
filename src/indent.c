@@ -178,17 +178,18 @@ size_t get_indent_level_bytes_right(void)
 
 char *alloc_indent(size_t count, size_t *sizep)
 {
-    char *indent;
     size_t size;
+    int ch;
     if (use_spaces_for_indent(buffer)) {
+        ch = ' ';
         size = count * buffer->options.indent_width;
-        indent = xmalloc(size);
-        memset(indent, ' ', size);
     } else {
+        ch = '\t';
         size = count;
-        indent = xmalloc(size);
-        memset(indent, '\t', size);
     }
+
+    char *indent = xmalloc(size);
+    memset(indent, ch, size);
     *sizep = size;
     return indent;
 }
