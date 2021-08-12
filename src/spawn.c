@@ -178,7 +178,9 @@ static int handle_child_error(pid_t pid)
     if (ret < 0) {
         perror_msg("waitpid");
     } else if (ret >= 256) {
-        error_msg("Child received signal %d", ret >> 8);
+        int sig = ret >> 8;
+        const char *str = strsignal(sig);
+        error_msg("Child received signal %d (%s)", sig, str ? str : "??");
     } else if (ret) {
         error_msg("Child returned %d", ret);
     }
