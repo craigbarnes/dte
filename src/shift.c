@@ -121,30 +121,33 @@ void shift_lines(int count)
         x = 0;
     }
 
-    if (view->selection) {
-        SelectionInfo info;
-        view->selection = SELECT_LINES;
-        init_selection(view, &info);
-        view->cursor = info.si;
-        size_t nr_lines = get_nr_selected_lines(&info);
-        do_shift_lines(count, nr_lines);
-        if (info.swapped) {
-            // Cursor should be at beginning of selection
-            block_iter_bol(&view->cursor);
-            view->sel_so = block_iter_get_offset(&view->cursor);
-            while (--nr_lines) {
-                block_iter_prev_line(&view->cursor);
-            }
-        } else {
-            BlockIter save = view->cursor;
-            while (--nr_lines) {
-                block_iter_prev_line(&view->cursor);
-            }
-            view->sel_so = block_iter_get_offset(&view->cursor);
-            view->cursor = save;
+    if (view->selection == SELECT_NONE) {
+        do_shift_lines(count, 1);
+        goto out;
+    }
+
+    SelectionInfo info;
+    view->selection = SELECT_LINES;
+    init_selection(view, &info);
+    view->cursor = info.si;
+    size_t nr_lines = get_nr_selected_lines(&info);
+    do_shift_lines(count, nr_lines);
+    if (info.swapped) {
+        // Cursor should be at beginning of selection
+        block_iter_bol(&view->cursor);
+        view->sel_so = block_iter_get_offset(&view->cursor);
+        while (--nr_lines) {
+            block_iter_prev_line(&view->cursor);
         }
     } else {
-        do_shift_lines(count, 1);
+        BlockIter save = view->cursor;
+        while (--nr_lines) {
+            block_iter_prev_line(&view->cursor);
+        }
+        view->sel_so = block_iter_get_offset(&view->cursor);
+        view->cursor = save;
     }
+
+out:
     move_to_preferred_x(x);
 }
