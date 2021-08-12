@@ -33,11 +33,19 @@ void error_msg(const char *format, ...)
         pos = snprintf(error_buf, size, "%s: ", cmd);
     }
 
-    if (pos >= 0 && pos < (size - 3)) {
+    if (unlikely(pos < 0)) {
+        // Note: POSIX snprintf(3) *does* set errno on failure (unlike ISO C)
+        DEBUG_LOG("snprintf() failed: %s", strerror(errno));
+        pos = 0;
+    }
+
+    if (likely(pos < (size - 3))) {
         va_list ap;
         va_start(ap, format);
         vsnprintf(error_buf + pos, size - pos, format, ap);
         va_end(ap);
+    } else {
+        DEBUG_LOG("no buffer space left for error message");
     }
 
     msg_is_error = true;
