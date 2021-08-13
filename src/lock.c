@@ -68,27 +68,13 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 
 static bool lock_or_unlock(const char *filename, bool lock)
 {
-    static char *file_locks;
-    static char *file_locks_lock;
-    static mode_t mode = 0666;
-    if (!file_locks) {
-        const char *dir = editor.xdg_runtime_dir;
-        if (dir && path_is_absolute(dir)) {
-            // Set sticky bit (see XDG Base Directory Specification)
-            #ifdef S_ISVTX
-                mode |= S_ISVTX;
-            #endif
-        } else {
-            dir = editor.user_config_dir;
-        }
-        file_locks = path_join(dir, "dte-locks");
-        file_locks_lock = path_join(dir, "dte-locks.lock");
-    }
-
+    const char *file_locks = editor.file_locks;
+    const char *file_locks_lock = editor.file_locks_lock;
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
         return true;
     }
 
+    const mode_t mode = editor.file_locks_mode;
     int tries = 0;
     int wfd;
     while (1) {

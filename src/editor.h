@@ -27,7 +27,9 @@ typedef struct {
     GlobalOptions options;
     StringView home_dir;
     const char *user_config_dir;
-    const char *xdg_runtime_dir;
+    const char *file_locks;
+    const char *file_locks_lock;
+    mode_t file_locks_mode;
     Encoding charset;
     bool child_controls_terminal;
     bool everything_changed;

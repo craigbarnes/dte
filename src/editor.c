@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "editor.h"
 #include "bind.h"
@@ -23,6 +24,7 @@
 #include "util/exitcode.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
+#include "util/path.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
@@ -39,6 +41,7 @@ EditorState editor = {
     .exit_code = EX_OK,
     .buffers = PTR_ARRAY_INIT,
     .version = version,
+    .file_locks_mode = 0666,
     .cmdline_x = 0,
     .cmdline = {
         .buf = STRING_INIT,
@@ -93,14 +96,30 @@ void init_editor_state(void)
 {
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
-    editor.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    editor.home_dir = strview_intern(home ? home : "");
+    const char *xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
 
+    editor.home_dir = strview_intern(home ? home : "");
     if (dte_home) {
         editor.user_config_dir = xstrdup(dte_home);
     } else {
         editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
     }
+
+    if (!xdg_runtime_dir || !path_is_absolute(xdg_runtime_dir)) {
+        xdg_runtime_dir = editor.user_config_dir;
+    } else {
+        // Set sticky bit (see XDG Base Directory Specification)
+        #ifdef S_ISVTX
+            editor.file_locks_mode |= S_ISVTX;
+        #endif
+    }
+
+    char *locks = path_join(xdg_runtime_dir, "dte-locks");
+    char *llocks = path_join(xdg_runtime_dir, "dte-locks.lock");
+    editor.file_locks = str_intern(locks);
+    editor.file_locks_lock = str_intern(llocks);
+    free(locks);
+    free(llocks);
 
     log_init("DTE_LOG");
     DEBUG_LOG("version: %s", version);
