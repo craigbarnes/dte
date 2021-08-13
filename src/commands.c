@@ -1288,16 +1288,17 @@ static void cmd_refresh(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_repeat(const CommandArgs *a)
 {
-    unsigned int count = 0;
-    if (!str_to_uint(a->args[0], &count)) {
+    unsigned int count;
+    if (unlikely(!str_to_uint(a->args[0], &count))) {
         error_msg("Not a valid repeat count: %s", a->args[0]);
         return;
-    } else if (count == 0) {
+    }
+    if (unlikely(count == 0)) {
         return;
     }
 
     const Command *cmd = find_normal_command(a->args[1]);
-    if (!cmd) {
+    if (unlikely(!cmd)) {
         error_msg("No such command: %s", a->args[1]);
         return;
     }
@@ -1306,7 +1307,7 @@ static void cmd_repeat(const CommandArgs *a)
     current_command = cmd;
     bool ok = parse_args(cmd, &a2);
     current_command = NULL;
-    if (!ok) {
+    if (unlikely(!ok)) {
         return;
     }
 
@@ -1317,6 +1318,9 @@ static void cmd_repeat(const CommandArgs *a)
         size_t bufsize;
         if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
             error_msg("Repeated insert would overflow");
+            return;
+        }
+        if (unlikely(bufsize == 0)) {
             return;
         }
         char *buf = malloc(bufsize);
