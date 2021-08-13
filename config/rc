@@ -14,8 +14,8 @@ alias trim-lines 'replace "[ \t]+$" ""'
 alias xsel 'pipe-to xsel -b'
 alias exit quit
 
-errorfmt basic '^([^:]+):([0-9]+):([0-9]+):' file line column
-errorfmt basic '^([^:]+):([0-9]+):' file line
+errorfmt basic '^([^:]+):([0-9]+):([0-9]+): *(.*)$' file line column message
+errorfmt basic '^([^:]+):([0-9]+): *(.*)$' file line message
 alias git-grep 'compile -1s basic git grep -n'
 
 # Remove possible 'F' from $LESS so that less will always wait
