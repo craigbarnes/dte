@@ -152,7 +152,7 @@ nocache:
     return binding;
 }
 
-static void key_binding_free(KeyBinding *binding)
+static void free_key_binding(KeyBinding *binding)
 {
     if (binding) {
         if (binding->cmd) {
@@ -162,12 +162,18 @@ static void key_binding_free(KeyBinding *binding)
     }
 }
 
+static void free_key_binding_entry(KeyBindingEntry *entry)
+{
+    free_key_binding(entry->bind);
+    free(entry);
+}
+
 void add_binding(InputMode mode, KeyCode key, const char *command)
 {
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;
-        key_binding_free(table[idx]);
+        free_key_binding(table[idx]);
         table[idx] = key_binding_new(mode, command);
         return;
     }
@@ -183,7 +189,7 @@ void remove_binding(InputMode mode, KeyCode key)
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
         KeyBinding **table = bindings[mode].table;
-        key_binding_free(table[idx]);
+        free_key_binding(table[idx]);
         table[idx] = NULL;
         return;
     }
@@ -194,8 +200,7 @@ void remove_binding(InputMode mode, KeyCode key)
         KeyBindingEntry *entry = ptr_array->ptrs[--i];
         if (entry->key == key) {
             ptr_array_remove_idx(ptr_array, i);
-            key_binding_free(entry->bind);
-            free(entry);
+            free_key_binding_entry(entry);
             return;
         }
     }
