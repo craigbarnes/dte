@@ -397,20 +397,19 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     blk->nl += ins_nl;
     buffer->nl += ins_nl;
     blk->size = new_size;
-
     sanity_check_blocks(true);
-
     view_update_cursor_y(view);
-    if (del_nl == ins_nl) {
-        // Some line(s) changed but lines after them did not move up or down
-        buffer_mark_lines_changed(buffer, view->cy, view->cy + del_nl);
-    } else {
-        buffer_mark_lines_changed(buffer, view->cy, LONG_MAX);
-    }
+
+    // If the number of inserted and removed bytes are the same, some
+    // line(s) changed but the lines after them didn't move up or down
+    long max = (del_nl == ins_nl) ? view->cy + del_nl : LONG_MAX;
+    buffer_mark_lines_changed(buffer, view->cy, max);
+
     if (buffer->syn) {
         hl_delete(buffer, view->cy, del_nl);
         hl_insert(buffer, view->cy, ins_nl);
     }
+
     return deleted;
 
 slow:
