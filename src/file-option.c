@@ -101,11 +101,11 @@ void set_file_options(Buffer *b)
         }
 
         BUG_ON(opt->type != FILE_OPTIONS_FILENAME);
-        if (!b->abs_filename) {
+        const char *filename = b->abs_filename;
+        if (!filename) {
             continue;
         }
 
-        const char *filename = b->abs_filename;
         const regex_t *re = &opt->u.filename->re;
         regmatch_t m;
         if (regexp_exec(re, filename, strlen(filename), 0, &m, 0)) {
@@ -117,16 +117,16 @@ void set_file_options(Buffer *b)
 void add_file_options(FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
     FileOption *opt = xnew(FileOption, 1);
+    size_t len = str.length;
     if (type == FILE_OPTIONS_FILETYPE) {
-        if (unlikely(str.length == 0)) {
+        if (unlikely(len == 0)) {
             goto error;
         }
-        opt->u.filetype = xstrcut(str.data, str.length);
+        opt->u.filetype = xstrcut(str.data, len);
         goto append;
     }
 
     BUG_ON(type != FILE_OPTIONS_FILENAME);
-    size_t len = str.length;
     CachedRegexp *r = xmalloc(sizeof(*r) + len + 1);
     memcpy(r->str, str.data, len);
     r->str[len] = '\0';
