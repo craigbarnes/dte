@@ -1,6 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+#include <regex.h>
 #include <stdbool.h>
 #include "util/macros.h"
 
@@ -17,9 +18,17 @@ typedef enum {
     REPLACE_CANCEL = 1 << 4,
 } ReplaceFlags;
 
-SearchDirection get_search_direction(void) PURE;
-void set_search_direction(SearchDirection dir);
-void toggle_search_direction(void);
+typedef struct {
+    regex_t regex;
+    char *pattern;
+    SearchDirection direction;
+    int re_flags; // If zero, regex hasn't been compiled
+} SearchState;
+
+static inline void toggle_search_direction(SearchDirection *direction)
+{
+    *direction ^= 1;
+}
 
 bool search_tag(const char *pattern, bool *err);
 void search_set_regexp(const char *pattern);

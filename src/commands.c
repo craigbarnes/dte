@@ -1671,7 +1671,7 @@ static void cmd_search(const CommandArgs *a)
     bool next = has_flag(a, 'n');
     bool prev = has_flag(a, 'p');
     bool w = has_flag(a, 'w');
-    SearchDirection dir = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
+    SearchDirection direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
 
     if (unlikely(w && pattern)) {
         error_msg("flag -w can't be used with search pattern");
@@ -1704,7 +1704,7 @@ static void cmd_search(const CommandArgs *a)
     do_selection(SELECT_NONE);
 
     if (pattern) {
-        set_search_direction(dir);
+        editor.search.direction = direction;
         search_set_regexp(pattern);
         if (w) {
             search_next_word();
@@ -1720,7 +1720,7 @@ static void cmd_search(const CommandArgs *a)
         search_prev();
     } else {
         set_input_mode(INPUT_SEARCH);
-        set_search_direction(dir);
+        editor.search.direction = direction;
     }
 }
 

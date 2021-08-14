@@ -10,6 +10,7 @@
 #include "history.h"
 #include "mode.h"
 #include "options.h"
+#include "search.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -24,6 +25,7 @@ typedef struct {
     EditorStatus status;
     InputMode input_mode;
     CommandLine cmdline;
+    SearchState search;
     GlobalOptions options;
     StringView home_dir;
     const char *user_config_dir;

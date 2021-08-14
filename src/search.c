@@ -10,25 +10,17 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
-static struct {
-    regex_t regex;
-    char *pattern;
-    SearchDirection direction;
-    int re_flags; // If zero, regex hasn't been compiled
-} current_search;
-
 static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
 {
     int flags = block_iter_is_bol(bi) ? 0 : REG_NOTBOL;
 
     do {
-        regmatch_t match;
-        StringView line;
-
         if (block_iter_is_eof(bi)) {
             return false;
         }
 
+        regmatch_t match;
+        StringView line;
         fill_line_ref(bi, &line);
 
         // NOTE: If this is the first iteration then line.data contains
@@ -54,9 +46,11 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
             view_reset_preferred_x(view);
             return true;
         }
-        skip = false; // Not at cursor position anymore
+
+        skip = false; // Not at cursor position any more
         flags = 0;
     } while (block_iter_next_line(bi));
+
     return false;
 }
 
@@ -107,9 +101,11 @@ static bool do_search_bwd(regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
             view_reset_preferred_x(view);
             return true;
         }
-next:
+
+        next:
         cx = -1;
     } while (block_iter_prev_line(bi));
+
     return false;
 }
 
@@ -137,26 +133,11 @@ bool search_tag(const char *pattern, bool *err)
     return found;
 }
 
-void set_search_direction(SearchDirection dir)
+static void free_regex(SearchState *search)
 {
-    current_search.direction = dir;
-}
-
-SearchDirection get_search_direction(void)
-{
-    return current_search.direction;
-}
-
-void toggle_search_direction(void)
-{
-    current_search.direction ^= 1;
-}
-
-static void free_regex(void)
-{
-    if (current_search.re_flags) {
-        regfree(&current_search.regex);
-        current_search.re_flags = 0;
+    if (search->re_flags) {
+        regfree(&search->regex);
+        search->re_flags = 0;
     }
 }
 
@@ -170,10 +151,9 @@ static bool has_upper(const char *str)
     return false;
 }
 
-static bool update_regex(void)
+static bool update_regex(SearchState *search)
 {
     int re_flags = REG_NEWLINE;
-
     switch (editor.options.case_sensitive_search) {
     case CSS_TRUE:
         break;
@@ -181,80 +161,81 @@ static bool update_regex(void)
         re_flags |= REG_ICASE;
         break;
     case CSS_AUTO:
-        if (!has_upper(current_search.pattern)) {
+        if (!has_upper(search->pattern)) {
             re_flags |= REG_ICASE;
         }
         break;
+    default:
+        BUG("unhandled case sensitivity value");
     }
 
-    if (re_flags == current_search.re_flags) {
+    if (re_flags == search->re_flags) {
         return true;
     }
 
-    free_regex();
+    free_regex(search);
 
-    current_search.re_flags = re_flags;
-    if (regexp_compile (
-        &current_search.regex,
-        current_search.pattern,
-        current_search.re_flags
-    )) {
+    search->re_flags = re_flags;
+    if (regexp_compile(&search->regex, search->pattern, search->re_flags)) {
         return true;
     }
 
-    free_regex();
+    free_regex(search);
     return false;
 }
 
 void search_set_regexp(const char *pattern)
 {
-    free_regex();
-    free(current_search.pattern);
-    current_search.pattern = xstrdup(pattern);
+    SearchState *search = &editor.search;
+    free_regex(search);
+    free(search->pattern);
+    search->pattern = xstrdup(pattern);
 }
 
 static void do_search_next(bool skip)
 {
-    BlockIter bi = view->cursor;
-
-    if (!current_search.pattern) {
+    SearchState *search = &editor.search;
+    if (!search->pattern) {
         error_msg("No previous search pattern");
         return;
     }
-    if (!update_regex()) {
+    if (!update_regex(search)) {
         return;
     }
-    if (current_search.direction == SEARCH_FWD) {
-        if (do_search_fwd(&current_search.regex, &bi, true)) {
+
+    BlockIter bi = view->cursor;
+    if (search->direction == SEARCH_FWD) {
+        if (do_search_fwd(&search->regex, &bi, true)) {
             return;
         }
 
         block_iter_bof(&bi);
-        if (do_search_fwd(&current_search.regex, &bi, false)) {
+        if (do_search_fwd(&search->regex, &bi, false)) {
             info_msg("Continuing at top");
         } else {
-            error_msg("Pattern '%s' not found", current_search.pattern);
+            error_msg("Pattern '%s' not found", search->pattern);
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
-        if (do_search_bwd(&current_search.regex, &bi, cursor_x, skip)) {
+        if (do_search_bwd(&search->regex, &bi, cursor_x, skip)) {
             return;
         }
 
         block_iter_eof(&bi);
-        if (do_search_bwd(&current_search.regex, &bi, -1, false)) {
+        if (do_search_bwd(&search->regex, &bi, -1, false)) {
             info_msg("Continuing at bottom");
         } else {
-            error_msg("Pattern '%s' not found", current_search.pattern);
+            error_msg("Pattern '%s' not found", search->pattern);
         }
     }
 }
 
 void search_prev(void)
 {
-    current_search.direction ^= 1;
+    SearchDirection *dir = &editor.search.direction;
+    toggle_search_direction(dir);
     search_next();
-    current_search.direction ^= 1;
+    toggle_search_direction(dir);
 }
 
 void search_next(void)
@@ -420,6 +401,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     if (flags & REPLACE_IGNORE_CASE) {
         re_flags |= REG_ICASE;
     }
+
     if (flags & REPLACE_BASIC) {
         if (!regexp_compile_basic(&re, pattern, re_flags)) {
             return;

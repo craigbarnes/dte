@@ -299,7 +299,7 @@ static void cmd_case(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_direction(const CommandArgs* UNUSED_ARG(a))
 {
-    toggle_search_direction();
+    toggle_search_direction(&editor.search.direction);
 }
 
 static const Command common_cmds[] = {

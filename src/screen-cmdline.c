@@ -78,7 +78,7 @@ void update_command_line(void)
         break;
     }
     case INPUT_SEARCH:
-        prefix = get_search_direction() == SEARCH_FWD ? '/' : '?';
+        prefix = editor.search.direction == SEARCH_FWD ? '/' : '?';
         // fallthrough
     case INPUT_COMMAND:
         editor.cmdline_x = print_command(prefix);
