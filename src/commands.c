@@ -1326,18 +1326,45 @@ static void cmd_repeat(const CommandArgs *a)
             return;
         }
 
+        char tmp[4096];
+        bool move_after = has_flag(&a2, 'm');
         if (str_len == 1) {
             memset(buf, str[0], bufsize);
-        } else {
-            // TODO: for many repeats of small strings, fill in the first 4K
-            // and then use that to batch copy larger blocks (making sure to
-            // handle any unaligned remainder).
+            goto insert;
+        } else if (bufsize < 2 * sizeof(tmp) || str_len > sizeof(tmp) / 8) {
             for (size_t i = 0; i < count; i++) {
                 memcpy(buf + (i * str_len), str, str_len);
             }
+            goto insert;
         }
 
-        bool move_after = has_flag(&a2, 'm');
+        size_t strs_per_tmp = sizeof(tmp) / str_len;
+        size_t tmp_len = strs_per_tmp * str_len;
+        size_t tmps_per_buf = bufsize / tmp_len;
+        size_t remainder = bufsize % tmp_len;
+
+        // Create a block of text containing `strs_per_tmp` concatenated strs
+        for (size_t i = 0; i < strs_per_tmp; i++) {
+            memcpy(tmp + (i * str_len), str, str_len);
+        }
+
+        // Copy `tmps_per_buf` copies of `tmp` into `buf`
+        for (size_t i = 0; i < tmps_per_buf; i++) {
+            memcpy(buf + (i * tmp_len), tmp, tmp_len);
+        }
+
+        // Copy the remainder into `buf` (if any)
+        if (remainder) {
+            memcpy(buf + (tmps_per_buf * tmp_len), tmp, remainder);
+        }
+
+        DEBUG_LOG (
+            "Optimized %u inserts of %zu bytes into %zu inserts of %zu bytes",
+            count, str_len,
+            tmps_per_buf, tmp_len
+        );
+
+        insert:
         insert_text(buf, bufsize, move_after);
         free(buf);
         return;
