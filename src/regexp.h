@@ -44,6 +44,7 @@ static inline bool regexp_is_valid(const char *pattern, int flags)
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
 bool regexp_match_nosub(const char *pattern, const StringView *buf) WARN_UNUSED_RESULT;
 void regexp_init_word_boundary_tokens(void);
+void regexp_error_msg(const regex_t *re, const char *pattern, int err);
 
 bool regexp_exec (
     const regex_t *re,

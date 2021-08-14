@@ -75,9 +75,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     if (use_re) {
         int err = regcomp(&re, str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB);
         if (unlikely(err)) {
-            char msg[1024];
-            regerror(err, &re, msg, sizeof msg);
-            error_msg("%s: %s", msg, str);
+            regexp_error_msg(&re, str, err);
             return;
         }
     }

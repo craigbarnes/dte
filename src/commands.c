@@ -1015,18 +1015,15 @@ static void cmd_option(const CommandArgs *a)
     }
 
     if (has_flag(a, 'r')) {
-        char *regex = xstrdup(a->args[0]);
-        char **opts = copy_string_array(strs, nstrs);
-        add_file_options(FILE_OPTIONS_FILENAME, regex, opts);
+        const StringView pattern = strview_from_cstring(a->args[0]);
+        add_file_options(FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
         return;
     }
 
     const char *ft_list = a->args[0];
     for (size_t pos = 0, len = strlen(ft_list); pos < len; ) {
-        const StringView sv = get_delim(ft_list, &pos, len, ',');
-        char *filetype = xstrcut(sv.data, sv.length);
-        char **opts = copy_string_array(strs, nstrs);
-        add_file_options(FILE_OPTIONS_FILETYPE, filetype, opts);
+        const StringView filetype = get_delim(ft_list, &pos, len, ',');
+        add_file_options(FILE_OPTIONS_FILETYPE, filetype, strs, nstrs);
     }
 }
 

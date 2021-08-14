@@ -19,13 +19,18 @@ bool regexp_match_nosub(const char *pattern, const StringView *buf)
     return ret;
 }
 
+void regexp_error_msg(const regex_t *re, const char *pattern, int err)
+{
+    char msg[1024];
+    regerror(err, re, msg, sizeof(msg));
+    error_msg("%s: %s", msg, pattern);
+}
+
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 {
     int err = regcomp(re, pattern, flags);
     if (err) {
-        char msg[1024];
-        regerror(err, re, msg, sizeof(msg));
-        error_msg("%s: %s", msg, pattern);
+        regexp_error_msg(re, pattern, err);
         return false;
     }
     return true;

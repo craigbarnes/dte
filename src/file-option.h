@@ -3,6 +3,7 @@
 
 #include "buffer.h"
 #include "util/macros.h"
+#include "util/string-view.h"
 #include "util/string.h"
 
 typedef enum {
@@ -10,7 +11,7 @@ typedef enum {
     FILE_OPTIONS_FILETYPE,
 } FileOptionType;
 
-void add_file_options(FileOptionType type, char *to, char **strs) NONNULL_ARGS;
+void add_file_options(FileOptionType type, StringView str, char **strs, size_t nstrs) NONNULL_ARGS;
 void set_file_options(Buffer *b) NONNULL_ARGS;
 void set_editorconfig_options(Buffer *b) NONNULL_ARGS;
 void dump_file_options(String *buf);

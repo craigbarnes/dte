@@ -10,9 +10,17 @@
 #include "util/xmalloc.h"
 
 typedef struct {
+    regex_t re;
+    char str[];
+} CachedRegexp;
+
+typedef struct {
     FileOptionType type;
-    char *type_or_pattern;
     char **strs;
+    union {
+        char *filetype;
+        CachedRegexp *filename;
+    } u;
 } FileOption;
 
 static PointerArray file_options = PTR_ARRAY_INIT;
@@ -85,49 +93,73 @@ void set_file_options(Buffer *b)
 {
     for (size_t i = 0, n = file_options.count; i < n; i++) {
         const FileOption *opt = file_options.ptrs[i];
-        switch (opt->type) {
-        case FILE_OPTIONS_FILETYPE:
-            if (streq(opt->type_or_pattern, b->options.filetype)) {
+        if (opt->type == FILE_OPTIONS_FILETYPE) {
+            if (streq(opt->u.filetype, b->options.filetype)) {
                 set_options(opt->strs);
             }
-            break;
-        case FILE_OPTIONS_FILENAME:
-            if (b->abs_filename) {
-                const StringView f = strview_from_cstring(b->abs_filename);
-                if (regexp_match_nosub(opt->type_or_pattern, &f)) {
-                    set_options(opt->strs);
-                }
-            }
-            break;
-        default:
-            BUG("unhandled file option type");
+            continue;
+        }
+
+        BUG_ON(opt->type != FILE_OPTIONS_FILENAME);
+        if (!b->abs_filename) {
+            continue;
+        }
+
+        const char *filename = b->abs_filename;
+        const regex_t *re = &opt->u.filename->re;
+        regmatch_t m;
+        if (regexp_exec(re, filename, strlen(filename), 0, &m, 0)) {
+            set_options(opt->strs);
         }
     }
 }
 
-void add_file_options(FileOptionType type, char *to, char **strs)
+void add_file_options(FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
-    if (
-        (type == FILE_OPTIONS_FILENAME && !regexp_is_valid(to, REG_NEWLINE))
-        || (type == FILE_OPTIONS_FILETYPE && to[0] == '\0')
-    ) {
-        free(to);
-        free_string_array(strs);
-        return;
+    FileOption *opt = xnew(FileOption, 1);
+    if (type == FILE_OPTIONS_FILETYPE) {
+        if (unlikely(str.length == 0)) {
+            goto error;
+        }
+        opt->u.filetype = xstrcut(str.data, str.length);
+        goto append;
     }
 
-    FileOption *opt = xnew(FileOption, 1);
+    BUG_ON(type != FILE_OPTIONS_FILENAME);
+    size_t len = str.length;
+    CachedRegexp *r = xmalloc(sizeof(*r) + len + 1);
+    memcpy(r->str, str.data, len);
+    r->str[len] = '\0';
+    opt->u.filename = r;
+
+    int err = regcomp(&r->re, r->str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB);
+    if (unlikely(err)) {
+        regexp_error_msg(&r->re, r->str, err);
+        free(r);
+        goto error;
+    }
+
+append:
     opt->type = type;
-    opt->type_or_pattern = to;
-    opt->strs = strs;
+    opt->strs = copy_string_array(strs, nstrs);
     ptr_array_append(&file_options, opt);
+    return;
+
+error:
+    free(opt);
+    return;
 }
 
 void dump_file_options(String *buf)
 {
     for (size_t i = 0, n = file_options.count; i < n; i++) {
         const FileOption *opt = file_options.ptrs[i];
-        const char *tp = opt->type_or_pattern;
+        const char *tp;
+        if (opt->type == FILE_OPTIONS_FILENAME) {
+            tp = opt->u.filename->str;
+        } else {
+            tp = opt->u.filetype;
+        }
         char **strs = opt->strs;
         string_append_literal(buf, "option ");
         if (opt->type == FILE_OPTIONS_FILENAME) {
