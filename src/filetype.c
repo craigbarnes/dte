@@ -40,49 +40,68 @@ UNITTEST {
     CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
 }
 
+typedef struct {
+    regex_t re;
+    char str[];
+} CachedRegexp;
+
+typedef struct {
+    unsigned int str_len;
+    char str[];
+} FlexArrayStr;
+
 // Filetypes dynamically added via the `ft` command.
 // Not grouped by name to make it possible to order them freely.
 typedef struct {
-    FileDetectionType type : 8;
-    unsigned int name_len : 8;
-    unsigned int str_len : 16;
-    char data[]; // Contains name followed by str (both null-terminated)
+    union {
+        FlexArrayStr *str;
+        CachedRegexp *regexp;
+    } u;
+    uint8_t type; // FileDetectionType
+    char name[];
 } UserFileTypeEntry;
 
 static PointerArray filetypes = PTR_ARRAY_INIT;
 
-static const char *ft_get_name(const UserFileTypeEntry *ft)
+static bool ft_uses_regex(FileDetectionType type)
 {
-    return ft->data;
-}
-
-static const char *ft_get_str(const UserFileTypeEntry *ft)
-{
-    return ft->data + ft->name_len + 1;
+    return type == FT_CONTENT || type == FT_FILENAME;
 }
 
 void add_filetype(const char *name, const char *str, FileDetectionType type)
 {
-    const size_t name_len = strlen(name);
-    const size_t str_len = strlen(str);
-    if (unlikely(name_len > 0xFF || str_len > 0xFFFF)) {
-        error_msg("ft argument exceeds maximum length");
-        return;
-    }
-
-    if (type == FT_CONTENT || type == FT_FILENAME) {
-        if (!regexp_is_valid(str, REG_NEWLINE)) {
+    regex_t re;
+    bool use_re = ft_uses_regex(type);
+    if (use_re) {
+        int err = regcomp(&re, str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB);
+        if (unlikely(err)) {
+            char msg[1024];
+            regerror(err, &re, msg, sizeof msg);
+            error_msg("%s: %s", msg, str);
             return;
         }
     }
 
-    const size_t data_len = name_len + str_len + 2;
-    UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + data_len);
+    size_t name_len = strlen(name);
+    size_t str_len = strlen(str);
+    UserFileTypeEntry *ft = xmalloc(sizeof(*ft) + name_len + 1);
     ft->type = type;
-    ft->name_len = name_len;
-    ft->str_len = str_len;
-    memcpy(ft->data, name, name_len + 1);
-    memcpy(ft->data + name_len + 1, str, str_len + 1);
+
+    char *str_dest;
+    if (use_re) {
+        CachedRegexp *r = xmalloc(sizeof(*r) + str_len + 1);
+        r->re = re;
+        ft->u.regexp = r;
+        str_dest = r->str;
+    } else {
+        FlexArrayStr *s = xmalloc(sizeof(*s) + str_len + 1);
+        s->str_len = str_len;
+        ft->u.str = s;
+        str_dest = s->str;
+    }
+
+    memcpy(ft->name, name, name_len + 1);
+    memcpy(str_dest, str, str_len + 1);
     ptr_array_append(&filetypes, ft);
 }
 
@@ -164,15 +183,16 @@ static StringView get_interpreter(StringView line)
 
 static bool ft_str_match(const UserFileTypeEntry *ft, const StringView sv)
 {
-    const char *str = ft_get_str(ft);
-    const size_t len = (size_t)ft->str_len;
+    const char *str = ft->u.str->str;
+    const size_t len = ft->u.str->str_len;
     return sv.length > 0 && strview_equal_strn(&sv, str, len);
 }
 
 static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
 {
-    const char *str = ft_get_str(ft);
-    return sv.length > 0 && regexp_match_nosub(str, &sv);
+    const regex_t *re = &ft->u.regexp->re;
+    regmatch_t m;
+    return sv.length > 0 && regexp_exec(re, sv.data, sv.length, 0, &m, 0);
 }
 
 HOT const char *find_ft(const char *filename, StringView line)
@@ -215,7 +235,7 @@ HOT const char *find_ft(const char *filename, StringView line)
         default:
             BUG("unhandled detection type");
         }
-        return ft_get_name(ft);
+        return ft->name;
     }
 
     // Search built-in lookup tables
@@ -287,7 +307,7 @@ bool is_ft(const char *name)
 
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
-        if (streq(ft_get_name(ft), name)) {
+        if (streq(ft->name, name)) {
             return true;
         }
     }
@@ -305,11 +325,16 @@ void collect_ft(const char *prefix)
     }
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
-        const char *name = ft_get_name(ft);
+        const char *name = ft->name;
         if (str_has_prefix(name, prefix)) {
             add_completion(xstrdup(name));
         }
     }
+}
+
+static const char *ft_get_str(const UserFileTypeEntry *ft)
+{
+    return ft_uses_regex(ft->type) ? ft->u.regexp->str : ft->u.str->str;
 }
 
 String dump_ft(void)
@@ -325,15 +350,13 @@ String dump_ft(void)
     String s = string_new(4096);
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
-        const char *name = ft_get_name(ft);
-        FileDetectionType type = ft->type;
-        BUG_ON(type >= ARRAY_COUNT(flags));
+        BUG_ON(ft->type >= ARRAY_COUNT(flags));
         string_append_literal(&s, "ft ");
-        string_append_cstring(&s, flags[type]);
-        if (unlikely(name[0] == '-')) {
+        string_append_cstring(&s, flags[ft->type]);
+        if (unlikely(ft->name[0] == '-')) {
             string_append_cstring(&s, "-- ");
         }
-        string_append_escaped_arg(&s, name, true);
+        string_append_escaped_arg(&s, ft->name, true);
         string_append_byte(&s, ' ');
         string_append_escaped_arg(&s, ft_get_str(ft), true);
         string_append_byte(&s, '\n');
