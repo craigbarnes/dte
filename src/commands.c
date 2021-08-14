@@ -1325,12 +1325,18 @@ static void cmd_repeat(const CommandArgs *a)
             perror_msg("malloc");
             return;
         }
-        // TODO: for many repeats of small strings, fill in the first 4K
-        // and then use that to batch copy larger blocks (making sure to
-        // handle any unaligned remainder).
-        for (size_t i = 0; i < count; i++) {
-            memcpy(buf + (i * str_len), str, str_len);
+
+        if (str_len == 1) {
+            memset(buf, str[0], bufsize);
+        } else {
+            // TODO: for many repeats of small strings, fill in the first 4K
+            // and then use that to batch copy larger blocks (making sure to
+            // handle any unaligned remainder).
+            for (size_t i = 0; i < count; i++) {
+                memcpy(buf + (i * str_len), str, str_len);
+            }
         }
+
         bool move_after = has_flag(&a2, 'm');
         insert_text(buf, bufsize, move_after);
         free(buf);
