@@ -376,6 +376,7 @@ static unsigned int replace_on_line (
         // Don't match beginning of line again
         eflags = REG_NOTBOL;
     }
+
 out:
     if (buf != line->data) {
         free(buf);
@@ -385,33 +386,23 @@ out:
 
 void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
 {
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
-    size_t nr_bytes;
-    bool swapped = false;
-    int re_flags = REG_NEWLINE;
-    unsigned int nr_substitutions = 0;
-    size_t nr_lines = 0;
-    regex_t re;
-
-    if (pattern[0] == '\0') {
+    if (unlikely(pattern[0] == '\0')) {
         error_msg("Search pattern must contain at least 1 character");
         return;
     }
 
-    if (flags & REPLACE_IGNORE_CASE) {
-        re_flags |= REG_ICASE;
+    int re_flags = REG_NEWLINE;
+    re_flags |= (flags & REPLACE_IGNORE_CASE) ? REG_ICASE : 0;
+    re_flags |= (flags & REPLACE_BASIC) ? 0 : REG_EXTENDED;
+
+    regex_t re;
+    if (unlikely(!regexp_compile_internal(&re, pattern, re_flags))) {
+        return;
     }
 
-    if (flags & REPLACE_BASIC) {
-        if (!regexp_compile_basic(&re, pattern, re_flags)) {
-            return;
-        }
-    } else {
-        if (!regexp_compile(&re, pattern, re_flags)) {
-            return;
-        }
-    }
-
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    size_t nr_bytes;
+    bool swapped = false;
     if (view->selection) {
         SelectionInfo info;
         init_selection(view, &info);
@@ -432,6 +423,8 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
         begin_change_chain();
     }
 
+    unsigned int nr_substitutions = 0;
+    size_t nr_lines = 0;
     while (1) {
         StringView line;
         fill_line_ref(&bi, &line);
@@ -448,14 +441,12 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
             nr_substitutions += nr;
             nr_lines++;
         }
-        if (flags & REPLACE_CANCEL) {
-            break;
-        }
-        if (count + 1 >= nr_bytes) {
-            break;
-        }
-        nr_bytes -= count + 1;
 
+        if (flags & REPLACE_CANCEL || count + 1 >= nr_bytes) {
+            break;
+        }
+
+        nr_bytes -= count + 1;
         block_iter_next_line(&bi);
     }
 
