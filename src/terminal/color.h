@@ -66,13 +66,9 @@ static inline void color_split_rgb(int32_t c, uint8_t *r, uint8_t *g, uint8_t *b
     *b = c & 0xff;
 }
 
-static inline bool same_color(const TermColor *c1, const TermColor *c2)
+static inline bool same_color(const TermColor *a, const TermColor *b)
 {
-    return
-        c1->attr == c2->attr
-        && c1->fg == c2->fg
-        && c1->bg == c2->bg
-    ;
+    return a->fg == b->fg && a->bg == b->bg && a->attr == b->attr;
 }
 
 bool parse_term_color(TermColor *color, char **strs) NONNULL_ARGS;
