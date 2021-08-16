@@ -19,6 +19,7 @@ enum FeatureFlags {
     BCE = 0x01, // Can erase with specific background color (back color erase)
     REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
     TITLE = 0x04, // Supports xterm control codes for setting window title
+    RXVT = 0x08, // Uses quirky, rxvt-style key codes
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -70,10 +71,10 @@ static const TermEntry terms[] = {
     {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
     {"mlterm2", 7, TERM_8_COLOR, 0, TITLE},
     {"mlterm3", 7, TERM_8_COLOR, 0, TITLE},
-    {"mrxvt", 5, TERM_8_COLOR, 0, BCE | TITLE},
+    {"mrxvt", 5, TERM_8_COLOR, 0, RXVT | BCE | TITLE},
     {"pcansi", 6, TERM_8_COLOR, UL, 0},
     {"putty", 5, TERM_8_COLOR, DIM | REV | UL, BCE},
-    {"rxvt", 4, TERM_8_COLOR, 0, BCE | TITLE},
+    {"rxvt", 4, TERM_8_COLOR, 0, RXVT | BCE | TITLE},
     {"screen", 6, TERM_8_COLOR, 0, TITLE},
     {"st", 2, TERM_8_COLOR, 0, BCE},
     {"stterm", 6, TERM_8_COLOR, 0, BCE},
@@ -200,7 +201,7 @@ void term_init(void)
             terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
             terminal.control_codes.set_title_end = strview_from_cstring("\033\\");
         }
-        if (streq(entry->name, "rxvt") || streq(entry->name, "mrxvt")) {
+        if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
         }
         const int n = (int)name.length;
