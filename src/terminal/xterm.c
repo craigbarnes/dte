@@ -69,13 +69,18 @@ static KeyCode normalize_modified_other_key(KeyCode mods, KeyCode key)
         // the base key itself to change (i.e. "r" becomes "R',
         // "." becomes ">", etc.)
         mods &= ~MOD_SHIFT;
-        if (mods & MOD_CTRL) {
-            // The Ctrl modifier should always cause letters to
-            // be uppercase -- this assumption is too ingrained
-            // and causes too much breakage if not enforced
-            key = ascii_toupper(key);
-        }
+
+        static_assert(MOD_CTRL >> 21 == 0x20);
+        static_assert(ASCII_LOWER << 1 == 0x20);
+
+        // Presence of the Ctrl modifier should always cause letters
+        // to be uppercase. This assumption is too ingrained and
+        // causes too much breakage if not enforced.
+        // Note: the code below is a branchless equivalent of:
+        // `if (mods & MOD_CTRL) key = ascii_toupper(key);`.
+        key -= ((mods & MOD_CTRL) >> 21) & ((ascii_table[key] & ASCII_LOWER) << 1);
     }
+
     return mods | keycode_normalize(key);
 }
 
