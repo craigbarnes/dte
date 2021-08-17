@@ -10,6 +10,14 @@
 #include "util/macros.h"
 #include "util/unicode.h"
 
+typedef enum {
+    BYTE_INVALID,
+    BYTE_INTERMEDIATE, // 32..47
+    BYTE_PARAMETER, // 48..63
+    BYTE_FINAL, // 64..111
+    BYTE_FINAL_PRIVATE, // 112..126
+} ByteType;
+
 static const KeyCode special_keys[] = {
     [1] = KEY_HOME,
     [2] = KEY_INSERT,
@@ -133,14 +141,43 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     return 0;
 }
 
-static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
+static ByteType get_byte_type(unsigned char byte)
 {
-    uint32_t params[4] = {0, 0, 0, 0};
-    size_t nparams = 0;
-    uint8_t final_byte = 0;
+    enum {
+        I = BYTE_INTERMEDIATE,
+        P = BYTE_PARAMETER,
+        F = BYTE_FINAL,
+        f = BYTE_FINAL_PRIVATE,
+        x = BYTE_INVALID
+    };
 
+    // ECMA 48 divides bytes ("bit combinations") into 16 rows of 16 columns.
+    // The byte classifications mostly fall into their own rows:
+    static const uint8_t rows[16] = {
+        x, x, I, P, F, F, F, f,
+        x, x, x, x, x, x, x, x
+    };
+
+    // ... with the single exception being byte 127 (DEL), which falls into
+    // row 7, but isn't a final byte like the others in that row:
+    if (unlikely(byte == 127)) {
+        return BYTE_INVALID;
+    }
+
+    return rows[(byte >> 4) & 0xF];
+}
+
+static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    uint32_t params[4] = {0};
+    size_t nparams = 0;
+    uint8_t intermediate[4] = {0};
+    size_t nr_intermediate = 0;
+    uint8_t final_byte = 0;
+    bool unhandled_bytes = false;
     uint32_t num = 0;
     size_t digits = 0;
+
     while (i < len) {
         const char ch = buf[i++];
         switch (ch) {
@@ -148,33 +185,68 @@ static ssize_t parse_csi_num(const char *buf, size_t len, size_t i, KeyCode *k)
         case '5': case '6': case '7': case '8': case '9':
             num = (num * 10) + (ch - '0');
             if (unlikely(num > UNICODE_MAX_VALID_CODEPOINT)) {
-                return 0;
+                unhandled_bytes = true;
             }
             digits++;
             continue;
         case ';':
-            params[nparams++] = num;
-            if (unlikely(nparams > 2)) {
-                return 0;
+            if (unlikely(nparams >= ARRAY_COUNT(params))) {
+                unhandled_bytes = true;
+                continue;
             }
+            params[nparams++] = num;
             num = 0;
             digits = 0;
             continue;
-        case 'A': case 'B': case 'C': case 'D': case 'E':
-        case 'F': case 'H': case 'P': case 'Q': case 'R':
-        case 'S': case 'u': case '~':
+        case ':':
+            // TODO: handle sub-params
+            unhandled_bytes = true;
+            continue;
+        }
+
+        switch (get_byte_type(ch)) {
+        case BYTE_INTERMEDIATE:
+            if (unlikely(nr_intermediate >= ARRAY_COUNT(intermediate))) {
+                unhandled_bytes = true;
+            } else {
+                intermediate[nr_intermediate++] = ch;
+            }
+            continue;
+        case BYTE_FINAL:
+        case BYTE_FINAL_PRIVATE:
             final_byte = ch;
             if (digits > 0) {
-                params[nparams++] = num;
+                if (unlikely(nparams >= ARRAY_COUNT(params))) {
+                    unhandled_bytes = true;
+                } else {
+                    params[nparams++] = num;
+                }
             }
             goto exit_loop;
+        case BYTE_PARAMETER:
+            // ECMA-48 §5.4.2: "bit combinations 03/12 to 03/15 are
+            // reserved for future standardization except when used
+            // as the first bit combination of the parameter string."
+            // (03/12 to 03/15 == '<' to '?')
+            unhandled_bytes = true;
+            continue;
+        case BYTE_INVALID:
+            return 0;
         }
+
+        BUG("unhandled byte type");
         return 0;
     }
+
 exit_loop:
 
     if (unlikely(final_byte == 0)) {
         return (i >= len) ? -1 : 0;
+    }
+
+    if (unlikely(unhandled_bytes || nr_intermediate)) {
+        *k = KEY_IGNORE;
+        return i;
     }
 
     KeyCode mods = 0;
@@ -224,6 +296,36 @@ exit_loop:
             goto check_first_param_is_special_key;
         }
         return 0;
+    case 0:
+        switch (final_byte) {
+        case 'A': // Up
+        case 'B': // Down
+        case 'C': // Right
+        case 'D': // Left
+        case 'E': // Begin (keypad '5')
+        case 'F': // End
+        case 'H': // Home
+            *k = KEY_UP + (final_byte - 'A');
+            return i;
+        case 'P': // F1
+        case 'Q': // F2
+        case 'R': // F3
+        case 'S': // F4
+            *k = KEY_F1 + (final_byte - 'P');
+            return i;
+        case 'a': // Shift+Up (rxvt)
+        case 'b': // Shift+Down (rxvt)
+        case 'c': // Shift+Right (rxvt)
+        case 'd': // Shift+Left (rxvt)
+            *k = MOD_SHIFT | (KEY_UP + (final_byte - 'a'));
+            return i;
+        case 'L':
+            *k = KEY_INSERT;
+            return i;
+        case 'Z':
+            *k = MOD_SHIFT | KEY_TAB;
+            return i;
+        }
     }
     return 0;
 
@@ -240,62 +342,6 @@ check_first_param_is_1:
 set_k_and_return_i:
     *k = mods | key;
     return i;
-}
-
-static ssize_t parse_csi(const char *buf, size_t length, size_t i, KeyCode *k)
-{
-    if (unlikely(i >= length)) {
-        return -1;
-    }
-    char ch = buf[i++];
-    switch (ch) {
-    case 'A': // Up
-    case 'B': // Down
-    case 'C': // Right
-    case 'D': // Left
-    case 'E': // Begin (keypad '5')
-    case 'F': // End
-    case 'H': // Home
-        *k = KEY_UP + (ch - 'A');
-        return i;
-    case 'P': // F1
-    case 'Q': // F2
-    case 'R': // F3
-    case 'S': // F4
-        *k = KEY_F1 + (ch - 'P');
-        return i;
-    case 'a': // Shift+Up (rxvt)
-    case 'b': // Shift+Down (rxvt)
-    case 'c': // Shift+Right (rxvt)
-    case 'd': // Shift+Left (rxvt)
-        *k = MOD_SHIFT | (KEY_UP + (ch - 'a'));
-        return i;
-    case 'L':
-        *k = KEY_INSERT;
-        return i;
-    case 'Z':
-        *k = MOD_SHIFT | KEY_TAB;
-        return i;
-    case '0': case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '8': case '9':
-        return parse_csi_num(buf, length, i - 1, k);
-    case '[':
-        if (unlikely(i >= length)) {
-            return -1;
-        }
-        switch (ch = buf[i++]) {
-        // Linux console keys
-        case 'A': // F1
-        case 'B': // F2
-        case 'C': // F3
-        case 'D': // F4
-        case 'E': // F5
-            *k = KEY_F1 + (ch - 'A');
-            return i;
-        }
-        return 0;
-    }
-    return 0;
 }
 
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)

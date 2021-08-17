@@ -3,6 +3,7 @@
 #include "terminal/color.h"
 #include "terminal/ecma48.h"
 #include "terminal/key.h"
+#include "terminal/linux.h"
 #include "terminal/output.h"
 #include "terminal/rxvt.h"
 #include "terminal/terminal.h"
@@ -274,12 +275,6 @@ static void test_xterm_parse_key(void)
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
-        // Linux console
-        {"\033[[A", 4, KEY_F1},
-        {"\033[[B", 4, KEY_F2},
-        {"\033[[C", 4, KEY_F3},
-        {"\033[[D", 4, KEY_F4},
-        {"\033[[E", 4, KEY_F5},
         // rxvt
         {"\033Oa", 3, MOD_CTRL | KEY_UP},
         {"\033Ob", 3, MOD_CTRL | KEY_DOWN},
@@ -303,9 +298,9 @@ static void test_xterm_parse_key(void)
         {"\033[27;4;62~", 10, MOD_META | '>'},
         {"\033[27;5;46~", 10, MOD_CTRL | '.'},
         {"\033[27;3;1114111~", 15, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
-        {"\033[27;3;1114112~", 0, 0},
-        {"\033[27;999999999999999999999;123~", 0, 0},
-        {"\033[27;123;99999999999999999~", 0, 0},
+        {"\033[27;3;1114112~", 15, KEY_IGNORE},
+        {"\033[27;999999999999999999999;123~", 31, KEY_IGNORE},
+        {"\033[27;123;99999999999999999~", 27, KEY_IGNORE},
         // www.leonerd.org.uk/hacks/fixterms/
         {"\033[13;3u", 7, MOD_META | KEY_ENTER},
         {"\033[9;5u", 6, MOD_CTRL | KEY_TAB},
@@ -313,15 +308,19 @@ static void test_xterm_parse_key(void)
         {"\033[108;5u", 8, MOD_CTRL | 'L'},
         {"\033[127765;3u", 11, MOD_META | 127765ul},
         {"\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
-        {"\033[1114112;3u", 0, 0},
-        {"\033[11141110;3u", 0, 0},
-        {"\033[11141111;3u", 0, 0},
-        {"\033[2147483647;3u", 0, 0}, // INT32_MAX
-        {"\033[2147483648;3u", 0, 0}, // INT32_MAX + 1
-        {"\033[4294967295;3u", 0, 0}, // UINT32_MAX
-        {"\033[4294967296;3u", 0, 0}, // UINT32_MAX + 1
-        {"\033[-1;3u", 0, 0},
-        {"\033[-2;3u", 0, 0},
+        {"\033[1114112;3u", 12, KEY_IGNORE},
+        {"\033[11141110;3u", 13, KEY_IGNORE},
+        {"\033[11141111;3u", 13, KEY_IGNORE},
+        {"\033[2147483647;3u", 15, KEY_IGNORE}, // INT32_MAX
+        {"\033[2147483648;3u", 15, KEY_IGNORE}, // INT32_MAX + 1
+        {"\033[4294967295;3u", 15, KEY_IGNORE}, // UINT32_MAX
+        {"\033[4294967296;3u", 15, KEY_IGNORE}, // UINT32_MAX + 1
+        {"\033[-1;3u", 7, KEY_IGNORE},
+        {"\033[-2;3u", 7, KEY_IGNORE},
+        {"\033[ 2;3u", 7, KEY_IGNORE},
+        {"\033[<?>2;3u", 9, KEY_IGNORE},
+        {"\033[ !//.$2;3u", 12, KEY_IGNORE},
+        {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;
@@ -508,6 +507,49 @@ static void test_rxvt_parse_key(void)
     // Check that rxvt_parse_key() falls back to xterm_parse_key()
     KeyCode key;
     ssize_t n = rxvt_parse_key(STRN("\033[1;5A"), &key);
+    EXPECT_EQ(n, 6);
+    EXPECT_EQ(key, MOD_CTRL | KEY_UP);
+}
+
+static void test_linux_parse_key(void)
+{
+    KeyCode key;
+    ssize_t n = linux_parse_key(STRN("\033[[A"), &key);
+    EXPECT_EQ(n, 4);
+    EXPECT_EQ(key, KEY_F1);
+
+    n = linux_parse_key(STRN("\033[[B"), &key);
+    EXPECT_EQ(n, 4);
+    EXPECT_EQ(key, KEY_F2);
+
+    n = linux_parse_key(STRN("\033[[C"), &key);
+    EXPECT_EQ(n, 4);
+    EXPECT_EQ(key, KEY_F3);
+
+    n = linux_parse_key(STRN("\033[[D"), &key);
+    EXPECT_EQ(n, 4);
+    EXPECT_EQ(key, KEY_F4);
+
+    n = linux_parse_key(STRN("\033[[E"), &key);
+    EXPECT_EQ(n, 4);
+    EXPECT_EQ(key, KEY_F5);
+
+    key = 0x18;
+    n = linux_parse_key(STRN("\033"), &key);
+    EXPECT_EQ(n, -1);
+    EXPECT_EQ(key, 0x18);
+    n = linux_parse_key(STRN("\033["), &key);
+    EXPECT_EQ(n, -1);
+    EXPECT_EQ(key, 0x18);
+    n = linux_parse_key(STRN("\033[["), &key);
+    EXPECT_EQ(n, -1);
+    EXPECT_EQ(key, 0x18);
+    n = linux_parse_key(STRN("\033[[F"), &key);
+    EXPECT_EQ(n, 0);
+    EXPECT_EQ(key, 0x18);
+
+    // Check that linux_parse_key() falls back to xterm_parse_key()
+    n = linux_parse_key(STRN("\033[1;5A"), &key);
     EXPECT_EQ(n, 6);
     EXPECT_EQ(key, MOD_CTRL | KEY_UP);
 }
@@ -720,6 +762,7 @@ static const TestEntry tests[] = {
     TEST(test_xterm_parse_key),
     TEST(test_xterm_parse_key_combo),
     TEST(test_rxvt_parse_key),
+    TEST(test_linux_parse_key),
     TEST(test_keycode_to_string),
     TEST(test_parse_key_string),
     TEST(test_term_add_str),

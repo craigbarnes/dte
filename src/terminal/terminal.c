@@ -6,6 +6,7 @@
 #include <string.h>
 #include "terminal.h"
 #include "ecma48.h"
+#include "linux.h"
 #include "mode.h"
 #include "output.h"
 #include "rxvt.h"
@@ -20,6 +21,7 @@ enum FeatureFlags {
     REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
     TITLE = 0x04, // Supports xterm control codes for setting window title
     RXVT = 0x08, // Uses quirky, rxvt-style key codes
+    LINUX = 0x10, // Identifies as "linux"
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -65,7 +67,7 @@ static const TermEntry terms[] = {
     {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
     {"kterm", 5, TERM_8_COLOR, 0, 0},
-    {"linux", 5, TERM_8_COLOR, DIM | UL, BCE},
+    {"linux", 5, TERM_8_COLOR, DIM | UL, LINUX | BCE},
     {"mgt", 3, TERM_8_COLOR, 0, BCE},
     {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE},
     {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
@@ -203,6 +205,8 @@ void term_init(void)
         }
         if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
+        } else if (entry->flags & LINUX) {
+            terminal.parse_key_sequence = linux_parse_key;
         }
         const int n = (int)name.length;
         DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
