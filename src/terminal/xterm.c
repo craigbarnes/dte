@@ -18,7 +18,25 @@ typedef enum {
     BYTE_FINAL_PRIVATE, // 112..126
 } ByteType;
 
-static const KeyCode special_keys[] = {
+#define ENTRY(x) [(x - 64)]
+
+static const KeyCode final_byte_keys[] = {
+    ENTRY('A') = KEY_UP,
+    ENTRY('B') = KEY_DOWN,
+    ENTRY('C') = KEY_RIGHT,
+    ENTRY('D') = KEY_LEFT,
+    ENTRY('E') = KEY_BEGIN, // (keypad '5')
+    ENTRY('F') = KEY_END,
+    ENTRY('H') = KEY_HOME,
+    ENTRY('L') = KEY_INSERT,
+    ENTRY('M') = KEY_ENTER,
+    ENTRY('P') = KEY_F1,
+    ENTRY('Q') = KEY_F2,
+    ENTRY('R') = KEY_F3,
+    ENTRY('S') = KEY_F4,
+};
+
+static const KeyCode param_keys[] = {
     [1] = KEY_HOME,
     [2] = KEY_INSERT,
     [3] = KEY_DELETE,
@@ -63,9 +81,21 @@ static KeyCode decode_modifiers(uint32_t n)
     return mods << MOD_OFFSET;
 }
 
-static KeyCode decode_special_key(uint32_t n)
+static KeyCode decode_key_from_param(uint32_t param)
 {
-    return (n >= ARRAY_COUNT(special_keys)) ? 0 : special_keys[n];
+    if (param >= ARRAY_COUNT(param_keys)) {
+        return 0;
+    }
+    return param_keys[param];
+}
+
+static KeyCode decode_key_from_final_byte(uint8_t byte)
+{
+    byte -= 64;
+    if (byte >= ARRAY_COUNT(final_byte_keys)) {
+        return 0;
+    }
+    return final_byte_keys[byte];
 }
 
 // Fix quirky key codes sent when "modifyOtherKeys" is enabled
@@ -97,26 +127,15 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     if (unlikely(i >= length)) {
         return -1;
     }
+
     const char ch = buf[i++];
+    KeyCode key = decode_key_from_final_byte(ch);
+    if (key) {
+        *k = key;
+        return i;
+    }
+
     switch (ch) {
-    case 'A': // Up
-    case 'B': // Down
-    case 'C': // Right
-    case 'D': // Left
-    case 'E': // Begin (keypad '5')
-    case 'F': // End
-    case 'H': // Home
-        *k = KEY_UP + (ch - 'A');
-        return i;
-    case 'M':
-        *k = KEY_ENTER;
-        return i;
-    case 'P': // F1
-    case 'Q': // F2
-    case 'R': // F3
-    case 'S': // F4
-        *k = KEY_F1 + (ch - 'P');
-        return i;
     case 'X':
         *k = '=';
         return i;
@@ -261,27 +280,16 @@ exit_loop:
         if (unlikely(mods == 0)) {
             goto ignore;
         }
+        key = decode_key_from_final_byte(final_byte);
+        if (key) {
+            goto check_first_param_is_1;
+        }
         switch (final_byte) {
         case '~':
             goto check_first_param_is_special_key;
         case 'u':
             *k = normalize_modified_other_key(mods, params[0]);
             return i;
-        case 'A': // Up
-        case 'B': // Down
-        case 'C': // Right
-        case 'D': // Left
-        case 'E': // Begin (keypad '5')
-        case 'F': // End
-        case 'H': // Home
-            key = KEY_UP + (final_byte - 'A');
-            goto check_first_param_is_1;
-        case 'P': // F1
-        case 'Q': // F2
-        case 'R': // F3
-        case 'S': // F4
-            key = KEY_F1 + (final_byte - 'P');
-            goto check_first_param_is_1;
         }
         goto ignore;
     case 1:
@@ -290,22 +298,12 @@ exit_loop:
         }
         goto ignore;
     case 0:
+        key = decode_key_from_final_byte(final_byte);
+        if (key) {
+            *k = key;
+            return i;
+        }
         switch (final_byte) {
-        case 'A': // Up
-        case 'B': // Down
-        case 'C': // Right
-        case 'D': // Left
-        case 'E': // Begin (keypad '5')
-        case 'F': // End
-        case 'H': // Home
-            *k = KEY_UP + (final_byte - 'A');
-            return i;
-        case 'P': // F1
-        case 'Q': // F2
-        case 'R': // F3
-        case 'S': // F4
-            *k = KEY_F1 + (final_byte - 'P');
-            return i;
         case 'L':
             *k = KEY_INSERT;
             return i;
@@ -317,7 +315,7 @@ exit_loop:
     goto ignore;
 
 check_first_param_is_special_key:
-    key = decode_special_key(params[0]);
+    key = decode_key_from_param(params[0]);
     if (unlikely(key == 0)) {
         goto ignore;
     }
