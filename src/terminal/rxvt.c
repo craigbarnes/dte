@@ -12,19 +12,39 @@ ssize_t rxvt_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     KeyCode extra_mods = 0;
     size_t extra_bytes = 0;
-
-    if (length < 2) {
+    if (length < 2 || buf[0] != '\033') {
         goto xterm;
     }
 
-    if (buf[0] == '\033' && buf[1] == '\033') {
+    KeyCode mods;
+    switch (buf[1]) {
+    case 'O':
+        mods = MOD_CTRL;
+        goto final;
+    case '[':
+        mods = MOD_SHIFT;
+        final:
+        if (length < 3) {
+            return -1;
+        }
+        switch (buf[2]) {
+        case 'a': // Up
+        case 'b': // Down
+        case 'c': // Right
+        case 'd': // Left
+            *k = mods | (KEY_UP + (buf[2] - 'a'));
+            return 3;
+        }
+        break;
+    case '\033':
         extra_mods = MOD_META;
         extra_bytes = 1;
         buf++;
         length--;
+        break;
     }
 
-    if (length < 4 || buf[0] != '\033' || buf[1] != '[') {
+    if (length < 4 || buf[1] != '[') {
         goto xterm;
     }
 
@@ -55,6 +75,9 @@ xterm:
     n = xterm_parse_key(buf, length, &key);
     if (n <= 0) {
         return n;
+    }
+    if (unlikely(key == KEY_IGNORE && extra_mods)) {
+        extra_mods = 0;
     }
     *k = key | extra_mods;
     return n + extra_bytes;
