@@ -191,12 +191,12 @@ static void test_xterm_parse_key(void)
         {"\033[1", -1, 0},
         {"\033[9", -1, 0},
         {"\033[1;", -1, 0},
-        {"\033[1[", 0, 0},
+        {"\033[1[", 4, KEY_IGNORE},
         {"\033[1;2", -1, 0},
         {"\033[1;8", -1, 0},
         {"\033[1;9", -1, 0},
-        {"\033[1;_", 0, 0},
-        {"\033[1;8Z", 0, 0},
+        {"\033[1;_", 5, KEY_IGNORE},
+        {"\033[1;8Z", 6, KEY_IGNORE},
         {"\033O", -1, 0},
         {"\033[\033", 0, 0},
         {"\033[A", 3, KEY_UP},
@@ -248,30 +248,30 @@ static void test_xterm_parse_key(void)
         {"\033Ow", 3, '7'},
         {"\033Ox", 3, '8'},
         {"\033Oy", 3, '9'},
-        {"\033[10~", 0, 0},
+        {"\033[10~", 5, KEY_IGNORE},
         {"\033[11~", 5, KEY_F1},
         {"\033[12~", 5, KEY_F2},
         {"\033[13~", 5, KEY_F3},
         {"\033[14~", 5, KEY_F4},
         {"\033[15~", 5, KEY_F5},
-        {"\033[16~", 0, 0},
+        {"\033[16~", 5, KEY_IGNORE},
         {"\033[17~", 5, KEY_F6},
         {"\033[18~", 5, KEY_F7},
         {"\033[19~", 5, KEY_F8},
         {"\033[20~", 5, KEY_F9},
         {"\033[21~", 5, KEY_F10},
-        {"\033[22~", 0, 0},
+        {"\033[22~", 5, KEY_IGNORE},
         {"\033[23~", 5, KEY_F11},
         {"\033[24~", 5, KEY_F12},
         {"\033[25~", 5, KEY_F13},
         {"\033[26~", 5, KEY_F14},
-        {"\033[27~", 0, 0},
+        {"\033[27~", 5, KEY_IGNORE},
         {"\033[28~", 5, KEY_F15},
         {"\033[29~", 5, KEY_F16},
-        {"\033[30~", 0, 0},
+        {"\033[30~", 5, KEY_IGNORE},
         {"\033[31~", 5, KEY_F17},
         {"\033[34~", 5, KEY_F20},
-        {"\033[35~", 0, 0},
+        {"\033[35~", 5, KEY_IGNORE},
         {"\033[6;3~", 6, MOD_META | KEY_PAGE_DOWN},
         {"\033[6;5~", 6, MOD_CTRL | KEY_PAGE_DOWN},
         {"\033[6;8~", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_PAGE_DOWN},
@@ -430,8 +430,8 @@ static void test_xterm_parse_key_combo(void)
             KeyCode key = 24;
             ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
             if (modifiers[j].mask == 0) {
-                EXPECT_EQ(parsed_length, 0);
-                EXPECT_EQ(key, 24);
+                EXPECT_EQ(parsed_length, seq_length);
+                EXPECT_EQ(key, KEY_IGNORE);
                 continue;
             }
             EXPECT_EQ(parsed_length, seq_length);

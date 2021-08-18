@@ -245,8 +245,7 @@ exit_loop:
     }
 
     if (unlikely(unhandled_bytes || nr_intermediate)) {
-        *k = KEY_IGNORE;
-        return i;
+        goto ignore;
     }
 
     KeyCode mods = 0;
@@ -257,16 +256,16 @@ exit_loop:
         if (params[0] == 27 && final_byte == '~') {
             mods = decode_modifiers(params[1]);
             if (unlikely(mods == 0)) {
-                return 0;
+                goto ignore;
             }
             *k = normalize_modified_other_key(mods, params[2]);
             return i;
         }
-        return 0;
+        goto ignore;
     case 2:
         mods = decode_modifiers(params[1]);
         if (unlikely(mods == 0)) {
-            return 0;
+            goto ignore;
         }
         switch (final_byte) {
         case '~':
@@ -290,12 +289,12 @@ exit_loop:
             key = KEY_F1 + (final_byte - 'P');
             goto check_first_param_is_1;
         }
-        return 0;
+        goto ignore;
     case 1:
         if (final_byte == '~') {
             goto check_first_param_is_special_key;
         }
-        return 0;
+        goto ignore;
     case 0:
         switch (final_byte) {
         case 'A': // Up
@@ -327,20 +326,23 @@ exit_loop:
             return i;
         }
     }
-    return 0;
+    goto ignore;
 
 check_first_param_is_special_key:
     key = decode_special_key(params[0]);
     if (unlikely(key == 0)) {
-        return 0;
+        goto ignore;
     }
     goto set_k_and_return_i;
 check_first_param_is_1:
     if (unlikely(params[0] != 1)) {
-        return 0;
+        goto ignore;
     }
 set_k_and_return_i:
     *k = mods | key;
+    return i;
+ignore:
+    *k = KEY_IGNORE;
     return i;
 }
 
