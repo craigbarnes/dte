@@ -54,7 +54,7 @@ void bindings_init(void)
 static ssize_t get_lookup_table_index(KeyCode k)
 {
     static_assert(ASCII_RANGE_LEN == 95);
-    static_assert(MOD_MASK >> MOD_OFFSET == (1 | 2 | 4));
+    static_assert(MOD_MASK >> MOD_OFFSET == 7);
 
     KeyCode modifiers = keycode_get_modifiers(k);
     KeyCode key = keycode_get_key(k);

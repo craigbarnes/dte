@@ -74,6 +74,8 @@ static KeyCode decode_modifiers(uint32_t n)
         return 0;
     }
 
+    static_assert(MOD_MASK >> MOD_OFFSET == 7);
+
     // Decode Meta (bit 4) and/or Alt (bit 2) as just Meta
     KeyCode mods = (n & 7) | ((n & 8) >> 2);
     BUG_ON(mods > 7);
