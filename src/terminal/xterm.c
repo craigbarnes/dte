@@ -272,12 +272,8 @@ exit_loop:
             if (unlikely(params[0] != 27)) {
                 goto ignore;
             }
-            mods = decode_modifiers(params[1]);
-            if (unlikely(mods == 0)) {
-                goto ignore;
-            }
-            *k = normalize_modified_other_key(mods, params[2]);
-            return i;
+            key = params[2];
+            goto normalize;
         case 2:
             mods = decode_modifiers(params[1]);
             if (unlikely(mods == 0)) {
@@ -297,12 +293,8 @@ exit_loop:
         if (unlikely(nparams != 2)) {
             goto ignore;
         }
-        mods = decode_modifiers(params[1]);
-        if (unlikely(mods == 0)) {
-            goto ignore;
-        }
-        *k = normalize_modified_other_key(mods, params[0]);
-        return i;
+        key = params[0];
+        goto normalize;
     case 'Z':
         if (unlikely(nparams != 0)) {
             goto ignore;
@@ -329,6 +321,14 @@ exit_loop:
 
 ignore:
     *k = KEY_IGNORE;
+    return i;
+
+normalize:
+    mods = decode_modifiers(params[1]);
+    if (unlikely(mods == 0)) {
+        goto ignore;
+    }
+    *k = normalize_modified_other_key(mods, key);
     return i;
 }
 
