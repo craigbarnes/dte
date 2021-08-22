@@ -1,0 +1,14 @@
+syntax gcode
+
+state code
+    char ';' comment
+    char ( paren-comment
+    eat this
+
+state comment
+    char "\n" code
+    eat this
+
+state paren-comment comment
+    char ")\n" code comment
+    eat this
