@@ -204,36 +204,33 @@ HOT const char *find_ft(const char *filename, StringView line)
     // Search user `ft` entries
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
+        StringView sv;
         switch (ft->type) {
         case FT_EXTENSION:
-            if (!ft_str_match(ft, ext)) {
-                continue;
+            sv = ext;
+            strmatch:
+            if (ft_str_match(ft, sv)) {
+                return ft->name;
             }
-            break;
-        case FT_BASENAME:
-            if (!ft_str_match(ft, base)) {
-                continue;
-            }
-            break;
+            continue;
         case FT_FILENAME:
-            if (!ft_regex_match(ft, path)) {
-                continue;
+            sv = path;
+            regmatch:
+            if (ft_regex_match(ft, sv)) {
+                return ft->name;
             }
-            break;
+            continue;
+        case FT_BASENAME:
+            sv = base;
+            goto strmatch;
         case FT_CONTENT:
-            if (!ft_regex_match(ft, line)) {
-                continue;
-            }
-            break;
+            sv = line;
+            goto regmatch;
         case FT_INTERPRETER:
-            if (!ft_str_match(ft, interpreter)) {
-                continue;
-            }
-            break;
-        default:
-            BUG("unhandled detection type");
+            sv = interpreter;
+            goto strmatch;
         }
-        return ft->name;
+        BUG("unhandled file detection type");
     }
 
     // Search built-in lookup tables
