@@ -523,6 +523,25 @@ static void test_string_view(void)
     EXPECT_TRUE(strview_equal_cstring(&sv7, "trim test"));
 }
 
+static void test_strview_has_suffix(void)
+{
+    StringView sv = strview_from_cstring("foobar");
+    EXPECT_TRUE(strview_has_suffix(&sv, "foobar"));
+    EXPECT_TRUE(strview_has_suffix(&sv, "bar"));
+    EXPECT_TRUE(strview_has_suffix(&sv, "r"));
+    EXPECT_TRUE(strview_has_suffix(&sv, ""));
+    EXPECT_FALSE(strview_has_suffix(&sv, "foo"));
+    EXPECT_FALSE(strview_has_suffix(&sv, "foobars"));
+
+    sv.length--;
+    EXPECT_FALSE(strview_has_suffix(&sv, "bar"));
+    EXPECT_TRUE(strview_has_suffix(&sv, "ba"));
+
+    sv.length = 0;
+    EXPECT_TRUE(strview_has_suffix(&sv, ""));
+    EXPECT_FALSE(strview_has_suffix(&sv, "f"));
+}
+
 static void test_get_delim(void)
 {
     static const char input[] = "-x-y-foo--bar--";
@@ -1798,6 +1817,7 @@ static const TestEntry tests[] = {
     TEST(test_base64),
     TEST(test_string),
     TEST(test_string_view),
+    TEST(test_strview_has_suffix),
     TEST(test_get_delim),
     TEST(test_size_str_width),
     TEST(test_buf_parse_uintmax),

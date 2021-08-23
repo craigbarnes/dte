@@ -90,6 +90,14 @@ static inline bool strview_has_prefix_icase(const StringView *sv, const char *p)
 }
 
 NONNULL_ARGS
+static inline bool strview_has_suffix(const StringView *sv, const char *suf)
+{
+    size_t len = sv->length;
+    size_t suflen = strlen(suf);
+    return len >= suflen && memcmp(sv->data + len - suflen, suf, suflen) == 0;
+}
+
+NONNULL_ARGS
 static inline bool strview_isblank(const StringView *sv)
 {
     const unsigned char *data = sv->data;
