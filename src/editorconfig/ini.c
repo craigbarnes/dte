@@ -62,8 +62,9 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
         }
 
         strip_trailing_comments_and_whitespace(&line);
+        BUG_ON(line.length == 0);
         if (line.data[0] == '[') {
-            if (line.length > 1 && line.data[line.length - 1] == ']') {
+            if (strview_has_suffix(&line, "]")) {
                 section = string_view(line.data + 1, line.length - 2);
                 nameidx = 0;
             }
