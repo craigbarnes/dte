@@ -18,22 +18,32 @@ typedef struct {
 } UserData;
 
 typedef enum {
-    EC_INDENT_STYLE,
+    EC_CHARSET,
+    EC_END_OF_LINE,
     EC_INDENT_SIZE,
-    EC_TAB_WIDTH,
+    EC_INDENT_STYLE,
+    EC_INSERT_FINAL_NL,
     EC_MAX_LINE_LENGTH,
+    EC_TAB_WIDTH,
+    EC_TRIM_TRAILING_WS,
     EC_UNKNOWN_PROPERTY,
 } PropertyType;
 
-#define CMP(s, val) if (mem_equal(name->data, s, STRLEN(s))) return val; break
+#define CMP(s, val) if (mem_equal(name->data, s, STRLEN(s))) return val;
 
 static PropertyType lookup_property(const StringView *name)
 {
     switch (name->length) {
-    case  9: CMP("tab_width", EC_TAB_WIDTH);
-    case 11: CMP("indent_size", EC_INDENT_SIZE);
-    case 12: CMP("indent_style", EC_INDENT_STYLE);
-    case 15: CMP("max_line_length", EC_MAX_LINE_LENGTH);
+    case  7: CMP("charset", EC_CHARSET); break;
+    case  9: CMP("tab_width", EC_TAB_WIDTH); break;
+    case 11:
+        CMP("indent_size", EC_INDENT_SIZE);
+        CMP("end_of_line", EC_END_OF_LINE);
+        break;
+    case 12: CMP("indent_style", EC_INDENT_STYLE); break;
+    case 15: CMP("max_line_length", EC_MAX_LINE_LENGTH); break;
+    case 20: CMP("insert_final_newline", EC_INSERT_FINAL_NL); break;
+    case 24: CMP("trim_trailing_whitespace", EC_TRIM_TRAILING_WS); break;
     }
     return EC_UNKNOWN_PROPERTY;
 }
@@ -74,6 +84,10 @@ static void editorconfig_option_set (
         buf_parse_uint(val->data, val->length, &n);
         options->max_line_length = n;
         break;
+    case EC_CHARSET:
+    case EC_END_OF_LINE:
+    case EC_INSERT_FINAL_NL:
+    case EC_TRIM_TRAILING_WS:
     case EC_UNKNOWN_PROPERTY:
         break;
     default:
