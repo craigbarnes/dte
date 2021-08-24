@@ -55,6 +55,8 @@ static bool u_seq_len_ok(CodePoint u, int len)
  */
 static unsigned int u_get_first_byte_mask(unsigned int len)
 {
+    BUG_ON(len < 2);
+    BUG_ON(len > 4);
     return (0x80 >> len) - 1;
 }
 
