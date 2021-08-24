@@ -62,26 +62,20 @@ static inline char *path_join(const char *s1, const char *s2)
 // Note: path *must* be canonical (i.e. as returned by path_absolute()).
 static inline bool path_parent(StringView *path)
 {
-    const char *data = path->data;
-    size_t length = path->length;
-    BUG_ON(length == 0);
-    BUG_ON(data[0] != '/');
-
-    if (length == 1) {
+    BUG_ON(!strview_has_prefix(path, "/"));
+    if (unlikely(path->length == 1)) {
         return false; // Root dir
     }
 
     // Remove up to 1 trailing slash
-    if (data[length - 1] == '/') {
-        path->length = --length;
-        BUG_ON(data[length - 1] == '/');
+    if (unlikely(strview_has_suffix(path, "/"))) {
+        path->length--;
+        BUG_ON(strview_has_suffix(path, "/"));
     }
 
-    const char *slash = strview_memrchr(path, '/');
-    BUG_ON(slash == NULL);
-
-    length = (size_t)(slash - data);
-    BUG_ON(length && data[length - 1] == '/');
+    const unsigned char *slash = strview_memrchr(path, '/');
+    BUG_ON(!slash);
+    size_t length = (size_t)(slash - path->data);
     path->length = length ? length : 1;
     return true;
 }
