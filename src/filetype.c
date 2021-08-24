@@ -18,8 +18,8 @@ static int ft_compare(const void *key, const void *elem)
     const StringView *sv = key;
     const char *ext = elem; // Cast to first member of struct
     int res = memcmp(sv->data, ext, sv->length);
-    if (res == 0 && ext[sv->length] != '\0') {
-        return -1;
+    if (unlikely(res == 0 && ext[sv->length] != '\0')) {
+        res = -1;
     }
     return res;
 }
@@ -118,10 +118,10 @@ static StringView get_ext(const StringView filename)
     ext.data++;
     ext.length = filename.length - (ext.data - filename.data);
 
-    if (ext.length && ext.data[ext.length - 1] == '~') {
+    if (unlikely(strview_has_suffix(&ext, "~"))) {
         ext.length--;
     }
-    if (ext.length == 0) {
+    if (unlikely(ext.length == 0)) {
         return ext;
     }
 
