@@ -100,6 +100,7 @@ static void test_find_ft_filename(void)
         {"test.c.rpmsave", "c"},
         {".c", NULL},
         {"test.@", NULL},
+        {"test.~", NULL},
         {NULL, NULL},
     };
     const StringView empty_line = STRING_VIEW_INIT;
