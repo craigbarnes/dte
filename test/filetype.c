@@ -209,6 +209,36 @@ static void test_find_ft_firstline(void)
     }
 }
 
+static void test_find_ft_dynamic(void)
+{
+    const char *ft = "test1";
+    StringView line = STRING_VIEW_INIT;
+    EXPECT_FALSE(is_ft(ft));
+    add_filetype(ft, "ext-test", FT_EXTENSION);
+    EXPECT_TRUE(is_ft(ft));
+    EXPECT_STREQ(find_ft("/tmp/file.ext-test", line), ft);
+
+    ft = "test2";
+    add_filetype(ft, "/zdir/__[A-Z]+$", FT_FILENAME);
+    EXPECT_STREQ(find_ft("/tmp/zdir/__TESTFILE", line), ft);
+    EXPECT_STREQ(find_ft("/tmp/zdir/__testfile", line), NULL);
+
+    ft = "test3";
+    add_filetype(ft, "._fiLeName", FT_BASENAME);
+    EXPECT_STREQ(find_ft("/tmp/._fiLeName", line), ft);
+    EXPECT_STREQ(find_ft("/tmp/._filename", line), NULL);
+
+    ft = "test4";
+    line = strview_from_cstring("!!42");
+    add_filetype(ft, "^!+42$", FT_CONTENT);
+    EXPECT_STREQ(find_ft(NULL, line), ft);
+
+    ft = "test5";
+    line = strview_from_cstring("#!/usr/bin/xyzlang4.2");
+    add_filetype(ft, "xyzlang", FT_INTERPRETER);
+    EXPECT_STREQ(find_ft(NULL, line), ft);
+}
+
 static void test_is_ft(void)
 {
     EXPECT_TRUE(is_ft("ada"));
@@ -233,11 +263,20 @@ static void test_is_ft(void)
     EXPECT_FALSE(is_ft("a"));
     EXPECT_FALSE(is_ft("C"));
     EXPECT_FALSE(is_ft("MAKE"));
+
+    EXPECT_TRUE(is_ft("test1"));
+    EXPECT_TRUE(is_ft("test2"));
+    EXPECT_TRUE(is_ft("test3"));
+    EXPECT_TRUE(is_ft("test4"));
+    EXPECT_TRUE(is_ft("test5"));
+    EXPECT_FALSE(is_ft("test0"));
+    EXPECT_FALSE(is_ft("test"));
 }
 
 static const TestEntry tests[] = {
     TEST(test_find_ft_filename),
     TEST(test_find_ft_firstline),
+    TEST(test_find_ft_dynamic),
     TEST(test_is_ft),
 };
 
