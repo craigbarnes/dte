@@ -96,36 +96,36 @@ static void editorconfig_option_set (
     }
 }
 
-static void editorconfig_parse(const char *buf, size_t size, UserData *userdata)
+static void editorconfig_parse(const char *buf, size_t size, UserData *data)
 {
-    IniParserContext ctx = {
+    IniParserContext ini = {
         .input = buf,
         .input_len = size,
     };
 
     if (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) {
         // Skip past UTF-8 BOM
-        ctx.pos += 3;
+        ini.pos += 3;
     }
 
-    while (ini_parse(&ctx)) {
-        if (ctx.section.length == 0) {
+    while (ini_parse(&ini)) {
+        if (ini.section.length == 0) {
             if (
-                strview_equal_cstring_icase(&ctx.name, "root")
-                && strview_equal_cstring_icase(&ctx.value, "true")
+                strview_equal_cstring_icase(&ini.name, "root")
+                && strview_equal_cstring_icase(&ini.value, "true")
             ) {
                 // root=true, clear all previous values
-                userdata->options = editorconfig_options_init();
+                data->options = editorconfig_options_init();
             }
             continue;
         }
 
-        if (ctx.name_count == 1) {
+        if (ini.name_count == 1) {
             // If name_count is 1, it indicates that the name/value pair is
             // the first in the section and therefore requires a new pattern
             // to be built and tested for a match
-            const StringView ecdir = userdata->config_file_dir;
-            String pattern = string_new(ecdir.length + ctx.section.length + 16);
+            const StringView ecdir = data->config_file_dir;
+            String pattern = string_new(ecdir.length + ini.section.length + 16);
 
             // Escape editorconfig special chars in path
             for (size_t i = 0, n = ecdir.length; i < n; i++) {
@@ -141,29 +141,29 @@ static void editorconfig_parse(const char *buf, size_t size, UserData *userdata)
                 }
             }
 
-            if (!strview_memchr(&ctx.section, '/')) {
+            if (!strview_memchr(&ini.section, '/')) {
                 // No slash in pattern, append "**/"
                 string_append_literal(&pattern, "**/");
-            } else if (ctx.section.data[0] != '/') {
+            } else if (ini.section.data[0] != '/') {
                 // Pattern contains at least one slash but not at the start, add one
                 string_append_byte(&pattern, '/');
             }
 
-            string_append_strview(&pattern, &ctx.section);
-            userdata->match = ec_pattern_match (
+            string_append_strview(&pattern, &ini.section);
+            data->match = ec_pattern_match (
                 pattern.buffer,
                 pattern.len,
-                userdata->pathname
+                data->pathname
             );
             string_free(&pattern);
         } else {
             // Otherwise, the section is the same as was passed for the first
-            // name/value pair in the section and the value of userdata->match
+            // name/value pair in the section and the value of data->match
             // can just be reused
         }
 
-        if (userdata->match) {
-            editorconfig_option_set(&userdata->options, &ctx.name, &ctx.value);
+        if (data->match) {
+            editorconfig_option_set(&data->options, &ini.name, &ini.value);
         }
     }
 }
