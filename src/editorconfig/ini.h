@@ -5,14 +5,15 @@
 #include "util/string-view.h"
 
 typedef struct {
+    const char *input;
+    size_t input_len;
+    size_t pos;
     StringView section;
     StringView name;
     StringView value;
-    unsigned int name_idx;
-} IniData;
+    unsigned int name_count;
+} IniParserContext;
 
-typedef int (*IniCallback)(const IniData *data, void *userdata);
-
-void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdata);
+bool ini_parse(IniParserContext *ctx);
 
 #endif

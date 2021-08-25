@@ -36,19 +36,14 @@ UNITTEST {
     BUG_ON(!strview_equal_cstring(&tmp, "key = val"));
 }
 
-void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdata)
+bool ini_parse(IniParserContext *ctx)
 {
-    size_t pos = 0;
-    if (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) {
-        // Skip past UTF-8 BOM
-        pos += 3;
-    }
+    const char *input = ctx->input;
+    const size_t len = ctx->input_len;
+    size_t pos = ctx->pos;
 
-    StringView section = STRING_VIEW_INIT;
-    unsigned int nameidx = 0;
-
-    while (pos < size) {
-        StringView line = buf_slice_next_line(buf, &pos, size);
+    while (pos < len) {
+        StringView line = buf_slice_next_line(input, &pos, len);
         strview_trim_left(&line);
         if (line.length < 2 || line.data[0] == '#' || line.data[0] == ';') {
             continue;
@@ -58,8 +53,8 @@ void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdat
         BUG_ON(line.length == 0);
         if (line.data[0] == '[') {
             if (strview_has_suffix(&line, "]")) {
-                section = string_view(line.data + 1, line.length - 2);
-                nameidx = 0;
+                ctx->section = string_view(line.data + 1, line.length - 2);
+                ctx->name_count = 0;
             }
             continue;
         }
@@ -79,13 +74,12 @@ void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdat
         strview_remove_prefix(&value, val_offset);
         strview_trim_left(&value);
 
-        const IniData data = {
-            .section = section,
-            .name = name,
-            .value = value,
-            .name_idx = nameidx++,
-        };
-
-        callback(&data, userdata);
+        ctx->name = name,
+        ctx->value = value,
+        ctx->name_count++;
+        ctx->pos = pos;
+        return true;
     }
+
+    return false;
 }
