@@ -7,36 +7,42 @@
 
 ssize_t read_file(const char *filename, char **bufp)
 {
-    *bufp = NULL;
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd == -1) {
-        return -1;
+        goto error_noclose;
     }
 
+    int saved_errno;
     struct stat st;
-    if (fstat(fd, &st) == -1) {
-        xclose(fd);
-        return -1;
+    if (unlikely(fstat(fd, &st) == -1)) {
+        goto error;
     }
-    if (S_ISDIR(st.st_mode)) {
-        xclose(fd);
+    if (unlikely(S_ISDIR(st.st_mode))) {
         errno = EISDIR;
-        return -1;
+        goto error;
     }
 
     char *buf = malloc(st.st_size + 1);
     if (unlikely(!buf)) {
-        xclose(fd);
-        return -1;
+        goto error;
     }
 
     ssize_t r = xread(fd, buf, st.st_size);
-    xclose(fd);
-    if (r > 0) {
-        buf[r] = '\0';
-        *bufp = buf;
-    } else {
+    if (unlikely(r < 0)) {
         free(buf);
+        goto error;
     }
+
+    buf[r] = '\0';
+    *bufp = buf;
+    xclose(fd);
     return r;
+
+error:
+    saved_errno = errno;
+    xclose(fd);
+    errno = saved_errno;
+error_noclose:
+    *bufp = NULL;
+    return -1;
 }

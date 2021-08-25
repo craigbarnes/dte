@@ -1777,9 +1777,8 @@ static void test_read_file(void)
     EXPECT_NULL(buf);
 
     size = read_file("test/data/3lines.txt", &buf);
-    ASSERT_NONNULL(buf);
     EXPECT_EQ(size, 26);
-
+    ASSERT_NONNULL(buf);
     size_t pos = 0;
     const char *line = buf_next_line(buf, &pos, size);
     EXPECT_STREQ(line, "line #1");
@@ -1790,7 +1789,13 @@ static void test_read_file(void)
     line = buf_next_line(buf, &pos, size);
     EXPECT_STREQ(line, "  line #3");
     EXPECT_EQ(pos, 26);
+    free(buf);
+    buf = NULL;
 
+    size = read_file("/dev/null", &buf);
+    EXPECT_EQ(size, 0);
+    ASSERT_NONNULL(buf);
+    EXPECT_EQ(buf[0], '\0');
     free(buf);
 }
 
