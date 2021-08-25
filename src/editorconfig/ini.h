@@ -1,6 +1,7 @@
 #ifndef EDITORCONFIG_INI_H
 #define EDITORCONFIG_INI_H
 
+#include <stddef.h>
 #include "util/string-view.h"
 
 typedef struct {
@@ -12,6 +13,6 @@ typedef struct {
 
 typedef int (*IniCallback)(const IniData *data, void *userdata);
 
-int ini_parse(const char *filename, IniCallback handler, void *userdata);
+void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdata);
 
 #endif

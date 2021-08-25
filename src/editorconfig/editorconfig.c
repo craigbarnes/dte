@@ -5,6 +5,7 @@
 #include "match.h"
 #include "util/debug.h"
 #include "util/path.h"
+#include "util/readfile.h"
 #include "util/string.h"
 #include "util/string-view.h"
 #include "util/strtonum.h"
@@ -178,9 +179,11 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     // Iterate up directory tree, looking for ".editorconfig" at each level
     while (1) {
         data.config_file_dir = string_view(buf, dir_len);
-        int err_num = ini_parse(buf, ini_handler, &data);
-        if (err_num > 0) {
-            return err_num;
+        char *text;
+        ssize_t len = read_file(buf, &text);
+        if (len >= 0) {
+            ini_parse(text, len, ini_handler, &data);
+            free(text);
         }
 
         const char *slash = strchr(ptr, '/');

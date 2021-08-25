@@ -36,15 +36,8 @@ UNITTEST {
     BUG_ON(!strview_equal_cstring(&tmp, "key = val"));
 }
 
-int ini_parse(const char *filename, IniCallback callback, void *userdata)
+void ini_parse(const char *buf, size_t size, IniCallback callback, void *userdata)
 {
-    char *buf;
-    const ssize_t ssize = read_file(filename, &buf);
-    if (ssize < 0) {
-        return -1;
-    }
-
-    const size_t size = ssize;
     size_t pos = 0;
     if (size >= 3 && mem_equal(buf, "\xEF\xBB\xBF", 3)) {
         // Skip past UTF-8 BOM
@@ -95,7 +88,4 @@ int ini_parse(const char *filename, IniCallback callback, void *userdata)
 
         callback(&data, userdata);
     }
-
-    free(buf);
-    return 0;
 }
