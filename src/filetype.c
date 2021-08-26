@@ -200,6 +200,8 @@ HOT const char *find_ft(const char *filename, StringView line)
     const StringView ext = get_filename_extension(base);
     const StringView path = strview_from_cstring(filename);
     const StringView interpreter = get_interpreter(line);
+    BUG_ON(path.length == 0 && (base.length != 0 || ext.length != 0));
+    BUG_ON(line.length == 0 && interpreter.length != 0);
 
     // Search user `ft` entries
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
