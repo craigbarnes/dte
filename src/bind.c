@@ -317,6 +317,7 @@ static void append_binding_group(String *buf, InputMode mode)
         [INPUT_SEARCH] = "-s ",
     };
 
+    static_assert(ARRAY_COUNT(mode_flags) == ARRAY_COUNT(bindings));
     const char *flag = mode_flags[mode];
     const size_t prev_buf_len = buf->len;
 
