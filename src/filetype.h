@@ -2,6 +2,7 @@
 #define FILETYPE_H
 
 #include <stdbool.h>
+#include <string.h>
 #include "util/string-view.h"
 #include "util/string.h"
 
@@ -12,6 +13,11 @@ typedef enum {
     FT_INTERPRETER,
     FT_BASENAME,
 } FileDetectionType;
+
+static inline bool is_valid_filetype_name(const char *name)
+{
+    return name[0] != '\0' && !strchr(name, '/');
+}
 
 void add_filetype(const char *name, const char *str, FileDetectionType type);
 bool is_ft(const char *name);

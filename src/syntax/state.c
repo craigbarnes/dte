@@ -6,6 +6,7 @@
 #include "command/run.h"
 #include "editor.h"
 #include "error.h"
+#include "filetype.h"
 #include "syntax/merge.h"
 #include "util/bsearch.h"
 #include "util/macros.h"
@@ -572,6 +573,10 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 
 Syntax *load_syntax_by_filetype(const char *filetype)
 {
+    if (!is_valid_filetype_name(filetype)) {
+        return NULL;
+    }
+
     const char *cfgdir = editor.user_config_dir;
     char filename[4096];
     int err;

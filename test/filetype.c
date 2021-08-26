@@ -2,6 +2,14 @@
 #include "test.h"
 #include "filetype.h"
 
+static void test_is_valid_filetype_name(void)
+{
+    EXPECT_TRUE(is_valid_filetype_name("abc-XYZ_128.90"));
+    EXPECT_FALSE(is_valid_filetype_name(""));
+    EXPECT_FALSE(is_valid_filetype_name("x/y"));
+    EXPECT_FALSE(is_valid_filetype_name("/"));
+}
+
 static void test_find_ft_filename(void)
 {
     static const struct {
@@ -276,6 +284,7 @@ static void test_is_ft(void)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_is_valid_filetype_name),
     TEST(test_find_ft_filename),
     TEST(test_find_ft_firstline),
     TEST(test_find_ft_dynamic),

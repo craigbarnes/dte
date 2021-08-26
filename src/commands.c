@@ -614,9 +614,8 @@ static void cmd_ft(const CommandArgs *a)
 {
     char **args = a->args;
     const char *filetype = args[0];
-    if (unlikely(filetype[0] == '\0')) {
-        error_msg("Filetype can't be blank");
-        return;
+    if (unlikely(!is_valid_filetype_name(filetype))) {
+        error_msg("Invalid filetype name: '%s'", filetype);
     }
 
     FileDetectionType dt = FT_EXTENSION;

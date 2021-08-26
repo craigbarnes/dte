@@ -110,20 +110,19 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 
     if (builtin) {
         const BuiltinConfig *cfg = get_builtin_config(filename);
+        int err = 0;
         if (cfg) {
             current_config.file = filename;
             current_config.line = 1;
             exec_config(cmds, cfg->text);
-            return 0;
         } else if (must_exist) {
             error_msg (
                 "Error reading '%s': no built-in config exists for that path",
                 filename
             );
-            return 1;
-        } else {
-            return 0;
+            err = 1;
         }
+        return err;
     }
 
     char *buf;
