@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "test.h"
 #include "cmdline.h"
+#include "commands.h"
 #include "completion.h"
 #include "editor.h"
 #include "mode.h"
@@ -126,6 +127,11 @@ static void test_complete_command(void)
     cmdline_set_text(c, "open test/data/.e");
     complete_command_next();
     EXPECT_STRING_EQ(c->buf, "open test/data/.editorconfig ");
+    reset_completion();
+
+    cmdline_set_text(c, "open GNUma");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "open GNUmakefile ");
     reset_completion();
 
     cmdline_set_text(c, "wsplit -bhr test/data/.e");
@@ -289,6 +295,22 @@ static void test_complete_command_extra(void)
     cmdline_set_text(c, "option c expand-tab ");
     complete_command_next();
     EXPECT_STRING_EQ(c->buf, "option c expand-tab true ");
+    reset_completion();
+
+    const CommandSet *cmds = &normal_commands;
+    handle_command(cmds, "run -s mkdir -p $HOME/sub", false);
+    handle_command(cmds, "run -s touch $HOME/file $HOME/sub/subfile", false);
+
+    cmdline_set_text(c, "open ~/");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "open ~/file");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "open ~/sub/");
+    reset_completion();
+
+    cmdline_set_text(c, "open ~/sub/");
+    complete_command_next();
+    EXPECT_STRING_EQ(c->buf, "open ~/sub/subfile ");
     reset_completion();
 }
 
