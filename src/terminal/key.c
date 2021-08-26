@@ -39,6 +39,15 @@ static const char special_names[][8] = {
     "F20",
 };
 
+static const struct {
+    char name[8];
+    KeyCode key;
+} other_keys[] = {
+    {"tab", KEY_TAB},
+    {"enter", KEY_ENTER},
+    {"space", KEY_SPACE},
+};
+
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
     KeyCode modifiers = 0;
@@ -103,17 +112,12 @@ bool parse_key_string(KeyCode *key, const char *str)
         *key = modifiers | ch;
         return true;
     }
-    if (ascii_streq_icase(str, "space")) {
-        *key = modifiers | KEY_SPACE;
-        return true;
-    }
-    if (ascii_streq_icase(str, "tab")) {
-        *key = modifiers | KEY_TAB;
-        return true;
-    }
-    if (ascii_streq_icase(str, "enter")) {
-        *key = modifiers | KEY_ENTER;
-        return true;
+
+    for (size_t j = 0; j < ARRAY_COUNT(other_keys); j++) {
+        if (ascii_streq_icase(str, other_keys[j].name)) {
+            *key = modifiers | other_keys[j].key;
+            return true;
+        }
     }
 
     static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
@@ -127,13 +131,10 @@ bool parse_key_string(KeyCode *key, const char *str)
     return false;
 }
 
-#define COPY(dest, src) memcpy(dest, src, STRLEN(src) + 1)
-
 const char *keycode_to_string(KeyCode k)
 {
     static char buf[32];
     size_t i = 0;
-
     if (k & MOD_CTRL) {
         buf[i++] = 'C';
         buf[i++] = '-';
@@ -147,29 +148,22 @@ const char *keycode_to_string(KeyCode k)
         buf[i++] = '-';
     }
 
-    char *const ptr = buf + i;
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
-        switch (key) {
-        case KEY_TAB:
-            COPY(ptr, "tab");
-            break;
-        case KEY_ENTER:
-            COPY(ptr, "enter");
-            break;
-        case KEY_SPACE:
-            COPY(ptr, "space");
-            break;
-        default:
-            u_set_char(buf, &i, key);
-            buf[i] = '\0';
+        for (size_t j = 0; j < ARRAY_COUNT(other_keys); j++) {
+            if (key == other_keys[j].key) {
+                memcpy(buf + i, other_keys[j].name, sizeof(other_keys[0].name));
+                return buf;
+            }
         }
+        u_set_char(buf, &i, key);
+        buf[i] = '\0';
         return buf;
     }
 
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
         const char *name = special_names[key - KEY_SPECIAL_MIN];
-        memcpy(ptr, name, sizeof(special_names[0]));
+        memcpy(buf + i, name, sizeof(special_names[0]));
         return buf;
     }
 
