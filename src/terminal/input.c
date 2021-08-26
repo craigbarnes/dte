@@ -126,7 +126,7 @@ static KeyCode read_simple(void)
      * 1111 1xxx invalid
      */
     CodePoint bit = 1 << 6;
-    int count = 0;
+    unsigned int count = 0;
     while (ch & bit) {
         bit >>= 1;
         count++;
