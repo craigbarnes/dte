@@ -103,7 +103,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
     ptr_array_append(&filetypes, ft);
 }
 
-static StringView get_ext(const StringView filename)
+static StringView get_filename_extension(const StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;
     if (filename.length < 3) {
@@ -197,7 +197,7 @@ HOT const char *find_ft(const char *filename, StringView line)
 {
     const char *b = filename ? path_basename(filename) : NULL;
     const StringView base = strview_from_cstring(b);
-    const StringView ext = get_ext(base);
+    const StringView ext = get_filename_extension(base);
     const StringView path = strview_from_cstring(filename);
     const StringView interpreter = get_interpreter(line);
 
