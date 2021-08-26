@@ -167,7 +167,7 @@ void any_key(void)
 {
     fputs("Press any key to continue\r\n", stderr);
     KeyCode key;
-    while (!term_read_key(&key)) {
+    while ((key = term_read_key()) == KEY_NONE) {
         ;
     }
     if (key == KEY_PASTE) {
@@ -356,8 +356,8 @@ const char *editor_file(const char *name)
 
 static char get_choice(const char *choices)
 {
-    KeyCode key;
-    if (!term_read_key(&key)) {
+    KeyCode key = term_read_key();
+    if (key == KEY_NONE) {
         return 0;
     }
 
@@ -529,8 +529,8 @@ void main_loop(void)
             ui_resize();
         }
 
-        KeyCode key;
-        if (!term_read_key(&key)) {
+        KeyCode key = term_read_key();
+        if (key == KEY_NONE) {
             continue;
         }
 

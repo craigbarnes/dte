@@ -197,21 +197,18 @@ static ExitCode showkey_loop(void)
 
     bool loop = true;
     while (loop) {
-        KeyCode key;
-        const char *str;
-        if (!term_read_key(&key)) {
-            str = "UNKNOWN";
-        } else if (key == KEY_PASTE) {
+        KeyCode key = term_read_key();
+        switch (key) {
+        case KEY_NONE:
+        case KEY_IGNORE:
+            continue;
+        case KEY_PASTE:
             term_discard_paste();
             continue;
-        } else if (key == KEY_IGNORE) {
-            continue;
-        } else {
-            if (key == CTRL('D')) {
-                loop = false;
-            }
-            str = keycode_to_string(key);
+        case CTRL('D'):
+            loop = false;
         }
+        const char *str = keycode_to_string(key);
         term_add_literal("  ");
         term_add_bytes(str, strlen(str));
         term_add_literal("\r\n");

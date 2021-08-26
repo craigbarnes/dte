@@ -6,6 +6,7 @@
 #include "util/macros.h"
 
 enum {
+    KEY_NONE = 0,
     KEY_TAB = '\t',
     KEY_ENTER = '\n',
     KEY_SPACE = ' ',

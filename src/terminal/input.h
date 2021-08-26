@@ -1,11 +1,10 @@
 #ifndef TERMINAL_INPUT_H
 #define TERMINAL_INPUT_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "key.h"
 
-bool term_read_key(KeyCode *key);
+KeyCode term_read_key(void);
 char *term_read_paste(size_t *size);
 void term_discard_paste(void);
 

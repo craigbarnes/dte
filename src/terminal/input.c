@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
@@ -81,30 +82,31 @@ static bool input_get_byte(unsigned char *ch)
     return true;
 }
 
-static bool read_special(KeyCode *key)
+static KeyCode read_special(void)
 {
-    ssize_t len = terminal.parse_key_sequence(input.buf, input.len, key);
+    KeyCode key;
+    ssize_t len = terminal.parse_key_sequence(input.buf, input.len, &key);
     switch (len) {
     case -1:
         // Possibly truncated
         break;
     case 0:
         // No match
-        return false;
+        return KEY_NONE;
     default:
         // Match
         consume_input(len);
-        return true;
+        return key;
     }
 
     if (input.can_be_truncated && fill_buffer()) {
-        return read_special(key);
+        return read_special();
     }
 
-    return false;
+    return KEY_NONE;
 }
 
-static bool read_simple(KeyCode *key)
+static KeyCode read_simple(void)
 {
     unsigned char ch = 0;
 
@@ -112,40 +114,38 @@ static bool read_simple(KeyCode *key)
     input_get_byte(&ch);
 
     // Normal key
-    if (editor.term_utf8 && ch > 0x7f) {
-        /*
-         * 10xx xxxx invalid
-         * 110x xxxx valid
-         * 1110 xxxx valid
-         * 1111 0xxx valid
-         * 1111 1xxx invalid
-         */
-        CodePoint bit = 1 << 6;
-        int count = 0;
-
-        while (ch & bit) {
-            bit >>= 1;
-            count++;
-        }
-        if (count == 0 || count > 3) {
-            // Invalid first byte
-            return false;
-        }
-        CodePoint u = ch & (bit - 1);
-        do {
-            if (!input_get_byte(&ch)) {
-                return false;
-            }
-            if (ch >> 6 != 2) {
-                return false;
-            }
-            u = (u << 6) | (ch & 0x3f);
-        } while (--count);
-        *key = u;
-    } else {
-        *key = keycode_normalize(ch);
+    if (!editor.term_utf8 || ch < 0x80) {
+        return keycode_normalize(ch);
     }
-    return true;
+
+    /*
+     * 10xx xxxx invalid
+     * 110x xxxx valid
+     * 1110 xxxx valid
+     * 1111 0xxx valid
+     * 1111 1xxx invalid
+     */
+    CodePoint bit = 1 << 6;
+    int count = 0;
+    while (ch & bit) {
+        bit >>= 1;
+        count++;
+    }
+
+    if (count == 0 || count > 3) {
+        // Invalid first byte
+        return KEY_NONE;
+    }
+
+    CodePoint u = ch & (bit - 1);
+    do {
+        if (!input_get_byte(&ch) || ch >> 6 != 2) {
+            return KEY_NONE;
+        }
+        u = (u << 6) | (ch & 0x3f);
+    } while (--count);
+
+    return u;
 }
 
 static bool is_text(const char *str, size_t len)
@@ -158,21 +158,21 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-bool term_read_key(KeyCode *key)
+KeyCode term_read_key(void)
 {
     if (!input.len && !fill_buffer()) {
-        return false;
+        return KEY_NONE;
     }
 
     if (input.len > 4 && is_text(input.buf, input.len)) {
-        *key = KEY_PASTE;
-        return true;
+        return KEY_PASTE;
     }
 
     if (input.buf[0] == '\033') {
         if (input.len > 1 || input.can_be_truncated) {
-            if (read_special(key)) {
-                return true;
+            KeyCode key = read_special();
+            if (key != KEY_NONE) {
+                return key;
             }
         }
         if (input.len == 1) {
@@ -192,7 +192,7 @@ bool term_read_key(KeyCode *key)
                  * This breaks the esc-key == alt-key rule for the
                  * esc-esc case but it shouldn't matter.
                  */
-                return read_simple(key);
+                return read_simple();
             }
         }
         if (input.len > 1) {
@@ -201,24 +201,23 @@ bool term_read_key(KeyCode *key)
             // Throw escape away
             consume_input(1);
 
-            const bool ok = read_simple(key);
-            if (!ok) {
-                return false;
+            KeyCode key = read_simple();
+            if (key == KEY_NONE) {
+                return KEY_NONE;
             }
 
             if (input.len == 0 || input.buf[0] == '\033') {
                 // 'esc key' or 'alt-key'
-                *key |= MOD_META;
-                return true;
+                return MOD_META | key;
             }
 
             // Unknown escape sequence; avoid inserting it
             input.len = 0;
-            return false;
+            return KEY_NONE;
         }
     }
 
-    return read_simple(key);
+    return read_simple();
 }
 
 char *term_read_paste(size_t *size)
