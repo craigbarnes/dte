@@ -727,20 +727,24 @@ static void cmd_line(const CommandArgs *a)
 
 static void cmd_load_syntax(const CommandArgs *a)
 {
-    const char *filename = a->args[0];
-    const char *filetype = path_basename(filename);
-    if (filename != filetype) {
-        if (find_syntax(filetype)) {
-            error_msg("Syntax for filetype %s already loaded", filetype);
-        } else {
-            int err;
-            load_syntax_file(filename, CFG_MUST_EXIST, &err);
-        }
-    } else {
+    const char *arg = a->args[0];
+    const char *slash = strrchr(arg, '/');
+    if (!slash) {
+        const char *filetype = arg;
         if (!find_syntax(filetype)) {
             load_syntax_by_filetype(filetype);
         }
+        return;
     }
+
+    const char *filetype = slash + 1;
+    if (find_syntax(filetype)) {
+        error_msg("Syntax for filetype %s already loaded", filetype);
+        return;
+    }
+
+    int err;
+    load_syntax_file(arg, CFG_MUST_EXIST, &err);
 }
 
 static void cmd_macro(const CommandArgs *a)
