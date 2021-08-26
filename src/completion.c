@@ -147,47 +147,28 @@ static void do_collect_files (
 
 static void collect_files(bool directories_only)
 {
-    char *str = parse_command_arg (
-        &normal_commands,
-        completion.escaped,
-        strlen(completion.escaped),
-        false
-    );
-
-    if (!streq(completion.parsed, str)) {
-        // ~ was expanded
-        const char *fileprefix = path_basename(str);
-
+    const char *e = completion.escaped;
+    if (e[0] == '~' && e[1] == '/') {
+        char *str = parse_command_arg(&normal_commands, e, strlen(e), false);
+        const char *slash = strrchr(str, '/');
+        BUG_ON(!slash);
         completion.tilde_expanded = true;
-        if (fileprefix == str) {
-            // str doesn't contain slashes
-            // complete ~ to ~/ or ~user to ~user/
-            size_t len = strlen(str);
-            char *s = xmalloc(len + 2);
-            memcpy(s, str, len);
-            s[len] = '/';
-            s[len + 1] = '\0';
-            add_completion(s);
-        } else {
-            char *dir = path_dirname(completion.parsed);
-            char *dirprefix = path_dirname(str);
-            do_collect_files(dir, dirprefix, fileprefix, directories_only);
-            free(dirprefix);
-            free(dir);
-        }
+        char *dir = path_dirname(completion.parsed);
+        char *dirprefix = path_dirname(str);
+        do_collect_files(dir, dirprefix, slash + 1, directories_only);
+        free(dirprefix);
+        free(dir);
+        free(str);
     } else {
-        const char *fileprefix = path_basename(completion.parsed);
-
-        if (fileprefix == completion.parsed) {
-            // completion.parsed doesn't contain slashes
-            do_collect_files(".", "", fileprefix, directories_only);
+        const char *slash = strrchr(completion.parsed, '/');
+        if (!slash) {
+            do_collect_files(".", "", completion.parsed, directories_only);
         } else {
             char *dir = path_dirname(completion.parsed);
-            do_collect_files(dir, dir, fileprefix, directories_only);
+            do_collect_files(dir, dir, slash + 1, directories_only);
             free(dir);
         }
     }
-    free(str);
 
     if (completion.completions.count == 1) {
         // Add space if completed string is not a directory
