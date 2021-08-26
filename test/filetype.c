@@ -101,6 +101,7 @@ static void test_find_ft_filename(void)
         {".c", NULL},
         {"test.@", NULL},
         {"test.~", NULL},
+        {"1", NULL},
         {NULL, NULL},
     };
     const StringView empty_line = STRING_VIEW_INIT;
