@@ -484,6 +484,7 @@ UNITTEST {
     const LocalOptions opts = {.filetype = NULL};
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
+        BUG_ON(desc->type >= ARRAY_COUNT(alignments));
         size_t alignment = alignments[desc->type];
         if (desc->global) {
             uintptr_t ptr_val = (uintptr_t)global_ptr(desc);
