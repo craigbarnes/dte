@@ -1286,6 +1286,65 @@ static void cmd_refresh(const CommandArgs* UNUSED_ARG(a))
     mark_everything_changed();
 }
 
+static void repeat_insert(const char *str, unsigned int count, bool move_after)
+{
+    size_t str_len = strlen(str);
+    size_t bufsize;
+    if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
+        error_msg("Repeated insert would overflow");
+        return;
+    }
+    if (unlikely(bufsize == 0)) {
+        return;
+    }
+    char *buf = malloc(bufsize);
+    if (unlikely(!buf)) {
+        perror_msg("malloc");
+        return;
+    }
+
+    char tmp[4096];
+    if (str_len == 1) {
+        memset(buf, str[0], bufsize);
+        goto insert;
+    } else if (bufsize < 2 * sizeof(tmp) || str_len > sizeof(tmp) / 8) {
+        for (size_t i = 0; i < count; i++) {
+            memcpy(buf + (i * str_len), str, str_len);
+        }
+        goto insert;
+    }
+
+    size_t strs_per_tmp = sizeof(tmp) / str_len;
+    size_t tmp_len = strs_per_tmp * str_len;
+    size_t tmps_per_buf = bufsize / tmp_len;
+    size_t remainder = bufsize % tmp_len;
+
+    // Create a block of text containing `strs_per_tmp` concatenated strs
+    for (size_t i = 0; i < strs_per_tmp; i++) {
+        memcpy(tmp + (i * str_len), str, str_len);
+    }
+
+    // Copy `tmps_per_buf` copies of `tmp` into `buf`
+    for (size_t i = 0; i < tmps_per_buf; i++) {
+        memcpy(buf + (i * tmp_len), tmp, tmp_len);
+    }
+
+    // Copy the remainder into `buf` (if any)
+    if (remainder) {
+        memcpy(buf + (tmps_per_buf * tmp_len), tmp, remainder);
+    }
+
+    DEBUG_LOG (
+        "Optimized %u inserts of %zu bytes into %zu inserts of %zu bytes",
+        count, str_len,
+        tmps_per_buf, tmp_len
+    );
+
+insert:
+    insert_text(buf, bufsize, move_after);
+    free(buf);
+}
+
 static void cmd_repeat(const CommandArgs *a)
 {
     unsigned int count;
@@ -1311,65 +1370,9 @@ static void cmd_repeat(const CommandArgs *a)
         return;
     }
 
-    // Optimized special case for "insert" command
     if (cmd->cmd == cmd_insert && !has_flag(&a2, 'k')) {
-        const char *str = a2.args[0];
-        size_t str_len = strlen(str);
-        size_t bufsize;
-        if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
-            error_msg("Repeated insert would overflow");
-            return;
-        }
-        if (unlikely(bufsize == 0)) {
-            return;
-        }
-        char *buf = malloc(bufsize);
-        if (unlikely(!buf)) {
-            perror_msg("malloc");
-            return;
-        }
-
-        char tmp[4096];
-        bool move_after = has_flag(&a2, 'm');
-        if (str_len == 1) {
-            memset(buf, str[0], bufsize);
-            goto insert;
-        } else if (bufsize < 2 * sizeof(tmp) || str_len > sizeof(tmp) / 8) {
-            for (size_t i = 0; i < count; i++) {
-                memcpy(buf + (i * str_len), str, str_len);
-            }
-            goto insert;
-        }
-
-        size_t strs_per_tmp = sizeof(tmp) / str_len;
-        size_t tmp_len = strs_per_tmp * str_len;
-        size_t tmps_per_buf = bufsize / tmp_len;
-        size_t remainder = bufsize % tmp_len;
-
-        // Create a block of text containing `strs_per_tmp` concatenated strs
-        for (size_t i = 0; i < strs_per_tmp; i++) {
-            memcpy(tmp + (i * str_len), str, str_len);
-        }
-
-        // Copy `tmps_per_buf` copies of `tmp` into `buf`
-        for (size_t i = 0; i < tmps_per_buf; i++) {
-            memcpy(buf + (i * tmp_len), tmp, tmp_len);
-        }
-
-        // Copy the remainder into `buf` (if any)
-        if (remainder) {
-            memcpy(buf + (tmps_per_buf * tmp_len), tmp, remainder);
-        }
-
-        DEBUG_LOG (
-            "Optimized %u inserts of %zu bytes into %zu inserts of %zu bytes",
-            count, str_len,
-            tmps_per_buf, tmp_len
-        );
-
-        insert:
-        insert_text(buf, bufsize, move_after);
-        free(buf);
+        // Use optimized implementation for repeated "insert"
+        repeat_insert(a2.args[0], count, has_flag(&a2, 'm'));
         return;
     }
 
