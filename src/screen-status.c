@@ -29,7 +29,7 @@ typedef enum {
     STATUS_CURSOR_ROW,
 } FormatSpecifierType;
 
-static const FormatSpecifierType format_specifiers[] = {
+static const uint8_t format_specifiers[] = {
     ['%'] = STATUS_ESCAPED_PERCENT,
     ['E'] = STATUS_ENCODING,
     ['M'] = STATUS_MISC,
