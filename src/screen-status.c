@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "screen.h"
 #include "editor.h"
 #include "selection.h"
@@ -5,6 +6,49 @@
 #include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
+
+typedef enum {
+    STATUS_INVALID = 0,
+    STATUS_ESCAPED_PERCENT,
+    STATUS_ENCODING,
+    STATUS_MISC,
+    STATUS_IS_CRLF,
+    STATUS_SEPARATOR_LONG,
+    STATUS_CURSOR_COL_BYTES,
+    STATUS_TOTAL_ROWS,
+    STATUS_BOM,
+    STATUS_FILENAME,
+    STATUS_MODIFIED,
+    STATUS_LINE_ENDING,
+    STATUS_SCROLL_POSITION,
+    STATUS_READONLY,
+    STATUS_SEPARATOR,
+    STATUS_FILETYPE,
+    STATUS_UNICODE,
+    STATUS_CURSOR_COL,
+    STATUS_CURSOR_ROW,
+} FormatSpecifierType;
+
+static const FormatSpecifierType format_specifiers[] = {
+    ['%'] = STATUS_ESCAPED_PERCENT,
+    ['E'] = STATUS_ENCODING,
+    ['M'] = STATUS_MISC,
+    ['N'] = STATUS_IS_CRLF,
+    ['S'] = STATUS_SEPARATOR_LONG,
+    ['X'] = STATUS_CURSOR_COL_BYTES,
+    ['Y'] = STATUS_TOTAL_ROWS,
+    ['b'] = STATUS_BOM,
+    ['f'] = STATUS_FILENAME,
+    ['m'] = STATUS_MODIFIED,
+    ['n'] = STATUS_LINE_ENDING,
+    ['p'] = STATUS_SCROLL_POSITION,
+    ['r'] = STATUS_READONLY,
+    ['s'] = STATUS_SEPARATOR,
+    ['t'] = STATUS_FILETYPE,
+    ['u'] = STATUS_UNICODE,
+    ['x'] = STATUS_CURSOR_COL,
+    ['y'] = STATUS_CURSOR_ROW,
+};
 
 typedef struct {
     char *buf;
@@ -92,112 +136,118 @@ static void add_status_pos(Formatter *f)
 
 static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
-    View *v = f->win->view;
-
     f->buf = buf;
     f->size = size - 5; // Max length of char and terminating NUL
     f->pos = 0;
     f->separator = 0;
 
+    View *v = f->win->view;
     CodePoint u;
-    bool got_char = block_iter_get_char(&v->cursor, &u) > 0;
+
     while (f->pos < f->size && *format) {
-        char ch = *format++;
+        unsigned char ch = *format++;
         if (ch != '%') {
             add_separator(f);
             add_ch(f, ch);
             continue;
         }
+
         ch = *format++;
-        switch (ch) {
-        case 'b':
+        BUG_ON(ch >= ARRAY_COUNT(format_specifiers));
+
+        // Note: this explicit type conversion (from uint8_t) is here to
+        // ensure "-Wswitch-enum" warnings are in effect
+        FormatSpecifierType type = format_specifiers[ch];
+
+        switch (type) {
+        case STATUS_BOM:
             if (v->buffer->bom) {
                 add_status_literal(f, "BOM");
             }
             break;
-        case 'f':
+        case STATUS_FILENAME:
             add_status_str(f, buffer_filename(v->buffer));
             break;
-        case 'm':
+        case STATUS_MODIFIED:
             if (buffer_modified(v->buffer)) {
                 add_separator(f);
                 add_ch(f, '*');
             }
             break;
-        case 'r':
+        case STATUS_READONLY:
             if (v->buffer->readonly) {
                 add_status_literal(f, "RO");
             } else if (v->buffer->temporary) {
                 add_status_literal(f, "TMP");
             }
             break;
-        case 'y':
+        case STATUS_CURSOR_ROW:
             add_status_format(f, "%ld", v->cy + 1);
             break;
-        case 'Y':
+        case STATUS_TOTAL_ROWS:
             add_status_format(f, "%zu", v->buffer->nl);
             break;
-        case 'x':
+        case STATUS_CURSOR_COL:
             add_status_format(f, "%ld", v->cx_display + 1);
             break;
-        case 'X':
+        case STATUS_CURSOR_COL_BYTES:
             add_status_format(f, "%ld", v->cx_char + 1);
             if (v->cx_display != v->cx_char) {
                 add_status_format(f, "-%ld", v->cx_display + 1);
             }
             break;
-        case 'p':
+        case STATUS_SCROLL_POSITION:
             add_status_pos(f);
             break;
-        case 'E':
+        case STATUS_ENCODING:
             add_status_str(f, v->buffer->encoding.name);
             break;
-        case 'M':
+        case STATUS_MISC:
             if (f->misc_status) {
                 add_status_str(f, f->misc_status);
             }
             break;
-        case 'N':
+        case STATUS_IS_CRLF:
             if (v->buffer->crlf_newlines) {
                 add_status_literal(f, "CRLF");
             }
             break;
-        case 'n':
+        case STATUS_LINE_ENDING:
             if (v->buffer->crlf_newlines) {
                 add_status_literal(f, "CRLF");
             } else {
                 add_status_literal(f, "LF");
             }
             break;
-        case 'S':
+        case STATUS_SEPARATOR_LONG:
             f->separator = 3;
             break;
-        case 's':
+        case STATUS_SEPARATOR:
             f->separator = 1;
             break;
-        case 't':
+        case STATUS_FILETYPE:
             add_status_str(f, v->buffer->options.filetype);
             break;
-        case 'u':
-            if (got_char) {
-                if (u_is_unicode(u)) {
-                    add_status_format(f, "U+%04X", u);
-                } else {
-                    add_status_literal(f, "Invalid");
-                }
+        case STATUS_UNICODE:
+            if (unlikely(!block_iter_get_char(&v->cursor, &u))) {
+                break;
+            }
+            if (u_is_unicode(u)) {
+                add_status_format(f, "U+%04X", u);
+            } else {
+                add_status_literal(f, "Invalid");
             }
             break;
-        case '%':
+        case STATUS_ESCAPED_PERCENT:
             add_separator(f);
             add_ch(f, '%');
             break;
-        case '\0':
-            f->buf[f->pos] = '\0';
-            return;
+        case STATUS_INVALID:
         default:
             BUG("should be unreachable, due to validate_statusline_format()");
         }
     }
+
     f->buf[f->pos] = '\0';
 }
 
@@ -278,4 +328,20 @@ void update_status_line(const Window *win)
     } else {
         term_clear_eol();
     }
+}
+
+size_t statusline_format_find_error(const char *str)
+{
+    size_t i = 0;
+    while (str[i]) {
+        unsigned char c = str[i++];
+        if (c != '%') {
+            continue;
+        }
+        c = str[i++];
+        if (c >= ARRAY_COUNT(format_specifiers) || !format_specifiers[c]) {
+            return i - 1;
+        }
+    }
+    return 0;
 }

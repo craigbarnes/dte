@@ -168,23 +168,17 @@ static void redraw_screen(bool UNUSED_ARG(global))
 
 static bool validate_statusline_format(const char *value)
 {
-    static const StringView chars = STRING_VIEW("bfmryYxXpEMNSnstu%");
-    size_t i = 0;
-    while (value[i]) {
-        char ch = value[i++];
-        if (ch == '%') {
-            ch = value[i++];
-            if (ch == '\0') {
-                error_msg("Format character expected after '%%'");
-                return false;
-            }
-            if (!strview_memchr(&chars, ch)) {
-                error_msg("Invalid format character '%c'", ch);
-                return false;
-            }
-        }
+    size_t errpos = statusline_format_find_error(value);
+    if (likely(errpos == 0)) {
+        return true;
     }
-    return true;
+    char ch = value[errpos];
+    if (ch == '\0') {
+        error_msg("Format character expected after '%%'");
+    } else {
+        error_msg("Invalid format character '%c'", ch);
+    }
+    return false;
 }
 
 static bool validate_filetype(const char *value)

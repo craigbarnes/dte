@@ -2,6 +2,7 @@
 #define SCREEN_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "buffer.h"
 #include "syntax/color.h"
 #include "view.h"
@@ -26,6 +27,7 @@ void print_tabbar(Window *w);
 
 // screen-status.c
 void update_status_line(const Window *win);
+size_t statusline_format_find_error(const char *str);
 
 // screen-view.c
 void update_range(const View *v, long y1, long y2);
