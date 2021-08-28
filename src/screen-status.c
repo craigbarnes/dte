@@ -77,7 +77,7 @@ static void add_separator(Formatter *f)
 static void add_status_str(Formatter *f, const char *str)
 {
     BUG_ON(!str);
-    if (!str[0]) {
+    if (unlikely(!str[0])) {
         return;
     }
     add_separator(f);
@@ -89,7 +89,7 @@ static void add_status_str(Formatter *f, const char *str)
 
 static void add_status_bytes(Formatter *f, const char *str, size_t len)
 {
-    if (len == 0) {
+    if (unlikely(len == 0)) {
         return;
     }
     add_separator(f);
