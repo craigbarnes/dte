@@ -27,6 +27,7 @@ static int ft_compare(const void *key, const void *elem)
 // Built-in filetypes
 #include "filetype/names.c"
 #include "filetype/basenames.c"
+#include "filetype/directories.c"
 #include "filetype/extensions.c"
 #include "filetype/interpreters.c"
 #include "filetype/ignored-exts.c"
@@ -264,10 +265,11 @@ HOT const char *find_ft(const char *filename, StringView line)
         }
     }
 
-    if (strview_has_prefix(&path, "/etc/default/")) {
-        return builtin_filetype_names[SH];
-    } else if (strview_has_prefix(&path, "/etc/nginx/")) {
-        return builtin_filetype_names[NGINX];
+    if (path.length) {
+        FileTypeEnum ft = filetype_from_dir_prefix(path);
+        if (ft != NONE) {
+            return builtin_filetype_names[ft];
+        }
     }
 
     strview_trim_right(&line);

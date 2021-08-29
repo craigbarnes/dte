@@ -52,6 +52,7 @@ static void test_find_ft_filename(void)
         {"/etc/default/grub", "sh"},
         {"/etc/systemd/user.conf", "ini"},
         {"/etc/nginx/mime.types", "nginx"},
+        {"/etc/pam.d/login", "config"},
         {"/etc/iptables/iptables.rules", "config"},
         {"/etc/iptables/ip6tables.rules", "config"},
         {"/root/.bash_profile", "sh"},
