@@ -15,12 +15,12 @@
 
 // Subset of stat(3) struct
 typedef struct {
-    off_t size;
-    mode_t mode;
-    gid_t gid;
-    uid_t uid;
     dev_t dev;
     ino_t ino;
+    mode_t mode;
+    uid_t uid;
+    gid_t gid;
+    off_t size;
     time_t mtime;
 } FileInfo;
 
