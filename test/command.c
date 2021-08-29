@@ -468,6 +468,31 @@ static void test_add_alias(void)
     hashmap_free(&m, free);
 }
 
+static void test_allow_macro_recording(void)
+{
+    const char *args[4] = {NULL};
+    char **argp = (char**)args;
+    const Command *cmd = find_normal_command("left");
+    ASSERT_NONNULL(cmd);
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+
+    cmd = find_normal_command("search");
+    ASSERT_NONNULL(cmd);
+    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    args[0] = "xyz";
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    args[0] = "-n";
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    args[0] = "-p";
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    args[0] = "-w";
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    args[0] = "-Hr";
+    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    args[1] = "str";
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
@@ -479,6 +504,7 @@ static const TestEntry tests[] = {
     TEST(test_cmdargs_flagset_idx),
     TEST(test_cmdargs_convert_flags),
     TEST(test_add_alias),
+    TEST(test_allow_macro_recording),
 };
 
 const TestGroup command_tests = TEST_GROUP(tests);
