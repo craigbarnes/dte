@@ -2300,7 +2300,8 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         CommandArgs a = {.args = args_copy};
         bool ret = true;
         if (do_parse_args(cmd, &a) == 0) {
-            if (a.nr_args == 0 && !strpbrk(a.flags, "npw")) {
+            const uint_least64_t flags_npw = UINT64_C(517) << 40;
+            if (a.nr_args == 0 && !(a.flag_set & flags_npw)) {
                 // If command is "search" with no pattern argument and without
                 // flags -n, -p or -w, the command would put the editor into
                 // search mode, which shouldn't be recorded.
