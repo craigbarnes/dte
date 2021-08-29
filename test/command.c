@@ -476,6 +476,18 @@ static void test_allow_macro_recording(void)
     ASSERT_NONNULL(cmd);
     EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
 
+    cmd = find_normal_command("filter");
+    ASSERT_NONNULL(cmd);
+    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+
+    cmd = find_normal_command("command");
+    ASSERT_NONNULL(cmd);
+    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+
+    cmd = find_normal_command("macro");
+    ASSERT_NONNULL(cmd);
+    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+
     cmd = find_normal_command("search");
     ASSERT_NONNULL(cmd);
     EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
