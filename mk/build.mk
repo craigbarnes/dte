@@ -226,7 +226,7 @@ build/feature.h: mk/feature-test/defs.h $(feature_tests)
 	$(Q) cat $^ > $@
 
 $(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature-test/%.h
-	$(E) DETECT $*
+	$(E) DETECT $@
 	$(Q) if $(CC) $(CFLAGS_ALL) -o $(@:.h=.o) $< 2>$(@:.h=.log); then \
 	  cp $(<:.c=.h) $@ ; \
 	else \
