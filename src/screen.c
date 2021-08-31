@@ -43,7 +43,7 @@ void update_term_title(const Buffer *b)
     term_add_bytes(filename, strlen(filename));
     term_add_byte(' ');
     term_add_byte(buffer_modified(b) ? '+' : '-');
-    term_add_bytes(STRN(" dte"));
+    term_add_literal(" dte");
     terminal.put_control_code(terminal.control_codes.set_title_end);
 }
 
