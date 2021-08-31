@@ -222,6 +222,25 @@ static ExitCode showkey_loop(void)
     return EX_OK;
 }
 
+static void freopen_tty(FILE *stream, const char *mode, int fd)
+{
+    if (unlikely(!freopen("/dev/tty", mode, stream))) {
+        const char *err = strerror(errno);
+        fprintf(stderr, "Failed to open tty in mode '%s': %s\n", mode, err);
+        exit(EX_IOERR);
+    }
+
+    int new_fd = fileno(stream);
+    if (unlikely(new_fd != fd)) {
+        // This should never happen in a single-threaded program.
+        // freopen() should call fclose() followed by open() and
+        // POSIX requires a successful call to open() to return the
+        // lowest available file descriptor.
+        fprintf(stderr, "freopen() changed fd from %d to %d\n", fd, new_fd);
+        exit(EX_OSERR);
+    }
+}
+
 static const char copyright[] =
     "(C) 2017-2021 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
@@ -313,15 +332,7 @@ loop_break:
             }
             free_buffer(b);
         }
-        if (!freopen("/dev/tty", "r", stdin)) {
-            perror("Unable to reopen input tty");
-            return EX_IOERR;
-        }
-        int fd = fileno(stdin);
-        if (fd != STDIN_FILENO) {
-            fprintf(stderr, "freopen() changed stdin fd from 0 to %d\n", fd);
-            return EX_OSERR;
-        }
+        freopen_tty(stdin, "r", STDIN_FILENO);
     }
 
     Buffer *stdout_buffer = NULL;
@@ -332,19 +343,7 @@ loop_break:
             perror("fcntl");
             return EX_OSERR;
         }
-        if (!freopen("/dev/tty", "w", stdout)) {
-            perror("Unable to open /dev/tty");
-            return EX_OSERR;
-        }
-        int fd = fileno(stdout);
-        if (fd != STDOUT_FILENO) {
-            // This should never happen in a single-threaded program.
-            // freopen() should call fclose() followed by open() and
-            // POSIX requires a successful call to open() to return the
-            // lowest available file descriptor.
-            fprintf(stderr, "freopen() changed stdout fd from 1 to %d\n", fd);
-            return EX_OSERR;
-        }
+        freopen_tty(stdout, "w", STDOUT_FILENO);
         if (old_stdout_fd == -1) {
             // The call to fcntl(3) above failed with EBADF, meaning stdout was
             // most likely closed and there's no point opening a buffer for it
