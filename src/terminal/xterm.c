@@ -153,7 +153,8 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
         *k = ch - 64;
         return i;
     }
-    return 0;
+    *k = KEY_IGNORE;
+    return i;
 }
 
 static ByteType get_byte_type(unsigned char byte)
