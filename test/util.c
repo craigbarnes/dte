@@ -1314,9 +1314,9 @@ static void test_hashmap(void)
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
         EXPECT_PTREQ(e->value, value);
-
         EXPECT_PTREQ(hashmap_remove(&map, key), value);
-        EXPECT_STREQ(e->key, "TOMBSTONE");
+        EXPECT_STREQ(e->key, NULL);
+        EXPECT_UINT_EQ(e->hash, 0xdead);
         EXPECT_NULL(hashmap_find(&map, key));
     }
 
@@ -1346,7 +1346,8 @@ static void test_hashmap(void)
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
         EXPECT_PTREQ(hashmap_remove(&map, key), value);
-        EXPECT_STREQ(e->key, "TOMBSTONE");
+        EXPECT_STREQ(e->key, NULL);
+        EXPECT_UINT_EQ(e->hash, 0xdead);
         EXPECT_NULL(hashmap_find(&map, key));
     }
 

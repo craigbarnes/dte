@@ -45,10 +45,9 @@ static inline bool hashmap_next(HashMapIter *iter)
         return false;
     }
 
-    extern char tombstone[16];
     for (size_t i = iter->idx, n = map->mask + 1; i < n; i++) {
         HashMapEntry *e = map->entries + i;
-        if (e->key && e->key != tombstone) {
+        if (e->key) {
             iter->entry = e;
             iter->idx = i + 1;
             return true;
