@@ -98,13 +98,14 @@ HashMapEntry *hashmap_find(const HashMap *map, const char *key)
             if (e->hash == TOMBSTONE) {
                 continue;
             }
-            break;
+            return NULL;
         }
         if (e->hash == hash && streq(e->key, key)) {
-            break;
+            return e;
         }
     }
-    return e->key ? e : NULL;
+
+    BUG("unexpected loop break");
 }
 
 void *hashmap_remove(HashMap *map, const char *key)
