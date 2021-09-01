@@ -56,7 +56,6 @@ typedef struct {
     size_t pos;
     size_t separator;
     const Window *win;
-    const char *misc_status;
 } Formatter;
 
 #define add_status_literal(f, s) add_status_bytes(f, s, STRLEN(s))
@@ -134,6 +133,47 @@ static void add_status_pos(Formatter *f)
     }
 }
 
+static void add_misc_status(Formatter *f)
+{
+    static const struct {
+        const char str[24];
+        size_t len;
+    } css_strs[] = {
+        [CSS_FALSE] = {STRN("[case-sensitive = false]")},
+        [CSS_TRUE] = {STRN("[case-sensitive = true]")},
+        [CSS_AUTO] = {STRN("[case-sensitive = auto]")},
+    };
+
+    if (editor.input_mode == INPUT_SEARCH) {
+        SearchCaseSensitivity css = editor.options.case_sensitive_search;
+        BUG_ON(css >= ARRAY_COUNT(css_strs));
+        add_status_bytes(f, css_strs[css].str, css_strs[css].len);
+        return;
+    }
+
+    const View *v = f->win->view;
+    if (v->selection == SELECT_NONE) {
+        return;
+    }
+
+    SelectionInfo si;
+    init_selection(v, &si);
+
+    switch (v->selection) {
+    case SELECT_CHARS:
+        add_status_format(f, "[%zu chars]", get_nr_selected_chars(&si));
+        return;
+    case SELECT_LINES:
+        add_status_format(f, "[%zu lines]", get_nr_selected_lines(&si));
+        return;
+    case SELECT_NONE:
+        // Already handled above
+        break;
+    }
+
+    BUG("unhandled selection type");
+}
+
 static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     f->buf = buf;
@@ -203,9 +243,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
             add_status_str(f, v->buffer->encoding.name);
             break;
         case STATUS_MISC:
-            if (f->misc_status) {
-                add_status_str(f, f->misc_status);
-            }
+            add_misc_status(f);
             break;
         case STATUS_IS_CRLF:
             if (v->buffer->crlf_newlines) {
@@ -251,51 +289,9 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     f->buf[f->pos] = '\0';
 }
 
-static const char *format_misc_status(const Window *win)
-{
-    if (editor.input_mode == INPUT_SEARCH) {
-        switch (editor.options.case_sensitive_search) {
-        case CSS_FALSE:
-            return "[case-sensitive = false]";
-        case CSS_TRUE:
-            return "[case-sensitive = true]";
-        case CSS_AUTO:
-            return "[case-sensitive = auto]";
-        }
-        BUG("unhandled case sensitivity type");
-        return NULL;
-    }
-
-    if (win->view->selection == SELECT_NONE) {
-        return NULL;
-    }
-
-    static char buf[sizeof("[n chars]") + DECIMAL_STR_MAX(size_t)];
-    SelectionInfo si;
-    init_selection(win->view, &si);
-
-    switch (win->view->selection) {
-    case SELECT_CHARS:
-        xsnprintf(buf, sizeof(buf), "[%zu chars]", get_nr_selected_chars(&si));
-        return buf;
-    case SELECT_LINES:
-        xsnprintf(buf, sizeof(buf), "[%zu lines]", get_nr_selected_lines(&si));
-        return buf;
-    case SELECT_NONE:
-        // Already handled above
-        break;
-    }
-
-    BUG("unhandled selection type");
-    return NULL;
-}
-
 void update_status_line(const Window *win)
 {
-    Formatter f = {
-        .win = win,
-        .misc_status = format_misc_status(win)
-    };
+    Formatter f = {.win = win};
     char lbuf[256];
     char rbuf[256];
     sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
