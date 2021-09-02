@@ -354,43 +354,32 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
 {
     char data[4096];
     size_t pos = 0;
-    bool terminated = false;
 
     while (i < len) {
         const char ch = buf[i++];
-        switch (ch) {
-        case 0x00 ... 0x06:
-        case 0x08 ... 0x17:
-        case 0x19:
-        case 0x1C ... 0x1F:
-            continue;
-        case 0x18: // CAN
-        case 0x1A: // SUB
-            *k = KEY_IGNORE;
-            return i;
-        case 0x1B: // ESC
-            // Don't consume the ESC; it will be consumed (and ignored)
-            // as part of the ST sequence ("\033\\"), if present.
-            // See: https://vt100.net/emu/dec_ansi_parser#STESC
-            i--;
-            // Fallthrough
-        case 0x07: // BEL
-            terminated = true;
-            break;
-        default:
-            // Consume 0x20..0xFF (UTF-8 allowed)
-            if (likely(pos < sizeof(data))) {
-                data[pos++] = ch;
+        if (unlikely(ch < 0x20)) {
+            switch (ch) {
+            case 0x18: // CAN
+            case 0x1A: // SUB
+                goto ignore;
+            case 0x1B: // ESC
+                i--;
+                // Fallthrough
+            case 0x07: // BEL
+                goto complete;
             }
             continue;
         }
-        break;
+        // Consume 0x20..0xFF (UTF-8 allowed)
+        if (likely(pos < sizeof(data))) {
+            data[pos++] = ch;
+        }
     }
 
-    if (!terminated) {
-        return -1;
-    }
+    // Unterminated sequence (possibly truncated)
+    return -1;
 
+complete:
     if (pos > 0) {
         const char prefix = data[0];
         if (prefix == 'L' || prefix == 'l') {
@@ -400,6 +389,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
         }
     }
 
+ignore:
     *k = KEY_IGNORE;
     return i;
 }
