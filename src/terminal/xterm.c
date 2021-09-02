@@ -11,11 +11,13 @@
 #include "util/unicode.h"
 
 typedef enum {
-    BYTE_INVALID,
+    BYTE_CONTROL, // 0..31
     BYTE_INTERMEDIATE, // 32..47
     BYTE_PARAMETER, // 48..63
     BYTE_FINAL, // 64..111
     BYTE_FINAL_PRIVATE, // 112..126
+    BYTE_DELETE, // 127
+    BYTE_OTHER,
 } ByteType;
 
 #define ENTRY(x) [(x - 64)]
@@ -160,24 +162,25 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
 static ByteType get_byte_type(unsigned char byte)
 {
     enum {
+        C = BYTE_CONTROL,
         I = BYTE_INTERMEDIATE,
         P = BYTE_PARAMETER,
         F = BYTE_FINAL,
         f = BYTE_FINAL_PRIVATE,
-        x = BYTE_INVALID
+        x = BYTE_OTHER,
     };
 
-    // ECMA 48 divides bytes ("bit combinations") into 16 rows of 16 columns.
+    // ECMA 48 divides bytes ("bit combinations") into rows of 16 columns.
     // The byte classifications mostly fall into their own rows:
     static const uint8_t rows[16] = {
-        x, x, I, P, F, F, F, f,
+        C, C, I, P, F, F, F, f,
         x, x, x, x, x, x, x, x
     };
 
-    // ... with the single exception being byte 127 (DEL), which falls into
-    // row 7, but isn't a final byte like the others in that row:
+    // ... with the exception of byte 127 (DEL), which falls into rows[7]
+    // but isn't a final byte like the others in that row:
     if (unlikely(byte == 127)) {
-        return BYTE_INVALID;
+        return BYTE_DELETE;
     }
 
     return rows[(byte >> 4) & 0xF];
@@ -246,8 +249,22 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             // (03/12 to 03/15 == '<' to '?')
             unhandled_bytes = true;
             continue;
-        case BYTE_INVALID:
-            return 0;
+        case BYTE_CONTROL:
+            switch (ch) {
+            case 0x1B: // ESC
+                // Don't consume ESC; it's the start of another sequence
+                i--;
+                // Fallthrough
+            case 0x18: // CAN
+            case 0x1A: // SUB
+                goto ignore;
+            }
+            // Fallthrough
+        case BYTE_DELETE:
+            continue;
+        case BYTE_OTHER:
+            unhandled_bytes = true;
+            continue;
         }
 
         BUG("unhandled byte type");
