@@ -187,7 +187,7 @@ static void test_xterm_parse_key(void)
         {"\033[1;8H~_", 6, MOD_SHIFT | MOD_META | MOD_CTRL | KEY_HOME},
         {"\033", -1, 0},
         {"\033[", -1, 0},
-        {"\033]", 0, 0},
+        {"\033]", -1, 0},
         {"\033[1", -1, 0},
         {"\033[9", -1, 0},
         {"\033[1;", -1, 0},
@@ -316,7 +316,13 @@ static void test_xterm_parse_key(void)
         {"\033[ 2;3u", 7, KEY_IGNORE},
         {"\033[<?>2;3u", 9, KEY_IGNORE},
         {"\033[ !//.$2;3u", 12, KEY_IGNORE},
+        // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
+        // XTWINOPS replies
+        {"\033]ltitle\033\\", 8, KEY_IGNORE},
+        {"\033]Licon\033\\", 7, KEY_IGNORE},
+        {"\033]ltitle\a", 9, KEY_IGNORE},
+        {"\033]Licon\a", 8, KEY_IGNORE},
     };
     FOR_EACH_I(i, tests) {
         const char *seq = tests[i].escape_sequence;

@@ -333,6 +333,60 @@ normalize:
     return i;
 }
 
+static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    char data[4096];
+    size_t pos = 0;
+    bool terminated = false;
+
+    while (i < len) {
+        const char ch = buf[i++];
+        switch (ch) {
+        case 0x00 ... 0x06:
+        case 0x08 ... 0x17:
+        case 0x19:
+        case 0x1C ... 0x1F:
+            continue;
+        case 0x18: // CAN
+        case 0x1A: // SUB
+            *k = KEY_IGNORE;
+            return i;
+        case 0x1B: // ESC
+            // Don't consume the ESC; it will be consumed (and ignored)
+            // as part of the ST sequence ("\033\\"), if present.
+            // See: https://vt100.net/emu/dec_ansi_parser#STESC
+            i--;
+            // Fallthrough
+        case 0x07: // BEL
+            terminated = true;
+            break;
+        default:
+            // Consume 0x20..0xFF (UTF-8 allowed)
+            if (likely(pos < sizeof(data))) {
+                data[pos++] = ch;
+            }
+            continue;
+        }
+        break;
+    }
+
+    if (!terminated) {
+        return -1;
+    }
+
+    if (pos > 0) {
+        const char prefix = data[0];
+        if (prefix == 'L' || prefix == 'l') {
+            const char *note = (pos >= sizeof(data)) ? " (truncated)" : "";
+            const char *type = (prefix == 'l') ? "title" : "icon";
+            DEBUG_LOG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
+        }
+    }
+
+    *k = KEY_IGNORE;
+    return i;
+}
+
 ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length == 0 || buf[0] != '\033')) {
@@ -343,6 +397,8 @@ ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
     switch (buf[1]) {
     case 'O': return parse_ss3(buf, length, 2, k);
     case '[': return parse_csi(buf, length, 2, k);
+    case ']': return parse_osc(buf, length, 2, k);
+    case '\\': *k = KEY_IGNORE; return 2;
     }
     return 0;
 }
