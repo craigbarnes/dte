@@ -86,23 +86,18 @@ static KeyCode read_special(void)
 {
     KeyCode key;
     ssize_t len = terminal.parse_key_sequence(input.buf, input.len, &key);
-    switch (len) {
-    case -1:
-        // Possibly truncated
-        break;
-    case 0:
-        // No match
-        return KEY_NONE;
-    default:
+    if (likely(len > 0)) {
         // Match
         consume_input(len);
         return key;
     }
 
-    if (input.can_be_truncated && fill_buffer()) {
+    if (len < 0 && input.can_be_truncated && fill_buffer()) {
+        // Possibly truncated
         return read_special();
     }
 
+    // No match
     return KEY_NONE;
 }
 
