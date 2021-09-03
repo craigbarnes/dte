@@ -356,7 +356,7 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
     size_t pos = 0;
 
     while (i < len) {
-        const char ch = buf[i++];
+        const unsigned char ch = buf[i++];
         if (unlikely(ch < 0x20)) {
             switch (ch) {
             case 0x18: // CAN
