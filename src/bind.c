@@ -101,6 +101,10 @@ UNITTEST {
     BUG_ON(get_lookup_table_index(MOD_CTRL | ASCII_RANGE_END) != arl - 1);
     BUG_ON(get_lookup_table_index(MOD_META | ASCII_RANGE_END) != ax2 - 1);
 
+    BUG_ON(get_lookup_table_index(MOD_CTRL | (ASCII_RANGE_START - 1)) != -1);
+    BUG_ON(get_lookup_table_index(MOD_META | (ASCII_RANGE_START - 1)) != -1);
+    BUG_ON(get_lookup_table_index(MOD_CTRL | (ASCII_RANGE_END + 1)) != -1);
+    BUG_ON(get_lookup_table_index(MOD_META | (ASCII_RANGE_END + 1)) != -1);
     BUG_ON(get_lookup_table_index(MOD_CTRL | MOD_META | 'a') != -1);
     BUG_ON(get_lookup_table_index(MOD_META | 0x0E01) != -1);
 }
