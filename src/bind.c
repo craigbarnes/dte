@@ -56,19 +56,23 @@ static ssize_t get_lookup_table_index(KeyCode k)
     static_assert(ASCII_RANGE_LEN == 95);
     static_assert(MOD_MASK >> MOD_OFFSET == 7);
 
-    KeyCode modifiers = keycode_get_modifiers(k);
-    KeyCode key = keycode_get_key(k);
+    const KeyCode modifiers = keycode_get_modifiers(k);
+    const KeyCode key = keycode_get_key(k);
 
-    if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
+    size_t idx = key - KEY_SPECIAL_MIN;
+    if (idx < NR_SPECIAL_KEYS) {
         const size_t mod_offset = (modifiers >> MOD_OFFSET) * NR_SPECIAL_KEYS;
-        return (2 * ASCII_RANGE_LEN) + mod_offset + (key - KEY_SPECIAL_MIN);
+        return (2 * ASCII_RANGE_LEN) + mod_offset + idx;
     }
 
-    if (key >= ASCII_RANGE_START && key <= ASCII_RANGE_END) {
-        key -= ASCII_RANGE_START;
+    idx = key - ASCII_RANGE_START;
+    if (idx < ASCII_RANGE_LEN) {
         switch (modifiers) {
-        case MOD_CTRL: return key;
-        case MOD_META: return key + ASCII_RANGE_LEN;
+        case MOD_META:
+            idx += ASCII_RANGE_LEN;
+            // Fallthrough
+        case MOD_CTRL:
+            return idx;
         }
     }
 
