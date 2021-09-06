@@ -457,11 +457,13 @@ static const OptionDesc option_desc[] = {
 
 static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
 {
+    BUG_ON(!desc->local);
     return (char*)opt + desc->offset;
 }
 
 static char *global_ptr(const OptionDesc *desc)
 {
+    BUG_ON(!desc->global);
     return (char*)&editor.options + desc->offset;
 }
 
