@@ -51,11 +51,6 @@ const char *ulong_to_str(unsigned long x)
     return umax_to_str(x);
 }
 
-size_t buf_ulong_to_str(unsigned long x, char *buf)
-{
-    return buf_umax_to_str(x, buf);
-}
-
 size_t buf_uint_to_str(unsigned int x, char *buf)
 {
     return buf_umax_to_str(x, buf);
