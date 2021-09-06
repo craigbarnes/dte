@@ -697,6 +697,15 @@ static void test_uint_to_str(void)
     EXPECT_STREQ(uint_to_str(4294967295u), "4294967295");
 }
 
+static void test_ulong_to_str(void)
+{
+    unsigned long x = ULONG_MAX;
+    char ref[DECIMAL_STR_MAX(x)];
+    xsnprintf(ref, sizeof ref, "%lu", x);
+    EXPECT_STREQ(ulong_to_str(x), ref);
+    EXPECT_STREQ(ulong_to_str(x + 1), "0");
+}
+
 static void test_buf_uint_to_str(void)
 {
     char buf[DECIMAL_STR_MAX(unsigned int)];
@@ -1832,6 +1841,7 @@ static const TestEntry tests[] = {
     TEST(test_str_to_size),
     TEST(test_umax_to_str),
     TEST(test_uint_to_str),
+    TEST(test_ulong_to_str),
     TEST(test_buf_uint_to_str),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
