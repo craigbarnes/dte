@@ -620,6 +620,22 @@ static void test_buf_parse_ulong(void)
     EXPECT_EQ(val, 9876);
 }
 
+static void test_buf_parse_size(void)
+{
+    size_t val;
+    char max[DECIMAL_STR_MAX(val) + 1];
+    size_t max_len = xsnprintf(max, sizeof max, "%zu", SIZE_MAX);
+
+    val = 14;
+    EXPECT_EQ(buf_parse_size(max, max_len, &val), max_len);
+    EXPECT_UINT_EQ(val, SIZE_MAX);
+
+    val = 88;
+    max[max_len++] = '0';
+    EXPECT_EQ(buf_parse_size(max, max_len, &val), 0);
+    EXPECT_EQ(val, 88);
+}
+
 static void test_str_to_int(void)
 {
     int val = 0;
@@ -1837,6 +1853,7 @@ static const TestEntry tests[] = {
     TEST(test_size_str_width),
     TEST(test_buf_parse_uintmax),
     TEST(test_buf_parse_ulong),
+    TEST(test_buf_parse_size),
     TEST(test_str_to_int),
     TEST(test_str_to_size),
     TEST(test_umax_to_str),
