@@ -46,12 +46,12 @@ option yaml \
     ws-error tab-indent,tab-after-indent,trailing,special
 
 # Patterns used to detect indent size when "auto-indent" option is enabled
-option c indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
-option java indent-regex '^[ \t]*(case|default|do|else|for|if|while)\b'
+option c indent-regex '^[ \t]*(case|default|do|else|for|if|while)[ (]'
+option java indent-regex '^[ \t]*(case|default|do|else|for|if|while)[ (]'
 option lua indent-regex '(then|do|repeat|else) *$|function *[A-Za-z0-9_.:]* *\([A-Za-z0-9_, ]*\) *$'
-option php indent-regex '^[ \t]*(case|default|do|else|for|foreach|if|while)\b'
+option php indent-regex '^[ \t]*(case|default|do|else|for|foreach|if|while)[ (]'
 option python indent-regex ':[ \t]*(#.*)?$'
-option sh indent-regex '(^|;)[ \t]*(do|else|then)\b'
+option sh indent-regex '(^|;)[ \t]*(do|else|then) *$'
 
 # Don't highlight whitespace errors in diff and mail files
 option diff,mail ws-error 0
