@@ -133,7 +133,7 @@ bool str_to_int(const char *str, int *valp)
     return true;
 }
 
-bool str_to_uint(const char *str, unsigned int *valp)
+static bool str_to_uintmax(const char *str, uintmax_t *valp)
 {
     const size_t len = strlen(str);
     if (unlikely(len == 0)) {
@@ -141,40 +141,40 @@ bool str_to_uint(const char *str, unsigned int *valp)
     }
     uintmax_t val;
     const size_t n = buf_parse_uintmax(str, len, &val);
-    if (n != len || val > UINT_MAX) {
+    if (n != len) {
         return false;
     }
-    *valp = (unsigned int)val;
+    *valp = val;
     return true;
 }
 
-bool str_to_size(const char *str, size_t *valp)
+bool str_to_uint(const char *str, unsigned int *valp)
 {
-    const size_t len = strlen(str);
-    if (unlikely(len == 0)) {
+    uintmax_t x;
+    if (!str_to_uintmax(str, &x) || x > UINT_MAX) {
         return false;
     }
-    uintmax_t val;
-    const size_t n = buf_parse_uintmax(str, len, &val);
-    if (n != len || val > SIZE_MAX) {
-        return false;
-    }
-    *valp = (size_t)val;
+    *valp = (unsigned int)x;
     return true;
 }
 
 bool str_to_ulong(const char *str, unsigned long *valp)
 {
-    const size_t len = strlen(str);
-    if (unlikely(len == 0)) {
+    uintmax_t x;
+    if (!str_to_uintmax(str, &x) || x > ULONG_MAX) {
         return false;
     }
-    unsigned long val;
-    const size_t n = buf_parse_ulong(str, len, &val);
-    if (n != len) {
+    *valp = (unsigned long)x;
+    return true;
+}
+
+bool str_to_size(const char *str, size_t *valp)
+{
+    uintmax_t x;
+    if (!str_to_uintmax(str, &x) || x > SIZE_MAX) {
         return false;
     }
-    *valp = val;
+    *valp = (size_t)x;
     return true;
 }
 
