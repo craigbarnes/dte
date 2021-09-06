@@ -9,16 +9,6 @@
 
 RegexpWordBoundaryTokens regexp_word_boundary;
 
-bool regexp_match_nosub(const char *pattern, const StringView *buf)
-{
-    regex_t re;
-    regexp_compile_or_fatal_error(&re, pattern, REG_NEWLINE | REG_NOSUB);
-    regmatch_t m;
-    bool ret = regexp_exec(&re, buf->data, buf->length, 0, &m, 0);
-    regfree(&re);
-    return ret;
-}
-
 void regexp_error_msg(const regex_t *re, const char *pattern, int err)
 {
     char msg[1024];
