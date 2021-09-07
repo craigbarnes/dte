@@ -29,32 +29,46 @@ static bool close_on_exec(int fd, bool cloexec)
 bool pipe_close_on_exec(int fd[2])
 {
 #ifdef HAVE_PIPE2
-    return (pipe2(fd, O_CLOEXEC) == 0);
-#else
+    if (likely(pipe2(fd, O_CLOEXEC) == 0)) {
+        return true;
+    }
+    // If pipe2() fails with ENOSYS, it means the function is just a stub
+    // and not actually supported. In that case, the pure POSIX fallback
+    // implementation should be tried instead. In other cases, the failure
+    // is probably caused by a normal error condition.
+    if (errno != ENOSYS) {
+        return false;
+    }
+#endif
+
     if (pipe(fd) != 0) {
         return false;
     }
     close_on_exec(fd[0], true);
     close_on_exec(fd[1], true);
     return true;
-#endif
 }
 
 static int xdup3(int oldfd, int newfd, int flags)
 {
-#ifdef HAVE_DUP3
     int fd;
+#ifdef HAVE_DUP3
     do {
         fd = dup3(oldfd, newfd, flags);
     } while (unlikely(fd < 0 && errno == EINTR));
-    return fd;
-#else
+    if (fd != -1 || errno != ENOSYS) {
+        return fd;
+    }
+    // If execution reaches this point, dup3() failed with ENOSYS
+    // ("function not supported"), so we fall through to the pure
+    // POSIX implementation below.
+#endif
+
     if (unlikely(oldfd == newfd)) {
         // Replicate dup3() behaviour:
         errno = EINVAL;
         return -1;
     }
-    int fd;
     do {
         fd = dup2(oldfd, newfd);
     } while (unlikely(fd < 0 && errno == EINTR));
@@ -62,7 +76,6 @@ static int xdup3(int oldfd, int newfd, int flags)
         close_on_exec(fd, true);
     }
     return fd;
-#endif
 }
 
 static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd)
