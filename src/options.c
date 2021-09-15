@@ -161,8 +161,9 @@ static void redraw_buffer(bool global)
     }
 }
 
-static void redraw_screen(bool UNUSED_ARG(global))
+static void redraw_screen(bool global)
 {
+    BUG_ON(!global);
     mark_everything_changed();
 }
 
