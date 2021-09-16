@@ -102,6 +102,13 @@ static void test_parse_command_arg(void)
     EXPECT_STREQ(arg, "\\t\\n");
     free(arg);
 
+    // Trailing backslash
+    // Note: `s` is unterminated, to allow ASan to catch OOB reads
+    static const NONSTRING char s[4] = "123\\";
+    arg = parse_command_arg(nc, s, sizeof s, false);
+    EXPECT_STREQ(arg, "123");
+    free(arg);
+
     // Single-quoted, empty string
     arg = parse_command_arg(nc, STRN("''"), false);
     EXPECT_STREQ(arg, "");
