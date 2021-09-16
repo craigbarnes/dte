@@ -165,7 +165,7 @@ char *parse_command_arg(const CommandSet *cmds, const char *cmd, size_t len, boo
             pos += parse_var(cmds, cmd + pos, len - pos, &buf);
             break;
         case '\\':
-            if (pos == len) {
+            if (unlikely(pos == len)) {
                 goto end;
             }
             ch = cmd[pos++];
@@ -180,9 +180,8 @@ end:
     return string_steal_cstring(&buf);
 }
 
-size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
+size_t find_end(const char *cmd, size_t pos, CommandParseError *err)
 {
-    size_t pos = startpos;
     while (1) {
         switch (cmd[pos++]) {
         case '\'':
@@ -191,7 +190,7 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
                     pos++;
                     break;
                 }
-                if (cmd[pos] == '\0') {
+                if (unlikely(cmd[pos] == '\0')) {
                     *err = CMDERR_UNCLOSED_SQUOTE;
                     return 0;
                 }
@@ -204,21 +203,23 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
                     pos++;
                     break;
                 }
-                if (cmd[pos] == '\0') {
+                if (unlikely(cmd[pos] == '\0')) {
                     *err = CMDERR_UNCLOSED_DQUOTE;
                     return 0;
                 }
                 if (cmd[pos++] == '\\') {
-                    if (cmd[pos] == '\0') {
-                        goto unexpected_eof;
+                    if (unlikely(cmd[pos] == '\0')) {
+                        *err = CMDERR_UNEXPECTED_EOF;
+                        return 0;
                     }
                     pos++;
                 }
             }
             break;
         case '\\':
-            if (cmd[pos] == '\0') {
-                goto unexpected_eof;
+            if (unlikely(cmd[pos] == '\0')) {
+                *err = CMDERR_UNEXPECTED_EOF;
+                return 0;
             }
             pos++;
             break;
@@ -232,12 +233,11 @@ size_t find_end(const char *cmd, const size_t startpos, CommandParseError *err)
             return pos - 1;
         }
     }
+
     BUG("Unexpected break of outer loop");
-unexpected_eof:
-    *err = CMDERR_UNEXPECTED_EOF;
-    return 0;
 }
 
+// Note: `array` must be freed, regardless of the return value
 CommandParseError parse_commands(const CommandSet *cmds, PointerArray *array, const char *cmd)
 {
     size_t pos = 0;
