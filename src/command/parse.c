@@ -44,12 +44,28 @@ static size_t unicode_escape(const char *str, size_t count, String *buf)
     return i;
 }
 
+static size_t hex_escape(const char *str, size_t count, String *buf)
+{
+    unsigned char ch = 0;
+    size_t i;
+    for (i = 0; i < count; i++) {
+        unsigned int x = hex_decode(str[i]);
+        if (unlikely(x > 0xF)) {
+            break;
+        }
+        ch = ch << 4 | x;
+    }
+    if (likely(i == 2)) {
+        string_append_byte(buf, ch);
+    }
+    return i;
+}
+
 static size_t parse_dq(const char *cmd, size_t len, String *buf)
 {
     size_t pos = 0;
     while (pos < len) {
         unsigned char ch = cmd[pos++];
-
         if (ch == '"') {
             break;
         }
@@ -69,17 +85,7 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
             case '"':
                 break;
             case 'x':
-                if (pos < len) {
-                    unsigned int x1 = hex_decode(cmd[pos]);
-                    if (x1 <= 0xF && ++pos < len) {
-                        unsigned int x2 = hex_decode(cmd[pos]);
-                        if (x2 <= 0xF) {
-                            pos++;
-                            ch = x1 << 4 | x2;
-                            break;
-                        }
-                    }
-                }
+                pos += hex_escape(cmd + pos, MIN(2, len - pos), buf);
                 continue;
             case 'u':
                 pos += unicode_escape(cmd + pos, MIN(4, len - pos), buf);

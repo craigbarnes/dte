@@ -85,7 +85,6 @@ static void test_parse_command_arg(void)
     // Incomplete hexadecimal escape sequence
     arg = parse_command_arg(nc, STRN("\"\\x"), false);
     EXPECT_STREQ(arg, "");
-    (void)arg;
     free(arg);
 
     // 4-digit Unicode escape sequence
