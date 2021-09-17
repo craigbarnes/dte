@@ -203,6 +203,9 @@ static void test_parse_commands(void)
 
     EXPECT_EQ(parse_commands(nc, &array, "insert \\"), CMDERR_UNEXPECTED_EOF);
     ptr_array_free(&array);
+
+    EXPECT_EQ(parse_commands(nc, &array, "insert \"\\"), CMDERR_UNEXPECTED_EOF);
+    ptr_array_free(&array);
 }
 
 static void test_command_parse_error_to_string(void)
