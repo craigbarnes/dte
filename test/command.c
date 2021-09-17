@@ -77,9 +77,15 @@ static void test_parse_command_arg(void)
     EXPECT_STREQ(arg, "\x1B[31m~/\x1B[0m");
     free(arg);
 
-    // Incomplete/invalid hexadecimal escape sequences
+    // Invalid hexadecimal escape sequences
     arg = parse_command_arg(nc, STRN("\"\\x\\x1\\xFG\\xz1\""), false);
     EXPECT_STREQ(arg, "Gz1");
+    free(arg);
+
+    // Incomplete hexadecimal escape sequence
+    arg = parse_command_arg(nc, STRN("\"\\x"), false);
+    EXPECT_STREQ(arg, "");
+    (void)arg;
     free(arg);
 
     // 4-digit Unicode escape sequence
