@@ -97,6 +97,16 @@ static void test_parse_command_arg(void)
     EXPECT_STREQ(arg, "\xF0\x9F\x92\xA4...");
     free(arg);
 
+    // Incomplete Unicode escape sequence
+    arg = parse_command_arg(nc, STRN("\"\\u"), false);
+    EXPECT_STREQ(arg, "");
+    free(arg);
+
+    // Invalid Unicode escape sequence
+    arg = parse_command_arg(nc, STRN("\"\\ugef\""), false);
+    EXPECT_STREQ(arg, "gef");
+    free(arg);
+
     // Unsupported, escape-like sequences in a single-quoted string
     arg = parse_command_arg(nc, STRN("'\\t\\n'"), false);
     EXPECT_STREQ(arg, "\\t\\n");

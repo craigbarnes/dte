@@ -29,10 +29,6 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
 
 static size_t unicode_escape(const char *str, size_t count, String *buf)
 {
-    if (unlikely(count == 0)) {
-        return 0;
-    }
-
     CodePoint u = 0;
     size_t i;
     for (i = 0; i < count; i++) {
@@ -42,7 +38,7 @@ static size_t unicode_escape(const char *str, size_t count, String *buf)
         }
         u = u << 4 | x;
     }
-    if (likely(u_is_unicode(u))) {
+    if (likely(i > 0 && u_is_unicode(u))) {
         string_append_codepoint(buf, u);
     }
     return i;
