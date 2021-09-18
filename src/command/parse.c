@@ -29,36 +29,25 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
 
 static size_t unicode_escape(const char *str, size_t count, String *buf)
 {
-    CodePoint u = 0;
-    size_t i;
-    for (i = 0; i < count; i++) {
-        unsigned int x = hex_decode(str[i]);
-        if (unlikely(x > 0xF)) {
-            break;
-        }
-        u = u << 4 | x;
-    }
-    if (likely(i > 0 && u_is_unicode(u))) {
+    // Note: `u` doesn't need to be initialized here, but `gcc -Og`
+    // gives a spurious -Wmaybe-uninitialized warning if it's not.
+    unsigned int u = 0;
+    static_assert(sizeof(u) >= 4);
+    size_t n = buf_parse_hex_uint(str, count, &u);
+    if (likely(n > 0 && u_is_unicode(u))) {
         string_append_codepoint(buf, u);
     }
-    return i;
+    return n;
 }
 
 static size_t hex_escape(const char *str, size_t count, String *buf)
 {
-    unsigned char ch = 0;
-    size_t i;
-    for (i = 0; i < count; i++) {
-        unsigned int x = hex_decode(str[i]);
-        if (unlikely(x > 0xF)) {
-            break;
-        }
-        ch = ch << 4 | x;
+    unsigned int x = 0;
+    size_t n = buf_parse_hex_uint(str, count, &x);
+    if (likely(n == 2)) {
+        string_append_byte(buf, x);
     }
-    if (likely(i == 2)) {
-        string_append_byte(buf, ch);
-    }
-    return i;
+    return n;
 }
 
 static size_t parse_dq(const char *cmd, size_t len, String *buf)
@@ -69,7 +58,6 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
         if (ch == '"') {
             break;
         }
-
         if (ch == '\\' && pos < len) {
             ch = cmd[pos++];
             switch (ch) {
@@ -98,10 +86,8 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
                 break;
             }
         }
-
         string_append_byte(buf, ch);
     }
-
     return pos;
 }
 

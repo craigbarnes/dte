@@ -86,15 +86,9 @@ UNITTEST {
 
 static int32_t parse_rrggbb(const char *str)
 {
-    int32_t color = 0;
-    for (size_t i = 0; i < 6; i++) {
-        unsigned int digit = hex_decode(str[i]);
-        if (unlikely(digit > 0xF)) {
-            return COLOR_INVALID;
-        }
-        color = (color << 4) | digit;
-    }
-    return COLOR_RGB(color);
+    unsigned int val;
+    size_t n = buf_parse_hex_uint(str, 6, &val);
+    return (n == 6) ? COLOR_RGB(val) : COLOR_INVALID;
 }
 
 UNITTEST {
