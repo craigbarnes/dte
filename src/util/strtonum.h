@@ -1,6 +1,7 @@
 #ifndef UTIL_STRTONUM_H
 #define UTIL_STRTONUM_H
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -16,6 +17,24 @@ static inline unsigned int hex_decode(unsigned char c)
 {
     extern const uint8_t hex_table[256];
     return hex_table[c];
+}
+
+static inline size_t buf_parse_hex_uint(const char *str, size_t size, unsigned int *valp)
+{
+    unsigned int val = 0;
+    size_t i;
+    for (i = 0; i < size; i++) {
+        unsigned int x = hex_decode(str[i]);
+        if (unlikely(x > 0xF)) {
+            break;
+        }
+        if (unlikely(val > (UINT_MAX >> 4))) {
+            return 0; // Overflow
+        }
+        val = val << 4 | x;
+    }
+    *valp = val;
+    return i;
 }
 
 size_t size_str_width(size_t x) CONST_FN;
