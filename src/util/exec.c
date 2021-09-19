@@ -26,7 +26,7 @@ static bool fd_set_cloexec(int fd, bool cloexec)
     return true;
 }
 
-bool pipe_close_on_exec(int fd[2])
+bool pipe_cloexec(int fd[2])
 {
 #ifdef HAVE_PIPE2
     if (likely(pipe2(fd, O_CLOEXEC) == 0)) {
@@ -159,7 +159,7 @@ error:
 pid_t fork_exec(char **argv, const char **env, int fd[3])
 {
     int ep[2];
-    if (!pipe_close_on_exec(ep)) {
+    if (!pipe_cloexec(ep)) {
         return -1;
     }
 

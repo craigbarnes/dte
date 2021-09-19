@@ -220,7 +220,7 @@ bool spawn_filter(SpawnContext *ctx)
     int p0[2] = {-1, -1};
     int p1[2] = {-1, -1};
     int errfd = -1;
-    if (!pipe_close_on_exec(p0) || !pipe_close_on_exec(p1)) {
+    if (!pipe_cloexec(p0) || !pipe_cloexec(p1)) {
         perror_msg("pipe");
         goto error;
     }
@@ -278,7 +278,7 @@ bool spawn_source(SpawnContext *ctx)
     int dev_null_r = -1;
     int dev_null_w = -1;
 
-    if (!pipe_close_on_exec(p)) {
+    if (!pipe_cloexec(p)) {
         perror_msg("pipe");
         return false;
     }
@@ -351,7 +351,7 @@ bool spawn_sink(SpawnContext *ctx)
     int p[2] = {-1, -1};
     int dev_null = -1;
 
-    if (!pipe_close_on_exec(p)) {
+    if (!pipe_cloexec(p)) {
         perror_msg("pipe");
         goto error;
     }
@@ -405,7 +405,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
     }
 
     int p[2];
-    if (!pipe_close_on_exec(p)) {
+    if (!pipe_cloexec(p)) {
         perror_msg("pipe");
         xclose(dev_null);
         xclose(fd[0]);
