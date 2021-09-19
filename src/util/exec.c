@@ -1,6 +1,5 @@
 #include "../../build/feature.h" // Must be first include
 #include <errno.h>
-#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,22 +8,6 @@
 #include "exec.h"
 #include "debug.h"
 #include "xreadwrite.h"
-
-static bool fd_set_cloexec(int fd, bool cloexec)
-{
-    int flags = fcntl(fd, F_GETFD);
-    if (flags < 0) {
-        return false;
-    }
-    int new_flags = cloexec ? (flags | FD_CLOEXEC) : (flags & ~FD_CLOEXEC);
-    if (new_flags == flags) {
-        return true;
-    }
-    if (fcntl(fd, F_SETFD, new_flags) == -1) {
-        return false;
-    }
-    return true;
-}
 
 bool pipe_cloexec(int fd[2])
 {

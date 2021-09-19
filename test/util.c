@@ -9,6 +9,7 @@
 #include "util/ascii.h"
 #include "util/base64.h"
 #include "util/checked-arith.h"
+#include "util/exec.h"
 #include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
@@ -1884,6 +1885,26 @@ static void test_xfopen(void)
     }
 }
 
+static void test_fd_set_cloexec(void)
+{
+    int fd = open("/dev/null", O_RDONLY);
+    ASSERT_TRUE(fd >= 0);
+    int flags = fcntl(fd, F_GETFD);
+    EXPECT_TRUE(flags >= 0);
+    EXPECT_EQ(flags & FD_CLOEXEC, 0);
+
+    EXPECT_TRUE(fd_set_cloexec(fd, true));
+    flags = fcntl(fd, F_GETFD);
+    EXPECT_TRUE(flags > 0);
+    EXPECT_EQ(flags & FD_CLOEXEC, FD_CLOEXEC);
+
+    EXPECT_TRUE(fd_set_cloexec(fd, false));
+    flags = fcntl(fd, F_GETFD);
+    EXPECT_TRUE(flags >= 0);
+    EXPECT_EQ(flags & FD_CLOEXEC, 0);
+    close(fd);
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -1939,6 +1960,7 @@ static const TestEntry tests[] = {
     TEST(test_mem_intern),
     TEST(test_read_file),
     TEST(test_xfopen),
+    TEST(test_fd_set_cloexec),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
