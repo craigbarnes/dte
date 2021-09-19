@@ -1898,10 +1898,16 @@ static void test_fd_set_cloexec(void)
     EXPECT_TRUE(flags > 0);
     EXPECT_EQ(flags & FD_CLOEXEC, FD_CLOEXEC);
 
-    EXPECT_TRUE(fd_set_cloexec(fd, false));
-    flags = fcntl(fd, F_GETFD);
-    EXPECT_TRUE(flags >= 0);
-    EXPECT_EQ(flags & FD_CLOEXEC, 0);
+    // This set of tests is repeated twice, in order to check the special
+    // case where the F_SETFD operation can be omitted because FD_CLOEXEC
+    // was already set as requested
+    for (size_t i = 0; i < 2; i++) {
+        IEXPECT_TRUE(fd_set_cloexec(fd, false));
+        flags = fcntl(fd, F_GETFD);
+        IEXPECT_TRUE(flags >= 0);
+        IEXPECT_EQ(flags & FD_CLOEXEC, 0);
+    }
+
     close(fd);
 }
 
