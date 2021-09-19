@@ -10,7 +10,7 @@
 #include "debug.h"
 #include "xreadwrite.h"
 
-static bool close_on_exec(int fd, bool cloexec)
+static bool fd_set_cloexec(int fd, bool cloexec)
 {
     int flags = fcntl(fd, F_GETFD);
     if (flags < 0) {
@@ -44,8 +44,8 @@ bool pipe_close_on_exec(int fd[2])
     if (pipe(fd) != 0) {
         return false;
     }
-    close_on_exec(fd[0], true);
-    close_on_exec(fd[1], true);
+    fd_set_cloexec(fd[0], true);
+    fd_set_cloexec(fd[1], true);
     return true;
 }
 
@@ -73,7 +73,7 @@ static int xdup3(int oldfd, int newfd, int flags)
         fd = dup2(oldfd, newfd);
     } while (unlikely(fd < 0 && errno == EINTR));
     if (fd >= 0 && (flags & O_CLOEXEC)) {
-        close_on_exec(fd, true);
+        fd_set_cloexec(fd, true);
     }
     return fd;
 }
@@ -117,7 +117,7 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
     for (int i = 0; i < nr_fds; i++) {
         if (i == fd[i]) {
             // Clear FD_CLOEXEC flag
-            close_on_exec(fd[i], false);
+            fd_set_cloexec(fd[i], false);
         } else {
             if (xdup3(fd[i], i, 0) < 0) {
                 goto error;
