@@ -139,6 +139,15 @@ error:
     exit(42);
 }
 
+static pid_t xwaitpid(pid_t pid, int *status, int options)
+{
+    pid_t ret;
+    do {
+        ret = waitpid(pid, status, options);
+    } while (unlikely(ret < 0 && errno == EINTR));
+    return ret;
+}
+
 pid_t fork_exec(char **argv, const char **env, int fd[3])
 {
     int ep[2];
@@ -180,9 +189,7 @@ pid_t fork_exec(char **argv, const char **env, int fd[3])
     }
 
     int status;
-    while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
-        ;
-    }
+    xwaitpid(pid, &status, 0);
     errno = error;
     return -1;
 }
@@ -190,10 +197,7 @@ pid_t fork_exec(char **argv, const char **env, int fd[3])
 int wait_child(pid_t pid)
 {
     int status;
-    while (waitpid(pid, &status, 0) < 0) {
-        if (errno == EINTR) {
-            continue;
-        }
+    if (unlikely(xwaitpid(pid, &status, 0) < 0)) {
         return -errno;
     }
 
@@ -205,9 +209,6 @@ int wait_child(pid_t pid)
         return WTERMSIG(status) << 8;
     }
 
-    if (WIFSTOPPED(status)) {
-        return WSTOPSIG(status) << 8;
-    }
-
+    DEBUG_LOG("unhandled waitpid() status: %d", status);
     return -EINVAL;
 }
