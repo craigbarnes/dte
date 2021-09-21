@@ -24,7 +24,7 @@ bool pipe_cloexec(int fd[2])
     }
 #endif
 
-    if (pipe(fd) != 0) {
+    if (unlikely(pipe(fd) != 0)) {
         return false;
     }
     fd_set_cloexec(fd[0], true);
@@ -201,11 +201,11 @@ int wait_child(pid_t pid)
         return -errno;
     }
 
-    if (WIFEXITED(status)) {
+    if (likely(WIFEXITED(status))) {
         return WEXITSTATUS(status) & 0xFF;
     }
 
-    if (WIFSIGNALED(status)) {
+    if (likely(WIFSIGNALED(status))) {
         return WTERMSIG(status) << 8;
     }
 
