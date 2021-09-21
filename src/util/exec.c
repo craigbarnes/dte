@@ -209,11 +209,5 @@ int wait_child(pid_t pid)
         return WSTOPSIG(status) << 8;
     }
 
-#if defined(WIFCONTINUED)
-    if (WIFCONTINUED(status)) {
-        return SIGCONT << 8;
-    }
-#endif
-
     return -EINVAL;
 }
