@@ -252,7 +252,8 @@ The _fg-color_ and _bg-color_ arguments can be one of the following:
 * No value (equivalent to `default`)
 * A numeric value between `-2` and `255`
 * A 256-color palette value in R/G/B notation (e.g. `0/3/5`)
-* A true color value in CSS-style #RRGGBB notation (e.g. `#ab90df`)
+* A true color value in #RRGGBB notation (e.g. `#ab90df`)
+* A true color value in #RGB notation (e.g. `#1ef`)
 * `keep` (`-2`)
 * `default` (`-1`)
 * `black` (`0`)
