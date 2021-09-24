@@ -416,6 +416,23 @@ static bool is_var(const char *str, size_t len)
     return true;
 }
 
+UNITTEST {
+    BUG_ON(!is_var(STRN("$VAR")));
+    BUG_ON(!is_var(STRN("$xy_190")));
+    BUG_ON(!is_var(STRN("$__x_y_z")));
+    BUG_ON(!is_var(STRN("$x")));
+    BUG_ON(!is_var(STRN("$A")));
+    BUG_ON(!is_var(STRN("$_0")));
+    BUG_ON(!is_var(STRN("$")));
+    BUG_ON(is_var(STRN("")));
+    BUG_ON(is_var(STRN("A")));
+    BUG_ON(is_var(STRN("$.a")));
+    BUG_ON(is_var(STRN("$xyz!")));
+    BUG_ON(is_var(STRN("$1")));
+    BUG_ON(is_var(STRN("$09")));
+    BUG_ON(is_var(STRN("$1a")));
+}
+
 static void init_completion(void)
 {
     BUG_ON(completion.head);
