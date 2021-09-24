@@ -2,7 +2,6 @@
 #include <string.h>
 #include "color.h"
 #include "completion.h"
-#include "error.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -192,40 +191,45 @@ UNITTEST {
     BUG_ON(parse_color("#fffffg") != COLOR_INVALID);
 }
 
-bool parse_term_color(TermColor *color, char **strs)
+// Note: this function returns the number of valid strings parsed, or -1 if
+// more than 2 valid colors were encountered. Thus, success is indicated by
+// a return value equal to `nstrs`.
+ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs)
 {
-    color->fg = COLOR_DEFAULT;
-    color->bg = COLOR_DEFAULT;
-    color->attr = 0;
+    int32_t colors[2] = {COLOR_DEFAULT, COLOR_DEFAULT};
+    unsigned int attrs = 0;
+    size_t i = 0;
 
-    for (size_t i = 0, nr_colors = 0; strs[i]; i++) {
+    for (size_t nr_colors = 0; i < nstrs; i++) {
         const char *str = strs[i];
         int32_t c = parse_color(str);
         if (c == COLOR_INVALID) {
             unsigned int attr = lookup_attr(str);
-            if (attr) {
-                color->attr |= attr;
+            if (likely(attr)) {
+                attrs |= attr;
                 continue;
             }
-            error_msg("invalid color or attribute %s", str);
-            return false;
+            // Invalid color or attribute
+            return i;
         }
-        if (nr_colors == 0) {
-            color->fg = c;
-            nr_colors++;
-        } else if (nr_colors == 1) {
-            color->bg = c;
-            nr_colors++;
-        } else if (c == COLOR_KEEP) {
-            // "keep" is also a valid attribute
-            color->attr |= ATTR_KEEP;
-        } else {
-            error_msg("too many colors");
-            return false;
+        if (nr_colors == ARRAY_COUNT(colors)) {
+            if (likely(c == COLOR_KEEP)) {
+                // "keep" is also a valid attribute
+                attrs |= ATTR_KEEP;
+                continue;
+            }
+            // Too many colors
+            return -1;
         }
+        colors[nr_colors++] = c;
     }
 
-    return true;
+    *color = (TermColor) {
+        .fg = colors[0],
+        .bg = colors[1],
+        .attr = attrs
+    };
+    return i;
 }
 
 // Calculate squared Euclidean distance between 2 RGB colors

@@ -9,49 +9,56 @@
 #include "terminal/terminal.h"
 #include "terminal/xterm.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xsnprintf.h"
 
 static void test_parse_term_color(void)
 {
     static const struct {
+        ssize_t expected_return;
         const char *const strs[4];
-        const TermColor expected_color;
+        TermColor expected_color;
     } tests[] = {
-        {{"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
-        {{"#ff0000"}, {COLOR_RGB(0xff0000), -1, 0}},
-        {{"#f00a9c", "reverse"}, {COLOR_RGB(0xf00a9c), -1, ATTR_REVERSE}},
-        {{"black", "#00ffff"}, {COLOR_BLACK, COLOR_RGB(0x00ffff), 0}},
-        {{"#123456", "#abcdef"}, {COLOR_RGB(0x123456), COLOR_RGB(0xabcdef), 0}},
-        {{"#123", "#fa0"}, {COLOR_RGB(0x112233), COLOR_RGB(0xffaa00), 0}},
-        {{"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
-        {{"5/5/5"}, {231, COLOR_DEFAULT, 0}},
-        {{"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
-        {{"-1", "-2"}, {COLOR_DEFAULT, COLOR_KEEP, 0}},
-        {{"keep", "red", "keep"}, {-2, COLOR_RED, ATTR_KEEP}},
-        {{"bold", "blink"}, {-1, -1, ATTR_BOLD | ATTR_BLINK}},
-        {{"0", "255", "underline"}, {COLOR_BLACK, 255, ATTR_UNDERLINE}},
-        {{"white", "green", "dim"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
-        {{"white", "green", "lowintensity"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
-        {{"lightred", "lightyellow"}, {COLOR_LIGHTRED, COLOR_LIGHTYELLOW, 0}},
-        {{"darkgray", "lightgreen"}, {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
-        {{"lightblue", "lightcyan"}, {COLOR_LIGHTBLUE, COLOR_LIGHTCYAN, 0}},
-        {{"lightmagenta"}, {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
-        {{"keep", "254", "keep"}, {COLOR_KEEP, 254, ATTR_KEEP}},
-        {{"red", "green", "keep"}, {COLOR_RED, COLOR_GREEN, ATTR_KEEP}},
-        {{"1", "2", "invisible"}, {COLOR_RED, COLOR_GREEN, ATTR_INVIS}},
+        {3, {"bold", "red", "yellow"}, {COLOR_RED, COLOR_YELLOW, ATTR_BOLD}},
+        {1, {"#ff0000"}, {COLOR_RGB(0xff0000), -1, 0}},
+        {2, {"#f00a9c", "reverse"}, {COLOR_RGB(0xf00a9c), -1, ATTR_REVERSE}},
+        {2, {"black", "#00ffff"}, {COLOR_BLACK, COLOR_RGB(0x00ffff), 0}},
+        {2, {"#123456", "#abcdef"}, {COLOR_RGB(0x123456), COLOR_RGB(0xabcdef), 0}},
+        {2, {"#123", "#fa0"}, {COLOR_RGB(0x112233), COLOR_RGB(0xffaa00), 0}},
+        {2, {"red", "strikethrough"}, {COLOR_RED, -1, ATTR_STRIKETHROUGH}},
+        {1, {"5/5/5"}, {231, COLOR_DEFAULT, 0}},
+        {3, {"1/3/0", "0/5/2", "italic"}, {70, 48, ATTR_ITALIC}},
+        {2, {"-1", "-2"}, {COLOR_DEFAULT, COLOR_KEEP, 0}},
+        {3, {"keep", "red", "keep"}, {-2, COLOR_RED, ATTR_KEEP}},
+        {2, {"bold", "blink"}, {-1, -1, ATTR_BOLD | ATTR_BLINK}},
+        {3, {"0", "255", "underline"}, {COLOR_BLACK, 255, ATTR_UNDERLINE}},
+        {3, {"white", "green", "dim"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
+        {3, {"white", "green", "lowintensity"}, {COLOR_WHITE, COLOR_GREEN, ATTR_DIM}},
+        {2, {"lightred", "lightyellow"}, {COLOR_LIGHTRED, COLOR_LIGHTYELLOW, 0}},
+        {2, {"darkgray", "lightgreen"}, {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
+        {2, {"lightblue", "lightcyan"}, {COLOR_LIGHTBLUE, COLOR_LIGHTCYAN, 0}},
+        {1, {"lightmagenta"}, {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
+        {3, {"keep", "254", "keep"}, {COLOR_KEEP, 254, ATTR_KEEP}},
+        {3, {"red", "green", "keep"}, {COLOR_RED, COLOR_GREEN, ATTR_KEEP}},
+        {3, {"1", "2", "invisible"}, {COLOR_RED, COLOR_GREEN, ATTR_INVIS}},
+        {0, {NULL}, {COLOR_DEFAULT, COLOR_DEFAULT, 0}},
+        // Invalid:
+        {2, {"red", "blue", "invalid"}, {COLOR_INVALID, COLOR_INVALID, 0}},
+        {-1, {"cyan", "magenta", "yellow"}, {COLOR_INVALID, COLOR_INVALID, 0}},
+        {0, {"invalid", "default", "bold"}, {COLOR_INVALID, COLOR_INVALID, 0}},
+        {1, {"italic", "invalid"}, {COLOR_INVALID, COLOR_INVALID, 0}},
     };
     FOR_EACH_I(i, tests) {
-        TermColor parsed;
-        bool ok = parse_term_color(&parsed, (char**)tests[i].strs);
-        IEXPECT_TRUE(ok);
-        if (ok) {
-            const TermColor expected = tests[i].expected_color;
-            IEXPECT_EQ(parsed.fg, expected.fg);
-            IEXPECT_EQ(parsed.bg, expected.bg);
-            IEXPECT_EQ(parsed.attr, expected.attr);
-            IEXPECT_TRUE(same_color(&parsed, &expected));
-        }
+        const TermColor expected = tests[i].expected_color;
+        TermColor parsed = {COLOR_INVALID, COLOR_INVALID, 0};
+        char **strs = (char**)tests[i].strs;
+        ssize_t n = parse_term_color(&parsed, strs, string_array_length(strs));
+        IEXPECT_EQ(n, tests[i].expected_return);
+        IEXPECT_EQ(parsed.fg, expected.fg);
+        IEXPECT_EQ(parsed.bg, expected.bg);
+        IEXPECT_EQ(parsed.attr, expected.attr);
+        IEXPECT_TRUE(same_color(&parsed, &expected));
     }
 }
 

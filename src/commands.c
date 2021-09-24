@@ -646,8 +646,17 @@ static void cmd_hi(const CommandArgs *a)
         goto update;
     }
 
+    char **strs = a->args + 1;
+    size_t strs_len = a->nr_args - 1;
     TermColor color;
-    if (unlikely(!parse_term_color(&color, a->args + 1))) {
+    ssize_t n = parse_term_color(&color, strs, strs_len);
+    if (unlikely(n != strs_len)) {
+        BUG_ON(n > strs_len);
+        if (n < 0) {
+            error_msg("too many colors");
+        } else {
+            error_msg("invalid color or attribute: '%s'", strs[n]);
+        }
         return;
     }
 
