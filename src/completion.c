@@ -49,11 +49,6 @@ static int strptrcmp(const void *v1, const void *v2)
     return strcmp(*s1, *s2);
 }
 
-static void sort_completions(void)
-{
-    ptr_array_sort(&completion.completions, strptrcmp);
-}
-
 void add_completion(char *str)
 {
     ptr_array_append(&completion.completions, str);
@@ -402,8 +397,28 @@ out:
     free_string_array(args_copy);
 }
 
+static bool is_var(const char *str, size_t len)
+{
+    if (len == 0 || str[0] != '$') {
+        return false;
+    }
+    if (len == 1) {
+        return true;
+    }
+    if (!is_alpha_or_underscore(str[1])) {
+        return false;
+    }
+    for (size_t i = 2; i < len; i++) {
+        if (!is_alnum_or_underscore(str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 static void init_completion(void)
 {
+    BUG_ON(completion.head);
     const CommandSet *cmds = &normal_commands;
     const char *cmd = string_borrow_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
@@ -468,53 +483,29 @@ static void init_completion(void)
 
     const char *str = cmd + completion_pos;
     size_t len = editor.cmdline.pos - completion_pos;
-    if (len && str[0] == '$') {
-        bool var = true;
-        if (len >= 2) {
-            if (is_alpha_or_underscore(str[1])) {
-                for (size_t i = 2; i < len; i++) {
-                    if (is_alnum_or_underscore(str[i])) {
-                        continue;
-                    }
-                    var = false;
-                    break;
-                }
-            } else {
-                var = false;
-            }
+    if (is_var(str, len)) {
+        char *name = xstrslice(str, 1, len);
+        completion_pos++;
+        collect_env(name);
+        collect_normal_vars(name);
+        free(name);
+    } else {
+        completion.escaped = xstrcut(str, len);
+        completion.parsed = parse_command_arg(cmds, completion.escaped, len, true);
+        completion.add_space = true;
+        char **args = NULL;
+        size_t argc = 0;
+        if (array.count) {
+            args = (char**)array.ptrs + 1 + semicolon;
+            argc = array.count - semicolon - 1;
         }
-        if (var) {
-            char *name = xstrslice(str, 1, len);
-            completion_pos++;
-            completion.escaped = NULL;
-            completion.parsed = NULL;
-            completion.head = xstrcut(cmd, completion_pos);
-            completion.tail = xstrdup(cmd + editor.cmdline.pos);
-            collect_env(name);
-            collect_normal_vars(name);
-            sort_completions();
-            free(name);
-            ptr_array_free(&array);
-            return;
-        }
+        collect_completions(args, argc);
     }
 
-    completion.escaped = xstrcut(str, len);
-    completion.parsed = parse_command_arg(cmds, completion.escaped, len, true);
+    ptr_array_free(&array);
+    ptr_array_sort(&completion.completions, strptrcmp);
     completion.head = xstrcut(cmd, completion_pos);
     completion.tail = xstrdup(cmd + editor.cmdline.pos);
-    completion.add_space = true;
-
-    char **args = NULL;
-    size_t argc = 0;
-    if (array.count) {
-        args = (char**)array.ptrs + 1 + semicolon;
-        argc = array.count - semicolon - 1;
-    }
-
-    collect_completions(args, argc);
-    sort_completions();
-    ptr_array_free(&array);
 }
 
 static void do_complete_command(void)
