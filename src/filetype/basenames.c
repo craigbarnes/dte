@@ -65,6 +65,7 @@ static const struct FileBasenameMap {
     {"mkinitcpio.conf", SH, false},
     {"muttrc", CONFIG, true},
     {"nanorc", CONFIG, true},
+    {"nftables.conf", NFTABLES, false},
     {"nginx.conf", NGINX, false},
     {"pacman.conf", INI, false},
     {"profile", SH, true},

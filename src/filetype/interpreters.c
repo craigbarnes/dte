@@ -35,6 +35,7 @@ static const struct FileInterpreterMap {
     {"mksh", SH},
     {"moon", MOONSCRIPT},
     {"nawk", AWK},
+    {"nft", NFTABLES},
     {"node", JAVASCRIPT},
     {"ocaml", OCAML},
     {"pdksh", SH},

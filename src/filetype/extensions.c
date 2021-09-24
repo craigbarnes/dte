@@ -102,6 +102,7 @@ static const struct FileExtensionMap {
     {"moon", MOONSCRIPT},
     {"mount", INI},
     {"nawk", AWK},
+    {"nft", NFTABLES},
     {"nginx", NGINX},
     {"nginxconf", NGINX},
     {"nim", NIM},
