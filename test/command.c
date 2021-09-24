@@ -467,7 +467,7 @@ static void test_cmdargs_convert_flags(void)
     };
 
     const CommandArgs a = {
-        .flag_set = 1ULL << cmdargs_flagset_idx('c') | 1ULL << cmdargs_flagset_idx('g')
+        .flag_set = cmdargs_flagset_value('c') | cmdargs_flagset_value('g')
     };
 
     ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAY_COUNT(map), 0);

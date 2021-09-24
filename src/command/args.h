@@ -2,6 +2,7 @@
 #define COMMAND_ARGS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "run.h"
 #include "util/base64.h"
 #include "util/debug.h"
@@ -29,14 +30,20 @@ static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
     // We use base64_decode() here simply because it does a similar byte
     // mapping to the one we want and allows us to share the lookup table.
     // There's no "real" base64 encoding involved.
+    static_assert(BASE64_INVALID > 63);
     unsigned int idx = base64_decode(flag) + 1;
     BUG_ON(idx > 62);
     return idx;
 }
 
+static inline uint_least64_t cmdargs_flagset_value(unsigned char flag)
+{
+    return UINT64_C(1) << cmdargs_flagset_idx(flag);
+}
+
 static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 {
-    uint_least64_t bitmask = UINT64_C(1) << cmdargs_flagset_idx(flag);
+    uint_least64_t bitmask = cmdargs_flagset_value(flag);
     static_assert_compatible_types(bitmask, a->flag_set);
     return (a->flag_set & bitmask) != 0;
 }
