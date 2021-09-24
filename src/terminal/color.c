@@ -91,6 +91,14 @@ static unsigned int rgb_to_rrggbb(unsigned int c)
     return r | (r|g) << 4 | (g|b) << 8 | b << 12;
 }
 
+UNITTEST {
+    BUG_ON(rgb_to_rrggbb(0x000) != 0x000000);
+    BUG_ON(rgb_to_rrggbb(0x123) != 0x112233);
+    BUG_ON(rgb_to_rrggbb(0xABC) != 0xAABBCC);
+    BUG_ON(rgb_to_rrggbb(0x0F0) != 0x00FF00);
+    BUG_ON(rgb_to_rrggbb(0xFFF) != 0xFFFFFF);
+}
+
 static int32_t parse_rgb(const char *str, size_t len)
 {
     unsigned int val = 0;
