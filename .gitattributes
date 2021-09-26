@@ -10,7 +10,6 @@ mk/version.sh export-subst
 .mailmap export-ignore
 .clang-tidy export-ignore
 /.editorconfig export-ignore
-.travis.yml export-ignore
 docs/README.md export-ignore
 docs/contributing.md export-ignore
 docs/releasing.md export-ignore
