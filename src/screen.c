@@ -130,13 +130,15 @@ void update_window_sizes(void)
 
 void update_screen_size(void)
 {
-    if (term_get_size(&terminal.width, &terminal.height)) {
-        if (terminal.width < 3) {
-            terminal.width = 3;
-        }
-        if (terminal.height < 3) {
-            terminal.height = 3;
-        }
-        update_window_sizes();
+    unsigned int width, height;
+    if (!term_get_size(&width, &height)) {
+        return;
     }
+
+    // TODO: remove minimum width/height and instead make update_screen()
+    // do something sensible when the terminal dimensions are tiny.
+    terminal.width = MAX(width, 3);
+    terminal.height = MAX(height, 3);
+
+    update_window_sizes();
 }
