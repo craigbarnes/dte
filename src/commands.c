@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <glob.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -38,6 +39,7 @@
 #include "syntax/syntax.h"
 #include "tag.h"
 #include "terminal/color.h"
+#include "terminal/mode.h"
 #include "terminal/terminal.h"
 #include "util/bsearch.h"
 #include "util/checked-arith.h"
@@ -1881,7 +1883,22 @@ static void cmd_show(const CommandArgs *a)
 
 static void cmd_suspend(const CommandArgs* UNUSED_ARG(a))
 {
-    suspend();
+    if (editor.session_leader) {
+        error_msg("Session leader can't suspend");
+        return;
+    }
+    if (
+        !editor.child_controls_terminal
+        && editor.status != EDITOR_INITIALIZING
+    ) {
+        ui_end();
+    }
+    int r = kill(0, SIGSTOP);
+    if (unlikely(r != 0)) {
+        perror_msg("kill");
+        term_raw();
+        ui_start();
+    }
 }
 
 static void cmd_tag(const CommandArgs *a)

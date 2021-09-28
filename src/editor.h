@@ -65,7 +65,6 @@ char status_prompt(const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);
 void normal_update(void);
-void suspend(void);
 void main_loop(void);
 void ui_start(void);
 void ui_end(void);

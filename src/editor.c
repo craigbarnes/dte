@@ -327,26 +327,6 @@ void ui_end(void)
     term_cooked();
 }
 
-void suspend(void)
-{
-    if (editor.session_leader) {
-        error_msg("Session leader can't suspend");
-        return;
-    }
-    if (
-        !editor.child_controls_terminal
-        && editor.status != EDITOR_INITIALIZING
-    ) {
-        ui_end();
-    }
-    int r = kill(0, SIGSTOP);
-    if (unlikely(r != 0)) {
-        perror_msg("kill");
-        term_raw();
-        ui_start();
-    }
-}
-
 const char *editor_file(const char *name)
 {
     char buf[4096];
