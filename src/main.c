@@ -26,7 +26,6 @@
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/macros.h"
-#include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
@@ -67,10 +66,8 @@ static noreturn COLD void handle_fatal_signal(int signum)
         term_cleanup();
     }
 
-    struct sigaction sa;
-    MEMZERO(&sa);
+    struct sigaction sa = {.sa_handler = SIG_DFL};
     sigemptyset(&sa.sa_mask);
-    sa.sa_handler = SIG_DFL;
     sigaction(signum, &sa, NULL);
 
     sigset_t mask;
@@ -126,11 +123,8 @@ static void set_signal_handlers(void)
 #endif
     };
 
-    struct sigaction action;
-    MEMZERO(&action);
+    struct sigaction action = {.sa_handler = handle_fatal_signal};
     sigfillset(&action.sa_mask);
-
-    action.sa_handler = handle_fatal_signal;
     for (size_t i = 0; i < ARRAY_COUNT(fatal_signals); i++) {
         do_sigaction(fatal_signals[i], &action);
     }
