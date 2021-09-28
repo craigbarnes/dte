@@ -120,10 +120,8 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
     }
 
     // Reset ignored signals to SIG_DFL (see exec(3p))
-    struct sigaction act;
-    memset(&act, 0, sizeof(struct sigaction));
+    struct sigaction act = {.sa_handler = SIG_DFL};
     sigemptyset(&act.sa_mask);
-    act.sa_handler = SIG_DFL;
     sigaction(SIGINT, &act, NULL);
     sigaction(SIGQUIT, &act, NULL);
     sigaction(SIGTSTP, &act, NULL);
