@@ -62,7 +62,10 @@ static void term_cleanup(void)
 static noreturn COLD void handle_fatal_signal(int signum)
 {
     DEBUG_LOG("Received signal %d (%s)", signum, strsignal(signum));
-    term_cleanup();
+
+    if (signum != SIGHUP) {
+        term_cleanup();
+    }
 
     struct sigaction sa;
     MEMZERO(&sa);
