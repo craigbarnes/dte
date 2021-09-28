@@ -53,6 +53,7 @@ static void handle_sigwinch(int UNUSED_ARG(signum))
 
 static void term_cleanup(void)
 {
+    set_fatal_error_cleanup_handler(NULL);
     if (!editor.child_controls_terminal) {
         ui_end();
     }

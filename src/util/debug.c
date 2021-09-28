@@ -8,8 +8,14 @@
 #include "xreadwrite.h"
 #include "xsnprintf.h"
 
-static void no_op(void) {}
-static void (*cleanup_handler)(void) = no_op;
+static void (*cleanup_handler)(void) = NULL;
+
+static void cleanup(void)
+{
+    if (cleanup_handler) {
+        cleanup_handler();
+    }
+}
 
 #ifdef ASAN_ENABLED
 #include <sanitizer/asan_interface.h>
@@ -25,7 +31,7 @@ void __asan_on_error(void)
     // callbacks set with __sanitizer_set_death_callback(), it runs
     // before the error report is printed and so allows us to clean
     // up the terminal state and avoid clobbering the stderr output.
-    cleanup_handler();
+    cleanup();
 }
 #endif
 
@@ -46,7 +52,7 @@ void set_fatal_error_cleanup_handler(void (*handler)(void))
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {
-    cleanup_handler();
+    cleanup();
     fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
 
     va_list ap;
@@ -131,7 +137,7 @@ void debug_log(const char *file, int line, const char *fmt, ...)
 noreturn void fatal_error(const char *msg, int err)
 {
     DEBUG_LOG("%s: %s", msg, strerror(err));
-    cleanup_handler();
+    cleanup();
     errno = err;
     perror(msg);
     print_stack_trace();
