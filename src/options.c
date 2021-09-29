@@ -456,7 +456,7 @@ static const OptionDesc option_desc[] = {
     FLAG_OPT("ws-error", C(ws_error), ws_error_values, redraw_buffer),
 };
 
-static char *local_ptr(const OptionDesc *desc, const LocalOptions *opt)
+static char *local_ptr(const OptionDesc *desc, LocalOptions *opt)
 {
     BUG_ON(!desc->local);
     return (char*)opt + desc->offset;
@@ -478,7 +478,7 @@ UNITTEST {
     };
 
     // Check offset alignments
-    const LocalOptions opts = {.filetype = NULL};
+    LocalOptions opts = {.filetype = NULL};
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         BUG_ON(desc->type >= ARRAY_COUNT(alignments));

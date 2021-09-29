@@ -17,7 +17,7 @@ typedef struct {
     size_t nl;
 } Block;
 
-static inline Block *BLOCK(const ListHead *item)
+static inline Block *BLOCK(ListHead *item)
 {
     static_assert(offsetof(Block, node) == 0);
     return (Block*)item;

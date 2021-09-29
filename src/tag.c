@@ -88,10 +88,10 @@ static int kind_cmp(const Tag *a, const Tag *b)
 
 static int tag_cmp(const void *ap, const void *bp)
 {
-    const Tag *a = *(const Tag **)ap;
-    const Tag *b = *(const Tag **)bp;
-    int r = visibility_cmp(a, b);
-    return r ? r : kind_cmp(a, b);
+    const Tag *const *a = ap;
+    const Tag *const *b = bp;
+    int r = visibility_cmp(*a, *b);
+    return r ? r : kind_cmp(*a, *b);
 }
 
 // Find "tags" file from directory path and its parent directories
