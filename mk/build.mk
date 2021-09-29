@@ -12,6 +12,7 @@ WARNINGS = \
     -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings \
     -Wundef -Wshadow -Wcast-align -Wredundant-decls -Wswitch-enum \
     -Wvla -Wold-style-definition -Wframe-larger-than=32768 \
+    -Wpointer-arith -Wnested-externs -Winit-self \
     -Werror=div-by-zero -Werror=implicit-function-declaration \
     -Wno-sign-compare -Wno-pointer-sign
 
