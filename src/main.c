@@ -407,7 +407,10 @@ loop_break:
     // Initialize terminal but don't update screen yet. Also display
     // "Press any key to continue" prompt if there were any errors
     // during reading configuration files.
-    term_raw();
+    if (!term_raw()) {
+        perror("tcsetattr");
+        return EX_IOERR;
+    }
     if (get_nr_errors()) {
         any_key();
         clear_error();

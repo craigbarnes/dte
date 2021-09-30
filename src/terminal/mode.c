@@ -38,33 +38,31 @@ bool term_mode_init(void)
     return true;
 }
 
-static void xtcsetattr(const struct termios *t)
+static bool xtcsetattr(const struct termios *t)
 {
     if (unlikely(!initialized)) {
-        return;
+        return true;
     }
 
-    int ret;
+    int r;
     do {
-        ret = tcsetattr(STDIN_FILENO, TCSANOW, t);
-    } while (unlikely(ret != 0 && errno == EINTR));
+        r = tcsetattr(STDIN_FILENO, TCSANOW, t);
+    } while (unlikely(r != 0 && errno == EINTR));
 
-    if (unlikely(ret != 0)) {
-        fatal_error("tcsetattr", errno);
-    }
+    return (r == 0);
 }
 
-void term_raw(void)
+bool term_raw(void)
 {
-    xtcsetattr(&raw);
+    return xtcsetattr(&raw);
 }
 
-void term_raw_isig(void)
+bool term_raw_isig(void)
 {
-    xtcsetattr(&raw_isig);
+    return xtcsetattr(&raw_isig);
 }
 
-void term_cooked(void)
+bool term_cooked(void)
 {
-    xtcsetattr(&cooked);
+    return xtcsetattr(&cooked);
 }

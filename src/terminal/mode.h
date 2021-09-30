@@ -2,10 +2,11 @@
 #define TERMINAL_MODE_H
 
 #include <stdbool.h>
+#include "util/macros.h"
 
-bool term_mode_init(void);
-void term_raw(void);
-void term_raw_isig(void);
-void term_cooked(void);
+bool term_mode_init(void) WARN_UNUSED_RESULT;
+bool term_raw(void);
+bool term_raw_isig(void);
+bool term_cooked(void);
 
 #endif
