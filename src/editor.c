@@ -345,9 +345,9 @@ static char get_choice(const char *choices)
     case KEY_PASTE:
         term_discard_paste();
         return 0;
-    case CTRL('C'):
-    case CTRL('G'):
-    case CTRL('['):
+    case MOD_CTRL | 'C':
+    case MOD_CTRL | 'G':
+    case MOD_CTRL | '[':
         return 0x18; // Cancel
     case KEY_ENTER:
         return choices[0]; // Default
