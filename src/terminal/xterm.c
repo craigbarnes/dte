@@ -87,19 +87,13 @@ static KeyCode decode_modifiers(uint32_t n)
 
 static KeyCode decode_key_from_param(uint32_t param)
 {
-    if (param >= ARRAY_COUNT(param_keys)) {
-        return 0;
-    }
-    return param_keys[param];
+    return (param < ARRAY_COUNT(param_keys)) ? param_keys[param] : 0;
 }
 
 static KeyCode decode_key_from_final_byte(uint8_t byte)
 {
     byte -= 64;
-    if (byte >= ARRAY_COUNT(final_byte_keys)) {
-        return 0;
-    }
-    return final_byte_keys[byte];
+    return (byte < ARRAY_COUNT(final_byte_keys)) ? final_byte_keys[byte] : 0;
 }
 
 // Fix quirky key codes sent when "modifyOtherKeys" is enabled
