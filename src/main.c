@@ -188,7 +188,10 @@ static ExitCode lint_syntax(const char *filename)
 
 static ExitCode showkey_loop(void)
 {
-    term_raw();
+    if (!term_raw()) {
+        perror("tcsetattr");
+        return EX_IOERR;
+    }
     terminal.put_control_code(terminal.control_codes.init);
     terminal.put_control_code(terminal.control_codes.keypad_on);
     term_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
