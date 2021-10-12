@@ -93,7 +93,6 @@ static void do_sigaction(int sig, const struct sigaction *action)
 // Signals not handled by this function:
 // * SIGKILL, SIGSTOP (can't be caught or ignored)
 // * SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
-// * SIGABRT (cleanup is done before calling abort())
 static void set_signal_handlers(void)
 {
     static const int fatal_signals[] = {
@@ -109,8 +108,11 @@ static void set_signal_handlers(void)
     };
 
     static const int default_signals[] = {
-        SIGCHLD, SIGURG,
-        SIGTTIN, SIGTTOU,
+        SIGABRT, // Terminate (cleanup already done)
+        SIGCHLD, // Ignore (see also: wait(3))
+        SIGURG,  // Ignore
+        SIGTTIN, // Stop
+        SIGTTOU, // Stop
     };
 
     static const struct {
