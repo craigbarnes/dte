@@ -52,15 +52,17 @@ void set_fatal_error_cleanup_handler(void (*handler)(void))
 noreturn
 void bug(const char *file, int line, const char *func, const char *fmt, ...)
 {
-    cleanup();
-    fprintf(stderr, "\n%s:%d: **BUG** in %s() function: '", file, line, func);
-
+    char str[512];
     va_list ap;
+    str[0] = '\0';
     va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
+    vsnprintf(str, sizeof str, fmt, ap);
     va_end(ap);
 
-    fputs("'\n", stderr);
+    debug_log(file, line, "BUG in %s(): '%s'", func, str);
+    cleanup();
+
+    fprintf(stderr, "\n%s:%d: **BUG** in %s(): '%s'\n", file, line, func, str);
     print_stack_trace();
     fflush(stderr);
     abort();
