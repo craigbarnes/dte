@@ -363,7 +363,20 @@ loop_break:
         }
     }
 
-    term_init();
+    const char *term = getenv("TERM");
+    if (!term || term[0] == '\0') {
+        fputs("Error: $TERM not set\n", stderr);
+        // This is considered a "usage" error, because the program
+        // must be started from a properly configured terminal
+        return EX_USAGE;
+    }
+
+    if (!term_mode_init()) {
+        perror("tcgetattr");
+        return EX_IOERR;
+    }
+
+    term_init(term);
 
     if (use_showkey) {
         return showkey_loop();

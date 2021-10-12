@@ -28,7 +28,6 @@
 #endif
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
-noreturn void init_error(const char *fmt, ...) COLD NONNULL_ARGS PRINTF(1);
 void set_fatal_error_cleanup_handler(void (*handler)(void));
 
 #endif

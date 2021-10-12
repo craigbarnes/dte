@@ -10,7 +10,6 @@
 #include "xterm.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/str-util.h"
 
 enum FeatureFlags {
@@ -159,16 +158,9 @@ UNITTEST {
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
 }
 
-void term_init(void)
+void term_init(const char *term)
 {
-    const char *const term = getenv("TERM");
-    if (!term || term[0] == '\0') {
-        init_error("'TERM' not set");
-    }
-
-    if (!term_mode_init()) {
-        init_error("tcgetattr: %s", strerror(errno));
-    }
+    BUG_ON(term[0] == '\0');
 
     // Strip phony "xterm-" prefix used by certain terminals
     const char *real_term = term;

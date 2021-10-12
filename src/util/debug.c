@@ -135,7 +135,6 @@ void debug_log(const char *file, int line, const char *fmt, ...)
 #endif
 
 // Error handler for unrecoverable system errors during runtime
-// (e.g. ENOMEM)
 noreturn void fatal_error(const char *msg, int err)
 {
     DEBUG_LOG("%s: %s", msg, strerror(err));
@@ -144,26 +143,4 @@ noreturn void fatal_error(const char *msg, int err)
     perror(msg);
     print_stack_trace();
     abort();
-}
-
-// Error handler for problems encountered during initialization
-// (e.g. unsupported $TERM)
-noreturn void init_error(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-
-#if DEBUG >= 2
-    va_list ap2;
-    va_copy(ap2, ap);
-    debug_logv(__FILE__, __LINE__, fmt, ap2);
-    va_end(ap2);
-#endif
-
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    putc('\n', stderr);
-    fflush(stderr);
-
-    exit(1);
 }

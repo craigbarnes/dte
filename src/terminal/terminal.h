@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include "color.h"
 #include "key.h"
+#include "util/macros.h"
 #include "util/string-view.h"
 
 typedef struct {
@@ -40,6 +41,6 @@ typedef struct {
 
 extern Terminal terminal;
 
-void term_init(void);
+void term_init(const char *term) NONNULL_ARGS;
 
 #endif
