@@ -132,11 +132,14 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
         if (FD_ISSET(rfd, &rfds)) {
             char data[8192];
             ssize_t rc = read(rfd, data, sizeof(data));
-            if (rc < 0) {
+            if (unlikely(rc < 0)) {
+                if (errno == EINTR) {
+                    continue;
+                }
                 perror_msg("read");
                 break;
             }
-            if (!rc) {
+            if (unlikely(rc == 0)) {
                 if (wlen < ctx->input.length) {
                     error_msg("Command did not read all data");
                 }
