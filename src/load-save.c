@@ -12,7 +12,6 @@
 #include "encoding.h"
 #include "error.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

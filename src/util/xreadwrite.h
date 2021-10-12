@@ -17,8 +17,8 @@ static inline int xopen(const char *path, int flags, mode_t mode)
     return fd;
 }
 
-ssize_t xread(int fd, void *buf, size_t count) NONNULL_ARGS;
-ssize_t xwrite(int fd, const void *buf, size_t count);
+ssize_t xread(int fd, void *buf, size_t count) NONNULL_ARGS WARN_UNUSED_RESULT;
+ssize_t xwrite(int fd, const void *buf, size_t count) WARN_UNUSED_RESULT;
 int xclose(int fd);
 
 #endif

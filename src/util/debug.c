@@ -120,7 +120,7 @@ static void debug_logv(const char *file, int line, const char *fmt, va_list ap)
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     size_t n = len1 + len2;
     buf[n++] = '\n';
-    xwrite(logfd, buf, n);
+    (void)!xwrite(logfd, buf, n);
 }
 
 void debug_log(const char *file, int line, const char *fmt, ...)

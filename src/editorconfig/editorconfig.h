@@ -29,7 +29,7 @@ static inline EditorConfigOptions editorconfig_options_init(void)
     };
 }
 
-NONNULL_ARG(1)
+NONNULL_ARG(1) WARN_UNUSED_RESULT
 int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts);
 
 #endif

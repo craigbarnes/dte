@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "util/hashmap.h"
+#include "util/macros.h"
 
 typedef struct HistoryEntry {
     struct HistoryEntry *next;
@@ -25,8 +26,8 @@ typedef struct {
 } History;
 
 void history_add(History *history, const char *text);
-bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text);
-bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text);
+bool history_search_forward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
+bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
 void history_load(History *history, const char *filename);
 void history_save(const History *history);
 

@@ -2,7 +2,6 @@
 #include "ini.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
 

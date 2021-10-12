@@ -4,6 +4,6 @@
 #include <stdbool.h>
 #include "util/macros.h"
 
-bool term_get_size(unsigned int *w, unsigned int *h) NONNULL_ARGS;
+bool term_get_size(unsigned int *w, unsigned int *h) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

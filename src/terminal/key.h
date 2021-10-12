@@ -94,7 +94,7 @@ static inline KeyCode keycode_normalize(KeyCode k)
     return k;
 }
 
-bool parse_key_string(KeyCode *key, const char *str);
+bool parse_key_string(KeyCode *key, const char *str) WARN_UNUSED_RESULT;
 const char *keycode_to_string(KeyCode key) RETURNS_NONNULL;
 
 #endif

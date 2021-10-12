@@ -2,6 +2,7 @@
 #define EDITORCONFIG_INI_H
 
 #include <stddef.h>
+#include "util/macros.h"
 #include "util/string-view.h"
 
 typedef struct {
@@ -14,6 +15,6 @@ typedef struct {
     unsigned int name_count;
 } IniParserContext;
 
-bool ini_parse(IniParserContext *ctx);
+bool ini_parse(IniParserContext *ctx) WARN_UNUSED_RESULT;
 
 #endif

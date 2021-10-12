@@ -34,7 +34,7 @@ void term_add_bytes(const char *str, size_t count)
     if (unlikely(count > obuf_avail())) {
         term_output_flush();
         if (unlikely(count >= sizeof(obuf.buf))) {
-            xwrite(STDOUT_FILENO, str, count);
+            (void)!xwrite(STDOUT_FILENO, str, count);
             return;
         }
     }
@@ -148,7 +148,7 @@ void term_clear_eol(void)
 void term_output_flush(void)
 {
     if (obuf.count) {
-        xwrite(STDOUT_FILENO, obuf.buf, obuf.count);
+        (void)!xwrite(STDOUT_FILENO, obuf.buf, obuf.count);
         obuf.count = 0;
     }
 }

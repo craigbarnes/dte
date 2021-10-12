@@ -7,7 +7,6 @@
 #include "xterm.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/unicode.h"
 
 typedef enum {
