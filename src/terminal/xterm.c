@@ -10,12 +10,12 @@
 #include "util/unicode.h"
 
 typedef enum {
-    BYTE_CONTROL, // 0..31
-    BYTE_INTERMEDIATE, // 32..47
-    BYTE_PARAMETER, // 48..63
-    BYTE_FINAL, // 64..111
-    BYTE_FINAL_PRIVATE, // 112..126
-    BYTE_DELETE, // 127
+    BYTE_CONTROL,       // 0x00..0x1F
+    BYTE_INTERMEDIATE,  // 0x20..0x2F
+    BYTE_PARAMETER,     // 0x30..0x3F
+    BYTE_FINAL,         // 0x40..0x6F
+    BYTE_FINAL_PRIVATE, // 0x70..0x7E
+    BYTE_DELETE,        // 0x7F
     BYTE_OTHER,
 } ByteType;
 
