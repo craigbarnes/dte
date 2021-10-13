@@ -22,23 +22,22 @@
 #include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
+#include "util/string-view.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 #include "vars.h"
 
 static struct {
-    // Part of string that is to be replaced
-    char *escaped;
-    char *parsed;
+    char *orig; // Full cmdline string (backing buffer for `escaped` and `tail`)
+    char *parsed; // Result of passing `escaped` through parse_command_arg()
+    StringView escaped; // Middle part of `orig` (string to be replaced)
+    StringView tail; // Suffix part of `orig` (after `escaped`)
+    size_t head_len; // Length of prefix part of `orig` (before `escaped`)
 
-    char *head;
-    char *tail;
-    PointerArray completions;
-    size_t idx;
+    PointerArray completions; // Array of completion candidates
+    size_t idx; // Index of currently selected completion
 
-    // Should we add space after completed string if we have only one match?
-    bool add_space;
-
+    bool add_space_after_single_match;
     bool tilde_expanded;
 } completion;
 
@@ -142,9 +141,9 @@ static void do_collect_files (
 
 static void collect_files(bool directories_only)
 {
-    const char *e = completion.escaped;
-    if (e[0] == '~' && e[1] == '/') {
-        char *str = parse_command_arg(&normal_commands, e, strlen(e), false);
+    StringView e = completion.escaped;
+    if (strview_has_prefix(&e, "~/")) {
+        char *str = parse_command_arg(&normal_commands, e.data, e.length, false);
         const char *slash = strrchr(str, '/');
         BUG_ON(!slash);
         completion.tilde_expanded = true;
@@ -170,7 +169,7 @@ static void collect_files(bool directories_only)
         const char *s = completion.completions.ptrs[0];
         size_t len = strlen(s);
         if (len > 0) {
-            completion.add_space = s[len - 1] != '/';
+            completion.add_space_after_single_match = s[len - 1] != '/';
         }
     }
 }
@@ -435,21 +434,21 @@ UNITTEST {
 
 static void init_completion(void)
 {
-    BUG_ON(completion.head);
+    BUG_ON(completion.orig);
     const CommandSet *cmds = &normal_commands;
-    const char *cmd = string_borrow_cstring(&editor.cmdline.buf);
+    const size_t cmdline_pos = editor.cmdline.pos;
+    char *const cmd = string_clone_cstring(&editor.cmdline.buf);
     PointerArray array = PTR_ARRAY_INIT;
     ssize_t semicolon = -1;
     ssize_t completion_pos = -1;
-    size_t pos = 0;
 
-    while (1) {
+    for (size_t pos = 0; true; ) {
         while (ascii_isspace(cmd[pos])) {
             pos++;
         }
 
-        if (pos >= editor.cmdline.pos) {
-            completion_pos = editor.cmdline.pos;
+        if (pos >= cmdline_pos) {
+            completion_pos = cmdline_pos;
             break;
         }
 
@@ -466,7 +465,7 @@ static void init_completion(void)
 
         CommandParseError err;
         size_t end = find_end(cmd, pos, &err);
-        if (err != CMDERR_NONE || end >= editor.cmdline.pos) {
+        if (err != CMDERR_NONE || end >= cmdline_pos) {
             completion_pos = pos;
             break;
         }
@@ -474,7 +473,6 @@ static void init_completion(void)
         if (semicolon + 1 == array.count) {
             char *name = xstrslice(cmd, pos, end);
             const char *value = find_alias(&normal_commands.aliases, name);
-
             if (value) {
                 size_t save = array.count;
                 if (parse_commands(cmds, &array, value) != CMDERR_NONE) {
@@ -499,7 +497,7 @@ static void init_completion(void)
     }
 
     const char *str = cmd + completion_pos;
-    size_t len = editor.cmdline.pos - completion_pos;
+    size_t len = cmdline_pos - completion_pos;
     if (is_var(str, len)) {
         char *name = xstrslice(str, 1, len);
         completion_pos++;
@@ -507,9 +505,9 @@ static void init_completion(void)
         collect_normal_vars(name);
         free(name);
     } else {
-        completion.escaped = xstrcut(str, len);
-        completion.parsed = parse_command_arg(cmds, completion.escaped, len, true);
-        completion.add_space = true;
+        completion.escaped = string_view(str, len);
+        completion.parsed = parse_command_arg(cmds, str, len, true);
+        completion.add_space_after_single_match = true;
         char **args = NULL;
         size_t argc = 0;
         if (array.count) {
@@ -521,40 +519,41 @@ static void init_completion(void)
 
     ptr_array_free(&array);
     ptr_array_sort(&completion.completions, strptrcmp);
-    completion.head = xstrcut(cmd, completion_pos);
-    completion.tail = xstrdup(cmd + editor.cmdline.pos);
+    completion.orig = cmd; // (takes ownership)
+    completion.tail = strview_from_cstring(cmd + cmdline_pos);
+    completion.head_len = completion_pos;
 }
 
 static void do_complete_command(void)
 {
-    const char *arg = completion.completions.ptrs[completion.idx];
-    char *middle = escape_command_arg(arg, !completion.tilde_expanded);
-    size_t middle_len = strlen(middle);
-    size_t head_len = strlen(completion.head);
-    size_t tail_len = strlen(completion.tail);
+    const PointerArray *arr = &completion.completions;
+    const StringView middle = strview_from_cstring(arr->ptrs[completion.idx]);
+    const StringView tail = completion.tail;
+    const size_t head_length = completion.head_len;
 
-    char *str = xmalloc(head_len + middle_len + tail_len + 2);
-    memcpy(str, completion.head, head_len);
-    memcpy(str + head_len, middle, middle_len);
-    if (completion.completions.count == 1 && completion.add_space) {
-        str[head_len + middle_len] = ' ';
-        middle_len++;
+    String buf = string_new(head_length + tail.length + middle.length + 16);
+    string_append_buf(&buf, completion.orig, head_length);
+    string_append_escaped_arg_sv(&buf, middle, !completion.tilde_expanded);
+
+    bool single_completion = (arr->count == 1);
+    if (single_completion && completion.add_space_after_single_match) {
+        string_append_byte(&buf, ' ');
     }
-    memcpy(str + head_len + middle_len, completion.tail, tail_len + 1);
 
-    cmdline_set_text(&editor.cmdline, str);
-    editor.cmdline.pos = head_len + middle_len;
+    size_t pos = buf.len;
+    string_append_strview(&buf, &tail);
+    cmdline_set_text(&editor.cmdline, string_borrow_cstring(&buf));
+    editor.cmdline.pos = pos;
+    string_free(&buf);
 
-    free(middle);
-    free(str);
-    if (completion.completions.count == 1) {
+    if (single_completion) {
         reset_completion();
     }
 }
 
 void complete_command_next(void)
 {
-    const bool init = !completion.head;
+    const bool init = !completion.orig;
     if (init) {
         init_completion();
     }
@@ -573,7 +572,7 @@ void complete_command_next(void)
 
 void complete_command_prev(void)
 {
-    const bool init = !completion.head;
+    const bool init = !completion.orig;
     if (init) {
         init_completion();
     }
@@ -592,10 +591,8 @@ void complete_command_prev(void)
 
 void reset_completion(void)
 {
-    free(completion.escaped);
     free(completion.parsed);
-    free(completion.head);
-    free(completion.tail);
+    free(completion.orig);
     ptr_array_free(&completion.completions);
     MEMZERO(&completion);
 }
