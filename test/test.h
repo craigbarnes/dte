@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 #include "util/macros.h"
 
 extern unsigned int passed, failed;

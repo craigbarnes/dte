@@ -1,4 +1,3 @@
-#include <string.h>
 #include "test.h"
 #include "terminal/color.h"
 #include "terminal/ecma48.h"

@@ -3,7 +3,6 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include "test.h"
 #include "util/ascii.h"

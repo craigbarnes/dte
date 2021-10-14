@@ -1,4 +1,3 @@
-#include <string.h>
 #include "test.h"
 #include "block-iter.h"
 #include "config.h"

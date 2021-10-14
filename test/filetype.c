@@ -1,4 +1,3 @@
-#include <string.h>
 #include "test.h"
 #include "filetype.h"
 
