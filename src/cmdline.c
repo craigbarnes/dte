@@ -53,12 +53,14 @@ static void cmd_bol(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_cancel(const CommandArgs* UNUSED_ARG(a))
 {
-    CommandLine *c = &editor.cmdline;
-    string_clear(&c->buf);
-    c->pos = 0;
-    c->search_pos = NULL;
+    cmdline_clear(&editor.cmdline);
     set_input_mode(INPUT_NORMAL);
     reset_completion();
+}
+
+static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
+{
+    cmdline_clear(&editor.cmdline);
 }
 
 static void cmd_delete(const CommandArgs* UNUSED_ARG(a))
@@ -305,6 +307,7 @@ static void cmd_direction(const CommandArgs* UNUSED_ARG(a))
 static const Command common_cmds[] = {
     {"bol", "", false, 0, 0, cmd_bol},
     {"cancel", "", false, 0, 0, cmd_cancel},
+    {"clear", "", false, 0, 0, cmd_clear},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "", false, 0, 0, cmd_delete_eol},
     {"delete-word", "", false, 0, 0, cmd_delete_word},

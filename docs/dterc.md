@@ -174,6 +174,7 @@ The commands avilable in [`command`]/[`search`] modes are as follows:
 * `erase-word`
 * `erase-bol`
 * `cancel`
+* `clear`
 * `history-next`
 * `history-prev`
 * `complete-next` (command mode)
