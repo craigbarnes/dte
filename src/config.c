@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include "config.h"
 #include "commands.h"
-#include "completion.h"
 #include "error.h"
 #include "syntax/color.h"
 #include "terminal/terminal.h"

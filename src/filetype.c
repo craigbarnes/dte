@@ -1,6 +1,5 @@
 #include "filetype.h"
 #include "command/serialize.h"
-#include "completion.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"

@@ -13,7 +13,6 @@
 #include "command/args.h"
 #include "command/macro.h"
 #include "command/serialize.h"
-#include "completion.h"
 #include "config.h"
 #include "convert.h"
 #include "edit.h"

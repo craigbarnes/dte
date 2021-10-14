@@ -4,7 +4,6 @@
 #include "options.h"
 #include "buffer.h"
 #include "command/serialize.h"
-#include "completion.h"
 #include "editor.h"
 #include "error.h"
 #include "file-option.h"

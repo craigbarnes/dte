@@ -1,7 +1,6 @@
 #include <limits.h>
 #include <string.h>
 #include "color.h"
-#include "completion.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/numtostr.h"

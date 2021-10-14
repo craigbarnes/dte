@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "tag.h"
-#include "completion.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include "vars.h"
 #include "buffer.h"
-#include "completion.h"
 #include "editor.h"
 #include "error.h"
 #include "selection.h"

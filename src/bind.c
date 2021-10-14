@@ -9,7 +9,6 @@
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
-#include "completion.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
