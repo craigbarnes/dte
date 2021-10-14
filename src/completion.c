@@ -27,7 +27,7 @@
 #include "util/xmalloc.h"
 #include "vars.h"
 
-static struct {
+typedef struct {
     char *orig; // Full cmdline string (backing buffer for `escaped` and `tail`)
     char *parsed; // Result of passing `escaped` through parse_command_arg()
     StringView escaped; // Middle part of `orig` (string to be replaced)
@@ -39,29 +39,9 @@ static struct {
 
     bool add_space_after_single_match;
     bool tilde_expanded;
-} completion;
+} CompletionState;
 
-static int strptrcmp(const void *v1, const void *v2)
-{
-    const char *const *s1 = v1;
-    const char *const *s2 = v2;
-    return strcmp(*s1, *s2);
-}
-
-void add_completion(char *str)
-{
-    ptr_array_append(&completion.completions, str);
-}
-
-void collect_hashmap_keys(const HashMap *map, const char *prefix)
-{
-    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); ) {
-        const char *name = it.entry->key;
-        if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
-        }
-    }
-}
+static CompletionState completion;
 
 static void do_collect_files (
     const char *dirname,
@@ -139,95 +119,95 @@ static void do_collect_files (
     closedir(dir);
 }
 
-static void collect_files(bool directories_only)
+static void collect_files(CompletionState *cs, bool directories_only)
 {
-    StringView e = completion.escaped;
+    StringView e = cs->escaped;
     if (strview_has_prefix(&e, "~/")) {
         char *str = parse_command_arg(&normal_commands, e.data, e.length, false);
         const char *slash = strrchr(str, '/');
         BUG_ON(!slash);
-        completion.tilde_expanded = true;
-        char *dir = path_dirname(completion.parsed);
+        cs->tilde_expanded = true;
+        char *dir = path_dirname(cs->parsed);
         char *dirprefix = path_dirname(str);
         do_collect_files(dir, dirprefix, slash + 1, directories_only);
         free(dirprefix);
         free(dir);
         free(str);
     } else {
-        const char *slash = strrchr(completion.parsed, '/');
+        const char *slash = strrchr(cs->parsed, '/');
         if (!slash) {
-            do_collect_files(".", "", completion.parsed, directories_only);
+            do_collect_files(".", "", cs->parsed, directories_only);
         } else {
-            char *dir = path_dirname(completion.parsed);
+            char *dir = path_dirname(cs->parsed);
             do_collect_files(dir, dir, slash + 1, directories_only);
             free(dir);
         }
     }
 
-    if (completion.completions.count == 1) {
+    if (cs->completions.count == 1) {
         // Add space if completed string is not a directory
-        const char *s = completion.completions.ptrs[0];
+        const char *s = cs->completions.ptrs[0];
         size_t len = strlen(s);
         if (len > 0) {
-            completion.add_space_after_single_match = s[len - 1] != '/';
+            cs->add_space_after_single_match = s[len - 1] != '/';
         }
     }
 }
 
-static void complete_files(const char* UNUSED_ARG(str), const CommandArgs* UNUSED_ARG(a))
+static void complete_files(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(false);
+    collect_files(cs, false);
 }
 
-static void complete_dirs(const char* UNUSED_ARG(str), const CommandArgs* UNUSED_ARG(a))
+static void complete_dirs(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(true);
+    collect_files(cs, true);
 }
 
-static void complete_compile(const char *str, const CommandArgs *a)
+static void complete_compile(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_compilers(str);
+        collect_compilers(cs->parsed);
     }
 }
 
-static void complete_errorfmt(const char *str, const CommandArgs *a)
+static void complete_errorfmt(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_compilers(str);
+        collect_compilers(cs->parsed);
     } else if (a->nr_args >= 2 && !cmdargs_has_flag(a, 'i')) {
-        collect_errorfmt_capture_names(str);
+        collect_errorfmt_capture_names(cs->parsed);
     }
 }
 
-static void complete_ft(const char *str, const CommandArgs *a)
+static void complete_ft(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_ft(str);
+        collect_ft(cs->parsed);
     }
 }
 
-static void complete_hi(const char *str, const CommandArgs *a)
+static void complete_hi(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_hl_colors(str);
+        collect_hl_colors(cs->parsed);
     } else {
-        collect_colors_and_attributes(str);
+        collect_colors_and_attributes(cs->parsed);
     }
 }
 
-static void complete_include(const char *str, const CommandArgs *a)
+static void complete_include(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         if (cmdargs_has_flag(a, 'b')) {
-            collect_builtin_configs(str);
+            collect_builtin_configs(cs->parsed);
         } else {
-            collect_files(false);
+            collect_files(cs, false);
         }
     }
 }
 
-static void complete_macro(const char *str, const CommandArgs *a)
+static void complete_macro(CompletionState *cs, const CommandArgs *a)
 {
     static const char verbs[][8] = {
         "cancel",
@@ -242,48 +222,48 @@ static void complete_macro(const char *str, const CommandArgs *a)
     }
 
     for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
-        if (str_has_prefix(verbs[i], str)) {
+        if (str_has_prefix(verbs[i], cs->parsed)) {
             add_completion(xstrdup(verbs[i]));
         }
     }
 }
 
-static void complete_open(const char* UNUSED_ARG(str), const CommandArgs *a)
+static void complete_open(CompletionState *cs, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't')) {
-        collect_files(false);
+        collect_files(cs, false);
     }
 }
 
-static void complete_option(const char *str, const CommandArgs *a)
+static void complete_option(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         if (!cmdargs_has_flag(a, 'r')) {
-            collect_ft(str);
+            collect_ft(cs->parsed);
         }
     } else if (a->nr_args & 1) {
-        collect_auto_options(str);
+        collect_auto_options(cs->parsed);
     } else {
-        collect_option_values(a->args[a->nr_args - 1], str);
+        collect_option_values(a->args[a->nr_args - 1], cs->parsed);
     }
 }
 
-static void complete_set(const char *str, const CommandArgs *a)
+static void complete_set(CompletionState *cs, const CommandArgs *a)
 {
     if ((a->nr_args + 1) & 1) {
         bool local = cmdargs_has_flag(a, 'l');
         bool global = cmdargs_has_flag(a, 'g');
-        collect_options(str, local, global);
+        collect_options(cs->parsed, local, global);
     } else {
-        collect_option_values(a->args[a->nr_args - 1], str);
+        collect_option_values(a->args[a->nr_args - 1], cs->parsed);
     }
 }
 
-static void complete_setenv(const char *str, const CommandArgs *a)
+static void complete_setenv(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_env(str);
-    } else if (a->nr_args == 1 && str[0] == '\0') {
+        collect_env(cs->parsed);
+    } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
         if (value) {
@@ -292,44 +272,44 @@ static void complete_setenv(const char *str, const CommandArgs *a)
     }
 }
 
-static void complete_show(const char *str, const CommandArgs *a)
+static void complete_show(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_show_subcommands(str);
+        collect_show_subcommands(cs->parsed);
     } else if (a->nr_args == 1) {
         BUG_ON(!a->args[0]);
-        collect_show_subcommand_args(a->args[0], str);
+        collect_show_subcommand_args(a->args[0], cs->parsed);
     }
 }
 
-static void complete_tag(const char *str, const CommandArgs *a)
+static void complete_tag(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
         TagFile *tf = load_tag_file();
         if (tf) {
-            collect_tags(tf, str);
+            collect_tags(tf, cs->parsed);
         }
     }
 }
 
-static void complete_toggle(const char *str, const CommandArgs *a)
+static void complete_toggle(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         bool global = cmdargs_has_flag(a, 'g');
-        collect_toggleable_options(str, global);
+        collect_toggleable_options(cs->parsed, global);
     }
 }
 
-static void complete_wsplit(const char* UNUSED_ARG(str), const CommandArgs *a)
+static void complete_wsplit(CompletionState *cs, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't') && !cmdargs_has_flag(a, 'n')) {
-        collect_files(false);
+        collect_files(cs, false);
     }
 }
 
 typedef struct {
     char cmd_name[12];
-    void (*complete)(const char *str, const CommandArgs *a);
+    void (*complete)(CompletionState *cs, const CommandArgs *a);
 } CompletionHandler;
 
 static const CompletionHandler handlers[] = {
@@ -358,11 +338,11 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(handlers, cmd_name, strcmp);
 }
 
-static void collect_completions(char **args, size_t argc)
+static void collect_completions(CompletionState *cs, char **args, size_t argc)
 {
     if (!argc) {
-        collect_normal_commands(completion.parsed);
-        collect_normal_aliases(completion.parsed);
+        collect_normal_commands(cs->parsed);
+        collect_normal_aliases(cs->parsed);
         return;
     }
 
@@ -383,12 +363,12 @@ static void collect_completions(char **args, size_t argc)
 
     const CompletionHandler *h = BSEARCH(args[0], handlers, (CompareFunction)strcmp);
     if (h) {
-        h->complete(completion.parsed, &a);
+        h->complete(cs, &a);
     } else if (streq(args[0], "repeat")) {
         if (a.nr_args == 1) {
-            collect_normal_commands(completion.parsed);
+            collect_normal_commands(cs->parsed);
         } else if (a.nr_args >= 2) {
-            collect_completions(args + 2, argc - 2);
+            collect_completions(cs, args + 2, argc - 2);
         }
     }
 
@@ -432,9 +412,16 @@ UNITTEST {
     BUG_ON(is_var(STRN("$1a")));
 }
 
-static void init_completion(void)
+static int strptrcmp(const void *v1, const void *v2)
 {
-    BUG_ON(completion.orig);
+    const char *const *s1 = v1;
+    const char *const *s2 = v2;
+    return strcmp(*s1, *s2);
+}
+
+static void init_completion(CompletionState *cs)
+{
+    BUG_ON(cs->orig);
     const CommandSet *cmds = &normal_commands;
     const size_t cmdline_pos = editor.cmdline.pos;
     char *const cmd = string_clone_cstring(&editor.cmdline.buf);
@@ -505,38 +492,38 @@ static void init_completion(void)
         collect_normal_vars(name);
         free(name);
     } else {
-        completion.escaped = string_view(str, len);
-        completion.parsed = parse_command_arg(cmds, str, len, true);
-        completion.add_space_after_single_match = true;
+        cs->escaped = string_view(str, len);
+        cs->parsed = parse_command_arg(cmds, str, len, true);
+        cs->add_space_after_single_match = true;
         char **args = NULL;
         size_t argc = 0;
         if (array.count) {
             args = (char**)array.ptrs + 1 + semicolon;
             argc = array.count - semicolon - 1;
         }
-        collect_completions(args, argc);
+        collect_completions(cs, args, argc);
     }
 
     ptr_array_free(&array);
-    ptr_array_sort(&completion.completions, strptrcmp);
-    completion.orig = cmd; // (takes ownership)
-    completion.tail = strview_from_cstring(cmd + cmdline_pos);
-    completion.head_len = completion_pos;
+    ptr_array_sort(&cs->completions, strptrcmp);
+    cs->orig = cmd; // (takes ownership)
+    cs->tail = strview_from_cstring(cmd + cmdline_pos);
+    cs->head_len = completion_pos;
 }
 
-static void do_complete_command(void)
+static void do_complete_command(CompletionState *cs)
 {
-    const PointerArray *arr = &completion.completions;
-    const StringView middle = strview_from_cstring(arr->ptrs[completion.idx]);
-    const StringView tail = completion.tail;
-    const size_t head_length = completion.head_len;
+    const PointerArray *arr = &cs->completions;
+    const StringView middle = strview_from_cstring(arr->ptrs[cs->idx]);
+    const StringView tail = cs->tail;
+    const size_t head_length = cs->head_len;
 
     String buf = string_new(head_length + tail.length + middle.length + 16);
-    string_append_buf(&buf, completion.orig, head_length);
-    string_append_escaped_arg_sv(&buf, middle, !completion.tilde_expanded);
+    string_append_buf(&buf, cs->orig, head_length);
+    string_append_escaped_arg_sv(&buf, middle, !cs->tilde_expanded);
 
     bool single_completion = (arr->count == 1);
-    if (single_completion && completion.add_space_after_single_match) {
+    if (single_completion && cs->add_space_after_single_match) {
         string_append_byte(&buf, ' ');
     }
 
@@ -553,46 +540,64 @@ static void do_complete_command(void)
 
 void complete_command_next(void)
 {
-    const bool init = !completion.orig;
+    CompletionState *cs = &completion;
+    const bool init = !cs->orig;
     if (init) {
-        init_completion();
+        init_completion(cs);
     }
-    if (!completion.completions.count) {
+    if (!cs->completions.count) {
         return;
     }
     if (!init) {
-        if (completion.idx >= completion.completions.count - 1) {
-            completion.idx = 0;
+        if (cs->idx >= cs->completions.count - 1) {
+            cs->idx = 0;
         } else {
-            completion.idx++;
+            cs->idx++;
         }
     }
-    do_complete_command();
+    do_complete_command(cs);
 }
 
 void complete_command_prev(void)
 {
-    const bool init = !completion.orig;
+    CompletionState *cs = &completion;
+    const bool init = !cs->orig;
     if (init) {
-        init_completion();
+        init_completion(cs);
     }
-    if (!completion.completions.count) {
+    if (!cs->completions.count) {
         return;
     }
     if (!init) {
-        if (completion.idx == 0) {
-            completion.idx = completion.completions.count - 1;
+        if (cs->idx == 0) {
+            cs->idx = cs->completions.count - 1;
         } else {
-            completion.idx--;
+            cs->idx--;
         }
     }
-    do_complete_command();
+    do_complete_command(cs);
 }
 
 void reset_completion(void)
 {
-    free(completion.parsed);
-    free(completion.orig);
-    ptr_array_free(&completion.completions);
-    MEMZERO(&completion);
+    CompletionState *cs = &completion;
+    free(cs->parsed);
+    free(cs->orig);
+    ptr_array_free(&cs->completions);
+    MEMZERO(cs);
+}
+
+void add_completion(char *str)
+{
+    ptr_array_append(&completion.completions, str);
+}
+
+void collect_hashmap_keys(const HashMap *map, const char *prefix)
+{
+    for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        if (str_has_prefix(name, prefix)) {
+            add_completion(xstrdup(name));
+        }
+    }
 }
