@@ -285,12 +285,12 @@ static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_complete_next(const CommandArgs* UNUSED_ARG(a))
 {
-    complete_command_next();
+    complete_command_next(&editor.cmdline);
 }
 
 static void cmd_complete_prev(const CommandArgs* UNUSED_ARG(a))
 {
-    complete_command_prev();
+    complete_command_prev(&editor.cmdline);
 }
 
 static void cmd_case(const CommandArgs* UNUSED_ARG(a))

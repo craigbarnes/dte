@@ -2,7 +2,6 @@
 #include <sys/stat.h>
 #include "completion.h"
 #include "bind.h"
-#include "cmdline.h"
 #include "command/alias.h"
 #include "command/args.h"
 #include "command/parse.h"
@@ -10,7 +9,6 @@
 #include "commands.h"
 #include "compiler.h"
 #include "config.h"
-#include "editor.h"
 #include "filetype.h"
 #include "options.h"
 #include "show.h"
@@ -419,12 +417,12 @@ static int strptrcmp(const void *v1, const void *v2)
     return strcmp(*s1, *s2);
 }
 
-static void init_completion(CompletionState *cs)
+static void init_completion(CompletionState *cs, CommandLine *cmdline)
 {
     BUG_ON(cs->orig);
     const CommandSet *cmds = &normal_commands;
-    const size_t cmdline_pos = editor.cmdline.pos;
-    char *const cmd = string_clone_cstring(&editor.cmdline.buf);
+    const size_t cmdline_pos = cmdline->pos;
+    char *const cmd = string_clone_cstring(&cmdline->buf);
     PointerArray array = PTR_ARRAY_INIT;
     ssize_t semicolon = -1;
     ssize_t completion_pos = -1;
@@ -511,7 +509,7 @@ static void init_completion(CompletionState *cs)
     cs->head_len = completion_pos;
 }
 
-static void do_complete_command(CompletionState *cs)
+static void do_complete_command(CompletionState *cs, CommandLine *cmdline)
 {
     const PointerArray *arr = &cs->completions;
     const StringView middle = strview_from_cstring(arr->ptrs[cs->idx]);
@@ -529,8 +527,8 @@ static void do_complete_command(CompletionState *cs)
 
     size_t pos = buf.len;
     string_append_strview(&buf, &tail);
-    cmdline_set_text(&editor.cmdline, string_borrow_cstring(&buf));
-    editor.cmdline.pos = pos;
+    cmdline_set_text(cmdline, string_borrow_cstring(&buf));
+    cmdline->pos = pos;
     string_free(&buf);
 
     if (single_completion) {
@@ -538,12 +536,12 @@ static void do_complete_command(CompletionState *cs)
     }
 }
 
-void complete_command_next(void)
+void complete_command_next(CommandLine *cmdline)
 {
     CompletionState *cs = &completion;
     const bool init = !cs->orig;
     if (init) {
-        init_completion(cs);
+        init_completion(cs, cmdline);
     }
     if (!cs->completions.count) {
         return;
@@ -555,15 +553,15 @@ void complete_command_next(void)
             cs->idx++;
         }
     }
-    do_complete_command(cs);
+    do_complete_command(cs, cmdline);
 }
 
-void complete_command_prev(void)
+void complete_command_prev(CommandLine *cmdline)
 {
     CompletionState *cs = &completion;
     const bool init = !cs->orig;
     if (init) {
-        init_completion(cs);
+        init_completion(cs, cmdline);
     }
     if (!cs->completions.count) {
         return;
@@ -575,7 +573,7 @@ void complete_command_prev(void)
             cs->idx--;
         }
     }
-    do_complete_command(cs);
+    do_complete_command(cs, cmdline);
 }
 
 void reset_completion(void)
