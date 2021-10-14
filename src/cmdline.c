@@ -47,15 +47,17 @@ void cmdline_set_text(CommandLine *c, const char *text)
 
 static void cmd_bol(const CommandArgs* UNUSED_ARG(a))
 {
-    editor.cmdline.pos = 0;
-    reset_completion();
+    CommandLine *c = &editor.cmdline;
+    c->pos = 0;
+    reset_completion(c);
 }
 
 static void cmd_cancel(const CommandArgs* UNUSED_ARG(a))
 {
-    cmdline_clear(&editor.cmdline);
+    CommandLine *c = &editor.cmdline;
+    cmdline_clear(c);
     set_input_mode(INPUT_NORMAL);
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
@@ -68,7 +70,7 @@ static void cmd_delete(const CommandArgs* UNUSED_ARG(a))
     CommandLine *c = &editor.cmdline;
     cmdline_delete(c);
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_delete_eol(const CommandArgs* UNUSED_ARG(a))
@@ -76,7 +78,7 @@ static void cmd_delete_eol(const CommandArgs* UNUSED_ARG(a))
     CommandLine *c = &editor.cmdline;
     c->buf.len = c->pos;
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_delete_word(const CommandArgs* UNUSED_ARG(a))
@@ -101,14 +103,14 @@ static void cmd_delete_word(const CommandArgs* UNUSED_ARG(a))
     string_remove(&c->buf, c->pos, i - c->pos);
 
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_eol(const CommandArgs* UNUSED_ARG(a))
 {
     CommandLine *c = &editor.cmdline;
     c->pos = c->buf.len;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
@@ -119,7 +121,7 @@ static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
         cmdline_delete(c);
     }
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
@@ -128,7 +130,7 @@ static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
     string_remove(&c->buf, 0, c->pos);
     c->pos = 0;
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_erase_word(const CommandArgs* UNUSED_ARG(a))
@@ -159,7 +161,7 @@ static void cmd_erase_word(const CommandArgs* UNUSED_ARG(a))
     string_remove(&c->buf, i, c->pos - i);
     c->pos = i;
     c->search_pos = NULL;
-    reset_completion();
+    reset_completion(c);
 }
 
 static const History *get_history(void)
@@ -193,7 +195,7 @@ static void cmd_history_prev(const CommandArgs* UNUSED_ARG(a))
         set_text(c, c->search_pos->text);
     }
 
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_history_next(const CommandArgs* UNUSED_ARG(a))
@@ -216,7 +218,7 @@ static void cmd_history_next(const CommandArgs* UNUSED_ARG(a))
     }
 
 out:
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_left(const CommandArgs* UNUSED_ARG(a))
@@ -225,7 +227,7 @@ static void cmd_left(const CommandArgs* UNUSED_ARG(a))
     if (c->pos) {
         u_prev_char(c->buf.buffer, &c->pos);
     }
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_right(const CommandArgs* UNUSED_ARG(a))
@@ -234,7 +236,7 @@ static void cmd_right(const CommandArgs* UNUSED_ARG(a))
     if (c->pos < c->buf.len) {
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
     }
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_word_bwd(const CommandArgs* UNUSED_ARG(a))
@@ -261,7 +263,7 @@ static void cmd_word_bwd(const CommandArgs* UNUSED_ARG(a))
     }
 
     c->pos = i;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
@@ -280,7 +282,7 @@ static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
     }
 
     c->pos = i;
-    reset_completion();
+    reset_completion(c);
 }
 
 static void cmd_complete_next(const CommandArgs* UNUSED_ARG(a))

@@ -25,22 +25,6 @@
 #include "util/xmalloc.h"
 #include "vars.h"
 
-typedef struct {
-    char *orig; // Full cmdline string (backing buffer for `escaped` and `tail`)
-    char *parsed; // Result of passing `escaped` through parse_command_arg()
-    StringView escaped; // Middle part of `orig` (string to be replaced)
-    StringView tail; // Suffix part of `orig` (after `escaped`)
-    size_t head_len; // Length of prefix part of `orig` (before `escaped`)
-
-    PointerArray completions; // Array of completion candidates
-    size_t idx; // Index of currently selected completion
-
-    bool add_space_after_single_match;
-    bool tilde_expanded;
-} CompletionState;
-
-static CompletionState completion;
-
 static void do_collect_files (
     const char *dirname,
     const char *dirprefix,
@@ -509,8 +493,9 @@ static void init_completion(CompletionState *cs, CommandLine *cmdline)
     cs->head_len = completion_pos;
 }
 
-static void do_complete_command(CompletionState *cs, CommandLine *cmdline)
+static void do_complete_command(CommandLine *cmdline)
 {
+    const CompletionState *cs = &cmdline->completion;
     const PointerArray *arr = &cs->completions;
     const StringView middle = strview_from_cstring(arr->ptrs[cs->idx]);
     const StringView tail = cs->tail;
@@ -532,13 +517,13 @@ static void do_complete_command(CompletionState *cs, CommandLine *cmdline)
     string_free(&buf);
 
     if (single_completion) {
-        reset_completion();
+        reset_completion(cmdline);
     }
 }
 
 void complete_command_next(CommandLine *cmdline)
 {
-    CompletionState *cs = &completion;
+    CompletionState *cs = &cmdline->completion;
     const bool init = !cs->orig;
     if (init) {
         init_completion(cs, cmdline);
@@ -553,12 +538,12 @@ void complete_command_next(CommandLine *cmdline)
             cs->idx++;
         }
     }
-    do_complete_command(cs, cmdline);
+    do_complete_command(cmdline);
 }
 
 void complete_command_prev(CommandLine *cmdline)
 {
-    CompletionState *cs = &completion;
+    CompletionState *cs = &cmdline->completion;
     const bool init = !cs->orig;
     if (init) {
         init_completion(cs, cmdline);
@@ -573,21 +558,23 @@ void complete_command_prev(CommandLine *cmdline)
             cs->idx--;
         }
     }
-    do_complete_command(cs, cmdline);
+    do_complete_command(cmdline);
 }
 
-void reset_completion(void)
+void reset_completion(CommandLine *cmdline)
 {
-    CompletionState *cs = &completion;
+    CompletionState *cs = &cmdline->completion;
     free(cs->parsed);
     free(cs->orig);
     ptr_array_free(&cs->completions);
     MEMZERO(cs);
 }
 
+// TODO: Pass completions PointerArray as a parameter
+#include "editor.h"
 void add_completion(char *str)
 {
-    ptr_array_append(&completion.completions, str);
+    ptr_array_append(&editor.cmdline.completion.completions, str);
 }
 
 void collect_hashmap_keys(const HashMap *map, const char *prefix)

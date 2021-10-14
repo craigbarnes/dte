@@ -70,7 +70,7 @@ static void command_mode_keypress(KeyCode key)
     CommandLine *c = &editor.cmdline;
     switch (key) {
     case KEY_ENTER:
-        reset_completion();
+        reset_completion(c);
         set_input_mode(INPUT_NORMAL);
         const char *str = string_borrow_cstring(&c->buf);
         cmdline_clear(c);
@@ -84,13 +84,13 @@ static void command_mode_keypress(KeyCode key)
     case KEY_PASTE:
         cmdline_insert_paste(c);
         c->search_pos = NULL;
-        reset_completion();
+        reset_completion(c);
         return;
     }
 
     if (u_is_unicode(key) && key != KEY_TAB) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
-        reset_completion();
+        reset_completion(c);
     } else {
         handle_binding(INPUT_COMMAND, key);
     }
