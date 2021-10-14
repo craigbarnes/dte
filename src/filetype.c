@@ -1,4 +1,3 @@
-#include <string.h>
 #include "filetype.h"
 #include "command/serialize.h"
 #include "completion.h"
@@ -9,7 +8,6 @@
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/path.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -314,19 +312,19 @@ bool is_ft(const char *name)
     return false;
 }
 
-void collect_ft(const char *prefix)
+void collect_ft(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
         const char *name = builtin_filetype_names[i];
         if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+            ptr_array_append(a, xstrdup(name));
         }
     }
     for (size_t i = 0, n = filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes.ptrs[i];
         const char *name = ft->name;
         if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+            ptr_array_append(a, xstrdup(name));
         }
     }
 }

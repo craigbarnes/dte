@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "util/ptr-array.h"
 #include "util/string.h"
 
 enum {
@@ -101,10 +102,10 @@ void set_bool_option(const char *name, bool local, bool global);
 void toggle_option(const char *name, bool global, bool verbose);
 void toggle_option_values(const char *name, bool global, bool verbose, char **values, size_t count);
 bool validate_local_options(char **strs);
-void collect_options(const char *prefix, bool local, bool global);
-void collect_auto_options(const char *prefix);
-void collect_toggleable_options(const char *prefix, bool global);
-void collect_option_values(const char *option, const char *prefix);
+void collect_options(PointerArray *a, const char *prefix, bool local, bool global);
+void collect_auto_options(PointerArray *a, const char *prefix);
+void collect_toggleable_options(PointerArray *a, const char *prefix, bool global);
+void collect_option_values(PointerArray *a, const char *option, const char *prefix);
 String dump_options(void);
 const char *get_option_value_string(const char *name);
 

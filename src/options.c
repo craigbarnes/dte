@@ -728,7 +728,7 @@ bool validate_local_options(char **strs)
     return !invalid;
 }
 
-void collect_options(const char *prefix, bool local, bool global)
+void collect_options(PointerArray *a, const char *prefix, bool local, bool global)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
@@ -736,13 +736,13 @@ void collect_options(const char *prefix, bool local, bool global)
             continue;
         }
         if (str_has_prefix(desc->name, prefix)) {
-            add_completion(xstrdup(desc->name));
+            ptr_array_append(a, xstrdup(desc->name));
         }
     }
 }
 
 // Collect options that can be set via the "option" command
-void collect_auto_options(const char *prefix)
+void collect_auto_options(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
@@ -750,12 +750,12 @@ void collect_auto_options(const char *prefix)
             continue;
         }
         if (str_has_prefix(desc->name, prefix)) {
-            add_completion(xstrdup(desc->name));
+            ptr_array_append(a, xstrdup(desc->name));
         }
     }
 }
 
-void collect_toggleable_options(const char *prefix, bool global)
+void collect_toggleable_options(PointerArray *a, const char *prefix, bool global)
 {
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
@@ -765,12 +765,12 @@ void collect_toggleable_options(const char *prefix, bool global)
         OptionType type = desc->type;
         bool toggleable = (type == OPT_ENUM || type == OPT_BOOL);
         if (toggleable && str_has_prefix(desc->name, prefix)) {
-            add_completion(xstrdup(desc->name));
+            ptr_array_append(a, xstrdup(desc->name));
         }
     }
 }
 
-void collect_option_values(const char *option, const char *prefix)
+void collect_option_values(PointerArray *a, const char *option, const char *prefix)
 {
     const OptionDesc *desc = find_option(option);
     if (!desc) {
@@ -781,7 +781,7 @@ void collect_option_values(const char *option, const char *prefix)
         bool local = desc->local;
         char *ptr = local ? local_ptr(desc, &buffer->options) : global_ptr(desc);
         OptionValue value = desc_get(desc, ptr);
-        add_completion(xstrdup(desc_string(desc, value)));
+        ptr_array_append(a, xstrdup(desc_string(desc, value)));
         return;
     }
 
@@ -795,7 +795,7 @@ void collect_option_values(const char *option, const char *prefix)
         values = desc->u.enum_opt.values;
         for (size_t i = 0; values[i]; i++) {
             if (str_has_prefix(values[i], prefix)) {
-                add_completion(xstrdup(values[i]));
+                ptr_array_append(a, xstrdup(values[i]));
             }
         }
         break;
@@ -810,7 +810,7 @@ void collect_option_values(const char *option, const char *prefix)
                 char *completion = xmalloc(prefix_len + str_len + 1);
                 memcpy(completion, prefix, prefix_len);
                 memcpy(completion + prefix_len, str, str_len + 1);
-                add_completion(completion);
+                ptr_array_append(a, completion);
             }
         }
         break;

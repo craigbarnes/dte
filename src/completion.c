@@ -18,7 +18,6 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/path.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/string.h"
@@ -26,6 +25,7 @@
 #include "vars.h"
 
 static void do_collect_files (
+    CompletionState *cs,
     const char *dirname,
     const char *dirprefix,
     const char *fileprefix,
@@ -96,8 +96,9 @@ static void do_collect_files (
         if (is_dir) {
             string_append_byte(&buf, '/');
         }
-        add_completion(string_steal_cstring(&buf));
+        ptr_array_append(&cs->completions, string_steal_cstring(&buf));
     }
+
     closedir(dir);
 }
 
@@ -111,17 +112,17 @@ static void collect_files(CompletionState *cs, bool directories_only)
         cs->tilde_expanded = true;
         char *dir = path_dirname(cs->parsed);
         char *dirprefix = path_dirname(str);
-        do_collect_files(dir, dirprefix, slash + 1, directories_only);
+        do_collect_files(cs, dir, dirprefix, slash + 1, directories_only);
         free(dirprefix);
         free(dir);
         free(str);
     } else {
         const char *slash = strrchr(cs->parsed, '/');
         if (!slash) {
-            do_collect_files(".", "", cs->parsed, directories_only);
+            do_collect_files(cs, ".", "", cs->parsed, directories_only);
         } else {
             char *dir = path_dirname(cs->parsed);
-            do_collect_files(dir, dir, slash + 1, directories_only);
+            do_collect_files(cs, dir, dir, slash + 1, directories_only);
             free(dir);
         }
     }
@@ -149,32 +150,32 @@ static void complete_dirs(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
 static void complete_compile(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_compilers(cs->parsed);
+        collect_compilers(&cs->completions, cs->parsed);
     }
 }
 
 static void complete_errorfmt(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_compilers(cs->parsed);
+        collect_compilers(&cs->completions, cs->parsed);
     } else if (a->nr_args >= 2 && !cmdargs_has_flag(a, 'i')) {
-        collect_errorfmt_capture_names(cs->parsed);
+        collect_errorfmt_capture_names(&cs->completions, cs->parsed);
     }
 }
 
 static void complete_ft(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_ft(cs->parsed);
+        collect_ft(&cs->completions, cs->parsed);
     }
 }
 
 static void complete_hi(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_hl_colors(cs->parsed);
+        collect_hl_colors(&cs->completions, cs->parsed);
     } else {
-        collect_colors_and_attributes(cs->parsed);
+        collect_colors_and_attributes(&cs->completions, cs->parsed);
     }
 }
 
@@ -182,7 +183,7 @@ static void complete_include(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         if (cmdargs_has_flag(a, 'b')) {
-            collect_builtin_configs(cs->parsed);
+            collect_builtin_configs(&cs->completions, cs->parsed);
         } else {
             collect_files(cs, false);
         }
@@ -205,7 +206,7 @@ static void complete_macro(CompletionState *cs, const CommandArgs *a)
 
     for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
         if (str_has_prefix(verbs[i], cs->parsed)) {
-            add_completion(xstrdup(verbs[i]));
+            ptr_array_append(&cs->completions, xstrdup(verbs[i]));
         }
     }
 }
@@ -221,12 +222,12 @@ static void complete_option(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         if (!cmdargs_has_flag(a, 'r')) {
-            collect_ft(cs->parsed);
+            collect_ft(&cs->completions, cs->parsed);
         }
     } else if (a->nr_args & 1) {
-        collect_auto_options(cs->parsed);
+        collect_auto_options(&cs->completions, cs->parsed);
     } else {
-        collect_option_values(a->args[a->nr_args - 1], cs->parsed);
+        collect_option_values(&cs->completions, a->args[a->nr_args - 1], cs->parsed);
     }
 }
 
@@ -235,21 +236,21 @@ static void complete_set(CompletionState *cs, const CommandArgs *a)
     if ((a->nr_args + 1) & 1) {
         bool local = cmdargs_has_flag(a, 'l');
         bool global = cmdargs_has_flag(a, 'g');
-        collect_options(cs->parsed, local, global);
+        collect_options(&cs->completions, cs->parsed, local, global);
     } else {
-        collect_option_values(a->args[a->nr_args - 1], cs->parsed);
+        collect_option_values(&cs->completions, a->args[a->nr_args - 1], cs->parsed);
     }
 }
 
 static void complete_setenv(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_env(cs->parsed);
+        collect_env(&cs->completions, cs->parsed);
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
         if (value) {
-            add_completion(xstrdup(value));
+            ptr_array_append(&cs->completions, xstrdup(value));
         }
     }
 }
@@ -257,10 +258,10 @@ static void complete_setenv(CompletionState *cs, const CommandArgs *a)
 static void complete_show(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
-        collect_show_subcommands(cs->parsed);
+        collect_show_subcommands(&cs->completions, cs->parsed);
     } else if (a->nr_args == 1) {
         BUG_ON(!a->args[0]);
-        collect_show_subcommand_args(a->args[0], cs->parsed);
+        collect_show_subcommand_args(&cs->completions, a->args[0], cs->parsed);
     }
 }
 
@@ -269,7 +270,7 @@ static void complete_tag(CompletionState *cs, const CommandArgs *a)
     if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
         TagFile *tf = load_tag_file();
         if (tf) {
-            collect_tags(tf, cs->parsed);
+            collect_tags(&cs->completions, tf, cs->parsed);
         }
     }
 }
@@ -278,7 +279,7 @@ static void complete_toggle(CompletionState *cs, const CommandArgs *a)
 {
     if (a->nr_args == 0) {
         bool global = cmdargs_has_flag(a, 'g');
-        collect_toggleable_options(cs->parsed, global);
+        collect_toggleable_options(&cs->completions, cs->parsed, global);
     }
 }
 
@@ -323,8 +324,8 @@ UNITTEST {
 static void collect_completions(CompletionState *cs, char **args, size_t argc)
 {
     if (!argc) {
-        collect_normal_commands(cs->parsed);
-        collect_normal_aliases(cs->parsed);
+        collect_normal_commands(&cs->completions, cs->parsed);
+        collect_normal_aliases(&cs->completions, cs->parsed);
         return;
     }
 
@@ -348,7 +349,7 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
         h->complete(cs, &a);
     } else if (streq(args[0], "repeat")) {
         if (a.nr_args == 1) {
-            collect_normal_commands(cs->parsed);
+            collect_normal_commands(&cs->completions, cs->parsed);
         } else if (a.nr_args >= 2) {
             collect_completions(cs, args + 2, argc - 2);
         }
@@ -470,8 +471,8 @@ static void init_completion(CompletionState *cs, CommandLine *cmdline)
     if (is_var(str, len)) {
         char *name = xstrslice(str, 1, len);
         completion_pos++;
-        collect_env(name);
-        collect_normal_vars(name);
+        collect_env(&cs->completions, name);
+        collect_normal_vars(&cs->completions, name);
         free(name);
     } else {
         cs->escaped = string_view(str, len);
@@ -570,19 +571,12 @@ void reset_completion(CommandLine *cmdline)
     MEMZERO(cs);
 }
 
-// TODO: Pass completions PointerArray as a parameter
-#include "editor.h"
-void add_completion(char *str)
-{
-    ptr_array_append(&editor.cmdline.completion.completions, str);
-}
-
-void collect_hashmap_keys(const HashMap *map, const char *prefix)
+void collect_hashmap_keys(const HashMap *map, PointerArray *a, const char *prefix)
 {
     for (HashMapIter it = hashmap_iter(map); hashmap_next(&it); ) {
         const char *name = it.entry->key;
         if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+            ptr_array_append(a, xstrdup(name));
         }
     }
 }

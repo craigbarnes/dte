@@ -75,14 +75,14 @@ String dump_builtin_configs(void)
     return str;
 }
 
-void collect_builtin_configs(const char *prefix)
+void collect_builtin_configs(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
         const BuiltinConfig *cfg = &builtin_configs[i];
         if (str_has_prefix(cfg->name, "syntax/")) {
             return;
         } else if (str_has_prefix(cfg->name, prefix)) {
-            add_completion(xstrdup(cfg->name));
+            ptr_array_append(a, xstrdup(cfg->name));
         }
     }
 }

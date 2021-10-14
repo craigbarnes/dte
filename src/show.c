@@ -145,14 +145,14 @@ static String dump_env(void)
     return buf;
 }
 
-void collect_env(const char *prefix)
+void collect_env(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; environ[i]; i++) {
         const char *var = environ[i];
         if (str_has_prefix(var, prefix)) {
             const char *delim = strchr(var, '=');
             if (likely(delim)) {
-                add_completion(xstrcut(var, delim - var));
+                ptr_array_append(a, xstrcut(var, delim - var));
             }
         }
     }
@@ -206,9 +206,9 @@ static void show_option(const char *name, bool cflag)
     }
 }
 
-static void collect_all_options(const char *prefix)
+static void collect_all_options(PointerArray *a, const char *prefix)
 {
-    collect_options(prefix, false, false);
+    collect_options(a, prefix, false, false);
 }
 
 static void show_wsplit(const char *name, bool cflag)
@@ -306,9 +306,9 @@ String dump_normal_aliases(void)
     return buf;
 }
 
-void collect_normal_aliases(const char *prefix)
+void collect_normal_aliases(PointerArray *a, const char *prefix)
 {
-    collect_hashmap_keys(&normal_commands.aliases, prefix);
+    collect_hashmap_keys(&normal_commands.aliases, a, prefix);
 }
 
 typedef struct {
@@ -316,7 +316,7 @@ typedef struct {
     bool dumps_dterc_syntax;
     void (*show)(const char *name, bool cmdline);
     String (*dump)(void);
-    void (*complete_arg)(const char *prefix);
+    void (*complete_arg)(PointerArray *a, const char *prefix);
 } ShowHandler;
 
 static const ShowHandler handlers[] = {
@@ -362,19 +362,19 @@ void show(const char *type, const char *key, bool cflag)
     string_free(&str);
 }
 
-void collect_show_subcommands(const char *prefix)
+void collect_show_subcommands(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
         if (str_has_prefix(handlers[i].name, prefix)) {
-            add_completion(xstrdup(handlers[i].name));
+            ptr_array_append(a, xstrdup(handlers[i].name));
         }
     }
 }
 
-void collect_show_subcommand_args(const char *name, const char *arg_prefix)
+void collect_show_subcommand_args(PointerArray *a, const char *name, const char *arg_prefix)
 {
     const ShowHandler *handler = BSEARCH(name, handlers, (CompareFunction)strcmp);
     if (handler && handler->complete_arg) {
-        handler->complete_arg(arg_prefix);
+        handler->complete_arg(a, arg_prefix);
     }
 }

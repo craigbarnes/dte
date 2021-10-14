@@ -76,15 +76,15 @@ void clear_hl_colors(void)
     hashmap_clear(&hl_colors, free);
 }
 
-void collect_hl_colors(const char *prefix)
+void collect_hl_colors(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < NR_BC; i++) {
         const char *name = builtin_color_names[i];
         if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+            ptr_array_append(a, xstrdup(name));
         }
     }
-    collect_hashmap_keys(&hl_colors, prefix);
+    collect_hashmap_keys(&hl_colors, a, prefix);
 }
 
 typedef struct {

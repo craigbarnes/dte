@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include "util/macros.h"
+#include "util/ptr-array.h"
 
 #define COLOR_RGB(x) (COLOR_FLAG_RGB | (x))
 
@@ -75,6 +76,6 @@ static inline bool same_color(const TermColor *a, const TermColor *b)
 ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs) NONNULL_ARGS WARN_UNUSED_RESULT;
 int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optimize);
 const char *term_color_to_string(const TermColor *color) NONNULL_ARGS_AND_RETURN;
-void collect_colors_and_attributes(const char *prefix) NONNULL_ARGS;
+void collect_colors_and_attributes(PointerArray *a, const char *prefix) NONNULL_ARGS;
 
 #endif

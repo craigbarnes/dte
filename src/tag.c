@@ -244,14 +244,14 @@ char *tag_file_get_tag_filename(const TagFile *tagfile, const Tag *tag)
     return filename;
 }
 
-void collect_tags(const TagFile *tf, const char *prefix)
+void collect_tags(PointerArray *a, const TagFile *tf, const char *prefix)
 {
     Tag t;
     size_t pos = 0;
     char *prev = NULL;
     while (next_tag(tf, &pos, prefix, false, &t)) {
         if (!prev || !streq(prev, t.name)) {
-            add_completion(t.name);
+            ptr_array_append(a, t.name);
             prev = t.name;
             t.name = NULL;
         }

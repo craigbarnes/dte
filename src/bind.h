@@ -5,6 +5,7 @@
 #include "command/run.h"
 #include "mode.h"
 #include "terminal/key.h"
+#include "util/ptr-array.h"
 #include "util/string.h"
 
 typedef struct {
@@ -20,7 +21,7 @@ void add_binding(InputMode mode, KeyCode key, const char *command);
 void remove_binding(InputMode mode, KeyCode key);
 const KeyBinding *lookup_binding(InputMode mode, KeyCode key);
 bool handle_binding(InputMode mode, KeyCode key);
-void collect_bound_keys(const char *keystr_prefix);
+void collect_bound_keys(PointerArray *a, const char *keystr_prefix);
 String dump_bindings(void);
 
 #endif

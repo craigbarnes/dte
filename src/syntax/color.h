@@ -28,7 +28,7 @@ extern TermColor builtin_colors[NR_BC];
 void set_highlight_color(const char *name, const TermColor *color);
 TermColor *find_color(const char *name);
 void clear_hl_colors(void);
-void collect_hl_colors(const char *prefix);
+void collect_hl_colors(PointerArray *a, const char *prefix);
 String dump_hl_colors(void);
 
 #endif

@@ -88,20 +88,20 @@ void add_error_fmt (
     ptr_array_append(&find_or_add_compiler(compiler)->error_formats, f);
 }
 
-void collect_compilers(const char *prefix)
+void collect_compilers(PointerArray *a, const char *prefix)
 {
-    collect_hashmap_keys(&compilers, prefix);
+    collect_hashmap_keys(&compilers, a, prefix);
 }
 
-void collect_errorfmt_capture_names(const char *prefix)
+void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(capture_names); i++) {
         if (str_has_prefix(capture_names[i], prefix)) {
-            add_completion(xstrdup(capture_names[i]));
+            ptr_array_append(a, xstrdup(capture_names[i]));
         }
     }
     if (str_has_prefix("_", prefix)) {
-        add_completion(xstrdup("_"));
+        ptr_array_append(a, xstrdup("_"));
     }
 }
 

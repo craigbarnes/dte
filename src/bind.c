@@ -12,7 +12,6 @@
 #include "completion.h"
 #include "util/debug.h"
 #include "util/macros.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -256,44 +255,44 @@ bool handle_binding(InputMode mode, KeyCode key)
     return true;
 }
 
-static void maybe_add_key_completion(const char *prefix, KeyCode k)
+static void maybe_add_key_completion(PointerArray *a, const char *prefix, KeyCode k)
 {
     const char *str = keycode_to_string(k);
     if (str_has_prefix(str, prefix)) {
-        add_completion(xstrdup(str));
+        ptr_array_append(a, xstrdup(str));
     }
 }
 
-static void maybe_add_lt_key_completion(const char *prefix, KeyCode k)
+static void maybe_add_lt_key_completion(PointerArray *a, const char *prefix, KeyCode k)
 {
     const ssize_t idx = get_lookup_table_index(k);
     BUG_ON(idx < 0);
     if (bindings[INPUT_NORMAL].table[idx]) {
-        maybe_add_key_completion(prefix, k);
+        maybe_add_key_completion(a, prefix, k);
     }
 }
 
-void collect_bound_keys(const char *prefix)
+void collect_bound_keys(PointerArray *a, const char *prefix)
 {
     for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        maybe_add_lt_key_completion(prefix, MOD_CTRL | k);
+        maybe_add_lt_key_completion(a, prefix, MOD_CTRL | k);
     }
 
     for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        maybe_add_lt_key_completion(prefix, MOD_META | k);
+        maybe_add_lt_key_completion(a, prefix, MOD_META | k);
     }
 
     static_assert(MOD_MASK >> MOD_OFFSET == 7);
     for (KeyCode m = 0, mods = 0; m <= 7; mods = ++m << MOD_OFFSET) {
         for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
-            maybe_add_lt_key_completion(prefix, mods | k);
+            maybe_add_lt_key_completion(a, prefix, mods | k);
         }
     }
 
     const PointerArray *array = &bindings[INPUT_NORMAL].ptr_array;
     for (size_t i = 0, n = array->count; i < n; i++) {
         const KeyBindingEntry *entry = array->ptrs[i];
-        maybe_add_key_completion(prefix, entry->key);
+        maybe_add_key_completion(a, prefix, entry->key);
     }
 }
 

@@ -32,8 +32,8 @@ typedef struct {
 
 void add_error_fmt(const char *compiler, bool ignore, const char *format, char **desc) NONNULL_ARGS;
 Compiler *find_compiler(const char *name) NONNULL_ARGS;
-void collect_compilers(const char *prefix) NONNULL_ARGS;
-void collect_errorfmt_capture_names(const char *prefix) NONNULL_ARGS;
+void collect_compilers(PointerArray *a, const char *prefix) NONNULL_ARGS;
+void collect_errorfmt_capture_names(PointerArray *a, const char *prefix) NONNULL_ARGS;
 String dump_compiler(const Compiler *c, const char *name) NONNULL_ARGS;
 String dump_compilers(void);
 

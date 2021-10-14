@@ -91,12 +91,12 @@ bool expand_syntax_var(const char *name, char **value)
     return false;
 }
 
-void collect_normal_vars(const char *prefix)
+void collect_normal_vars(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
         const char *name = normal_vars[i].name;
         if (str_has_prefix(name, prefix)) {
-            add_completion(xstrdup(name));
+            ptr_array_append(a, xstrdup(name));
         }
     }
 }

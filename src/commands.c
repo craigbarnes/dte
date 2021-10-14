@@ -12,7 +12,6 @@
 #include "command/alias.h"
 #include "command/args.h"
 #include "command/macro.h"
-#include "command/run.h"
 #include "command/serialize.h"
 #include "completion.h"
 #include "config.h"
@@ -2352,12 +2351,12 @@ CommandSet normal_commands = {
     .aliases = HASHMAP_INIT,
 };
 
-void collect_normal_commands(const char *prefix)
+void collect_normal_commands(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
         const Command *c = &cmds[i];
         if (str_has_prefix(c->name, prefix)) {
-            add_completion(xstrdup(c->name));
+            ptr_array_append(a, xstrdup(c->name));
         }
     }
 }

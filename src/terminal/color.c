@@ -421,16 +421,16 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optim
     return COLOR_DEFAULT;
 }
 
-void collect_colors_and_attributes(const char *prefix)
+void collect_colors_and_attributes(PointerArray *a, const char *prefix)
 {
     for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {
         if (str_has_prefix(color_names[i], prefix)) {
-            add_completion(xstrdup(color_names[i]));
+            ptr_array_append(a, xstrdup(color_names[i]));
         }
     }
     for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
         if (str_has_prefix(attr_names[i], prefix)) {
-            add_completion(xstrdup(attr_names[i]));
+            ptr_array_append(a, xstrdup(attr_names[i]));
         }
     }
 }
