@@ -348,7 +348,15 @@ static void test_parse_args(void)
     ptr_array_free(&array);
 }
 
-static void test_escape_command_arg(void)
+static char *escape_command_arg(const char *arg, bool escape_tilde)
+{
+    size_t n = strlen(arg);
+    String buf = string_new(n + 32);
+    string_append_escaped_arg_sv(&buf, string_view(arg, n), escape_tilde);
+    return string_steal_cstring(&buf);
+}
+
+static void test_string_append_escaped_arg(void)
 {
     char *str = escape_command_arg("arg", false);
     EXPECT_STREQ(str, "arg");
@@ -536,7 +544,7 @@ static const TestEntry tests[] = {
     TEST(test_command_parse_error_to_string),
     TEST(test_find_normal_command),
     TEST(test_parse_args),
-    TEST(test_escape_command_arg),
+    TEST(test_string_append_escaped_arg),
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
     TEST(test_cmdargs_convert_flags),

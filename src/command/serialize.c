@@ -73,11 +73,3 @@ dquote:
     }
     string_append_byte(s, '"');
 }
-
-char *escape_command_arg(const char *arg, bool escape_tilde)
-{
-    size_t n = strlen(arg);
-    String buf = string_new(n + 16);
-    string_append_escaped_arg_sv(&buf, string_view(arg, n), escape_tilde);
-    return string_steal_cstring(&buf);
-}
