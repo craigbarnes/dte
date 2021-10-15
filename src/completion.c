@@ -402,7 +402,7 @@ static int strptrcmp(const void *v1, const void *v2)
     return strcmp(*s1, *s2);
 }
 
-static void init_completion(CompletionState *cs, CommandLine *cmdline)
+static void init_completion(CompletionState *cs, const CommandLine *cmdline)
 {
     BUG_ON(cs->orig);
     const CommandSet *cmds = &normal_commands;
