@@ -66,9 +66,9 @@ bool regexp_exec (
 
 void regexp_init_word_boundary_tokens(void)
 {
-    const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
+    static const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
     const regoff_t match_start = 20, match_end = 23;
-    const RegexpWordBoundaryTokens pairs[] = {
+    static const RegexpWordBoundaryTokens pairs[] = {
         {"\\<", "\\>"},
         {"[[:<:]]", "[[:>:]]"},
         {"\\b", "\\b"},
