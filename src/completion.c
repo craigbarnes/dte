@@ -529,15 +529,12 @@ void complete_command_next(CommandLine *cmdline)
     if (init) {
         init_completion(cs, cmdline);
     }
-    if (!cs->completions.count) {
+    size_t count = cs->completions.count;
+    if (!count) {
         return;
     }
     if (!init) {
-        if (cs->idx >= cs->completions.count - 1) {
-            cs->idx = 0;
-        } else {
-            cs->idx++;
-        }
+        cs->idx = (cs->idx < count - 1) ? cs->idx + 1 : 0;
     }
     do_complete_command(cmdline);
 }
@@ -549,15 +546,12 @@ void complete_command_prev(CommandLine *cmdline)
     if (init) {
         init_completion(cs, cmdline);
     }
-    if (!cs->completions.count) {
+    size_t count = cs->completions.count;
+    if (!count) {
         return;
     }
     if (!init) {
-        if (cs->idx == 0) {
-            cs->idx = cs->completions.count - 1;
-        } else {
-            cs->idx--;
-        }
+        cs->idx = (cs->idx ? cs->idx : count) - 1;
     }
     do_complete_command(cmdline);
 }
