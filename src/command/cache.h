@@ -5,11 +5,9 @@
 #include "util/macros.h"
 
 typedef struct {
-    // The cached command and parsed arguments (NULL if not cached)
-    const Command *cmd;
-    CommandArgs a;
-    // The original command string
-    char cmd_str[];
+    const Command *cmd; // Cached command (or NULL if not cacheable)
+    CommandArgs a; // Pre-parsed arguments (uninitialized if cmd is NULL)
+    char cmd_str[]; // Original command string
 } CachedCommand;
 
 CachedCommand *cached_command_new(const CommandSet *cmds, const char *cmd_str) NONNULL_ARGS_AND_RETURN;
