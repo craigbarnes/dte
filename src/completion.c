@@ -211,6 +211,20 @@ static void complete_macro(CompletionState *cs, const CommandArgs *a)
     }
 }
 
+static void complete_move_tab(CompletionState *cs, const CommandArgs *a)
+{
+    if (a->nr_args != 0) {
+        return;
+    }
+
+    static const char words[][8] = {"left", "right"};
+    for (size_t i = 0; i < ARRAY_COUNT(words); i++) {
+        if (str_has_prefix(words[i], cs->parsed)) {
+            ptr_array_append(&cs->completions, xstrdup(words[i]));
+        }
+    }
+}
+
 static void complete_open(CompletionState *cs, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't')) {
@@ -303,6 +317,7 @@ static const CompletionHandler handlers[] = {
     {"hi", complete_hi},
     {"include", complete_include},
     {"macro", complete_macro},
+    {"move-tab", complete_move_tab},
     {"open", complete_open},
     {"option", complete_option},
     {"pipe-from", complete_files},
