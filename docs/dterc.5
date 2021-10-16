@@ -384,10 +384,15 @@ are the only commands allowed in user config files.
 .P
 \fBalias\fR \fIname\fR \fIcommand\fR
 .RS
-Create an alias \fIname\fR for \fIcommand\fR. If no \fIcommand\fR is given then the
-alias for \fIname\fR is removed.
+Create an alias \fIname\fR for \fIcommand\fR. If no \fIcommand\fR is given then any
+existing alias for \fIname\fR is removed.
 .P
-Example:
+Aliases can be used in command mode or bound to keys, just as
+normal commands can. When aliases are used in place of commands, they
+are first recursively expanded (to allow aliases of aliases) and any
+additional arguments are then added to the end of the expanded command.
+.P
+For example, if the following alias is created:
 .P
 .IP
 .nf
@@ -396,8 +401,9 @@ alias\ read\ 'pipe\-from\ cat'
 \f[]
 .fi
 .PP
-Now you can run \fBread file.txt\fR to insert \fBfile.txt\fR into the current
-buffer.
+this can then be invoked as \fBread file.txt\fR, which will expand to
+the command \fBpipe\-from cat file.txt\fR and thus cause \fBfile.txt\fR to be
+inserted into the current buffer.
 .P
 .RE
 \fBbind\fR [\fB\-cns\fR] \fIkey\fR [\fIcommand\fR]

@@ -100,15 +100,21 @@ are the only commands allowed in user config files.
 
 ### **alias** _name_ _command_
 
-Create an alias _name_ for _command_. If no _command_ is given then the
-alias for _name_ is removed.
+Create an alias _name_ for _command_. If no _command_ is given then any
+existing alias for _name_ is removed.
 
-Example:
+Aliases can be used in command mode or [bound][`bind`] to keys, just as
+normal commands can. When aliases are used in place of commands, they
+are first recursively expanded (to allow aliases of aliases) and any
+additional arguments are then added to the end of the expanded command.
+
+For example, if the following alias is created:
 
     alias read 'pipe-from cat'
 
-Now you can run `read file.txt` to insert `file.txt` into the current
-buffer.
+this can then be invoked as `read file.txt`, which will expand to
+the command `pipe-from cat file.txt` and thus cause `file.txt` to be
+inserted into the current buffer.
 
 ### **bind** [**-cns**] _key_ [_command_]
 
