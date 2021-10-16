@@ -5,6 +5,7 @@
 #include "change.h"
 #include "cmdline.h"
 #include "command/args.h"
+#include "command/cache.h"
 #include "command/macro.h"
 #include "command/parse.h"
 #include "command/serialize.h"
@@ -22,7 +23,7 @@ enum {
 
 typedef struct {
     KeyCode key;
-    KeyBinding *bind;
+    CachedCommand *bind;
 } KeyBindingEntry;
 
 typedef struct {
@@ -30,7 +31,7 @@ typedef struct {
 
     // Fast lookup table for most common key combinations (Ctrl or Meta
     // with ASCII keys or any combination of modifiers with special keys)
-    KeyBinding *table[(2 * ASCII_RANGE_LEN) + (8 * NR_SPECIAL_KEYS)];
+    CachedCommand *table[(2 * ASCII_RANGE_LEN) + (8 * NR_SPECIAL_KEYS)];
 
     // Fallback for all other keys (Unicode combos etc.)
     PointerArray ptr_array;
@@ -111,66 +112,9 @@ UNITTEST {
     BUG_ON(get_lookup_table_index(MOD_META | 0x0E01) != -1);
 }
 
-static KeyBinding *key_binding_new(InputMode mode, const char *cmd_str)
-{
-    const size_t cmd_str_len = strlen(cmd_str);
-    KeyBinding *binding = xmalloc(sizeof(*binding) + cmd_str_len + 1);
-    binding->cmd = NULL;
-    memcpy(binding->cmd_str, cmd_str, cmd_str_len + 1);
-
-    const CommandSet *cmds = bindings[mode].cmds;
-    PointerArray array = PTR_ARRAY_INIT;
-    if (parse_commands(cmds, &array, cmd_str) != CMDERR_NONE) {
-        goto nocache;
-    }
-
-    ptr_array_trim_nulls(&array);
-    size_t n = array.count;
-    if (n < 2 || ptr_array_idx(&array, NULL) != n - 1) {
-        // Only single commands can be cached
-        goto nocache;
-    }
-
-    const Command *cmd = cmds->lookup(array.ptrs[0]);
-    if (!cmd) {
-        // Aliases or non-existent commands can't be cached
-        goto nocache;
-    }
-
-    if (memchr(cmd_str, '$', cmd_str_len)) {
-        // Commands containing variables can't be cached
-        goto nocache;
-    }
-
-    free(ptr_array_remove_idx(&array, 0));
-    CommandArgs cmdargs = {.args = (char**)array.ptrs};
-    if (do_parse_args(cmd, &cmdargs) != 0) {
-        goto nocache;
-    }
-
-    // Command can be cached; binding takes ownership of args array
-    binding->cmd = cmd;
-    binding->a = cmdargs;
-    return binding;
-
-nocache:
-    ptr_array_free(&array);
-    return binding;
-}
-
-static void free_key_binding(KeyBinding *binding)
-{
-    if (binding) {
-        if (binding->cmd) {
-            free_string_array(binding->a.args);
-        }
-        free(binding);
-    }
-}
-
 static void free_key_binding_entry(KeyBindingEntry *entry)
 {
-    free_key_binding(entry->bind);
+    cached_command_free(entry->bind);
     free(entry);
 }
 
@@ -178,15 +122,15 @@ void add_binding(InputMode mode, KeyCode key, const char *command)
 {
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
-        KeyBinding **table = bindings[mode].table;
-        free_key_binding(table[idx]);
-        table[idx] = key_binding_new(mode, command);
+        CachedCommand **table = bindings[mode].table;
+        cached_command_free(table[idx]);
+        table[idx] = cached_command_new(bindings[mode].cmds, command);
         return;
     }
 
     KeyBindingEntry *entry = xnew(KeyBindingEntry, 1);
     entry->key = key;
-    entry->bind = key_binding_new(mode, command);
+    entry->bind = cached_command_new(bindings[mode].cmds, command);
     ptr_array_append(&bindings[mode].ptr_array, entry);
 }
 
@@ -194,8 +138,8 @@ void remove_binding(InputMode mode, KeyCode key)
 {
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
-        KeyBinding **table = bindings[mode].table;
-        free_key_binding(table[idx]);
+        CachedCommand **table = bindings[mode].table;
+        cached_command_free(table[idx]);
         table[idx] = NULL;
         return;
     }
@@ -212,7 +156,7 @@ void remove_binding(InputMode mode, KeyCode key)
     }
 }
 
-const KeyBinding *lookup_binding(InputMode mode, KeyCode key)
+const CachedCommand *lookup_binding(InputMode mode, KeyCode key)
 {
     const ssize_t idx = get_lookup_table_index(key);
     if (likely(idx >= 0)) {
@@ -232,7 +176,7 @@ const KeyBinding *lookup_binding(InputMode mode, KeyCode key)
 
 bool handle_binding(InputMode mode, KeyCode key)
 {
-    const KeyBinding *binding = lookup_binding(mode, key);
+    const CachedCommand *binding = lookup_binding(mode, key);
     if (!binding) {
         return false;
     }
@@ -309,7 +253,7 @@ static void append_lookup_table_binding(String *s, InputMode mode, const char *f
 {
     const ssize_t i = get_lookup_table_index(key);
     BUG_ON(i < 0);
-    const KeyBinding *binding = bindings[mode].table[i];
+    const CachedCommand *binding = bindings[mode].table[i];
     if (binding) {
         append_binding(s, key, flag, binding->cmd_str);
     }

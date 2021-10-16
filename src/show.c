@@ -88,7 +88,7 @@ static void show_binding(const char *keystr, bool cflag)
         return;
     }
 
-    const KeyBinding *b = lookup_binding(INPUT_NORMAL, key);
+    const CachedCommand *b = lookup_binding(INPUT_NORMAL, key);
     if (!b) {
         info_msg("%s is not bound to a command", keystr);
         return;

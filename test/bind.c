@@ -10,7 +10,7 @@
 static void test_add_binding(void)
 {
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F12;
-    const KeyBinding *bind = lookup_binding(INPUT_NORMAL, key);
+    const CachedCommand *bind = lookup_binding(INPUT_NORMAL, key);
     EXPECT_NULL(bind);
 
     const Command *insert_cmd = find_normal_command("insert");
@@ -39,7 +39,7 @@ static void test_handle_binding(void)
 
     // Bound command should be cached
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F11;
-    const KeyBinding *binding = lookup_binding(INPUT_NORMAL, key);
+    const CachedCommand *binding = lookup_binding(INPUT_NORMAL, key);
     ASSERT_NONNULL(binding);
     EXPECT_PTREQ(binding->cmd, insert);
     EXPECT_EQ(binding->a.nr_flags, 1);
