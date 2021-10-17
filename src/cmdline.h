@@ -33,12 +33,6 @@ typedef struct {
     CompletionState completion;
 } CommandLine;
 
-typedef enum {
-    CMDLINE_UNKNOWN_KEY,
-    CMDLINE_KEY_HANDLED,
-    CMDLINE_CANCEL,
-} CommandLineResult;
-
 extern const CommandSet cmd_mode_commands;
 extern const CommandSet search_mode_commands;
 
