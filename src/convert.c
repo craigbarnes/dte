@@ -30,7 +30,7 @@ const char *file_decoder_get_encoding(const FileDecoder *dec)
 
 static bool read_utf8_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
-    char *line = (char *)dec->ibuf + dec->ipos;
+    const char *line = dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
     size_t len;
 
@@ -347,12 +347,12 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
         len -= ipos;
     }
 
-    char *ib = (char *)input;
+    const char *ib = input;
     size_t ic = len;
     while (ic > 0) {
         size_t skip;
 
-        switch (xiconv(c, &ib, &ic)) {
+        switch (xiconv(c, (char**)&ib, &ic)) {
         case EINVAL:
             // Incomplete character at end of input buffer.
             if (ic < sizeof(c->tbuf)) {
@@ -607,7 +607,7 @@ static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
 
 static bool detect_and_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 {
-    char *line = (char *)dec->ibuf + dec->ipos;
+    const char *line = dec->ibuf + dec->ipos;
     const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
     size_t len;
 
