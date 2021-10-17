@@ -1,5 +1,10 @@
 #include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "completion.h"
 #include "bind.h"
 #include "command/alias.h"
@@ -31,29 +36,24 @@ static void do_collect_files (
     const char *fileprefix,
     bool directories_only
 ) {
-    char path[8192];
-    size_t plen = strlen(dirname);
-    const size_t flen = strlen(fileprefix);
-    BUG_ON(plen == 0U);
-
-    if (plen >= sizeof(path) - 2) {
-        return;
-    }
-
     DIR *const dir = opendir(dirname);
     if (!dir) {
         return;
     }
 
-    memcpy(path, dirname, plen);
-    if (path[plen - 1] != '/') {
-        path[plen++] = '/';
+    const int dir_fd = dirfd(dir);
+    if (unlikely(dir_fd < 0)) {
+        DEBUG_LOG("dirfd() failed: %s", strerror(errno));
+        closedir(dir);
+        return;
     }
 
+    const size_t dlen = strlen(dirprefix);
+    const size_t flen = strlen(fileprefix);
     const struct dirent *de;
+
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
-
         if (flen) {
             if (strncmp(name, fileprefix, flen) != 0) {
                 continue;
@@ -64,20 +64,14 @@ static void do_collect_files (
             }
         }
 
-        size_t len = strlen(name);
-        if (plen + len + 2 > sizeof(path)) {
-            continue;
-        }
-        memcpy(path + plen, name, len + 1);
-
         struct stat st;
-        if (lstat(path, &st)) {
+        if (fstatat(dir_fd, name, &st, AT_SYMLINK_NOFOLLOW)) {
             continue;
         }
 
         bool is_dir = S_ISDIR(st.st_mode);
         if (S_ISLNK(st.st_mode)) {
-            if (!stat(path, &st)) {
+            if (!fstatat(dir_fd, name, &st, 0)) {
                 is_dir = S_ISDIR(st.st_mode);
             }
         }
@@ -85,18 +79,24 @@ static void do_collect_files (
             continue;
         }
 
-        String buf = string_new(strlen(dirprefix) + len + 4);
-        if (dirprefix[0]) {
-            string_append_cstring(&buf, dirprefix);
-            if (!str_has_suffix(dirprefix, "/")) {
-                string_append_byte(&buf, '/');
+        size_t name_len = strlen(name);
+        char *buf = xmalloc(dlen + name_len + 3);
+        size_t n = dlen;
+        if (dlen) {
+            memcpy(buf, dirprefix, dlen);
+            if (dirprefix[dlen - 1] != '/') {
+                buf[n++] = '/';
             }
         }
-        string_append_cstring(&buf, name);
+
+        memcpy(buf + n, name, name_len);
+        n += name_len;
         if (is_dir) {
-            string_append_byte(&buf, '/');
+            buf[n++] = '/';
         }
-        ptr_array_append(&cs->completions, string_steal_cstring(&buf));
+
+        buf[n] = '\0';
+        ptr_array_append(&cs->completions, buf);
     }
 
     closedir(dir);
