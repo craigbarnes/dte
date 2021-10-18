@@ -29,12 +29,23 @@
 #include "util/xmalloc.h"
 #include "vars.h"
 
+typedef enum {
+    COLLECT_ALL, // (directories and files)
+    COLLECT_EXECUTABLES, // (directories and executable files)
+    COLLECT_DIRS_ONLY,
+} FileCollectionType;
+
+static bool is_executable(int dir_fd, const char *filename)
+{
+    return faccessat(dir_fd, filename, X_OK, AT_EACCESS) == 0;
+}
+
 static void do_collect_files (
     CompletionState *cs,
     const char *dirname,
     const char *dirprefix,
     const char *fileprefix,
-    bool directories_only
+    FileCollectionType type
 ) {
     DIR *const dir = opendir(dirname);
     if (!dir) {
@@ -48,8 +59,8 @@ static void do_collect_files (
         return;
     }
 
-    const size_t dlen = strlen(dirprefix);
-    const size_t flen = strlen(fileprefix);
+    size_t dlen = strlen(dirprefix);
+    size_t flen = strlen(fileprefix);
     const struct dirent *de;
 
     while ((de = readdir(dir))) {
@@ -75,8 +86,25 @@ static void do_collect_files (
                 is_dir = S_ISDIR(st.st_mode);
             }
         }
-        if (!is_dir && directories_only) {
-            continue;
+
+        if (!is_dir) {
+            switch (type) {
+            case COLLECT_DIRS_ONLY:
+                continue;
+            case COLLECT_ALL:
+                break;
+            case COLLECT_EXECUTABLES:
+                if (is_executable(dir_fd, name)) {
+                    if (!dlen) {
+                        dirprefix = "./";
+                        dlen = 2;
+                    }
+                    break;
+                }
+                continue;
+            default:
+                BUG("unhandled FileCollectionType value");
+            }
         }
 
         size_t name_len = strlen(name);
@@ -102,7 +130,7 @@ static void do_collect_files (
     closedir(dir);
 }
 
-static void collect_files(CompletionState *cs, bool directories_only)
+static void collect_files(CompletionState *cs, FileCollectionType type)
 {
     StringView e = cs->escaped;
     if (strview_has_prefix(&e, "~/")) {
@@ -112,17 +140,17 @@ static void collect_files(CompletionState *cs, bool directories_only)
         cs->tilde_expanded = true;
         char *dir = path_dirname(cs->parsed);
         char *dirprefix = path_dirname(str);
-        do_collect_files(cs, dir, dirprefix, slash + 1, directories_only);
+        do_collect_files(cs, dir, dirprefix, slash + 1, type);
         free(dirprefix);
         free(dir);
         free(str);
     } else {
         const char *slash = strrchr(cs->parsed, '/');
         if (!slash) {
-            do_collect_files(cs, ".", "", cs->parsed, directories_only);
+            do_collect_files(cs, ".", "", cs->parsed, type);
         } else {
             char *dir = path_dirname(cs->parsed);
-            do_collect_files(cs, dir, dir, slash + 1, directories_only);
+            do_collect_files(cs, dir, dir, slash + 1, type);
             free(dir);
         }
     }
@@ -139,18 +167,26 @@ static void collect_files(CompletionState *cs, bool directories_only)
 
 static void complete_files(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(cs, false);
+    collect_files(cs, COLLECT_ALL);
 }
 
 static void complete_dirs(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(cs, true);
+    collect_files(cs, COLLECT_DIRS_ONLY);
+}
+
+static void complete_exec(CompletionState *cs, const CommandArgs *a)
+{
+    collect_files(cs, a->nr_args == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
 }
 
 static void complete_compile(CompletionState *cs, const CommandArgs *a)
 {
-    if (a->nr_args == 0) {
+    size_t n = a->nr_args;
+    if (n == 0) {
         collect_compilers(&cs->completions, cs->parsed);
+    } else {
+        collect_files(cs, n == 1 ? COLLECT_EXECUTABLES : COLLECT_ALL);
     }
 }
 
@@ -185,7 +221,7 @@ static void complete_include(CompletionState *cs, const CommandArgs *a)
         if (cmdargs_has_flag(a, 'b')) {
             collect_builtin_configs(&cs->completions, cs->parsed);
         } else {
-            collect_files(cs, false);
+            collect_files(cs, COLLECT_ALL);
         }
     }
 }
@@ -228,7 +264,7 @@ static void complete_move_tab(CompletionState *cs, const CommandArgs *a)
 static void complete_open(CompletionState *cs, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't')) {
-        collect_files(cs, false);
+        collect_files(cs, COLLECT_ALL);
     }
 }
 
@@ -300,7 +336,7 @@ static void complete_toggle(CompletionState *cs, const CommandArgs *a)
 static void complete_wsplit(CompletionState *cs, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't') && !cmdargs_has_flag(a, 'n')) {
-        collect_files(cs, false);
+        collect_files(cs, COLLECT_ALL);
     }
 }
 
@@ -313,10 +349,10 @@ static const CompletionHandler handlers[] = {
     {"cd", complete_dirs},
     {"compile", complete_compile},
     {"errorfmt", complete_errorfmt},
-    {"eval", complete_files},
-    {"exec-open", complete_files},
-    {"exec-tag", complete_files},
-    {"filter", complete_files},
+    {"eval", complete_exec},
+    {"exec-open", complete_exec},
+    {"exec-tag", complete_exec},
+    {"filter", complete_exec},
     {"ft", complete_ft},
     {"hi", complete_hi},
     {"include", complete_include},
@@ -324,9 +360,9 @@ static const CompletionHandler handlers[] = {
     {"move-tab", complete_move_tab},
     {"open", complete_open},
     {"option", complete_option},
-    {"pipe-from", complete_files},
-    {"pipe-to", complete_files},
-    {"run", complete_files},
+    {"pipe-from", complete_exec},
+    {"pipe-to", complete_exec},
+    {"run", complete_exec},
     {"save", complete_files},
     {"set", complete_set},
     {"setenv", complete_setenv},
