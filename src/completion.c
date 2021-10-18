@@ -37,7 +37,7 @@ typedef enum {
 
 static bool is_executable(int dir_fd, const char *filename)
 {
-    return faccessat(dir_fd, filename, X_OK, AT_EACCESS) == 0;
+    return faccessat(dir_fd, filename, X_OK, 0) == 0;
 }
 
 static void do_collect_files (
