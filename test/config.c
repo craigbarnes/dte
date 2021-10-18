@@ -94,6 +94,7 @@ static void test_exec_config(void)
         "pipe-to.txt",
         "redo1.txt",
         "redo2.txt",
+        "shift.txt",
     };
 
     // Delete output files left over from previous runs

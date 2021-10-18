@@ -1,0 +1,21 @@
+open
+set -l auto-indent true
+set -l expand-tab true
+set -l emulate-tab true
+set -l indent-width 4
+insert -k "line 1\n\tline 2\n\tline 3\nline 4\n\tline 5"
+up -l
+up -l
+up -l
+up -l
+shift +1
+shift +1
+shift +1
+shift -- -1
+shift -- -1
+shift -- -1
+shift -- -1
+shift +1
+shift +1
+save -f build/test/shift.txt
+close -f

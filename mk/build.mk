@@ -35,7 +35,7 @@ BUILTIN_CONFIGS = $(addprefix config/, \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
-    env thai crlf pipe redo fuzz1 fuzz2 ))
+    env thai crlf pipe redo shift fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
     ascii base64 debug exec hashmap hashset numtostr path ptr-array \
