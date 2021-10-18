@@ -270,7 +270,7 @@ static void test_parse_args(void)
     EXPECT_STREQ(cmd->name, "open");
 
     CommandArgs a = {.args = (char**)array.ptrs + 1};
-    ASSERT_EQ(do_parse_args(cmd, &a), 0);
+    ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_NONE);
     EXPECT_EQ(a.nr_flags, 2);
     EXPECT_EQ(a.flags[0], 'g');
     EXPECT_EQ(a.flags[1], 'e');

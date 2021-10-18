@@ -393,7 +393,7 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
     CommandArgs a = {.args = args_copy};
     ArgParseError err = do_parse_args(cmd, &a);
     if (
-        (err != 0 && err != ARGERR_TOO_FEW_ARGUMENTS)
+        (err != ARGERR_NONE && err != ARGERR_TOO_FEW_ARGUMENTS)
         || (a.nr_args >= cmd->max_args && cmd->max_args != 0xFF)
     ) {
         goto out;

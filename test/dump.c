@@ -61,8 +61,8 @@ static void test_dump_handlers(void)
 
             CommandArgs a = {.args = (char**)arr.ptrs + 1};
             ArgParseError arg_err = do_parse_args(cmd, &a);
-            EXPECT_EQ(arg_err, 0);
-            if (arg_err != 0) {
+            EXPECT_EQ(arg_err, ARGERR_NONE);
+            if (arg_err != ARGERR_NONE) {
                 continue;
             }
             ptr_array_free(&arr);

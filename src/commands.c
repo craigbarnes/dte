@@ -2323,7 +2323,7 @@ static bool allow_macro_recording(const Command *cmd, char **args)
         char **args_copy = copy_string_array(args, string_array_length(args));
         CommandArgs a = {.args = args_copy};
         bool ret = true;
-        if (do_parse_args(cmd, &a) == 0) {
+        if (do_parse_args(cmd, &a) == ARGERR_NONE) {
             const uint_least64_t flags_npw = UINT64_C(517) << 40;
             if (a.nr_args == 0 && !(a.flag_set & flags_npw)) {
                 // If command is "search" with no pattern argument and without

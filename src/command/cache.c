@@ -38,7 +38,7 @@ CachedCommand *cached_command_new(const CommandSet *cmds, const char *cmd_str)
 
     free(ptr_array_remove_idx(&array, 0));
     CommandArgs cmdargs = {.args = (char**)array.ptrs};
-    if (do_parse_args(cmd, &cmdargs) != 0) {
+    if (do_parse_args(cmd, &cmdargs) != ARGERR_NONE) {
         goto nocache;
     }
 
