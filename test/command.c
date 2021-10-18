@@ -2,6 +2,7 @@
 #include "test.h"
 #include "command/alias.h"
 #include "command/args.h"
+#include "command/cache.h"
 #include "command/parse.h"
 #include "command/run.h"
 #include "command/serialize.h"
@@ -348,6 +349,46 @@ static void test_parse_args(void)
     ptr_array_free(&array);
 }
 
+static void test_cached_command_new(void)
+{
+    const CommandSet *cmds = &normal_commands;
+    const char *cmd_str = "open -t -e UTF-8 file.c inc.h";
+    CachedCommand *cc = cached_command_new(cmds, cmd_str);
+    ASSERT_NONNULL(cc);
+    ASSERT_NONNULL(cc->cmd);
+    EXPECT_PTREQ(cc->cmd, find_normal_command("open"));
+    EXPECT_STREQ(cc->cmd_str, cmd_str);
+    ASSERT_EQ(cc->a.nr_args, 2);
+    ASSERT_EQ(cc->a.nr_flag_args, 1);
+    ASSERT_EQ(cc->a.nr_flags, 2);
+    EXPECT_STREQ(cc->a.args[0], "UTF-8");
+    EXPECT_STREQ(cc->a.args[1], "file.c");
+    EXPECT_STREQ(cc->a.args[2], "inc.h");
+    EXPECT_EQ(cc->a.flags[0], 't');
+    EXPECT_EQ(cc->a.flags[1], 'e');
+    EXPECT_TRUE(cmdargs_has_flag(&cc->a, 't'));
+    EXPECT_TRUE(cmdargs_has_flag(&cc->a, 'e'));
+    cached_command_free(cc);
+    cached_command_free(NULL);
+
+    static const char *const uncacheable[] = {
+        "", // No command
+        "zxcvbnm", // Invalid command
+        "left; right", // Multiple commands
+        "insert $DTE_HOME", // Variable expansion
+        "insert -xyz321", // Invalid flags
+        "alias 1 2 3", // Too many arguments
+        "alias", // Too few arguments
+    };
+
+    for (size_t i = 0; i < ARRAY_COUNT(uncacheable); i++) {
+        cc = cached_command_new(cmds, uncacheable[i]);
+        ASSERT_NONNULL(cc);
+        EXPECT_NULL(cc->cmd);
+        cached_command_free(cc);
+    }
+}
+
 static char *escape_command_arg(const char *arg, bool escape_tilde)
 {
     size_t n = strlen(arg);
@@ -544,6 +585,7 @@ static const TestEntry tests[] = {
     TEST(test_command_parse_error_to_string),
     TEST(test_find_normal_command),
     TEST(test_parse_args),
+    TEST(test_cached_command_new),
     TEST(test_string_append_escaped_arg),
     TEST(test_command_struct_layout),
     TEST(test_cmdargs_flagset_idx),
