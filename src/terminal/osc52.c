@@ -9,6 +9,12 @@
 bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
 {
     BUG_ON(!clipboard && !primary);
+    size_t bufsize = (text_len / 3 * 4) + 4;
+    char *buf = malloc(bufsize);
+    if (unlikely(!buf)) {
+        return false;
+    }
+
     term_add_literal("\033]52;");
     if (primary) {
         term_add_byte('p');
@@ -20,12 +26,6 @@ bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
 
     if (unlikely(text_len == 0)) {
         goto out;
-    }
-
-    size_t bufsize = (text_len / 3 * 4) + 4;
-    char *buf = malloc(bufsize);
-    if (unlikely(!buf)) {
-        return false;
     }
 
     size_t remainder = text_len % 3;
@@ -44,9 +44,9 @@ bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
     }
 
     term_add_bytes(buf, olen);
-    free(buf);
 
 out:
+    free(buf);
     term_add_literal("\033\\");
     return true;
 }

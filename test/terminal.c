@@ -3,6 +3,7 @@
 #include "terminal/ecma48.h"
 #include "terminal/key.h"
 #include "terminal/linux.h"
+#include "terminal/osc52.h"
 #include "terminal/output.h"
 #include "terminal/rxvt.h"
 #include "terminal/terminal.h"
@@ -821,6 +822,21 @@ static void test_ecma48_set_color(void)
     terminal.color_type = color_type;
 }
 
+static void test_osc52_copy(void)
+{
+    EXPECT_TRUE(osc52_copy(STRN("foobar"), true, true));
+    EXPECT_EQ(obuf.count, 18);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
+    clear_obuf();
+
+    EXPECT_TRUE(osc52_copy(STRN(""), true, false));
+    EXPECT_EQ(obuf.count, 9);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
+    clear_obuf();
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_term_color),
     TEST(test_color_to_nearest),
@@ -836,6 +852,7 @@ static const TestEntry tests[] = {
     TEST(test_ecma48_move_cursor),
     TEST(test_ecma48_repeat_byte),
     TEST(test_ecma48_set_color),
+    TEST(test_osc52_copy),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);
