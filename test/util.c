@@ -356,7 +356,7 @@ static void test_ascii(void)
     free(saved_locale);
 }
 
-static void test_base64(void)
+static void test_base64_decode(void)
 {
     EXPECT_EQ(base64_decode('A'), 0);
     EXPECT_EQ(base64_decode('Z'), 25);
@@ -390,6 +390,35 @@ static void test_base64(void)
             IEXPECT_EQ(val, val & 192);
         }
     }
+}
+
+static void test_base64_encode_block(void)
+{
+    char buf[16];
+    size_t n = base64_encode_block(STRN("xyz"), buf, sizeof(buf));
+    EXPECT_EQ(n, 4);
+    EXPECT_MEMEQ(buf, "eHl6", n);
+
+    n = base64_encode_block(STRN("123456"), buf, sizeof(buf));
+    EXPECT_EQ(n, 8);
+    EXPECT_MEMEQ(buf, "MTIzNDU2", n);
+
+    n = base64_encode_block(STRN("a == *x++"), buf, sizeof(buf));
+    EXPECT_EQ(n, 12);
+    EXPECT_MEMEQ(buf, "YSA9PSAqeCsr", n);
+}
+
+static void test_base64_encode_final(void)
+{
+    char buf[4];
+    base64_encode_final(STRN("+"), buf);
+    EXPECT_MEMEQ(buf, "Kw==", 4);
+
+    base64_encode_final(STRN(".."), buf);
+    EXPECT_MEMEQ(buf, "Li4=", 4);
+
+    base64_encode_final(STRN("~."), buf);
+    EXPECT_MEMEQ(buf, "fi4=", 4);
 }
 
 static void test_string(void)
@@ -1918,7 +1947,9 @@ static const TestEntry tests[] = {
     TEST(test_str_has_suffix),
     TEST(test_hex_decode),
     TEST(test_ascii),
-    TEST(test_base64),
+    TEST(test_base64_decode),
+    TEST(test_base64_encode_block),
+    TEST(test_base64_encode_final),
     TEST(test_string),
     TEST(test_string_view),
     TEST(test_strview_has_suffix),

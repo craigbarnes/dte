@@ -1,11 +1,12 @@
 #include "base64.h"
+#include "debug.h"
 
 enum {
     I = BASE64_INVALID,
     P = BASE64_PADDING,
 };
 
-const uint8_t base64_table[256] = {
+const uint8_t base64_decode_table[256] = {
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I, 62,  I,  I,  I, 63,
@@ -23,3 +24,51 @@ const uint8_t base64_table[256] = {
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,
      I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I,  I
 };
+
+static const char base64_encode_table[64] = {
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789"
+    "+/"
+};
+
+size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
+{
+    BUG_ON(ilen == 0);
+    BUG_ON(ilen % 3 != 0);
+    BUG_ON(ilen / 3 * 4 > olen);
+
+    for (size_t i = 0, o = 0; i < ilen; ) {
+        uint32_t a = in[i++];
+        uint32_t b = in[i++];
+        uint32_t c = in[i++];
+        uint32_t v = a << 16 | b << 8 | c;
+        out[o++] = base64_encode_table[(v >> 18) & 63];
+        out[o++] = base64_encode_table[(v >> 12) & 63];
+        out[o++] = base64_encode_table[(v >>  6) & 63];
+        out[o++] = base64_encode_table[(v >>  0) & 63];
+    }
+
+    return ilen / 3 * 4;
+}
+
+void base64_encode_final(const char *in, size_t ilen, char out[4])
+{
+    uint32_t v;
+    switch (ilen) {
+    case 1:
+        v = (uint32_t)in[0] << 16;
+        out[2] = '=';
+        break;
+    case 2:
+        v = (uint32_t)in[0] << 16 | (uint32_t)in[1] << 8;
+        out[2] = base64_encode_table[(v >> 6) & 63];
+        break;
+    default:
+        BUG("Invalid input length: %zu", ilen);
+    }
+
+    out[0] = base64_encode_table[(v >> 18) & 63];
+    out[1] = base64_encode_table[(v >> 12) & 63];
+    out[3] = '=';
+}
