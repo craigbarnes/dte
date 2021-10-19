@@ -37,6 +37,7 @@ typedef struct {
     void (*set_color)(const TermColor *color);
     void (*move_cursor)(unsigned int x, unsigned int y);
     void (*repeat_byte)(char ch, size_t count);
+    bool (*copy_text)(const char *text, size_t len, bool clipboard, bool primary);
 } Terminal;
 
 extern Terminal terminal;

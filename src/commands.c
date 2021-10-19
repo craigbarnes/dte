@@ -337,18 +337,52 @@ static void cmd_compile(const CommandArgs *a)
 
 static void cmd_copy(const CommandArgs *a)
 {
-    BlockIter save = view->cursor;
+    const BlockIter save = view->cursor;
+    size_t size;
+    bool line_copy;
     if (view->selection) {
-        copy(prepare_selection(view), view->selection == SELECT_LINES);
-        bool keep_selection = has_flag(a, 'k');
-        if (!keep_selection) {
-            unselect();
-        }
+        size = prepare_selection(view);
+        line_copy = (view->selection == SELECT_LINES);
     } else {
         block_iter_bol(&view->cursor);
         BlockIter tmp = view->cursor;
-        copy(block_iter_eat_line(&tmp), true);
+        size = block_iter_eat_line(&tmp);
+        line_copy = true;
     }
+
+    if (unlikely(size == 0)) {
+        return;
+    }
+
+    bool internal = has_flag(a, 'i');
+    bool clipboard = has_flag(a, 'b');
+    bool primary = has_flag(a, 'p');
+    if (!(internal || clipboard || primary)) {
+        internal = true;
+    }
+
+    if (internal) {
+        copy(size, line_copy);
+    }
+
+    if ((clipboard || primary) && terminal.copy_text) {
+        if (internal) {
+            view->cursor = save;
+            if (view->selection) {
+                size = prepare_selection(view);
+            }
+        }
+        char *buf = block_iter_get_bytes(&view->cursor, size);
+        if (!terminal.copy_text(buf, size, clipboard, primary)) {
+            error_msg("%s", strerror(errno));
+        }
+        free(buf);
+    }
+
+    if (!has_flag(a, 'k')) {
+        unselect();
+    }
+
     view->cursor = save;
 }
 
@@ -2227,7 +2261,7 @@ static const Command cmds[] = {
     {"close", "fpqw", false, 0, 0, cmd_close},
     {"command", "-", false, 0, 1, cmd_command},
     {"compile", "-1ps", false, 2, -1, cmd_compile},
-    {"copy", "k", false, 0, 0, cmd_copy},
+    {"copy", "bikp", false, 0, 0, cmd_copy},
     {"cut", "", false, 0, 0, cmd_cut},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "n", false, 0, 0, cmd_delete_eol},

@@ -5,6 +5,7 @@
 #include "ecma48.h"
 #include "linux.h"
 #include "mode.h"
+#include "osc52.h"
 #include "output.h"
 #include "rxvt.h"
 #include "xterm.h"
@@ -18,6 +19,8 @@ enum FeatureFlags {
     TITLE = 0x04, // Supports xterm control codes for setting window title
     RXVT = 0x08, // Uses quirky, rxvt-style key codes
     LINUX = 0x10, // Identifies as "linux"
+    OSC52 = 0x20, // Supports OSC 52 clipboard operations (with arbitrary length)
+    OSC52_KITTY = 0x40, // Supports kitty's pseudo OSC 52 "concat" protocol
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -37,7 +40,7 @@ typedef struct {
 
 static const TermEntry terms[] = {
     {"Eterm", 5, TERM_8_COLOR, 0, BCE},
-    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP},
+    {"alacritty", 9, TERM_TRUE_COLOR, 0, BCE | REP | OSC52},
     {"ansi", 4, TERM_8_COLOR, UL, 0},
     {"ansiterm", 8, TERM_0_COLOR, 0, 0},
     {"aterm", 5, TERM_8_COLOR, 0, BCE},
@@ -51,38 +54,38 @@ static const TermEntry terms[] = {
     {"dtterm", 6, TERM_8_COLOR, 0, 0},
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
     {"fbterm", 6, TERM_256_COLOR, DIM | UL, BCE},
-    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
+    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52},
     {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
-    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE},
+    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52},
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
-    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE},
+    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52},
     {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
-    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE},
+    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52_KITTY},
     {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
     {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
     {"kterm", 5, TERM_8_COLOR, 0, 0},
     {"linux", 5, TERM_8_COLOR, DIM | UL, LINUX | BCE},
     {"mgt", 3, TERM_8_COLOR, 0, BCE},
-    {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE},
+    {"mintty", 6, TERM_8_COLOR, 0, BCE | REP | TITLE | OSC52},
     {"mlterm", 6, TERM_8_COLOR, 0, TITLE},
     {"mlterm2", 7, TERM_8_COLOR, 0, TITLE},
     {"mlterm3", 7, TERM_8_COLOR, 0, TITLE},
-    {"mrxvt", 5, TERM_8_COLOR, 0, RXVT | BCE | TITLE},
+    {"mrxvt", 5, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
     {"pcansi", 6, TERM_8_COLOR, UL, 0},
     {"putty", 5, TERM_8_COLOR, DIM | REV | UL, BCE},
-    {"rxvt", 4, TERM_8_COLOR, 0, RXVT | BCE | TITLE},
-    {"screen", 6, TERM_8_COLOR, 0, TITLE},
-    {"st", 2, TERM_8_COLOR, 0, BCE},
-    {"stterm", 6, TERM_8_COLOR, 0, BCE},
+    {"rxvt", 4, TERM_8_COLOR, 0, RXVT | BCE | TITLE | OSC52},
+    {"screen", 6, TERM_8_COLOR, 0, TITLE | OSC52},
+    {"st", 2, TERM_8_COLOR, 0, BCE | OSC52},
+    {"stterm", 6, TERM_8_COLOR, 0, BCE | OSC52},
     {"teken", 5, TERM_8_COLOR, DIM | REV, BCE},
     {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"termite", 7, TERM_8_COLOR, 0, TITLE},
-    {"tmux", 4, TERM_8_COLOR, 0, TITLE},
+    {"tmux", 4, TERM_8_COLOR, 0, TITLE | OSC52},
     {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
     {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
-    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE},
+    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52},
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
 
@@ -110,6 +113,7 @@ Terminal terminal = {
     .set_color = &ecma48_set_color,
     .move_cursor = &ecma48_move_cursor,
     .repeat_byte = &term_repeat_byte,
+    .copy_text = NULL,
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .init = STRING_VIEW (
@@ -191,6 +195,11 @@ void term_init(const char *term)
             terminal.control_codes.restore_title = strview_from_cstring("\033[23;2t");
             terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
             terminal.control_codes.set_title_end = strview_from_cstring("\033\\");
+        }
+        if (entry->flags & OSC52) {
+            terminal.copy_text = osc52_copy;
+        } else if (entry->flags & OSC52_KITTY) {
+            terminal.copy_text = kitty_osc52_copy;
         }
         if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
