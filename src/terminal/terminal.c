@@ -19,8 +19,7 @@ enum FeatureFlags {
     TITLE = 0x04, // Supports xterm control codes for setting window title
     RXVT = 0x08, // Emits rxvt-specific sequences for some key combos (see rxvt.c)
     LINUX = 0x10, // Emits linux-specific sequences for F1-F5 (see linux.c)
-    OSC52 = 0x20, // Supports OSC 52 clipboard operations (with arbitrary length)
-    OSC52_KITTY = 0x40, // Supports kitty's pseudo OSC 52 "concat" protocol
+    OSC52 = 0x20, // Supports OSC 52 clipboard operations
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -61,7 +60,7 @@ static const TermEntry terms[] = {
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
     {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52},
     {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
-    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52_KITTY},
+    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52},
     {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
     {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
@@ -198,8 +197,6 @@ void term_init(const char *term)
         }
         if (entry->flags & OSC52) {
             terminal.copy_text = osc52_copy;
-        } else if (entry->flags & OSC52_KITTY) {
-            terminal.copy_text = kitty_osc52_copy;
         }
         if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
