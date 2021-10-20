@@ -17,8 +17,8 @@ enum FeatureFlags {
     BCE = 0x01, // Can erase with specific background color (back color erase)
     REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
     TITLE = 0x04, // Supports xterm control codes for setting window title
-    RXVT = 0x08, // Uses quirky, rxvt-style key codes
-    LINUX = 0x10, // Identifies as "linux"
+    RXVT = 0x08, // Emits rxvt-specific sequences for some key combos (see rxvt.c)
+    LINUX = 0x10, // Emits linux-specific sequences for F1-F5 (see linux.c)
     OSC52 = 0x20, // Supports OSC 52 clipboard operations (with arbitrary length)
     OSC52_KITTY = 0x40, // Supports kitty's pseudo OSC 52 "concat" protocol
 };
