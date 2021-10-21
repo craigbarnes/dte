@@ -830,6 +830,12 @@ static void test_osc52_copy(void)
     EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
     clear_obuf();
 
+    EXPECT_TRUE(osc52_copy(STRN("\xF0\x9F\xA5\xA3"), false, true));
+    EXPECT_EQ(obuf.count, 17);
+    EXPECT_EQ(obuf.x, 0);
+    EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
+    clear_obuf();
+
     EXPECT_TRUE(osc52_copy(STRN(""), true, false));
     EXPECT_EQ(obuf.count, 9);
     EXPECT_EQ(obuf.x, 0);
