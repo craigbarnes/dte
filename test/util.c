@@ -419,6 +419,9 @@ static void test_base64_encode_final(void)
 
     base64_encode_final(STRN("~."), buf);
     EXPECT_MEMEQ(buf, "fi4=", 4);
+
+    base64_encode_final(STRN("\xC2\xA9"), buf);
+    EXPECT_MEMEQ(buf, "wqk=", 4);
 }
 
 static void test_string(void)
