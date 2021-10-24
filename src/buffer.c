@@ -372,7 +372,7 @@ static bool detect_indent(Buffer *b)
         fill_line_ref(&bi, &line);
 
         bool tab;
-        int indent = indent_len(line, buffer->options.detect_indent, &tab);
+        int indent = indent_len(line, b->options.detect_indent, &tab);
         switch (indent) {
         case -2: // Ignore mixed indent because tab width might not be 8
         case -1: // Empty line; no change in indent
