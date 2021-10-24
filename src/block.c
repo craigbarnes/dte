@@ -8,27 +8,28 @@
 
 #define BLOCK_EDIT_SIZE 512
 
-static void sanity_check_blocks(bool check_newlines)
+static void sanity_check_blocks(const View *v, bool check_newlines)
 {
 #if DEBUG >= 1
-    BUG_ON(list_empty(&buffer->blocks));
-    BUG_ON(view->cursor.offset > view->cursor.blk->size);
+    const Buffer *b = v->buffer;
+    BUG_ON(list_empty(&b->blocks));
+    BUG_ON(v->cursor.offset > v->cursor.blk->size);
 
-    const Block *blk = BLOCK(buffer->blocks.next);
+    const Block *blk = BLOCK(b->blocks.next);
     if (blk->size == 0) {
         // The only time a zero-sized block is valid is when it's the
         // first and only block
-        BUG_ON(buffer->blocks.next->next != &buffer->blocks);
-        BUG_ON(view->cursor.blk != blk);
+        BUG_ON(b->blocks.next->next != &b->blocks);
+        BUG_ON(v->cursor.blk != blk);
         return;
     }
 
     bool cursor_seen = false;
-    block_for_each(blk, &buffer->blocks) {
+    block_for_each(blk, &b->blocks) {
         const size_t size = blk->size;
         BUG_ON(size == 0);
         BUG_ON(size > blk->alloc);
-        if (blk == view->cursor.blk) {
+        if (blk == v->cursor.blk) {
             cursor_seen = true;
         }
         if (check_newlines) {
@@ -40,7 +41,8 @@ static void sanity_check_blocks(bool check_newlines)
     }
     BUG_ON(!cursor_seen);
 #else
-    // Silence "unused parameter" warning
+    // Silence "unused parameter" warnings
+    (void)v;
     (void)check_newlines;
 #endif
 }
@@ -78,10 +80,10 @@ static size_t copy_count_nl(char *dst, const char *src, size_t len)
     return nl;
 }
 
-static size_t insert_to_current(const char *buf, size_t len)
+static size_t insert_to_current(View *v, const char *buf, size_t len)
 {
-    Block *blk = view->cursor.blk;
-    size_t offset = view->cursor.offset;
+    Block *blk = v->cursor.blk;
+    size_t offset = v->cursor.offset;
     size_t size = blk->size + len;
 
     if (size > blk->alloc) {
@@ -103,14 +105,14 @@ static size_t insert_to_current(const char *buf, size_t len)
  *   - Size of any block can be larger than BLOCK_EDIT_SIZE
  *     only if there's a very long line
  */
-static size_t split_and_insert(const char *buf, size_t len)
+static size_t split_and_insert(View *v, const char *buf, size_t len)
 {
-    Block *blk = view->cursor.blk;
+    Block *blk = v->cursor.blk;
     ListHead *prev_node = blk->node.prev;
     const char *buf1 = blk->data;
     const char *buf2 = buf;
-    const char *buf3 = blk->data + view->cursor.offset;
-    size_t size1 = view->cursor.offset;
+    const char *buf3 = blk->data + v->cursor.offset;
+    size_t size1 = v->cursor.offset;
     size_t size2 = len;
     size_t size3 = blk->size - size1;
     size_t total = size1 + size2 + size3;
@@ -217,10 +219,10 @@ static size_t split_and_insert(const char *buf, size_t len)
         size = 0;
     }
 
-    view->cursor.blk = BLOCK(prev_node->next);
-    while (view->cursor.offset > view->cursor.blk->size) {
-        view->cursor.offset -= view->cursor.blk->size;
-        view->cursor.blk = BLOCK(view->cursor.blk->node.next);
+    v->cursor.blk = BLOCK(prev_node->next);
+    while (v->cursor.offset > v->cursor.blk->size) {
+        v->cursor.offset -= v->cursor.blk->size;
+        v->cursor.blk = BLOCK(v->cursor.blk->node.next);
     }
 
     nl_added -= blk->nl;
@@ -228,31 +230,31 @@ static size_t split_and_insert(const char *buf, size_t len)
     return nl_added;
 }
 
-static size_t insert_bytes(const char *buf, size_t len)
+static size_t insert_bytes(View *v, const char *buf, size_t len)
 {
     // Blocks must contain whole lines.
     // Last char of buf might not be newline.
-    block_iter_normalize(&view->cursor);
+    block_iter_normalize(&v->cursor);
 
-    Block *blk = view->cursor.blk;
+    Block *blk = v->cursor.blk;
     size_t new_size = blk->size + len;
     if (new_size <= blk->alloc || new_size <= BLOCK_EDIT_SIZE) {
-        return insert_to_current(buf, len);
+        return insert_to_current(v, buf, len);
     }
 
     if (blk->nl <= 1 && !memchr(buf, '\n', len)) {
         // Can't split this possibly very long line.
         // insert_to_current() is much faster than split_and_insert().
-        return insert_to_current(buf, len);
+        return insert_to_current(v, buf, len);
     }
-    return split_and_insert(buf, len);
+    return split_and_insert(v, buf, len);
 }
 
 void do_insert(const char *buf, size_t len)
 {
-    size_t nl = insert_bytes(buf, len);
+    size_t nl = insert_bytes(view, buf, len);
     buffer->nl += nl;
-    sanity_check_blocks(true);
+    sanity_check_blocks(view, true);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
@@ -261,11 +263,9 @@ void do_insert(const char *buf, size_t len)
     }
 }
 
-static bool only_block(const Block *blk)
+static bool only_block(const Buffer *b, const Block *blk)
 {
-    return
-        blk->node.prev == &buffer->blocks
-        && blk->node.next == &buffer->blocks;
+    return blk->node.prev == &b->blocks && blk->node.next == &b->blocks;
 }
 
 char *do_delete(size_t len, bool sanity_check_newlines)
@@ -307,7 +307,7 @@ char *do_delete(size_t len, bool sanity_check_newlines)
         buffer->nl -= nl;
         blk->nl -= nl;
         blk->size -= count;
-        if (!blk->size && !only_block(blk)) {
+        if (!blk->size && !only_block(buffer, blk)) {
             delete_block(blk);
         }
 
@@ -347,7 +347,7 @@ char *do_delete(size_t len, bool sanity_check_newlines)
         delete_block(next);
     }
 
-    sanity_check_blocks(sanity_check_newlines);
+    sanity_check_blocks(view, sanity_check_newlines);
 
     view_update_cursor_y(view);
     buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
@@ -397,7 +397,7 @@ char *do_replace(size_t del, const char *buf, size_t ins)
     blk->nl += ins_nl;
     buffer->nl += ins_nl;
     blk->size = new_size;
-    sanity_check_blocks(true);
+    sanity_check_blocks(view, true);
     view_update_cursor_y(view);
 
     // If the number of inserted and removed bytes are the same, some
