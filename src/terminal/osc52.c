@@ -1,11 +1,10 @@
 #include <stdlib.h>
 #include "osc52.h"
-#include "output.h"
 #include "util/base64.h"
 #include "util/debug.h"
 #include "util/macros.h"
 
-bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
+bool osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len, bool clipboard, bool primary)
 {
     BUG_ON(!clipboard && !primary);
     size_t bufsize = (text_len / 3 * 4) + 4;
@@ -14,14 +13,14 @@ bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
         return false;
     }
 
-    term_add_literal("\033]52;");
+    term_add_literal(output, "\033]52;");
     if (primary) {
-        term_add_byte('p');
+        term_add_byte(output, 'p');
     }
     if (clipboard) {
-        term_add_byte('c');
+        term_add_byte(output, 'c');
     }
-    term_add_byte(';');
+    term_add_byte(output, ';');
 
     if (unlikely(text_len == 0)) {
         goto out;
@@ -42,10 +41,10 @@ bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary)
         olen += 4;
     }
 
-    term_add_bytes(buf, olen);
+    term_add_bytes(output, buf, olen);
 
 out:
     free(buf);
-    term_add_literal("\033\\");
+    term_add_literal(output, "\033\\");
     return true;
 }

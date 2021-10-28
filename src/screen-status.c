@@ -2,7 +2,6 @@
 #include "screen.h"
 #include "editor.h"
 #include "selection.h"
-#include "terminal/output.h"
 #include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
@@ -289,7 +288,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     f->buf[f->pos] = '\0';
 }
 
-void update_status_line(const Window *win)
+void update_status_line(TermOutputBuffer *obuf, const Window *win)
 {
     Formatter f = {.win = win};
     char lbuf[256];
@@ -297,32 +296,32 @@ void update_status_line(const Window *win)
     sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
     sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
 
-    term_output_reset(win->x, win->w, 0);
-    term_move_cursor(win->x, win->y + win->h - 1);
-    set_builtin_color(BC_STATUSLINE);
+    term_output_reset(obuf, win->x, win->w, 0);
+    term_move_cursor(obuf, win->x, win->y + win->h - 1);
+    set_builtin_color(obuf, BC_STATUSLINE);
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
     if (lw + rw <= win->w) {
         // Both fit
-        term_add_str(lbuf);
-        term_set_bytes(' ', win->w - lw - rw);
-        term_add_str(rbuf);
+        term_add_str(obuf, lbuf);
+        term_set_bytes(obuf, ' ', win->w - lw - rw);
+        term_add_str(obuf, rbuf);
     } else if (lw <= win->w && rw <= win->w) {
         // Both would fit separately, draw overlapping
-        term_add_str(lbuf);
-        obuf.x = win->w - rw;
-        term_move_cursor(win->x + win->w - rw, win->y + win->h - 1);
-        term_add_str(rbuf);
+        term_add_str(obuf, lbuf);
+        obuf->x = win->w - rw;
+        term_move_cursor(obuf, win->x + win->w - rw, win->y + win->h - 1);
+        term_add_str(obuf, rbuf);
     } else if (lw <= win->w) {
         // Left fits
-        term_add_str(lbuf);
-        term_clear_eol();
+        term_add_str(obuf, lbuf);
+        term_clear_eol(obuf);
     } else if (rw <= win->w) {
         // Right fits
-        term_set_bytes(' ', win->w - rw);
-        term_add_str(rbuf);
+        term_set_bytes(obuf, ' ', win->w - rw);
+        term_add_str(obuf, rbuf);
     } else {
-        term_clear_eol();
+        term_clear_eol(obuf);
     }
 }
 

@@ -17,7 +17,6 @@
 #include "screen.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
-#include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -143,6 +142,7 @@ void init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
+    term_output_init(&editor.obuf);
     regexp_init_word_boundary_tokens();
     hashmap_init(&normal_commands.aliases, 32);
     bindings_init();
@@ -175,32 +175,34 @@ void any_key(void)
     }
 }
 
-static void update_window_full(Window *w)
+static void update_window_full(Window *w, void *ud)
 {
+    TermOutputBuffer *obuf = ud;
     View *v = w->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v);
-    print_tabbar(w);
+    print_tabbar(obuf, w);
     if (editor.options.show_line_numbers) {
-        update_line_numbers(w, true);
+        update_line_numbers(obuf, w, true);
     }
-    update_range(v, v->vy, v->vy + w->edit_h);
-    update_status_line(w);
+    update_range(obuf, v, v->vy, v->vy + w->edit_h);
+    update_status_line(obuf, w);
 }
 
-static void restore_cursor(void)
+static void restore_cursor(TermOutputBuffer *obuf)
 {
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         term_move_cursor (
+            obuf,
             window->edit_x + view->cx_display - view->vx,
             window->edit_y + view->cy - view->vy
         );
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        term_move_cursor(editor.cmdline_x, terminal.height - 1);
+        term_move_cursor(obuf, editor.cmdline_x, terminal.height - 1);
         break;
     default:
         BUG("unhandled input mode");
@@ -209,7 +211,7 @@ static void restore_cursor(void)
 
 static void start_update(void)
 {
-    term_hide_cursor();
+    term_hide_cursor(&editor.obuf);
 }
 
 static void clear_update_tabbar(Window *w)
@@ -219,9 +221,9 @@ static void clear_update_tabbar(Window *w)
 
 static void end_update(void)
 {
-    restore_cursor();
-    term_show_cursor();
-    term_output_flush();
+    restore_cursor(&editor.obuf);
+    term_show_cursor(&editor.obuf);
+    term_output_flush(&editor.obuf);
 
     buffer->changed_line_min = LONG_MAX;
     buffer->changed_line_max = -1;
@@ -231,20 +233,20 @@ static void end_update(void)
 static void update_all_windows(void)
 {
     update_window_sizes();
-    for_each_window(update_window_full);
-    update_separators();
+    for_each_window_data(update_window_full, &editor.obuf);
+    update_separators(&editor.obuf);
 }
 
 static void update_window(Window *w)
 {
     if (w->update_tabbar) {
-        print_tabbar(w);
+        print_tabbar(&editor.obuf, w);
     }
 
     View *v = w->view;
     if (editor.options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        update_line_numbers(w, v->buffer->changed_line_max == LONG_MAX);
+        update_line_numbers(&editor.obuf, w, v->buffer->changed_line_max == LONG_MAX);
     }
 
     long y1 = v->buffer->changed_line_min;
@@ -256,8 +258,8 @@ static void update_window(Window *w)
         y2 = v->vy + w->edit_h - 1;
     }
 
-    update_range(v, y1, y2 + 1);
-    update_status_line(w);
+    update_range(&editor.obuf, v, y1, y2 + 1);
+    update_status_line(&editor.obuf, w);
 }
 
 // Update all visible views containing this buffer
@@ -285,9 +287,9 @@ static void update_buffer_windows(const Buffer *b)
 void normal_update(void)
 {
     start_update();
-    update_term_title(buffer);
+    update_term_title(&editor.obuf, buffer);
     update_all_windows();
-    update_command_line();
+    update_command_line(&editor.obuf);
     end_update();
 }
 
@@ -306,9 +308,9 @@ void ui_start(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    terminal.put_control_code(terminal.control_codes.init);
-    terminal.put_control_code(terminal.control_codes.keypad_on);
-    terminal.put_control_code(terminal.control_codes.cup_mode_on);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.init);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.keypad_on);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.cup_mode_on);
     ui_resize();
 }
 
@@ -317,13 +319,13 @@ void ui_end(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    terminal.clear_screen();
-    term_move_cursor(0, terminal.height - 1);
-    term_show_cursor();
-    terminal.put_control_code(terminal.control_codes.cup_mode_off);
-    terminal.put_control_code(terminal.control_codes.keypad_off);
-    terminal.put_control_code(terminal.control_codes.deinit);
-    term_output_flush();
+    terminal.clear_screen(&editor.obuf);
+    term_move_cursor(&editor.obuf, 0, terminal.height - 1);
+    term_show_cursor(&editor.obuf);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.cup_mode_off);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.keypad_off);
+    terminal.put_control_code(&editor.obuf, terminal.control_codes.deinit);
+    term_output_flush(&editor.obuf);
     term_cooked();
 }
 
@@ -362,7 +364,7 @@ static char get_choice(const char *choices)
     return 0;
 }
 
-static void show_dialog(const char *question)
+static void show_dialog(TermOutputBuffer *obuf, const char *question)
 {
     unsigned int question_width = u_str_width(question);
     unsigned int min_width = question_width + 2;
@@ -382,28 +384,28 @@ static void show_dialog(const char *question)
     const TermColor *text_color = &builtin_colors[BC_DIALOG];
     TermColor dialog_color = *text_color;
     dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
-    set_color(&dialog_color);
+    set_color(obuf, &dialog_color);
 
     for (unsigned int y = top; y < bot; y++) {
-        term_output_reset(x, width, 0);
-        term_move_cursor(x, y);
+        term_output_reset(obuf, x, width, 0);
+        term_move_cursor(obuf, x, y);
         if (y == mid) {
-            term_set_bytes(' ', (width - question_width) / 2);
-            set_color(text_color);
-            term_add_str(question);
-            set_color(&dialog_color);
+            term_set_bytes(obuf, ' ', (width - question_width) / 2);
+            set_color(obuf, text_color);
+            term_add_str(obuf, question);
+            set_color(obuf, &dialog_color);
         }
-        term_clear_eol();
+        term_clear_eol(obuf);
     }
 }
 
 char dialog_prompt(const char *question, const char *choices)
 {
     normal_update();
-    term_hide_cursor();
-    show_dialog(question);
-    show_message(question, false);
-    term_output_flush();
+    term_hide_cursor(&editor.obuf);
+    show_dialog(&editor.obuf, question);
+    show_message(&editor.obuf, question, false);
+    term_output_flush(&editor.obuf);
 
     char choice;
     while ((choice = get_choice(choices)) == 0) {
@@ -411,10 +413,10 @@ char dialog_prompt(const char *question, const char *choices)
             continue;
         }
         ui_resize();
-        term_hide_cursor();
-        show_dialog(question);
-        show_message(question, false);
-        term_output_flush();
+        term_hide_cursor(&editor.obuf);
+        show_dialog(&editor.obuf, question);
+        show_message(&editor.obuf, question, false);
+        term_output_flush(&editor.obuf);
     }
 
     mark_everything_changed();
@@ -432,9 +434,9 @@ char status_prompt(const char *question, const char *choices)
     mark_all_lines_changed(buffer);
 
     start_update();
-    update_term_title(buffer);
+    update_term_title(&editor.obuf, buffer);
     update_buffer_windows(buffer);
-    show_message(question, false);
+    show_message(&editor.obuf, question, false);
     end_update();
 
     char choice;
@@ -443,11 +445,11 @@ char status_prompt(const char *question, const char *choices)
             continue;
         }
         ui_resize();
-        term_hide_cursor();
-        show_message(question, false);
-        restore_cursor();
-        term_show_cursor();
-        term_output_flush();
+        term_hide_cursor(&editor.obuf);
+        show_message(&editor.obuf, question, false);
+        restore_cursor(&editor.obuf);
+        term_show_cursor(&editor.obuf);
+        term_output_flush(&editor.obuf);
     }
 
     return (choice >= 'a') ? choice : 0;
@@ -495,10 +497,10 @@ static void update_screen(const ScreenState *s)
 
     start_update();
     if (window->update_tabbar) {
-        update_term_title(buffer);
+        update_term_title(&editor.obuf, buffer);
     }
     update_buffer_windows(buffer);
-    update_command_line();
+    update_command_line(&editor.obuf);
     end_update();
 }
 

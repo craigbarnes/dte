@@ -11,6 +11,7 @@
 #include "mode.h"
 #include "options.h"
 #include "search.h"
+#include "terminal/output.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -27,6 +28,7 @@ typedef struct {
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
+    TermOutputBuffer obuf;
     StringView home_dir;
     const char *user_config_dir;
     const char *file_locks;

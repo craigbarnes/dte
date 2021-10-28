@@ -2,11 +2,10 @@
 #include "screen.h"
 #include "editor.h"
 #include "frame.h"
-#include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
 
-void set_color(const TermColor *color)
+void set_color(TermOutputBuffer *obuf, const TermColor *color)
 {
     TermColor tmp = *color;
     // NOTE: -2 (keep) is treated as -1 (default)
@@ -16,19 +15,19 @@ void set_color(const TermColor *color)
     if (tmp.bg < 0) {
         tmp.bg = builtin_colors[BC_DEFAULT].bg;
     }
-    if (same_color(&tmp, &obuf.color)) {
+    if (same_color(&tmp, &obuf->color)) {
         return;
     }
-    terminal.set_color(&tmp);
-    obuf.color = tmp;
+    terminal.set_color(obuf, &tmp);
+    obuf->color = tmp;
 }
 
-void set_builtin_color(BuiltinColorEnum c)
+void set_builtin_color(TermOutputBuffer *obuf, BuiltinColorEnum c)
 {
-    set_color(&builtin_colors[c]);
+    set_color(obuf, &builtin_colors[c]);
 }
 
-void update_term_title(const Buffer *b)
+void update_term_title(TermOutputBuffer *obuf, const Buffer *b)
 {
     if (
         !editor.options.set_window_title
@@ -39,12 +38,12 @@ void update_term_title(const Buffer *b)
 
     // FIXME: title must not contain control characters
     const char *filename = buffer_filename(b);
-    terminal.put_control_code(terminal.control_codes.set_title_begin);
-    term_add_bytes(filename, strlen(filename));
-    term_add_byte(' ');
-    term_add_byte(buffer_modified(b) ? '+' : '-');
-    term_add_literal(" dte");
-    terminal.put_control_code(terminal.control_codes.set_title_end);
+    terminal.put_control_code(obuf, terminal.control_codes.set_title_begin);
+    term_add_bytes(obuf, filename, strlen(filename));
+    term_add_byte(obuf, ' ');
+    term_add_byte(obuf, buffer_modified(b) ? '+' : '-');
+    term_add_literal(obuf, " dte");
+    terminal.put_control_code(obuf, terminal.control_codes.set_title_end);
 }
 
 void mask_color(TermColor *color, const TermColor *over)
@@ -60,24 +59,25 @@ void mask_color(TermColor *color, const TermColor *over)
     }
 }
 
-static void print_separator(Window *win)
+static void print_separator(Window *win, void *ud)
 {
+    TermOutputBuffer *obuf = ud;
     if (win->x + win->w == terminal.width) {
         return;
     }
     for (int y = 0, h = win->h; y < h; y++) {
-        term_move_cursor(win->x + win->w, win->y + y);
-        term_add_byte('|');
+        term_move_cursor(obuf, win->x + win->w, win->y + y);
+        term_add_byte(obuf, '|');
     }
 }
 
-void update_separators(void)
+void update_separators(TermOutputBuffer *obuf)
 {
-    set_builtin_color(BC_STATUSLINE);
-    for_each_window(print_separator);
+    set_builtin_color(obuf, BC_STATUSLINE);
+    for_each_window_data(print_separator, obuf);
 }
 
-void update_line_numbers(Window *win, bool force)
+void update_line_numbers(TermOutputBuffer *obuf, Window *win, bool force)
 {
     const View *v = win->view;
     size_t lines = v->buffer->nl;
@@ -105,8 +105,8 @@ void update_line_numbers(Window *win, bool force)
     size_t width = win->line_numbers.width;
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
-    term_output_reset(win->x, win->w, 0);
-    set_builtin_color(BC_LINENUMBER);
+    term_output_reset(obuf, win->x, win->w, 0);
+    set_builtin_color(obuf, BC_LINENUMBER);
 
     for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
         unsigned long line = v->vy + y + 1;
@@ -117,8 +117,8 @@ void update_line_numbers(Window *win, bool force)
                 buf[i--] = (line % 10) + '0';
             } while (line /= 10);
         }
-        term_move_cursor(x, edit_y + y);
-        term_add_bytes(buf, width);
+        term_move_cursor(obuf, x, edit_y + y);
+        term_add_bytes(obuf, buf, width);
     }
 }
 

@@ -1,6 +1,5 @@
 #include "screen.h"
 #include "editor.h"
-#include "terminal/output.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/strtonum.h"
@@ -128,7 +127,7 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_tab_title(const View *v, size_t idx)
+static void print_tab_title(TermOutputBuffer *obuf, const View *v, size_t idx)
 {
     const char *filename = buffer_filename(v->buffer);
     int skip = v->tt_width - v->tt_truncated_width;
@@ -139,50 +138,50 @@ static void print_tab_title(const View *v, size_t idx)
     const char *tab_number = uint_to_str((unsigned int)idx + 1);
     bool is_active_tab = (v == v->window->view);
     bool is_modified = buffer_modified(v->buffer);
-    bool left_overflow = (obuf.x == 0 && idx > 0);
+    bool left_overflow = (obuf->x == 0 && idx > 0);
 
-    set_builtin_color(is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
-    term_put_char(left_overflow ? '<' : ' ');
-    term_add_str(tab_number);
-    term_put_char(is_modified ? '+' : ':');
-    term_add_str(filename);
+    set_builtin_color(obuf, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
+    term_put_char(obuf, left_overflow ? '<' : ' ');
+    term_add_str(obuf, tab_number);
+    term_put_char(obuf, is_modified ? '+' : ':');
+    term_add_str(obuf, filename);
 
     size_t ntabs = v->window->views.count;
-    bool right_overflow = (obuf.x == (obuf.width - 1) && idx < (ntabs - 1));
-    term_put_char(right_overflow ? '>' : ' ');
+    bool right_overflow = (obuf->x == (obuf->width - 1) && idx < (ntabs - 1));
+    term_put_char(obuf, right_overflow ? '>' : ' ');
 }
 
-void print_tabbar(Window *win)
+void print_tabbar(TermOutputBuffer *obuf, Window *win)
 {
     if (!editor.options.tab_bar) {
         return;
     }
 
-    term_output_reset(win->x, win->w, 0);
-    term_move_cursor(win->x, win->y);
+    term_output_reset(obuf, win->x, win->w, 0);
+    term_move_cursor(obuf, win->x, win->y);
     calculate_tabbar(win);
 
     size_t i = win->first_tab_idx;
     size_t n = win->views.count;
     for (; i < n; i++) {
         const View *v = win->views.ptrs[i];
-        if (obuf.x + v->tt_truncated_width > win->w) {
+        if (obuf->x + v->tt_truncated_width > win->w) {
             break;
         }
-        print_tab_title(v, i);
+        print_tab_title(obuf, v, i);
     }
 
-    set_builtin_color(BC_TABBAR);
+    set_builtin_color(obuf, BC_TABBAR);
 
     if (i == n) {
-        term_clear_eol();
+        term_clear_eol(obuf);
         return;
     }
 
-    while (obuf.x < obuf.width - 1) {
-        term_put_char(' ');
+    while (obuf->x < obuf->width - 1) {
+        term_put_char(obuf, ' ');
     }
-    if (obuf.x == obuf.width - 1) {
-        term_put_char('>');
+    if (obuf->x == obuf->width - 1) {
+        term_put_char(obuf, '>');
     }
 }

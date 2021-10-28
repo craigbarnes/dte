@@ -2,7 +2,6 @@
 #include "editor.h"
 #include "selection.h"
 #include "syntax/highlight.h"
-#include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -129,7 +128,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     return (flags & mask) != 0;
 }
 
-static CodePoint screen_next_char(LineInfo *info)
+static CodePoint screen_next_char(TermOutputBuffer *obuf, LineInfo *info)
 {
     size_t count, pos = info->pos;
     CodePoint u = info->line[pos];
@@ -166,31 +165,31 @@ static CodePoint screen_next_char(LineInfo *info)
         mask_color(&color, &builtin_colors[BC_WSERROR]);
     }
     mask_selection_and_current_line(info, &color);
-    set_color(&color);
+    set_color(obuf, &color);
 
     info->offset += count;
     return u;
 }
 
-static void screen_skip_char(LineInfo *info)
+static void screen_skip_char(TermOutputBuffer *obuf, LineInfo *info)
 {
     CodePoint u = info->line[info->pos++];
     info->offset++;
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
-            obuf.x++;
-        } else if (u == '\t' && obuf.tab != TAB_CONTROL) {
-            size_t tw = obuf.tab_width;
-            obuf.x += (obuf.x + tw) / tw * tw - obuf.x;
+            obuf->x++;
+        } else if (u == '\t' && obuf->tab != TAB_CONTROL) {
+            size_t tw = obuf->tab_width;
+            obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
         } else {
             // Control
-            obuf.x += 2;
+            obuf->x += 2;
         }
     } else {
         size_t pos = info->pos;
         info->pos--;
         u = u_get_nonascii(info->line, info->size, &info->pos);
-        obuf.x += u_char_width(u);
+        obuf->x += u_char_width(u);
         info->offset += info->pos - pos;
     }
 }
@@ -316,7 +315,7 @@ static void line_info_set_line (
     }
 }
 
-static void print_line(LineInfo *info)
+static void print_line(TermOutputBuffer *obuf, LineInfo *info)
 {
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char(), which is much faster than
@@ -324,16 +323,16 @@ static void print_line(LineInfo *info)
     //
     // There can be a wide character (tab, control code etc.) that is
     // partially visible and can't be skipped using screen_skip_char().
-    while (obuf.x + 8 < obuf.scroll_x && info->pos < info->size) {
-        screen_skip_char(info);
+    while (obuf->x + 8 < obuf->scroll_x && info->pos < info->size) {
+        screen_skip_char(obuf, info);
     }
 
     hl_words(info);
 
     while (info->pos < info->size) {
-        BUG_ON(obuf.x > obuf.scroll_x + obuf.width);
-        CodePoint u = screen_next_char(info);
-        if (!term_put_char(u)) {
+        BUG_ON(obuf->x > obuf->scroll_x + obuf->width);
+        CodePoint u = screen_next_char(obuf, info);
+        if (!term_put_char(obuf, u)) {
             // +1 for newline
             info->offset += info->size - info->pos + 1;
             return;
@@ -341,32 +340,32 @@ static void print_line(LineInfo *info)
     }
 
     TermColor color;
-    if (editor.options.display_special && obuf.x >= obuf.scroll_x) {
+    if (editor.options.display_special && obuf->x >= obuf->scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
         color = builtin_colors[BC_DEFAULT];
         mask_color(&color, &builtin_colors[BC_NONTEXT]);
         mask_selection_and_current_line(info, &color);
-        set_color(&color);
-        term_put_char('$');
+        set_color(obuf, &color);
+        term_put_char(obuf, '$');
     }
 
     color = builtin_colors[BC_DEFAULT];
     mask_selection_and_current_line(info, &color);
-    set_color(&color);
+    set_color(obuf, &color);
     info->offset++;
-    term_clear_eol();
+    term_clear_eol(obuf);
 }
 
-void update_range(const View *v, long y1, long y2)
+void update_range(TermOutputBuffer *obuf, const View *v, long y1, long y2)
 {
     const int edit_x = v->window->edit_x;
     const int edit_y = v->window->edit_y;
     const int edit_w = v->window->edit_w;
     const int edit_h = v->window->edit_h;
 
-    term_output_reset(edit_x, edit_w, v->vx);
-    obuf.tab_width = v->buffer->options.tab_width;
-    obuf.tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
+    term_output_reset(obuf, edit_x, edit_w, v->vx);
+    obuf->tab_width = v->buffer->options.tab_width;
+    obuf->tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     BlockIter bi = v->cursor;
     for (long i = 0, n = v->cy - y1; i < n; i++) {
@@ -387,15 +386,15 @@ void update_range(const View *v, long y1, long y2)
     hl_fill_start_states(v->buffer, info.line_nr);
     long i;
     for (i = y1; got_line && i < y2; i++) {
-        obuf.x = 0;
-        term_move_cursor(edit_x, edit_y + i);
+        obuf->x = 0;
+        term_move_cursor(obuf, edit_x, edit_y + i);
 
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
         TermColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
-        print_line(&info);
+        print_line(obuf, &info);
 
         got_line = !!block_iter_next_line(&bi);
         info.line_nr++;
@@ -412,21 +411,21 @@ void update_range(const View *v, long y1, long y2)
         // Dummy empty line is shown only if cursor is on it
         TermColor color = builtin_colors[BC_DEFAULT];
 
-        obuf.x = 0;
+        obuf->x = 0;
         mask_color2(&color, &builtin_colors[BC_CURRENTLINE]);
-        set_color(&color);
+        set_color(obuf, &color);
 
-        term_move_cursor(edit_x, edit_y + i++);
-        term_clear_eol();
+        term_move_cursor(obuf, edit_x, edit_y + i++);
+        term_clear_eol(obuf);
     }
 
     if (i < y2) {
-        set_builtin_color(BC_NOLINE);
+        set_builtin_color(obuf, BC_NOLINE);
     }
     for (; i < y2; i++) {
-        obuf.x = 0;
-        term_move_cursor(edit_x, edit_y + i);
-        term_put_char('~');
-        term_clear_eol();
+        obuf->x = 0;
+        term_move_cursor(obuf, edit_x, edit_y + i);
+        term_put_char(obuf, '~');
+        term_clear_eol(obuf);
     }
 }

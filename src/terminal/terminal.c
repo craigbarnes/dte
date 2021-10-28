@@ -6,7 +6,6 @@
 #include "linux.h"
 #include "mode.h"
 #include "osc52.h"
-#include "output.h"
 #include "rxvt.h"
 #include "xterm.h"
 #include "util/bsearch.h"

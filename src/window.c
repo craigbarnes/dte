@@ -431,10 +431,8 @@ static void frame_for_each_window (
     }
 }
 
-static void for_each_window_data (
-    void (*func)(Window *, void *),
-    void *data
-) {
+void for_each_window_data(void (*func)(Window *, void *), void *data)
+{
     frame_for_each_window(root_frame, func, data);
 }
 

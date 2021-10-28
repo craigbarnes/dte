@@ -194,10 +194,11 @@ static ExitCode showkey_loop(void)
         perror("tcsetattr");
         return EX_IOERR;
     }
-    terminal.put_control_code(terminal.control_codes.init);
-    terminal.put_control_code(terminal.control_codes.keypad_on);
-    term_add_literal("Press any key combination, or use Ctrl+D to exit\r\n");
-    term_output_flush();
+    TermOutputBuffer *obuf = &editor.obuf;
+    terminal.put_control_code(obuf, terminal.control_codes.init);
+    terminal.put_control_code(obuf, terminal.control_codes.keypad_on);
+    term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
+    term_output_flush(obuf);
 
     bool loop = true;
     while (loop) {
@@ -213,15 +214,15 @@ static ExitCode showkey_loop(void)
             loop = false;
         }
         const char *str = keycode_to_string(key);
-        term_add_literal("  ");
-        term_add_bytes(str, strlen(str));
-        term_add_literal("\r\n");
-        term_output_flush();
+        term_add_literal(obuf, "  ");
+        term_add_bytes(obuf, str, strlen(str));
+        term_add_literal(obuf, "\r\n");
+        term_output_flush(obuf);
     }
 
-    terminal.put_control_code(terminal.control_codes.keypad_off);
-    terminal.put_control_code(terminal.control_codes.deinit);
-    term_output_flush();
+    terminal.put_control_code(obuf, terminal.control_codes.keypad_off);
+    terminal.put_control_code(obuf, terminal.control_codes.deinit);
+    term_output_flush(obuf);
     term_cooked();
     return EX_OK;
 }
@@ -390,7 +391,7 @@ loop_break:
         editor.options.lock_files = false;
     }
 
-    term_save_title();
+    term_save_title(&editor.obuf);
     exec_builtin_rc();
 
     if (read_rc) {
@@ -500,9 +501,9 @@ loop_break:
 
     main_loop();
 
-    term_restore_title();
+    term_restore_title(&editor.obuf);
     ui_end();
-    term_output_flush();
+    term_output_flush(&editor.obuf);
 
     // Unlock files and add files to file history
     remove_frame(root_frame);

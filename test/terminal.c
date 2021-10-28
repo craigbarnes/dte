@@ -698,27 +698,29 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, 0x18);
 }
 
-static void clear_obuf(void)
+static void clear_obuf(TermOutputBuffer *obuf)
 {
-    ASSERT_TRUE(obuf_avail() > 8);
-    memset(obuf.buf, '\0', obuf.count + 8);
-    obuf.count = 0;
-    obuf.x = 0;
+    ASSERT_TRUE(obuf_avail(obuf) > 8);
+    memset(obuf->buf, '\0', obuf->count + 8);
+    obuf->count = 0;
+    obuf->x = 0;
 }
 
 static void test_term_add_str(void)
 {
-    EXPECT_EQ(obuf.tab, TAB_NORMAL);
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+    ASSERT_NONNULL(obuf.buf);
+
+    // Fill start of buffer with zeroes, to allow using EXPECT_STREQ() below
+    ASSERT_TRUE(256 <= TERM_OUTBUF_SIZE);
+    memset(obuf.buf, 0, 256);
+
+    term_add_str(&obuf, "this should write nothing because obuf.width == 0");
     EXPECT_EQ(obuf.count, 0);
     EXPECT_EQ(obuf.x, 0);
-    EXPECT_EQ(obuf.scroll_x, 0);
-    EXPECT_EQ(obuf.width, 0);
 
-    term_add_str("this should write nothing because obuf.width == 0");
-    EXPECT_EQ(obuf.count, 0);
-    EXPECT_EQ(obuf.x, 0);
-
-    term_output_reset(0, 80, 0);
+    term_output_reset(&obuf, 0, 80, 0);
     EXPECT_EQ(obuf.tab, TAB_CONTROL);
     EXPECT_EQ(obuf.tab_width, 8);
     EXPECT_EQ(obuf.x, 0);
@@ -727,61 +729,74 @@ static void test_term_add_str(void)
     EXPECT_EQ(terminal.width, 80);
     EXPECT_EQ(obuf.can_clear, true);
 
-    term_add_str("1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
+    term_add_str(&obuf, "1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
     EXPECT_EQ(obuf.count, 20);
     EXPECT_EQ(obuf.x, 17);
     EXPECT_STREQ(obuf.buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");
 
-    EXPECT_TRUE(term_put_char(0x10FFFF));
+    EXPECT_TRUE(term_put_char(&obuf, 0x10FFFF));
     EXPECT_EQ(obuf.count, 24);
     EXPECT_EQ(obuf.x, 21);
     EXPECT_STREQ(obuf.buf + 20, "<" "??" ">");
-    clear_obuf();
+    clear_obuf(&obuf);
+
+    term_output_free(&obuf);
 }
 
 static void test_ecma48_clear_to_eol(void)
 {
-    ecma48_clear_to_eol();
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+    ecma48_clear_to_eol(&obuf);
     EXPECT_EQ(obuf.count, 3);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[K", 3);
-    clear_obuf();
+    clear_obuf(&obuf);
+    term_output_free(&obuf);
 }
 
 static void test_ecma48_move_cursor(void)
 {
-    ecma48_move_cursor(12, 5);
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+    ecma48_move_cursor(&obuf, 12, 5);
     EXPECT_EQ(obuf.count, 7);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
-    clear_obuf();
+    clear_obuf(&obuf);
 
-    ecma48_move_cursor(0, 22);
+    ecma48_move_cursor(&obuf, 0, 22);
     EXPECT_EQ(obuf.count, 5);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
-    clear_obuf();
+    clear_obuf(&obuf);
+
+    term_output_free(&obuf);
 }
 
 static void test_ecma48_repeat_byte(void)
 {
-    ecma48_repeat_byte('x', 40);
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+    ecma48_repeat_byte(&obuf, 'x', 40);
     EXPECT_EQ(obuf.count, 6);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "x\033[39b", 6);
-    clear_obuf();
+    clear_obuf(&obuf);
 
-    ecma48_repeat_byte('-', 5);
+    ecma48_repeat_byte(&obuf, '-', 5);
     EXPECT_EQ(obuf.count, 5);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "-----", 5);
-    clear_obuf();
+    clear_obuf(&obuf);
 
-    ecma48_repeat_byte('\n', 8);
+    ecma48_repeat_byte(&obuf, '\n', 8);
     EXPECT_EQ(obuf.count, 8);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\n\n\n\n\n\n\n\n", 8);
-    clear_obuf();
+    clear_obuf(&obuf);
+
+    term_output_free(&obuf);
 }
 
 static void test_ecma48_set_color(void)
@@ -797,50 +812,59 @@ static void test_ecma48_set_color(void)
         .attr = ATTR_BOLD | ATTR_REVERSE,
     };
 
-    ecma48_set_color(&c);
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+
+    ecma48_set_color(&obuf, &c);
     EXPECT_EQ(obuf.count, 14);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[0;1;7;31;43m", 14);
-    clear_obuf();
+    clear_obuf(&obuf);
 
     c.attr = 0;
     c.fg = COLOR_RGB(0x12ef46);
-    ecma48_set_color(&c);
+    ecma48_set_color(&obuf, &c);
     EXPECT_EQ(obuf.count, 22);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[0;38;2;18;239;70;43m", 22);
-    clear_obuf();
+    clear_obuf(&obuf);
 
     c.fg = 144;
     c.bg = COLOR_DEFAULT;
-    ecma48_set_color(&c);
+    ecma48_set_color(&obuf, &c);
     EXPECT_EQ(obuf.count, 13);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[0;38;5;144m", 13);
-    clear_obuf();
+    clear_obuf(&obuf);
 
     terminal.color_type = color_type;
+    term_output_free(&obuf);
 }
 
 static void test_osc52_copy(void)
 {
-    EXPECT_TRUE(osc52_copy(STRN("foobar"), true, true));
+    TermOutputBuffer obuf;
+    term_output_init(&obuf);
+
+    EXPECT_TRUE(osc52_copy(&obuf, STRN("foobar"), true, true));
     EXPECT_EQ(obuf.count, 18);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
-    clear_obuf();
+    clear_obuf(&obuf);
 
-    EXPECT_TRUE(osc52_copy(STRN("\xF0\x9F\xA5\xA3"), false, true));
+    EXPECT_TRUE(osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
     EXPECT_EQ(obuf.count, 17);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
-    clear_obuf();
+    clear_obuf(&obuf);
 
-    EXPECT_TRUE(osc52_copy(STRN(""), true, false));
+    EXPECT_TRUE(osc52_copy(&obuf, STRN(""), true, false));
     EXPECT_EQ(obuf.count, 9);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
-    clear_obuf();
+    clear_obuf(&obuf);
+
+    term_output_free(&obuf);
 }
 
 static const TestEntry tests[] = {

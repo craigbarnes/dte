@@ -373,7 +373,7 @@ static void cmd_copy(const CommandArgs *a)
             }
         }
         char *buf = block_iter_get_bytes(&view->cursor, size);
-        if (!terminal.copy_text(buf, size, clipboard, primary)) {
+        if (!terminal.copy_text(&editor.obuf, buf, size, clipboard, primary)) {
             error_msg("%s", strerror(errno));
         }
         free(buf);

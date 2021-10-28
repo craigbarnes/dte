@@ -1,9 +1,10 @@
-#ifndef TERMINAL_COPY_PASTE_H
-#define TERMINAL_COPY_PASTE_H
+#ifndef TERMINAL_OSC52_H
+#define TERMINAL_OSC52_H
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "output.h"
 
-bool osc52_copy(const char *text, size_t text_len, bool clipboard, bool primary);
+bool osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len, bool clipboard, bool primary);
 
 #endif
