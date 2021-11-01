@@ -116,27 +116,33 @@ void term_add_uint(TermOutputBuffer *obuf, unsigned int x)
 
 void term_hide_cursor(TermOutputBuffer *obuf)
 {
-    terminal.put_control_code(obuf, terminal.control_codes.hide_cursor);
+    term_add_string_view(obuf, terminal.control_codes.hide_cursor);
 }
 
 void term_show_cursor(TermOutputBuffer *obuf)
 {
-    terminal.put_control_code(obuf, terminal.control_codes.show_cursor);
+    term_add_string_view(obuf, terminal.control_codes.show_cursor);
 }
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
-    terminal.move_cursor(obuf, x, y);
+    term_add_literal(obuf, "\033[");
+    term_add_uint(obuf, y + 1);
+    if (x != 0) {
+        term_add_byte(obuf, ';');
+        term_add_uint(obuf, x + 1);
+    }
+    term_add_byte(obuf, 'H');
 }
 
 void term_save_title(TermOutputBuffer *obuf)
 {
-    terminal.put_control_code(obuf, terminal.control_codes.save_title);
+    term_add_string_view(obuf, terminal.control_codes.save_title);
 }
 
 void term_restore_title(TermOutputBuffer *obuf)
 {
-    terminal.put_control_code(obuf, terminal.control_codes.restore_title);
+    term_add_string_view(obuf, terminal.control_codes.restore_title);
 }
 
 void term_clear_eol(TermOutputBuffer *obuf)
@@ -150,11 +156,21 @@ void term_clear_eol(TermOutputBuffer *obuf)
         && (obuf->color.bg < 0 || terminal.back_color_erase)
         && !(obuf->color.attr & ATTR_REVERSE)
     ) {
-        terminal.clear_to_eol(obuf);
+        term_add_literal(obuf, "\033[K");
         obuf->x = end;
     } else {
         term_set_bytes(obuf, ' ', end - obuf->x);
     }
+}
+
+void term_clear_screen(TermOutputBuffer *obuf)
+{
+    term_add_literal (
+        obuf,
+        "\033[0m" // Reset colors and attributes
+        "\033[H"  // Move cursor to 1,1 (done only to mimic terminfo(5) "clear")
+        "\033[2J" // Clear whole screen (regardless of cursor position)
+    );
 }
 
 void term_output_flush(TermOutputBuffer *obuf)

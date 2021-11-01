@@ -32,11 +32,7 @@ typedef struct {
     unsigned int ncv_attributes;
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
-    void (*put_control_code)(TermOutputBuffer *obuf, StringView code);
-    void (*clear_screen)(TermOutputBuffer *obuf);
-    void (*clear_to_eol)(TermOutputBuffer *obuf);
     void (*set_color)(TermOutputBuffer *obuf, const TermColor *color);
-    void (*move_cursor)(TermOutputBuffer *obuf, unsigned int x, unsigned int y);
     void (*repeat_byte)(TermOutputBuffer *obuf, char ch, size_t count);
     bool (*copy_text)(TermOutputBuffer *obuf, const char *text, size_t len, bool clipboard, bool primary);
 } Terminal;

@@ -195,8 +195,8 @@ static ExitCode showkey_loop(void)
         return EX_IOERR;
     }
     TermOutputBuffer *obuf = &editor.obuf;
-    terminal.put_control_code(obuf, terminal.control_codes.init);
-    terminal.put_control_code(obuf, terminal.control_codes.keypad_on);
+    term_add_string_view(obuf, terminal.control_codes.init);
+    term_add_string_view(obuf, terminal.control_codes.keypad_on);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -220,8 +220,8 @@ static ExitCode showkey_loop(void)
         term_output_flush(obuf);
     }
 
-    terminal.put_control_code(obuf, terminal.control_codes.keypad_off);
-    terminal.put_control_code(obuf, terminal.control_codes.deinit);
+    term_add_string_view(obuf, terminal.control_codes.keypad_off);
+    term_add_string_view(obuf, terminal.control_codes.deinit);
     term_output_flush(obuf);
     term_cooked();
     return EX_OK;

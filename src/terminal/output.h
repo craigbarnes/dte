@@ -61,6 +61,7 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y);
 void term_save_title(TermOutputBuffer *obuf);
 void term_restore_title(TermOutputBuffer *obuf);
 void term_clear_eol(TermOutputBuffer *obuf);
+void term_clear_screen(TermOutputBuffer *obuf);
 void term_output_flush(TermOutputBuffer *obuf);
 bool term_put_char(TermOutputBuffer *obuf, CodePoint u);
 

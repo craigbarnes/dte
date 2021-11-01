@@ -308,9 +308,9 @@ void ui_start(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.init);
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.keypad_on);
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.cup_mode_on);
+    term_add_string_view(&editor.obuf, terminal.control_codes.init);
+    term_add_string_view(&editor.obuf, terminal.control_codes.keypad_on);
+    term_add_string_view(&editor.obuf, terminal.control_codes.cup_mode_on);
     ui_resize();
 }
 
@@ -319,12 +319,12 @@ void ui_end(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    terminal.clear_screen(&editor.obuf);
+    term_clear_screen(&editor.obuf);
     term_move_cursor(&editor.obuf, 0, terminal.height - 1);
     term_show_cursor(&editor.obuf);
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.cup_mode_off);
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.keypad_off);
-    terminal.put_control_code(&editor.obuf, terminal.control_codes.deinit);
+    term_add_string_view(&editor.obuf, terminal.control_codes.cup_mode_off);
+    term_add_string_view(&editor.obuf, terminal.control_codes.keypad_off);
+    term_add_string_view(&editor.obuf, terminal.control_codes.deinit);
     term_output_flush(&editor.obuf);
     term_cooked();
 }

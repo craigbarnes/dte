@@ -743,29 +743,42 @@ static void test_term_add_str(void)
     term_output_free(&obuf);
 }
 
-static void test_ecma48_clear_to_eol(void)
+static void test_term_clear_eol(void)
 {
     TermOutputBuffer obuf;
     term_output_init(&obuf);
-    ecma48_clear_to_eol(&obuf);
+
+    terminal.back_color_erase = true;
+    term_output_reset(&obuf, 0, 80, 0);
+    term_clear_eol(&obuf);
     EXPECT_EQ(obuf.count, 3);
-    EXPECT_EQ(obuf.x, 0);
+    EXPECT_EQ(obuf.x, 80);
     EXPECT_MEMEQ(obuf.buf, "\033[K", 3);
     clear_obuf(&obuf);
+
+    terminal.back_color_erase = false;
+    term_output_reset(&obuf, 0, 80, 0);
+    term_clear_eol(&obuf);
+    EXPECT_EQ(obuf.count, 80);
+    EXPECT_EQ(obuf.x, 80);
+    EXPECT_EQ(obuf.buf[0], ' ');
+    EXPECT_EQ(obuf.buf[79], ' ');
+    clear_obuf(&obuf);
+
     term_output_free(&obuf);
 }
 
-static void test_ecma48_move_cursor(void)
+static void test_term_move_cursor(void)
 {
     TermOutputBuffer obuf;
     term_output_init(&obuf);
-    ecma48_move_cursor(&obuf, 12, 5);
+    term_move_cursor(&obuf, 12, 5);
     EXPECT_EQ(obuf.count, 7);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
     clear_obuf(&obuf);
 
-    ecma48_move_cursor(&obuf, 0, 22);
+    term_move_cursor(&obuf, 0, 22);
     EXPECT_EQ(obuf.count, 5);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
@@ -878,8 +891,8 @@ static const TestEntry tests[] = {
     TEST(test_keycode_to_string),
     TEST(test_parse_key_string),
     TEST(test_term_add_str),
-    TEST(test_ecma48_clear_to_eol),
-    TEST(test_ecma48_move_cursor),
+    TEST(test_term_clear_eol),
+    TEST(test_term_move_cursor),
     TEST(test_ecma48_repeat_byte),
     TEST(test_ecma48_set_color),
     TEST(test_osc52_copy),

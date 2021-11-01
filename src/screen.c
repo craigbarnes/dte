@@ -38,12 +38,12 @@ void update_term_title(TermOutputBuffer *obuf, const Buffer *b)
 
     // FIXME: title must not contain control characters
     const char *filename = buffer_filename(b);
-    terminal.put_control_code(obuf, terminal.control_codes.set_title_begin);
+    term_add_string_view(obuf, terminal.control_codes.set_title_begin);
     term_add_bytes(obuf, filename, strlen(filename));
     term_add_byte(obuf, ' ');
     term_add_byte(obuf, buffer_modified(b) ? '+' : '-');
     term_add_literal(obuf, " dte");
-    terminal.put_control_code(obuf, terminal.control_codes.set_title_end);
+    term_add_string_view(obuf, terminal.control_codes.set_title_end);
 }
 
 void mask_color(TermColor *color, const TermColor *over)

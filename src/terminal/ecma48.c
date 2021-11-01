@@ -4,32 +4,6 @@
 #include "util/ascii.h"
 #include "util/macros.h"
 
-void ecma48_clear_screen(TermOutputBuffer *obuf)
-{
-    term_add_literal (
-        obuf,
-        "\033[0m" // Reset colors and attributes
-        "\033[H"  // Move cursor to 1,1 (done only to mimic terminfo(5) "clear")
-        "\033[2J" // Clear whole screen (regardless of cursor position)
-    );
-}
-
-void ecma48_clear_to_eol(TermOutputBuffer *obuf)
-{
-    term_add_literal(obuf, "\033[K");
-}
-
-void ecma48_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
-{
-    term_add_literal(obuf, "\033[");
-    term_add_uint(obuf, y + 1);
-    if (x != 0) {
-        term_add_byte(obuf, ';');
-        term_add_uint(obuf, x + 1);
-    }
-    term_add_byte(obuf, 'H');
-}
-
 void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
     if (!ascii_isprint(ch) || count < 6 || count > 30000) {
