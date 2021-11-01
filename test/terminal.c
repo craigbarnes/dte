@@ -854,24 +854,24 @@ static void test_ecma48_set_color(void)
     term_output_free(&obuf);
 }
 
-static void test_osc52_copy(void)
+static void test_term_osc52_copy(void)
 {
     TermOutputBuffer obuf;
     term_output_init(&obuf);
 
-    EXPECT_TRUE(osc52_copy(&obuf, STRN("foobar"), true, true));
+    EXPECT_TRUE(term_osc52_copy(&obuf, STRN("foobar"), true, true));
     EXPECT_EQ(obuf.count, 18);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
     clear_obuf(&obuf);
 
-    EXPECT_TRUE(osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
+    EXPECT_TRUE(term_osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
     EXPECT_EQ(obuf.count, 17);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
     clear_obuf(&obuf);
 
-    EXPECT_TRUE(osc52_copy(&obuf, STRN(""), true, false));
+    EXPECT_TRUE(term_osc52_copy(&obuf, STRN(""), true, false));
     EXPECT_EQ(obuf.count, 9);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
@@ -895,7 +895,7 @@ static const TestEntry tests[] = {
     TEST(test_term_move_cursor),
     TEST(test_ecma48_repeat_byte),
     TEST(test_ecma48_set_color),
-    TEST(test_osc52_copy),
+    TEST(test_term_osc52_copy),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);

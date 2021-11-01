@@ -26,6 +26,7 @@ typedef struct {
 
 typedef struct {
     bool back_color_erase;
+    bool osc52_copy;
     TermColorCapabilityType color_type;
     unsigned int width;
     unsigned int height;
@@ -34,7 +35,6 @@ typedef struct {
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     void (*set_color)(TermOutputBuffer *obuf, const TermColor *color);
     void (*repeat_byte)(TermOutputBuffer *obuf, char ch, size_t count);
-    bool (*copy_text)(TermOutputBuffer *obuf, const char *text, size_t len, bool clipboard, bool primary);
 } Terminal;
 
 extern Terminal terminal;

@@ -101,13 +101,13 @@ static const struct {
 
 Terminal terminal = {
     .back_color_erase = false,
+    .osc52_copy = false,
     .color_type = TERM_8_COLOR,
     .width = 80,
     .height = 24,
     .parse_key_sequence = &xterm_parse_key,
     .set_color = &ecma48_set_color,
     .repeat_byte = &term_repeat_byte,
-    .copy_text = NULL,
     .control_codes = {
         // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
         .init = STRING_VIEW (
@@ -181,6 +181,7 @@ void term_init(const char *term)
         terminal.color_type = entry->color_type;
         terminal.ncv_attributes = entry->ncv_attributes;
         terminal.back_color_erase = !!(entry->flags & BCE);
+        terminal.osc52_copy = !!(entry->flags & OSC52);
         if (entry->flags & REP) {
             terminal.repeat_byte = ecma48_repeat_byte;
         }
@@ -189,9 +190,6 @@ void term_init(const char *term)
             terminal.control_codes.restore_title = strview_from_cstring("\033[23;2t");
             terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
             terminal.control_codes.set_title_end = strview_from_cstring("\033\\");
-        }
-        if (entry->flags & OSC52) {
-            terminal.copy_text = osc52_copy;
         }
         if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;

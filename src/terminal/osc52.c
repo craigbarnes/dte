@@ -4,7 +4,7 @@
 #include "util/debug.h"
 #include "util/macros.h"
 
-bool osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len, bool clipboard, bool primary)
+bool term_osc52_copy(TermOutputBuffer *output, const char *text, size_t text_len, bool clipboard, bool primary)
 {
     BUG_ON(!clipboard && !primary);
     size_t bufsize = (text_len / 3 * 4) + 4;

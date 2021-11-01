@@ -38,6 +38,7 @@
 #include "tag.h"
 #include "terminal/color.h"
 #include "terminal/mode.h"
+#include "terminal/osc52.h"
 #include "terminal/terminal.h"
 #include "util/bsearch.h"
 #include "util/checked-arith.h"
@@ -365,7 +366,7 @@ static void cmd_copy(const CommandArgs *a)
         copy(size, line_copy);
     }
 
-    if ((clipboard || primary) && terminal.copy_text) {
+    if ((clipboard || primary) && terminal.osc52_copy) {
         if (internal) {
             view->cursor = save;
             if (view->selection) {
@@ -373,7 +374,7 @@ static void cmd_copy(const CommandArgs *a)
             }
         }
         char *buf = block_iter_get_bytes(&view->cursor, size);
-        if (!terminal.copy_text(&editor.obuf, buf, size, clipboard, primary)) {
+        if (!term_osc52_copy(&editor.obuf, buf, size, clipboard, primary)) {
             error_msg("%s", strerror(errno));
         }
         free(buf);
