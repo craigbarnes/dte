@@ -176,7 +176,7 @@ static void reverse_change(Change *change)
     block_iter_goto_offset(&view->cursor, change->offset);
     if (!change->ins_count) {
         // Convert delete to insert
-        do_insert(change->buf, change->del_count);
+        do_insert(view, change->buf, change->del_count);
         if (change->move_after) {
             block_iter_skip_bytes(&view->cursor, change->del_count);
         }
@@ -188,14 +188,14 @@ static void reverse_change(Change *change)
         // Reverse replace
         size_t del_count = change->ins_count;
         size_t ins_count = change->del_count;
-        char *buf = do_replace(del_count, change->buf, ins_count);
+        char *buf = do_replace(view, del_count, change->buf, ins_count);
         free(change->buf);
         change->buf = buf;
         change->ins_count = ins_count;
         change->del_count = del_count;
     } else {
         // Convert insert to delete
-        change->buf = do_delete(change->ins_count, true);
+        change->buf = do_delete(view, change->ins_count, true);
         change->del_count = change->ins_count;
         change->ins_count = 0;
     }
@@ -313,11 +313,11 @@ void buffer_insert_bytes(const char *buf, const size_t len)
     size_t rec_len = len;
     if (buf[len - 1] != '\n' && block_iter_is_eof(&view->cursor)) {
         // Force newline at EOF
-        do_insert("\n", 1);
+        do_insert(view, "\n", 1);
         rec_len++;
     }
 
-    do_insert(buf, len);
+    do_insert(view, buf, len);
     record_insert(rec_len);
 
     if (buffer->views.count > 1) {
@@ -365,7 +365,7 @@ static void buffer_delete_bytes_internal(size_t len, bool move_after)
             }
         }
     }
-    record_delete(do_delete(len, true), len, move_after);
+    record_delete(do_delete(view, len, true), len, move_after);
 
     if (buffer->views.count > 1) {
         fix_cursors(block_iter_get_offset(&view->cursor), len, 0);
@@ -405,7 +405,7 @@ void buffer_replace_bytes(size_t del_count, const char *ins, size_t ins_count)
         }
     }
 
-    char *deleted = do_replace(del_count, ins, ins_count);
+    char *deleted = do_replace(view, del_count, ins, ins_count);
     record_replace(deleted, del_count, ins_count);
 
     if (buffer->views.count > 1) {

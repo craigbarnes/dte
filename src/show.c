@@ -46,7 +46,7 @@ static void open_temporary_buffer (
 ) {
     View *v = window_open_new_file(window);
     v->buffer->temporary = true;
-    do_insert(text, text_len);
+    do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
     if (dterc_syntax) {
