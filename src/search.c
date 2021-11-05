@@ -10,7 +10,7 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
-static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
+static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
 {
     int flags = block_iter_is_bol(bi) ? 0 : REG_NOTBOL;
 
@@ -37,7 +37,7 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
                     count = 1;
                 }
                 block_iter_skip_bytes(bi, (size_t)count);
-                return do_search_fwd(regex, bi, false);
+                return do_search_fwd(view, regex, bi, false);
             }
 
             block_iter_skip_bytes(bi, match.rm_so);
@@ -54,7 +54,7 @@ static bool do_search_fwd(regex_t *regex, BlockIter *bi, bool skip)
     return false;
 }
 
-static bool do_search_bwd(regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
+static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
 {
     if (block_iter_is_eof(bi)) {
         goto next;
@@ -109,7 +109,7 @@ static bool do_search_bwd(regex_t *regex, BlockIter *bi, ssize_t cx, bool skip)
     return false;
 }
 
-bool search_tag(const char *pattern, bool *err)
+bool search_tag(View *view, const char *pattern, bool *err)
 {
     regex_t regex;
     bool found = false;
@@ -118,8 +118,8 @@ bool search_tag(const char *pattern, bool *err)
         return found;
     }
 
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
-    if (do_search_fwd(&regex, &bi, false)) {
+    BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
+    if (do_search_fwd(view, &regex, &bi, false)) {
         view->center_on_scroll = true;
         found = true;
     } else {
@@ -192,7 +192,7 @@ void search_set_regexp(const char *pattern)
     search->pattern = xstrdup(pattern);
 }
 
-static void do_search_next(bool skip)
+static void do_search_next(View *view, bool skip)
 {
     SearchState *search = &editor.search;
     if (!search->pattern) {
@@ -205,24 +205,24 @@ static void do_search_next(bool skip)
 
     BlockIter bi = view->cursor;
     if (search->direction == SEARCH_FWD) {
-        if (do_search_fwd(&search->regex, &bi, true)) {
+        if (do_search_fwd(view, &search->regex, &bi, true)) {
             return;
         }
 
         block_iter_bof(&bi);
-        if (do_search_fwd(&search->regex, &bi, false)) {
+        if (do_search_fwd(view, &search->regex, &bi, false)) {
             info_msg("Continuing at top");
         } else {
             error_msg("Pattern '%s' not found", search->pattern);
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
-        if (do_search_bwd(&search->regex, &bi, cursor_x, skip)) {
+        if (do_search_bwd(view, &search->regex, &bi, cursor_x, skip)) {
             return;
         }
 
         block_iter_eof(&bi);
-        if (do_search_bwd(&search->regex, &bi, -1, false)) {
+        if (do_search_bwd(view, &search->regex, &bi, -1, false)) {
             info_msg("Continuing at bottom");
         } else {
             error_msg("Pattern '%s' not found", search->pattern);
@@ -230,22 +230,22 @@ static void do_search_next(bool skip)
     }
 }
 
-void search_prev(void)
+void search_prev(View *view)
 {
     SearchDirection *dir = &editor.search.direction;
     toggle_search_direction(dir);
-    search_next();
+    search_next(view);
     toggle_search_direction(dir);
 }
 
-void search_next(void)
+void search_next(View *view)
 {
-    do_search_next(false);
+    do_search_next(view, false);
 }
 
-void search_next_word(void)
+void search_next_word(View *view)
 {
-    do_search_next(true);
+    do_search_next(view, true);
 }
 
 static void build_replacement (
@@ -287,6 +287,7 @@ static void build_replacement (
  * "foo x bar abc baz"   " bar abc baz"
  */
 static unsigned int replace_on_line (
+    View *view,
     StringView *line,
     regex_t *re,
     const char *format,
@@ -348,7 +349,7 @@ static unsigned int replace_on_line (
                 buf = xmemdup(buf, line->length);
             }
 
-            buffer_replace_bytes(match_len, b.buffer, b.len);
+            buffer_replace_bytes(view, match_len, b.buffer, b.len);
             nr++;
 
             // Update selection length
@@ -384,7 +385,7 @@ out:
     return nr;
 }
 
-void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
+void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
     if (unlikely(pattern[0] == '\0')) {
         error_msg("Search pattern must contain at least 1 character");
@@ -400,7 +401,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
         return;
     }
 
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
     size_t nr_bytes;
     bool swapped = false;
     if (view->selection) {
@@ -436,7 +437,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(&line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(view, &line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;
@@ -451,7 +452,7 @@ void reg_replace(const char *pattern, const char *format, ReplaceFlags flags)
     }
 
     if (!(flags & REPLACE_CONFIRM)) {
-        end_change_chain();
+        end_change_chain(view);
     }
 
     regfree(&re);

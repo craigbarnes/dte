@@ -144,15 +144,17 @@ static void test_detect_indent(void)
         false
     );
 
-    EXPECT_EQ(buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
-    EXPECT_TRUE(buffer->options.expand_tab);
-    EXPECT_EQ(buffer->options.indent_width, 2);
+    EXPECT_EQ(editor.buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
+    EXPECT_TRUE(editor.buffer->options.expand_tab);
+    EXPECT_EQ(editor.buffer->options.indent_width, 2);
 
     handle_command(&normal_commands, "close", false);
 }
 
 static void test_global_state(void)
 {
+    const Buffer *buffer = editor.buffer;
+    const View *view = editor.view;
     ASSERT_NONNULL(window);
     ASSERT_NONNULL(root_frame);
     ASSERT_NONNULL(buffer);
@@ -198,11 +200,11 @@ static void test_macro_record(void)
     handle_command(cmds, "eol; right; insert -m .; new-line", true);
 
     const StringView t1 = STRING_VIEW("test 1\n");
-    insert_text(t1.data, t1.length, true);
+    insert_text(editor.view, t1.data, t1.length, true);
     macro_insert_text_hook(t1.data, t1.length);
 
     const StringView t2 = STRING_VIEW("-- test 2");
-    insert_text(t2.data, t2.length, true);
+    insert_text(editor.view, t2.data, t2.length, true);
     macro_insert_text_hook(t2.data, t2.length);
 
     EXPECT_TRUE(macro_is_recording());

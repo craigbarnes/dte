@@ -6,16 +6,16 @@
 #include "block-iter.h"
 #include "view.h"
 
-void move_to_preferred_x(long preferred_x);
-void move_cursor_left(void);
-void move_cursor_right(void);
-void move_bol(void);
-void move_bol_smart(void);
-void move_eol(void);
-void move_up(long count);
-void move_down(long count);
-void move_bof(void);
-void move_eof(void);
+void move_to_preferred_x(View *view, long preferred_x);
+void move_cursor_left(View *view);
+void move_cursor_right(View *view);
+void move_bol(View *view);
+void move_bol_smart(View *view);
+void move_eol(View *view);
+void move_up(View *view, long count);
+void move_down(View *view, long count);
+void move_bof(View *view);
+void move_eof(View *view);
 void move_to_line(View *v, size_t line);
 void move_to_column(View *v, size_t column);
 

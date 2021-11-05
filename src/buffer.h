@@ -67,10 +67,6 @@ typedef struct Buffer {
     long changed_line_max;
 } Buffer;
 
-// buffer = view->buffer = window->view->buffer
-extern struct View *view;
-extern Buffer *buffer;
-
 static inline void mark_all_lines_changed(Buffer *b)
 {
     b->changed_line_min = 0;

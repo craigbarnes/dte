@@ -169,7 +169,7 @@ static void show_include(const char *name, bool cflag)
 
     const StringView sv = cfg->text;
     if (cflag) {
-        buffer_insert_bytes(sv.data, sv.length);
+        buffer_insert_bytes(editor.view, sv.data, sv.length);
     } else {
         open_temporary_buffer(sv.data, sv.length, "builtin", name, true);
     }
@@ -185,7 +185,7 @@ static void show_compiler(const char *name, bool cflag)
 
     String str = dump_compiler(compiler, name);
     if (cflag) {
-        buffer_insert_bytes(str.buffer, str.len);
+        buffer_insert_bytes(editor.view, str.buffer, str.len);
     } else {
         open_temporary_buffer(str.buffer, str.len, "errorfmt", name, true);
     }

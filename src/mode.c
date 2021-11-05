@@ -20,14 +20,14 @@ static void normal_mode_keypress(KeyCode key)
 {
     switch (key) {
     case KEY_TAB:
-        if (view->selection == SELECT_LINES) {
-            shift_lines(1);
+        if (editor.view->selection == SELECT_LINES) {
+            shift_lines(editor.view, 1);
             return;
         }
         break;
     case MOD_SHIFT | KEY_TAB:
-        if (view->selection == SELECT_LINES) {
-            shift_lines(-1);
+        if (editor.view->selection == SELECT_LINES) {
+            shift_lines(editor.view, -1);
             return;
         }
         break;
@@ -35,7 +35,7 @@ static void normal_mode_keypress(KeyCode key)
         size_t size;
         char *text = term_read_paste(&size);
         begin_change(CHANGE_MERGE_NONE);
-        insert_text(text, size, true);
+        insert_text(editor.view, text, size, true);
         end_change();
         macro_insert_text_hook(text, size);
         free(text);
@@ -44,7 +44,7 @@ static void normal_mode_keypress(KeyCode key)
     }
 
     if (u_is_unicode(key)) {
-        insert_ch(key);
+        insert_ch(editor.view, key);
         macro_insert_char_hook(key);
     } else {
         handle_binding(INPUT_NORMAL, key);
@@ -133,7 +133,7 @@ static void search_mode_keypress(KeyCode key)
         } else {
             args[0] = "-n";
         }
-        search_next();
+        search_next(editor.view);
         macro_command_hook("search", (char**)args);
         cmdline_clear(c);
         set_input_mode(INPUT_NORMAL);

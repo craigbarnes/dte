@@ -53,12 +53,12 @@
 #include "view.h"
 #include "window.h"
 
-static void do_selection(SelectionType sel)
+static void do_selection(View *view, SelectionType sel)
 {
     if (sel == SELECT_NONE) {
         if (view->next_movement_cancels_selection) {
             view->next_movement_cancels_selection = false;
-            unselect();
+            unselect(view);
         }
         return;
     }
@@ -67,7 +67,7 @@ static void do_selection(SelectionType sel)
 
     if (view->selection) {
         view->selection = sel;
-        mark_all_lines_changed(buffer);
+        mark_all_lines_changed(view->buffer);
         return;
     }
 
@@ -78,7 +78,7 @@ static void do_selection(SelectionType sel)
     // Need to mark current line changed because cursor might
     // move up or down before screen is updated
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(buffer, view->cy, view->cy);
+    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
 }
 
 static char last_flag_or_default(const CommandArgs *a, char def)
@@ -99,7 +99,7 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
 
 static void handle_select_chars_flag(const CommandArgs *a)
 {
-    do_selection(has_flag(a, 'c') ? SELECT_CHARS : SELECT_NONE);
+    do_selection(editor.view, has_flag(a, 'c') ? SELECT_CHARS : SELECT_NONE);
 }
 
 static void handle_select_chars_or_lines_flags(const CommandArgs *a)
@@ -110,7 +110,7 @@ static void handle_select_chars_or_lines_flags(const CommandArgs *a)
     } else if (has_flag(a, 'c')) {
         sel = SELECT_CHARS;
     }
-    do_selection(sel);
+    do_selection(editor.view, sel);
 }
 
 static void cmd_alias(const CommandArgs *a)
@@ -179,27 +179,28 @@ static void cmd_bind(const CommandArgs *a)
 
 static void cmd_bof(const CommandArgs* UNUSED_ARG(a))
 {
-    do_selection(SELECT_NONE);
-    move_bof();
+    do_selection(editor.view, SELECT_NONE);
+    move_bof(editor.view);
 }
 
 static void cmd_bol(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
     if (has_flag(a, 's')) {
-        move_bol_smart();
+        move_bol_smart(editor.view);
     } else {
-        move_bol();
+        move_bol(editor.view);
     }
 }
 
 static void cmd_bolsf(const CommandArgs* UNUSED_ARG(a))
 {
-    do_selection(SELECT_NONE);
+    View *view = editor.view;
+    do_selection(view, SELECT_NONE);
     if (!block_iter_bol(&view->cursor)) {
         long top = view->vy + window_get_scroll_margin(window);
         if (view->cy > top) {
-            move_up(view->cy - top);
+            move_up(view, view->cy - top);
         } else {
             block_iter_bof(&view->cursor);
         }
@@ -214,12 +215,12 @@ static void cmd_bookmark(const CommandArgs *a)
         return;
     }
 
-    push_file_location(get_current_file_location());
+    push_file_location(get_current_file_location(editor.view));
 }
 
 static void cmd_case(const CommandArgs *a)
 {
-    change_case(last_flag_or_default(a, 't'));
+    change_case(editor.view, last_flag_or_default(a, 't'));
 }
 
 static void cmd_cd(const CommandArgs *a)
@@ -261,12 +262,12 @@ static void cmd_cd(const CommandArgs *a)
 
 static void cmd_center_view(const CommandArgs* UNUSED_ARG(a))
 {
-    view->force_center = true;
+    editor.view->force_center = true;
 }
 
 static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
 {
-    clear_lines();
+    clear_lines(editor.view);
 }
 
 static void cmd_close(const CommandArgs *a)
@@ -276,7 +277,7 @@ static void cmd_close(const CommandArgs *a)
     bool allow_quit = has_flag(a, 'q');
     bool allow_wclose = has_flag(a, 'w');
 
-    if (!view_can_close(view) && !force) {
+    if (!view_can_close(editor.view) && !force) {
         if (prompt) {
             if (dialog_prompt("Close without saving changes? [y/N]", "ny") != 'y') {
                 return;
@@ -332,12 +333,13 @@ static void cmd_compile(const CommandArgs *a)
     clear_messages();
     spawn_compiler(a->args + 1, flags, c);
     if (message_count()) {
-        activate_current_message_save();
+        activate_current_message_save(editor.view);
     }
 }
 
 static void cmd_copy(const CommandArgs *a)
 {
+    View *view = editor.view;
     const BlockIter save = view->cursor;
     size_t size;
     bool line_copy;
@@ -363,7 +365,7 @@ static void cmd_copy(const CommandArgs *a)
     }
 
     if (internal) {
-        copy(size, line_copy);
+        copy(view, size, line_copy);
     }
 
     if ((clipboard || primary) && terminal.osc52_copy) {
@@ -381,7 +383,7 @@ static void cmd_copy(const CommandArgs *a)
     }
 
     if (!has_flag(a, 'k')) {
-        unselect();
+        unselect(view);
     }
 
     view->cursor = save;
@@ -389,29 +391,31 @@ static void cmd_copy(const CommandArgs *a)
 
 static void cmd_cut(const CommandArgs* UNUSED_ARG(a))
 {
+    View *view = editor.view;
     const long x = view_get_preferred_x(view);
     if (view->selection) {
-        cut(prepare_selection(view), view->selection == SELECT_LINES);
+        cut(view, prepare_selection(view), view->selection == SELECT_LINES);
         if (view->selection == SELECT_LINES) {
-            move_to_preferred_x(x);
+            move_to_preferred_x(view, x);
         }
-        unselect();
+        unselect(view);
     } else {
         BlockIter tmp;
         block_iter_bol(&view->cursor);
         tmp = view->cursor;
-        cut(block_iter_eat_line(&tmp), true);
-        move_to_preferred_x(x);
+        cut(view, block_iter_eat_line(&tmp), true);
+        move_to_preferred_x(view, x);
     }
 }
 
 static void cmd_delete(const CommandArgs* UNUSED_ARG(a))
 {
-    delete_ch();
+    delete_ch(editor.view);
 }
 
 static void cmd_delete_eol(const CommandArgs *a)
 {
+    View *view = editor.view;
     if (view->selection) {
         return;
     }
@@ -421,51 +425,52 @@ static void cmd_delete_eol(const CommandArgs *a)
     if (delete_newline_if_at_eol) {
         CodePoint ch;
         if (block_iter_get_char(&view->cursor, &ch) == 1 && ch == '\n') {
-            delete_ch();
+            delete_ch(view);
             return;
         }
     }
 
-    buffer_delete_bytes(block_iter_eol(&bi));
+    buffer_delete_bytes(view, block_iter_eol(&bi));
 }
 
 static void cmd_delete_line(const CommandArgs* UNUSED_ARG(a))
 {
-    delete_lines();
+    delete_lines(editor.view);
 }
 
 static void cmd_delete_word(const CommandArgs *a)
 {
     bool skip_non_word = has_flag(a, 's');
-    BlockIter bi = view->cursor;
-    buffer_delete_bytes(word_fwd(&bi, skip_non_word));
+    BlockIter bi = editor.view->cursor;
+    buffer_delete_bytes(editor.view, word_fwd(&bi, skip_non_word));
 }
 
 static void cmd_down(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a);
-    move_down(1);
+    move_down(editor.view, 1);
 }
 
 static void cmd_eof(const CommandArgs* UNUSED_ARG(a))
 {
-    do_selection(SELECT_NONE);
-    move_eof();
+    do_selection(editor.view, SELECT_NONE);
+    move_eof(editor.view);
 }
 
 static void cmd_eol(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
-    move_eol();
+    move_eol(editor.view);
 }
 
 static void cmd_eolsf(const CommandArgs* UNUSED_ARG(a))
 {
-    do_selection(SELECT_NONE);
+    View *view = editor.view;
+    do_selection(view, SELECT_NONE);
     if (!block_iter_eol(&view->cursor)) {
         long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
         if (view->cy < bottom) {
-            move_down(bottom - view->cy);
+            move_down(view, bottom - view->cy);
         } else {
             block_iter_eof(&view->cursor);
         }
@@ -475,18 +480,19 @@ static void cmd_eolsf(const CommandArgs* UNUSED_ARG(a))
 
 static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
 {
-    erase();
+    erase(editor.view);
 }
 
 static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
 {
-    buffer_erase_bytes(block_iter_bol(&view->cursor));
+    buffer_erase_bytes(editor.view, block_iter_bol(&editor.view->cursor));
 }
 
 static void cmd_erase_word(const CommandArgs *a)
 {
+    View *view = editor.view;
     bool skip_non_word = has_flag(a, 's');
-    buffer_erase_bytes(word_bwd(&view->cursor, skip_non_word));
+    buffer_erase_bytes(view, word_bwd(&view->cursor, skip_non_word));
 }
 
 static void cmd_errorfmt(const CommandArgs *a)
@@ -607,6 +613,7 @@ static const char **lines_and_columns_env(void)
 
 static void cmd_filter(const CommandArgs *a)
 {
+    View *view = editor.view;
     BlockIter save = view->cursor;
     SpawnContext ctx = {
         .argv = a->args,
@@ -620,15 +627,15 @@ static void cmd_filter(const CommandArgs *a)
         ctx.input.length = prepare_selection(view);
     } else if (has_flag(a, 'l')) {
         StringView line;
-        move_bol();
+        move_bol(view);
         fill_line_ref(&view->cursor, &line);
         ctx.input.length = line.length;
     } else {
         Block *blk;
-        block_for_each(blk, &buffer->blocks) {
+        block_for_each(blk, &view->buffer->blocks) {
             ctx.input.length += blk->size;
         }
-        move_bof();
+        move_bof(view);
     }
 
     char *input = block_iter_get_bytes(&view->cursor, ctx.input.length);
@@ -640,9 +647,9 @@ static void cmd_filter(const CommandArgs *a)
     }
 
     free(input);
-    buffer_replace_bytes(ctx.input.length, ctx.output.buffer, ctx.output.len);
+    buffer_replace_bytes(view, ctx.input.length, ctx.output.buffer, ctx.output.len);
     string_free(&ctx.output);
-    unselect();
+    unselect(view);
 }
 
 static void cmd_ft(const CommandArgs *a)
@@ -733,28 +740,29 @@ static void cmd_insert(const CommandArgs *a)
     const char *str = a->args[0];
     if (has_flag(a, 'k')) {
         for (size_t i = 0; str[i]; i++) {
-            insert_ch(str[i]);
+            insert_ch(editor.view, str[i]);
         }
         return;
     }
 
     bool move_after = has_flag(a, 'm');
-    insert_text(str, strlen(str), move_after);
+    insert_text(editor.view, str, strlen(str), move_after);
 }
 
 static void cmd_join(const CommandArgs* UNUSED_ARG(a))
 {
-    join_lines();
+    join_lines(editor.view);
 }
 
 static void cmd_left(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
-    move_cursor_left();
+    move_cursor_left(editor.view);
 }
 
 static void cmd_line(const CommandArgs *a)
 {
+    View *view = editor.view;
     const char *arg = a->args[0];
     const long x = view_get_preferred_x(view);
     size_t line;
@@ -763,9 +771,9 @@ static void cmd_line(const CommandArgs *a)
         return;
     }
 
-    do_selection(SELECT_NONE);
+    do_selection(view, SELECT_NONE);
     move_to_line(view, line);
-    move_to_preferred_x(x);
+    move_to_preferred_x(view, x);
 }
 
 static void cmd_load_syntax(const CommandArgs *a)
@@ -815,6 +823,7 @@ static void cmd_macro(const CommandArgs *a)
 
 static void cmd_match_bracket(const CommandArgs* UNUSED_ARG(a))
 {
+    View *view = editor.view;
     CodePoint cursor_char;
     if (!block_iter_get_char(&view->cursor, &cursor_char)) {
         error_msg("No character under cursor");
@@ -886,7 +895,7 @@ static void cmd_move_tab(const CommandArgs *a)
 {
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
-    size_t to, from = ptr_array_idx(&window->views, view);
+    size_t to, from = ptr_array_idx(&window->views, editor.view);
     BUG_ON(from >= ntabs);
     if (streq(str, "left")) {
         to = (from ? from : ntabs) - 1;
@@ -942,12 +951,12 @@ static void cmd_msg(const CommandArgs *a)
 
 static void cmd_new_line(const CommandArgs* UNUSED_ARG(a))
 {
-    new_line();
+    new_line(editor.view);
 }
 
 static void cmd_next(const CommandArgs* UNUSED_ARG(a))
 {
-    size_t i = ptr_array_idx(&window->views, view);
+    size_t i = ptr_array_idx(&window->views, editor.view);
     size_t n = window->views.count;
     BUG_ON(i >= n);
     set_view(window->views.ptrs[(i + 1) % n]);
@@ -1079,6 +1088,7 @@ static void cmd_blkdown(const CommandArgs *a)
     handle_select_chars_or_lines_flags(a);
 
     // If current line is blank, skip past consecutive blank lines
+    View *view = editor.view;
     StringView line;
     fetch_this_line(&view->cursor, &line);
     if (strview_isblank(&line)) {
@@ -1112,6 +1122,7 @@ static void cmd_blkup(const CommandArgs *a)
     handle_select_chars_or_lines_flags(a);
 
     // If cursor is on the first line, just move to bol
+    View *view = editor.view;
     if (view->cy == 0) {
         block_iter_bol(&view->cursor);
         return;
@@ -1141,13 +1152,14 @@ static void cmd_blkup(const CommandArgs *a)
 static void cmd_paste(const CommandArgs *a)
 {
     bool at_cursor = has_flag(a, 'c');
-    paste(at_cursor);
+    paste(editor.view, at_cursor);
 }
 
 static void cmd_pgdown(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a);
 
+    View *view = editor.view;
     long margin = window_get_scroll_margin(window);
     long bottom = view->vy + window->edit_h - 1 - margin;
     long count;
@@ -1157,13 +1169,14 @@ static void cmd_pgdown(const CommandArgs *a)
     } else {
         count = window->edit_h - 1 - margin * 2;
     }
-    move_down(count);
+    move_down(view, count);
 }
 
 static void cmd_pgup(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a);
 
+    View *view = editor.view;
     long margin = window_get_scroll_margin(window);
     long top = view->vy + margin;
     long count;
@@ -1173,7 +1186,7 @@ static void cmd_pgup(const CommandArgs *a)
     } else {
         count = window->edit_h - 1 - margin * 2;
     }
-    move_up(count);
+    move_up(view, count);
 }
 
 static void cmd_pipe_from(const CommandArgs *a)
@@ -1188,10 +1201,11 @@ static void cmd_pipe_from(const CommandArgs *a)
         return;
     }
 
+    View *view = editor.view;
     size_t del_len = 0;
     if (view->selection) {
         del_len = prepare_selection(view);
-        unselect();
+        unselect(view);
     }
 
     bool strip_nl = has_flag(a, 's');
@@ -1206,7 +1220,7 @@ static void cmd_pipe_from(const CommandArgs *a)
         }
     }
 
-    buffer_replace_bytes(del_len, ctx.output.buffer, ins_len);
+    buffer_replace_bytes(view, del_len, ctx.output.buffer, ins_len);
     string_free(&ctx.output);
 
     if (move) {
@@ -1216,6 +1230,7 @@ static void cmd_pipe_from(const CommandArgs *a)
 
 static void cmd_pipe_to(const CommandArgs *a)
 {
+    View *view = editor.view;
     const BlockIter saved_cursor = view->cursor;
     const ssize_t saved_sel_so = view->sel_so;
     const ssize_t saved_sel_eo = view->sel_eo;
@@ -1225,15 +1240,15 @@ static void cmd_pipe_to(const CommandArgs *a)
         input_len = prepare_selection(view);
     } else if (has_flag(a, 'l')) {
         StringView line;
-        move_bol();
+        move_bol(view);
         fill_line_ref(&view->cursor, &line);
         input_len = line.length;
     } else {
         Block *blk;
-        block_for_each(blk, &buffer->blocks) {
+        block_for_each(blk, &view->buffer->blocks) {
             input_len += blk->size;
         }
-        move_bof();
+        move_bof(view);
     }
 
     char *input = block_iter_get_bytes(&view->cursor, input_len);
@@ -1253,7 +1268,7 @@ static void cmd_pipe_to(const CommandArgs *a)
 
 static void cmd_prev(const CommandArgs* UNUSED_ARG(a))
 {
-    size_t i = ptr_array_idx(&window->views, view);
+    size_t i = ptr_array_idx(&window->views, editor.view);
     size_t n = window->views.count;
     BUG_ON(i >= n);
     set_view(window->views.ptrs[(i ? i : n) - 1]);
@@ -1320,8 +1335,8 @@ static void cmd_redo(const CommandArgs *a)
             return;
         }
     }
-    if (redo(change_id)) {
-        unselect();
+    if (redo(editor.view, change_id)) {
+        unselect(editor.view);
     }
 }
 
@@ -1385,7 +1400,7 @@ static void repeat_insert(const char *str, unsigned int count, bool move_after)
     );
 
 insert:
-    insert_text(buf, bufsize, move_after);
+    insert_text(editor.view, buf, bufsize, move_after);
     free(buf);
 }
 
@@ -1435,13 +1450,13 @@ static void cmd_replace(const CommandArgs *a)
     };
 
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
-    reg_replace(a->args[0], a->args[1], flags);
+    reg_replace(editor.view, a->args[0], a->args[1], flags);
 }
 
 static void cmd_right(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
-    move_cursor_right();
+    move_cursor_right(editor.view);
 }
 
 static void cmd_run(const CommandArgs *a)
@@ -1468,6 +1483,7 @@ static bool stat_changed(const Buffer *b, const struct stat *st)
 
 static void cmd_save(const CommandArgs *a)
 {
+    Buffer *buffer = editor.buffer;
     if (unlikely(buffer->stdout_buffer)) {
         const char *f = buffer_filename(buffer);
         info_msg("%s can't be saved; it will be piped to stdout on exit", f);
@@ -1699,48 +1715,52 @@ error:
 
 static void cmd_scroll_down(const CommandArgs* UNUSED_ARG(a))
 {
+    View *view = editor.view;
     view->vy++;
     if (view->cy < view->vy) {
-        move_down(1);
+        move_down(view, 1);
     }
 }
 
 static void cmd_scroll_pgdown(const CommandArgs* UNUSED_ARG(a))
 {
-    long max = buffer->nl - window->edit_h + 1;
+    View *view = editor.view;
+    long max = view->buffer->nl - window->edit_h + 1;
     if (view->vy < max && max > 0) {
         long count = window->edit_h - 1;
         if (view->vy + count > max) {
             count = max - view->vy;
         }
         view->vy += count;
-        move_down(count);
-    } else if (view->cy < buffer->nl) {
-        move_down(buffer->nl - view->cy);
+        move_down(view, count);
+    } else if (view->cy < view->buffer->nl) {
+        move_down(view, view->buffer->nl - view->cy);
     }
 }
 
 static void cmd_scroll_pgup(const CommandArgs* UNUSED_ARG(a))
 {
+    View *view = editor.view;
     if (view->vy > 0) {
         long count = window->edit_h - 1;
         if (count > view->vy) {
             count = view->vy;
         }
         view->vy -= count;
-        move_up(count);
+        move_up(view, count);
     } else if (view->cy > 0) {
-        move_up(view->cy);
+        move_up(view, view->cy);
     }
 }
 
 static void cmd_scroll_up(const CommandArgs* UNUSED_ARG(a))
 {
+    View *view = editor.view;
     if (view->vy) {
         view->vy--;
     }
     if (view->vy + window->edit_h <= view->cy) {
-        move_up(1);
+        move_up(view, 1);
     }
 }
 
@@ -1762,6 +1782,7 @@ static void cmd_search(const CommandArgs *a)
         return;
     }
 
+    View *view = editor.view;
     char pattbuf[4096];
     if (w) {
         StringView word = view_get_word_under_cursor(view);
@@ -1781,23 +1802,23 @@ static void cmd_search(const CommandArgs *a)
         pattern = pattbuf;
     }
 
-    do_selection(SELECT_NONE);
+    do_selection(view, SELECT_NONE);
 
     if (pattern) {
         editor.search.direction = direction;
         search_set_regexp(pattern);
         if (w) {
-            search_next_word();
+            search_next_word(view);
         } else {
-            search_next();
+            search_next(view);
         }
         if (history) {
             history_add(&editor.search_history, pattern);
         }
     } else if (next) {
-        search_next();
+        search_next(view);
     } else if (prev) {
-        search_prev();
+        search_prev(view);
     } else {
         set_input_mode(INPUT_SEARCH);
         editor.search.direction = direction;
@@ -1809,20 +1830,21 @@ static void cmd_select(const CommandArgs *a)
     SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
     bool block = has_flag(a, 'b');
     bool keep = has_flag(a, 'k');
+    View *view = editor.view;
     view->next_movement_cancels_selection = false;
 
     if (block) {
-        select_block();
+        select_block(view);
         return;
     }
 
     if (view->selection) {
         if (!keep && view->selection == sel) {
-            unselect();
+            unselect(view);
             return;
         }
         view->selection = sel;
-        mark_all_lines_changed(buffer);
+        mark_all_lines_changed(view->buffer);
         return;
     }
 
@@ -1833,14 +1855,14 @@ static void cmd_select(const CommandArgs *a)
     // Need to mark current line changed because cursor might
     // move up or down before screen is updated
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(buffer, view->cy, view->cy);
+    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
 }
 
 static void cmd_set(const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool local = has_flag(a, 'l');
-    if (!buffer) {
+    if (!editor.buffer) {
         if (unlikely(local)) {
             error_msg("Flag -l makes no sense in config file");
             return;
@@ -1901,7 +1923,7 @@ static void cmd_shift(const CommandArgs *a)
         error_msg("Count must be non-zero");
         return;
     }
-    shift_lines(count);
+    shift_lines(editor.view, count);
 }
 
 static void cmd_show(const CommandArgs *a)
@@ -1951,7 +1973,7 @@ static void cmd_tag(const CommandArgs *a)
     const char *name = a->args[0];
     char *word = NULL;
     if (!name) {
-        StringView w = view_get_word_under_cursor(view);
+        StringView w = view_get_word_under_cursor(editor.view);
         if (w.length == 0) {
             return;
         }
@@ -1961,7 +1983,7 @@ static void cmd_tag(const CommandArgs *a)
 
     PointerArray tags = PTR_ARRAY_INIT;
     // Filename helps to find correct tags
-    tag_file_find_tags(tf, buffer->abs_filename, name, &tags);
+    tag_file_find_tags(tf, editor.buffer->abs_filename, name, &tags);
     if (tags.count == 0) {
         error_msg("Tag '%s' not found", name);
         free(word);
@@ -1986,11 +2008,12 @@ static void cmd_tag(const CommandArgs *a)
 
     free(word);
     free_tags(&tags);
-    activate_current_message_save();
+    activate_current_message_save(editor.view);
 }
 
 static void cmd_title(const CommandArgs *a)
 {
+    Buffer *buffer = editor.buffer;
     if (buffer->abs_filename) {
         error_msg("saved buffers can't be retitled");
         return;
@@ -2015,20 +2038,20 @@ static void cmd_toggle(const CommandArgs *a)
 
 static void cmd_undo(const CommandArgs* UNUSED_ARG(a))
 {
-    if (undo()) {
-        unselect();
+    if (undo(editor.view)) {
+        unselect(editor.view);
     }
 }
 
 static void cmd_unselect(const CommandArgs* UNUSED_ARG(a))
 {
-    unselect();
+    unselect(editor.view);
 }
 
 static void cmd_up(const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(a);
-    move_up(1);
+    move_up(editor.view, 1);
 }
 
 static void cmd_view(const CommandArgs *a)
@@ -2095,16 +2118,16 @@ static void cmd_word_bwd(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
     bool skip_non_word = has_flag(a, 's');
-    word_bwd(&view->cursor, skip_non_word);
-    view_reset_preferred_x(view);
+    word_bwd(&editor.view->cursor, skip_non_word);
+    view_reset_preferred_x(editor.view);
 }
 
 static void cmd_word_fwd(const CommandArgs *a)
 {
     handle_select_chars_flag(a);
     bool skip_non_word = has_flag(a, 's');
-    word_fwd(&view->cursor, skip_non_word);
-    view_reset_preferred_x(view);
+    word_fwd(&editor.view->cursor, skip_non_word);
+    view_reset_preferred_x(editor.view);
 }
 
 static void cmd_wprev(const CommandArgs* UNUSED_ARG(a))
@@ -2118,14 +2141,14 @@ static void cmd_wprev(const CommandArgs* UNUSED_ARG(a))
 static void cmd_wrap_paragraph(const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    unsigned int width = buffer->options.text_width;
+    unsigned int width = editor.buffer->options.text_width;
     if (arg) {
         if (!str_to_uint(arg, &width) || width < 1 || width > TEXT_WIDTH_MAX) {
             error_msg("invalid paragraph width: %s", arg);
             return;
         }
     }
-    format_paragraph(width);
+    format_paragraph(editor.view, width);
 }
 
 static void cmd_wresize(const CommandArgs *a)
@@ -2194,15 +2217,15 @@ static void cmd_wsplit(const CommandArgs *a)
         f = split_frame(window, vertical, before);
     }
 
-    View *save = view;
+    View *save = editor.view;
     window = f->window;
-    view = NULL;
-    buffer = NULL;
+    editor.view = NULL;
+    editor.buffer = NULL;
     mark_everything_changed();
 
     if (empty) {
         window_open_new_file(window);
-        buffer->temporary = temporary;
+        editor.buffer->temporary = temporary;
     } else if (paths[0]) {
         window_open_files(window, paths, NULL);
     } else {
@@ -2218,9 +2241,9 @@ static void cmd_wsplit(const CommandArgs *a)
     if (window->views.count == 0) {
         // Open failed, remove new window
         remove_frame(window->frame);
-        view = save;
-        buffer = view->buffer;
-        window = view->window;
+        editor.view = save;
+        editor.buffer = save->buffer;
+        window = save->window;
     }
 
     debug_frames();

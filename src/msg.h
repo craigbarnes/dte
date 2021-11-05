@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include "util/macros.h"
 #include "util/string.h"
+#include "view.h"
 
 typedef struct {
     // Needed after buffer is closed
@@ -23,7 +24,7 @@ typedef struct {
     FileLocation *loc;
 } Message;
 
-FileLocation *get_current_file_location(void) RETURNS_NONNULL;
+FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
 void file_location_free(FileLocation *loc);
 void push_file_location(FileLocation *loc);
 void pop_file_location(void);
@@ -34,7 +35,7 @@ void activate_message(size_t idx);
 void activate_current_message(void);
 void activate_next_message(void);
 void activate_prev_message(void);
-void activate_current_message_save(void);
+void activate_current_message_save(const View *view) NONNULL_ARGS;
 void clear_messages(void);
 size_t message_count(void) PURE;
 String dump_messages(void);

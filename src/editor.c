@@ -39,6 +39,8 @@ EditorState editor = {
     .resized = false,
     .exit_code = EX_OK,
     .buffers = PTR_ARRAY_INIT,
+    .buffer = NULL,
+    .view = NULL,
     .version = version,
     .file_locks_mode = 0666,
     .cmdline_x = 0,
@@ -192,6 +194,7 @@ static void update_window_full(Window *w, void *ud)
 
 static void restore_cursor(TermOutputBuffer *obuf)
 {
+    const View *view = editor.view;
     switch (editor.input_mode) {
     case INPUT_NORMAL:
         term_move_cursor (
@@ -225,8 +228,8 @@ static void end_update(void)
     term_show_cursor(&editor.obuf);
     term_output_flush(&editor.obuf);
 
-    buffer->changed_line_min = LONG_MAX;
-    buffer->changed_line_max = -1;
+    editor.buffer->changed_line_min = LONG_MAX;
+    editor.buffer->changed_line_max = -1;
     for_each_window(clear_update_tabbar);
 }
 
@@ -287,7 +290,7 @@ static void update_buffer_windows(const Buffer *b)
 void normal_update(void)
 {
     start_update();
-    update_term_title(&editor.obuf, buffer);
+    update_term_title(&editor.obuf, editor.buffer);
     update_all_windows();
     update_command_line(&editor.obuf);
     end_update();
@@ -426,16 +429,16 @@ char dialog_prompt(const char *question, const char *choices)
 char status_prompt(const char *question, const char *choices)
 {
     // update_windows() assumes these have been called for the current view
-    view_update_cursor_x(view);
-    view_update_cursor_y(view);
-    view_update(view);
+    view_update_cursor_x(editor.view);
+    view_update_cursor_y(editor.view);
+    view_update(editor.view);
 
     // Set changed_line_min and changed_line_max before calling update_range()
-    mark_all_lines_changed(buffer);
+    mark_all_lines_changed(editor.buffer);
 
     start_update();
-    update_term_title(&editor.obuf, buffer);
-    update_buffer_windows(buffer);
+    update_term_title(&editor.obuf, editor.buffer);
+    update_buffer_windows(editor.buffer);
     show_message(&editor.obuf, question, false);
     end_update();
 
@@ -471,6 +474,8 @@ static void update_screen(const ScreenState *s)
         return;
     }
 
+    Buffer *buffer = editor.buffer;
+    View *view = editor.view;
     view_update_cursor_x(view);
     view_update_cursor_y(view);
     view_update(view);
@@ -518,11 +523,11 @@ void main_loop(void)
 
         clear_error();
         const ScreenState s = {
-            .is_modified = buffer_modified(buffer),
-            .id = buffer->id,
-            .cy = view->cy,
-            .vx = view->vx,
-            .vy = view->vy
+            .is_modified = buffer_modified(editor.buffer),
+            .id = editor.buffer->id,
+            .cy = editor.view->cy,
+            .vx = editor.view->vx,
+            .vy = editor.view->vy
         };
 
         handle_input(key);

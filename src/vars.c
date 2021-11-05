@@ -21,37 +21,37 @@ static char *expand_dte_home(void)
 
 static char *expand_file(void)
 {
-    if (!buffer || !buffer->abs_filename) {
+    if (!editor.buffer || !editor.buffer->abs_filename) {
         return NULL;
     }
-    return xstrdup(buffer->abs_filename);
+    return xstrdup(editor.buffer->abs_filename);
 }
 
 static char *expand_filetype(void)
 {
-    return buffer ? xstrdup(buffer->options.filetype) : NULL;
+    return editor.buffer ? xstrdup(editor.buffer->options.filetype) : NULL;
 }
 
 static char *expand_lineno(void)
 {
-    return view ? xstrdup(umax_to_str(view->cy + 1)) : NULL;
+    return editor.view ? xstrdup(umax_to_str(editor.view->cy + 1)) : NULL;
 }
 
 static char *expand_word(void)
 {
-    if (!view) {
+    if (!editor.view) {
         return NULL;
     }
 
     size_t size;
-    char *selection = view_get_selection(view, &size);
+    char *selection = view_get_selection(editor.view, &size);
     if (selection) {
         xrenew(selection, size + 1);
         selection[size] = '\0';
         return selection;
     }
 
-    StringView word = view_get_word_under_cursor(view);
+    StringView word = view_get_word_under_cursor(editor.view);
     return word.length ? xstrcut(word.data, word.length) : NULL;
 }
 

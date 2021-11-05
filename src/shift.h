@@ -1,6 +1,8 @@
 #ifndef SHIFT_H
 #define SHIFT_H
 
-void shift_lines(int count);
+#include "view.h"
+
+void shift_lines(View *view, int count);
 
 #endif

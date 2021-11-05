@@ -5,6 +5,7 @@
 #include "change.h"
 #include "command/args.h"
 #include "commands.h"
+#include "editor.h"
 #include "util/str-util.h"
 
 static void test_add_binding(void)
@@ -51,7 +52,7 @@ static void test_handle_binding(void)
     EXPECT_TRUE(cmdargs_has_flag(&binding->a, 'm'));
 
     handle_binding(INPUT_NORMAL, key);
-    const Block *block = BLOCK(buffer->blocks.next);
+    const Block *block = BLOCK(editor.buffer->blocks.next);
     ASSERT_NONNULL(block);
     ASSERT_EQ(block->size, 4);
     EXPECT_EQ(block->nl, 1);
@@ -67,14 +68,16 @@ static void test_handle_binding(void)
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "\n", 1);
 
-    EXPECT_TRUE(undo());
+    View *view = editor.view;
+    ASSERT_NONNULL(view);
+    EXPECT_TRUE(undo(view));
     ASSERT_EQ(block->size, 3);
-    EXPECT_TRUE(undo());
+    EXPECT_TRUE(undo(view));
     ASSERT_EQ(block->size, 4);
-    EXPECT_TRUE(undo());
+    EXPECT_TRUE(undo(view));
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
-    EXPECT_FALSE(undo());
+    EXPECT_FALSE(undo(view));
     handle_command(cmds, "close", false);
 }
 

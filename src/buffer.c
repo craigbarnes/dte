@@ -17,8 +17,6 @@
 #include "util/string-view.h"
 #include "util/xmalloc.h"
 
-Buffer *buffer;
-
 void set_display_filename(Buffer *b, char *name)
 {
     free(b->display_filename);

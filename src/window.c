@@ -189,9 +189,9 @@ size_t remove_view(View *v)
     if (v == w->prev_view) {
         w->prev_view = NULL;
     }
-    if (v == view) {
-        view = NULL;
-        buffer = NULL;
+    if (v == editor.view) {
+        editor.view = NULL;
+        editor.buffer = NULL;
     }
 
     size_t idx = ptr_array_idx(&w->views, v);
@@ -240,7 +240,7 @@ static void restore_cursor_from_history(View *v)
 
 void set_view(View *v)
 {
-    if (view == v) {
+    if (editor.view == v) {
         return;
     }
 
@@ -249,8 +249,8 @@ void set_view(View *v)
         window->prev_view = NULL;
     }
 
-    view = v;
-    buffer = v->buffer;
+    editor.view = v;
+    editor.buffer = v->buffer;
     window = v->window;
     window->view = v;
 

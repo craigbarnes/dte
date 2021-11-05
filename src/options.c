@@ -127,10 +127,10 @@ typedef union {
 
 static void filetype_changed(bool global)
 {
-    BUG_ON(!buffer);
+    BUG_ON(!editor.buffer);
     BUG_ON(global);
-    set_file_options(buffer);
-    buffer_update_syntax(buffer);
+    set_file_options(editor.buffer);
+    buffer_update_syntax(editor.buffer);
 }
 
 static void set_window_title_changed(bool global)
@@ -138,7 +138,7 @@ static void set_window_title_changed(bool global)
     BUG_ON(!global);
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
-            update_term_title(&editor.obuf, buffer);
+            update_term_title(&editor.obuf, editor.buffer);
         }
     } else {
         term_restore_title(&editor.obuf);
@@ -148,15 +148,15 @@ static void set_window_title_changed(bool global)
 
 static void syntax_changed(bool global)
 {
-    if (buffer && !global) {
-        buffer_update_syntax(buffer);
+    if (editor.buffer && !global) {
+        buffer_update_syntax(editor.buffer);
     }
 }
 
 static void redraw_buffer(bool global)
 {
-    if (buffer && !global) {
-        mark_all_lines_changed(buffer);
+    if (editor.buffer && !global) {
+        mark_all_lines_changed(editor.buffer);
     }
 }
 
@@ -589,7 +589,7 @@ static void do_set_option (
     }
 
     if (local) {
-        desc_set(desc, local_ptr(desc, &buffer->options), false, val);
+        desc_set(desc, local_ptr(desc, &editor.buffer->options), false, val);
     }
     if (global) {
         desc_set(desc, global_ptr(desc), true, val);
@@ -639,7 +639,7 @@ void toggle_option(const char *name, bool global, bool verbose)
         return;
     }
 
-    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
+    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &editor.buffer->options);
     OptionValue value = desc_get(desc, ptr);
     OptionType type = desc->type;
     if (type == OPT_ENUM) {
@@ -677,7 +677,7 @@ void toggle_option_values (
     BUG_ON(count == 0);
     size_t current = 0;
     bool error = false;
-    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &buffer->options);
+    char *ptr = global ? global_ptr(desc) : local_ptr(desc, &editor.buffer->options);
     OptionValue *parsed_values = xnew(OptionValue, count);
 
     for (size_t i = 0; i < count; i++) {
@@ -778,7 +778,7 @@ void collect_option_values(PointerArray *a, const char *option, const char *pref
 
     if (prefix[0] == '\0') {
         bool local = desc->local;
-        char *ptr = local ? local_ptr(desc, &buffer->options) : global_ptr(desc);
+        char *ptr = local ? local_ptr(desc, &editor.buffer->options) : global_ptr(desc);
         OptionValue value = desc_get(desc, ptr);
         ptr_array_append(a, xstrdup(desc_string(desc, value)));
         return;
@@ -839,7 +839,7 @@ String dump_options(void)
     String buf = string_new(4096);
     for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        void *local = desc->local ? local_ptr(desc, &buffer->options) : NULL;
+        void *local = desc->local ? local_ptr(desc, &editor.buffer->options) : NULL;
         void *global = desc->global ? global_ptr(desc) : NULL;
         if (local && global) {
             const OptionValue global_value = desc_get(desc, global);
@@ -869,6 +869,6 @@ const char *get_option_value_string(const char *name)
         return NULL;
     }
     bool local = desc->local;
-    char *ptr = local ? local_ptr(desc, &buffer->options) : global_ptr(desc);
+    char *ptr = local ? local_ptr(desc, &editor.buffer->options) : global_ptr(desc);
     return desc_string(desc, desc_get(desc, ptr));
 }

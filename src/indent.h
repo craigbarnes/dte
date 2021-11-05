@@ -3,7 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "buffer.h"
 #include "util/string-view.h"
+#include "view.h"
 
 typedef struct {
     // Size in bytes
@@ -23,10 +25,10 @@ typedef struct {
     bool wsonly;
 } IndentInfo;
 
-char *make_indent(size_t width);
-char *get_indent_for_next_line(const StringView *line);
-void get_indent_info(const StringView *buf, IndentInfo *info);
-size_t get_indent_level_bytes_left(void);
-size_t get_indent_level_bytes_right(void);
+char *make_indent(const Buffer *b, size_t width);
+char *get_indent_for_next_line(const Buffer *buffer, const StringView *line);
+void get_indent_info(const Buffer *buffer, const StringView *buf, IndentInfo *info);
+size_t get_indent_level_bytes_left(const View *view);
+size_t get_indent_level_bytes_right(const View *view);
 
 #endif

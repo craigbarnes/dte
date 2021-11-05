@@ -6,8 +6,6 @@
 #include "util/utf8.h"
 #include "window.h"
 
-View *view;
-
 void view_update_cursor_y(View *v)
 {
     Buffer *b = v->buffer;

@@ -26,13 +26,13 @@ void file_location_free(FileLocation *loc)
     free(loc);
 }
 
-FileLocation *get_current_file_location(void)
+FileLocation *get_current_file_location(const View *view)
 {
-    const char *filename = buffer->abs_filename;
+    const char *filename = view->buffer->abs_filename;
     FileLocation *loc = xmalloc(sizeof(*loc));
     *loc = (FileLocation) {
         .filename = filename ? xstrdup(filename) : NULL,
-        .buffer_id = buffer->id,
+        .buffer_id = view->buffer->id,
         .line = view->cy + 1,
         .column = view->cx_char + 1
     };
@@ -57,7 +57,7 @@ static bool file_location_go(const FileLocation *loc)
     bool ok = true;
     if (loc->pattern) {
         bool err = false;
-        search_tag(loc->pattern, &err);
+        search_tag(v, loc->pattern, &err);
         ok = !err;
     } else if (loc->line > 0) {
         move_to_line(v, loc->line);
@@ -66,7 +66,7 @@ static bool file_location_go(const FileLocation *loc)
         }
     }
     if (ok) {
-        unselect();
+        unselect(v);
     }
     return ok;
 }
@@ -94,7 +94,7 @@ static bool file_location_return(const FileLocation *loc)
     }
 
     set_view(v);
-    unselect();
+    unselect(v);
     move_to_line(v, loc->line);
     move_to_column(v, loc->column);
     return true;
@@ -185,10 +185,10 @@ void activate_prev_message(void)
     activate_current_message();
 }
 
-void activate_current_message_save(void)
+void activate_current_message_save(const View *view)
 {
     const BlockIter save = view->cursor;
-    FileLocation *loc = get_current_file_location();
+    FileLocation *loc = get_current_file_location(view);
     activate_current_message();
 
     // Save position if file changed or cursor moved

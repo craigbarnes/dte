@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include "buffer.h"
 #include "cmdline.h"
 #include "encoding.h"
 #include "history.h"
@@ -15,6 +16,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
+#include "view.h"
 
 typedef enum {
     EDITOR_INITIALIZING,
@@ -42,6 +44,8 @@ typedef struct {
     pid_t pid;
     int exit_code;
     size_t cmdline_x;
+    View *view;
+    Buffer *buffer;
     PointerArray buffers;
     History search_history;
     History command_history;

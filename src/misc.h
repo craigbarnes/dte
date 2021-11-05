@@ -4,21 +4,22 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "util/unicode.h"
+#include "view.h"
 
-void select_block(void);
-void unselect(void);
-void cut(size_t len, bool is_lines);
-void copy(size_t len, bool is_lines);
-void insert_text(const char *text, size_t size, bool move_after);
-void paste(bool at_cursor);
-void delete_ch(void);
-void erase(void);
-void insert_ch(CodePoint ch);
-void join_lines(void);
-void clear_lines(void);
-void delete_lines(void);
-void new_line(void);
-void format_paragraph(size_t text_width);
-void change_case(char mode);
+void select_block(View *v);
+void unselect(View *v);
+void cut(View *v, size_t len, bool is_lines);
+void copy(View *v, size_t len, bool is_lines);
+void insert_text(View *v, const char *text, size_t size, bool move_after);
+void paste(View *v, bool at_cursor);
+void delete_ch(View *v);
+void erase(View *v);
+void insert_ch(View *v, CodePoint ch);
+void join_lines(View *v);
+void clear_lines(View *v);
+void delete_lines(View *v);
+void new_line(View *v);
+void format_paragraph(View *v, size_t text_width);
+void change_case(View *v, char mode);
 
 #endif

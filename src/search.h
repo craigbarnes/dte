@@ -4,6 +4,7 @@
 #include <regex.h>
 #include <stdbool.h>
 #include "util/macros.h"
+#include "view.h"
 
 typedef enum {
     SEARCH_FWD,
@@ -30,12 +31,12 @@ static inline void toggle_search_direction(SearchDirection *direction)
     *direction ^= 1;
 }
 
-bool search_tag(const char *pattern, bool *err);
+bool search_tag(View *view, const char *pattern, bool *err);
 void search_set_regexp(const char *pattern);
-void search_prev(void);
-void search_next(void);
-void search_next_word(void);
+void search_prev(View *view);
+void search_next(View *view);
+void search_next_word(View *view);
 
-void reg_replace(const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
+void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
 
 #endif
