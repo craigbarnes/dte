@@ -1,13 +1,16 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "util/list.h"
 #include "util/macros.h"
 
+enum {
+    BLOCK_ALLOC_MULTIPLE = 64
+};
+
 // Blocks always contain whole lines.
-// There's one zero-sized block when the file is empty.
+// There's one zero-sized block for an empty file.
 // Otherwise zero-sized blocks are forbidden.
 typedef struct {
     ListHead node;
@@ -17,12 +20,6 @@ typedef struct {
     size_t nl;
 } Block;
 
-static inline Block *BLOCK(ListHead *item)
-{
-    static_assert(offsetof(Block, node) == 0);
-    return (Block*)item;
-}
-
 #define block_for_each(block_, list_head_) \
     for ( \
         block_ = BLOCK((list_head_)->next); \
@@ -30,9 +27,13 @@ static inline Block *BLOCK(ListHead *item)
         block_ = BLOCK(block_->node.next) \
     )
 
-Block *block_new(size_t size);
-void do_insert(const char *buf, size_t len);
-char *do_delete(size_t len, bool sanity_check_newlines);
-char *do_replace(size_t del, const char *buf, size_t ins);
+static inline Block *BLOCK(ListHead *item)
+{
+    static_assert(offsetof(Block, node) == 0);
+    return (Block*)item;
+}
+
+Block *block_new(size_t size) RETURNS_NONNULL;
+void block_free(Block *blk) NONNULL_ARGS;
 
 #endif

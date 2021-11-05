@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include "msg.h"
 #include "buffer.h"
-#include "edit.h"
 #include "error.h"
+#include "misc.h"
 #include "move.h"
 #include "search.h"
 #include "util/debug.h"

@@ -14,6 +14,7 @@
 #include "compiler.h"
 #include "completion.h"
 #include "config.h"
+#include "edit.h"
 #include "editor.h"
 #include "encoding.h"
 #include "error.h"

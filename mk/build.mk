@@ -58,7 +58,7 @@ editor_objects := $(call prefix-obj, build/, \
     bind block block-iter buffer change cmdline commands \
     convert compiler completion config ctags edit editor \
     encoding error file-history file-option filetype frame history \
-    indent load-save lock main mode move msg options regexp \
+    indent load-save lock main misc mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
     search selection shift show spawn tag vars view window ) \
     $(command_objects) \
