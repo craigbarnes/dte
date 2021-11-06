@@ -65,8 +65,7 @@ void calculate_line_numbers(Window *win);
 void set_window_coordinates(Window *win, int x, int y);
 void set_window_size(Window *win, int w, int h);
 int window_get_scroll_margin(const Window *w);
-void for_each_window(void (*func)(Window *w));
-void for_each_window_data(void (*func)(Window *, void *), void *data);
+void frame_for_each_window(const Frame *f, void (*func)(Window*, void*), void *data);
 Window *prev_window(Window *w);
 Window *next_window(Window *w);
 

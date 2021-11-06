@@ -74,7 +74,7 @@ static void print_separator(Window *win, void *ud)
 void update_separators(TermOutputBuffer *obuf)
 {
     set_builtin_color(obuf, BC_STATUSLINE);
-    for_each_window_data(print_separator, obuf);
+    frame_for_each_window(root_frame, print_separator, obuf);
 }
 
 void update_line_numbers(TermOutputBuffer *obuf, Window *win, bool force)

@@ -417,11 +417,8 @@ int window_get_scroll_margin(const Window *w)
     return editor.options.scroll_margin;
 }
 
-static void frame_for_each_window (
-    Frame *f,
-    void (*func)(Window *, void *),
-    void *data
-) {
+void frame_for_each_window(const Frame *f, void (*func)(Window*, void*), void *data)
+{
     if (f->window) {
         func(f->window, data);
         return;
@@ -430,29 +427,6 @@ static void frame_for_each_window (
         frame_for_each_window(f->frames.ptrs[i], func, data);
     }
 }
-
-void for_each_window_data(void (*func)(Window *, void *), void *data)
-{
-    frame_for_each_window(root_frame, func, data);
-}
-
-// Conversion from a void* pointer to a function pointer is not defined
-// by the ISO C standard, but POSIX explicitly requires it:
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/dlsym.html
-IGNORE_WARNING("-Wpedantic")
-
-static void call_data(Window *w, void *data)
-{
-    void (*func)(Window *) = data;
-    func(w);
-}
-
-void for_each_window(void (*func)(Window *w))
-{
-    for_each_window_data(call_data, func);
-}
-
-UNIGNORE_WARNINGS
 
 typedef struct {
     const Window *const target; // Window to search for (set at init.)
@@ -486,7 +460,7 @@ static void find_prev_and_next(Window *w, void *ud)
 Window *prev_window(Window *w)
 {
     WindowCallbackData data = {.target = w};
-    for_each_window_data(find_prev_and_next, &data);
+    frame_for_each_window(root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.prev ? data.prev : data.last;
 }
@@ -494,7 +468,7 @@ Window *prev_window(Window *w)
 Window *next_window(Window *w)
 {
     WindowCallbackData data = {.target = w};
-    for_each_window_data(find_prev_and_next, &data);
+    frame_for_each_window(root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.next ? data.next : data.first;
 }
@@ -509,7 +483,7 @@ void window_close_current(void)
     }
 
     WindowCallbackData data = {.target = window};
-    for_each_window_data(find_prev_and_next, &data);
+    frame_for_each_window(root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     Window *next_or_prev = data.next ? data.next : data.prev;
     BUG_ON(!next_or_prev);

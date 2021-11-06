@@ -217,7 +217,7 @@ static void start_update(void)
     term_hide_cursor(&editor.obuf);
 }
 
-static void clear_update_tabbar(Window *w)
+static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
 {
     w->update_tabbar = false;
 }
@@ -230,13 +230,13 @@ static void end_update(void)
 
     editor.buffer->changed_line_min = LONG_MAX;
     editor.buffer->changed_line_max = -1;
-    for_each_window(clear_update_tabbar);
+    frame_for_each_window(root_frame, clear_update_tabbar, NULL);
 }
 
 static void update_all_windows(void)
 {
     update_window_sizes();
-    for_each_window_data(update_window_full, &editor.obuf);
+    frame_for_each_window(root_frame, update_window_full, &editor.obuf);
     update_separators(&editor.obuf);
 }
 
