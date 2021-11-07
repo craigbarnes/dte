@@ -570,71 +570,6 @@ static bool set_encoding(FileDecoder *dec, const char *encoding)
     return true;
 }
 
-static bool detect(FileDecoder *dec, const unsigned char *line, size_t len)
-{
-    for (size_t i = 0; i < len; i++) {
-        if (line[i] >= 0x80) {
-            size_t idx = i;
-            CodePoint u = u_get_nonascii(line, len, &idx);
-            const char *encoding;
-            if (u_is_unicode(u)) {
-                encoding = "UTF-8";
-            } else if (editor.term_utf8) {
-                if (dec->isize <= (32 * 1024 * 1024)) {
-                    // If locale is UTF-8 but file doesn't contain valid
-                    // UTF-8 and is also fairly small, just assume latin1
-                    encoding = "ISO-8859-1";
-                } else {
-                    // Large files are likely binary; just decode as
-                    // UTF-8 to avoid costly charset conversion
-                    encoding = "UTF-8";
-                }
-            } else {
-                // Assume encoding is same as locale
-                encoding = editor.charset.name;
-            }
-            if (!set_encoding(dec, encoding)) {
-                // FIXME: error message?
-                set_encoding(dec, "UTF-8");
-            }
-            return true;
-        }
-    }
-
-    // ASCII
-    return false;
-}
-
-static bool detect_and_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
-{
-    const char *line = dec->ibuf + dec->ipos;
-    const char *nl = memchr(line, '\n', dec->isize - dec->ipos);
-    size_t len;
-
-    if (nl) {
-        len = nl - line;
-    } else {
-        len = dec->isize - dec->ipos;
-        if (len == 0) {
-            return false;
-        }
-    }
-
-    if (detect(dec, line, len)) {
-        // Encoding detected
-        return dec->read_line(dec, linep, lenp);
-    }
-
-    // Only ASCII so far
-    dec->ipos += len;
-    if (nl) {
-        dec->ipos++;
-    }
-    *linep = line;
-    *lenp = len;
-    return true;
-}
-
 FileDecoder *new_file_decoder (
     const char *encoding,
     const unsigned char *buf,
@@ -643,13 +578,14 @@ FileDecoder *new_file_decoder (
     FileDecoder *dec = xnew0(FileDecoder, 1);
     dec->ibuf = buf;
     dec->isize = size;
-    dec->read_line = detect_and_read_line;
 
-    if (encoding) {
-        if (!set_encoding(dec, encoding)) {
-            free_file_decoder(dec);
-            return NULL;
-        }
+    if (!encoding) {
+        encoding = "UTF-8";
+    }
+
+    if (!set_encoding(dec, encoding)) {
+        free_file_decoder(dec);
+        return NULL;
     }
 
     return dec;
