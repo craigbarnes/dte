@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "msg.h"
 #include "buffer.h"
+#include "editor.h"
 #include "error.h"
 #include "misc.h"
 #include "move.h"
@@ -192,6 +193,7 @@ void activate_current_message_save(const View *view)
     activate_current_message();
 
     // Save position if file changed or cursor moved
+    view = editor.view;
     if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
         push_file_location(loc);
     } else {
