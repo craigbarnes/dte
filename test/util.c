@@ -1704,6 +1704,10 @@ static void test_short_filename(void)
     s = short_filename("/home/user/subdir/file.txt", &home);
     EXPECT_STREQ(s, "~/subdir/file.txt");
     free(s);
+
+    s = short_filename("/x/y/z", &home);
+    EXPECT_STREQ(s, "/x/y/z");
+    free(s);
 }
 
 static void test_path_absolute(void)
