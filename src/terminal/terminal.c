@@ -186,10 +186,11 @@ void term_init(const char *term)
             terminal.repeat_byte = ecma48_repeat_byte;
         }
         if (entry->flags & TITLE) {
-            terminal.control_codes.save_title = strview_from_cstring("\033[22;2t");
-            terminal.control_codes.restore_title = strview_from_cstring("\033[23;2t");
-            terminal.control_codes.set_title_begin = strview_from_cstring("\033]2;");
-            terminal.control_codes.set_title_end = strview_from_cstring("\033\\");
+            TermControlCodes *tcc = &terminal.control_codes;
+            tcc->save_title = strview_from_cstring("\033[22;2t");
+            tcc->restore_title = strview_from_cstring("\033[23;2t");
+            tcc->set_title_begin = strview_from_cstring("\033]2;");
+            tcc->set_title_end = strview_from_cstring("\033\\");
         }
         if (entry->flags & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
