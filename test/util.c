@@ -1690,6 +1690,22 @@ static void test_relative_filename(void)
     }
 }
 
+static void test_short_filename(void)
+{
+    const StringView home = STRING_VIEW("/home/user");
+    const char *rel = "test/main.c";
+    char *abs = path_absolute(rel);
+    ASSERT_NONNULL(abs);
+    char *s = short_filename(abs, &home);
+    EXPECT_STREQ(s, rel);
+    free(abs);
+    free(s);
+
+    s = short_filename("/home/user/subdir/file.txt", &home);
+    EXPECT_STREQ(s, "~/subdir/file.txt");
+    free(s);
+}
+
 static void test_path_absolute(void)
 {
     char *path = path_absolute("///dev///");
@@ -1989,6 +2005,7 @@ static const TestEntry tests[] = {
     TEST(test_round_size_to_next_power_of_2),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_relative_filename),
+    TEST(test_short_filename),
     TEST(test_path_absolute),
     TEST(test_path_join),
     TEST(test_path_parent),

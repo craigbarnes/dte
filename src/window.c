@@ -57,7 +57,7 @@ View *window_open_buffer (
         if (b) {
             if (!streq(absolute, b->abs_filename)) {
                 const char *bufname = buffer_filename(b);
-                char *s = short_filename(absolute);
+                char *s = short_filename(absolute, &editor.home_dir);
                 info_msg("%s and %s are the same file", s, bufname);
                 free(s);
             }

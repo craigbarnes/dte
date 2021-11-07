@@ -188,53 +188,13 @@ bool buffer_detect_filetype(Buffer *b)
     return false;
 }
 
-static char *short_filename_cwd(const char *absolute, const char *cwd)
-{
-    char *relative = relative_filename(absolute, cwd);
-    size_t abs_len = strlen(absolute);
-    size_t rel_len = strlen(relative);
-    if (rel_len >= abs_len) {
-        // Prefer absolute if relative isn't shorter
-        free(relative);
-        relative = xstrdup(absolute);
-        rel_len = abs_len;
-    }
-
-    size_t home_len = editor.home_dir.length;
-    if (
-        abs_len > home_len
-        && mem_equal(absolute, editor.home_dir.data, home_len)
-        && absolute[home_len] == '/'
-    ) {
-        size_t suffix_len = (abs_len - home_len) + 1;
-        if (suffix_len < rel_len) {
-            // Prefer absolute path in tilde notation (e.g. "~/abs/path")
-            // if shorter than relative
-            free(relative);
-            char *tilde = xmalloc(suffix_len + 1);
-            tilde[0] = '~';
-            memcpy(tilde + 1, absolute + home_len, suffix_len);
-            return tilde;
-        }
-    }
-
-    return relative;
-}
-
-char *short_filename(const char *absolute)
-{
-    char cwd[8192];
-    if (getcwd(cwd, sizeof(cwd))) {
-        return short_filename_cwd(absolute, cwd);
-    }
-    return xstrdup(absolute);
-}
-
 void update_short_filename_cwd(Buffer *b, const char *cwd)
 {
     if (b->abs_filename) {
         if (cwd) {
-            set_display_filename(b, short_filename_cwd(b->abs_filename, cwd));
+            const StringView *home = &editor.home_dir;
+            char *name = short_filename_cwd(b->abs_filename, cwd, home);
+            set_display_filename(b, name);
         } else {
             // getcwd() failed
             set_display_filename(b, xstrdup(b->abs_filename));
@@ -244,7 +204,7 @@ void update_short_filename_cwd(Buffer *b, const char *cwd)
 
 void update_short_filename(Buffer *b)
 {
-    set_display_filename(b, short_filename(b->abs_filename));
+    set_display_filename(b, short_filename(b->abs_filename, &editor.home_dir));
 }
 
 void buffer_update_syntax(Buffer *b)
