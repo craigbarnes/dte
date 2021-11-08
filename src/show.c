@@ -15,7 +15,6 @@
 #include "completion.h"
 #include "config.h"
 #include "edit.h"
-#include "editor.h"
 #include "encoding.h"
 #include "error.h"
 #include "file-option.h"
@@ -56,7 +55,7 @@ static void open_temporary_buffer (
     }
 }
 
-static void show_normal_alias(const char *alias_name, bool cflag)
+static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag)
 {
     const char *cmd_str = find_alias(&normal_commands.aliases, alias_name);
     if (!cmd_str) {
@@ -70,13 +69,13 @@ static void show_normal_alias(const char *alias_name, bool cflag)
 
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, cmd_str);
+        cmdline_set_text(&e->cmdline, cmd_str);
     } else {
         info_msg("%s is aliased to: %s", alias_name, cmd_str);
     }
 }
 
-static void show_binding(const char *keystr, bool cflag)
+static void show_binding(EditorState *e, const char *keystr, bool cflag)
 {
     KeyCode key;
     if (!parse_key_string(&key, keystr)) {
@@ -97,13 +96,13 @@ static void show_binding(const char *keystr, bool cflag)
 
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, b->cmd_str);
+        cmdline_set_text(&e->cmdline, b->cmd_str);
     } else {
         info_msg("%s is bound to: %s", keystr, b->cmd_str);
     }
 }
 
-static void show_color(const char *color_name, bool cflag)
+static void show_color(EditorState *e, const char *color_name, bool cflag)
 {
     const TermColor *hl = find_color(color_name);
     if (!hl) {
@@ -114,13 +113,13 @@ static void show_color(const char *color_name, bool cflag)
     const char *color_str = term_color_to_string(hl);
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, color_str);
+        cmdline_set_text(&e->cmdline, color_str);
     } else {
         info_msg("color '%s' is set to: %s", color_name, color_str);
     }
 }
 
-static void show_env(const char *name, bool cflag)
+static void show_env(EditorState *e, const char *name, bool cflag)
 {
     const char *value = getenv(name);
     if (!value) {
@@ -130,7 +129,7 @@ static void show_env(const char *name, bool cflag)
 
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, value);
+        cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("$%s is set to: %s", name, value);
     }
@@ -159,7 +158,7 @@ void collect_env(PointerArray *a, const char *prefix)
     }
 }
 
-static void show_include(const char *name, bool cflag)
+static void show_include(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
@@ -169,13 +168,13 @@ static void show_include(const char *name, bool cflag)
 
     const StringView sv = cfg->text;
     if (cflag) {
-        buffer_insert_bytes(editor.view, sv.data, sv.length);
+        buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
         open_temporary_buffer(sv.data, sv.length, "builtin", name, true);
     }
 }
 
-static void show_compiler(const char *name, bool cflag)
+static void show_compiler(EditorState *e, const char *name, bool cflag)
 {
     const Compiler *compiler = find_compiler(name);
     if (!compiler) {
@@ -185,14 +184,14 @@ static void show_compiler(const char *name, bool cflag)
 
     String str = dump_compiler(compiler, name);
     if (cflag) {
-        buffer_insert_bytes(editor.view, str.buffer, str.len);
+        buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
         open_temporary_buffer(str.buffer, str.len, "errorfmt", name, true);
     }
     string_free(&str);
 }
 
-static void show_option(const char *name, bool cflag)
+static void show_option(EditorState *e, const char *name, bool cflag)
 {
     const char *value = get_option_value_string(name);
     if (!value) {
@@ -201,7 +200,7 @@ static void show_option(const char *name, bool cflag)
     }
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, value);
+        cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("%s is set to: %s", name, value);
     }
@@ -212,7 +211,7 @@ static void collect_all_options(PointerArray *a, const char *prefix)
     collect_options(a, prefix, false, false);
 }
 
-static void show_wsplit(const char *name, bool cflag)
+static void show_wsplit(EditorState *e, const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
         error_msg("invalid window: %s", name);
@@ -225,7 +224,7 @@ static void show_wsplit(const char *name, bool cflag)
 
     if (cflag) {
         set_input_mode(INPUT_COMMAND);
-        cmdline_set_text(&editor.cmdline, buf);
+        cmdline_set_text(&e->cmdline, buf);
     } else {
         info_msg("current window dimensions: %s", buf);
     }
@@ -315,7 +314,7 @@ void collect_normal_aliases(PointerArray *a, const char *prefix)
 typedef struct {
     const char name[11];
     bool dumps_dterc_syntax;
-    void (*show)(const char *name, bool cmdline);
+    void (*show)(EditorState *e, const char *name, bool cmdline);
     String (*dump)(void);
     void (*complete_arg)(PointerArray *a, const char *prefix);
 } ShowHandler;
@@ -340,7 +339,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(handlers, name, strcmp);
 }
 
-void show(const char *type, const char *key, bool cflag)
+void show(EditorState *e, const char *type, const char *key, bool cflag)
 {
     const ShowHandler *handler = BSEARCH(type, handlers, (CompareFunction)strcmp);
     if (!handler) {
@@ -350,7 +349,7 @@ void show(const char *type, const char *key, bool cflag)
 
     if (key) {
         if (handler->show) {
-            handler->show(key, cflag);
+            handler->show(e, key, cflag);
         } else {
             error_msg("'show %s' doesn't take extra arguments", type);
         }

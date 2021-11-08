@@ -1990,12 +1990,13 @@ static void cmd_shift(const CommandArgs *a)
 
 static void cmd_show(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     bool write_to_cmdline = has_flag(a, 'c');
     if (write_to_cmdline && a->nr_args < 2) {
         error_msg("\"show -c\" requires 2 arguments");
         return;
     }
-    show(a->args[0], a->args[1], write_to_cmdline);
+    show(e, a->args[0], a->args[1], write_to_cmdline);
 }
 
 static void cmd_suspend(const CommandArgs *a)
