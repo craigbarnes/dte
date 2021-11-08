@@ -402,57 +402,57 @@ static void show_dialog(TermOutputBuffer *obuf, const char *question)
     }
 }
 
-char dialog_prompt(const char *question, const char *choices)
+char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
     normal_update();
-    term_hide_cursor(&editor.obuf);
-    show_dialog(&editor.obuf, question);
-    show_message(&editor.obuf, question, false);
-    term_output_flush(&editor.obuf);
+    term_hide_cursor(&e->obuf);
+    show_dialog(&e->obuf, question);
+    show_message(&e->obuf, question, false);
+    term_output_flush(&e->obuf);
 
     char choice;
     while ((choice = get_choice(choices)) == 0) {
-        if (!editor.resized) {
+        if (!e->resized) {
             continue;
         }
         ui_resize();
-        term_hide_cursor(&editor.obuf);
-        show_dialog(&editor.obuf, question);
-        show_message(&editor.obuf, question, false);
-        term_output_flush(&editor.obuf);
+        term_hide_cursor(&e->obuf);
+        show_dialog(&e->obuf, question);
+        show_message(&e->obuf, question, false);
+        term_output_flush(&e->obuf);
     }
 
-    mark_everything_changed();
+    mark_everything_changed(e);
     return (choice >= 'a') ? choice : 0;
 }
 
-char status_prompt(const char *question, const char *choices)
+char status_prompt(EditorState *e, const char *question, const char *choices)
 {
     // update_windows() assumes these have been called for the current view
-    view_update_cursor_x(editor.view);
-    view_update_cursor_y(editor.view);
-    view_update(editor.view);
+    view_update_cursor_x(e->view);
+    view_update_cursor_y(e->view);
+    view_update(e->view);
 
     // Set changed_line_min and changed_line_max before calling update_range()
-    mark_all_lines_changed(editor.buffer);
+    mark_all_lines_changed(e->buffer);
 
     start_update();
-    update_term_title(&editor.obuf, editor.buffer);
-    update_buffer_windows(editor.buffer);
-    show_message(&editor.obuf, question, false);
+    update_term_title(&e->obuf, e->buffer);
+    update_buffer_windows(e->buffer);
+    show_message(&e->obuf, question, false);
     end_update();
 
     char choice;
     while ((choice = get_choice(choices)) == 0) {
-        if (!editor.resized) {
+        if (!e->resized) {
             continue;
         }
         ui_resize();
-        term_hide_cursor(&editor.obuf);
-        show_message(&editor.obuf, question, false);
-        restore_cursor(&editor.obuf);
-        term_show_cursor(&editor.obuf);
-        term_output_flush(&editor.obuf);
+        term_hide_cursor(&e->obuf);
+        show_message(&e->obuf, question, false);
+        restore_cursor(&e->obuf);
+        term_show_cursor(&e->obuf);
+        term_output_flush(&e->obuf);
     }
 
     return (choice >= 'a') ? choice : 0;

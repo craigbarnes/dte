@@ -1,6 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include <regex.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -11,7 +12,6 @@
 #include "history.h"
 #include "mode.h"
 #include "options.h"
-#include "search.h"
 #include "terminal/output.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -23,6 +23,18 @@ typedef enum {
     EDITOR_RUNNING,
     EDITOR_EXITING,
 } EditorStatus;
+
+typedef enum {
+    SEARCH_FWD,
+    SEARCH_BWD,
+} SearchDirection;
+
+typedef struct {
+    regex_t regex;
+    char *pattern;
+    SearchDirection direction;
+    int re_flags; // If zero, regex hasn't been compiled
+} SearchState;
 
 typedef struct {
     EditorStatus status;
@@ -55,9 +67,9 @@ typedef struct {
 
 extern EditorState editor;
 
-static inline void mark_everything_changed(void)
+static inline void mark_everything_changed(EditorState *e)
 {
-    editor.everything_changed = true;
+    e->everything_changed = true;
 }
 
 static inline void set_input_mode(InputMode mode)
@@ -67,8 +79,8 @@ static inline void set_input_mode(InputMode mode)
 
 void init_editor_state(void);
 const char *editor_file(const char *name) NONNULL_ARGS_AND_RETURN;
-char status_prompt(const char *question, const char *choices) NONNULL_ARGS;
-char dialog_prompt(const char *question, const char *choices) NONNULL_ARGS;
+char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
+char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);
 void normal_update(void);
 void main_loop(void);

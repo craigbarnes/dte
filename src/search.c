@@ -1,7 +1,6 @@
 #include "search.h"
 #include "buffer.h"
 #include "change.h"
-#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "selection.h"
@@ -151,10 +150,10 @@ static bool has_upper(const char *str)
     return false;
 }
 
-static bool update_regex(SearchState *search)
+static bool update_regex(SearchState *search, SearchCaseSensitivity cs)
 {
     int re_flags = REG_NEWLINE;
-    switch (editor.options.case_sensitive_search) {
+    switch (cs) {
     case CSS_TRUE:
         break;
     case CSS_FALSE:
@@ -184,45 +183,46 @@ static bool update_regex(SearchState *search)
     return false;
 }
 
-void search_set_regexp(const char *pattern)
+void search_set_regexp(SearchState *search, const char *pattern)
 {
-    SearchState *search = &editor.search;
     free_regex(search);
     free(search->pattern);
     search->pattern = xstrdup(pattern);
 }
 
-static void do_search_next(View *view, bool skip)
+static void do_search_next(EditorState *e, bool skip)
 {
-    SearchState *search = &editor.search;
+    SearchState *search = &e->search;
     if (!search->pattern) {
         error_msg("No previous search pattern");
         return;
     }
-    if (!update_regex(search)) {
+    if (!update_regex(search, e->options.case_sensitive_search)) {
         return;
     }
 
+    View *view = e->view;
     BlockIter bi = view->cursor;
+    regex_t *regex = &search->regex;
     if (search->direction == SEARCH_FWD) {
-        if (do_search_fwd(view, &search->regex, &bi, true)) {
+        if (do_search_fwd(view, regex, &bi, true)) {
             return;
         }
 
         block_iter_bof(&bi);
-        if (do_search_fwd(view, &search->regex, &bi, false)) {
+        if (do_search_fwd(view, regex, &bi, false)) {
             info_msg("Continuing at top");
         } else {
             error_msg("Pattern '%s' not found", search->pattern);
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
-        if (do_search_bwd(view, &search->regex, &bi, cursor_x, skip)) {
+        if (do_search_bwd(view, regex, &bi, cursor_x, skip)) {
             return;
         }
 
         block_iter_eof(&bi);
-        if (do_search_bwd(view, &search->regex, &bi, -1, false)) {
+        if (do_search_bwd(view, regex, &bi, -1, false)) {
             info_msg("Continuing at bottom");
         } else {
             error_msg("Pattern '%s' not found", search->pattern);
@@ -230,22 +230,22 @@ static void do_search_next(View *view, bool skip)
     }
 }
 
-void search_prev(View *view)
+void search_prev(EditorState *e)
 {
-    SearchDirection *dir = &editor.search.direction;
+    SearchDirection *dir = &e->search.direction;
     toggle_search_direction(dir);
-    search_next(view);
+    search_next(e);
     toggle_search_direction(dir);
 }
 
-void search_next(View *view)
+void search_next(EditorState *e)
 {
-    do_search_next(view, false);
+    do_search_next(e, false);
 }
 
-void search_next_word(View *view)
+void search_next_word(EditorState *e)
 {
-    do_search_next(view, true);
+    do_search_next(e, true);
 }
 
 static void build_replacement (
@@ -287,13 +287,14 @@ static void build_replacement (
  * "foo x bar abc baz"   " bar abc baz"
  */
 static unsigned int replace_on_line (
-    View *view,
+    EditorState *e,
     StringView *line,
     regex_t *re,
     const char *format,
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
+    View *view = e->view;
     unsigned char *buf = (unsigned char *)line->data;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];
@@ -317,7 +318,7 @@ static unsigned int replace_on_line (
         view->cursor = *bi;
 
         if (flags & REPLACE_CONFIRM) {
-            switch (status_prompt("Replace? [Y/n/a/q]", "ynaq")) {
+            switch (status_prompt(e, "Replace? [Y/n/a/q]", "ynaq")) {
             case 'y':
                 break;
             case 'n':
@@ -385,7 +386,7 @@ out:
     return nr;
 }
 
-void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
+void reg_replace(EditorState *e, const char *pattern, const char *format, ReplaceFlags flags)
 {
     if (unlikely(pattern[0] == '\0')) {
         error_msg("Search pattern must contain at least 1 character");
@@ -401,6 +402,7 @@ void reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
         return;
     }
 
+    View *view = e->view;
     BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
     size_t nr_bytes;
     bool swapped = false;
@@ -437,7 +439,7 @@ void reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(view, &line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(e, &line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

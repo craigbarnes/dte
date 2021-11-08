@@ -419,7 +419,7 @@ loop_break:
         history_load(&editor.command_history, editor_file("command-history"));
         history_load(&editor.search_history, editor_file("search-history"));
         if (editor.search_history.last) {
-            search_set_regexp(editor.search_history.last->text);
+            search_set_regexp(&editor.search, editor.search_history.last->text);
         }
     }
 

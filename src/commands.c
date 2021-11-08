@@ -257,7 +257,7 @@ static void cmd_cd(const CommandArgs *a)
     }
 
     // Need to update all tabbars
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 }
 
 static void cmd_center_view(const CommandArgs* UNUSED_ARG(a))
@@ -279,7 +279,8 @@ static void cmd_close(const CommandArgs *a)
 
     if (!view_can_close(editor.view) && !force) {
         if (prompt) {
-            if (dialog_prompt("Close without saving changes? [y/N]", "ny") != 'y') {
+            static const char str[] = "Close without saving changes? [y/N]";
+            if (dialog_prompt(&editor, str, "ny") != 'y') {
                 return;
             }
         } else {
@@ -722,7 +723,7 @@ update:
     // It is called right after config has been loaded.
     if (editor.status != EDITOR_INITIALIZING) {
         update_all_syntax_colors();
-        mark_everything_changed();
+        mark_everything_changed(&editor);
     }
 }
 
@@ -1302,11 +1303,12 @@ static void cmd_quit(const CommandArgs *a)
                 // Activate first window of the buffer.
                 v = b->views.ptrs[0];
                 window = v->window;
-                mark_everything_changed();
+                mark_everything_changed(&editor);
             }
             set_view(v);
             if (has_flag(a, 'p')) {
-                if (dialog_prompt("Quit without saving changes? [y/N]", "ny") == 'y') {
+                static const char str[] = "Quit without saving changes? [y/N]";
+                if (dialog_prompt(&editor, str, "ny") == 'y') {
                     goto exit;
                 }
                 return;
@@ -1342,7 +1344,7 @@ static void cmd_redo(const CommandArgs *a)
 
 static void cmd_refresh(const CommandArgs* UNUSED_ARG(a))
 {
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 }
 
 static void repeat_insert(const char *str, unsigned int count, bool move_after)
@@ -1450,7 +1452,7 @@ static void cmd_replace(const CommandArgs *a)
     };
 
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
-    reg_replace(editor.view, a->args[0], a->args[1], flags);
+    reg_replace(&editor, a->args[0], a->args[1], flags);
 }
 
 static void cmd_right(const CommandArgs *a)
@@ -1806,19 +1808,19 @@ static void cmd_search(const CommandArgs *a)
 
     if (pattern) {
         editor.search.direction = direction;
-        search_set_regexp(pattern);
+        search_set_regexp(&editor.search, pattern);
         if (w) {
-            search_next_word(view);
+            search_next_word(&editor);
         } else {
-            search_next(view);
+            search_next(&editor);
         }
         if (history) {
             history_add(&editor.search_history, pattern);
         }
     } else if (next) {
-        search_next(view);
+        search_next(&editor);
     } else if (prev) {
-        search_prev(view);
+        search_prev(&editor);
     } else {
         set_input_mode(INPUT_SEARCH);
         editor.search.direction = direction;
@@ -2082,7 +2084,8 @@ static void cmd_wclose(const CommandArgs *a)
     if (v && !force) {
         set_view(v);
         if (prompt) {
-            if (dialog_prompt("Close window without saving? [y/N]", "ny") != 'y') {
+            static const char str[] = "Close window without saving? [y/N]";
+            if (dialog_prompt(&editor, str, "ny") != 'y') {
                 return;
             }
         } else {
@@ -2103,14 +2106,14 @@ static void cmd_wflip(const CommandArgs* UNUSED_ARG(a))
         return;
     }
     f->parent->vertical ^= 1;
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 }
 
 static void cmd_wnext(const CommandArgs* UNUSED_ARG(a))
 {
     window = next_window(window);
     set_view(window->view);
-    mark_everything_changed();
+    mark_everything_changed(&editor);
     debug_frames();
 }
 
@@ -2134,7 +2137,7 @@ static void cmd_wprev(const CommandArgs* UNUSED_ARG(a))
 {
     window = prev_window(window);
     set_view(window->view);
-    mark_everything_changed();
+    mark_everything_changed(&editor);
     debug_frames();
 }
 
@@ -2183,7 +2186,7 @@ static void cmd_wresize(const CommandArgs *a)
     } else {
         equalize_frame_sizes(window->frame->parent);
     }
-    mark_everything_changed();
+    mark_everything_changed(&editor);
     debug_frames();
 }
 
@@ -2221,7 +2224,7 @@ static void cmd_wsplit(const CommandArgs *a)
     window = f->window;
     editor.view = NULL;
     editor.buffer = NULL;
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 
     if (empty) {
         window_open_new_file(window);
@@ -2266,7 +2269,7 @@ static void cmd_wswap(const CommandArgs* UNUSED_ARG(a))
     Frame *tmp = parent->frames.ptrs[i];
     parent->frames.ptrs[i] = parent->frames.ptrs[j];
     parent->frames.ptrs[j] = tmp;
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 }
 
 static const Command cmds[] = {

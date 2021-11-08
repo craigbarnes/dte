@@ -122,7 +122,7 @@ static void search_mode_keypress(KeyCode key)
         const char *args[3] = {NULL, NULL, NULL};
         if (c->buf.len > 0) {
             const char *str = string_borrow_cstring(&c->buf);
-            search_set_regexp(str);
+            search_set_regexp(&editor.search, str);
             history_add(&editor.search_history, str);
             if (unlikely(str[0] == '-')) {
                 args[0] = "--";
@@ -133,7 +133,7 @@ static void search_mode_keypress(KeyCode key)
         } else {
             args[0] = "-n";
         }
-        search_next(editor.view);
+        search_next(&editor);
         macro_command_hook("search", (char**)args);
         cmdline_clear(c);
         set_input_mode(INPUT_NORMAL);

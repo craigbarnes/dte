@@ -163,7 +163,7 @@ static void redraw_buffer(bool global)
 static void redraw_screen(bool global)
 {
     BUG_ON(!global);
-    mark_everything_changed();
+    mark_everything_changed(&editor);
 }
 
 static bool validate_statusline_format(const char *value)

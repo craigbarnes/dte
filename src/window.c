@@ -492,6 +492,6 @@ void window_close_current(void)
     window = NULL;
     set_view(next_or_prev->view);
 
-    mark_everything_changed();
+    mark_everything_changed(&editor);
     debug_frames();
 }
