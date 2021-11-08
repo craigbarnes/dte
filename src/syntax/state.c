@@ -94,10 +94,10 @@ static bool not_subsyntax(void)
     return true;
 }
 
-static bool subsyntax_call(const char *name, const char *ret, State **dest)
+static bool subsyntax_call(const EditorState *e, const char *name, const char *ret, State **dest)
 {
     SyntaxMerge m = {
-        .subsyn = find_any_syntax(&editor.syntaxes, name),
+        .subsyn = find_any_syntax(&e->syntaxes, name),
         .return_state = NULL,
         .delim = NULL,
         .delim_len = 0,
@@ -125,13 +125,13 @@ static bool subsyntax_call(const char *name, const char *ret, State **dest)
     return ok;
 }
 
-static bool destination_state(const char *name, State **dest)
+static bool destination_state(const EditorState *e, const char *name, State **dest)
 {
     const char *sep = strchr(name, ':');
     if (sep) {
         // subsyntax:returnstate
         char *sub = xstrcut(name, sep - name);
-        bool success = subsyntax_call(sub, sep + 1, dest);
+        bool success = subsyntax_call(e, sub, sep + 1, dest);
         free(sub);
         return success;
     }
@@ -149,6 +149,7 @@ static bool destination_state(const char *name, State **dest)
 }
 
 static Condition *add_condition (
+    const EditorState *e,
     ConditionType type,
     const char *dest,
     const char *emit
@@ -158,7 +159,7 @@ static Condition *add_condition (
     }
 
     State *d = NULL;
-    if (dest && !destination_state(dest, &d)) {
+    if (dest && !destination_state(e, dest, &d)) {
         return NULL;
     }
 
@@ -183,8 +184,9 @@ static void cmd_bufis(const CommandArgs *a)
         return;
     }
 
+    EditorState *e = a->userdata;
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
-    c = add_condition(type, a->args[1], a->args[2]);
+    c = add_condition(e, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
         c->u.str.len = len;
@@ -210,7 +212,8 @@ static void cmd_char(const CommandArgs *a)
         type = COND_CHAR;
     }
 
-    Condition *c = add_condition(type, a->args[1], a->args[2]);
+    EditorState *e = a->userdata;
+    Condition *c = add_condition(e, type, a->args[1], a->args[2]);
     if (!c) {
         return;
     }
@@ -254,8 +257,9 @@ static void cmd_eat(const CommandArgs *a)
         return;
     }
 
+    EditorState *e = a->userdata;
     const char *dest = a->args[0];
-    if (!destination_state(dest, &current_state->default_action.destination)) {
+    if (!destination_state(e, dest, &current_state->default_action.destination)) {
         return;
     }
 
@@ -271,8 +275,9 @@ static void cmd_heredocbegin(const CommandArgs *a)
         return;
     }
 
+    EditorState *e = a->userdata;
     const char *sub = a->args[0];
-    Syntax *subsyn = find_any_syntax(&editor.syntaxes, sub);
+    Syntax *subsyn = find_any_syntax(&e->syntaxes, sub);
     if (unlikely(!subsyn)) {
         error_msg("No such syntax %s", sub);
         return;
@@ -284,7 +289,7 @@ static void cmd_heredocbegin(const CommandArgs *a)
 
     // default_action.destination is used as the return state
     const char *ret = a->args[1];
-    if (!destination_state(ret, &current_state->default_action.destination)) {
+    if (!destination_state(e, ret, &current_state->default_action.destination)) {
         return;
     }
 
@@ -300,7 +305,8 @@ static void cmd_heredocbegin(const CommandArgs *a)
 
 static void cmd_heredocend(const CommandArgs *a)
 {
-    add_condition(COND_HEREDOCEND, a->args[0], a->args[1]);
+    EditorState *e = a->userdata;
+    add_condition(e, COND_HEREDOCEND, a->args[0], a->args[1]);
     current_syntax->heredoc = true;
 }
 
@@ -334,11 +340,12 @@ static void cmd_list(const CommandArgs *a)
 
 static void cmd_inlist(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
     StringList *list = find_string_list(current_syntax, name);
-    Condition *c = add_condition(COND_INLIST, args[1], emit);
+    Condition *c = add_condition(e, COND_INLIST, args[1], emit);
 
     if (!c) {
         return;
@@ -355,8 +362,9 @@ static void cmd_inlist(const CommandArgs *a)
 
 static void cmd_noeat(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     State *dest;
-    if (unlikely(no_state() || !destination_state(a->args[0], &dest))) {
+    if (unlikely(no_state() || !destination_state(e, a->args[0], &dest))) {
         return;
     }
 
@@ -390,7 +398,8 @@ static void cmd_recolor(const CommandArgs *a)
         }
     }
 
-    Condition *c = add_condition(type, NULL, a->args[0]);
+    EditorState *e = a->userdata;
+    Condition *c = add_condition(e, type, NULL, a->args[0]);
     if (c && type == COND_RECOLOR) {
         c->u.recolor_len = len;
     }
@@ -439,24 +448,26 @@ static void cmd_str(const CommandArgs *a)
     if (!icase && len == 2) {
         type = COND_STR2;
     }
-    c = add_condition(type, a->args[1], a->args[2]);
+    EditorState *e = a->userdata;
+    c = add_condition(e, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
         c->u.str.len = len;
     }
 }
 
-static void finish_syntax(void)
+static void finish_syntax(EditorState *e)
 {
     close_state();
-    finalize_syntax(&editor.syntaxes, current_syntax, saved_nr_errors);
+    finalize_syntax(&e->syntaxes, current_syntax, saved_nr_errors);
     current_syntax = NULL;
 }
 
 static void cmd_syntax(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     if (current_syntax) {
-        finish_syntax();
+        finish_syntax(e);
     }
 
     current_syntax = xnew0(Syntax, 1);
@@ -501,6 +512,7 @@ static const CommandSet syntax_commands = {
     .allow_recording = NULL,
     .expand_variable = expand_syntax_var,
     .aliases = HASHMAP_INIT,
+    .userdata = &editor,
 };
 
 static void cmd_include(const CommandArgs *a)
@@ -556,7 +568,7 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
         return NULL;
     }
     if (current_syntax) {
-        finish_syntax();
+        finish_syntax(&editor);
         find_unused_subsyntaxes(&editor.syntaxes);
     }
     current_config = saved;

@@ -30,6 +30,10 @@ static const struct {
 
 static void test_dump_handlers(void)
 {
+    const CommandSet *cmds = &normal_commands;
+    void *ud = cmds->userdata;
+    ASSERT_NONNULL(ud);
+
     for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
         String str = handlers[i].dump();
         size_t pos = 0;
@@ -42,7 +46,7 @@ static void test_dump_handlers(void)
             }
 
             PointerArray arr = PTR_ARRAY_INIT;
-            CommandParseError parse_err = parse_commands(&normal_commands, &arr, line);
+            CommandParseError parse_err = parse_commands(cmds, &arr, line);
             EXPECT_EQ(parse_err, CMDERR_NONE);
             EXPECT_TRUE(arr.count >= 2);
             if (parse_err != CMDERR_NONE || arr.count < 2) {
@@ -53,13 +57,13 @@ static void test_dump_handlers(void)
                 EXPECT_STREQ(arr.ptrs[0], handlers[i].name);
             }
 
-            const Command *cmd = find_normal_command(arr.ptrs[0]);
+            const Command *cmd = cmds->lookup(arr.ptrs[0]);
             EXPECT_NONNULL(cmd);
             if (!cmd) {
                 continue;
             }
 
-            CommandArgs a = {.args = (char**)arr.ptrs + 1};
+            CommandArgs a = cmdargs_new((char**)arr.ptrs + 1, ud);
             ArgParseError arg_err = do_parse_args(cmd, &a);
             EXPECT_EQ(arg_err, ARGERR_NONE);
             if (arg_err != ARGERR_NONE) {

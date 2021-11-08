@@ -390,7 +390,7 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
     }
 
     char **args_copy = copy_string_array(args + 1, argc - 1);
-    CommandArgs a = {.args = args_copy};
+    CommandArgs a = cmdargs_new(args_copy, normal_commands.userdata);
     ArgParseError err = do_parse_args(cmd, &a);
     if (
         (err != ARGERR_NONE && err != ARGERR_TOO_FEW_ARGUMENTS)

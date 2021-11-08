@@ -261,16 +261,19 @@ static void test_find_normal_command(void)
 static void test_parse_args(void)
 {
     const CommandSet *nc = &normal_commands;
+    void *ud = nc->userdata;
+    ASSERT_NONNULL(ud);
+
     const char *cmd_str = "open -g file.c file.h *.mk -e UTF-8";
     PointerArray array = PTR_ARRAY_INIT;
     ASSERT_EQ(parse_commands(nc, &array, cmd_str), CMDERR_NONE);
     ASSERT_EQ(array.count, 8);
 
-    const Command *cmd = find_normal_command(array.ptrs[0]);
+    const Command *cmd = nc->lookup(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
     EXPECT_STREQ(cmd->name, "open");
 
-    CommandArgs a = {.args = (char**)array.ptrs + 1};
+    CommandArgs a = cmdargs_new((char**)array.ptrs + 1, &ud);
     ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_NONE);
     EXPECT_EQ(a.nr_flags, 2);
     EXPECT_EQ(a.flags[0], 'g');
@@ -302,13 +305,14 @@ static void test_parse_args(void)
     EXPECT_STREQ(array.ptrs[6], "-6");
     EXPECT_NULL(array.ptrs[7]);
 
-    cmd = find_normal_command(array.ptrs[0]);
+    cmd = nc->lookup(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
     EXPECT_STREQ(cmd->name, "bind");
     EXPECT_EQ(cmd->max_args, 2);
     EXPECT_EQ(cmd->flags[0], '-');
 
-    a = (CommandArgs){.args = (char**)array.ptrs + 1, .flags = "TEST"};
+    a = cmdargs_new((char**)array.ptrs + 1, ud);
+    a.flags[0] = 'X';
     ASSERT_EQ(do_parse_args(cmd, &a), ARGERR_TOO_MANY_ARGUMENTS);
     EXPECT_EQ(a.nr_args, 6);
     EXPECT_EQ(a.nr_flags, 0);
@@ -323,27 +327,27 @@ static void test_parse_args(void)
     EXPECT_STREQ(array.ptrs[0], "open");
     EXPECT_STREQ(array.ptrs[1], "-\xff");
     EXPECT_NULL(array.ptrs[2]);
-    cmd = find_normal_command(array.ptrs[0]);
+    cmd = nc->lookup(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
-    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    a = cmdargs_new((char**)array.ptrs + 1, ud);
     EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_INVALID_OPTION);
     EXPECT_EQ(a.flags[0], '\xff');
     ptr_array_free(&array);
 
     ASSERT_EQ(parse_commands(nc, &array, "save -e"), CMDERR_NONE);
     ASSERT_EQ(array.count, 3);
-    cmd = find_normal_command(array.ptrs[0]);
+    cmd = nc->lookup(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
-    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    a = cmdargs_new((char**)array.ptrs + 1, ud);
     EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_MISSING);
     EXPECT_EQ(a.flags[0], 'e');
     ptr_array_free(&array);
 
     ASSERT_EQ(parse_commands(nc, &array, "save -eUTF-8"), CMDERR_NONE);
     ASSERT_EQ(array.count, 3);
-    cmd = find_normal_command(array.ptrs[0]);
+    cmd = nc->lookup(array.ptrs[0]);
     ASSERT_NONNULL(cmd);
-    a = (CommandArgs){.args = (char**)array.ptrs + 1};
+    a = cmdargs_new((char**)array.ptrs + 1, ud);
     EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_NOT_SEPARATE);
     EXPECT_EQ(a.flags[0], 'e');
     ptr_array_free(&array);
@@ -356,7 +360,7 @@ static void test_cached_command_new(void)
     CachedCommand *cc = cached_command_new(cmds, cmd_str);
     ASSERT_NONNULL(cc);
     ASSERT_NONNULL(cc->cmd);
-    EXPECT_PTREQ(cc->cmd, find_normal_command("open"));
+    EXPECT_PTREQ(cc->cmd, cmds->lookup("open"));
     EXPECT_STREQ(cc->cmd_str, cmd_str);
     ASSERT_EQ(cc->a.nr_args, 2);
     ASSERT_EQ(cc->a.nr_flag_args, 1);
@@ -544,39 +548,43 @@ static void test_add_alias(void)
 
 static void test_allow_macro_recording(void)
 {
+    const CommandSet *cmds = &normal_commands;
     const char *args[4] = {NULL};
     char **argp = (char**)args;
-    const Command *cmd = find_normal_command("left");
-    ASSERT_NONNULL(cmd);
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    void *ud = cmds->userdata;
+    ASSERT_NONNULL(ud);
 
-    cmd = find_normal_command("filter");
+    const Command *cmd = cmds->lookup("left");
     ASSERT_NONNULL(cmd);
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
 
-    cmd = find_normal_command("command");
+    cmd = cmds->lookup("filter");
     ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
 
-    cmd = find_normal_command("macro");
+    cmd = cmds->lookup("command");
     ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_FALSE(cmds->allow_recording(cmd, argp, ud));
 
-    cmd = find_normal_command("search");
+    cmd = cmds->lookup("macro");
     ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_FALSE(cmds->allow_recording(cmd, argp, ud));
+
+    cmd = cmds->lookup("search");
+    ASSERT_NONNULL(cmd);
+    EXPECT_FALSE(cmds->allow_recording(cmd, argp, ud));
     args[0] = "xyz";
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
     args[0] = "-n";
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
     args[0] = "-p";
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
     args[0] = "-w";
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
     args[0] = "-Hr";
-    EXPECT_FALSE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_FALSE(cmds->allow_recording(cmd, argp, ud));
     args[1] = "str";
-    EXPECT_TRUE(normal_commands.allow_recording(cmd, argp));
+    EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
 }
 
 static const TestEntry tests[] = {

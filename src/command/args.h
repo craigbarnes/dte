@@ -23,6 +23,14 @@ typedef struct {
     unsigned int val;
 } FlagMapping;
 
+static inline CommandArgs cmdargs_new(char **args, void *userdata)
+{
+    return (CommandArgs) {
+        .args = args,
+        .userdata = userdata
+    };
+}
+
 // Map ASCII alphanumeric characters to values between 1 and 62,
 // for use as bitset indices in CommandArgs::flag_set
 static inline unsigned int cmdargs_flagset_idx(unsigned char flag)

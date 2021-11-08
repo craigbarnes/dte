@@ -14,6 +14,7 @@ typedef struct {
     char flags[10]; // Flags in parsed order
     uint8_t nr_flags; // Number of parsed flags
     uint8_t nr_flag_args; // Number of flag args
+    void *userdata;
 } CommandArgs;
 
 typedef struct {
@@ -27,9 +28,10 @@ typedef struct {
 
 typedef struct {
     const Command* (*lookup)(const char *name);
-    bool (*allow_recording)(const Command *cmd, char **args);
-    bool (*expand_variable)(const char *name, char **value);
+    bool (*allow_recording)(const Command *cmd, char **args, void *userdata);
+    bool (*expand_variable)(const char *name, char **value, void *userdata);
     HashMap aliases;
+    void *userdata;
 } CommandSet;
 
 extern const Command *current_command;

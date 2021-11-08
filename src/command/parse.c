@@ -104,7 +104,7 @@ static size_t parse_var(const CommandSet *cmds, const char *cmd, size_t len, Str
 
     char *name = xstrcut(cmd, n);
     char *value;
-    if (cmds->expand_variable && cmds->expand_variable(name, &value)) {
+    if (cmds->expand_variable && cmds->expand_variable(name, &value, cmds->userdata)) {
         if (value) {
             string_append_cstring(buf, value);
             free(value);

@@ -11,51 +11,51 @@
 
 typedef struct {
     const char *name;
-    char *(*expand)(void);
+    char *(*expand)(const EditorState *e);
 } BuiltinVar;
 
-static char *expand_dte_home(void)
+static char *expand_dte_home(const EditorState *e)
 {
-    return xstrdup(editor.user_config_dir);
+    return xstrdup(e->user_config_dir);
 }
 
-static char *expand_file(void)
+static char *expand_file(const EditorState *e)
 {
-    if (!editor.buffer || !editor.buffer->abs_filename) {
+    if (!e->buffer || !e->buffer->abs_filename) {
         return NULL;
     }
-    return xstrdup(editor.buffer->abs_filename);
+    return xstrdup(e->buffer->abs_filename);
 }
 
-static char *expand_filetype(void)
+static char *expand_filetype(const EditorState *e)
 {
-    return editor.buffer ? xstrdup(editor.buffer->options.filetype) : NULL;
+    return e->buffer ? xstrdup(e->buffer->options.filetype) : NULL;
 }
 
-static char *expand_lineno(void)
+static char *expand_lineno(const EditorState *e)
 {
-    return editor.view ? xstrdup(umax_to_str(editor.view->cy + 1)) : NULL;
+    return e->view ? xstrdup(umax_to_str(e->view->cy + 1)) : NULL;
 }
 
-static char *expand_word(void)
+static char *expand_word(const EditorState *e)
 {
-    if (!editor.view) {
+    if (!e->view) {
         return NULL;
     }
 
     size_t size;
-    char *selection = view_get_selection(editor.view, &size);
+    char *selection = view_get_selection(e->view, &size);
     if (selection) {
         xrenew(selection, size + 1);
         selection[size] = '\0';
         return selection;
     }
 
-    StringView word = view_get_word_under_cursor(editor.view);
+    StringView word = view_get_word_under_cursor(e->view);
     return word.length ? xstrcut(word.data, word.length) : NULL;
 }
 
-static char *expand_pkgdatadir(void)
+static char *expand_pkgdatadir(const EditorState* UNUSED_ARG(e))
 {
     error_msg("The $PKGDATADIR variable was removed in dte v1.4");
     return NULL;
@@ -70,21 +70,23 @@ static const BuiltinVar normal_vars[] = {
     {"WORD", expand_word},
 };
 
-bool expand_normal_var(const char *name, char **value)
+bool expand_normal_var(const char *name, char **value, void *userdata)
 {
+    const EditorState *e = userdata;
     for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
         if (streq(name, normal_vars[i].name)) {
-            *value = normal_vars[i].expand();
+            *value = normal_vars[i].expand(e);
             return true;
         }
     }
     return false;
 }
 
-bool expand_syntax_var(const char *name, char **value)
+bool expand_syntax_var(const char *name, char **value, void *userdata)
 {
+    const EditorState *e = userdata;
     if (streq(name, "DTE_HOME")) {
-        *value = expand_dte_home();
+        *value = expand_dte_home(e);
         return true;
     }
     return false;

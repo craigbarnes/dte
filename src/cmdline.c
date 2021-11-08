@@ -45,45 +45,50 @@ void cmdline_set_text(CommandLine *c, const char *text)
     c->search_pos = NULL;
 }
 
-static void cmd_bol(const CommandArgs* UNUSED_ARG(a))
+static void cmd_bol(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
-    c->pos = 0;
-    reset_completion(c);
+    EditorState *e = a->userdata;
+    e->cmdline.pos = 0;
+    reset_completion(&e->cmdline);
 }
 
-static void cmd_cancel(const CommandArgs* UNUSED_ARG(a))
+static void cmd_cancel(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     cmdline_clear(c);
     set_input_mode(INPUT_NORMAL);
     reset_completion(c);
 }
 
-static void cmd_clear(const CommandArgs* UNUSED_ARG(a))
+static void cmd_clear(const CommandArgs *a)
 {
-    cmdline_clear(&editor.cmdline);
+    EditorState *e = a->userdata;
+    cmdline_clear(&e->cmdline);
 }
 
-static void cmd_delete(const CommandArgs* UNUSED_ARG(a))
+static void cmd_delete(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     cmdline_delete(c);
     c->search_pos = NULL;
     reset_completion(c);
 }
 
-static void cmd_delete_eol(const CommandArgs* UNUSED_ARG(a))
+static void cmd_delete_eol(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     c->buf.len = c->pos;
     c->search_pos = NULL;
     reset_completion(c);
 }
 
-static void cmd_delete_word(const CommandArgs* UNUSED_ARG(a))
+static void cmd_delete_word(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     const unsigned char *buf = c->buf.buffer;
     const size_t len = c->buf.len;
     size_t i = c->pos;
@@ -106,16 +111,18 @@ static void cmd_delete_word(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static void cmd_eol(const CommandArgs* UNUSED_ARG(a))
+static void cmd_eol(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     c->pos = c->buf.len;
     reset_completion(c);
 }
 
-static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
+static void cmd_erase(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     if (c->pos > 0) {
         u_prev_char(c->buf.buffer, &c->pos);
         cmdline_delete(c);
@@ -124,18 +131,20 @@ static void cmd_erase(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static void cmd_erase_bol(const CommandArgs* UNUSED_ARG(a))
+static void cmd_erase_bol(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     string_remove(&c->buf, 0, c->pos);
     c->pos = 0;
     c->search_pos = NULL;
     reset_completion(c);
 }
 
-static void cmd_erase_word(const CommandArgs* UNUSED_ARG(a))
+static void cmd_erase_word(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     size_t i = c->pos;
     if (i == 0) {
         return;
@@ -164,13 +173,13 @@ static void cmd_erase_word(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static const History *get_history(void)
+static const History *get_history(EditorState *e)
 {
-    switch (editor.input_mode) {
+    switch (e->input_mode) {
     case INPUT_COMMAND:
-        return &editor.command_history;
+        return &e->command_history;
     case INPUT_SEARCH:
-        return &editor.search_history;
+        return &e->search_history;
     case INPUT_NORMAL:
         return NULL;
     }
@@ -178,14 +187,15 @@ static const History *get_history(void)
     return NULL;
 }
 
-static void cmd_history_prev(const CommandArgs* UNUSED_ARG(a))
+static void cmd_history_prev(const CommandArgs *a)
 {
-    const History *hist = get_history();
+    EditorState *e = a->userdata;
+    const History *hist = get_history(e);
     if (unlikely(!hist)) {
         return;
     }
 
-    CommandLine *c = &editor.cmdline;
+    CommandLine *c = &e->cmdline;
     if (!c->search_pos) {
         free(c->search_text);
         c->search_text = string_clone_cstring(&c->buf);
@@ -198,14 +208,15 @@ static void cmd_history_prev(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static void cmd_history_next(const CommandArgs* UNUSED_ARG(a))
+static void cmd_history_next(const CommandArgs *a)
 {
-    const History *hist = get_history();
+    EditorState *e = a->userdata;
+    const History *hist = get_history(e);
     if (unlikely(!hist)) {
         return;
     }
 
-    CommandLine *c = &editor.cmdline;
+    CommandLine *c = &e->cmdline;
     if (!c->search_pos) {
         goto out;
     }
@@ -221,27 +232,30 @@ out:
     reset_completion(c);
 }
 
-static void cmd_left(const CommandArgs* UNUSED_ARG(a))
+static void cmd_left(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     if (c->pos) {
         u_prev_char(c->buf.buffer, &c->pos);
     }
     reset_completion(c);
 }
 
-static void cmd_right(const CommandArgs* UNUSED_ARG(a))
+static void cmd_right(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     if (c->pos < c->buf.len) {
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
     }
     reset_completion(c);
 }
 
-static void cmd_word_bwd(const CommandArgs* UNUSED_ARG(a))
+static void cmd_word_bwd(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     if (c->pos <= 1) {
         c->pos = 0;
         return;
@@ -266,9 +280,10 @@ static void cmd_word_bwd(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
+static void cmd_word_fwd(const CommandArgs *a)
 {
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
     const unsigned char *buf = c->buf.buffer;
     const size_t len = c->buf.len;
     size_t i = c->pos;
@@ -285,25 +300,29 @@ static void cmd_word_fwd(const CommandArgs* UNUSED_ARG(a))
     reset_completion(c);
 }
 
-static void cmd_complete_next(const CommandArgs* UNUSED_ARG(a))
+static void cmd_complete_next(const CommandArgs *a)
 {
-    complete_command_next(&editor.cmdline);
+    EditorState *e = a->userdata;
+    complete_command_next(&e->cmdline);
 }
 
-static void cmd_complete_prev(const CommandArgs* UNUSED_ARG(a))
+static void cmd_complete_prev(const CommandArgs *a)
 {
-    complete_command_prev(&editor.cmdline);
+    EditorState *e = a->userdata;
+    complete_command_prev(&e->cmdline);
 }
 
-static void cmd_case(const CommandArgs* UNUSED_ARG(a))
+static void cmd_case(const CommandArgs *a)
 {
-    unsigned int *css = &editor.options.case_sensitive_search;
+    EditorState *e = a->userdata;
+    unsigned int *css = &e->options.case_sensitive_search;
     *css = (*css + 1) % 3;
 }
 
-static void cmd_direction(const CommandArgs* UNUSED_ARG(a))
+static void cmd_direction(const CommandArgs *a)
 {
-    toggle_search_direction(&editor.search.direction);
+    EditorState *e = a->userdata;
+    toggle_search_direction(&e->search.direction);
 }
 
 static const Command common_cmds[] = {
@@ -351,10 +370,12 @@ const CommandSet cmd_mode_commands = {
     .lookup = find_cmd_mode_command,
     .allow_recording = NULL,
     .aliases = HASHMAP_INIT,
+    .userdata = &editor,
 };
 
 const CommandSet search_mode_commands = {
     .lookup = find_search_mode_command,
     .allow_recording = NULL,
     .aliases = HASHMAP_INIT,
+    .userdata = &editor,
 };
