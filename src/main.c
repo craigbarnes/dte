@@ -405,7 +405,7 @@ loop_break:
         read_config(&normal_commands, rc, flags);
     }
 
-    update_all_syntax_colors();
+    update_all_syntax_colors(&editor.syntaxes);
     window = new_window();
     root_frame = new_root_frame(window);
 

@@ -56,6 +56,7 @@ typedef struct {
     pid_t pid;
     int exit_code;
     size_t cmdline_x;
+    HashMap syntaxes;
     View *view;
     Buffer *buffer;
     PointerArray buffers;

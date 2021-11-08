@@ -123,7 +123,7 @@ int main(void)
     run_tests(&buffer_tests);
     run_tests(&syntax_tests);
     run_tests(&dump_tests);
-    free_syntaxes();
+    free_syntaxes(&editor.syntaxes);
 
     fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", passed, failed);
     return failed ? 1 : 0;

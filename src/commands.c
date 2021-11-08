@@ -722,7 +722,7 @@ update:
     // Don't call update_all_syntax_colors() needlessly.
     // It is called right after config has been loaded.
     if (editor.status != EDITOR_INITIALIZING) {
-        update_all_syntax_colors();
+        update_all_syntax_colors(&editor.syntaxes);
         mark_everything_changed(&editor);
     }
 }
@@ -783,14 +783,14 @@ static void cmd_load_syntax(const CommandArgs *a)
     const char *slash = strrchr(arg, '/');
     if (!slash) {
         const char *filetype = arg;
-        if (!find_syntax(filetype)) {
+        if (!find_syntax(&editor.syntaxes, filetype)) {
             load_syntax_by_filetype(filetype);
         }
         return;
     }
 
     const char *filetype = slash + 1;
-    if (find_syntax(filetype)) {
+    if (find_syntax(&editor.syntaxes, filetype)) {
         error_msg("Syntax for filetype %s already loaded", filetype);
         return;
     }

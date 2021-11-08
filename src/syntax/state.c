@@ -97,7 +97,7 @@ static bool not_subsyntax(void)
 static bool subsyntax_call(const char *name, const char *ret, State **dest)
 {
     SyntaxMerge m = {
-        .subsyn = find_any_syntax(name),
+        .subsyn = find_any_syntax(&editor.syntaxes, name),
         .return_state = NULL,
         .delim = NULL,
         .delim_len = 0,
@@ -272,7 +272,7 @@ static void cmd_heredocbegin(const CommandArgs *a)
     }
 
     const char *sub = a->args[0];
-    Syntax *subsyn = find_any_syntax(sub);
+    Syntax *subsyn = find_any_syntax(&editor.syntaxes, sub);
     if (unlikely(!subsyn)) {
         error_msg("No such syntax %s", sub);
         return;
@@ -449,7 +449,7 @@ static void cmd_str(const CommandArgs *a)
 static void finish_syntax(void)
 {
     close_state();
-    finalize_syntax(current_syntax, saved_nr_errors);
+    finalize_syntax(&editor.syntaxes, current_syntax, saved_nr_errors);
     current_syntax = NULL;
 }
 
@@ -557,11 +557,11 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
     }
     if (current_syntax) {
         finish_syntax();
-        find_unused_subsyntaxes();
+        find_unused_subsyntaxes(&editor.syntaxes);
     }
     current_config = saved;
 
-    Syntax *syn = find_syntax(path_basename(filename));
+    Syntax *syn = find_syntax(&editor.syntaxes, path_basename(filename));
     if (syn && editor.status != EDITOR_INITIALIZING) {
         update_syntax_colors(syn);
     }

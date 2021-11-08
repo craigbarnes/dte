@@ -34,13 +34,13 @@ static void test_builtin_configs(void)
                 continue;
             }
             // Check that built-in syntax files load without errors
-            EXPECT_NULL(find_syntax(path_basename(cfg.name)));
+            EXPECT_NULL(find_syntax(&editor.syntaxes, path_basename(cfg.name)));
             int err;
             ConfigFlags flags = CFG_BUILTIN | CFG_MUST_EXIST;
             unsigned int saved_nr_errs = get_nr_errors();
             EXPECT_NONNULL(load_syntax_file(cfg.name, flags, &err));
             EXPECT_EQ(get_nr_errors(), saved_nr_errs);
-            EXPECT_NONNULL(find_syntax(path_basename(cfg.name)));
+            EXPECT_NONNULL(find_syntax(&editor.syntaxes, path_basename(cfg.name)));
         } else {
             // Check that built-in configs are identical to their source files
             char path[4096];
@@ -52,7 +52,7 @@ static void test_builtin_configs(void)
             free(src);
         }
     }
-    update_all_syntax_colors();
+    update_all_syntax_colors(&editor.syntaxes);
 }
 
 static void expect_files_equal(const char *path1, const char *path2)
@@ -243,7 +243,7 @@ void init_headless_mode(void)
 {
     MEMZERO(&terminal.control_codes);
     exec_builtin_rc();
-    update_all_syntax_colors();
+    update_all_syntax_colors(&editor.syntaxes);
     editor.options.lock_files = false;
     window = new_window();
     root_frame = new_root_frame(window);

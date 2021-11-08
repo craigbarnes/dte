@@ -7,8 +7,6 @@
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
-static HashMap syntaxes = HASHMAP_INIT;
-
 StringList *find_string_list(const Syntax *syn, const char *name)
 {
     return hashmap_get(&syn->string_lists, name);
@@ -19,9 +17,9 @@ State *find_state(const Syntax *syn, const char *name)
     return hashmap_get(&syn->states, name);
 }
 
-Syntax *find_any_syntax(const char *name)
+Syntax *find_any_syntax(const HashMap *syntaxes, const char *name)
 {
-    return hashmap_get(&syntaxes, name);
+    return hashmap_get(syntaxes, name);
 }
 
 static void visit(State *s)
@@ -83,12 +81,12 @@ static void free_syntax_cb(Syntax *syn)
 
 // This function is only called by the test binary, just to ensure
 // the various free_*() functions get exercised by ASan/UBSan
-void free_syntaxes(void)
+void free_syntaxes(HashMap *syntaxes)
 {
-    hashmap_free(&syntaxes, FREE_FUNC(free_syntax_cb));
+    hashmap_free(syntaxes, FREE_FUNC(free_syntax_cb));
 }
 
-void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
+void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_errors)
 {
     if (syn->states.count == 0) {
         error_msg("Empty syntax");
@@ -112,7 +110,7 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         error_msg("heredocend can be used only in subsyntaxes");
     }
 
-    if (find_any_syntax(syn->name)) {
+    if (find_any_syntax(syntaxes, syn->name)) {
         error_msg("Syntax %s already exists", syn->name);
     }
 
@@ -136,12 +134,12 @@ void finalize_syntax(Syntax *syn, unsigned int saved_nr_errors)
         }
     }
 
-    hashmap_insert(&syntaxes, syn->name, syn);
+    hashmap_insert(syntaxes, syn->name, syn);
 }
 
-Syntax *find_syntax(const char *name)
+Syntax *find_syntax(const HashMap *syntaxes, const char *name)
 {
-    Syntax *syn = find_any_syntax(name);
+    Syntax *syn = find_any_syntax(syntaxes, name);
     if (syn && is_subsyntax(syn)) {
         return NULL;
     }
@@ -196,16 +194,16 @@ void update_syntax_colors(Syntax *syn)
     }
 }
 
-void update_all_syntax_colors(void)
+void update_all_syntax_colors(const HashMap *syntaxes)
 {
-    for (HashMapIter it = hashmap_iter(&syntaxes); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
         update_syntax_colors(it.entry->value);
     }
 }
 
-void find_unused_subsyntaxes(void)
+void find_unused_subsyntaxes(const HashMap *syntaxes)
 {
-    for (HashMapIter it = hashmap_iter(&syntaxes); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
         Syntax *s = it.entry->value;
         if (!s->used && !s->warned_unused_subsyntax && is_subsyntax(s)) {
             error_msg("Subsyntax %s is unused", s->name);
