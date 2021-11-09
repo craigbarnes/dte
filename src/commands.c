@@ -705,8 +705,9 @@ static void cmd_ft(const CommandArgs *a)
         break;
     }
 
+    EditorState *e = a->userdata;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        add_filetype(filetype, args[i], dt);
+        add_filetype(&e->filetypes, filetype, args[i], dt);
     }
 }
 

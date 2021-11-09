@@ -1,5 +1,6 @@
 #include "filetype.h"
 #include "command/serialize.h"
+#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/ascii.h"
@@ -59,14 +60,12 @@ typedef struct {
     char name[];
 } UserFileTypeEntry;
 
-static PointerArray filetypes = PTR_ARRAY_INIT;
-
 static bool ft_uses_regex(FileDetectionType type)
 {
     return type == FT_CONTENT || type == FT_FILENAME;
 }
 
-void add_filetype(const char *name, const char *str, FileDetectionType type)
+void add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type)
 {
     regex_t re;
     bool use_re = ft_uses_regex(type);
@@ -98,7 +97,7 @@ void add_filetype(const char *name, const char *str, FileDetectionType type)
 
     memcpy(ft->name, name, name_len + 1);
     memcpy(str_dest, str, str_len + 1);
-    ptr_array_append(&filetypes, ft);
+    ptr_array_append(filetypes, ft);
 }
 
 static StringView get_filename_extension(const StringView filename)
@@ -191,7 +190,7 @@ static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
     return sv.length > 0 && regexp_exec(re, sv.data, sv.length, 0, &m, 0);
 }
 
-HOT const char *find_ft(const char *filename, StringView line)
+const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line)
 {
     const char *b = filename ? path_basename(filename) : NULL;
     const StringView base = strview_from_cstring(b);
@@ -202,8 +201,8 @@ HOT const char *find_ft(const char *filename, StringView line)
     BUG_ON(line.length == 0 && interpreter.length != 0);
 
     // Search user `ft` entries
-    for (size_t i = 0, n = filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+    for (size_t i = 0, n = filetypes->count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes->ptrs[i];
         StringView sv;
         switch (ft->type) {
         case FT_EXTENSION:
@@ -295,14 +294,14 @@ HOT const char *find_ft(const char *filename, StringView line)
     return NULL;
 }
 
-bool is_ft(const char *name)
+bool is_ft(const PointerArray *filetypes, const char *name)
 {
     if (BSEARCH(name, builtin_filetype_names, (CompareFunction)strcmp)) {
         return true;
     }
 
-    for (size_t i = 0, n = filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+    for (size_t i = 0, n = filetypes->count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes->ptrs[i];
         if (streq(ft->name, name)) {
             return true;
         }
@@ -319,8 +318,8 @@ void collect_ft(PointerArray *a, const char *prefix)
             ptr_array_append(a, xstrdup(name));
         }
     }
-    for (size_t i = 0, n = filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+    for (size_t i = 0, n = editor.filetypes.count; i < n; i++) {
+        const UserFileTypeEntry *ft = editor.filetypes.ptrs[i];
         const char *name = ft->name;
         if (str_has_prefix(name, prefix)) {
             ptr_array_append(a, xstrdup(name));
@@ -344,8 +343,8 @@ String dump_ft(void)
     };
 
     String s = string_new(4096);
-    for (size_t i = 0, n = filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = filetypes.ptrs[i];
+    for (size_t i = 0, n = editor.filetypes.count; i < n; i++) {
+        const UserFileTypeEntry *ft = editor.filetypes.ptrs[i];
         BUG_ON(ft->type >= ARRAY_COUNT(flags));
         string_append_literal(&s, "ft ");
         string_append_cstring(&s, flags[ft->type]);

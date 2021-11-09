@@ -179,7 +179,7 @@ bool buffer_detect_filetype(Buffer *b)
         return false;
     }
 
-    const char *ft = find_ft(b->abs_filename, line);
+    const char *ft = find_ft(&editor.filetypes, b->abs_filename, line);
     if (ft && !streq(ft, b->options.filetype)) {
         b->options.filetype = str_intern(ft);
         return true;
