@@ -50,7 +50,7 @@ static void open_temporary_buffer (
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
     if (dterc_syntax) {
         v->buffer->options.filetype = str_intern("dte");
-        set_file_options(v->buffer);
+        set_file_options(&editor.file_options, v->buffer);
         buffer_update_syntax(v->buffer);
     }
 }

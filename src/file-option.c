@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include "file-option.h"
 #include "command/serialize.h"
+#include "editor.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
@@ -22,8 +23,6 @@ typedef struct {
         CachedRegexp *filename;
     } u;
 } FileOption;
-
-static PointerArray file_options = PTR_ARRAY_INIT;
 
 static void set_options(char **args)
 {
@@ -89,10 +88,10 @@ void set_editorconfig_options(Buffer *b)
     }
 }
 
-void set_file_options(Buffer *b)
+void set_file_options(const PointerArray *file_options, Buffer *b)
 {
-    for (size_t i = 0, n = file_options.count; i < n; i++) {
-        const FileOption *opt = file_options.ptrs[i];
+    for (size_t i = 0, n = file_options->count; i < n; i++) {
+        const FileOption *opt = file_options->ptrs[i];
         if (opt->type == FILE_OPTIONS_FILETYPE) {
             if (streq(opt->u.filetype, b->options.filetype)) {
                 set_options(opt->strs);
@@ -114,7 +113,7 @@ void set_file_options(Buffer *b)
     }
 }
 
-void add_file_options(FileOptionType type, StringView str, char **strs, size_t nstrs)
+void add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
     FileOption *opt = xnew(FileOption, 1);
     size_t len = str.length;
@@ -142,7 +141,7 @@ void add_file_options(FileOptionType type, StringView str, char **strs, size_t n
 append:
     opt->type = type;
     opt->strs = copy_string_array(strs, nstrs);
-    ptr_array_append(&file_options, opt);
+    ptr_array_append(file_options, opt);
     return;
 
 error:
@@ -152,8 +151,8 @@ error:
 
 void dump_file_options(String *buf)
 {
-    for (size_t i = 0, n = file_options.count; i < n; i++) {
-        const FileOption *opt = file_options.ptrs[i];
+    for (size_t i = 0, n = editor.file_options.count; i < n; i++) {
+        const FileOption *opt = editor.file_options.ptrs[i];
         const char *tp;
         if (opt->type == FILE_OPTIONS_FILENAME) {
             tp = opt->u.filename->str;

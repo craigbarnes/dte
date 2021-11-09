@@ -62,6 +62,7 @@ typedef struct {
     Buffer *buffer;
     PointerArray buffers;
     PointerArray filetypes;
+    PointerArray file_options;
     History search_history;
     History command_history;
     const char *const version;

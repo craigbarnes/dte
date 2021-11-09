@@ -1110,16 +1110,18 @@ static void cmd_option(const CommandArgs *a)
         return;
     }
 
+    EditorState *e = a->userdata;
+    PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
         const StringView pattern = strview_from_cstring(a->args[0]);
-        add_file_options(FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
+        add_file_options(opts, FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
         return;
     }
 
     const char *ft_list = a->args[0];
     for (size_t pos = 0, len = strlen(ft_list); pos < len; ) {
         const StringView filetype = get_delim(ft_list, &pos, len, ',');
-        add_file_options(FILE_OPTIONS_FILETYPE, filetype, strs, nstrs);
+        add_file_options(opts, FILE_OPTIONS_FILETYPE, filetype, strs, nstrs);
     }
 }
 
@@ -1754,7 +1756,7 @@ static void cmd_save(const CommandArgs *a)
     if (!old_mode && streq(buffer->options.filetype, "none")) {
         // New file and most likely user has not changed the filetype
         if (buffer_detect_filetype(buffer)) {
-            set_file_options(buffer);
+            set_file_options(&e->file_options, buffer);
             set_editorconfig_options(buffer);
             buffer_update_syntax(buffer);
         }

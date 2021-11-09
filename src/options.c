@@ -129,7 +129,7 @@ static void filetype_changed(bool global)
 {
     BUG_ON(!editor.buffer);
     BUG_ON(global);
-    set_file_options(editor.buffer);
+    set_file_options(&editor.file_options, editor.buffer);
     buffer_update_syntax(editor.buffer);
 }
 
