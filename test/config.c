@@ -106,9 +106,10 @@ static void test_exec_config(void)
     }
 
     // Execute *.dterc files
+    const CommandSet *cmds = &normal_commands;
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
-        exec_config(&normal_commands, config.text);
+        exec_config(cmds, config.text);
     }
 
     // Check that output files have expected contents
@@ -125,20 +126,21 @@ static void test_exec_config(void)
 
     const StringView s = STRING_VIEW("toggle utf8-bom \\");
     EXPECT_FALSE(editor.options.utf8_bom);
-    exec_config(&normal_commands, s);
+    exec_config(cmds, s);
     EXPECT_TRUE(editor.options.utf8_bom);
-    exec_config(&normal_commands, s);
+    exec_config(cmds, s);
     EXPECT_FALSE(editor.options.utf8_bom);
 }
 
 static void test_detect_indent(void)
 {
+    const CommandSet *cmds = &normal_commands;
     EXPECT_FALSE(editor.options.detect_indent);
     EXPECT_FALSE(editor.options.expand_tab);
     EXPECT_EQ(editor.options.indent_width, 8);
 
     handle_command (
-        &normal_commands,
+        cmds,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
         "open test/data/detect-indent.ini",
         false
@@ -148,7 +150,7 @@ static void test_detect_indent(void)
     EXPECT_TRUE(editor.buffer->options.expand_tab);
     EXPECT_EQ(editor.buffer->options.indent_width, 2);
 
-    handle_command(&normal_commands, "close", false);
+    handle_command(cmds, "close", false);
 }
 
 static void test_global_state(void)
