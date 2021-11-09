@@ -32,8 +32,8 @@ typedef struct {
 
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
 void file_location_free(FileLocation *loc);
-void push_file_location(FileLocation *loc);
-void pop_file_location(void);
+void push_file_location(PointerArray *locations, FileLocation *loc);
+void pop_file_location(PointerArray *locations);
 
 Message *new_message(const char *msg, size_t len) RETURNS_NONNULL;
 void add_message(MessageArray *arr, Message *m);
@@ -41,7 +41,7 @@ void activate_message(MessageArray *arr, size_t idx);
 void activate_current_message(const MessageArray *arr);
 void activate_next_message(MessageArray *arr);
 void activate_prev_message(MessageArray *arr);
-void activate_current_message_save(const MessageArray *arr, const View *view) NONNULL_ARGS;
+void activate_current_message_save(const MessageArray *arr, PointerArray *file_locations, const View *view) NONNULL_ARGS;
 void clear_messages(MessageArray *arr);
 String dump_messages(void);
 

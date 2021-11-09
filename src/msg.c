@@ -14,8 +14,6 @@
 #include "util/xmalloc.h"
 #include "window.h"
 
-static PointerArray file_locations = PTR_ARRAY_INIT;
-
 void file_location_free(FileLocation *loc)
 {
     free(loc->filename);
@@ -97,24 +95,27 @@ static bool file_location_return(const FileLocation *loc)
     return true;
 }
 
-void push_file_location(FileLocation *loc)
+void push_file_location(PointerArray *locations, FileLocation *loc)
 {
     const size_t max_entries = 256;
-    if (file_locations.count == max_entries) {
-        file_location_free(ptr_array_remove_idx(&file_locations, 0));
+    if (locations->count == max_entries) {
+        file_location_free(ptr_array_remove_idx(locations, 0));
     }
-    BUG_ON(file_locations.count >= max_entries);
-    ptr_array_append(&file_locations, loc);
+    BUG_ON(locations->count >= max_entries);
+    ptr_array_append(locations, loc);
 }
 
-void pop_file_location(void)
+void pop_file_location(PointerArray *locations)
 {
+    void **ptrs = locations->ptrs;
+    size_t count = locations->count;
     bool go = true;
-    while (file_locations.count > 0 && go) {
-        FileLocation *loc = file_locations.ptrs[--file_locations.count];
+    while (count > 0 && go) {
+        FileLocation *loc = ptrs[--count];
         go = !file_location_return(loc);
         file_location_free(loc);
     }
+    locations->count = count;
 }
 
 static void free_message(Message *m)
@@ -184,7 +185,7 @@ void activate_prev_message(MessageArray *msgs)
     activate_current_message(msgs);
 }
 
-void activate_current_message_save(const MessageArray *arr, const View *view)
+void activate_current_message_save(const MessageArray *arr, PointerArray *file_locations, const View *view)
 {
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
@@ -193,7 +194,7 @@ void activate_current_message_save(const MessageArray *arr, const View *view)
     // Save position if file changed or cursor moved
     view = editor.view;
     if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
-        push_file_location(loc);
+        push_file_location(file_locations, loc);
     } else {
         file_location_free(loc);
     }

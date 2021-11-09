@@ -217,11 +217,11 @@ static void cmd_bookmark(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     if (has_flag(a, 'r')) {
-        pop_file_location();
+        pop_file_location(&e->bookmarks);
         return;
     }
 
-    push_file_location(get_current_file_location(e->view));
+    push_file_location(&e->bookmarks, get_current_file_location(e->view));
 }
 
 static void cmd_case(const CommandArgs *a)
@@ -347,7 +347,7 @@ static void cmd_compile(const CommandArgs *a)
     clear_messages(&e->messages);
     spawn_compiler(a->args + 1, flags, c, &e->messages);
     if (e->messages.array.count) {
-        activate_current_message_save(&e->messages, e->view);
+        activate_current_message_save(&e->messages, &e->bookmarks, e->view);
     }
 }
 
@@ -2028,12 +2028,12 @@ static void cmd_suspend(const CommandArgs *a)
 
 static void cmd_tag(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     if (has_flag(a, 'r')) {
-        pop_file_location();
+        pop_file_location(&e->bookmarks);
         return;
     }
 
-    EditorState *e = a->userdata;
     clear_messages(&e->messages);
     TagFile *tf = load_tag_file();
     if (!tf) {
@@ -2079,7 +2079,7 @@ static void cmd_tag(const CommandArgs *a)
 
     free(word);
     free_tags(&tags);
-    activate_current_message_save(&e->messages, e->view);
+    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
 }
 
 static void cmd_title(const CommandArgs *a)

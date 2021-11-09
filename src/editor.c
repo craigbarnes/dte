@@ -43,6 +43,7 @@ EditorState editor = {
     .buffers = PTR_ARRAY_INIT,
     .filetypes = PTR_ARRAY_INIT,
     .file_options = PTR_ARRAY_INIT,
+    .bookmarks = PTR_ARRAY_INIT,
     .buffer = NULL,
     .view = NULL,
     .version = version,

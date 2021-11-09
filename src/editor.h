@@ -64,6 +64,7 @@ typedef struct {
     PointerArray buffers;
     PointerArray filetypes;
     PointerArray file_options;
+    PointerArray bookmarks;
     MessageArray messages;
     History search_history;
     History command_history;
