@@ -337,7 +337,7 @@ static void cmd_compile(const CommandArgs *a)
 
     EditorState *e = a->userdata;
     const char *name = a->args[0];
-    Compiler *c = find_compiler(name);
+    Compiler *c = find_compiler(&e->compilers, name);
     if (unlikely(!c)) {
         error_msg("No such error parser %s", name);
         return;
@@ -524,8 +524,9 @@ static void cmd_erase_word(const CommandArgs *a)
 
 static void cmd_errorfmt(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     bool ignore = has_flag(a, 'i');
-    add_error_fmt(a->args[0], ignore, a->args[1], a->args + 2);
+    add_error_fmt(&e->compilers, a->args[0], ignore, a->args[1], a->args + 2);
 }
 
 static void cmd_eval(const CommandArgs *a)

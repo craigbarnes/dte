@@ -176,7 +176,7 @@ static void show_include(EditorState *e, const char *name, bool cflag)
 
 static void show_compiler(EditorState *e, const char *name, bool cflag)
 {
-    const Compiler *compiler = find_compiler(name);
+    const Compiler *compiler = find_compiler(&e->compilers, name);
     if (!compiler) {
         error_msg("no errorfmt entry found for '%s'", name);
         return;

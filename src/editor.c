@@ -38,6 +38,7 @@ EditorState editor = {
     .everything_changed = false,
     .resized = false,
     .exit_code = EX_OK,
+    .compilers = HASHMAP_INIT,
     .syntaxes = HASHMAP_INIT,
     .buffers = PTR_ARRAY_INIT,
     .buffer = NULL,

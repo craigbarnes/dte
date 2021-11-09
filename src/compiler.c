@@ -2,6 +2,7 @@
 #include "compiler.h"
 #include "command/serialize.h"
 #include "completion.h"
+#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/hashmap.h"
@@ -16,27 +17,26 @@ static const char capture_names[][8] = {
     [ERRFMT_MESSAGE] = "message"
 };
 
-static HashMap compilers = HASHMAP_INIT;
-
-static Compiler *find_or_add_compiler(const char *name)
+static Compiler *find_or_add_compiler(HashMap *compilers, const char *name)
 {
-    Compiler *c = find_compiler(name);
+    Compiler *c = find_compiler(compilers, name);
     if (c) {
         return c;
     }
 
     c = xnew0(Compiler, 1);
-    hashmap_insert(&compilers, xstrdup(name), c);
+    hashmap_insert(compilers, xstrdup(name), c);
     return c;
 }
 
-Compiler *find_compiler(const char *name)
+Compiler *find_compiler(const HashMap *compilers, const char *name)
 {
-    return hashmap_get(&compilers, name);
+    return hashmap_get(compilers, name);
 }
 
 void add_error_fmt (
-    const char *compiler,
+    HashMap *compilers,
+    const char *name,
     bool ignore,
     const char *format,
     char **desc
@@ -84,13 +84,14 @@ void add_error_fmt (
         return;
     }
 
+    Compiler *compiler = find_or_add_compiler(compilers, name);
     f->pattern = str_intern(format);
-    ptr_array_append(&find_or_add_compiler(compiler)->error_formats, f);
+    ptr_array_append(&compiler->error_formats, f);
 }
 
 void collect_compilers(PointerArray *a, const char *prefix)
 {
-    collect_hashmap_keys(&compilers, a, prefix);
+    collect_hashmap_keys(&editor.compilers, a, prefix);
 }
 
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
@@ -151,7 +152,7 @@ String dump_compiler(const Compiler *c, const char *name)
 String dump_compilers(void)
 {
     String buf = string_new(4096);
-    for (HashMapIter it = hashmap_iter(&compilers); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(&editor.compilers); hashmap_next(&it); ) {
         const char *name = it.entry->key;
         const Compiler *c = it.entry->value;
         append_compiler(&buf, c, name);
