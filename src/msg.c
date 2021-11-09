@@ -11,14 +11,10 @@
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/path.h"
-#include "util/ptr-array.h"
 #include "util/xmalloc.h"
-#include "view.h"
 #include "window.h"
 
 static PointerArray file_locations = PTR_ARRAY_INIT;
-static PointerArray msgs = PTR_ARRAY_INIT;
-static size_t msg_pos;
 
 void file_location_free(FileLocation *loc)
 {
@@ -137,60 +133,62 @@ Message *new_message(const char *msg, size_t len)
     return m;
 }
 
-void add_message(Message *m)
+void add_message(MessageArray *msgs, Message *m)
 {
-    ptr_array_append(&msgs, m);
+    ptr_array_append(&msgs->array, m);
 }
 
-void activate_current_message(void)
+void activate_current_message(const MessageArray *msgs)
 {
-    if (msg_pos == msgs.count) {
+    size_t msg_pos = msgs->pos;
+    if (msg_pos == msgs->array.count) {
         return;
     }
-    const Message *m = msgs.ptrs[msg_pos];
+    const Message *m = msgs->array.ptrs[msg_pos];
     if (m->loc && m->loc->filename) {
         if (!file_location_go(m->loc)) {
             // Error message is visible
             return;
         }
     }
-    if (msgs.count == 1) {
+    if (msgs->array.count == 1) {
         info_msg("%s", m->msg);
     } else {
-        info_msg("[%zu/%zu] %s", msg_pos + 1, msgs.count, m->msg);
+        info_msg("[%zu/%zu] %s", msg_pos + 1, msgs->array.count, m->msg);
     }
 }
 
-void activate_message(size_t idx)
+void activate_message(MessageArray *msgs, size_t idx)
 {
-    if (msgs.count == 0) {
+    const size_t count = msgs->array.count;
+    if (count == 0) {
         return;
     }
-    msg_pos = (idx < msgs.count) ? idx : msgs.count - 1;
-    activate_current_message();
+    msgs->pos = (idx < count) ? idx : count - 1;
+    activate_current_message(msgs);
 }
 
-void activate_next_message(void)
+void activate_next_message(MessageArray *msgs)
 {
-    if (msg_pos + 1 < msgs.count) {
-        msg_pos++;
+    if (msgs->pos + 1 < msgs->array.count) {
+        msgs->pos++;
     }
-    activate_current_message();
+    activate_current_message(msgs);
 }
 
-void activate_prev_message(void)
+void activate_prev_message(MessageArray *msgs)
 {
-    if (msg_pos > 0) {
-        msg_pos--;
+    if (msgs->pos > 0) {
+        msgs->pos--;
     }
-    activate_current_message();
+    activate_current_message(msgs);
 }
 
-void activate_current_message_save(const View *view)
+void activate_current_message_save(const MessageArray *arr, const View *view)
 {
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
-    activate_current_message();
+    activate_current_message(arr);
 
     // Save position if file changed or cursor moved
     view = editor.view;
@@ -201,15 +199,10 @@ void activate_current_message_save(const View *view)
     }
 }
 
-void clear_messages(void)
+void clear_messages(MessageArray *msgs)
 {
-    ptr_array_free_cb(&msgs, FREE_FUNC(free_message));
-    msg_pos = 0;
-}
-
-size_t message_count(void)
-{
-    return msgs.count;
+    ptr_array_free_cb(&msgs->array, FREE_FUNC(free_message));
+    msgs->pos = 0;
 }
 
 String dump_messages(void)
@@ -220,8 +213,8 @@ String dump_messages(void)
         return buf;
     }
 
-    for (size_t i = 0, n = msgs.count; i < n; i++) {
-        const Message *m = msgs.ptrs[i];
+    for (size_t i = 0, n = editor.messages.array.count; i < n; i++) {
+        const Message *m = editor.messages.array.ptrs[i];
         string_sprintf(&buf, "%zu: ", i + 1);
 
         const FileLocation *loc = m->loc;

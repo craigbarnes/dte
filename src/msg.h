@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "util/macros.h"
+#include "util/ptr-array.h"
 #include "util/string.h"
 #include "view.h"
 
@@ -24,20 +25,24 @@ typedef struct {
     FileLocation *loc;
 } Message;
 
+typedef struct {
+    PointerArray array;
+    size_t pos;
+} MessageArray;
+
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
 void file_location_free(FileLocation *loc);
 void push_file_location(FileLocation *loc);
 void pop_file_location(void);
 
 Message *new_message(const char *msg, size_t len) RETURNS_NONNULL;
-void add_message(Message *m);
-void activate_message(size_t idx);
-void activate_current_message(void);
-void activate_next_message(void);
-void activate_prev_message(void);
-void activate_current_message_save(const View *view) NONNULL_ARGS;
-void clear_messages(void);
-size_t message_count(void) PURE;
+void add_message(MessageArray *arr, Message *m);
+void activate_message(MessageArray *arr, size_t idx);
+void activate_current_message(const MessageArray *arr);
+void activate_next_message(MessageArray *arr);
+void activate_prev_message(MessageArray *arr);
+void activate_current_message_save(const MessageArray *arr, const View *view) NONNULL_ARGS;
+void clear_messages(MessageArray *arr);
 String dump_messages(void);
 
 #endif

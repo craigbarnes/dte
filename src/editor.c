@@ -48,6 +48,10 @@ EditorState editor = {
     .version = version,
     .file_locks_mode = 0666,
     .cmdline_x = 0,
+    .messages = {
+        .array = PTR_ARRAY_INIT,
+        .pos = 0,
+    },
     .cmdline = {
         .buf = STRING_INIT,
         .pos = 0,

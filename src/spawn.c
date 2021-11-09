@@ -18,7 +18,7 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-static void handle_error_msg(const Compiler *c, char *str)
+static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
 {
     if (str[0] == '\0' || str[0] == '\n') {
         return;
@@ -74,14 +74,14 @@ static void handle_error_msg(const Compiler *c, char *str)
             }
         }
 
-        add_message(msg);
+        add_message(msgs, msg);
         return;
     }
 
-    add_message(new_message(str, str_len));
+    add_message(msgs, new_message(str, str_len));
 }
 
-static void read_errors(const Compiler *c, int fd, bool quiet)
+static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quiet)
 {
     FILE *f = fdopen(fd, "r");
     if (unlikely(!f)) {
@@ -92,7 +92,7 @@ static void read_errors(const Compiler *c, int fd, bool quiet)
         if (!quiet) {
             fputs(line, stderr);
         }
-        handle_error_msg(c, line);
+        handle_error_msg(c, msgs, line);
     }
     fclose(f);
 }
@@ -393,7 +393,7 @@ error:
     return false;
 }
 
-void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
+void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs)
 {
     int fd[3];
     fd[0] = open_dev_null(O_RDONLY);
@@ -436,7 +436,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c)
         // Must close write end of the pipe before read_errors() or
         // the read end never gets EOF!
         xclose(p[1]);
-        read_errors(c, p[0], quiet);
+        read_errors(c, msgs, p[0], quiet);
         handle_child_error(pid);
     }
     resume_terminal(quiet, prompt);

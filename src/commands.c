@@ -344,10 +344,10 @@ static void cmd_compile(const CommandArgs *a)
     }
 
     SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
-    clear_messages();
-    spawn_compiler(a->args + 1, flags, c);
-    if (message_count()) {
-        activate_current_message_save(e->view);
+    clear_messages(&e->messages);
+    spawn_compiler(a->args + 1, flags, c, &e->messages);
+    if (e->messages.array.count) {
+        activate_current_message_save(&e->messages, e->view);
     }
 }
 
@@ -561,7 +561,8 @@ static void cmd_exec_msg(const CommandArgs *a)
 
     size_t i;
     if (buf_parse_size(ctx.output.buffer, ctx.output.len, &i) > 0 && i > 0) {
-        activate_message(i - 1);
+        EditorState *e = a->userdata;
+        activate_message(&e->messages, i - 1);
     }
 
     string_free(&ctx.output);
@@ -955,17 +956,18 @@ static void cmd_move_tab(const CommandArgs *a)
 
 static void cmd_msg(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     const char *arg = a->args[0];
     if (!arg) {
         switch (last_flag(a)) {
         case 0:
-            activate_current_message();
+            activate_current_message(&e->messages);
             break;
         case 'n':
-            activate_next_message();
+            activate_next_message(&e->messages);
             break;
         case 'p':
-            activate_prev_message();
+            activate_prev_message(&e->messages);
             break;
         default:
             BUG("unexpected flag");
@@ -984,7 +986,7 @@ static void cmd_msg(const CommandArgs *a)
         return;
     }
 
-    activate_message(idx - 1);
+    activate_message(&e->messages, idx - 1);
 }
 
 static void cmd_new_line(const CommandArgs *a)
@@ -2031,14 +2033,14 @@ static void cmd_tag(const CommandArgs *a)
         return;
     }
 
-    clear_messages();
+    EditorState *e = a->userdata;
+    clear_messages(&e->messages);
     TagFile *tf = load_tag_file();
     if (!tf) {
         error_msg("No tags file");
         return;
     }
 
-    EditorState *e = a->userdata;
     const char *name = a->args[0];
     char *word = NULL;
     if (!name) {
@@ -2072,12 +2074,12 @@ static void cmd_tag(const CommandArgs *a)
         } else {
             m->loc->line = t->line;
         }
-        add_message(m);
+        add_message(&e->messages, m);
     }
 
     free(word);
     free_tags(&tags);
-    activate_current_message_save(e->view);
+    activate_current_message_save(&e->messages, e->view);
 }
 
 static void cmd_title(const CommandArgs *a)

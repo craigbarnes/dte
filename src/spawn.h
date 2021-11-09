@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "compiler.h"
+#include "msg.h"
 #include "util/string.h"
 #include "util/string-view.h"
 
@@ -25,6 +26,6 @@ bool spawn_source(SpawnContext *ctx);
 bool spawn_sink(SpawnContext *ctx);
 bool spawn_filter(SpawnContext *ctx);
 void spawn(SpawnContext *ctx);
-void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c);
+void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
 
 #endif

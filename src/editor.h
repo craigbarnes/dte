@@ -11,6 +11,7 @@
 #include "encoding.h"
 #include "history.h"
 #include "mode.h"
+#include "msg.h"
 #include "options.h"
 #include "terminal/output.h"
 #include "util/macros.h"
@@ -63,6 +64,7 @@ typedef struct {
     PointerArray buffers;
     PointerArray filetypes;
     PointerArray file_options;
+    MessageArray messages;
     History search_history;
     History command_history;
     const char *const version;
