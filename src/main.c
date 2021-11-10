@@ -412,10 +412,8 @@ loop_break:
     set_signal_handlers();
     set_fatal_error_cleanup_handler(term_cleanup);
 
-    const char *file_history_filename = NULL;
     if (load_and_save_history) {
-        file_history_filename = editor_file("file-history");
-        file_history_load(file_history_filename);
+        file_history_load(&editor.file_history, editor_file("file-history"));
         history_load(&editor.command_history, editor_file("command-history"));
         history_load(&editor.search_history, editor_file("search-history"));
         if (editor.search_history.last) {
@@ -511,7 +509,7 @@ loop_break:
     if (load_and_save_history) {
         history_save(&editor.command_history);
         history_save(&editor.search_history);
-        file_history_save(file_history_filename);
+        file_history_save(&editor.file_history);
     }
 
     if (stdout_buffer) {

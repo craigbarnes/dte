@@ -10,6 +10,7 @@
 #include "buffer.h"
 #include "cmdline.h"
 #include "encoding.h"
+#include "file-history.h"
 #include "history.h"
 #include "mode.h"
 #include "msg.h"
@@ -70,6 +71,7 @@ typedef struct {
     PointerArray file_options;
     PointerArray bookmarks;
     MessageArray messages;
+    FileHistory file_history;
     History search_history;
     History command_history;
     const char *const version;

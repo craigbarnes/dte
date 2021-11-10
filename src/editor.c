@@ -62,6 +62,10 @@ EditorState editor = {
         .search_pos = NULL,
         .search_text = NULL
     },
+    .file_history = {
+        .filename = NULL,
+        .entries = HASHMAP_INIT
+    },
     .command_history = {
         .filename = NULL,
         .max_entries = 512,
