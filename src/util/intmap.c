@@ -11,9 +11,12 @@ enum {
     MIN_SIZE = 8,
 };
 
-static size_t hash_key(uint32_t key)
+static size_t hash_key(uint32_t k)
 {
-    return key;
+    k = ((k >> 16) ^ k) * 0x45d9f3b;
+    k = ((k >> 16) ^ k) * 0x45d9f3b;
+    k = (k >> 16) ^ k;
+    return k;
 }
 
 WARN_UNUSED_RESULT
