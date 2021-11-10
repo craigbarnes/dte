@@ -38,7 +38,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf pipe redo shift fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    ascii base64 debug exec hashmap hashset numtostr path ptr-array \
+    ascii base64 debug exec hashmap hashset intmap numtostr path ptr-array \
     readfile string strtonum unicode utf8 xmalloc xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \

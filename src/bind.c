@@ -11,167 +11,44 @@
 #include "command/serialize.h"
 #include "commands.h"
 #include "util/debug.h"
+#include "util/intmap.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-enum {
-    ASCII_RANGE_START = 0x20, // ' '
-    ASCII_RANGE_END = 0x7E, // '~'
-    ASCII_RANGE_LEN = (ASCII_RANGE_END - ASCII_RANGE_START) + 1,
-};
-
-typedef struct {
-    KeyCode key;
-    CachedCommand *bind;
-} KeyBindingEntry;
-
 typedef struct {
     const CommandSet *cmds;
-
-    // Fast lookup table for most common key combinations (Ctrl or Meta
-    // with ASCII keys or any combination of modifiers with special keys)
-    CachedCommand *table[(2 * ASCII_RANGE_LEN) + (8 * NR_SPECIAL_KEYS)];
-
-    // Fallback for all other keys (Unicode combos etc.)
-    PointerArray ptr_array;
+    IntMap map;
 } KeyBindingGroup;
 
-static KeyBindingGroup bindings[3];
+static KeyBindingGroup bindings[3] = {
+    [INPUT_NORMAL] = {.cmds = &normal_commands},
+    [INPUT_COMMAND] = {.cmds = &cmd_mode_commands},
+    [INPUT_SEARCH] = {.cmds = &search_mode_commands},
+};
 
 void bindings_init(void)
 {
-    // This is done here instead of as a static initializer to allow
-    // `bindings` to live in the .bss section and thus avoid placing
-    // the whole thing (including the large lookup tables) in the
-    // .data section
-    bindings[INPUT_NORMAL].cmds = &normal_commands;
-    bindings[INPUT_COMMAND].cmds = &cmd_mode_commands;
-    bindings[INPUT_SEARCH].cmds = &search_mode_commands;
-}
-
-static ssize_t get_lookup_table_index(KeyCode k)
-{
-    static_assert(ASCII_RANGE_LEN == 95);
-    static_assert(MOD_MASK >> MOD_OFFSET == 7);
-
-    const KeyCode modifiers = keycode_get_modifiers(k);
-    const KeyCode key = keycode_get_key(k);
-
-    size_t idx = key - KEY_SPECIAL_MIN;
-    if (idx < NR_SPECIAL_KEYS) {
-        const size_t mod_offset = (modifiers >> MOD_OFFSET) * NR_SPECIAL_KEYS;
-        return (2 * ASCII_RANGE_LEN) + mod_offset + idx;
-    }
-
-    idx = key - ASCII_RANGE_START;
-    if (idx < ASCII_RANGE_LEN) {
-        switch (modifiers) {
-        case MOD_META:
-            idx += ASCII_RANGE_LEN;
-            // Fallthrough
-        case MOD_CTRL:
-            return idx;
-        }
-    }
-
-    return -1;
-}
-
-UNITTEST {
-    const size_t size = ARRAY_COUNT(bindings[0].table);
-    const KeyCode min = KEY_SPECIAL_MIN;
-    const KeyCode max = KEY_SPECIAL_MAX;
-    const KeyCode nsk = NR_SPECIAL_KEYS;
-    const KeyCode arl = ASCII_RANGE_LEN;
-    const KeyCode ax2 = ASCII_RANGE_LEN * 2;
-    BUG_ON(size != ax2 + (8 * nsk));
-
-    BUG_ON(get_lookup_table_index(min) != ax2);
-    BUG_ON(get_lookup_table_index(max) != ax2 + nsk - 1);
-    BUG_ON(get_lookup_table_index(MOD_SHIFT | min) != ax2 + nsk);
-    BUG_ON(get_lookup_table_index(MOD_SHIFT | max) != ax2 + (2 * nsk) - 1);
-    BUG_ON(get_lookup_table_index(MOD_META | min) != ax2 + (2 * nsk));
-    BUG_ON(get_lookup_table_index(MOD_META | max) != ax2 + (3 * nsk) - 1);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | min) != ax2 + (4 * nsk));
-    BUG_ON(get_lookup_table_index(MOD_CTRL | max) != ax2 + (5 * nsk) - 1);
-    BUG_ON(get_lookup_table_index(MOD_MASK | min) != ax2 + (7 * nsk));
-    BUG_ON(get_lookup_table_index(MOD_MASK | max) != ax2 + (8 * nsk) - 1);
-    BUG_ON(get_lookup_table_index(MOD_MASK | max) != size - 1);
-
-    BUG_ON(get_lookup_table_index(MOD_CTRL | ASCII_RANGE_START) != 0);
-    BUG_ON(get_lookup_table_index(MOD_META | ASCII_RANGE_START) != arl);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | ASCII_RANGE_END) != arl - 1);
-    BUG_ON(get_lookup_table_index(MOD_META | ASCII_RANGE_END) != ax2 - 1);
-
-    BUG_ON(get_lookup_table_index(MOD_CTRL | (ASCII_RANGE_START - 1)) != -1);
-    BUG_ON(get_lookup_table_index(MOD_META | (ASCII_RANGE_START - 1)) != -1);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | (ASCII_RANGE_END + 1)) != -1);
-    BUG_ON(get_lookup_table_index(MOD_META | (ASCII_RANGE_END + 1)) != -1);
-    BUG_ON(get_lookup_table_index(MOD_CTRL | MOD_META | 'a') != -1);
-    BUG_ON(get_lookup_table_index(MOD_META | 0x0E01) != -1);
-}
-
-static void free_key_binding_entry(KeyBindingEntry *entry)
-{
-    cached_command_free(entry->bind);
-    free(entry);
+    intmap_init(&bindings[INPUT_NORMAL].map, 150);
+    intmap_init(&bindings[INPUT_COMMAND].map, 40);
+    intmap_init(&bindings[INPUT_SEARCH].map, 40);
 }
 
 void add_binding(InputMode mode, KeyCode key, const char *command)
 {
-    const ssize_t idx = get_lookup_table_index(key);
-    if (likely(idx >= 0)) {
-        CachedCommand **table = bindings[mode].table;
-        cached_command_free(table[idx]);
-        table[idx] = cached_command_new(bindings[mode].cmds, command);
-        return;
-    }
-
-    KeyBindingEntry *entry = xnew(KeyBindingEntry, 1);
-    entry->key = key;
-    entry->bind = cached_command_new(bindings[mode].cmds, command);
-    ptr_array_append(&bindings[mode].ptr_array, entry);
+    KeyBindingGroup *kbg = &bindings[mode];
+    CachedCommand *cc = cached_command_new(kbg->cmds, command);
+    cached_command_free(intmap_insert_or_replace(&kbg->map, key, cc));
 }
 
 void remove_binding(InputMode mode, KeyCode key)
 {
-    const ssize_t idx = get_lookup_table_index(key);
-    if (likely(idx >= 0)) {
-        CachedCommand **table = bindings[mode].table;
-        cached_command_free(table[idx]);
-        table[idx] = NULL;
-        return;
-    }
-
-    PointerArray *ptr_array = &bindings[mode].ptr_array;
-    size_t i = ptr_array->count;
-    while (i > 0) {
-        KeyBindingEntry *entry = ptr_array->ptrs[--i];
-        if (entry->key == key) {
-            ptr_array_remove_idx(ptr_array, i);
-            free_key_binding_entry(entry);
-            return;
-        }
-    }
+    cached_command_free(intmap_remove(&bindings[mode].map, key));
 }
 
 const CachedCommand *lookup_binding(InputMode mode, KeyCode key)
 {
-    const ssize_t idx = get_lookup_table_index(key);
-    if (likely(idx >= 0)) {
-        return bindings[mode].table[idx];
-    }
-
-    PointerArray *ptr_array = &bindings[mode].ptr_array;
-    for (size_t i = ptr_array->count; i > 0; i--) {
-        KeyBindingEntry *entry = ptr_array->ptrs[i - 1];
-        if (entry->key == key) {
-            return entry->bind;
-        }
-    }
-
-    return NULL;
+    return intmap_get(&bindings[mode].map, key);
 }
 
 bool handle_binding(InputMode mode, KeyCode key)
@@ -198,65 +75,27 @@ bool handle_binding(InputMode mode, KeyCode key)
     return true;
 }
 
-static void maybe_add_key_completion(PointerArray *a, const char *prefix, KeyCode k)
-{
-    const char *str = keycode_to_string(k);
-    if (str_has_prefix(str, prefix)) {
-        ptr_array_append(a, xstrdup(str));
-    }
-}
-
-static void maybe_add_lt_key_completion(PointerArray *a, const char *prefix, KeyCode k)
-{
-    const ssize_t idx = get_lookup_table_index(k);
-    BUG_ON(idx < 0);
-    if (bindings[INPUT_NORMAL].table[idx]) {
-        maybe_add_key_completion(a, prefix, k);
-    }
-}
-
 void collect_bound_keys(PointerArray *a, const char *prefix)
 {
-    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        maybe_add_lt_key_completion(a, prefix, MOD_CTRL | k);
-    }
-
-    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        maybe_add_lt_key_completion(a, prefix, MOD_META | k);
-    }
-
-    static_assert(MOD_MASK >> MOD_OFFSET == 7);
-    for (KeyCode m = 0, mods = 0; m <= 7; mods = ++m << MOD_OFFSET) {
-        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
-            maybe_add_lt_key_completion(a, prefix, mods | k);
+    const IntMap *map = &bindings[INPUT_NORMAL].map;
+    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
+        const char *str = keycode_to_string(it.entry->key);
+        if (str_has_prefix(str, prefix)) {
+            ptr_array_append(a, xstrdup(str));
         }
     }
-
-    const PointerArray *array = &bindings[INPUT_NORMAL].ptr_array;
-    for (size_t i = 0, n = array->count; i < n; i++) {
-        const KeyBindingEntry *entry = array->ptrs[i];
-        maybe_add_key_completion(a, prefix, entry->key);
-    }
 }
 
-static void append_binding(String *s, KeyCode key, const char *flag, const char *cmd)
-{
-    string_append_literal(s, "bind ");
-    string_append_cstring(s, flag);
-    string_append_escaped_arg(s, keycode_to_string(key), true);
-    string_append_byte(s, ' ');
-    string_append_escaped_arg(s, cmd, true);
-    string_append_byte(s, '\n');
-}
+typedef struct {
+    KeyCode key;
+    const char *cmd;
+} KeyBinding;
 
-static void append_lookup_table_binding(String *s, InputMode mode, const char *flag, KeyCode key)
+static int binding_cmp(const void *ap, const void *bp)
 {
-    const ssize_t i = get_lookup_table_index(key);
-    BUG_ON(i < 0);
-    const CachedCommand *binding = bindings[mode].table[i];
-    if (binding) {
-        append_binding(s, key, flag, binding->cmd_str);
-    }
+    KeyCode a = ((const KeyBinding*)ap)->key;
+    KeyCode b = ((const KeyBinding*)bp)->key;
+    return a == b ? 0 : (a > b ? 1 : -1);
 }
 
 static void append_binding_group(String *buf, InputMode mode)
@@ -267,37 +106,41 @@ static void append_binding_group(String *buf, InputMode mode)
         [INPUT_SEARCH] = "-s ",
     };
 
+    const IntMap *map = &bindings[mode].map;
+    const size_t count = map->count;
+    if (unlikely(count == 0)) {
+        return;
+    }
+
+    // Clone the contents of the map as an array of key/command pairs
+    KeyBinding *array = xnew(*array, count);
+    size_t n = 0;
+    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
+        const CachedCommand *cc = it.entry->value;
+        array[n++] = (KeyBinding) {
+            .key = it.entry->key,
+            .cmd = cc->cmd_str,
+        };
+    }
+
+    // Sort the array
+    BUG_ON(n != count);
+    qsort(array, count, sizeof(array[0]), binding_cmp);
+
+    // Serialize the bindings in sorted order
     static_assert(ARRAY_COUNT(mode_flags) == ARRAY_COUNT(bindings));
     const char *flag = mode_flags[mode];
     const size_t prev_buf_len = buf->len;
-
-    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        append_lookup_table_binding(buf, mode, flag, MOD_CTRL | k);
-    }
-
-    for (KeyCode k = ASCII_RANGE_START; k <= ASCII_RANGE_END; k++) {
-        append_lookup_table_binding(buf, mode, flag, MOD_META | k);
-    }
-
-    static_assert(MOD_MASK >> MOD_OFFSET == 7);
-    for (KeyCode m = 0, modifiers = 0; m <= 7; modifiers = ++m << MOD_OFFSET) {
-        for (KeyCode k = KEY_SPECIAL_MIN; k <= KEY_SPECIAL_MAX; k++) {
-            append_lookup_table_binding(buf, mode, flag, modifiers | k);
-        }
-    }
-
-    const PointerArray *array = &bindings[mode].ptr_array;
-    size_t n = array->count;
-    if (DEBUG && n) {
-        // Show a blank line divider in debug mode, to make it easier to
-        // see which bindings are in the fallback PointerArray
+    for (size_t i = 0; i < count; i++) {
+        string_append_literal(buf, "bind ");
+        string_append_cstring(buf, flag);
+        string_append_escaped_arg(buf, keycode_to_string(array[i].key), true);
+        string_append_byte(buf, ' ');
+        string_append_escaped_arg(buf, array[i].cmd, true);
         string_append_byte(buf, '\n');
     }
-    for (size_t i = 0; i < n; i++) {
-        const KeyBindingEntry *entry = array->ptrs[i];
-        append_binding(buf, entry->key, flag, entry->bind->cmd_str);
-    }
 
+    free(array);
     if (buf->len > prev_buf_len) {
         string_append_byte(buf, '\n');
     }
