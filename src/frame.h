@@ -36,7 +36,7 @@ void update_window_coordinates(void);
 Frame *split_frame(struct Window *w, bool vertical, bool before);
 Frame *split_root(bool vertical, bool before);
 void remove_frame(Frame *f);
-String dump_frames(void);
+void dump_frame(const Frame *f, int level, String *str);
 
 #if DEBUG >= 1
   void debug_frames(void);

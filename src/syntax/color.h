@@ -33,6 +33,6 @@ void set_highlight_color(ColorScheme *colors, const char *name, const TermColor 
 TermColor *find_color(ColorScheme *colors, const char *name);
 void clear_hl_colors(ColorScheme *colors);
 void collect_hl_colors(PointerArray *a, const char *prefix);
-String dump_hl_colors(void);
+String dump_hl_colors(const ColorScheme *colors);
 
 #endif

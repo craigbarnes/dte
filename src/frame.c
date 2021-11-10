@@ -488,7 +488,7 @@ void remove_frame(Frame *f)
     update_window_coordinates();
 }
 
-static void string_append_frame(String *str, const Frame *f, int level)
+void dump_frame(const Frame *f, int level, String *str)
 {
     string_sprintf(str, "%*s%dx%d", level * 4, "", f->w, f->h);
 
@@ -511,15 +511,8 @@ static void string_append_frame(String *str, const Frame *f, int level)
     BUG_ON(n == 0);
     for (size_t i = 0; i < n; i++) {
         const Frame *c = f->frames.ptrs[i];
-        string_append_frame(str, c, level + 1);
+        dump_frame(c, level + 1, str);
     }
-}
-
-String dump_frames(void)
-{
-    String str = string_new(4096);
-    string_append_frame(&str, root_frame, 0);
-    return str;
 }
 
 #if DEBUG >= 1

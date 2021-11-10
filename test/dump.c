@@ -5,6 +5,7 @@
 #include "commands.h"
 #include "compiler.h"
 #include "config.h"
+#include "editor.h"
 #include "filetype.h"
 #include "frame.h"
 #include "options.h"
@@ -16,15 +17,15 @@ static const struct {
     const char name[10];
     bool check_parse;
     bool check_name;
-    String (*dump)(void);
+    String (*dump)(EditorState *e);
 } handlers[] = {
     {"alias", true, true, dump_normal_aliases},
     {"bind", true, true, dump_bindings},
     {"errorfmt", true, true, dump_compilers},
-    {"ft", true, true, dump_ft},
-    {"hi", true, true, dump_hl_colors},
-    {"include", false, false, dump_builtin_configs},
-    {"option", true, false, dump_options},
+    {"ft", true, true, do_dump_filetypes},
+    {"hi", true, true, do_dump_hl_colors},
+    {"include", false, false, do_dump_builtin_configs},
+    {"option", true, false, do_dump_options},
     {"wsplit", false, false, dump_frames},
 };
 
@@ -35,13 +36,16 @@ static void test_dump_handlers(void)
     ASSERT_NONNULL(ud);
 
     for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
-        String str = handlers[i].dump();
+        String str = handlers[i].dump(&editor);
         size_t pos = 0;
         while (pos < str.len) {
+            bool check_parse = handlers[i].check_parse;
+            bool check_name = handlers[i].check_name;
+            EXPECT_TRUE(!check_name || check_parse);
+
             const char *line = buf_next_line(str.buffer, &pos, str.len);
             ASSERT_NONNULL(line);
-            char c = line[0];
-            if (c == '\0' || c == '#' || !handlers[i].check_parse) {
+            if (line[0] == '\0' || line[0] == '#' || !check_parse) {
                 continue;
             }
 
@@ -53,7 +57,7 @@ static void test_dump_handlers(void)
                 continue;
             }
 
-            if (handlers[i].check_name) {
+            if (check_name) {
                 EXPECT_STREQ(arr.ptrs[0], handlers[i].name);
             }
 

@@ -106,7 +106,7 @@ void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
     }
 }
 
-static void append_compiler(String *s, const Compiler *c, const char *name)
+void dump_compiler(const Compiler *c, const char *name, String *s)
 {
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         ErrorFormat *e = c->error_formats.ptrs[i];
@@ -140,23 +140,4 @@ static void append_compiler(String *s, const Compiler *c, const char *name)
 
         string_append_byte(s, '\n');
     }
-}
-
-String dump_compiler(const Compiler *c, const char *name)
-{
-    String buf = string_new(512);
-    append_compiler(&buf, c, name);
-    return buf;
-}
-
-String dump_compilers(void)
-{
-    String buf = string_new(4096);
-    for (HashMapIter it = hashmap_iter(&editor.compilers); hashmap_next(&it); ) {
-        const char *name = it.entry->key;
-        const Compiler *c = it.entry->value;
-        append_compiler(&buf, c, name);
-        string_append_byte(&buf, '\n');
-    }
-    return buf;
 }

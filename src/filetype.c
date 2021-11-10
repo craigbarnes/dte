@@ -332,7 +332,7 @@ static const char *ft_get_str(const UserFileTypeEntry *ft)
     return ft_uses_regex(ft->type) ? ft->u.regexp->str : ft->u.str->str;
 }
 
-String dump_ft(void)
+String dump_filetypes(const PointerArray *filetypes)
 {
     static const char flags[][4] = {
         [FT_EXTENSION] = "",
@@ -343,8 +343,8 @@ String dump_ft(void)
     };
 
     String s = string_new(4096);
-    for (size_t i = 0, n = editor.filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = editor.filetypes.ptrs[i];
+    for (size_t i = 0, n = filetypes->count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes->ptrs[i];
         BUG_ON(ft->type >= ARRAY_COUNT(flags));
         string_append_literal(&s, "ft ");
         string_append_cstring(&s, flags[ft->type]);

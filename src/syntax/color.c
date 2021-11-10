@@ -107,15 +107,15 @@ static void append_color(String *s, const char *name, const TermColor *color)
     string_append_byte(s, '\n');
 }
 
-String dump_hl_colors(void)
+String dump_hl_colors(const ColorScheme *colors)
 {
     String buf = string_new(4096);
     string_append_literal(&buf, "# UI colors:\n");
     for (size_t i = 0; i < NR_BC; i++) {
-        append_color(&buf, builtin_color_names[i], &editor.colors.builtin[i]);
+        append_color(&buf, builtin_color_names[i], &colors->builtin[i]);
     }
 
-    const HashMap *hl_colors = &editor.colors.other;
+    const HashMap *hl_colors = &colors->other;
     const size_t count = hl_colors->count;
     if (unlikely(count == 0)) {
         return buf;

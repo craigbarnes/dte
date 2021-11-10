@@ -135,7 +135,7 @@ static void show_env(EditorState *e, const char *name, bool cflag)
     }
 }
 
-static String dump_env(void)
+static String dump_env(EditorState* UNUSED_ARG(e))
 {
     String buf = string_new(4096);
     for (size_t i = 0; environ[i]; i++) {
@@ -182,7 +182,8 @@ static void show_compiler(EditorState *e, const char *name, bool cflag)
         return;
     }
 
-    String str = dump_compiler(compiler, name);
+    String str = string_new(512);
+    dump_compiler(compiler, name, &str);
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
@@ -244,14 +245,14 @@ static String do_history_dump(const History *history)
     return buf;
 }
 
-static String dump_command_history(void)
+static String dump_command_history(EditorState *e)
 {
-    return do_history_dump(&editor.command_history);
+    return do_history_dump(&e->command_history);
 }
 
-static String dump_search_history(void)
+static String dump_search_history(EditorState *e)
 {
-    return do_history_dump(&editor.search_history);
+    return do_history_dump(&e->search_history);
 }
 
 typedef struct {
@@ -266,7 +267,7 @@ static int alias_cmp(const void *ap, const void *bp)
     return strcmp(a->name, b->name);
 }
 
-String dump_normal_aliases(void)
+String dump_normal_aliases(EditorState* UNUSED_ARG(e))
 {
     const HashMap *aliases = &normal_commands.aliases;
     const size_t count = aliases->count;
@@ -311,26 +312,93 @@ void collect_normal_aliases(PointerArray *a, const char *prefix)
     collect_hashmap_keys(&normal_commands.aliases, a, prefix);
 }
 
+String dump_bindings(EditorState *e)
+{
+    static const char flags[][4] = {
+        [INPUT_NORMAL] = "",
+        [INPUT_COMMAND] = "-c ",
+        [INPUT_SEARCH] = "-s ",
+    };
+
+    static_assert(ARRAY_COUNT(flags) == ARRAY_COUNT(e->bindings));
+    String buf = string_new(4096);
+    for (InputMode i = 0, n = ARRAY_COUNT(e->bindings); i < n; i++) {
+        if (dump_binding_group(&e->bindings[i], flags[i], &buf) && i != n - 1) {
+            string_append_byte(&buf, '\n');
+        }
+    }
+    return buf;
+}
+
+String dump_frames(EditorState* UNUSED_ARG(e))
+{
+    String str = string_new(4096);
+    dump_frame(root_frame, 0, &str);
+    return str;
+}
+
+String dump_compilers(EditorState *e)
+{
+    String buf = string_new(4096);
+    for (HashMapIter it = hashmap_iter(&e->compilers); hashmap_next(&it); ) {
+        const char *name = it.entry->key;
+        const Compiler *c = it.entry->value;
+        dump_compiler(c, name, &buf);
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
+}
+
+String do_dump_options(EditorState* UNUSED_ARG(e))
+{
+    return dump_options();
+}
+
+String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))
+{
+    return dump_builtin_configs();
+}
+
+String do_dump_hl_colors(EditorState *e)
+{
+    return dump_hl_colors(&e->colors);
+}
+
+String do_dump_filetypes(EditorState *e)
+{
+    return dump_filetypes(&e->filetypes);
+}
+
+static String do_dump_messages(EditorState *e)
+{
+    return dump_messages(&e->messages);
+}
+
+static String do_dump_macro(EditorState* UNUSED_ARG(e))
+{
+    return dump_macro();
+}
+
 typedef struct {
     const char name[11];
     bool dumps_dterc_syntax;
     void (*show)(EditorState *e, const char *name, bool cmdline);
-    String (*dump)(void);
+    String (*dump)(EditorState *e);
     void (*complete_arg)(PointerArray *a, const char *prefix);
 } ShowHandler;
 
 static const ShowHandler handlers[] = {
     {"alias", true, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
     {"bind", true, show_binding, dump_bindings, collect_bound_keys},
-    {"color", true, show_color, dump_hl_colors, collect_hl_colors},
+    {"color", true, show_color, do_dump_hl_colors, collect_hl_colors},
     {"command", true, NULL, dump_command_history, NULL},
     {"env", false, show_env, dump_env, collect_env},
     {"errorfmt", true, show_compiler, dump_compilers, collect_compilers},
-    {"ft", true, NULL, dump_ft, NULL},
-    {"include", false, show_include, dump_builtin_configs, collect_builtin_configs},
-    {"macro", true, NULL, dump_macro, NULL},
-    {"msg", false, NULL, dump_messages, NULL},
-    {"option", true, show_option, dump_options, collect_all_options},
+    {"ft", true, NULL, do_dump_filetypes, NULL},
+    {"include", false, show_include, do_dump_builtin_configs, collect_builtin_configs},
+    {"macro", true, NULL, do_dump_macro, NULL},
+    {"msg", false, NULL, do_dump_messages, NULL},
+    {"option", true, show_option, do_dump_options, collect_all_options},
     {"search", false, NULL, dump_search_history, NULL},
     {"wsplit", false, show_wsplit, dump_frames, NULL},
 };
@@ -356,7 +424,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
         return;
     }
 
-    String str = handler->dump();
+    String str = handler->dump(e);
     bool dte_syntax = handler->dumps_dterc_syntax;
     open_temporary_buffer(str.buffer, str.len, "show", type, dte_syntax);
     string_free(&str);

@@ -548,7 +548,8 @@ static void cmd_eval(const CommandArgs *a)
 
 static void cmd_exec_msg(const CommandArgs *a)
 {
-    String messages = dump_messages();
+    EditorState *e = a->userdata;
+    String messages = dump_messages(&e->messages);
     SpawnContext ctx = {
         .argv = a->args,
         .input = strview_from_string(&messages),
@@ -564,7 +565,6 @@ static void cmd_exec_msg(const CommandArgs *a)
 
     size_t i;
     if (buf_parse_size(ctx.output.buffer, ctx.output.len, &i) > 0 && i > 0) {
-        EditorState *e = a->userdata;
         activate_message(&e->messages, i - 1);
     }
 

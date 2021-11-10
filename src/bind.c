@@ -79,15 +79,10 @@ static int binding_cmp(const void *ap, const void *bp)
     return a == b ? 0 : (a > b ? 1 : -1);
 }
 
-static bool append_binding_group(String *buf, InputMode mode)
+bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf)
 {
-    static const char mode_flags[][4] = {
-        [INPUT_NORMAL] = "",
-        [INPUT_COMMAND] = "-c ",
-        [INPUT_SEARCH] = "-s ",
-    };
 
-    const IntMap *map = &editor.bindings[mode].map;
+    const IntMap *map = &kbg->map;
     const size_t count = map->count;
     if (unlikely(count == 0)) {
         return false;
@@ -109,8 +104,6 @@ static bool append_binding_group(String *buf, InputMode mode)
     qsort(array, count, sizeof(array[0]), binding_cmp);
 
     // Serialize the bindings in sorted order
-    static_assert(ARRAY_COUNT(mode_flags) == ARRAY_COUNT(editor.bindings));
-    const char *flag = mode_flags[mode];
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
         string_append_cstring(buf, flag);
@@ -122,15 +115,4 @@ static bool append_binding_group(String *buf, InputMode mode)
 
     free(array);
     return true;
-}
-
-String dump_bindings(void)
-{
-    String buf = string_new(4096);
-    for (InputMode i = 0, n = ARRAY_COUNT(editor.bindings); i < n; i++) {
-        if (append_binding_group(&buf, i) && i != n - 1) {
-            string_append_byte(&buf, '\n');
-        }
-    }
-    return buf;
 }

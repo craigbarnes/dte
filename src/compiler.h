@@ -35,7 +35,6 @@ void add_error_fmt(HashMap *compilers, const char *name, bool ignore, const char
 Compiler *find_compiler(const HashMap *compilers, const char *name) NONNULL_ARGS;
 void collect_compilers(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix) NONNULL_ARGS;
-String dump_compiler(const Compiler *c, const char *name) NONNULL_ARGS;
-String dump_compilers(void);
+void dump_compiler(const Compiler *c, const char *name, String *s);
 
 #endif

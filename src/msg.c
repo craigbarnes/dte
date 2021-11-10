@@ -206,7 +206,7 @@ void clear_messages(MessageArray *msgs)
     msgs->pos = 0;
 }
 
-String dump_messages(void)
+String dump_messages(const MessageArray *messages)
 {
     String buf = string_new(4096);
     char cwd[8192];
@@ -214,8 +214,8 @@ String dump_messages(void)
         return buf;
     }
 
-    for (size_t i = 0, n = editor.messages.array.count; i < n; i++) {
-        const Message *m = editor.messages.array.ptrs[i];
+    for (size_t i = 0, n = messages->array.count; i < n; i++) {
+        const Message *m = messages->array.ptrs[i];
         string_sprintf(&buf, "%zu: ", i + 1);
 
         const FileLocation *loc = m->loc;

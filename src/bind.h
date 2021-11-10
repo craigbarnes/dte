@@ -20,6 +20,6 @@ void remove_binding(KeyBindingGroup *kbg, KeyCode key);
 const CachedCommand *lookup_binding(KeyBindingGroup *kbg, KeyCode key);
 bool handle_binding(KeyBindingGroup *kbg, KeyCode key);
 void collect_bound_keys(PointerArray *a, const char *keystr_prefix);
-String dump_bindings(void);
+bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf);
 
 #endif

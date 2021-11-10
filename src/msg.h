@@ -43,6 +43,6 @@ void activate_next_message(MessageArray *arr);
 void activate_prev_message(MessageArray *arr);
 void activate_current_message_save(const MessageArray *arr, PointerArray *file_locations, const View *view) NONNULL_ARGS;
 void clear_messages(MessageArray *arr);
-String dump_messages(void);
+String dump_messages(const MessageArray *messages);
 
 #endif
