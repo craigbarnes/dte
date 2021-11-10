@@ -104,7 +104,7 @@ static void show_binding(EditorState *e, const char *keystr, bool cflag)
 
 static void show_color(EditorState *e, const char *color_name, bool cflag)
 {
-    const TermColor *hl = find_color(color_name);
+    const TermColor *hl = find_color(&e->colors, color_name);
     if (!hl) {
         error_msg("no color entry with name '%s'", color_name);
         return;

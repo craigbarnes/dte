@@ -14,6 +14,7 @@
 #include "mode.h"
 #include "msg.h"
 #include "options.h"
+#include "syntax/color.h"
 #include "terminal/output.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
@@ -61,6 +62,7 @@ typedef struct {
     KeyBindingGroup bindings[3];
     HashMap compilers;
     HashMap syntaxes;
+    ColorScheme colors;
     View *view;
     Buffer *buffer;
     PointerArray buffers;

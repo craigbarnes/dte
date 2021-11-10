@@ -10,10 +10,10 @@ void set_color(TermOutputBuffer *obuf, const TermColor *color)
     TermColor tmp = *color;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = builtin_colors[BC_DEFAULT].fg;
+        tmp.fg = editor.colors.builtin[BC_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = builtin_colors[BC_DEFAULT].bg;
+        tmp.bg = editor.colors.builtin[BC_DEFAULT].bg;
     }
     if (same_color(&tmp, &obuf->color)) {
         return;
@@ -24,7 +24,7 @@ void set_color(TermOutputBuffer *obuf, const TermColor *color)
 
 void set_builtin_color(TermOutputBuffer *obuf, BuiltinColorEnum c)
 {
-    set_color(obuf, &builtin_colors[c]);
+    set_color(obuf, &editor.colors.builtin[c]);
 }
 
 void update_term_title(TermOutputBuffer *obuf, const Buffer *b)

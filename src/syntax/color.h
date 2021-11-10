@@ -2,6 +2,7 @@
 #define SYNTAX_COLOR_H
 
 #include "terminal/color.h"
+#include "util/hashmap.h"
 #include "util/string.h"
 
 typedef enum {
@@ -23,11 +24,14 @@ typedef enum {
     NR_BC
 } BuiltinColorEnum;
 
-extern TermColor builtin_colors[NR_BC];
+typedef struct {
+    TermColor builtin[NR_BC];
+    HashMap other;
+} ColorScheme;
 
-void set_highlight_color(const char *name, const TermColor *color);
-TermColor *find_color(const char *name);
-void clear_hl_colors(void);
+void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color);
+TermColor *find_color(ColorScheme *colors, const char *name);
+void clear_hl_colors(ColorScheme *colors);
 void collect_hl_colors(PointerArray *a, const char *prefix);
 String dump_hl_colors(void);
 

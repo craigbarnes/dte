@@ -1,6 +1,7 @@
 #include "test.h"
 #include "block-iter.h"
 #include "config.h"
+#include "editor.h"
 #include "syntax/bitset.h"
 #include "syntax/highlight.h"
 #include "util/debug.h"
@@ -103,11 +104,11 @@ static void test_hl_line(void)
     ASSERT_NONNULL(colors);
     EXPECT_TRUE(next_changed);
 
-    const TermColor *t = find_color("text");
-    const TermColor *c = find_color("constant");
-    const TermColor *s = find_color("string");
-    const TermColor *x = find_color("special");
-    const TermColor *n = find_color("numeric");
+    const TermColor *t = find_color(&editor.colors, "text");
+    const TermColor *c = find_color(&editor.colors, "constant");
+    const TermColor *s = find_color(&editor.colors, "string");
+    const TermColor *x = find_color(&editor.colors, "special");
+    const TermColor *n = find_color(&editor.colors, "numeric");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);

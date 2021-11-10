@@ -750,7 +750,7 @@ static void cmd_hi(const CommandArgs *a)
 
     color.fg = fg;
     color.bg = bg;
-    set_highlight_color(a->args[0], &color);
+    set_highlight_color(&e->colors, a->args[0], &color);
 
 update:
     // Don't call update_all_syntax_colors() needlessly.

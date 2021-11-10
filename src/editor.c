@@ -49,6 +49,9 @@ EditorState editor = {
     .version = version,
     .file_locks_mode = 0666,
     .cmdline_x = 0,
+    .colors = {
+        .other = HASHMAP_INIT,
+    },
     .messages = {
         .array = PTR_ARRAY_INIT,
         .pos = 0,
@@ -409,7 +412,7 @@ static void show_dialog(TermOutputBuffer *obuf, const char *question)
 
     // The "underline" and "strikethrough" attributes should only apply
     // to the text, not the whole dialog background:
-    const TermColor *text_color = &builtin_colors[BC_DIALOG];
+    const TermColor *text_color = &editor.colors.builtin[BC_DIALOG];
     TermColor dialog_color = *text_color;
     dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
     set_color(obuf, &dialog_color);

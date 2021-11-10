@@ -3,16 +3,12 @@
 #include "color.h"
 #include "command/serialize.h"
 #include "completion.h"
+#include "editor.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
-#include "util/hashmap.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
-
-TermColor builtin_colors[NR_BC];
-
-static HashMap hl_colors = HASHMAP_INIT;
 
 static const char builtin_color_names[NR_BC][16] = {
     [BC_ACTIVETAB] = "activetab",
@@ -36,20 +32,20 @@ UNITTEST {
     CHECK_BSEARCH_STR_ARRAY(builtin_color_names, strcmp);
 }
 
-static TermColor *find_real_color(const char *name)
+static TermColor *find_real_color(ColorScheme *colors, const char *name)
 {
     ssize_t idx = BSEARCH_IDX(name, builtin_color_names, (CompareFunction)strcmp);
     if (idx >= 0) {
         BUG_ON(idx >= ARRAY_COUNT(builtin_color_names));
-        return &builtin_colors[(BuiltinColorEnum)idx];
+        return &colors->builtin[(BuiltinColorEnum)idx];
     }
 
-    return hashmap_get(&hl_colors, name);
+    return hashmap_get(&colors->other, name);
 }
 
-void set_highlight_color(const char *name, const TermColor *color)
+void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color)
 {
-    TermColor *c = find_real_color(name);
+    TermColor *c = find_real_color(colors, name);
     if (c) {
         *c = *color;
         return;
@@ -57,23 +53,23 @@ void set_highlight_color(const char *name, const TermColor *color)
 
     c = xnew(TermColor, 1);
     *c = *color;
-    hashmap_insert(&hl_colors, xstrdup(name), c);
+    hashmap_insert(&colors->other, xstrdup(name), c);
 }
 
-TermColor *find_color(const char *name)
+TermColor *find_color(ColorScheme *colors, const char *name)
 {
-    TermColor *c = find_real_color(name);
+    TermColor *c = find_real_color(colors, name);
     if (c) {
         return c;
     }
 
     const char *dot = strchr(name, '.');
-    return dot ? find_real_color(dot + 1) : NULL;
+    return dot ? find_real_color(colors, dot + 1) : NULL;
 }
 
-void clear_hl_colors(void)
+void clear_hl_colors(ColorScheme *colors)
 {
-    hashmap_clear(&hl_colors, free);
+    hashmap_clear(&colors->other, free);
 }
 
 void collect_hl_colors(PointerArray *a, const char *prefix)
@@ -84,7 +80,7 @@ void collect_hl_colors(PointerArray *a, const char *prefix)
             ptr_array_append(a, xstrdup(name));
         }
     }
-    collect_hashmap_keys(&hl_colors, a, prefix);
+    collect_hashmap_keys(&editor.colors.other, a, prefix);
 }
 
 typedef struct {
@@ -116,10 +112,11 @@ String dump_hl_colors(void)
     String buf = string_new(4096);
     string_append_literal(&buf, "# UI colors:\n");
     for (size_t i = 0; i < NR_BC; i++) {
-        append_color(&buf, builtin_color_names[i], &builtin_colors[i]);
+        append_color(&buf, builtin_color_names[i], &editor.colors.builtin[i]);
     }
 
-    const size_t count = hl_colors.count;
+    const HashMap *hl_colors = &editor.colors.other;
+    const size_t count = hl_colors->count;
     if (unlikely(count == 0)) {
         return buf;
     }
@@ -127,7 +124,7 @@ String dump_hl_colors(void)
     // Copy the HashMap entries into an array
     HlColor *array = xnew(HlColor, count);
     size_t n = 0;
-    for (HashMapIter it = hashmap_iter(&hl_colors); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(hl_colors); hashmap_next(&it); ) {
         const TermColor *c = it.entry->value;
         array[n++] = (HlColor) {
             .name = it.entry->key,

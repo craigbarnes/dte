@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "syntax.h"
+#include "editor.h"
 #include "error.h"
 #include "syntax/merge.h"
 #include "util/str-util.h"
@@ -160,7 +161,7 @@ static void update_action_color(const Syntax *syn, Action *a)
 
     char full[256];
     xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
-    a->emit_color = find_color(full);
+    a->emit_color = find_color(&editor.colors, full);
     if (a->emit_color) {
         return;
     }
@@ -171,7 +172,7 @@ static void update_action_color(const Syntax *syn, Action *a)
     }
 
     xsnprintf(full, sizeof full, "%s.%s", syn->name, def);
-    a->emit_color = find_color(full);
+    a->emit_color = find_color(&editor.colors, full);
 }
 
 void update_state_colors(const Syntax *syn, State *s)
