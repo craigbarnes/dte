@@ -164,16 +164,19 @@ static void cmd_bind(const CommandArgs *a)
         [INPUT_SEARCH] = has_flag(a, 's'),
     };
 
+    EditorState *e = a->userdata;
+    static_assert(ARRAY_COUNT(modes) == ARRAY_COUNT(e->bindings));
+
     if (likely(cmd)) {
         for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
             if (modes[mode]) {
-                add_binding(mode, key, cmd);
+                add_binding(&e->bindings[mode], key, cmd);
             }
         }
     } else {
         for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
             if (modes[mode]) {
-                remove_binding(mode, key);
+                remove_binding(&e->bindings[mode], key);
             }
         }
     }

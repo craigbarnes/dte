@@ -47,7 +47,7 @@ static void normal_mode_keypress(KeyCode key)
         insert_ch(editor.view, key);
         macro_insert_char_hook(key);
     } else {
-        handle_binding(INPUT_NORMAL, key);
+        handle_binding(&editor.bindings[INPUT_NORMAL], key);
     }
 }
 
@@ -92,7 +92,7 @@ static void command_mode_keypress(KeyCode key)
         c->pos += string_insert_ch(&c->buf, c->pos, key);
         reset_completion(c);
     } else {
-        handle_binding(INPUT_COMMAND, key);
+        handle_binding(&editor.bindings[INPUT_COMMAND], key);
     }
 }
 
@@ -148,7 +148,7 @@ static void search_mode_keypress(KeyCode key)
     if (u_is_unicode(key) && key != KEY_TAB) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
     } else {
-        handle_binding(INPUT_SEARCH, key);
+        handle_binding(&editor.bindings[INPUT_SEARCH], key);
     }
 }
 

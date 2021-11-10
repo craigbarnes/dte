@@ -69,6 +69,20 @@ EditorState editor = {
         .max_entries = 128,
         .entries = HASHMAP_INIT
     },
+    .bindings = {
+        [INPUT_NORMAL] = {
+            .cmds = &normal_commands,
+            .map = INTMAP_INIT,
+        },
+        [INPUT_COMMAND] = {
+            .cmds = &cmd_mode_commands,
+            .map = INTMAP_INIT,
+        },
+        [INPUT_SEARCH] = {
+            .cmds = &search_mode_commands,
+            .map = INTMAP_INIT,
+        },
+    },
     .options = {
         .auto_indent = true,
         .detect_indent = 0,
@@ -156,7 +170,9 @@ void init_editor_state(void)
     term_output_init(&editor.obuf);
     regexp_init_word_boundary_tokens();
     hashmap_init(&normal_commands.aliases, 32);
-    bindings_init();
+    intmap_init(&editor.bindings[INPUT_NORMAL].map, 150);
+    intmap_init(&editor.bindings[INPUT_COMMAND].map, 40);
+    intmap_init(&editor.bindings[INPUT_SEARCH].map, 40);
 }
 
 static void sanity_check(void)

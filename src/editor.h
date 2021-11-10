@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include "bind.h"
 #include "buffer.h"
 #include "cmdline.h"
 #include "encoding.h"
@@ -57,6 +58,7 @@ typedef struct {
     pid_t pid;
     int exit_code;
     size_t cmdline_x;
+    KeyBindingGroup bindings[3];
     HashMap compilers;
     HashMap syntaxes;
     View *view;
