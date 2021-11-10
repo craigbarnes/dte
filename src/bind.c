@@ -98,7 +98,7 @@ static int binding_cmp(const void *ap, const void *bp)
     return a == b ? 0 : (a > b ? 1 : -1);
 }
 
-static void append_binding_group(String *buf, InputMode mode)
+static bool append_binding_group(String *buf, InputMode mode)
 {
     static const char mode_flags[][4] = {
         [INPUT_NORMAL] = "",
@@ -109,7 +109,7 @@ static void append_binding_group(String *buf, InputMode mode)
     const IntMap *map = &bindings[mode].map;
     const size_t count = map->count;
     if (unlikely(count == 0)) {
-        return;
+        return false;
     }
 
     // Clone the contents of the map as an array of key/command pairs
@@ -130,7 +130,6 @@ static void append_binding_group(String *buf, InputMode mode)
     // Serialize the bindings in sorted order
     static_assert(ARRAY_COUNT(mode_flags) == ARRAY_COUNT(bindings));
     const char *flag = mode_flags[mode];
-    const size_t prev_buf_len = buf->len;
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
         string_append_cstring(buf, flag);
@@ -141,16 +140,16 @@ static void append_binding_group(String *buf, InputMode mode)
     }
 
     free(array);
-    if (buf->len > prev_buf_len) {
-        string_append_byte(buf, '\n');
-    }
+    return true;
 }
 
 String dump_bindings(void)
 {
     String buf = string_new(4096);
-    for (InputMode mode = 0; mode < ARRAY_COUNT(bindings); mode++) {
-        append_binding_group(&buf, mode);
+    for (InputMode i = 0, n = ARRAY_COUNT(bindings); i < n; i++) {
+        if (append_binding_group(&buf, i) && i != n - 1) {
+            string_append_byte(&buf, '\n');
+        }
     }
     return buf;
 }
