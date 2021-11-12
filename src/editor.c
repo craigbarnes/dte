@@ -8,11 +8,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "editor.h"
-#include "bind.h"
-#include "buffer.h"
 #include "commands.h"
 #include "error.h"
-#include "mode.h"
 #include "regexp.h"
 #include "screen.h"
 #include "terminal/input.h"
@@ -27,7 +24,6 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
-#include "view.h"
 #include "window.h"
 #include "../build/version.h"
 
