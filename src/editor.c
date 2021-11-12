@@ -119,6 +119,34 @@ EditorState editor = {
     }
 };
 
+static void set_and_check_locale(void)
+{
+    const char *default_locale = setlocale(LC_CTYPE, "");
+    if (likely(default_locale)) {
+        const char *codeset = nl_langinfo(CODESET);
+        DEBUG_LOG("locale: %s (codeset: %s)", default_locale, codeset);
+        if (likely(lookup_encoding(codeset) == UTF8)) {
+            return;
+        }
+    } else {
+        DEBUG_LOG("failed to set default locale");
+    }
+
+    static const char fallbacks[][12] = {"C.UTF-8", "en_US.UTF-8"};
+    const char *fallback = NULL;
+    for (size_t i = 0; i < ARRAY_COUNT(fallbacks) && !fallback; i++) {
+        fallback = setlocale(LC_CTYPE, fallbacks[i]);
+    }
+    if (fallback) {
+        DEBUG_LOG("using fallback locale for LC_CTYPE: %s", fallback);
+        return;
+    }
+
+    DEBUG_LOG("no UTF-8 fallback locales found");
+    fputs("setlocale() failed\n", stderr);
+    exit(EX_CONFIG);
+}
+
 void init_editor_state(void)
 {
     const char *home = getenv("HOME");
@@ -157,19 +185,7 @@ void init_editor_state(void)
     editor.pid = pid;
     editor.session_leader = leader;
 
-    const char *locale = setlocale(LC_CTYPE, "");
-    if (unlikely(!locale)) {
-        fatal_error("setlocale", errno);
-    }
-    DEBUG_LOG("locale: %s", locale);
-
-    const char *codeset = nl_langinfo(CODESET);
-    BUG_ON(codeset[0] == '\0');
-    Encoding enc = encoding_from_name(codeset);
-    if (unlikely(enc.type != UTF8)) {
-        fprintf(stderr, "UTF-8 locale required (LC_CTYPE); got '%s'", codeset);
-        exit(EX_CONFIG);
-    }
+    set_and_check_locale();
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
