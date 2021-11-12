@@ -166,8 +166,14 @@ void init_editor_state(void)
         fatal_error("setlocale", errno);
     }
     DEBUG_LOG("locale: %s", locale);
-    editor.charset = encoding_from_name(nl_langinfo(CODESET));
-    editor.term_utf8 = (editor.charset.type == UTF8);
+
+    const char *codeset = nl_langinfo(CODESET);
+    BUG_ON(codeset[0] == '\0');
+    Encoding enc = encoding_from_name(codeset);
+    if (unlikely(enc.type != UTF8)) {
+        fprintf(stderr, "UTF-8 locale required (LC_CTYPE); got '%s'", codeset);
+        exit(EX_CONFIG);
+    }
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {

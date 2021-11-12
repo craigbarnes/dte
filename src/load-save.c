@@ -102,7 +102,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
         const char *enc = file_decoder_get_encoding(dec);
-        buffer_set_encoding(b, enc ? encoding_from_name(enc) : editor.charset);
+        buffer_set_encoding(b, encoding_from_name(enc ? enc : "UTF-8"));
     }
 
     free_file_decoder(dec);
@@ -301,7 +301,8 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
     }
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
-        buffer_set_encoding(b, editor.charset);
+        Encoding enc = encoding_from_type(UTF8);
+        buffer_set_encoding(b, enc);
     }
 
     return true;

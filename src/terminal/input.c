@@ -109,7 +109,7 @@ static KeyCode read_simple(void)
     input_get_byte(&ch);
 
     // Normal key
-    if (!editor.term_utf8 || ch < 0x80) {
+    if (ch < 0x80) {
         return keycode_normalize(ch);
     }
 

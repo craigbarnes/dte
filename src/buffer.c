@@ -96,7 +96,8 @@ Buffer *buffer_new(const Encoding *encoding)
 
 Buffer *open_empty_buffer(void)
 {
-    Buffer *b = buffer_new(&editor.charset);
+    Encoding enc = encoding_from_type(UTF8);
+    Buffer *b = buffer_new(&enc);
 
     // At least one block required
     Block *blk = block_new(1);

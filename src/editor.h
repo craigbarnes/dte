@@ -52,10 +52,8 @@ typedef struct {
     const char *file_locks;
     const char *file_locks_lock;
     mode_t file_locks_mode;
-    Encoding charset;
     bool child_controls_terminal;
     bool everything_changed;
-    bool term_utf8;
     bool session_leader;
     pid_t pid;
     int exit_code;

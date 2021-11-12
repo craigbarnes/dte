@@ -260,6 +260,9 @@ The following environment variables are inspected at startup:
 `74`
 :   Input/output error.
 
+`78`
+:   Configuration error.
+
 Note: the above exit codes are set by the editor itself, with values in
 accordance with [`sysexits`]. The exit code may also be set to values
 in the range `0`..`125` by the [`quit`] command.

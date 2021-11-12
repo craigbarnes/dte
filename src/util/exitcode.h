@@ -8,6 +8,7 @@ enum {
     EX_DATAERR = 65, // Input data error
     EX_OSERR = 71, // Operating system error
     EX_IOERR = 74, // Input/output error
+    EX_CONFIG = 78, // Configuration error
 };
 
 typedef int ExitCode;

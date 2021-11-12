@@ -326,7 +326,8 @@ loop_break:
 
     Buffer *stdin_buffer = NULL;
     if (!isatty(STDIN_FILENO)) {
-        Buffer *b = buffer_new(&editor.charset);
+        Encoding enc = encoding_from_type(UTF8);
+        Buffer *b = buffer_new(&enc);
         if (read_blocks(b, STDIN_FILENO)) {
             set_display_filename(b, xmemdup_literal("(stdin)"));
             stdin_buffer = b;
