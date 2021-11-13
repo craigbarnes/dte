@@ -65,9 +65,11 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
         // Note: the indent_regex pattern has already been checked by
         // validate_regex(), so the only error that should be possible
         // here is REG_ESPACE ("ran out of memory").
-        char msg[1024];
-        regerror(err, &re, msg, sizeof(msg));
-        DEBUG_LOG("regcomp: %s", msg);
+        if (DEBUG >= 2) {
+            char msg[1024];
+            regerror(err, &re, msg, sizeof(msg));
+            DEBUG_LOG("regcomp: %s", msg);
+        }
         return false;
     }
 
