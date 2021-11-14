@@ -81,7 +81,6 @@ static int binding_cmp(const void *ap, const void *bp)
 
 bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf)
 {
-
     const IntMap *map = &kbg->map;
     const size_t count = map->count;
     if (unlikely(count == 0)) {
