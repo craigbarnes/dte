@@ -12,6 +12,7 @@
 #include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
+#include "util/intmap.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
@@ -1596,6 +1597,43 @@ static void test_hashset(void)
     hashset_free(&set);
 }
 
+static void test_intmap(void)
+{
+    IntMap map = INTMAP_INIT;
+    EXPECT_NULL(intmap_find(&map, 0));
+    EXPECT_NULL(intmap_get(&map, 0));
+    intmap_free(&map, free);
+
+    const char *value = "value";
+    EXPECT_NULL(intmap_insert_or_replace(&map, 0, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 1, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 2, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 4, xstrdup(value)));
+    EXPECT_EQ(map.count, 4);
+    EXPECT_EQ(map.mask, 7);
+
+    char *replaced = intmap_insert_or_replace(&map, 0, xstrdup(value));
+    EXPECT_STREQ(replaced, value);
+    free(replaced);
+    EXPECT_EQ(map.tombstones, 0);
+    EXPECT_STREQ(intmap_get(&map, 0), value);
+
+    char *removed = intmap_remove(&map, 0);
+    EXPECT_STREQ(removed, value);
+    free(removed);
+    EXPECT_EQ(map.tombstones, 1);
+    EXPECT_NULL(intmap_get(&map, 0));
+
+    EXPECT_NULL(intmap_insert_or_replace(&map, 100, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 488, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 899, xstrdup(value)));
+    EXPECT_NULL(intmap_insert_or_replace(&map, 256, xstrdup(value)));
+    EXPECT_EQ(map.count, 7);
+    EXPECT_EQ(map.mask, 15);
+
+    intmap_free(&map, free);
+}
+
 static void test_round_size_to_next_multiple(void)
 {
     EXPECT_EQ(round_size_to_next_multiple(3, 8), 8);
@@ -2005,6 +2043,7 @@ static const TestEntry tests[] = {
     TEST(test_ptr_array_move),
     TEST(test_hashmap),
     TEST(test_hashset),
+    TEST(test_intmap),
     TEST(test_round_size_to_next_multiple),
     TEST(test_round_size_to_next_power_of_2),
     TEST(test_path_dirname_and_path_basename),
