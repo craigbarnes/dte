@@ -210,14 +210,14 @@ static void intmap_clear(IntMap *map, FreeFunction free_value)
         return;
     }
 
-    size_t count = 0;
-    for (IntMapIter it = intmap_iter(map); intmap_next(&it); count++) {
-        if (free_value) {
+    if (free_value) {
+        size_t count = 0;
+        for (IntMapIter it = intmap_iter(map); intmap_next(&it); count++) {
             free_value(it.entry->value);
         }
+        BUG_ON(count != map->count);
     }
 
-    BUG_ON(count != map->count);
     size_t len = map->mask + 1;
     memset(map->entries, 0, len * sizeof(*map->entries));
     map->count = 0;
