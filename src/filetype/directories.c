@@ -5,6 +5,7 @@ static const struct {
     {"/etc/default/", SH},
     {"/etc/nginx/", NGINX},
     {"/etc/pam.d/", CONFIG},
+    {"/etc/sudoers.d/", CONFIG},
 };
 
 UNITTEST {
