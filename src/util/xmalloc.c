@@ -66,7 +66,7 @@ static char *xvasprintf(const char *format, va_list ap)
     va_end(ap2);
     if (unlikely(n < 0)) {
         goto error;
-    } else if (unlikely(n >= INT_MAX)) {
+    } else if (unlikely(n == INT_MAX)) {
         errno = EOVERFLOW;
         goto error;
     }
