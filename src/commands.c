@@ -1489,14 +1489,15 @@ static void cmd_repeat(const CommandArgs *a)
         return;
     }
 
-    if (cmd->cmd == cmd_insert && !has_flag(&a2, 'k')) {
+    void (*fn)(const CommandArgs *args) = cmd->cmd;
+    if (fn == cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
         repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
         return;
     }
 
     while (count--) {
-        cmd->cmd(&a2);
+        fn(&a2);
     }
 }
 
