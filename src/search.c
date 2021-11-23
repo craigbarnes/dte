@@ -294,8 +294,9 @@ static unsigned int replace_on_line (
     BlockIter *bi,
     ReplaceFlags *flagsp
 ) {
+    const unsigned char *buf = line->data;
+    unsigned char *alloc = NULL;
     View *view = e->view;
-    unsigned char *buf = (unsigned char *)line->data;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];
     size_t pos = 0;
@@ -347,7 +348,9 @@ static unsigned int replace_on_line (
 
             // line ref is invalidated by modification
             if (buf == line->data && line->length != 0) {
-                buf = xmemdup(buf, line->length);
+                BUG_ON(alloc);
+                alloc = xmemdup(buf, line->length);
+                buf = alloc;
             }
 
             buffer_replace_bytes(view, match_len, b.buffer, b.len);
@@ -380,9 +383,7 @@ static unsigned int replace_on_line (
     }
 
 out:
-    if (buf != line->data) {
-        free(buf);
-    }
+    free(alloc);
     return nr;
 }
 
