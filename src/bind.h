@@ -14,7 +14,6 @@ typedef struct {
     IntMap map;
 } KeyBindingGroup;
 
-void bindings_init(void);
 void add_binding(KeyBindingGroup *kbg, KeyCode key, const char *command);
 void remove_binding(KeyBindingGroup *kbg, KeyCode key);
 const CachedCommand *lookup_binding(KeyBindingGroup *kbg, KeyCode key);
