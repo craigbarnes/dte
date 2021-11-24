@@ -393,89 +393,67 @@ static void test_cached_command_new(void)
     }
 }
 
-static char *escape_command_arg(const char *arg, bool escape_tilde)
+static const char *escape_command_arg(String *buf, const char *arg, bool escape_tilde)
 {
-    size_t n = strlen(arg);
-    String buf = string_new(n + 32);
-    string_append_escaped_arg_sv(&buf, string_view(arg, n), escape_tilde);
-    return string_steal_cstring(&buf);
+    string_clear(buf);
+    string_append_escaped_arg(buf, arg, escape_tilde);
+    return string_borrow_cstring(buf);
 }
 
 static void test_string_append_escaped_arg(void)
 {
-    char *str = escape_command_arg("arg", false);
+    String buf = string_new(64);
+    const char *str = escape_command_arg(&buf, "arg", false);
     EXPECT_STREQ(str, "arg");
-    free(str);
 
-    str = escape_command_arg("arg-x.y:z", false);
+    str = escape_command_arg(&buf, "arg-x.y:z", false);
     EXPECT_STREQ(str, "arg-x.y:z");
-    free(str);
 
-    str = escape_command_arg("", false);
+    str = escape_command_arg(&buf, "", false);
     EXPECT_STREQ(str, "''");
-    free(str);
 
-    str = escape_command_arg(" ", false);
+    str = escape_command_arg(&buf, " ", false);
     EXPECT_STREQ(str, "' '");
-    free(str);
 
-    str = escape_command_arg("hello world", false);
+    str = escape_command_arg(&buf, "hello world", false);
     EXPECT_STREQ(str, "'hello world'");
-    free(str);
 
-    str = escape_command_arg("line1\nline2\n", false);
+    str = escape_command_arg(&buf, "line1\nline2\n", false);
     EXPECT_STREQ(str, "\"line1\\nline2\\n\"");
-    free(str);
 
-    str = escape_command_arg(" \t\r\n\x1F\x7F", false);
+    str = escape_command_arg(&buf, " \t\r\n\x1F\x7F", false);
     EXPECT_STREQ(str, "\" \\t\\r\\n\\x1F\\x7F\"");
-    free(str);
 
-    str = escape_command_arg("x ' y", false);
+    str = escape_command_arg(&buf, "x ' y", false);
     EXPECT_STREQ(str, "\"x ' y\"");
-    free(str);
 
-    str = escape_command_arg("\033[P", false);
+    str = escape_command_arg(&buf, "\033[P", false);
     EXPECT_STREQ(str, "\"\\e[P\"");
-    free(str);
 
-    str = escape_command_arg("\"''\"", false);
+    str = escape_command_arg(&buf, "\"''\"", false);
     EXPECT_STREQ(str, "\"\\\"''\\\"\"");
-    free(str);
 
-    str = escape_command_arg("~/file with spaces", false);
+    str = escape_command_arg(&buf, "~/file with spaces", false);
     EXPECT_STREQ(str, "~/'file with spaces'");
-    free(str);
-    str = escape_command_arg("~/file with spaces", true);
+    str = escape_command_arg(&buf, "~/file with spaces", true);
     EXPECT_STREQ(str, "'~/file with spaces'");
-    free(str);
 
-    str = escape_command_arg("~/need \t\ndquotes", false);
+    str = escape_command_arg(&buf, "~/need \t\ndquotes", false);
     EXPECT_STREQ(str, "~/\"need \\t\\ndquotes\"");
-    free(str);
-    str = escape_command_arg("~/need \t\ndquotes", true);
+    str = escape_command_arg(&buf, "~/need \t\ndquotes", true);
     EXPECT_STREQ(str, "\"~/need \\t\\ndquotes\"");
-    free(str);
 
-    str = escape_command_arg("~/file-with-no-spaces", false);
+    str = escape_command_arg(&buf, "~/file-with-no-spaces", false);
     EXPECT_STREQ(str, "~/file-with-no-spaces");
-    free(str);
-    str = escape_command_arg("~/file-with-no-spaces", true);
+    str = escape_command_arg(&buf, "~/file-with-no-spaces", true);
     EXPECT_STREQ(str, "\\~/file-with-no-spaces");
-    free(str);
 
-    str = escape_command_arg("~/", false);
+    str = escape_command_arg(&buf, "~/", false);
     EXPECT_STREQ(str, "~/");
-    free(str);
-    str = escape_command_arg("~/", true);
+    str = escape_command_arg(&buf, "~/", true);
     EXPECT_STREQ(str, "\\~/");
-    free(str);
 
-    String s = STRING_INIT;
-    string_append_escaped_arg(&s, "~/", true);
-    str = string_steal_cstring(&s);
-    EXPECT_STREQ(str, "\\~/");
-    free(str);
+    string_free(&buf);
 }
 
 static void test_command_struct_layout(void)
