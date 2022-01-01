@@ -146,6 +146,10 @@ static void set_signal_handlers(void)
         action.sa_handler = handled_signals[i].handler;
         do_sigaction(handled_signals[i].signum, &action);
     }
+
+    // Set signal mask explicitly, to avoid any possibility of
+    // inheriting blocked signals
+    sigprocmask(SIG_SETMASK, &action.sa_mask, NULL);
 }
 
 static ExitCode list_builtin_configs(void)
