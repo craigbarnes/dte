@@ -65,7 +65,9 @@ int xclose(int fd)
     // same file descriptor.
     //
     // * http://www.daemonology.net/blog/2011-12-17-POSIX-close-is-broken.html
+    // * https://ewontfix.com/4/
     // * https://sourceware.org/bugzilla/show_bug.cgi?id=14627
+    // * https://www.austingroupbugs.net/view.php?id=529#c1200
     if (r && errno == EBADF) {
         r = 0;
     }
