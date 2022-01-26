@@ -71,7 +71,7 @@ static void command_mode_keypress(KeyCode key)
     switch (key) {
     case KEY_ENTER:
         reset_completion(c);
-        set_input_mode(INPUT_NORMAL);
+        set_input_mode(&editor, INPUT_NORMAL);
         const char *str = string_borrow_cstring(&c->buf);
         cmdline_clear(c);
         if (str[0] != ' ') {
@@ -136,7 +136,7 @@ static void search_mode_keypress(KeyCode key)
         search_next(&editor);
         macro_command_hook("search", (char**)args);
         cmdline_clear(c);
-        set_input_mode(INPUT_NORMAL);
+        set_input_mode(&editor, INPUT_NORMAL);
         return;
     }
     case KEY_PASTE:

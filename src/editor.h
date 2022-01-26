@@ -83,9 +83,9 @@ static inline void mark_everything_changed(EditorState *e)
     e->everything_changed = true;
 }
 
-static inline void set_input_mode(InputMode mode)
+static inline void set_input_mode(EditorState *e, InputMode mode)
 {
-    editor.input_mode = mode;
+    e->input_mode = mode;
 }
 
 void init_editor_state(void);

@@ -57,7 +57,7 @@ static void cmd_cancel(const CommandArgs *a)
     EditorState *e = a->userdata;
     CommandLine *c = &e->cmdline;
     cmdline_clear(c);
-    set_input_mode(INPUT_NORMAL);
+    set_input_mode(e, INPUT_NORMAL);
     reset_completion(c);
 }
 

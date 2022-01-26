@@ -324,7 +324,7 @@ static void cmd_command(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     const char *text = a->args[0];
-    set_input_mode(INPUT_COMMAND);
+    set_input_mode(e, INPUT_COMMAND);
     if (text) {
         cmdline_set_text(&e->cmdline, text);
     }
@@ -1637,7 +1637,7 @@ static void cmd_save(const CommandArgs *a)
         if (!absolute) {
             bool prompt = has_flag(a, 'p');
             if (prompt) {
-                set_input_mode(INPUT_COMMAND);
+                set_input_mode(e, INPUT_COMMAND);
                 cmdline_set_text(&e->cmdline, "save ");
                 // This branch is not really an error, but we still return via
                 // the "error" label because we need to clean up memory and
@@ -1889,7 +1889,7 @@ static void cmd_search(const CommandArgs *a)
     } else if (prev) {
         search_prev(e);
     } else {
-        set_input_mode(INPUT_SEARCH);
+        set_input_mode(e, INPUT_SEARCH);
         e->search.direction = direction;
     }
 }

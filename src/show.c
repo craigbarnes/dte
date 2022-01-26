@@ -68,7 +68,7 @@ static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag
     }
 
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, cmd_str);
     } else {
         info_msg("%s is aliased to: %s", alias_name, cmd_str);
@@ -95,7 +95,7 @@ static void show_binding(EditorState *e, const char *keystr, bool cflag)
     }
 
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, b->cmd_str);
     } else {
         info_msg("%s is bound to: %s", keystr, b->cmd_str);
@@ -112,7 +112,7 @@ static void show_color(EditorState *e, const char *color_name, bool cflag)
 
     const char *color_str = term_color_to_string(hl);
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, color_str);
     } else {
         info_msg("color '%s' is set to: %s", color_name, color_str);
@@ -128,7 +128,7 @@ static void show_env(EditorState *e, const char *name, bool cflag)
     }
 
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("$%s is set to: %s", name, value);
@@ -200,7 +200,7 @@ static void show_option(EditorState *e, const char *name, bool cflag)
         return;
     }
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("%s is set to: %s", name, value);
@@ -224,7 +224,7 @@ static void show_wsplit(EditorState *e, const char *name, bool cflag)
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 
     if (cflag) {
-        set_input_mode(INPUT_COMMAND);
+        set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, buf);
     } else {
         info_msg("current window dimensions: %s", buf);

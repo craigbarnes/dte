@@ -13,7 +13,7 @@ static void test_command_mode(void)
 {
     const CommandSet *cmds = &cmd_mode_commands;
     CommandLine *c = &editor.cmdline;
-    set_input_mode(INPUT_COMMAND);
+    set_input_mode(&editor, INPUT_COMMAND);
     EXPECT_EQ(editor.input_mode, INPUT_COMMAND);
 
     handle_input('a');
