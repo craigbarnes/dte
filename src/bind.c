@@ -79,6 +79,16 @@ static int binding_cmp(const void *ap, const void *bp)
     return a == b ? 0 : (a > b ? 1 : -1);
 }
 
+UNITTEST {
+    KeyBinding a = {.key = KEY_F5};
+    KeyBinding b = {.key = KEY_F5};
+    BUG_ON(binding_cmp(&a, &b) != 0);
+    b.key = KEY_F3;
+    BUG_ON(binding_cmp(&a, &b) != 1);
+    b.key = KEY_F12;
+    BUG_ON(binding_cmp(&a, &b) != -1);
+}
+
 bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf)
 {
     const IntMap *map = &kbg->map;
