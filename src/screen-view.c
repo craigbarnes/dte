@@ -259,10 +259,11 @@ static void line_info_init (
     const BlockIter *bi,
     size_t line_nr
 ) {
-    memset(info, 0, sizeof(*info));
-    info->view = v;
-    info->line_nr = line_nr;
-    info->offset = block_iter_get_offset(bi);
+    *info = (LineInfo) {
+        .view = v,
+        .line_nr = line_nr,
+        .offset = block_iter_get_offset(bi),
+    };
 
     if (!v->selection) {
         info->sel_so = -1;
