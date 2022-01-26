@@ -23,7 +23,7 @@ void ptr_array_insert(PointerArray *array, void *ptr, size_t pos)
     BUG_ON(pos > array->count);
     size_t count = array->count - pos;
     ptr_array_append(array, NULL);
-    memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void *));
+    memmove(array->ptrs + pos + 1, array->ptrs + pos, count * sizeof(void*));
     array->ptrs[pos] = ptr;
 }
 

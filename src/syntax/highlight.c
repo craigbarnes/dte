@@ -18,12 +18,12 @@ static bool state_is_valid(const State *st)
 static void mark_state_invalid(void **ptrs, size_t idx)
 {
     const State *st = ptrs[idx];
-    ptrs[idx] = (State *)((uintptr_t)st | 1);
+    ptrs[idx] = (State*)((uintptr_t)st | 1);
 }
 
 static bool states_equal(void **ptrs, size_t idx, const State *b)
 {
-    const State *a = (State *)((uintptr_t)ptrs[idx] & ~(uintptr_t)1);
+    const State *a = (State*)((uintptr_t)ptrs[idx] & ~(uintptr_t)1);
     return a == b;
 }
 
