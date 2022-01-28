@@ -2456,8 +2456,7 @@ static const Command cmds[] = {
 
 static bool allow_macro_recording(const Command *cmd, char **args, void *userdata)
 {
-    IGNORE_WARNING("-Wpedantic")
-    static const void *const non_recordable[] = {
+    static void (*non_recordable[])(const CommandArgs *args) = {
         cmd_macro, cmd_command, cmd_exec_open, cmd_exec_tag,
     };
     for (size_t i = 0; i < ARRAY_COUNT(non_recordable); i++) {
@@ -2465,7 +2464,6 @@ static bool allow_macro_recording(const Command *cmd, char **args, void *userdat
             return false;
         }
     }
-    UNIGNORE_WARNINGS
 
     if (cmd->cmd == cmd_search) {
         char **args_copy = copy_string_array(args, string_array_length(args));
