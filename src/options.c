@@ -441,6 +441,7 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
     BOOL_OPT("optimize-true-color", G(optimize_true_color), redraw_screen),
+    BOOL_OPT("overwrite", C(overwrite), NULL),
     UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
     BOOL_OPT("select-cursor-char", G(select_cursor_char), redraw_screen),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),

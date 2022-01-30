@@ -7,6 +7,7 @@ bind end eol
 bind pgup pgup
 bind pgdown pgdown
 bind delete delete
+bind insert 'toggle overwrite'
 
 bind C-left 'word-bwd -s'
 bind C-right 'word-fwd -s'

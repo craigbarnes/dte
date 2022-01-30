@@ -242,7 +242,7 @@ Global options:
 .br
    \fBstatusline\-left\fR [" %f%s%m%r%s%M"]
 .br
-   \fBstatusline\-right\fR [" %y,%X %u %E%s%b%s%n %t %p "]
+   \fBstatusline\-right\fR [" %y,%X %u %o %E%s%b%s%n %t %p "]
 .br
    \fBtab\-bar\fR [true]
 .br
@@ -271,6 +271,8 @@ Local and global options:
    \fBfile\-history\fR [true]
 .br
    \fBindent\-width\fR [8]
+.br
+   \fBoverwrite\fR [false]
 .br
    \fBsyntax\fR [true]
 .br
@@ -1942,11 +1944,15 @@ File type.
 Hexadecimal Unicode value value of character under cursor.
 .PP
 .TP
+\fB%o\fR
+Prints \fBOVR\fR or \fBINS\fR for overwrite mode on or off respectively.
+.PP
+.TP
 \fB%%\fR
 Literal \fB%\fR.
 .PP
 .RE
-\fBstatusline\-right\fR [" %y,%X %u %E%s%b%s%n %t %p "]
+\fBstatusline\-right\fR [" %y,%X %u %o %E%s%b%s%n %t %p "]
 .RS
 Format string for the right aligned part of status line.
 .P
@@ -2038,6 +2044,12 @@ See also: the \fBFILES\fR section in the \fBdte\fR(1) man page.
 \fBindent\-width\fR [8]
 .RS
 Size of indentation in spaces.
+.P
+.RE
+\fBoverwrite\fR [false]
+.RS
+If set to \fBtrue\fR, typing will overwrite existing characters within current
+line instead of inserting before them.
 .P
 .RE
 \fBsyntax\fR [true]

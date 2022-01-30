@@ -1297,10 +1297,13 @@ Format string for the left aligned part of status line.
 `%u`
 :   Hexadecimal Unicode value value of character under cursor.
 
+`%o`
+:   Prints `OVR` or `INS` for overwrite mode on or off respectively.
+
 `%%`
 :   Literal `%`.
 
-### **statusline-right** [" %y,%X   %u   %E%s%b%s%n %t   %p "]
+### **statusline-right** [" %y,%X  %u  %o  %E%s%b%s%n %t   %p "]
 
 Format string for the right aligned part of status line.
 
@@ -1378,6 +1381,11 @@ See also: the `FILES` section in the [`dte`] man page.
 ### **indent-width** [8]
 
 Size of indentation in spaces.
+
+### **overwrite** [false]
+
+If set to `true`, typing will overwrite existing characters within current
+line instead of inserting before them.
 
 ### **syntax** [true]
 

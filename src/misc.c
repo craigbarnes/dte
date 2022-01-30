@@ -369,6 +369,10 @@ void insert_ch(View *view, CodePoint ch)
         // Prepare deleted text (selection)
         del_count = prepare_selection(view);
         unselect(view);
+    } else if (b->options.overwrite) {
+        // Delete character under cursor unless we're at end of line
+        BlockIter bi = view->cursor;
+        del_count = !block_iter_is_eol(&bi) ? block_iter_next_column(&bi) : 0;
     } else if (ch == '}' && b->options.auto_indent && b->options.brace_indent) {
         BlockIter bi = view->cursor;
         StringView curlr;

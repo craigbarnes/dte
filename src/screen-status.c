@@ -26,6 +26,7 @@ typedef enum {
     STATUS_UNICODE,
     STATUS_CURSOR_COL,
     STATUS_CURSOR_ROW,
+    STATUS_OVERWRITE,
 } FormatSpecifierType;
 
 static const uint8_t format_specifiers[] = {
@@ -40,6 +41,7 @@ static const uint8_t format_specifiers[] = {
     ['f'] = STATUS_FILENAME,
     ['m'] = STATUS_MODIFIED,
     ['n'] = STATUS_LINE_ENDING,
+    ['o'] = STATUS_OVERWRITE,
     ['p'] = STATUS_SCROLL_POSITION,
     ['r'] = STATUS_READONLY,
     ['s'] = STATUS_SEPARATOR,
@@ -254,6 +256,13 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
                 add_status_literal(f, "CRLF");
             } else {
                 add_status_literal(f, "LF");
+            }
+            break;
+        case STATUS_OVERWRITE:
+            if (v->buffer->options.overwrite) {
+                add_status_literal(f, "OVR");
+            } else {
+                add_status_literal(f, "INS");
             }
             break;
         case STATUS_SEPARATOR_LONG:

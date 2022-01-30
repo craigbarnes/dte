@@ -60,6 +60,7 @@ typedef enum {
     bool expand_tab; \
     bool file_history; \
     bool fsync; \
+    bool overwrite; \
     bool syntax
 
 typedef struct {

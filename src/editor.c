@@ -94,6 +94,7 @@ EditorState editor = {
         .expand_tab = false,
         .file_history = true,
         .indent_width = 8,
+        .overwrite = false,
         .syntax = true,
         .tab_width = 8,
         .text_width = 72,
@@ -113,7 +114,7 @@ EditorState editor = {
         .set_window_title = false,
         .show_line_numbers = false,
         .statusline_left = " %f%s%m%r%s%M",
-        .statusline_right = " %y,%X   %u   %E%s%b%s%n %t   %p ",
+        .statusline_right = " %y,%X  %u  %o  %E%s%b%s%n %t   %p ",
         .tab_bar = true,
         .utf8_bom = false,
     }
