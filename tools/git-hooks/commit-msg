@@ -5,7 +5,7 @@
 }
 
 # Exclude long URLs from maximum line length check
-/^ *https?:/ {
+/^[*-]? *https?:/ {
     LINES++
     next
 }
