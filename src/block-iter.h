@@ -44,6 +44,23 @@ static inline bool block_iter_is_bol(const BlockIter *bi)
 }
 
 void block_iter_normalize(BlockIter *bi);
+
+static inline bool block_iter_is_eol(const BlockIter *bi)
+{
+    const Block *blk = bi->blk;
+    size_t offset = bi->offset;
+    if (offset == blk->size) {
+        if (blk->node.next == bi->head) {
+            // EOF
+            return true;
+        }
+        // Normalize
+        blk = BLOCK(blk->node.next);
+        offset = 0;
+    }
+    return blk->data[offset] == '\n';
+}
+
 size_t block_iter_eat_line(BlockIter *bi);
 size_t block_iter_next_line(BlockIter *bi);
 size_t block_iter_prev_line(BlockIter *bi);
