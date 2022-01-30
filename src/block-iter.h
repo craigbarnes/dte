@@ -43,8 +43,6 @@ static inline bool block_iter_is_bol(const BlockIter *bi)
     return bi->offset == 0 || bi->blk->data[bi->offset - 1] == '\n';
 }
 
-void block_iter_normalize(BlockIter *bi);
-
 static inline bool block_iter_is_eol(const BlockIter *bi)
 {
     const Block *blk = bi->blk;
@@ -61,6 +59,7 @@ static inline bool block_iter_is_eol(const BlockIter *bi)
     return blk->data[offset] == '\n';
 }
 
+void block_iter_normalize(BlockIter *bi);
 size_t block_iter_eat_line(BlockIter *bi);
 size_t block_iter_next_line(BlockIter *bi);
 size_t block_iter_prev_line(BlockIter *bi);
