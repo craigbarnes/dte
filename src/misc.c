@@ -1,16 +1,17 @@
+#include <stdlib.h>
 #include "misc.h"
 #include "buffer.h"
 #include "change.h"
 #include "indent.h"
 #include "move.h"
+#include "options.h"
 #include "regexp.h"
 #include "selection.h"
 #include "util/debug.h"
+#include "util/macros.h"
 #include "util/string.h"
 #include "util/string-view.h"
 #include "util/utf8.h"
-#include "util/xmalloc.h"
-#include "view.h"
 
 typedef struct {
     String buf;
@@ -361,7 +362,9 @@ void insert_ch(View *view, CodePoint ch)
     }
 
     const Buffer *b = view->buffer;
-    char *ins = xmalloc(8);
+    char buf[8];
+    char *ins = buf;
+    char *alloc = NULL;
     size_t del_count = 0;
     size_t ins_count = 0;
 
@@ -385,8 +388,8 @@ void insert_ch(View *view, CodePoint ch)
                 block_iter_bol(&view->cursor);
                 del_count = curlr.length;
                 if (width) {
-                    free(ins);
-                    ins = make_indent(b, width);
+                    alloc = make_indent(b, width);
+                    ins = alloc;
                     ins_count = strlen(ins);
                     // '}' will be replace the terminating NUL
                 }
@@ -397,6 +400,7 @@ void insert_ch(View *view, CodePoint ch)
     // Prepare inserted text
     if (ch == '\t' && b->options.expand_tab) {
         ins_count = b->options.indent_width;
+        static_assert(sizeof(buf) >= INDENT_WIDTH_MAX);
         memset(ins, ' ', ins_count);
     } else {
         u_set_char_raw(ins, &ins_count, ch);
@@ -406,11 +410,10 @@ void insert_ch(View *view, CodePoint ch)
     begin_change(del_count ? CHANGE_MERGE_NONE : CHANGE_MERGE_INSERT);
     buffer_replace_bytes(view, del_count, ins, ins_count);
     end_change();
+    free(alloc);
 
     // Move after inserted text
     block_iter_skip_bytes(&view->cursor, ins_count);
-
-    free(ins);
 }
 
 static void join_selection(View *view)
