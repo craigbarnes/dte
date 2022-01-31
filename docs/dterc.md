@@ -1243,7 +1243,7 @@ terminal supports it).
 
 Show line numbers.
 
-### **statusline-left** [" %f%s%m%r%s%M"]
+### **statusline-left** [" %f%s%m%s%r%s%M"]
 
 Format string for the left aligned part of status line.
 
