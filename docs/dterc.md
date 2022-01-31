@@ -1251,7 +1251,7 @@ Format string for the left aligned part of status line.
 :   Filename.
 
 `%m`
-:   Prints `*` if file is has been modified since last save.
+:   Prints `*` if file has been modified since last save.
 
 `%r`
 :   Prints `RO` for read-only buffers or `TMP` for temporary buffers.
