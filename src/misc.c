@@ -355,9 +355,6 @@ static void insert_nl(View *view)
 
 void insert_ch(View *view, CodePoint ch)
 {
-    size_t del_count = 0;
-    size_t ins_count = 0;
-
     if (ch == '\n') {
         insert_nl(view);
         return;
@@ -365,6 +362,9 @@ void insert_ch(View *view, CodePoint ch)
 
     const Buffer *b = view->buffer;
     char *ins = xmalloc(8);
+    size_t del_count = 0;
+    size_t ins_count = 0;
+
     if (view->selection) {
         // Prepare deleted text (selection)
         del_count = prepare_selection(view);
@@ -403,11 +403,7 @@ void insert_ch(View *view, CodePoint ch)
     }
 
     // Record change
-    if (del_count) {
-        begin_change(CHANGE_MERGE_NONE);
-    } else {
-        begin_change(CHANGE_MERGE_INSERT);
-    }
+    begin_change(del_count ? CHANGE_MERGE_NONE : CHANGE_MERGE_INSERT);
     buffer_replace_bytes(view, del_count, ins, ins_count);
     end_change();
 
