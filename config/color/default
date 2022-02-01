@@ -1,5 +1,5 @@
 # This is the color scheme that gets loaded by default when the editor
-# starts. It only uses the basic color palette, in order to maximize
+# starts. It mostly uses the basic color palette, in order to maximize
 # compatibility and remain suitable for both light and dark terminals.
 
 hi
