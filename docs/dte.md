@@ -14,7 +14,7 @@ seealso: ["`dterc`", "`dte-syntax`"]
 \[**-c** _command_]
 \[**-t** _ctag_]
 \[**-r** _rcfile_]
-\[\[**+**line] _file_]...  
+\[\[**+***line*\[**,***column*]] _file_]...  
 **dte** \[**-h**|**-B**|**-K**|**-V**|**-b** _rcname_|**-s** _file_]
 
 # Options
@@ -60,6 +60,10 @@ seealso: ["`dterc`", "`dte-syntax`"]
 
 `-V`
 :   Display the version number and exit.
+
+**+***line***,***column* arguments can be used to specify the initial
+cursor position of the next _file_ argument. These can also be specified
+in the format **+***line***:***column*.
 
 # Key Bindings
 

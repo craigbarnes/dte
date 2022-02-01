@@ -250,6 +250,43 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
     }
 }
 
+// Parse line and column number from line[,col] or line[:col]
+static bool parse_file_position(const char *str, size_t *line, size_t *col)
+{
+    size_t len = strlen(str);
+    size_t i = buf_parse_size(str, len, line);
+    if (str[i] != ':' && str[i] != ',') {
+        return i == len && *line > 0;
+    }
+    if (!str_to_size(str + i + 1, col) || *col == 0) {
+        *line = 0;
+        return false;
+    }
+    return true;
+}
+
+UNITTEST {
+    size_t line = 0, col = 0;
+    BUG_ON(!parse_file_position("10,60", &line, &col));
+    BUG_ON(line != 10);
+    BUG_ON(col != 60);
+    line = 0, col = 0;
+    BUG_ON(!parse_file_position("1:9", &line, &col));
+    BUG_ON(line != 1);
+    BUG_ON(col != 9);
+    line = 0, col = 0;
+    BUG_ON(!parse_file_position("4980", &line, &col));
+    BUG_ON(line != 4980);
+    BUG_ON(col != 0);
+    line = 0, col = 0;
+    BUG_ON(parse_file_position("", &line, &col));
+    BUG_ON(line != 0);
+    BUG_ON(col != 0);
+    BUG_ON(parse_file_position("44,9x", &line, &col));
+    BUG_ON(line != 0);
+    BUG_ON(col != 0);
+}
+
 static const char copyright[] =
     "(C) 2017-2021 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
@@ -440,18 +477,22 @@ loop_break:
 
     editor.status = EDITOR_RUNNING;
 
-    for (int i = optind, lineno = 0; i < argc; i++) {
-        if (argv[i][0] == '+' && lineno <= 0) {
-            const char *const lineno_string = &argv[i][1];
-            if (!str_to_int(lineno_string, &lineno) || lineno <= 0) {
-                error_msg("Invalid line number: '%s'", lineno_string);
+    for (size_t i = optind, line = 0, col = 0; i < argc; i++) {
+        const char *str = argv[i];
+        if (str[0] == '+' && ascii_isdigit(str[1]) && line == 0) {
+            if (!parse_file_position(str + 1, &line, &col)) {
+                error_msg("Invalid file position: '%s'", str);
             }
         } else {
-            View *v = window_open_buffer(window, argv[i], false, NULL);
-            if (lineno > 0) {
+            View *v = window_open_buffer(window, str, false, NULL);
+            if (line > 0) {
                 set_view(v);
-                move_to_line(v, lineno);
-                lineno = 0;
+                move_to_line(v, line);
+                line = 0;
+                if (col > 0) {
+                    move_to_column(v, col);
+                    col = 0;
+                }
             }
         }
     }
