@@ -563,7 +563,8 @@ loop_break:
         block_for_each(blk, &stdout_buffer->blocks) {
             if (xwrite(old_stdout_fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
-                return EX_IOERR;
+                editor.exit_code = EX_IOERR;
+                break;
             }
         }
         free_blocks(stdout_buffer);
