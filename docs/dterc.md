@@ -312,7 +312,8 @@ terminal's default fg/bg is used.
 
 `-c`
 :   Do nothing at all if the terminal can't display _fg-color_ and/or
-    _bg-color_ with full precision
+    _bg-color_ with full precision (this can be used to set up tiered
+    color schemes that use the best supported colors automatically)
 
 ### **ft** [**-b**|**-c**|**-f**|**-i**] _filetype_ _string_...
 
