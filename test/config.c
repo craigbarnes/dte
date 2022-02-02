@@ -157,6 +157,7 @@ static void test_global_state(void)
 {
     const Buffer *buffer = editor.buffer;
     const View *view = editor.view;
+    const Window *window = editor.window;
     ASSERT_NONNULL(window);
     ASSERT_NONNULL(root_frame);
     ASSERT_NONNULL(buffer);
@@ -247,7 +248,7 @@ void init_headless_mode(void)
     exec_builtin_rc();
     update_all_syntax_colors(&editor.syntaxes);
     editor.options.lock_files = false;
-    window = new_window();
-    root_frame = new_root_frame(window);
-    set_view(window_open_empty_buffer(window));
+    editor.window = new_window();
+    root_frame = new_root_frame(editor.window);
+    set_view(window_open_empty_buffer(editor.window));
 }

@@ -448,7 +448,9 @@ loop_break:
     }
 
     update_all_syntax_colors(&editor.syntaxes);
-    window = new_window();
+
+    Window *window = new_window();
+    editor.window = window;
     root_frame = new_root_frame(window);
 
     set_signal_handlers();

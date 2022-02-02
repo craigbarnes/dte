@@ -204,7 +204,7 @@ void init_editor_state(void)
 static void sanity_check(void)
 {
 #if DEBUG >= 1
-    View *v = window->view;
+    View *v = editor.window->view;
     Block *blk;
     block_for_each(blk, &v->buffer->blocks) {
         if (blk == v->cursor.blk) {
@@ -245,6 +245,7 @@ static void update_window_full(Window *w, void *ud)
 
 static void restore_cursor(TermOutputBuffer *obuf)
 {
+    const Window *window = editor.window;
     const View *view = editor.view;
     switch (editor.input_mode) {
     case INPUT_NORMAL:
@@ -323,7 +324,7 @@ static void update_buffer_windows(const Buffer *b)
         View *v = b->views.ptrs[i];
         if (v->window->view == v) {
             // Visible view
-            if (v != window->view) {
+            if (v != editor.window->view) {
                 // Restore cursor
                 v->cursor.blk = BLOCK(v->buffer->blocks.next);
                 block_iter_goto_offset(&v->cursor, v->saved_cursor_offset);
@@ -547,12 +548,12 @@ static void update_screen(const ScreenState *s)
             mark_buffer_tabbars_changed(buffer);
         }
     } else {
-        window->update_tabbar = true;
+        editor.window->update_tabbar = true;
         mark_all_lines_changed(buffer);
     }
 
     start_update();
-    if (window->update_tabbar) {
+    if (editor.window->update_tabbar) {
         update_term_title(&editor.obuf, buffer);
     }
     update_buffer_windows(buffer);

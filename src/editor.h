@@ -21,6 +21,7 @@
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 #include "view.h"
+#include "window.h"
 
 typedef enum {
     EDITOR_INITIALIZING,
@@ -62,6 +63,7 @@ typedef struct {
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;
+    Window *window;
     View *view;
     Buffer *buffer;
     PointerArray buffers;

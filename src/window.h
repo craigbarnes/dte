@@ -38,8 +38,6 @@ typedef struct Window {
     bool update_tabbar;
 } Window;
 
-extern Window *window;
-
 enum {
     // Minimum width of line numbers bar (including padding)
     LINE_NUMBERS_MIN_WIDTH = 5

@@ -12,8 +12,6 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 
-Window *window;
-
 Window *new_window(void)
 {
     return xnew0(Window, 1);
@@ -247,14 +245,14 @@ void set_view(View *v)
     }
 
     // Forget previous view when changing view using any other command but open
-    if (window) {
-        window->prev_view = NULL;
+    if (editor.window) {
+        editor.window->prev_view = NULL;
     }
 
     editor.view = v;
     editor.buffer = v->buffer;
-    window = v->window;
-    window->view = v;
+    editor.window = v->window;
+    editor.window->view = v;
 
     if (!v->buffer->setup) {
         buffer_setup(v->buffer);
@@ -477,6 +475,7 @@ Window *next_window(Window *w)
 
 void window_close_current(void)
 {
+    Window *window = editor.window;
     if (!window->frame->parent) {
         // Don't close last window
         window_remove_views(window);
@@ -491,7 +490,7 @@ void window_close_current(void)
     BUG_ON(!next_or_prev);
 
     remove_frame(window->frame);
-    window = NULL;
+    editor.window = NULL;
     set_view(next_or_prev->view);
 
     mark_everything_changed(&editor);

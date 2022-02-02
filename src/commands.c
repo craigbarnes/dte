@@ -206,7 +206,7 @@ static void cmd_bolsf(const CommandArgs *a)
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_bol(&view->cursor)) {
-        long top = view->vy + window_get_scroll_margin(window);
+        long top = view->vy + window_get_scroll_margin(e->window);
         if (view->cy > top) {
             move_up(view, view->cy - top);
         } else {
@@ -311,13 +311,13 @@ static void cmd_close(const CommandArgs *a)
         return;
     }
 
-    if (allow_wclose && window->views.count <= 1) {
+    if (allow_wclose && e->window->views.count <= 1) {
         window_close_current();
         return;
     }
 
-    window_close_current_view(window);
-    set_view(window->view);
+    window_close_current_view(e->window);
+    set_view(e->window->view);
 }
 
 static void cmd_command(const CommandArgs *a)
@@ -492,6 +492,7 @@ static void cmd_eol(const CommandArgs *a)
 static void cmd_eolsf(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_eol(&view->cursor)) {
@@ -590,8 +591,9 @@ static void cmd_exec_open(const CommandArgs *a)
         }
     }
 
+    EditorState *e = a->userdata;
     ptr_array_append(&filenames, NULL);
-    window_open_files(window, (char**)filenames.ptrs, NULL);
+    window_open_files(e->window, (char**)filenames.ptrs, NULL);
     macro_command_hook("open", (char**)filenames.ptrs);
     ptr_array_free_array(&filenames);
     string_free(&ctx.output);
@@ -628,7 +630,7 @@ static void cmd_exec_tag(const CommandArgs *a)
     string_free(&s);
 }
 
-static const char **lines_and_columns_env(void)
+static const char **lines_and_columns_env(const Window *window)
 {
     static char lines[DECIMAL_STR_MAX(window->edit_h)];
     static char columns[DECIMAL_STR_MAX(window->edit_w)];
@@ -650,7 +652,7 @@ static void cmd_filter(const CommandArgs *a)
     BlockIter save = view->cursor;
     SpawnContext ctx = {
         .argv = a->args,
-        .env = lines_and_columns_env(),
+        .env = lines_and_columns_env(e->window),
         .input = STRING_VIEW_INIT,
         .output = STRING_INIT,
         .flags = SPAWN_QUIET
@@ -935,6 +937,7 @@ not_found:
 static void cmd_move_tab(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     const size_t ntabs = window->views.count;
     const char *str = a->args[0];
     size_t to, from = ptr_array_idx(&window->views, e->view);
@@ -1001,10 +1004,10 @@ static void cmd_new_line(const CommandArgs *a)
 static void cmd_next(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    size_t i = ptr_array_idx(&window->views, e->view);
-    size_t n = window->views.count;
+    size_t i = ptr_array_idx(&e->window->views, e->view);
+    size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(window->views.ptrs[(i + 1) % n]);
+    set_view(e->window->views.ptrs[(i + 1) % n]);
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -1049,9 +1052,9 @@ static void cmd_open(const CommandArgs *a)
 
     Encoding encoding = {.type = ENCODING_AUTODETECT};
     if (requested_encoding) {
-        EncodingType e = lookup_encoding(requested_encoding);
-        if (e == UTF8) {
-            encoding = encoding_from_type(e);
+        EncodingType enctype = lookup_encoding(requested_encoding);
+        if (enctype == UTF8) {
+            encoding = encoding_from_type(enctype);
         } else if (conversion_supported_by_iconv(requested_encoding, "UTF-8")) {
             encoding = encoding_from_name(requested_encoding);
         } else {
@@ -1068,8 +1071,9 @@ static void cmd_open(const CommandArgs *a)
         }
     }
 
+    EditorState *e = a->userdata;
     if (a->nr_args == 0) {
-        View *v = window_open_new_file(window);
+        View *v = window_open_new_file(e->window);
         v->buffer->temporary = temporary;
         if (requested_encoding) {
             buffer_set_encoding(v->buffer, encoding);
@@ -1089,11 +1093,11 @@ static void cmd_open(const CommandArgs *a)
 
     if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(window, paths[0], &encoding);
+        window_open_file(e->window, paths[0], &encoding);
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(window, paths, &encoding);
+        window_open_files(e->window, paths, &encoding);
     }
 
     if (use_glob) {
@@ -1210,6 +1214,7 @@ static void cmd_pgdown(const CommandArgs *a)
     handle_select_chars_or_lines_flags(a);
 
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     long margin = window_get_scroll_margin(window);
     long bottom = view->vy + window->edit_h - 1 - margin;
@@ -1228,6 +1233,7 @@ static void cmd_pgup(const CommandArgs *a)
     handle_select_chars_or_lines_flags(a);
 
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     long margin = window_get_scroll_margin(window);
     long top = view->vy + margin;
@@ -1243,9 +1249,10 @@ static void cmd_pgup(const CommandArgs *a)
 
 static void cmd_pipe_from(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
     SpawnContext ctx = {
         .argv = a->args,
-        .env = lines_and_columns_env(),
+        .env = lines_and_columns_env(e->window),
         .output = STRING_INIT,
         .flags = SPAWN_QUIET
     };
@@ -1253,7 +1260,6 @@ static void cmd_pipe_from(const CommandArgs *a)
         return;
     }
 
-    EditorState *e = a->userdata;
     View *view = e->view;
     size_t del_len = 0;
     if (view->selection) {
@@ -1323,10 +1329,10 @@ static void cmd_pipe_to(const CommandArgs *a)
 static void cmd_prev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    size_t i = ptr_array_idx(&window->views, e->view);
-    size_t n = window->views.count;
+    size_t i = ptr_array_idx(&e->window->views, e->view);
+    size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(window->views.ptrs[(i ? i : n) - 1]);
+    set_view(e->window->views.ptrs[(i ? i : n) - 1]);
 }
 
 static void cmd_quit(const CommandArgs *a)
@@ -1352,12 +1358,12 @@ static void cmd_quit(const CommandArgs *a)
         Buffer *b = e->buffers.ptrs[i];
         if (buffer_modified(b)) {
             // Activate modified buffer
-            View *v = window_find_view(window, b);
+            View *v = window_find_view(e->window, b);
             if (!v) {
                 // Buffer isn't open in current window.
                 // Activate first window of the buffer.
                 v = b->views.ptrs[0];
-                window = v->window;
+                e->window = v->window;
                 mark_everything_changed(e);
             }
             set_view(v);
@@ -1790,6 +1796,7 @@ static void cmd_scroll_down(const CommandArgs *a)
 static void cmd_scroll_pgdown(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     long max = view->buffer->nl - window->edit_h + 1;
     if (view->vy < max && max > 0) {
@@ -1807,6 +1814,7 @@ static void cmd_scroll_pgdown(const CommandArgs *a)
 static void cmd_scroll_pgup(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     if (view->vy > 0) {
         long count = window->edit_h - 1;
@@ -1823,6 +1831,7 @@ static void cmd_scroll_pgup(const CommandArgs *a)
 static void cmd_scroll_up(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     View *view = e->view;
     if (view->vy) {
         view->vy--;
@@ -2135,6 +2144,8 @@ static void cmd_up(const CommandArgs *a)
 
 static void cmd_view(const CommandArgs *a)
 {
+    EditorState *e = a->userdata;
+    Window *window = e->window;
     BUG_ON(window->views.count == 0);
     const char *arg = a->args[0];
     size_t idx;
@@ -2158,7 +2169,7 @@ static void cmd_wclose(const CommandArgs *a)
     EditorState *e = a->userdata;
     bool force = has_flag(a, 'f');
     bool prompt = has_flag(a, 'p');
-    View *v = window_find_unclosable_view(window);
+    View *v = window_find_unclosable_view(e->window);
     if (v && !force) {
         set_view(v);
         if (prompt) {
@@ -2180,7 +2191,7 @@ static void cmd_wclose(const CommandArgs *a)
 static void cmd_wflip(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    Frame *f = window->frame;
+    Frame *f = e->window->frame;
     if (!f->parent) {
         return;
     }
@@ -2191,8 +2202,8 @@ static void cmd_wflip(const CommandArgs *a)
 static void cmd_wnext(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    window = next_window(window);
-    set_view(window->view);
+    e->window = next_window(e->window);
+    set_view(e->window->view);
     mark_everything_changed(e);
     debug_frames();
 }
@@ -2218,8 +2229,8 @@ static void cmd_word_fwd(const CommandArgs *a)
 static void cmd_wprev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    window = prev_window(window);
-    set_view(window->view);
+    e->window = prev_window(e->window);
+    set_view(e->window->view);
     mark_everything_changed(e);
     debug_frames();
 }
@@ -2241,6 +2252,7 @@ static void cmd_wrap_paragraph(const CommandArgs *a)
 static void cmd_wresize(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
+    Window *window = e->window;
     if (!window->frame->parent) {
         // Only window
         return;
@@ -2298,27 +2310,27 @@ static void cmd_wsplit(const CommandArgs *a)
         paths = globbuf.gl_pathv;
     }
 
+    EditorState *e = a->userdata;
     Frame *f;
     if (root) {
         f = split_root(vertical, before);
     } else {
-        f = split_frame(window, vertical, before);
+        f = split_frame(e->window, vertical, before);
     }
 
-    EditorState *e = a->userdata;
     View *save = e->view;
-    window = f->window;
+    e->window = f->window;
     e->view = NULL;
     e->buffer = NULL;
     mark_everything_changed(e);
 
     if (empty) {
-        window_open_new_file(window);
+        window_open_new_file(e->window);
         e->buffer->temporary = temporary;
     } else if (paths[0]) {
-        window_open_files(window, paths, NULL);
+        window_open_files(e->window, paths, NULL);
     } else {
-        View *new = window_add_buffer(window, save->buffer);
+        View *new = window_add_buffer(e->window, save->buffer);
         new->cursor = save->cursor;
         set_view(new);
     }
@@ -2327,12 +2339,12 @@ static void cmd_wsplit(const CommandArgs *a)
         globfree(&globbuf);
     }
 
-    if (window->views.count == 0) {
+    if (e->window->views.count == 0) {
         // Open failed, remove new window
-        remove_frame(window->frame);
+        remove_frame(e->window->frame);
         e->view = save;
         e->buffer = save->buffer;
-        window = save->window;
+        e->window = save->window;
     }
 
     debug_frames();
@@ -2341,21 +2353,21 @@ static void cmd_wsplit(const CommandArgs *a)
 static void cmd_wswap(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    Frame *parent = window->frame->parent;
+    Frame *frame = e->window->frame;
+    Frame *parent = frame->parent;
     if (!parent) {
         return;
     }
 
-    size_t i = ptr_array_idx(&parent->frames, window->frame);
-    BUG_ON(i >= parent->frames.count);
-    size_t j = i + 1;
-    if (j == parent->frames.count) {
-        j = 0;
-    }
+    size_t count = parent->frames.count;
+    size_t current = ptr_array_idx(&parent->frames, frame);
+    BUG_ON(current >= count);
+    size_t next = (current + 1 < count) ? current + 1 : 0;
 
-    Frame *tmp = parent->frames.ptrs[i];
-    parent->frames.ptrs[i] = parent->frames.ptrs[j];
-    parent->frames.ptrs[j] = tmp;
+    void **ptrs = parent->frames.ptrs;
+    Frame *tmp = ptrs[current];
+    ptrs[current] = ptrs[next];
+    ptrs[next] = tmp;
     mark_everything_changed(e);
 }
 

@@ -43,7 +43,7 @@ static void open_temporary_buffer (
     const char *cmd_arg,
     bool dterc_syntax
 ) {
-    View *v = window_open_new_file(window);
+    View *v = window_open_new_file(editor.window);
     v->buffer->temporary = true;
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
@@ -219,7 +219,7 @@ static void show_wsplit(EditorState *e, const char *name, bool cflag)
         return;
     }
 
-    const Window *w = window;
+    const Window *w = e->window;
     char buf[(4 * DECIMAL_STR_MAX(w->x)) + 4];
     xsnprintf(buf, sizeof buf, "%d,%d %dx%d", w->x, w->y, w->w, w->h);
 

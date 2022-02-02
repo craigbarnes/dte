@@ -82,7 +82,7 @@ static void test_hl_line(void)
     const Encoding enc = encoding_from_type(UTF8);
     EXPECT_EQ(enc.type, UTF8);
     EXPECT_STREQ(enc.name, "UTF-8");
-    View *v = window_open_file(window, "test/data/test.c", &enc);
+    View *v = window_open_file(editor.window, "test/data/test.c", &enc);
     ASSERT_NONNULL(v);
 
     const size_t line_nr = 5;

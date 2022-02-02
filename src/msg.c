@@ -36,62 +36,62 @@ FileLocation *get_current_file_location(const View *view)
 
 static bool file_location_go(const FileLocation *loc)
 {
-    Window *w = window;
-    View *v = window_open_buffer(w, loc->filename, true, NULL);
-    if (!v) {
+    Window *window = editor.window;
+    View *view = window_open_buffer(window, loc->filename, true, NULL);
+    if (!view) {
         // Failed to open file. Error message should be visible.
         return false;
     }
 
-    if (w->view != v) {
-        set_view(v);
+    if (window->view != view) {
+        set_view(view);
         // Force centering view to the cursor because file changed
-        v->force_center = true;
+        view->force_center = true;
     }
 
     bool ok = true;
     if (loc->pattern) {
         bool err = false;
-        search_tag(v, loc->pattern, &err);
+        search_tag(view, loc->pattern, &err);
         ok = !err;
     } else if (loc->line > 0) {
-        move_to_line(v, loc->line);
+        move_to_line(view, loc->line);
         if (loc->column > 0) {
-            move_to_column(v, loc->column);
+            move_to_column(view, loc->column);
         }
     }
     if (ok) {
-        unselect(v);
+        unselect(view);
     }
     return ok;
 }
 
 static bool file_location_return(const FileLocation *loc)
 {
-    Window *w = window;
-    Buffer *b = find_buffer_by_id(loc->buffer_id);
-    View *v;
+    Window *window = editor.window;
+    Buffer *buffer = find_buffer_by_id(loc->buffer_id);
+    View *view;
 
-    if (b) {
-        v = window_get_view(w, b);
+    if (buffer) {
+        view = window_get_view(window, buffer);
     } else {
         if (!loc->filename) {
             // Can't restore closed buffer that had no filename.
             // Try again.
             return false;
         }
-        v = window_open_buffer(w, loc->filename, true, NULL);
+        view = window_open_buffer(window, loc->filename, true, NULL);
     }
 
-    if (!v) {
+    if (!view) {
         // Open failed. Don't try again.
         return true;
     }
 
-    set_view(v);
-    unselect(v);
-    move_to_line(v, loc->line);
-    move_to_column(v, loc->column);
+    set_view(view);
+    unselect(view);
+    move_to_line(view, loc->line);
+    move_to_column(view, loc->column);
     return true;
 }
 
