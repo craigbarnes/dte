@@ -160,11 +160,7 @@ static size_t split_and_insert(View *v, const char *buf, size_t len)
         Block *new = block_new(size);
         if (start < size1) {
             size_t avail = size1 - start;
-            size_t count = size;
-
-            if (count > avail) {
-                count = avail;
-            }
+            size_t count = MIN(size, avail);
             new->nl += copy_count_nl(new->data, buf1 + start, count);
             copied += count;
             start += count;
@@ -172,11 +168,7 @@ static size_t split_and_insert(View *v, const char *buf, size_t len)
         if (start >= size1 && start < size1 + size2) {
             size_t offset = start - size1;
             size_t avail = size2 - offset;
-            size_t count = size - copied;
-
-            if (count > avail) {
-                count = avail;
-            }
+            size_t count = MIN(size - copied, avail);
             new->nl += copy_count_nl(new->data + copied, buf2 + offset, count);
             copied += count;
             start += count;
@@ -185,7 +177,6 @@ static size_t split_and_insert(View *v, const char *buf, size_t len)
             size_t offset = start - size1 - size2;
             size_t avail = size3 - offset;
             size_t count = size - copied;
-
             BUG_ON(count > avail);
             new->nl += copy_count_nl(new->data + copied, buf3 + offset, count);
             copied += count;
@@ -272,11 +263,7 @@ char *do_delete(View *v, size_t len, bool sanity_check_newlines)
     while (pos < len) {
         ListHead *next = blk->node.next;
         size_t avail = blk->size - offset;
-        size_t count = len - pos;
-
-        if (count > avail) {
-            count = avail;
-        }
+        size_t count = MIN(len - pos, avail);
         size_t nl = copy_count_nl(deleted + pos, blk->data + offset, count);
         if (count < avail) {
             memmove (

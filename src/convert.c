@@ -502,19 +502,14 @@ size_t file_encoder_get_nr_errors(const FileEncoder *enc)
 
 static bool fill(FileDecoder *dec)
 {
-    size_t icount = dec->isize - dec->ipos;
-
-    // Smaller than cconv.obuf to make realloc less likely
-    size_t max = 7 * 1024;
-
-    if (icount > max) {
-        icount = max;
-    }
-
     if (dec->ipos == dec->isize) {
         return false;
     }
 
+    // Smaller than cconv.obuf to make realloc less likely
+    size_t max = 7 * 1024;
+
+    size_t icount = MIN(dec->isize - dec->ipos, max);
     cconv_process(dec->cconv, dec->ibuf + dec->ipos, icount);
     dec->ipos += icount;
     if (dec->ipos == dec->isize) {

@@ -291,10 +291,7 @@ char *block_iter_get_bytes(const BlockIter *bi, size_t len)
 
     while (pos < len) {
         const size_t avail = blk->size - offset;
-        size_t count = len - pos;
-        if (count > avail) {
-            count = avail;
-        }
+        size_t count = MIN(len - pos, avail);
         memcpy(buf + pos, blk->data + offset, count);
         pos += count;
         BUG_ON(pos < len && blk->node.next == bi->head);
