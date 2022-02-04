@@ -304,15 +304,8 @@ static void update_window(Window *w)
         update_line_numbers(&editor.obuf, w, v->buffer->changed_line_max == LONG_MAX);
     }
 
-    long y1 = v->buffer->changed_line_min;
-    long y2 = v->buffer->changed_line_max;
-    if (y1 < v->vy) {
-        y1 = v->vy;
-    }
-    if (y2 > v->vy + w->edit_h - 1) {
-        y2 = v->vy + w->edit_h - 1;
-    }
-
+    long y1 = MAX(v->buffer->changed_line_min, v->vy);
+    long y2 = MIN(v->buffer->changed_line_max, v->vy + w->edit_h - 1);
     update_range(&editor.obuf, v, y1, y2 + 1);
     update_status_line(&editor.obuf, w);
 }

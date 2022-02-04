@@ -59,7 +59,7 @@ void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
     while (count) {
         obuf_need_space(obuf, 1);
         size_t avail = obuf_avail(obuf);
-        size_t n = (count > avail) ? avail : count;
+        size_t n = MIN(count, avail);
         memset(obuf->buf + obuf->count, ch, n);
         obuf->count += n;
         count -= n;

@@ -85,10 +85,7 @@ void update_line_numbers(TermOutputBuffer *obuf, Window *win, bool force)
 
     calculate_line_numbers(win);
     long first = v->vy + 1;
-    long last = v->vy + win->edit_h;
-    if (last > lines) {
-        last = lines;
-    }
+    long last = MIN(v->vy + win->edit_h, lines);
 
     if (
         !force
