@@ -306,7 +306,7 @@ static void cmd_close(const CommandArgs *a)
         }
     }
 
-    if (allow_quit && e->buffers.count == 1 && root_frame->frames.count <= 1) {
+    if (allow_quit && e->buffers.count == 1 && e->root_frame->frames.count <= 1) {
         e->status = EDITOR_EXITING;
         return;
     }
@@ -2205,7 +2205,7 @@ static void cmd_wnext(const CommandArgs *a)
     e->window = next_window(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
-    debug_frames();
+    debug_frame(e->root_frame);
 }
 
 static void cmd_word_bwd(const CommandArgs *a)
@@ -2232,7 +2232,7 @@ static void cmd_wprev(const CommandArgs *a)
     e->window = prev_window(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
-    debug_frames();
+    debug_frame(e->root_frame);
 }
 
 static void cmd_wrap_paragraph(const CommandArgs *a)
@@ -2284,7 +2284,7 @@ static void cmd_wresize(const CommandArgs *a)
         equalize_frame_sizes(window->frame->parent);
     }
     mark_everything_changed(e);
-    debug_frames();
+    debug_frame(e->root_frame);
 }
 
 static void cmd_wsplit(const CommandArgs *a)
@@ -2347,7 +2347,7 @@ static void cmd_wsplit(const CommandArgs *a)
         e->window = save->window;
     }
 
-    debug_frames();
+    debug_frame(e->root_frame);
 }
 
 static void cmd_wswap(const CommandArgs *a)

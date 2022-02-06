@@ -282,13 +282,13 @@ static void end_update(void)
 
     editor.buffer->changed_line_min = LONG_MAX;
     editor.buffer->changed_line_max = -1;
-    frame_for_each_window(root_frame, clear_update_tabbar, NULL);
+    frame_for_each_window(editor.root_frame, clear_update_tabbar, NULL);
 }
 
 static void update_all_windows(void)
 {
     update_window_sizes();
-    frame_for_each_window(root_frame, update_window_full, &editor.obuf);
+    frame_for_each_window(editor.root_frame, update_window_full, &editor.obuf);
     update_separators(&editor.obuf);
 }
 

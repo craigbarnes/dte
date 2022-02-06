@@ -451,7 +451,7 @@ loop_break:
 
     Window *window = new_window();
     editor.window = window;
-    root_frame = new_root_frame(window);
+    editor.root_frame = new_root_frame(window);
 
     set_signal_handlers();
     set_fatal_error_cleanup_handler(term_cleanup);
@@ -552,7 +552,7 @@ loop_break:
     term_output_flush(&editor.obuf);
 
     // Unlock files and add files to file history
-    remove_frame(root_frame);
+    remove_frame(editor.root_frame);
 
     if (load_and_save_history) {
         history_save(&editor.command_history);

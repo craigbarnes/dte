@@ -63,6 +63,7 @@ typedef struct {
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;
+    Frame *root_frame;
     Window *window;
     View *view;
     Buffer *buffer;

@@ -1,9 +1,8 @@
 #include "frame.h"
+#include "editor.h"
 #include "util/debug.h"
 #include "util/xmalloc.h"
 #include "window.h"
-
-Frame *root_frame;
 
 static int get_min_w(const Frame *f)
 {
@@ -388,7 +387,7 @@ static void update_frame_coordinates(const Frame *f, int x, int y)
 
 void update_window_coordinates(void)
 {
-    update_frame_coordinates(root_frame, 0, 0);
+    update_frame_coordinates(editor.root_frame, 0, 0);
 }
 
 Frame *split_frame(Window *w, bool vertical, bool before)
@@ -421,22 +420,24 @@ Frame *split_frame(Window *w, bool vertical, bool before)
 Frame *split_root(bool vertical, bool before)
 {
     Frame *new_root = new_frame();
-    new_root->vertical = vertical;
     Frame *f = new_frame();
     f->parent = new_root;
     f->window = new_window();
     f->window->frame = f;
+    new_root->vertical = vertical;
+
+    Frame *old_root = editor.root_frame;
     if (before) {
         ptr_array_append(&new_root->frames, f);
-        ptr_array_append(&new_root->frames, root_frame);
+        ptr_array_append(&new_root->frames, old_root);
     } else {
-        ptr_array_append(&new_root->frames, root_frame);
+        ptr_array_append(&new_root->frames, old_root);
         ptr_array_append(&new_root->frames, f);
     }
 
-    root_frame->parent = new_root;
-    set_frame_size(new_root, root_frame->w, root_frame->h);
-    root_frame = new_root;
+    old_root->parent = new_root;
+    set_frame_size(new_root, old_root->w, old_root->h);
+    editor.root_frame = new_root;
     update_window_coordinates();
     return f;
 }
@@ -467,7 +468,6 @@ void remove_frame(Frame *f)
         // Replace parent with the only child frame
         Frame *gp = parent->parent;
         Frame *c = parent->frames.ptrs[0];
-
         c->parent = gp;
         c->w = parent->w;
         c->h = parent->h;
@@ -476,7 +476,7 @@ void remove_frame(Frame *f)
             BUG_ON(idx >= gp->frames.count);
             gp->frames.ptrs[idx] = c;
         } else {
-            root_frame = c;
+            editor.root_frame = c;
         }
         free(parent->frames.ptrs);
         free(parent);
@@ -516,7 +516,7 @@ void dump_frame(const Frame *f, int level, String *str)
 }
 
 #if DEBUG >= 1
-static void debug_frame(const Frame *f)
+void debug_frame(const Frame *f)
 {
     BUG_ON(f->window && f->frames.count);
     if (f->window) {
@@ -527,10 +527,5 @@ static void debug_frame(const Frame *f)
         BUG_ON(c->parent != f);
         debug_frame(c);
     }
-}
-
-void debug_frames(void)
-{
-    debug_frame(root_frame);
 }
 #endif

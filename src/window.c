@@ -460,7 +460,7 @@ static void find_prev_and_next(Window *w, void *ud)
 Window *prev_window(Window *w)
 {
     WindowCallbackData data = {.target = w};
-    frame_for_each_window(root_frame, find_prev_and_next, &data);
+    frame_for_each_window(editor.root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.prev ? data.prev : data.last;
 }
@@ -468,7 +468,7 @@ Window *prev_window(Window *w)
 Window *next_window(Window *w)
 {
     WindowCallbackData data = {.target = w};
-    frame_for_each_window(root_frame, find_prev_and_next, &data);
+    frame_for_each_window(editor.root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.next ? data.next : data.first;
 }
@@ -484,7 +484,7 @@ void window_close_current(void)
     }
 
     WindowCallbackData data = {.target = window};
-    frame_for_each_window(root_frame, find_prev_and_next, &data);
+    frame_for_each_window(editor.root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     Window *next_or_prev = data.next ? data.next : data.prev;
     BUG_ON(!next_or_prev);
@@ -494,5 +494,5 @@ void window_close_current(void)
     set_view(next_or_prev->view);
 
     mark_everything_changed(&editor);
-    debug_frames();
+    debug_frame(editor.root_frame);
 }

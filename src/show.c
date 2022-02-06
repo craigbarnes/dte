@@ -330,10 +330,10 @@ String dump_bindings(EditorState *e)
     return buf;
 }
 
-String dump_frames(EditorState* UNUSED_ARG(e))
+String dump_frames(EditorState *e)
 {
     String str = string_new(4096);
-    dump_frame(root_frame, 0, &str);
+    dump_frame(e->root_frame, 0, &str);
     return str;
 }
 

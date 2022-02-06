@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include <stdbool.h>
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 
@@ -25,8 +26,6 @@ typedef enum {
     RESIZE_DIRECTION_VERTICAL,
 } ResizeDirection;
 
-extern Frame *root_frame;
-
 Frame *new_root_frame(struct Window *w);
 void set_frame_size(Frame *f, int w, int h);
 void equalize_frame_sizes(Frame *parent);
@@ -39,9 +38,9 @@ void remove_frame(Frame *f);
 void dump_frame(const Frame *f, int level, String *str);
 
 #if DEBUG >= 1
-  void debug_frames(void);
+  void debug_frame(const Frame *f);
 #else
-  static inline void debug_frames(void) {}
+  static inline void debug_frame(const Frame* UNUSED_ARG(f)) {}
 #endif
 
 #endif

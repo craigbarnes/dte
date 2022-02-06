@@ -74,7 +74,7 @@ static void print_separator(Window *win, void *ud)
 void update_separators(TermOutputBuffer *obuf)
 {
     set_builtin_color(obuf, BC_STATUSLINE);
-    frame_for_each_window(root_frame, print_separator, obuf);
+    frame_for_each_window(editor.root_frame, print_separator, obuf);
 }
 
 void update_line_numbers(TermOutputBuffer *obuf, Window *win, bool force)
@@ -121,7 +121,7 @@ void update_line_numbers(TermOutputBuffer *obuf, Window *win, bool force)
 
 void update_window_sizes(void)
 {
-    set_frame_size(root_frame, terminal.width, terminal.height - 1);
+    set_frame_size(editor.root_frame, terminal.width, terminal.height - 1);
     update_window_coordinates();
 }
 
