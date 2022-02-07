@@ -33,7 +33,7 @@ void add_to_frame_size(Frame *f, ResizeDirection dir, int amount);
 void resize_frame(Frame *f, ResizeDirection dir, int size);
 void update_window_coordinates(void);
 Frame *split_frame(struct Window *w, bool vertical, bool before);
-Frame *split_root(bool vertical, bool before);
+Frame *split_root(Frame **root, bool vertical, bool before);
 void remove_frame(Frame *f);
 void dump_frame(const Frame *f, int level, String *str);
 

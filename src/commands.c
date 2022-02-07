@@ -2313,7 +2313,7 @@ static void cmd_wsplit(const CommandArgs *a)
     EditorState *e = a->userdata;
     Frame *f;
     if (root) {
-        f = split_root(vertical, before);
+        f = split_root(&e->root_frame, vertical, before);
     } else {
         f = split_frame(e->window, vertical, before);
     }
