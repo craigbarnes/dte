@@ -349,14 +349,12 @@ void mark_buffer_tabbars_changed(Buffer *b)
 
 static int line_numbers_width(const Window *win)
 {
-    int w = 0;
-    if (editor.options.show_line_numbers && win->view) {
-        w = size_str_width(win->view->buffer->nl) + 1;
-        if (w < LINE_NUMBERS_MIN_WIDTH) {
-            w = LINE_NUMBERS_MIN_WIDTH;
-        }
+    if (!editor.options.show_line_numbers || !win->view) {
+        return 0;
     }
-    return w;
+    int width = size_str_width(win->view->buffer->nl) + 1;
+    int min = LINE_NUMBERS_MIN_WIDTH;
+    return (width < min) ? min : width;
 }
 
 static int edit_x_offset(const Window *win)
