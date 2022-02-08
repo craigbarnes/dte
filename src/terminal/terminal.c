@@ -42,6 +42,7 @@ static const TermEntry terms[] = {
     {"ansi", 4, TERM_8_COLOR, UL, 0},
     {"ansiterm", 8, TERM_0_COLOR, 0, 0},
     {"aterm", 5, TERM_8_COLOR, 0, BCE},
+    {"contour", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52},
     {"cx", 2, TERM_8_COLOR, 0, 0},
     {"cx100", 5, TERM_8_COLOR, 0, 0},
     {"cygwin", 6, TERM_8_COLOR, 0, 0},
