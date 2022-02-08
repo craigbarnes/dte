@@ -33,6 +33,10 @@ ubuntu:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
 
+rocky-8:
+    extends: .test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-rocky-8
+
 debian-9:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-9
