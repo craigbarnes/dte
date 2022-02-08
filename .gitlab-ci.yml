@@ -29,14 +29,6 @@ arch:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-arch
 
-centos-7:
-    extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos-7
-
-centos-8:
-    extends: .test
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-centos-8
-
 ubuntu:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-ubuntu
