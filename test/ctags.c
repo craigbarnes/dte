@@ -2,6 +2,7 @@
 #include "test.h"
 #include "ctags.h"
 #include "util/ptr-array.h"
+#include "util/readfile.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
@@ -27,23 +28,14 @@ static void test_next_tag(void)
     };
 
     const char path[] = "test/data/ctags.txt";
-    int fd = xopen(path, O_RDONLY | O_CLOEXEC, 0);
-    ASSERT_TRUE(fd >= 0);
-
-    struct stat st;
-    ASSERT_EQ(fstat(fd, &st), 0);
-    ASSERT_TRUE(st.st_size > 64);
-
-    char *buf = xmalloc(st.st_size);
-    ssize_t size = xread(fd, buf, st.st_size);
-    xclose(fd);
-    ASSERT_EQ(size, st.st_size);
+    char *buf;
+    ssize_t size = read_file(path, &buf);
+    ASSERT_TRUE(size >= 64);
 
     TagFile tf = {
         .filename = xstrdup(path),
         .buf = buf,
         .size = size,
-        .mtime = st.st_mtime,
     };
 
     Tag t;
