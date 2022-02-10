@@ -1,0 +1,18 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+MIN_SIZE	src/util/hashmap.c	/^    MIN_SIZE = 8,$/;"	e	enum:__anonf100087c0103	file:
+TOMBSTONE	src/util/hashmap.c	/^    TOMBSTONE = 0xdead,$/;"	e	enum:__anonf100087c0103	file:
+hashmap_clear	src/util/hashmap.c	/^void hashmap_clear(HashMap *map, FreeFunction free_value)$/;"	f	typeref:typename:void
+hashmap_do_init	src/util/hashmap.c	/^static int hashmap_do_init(HashMap *map, size_t size)$/;"	f	typeref:typename:WARN_UNUSED_RESULT int	file:
+hashmap_do_insert	src/util/hashmap.c	/^static int hashmap_do_insert(HashMap *map, char *key, void *value, void **old_value)$/;"	f	typeref:typename:WARN_UNUSED_RESULT int	file:
+hashmap_find	src/util/hashmap.c	/^HashMapEntry *hashmap_find(const HashMap *map, const char *key)$/;"	f	typeref:typename:HashMapEntry *
+hashmap_free	src/util/hashmap.c	/^void hashmap_free(HashMap *map, FreeFunction free_value)$/;"	f	typeref:typename:void
+hashmap_init	src/util/hashmap.c	/^void hashmap_init(HashMap *map, size_t size)$/;"	f	typeref:typename:void
+hashmap_insert	src/util/hashmap.c	/^void hashmap_insert(HashMap *map, char *key, void *value)$/;"	f	typeref:typename:void
+hashmap_insert_or_replace	src/util/hashmap.c	/^void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)$/;"	f	typeref:typename:void *
+hashmap_remove	src/util/hashmap.c	/^void *hashmap_remove(HashMap *map, const char *key)$/;"	f	typeref:typename:void *
+hashmap_resize	src/util/hashmap.c	/^static int hashmap_resize(HashMap *map, size_t size)$/;"	f	typeref:typename:WARN_UNUSED_RESULT int	file:

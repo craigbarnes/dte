@@ -14,6 +14,7 @@ extern const TestGroup cmdline_tests;
 extern const TestGroup cmdline_tests_late;
 extern const TestGroup command_tests;
 extern const TestGroup config_tests;
+extern const TestGroup ctags_tests;
 extern const TestGroup dump_tests;
 extern const TestGroup editorconfig_tests;
 extern const TestGroup encoding_tests;
@@ -115,6 +116,7 @@ int main(void)
     run_tests(&terminal_tests);
     run_tests(&cmdline_tests);
     run_tests(&history_tests);
+    run_tests(&ctags_tests);
 
     init_headless_mode();
     run_tests(&config_tests);
