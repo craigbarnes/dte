@@ -567,10 +567,19 @@ void delete_lines(View *view)
     move_to_preferred_x(view, x);
 }
 
-void new_line(View *view)
+void new_line(View *view, bool above)
 {
     size_t ins_count = 1;
     char *ins = NULL;
+
+    if (above) {
+        if (block_iter_prev_line(&view->cursor) == 0) {
+            // Already on first line; insert newline at bof
+            block_iter_bol(&view->cursor);
+            buffer_insert_bytes(view, "\n", 1);
+            return;
+        }
+    }
 
     block_iter_eol(&view->cursor);
 

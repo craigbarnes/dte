@@ -810,9 +810,12 @@ Clear current line.
 
 Join selection or next line to current.
 
-### **new-line**
+### **new-line** [**-a**]
 
-Insert empty line under current line.
+Insert empty line below current line.
+
+`-a`
+:   Insert above current line, instead of below
 
 ### **delete**
 

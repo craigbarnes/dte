@@ -18,7 +18,7 @@ void insert_ch(View *v, CodePoint ch);
 void join_lines(View *v);
 void clear_lines(View *v);
 void delete_lines(View *v);
-void new_line(View *v);
+void new_line(View *v, bool above);
 void format_paragraph(View *v, size_t text_width);
 void change_case(View *v, char mode);
 

@@ -150,7 +150,7 @@ Editing Commands:
 .br
    \fBjoin\fR
 .br
-   \fBnew\-line\fR
+   \fBnew\-line\fR [\fB\-a\fR]
 .br
    \fBdelete\fR
 .br
@@ -1323,10 +1323,14 @@ Clear current line.
 Join selection or next line to current.
 .P
 .RE
-\fBnew\-line\fR
+\fBnew\-line\fR [\fB\-a\fR]
 .RS
-Insert empty line under current line.
+Insert empty line below current line.
 .P
+.TP
+\fB\-a\fR
+Insert above current line, instead of below
+.PP
 .RE
 \fBdelete\fR
 .RS

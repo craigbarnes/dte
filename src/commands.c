@@ -998,7 +998,7 @@ static void cmd_msg(const CommandArgs *a)
 static void cmd_new_line(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    new_line(e->view);
+    new_line(e->view, has_flag(a, 'a'));
 }
 
 static void cmd_next(const CommandArgs *a)
@@ -2418,7 +2418,7 @@ static const Command cmds[] = {
     {"match-bracket", "", false, 0, 0, cmd_match_bracket},
     {"move-tab", "", false, 1, 1, cmd_move_tab},
     {"msg", "np", false, 0, 1, cmd_msg},
-    {"new-line", "", false, 0, 0, cmd_new_line},
+    {"new-line", "a", false, 0, 0, cmd_new_line},
     {"next", "", false, 0, 0, cmd_next},
     {"open", "e=gt", false, 0, -1, cmd_open},
     {"option", "-r", true, 3, -1, cmd_option},
