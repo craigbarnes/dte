@@ -77,6 +77,16 @@ Packaging
 
 See [`docs/packaging.md`](https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md).
 
+Contact
+-------
+
+Questions and patches may be sent by email to <craigbarnes@protonmail.com>,
+although GitLab [issue reports] and [merge requests] are usually preferred,
+when possible.
+
+For general discussion, we also have a `#dte` channel on the [Libera.Chat]
+IRC network.
+
 License
 -------
 
@@ -113,3 +123,6 @@ Public License version 2 for more details.
 [pkgsrc]: https://pkgsrc.se/editors/dte
 [Homebrew]: https://github.com/yumitsu/homebrew-dte
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
+[issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
+[merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
+[Libera.Chat]: https://libera.chat/
