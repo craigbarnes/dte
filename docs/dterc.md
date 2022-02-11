@@ -165,7 +165,7 @@ following flags are used:
 The commands available in normal mode are the ones listed in the main
 sections of this manual.
 
-The commands avilable in [`command`]/[`search`] modes are as follows:
+The commands available in [`command`]/[`search`] modes are as follows:
 
 * `left`
 * `right`
