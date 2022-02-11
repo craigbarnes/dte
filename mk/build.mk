@@ -56,7 +56,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter buffer change cmdline commands \
-    convert compiler completion config ctags edit editor \
+    convert compiler completion config copy ctags edit editor \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \

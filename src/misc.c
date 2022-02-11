@@ -137,33 +137,6 @@ void unselect(View *view)
     }
 }
 
-static void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
-{
-    if (clip->buf) {
-        free(clip->buf);
-    }
-    clip->buf = buf;
-    clip->len = len;
-    clip->is_lines = is_lines;
-}
-
-void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
-{
-    if (len) {
-        char *buf = block_iter_get_bytes(&view->cursor, len);
-        record_copy(clip, buf, len, is_lines);
-        buffer_delete_bytes(view, len);
-    }
-}
-
-void copy(Clipboard *clip, View *view, size_t len, bool is_lines)
-{
-    if (len) {
-        char *buf = block_iter_get_bytes(&view->cursor, len);
-        record_copy(clip, buf, len, is_lines);
-    }
-}
-
 void insert_text(View *view, const char *text, size_t size, bool move_after)
 {
     size_t del_count = 0;
@@ -174,34 +147,6 @@ void insert_text(View *view, const char *text, size_t size, bool move_after)
     buffer_replace_bytes(view, del_count, text, size);
     if (move_after) {
         block_iter_skip_bytes(&view->cursor, size);
-    }
-}
-
-void paste(Clipboard *clip, View *view, bool at_cursor)
-{
-    if (!clip->buf) {
-        return;
-    }
-
-    size_t del_count = 0;
-    if (view->selection) {
-        del_count = prepare_selection(view);
-        unselect(view);
-    }
-
-    if (clip->is_lines && !at_cursor) {
-        const long x = view_get_preferred_x(view);
-        if (!del_count) {
-            block_iter_eat_line(&view->cursor);
-        }
-        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
-
-        // Try to keep cursor column
-        move_to_preferred_x(view, x);
-        // New preferred_x
-        view_reset_preferred_x(view);
-    } else {
-        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
     }
 }
 

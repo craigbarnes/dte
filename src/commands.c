@@ -15,6 +15,7 @@
 #include "command/serialize.h"
 #include "config.h"
 #include "convert.h"
+#include "copy.h"
 #include "editor.h"
 #include "encoding.h"
 #include "error.h"
