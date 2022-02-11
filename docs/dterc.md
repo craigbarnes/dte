@@ -772,12 +772,36 @@ message will be displayed.
 
 Cut current line or selection.
 
-### **copy** [**-k**]
+### **copy** [**-bikp**]
 
 Copy current line or selection.
 
+`-b`
+:   Copy to system clipboard
+
+`-i`
+:   Copy to internal copy buffer (this is the default, if no **-bip**
+    flags are used)
+
 `-k`
 :   Keep selection (by default, selections are lost after copying)
+
+`-p`
+:   Copy to system "primary selection"
+
+Note that the **-b** and **-p** flags depend upon the terminal
+supporting copy operations via escape sequences (commonly known as
+"OSC 52"). If the terminal doesn't support OSC 52, these flags will
+silently become no-ops.
+
+Also note that "system clipboard", in this case, refers to the clipboard
+on the system running the terminal. OSC 52 does in-band copying over the
+wire, so it can be used in conjunction with SSH, for example.
+
+The **-i**, **-b** and **-p** flags can be used together, to allow
+copying to multiple targets in a single command. For example:
+
+    copy -ib
 
 ### **paste** [**-c**]
 

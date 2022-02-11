@@ -138,7 +138,7 @@ Editing Commands:
 .br
    \fBcut\fR
 .br
-   \fBcopy\fR [\fB\-k\fR]
+   \fBcopy\fR [\fB\-bikp\fR]
 .br
    \fBpaste\fR [\fB\-c\fR]
 .br
@@ -1272,13 +1272,45 @@ Previous message
 Cut current line or selection.
 .P
 .RE
-\fBcopy\fR [\fB\-k\fR]
+\fBcopy\fR [\fB\-bikp\fR]
 .RS
 Copy current line or selection.
 .P
 .TP
+\fB\-b\fR
+Copy to system clipboard
+.PP
+.TP
+\fB\-i\fR
+Copy to internal copy buffer (this is the default, if no \fB\-bip\fR
+flags are used)
+.PP
+.TP
 \fB\-k\fR
 Keep selection (by default, selections are lost after copying)
+.PP
+.TP
+\fB\-p\fR
+Copy to system "primary selection"
+.PP
+Note that the \fB\-b\fR and \fB\-p\fR flags depend upon the terminal
+supporting copy operations via escape sequences (commonly known as
+"OSC 52"). If the terminal doesn't support OSC 52, these flags will
+silently become no\-ops.
+.P
+Also note that "system clipboard", in this case, refers to the clipboard
+on the system running the terminal. OSC 52 does in\-band copying over the
+wire, so it can be used in conjunction with SSH, for example.
+.P
+The \fB\-i\fR, \fB\-b\fR and \fB\-p\fR flags can be used together, to allow
+copying to multiple targets in a single command. For example:
+.P
+.IP
+.nf
+\f[C]
+copy\ \-ib
+\f[]
+.fi
 .PP
 .RE
 \fBpaste\fR [\fB\-c\fR]
