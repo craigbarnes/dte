@@ -54,7 +54,7 @@ void macro_stop(void)
     }
     merge_insert_buffer();
     const size_t count = macro.count;
-    const char *plural = (count > 1) ? "s" : "";
+    const char *plural = (count != 1) ? "s" : "";
     info_msg("Macro recording stopped; %zu command%s saved", count, plural);
     recording_macro = false;
 }
