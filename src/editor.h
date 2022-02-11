@@ -12,6 +12,7 @@
 #include "encoding.h"
 #include "file-history.h"
 #include "history.h"
+#include "misc.h"
 #include "mode.h"
 #include "msg.h"
 #include "options.h"
@@ -60,6 +61,7 @@ typedef struct {
     int exit_code;
     size_t cmdline_x;
     KeyBindingGroup bindings[3];
+    Clipboard clipboard;
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;

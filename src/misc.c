@@ -22,10 +22,6 @@ typedef struct {
     size_t text_width;
 } ParagraphFormatter;
 
-static char *copy_buf;
-static size_t copy_len;
-static bool copy_is_lines;
-
 static bool line_has_opening_brace(StringView line)
 {
     static regex_t re;
@@ -141,30 +137,30 @@ void unselect(View *view)
     }
 }
 
-static void record_copy(char *buf, size_t len, bool is_lines)
+static void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
 {
-    if (copy_buf) {
-        free(copy_buf);
+    if (clip->buf) {
+        free(clip->buf);
     }
-    copy_buf = buf;
-    copy_len = len;
-    copy_is_lines = is_lines;
+    clip->buf = buf;
+    clip->len = len;
+    clip->is_lines = is_lines;
 }
 
-void cut(View *view, size_t len, bool is_lines)
+void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
 {
     if (len) {
         char *buf = block_iter_get_bytes(&view->cursor, len);
-        record_copy(buf, len, is_lines);
+        record_copy(clip, buf, len, is_lines);
         buffer_delete_bytes(view, len);
     }
 }
 
-void copy(View *view, size_t len, bool is_lines)
+void copy(Clipboard *clip, View *view, size_t len, bool is_lines)
 {
     if (len) {
         char *buf = block_iter_get_bytes(&view->cursor, len);
-        record_copy(buf, len, is_lines);
+        record_copy(clip, buf, len, is_lines);
     }
 }
 
@@ -181,9 +177,9 @@ void insert_text(View *view, const char *text, size_t size, bool move_after)
     }
 }
 
-void paste(View *view, bool at_cursor)
+void paste(Clipboard *clip, View *view, bool at_cursor)
 {
-    if (!copy_buf) {
+    if (!clip->buf) {
         return;
     }
 
@@ -193,19 +189,19 @@ void paste(View *view, bool at_cursor)
         unselect(view);
     }
 
-    if (copy_is_lines && !at_cursor) {
+    if (clip->is_lines && !at_cursor) {
         const long x = view_get_preferred_x(view);
         if (!del_count) {
             block_iter_eat_line(&view->cursor);
         }
-        buffer_replace_bytes(view, del_count, copy_buf, copy_len);
+        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
 
         // Try to keep cursor column
         move_to_preferred_x(view, x);
         // New preferred_x
         view_reset_preferred_x(view);
     } else {
-        buffer_replace_bytes(view, del_count, copy_buf, copy_len);
+        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
     }
 }
 

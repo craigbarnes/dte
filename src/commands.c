@@ -383,7 +383,7 @@ static void cmd_copy(const CommandArgs *a)
     }
 
     if (internal) {
-        copy(view, size, line_copy);
+        copy(&e->clipboard, view, size, line_copy);
     }
 
     if ((clipboard || primary) && terminal.osc52_copy) {
@@ -413,7 +413,8 @@ static void cmd_cut(const CommandArgs *a)
     View *view = e->view;
     const long x = view_get_preferred_x(view);
     if (view->selection) {
-        cut(view, prepare_selection(view), view->selection == SELECT_LINES);
+        bool is_lines = view->selection == SELECT_LINES;
+        cut(&e->clipboard, view, prepare_selection(view), is_lines);
         if (view->selection == SELECT_LINES) {
             move_to_preferred_x(view, x);
         }
@@ -422,7 +423,7 @@ static void cmd_cut(const CommandArgs *a)
         BlockIter tmp;
         block_iter_bol(&view->cursor);
         tmp = view->cursor;
-        cut(view, block_iter_eat_line(&tmp), true);
+        cut(&e->clipboard, view, block_iter_eat_line(&tmp), true);
         move_to_preferred_x(view, x);
     }
 }
@@ -1206,7 +1207,7 @@ static void cmd_paste(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     bool at_cursor = has_flag(a, 'c');
-    paste(e->view, at_cursor);
+    paste(&e->clipboard, e->view, at_cursor);
 }
 
 static void cmd_pgdown(const CommandArgs *a)
