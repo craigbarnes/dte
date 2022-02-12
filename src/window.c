@@ -228,9 +228,8 @@ void window_close_current_view(Window *w)
     w->view = w->views.ptrs[idx];
 }
 
-static void restore_cursor_from_history(View *v)
+static void restore_cursor_from_history(const FileHistory *hist, View *v)
 {
-    const FileHistory *hist = &editor.file_history;
     unsigned long row, col;
     if (file_history_find(hist, v->buffer->abs_filename, &row, &col)) {
         move_to_line(v, row);
@@ -238,26 +237,26 @@ static void restore_cursor_from_history(View *v)
     }
 }
 
-void set_view(View *v)
+void set_view(EditorState *e, View *v)
 {
-    if (editor.view == v) {
+    if (e->view == v) {
         return;
     }
 
     // Forget previous view when changing view using any other command but open
-    if (editor.window) {
-        editor.window->prev_view = NULL;
+    if (e->window) {
+        e->window->prev_view = NULL;
     }
 
-    editor.view = v;
-    editor.buffer = v->buffer;
-    editor.window = v->window;
-    editor.window->view = v;
+    e->view = v;
+    e->buffer = v->buffer;
+    e->window = v->window;
+    e->window->view = v;
 
     if (!v->buffer->setup) {
         buffer_setup(v->buffer);
         if (v->buffer->options.file_history && v->buffer->abs_filename) {
-            restore_cursor_from_history(v);
+            restore_cursor_from_history(&e->file_history, v);
         }
     }
 
@@ -283,7 +282,7 @@ View *window_open_new_file(Window *w)
 {
     View *prev = w->view;
     View *v = window_open_empty_buffer(w);
-    set_view(v);
+    set_view(&editor, v);
     w->prev_view = prev;
     return v;
 }
@@ -312,7 +311,7 @@ View *window_open_file(Window *w, const char *filename, const Encoding *encoding
     bool useless = is_useless_empty_view(prev);
     View *v = window_open_buffer(w, filename, false, encoding);
     if (v) {
-        set_view(v);
+        set_view(&editor, v);
         if (useless) {
             remove_view(prev);
         } else {
@@ -330,7 +329,7 @@ void window_open_files(Window *w, char **filenames, const Encoding *encoding)
     for (size_t i = 0; filenames[i]; i++) {
         View *v = window_open_buffer(w, filenames[i], false, encoding);
         if (v && first) {
-            set_view(v);
+            set_view(&editor, v);
             first = false;
         }
     }
@@ -477,7 +476,7 @@ void window_close_current(void)
     if (!window->frame->parent) {
         // Don't close last window
         window_remove_views(window);
-        set_view(window_open_empty_buffer(window));
+        set_view(&editor, window_open_empty_buffer(window));
         return;
     }
 
@@ -489,7 +488,7 @@ void window_close_current(void)
 
     remove_frame(window->frame);
     editor.window = NULL;
-    set_view(next_or_prev->view);
+    set_view(&editor, next_or_prev->view);
 
     mark_everything_changed(&editor);
     debug_frame(editor.root_frame);

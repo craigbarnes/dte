@@ -251,5 +251,5 @@ void init_headless_mode(void)
     editor.options.lock_files = false;
     editor.window = new_window();
     editor.root_frame = new_root_frame(editor.window);
-    set_view(window_open_empty_buffer(editor.window));
+    set_view(&editor, window_open_empty_buffer(editor.window));
 }

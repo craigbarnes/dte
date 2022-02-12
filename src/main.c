@@ -488,7 +488,7 @@ loop_break:
         } else {
             View *v = window_open_buffer(window, str, false, NULL);
             if (line > 0) {
-                set_view(v);
+                set_view(&editor, v);
                 move_to_line(v, line);
                 line = 0;
                 if (col > 0) {
@@ -511,7 +511,7 @@ loop_break:
         empty_buffer = window_open_empty_buffer(window);
     }
 
-    set_view(window->views.ptrs[0]);
+    set_view(&editor, window->views.ptrs[0]);
     ui_start();
 
     if (command) {

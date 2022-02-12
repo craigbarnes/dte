@@ -4,39 +4,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "buffer.h"
+#include "editor.h"
 #include "encoding.h"
 #include "frame.h"
 #include "util/ptr-array.h"
 #include "view.h"
-
-typedef struct Window {
-    PointerArray views;
-    Frame *frame;
-
-    // Current view
-    View *view;
-
-    // Previous view if set
-    View *prev_view;
-
-    // Coordinates and size of entire window including tabbar and status line
-    int x, y;
-    int w, h;
-
-    // Coordinates and size of editable area
-    int edit_x, edit_y;
-    int edit_w, edit_h;
-
-    struct {
-        int width;
-        long first;
-        long last;
-    } line_numbers;
-
-    size_t first_tab_idx;
-
-    bool update_tabbar;
-} Window;
 
 enum {
     // Minimum width of line numbers bar (including padding)
@@ -54,7 +26,7 @@ void window_free(Window *w);
 size_t remove_view(View *v);
 void window_close_current(void);
 void window_close_current_view(Window *w);
-void set_view(View *v);
+void set_view(EditorState *e, View *v);
 View *window_open_new_file(Window *w);
 View *window_open_file(Window *w, const char *filename, const Encoding *encoding);
 void window_open_files(Window *w, char **filenames, const Encoding *encoding);

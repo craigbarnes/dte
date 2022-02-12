@@ -12,6 +12,7 @@
 #include "copy.h"
 #include "encoding.h"
 #include "file-history.h"
+#include "frame.h"
 #include "history.h"
 #include "mode.h"
 #include "msg.h"
@@ -22,7 +23,6 @@
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 #include "view.h"
-#include "window.h"
 
 typedef enum {
     EDITOR_INITIALIZING,
@@ -41,6 +41,34 @@ typedef struct {
     SearchDirection direction;
     int re_flags; // If zero, regex hasn't been compiled
 } SearchState;
+
+typedef struct Window {
+    PointerArray views;
+    Frame *frame;
+
+    // Current view
+    View *view;
+
+    // Previous view, if set
+    View *prev_view;
+
+    // Coordinates and size of entire window including tabbar and status line
+    int x, y;
+    int w, h;
+
+    // Coordinates and size of editable area
+    int edit_x, edit_y;
+    int edit_w, edit_h;
+
+    struct {
+        int width;
+        long first;
+        long last;
+    } line_numbers;
+
+    size_t first_tab_idx;
+    bool update_tabbar;
+} Window;
 
 typedef struct {
     EditorStatus status;

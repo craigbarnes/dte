@@ -318,7 +318,7 @@ static void cmd_close(const CommandArgs *a)
     }
 
     window_close_current_view(e->window);
-    set_view(e->window->view);
+    set_view(e, e->window->view);
 }
 
 static void cmd_command(const CommandArgs *a)
@@ -1009,7 +1009,7 @@ static void cmd_next(const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e->window->views.ptrs[(i + 1) % n]);
+    set_view(e, e->window->views.ptrs[(i + 1) % n]);
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -1334,7 +1334,7 @@ static void cmd_prev(const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e->window->views.ptrs[(i ? i : n) - 1]);
+    set_view(e, e->window->views.ptrs[(i ? i : n) - 1]);
 }
 
 static void cmd_quit(const CommandArgs *a)
@@ -1368,7 +1368,7 @@ static void cmd_quit(const CommandArgs *a)
                 e->window = v->window;
                 mark_everything_changed(e);
             }
-            set_view(v);
+            set_view(e, v);
             if (has_flag(a, 'p')) {
                 static const char str[] = "Quit without saving changes? [y/N]";
                 if (dialog_prompt(e, str, "ny") == 'y') {
@@ -2163,7 +2163,7 @@ static void cmd_view(const CommandArgs *a)
             idx = window->views.count - 1;
         }
     }
-    set_view(window->views.ptrs[idx]);
+    set_view(e, window->views.ptrs[idx]);
 }
 
 static void cmd_wclose(const CommandArgs *a)
@@ -2173,7 +2173,7 @@ static void cmd_wclose(const CommandArgs *a)
     bool prompt = has_flag(a, 'p');
     View *v = window_find_unclosable_view(e->window);
     if (v && !force) {
-        set_view(v);
+        set_view(e, v);
         if (prompt) {
             static const char str[] = "Close window without saving? [y/N]";
             if (dialog_prompt(e, str, "ny") != 'y') {
@@ -2205,7 +2205,7 @@ static void cmd_wnext(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     e->window = next_window(e->window);
-    set_view(e->window->view);
+    set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
 }
@@ -2232,7 +2232,7 @@ static void cmd_wprev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     e->window = prev_window(e->window);
-    set_view(e->window->view);
+    set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
 }
@@ -2334,7 +2334,7 @@ static void cmd_wsplit(const CommandArgs *a)
     } else {
         View *new = window_add_buffer(e->window, save->buffer);
         new->cursor = save->cursor;
-        set_view(new);
+        set_view(e, new);
     }
 
     if (use_glob) {
