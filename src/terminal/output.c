@@ -90,7 +90,7 @@ void term_add_byte(TermOutputBuffer *obuf, char ch)
     obuf->buf[obuf->count++] = ch;
 }
 
-void term_add_string_view(TermOutputBuffer *obuf, StringView sv)
+void term_add_strview(TermOutputBuffer *obuf, StringView sv)
 {
     if (sv.length) {
         term_add_bytes(obuf, sv.data, sv.length);
@@ -116,12 +116,12 @@ void term_add_uint(TermOutputBuffer *obuf, unsigned int x)
 
 void term_hide_cursor(TermOutputBuffer *obuf)
 {
-    term_add_string_view(obuf, terminal.control_codes.hide_cursor);
+    term_add_strview(obuf, terminal.control_codes.hide_cursor);
 }
 
 void term_show_cursor(TermOutputBuffer *obuf)
 {
-    term_add_string_view(obuf, terminal.control_codes.show_cursor);
+    term_add_strview(obuf, terminal.control_codes.show_cursor);
 }
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
@@ -137,12 +137,12 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 
 void term_save_title(TermOutputBuffer *obuf)
 {
-    term_add_string_view(obuf, terminal.control_codes.save_title);
+    term_add_strview(obuf, terminal.control_codes.save_title);
 }
 
 void term_restore_title(TermOutputBuffer *obuf)
 {
-    term_add_string_view(obuf, terminal.control_codes.restore_title);
+    term_add_strview(obuf, terminal.control_codes.restore_title);
 }
 
 void term_clear_eol(TermOutputBuffer *obuf)

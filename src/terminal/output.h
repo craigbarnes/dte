@@ -52,7 +52,7 @@ void term_add_byte(TermOutputBuffer *obuf, char ch);
 void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
 void term_set_bytes(TermOutputBuffer *obuf, char ch, size_t count);
 void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count);
-void term_add_string_view(TermOutputBuffer *obuf, StringView sv);
+void term_add_strview(TermOutputBuffer *obuf, StringView sv);
 void term_add_str(TermOutputBuffer *obuf, const char *str);
 void term_add_uint(TermOutputBuffer *obuf, unsigned int x);
 void term_hide_cursor(TermOutputBuffer *obuf);
