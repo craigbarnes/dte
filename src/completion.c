@@ -384,6 +384,14 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
         return;
     }
 
+    for (size_t i = 0; i < argc; i++) {
+        if (!args[i]) {
+            // Embedded NULLs indicate there are multiple commands.
+            // Just return early here and avoid handling this case.
+            return;
+        }
+    }
+
     const Command *cmd = find_normal_command(args[0]);
     if (!cmd || cmd->max_args == 0) {
         return;
