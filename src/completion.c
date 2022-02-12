@@ -384,12 +384,29 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
         return;
     }
 
-    const Command *cmd = find_normal_command(args[0]);
+    // Remove any trailing NULLs
+    while (argc > 0 && !args[argc - 1]) {
+        argc--;
+    }
+
+    // Find the start of the last command
+    size_t start = argc;
+    while (start > 0 && args[start - 1]) {
+        start--;
+    }
+
+    if (unlikely(start >= argc)) {
+        // Empty command (e.g. from parsing ";;;" or "")
+        return;
+    }
+
+    const char *cmd_name = args[start++];
+    const Command *cmd = find_normal_command(cmd_name);
     if (!cmd || cmd->max_args == 0) {
         return;
     }
 
-    char **args_copy = copy_string_array(args + 1, argc - 1);
+    char **args_copy = copy_string_array(args + start, argc - start);
     CommandArgs a = cmdargs_new(args_copy, normal_commands.userdata);
     ArgParseError err = do_parse_args(cmd, &a);
     if (
@@ -402,11 +419,12 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
     const CompletionHandler *h = BSEARCH(args[0], handlers, (CompareFunction)strcmp);
     if (h) {
         h->complete(cs, &a);
-    } else if (streq(args[0], "repeat")) {
+    } else if (streq(cmd_name, "repeat")) {
         if (a.nr_args == 1) {
             collect_normal_commands(&cs->completions, cs->parsed);
         } else if (a.nr_args >= 2) {
-            collect_completions(cs, args + 2, argc - 2);
+            start++;
+            collect_completions(cs, args + start, argc - start);
         }
     }
 
