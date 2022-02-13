@@ -2403,7 +2403,7 @@ static const Command cmds[] = {
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
     {"erase-word", "s", false, 0, 0, cmd_erase_word},
     {"errorfmt", "i", true, 2, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
-    {"eval", "-", false, 1, -1, cmd_eval},
+    {"eval", "-s", false, 1, -1, cmd_eval},
     {"exec-msg", "-s", false, 1, -1, cmd_exec_msg},
     {"exec-open", "-s", false, 1, -1, cmd_exec_open},
     {"exec-tag", "-s", false, 1, -1, cmd_exec_tag},
