@@ -53,8 +53,12 @@ local function read_ucd(path, pattern)
     assert(pattern)
     if not path then
         io.stderr:write (
-            "Usage: ", progname, " UnicodeData.txt EastAsianWidth.txt\n",
-            "(available from: https://unicode.org/Public/11.0.0/ucd/)\n"
+            "Usage: ",
+            progname,
+            " path/to/UnicodeData.txt",
+            " path/to/EastAsianWidth.txt",
+            " path/to/DerivedCoreProperties.txt",
+            "\n(available from: https://unicode.org/Public/13.0.0/ucd/)\n"
         )
         os.exit(1)
     end
