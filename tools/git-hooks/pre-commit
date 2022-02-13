@@ -30,15 +30,20 @@ set -e
 git checkout-index --prefix="$TMPDIR/" -a
 trap "rm -rf '$TMPDIR'" EXIT HUP INT QUIT TERM
 
+# Generated files that are checked into the repository have an
+# "is-generated" attribute (set via .gitattributes):
 GENERATED=''
 for G in $(git ls-files --error-unmatch ':(attr:is-generated)'); do
     GENERATED="$GENERATED $TMPDIR/$G"
 done
 
+# ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
 cp $GENERATED "$TMPDIR/GEN/"
 $MAKE -B man
 
+# ...and then check the freshly generated files are identical to the
+# ones that are to be committed:
 for F in $GENERATED; do
     B="$(basename $F)"
     if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
@@ -46,6 +51,7 @@ for F in $GENERATED; do
     fi
 done
 
+# Build and test with various configurations and compilers:
 for CC in gcc clang; do
     export CC="ccache $CC"
     $MAKE check
