@@ -540,7 +540,7 @@ static void cmd_eval(const CommandArgs *a)
     SpawnContext ctx = {
         .argv = a->args,
         .output = STRING_INIT,
-        .flags = SPAWN_QUIET
+        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
     };
     if (!spawn_source(&ctx)) {
         return;

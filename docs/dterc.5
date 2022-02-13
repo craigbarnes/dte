@@ -193,7 +193,7 @@ External Commands:
 .br
    \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
 .br
-   \fBeval\fR \fIcommand\fR [\fIparameter\fR]...
+   \fBeval\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
@@ -1643,11 +1643,15 @@ Silent. Both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\
 See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
 .RE
-\fBeval\fR \fIcommand\fR [\fIparameter\fR]...
+\fBeval\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
 Run external \fIcommand\fR and execute its standard output text as dterc
 commands.
 .P
+.TP
+\fB\-s\fR
+Don't yield terminal control to the child process
+.PP
 .RE
 \fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS

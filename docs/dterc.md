@@ -1055,10 +1055,13 @@ exits successfully, parsed messages can be navigated using the
 
 See also: [`errorfmt`] and [`msg`] commands.
 
-### **eval** _command_ [_parameter_]...
+### **eval** [**-s**] _command_ [_parameter_]...
 
 Run external _command_ and execute its standard output text as dterc
 commands.
+
+`-s`
+:   Don't yield terminal control to the child process
 
 ### **exec-open** [**-s**] _command_ [_parameter_]...
 
