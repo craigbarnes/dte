@@ -179,16 +179,22 @@ static ByteType get_byte_type(unsigned char byte)
     return rows[(byte >> 4) & 0xF];
 }
 
-static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
+typedef struct {
+    uint32_t params[4];
+    uint8_t intermediate[4];
+    uint8_t nparams;
+    uint8_t nr_intermediate;
+    uint8_t final_byte;
+    bool unhandled_bytes;
+} ControlParams;
+
+static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlParams *csi)
 {
-    uint32_t params[4] = {0};
     size_t nparams = 0;
-    uint8_t intermediate[4] = {0};
     size_t nr_intermediate = 0;
-    uint8_t final_byte = 0;
-    bool unhandled_bytes = false;
-    uint32_t num = 0;
     size_t digits = 0;
+    uint32_t num = 0;
+    bool unhandled_bytes = false;
 
     while (i < len) {
         const char ch = buf[i++];
@@ -202,11 +208,11 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             digits++;
             continue;
         case ';':
-            if (unlikely(nparams >= ARRAY_COUNT(params))) {
+            if (unlikely(nparams >= ARRAY_COUNT(csi->params))) {
                 unhandled_bytes = true;
                 continue;
             }
-            params[nparams++] = num;
+            csi->params[nparams++] = num;
             num = 0;
             digits = 0;
             continue;
@@ -218,20 +224,20 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 
         switch (get_byte_type(ch)) {
         case BYTE_INTERMEDIATE:
-            if (unlikely(nr_intermediate >= ARRAY_COUNT(intermediate))) {
+            if (unlikely(nr_intermediate >= ARRAY_COUNT(csi->intermediate))) {
                 unhandled_bytes = true;
             } else {
-                intermediate[nr_intermediate++] = ch;
+                csi->intermediate[nr_intermediate++] = ch;
             }
             continue;
         case BYTE_FINAL:
         case BYTE_FINAL_PRIVATE:
-            final_byte = ch;
+            csi->final_byte = ch;
             if (digits > 0) {
-                if (unlikely(nparams >= ARRAY_COUNT(params))) {
+                if (unlikely(nparams >= ARRAY_COUNT(csi->params))) {
                     unhandled_bytes = true;
                 } else {
-                    params[nparams++] = num;
+                    csi->params[nparams++] = num;
                 }
             }
             goto exit_loop;
@@ -250,7 +256,9 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
                 // Fallthrough
             case 0x18: // CAN
             case 0x1A: // SUB
-                goto ignore;
+                csi->final_byte = ch;
+                unhandled_bytes = true;
+                goto exit_loop;
             }
             // Fallthrough
         case BYTE_DELETE:
@@ -265,34 +273,44 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
     }
 
 exit_loop:
+    csi->nparams = nparams;
+    csi->nr_intermediate = nr_intermediate;
+    csi->unhandled_bytes = unhandled_bytes;
+    return i;
+}
 
-    if (unlikely(final_byte == 0)) {
+static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
+{
+    ControlParams csi = {.nparams = 0};
+    i = parse_csi_params(buf, len, i, &csi);
+
+    if (unlikely(csi.final_byte == 0)) {
         return (i >= len) ? -1 : 0;
     }
-    if (unlikely(unhandled_bytes || nr_intermediate)) {
+    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate)) {
         goto ignore;
     }
 
     KeyCode mods = 0;
     KeyCode key;
 
-    switch (final_byte) {
+    switch (csi.final_byte) {
     case '~':
-        switch (nparams) {
+        switch (csi.nparams) {
         case 3:
-            if (unlikely(params[0] != 27)) {
+            if (unlikely(csi.params[0] != 27)) {
                 goto ignore;
             }
-            key = params[2];
+            key = csi.params[2];
             goto normalize;
         case 2:
-            mods = decode_modifiers(params[1]);
+            mods = decode_modifiers(csi.params[1]);
             if (unlikely(mods == 0)) {
                 goto ignore;
             }
             // Fallthrough
         case 1:
-            key = decode_key_from_param(params[0]);
+            key = decode_key_from_param(csi.params[0]);
             if (unlikely(key == 0)) {
                 goto ignore;
             }
@@ -301,28 +319,28 @@ exit_loop:
         }
         goto ignore;
     case 'u':
-        if (unlikely(nparams != 2)) {
+        if (unlikely(csi.nparams != 2)) {
             goto ignore;
         }
-        key = params[0];
+        key = csi.params[0];
         goto normalize;
     case 'Z':
-        if (unlikely(nparams != 0)) {
+        if (unlikely(csi.nparams != 0)) {
             goto ignore;
         }
         *k = MOD_SHIFT | KEY_TAB;
         return i;
     }
 
-    switch (nparams) {
+    switch (csi.nparams) {
     case 2:
-        mods = decode_modifiers(params[1]);
-        if (unlikely(mods == 0 || params[0] != 1)) {
+        mods = decode_modifiers(csi.params[1]);
+        if (unlikely(mods == 0 || csi.params[0] != 1)) {
             goto ignore;
         }
         // Fallthrough
     case 0:
-        key = decode_key_from_final_byte(final_byte);
+        key = decode_key_from_final_byte(csi.final_byte);
         if (unlikely(key == 0)) {
             goto ignore;
         }
@@ -335,7 +353,7 @@ ignore:
     return i;
 
 normalize:
-    mods = decode_modifiers(params[1]);
+    mods = decode_modifiers(csi.params[1]);
     if (unlikely(mods == 0)) {
         goto ignore;
     }
