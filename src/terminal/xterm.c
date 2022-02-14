@@ -7,6 +7,7 @@
 #include "xterm.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/string-view.h"
 #include "util/unicode.h"
 
 typedef enum {
@@ -269,7 +270,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
         }
 
         BUG("unhandled byte type");
-        return 0;
+        unhandled_bytes = true;
     }
 
 exit_loop:
@@ -277,6 +278,31 @@ exit_loop:
     csi->nr_intermediate = nr_intermediate;
     csi->unhandled_bytes = unhandled_bytes;
     return i;
+}
+
+UNITTEST {
+    ControlParams csi = {.nparams = 0};
+    StringView s = STRING_VIEW("\033[901;0;55mx");
+    size_t n = parse_csi_params(s.data, s.length, 2, &csi);
+    BUG_ON(n != s.length - 1);
+    BUG_ON(csi.nparams != 3);
+    BUG_ON(csi.params[0] != 901);
+    BUG_ON(csi.params[1] != 0);
+    BUG_ON(csi.params[2] != 55);
+    BUG_ON(csi.nr_intermediate != 0);
+    BUG_ON(csi.final_byte != 'm');
+    BUG_ON(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[123;09;56:78:99m");
+    n = parse_csi_params(s.data, s.length, 2, &csi);
+    BUG_ON(n != s.length);
+    BUG_ON(csi.nparams != 3);
+    BUG_ON(csi.params[0] != 123);
+    BUG_ON(csi.params[1] != 9);
+    BUG_ON(csi.nr_intermediate != 0);
+    BUG_ON(csi.final_byte != 'm');
+    BUG_ON(!csi.unhandled_bytes);
 }
 
 static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
