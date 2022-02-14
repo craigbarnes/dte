@@ -19,6 +19,7 @@ enum FeatureFlags {
     RXVT = 0x08, // Emits rxvt-specific sequences for some key combos (see rxvt.c)
     LINUX = 0x10, // Emits linux-specific sequences for F1-F5 (see linux.c)
     OSC52 = 0x20, // Supports OSC 52 clipboard operations
+    METAESC = 0x40, // Try to enable {meta,alt}SendsEscape modes at startup
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -84,7 +85,7 @@ static const TermEntry terms[] = {
     {"tmux", 4, TERM_8_COLOR, 0, TITLE | OSC52},
     {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
     {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
-    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52},
+    {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC},
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
 };
 
@@ -110,18 +111,8 @@ Terminal terminal = {
     .set_color = &ecma48_set_color,
     .repeat_byte = &term_repeat_byte,
     .control_codes = {
-        // https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-        .init = STRING_VIEW (
-            // 1036 = metaSendsEscape
-            // 1039 = altSendsEscape
-            "\033[?1036;1039s" // Save
-            "\033[?1036;1039h" // Enable
-            "\033[>4;1m" // Enable modifyOtherKeys
-        ),
-        .deinit = STRING_VIEW (
-            "\033[>4m" // Reset modifyOtherKeys to initial value
-            "\033[?1036;1039r" // Restore
-        ),
+        .init = STRING_INIT,
+        .deinit = STRING_INIT,
         .keypad_off = STRING_VIEW("\033[?1l\033>"),
         .keypad_on = STRING_VIEW("\033[?1h\033="),
         .cup_mode_off = STRING_VIEW("\033[?1049l"),
@@ -178,6 +169,7 @@ void term_init(const char *term)
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&name, terms, term_name_compare);
+    TermControlCodes *tcc = &terminal.control_codes;
     if (entry) {
         terminal.color_type = entry->color_type;
         terminal.ncv_attributes = entry->ncv_attributes;
@@ -187,7 +179,6 @@ void term_init(const char *term)
             terminal.repeat_byte = ecma48_repeat_byte;
         }
         if (entry->flags & TITLE) {
-            TermControlCodes *tcc = &terminal.control_codes;
             tcc->save_title = strview_from_cstring("\033[22;2t");
             tcc->restore_title = strview_from_cstring("\033[23;2t");
             tcc->set_title_begin = strview_from_cstring("\033]2;");
@@ -198,9 +189,20 @@ void term_init(const char *term)
         } else if (entry->flags & LINUX) {
             terminal.parse_key_sequence = linux_parse_key;
         }
+        if (entry->flags & METAESC) {
+            // 1036 = metaSendsEscape, 1039 = altSendsEscape
+            // s = save, h = enable, r = restore
+            string_append_literal(&tcc->init, "\033[?1036;1039s\033[?1036;1039h");
+            string_append_literal(&tcc->deinit, "\033[?1036;1039r");
+        }
         const int n = (int)name.length;
         DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
     }
+
+    // Try to use "modifyOtherKeys" mode, if available
+    // (see: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
+    string_append_literal(&tcc->init, "\033[>4;1m");
+    string_append_literal(&tcc->deinit, "\033[>4m");
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;

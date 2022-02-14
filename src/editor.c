@@ -356,9 +356,11 @@ void ui_start(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    term_add_strview(&editor.obuf, terminal.control_codes.init);
-    term_add_strview(&editor.obuf, terminal.control_codes.keypad_on);
-    term_add_strview(&editor.obuf, terminal.control_codes.cup_mode_on);
+    const TermControlCodes *tcc = &terminal.control_codes;
+    TermOutputBuffer *obuf = &editor.obuf;
+    term_add_bytes(obuf, tcc->init.buffer, tcc->init.len);
+    term_add_strview(obuf, tcc->keypad_on);
+    term_add_strview(obuf, tcc->cup_mode_on);
     ui_resize();
 }
 
@@ -367,13 +369,15 @@ void ui_end(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    term_clear_screen(&editor.obuf);
-    term_move_cursor(&editor.obuf, 0, terminal.height - 1);
-    term_show_cursor(&editor.obuf);
-    term_add_strview(&editor.obuf, terminal.control_codes.cup_mode_off);
-    term_add_strview(&editor.obuf, terminal.control_codes.keypad_off);
-    term_add_strview(&editor.obuf, terminal.control_codes.deinit);
-    term_output_flush(&editor.obuf);
+    const TermControlCodes *tcc = &terminal.control_codes;
+    TermOutputBuffer *obuf = &editor.obuf;
+    term_clear_screen(obuf);
+    term_move_cursor(obuf, 0, terminal.height - 1);
+    term_show_cursor(obuf);
+    term_add_strview(obuf, tcc->cup_mode_off);
+    term_add_strview(obuf, tcc->keypad_off);
+    term_add_bytes(obuf, tcc->deinit.buffer, tcc->deinit.len);
+    term_output_flush(obuf);
     term_cooked();
 }
 

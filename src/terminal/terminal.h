@@ -8,10 +8,11 @@
 #include "output.h"
 #include "util/macros.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 typedef struct {
-    StringView init;
-    StringView deinit;
+    String init;
+    String deinit;
     StringView keypad_off;
     StringView keypad_on;
     StringView cup_mode_off;
