@@ -39,12 +39,12 @@ static bool path_component(const char *path, size_t pos)
 
 char *relative_filename(const char *f, const char *cwd)
 {
+    BUG_ON(!path_is_absolute(cwd));
+    BUG_ON(!path_is_absolute(f));
+
     // Annoying special case
     if (cwd[1] == '\0') {
-        if (f[1] == '\0') {
-            return xstrdup(f);
-        }
-        return xstrdup(f + 1);
+        return xstrdup(f[1] == '\0' ? f : f + 1);
     }
 
     // Length of common path
