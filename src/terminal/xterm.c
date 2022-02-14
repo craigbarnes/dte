@@ -181,11 +181,15 @@ static ByteType get_byte_type(unsigned char byte)
 }
 
 typedef struct {
-    uint32_t params[4];
+    struct {
+        uint32_t val[4]; // sub-params
+        uint32_t len;
+    } params[4];
     uint8_t intermediate[4];
     uint8_t nparams;
     uint8_t nr_intermediate;
     uint8_t final_byte;
+    bool have_subparams;
     bool unhandled_bytes;
 } ControlParams;
 
@@ -193,8 +197,10 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
 {
     size_t nparams = 0;
     size_t nr_intermediate = 0;
+    size_t sub = 0;
     size_t digits = 0;
     uint32_t num = 0;
+    bool have_subparams = false;
     bool unhandled_bytes = false;
 
     while (i < len) {
@@ -213,13 +219,21 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
                 unhandled_bytes = true;
                 continue;
             }
-            csi->params[nparams++] = num;
+            csi->params[nparams].len = sub + 1;
+            csi->params[nparams++].val[sub] = num;
             num = 0;
             digits = 0;
+            sub = 0;
             continue;
         case ':':
-            // TODO: handle sub-params
-            unhandled_bytes = true;
+            if (unlikely(sub >= ARRAY_COUNT(csi->params[0].val))) {
+                unhandled_bytes = true;
+                continue;
+            }
+            csi->params[nparams].val[sub++] = num;
+            num = 0;
+            digits = 0;
+            have_subparams = true;
             continue;
         }
 
@@ -235,10 +249,14 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
         case BYTE_FINAL_PRIVATE:
             csi->final_byte = ch;
             if (digits > 0) {
-                if (unlikely(nparams >= ARRAY_COUNT(csi->params))) {
+                if (unlikely(
+                    nparams >= ARRAY_COUNT(csi->params)
+                    || sub >= ARRAY_COUNT(csi->params[0].val)
+                )) {
                     unhandled_bytes = true;
                 } else {
-                    csi->params[nparams++] = num;
+                    csi->params[nparams].len = sub + 1;
+                    csi->params[nparams++].val[sub] = num;
                 }
             }
             goto exit_loop;
@@ -276,6 +294,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
 exit_loop:
     csi->nparams = nparams;
     csi->nr_intermediate = nr_intermediate;
+    csi->have_subparams = have_subparams;
     csi->unhandled_bytes = unhandled_bytes;
     return i;
 }
@@ -286,11 +305,12 @@ UNITTEST {
     size_t n = parse_csi_params(s.data, s.length, 2, &csi);
     BUG_ON(n != s.length - 1);
     BUG_ON(csi.nparams != 3);
-    BUG_ON(csi.params[0] != 901);
-    BUG_ON(csi.params[1] != 0);
-    BUG_ON(csi.params[2] != 55);
+    BUG_ON(csi.params[0].val[0] != 901);
+    BUG_ON(csi.params[1].val[0] != 0);
+    BUG_ON(csi.params[2].val[0] != 55);
     BUG_ON(csi.nr_intermediate != 0);
     BUG_ON(csi.final_byte != 'm');
+    BUG_ON(csi.have_subparams);
     BUG_ON(csi.unhandled_bytes);
 
     csi = (ControlParams){.nparams = 0};
@@ -298,10 +318,63 @@ UNITTEST {
     n = parse_csi_params(s.data, s.length, 2, &csi);
     BUG_ON(n != s.length);
     BUG_ON(csi.nparams != 3);
-    BUG_ON(csi.params[0] != 123);
-    BUG_ON(csi.params[1] != 9);
+    BUG_ON(csi.params[0].len != 1);
+    BUG_ON(csi.params[1].len != 1);
+    BUG_ON(csi.params[2].len != 3);
+    BUG_ON(csi.params[0].val[0] != 123);
+    BUG_ON(csi.params[1].val[0] != 9);
+    BUG_ON(csi.params[2].val[0] != 56);
+    BUG_ON(csi.params[2].val[1] != 78);
+    BUG_ON(csi.params[2].val[2] != 99);
     BUG_ON(csi.nr_intermediate != 0);
     BUG_ON(csi.final_byte != 'm');
+    BUG_ON(!csi.have_subparams);
+    BUG_ON(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[1:2:3;44:55;;6~");
+    n = parse_csi_params(s.data, s.length, 2, &csi);
+    BUG_ON(n != s.length);
+    BUG_ON(csi.nparams != 4);
+    BUG_ON(csi.params[0].len != 3);
+    BUG_ON(csi.params[1].len != 2);
+    BUG_ON(csi.params[2].len != 1);
+    BUG_ON(csi.params[0].val[0] != 1);
+    BUG_ON(csi.params[0].val[1] != 2);
+    BUG_ON(csi.params[0].val[2] != 3);
+    BUG_ON(csi.params[1].val[0] != 44);
+    BUG_ON(csi.params[1].val[1] != 55);
+    BUG_ON(csi.params[2].val[0] != 0);
+    BUG_ON(csi.params[3].val[0] != 6);
+    BUG_ON(csi.nr_intermediate != 0);
+    BUG_ON(csi.final_byte != '~');
+    BUG_ON(!csi.have_subparams);
+    BUG_ON(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[+2p");
+    n = parse_csi_params(s.data, s.length, 2, &csi);
+    BUG_ON(n != s.length);
+    BUG_ON(csi.nparams != 1);
+    BUG_ON(csi.params[0].len != 1);
+    BUG_ON(csi.params[0].val[0] != 2);
+    BUG_ON(csi.nr_intermediate != 1);
+    BUG_ON(csi.intermediate[0] != '+');
+    BUG_ON(csi.final_byte != 'p');
+    BUG_ON(csi.have_subparams);
+    BUG_ON(csi.unhandled_bytes);
+
+    csi = (ControlParams){.nparams = 0};
+    s = strview_from_cstring("\033[?47;1$y");
+    n = parse_csi_params(s.data, s.length, 2, &csi);
+    BUG_ON(n != s.length);
+    BUG_ON(csi.nparams != 2);
+    BUG_ON(csi.params[0].val[0] != 47);
+    BUG_ON(csi.params[1].val[0] != 1);
+    BUG_ON(csi.nr_intermediate != 1);
+    BUG_ON(csi.intermediate[0] != '$');
+    BUG_ON(csi.have_subparams);
+    // TODO: support parsing '?' as param prefix?
     BUG_ON(!csi.unhandled_bytes);
 }
 
@@ -313,7 +386,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
     if (unlikely(csi.final_byte == 0)) {
         return (i >= len) ? -1 : 0;
     }
-    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate)) {
+    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate || csi.have_subparams)) {
         goto ignore;
     }
 
@@ -324,19 +397,19 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
     case '~':
         switch (csi.nparams) {
         case 3:
-            if (unlikely(csi.params[0] != 27)) {
+            if (unlikely(csi.params[0].val[0] != 27)) {
                 goto ignore;
             }
-            key = csi.params[2];
+            key = csi.params[2].val[0];
             goto normalize;
         case 2:
-            mods = decode_modifiers(csi.params[1]);
+            mods = decode_modifiers(csi.params[1].val[0]);
             if (unlikely(mods == 0)) {
                 goto ignore;
             }
             // Fallthrough
         case 1:
-            key = decode_key_from_param(csi.params[0]);
+            key = decode_key_from_param(csi.params[0].val[0]);
             if (unlikely(key == 0)) {
                 goto ignore;
             }
@@ -348,7 +421,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
         if (unlikely(csi.nparams != 2)) {
             goto ignore;
         }
-        key = csi.params[0];
+        key = csi.params[0].val[0];
         goto normalize;
     case 'Z':
         if (unlikely(csi.nparams != 0)) {
@@ -360,8 +433,8 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
 
     switch (csi.nparams) {
     case 2:
-        mods = decode_modifiers(csi.params[1]);
-        if (unlikely(mods == 0 || csi.params[0] != 1)) {
+        mods = decode_modifiers(csi.params[1].val[0]);
+        if (unlikely(mods == 0 || csi.params[0].val[0] != 1)) {
             goto ignore;
         }
         // Fallthrough
@@ -379,7 +452,7 @@ ignore:
     return i;
 
 normalize:
-    mods = decode_modifiers(csi.params[1]);
+    mods = decode_modifiers(csi.params[1].val[0]);
     if (unlikely(mods == 0)) {
         goto ignore;
     }
