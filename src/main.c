@@ -38,8 +38,10 @@ static void handle_sigcont(int UNUSED_ARG(signum))
         !editor.child_controls_terminal
         && editor.status != EDITOR_INITIALIZING
     ) {
+        int saved_errno = errno;
         term_raw();
         ui_start();
+        errno = saved_errno;
     }
 }
 
