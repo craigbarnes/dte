@@ -629,6 +629,29 @@ static void test_buf_parse_uintmax(void)
 
     EXPECT_EQ(buf_parse_uintmax("0019817", 8, &val), 7);
     EXPECT_EQ(val, 19817);
+
+    char buf[4] = " 90/";
+    buf[0] = CHAR_MAX;
+    EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 0);
+
+    for (char c = CHAR_MIN; c < CHAR_MAX; c++) {
+        buf[0] = c;
+        if (!ascii_isdigit(c)) {
+            EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 0);
+            continue;
+        }
+        val = 337;
+        EXPECT_EQ(buf_parse_uintmax(buf, 0, &val), 0);
+        EXPECT_EQ(val, 337);
+        EXPECT_EQ(buf_parse_uintmax(buf, 1, &val), 1);
+        EXPECT_TRUE(val <= 9);
+        EXPECT_EQ(buf_parse_uintmax(buf, 2, &val), 2);
+        EXPECT_TRUE(val <= 99);
+        EXPECT_EQ(buf_parse_uintmax(buf, 3, &val), 3);
+        EXPECT_TRUE(val <= 990);
+        EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 3);
+        EXPECT_TRUE(val <= 990);
+    }
 }
 
 static void test_buf_parse_ulong(void)
