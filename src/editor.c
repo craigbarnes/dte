@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "editor.h"
+#include "command/macro.h"
 #include "commands.h"
 #include "compiler.h"
 #include "error.h"
@@ -16,6 +17,7 @@
 #include "regexp.h"
 #include "screen.h"
 #include "search.h"
+#include "tag.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
 #include "terminal/terminal.h"
@@ -232,7 +234,9 @@ void free_editor_state(EditorState *e)
     free_bindings(&e->bindings[INPUT_SEARCH]);
 
     term_free(&terminal);
+    tag_file_free();
     free_intern_pool();
+    free_macro();
 
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)editor.user_config_dir);

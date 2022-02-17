@@ -125,11 +125,15 @@ static bool tag_file_changed (
     return tf->mtime != st->st_mtime || !streq(tf->filename, filename);
 }
 
-static void tag_file_free(TagFile *tf)
+void tag_file_free(void)
 {
-    free(tf->filename);
-    free(tf->buf);
-    free(tf);
+    if (!current_tag_file) {
+        return;
+    }
+    free(current_tag_file->filename);
+    free(current_tag_file->buf);
+    free(current_tag_file);
+    current_tag_file = NULL;
 }
 
 TagFile *load_tag_file(void)
@@ -152,8 +156,8 @@ TagFile *load_tag_file(void)
 
     if (current_tag_file) {
         if (tag_file_changed(current_tag_file, path, &st)) {
-            tag_file_free(current_tag_file);
-            current_tag_file = NULL;
+            tag_file_free();
+            BUG_ON(current_tag_file);
         } else {
             xclose(fd);
             return current_tag_file;

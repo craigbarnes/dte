@@ -1,0 +1,30 @@
+{
+   static HashSet in cmd_require()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:hashset_*
+   ...
+   fun:cmd_require
+   ...
+}
+
+{
+   static TermColor** in highlight_line()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:xrealloc
+   ...
+   fun:highlight_line*
+   ...
+}
+
+{
+   static regex_t compiled with regexp_compile_or_fatal_error()
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:regexp_compile_or_fatal_error
+   ...
+}

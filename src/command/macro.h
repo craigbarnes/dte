@@ -16,5 +16,6 @@ void macro_command_hook(const char *cmd_name, char **args);
 void macro_insert_char_hook(CodePoint c);
 void macro_insert_text_hook(const char *text, size_t size);
 String dump_macro(void);
+void free_macro(void);
 
 #endif

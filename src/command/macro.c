@@ -142,3 +142,10 @@ String dump_macro(void)
     }
     return buf;
 }
+
+void free_macro(void)
+{
+    string_free(&insert_buffer);
+    ptr_array_free(&macro);
+    ptr_array_free(&prev_macro);
+}
