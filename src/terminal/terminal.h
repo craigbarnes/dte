@@ -41,5 +41,6 @@ typedef struct {
 extern Terminal terminal;
 
 void term_init(const char *term) NONNULL_ARGS;
+void term_free(Terminal *t) NONNULL_ARGS;
 
 #endif

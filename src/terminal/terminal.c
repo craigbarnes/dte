@@ -225,3 +225,9 @@ void term_init(const char *term)
         }
     }
 }
+
+void term_free(Terminal *t)
+{
+    string_free(&t->control_codes.init);
+    string_free(&t->control_codes.deinit);
+}

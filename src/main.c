@@ -564,12 +564,15 @@ loop_break:
         file_history_save(&editor.file_history);
     }
 
+    int exit_code = editor.exit_code;
+    free_editor_state(&editor);
+
     if (stdout_buffer) {
         Block *blk;
         block_for_each(blk, &stdout_buffer->blocks) {
             if (xwrite(old_stdout_fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
-                editor.exit_code = EX_IOERR;
+                exit_code = EX_IOERR;
                 break;
             }
         }
@@ -577,5 +580,5 @@ loop_break:
         free(stdout_buffer);
     }
 
-    return editor.exit_code;
+    return exit_code;
 }

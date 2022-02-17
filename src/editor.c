@@ -9,9 +9,13 @@
 #include <unistd.h>
 #include "editor.h"
 #include "commands.h"
+#include "compiler.h"
 #include "error.h"
+#include "file-option.h"
+#include "filetype.h"
 #include "regexp.h"
 #include "screen.h"
+#include "search.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
 #include "terminal/terminal.h"
@@ -199,6 +203,39 @@ void init_editor_state(void)
     intmap_init(&editor.bindings[INPUT_NORMAL].map, 150);
     intmap_init(&editor.bindings[INPUT_COMMAND].map, 40);
     intmap_init(&editor.bindings[INPUT_SEARCH].map, 40);
+}
+
+void free_editor_state(EditorState *e)
+{
+    free(e->clipboard.buf);
+    free_file_options(&e->file_options);
+    free_filetypes(&e->filetypes);
+    free_syntaxes(&e->syntaxes);
+    file_history_free(&e->file_history);
+    history_free(&e->command_history);
+    history_free(&e->search_history);
+    search_free_regexp(&e->search);
+    term_output_free(&e->obuf);
+    cmdline_free(&e->cmdline);
+    clear_messages(&e->messages);
+
+    ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
+    ptr_array_free_cb(&editor.buffers, FREE_FUNC(free_buffer));
+    hashmap_free(&editor.compilers, FREE_FUNC(free_compiler));
+    hashmap_free(&e->colors.other, free);
+    hashmap_free(&normal_commands.aliases, free);
+    BUG_ON(cmd_mode_commands.aliases.count != 0);
+    BUG_ON(search_mode_commands.aliases.count != 0);
+
+    free_bindings(&e->bindings[INPUT_NORMAL]);
+    free_bindings(&e->bindings[INPUT_COMMAND]);
+    free_bindings(&e->bindings[INPUT_SEARCH]);
+
+    term_free(&terminal);
+    free_intern_pool();
+
+    // TODO: intern this (so that it's freed by free_intern_pool())
+    free((void*)editor.user_config_dir);
 }
 
 static void sanity_check(void)

@@ -177,3 +177,26 @@ void dump_file_options(String *buf)
         string_append_byte(buf, '\n');
     }
 }
+
+static void free_cached_regexp(CachedRegexp *cr)
+{
+    regfree(&cr->re);
+    free(cr);
+}
+
+static void free_file_option(FileOption *opt)
+{
+    if (opt->type == FILE_OPTIONS_FILENAME) {
+        free_cached_regexp(opt->u.filename);
+    } else {
+        BUG_ON(opt->type != FILE_OPTIONS_FILETYPE);
+        free(opt->u.filetype);
+    }
+    free_string_array(opt->strs);
+    free(opt);
+}
+
+void free_file_options(PointerArray *file_options)
+{
+    ptr_array_free_cb(file_options, (FreeFunction)free_file_option);
+}

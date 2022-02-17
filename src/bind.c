@@ -32,6 +32,11 @@ const CachedCommand *lookup_binding(KeyBindingGroup *kbg, KeyCode key)
     return intmap_get(&kbg->map, key);
 }
 
+void free_bindings(KeyBindingGroup *kbg)
+{
+    intmap_free(&kbg->map, (FreeFunction)cached_command_free);
+}
+
 bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
 {
     const CachedCommand *binding = lookup_binding(kbg, key);

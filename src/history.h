@@ -30,5 +30,6 @@ bool history_search_forward(const History *history, const HistoryEntry **pos, co
 bool history_search_backward(const History *history, const HistoryEntry **pos, const char *text) WARN_UNUSED_RESULT;
 void history_load(History *history, const char *filename);
 void history_save(const History *history);
+void history_free(History *history);
 
 #endif

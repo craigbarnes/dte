@@ -89,6 +89,18 @@ void add_error_fmt (
     ptr_array_append(&compiler->error_formats, f);
 }
 
+static void free_error_format(ErrorFormat *f)
+{
+    regfree(&f->re);
+    free(f);
+}
+
+void free_compiler(Compiler *c)
+{
+    ptr_array_free_cb(&c->error_formats, (FreeFunction)free_error_format);
+    free(c);
+}
+
 void collect_compilers(PointerArray *a, const char *prefix)
 {
     collect_hashmap_keys(&editor.compilers, a, prefix);

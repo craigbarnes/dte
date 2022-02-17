@@ -358,3 +358,19 @@ String dump_filetypes(const PointerArray *filetypes)
     }
     return s;
 }
+
+static void free_filetype_entry(UserFileTypeEntry *ft)
+{
+    if (ft_uses_regex(ft->type)) {
+        regfree(&ft->u.regexp->re);
+        free(ft->u.regexp);
+    } else {
+        free(ft->u.str);
+    }
+    free(ft);
+}
+
+void free_filetypes(PointerArray *filetypes)
+{
+    ptr_array_free_cb(filetypes, (FreeFunction)free_filetype_entry);
+}

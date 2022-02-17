@@ -25,5 +25,6 @@ bool is_ft(const PointerArray *filetypes, const char *name);
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line);
 void collect_ft(PointerArray *a, const char *prefix);
 String dump_filetypes(const PointerArray *filetypes);
+void free_filetypes(PointerArray *filetypes);
 
 #endif

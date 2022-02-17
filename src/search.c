@@ -183,10 +183,15 @@ static bool update_regex(SearchState *search, SearchCaseSensitivity cs)
     return false;
 }
 
-void search_set_regexp(SearchState *search, const char *pattern)
+void search_free_regexp(SearchState *search)
 {
     free_regex(search);
     free(search->pattern);
+}
+
+void search_set_regexp(SearchState *search, const char *pattern)
+{
+    search_free_regexp(search);
     search->pattern = xstrdup(pattern);
 }
 

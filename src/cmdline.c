@@ -31,6 +31,14 @@ void cmdline_clear(CommandLine *c)
     c->search_pos = NULL;
 }
 
+void cmdline_free(CommandLine *c)
+{
+    cmdline_clear(c);
+    string_free(&c->buf);
+    free(c->search_text);
+    reset_completion(c);
+}
+
 static void set_text(CommandLine *c, const char *text)
 {
     string_clear(&c->buf);

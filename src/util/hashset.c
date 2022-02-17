@@ -8,6 +8,8 @@
 #include "str-util.h"
 #include "xmalloc.h"
 
+static HashSet intern_pool;
+
 static void alloc_table(HashSet *set, size_t size)
 {
     BUG_ON(size < 8);
@@ -124,11 +126,15 @@ HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len)
 
 const void *mem_intern(const void *data, size_t len)
 {
-    static HashSet pool;
-    if (unlikely(pool.table_size == 0)) {
-        hashset_init(&pool, 32, false);
+    if (unlikely(intern_pool.table_size == 0)) {
+        hashset_init(&intern_pool, 32, false);
     }
 
-    HashSetEntry *e = hashset_add(&pool, data, len);
+    HashSetEntry *e = hashset_add(&intern_pool, data, len);
     return e->str;
+}
+
+void free_intern_pool(void)
+{
+    hashset_free(&intern_pool);
 }

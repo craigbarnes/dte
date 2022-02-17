@@ -135,3 +135,10 @@ void history_save(const History *history)
 
     fclose(f);
 }
+
+void history_free(History *history)
+{
+    hashmap_free(&history->entries, free);
+    history->first = NULL;
+    history->last = NULL;
+}

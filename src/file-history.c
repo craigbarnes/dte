@@ -139,3 +139,10 @@ bool file_history_find(const FileHistory *history, const char *filename, unsigne
     *col = e->col;
     return true;
 }
+
+void file_history_free(FileHistory *history)
+{
+    hashmap_free(&history->entries, free);
+    history->first = NULL;
+    history->last = NULL;
+}
