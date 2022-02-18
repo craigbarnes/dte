@@ -38,38 +38,38 @@ static bool path_component(const char *path, size_t pos)
     return path[pos] == '\0' || pos == 0 || path[pos - 1] == '/';
 }
 
-char *relative_filename(const char *f, const char *cwd)
+char *relative_filename(const char *abs, const char *cwd)
 {
     BUG_ON(!path_is_absolute(cwd));
-    BUG_ON(!path_is_absolute(f));
+    BUG_ON(!path_is_absolute(abs));
 
     // Special case
     if (cwd[1] == '\0') {
-        return xstrdup(f[1] == '\0' ? f : f + 1);
+        return xstrdup(abs[1] == '\0' ? abs : abs + 1);
     }
 
     // Length of common path
     size_t clen = 0;
-    while (cwd[clen] && cwd[clen] == f[clen]) {
+    while (cwd[clen] && cwd[clen] == abs[clen]) {
         clen++;
     }
 
     if (cwd[clen] == '\0') {
-        switch (f[clen]) {
+        switch (abs[clen]) {
         case '\0':
-            // Identical strings; f is current directory
+            // Identical strings; abs is current directory
             return xstrdup(".");
         case '/':
             // cwd    = /home/user
             // abs    = /home/user/project-a/file.c
             // common = /home/user
-            return xstrdup(f + clen + 1);
+            return xstrdup(abs + clen + 1);
         }
     }
 
     // Common path components
-    if (!path_component(cwd, clen) || !path_component(f, clen)) {
-        while (clen > 0 && f[clen - 1] != '/') {
+    if (!path_component(cwd, clen) || !path_component(abs, clen)) {
+        while (clen > 0 && abs[clen - 1] != '/') {
             clen--;
         }
     }
@@ -81,15 +81,15 @@ char *relative_filename(const char *f, const char *cwd)
         dotdot++;
         if (strchr(slash + 1, '/')) {
             // Just use absolute path if `dotdot` would be > 2
-            return xstrdup(f);
+            return xstrdup(abs);
         }
     }
 
     size_t hlen = 3 * dotdot;
-    size_t tlen = strlen(f + clen) + 1;
+    size_t tlen = strlen(abs + clen) + 1;
     char *filename = xmalloc(hlen + tlen);
     memcpy(filename, "../../", hlen);
-    memcpy(filename + hlen, f + clen, tlen);
+    memcpy(filename + hlen, abs + clen, tlen);
     return filename;
 }
 
@@ -122,11 +122,11 @@ char *short_filename_cwd(const char *abs, const char *cwd, const StringView *hom
     return rel;
 }
 
-char *short_filename(const char *absolute, const StringView *home_dir)
+char *short_filename(const char *abs, const StringView *home)
 {
     char cwd[8192];
     if (getcwd(cwd, sizeof(cwd))) {
-        return short_filename_cwd(absolute, cwd, home_dir);
+        return short_filename_cwd(abs, cwd, home);
     }
-    return xstrdup(absolute);
+    return xstrdup(abs);
 }
