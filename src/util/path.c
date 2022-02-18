@@ -69,9 +69,11 @@ char *relative_filename(const char *f, const char *cwd)
 
     // Number of "../" needed
     size_t dotdot = 1;
-    for (size_t i = clen + 1; cwd[i]; i++) {
-        if (cwd[i] == '/' && ++dotdot > 2) {
-            // Just use absolute path if dotdot > 2
+    const char *slash = strchr(cwd + clen + 1, '/');
+    if (slash) {
+        dotdot++;
+        if (strchr(slash + 1, '/')) {
+            // Just use absolute path if `dotdot` would be > 2
             return xstrdup(f);
         }
     }
@@ -79,7 +81,6 @@ char *relative_filename(const char *f, const char *cwd)
     size_t hlen = 3 * dotdot;
     size_t tlen = strlen(f + clen) + 1;
     char *filename = xmalloc(hlen + tlen);
-    BUG_ON(hlen > 6);
     memcpy(filename, "../../", hlen);
     memcpy(filename + hlen, f + clen, tlen);
     return filename;
