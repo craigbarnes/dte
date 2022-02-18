@@ -1749,12 +1749,28 @@ static void test_relative_filename(void)
         { "/a/b/c/d", "/a/b/file", "../../file" },
         { "/a/b/c/d/e", "/a/b/file", "/a/b/file" },
         { "/a/foobar", "/a/foo/file", "../foo/file" },
+        { "/home/user", "/home/userx", "../userx"},
+        { "/home/user", "/home/use", "../use"},
+        { "/home/user", "/home/user", "."},
+        { "/home", "/home/user", "user"},
     };
     FOR_EACH_I(i, tests) {
         char *result = relative_filename(tests[i].path, tests[i].cwd);
         IEXPECT_STREQ(tests[i].result, result);
         free(result);
     }
+}
+
+static void test_short_filename_cwd(void)
+{
+    const StringView home = STRING_VIEW("/home/user");
+    char *s = short_filename_cwd("/home/user", "/home/user", &home);
+    EXPECT_STREQ(s, ".");
+    free(s);
+
+    s = short_filename_cwd("/home/use", "/home/user", &home);
+    EXPECT_STREQ(s, "../use");
+    free(s);
 }
 
 static void test_short_filename(void)
@@ -2077,6 +2093,7 @@ static const TestEntry tests[] = {
     TEST(test_round_size_to_next_power_of_2),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_relative_filename),
+    TEST(test_short_filename_cwd),
     TEST(test_short_filename),
     TEST(test_path_absolute),
     TEST(test_path_join),

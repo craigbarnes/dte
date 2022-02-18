@@ -53,11 +53,17 @@ char *relative_filename(const char *f, const char *cwd)
         clen++;
     }
 
-    if (!cwd[clen] && f[clen] == '/') {
-        // cwd    = /home/user
-        // abs    = /home/user/project-a/file.c
-        // common = /home/user
-        return xstrdup(f + clen + 1);
+    if (cwd[clen] == '\0') {
+        switch (f[clen]) {
+        case '\0':
+            // Identical strings; f is current directory
+            return xstrdup(".");
+        case '/':
+            // cwd    = /home/user
+            // abs    = /home/user/project-a/file.c
+            // common = /home/user
+            return xstrdup(f + clen + 1);
+        }
     }
 
     // Common path components
