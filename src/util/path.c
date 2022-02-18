@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "path.h"
+#include "util/str-util.h"
 
 char *path_absolute(const char *path)
 {
@@ -92,37 +93,33 @@ char *relative_filename(const char *f, const char *cwd)
     return filename;
 }
 
-char *short_filename_cwd(const char *absolute, const char *cwd, const StringView *home_dir)
+char *short_filename_cwd(const char *abs, const char *cwd, const StringView *home)
 {
-    char *relative = relative_filename(absolute, cwd);
-    size_t abs_len = strlen(absolute);
-    size_t rel_len = strlen(relative);
+    char *rel = relative_filename(abs, cwd);
+    size_t abs_len = strlen(abs);
+    size_t rel_len = strlen(rel);
     if (abs_len < rel_len) {
         // Prefer absolute if relative isn't shorter
-        free(relative);
-        relative = xstrdup(absolute);
+        free(rel);
+        rel = xstrdup(abs);
         rel_len = abs_len;
     }
 
-    size_t home_len = home_dir->length;
-    if (
-        abs_len > home_len
-        && memcmp(absolute, home_dir->data, home_len) == 0
-        && absolute[home_len] == '/'
-    ) {
+    size_t home_len = home->length;
+    if (strn_has_strview_prefix(abs, abs_len, home) && abs[home_len] == '/') {
         size_t suffix_len = (abs_len - home_len) + 1;
         if (suffix_len < rel_len) {
             // Prefer absolute path in tilde notation (e.g. "~/abs/path")
             // if shorter than relative
-            free(relative);
+            free(rel);
             char *tilde = xmalloc(suffix_len + 1);
             tilde[0] = '~';
-            memcpy(tilde + 1, absolute + home_len, suffix_len);
+            memcpy(tilde + 1, abs + home_len, suffix_len);
             return tilde;
         }
     }
 
-    return relative;
+    return rel;
 }
 
 char *short_filename(const char *absolute, const StringView *home_dir)

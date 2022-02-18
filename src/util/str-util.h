@@ -44,6 +44,12 @@ static inline bool str_has_suffix(const char *str, const char *suffix)
 }
 
 NONNULL_ARGS
+static inline bool strn_has_strview_prefix(const char *s, size_t n, const StringView *p)
+{
+    return n >= p->length && mem_equal(s, p->data, p->length);
+}
+
+NONNULL_ARGS
 static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
 {
     size_t pos = *posp;
