@@ -646,11 +646,14 @@ static void test_buf_parse_uintmax(void)
         EXPECT_EQ(buf_parse_uintmax(buf, 1, &val), 1);
         EXPECT_TRUE(val <= 9);
         EXPECT_EQ(buf_parse_uintmax(buf, 2, &val), 2);
+        EXPECT_TRUE(val >= 9);
         EXPECT_TRUE(val <= 99);
         EXPECT_EQ(buf_parse_uintmax(buf, 3, &val), 3);
+        EXPECT_TRUE(val >= 90);
         EXPECT_TRUE(val <= 990);
+        const uintmax_t prev = val;
         EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 3);
-        EXPECT_TRUE(val <= 990);
+        EXPECT_EQ(val, prev);
     }
 }
 
