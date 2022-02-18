@@ -175,6 +175,14 @@ static void add_misc_status(Formatter *f)
     BUG("unhandled selection type");
 }
 
+static FormatSpecifierType lookup_format_specifier(unsigned char ch)
+{
+    if (unlikely(ch >= ARRAY_COUNT(format_specifiers))) {
+        return STATUS_INVALID;
+    }
+    return format_specifiers[ch];
+}
+
 static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
 {
     f->buf = buf;
@@ -193,14 +201,7 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
             continue;
         }
 
-        ch = *format++;
-        BUG_ON(ch >= ARRAY_COUNT(format_specifiers));
-
-        // Note: this explicit type conversion (from uint8_t) is here to
-        // ensure "-Wswitch-enum" warnings are in effect
-        FormatSpecifierType type = format_specifiers[ch];
-
-        switch (type) {
+        switch (lookup_format_specifier(*format++)) {
         case STATUS_BOM:
             if (v->buffer->bom) {
                 add_status_literal(f, "BOM");
@@ -336,14 +337,11 @@ void update_status_line(TermOutputBuffer *obuf, const Window *win)
 
 size_t statusline_format_find_error(const char *str)
 {
-    size_t i = 0;
-    while (str[i]) {
-        unsigned char c = str[i++];
-        if (c != '%') {
+    for (size_t i = 0; str[i]; ) {
+        if (str[i++] != '%') {
             continue;
         }
-        c = str[i++];
-        if (c >= ARRAY_COUNT(format_specifiers) || !format_specifiers[c]) {
+        if (lookup_format_specifier(str[i++]) == STATUS_INVALID) {
             return i - 1;
         }
     }
