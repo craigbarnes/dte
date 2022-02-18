@@ -42,7 +42,7 @@ char *relative_filename(const char *f, const char *cwd)
     BUG_ON(!path_is_absolute(cwd));
     BUG_ON(!path_is_absolute(f));
 
-    // Annoying special case
+    // Special case
     if (cwd[1] == '\0') {
         return xstrdup(f[1] == '\0' ? f : f + 1);
     }
@@ -70,22 +70,18 @@ char *relative_filename(const char *f, const char *cwd)
     // Number of "../" needed
     size_t dotdot = 1;
     for (size_t i = clen + 1; cwd[i]; i++) {
-        if (cwd[i] == '/') {
-            dotdot++;
+        if (cwd[i] == '/' && ++dotdot > 2) {
+            // Just use absolute path if dotdot > 2
+            return xstrdup(f);
         }
     }
-    if (dotdot > 2) {
-        return xstrdup(f);
-    }
 
-    size_t tlen = strlen(f + clen);
-    size_t len = dotdot * 3 + tlen;
-
-    char *filename = xmalloc(len + 1);
-    for (size_t i = 0; i < dotdot; i++) {
-        memcpy(filename + i * 3, "../", 3);
-    }
-    memcpy(filename + dotdot * 3, f + clen, tlen + 1);
+    size_t hlen = 3 * dotdot;
+    size_t tlen = strlen(f + clen) + 1;
+    char *filename = xmalloc(hlen + tlen);
+    BUG_ON(hlen > 6);
+    memcpy(filename, "../../", hlen);
+    memcpy(filename + hlen, f + clen, tlen);
     return filename;
 }
 
