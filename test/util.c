@@ -630,6 +630,9 @@ static void test_buf_parse_uintmax(void)
     EXPECT_EQ(buf_parse_uintmax("0019817", 8, &val), 7);
     EXPECT_EQ(val, 19817);
 
+    EXPECT_EQ(buf_parse_uintmax("0098765", 5, &val), 5);
+    EXPECT_EQ(val, 987);
+
     char buf[4] = " 90/";
     buf[0] = CHAR_MAX;
     EXPECT_EQ(buf_parse_uintmax(buf, 4, &val), 0);
