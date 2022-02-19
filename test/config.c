@@ -184,7 +184,11 @@ static void test_global_state(void)
     ASSERT_PTREQ(buffer->cur_change, &buffer->change_head);
     ASSERT_PTREQ(buffer->saved_change, buffer->cur_change);
     EXPECT_NULL(buffer->display_filename);
-    EXPECT_EQ(buffer->id, 1);
+
+    // Note: this isn't necessarily equal to 1 because some UNITTEST
+    // blocks may have already called window_open_empty_buffer()
+    // before init_headless_mode() was entered
+    EXPECT_TRUE(buffer->id > 0);
 }
 
 static void test_macro_record(void)

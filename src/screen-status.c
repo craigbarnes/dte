@@ -3,6 +3,7 @@
 #include "editor.h"
 #include "selection.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
@@ -296,6 +297,29 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
     }
 
     f->buf[f->pos] = '\0';
+}
+
+UNITTEST {
+    Window *window = new_window();
+    View *v = window_open_empty_buffer(window);
+    window->view = v;
+    Formatter f = {.win = window};
+    char fmt[4] = "%%";
+    char buf[256];
+
+    sf_format(&f, buf, sizeof(buf), "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
+
+    for (unsigned char i = 0; i < ARRAY_COUNT(format_specifiers); i++) {
+        FormatSpecifierType type =  format_specifiers[i];
+        if (type == STATUS_INVALID) {
+            continue;
+        }
+        fmt[1] = i;
+        sf_format(&f, buf, sizeof(buf), fmt);
+    }
+
+    window_free(window);
 }
 
 void update_status_line(TermOutputBuffer *obuf, const Window *win)
