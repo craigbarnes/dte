@@ -67,6 +67,7 @@ typedef struct {
     COMMON_OPTIONS;
 } CommonOptions;
 
+// Note: all members should be initialized in buffer_new()
 typedef struct {
     COMMON_OPTIONS;
     // Only local
