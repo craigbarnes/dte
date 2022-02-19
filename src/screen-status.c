@@ -184,111 +184,113 @@ static FormatSpecifierType lookup_format_specifier(unsigned char ch)
     return format_specifiers[ch];
 }
 
-static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
+static void sf_format(const Window *w, char *buf, size_t size, const char *format)
 {
-    f->buf = buf;
-    f->size = size - 5; // Max length of char and terminating NUL
-    f->pos = 0;
-    f->separator = 0;
+    BUG_ON(size < 16);
+    Formatter f = {
+        .win = w,
+        .buf = buf,
+        .size = size - 5, // Max length of char and terminating NUL
+    };
 
-    View *v = f->win->view;
+    const View *v = w->view;
     CodePoint u;
 
-    while (f->pos < f->size && *format) {
+    while (f.pos < f.size && *format) {
         unsigned char ch = *format++;
         if (ch != '%') {
-            add_separator(f);
-            add_ch(f, ch);
+            add_separator(&f);
+            add_ch(&f, ch);
             continue;
         }
 
         switch (lookup_format_specifier(*format++)) {
         case STATUS_BOM:
             if (v->buffer->bom) {
-                add_status_literal(f, "BOM");
+                add_status_literal(&f, "BOM");
             }
             break;
         case STATUS_FILENAME:
-            add_status_str(f, buffer_filename(v->buffer));
+            add_status_str(&f, buffer_filename(v->buffer));
             break;
         case STATUS_MODIFIED:
             if (buffer_modified(v->buffer)) {
-                add_separator(f);
-                add_ch(f, '*');
+                add_separator(&f);
+                add_ch(&f, '*');
             }
             break;
         case STATUS_READONLY:
             if (v->buffer->readonly) {
-                add_status_literal(f, "RO");
+                add_status_literal(&f, "RO");
             } else if (v->buffer->temporary) {
-                add_status_literal(f, "TMP");
+                add_status_literal(&f, "TMP");
             }
             break;
         case STATUS_CURSOR_ROW:
-            add_status_format(f, "%ld", v->cy + 1);
+            add_status_format(&f, "%ld", v->cy + 1);
             break;
         case STATUS_TOTAL_ROWS:
-            add_status_format(f, "%zu", v->buffer->nl);
+            add_status_format(&f, "%zu", v->buffer->nl);
             break;
         case STATUS_CURSOR_COL:
-            add_status_format(f, "%ld", v->cx_display + 1);
+            add_status_format(&f, "%ld", v->cx_display + 1);
             break;
         case STATUS_CURSOR_COL_BYTES:
-            add_status_format(f, "%ld", v->cx_char + 1);
+            add_status_format(&f, "%ld", v->cx_char + 1);
             if (v->cx_display != v->cx_char) {
-                add_status_format(f, "-%ld", v->cx_display + 1);
+                add_status_format(&f, "-%ld", v->cx_display + 1);
             }
             break;
         case STATUS_SCROLL_POSITION:
-            add_status_pos(f);
+            add_status_pos(&f);
             break;
         case STATUS_ENCODING:
-            add_status_str(f, v->buffer->encoding.name);
+            add_status_str(&f, v->buffer->encoding.name);
             break;
         case STATUS_MISC:
-            add_misc_status(f);
+            add_misc_status(&f);
             break;
         case STATUS_IS_CRLF:
             if (v->buffer->crlf_newlines) {
-                add_status_literal(f, "CRLF");
+                add_status_literal(&f, "CRLF");
             }
             break;
         case STATUS_LINE_ENDING:
             if (v->buffer->crlf_newlines) {
-                add_status_literal(f, "CRLF");
+                add_status_literal(&f, "CRLF");
             } else {
-                add_status_literal(f, "LF");
+                add_status_literal(&f, "LF");
             }
             break;
         case STATUS_OVERWRITE:
             if (v->buffer->options.overwrite) {
-                add_status_literal(f, "OVR");
+                add_status_literal(&f, "OVR");
             } else {
-                add_status_literal(f, "INS");
+                add_status_literal(&f, "INS");
             }
             break;
         case STATUS_SEPARATOR_LONG:
-            f->separator = 3;
+            f.separator = 3;
             break;
         case STATUS_SEPARATOR:
-            f->separator = 1;
+            f.separator = 1;
             break;
         case STATUS_FILETYPE:
-            add_status_str(f, v->buffer->options.filetype);
+            add_status_str(&f, v->buffer->options.filetype);
             break;
         case STATUS_UNICODE:
             if (unlikely(!block_iter_get_char(&v->cursor, &u))) {
                 break;
             }
             if (u_is_unicode(u)) {
-                add_status_format(f, "U+%04X", u);
+                add_status_format(&f, "U+%04X", u);
             } else {
-                add_status_literal(f, "Invalid");
+                add_status_literal(&f, "Invalid");
             }
             break;
         case STATUS_ESCAPED_PERCENT:
-            add_separator(f);
-            add_ch(f, '%');
+            add_separator(&f);
+            add_ch(&f, '%');
             break;
         case STATUS_INVALID:
         default:
@@ -296,27 +298,25 @@ static void sf_format(Formatter *f, char *buf, size_t size, const char *format)
         }
     }
 
-    f->buf[f->pos] = '\0';
+    f.buf[f.pos] = '\0';
 }
 
 UNITTEST {
-    Window *window = new_window();
-    View *v = window_open_empty_buffer(window);
-    window->view = v;
-    Formatter f = {.win = window};
-    char fmt[4] = "%%";
     char buf[256];
+    Window *window = new_window();
+    window->view = window_open_empty_buffer(window);
 
-    sf_format(&f, buf, sizeof(buf), "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    sf_format(window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
+    char fmt[4] = "%%";
     for (unsigned char i = 0; i < ARRAY_COUNT(format_specifiers); i++) {
         FormatSpecifierType type =  format_specifiers[i];
         if (type == STATUS_INVALID) {
             continue;
         }
         fmt[1] = i;
-        sf_format(&f, buf, sizeof(buf), fmt);
+        sf_format(window, buf, sizeof(buf), fmt);
     }
 
     window_free(window);
@@ -324,11 +324,10 @@ UNITTEST {
 
 void update_status_line(TermOutputBuffer *obuf, const Window *win)
 {
-    Formatter f = {.win = win};
     char lbuf[256];
     char rbuf[256];
-    sf_format(&f, lbuf, sizeof(lbuf), editor.options.statusline_left);
-    sf_format(&f, rbuf, sizeof(rbuf), editor.options.statusline_right);
+    sf_format(win, lbuf, sizeof lbuf, editor.options.statusline_left);
+    sf_format(win, rbuf, sizeof rbuf, editor.options.statusline_right);
 
     term_output_reset(obuf, win->x, win->w, 0);
     term_move_cursor(obuf, win->x, win->y + win->h - 1);
