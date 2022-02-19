@@ -1779,6 +1779,16 @@ static void test_short_filename_cwd(void)
     s = short_filename_cwd("/home/user/file", "/home/user/cwd", &home);
     EXPECT_STREQ(s, "~/file");
     free(s);
+
+    const char *abs = "/a/b";
+    const char *cwd = "/a/x/c";
+    char *rel = relative_filename(abs, cwd);
+    EXPECT_TRUE(strlen(abs) < strlen(rel));
+    EXPECT_STREQ(rel, "../../b");
+    free(rel);
+    s = short_filename_cwd(abs, cwd, &home);
+    EXPECT_STREQ(s, "/a/b");
+    free(s);
 }
 
 static void test_short_filename(void)
