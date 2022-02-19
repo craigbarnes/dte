@@ -1771,6 +1771,14 @@ static void test_short_filename_cwd(void)
     s = short_filename_cwd("/home/use", "/home/user", &home);
     EXPECT_STREQ(s, "../use");
     free(s);
+
+    s = short_filename_cwd("/a/b/c/d", "/a/x/y/file", &home);
+    EXPECT_STREQ(s, "/a/b/c/d");
+    free(s);
+
+    s = short_filename_cwd("/home/user/file", "/home/user/cwd", &home);
+    EXPECT_STREQ(s, "~/file");
+    free(s);
 }
 
 static void test_short_filename(void)
