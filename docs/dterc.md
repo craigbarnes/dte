@@ -736,6 +736,13 @@ The character under the cursor should be one of `{}[]()<>`.
 
 Go to line.
 
+### **bookmark** [**-r**]
+
+Save the current file/cursor location to a stack.
+
+`-r`
+:   Jump back to the previous location (and pop it off the stack)
+
 ### **tag** [**-r**|_tag_]
 
 Save the current file/cursor location to a stack and jump to the
@@ -747,7 +754,10 @@ current directory, or any of its parent directories. These files are
 expected be encoded in [`ctags`] format.
 
 `-r`
-:   jump back to the previous location (and pop it off the stack)
+:   Jump back to the previous location (and pop it off the stack)
+
+Note: the saving of the cursor location described above is much the same
+as running [`bookmark`] and `tag -r` is identical to `bookmark -r`.
 
 See also: [`msg`] command.
 
@@ -1482,6 +1492,7 @@ errors should be highlighted. Set to `""` to disable.
 
 [`alias`]: #alias
 [`bind`]: #bind
+[`bookmark`]: #bookmark
 [`command`]: #command
 [`compile`]: #compile
 [`copy`]: #copy

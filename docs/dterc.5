@@ -129,6 +129,8 @@ Movement Commands:
 .br
    \fBline\fR \fInumber\fR
 .br
+   \fBbookmark\fR [\fB\-r\fR]
+.br
    \fBtag\fR [\fB\-r\fR|\fItag\fR]
 .br
    \fBmsg\fR [\fB\-n\fR|\fB\-p\fR|\fInumber\fR]
@@ -1232,6 +1234,15 @@ The character under the cursor should be one of \fB{}[]()<>\fR.
 Go to line.
 .P
 .RE
+\fBbookmark\fR [\fB\-r\fR]
+.RS
+Save the current file/cursor location to a stack.
+.P
+.TP
+\fB\-r\fR
+Jump back to the previous location (and pop it off the stack)
+.PP
+.RE
 \fBtag\fR [\fB\-r\fR|\fItag\fR]
 .RS
 Save the current file/cursor location to a stack and jump to the
@@ -1244,8 +1255,11 @@ expected be encoded in \fBctags\fR(1) format.
 .P
 .TP
 \fB\-r\fR
-jump back to the previous location (and pop it off the stack)
+Jump back to the previous location (and pop it off the stack)
 .PP
+Note: the saving of the cursor location described above is much the same
+as running \fBbookmark\fR and \fBtag \-r\fR is identical to \fBbookmark \-r\fR.
+.P
 See also: \fBmsg\fR command.
 .P
 .RE
