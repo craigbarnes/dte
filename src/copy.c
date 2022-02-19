@@ -6,7 +6,7 @@
 #include "move.h"
 #include "selection.h"
 
-static void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
+void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
 {
     if (clip->buf) {
         free(clip->buf);

@@ -2,6 +2,7 @@
 #include <string.h>
 #include "cmdline.h"
 #include "completion.h"
+#include "copy.h"
 #include "editor.h"
 #include "history.h"
 #include "search.h"
@@ -73,6 +74,13 @@ static void cmd_clear(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     cmdline_clear(&e->cmdline);
+}
+
+static void cmd_copy(const CommandArgs *a)
+{
+    EditorState *e = a->userdata;
+    char *str = string_clone_cstring(&e->cmdline.buf);
+    record_copy(&e->clipboard, str, e->cmdline.buf.len, false);
 }
 
 static void cmd_delete(const CommandArgs *a)
@@ -337,6 +345,7 @@ static const Command common_cmds[] = {
     {"bol", "", false, 0, 0, cmd_bol},
     {"cancel", "", false, 0, 0, cmd_cancel},
     {"clear", "", false, 0, 0, cmd_clear},
+    {"copy", "", false, 0, 0, cmd_copy},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "", false, 0, 0, cmd_delete_eol},
     {"delete-word", "", false, 0, 0, cmd_delete_word},
