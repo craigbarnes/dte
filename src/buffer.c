@@ -11,6 +11,7 @@
 #include "filetype.h"
 #include "lock.h"
 #include "syntax/state.h"
+#include "util/debug.h"
 #include "util/hashset.h"
 #include "util/path.h"
 #include "util/str-util.h"
@@ -62,7 +63,7 @@ void buffer_set_encoding(Buffer *b, Encoding encoding)
         if (type == UTF8) {
             b->bom = editor.options.utf8_bom;
         } else {
-            b->bom = type < NR_ENCODING_TYPES && get_bom_for_encoding(type);
+            b->bom = type < NR_ENCODING_TYPES && !!get_bom_for_encoding(type);
         }
         b->encoding = encoding;
     }
@@ -191,20 +192,18 @@ bool buffer_detect_filetype(Buffer *b)
 
 void update_short_filename_cwd(Buffer *b, const char *cwd)
 {
-    if (b->abs_filename) {
-        if (cwd) {
-            const StringView *home = &editor.home_dir;
-            char *name = short_filename_cwd(b->abs_filename, cwd, home);
-            set_display_filename(b, name);
-        } else {
-            // getcwd() failed
-            set_display_filename(b, xstrdup(b->abs_filename));
-        }
+    const char *abs = b->abs_filename;
+    if (!abs) {
+        return;
     }
+    const StringView *home = &editor.home_dir;
+    char *name = cwd ? short_filename_cwd(abs, cwd, home) : xstrdup(abs);
+    set_display_filename(b, name);
 }
 
 void update_short_filename(Buffer *b)
 {
+    BUG_ON(!b->abs_filename);
     set_display_filename(b, short_filename(b->abs_filename, &editor.home_dir));
 }
 
