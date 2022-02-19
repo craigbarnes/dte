@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <locale.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,6 +26,7 @@
 #include "util/unicode.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 #include "util/xstdio.h"
 
@@ -2098,6 +2100,33 @@ static void test_fd_set_cloexec(void)
     close(fd);
 }
 
+static void test_fork_exec(void)
+{
+    int fd[3];
+    fd[0] = xopen("/dev/null", O_RDWR | O_CLOEXEC, 0);
+    ASSERT_TRUE(fd[0] > 0);
+    fd[1] = fd[0];
+    fd[2] = fd[0];
+
+    const char *argv[] = {"sh", "-c", "exit 95", NULL};
+    pid_t pid = fork_exec((char**)argv, NULL, fd);
+    ASSERT_TRUE(pid >= 0);
+    int r = wait_child(pid);
+    EXPECT_EQ(r, 95);
+
+    argv[0] = "sleep";
+    argv[1] = "5";
+    argv[2] = NULL;
+    pid = fork_exec((char**)argv, NULL, fd);
+    ASSERT_TRUE(pid >= 0);
+    EXPECT_EQ(kill(pid, SIGINT), 0);
+    r = wait_child(pid);
+    EXPECT_TRUE(r >= 256);
+    EXPECT_EQ(r >> 8, SIGINT);
+
+    EXPECT_EQ(xclose(fd[0]), 0);
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2160,6 +2189,7 @@ static const TestEntry tests[] = {
     TEST(test_read_file),
     TEST(test_xfopen),
     TEST(test_fd_set_cloexec),
+    TEST(test_fork_exec),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
