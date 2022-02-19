@@ -13,6 +13,7 @@
 #include "util/hashmap.h"
 #include "util/hashset.h"
 #include "util/intmap.h"
+#include "util/list.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/ptr-array.h"
@@ -1400,6 +1401,40 @@ static void test_ptr_array_move(void)
     ptr_array_free(&a);
 }
 
+static void test_list(void)
+{
+    ListHead a, b, c;
+    list_init(&b);
+    EXPECT_TRUE(list_empty(&b));
+
+    list_add_before(&a, &b);
+    EXPECT_FALSE(list_empty(&a));
+    EXPECT_FALSE(list_empty(&b));
+    EXPECT_PTREQ(a.next, &b);
+    EXPECT_PTREQ(a.prev, &b);
+    EXPECT_PTREQ(b.next, &a);
+    EXPECT_PTREQ(b.prev, &a);
+
+    list_add_after(&c, &b);
+    EXPECT_FALSE(list_empty(&a));
+    EXPECT_FALSE(list_empty(&b));
+    EXPECT_FALSE(list_empty(&c));
+    EXPECT_PTREQ(a.next, &b);
+    EXPECT_PTREQ(a.prev, &c);
+    EXPECT_PTREQ(b.next, &c);
+    EXPECT_PTREQ(b.prev, &a);
+    EXPECT_PTREQ(c.next, &a);
+    EXPECT_PTREQ(c.prev, &b);
+
+    list_del(&b);
+    EXPECT_FALSE(list_empty(&a));
+    EXPECT_FALSE(list_empty(&c));
+    EXPECT_PTREQ(a.next, &c);
+    EXPECT_PTREQ(a.prev, &c);
+    EXPECT_PTREQ(c.next, &a);
+    EXPECT_PTREQ(c.prev, &a);
+}
+
 static void test_hashmap(void)
 {
     static const char strings[][8] = {
@@ -2104,6 +2139,7 @@ static const TestEntry tests[] = {
     TEST(test_u_prev_char),
     TEST(test_ptr_array),
     TEST(test_ptr_array_move),
+    TEST(test_list),
     TEST(test_hashmap),
     TEST(test_hashset),
     TEST(test_intmap),
