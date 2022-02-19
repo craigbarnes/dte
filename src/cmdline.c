@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cmdline.h"
+#include "command/args.h"
+#include "command/macro.h"
+#include "commands.h"
 #include "completion.h"
 #include "copy.h"
 #include "editor.h"
@@ -341,6 +344,68 @@ static void cmd_direction(const CommandArgs *a)
     toggle_search_direction(&e->search.direction);
 }
 
+static void cmd_command_mode_accept(const CommandArgs *a)
+{
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
+    reset_completion(c);
+    set_input_mode(e, INPUT_NORMAL);
+
+    const char *str = string_borrow_cstring(&c->buf);
+    cmdline_clear(c);
+    if (str[0] != ' ') {
+        // This is done before handle_command() because "command [text]"
+        // can modify the contents of the command-line
+        history_add(&e->command_history, str);
+    }
+
+    handle_command(&normal_commands, str, true);
+}
+
+static void cmd_search_mode_accept(const CommandArgs *a)
+{
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
+
+    if (cmdargs_has_flag(a, 'e')) {
+        if (c->buf.len == 0) {
+            return;
+        }
+        // Escape the regex; to match as plain text
+        char *original = string_clone_cstring(&c->buf);
+        size_t len = c->buf.len;
+        string_clear(&c->buf);
+        for (size_t i = 0; i < len; i++) {
+            char ch = original[i];
+            if (is_regex_special_char(ch)) {
+                string_append_byte(&c->buf, '\\');
+            }
+            string_append_byte(&c->buf, ch);
+        }
+        free(original);
+    }
+
+    const char *args[3] = {NULL, NULL, NULL};
+    if (c->buf.len > 0) {
+        const char *str = string_borrow_cstring(&c->buf);
+        search_set_regexp(&e->search, str);
+        history_add(&e->search_history, str);
+        if (unlikely(str[0] == '-')) {
+            args[0] = "--";
+            args[1] = str;
+        } else {
+            args[0] = str;
+        }
+    } else {
+        args[0] = "-n";
+    }
+
+    search_next(e);
+    macro_command_hook("search", (char**)args);
+    cmdline_clear(c);
+    set_input_mode(e, INPUT_NORMAL);
+}
+
 static const Command common_cmds[] = {
     {"bol", "", false, 0, 0, cmd_bol},
     {"cancel", "", false, 0, 0, cmd_cancel},
@@ -362,11 +427,13 @@ static const Command common_cmds[] = {
 };
 
 static const Command search_cmds[] = {
+    {"accept", "e", false, 0, 0, cmd_search_mode_accept},
     {"case", "", false, 0, 0, cmd_case},
     {"direction", "", false, 0, 0, cmd_direction},
 };
 
 static const Command command_cmds[] = {
+    {"accept", "", false, 0, 0, cmd_command_mode_accept},
     {"complete-next", "", false, 0, 0, cmd_complete_next},
     {"complete-prev", "", false, 0, 0, cmd_complete_prev},
 };

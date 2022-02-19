@@ -159,7 +159,9 @@ bind -cs ^[ cancel
 bind -cs M-b word-bwd
 bind -cs M-d delete-word
 bind -cs M-f word-fwd
+bind -cs enter accept
 bind -c tab complete-next
 bind -c S-tab complete-prev
+bind -s M-enter 'accept -e'
 bind -s M-c case
 bind -s M-r direction

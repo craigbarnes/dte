@@ -179,6 +179,7 @@ The commands available in [`command`]/[`search`] modes are as follows:
 * `erase`
 * `erase-word`
 * `erase-bol`
+* `accept`
 * `cancel`
 * `clear`
 * `copy`
