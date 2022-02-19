@@ -139,7 +139,7 @@ void tag_file_free(void)
 TagFile *load_tag_file(void)
 {
     char path[4096];
-    if (!getcwd(path, sizeof(path) - STRLEN("/tags"))) {
+    if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
         return NULL;
     }
 

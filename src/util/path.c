@@ -124,9 +124,7 @@ char *short_filename_cwd(const char *abs, const char *cwd, const StringView *hom
 
 char *short_filename(const char *abs, const StringView *home)
 {
-    char cwd[8192];
-    if (getcwd(cwd, sizeof(cwd))) {
-        return short_filename_cwd(abs, cwd, home);
-    }
-    return xstrdup(abs);
+    char buf[8192];
+    const char *cwd = getcwd(buf, sizeof buf);
+    return likely(cwd) ? short_filename_cwd(abs, cwd, home) : xstrdup(abs);
 }

@@ -44,7 +44,7 @@ void set_editorconfig_options(Buffer *b)
         // "$PWD/__", to obtain generic settings for the working directory
         // or the user's default settings.
         static const char suffix[] = "/__";
-        if (!getcwd(cwd, sizeof(cwd) - sizeof(suffix))) {
+        if (unlikely(!getcwd(cwd, sizeof(cwd) - sizeof(suffix)))) {
             return;
         }
         memcpy(cwd + strlen(cwd), suffix, sizeof(suffix));
