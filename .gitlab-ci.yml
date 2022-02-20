@@ -71,7 +71,7 @@ android:
 coverage:
     stage: test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
-    coverage: /^ *lines: *(\d+\.\d+\%) .*$/
+    coverage: '/^ *lines: *(\d+\.\d+\%) .*$/'
     artifacts:
         reports: {cobertura: build/coverage.xml}
         expire_in: 30 days
