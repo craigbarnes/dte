@@ -58,6 +58,7 @@ static void cmdline_insert_paste(CommandLine *c)
     strn_replace_byte(text, size, '\n', ' ');
     string_insert_buf(&c->buf, c->pos, text, size);
     c->pos += size;
+    c->search_pos = NULL;
     free(text);
 }
 
@@ -69,23 +70,17 @@ void handle_input(EditorState *e, KeyCode key)
         return;
     }
 
-    BUG_ON(mode != INPUT_COMMAND && mode != INPUT_SEARCH);
+    BUG_ON(!(mode == INPUT_COMMAND || mode == INPUT_SEARCH));
     CommandLine *c = &e->cmdline;
-    if (key == KEY_PASTE) {
-        cmdline_insert_paste(c);
-        c->search_pos = NULL;
-        goto reset;
-    }
-
     if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
-        goto reset;
+    } else if (key == KEY_PASTE) {
+        cmdline_insert_paste(c);
+    } else {
+        handle_binding(&e->bindings[mode], key);
+        return;
     }
 
-    handle_binding(&e->bindings[mode], key);
-    return;
-
-reset:
     if (mode == INPUT_COMMAND) {
         reset_completion(c);
     }
