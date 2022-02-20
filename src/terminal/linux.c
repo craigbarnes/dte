@@ -3,28 +3,20 @@
 
 ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
 {
-    if (length < 3 || buf[0] != '\033' || buf[1] != '[') {
-        goto xterm;
+    if (length < 3 || buf[0] != '\033' || buf[1] != '[' || buf[2] != '[') {
+        return xterm_parse_key(buf, length, k);
     }
 
-    size_t i = 2;
-    if (buf[i++] == '[') {
-        if (unlikely(i >= length)) {
-            return -1;
-        }
-        char ch = buf[i++];
-        switch (ch) {
-        case 'A': // F1
-        case 'B': // F2
-        case 'C': // F3
-        case 'D': // F4
-        case 'E': // F5
-            *k = KEY_F1 + (ch - 'A');
-            return i;
-        }
-        return 0;
+    if (unlikely(length == 3)) {
+        return -1;
     }
 
-xterm:
-    return xterm_parse_key(buf, length, k);
+    // Letters A-E represent keys F1-F5
+    char c = buf[3];
+    if (c >= 'A' && c <= 'E') {
+        *k = KEY_F1 + (c - 'A');
+        return 4;
+    }
+
+    return 0;
 }
