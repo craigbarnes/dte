@@ -1876,6 +1876,12 @@ static void test_path_absolute(void)
     EXPECT_STREQ(path, "/dev/n0nexist3nt-file");
     free(path);
 
+    errno = 0;
+    path = path_absolute("/dev/-n0n-existent-dir-[];/file");
+    EXPECT_EQ(errno, ENOENT);
+    EXPECT_STREQ(path, NULL);
+    free(path);
+
     path = path_absolute("///../..//./");
     EXPECT_STREQ(path, "/");
     free(path);
