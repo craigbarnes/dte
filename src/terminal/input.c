@@ -9,6 +9,7 @@
 #include "terminal.h"
 #include "editor.h"
 #include "util/ascii.h"
+#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 static struct {
@@ -262,12 +263,7 @@ char *term_read_paste(size_t *size)
         count += n;
     }
 
-    for (size_t i = 0; i < count; i++) {
-        if (buf[i] == '\r') {
-            buf[i] = '\n';
-        }
-    }
-
+    strn_replace_byte(buf, count, '\r', '\n');
     *size = count;
     return buf;
 }
