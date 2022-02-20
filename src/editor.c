@@ -14,6 +14,7 @@
 #include "error.h"
 #include "file-option.h"
 #include "filetype.h"
+#include "mode.h"
 #include "regexp.h"
 #include "screen.h"
 #include "search.h"
@@ -620,7 +621,7 @@ void main_loop(void)
             .vy = editor.view->vy
         };
 
-        handle_input(key);
+        handle_input(&editor, key);
         sanity_check();
         update_screen(&s);
     }

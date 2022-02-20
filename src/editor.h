@@ -14,7 +14,6 @@
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"
-#include "mode.h"
 #include "msg.h"
 #include "options.h"
 #include "syntax/color.h"
@@ -29,6 +28,12 @@ typedef enum {
     EDITOR_RUNNING,
     EDITOR_EXITING,
 } EditorStatus;
+
+typedef enum {
+    INPUT_NORMAL,
+    INPUT_COMMAND,
+    INPUT_SEARCH,
+} InputMode;
 
 typedef enum {
     SEARCH_FWD,

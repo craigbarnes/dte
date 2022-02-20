@@ -5,7 +5,6 @@
 #include "cmdline.h"
 #include "command/macro.h"
 #include "completion.h"
-#include "editor.h"
 #include "history.h"
 #include "misc.h"
 #include "search.h"
@@ -16,18 +15,19 @@
 #include "util/unicode.h"
 #include "view.h"
 
-static void normal_mode_keypress(KeyCode key)
+static void normal_mode_keypress(EditorState *e, KeyCode key)
 {
+    View *view = e->view;
     switch (key) {
     case KEY_TAB:
-        if (editor.view->selection == SELECT_LINES) {
-            shift_lines(editor.view, 1);
+        if (view->selection == SELECT_LINES) {
+            shift_lines(view, 1);
             return;
         }
         break;
     case MOD_SHIFT | KEY_TAB:
-        if (editor.view->selection == SELECT_LINES) {
-            shift_lines(editor.view, -1);
+        if (view->selection == SELECT_LINES) {
+            shift_lines(view, -1);
             return;
         }
         break;
@@ -35,7 +35,7 @@ static void normal_mode_keypress(KeyCode key)
         size_t size;
         char *text = term_read_paste(&size);
         begin_change(CHANGE_MERGE_NONE);
-        insert_text(editor.view, text, size, true);
+        insert_text(view, text, size, true);
         end_change();
         macro_insert_text_hook(text, size);
         free(text);
@@ -44,10 +44,10 @@ static void normal_mode_keypress(KeyCode key)
     }
 
     if (u_is_unicode(key)) {
-        insert_ch(editor.view, key);
+        insert_ch(view, key);
         macro_insert_char_hook(key);
     } else {
-        handle_binding(&editor.bindings[INPUT_NORMAL], key);
+        handle_binding(&e->bindings[INPUT_NORMAL], key);
     }
 }
 
@@ -61,16 +61,16 @@ static void cmdline_insert_paste(CommandLine *c)
     free(text);
 }
 
-void handle_input(KeyCode key)
+void handle_input(EditorState *e, KeyCode key)
 {
-    InputMode mode = editor.input_mode;
+    InputMode mode = e->input_mode;
     if (mode == INPUT_NORMAL) {
-        normal_mode_keypress(key);
+        normal_mode_keypress(e, key);
         return;
     }
 
     BUG_ON(mode != INPUT_COMMAND && mode != INPUT_SEARCH);
-    CommandLine *c = &editor.cmdline;
+    CommandLine *c = &e->cmdline;
     if (key == KEY_PASTE) {
         cmdline_insert_paste(c);
         c->search_pos = NULL;
@@ -82,7 +82,7 @@ void handle_input(KeyCode key)
         goto reset;
     }
 
-    handle_binding(&editor.bindings[mode], key);
+    handle_binding(&e->bindings[mode], key);
     return;
 
 reset:

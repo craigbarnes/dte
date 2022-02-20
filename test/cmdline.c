@@ -12,15 +12,16 @@
 static void test_command_mode(void)
 {
     const CommandSet *cmds = &cmd_mode_commands;
-    CommandLine *c = &editor.cmdline;
-    set_input_mode(&editor, INPUT_COMMAND);
-    EXPECT_EQ(editor.input_mode, INPUT_COMMAND);
+    EditorState *e = &editor;
+    CommandLine *c = &e->cmdline;
+    set_input_mode(e, INPUT_COMMAND);
+    EXPECT_EQ(e->input_mode, INPUT_COMMAND);
 
-    handle_input('a');
+    handle_input(e, 'a');
     EXPECT_EQ(c->pos, 1);
     EXPECT_STRING_EQ(c->buf, "a");
 
-    handle_input(0x1F999);
+    handle_input(e, 0x1F999);
     EXPECT_EQ(c->pos, 5);
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 
@@ -102,7 +103,7 @@ static void test_command_mode(void)
     EXPECT_EQ(c->pos, 0);
     EXPECT_NULL(c->search_pos);
     EXPECT_EQ(c->buf.len, 0);
-    EXPECT_EQ(editor.input_mode, INPUT_NORMAL);
+    EXPECT_EQ(e->input_mode, INPUT_NORMAL);
 
     string_free(&c->buf);
     EXPECT_NULL(c->buf.buffer);

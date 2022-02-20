@@ -193,26 +193,27 @@ static void test_global_state(void)
 
 static void test_macro_record(void)
 {
-    EXPECT_EQ(editor.input_mode, INPUT_NORMAL);
+    EditorState *e = &editor;
+    EXPECT_EQ(e->input_mode, INPUT_NORMAL);
     EXPECT_FALSE(macro_is_recording());
     macro_record();
     EXPECT_TRUE(macro_is_recording());
 
     const CommandSet *cmds = &normal_commands;
     handle_command(cmds, "open", false);
-    handle_input('x');
-    handle_input('y');
+    handle_input(e, 'x');
+    handle_input(e, 'y');
     handle_command(cmds, "bol", true);
-    handle_input('-');
-    handle_input('z');
+    handle_input(e, '-');
+    handle_input(e, 'z');
     handle_command(cmds, "eol; right; insert -m .; new-line", true);
 
     const StringView t1 = STRING_VIEW("test 1\n");
-    insert_text(editor.view, t1.data, t1.length, true);
+    insert_text(e->view, t1.data, t1.length, true);
     macro_insert_text_hook(t1.data, t1.length);
 
     const StringView t2 = STRING_VIEW("-- test 2");
-    insert_text(editor.view, t2.data, t2.length, true);
+    insert_text(e->view, t2.data, t2.length, true);
     macro_insert_text_hook(t2.data, t2.length);
 
     EXPECT_TRUE(macro_is_recording());
