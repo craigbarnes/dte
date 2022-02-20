@@ -596,6 +596,20 @@ static void test_get_delim(void)
     EXPECT_EQ(idx, nparts - 1);
 }
 
+static void test_str_replace_byte(void)
+{
+    char str[] = " a b c  d e  f g ";
+    EXPECT_EQ(str_replace_byte(str, ' ', '-'), strlen(str));
+    EXPECT_STREQ(str, "-a-b-c--d-e--f-g-");
+}
+
+static void test_strn_replace_byte(void)
+{
+    char str[] = "..a.b.c..\n\0\0.d.e.f...\0g.h..\0\0";
+    strn_replace_byte(str, sizeof(str), '.', '|');
+    EXPECT_MEMEQ(str, "||a|b|c||\n\0\0|d|e|f|||\0g|h||\0\0", sizeof(str));
+}
+
 static void test_size_str_width(void)
 {
     EXPECT_EQ(size_str_width(0), 1);
@@ -2142,6 +2156,8 @@ static const TestEntry tests[] = {
     TEST(test_string_view),
     TEST(test_strview_has_suffix),
     TEST(test_get_delim),
+    TEST(test_str_replace_byte),
+    TEST(test_strn_replace_byte),
     TEST(test_size_str_width),
     TEST(test_buf_parse_uintmax),
     TEST(test_buf_parse_ulong),
