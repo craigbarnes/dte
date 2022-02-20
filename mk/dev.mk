@@ -89,7 +89,7 @@ build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
-build/coverage.xml: mk/gcovr-xml.cfg | build/
+build/coverage.xml: gcovr-xml.cfg | build/
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
 	$(GCOVR) -j$(NPROC) -s --config $< --xml-pretty --xml $@
 
