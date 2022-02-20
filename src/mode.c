@@ -4,7 +4,6 @@
 #include "change.h"
 #include "cmdline.h"
 #include "command/macro.h"
-#include "commands.h"
 #include "completion.h"
 #include "editor.h"
 #include "history.h"
@@ -62,53 +61,32 @@ static void cmdline_insert_paste(CommandLine *c)
     free(text);
 }
 
-static void command_mode_keypress(KeyCode key)
-{
-    CommandLine *c = &editor.cmdline;
-    if (key == KEY_PASTE) {
-        cmdline_insert_paste(c);
-        c->search_pos = NULL;
-        reset_completion(c);
-        return;
-    }
-
-    if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
-        c->pos += string_insert_ch(&c->buf, c->pos, key);
-        reset_completion(c);
-    } else {
-        handle_binding(&editor.bindings[INPUT_COMMAND], key);
-    }
-}
-
-static void search_mode_keypress(KeyCode key)
-{
-    CommandLine *c = &editor.cmdline;
-    if (key == KEY_PASTE) {
-        cmdline_insert_paste(c);
-        c->search_pos = NULL;
-        return;
-    }
-
-    if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
-        c->pos += string_insert_ch(&c->buf, c->pos, key);
-    } else {
-        handle_binding(&editor.bindings[INPUT_SEARCH], key);
-    }
-}
-
 void handle_input(KeyCode key)
 {
-    switch (editor.input_mode) {
-    case INPUT_NORMAL:
+    InputMode mode = editor.input_mode;
+    if (mode == INPUT_NORMAL) {
         normal_mode_keypress(key);
-        return;
-    case INPUT_COMMAND:
-        command_mode_keypress(key);
-        return;
-    case INPUT_SEARCH:
-        search_mode_keypress(key);
         return;
     }
 
-    BUG("unhandled input mode");
+    BUG_ON(mode != INPUT_COMMAND && mode != INPUT_SEARCH);
+    CommandLine *c = &editor.cmdline;
+    if (key == KEY_PASTE) {
+        cmdline_insert_paste(c);
+        c->search_pos = NULL;
+        goto reset;
+    }
+
+    if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
+        c->pos += string_insert_ch(&c->buf, c->pos, key);
+        goto reset;
+    }
+
+    handle_binding(&editor.bindings[mode], key);
+    return;
+
+reset:
+    if (mode == INPUT_COMMAND) {
+        reset_completion(c);
+    }
 }
