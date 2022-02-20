@@ -41,7 +41,7 @@ static bool is_executable(int dir_fd, const char *filename)
 }
 
 static void do_collect_files (
-    CompletionState *cs,
+    PointerArray *array,
     const char *dirname,
     const char *dirprefix,
     const char *fileprefix,
@@ -124,7 +124,7 @@ static void do_collect_files (
         }
 
         buf[n] = '\0';
-        ptr_array_append(&cs->completions, buf);
+        ptr_array_append(array, buf);
     }
 
     closedir(dir);
@@ -140,17 +140,17 @@ static void collect_files(CompletionState *cs, FileCollectionType type)
         cs->tilde_expanded = true;
         char *dir = path_dirname(cs->parsed);
         char *dirprefix = path_dirname(str);
-        do_collect_files(cs, dir, dirprefix, slash + 1, type);
+        do_collect_files(&cs->completions, dir, dirprefix, slash + 1, type);
         free(dirprefix);
         free(dir);
         free(str);
     } else {
         const char *slash = strrchr(cs->parsed, '/');
         if (!slash) {
-            do_collect_files(cs, ".", "", cs->parsed, type);
+            do_collect_files(&cs->completions, ".", "", cs->parsed, type);
         } else {
             char *dir = path_dirname(cs->parsed);
-            do_collect_files(cs, dir, dir, slash + 1, type);
+            do_collect_files(&cs->completions, dir, dir, slash + 1, type);
             free(dir);
         }
     }
