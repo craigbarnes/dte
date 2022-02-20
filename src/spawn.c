@@ -13,6 +13,7 @@
 #include "util/exec.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/str-util.h"
 #include "util/string.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -24,12 +25,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
         return;
     }
 
-    size_t str_len = 0;
-    for (char ch; (ch = str[str_len]); str_len++) {
-        if (ch == '\t') {
-            str[str_len] = ' ';
-        }
-    }
+    size_t str_len = str_replace_byte(str, '\t', ' ');
     if (str[str_len - 1] == '\n') {
         str[--str_len] = '\0';
     }

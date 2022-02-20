@@ -49,6 +49,30 @@ static inline bool strn_has_strview_prefix(const char *s, size_t n, const String
     return n >= p->length && mem_equal(s, p->data, p->length);
 }
 
+// Replaces all occurrences of a specific byte with a replacement byte
+// and returns the length of the string (like strlen(str))
+NONNULL_ARGS
+static inline size_t str_replace_byte(char *str, char byte, char replacement)
+{
+    size_t n = 0;
+    for (char c; (c = str[n]); n++) {
+        if (c == byte) {
+            str[n] = replacement;
+        }
+    }
+    return n;
+}
+
+NONNULL_ARGS
+static inline void strn_replace_byte(char *str, size_t n, char byte, char rep)
+{
+    for (size_t i = 0; i < n; i++) {
+        if (str[i] == byte) {
+            str[i] = rep;
+        }
+    }
+}
+
 NONNULL_ARGS
 static inline StringView get_delim(const char *buf, size_t *posp, size_t size, int delim)
 {

@@ -13,6 +13,7 @@
 #include "shift.h"
 #include "terminal/input.h"
 #include "util/debug.h"
+#include "util/str-util.h"
 #include "util/unicode.h"
 #include "view.h"
 
@@ -55,11 +56,7 @@ static void cmdline_insert_paste(CommandLine *c)
 {
     size_t size;
     char *text = term_read_paste(&size);
-    for (size_t i = 0; i < size; i++) {
-        if (text[i] == '\n') {
-            text[i] = ' ';
-        }
-    }
+    strn_replace_byte(text, size, '\n', ' ');
     string_insert_buf(&c->buf, c->pos, text, size);
     c->pos += size;
     free(text);
