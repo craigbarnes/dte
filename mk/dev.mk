@@ -3,6 +3,7 @@ RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
 DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 SHELLCHECK ?= shellcheck
+GCOVR ?= gcovr
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
 LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '$(PAT)';)
@@ -87,6 +88,10 @@ coverage-report: build/docs/lcov.css
 build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
+
+build/coverage.xml: mk/gcovr-xml.cfg | build/
+	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
+	$(GCOVR) -j$(NPROC) -s --config $< --xml-pretty --xml $@
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*

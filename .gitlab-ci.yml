@@ -68,10 +68,20 @@ android:
         - make clean && make CC="$CC_I686"
         - make clean && make CC="$CC_X86_64"
 
+coverage:
+    stage: test
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
+    coverage: /^ *lines: *(\d+\.\d+\%) .*$/
+    artifacts:
+        reports: {cobertura: build/coverage.xml}
+        expire_in: 30 days
+        name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+    script:
+        - make build/coverage.xml
+
 .pages:
     stage: dist
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian
-    coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
     artifacts:
         paths: [public]
         expire_in: 60 days

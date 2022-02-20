@@ -114,6 +114,7 @@ bool parse_args(const Command *cmd, CommandArgs *a)
     switch (BUILTIN_EXPECT(do_parse_args(cmd, a), ARGERR_NONE)) {
     case ARGERR_NONE:
         return true;
+    // GCOV_EXCL_START
     case ARGERR_INVALID_OPTION:
         error_msg("Invalid option -%c", a->flags[0]);
         break;
@@ -148,4 +149,5 @@ bool parse_args(const Command *cmd, CommandArgs *a)
         BUG("unhandled error type");
     }
     return false;
+    // GCOV_EXCL_STOP
 }
