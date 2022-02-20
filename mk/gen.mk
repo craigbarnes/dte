@@ -1,3 +1,4 @@
+GEN_MK = $(lastword $(MAKEFILE_LIST))
 FETCH = curl -LSs -o $@
 LUA = lua
 
@@ -8,7 +9,7 @@ gen-unidata: $(UCD_FILES)
 	$(E) GEN src/util/unidata.h
 	$(Q) $(LUA) src/util/unidata.lua $(UCD_FILES) > src/util/unidata.h
 
-$(UCD_FILES): | .cache/
+$(UCD_FILES): $(GEN_MK) | .cache/
 	$(E) FETCH $@
 	$(Q) $(FETCH) https://unicode.org/Public/13.0.0/ucd/$(@F)
 
