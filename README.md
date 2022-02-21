@@ -14,7 +14,7 @@ Features
 * Customizable key bindings
 * Support for all xterm Ctrl/Alt/Shift key codes
 * Command language with auto-completion
-* Unicode 13 compatible text rendering
+* Unicode 14 compatible text rendering
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to compiler error
