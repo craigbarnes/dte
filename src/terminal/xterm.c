@@ -1,5 +1,5 @@
 // Escape sequence parser for xterm function keys.
-// Copyright 2018-2020 Craig Barnes.
+// Copyright 2018-2022 Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
 // See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 

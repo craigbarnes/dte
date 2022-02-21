@@ -90,7 +90,7 @@ IRC network.
 License
 -------
 
-Copyright (C) 2017-2021 Craig Barnes.  
+Copyright (C) 2013-2022 Craig Barnes.  
 Copyright (C) 2010-2015 Timo Hirvonen.
 
 This program is free software; you can redistribute it and/or modify it
