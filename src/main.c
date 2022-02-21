@@ -218,7 +218,7 @@ static ExitCode showkey_loop(void)
         case KEY_PASTE:
             term_discard_paste();
             continue;
-        case MOD_CTRL | 'D':
+        case MOD_CTRL | 'd':
             loop = false;
         }
         const char *str = keycode_to_string(key);

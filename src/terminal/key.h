@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "util/ascii.h"
 #include "util/macros.h"
 
 enum {
@@ -89,7 +90,7 @@ static inline KeyCode keycode_normalize(KeyCode k)
     case 0x7F: return MOD_CTRL | '?';
     }
     if (k < 0x20) {
-        return MOD_CTRL | k | 0x40;
+        return MOD_CTRL | ascii_tolower(k | 0x40);
     }
     return k;
 }

@@ -69,6 +69,53 @@ static const KeyCode param_keys[] = {
     [34] = KEY_F20,
 };
 
+static KeyCode decode_kitty_special_key(uint32_t n)
+{
+    switch (n) {
+    // case 57359: return KEY_SCROLL_LOCK;
+    // case 57361: return KEY_PRINT_SCREEN;
+    // case 57362: return KEY_PAUSE;
+    // case 57363: return KEY_MENU;
+    case 57376: return KEY_F13;
+    case 57377: return KEY_F14;
+    case 57378: return KEY_F15;
+    case 57379: return KEY_F16;
+    case 57380: return KEY_F17;
+    case 57381: return KEY_F18;
+    case 57382: return KEY_F19;
+    case 57383: return KEY_F20;
+    case 57399: return '0';
+    case 57400: return '1';
+    case 57401: return '2';
+    case 57402: return '3';
+    case 57403: return '4';
+    case 57404: return '5';
+    case 57405: return '6';
+    case 57406: return '7';
+    case 57407: return '8';
+    case 57408: return '9';
+    case 57409: return '.';
+    case 57410: return '/';
+    case 57411: return '*';
+    case 57412: return '-';
+    case 57413: return '+';
+    case 57414: return KEY_ENTER;
+    case 57415: return '=';
+    case 57417: return KEY_LEFT;
+    case 57418: return KEY_RIGHT;
+    case 57419: return KEY_UP;
+    case 57420: return KEY_DOWN;
+    case 57421: return KEY_PAGE_UP;
+    case 57422: return KEY_PAGE_DOWN;
+    case 57423: return KEY_HOME;
+    case 57424: return KEY_END;
+    case 57425: return KEY_INSERT;
+    case 57426: return KEY_DELETE;
+    case 57427: return KEY_BEGIN;
+    }
+    return KEY_IGNORE;
+}
+
 static KeyCode decode_modifiers(uint32_t n)
 {
     n--;
@@ -96,25 +143,18 @@ static KeyCode decode_key_from_final_byte(uint8_t byte)
     return (byte < ARRAY_COUNT(final_byte_keys)) ? final_byte_keys[byte] : 0;
 }
 
-// Fix quirky key codes sent when "modifyOtherKeys" is enabled
-static KeyCode normalize_modified_other_key(KeyCode mods, KeyCode key)
+static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
 {
     if (key > 0x20 && key < 0x80) {
-        // The Shift modifier is never appropriate with the
-        // printable ASCII range, since pressing Shift causes
-        // the base key itself to change (i.e. "r" becomes "R',
-        // "." becomes ">", etc.)
-        mods &= ~MOD_SHIFT;
-
-        static_assert(MOD_CTRL >> 21 == 0x20);
-        static_assert(ASCII_LOWER << 1 == 0x20);
-
-        // Presence of the Ctrl modifier should always cause letters
-        // to be uppercase. This assumption is too ingrained and
-        // causes too much breakage if not enforced.
-        // Note: the code below is a branchless equivalent of:
-        // `if (mods & MOD_CTRL) key = ascii_toupper(key);`.
-        key -= ((mods & MOD_CTRL) >> 21) & ((ascii_table[key] & ASCII_LOWER) << 1);
+        if (!ascii_isalpha(key)) {
+            // TODO: refine this?
+            mods &= ~MOD_SHIFT;
+        }
+        if (mods & MOD_CTRL) {
+            key = ascii_tolower(key);
+        }
+    } else if (key >= 57344 && key <= 63743) {
+        key = decode_kitty_special_key(key);
     }
 
     return mods | keycode_normalize(key);
@@ -399,7 +439,7 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
                 goto ignore;
             }
             key = csi.params[2][0];
-            goto normalize;
+            goto decode_mods_and_normalize;
         case 2:
             mods = decode_modifiers(csi.params[1][0]);
             if (unlikely(mods == 0)) {
@@ -416,11 +456,14 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
         }
         goto ignore;
     case 'u':
-        if (unlikely(csi.nparams != 2)) {
-            goto ignore;
-        }
         key = csi.params[0][0];
-        goto normalize;
+        switch (csi.nparams) {
+        case 2:
+            goto decode_mods_and_normalize;
+        case 1:
+            goto normalize;
+        }
+        goto ignore;
     case 'Z':
         if (unlikely(csi.nparams != 0)) {
             goto ignore;
@@ -449,12 +492,13 @@ ignore:
     *k = KEY_IGNORE;
     return i;
 
-normalize:
+decode_mods_and_normalize:
     mods = decode_modifiers(csi.params[1][0]);
     if (unlikely(mods == 0)) {
         goto ignore;
     }
-    *k = normalize_modified_other_key(mods, key);
+normalize:
+    *k = normalize_extended_keycode(mods, key);
     return i;
 }
 

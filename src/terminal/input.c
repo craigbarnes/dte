@@ -204,6 +204,9 @@ KeyCode term_read_key(void)
 
             if (input.len == 0 || input.buf[0] == '\033') {
                 // 'esc key' or 'alt-key'
+                if (key < 0x80 && ascii_isupper(key)) {
+                    return MOD_META | MOD_SHIFT | ascii_tolower(key);
+                }
                 return MOD_META | key;
             }
 

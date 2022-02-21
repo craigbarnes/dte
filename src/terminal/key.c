@@ -94,19 +94,15 @@ bool parse_key_string(KeyCode *key, const char *str)
     size_t i = 0;
     KeyCode ch = u_get_char(str, len, &i);
     if (u_is_unicode(ch) && i == len) {
-        if (modifiers == MOD_CTRL) {
-            // Normalize
-            switch (ch) {
-            case 'i':
-            case 'I':
-                ch = KEY_TAB;
-                modifiers = 0;
-                break;
-            case 'm':
-            case 'M':
-                ch = KEY_ENTER;
-                modifiers = 0;
-                break;
+        if (ch < 0x80) {
+            if (modifiers & MOD_CTRL) {
+                // Convert C-A to C-a
+                ch = ascii_tolower(ch);
+            }
+            if (modifiers & MOD_META && ascii_isupper(ch)) {
+                // Convert M-A to M-S-a
+                modifiers |= MOD_SHIFT;
+                ch = ascii_tolower(ch);
             }
         }
         *key = modifiers | ch;

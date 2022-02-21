@@ -296,8 +296,8 @@ static void test_xterm_parse_key(void)
         {"\033[27;2;127~", 11, MOD_CTRL | '?'},
         {"\033[27;6;127~", 11, MOD_CTRL | '?'},
         {"\033[27;8;127~", 11, MOD_CTRL | MOD_META | '?'},
-        {"\033[27;6;82~", 10, MOD_CTRL | 'R'},
-        {"\033[27;5;114~", 11, MOD_CTRL | 'R'},
+        {"\033[27;6;82~", 10, MOD_CTRL | MOD_SHIFT | 'r'},
+        {"\033[27;5;114~", 11, MOD_CTRL | 'r'},
         {"\033[27;3;82~", 10, MOD_META | 'R'},
         {"\033[27;3;114~", 11, MOD_META | 'r'},
         {"\033[27;4;62~", 10, MOD_META | '>'},
@@ -310,7 +310,7 @@ static void test_xterm_parse_key(void)
         {"\033[13;3u", 7, MOD_META | KEY_ENTER},
         {"\033[9;5u", 6, MOD_CTRL | KEY_TAB},
         {"\033[65;3u", 7, MOD_META | 'A'},
-        {"\033[108;5u", 8, MOD_CTRL | 'L'},
+        {"\033[108;5u", 8, MOD_CTRL | 'l'},
         {"\033[127765;3u", 11, MOD_META | 127765ul},
         {"\033[1114111;3u", 12, MOD_META | UNICODE_MAX_VALID_CODEPOINT},
         {"\033[1114112;3u", 12, KEY_IGNORE},
@@ -325,6 +325,8 @@ static void test_xterm_parse_key(void)
         {"\033[ 2;3u", 7, KEY_IGNORE},
         {"\033[<?>2;3u", 9, KEY_IGNORE},
         {"\033[ !//.$2;3u", 12, KEY_IGNORE},
+        // https://sw.kovidgoyal.net/kitty/keyboard-protocol
+        {"\033[27u", 5, MOD_CTRL | '['},
         // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
         // XTWINOPS replies
@@ -645,9 +647,10 @@ static void test_keycode_to_string(void)
         {"right", KEY_RIGHT},
         {"up", KEY_UP},
         {"down", KEY_DOWN},
-        {"C-A", MOD_CTRL | 'A'},
+        {"C-a", MOD_CTRL | 'a'},
+        {"M-a", MOD_META | 'a'},
         {"M-S-{", MOD_META | MOD_SHIFT | '{'},
-        {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
+        {"C-S-a", MOD_CTRL | MOD_SHIFT | 'a'},
         {"F1", KEY_F1},
         {"F5", KEY_F5},
         {"F12", KEY_F12},
@@ -671,6 +674,20 @@ static void test_keycode_to_string(void)
         IEXPECT_TRUE(parse_key_string(&key, tests[i].str));
         IEXPECT_EQ(key, tests[i].key);
     }
+
+    KeyCode key = 0;
+    EXPECT_TRUE(parse_key_string(&key, "C-A"));
+    EXPECT_EQ(key, MOD_CTRL | 'a');
+    EXPECT_STREQ(keycode_to_string(MOD_CTRL | 'a'), "C-a");
+
+    EXPECT_TRUE(parse_key_string(&key, "C-S-A"));
+    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | 'a');
+    EXPECT_STREQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'a'), "C-S-a");
+
+    EXPECT_TRUE(parse_key_string(&key, "M-A"));
+    EXPECT_EQ(key, MOD_META | MOD_SHIFT | 'a');
+    EXPECT_STREQ(keycode_to_string(MOD_META | MOD_SHIFT | 'a'), "M-S-a");
+
     EXPECT_STREQ(keycode_to_string(KEY_PASTE), "INVALID (0x08000000)");
     EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
 }
@@ -679,13 +696,13 @@ static void test_parse_key_string(void)
 {
     KeyCode key = 0;
     EXPECT_TRUE(parse_key_string(&key, "^I"));
-    EXPECT_EQ(key, KEY_TAB);
+    EXPECT_EQ(key, MOD_CTRL | 'i');
     EXPECT_TRUE(parse_key_string(&key, "^M"));
-    EXPECT_EQ(key, KEY_ENTER);
+    EXPECT_EQ(key, MOD_CTRL | 'm');
     EXPECT_TRUE(parse_key_string(&key, "C-I"));
-    EXPECT_EQ(key, KEY_TAB);
+    EXPECT_EQ(key, MOD_CTRL | 'i');
     EXPECT_TRUE(parse_key_string(&key, "C-M"));
-    EXPECT_EQ(key, KEY_ENTER);
+    EXPECT_EQ(key, MOD_CTRL | 'm');
 
     key = 0x18;
     EXPECT_FALSE(parse_key_string(&key, "C-"));

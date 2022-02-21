@@ -20,6 +20,7 @@ enum FeatureFlags {
     LINUX = 0x10, // Emits linux-specific sequences for F1-F5 (see linux.c)
     OSC52 = 0x20, // Supports OSC 52 clipboard operations
     METAESC = 0x40, // Try to enable {meta,alt}SendsEscape modes at startup
+    KITTYKBD = 0x80, // Supports kitty keyboard protocol (at least mode 0b1)
 };
 
 // See terminfo(5) for the meaning of "ncv"
@@ -54,14 +55,14 @@ static const TermEntry terms[] = {
     {"dtterm", 6, TERM_8_COLOR, 0, 0},
     {"dvtm", 4, TERM_8_COLOR, 0, 0},
     {"fbterm", 6, TERM_256_COLOR, DIM | UL, BCE},
-    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52},
+    {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD},
     {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
     {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52},
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
     {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52},
     {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
-    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52},
+    {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD},
     {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
     {"kon2", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"konsole", 7, TERM_8_COLOR, 0, BCE},
@@ -195,14 +196,21 @@ void term_init(const char *term)
             string_append_literal(&tcc->init, "\033[?1036;1039s\033[?1036;1039h");
             string_append_literal(&tcc->deinit, "\033[?1036;1039r");
         }
+        if (entry->flags & KITTYKBD) {
+            // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#quickstart
+            string_append_literal(&tcc->init, "\033[>1u");
+            string_append_literal(&tcc->deinit, "\033[<u");
+        }
         const int n = (int)name.length;
         DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
     }
 
-    // Try to use "modifyOtherKeys" mode, if available
+    // Try to use "modifyOtherKeys" mode, unless kitty protocol is supported
     // (see: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
-    string_append_literal(&tcc->init, "\033[>4;1m");
-    string_append_literal(&tcc->deinit, "\033[>4m");
+    if (!entry || !(entry->flags & KITTYKBD)) {
+        string_append_literal(&tcc->init, "\033[>4;1m");
+        string_append_literal(&tcc->deinit, "\033[>4m");
+    }
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         terminal.color_type = TERM_TRUE_COLOR;
