@@ -56,9 +56,9 @@ void set_highlight_color(ColorScheme *colors, const char *name, const TermColor 
     hashmap_insert(&colors->other, xstrdup(name), c);
 }
 
-TermColor *find_color(ColorScheme *colors, const char *name)
+const TermColor *find_color(ColorScheme *colors, const char *name)
 {
-    TermColor *c = find_real_color(colors, name);
+    const TermColor *c = find_real_color(colors, name);
     if (c) {
         return c;
     }

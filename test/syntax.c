@@ -100,7 +100,7 @@ static void test_hl_line(void)
     ASSERT_EQ(line.length, 56);
 
     bool next_changed;
-    TermColor **colors = hl_line(v->buffer, &line, line_nr, &next_changed);
+    const TermColor **colors = hl_line(v->buffer, &line, line_nr, &next_changed);
     ASSERT_NONNULL(colors);
     EXPECT_TRUE(next_changed);
 

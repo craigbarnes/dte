@@ -42,7 +42,7 @@ typedef struct {
     char *emit_name;
 
     // Set after all colors have been added (config loaded).
-    TermColor *emit_color;
+    const TermColor *emit_color;
 } Action;
 
 typedef struct {
@@ -103,7 +103,6 @@ typedef struct {
     char *delim;
     size_t len;
 } HeredocState;
-
 
 static inline bool is_subsyntax(const Syntax *syn)
 {

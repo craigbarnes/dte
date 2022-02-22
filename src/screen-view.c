@@ -20,7 +20,7 @@ typedef struct {
     size_t pos;
     size_t indent_size;
     size_t trailing_ws_offset;
-    TermColor **colors;
+    const TermColor **colors;
 } LineInfo;
 
 static bool is_default_bg_color(int32_t color)
@@ -207,8 +207,8 @@ static bool is_notice(const char *word, size_t len)
 // Highlight certain words inside comments
 static void hl_words(const LineInfo *info)
 {
-    TermColor *cc = find_color(&editor.colors, "comment");
-    TermColor *nc = find_color(&editor.colors, "notice");
+    const TermColor *cc = find_color(&editor.colors, "comment");
+    const TermColor *nc = find_color(&editor.colors, "notice");
 
     if (!info->colors || !cc || !nc) {
         return;
@@ -284,7 +284,7 @@ static void line_info_init (
 static void line_info_set_line (
     LineInfo *info,
     const StringView *line,
-    TermColor **colors
+    const TermColor **colors
 ) {
     BUG_ON(line->length == 0);
     BUG_ON(line->data[line->length - 1] != '\n');
@@ -393,7 +393,7 @@ void update_range(TermOutputBuffer *obuf, const View *v, long y1, long y2)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        TermColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
+        const TermColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
         print_line(obuf, &info);
 
