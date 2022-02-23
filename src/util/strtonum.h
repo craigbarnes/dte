@@ -39,13 +39,14 @@ static inline size_t buf_parse_hex_uint(const char *str, size_t size, unsigned i
 }
 
 size_t size_str_width(size_t x) CONST_FN;
-size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp) NONNULL_ARG(1);
-size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp) NONNULL_ARG(1);
-size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp) NONNULL_ARG(1);
-size_t buf_parse_size(const char *str, size_t len, size_t *valp) NONNULL_ARG(1);
-bool str_to_int(const char *str, int *valp) NONNULL_ARG(1);
-bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARG(1);
-bool str_to_size(const char *str, size_t *valp) NONNULL_ARG(1);
-bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARG(1);
+size_t buf_parse_uintmax(const char *str, size_t size, uintmax_t *valp) NONNULL_ARGS;
+size_t buf_parse_ulong(const char *str, size_t size, unsigned long *valp) NONNULL_ARGS;
+size_t buf_parse_uint(const char *str, size_t size, unsigned int *valp) NONNULL_ARGS;
+size_t buf_parse_size(const char *str, size_t len, size_t *valp) NONNULL_ARGS;
+bool str_to_int(const char *str, int *valp) NONNULL_ARGS;
+bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARGS;
+bool str_to_size(const char *str, size_t *valp) NONNULL_ARGS;
+bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARGS;
+bool str_to_filepos(const char *str, size_t *line, size_t *col) NONNULL_ARGS;
 
 #endif

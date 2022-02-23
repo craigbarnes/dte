@@ -800,6 +800,33 @@ static void test_str_to_size(void)
     EXPECT_FALSE(str_to_size("99999999999999999999999999999999", &val));
 }
 
+static void test_str_to_filepos(void)
+{
+    size_t line = 0, col = 0;
+    EXPECT_TRUE(str_to_filepos("10,60", &line, &col));
+    EXPECT_EQ(line, 10);
+    EXPECT_EQ(col, 60);
+
+    line = 0, col = 0;
+    EXPECT_TRUE(str_to_filepos("1:9", &line, &col));
+    EXPECT_EQ(line, 1);
+    EXPECT_EQ(col, 9);
+
+    line = 0, col = 0;
+    EXPECT_TRUE(str_to_filepos("4980", &line, &col));
+    EXPECT_EQ(line, 4980);
+    EXPECT_EQ(col, 0);
+
+    line = 0, col = 0;
+    EXPECT_FALSE(str_to_filepos("", &line, &col));
+    EXPECT_EQ(line, 0);
+    EXPECT_EQ(col, 0);
+
+    EXPECT_FALSE(str_to_filepos("44,9x", &line, &col));
+    EXPECT_EQ(line, 0);
+    EXPECT_EQ(col, 0);
+}
+
 static void test_umax_to_str(void)
 {
     EXPECT_STREQ(umax_to_str(0), "0");
@@ -2171,6 +2198,7 @@ static const TestEntry tests[] = {
     TEST(test_buf_parse_hex_uint),
     TEST(test_str_to_int),
     TEST(test_str_to_size),
+    TEST(test_str_to_filepos),
     TEST(test_umax_to_str),
     TEST(test_uint_to_str),
     TEST(test_ulong_to_str),

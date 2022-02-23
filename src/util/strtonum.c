@@ -178,6 +178,21 @@ bool str_to_size(const char *str, size_t *valp)
     return true;
 }
 
+// Parse line and column number from line[,col] or line[:col]
+bool str_to_filepos(const char *str, size_t *line, size_t *col)
+{
+    size_t len = strlen(str);
+    size_t i = buf_parse_size(str, len, line);
+    if (str[i] != ':' && str[i] != ',') {
+        return i == len && *line > 0;
+    }
+    if (!str_to_size(str + i + 1, col) || *col == 0) {
+        *line = 0;
+        return false;
+    }
+    return true;
+}
+
 size_t size_str_width(size_t x)
 {
     size_t width = 0;

@@ -254,43 +254,6 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
     }
 }
 
-// Parse line and column number from line[,col] or line[:col]
-static bool parse_file_position(const char *str, size_t *line, size_t *col)
-{
-    size_t len = strlen(str);
-    size_t i = buf_parse_size(str, len, line);
-    if (str[i] != ':' && str[i] != ',') {
-        return i == len && *line > 0;
-    }
-    if (!str_to_size(str + i + 1, col) || *col == 0) {
-        *line = 0;
-        return false;
-    }
-    return true;
-}
-
-UNITTEST {
-    size_t line = 0, col = 0;
-    BUG_ON(!parse_file_position("10,60", &line, &col));
-    BUG_ON(line != 10);
-    BUG_ON(col != 60);
-    line = 0, col = 0;
-    BUG_ON(!parse_file_position("1:9", &line, &col));
-    BUG_ON(line != 1);
-    BUG_ON(col != 9);
-    line = 0, col = 0;
-    BUG_ON(!parse_file_position("4980", &line, &col));
-    BUG_ON(line != 4980);
-    BUG_ON(col != 0);
-    line = 0, col = 0;
-    BUG_ON(parse_file_position("", &line, &col));
-    BUG_ON(line != 0);
-    BUG_ON(col != 0);
-    BUG_ON(parse_file_position("44,9x", &line, &col));
-    BUG_ON(line != 0);
-    BUG_ON(col != 0);
-}
-
 static const char copyright[] =
     "(C) 2013-2022 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
@@ -486,7 +449,7 @@ loop_break:
     for (size_t i = optind, line = 0, col = 0; i < argc; i++) {
         const char *str = argv[i];
         if (str[0] == '+' && ascii_isdigit(str[1]) && line == 0) {
-            if (!parse_file_position(str + 1, &line, &col)) {
+            if (!str_to_filepos(str + 1, &line, &col)) {
                 error_msg("Invalid file position: '%s'", str);
             }
         } else {
