@@ -316,7 +316,7 @@ void insert_ch(View *view, CodePoint ch)
     } else if (b->options.overwrite) {
         // Delete character under cursor unless we're at end of line
         BlockIter bi = view->cursor;
-        del_count = !block_iter_is_eol(&bi) ? block_iter_next_column(&bi) : 0;
+        del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
     } else if (ch == '}' && b->options.auto_indent && b->options.brace_indent) {
         BlockIter bi = view->cursor;
         StringView curlr;
