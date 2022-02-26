@@ -81,7 +81,7 @@ static inline bool path_parent(StringView *path)
 }
 
 char *path_absolute(const char *filename) MALLOC NONNULL_ARGS;
-char *relative_filename(const char *f, const char *cwd) XSTRDUP;
+char *path_relative(const char *f, const char *cwd) XSTRDUP;
 char *short_filename(const char *absolute, const StringView *home_dir) XSTRDUP;
 char *short_filename_cwd(const char *absolute, const char *cwd, const StringView *home_dir) XSTRDUP;
 

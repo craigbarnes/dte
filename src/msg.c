@@ -224,7 +224,7 @@ String dump_messages(const MessageArray *messages)
         }
 
         if (path_is_absolute(loc->filename)) {
-            char *rel = relative_filename(loc->filename, cwd);
+            char *rel = path_relative(loc->filename, cwd);
             string_append_cstring(&buf, rel);
             free(rel);
         } else {

@@ -1815,7 +1815,7 @@ static void test_path_dirname_and_path_basename(void)
     }
 }
 
-static void test_relative_filename(void)
+static void test_path_relative(void)
 {
     static const struct rel_test {
         const char *cwd;
@@ -1833,7 +1833,7 @@ static void test_relative_filename(void)
         { "/home", "/home/user", "user"},
     };
     FOR_EACH_I(i, tests) {
-        char *result = relative_filename(tests[i].path, tests[i].cwd);
+        char *result = path_relative(tests[i].path, tests[i].cwd);
         IEXPECT_STREQ(tests[i].result, result);
         free(result);
     }
@@ -1860,7 +1860,7 @@ static void test_short_filename_cwd(void)
 
     const char *abs = "/a/b";
     const char *cwd = "/a/x/c";
-    char *rel = relative_filename(abs, cwd);
+    char *rel = path_relative(abs, cwd);
     EXPECT_TRUE(strlen(abs) < strlen(rel));
     EXPECT_STREQ(rel, "../../b");
     free(rel);
@@ -2225,7 +2225,7 @@ static const TestEntry tests[] = {
     TEST(test_round_size_to_next_multiple),
     TEST(test_round_size_to_next_power_of_2),
     TEST(test_path_dirname_and_path_basename),
-    TEST(test_relative_filename),
+    TEST(test_path_relative),
     TEST(test_short_filename_cwd),
     TEST(test_short_filename),
     TEST(test_path_absolute),

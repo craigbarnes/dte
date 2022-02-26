@@ -38,7 +38,7 @@ static bool path_component(const char *path, size_t pos)
     return path[pos] == '\0' || pos == 0 || path[pos - 1] == '/';
 }
 
-char *relative_filename(const char *abs, const char *cwd)
+char *path_relative(const char *abs, const char *cwd)
 {
     BUG_ON(!path_is_absolute(cwd));
     BUG_ON(!path_is_absolute(abs));
@@ -95,7 +95,7 @@ char *relative_filename(const char *abs, const char *cwd)
 
 char *short_filename_cwd(const char *abs, const char *cwd, const StringView *home)
 {
-    char *rel = relative_filename(abs, cwd);
+    char *rel = path_relative(abs, cwd);
     size_t abs_len = strlen(abs);
     size_t rel_len = strlen(rel);
     if (abs_len < rel_len) {
