@@ -100,43 +100,31 @@ void add_filetype(PointerArray *filetypes, const char *name, const char *str, Fi
     ptr_array_append(filetypes, ft);
 }
 
-static StringView get_filename_extension(const StringView filename)
+static StringView get_ext(StringView filename)
 {
     StringView ext = STRING_VIEW_INIT;
     if (filename.length < 3) {
         return ext;
     }
-
     ext.data = strview_memrchr(&filename, '.');
     if (!ext.data) {
         return ext;
     }
-
     ext.data++;
     ext.length = filename.length - (ext.data - filename.data);
+    return ext;
+}
 
-    if (unlikely(strview_has_suffix(&ext, "~"))) {
+static StringView get_filename_extension(StringView filename)
+{
+    StringView ext = get_ext(filename);
+    if (is_ignored_extension(ext)) {
+        filename.length -= ext.length + 1;
+        ext = get_ext(filename);
+    }
+    if (strview_has_suffix(&ext, "~")) {
         ext.length--;
     }
-    if (unlikely(ext.length == 0)) {
-        return ext;
-    }
-
-    if (is_ignored_extension(ext)) {
-        int idx = -2;
-        while (ext.data + idx >= filename.data) {
-            if (ext.data[idx] == '.') {
-                int len = -idx - 2;
-                if (len) {
-                    ext.data -= len + 1;
-                    ext.length = len;
-                }
-                break;
-            }
-            idx--;
-        }
-    }
-
     return ext;
 }
 

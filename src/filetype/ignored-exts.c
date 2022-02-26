@@ -21,10 +21,13 @@ static const char ignored_extensions[][12] = {
     "ucf-old",
 };
 
-static bool is_ignored_extension(const StringView sv)
+static bool is_ignored_extension(StringView sv)
 {
     if (sv.length < 3 || sv.length >= sizeof(ignored_extensions[0])) {
         return false;
+    }
+    if (sv.data[sv.length - 1] == '~') {
+        sv.length--;
     }
     const char *e = BSEARCH(&sv, ignored_extensions, ft_compare);
     return e != NULL;
