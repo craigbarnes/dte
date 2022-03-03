@@ -693,6 +693,7 @@ static void test_keycode_to_string(void)
         {"M-a", MOD_META | 'a'},
         {"M-S-{", MOD_META | MOD_SHIFT | '{'},
         {"C-S-a", MOD_CTRL | MOD_SHIFT | 'a'},
+        {"M-S-a", MOD_META | MOD_SHIFT | 'a'},
         {"F1", KEY_F1},
         {"F5", KEY_F5},
         {"F12", KEY_F12},
@@ -717,18 +718,13 @@ static void test_keycode_to_string(void)
         IEXPECT_EQ(key, tests[i].key);
     }
 
-    KeyCode key = 0;
-    EXPECT_TRUE(parse_key_string(&key, "C-A"));
-    EXPECT_EQ(key, MOD_CTRL | 'a');
-    EXPECT_STREQ(keycode_to_string(MOD_CTRL | 'a'), "C-a");
-
-    EXPECT_TRUE(parse_key_string(&key, "C-S-A"));
-    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | 'a');
-    EXPECT_STREQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'a'), "C-S-a");
-
-    EXPECT_TRUE(parse_key_string(&key, "M-A"));
-    EXPECT_EQ(key, MOD_META | MOD_SHIFT | 'a');
-    EXPECT_STREQ(keycode_to_string(MOD_META | MOD_SHIFT | 'a'), "M-S-a");
+    // These combos aren't round-trippable by the code above and can't end
+    // up in real bindings, since the letters are normalized to lower case
+    // by parse_key_string(). We still test them nevertheless; for the sake
+    // of completeness and catching unexpected changes.
+    EXPECT_STREQ(keycode_to_string(MOD_CTRL | 'A'), "C-A");
+    EXPECT_STREQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'A'), "C-S-A");
+    EXPECT_STREQ(keycode_to_string(MOD_META | MOD_SHIFT | 'A'), "M-S-A");
 
     EXPECT_STREQ(keycode_to_string(KEY_PASTE), "INVALID (0x08000000)");
     EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
@@ -755,6 +751,22 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "???"));
     EXPECT_EQ(key, 0x18);
+
+    // Special cases for normalization:
+    EXPECT_TRUE(parse_key_string(&key, "C-A"));
+    EXPECT_EQ(key, MOD_CTRL | 'a');
+    EXPECT_TRUE(parse_key_string(&key, "C-S-A"));
+    EXPECT_EQ(key, MOD_CTRL | MOD_SHIFT | 'a');
+    EXPECT_TRUE(parse_key_string(&key, "M-A"));
+    EXPECT_EQ(key, MOD_META | MOD_SHIFT | 'a');
+    EXPECT_TRUE(parse_key_string(&key, "C-?"));
+    EXPECT_EQ(key, MOD_CTRL | '?');
+    EXPECT_TRUE(parse_key_string(&key, "C-H"));
+    EXPECT_EQ(key, MOD_CTRL | 'h');
+    EXPECT_TRUE(parse_key_string(&key, "M-C-?"));
+    EXPECT_EQ(key, MOD_META | MOD_CTRL | '?');
+    EXPECT_TRUE(parse_key_string(&key, "M-C-H"));
+    EXPECT_EQ(key, MOD_META | MOD_CTRL | 'h');
 }
 
 static void clear_obuf(TermOutputBuffer *obuf)

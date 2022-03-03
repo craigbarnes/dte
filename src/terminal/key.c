@@ -98,8 +98,7 @@ bool parse_key_string(KeyCode *key, const char *str)
             if (modifiers & MOD_CTRL) {
                 // Convert C-A to C-a
                 ch = ascii_tolower(ch);
-            }
-            if (modifiers & MOD_META) {
+            } else if (modifiers & MOD_META) {
                 // Convert M-A to M-S-a
                 modifiers |= MOD_SHIFT;
                 ch = ascii_tolower(ch);
