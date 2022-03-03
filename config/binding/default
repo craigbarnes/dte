@@ -105,17 +105,24 @@ bind M-0 'view last'
 
 bind M-, prev
 bind M-. next
-bind M-< wprev
-bind M-> wnext
 bind M-- 'shift -- -1'
 bind M-= 'shift +1'
 bind M-\; command
-bind M-: command
 bind M-/ search
-bind M-? 'search -r'
 
+bind M-< wprev
+bind M-> wnext
+bind M-: command
+bind M-? 'search -r'
 bind M-! 'move-tab left'
 bind M-@ 'move-tab right'
+
+bind M-S-, wprev
+bind M-S-. wnext
+bind M-S-\; command
+bind M-S-/ 'search -r'
+bind M-S-1 'move-tab left'
+bind M-S-2 'move-tab right'
 
 bind F1 'run man dterc'
 bind F3 'search -n'
