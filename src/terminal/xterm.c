@@ -145,7 +145,7 @@ static KeyCode decode_key_from_final_byte(uint8_t byte)
 
 static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
 {
-    if (key > 0x20 && key < 0x80) {
+    if (u_is_ascii_upper(key)) {
         if (mods & MOD_CTRL) {
             key = ascii_tolower(key);
         }
