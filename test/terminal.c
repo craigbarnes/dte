@@ -11,7 +11,49 @@
 #include "util/debug.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
+#include "util/utf8.h"
 #include "util/xsnprintf.h"
+
+#define EXPECT_KEYCODE_EQ(idx, a, b, seq) EXPECT(keycode_eq, idx, a, b, seq)
+
+static size_t make_printable(const char *src, char *dest, size_t destsize)
+{
+    BUG_ON(destsize < 16);
+    size_t len = 0;
+    for (size_t i = 0, n = strlen(src); i < n && len < destsize - 5; ) {
+        u_set_char(dest, &len, u_get_char(src, n, &i));
+    }
+    dest[len] = '\0';
+    return len;
+}
+
+static void expect_keycode_eq (
+    const char *file,
+    int line,
+    size_t idx,
+    KeyCode a,
+    KeyCode b,
+    const char *seq
+) {
+    if (likely(a == b)) {
+        passed++;
+        return;
+    }
+
+    // Note: keycode_to_string() returns a pointer to static storage,
+    // so the generated strings must be copied if using several at the
+    // same time:
+    char a_str[32], b_str[32], seq_str[64];
+    xsnprintf(a_str, sizeof a_str, "%s", keycode_to_string(a));
+    xsnprintf(b_str, sizeof b_str, "%s", keycode_to_string(b));
+    make_printable(seq, seq_str, sizeof seq_str);
+
+    test_fail(
+        file, line,
+        "Test #%zu: key codes not equal: 0x%02x, 0x%02x (%s, %s); input: %s",
+        idx, a, b, a_str, b_str, seq_str
+    );
+}
 
 static void test_parse_term_color(void)
 {
@@ -348,7 +390,7 @@ static void test_xterm_parse_key(void)
             IEXPECT_EQ(key, 0x18);
             continue;
         }
-        IEXPECT_EQ(key, tests[i].expected_key);
+        EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq);
         // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
