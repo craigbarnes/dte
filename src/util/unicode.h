@@ -23,6 +23,11 @@ static inline bool u_is_cntrl(CodePoint u)
     return (u < 0x20) || (u >= 0x7F && u <= 0x9F);
 }
 
+static inline bool u_is_ascii_upper(CodePoint u)
+{
+    return u - 'A' < 26;
+}
+
 #ifdef SANE_WCTYPE
     #include <wctype.h>
 

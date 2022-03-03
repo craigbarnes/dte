@@ -342,6 +342,7 @@ static void test_ascii(void)
         EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
         EXPECT_EQ(ascii_isblank(i), !!isblank(i));
         EXPECT_EQ(ascii_isprint(i), !!isprint(i));
+        EXPECT_EQ(u_is_ascii_upper(i), !!isupper(i));
         EXPECT_EQ(hex_decode(i) <= 0xF, !!isxdigit(i));
         EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha(i) || i == '_');
         EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
@@ -1004,6 +1005,25 @@ static void test_u_is_upper(void)
     EXPECT_FALSE(u_is_upper(0x10ffff));
     EXPECT_FALSE(u_is_upper(0x00E0));
     EXPECT_FALSE(u_is_upper(0x00E7));
+}
+
+static void test_u_is_ascii_upper(void)
+{
+    EXPECT_TRUE(u_is_ascii_upper('A'));
+    EXPECT_TRUE(u_is_ascii_upper('Z'));
+    EXPECT_FALSE(u_is_ascii_upper('a'));
+    EXPECT_FALSE(u_is_ascii_upper('z'));
+    EXPECT_FALSE(u_is_ascii_upper('0'));
+    EXPECT_FALSE(u_is_ascii_upper('9'));
+    EXPECT_FALSE(u_is_ascii_upper('@'));
+    EXPECT_FALSE(u_is_ascii_upper('['));
+    EXPECT_FALSE(u_is_ascii_upper('{'));
+    EXPECT_FALSE(u_is_ascii_upper('\0'));
+    EXPECT_FALSE(u_is_ascii_upper('\t'));
+    EXPECT_FALSE(u_is_ascii_upper(' '));
+    EXPECT_FALSE(u_is_ascii_upper(0x7F));
+    EXPECT_FALSE(u_is_ascii_upper(0x1D440));
+    EXPECT_FALSE(u_is_ascii_upper(UNICODE_MAX_VALID_CODEPOINT));
 }
 
 static void test_u_is_cntrl(void)
@@ -2208,6 +2228,7 @@ static const TestEntry tests[] = {
     TEST(test_u_to_upper),
     TEST(test_u_is_lower),
     TEST(test_u_is_upper),
+    TEST(test_u_is_ascii_upper),
     TEST(test_u_is_cntrl),
     TEST(test_u_is_zero_width),
     TEST(test_u_is_special_whitespace),
