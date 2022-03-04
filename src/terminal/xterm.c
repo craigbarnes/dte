@@ -352,9 +352,11 @@ UNITTEST {
     n = parse_csi_params(s.data, s.length, 2, &csi);
     BUG_ON(n != s.length);
     BUG_ON(csi.nparams != 3);
+    static_assert(ARRAY_COUNT(csi.nsub) == 4);
     BUG_ON(csi.nsub[0] != 1);
     BUG_ON(csi.nsub[1] != 1);
     BUG_ON(csi.nsub[2] != 3);
+    BUG_ON(csi.nsub[3] != 0);
     BUG_ON(csi.params[0][0] != 123);
     BUG_ON(csi.params[1][0] != 9);
     BUG_ON(csi.params[2][0] != 56);
@@ -418,14 +420,31 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
     i = parse_csi_params(buf, len, i, &csi);
 
     if (unlikely(csi.final_byte == 0)) {
-        return (i >= len) ? -1 : 0;
+        BUG_ON(i < len);
+        return -1;
     }
-    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate || csi.have_subparams)) {
+    if (unlikely(csi.unhandled_bytes || csi.nr_intermediate)) {
         goto ignore;
     }
 
-    KeyCode mods = 0;
-    KeyCode key;
+    KeyCode key, mods = 0;
+    if (csi.final_byte == 'u') {
+        if (csi.nsub[0] > 3 || csi.nsub[1] > 1) {
+            goto ignore;
+        }
+        key = csi.params[0][csi.nsub[0] == 3 ? 2 : 0];
+        switch (csi.nparams) {
+        case 2:
+            goto decode_mods_and_normalize;
+        case 1:
+            goto normalize;
+        }
+        goto ignore;
+    }
+
+    if (unlikely(csi.have_subparams)) {
+        goto ignore;
+    }
 
     switch (csi.final_byte) {
     case '~':
@@ -449,15 +468,6 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             }
             *k = mods | key;
             return i;
-        }
-        goto ignore;
-    case 'u':
-        key = csi.params[0][0];
-        switch (csi.nparams) {
-        case 2:
-            goto decode_mods_and_normalize;
-        case 1:
-            goto normalize;
         }
         goto ignore;
     case 'Z':

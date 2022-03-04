@@ -18,6 +18,7 @@ typedef enum {
     TFLAG_OSC52_COPY = 0x20, // Supports OSC 52 clipboard copy operations
     TFLAG_META_ESC = 0x40, // Try to enable {meta,alt}SendsEscape modes at startup
     TFLAG_KITTY_KEYBOARD = 0x80, // Supports kitty keyboard protocol (at least mode 0b1)
+    TFLAG_ITERM2 = 0x100, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
 } TermFeatureFlags;
 
 typedef struct {

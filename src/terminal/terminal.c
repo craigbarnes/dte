@@ -14,10 +14,10 @@
 
 typedef struct {
     const char name[12];
-    uint8_t name_len;
-    uint8_t color_type; // TermColorCapabilityType
-    uint8_t ncv_attributes; // TermColor attributes (see "ncv" in terminfo(5))
-    uint8_t features; // TermFeatureFlags
+    unsigned int name_len : 4;
+    unsigned int color_type : 3; // TermColorCapabilityType
+    unsigned int ncv_attrs : 5; // TermColor attributes (see "ncv" in terminfo(5))
+    unsigned int features : 20; // TermFeatureFlags
 } TermEntry;
 
 enum {
@@ -30,6 +30,7 @@ enum {
     OSC52 = TFLAG_OSC52_COPY,
     METAESC = TFLAG_META_ESC,
     KITTYKBD = TFLAG_KITTY_KEYBOARD,
+    ITERM2 = TFLAG_ITERM2,
 };
 
 enum {
@@ -59,9 +60,9 @@ static const TermEntry terms[] = {
     {"foot", 4, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52 | KITTYKBD},
     {"hurd", 4, TERM_8_COLOR, DIM | UL, BCE},
     {"iTerm.app", 9, TERM_256_COLOR, 0, BCE},
-    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | KITTYKBD},
+    {"iTerm2.app", 10, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2},
     {"iterm", 5, TERM_256_COLOR, 0, BCE},
-    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | KITTYKBD},
+    {"iterm2", 6, TERM_256_COLOR, 0, BCE | TITLE | OSC52 | ITERM2},
     {"jfbterm", 7, TERM_8_COLOR, DIM | UL, BCE},
     {"kitty", 5, TERM_TRUE_COLOR, 0, TITLE | OSC52 | KITTYKBD},
     {"kon", 3, TERM_8_COLOR, DIM | UL, BCE},
@@ -172,7 +173,7 @@ void term_init(const char *term)
         TermFeatureFlags features = entry->features;
         terminal.features = features;
         terminal.color_type = entry->color_type;
-        terminal.ncv_attributes = entry->ncv_attributes;
+        terminal.ncv_attributes = entry->ncv_attrs;
         if (features & REP) {
             terminal.repeat_byte = ecma48_repeat_byte;
         }
@@ -220,9 +221,11 @@ void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf)
         term_add_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
     }
     if (features & KITTYKBD) {
+        term_add_literal(obuf, "\033[>5u");
+    } else if (features & ITERM2) {
         term_add_literal(obuf, "\033[>1u");
     } else {
-        // Try to use "modifyOtherKeys" mode, if kitty protocol isn't supported
+        // Try to use "modifyOtherKeys" mode
         term_add_literal(obuf, "\033[>4;1m");
     }
     term_add_strview(obuf, term->control_codes.keypad_on);
@@ -234,7 +237,7 @@ void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf)
     if (features & METAESC) {
         term_add_literal(obuf, "\033[?1036;1039r");
     }
-    if (features & KITTYKBD) {
+    if (features & (KITTYKBD | ITERM2)) {
         term_add_literal(obuf, "\033[<u");
     } else {
         term_add_literal(obuf, "\033[>4m");
