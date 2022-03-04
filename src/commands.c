@@ -387,7 +387,7 @@ static void cmd_copy(const CommandArgs *a)
         copy(&e->clipboard, view, size, line_copy);
     }
 
-    if ((clipboard || primary) && terminal.osc52_copy) {
+    if ((clipboard || primary) && terminal.features & TFLAG_OSC52_COPY) {
         if (internal) {
             view->cursor = save;
             if (view->selection) {

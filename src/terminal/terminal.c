@@ -12,31 +12,32 @@
 #include "util/debug.h"
 #include "util/str-util.h"
 
-enum FeatureFlags {
-    BCE = 0x01, // Can erase with specific background color (back color erase)
-    REP = 0x02, // Supports ECMA-48 "REP" (repeat character)
-    TITLE = 0x04, // Supports xterm control codes for setting window title
-    RXVT = 0x08, // Emits rxvt-specific sequences for some key combos (see rxvt.c)
-    LINUX = 0x10, // Emits linux-specific sequences for F1-F5 (see linux.c)
-    OSC52 = 0x20, // Supports OSC 52 clipboard operations
-    METAESC = 0x40, // Try to enable {meta,alt}SendsEscape modes at startup
-    KITTYKBD = 0x80, // Supports kitty keyboard protocol (at least mode 0b1)
-};
-
-// See terminfo(5) for the meaning of "ncv"
-enum NcvFlags {
-    UL = ATTR_UNDERLINE, // 0x02
-    REV = ATTR_REVERSE, // 0x04
-    DIM = ATTR_DIM, // 0x10
-};
-
 typedef struct {
     const char name[12];
     uint8_t name_len;
     uint8_t color_type; // TermColorCapabilityType
-    uint8_t ncv_attributes; // NcvFlags
-    uint8_t flags; // FeatureFlags
+    uint8_t ncv_attributes; // TermColor attributes (see "ncv" in terminfo(5))
+    uint8_t features; // TermFeatureFlags
 } TermEntry;
+
+enum {
+    // Short aliases for TermFeatureFlags:
+    BCE = TFLAG_BACK_COLOR_ERASE,
+    REP = TFLAG_ECMA48_REPEAT,
+    TITLE = TFLAG_SET_WINDOW_TITLE,
+    RXVT = TFLAG_RXVT,
+    LINUX = TFLAG_LINUX,
+    OSC52 = TFLAG_OSC52_COPY,
+    METAESC = TFLAG_META_ESC,
+    KITTYKBD = TFLAG_KITTY_KEYBOARD,
+};
+
+enum {
+    // Short aliases for TermColor attributes:
+    UL = ATTR_UNDERLINE,
+    REV = ATTR_REVERSE,
+    DIM = ATTR_DIM,
+};
 
 static const TermEntry terms[] = {
     {"Eterm", 5, TERM_8_COLOR, 0, BCE},
@@ -103,8 +104,6 @@ static const struct {
 };
 
 Terminal terminal = {
-    .back_color_erase = false,
-    .osc52_copy = false,
     .color_type = TERM_8_COLOR,
     .width = 80,
     .height = 24,
@@ -172,31 +171,31 @@ void term_init(const char *term)
     const TermEntry *entry = BSEARCH(&name, terms, term_name_compare);
     TermControlCodes *tcc = &terminal.control_codes;
     if (entry) {
+        TermFeatureFlags features = entry->features;
+        terminal.features = features;
         terminal.color_type = entry->color_type;
         terminal.ncv_attributes = entry->ncv_attributes;
-        terminal.back_color_erase = !!(entry->flags & BCE);
-        terminal.osc52_copy = !!(entry->flags & OSC52);
-        if (entry->flags & REP) {
+        if (features & REP) {
             terminal.repeat_byte = ecma48_repeat_byte;
         }
-        if (entry->flags & TITLE) {
+        if (features & TITLE) {
             tcc->save_title = strview_from_cstring("\033[22;2t");
             tcc->restore_title = strview_from_cstring("\033[23;2t");
             tcc->set_title_begin = strview_from_cstring("\033]2;");
             tcc->set_title_end = strview_from_cstring("\033\\");
         }
-        if (entry->flags & RXVT) {
+        if (features & RXVT) {
             terminal.parse_key_sequence = rxvt_parse_key;
-        } else if (entry->flags & LINUX) {
+        } else if (features & LINUX) {
             terminal.parse_key_sequence = linux_parse_key;
         }
-        if (entry->flags & METAESC) {
+        if (features & METAESC) {
             // 1036 = metaSendsEscape, 1039 = altSendsEscape
             // s = save, h = enable, r = restore
             string_append_literal(&tcc->init, "\033[?1036;1039s\033[?1036;1039h");
             string_append_literal(&tcc->deinit, "\033[?1036;1039r");
         }
-        if (entry->flags & KITTYKBD) {
+        if (features & KITTYKBD) {
             // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#quickstart
             string_append_literal(&tcc->init, "\033[>1u");
             string_append_literal(&tcc->deinit, "\033[<u");
@@ -207,7 +206,7 @@ void term_init(const char *term)
 
     // Try to use "modifyOtherKeys" mode, unless kitty protocol is supported
     // (see: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
-    if (!entry || !(entry->flags & KITTYKBD)) {
+    if (!entry || !(entry->features & KITTYKBD)) {
         string_append_literal(&tcc->init, "\033[>4;1m");
         string_append_literal(&tcc->deinit, "\033[>4m");
     }

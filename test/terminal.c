@@ -819,7 +819,7 @@ static void test_term_clear_eol(void)
     TermOutputBuffer obuf;
     term_output_init(&obuf);
 
-    terminal.back_color_erase = true;
+    terminal.features |= TFLAG_BACK_COLOR_ERASE;
     term_output_reset(&obuf, 0, 80, 0);
     term_clear_eol(&obuf);
     EXPECT_EQ(obuf.count, 3);
@@ -827,7 +827,7 @@ static void test_term_clear_eol(void)
     EXPECT_MEMEQ(obuf.buf, "\033[K", 3);
     clear_obuf(&obuf);
 
-    terminal.back_color_erase = false;
+    terminal.features &= ~TFLAG_BACK_COLOR_ERASE;
     term_output_reset(&obuf, 0, 80, 0);
     term_clear_eol(&obuf);
     EXPECT_EQ(obuf.count, 80);

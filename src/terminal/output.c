@@ -153,7 +153,7 @@ void term_clear_eol(TermOutputBuffer *obuf)
     }
     if (
         obuf->can_clear
-        && (obuf->color.bg < 0 || terminal.back_color_erase)
+        && (obuf->color.bg < 0 || terminal.features & TFLAG_BACK_COLOR_ERASE)
         && !(obuf->color.attr & ATTR_REVERSE)
     ) {
         term_add_literal(obuf, "\033[K");
