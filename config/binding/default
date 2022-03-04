@@ -55,30 +55,30 @@ bind C-M-S-delete 'delete-eol'
 # on the terminal, so they're both bound to "erase" by default for
 # portability. On some terminals one may be equivalent to Backspace
 # and the other Ctrl+Backspace.
-bind C-H erase
+bind C-h erase
 bind C-? erase
-bind M-C-H 'erase-word -s'
+bind M-C-h 'erase-word -s'
 bind M-C-? 'erase-word -s'
 
-bind ^C 'copy -k'
-bind ^F search
-bind ^G 'search -n'
-# ^I == Tab
-bind ^L 'command line\ '
-# ^M == Enter
-bind ^N open
-bind ^O 'command open\ '
-bind ^Q 'quit -p'
-bind ^R 'command replace\ '
-bind ^S 'save -p'
-bind ^T open
-bind ^V 'paste -c'
-bind ^W 'close -pwq'
-bind ^X cut
-bind ^Y redo
-bind ^Z undo
-bind ^] tag
-bind ^[ unselect
+bind C-c 'copy -k'
+bind C-f search
+bind C-g 'search -n'
+# C-i == Tab
+bind C-l 'command line\ '
+# C-m == Enter
+bind C-n open
+bind C-o 'command open\ '
+bind C-q 'quit -p'
+bind C-r 'command replace\ '
+bind C-s 'save -p'
+bind C-t open
+bind C-v 'paste -c'
+bind C-w 'close -pwq'
+bind C-x cut
+bind C-y redo
+bind C-z undo
+bind C-] tag
+bind C-[ unselect
 
 bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
@@ -150,19 +150,19 @@ bind -cs C-delete delete-word
 bind -cs M-delete delete-word
 bind -cs C-M-H erase-word
 bind -cs C-M-? erase-word
-bind -cs ^A bol
-bind -cs ^B left
-bind -cs ^C cancel
-bind -cs ^D delete
-bind -cs ^E eol
-bind -cs ^F right
-bind -cs ^G cancel
-bind -cs ^H erase
-bind -cs ^K delete-eol
-bind -cs ^U erase-bol
-bind -cs ^W erase-word
-bind -cs ^? erase
-bind -cs ^[ cancel
+bind -cs C-a bol
+bind -cs C-b left
+bind -cs C-c cancel
+bind -cs C-d delete
+bind -cs C-e eol
+bind -cs C-f right
+bind -cs C-g cancel
+bind -cs C-h erase
+bind -cs C-k delete-eol
+bind -cs C-u erase-bol
+bind -cs C-w erase-word
+bind -cs C-? erase
+bind -cs C-[ cancel
 bind -cs M-b word-bwd
 bind -cs M-d delete-word
 bind -cs M-f word-fwd
