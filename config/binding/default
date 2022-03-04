@@ -84,7 +84,7 @@ bind M-b bof
 bind M-c 'toggle -v case-sensitive-search'
 bind M-e eof
 bind M-f 'search -w'
-bind M-F 'search -wr'
+bind M-S-f 'search -wr'
 bind M-j wrap-paragraph
 bind M-n 'msg -n'
 bind M-p 'msg -p'
@@ -148,7 +148,7 @@ bind -cs M-left bol
 bind -cs M-right eol
 bind -cs C-delete delete-word
 bind -cs M-delete delete-word
-bind -cs C-M-H erase-word
+bind -cs C-M-h erase-word
 bind -cs C-M-? erase-word
 bind -cs C-a bol
 bind -cs C-b left
