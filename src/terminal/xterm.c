@@ -353,6 +353,7 @@ UNITTEST {
     BUG_ON(n != s.length);
     BUG_ON(csi.nparams != 3);
     static_assert(ARRAY_COUNT(csi.nsub) == 4);
+    static_assert(ARRAY_COUNT(csi.nsub) == ARRAY_COUNT(csi.params[0]));
     BUG_ON(csi.nsub[0] != 1);
     BUG_ON(csi.nsub[1] != 1);
     BUG_ON(csi.nsub[2] != 3);
@@ -362,6 +363,7 @@ UNITTEST {
     BUG_ON(csi.params[2][0] != 56);
     BUG_ON(csi.params[2][1] != 78);
     BUG_ON(csi.params[2][2] != 99);
+    BUG_ON(csi.params[3][0] != 0);
     BUG_ON(csi.nr_intermediate != 0);
     BUG_ON(csi.final_byte != 'm');
     BUG_ON(!csi.have_subparams);
