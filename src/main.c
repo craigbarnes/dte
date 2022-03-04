@@ -92,9 +92,18 @@ static void do_sigaction(int sig, const struct sigaction *action)
     }
 }
 
-// Signals not handled by this function:
-// * SIGKILL, SIGSTOP (can't be caught or ignored)
-// * SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
+/*
+ * "A program that uses these functions should be written to catch all
+ * signals and take other appropriate actions to ensure that when the
+ * program terminates, whether planned or not, the terminal device's
+ * state is restored to its original state."
+ *
+ * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
+ *
+ * Signals not handled by this function:
+ * - SIGKILL, SIGSTOP (can't be caught or ignored)
+ * - SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
+ */
 static void set_signal_handlers(void)
 {
     static const int fatal_signals[] = {
