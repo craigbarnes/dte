@@ -76,7 +76,7 @@ the [`bind`] command. In particular, key combinations are represented
 as follows:
 
 * `M-x` is Alt+x
-* `C-V` (or `^V`) is Ctrl+v
+* `C-v` (or `^V`) is Ctrl+v
 * `S-left` is Shift+left
 * `C-M-S-left` is Ctrl+Alt+Shift+left
 
@@ -95,25 +95,25 @@ are also various key combinations bound by default:
 `C-S-up`, `C-S-down`
 :   Move cursor and select whole lines
 
-`^C`
+`C-c`
 :   Copy current line or selection
 
-`^X`
+`C-x`
 :   Cut current line or selection
 
-`^V`
+`C-v`
 :   Paste
 
-`^Z`
+`C-z`
 :   Undo
 
-`^Y`
+`C-y`
 :   Redo
 
 `M-x`
 :   Enter command mode
 
-`^F`
+`C-f`
 :   Enter search mode
 
 `F3`
@@ -122,19 +122,19 @@ are also various key combinations bound by default:
 `F4`
 :   Search previous
 
-`^T`
+`C-t`
 :   Open new buffer
 
 `M-1`, `M-2` ... `M-9`
 :   Switch to buffer 1 (or 2, 3, 4, etc.)
 
-`^W`
+`C-w`
 :   Close current buffer
 
-`^S`
+`C-s`
 :   Save
 
-`^Q`
+`C-q`
 :   Quit
 
 ## Command Mode
@@ -153,31 +153,31 @@ The key bindings for command mode are:
 `tab`
 :   Auto-complete current command or argument
 
-`^A`, `home`
+`C-a`, `home`
 :   Go to beginning of command line
 
-`^B`, `left`
+`C-b`, `left`
 :   Move left
 
-`^C`, `^G`, `Esc`
+`C-c`, `C-g`, `Esc`
 :   Exit command mode
 
-`^D`, `delete`
+`C-d`, `delete`
 :   Delete
 
-`^E`, `end`
+`C-e`, `end`
 :   Go to end of command line
 
-`^F`, `right`
+`C-f`, `right`
 :   Move right
 
-`^K`, `M-delete`
+`C-k`, `M-delete`
 :   Delete to end of command line
 
-`^U`
+`C-u`
 :   Delete to beginning of command line
 
-`^W`, `M-C-?` (Alt+Backspace)
+`C-w`, `M-C-?` (Alt+Backspace)
 :   Erase word
 
 ## Search Mode

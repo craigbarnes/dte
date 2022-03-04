@@ -142,10 +142,10 @@ Special keys:
 Modifiers:
 
 Ctrl:
-:   `C-X` or `^X`
+:   `C-x` (or `^X`)
 
 Alt:
-:   `M-X`
+:   `M-x`
 
 Shift:
 :   `S-left`
