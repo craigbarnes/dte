@@ -111,8 +111,6 @@ Terminal terminal = {
     .set_color = &ecma48_set_color,
     .repeat_byte = &term_repeat_byte,
     .control_codes = {
-        .init = STRING_INIT,
-        .deinit = STRING_INIT,
         .keypad_off = STRING_VIEW("\033[?1l\033>"),
         .keypad_on = STRING_VIEW("\033[?1h\033="),
         .cup_mode_off = STRING_VIEW("\033[?1049l"),
@@ -189,26 +187,8 @@ void term_init(const char *term)
         } else if (features & LINUX) {
             terminal.parse_key_sequence = linux_parse_key;
         }
-        if (features & METAESC) {
-            // 1036 = metaSendsEscape, 1039 = altSendsEscape
-            // s = save, h = enable, r = restore
-            string_append_literal(&tcc->init, "\033[?1036;1039s\033[?1036;1039h");
-            string_append_literal(&tcc->deinit, "\033[?1036;1039r");
-        }
-        if (features & KITTYKBD) {
-            // https://sw.kovidgoyal.net/kitty/keyboard-protocol/#quickstart
-            string_append_literal(&tcc->init, "\033[>1u");
-            string_append_literal(&tcc->deinit, "\033[<u");
-        }
         const int n = (int)name.length;
         DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
-    }
-
-    // Try to use "modifyOtherKeys" mode, unless kitty protocol is supported
-    // (see: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
-    if (!entry || !(entry->features & KITTYKBD)) {
-        string_append_literal(&tcc->init, "\033[>4;1m");
-        string_append_literal(&tcc->deinit, "\033[>4m");
     }
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
@@ -233,8 +213,31 @@ void term_init(const char *term)
     }
 }
 
-void term_free(Terminal *t)
+void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf)
 {
-    string_free(&t->control_codes.init);
-    string_free(&t->control_codes.deinit);
+    TermFeatureFlags features = term->features;
+    if (features & METAESC) {
+        term_add_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
+    }
+    if (features & KITTYKBD) {
+        term_add_literal(obuf, "\033[>1u");
+    } else {
+        // Try to use "modifyOtherKeys" mode, if kitty protocol isn't supported
+        term_add_literal(obuf, "\033[>4;1m");
+    }
+    term_add_strview(obuf, term->control_codes.keypad_on);
+}
+
+void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf)
+{
+    TermFeatureFlags features = term->features;
+    if (features & METAESC) {
+        term_add_literal(obuf, "\033[?1036;1039r");
+    }
+    if (features & KITTYKBD) {
+        term_add_literal(obuf, "\033[<u");
+    } else {
+        term_add_literal(obuf, "\033[>4m");
+    }
+    term_add_strview(obuf, term->control_codes.keypad_off);
 }

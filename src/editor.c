@@ -234,7 +234,6 @@ void free_editor_state(EditorState *e)
     free_bindings(&e->bindings[INPUT_COMMAND]);
     free_bindings(&e->bindings[INPUT_SEARCH]);
 
-    term_free(&terminal);
     tag_file_free();
     free_intern_pool();
     free_macro();
@@ -398,11 +397,9 @@ void ui_start(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    const TermControlCodes *tcc = &terminal.control_codes;
     TermOutputBuffer *obuf = &editor.obuf;
-    term_add_bytes(obuf, tcc->init.buffer, tcc->init.len);
-    term_add_strview(obuf, tcc->keypad_on);
-    term_add_strview(obuf, tcc->cup_mode_on);
+    term_enable_private_modes(&terminal, obuf);
+    term_add_strview(obuf, terminal.control_codes.cup_mode_on);
     ui_resize();
 }
 
@@ -411,14 +408,12 @@ void ui_end(void)
     if (editor.status == EDITOR_INITIALIZING) {
         return;
     }
-    const TermControlCodes *tcc = &terminal.control_codes;
     TermOutputBuffer *obuf = &editor.obuf;
     term_clear_screen(obuf);
     term_move_cursor(obuf, 0, terminal.height - 1);
     term_show_cursor(obuf);
-    term_add_strview(obuf, tcc->cup_mode_off);
-    term_add_strview(obuf, tcc->keypad_off);
-    term_add_bytes(obuf, tcc->deinit.buffer, tcc->deinit.len);
+    term_add_strview(obuf, terminal.control_codes.cup_mode_off);
+    term_restore_private_modes(&terminal, obuf);
     term_output_flush(obuf);
     term_cooked();
 }

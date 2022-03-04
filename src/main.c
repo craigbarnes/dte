@@ -201,10 +201,8 @@ static ExitCode showkey_loop(void)
         return EX_IOERR;
     }
 
-    const TermControlCodes *tcc = &terminal.control_codes;
     TermOutputBuffer *obuf = &editor.obuf;
-    term_add_bytes(obuf, tcc->init.buffer, tcc->init.len);
-    term_add_strview(obuf, tcc->keypad_on);
+    term_enable_private_modes(&terminal, obuf);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -228,8 +226,7 @@ static ExitCode showkey_loop(void)
         term_output_flush(obuf);
     }
 
-    term_add_strview(obuf, tcc->keypad_off);
-    term_add_bytes(obuf, tcc->deinit.buffer, tcc->deinit.len);
+    term_restore_private_modes(&terminal, obuf);
     term_output_flush(obuf);
     term_cooked();
     return EX_OK;

@@ -8,7 +8,6 @@
 #include "output.h"
 #include "util/macros.h"
 #include "util/string-view.h"
-#include "util/string.h"
 
 typedef enum {
     TFLAG_BACK_COLOR_ERASE = 0x01, // Can erase with specific background color
@@ -22,8 +21,6 @@ typedef enum {
 } TermFeatureFlags;
 
 typedef struct {
-    String init;
-    String deinit;
     StringView keypad_off;
     StringView keypad_on;
     StringView cup_mode_off;
@@ -51,6 +48,7 @@ typedef struct {
 extern Terminal terminal;
 
 void term_init(const char *term) NONNULL_ARGS;
-void term_free(Terminal *t) NONNULL_ARGS;
+void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
+void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
 
 #endif
