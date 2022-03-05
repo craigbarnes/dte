@@ -33,7 +33,7 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
     for (size_t i = 0, n = c->error_formats.count; i < n; i++) {
         const ErrorFormat *p = c->error_formats.ptrs[i];
         regmatch_t m[ERRORFMT_CAPTURE_MAX];
-        if (!regexp_exec(&p->re, str, str_len, ARRAY_COUNT(m), m, 0)) {
+        if (!regexp_exec(&p->re, str, str_len, ARRAYLEN(m), m, 0)) {
             continue;
         }
         if (p->ignore) {
@@ -57,8 +57,8 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
                 [ERRFMT_COLUMN] = &msg->loc->column,
             };
 
-            static_assert(ARRAY_COUNT(ptrs) == 3);
-            for (size_t j = ERRFMT_LINE; j < ARRAY_COUNT(ptrs); j++) {
+            static_assert(ARRAYLEN(ptrs) == 3);
+            for (size_t j = ERRFMT_LINE; j < ARRAYLEN(ptrs); j++) {
                 int8_t ci = p->capture_index[j];
                 if (ci >= 0 && m[ci].rm_so >= 0) {
                     size_t len = m[ci].rm_eo - m[ci].rm_so;

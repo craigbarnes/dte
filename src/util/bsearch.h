@@ -11,8 +11,8 @@
 typedef int (*CompareFunction)(const void *key, const void *elem);
 typedef int (*StringCompareFunction)(const char *key, const char *elem);
 
-#define BSEARCH(key, a, cmp) bsearch(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
-#define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAY_COUNT(a), sizeof(a[0]), cmp)
+#define BSEARCH(key, a, cmp) bsearch(key, a, ARRAYLEN(a), sizeof(a[0]), cmp)
+#define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAYLEN(a), sizeof(a[0]), cmp)
 
 #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
     static_assert_offsetof(a[0], field, 0); \
@@ -20,7 +20,7 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
     static_assert_incompatible_types(a[0].field, char*); \
     static_assert_compatible_types(a[0].field[0], char); \
     check_bsearch_array ( \
-        a, #a, "." #field, ARRAY_COUNT(a), sizeof(a[0]), sizeof(a[0].field), cmp \
+        a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field), cmp \
     ); \
 } while (0)
 
@@ -28,7 +28,7 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
     static_assert_incompatible_types(a[0], const char*); \
     static_assert_incompatible_types(a[0], char*); \
     static_assert_compatible_types(a[0][0], char); \
-    check_bsearch_array(a, #a, "", ARRAY_COUNT(a), sizeof(a[0]), sizeof(a[0]), cmp); \
+    check_bsearch_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]), cmp); \
 } while (0)
 
 static inline void check_bsearch_array (

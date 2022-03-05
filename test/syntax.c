@@ -126,13 +126,13 @@ static void test_hl_line(void)
     for (size_t pos = 0; pos < line.length; i++) {
         CodePoint u = u_get_char(line.data, line.length, &pos);
         IEXPECT_EQ(u, line.data[i]);
-        if (i >= ARRAY_COUNT(expected_colors)) {
+        if (i >= ARRAYLEN(expected_colors)) {
             continue;
         }
         IEXPECT_TRUE(same_color(colors[i], expected_colors[i]));
     }
 
-    EXPECT_EQ(i, ARRAY_COUNT(expected_colors));
+    EXPECT_EQ(i, ARRAYLEN(expected_colors));
     window_close_current();
 }
 

@@ -21,7 +21,7 @@
 // The extra division on the third line is a trick to help prevent
 // passing a pointer to the first element of an array instead of a
 // reference to the array itself.
-#define ARRAY_COUNT(x) ( \
+#define ARRAYLEN(x) ( \
     (sizeof(x) / sizeof((x)[0])) \
     / ((size_t)(!(sizeof(x) % sizeof((x)[0])))) \
 )

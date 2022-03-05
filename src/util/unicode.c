@@ -4,7 +4,7 @@
 #include "ascii.h"
 #include "editor.h"
 
-#define BISEARCH(u, arr) bisearch((u), (arr), ARRAY_COUNT(arr) - 1)
+#define BISEARCH(u, arr) bisearch((u), (arr), ARRAYLEN(arr) - 1)
 
 static bool bisearch(CodePoint u, const CodepointRange *range, size_t max)
 {

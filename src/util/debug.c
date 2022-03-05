@@ -116,7 +116,7 @@ static void debug_logv(const char *file, int line, const char *fmt, va_list ap)
         return;
     }
     char buf[4096];
-    size_t write_max = ARRAY_COUNT(buf) - 1;
+    size_t write_max = ARRAYLEN(buf) - 1;
     const size_t len1 = xsnprintf(buf, write_max, "%s%s:%d:%s ", dim, file, line, sgr0);
     write_max -= len1;
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);

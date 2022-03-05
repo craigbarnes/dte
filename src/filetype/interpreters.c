@@ -65,7 +65,7 @@ static FileTypeEnum filetype_from_interpreter(const StringView name)
         return NONE;
     }
 
-    if (name.length >= ARRAY_COUNT(interpreters[0].key)) {
+    if (name.length >= ARRAYLEN(interpreters[0].key)) {
         if (strview_equal_cstring(&name, "openrc-run")) {
             return SH;
         } else if (strview_equal_cstring(&name, "runhaskell")) {

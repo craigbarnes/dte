@@ -199,7 +199,7 @@ void term_init(const char *term)
 
     while (pos < rtlen) {
         const StringView str = get_delim(real_term, &pos, rtlen, '-');
-        for (size_t i = 0; i < ARRAY_COUNT(color_suffixes); i++) {
+        for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
             size_t len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, len)) {

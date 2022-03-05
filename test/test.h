@@ -27,11 +27,11 @@ typedef struct {
 
 #define TEST_GROUP(t) { \
     .tests = t, \
-    .nr_tests = ARRAY_COUNT(t) \
+    .nr_tests = ARRAYLEN(t) \
 }
 
 #define FOR_EACH_I(i, array) \
-    for (size_t i = 0; i < ARRAY_COUNT(array); i++)
+    for (size_t i = 0; i < ARRAYLEN(array); i++)
 
 #define TEST_FAIL(...) test_fail(__FILE__, __LINE__, __VA_ARGS__)
 #define EXPECT(fn, ...) expect_##fn(__FILE__, __LINE__, __VA_ARGS__)

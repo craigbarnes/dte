@@ -134,13 +134,13 @@ static KeyCode decode_modifiers(uint32_t n)
 
 static KeyCode decode_key_from_param(uint32_t param)
 {
-    return (param < ARRAY_COUNT(param_keys)) ? param_keys[param] : 0;
+    return (param < ARRAYLEN(param_keys)) ? param_keys[param] : 0;
 }
 
 static KeyCode decode_key_from_final_byte(uint8_t byte)
 {
     byte -= 64;
-    return (byte < ARRAY_COUNT(final_byte_keys)) ? final_byte_keys[byte] : 0;
+    return (byte < ARRAYLEN(final_byte_keys)) ? final_byte_keys[byte] : 0;
 }
 
 static KeyCode normalize_extended_keycode(KeyCode mods, KeyCode key)
@@ -249,7 +249,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
             digits++;
             continue;
         case ';':
-            if (unlikely(nparams >= ARRAY_COUNT(csi->params))) {
+            if (unlikely(nparams >= ARRAYLEN(csi->params))) {
                 unhandled_bytes = true;
                 continue;
             }
@@ -260,7 +260,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
             sub = 0;
             continue;
         case ':':
-            if (unlikely(sub >= ARRAY_COUNT(csi->params[0]))) {
+            if (unlikely(sub >= ARRAYLEN(csi->params[0]))) {
                 unhandled_bytes = true;
                 continue;
             }
@@ -273,7 +273,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
 
         switch (get_byte_type(ch)) {
         case BYTE_INTERMEDIATE:
-            if (unlikely(nr_intermediate >= ARRAY_COUNT(csi->intermediate))) {
+            if (unlikely(nr_intermediate >= ARRAYLEN(csi->intermediate))) {
                 unhandled_bytes = true;
             } else {
                 csi->intermediate[nr_intermediate++] = ch;
@@ -284,8 +284,8 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
             csi->final_byte = ch;
             if (digits > 0) {
                 if (unlikely(
-                    nparams >= ARRAY_COUNT(csi->params)
-                    || sub >= ARRAY_COUNT(csi->params[0])
+                    nparams >= ARRAYLEN(csi->params)
+                    || sub >= ARRAYLEN(csi->params[0])
                 )) {
                     unhandled_bytes = true;
                 } else {
@@ -352,8 +352,8 @@ UNITTEST {
     n = parse_csi_params(s.data, s.length, 2, &csi);
     BUG_ON(n != s.length);
     BUG_ON(csi.nparams != 3);
-    static_assert(ARRAY_COUNT(csi.nsub) == 4);
-    static_assert(ARRAY_COUNT(csi.nsub) == ARRAY_COUNT(csi.params[0]));
+    static_assert(ARRAYLEN(csi.nsub) == 4);
+    static_assert(ARRAYLEN(csi.nsub) == ARRAYLEN(csi.params[0]));
     BUG_ON(csi.nsub[0] != 1);
     BUG_ON(csi.nsub[1] != 1);
     BUG_ON(csi.nsub[2] != 3);

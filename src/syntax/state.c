@@ -176,10 +176,10 @@ static void cmd_bufis(const CommandArgs *a)
     const char *str = a->args[0];
     const size_t len = strlen(str);
     Condition *c;
-    if (unlikely(len > ARRAY_COUNT(c->u.str.buf))) {
+    if (unlikely(len > ARRAYLEN(c->u.str.buf))) {
         error_msg (
             "Maximum length of string is %zu bytes",
-            ARRAY_COUNT(c->u.str.buf)
+            ARRAYLEN(c->u.str.buf)
         );
         return;
     }
@@ -436,10 +436,10 @@ static void cmd_str(const CommandArgs *a)
     Condition *c;
     size_t len = strlen(str);
 
-    if (unlikely(len > ARRAY_COUNT(c->u.str.buf))) {
+    if (unlikely(len > ARRAYLEN(c->u.str.buf))) {
         error_msg (
             "Maximum length of string is %zu bytes",
-            ARRAY_COUNT(c->u.str.buf)
+            ARRAYLEN(c->u.str.buf)
         );
         return;
     }

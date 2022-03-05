@@ -310,7 +310,7 @@ static unsigned int replace_on_line (
         re,
         buf + pos,
         line->length - pos,
-        ARRAY_COUNT(matches),
+        ARRAYLEN(matches),
         matches,
         eflags
     )) {

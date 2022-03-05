@@ -53,8 +53,8 @@ UNITTEST {
 
 EncodingType lookup_encoding(const char *name)
 {
-    static_assert(ARRAY_COUNT(encoding_names) == NR_ENCODING_TYPES - 1);
-    for (size_t i = 0; i < ARRAY_COUNT(encoding_names); i++) {
+    static_assert(ARRAYLEN(encoding_names) == NR_ENCODING_TYPES - 1);
+    for (size_t i = 0; i < ARRAYLEN(encoding_names); i++) {
         if (ascii_streq_icase(name, encoding_names[i])) {
             return (EncodingType) i;
         }
@@ -124,8 +124,8 @@ EncodingType detect_encoding_from_bom(const unsigned char *buf, size_t size)
 
 const ByteOrderMark *get_bom_for_encoding(EncodingType encoding)
 {
-    static_assert(ARRAY_COUNT(boms) == NR_ENCODING_TYPES);
-    BUG_ON(encoding >= ARRAY_COUNT(boms));
+    static_assert(ARRAYLEN(boms) == NR_ENCODING_TYPES);
+    BUG_ON(encoding >= ARRAYLEN(boms));
     const ByteOrderMark *bom = &boms[encoding];
     return bom->len ? bom : NULL;
 }

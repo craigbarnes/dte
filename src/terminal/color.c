@@ -43,7 +43,7 @@ static const char color_names[][16] = {
 
 static unsigned int lookup_attr(const char *s)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (streq(s, attr_names[i])) {
             return 1U << i;
         }
@@ -56,7 +56,7 @@ static unsigned int lookup_attr(const char *s)
 
 static int32_t lookup_color(const char *s)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(color_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(color_names); i++) {
         if (streq(s, color_names[i])) {
             return i - 2;
         }
@@ -219,7 +219,7 @@ ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs)
             // Invalid color or attribute
             return i;
         }
-        if (nr_colors == ARRAY_COUNT(colors)) {
+        if (nr_colors == ARRAYLEN(colors)) {
             if (likely(c == COLOR_KEEP)) {
                 // "keep" is also a valid attribute
                 attrs |= ATTR_KEEP;
@@ -276,7 +276,7 @@ UNITTEST {
 
     static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
     size_t count = 0;
-    for (size_t i = 1; i < ARRAY_COUNT(color_stops); i++) {
+    for (size_t i = 1; i < ARRAYLEN(color_stops); i++) {
         uint8_t min = color_stops[i - 1];
         uint8_t max = color_stops[i];
         uint8_t mid = min + ((max - min) / 2);
@@ -288,7 +288,7 @@ UNITTEST {
             }
         }
     }
-    BUG_ON(count != 255 + ARRAY_COUNT(color_stops) - 1);
+    BUG_ON(count != 255 + ARRAYLEN(color_stops) - 1);
 }
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
@@ -422,12 +422,12 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optim
 
 void collect_colors_and_attributes(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 1; i < ARRAY_COUNT(color_names); i++) {
+    for (size_t i = 1; i < ARRAYLEN(color_names); i++) {
         if (str_has_prefix(color_names[i], prefix)) {
             ptr_array_append(a, xstrdup(color_names[i]));
         }
     }
-    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (str_has_prefix(attr_names[i], prefix)) {
             ptr_array_append(a, xstrdup(attr_names[i]));
         }
@@ -467,7 +467,7 @@ const char *term_color_to_string(const TermColor *color)
         buf[pos++] = ' ';
         pos += append_color(buf + pos, color->bg);
     }
-    for (size_t i = 0; i < ARRAY_COUNT(attr_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {
         if (color->attr & (1U << i)) {
             size_t len = strlen(attr_names[i]);
             BUG_ON(pos + len + 2 >= sizeof(buf));

@@ -481,9 +481,9 @@ UNITTEST {
     LocalOptions lopts = {.filetype = NULL};
 
     // Check offset alignments
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        BUG_ON(desc->type >= ARRAY_COUNT(alignments));
+        BUG_ON(desc->type >= ARRAYLEN(alignments));
         size_t alignment = alignments[desc->type];
         if (desc->global) {
             uintptr_t ptr_val = (uintptr_t)global_ptr(desc, &gopts);
@@ -732,7 +732,7 @@ bool validate_local_options(char **strs)
 
 void collect_options(PointerArray *a, const char *prefix, bool local, bool global)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if ((local && !desc->local) || (global && !desc->global)) {
             continue;
@@ -746,7 +746,7 @@ void collect_options(PointerArray *a, const char *prefix, bool local, bool globa
 // Collect options that can be set via the "option" command
 void collect_auto_options(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (!desc->local || desc->on_change == filetype_changed) {
             continue;
@@ -759,7 +759,7 @@ void collect_auto_options(PointerArray *a, const char *prefix)
 
 void collect_toggleable_options(PointerArray *a, const char *prefix, bool global)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         if (global && !desc->global) {
             continue;
@@ -840,7 +840,7 @@ static void append_option(String *s, const OptionDesc *desc, void *ptr)
 String dump_options(void)
 {
     String buf = string_new(4096);
-    for (size_t i = 0; i < ARRAY_COUNT(option_desc); i++) {
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
         void *local = desc->local ? local_ptr(desc, &editor.buffer->options) : NULL;
         void *global = desc->global ? global_ptr(desc, &editor.options) : NULL;

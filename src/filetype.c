@@ -300,7 +300,7 @@ bool is_ft(const PointerArray *filetypes, const char *name)
 
 void collect_ft(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_filetype_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(builtin_filetype_names); i++) {
         const char *name = builtin_filetype_names[i];
         if (str_has_prefix(name, prefix)) {
             ptr_array_append(a, xstrdup(name));
@@ -333,7 +333,7 @@ String dump_filetypes(const PointerArray *filetypes)
     String s = string_new(4096);
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
-        BUG_ON(ft->type >= ARRAY_COUNT(flags));
+        BUG_ON(ft->type >= ARRAYLEN(flags));
         string_append_literal(&s, "ft ");
         string_append_cstring(&s, flags[ft->type]);
         if (unlikely(ft->name[0] == '-')) {

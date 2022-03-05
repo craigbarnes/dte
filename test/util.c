@@ -36,16 +36,16 @@ static void test_util_macros(void)
     EXPECT_EQ(STRLEN("a"), 1);
     EXPECT_EQ(STRLEN("123456789"), 9);
 
-    EXPECT_EQ(ARRAY_COUNT(""), 1);
-    EXPECT_EQ(ARRAY_COUNT("a"), 2);
-    EXPECT_EQ(ARRAY_COUNT("123456789"), 10);
+    EXPECT_EQ(ARRAYLEN(""), 1);
+    EXPECT_EQ(ARRAYLEN("a"), 2);
+    EXPECT_EQ(ARRAYLEN("123456789"), 10);
 
     const UNUSED char a2[] = {1, 2};
     const UNUSED int a3[] = {1, 2, 3};
     const UNUSED long long a4[] = {1, 2, 3, 4};
-    EXPECT_EQ(ARRAY_COUNT(a2), 2);
-    EXPECT_EQ(ARRAY_COUNT(a3), 3);
-    EXPECT_EQ(ARRAY_COUNT(a4), 4);
+    EXPECT_EQ(ARRAYLEN(a2), 2);
+    EXPECT_EQ(ARRAYLEN(a3), 3);
+    EXPECT_EQ(ARRAYLEN(a4), 4);
 
     EXPECT_EQ(MIN(0, 1), 0);
     EXPECT_EQ(MIN(99, 100), 99);
@@ -583,8 +583,8 @@ static void test_get_delim(void)
 {
     static const char input[] = "-x-y-foo--bar--";
     static const char parts[][4] = {"", "x", "y", "foo", "", "bar", "", ""};
-    const size_t nparts = ARRAY_COUNT(parts);
-    const size_t part_size = ARRAY_COUNT(parts[0]);
+    const size_t nparts = ARRAYLEN(parts);
+    const size_t part_size = ARRAYLEN(parts[0]);
 
     size_t idx = 0;
     for (size_t pos = 0, len = sizeof(input) - 1; pos < len; idx++) {
@@ -1509,7 +1509,7 @@ static void test_hashmap(void)
     };
 
     HashMap map;
-    hashmap_init(&map, ARRAY_COUNT(strings));
+    hashmap_init(&map, ARRAYLEN(strings));
     ASSERT_NONNULL(map.entries);
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);
@@ -1650,14 +1650,14 @@ static void test_hashset(void)
     };
 
     HashSet set;
-    hashset_init(&set, ARRAY_COUNT(strings), false);
+    hashset_init(&set, ARRAYLEN(strings), false);
     EXPECT_EQ(set.nr_entries, 0);
     EXPECT_NULL(hashset_get(&set, "foo", 3));
     FOR_EACH_I(i, strings) {
         hashset_add(&set, strings[i], strlen(strings[i]));
     }
 
-    EXPECT_EQ(set.nr_entries, ARRAY_COUNT(strings));
+    EXPECT_EQ(set.nr_entries, ARRAYLEN(strings));
     EXPECT_NONNULL(hashset_get(&set, "\t\xff\x80\b", 4));
     EXPECT_NONNULL(hashset_get(&set, "foo", 3));
     EXPECT_NONNULL(hashset_get(&set, "Foo", 3));
@@ -1667,7 +1667,7 @@ static void test_hashset(void)
     EXPECT_NULL(hashset_get(&set, NULL, 0));
     EXPECT_NULL(hashset_get(&set, "\0", 1));
 
-    const char *last_string = strings[ARRAY_COUNT(strings) - 1];
+    const char *last_string = strings[ARRAYLEN(strings) - 1];
     EXPECT_NONNULL(hashset_get(&set, last_string, strlen(last_string)));
 
     FOR_EACH_I(i, strings) {
@@ -2081,7 +2081,7 @@ static void test_mem_intern(void)
 {
     const char *ptrs[256];
     char str[8];
-    for (size_t i = 0; i < ARRAY_COUNT(ptrs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(ptrs); i++) {
         size_t len = xsnprintf(str, sizeof str, "%zu", i);
         ptrs[i] = mem_intern(str, len);
     }
@@ -2091,7 +2091,7 @@ static void test_mem_intern(void)
     EXPECT_STREQ(ptrs[101], "101");
     EXPECT_STREQ(ptrs[255], "255");
 
-    for (size_t i = 0; i < ARRAY_COUNT(ptrs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(ptrs); i++) {
         size_t len = xsnprintf(str, sizeof str, "%zu", i);
         const char *ptr = mem_intern(str, len);
         EXPECT_PTREQ(ptr, ptrs[i]);

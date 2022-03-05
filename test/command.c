@@ -385,7 +385,7 @@ static void test_cached_command_new(void)
         "alias", // Too few arguments
     };
 
-    for (size_t i = 0; i < ARRAY_COUNT(uncacheable); i++) {
+    for (size_t i = 0; i < ARRAYLEN(uncacheable); i++) {
         cc = cached_command_new(cmds, uncacheable[i]);
         ASSERT_NONNULL(cc);
         EXPECT_NULL(cc->cmd);
@@ -501,10 +501,10 @@ static void test_cmdargs_convert_flags(void)
         .flag_set = cmdargs_flagset_value('c') | cmdargs_flagset_value('g')
     };
 
-    ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAY_COUNT(map), 0);
+    ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map), 0);
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL);
 
-    flags = cmdargs_convert_flags(&a, map, ARRAY_COUNT(map), REPLACE_BASIC);
+    flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map), REPLACE_BASIC);
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL | REPLACE_BASIC);
 }
 

@@ -72,7 +72,7 @@ void ecma48_set_color(TermOutputBuffer *obuf, const TermColor *color)
 
     term_add_literal(obuf, "\033[0");
 
-    for (size_t i = 0; i < ARRAY_COUNT(attr_map); i++) {
+    for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
         if (attr_is_set(color, attr_map[i].attr)) {
             term_add_byte(obuf, ';');
             term_add_byte(obuf, attr_map[i].code);

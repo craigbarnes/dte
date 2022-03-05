@@ -141,22 +141,22 @@ static void set_signal_handlers(void)
 
     struct sigaction action = {.sa_handler = handle_fatal_signal};
     sigfillset(&action.sa_mask);
-    for (size_t i = 0; i < ARRAY_COUNT(fatal_signals); i++) {
+    for (size_t i = 0; i < ARRAYLEN(fatal_signals); i++) {
         do_sigaction(fatal_signals[i], &action);
     }
 
     action.sa_handler = SIG_IGN;
-    for (size_t i = 0; i < ARRAY_COUNT(ignored_signals); i++) {
+    for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
         do_sigaction(ignored_signals[i], &action);
     }
 
     action.sa_handler = SIG_DFL;
-    for (size_t i = 0; i < ARRAY_COUNT(default_signals); i++) {
+    for (size_t i = 0; i < ARRAYLEN(default_signals); i++) {
         do_sigaction(default_signals[i], &action);
     }
 
     sigemptyset(&action.sa_mask);
-    for (size_t i = 0; i < ARRAY_COUNT(handled_signals); i++) {
+    for (size_t i = 0; i < ARRAYLEN(handled_signals); i++) {
         action.sa_handler = handled_signals[i].handler;
         do_sigaction(handled_signals[i].signum, &action);
     }

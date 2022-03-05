@@ -96,7 +96,7 @@ static FileTypeEnum filetype_from_basename(StringView name)
         return NONE;
     }
 
-    if (name.length >= ARRAY_COUNT(basenames[0].name)) {
+    if (name.length >= ARRAYLEN(basenames[0].name)) {
         if (strview_equal_cstring(&name, "meson_options.txt")) {
             return MESON;
         }

@@ -74,10 +74,10 @@ void regexp_init_word_boundary_tokens(void)
         {"\\b", "\\b"},
     };
 
-    BUG_ON(ARRAY_COUNT(text) <= match_end);
+    BUG_ON(ARRAYLEN(text) <= match_end);
     BUG_ON(!mem_equal(text + match_start - 1, " foo ", 5));
 
-    for (size_t i = 0; i < ARRAY_COUNT(pairs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(pairs); i++) {
         const char *start = pairs[i].start;
         const char *end = pairs[i].end;
         char patt[32];
@@ -87,7 +87,7 @@ void regexp_init_word_boundary_tokens(void)
             continue;
         }
         regmatch_t m[2];
-        bool match = !regexec(&re, text, ARRAY_COUNT(m), m, 0);
+        bool match = !regexec(&re, text, ARRAYLEN(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
             DEBUG_LOG("regexp word boundary tokens detected: %s %s", start, end);

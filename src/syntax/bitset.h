@@ -9,7 +9,7 @@
 #define BITSET_WORD_BITS (sizeof(BitSetWord) * CHAR_BIT)
 #define BITSET_BIT_MASK (BITSET_WORD_BITS - 1)
 #define BITSET_NR_WORDS(bits) (((bits) + BITSET_WORD_BITS - 1) / BITSET_WORD_BITS)
-#define BITSET_INVERT(set) bitset_invert(set, ARRAY_COUNT(set))
+#define BITSET_INVERT(set) bitset_invert(set, ARRAYLEN(set))
 
 typedef unsigned long BitSetWord;
 

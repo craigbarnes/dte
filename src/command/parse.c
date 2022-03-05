@@ -265,6 +265,6 @@ const char *command_parse_error_to_string(CommandParseError err)
         [CMDERR_UNEXPECTED_EOF] = "unexpected EOF",
     };
     BUG_ON(err <= CMDERR_NONE);
-    BUG_ON(err >= ARRAY_COUNT(error_strings));
+    BUG_ON(err >= ARRAYLEN(error_strings));
     return error_strings[err];
 }

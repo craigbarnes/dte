@@ -36,7 +36,7 @@ static TermColor *find_real_color(ColorScheme *colors, const char *name)
 {
     ssize_t idx = BSEARCH_IDX(name, builtin_color_names, (CompareFunction)strcmp);
     if (idx >= 0) {
-        BUG_ON(idx >= ARRAY_COUNT(builtin_color_names));
+        BUG_ON(idx >= ARRAYLEN(builtin_color_names));
         return &colors->builtin[(BuiltinColorEnum)idx];
     }
 

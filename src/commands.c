@@ -166,16 +166,16 @@ static void cmd_bind(const CommandArgs *a)
     };
 
     EditorState *e = a->userdata;
-    static_assert(ARRAY_COUNT(modes) == ARRAY_COUNT(e->bindings));
+    static_assert(ARRAYLEN(modes) == ARRAYLEN(e->bindings));
 
     if (likely(cmd)) {
-        for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
+        for (InputMode mode = 0; mode < ARRAYLEN(modes); mode++) {
             if (modes[mode]) {
                 add_binding(&e->bindings[mode], key, cmd);
             }
         }
     } else {
-        for (InputMode mode = 0; mode < ARRAY_COUNT(modes); mode++) {
+        for (InputMode mode = 0; mode < ARRAYLEN(modes); mode++) {
             if (modes[mode]) {
                 remove_binding(&e->bindings[mode], key);
             }
@@ -347,7 +347,7 @@ static void cmd_compile(const CommandArgs *a)
         return;
     }
 
-    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
+    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
     clear_messages(&e->messages);
     spawn_compiler(a->args + 1, flags, c, &e->messages);
     if (e->messages.array.count) {
@@ -856,7 +856,7 @@ static void cmd_macro(const CommandArgs *a)
         {"run", macro_play},
     };
     const char *action = a->args[0];
-    for (size_t i = 0; i < ARRAY_COUNT(actions); i++) {
+    for (size_t i = 0; i < ARRAYLEN(actions); i++) {
         if (streq(action, actions[i].name)) {
             actions[i].handler();
             return;
@@ -1519,7 +1519,7 @@ static void cmd_replace(const CommandArgs *a)
     };
 
     EditorState *e = a->userdata;
-    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0);
+    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
     reg_replace(e, a->args[0], a->args[1], flags);
 }
 
@@ -1539,7 +1539,7 @@ static void cmd_run(const CommandArgs *a)
 
     SpawnContext ctx = {
         .argv = a->args,
-        .flags = cmdargs_convert_flags(a, map, ARRAY_COUNT(map), 0),
+        .flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0),
     };
     spawn(&ctx);
 }
@@ -2473,7 +2473,7 @@ static bool allow_macro_recording(const Command *cmd, char **args, void *userdat
     static void (*non_recordable[])(const CommandArgs *args) = {
         cmd_macro, cmd_command, cmd_exec_open, cmd_exec_tag,
     };
-    for (size_t i = 0; i < ARRAY_COUNT(non_recordable); i++) {
+    for (size_t i = 0; i < ARRAYLEN(non_recordable); i++) {
         if (cmd->cmd == non_recordable[i]) {
             return false;
         }
@@ -2513,7 +2513,7 @@ CommandSet normal_commands = {
 
 void collect_normal_commands(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+    for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
         const Command *c = &cmds[i];
         if (str_has_prefix(c->name, prefix)) {
             ptr_array_append(a, xstrdup(c->name));
@@ -2524,10 +2524,10 @@ void collect_normal_commands(PointerArray *a, const char *prefix)
 UNITTEST {
     CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
 
-    for (size_t i = 0, n = ARRAY_COUNT(cmds); i < n; i++) {
+    for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
         // Check that flags arrays is null-terminated within bounds
         const char *const flags = cmds[i].flags;
-        BUG_ON(flags[ARRAY_COUNT(cmds[0].flags) - 1] != '\0');
+        BUG_ON(flags[ARRAYLEN(cmds[0].flags) - 1] != '\0');
 
         // Count number of real flags (i.e. not including '-' or '=')
         size_t nr_real_flags = 0;
@@ -2543,6 +2543,6 @@ UNITTEST {
         // Check that max. number of real flags fits in CommandArgs::flags
         // array (and also leaves 1 byte for null-terminator)
         CommandArgs a;
-        BUG_ON(nr_real_flags >= ARRAY_COUNT(a.flags));
+        BUG_ON(nr_real_flags >= ARRAYLEN(a.flags));
     }
 }

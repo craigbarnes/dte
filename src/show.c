@@ -337,9 +337,9 @@ String dump_bindings(EditorState *e)
         [INPUT_SEARCH] = "-s ",
     };
 
-    static_assert(ARRAY_COUNT(flags) == ARRAY_COUNT(e->bindings));
+    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->bindings));
     String buf = string_new(4096);
-    for (InputMode i = 0, n = ARRAY_COUNT(e->bindings); i < n; i++) {
+    for (InputMode i = 0, n = ARRAYLEN(e->bindings); i < n; i++) {
         if (dump_binding_group(&e->bindings[i], flags[i], &buf) && i != n - 1) {
             string_append_byte(&buf, '\n');
         }
@@ -440,7 +440,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
 
 void collect_show_subcommands(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
+    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
         if (str_has_prefix(handlers[i].name, prefix)) {
             ptr_array_append(a, xstrdup(handlers[i].name));
         }

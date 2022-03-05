@@ -73,7 +73,7 @@ static const BuiltinVar normal_vars[] = {
 bool expand_normal_var(const char *name, char **value, void *userdata)
 {
     const EditorState *e = userdata;
-    for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
+    for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
         if (streq(name, normal_vars[i].name)) {
             *value = normal_vars[i].expand(e);
             return true;
@@ -94,7 +94,7 @@ bool expand_syntax_var(const char *name, char **value, void *userdata)
 
 void collect_normal_vars(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(normal_vars); i++) {
+    for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
         const char *name = normal_vars[i].name;
         if (str_has_prefix(name, prefix)) {
             ptr_array_append(a, xstrdup(name));

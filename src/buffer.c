@@ -366,7 +366,7 @@ static bool detect_indent(Buffer *b)
     }
 
     size_t m = 0;
-    for (size_t i = 1; i < ARRAY_COUNT(counts); i++) {
+    for (size_t i = 1; i < ARRAYLEN(counts); i++) {
         unsigned int bit = 1u << (i - 1);
         if ((b->options.detect_indent & bit) && counts[i] > counts[m]) {
             m = i;

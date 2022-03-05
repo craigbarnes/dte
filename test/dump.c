@@ -35,7 +35,7 @@ static void test_dump_handlers(void)
     void *ud = cmds->userdata;
     ASSERT_NONNULL(ud);
 
-    for (size_t i = 0; i < ARRAY_COUNT(handlers); i++) {
+    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
         String str = handlers[i].dump(&editor);
         size_t pos = 0;
         while (pos < str.len) {

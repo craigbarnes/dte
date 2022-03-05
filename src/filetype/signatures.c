@@ -29,7 +29,7 @@ static FileTypeEnum filetype_from_signature(const StringView line)
         return HTML;
     }
 
-    for (size_t i = 0; i < ARRAY_COUNT(signatures); i++) {
+    for (size_t i = 0; i < ARRAYLEN(signatures); i++) {
         if (strview_has_prefix(&line, signatures[i].bytes)) {
             return signatures[i].filetype;
         }

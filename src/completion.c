@@ -240,7 +240,7 @@ static void complete_macro(CompletionState *cs, const CommandArgs *a)
         return;
     }
 
-    for (size_t i = 0; i < ARRAY_COUNT(verbs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(verbs); i++) {
         if (str_has_prefix(verbs[i], cs->parsed)) {
             ptr_array_append(&cs->completions, xstrdup(verbs[i]));
         }
@@ -254,7 +254,7 @@ static void complete_move_tab(CompletionState *cs, const CommandArgs *a)
     }
 
     static const char words[][8] = {"left", "right"};
-    for (size_t i = 0; i < ARRAY_COUNT(words); i++) {
+    for (size_t i = 0; i < ARRAYLEN(words); i++) {
         if (str_has_prefix(words[i], cs->parsed)) {
             ptr_array_append(&cs->completions, xstrdup(words[i]));
         }

@@ -9,10 +9,10 @@ static const struct {
 };
 
 UNITTEST {
-    for (size_t i = 0; i < ARRAY_COUNT(prefixes); i++) {
+    for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
         const char *dir = prefixes[i].dir;
         BUG_ON(dir[0] != '/');
-        BUG_ON(dir[ARRAY_COUNT(prefixes[0].dir) - 1] != '\0');
+        BUG_ON(dir[ARRAYLEN(prefixes[0].dir) - 1] != '\0');
         BUG_ON(dir[strlen(dir) - 1] != '/');
         BUG_ON(prefixes[i].filetype >= NR_BUILTIN_FILETYPES);
     }
@@ -20,7 +20,7 @@ UNITTEST {
 
 static FileTypeEnum filetype_from_dir_prefix(StringView path)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(prefixes); i++) {
+    for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
         if (strview_has_prefix(&path, prefixes[i].dir)) {
             return prefixes[i].filetype;
         }

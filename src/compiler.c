@@ -49,7 +49,7 @@ void add_error_fmt (
     };
 
     size_t max_idx = 0;
-    for (size_t i = 0, j = 0, n = ARRAY_COUNT(capture_names); desc[i]; i++) {
+    for (size_t i = 0, j = 0, n = ARRAYLEN(capture_names); desc[i]; i++) {
         BUG_ON(i >= ERRORFMT_CAPTURE_MAX);
         if (streq(desc[i], "_")) {
             continue;
@@ -108,7 +108,7 @@ void collect_compilers(PointerArray *a, const char *prefix)
 
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(capture_names); i++) {
+    for (size_t i = 0; i < ARRAYLEN(capture_names); i++) {
         if (str_has_prefix(capture_names[i], prefix)) {
             ptr_array_append(a, xstrdup(capture_names[i]));
         }
@@ -133,14 +133,14 @@ void dump_compiler(const Compiler *c, const char *name, String *s)
         string_append_byte(s, ' ');
         string_append_escaped_arg(s, e->pattern, true);
 
-        static_assert(ARRAY_COUNT(e->capture_index) == 4);
+        static_assert(ARRAYLEN(e->capture_index) == 4);
         const int8_t *a = e->capture_index;
         int max_idx = MAX4(a[0], a[1], a[2], a[3]);
         BUG_ON(max_idx > ERRORFMT_CAPTURE_MAX);
 
         for (int j = 1; j <= max_idx; j++) {
             const char *capname = "_";
-            for (size_t k = 0; k < ARRAY_COUNT(capture_names); k++) {
+            for (size_t k = 0; k < ARRAYLEN(capture_names); k++) {
                 if (j == a[k]) {
                     capname = capture_names[k];
                     break;

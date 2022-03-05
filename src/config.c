@@ -68,7 +68,7 @@ void exec_config(const CommandSet *cmds, StringView config)
 String dump_builtin_configs(void)
 {
     String str = string_new(1024);
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
         string_append_cstring(&str, builtin_configs[i].name);
         string_append_byte(&str, '\n');
     }
@@ -77,7 +77,7 @@ String dump_builtin_configs(void)
 
 void collect_builtin_configs(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
         const BuiltinConfig *cfg = &builtin_configs[i];
         if (str_has_prefix(cfg->name, "syntax/")) {
             return;
@@ -89,7 +89,7 @@ void collect_builtin_configs(PointerArray *a, const char *prefix)
 
 const BuiltinConfig *get_builtin_config(const char *name)
 {
-    for (size_t i = 0; i < ARRAY_COUNT(builtin_configs); i++) {
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
         if (streq(name, builtin_configs[i].name)) {
             return &builtin_configs[i];
         }
@@ -99,7 +99,7 @@ const BuiltinConfig *get_builtin_config(const char *name)
 
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
 {
-    *nconfigs = ARRAY_COUNT(builtin_configs);
+    *nconfigs = ARRAYLEN(builtin_configs);
     return &builtin_configs[0];
 }
 

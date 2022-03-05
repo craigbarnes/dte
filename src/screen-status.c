@@ -148,7 +148,7 @@ static void add_misc_status(Formatter *f)
 
     if (editor.input_mode == INPUT_SEARCH) {
         SearchCaseSensitivity css = editor.options.case_sensitive_search;
-        BUG_ON(css >= ARRAY_COUNT(css_strs));
+        BUG_ON(css >= ARRAYLEN(css_strs));
         add_status_bytes(f, css_strs[css].str, css_strs[css].len);
         return;
     }
@@ -178,7 +178,7 @@ static void add_misc_status(Formatter *f)
 
 static FormatSpecifierType lookup_format_specifier(unsigned char ch)
 {
-    if (unlikely(ch >= ARRAY_COUNT(format_specifiers))) {
+    if (unlikely(ch >= ARRAYLEN(format_specifiers))) {
         return STATUS_INVALID;
     }
     return format_specifiers[ch];
@@ -310,7 +310,7 @@ UNITTEST {
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
     char fmt[4] = "%%";
-    for (unsigned char i = 0; i < ARRAY_COUNT(format_specifiers); i++) {
+    for (unsigned char i = 0; i < ARRAYLEN(format_specifiers); i++) {
         FormatSpecifierType type =  format_specifiers[i];
         if (type == STATUS_INVALID) {
             continue;

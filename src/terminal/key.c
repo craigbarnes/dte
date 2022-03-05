@@ -108,14 +108,14 @@ bool parse_key_string(KeyCode *key, const char *str)
         return true;
     }
 
-    for (size_t j = 0; j < ARRAY_COUNT(other_keys); j++) {
+    for (size_t j = 0; j < ARRAYLEN(other_keys); j++) {
         if (ascii_streq_icase(str, other_keys[j].name)) {
             *key = modifiers | other_keys[j].key;
             return true;
         }
     }
 
-    static_assert(ARRAY_COUNT(special_names) == NR_SPECIAL_KEYS);
+    static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
     for (i = 0; i < NR_SPECIAL_KEYS; i++) {
         if (ascii_streq_icase(str, special_names[i])) {
             *key = modifiers | (KEY_SPECIAL_MIN + i);
@@ -145,7 +145,7 @@ const char *keycode_to_string(KeyCode k)
 
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
-        for (size_t j = 0; j < ARRAY_COUNT(other_keys); j++) {
+        for (size_t j = 0; j < ARRAYLEN(other_keys); j++) {
             if (key == other_keys[j].key) {
                 memcpy(buf + i, other_keys[j].name, sizeof(other_keys[0].name));
                 return buf;

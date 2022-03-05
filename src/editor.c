@@ -142,7 +142,7 @@ static void set_and_check_locale(void)
 
     static const char fallbacks[][12] = {"C.UTF-8", "en_US.UTF-8"};
     const char *fallback = NULL;
-    for (size_t i = 0; i < ARRAY_COUNT(fallbacks) && !fallback; i++) {
+    for (size_t i = 0; i < ARRAYLEN(fallbacks) && !fallback; i++) {
         fallback = setlocale(LC_CTYPE, fallbacks[i]);
     }
     if (fallback) {
