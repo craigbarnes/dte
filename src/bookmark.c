@@ -82,6 +82,13 @@ static bool file_location_return(const FileLocation *loc)
     return true;
 }
 
+void file_location_free(FileLocation *loc)
+{
+    free(loc->filename);
+    free(loc->pattern);
+    free(loc);
+}
+
 void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
 {
     const size_t max_entries = 256;
@@ -103,11 +110,4 @@ void bookmark_pop(PointerArray *bookmarks)
         file_location_free(loc);
     }
     bookmarks->count = count;
-}
-
-void file_location_free(FileLocation *loc)
-{
-    free(loc->filename);
-    free(loc->pattern);
-    free(loc);
 }
