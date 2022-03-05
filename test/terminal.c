@@ -14,14 +14,14 @@
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
-#define EXPECT_KEYCODE_EQ(idx, a, b, seq) EXPECT(keycode_eq, idx, a, b, seq)
+#define EXPECT_KEYCODE_EQ(idx, a, b, seq, seq_len) EXPECT(keycode_eq, idx, a, b, seq, seq_len)
 
-static size_t make_printable(const char *src, char *dest, size_t destsize)
+static size_t make_printable(const char *src, size_t src_len, char *dest, size_t destsize)
 {
     BUG_ON(destsize < 16);
     size_t len = 0;
-    for (size_t i = 0, n = strlen(src); i < n && len < destsize - 5; ) {
-        u_set_char(dest, &len, u_get_char(src, n, &i));
+    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
+        u_set_char(dest, &len, u_get_char(src, src_len, &i));
     }
     dest[len] = '\0';
     return len;
@@ -33,7 +33,8 @@ static void expect_keycode_eq (
     size_t idx,
     KeyCode a,
     KeyCode b,
-    const char *seq
+    const char *seq,
+    size_t seq_len
 ) {
     if (likely(a == b)) {
         passed++;
@@ -46,7 +47,7 @@ static void expect_keycode_eq (
     char a_str[32], b_str[32], seq_str[64];
     xsnprintf(a_str, sizeof a_str, "%s", keycode_to_string(a));
     xsnprintf(b_str, sizeof b_str, "%s", keycode_to_string(b));
-    make_printable(seq, seq_str, sizeof seq_str);
+    make_printable(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
         file, line,
@@ -390,7 +391,7 @@ static void test_xterm_parse_key(void)
             IEXPECT_EQ(key, 0x18);
             continue;
         }
-        EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq);
+        EXPECT_KEYCODE_EQ(i, key, tests[i].expected_key, seq, seq_length);
         // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
@@ -489,8 +490,9 @@ static void test_xterm_parse_key_combo(void)
                 EXPECT_EQ(key, KEY_IGNORE);
                 continue;
             }
+            KeyCode expected_key = modifiers[j].mask | templates[i].key;
             IEXPECT_EQ(parsed_length, seq_length);
-            EXPECT_KEYCODE_EQ(i, key, modifiers[j].mask | templates[i].key, seq);
+            EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
             // Truncated
             key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
@@ -501,11 +503,9 @@ static void test_xterm_parse_key_combo(void)
             // Overlength
             key = 26;
             seq[seq_length++] = '~';
-            ASSERT_TRUE(seq_length < sizeof(seq));
-            seq[seq_length] = '\0'; // null-terminate; for EXPECT_KEYCODE_EQ()
             parsed_length = xterm_parse_key(seq, seq_length, &key);
             IEXPECT_EQ(parsed_length, seq_length - 1);
-            EXPECT_KEYCODE_EQ(i, key, modifiers[j].mask | templates[i].key, seq);
+            EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
         }
     }
 }
