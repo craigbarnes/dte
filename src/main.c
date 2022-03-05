@@ -111,6 +111,9 @@ static void set_signal_handlers(void)
         SIGSYS, SIGTRAP, SIGXCPU, SIGXFSZ,
         SIGALRM, SIGVTALRM,
         SIGHUP, SIGTERM,
+#ifdef SIGEMT
+        SIGEMT,
+#endif
     };
 
     static const int ignored_signals[] = {
