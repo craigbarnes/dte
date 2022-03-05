@@ -35,7 +35,7 @@ static void test_detect_encoding_from_bom(void)
 
 static void test_lookup_encoding(void)
 {
-    static const struct lookup_encoding_test {
+    static const struct {
         EncodingType encoding;
         const char *name;
     } tests[] = {

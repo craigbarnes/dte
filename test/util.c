@@ -1837,7 +1837,7 @@ static void test_path_dirname_and_path_basename(void)
 
 static void test_path_relative(void)
 {
-    static const struct rel_test {
+    static const struct {
         const char *cwd;
         const char *path;
         const char *result;

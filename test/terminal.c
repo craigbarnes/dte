@@ -220,7 +220,7 @@ static void test_term_color_to_string(void)
 
 static void test_xterm_parse_key(void)
 {
-    static const struct xterm_key_test {
+    static const struct {
         const char *escape_sequence;
         ssize_t expected_length;
         KeyCode expected_key;
@@ -641,7 +641,7 @@ static void test_linux_parse_key(void)
 
 static void test_keycode_to_string(void)
 {
-    static const struct keycode_to_string_test {
+    static const struct {
         const char *str;
         KeyCode key;
     } tests[] = {
