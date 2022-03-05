@@ -359,6 +359,7 @@ static void cmd_command_mode_accept(const CommandArgs *a)
         history_add(&e->command_history, str);
     }
 
+    current_command = NULL;
     handle_command(&normal_commands, str, true);
 }
 
@@ -400,6 +401,7 @@ static void cmd_search_mode_accept(const CommandArgs *a)
         args[0] = "-n";
     }
 
+    current_command = NULL;
     search_next(e);
     macro_command_hook("search", (char**)args);
     cmdline_clear(c);
