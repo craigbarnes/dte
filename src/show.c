@@ -20,6 +20,7 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
+#include "move.h"
 #include "msg.h"
 #include "options.h"
 #include "syntax/color.h"
@@ -36,19 +37,35 @@
 
 extern char **environ;
 
+typedef enum {
+    DTERC = 0x1, // Use "dte" filetype (and syntax highlighter)
+    LASTLINE = 0x2, // Move cursor to last line (e.g. most recent history entry)
+} ShowHandlerFlags;
+
+typedef struct {
+    const char name[11];
+    uint8_t flags; // ShowHandlerFlags
+    void (*show)(EditorState *e, const char *name, bool cmdline);
+    String (*dump)(EditorState *e);
+    void (*complete_arg)(PointerArray *a, const char *prefix);
+} ShowHandler;
+
 static void open_temporary_buffer (
     const char *text,
     size_t text_len,
     const char *cmd,
     const char *cmd_arg,
-    bool dterc_syntax
+    ShowHandlerFlags flags
 ) {
     View *v = window_open_new_file(editor.window);
     v->buffer->temporary = true;
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
-    if (dterc_syntax) {
+    if (flags & LASTLINE) {
+        move_eof(v);
+    }
+    if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(&editor.file_options, v->buffer);
         buffer_update_syntax(v->buffer);
@@ -379,28 +396,20 @@ static String do_dump_macro(EditorState* UNUSED_ARG(e))
     return dump_macro();
 }
 
-typedef struct {
-    const char name[11];
-    bool dumps_dterc_syntax;
-    void (*show)(EditorState *e, const char *name, bool cmdline);
-    String (*dump)(EditorState *e);
-    void (*complete_arg)(PointerArray *a, const char *prefix);
-} ShowHandler;
-
 static const ShowHandler handlers[] = {
-    {"alias", true, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
-    {"bind", true, show_binding, dump_bindings, collect_bound_keys},
-    {"color", true, show_color, do_dump_hl_colors, collect_hl_colors},
-    {"command", true, NULL, dump_command_history, NULL},
-    {"env", false, show_env, dump_env, collect_env},
-    {"errorfmt", true, show_compiler, dump_compilers, collect_compilers},
-    {"ft", true, NULL, do_dump_filetypes, NULL},
-    {"include", false, show_include, do_dump_builtin_configs, collect_builtin_configs},
-    {"macro", true, NULL, do_dump_macro, NULL},
-    {"msg", false, NULL, do_dump_messages, NULL},
-    {"option", true, show_option, do_dump_options, collect_all_options},
-    {"search", false, NULL, dump_search_history, NULL},
-    {"wsplit", false, show_wsplit, dump_frames, NULL},
+    {"alias", DTERC, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
+    {"bind", DTERC, show_binding, dump_bindings, collect_bound_keys},
+    {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
+    {"command", DTERC | LASTLINE, NULL, dump_command_history, NULL},
+    {"env", 0, show_env, dump_env, collect_env},
+    {"errorfmt", DTERC, show_compiler, dump_compilers, collect_compilers},
+    {"ft", DTERC, NULL, do_dump_filetypes, NULL},
+    {"include", 0, show_include, do_dump_builtin_configs, collect_builtin_configs},
+    {"macro", DTERC, NULL, do_dump_macro, NULL},
+    {"msg", 0, NULL, do_dump_messages, NULL},
+    {"option", DTERC, show_option, do_dump_options, collect_all_options},
+    {"search", LASTLINE, NULL, dump_search_history, NULL},
+    {"wsplit", 0, show_wsplit, dump_frames, NULL},
 };
 
 UNITTEST {
@@ -425,8 +434,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
     }
 
     String str = handler->dump(e);
-    bool dte_syntax = handler->dumps_dterc_syntax;
-    open_temporary_buffer(str.buffer, str.len, "show", type, dte_syntax);
+    open_temporary_buffer(str.buffer, str.len, "show", type, handler->flags);
     string_free(&str);
 }
 
