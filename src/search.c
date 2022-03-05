@@ -213,26 +213,24 @@ static void do_search_next(EditorState *e, bool skip)
         if (do_search_fwd(view, regex, &bi, true)) {
             return;
         }
-
         block_iter_bof(&bi);
         if (do_search_fwd(view, regex, &bi, false)) {
             info_msg("Continuing at top");
-        } else {
-            error_msg("Pattern '%s' not found", search->pattern);
+            return;
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
         if (do_search_bwd(view, regex, &bi, cursor_x, skip)) {
             return;
         }
-
         block_iter_eof(&bi);
         if (do_search_bwd(view, regex, &bi, -1, false)) {
             info_msg("Continuing at bottom");
-        } else {
-            error_msg("Pattern '%s' not found", search->pattern);
+            return;
         }
     }
+
+    error_msg("Pattern '%s' not found", search->pattern);
 }
 
 void search_prev(EditorState *e)
