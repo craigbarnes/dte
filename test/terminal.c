@@ -626,45 +626,33 @@ static void test_rxvt_parse_key(void)
 
 static void test_linux_parse_key(void)
 {
-    KeyCode key;
-    ssize_t n = linux_parse_key(STRN("\033[[A"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_F1);
+    static const struct {
+        char seq[6];
+        uint8_t seq_length;
+        int8_t expected_length;
+        KeyCode expected_key;
+    } tests[] = {
+        {STRN("\033[1;5A"), 6, MOD_CTRL | KEY_UP},
+        {STRN("\033[[A"), 4, KEY_F1},
+        {STRN("\033[[B"), 4, KEY_F2},
+        {STRN("\033[[C"), 4, KEY_F3},
+        {STRN("\033[[D"), 4, KEY_F4},
+        {STRN("\033[[E"), 4, KEY_F5},
+        {STRN("\033[[F"), 0, 0},
+        {STRN("\033[["), -1, 0},
+        {STRN("\033["), -1, 0},
+        {STRN("\033"), -1, 0},
+    };
 
-    n = linux_parse_key(STRN("\033[[B"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_F2);
-
-    n = linux_parse_key(STRN("\033[[C"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_F3);
-
-    n = linux_parse_key(STRN("\033[[D"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_F4);
-
-    n = linux_parse_key(STRN("\033[[E"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_F5);
-
-    key = 0x18;
-    n = linux_parse_key(STRN("\033"), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 0x18);
-    n = linux_parse_key(STRN("\033["), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 0x18);
-    n = linux_parse_key(STRN("\033[["), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 0x18);
-    n = linux_parse_key(STRN("\033[[F"), &key);
-    EXPECT_EQ(n, 0);
-    EXPECT_EQ(key, 0x18);
-
-    // Check that linux_parse_key() falls back to xterm_parse_key()
-    n = linux_parse_key(STRN("\033[1;5A"), &key);
-    EXPECT_EQ(n, 6);
-    EXPECT_EQ(key, MOD_CTRL | KEY_UP);
+    FOR_EACH_I(i, tests) {
+        const char *seq = tests[i].seq;
+        const size_t seq_length = tests[i].seq_length;
+        KeyCode key = 0x18;
+        ssize_t parsed_length = linux_parse_key(seq, seq_length, &key);
+        KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
+        IEXPECT_EQ(parsed_length, tests[i].expected_length);
+        EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+    }
 }
 
 static void test_keycode_to_string(void)
