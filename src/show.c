@@ -20,7 +20,6 @@
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
-#include "move.h"
 #include "msg.h"
 #include "options.h"
 #include "syntax/color.h"
@@ -63,7 +62,8 @@ static void open_temporary_buffer (
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
     if (flags & LASTLINE) {
-        move_eof(v);
+        block_iter_eof(&v->cursor);
+        block_iter_prev_line(&v->cursor);
     }
     if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
