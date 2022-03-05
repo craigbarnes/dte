@@ -573,55 +573,39 @@ static void test_rxvt_parse_key(void)
         }
     }
 
-    KeyCode key;
-    ssize_t n = rxvt_parse_key(STRN("\033Oa"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_CTRL | KEY_UP);
-    n = rxvt_parse_key(STRN("\033Ob"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_CTRL | KEY_DOWN);
-    n = rxvt_parse_key(STRN("\033Oc"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_CTRL | KEY_RIGHT);
-    n = rxvt_parse_key(STRN("\033Od"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_CTRL | KEY_LEFT);
-    key = 25;
-    n = rxvt_parse_key(STRN("\033O"), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 25);
+    static const struct {
+        char seq[6];
+        uint8_t seq_length;
+        int8_t expected_length;
+        KeyCode expected_key;
+    } tests[] = {
+        {STRN("\033Oa"), 3, MOD_CTRL | KEY_UP},
+        {STRN("\033Ob"), 3, MOD_CTRL | KEY_DOWN},
+        {STRN("\033Oc"), 3, MOD_CTRL | KEY_RIGHT},
+        {STRN("\033Od"), 3, MOD_CTRL | KEY_LEFT},
+        {STRN("\033O"), -1, 0},
+        {STRN("\033[a"), 3, MOD_SHIFT | KEY_UP},
+        {STRN("\033[b"), 3, MOD_SHIFT | KEY_DOWN},
+        {STRN("\033[c"), 3, MOD_SHIFT | KEY_RIGHT},
+        {STRN("\033[d"), 3, MOD_SHIFT | KEY_LEFT},
+        {STRN("\033["), -1, 0},
+        {STRN("\033[1;5A"), 6, MOD_CTRL | KEY_UP},
+        {STRN("\033[1;5"), -1, 0},
+        {STRN("\033\033[@"), 4, KEY_IGNORE},
+        {STRN("\033\033["), -1, 0},
+        {STRN("\033\033"), -1, 0},
+        {STRN("\033"), -1, 0},
+    };
 
-    n = rxvt_parse_key(STRN("\033[a"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_SHIFT | KEY_UP);
-    n = rxvt_parse_key(STRN("\033[b"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_SHIFT | KEY_DOWN);
-    n = rxvt_parse_key(STRN("\033[c"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_SHIFT | KEY_RIGHT);
-    n = rxvt_parse_key(STRN("\033[d"), &key);
-    EXPECT_EQ(n, 3);
-    EXPECT_EQ(key, MOD_SHIFT | KEY_LEFT);
-    key = 25;
-    n = rxvt_parse_key(STRN("\033["), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 25);
-
-    // Check that rxvt_parse_key() falls back to xterm_parse_key()
-    n = rxvt_parse_key(STRN("\033[1;5A"), &key);
-    EXPECT_EQ(n, 6);
-    EXPECT_EQ(key, MOD_CTRL | KEY_UP);
-
-    key = 25;
-    n = rxvt_parse_key(STRN("\033\033["), &key);
-    EXPECT_EQ(n, -1);
-    EXPECT_EQ(key, 25);
-
-    key = 25;
-    n = rxvt_parse_key(STRN("\033\033[@"), &key);
-    EXPECT_EQ(n, 4);
-    EXPECT_EQ(key, KEY_IGNORE);
+    FOR_EACH_I(i, tests) {
+        const char *seq = tests[i].seq;
+        const size_t seq_length = tests[i].seq_length;
+        KeyCode key = 0x18;
+        ssize_t parsed_length = rxvt_parse_key(seq, seq_length, &key);
+        KeyCode expected_key = (parsed_length > 0) ? tests[i].expected_key : 0x18;
+        IEXPECT_EQ(parsed_length, tests[i].expected_length);
+        EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
+    }
 }
 
 static void test_linux_parse_key(void)
