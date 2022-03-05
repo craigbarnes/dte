@@ -489,8 +489,8 @@ static void test_xterm_parse_key_combo(void)
                 EXPECT_EQ(key, KEY_IGNORE);
                 continue;
             }
-            EXPECT_EQ(parsed_length, seq_length);
-            EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
+            IEXPECT_EQ(parsed_length, seq_length);
+            EXPECT_KEYCODE_EQ(i, key, modifiers[j].mask | templates[i].key, seq);
             // Truncated
             key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
@@ -500,10 +500,12 @@ static void test_xterm_parse_key_combo(void)
             }
             // Overlength
             key = 26;
-            seq[seq_length] = '~';
-            parsed_length = xterm_parse_key(seq, seq_length + 1, &key);
-            EXPECT_EQ(parsed_length, seq_length);
-            EXPECT_EQ(key, modifiers[j].mask | templates[i].key);
+            seq[seq_length++] = '~';
+            ASSERT_TRUE(seq_length < sizeof(seq));
+            seq[seq_length] = '\0'; // null-terminate; for EXPECT_KEYCODE_EQ()
+            parsed_length = xterm_parse_key(seq, seq_length, &key);
+            IEXPECT_EQ(parsed_length, seq_length - 1);
+            EXPECT_KEYCODE_EQ(i, key, modifiers[j].mask | templates[i].key, seq);
         }
     }
 }
