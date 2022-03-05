@@ -129,12 +129,9 @@ static int term_name_compare(const void *key, const void *elem)
 {
     const StringView *prefix = key;
     const TermEntry *entry = elem;
-    size_t cmplen = MIN(prefix->length, (size_t)entry->name_len);
-    int res = memcmp(prefix->data, entry->name, cmplen);
-    if (res == 0) {
-        return (int)prefix->length - (int)entry->name_len;
-    }
-    return res;
+    size_t cmplen = MIN(prefix->length, entry->name_len);
+    int r = memcmp(prefix->data, entry->name, cmplen);
+    return r ? r : (int)prefix->length - entry->name_len;
 }
 
 UNITTEST {
