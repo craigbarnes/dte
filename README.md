@@ -12,9 +12,10 @@ Features
 * Syntax highlighting
 * Customizable color schemes
 * Customizable key bindings
-* Support for all xterm Ctrl/Alt/Shift key codes
 * Command language with auto-completion
 * Unicode 14 compatible text rendering
+* Support for all xterm key combos (including [`modifyOtherKeys`])
+* Support for [kitty's keyboard protocol]
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to compiler error
@@ -109,6 +110,8 @@ Public License version 2 for more details.
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
 [`GNUmakefile`]: https://gitlab.com/craigbarnes/dte/blob/master/GNUmakefile
+[`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+[kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 [Debian]: https://packages.debian.org/bullseye/editors/dte
