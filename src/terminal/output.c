@@ -213,7 +213,8 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
         if (!ascii_iscntrl(u)) {
             obuf->x++;
         } else if (u == '\t' && obuf->tab != TAB_CONTROL) {
-            obuf->x += (obuf->x + obuf->tab_width) / obuf->tab_width * obuf->tab_width - obuf->x;
+            size_t tw = obuf->tab_width;
+            obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
         } else {
             // Control
             obuf->x += 2;
