@@ -55,7 +55,7 @@ terminal_objects := $(call prefix-obj, build/terminal/, \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \
-    bind block block-iter buffer change cmdline commands \
+    bind block block-iter bookmark buffer change cmdline commands \
     convert compiler completion config copy ctags edit editor \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp \
