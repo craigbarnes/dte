@@ -82,27 +82,27 @@ static bool file_location_return(const FileLocation *loc)
     return true;
 }
 
-void push_file_location(PointerArray *locations, FileLocation *loc)
+void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
 {
     const size_t max_entries = 256;
-    if (locations->count == max_entries) {
-        file_location_free(ptr_array_remove_idx(locations, 0));
+    if (bookmarks->count == max_entries) {
+        file_location_free(ptr_array_remove_idx(bookmarks, 0));
     }
-    BUG_ON(locations->count >= max_entries);
-    ptr_array_append(locations, loc);
+    BUG_ON(bookmarks->count >= max_entries);
+    ptr_array_append(bookmarks, loc);
 }
 
-void pop_file_location(PointerArray *locations)
+void bookmark_pop(PointerArray *bookmarks)
 {
-    void **ptrs = locations->ptrs;
-    size_t count = locations->count;
+    void **ptrs = bookmarks->ptrs;
+    size_t count = bookmarks->count;
     bool go = true;
     while (count > 0 && go) {
         FileLocation *loc = ptrs[--count];
         go = !file_location_return(loc);
         file_location_free(loc);
     }
-    locations->count = count;
+    bookmarks->count = count;
 }
 
 void file_location_free(FileLocation *loc)

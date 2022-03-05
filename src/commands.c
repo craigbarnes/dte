@@ -221,11 +221,11 @@ static void cmd_bookmark(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     if (has_flag(a, 'r')) {
-        pop_file_location(&e->bookmarks);
+        bookmark_pop(&e->bookmarks);
         return;
     }
 
-    push_file_location(&e->bookmarks, get_current_file_location(e->view));
+    bookmark_push(&e->bookmarks, get_current_file_location(e->view));
 }
 
 static void cmd_case(const CommandArgs *a)
@@ -2045,7 +2045,7 @@ static void cmd_tag(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     if (has_flag(a, 'r')) {
-        pop_file_location(&e->bookmarks);
+        bookmark_pop(&e->bookmarks);
         return;
     }
 

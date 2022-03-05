@@ -20,9 +20,10 @@ typedef struct {
 } FileLocation;
 
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
-void file_location_free(FileLocation *loc);
-void push_file_location(PointerArray *locations, FileLocation *loc);
-void pop_file_location(PointerArray *locations);
 bool file_location_go(const FileLocation *loc);
+void file_location_free(FileLocation *loc);
+
+void bookmark_push(PointerArray *bookmarks, FileLocation *loc);
+void bookmark_pop(PointerArray *bookmarks);
 
 #endif

@@ -90,7 +90,7 @@ void activate_current_message_save(const MessageArray *arr, PointerArray *file_l
     // Save position if file changed or cursor moved
     view = editor.view;
     if (view->cursor.blk != save.blk || view->cursor.offset != save.offset) {
-        push_file_location(file_locations, loc);
+        bookmark_push(file_locations, loc);
     } else {
         file_location_free(loc);
     }
