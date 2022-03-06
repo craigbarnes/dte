@@ -1,5 +1,4 @@
 #include "screen.h"
-#include "editor.h"
 #include "selection.h"
 #include "syntax/highlight.h"
 #include "terminal/terminal.h"

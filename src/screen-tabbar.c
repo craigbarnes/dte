@@ -1,5 +1,4 @@
 #include "screen.h"
-#include "editor.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/strtonum.h"

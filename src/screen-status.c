@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include "screen.h"
-#include "editor.h"
 #include "selection.h"
 #include "util/debug.h"
 #include "util/str-util.h"

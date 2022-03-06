@@ -1,6 +1,5 @@
 #include <string.h>
 #include "screen.h"
-#include "editor.h"
 #include "frame.h"
 #include "terminal/ecma48.h"
 #include "terminal/terminal.h"
@@ -124,14 +123,13 @@ void update_line_numbers(Terminal *term, Window *win, bool force)
     }
 }
 
-void update_window_sizes(void)
+void update_window_sizes(EditorState *e)
 {
-    const Terminal *term = &editor.terminal;
-    set_frame_size(editor.root_frame, term->width, term->height - 1);
+    set_frame_size(e->root_frame, e->terminal.width, e->terminal.height - 1);
     update_window_coordinates();
 }
 
-void update_screen_size(void)
+void update_screen_size(EditorState *e)
 {
     unsigned int width, height;
     if (!term_get_size(&width, &height)) {
@@ -140,8 +138,8 @@ void update_screen_size(void)
 
     // TODO: remove minimum width/height and instead make update_screen()
     // do something sensible when the terminal dimensions are tiny.
-    editor.terminal.width = MAX(width, 3);
-    editor.terminal.height = MAX(height, 3);
+    e->terminal.width = MAX(width, 3);
+    e->terminal.height = MAX(height, 3);
 
-    update_window_sizes();
+    update_window_sizes(e);
 }

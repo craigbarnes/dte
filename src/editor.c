@@ -347,7 +347,7 @@ static void end_update(EditorState *e)
 
 static void update_all_windows(EditorState *e)
 {
-    update_window_sizes();
+    update_window_sizes(e);
     frame_for_each_window(e->root_frame, update_window_full, e);
     update_separators(&e->terminal);
 }
@@ -407,7 +407,7 @@ static void ui_resize(EditorState *e)
         return;
     }
     e->resized = false;
-    update_screen_size();
+    update_screen_size(e);
     normal_update(e);
 }
 
