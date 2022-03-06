@@ -11,21 +11,9 @@
 #include "util/debug.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
-#include "util/utf8.h"
 #include "util/xsnprintf.h"
 
 #define EXPECT_KEYCODE_EQ(idx, a, b, seq, seq_len) EXPECT(keycode_eq, idx, a, b, seq, seq_len)
-
-static size_t make_printable(const char *src, size_t src_len, char *dest, size_t destsize)
-{
-    BUG_ON(destsize < 16);
-    size_t len = 0;
-    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
-        u_set_char(dest, &len, u_get_char(src, src_len, &i));
-    }
-    dest[len] = '\0';
-    return len;
-}
 
 static void expect_keycode_eq (
     const char *file,
@@ -47,7 +35,7 @@ static void expect_keycode_eq (
     char a_str[32], b_str[32], seq_str[64];
     xsnprintf(a_str, sizeof a_str, "%s", keycode_to_string(a));
     xsnprintf(b_str, sizeof b_str, "%s", keycode_to_string(b));
-    make_printable(seq, seq_len, seq_str, sizeof seq_str);
+    make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
         file, line,

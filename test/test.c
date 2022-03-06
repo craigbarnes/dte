@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "test.h"
 #include "util/str-util.h"
+#include "util/utf8.h"
 
 unsigned int passed, failed;
 
@@ -15,13 +16,24 @@ static void abort_if_false(bool cond)
     }
 }
 
-static bool make_printable(const char **s1, const char **s2, bool cond)
+static bool make_printable_str(const char **s1, const char **s2, bool cond)
 {
     if (unlikely(!cond)) {
         *s1 = *s1 ? *s1 : "(null)";
         *s2 = *s2 ? *s2 : "(null)";
     }
     return cond;
+}
+
+size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize)
+{
+    BUG_ON(destsize < 16);
+    size_t len = 0;
+    for (size_t i = 0; i < src_len && len < destsize - 5; ) {
+        u_set_char(dest, &len, u_get_char(src, src_len, &i));
+    }
+    dest[len] = '\0';
+    return len;
 }
 
 void test_fail(const char *file, int line, const char *format, ...)
@@ -38,7 +50,7 @@ void test_fail(const char *file, int line, const char *format, ...)
 
 void expect_streq(const char *file, int line, const char *s1, const char *s2)
 {
-    bool cond = make_printable(&s1, &s2, xstreq(s1, s2));
+    bool cond = make_printable_str(&s1, &s2, xstreq(s1, s2));
     expect(cond, file, line, "Strings not equal: '%s', '%s'", s1, s2);
 }
 
@@ -49,7 +61,14 @@ void expect_ptreq(const char *file, int line, const void *p1, const void *p2)
 
 void expect_memeq(const char *file, int line, const void *m1, const void *m2, size_t len)
 {
-    expect(mem_equal(m1, m2, len), file, line, "Bytes not equal");
+    if (mem_equal(m1, m2, len)) {
+        passed++;
+        return;
+    }
+    char buf1[256], buf2[256];
+    make_printable_mem(m1, len, buf1, sizeof buf1);
+    make_printable_mem(m2, len, buf2, sizeof buf2);
+    test_fail(file, line, "Bytes not equal:  %s  %s", buf1, buf2);
 }
 
 void expect_eq(const char *file, int line, intmax_t a, intmax_t b)
@@ -84,7 +103,7 @@ void expect_nonnull(const char *file, int line, const void *ptr)
 
 void iexpect_streq(const char *f, int l, size_t i, const char *a, const char *b)
 {
-    bool cond = make_printable(&a, &b, xstreq(a, b));
+    bool cond = make_printable_str(&a, &b, xstreq(a, b));
     expect(cond, f, l, "Test #%zu: strings not equal: '%s', '%s'", ++i, a, b);
 }
 

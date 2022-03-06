@@ -72,5 +72,6 @@ void assert_ptreq(const char *file, int line, const void *p1, const void *p2);
 void assert_eq(const char *file, int line, intmax_t a, intmax_t b);
 void assert_true(const char *file, int line, bool x);
 void assert_nonnull(const char *file, int line, const void *ptr);
+size_t make_printable_mem(const char *src, size_t src_len, char *dest, size_t destsize) NONNULL_ARGS;
 
 #endif
