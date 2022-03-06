@@ -2031,13 +2031,13 @@ static void cmd_suspend(const CommandArgs *a)
         !e->child_controls_terminal
         && e->status != EDITOR_INITIALIZING
     ) {
-        ui_end();
+        ui_end(e);
     }
     int r = kill(0, SIGSTOP);
     if (unlikely(r != 0)) {
         perror_msg("kill");
         term_raw();
-        ui_start();
+        ui_start(e);
     }
 }
 

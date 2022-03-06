@@ -40,7 +40,7 @@ static void handle_sigcont(int UNUSED_ARG(signum))
     ) {
         int saved_errno = errno;
         term_raw();
-        ui_start();
+        ui_start(&editor);
         errno = saved_errno;
     }
 }
@@ -56,7 +56,7 @@ static void term_cleanup(void)
 {
     set_fatal_error_cleanup_handler(NULL);
     if (!editor.child_controls_terminal) {
-        ui_end();
+        ui_end(&editor);
     }
 }
 
@@ -488,7 +488,7 @@ loop_break:
     }
 
     set_view(&editor, window->views.ptrs[0]);
-    ui_start();
+    ui_start(&editor);
 
     if (command) {
         handle_command(&normal_commands, command, false);
@@ -518,13 +518,13 @@ loop_break:
     }
 
     if (command || tag) {
-        normal_update();
+        normal_update(&editor);
     }
 
-    main_loop();
+    main_loop(&editor);
 
     term_restore_title(&editor.obuf);
-    ui_end();
+    ui_end(&editor);
     term_output_flush(&editor.obuf);
 
     // Unlock files and add files to file history

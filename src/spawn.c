@@ -192,7 +192,7 @@ static void yield_terminal(bool quiet)
         term_raw_isig();
     } else {
         editor.child_controls_terminal = true;
-        ui_end();
+        ui_end(&editor);
     }
 }
 
@@ -203,7 +203,7 @@ static void resume_terminal(bool quiet, bool prompt)
         if (prompt) {
             any_key();
         }
-        ui_start();
+        ui_start(&editor);
         editor.child_controls_terminal = false;
     }
 }

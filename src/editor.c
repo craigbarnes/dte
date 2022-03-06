@@ -242,11 +242,10 @@ void free_editor_state(EditorState *e)
     free((void*)editor.user_config_dir);
 }
 
-static void sanity_check(void)
+static void sanity_check(const View *v)
 {
 #if DEBUG >= 1
-    View *v = editor.window->view;
-    Block *blk;
+    const Block *blk;
     block_for_each(blk, &v->buffer->blocks) {
         if (blk == v->cursor.blk) {
             BUG_ON(v->cursor.offset > v->cursor.blk->size);
@@ -254,6 +253,8 @@ static void sanity_check(void)
         }
     }
     BUG("cursor not seen");
+#else
+    (void)v;
 #endif
 }
 
@@ -271,43 +272,44 @@ void any_key(void)
 
 static void update_window_full(Window *w, void *ud)
 {
-    TermOutputBuffer *obuf = ud;
+    EditorState *e = ud;
+    TermOutputBuffer *obuf = &e->obuf;
     View *v = w->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v);
     print_tabbar(obuf, w);
-    if (editor.options.show_line_numbers) {
+    if (e->options.show_line_numbers) {
         update_line_numbers(obuf, w, true);
     }
     update_range(obuf, v, v->vy, v->vy + w->edit_h);
     update_status_line(obuf, w);
 }
 
-static void restore_cursor(TermOutputBuffer *obuf)
+static void restore_cursor(EditorState *e)
 {
-    const Window *window = editor.window;
-    const View *view = editor.view;
-    switch (editor.input_mode) {
+    const Window *window = e->window;
+    const View *view = e->view;
+    switch (e->input_mode) {
     case INPUT_NORMAL:
         term_move_cursor (
-            obuf,
+            &e->obuf,
             window->edit_x + view->cx_display - view->vx,
             window->edit_y + view->cy - view->vy
         );
         break;
     case INPUT_COMMAND:
     case INPUT_SEARCH:
-        term_move_cursor(obuf, editor.cmdline_x, terminal.height - 1);
+        term_move_cursor(&e->obuf, e->cmdline_x, terminal.height - 1);
         break;
     default:
         BUG("unhandled input mode");
     }
 }
 
-static void start_update(void)
+static void start_update(EditorState *e)
 {
-    term_hide_cursor(&editor.obuf);
+    term_hide_cursor(&e->obuf);
 }
 
 static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
@@ -315,50 +317,50 @@ static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
     w->update_tabbar = false;
 }
 
-static void end_update(void)
+static void end_update(EditorState *e)
 {
-    restore_cursor(&editor.obuf);
-    term_show_cursor(&editor.obuf);
-    term_output_flush(&editor.obuf);
+    restore_cursor(e);
+    term_show_cursor(&e->obuf);
+    term_output_flush(&e->obuf);
 
-    editor.buffer->changed_line_min = LONG_MAX;
-    editor.buffer->changed_line_max = -1;
-    frame_for_each_window(editor.root_frame, clear_update_tabbar, NULL);
+    e->buffer->changed_line_min = LONG_MAX;
+    e->buffer->changed_line_max = -1;
+    frame_for_each_window(e->root_frame, clear_update_tabbar, NULL);
 }
 
-static void update_all_windows(void)
+static void update_all_windows(EditorState *e)
 {
     update_window_sizes();
-    frame_for_each_window(editor.root_frame, update_window_full, &editor.obuf);
-    update_separators(&editor.obuf);
+    frame_for_each_window(e->root_frame, update_window_full, e);
+    update_separators(&e->obuf);
 }
 
-static void update_window(Window *w)
+static void update_window(EditorState *e, Window *w)
 {
     if (w->update_tabbar) {
-        print_tabbar(&editor.obuf, w);
+        print_tabbar(&e->obuf, w);
     }
 
     View *v = w->view;
-    if (editor.options.show_line_numbers) {
+    if (e->options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        update_line_numbers(&editor.obuf, w, v->buffer->changed_line_max == LONG_MAX);
+        update_line_numbers(&e->obuf, w, v->buffer->changed_line_max == LONG_MAX);
     }
 
     long y1 = MAX(v->buffer->changed_line_min, v->vy);
     long y2 = MIN(v->buffer->changed_line_max, v->vy + w->edit_h - 1);
-    update_range(&editor.obuf, v, y1, y2 + 1);
-    update_status_line(&editor.obuf, w);
+    update_range(&e->obuf, v, y1, y2 + 1);
+    update_status_line(&e->obuf, w);
 }
 
 // Update all visible views containing this buffer
-static void update_buffer_windows(const Buffer *b)
+static void update_buffer_windows(EditorState *e, const Buffer *b)
 {
     for (size_t i = 0, n = b->views.count; i < n; i++) {
         View *v = b->views.ptrs[i];
         if (v->window->view == v) {
             // Visible view
-            if (v != editor.window->view) {
+            if (v != e->window->view) {
                 // Restore cursor
                 v->cursor.blk = BLOCK(v->buffer->blocks.next);
                 block_iter_goto_offset(&v->cursor, v->saved_cursor_offset);
@@ -368,47 +370,47 @@ static void update_buffer_windows(const Buffer *b)
                 view_update_cursor_y(v);
                 view_update(v);
             }
-            update_window(v->window);
+            update_window(e, v->window);
         }
     }
 }
 
-void normal_update(void)
+void normal_update(EditorState *e)
 {
-    start_update();
-    update_term_title(&editor.obuf, editor.buffer);
-    update_all_windows();
-    update_command_line(&editor.obuf);
-    end_update();
+    start_update(e);
+    update_term_title(&e->obuf, e->buffer);
+    update_all_windows(e);
+    update_command_line(&e->obuf);
+    end_update(e);
 }
 
-static void ui_resize(void)
+static void ui_resize(EditorState *e)
 {
-    if (editor.status == EDITOR_INITIALIZING) {
+    if (e->status == EDITOR_INITIALIZING) {
         return;
     }
-    editor.resized = false;
+    e->resized = false;
     update_screen_size();
-    normal_update();
+    normal_update(e);
 }
 
-void ui_start(void)
+void ui_start(EditorState *e)
 {
-    if (editor.status == EDITOR_INITIALIZING) {
+    if (e->status == EDITOR_INITIALIZING) {
         return;
     }
-    TermOutputBuffer *obuf = &editor.obuf;
+    TermOutputBuffer *obuf = &e->obuf;
     term_enable_private_modes(&terminal, obuf);
     term_add_strview(obuf, terminal.control_codes.cup_mode_on);
-    ui_resize();
+    ui_resize(e);
 }
 
-void ui_end(void)
+void ui_end(EditorState *e)
 {
-    if (editor.status == EDITOR_INITIALIZING) {
+    if (e->status == EDITOR_INITIALIZING) {
         return;
     }
-    TermOutputBuffer *obuf = &editor.obuf;
+    TermOutputBuffer *obuf = &e->obuf;
     term_clear_screen(obuf);
     term_move_cursor(obuf, 0, terminal.height - 1);
     term_show_cursor(obuf);
@@ -453,8 +455,11 @@ static char get_choice(const char *choices)
     return 0;
 }
 
-static void show_dialog(TermOutputBuffer *obuf, const char *question)
-{
+static void show_dialog (
+    TermOutputBuffer *obuf,
+    const TermColor *text_color,
+    const char *question
+) {
     unsigned int question_width = u_str_width(question);
     unsigned int min_width = question_width + 2;
     if (terminal.height < 12 || terminal.width < min_width) {
@@ -470,7 +475,6 @@ static void show_dialog(TermOutputBuffer *obuf, const char *question)
 
     // The "underline" and "strikethrough" attributes should only apply
     // to the text, not the whole dialog background:
-    const TermColor *text_color = &editor.colors.builtin[BC_DIALOG];
     TermColor dialog_color = *text_color;
     dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
     set_color(obuf, &dialog_color);
@@ -490,9 +494,10 @@ static void show_dialog(TermOutputBuffer *obuf, const char *question)
 
 char dialog_prompt(EditorState *e, const char *question, const char *choices)
 {
-    normal_update();
+    const TermColor *color = &e->colors.builtin[BC_DIALOG];
+    normal_update(e);
     term_hide_cursor(&e->obuf);
-    show_dialog(&e->obuf, question);
+    show_dialog(&e->obuf, color, question);
     show_message(&e->obuf, question, false);
     term_output_flush(&e->obuf);
 
@@ -501,9 +506,9 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         if (!e->resized) {
             continue;
         }
-        ui_resize();
+        ui_resize(e);
         term_hide_cursor(&e->obuf);
-        show_dialog(&e->obuf, question);
+        show_dialog(&e->obuf, color, question);
         show_message(&e->obuf, question, false);
         term_output_flush(&e->obuf);
     }
@@ -522,21 +527,21 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     // Set changed_line_min and changed_line_max before calling update_range()
     mark_all_lines_changed(e->buffer);
 
-    start_update();
+    start_update(e);
     update_term_title(&e->obuf, e->buffer);
-    update_buffer_windows(e->buffer);
+    update_buffer_windows(e, e->buffer);
     show_message(&e->obuf, question, false);
-    end_update();
+    end_update(e);
 
     char choice;
     while ((choice = get_choice(choices)) == 0) {
         if (!e->resized) {
             continue;
         }
-        ui_resize();
+        ui_resize(e);
         term_hide_cursor(&e->obuf);
         show_message(&e->obuf, question, false);
-        restore_cursor(&e->obuf);
+        restore_cursor(e);
         term_show_cursor(&e->obuf);
         term_output_flush(&e->obuf);
     }
@@ -552,16 +557,16 @@ typedef struct {
     long vy;
 } ScreenState;
 
-static void update_screen(const ScreenState *s)
+static void update_screen(EditorState *e, const ScreenState *s)
 {
-    if (editor.everything_changed) {
-        normal_update();
-        editor.everything_changed = false;
+    if (e->everything_changed) {
+        normal_update(e);
+        e->everything_changed = false;
         return;
     }
 
-    Buffer *buffer = editor.buffer;
-    View *view = editor.view;
+    Buffer *buffer = e->buffer;
+    View *view = e->view;
     view_update_cursor_x(view);
     view_update_cursor_y(view);
     view_update(view);
@@ -582,24 +587,24 @@ static void update_screen(const ScreenState *s)
             mark_buffer_tabbars_changed(buffer);
         }
     } else {
-        editor.window->update_tabbar = true;
+        e->window->update_tabbar = true;
         mark_all_lines_changed(buffer);
     }
 
-    start_update();
-    if (editor.window->update_tabbar) {
-        update_term_title(&editor.obuf, buffer);
+    start_update(e);
+    if (e->window->update_tabbar) {
+        update_term_title(&e->obuf, buffer);
     }
-    update_buffer_windows(buffer);
-    update_command_line(&editor.obuf);
-    end_update();
+    update_buffer_windows(e, buffer);
+    update_command_line(&e->obuf);
+    end_update(e);
 }
 
-void main_loop(void)
+void main_loop(EditorState *e)
 {
-    while (editor.status == EDITOR_RUNNING) {
-        if (editor.resized) {
-            ui_resize();
+    while (e->status == EDITOR_RUNNING) {
+        if (e->resized) {
+            ui_resize(e);
         }
 
         KeyCode key = term_read_key();
@@ -609,15 +614,15 @@ void main_loop(void)
 
         clear_error();
         const ScreenState s = {
-            .is_modified = buffer_modified(editor.buffer),
-            .id = editor.buffer->id,
-            .cy = editor.view->cy,
-            .vx = editor.view->vx,
-            .vy = editor.view->vy
+            .is_modified = buffer_modified(e->buffer),
+            .id = e->buffer->id,
+            .cy = e->view->cy,
+            .vx = e->view->vx,
+            .vy = e->view->vy
         };
 
-        handle_input(&editor, key);
-        sanity_check();
-        update_screen(&s);
+        handle_input(e, key);
+        sanity_check(e->view);
+        update_screen(e, &s);
     }
 }

@@ -132,9 +132,9 @@ const char *editor_file(const char *name) NONNULL_ARGS_AND_RETURN;
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 void any_key(void);
-void normal_update(void);
-void main_loop(void);
-void ui_start(void);
-void ui_end(void);
+void normal_update(EditorState *e);
+void main_loop(EditorState *e);
+void ui_start(EditorState *e);
+void ui_end(EditorState *e);
 
 #endif
