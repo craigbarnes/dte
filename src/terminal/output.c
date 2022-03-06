@@ -30,14 +30,15 @@ static void obuf_need_space(TermOutputBuffer *obuf, size_t count)
     }
 }
 
-void term_output_reset(TermOutputBuffer *obuf, size_t start_x, size_t width, size_t scroll_x)
+void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scroll_x)
 {
+    TermOutputBuffer *obuf = &term->obuf;
     obuf->x = 0;
     obuf->width = width;
     obuf->scroll_x = scroll_x;
     obuf->tab_width = 8;
     obuf->tab = TAB_CONTROL;
-    obuf->can_clear = start_x + width == terminal.width;
+    obuf->can_clear = start_x + width == term->width;
 }
 
 // Does not update obuf.x
@@ -66,8 +67,21 @@ void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
     }
 }
 
-void term_set_bytes(TermOutputBuffer *obuf, char ch, size_t count)
+static void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
 {
+    if (!ascii_isprint(ch) || count < 6 || count > 30000) {
+        term_repeat_byte(obuf, ch, count);
+        return;
+    }
+    term_add_byte(obuf, ch);
+    term_add_literal(obuf, "\033[");
+    term_add_uint(obuf, count - 1);
+    term_add_byte(obuf, 'b');
+}
+
+void term_set_bytes(Terminal *term, char ch, size_t count)
+{
+    TermOutputBuffer *obuf = &term->obuf;
     if (obuf->x + count > obuf->scroll_x + obuf->width) {
         count = obuf->scroll_x + obuf->width - obuf->x;
     }
@@ -80,7 +94,11 @@ void term_set_bytes(TermOutputBuffer *obuf, char ch, size_t count)
         count -= skip;
     }
     obuf->x += count;
-    terminal.repeat_byte(obuf, ch, count);
+    if (term->features & TFLAG_ECMA48_REPEAT) {
+        ecma48_repeat_byte(obuf, ch, count);
+    } else {
+        term_repeat_byte(obuf, ch, count);
+    }
 }
 
 // Does not update obuf.x
@@ -114,14 +132,14 @@ void term_add_uint(TermOutputBuffer *obuf, unsigned int x)
     obuf->count += buf_uint_to_str(x, obuf->buf + obuf->count);
 }
 
-void term_hide_cursor(TermOutputBuffer *obuf)
+void term_hide_cursor(Terminal *term)
 {
-    term_add_strview(obuf, terminal.control_codes.hide_cursor);
+    term_add_strview(&term->obuf, term->control_codes.hide_cursor);
 }
 
-void term_show_cursor(TermOutputBuffer *obuf)
+void term_show_cursor(Terminal *term)
 {
-    term_add_strview(obuf, terminal.control_codes.show_cursor);
+    term_add_strview(&term->obuf, term->control_codes.show_cursor);
 }
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
@@ -135,31 +153,32 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
     term_add_byte(obuf, 'H');
 }
 
-void term_save_title(TermOutputBuffer *obuf)
+void term_save_title(Terminal *term)
 {
-    term_add_strview(obuf, terminal.control_codes.save_title);
+    term_add_strview(&term->obuf, term->control_codes.save_title);
 }
 
-void term_restore_title(TermOutputBuffer *obuf)
+void term_restore_title(Terminal *term)
 {
-    term_add_strview(obuf, terminal.control_codes.restore_title);
+    term_add_strview(&term->obuf, term->control_codes.restore_title);
 }
 
-void term_clear_eol(TermOutputBuffer *obuf)
+void term_clear_eol(Terminal *term)
 {
+    TermOutputBuffer *obuf = &term->obuf;
     const size_t end = obuf->scroll_x + obuf->width;
     if (obuf->x >= end) {
         return;
     }
     if (
         obuf->can_clear
-        && (obuf->color.bg < 0 || terminal.features & TFLAG_BACK_COLOR_ERASE)
+        && (obuf->color.bg < 0 || term->features & TFLAG_BACK_COLOR_ERASE)
         && !(obuf->color.attr & ATTR_REVERSE)
     ) {
         term_add_literal(obuf, "\033[K");
         obuf->x = end;
     } else {
-        term_set_bytes(obuf, ' ', end - obuf->x);
+        term_set_bytes(term, ' ', end - obuf->x);
     }
 }
 

@@ -104,27 +104,6 @@ static const struct {
     {"m", 1, TERM_0_COLOR},
 };
 
-Terminal terminal = {
-    .color_type = TERM_8_COLOR,
-    .width = 80,
-    .height = 24,
-    .parse_key_sequence = &xterm_parse_key,
-    .set_color = &ecma48_set_color,
-    .repeat_byte = &term_repeat_byte,
-    .control_codes = {
-        .keypad_off = STRING_VIEW("\033[?1l\033>"),
-        .keypad_on = STRING_VIEW("\033[?1h\033="),
-        .cup_mode_off = STRING_VIEW("\033[?1049l"),
-        .cup_mode_on = STRING_VIEW("\033[?1049h"),
-        .hide_cursor = STRING_VIEW("\033[?25l"),
-        .show_cursor = STRING_VIEW("\033[?25h"),
-        .set_title_begin = STRING_VIEW_INIT,
-        .set_title_end = STRING_VIEW_INIT,
-        .save_title = STRING_VIEW_INIT,
-        .restore_title = STRING_VIEW_INIT,
-    }
-};
-
 static int term_name_compare(const void *key, const void *elem)
 {
     const StringView *prefix = key;
@@ -144,36 +123,33 @@ UNITTEST {
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
 }
 
-void term_init(const char *term)
+void term_init(Terminal *term, const char *name)
 {
-    BUG_ON(term[0] == '\0');
+    BUG_ON(name[0] == '\0');
 
     // Strip phony "xterm-" prefix used by certain terminals
-    const char *real_term = term;
-    if (str_has_prefix(term, "xterm-")) {
-        const char *str = term + STRLEN("xterm-");
+    const char *real_name = name;
+    if (str_has_prefix(name, "xterm-")) {
+        const char *str = name + STRLEN("xterm-");
         if (str_has_prefix(str, "kitty") || str_has_prefix(str, "termite")) {
-            real_term = str;
+            real_name = str;
         }
     }
 
     // Extract the "root name" from $TERM, as defined by terminfo(5).
     // This is the initial part of the string up to the first hyphen.
     size_t pos = 0;
-    size_t rtlen = strlen(real_term);
-    StringView name = get_delim(real_term, &pos, rtlen, '-');
+    size_t rnlen = strlen(real_name);
+    StringView root_name = get_delim(real_name, &pos, rnlen, '-');
 
     // Look up the root name in the list of known terminals
-    const TermEntry *entry = BSEARCH(&name, terms, term_name_compare);
-    TermControlCodes *tcc = &terminal.control_codes;
+    const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
+    TermControlCodes *tcc = &term->control_codes;
     if (entry) {
         TermFeatureFlags features = entry->features;
-        terminal.features = features;
-        terminal.color_type = entry->color_type;
-        terminal.ncv_attributes = entry->ncv_attrs;
-        if (features & REP) {
-            terminal.repeat_byte = ecma48_repeat_byte;
-        }
+        term->features = features;
+        term->color_type = entry->color_type;
+        term->ncv_attributes = entry->ncv_attrs;
         if (features & TITLE) {
             tcc->save_title = strview_from_cstring("\033[22;2t");
             tcc->restore_title = strview_from_cstring("\033[23;2t");
@@ -181,29 +157,29 @@ void term_init(const char *term)
             tcc->set_title_end = strview_from_cstring("\033\\");
         }
         if (features & RXVT) {
-            terminal.parse_key_sequence = rxvt_parse_key;
+            term->parse_key_sequence = rxvt_parse_key;
         } else if (features & LINUX) {
-            terminal.parse_key_sequence = linux_parse_key;
+            term->parse_key_sequence = linux_parse_key;
         }
-        const int n = (int)name.length;
-        DEBUG_LOG("using built-in terminal support for '%.*s'", n, name.data);
+        const int n = (int)root_name.length;
+        DEBUG_LOG("using built-in terminal support for '%.*s'", n, root_name.data);
     }
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
-        terminal.color_type = TERM_TRUE_COLOR;
+        term->color_type = TERM_TRUE_COLOR;
         DEBUG_LOG("true color support detected ($COLORTERM)");
     }
-    if (terminal.color_type == TERM_TRUE_COLOR) {
+    if (term->color_type == TERM_TRUE_COLOR) {
         return;
     }
 
-    while (pos < rtlen) {
-        const StringView str = get_delim(real_term, &pos, rtlen, '-');
+    while (pos < rnlen) {
+        const StringView str = get_delim(real_name, &pos, rnlen, '-');
         for (size_t i = 0; i < ARRAYLEN(color_suffixes); i++) {
             const char *suffix = color_suffixes[i].suffix;
             size_t len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, len)) {
-                terminal.color_type = color_suffixes[i].color_type;
+                term->color_type = color_suffixes[i].color_type;
                 DEBUG_LOG("color type detected from $TERM suffix '-%s'", suffix);
                 return;
             }

@@ -387,7 +387,8 @@ static void cmd_copy(const CommandArgs *a)
         copy(&e->clipboard, view, size, line_copy);
     }
 
-    if ((clipboard || primary) && terminal.features & TFLAG_OSC52_COPY) {
+    Terminal *term = &e->terminal;
+    if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
         if (internal) {
             view->cursor = save;
             if (view->selection) {
@@ -395,7 +396,7 @@ static void cmd_copy(const CommandArgs *a)
             }
         }
         char *buf = block_iter_get_bytes(&view->cursor, size);
-        if (!term_osc52_copy(&e->obuf, buf, size, clipboard, primary)) {
+        if (!term_osc52_copy(&term->obuf, buf, size, clipboard, primary)) {
             error_msg("%s", strerror(errno));
         }
         free(buf);
@@ -741,11 +742,12 @@ static void cmd_hi(const CommandArgs *a)
         return;
     }
 
+    TermColorCapabilityType color_type = e->terminal.color_type;
     bool optimize = e->options.optimize_true_color;
-    int32_t fg = color_to_nearest(color.fg, terminal.color_type, optimize);
-    int32_t bg = color_to_nearest(color.bg, terminal.color_type, optimize);
+    int32_t fg = color_to_nearest(color.fg, color_type, optimize);
+    int32_t bg = color_to_nearest(color.bg, color_type, optimize);
     if (
-        terminal.color_type != TERM_TRUE_COLOR
+        color_type != TERM_TRUE_COLOR
         && has_flag(a, 'c')
         && (fg != color.fg || bg != color.bg)
     ) {

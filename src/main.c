@@ -206,15 +206,15 @@ static ExitCode lint_syntax(const char *filename)
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
-static ExitCode showkey_loop(void)
+static ExitCode showkey_loop(Terminal *term)
 {
     if (!term_raw()) {
         perror("tcsetattr");
         return EX_IOERR;
     }
 
-    TermOutputBuffer *obuf = &editor.obuf;
-    term_enable_private_modes(&terminal, obuf);
+    TermOutputBuffer *obuf = &term->obuf;
+    term_enable_private_modes(term, obuf);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -238,7 +238,7 @@ static ExitCode showkey_loop(void)
         term_output_flush(obuf);
     }
 
-    term_restore_private_modes(&terminal, obuf);
+    term_restore_private_modes(term, obuf);
     term_output_flush(obuf);
     term_cooked();
     return EX_OK;
@@ -382,8 +382,8 @@ loop_break:
         }
     }
 
-    const char *term = getenv("TERM");
-    if (!term || term[0] == '\0') {
+    const char *term_name = getenv("TERM");
+    if (!term_name || term_name[0] == '\0') {
         fputs("Error: $TERM not set\n", stderr);
         // This is considered a "usage" error, because the program
         // must be started from a properly configured terminal
@@ -395,10 +395,11 @@ loop_break:
         return EX_IOERR;
     }
 
-    term_init(term);
+    Terminal *term = &editor.terminal;
+    term_init(term, term_name);
 
     if (use_showkey) {
-        return showkey_loop();
+        return showkey_loop(term);
     }
 
     // Create this early. Needed if lock-files is true.
@@ -409,7 +410,7 @@ loop_break:
         editor.options.lock_files = false;
     }
 
-    term_save_title(&editor.obuf);
+    term_save_title(term);
     exec_builtin_rc();
 
     if (read_rc) {
@@ -523,9 +524,9 @@ loop_break:
 
     main_loop(&editor);
 
-    term_restore_title(&editor.obuf);
+    term_restore_title(term);
     ui_end(&editor);
-    term_output_flush(&editor.obuf);
+    term_output_flush(&term->obuf);
 
     // Unlock files and add files to file history
     remove_frame(editor.root_frame);

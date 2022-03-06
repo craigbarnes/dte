@@ -136,13 +136,14 @@ static void filetype_changed(bool global)
 static void set_window_title_changed(bool global)
 {
     BUG_ON(!global);
+    Terminal *term = &editor.terminal;
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
-            update_term_title(&editor.obuf, editor.buffer);
+            update_term_title(term, editor.buffer);
         }
     } else {
-        term_restore_title(&editor.obuf);
-        term_save_title(&editor.obuf);
+        term_restore_title(term);
+        term_save_title(term);
     }
 }
 

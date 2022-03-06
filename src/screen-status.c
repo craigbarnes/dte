@@ -322,22 +322,23 @@ UNITTEST {
     window_free(window);
 }
 
-void update_status_line(TermOutputBuffer *obuf, const Window *win)
+void update_status_line(Terminal *term, const Window *win)
 {
-    char lbuf[256];
-    char rbuf[256];
+    char lbuf[256], rbuf[256];
     sf_format(win, lbuf, sizeof lbuf, editor.options.statusline_left);
     sf_format(win, rbuf, sizeof rbuf, editor.options.statusline_right);
 
-    term_output_reset(obuf, win->x, win->w, 0);
-    term_move_cursor(obuf, win->x, win->y + win->h - 1);
-    set_builtin_color(obuf, BC_STATUSLINE);
+    TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
+    term_output_reset(term, win->x, win->w, 0);
+    term_move_cursor(obuf, win->x, win->y + win->h - 1);
+    set_builtin_color(term, BC_STATUSLINE);
+
     if (lw + rw <= win->w) {
         // Both fit
         term_add_str(obuf, lbuf);
-        term_set_bytes(obuf, ' ', win->w - lw - rw);
+        term_set_bytes(term, ' ', win->w - lw - rw);
         term_add_str(obuf, rbuf);
     } else if (lw <= win->w && rw <= win->w) {
         // Both would fit separately, draw overlapping
@@ -348,13 +349,13 @@ void update_status_line(TermOutputBuffer *obuf, const Window *win)
     } else if (lw <= win->w) {
         // Left fits
         term_add_str(obuf, lbuf);
-        term_clear_eol(obuf);
+        term_clear_eol(term);
     } else if (rw <= win->w) {
         // Right fits
-        term_set_bytes(obuf, ' ', win->w - rw);
+        term_set_bytes(term, ' ', win->w - rw);
         term_add_str(obuf, rbuf);
     } else {
-        term_clear_eol(obuf);
+        term_clear_eol(term);
     }
 }
 

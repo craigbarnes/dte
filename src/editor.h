@@ -18,6 +18,7 @@
 #include "options.h"
 #include "syntax/color.h"
 #include "terminal/output.h"
+#include "terminal/terminal.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -81,7 +82,7 @@ typedef struct {
     CommandLine cmdline;
     SearchState search;
     GlobalOptions options;
-    TermOutputBuffer obuf;
+    Terminal terminal;
     StringView home_dir;
     const char *user_config_dir;
     const char *file_locks;

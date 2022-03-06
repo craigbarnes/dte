@@ -250,7 +250,7 @@ DISABLE_WARNING("-Wmissing-prototypes")
 
 void init_headless_mode(void)
 {
-    MEMZERO(&terminal.control_codes);
+    MEMZERO(&editor.terminal.control_codes);
     exec_builtin_rc();
     update_all_syntax_colors(&editor.syntaxes);
     editor.options.lock_files = false;

@@ -4,18 +4,6 @@
 #include "util/ascii.h"
 #include "util/macros.h"
 
-void ecma48_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count)
-{
-    if (!ascii_isprint(ch) || count < 6 || count > 30000) {
-        term_repeat_byte(obuf, ch, count);
-        return;
-    }
-    term_add_byte(obuf, ch);
-    term_add_literal(obuf, "\033[");
-    term_add_uint(obuf, count - 1);
-    term_add_byte(obuf, 'b');
-}
-
 static void do_set_color(TermOutputBuffer *obuf, int32_t color, char ch)
 {
     if (color < 0) {
@@ -42,10 +30,10 @@ static void do_set_color(TermOutputBuffer *obuf, int32_t color, char ch)
     }
 }
 
-static bool attr_is_set(const TermColor *color, unsigned int attr)
+static bool attr_is_set(const TermColor *color, unsigned int attr, unsigned int ncv_attrs)
 {
     if (color->attr & attr) {
-        if (unlikely(terminal.ncv_attributes & attr)) {
+        if (unlikely(ncv_attrs & attr)) {
             // Terminal only allows attr when not using colors
             return color->fg == COLOR_DEFAULT && color->bg == COLOR_DEFAULT;
         }
@@ -54,7 +42,7 @@ static bool attr_is_set(const TermColor *color, unsigned int attr)
     return false;
 }
 
-void ecma48_set_color(TermOutputBuffer *obuf, const TermColor *color)
+void term_set_color(Terminal *term, const TermColor *color)
 {
     static const struct {
         char code;
@@ -70,10 +58,11 @@ void ecma48_set_color(TermOutputBuffer *obuf, const TermColor *color)
         {'9', ATTR_STRIKETHROUGH}
     };
 
+    TermOutputBuffer *obuf = &term->obuf;
     term_add_literal(obuf, "\033[0");
 
     for (size_t i = 0; i < ARRAYLEN(attr_map); i++) {
-        if (attr_is_set(color, attr_map[i].attr)) {
+        if (attr_is_set(color, attr_map[i].attr, term->ncv_attributes)) {
             term_add_byte(obuf, ';');
             term_add_byte(obuf, attr_map[i].code);
         }

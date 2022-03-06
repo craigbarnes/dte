@@ -741,64 +741,66 @@ static void clear_obuf(TermOutputBuffer *obuf)
 
 static void test_term_add_str(void)
 {
-    TermOutputBuffer obuf;
-    term_output_init(&obuf);
-    ASSERT_NONNULL(obuf.buf);
+    Terminal term = {.width = 80, .height = 24};
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    ASSERT_NONNULL(obuf->buf);
 
     // Fill start of buffer with zeroes, to allow using EXPECT_STREQ() below
     ASSERT_TRUE(256 <= TERM_OUTBUF_SIZE);
-    memset(obuf.buf, 0, 256);
+    memset(obuf->buf, 0, 256);
 
-    term_add_str(&obuf, "this should write nothing because obuf.width == 0");
-    EXPECT_EQ(obuf.count, 0);
-    EXPECT_EQ(obuf.x, 0);
+    term_add_str(obuf, "this should write nothing because obuf.width == 0");
+    EXPECT_EQ(obuf->count, 0);
+    EXPECT_EQ(obuf->x, 0);
 
-    term_output_reset(&obuf, 0, 80, 0);
-    EXPECT_EQ(obuf.tab, TAB_CONTROL);
-    EXPECT_EQ(obuf.tab_width, 8);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_EQ(obuf.width, 80);
-    EXPECT_EQ(obuf.scroll_x, 0);
-    EXPECT_EQ(terminal.width, 80);
-    EXPECT_EQ(obuf.can_clear, true);
+    term_output_reset(&term, 0, 80, 0);
+    EXPECT_EQ(obuf->tab, TAB_CONTROL);
+    EXPECT_EQ(obuf->tab_width, 8);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_EQ(obuf->width, 80);
+    EXPECT_EQ(obuf->scroll_x, 0);
+    EXPECT_EQ(term.width, 80);
+    EXPECT_EQ(obuf->can_clear, true);
 
-    term_add_str(&obuf, "1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
-    EXPECT_EQ(obuf.count, 20);
-    EXPECT_EQ(obuf.x, 17);
-    EXPECT_STREQ(obuf.buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");
+    term_add_str(obuf, "1\xF0\x9F\xA7\xB2 \t xyz \t\r \xC2\xB6");
+    EXPECT_EQ(obuf->count, 20);
+    EXPECT_EQ(obuf->x, 17);
+    EXPECT_STREQ(obuf->buf, "1\xF0\x9F\xA7\xB2 ^I xyz ^I^M \xC2\xB6");
 
-    EXPECT_TRUE(term_put_char(&obuf, 0x10FFFF));
-    EXPECT_EQ(obuf.count, 24);
-    EXPECT_EQ(obuf.x, 21);
-    EXPECT_STREQ(obuf.buf + 20, "<" "??" ">");
-    clear_obuf(&obuf);
+    EXPECT_TRUE(term_put_char(obuf, 0x10FFFF));
+    EXPECT_EQ(obuf->count, 24);
+    EXPECT_EQ(obuf->x, 21);
+    EXPECT_STREQ(obuf->buf + 20, "<" "??" ">");
+    clear_obuf(obuf);
 
-    term_output_free(&obuf);
+    term_output_free(obuf);
 }
 
 static void test_term_clear_eol(void)
 {
-    TermOutputBuffer obuf;
-    term_output_init(&obuf);
+    Terminal term = {.width = 80, .height = 24};
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
 
-    terminal.features |= TFLAG_BACK_COLOR_ERASE;
-    term_output_reset(&obuf, 0, 80, 0);
-    term_clear_eol(&obuf);
-    EXPECT_EQ(obuf.count, 3);
-    EXPECT_EQ(obuf.x, 80);
-    EXPECT_MEMEQ(obuf.buf, "\033[K", 3);
-    clear_obuf(&obuf);
+    term.features |= TFLAG_BACK_COLOR_ERASE;
+    term_output_reset(&term, 0, 80, 0);
+    term_clear_eol(&term);
+    EXPECT_EQ(obuf->count, 3);
+    EXPECT_EQ(obuf->x, 80);
+    EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
+    clear_obuf(obuf);
 
-    terminal.features &= ~TFLAG_BACK_COLOR_ERASE;
-    term_output_reset(&obuf, 0, 80, 0);
-    term_clear_eol(&obuf);
-    EXPECT_EQ(obuf.count, 80);
-    EXPECT_EQ(obuf.x, 80);
-    EXPECT_EQ(obuf.buf[0], ' ');
-    EXPECT_EQ(obuf.buf[79], ' ');
-    clear_obuf(&obuf);
+    term.features &= ~TFLAG_BACK_COLOR_ERASE;
+    term_output_reset(&term, 0, 80, 0);
+    term_clear_eol(&term);
+    EXPECT_EQ(obuf->count, 80);
+    EXPECT_EQ(obuf->x, 80);
+    EXPECT_EQ(obuf->buf[0], ' ');
+    EXPECT_EQ(obuf->buf[79], ' ');
+    clear_obuf(obuf);
 
-    term_output_free(&obuf);
+    term_output_free(obuf);
 }
 
 static void test_term_move_cursor(void)
@@ -820,37 +822,51 @@ static void test_term_move_cursor(void)
     term_output_free(&obuf);
 }
 
-static void test_ecma48_repeat_byte(void)
+static void test_term_set_bytes(void)
 {
-    TermOutputBuffer obuf;
-    term_output_init(&obuf);
-    ecma48_repeat_byte(&obuf, 'x', 40);
-    EXPECT_EQ(obuf.count, 6);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "x\033[39b", 6);
-    clear_obuf(&obuf);
+    Terminal term = {
+        .width = 80,
+        .height = 24,
+        .features = TFLAG_ECMA48_REPEAT,
+    };
 
-    ecma48_repeat_byte(&obuf, '-', 5);
-    EXPECT_EQ(obuf.count, 5);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "-----", 5);
-    clear_obuf(&obuf);
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    clear_obuf(obuf);
+    term_output_reset(&term, 0, 80, 0);
 
-    ecma48_repeat_byte(&obuf, '\n', 8);
-    EXPECT_EQ(obuf.count, 8);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\n\n\n\n\n\n\n\n", 8);
-    clear_obuf(&obuf);
+    term_set_bytes(&term, 'x', 40);
+    EXPECT_EQ(obuf->count, 6);
+    EXPECT_EQ(obuf->x, 40);
+    EXPECT_MEMEQ(obuf->buf, "x\033[39b", 6);
+    clear_obuf(obuf);
 
-    term_output_free(&obuf);
+    term_set_bytes(&term, '-', 5);
+    EXPECT_EQ(obuf->count, 5);
+    EXPECT_EQ(obuf->x, 5);
+    EXPECT_MEMEQ(obuf->buf, "-----", 5);
+    clear_obuf(obuf);
+
+    term_set_bytes(&term, '\n', 8);
+    EXPECT_EQ(obuf->count, 8);
+    EXPECT_EQ(obuf->x, 8);
+    EXPECT_MEMEQ(obuf->buf, "\n\n\n\n\n\n\n\n", 8);
+    clear_obuf(obuf);
+
+    term_output_free(obuf);
 }
 
 static void test_ecma48_set_color(void)
 {
-    const TermColorCapabilityType color_type = terminal.color_type;
-    EXPECT_EQ(color_type, TERM_8_COLOR);
-    EXPECT_EQ(terminal.ncv_attributes, 0);
-    terminal.color_type = TERM_TRUE_COLOR;
+    Terminal term = {
+        .width = 80,
+        .height = 24,
+        .color_type = TERM_TRUE_COLOR,
+        .ncv_attributes = 0,
+    };
+
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
 
     TermColor c = {
         .fg = COLOR_RED,
@@ -858,33 +874,29 @@ static void test_ecma48_set_color(void)
         .attr = ATTR_BOLD | ATTR_REVERSE,
     };
 
-    TermOutputBuffer obuf;
-    term_output_init(&obuf);
-
-    ecma48_set_color(&obuf, &c);
-    EXPECT_EQ(obuf.count, 14);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033[0;1;7;31;43m", 14);
-    clear_obuf(&obuf);
+    term_set_color(&term, &c);
+    EXPECT_EQ(obuf->count, 14);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
+    clear_obuf(obuf);
 
     c.attr = 0;
     c.fg = COLOR_RGB(0x12ef46);
-    ecma48_set_color(&obuf, &c);
-    EXPECT_EQ(obuf.count, 22);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033[0;38;2;18;239;70;43m", 22);
-    clear_obuf(&obuf);
+    term_set_color(&term, &c);
+    EXPECT_EQ(obuf->count, 22);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
+    clear_obuf(obuf);
 
     c.fg = 144;
     c.bg = COLOR_DEFAULT;
-    ecma48_set_color(&obuf, &c);
-    EXPECT_EQ(obuf.count, 13);
-    EXPECT_EQ(obuf.x, 0);
-    EXPECT_MEMEQ(obuf.buf, "\033[0;38;5;144m", 13);
-    clear_obuf(&obuf);
+    term_set_color(&term, &c);
+    EXPECT_EQ(obuf->count, 13);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
+    clear_obuf(obuf);
 
-    terminal.color_type = color_type;
-    term_output_free(&obuf);
+    term_output_free(obuf);
 }
 
 static void test_term_osc52_copy(void)
@@ -926,7 +938,7 @@ static const TestEntry tests[] = {
     TEST(test_term_add_str),
     TEST(test_term_clear_eol),
     TEST(test_term_move_cursor),
-    TEST(test_ecma48_repeat_byte),
+    TEST(test_term_set_bytes),
     TEST(test_ecma48_set_color),
     TEST(test_term_osc52_copy),
 };

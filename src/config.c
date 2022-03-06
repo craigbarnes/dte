@@ -154,7 +154,7 @@ int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
 void exec_builtin_color_reset(void)
 {
     clear_hl_colors(&editor.colors);
-    bool colors = terminal.color_type >= TERM_8_COLOR;
+    bool colors = editor.terminal.color_type >= TERM_8_COLOR;
     const char *cfg = colors ? "color/reset" : "color/reset-basic";
     read_config(&normal_commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }

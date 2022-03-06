@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include "color.h"
 #include "key.h"
-#include "output.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 
@@ -35,6 +34,31 @@ typedef struct {
 } TermControlCodes;
 
 typedef struct {
+    char *buf;
+    size_t count;
+
+    // Number of characters scrolled (x direction)
+    size_t scroll_x;
+
+    // Current x position (tab 1-8, double-width 2, invalid UTF-8 byte 4)
+    // if smaller than scroll_x printed characters are not visible
+    size_t x;
+
+    size_t width;
+
+    enum {
+        TAB_NORMAL,
+        TAB_SPECIAL,
+        TAB_CONTROL,
+    } tab;
+
+    uint8_t tab_width;
+    bool can_clear;
+
+    TermColor color;
+} TermOutputBuffer;
+
+typedef struct Terminal {
     TermColorCapabilityType color_type;
     TermFeatureFlags features;
     unsigned int width;
@@ -42,13 +66,10 @@ typedef struct {
     unsigned int ncv_attributes;
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
-    void (*set_color)(TermOutputBuffer *obuf, const TermColor *color);
-    void (*repeat_byte)(TermOutputBuffer *obuf, char ch, size_t count);
+    TermOutputBuffer obuf;
 } Terminal;
 
-extern Terminal terminal;
-
-void term_init(const char *term) NONNULL_ARGS;
+void term_init(Terminal *term, const char *name) NONNULL_ARGS;
 void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
 void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
 

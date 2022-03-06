@@ -86,7 +86,7 @@ static bool input_get_byte(unsigned char *ch)
 static KeyCode read_special(void)
 {
     KeyCode key;
-    ssize_t len = terminal.parse_key_sequence(input.buf, input.len, &key);
+    ssize_t len = editor.terminal.parse_key_sequence(input.buf, input.len, &key);
     if (likely(len > 0)) {
         // Match
         consume_input(len);
