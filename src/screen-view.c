@@ -22,40 +22,39 @@ typedef struct {
     const TermColor **colors;
 } LineInfo;
 
-static bool is_default_bg_color(int32_t color)
-{
-    return color == editor.colors.builtin[BC_DEFAULT].bg || color < 0;
-}
-
 // Like mask_color() but can change bg color only if it has not been changed yet
-static void mask_color2(TermColor *color, const TermColor *over)
+static void mask_color2(const EditorState *e, TermColor *color, const TermColor *over)
 {
+    int32_t default_bg = e->colors.builtin[BC_DEFAULT].bg;
+    if (over->bg != -2 && (color->bg == default_bg || color->bg < 0)) {
+        color->bg = over->bg;
+    }
+
     if (over->fg != -2) {
         color->fg = over->fg;
     }
-    if (over->bg != -2 && is_default_bg_color(color->bg)) {
-        color->bg = over->bg;
-    }
+
     if (!(over->attr & ATTR_KEEP)) {
         color->attr = over->attr;
     }
 }
 
 static void mask_selection_and_current_line (
+    const EditorState *e,
     const LineInfo *info,
     TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
-        mask_color(color, &editor.colors.builtin[BC_SELECTION]);
+        mask_color(color, &e->colors.builtin[BC_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        mask_color2(color, &editor.colors.builtin[BC_CURRENTLINE]);
+        mask_color2(e, color, &e->colors.builtin[BC_CURRENTLINE]);
     }
 }
 
-static bool is_non_text(CodePoint u)
+static bool is_non_text(CodePoint u, bool display_special)
 {
     if (u == '\t') {
-        return editor.options.display_special;
+        return display_special;
     }
     return u < 0x20 || u == 0x7F || u_is_unprintable(u);
 }
@@ -127,7 +126,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     return (flags & mask) != 0;
 }
 
-static CodePoint screen_next_char(Terminal *term, LineInfo *info)
+static CodePoint screen_next_char(EditorState *e, LineInfo *info)
 {
     size_t count, pos = info->pos;
     CodePoint u = info->line[pos];
@@ -155,16 +154,16 @@ static CodePoint screen_next_char(Terminal *term, LineInfo *info)
     if (info->colors && info->colors[pos]) {
         color = *info->colors[pos];
     } else {
-        color = editor.colors.builtin[BC_DEFAULT];
+        color = e->colors.builtin[BC_DEFAULT];
     }
-    if (is_non_text(u)) {
-        mask_color(&color, &editor.colors.builtin[BC_NONTEXT]);
+    if (is_non_text(u, e->options.display_special)) {
+        mask_color(&color, &e->colors.builtin[BC_NONTEXT]);
     }
     if (ws_error) {
-        mask_color(&color, &editor.colors.builtin[BC_WSERROR]);
+        mask_color(&color, &e->colors.builtin[BC_WSERROR]);
     }
-    mask_selection_and_current_line(info, &color);
-    set_color(term, &color);
+    mask_selection_and_current_line(e, info, &color);
+    set_color(e, &color);
 
     info->offset += count;
     return u;
@@ -204,10 +203,10 @@ static bool is_notice(const char *word, size_t len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(const LineInfo *info)
+static void hl_words(EditorState *e, const LineInfo *info)
 {
-    const TermColor *cc = find_color(&editor.colors, "comment");
-    const TermColor *nc = find_color(&editor.colors, "notice");
+    const TermColor *cc = find_color(&e->colors, "comment");
+    const TermColor *nc = find_color(&e->colors, "notice");
 
     if (!info->colors || !cc || !nc) {
         return;
@@ -225,7 +224,7 @@ static void hl_words(const LineInfo *info)
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    const size_t max = info->pos + editor.terminal.width * 4 + 8;
+    const size_t max = info->pos + e->terminal.width * 4 + 8;
 
     size_t si;
     while (i < info->size) {
@@ -315,7 +314,7 @@ static void line_info_set_line (
     }
 }
 
-static void print_line(Terminal *term, LineInfo *info)
+static void print_line(EditorState *e, LineInfo *info)
 {
     // Screen might be scrolled horizontally. Skip most invisible
     // characters using screen_skip_char(), which is much faster than
@@ -323,16 +322,17 @@ static void print_line(Terminal *term, LineInfo *info)
     //
     // There can be a wide character (tab, control code etc.) that is
     // partially visible and can't be skipped using screen_skip_char().
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     while (obuf->x + 8 < obuf->scroll_x && info->pos < info->size) {
         screen_skip_char(obuf, info);
     }
 
-    hl_words(info);
+    hl_words(e, info);
 
     while (info->pos < info->size) {
         BUG_ON(obuf->x > obuf->scroll_x + obuf->width);
-        CodePoint u = screen_next_char(term, info);
+        CodePoint u = screen_next_char(e, info);
         if (!term_put_char(obuf, u)) {
             // +1 for newline
             info->offset += info->size - info->pos + 1;
@@ -341,33 +341,34 @@ static void print_line(Terminal *term, LineInfo *info)
     }
 
     TermColor color;
-    if (editor.options.display_special && obuf->x >= obuf->scroll_x) {
+    if (e->options.display_special && obuf->x >= obuf->scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
-        color = editor.colors.builtin[BC_DEFAULT];
-        mask_color(&color, &editor.colors.builtin[BC_NONTEXT]);
-        mask_selection_and_current_line(info, &color);
-        set_color(term, &color);
+        color = e->colors.builtin[BC_DEFAULT];
+        mask_color(&color, &e->colors.builtin[BC_NONTEXT]);
+        mask_selection_and_current_line(e, info, &color);
+        set_color(e, &color);
         term_put_char(obuf, '$');
     }
 
-    color = editor.colors.builtin[BC_DEFAULT];
-    mask_selection_and_current_line(info, &color);
-    set_color(term, &color);
+    color = e->colors.builtin[BC_DEFAULT];
+    mask_selection_and_current_line(e, info, &color);
+    set_color(e, &color);
     info->offset++;
     term_clear_eol(term);
 }
 
-void update_range(Terminal *term, const View *v, long y1, long y2)
+void update_range(EditorState *e, const View *v, long y1, long y2)
 {
     const int edit_x = v->window->edit_x;
     const int edit_y = v->window->edit_y;
     const int edit_w = v->window->edit_w;
     const int edit_h = v->window->edit_h;
 
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     term_output_reset(term, edit_x, edit_w, v->vx);
     obuf->tab_width = v->buffer->options.tab_width;
-    obuf->tab = editor.options.display_special ? TAB_SPECIAL : TAB_NORMAL;
+    obuf->tab = e->options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     BlockIter bi = v->cursor;
     for (long i = 0, n = v->cy - y1; i < n; i++) {
@@ -396,7 +397,7 @@ void update_range(Terminal *term, const View *v, long y1, long y2)
         bool next_changed;
         const TermColor **colors = hl_line(v->buffer, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
-        print_line(term, &info);
+        print_line(e, &info);
 
         got_line = !!block_iter_next_line(&bi);
         info.line_nr++;
@@ -411,18 +412,18 @@ void update_range(Terminal *term, const View *v, long y1, long y2)
 
     if (i < y2 && info.line_nr == v->cy) {
         // Dummy empty line is shown only if cursor is on it
-        TermColor color = editor.colors.builtin[BC_DEFAULT];
+        TermColor color = e->colors.builtin[BC_DEFAULT];
 
         obuf->x = 0;
-        mask_color2(&color, &editor.colors.builtin[BC_CURRENTLINE]);
-        set_color(term, &color);
+        mask_color2(e, &color, &e->colors.builtin[BC_CURRENTLINE]);
+        set_color(e, &color);
 
         term_move_cursor(obuf, edit_x, edit_y + i++);
         term_clear_eol(term);
     }
 
     if (i < y2) {
-        set_builtin_color(term, BC_NOLINE);
+        set_builtin_color(e, BC_NOLINE);
     }
     for (; i < y2; i++) {
         obuf->x = 0;

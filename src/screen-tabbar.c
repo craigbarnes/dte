@@ -126,7 +126,7 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_tab_title(Terminal *term, const View *v, size_t idx)
+static void print_tab_title(EditorState *e, const View *v, size_t idx)
 {
     const char *filename = buffer_filename(v->buffer);
     int skip = v->tt_width - v->tt_truncated_width;
@@ -135,12 +135,12 @@ static void print_tab_title(Terminal *term, const View *v, size_t idx)
     }
 
     const char *tab_number = uint_to_str((unsigned int)idx + 1);
-    TermOutputBuffer *obuf = &term->obuf;
+    TermOutputBuffer *obuf = &e->terminal.obuf;
     bool is_active_tab = (v == v->window->view);
     bool is_modified = buffer_modified(v->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
-    set_builtin_color(term, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
+    set_builtin_color(e, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
     term_add_str(obuf, tab_number);
     term_put_char(obuf, is_modified ? '+' : ':');
@@ -151,12 +151,13 @@ static void print_tab_title(Terminal *term, const View *v, size_t idx)
     term_put_char(obuf, right_overflow ? '>' : ' ');
 }
 
-void print_tabbar(Terminal *term, Window *win)
+void print_tabbar(EditorState *e, Window *win)
 {
-    if (!editor.options.tab_bar) {
+    if (!e->options.tab_bar) {
         return;
     }
 
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     term_output_reset(term, win->x, win->w, 0);
     term_move_cursor(obuf, win->x, win->y);
@@ -165,14 +166,14 @@ void print_tabbar(Terminal *term, Window *win)
     size_t i = win->first_tab_idx;
     size_t n = win->views.count;
     for (; i < n; i++) {
-        const View *v = win->views.ptrs[i];
-        if (obuf->x + v->tt_truncated_width > win->w) {
+        const View *view = win->views.ptrs[i];
+        if (obuf->x + view->tt_truncated_width > win->w) {
             break;
         }
-        print_tab_title(term, v, i);
+        print_tab_title(e, view, i);
     }
 
-    set_builtin_color(term, BC_TABBAR);
+    set_builtin_color(e, BC_TABBAR);
 
     if (i == n) {
         term_clear_eol(term);

@@ -139,7 +139,7 @@ static void set_window_title_changed(bool global)
     Terminal *term = &editor.terminal;
     if (editor.options.set_window_title) {
         if (editor.status == EDITOR_RUNNING) {
-            update_term_title(term, editor.buffer);
+            update_term_title(&editor, editor.buffer);
         }
     } else {
         term_restore_title(term);

@@ -321,18 +321,19 @@ UNITTEST {
     window_free(window);
 }
 
-void update_status_line(Terminal *term, const Window *win)
+void update_status_line(EditorState *e, const Window *win)
 {
     char lbuf[256], rbuf[256];
-    sf_format(win, lbuf, sizeof lbuf, editor.options.statusline_left);
-    sf_format(win, rbuf, sizeof rbuf, editor.options.statusline_right);
+    sf_format(win, lbuf, sizeof lbuf, e->options.statusline_left);
+    sf_format(win, rbuf, sizeof rbuf, e->options.statusline_right);
 
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
     term_output_reset(term, win->x, win->w, 0);
     term_move_cursor(obuf, win->x, win->y + win->h - 1);
-    set_builtin_color(term, BC_STATUSLINE);
+    set_builtin_color(e, BC_STATUSLINE);
 
     if (lw + rw <= win->w) {
         // Both fit

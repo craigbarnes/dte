@@ -5,39 +5,39 @@
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
 
-void set_color(Terminal *term, const TermColor *color)
+void set_color(EditorState *e, const TermColor *color)
 {
-    TermOutputBuffer *obuf = &term->obuf;
     TermColor tmp = *color;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = editor.colors.builtin[BC_DEFAULT].fg;
+        tmp.fg = e->colors.builtin[BC_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = editor.colors.builtin[BC_DEFAULT].bg;
+        tmp.bg = e->colors.builtin[BC_DEFAULT].bg;
     }
-    if (same_color(&tmp, &obuf->color)) {
+    if (same_color(&tmp, &e->terminal.obuf.color)) {
         return;
     }
-    term_set_color(term, &tmp);
-    obuf->color = tmp;
+    term_set_color(&e->terminal, &tmp);
+    e->terminal.obuf.color = tmp;
 }
 
-void set_builtin_color(Terminal *term, BuiltinColorEnum c)
+void set_builtin_color(EditorState *e, BuiltinColorEnum c)
 {
-    set_color(term, &editor.colors.builtin[c]);
+    set_color(e, &e->colors.builtin[c]);
 }
 
-void update_term_title(Terminal *term, const Buffer *b)
+void update_term_title(EditorState *e, const Buffer *b)
 {
     if (
-        !editor.options.set_window_title
-        || term->control_codes.set_title_begin.length == 0
+        !e->options.set_window_title
+        || e->terminal.control_codes.set_title_begin.length == 0
     ) {
         return;
     }
 
     // FIXME: title must not contain control characters
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     const char *filename = buffer_filename(b);
     term_add_strview(obuf, term->control_codes.set_title_begin);
@@ -74,13 +74,13 @@ static void print_separator(Window *win, void *ud)
     }
 }
 
-void update_separators(Terminal *term)
+void update_separators(EditorState *e)
 {
-    set_builtin_color(term, BC_STATUSLINE);
-    frame_for_each_window(editor.root_frame, print_separator, term);
+    set_builtin_color(e, BC_STATUSLINE);
+    frame_for_each_window(e->root_frame, print_separator, &e->terminal);
 }
 
-void update_line_numbers(Terminal *term, Window *win, bool force)
+void update_line_numbers(EditorState *e, Window *win, bool force)
 {
     const View *view = win->view;
     size_t lines = view->buffer->nl;
@@ -101,13 +101,13 @@ void update_line_numbers(Terminal *term, Window *win, bool force)
     win->line_numbers.first = first;
     win->line_numbers.last = last;
 
-    TermOutputBuffer *obuf = &term->obuf;
+    TermOutputBuffer *obuf = &e->terminal.obuf;
     char buf[DECIMAL_STR_MAX(unsigned long) + 1];
     size_t width = win->line_numbers.width;
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
-    term_output_reset(term, win->x, win->w, 0);
-    set_builtin_color(term, BC_LINENUMBER);
+    term_output_reset(&e->terminal, win->x, win->w, 0);
+    set_builtin_color(e, BC_LINENUMBER);
 
     for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;
