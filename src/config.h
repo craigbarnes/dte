@@ -27,7 +27,6 @@ typedef struct {
 extern ConfigState current_config;
 
 String dump_builtin_configs(void);
-void collect_builtin_configs(PointerArray *a, const char *prefix);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
 void exec_config(const CommandSet *cmds, StringView config);

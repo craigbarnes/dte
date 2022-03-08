@@ -10,7 +10,6 @@
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
-#include "editor.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
@@ -59,17 +58,6 @@ bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
     current_command = NULL;
     end_change();
     return true;
-}
-
-void collect_bound_keys(PointerArray *a, const char *prefix)
-{
-    const IntMap *map = &editor.bindings[INPUT_NORMAL].map;
-    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
-        const char *str = keycode_to_string(it.entry->key);
-        if (str_has_prefix(str, prefix)) {
-            ptr_array_append(a, xstrdup(str));
-        }
-    }
 }
 
 typedef struct {

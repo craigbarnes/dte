@@ -29,6 +29,8 @@
 #include "util/xmalloc.h"
 #include "vars.h"
 
+extern char **environ;
+
 typedef enum {
     COLLECT_ALL, // (directories and files)
     COLLECT_EXECUTABLES, // (directories and executable files)
@@ -165,68 +167,133 @@ static void collect_files(CompletionState *cs, FileCollectionType type)
     }
 }
 
-static void complete_files(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
+void collect_normal_aliases(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
-    collect_files(cs, COLLECT_ALL);
+    collect_hashmap_keys(&normal_commands.aliases, a, prefix);
 }
 
-static void complete_dirs(CompletionState *cs, const CommandArgs* UNUSED_ARG(a))
+void collect_bound_keys(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_files(cs, COLLECT_DIRS_ONLY);
+    const IntMap *map = &e->bindings[INPUT_NORMAL].map;
+    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
+        const char *str = keycode_to_string(it.entry->key);
+        if (str_has_prefix(str, prefix)) {
+            ptr_array_append(a, xstrdup(str));
+        }
+    }
 }
 
-static void complete_exec(CompletionState *cs, const CommandArgs *a)
+void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
 {
+    for (size_t i = 0; i < NR_BC; i++) {
+        const char *name = builtin_color_names[i];
+        if (str_has_prefix(name, prefix)) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
+    collect_hashmap_keys(&e->colors.other, a, prefix);
+}
+
+void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
+{
+    collect_hashmap_keys(&e->compilers, a, prefix);
+}
+
+void collect_builtin_configs(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+{
+    size_t nconfigs;
+    const BuiltinConfig *configs = get_builtin_configs_array(&nconfigs);
+    for (size_t i = 0; i < nconfigs; i++) {
+        const BuiltinConfig *cfg = &configs[i];
+        if (str_has_prefix(cfg->name, "syntax/")) {
+            return;
+        } else if (str_has_prefix(cfg->name, prefix)) {
+            ptr_array_append(a, xstrdup(cfg->name));
+        }
+    }
+}
+
+void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+{
+    for (size_t i = 0; environ[i]; i++) {
+        const char *var = environ[i];
+        if (str_has_prefix(var, prefix)) {
+            const char *delim = strchr(var, '=');
+            if (likely(delim)) {
+                ptr_array_append(a, xstrcut(var, delim - var));
+            }
+        }
+    }
+}
+
+static void complete_files(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    collect_files(&e->cmdline.completion, COLLECT_ALL);
+}
+
+static void complete_dirs(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    collect_files(&e->cmdline.completion, COLLECT_DIRS_ONLY);
+}
+
+static void complete_exec(EditorState *e, const CommandArgs *a)
+{
+    CompletionState *cs = &e->cmdline.completion;
     collect_files(cs, a->nr_args == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
 }
 
-static void complete_compile(CompletionState *cs, const CommandArgs *a)
+static void complete_compile(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     size_t n = a->nr_args;
     if (n == 0) {
-        collect_compilers(&cs->completions, cs->parsed);
+        collect_compilers(e, &cs->completions, cs->parsed);
     } else {
         collect_files(cs, n == 1 ? COLLECT_EXECUTABLES : COLLECT_ALL);
     }
 }
 
-static void complete_errorfmt(CompletionState *cs, const CommandArgs *a)
+static void complete_errorfmt(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_compilers(&cs->completions, cs->parsed);
+        collect_compilers(e, &cs->completions, cs->parsed);
     } else if (a->nr_args >= 2 && !cmdargs_has_flag(a, 'i')) {
         collect_errorfmt_capture_names(&cs->completions, cs->parsed);
     }
 }
 
-static void complete_ft(CompletionState *cs, const CommandArgs *a)
+static void complete_ft(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         collect_ft(&cs->completions, cs->parsed);
     }
 }
 
-static void complete_hi(CompletionState *cs, const CommandArgs *a)
+static void complete_hi(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_hl_colors(&cs->completions, cs->parsed);
+        collect_hl_colors(e, &cs->completions, cs->parsed);
     } else {
         collect_colors_and_attributes(&cs->completions, cs->parsed);
     }
 }
 
-static void complete_include(CompletionState *cs, const CommandArgs *a)
+static void complete_include(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         if (cmdargs_has_flag(a, 'b')) {
-            collect_builtin_configs(&cs->completions, cs->parsed);
+            collect_builtin_configs(e, &cs->completions, cs->parsed);
         } else {
             collect_files(cs, COLLECT_ALL);
         }
     }
 }
 
-static void complete_macro(CompletionState *cs, const CommandArgs *a)
+static void complete_macro(EditorState *e, const CommandArgs *a)
 {
     static const char verbs[][8] = {
         "cancel",
@@ -240,6 +307,7 @@ static void complete_macro(CompletionState *cs, const CommandArgs *a)
         return;
     }
 
+    CompletionState *cs = &e->cmdline.completion;
     for (size_t i = 0; i < ARRAYLEN(verbs); i++) {
         if (str_has_prefix(verbs[i], cs->parsed)) {
             ptr_array_append(&cs->completions, xstrdup(verbs[i]));
@@ -247,13 +315,14 @@ static void complete_macro(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_move_tab(CompletionState *cs, const CommandArgs *a)
+static void complete_move_tab(EditorState *e, const CommandArgs *a)
 {
     if (a->nr_args != 0) {
         return;
     }
 
     static const char words[][8] = {"left", "right"};
+    CompletionState *cs = &e->cmdline.completion;
     for (size_t i = 0; i < ARRAYLEN(words); i++) {
         if (str_has_prefix(words[i], cs->parsed)) {
             ptr_array_append(&cs->completions, xstrdup(words[i]));
@@ -261,15 +330,16 @@ static void complete_move_tab(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_open(CompletionState *cs, const CommandArgs *a)
+static void complete_open(EditorState *e, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't')) {
-        collect_files(cs, COLLECT_ALL);
+        collect_files(&e->cmdline.completion, COLLECT_ALL);
     }
 }
 
-static void complete_option(CompletionState *cs, const CommandArgs *a)
+static void complete_option(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         if (!cmdargs_has_flag(a, 'r')) {
             collect_ft(&cs->completions, cs->parsed);
@@ -281,8 +351,9 @@ static void complete_option(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_set(CompletionState *cs, const CommandArgs *a)
+static void complete_set(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if ((a->nr_args + 1) & 1) {
         bool local = cmdargs_has_flag(a, 'l');
         bool global = cmdargs_has_flag(a, 'g');
@@ -292,10 +363,11 @@ static void complete_set(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_setenv(CompletionState *cs, const CommandArgs *a)
+static void complete_setenv(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_env(&cs->completions, cs->parsed);
+        collect_env(e, &cs->completions, cs->parsed);
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
         BUG_ON(!a->args[0]);
         const char *value = getenv(a->args[0]);
@@ -305,18 +377,20 @@ static void complete_setenv(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_show(CompletionState *cs, const CommandArgs *a)
+static void complete_show(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         collect_show_subcommands(&cs->completions, cs->parsed);
     } else if (a->nr_args == 1) {
         BUG_ON(!a->args[0]);
-        collect_show_subcommand_args(&cs->completions, a->args[0], cs->parsed);
+        collect_show_subcommand_args(e, &cs->completions, a->args[0], cs->parsed);
     }
 }
 
-static void complete_tag(CompletionState *cs, const CommandArgs *a)
+static void complete_tag(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0 && !cmdargs_has_flag(a, 'r')) {
         TagFile *tf = load_tag_file();
         if (tf) {
@@ -325,16 +399,18 @@ static void complete_tag(CompletionState *cs, const CommandArgs *a)
     }
 }
 
-static void complete_toggle(CompletionState *cs, const CommandArgs *a)
+static void complete_toggle(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         bool global = cmdargs_has_flag(a, 'g');
         collect_toggleable_options(&cs->completions, cs->parsed, global);
     }
 }
 
-static void complete_wsplit(CompletionState *cs, const CommandArgs *a)
+static void complete_wsplit(EditorState *e, const CommandArgs *a)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (!cmdargs_has_flag(a, 't') && !cmdargs_has_flag(a, 'n')) {
         collect_files(cs, COLLECT_ALL);
     }
@@ -342,7 +418,7 @@ static void complete_wsplit(CompletionState *cs, const CommandArgs *a)
 
 typedef struct {
     char cmd_name[12];
-    void (*complete)(CompletionState *cs, const CommandArgs *a);
+    void (*complete)(EditorState *e, const CommandArgs *a);
 } CompletionHandler;
 
 static const CompletionHandler handlers[] = {
@@ -376,11 +452,12 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(handlers, cmd_name, strcmp);
 }
 
-static void collect_completions(CompletionState *cs, char **args, size_t argc)
+static void collect_completions(EditorState *e, char **args, size_t argc)
 {
+    CompletionState *cs = &e->cmdline.completion;
     if (!argc) {
         collect_normal_commands(&cs->completions, cs->parsed);
-        collect_normal_aliases(&cs->completions, cs->parsed);
+        collect_normal_aliases(e, &cs->completions, cs->parsed);
         return;
     }
 
@@ -409,12 +486,12 @@ static void collect_completions(CompletionState *cs, char **args, size_t argc)
 
     const CompletionHandler *h = BSEARCH(args[0], handlers, (CompareFunction)strcmp);
     if (h) {
-        h->complete(cs, &a);
+        h->complete(e, &a);
     } else if (streq(args[0], "repeat")) {
         if (a.nr_args == 1) {
             collect_normal_commands(&cs->completions, cs->parsed);
         } else if (a.nr_args >= 2) {
-            collect_completions(cs, args + 2, argc - 2);
+            collect_completions(e, args + 2, argc - 2);
         }
     }
 
@@ -465,8 +542,9 @@ static int strptrcmp(const void *v1, const void *v2)
     return strcmp(*s1, *s2);
 }
 
-static void init_completion(CompletionState *cs, const CommandLine *cmdline)
+static void init_completion(EditorState *e, const CommandLine *cmdline)
 {
+    CompletionState *cs = &e->cmdline.completion;
     BUG_ON(cs->orig);
     const CommandSet *cmds = &normal_commands;
     const size_t cmdline_pos = cmdline->pos;
@@ -534,7 +612,7 @@ static void init_completion(CompletionState *cs, const CommandLine *cmdline)
     if (is_var(str, len)) {
         char *name = xstrslice(str, 1, len);
         completion_pos++;
-        collect_env(&cs->completions, name);
+        collect_env(e, &cs->completions, name);
         collect_normal_vars(&cs->completions, name);
         free(name);
     } else {
@@ -547,7 +625,7 @@ static void init_completion(CompletionState *cs, const CommandLine *cmdline)
             args = (char**)array.ptrs + 1 + semicolon;
             argc = array.count - semicolon - 1;
         }
-        collect_completions(cs, args, argc);
+        collect_completions(e, args, argc);
     }
 
     ptr_array_free(&array);
@@ -585,12 +663,12 @@ static void do_complete_command(CommandLine *cmdline)
     }
 }
 
-void complete_command_next(CommandLine *cmdline)
+void complete_command_next(EditorState *e)
 {
-    CompletionState *cs = &cmdline->completion;
+    CompletionState *cs = &e->cmdline.completion;
     const bool init = !cs->orig;
     if (init) {
-        init_completion(cs, cmdline);
+        init_completion(e, &e->cmdline);
     }
     size_t count = cs->completions.count;
     if (!count) {
@@ -599,15 +677,15 @@ void complete_command_next(CommandLine *cmdline)
     if (!init) {
         cs->idx = (cs->idx < count - 1) ? cs->idx + 1 : 0;
     }
-    do_complete_command(cmdline);
+    do_complete_command(&e->cmdline);
 }
 
-void complete_command_prev(CommandLine *cmdline)
+void complete_command_prev(EditorState *e)
 {
-    CompletionState *cs = &cmdline->completion;
+    CompletionState *cs = &e->cmdline.completion;
     const bool init = !cs->orig;
     if (init) {
-        init_completion(cs, cmdline);
+        init_completion(e, &e->cmdline);
     }
     size_t count = cs->completions.count;
     if (!count) {
@@ -616,7 +694,7 @@ void complete_command_prev(CommandLine *cmdline)
     if (!init) {
         cs->idx = (cs->idx ? cs->idx : count) - 1;
     }
-    do_complete_command(cmdline);
+    do_complete_command(&e->cmdline);
 }
 
 void reset_completion(CommandLine *cmdline)

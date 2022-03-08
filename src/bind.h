@@ -19,7 +19,6 @@ void remove_binding(KeyBindingGroup *kbg, KeyCode key);
 const CachedCommand *lookup_binding(KeyBindingGroup *kbg, KeyCode key);
 bool handle_binding(KeyBindingGroup *kbg, KeyCode key);
 void free_bindings(KeyBindingGroup *kbg);
-void collect_bound_keys(PointerArray *a, const char *keystr_prefix);
 bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf);
 
 #endif

@@ -9,9 +9,7 @@
 
 void show(EditorState *e, const char *type, const char *key, bool cflag) NONNULL_ARG(1, 2);
 void collect_show_subcommands(PointerArray *a, const char *prefix) NONNULL_ARGS;
-void collect_show_subcommand_args(PointerArray *a, const char *name, const char *arg_prefix) NONNULL_ARGS;
-void collect_env(PointerArray *a, const char *prefix) NONNULL_ARGS;
-void collect_normal_aliases(PointerArray *a, const char *prefix) NONNULL_ARGS;
+void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix) NONNULL_ARGS;
 
 String dump_bindings(EditorState *e);
 String dump_compilers(EditorState *e);

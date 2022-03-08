@@ -75,18 +75,6 @@ String dump_builtin_configs(void)
     return str;
 }
 
-void collect_builtin_configs(PointerArray *a, const char *prefix)
-{
-    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
-        const BuiltinConfig *cfg = &builtin_configs[i];
-        if (str_has_prefix(cfg->name, "syntax/")) {
-            return;
-        } else if (str_has_prefix(cfg->name, prefix)) {
-            ptr_array_append(a, xstrdup(cfg->name));
-        }
-    }
-}
-
 const BuiltinConfig *get_builtin_config(const char *name)
 {
     for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {

@@ -46,7 +46,7 @@ typedef struct {
     uint8_t flags; // ShowHandlerFlags
     void (*show)(EditorState *e, const char *name, bool cmdline);
     String (*dump)(EditorState *e);
-    void (*complete_arg)(PointerArray *a, const char *prefix);
+    void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
 } ShowHandler;
 
 static void open_temporary_buffer (
@@ -162,19 +162,6 @@ static String dump_env(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
-void collect_env(PointerArray *a, const char *prefix)
-{
-    for (size_t i = 0; environ[i]; i++) {
-        const char *var = environ[i];
-        if (str_has_prefix(var, prefix)) {
-            const char *delim = strchr(var, '=');
-            if (likely(delim)) {
-                ptr_array_append(a, xstrcut(var, delim - var));
-            }
-        }
-    }
-}
-
 static void show_include(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -224,7 +211,7 @@ static void show_option(EditorState *e, const char *name, bool cflag)
     }
 }
 
-static void collect_all_options(PointerArray *a, const char *prefix)
+static void collect_all_options(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     collect_options(a, prefix, false, false);
 }
@@ -322,11 +309,6 @@ String dump_normal_aliases(EditorState* UNUSED_ARG(e))
 
     free(array);
     return buf;
-}
-
-void collect_normal_aliases(PointerArray *a, const char *prefix)
-{
-    collect_hashmap_keys(&normal_commands.aliases, a, prefix);
 }
 
 String dump_bindings(EditorState *e)
@@ -447,10 +429,10 @@ void collect_show_subcommands(PointerArray *a, const char *prefix)
     }
 }
 
-void collect_show_subcommand_args(PointerArray *a, const char *name, const char *arg_prefix)
+void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix)
 {
     const ShowHandler *handler = BSEARCH(name, handlers, (CompareFunction)strcmp);
     if (handler && handler->complete_arg) {
-        handler->complete_arg(a, arg_prefix);
+        handler->complete_arg(e, a, arg_prefix);
     }
 }

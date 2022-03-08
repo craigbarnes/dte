@@ -322,13 +322,13 @@ static void cmd_word_fwd(const CommandArgs *a)
 static void cmd_complete_next(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    complete_command_next(&e->cmdline);
+    complete_command_next(e);
 }
 
 static void cmd_complete_prev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    complete_command_prev(&e->cmdline);
+    complete_command_prev(e);
 }
 
 static void cmd_case(const CommandArgs *a)

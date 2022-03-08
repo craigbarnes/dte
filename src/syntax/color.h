@@ -29,10 +29,11 @@ typedef struct {
     HashMap other;
 } ColorScheme;
 
+extern const char builtin_color_names[NR_BC][16];
+
 void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color);
 const TermColor *find_color(ColorScheme *colors, const char *name);
 void clear_hl_colors(ColorScheme *colors);
-void collect_hl_colors(PointerArray *a, const char *prefix);
 String dump_hl_colors(const ColorScheme *colors);
 
 #endif

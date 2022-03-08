@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "compiler.h"
 #include "command/serialize.h"
-#include "completion.h"
-#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/hashmap.h"
@@ -99,11 +97,6 @@ void free_compiler(Compiler *c)
 {
     ptr_array_free_cb(&c->error_formats, (FreeFunction)free_error_format);
     free(c);
-}
-
-void collect_compilers(PointerArray *a, const char *prefix)
-{
-    collect_hashmap_keys(&editor.compilers, a, prefix);
 }
 
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
