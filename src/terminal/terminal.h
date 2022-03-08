@@ -53,6 +53,12 @@ typedef struct {
     TermColor color;
 } TermOutputBuffer;
 
+typedef struct {
+    char buf[256];
+    size_t len;
+    bool can_be_truncated;
+} TermInputBuffer;
+
 typedef struct Terminal {
     TermColorCapabilityType color_type;
     TermFeatureFlags features;
@@ -62,6 +68,7 @@ typedef struct Terminal {
     TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
+    TermInputBuffer ibuf;
 } Terminal;
 
 void term_init(Terminal *term, const char *name) NONNULL_ARGS;

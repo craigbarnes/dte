@@ -1,7 +1,6 @@
 #include "screen.h"
 #include "error.h"
 #include "search.h"
-#include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/utf8.h"
 

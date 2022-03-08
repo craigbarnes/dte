@@ -33,7 +33,7 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
         break;
     case KEY_PASTE: {
         size_t size;
-        char *text = term_read_paste(&size);
+        char *text = term_read_paste(&e->terminal.ibuf, &size);
         begin_change(CHANGE_MERGE_NONE);
         insert_text(view, text, size, true);
         end_change();
@@ -51,10 +51,10 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
     }
 }
 
-static void cmdline_insert_paste(CommandLine *c)
+static void cmdline_insert_paste(CommandLine *c, TermInputBuffer *input)
 {
     size_t size;
-    char *text = term_read_paste(&size);
+    char *text = term_read_paste(input, &size);
     strn_replace_byte(text, size, '\n', ' ');
     string_insert_buf(&c->buf, c->pos, text, size);
     c->pos += size;
@@ -75,7 +75,7 @@ void handle_input(EditorState *e, KeyCode key)
     if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
     } else if (key == KEY_PASTE) {
-        cmdline_insert_paste(c);
+        cmdline_insert_paste(c, &e->terminal.ibuf);
     } else {
         handle_binding(&e->bindings[mode], key);
         return;

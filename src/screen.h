@@ -6,6 +6,7 @@
 #include "buffer.h"
 #include "editor.h"
 #include "syntax/color.h"
+#include "terminal/output.h"
 #include "view.h"
 #include "window.h"
 

@@ -1,7 +1,6 @@
 #include "screen.h"
 #include "selection.h"
 #include "syntax/highlight.h"
-#include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"

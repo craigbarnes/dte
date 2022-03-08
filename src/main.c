@@ -220,13 +220,13 @@ static ExitCode showkey_loop(Terminal *term)
 
     bool loop = true;
     while (loop) {
-        KeyCode key = term_read_key();
+        KeyCode key = term_read_key(&term->ibuf);
         switch (key) {
         case KEY_NONE:
         case KEY_IGNORE:
             continue;
         case KEY_PASTE:
-            term_discard_paste();
+            term_discard_paste(&term->ibuf);
             continue;
         case MOD_CTRL | 'd':
             loop = false;
@@ -450,7 +450,7 @@ loop_break:
         return EX_IOERR;
     }
     if (get_nr_errors()) {
-        any_key();
+        any_key(&editor.terminal.ibuf);
         clear_error();
     }
 

@@ -3,9 +3,10 @@
 
 #include <stddef.h>
 #include "key.h"
+#include "terminal.h"
 
-KeyCode term_read_key(void);
-char *term_read_paste(size_t *size);
-void term_discard_paste(void);
+KeyCode term_read_key(TermInputBuffer *ibuf);
+char *term_read_paste(TermInputBuffer *ibuf, size_t *size);
+void term_discard_paste(TermInputBuffer *ibuf);
 
 #endif

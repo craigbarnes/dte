@@ -12,46 +12,38 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-typedef struct {
-    char buf[256];
-    size_t len;
-    bool can_be_truncated;
-} TermInputBuffer;
-
-TermInputBuffer input;
-
-static void consume_input(size_t len)
+static void consume_input(TermInputBuffer *input, size_t len)
 {
-    input.len -= len;
-    if (input.len) {
-        memmove(input.buf, input.buf + len, input.len);
+    input->len -= len;
+    if (input->len) {
+        memmove(input->buf, input->buf + len, input->len);
 
         // Keys are sent faster than we can read
-        input.can_be_truncated = true;
+        input->can_be_truncated = true;
     }
 }
 
-static bool fill_buffer(void)
+static bool fill_buffer(TermInputBuffer *input)
 {
-    if (input.len == sizeof(input.buf)) {
+    if (input->len == sizeof(input->buf)) {
         return false;
     }
 
-    if (!input.len) {
-        input.can_be_truncated = false;
+    if (!input->len) {
+        input->can_be_truncated = false;
     }
 
-    size_t avail = sizeof(input.buf) - input.len;
-    ssize_t rc = read(STDIN_FILENO, input.buf + input.len, avail);
+    size_t avail = sizeof(input->buf) - input->len;
+    ssize_t rc = read(STDIN_FILENO, input->buf + input->len, avail);
     if (rc <= 0) {
         return false;
     }
 
-    input.len += (size_t)rc;
+    input->len += (size_t)rc;
     return true;
 }
 
-static bool fill_buffer_timeout(void)
+static bool fill_buffer_timeout(TermInputBuffer *input)
 {
     struct timeval tv = {
         .tv_sec = editor.options.esc_timeout / 1000,
@@ -69,47 +61,47 @@ static bool fill_buffer_timeout(void)
     FD_SET(STDIN_FILENO, &set);
 
     int rc = select(1, &set, NULL, NULL, &tv);
-    if (rc > 0 && fill_buffer()) {
+    if (rc > 0 && fill_buffer(input)) {
         return true;
     }
     return false;
 }
 
-static bool input_get_byte(unsigned char *ch)
+static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
 {
-    if (!input.len && !fill_buffer()) {
+    if (!input->len && !fill_buffer(input)) {
         return false;
     }
-    *ch = input.buf[0];
-    consume_input(1);
+    *ch = input->buf[0];
+    consume_input(input, 1);
     return true;
 }
 
-static KeyCode read_special(void)
+static KeyCode read_special(TermInputBuffer *input)
 {
     KeyCode key;
-    ssize_t len = editor.terminal.parse_key_sequence(input.buf, input.len, &key);
+    ssize_t len = editor.terminal.parse_key_sequence(input->buf, input->len, &key);
     if (likely(len > 0)) {
         // Match
-        consume_input(len);
+        consume_input(input, len);
         return key;
     }
 
-    if (len < 0 && input.can_be_truncated && fill_buffer()) {
+    if (len < 0 && input->can_be_truncated && fill_buffer(input)) {
         // Possibly truncated
-        return read_special();
+        return read_special(input);
     }
 
     // No match
     return KEY_NONE;
 }
 
-static KeyCode read_simple(void)
+static KeyCode read_simple(TermInputBuffer *input)
 {
     unsigned char ch = 0;
 
     // > 0 bytes in buf
-    input_get_byte(&ch);
+    input_get_byte(input, &ch);
 
     // Normal key
     if (ch < 0x80) {
@@ -137,7 +129,7 @@ static KeyCode read_simple(void)
 
     CodePoint u = ch & (bit - 1);
     do {
-        if (!input_get_byte(&ch) || ch >> 6 != 2) {
+        if (!input_get_byte(input, &ch) || ch >> 6 != 2) {
             return KEY_NONE;
         }
         u = (u << 6) | (ch & 0x3f);
@@ -156,27 +148,27 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-KeyCode term_read_key(void)
+KeyCode term_read_key(TermInputBuffer *input)
 {
-    if (!input.len && !fill_buffer()) {
+    if (!input->len && !fill_buffer(input)) {
         return KEY_NONE;
     }
 
-    if (input.len > 4 && is_text(input.buf, input.len)) {
+    if (input->len > 4 && is_text(input->buf, input->len)) {
         return KEY_PASTE;
     }
 
-    if (input.buf[0] == '\033') {
-        if (input.len > 1 || input.can_be_truncated) {
-            KeyCode key = read_special();
+    if (input->buf[0] == '\033') {
+        if (input->len > 1 || input->can_be_truncated) {
+            KeyCode key = read_special(input);
             if (key != KEY_NONE) {
                 return key;
             }
         }
-        if (input.len == 1) {
+        if (input->len == 1) {
             // Sometimes alt-key gets split into two reads
-            fill_buffer_timeout();
-            if (input.len > 1 && input.buf[1] == '\033') {
+            fill_buffer_timeout(input);
+            if (input->len > 1 && input->buf[1] == '\033') {
                 /*
                  * Double-esc (+ maybe some other characters)
                  *
@@ -190,21 +182,21 @@ KeyCode term_read_key(void)
                  * This breaks the esc-key == alt-key rule for the
                  * esc-esc case but it shouldn't matter.
                  */
-                return read_simple();
+                return read_simple(input);
             }
         }
-        if (input.len > 1) {
+        if (input->len > 1) {
             // Unknown escape sequence or 'esc key' / 'alt-key'
 
             // Throw escape away
-            consume_input(1);
+            consume_input(input, 1);
 
-            KeyCode key = read_simple();
+            KeyCode key = read_simple(input);
             if (key == KEY_NONE) {
                 return KEY_NONE;
             }
 
-            if (input.len == 0 || input.buf[0] == '\033') {
+            if (input->len == 0 || input->buf[0] == '\033') {
                 // 'esc key' or 'alt-key'
                 if (u_is_ascii_upper(key)) {
                     return MOD_META | MOD_SHIFT | ascii_tolower(key);
@@ -213,24 +205,24 @@ KeyCode term_read_key(void)
             }
 
             // Unknown escape sequence; avoid inserting it
-            input.len = 0;
+            input->len = 0;
             return KEY_NONE;
         }
     }
 
-    return read_simple();
+    return read_simple(input);
 }
 
-char *term_read_paste(size_t *size)
+char *term_read_paste(TermInputBuffer *input, size_t *size)
 {
-    size_t alloc = round_size_to_next_multiple(input.len + 1, 1024);
+    size_t alloc = round_size_to_next_multiple(input->len + 1, 1024);
     size_t count = 0;
     char *buf = xmalloc(alloc);
 
-    if (input.len) {
-        memcpy(buf, input.buf, input.len);
-        count = input.len;
-        input.len = 0;
+    if (input->len) {
+        memcpy(buf, input->buf, input->len);
+        count = input->len;
+        input->len = 0;
     }
 
     while (1) {
@@ -273,8 +265,8 @@ char *term_read_paste(size_t *size)
     return buf;
 }
 
-void term_discard_paste(void)
+void term_discard_paste(TermInputBuffer *input)
 {
     size_t size;
-    free(term_read_paste(&size));
+    free(term_read_paste(input, &size));
 }
