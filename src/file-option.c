@@ -146,7 +146,6 @@ append:
 
 error:
     free(opt);
-    return;
 }
 
 void dump_file_options(String *buf)
