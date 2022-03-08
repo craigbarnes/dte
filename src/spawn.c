@@ -201,7 +201,7 @@ static void resume_terminal(bool quiet, bool prompt)
     term_raw();
     if (!quiet && editor.child_controls_terminal) {
         if (prompt) {
-            any_key(&editor.terminal);
+            any_key(&editor);
         }
         ui_start(&editor);
         editor.child_controls_terminal = false;

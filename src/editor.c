@@ -277,11 +277,13 @@ static void sanity_check(const View *v)
 #endif
 }
 
-void any_key(Terminal *term)
+void any_key(EditorState *e)
 {
-    fputs("Press any key to continue\r\n", stderr);
+    Terminal *term = &e->terminal;
+    unsigned int esc_timeout = e->options.esc_timeout;
     KeyCode key;
-    while ((key = term_read_key(term, 100)) == KEY_NONE) {
+    fputs("Press any key to continue\r\n", stderr);
+    while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
         ;
     }
     if (key == KEY_PASTE) {

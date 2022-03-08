@@ -450,7 +450,7 @@ loop_break:
         return EX_IOERR;
     }
     if (get_nr_errors()) {
-        any_key(term);
+        any_key(&editor);
         clear_error();
     }
 
