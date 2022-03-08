@@ -207,7 +207,7 @@ static void cmd_bolsf(const CommandArgs *a)
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_bol(&view->cursor)) {
-        long top = view->vy + window_get_scroll_margin(e->window);
+        long top = view->vy + window_get_scroll_margin(e, e->window);
         if (view->cy > top) {
             move_up(view, view->cy - top);
         } else {
@@ -313,11 +313,11 @@ static void cmd_close(const CommandArgs *a)
     }
 
     if (allow_wclose && e->window->views.count <= 1) {
-        window_close_current();
+        window_close_current(e);
         return;
     }
 
-    window_close_current_view(e->window);
+    window_close_current_view(e, e->window);
     set_view(e, e->window->view);
 }
 
@@ -499,7 +499,7 @@ static void cmd_eolsf(const CommandArgs *a)
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_eol(&view->cursor)) {
-        long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(window);
+        long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(e, window);
         if (view->cy < bottom) {
             move_down(view, bottom - view->cy);
         } else {
@@ -596,7 +596,7 @@ static void cmd_exec_open(const CommandArgs *a)
 
     EditorState *e = a->userdata;
     ptr_array_append(&filenames, NULL);
-    window_open_files(e->window, (char**)filenames.ptrs, NULL);
+    window_open_files(e, e->window, (char**)filenames.ptrs, NULL);
     macro_command_hook("open", (char**)filenames.ptrs);
     ptr_array_free_array(&filenames);
     string_free(&ctx.output);
@@ -1077,7 +1077,7 @@ static void cmd_open(const CommandArgs *a)
 
     EditorState *e = a->userdata;
     if (a->nr_args == 0) {
-        View *v = window_open_new_file(e->window);
+        View *v = window_open_new_file(e, e->window);
         v->buffer->temporary = temporary;
         if (requested_encoding) {
             buffer_set_encoding(v->buffer, encoding);
@@ -1097,11 +1097,11 @@ static void cmd_open(const CommandArgs *a)
 
     if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(e->window, paths[0], &encoding);
+        window_open_file(e, e->window, paths[0], &encoding);
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(e->window, paths, &encoding);
+        window_open_files(e, e->window, paths, &encoding);
     }
 
     if (use_glob) {
@@ -1220,7 +1220,7 @@ static void cmd_pgdown(const CommandArgs *a)
     EditorState *e = a->userdata;
     Window *window = e->window;
     View *view = e->view;
-    long margin = window_get_scroll_margin(window);
+    long margin = window_get_scroll_margin(e, window);
     long bottom = view->vy + window->edit_h - 1 - margin;
     long count;
 
@@ -1239,7 +1239,7 @@ static void cmd_pgup(const CommandArgs *a)
     EditorState *e = a->userdata;
     Window *window = e->window;
     View *view = e->view;
-    long margin = window_get_scroll_margin(window);
+    long margin = window_get_scroll_margin(e, window);
     long top = view->vy + margin;
     long count;
 
@@ -2189,7 +2189,7 @@ static void cmd_wclose(const CommandArgs *a)
             return;
         }
     }
-    window_close_current();
+    window_close_current(e);
 }
 
 static void cmd_wflip(const CommandArgs *a)
@@ -2206,7 +2206,7 @@ static void cmd_wflip(const CommandArgs *a)
 static void cmd_wnext(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    e->window = next_window(e->window);
+    e->window = next_window(e, e->window);
     set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
@@ -2233,7 +2233,7 @@ static void cmd_word_fwd(const CommandArgs *a)
 static void cmd_wprev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    e->window = prev_window(e->window);
+    e->window = prev_window(e, e->window);
     set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
@@ -2329,10 +2329,10 @@ static void cmd_wsplit(const CommandArgs *a)
     mark_everything_changed(e);
 
     if (empty) {
-        window_open_new_file(e->window);
+        window_open_new_file(e, e->window);
         e->buffer->temporary = temporary;
     } else if (paths[0]) {
-        window_open_files(e->window, paths, NULL);
+        window_open_files(e, e->window, paths, NULL);
     } else {
         View *new = window_add_buffer(e->window, save->buffer);
         new->cursor = save->cursor;

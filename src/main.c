@@ -463,7 +463,7 @@ loop_break:
                 error_msg("Invalid file position: '%s'", str);
             }
         } else {
-            View *v = window_open_buffer(window, str, false, NULL);
+            View *v = window_open_buffer(&editor, window, str, false, NULL);
             if (line > 0) {
                 set_view(&editor, v);
                 move_to_line(v, line);
@@ -515,7 +515,7 @@ loop_break:
         && tag && window->views.count > 1
     ) {
         // Close the empty buffer, leaving just the buffer opened via "-t"
-        remove_view(window->views.ptrs[0]);
+        remove_view(&editor, window->views.ptrs[0]);
     }
 
     if (command || tag) {

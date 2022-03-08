@@ -57,6 +57,7 @@ typedef struct {
     size_t pos;
     size_t separator;
     const Window *win;
+    const EditorState *editor;
 } Formatter;
 
 #define add_status_literal(f, s) add_status_bytes(f, s, STRLEN(s))
@@ -145,8 +146,8 @@ static void add_misc_status(Formatter *f)
         [CSS_AUTO] = {STRN("[case-sensitive = auto]")},
     };
 
-    if (editor.input_mode == INPUT_SEARCH) {
-        SearchCaseSensitivity css = editor.options.case_sensitive_search;
+    if (f->editor->input_mode == INPUT_SEARCH) {
+        SearchCaseSensitivity css = f->editor->options.case_sensitive_search;
         BUG_ON(css >= ARRAYLEN(css_strs));
         add_status_bytes(f, css_strs[css].str, css_strs[css].len);
         return;
@@ -183,11 +184,17 @@ static FormatSpecifierType lookup_format_specifier(unsigned char ch)
     return format_specifiers[ch];
 }
 
-static void sf_format(const Window *w, char *buf, size_t size, const char *format)
-{
+static void sf_format (
+    const EditorState *e,
+    const Window *w,
+    char *buf,
+    size_t size,
+    const char *format
+) {
     BUG_ON(size < 16);
     Formatter f = {
         .win = w,
+        .editor = e,
         .buf = buf,
         .size = size - 5, // Max length of char and terminating NUL
     };
@@ -301,11 +308,12 @@ static void sf_format(const Window *w, char *buf, size_t size, const char *forma
 }
 
 UNITTEST {
+    EditorState e = {.input_mode = INPUT_NORMAL};
     char buf[256];
     Window *window = new_window();
     window->view = window_open_empty_buffer(window);
 
-    sf_format(window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    sf_format(&e, window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
     char fmt[4] = "%%";
@@ -315,17 +323,17 @@ UNITTEST {
             continue;
         }
         fmt[1] = i;
-        sf_format(window, buf, sizeof(buf), fmt);
+        sf_format(&e, window, buf, sizeof(buf), fmt);
     }
 
-    window_free(window);
+    window_free(&e, window);
 }
 
 void update_status_line(EditorState *e, const Window *win)
 {
     char lbuf[256], rbuf[256];
-    sf_format(win, lbuf, sizeof lbuf, e->options.statusline_left);
-    sf_format(win, rbuf, sizeof rbuf, e->options.statusline_right);
+    sf_format(e, win, lbuf, sizeof lbuf, e->options.statusline_left);
+    sf_format(e, win, rbuf, sizeof rbuf, e->options.statusline_right);
 
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;

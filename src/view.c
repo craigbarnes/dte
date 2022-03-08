@@ -91,7 +91,7 @@ static void view_update_vx(View *v)
 static void view_update_vy(View *v)
 {
     Window *w = v->window;
-    int margin = window_get_scroll_margin(w);
+    int margin = window_get_scroll_margin(&editor, w);
     long max_y = v->vy + w->edit_h - 1 - margin;
 
     if (v->cy < v->vy + margin) {

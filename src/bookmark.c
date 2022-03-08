@@ -24,7 +24,7 @@ FileLocation *get_current_file_location(const View *view)
 bool file_location_go(const FileLocation *loc)
 {
     Window *window = editor.window;
-    View *view = window_open_buffer(window, loc->filename, true, NULL);
+    View *view = window_open_buffer(&editor, window, loc->filename, true, NULL);
     if (!view) {
         // Failed to open file. Error message should be visible.
         return false;
@@ -67,7 +67,7 @@ static bool file_location_return(const FileLocation *loc)
             // Try again.
             return false;
         }
-        view = window_open_buffer(window, loc->filename, true, NULL);
+        view = window_open_buffer(&editor, window, loc->filename, true, NULL);
     }
 
     if (!view) {
