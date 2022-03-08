@@ -6,10 +6,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "input.h"
-#include "terminal.h"
-#include "editor.h"
 #include "util/ascii.h"
 #include "util/str-util.h"
+#include "util/unicode.h"
 #include "util/xmalloc.h"
 
 static void consume_input(TermInputBuffer *input, size_t len)
@@ -43,11 +42,11 @@ static bool fill_buffer(TermInputBuffer *input)
     return true;
 }
 
-static bool fill_buffer_timeout(TermInputBuffer *input)
+static bool fill_buffer_timeout(TermInputBuffer *input, unsigned int esc_timeout)
 {
     struct timeval tv = {
-        .tv_sec = editor.options.esc_timeout / 1000,
-        .tv_usec = (editor.options.esc_timeout % 1000) * 1000
+        .tv_sec = esc_timeout / 1000,
+        .tv_usec = (esc_timeout % 1000) * 1000
     };
 
     fd_set set;
@@ -77,10 +76,11 @@ static bool input_get_byte(TermInputBuffer *input, unsigned char *ch)
     return true;
 }
 
-static KeyCode read_special(TermInputBuffer *input)
+static KeyCode read_special(Terminal *term)
 {
+    TermInputBuffer *input = &term->ibuf;
     KeyCode key;
-    ssize_t len = editor.terminal.parse_key_sequence(input->buf, input->len, &key);
+    ssize_t len = term->parse_key_sequence(input->buf, input->len, &key);
     if (likely(len > 0)) {
         // Match
         consume_input(input, len);
@@ -89,7 +89,7 @@ static KeyCode read_special(TermInputBuffer *input)
 
     if (len < 0 && input->can_be_truncated && fill_buffer(input)) {
         // Possibly truncated
-        return read_special(input);
+        return read_special(term);
     }
 
     // No match
@@ -148,8 +148,9 @@ static bool is_text(const char *str, size_t len)
     return true;
 }
 
-KeyCode term_read_key(TermInputBuffer *input)
+KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
 {
+    TermInputBuffer *input = &term->ibuf;
     if (!input->len && !fill_buffer(input)) {
         return KEY_NONE;
     }
@@ -160,14 +161,14 @@ KeyCode term_read_key(TermInputBuffer *input)
 
     if (input->buf[0] == '\033') {
         if (input->len > 1 || input->can_be_truncated) {
-            KeyCode key = read_special(input);
+            KeyCode key = read_special(term);
             if (key != KEY_NONE) {
                 return key;
             }
         }
         if (input->len == 1) {
             // Sometimes alt-key gets split into two reads
-            fill_buffer_timeout(input);
+            fill_buffer_timeout(input, esc_timeout);
             if (input->len > 1 && input->buf[1] == '\033') {
                 /*
                  * Double-esc (+ maybe some other characters)

@@ -277,15 +277,15 @@ static void sanity_check(const View *v)
 #endif
 }
 
-void any_key(TermInputBuffer *input)
+void any_key(Terminal *term)
 {
     fputs("Press any key to continue\r\n", stderr);
     KeyCode key;
-    while ((key = term_read_key(input)) == KEY_NONE) {
+    while ((key = term_read_key(term, 100)) == KEY_NONE) {
         ;
     }
     if (key == KEY_PASTE) {
-        term_discard_paste(input);
+        term_discard_paste(&term->ibuf);
     }
 }
 
@@ -444,16 +444,16 @@ const char *editor_file(const char *name)
     return mem_intern(buf, n);
 }
 
-static char get_choice(TermInputBuffer *input, const char *choices)
+static char get_choice(EditorState *e, const char *choices)
 {
-    KeyCode key = term_read_key(input);
+    KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);
     if (key == KEY_NONE) {
         return 0;
     }
 
     switch (key) {
     case KEY_PASTE:
-        term_discard_paste(input);
+        term_discard_paste(&e->terminal.ibuf);
         return 0;
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':
@@ -524,7 +524,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
     term_output_flush(obuf);
 
     char choice;
-    while ((choice = get_choice(&term->ibuf, choices)) == 0) {
+    while ((choice = get_choice(e, choices)) == 0) {
         if (!e->resized) {
             continue;
         }
@@ -557,7 +557,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     end_update(e);
 
     char choice;
-    while ((choice = get_choice(&term->ibuf, choices)) == 0) {
+    while ((choice = get_choice(e, choices)) == 0) {
         if (!e->resized) {
             continue;
         }
@@ -630,7 +630,7 @@ void main_loop(EditorState *e)
             ui_resize(e);
         }
 
-        KeyCode key = term_read_key(&e->terminal.ibuf);
+        KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);
         if (key == KEY_NONE) {
             continue;
         }

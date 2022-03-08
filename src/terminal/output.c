@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "output.h"
-#include "terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/numtostr.h"

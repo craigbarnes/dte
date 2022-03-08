@@ -220,7 +220,7 @@ static ExitCode showkey_loop(Terminal *term)
 
     bool loop = true;
     while (loop) {
-        KeyCode key = term_read_key(&term->ibuf);
+        KeyCode key = term_read_key(term, 100);
         switch (key) {
         case KEY_NONE:
         case KEY_IGNORE:
@@ -450,7 +450,7 @@ loop_break:
         return EX_IOERR;
     }
     if (get_nr_errors()) {
-        any_key(&editor.terminal.ibuf);
+        any_key(term);
         clear_error();
     }
 
