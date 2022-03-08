@@ -36,25 +36,20 @@ typedef struct {
 typedef struct {
     char *buf;
     size_t count;
+    size_t scroll_x; // Number of characters scrolled (x direction)
 
-    // Number of characters scrolled (x direction)
-    size_t scroll_x;
-
-    // Current x position (tab 1-8, double-width 2, invalid UTF-8 byte 4)
+    // Current x position (tab: 1-8, double-width: 2, invalid UTF-8 byte: 4)
     // if smaller than scroll_x printed characters are not visible
     size_t x;
 
     size_t width;
-
     enum {
         TAB_NORMAL,
         TAB_SPECIAL,
         TAB_CONTROL,
     } tab;
-
     uint8_t tab_width;
     bool can_clear;
-
     TermColor color;
 } TermOutputBuffer;
 
