@@ -12,30 +12,31 @@
 
 #define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
 
-NONNULL_ARGS
+PURE NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {
     return strcmp(a, b) == 0;
 }
 
+PURE
 static inline bool xstreq(const char *a, const char *b)
 {
     return (a == b) || (a && b && streq(a, b));
 }
 
-NONNULL_ARGS
+PURE NONNULL_ARGS
 static inline bool mem_equal(const void *s1, const void *s2, size_t n)
 {
     return memcmp(s1, s2, n) == 0;
 }
 
-NONNULL_ARGS
+PURE NONNULL_ARGS
 static inline bool str_has_prefix(const char *str, const char *prefix)
 {
     return strncmp(str, prefix, strlen(prefix)) == 0;
 }
 
-NONNULL_ARGS
+PURE NONNULL_ARGS
 static inline bool str_has_suffix(const char *str, const char *suffix)
 {
     size_t l1 = strlen(str);
