@@ -19,6 +19,7 @@ Features
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
 * Jump to compiler error
+* Copy to system clipboard (via OSC 52, which works over SSH)
 * [EditorConfig] support
 
 Screenshot
