@@ -12,11 +12,13 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-static struct {
+typedef struct {
     char buf[256];
     size_t len;
     bool can_be_truncated;
-} input;
+} TermInputBuffer;
+
+TermInputBuffer input;
 
 static void consume_input(size_t len)
 {
