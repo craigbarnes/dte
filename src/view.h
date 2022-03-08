@@ -15,44 +15,24 @@ typedef enum {
 typedef struct View {
     struct Buffer *buffer;
     struct Window *window;
-
     BlockIter cursor;
-
-    // Cursor position
-    long cx, cy;
-
-    // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
-    long cx_display;
-
-    // Cursor x in characters (invalid UTF-8 character (byte) is one char)
-    long cx_char;
-
-    // Top left corner
-    long vx, vy;
-
-    // Preferred cursor x (preferred value for cx_display)
-    long preferred_x;
-
-    // Tab title
-    int tt_width;
+    long cx, cy; // Cursor position
+    long cx_display; // Visual cursor x (char widths: wide 2, tab 1-8, control 2, invalid char 4)
+    long cx_char; // Cursor x in characters (invalid UTF-8 character (byte) is 1 char)
+    long vx, vy; // Top left corner
+    long preferred_x; // Preferred cursor x (preferred value for cx_display)
+    int tt_width; // Tab title width
     int tt_truncated_width;
-
-    SelectionType selection;
+    bool center_on_scroll; // Center view to cursor if scrolled
+    bool force_center; // Force centering view to cursor
     bool next_movement_cancels_selection;
-
-    // Cursor offset when selection was started
-    ssize_t sel_so;
+    SelectionType selection;
+    ssize_t sel_so; // Cursor offset when selection was started
 
     // If sel_eo is UINT_MAX that means the offset must be calculated from
     // the cursor iterator. Otherwise the offset is precalculated and may
     // not be same as cursor position (see search/replace code).
     ssize_t sel_eo;
-
-    // Center view to cursor if scrolled
-    bool center_on_scroll;
-
-    // Force centering view to cursor
-    bool force_center;
 
     // Used to save cursor state when multiple views share same buffer
     bool restore_cursor;

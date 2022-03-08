@@ -8,14 +8,10 @@
 
 typedef struct Frame {
     struct Frame *parent;
-
     // Every frame contains either one window or multiple subframes
     PointerArray frames;
     struct Window *window;
-
-    // Width and height
-    int w, h;
-
+    int w, h; // Width and height
     bool vertical;
     bool equal_size;
 } Frame;

@@ -51,29 +51,19 @@ typedef struct {
 typedef struct Window {
     PointerArray views;
     Frame *frame;
-
-    // Current view
-    View *view;
-
-    // Previous view, if set
-    View *prev_view;
-
-    // Coordinates and size of entire window including tabbar and status line
-    int x, y;
-    int w, h;
-
-    // Coordinates and size of editable area
-    int edit_x, edit_y;
-    int edit_w, edit_h;
-
+    View *view; // Current view
+    View *prev_view; // Previous view, if set
+    int x, y; // Coordinates for top left of window
+    int w, h; // Width and height of window (including tabbar and status)
+    int edit_x, edit_y; // Top left of editable area
+    int edit_w, edit_h; // Width and height of editable area
+    size_t first_tab_idx;
+    bool update_tabbar;
     struct {
         int width;
         long first;
         long last;
     } line_numbers;
-
-    size_t first_tab_idx;
-    bool update_tabbar;
 } Window;
 
 typedef struct {

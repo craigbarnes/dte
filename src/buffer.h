@@ -28,23 +28,13 @@ typedef struct Buffer {
     ListHead blocks;
     Change change_head;
     Change *cur_change;
-
-    // Used to determine if buffer is modified
-    Change *saved_change;
-
+    Change *saved_change; // Used to determine if buffer is modified
     FileInfo file;
-
-    // Needed for identifying buffers whose filename is NULL
-    unsigned long id;
-
+    unsigned long id; // Needed for identifying buffers whose filename is NULL
     size_t nl;
-
-    // Views pointing to this buffer
-    PointerArray views;
-
+    PointerArray views; // Views pointing to this buffer
     char *display_filename;
     char *abs_filename;
-
     bool readonly;
     bool temporary;
     bool stdout_buffer;
@@ -52,19 +42,14 @@ typedef struct Buffer {
     bool setup;
     bool crlf_newlines;
     bool bom;
-
-    // Encoding of the file (buffer always contains UTF-8)
-    Encoding encoding;
-
+    Encoding encoding; // Encoding of the file (buffer always contains UTF-8)
     LocalOptions options;
-
     Syntax *syn;
+    long changed_line_min;
+    long changed_line_max;
     // Index 0 is always syn->states.ptrs[0].
     // Lowest bit of an invalidated value is 1.
     PointerArray line_start_states;
-
-    long changed_line_min;
-    long changed_line_max;
 } Buffer;
 
 static inline void mark_all_lines_changed(Buffer *b)
