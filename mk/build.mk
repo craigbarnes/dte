@@ -71,14 +71,18 @@ test_objects := $(call prefix-obj, build/test/, \
     bind buffer cmdline command config ctags dump editorconfig encoding \
     filetype history main options syntax terminal test util )
 
+bench_objects := $(call prefix-obj, build/test/, benchmark)
+
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
     dup3 pipe2 fsync TIOCGWINSZ tcgetwinsize posix_madvise ))
 
-all_objects := $(editor_objects) $(test_objects)
+all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/
 
 editor_sources := $(patsubst build/%.o, src/%.c, $(editor_objects))
 test_sources := $(patsubst build/test/%.o, test/%.c, $(test_objects))
+bench_sources := $(patsubst build/test/%.o, test/%.c, $(bench_objects))
+all_sources := $(editor_sources) $(test_sources) $(bench_sources)
 
 ifeq "$(WERROR)" "1"
   WARNINGS += -Werror
@@ -118,6 +122,7 @@ endif
 
 dte = dte$(EXEC_SUFFIX)
 test = build/test/test$(EXEC_SUFFIX)
+bench = build/test/bench$(EXEC_SUFFIX)
 
 ifeq "$(USE_SANITIZER)" "1"
   SANITIZER_FLAGS := \
@@ -127,7 +132,7 @@ ifeq "$(USE_SANITIZER)" "1"
     $(call cc-option,$(SANITIZER_FLAGS)), \
     $(warning USE_SANITIZER set but compiler doesn't support ASan/UBSan) )
   $(all_objects): BASIC_CFLAGS += $(CC_SANITIZER_FLAGS)
-  $(dte) $(test): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
+  $(dte) $(test) $(bench): BASIC_LDFLAGS += $(CC_SANITIZER_FLAGS)
   DEBUG = 3
 else
   # 0: Disable debugging
@@ -166,7 +171,8 @@ ifndef NO_DEPS
 endif
 
 $(dte): $(editor_objects)
-$(test): $(filter-out build/main.o, $(all_objects))
+$(test): $(filter-out build/main.o, $(editor_objects)) $(test_objects)
+$(bench): $(filter-out build/main.o, $(editor_objects)) $(bench_objects)
 $(util_objects): | build/util/
 $(command_objects): | build/command/
 $(editorconfig_objects): | build/editorconfig/
@@ -187,7 +193,7 @@ build/convert.o: build/convert.cflags
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
 
-$(dte) $(test): build/all.ldflags
+$(dte) $(test) $(bench): build/all.ldflags
 	$(E) LINK $@
 	$(Q) $(CC) $(LDFLAGS_ALL) -o $@ $(filter %.o, $^) $(LDLIBS)
 
@@ -195,7 +201,7 @@ $(editor_objects): build/%.o: src/%.c build/all.cflags | build/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 
-$(test_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
+$(test_objects) $(bench_objects): build/test/%.o: test/%.c build/all.cflags | build/test/
 	$(E) CC $@
 	$(Q) $(CC) $(CFLAGS_ALL) $(DEPFLAGS) -c -o $@ $<
 

@@ -86,6 +86,10 @@ installcheck: install
 	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte) -V'
 	$(Q) '$(DESTDIR)$(bindir)/$(dte)' -V >/dev/null
 
+bench: $(bench)
+	$(E) EXEC '$(bench)'
+	$(Q) ./$(bench)
+
 tags:
 	ctags src/*.[ch] src/*/*.[ch] test/*.[ch]
 
@@ -99,7 +103,7 @@ clean:
 .PHONY: uninstall uninstall-bin uninstall-man
 .PHONY: install-bash-completion uninstall-bash-completion
 .PHONY: install-desktop-file uninstall-desktop-file
-.PHONY: check check-tests check-opts installcheck tags clean
+.PHONY: check check-tests check-opts installcheck bench tags clean
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%

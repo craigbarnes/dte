@@ -13,7 +13,7 @@ FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
 
-clang_tidy_targets = $(addprefix clang-tidy-, $(editor_sources) $(test_sources))
+clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
 dist: dte-$(DISTVER).tar.gz
 dist-latest-release: $(firstword $(RELEASE_DIST))
