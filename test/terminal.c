@@ -856,7 +856,7 @@ static void test_term_set_bytes(void)
     term_output_free(obuf);
 }
 
-static void test_ecma48_set_color(void)
+static void test_term_set_color(void)
 {
     Terminal term = {
         .width = 80,
@@ -939,7 +939,7 @@ static const TestEntry tests[] = {
     TEST(test_term_clear_eol),
     TEST(test_term_move_cursor),
     TEST(test_term_set_bytes),
-    TEST(test_ecma48_set_color),
+    TEST(test_term_set_color),
     TEST(test_term_osc52_copy),
 };
 
