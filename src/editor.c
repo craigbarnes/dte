@@ -629,6 +629,7 @@ void main_loop(EditorState *e)
 {
     while (e->status == EDITOR_RUNNING) {
         if (e->resized) {
+            DEBUG_LOG("SIGWINCH received");
             ui_resize(e);
         }
 

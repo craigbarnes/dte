@@ -142,4 +142,5 @@ void update_screen_size(EditorState *e)
     e->terminal.height = MAX(height, 3);
 
     update_window_sizes(e);
+    DEBUG_LOG("terminal size: %ux%u", width, height);
 }
