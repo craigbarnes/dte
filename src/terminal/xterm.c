@@ -540,13 +540,17 @@ static ssize_t parse_osc(const char *buf, size_t len, size_t i, KeyCode *k)
     return -1;
 
 complete:
-    if (pos > 0) {
-        const char prefix = data[0];
-        if (prefix == 'L' || prefix == 'l') {
-            const char *note = (pos >= sizeof(data)) ? " (truncated)" : "";
-            const char *type = (prefix == 'l') ? "title" : "icon";
-            DEBUG_LOG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
-        }
+    if (unlikely(pos == 0)) {
+        goto ignore;
+    }
+
+    const char *note = unlikely(pos >= sizeof(data)) ? " (truncated)" : "";
+    char prefix = data[0];
+    if (prefix == 'L' || prefix == 'l') {
+        const char *type = (prefix == 'l') ? "title" : "icon";
+        DEBUG_LOG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
+    } else {
+        DEBUG_LOG("unknown OSC string%s: %.*s", note, (int)pos, data);
     }
 
 ignore:
