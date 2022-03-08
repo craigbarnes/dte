@@ -156,7 +156,7 @@ static void test_find_ft_firstline(void)
         {"#!/usr/bin/ccl", "lisp"},
         {"#!/usr/bin/chicken", "scheme"},
         {"#!/usr/bin/clisp", "lisp"},
-        {"#!/usr/bin/coffee", "coffeescript"},
+        {"#!/usr/bin/coffee", "coffee"},
         {"#!/usr/bin/crystal", "ruby"},
         {"#!/usr/bin/dash", "sh"},
         {"#!/usr/bin/ecl", "lisp"},

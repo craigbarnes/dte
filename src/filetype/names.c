@@ -99,7 +99,7 @@ typedef enum {
     NR_BUILTIN_FILETYPES
 } FileTypeEnum;
 
-static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
+static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][12] = {
     [ADA] = "ada",
     [ASM] = "asm",
     [AWK] = "awk",
@@ -108,7 +108,7 @@ static const char builtin_filetype_names[NR_BUILTIN_FILETYPES][16] = {
     [C] = "c",
     [CLOJURE] = "clojure",
     [CMAKE] = "cmake",
-    [COFFEESCRIPT] = "coffeescript",
+    [COFFEESCRIPT] = "coffee",
     [CONFIG] = "config",
     [CSHARP] = "csharp",
     [CSS] = "css",
