@@ -802,13 +802,10 @@ Copy current line or selection.
 :   Copy to system "primary selection"
 
 Note that the **-b** and **-p** flags depend upon the terminal
-supporting copy operations via escape sequences (commonly known as
-"OSC 52"). If the terminal doesn't support OSC 52, these flags will
-silently become no-ops.
-
-Also note that "system clipboard", in this case, refers to the clipboard
-on the system running the terminal. OSC 52 does in-band copying over the
-wire, so it can be used in conjunction with SSH, for example.
+supporting "OSC 52" escape sequences. If the terminal lacks this
+support, these flags will simply do nothing. OSC 52 sends data over
+the wire, so it can be used over SSH and still work as expected,
+unlike most other methods of copying to the system clipboard.
 
 The **-i**, **-b** and **-p** flags can be used together, to allow
 copying to multiple targets in a single command. For example:
