@@ -178,6 +178,14 @@ static bool ft_regex_match(const UserFileTypeEntry *ft, const StringView sv)
     return sv.length > 0 && regexp_exec(re, sv.data, sv.length, 0, &m, 0);
 }
 
+static bool ft_match(const UserFileTypeEntry *ft, const StringView sv)
+{
+    if (ft_uses_regex(ft->type)) {
+        return ft_regex_match(ft, sv);
+    }
+    return ft_str_match(ft, sv);
+}
+
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line)
 {
     const char *b = filename ? path_basename(filename) : NULL;
@@ -188,74 +196,35 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     BUG_ON(path.length == 0 && (base.length != 0 || ext.length != 0));
     BUG_ON(line.length == 0 && interpreter.length != 0);
 
+    const struct {
+        StringView sv;
+        FileTypeEnum (*lookup)(const StringView sv);
+    } table[] = {
+        [FT_INTERPRETER] = {interpreter, filetype_from_interpreter},
+        [FT_BASENAME] = {base, filetype_from_basename},
+        [FT_CONTENT] = {line, filetype_from_signature},
+        [FT_EXTENSION] = {ext, filetype_from_extension},
+        [FT_FILENAME] = {path, filetype_from_dir_prefix},
+    };
+
     // Search user `ft` entries
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
-        StringView sv;
-        switch (ft->type) {
-        case FT_EXTENSION:
-            sv = ext;
-            strmatch:
-            if (ft_str_match(ft, sv)) {
-                return ft->name;
-            }
-            continue;
-        case FT_FILENAME:
-            sv = path;
-            regmatch:
-            if (ft_regex_match(ft, sv)) {
-                return ft->name;
-            }
-            continue;
-        case FT_BASENAME:
-            sv = base;
-            goto strmatch;
-        case FT_CONTENT:
-            sv = line;
-            goto regmatch;
-        case FT_INTERPRETER:
-            sv = interpreter;
-            goto strmatch;
+        if (ft_match(ft, table[ft->type].sv)) {
+            return ft->name;
         }
-        BUG("unhandled file detection type");
     }
 
     // Search built-in lookup tables
-    if (interpreter.length) {
-        FileTypeEnum ft = filetype_from_interpreter(interpreter);
+    for (size_t i = 0; i < ARRAYLEN(table); i++) {
+        BUG_ON(!table[i].lookup);
+        FileTypeEnum ft = table[i].lookup(table[i].sv);
         if (ft != NONE) {
             return builtin_filetype_names[ft];
         }
     }
 
-    if (base.length) {
-        FileTypeEnum ft = filetype_from_basename(base);
-        if (ft != NONE) {
-            return builtin_filetype_names[ft];
-        }
-    }
-
-    if (line.length) {
-        FileTypeEnum ft = filetype_from_signature(line);
-        if (ft != NONE) {
-            return builtin_filetype_names[ft];
-        }
-    }
-
-    if (ext.length) {
-        FileTypeEnum ft = filetype_from_extension(ext);
-        if (ft != NONE) {
-            return builtin_filetype_names[ft];
-        }
-    }
-
-    if (path.length) {
-        FileTypeEnum ft = filetype_from_dir_prefix(path);
-        if (ft != NONE) {
-            return builtin_filetype_names[ft];
-        }
-    }
-
+    // Use "ini" filetype if first line looks like an ini [section]
     strview_trim_right(&line);
     if (line.length >= 4) {
         const char *s = line.data;

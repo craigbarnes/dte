@@ -194,7 +194,7 @@ static const struct FileExtensionMap {
 
 static FileTypeEnum filetype_from_extension(const StringView ext)
 {
-    if (ext.length >= sizeof(extensions[0].ext)) {
+    if (ext.length == 0 || ext.length >= sizeof(extensions[0].ext)) {
         return NONE;
     }
 

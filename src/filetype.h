@@ -7,12 +7,14 @@
 #include "util/string-view.h"
 #include "util/string.h"
 
+// Note: the order of these values changes the order of iteration
+// in find_ft()
 typedef enum {
-    FT_EXTENSION,
-    FT_FILENAME,
-    FT_CONTENT,
     FT_INTERPRETER,
     FT_BASENAME,
+    FT_CONTENT,
+    FT_EXTENSION,
+    FT_FILENAME,
 } FileDetectionType;
 
 static inline bool is_valid_filetype_name(const char *name)

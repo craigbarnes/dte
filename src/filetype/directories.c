@@ -20,6 +20,9 @@ UNITTEST {
 
 static FileTypeEnum filetype_from_dir_prefix(StringView path)
 {
+    if (path.length < 5) {
+        return NONE;
+    }
     for (size_t i = 0; i < ARRAYLEN(prefixes); i++) {
         if (strview_has_prefix(&path, prefixes[i].dir)) {
             return prefixes[i].filetype;
