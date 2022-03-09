@@ -521,63 +521,59 @@ static void test_string(void)
 
 static void test_string_view(void)
 {
-    const StringView sv1 = STRING_VIEW("testing");
-    EXPECT_TRUE(strview_equal_cstring(&sv1, "testing"));
-    EXPECT_FALSE(strview_equal_cstring(&sv1, "testin"));
-    EXPECT_FALSE(strview_equal_cstring(&sv1, "TESTING"));
-    EXPECT_TRUE(strview_has_prefix(&sv1, "test"));
-    EXPECT_TRUE(strview_has_prefix_icase(&sv1, "TEst"));
-    EXPECT_FALSE(strview_has_prefix(&sv1, "TEst"));
-    EXPECT_FALSE(strview_has_prefix_icase(&sv1, "TEst_"));
+    StringView sv = STRING_VIEW("testing");
+    EXPECT_TRUE(strview_equal_cstring(&sv, "testing"));
+    EXPECT_FALSE(strview_equal_cstring(&sv, "testin"));
+    EXPECT_FALSE(strview_equal_cstring(&sv, "TESTING"));
+    EXPECT_TRUE(strview_has_prefix(&sv, "test"));
+    EXPECT_TRUE(strview_has_prefix_icase(&sv, "TEst"));
+    EXPECT_FALSE(strview_has_prefix(&sv, "TEst"));
+    EXPECT_FALSE(strview_has_prefix_icase(&sv, "TEst_"));
 
-    const StringView sv2 = string_view(sv1.data, sv1.length);
-    EXPECT_TRUE(strview_equal(&sv1, &sv2));
+    sv = string_view(sv.data, sv.length);
+    EXPECT_TRUE(strview_equal(&sv, &sv));
+    sv = string_view(STRN("\0test\0 ..."));
+    EXPECT_TRUE(strview_equal_strn(&sv, "\0test\0 ...", 10));
 
-    const StringView sv3 = STRING_VIEW("\0test\0 ...");
-    EXPECT_TRUE(strview_equal_strn(&sv3, "\0test\0 ...", 10));
+    sv = strview_from_cstring("foobar");
+    EXPECT_TRUE(strview_equal_cstring(&sv, "foobar"));
+    EXPECT_TRUE(strview_has_prefix(&sv, "foo"));
+    EXPECT_FALSE(strview_equal_cstring(&sv, "foo"));
 
-    const StringView sv4 = sv3;
-    EXPECT_TRUE(strview_equal(&sv4, &sv3));
+    sv = strview_from_cstring("\t  \t\t ");
+    EXPECT_TRUE(strview_isblank(&sv));
+    sv.length = 0;
+    EXPECT_TRUE(strview_isblank(&sv));
+    sv = strview_from_cstring("    \t .  ");
+    EXPECT_FALSE(strview_isblank(&sv));
+    sv = strview_from_cstring("\n");
+    EXPECT_FALSE(strview_isblank(&sv));
+    sv = strview_from_cstring("  \r ");
+    EXPECT_FALSE(strview_isblank(&sv));
 
-    const StringView sv5 = strview_from_cstring("foobar");
-    EXPECT_TRUE(strview_equal_cstring(&sv5, "foobar"));
-    EXPECT_TRUE(strview_has_prefix(&sv5, "foo"));
-    EXPECT_FALSE(strview_equal_cstring(&sv5, "foo"));
+    sv = strview_from_cstring("  \t\t \ttrim test \t\t");
+    strview_trim(&sv);
+    EXPECT_TRUE(strview_equal_cstring(&sv, "trim test"));
 
-    StringView sv6 = strview_from_cstring("\t  \t\t ");
-    EXPECT_TRUE(strview_isblank(&sv6));
-    sv6.length = 0;
-    EXPECT_TRUE(strview_isblank(&sv6));
-    sv6 = strview_from_cstring("    \t .  ");
-    EXPECT_FALSE(strview_isblank(&sv6));
-    sv6 = strview_from_cstring("\n");
-    EXPECT_FALSE(strview_isblank(&sv6));
-    sv6 = strview_from_cstring("  \r ");
-    EXPECT_FALSE(strview_isblank(&sv6));
-
-    StringView sv7 = strview_from_cstring("  \t\t \ttrim test \t\t");
-    strview_trim(&sv7);
-    EXPECT_TRUE(strview_equal_cstring(&sv7, "trim test"));
-
-    StringView sv8 = STRING_VIEW_INIT;
-    EXPECT_NULL(strview_memrchr(&sv8, '.'));
-    EXPECT_NULL(strview_memchr(&sv8, '.'));
-    EXPECT_TRUE(strview_equal(&sv8, &sv8));
-    EXPECT_FALSE(strview_contains_char_type(&sv8, ASCII_DIGIT));
-    EXPECT_TRUE(strview_isblank(&sv8));
-    EXPECT_EQ(strview_trim_left(&sv8), 0);
+    sv = string_view(NULL, 0);
+    EXPECT_NULL(strview_memrchr(&sv, '.'));
+    EXPECT_NULL(strview_memchr(&sv, '.'));
+    EXPECT_TRUE(strview_equal(&sv, &sv));
+    EXPECT_FALSE(strview_contains_char_type(&sv, ASCII_DIGIT));
+    EXPECT_TRUE(strview_isblank(&sv));
+    EXPECT_EQ(strview_trim_left(&sv), 0);
 
     // Call these 3 for ASan/UBSan coverage:
-    strview_trim_right(&sv8);
-    strview_trim(&sv8);
-    strview_remove_prefix(&sv8, 0);
-    EXPECT_NULL(sv8.data);
-    EXPECT_EQ(sv8.length, 0);
+    strview_trim_right(&sv);
+    strview_trim(&sv);
+    strview_remove_prefix(&sv, 0);
+    EXPECT_NULL(sv.data);
+    EXPECT_EQ(sv.length, 0);
 
-    StringView sv9 = strview_from_cstring("prefix - suffix");
-    EXPECT_PTREQ(strview_memchr(&sv9, '-'), strview_memrchr(&sv9, '-'));
-    EXPECT_PTREQ(strview_memchr(&sv9, 'x'), sv9.data + 5);
-    EXPECT_PTREQ(strview_memrchr(&sv9, 'x'), sv9.data + 14);
+    sv = strview_from_cstring("prefix - suffix");
+    EXPECT_PTREQ(strview_memchr(&sv, '-'), strview_memrchr(&sv, '-'));
+    EXPECT_PTREQ(strview_memchr(&sv, 'x'), sv.data + 5);
+    EXPECT_PTREQ(strview_memrchr(&sv, 'x'), sv.data + 14);
 }
 
 static void test_strview_has_suffix(void)
