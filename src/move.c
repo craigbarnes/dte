@@ -110,15 +110,15 @@ void move_bol_smart(View *view, SmartBolFlags flags)
     }
 
     BUG_ON(!(flags & BOL_SMART));
+    bool fwd = false;
     StringView line;
     size_t cursor_offset = fetch_this_line(&view->cursor, &line);
-    bool fwd = false;
 
-    if (block_iter_is_bol(&view->cursor)) {
+    if (cursor_offset == 0) {
+        // Already at bol
         if (!(flags & BOL_SMART_TOGGLE)) {
-            goto out; // Already at bol
+            goto out;
         }
-        BUG_ON(cursor_offset != 0);
         fwd = true;
     }
 
