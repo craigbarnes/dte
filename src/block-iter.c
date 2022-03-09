@@ -341,10 +341,13 @@ void fill_line_nl_ref(BlockIter *bi, StringView *line)
     line->length = (size_t)(nl - line->data + 1);
 }
 
+// Set the `line` argument to point to the current line and return
+// the offset of the cursor, relative to the start of the line
+// (zero means cursor is at bol)
 size_t fetch_this_line(const BlockIter *bi, StringView *line)
 {
     BlockIter tmp = *bi;
-    const size_t count = block_iter_bol(&tmp);
+    size_t count = block_iter_bol(&tmp);
     fill_line_ref(&tmp, line);
     return count;
 }
