@@ -42,7 +42,8 @@ static inline StringView strview_from_cstring(const char *str)
 NONNULL_ARGS
 static inline bool strview_equal(const StringView *a, const StringView *b)
 {
-    return a->length == b->length && memcmp(a->data, b->data, a->length) == 0;
+    size_t n = a->length;
+    return n == b->length && (n == 0 || memcmp(a->data, b->data, n) == 0);
 }
 
 NONNULL_ARGS
@@ -124,7 +125,7 @@ static inline bool strview_contains_char_type(const StringView *sv, AsciiCharTyp
 NONNULL_ARGS
 static inline const unsigned char *strview_memchr(const StringView *sv, int c)
 {
-    return memchr(sv->data, c, sv->length);
+    return sv->length ? memchr(sv->data, c, sv->length) : NULL;
 }
 
 NONNULL_ARGS
@@ -144,8 +145,10 @@ static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
 static inline void strview_remove_prefix(StringView *sv, size_t len)
 {
     BUG_ON(len > sv->length);
-    sv->data += len;
-    sv->length -= len;
+    if (len > 0) {
+        sv->data += len;
+        sv->length -= len;
+    }
 }
 
 NONNULL_ARGS

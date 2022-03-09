@@ -561,9 +561,23 @@ static void test_string_view(void)
 
     StringView sv8 = STRING_VIEW_INIT;
     EXPECT_NULL(strview_memrchr(&sv8, '.'));
+    EXPECT_NULL(strview_memchr(&sv8, '.'));
+    EXPECT_TRUE(strview_equal(&sv8, &sv8));
+    EXPECT_FALSE(strview_contains_char_type(&sv8, ASCII_DIGIT));
+    EXPECT_TRUE(strview_isblank(&sv8));
+    EXPECT_EQ(strview_trim_left(&sv8), 0);
+
+    // Call these 3 for ASan/UBSan coverage:
+    strview_trim_right(&sv8);
+    strview_trim(&sv8);
+    strview_remove_prefix(&sv8, 0);
+    EXPECT_NULL(sv8.data);
+    EXPECT_EQ(sv8.length, 0);
 
     StringView sv9 = strview_from_cstring("prefix - suffix");
     EXPECT_PTREQ(strview_memchr(&sv9, '-'), strview_memrchr(&sv9, '-'));
+    EXPECT_PTREQ(strview_memchr(&sv9, 'x'), sv9.data + 5);
+    EXPECT_PTREQ(strview_memrchr(&sv9, 'x'), sv9.data + 14);
 }
 
 static void test_strview_has_suffix(void)
