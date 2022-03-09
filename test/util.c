@@ -558,6 +558,12 @@ static void test_string_view(void)
     StringView sv7 = strview_from_cstring("  \t\t \ttrim test \t\t");
     strview_trim(&sv7);
     EXPECT_TRUE(strview_equal_cstring(&sv7, "trim test"));
+
+    StringView sv8 = STRING_VIEW_INIT;
+    EXPECT_NULL(strview_memrchr(&sv8, '.'));
+
+    StringView sv9 = strview_from_cstring("prefix - suffix");
+    EXPECT_PTREQ(strview_memchr(&sv9, '-'), strview_memrchr(&sv9, '-'));
 }
 
 static void test_strview_has_suffix(void)
