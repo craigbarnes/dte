@@ -1,10 +1,12 @@
 #include <stddef.h>
+#include <unistd.h>
 #include "vars.h"
 #include "buffer.h"
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
 #include "util/numtostr.h"
+#include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "view.h"
@@ -25,6 +27,17 @@ static char *expand_file(const EditorState *e)
         return NULL;
     }
     return xstrdup(e->buffer->abs_filename);
+}
+
+static char *expand_rfile(const EditorState *e)
+{
+    if (!e->buffer || !e->buffer->abs_filename) {
+        return NULL;
+    }
+    char buf[8192];
+    const char *cwd = getcwd(buf, sizeof buf);
+    const char *abs = e->buffer->abs_filename;
+    return likely(cwd) ? path_relative(abs, cwd) : xstrdup(abs);
 }
 
 static char *expand_filetype(const EditorState *e)
@@ -65,6 +78,7 @@ static const BuiltinVar normal_vars[] = {
     {"PKGDATADIR", expand_pkgdatadir},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
+    {"RFILE", expand_rfile},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
     {"WORD", expand_word},
