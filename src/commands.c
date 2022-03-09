@@ -192,13 +192,15 @@ static void cmd_bof(const CommandArgs *a)
 
 static void cmd_bol(const CommandArgs *a)
 {
+    static const FlagMapping map[] = {
+        {'s', BOL_SMART},
+        {'t', BOL_SMART | BOL_SMART_TOGGLE},
+    };
+
     EditorState *e = a->userdata;
+    SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
     handle_select_chars_flag(a);
-    if (has_flag(a, 's')) {
-        move_bol_smart(e->view);
-    } else {
-        move_bol(e->view);
-    }
+    move_bol_smart(e->view, flags);
 }
 
 static void cmd_bolsf(const CommandArgs *a)
@@ -2381,7 +2383,7 @@ static const Command cmds[] = {
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "", false, 0, 0, cmd_bof},
-    {"bol", "cs", false, 0, 0, cmd_bol},
+    {"bol", "cst", false, 0, 0, cmd_bol},
     {"bolsf", "", false, 0, 0, cmd_bolsf},
     {"bookmark", "r", false, 0, 0, cmd_bookmark},
     {"case", "lu", false, 0, 0, cmd_case},

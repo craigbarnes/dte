@@ -102,24 +102,42 @@ void move_bol(View *view)
     view_reset_preferred_x(view);
 }
 
-void move_bol_smart(View *view)
+void move_bol_smart(View *view, SmartBolFlags flags)
 {
+    if (flags == 0) {
+        move_bol(view);
+        return;
+    }
+
+    BUG_ON(!(flags & BOL_SMART));
     StringView line;
-    const size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    bool fwd = false;
 
-    size_t indent_bytes = 0;
-    while (ascii_isblank(*line.data++)) {
-        indent_bytes++;
+    if (block_iter_is_bol(&view->cursor)) {
+        if (!(flags & BOL_SMART_TOGGLE)) {
+            goto out; // Already at bol
+        }
+        BUG_ON(cursor_offset != 0);
+        fwd = true;
     }
 
-    size_t move_bytes;
-    if (cursor_offset > indent_bytes) {
-        move_bytes = cursor_offset - indent_bytes;
+    // Note: this loop is safe, because there's always a newline
+    const char *ptr = line.data;
+    size_t indent = 0;
+    while (ascii_isblank(*ptr++)) {
+        indent++;
+    }
+
+    if (fwd) {
+        block_iter_skip_bytes(&view->cursor, indent);
     } else {
-        move_bytes = cursor_offset;
+        size_t co = cursor_offset;
+        size_t move = (co > indent) ? co - indent : co;
+        block_iter_back_bytes(&view->cursor, move);
     }
 
-    block_iter_back_bytes(&view->cursor, move_bytes);
+out:
     view_reset_preferred_x(view);
 }
 
