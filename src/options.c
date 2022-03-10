@@ -469,6 +469,11 @@ static char *global_ptr(const OptionDesc *desc, GlobalOptions *opt)
     return (char*)opt + desc->offset;
 }
 
+static char *get_option_ptr(EditorState *e, const OptionDesc *d, bool global)
+{
+    return global ? global_ptr(d, &e->options) : local_ptr(d, &e->buffer->options);
+}
+
 UNITTEST {
     static const size_t alignments[] = {
         [OPT_STR] = alignof(const char*),
@@ -643,7 +648,7 @@ void toggle_option(const char *name, bool global, bool verbose)
         return;
     }
 
-    char *ptr = global ? global_ptr(desc, &editor.options) : local_ptr(desc, &editor.buffer->options);
+    char *ptr = get_option_ptr(&editor, desc, global);
     OptionValue value = desc_get(desc, ptr);
     OptionType type = desc->type;
     if (type == OPT_ENUM) {
@@ -681,7 +686,7 @@ void toggle_option_values (
     BUG_ON(count == 0);
     size_t current = 0;
     bool error = false;
-    char *ptr = global ? global_ptr(desc, &editor.options) : local_ptr(desc, &editor.buffer->options);
+    char *ptr = get_option_ptr(&editor, desc, global);
     OptionValue *parsed_values = xnew(OptionValue, count);
 
     for (size_t i = 0; i < count; i++) {
@@ -781,8 +786,7 @@ void collect_option_values(PointerArray *a, const char *option, const char *pref
     }
 
     if (prefix[0] == '\0') {
-        bool local = desc->local;
-        char *ptr = local ? local_ptr(desc, &editor.buffer->options) : global_ptr(desc, &editor.options);
+        char *ptr = get_option_ptr(&editor, desc, !desc->local);
         OptionValue value = desc_get(desc, ptr);
         ptr_array_append(a, xstrdup(desc_string(desc, value)));
         return;
@@ -872,7 +876,6 @@ const char *get_option_value_string(const char *name)
     if (!desc) {
         return NULL;
     }
-    bool local = desc->local;
-    char *ptr = local ? local_ptr(desc, &editor.buffer->options) : global_ptr(desc, &editor.options);
+    char *ptr = get_option_ptr(&editor, desc, !desc->local);
     return desc_string(desc, desc_get(desc, ptr));
 }
