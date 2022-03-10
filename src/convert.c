@@ -138,7 +138,7 @@ bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 
 #include <iconv.h>
 #include <inttypes.h>
-#include "util/hashset.h"
+#include "util/intern.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 

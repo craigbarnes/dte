@@ -9,6 +9,7 @@
 #include "filetype.h"
 #include "syntax/merge.h"
 #include "util/bsearch.h"
+#include "util/intern.h"
 #include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"

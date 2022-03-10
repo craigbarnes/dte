@@ -13,6 +13,7 @@
 #include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
+#include "util/intern.h"
 #include "util/intmap.h"
 #include "util/list.h"
 #include "util/numtostr.h"

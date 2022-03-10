@@ -30,18 +30,4 @@ void hashset_free(HashSet *set);
 HashSetEntry *hashset_get(const HashSet *set, const char *str, size_t str_len);
 HashSetEntry *hashset_add(HashSet *set, const char *str, size_t str_len);
 
-const void *mem_intern(const void *data, size_t len) NONNULL_ARGS_AND_RETURN;
-void free_intern_pool(void);
-
-static inline const char *str_intern(const char *str)
-{
-    return mem_intern(str, strlen(str));
-}
-
-static inline StringView strview_intern(const char *str)
-{
-    size_t len = strlen(str);
-    return string_view(mem_intern(str, len), len);
-}
-
 #endif

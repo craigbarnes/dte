@@ -27,7 +27,7 @@
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/hashmap.h"
-#include "util/hashset.h"
+#include "util/intern.h"
 #include "util/path.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"

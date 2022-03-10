@@ -26,7 +26,7 @@
 #include "terminal/color.h"
 #include "terminal/key.h"
 #include "util/bsearch.h"
-#include "util/hashset.h"
+#include "util/intern.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
