@@ -12,7 +12,7 @@ enum {
     TEXT_WIDTH_MAX = 1000,
 };
 
-enum {
+typedef enum {
     WSE_SPACE_INDENT = 1 << 0, // Spaces in indent (except WSE_SPACE_ALIGN)
     WSE_SPACE_ALIGN = 1 << 1, // Less than tab-width spaces at end of indent
     WSE_TAB_INDENT = 1 << 2, // Tab in indent
@@ -21,7 +21,7 @@ enum {
     WSE_AUTO_INDENT = 1 << 5, // expand-tab ? WSE_TAB_AFTER_INDENT | WSE_TAB_INDENT : WSE_SPACE_INDENT
     WSE_TRAILING = 1 << 6, // Trailing whitespace
     WSE_ALL_TRAILING = 1 << 7, // Like WSE_TRAILING, but including around cursor
-};
+} WhitespaceErrorFlags;
 
 typedef enum {
     CSS_FALSE,

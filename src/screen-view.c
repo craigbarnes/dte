@@ -58,9 +58,9 @@ static bool is_non_text(CodePoint u, bool display_special)
     return u < 0x20 || u == 0x7F || u_is_unprintable(u);
 }
 
-static unsigned int get_ws_error_option(const Buffer *b)
+static WhitespaceErrorFlags get_ws_error_option(const Buffer *b)
 {
-    unsigned int flags = b->options.ws_error;
+    WhitespaceErrorFlags flags = b->options.ws_error;
     if (flags & WSE_AUTO_INDENT) {
         if (b->options.expand_tab) {
             flags |= WSE_TAB_AFTER_INDENT | WSE_TAB_INDENT;
@@ -74,8 +74,8 @@ static unsigned int get_ws_error_option(const Buffer *b)
 static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
     const View *v = info->view;
-    const unsigned int flags = get_ws_error_option(v->buffer);
-    const unsigned int trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
+    WhitespaceErrorFlags flags = get_ws_error_option(v->buffer);
+    WhitespaceErrorFlags trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
         if (
@@ -92,7 +92,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 
     bool in_indent = (i < info->indent_size);
     if (u == '\t') {
-        unsigned int mask = in_indent ? WSE_TAB_INDENT : WSE_TAB_AFTER_INDENT;
+        WhitespaceErrorFlags mask = in_indent ? WSE_TAB_INDENT : WSE_TAB_AFTER_INDENT;
         return (flags & mask) != 0;
     }
     if (!in_indent) {
@@ -111,7 +111,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
         count++;
     }
 
-    unsigned int mask;
+    WhitespaceErrorFlags mask;
     if (count >= v->buffer->options.tab_width) {
         // Spaces used instead of tab
         mask = WSE_SPACE_INDENT;
