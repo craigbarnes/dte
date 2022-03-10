@@ -1,8 +1,8 @@
 #include <errno.h>
+#include <poll.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/select.h>
 #include <unistd.h>
 #include "spawn.h"
 #include "editor.h"
@@ -95,39 +95,32 @@ static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quie
 
 static void filter(int rfd, int wfd, SpawnContext *ctx)
 {
-    size_t wlen = 0;
+    BUG_ON(rfd < 0);
+    BUG_ON(wfd < 0);
+
     if (!ctx->input.length) {
         xclose(wfd);
         wfd = -1;
     }
+
+    struct pollfd fds[] = {
+        {.fd = rfd, .events = POLLIN},
+        {.fd = wfd, .events = POLLOUT}
+    };
+
+    size_t wlen = 0;
     while (1) {
-        fd_set rfds, wfds;
-        fd_set *wfdsp = NULL;
-        int fd_high = rfd;
-
-        FD_ZERO(&rfds);
-        FD_SET(rfd, &rfds);
-
-        if (wfd >= 0) {
-            FD_ZERO(&wfds);
-            FD_SET(wfd, &wfds);
-            wfdsp = &wfds;
-        }
-        if (wfd > fd_high) {
-            fd_high = wfd;
-        }
-
-        if (select(fd_high + 1, &rfds, wfdsp, NULL, NULL) < 0) {
+        if (unlikely(poll(fds, ARRAYLEN(fds), -1) < 0)) {
             if (errno == EINTR) {
                 continue;
             }
-            perror_msg("select");
+            perror_msg("poll");
             break;
         }
 
-        if (FD_ISSET(rfd, &rfds)) {
+        if (fds[0].revents & POLLIN) {
             char data[8192];
-            ssize_t rc = read(rfd, data, sizeof(data));
+            ssize_t rc = read(fds[0].fd, data, sizeof(data));
             if (unlikely(rc < 0)) {
                 if (errno == EINTR) {
                     continue;
@@ -144,20 +137,39 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
             string_append_buf(&ctx->output, data, (size_t) rc);
         }
 
-        if (wfdsp && FD_ISSET(wfd, &wfds)) {
-            ssize_t rc = write(wfd, ctx->input.data + wlen, ctx->input.length - wlen);
+        if (fds[1].revents & POLLOUT) {
+            ssize_t rc = write(fds[1].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (rc < 0) {
                 perror_msg("write");
                 break;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
-                if (xclose(wfd)) {
+                if (xclose(fds[1].fd)) {
                     perror_msg("close");
                     break;
                 }
-                wfd = -1;
+                fds[1].fd = -1;
             }
+        }
+
+        size_t active_fds = ARRAYLEN(fds);
+        for (size_t i = 0; i < ARRAYLEN(fds); i++) {
+            if (fds[i].fd < 0 || fds[i].revents & POLLNVAL) {
+                fds[i].fd = -1;
+                active_fds--;
+                continue;
+            }
+            if (fds[i].revents & (POLLHUP | POLLERR)) {
+                if (xclose(fds[i].fd)) {
+                    perror_msg("close");
+                }
+                fds[i].fd = -1;
+                active_fds--;
+            }
+        }
+        if (active_fds == 0) {
+            break;
         }
     }
 }
