@@ -9,6 +9,10 @@
 #include "debug.h"
 #include "xreadwrite.h"
 
+#ifdef HAVE_TIOCNOTTY
+# include <sys/ioctl.h>
+#endif
+
 bool pipe_cloexec(int fd[2])
 {
 #ifdef HAVE_PIPE2
@@ -61,8 +65,14 @@ static int xdup3(int oldfd, int newfd, int flags)
     return fd;
 }
 
-static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd)
+static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
 {
+#ifdef HAVE_TIOCNOTTY
+    if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) != 0) {
+        DEBUG_LOG("TIOCNOTTY ioctl failed: %s", strerror(errno));
+    }
+#endif
+
     int error;
     int nr_fds = 3;
     bool move = error_fd < nr_fds;
@@ -146,7 +156,7 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
     return ret;
 }
 
-pid_t fork_exec(char **argv, const char **env, int fd[3])
+pid_t fork_exec(char **argv, const char **env, int fd[3], bool drop_ctty)
 {
     int ep[2];
     if (!pipe_cloexec(ep)) {
@@ -164,7 +174,7 @@ pid_t fork_exec(char **argv, const char **env, int fd[3])
 
     if (pid == 0) {
         // Child
-        handle_child(argv, env, fd, ep[1]);
+        handle_child(argv, env, fd, ep[1], drop_ctty);
         BUG("handle_child() should never return");
     }
 

@@ -262,7 +262,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArr
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(args, NULL, fd);
+    pid_t pid = fork_exec(args, NULL, fd, quiet);
     if (pid < 0) {
         exec_error(args[0]);
         xclose(p[1]);
@@ -329,7 +329,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds);
+    pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds, quiet);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
         goto error_resume;
