@@ -255,28 +255,31 @@ static void build_replacement (
     String *buf,
     const char *line,
     const char *format,
-    regmatch_t *matches
+    const regmatch_t *matches
 ) {
-    size_t i = 0;
-    while (format[i]) {
+    for (size_t i = 0; format[i]; ) {
         char ch = format[i++];
+        size_t match_idx;
         if (ch == '\\') {
-            if (format[i] >= '1' && format[i] <= '9') {
-                int n = format[i++] - '0';
-                int len = matches[n].rm_eo - matches[n].rm_so;
-                if (len > 0) {
-                    string_append_buf(buf, line + matches[n].rm_so, len);
-                }
-            } else if (format[i] != '\0') {
-                string_append_byte(buf, format[i++]);
+            if (unlikely(format[i] == '\0')) {
+                break;
             }
+            ch = format[i++];
+            if (ch < '1' || ch > '9') {
+                string_append_byte(buf, ch);
+                continue;
+            }
+            match_idx = ch - '0';
         } else if (ch == '&') {
-            int len = matches[0].rm_eo - matches[0].rm_so;
-            if (len > 0) {
-                string_append_buf(buf, line + matches[0].rm_so, len);
-            }
+            match_idx = 0;
         } else {
             string_append_byte(buf, ch);
+            continue;
+        }
+        const regmatch_t *match = &matches[match_idx];
+        regoff_t len = match->rm_eo - match->rm_so;
+        if (len > 0) {
+            string_append_buf(buf, line + match->rm_so, (size_t)len);
         }
     }
 }
