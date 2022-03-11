@@ -236,7 +236,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArr
         return;
     }
 
-    const int dev_null = open_dev_null(O_WRONLY);
+    int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         xclose(fd[0]);
         return;
@@ -250,8 +250,8 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArr
         return;
     }
 
-    const bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
-    const bool quiet = !!(flags & SPAWN_QUIET);
+    bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
+    bool quiet = !!(flags & SPAWN_QUIET);
     bool prompt = !!(flags & SPAWN_PROMPT);
     if (read_stdout) {
         fd[1] = p[1];
