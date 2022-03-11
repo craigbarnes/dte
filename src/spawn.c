@@ -119,8 +119,10 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
         }
 
         if (fds[0].revents & POLLIN) {
-            char data[8192];
-            ssize_t rc = read(fds[0].fd, data, sizeof(data));
+            size_t max_read = 8192;
+            string_ensure_space(&ctx->output, max_read);
+            char *buf = ctx->output.buffer + ctx->output.len;
+            ssize_t rc = read(fds[0].fd, buf, max_read);
             if (unlikely(rc < 0)) {
                 if (errno == EINTR) {
                     continue;
@@ -134,7 +136,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
                 }
                 break;
             }
-            string_append_buf(&ctx->output, data, (size_t) rc);
+            ctx->output.len += rc;
         }
 
         if (fds[1].revents & POLLOUT) {

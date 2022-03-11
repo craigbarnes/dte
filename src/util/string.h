@@ -59,7 +59,7 @@ static inline void string_clear(String *s)
     s->len = 0;
 }
 
-void string_free(String *s) NONNULL_ARGS;
+void string_ensure_space(String *s, size_t more) NONNULL_ARGS;
 void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
@@ -69,5 +69,6 @@ char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN;
 char *string_clone_cstring(const String *s) XSTRDUP;
 const char *string_borrow_cstring(String *s) NONNULL_ARGS_AND_RETURN;
 void string_remove(String *s, size_t pos, size_t len) NONNULL_ARGS;
+void string_free(String *s) NONNULL_ARGS;
 
 #endif

@@ -18,9 +18,8 @@ static COLD void string_grow(String *s, size_t min_alloc)
     s->alloc = alloc;
 }
 
-static void string_ensure_space(String *s, size_t more)
+void string_ensure_space(String *s, size_t more)
 {
-    BUG_ON(more == 0);
     const size_t min_alloc = s->len + more;
     if (unlikely(s->alloc < min_alloc)) {
         string_grow(s, min_alloc);
