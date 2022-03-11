@@ -458,10 +458,11 @@ static void test_string_append_escaped_arg(void)
 
 static void test_command_struct_layout(void)
 {
-    const Command *cmd = find_normal_command("filter");
-    EXPECT_STREQ(cmd->name, "filter");
-    EXPECT_STREQ(cmd->flags, "-l");
-    EXPECT_UINT_EQ(cmd->min_args, 1);
+    const Command *cmd = find_normal_command("open");
+    EXPECT_STREQ(cmd->name, "open");
+    EXPECT_STREQ(cmd->flags, "e=gt");
+    EXPECT_FALSE(cmd->allow_in_rc);
+    EXPECT_UINT_EQ(cmd->min_args, 0);
     EXPECT_UINT_EQ(cmd->max_args, 0xFF);
 
     IGNORE_WARNING("-Wpedantic")
@@ -536,7 +537,7 @@ static void test_allow_macro_recording(void)
     ASSERT_NONNULL(cmd);
     EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
 
-    cmd = cmds->lookup("filter");
+    cmd = cmds->lookup("exec");
     ASSERT_NONNULL(cmd);
     EXPECT_TRUE(cmds->allow_recording(cmd, argp, ud));
 

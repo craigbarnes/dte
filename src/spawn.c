@@ -95,8 +95,9 @@ static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quie
 
 static void filter(int rfd, int wfd, SpawnContext *ctx)
 {
-    BUG_ON(rfd < 0);
-    BUG_ON(wfd < 0);
+    BUG_ON(rfd < 0 && wfd < 0);
+    BUG_ON(rfd >= 0 && rfd <= 2);
+    BUG_ON(wfd >= 0 && wfd <= 2);
 
     if (!ctx->input.length) {
         xclose(wfd);
@@ -179,7 +180,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
 static int open_dev_null(int flags)
 {
     int fd = xopen("/dev/null", flags | O_CLOEXEC, 0);
-    if (fd < 0) {
+    if (unlikely(fd < 0)) {
         error_msg("Error opening /dev/null: %s", strerror(errno));
     }
     return fd;
@@ -225,182 +226,6 @@ static void resume_terminal(bool quiet, bool prompt)
 static void exec_error(const char *argv0)
 {
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
-}
-
-bool spawn_filter(SpawnContext *ctx)
-{
-    bool quiet = !!(ctx->flags & SPAWN_QUIET);
-    int p0[2] = {-1, -1};
-    int p1[2] = {-1, -1};
-    int errfd = -1;
-    if (!pipe_cloexec(p0) || !pipe_cloexec(p1)) {
-        perror_msg("pipe");
-        goto error;
-    }
-
-    if (quiet) {
-        errfd = open_dev_null(O_WRONLY);
-        if (errfd < 0) {
-            goto error;
-        }
-    } else {
-        errfd = 2;
-    }
-
-    int fd[3] = {p0[0], p1[1], errfd};
-    yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
-    if (pid < 0) {
-        exec_error(ctx->argv[0]);
-        goto error;
-    }
-
-    if (quiet) {
-        xclose(errfd);
-    }
-    xclose(p0[0]);
-    xclose(p1[1]);
-    filter(p1[0], p0[1], ctx);
-    xclose(p1[0]);
-    xclose(p0[1]);
-
-    int err = handle_child_error(pid);
-    resume_terminal(quiet, false);
-    if (err) {
-        string_free(&ctx->output);
-        return false;
-    }
-    return true;
-
-error:
-    resume_terminal(quiet, false);
-    xclose(p0[0]);
-    xclose(p0[1]);
-    xclose(p1[0]);
-    xclose(p1[1]);
-    if (quiet) {
-        xclose(errfd);
-    }
-    return false;
-}
-
-bool spawn_source(SpawnContext *ctx)
-{
-    bool quiet = !!(ctx->flags & SPAWN_QUIET);
-    int p[2] = {-1, -1};
-    int dev_null_r = -1;
-    int dev_null_w = -1;
-
-    if (!pipe_cloexec(p)) {
-        perror_msg("pipe");
-        return false;
-    }
-
-    int fd[3] = {0, p[1], 2};
-    if (quiet) {
-        dev_null_r = open_dev_null(O_RDONLY);
-        if (dev_null_r < 0) {
-            goto error;
-        }
-        fd[0] = dev_null_r;
-        dev_null_w = open_dev_null(O_WRONLY);
-        if (dev_null_w < 0) {
-            goto error;
-        }
-        fd[2] = dev_null_w;
-    }
-
-    yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
-    if (pid < 0) {
-        exec_error(ctx->argv[0]);
-        goto error;
-    }
-
-    if (quiet) {
-        xclose(dev_null_r);
-        xclose(dev_null_w);
-        dev_null_r = dev_null_w = -1;
-    }
-    xclose(p[1]);
-    p[1] = -1;
-
-    while (1) {
-        char buf[8192];
-        ssize_t rc = xread(p[0], buf, sizeof(buf));
-        if (unlikely(rc < 0)) {
-            perror_msg("read");
-            goto error;
-        }
-        if (rc == 0) {
-            break;
-        }
-        string_append_buf(&ctx->output, buf, (size_t) rc);
-    }
-
-    xclose(p[0]);
-    p[0] = -1;
-    if (handle_child_error(pid)) {
-        goto error;
-    }
-
-    resume_terminal(quiet, false);
-    return true;
-
-error:
-    string_free(&ctx->output);
-    xclose(p[0]);
-    xclose(p[1]);
-    if (quiet) {
-        xclose(dev_null_r);
-        xclose(dev_null_w);
-    }
-    resume_terminal(quiet, false);
-    return false;
-}
-
-bool spawn_sink(SpawnContext *ctx)
-{
-    int p[2] = {-1, -1};
-    int dev_null = -1;
-
-    if (!pipe_cloexec(p)) {
-        perror_msg("pipe");
-        goto error;
-    }
-
-    dev_null = open_dev_null(O_WRONLY);
-    if (dev_null < 0) {
-        goto error;
-    }
-
-    int fd[3] = {p[0], dev_null, dev_null};
-    term_raw_isig();
-    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
-    if (pid < 0) {
-        exec_error(ctx->argv[0]);
-        goto error;
-    }
-
-    xclose(dev_null);
-    xclose(p[0]);
-    p[0] = dev_null = -1;
-    size_t input_len = ctx->input.length;
-    if (input_len && xwrite(p[1], ctx->input.data, input_len) < 0) {
-        perror_msg("write");
-        goto error;
-    }
-    xclose(p[1]);
-    int err = handle_child_error(pid);
-    term_raw();
-    return !err;
-
-error:
-    term_raw();
-    xclose(p[0]);
-    xclose(p[1]);
-    xclose(dev_null);
-    return false;
 }
 
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs)
@@ -456,34 +281,107 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArr
     xclose(fd[0]);
 }
 
-void spawn(SpawnContext *ctx)
+// Close fd only if valid (positive) and not stdin/stdout/stderr
+static int safe_xclose(int fd)
 {
+    return (fd >= 3) ? xclose(fd) : 0;
+}
+
+bool spawn(SpawnContext *ctx, SpawnAction actions[3])
+{
+    int child_fds[3] = {-1, -1, -1};
+    int parent_fds[3] = {-1, -1, -1};
     bool quiet = !!(ctx->flags & SPAWN_QUIET);
-    bool prompt = !!(ctx->flags & SPAWN_PROMPT);
-    int fd[3] = {0, 1, 2};
-    if (quiet) {
-        if ((fd[0] = open_dev_null(O_RDONLY)) < 0) {
-            return;
+
+    // TODO: support stderr pipe
+    BUG_ON(actions[STDERR_FILENO] == SPAWN_PIPE);
+
+    for (size_t i = 0; i < ARRAYLEN(child_fds); i++) {
+        switch (actions[i]) {
+        case SPAWN_TTY:
+            if (!quiet) {
+                child_fds[i] = i;
+                break;
+            }
+            // Fallthrough
+        case SPAWN_NULL:
+            child_fds[i] = open_dev_null(O_RDWR);
+            if (child_fds[i] < 0) {
+                goto error_close;
+            }
+            break;
+        case SPAWN_PIPE: {
+            int p[2];
+            if (!pipe_cloexec(p)) {
+                perror_msg("pipe");
+                goto error_close;
+            }
+            BUG_ON(p[0] < 3);
+            BUG_ON(p[1] < 3);
+            child_fds[i] = i ? p[1] : p[0];
+            parent_fds[i] = i ? p[0] : p[1];
+            break;
         }
-        if ((fd[1] = open_dev_null(O_WRONLY)) < 0) {
-            xclose(fd[0]);
-            return;
+        default:
+            BUG("unhandled action type");
+            return false;
         }
-        fd[2] = fd[1];
     }
 
     yield_terminal(quiet);
-    const pid_t pid = fork_exec(ctx->argv, ctx->env, fd);
+    const pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
-        prompt = false;
-    } else {
-        handle_child_error(pid);
+        goto error_resume;
     }
-    resume_terminal(quiet, prompt);
 
-    if (quiet) {
-        xclose(fd[0]);
-        xclose(fd[1]);
+    safe_xclose(child_fds[0]);
+    safe_xclose(child_fds[1]);
+    safe_xclose(child_fds[1]);
+
+    if (actions[0] == SPAWN_PIPE && actions[1] == SPAWN_PIPE) {
+        filter(parent_fds[1], parent_fds[0], ctx);
+    } else if (actions[0] == SPAWN_PIPE) {
+        size_t input_len = ctx->input.length;
+        if (input_len && xwrite(parent_fds[0], ctx->input.data, input_len) < 0) {
+            perror_msg("write");
+            goto error_resume;
+        }
+    } else if (actions[1] == SPAWN_PIPE) {
+        while (1) {
+            size_t max_read = 8192;
+            string_ensure_space(&ctx->output, max_read);
+            char *buf = ctx->output.buffer + ctx->output.len;
+            ssize_t rc = xread(parent_fds[1], buf, max_read);
+            if (unlikely(rc < 0)) {
+                perror_msg("read");
+                goto error_resume;
+            }
+            if (rc == 0) {
+                break;
+            }
+            ctx->output.len += rc;
+        }
     }
+
+    safe_xclose(parent_fds[0]);
+    safe_xclose(parent_fds[1]);
+    safe_xclose(parent_fds[2]);
+
+    int err = handle_child_error(pid);
+    resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
+    if (err) {
+        string_free(&ctx->output);
+        return false;
+    }
+    return true;
+
+error_resume:
+    resume_terminal(quiet, false);
+error_close:
+    for (size_t i = 0; i < 3; i++) {
+        safe_xclose(child_fds[i]);
+        safe_xclose(parent_fds[i]);
+    }
+    return false;
 }

@@ -538,90 +538,39 @@ static void cmd_errorfmt(const CommandArgs *a)
     add_error_fmt(&e->compilers, a->args[0], ignore, a->args[1], a->args + 2);
 }
 
-static void cmd_eval(const CommandArgs *a)
+static void open_files_from_string(EditorState *e, const String *str)
 {
-    SpawnContext ctx = {
-        .argv = a->args,
-        .output = STRING_INIT,
-        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
-    };
-    if (!spawn_source(&ctx)) {
-        return;
-    }
-    exec_config(&normal_commands, strview_from_string(&ctx.output));
-    string_free(&ctx.output);
-}
-
-static void cmd_exec_msg(const CommandArgs *a)
-{
-    EditorState *e = a->userdata;
-    String messages = dump_messages(&e->messages);
-    SpawnContext ctx = {
-        .argv = a->args,
-        .input = strview_from_string(&messages),
-        .output = STRING_INIT,
-        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
-    };
-
-    bool spawned = spawn_filter(&ctx);
-    string_free(&messages);
-    if (!spawned) {
-        return;
-    }
-
-    size_t i;
-    if (buf_parse_size(ctx.output.buffer, ctx.output.len, &i) > 0 && i > 0) {
-        activate_message(&e->messages, i - 1);
-    }
-
-    string_free(&ctx.output);
-}
-
-static void cmd_exec_open(const CommandArgs *a)
-{
-    SpawnContext ctx = {
-        .argv = a->args,
-        .output = STRING_INIT,
-        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
-    };
-    if (!spawn_source(&ctx)) {
-        return;
-    }
-
     PointerArray filenames = PTR_ARRAY_INIT;
-    for (size_t pos = 0, size = ctx.output.len; pos < size; ) {
-        char *filename = buf_next_line(ctx.output.buffer, &pos, size);
+    for (size_t pos = 0, size = str->len; pos < size; ) {
+        char *filename = buf_next_line(str->buffer, &pos, size);
         if (filename[0] != '\0') {
             ptr_array_append(&filenames, filename);
         }
     }
 
-    EditorState *e = a->userdata;
     ptr_array_append(&filenames, NULL);
     window_open_files(e, e->window, (char**)filenames.ptrs, NULL);
     macro_command_hook("open", (char**)filenames.ptrs);
     ptr_array_free_array(&filenames);
-    string_free(&ctx.output);
 }
 
-static void cmd_exec_tag(const CommandArgs *a)
+static void parse_and_activate_message(EditorState *e, const String *str)
 {
-    SpawnContext ctx = {
-        .argv = a->args,
-        .output = STRING_INIT,
-        .flags = has_flag(a, 's') ? SPAWN_QUIET : SPAWN_DEFAULT
-    };
-    if (!spawn_source(&ctx)) {
-        return;
+    size_t x;
+    if (buf_parse_size(str->buffer, str->len, &x) > 0 && x > 0) {
+        activate_message(&e->messages, x - 1);
     }
+}
 
-    if (unlikely(ctx.output.len == 0)) {
+static void parse_and_goto_tag(const String *str)
+{
+    if (unlikely(str->len == 0)) {
         error_msg("child produced no output");
         return;
     }
 
     size_t pos = 0;
-    StringView tag = buf_slice_next_line(ctx.output.buffer, &pos, ctx.output.len);
+    StringView tag = buf_slice_next_line(str->buffer, &pos, str->len);
 
     String s = string_new(tag.length + 16);
     string_append_literal(&s, "tag ");
@@ -630,7 +579,6 @@ static void cmd_exec_tag(const CommandArgs *a)
     }
 
     string_append_escaped_arg_sv(&s, tag, true);
-    string_free(&ctx.output);
     handle_command(&normal_commands, string_borrow_cstring(&s), true);
     string_free(&s);
 }
@@ -650,46 +598,197 @@ static const char **lines_and_columns_env(const Window *window)
     return vars;
 }
 
-static void cmd_filter(const CommandArgs *a)
+typedef enum {
+    // Note: these need to be kept sorted
+    EXEC_BUFFER,
+    EXEC_EVAL,
+    EXEC_LINE,
+    EXEC_MSG,
+    EXEC_NULL,
+    EXEC_OPEN,
+    EXEC_TAG,
+    EXEC_TTY,
+} ExecAction;
+
+typedef enum {
+    IN = 1 << 0,
+    OUT = 1 << 1,
+    ERR = 1 << 2,
+    ALL = IN | OUT | ERR,
+} ExecFlags;
+
+static void cmd_exec(const CommandArgs *a)
 {
-    EditorState *e = a->userdata;
-    View *view = e->view;
-    BlockIter save = view->cursor;
-    SpawnContext ctx = {
-        .argv = a->args,
-        .env = lines_and_columns_env(e->window),
-        .input = STRING_VIEW_INIT,
-        .output = STRING_INIT,
-        .flags = SPAWN_QUIET
+    static const struct {
+        char name[7];
+        uint8_t spawn_action : 2; // SpawnAction
+        uint8_t flags : 6; // ExecFlags
+    } map[] = {
+        [EXEC_BUFFER] = {"buffer", SPAWN_PIPE, IN | OUT},
+        [EXEC_EVAL] = {"eval", SPAWN_PIPE, OUT},
+        [EXEC_LINE] = {"line", SPAWN_PIPE, IN},
+        [EXEC_MSG] = {"msg", SPAWN_PIPE, IN | OUT},
+        [EXEC_NULL] = {"null", SPAWN_NULL, ALL},
+        [EXEC_OPEN] = {"open", SPAWN_PIPE, OUT},
+        [EXEC_TAG] = {"tag", SPAWN_PIPE, OUT},
+        [EXEC_TTY] = {"tty", SPAWN_TTY, ALL},
     };
 
-    if (view->selection) {
-        ctx.input.length = prepare_selection(view);
-    } else if (has_flag(a, 'l')) {
-        StringView line;
-        move_bol(view);
-        fill_line_ref(&view->cursor, &line);
-        ctx.input.length = line.length;
-    } else {
-        Block *blk;
-        block_for_each(blk, &view->buffer->blocks) {
-            ctx.input.length += blk->size;
+    ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
+    SpawnAction spawn_actions[3] = {SPAWN_TTY, SPAWN_TTY, SPAWN_TTY};
+    SpawnFlags spawn_flags = 0;
+    bool lflag = false;
+    bool move_after_insert = false;
+    bool strip_trailing_newline = false;
+
+    for (size_t i = 0, n = a->nr_flags, x = 0; i < n; i++) {
+        size_t fd_idx;
+        switch (a->flags[i]) {
+            case 'e': fd_idx = STDERR_FILENO; break;
+            case 'i': fd_idx = STDIN_FILENO; break;
+            case 'o': fd_idx = STDOUT_FILENO; break;
+            case 'p': spawn_flags |= SPAWN_PROMPT; continue;
+            case 's': spawn_flags |= SPAWN_QUIET; continue;
+            case 't': spawn_flags &= ~SPAWN_QUIET; continue;
+            case 'l': lflag = true; continue;
+            case 'm': move_after_insert = true; continue;
+            case 'n': strip_trailing_newline = true; continue;
+            default: BUG("unexpected flag"); return;
         }
-        move_bof(view);
+        const char *flag_arg = a->args[x++];
+        ssize_t action = BSEARCH_IDX(flag_arg, map, (CompareFunction)strcmp);
+        if (action < 0 || !(map[action].flags & 1u << fd_idx)) {
+            error_msg("invalid action for -%c: '%s'", a->flags[i], flag_arg);
+            return;
+        }
+        actions[fd_idx] = action;
+        spawn_actions[fd_idx] = map[action].spawn_action;
     }
 
-    char *input = block_iter_get_bytes(&view->cursor, ctx.input.length);
-    ctx.input.data = input;
-    if (!spawn_filter(&ctx)) {
-        free(input);
-        view->cursor = save;
+    EditorState *e = a->userdata;
+    View *view = e->view;
+    BlockIter saved_cursor = view->cursor;
+    char *alloc = NULL;
+    const char **env = NULL;
+    if (actions[STDOUT_FILENO] == EXEC_BUFFER) {
+        env = lines_and_columns_env(e->window);
+    }
+    if (move_after_insert && actions[STDOUT_FILENO] != EXEC_BUFFER) {
+        move_after_insert = false;
+    }
+    if (lflag && actions[STDIN_FILENO] == EXEC_BUFFER) {
+        // For compat. with old "filter" and "pipe-to" commands
+        actions[STDIN_FILENO] = EXEC_LINE;
+    }
+
+    SpawnContext ctx = {
+        .argv = a->args + a->nr_flag_args,
+        .output = STRING_INIT,
+        .flags = spawn_flags,
+        .env = env,
+    };
+
+    switch (actions[STDIN_FILENO]) {
+    case EXEC_LINE:
+        if (view->selection) {
+            ctx.input.length = prepare_selection(view);
+        } else {
+            StringView line;
+            move_bol(view);
+            fill_line_ref(&view->cursor, &line);
+            ctx.input.length = line.length;
+        }
+        get_bytes:
+        alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
+        ctx.input.data = alloc;
+        break;
+    case EXEC_BUFFER:
+        if (view->selection) {
+            ctx.input.length = prepare_selection(view);
+        } else {
+            Block *blk;
+            block_for_each(blk, &view->buffer->blocks) {
+                ctx.input.length += blk->size;
+            }
+            move_bof(view);
+        }
+        goto get_bytes;
+    case EXEC_MSG: {
+        String messages = dump_messages(&e->messages);
+        ctx.input = strview_from_string(&messages),
+        alloc = messages.buffer;
+        break;
+    }
+    case EXEC_NULL:
+    case EXEC_TTY:
+        break;
+    case EXEC_OPEN:
+    case EXEC_TAG:
+    case EXEC_EVAL:
+        error_msg("invalid action for -i: '%s'", map[actions[0]].name);
+        return;
+    default:
+        BUG("unhandled action");
         return;
     }
 
-    free(input);
-    buffer_replace_bytes(view, ctx.input.length, ctx.output.buffer, ctx.output.len);
-    string_free(&ctx.output);
-    unselect(view);
+    bool ok = spawn(&ctx, spawn_actions);
+    free(alloc);
+    if (!ok) {
+        view->cursor = saved_cursor;
+        return;
+    }
+
+    String *output = &ctx.output;
+    if (
+        strip_trailing_newline
+        && actions[STDOUT_FILENO] == EXEC_BUFFER
+        && output->len > 0
+        && output->buffer[output->len - 1] == '\n'
+    ) {
+        output->len--;
+        if (output->len > 0 && output->buffer[output->len - 1] == '\r') {
+            output->len--;
+        }
+    }
+
+    switch (actions[STDOUT_FILENO]) {
+    case EXEC_BUFFER: {
+        size_t del_count = ctx.input.length;
+        if (view->selection && del_count == 0) {
+            del_count = prepare_selection(view);
+        }
+        buffer_replace_bytes(view, del_count, output->buffer, output->len);
+        unselect(view);
+        break;
+    }
+    case EXEC_MSG:
+        parse_and_activate_message(e, output);
+        break;
+    case EXEC_OPEN:
+        open_files_from_string(e, output);
+        break;
+    case EXEC_TAG:
+        parse_and_goto_tag(output);
+        break;
+    case EXEC_EVAL:
+        exec_config(&normal_commands, strview_from_string(output));
+        break;
+    case EXEC_NULL:
+    case EXEC_TTY:
+        break;
+    case EXEC_LINE:
+        error_msg("invalid action for -o: '%s'", map[actions[1]].name);
+        return;
+    default:
+        BUG("unhandled action");
+        return;
+    }
+
+    if (move_after_insert) {
+        block_iter_skip_bytes(&view->cursor, output->len);
+    }
+    string_free(output);
 }
 
 static void cmd_ft(const CommandArgs *a)
@@ -1253,85 +1352,6 @@ static void cmd_pgup(const CommandArgs *a)
     move_up(view, count);
 }
 
-static void cmd_pipe_from(const CommandArgs *a)
-{
-    EditorState *e = a->userdata;
-    SpawnContext ctx = {
-        .argv = a->args,
-        .env = lines_and_columns_env(e->window),
-        .output = STRING_INIT,
-        .flags = SPAWN_QUIET
-    };
-    if (!spawn_source(&ctx)) {
-        return;
-    }
-
-    View *view = e->view;
-    size_t del_len = 0;
-    if (view->selection) {
-        del_len = prepare_selection(view);
-        unselect(view);
-    }
-
-    bool strip_nl = has_flag(a, 's');
-    bool move = has_flag(a, 'm');
-    size_t ins_len = ctx.output.len;
-    if (strip_nl) {
-        if (ins_len && ctx.output.buffer[ins_len - 1] == '\n') {
-            ins_len--;
-            if (ins_len && ctx.output.buffer[ins_len - 1] == '\r') {
-                ins_len--;
-            }
-        }
-    }
-
-    buffer_replace_bytes(view, del_len, ctx.output.buffer, ins_len);
-    string_free(&ctx.output);
-
-    if (move) {
-        block_iter_skip_bytes(&view->cursor, ins_len);
-    }
-}
-
-static void cmd_pipe_to(const CommandArgs *a)
-{
-    EditorState *e = a->userdata;
-    View *view = e->view;
-    const BlockIter saved_cursor = view->cursor;
-    const ssize_t saved_sel_so = view->sel_so;
-    const ssize_t saved_sel_eo = view->sel_eo;
-
-    size_t input_len = 0;
-    if (view->selection) {
-        input_len = prepare_selection(view);
-    } else if (has_flag(a, 'l')) {
-        StringView line;
-        move_bol(view);
-        fill_line_ref(&view->cursor, &line);
-        input_len = line.length;
-    } else {
-        Block *blk;
-        block_for_each(blk, &view->buffer->blocks) {
-            input_len += blk->size;
-        }
-        move_bof(view);
-    }
-
-    char *input = block_iter_get_bytes(&view->cursor, input_len);
-    SpawnContext ctx = {
-        .argv = a->args,
-        .input = string_view(input, input_len),
-        .flags = SPAWN_DEFAULT
-    };
-    spawn_sink(&ctx);
-    free(input);
-
-    // Restore cursor and selection offsets, instead of calling unselect()
-    view->cursor = saved_cursor;
-    view->sel_so = saved_sel_so;
-    view->sel_eo = saved_sel_eo;
-}
-
 static void cmd_prev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
@@ -1532,20 +1552,6 @@ static void cmd_right(const CommandArgs *a)
     EditorState *e = a->userdata;
     handle_select_chars_flag(a);
     move_cursor_right(e->view);
-}
-
-static void cmd_run(const CommandArgs *a)
-{
-    static const FlagMapping map[] = {
-        {'p', SPAWN_PROMPT},
-        {'s', SPAWN_QUIET},
-    };
-
-    SpawnContext ctx = {
-        .argv = a->args,
-        .flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0),
-    };
-    spawn(&ctx);
 }
 
 static bool stat_changed(const Buffer *b, const struct stat *st)
@@ -2407,11 +2413,7 @@ static const Command cmds[] = {
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
     {"erase-word", "s", false, 0, 0, cmd_erase_word},
     {"errorfmt", "i", true, 2, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
-    {"eval", "-s", false, 1, -1, cmd_eval},
-    {"exec-msg", "-s", false, 1, -1, cmd_exec_msg},
-    {"exec-open", "-s", false, 1, -1, cmd_exec_open},
-    {"exec-tag", "-s", false, 1, -1, cmd_exec_tag},
-    {"filter", "-l", false, 1, -1, cmd_filter},
+    {"exec", "-e=i=o=lmnpst", false, 1, -1, cmd_exec},
     {"ft", "-bcfi", true, 2, -1, cmd_ft},
     {"hi", "-c", true, 0, -1, cmd_hi},
     {"include", "bq", true, 1, 1, cmd_include},
@@ -2431,8 +2433,6 @@ static const Command cmds[] = {
     {"paste", "c", false, 0, 0, cmd_paste},
     {"pgdown", "cl", false, 0, 0, cmd_pgdown},
     {"pgup", "cl", false, 0, 0, cmd_pgup},
-    {"pipe-from", "-ms", false, 1, -1, cmd_pipe_from},
-    {"pipe-to", "-l", false, 1, -1, cmd_pipe_to},
     {"prev", "", false, 0, 0, cmd_prev},
     {"quit", "fp", false, 0, 1, cmd_quit},
     {"redo", "", false, 0, 1, cmd_redo},
@@ -2440,7 +2440,6 @@ static const Command cmds[] = {
     {"repeat", "-", false, 2, -1, cmd_repeat},
     {"replace", "bcgi", false, 2, 2, cmd_replace},
     {"right", "c", false, 0, 0, cmd_right},
-    {"run", "-ps", false, 1, -1, cmd_run},
     {"save", "Bbde=fpu", false, 0, 1, cmd_save},
     {"scroll-down", "", false, 0, 0, cmd_scroll_down},
     {"scroll-pgdown", "", false, 0, 0, cmd_scroll_pgdown},
@@ -2474,13 +2473,8 @@ static const Command cmds[] = {
 
 static bool allow_macro_recording(const Command *cmd, char **args, void *userdata)
 {
-    static void (*non_recordable[])(const CommandArgs *args) = {
-        cmd_macro, cmd_command, cmd_exec_open, cmd_exec_tag,
-    };
-    for (size_t i = 0; i < ARRAYLEN(non_recordable); i++) {
-        if (cmd->cmd == non_recordable[i]) {
-            return false;
-        }
+    if (cmd->cmd == cmd_macro || cmd->cmd == cmd_command) {
+        return false;
     }
 
     if (cmd->cmd == cmd_search) {
@@ -2499,6 +2493,11 @@ static bool allow_macro_recording(const Command *cmd, char **args, void *userdat
         free_string_array(args_copy);
         return ret;
     }
+
+    if (cmd->cmd == cmd_exec) {
+        // TODO: don't record -o with open/tag/eval/msg
+    }
+
     return true;
 }
 

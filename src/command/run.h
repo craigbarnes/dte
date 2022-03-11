@@ -18,8 +18,8 @@ typedef struct {
 } CommandArgs;
 
 typedef struct {
-    const char name[16];
-    const char flags[12];
+    const char name[15];
+    const char flags[14];
     bool allow_in_rc;
     uint8_t min_args;
     uint8_t max_args; // 0xFF here means "no limit" (effectively SIZE_MAX)
