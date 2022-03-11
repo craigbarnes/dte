@@ -27,7 +27,9 @@
     static inline void log_init(const char* UNUSED_ARG(varname)) {}
 #endif
 
+typedef void (*CleanupHandler)(void *userdata);
+
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
-void set_fatal_error_cleanup_handler(void (*handler)(void));
+void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata);
 
 #endif

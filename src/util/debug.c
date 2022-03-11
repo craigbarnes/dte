@@ -8,12 +8,19 @@
 #include "xreadwrite.h"
 #include "xsnprintf.h"
 
-static void (*cleanup_handler)(void) = NULL;
+static CleanupHandler cleanup_handler = NULL;
+static void *cleanup_userdata = NULL;
+
+void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata)
+{
+    cleanup_handler = handler;
+    cleanup_userdata = userdata;
+}
 
 static void cleanup(void)
 {
     if (cleanup_handler) {
-        cleanup_handler();
+        cleanup_handler(cleanup_userdata);
     }
 }
 
@@ -41,11 +48,6 @@ static void print_stack_trace(void)
         fputs("\nStack trace:\n", stderr);
         __sanitizer_print_stack_trace();
     #endif
-}
-
-void set_fatal_error_cleanup_handler(void (*handler)(void))
-{
-    cleanup_handler = handler;
 }
 
 #if DEBUG >= 1

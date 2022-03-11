@@ -52,12 +52,17 @@ static void handle_sigwinch(int UNUSED_ARG(signum))
 }
 #endif
 
-static void term_cleanup(void)
+static void term_cleanup(EditorState *e)
 {
-    set_fatal_error_cleanup_handler(NULL);
-    if (!editor.child_controls_terminal) {
-        ui_end(&editor);
+    set_fatal_error_cleanup_handler(NULL, NULL);
+    if (!e->child_controls_terminal) {
+        ui_end(e);
     }
+}
+
+static void cleanup_handler(void *userdata)
+{
+    term_cleanup(userdata);
 }
 
 static noreturn COLD void handle_fatal_signal(int signum)
@@ -65,7 +70,7 @@ static noreturn COLD void handle_fatal_signal(int signum)
     DEBUG_LOG("Received signal %d (%s)", signum, strsignal(signum));
 
     if (signum != SIGHUP) {
-        term_cleanup();
+        term_cleanup(&editor);
     }
 
     struct sigaction sa = {.sa_handler = SIG_DFL};
@@ -431,7 +436,7 @@ loop_break:
     editor.root_frame = new_root_frame(window);
 
     set_signal_handlers();
-    set_fatal_error_cleanup_handler(term_cleanup);
+    set_fatal_error_cleanup_handler(cleanup_handler, &editor);
 
     if (load_and_save_history) {
         file_history_load(&editor.file_history, editor_file("file-history"));
