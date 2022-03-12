@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 #include "command/run.h"
+#include "syntax/color.h"
+#include "terminal/color.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -32,7 +34,7 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
 void exec_config(const CommandSet *cmds, StringView config);
 int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags f) WARN_UNUSED_RESULT;
 int read_config(const CommandSet *cmds, const char *filename, ConfigFlags f);
-void exec_builtin_color_reset(void);
-void exec_builtin_rc(void);
+void exec_builtin_color_reset(ColorScheme *colors, TermColorCapabilityType color_type);
+void exec_builtin_rc(ColorScheme *colors, TermColorCapabilityType color_type);
 
 #endif

@@ -825,7 +825,7 @@ static void cmd_hi(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     if (unlikely(a->nr_args == 0)) {
-        exec_builtin_color_reset();
+        exec_builtin_color_reset(&e->colors, e->terminal.color_type);
         goto update;
     }
 

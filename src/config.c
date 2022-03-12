@@ -3,9 +3,7 @@
 #include <sys/types.h>
 #include "config.h"
 #include "commands.h"
-#include "editor.h"
 #include "error.h"
-#include "syntax/color.h"
 #include "terminal/terminal.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -139,17 +137,17 @@ int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
     return ret;
 }
 
-void exec_builtin_color_reset(void)
+void exec_builtin_color_reset(ColorScheme *colors, TermColorCapabilityType type)
 {
-    clear_hl_colors(&editor.colors);
-    bool colors = editor.terminal.color_type >= TERM_8_COLOR;
-    const char *cfg = colors ? "color/reset" : "color/reset-basic";
+    clear_hl_colors(colors);
+    bool basic = type == TERM_0_COLOR;
+    const char *cfg = basic ? "color/reset-basic" : "color/reset";
     read_config(&normal_commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
-void exec_builtin_rc(void)
+void exec_builtin_rc(ColorScheme *colors, TermColorCapabilityType color_type)
 {
-    exec_builtin_color_reset();
+    exec_builtin_color_reset(colors, color_type);
     read_config(&normal_commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 }
 

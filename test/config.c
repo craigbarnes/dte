@@ -251,7 +251,7 @@ DISABLE_WARNING("-Wmissing-prototypes")
 void init_headless_mode(void)
 {
     MEMZERO(&editor.terminal.control_codes);
-    exec_builtin_rc();
+    exec_builtin_rc(&editor.colors, TERM_8_COLOR);
     update_all_syntax_colors(&editor.syntaxes);
     editor.options.lock_files = false;
     editor.window = new_window();

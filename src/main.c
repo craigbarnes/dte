@@ -416,7 +416,7 @@ loop_break:
     }
 
     term_save_title(term);
-    exec_builtin_rc();
+    exec_builtin_rc(&editor.colors, editor.terminal.color_type);
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
