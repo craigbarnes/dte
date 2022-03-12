@@ -165,17 +165,18 @@ pid_t fork_exec(char **argv, const char **env, int fd[3], bool drop_ctty)
 
     const pid_t pid = fork();
     if (unlikely(pid < 0)) {
-        const int saved_errno = errno;
+        int saved_errno = errno;
         xclose(ep[0]);
         xclose(ep[1]);
         errno = saved_errno;
-        return pid;
+        return -1;
     }
 
     if (pid == 0) {
         // Child
         handle_child(argv, env, fd, ep[1], drop_ctty);
         BUG("handle_child() should never return");
+        return -1;
     }
 
     // Parent
