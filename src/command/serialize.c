@@ -59,17 +59,16 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 dquote:
     string_append_byte(s, '"');
     for (size_t i = 0, n = sv.length; i < n; i++) {
-        const unsigned char ch = sv.data[i];
+        unsigned char ch = sv.data[i];
         if (unlikely(ch < sizeof(escmap) && escmap[ch])) {
             string_append_byte(s, '\\');
-            string_append_byte(s, escmap[ch]);
+            ch = escmap[ch];
         } else if (unlikely(ascii_iscntrl(ch))) {
             string_append_literal(s, "\\x");
             string_append_byte(s, hexmap[(ch >> 4) & 15]);
-            string_append_byte(s, hexmap[ch & 15]);
-        } else {
-            string_append_byte(s, ch);
+            ch = hexmap[ch & 15];
         }
+        string_append_byte(s, ch);
     }
     string_append_byte(s, '"');
 }
