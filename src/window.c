@@ -90,14 +90,14 @@ View *window_open_buffer (
 
     Buffer *b = buffer_new(encoding);
     if (!load_buffer(e, b, must_exist, filename)) {
-        free_buffer(&e->buffers, b);
+        remove_and_free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;
     }
     if (unlikely(b->file.mode == 0 && dir_missing)) {
         // New file in non-existing directory. This is usually a mistake.
         error_msg("Error opening %s: Directory does not exist", filename);
-        free_buffer(&e->buffers, b);
+        remove_and_free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;
     }
@@ -205,7 +205,7 @@ size_t remove_view(EditorState *e, View *v)
             FileHistory *hist = &e->file_history;
             file_history_add(hist, v->cy + 1, v->cx_char + 1, b->abs_filename);
         }
-        free_buffer(&e->buffers, b);
+        remove_and_free_buffer(&e->buffers, b);
     }
 
     free(v);

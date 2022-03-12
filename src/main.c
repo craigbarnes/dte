@@ -358,7 +358,7 @@ loop_break:
             if (errno != EBADF) {
                 error_msg("Unable to read redirected stdin");
             }
-            free_buffer(&editor.buffers, b);
+            remove_and_free_buffer(&editor.buffers, b);
         }
         freopen_tty(stdin, "r", STDIN_FILENO);
     }

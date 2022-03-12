@@ -79,7 +79,8 @@ Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNU
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
 Buffer *buffer_new(const Encoding *encoding) RETURNS_NONNULL;
 Buffer *open_empty_buffer(void) RETURNS_NONNULL;
-void free_buffer(PointerArray *buffers, Buffer *b) NONNULL_ARGS;
+void free_buffer(Buffer *b) NONNULL_ARGS;
+void remove_and_free_buffer(PointerArray *buffers, Buffer *b) NONNULL_ARGS;
 void free_blocks(Buffer *b) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *b) NONNULL_ARGS;
 void buffer_update_syntax(Buffer *b) NONNULL_ARGS;

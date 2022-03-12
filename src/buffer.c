@@ -119,10 +119,8 @@ void free_blocks(Buffer *b)
     }
 }
 
-void free_buffer(PointerArray *buffers, Buffer *b)
+void free_buffer(Buffer *b)
 {
-    ptr_array_remove(buffers, b);
-
     if (b->locked) {
         unlock_file(b->abs_filename);
     }
@@ -139,6 +137,12 @@ void free_buffer(PointerArray *buffers, Buffer *b)
 
     free_blocks(b);
     free(b);
+}
+
+void remove_and_free_buffer(PointerArray *buffers, Buffer *b)
+{
+    ptr_array_remove(buffers, b);
+    free_buffer(b);
 }
 
 static bool same_file(const Buffer *b, const struct stat *st)
