@@ -7,16 +7,10 @@
 #include "view.h"
 
 typedef struct {
-    // Needed after buffer is closed
-    char *filename;
-
-    // Needed if buffer doesn't have filename.
-    // Pointer would have to be set to NULL after closing buffer.
-    unsigned long buffer_id;
-
-    // If pattern is set then line and column are 0 and vice versa
-    char *pattern; // Regex from tag file
-    unsigned long line, column;
+    char *filename; // Needed after buffer is closed
+    unsigned long buffer_id; // Needed if buffer doesn't have a filename
+    char *pattern; // Regex from tag file (if set, line and column are 0)
+    unsigned long line, column; // File position (if non-zero, pattern is NULL)
 } FileLocation;
 
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
