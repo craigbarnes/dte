@@ -242,12 +242,18 @@ void free_editor_state(EditorState *e)
     clear_messages(&e->messages);
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
-    ptr_array_free_cb(&editor.buffers, FREE_FUNC(free_buffer));
     hashmap_free(&editor.compilers, FREE_FUNC(free_compiler));
     hashmap_free(&e->colors.other, free);
     hashmap_free(&normal_commands.aliases, free);
     BUG_ON(cmd_mode_commands.aliases.count != 0);
     BUG_ON(search_mode_commands.aliases.count != 0);
+
+    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
+        free_buffer(&e->buffers, editor.buffers.ptrs[i]);
+        editor.buffers.ptrs[i] = NULL;
+    }
+    BUG_ON(editor.buffers.count != 0);
+    ptr_array_free_array(&editor.buffers);
 
     free_bindings(&e->bindings[INPUT_NORMAL]);
     free_bindings(&e->bindings[INPUT_COMMAND]);
@@ -259,6 +265,9 @@ void free_editor_state(EditorState *e)
 
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)editor.user_config_dir);
+
+    // Zero pointers to help LSan find leaks
+    *e = (EditorState){.window = NULL};
 }
 
 static void sanity_check(const View *v)

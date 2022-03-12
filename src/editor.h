@@ -100,7 +100,7 @@ typedef struct {
     FileHistory file_history;
     History search_history;
     History command_history;
-    const char *const version;
+    const char *version;
     volatile sig_atomic_t resized;
 } EditorState;
 

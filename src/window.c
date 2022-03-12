@@ -52,7 +52,7 @@ View *window_open_buffer (
     char *absolute = path_absolute(filename);
     if (absolute) {
         // Already open?
-        Buffer *b = find_buffer(absolute);
+        Buffer *b = find_buffer(&e->buffers, absolute);
         if (b) {
             if (!streq(absolute, b->abs_filename)) {
                 const char *bufname = buffer_filename(b);
@@ -89,15 +89,15 @@ View *window_open_buffer (
     */
 
     Buffer *b = buffer_new(encoding);
-    if (!load_buffer(b, must_exist, filename)) {
-        free_buffer(b);
+    if (!load_buffer(e, b, must_exist, filename)) {
+        free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;
     }
     if (unlikely(b->file.mode == 0 && dir_missing)) {
         // New file in non-existing directory. This is usually a mistake.
         error_msg("Error opening %s: Directory does not exist", filename);
-        free_buffer(b);
+        free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;
     }
@@ -205,7 +205,7 @@ size_t remove_view(EditorState *e, View *v)
             FileHistory *hist = &e->file_history;
             file_history_add(hist, v->cy + 1, v->cx_char + 1, b->abs_filename);
         }
-        free_buffer(b);
+        free_buffer(&e->buffers, b);
     }
 
     free(v);

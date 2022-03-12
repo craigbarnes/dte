@@ -56,7 +56,7 @@ bool file_location_go(const FileLocation *loc)
 static bool file_location_return(const FileLocation *loc)
 {
     Window *window = editor.window;
-    Buffer *buffer = find_buffer_by_id(loc->buffer_id);
+    Buffer *buffer = find_buffer_by_id(&editor.buffers, loc->buffer_id);
     View *view;
 
     if (buffer) {

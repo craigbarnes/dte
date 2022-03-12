@@ -119,9 +119,9 @@ void free_blocks(Buffer *b)
     }
 }
 
-void free_buffer(Buffer *b)
+void free_buffer(PointerArray *buffers, Buffer *b)
 {
-    ptr_array_remove(&editor.buffers, b);
+    ptr_array_remove(buffers, b);
 
     if (b->locked) {
         unlock_file(b->abs_filename);
@@ -146,12 +146,12 @@ static bool same_file(const Buffer *b, const struct stat *st)
     return (st->st_dev == b->file.dev) && (st->st_ino == b->file.ino);
 }
 
-Buffer *find_buffer(const char *abs_filename)
+Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename)
 {
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
-    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
-        Buffer *b = editor.buffers.ptrs[i];
+    for (size_t i = 0, n = buffers->count; i < n; i++) {
+        Buffer *b = buffers->ptrs[i];
         const char *f = b->abs_filename;
         if ((f && streq(f, abs_filename)) || (st_ok && same_file(b, &st))) {
             return b;
@@ -160,10 +160,10 @@ Buffer *find_buffer(const char *abs_filename)
     return NULL;
 }
 
-Buffer *find_buffer_by_id(unsigned long id)
+Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id)
 {
-    for (size_t i = 0, n = editor.buffers.count; i < n; i++) {
-        Buffer *b = editor.buffers.ptrs[i];
+    for (size_t i = 0, n = buffers->count; i < n; i++) {
+        Buffer *b = buffers->ptrs[i];
         if (b->id == id) {
             return b;
         }

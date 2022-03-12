@@ -8,7 +8,6 @@
 #include "load-save.h"
 #include "block.h"
 #include "convert.h"
-#include "editor.h"
 #include "encoding.h"
 #include "error.h"
 #include "util/debug.h"
@@ -258,7 +257,7 @@ error:
     return ret;
 }
 
-bool load_buffer(Buffer *b, bool must_exist, const char *filename)
+bool load_buffer(const EditorState *e, Buffer *b, bool must_exist, const char *filename)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
 
@@ -285,10 +284,10 @@ bool load_buffer(Buffer *b, bool must_exist, const char *filename)
             error_msg("Invalid file size: %jd", (intmax_t)b->file.size);
             goto error;
         }
-        if (b->file.size / 1024 / 1024 > editor.options.filesize_limit) {
+        if (b->file.size / 1024 / 1024 > e->options.filesize_limit) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
-                editor.options.filesize_limit,
+                e->options.filesize_limit,
                 filename
             );
             goto error;

@@ -6,12 +6,13 @@
 
 static void test_find_buffer_by_id(void)
 {
-    ASSERT_NONNULL(editor.buffer);
-    EXPECT_PTREQ(find_buffer_by_id(editor.buffer->id), editor.buffer);
+    const Buffer *buffer = editor.buffer;
+    ASSERT_NONNULL(buffer);
+    EXPECT_PTREQ(find_buffer_by_id(&editor.buffers, buffer->id), buffer);
 
     const unsigned long large_id = 1UL << 30;
-    static_assert_compatible_types(large_id, editor.buffer->id);
-    EXPECT_NULL(find_buffer_by_id(large_id));
+    static_assert_compatible_types(large_id, buffer->id);
+    EXPECT_NULL(find_buffer_by_id(&editor.buffers, large_id));
 }
 
 static void test_make_indent(void)

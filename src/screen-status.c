@@ -308,12 +308,32 @@ static void sf_format (
 }
 
 UNITTEST {
-    EditorState e = {.input_mode = INPUT_NORMAL};
-    char buf[256];
-    Window *window = new_window();
-    window->view = window_open_empty_buffer(window);
+    Buffer buffer = {
+        .encoding = {.type = UTF8, .name = "UTF-8"},
+        .options = {.filetype = "none"},
+    };
 
-    sf_format(&e, window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    list_init(&buffer.blocks);
+    Block *block = block_new(1);
+    list_add_before(&block->node, &buffer.blocks);
+
+    View view = {
+        .buffer = &buffer,
+        .cursor = {.head = &buffer.blocks, .blk = block},
+    };
+
+    Window window = {.view = &view};
+    view.window = &window;
+
+    EditorState e = {
+        .input_mode = INPUT_NORMAL,
+        .window = &window,
+        .buffer = &buffer,
+        .view = &view,
+    };
+
+    char buf[256];
+    sf_format(&e, &window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
     char fmt[4] = "%%";
@@ -323,10 +343,10 @@ UNITTEST {
             continue;
         }
         fmt[1] = i;
-        sf_format(&e, window, buf, sizeof(buf), fmt);
+        sf_format(&e, &window, buf, sizeof(buf), fmt);
     }
 
-    window_free(&e, window);
+    block_free(block);
 }
 
 void update_status_line(EditorState *e, const Window *win)
