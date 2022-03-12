@@ -3,6 +3,7 @@
 #include "utf8.h"
 #include "ascii.h"
 #include "debug.h"
+#include "numtostr.h"
 
 enum {
     I = -1, // Invalid byte
@@ -215,14 +216,12 @@ void u_set_char(char *str, size_t *idx, CodePoint u)
 
 void u_set_hex(char *str, size_t *idx, CodePoint u)
 {
-    static const char hex_tab[16] = "0123456789abcdef";
     char *p = str + *idx;
     p[0] = '<';
     if (!u_is_unicode(u)) {
         // Invalid byte (negated)
         u *= -1;
-        p[1] = hex_tab[(u >> 4) & 0x0f];
-        p[2] = hex_tab[u & 0x0f];
+        hex_encode_byte(p + 1, u & 0xFF);
     } else {
         p[1] = '?';
         p[2] = '?';

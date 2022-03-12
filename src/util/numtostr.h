@@ -5,6 +5,26 @@
 #include <stdint.h>
 #include "macros.h"
 
+extern const char hex_encode_table[16];
+
+// Encodes a byte of data as 2 hexadecimal digits
+static inline char *hex_encode_byte(char *out, uint8_t byte)
+{
+    out[0] = hex_encode_table[byte >> 4];
+    out[1] = hex_encode_table[byte & 0xF];
+    return out;
+}
+
+// Encodes 24 bits from a uint32_t as 6 hexadecimal digits (fixed width)
+static inline char *hex_encode_u24_fixed(char *out, uint32_t x)
+{
+    UNROLL_LOOP(6)
+    for (unsigned int shift = 20, i = 0; shift <= 20; shift -= 4) {
+        out[i++] = hex_encode_table[(x >> shift) & 0xF];
+    }
+    return out;
+}
+
 size_t buf_umax_to_str(uintmax_t x, char *buf) NONNULL_ARGS;
 size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;
 

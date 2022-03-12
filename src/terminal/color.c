@@ -446,17 +446,10 @@ static size_t append_color(char *buf, int32_t color)
         return buf_uint_to_str((unsigned int)color, buf);
     }
 
-    BUG_ON((color & COLOR_FLAG_RGB) == 0);
-    size_t n = 0;
-    buf[n++] = '#';
-
-    static const char hextab[] = "0123456789abcdef";
-    for (unsigned int shift = 20; shift <= 20; shift -= 4) {
-        buf[n++] = hextab[(color >> shift) & 0xF];
-    }
-
-    BUG_ON(n != 7);
-    return n;
+    BUG_ON(!(color & COLOR_FLAG_RGB));
+    buf[0] = '#';
+    hex_encode_u24_fixed(buf + 1, color);
+    return 7;
 }
 
 const char *term_color_to_string(const TermColor *color)

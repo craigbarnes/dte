@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "macros.h"
 
-extern const uint8_t hex_table[256];
+extern const uint8_t hex_decode_table[256];
 
 enum {
     HEX_INVALID = 0xF0,
@@ -17,7 +17,7 @@ enum {
 // between 0-15, or HEX_INVALID for invalid digits
 static inline unsigned int hex_decode(unsigned char c)
 {
-    return hex_table[c];
+    return hex_decode_table[c];
 }
 
 static inline size_t buf_parse_hex_uint(const char *str, size_t size, unsigned int *valp)

@@ -166,6 +166,32 @@ static void test_hex_decode(void)
     EXPECT_EQ(hex_decode(0xFF), HEX_INVALID);
 }
 
+static void test_hex_encode_byte(void)
+{
+    char buf[4] = {0};
+    EXPECT_STREQ(hex_encode_byte(buf, 0x00), "00");
+    EXPECT_STREQ(hex_encode_byte(buf, 0x05), "05");
+    EXPECT_STREQ(hex_encode_byte(buf, 0x10), "10");
+    EXPECT_STREQ(hex_encode_byte(buf, 0x1b), "1b");
+    EXPECT_STREQ(hex_encode_byte(buf, 0xee), "ee");
+    EXPECT_STREQ(hex_encode_byte(buf, 0xfe), "fe");
+    EXPECT_STREQ(hex_encode_byte(buf, 0xff), "ff");
+}
+
+static void test_hex_encode_u24_fixed(void)
+{
+    char buf[8] = {0};
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0xabcdef), "abcdef");
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0x00001e), "00001e");
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0x000000), "000000");
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0x100001), "100001");
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0xffffff), "ffffff");
+
+    // Upper 8 bits (ff) should be ignored, since we're deliberately
+    // treating the uint32_t parameter as if it were only 24 bits
+    EXPECT_STREQ(hex_encode_u24_fixed(buf, 0xff123456), "123456");
+}
+
 static void test_ascii(void)
 {
     EXPECT_EQ(ascii_tolower('A'), 'a');
@@ -2222,6 +2248,8 @@ static const TestEntry tests[] = {
     TEST(test_str_has_prefix),
     TEST(test_str_has_suffix),
     TEST(test_hex_decode),
+    TEST(test_hex_encode_byte),
+    TEST(test_hex_encode_u24_fixed),
     TEST(test_ascii),
     TEST(test_base64_decode),
     TEST(test_base64_encode_block),

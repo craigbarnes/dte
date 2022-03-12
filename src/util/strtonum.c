@@ -10,7 +10,7 @@ enum {
     I = HEX_INVALID
 };
 
-const uint8_t hex_table[256] = {
+const uint8_t hex_decode_table[256] = {
     I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
     I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,
     I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I,

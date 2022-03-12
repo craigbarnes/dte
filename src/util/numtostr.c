@@ -1,5 +1,7 @@
 #include "numtostr.h"
 
+const char hex_encode_table[16] = "0123456789abcdef";
+
 static size_t umax_count_base10_digits(uintmax_t x)
 {
     size_t digits = 0;
