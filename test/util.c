@@ -575,6 +575,10 @@ static void test_string_view(void)
     EXPECT_PTREQ(strview_memchr(&sv, '-'), strview_memrchr(&sv, '-'));
     EXPECT_PTREQ(strview_memchr(&sv, 'x'), sv.data + 5);
     EXPECT_PTREQ(strview_memrchr(&sv, 'x'), sv.data + 14);
+    EXPECT_PTREQ(strview_memrchr(&sv, '@'), NULL);
+    EXPECT_EQ(strview_memrchr_idx(&sv, 'p'), 0);
+    EXPECT_EQ(strview_memrchr_idx(&sv, 'x'), 14);
+    EXPECT_EQ(strview_memrchr_idx(&sv, '@'), -1);
 }
 
 static void test_strview_has_suffix(void)

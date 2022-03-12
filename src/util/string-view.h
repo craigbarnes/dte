@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/types.h>
 #include "ascii.h"
 #include "debug.h"
 #include "macros.h"
@@ -140,6 +141,13 @@ static inline const unsigned char *strview_memrchr(const StringView *sv, int c)
         }
     }
     return NULL;
+}
+
+NONNULL_ARGS
+static inline ssize_t strview_memrchr_idx(const StringView *sv, int c)
+{
+    const unsigned char *ptr = strview_memrchr(sv, c);
+    return ptr ? (ssize_t)(ptr - sv->data) : -1;
 }
 
 static inline void strview_remove_prefix(StringView *sv, size_t len)

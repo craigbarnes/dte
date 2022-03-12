@@ -73,10 +73,9 @@ static inline bool path_parent(StringView *path)
         BUG_ON(strview_has_suffix(path, "/"));
     }
 
-    const unsigned char *slash = strview_memrchr(path, '/');
-    BUG_ON(!slash);
-    size_t length = (size_t)(slash - path->data);
-    path->length = length ? length : 1;
+    ssize_t slash_idx = strview_memrchr_idx(path, '/');
+    BUG_ON(slash_idx < 0);
+    path->length = slash_idx ? slash_idx : 1;
     return true;
 }
 

@@ -149,9 +149,9 @@ static StringView get_interpreter(StringView line)
         sv = get_delim(line.data, &pos, line.length, ' ');
     }
 
-    const unsigned char *last_slash = strview_memrchr(&sv, '/');
-    if (last_slash) {
-        strview_remove_prefix(&sv, (last_slash - sv.data) + 1);
+    ssize_t last_slash_idx = strview_memrchr_idx(&sv, '/');
+    if (last_slash_idx >= 0) {
+        strview_remove_prefix(&sv, last_slash_idx + 1);
     }
 
     while (sv.length && ascii_is_digit_or_dot(sv.data[sv.length - 1])) {
