@@ -336,13 +336,30 @@ UNITTEST {
     sf_format(&e, &window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
-    char fmt[4] = "%%";
+    sf_format(&e, &window, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    BUG_ON(!streq(buf, " LF INS"));
+
+    buffer.bom = true;
+    buffer.crlf_newlines = true;
+    buffer.temporary = true;
+    buffer.options.overwrite = true;
+    sf_format(&e, &window, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    BUG_ON(!streq(buf, "BOM CRLF CRLF TMP OVR"));
+
+    e.input_mode = INPUT_SEARCH;
+    sf_format(&e, &window, buf, sizeof buf, "%M");
+    BUG_ON(!streq(buf, "[case-sensitive = false]"));
+
+    e.options.case_sensitive_search = CSS_AUTO;
+    sf_format(&e, &window, buf, sizeof buf, "%M");
+    BUG_ON(!streq(buf, "[case-sensitive = auto]"));
+
     for (unsigned char i = 0; i < ARRAYLEN(format_specifiers); i++) {
         FormatSpecifierType type =  format_specifiers[i];
         if (type == STATUS_INVALID) {
             continue;
         }
-        fmt[1] = i;
+        const char fmt[4] = {'%', i, '\0'};
         sf_format(&e, &window, buf, sizeof(buf), fmt);
     }
 
