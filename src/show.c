@@ -50,13 +50,14 @@ typedef struct {
 } ShowHandler;
 
 static void open_temporary_buffer (
+    EditorState *e,
     const char *text,
     size_t text_len,
     const char *cmd,
     const char *cmd_arg,
     ShowHandlerFlags flags
 ) {
-    View *v = window_open_new_file(&editor, editor.window);
+    View *v = window_open_new_file(e, e->window);
     v->buffer->temporary = true;
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
@@ -67,7 +68,7 @@ static void open_temporary_buffer (
     }
     if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
-        set_file_options(&editor.file_options, v->buffer);
+        set_file_options(&e->file_options, v->buffer);
         buffer_update_syntax(v->buffer);
     }
 }
@@ -174,7 +175,7 @@ static void show_include(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
-        open_temporary_buffer(sv.data, sv.length, "builtin", name, true);
+        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, true);
     }
 }
 
@@ -191,7 +192,7 @@ static void show_compiler(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(str.buffer, str.len, "errorfmt", name, true);
+        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, true);
     }
     string_free(&str);
 }
@@ -416,7 +417,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
     }
 
     String str = handler->dump(e);
-    open_temporary_buffer(str.buffer, str.len, "show", type, handler->flags);
+    open_temporary_buffer(e, str.buffer, str.len, "show", type, handler->flags);
     string_free(&str);
 }
 
