@@ -1,5 +1,4 @@
 #include "test.h"
-#include "editor.h"
 #include "filetype.h"
 
 static void test_is_valid_filetype_name(void)
@@ -115,9 +114,10 @@ static void test_find_ft_filename(void)
         {"1", NULL},
         {NULL, NULL},
     };
+    const PointerArray arr = PTR_ARRAY_INIT;
     const StringView empty_line = STRING_VIEW_INIT;
     FOR_EACH_I(i, tests) {
-        const char *ft = find_ft(&editor.filetypes, tests[i].filename, empty_line);
+        const char *ft = find_ft(&arr, tests[i].filename, empty_line);
         IEXPECT_STREQ(ft, tests[i].expected_filetype);
     }
 }
@@ -216,76 +216,79 @@ static void test_find_ft_firstline(void)
         {"#!/usr/bin/env/ lua", NULL},
         {"#!/lua/", NULL},
     };
+    const PointerArray arr = PTR_ARRAY_INIT;
     FOR_EACH_I(i, tests) {
-        const char *ft = find_ft(&editor.filetypes, NULL, strview_from_cstring(tests[i].line));
+        const char *ft = find_ft(&arr, NULL, strview_from_cstring(tests[i].line));
         IEXPECT_STREQ(ft, tests[i].expected_filetype);
     }
 }
 
 static void test_find_ft_dynamic(void)
 {
-    PointerArray *a = &editor.filetypes;
+    PointerArray a = PTR_ARRAY_INIT;
     const char *ft = "test1";
     StringView line = STRING_VIEW_INIT;
-    EXPECT_FALSE(is_ft(a, ft));
-    add_filetype(a, ft, "ext-test", FT_EXTENSION);
-    EXPECT_TRUE(is_ft(a, ft));
-    EXPECT_STREQ(find_ft(a, "/tmp/file.ext-test", line), ft);
+    EXPECT_FALSE(is_ft(&a, ft));
+    add_filetype(&a, ft, "ext-test", FT_EXTENSION);
+    EXPECT_TRUE(is_ft(&a, ft));
+    EXPECT_STREQ(find_ft(&a, "/tmp/file.ext-test", line), ft);
 
     ft = "test2";
-    add_filetype(a, ft, "/zdir/__[A-Z]+$", FT_FILENAME);
-    EXPECT_STREQ(find_ft(a, "/tmp/zdir/__TESTFILE", line), ft);
-    EXPECT_STREQ(find_ft(a, "/tmp/zdir/__testfile", line), NULL);
+    add_filetype(&a, ft, "/zdir/__[A-Z]+$", FT_FILENAME);
+    EXPECT_STREQ(find_ft(&a, "/tmp/zdir/__TESTFILE", line), ft);
+    EXPECT_STREQ(find_ft(&a, "/tmp/zdir/__testfile", line), NULL);
 
     ft = "test3";
-    add_filetype(a, ft, "._fiLeName", FT_BASENAME);
-    EXPECT_STREQ(find_ft(a, "/tmp/._fiLeName", line), ft);
-    EXPECT_STREQ(find_ft(a, "/tmp/._filename", line), NULL);
+    add_filetype(&a, ft, "._fiLeName", FT_BASENAME);
+    EXPECT_STREQ(find_ft(&a, "/tmp/._fiLeName", line), ft);
+    EXPECT_STREQ(find_ft(&a, "/tmp/._filename", line), NULL);
 
     ft = "test4";
     line = strview_from_cstring("!!42");
-    add_filetype(a, ft, "^!+42$", FT_CONTENT);
-    EXPECT_STREQ(find_ft(a, NULL, line), ft);
+    add_filetype(&a, ft, "^!+42$", FT_CONTENT);
+    EXPECT_STREQ(find_ft(&a, NULL, line), ft);
 
     ft = "test5";
     line = strview_from_cstring("#!/usr/bin/xyzlang4.2");
-    add_filetype(a, ft, "xyzlang", FT_INTERPRETER);
-    EXPECT_STREQ(find_ft(a, NULL, line), ft);
+    add_filetype(&a, ft, "xyzlang", FT_INTERPRETER);
+    EXPECT_STREQ(find_ft(&a, NULL, line), ft);
+
+    EXPECT_TRUE(is_ft(&a, "test1"));
+    EXPECT_TRUE(is_ft(&a, "test2"));
+    EXPECT_TRUE(is_ft(&a, "test3"));
+    EXPECT_TRUE(is_ft(&a, "test4"));
+    EXPECT_TRUE(is_ft(&a, "test5"));
+    EXPECT_FALSE(is_ft(&a, "test0"));
+    EXPECT_FALSE(is_ft(&a, "test"));
+
+    free_filetypes(&a);
 }
 
 static void test_is_ft(void)
 {
-    const PointerArray *a = &editor.filetypes;
-    EXPECT_TRUE(is_ft(a, "ada"));
-    EXPECT_TRUE(is_ft(a, "asm"));
-    EXPECT_TRUE(is_ft(a, "awk"));
-    EXPECT_TRUE(is_ft(a, "c"));
-    EXPECT_TRUE(is_ft(a, "d"));
-    EXPECT_TRUE(is_ft(a, "dte"));
-    EXPECT_TRUE(is_ft(a, "java"));
-    EXPECT_TRUE(is_ft(a, "javascript"));
-    EXPECT_TRUE(is_ft(a, "lua"));
-    EXPECT_TRUE(is_ft(a, "mail"));
-    EXPECT_TRUE(is_ft(a, "make"));
-    EXPECT_TRUE(is_ft(a, "pkg-config"));
-    EXPECT_TRUE(is_ft(a, "rst"));
-    EXPECT_TRUE(is_ft(a, "sh"));
-    EXPECT_TRUE(is_ft(a, "yaml"));
-    EXPECT_TRUE(is_ft(a, "zig"));
+    const PointerArray a = PTR_ARRAY_INIT;
+    EXPECT_TRUE(is_ft(&a, "ada"));
+    EXPECT_TRUE(is_ft(&a, "asm"));
+    EXPECT_TRUE(is_ft(&a, "awk"));
+    EXPECT_TRUE(is_ft(&a, "c"));
+    EXPECT_TRUE(is_ft(&a, "d"));
+    EXPECT_TRUE(is_ft(&a, "dte"));
+    EXPECT_TRUE(is_ft(&a, "java"));
+    EXPECT_TRUE(is_ft(&a, "javascript"));
+    EXPECT_TRUE(is_ft(&a, "lua"));
+    EXPECT_TRUE(is_ft(&a, "mail"));
+    EXPECT_TRUE(is_ft(&a, "make"));
+    EXPECT_TRUE(is_ft(&a, "pkg-config"));
+    EXPECT_TRUE(is_ft(&a, "rst"));
+    EXPECT_TRUE(is_ft(&a, "sh"));
+    EXPECT_TRUE(is_ft(&a, "yaml"));
+    EXPECT_TRUE(is_ft(&a, "zig"));
 
-    EXPECT_FALSE(is_ft(a, ""));
-    EXPECT_FALSE(is_ft(a, "-"));
-    EXPECT_FALSE(is_ft(a, "a"));
-    EXPECT_FALSE(is_ft(a, "C"));
-    EXPECT_FALSE(is_ft(a, "MAKE"));
-
-    EXPECT_TRUE(is_ft(a, "test1"));
-    EXPECT_TRUE(is_ft(a, "test2"));
-    EXPECT_TRUE(is_ft(a, "test3"));
-    EXPECT_TRUE(is_ft(a, "test4"));
-    EXPECT_TRUE(is_ft(a, "test5"));
-    EXPECT_FALSE(is_ft(a, "test0"));
-    EXPECT_FALSE(is_ft(a, "test"));
+    EXPECT_FALSE(is_ft(&a, ""));
+    EXPECT_FALSE(is_ft(&a, "-"));
+    EXPECT_FALSE(is_ft(&a, "a"));
+    EXPECT_FALSE(is_ft(&a, "C"));
+    EXPECT_FALSE(is_ft(&a, "MAKE"));
 }
 
 static const TestEntry tests[] = {
