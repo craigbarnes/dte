@@ -383,12 +383,12 @@ static bool detect_indent(Buffer *b)
     return true;
 }
 
-void buffer_setup(Buffer *b)
+void buffer_setup(Buffer *b, const PointerArray *file_options)
 {
     const char *filename = b->abs_filename;
     b->setup = true;
     buffer_detect_filetype(b);
-    set_file_options(&editor.file_options, b);
+    set_file_options(file_options, b);
     set_editorconfig_options(b);
     buffer_update_syntax(b);
     if (b->options.detect_indent && filename) {

@@ -83,6 +83,6 @@ void free_buffer(Buffer *b) NONNULL_ARGS;
 void free_blocks(Buffer *b) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *b) NONNULL_ARGS;
 void buffer_update_syntax(Buffer *b) NONNULL_ARGS;
-void buffer_setup(Buffer *b) NONNULL_ARGS;
+void buffer_setup(Buffer *b, const PointerArray *file_options) NONNULL_ARGS;
 
 #endif

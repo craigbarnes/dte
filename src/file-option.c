@@ -1,12 +1,10 @@
 #include <unistd.h>
 #include "file-option.h"
 #include "command/serialize.h"
-#include "editor.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
 #include "util/debug.h"
-#include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
@@ -148,10 +146,10 @@ error:
     free(opt);
 }
 
-void dump_file_options(String *buf)
+void dump_file_options(const PointerArray *file_options, String *buf)
 {
-    for (size_t i = 0, n = editor.file_options.count; i < n; i++) {
-        const FileOption *opt = editor.file_options.ptrs[i];
+    for (size_t i = 0, n = file_options->count; i < n; i++) {
+        const FileOption *opt = file_options->ptrs[i];
         const char *tp;
         if (opt->type == FILE_OPTIONS_FILENAME) {
             tp = opt->u.filename->str;

@@ -255,7 +255,7 @@ void set_view(EditorState *e, View *v)
     e->window->view = v;
 
     if (!v->buffer->setup) {
-        buffer_setup(v->buffer);
+        buffer_setup(v->buffer, &e->file_options);
         if (v->buffer->options.file_history && v->buffer->abs_filename) {
             restore_cursor_from_history(&e->file_history, v);
         }

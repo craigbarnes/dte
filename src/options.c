@@ -866,7 +866,7 @@ String dump_options(void)
         }
     }
     string_append_literal(&buf, "\n\n");
-    dump_file_options(&buf);
+    dump_file_options(&editor.file_options, &buf);
     return buf;
 }
 
