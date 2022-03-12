@@ -213,7 +213,7 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     }
 
     // Search built-in lookup tables
-    for (size_t i = 0; i < ARRAYLEN(table); i++) {
+    for (FileDetectionType i = 0; i < ARRAYLEN(table); i++) {
         BUG_ON(!table[i].lookup);
         FileTypeEnum ft = table[i].lookup(table[i].sv);
         if (ft != NONE) {
