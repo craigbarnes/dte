@@ -842,13 +842,13 @@ static void append_option(String *s, const OptionDesc *desc, void *ptr)
     string_append_byte(s, '\n');
 }
 
-String dump_options(void)
+String dump_options(GlobalOptions *gopts, LocalOptions *lopts)
 {
     String buf = string_new(4096);
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        void *local = desc->local ? local_ptr(desc, &editor.buffer->options) : NULL;
-        void *global = desc->global ? global_ptr(desc, &editor.options) : NULL;
+        void *local = desc->local ? local_ptr(desc, lopts) : NULL;
+        void *global = desc->global ? global_ptr(desc, gopts) : NULL;
         if (local && global) {
             const OptionValue global_value = desc_get(desc, global);
             if (desc_equals(desc, local, global_value)) {
@@ -865,8 +865,6 @@ String dump_options(void)
             append_option(&buf, desc, local ? local : global);
         }
     }
-    string_append_literal(&buf, "\n\n");
-    dump_file_options(&editor.file_options, &buf);
     return buf;
 }
 

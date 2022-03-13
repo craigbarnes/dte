@@ -349,9 +349,12 @@ String dump_compilers(EditorState *e)
     return buf;
 }
 
-String do_dump_options(EditorState* UNUSED_ARG(e))
+String do_dump_options(EditorState *e)
 {
-    return dump_options();
+    String str = dump_options(&e->options, &e->buffer->options);
+    string_append_literal(&str, "\n\n");
+    dump_file_options(&e->file_options, &str);
+    return str;
 }
 
 String do_dump_builtin_configs(EditorState* UNUSED_ARG(e))

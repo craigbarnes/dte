@@ -89,7 +89,7 @@ void collect_options(PointerArray *a, const char *prefix, bool local, bool globa
 void collect_auto_options(PointerArray *a, const char *prefix);
 void collect_toggleable_options(PointerArray *a, const char *prefix, bool global);
 void collect_option_values(PointerArray *a, const char *option, const char *prefix);
-String dump_options(void);
+String dump_options(GlobalOptions *gopts, LocalOptions *lopts);
 const char *get_option_value_string(const char *name);
 
 #endif
