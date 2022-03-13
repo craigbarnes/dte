@@ -5,7 +5,6 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <sys/types.h>
 #include "bind.h"
 #include "buffer.h"
 #include "cmdline.h"
@@ -74,13 +73,9 @@ typedef struct {
     Terminal terminal;
     StringView home_dir;
     const char *user_config_dir;
-    const char *file_locks;
-    const char *file_locks_lock;
-    mode_t file_locks_mode;
     bool child_controls_terminal;
     bool everything_changed;
     bool session_leader;
-    pid_t pid;
     int exit_code;
     size_t cmdline_x;
     KeyBindingGroup bindings[3];

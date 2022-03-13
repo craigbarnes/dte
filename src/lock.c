@@ -1,11 +1,12 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 #include "lock.h"
-#include "editor.h"
 #include "error.h"
 #include "util/path.h"
 #include "util/readfile.h"
@@ -16,6 +17,29 @@
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 
+// These are initialized during early startup and then never changed,
+// so they're deemed an "acceptable" use of globals:
+static const char *file_locks;
+static const char *file_locks_lock;
+static mode_t file_locks_mode = 0666;
+static pid_t editor_pid;
+
+void init_file_locks_context(const char *fallback_dir, pid_t pid)
+{
+    const char *xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
+    if (!xdg_runtime_dir || !path_is_absolute(xdg_runtime_dir)) {
+        xdg_runtime_dir = fallback_dir;
+    } else {
+        // Set sticky bit (see XDG Base Directory Specification)
+        #ifdef S_ISVTX
+            file_locks_mode |= S_ISVTX;
+        #endif
+    }
+    file_locks = path_join(xdg_runtime_dir, "dte-locks");
+    file_locks_lock = path_join(xdg_runtime_dir, "dte-locks.lock");
+    editor_pid = pid;
+}
+
 static bool process_exists(pid_t pid)
 {
     return !kill(pid, 0);
@@ -24,7 +48,6 @@ static bool process_exists(pid_t pid)
 static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 {
     const size_t filename_len = strlen(filename);
-    const pid_t my_pid = editor.pid;
     size_t size = *sizep;
     pid_t other_pid = 0;
 
@@ -44,7 +67,7 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 
         bool same = strview_equal_strn(&line, filename, filename_len);
         pid_t pid = (pid_t)num;
-        if (pid == my_pid) {
+        if (pid == editor_pid) {
             if (same) {
                 goto remove_line;
             }
@@ -68,13 +91,11 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 
 static bool lock_or_unlock(const char *filename, bool lock)
 {
-    const char *file_locks = editor.file_locks;
-    const char *file_locks_lock = editor.file_locks_lock;
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
         return true;
     }
 
-    const mode_t mode = editor.file_locks_mode;
+    mode_t mode = file_locks_mode;
     int tries = 0;
     int wfd;
     while (1) {
@@ -120,7 +141,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
     pid_t pid = rewrite_lock_file(buf, &size, filename);
     if (lock) {
         if (pid == 0) {
-            intmax_t p = (intmax_t)editor.pid;
+            intmax_t p = (intmax_t)editor_pid;
             size_t n = strlen(filename) + DECIMAL_STR_MAX(pid) + 4;
             xrenew(buf, size + n);
             size += xsnprintf(buf + size, n, "%jd %s\n", p, filename);

@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include "editor.h"
 #include "command/macro.h"
@@ -14,6 +13,7 @@
 #include "error.h"
 #include "file-option.h"
 #include "filetype.h"
+#include "lock.h"
 #include "mode.h"
 #include "regexp.h"
 #include "screen.h"
@@ -51,7 +51,6 @@ EditorState editor = {
     .buffer = NULL,
     .view = NULL,
     .version = version,
-    .file_locks_mode = 0666,
     .cmdline_x = 0,
     .colors = {
         .other = HASHMAP_INIT,
@@ -178,7 +177,6 @@ void init_editor_state(void)
 {
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
-    const char *xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
 
     editor.home_dir = strview_intern(home ? home : "");
     if (dte_home) {
@@ -187,32 +185,16 @@ void init_editor_state(void)
         editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
     }
 
-    if (!xdg_runtime_dir || !path_is_absolute(xdg_runtime_dir)) {
-        xdg_runtime_dir = editor.user_config_dir;
-    } else {
-        // Set sticky bit (see XDG Base Directory Specification)
-        #ifdef S_ISVTX
-            editor.file_locks_mode |= S_ISVTX;
-        #endif
-    }
-
-    char *locks = path_join(xdg_runtime_dir, "dte-locks");
-    char *llocks = path_join(xdg_runtime_dir, "dte-locks.lock");
-    editor.file_locks = str_intern(locks);
-    editor.file_locks_lock = str_intern(llocks);
-    free(locks);
-    free(llocks);
-
     log_init("DTE_LOG");
     DEBUG_LOG("version: %s", version);
 
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
     DEBUG_LOG("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
-    editor.pid = pid;
     editor.session_leader = leader;
 
     set_and_check_locale();
+    init_file_locks_context(editor.user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
