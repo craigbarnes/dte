@@ -440,9 +440,8 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
      */
     KeyCode key, mods = 0;
     if (csi.final_byte == 'u') {
-        if (unlikely(csi.nsub[0] > 3 || csi.nsub[1] > 1 || csi.nsub[2] > 1)) {
-            // Don't allow unknown sub-params or known sub-params that we
-            // don't request and that need explicit handling (e.g. event-type)
+        if (unlikely(csi.nsub[0] > 3 || csi.nsub[1] > 2 || csi.nsub[2] > 1)) {
+            // Don't allow unknown sub-params
             goto ignore;
         }
         // Use the "base layout key", if present
@@ -450,6 +449,10 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
         switch (csi.nparams) {
         case 3:
         case 2:
+            if (unlikely(csi.params[1][1] > 2)) {
+                // Key release event
+                goto ignore;
+            }
             goto decode_mods_and_normalize;
         case 1:
             goto normalize;

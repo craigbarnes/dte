@@ -368,6 +368,11 @@ static void test_xterm_parse_key(void)
         {"\033[57415u", 8, '='},
         {"\033[57427u", 8, KEY_BEGIN},
         {"\033[3615:3620:97;6u", 17, MOD_CTRL | MOD_SHIFT | 'a'},
+        {"\033[97;5u", 7, MOD_CTRL | 'a'},
+        {"\033[97;5:1u", 9, MOD_CTRL | 'a'},
+        {"\033[97;5:2u", 9, MOD_CTRL | 'a'},
+        {"\033[97;5:3u", 9, KEY_IGNORE},
+        // TODO: {"\033[97;5:u", 8, MOD_CTRL | 'a'},
         // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
         // XTWINOPS replies
