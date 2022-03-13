@@ -26,6 +26,7 @@ static pid_t editor_pid;
 
 void init_file_locks_context(const char *fallback_dir, pid_t pid)
 {
+    BUG_ON(file_locks);
     const char *xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
     if (!xdg_runtime_dir || !path_is_absolute(xdg_runtime_dir)) {
         xdg_runtime_dir = fallback_dir;
