@@ -358,6 +358,16 @@ static void test_xterm_parse_key(void)
         {"\033[ !//.$2;3u", 12, KEY_IGNORE},
         // https://sw.kovidgoyal.net/kitty/keyboard-protocol
         {"\033[27u", 5, MOD_CTRL | '['},
+        {"\033[57376u", 8, KEY_F13},
+        {"\033[57382u", 8, KEY_F19},
+        {"\033[57383u", 8, KEY_F20},
+        {"\033[57399u", 8, '0'},
+        {"\033[57405u", 8, '6'},
+        {"\033[57408u", 8, '9'},
+        // TODO: {"\033[57414u", 8, KEY_ENTER},
+        {"\033[57415u", 8, '='},
+        {"\033[57427u", 8, KEY_BEGIN},
+        {"\033[3615:3620:97;6u", 17, MOD_CTRL | MOD_SHIFT | 'a'},
         // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
         // XTWINOPS replies
