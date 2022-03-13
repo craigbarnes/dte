@@ -429,13 +429,26 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
         goto ignore;
     }
 
+    /*
+     * This handles the basic CSI u ("fixterms") encoding and also the
+     * extended kitty keyboard encoding.
+     *
+     * - https://www.leonerd.org.uk/hacks/fixterms/
+     * - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+     *
+     * kitty params: key:unshifted-key:base-layout-key ; mods:event-type ; text
+     */
     KeyCode key, mods = 0;
     if (csi.final_byte == 'u') {
-        if (csi.nsub[0] > 3 || csi.nsub[1] > 1) {
+        if (unlikely(csi.nsub[0] > 3 || csi.nsub[1] > 1 || csi.nsub[2] > 1)) {
+            // Don't allow unknown sub-params or known sub-params that we
+            // don't request and that need explicit handling (e.g. event-type)
             goto ignore;
         }
+        // Use the "base layout key", if present
         key = csi.params[0][csi.nsub[0] == 3 ? 2 : 0];
         switch (csi.nparams) {
+        case 3:
         case 2:
             goto decode_mods_and_normalize;
         case 1:
