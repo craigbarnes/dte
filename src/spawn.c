@@ -123,11 +123,8 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
             size_t max_read = 8192;
             string_ensure_space(&ctx->output, max_read);
             char *buf = ctx->output.buffer + ctx->output.len;
-            ssize_t rc = read(fds[0].fd, buf, max_read);
+            ssize_t rc = xread(fds[0].fd, buf, max_read);
             if (unlikely(rc < 0)) {
-                if (errno == EINTR) {
-                    continue;
-                }
                 perror_msg("read");
                 break;
             }
@@ -141,8 +138,8 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
         }
 
         if (fds[1].revents & POLLOUT) {
-            ssize_t rc = write(fds[1].fd, ctx->input.data + wlen, ctx->input.length - wlen);
-            if (rc < 0) {
+            ssize_t rc = xwrite(fds[1].fd, ctx->input.data + wlen, ctx->input.length - wlen);
+            if (unlikely(rc < 0)) {
                 perror_msg("write");
                 break;
             }

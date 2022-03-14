@@ -10,6 +10,7 @@
 #include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
+#include "util/xreadwrite.h"
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {
@@ -33,8 +34,8 @@ static bool fill_buffer(TermInputBuffer *input)
     }
 
     size_t avail = sizeof(input->buf) - input->len;
-    ssize_t rc = read(STDIN_FILENO, input->buf + input->len, avail);
-    if (rc <= 0) {
+    ssize_t rc = xread(STDIN_FILENO, input->buf + input->len, avail);
+    if (unlikely(rc <= 0)) {
         return false;
     }
 
@@ -250,11 +251,7 @@ char *term_read_paste(TermInputBuffer *input, size_t *size)
             xrenew(buf, alloc);
         }
 
-        ssize_t n;
-        do {
-            n = read(STDIN_FILENO, buf + count, alloc - count);
-        } while (n < 0 && errno == EINTR);
-
+        ssize_t n = xread(STDIN_FILENO, buf + count, alloc - count);
         if (n <= 0) {
             break;
         }

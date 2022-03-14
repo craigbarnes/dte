@@ -143,7 +143,7 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
 
 error:
     error = errno;
-    error = write(error_fd, &error, sizeof(error));
+    error = xwrite(error_fd, &error, sizeof(error));
     exit(42);
 }
 
@@ -182,8 +182,8 @@ pid_t fork_exec(char **argv, const char **env, int fd[3], bool drop_ctty)
     // Parent
     xclose(ep[1]);
     int error = 0;
-    const ssize_t rc = read(ep[0], &error, sizeof(error));
-    const int saved_errno = errno;
+    ssize_t rc = xread(ep[0], &error, sizeof(error));
+    int saved_errno = errno;
     xclose(ep[0]);
 
     if (rc > 0 && rc != sizeof(error)) {
