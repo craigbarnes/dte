@@ -3,6 +3,24 @@
 #include <unistd.h>
 #include "xreadwrite.h"
 
+ssize_t xread(int fd, void *buf, size_t count)
+{
+    ssize_t r;
+    do {
+        r = read(fd, buf, count);
+    } while (unlikely(r < 0 && errno == EINTR));
+    return r;
+}
+
+ssize_t xwrite(int fd, void *buf, size_t count)
+{
+    ssize_t r;
+    do {
+        r = write(fd, buf, count);
+    } while (unlikely(r < 0 && errno == EINTR));
+    return r;
+}
+
 ssize_t xread_all(int fd, void *buf, size_t count)
 {
     char *b = buf;
