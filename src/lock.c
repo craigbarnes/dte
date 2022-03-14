@@ -152,7 +152,7 @@ static bool lock_or_unlock(const char *filename, bool lock)
         }
     }
 
-    if (xwrite(wfd, buf, size) < 0) {
+    if (xwrite_all(wfd, buf, size) < 0) {
         error_msg("Error writing %s: %s", file_locks_lock, strerror(errno));
         goto error;
     }

@@ -27,7 +27,7 @@ ssize_t read_file(const char *filename, char **bufp)
         goto error;
     }
 
-    ssize_t r = xread(fd, buf, st.st_size);
+    ssize_t r = xread_all(fd, buf, st.st_size);
     if (unlikely(r < 0)) {
         free(buf);
         goto error;

@@ -165,7 +165,7 @@ TagFile *load_tag_file(void)
     }
 
     char *buf = xmalloc(st.st_size);
-    ssize_t size = xread(fd, buf, st.st_size);
+    ssize_t size = xread_all(fd, buf, st.st_size);
     xclose(fd);
     if (size < 0) {
         free(buf);

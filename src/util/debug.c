@@ -93,7 +93,7 @@ void log_init(const char *varname)
         fprintf(stderr, "Failed to open '%s' ($%s): %s\n", path, varname, err);
         exit(EX_IOERR);
     }
-    if (xwrite(logfd, "\n", 1) != 1) {
+    if (xwrite_all(logfd, "\n", 1) != 1) {
         fprintf(stderr, "Failed to write to log: %s\n", strerror(errno));
         exit(EX_IOERR);
     }
@@ -124,7 +124,7 @@ static void debug_logv(const char *file, int line, const char *fmt, va_list ap)
     const size_t len2 = xvsnprintf(buf + len1, write_max, fmt, ap);
     size_t n = len1 + len2;
     buf[n++] = '\n';
-    (void)!xwrite(logfd, buf, n);
+    (void)!xwrite_all(logfd, buf, n);
 }
 
 void debug_log(const char *file, int line, const char *fmt, ...)

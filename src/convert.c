@@ -104,7 +104,7 @@ ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t n)
         n = unix_to_dos(enc, buf, n);
         buf = enc->nbuf;
     }
-    return xwrite(enc->fd, buf, n);
+    return xwrite_all(enc->fd, buf, n);
 }
 
 size_t file_encoder_get_nr_errors(const FileEncoder* UNUSED_ARG(enc))
@@ -492,7 +492,7 @@ ssize_t file_encoder_write (
         cconv_flush(enc->cconv);
         buf = cconv_consume_all(enc->cconv, &size);
     }
-    return xwrite(enc->fd, buf, size);
+    return xwrite_all(enc->fd, buf, size);
 }
 
 size_t file_encoder_get_nr_errors(const FileEncoder *enc)

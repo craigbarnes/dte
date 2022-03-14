@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "xreadwrite.h"
 
-ssize_t xread(int fd, void *buf, size_t count)
+ssize_t xread_all(int fd, void *buf, size_t count)
 {
     char *b = buf;
     size_t pos = 0;
@@ -24,7 +24,7 @@ ssize_t xread(int fd, void *buf, size_t count)
     return pos;
 }
 
-ssize_t xwrite(int fd, const void *buf, size_t count)
+ssize_t xwrite_all(int fd, const void *buf, size_t count)
 {
     const char *b = buf;
     const size_t count_save = count;

@@ -343,7 +343,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
         filter(parent_fds[1], parent_fds[0], ctx);
     } else if (actions[0] == SPAWN_PIPE) {
         size_t input_len = ctx->input.length;
-        if (input_len && xwrite(parent_fds[0], ctx->input.data, input_len) < 0) {
+        if (input_len && xwrite_all(parent_fds[0], ctx->input.data, input_len) < 0) {
             perror_msg("write");
             goto error_resume;
         }
@@ -352,7 +352,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
             size_t max_read = 8192;
             string_ensure_space(&ctx->output, max_read);
             char *buf = ctx->output.buffer + ctx->output.len;
-            ssize_t rc = xread(parent_fds[1], buf, max_read);
+            ssize_t rc = xread_all(parent_fds[1], buf, max_read);
             if (unlikely(rc < 0)) {
                 perror_msg("read");
                 goto error_resume;

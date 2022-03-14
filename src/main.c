@@ -174,7 +174,7 @@ static void set_signal_handlers(void)
 static ExitCode list_builtin_configs(void)
 {
     String str = dump_builtin_configs();
-    ssize_t n = xwrite(STDOUT_FILENO, str.buffer, str.len);
+    ssize_t n = xwrite_all(STDOUT_FILENO, str.buffer, str.len);
     string_free(&str);
     if (n < 0) {
         perror("write");
@@ -190,7 +190,7 @@ static ExitCode dump_builtin_config(const char *name)
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
         return EX_USAGE;
     }
-    if (xwrite(STDOUT_FILENO, cfg->text.data, cfg->text.length) < 0) {
+    if (xwrite_all(STDOUT_FILENO, cfg->text.data, cfg->text.length) < 0) {
         perror("write");
         return EX_IOERR;
     }
@@ -548,7 +548,7 @@ loop_break:
     if (stdout_buffer) {
         Block *blk;
         block_for_each(blk, &stdout_buffer->blocks) {
-            if (xwrite(old_stdout_fd, blk->data, blk->size) < 0) {
+            if (xwrite_all(old_stdout_fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
                 exit_code = EX_IOERR;
                 break;

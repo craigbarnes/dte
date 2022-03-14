@@ -46,7 +46,7 @@ void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
     if (unlikely(count > obuf_avail(obuf))) {
         term_output_flush(obuf);
         if (unlikely(count >= TERM_OUTBUF_SIZE)) {
-            (void)!xwrite(STDOUT_FILENO, str, count);
+            (void)!xwrite_all(STDOUT_FILENO, str, count);
             return;
         }
     }
@@ -194,7 +194,7 @@ void term_clear_screen(TermOutputBuffer *obuf)
 void term_output_flush(TermOutputBuffer *obuf)
 {
     if (obuf->count) {
-        (void)!xwrite(STDOUT_FILENO, obuf->buf, obuf->count);
+        (void)!xwrite_all(STDOUT_FILENO, obuf->buf, obuf->count);
         obuf->count = 0;
     }
 }

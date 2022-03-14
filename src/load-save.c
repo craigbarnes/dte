@@ -200,7 +200,7 @@ bool read_blocks(Buffer *b, int fd)
         if (unlikely(!buf)) {
             goto error;
         }
-        ssize_t rc = xread(fd, buf, size);
+        ssize_t rc = xread_all(fd, buf, size);
         if (unlikely(rc < 0)) {
             goto error;
         }
@@ -215,7 +215,7 @@ bool read_blocks(Buffer *b, int fd)
         }
         size_t pos = 0;
         while (1) {
-            ssize_t rc = xread(fd, buf + pos, alloc - pos);
+            ssize_t rc = xread_all(fd, buf + pos, alloc - pos);
             if (rc < 0) {
                 goto error;
             }
@@ -326,7 +326,7 @@ static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_t
     if (bom) {
         size = bom->len;
         BUG_ON(size == 0);
-        if (xwrite(fd, bom->bytes, size) < 0) {
+        if (xwrite_all(fd, bom->bytes, size) < 0) {
             perror_msg("write");
             return false;
         }
