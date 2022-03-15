@@ -59,7 +59,7 @@ static inline void string_clear(String *s)
     s->len = 0;
 }
 
-void string_ensure_space(String *s, size_t more) NONNULL_ARGS;
+void string_reserve_space(String *s, size_t more) NONNULL_ARGS;
 void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;
 size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;

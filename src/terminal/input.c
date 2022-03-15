@@ -257,7 +257,7 @@ static String term_read_detected_paste(TermInputBuffer *input)
             break;
         }
 
-        string_ensure_space(&str, 4096);
+        string_reserve_space(&str, 4096);
         char *buf = str.buffer + str.len;
         ssize_t n = xread(STDIN_FILENO, buf, str.alloc - str.len);
         if (n <= 0) {
@@ -284,7 +284,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     ssize_t read_len;
 
     while (1) {
-        string_ensure_space(&str, read_max);
+        string_reserve_space(&str, read_max);
         start = str.buffer + str.len;
         read_len = xread(STDIN_FILENO, start, read_max);
         if (unlikely(read_len <= 0)) {

@@ -121,7 +121,7 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
 
         if (fds[0].revents & POLLIN) {
             size_t max_read = 8192;
-            string_ensure_space(&ctx->output, max_read);
+            string_reserve_space(&ctx->output, max_read);
             char *buf = ctx->output.buffer + ctx->output.len;
             ssize_t rc = xread(fds[0].fd, buf, max_read);
             if (unlikely(rc < 0)) {
@@ -347,7 +347,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
     } else if (actions[1] == SPAWN_PIPE) {
         while (1) {
             size_t max_read = 8192;
-            string_ensure_space(&ctx->output, max_read);
+            string_reserve_space(&ctx->output, max_read);
             char *buf = ctx->output.buffer + ctx->output.len;
             ssize_t rc = xread_all(parent_fds[1], buf, max_read);
             if (unlikely(rc < 0)) {

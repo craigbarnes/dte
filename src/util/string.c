@@ -18,7 +18,7 @@ static COLD void string_grow(String *s, size_t min_alloc)
     s->alloc = alloc;
 }
 
-void string_ensure_space(String *s, size_t more)
+void string_reserve_space(String *s, size_t more)
 {
     const size_t min_alloc = s->len + more;
     if (unlikely(s->alloc < min_alloc)) {
@@ -34,14 +34,14 @@ void string_free(String *s)
 
 void string_append_byte(String *s, unsigned char byte)
 {
-    string_ensure_space(s, 1);
+    string_reserve_space(s, 1);
     s->buffer[s->len++] = byte;
 }
 
 size_t string_append_codepoint(String *s, CodePoint u)
 {
     size_t len = u_char_size(u);
-    string_ensure_space(s, len);
+    string_reserve_space(s, len);
     u_set_char_raw(s->buffer, &s->len, u);
     return len;
 }
@@ -50,7 +50,7 @@ static void string_make_space(String *s, size_t pos, size_t len)
 {
     BUG_ON(pos > s->len);
     BUG_ON(len == 0);
-    string_ensure_space(s, len);
+    string_reserve_space(s, len);
     memmove(s->buffer + pos + len, s->buffer + pos, s->len - pos);
     s->len += len;
 }
@@ -77,7 +77,7 @@ void string_append_buf(String *s, const char *ptr, size_t len)
     if (!len) {
         return;
     }
-    string_ensure_space(s, len);
+    string_reserve_space(s, len);
     memcpy(s->buffer + s->len, ptr, len);
     s->len += len;
 }
@@ -91,7 +91,7 @@ static void string_vsprintf(String *s, const char *fmt, va_list ap)
     int n = vsnprintf(NULL, 0, fmt, ap2);
     va_end(ap2);
     BUG_ON(n < 0);
-    string_ensure_space(s, n + 1);
+    string_reserve_space(s, n + 1);
     int wrote = vsnprintf(s->buffer + s->len, n + 1, fmt, ap);
     BUG_ON(wrote != n);
     s->len += wrote;
@@ -107,7 +107,7 @@ void string_sprintf(String *s, const char *fmt, ...)
 
 static void null_terminate(String *s)
 {
-    string_ensure_space(s, 1);
+    string_reserve_space(s, 1);
     s->buffer[s->len] = '\0';
 }
 
