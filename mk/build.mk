@@ -188,6 +188,7 @@ build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/load-save.o: build/feature.h
 build/util/exec.o: build/feature.h
+build/util/xmemmem.o: build/feature.h
 build/terminal/winsize.o: build/feature.h
 build/convert.o: build/convert.cflags
 
