@@ -404,14 +404,13 @@ void set_window_size(const EditorState *e, Window *win, int w, int h)
     calculate_line_numbers(e, win);
 }
 
-int window_get_scroll_margin(const EditorState *e, const Window *w)
+int window_get_scroll_margin(const Window *w, unsigned int scroll_margin)
 {
     int max = (w->edit_h - 1) / 2;
-
-    if (e->options.scroll_margin > max) {
+    if (scroll_margin > max) {
         return max;
     }
-    return e->options.scroll_margin;
+    return scroll_margin;
 }
 
 void frame_for_each_window(const Frame *f, void (*func)(Window*, void*), void *data)

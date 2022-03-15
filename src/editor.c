@@ -285,7 +285,7 @@ static void update_window_full(Window *w, void *ud)
     View *v = w->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
-    view_update(v);
+    view_update(v, e->options.scroll_margin);
     print_tabbar(e, w);
     if (e->options.show_line_numbers) {
         update_line_numbers(e, w, true);
@@ -374,7 +374,7 @@ static void update_buffer_windows(EditorState *e, const Buffer *b)
                 // These have already been updated for current view
                 view_update_cursor_x(v);
                 view_update_cursor_y(v);
-                view_update(v);
+                view_update(v, e->options.scroll_margin);
             }
             update_window(e, v->window);
         }
@@ -535,7 +535,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     // update_windows() assumes these have been called for the current view
     view_update_cursor_x(e->view);
     view_update_cursor_y(e->view);
-    view_update(e->view);
+    view_update(e->view, e->options.scroll_margin);
 
     // Set changed_line_min and changed_line_max before calling update_range()
     mark_all_lines_changed(e->buffer);
@@ -583,7 +583,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
     View *view = e->view;
     view_update_cursor_x(view);
     view_update_cursor_y(view);
-    view_update(view);
+    view_update(view, e->options.scroll_margin);
 
     if (s->id == buffer->id) {
         if (s->vx != view->vx || s->vy != view->vy) {

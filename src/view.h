@@ -46,7 +46,7 @@ static inline void view_reset_preferred_x(View *v)
 
 void view_update_cursor_y(View *v);
 void view_update_cursor_x(View *v);
-void view_update(View *v);
+void view_update(View *v, unsigned int scroll_margin);
 long view_get_preferred_x(View *v);
 bool view_can_close(const View *v);
 StringView view_get_word_under_cursor(const View *v);

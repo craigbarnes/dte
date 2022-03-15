@@ -34,7 +34,7 @@ void mark_buffer_tabbars_changed(Buffer *b);
 void calculate_line_numbers(const EditorState *e, Window *win);
 void set_window_coordinates(const EditorState *e, Window *win, int x, int y);
 void set_window_size(const EditorState *e, Window *win, int w, int h);
-int window_get_scroll_margin(const EditorState *e, const Window *w);
+int window_get_scroll_margin(const Window *w, unsigned int scroll_margin);
 void frame_for_each_window(const Frame *f, void (*func)(Window*, void*), void *data);
 Window *prev_window(EditorState *e, Window *w);
 Window *next_window(EditorState *e, Window *w);

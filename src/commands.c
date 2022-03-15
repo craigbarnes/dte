@@ -209,7 +209,8 @@ static void cmd_bolsf(const CommandArgs *a)
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_bol(&view->cursor)) {
-        long top = view->vy + window_get_scroll_margin(e, e->window);
+        unsigned int margin = e->options.scroll_margin;
+        long top = view->vy + window_get_scroll_margin(e->window, margin);
         if (view->cy > top) {
             move_up(view, view->cy - top);
         } else {
@@ -501,7 +502,8 @@ static void cmd_eolsf(const CommandArgs *a)
     View *view = e->view;
     do_selection(view, SELECT_NONE);
     if (!block_iter_eol(&view->cursor)) {
-        long bottom = view->vy + window->edit_h - 1 - window_get_scroll_margin(e, window);
+        long margin = window_get_scroll_margin(window, e->options.scroll_margin);
+        long bottom = view->vy + window->edit_h - 1 - margin;
         if (view->cy < bottom) {
             move_down(view, bottom - view->cy);
         } else {
@@ -1321,7 +1323,7 @@ static void cmd_pgdown(const CommandArgs *a)
     EditorState *e = a->userdata;
     Window *window = e->window;
     View *view = e->view;
-    long margin = window_get_scroll_margin(e, window);
+    long margin = window_get_scroll_margin(window, e->options.scroll_margin);
     long bottom = view->vy + window->edit_h - 1 - margin;
     long count;
 
@@ -1340,7 +1342,7 @@ static void cmd_pgup(const CommandArgs *a)
     EditorState *e = a->userdata;
     Window *window = e->window;
     View *view = e->view;
-    long margin = window_get_scroll_margin(e, window);
+    long margin = window_get_scroll_margin(window, e->options.scroll_margin);
     long top = view->vy + margin;
     long count;
 

@@ -91,7 +91,7 @@ static void test_hl_line(void)
     block_iter_goto_line(&v->cursor, line_nr - 1);
     view_update_cursor_x(v);
     view_update_cursor_y(v);
-    view_update(v);
+    view_update(v, 0);
     ASSERT_EQ(v->cx, 0);
     ASSERT_EQ(v->cy, line_nr - 1);
 
