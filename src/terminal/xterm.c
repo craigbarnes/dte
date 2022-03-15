@@ -481,7 +481,11 @@ static ssize_t parse_csi(const char *buf, size_t len, size_t i, KeyCode *k)
             // Fallthrough
         case 1:
             key = decode_key_from_param(csi.params[0][0]);
-            if (unlikely(key == 0)) {
+            if (key == 0) {
+                if (csi.params[0][0] == 200 && mods == 0) {
+                    *k = KEY_BRACKETED_PASTE;
+                    return i;
+                }
                 goto ignore;
             }
             *k = mods | key;

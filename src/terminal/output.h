@@ -10,10 +10,6 @@
 #include "util/string-view.h"
 #include "util/unicode.h"
 
-enum {
-    TERM_OUTBUF_SIZE = 8192
-};
-
 #define term_add_literal(buf, s) term_add_bytes(buf, s, STRLEN(s))
 
 static inline size_t obuf_avail(TermOutputBuffer *obuf)

@@ -230,8 +230,11 @@ static ExitCode showkey_loop(Terminal *term)
         case KEY_NONE:
         case KEY_IGNORE:
             continue;
-        case KEY_PASTE:
-            term_discard_paste(&term->ibuf);
+        case KEY_DETECTED_PASTE:
+            term_discard_detected_paste(&term->ibuf);
+            continue;
+        case KEY_BRACKETED_PASTE:
+            term_discard_bracketed_paste(&term->ibuf);
             continue;
         case MOD_CTRL | 'd':
             loop = false;

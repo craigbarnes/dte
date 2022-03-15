@@ -11,7 +11,20 @@
 #include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
+#include "util/xmemmem.h"
 #include "util/xreadwrite.h"
+
+void term_input_init(TermInputBuffer *ibuf)
+{
+    *ibuf = (TermInputBuffer) {
+        .buf = xmalloc(TERM_INBUF_SIZE)
+    };
+}
+
+void term_input_free(TermInputBuffer *ibuf)
+{
+    free(ibuf->buf);
+}
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {
@@ -27,7 +40,7 @@ static void consume_input(TermInputBuffer *input, size_t len)
 
 static bool fill_buffer(TermInputBuffer *input)
 {
-    if (input->len == sizeof(input->buf)) {
+    if (input->len == TERM_INBUF_SIZE) {
         return false;
     }
 
@@ -35,7 +48,7 @@ static bool fill_buffer(TermInputBuffer *input)
         input->can_be_truncated = false;
     }
 
-    size_t avail = sizeof(input->buf) - input->len;
+    size_t avail = TERM_INBUF_SIZE - input->len;
     ssize_t rc = read(STDIN_FILENO, input->buf + input->len, avail);
     if (unlikely(rc <= 0)) {
         return false;
@@ -159,7 +172,7 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
     }
 
     if (input->len > 4 && is_text(input->buf, input->len)) {
-        return KEY_PASTE;
+        return KEY_DETECTED_PASTE;
     }
 
     if (input->buf[0] == '\033') {
@@ -217,7 +230,7 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
     return read_simple(input);
 }
 
-char *term_read_paste(TermInputBuffer *input, size_t *size)
+char *term_read_detected_paste(TermInputBuffer *input, size_t *size)
 {
     size_t alloc = round_size_to_next_multiple(input->len + 1, 1024);
     size_t count = 0;
@@ -265,8 +278,68 @@ char *term_read_paste(TermInputBuffer *input, size_t *size)
     return buf;
 }
 
-void term_discard_paste(TermInputBuffer *input)
+void term_discard_detected_paste(TermInputBuffer *input)
 {
     size_t size;
-    free(term_read_paste(input, &size));
+    free(term_read_detected_paste(input, &size));
+}
+
+String term_read_bracketed_paste(TermInputBuffer *input)
+{
+    size_t read_max = TERM_INBUF_SIZE;
+    String str = string_new(read_max + input->len);
+    if (input->len) {
+        string_append_buf(&str, input->buf, input->len);
+        input->len = 0;
+    }
+
+    static const StringView delim = STRING_VIEW("\033[201~");
+    char *start, *end;
+    ssize_t read_len;
+
+    while (1) {
+        string_ensure_space(&str, read_max);
+        start = str.buffer + str.len;
+        read_len = read(STDIN_FILENO, start, read_max);
+        if (unlikely(read_len <= 0)) {
+            goto read_error;
+        }
+        end = xmemmem(start, read_len, delim.data, delim.length);
+        if (end) {
+            break;
+        }
+        str.len += read_len;
+    }
+
+    size_t final_chunk_len = (size_t)(end - start);
+    str.len += final_chunk_len;
+    final_chunk_len += delim.length;
+    BUG_ON(final_chunk_len > read_len);
+
+    size_t remainder = read_len - final_chunk_len;
+    if (unlikely(remainder)) {
+        // Copy anything still in the buffer beyond the end delimiter
+        // into the normal input buffer
+        DEBUG_LOG("remainder after bracketed paste: %zu", remainder);
+        BUG_ON(remainder > TERM_INBUF_SIZE);
+        memcpy(input->buf, start + final_chunk_len, remainder);
+        input->len = remainder;
+    }
+
+    DEBUG_LOG("received bracketed paste of %zu bytes", str.len);
+    strn_replace_byte(str.buffer, str.len, '\r', '\n');
+    return str;
+
+read_error:
+    DEBUG_LOG("read error: %s", strerror(errno));
+    string_free(&str);
+    BUG_ON(str.buffer);
+    return str;
+}
+
+void term_discard_bracketed_paste(TermInputBuffer *input)
+{
+    String str = term_read_bracketed_paste(input);
+    string_free(&str);
+    DEBUG_LOG("bracketed paste discarded");
 }

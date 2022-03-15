@@ -8,6 +8,11 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 
+enum {
+    TERM_INBUF_SIZE = 4096,
+    TERM_OUTBUF_SIZE = 8192,
+};
+
 typedef enum {
     TFLAG_BACK_COLOR_ERASE = 0x01, // Can erase with specific background color
     TFLAG_ECMA48_REPEAT = 0x02, // Supports ECMA-48 "REP" (repeat character; §8.3.103)
@@ -54,7 +59,7 @@ typedef struct {
 } TermOutputBuffer;
 
 typedef struct {
-    char buf[256];
+    char *buf;
     size_t len;
     bool can_be_truncated;
 } TermInputBuffer;

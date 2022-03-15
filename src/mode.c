@@ -31,14 +31,23 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
             return;
         }
         break;
-    case KEY_PASTE: {
+    case KEY_DETECTED_PASTE: {
         size_t size;
-        char *text = term_read_paste(&e->terminal.ibuf, &size);
+        char *text = term_read_detected_paste(&e->terminal.ibuf, &size);
         begin_change(CHANGE_MERGE_NONE);
         insert_text(view, text, size, true);
         end_change();
         macro_insert_text_hook(text, size);
         free(text);
+        return;
+        }
+    case KEY_BRACKETED_PASTE: {
+        String str = term_read_bracketed_paste(&e->terminal.ibuf);
+        begin_change(CHANGE_MERGE_NONE);
+        insert_text(view, str.buffer, str.len, true);
+        end_change();
+        macro_insert_text_hook(str.buffer, str.len);
+        string_free(&str);
         return;
         }
     }
@@ -54,12 +63,22 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
 static void cmdline_insert_paste(CommandLine *c, TermInputBuffer *input)
 {
     size_t size;
-    char *text = term_read_paste(input, &size);
+    char *text = term_read_detected_paste(input, &size);
     strn_replace_byte(text, size, '\n', ' ');
     string_insert_buf(&c->buf, c->pos, text, size);
     c->pos += size;
     c->search_pos = NULL;
     free(text);
+}
+
+static void cmdline_insert_bracketed_paste(CommandLine *c, TermInputBuffer *input)
+{
+    String str = term_read_bracketed_paste(input);
+    strn_replace_byte(str.buffer, str.len, '\n', ' ');
+    string_insert_buf(&c->buf, c->pos, str.buffer, str.len);
+    c->pos += str.len;
+    c->search_pos = NULL;
+    string_free(&str);
 }
 
 void handle_input(EditorState *e, KeyCode key)
@@ -74,8 +93,10 @@ void handle_input(EditorState *e, KeyCode key)
     CommandLine *c = &e->cmdline;
     if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
-    } else if (key == KEY_PASTE) {
+    } else if (key == KEY_DETECTED_PASTE) {
         cmdline_insert_paste(c, &e->terminal.ibuf);
+    } else if (key == KEY_BRACKETED_PASTE) {
+        cmdline_insert_bracketed_paste(c, &e->terminal.ibuf);
     } else {
         handle_binding(&e->bindings[mode], key);
         return;

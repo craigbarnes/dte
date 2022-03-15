@@ -202,6 +202,12 @@ void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf)
         term_add_literal(obuf, "\033[>4;1m");
     }
     term_add_strview(obuf, term->control_codes.keypad_on);
+
+    // Try to enable bracketed paste mode. This is done unconditionally,
+    // since it should be ignored by terminals that don't recognize it
+    // and we really want to enable it for terminals that support it but
+    // are spoofing $TERM for whatever reason.
+    term_add_literal(obuf, "\033[?2004s\033[?2004h");
 }
 
 void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf)
@@ -216,4 +222,5 @@ void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf)
         term_add_literal(obuf, "\033[>4m");
     }
     term_add_strview(obuf, term->control_codes.keypad_off);
+    term_add_literal(obuf, "\033[?2004l\033[?2004r");
 }

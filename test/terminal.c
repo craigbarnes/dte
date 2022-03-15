@@ -703,7 +703,8 @@ static void test_keycode_to_string(void)
     EXPECT_STREQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'A'), "C-S-A");
     EXPECT_STREQ(keycode_to_string(MOD_META | MOD_SHIFT | 'A'), "M-S-A");
 
-    EXPECT_STREQ(keycode_to_string(KEY_PASTE), "INVALID (0x08000000)");
+    EXPECT_STREQ(keycode_to_string(KEY_DETECTED_PASTE), "INVALID (0x08000000)");
+    EXPECT_STREQ(keycode_to_string(KEY_BRACKETED_PASTE), "INVALID (0x08000001)");
     EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
 }
 

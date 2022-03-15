@@ -201,6 +201,7 @@ void init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
+    term_input_init(&editor.terminal.ibuf);
     term_output_init(&editor.terminal.obuf);
     regexp_init_word_boundary_tokens();
     hashmap_init(&normal_commands.aliases, 32);
@@ -220,6 +221,7 @@ void free_editor_state(EditorState *e)
     history_free(&e->search_history);
     search_free_regexp(&e->search);
     term_output_free(&e->terminal.obuf);
+    term_input_free(&e->terminal.ibuf);
     cmdline_free(&e->cmdline);
     clear_messages(&e->messages);
 
@@ -271,8 +273,10 @@ void any_key(EditorState *e)
     while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
         ;
     }
-    if (key == KEY_PASTE) {
-        term_discard_paste(&term->ibuf);
+    if (key == KEY_DETECTED_PASTE) {
+        term_discard_detected_paste(&term->ibuf);
+    } else if (key == KEY_BRACKETED_PASTE) {
+        term_discard_bracketed_paste(&term->ibuf);
     }
 }
 
@@ -439,8 +443,11 @@ static char get_choice(EditorState *e, const char *choices)
     }
 
     switch (key) {
-    case KEY_PASTE:
-        term_discard_paste(&e->terminal.ibuf);
+    case KEY_DETECTED_PASTE:
+        term_discard_detected_paste(&e->terminal.ibuf);
+        return 0;
+    case KEY_BRACKETED_PASTE:
+        term_discard_bracketed_paste(&e->terminal.ibuf);
         return 0;
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':
