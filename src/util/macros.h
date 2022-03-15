@@ -52,6 +52,12 @@
     #define HAS_BUILTIN(x) 0
 #endif
 
+#ifdef __has_include
+    #define HAS_INCLUDE(x) __has_include(x)
+#else
+    #define HAS_INCLUDE(x) 0
+#endif
+
 #ifdef __has_warning
     #define HAS_WARNING(x) __has_warning(x)
 #else

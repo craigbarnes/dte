@@ -5,11 +5,17 @@
 #include <stdint.h>
 #include "macros.h"
 
-#define UNICODE_MAX_VALID_CODEPOINT UINT32_C(0x10FFFF)
+// Work around some musl-targetted toolchains failing to include this
+// header automatically and thus failing to define __STDC_ISO_10646__
+#if HAS_INCLUDE(<stdc-predef.h>)
+# include <stdc-predef.h>
+#endif
 
 #if defined(WINT_MAX) && (WINT_MAX >= 0x10FFFF) && defined(__STDC_ISO_10646__)
- #define SANE_WCTYPE 1
+# define SANE_WCTYPE 1
 #endif
+
+#define UNICODE_MAX_VALID_CODEPOINT UINT32_C(0x10FFFF)
 
 typedef uint32_t CodePoint;
 
