@@ -230,15 +230,11 @@ KeyCode term_read_key(Terminal *term, unsigned int esc_timeout)
     return read_simple(input);
 }
 
-char *term_read_detected_paste(TermInputBuffer *input, size_t *size)
+static String term_read_detected_paste(TermInputBuffer *input)
 {
-    size_t alloc = round_size_to_next_multiple(input->len + 1, 1024);
-    size_t count = 0;
-    char *buf = xmalloc(alloc);
-
+    String str = string_new(4096 + input->len);
     if (input->len) {
-        memcpy(buf, input->buf, input->len);
-        count = input->len;
+        string_append_buf(&str, input->buf, input->len);
         input->len = 0;
     }
 
@@ -261,30 +257,20 @@ char *term_read_detected_paste(TermInputBuffer *input, size_t *size)
             break;
         }
 
-        if (alloc - count < 256) {
-            alloc *= 2;
-            xrenew(buf, alloc);
-        }
-
-        ssize_t n = xread(STDIN_FILENO, buf + count, alloc - count);
+        string_ensure_space(&str, 4096);
+        char *buf = str.buffer + str.len;
+        ssize_t n = xread(STDIN_FILENO, buf, str.alloc - str.len);
         if (n <= 0) {
             break;
         }
-        count += n;
+        str.len += n;
     }
 
-    strn_replace_byte(buf, count, '\r', '\n');
-    *size = count;
-    return buf;
+    strn_replace_byte(str.buffer, str.len, '\r', '\n');
+    return str;
 }
 
-void term_discard_detected_paste(TermInputBuffer *input)
-{
-    size_t size;
-    free(term_read_detected_paste(input, &size));
-}
-
-String term_read_bracketed_paste(TermInputBuffer *input)
+static String term_read_bracketed_paste(TermInputBuffer *input)
 {
     size_t read_max = TERM_INBUF_SIZE;
     String str = string_new(read_max + input->len);
@@ -300,7 +286,7 @@ String term_read_bracketed_paste(TermInputBuffer *input)
     while (1) {
         string_ensure_space(&str, read_max);
         start = str.buffer + str.len;
-        read_len = read(STDIN_FILENO, start, read_max);
+        read_len = xread(STDIN_FILENO, start, read_max);
         if (unlikely(read_len <= 0)) {
             goto read_error;
         }
@@ -337,9 +323,17 @@ read_error:
     return str;
 }
 
-void term_discard_bracketed_paste(TermInputBuffer *input)
+String term_read_paste(TermInputBuffer *input, bool bracketed)
 {
-    String str = term_read_bracketed_paste(input);
+    if (bracketed) {
+        return term_read_bracketed_paste(input);
+    }
+    return term_read_detected_paste(input);
+}
+
+void term_discard_paste(TermInputBuffer *input, bool bracketed)
+{
+    String str = term_read_paste(input, bracketed);
     string_free(&str);
-    DEBUG_LOG("bracketed paste discarded");
+    DEBUG_LOG("%spaste discarded", bracketed ? "bracketed " : "");
 }

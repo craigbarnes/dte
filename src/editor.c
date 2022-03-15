@@ -273,10 +273,9 @@ void any_key(EditorState *e)
     while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
         ;
     }
-    if (key == KEY_DETECTED_PASTE) {
-        term_discard_detected_paste(&term->ibuf);
-    } else if (key == KEY_BRACKETED_PASTE) {
-        term_discard_bracketed_paste(&term->ibuf);
+    bool bracketed_paste = key == KEY_BRACKETED_PASTE;
+    if (bracketed_paste || key == KEY_DETECTED_PASTE) {
+        term_discard_paste(&term->ibuf, bracketed_paste);
     }
 }
 
@@ -443,11 +442,9 @@ static char get_choice(EditorState *e, const char *choices)
     }
 
     switch (key) {
-    case KEY_DETECTED_PASTE:
-        term_discard_detected_paste(&e->terminal.ibuf);
-        return 0;
     case KEY_BRACKETED_PASTE:
-        term_discard_bracketed_paste(&e->terminal.ibuf);
+    case KEY_DETECTED_PASTE:
+        term_discard_paste(&e->terminal.ibuf, key == KEY_BRACKETED_PASTE);
         return 0;
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':
