@@ -34,7 +34,7 @@ static bool fill_buffer(TermInputBuffer *input)
     }
 
     size_t avail = sizeof(input->buf) - input->len;
-    ssize_t rc = xread(STDIN_FILENO, input->buf + input->len, avail);
+    ssize_t rc = read(STDIN_FILENO, input->buf + input->len, avail);
     if (unlikely(rc <= 0)) {
         return false;
     }
