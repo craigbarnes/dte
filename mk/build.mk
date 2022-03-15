@@ -40,7 +40,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 util_objects := $(call prefix-obj, build/util/, \
     ascii base64 debug exec hashmap hashset intern intmap numtostr \
     path ptr-array readfile string strtonum unicode utf8 xmalloc \
-    xreadwrite xsnprintf )
+    xmemmem xreadwrite xsnprintf )
 
 command_objects := $(call prefix-obj, build/command/, \
     alias args cache macro parse run serialize )
@@ -75,7 +75,7 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 pipe2 fsync TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise ))
+    dup3 pipe2 fsync memmem TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/
