@@ -144,13 +144,13 @@ void term_init(Terminal *term, const char *name)
 
     // Look up the root name in the list of known terminals
     const TermEntry *entry = BSEARCH(&root_name, terms, term_name_compare);
-    TermControlCodes *tcc = &term->control_codes;
     if (entry) {
         TermFeatureFlags features = entry->features;
         term->features = features;
         term->color_type = entry->color_type;
         term->ncv_attributes = entry->ncv_attrs;
         if (features & TITLE) {
+            TermControlCodes *tcc = &term->control_codes;
             tcc->save_title = strview_from_cstring("\033[22;2t");
             tcc->restore_title = strview_from_cstring("\033[23;2t");
             tcc->set_title_begin = strview_from_cstring("\033]2;");
