@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "input.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
@@ -14,6 +15,7 @@
 
 static void consume_input(TermInputBuffer *input, size_t len)
 {
+    BUG_ON(len > input->len);
     input->len -= len;
     if (input->len) {
         memmove(input->buf, input->buf + len, input->len);
