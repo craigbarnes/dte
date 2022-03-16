@@ -7,8 +7,6 @@
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
-RegexpWordBoundaryTokens regexp_word_boundary;
-
 void regexp_error_msg(const regex_t *re, const char *pattern, int err)
 {
     char msg[1024];
@@ -64,7 +62,7 @@ bool regexp_exec (
 #endif
 }
 
-void regexp_init_word_boundary_tokens(void)
+void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
 {
     static const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
     const regoff_t match_start = 20, match_end = 23;
@@ -91,7 +89,7 @@ void regexp_init_word_boundary_tokens(void)
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
             DEBUG_LOG("regexp word boundary tokens detected: %s %s", start, end);
-            regexp_word_boundary = pairs[i];
+            *rwbt = pairs[i];
             break;
         }
     }

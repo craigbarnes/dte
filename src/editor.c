@@ -203,7 +203,7 @@ void init_editor_state(void)
 
     term_input_init(&editor.terminal.ibuf);
     term_output_init(&editor.terminal.obuf);
-    regexp_init_word_boundary_tokens();
+    regexp_init_word_boundary_tokens(&editor.regexp_word_tokens);
     hashmap_init(&normal_commands.aliases, 32);
     intmap_init(&editor.bindings[INPUT_NORMAL].map, 150);
     intmap_init(&editor.bindings[INPUT_COMMAND].map, 40);

@@ -1882,15 +1882,16 @@ static void cmd_search(const CommandArgs *a)
             // Error message would not be very useful here
             return;
         }
-        const size_t bmax = sizeof(regexp_word_boundary.start);
-        static_assert_compatible_types(regexp_word_boundary.start, char[8]);
+        const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
+        const size_t bmax = sizeof(rwbt->start);
+        static_assert_compatible_types(rwbt->start, char[8]);
         if (unlikely(word.length >= sizeof(pattbuf) - (bmax * 2))) {
             error_msg("word under cursor too long");
             return;
         }
-        char *ptr = stpncpy(pattbuf, regexp_word_boundary.start, bmax);
+        char *ptr = stpncpy(pattbuf, rwbt->start, bmax);
         memcpy(ptr, word.data, word.length);
-        memcpy(ptr + word.length, regexp_word_boundary.end, bmax);
+        memcpy(ptr + word.length, rwbt->end, bmax);
         pattern = pattbuf;
     }
 

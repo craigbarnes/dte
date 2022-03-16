@@ -15,6 +15,7 @@
 #include "history.h"
 #include "msg.h"
 #include "options.h"
+#include "regexp.h"
 #include "syntax/color.h"
 #include "terminal/terminal.h"
 #include "util/macros.h"
@@ -95,6 +96,7 @@ typedef struct {
     FileHistory file_history;
     History search_history;
     History command_history;
+    RegexpWordBoundaryTokens regexp_word_tokens;
     const char *version;
     volatile sig_atomic_t resized;
 } EditorState;

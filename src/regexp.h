@@ -7,14 +7,12 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 
+// Platform-specific patterns for matching word boundaries, as detected
+// and initialized by regexp_init_word_boundary_tokens()
 typedef struct {
     char start[8];
     char end[8];
 } RegexpWordBoundaryTokens;
-
-// Platform-specific patterns for matching word boundaries, as detected
-// and initialized by regexp_init_word_boundary_tokens()
-extern RegexpWordBoundaryTokens regexp_word_boundary;
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags) WARN_UNUSED_RESULT;
 
@@ -42,7 +40,7 @@ static inline bool regexp_is_valid(const char *pattern, int flags)
 }
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
-void regexp_init_word_boundary_tokens(void);
+void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt);
 void regexp_error_msg(const regex_t *re, const char *pattern, int err);
 
 bool regexp_exec (
