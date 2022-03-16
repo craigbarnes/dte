@@ -388,6 +388,10 @@ loop_break:
         }
     }
 
+    if (!isatty(STDERR_FILENO)) {
+        freopen_tty(stderr, "w", STDERR_FILENO);
+    }
+
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
         fputs("Error: $TERM not set\n", stderr);

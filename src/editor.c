@@ -244,7 +244,7 @@ void free_editor_state(EditorState *e)
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)editor.user_config_dir);
 
-    // Zero pointers to help LSan find leaks
+    // Zero pointers, to help LSan find leaks
     *e = (EditorState){.window = NULL};
 }
 
