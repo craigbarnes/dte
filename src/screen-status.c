@@ -404,6 +404,10 @@ void update_status_line(EditorState *e, const Window *win)
     }
 }
 
+// Returns the offset of the first invalid format specifier, or 0 if
+// the whole format string is valid. It's safe to use 0 to indicate
+// "no errors", since it's not possible for there to be an error at
+// the very start of the string.
 size_t statusline_format_find_error(const char *str)
 {
     for (size_t i = 0; str[i]; ) {
