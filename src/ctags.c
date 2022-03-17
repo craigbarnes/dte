@@ -89,24 +89,18 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
      * union:NAME                         tag is member of union NAME
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
-    if (line[pos] != '\t') {
+    if (line[pos++] != '\t') {
         goto error;
     }
 
-    pos++;
     while (pos < line_len) {
-        size_t end = pos;
-        while (end < line_len && line[end] != '\t') {
-            end++;
-        }
-        len = end - pos;
-        if (len == 1) {
-            t->kind = line[pos];
-        } else if (len == 5 && mem_equal(line + pos, "file:", 5)) {
+        StringView field = get_delim(line, &pos, line_len, '\t');
+        if (field.length == 1 && ascii_isalpha(field.data[0])) {
+            t->kind = field.data[0];
+        } else if (strview_equal_cstring(&field, "file:")) {
             t->local = true;
         }
-        // FIXME: struct/union/typeref
-        pos = end + 1;
+        // TODO: struct/union/typeref
     }
 
     return true;
