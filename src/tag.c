@@ -22,10 +22,10 @@ static int visibility_cmp(const Tag *a, const Tag *b)
 
     // Is tag visibility limited to the current file?
     if (a->local) {
-        a_this_file = current_filename && streq(current_filename, a->filename);
+        a_this_file = current_filename && strview_equal_cstring(&a->filename, current_filename);
     }
     if (b->local) {
-        b_this_file = current_filename && streq(current_filename, b->filename);
+        b_this_file = current_filename && strview_equal_cstring(&b->filename, current_filename);
     }
 
     // Tags local to other file than current are not interesting.
@@ -235,28 +235,22 @@ void tag_file_find_tags (
     current_filename = NULL;
 }
 
-char *tag_file_get_tag_filename(const TagFile *tagfile, const Tag *tag)
+char *tag_file_get_tag_filename(const TagFile *tf, const Tag *tag)
 {
-    const StringView dir = path_slice_dirname(tagfile->filename);
-    const size_t tag_filename_len = strlen(tag->filename);
-
-    char *filename = xmalloc(dir.length + tag_filename_len + 2);
-    memcpy(filename, dir.data, dir.length);
-    filename[dir.length] = '/';
-    memcpy(filename + dir.length + 1, tag->filename, tag_filename_len + 1);
-    return filename;
+    StringView tf_dir = path_slice_dirname(tf->filename);
+    return path_join_sv(&tf_dir, &tag->filename);
 }
 
 void collect_tags(PointerArray *a, const TagFile *tf, const char *prefix)
 {
     Tag t;
     size_t pos = 0;
-    char *prev = NULL;
+    StringView prev = STRING_VIEW_INIT;
     while (next_tag(tf, &pos, prefix, false, &t)) {
-        if (!prev || !streq(prev, t.name)) {
-            ptr_array_append(a, t.name);
+        BUG_ON(t.name.length == 0);
+        if (prev.length == 0 || !strview_equal(&t.name, &prev)) {
+            ptr_array_append(a, xstrcut(t.name.data, t.name.length));
             prev = t.name;
-            t.name = NULL;
         }
         free_tag(&t);
     }

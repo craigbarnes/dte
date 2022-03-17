@@ -40,20 +40,18 @@ static void test_next_tag(void)
 
     Tag t;
     for (size_t i = 0, pos = 0; next_tag(&tf, &pos, "", false, &t); i++) {
-        IEXPECT_STREQ(t.name, expected[i].name);
+        IEXPECT_TRUE(strview_equal_cstring(&t.name, expected[i].name));
         IEXPECT_EQ(t.kind, expected[i].kind);
         IEXPECT_EQ(t.local, expected[i].local);
-        IEXPECT_STREQ(t.filename, "src/util/hashmap.c");
-        IEXPECT_STREQ(t.member, NULL);
-        IEXPECT_STREQ(t.typeref, NULL);
-        IEXPECT_EQ(t.line, 0);
+        IEXPECT_TRUE(strview_equal_cstring(&t.filename, "src/util/hashmap.c"));
+        IEXPECT_EQ(t.lineno, 0);
         free_tag(&t);
     }
 
     size_t pos = 0;
-    t.name = NULL;
+    t.name = string_view(NULL, 0);
     EXPECT_TRUE(next_tag(&tf, &pos, "hashmap_res", false, &t));
-    EXPECT_STREQ(t.name, "hashmap_resize");
+    EXPECT_TRUE(strview_equal_cstring(&t.name, "hashmap_resize"));
     free_tag(&t);
     EXPECT_FALSE(next_tag(&tf, &pos, "hashmap_res", false, &t));
     pos = 0;

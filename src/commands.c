@@ -2097,7 +2097,7 @@ static void cmd_tag(const CommandArgs *a)
             m->loc->pattern = t->pattern;
             t->pattern = NULL;
         } else {
-            m->loc->line = t->line;
+            m->loc->line = t->lineno;
         }
         add_message(&e->messages, m);
     }

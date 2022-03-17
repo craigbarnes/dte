@@ -43,18 +43,27 @@ static inline char *path_dirname(const char *filename)
 }
 
 XSTRDUP
-static inline char *path_join(const char *s1, const char *s2)
+static inline char *path_join_sv(const StringView *s1, const StringView *s2)
 {
-    size_t n1 = strlen(s1);
-    size_t n2 = strlen(s2);
+    size_t n1 = s1->length;
+    size_t n2 = s2->length;
     char *path = xmalloc(n1 + n2 + 2);
-    memcpy(path, s1, n1);
+    memcpy(path, s1->data, n1);
     char *ptr = path + n1;
-    if (n1 && n2 && s1[n1 - 1] != '/') {
+    if (n1 && n2 && s1->data[n1 - 1] != '/') {
         *ptr++ = '/';
     }
-    memcpy(ptr, s2, n2 + 1);
+    memcpy(ptr, s2->data, n2);
+    ptr[n2] = '\0';
     return path;
+}
+
+XSTRDUP
+static inline char *path_join(const char *s1, const char *s2)
+{
+    StringView sv1 = strview_from_cstring(s1);
+    StringView sv2 = strview_from_cstring(s2);
+    return path_join_sv(&sv1, &sv2);
 }
 
 // If path is the root directory, return false. Otherwise, mutate

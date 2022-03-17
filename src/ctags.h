@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#include "util/string-view.h"
 
 typedef struct {
     char *filename;
@@ -12,14 +13,12 @@ typedef struct {
 } TagFile;
 
 typedef struct {
-    char *name;
-    char *filename;
-    char *pattern;
-    char *member;
-    char *typeref;
-    unsigned long line;
-    char kind;
-    bool local;
+    StringView name; // Name of tag (points into TagFile::buf)
+    StringView filename; // File containing tag (points into TagFile::buf)
+    char *pattern; // Regex pattern used to locate tag (escaped ex command)
+    unsigned long lineno; // Line number in file (mutually exclusive with pattern)
+    char kind; // ASCII letter representing type of tag (e.g. f=function)
+    bool local; // Indicates if tag is local to file (e.g. "static" in C)
 } Tag;
 
 bool next_tag (

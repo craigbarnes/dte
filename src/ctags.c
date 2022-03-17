@@ -42,8 +42,8 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
         return 0;
     }
 
-    unsigned long line;
-    size_t i = buf_parse_ulong(buf, size, &line);
+    unsigned long lineno;
+    size_t i = buf_parse_ulong(buf, size, &lineno);
     if (i == 0) {
         return 0;
     }
@@ -52,43 +52,43 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
         i += 2;
     }
 
-    t->line = line;
+    t->lineno = lineno;
     return i;
 }
 
-static bool parse_line(Tag *t, const char *buf, size_t size)
+static bool parse_line(Tag *t, const char *line, size_t line_len)
 {
     MEMZERO(t);
-    const char *end = memchr(buf, '\t', size);
+    const char *end = memchr(line, '\t', line_len);
     if (!end) {
         goto error;
     }
 
-    size_t len = end - buf;
-    t->name = xstrcut(buf, len);
+    size_t len = end - line;
+    t->name = string_view(line, len);
 
     size_t si = len + 1;
-    if (si >= size) {
+    if (si >= line_len) {
         goto error;
     }
 
-    end = memchr(buf + si, '\t', size - si);
-    len = end - buf - si;
-    t->filename = xstrslice(buf, si, si + len);
+    end = memchr(line + si, '\t', line_len - si);
+    len = end - line - si;
+    t->filename = string_view(line + si, len);
 
     si += len + 1;
-    if (si >= size) {
+    if (si >= line_len) {
         goto error;
     }
 
     // excmd can contain tabs
-    len = parse_excmd(t, buf + si, size - si);
-    if (!len) {
+    len = parse_excmd(t, line + si, line_len - si);
+    if (len == 0) {
         goto error;
     }
 
     si += len;
-    if (si == size) {
+    if (si == line_len) {
         return true;
     }
 
@@ -100,28 +100,28 @@ static bool parse_line(Tag *t, const char *buf, size_t size)
      * union:NAME                         tag is member of union NAME
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
-    if (buf[si] != '\t') {
+    if (line[si] != '\t') {
         goto error;
     }
 
     si++;
-    while (si < size) {
+    while (si < line_len) {
         size_t ei = si;
-
-        while (ei < size && buf[ei] != '\t') {
+        while (ei < line_len && line[ei] != '\t') {
             ei++;
         }
-
         len = ei - si;
         if (len == 1) {
-            t->kind = buf[si];
-        } else if (len == 5 && mem_equal(buf + si, "file:", 5)) {
+            t->kind = line[si];
+        } else if (len == 5 && mem_equal(line + si, "file:", 5)) {
             t->local = true;
         }
         // FIXME: struct/union/typeref
         si = ei + 1;
     }
+
     return true;
+
 error:
     free_tag(t);
     return false;
@@ -158,9 +158,5 @@ bool next_tag (
 // NOTE: t itself is not freed
 void free_tag(Tag *t)
 {
-    free(t->name);
-    free(t->filename);
     free(t->pattern);
-    free(t->member);
-    free(t->typeref);
 }
