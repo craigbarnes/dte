@@ -58,37 +58,26 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 
 static bool parse_line(Tag *t, const char *line, size_t line_len)
 {
+    size_t pos = 0;
     MEMZERO(t);
-    const char *end = memchr(line, '\t', line_len);
-    if (!end) {
+    t->name = get_delim(line, &pos, line_len, '\t');
+    if (t->name.length == 0 || pos >= line_len) {
         goto error;
     }
 
-    size_t len = end - line;
-    t->name = string_view(line, len);
-
-    size_t si = len + 1;
-    if (si >= line_len) {
-        goto error;
-    }
-
-    end = memchr(line + si, '\t', line_len - si);
-    len = end - line - si;
-    t->filename = string_view(line + si, len);
-
-    si += len + 1;
-    if (si >= line_len) {
+    t->filename = get_delim(line, &pos, line_len, '\t');
+    if (t->filename.length == 0 || pos >= line_len) {
         goto error;
     }
 
     // excmd can contain tabs
-    len = parse_excmd(t, line + si, line_len - si);
+    size_t len = parse_excmd(t, line + pos, line_len - pos);
     if (len == 0) {
         goto error;
     }
 
-    si += len;
-    if (si == line_len) {
+    pos += len;
+    if (pos >= line_len) {
         return true;
     }
 
@@ -100,24 +89,24 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
      * union:NAME                         tag is member of union NAME
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
-    if (line[si] != '\t') {
+    if (line[pos] != '\t') {
         goto error;
     }
 
-    si++;
-    while (si < line_len) {
-        size_t ei = si;
-        while (ei < line_len && line[ei] != '\t') {
-            ei++;
+    pos++;
+    while (pos < line_len) {
+        size_t end = pos;
+        while (end < line_len && line[end] != '\t') {
+            end++;
         }
-        len = ei - si;
+        len = end - pos;
         if (len == 1) {
-            t->kind = line[si];
-        } else if (len == 5 && mem_equal(line + si, "file:", 5)) {
+            t->kind = line[pos];
+        } else if (len == 5 && mem_equal(line + pos, "file:", 5)) {
             t->local = true;
         }
         // FIXME: struct/union/typeref
-        si = ei + 1;
+        pos = end + 1;
     }
 
     return true;
