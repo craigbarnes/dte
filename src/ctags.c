@@ -7,8 +7,8 @@
 
 static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 {
-    const char ch = *buf;
-    if (ch == '/' || ch == '?') {
+    const char open_delim = buf[0];
+    if (open_delim == '/' || open_delim == '?') {
         // The search pattern is not a real regular expression.
         // Need to escape special characters.
         char *pattern = xmalloc(size * 2);
@@ -21,7 +21,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
                 pattern[j++] = buf[i];
                 continue;
             }
-            if (buf[i] == ch) {
+            if (buf[i] == open_delim) {
                 if (i + 2 < size && buf[i + 1] == ';' && buf[i + 2] == '"') {
                     i += 2;
                 }
@@ -29,12 +29,9 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
                 t->pattern = pattern;
                 return i + 1;
             }
-            switch (buf[i]) {
-            case '*':
-            case '[':
-            case ']':
+            char c = buf[i];
+            if (c == '*' || c == '[' || c == ']') {
                 pattern[j++] = '\\';
-                break;
             }
             pattern[j++] = buf[i];
         }
@@ -47,11 +44,9 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
     if (i == 0) {
         return 0;
     }
-
     if (i + 1 < size && buf[i] == ';' && buf[i + 1] == '"') {
         i += 2;
     }
-
     t->lineno = lineno;
     return i;
 }
