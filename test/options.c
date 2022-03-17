@@ -18,6 +18,7 @@ static void test_common_options_offsets(void)
     CHECK_OFFSETS(expand_tab);
     CHECK_OFFSETS(file_history);
     CHECK_OFFSETS(fsync);
+    CHECK_OFFSETS(overwrite);
     CHECK_OFFSETS(syntax);
 }
 
