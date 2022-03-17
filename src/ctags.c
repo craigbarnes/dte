@@ -61,18 +61,18 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
     MEMZERO(t);
     t->name = get_delim(line, &pos, line_len, '\t');
     if (t->name.length == 0 || pos >= line_len) {
-        goto error;
+        return false;
     }
 
     t->filename = get_delim(line, &pos, line_len, '\t');
     if (t->filename.length == 0 || pos >= line_len) {
-        goto error;
+        return false;
     }
 
     // excmd can contain tabs
     size_t len = parse_excmd(t, line + pos, line_len - pos);
     if (len == 0) {
-        goto error;
+        return false;
     }
 
     pos += len;
@@ -89,7 +89,8 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
     if (line[pos++] != '\t') {
-        goto error;
+        free_tag(t); // free `pattern` allocated by parse_excmd()
+        return false;
     }
 
     while (pos < line_len) {
@@ -103,10 +104,6 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
     }
 
     return true;
-
-error:
-    free_tag(t);
-    return false;
 }
 
 bool next_tag (
