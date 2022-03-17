@@ -118,7 +118,7 @@ bool next_tag (
         if (line.length == 0 || line.data[0] == '!') {
             continue;
         }
-        if (line.length <= pflen || !mem_equal(line.data, prefix, pflen)) {
+        if (!strview_has_strn_prefix(&line, prefix, pflen)) {
             continue;
         }
         if (exact && line.data[pflen] != '\t') {

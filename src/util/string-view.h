@@ -78,10 +78,15 @@ static inline bool strview_equal_cstring_icase(const StringView *sv, const char 
 }
 
 NONNULL_ARGS
+static inline bool strview_has_strn_prefix(const StringView *sv, const char *p, size_t n)
+{
+    return sv->length >= n && memcmp(sv->data, p, n) == 0;
+}
+
+NONNULL_ARGS
 static inline bool strview_has_prefix(const StringView *sv, const char *p)
 {
-    size_t length = strlen(p);
-    return sv->length >= length && memcmp(sv->data, p, length) == 0;
+    return strview_has_strn_prefix(sv, p, strlen(p));
 }
 
 NONNULL_ARGS
