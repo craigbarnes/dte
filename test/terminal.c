@@ -189,6 +189,8 @@ static void test_term_color_to_string(void)
         {"darkgray lightgreen", {COLOR_DARKGRAY, COLOR_LIGHTGREEN, 0}},
         {"lightmagenta", {COLOR_LIGHTMAGENTA, COLOR_DEFAULT, 0}},
         {"keep 254 keep", {COLOR_KEEP, 254, ATTR_KEEP}},
+        {"default", {COLOR_DEFAULT, COLOR_DEFAULT, 0}},
+        {"default bold", {COLOR_DEFAULT, COLOR_DEFAULT, ATTR_BOLD}},
         {"default default keep", {COLOR_DEFAULT, COLOR_DEFAULT, ATTR_KEEP}},
     };
 
