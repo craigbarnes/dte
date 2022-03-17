@@ -7,6 +7,10 @@
 
 static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 {
+    if (unlikely(size == 0)) {
+        return 0;
+    }
+
     const char open_delim = buf[0];
     if (open_delim == '/' || open_delim == '?') {
         // The search pattern is not a real regular expression.
