@@ -156,6 +156,7 @@ static void test_color_to_nearest(void)
         {COLOR_RGB(0xF7F7F7), COLOR_RGB(0xF7F7F7), 231, COLOR_WHITE},
         {COLOR_RGB(0xFEFEFE), COLOR_RGB(0xFEFEFE), 231, COLOR_WHITE},
     };
+
     FOR_EACH_I(i, tests) {
         const int32_t c = tests[i].input;
         IEXPECT_EQ(color_to_nearest(c, TERM_TRUE_COLOR, false), c);
@@ -689,7 +690,13 @@ static void test_keycode_to_string(void)
         {"C-M-S-up", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
         {"C-M-delete", MOD_CTRL | MOD_META | KEY_DELETE},
         {"C-home", MOD_CTRL | KEY_HOME},
+#if __STDC_VERSION__ >= 201112L
+        {u8"ก", 0x0E01},
+        {u8"C-ก", MOD_CTRL | 0x0E01},
+        {u8"M-Ф", MOD_META | 0x0424},
+#endif
     };
+
     FOR_EACH_I(i, tests) {
         const char *str = keycode_to_string(tests[i].key);
         IEXPECT_STREQ(str, tests[i].str);
