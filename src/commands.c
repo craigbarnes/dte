@@ -724,11 +724,10 @@ static void cmd_exec(const CommandArgs *a)
     case EXEC_NULL:
     case EXEC_TTY:
         break;
+    // These are already handled by the validity check above:
     case EXEC_OPEN:
     case EXEC_TAG:
     case EXEC_EVAL:
-        error_msg("invalid action for -i: '%s'", map[actions[0]].name);
-        return;
     default:
         BUG("unhandled action");
         return;
@@ -779,9 +778,7 @@ static void cmd_exec(const CommandArgs *a)
     case EXEC_NULL:
     case EXEC_TTY:
         break;
-    case EXEC_LINE:
-        error_msg("invalid action for -o: '%s'", map[actions[1]].name);
-        return;
+    case EXEC_LINE: // Already handled above
     default:
         BUG("unhandled action");
         return;
