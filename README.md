@@ -52,7 +52,7 @@ Building
 To build from source, first ensure the following dependencies are
 installed:
 
-* [GCC] 4.6+ or [Clang]
+* [GCC] 4.8+ or [Clang]
 * [GNU Make] 3.81+
 * [iconv] library (usually provided by libc on Linux/FreeBSD)
 
