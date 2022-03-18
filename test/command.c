@@ -14,7 +14,7 @@
 #include "util/path.h"
 #include "util/str-util.h"
 
-static void test_parse_command_arg(void)
+static void test_parse_command_arg(TestContext *ctx)
 {
     const CommandSet *nc = &normal_commands;
 
@@ -171,7 +171,7 @@ static void test_parse_command_arg(void)
     free(arg);
 }
 
-static void test_parse_commands(void)
+static void test_parse_commands(TestContext *ctx)
 {
     const CommandSet *nc = &normal_commands;
     PointerArray array = PTR_ARRAY_INIT;
@@ -224,7 +224,7 @@ static void test_parse_commands(void)
     ptr_array_free(&array);
 }
 
-static void test_command_parse_error_to_string(void)
+static void test_command_parse_error_to_string(TestContext *ctx)
 {
     const char *str = command_parse_error_to_string(CMDERR_UNCLOSED_SQUOTE);
     EXPECT_STREQ(str, "unclosed '");
@@ -234,7 +234,7 @@ static void test_command_parse_error_to_string(void)
     EXPECT_STREQ(str, "unexpected EOF");
 }
 
-static void test_find_normal_command(void)
+static void test_find_normal_command(TestContext *ctx)
 {
     const Command *cmd = find_normal_command("alias");
     ASSERT_NONNULL(cmd);
@@ -258,7 +258,7 @@ static void test_find_normal_command(void)
     EXPECT_NULL(find_normal_command("bind\n"));
 }
 
-static void test_parse_args(void)
+static void test_parse_args(TestContext *ctx)
 {
     const CommandSet *nc = &normal_commands;
     void *ud = nc->userdata;
@@ -353,7 +353,7 @@ static void test_parse_args(void)
     ptr_array_free(&array);
 }
 
-static void test_cached_command_new(void)
+static void test_cached_command_new(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
     const char *cmd_str = "open -t -e UTF-8 file.c inc.h";
@@ -400,7 +400,7 @@ static const char *escape_command_arg(String *buf, const char *arg, bool escape_
     return string_borrow_cstring(buf);
 }
 
-static void test_string_append_escaped_arg(void)
+static void test_string_append_escaped_arg(TestContext *ctx)
 {
     String buf = string_new(64);
     const char *str = escape_command_arg(&buf, "arg", false);
@@ -456,7 +456,7 @@ static void test_string_append_escaped_arg(void)
     string_free(&buf);
 }
 
-static void test_command_struct_layout(void)
+static void test_command_struct_layout(TestContext *ctx)
 {
     const Command *cmd = find_normal_command("open");
     EXPECT_STREQ(cmd->name, "open");
@@ -470,7 +470,7 @@ static void test_command_struct_layout(void)
     UNIGNORE_WARNINGS
 }
 
-static void test_cmdargs_flagset_idx(void)
+static void test_cmdargs_flagset_idx(TestContext *ctx)
 {
     EXPECT_EQ(cmdargs_flagset_idx('A'), 1);
     EXPECT_EQ(cmdargs_flagset_idx('Z'), 26);
@@ -489,7 +489,7 @@ static void test_cmdargs_flagset_idx(void)
     }
 }
 
-static void test_cmdargs_convert_flags(void)
+static void test_cmdargs_convert_flags(TestContext *ctx)
 {
     static const FlagMapping map[] = {
         {'b', REPLACE_BASIC},
@@ -509,7 +509,7 @@ static void test_cmdargs_convert_flags(void)
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL | REPLACE_BASIC);
 }
 
-static void test_add_alias(void)
+static void test_add_alias(TestContext *ctx)
 {
     HashMap m = HASHMAP_INIT;
     const char *name = "insert-foo";
@@ -525,7 +525,7 @@ static void test_add_alias(void)
     hashmap_free(&m, free);
 }
 
-static void test_allow_macro_recording(void)
+static void test_allow_macro_recording(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
     const char *args[4] = {NULL};

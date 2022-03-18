@@ -6,7 +6,7 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-static void test_next_tag(void)
+static void test_next_tag(TestContext *ctx)
 {
     static const struct {
         const char *name;

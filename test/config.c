@@ -23,7 +23,7 @@
 #include "window.h"
 #include "../build/test/data.h"
 
-static void test_builtin_configs(void)
+static void test_builtin_configs(TestContext *ctx)
 {
     size_t n;
     const BuiltinConfig *editor_builtin_configs = get_builtin_configs_array(&n);
@@ -55,7 +55,7 @@ static void test_builtin_configs(void)
     update_all_syntax_colors(&editor.syntaxes);
 }
 
-static void expect_files_equal(const char *path1, const char *path2)
+static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)
 {
     char *buf1;
     ssize_t size1 = read_file(path1, &buf1);
@@ -63,7 +63,7 @@ static void expect_files_equal(const char *path1, const char *path2)
         TEST_FAIL("Error reading '%s': %s", path1, strerror(errno));
         return;
     }
-    passed++;
+    ctx->passed++;
 
     char *buf2;
     ssize_t size2 = read_file(path2, &buf2);
@@ -72,19 +72,19 @@ static void expect_files_equal(const char *path1, const char *path2)
         TEST_FAIL("Error reading '%s': %s", path2, strerror(errno));
         return;
     }
-    passed++;
+    ctx->passed++;
 
     if (size1 != size2 || !mem_equal(buf1, buf2, size1)) {
         TEST_FAIL("Files differ: '%s', '%s'", path1, path2);
     } else {
-        passed++;
+        ctx->passed++;
     }
 
     free(buf1);
     free(buf2);
 }
 
-static void test_exec_config(void)
+static void test_exec_config(TestContext *ctx)
 {
     static const char *const outfiles[] = {
         "env.txt",
@@ -117,11 +117,11 @@ static void test_exec_config(void)
         char out[64], ref[64];
         xsnprintf(out, sizeof out, "build/test/%s", outfiles[i]);
         xsnprintf(ref, sizeof ref, "test/data/%s", outfiles[i]);
-        expect_files_equal(out, ref);
+        expect_files_equal(ctx, out, ref);
     }
 
     if (conversion_supported_by_iconv("UTF-8", "TIS-620")) {
-        expect_files_equal("build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
+        expect_files_equal(ctx, "build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 
     const StringView s = STRING_VIEW("toggle utf8-bom \\");
@@ -132,7 +132,7 @@ static void test_exec_config(void)
     EXPECT_FALSE(editor.options.utf8_bom);
 }
 
-static void test_detect_indent(void)
+static void test_detect_indent(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
     EXPECT_FALSE(editor.options.detect_indent);
@@ -153,7 +153,7 @@ static void test_detect_indent(void)
     handle_command(cmds, "close", false);
 }
 
-static void test_global_state(void)
+static void test_global_state(TestContext *ctx)
 {
     const Buffer *buffer = editor.buffer;
     const View *view = editor.view;
@@ -191,7 +191,7 @@ static void test_global_state(void)
     EXPECT_TRUE(buffer->id > 0);
 }
 
-static void test_macro_record(void)
+static void test_macro_record(TestContext *ctx)
 {
     EditorState *e = &editor;
     EXPECT_EQ(e->input_mode, INPUT_NORMAL);
@@ -233,7 +233,7 @@ static void test_macro_record(void)
         true
     );
 
-    expect_files_equal("build/test/macro-rec.txt", "build/test/macro-out.txt");
+    expect_files_equal(ctx, "build/test/macro-rec.txt", "build/test/macro-out.txt");
 }
 
 static const TestEntry tests[] = {

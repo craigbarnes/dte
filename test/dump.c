@@ -29,7 +29,7 @@ static const struct {
     {"wsplit", false, false, dump_frames},
 };
 
-static void test_dump_handlers(void)
+static void test_dump_handlers(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
     void *ud = cmds->userdata;

@@ -1,7 +1,7 @@
 #include "test.h"
 #include "filetype.h"
 
-static void test_is_valid_filetype_name(void)
+static void test_is_valid_filetype_name(TestContext *ctx)
 {
     EXPECT_TRUE(is_valid_filetype_name("abc-XYZ_128.90"));
     EXPECT_FALSE(is_valid_filetype_name(""));
@@ -9,7 +9,7 @@ static void test_is_valid_filetype_name(void)
     EXPECT_FALSE(is_valid_filetype_name("/"));
 }
 
-static void test_find_ft_filename(void)
+static void test_find_ft_filename(TestContext *ctx)
 {
     static const struct {
         const char *filename;
@@ -122,7 +122,7 @@ static void test_find_ft_filename(void)
     }
 }
 
-static void test_find_ft_firstline(void)
+static void test_find_ft_firstline(TestContext *ctx)
 {
     static const struct {
         const char *line;
@@ -223,7 +223,7 @@ static void test_find_ft_firstline(void)
     }
 }
 
-static void test_find_ft_dynamic(void)
+static void test_find_ft_dynamic(TestContext *ctx)
 {
     PointerArray a = PTR_ARRAY_INIT;
     const char *ft = "test1";
@@ -264,7 +264,7 @@ static void test_find_ft_dynamic(void)
     free_filetypes(&a);
 }
 
-static void test_is_ft(void)
+static void test_is_ft(TestContext *ctx)
 {
     const PointerArray a = PTR_ARRAY_INIT;
     EXPECT_TRUE(is_ft(&a, "ada"));

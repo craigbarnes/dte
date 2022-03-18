@@ -8,7 +8,7 @@
 #include "editor.h"
 #include "util/str-util.h"
 
-static void test_add_binding(void)
+static void test_add_binding(TestContext *ctx)
 {
     KeyBindingGroup *kbg = &editor.bindings[INPUT_NORMAL];
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F12;
@@ -31,7 +31,7 @@ static void test_add_binding(void)
     EXPECT_NULL(lookup_binding(kbg, key));
 }
 
-static void test_handle_binding(void)
+static void test_handle_binding(TestContext *ctx)
 {
     const Command *insert = find_normal_command("insert");
     ASSERT_NONNULL(insert);

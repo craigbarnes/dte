@@ -25,7 +25,7 @@ extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
 extern const TestGroup util_tests;
 
-static void test_posix_sanity(void)
+static void test_posix_sanity(TestContext *ctx)
 {
     // This is not guaranteed by ISO C99, but it is required by POSIX
     // and is relied upon by this codebase:
@@ -49,7 +49,7 @@ static void test_posix_sanity(void)
     UNIGNORE_WARNINGS
 }
 
-static void test_init(void)
+static void test_init(TestContext *ctx)
 {
     char *home = path_absolute("build/test/HOME");
     char *dte_home = path_absolute("build/test/DTE_HOME");
@@ -76,7 +76,7 @@ static void test_init(void)
     EXPECT_STREQ(ver, editor.version);
 }
 
-static void run_tests(const TestGroup *g)
+static void run_tests(TestContext *ctx, const TestGroup *g)
 {
     ASSERT_TRUE(g->nr_tests != 0);
     ASSERT_NONNULL(g->tests);
@@ -84,11 +84,11 @@ static void run_tests(const TestGroup *g)
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
         ASSERT_NONNULL(t->func);
         ASSERT_NONNULL(t->name);
-        unsigned int prev_failed = failed;
-        unsigned int prev_passed = passed;
-        t->func();
-        unsigned int f = failed - prev_failed;
-        unsigned int p = passed - prev_passed;
+        unsigned int prev_failed = ctx->failed;
+        unsigned int prev_passed = ctx->passed;
+        t->func(ctx);
+        unsigned int f = ctx->failed - prev_failed;
+        unsigned int p = ctx->passed - prev_passed;
         fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, p);
         if (unlikely(f > 0)) {
             fprintf(stderr, " %4u FAILED", f);
@@ -106,28 +106,33 @@ const TestGroup init_tests = TEST_GROUP(tests);
 
 int main(void)
 {
-    run_tests(&init_tests);
-    run_tests(&command_tests);
-    run_tests(&option_tests);
-    run_tests(&editorconfig_tests);
-    run_tests(&encoding_tests);
-    run_tests(&filetype_tests);
-    run_tests(&util_tests);
-    run_tests(&terminal_tests);
-    run_tests(&cmdline_tests);
-    run_tests(&history_tests);
-    run_tests(&ctags_tests);
+    TestContext ctx = {
+        .passed = 0,
+        .failed = 0,
+    };
+
+    run_tests(&ctx, &init_tests);
+    run_tests(&ctx, &command_tests);
+    run_tests(&ctx, &option_tests);
+    run_tests(&ctx, &editorconfig_tests);
+    run_tests(&ctx, &encoding_tests);
+    run_tests(&ctx, &filetype_tests);
+    run_tests(&ctx, &util_tests);
+    run_tests(&ctx, &terminal_tests);
+    run_tests(&ctx, &cmdline_tests);
+    run_tests(&ctx, &history_tests);
+    run_tests(&ctx, &ctags_tests);
 
     init_headless_mode();
-    run_tests(&config_tests);
-    run_tests(&bind_tests);
-    run_tests(&cmdline_tests_late);
-    run_tests(&buffer_tests);
-    run_tests(&syntax_tests);
-    run_tests(&dump_tests);
+    run_tests(&ctx, &config_tests);
+    run_tests(&ctx, &bind_tests);
+    run_tests(&ctx, &cmdline_tests_late);
+    run_tests(&ctx, &buffer_tests);
+    run_tests(&ctx, &syntax_tests);
+    run_tests(&ctx, &dump_tests);
     remove_frame(editor.root_frame);
     free_editor_state(&editor);
 
-    fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", passed, failed);
-    return failed ? 1 : 0;
+    fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", ctx.passed, ctx.failed);
+    return ctx.failed ? 1 : 0;
 }

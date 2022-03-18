@@ -1,7 +1,7 @@
 #include "test.h"
 #include "encoding.h"
 
-static void test_detect_encoding_from_bom(void)
+static void test_detect_encoding_from_bom(TestContext *ctx)
 {
     static const struct bom_test {
         EncodingType encoding;
@@ -33,7 +33,7 @@ static void test_detect_encoding_from_bom(void)
     }
 }
 
-static void test_lookup_encoding(void)
+static void test_lookup_encoding(TestContext *ctx)
 {
     static const struct {
         EncodingType encoding;
@@ -62,7 +62,7 @@ static void test_lookup_encoding(void)
     }
 }
 
-static void test_encoding_from_type(void)
+static void test_encoding_from_type(TestContext *ctx)
 {
     const Encoding a = encoding_from_type(UTF8);
     EXPECT_EQ(a.type, UTF8);

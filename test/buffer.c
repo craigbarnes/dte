@@ -4,7 +4,7 @@
 #include "editor.h"
 #include "indent.h"
 
-static void test_find_buffer_by_id(void)
+static void test_find_buffer_by_id(TestContext *ctx)
 {
     const Buffer *buffer = editor.buffer;
     ASSERT_NONNULL(buffer);
@@ -15,7 +15,7 @@ static void test_find_buffer_by_id(void)
     EXPECT_NULL(find_buffer_by_id(&editor.buffers, large_id));
 }
 
-static void test_make_indent(void)
+static void test_make_indent(TestContext *ctx)
 {
     Buffer *buffer = editor.buffer;
     ASSERT_NONNULL(buffer);

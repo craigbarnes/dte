@@ -4,7 +4,7 @@
 #include "util/numtostr.h"
 #include "util/readfile.h"
 
-static void test_history_add(void)
+static void test_history_add(TestContext *ctx)
 {
     History h = {.max_entries = 7};
     history_add(&h, "A");
@@ -105,7 +105,7 @@ static void test_history_add(void)
     hashmap_free(&h.entries, free);
 }
 
-static void test_history_search(void)
+static void test_history_search(TestContext *ctx)
 {
     History h = {.max_entries = 64};
     history_load(&h, "test/data/history");
@@ -152,7 +152,7 @@ static void test_history_search(void)
 // churn from insertions and removals (i.e. that it rehashes the
 // table to clean out tombstones, even when the number of real
 // entries stops growing).
-static void test_history_tombstone_pressure(void)
+static void test_history_tombstone_pressure(TestContext *ctx)
 {
     History h = {.max_entries = 512};
     for (unsigned int i = 0; i < 12000; i++) {

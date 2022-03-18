@@ -9,7 +9,7 @@
 #define EXPECT_STRING_EQ(s, cstr) \
     EXPECT_STREQ(string_borrow_cstring(&(s)), (cstr))
 
-static void test_command_mode(void)
+static void test_command_mode(TestContext *ctx)
 {
     const CommandSet *cmds = &cmd_mode_commands;
     EditorState *e = &editor;
@@ -113,7 +113,7 @@ static void test_command_mode(void)
 #define ENV_VAR_PREFIX "D__p_tYmz3_"
 #define ENV_VAR_NAME ENV_VAR_PREFIX "_VAR"
 
-static void test_complete_command(void)
+static void test_complete_command(TestContext *ctx)
 {
     EditorState *e = &editor;
     CommandLine *c = &editor.cmdline;
@@ -277,7 +277,7 @@ static void test_complete_command(void)
 
 // This should only be run after init_headless_mode() because the completions
 // depend on the buffer and default config being initialized
-static void test_complete_command_extra(void)
+static void test_complete_command_extra(TestContext *ctx)
 {
     EditorState *e = &editor;
     CommandLine *c = &editor.cmdline;

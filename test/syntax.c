@@ -8,7 +8,7 @@
 #include "util/utf8.h"
 #include "window.h"
 
-static void test_bitset(void)
+static void test_bitset(TestContext *ctx)
 {
     BitSetWord set[BITSET_NR_WORDS(256)];
     ASSERT_TRUE(sizeof(set) >= 32);
@@ -72,7 +72,7 @@ static void test_bitset(void)
     }
 }
 
-static void test_hl_line(void)
+static void test_hl_line(TestContext *ctx)
 {
     if (!get_builtin_config("syntax/c")) {
         DEBUG_LOG("syntax/c not available; skipping %s()", __func__);

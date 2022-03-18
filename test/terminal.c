@@ -16,6 +16,7 @@
 #define EXPECT_KEYCODE_EQ(idx, a, b, seq, seq_len) EXPECT(keycode_eq, idx, a, b, seq, seq_len)
 
 static void expect_keycode_eq (
+    TestContext *ctx,
     const char *file,
     int line,
     size_t idx,
@@ -25,7 +26,7 @@ static void expect_keycode_eq (
     size_t seq_len
 ) {
     if (likely(a == b)) {
-        passed++;
+        ctx->passed++;
         return;
     }
 
@@ -38,13 +39,13 @@ static void expect_keycode_eq (
     make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
-        file, line,
+        ctx, file, line,
         "Test #%zu: key codes not equal: 0x%02x, 0x%02x (%s, %s); input: %s",
         idx, a, b, a_str, b_str, seq_str
     );
 }
 
-static void test_parse_term_color(void)
+static void test_parse_term_color(TestContext *ctx)
 {
     static const struct {
         ssize_t expected_return;
@@ -93,7 +94,7 @@ static void test_parse_term_color(void)
     }
 }
 
-static void test_color_to_nearest(void)
+static void test_color_to_nearest(TestContext *ctx)
 {
     static const struct {
         int32_t input;
@@ -168,7 +169,7 @@ static void test_color_to_nearest(void)
     }
 }
 
-static void test_term_color_to_string(void)
+static void test_term_color_to_string(TestContext *ctx)
 {
     static const struct {
         const char *expected_string;
@@ -210,7 +211,7 @@ static void test_term_color_to_string(void)
     EXPECT_EQ(strlen(term_color_to_string(&color)), 94);
 }
 
-static void test_xterm_parse_key(void)
+static void test_xterm_parse_key(TestContext *ctx)
 {
     static const struct {
         const char *escape_sequence;
@@ -409,7 +410,7 @@ static void test_xterm_parse_key(void)
     }
 }
 
-static void test_xterm_parse_key_combo(void)
+static void test_xterm_parse_key_combo(TestContext *ctx)
 {
     static const struct {
         char key_str[3];
@@ -517,7 +518,7 @@ static void test_xterm_parse_key_combo(void)
     }
 }
 
-static void test_rxvt_parse_key(void)
+static void test_rxvt_parse_key(TestContext *ctx)
 {
     static const struct {
         char escape_sequence[8];
@@ -615,7 +616,7 @@ static void test_rxvt_parse_key(void)
     }
 }
 
-static void test_linux_parse_key(void)
+static void test_linux_parse_key(TestContext *ctx)
 {
     static const struct {
         char seq[6];
@@ -646,7 +647,7 @@ static void test_linux_parse_key(void)
     }
 }
 
-static void test_keycode_to_string(void)
+static void test_keycode_to_string(TestContext *ctx)
 {
     static const struct {
         const char *str;
@@ -718,7 +719,7 @@ static void test_keycode_to_string(void)
     EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
 }
 
-static void test_parse_key_string(void)
+static void test_parse_key_string(TestContext *ctx)
 {
     KeyCode key = 0;
     EXPECT_TRUE(parse_key_string(&key, "^I"));
@@ -757,7 +758,7 @@ static void test_parse_key_string(void)
     EXPECT_EQ(key, MOD_META | MOD_CTRL | 'h');
 }
 
-static void clear_obuf(TermOutputBuffer *obuf)
+static void clear_obuf(TestContext *ctx, TermOutputBuffer *obuf)
 {
     ASSERT_TRUE(obuf_avail(obuf) > 8);
     memset(obuf->buf, '\0', obuf->count + 8);
@@ -765,7 +766,7 @@ static void clear_obuf(TermOutputBuffer *obuf)
     obuf->x = 0;
 }
 
-static void test_term_add_str(void)
+static void test_term_add_str(TestContext *ctx)
 {
     Terminal term = {.width = 80, .height = 24};
     TermOutputBuffer *obuf = &term.obuf;
@@ -798,12 +799,12 @@ static void test_term_add_str(void)
     EXPECT_EQ(obuf->count, 24);
     EXPECT_EQ(obuf->x, 21);
     EXPECT_STREQ(obuf->buf + 20, "<" "??" ">");
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_output_free(obuf);
 }
 
-static void test_term_clear_eol(void)
+static void test_term_clear_eol(TestContext *ctx)
 {
     Terminal term = {.width = 80, .height = 24};
     TermOutputBuffer *obuf = &term.obuf;
@@ -815,7 +816,7 @@ static void test_term_clear_eol(void)
     EXPECT_EQ(obuf->count, 3);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term.features &= ~TFLAG_BACK_COLOR_ERASE;
     term_output_reset(&term, 0, 80, 0);
@@ -824,12 +825,12 @@ static void test_term_clear_eol(void)
     EXPECT_EQ(obuf->x, 80);
     EXPECT_EQ(obuf->buf[0], ' ');
     EXPECT_EQ(obuf->buf[79], ' ');
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_output_free(obuf);
 }
 
-static void test_term_move_cursor(void)
+static void test_term_move_cursor(TestContext *ctx)
 {
     TermOutputBuffer obuf;
     term_output_init(&obuf);
@@ -837,18 +838,18 @@ static void test_term_move_cursor(void)
     EXPECT_EQ(obuf.count, 7);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
-    clear_obuf(&obuf);
+    clear_obuf(ctx, &obuf);
 
     term_move_cursor(&obuf, 0, 22);
     EXPECT_EQ(obuf.count, 5);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
-    clear_obuf(&obuf);
+    clear_obuf(ctx, &obuf);
 
     term_output_free(&obuf);
 }
 
-static void test_term_set_bytes(void)
+static void test_term_set_bytes(TestContext *ctx)
 {
     Terminal term = {
         .width = 80,
@@ -858,31 +859,31 @@ static void test_term_set_bytes(void)
 
     TermOutputBuffer *obuf = &term.obuf;
     term_output_init(obuf);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
     term_output_reset(&term, 0, 80, 0);
 
     term_set_bytes(&term, 'x', 40);
     EXPECT_EQ(obuf->count, 6);
     EXPECT_EQ(obuf->x, 40);
     EXPECT_MEMEQ(obuf->buf, "x\033[39b", 6);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_set_bytes(&term, '-', 5);
     EXPECT_EQ(obuf->count, 5);
     EXPECT_EQ(obuf->x, 5);
     EXPECT_MEMEQ(obuf->buf, "-----", 5);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_set_bytes(&term, '\n', 8);
     EXPECT_EQ(obuf->count, 8);
     EXPECT_EQ(obuf->x, 8);
     EXPECT_MEMEQ(obuf->buf, "\n\n\n\n\n\n\n\n", 8);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_output_free(obuf);
 }
 
-static void test_term_set_color(void)
+static void test_term_set_color(TestContext *ctx)
 {
     Terminal term = {
         .width = 80,
@@ -904,7 +905,7 @@ static void test_term_set_color(void)
     EXPECT_EQ(obuf->count, 14);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     c.attr = 0;
     c.fg = COLOR_RGB(0x12ef46);
@@ -912,7 +913,7 @@ static void test_term_set_color(void)
     EXPECT_EQ(obuf->count, 22);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     c.fg = 144;
     c.bg = COLOR_DEFAULT;
@@ -920,12 +921,12 @@ static void test_term_set_color(void)
     EXPECT_EQ(obuf->count, 13);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
-    clear_obuf(obuf);
+    clear_obuf(ctx, obuf);
 
     term_output_free(obuf);
 }
 
-static void test_term_osc52_copy(void)
+static void test_term_osc52_copy(TestContext *ctx)
 {
     TermOutputBuffer obuf;
     term_output_init(&obuf);
@@ -934,19 +935,19 @@ static void test_term_osc52_copy(void)
     EXPECT_EQ(obuf.count, 18);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
-    clear_obuf(&obuf);
+    clear_obuf(ctx, &obuf);
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
     EXPECT_EQ(obuf.count, 17);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
-    clear_obuf(&obuf);
+    clear_obuf(ctx, &obuf);
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN(""), true, false));
     EXPECT_EQ(obuf.count, 9);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
-    clear_obuf(&obuf);
+    clear_obuf(ctx, &obuf);
 
     term_output_free(&obuf);
 }

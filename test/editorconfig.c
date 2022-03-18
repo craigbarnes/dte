@@ -4,7 +4,7 @@
 #include "editorconfig/match.h"
 #include "util/path.h"
 
-static void test_editorconfig_pattern_match(void)
+static void test_editorconfig_pattern_match(TestContext *ctx)
 {
     #define patmatch(s, f) (ec_pattern_match(s, STRLEN(s), f))
 
@@ -76,7 +76,7 @@ static void test_editorconfig_pattern_match(void)
     #undef patmatch
 }
 
-static void test_get_editorconfig_options(void)
+static void test_get_editorconfig_options(TestContext *ctx)
 {
     EditorConfigOptions opts = editorconfig_options_init();
     char *path = path_absolute("test/data/file.0foo.z");
