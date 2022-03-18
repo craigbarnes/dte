@@ -3,7 +3,7 @@ stages: [test, dist]
 default:
     before_script:
         - git fetch --tags
-        - export MAKEFLAGS="-j$(mk/nproc.sh)" DEBUG=3 WERROR=1 V=1
+        - export DEBUG=3 WERROR=1 V=1
         - make vars
 
 .test:
