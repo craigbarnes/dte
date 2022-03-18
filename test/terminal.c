@@ -758,12 +758,15 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(key, MOD_META | MOD_CTRL | 'h');
 }
 
-static void clear_obuf(TestContext *ctx, TermOutputBuffer *obuf)
+static bool clear_obuf(TermOutputBuffer *obuf)
 {
-    ASSERT_TRUE(obuf_avail(obuf) > 8);
+    if (unlikely(obuf_avail(obuf) <= 8)) {
+        return false;
+    }
     memset(obuf->buf, '\0', obuf->count + 8);
     obuf->count = 0;
     obuf->x = 0;
+    return true;
 }
 
 static void test_term_add_str(TestContext *ctx)
@@ -799,7 +802,7 @@ static void test_term_add_str(TestContext *ctx)
     EXPECT_EQ(obuf->count, 24);
     EXPECT_EQ(obuf->x, 21);
     EXPECT_STREQ(obuf->buf + 20, "<" "??" ">");
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
 }
@@ -816,7 +819,7 @@ static void test_term_clear_eol(TestContext *ctx)
     EXPECT_EQ(obuf->count, 3);
     EXPECT_EQ(obuf->x, 80);
     EXPECT_MEMEQ(obuf->buf, "\033[K", 3);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term.features &= ~TFLAG_BACK_COLOR_ERASE;
     term_output_reset(&term, 0, 80, 0);
@@ -825,7 +828,7 @@ static void test_term_clear_eol(TestContext *ctx)
     EXPECT_EQ(obuf->x, 80);
     EXPECT_EQ(obuf->buf[0], ' ');
     EXPECT_EQ(obuf->buf[79], ' ');
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
 }
@@ -838,13 +841,13 @@ static void test_term_move_cursor(TestContext *ctx)
     EXPECT_EQ(obuf.count, 7);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[6;13H", 7);
-    clear_obuf(ctx, &obuf);
+    ASSERT_TRUE(clear_obuf(&obuf));
 
     term_move_cursor(&obuf, 0, 22);
     EXPECT_EQ(obuf.count, 5);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033[23H", 5);
-    clear_obuf(ctx, &obuf);
+    ASSERT_TRUE(clear_obuf(&obuf));
 
     term_output_free(&obuf);
 }
@@ -859,26 +862,26 @@ static void test_term_set_bytes(TestContext *ctx)
 
     TermOutputBuffer *obuf = &term.obuf;
     term_output_init(obuf);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
     term_output_reset(&term, 0, 80, 0);
 
     term_set_bytes(&term, 'x', 40);
     EXPECT_EQ(obuf->count, 6);
     EXPECT_EQ(obuf->x, 40);
     EXPECT_MEMEQ(obuf->buf, "x\033[39b", 6);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_set_bytes(&term, '-', 5);
     EXPECT_EQ(obuf->count, 5);
     EXPECT_EQ(obuf->x, 5);
     EXPECT_MEMEQ(obuf->buf, "-----", 5);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_set_bytes(&term, '\n', 8);
     EXPECT_EQ(obuf->count, 8);
     EXPECT_EQ(obuf->x, 8);
     EXPECT_MEMEQ(obuf->buf, "\n\n\n\n\n\n\n\n", 8);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
 }
@@ -905,7 +908,7 @@ static void test_term_set_color(TestContext *ctx)
     EXPECT_EQ(obuf->count, 14);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;1;7;31;43m", 14);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     c.attr = 0;
     c.fg = COLOR_RGB(0x12ef46);
@@ -913,7 +916,7 @@ static void test_term_set_color(TestContext *ctx)
     EXPECT_EQ(obuf->count, 22);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;2;18;239;70;43m", 22);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     c.fg = 144;
     c.bg = COLOR_DEFAULT;
@@ -921,7 +924,7 @@ static void test_term_set_color(TestContext *ctx)
     EXPECT_EQ(obuf->count, 13);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_MEMEQ(obuf->buf, "\033[0;38;5;144m", 13);
-    clear_obuf(ctx, obuf);
+    ASSERT_TRUE(clear_obuf(obuf));
 
     term_output_free(obuf);
 }
@@ -935,19 +938,19 @@ static void test_term_osc52_copy(TestContext *ctx)
     EXPECT_EQ(obuf.count, 18);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;pc;Zm9vYmFy\033\\", 18);
-    clear_obuf(ctx, &obuf);
+    ASSERT_TRUE(clear_obuf(&obuf));
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN("\xF0\x9F\xA5\xA3"), false, true));
     EXPECT_EQ(obuf.count, 17);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;p;8J+low==\033\\", 17);
-    clear_obuf(ctx, &obuf);
+    ASSERT_TRUE(clear_obuf(&obuf));
 
     EXPECT_TRUE(term_osc52_copy(&obuf, STRN(""), true, false));
     EXPECT_EQ(obuf.count, 9);
     EXPECT_EQ(obuf.x, 0);
     EXPECT_MEMEQ(obuf.buf, "\033]52;c;\033\\", 9);
-    clear_obuf(ctx, &obuf);
+    ASSERT_TRUE(clear_obuf(&obuf));
 
     term_output_free(&obuf);
 }
