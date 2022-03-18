@@ -31,15 +31,15 @@ typedef enum {
 } OptionType;
 
 typedef union {
-    struct {
-        bool (*validate)(const char *value); // OPT_STR (optional)
-    } str_opt;
-    struct {
-        unsigned int min, max; // OPT_UINT
-    } uint_opt;
-    struct {
-        const char *const *values; // OPT_ENUM, OPT_FLAG, OPT_BOOL
-    } enum_opt;
+    const char *str_val; // OPT_STR
+    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG
+    bool bool_val; // OPT_BOOL
+} OptionValue;
+
+typedef union {
+    struct {bool (*validate)(const char *value);} str_opt; // OPT_STR (optional)
+    struct {unsigned int min, max;} uint_opt; // OPT_UINT
+    struct {const char *const *values;} enum_opt; // OPT_ENUM, OPT_FLAG, OPT_BOOL
 } OptionConstraint;
 
 typedef struct {
@@ -52,26 +52,18 @@ typedef struct {
     void (*on_change)(bool global); // Optional
 } OptionDesc;
 
-typedef union {
-    const char *str_val; // OPT_STR
-    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG
-    bool bool_val; // OPT_BOOL
-} OptionValue;
-
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_STR, \
-    OLG \
-    .u = { .str_opt = { \
-        .validate = _validate, \
-    } }, \
+    .u = {.str_opt = {.validate = _validate}}, \
     .on_change = _on_change, \
 }
 
 #define UINT_OPT(_name, OLG, _min, _max, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_UINT, \
-    OLG \
     .u = { .uint_opt = { \
         .min = _min, \
         .max = _max, \
@@ -80,32 +72,26 @@ typedef union {
 }
 
 #define ENUM_OPT(_name, OLG, _values, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_ENUM, \
-    OLG \
-    .u = { .enum_opt = { \
-        .values = _values, \
-    } }, \
+    .u = {.enum_opt = {.values = _values}}, \
     .on_change = _on_change, \
 }
 
 #define FLAG_OPT(_name, OLG, _values, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_FLAG, \
-    OLG \
-    .u = { .enum_opt = { \
-        .values = _values, \
-    } }, \
+    .u = {.enum_opt = {.values = _values}}, \
     .on_change = _on_change, \
 }
 
 #define BOOL_OPT(_name, OLG, _on_change) { \
+    OLG \
     .name = _name, \
     .type = OPT_BOOL, \
-    OLG \
-    .u = { .enum_opt = { \
-        .values = bool_enum, \
-    } }, \
+    .u = {.enum_opt = {.values = bool_enum}}, \
     .on_change = _on_change, \
 }
 
