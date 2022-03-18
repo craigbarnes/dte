@@ -30,39 +30,32 @@ typedef enum {
     OPT_FLAG,
 } OptionType;
 
+typedef union {
+    struct {
+        bool (*validate)(const char *value); // OPT_STR (optional)
+    } str_opt;
+    struct {
+        unsigned int min, max; // OPT_UINT
+    } uint_opt;
+    struct {
+        const char *const *values; // OPT_ENUM, OPT_FLAG, OPT_BOOL
+    } enum_opt;
+} OptionConstraint;
+
 typedef struct {
     const char name[22];
     bool local;
     bool global;
     unsigned int offset;
     OptionType type;
-    union {
-        struct {
-            // Optional
-            bool (*validate)(const char *value);
-        } str_opt;
-        struct {
-            unsigned int min;
-            unsigned int max;
-        } uint_opt;
-        struct {
-            const char *const *values;
-        } enum_opt;
-        struct {
-            const char *const *values;
-        } flag_opt;
-    } u;
-    // Optional
-    void (*on_change)(bool global);
+    OptionConstraint u;
+    void (*on_change)(bool global); // Optional
 } OptionDesc;
 
 typedef union {
-    // OPT_STR
-    const char *str_val;
-    // OPT_UINT, OPT_ENUM, OPT_FLAG
-    unsigned int uint_val;
-    // OPT_BOOL
-    bool bool_val;
+    const char *str_val; // OPT_STR
+    unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG
+    bool bool_val; // OPT_BOOL
 } OptionValue;
 
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
@@ -100,7 +93,7 @@ typedef union {
     .name = _name, \
     .type = OPT_FLAG, \
     OLG \
-    .u = { .flag_opt = { \
+    .u = { .enum_opt = { \
         .values = _values, \
     } }, \
     .on_change = _on_change, \
@@ -339,7 +332,7 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
         return true;
     }
 
-    const char *const *values = d->u.flag_opt.values;
+    const char *const *values = d->u.enum_opt.values;
     unsigned int flags = 0;
 
     for (size_t pos = 0, len = strlen(str); pos < len; ) {
@@ -373,7 +366,7 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
     }
 
     char *ptr = buf;
-    const char *const *values = desc->u.flag_opt.values;
+    const char *const *values = desc->u.enum_opt.values;
     for (size_t i = 0; values[i]; i++) {
         if (flags & (1u << i)) {
             size_t len = strlen(values[i]);
@@ -792,40 +785,33 @@ void collect_option_values(PointerArray *a, const char *option, const char *pref
         return;
     }
 
-    const char *const *values;
-    const char *comma;
-    size_t prefix_len;
+    OptionType type = desc->type;
+    if (type == OPT_STR || type == OPT_UINT) {
+        return;
+    }
 
-    switch (desc->type) {
-    case OPT_ENUM:
-    case OPT_BOOL:
-        values = desc->u.enum_opt.values;
+    const char *const *values = desc->u.enum_opt.values;
+    if (type == OPT_ENUM || type == OPT_BOOL) {
         for (size_t i = 0; values[i]; i++) {
             if (str_has_prefix(values[i], prefix)) {
                 ptr_array_append(a, xstrdup(values[i]));
             }
         }
-        break;
-    case OPT_FLAG:
-        values = desc->u.flag_opt.values;
-        comma = strrchr(prefix, ',');
-        prefix_len = comma ? ++comma - prefix : 0;
-        for (size_t i = 0; values[i]; i++) {
-            const char *str = values[i];
-            if (str_has_prefix(str, prefix + prefix_len)) {
-                size_t str_len = strlen(str);
-                char *completion = xmalloc(prefix_len + str_len + 1);
-                memcpy(completion, prefix, prefix_len);
-                memcpy(completion + prefix_len, str, str_len + 1);
-                ptr_array_append(a, completion);
-            }
+        return;
+    }
+
+    BUG_ON(type != OPT_FLAG);
+    const char *comma = strrchr(prefix, ',');
+    size_t prefix_len = comma ? ++comma - prefix : 0;
+    for (size_t i = 0; values[i]; i++) {
+        const char *str = values[i];
+        if (str_has_prefix(str, prefix + prefix_len)) {
+            size_t str_len = strlen(str);
+            char *completion = xmalloc(prefix_len + str_len + 1);
+            memcpy(completion, prefix, prefix_len);
+            memcpy(completion + prefix_len, str, str_len + 1);
+            ptr_array_append(a, completion);
         }
-        break;
-    case OPT_STR:
-    case OPT_UINT:
-        break;
-    default:
-        BUG("unhandled option type");
     }
 }
 
