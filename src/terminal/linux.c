@@ -1,9 +1,10 @@
 #include "linux.h"
+#include "util/str-util.h"
 #include "xterm.h"
 
 ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
 {
-    if (length < 3 || buf[0] != '\033' || buf[1] != '[' || buf[2] != '[') {
+    if (length < 3 || !mem_equal(buf, "\033[[", 3)) {
         return xterm_parse_key(buf, length, k);
     }
 
