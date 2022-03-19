@@ -77,7 +77,7 @@ typedef struct Terminal {
 } Terminal;
 
 void term_init(Terminal *term, const char *name) NONNULL_ARGS;
-void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
-void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf) NONNULL_ARGS;
+void term_enable_private_modes(Terminal *term) NONNULL_ARGS;
+void term_restore_private_modes(Terminal *term) NONNULL_ARGS;
 
 #endif

@@ -187,8 +187,9 @@ void term_init(Terminal *term, const char *name)
     }
 }
 
-void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf)
+void term_enable_private_modes(Terminal *term)
 {
+    TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
         term_add_literal(obuf, "\033[?1036;1039s\033[?1036;1039h");
@@ -210,8 +211,9 @@ void term_enable_private_modes(const Terminal *term, TermOutputBuffer *obuf)
     term_add_literal(obuf, "\033[?2004s\033[?2004h");
 }
 
-void term_restore_private_modes(const Terminal *term, TermOutputBuffer *obuf)
+void term_restore_private_modes(Terminal *term)
 {
+    TermOutputBuffer *obuf = &term->obuf;
     TermFeatureFlags features = term->features;
     if (features & METAESC) {
         term_add_literal(obuf, "\033[?1036;1039r");

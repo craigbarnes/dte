@@ -406,7 +406,7 @@ void ui_start(EditorState *e)
         return;
     }
     Terminal *term = &e->terminal;
-    term_enable_private_modes(term, &term->obuf);
+    term_enable_private_modes(term);
     term_add_strview(&term->obuf, term->control_codes.cup_mode_on);
     ui_resize(e);
 }
@@ -422,7 +422,7 @@ void ui_end(EditorState *e)
     term_move_cursor(obuf, 0, term->height - 1);
     term_show_cursor(term);
     term_add_strview(obuf, term->control_codes.cup_mode_off);
-    term_restore_private_modes(term, obuf);
+    term_restore_private_modes(term);
     term_output_flush(obuf);
     term_cooked();
 }

@@ -219,7 +219,7 @@ static ExitCode showkey_loop(Terminal *term)
     }
 
     TermOutputBuffer *obuf = &term->obuf;
-    term_enable_private_modes(term, obuf);
+    term_enable_private_modes(term);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
@@ -244,7 +244,7 @@ static ExitCode showkey_loop(Terminal *term)
         term_output_flush(obuf);
     }
 
-    term_restore_private_modes(term, obuf);
+    term_restore_private_modes(term);
     term_output_flush(obuf);
     term_cooked();
     return EX_OK;
