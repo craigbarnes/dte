@@ -36,7 +36,7 @@ void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scro
     obuf->width = width;
     obuf->scroll_x = scroll_x;
     obuf->tab_width = 8;
-    obuf->tab = TAB_CONTROL;
+    obuf->tab_mode = TAB_CONTROL;
     obuf->can_clear = start_x + width == term->width;
 }
 
@@ -205,8 +205,8 @@ static void skipped_too_much(TermOutputBuffer *obuf, CodePoint u)
     size_t n = obuf->x - obuf->scroll_x;
     char *buf = obuf->buf + obuf->count;
     obuf_need_space(obuf, 8);
-    if (u == '\t' && obuf->tab != TAB_CONTROL) {
-        memset(buf, (obuf->tab == TAB_SPECIAL) ? '-' : ' ', n);
+    if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
+        memset(buf, (obuf->tab_mode == TAB_SPECIAL) ? '-' : ' ', n);
         obuf->count += n;
     } else if (u < 0x20) {
         *buf = u | 0x40;
@@ -231,7 +231,7 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
     if (u < 0x80) {
         if (!ascii_iscntrl(u)) {
             obuf->x++;
-        } else if (u == '\t' && obuf->tab != TAB_CONTROL) {
+        } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
             size_t tw = obuf->tab_width;
             obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
         } else {
@@ -251,7 +251,7 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
 static void print_tab(TermOutputBuffer *obuf, size_t width)
 {
     char ch = ' ';
-    if (unlikely(obuf->tab == TAB_SPECIAL)) {
+    if (unlikely(obuf->tab_mode == TAB_SPECIAL)) {
         obuf->buf[obuf->count++] = '>';
         obuf->x++;
         width--;
@@ -282,7 +282,7 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         if (likely(!ascii_iscntrl(u))) {
             obuf->buf[obuf->count++] = u;
             obuf->x++;
-        } else if (u == '\t' && obuf->tab != TAB_CONTROL) {
+        } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
             const size_t tw = obuf->tab_width;
             const size_t x = obuf->x;
             size_t width = (x + tw) / tw * tw - x;

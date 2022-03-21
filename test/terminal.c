@@ -785,7 +785,7 @@ static void test_term_add_str(TestContext *ctx)
     EXPECT_EQ(obuf->x, 0);
 
     term_output_reset(&term, 0, 80, 0);
-    EXPECT_EQ(obuf->tab, TAB_CONTROL);
+    EXPECT_EQ(obuf->tab_mode, TAB_CONTROL);
     EXPECT_EQ(obuf->tab_width, 8);
     EXPECT_EQ(obuf->x, 0);
     EXPECT_EQ(obuf->width, 80);

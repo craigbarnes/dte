@@ -175,7 +175,7 @@ static void screen_skip_char(TermOutputBuffer *obuf, LineInfo *info)
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
             obuf->x++;
-        } else if (u == '\t' && obuf->tab != TAB_CONTROL) {
+        } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
             size_t tw = obuf->tab_width;
             obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
         } else {
@@ -367,7 +367,7 @@ void update_range(EditorState *e, const View *v, long y1, long y2)
     TermOutputBuffer *obuf = &term->obuf;
     term_output_reset(term, edit_x, edit_w, v->vx);
     obuf->tab_width = v->buffer->options.tab_width;
-    obuf->tab = e->options.display_special ? TAB_SPECIAL : TAB_NORMAL;
+    obuf->tab_mode = e->options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
     BlockIter bi = v->cursor;
     for (long i = 0, n = v->cy - y1; i < n; i++) {

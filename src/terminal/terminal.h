@@ -38,6 +38,12 @@ typedef struct {
     StringView set_title_end;
 } TermControlCodes;
 
+typedef enum {
+    TAB_NORMAL, // Render tabs as whitespace
+    TAB_SPECIAL, // Render tabs according to `set display-special true` (">---")
+    TAB_CONTROL, // Render tabs like other control characters ("^I")
+} TermTabOutputMode;
+
 typedef struct {
     char *buf;
     size_t count;
@@ -47,12 +53,8 @@ typedef struct {
     // if smaller than scroll_x printed characters are not visible
     size_t x;
 
-    size_t width;
-    enum {
-        TAB_NORMAL,
-        TAB_SPECIAL,
-        TAB_CONTROL,
-    } tab;
+    unsigned int width; // Width of the terminal area being written to
+    uint8_t tab_mode; // TermTabOutputMode
     uint8_t tab_width;
     bool can_clear;
     TermColor color;
