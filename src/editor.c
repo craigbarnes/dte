@@ -99,8 +99,6 @@ EditorState editor = {
         .height = 24,
         .parse_key_sequence = xterm_parse_key,
         .control_codes = {
-            .keypad_off = STRING_VIEW("\033[?1l\033>"),
-            .keypad_on = STRING_VIEW("\033[?1h\033="),
             .cup_mode_off = STRING_VIEW("\033[?1049l"),
             .cup_mode_on = STRING_VIEW("\033[?1049h"),
             .hide_cursor = STRING_VIEW("\033[?25l"),

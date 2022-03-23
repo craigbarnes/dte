@@ -202,7 +202,6 @@ void term_enable_private_modes(Terminal *term)
         // Try to use "modifyOtherKeys" mode
         term_add_literal(obuf, "\033[>4;1m");
     }
-    term_add_strview(obuf, term->control_codes.keypad_on);
 
     // Try to enable bracketed paste mode. This is done unconditionally,
     // since it should be ignored by terminals that don't recognize it
@@ -223,6 +222,5 @@ void term_restore_private_modes(Terminal *term)
     } else {
         term_add_literal(obuf, "\033[>4m");
     }
-    term_add_strview(obuf, term->control_codes.keypad_off);
     term_add_literal(obuf, "\033[?2004l\033[?2004r");
 }

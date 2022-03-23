@@ -26,8 +26,6 @@ typedef enum {
 } TermFeatureFlags;
 
 typedef struct {
-    StringView keypad_off;
-    StringView keypad_on;
     StringView cup_mode_off;
     StringView cup_mode_on;
     StringView show_cursor;
