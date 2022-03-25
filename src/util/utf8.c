@@ -189,10 +189,10 @@ void u_set_char_raw(char *str, size_t *idx, CodePoint u)
     case 1:
         str[i] = (u & 0xFF) | first_byte_prefix;
         *idx = i + len;
-        break;
-    default:
-        BUG("unexpected UTF-8 sequence length: %zu", len);
+        return;
     }
+
+    BUG("unexpected UTF-8 sequence length: %zu", len);
 }
 
 void u_set_char(char *str, size_t *idx, CodePoint u)
