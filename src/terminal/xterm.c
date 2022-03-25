@@ -352,8 +352,8 @@ UNITTEST {
     n = parse_csi_params(s.data, s.length, 2, &csi);
     BUG_ON(n != s.length);
     BUG_ON(csi.nparams != 3);
-    static_assert(ARRAYLEN(csi.nsub) == 4);
-    static_assert(ARRAYLEN(csi.nsub) == ARRAYLEN(csi.params[0]));
+    static_assert(ARRAYLEN(csi.nsub) >= 4);
+    static_assert(ARRAYLEN(csi.nsub) == ARRAYLEN(csi.params));
     BUG_ON(csi.nsub[0] != 1);
     BUG_ON(csi.nsub[1] != 1);
     BUG_ON(csi.nsub[2] != 3);
