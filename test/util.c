@@ -27,6 +27,7 @@
 #include "util/unicode.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
+#include "util/xmemmem.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
 #include "util/xstdio.h"
@@ -2241,6 +2242,35 @@ static void test_fork_exec(TestContext *ctx)
     EXPECT_EQ(xclose(fd[0]), 0);
 }
 
+static void test_xmemmem(TestContext *ctx)
+{
+    static const char haystack[] = "finding a needle in a haystack";
+    const char *needle = xmemmem(haystack, sizeof(haystack), STRN("needle"));
+    ASSERT_NONNULL(needle);
+    EXPECT_PTREQ(needle, haystack + 10);
+
+    needle = xmemmem(haystack, sizeof(haystack), "\0", 1);
+    ASSERT_NONNULL(needle);
+    EXPECT_PTREQ(needle, haystack + sizeof(haystack) - 1);
+
+    needle = xmemmem(haystack, sizeof(haystack) - 1, "\0", 1);
+    EXPECT_NULL(needle);
+
+    needle = xmemmem(haystack, sizeof(haystack), STRN("in "));
+    ASSERT_NONNULL(needle);
+    EXPECT_PTREQ(needle, haystack + 17);
+
+    needle = xmemmem(haystack, sizeof(haystack) - 1, STRN("haystack"));
+    ASSERT_NONNULL(needle);
+    EXPECT_PTREQ(needle, haystack + 22);
+
+    needle = xmemmem(haystack, sizeof(haystack) - 1, STRN("haystacks"));
+    EXPECT_NULL(needle);
+
+    needle = xmemmem(haystack, sizeof(haystack), STRN("haystacks"));
+    EXPECT_NULL(needle);
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2310,6 +2340,7 @@ static const TestEntry tests[] = {
     TEST(test_xfopen),
     TEST(test_fd_set_cloexec),
     TEST(test_fork_exec),
+    TEST(test_xmemmem),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
