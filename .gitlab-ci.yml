@@ -62,6 +62,10 @@ debian-10:
     extends: debian-9
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
 
+debian-11:
+    extends: debian-9
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
+
 android:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
@@ -84,7 +88,7 @@ coverage:
 
 .pages:
     stage: dist
-    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
+    image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
     coverage: '/^ *lines\.*: *(\d+\.\d+\%) .*$/'
     artifacts:
         paths: [public]
