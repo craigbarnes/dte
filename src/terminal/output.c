@@ -388,4 +388,5 @@ void term_set_color(Terminal *term, const TermColor *color)
     do_set_color(obuf, color->fg, '3');
     do_set_color(obuf, color->bg, '4');
     term_add_byte(obuf, 'm');
+    obuf->color = *color;
 }

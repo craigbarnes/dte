@@ -19,7 +19,6 @@ void set_color(EditorState *e, const TermColor *color)
         return;
     }
     term_set_color(&e->terminal, &tmp);
-    e->terminal.obuf.color = tmp;
 }
 
 void set_builtin_color(EditorState *e, BuiltinColorEnum c)
