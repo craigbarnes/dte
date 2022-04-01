@@ -1,7 +1,7 @@
 #include <string.h>
 #include "screen.h"
 #include "frame.h"
-#include "terminal/ecma48.h"
+#include "terminal/output.h"
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
 

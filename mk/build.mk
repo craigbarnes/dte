@@ -52,7 +52,7 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color ecma48 input key linux mode osc52 output rxvt terminal \
+    color input key linux mode osc52 output rxvt terminal \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \

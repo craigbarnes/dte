@@ -1,6 +1,5 @@
 #include "test.h"
 #include "terminal/color.h"
-#include "terminal/ecma48.h"
 #include "terminal/key.h"
 #include "terminal/linux.h"
 #include "terminal/osc52.h"

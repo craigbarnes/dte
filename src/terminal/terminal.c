@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <string.h>
 #include "terminal.h"
-#include "ecma48.h"
 #include "linux.h"
 #include "mode.h"
 #include "osc52.h"
