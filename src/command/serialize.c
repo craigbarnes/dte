@@ -2,7 +2,7 @@
 #include "serialize.h"
 #include "util/ascii.h"
 
-void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
+void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde)
 {
     static const char hexmap[16] = "0123456789ABCDEF";
     static const char escmap[] = {
@@ -13,21 +13,21 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
         ['"']  = '"', ['\\'] = '\\',
     };
 
-    if (sv.length == 0) {
+    if (arg.length == 0) {
         string_append_literal(s, "''");
         return;
     }
 
-    bool has_tilde_slash_prefix = strview_has_prefix(&sv, "~/");
+    bool has_tilde_slash_prefix = strview_has_prefix(&arg, "~/");
     if (has_tilde_slash_prefix && !escape_tilde) {
         // Print "~/" and skip past it, so it doesn't get quoted
         string_append_literal(s, "~/");
-        strview_remove_prefix(&sv, 2);
+        strview_remove_prefix(&arg, 2);
     }
 
     bool squote = false;
-    for (size_t i = 0, n = sv.length; i < n; i++) {
-        const unsigned char c = sv.data[i];
+    for (size_t i = 0, n = arg.length; i < n; i++) {
+        const unsigned char c = arg.data[i];
         switch (c) {
         case ' ':
         case '"':
@@ -46,20 +46,20 @@ void string_append_escaped_arg_sv(String *s, StringView sv, bool escape_tilde)
 
     if (squote) {
         string_append_byte(s, '\'');
-        string_append_strview(s, &sv);
+        string_append_strview(s, &arg);
         string_append_byte(s, '\'');
     } else {
         if (has_tilde_slash_prefix && escape_tilde) {
             string_append_byte(s, '\\');
         }
-        string_append_strview(s, &sv);
+        string_append_strview(s, &arg);
     }
     return;
 
 dquote:
     string_append_byte(s, '"');
-    for (size_t i = 0, n = sv.length; i < n; i++) {
-        unsigned char ch = sv.data[i];
+    for (size_t i = 0, n = arg.length; i < n; i++) {
+        unsigned char ch = arg.data[i];
         if (unlikely(ch < sizeof(escmap) && escmap[ch])) {
             string_append_byte(s, '\\');
             ch = escmap[ch];
