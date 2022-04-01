@@ -27,17 +27,17 @@ static pid_t editor_pid;
 void init_file_locks_context(const char *fallback_dir, pid_t pid)
 {
     BUG_ON(file_locks);
-    const char *xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    if (!xdg_runtime_dir || !path_is_absolute(xdg_runtime_dir)) {
-        xdg_runtime_dir = fallback_dir;
+    const char *dir = getenv("XDG_RUNTIME_DIR");
+    if (!dir || !path_is_absolute(dir)) {
+        dir = fallback_dir;
     } else {
         // Set sticky bit (see XDG Base Directory Specification)
         #ifdef S_ISVTX
             file_locks_mode |= S_ISVTX;
         #endif
     }
-    file_locks = path_join(xdg_runtime_dir, "dte-locks");
-    file_locks_lock = path_join(xdg_runtime_dir, "dte-locks.lock");
+    file_locks = path_join(dir, "dte-locks");
+    file_locks_lock = path_join(dir, "dte-locks.lock");
     editor_pid = pid;
 }
 
