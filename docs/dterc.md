@@ -395,6 +395,9 @@ Running `errorfmt` multiple times with the same _compiler_ name appends
 each _regexp_ to a list. When running `compile`, the entries in the
 specified list are checked for a match in the same order they were added.
 
+If only 1 argument (i.e. _compiler_) is given, all patterns previously
+added for that compiler name will be removed.
+
 For a basic example of usage, see the output of `dte -b compiler/go`.
 
 `-i`

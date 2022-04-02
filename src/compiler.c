@@ -99,6 +99,14 @@ void free_compiler(Compiler *c)
     free(c);
 }
 
+void remove_compiler(HashMap *compilers, const char *name)
+{
+    Compiler *c = hashmap_remove(compilers, name);
+    if (c) {
+        free_compiler(c);
+    }
+}
+
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 {
     for (size_t i = 0; i < ARRAYLEN(capture_names); i++) {

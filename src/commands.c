@@ -535,9 +535,16 @@ static void cmd_erase_word(const CommandArgs *a)
 
 static void cmd_errorfmt(const CommandArgs *a)
 {
+    BUG_ON(a->nr_args == 0);
     EditorState *e = a->userdata;
+    const char *name = a->args[0];
+    if (a->nr_args == 1) {
+        remove_compiler(&e->compilers, name);
+        return;
+    }
+
     bool ignore = has_flag(a, 'i');
-    add_error_fmt(&e->compilers, a->args[0], ignore, a->args[1], a->args + 2);
+    add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
 }
 
 static void open_files_from_string(EditorState *e, const String *str)
@@ -2412,7 +2419,7 @@ static const Command cmds[] = {
     {"erase", "", false, 0, 0, cmd_erase},
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
     {"erase-word", "s", false, 0, 0, cmd_erase_word},
-    {"errorfmt", "i", true, 2, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
+    {"errorfmt", "i", true, 1, 2 + ERRORFMT_CAPTURE_MAX, cmd_errorfmt},
     {"exec", "-e=i=o=lmnpst", false, 1, -1, cmd_exec},
     {"ft", "-bcfi", true, 2, -1, cmd_ft},
     {"hi", "-c", true, 0, -1, cmd_hi},

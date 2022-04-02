@@ -813,6 +813,9 @@ Running \fBerrorfmt\fR multiple times with the same \fIcompiler\fR name appends
 each \fIregexp\fR to a list. When running \fBcompile\fR, the entries in the
 specified list are checked for a match in the same order they were added.
 .P
+If only 1 argument (i.e. \fIcompiler\fR) is given, all patterns previously
+added for that compiler name will be removed.
+.P
 For a basic example of usage, see the output of \fBdte \-b compiler/go\fR.
 .P
 .TP
