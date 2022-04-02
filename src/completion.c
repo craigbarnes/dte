@@ -56,7 +56,7 @@ static void do_collect_files (
 
     const int dir_fd = dirfd(dir);
     if (unlikely(dir_fd < 0)) {
-        DEBUG_LOG("dirfd() failed: %s", strerror(errno));
+        LOG_ERROR("dirfd() failed: %s", strerror(errno));
         closedir(dir);
         return;
     }

@@ -242,7 +242,7 @@ static void cmd_default(const CommandArgs *a)
         const char *name = a->args[i];
         void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
-            DEBUG_LOG (
+            LOG_WARNING (
                 "duplicate 'default' argument in %s:%d: '%s'",
                 current_config.file,
                 current_config.line,

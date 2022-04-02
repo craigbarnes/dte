@@ -68,7 +68,7 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
         if (DEBUG >= 2) {
             char msg[1024];
             regerror(err, &re, msg, sizeof(msg));
-            DEBUG_LOG("regcomp: %s", msg);
+            LOG_ERROR("regcomp: %s", msg);
         }
         return false;
     }

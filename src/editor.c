@@ -28,6 +28,7 @@
 #include "util/exitcode.h"
 #include "util/hashmap.h"
 #include "util/intern.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -148,12 +149,12 @@ static void set_and_check_locale(void)
     const char *default_locale = setlocale(LC_CTYPE, "");
     if (likely(default_locale)) {
         const char *codeset = nl_langinfo(CODESET);
-        DEBUG_LOG("locale: %s (codeset: %s)", default_locale, codeset);
+        LOG_INFO("locale: %s (codeset: %s)", default_locale, codeset);
         if (likely(lookup_encoding(codeset) == UTF8)) {
             return;
         }
     } else {
-        DEBUG_LOG("failed to set default locale");
+        LOG_ERROR("failed to set default locale");
     }
 
     static const char fallbacks[][12] = {"C.UTF-8", "en_US.UTF-8"};
@@ -162,20 +163,25 @@ static void set_and_check_locale(void)
         fallback = setlocale(LC_CTYPE, fallbacks[i]);
     }
     if (fallback) {
-        DEBUG_LOG("using fallback locale for LC_CTYPE: %s", fallback);
+        LOG_INFO("using fallback locale for LC_CTYPE: %s", fallback);
         return;
     }
 
-    DEBUG_LOG("no UTF-8 fallback locales found");
+    LOG_ERROR("no UTF-8 fallback locales found");
     fputs("setlocale() failed\n", stderr);
     exit(EX_CONFIG);
 }
 
 void init_editor_state(void)
 {
+    const char *log_filename = getenv("DTE_LOG");
+    if (log_filename && log_filename[0] != '\0') {
+        LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
+        log_init(log_filename, log_level);
+    }
+
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
-
     editor.home_dir = strview_intern(home ? home : "");
     if (dte_home) {
         editor.user_config_dir = xstrdup(dte_home);
@@ -183,13 +189,11 @@ void init_editor_state(void)
         editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
     }
 
-    log_init("DTE_LOG");
-    DEBUG_LOG("version: %s", version);
-
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
-    DEBUG_LOG("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
     editor.session_leader = leader;
+    LOG_INFO("version: %s", version);
+    LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
     set_and_check_locale();
     init_file_locks_context(editor.user_config_dir, pid);
@@ -616,7 +620,7 @@ void main_loop(EditorState *e)
 {
     while (e->status == EDITOR_RUNNING) {
         if (e->resized) {
-            DEBUG_LOG("SIGWINCH received");
+            LOG_INFO("SIGWINCH received");
             ui_resize(e);
         }
 

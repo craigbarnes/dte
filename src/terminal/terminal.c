@@ -161,12 +161,12 @@ void term_init(Terminal *term, const char *name)
             term->parse_key_sequence = linux_parse_key;
         }
         const int n = (int)root_name.length;
-        DEBUG_LOG("using built-in terminal support for '%.*s'", n, root_name.data);
+        LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);
     }
 
     if (xstreq(getenv("COLORTERM"), "truecolor")) {
         term->color_type = TERM_TRUE_COLOR;
-        DEBUG_LOG("true color support detected ($COLORTERM)");
+        LOG_INFO("true color support detected ($COLORTERM)");
     }
     if (term->color_type == TERM_TRUE_COLOR) {
         return;
@@ -179,7 +179,7 @@ void term_init(Terminal *term, const char *name)
             size_t len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, len)) {
                 term->color_type = color_suffixes[i].color_type;
-                DEBUG_LOG("color type detected from $TERM suffix '-%s'", suffix);
+                LOG_INFO("color type detected from $TERM suffix '-%s'", suffix);
                 return;
             }
         }

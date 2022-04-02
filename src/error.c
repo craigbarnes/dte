@@ -35,7 +35,7 @@ void error_msg(const char *format, ...)
 
     if (unlikely(pos < 0)) {
         // Note: POSIX snprintf(3) *does* set errno on failure (unlike ISO C)
-        DEBUG_LOG("snprintf() failed: %s", strerror(errno));
+        LOG_ERROR("snprintf() failed: %s", strerror(errno));
         pos = 0;
     }
 
@@ -45,7 +45,7 @@ void error_msg(const char *format, ...)
         vsnprintf(error_buf + pos, size - pos, format, ap);
         va_end(ap);
     } else {
-        DEBUG_LOG("no buffer space left for error message");
+        LOG_ERROR("no buffer space left for error message");
     }
 
     msg_is_error = true;
@@ -56,7 +56,7 @@ void error_msg(const char *format, ...)
         fputc('\n', stderr);
     }
 
-    DEBUG_LOG("%s", error_buf);
+    LOG_ERROR("%s", error_buf);
 }
 
 void perror_msg(const char *prefix)

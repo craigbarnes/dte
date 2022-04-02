@@ -568,9 +568,9 @@ complete:
     char prefix = data[0];
     if (prefix == 'L' || prefix == 'l') {
         const char *type = (prefix == 'l') ? "title" : "icon";
-        DEBUG_LOG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
+        LOG_DEBUG("window %s%s: %.*s", type, note, (int)pos - 1, data + 1);
     } else {
-        DEBUG_LOG("unknown OSC string%s: %.*s", note, (int)pos, data);
+        LOG_WARNING("unknown OSC string%s: %.*s", note, (int)pos, data);
     }
 
 ignore:

@@ -61,7 +61,7 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
     vsnprintf(str, sizeof str, fmt, ap);
     va_end(ap);
 
-    debug_log(file, line, "BUG in %s(): '%s'", func, str);
+    log_msg(LOG_LEVEL_ERROR, file, line, "BUG in %s(): '%s'", func, str);
     cleanup();
 
     fprintf(stderr, "\n%s:%d: **BUG** in %s(): '%s'\n", file, line, func, str);
@@ -74,7 +74,7 @@ void bug(const char *file, int line, const char *func, const char *fmt, ...)
 // Error handler for unrecoverable system errors during runtime
 noreturn void fatal_error(const char *msg, int err)
 {
-    DEBUG_LOG("%s: %s", msg, strerror(err));
+    LOG_ERROR("%s: %s", msg, strerror(err));
     cleanup();
     errno = err;
     perror(msg);

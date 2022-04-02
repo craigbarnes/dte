@@ -1483,7 +1483,7 @@ static void repeat_insert(EditorState *e, const char *str, unsigned int count, b
         memcpy(buf + (tmps_per_buf * tmp_len), tmp, remainder);
     }
 
-    DEBUG_LOG (
+    LOG_DEBUG (
         "Optimized %u inserts of %zu bytes into %zu inserts of %zu bytes",
         count, str_len,
         tmps_per_buf, tmp_len

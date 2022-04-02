@@ -69,7 +69,7 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
 {
 #ifdef HAVE_TIOCNOTTY
     if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) != 0) {
-        DEBUG_LOG("TIOCNOTTY ioctl failed: %s", strerror(errno));
+        LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
     }
 #endif
 
@@ -218,6 +218,6 @@ int wait_child(pid_t pid)
         return WTERMSIG(status) << 8;
     }
 
-    DEBUG_LOG("unhandled waitpid() status: %d", status);
+    LOG_ERROR("unhandled waitpid() status: %d", status);
     return -EINVAL;
 }

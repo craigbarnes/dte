@@ -88,7 +88,7 @@ void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
         bool match = !regexec(&re, text, ARRAYLEN(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
-            DEBUG_LOG("regexp word boundary tokens detected: %s %s", start, end);
+            LOG_INFO("regexp word boundary tokens detected: %s %s", start, end);
             *rwbt = pairs[i];
             break;
         }

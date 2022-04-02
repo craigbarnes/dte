@@ -47,7 +47,7 @@ void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
         term_output_flush(obuf);
         if (unlikely(count >= TERM_OUTBUF_SIZE)) {
             (void)!xwrite_all(STDOUT_FILENO, str, count);
-            DEBUG_LOG("writing %zu bytes directly to terminal", count);
+            LOG_INFO("writing %zu bytes directly to terminal", count);
             return;
         }
     }

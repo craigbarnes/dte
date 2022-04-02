@@ -67,7 +67,7 @@ static void cleanup_handler(void *userdata)
 
 static noreturn COLD void handle_fatal_signal(int signum)
 {
-    DEBUG_LOG("Received signal %d (%s)", signum, strsignal(signum));
+    LOG_ERROR("Received signal %d (%s)", signum, strsignal(signum));
 
     if (signum != SIGHUP) {
         term_cleanup(&editor);
@@ -430,7 +430,7 @@ loop_break:
         } else {
             rc = editor_file("rc");
         }
-        DEBUG_LOG("loading configuration from %s", rc);
+        LOG_INFO("loading configuration from %s", rc);
         read_config(&normal_commands, rc, flags);
     }
 

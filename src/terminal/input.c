@@ -306,18 +306,18 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     if (unlikely(remainder)) {
         // Copy anything still in the buffer beyond the end delimiter
         // into the normal input buffer
-        DEBUG_LOG("remainder after bracketed paste: %zu", remainder);
+        LOG_INFO("remainder after bracketed paste: %zu", remainder);
         BUG_ON(remainder > TERM_INBUF_SIZE);
         memcpy(input->buf, start + final_chunk_len, remainder);
         input->len = remainder;
     }
 
-    DEBUG_LOG("received bracketed paste of %zu bytes", str.len);
+    LOG_INFO("received bracketed paste of %zu bytes", str.len);
     strn_replace_byte(str.buffer, str.len, '\r', '\n');
     return str;
 
 read_error:
-    DEBUG_LOG("read error: %s", strerror(errno));
+    LOG_ERROR("read error: %s", strerror(errno));
     string_free(&str);
     BUG_ON(str.buffer);
     return str;
@@ -335,5 +335,5 @@ void term_discard_paste(TermInputBuffer *input, bool bracketed)
 {
     String str = term_read_paste(input, bracketed);
     string_free(&str);
-    DEBUG_LOG("%spaste discarded", bracketed ? "bracketed " : "");
+    LOG_INFO("%spaste discarded", bracketed ? "bracketed " : "");
 }

@@ -75,7 +75,7 @@ static void test_bitset(TestContext *ctx)
 static void test_hl_line(TestContext *ctx)
 {
     if (!get_builtin_config("syntax/c")) {
-        DEBUG_LOG("syntax/c not available; skipping %s()", __func__);
+        LOG_INFO("syntax/c not available; skipping %s()", __func__);
         return;
     }
 
