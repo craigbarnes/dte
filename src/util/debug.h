@@ -1,6 +1,7 @@
 #ifndef UTIL_DEBUG_H
 #define UTIL_DEBUG_H
 
+#include "log.h"
 #include "macros.h"
 
 #define BUG_ON(a) do { \
@@ -16,15 +17,6 @@
     noreturn void bug(const char *file, int line, const char *func, const char *fmt, ...) COLD PRINTF(4);
 #else
     #define BUG(...) UNREACHABLE()
-#endif
-
-#if DEBUG >= 2
-    #define DEBUG_LOG(...) debug_log(__FILE__, __LINE__, __VA_ARGS__)
-    void debug_log(const char *file, int line, const char *fmt, ...) PRINTF(3);
-    void log_init(const char *varname);
-#else
-    static inline PRINTF(1) void DEBUG_LOG(const char* UNUSED_ARG(fmt), ...) {}
-    static inline void log_init(const char* UNUSED_ARG(varname)) {}
 #endif
 
 typedef void (*CleanupHandler)(void *userdata);
