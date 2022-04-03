@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,9 +20,23 @@ void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata)
 
 static void cleanup(void)
 {
+    // Blocking signals here prevents the following call chain from leaving
+    // the above globals in an undefined state for signal handlers:
+    //
+    //  cleanup() -> cleanup_handler() -> set_fatal_error_cleanup_handler()
+    //
+    // Without this, one of the other functions below might call cleanup()
+    // and then get interupted in the middle of a sequence of instructions
+    // that aren't async-signal-safe (see: signal-safety(7)).
+    sigset_t mask, oldmask;
+    sigfillset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, &oldmask);
+
     if (cleanup_handler) {
         cleanup_handler(cleanup_userdata);
     }
+
+    sigprocmask(SIG_SETMASK, &oldmask, NULL);
 }
 
 #ifdef ASAN_ENABLED
