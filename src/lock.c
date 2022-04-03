@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include "lock.h"
 #include "error.h"
+#include "util/debug.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
@@ -28,7 +30,11 @@ void init_file_locks_context(const char *fallback_dir, pid_t pid)
 {
     BUG_ON(file_locks);
     const char *dir = getenv("XDG_RUNTIME_DIR");
-    if (!dir || !path_is_absolute(dir)) {
+    if (!dir) {
+        LOG_INFO("$XDG_RUNTIME_DIR not set");
+        dir = fallback_dir;
+    } else if (unlikely(!path_is_absolute(dir))) {
+        LOG_WARNING("$XDG_RUNTIME_DIR invalid (not an absolute path)");
         dir = fallback_dir;
     } else {
         // Set sticky bit (see XDG Base Directory Specification)
@@ -36,9 +42,11 @@ void init_file_locks_context(const char *fallback_dir, pid_t pid)
             file_locks_mode |= S_ISVTX;
         #endif
     }
+
     file_locks = path_join(dir, "dte-locks");
     file_locks_lock = path_join(dir, "dte-locks.lock");
     editor_pid = pid;
+    LOG_INFO("locks file: %s", file_locks);
 }
 
 static bool process_exists(pid_t pid)
