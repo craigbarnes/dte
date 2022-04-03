@@ -11,6 +11,8 @@ enum {
     EX_CONFIG = 78, // Configuration error
 };
 
+// This exists purely for "self-documentation" purposes. Functions
+// returning this type should only return one of the above values.
 typedef int ExitCode;
 
 #endif
