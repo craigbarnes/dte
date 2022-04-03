@@ -3,10 +3,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "tag.h"
+#include "error.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+#include "util/xsnprintf.h"
 
 static TagFile *current_tag_file;
 static const char *current_filename; // For sorting tags
@@ -136,7 +138,7 @@ void tag_file_free(void)
     current_tag_file = NULL;
 }
 
-TagFile *load_tag_file(void)
+static TagFile *load_tag_file(void)
 {
     char path[4096];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
@@ -190,7 +192,7 @@ static void free_tags_cb(Tag *t)
     free(t);
 }
 
-void free_tags(PointerArray *tags)
+static void free_tags(PointerArray *tags)
 {
     ptr_array_free_cb(tags, FREE_FUNC(free_tags_cb));
 }
@@ -211,7 +213,7 @@ static const char *path_slice_relative(const char *filename, const StringView di
     return NULL;
 }
 
-void tag_file_find_tags (
+static void tag_file_find_tags (
     const TagFile *tf,
     const char *filename,
     const char *name,
@@ -235,14 +237,55 @@ void tag_file_find_tags (
     current_filename = NULL;
 }
 
-char *tag_file_get_tag_filename(const TagFile *tf, const Tag *tag)
+static char *tag_file_get_tag_filename(const TagFile *tf, const Tag *tag)
 {
     StringView tf_dir = path_slice_dirname(tf->filename);
     return path_join_sv(&tf_dir, &tag->filename);
 }
 
-void collect_tags(PointerArray *a, const TagFile *tf, const char *prefix)
+void tag_lookup(const char *name, const char *filename, MessageArray *messages)
 {
+    clear_messages(messages);
+    TagFile *tf = load_tag_file();
+    if (!tf) {
+        error_msg("No tags file");
+        return;
+    }
+
+    PointerArray tags = PTR_ARRAY_INIT;
+    // Filename helps to find correct tags
+    tag_file_find_tags(tf, filename, name, &tags);
+    if (tags.count == 0) {
+        error_msg("Tag '%s' not found", name);
+        return;
+    }
+
+    for (size_t i = 0, n = tags.count; i < n; i++) {
+        Tag *t = tags.ptrs[i];
+        char buf[512];
+        size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
+        Message *m = new_message(buf, len);
+        m->loc = xnew0(FileLocation, 1);
+        m->loc->filename = tag_file_get_tag_filename(tf, t);
+        if (t->pattern) {
+            m->loc->pattern = t->pattern;
+            t->pattern = NULL;
+        } else {
+            m->loc->line = t->lineno;
+        }
+        add_message(messages, m);
+    }
+
+    free_tags(&tags);
+}
+
+void collect_tags(PointerArray *a, const char *prefix)
+{
+    TagFile *tf = load_tag_file();
+    if (!tf) {
+        return;
+    }
+
     Tag t;
     size_t pos = 0;
     StringView prev = STRING_VIEW_INIT;

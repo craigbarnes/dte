@@ -571,7 +571,7 @@ static void parse_and_activate_message(EditorState *e, const String *str)
     }
 }
 
-static void parse_and_goto_tag(const String *str)
+static void parse_and_goto_tag(EditorState *e, const String *str)
 {
     if (unlikely(str->len == 0)) {
         error_msg("child produced no output");
@@ -579,17 +579,9 @@ static void parse_and_goto_tag(const String *str)
     }
 
     size_t pos = 0;
-    StringView tag = buf_slice_next_line(str->buffer, &pos, str->len);
-
-    String s = string_new(tag.length + 16);
-    string_append_literal(&s, "tag ");
-    if (unlikely(tag.length > 0 && tag.data[0] == '-')) {
-        string_append_literal(&s, "-- ");
-    }
-
-    string_append_escaped_arg_sv(&s, tag, true);
-    handle_command(&normal_commands, string_borrow_cstring(&s), true);
-    string_free(&s);
+    const char *tag = buf_next_line(str->buffer, &pos, str->len);
+    tag_lookup(tag, e->buffer->abs_filename, &e->messages);
+    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
 }
 
 static const char **lines_and_columns_env(const Window *window)
@@ -777,7 +769,7 @@ static void cmd_exec(const CommandArgs *a)
         open_files_from_string(e, output);
         break;
     case EXEC_TAG:
-        parse_and_goto_tag(output);
+        parse_and_goto_tag(e, output);
         break;
     case EXEC_EVAL:
         exec_config(&normal_commands, strview_from_string(output));
@@ -2066,13 +2058,6 @@ static void cmd_tag(const CommandArgs *a)
         return;
     }
 
-    clear_messages(&e->messages);
-    TagFile *tf = load_tag_file();
-    if (!tf) {
-        error_msg("No tags file");
-        return;
-    }
-
     const char *name = a->args[0];
     char *word = NULL;
     if (!name) {
@@ -2084,34 +2069,9 @@ static void cmd_tag(const CommandArgs *a)
         name = word;
     }
 
-    PointerArray tags = PTR_ARRAY_INIT;
-    // Filename helps to find correct tags
-    tag_file_find_tags(tf, e->buffer->abs_filename, name, &tags);
-    if (tags.count == 0) {
-        error_msg("Tag '%s' not found", name);
-        free(word);
-        return;
-    }
-
-    for (size_t i = 0, n = tags.count; i < n; i++) {
-        Tag *t = tags.ptrs[i];
-        char buf[512];
-        size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
-        Message *m = new_message(buf, len);
-        m->loc = xnew0(FileLocation, 1);
-        m->loc->filename = tag_file_get_tag_filename(tf, t);
-        if (t->pattern) {
-            m->loc->pattern = t->pattern;
-            t->pattern = NULL;
-        } else {
-            m->loc->line = t->lineno;
-        }
-        add_message(&e->messages, m);
-    }
-
-    free(word);
-    free_tags(&tags);
+    tag_lookup(name, e->buffer->abs_filename, &e->messages);
     activate_current_message_save(&e->messages, &e->bookmarks, e->view);
+    free(word);
 }
 
 static void cmd_title(const CommandArgs *a)

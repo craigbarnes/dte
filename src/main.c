@@ -19,6 +19,7 @@
 #include "search.h"
 #include "syntax/state.h"
 #include "syntax/syntax.h"
+#include "tag.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
@@ -508,14 +509,8 @@ loop_break:
     }
 
     if (tag) {
-        String s = string_new(8 + strlen(tag));
-        string_append_literal(&s, "tag ");
-        if (unlikely(tag[0] == '-')) {
-            string_append_literal(&s, "-- ");
-        }
-        string_append_escaped_arg(&s, tag, true);
-        handle_command(&normal_commands, string_borrow_cstring(&s), false);
-        string_free(&s);
+        tag_lookup(tag, editor.buffer->abs_filename, &editor.messages);
+        activate_current_message(&editor.messages);
     }
 
     if (
