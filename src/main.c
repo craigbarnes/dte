@@ -168,7 +168,9 @@ static void set_signal_handlers(void)
 
     // Set signal mask explicitly, to avoid any possibility of
     // inheriting blocked signals
-    sigprocmask(SIG_SETMASK, &action.sa_mask, NULL);
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
 }
 
 static ExitCode list_builtin_configs(void)
