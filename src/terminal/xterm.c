@@ -216,6 +216,28 @@ static ByteType get_byte_type(unsigned char byte)
     return rows[(byte >> 4) & 0xF];
 }
 
+#if DEBUG >= 2
+
+#define UNHANDLED(var, ...) unhandled(var, __FILE__, __LINE__, __VA_ARGS__)
+static PRINTF(4) void unhandled(bool *var, const char *file, int line, const char *fmt, ...)
+{
+    if (*var) {
+        return; // Only log the first error in a sequence
+    }
+    va_list ap;
+    va_start(ap, fmt);
+    log_msgv(LOG_LEVEL_DEBUG, file, line, fmt, ap);
+    va_end(ap);
+    *var = true;
+}
+
+#else
+
+#define UNHANDLED(var, ...) unhandled(var)
+static void unhandled(bool *var) {*var = true;}
+
+#endif
+
 typedef struct {
     uint32_t params[4][4];
     uint8_t nsub[4]; // lengths for params arrays (sub-params)
@@ -235,7 +257,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
     size_t digits = 0;
     uint32_t num = 0;
     bool have_subparams = false;
-    bool unhandled_bytes = false;
+    bool err = false;
 
     while (i < len) {
         const char ch = buf[i++];
@@ -244,13 +266,13 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
         case '5': case '6': case '7': case '8': case '9':
             num = (num * 10) + (ch - '0');
             if (unlikely(num > UNICODE_MAX_VALID_CODEPOINT)) {
-                unhandled_bytes = true;
+                UNHANDLED(&err, "CSI param overflow");
             }
             digits++;
             continue;
         case ';':
             if (unlikely(nparams >= ARRAYLEN(csi->params))) {
-                unhandled_bytes = true;
+                UNHANDLED(&err, "Too many params in CSI sequence");
                 continue;
             }
             csi->nsub[nparams] = sub + 1;
@@ -261,7 +283,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
             continue;
         case ':':
             if (unlikely(sub >= ARRAYLEN(csi->params[0]))) {
-                unhandled_bytes = true;
+                UNHANDLED(&err, "Too many sub-params in CSI sequence");
                 continue;
             }
             csi->params[nparams][sub++] = num;
@@ -274,7 +296,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
         switch (get_byte_type(ch)) {
         case BYTE_INTERMEDIATE:
             if (unlikely(nr_intermediate >= ARRAYLEN(csi->intermediate))) {
-                unhandled_bytes = true;
+                UNHANDLED(&err, "Too many intermediate bytes in CSI sequence");
             } else {
                 csi->intermediate[nr_intermediate++] = ch;
             }
@@ -287,7 +309,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
                     nparams >= ARRAYLEN(csi->params)
                     || sub >= ARRAYLEN(csi->params[0])
                 )) {
-                    unhandled_bytes = true;
+                    UNHANDLED(&err, "Too many params/sub-params in CSI sequence");
                 } else {
                     csi->nsub[nparams] = sub + 1;
                     csi->params[nparams++][sub] = num;
@@ -299,7 +321,7 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
             // reserved for future standardization except when used
             // as the first bit combination of the parameter string."
             // (03/12 to 03/15 == '<' to '?')
-            unhandled_bytes = true;
+            UNHANDLED(&err, "Unhandled CSI param byte: '%c'", ch);
             continue;
         case BYTE_CONTROL:
             switch (ch) {
@@ -309,27 +331,27 @@ static size_t parse_csi_params(const char *buf, size_t len, size_t i, ControlPar
                 // Fallthrough
             case 0x18: // CAN
             case 0x1A: // SUB
+                UNHANDLED(&err, "CSI sequence cancelled by 0x%02hhx", ch);
                 csi->final_byte = ch;
-                unhandled_bytes = true;
                 goto exit_loop;
             }
             // Fallthrough
         case BYTE_DELETE:
             continue;
         case BYTE_OTHER:
-            unhandled_bytes = true;
+            UNHANDLED(&err, "Unhandled byte in CSI sequence: 0x%02hhx", ch);
             continue;
         }
 
         BUG("unhandled byte type");
-        unhandled_bytes = true;
+        err = true;
     }
 
 exit_loop:
     csi->nparams = nparams;
     csi->nr_intermediate = nr_intermediate;
     csi->have_subparams = have_subparams;
-    csi->unhandled_bytes = unhandled_bytes;
+    csi->unhandled_bytes = err;
     return i;
 }
 
