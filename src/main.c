@@ -272,6 +272,53 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
     }
 }
 
+static void init_std_fds(Buffer **inbuf, Buffer **outbuf, int *old_stdout_fd)
+{
+    if (!isatty(STDIN_FILENO)) {
+        Encoding enc = encoding_from_type(UTF8);
+        Buffer *b = buffer_new(&enc);
+        if (read_blocks(b, STDIN_FILENO)) {
+            set_display_filename(b, xmemdup_literal("(stdin)"));
+            b->temporary = true;
+            *inbuf = b;
+        } else {
+            if (errno != EBADF) {
+                error_msg("Unable to read redirected stdin");
+            }
+            remove_and_free_buffer(&editor.buffers, b);
+        }
+        freopen_tty(stdin, "r", STDIN_FILENO);
+    }
+
+    if (!isatty(STDOUT_FILENO)) {
+        *old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
+        if (*old_stdout_fd == -1 && errno != EBADF) {
+            perror("fcntl");
+            exit(EX_OSERR);
+        }
+        freopen_tty(stdout, "w", STDOUT_FILENO);
+        if (*old_stdout_fd == -1) {
+            // The call to fcntl(3) above failed with EBADF, meaning stdout was
+            // most likely closed and there's no point opening a buffer for it
+        } else if (*inbuf) {
+            Buffer *b = *inbuf;
+            set_display_filename(b, xmemdup_literal("(stdin|stdout)"));
+            b->stdout_buffer = true;
+            *outbuf = b;
+        } else {
+            Buffer *b = open_empty_buffer();
+            set_display_filename(b, xmemdup_literal("(stdout)"));
+            b->stdout_buffer = true;
+            b->temporary = true;
+            *outbuf = b;
+        }
+    }
+
+    if (!isatty(STDERR_FILENO)) {
+        freopen_tty(stderr, "w", STDERR_FILENO);
+    }
+}
+
 static const char copyright[] =
     "(C) 2013-2022 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
@@ -351,49 +398,9 @@ loop_break:
     init_editor_state();
 
     Buffer *stdin_buffer = NULL;
-    if (!isatty(STDIN_FILENO)) {
-        Encoding enc = encoding_from_type(UTF8);
-        Buffer *b = buffer_new(&enc);
-        if (read_blocks(b, STDIN_FILENO)) {
-            set_display_filename(b, xmemdup_literal("(stdin)"));
-            stdin_buffer = b;
-            stdin_buffer->temporary = true;
-        } else {
-            if (errno != EBADF) {
-                error_msg("Unable to read redirected stdin");
-            }
-            remove_and_free_buffer(&editor.buffers, b);
-        }
-        freopen_tty(stdin, "r", STDIN_FILENO);
-    }
-
     Buffer *stdout_buffer = NULL;
     int old_stdout_fd = -1;
-    if (!isatty(STDOUT_FILENO)) {
-        old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
-        if (old_stdout_fd == -1 && errno != EBADF) {
-            perror("fcntl");
-            return EX_OSERR;
-        }
-        freopen_tty(stdout, "w", STDOUT_FILENO);
-        if (old_stdout_fd == -1) {
-            // The call to fcntl(3) above failed with EBADF, meaning stdout was
-            // most likely closed and there's no point opening a buffer for it
-        } else if (stdin_buffer) {
-            stdout_buffer = stdin_buffer;
-            stdout_buffer->stdout_buffer = true;
-            set_display_filename(stdout_buffer, xmemdup_literal("(stdin|stdout)"));
-        } else {
-            stdout_buffer = open_empty_buffer();
-            set_display_filename(stdout_buffer, xmemdup_literal("(stdout)"));
-            stdout_buffer->stdout_buffer = true;
-            stdout_buffer->temporary = true;
-        }
-    }
-
-    if (!isatty(STDERR_FILENO)) {
-        freopen_tty(stderr, "w", STDERR_FILENO);
-    }
+    init_std_fds(&stdin_buffer, &stdout_buffer, &old_stdout_fd);
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
