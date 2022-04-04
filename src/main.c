@@ -274,6 +274,10 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
 
 static int init_std_fds(Buffer **inbuf, Buffer **outbuf)
 {
+    int old_stdout_fd = -1;
+    *inbuf = NULL;
+    *outbuf = NULL;
+
     if (!isatty(STDIN_FILENO)) {
         Encoding enc = encoding_from_type(UTF8);
         Buffer *b = buffer_new(&enc);
@@ -290,7 +294,6 @@ static int init_std_fds(Buffer **inbuf, Buffer **outbuf)
         freopen_tty(stdin, "r", STDIN_FILENO);
     }
 
-    int old_stdout_fd = -1;
     if (!isatty(STDOUT_FILENO)) {
         old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
         if (old_stdout_fd == -1 && errno != EBADF) {
@@ -301,14 +304,14 @@ static int init_std_fds(Buffer **inbuf, Buffer **outbuf)
         if (old_stdout_fd == -1) {
             // The call to fcntl(3) above failed with EBADF, meaning stdout was
             // most likely closed and there's no point opening a buffer for it
-        } else if (*inbuf) {
-            Buffer *b = *inbuf;
-            set_display_filename(b, xmemdup_literal("(stdin|stdout)"));
-            b->stdout_buffer = true;
-            *outbuf = b;
         } else {
-            Buffer *b = open_empty_buffer();
-            set_display_filename(b, xmemdup_literal("(stdout)"));
+            Buffer *b = *inbuf;
+            const char *name = "(stdin|stdout)";
+            if (!b) {
+                b = open_empty_buffer();
+                name = "(stdout)";
+            }
+            set_display_filename(b, xstrdup(name));
             b->stdout_buffer = true;
             b->temporary = true;
             *outbuf = b;
@@ -400,8 +403,7 @@ loop_break:
 
     init_editor_state();
 
-    Buffer *stdin_buffer = NULL;
-    Buffer *stdout_buffer = NULL;
+    Buffer *stdin_buffer, *stdout_buffer;
     int old_stdout_fd = init_std_fds(&stdin_buffer, &stdout_buffer);
 
     const char *term_name = getenv("TERM");
