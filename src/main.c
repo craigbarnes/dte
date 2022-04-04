@@ -68,7 +68,7 @@ static void cleanup_handler(void *userdata)
 
 static noreturn COLD void handle_fatal_signal(int signum)
 {
-    LOG_ERROR("Received signal %d (%s)", signum, strsignal(signum));
+    LOG_ERROR("received signal %d (%s)", signum, strsignal(signum));
 
     if (signum != SIGHUP) {
         term_cleanup(&editor);
