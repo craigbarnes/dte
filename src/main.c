@@ -509,7 +509,7 @@ loop_break:
     }
 
     if (tag) {
-        tag_lookup(tag, editor.buffer->abs_filename, &editor.messages);
+        tag_lookup(tag, NULL, &editor.messages);
         activate_current_message(&editor.messages);
     }
 
