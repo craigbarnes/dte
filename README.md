@@ -115,7 +115,7 @@ Public License version 2 for more details.
 [kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [General Public License version 2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-[Debian]: https://packages.debian.org/bullseye/editors/dte
+[Debian]: https://packages.debian.org/source/dte
 [Ubuntu]: https://launchpad.net/ubuntu/+source/dte
 [AUR]: https://aur.archlinux.org/packages/dte/
 [Void Linux]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/dte
