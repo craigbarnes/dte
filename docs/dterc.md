@@ -1318,6 +1318,9 @@ Format string for the left aligned part of status line.
 `%E`
 :   File encoding.
 
+`%b`
+:   Prints `BOM` if file has a byte order mark.
+
 `%M`
 :   Miscellaneous status information.
 
