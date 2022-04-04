@@ -212,7 +212,7 @@ void init_editor_state(void)
     intmap_init(&editor.bindings[INPUT_SEARCH].map, 40);
 }
 
-void free_editor_state(EditorState *e)
+int free_editor_state(EditorState *e)
 {
     free(e->clipboard.buf);
     free_file_options(&e->file_options);
@@ -246,8 +246,9 @@ void free_editor_state(EditorState *e)
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)editor.user_config_dir);
 
-    // Zero pointers, to help LSan find leaks
-    *e = (EditorState){.window = NULL};
+    int exit_code = e->exit_code;
+    *e = (EditorState){.window = NULL}; // Zero pointers, to help LSan find leaks
+    return exit_code;
 }
 
 static void sanity_check(const View *v)

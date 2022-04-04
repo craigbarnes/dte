@@ -551,8 +551,7 @@ loop_break:
         file_history_save(&editor.file_history);
     }
 
-    int exit_code = editor.exit_code;
-    free_editor_state(&editor);
+    int exit_code = free_editor_state(&editor);
 
     if (stdout_buffer) {
         Block *blk;
