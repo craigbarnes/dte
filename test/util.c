@@ -105,6 +105,35 @@ static void test_IS_POWER_OF_2(TestContext *ctx)
     }
 }
 
+static void test_xmalloc(TestContext *ctx)
+{
+    char *str = xmalloc(8);
+    ASSERT_NONNULL(str);
+    memcpy(str, "1234567", 8);
+    EXPECT_STREQ(str, "1234567");
+    free(str);
+
+    str = xstrdup("foobar");
+    EXPECT_STREQ(str, "foobar");
+    free(str);
+
+    str = xasprintf("%s %d", "xyz", 12340);
+    EXPECT_STREQ(str, "xyz 12340");
+    free(str);
+
+    str = xcalloc(4);
+    EXPECT_MEMEQ(str, "\0\0\0\0", 4);
+    free(str);
+
+    str = xmemdup_literal("string literal");
+    EXPECT_STREQ(str, "string literal");
+    free(str);
+
+    str = xstrslice("one two three", 4, 7);
+    EXPECT_STREQ(str, "two");
+    free(str);
+}
+
 static void test_xstreq(TestContext *ctx)
 {
     EXPECT_TRUE(xstreq("foo", "foo"));
@@ -2274,6 +2303,7 @@ static void test_xmemmem(TestContext *ctx)
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
+    TEST(test_xmalloc),
     TEST(test_xstreq),
     TEST(test_str_has_prefix),
     TEST(test_str_has_suffix),
