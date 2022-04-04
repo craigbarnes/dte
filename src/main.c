@@ -272,7 +272,7 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
     }
 }
 
-static void init_std_fds(Buffer **inbuf, Buffer **outbuf, int *old_stdout_fd)
+static int init_std_fds(Buffer **inbuf, Buffer **outbuf)
 {
     if (!isatty(STDIN_FILENO)) {
         Encoding enc = encoding_from_type(UTF8);
@@ -290,14 +290,15 @@ static void init_std_fds(Buffer **inbuf, Buffer **outbuf, int *old_stdout_fd)
         freopen_tty(stdin, "r", STDIN_FILENO);
     }
 
+    int old_stdout_fd = -1;
     if (!isatty(STDOUT_FILENO)) {
-        *old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
-        if (*old_stdout_fd == -1 && errno != EBADF) {
+        old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
+        if (old_stdout_fd == -1 && errno != EBADF) {
             perror("fcntl");
             exit(EX_OSERR);
         }
         freopen_tty(stdout, "w", STDOUT_FILENO);
-        if (*old_stdout_fd == -1) {
+        if (old_stdout_fd == -1) {
             // The call to fcntl(3) above failed with EBADF, meaning stdout was
             // most likely closed and there's no point opening a buffer for it
         } else if (*inbuf) {
@@ -317,6 +318,8 @@ static void init_std_fds(Buffer **inbuf, Buffer **outbuf, int *old_stdout_fd)
     if (!isatty(STDERR_FILENO)) {
         freopen_tty(stderr, "w", STDERR_FILENO);
     }
+
+    return old_stdout_fd;
 }
 
 static const char copyright[] =
@@ -399,8 +402,7 @@ loop_break:
 
     Buffer *stdin_buffer = NULL;
     Buffer *stdout_buffer = NULL;
-    int old_stdout_fd = -1;
-    init_std_fds(&stdin_buffer, &stdout_buffer, &old_stdout_fd);
+    int old_stdout_fd = init_std_fds(&stdin_buffer, &stdout_buffer);
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
@@ -551,14 +553,12 @@ loop_break:
         file_history_save(&editor.file_history);
     }
 
-    int exit_code = free_editor_state(&editor);
-
     if (stdout_buffer) {
         Block *blk;
         block_for_each(blk, &stdout_buffer->blocks) {
             if (xwrite_all(old_stdout_fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
-                exit_code = EX_IOERR;
+                editor.exit_code = EX_IOERR;
                 break;
             }
         }
@@ -566,5 +566,5 @@ loop_break:
         free(stdout_buffer);
     }
 
-    return exit_code;
+    return free_editor_state(&editor);
 }
