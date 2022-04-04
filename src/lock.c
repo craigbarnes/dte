@@ -100,6 +100,7 @@ static pid_t rewrite_lock_file(char *buf, size_t *sizep, const char *filename)
 
 static bool lock_or_unlock(const char *filename, bool lock)
 {
+    BUG_ON(!file_locks);
     if (streq(filename, file_locks) || streq(filename, file_locks_lock)) {
         return true;
     }
