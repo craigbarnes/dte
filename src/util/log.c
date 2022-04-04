@@ -32,7 +32,7 @@ LogLevel log_level_from_str(const char *str)
     if (!str || str[0] == '\0') {
         // This is the default log level, which takes effect when
         // $DTE_LOG is set and $DTE_LOG_LEVEL is unset (or empty)
-        return LOG_LEVEL_INFO;
+        return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
     }
 
     for (size_t i = 0; i < ARRAYLEN(levels); i++) {
