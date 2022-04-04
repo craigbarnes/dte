@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -81,8 +80,7 @@ void log_init(const char *filename, LogLevel level)
     }
 }
 
-VPRINTF(4)
-static void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
+void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
 {
     BUG_ON(level <= LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_DEBUG);
