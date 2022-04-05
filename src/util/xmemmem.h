@@ -4,6 +4,6 @@
 #include <stddef.h>
 #include "macros.h"
 
-void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen) NONNULL_ARGS;
+void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen) PURE NONNULL_ARGS;
 
 #endif
