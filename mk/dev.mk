@@ -80,7 +80,7 @@ show-sizes:
 coverage-report: build/docs/lcov.css
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
 	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
-	$(call LCOV_REMOVE, build/coverage.info, */src/debug.c */test/test.c)
+	$(call LCOV_REMOVE, build/coverage.info, */src/util/debug.c */test/test.c)
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
 	  xargs $(XARGS_P_FLAG) -- gzip -9 -k -f
