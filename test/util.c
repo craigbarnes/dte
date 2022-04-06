@@ -2300,6 +2300,24 @@ static void test_xmemmem(TestContext *ctx)
     EXPECT_NULL(needle);
 }
 
+static void test_log_level_from_str(TestContext *ctx)
+{
+    EXPECT_EQ(log_level_from_str("none"), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str("error"), LOG_LEVEL_ERROR);
+    EXPECT_EQ(log_level_from_str("warning"), LOG_LEVEL_WARNING);
+    EXPECT_EQ(log_level_from_str("info"), LOG_LEVEL_INFO);
+    EXPECT_EQ(log_level_from_str("debug"), LOG_LEVEL_DEBUG);
+
+    EXPECT_EQ(log_level_from_str("xyz"), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str(" "), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str("warn"), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str("errors"), LOG_LEVEL_NONE);
+
+    LogLevel default_level = (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+    EXPECT_EQ(log_level_from_str(""), default_level);
+    EXPECT_EQ(log_level_from_str(NULL), default_level);
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2371,6 +2389,7 @@ static const TestEntry tests[] = {
     TEST(test_fd_set_cloexec),
     TEST(test_fork_exec),
     TEST(test_xmemmem),
+    TEST(test_log_level_from_str),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);

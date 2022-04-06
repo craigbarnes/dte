@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -26,6 +27,7 @@
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
+#include "util/log.h"
 #include "util/macros.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -399,7 +401,13 @@ int main(int argc, char *argv[])
         }
     }
 
-loop_break:
+loop_break:;
+
+    const char *log_filename = getenv("DTE_LOG");
+    if (log_filename && log_filename[0] != '\0') {
+        LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
+        log_init(log_filename, log_level);
+    }
 
     init_editor_state();
 

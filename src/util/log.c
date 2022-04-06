@@ -55,7 +55,8 @@ void log_init(const char *filename, LogLevel level)
         return;
     }
 
-    logfd = xopen(filename, O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0666);
+    int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
+    logfd = xopen(filename, flags, 0666);
     if (unlikely(logfd < 0)) {
         const char *err = strerror(errno);
         fprintf(stderr, "Failed to open log file '%s': %s\n", filename, err);

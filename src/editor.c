@@ -174,12 +174,6 @@ static void set_and_check_locale(void)
 
 void init_editor_state(void)
 {
-    const char *log_filename = getenv("DTE_LOG");
-    if (log_filename && log_filename[0] != '\0') {
-        LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
-        log_init(log_filename, log_level);
-    }
-
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
     editor.home_dir = strview_intern(home ? home : "");
