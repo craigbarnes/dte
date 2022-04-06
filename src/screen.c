@@ -49,10 +49,10 @@ void update_term_title(EditorState *e, const Buffer *b)
 
 void mask_color(TermColor *color, const TermColor *over)
 {
-    if (over->fg != -2) {
+    if (over->fg != COLOR_KEEP) {
         color->fg = over->fg;
     }
-    if (over->bg != -2) {
+    if (over->bg != COLOR_KEEP) {
         color->bg = over->bg;
     }
     if (!(over->attr & ATTR_KEEP)) {

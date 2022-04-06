@@ -25,11 +25,11 @@ typedef struct {
 static void mask_color2(const EditorState *e, TermColor *color, const TermColor *over)
 {
     int32_t default_bg = e->colors.builtin[BC_DEFAULT].bg;
-    if (over->bg != -2 && (color->bg == default_bg || color->bg < 0)) {
+    if (over->bg != COLOR_KEEP && (color->bg == default_bg || color->bg < 0)) {
         color->bg = over->bg;
     }
 
-    if (over->fg != -2) {
+    if (over->fg != COLOR_KEEP) {
         color->fg = over->fg;
     }
 
