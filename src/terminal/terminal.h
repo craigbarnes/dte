@@ -25,6 +25,23 @@ typedef enum {
     TFLAG_ITERM2 = 0x100, // Supports extended keyboard protocol via "\e[>1u" (but not "\e[>5u")
 } TermFeatureFlags;
 
+typedef enum {
+    CURSOR_INVALID = -1,
+    CURSOR_DEFAULT = 0,
+    CURSOR_BLINKING_BLOCK = 1,
+    CURSOR_STEADY_BLOCK = 2,
+    CURSOR_BLINKING_UNDERLINE = 3,
+    CURSOR_STEADY_UNDERLINE = 4,
+    CURSOR_BLINKING_BAR = 5,
+    CURSOR_STEADY_BAR = 6,
+    CURSOR_KEEP = 7,
+} TermCursorType;
+
+typedef struct {
+    TermCursorType type;
+    int32_t color;
+} TermCursorStyle;
+
 typedef struct {
     StringView cup_mode_off;
     StringView cup_mode_on;
@@ -56,6 +73,7 @@ typedef struct {
     uint8_t tab_width;
     bool can_clear;
     TermColor color;
+    TermCursorStyle cursor_style;
 } TermOutputBuffer;
 
 typedef struct {
@@ -79,5 +97,6 @@ typedef struct Terminal {
 void term_init(Terminal *term, const char *name) NONNULL_ARGS;
 void term_enable_private_modes(Terminal *term) NONNULL_ARGS;
 void term_restore_private_modes(Terminal *term) NONNULL_ARGS;
+void term_restore_cursor_style(Terminal *term) NONNULL_ARGS;
 
 #endif

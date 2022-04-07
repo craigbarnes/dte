@@ -37,5 +37,6 @@ void term_clear_screen(TermOutputBuffer *obuf);
 void term_output_flush(TermOutputBuffer *obuf);
 bool term_put_char(TermOutputBuffer *obuf, CodePoint u);
 void term_set_color(Terminal *term, const TermColor *color);
+void term_set_cursor_style(Terminal *term, TermCursorStyle style);
 
 #endif

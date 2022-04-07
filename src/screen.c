@@ -1,5 +1,6 @@
 #include <string.h>
 #include "screen.h"
+#include "cursor.h"
 #include "frame.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
@@ -24,6 +25,42 @@ void set_color(EditorState *e, const TermColor *color)
 void set_builtin_color(EditorState *e, BuiltinColorEnum c)
 {
     set_color(e, &e->colors.builtin[c]);
+}
+
+void update_cursor_style(EditorState *e)
+{
+    CursorInputMode mode;
+    switch (e->input_mode) {
+    case INPUT_NORMAL:
+        if (e->buffer->options.overwrite) {
+            mode = CURSOR_MODE_OVERWRITE;
+        } else {
+            mode = CURSOR_MODE_INSERT;
+        }
+        break;
+    case INPUT_COMMAND:
+    case INPUT_SEARCH:
+        mode = CURSOR_MODE_CMDLINE;
+        break;
+    default:
+        BUG("unhandled input mode");
+        return;
+    }
+
+    TermCursorStyle style = e->cursor_styles[mode];
+    TermCursorStyle def = e->cursor_styles[CURSOR_MODE_DEFAULT];
+    if (style.type == CURSOR_KEEP) {
+        style.type = def.type;
+    }
+    if (style.color == COLOR_KEEP) {
+        style.color = def.color;
+    }
+
+    if (!same_cursor(&style, &e->terminal.obuf.cursor_style)) {
+        term_set_cursor_style(&e->terminal, style);
+    }
+
+    e->cursor_style_changed = false;
 }
 
 void update_term_title(EditorState *e, const Buffer *b)

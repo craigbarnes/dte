@@ -98,7 +98,7 @@ UNITTEST {
     BUG_ON(rgb_to_rrggbb(0xFFF) != 0xFFFFFF);
 }
 
-static int32_t parse_rgb(const char *str, size_t len)
+int32_t parse_rgb(const char *str, size_t len)
 {
     unsigned int val = 0;
     size_t n = buf_parse_hex_uint(str, len, &val);

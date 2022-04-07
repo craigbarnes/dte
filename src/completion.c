@@ -271,6 +271,24 @@ static void complete_compile(EditorState *e, const CommandArgs *a)
     }
 }
 
+static void complete_cursor(EditorState *e, const CommandArgs *a)
+{
+    CompletionState *cs = &e->cmdline.completion;
+    size_t n = a->nr_args;
+    if (n == 0) {
+        collect_cursor_modes(&cs->completions, cs->parsed);
+    } else if (n == 1) {
+        collect_cursor_types(&cs->completions, cs->parsed);
+    } else if (n == 2) {
+        collect_cursor_colors(&cs->completions, cs->parsed);
+        // Add an example #rrggbb color, to make things more discoverable
+        static const char rgb_example[] = "#22AABB";
+        if (str_has_prefix(rgb_example, cs->parsed)) {
+            ptr_array_append(&cs->completions, xstrdup(rgb_example));
+        }
+    }
+}
+
 static void complete_errorfmt(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -467,6 +485,7 @@ static const CompletionHandler handlers[] = {
     {"alias", complete_alias},
     {"cd", complete_cd},
     {"compile", complete_compile},
+    {"cursor", complete_cursor},
     {"errorfmt", complete_errorfmt},
     {"exec", complete_exec},
     {"ft", complete_ft},

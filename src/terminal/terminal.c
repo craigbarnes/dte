@@ -223,3 +223,16 @@ void term_restore_private_modes(Terminal *term)
     }
     term_add_literal(obuf, "\033[?2004l\033[?2004r");
 }
+
+void term_restore_cursor_style(Terminal *term)
+{
+    // TODO: query the cursor style at startup and restore that
+    // value instead of using CURSOR_DEFAULT (which basically
+    // amounts to using the so-called "DECSCUSR 0 hack"
+    static const TermCursorStyle reset = {
+        .type = CURSOR_DEFAULT,
+        .color = COLOR_DEFAULT,
+    };
+
+    term_set_cursor_style(term, reset);
+}

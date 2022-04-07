@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "cmdline.h"
 #include "copy.h"
+#include "cursor.h"
 #include "encoding.h"
 #include "file-history.h"
 #include "frame.h"
@@ -76,6 +77,7 @@ typedef struct {
     const char *user_config_dir;
     bool child_controls_terminal;
     bool everything_changed;
+    bool cursor_style_changed;
     bool session_leader;
     int exit_code;
     size_t cmdline_x;
@@ -84,6 +86,7 @@ typedef struct {
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;
+    TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     Frame *root_frame;
     Window *window;
     View *view;
@@ -110,6 +113,7 @@ static inline void mark_everything_changed(EditorState *e)
 
 static inline void set_input_mode(EditorState *e, InputMode mode)
 {
+    e->cursor_style_changed = true;
     e->input_mode = mode;
 }
 

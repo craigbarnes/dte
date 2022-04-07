@@ -41,6 +41,7 @@ EditorState editor = {
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .everything_changed = false,
+    .cursor_style_changed = false,
     .resized = false,
     .exit_code = EX_OK,
     .compilers = HASHMAP_INIT,
@@ -79,6 +80,12 @@ EditorState editor = {
         .filename = NULL,
         .max_entries = 128,
         .entries = HASHMAP_INIT
+    },
+    .cursor_styles = {
+        [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
+        [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
+        [CURSOR_MODE_OVERWRITE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
+        [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
     },
     .bindings = {
         [INPUT_NORMAL] = {
@@ -384,6 +391,7 @@ void normal_update(EditorState *e)
     update_term_title(e, e->buffer);
     update_all_windows(e);
     update_command_line(e);
+    update_cursor_style(e);
     end_update(e);
 }
 
@@ -420,6 +428,7 @@ void ui_end(EditorState *e)
     term_show_cursor(term);
     term_add_strview(obuf, term->control_codes.cup_mode_off);
     term_restore_private_modes(term);
+    term_restore_cursor_style(term);
     term_output_flush(obuf);
     term_cooked();
 }
@@ -608,6 +617,9 @@ static void update_screen(EditorState *e, const ScreenState *s)
     }
     update_buffer_windows(e, buffer);
     update_command_line(e);
+    if (e->cursor_style_changed) {
+        update_cursor_style(e);
+    }
     end_update(e);
 }
 

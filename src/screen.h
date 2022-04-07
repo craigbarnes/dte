@@ -17,6 +17,7 @@ void update_window_sizes(EditorState *e);
 void update_line_numbers(EditorState *e, Window *win, bool force);
 void update_screen_size(EditorState *e);
 void set_color(EditorState *e, const TermColor *color);
+void update_cursor_style(EditorState *e);
 void set_builtin_color(EditorState *e, BuiltinColorEnum c);
 void mask_color(TermColor *color, const TermColor *over);
 

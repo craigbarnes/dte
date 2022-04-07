@@ -73,6 +73,7 @@ static inline bool same_color(const TermColor *a, const TermColor *b)
     return a->fg == b->fg && a->bg == b->bg && a->attr == b->attr;
 }
 
+int32_t parse_rgb(const char *str, size_t len);
 ssize_t parse_term_color(TermColor *color, char **strs, size_t nstrs) NONNULL_ARGS WARN_UNUSED_RESULT;
 int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optimize);
 const char *term_color_to_string(const TermColor *color) NONNULL_ARGS_AND_RETURN;

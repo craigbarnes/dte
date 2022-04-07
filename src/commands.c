@@ -432,6 +432,45 @@ static void cmd_copy(const CommandArgs *a)
     view->cursor = save;
 }
 
+static void cmd_cursor(const CommandArgs *a)
+{
+    EditorState *e = a->userdata;
+    if (unlikely(a->nr_args == 0)) {
+        // Reset all cursor styles
+        for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {
+            e->cursor_styles[m] = get_default_cursor_style(m);
+        }
+        e->cursor_style_changed = true;
+        return;
+    }
+
+    CursorInputMode mode = cursor_mode_from_str(a->args[0]);
+    if (unlikely(mode >= NR_CURSOR_MODES)) {
+        error_msg("invalid mode argument: %s", a->args[0]);
+        return;
+    }
+
+    TermCursorStyle style = get_default_cursor_style(mode);
+    if (a->nr_args >= 2) {
+        style.type = cursor_type_from_str(a->args[1]);
+        if (unlikely(style.type == CURSOR_INVALID)) {
+            error_msg("invalid cursor type: %s", a->args[1]);
+            return;
+        }
+    }
+
+    if (a->nr_args >= 3) {
+        style.color = cursor_color_from_str(a->args[2]);
+        if (unlikely(style.color == COLOR_INVALID)) {
+            error_msg("invalid cursor color: %s", a->args[2]);
+            return;
+        }
+    }
+
+    e->cursor_styles[mode] = style;
+    e->cursor_style_changed = true;
+}
+
 static void cmd_cut(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
@@ -2398,6 +2437,7 @@ static const Command cmds[] = {
     {"command", "-", false, 0, 1, cmd_command},
     {"compile", "-1ps", false, 2, -1, cmd_compile},
     {"copy", "bikp", false, 0, 0, cmd_copy},
+    {"cursor", "", true, 0, 3, cmd_cursor},
     {"cut", "", false, 0, 0, cmd_cut},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "n", false, 0, 0, cmd_delete_eol},
