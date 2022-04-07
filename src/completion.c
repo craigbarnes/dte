@@ -372,6 +372,17 @@ static void complete_save(EditorState *e, const CommandArgs* UNUSED_ARG(a))
     collect_files(&e->cmdline.completion, COLLECT_ALL);
 }
 
+static void complete_quit(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    CompletionState *cs = &e->cmdline.completion;
+    if (str_has_prefix("0", cs->parsed)) {
+        ptr_array_append(&cs->completions, xstrdup("0"));
+    }
+    if (str_has_prefix("1", cs->parsed)) {
+        ptr_array_append(&cs->completions, xstrdup("1"));
+    }
+}
+
 static void complete_set(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -452,6 +463,7 @@ static const CompletionHandler handlers[] = {
     {"move-tab", complete_move_tab},
     {"open", complete_open},
     {"option", complete_option},
+    {"quit", complete_quit},
     {"save", complete_save},
     {"set", complete_set},
     {"setenv", complete_setenv},
