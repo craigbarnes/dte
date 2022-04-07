@@ -22,6 +22,7 @@
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
@@ -383,6 +384,15 @@ static void complete_quit(EditorState *e, const CommandArgs* UNUSED_ARG(a))
     }
 }
 
+static void complete_redo(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    const Change *change = e->view->buffer->cur_change;
+    CompletionState *cs = &e->cmdline.completion;
+    for (unsigned long i = 1, n = change->nr_prev; i <= n; i++) {
+        ptr_array_append(&cs->completions, xstrdup(ulong_to_str(i)));
+    }
+}
+
 static void complete_set(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -464,6 +474,7 @@ static const CompletionHandler handlers[] = {
     {"open", complete_open},
     {"option", complete_option},
     {"quit", complete_quit},
+    {"redo", complete_redo},
     {"save", complete_save},
     {"set", complete_set},
     {"setenv", complete_setenv},
