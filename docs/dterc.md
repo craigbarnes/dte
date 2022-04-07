@@ -182,7 +182,7 @@ The commands available in [`command`]/[`search`] modes are as follows:
 * `accept`
 * `cancel`
 * `clear`
-* `copy`
+* `copy` [**-bip**]
 * `history-next`
 * `history-prev`
 * `complete-next` (command mode)

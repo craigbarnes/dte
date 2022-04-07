@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include "cmdline.h"
@@ -10,6 +11,7 @@
 #include "history.h"
 #include "search.h"
 #include "terminal/input.h"
+#include "terminal/osc52.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/utf8.h"
@@ -81,9 +83,27 @@ static void cmd_clear(const CommandArgs *a)
 
 static void cmd_copy(const CommandArgs *a)
 {
+    bool internal = cmdargs_has_flag(a, 'i');
+    bool clipboard = cmdargs_has_flag(a, 'b');
+    bool primary = cmdargs_has_flag(a, 'p');
+    if (!(internal || clipboard || primary)) {
+        internal = true;
+    }
+
     EditorState *e = a->userdata;
-    char *str = string_clone_cstring(&e->cmdline.buf);
-    record_copy(&e->clipboard, str, e->cmdline.buf.len, false);
+    size_t len = e->cmdline.buf.len;
+    if (internal) {
+        char *str = string_clone_cstring(&e->cmdline.buf);
+        record_copy(&e->clipboard, str, len, false);
+    }
+
+    Terminal *term = &e->terminal;
+    if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
+        const char *str = string_borrow_cstring(&e->cmdline.buf);
+        if (!term_osc52_copy(&term->obuf, str, len, clipboard, primary)) {
+            LOG_ERROR("term_osc52_copy() failed: %s", strerror(ENOMEM));
+        }
+    }
 }
 
 static void cmd_delete(const CommandArgs *a)
@@ -412,7 +432,7 @@ static const Command common_cmds[] = {
     {"bol", "", false, 0, 0, cmd_bol},
     {"cancel", "", false, 0, 0, cmd_cancel},
     {"clear", "", false, 0, 0, cmd_clear},
-    {"copy", "", false, 0, 0, cmd_copy},
+    {"copy", "bip", false, 0, 0, cmd_copy},
     {"delete", "", false, 0, 0, cmd_delete},
     {"delete-eol", "", false, 0, 0, cmd_delete_eol},
     {"delete-word", "", false, 0, 0, cmd_delete_word},
