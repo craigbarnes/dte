@@ -125,6 +125,11 @@ static void cmd_alias(const CommandArgs *a)
         error_msg("Empty alias name not allowed");
         return;
     }
+    if (unlikely(name[0] == '-')) {
+        // Disallowing this simplifies auto-completion for "alias "
+        error_msg("Alias name cannot begin with '-'");
+        return;
+    }
 
     for (size_t i = 0; name[i]; i++) {
         unsigned char c = name[i];

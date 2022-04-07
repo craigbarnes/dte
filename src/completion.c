@@ -226,9 +226,18 @@ void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix
     }
 }
 
-static void complete_files(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+static void complete_alias(EditorState *e, const CommandArgs *a)
 {
-    collect_files(&e->cmdline.completion, COLLECT_ALL);
+    const HashMap *aliases = &normal_commands.aliases;
+    CompletionState *cs = &e->cmdline.completion;
+    if (a->nr_args == 0) {
+        collect_hashmap_keys(aliases, &cs->completions, cs->parsed);
+    } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
+        const char *cmd = find_alias(aliases, a->args[0]);
+        if (cmd) {
+            ptr_array_append(&cs->completions, xstrdup(cmd));
+        }
+    }
 }
 
 static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
@@ -358,6 +367,11 @@ static void complete_option(EditorState *e, const CommandArgs *a)
     }
 }
 
+static void complete_save(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+{
+    collect_files(&e->cmdline.completion, COLLECT_ALL);
+}
+
 static void complete_set(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
@@ -426,6 +440,7 @@ typedef struct {
 } CompletionHandler;
 
 static const CompletionHandler handlers[] = {
+    {"alias", complete_alias},
     {"cd", complete_cd},
     {"compile", complete_compile},
     {"errorfmt", complete_errorfmt},
@@ -437,7 +452,7 @@ static const CompletionHandler handlers[] = {
     {"move-tab", complete_move_tab},
     {"open", complete_open},
     {"option", complete_option},
-    {"save", complete_files},
+    {"save", complete_save},
     {"set", complete_set},
     {"setenv", complete_setenv},
     {"show", complete_show},
