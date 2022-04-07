@@ -255,6 +255,7 @@ static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 
 static void complete_exec(EditorState *e, const CommandArgs *a)
 {
+    // TODO: add completion for [-ioe] option arguments
     CompletionState *cs = &e->cmdline.completion;
     collect_files(cs, a->nr_args == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
 }
@@ -362,6 +363,7 @@ static void complete_option(EditorState *e, const CommandArgs *a)
             collect_ft(&cs->completions, cs->parsed);
         }
     } else if (a->nr_args & 1) {
+        // TODO: exclude options that have already been specified
         collect_auto_options(&cs->completions, cs->parsed);
     } else {
         collect_option_values(&cs->completions, a->args[a->nr_args - 1], cs->parsed);
@@ -397,6 +399,7 @@ static void complete_set(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if ((a->nr_args + 1) & 1) {
+        // TODO: exclude options that have already been specified
         bool local = cmdargs_has_flag(a, 'l');
         bool global = cmdargs_has_flag(a, 'g');
         collect_options(&cs->completions, cs->parsed, local, global);
