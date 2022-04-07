@@ -486,6 +486,13 @@ static const CompletionHandler handlers[] = {
 
 UNITTEST {
     CHECK_BSEARCH_ARRAY(handlers, cmd_name, strcmp);
+    // Ensure handlers are kept in sync with renamed/removed commands
+    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
+        const char *name = handlers[i].cmd_name;
+        if (!find_normal_command(name)) {
+            BUG("completion handler for non-existent command: \"%s\"", name);
+        }
+    }
 }
 
 static void collect_completions(EditorState *e, char **args, size_t argc)
