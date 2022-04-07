@@ -242,42 +242,56 @@ static void cmd_case(const CommandArgs *a)
     change_case(e->view, last_flag_or_default(a, 't'));
 }
 
+static void mark_tabbar_changed(Window *w, void* UNUSED_ARG(data))
+{
+    w->update_tabbar = true;
+}
+
 static void cmd_cd(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     const char *dir = a->args[0];
-    char cwd[8192];
-    const char *cwdp = NULL;
-    bool got_cwd = !!getcwd(cwd, sizeof(cwd));
+    if (unlikely(dir[0] == '\0')) {
+        error_msg("directory argument cannot be empty");
+        return;
+    }
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
         if (!dir || dir[0] == '\0') {
-            error_msg("cd: OLDPWD not set");
+            error_msg("OLDPWD not set");
             return;
         }
     }
-    if (chdir(dir)) {
-        perror_msg("cd");
+
+    char buf[8192];
+    const char *cwd = getcwd(buf, sizeof(buf));
+    if (chdir(dir) != 0) {
+        error_msg("changing directory failed: %s", strerror(errno));
         return;
     }
 
-    if (got_cwd) {
-        setenv("OLDPWD", cwd, 1);
+    if (likely(cwd)) {
+        int r = setenv("OLDPWD", cwd, 1);
+        if (unlikely(r != 0)) {
+            LOG_WARNING("failed to set OLDPWD: %s", strerror(errno));
+        }
     }
-    got_cwd = !!getcwd(cwd, sizeof(cwd));
-    if (got_cwd) {
-        setenv("PWD", cwd, 1);
-        cwdp = cwd;
+
+    cwd = getcwd(buf, sizeof(buf));
+    if (likely(cwd)) {
+        int r = setenv("PWD", cwd, 1);
+        if (unlikely(r != 0)) {
+            LOG_WARNING("failed to set PWD: %s", strerror(errno));
+        }
     }
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
         Buffer *b = e->buffers.ptrs[i];
-        update_short_filename_cwd(b, cwdp);
+        update_short_filename_cwd(b, cwd);
     }
 
-    // Need to update all tabbars
-    mark_everything_changed(e);
+    frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
 }
 
 static void cmd_center_view(const CommandArgs *a)
