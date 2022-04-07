@@ -386,7 +386,7 @@ static void complete_quit(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 
 static void complete_redo(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
-    const Change *change = e->view->buffer->cur_change;
+    const Change *change = e->buffer->cur_change;
     CompletionState *cs = &e->cmdline.completion;
     for (unsigned long i = 1, n = change->nr_prev; i <= n; i++) {
         ptr_array_append(&cs->completions, xstrdup(ulong_to_str(i)));
