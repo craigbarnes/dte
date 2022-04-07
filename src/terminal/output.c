@@ -24,6 +24,7 @@ void term_output_free(TermOutputBuffer *obuf)
 
 static void obuf_need_space(TermOutputBuffer *obuf, size_t count)
 {
+    BUG_ON(count > TERM_OUTBUF_SIZE);
     if (unlikely(obuf_avail(obuf) < count)) {
         term_output_flush(obuf);
     }
