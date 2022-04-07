@@ -231,9 +231,16 @@ static void complete_files(EditorState *e, const CommandArgs* UNUSED_ARG(a))
     collect_files(&e->cmdline.completion, COLLECT_ALL);
 }
 
-static void complete_dirs(EditorState *e, const CommandArgs* UNUSED_ARG(a))
+static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(&e->cmdline.completion, COLLECT_DIRS_ONLY);
+    CompletionState *cs = &e->cmdline.completion;
+    collect_files(cs, COLLECT_DIRS_ONLY);
+    if (str_has_prefix("-", cs->parsed)) {
+        const char *oldpwd = getenv("OLDPWD");
+        if (likely(oldpwd && oldpwd[0] != '\0')) {
+            ptr_array_append(&cs->completions, xstrdup("-"));
+        }
+    }
 }
 
 static void complete_exec(EditorState *e, const CommandArgs *a)
@@ -419,7 +426,7 @@ typedef struct {
 } CompletionHandler;
 
 static const CompletionHandler handlers[] = {
-    {"cd", complete_dirs},
+    {"cd", complete_cd},
     {"compile", complete_compile},
     {"errorfmt", complete_errorfmt},
     {"exec", complete_exec},
