@@ -8,6 +8,7 @@
 #include "test.h"
 #include "util/ascii.h"
 #include "util/base64.h"
+#include "util/bit.h"
 #include "util/checked-arith.h"
 #include "util/exec.h"
 #include "util/hash.h"
@@ -1885,6 +1886,25 @@ static void test_round_size_to_next_power_of_2(TestContext *ctx)
     EXPECT_UINT_EQ(round_size_to_next_power_of_2(size_max - 1), 0);
 }
 
+static void test_popcount(TestContext *ctx)
+{
+    EXPECT_EQ(u32_popcount(0), 0);
+    EXPECT_EQ(u32_popcount(1), 1);
+    EXPECT_EQ(u32_popcount(11), 3);
+    EXPECT_EQ(u32_popcount(128), 1);
+    EXPECT_EQ(u32_popcount(255), 8);
+    EXPECT_EQ(u32_popcount(UINT32_MAX), 32);
+    EXPECT_EQ(u32_popcount(UINT32_MAX - 1), 31);
+
+    EXPECT_EQ(u64_popcount(0), 0);
+    EXPECT_EQ(u64_popcount(1), 1);
+    EXPECT_EQ(u64_popcount(255), 8);
+    EXPECT_EQ(u64_popcount(UINT64_MAX), 64);
+    EXPECT_EQ(u64_popcount(UINT64_MAX - 1), 63);
+    EXPECT_EQ(u64_popcount(U64(0xFFFFFFFFFF)), 40);
+    EXPECT_EQ(u64_popcount(U64(0x10000000000)), 1);
+}
+
 static void test_path_dirname_and_path_basename(TestContext *ctx)
 {
     static const struct {
@@ -2372,6 +2392,7 @@ static const TestEntry tests[] = {
     TEST(test_intmap),
     TEST(test_round_size_to_next_multiple),
     TEST(test_round_size_to_next_power_of_2),
+    TEST(test_popcount),
     TEST(test_path_dirname_and_path_basename),
     TEST(test_path_relative),
     TEST(test_short_filename_cwd),

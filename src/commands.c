@@ -41,6 +41,7 @@
 #include "terminal/mode.h"
 #include "terminal/osc52.h"
 #include "terminal/terminal.h"
+#include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/checked-arith.h"
 #include "util/debug.h"
@@ -1870,28 +1871,39 @@ static void cmd_scroll_up(const CommandArgs *a)
     }
 }
 
+static uint_least64_t get_flagset_npw(void)
+{
+    // flagset mask for "-npw" flags
+    return UINT64_C(517) << 40;
+}
+
+UNITTEST {
+    uint_least64_t ref = 0;
+    ref |= cmdargs_flagset_value('n');
+    ref |= cmdargs_flagset_value('p');
+    ref |= cmdargs_flagset_value('w');
+    BUG_ON(get_flagset_npw() != ref);
+}
+
 static void cmd_search(const CommandArgs *a)
 {
-    char *pattern = a->args[0];
-    bool history = !has_flag(a, 'H');
-    bool next = has_flag(a, 'n');
-    bool prev = has_flag(a, 'p');
-    bool w = has_flag(a, 'w');
-    SearchDirection direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
-
-    if (unlikely(w && pattern)) {
-        error_msg("flag -w can't be used with search pattern");
+    const char *pattern = a->args[0];
+    unsigned int npw_count = u64_popcount(a->flag_set & get_flagset_npw());
+    if (npw_count >= 2) {
+        error_msg("flags -n, -p and -w are mutually exclusive");
         return;
     }
-    if (unlikely(next && prev)) {
-        error_msg("flags -n and -p can't be used together");
+    if (npw_count == 1 && pattern) {
+        error_msg("flags [-npw] and pattern argument are mutually exclusive");
         return;
     }
 
     EditorState *e = a->userdata;
     View *view = e->view;
     char pattbuf[4096];
-    if (w) {
+    bool use_word_under_cursor = has_flag(a, 'w');
+
+    if (use_word_under_cursor) {
         StringView word = view_get_word_under_cursor(view);
         if (word.length == 0) {
             // Error message would not be very useful here
@@ -1913,23 +1925,23 @@ static void cmd_search(const CommandArgs *a)
     do_selection(view, SELECT_NONE);
 
     if (pattern) {
-        e->search.direction = direction;
+        e->search.direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
         search_set_regexp(&e->search, pattern);
-        if (w) {
+        if (use_word_under_cursor) {
             search_next_word(e);
         } else {
             search_next(e);
         }
-        if (history) {
+        if (!has_flag(a, 'H')) {
             history_add(&e->search_history, pattern);
         }
-    } else if (next) {
+    } else if (has_flag(a, 'n')) {
         search_next(e);
-    } else if (prev) {
+    } else if (has_flag(a, 'p')) {
         search_prev(e);
     } else {
         set_input_mode(e, INPUT_SEARCH);
-        e->search.direction = direction;
+        e->search.direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
     }
 }
 
@@ -2468,8 +2480,7 @@ static bool allow_macro_recording(const Command *cmd, char **args, void *userdat
         CommandArgs a = cmdargs_new(args_copy, userdata);
         bool ret = true;
         if (do_parse_args(cmd, &a) == ARGERR_NONE) {
-            const uint_least64_t flags_npw = UINT64_C(517) << 40;
-            if (a.nr_args == 0 && !(a.flag_set & flags_npw)) {
+            if (a.nr_args == 0 && !(a.flag_set & get_flagset_npw())) {
                 // If command is "search" with no pattern argument and without
                 // flags -n, -p or -w, the command would put the editor into
                 // search mode, which shouldn't be recorded.
