@@ -384,7 +384,7 @@ static String do_dump_macro(EditorState* UNUSED_ARG(e))
 
 static const ShowHandler handlers[] = {
     {"alias", DTERC, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
-    {"bind", DTERC, show_binding, dump_bindings, collect_bound_keys},
+    {"bind", DTERC, show_binding, dump_bindings, collect_bound_normal_keys},
     {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
     {"command", DTERC | LASTLINE, NULL, dump_command_history, NULL},
     {"env", 0, show_env, dump_env, collect_env},

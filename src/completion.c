@@ -173,15 +173,20 @@ void collect_normal_aliases(EditorState* UNUSED_ARG(e), PointerArray *a, const c
     collect_hashmap_keys(&normal_commands.aliases, a, prefix);
 }
 
-void collect_bound_keys(EditorState *e, PointerArray *a, const char *prefix)
+static void collect_bound_keys(const KeyBindingGroup *kbg, PointerArray *a, const char *prefix)
 {
-    const IntMap *map = &e->bindings[INPUT_NORMAL].map;
+    const IntMap *map = &kbg->map;
     for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
         const char *str = keycode_to_string(it.entry->key);
         if (str_has_prefix(str, prefix)) {
             ptr_array_append(a, xstrdup(str));
         }
     }
+}
+
+void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *prefix)
+{
+    collect_bound_keys(&e->bindings[INPUT_NORMAL], a, prefix);
 }
 
 void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
@@ -239,6 +244,48 @@ static void complete_alias(EditorState *e, const CommandArgs *a)
             ptr_array_append(&cs->completions, xstrdup(cmd));
         }
     }
+}
+
+static void complete_bind(EditorState *e, const CommandArgs *a)
+{
+    static const char flags[] = {
+        [INPUT_NORMAL] = 'n',
+        [INPUT_COMMAND] = 'c',
+        [INPUT_SEARCH] = 's',
+    };
+
+    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->bindings));
+    InputMode mode = INPUT_NORMAL;
+    for (size_t i = 0, count = 0; i < ARRAYLEN(flags); i++) {
+        if (cmdargs_has_flag(a, flags[i])) {
+            if (++count >= 2) {
+                return; // Don't complete bindings for multiple modes
+            }
+            mode = i;
+        }
+    }
+
+    CompletionState *cs = &e->cmdline.completion;
+    KeyBindingGroup *kbg = &e->bindings[mode];
+    if (a->nr_args == 0) {
+        collect_bound_keys(kbg, &cs->completions, cs->parsed);
+        return;
+    }
+
+    if (a->nr_args != 1 || cs->parsed[0] != '\0') {
+        return;
+    }
+
+    KeyCode key;
+    if (!parse_key_string(&key, a->args[0])) {
+        return;
+    }
+    const CachedCommand *cmd = lookup_binding(kbg, key);
+    if (!cmd) {
+        return;
+    }
+
+    ptr_array_append(&cs->completions, xstrdup(cmd->cmd_str));
 }
 
 static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
@@ -483,6 +530,7 @@ typedef struct {
 
 static const CompletionHandler handlers[] = {
     {"alias", complete_alias},
+    {"bind", complete_bind},
     {"cd", complete_cd},
     {"compile", complete_compile},
     {"cursor", complete_cursor},
