@@ -7,6 +7,9 @@
 #include "debug.h"
 #include "macros.h"
 
+// This is equivalent to `(x + 1) % modulus`, given the constraints
+// imposed by BUG_ON(), but avoids expensive divisions by a non-constant
+// and/or non-power-of-2
 static inline size_t size_increment_wrapped(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
@@ -14,11 +17,12 @@ static inline size_t size_increment_wrapped(size_t x, size_t modulus)
     return (x + 1 < modulus) ? x + 1 : 0;
 }
 
+// As above, but equivalent to `x ? (x - 1) % modulus : modulus - 1`
 static inline size_t size_decrement_wrapped(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
     BUG_ON(x >= modulus);
-    return (x == 0) ? modulus - 1 : x - 1;
+    return (x ? x : modulus) - 1;
 }
 
 static inline bool size_add_overflows(size_t a, size_t b, size_t *result)

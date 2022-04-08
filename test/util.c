@@ -2123,6 +2123,12 @@ static void test_size_increment_wrapped(TestContext *ctx)
     EXPECT_EQ(size_increment_wrapped(3, 5), 4);
     EXPECT_EQ(size_increment_wrapped(4, 5), 0);
     EXPECT_EQ(size_increment_wrapped(0, 5), 1);
+
+    for (size_t m = 1; m < 9; m++) {
+        for (size_t x = 0; x < m; x++) {
+            EXPECT_EQ(size_increment_wrapped(x, m), (x + 1) % m);
+        }
+    }
 }
 
 static void test_size_decrement_wrapped(TestContext *ctx)
@@ -2131,6 +2137,13 @@ static void test_size_decrement_wrapped(TestContext *ctx)
     EXPECT_EQ(size_decrement_wrapped(1, 450), 0);
     EXPECT_EQ(size_decrement_wrapped(0, 450), 449);
     EXPECT_EQ(size_decrement_wrapped(449, 450), 448);
+
+    for (size_t m = 1; m < 9; m++) {
+        EXPECT_EQ(size_decrement_wrapped(0, m), m - 1);
+        for (size_t x = 1; x < m; x++) {
+            EXPECT_EQ(size_decrement_wrapped(x, m), (x - 1) % m);
+        }
+    }
 }
 
 static void test_size_multiply_overflows(TestContext *ctx)
