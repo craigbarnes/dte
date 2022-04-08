@@ -281,7 +281,7 @@ void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArr
 // Close fd only if valid (positive) and not stdin/stdout/stderr
 static int safe_xclose(int fd)
 {
-    return (fd >= 3) ? xclose(fd) : 0;
+    return (fd > STDERR_FILENO) ? xclose(fd) : 0;
 }
 
 bool spawn(SpawnContext *ctx, SpawnAction actions[3])
