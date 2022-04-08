@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "cursor.h"
+#include "util/numtostr.h"
 #include "util/str-util.h"
 
 static const char cursor_modes[NR_CURSOR_MODES][12] = {
@@ -25,6 +26,33 @@ static const char cursor_colors[][8] = {
     "keep",
     "default",
 };
+
+const char *cursor_mode_to_str(CursorInputMode mode)
+{
+    BUG_ON(mode < 0 || mode >= ARRAYLEN(cursor_modes));
+    return cursor_modes[mode];
+}
+
+const char *cursor_type_to_str(TermCursorType type)
+{
+    BUG_ON(type < 0 || type >= ARRAYLEN(cursor_types));
+    return cursor_types[type];
+}
+
+const char *cursor_color_to_str(int32_t color)
+{
+    BUG_ON(color <= COLOR_INVALID);
+    if (color == COLOR_KEEP || color == COLOR_DEFAULT) {
+        return cursor_colors[color + 2];
+    }
+
+    BUG_ON(!(color & COLOR_FLAG_RGB));
+    static char buf[8];
+    buf[0] = '#';
+    hex_encode_u24_fixed(buf + 1, color);
+    buf[7] = '\0';
+    return buf;
+}
 
 CursorInputMode cursor_mode_from_str(const char *name)
 {

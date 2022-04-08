@@ -137,6 +137,27 @@ static void show_color(EditorState *e, const char *color_name, bool cflag)
     }
 }
 
+static void show_cursor(EditorState *e, const char *mode_str, bool cflag)
+{
+    CursorInputMode mode = cursor_mode_from_str(mode_str);
+    if (mode >= NR_CURSOR_MODES) {
+        error_msg("no cursor entry for '%s'", mode_str);
+        return;
+    }
+
+    TermCursorStyle style = e->cursor_styles[mode];
+    const char *type = cursor_type_to_str(style.type);
+    const char *color = cursor_color_to_str(style.color);
+    if (cflag) {
+        char buf[64];
+        xsnprintf(buf, sizeof buf, "cursor %s %s %s", mode_str, type, color);
+        set_input_mode(e, INPUT_COMMAND);
+        cmdline_set_text(&e->cmdline, buf);
+    } else {
+        info_msg("cursor '%s' is set to: %s %s", mode_str, type, color);
+    }
+}
+
 static void show_env(EditorState *e, const char *name, bool cflag)
 {
     const char *value = getenv(name);
@@ -215,6 +236,11 @@ static void show_option(EditorState *e, const char *name, bool cflag)
 static void collect_all_options(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     collect_options(a, prefix, false, false);
+}
+
+static void do_collect_cursor_modes(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+{
+    collect_cursor_modes(a, prefix);
 }
 
 static void show_wsplit(EditorState *e, const char *name, bool cflag)
@@ -349,6 +375,22 @@ String dump_compilers(EditorState *e)
     return buf;
 }
 
+static String dump_cursors(EditorState *e)
+{
+    String buf = string_new(128);
+    for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {
+        const TermCursorStyle *style = &e->cursor_styles[m];
+        string_append_literal(&buf, "cursor ");
+        string_append_cstring(&buf, cursor_mode_to_str(m));
+        string_append_byte(&buf, ' ');
+        string_append_cstring(&buf, cursor_type_to_str(style->type));
+        string_append_byte(&buf, ' ');
+        string_append_cstring(&buf, cursor_color_to_str(style->color));
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
+}
+
 String do_dump_options(EditorState *e)
 {
     String str = dump_options(&e->options, &e->buffer->options);
@@ -387,6 +429,7 @@ static const ShowHandler handlers[] = {
     {"bind", DTERC, show_binding, dump_bindings, collect_bound_normal_keys},
     {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
     {"command", DTERC | LASTLINE, NULL, dump_command_history, NULL},
+    {"cursor", DTERC, show_cursor, dump_cursors, do_collect_cursor_modes},
     {"env", 0, show_env, dump_env, collect_env},
     {"errorfmt", DTERC, show_compiler, dump_compilers, collect_compilers},
     {"ft", DTERC, NULL, do_dump_filetypes, NULL},

@@ -30,6 +30,9 @@ static inline TermCursorStyle get_default_cursor_style(CursorInputMode mode)
     };
 }
 
+const char *cursor_mode_to_str(CursorInputMode mode) RETURNS_NONNULL;
+const char *cursor_type_to_str(TermCursorType type) RETURNS_NONNULL;
+const char *cursor_color_to_str(int32_t color) RETURNS_NONNULL;
 CursorInputMode cursor_mode_from_str(const char *name) NONNULL_ARGS;
 TermCursorType cursor_type_from_str(const char *name) NONNULL_ARGS;
 int32_t cursor_color_from_str(const char *str) NONNULL_ARGS;
