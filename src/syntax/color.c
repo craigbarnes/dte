@@ -82,7 +82,7 @@ static int hlcolor_cmp(const void *ap, const void *bp)
     return strcmp(a->name, b->name);
 }
 
-static void append_color(String *s, const char *name, const TermColor *color)
+void string_append_hl_color(String *s, const char *name, const TermColor *color)
 {
     string_append_literal(s, "hi ");
     string_append_escaped_arg(s, name, true);
@@ -91,7 +91,6 @@ static void append_color(String *s, const char *name, const TermColor *color)
         string_append_literal(s, "-- ");
     }
     string_append_cstring(s, term_color_to_string(color));
-    string_append_byte(s, '\n');
 }
 
 String dump_hl_colors(const ColorScheme *colors)
@@ -99,7 +98,8 @@ String dump_hl_colors(const ColorScheme *colors)
     String buf = string_new(4096);
     string_append_literal(&buf, "# UI colors:\n");
     for (size_t i = 0; i < NR_BC; i++) {
-        append_color(&buf, builtin_color_names[i], &colors->builtin[i]);
+        string_append_hl_color(&buf, builtin_color_names[i], &colors->builtin[i]);
+        string_append_byte(&buf, '\n');
     }
 
     const HashMap *hl_colors = &colors->other;
@@ -125,7 +125,8 @@ String dump_hl_colors(const ColorScheme *colors)
 
     string_append_literal(&buf, "\n# Syntax colors:\n");
     for (size_t i = 0; i < count; i++) {
-        append_color(&buf, array[i].name, &array[i].color);
+        string_append_hl_color(&buf, array[i].name, &array[i].color);
+        string_append_byte(&buf, '\n');
     }
 
     free(array);

@@ -128,11 +128,12 @@ static void show_color(EditorState *e, const char *color_name, bool cflag)
         return;
     }
 
-    const char *color_str = term_color_to_string(hl);
     if (cflag) {
         set_input_mode(e, INPUT_COMMAND);
-        cmdline_set_text(&e->cmdline, color_str);
+        cmdline_clear(&e->cmdline);
+        string_append_hl_color(&e->cmdline.buf, color_name, hl);
     } else {
+        const char *color_str = term_color_to_string(hl);
         info_msg("color '%s' is set to: %s", color_name, color_str);
     }
 }
