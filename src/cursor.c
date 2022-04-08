@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "cursor.h"
+#include "util/array.h"
 #include "util/numtostr.h"
 #include "util/str-util.h"
 
@@ -98,30 +99,15 @@ int32_t cursor_color_from_str(const char *str)
 
 void collect_cursor_modes(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(cursor_modes); i++) {
-        const char *str = cursor_modes[i];
-        if (str_has_prefix(str, prefix)) {
-            ptr_array_append(a, xstrdup(str));
-        }
-    }
+    COLLECT_STRINGS(cursor_modes, a, prefix);
 }
 
 void collect_cursor_types(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(cursor_types); i++) {
-        const char *str = cursor_types[i];
-        if (str_has_prefix(str, prefix)) {
-            ptr_array_append(a, xstrdup(str));
-        }
-    }
+    COLLECT_STRINGS(cursor_types, a, prefix);
 }
 
 void collect_cursor_colors(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(cursor_colors); i++) {
-        const char *str = cursor_colors[i];
-        if (str_has_prefix(str, prefix)) {
-            ptr_array_append(a, xstrdup(str));
-        }
-    }
+    COLLECT_STRINGS(cursor_colors, a, prefix);
 }

@@ -3,6 +3,7 @@
 #include "command/serialize.h"
 #include "error.h"
 #include "regexp.h"
+#include "util/array.h"
 #include "util/hashmap.h"
 #include "util/intern.h"
 #include "util/str-util.h"
@@ -109,11 +110,7 @@ void remove_compiler(HashMap *compilers, const char *name)
 
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(capture_names); i++) {
-        if (str_has_prefix(capture_names[i], prefix)) {
-            ptr_array_append(a, xstrdup(capture_names[i]));
-        }
-    }
+    COLLECT_STRINGS(capture_names, a, prefix);
     if (str_has_prefix("_", prefix)) {
         ptr_array_append(a, xstrdup("_"));
     }

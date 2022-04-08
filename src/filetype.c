@@ -3,6 +3,7 @@
 #include "editor.h"
 #include "error.h"
 #include "regexp.h"
+#include "util/array.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
@@ -266,12 +267,7 @@ bool is_ft(const PointerArray *filetypes, const char *name)
 
 void collect_ft(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(builtin_filetype_names); i++) {
-        const char *name = builtin_filetype_names[i];
-        if (str_has_prefix(name, prefix)) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
+    COLLECT_STRINGS(builtin_filetype_names, a, prefix);
     for (size_t i = 0, n = editor.filetypes.count; i < n; i++) {
         const UserFileTypeEntry *ft = editor.filetypes.ptrs[i];
         const char *name = ft->name;

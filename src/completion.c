@@ -20,6 +20,7 @@
 #include "syntax/color.h"
 #include "tag.h"
 #include "util/arith.h"
+#include "util/array.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
@@ -192,12 +193,7 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *pref
 
 void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < NR_BC; i++) {
-        const char *name = builtin_color_names[i];
-        if (str_has_prefix(name, prefix)) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
+    COLLECT_STRINGS(builtin_color_names, a, prefix);
     collect_hashmap_keys(&e->colors.other, a, prefix);
 }
 
@@ -392,11 +388,7 @@ static void complete_macro(EditorState *e, const CommandArgs *a)
     }
 
     CompletionState *cs = &e->cmdline.completion;
-    for (size_t i = 0; i < ARRAYLEN(verbs); i++) {
-        if (str_has_prefix(verbs[i], cs->parsed)) {
-            ptr_array_append(&cs->completions, xstrdup(verbs[i]));
-        }
-    }
+    COLLECT_STRINGS(verbs, &cs->completions, cs->parsed);
 }
 
 static void complete_move_tab(EditorState *e, const CommandArgs *a)
@@ -407,11 +399,7 @@ static void complete_move_tab(EditorState *e, const CommandArgs *a)
 
     static const char words[][8] = {"left", "right"};
     CompletionState *cs = &e->cmdline.completion;
-    for (size_t i = 0; i < ARRAYLEN(words); i++) {
-        if (str_has_prefix(words[i], cs->parsed)) {
-            ptr_array_append(&cs->completions, xstrdup(words[i]));
-        }
-    }
+    COLLECT_STRINGS(words, &cs->completions, cs->parsed);
 }
 
 static void complete_open(EditorState *e, const CommandArgs *a)
