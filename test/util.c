@@ -2117,6 +2117,22 @@ static void test_path_parent(TestContext *ctx)
     EXPECT_EQ(sv2.length, 1);
 }
 
+static void test_size_increment_wrapped(TestContext *ctx)
+{
+    EXPECT_EQ(size_increment_wrapped(0, 1), 0);
+    EXPECT_EQ(size_increment_wrapped(3, 5), 4);
+    EXPECT_EQ(size_increment_wrapped(4, 5), 0);
+    EXPECT_EQ(size_increment_wrapped(0, 5), 1);
+}
+
+static void test_size_decrement_wrapped(TestContext *ctx)
+{
+    EXPECT_EQ(size_decrement_wrapped(0, 1), 0);
+    EXPECT_EQ(size_decrement_wrapped(1, 450), 0);
+    EXPECT_EQ(size_decrement_wrapped(0, 450), 449);
+    EXPECT_EQ(size_decrement_wrapped(449, 450), 448);
+}
+
 static void test_size_multiply_overflows(TestContext *ctx)
 {
     size_t r = 0;
@@ -2400,6 +2416,8 @@ static const TestEntry tests[] = {
     TEST(test_path_absolute),
     TEST(test_path_join),
     TEST(test_path_parent),
+    TEST(test_size_increment_wrapped),
+    TEST(test_size_decrement_wrapped),
     TEST(test_size_multiply_overflows),
     TEST(test_size_add_overflows),
     TEST(test_size_multiply),
