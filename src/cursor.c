@@ -3,7 +3,7 @@
 #include "cursor.h"
 #include "util/str-util.h"
 
-static const char modes[NR_CURSOR_MODES][12] = {
+static const char cursor_modes[NR_CURSOR_MODES][12] = {
     [CURSOR_MODE_DEFAULT] = "default",
     [CURSOR_MODE_INSERT] = "insert",
     [CURSOR_MODE_OVERWRITE] = "overwrite",
@@ -28,8 +28,8 @@ static const char cursor_colors[][8] = {
 
 CursorInputMode cursor_mode_from_str(const char *name)
 {
-    for (CursorInputMode m = 0; m < ARRAYLEN(modes); m++) {
-        if (streq(name, modes[m])) {
+    for (CursorInputMode m = 0; m < ARRAYLEN(cursor_modes); m++) {
+        if (streq(name, cursor_modes[m])) {
             return m;
         }
     }
@@ -70,8 +70,8 @@ int32_t cursor_color_from_str(const char *str)
 
 void collect_cursor_modes(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(modes); i++) {
-        const char *str = modes[i];
+    for (size_t i = 0; i < ARRAYLEN(cursor_modes); i++) {
+        const char *str = cursor_modes[i];
         if (str_has_prefix(str, prefix)) {
             ptr_array_append(a, xstrdup(str));
         }
