@@ -37,21 +37,24 @@ void add_message(MessageArray *msgs, Message *m)
 
 void activate_current_message(const MessageArray *msgs)
 {
-    size_t msg_pos = msgs->pos;
-    if (msg_pos == msgs->array.count) {
+    size_t pos = msgs->pos;
+    size_t count = msgs->array.count;
+    if (pos == count) {
         return;
     }
-    const Message *m = msgs->array.ptrs[msg_pos];
+
+    const Message *m = msgs->array.ptrs[pos];
     if (m->loc && m->loc->filename) {
         if (!file_location_go(m->loc)) {
             // Error message is visible
             return;
         }
     }
-    if (msgs->array.count == 1) {
+
+    if (count == 1) {
         info_msg("%s", m->msg);
     } else {
-        info_msg("[%zu/%zu] %s", msg_pos + 1, msgs->array.count, m->msg);
+        info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
     }
 }
 
