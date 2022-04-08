@@ -19,6 +19,7 @@
 #include "show.h"
 #include "syntax/color.h"
 #include "tag.h"
+#include "util/arith.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
@@ -788,7 +789,7 @@ void complete_command_next(EditorState *e)
         return;
     }
     if (!init) {
-        cs->idx = (cs->idx < count - 1) ? cs->idx + 1 : 0;
+        cs->idx = size_increment_wrapped(cs->idx, count);
     }
     do_complete_command(&e->cmdline);
 }
@@ -805,7 +806,7 @@ void complete_command_prev(EditorState *e)
         return;
     }
     if (!init) {
-        cs->idx = (cs->idx ? cs->idx : count) - 1;
+        cs->idx = size_decrement_wrapped(cs->idx, count);
     }
     do_complete_command(&e->cmdline);
 }

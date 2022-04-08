@@ -41,9 +41,9 @@
 #include "terminal/mode.h"
 #include "terminal/osc52.h"
 #include "terminal/terminal.h"
+#include "util/arith.h"
 #include "util/bit.h"
 #include "util/bsearch.h"
-#include "util/checked-arith.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
 #include "util/path.h"
@@ -1105,9 +1105,9 @@ static void cmd_move_tab(const CommandArgs *a)
     size_t to, from = ptr_array_idx(&window->views, e->view);
     BUG_ON(from >= ntabs);
     if (streq(str, "left")) {
-        to = (from ? from : ntabs) - 1;
+        to = size_decrement_wrapped(from, ntabs);
     } else if (streq(str, "right")) {
-        to = (from + 1) % ntabs;
+        to = size_increment_wrapped(from, ntabs);
     } else {
         if (!str_to_size(str, &to) || to == 0) {
             error_msg("Invalid tab position %s", str);
@@ -1169,7 +1169,7 @@ static void cmd_next(const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e, e->window->views.ptrs[(i + 1) % n]);
+    set_view(e, e->window->views.ptrs[size_increment_wrapped(i, n)]);
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -1415,7 +1415,7 @@ static void cmd_prev(const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e, e->window->views.ptrs[(i ? i : n) - 1]);
+    set_view(e, e->window->views.ptrs[size_decrement_wrapped(i, n)]);
 }
 
 static void cmd_quit(const CommandArgs *a)
@@ -2411,7 +2411,7 @@ static void cmd_wswap(const CommandArgs *a)
     size_t count = parent->frames.count;
     size_t current = ptr_array_idx(&parent->frames, frame);
     BUG_ON(current >= count);
-    size_t next = (current + 1 < count) ? current + 1 : 0;
+    size_t next = size_increment_wrapped(current, count);
 
     void **ptrs = parent->frames.ptrs;
     Frame *tmp = ptrs[current];

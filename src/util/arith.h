@@ -4,7 +4,22 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "debug.h"
 #include "macros.h"
+
+static inline size_t size_increment_wrapped(size_t x, size_t modulus)
+{
+    BUG_ON(modulus == 0);
+    BUG_ON(x >= modulus);
+    return (x + 1 < modulus) ? x + 1 : 0;
+}
+
+static inline size_t size_decrement_wrapped(size_t x, size_t modulus)
+{
+    BUG_ON(modulus == 0);
+    BUG_ON(x >= modulus);
+    return (x == 0) ? modulus - 1 : x - 1;
+}
 
 static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
 {

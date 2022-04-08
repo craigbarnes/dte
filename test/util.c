@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "test.h"
+#include "util/arith.h"
 #include "util/ascii.h"
 #include "util/base64.h"
 #include "util/bit.h"
-#include "util/checked-arith.h"
 #include "util/exec.h"
 #include "util/hash.h"
 #include "util/hashmap.h"

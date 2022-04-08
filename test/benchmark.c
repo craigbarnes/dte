@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include "filetype.h"
-#include "util/checked-arith.h"
+#include "util/arith.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/string-view.h"

@@ -1,8 +1,8 @@
 #include <limits.h>
 #include <string.h>
 #include "strtonum.h"
+#include "arith.h"
 #include "ascii.h"
-#include "checked-arith.h"
 
 enum {
     A = 0xA, B = 0xB, C = 0xC,
