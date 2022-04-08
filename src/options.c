@@ -652,8 +652,9 @@ void toggle_option(const char *name, bool global, bool verbose)
 
     desc_set(desc, ptr, global, value);
     if (verbose) {
+        const char *prefix = (global && desc->local) ? "[global] " : "";
         const char *str = desc_string(desc, value);
-        info_msg("%s = %s", desc->name, str);
+        info_msg("%s%s = %s", prefix, desc->name, str);
     }
 }
 
@@ -689,8 +690,9 @@ void toggle_option_values (
         size_t i = current % count;
         desc_set(desc, ptr, global, parsed_values[i]);
         if (verbose) {
+            const char *prefix = (global && desc->local) ? "[global] " : "";
             const char *str = desc_string(desc, parsed_values[i]);
-            info_msg("%s = %s", desc->name, str);
+            info_msg("%s%s = %s", prefix, desc->name, str);
         }
     }
 
