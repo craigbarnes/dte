@@ -376,7 +376,7 @@ String dump_compilers(EditorState *e)
     return buf;
 }
 
-static String dump_cursors(EditorState *e)
+String dump_cursors(EditorState *e)
 {
     String buf = string_new(128);
     for (CursorInputMode m = 0; m < ARRAYLEN(e->cursor_styles); m++) {

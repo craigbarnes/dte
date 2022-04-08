@@ -21,6 +21,7 @@ static const struct {
 } handlers[] = {
     {"alias", true, true, dump_normal_aliases},
     {"bind", true, true, dump_bindings},
+    {"cursor", true, true, dump_cursors},
     {"errorfmt", true, true, dump_compilers},
     {"ft", true, true, do_dump_filetypes},
     {"hi", true, true, do_dump_hl_colors},

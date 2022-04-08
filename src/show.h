@@ -13,6 +13,7 @@ void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *n
 
 String dump_bindings(EditorState *e);
 String dump_compilers(EditorState *e);
+String dump_cursors(EditorState *e);
 String dump_frames(EditorState *e);
 String dump_normal_aliases(EditorState *e);
 String do_dump_builtin_configs(EditorState *e);
