@@ -17,7 +17,7 @@ static inline size_t size_increment_wrapped(size_t x, size_t modulus)
     return (x + 1 < modulus) ? x + 1 : 0;
 }
 
-// As above, but equivalent to `x ? (x - 1) % modulus : modulus - 1`
+// As above, but for decrementing `x` instead of incrementing it
 static inline size_t size_decrement_wrapped(size_t x, size_t modulus)
 {
     BUG_ON(modulus == 0);
