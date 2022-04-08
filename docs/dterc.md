@@ -1169,7 +1169,8 @@ name). If this argument is omitted, the full list of entries of the
 specified _type_ will be displayed in a new buffer.
 
 `-c`
-:   write value to command line (if possible)
+:   write output to the command line (for most _type_ arguments) or to
+    the current buffer (when _type_ is `errorfmt` or `include`)
 
 ### **macro** _action_
 
