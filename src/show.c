@@ -129,9 +129,11 @@ static void show_color(EditorState *e, const char *color_name, bool cflag)
     }
 
     if (cflag) {
+        CommandLine *c = &e->cmdline;
         set_input_mode(e, INPUT_COMMAND);
-        cmdline_clear(&e->cmdline);
-        string_append_hl_color(&e->cmdline.buf, color_name, hl);
+        cmdline_clear(c);
+        string_append_hl_color(&c->buf, color_name, hl);
+        c->pos = c->buf.len;
     } else {
         const char *color_str = term_color_to_string(hl);
         info_msg("color '%s' is set to: %s", color_name, color_str);
