@@ -954,6 +954,63 @@ static void test_term_osc52_copy(TestContext *ctx)
     term_output_free(&obuf);
 }
 
+static void test_term_set_cursor_style(TestContext *ctx)
+{
+    Terminal term = {
+        .width = 80,
+        .height = 24,
+        .color_type = TERM_TRUE_COLOR,
+    };
+
+    TermCursorStyle style = {
+        .type = CURSOR_STEADY_BAR,
+        .color = COLOR_RGB(0x22AACC),
+    };
+
+    static const char expected[] = "\033[6 q\033]12;rgb:22/aa/cc\033\\";
+    size_t expected_len = sizeof(expected) - 1;
+    ASSERT_EQ(expected_len, 24);
+
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    memset(obuf->buf, '@', expected_len + 16);
+
+    term_set_cursor_style(&term, style);
+    EXPECT_EQ(obuf->count, expected_len);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, expected, expected_len);
+    EXPECT_EQ(obuf->cursor_style.type, style.type);
+    EXPECT_EQ(obuf->cursor_style.color, style.color);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    term_output_free(obuf);
+}
+
+static void test_term_restore_cursor_style(TestContext *ctx)
+{
+    Terminal term = {
+        .width = 80,
+        .height = 24,
+        .color_type = TERM_TRUE_COLOR,
+    };
+
+    static const char expected[] = "\033[0 q\033]112\033\\";
+    size_t expected_len = sizeof(expected) - 1;
+    ASSERT_EQ(expected_len, 12);
+
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    memset(obuf->buf, '@', expected_len + 16);
+
+    term_restore_cursor_style(&term);
+    EXPECT_EQ(obuf->count, expected_len);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, expected, expected_len);
+    ASSERT_TRUE(clear_obuf(obuf));
+
+    term_output_free(obuf);
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_term_color),
     TEST(test_color_to_nearest),
@@ -970,6 +1027,8 @@ static const TestEntry tests[] = {
     TEST(test_term_set_bytes),
     TEST(test_term_set_color),
     TEST(test_term_osc52_copy),
+    TEST(test_term_set_cursor_style),
+    TEST(test_term_restore_cursor_style),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);
