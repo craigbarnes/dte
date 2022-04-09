@@ -73,20 +73,6 @@ int32_t cursor_color_from_str(const char *str)
     return STR_TO_ENUM(cursor_colors, str, -2, COLOR_INVALID);
 }
 
-UNITTEST {
-    BUG_ON(cursor_color_from_str("keep") != COLOR_KEEP);
-    BUG_ON(cursor_color_from_str("default") != COLOR_DEFAULT);
-    BUG_ON(cursor_color_from_str("#f9a") != COLOR_RGB(0xFF99AA));
-    BUG_ON(cursor_color_from_str("#123456") != COLOR_RGB(0x123456));
-    BUG_ON(cursor_color_from_str("red") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("#") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("0") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("#12345") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("#1234567") != COLOR_INVALID);
-    BUG_ON(cursor_color_from_str("123456") != COLOR_INVALID);
-}
-
 void collect_cursor_modes(PointerArray *a, const char *prefix)
 {
     COLLECT_STRINGS(cursor_modes, a, prefix);

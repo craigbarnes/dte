@@ -1,5 +1,6 @@
 #include "test.h"
 #include "terminal/color.h"
+#include "terminal/cursor.h"
 #include "terminal/key.h"
 #include "terminal/linux.h"
 #include "terminal/osc52.h"
@@ -208,6 +209,50 @@ static void test_term_color_to_string(TestContext *ctx)
         .attr = ~0U
     };
     EXPECT_EQ(strlen(term_color_to_string(&color)), 94);
+}
+
+static void test_cursor_mode_from_str(TestContext *ctx)
+{
+    EXPECT_EQ(cursor_mode_from_str("default"), CURSOR_MODE_DEFAULT);
+    EXPECT_EQ(cursor_mode_from_str("insert"), CURSOR_MODE_INSERT);
+    EXPECT_EQ(cursor_mode_from_str("overwrite"), CURSOR_MODE_OVERWRITE);
+    EXPECT_EQ(cursor_mode_from_str("cmdline"), CURSOR_MODE_CMDLINE);
+    EXPECT_EQ(cursor_mode_from_str(""), NR_CURSOR_MODES);
+    EXPECT_EQ(cursor_mode_from_str("d"), NR_CURSOR_MODES);
+    EXPECT_EQ(cursor_mode_from_str("defaults"), NR_CURSOR_MODES);
+    EXPECT_EQ(cursor_mode_from_str("command"), NR_CURSOR_MODES);
+}
+
+static void test_cursor_type_from_str(TestContext *ctx)
+{
+    EXPECT_EQ(cursor_type_from_str("default"), CURSOR_DEFAULT);
+    EXPECT_EQ(cursor_type_from_str("keep"), CURSOR_KEEP);
+    EXPECT_EQ(cursor_type_from_str("block"), CURSOR_STEADY_BLOCK);
+    EXPECT_EQ(cursor_type_from_str("bar"), CURSOR_STEADY_BAR);
+    EXPECT_EQ(cursor_type_from_str("underline"), CURSOR_STEADY_UNDERLINE);
+    EXPECT_EQ(cursor_type_from_str("blinking-block"), CURSOR_BLINKING_BLOCK);
+    EXPECT_EQ(cursor_type_from_str("blinking-bar"), CURSOR_BLINKING_BAR);
+    EXPECT_EQ(cursor_type_from_str("blinking-underline"), CURSOR_BLINKING_UNDERLINE);
+    EXPECT_EQ(cursor_type_from_str(""), CURSOR_INVALID);
+    EXPECT_EQ(cursor_type_from_str("b"), CURSOR_INVALID);
+    EXPECT_EQ(cursor_type_from_str("bars"), CURSOR_INVALID);
+    EXPECT_EQ(cursor_type_from_str("blinking-default"), CURSOR_INVALID);
+    EXPECT_EQ(cursor_type_from_str("blinking-keep"), CURSOR_INVALID);
+}
+
+static void test_cursor_color_from_str(TestContext *ctx)
+{
+    EXPECT_EQ(cursor_color_from_str("keep"), COLOR_KEEP);
+    EXPECT_EQ(cursor_color_from_str("default"), COLOR_DEFAULT);
+    EXPECT_EQ(cursor_color_from_str("#f9a"), COLOR_RGB(0xFF99AA));
+    EXPECT_EQ(cursor_color_from_str("#123456"), COLOR_RGB(0x123456));
+    EXPECT_EQ(cursor_color_from_str("red"), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str(""), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str("#"), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str("0"), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str("#12345"), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str("#1234567"), COLOR_INVALID);
+    EXPECT_EQ(cursor_color_from_str("123456"), COLOR_INVALID);
 }
 
 static void test_xterm_parse_key(TestContext *ctx)
@@ -1015,6 +1060,9 @@ static const TestEntry tests[] = {
     TEST(test_parse_term_color),
     TEST(test_color_to_nearest),
     TEST(test_term_color_to_string),
+    TEST(test_cursor_mode_from_str),
+    TEST(test_cursor_type_from_str),
+    TEST(test_cursor_color_from_str),
     TEST(test_xterm_parse_key),
     TEST(test_xterm_parse_key_combo),
     TEST(test_rxvt_parse_key),
