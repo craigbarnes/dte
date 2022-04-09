@@ -67,18 +67,24 @@ TermCursorType cursor_type_from_str(const char *name)
 
 int32_t cursor_color_from_str(const char *str)
 {
-    size_t len = strlen(str);
-    if (unlikely(len == 0)) {
-        return COLOR_INVALID;
-    }
-
     if (str[0] == '#') {
-        return parse_rgb(str + 1, len - 1);
+        return parse_rgb(str + 1, strlen(str + 1));
     }
-
-    static_assert(COLOR_KEEP == -2);
-    static_assert(COLOR_DEFAULT == -1);
     return STR_TO_ENUM(cursor_colors, str, -2, COLOR_INVALID);
+}
+
+UNITTEST {
+    BUG_ON(cursor_color_from_str("keep") != COLOR_KEEP);
+    BUG_ON(cursor_color_from_str("default") != COLOR_DEFAULT);
+    BUG_ON(cursor_color_from_str("#f9a") != COLOR_RGB(0xFF99AA));
+    BUG_ON(cursor_color_from_str("#123456") != COLOR_RGB(0x123456));
+    BUG_ON(cursor_color_from_str("red") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("#") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("0") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("#12345") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("#1234567") != COLOR_INVALID);
+    BUG_ON(cursor_color_from_str("123456") != COLOR_INVALID);
 }
 
 void collect_cursor_modes(PointerArray *a, const char *prefix)
