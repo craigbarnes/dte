@@ -45,6 +45,30 @@ static void expect_keycode_eq (
     );
 }
 
+static void test_parse_rgb(TestContext *ctx)
+{
+    EXPECT_EQ(parse_rgb(STRN("f01cff")), COLOR_RGB(0xf01cff));
+    EXPECT_EQ(parse_rgb(STRN("011011")), COLOR_RGB(0x011011));
+    EXPECT_EQ(parse_rgb(STRN("12aC90")), COLOR_RGB(0x12ac90));
+    EXPECT_EQ(parse_rgb(STRN("fffffF")), COLOR_RGB(0xffffff));
+    EXPECT_EQ(parse_rgb(STRN("fa0")), COLOR_RGB(0xffaa00));
+    EXPECT_EQ(parse_rgb(STRN("123")), COLOR_RGB(0x112233));
+    EXPECT_EQ(parse_rgb(STRN("fff")), COLOR_RGB(0xffffff));
+    EXPECT_EQ(parse_rgb(STRN("ABC")), COLOR_RGB(0xaabbcc));
+    EXPECT_EQ(parse_rgb(STRN("0F0")), COLOR_RGB(0x00ff00));
+    EXPECT_EQ(parse_rgb(STRN("000")), COLOR_RGB(0x000000));
+    EXPECT_EQ(parse_rgb(STRN("fffffg")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN(".")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("11223")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("efg")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("12")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("ffff")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("00")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("1234567")), COLOR_INVALID);
+    EXPECT_EQ(parse_rgb(STRN("123456789")), COLOR_INVALID);
+}
+
 static void test_parse_term_color(TestContext *ctx)
 {
     static const struct {
@@ -1057,6 +1081,7 @@ static void test_term_restore_cursor_style(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_parse_rgb),
     TEST(test_parse_term_color),
     TEST(test_color_to_nearest),
     TEST(test_term_color_to_string),

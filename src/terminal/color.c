@@ -86,14 +86,6 @@ static unsigned int rgb_to_rrggbb(unsigned int c)
     return r | (r|g) << 4 | (g|b) << 8 | b << 12;
 }
 
-UNITTEST {
-    BUG_ON(rgb_to_rrggbb(0x000) != 0x000000);
-    BUG_ON(rgb_to_rrggbb(0x123) != 0x112233);
-    BUG_ON(rgb_to_rrggbb(0xABC) != 0xAABBCC);
-    BUG_ON(rgb_to_rrggbb(0x0F0) != 0x00FF00);
-    BUG_ON(rgb_to_rrggbb(0xFFF) != 0xFFFFFF);
-}
-
 int32_t parse_rgb(const char *str, size_t len)
 {
     unsigned int val = 0;
@@ -108,26 +100,6 @@ int32_t parse_rgb(const char *str, size_t len)
         }
     }
     return COLOR_INVALID;
-}
-
-UNITTEST {
-    BUG_ON(parse_rgb(STRN("f01cff")) != COLOR_RGB(0xf01cff));
-    BUG_ON(parse_rgb(STRN("011011")) != COLOR_RGB(0x011011));
-    BUG_ON(parse_rgb(STRN("12aC90")) != COLOR_RGB(0x12ac90));
-    BUG_ON(parse_rgb(STRN("fffffF")) != COLOR_RGB(0xffffff));
-    BUG_ON(parse_rgb(STRN("fa0")) != COLOR_RGB(0xffaa00));
-    BUG_ON(parse_rgb(STRN("123")) != COLOR_RGB(0x112233));
-    BUG_ON(parse_rgb(STRN("fff")) != COLOR_RGB(0xffffff));
-    BUG_ON(parse_rgb(STRN("fffffg")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN(".")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("11223")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("efg")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("12")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("ffff")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("00")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("1234567")) != COLOR_INVALID);
-    BUG_ON(parse_rgb(STRN("123456789")) != COLOR_INVALID);
 }
 
 static int32_t parse_color(const char *str)
