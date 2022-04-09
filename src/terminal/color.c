@@ -139,34 +139,6 @@ static int32_t parse_color(const char *str)
     return lookup_color(str);
 }
 
-UNITTEST {
-    BUG_ON(parse_color("-2") != COLOR_KEEP);
-    BUG_ON(parse_color("-1") != COLOR_DEFAULT);
-    BUG_ON(parse_color("0") != COLOR_BLACK);
-    BUG_ON(parse_color("1") != COLOR_RED);
-    BUG_ON(parse_color("255") != 255);
-    BUG_ON(parse_color("0/0/0") != 16);
-    BUG_ON(parse_color("2/3/4") != 110);
-    BUG_ON(parse_color("5/5/5") != 231);
-    BUG_ON(parse_color("black") != COLOR_BLACK);
-    BUG_ON(parse_color("white") != COLOR_WHITE);
-    BUG_ON(parse_color("keep") != COLOR_KEEP);
-    BUG_ON(parse_color("default") != COLOR_DEFAULT);
-    BUG_ON(parse_color("#abcdef") != COLOR_RGB(0xABCDEF));
-    BUG_ON(parse_color("#a1b2c3") != COLOR_RGB(0xA1B2C3));
-    BUG_ON(parse_color("-3") != COLOR_INVALID);
-    BUG_ON(parse_color("256") != COLOR_INVALID);
-    BUG_ON(parse_color("//0/0") != COLOR_INVALID);
-    BUG_ON(parse_color("0/0/:") != COLOR_INVALID);
-    BUG_ON(parse_color("lightblack") != COLOR_INVALID);
-    BUG_ON(parse_color("lightwhite") != COLOR_INVALID);
-    BUG_ON(parse_color("light_") != COLOR_INVALID);
-    BUG_ON(parse_color("") != COLOR_INVALID);
-    BUG_ON(parse_color(".") != COLOR_INVALID);
-    BUG_ON(parse_color("#11223") != COLOR_INVALID);
-    BUG_ON(parse_color("#fffffg") != COLOR_INVALID);
-}
-
 // Note: this function returns the number of valid strings parsed, or -1 if
 // more than 2 valid colors were encountered. Thus, success is indicated by
 // a return value equal to `nstrs`.
