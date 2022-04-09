@@ -1,6 +1,9 @@
 #include "../../build/feature.h"
+#include <errno.h>
+#include <string.h>
 #include <unistd.h>
 #include "winsize.h"
+#include "util/log.h"
 
 #if defined(HAVE_TIOCGWINSZ)
 
@@ -10,6 +13,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
     if (unlikely(ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)) {
+        LOG_ERROR("TIOCGWINSZ ioctl failed: %s", strerror(errno));
         return false;
     }
     *w = ws.ws_col;
@@ -25,6 +29,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
     if (unlikely(tcgetwinsize(STDIN_FILENO, &ws) != 0)) {
+        LOG_ERROR("tcgetwinsize() failed: %s", strerror(errno));
         return false;
     }
     *w = ws.ws_col;
