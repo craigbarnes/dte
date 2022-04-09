@@ -57,22 +57,12 @@ const char *cursor_color_to_str(int32_t color)
 
 CursorInputMode cursor_mode_from_str(const char *name)
 {
-    for (CursorInputMode m = 0; m < ARRAYLEN(cursor_modes); m++) {
-        if (streq(name, cursor_modes[m])) {
-            return m;
-        }
-    }
-    return NR_CURSOR_MODES; // Invalid name
+    return STR_TO_ENUM(cursor_modes, name, 0, NR_CURSOR_MODES);
 }
 
 TermCursorType cursor_type_from_str(const char *name)
 {
-    for (TermCursorType t = 0; t < ARRAYLEN(cursor_types); t++) {
-        if (streq(name, cursor_types[t])) {
-            return t;
-        }
-    }
-    return CURSOR_INVALID;
+    return STR_TO_ENUM(cursor_types, name, 0, CURSOR_INVALID);
 }
 
 int32_t cursor_color_from_str(const char *str)
@@ -88,13 +78,7 @@ int32_t cursor_color_from_str(const char *str)
 
     static_assert(COLOR_KEEP == -2);
     static_assert(COLOR_DEFAULT == -1);
-    for (int32_t i = 0; i < ARRAYLEN(cursor_colors); i++) {
-        if (streq(str, cursor_colors[i])) {
-            return i - 2;
-        }
-    }
-
-    return COLOR_INVALID;
+    return STR_TO_ENUM(cursor_colors, str, -2, COLOR_INVALID);
 }
 
 void collect_cursor_modes(PointerArray *a, const char *prefix)

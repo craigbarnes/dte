@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <string.h>
 #include "color.h"
+#include "util/array.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
@@ -54,14 +55,9 @@ static unsigned int lookup_attr(const char *s)
     return 0;
 }
 
-static int32_t lookup_color(const char *s)
+static int32_t lookup_color(const char *name)
 {
-    for (size_t i = 0; i < ARRAYLEN(color_names); i++) {
-        if (streq(s, color_names[i])) {
-            return i - 2;
-        }
-    }
-    return COLOR_INVALID;
+    return STR_TO_ENUM(color_names, name, -2, COLOR_INVALID);
 }
 
 UNITTEST {

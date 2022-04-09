@@ -7,6 +7,7 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 #include "log.h"
+#include "array.h"
 #include "debug.h"
 #include "exitcode.h"
 #include "str-util.h"
@@ -33,14 +34,7 @@ LogLevel log_level_from_str(const char *str)
         // $DTE_LOG is set and $DTE_LOG_LEVEL is unset (or empty)
         return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
     }
-
-    for (size_t i = 0; i < ARRAYLEN(levels); i++) {
-        if (streq(str, levels[i])) {
-            return (LogLevel)i;
-        }
-    }
-
-    return LOG_LEVEL_NONE;
+    return STR_TO_ENUM(levels, str, 0, LOG_LEVEL_NONE);
 }
 
 void log_init(const char *filename, LogLevel level)
