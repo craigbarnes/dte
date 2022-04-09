@@ -60,24 +60,6 @@ static int32_t lookup_color(const char *name)
     return STR_TO_ENUM(color_names, name, -2, COLOR_INVALID);
 }
 
-UNITTEST {
-    BUG_ON(lookup_attr("keep") != ATTR_KEEP);
-    BUG_ON(lookup_attr("dim") != ATTR_DIM);
-    BUG_ON(lookup_attr("bold") != ATTR_BOLD);
-    BUG_ON(lookup_attr("strikethrough") != ATTR_STRIKETHROUGH);
-    BUG_ON(lookup_attr("") != 0);
-    BUG_ON(lookup_color("keep") != COLOR_KEEP);
-    BUG_ON(lookup_color("default") != COLOR_DEFAULT);
-    BUG_ON(lookup_color("black") != COLOR_BLACK);
-    BUG_ON(lookup_color("magenta") != COLOR_MAGENTA);
-    BUG_ON(lookup_color("gray") != COLOR_GRAY);
-    BUG_ON(lookup_color("darkgray") != COLOR_DARKGRAY);
-    BUG_ON(lookup_color("lightblue") != COLOR_LIGHTBLUE);
-    BUG_ON(lookup_color("white") != COLOR_WHITE);
-    BUG_ON(lookup_color("lightblack") != COLOR_INVALID);
-    BUG_ON(lookup_color("") != COLOR_INVALID);
-}
-
 static unsigned int rgb_to_rrggbb(unsigned int c)
 {
     unsigned int r = c & 0xF;

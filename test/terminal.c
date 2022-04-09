@@ -108,6 +108,8 @@ static void test_parse_term_color(TestContext *ctx)
         {-1, {"cyan", "magenta", "yellow"}, {COLOR_INVALID, COLOR_INVALID, 0}},
         {0, {"invalid", "default", "bold"}, {COLOR_INVALID, COLOR_INVALID, 0}},
         {1, {"italic", "invalid"}, {COLOR_INVALID, COLOR_INVALID, 0}},
+        {2, {"red", "blue", ""}, {COLOR_INVALID, COLOR_INVALID, 0}},
+        {2, {"24", "#abc", "dims"}, {COLOR_INVALID, COLOR_INVALID, 0}},
         {0, {""}, {COLOR_INVALID, COLOR_INVALID, 0}},
         {0, {"."}, {COLOR_INVALID, COLOR_INVALID, 0}},
         {0, {"#"}, {COLOR_INVALID, COLOR_INVALID, 0}},
