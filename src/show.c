@@ -436,6 +436,7 @@ static const ShowHandler handlers[] = {
     {"env", 0, show_env, dump_env, collect_env},
     {"errorfmt", DTERC, show_compiler, dump_compilers, collect_compilers},
     {"ft", DTERC, NULL, do_dump_filetypes, NULL},
+    {"hi", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
     {"include", 0, show_include, do_dump_builtin_configs, collect_builtin_configs},
     {"macro", DTERC, NULL, do_dump_macro, NULL},
     {"msg", 0, NULL, do_dump_messages, NULL},
