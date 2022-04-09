@@ -52,12 +52,12 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color input key linux mode osc52 output rxvt terminal \
+    color cursor input key linux mode osc52 output rxvt terminal \
     winsize xterm )
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer change cmdline commands \
-    convert compiler completion config copy ctags cursor edit editor \
+    convert compiler completion config copy ctags edit editor \
     encoding error file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp \
     screen screen-cmdline screen-status screen-tabbar screen-view \
