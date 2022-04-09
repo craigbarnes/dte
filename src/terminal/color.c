@@ -109,16 +109,17 @@ static int32_t parse_color(const char *str)
         return COLOR_INVALID;
     }
 
-    // Parse #rrggbb
+    // Parse #rgb or #rrggbb
     if (str[0] == '#') {
         return parse_rgb(str + 1, len - 1);
     }
 
     // Parse r/g/b
     if (len == 5 && str[1] == '/') {
-        uint8_t r = ((uint8_t)str[0]) - '0';
-        uint8_t g = ((uint8_t)str[2]) - '0';
-        uint8_t b = ((uint8_t)str[4]) - '0';
+        const unsigned char *u_str = str;
+        uint8_t r = u_str[0] - '0';
+        uint8_t g = u_str[2] - '0';
+        uint8_t b = u_str[4] - '0';
         if (unlikely(r > 5 || g > 5 || b > 5 || str[3] != '/')) {
             return COLOR_INVALID;
         }
