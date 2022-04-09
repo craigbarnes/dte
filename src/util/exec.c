@@ -68,7 +68,7 @@ static int xdup3(int oldfd, int newfd, int flags)
 static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
 {
 #ifdef HAVE_TIOCNOTTY
-    if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) != 0) {
+    if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) == -1) {
         LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
     }
 #endif
