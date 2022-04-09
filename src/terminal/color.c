@@ -242,22 +242,6 @@ UNITTEST {
     BUG_ON(nearest_cube_index(0x73) != 2);
     BUG_ON(nearest_cube_index(0xaa) != 3);
     BUG_ON(nearest_cube_index(0xff) != 5);
-
-    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
-    size_t count = 0;
-    for (size_t i = 1; i < ARRAYLEN(color_stops); i++) {
-        uint8_t min = color_stops[i - 1];
-        uint8_t max = color_stops[i];
-        uint8_t mid = min + ((max - min) / 2);
-        for (unsigned int c = min; c <= max; c++, count++) {
-            unsigned int ni = nearest_cube_index(c);
-            unsigned int e = (c < mid) ? i - 1 : i;
-            if (ni != e) {
-                BUG("nearest_cube_index(%u) returned %u (expected %u)", c, ni, e);
-            }
-        }
-    }
-    BUG_ON(count != 255 + ARRAYLEN(color_stops) - 1);
 }
 
 static uint8_t color_rgb_to_256(uint32_t color, bool *exact)
