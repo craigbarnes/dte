@@ -191,6 +191,37 @@ static void test_color_to_nearest(TestContext *ctx)
         IEXPECT_EQ(color_to_nearest(c, TERM_8_COLOR, false), tests[i].expected_16 & 7);
         IEXPECT_EQ(color_to_nearest(c, TERM_0_COLOR, false), COLOR_DEFAULT);
     }
+
+    static const uint8_t color_stops[6] = {0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff};
+    size_t count = 0;
+
+    for (size_t i = 1; i < ARRAYLEN(color_stops); i++) {
+        uint8_t min = color_stops[i - 1];
+        uint8_t max = color_stops[i];
+        uint8_t mid = min + ((max - min) / 2);
+        for (unsigned int b = min; b <= max; b++, count++) {
+            int32_t orig = COLOR_RGB(b);
+            int32_t nearest = color_to_nearest(orig, TERM_256_COLOR, false);
+            size_t nearest_stop_idx = (b < mid) ? i - 1 : i;
+            EXPECT_TRUE(nearest >= 16);
+            EXPECT_TRUE(nearest <= 255);
+            if (nearest < 232) {
+                EXPECT_EQ(nearest, nearest_stop_idx + 16);
+            } else {
+                int32_t v = orig & ~COLOR_FLAG_RGB;
+                EXPECT_TRUE(v >= 0x0D);
+                EXPECT_TRUE(v <= 0x34);
+                EXPECT_EQ(nearest, 232 + (((b / 3) - 3) / 10));
+            }
+            if (nearest == min || nearest == max) {
+                EXPECT_EQ(nearest, b);
+                EXPECT_EQ(nearest, color_to_nearest(orig, TERM_TRUE_COLOR, true));
+            }
+            EXPECT_EQ(nearest_stop_idx, ((uint8_t)b - (b < 75 ? 7 : 35)) / 40);
+        }
+    }
+
+    EXPECT_EQ(count, 255 + ARRAYLEN(color_stops) - 1);
 }
 
 static void test_term_color_to_string(TestContext *ctx)
