@@ -284,6 +284,14 @@ static int safe_xclose(int fd)
     return (fd > STDERR_FILENO) ? xclose(fd) : 0;
 }
 
+static void safe_xclose_all(int *fds, size_t nr_fds)
+{
+    for (size_t i = 0; i < nr_fds; i++) {
+        safe_xclose(fds[i]);
+        fds[i] = -1;
+    }
+}
+
 bool spawn(SpawnContext *ctx, SpawnAction actions[3])
 {
     int child_fds[3] = {-1, -1, -1};
@@ -313,8 +321,8 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
                 perror_msg("pipe");
                 goto error_close;
             }
-            BUG_ON(p[0] < 3);
-            BUG_ON(p[1] < 3);
+            BUG_ON(p[0] <= STDERR_FILENO);
+            BUG_ON(p[1] <= STDERR_FILENO);
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
             break;
@@ -332,9 +340,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
         goto error_resume;
     }
 
-    safe_xclose(child_fds[0]);
-    safe_xclose(child_fds[1]);
-    safe_xclose(child_fds[1]);
+    safe_xclose_all(child_fds, ARRAYLEN(child_fds));
 
     if (actions[0] == SPAWN_PIPE && actions[1] == SPAWN_PIPE) {
         filter(parent_fds[1], parent_fds[0], ctx);
@@ -361,9 +367,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
         }
     }
 
-    safe_xclose(parent_fds[0]);
-    safe_xclose(parent_fds[1]);
-    safe_xclose(parent_fds[2]);
+    safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
 
     int err = handle_child_error(pid);
     resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
@@ -376,9 +380,7 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
 error_resume:
     resume_terminal(quiet, false);
 error_close:
-    for (size_t i = 0; i < 3; i++) {
-        safe_xclose(child_fds[i]);
-        safe_xclose(parent_fds[i]);
-    }
+    safe_xclose_all(child_fds, ARRAYLEN(child_fds));
+    safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
     return false;
 }
