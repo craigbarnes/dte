@@ -1,5 +1,4 @@
 #include "array.h"
-#include "str-util.h"
 
 // This can be used to collect all prefix-matched strings from a "flat" array
 // (i.e. an array of fixed-length char arrays; *not* pointers to char)
