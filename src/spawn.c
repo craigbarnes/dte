@@ -345,8 +345,8 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
     if (actions[0] == SPAWN_PIPE && actions[1] == SPAWN_PIPE) {
         filter(parent_fds[1], parent_fds[0], ctx);
     } else if (actions[0] == SPAWN_PIPE) {
-        size_t input_len = ctx->input.length;
-        if (input_len && xwrite_all(parent_fds[0], ctx->input.data, input_len) < 0) {
+        size_t len = ctx->input.length;
+        if (len && xwrite_all(parent_fds[0], ctx->input.data, len) < 0) {
             perror_msg("write");
             goto error_resume;
         }
