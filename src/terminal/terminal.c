@@ -206,7 +206,10 @@ void term_enable_private_modes(Terminal *term)
     // since it should be ignored by terminals that don't recognize it
     // and we really want to enable it for terminals that support it but
     // are spoofing $TERM for whatever reason.
-    term_add_literal(obuf, "\033[?2004s\033[?2004h");
+
+    // TODO: fix term_read_bracketed_paste() to handle end delimiters
+    // that get split between 2 reads before re-enabling this
+    //term_add_literal(obuf, "\033[?2004s\033[?2004h");
 }
 
 void term_restore_private_modes(Terminal *term)
@@ -221,7 +224,7 @@ void term_restore_private_modes(Terminal *term)
     } else {
         term_add_literal(obuf, "\033[>4m");
     }
-    term_add_literal(obuf, "\033[?2004l\033[?2004r");
+    //term_add_literal(obuf, "\033[?2004l\033[?2004r");
 }
 
 void term_restore_cursor_style(Terminal *term)
