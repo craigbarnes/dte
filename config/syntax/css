@@ -521,8 +521,9 @@ list -i color \
 # Simple pseudo-classes
 list -i pseudoclass \
     :active :checked :disabled :empty :enabled :first-child \
-    :first-of-type :focus :hover :last-child :last-of-type :link \
-    :only-child :only-of-type :root :target :visited
+    :first-of-type :focus :focus-visible :focus-within :hover \
+    :last-child :last-of-type :link :only-child :only-of-type \
+    :root :target :visited
 
 # nth-child(odd) etc.
 list -i exprpseudo :nth-child :nth-last-child :nth-last-of-type :nth-of-type
