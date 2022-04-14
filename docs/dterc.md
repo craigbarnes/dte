@@ -1013,14 +1013,14 @@ _command_. For example:
 `-l`
 :   Operate on current line instead of whole file, if there's no selection
 
-### **pipe-from** [**-ms**] _command_ [_parameter_]...
+### **pipe-from** [**-mn**] _command_ [_parameter_]...
 
 Run external _command_ and insert its standard output.
 
 `-m`
 :   Move after the inserted text
 
-`-s`
+`-n`
 :   Strip newline from end of output
 
 ### **pipe-to** [**-l**] _command_ [_parameter_]...

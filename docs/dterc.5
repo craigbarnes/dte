@@ -187,7 +187,7 @@ External Commands:
 .br
    \fBfilter\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
-   \fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
+   \fBpipe\-from\fR [\fB\-mn\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBpipe\-to\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
@@ -1590,7 +1590,7 @@ filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
 Operate on current line instead of whole file, if there's no selection
 .PP
 .RE
-\fBpipe\-from\fR [\fB\-ms\fR] \fIcommand\fR [\fIparameter\fR]...
+\fBpipe\-from\fR [\fB\-mn\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
 Run external \fIcommand\fR and insert its standard output.
 .P
@@ -1599,7 +1599,7 @@ Run external \fIcommand\fR and insert its standard output.
 Move after the inserted text
 .PP
 .TP
-\fB\-s\fR
+\fB\-n\fR
 Strip newline from end of output
 .PP
 .RE
