@@ -1,7 +1,6 @@
 #ifndef SPAWN_H
 #define SPAWN_H
 
-#include <stdbool.h>
 #include "compiler.h"
 #include "msg.h"
 #include "util/string.h"
@@ -23,11 +22,11 @@ typedef struct {
     char **argv;
     const char **env;
     StringView input;
-    String output;
+    String outputs[2]; // For stdout/stderr
     SpawnFlags flags;
 } SpawnContext;
 
-bool spawn(SpawnContext *ctx, SpawnAction actions[3]);
+int spawn(SpawnContext *ctx, SpawnAction actions[3]);
 void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
 
 #endif

@@ -658,9 +658,35 @@ static const char **lines_and_columns_env(const Window *window)
     return vars;
 }
 
+static void show_spawn_error_msg(const String *errstr, int err)
+{
+    if (err <= 0) {
+        return;
+    }
+
+    char msg[512];
+    if (errstr->len) {
+        size_t pos = 0;
+        StringView line = buf_slice_next_line(errstr->buffer, &pos, errstr->len);
+        BUG_ON(pos == 0);
+        xsnprintf(msg, sizeof(msg), ": \"%.*s\"", (int)line.length, line.data);
+    } else {
+        msg[0] = '\0';
+    }
+
+    if (err >= 256) {
+        int sig = err >> 8;
+        const char *str = strsignal(sig);
+        error_msg("Child received signal %d (%s)%s", sig, str ? str : "??", msg);
+    } else if (err) {
+        error_msg("Child returned %d%s", err, msg);
+    }
+}
+
 typedef enum {
     // Note: these need to be kept sorted
     EXEC_BUFFER,
+    EXEC_ERRMSG,
     EXEC_EVAL,
     EXEC_LINE,
     EXEC_MSG,
@@ -685,6 +711,7 @@ static void cmd_exec(const CommandArgs *a)
         uint8_t flags : 6; // ExecFlags
     } map[] = {
         [EXEC_BUFFER] = {"buffer", SPAWN_PIPE, IN | OUT},
+        [EXEC_ERRMSG] = {"errmsg", SPAWN_PIPE, ERR},
         [EXEC_EVAL] = {"eval", SPAWN_PIPE, OUT},
         [EXEC_LINE] = {"line", SPAWN_PIPE, IN},
         [EXEC_MSG] = {"msg", SPAWN_PIPE, IN | OUT},
@@ -743,7 +770,7 @@ static void cmd_exec(const CommandArgs *a)
 
     SpawnContext ctx = {
         .argv = a->args + a->nr_flag_args,
-        .output = STRING_INIT,
+        .outputs = {STRING_INIT, STRING_INIT},
         .flags = spawn_flags,
         .env = env,
     };
@@ -786,19 +813,23 @@ static void cmd_exec(const CommandArgs *a)
     case EXEC_OPEN:
     case EXEC_TAG:
     case EXEC_EVAL:
+    case EXEC_ERRMSG:
     default:
         BUG("unhandled action");
         return;
     }
 
-    bool ok = spawn(&ctx, spawn_actions);
+    int err = spawn(&ctx, spawn_actions);
     free(alloc);
-    if (!ok) {
+    if (err != 0) {
+        show_spawn_error_msg(&ctx.outputs[1], err);
+        string_free(&ctx.outputs[1]);
         view->cursor = saved_cursor;
         return;
     }
 
-    String *output = &ctx.output;
+    string_free(&ctx.outputs[1]);
+    String *output = &ctx.outputs[0];
     if (
         strip_trailing_newline
         && actions[STDOUT_FILENO] == EXEC_BUFFER
@@ -837,6 +868,7 @@ static void cmd_exec(const CommandArgs *a)
     case EXEC_TTY:
         break;
     case EXEC_LINE: // Already handled above
+    case EXEC_ERRMSG:
     default:
         BUG("unhandled action");
         return;

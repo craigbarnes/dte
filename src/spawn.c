@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <poll.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -93,20 +94,22 @@ static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quie
     fclose(f);
 }
 
-static void filter(int rfd, int wfd, SpawnContext *ctx)
+static void filter(int f[3], SpawnContext *ctx)
 {
-    BUG_ON(rfd < 0 && wfd < 0);
-    BUG_ON(rfd >= 0 && rfd <= 2);
-    BUG_ON(wfd >= 0 && wfd <= 2);
+    BUG_ON(f[0] < 0 && f[1] < 0 && f[2] < 0);
+    BUG_ON(f[0] >= 0 && f[0] <= 2);
+    BUG_ON(f[1] >= 0 && f[1] <= 2);
+    BUG_ON(f[2] >= 0 && f[2] <= 2);
 
     if (!ctx->input.length) {
-        xclose(wfd);
-        wfd = -1;
+        xclose(f[0]);
+        f[0] = -1;
     }
 
     struct pollfd fds[] = {
-        {.fd = rfd, .events = POLLIN},
-        {.fd = wfd, .events = POLLOUT}
+        {.fd = f[0], .events = POLLOUT},
+        {.fd = f[1], .events = POLLIN},
+        {.fd = f[2], .events = POLLIN},
     };
 
     size_t wlen = 0;
@@ -119,37 +122,36 @@ static void filter(int rfd, int wfd, SpawnContext *ctx)
             break;
         }
 
-        if (fds[0].revents & POLLIN) {
-            size_t max_read = 8192;
-            string_reserve_space(&ctx->output, max_read);
-            char *buf = ctx->output.buffer + ctx->output.len;
-            ssize_t rc = xread(fds[0].fd, buf, max_read);
-            if (unlikely(rc < 0)) {
-                perror_msg("read");
-                break;
-            }
-            if (unlikely(rc == 0)) {
-                if (wlen < ctx->input.length) {
-                    error_msg("Command did not read all data");
+        for (size_t i = 0; i < ARRAYLEN(ctx->outputs); i++) {
+            const struct pollfd *pfd = fds + i + 1;
+            if (pfd->revents & POLLIN) {
+                size_t max_read = 8192;
+                string_reserve_space(&ctx->outputs[i], max_read);
+                char *buf = ctx->outputs[i].buffer + ctx->outputs[i].len;
+                ssize_t rc = xread(pfd->fd, buf, max_read);
+                if (unlikely(rc <= 0)) {
+                    if (rc < 0) {
+                        perror_msg("read");
+                    }
+                    break;
                 }
-                break;
+                ctx->outputs[i].len += rc;
             }
-            ctx->output.len += rc;
         }
 
-        if (fds[1].revents & POLLOUT) {
-            ssize_t rc = xwrite(fds[1].fd, ctx->input.data + wlen, ctx->input.length - wlen);
+        if (fds[0].revents & POLLOUT) {
+            ssize_t rc = xwrite(fds[0].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (unlikely(rc < 0)) {
                 perror_msg("write");
                 break;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
-                if (xclose(fds[1].fd)) {
+                if (xclose(fds[0].fd)) {
                     perror_msg("close");
                     break;
                 }
-                fds[1].fd = -1;
+                fds[0].fd = -1;
             }
         }
 
@@ -292,14 +294,12 @@ static void safe_xclose_all(int *fds, size_t nr_fds)
     }
 }
 
-bool spawn(SpawnContext *ctx, SpawnAction actions[3])
+int spawn(SpawnContext *ctx, SpawnAction actions[3])
 {
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};
     bool quiet = !!(ctx->flags & SPAWN_QUIET);
-
-    // TODO: support stderr pipe
-    BUG_ON(actions[STDERR_FILENO] == SPAWN_PIPE);
+    size_t nr_pipes = 0;
 
     for (size_t i = 0; i < ARRAYLEN(child_fds); i++) {
         switch (actions[i]) {
@@ -325,11 +325,12 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
             BUG_ON(p[1] <= STDERR_FILENO);
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
+            nr_pipes++;
             break;
         }
         default:
             BUG("unhandled action type");
-            return false;
+            return -1;
         }
     }
 
@@ -342,8 +343,8 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
 
     safe_xclose_all(child_fds, ARRAYLEN(child_fds));
 
-    if (actions[0] == SPAWN_PIPE && actions[1] == SPAWN_PIPE) {
-        filter(parent_fds[1], parent_fds[0], ctx);
+    if (nr_pipes >= 2 || actions[2] == SPAWN_PIPE) {
+        filter(parent_fds, ctx);
     } else if (actions[0] == SPAWN_PIPE) {
         size_t len = ctx->input.length;
         if (len && xwrite_all(parent_fds[0], ctx->input.data, len) < 0) {
@@ -352,9 +353,10 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
         }
     } else if (actions[1] == SPAWN_PIPE) {
         while (1) {
+            String *out = &ctx->outputs[0];
             size_t max_read = 8192;
-            string_reserve_space(&ctx->output, max_read);
-            char *buf = ctx->output.buffer + ctx->output.len;
+            string_reserve_space(out, max_read);
+            char *buf = out->buffer + out->len;
             ssize_t rc = xread_all(parent_fds[1], buf, max_read);
             if (unlikely(rc < 0)) {
                 perror_msg("read");
@@ -363,24 +365,26 @@ bool spawn(SpawnContext *ctx, SpawnAction actions[3])
             if (rc == 0) {
                 break;
             }
-            ctx->output.len += rc;
+            out->len += rc;
         }
     }
 
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
-
-    int err = handle_child_error(pid);
-    resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
-    if (err) {
-        string_free(&ctx->output);
-        return false;
+    int err = wait_child(pid);
+    if (err < 0) {
+        perror_msg("waitpid");
     }
-    return true;
+
+    resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
+    if (err != 0) {
+        string_free(&ctx->outputs[0]);
+    }
+    return err;
 
 error_resume:
     resume_terminal(quiet, false);
 error_close:
     safe_xclose_all(child_fds, ARRAYLEN(child_fds));
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
-    return false;
+    return -1;
 }
