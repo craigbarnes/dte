@@ -703,24 +703,28 @@ typedef enum {
     ALL = IN | OUT | ERR,
 } ExecFlags;
 
+static const struct {
+    char name[7];
+    uint8_t spawn_action : 2; // SpawnAction
+    uint8_t flags : 6; // ExecFlags
+} exec_map[] = {
+    [EXEC_BUFFER] = {"buffer", SPAWN_PIPE, IN | OUT},
+    [EXEC_ERRMSG] = {"errmsg", SPAWN_PIPE, ERR},
+    [EXEC_EVAL] = {"eval", SPAWN_PIPE, OUT},
+    [EXEC_LINE] = {"line", SPAWN_PIPE, IN},
+    [EXEC_MSG] = {"msg", SPAWN_PIPE, IN | OUT},
+    [EXEC_NULL] = {"null", SPAWN_NULL, ALL},
+    [EXEC_OPEN] = {"open", SPAWN_PIPE, OUT},
+    [EXEC_TAG] = {"tag", SPAWN_PIPE, OUT},
+    [EXEC_TTY] = {"tty", SPAWN_TTY, ALL},
+};
+
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(exec_map, name, strcmp);
+}
+
 static void cmd_exec(const CommandArgs *a)
 {
-    static const struct {
-        char name[7];
-        uint8_t spawn_action : 2; // SpawnAction
-        uint8_t flags : 6; // ExecFlags
-    } map[] = {
-        [EXEC_BUFFER] = {"buffer", SPAWN_PIPE, IN | OUT},
-        [EXEC_ERRMSG] = {"errmsg", SPAWN_PIPE, ERR},
-        [EXEC_EVAL] = {"eval", SPAWN_PIPE, OUT},
-        [EXEC_LINE] = {"line", SPAWN_PIPE, IN},
-        [EXEC_MSG] = {"msg", SPAWN_PIPE, IN | OUT},
-        [EXEC_NULL] = {"null", SPAWN_NULL, ALL},
-        [EXEC_OPEN] = {"open", SPAWN_PIPE, OUT},
-        [EXEC_TAG] = {"tag", SPAWN_PIPE, OUT},
-        [EXEC_TTY] = {"tty", SPAWN_TTY, ALL},
-    };
-
     ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
     SpawnAction spawn_actions[3] = {SPAWN_TTY, SPAWN_TTY, SPAWN_TTY};
     SpawnFlags spawn_flags = 0;
@@ -743,13 +747,13 @@ static void cmd_exec(const CommandArgs *a)
             default: BUG("unexpected flag"); return;
         }
         const char *flag_arg = a->args[x++];
-        ssize_t action = BSEARCH_IDX(flag_arg, map, (CompareFunction)strcmp);
-        if (action < 0 || !(map[action].flags & 1u << fd_idx)) {
+        ssize_t action = BSEARCH_IDX(flag_arg, exec_map, (CompareFunction)strcmp);
+        if (action < 0 || !(exec_map[action].flags & 1u << fd_idx)) {
             error_msg("invalid action for -%c: '%s'", a->flags[i], flag_arg);
             return;
         }
         actions[fd_idx] = action;
-        spawn_actions[fd_idx] = map[action].spawn_action;
+        spawn_actions[fd_idx] = exec_map[action].spawn_action;
     }
 
     EditorState *e = a->userdata;
