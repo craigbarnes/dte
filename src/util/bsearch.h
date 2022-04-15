@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include "array.h"
 #include "debug.h"
 #include "macros.h"
 
@@ -15,19 +16,14 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 #define BSEARCH_IDX(key, a, cmp) bisearch_idx(key, a, ARRAYLEN(a), sizeof(a[0]), cmp)
 
 #define CHECK_BSEARCH_ARRAY(a, field, cmp) do { \
-    static_assert_offsetof(a[0], field, 0); \
-    static_assert_incompatible_types(a[0].field, const char*); \
-    static_assert_incompatible_types(a[0].field, char*); \
-    static_assert_compatible_types(a[0].field[0], char); \
+    static_assert_flat_struct_array(a, field); \
     check_bsearch_array ( \
         a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field), cmp \
     ); \
 } while (0)
 
 #define CHECK_BSEARCH_STR_ARRAY(a, cmp) do { \
-    static_assert_incompatible_types(a[0], const char*); \
-    static_assert_incompatible_types(a[0], char*); \
-    static_assert_compatible_types(a[0][0], char); \
+    static_assert_flat_string_array(a); \
     check_bsearch_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0]), cmp); \
 } while (0)
 

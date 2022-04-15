@@ -7,18 +7,26 @@
 #include "ptr-array.h"
 #include "str-util.h"
 
-#define COLLECT_STRINGS(a, ptrs, prefix) do { \
+#define static_assert_flat_string_array(a) do { \
     static_assert_incompatible_types(a[0], const char*); \
     static_assert_incompatible_types(a[0], char*); \
     static_assert_compatible_types(a[0][0], char); \
-    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
 } while(0)
 
-#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) do { \
+#define static_assert_flat_struct_array(a, field) do { \
     static_assert_offsetof(a[0], field, 0); \
     static_assert_incompatible_types(a[0].field, const char*); \
     static_assert_incompatible_types(a[0].field, char*); \
     static_assert_compatible_types(a[0].field[0], char); \
+} while(0)
+
+#define COLLECT_STRINGS(a, ptrs, prefix) do { \
+    static_assert_flat_string_array(a); \
+    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
+} while(0)
+
+#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) do { \
+    static_assert_flat_struct_array(a, field); \
     collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
 } while (0)
 
