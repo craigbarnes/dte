@@ -94,3 +94,9 @@ void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
         }
     }
 }
+
+void free_cached_regexp(CachedRegexp *cr)
+{
+    regfree(&cr->re);
+    free(cr);
+}

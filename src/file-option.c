@@ -9,11 +9,6 @@
 #include "util/xmalloc.h"
 
 typedef struct {
-    regex_t re;
-    char str[];
-} CachedRegexp;
-
-typedef struct {
     FileOptionType type;
     char **strs;
     union {
@@ -173,12 +168,6 @@ void dump_file_options(const PointerArray *file_options, String *buf)
         }
         string_append_byte(buf, '\n');
     }
-}
-
-static void free_cached_regexp(CachedRegexp *cr)
-{
-    regfree(&cr->re);
-    free(cr);
 }
 
 static void free_file_option(FileOption *opt)

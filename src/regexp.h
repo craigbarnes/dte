@@ -7,6 +7,11 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 
+typedef struct {
+    regex_t re;
+    char str[];
+} CachedRegexp;
+
 // Platform-specific patterns for matching word boundaries, as detected
 // and initialized by regexp_init_word_boundary_tokens()
 typedef struct {
@@ -42,6 +47,7 @@ static inline bool regexp_is_valid(const char *pattern, int flags)
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
 void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt);
 void regexp_error_msg(const regex_t *re, const char *pattern, int err);
+void free_cached_regexp(CachedRegexp *cr);
 
 bool regexp_exec (
     const regex_t *re,

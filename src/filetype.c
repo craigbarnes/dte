@@ -41,11 +41,6 @@ UNITTEST {
 }
 
 typedef struct {
-    regex_t re;
-    char str[];
-} CachedRegexp;
-
-typedef struct {
     unsigned int str_len;
     char str[];
 } FlexArrayStr;
@@ -312,8 +307,7 @@ String dump_filetypes(const PointerArray *filetypes)
 static void free_filetype_entry(UserFileTypeEntry *ft)
 {
     if (ft_uses_regex(ft->type)) {
-        regfree(&ft->u.regexp->re);
-        free(ft->u.regexp);
+        free_cached_regexp(ft->u.regexp);
     } else {
         free(ft->u.str);
     }
