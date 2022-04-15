@@ -227,7 +227,7 @@ static void exec_error(const char *argv0)
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
 }
 
-void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs)
+void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs)
 {
     int fd[3];
     fd[0] = open_dev_null(O_RDONLY);

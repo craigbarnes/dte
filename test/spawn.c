@@ -10,7 +10,7 @@ static void test_spawn(TestContext *ctx)
     };
 
     SpawnContext sc = {
-        .argv = (char**)args,
+        .argv = args,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = SPAWN_QUIET,

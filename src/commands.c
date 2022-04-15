@@ -372,7 +372,7 @@ static void cmd_compile(const CommandArgs *a)
 
     SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
     clear_messages(&e->messages);
-    spawn_compiler(a->args + 1, flags, c, &e->messages);
+    spawn_compiler((const char **)a->args + 1, flags, c, &e->messages);
     if (e->messages.array.count) {
         activate_current_message_save(&e->messages, &e->bookmarks, e->view);
     }
@@ -773,7 +773,7 @@ static void cmd_exec(const CommandArgs *a)
     }
 
     SpawnContext ctx = {
-        .argv = a->args + a->nr_flag_args,
+        .argv = (const char **)a->args + a->nr_flag_args,
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = spawn_flags,
         .env = env,

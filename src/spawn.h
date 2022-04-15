@@ -19,7 +19,7 @@ typedef enum {
 } SpawnAction;
 
 typedef struct {
-    char **argv;
+    const char **argv;
     const char **env;
     StringView input;
     String outputs[2]; // For stdout/stderr
@@ -27,6 +27,6 @@ typedef struct {
 } SpawnContext;
 
 int spawn(SpawnContext *ctx, SpawnAction actions[3]);
-void spawn_compiler(char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
+void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
 
 #endif

@@ -65,7 +65,7 @@ static int xdup3(int oldfd, int newfd, int flags)
     return fd;
 }
 
-static noreturn void handle_child(char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
+static noreturn void handle_child(const char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
 {
 #ifdef HAVE_TIOCNOTTY
     if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) == -1) {
@@ -139,7 +139,7 @@ static noreturn void handle_child(char **argv, const char **env, int fd[3], int 
     sigaction(SIGUSR1, &act, NULL);
     sigaction(SIGUSR2, &act, NULL);
 
-    execvp(argv[0], argv);
+    execvp(argv[0], (char**)argv);
 
 error:
     error = errno;
@@ -156,7 +156,7 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
     return ret;
 }
 
-pid_t fork_exec(char **argv, const char **env, int fd[3], bool drop_ctty)
+pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
 {
     int ep[2];
     if (!pipe_cloexec(ep)) {
