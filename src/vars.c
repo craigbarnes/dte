@@ -5,6 +5,7 @@
 #include "editor.h"
 #include "error.h"
 #include "selection.h"
+#include "util/array.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
@@ -12,7 +13,7 @@
 #include "view.h"
 
 typedef struct {
-    const char *name;
+    char name[12];
     char *(*expand)(const EditorState *e);
 } BuiltinVar;
 
@@ -108,10 +109,5 @@ bool expand_syntax_var(const char *name, char **value, void *userdata)
 
 void collect_normal_vars(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
-        const char *name = normal_vars[i].name;
-        if (str_has_prefix(name, prefix)) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
+    COLLECT_STRING_FIELDS(normal_vars, name, a, prefix);
 }

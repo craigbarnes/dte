@@ -7,8 +7,20 @@
 #include "ptr-array.h"
 #include "str-util.h"
 
-#define COLLECT_STRINGS(a, ptrs, prefix) \
-    collect_strings_from_flat_array(*a, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix)
+#define COLLECT_STRINGS(a, ptrs, prefix) do { \
+    static_assert_incompatible_types(a[0], const char*); \
+    static_assert_incompatible_types(a[0], char*); \
+    static_assert_compatible_types(a[0][0], char); \
+    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
+} while(0)
+
+#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) do { \
+    static_assert_offsetof(a[0], field, 0); \
+    static_assert_incompatible_types(a[0].field, const char*); \
+    static_assert_incompatible_types(a[0].field, char*); \
+    static_assert_compatible_types(a[0].field[0], char); \
+    collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
+} while (0)
 
 #define STR_TO_ENUM(a, str, off, nfval) \
     str_to_enum(str, *a, ARRAYLEN(a), sizeof(a[0]), off, nfval)

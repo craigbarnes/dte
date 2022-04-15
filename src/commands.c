@@ -42,6 +42,7 @@
 #include "terminal/osc52.h"
 #include "terminal/terminal.h"
 #include "util/arith.h"
+#include "util/array.h"
 #include "util/bit.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
@@ -2589,12 +2590,7 @@ CommandSet normal_commands = {
 
 void collect_normal_commands(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0, n = ARRAYLEN(cmds); i < n; i++) {
-        const Command *c = &cmds[i];
-        if (str_has_prefix(c->name, prefix)) {
-            ptr_array_append(a, xstrdup(c->name));
-        }
-    }
+    COLLECT_STRING_FIELDS(cmds, name, a, prefix);
 }
 
 UNITTEST {

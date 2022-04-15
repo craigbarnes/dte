@@ -25,6 +25,7 @@
 #include "syntax/color.h"
 #include "terminal/color.h"
 #include "terminal/key.h"
+#include "util/array.h"
 #include "util/bsearch.h"
 #include "util/intern.h"
 #include "util/str-util.h"
@@ -473,11 +474,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
 
 void collect_show_subcommands(PointerArray *a, const char *prefix)
 {
-    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        if (str_has_prefix(handlers[i].name, prefix)) {
-            ptr_array_append(a, xstrdup(handlers[i].name));
-        }
-    }
+    COLLECT_STRING_FIELDS(handlers, name, a, prefix);
 }
 
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix)
