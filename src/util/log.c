@@ -14,6 +14,8 @@
 #include "xreadwrite.h"
 #include "xsnprintf.h"
 
+// These are initialized during early startup and then never changed,
+// so they're deemed an "acceptable" use of globals:
 static const char *dim = "";
 static const char *sgr0 = "";
 static LogLevel log_level = LOG_LEVEL_NONE;
