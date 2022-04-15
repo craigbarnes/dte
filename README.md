@@ -89,6 +89,14 @@ when possible.
 For general discussion, we also have a `#dte` channel on the [Libera.Chat]
 IRC network.
 
+Donations
+---------
+
+Donations can be made via Liberapay, using the link below. All support
+is very much appreciated and allows me to spend more time working on dte. 😊
+
+[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/craigbarnes/donate)
+
 License
 -------
 
