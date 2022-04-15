@@ -45,7 +45,7 @@ void error_msg(const char *format, ...)
         vsnprintf(error_buf + pos, size - pos, format, ap);
         va_end(ap);
     } else {
-        LOG_ERROR("no buffer space left for error message");
+        LOG_WARNING("no buffer space left for error message");
     }
 
     msg_is_error = true;
@@ -56,7 +56,7 @@ void error_msg(const char *format, ...)
         fputc('\n', stderr);
     }
 
-    LOG_ERROR("%s", error_buf);
+    LOG_INFO("%s", error_buf);
 }
 
 void perror_msg(const char *prefix)
