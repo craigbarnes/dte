@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +6,7 @@
 #include "output.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/numtostr.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
@@ -47,8 +49,12 @@ void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
     if (unlikely(count > obuf_avail(obuf))) {
         term_output_flush(obuf);
         if (unlikely(count >= TERM_OUTBUF_SIZE)) {
-            (void)!xwrite_all(STDOUT_FILENO, str, count);
-            LOG_INFO("writing %zu bytes directly to terminal", count);
+            ssize_t n = xwrite_all(STDOUT_FILENO, str, count);
+            if (unlikely(n != count)) {
+                LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
+            } else {
+                LOG_INFO("writing %zu bytes directly to terminal", count);
+            }
             return;
         }
     }
@@ -203,8 +209,12 @@ void term_clear_screen(TermOutputBuffer *obuf)
 
 void term_output_flush(TermOutputBuffer *obuf)
 {
-    if (obuf->count) {
-        (void)!xwrite_all(STDOUT_FILENO, obuf->buf, obuf->count);
+    size_t count = obuf->count;
+    if (count) {
+        ssize_t n = xwrite_all(STDOUT_FILENO, obuf->buf, count);
+        if (unlikely(n != count)) {
+            LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
+        }
         obuf->count = 0;
     }
 }
