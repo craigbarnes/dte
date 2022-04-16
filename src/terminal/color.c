@@ -57,7 +57,7 @@ static unsigned int lookup_attr(const char *s)
 
 static int32_t lookup_color(const char *name)
 {
-    return STR_TO_ENUM(color_names, name, -2, COLOR_INVALID);
+    return STR_TO_ENUM_WITH_OFFSET(name, color_names, COLOR_INVALID, -2);
 }
 
 static unsigned int rgb_to_rrggbb(unsigned int c)

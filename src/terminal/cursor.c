@@ -57,12 +57,12 @@ const char *cursor_color_to_str(int32_t color)
 
 CursorInputMode cursor_mode_from_str(const char *name)
 {
-    return STR_TO_ENUM(cursor_modes, name, 0, NR_CURSOR_MODES);
+    return STR_TO_ENUM(name, cursor_modes, NR_CURSOR_MODES);
 }
 
 TermCursorType cursor_type_from_str(const char *name)
 {
-    return STR_TO_ENUM(cursor_types, name, 0, CURSOR_INVALID);
+    return STR_TO_ENUM(name, cursor_types, CURSOR_INVALID);
 }
 
 int32_t cursor_color_from_str(const char *str)
@@ -70,7 +70,7 @@ int32_t cursor_color_from_str(const char *str)
     if (str[0] == '#') {
         return parse_rgb(str + 1, strlen(str + 1));
     }
-    return STR_TO_ENUM(cursor_colors, str, -2, COLOR_INVALID);
+    return STR_TO_ENUM_WITH_OFFSET(str, cursor_colors, COLOR_INVALID, -2);
 }
 
 void collect_cursor_modes(PointerArray *a, const char *prefix)

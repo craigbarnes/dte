@@ -30,8 +30,11 @@
     collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
 } while (0)
 
-#define STR_TO_ENUM(a, str, off, nfval) \
-    str_to_enum(str, *a, ARRAYLEN(a), sizeof(a[0]), off, nfval)
+#define STR_TO_ENUM_WITH_OFFSET(str, a, nfval, off) \
+    str_to_enum(str, a[0], ARRAYLEN(a), sizeof(a[0]), off, nfval)
+
+#define STR_TO_ENUM(str, a, nfval) \
+    STR_TO_ENUM_WITH_OFFSET(str, a, nfval, 0)
 
 // This is somewhat similar to lfind(3), but returning an index
 // instead of a pointer and specifically for arrays of type
