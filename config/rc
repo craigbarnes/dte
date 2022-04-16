@@ -58,9 +58,9 @@ option sh indent-regex '(^|;)[ \t]*(do|else|then) *$'
 option diff,mail ws-error 0
 
 # Aliases for renamed/removed commands (for backwards compatibility)
-alias filter 'exec -s -i buffer -o buffer'
-alias pipe-from 'exec -s -o buffer'
-alias pipe-to 'exec -s -i buffer'
+alias filter 'exec -s -i buffer -o buffer -e errmsg'
+alias pipe-from 'exec -s -o buffer -e errmsg'
+alias pipe-to 'exec -s -i buffer -e errmsg'
 alias run 'exec'
 alias eval 'exec -o eval'
 alias exec-open 'exec -o open'
