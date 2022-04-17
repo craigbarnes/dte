@@ -28,6 +28,12 @@ static const char cursor_colors[][8] = {
     "default",
 };
 
+UNITTEST {
+    CHECK_STRING_ARRAY(cursor_modes);
+    CHECK_STRING_ARRAY(cursor_types);
+    CHECK_STRING_ARRAY(cursor_colors);
+}
+
 const char *cursor_mode_to_str(CursorInputMode mode)
 {
     BUG_ON(mode < 0 || mode >= ARRAYLEN(cursor_modes));

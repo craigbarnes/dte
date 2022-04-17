@@ -16,6 +16,10 @@ static const char capture_names[][8] = {
     [ERRFMT_MESSAGE] = "message"
 };
 
+UNITTEST {
+    CHECK_STRING_ARRAY(capture_names);
+}
+
 static Compiler *find_or_add_compiler(HashMap *compilers, const char *name)
 {
     Compiler *c = find_compiler(compilers, name);

@@ -20,15 +20,19 @@
     static_assert_compatible_types(a[0].field[0], char); \
 } while(0)
 
-#define COLLECT_STRINGS(a, ptrs, prefix) do { \
+#define CHECK_STRING_ARRAY(a) do { \
     static_assert_flat_string_array(a); \
-    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
-} while(0)
-
-#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) do { \
-    static_assert_flat_struct_array(a, field); \
-    collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix); \
 } while (0)
+
+#define CHECK_STRUCT_ARRAY(a, field) do { \
+    static_assert_flat_struct_array(a, field); \
+} while (0)
+
+#define COLLECT_STRINGS(a, ptrs, prefix) \
+    collect_strings_from_flat_array(a[0], ARRAYLEN(a), sizeof(a[0]), ptrs, prefix)
+
+#define COLLECT_STRING_FIELDS(a, field, ptrs, prefix) \
+    collect_strings_from_flat_array(a[0].field, ARRAYLEN(a), sizeof(a[0]), ptrs, prefix)
 
 #define STR_TO_ENUM_WITH_OFFSET(str, a, nfval, off) \
     str_to_enum(str, a[0], ARRAYLEN(a), sizeof(a[0]), off, nfval)

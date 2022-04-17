@@ -42,6 +42,11 @@ static const char color_names[][16] = {
     "white"
 };
 
+UNITTEST {
+    CHECK_STRING_ARRAY(attr_names);
+    CHECK_STRING_ARRAY(color_names);
+}
+
 static unsigned int lookup_attr(const char *s)
 {
     for (size_t i = 0; i < ARRAYLEN(attr_names); i++) {

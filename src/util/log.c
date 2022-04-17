@@ -29,6 +29,10 @@ static const char levels[][8] = {
     [LOG_LEVEL_DEBUG] = "debug",
 };
 
+UNITTEST {
+    CHECK_STRING_ARRAY(levels);
+}
+
 LogLevel log_level_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {

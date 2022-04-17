@@ -85,6 +85,10 @@ static const BuiltinVar normal_vars[] = {
     {"WORD", expand_word},
 };
 
+UNITTEST {
+    CHECK_STRUCT_ARRAY(normal_vars, name);
+}
+
 bool expand_normal_var(const char *name, char **value, void *userdata)
 {
     const EditorState *e = userdata;
