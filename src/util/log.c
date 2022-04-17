@@ -21,7 +21,7 @@ static const char *sgr0 = "";
 static LogLevel log_level = LOG_LEVEL_NONE;
 static int logfd = -1;
 
-static const char levels[][8] = {
+static const char log_levels[][8] = {
     [LOG_LEVEL_NONE] = "none",
     [LOG_LEVEL_ERROR] = "error",
     [LOG_LEVEL_WARNING] = "warning",
@@ -30,7 +30,7 @@ static const char levels[][8] = {
 };
 
 UNITTEST {
-    CHECK_STRING_ARRAY(levels);
+    CHECK_STRING_ARRAY(log_levels);
 }
 
 LogLevel log_level_from_str(const char *str)
@@ -40,7 +40,7 @@ LogLevel log_level_from_str(const char *str)
         // $DTE_LOG is set and $DTE_LOG_LEVEL is unset (or empty)
         return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
     }
-    return STR_TO_ENUM(str, levels, LOG_LEVEL_NONE);
+    return STR_TO_ENUM(str, log_levels, LOG_LEVEL_NONE);
 }
 
 void log_init(const char *filename, LogLevel level)
