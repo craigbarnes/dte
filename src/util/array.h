@@ -22,10 +22,12 @@
 
 #define CHECK_STRING_ARRAY(a) do { \
     static_assert_flat_string_array(a); \
+    check_array(a, #a, "", ARRAYLEN(a), sizeof(a[0]), sizeof(a[0])); \
 } while (0)
 
 #define CHECK_STRUCT_ARRAY(a, field) do { \
     static_assert_flat_struct_array(a, field); \
+    check_array(a, #a, "." #field, ARRAYLEN(a), sizeof(a[0]), sizeof(a[0].field)); \
 } while (0)
 
 #define COLLECT_STRINGS(a, ptrs, prefix) \
@@ -81,5 +83,37 @@ void collect_strings_from_flat_array (
     PointerArray *a,
     const char *prefix
 );
+
+static inline void check_array (
+    const void *base,
+    const char *array_name,
+    const char *name_field_name,
+    size_t array_len,
+    size_t elem_size,
+    size_t name_size
+) {
+    BUG_ON(!base);
+    BUG_ON(!array_name);
+    BUG_ON(!name_field_name);
+    BUG_ON(name_field_name[0] != '\0' && name_field_name[0] != '.');
+    BUG_ON(array_len == 0);
+    BUG_ON(elem_size == 0);
+    BUG_ON(name_size == 0);
+
+#if DEBUG >= 1
+    const char *first_name = base;
+    for (size_t i = 0; i < array_len; i++) {
+        const char *curr_name = first_name + (i * elem_size);
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+        if (curr_name[0] == '\0') {
+            BUG("Empty string at %s[%zu]%s", array_name, i, name_field_name);
+        }
+        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
+        if (curr_name[name_size - 1] != '\0') {
+            BUG("String sentinel missing from %s[%zu]%s", array_name, i, name_field_name);
+        }
+    }
+#endif
+}
 
 #endif

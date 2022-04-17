@@ -28,43 +28,22 @@ typedef int (*StringCompareFunction)(const char *key, const char *elem);
 } while (0)
 
 static inline void check_bsearch_array (
-    const void *array_base,
+    const void *base,
     const char *array_name,
     const char *name_field_name,
-    size_t array_length,
-    size_t array_element_size,
+    size_t array_len,
+    size_t elem_size,
     size_t name_size,
     StringCompareFunction cmp
 ) {
-    BUG_ON(!array_base);
-    BUG_ON(!array_name);
-    BUG_ON(!name_field_name);
-    BUG_ON(name_field_name[0] != '\0' && name_field_name[0] != '.');
-    BUG_ON(array_length == 0);
-    BUG_ON(array_element_size == 0);
-    BUG_ON(name_size == 0);
     BUG_ON(!cmp);
+    check_array(base, array_name, name_field_name, array_len, elem_size, name_size);
 
 #if DEBUG >= 1
-    const char *first_name = array_base;
-
-    for (size_t i = 0; i < array_length; i++) {
-        const char *curr_name = first_name + (i * array_element_size);
-        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-        if (curr_name[0] == '\0') {
-            BUG("Empty string at %s[%zu]%s", array_name, i, name_field_name);
-        }
-        // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
-        if (curr_name[name_size - 1] != '\0') {
-            BUG("String sentinel missing from %s[%zu]%s", array_name, i, name_field_name);
-        }
-
-        // Skip sort order check for index 0; there's no prev_name to compare
-        if (i == 0) {
-            continue;
-        }
-
-        const char *prev_name = curr_name - array_element_size;
+    const char *first_name = base;
+    for (size_t i = 1; i < array_len; i++) {
+        const char *curr_name = first_name + (i * elem_size);
+        const char *prev_name = curr_name - elem_size;
         if (cmp(curr_name, prev_name) <= 0) {
             BUG (
                 "String at %s[%zu]%s not in sorted order: \"%s\" (prev: \"%s\")",
