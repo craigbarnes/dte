@@ -638,9 +638,46 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         return;
     }
 
+    Tag tag;
     size_t pos = 0;
-    const char *tag = buf_next_line(str->buffer, &pos, str->len);
-    tag_lookup(tag, e->buffer->abs_filename, &e->messages);
+    const char *line = buf_next_line(str->buffer, &pos, str->len);
+    if (pos == 0) {
+        return;
+    }
+
+    if (!parse_ctags_line(&tag, line, pos - 1)) {
+        // Treat line as simple tag name
+        tag_lookup(line, e->buffer->abs_filename, &e->messages);
+        goto activate;
+    }
+
+    char buf[8192];
+    const char *cwd = getcwd(buf, sizeof buf);
+    if (unlikely(!cwd)) {
+        error_msg("getcwd() failed: %s", strerror(errno));
+        return;
+    }
+
+    // TODO: turn most of this into a helper function and share with tag_lookup()
+    char msg[256];
+    int tlen = (int)tag.name.length;
+    size_t n = xsnprintf(msg, sizeof(msg), "Tag %.*s", tlen, tag.name.data);
+    Message *m = new_message(msg, n);
+    m->loc = xnew0(FileLocation, 1);
+
+    StringView dir = strview_from_cstring(cwd);
+    m->loc->filename = path_join_sv(&dir, &tag.filename);
+    if (tag.pattern) {
+        m->loc->pattern = tag.pattern;
+        tag.pattern = NULL;
+    } else {
+        m->loc->line = tag.lineno;
+    }
+
+    clear_messages(&e->messages);
+    add_message(&e->messages, m);
+
+activate:
     activate_current_message_save(&e->messages, &e->bookmarks, e->view);
 }
 

@@ -55,7 +55,7 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
     return i;
 }
 
-static bool parse_line(Tag *t, const char *line, size_t line_len)
+bool parse_ctags_line(Tag *t, const char *line, size_t line_len)
 {
     size_t pos = 0;
     MEMZERO(t);
@@ -126,7 +126,7 @@ bool next_tag (
         if (exact && line.data[pflen] != '\t') {
             continue;
         }
-        if (!parse_line(t, line.data, line.length)) {
+        if (!parse_ctags_line(t, line.data, line.length)) {
             continue;
         }
         *posp = pos;

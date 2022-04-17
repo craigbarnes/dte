@@ -22,6 +22,7 @@ bool next_tag (
     Tag *t
 );
 
+bool parse_ctags_line(Tag *t, const char *line, size_t line_len);
 void free_tag(Tag *t);
 
 #endif
