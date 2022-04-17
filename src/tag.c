@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include "tag.h"
 #include "error.h"
@@ -9,6 +10,13 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 #include "util/xsnprintf.h"
+
+typedef struct {
+    char *filename;
+    char *buf;
+    size_t size;
+    time_t mtime;
+} TagFile;
 
 static TagFile *current_tag_file;
 static const char *current_filename; // For sorting tags
@@ -221,7 +229,7 @@ static void tag_file_find_tags (
 ) {
     Tag *t = xnew(Tag, 1);
     size_t pos = 0;
-    while (next_tag(tf, &pos, name, true, t)) {
+    while (next_tag(tf->buf, tf->size, &pos, name, true, t)) {
         ptr_array_append(tags, t);
         t = xnew(Tag, 1);
     }
@@ -289,7 +297,7 @@ void collect_tags(PointerArray *a, const char *prefix)
     Tag t;
     size_t pos = 0;
     StringView prev = STRING_VIEW_INIT;
-    while (next_tag(tf, &pos, prefix, false, &t)) {
+    while (next_tag(tf->buf, tf->size, &pos, prefix, false, &t)) {
         BUG_ON(t.name.length == 0);
         if (prev.length == 0 || !strview_equal(&t.name, &prev)) {
             ptr_array_append(a, xstrcut(t.name.data, t.name.length));

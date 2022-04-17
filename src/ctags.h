@@ -2,15 +2,7 @@
 #define CTAGS_H
 
 #include <stdbool.h>
-#include <sys/types.h>
 #include "util/string-view.h"
-
-typedef struct {
-    char *filename;
-    char *buf;
-    size_t size;
-    time_t mtime;
-} TagFile;
 
 typedef struct {
     StringView name; // Name of tag (points into TagFile::buf)
@@ -22,7 +14,8 @@ typedef struct {
 } Tag;
 
 bool next_tag (
-    const TagFile *tf,
+    const char *buf,
+    size_t buf_len,
     size_t *posp,
     const char *prefix,
     bool exact,

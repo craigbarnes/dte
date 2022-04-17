@@ -27,19 +27,12 @@ static void test_next_tag(TestContext *ctx)
         {"hashmap_resize", 'f', true},
     };
 
-    const char path[] = "test/data/ctags.txt";
     char *buf;
-    ssize_t size = read_file(path, &buf);
-    ASSERT_TRUE(size >= 64);
-
-    TagFile tf = {
-        .filename = xstrdup(path),
-        .buf = buf,
-        .size = size,
-    };
+    ssize_t len = read_file("test/data/ctags.txt", &buf);
+    ASSERT_TRUE(len >= 64);
 
     Tag t;
-    for (size_t i = 0, pos = 0; next_tag(&tf, &pos, "", false, &t); i++) {
+    for (size_t i = 0, pos = 0; next_tag(buf, len, &pos, "", false, &t); i++) {
         IEXPECT_TRUE(strview_equal_cstring(&t.name, expected[i].name));
         IEXPECT_EQ(t.kind, expected[i].kind);
         IEXPECT_EQ(t.local, expected[i].local);
@@ -50,15 +43,14 @@ static void test_next_tag(TestContext *ctx)
 
     size_t pos = 0;
     t.name = string_view(NULL, 0);
-    EXPECT_TRUE(next_tag(&tf, &pos, "hashmap_res", false, &t));
+    EXPECT_TRUE(next_tag(buf, len, &pos, "hashmap_res", false, &t));
     EXPECT_TRUE(strview_equal_cstring(&t.name, "hashmap_resize"));
     free_tag(&t);
-    EXPECT_FALSE(next_tag(&tf, &pos, "hashmap_res", false, &t));
+    EXPECT_FALSE(next_tag(buf, len, &pos, "hashmap_res", false, &t));
     pos = 0;
-    EXPECT_FALSE(next_tag(&tf, &pos, "hashmap_res", true, &t));
+    EXPECT_FALSE(next_tag(buf, len, &pos, "hashmap_res", true, &t));
 
-    free(tf.filename);
-    free(tf.buf);
+    free(buf);
 }
 
 static const TestEntry tests[] = {

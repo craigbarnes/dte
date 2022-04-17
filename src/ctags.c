@@ -107,15 +107,16 @@ static bool parse_line(Tag *t, const char *line, size_t line_len)
 }
 
 bool next_tag (
-    const TagFile *tf,
+    const char *buf,
+    size_t buf_len,
     size_t *posp,
     const char *prefix,
     bool exact,
     Tag *t
 ) {
     size_t pflen = strlen(prefix);
-    for (size_t pos = *posp, size = tf->size; pos < size; ) {
-        StringView line = buf_slice_next_line(tf->buf, &pos, size);
+    for (size_t pos = *posp; pos < buf_len; ) {
+        StringView line = buf_slice_next_line(buf, &pos, buf_len);
         if (line.length == 0 || line.data[0] == '!') {
             continue;
         }
