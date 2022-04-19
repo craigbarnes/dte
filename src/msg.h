@@ -9,8 +9,8 @@
 #include "view.h"
 
 typedef struct {
-    char *msg;
     FileLocation *loc;
+    char msg[];
 } Message;
 
 typedef struct {

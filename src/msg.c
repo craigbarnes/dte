@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "msg.h"
 #include "buffer.h"
@@ -16,7 +17,6 @@
 
 static void free_message(Message *m)
 {
-    free(m->msg);
     if (m->loc) {
         file_location_free(m->loc);
     }
@@ -25,8 +25,12 @@ static void free_message(Message *m)
 
 Message *new_message(const char *msg, size_t len)
 {
-    Message *m = xnew0(Message, 1);
-    m->msg = xstrcut(msg, len);
+    Message *m = xmalloc(sizeof(*m) + len + 1);
+    m->loc = NULL;
+    if (len) {
+        memcpy(m->msg, msg, len);
+    }
+    m->msg[len] = '\0';
     return m;
 }
 
