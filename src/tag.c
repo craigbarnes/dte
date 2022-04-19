@@ -246,6 +246,8 @@ static void tag_file_find_tags (
     current_filename = NULL;
 }
 
+// Note: this moves ownership of tag->pattern to the generated Message
+// and assigns NULL to the old pointer
 void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir)
 {
     BUG_ON(dir->length == 0);
