@@ -49,6 +49,7 @@ void view_update_cursor_x(View *v);
 void view_update(View *v, unsigned int scroll_margin);
 long view_get_preferred_x(View *v);
 bool view_can_close(const View *v);
+StringView view_do_get_word_under_cursor(const View *v, size_t *start_offset);
 StringView view_get_word_under_cursor(const View *v);
 
 #endif

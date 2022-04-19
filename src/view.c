@@ -138,7 +138,7 @@ bool view_can_close(const View *v)
     return v->buffer->views.count > 1;
 }
 
-StringView view_get_word_under_cursor(const View *v)
+StringView view_do_get_word_under_cursor(const View *v, size_t *offset_in_line)
 {
     StringView line;
     size_t si = fetch_this_line(&v->cursor, &line);
@@ -151,6 +151,7 @@ StringView view_get_word_under_cursor(const View *v)
     }
 
     if (si == line.length) {
+        *offset_in_line = 0;
         return string_view(NULL, 0);
     }
 
@@ -171,5 +172,12 @@ StringView view_get_word_under_cursor(const View *v)
         ei = i;
     }
 
+    *offset_in_line = si;
     return string_view(line.data + si, ei - si);
+}
+
+StringView view_get_word_under_cursor(const View *v)
+{
+    size_t offset_in_line;
+    return view_do_get_word_under_cursor(v, &offset_in_line);
 }

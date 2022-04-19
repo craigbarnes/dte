@@ -695,6 +695,7 @@ typedef enum {
     EXEC_OPEN,
     EXEC_TAG,
     EXEC_TTY,
+    EXEC_WORD,
 } ExecAction;
 
 typedef enum {
@@ -718,6 +719,7 @@ static const struct {
     [EXEC_OPEN] = {"open", SPAWN_PIPE, OUT},
     [EXEC_TAG] = {"tag", SPAWN_PIPE, OUT},
     [EXEC_TTY] = {"tty", SPAWN_TTY, ALL},
+    [EXEC_WORD] = {"word", SPAWN_PIPE, IN},
 };
 
 UNITTEST {
@@ -805,6 +807,23 @@ static void cmd_exec(const CommandArgs *a)
             move_bof(view);
         }
         goto get_bytes;
+    case EXEC_WORD:
+        if (view->selection) {
+            ctx.input.length = prepare_selection(view);
+        } else {
+            size_t offset;
+            StringView word = view_do_get_word_under_cursor(e->view, &offset);
+            if (word.length == 0) {
+                break;
+            }
+            // TODO: optimize this, so that the BlockIter moves by just the
+            // minimal word offset instead of iterating to a line offset
+            ctx.input.length = word.length;
+            move_bol(view);
+            view->cursor.offset += offset;
+            BUG_ON(view->cursor.offset >= view->cursor.blk->size);
+        }
+        goto get_bytes;
     case EXEC_MSG: {
         String messages = dump_messages(&e->messages);
         ctx.input = strview_from_string(&messages),
@@ -874,6 +893,7 @@ static void cmd_exec(const CommandArgs *a)
         break;
     case EXEC_LINE: // Already handled above
     case EXEC_ERRMSG:
+    case EXEC_WORD:
     default:
         BUG("unhandled action");
         return;
