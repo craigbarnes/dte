@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "tag.h"
 #include "error.h"
+#include "util/debug.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -245,10 +246,26 @@ static void tag_file_find_tags (
     current_filename = NULL;
 }
 
-static char *tag_file_get_tag_filename(const TagFile *tf, const Tag *tag)
+void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir)
 {
-    StringView tf_dir = path_slice_dirname(tf->filename);
-    return path_join_sv(&tf_dir, &tag->filename);
+    BUG_ON(dir->length == 0);
+    BUG_ON(dir->data[0] != '/');
+
+    char buf[512];
+    int tlen = (int)tag->name.length;
+    size_t len = xsnprintf(buf, sizeof(buf), "Tag %.*s", tlen, tag->name.data);
+    Message *m = new_message(buf, len);
+    m->loc = xnew0(FileLocation, 1);
+    m->loc->filename = path_join_sv(dir, &tag->filename);
+
+    if (tag->pattern) {
+        m->loc->pattern = tag->pattern; // Message takes ownership
+        tag->pattern = NULL;
+    } else {
+        m->loc->line = tag->lineno;
+    }
+
+    add_message(messages, m);
 }
 
 void tag_lookup(const char *name, const char *filename, MessageArray *messages)
@@ -268,20 +285,10 @@ void tag_lookup(const char *name, const char *filename, MessageArray *messages)
         return;
     }
 
+    StringView tf_dir = path_slice_dirname(tf->filename);
     for (size_t i = 0, n = tags.count; i < n; i++) {
-        Tag *t = tags.ptrs[i];
-        char buf[512];
-        size_t len = xsnprintf(buf, sizeof(buf), "Tag %s", name);
-        Message *m = new_message(buf, len);
-        m->loc = xnew0(FileLocation, 1);
-        m->loc->filename = tag_file_get_tag_filename(tf, t);
-        if (t->pattern) {
-            m->loc->pattern = t->pattern;
-            t->pattern = NULL;
-        } else {
-            m->loc->line = t->lineno;
-        }
-        add_message(messages, m);
+        Tag *tag = tags.ptrs[i];
+        add_message_for_tag(messages, tag, &tf_dir);
     }
 
     free_tags(&tags);

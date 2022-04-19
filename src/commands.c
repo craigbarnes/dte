@@ -658,24 +658,9 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
         return;
     }
 
-    // TODO: turn most of this into a helper function and share with tag_lookup()
-    char msg[256];
-    int tlen = (int)tag.name.length;
-    size_t n = xsnprintf(msg, sizeof(msg), "Tag %.*s", tlen, tag.name.data);
-    Message *m = new_message(msg, n);
-    m->loc = xnew0(FileLocation, 1);
-
     StringView dir = strview_from_cstring(cwd);
-    m->loc->filename = path_join_sv(&dir, &tag.filename);
-    if (tag.pattern) {
-        m->loc->pattern = tag.pattern;
-        tag.pattern = NULL;
-    } else {
-        m->loc->line = tag.lineno;
-    }
-
     clear_messages(&e->messages);
-    add_message(&e->messages, m);
+    add_message_for_tag(&e->messages, &tag, &dir);
 
 activate:
     activate_current_message_save(&e->messages, &e->bookmarks, e->view);
