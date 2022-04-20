@@ -85,7 +85,7 @@ static const TermEntry terms[] = {
     {"terminator", 10, TERM_256_COLOR, 0, BCE | TITLE},
     {"termite", 7, TERM_8_COLOR, 0, TITLE},
     {"tmux", 4, TERM_8_COLOR, 0, TITLE | OSC52},
-    {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE},
+    {"wezterm", 7, TERM_TRUE_COLOR, 0, BCE | REP | TITLE | OSC52},
     {"xfce", 4, TERM_8_COLOR, 0, BCE | TITLE},
     {"xterm", 5, TERM_8_COLOR, 0, BCE | TITLE | OSC52 | METAESC},
     {"xterm.js", 8, TERM_8_COLOR, 0, BCE},
