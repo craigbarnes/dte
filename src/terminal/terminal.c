@@ -92,9 +92,9 @@ static const TermEntry terms[] = {
 };
 
 static const struct {
-    const char suffix[11];
+    const char suffix[10];
     uint8_t suffix_len;
-    TermColorCapabilityType color_type;
+    uint8_t color_type; // TermColorCapabilityType
 } color_suffixes[] = {
     {"direct", 6, TERM_TRUE_COLOR},
     {"256color", 8, TERM_256_COLOR},
