@@ -7,6 +7,7 @@
 #include "osc52.h"
 #include "rxvt.h"
 #include "xterm.h"
+#include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/str-util.h"
@@ -114,6 +115,7 @@ static int term_name_compare(const void *key, const void *elem)
 
 UNITTEST {
     CHECK_BSEARCH_ARRAY(terms, name, strcmp);
+    CHECK_STRUCT_ARRAY(color_suffixes, suffix);
     StringView k = STRING_VIEW("xtermz");
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
     k.length--;

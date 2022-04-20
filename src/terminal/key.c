@@ -1,5 +1,6 @@
 #include <string.h>
 #include "key.h"
+#include "util/array.h"
 #include "util/ascii.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
@@ -47,6 +48,11 @@ static const struct {
     {"enter", KEY_ENTER},
     {"space", KEY_SPACE},
 };
+
+UNITTEST {
+    CHECK_STRING_ARRAY(special_names);
+    CHECK_STRUCT_ARRAY(other_keys, name);
+}
 
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
