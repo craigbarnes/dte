@@ -205,7 +205,7 @@ static void cmd_bol(const CommandArgs *a)
     };
 
     EditorState *e = a->userdata;
-    SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
+    SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     handle_select_chars_flag(a);
     move_bol_smart(e->view, flags);
 }
@@ -371,7 +371,7 @@ static void cmd_compile(const CommandArgs *a)
         return;
     }
 
-    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
+    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     clear_messages(&e->messages);
     spawn_compiler((const char **)a->args + 1, flags, c, &e->messages);
     if (e->messages.array.count) {
@@ -1679,7 +1679,7 @@ static void cmd_replace(const CommandArgs *a)
     };
 
     EditorState *e = a->userdata;
-    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map), 0);
+    ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     reg_replace(e, a->args[0], a->args[1], flags);
 }
 

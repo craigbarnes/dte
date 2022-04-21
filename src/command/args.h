@@ -61,9 +61,9 @@ static inline bool cmdargs_has_flag(const CommandArgs *a, unsigned char flag)
 static inline unsigned int cmdargs_convert_flags (
     const CommandArgs *a,
     const FlagMapping *map,
-    size_t map_len,
-    unsigned int val
+    size_t map_len
 ) {
+    unsigned int val = 0;
     for (size_t i = 0; i < map_len; i++, map++) {
         if (cmdargs_has_flag(a, map->ch)) {
             val |= map->val;

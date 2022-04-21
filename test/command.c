@@ -502,11 +502,8 @@ static void test_cmdargs_convert_flags(TestContext *ctx)
         .flag_set = cmdargs_flagset_value('c') | cmdargs_flagset_value('g')
     };
 
-    ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map), 0);
+    ReplaceFlags flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map));
     EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL);
-
-    flags = cmdargs_convert_flags(&a, map, ARRAYLEN(map), REPLACE_BASIC);
-    EXPECT_EQ(flags, REPLACE_CONFIRM | REPLACE_GLOBAL | REPLACE_BASIC);
 }
 
 static void test_add_alias(TestContext *ctx)
