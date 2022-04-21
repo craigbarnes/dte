@@ -166,10 +166,12 @@ void term_init(Terminal *term, const char *name)
         LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);
     }
 
-    if (xstreq(getenv("COLORTERM"), "truecolor")) {
+    const char *ct = getenv("COLORTERM");
+    if (ct && (streq(ct, "truecolor") || streq(ct, "24bit"))) {
         term->color_type = TERM_TRUE_COLOR;
-        LOG_INFO("true color support detected ($COLORTERM)");
+        LOG_INFO("24-bit color support detected (COLORTERM=%s)", ct);
     }
+
     if (term->color_type == TERM_TRUE_COLOR) {
         return;
     }
