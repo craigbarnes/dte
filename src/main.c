@@ -95,8 +95,10 @@ static noreturn COLD void handle_fatal_signal(int signum)
 
 static void do_sigaction(int sig, const struct sigaction *action)
 {
-    if (sigaction(sig, action, NULL) != 0) {
-        BUG("Failed to add handler for signal %d: %s", sig, strerror(errno));
+    int r = sigaction(sig, action, NULL);
+    if (unlikely(r != 0)) {
+        const char *err = strerror(errno);
+        LOG_ERROR("failed to set disposition for signal %d: %s", sig, err);
     }
 }
 
