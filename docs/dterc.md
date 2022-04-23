@@ -692,11 +692,11 @@ Move to beginning of current line.
 
 Move to end of current line.
 
-### **bof**
+### **bof** [**-c**|**-l**]
 
 Move to beginning of file.
 
-### **eof**
+### **eof** [**-c**|**-l**]
 
 Move to end of file.
 

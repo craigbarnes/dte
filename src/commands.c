@@ -193,7 +193,7 @@ static void cmd_bind(const CommandArgs *a)
 static void cmd_bof(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    do_selection(e->view, SELECT_NONE);
+    handle_select_chars_or_lines_flags(a);
     move_bof(e->view);
 }
 
@@ -544,7 +544,7 @@ static void cmd_down(const CommandArgs *a)
 static void cmd_eof(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    do_selection(e->view, SELECT_NONE);
+    handle_select_chars_or_lines_flags(a);
     move_eof(e->view);
 }
 
@@ -2504,7 +2504,7 @@ static const Command cmds[] = {
     {"bind", "-cns", true, 1, 2, cmd_bind},
     {"blkdown", "cl", false, 0, 0, cmd_blkdown},
     {"blkup", "cl", false, 0, 0, cmd_blkup},
-    {"bof", "", false, 0, 0, cmd_bof},
+    {"bof", "cl", false, 0, 0, cmd_bof},
     {"bol", "cst", false, 0, 0, cmd_bol},
     {"bolsf", "", false, 0, 0, cmd_bolsf},
     {"bookmark", "r", false, 0, 0, cmd_bookmark},
@@ -2523,7 +2523,7 @@ static const Command cmds[] = {
     {"delete-line", "", false, 0, 0, cmd_delete_line},
     {"delete-word", "s", false, 0, 0, cmd_delete_word},
     {"down", "cl", false, 0, 0, cmd_down},
-    {"eof", "", false, 0, 0, cmd_eof},
+    {"eof", "cl", false, 0, 0, cmd_eof},
     {"eol", "c", false, 0, 0, cmd_eol},
     {"eolsf", "", false, 0, 0, cmd_eolsf},
     {"erase", "", false, 0, 0, cmd_erase},
