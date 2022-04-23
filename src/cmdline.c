@@ -14,6 +14,7 @@
 #include "terminal/osc52.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
+#include "util/debug.h"
 #include "util/utf8.h"
 
 static void cmdline_delete(CommandLine *c)
@@ -291,6 +292,19 @@ static void cmd_right(const CommandArgs *a)
     reset_completion(c);
 }
 
+static void cmd_toggle(const CommandArgs *a)
+{
+    const char *option_name = a->args[0];
+    bool global = cmdargs_has_flag(a, 'g');
+    size_t nr_values = a->nr_args - 1;
+    if (nr_values) {
+        char **values = a->args + 1;
+        toggle_option_values(option_name, global, false, values, nr_values);
+    } else {
+        toggle_option(option_name, global, false);
+    }
+}
+
 static void cmd_word_bwd(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
@@ -349,13 +363,6 @@ static void cmd_complete_prev(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     complete_command_prev(e);
-}
-
-static void cmd_case(const CommandArgs *a)
-{
-    EditorState *e = a->userdata;
-    unsigned int *css = &e->options.case_sensitive_search;
-    *css = (*css + 1) % 3;
 }
 
 static void cmd_direction(const CommandArgs *a)
@@ -444,13 +451,13 @@ static const Command common_cmds[] = {
     {"history-prev", "", false, 0, 0, cmd_history_prev},
     {"left", "", false, 0, 0, cmd_left},
     {"right", "", false, 0, 0, cmd_right},
+    {"toggle", "g", false, 1, -1, cmd_toggle},
     {"word-bwd", "", false, 0, 0, cmd_word_bwd},
     {"word-fwd", "", false, 0, 0, cmd_word_fwd},
 };
 
 static const Command search_cmds[] = {
     {"accept", "e", false, 0, 0, cmd_search_mode_accept},
-    {"case", "", false, 0, 0, cmd_case},
     {"direction", "", false, 0, 0, cmd_direction},
 };
 

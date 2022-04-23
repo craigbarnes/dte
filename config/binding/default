@@ -170,5 +170,5 @@ bind -cs enter accept
 bind -c tab complete-next
 bind -c S-tab complete-prev
 bind -s M-enter 'accept -e'
-bind -s M-c case
+bind -s M-c 'toggle case-sensitive-search'
 bind -s M-r direction

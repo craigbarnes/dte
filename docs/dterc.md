@@ -185,9 +185,9 @@ The commands available in [`command`]/[`search`] modes are as follows:
 * `copy` [**-bip**]
 * `history-next`
 * `history-prev`
+* `toggle` [**-g**] _option_ [_values_]...
 * `complete-next` (command mode)
 * `complete-prev` (command mode)
-* `case` (search mode)
 * `direction` (search mode)
 
 Most of these commands behave in a similar fashion to the normal mode
