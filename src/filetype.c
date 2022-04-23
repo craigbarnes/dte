@@ -66,7 +66,7 @@ void add_filetype(PointerArray *filetypes, const char *name, const char *str, Fi
     regex_t re;
     bool use_re = ft_uses_regex(type);
     if (use_re) {
-        int err = regcomp(&re, str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB);
+        int err = regcomp(&re, str, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
         if (unlikely(err)) {
             regexp_error_msg(&re, str, err);
             return;

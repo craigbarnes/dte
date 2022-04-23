@@ -402,7 +402,7 @@ void reg_replace(EditorState *e, const char *pattern, const char *format, Replac
 
     int re_flags = REG_NEWLINE;
     re_flags |= (flags & REPLACE_IGNORE_CASE) ? REG_ICASE : 0;
-    re_flags |= (flags & REPLACE_BASIC) ? 0 : REG_EXTENDED;
+    re_flags |= (flags & REPLACE_BASIC) ? 0 : DEFAULT_REGEX_FLAGS;
 
     regex_t re;
     if (unlikely(!regexp_compile_internal(&re, pattern, re_flags))) {

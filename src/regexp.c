@@ -26,6 +26,9 @@ bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags)
 {
+    // Note: DEFAULT_REGEX_FLAGS isn't used here because this function
+    // is only used for compiling built-in patterns, where we explicitly
+    // avoid using "enhanced" features
     int err = regcomp(re, pattern, flags | REG_EXTENDED);
     if (unlikely(err)) {
         char msg[1024];
@@ -81,7 +84,7 @@ void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
         char patt[32];
         xsnprintf(patt, sizeof(patt), "%s(foo)%s", start, end);
         regex_t re;
-        if (regcomp(&re, patt, REG_EXTENDED) != 0) {
+        if (regcomp(&re, patt, DEFAULT_REGEX_FLAGS) != 0) {
             continue;
         }
         regmatch_t m[2];

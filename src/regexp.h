@@ -7,6 +7,22 @@
 #include "util/macros.h"
 #include "util/string-view.h"
 
+enum {
+#ifdef REG_ENHANCED
+    // The REG_ENHANCED flag enables various extensions on macOS
+    // (see "enhanced features" in re_format(7)). Most of these
+    // extensions are enabled by default on Linux (in both glibc
+    // and musl) without the need for any extra flags.
+    DEFAULT_REGEX_FLAGS = REG_EXTENDED | REG_ENHANCED,
+#else
+    // POSIX Extended Regular Expressions (ERE) are used almost
+    // everywhere in this codebase, except where Basic Regular
+    // Expressions (BRE) are explicitly called for (most notably
+    // in search_tag(), which is used for ctags patterns).
+    DEFAULT_REGEX_FLAGS = REG_EXTENDED,
+#endif
+};
+
 typedef struct {
     regex_t re;
     char str[];
@@ -24,7 +40,7 @@ bool regexp_compile_internal(regex_t *re, const char *pattern, int flags) WARN_U
 WARN_UNUSED_RESULT
 static inline bool regexp_compile(regex_t *re, const char *pattern, int flags)
 {
-    return regexp_compile_internal(re, pattern, flags | REG_EXTENDED);
+    return regexp_compile_internal(re, pattern, flags | DEFAULT_REGEX_FLAGS);
 }
 
 WARN_UNUSED_RESULT

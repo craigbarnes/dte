@@ -1,6 +1,7 @@
 #include <regex.h>
 #include <stdlib.h>
 #include "match.h"
+#include "regexp.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"
@@ -202,7 +203,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
     char *regex_pattern = string_steal_cstring(&buf);
 
     regex_t re;
-    bool compiled = !regcomp(&re, regex_pattern, REG_EXTENDED | REG_NOSUB);
+    bool compiled = !regcomp(&re, regex_pattern, DEFAULT_REGEX_FLAGS | REG_NOSUB);
     free(regex_pattern);
     if (!compiled) {
         return false;

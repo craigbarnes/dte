@@ -124,7 +124,7 @@ void add_file_options(PointerArray *file_options, FileOptionType type, StringVie
     r->str[len] = '\0';
     opt->u.filename = r;
 
-    int err = regcomp(&r->re, r->str, REG_EXTENDED | REG_NEWLINE | REG_NOSUB);
+    int err = regcomp(&r->re, r->str, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
     if (unlikely(err)) {
         regexp_error_msg(&r->re, r->str, err);
         free(r);

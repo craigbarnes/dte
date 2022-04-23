@@ -60,7 +60,7 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
     }
 
     regex_t re;
-    int err = regcomp(&re, pat, REG_EXTENDED | REG_NOSUB | REG_NEWLINE);
+    int err = regcomp(&re, pat, DEFAULT_REGEX_FLAGS | REG_NOSUB | REG_NEWLINE);
     if (unlikely(err)) {
         // Note: the indent_regex pattern has already been checked by
         // validate_regex(), so the only error that should be possible
