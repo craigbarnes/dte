@@ -25,7 +25,7 @@ WARNINGS_EXTRA = \
 
 BUILTIN_SYNTAX_FILES ?= \
     awk c config css d diff docker dte gcode gitcommit gitrebase go html \
-    ini java javascript lisp lua mail make markdown meson nginx ninja \
+    ini java javascript json lisp lua mail make markdown meson nginx ninja \
     php python robotstxt roff ruby scheme sed sh sql tex texmfcnf tmux \
     vala xml xresources zig inc/c-comment inc/c-uchar
 

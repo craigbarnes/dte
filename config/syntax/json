@@ -1,0 +1,79 @@
+syntax json
+
+state value code
+    char -b a-z this
+    char -b \" string
+    char -b - number-negative
+    char -b 0 number-zero
+    char -b 1-9 number
+    inlist constant value constant
+    eat this
+
+state string
+    char -b \" value string
+    char -b \\ string-escape
+    char "\n" value
+    eat this
+
+state string-escape special
+    char -b \"\\/bfnrt string special
+    char -b u string-escape-unicode
+    recolor string 1
+    eat string
+
+state string-escape-unicode special
+    char -b a-fA-F0-9 string-escape-unicode-2
+    recolor string 2
+    noeat string
+
+state string-escape-unicode-2 special
+    char -b a-fA-F0-9 string-escape-unicode-3
+    recolor string 3
+    noeat string
+
+state string-escape-unicode-3 special
+    char -b a-fA-F0-9 string-escape-unicode-4
+    recolor string 4
+    noeat string
+
+state string-escape-unicode-4 special
+    char -b a-fA-F0-9 string special
+    recolor string 5
+    noeat string
+
+state number-negative numeric
+    char -b 0 number-zero
+    char -b 1-9 number
+    recolor code
+    noeat number-check-suffix
+
+state number-zero numeric
+    char . number-fraction
+    char eE number-exponent
+    noeat number-check-suffix
+
+state number numeric
+    char -b 0-9 this
+    char . number-fraction
+    char eE number-exponent
+    noeat number-check-suffix
+
+state number-fraction numeric
+    char -b 0-9 this
+    char eE number-exponent
+    noeat number-check-suffix
+
+state number-exponent numeric
+    char +- number-exponent-signed
+    char -b 0-9 this
+    noeat number-check-suffix
+
+state number-exponent-signed numeric
+    char -b 0-9 this
+    noeat number-check-suffix
+
+state number-check-suffix error
+    char a-zA-Z0-9_ this
+    noeat value
+
+list constant true false null
