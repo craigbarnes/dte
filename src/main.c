@@ -578,5 +578,5 @@ loop_break:;
         free(stdout_buffer);
     }
 
-    return free_editor_state(&editor);
+    return editor.exit_code;
 }
