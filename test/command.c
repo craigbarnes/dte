@@ -146,8 +146,8 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 
     // Built-in vars (expand to nothing; buffer isn't initialized yet)
-    arg = parse_command_arg(nc, STRN("$FILE' '$FILETYPE' '$LINENO' '$WORD"), false);
-    EXPECT_STREQ(arg, "   ");
+    arg = parse_command_arg(nc, STRN("$FILE' '$FILEDIR' '$FILETYPE' '$LINENO' '$WORD"), false);
+    EXPECT_STREQ(arg, "    ");
     free(arg);
 
     // Built-in $DTE_HOME var (expands to user config dir)

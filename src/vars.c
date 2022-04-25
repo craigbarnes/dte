@@ -30,6 +30,15 @@ static char *expand_file(const EditorState *e)
     return xstrdup(e->buffer->abs_filename);
 }
 
+static char *expand_file_dir(const EditorState *e)
+{
+    if (!e->buffer || !e->buffer->abs_filename) {
+        return NULL;
+    }
+
+    return path_dirname(e->buffer->abs_filename);
+}
+
 static char *expand_rfile(const EditorState *e)
 {
     if (!e->buffer || !e->buffer->abs_filename) {
@@ -79,6 +88,7 @@ static const BuiltinVar normal_vars[] = {
     {"PKGDATADIR", expand_pkgdatadir},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
+    {"FILEDIR", expand_file_dir},
     {"RFILE", expand_rfile},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
