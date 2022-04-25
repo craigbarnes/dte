@@ -71,6 +71,8 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
     if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) == -1) {
         LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
     }
+#else
+    (void)drop_ctty;
 #endif
 
     int error;
