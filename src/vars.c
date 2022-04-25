@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 #include <unistd.h>
 #include "vars.h"
 #include "buffer.h"
@@ -6,6 +7,7 @@
 #include "error.h"
 #include "selection.h"
 #include "util/array.h"
+#include "util/bsearch.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
@@ -35,7 +37,6 @@ static char *expand_file_dir(const EditorState *e)
     if (!e->buffer || !e->buffer->abs_filename) {
         return NULL;
     }
-
     return path_dirname(e->buffer->abs_filename);
 }
 
@@ -85,37 +86,34 @@ static char *expand_pkgdatadir(const EditorState* UNUSED_ARG(e))
 }
 
 static const BuiltinVar normal_vars[] = {
-    {"PKGDATADIR", expand_pkgdatadir},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"FILEDIR", expand_file_dir},
-    {"RFILE", expand_rfile},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
+    {"PKGDATADIR", expand_pkgdatadir},
+    {"RFILE", expand_rfile},
     {"WORD", expand_word},
 };
 
 UNITTEST {
-    CHECK_STRUCT_ARRAY(normal_vars, name);
+    CHECK_BSEARCH_ARRAY(normal_vars, name, strcmp);
 }
 
 bool expand_normal_var(const char *name, char **value, void *userdata)
 {
-    const EditorState *e = userdata;
-    for (size_t i = 0; i < ARRAYLEN(normal_vars); i++) {
-        if (streq(name, normal_vars[i].name)) {
-            *value = normal_vars[i].expand(e);
-            return true;
-        }
+    const BuiltinVar *var = BSEARCH(name, normal_vars, (CompareFunction)strcmp);
+    if (!var) {
+        return false;
     }
-    return false;
+    *value = var->expand(userdata);
+    return true;
 }
 
 bool expand_syntax_var(const char *name, char **value, void *userdata)
 {
-    const EditorState *e = userdata;
     if (streq(name, "DTE_HOME")) {
-        *value = expand_dte_home(e);
+        *value = expand_dte_home(userdata);
         return true;
     }
     return false;
