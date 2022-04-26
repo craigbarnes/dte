@@ -1,5 +1,10 @@
 #!/usr/bin/awk -f
 
+# Ignore everything below "scissors" line (as used by "git commit -v")
+/^# *--+ >8 --+$/ {
+    exit 0
+}
+
 /^#/ {
     next
 }
