@@ -16,7 +16,7 @@ while getopts 'hsR' flag; do
    esac
 done
 
-shift $(($OPTIND - 1))
+shift $((OPTIND - 1))
 value="$1"
 file="$2"
 
