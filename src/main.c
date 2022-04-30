@@ -276,57 +276,60 @@ static void freopen_tty(FILE *stream, const char *mode, int fd)
     }
 }
 
-static int init_std_fds(Buffer **inbuf, Buffer **outbuf)
+static void init_std_fds(int std_fds[2])
 {
-    int old_stdout_fd = -1;
-    *inbuf = NULL;
-    *outbuf = NULL;
-
     if (!isatty(STDIN_FILENO)) {
-        Encoding enc = encoding_from_type(UTF8);
-        Buffer *b = buffer_new(&enc);
-        if (read_blocks(b, STDIN_FILENO)) {
-            set_display_filename(b, xmemdup_literal("(stdin)"));
-            b->temporary = true;
-            *inbuf = b;
-        } else {
-            if (errno != EBADF) {
-                error_msg("Unable to read redirected stdin");
-            }
-            remove_and_free_buffer(&editor.buffers, b);
+        int fd = fcntl(STDIN_FILENO, F_DUPFD_CLOEXEC, 3);
+        if (fd == -1 && errno != EBADF) {
+            perror("fcntl");
+            exit(EX_OSERR);
         }
+        std_fds[STDIN_FILENO] = fd;
         freopen_tty(stdin, "r", STDIN_FILENO);
     }
 
     if (!isatty(STDOUT_FILENO)) {
-        old_stdout_fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
-        if (old_stdout_fd == -1 && errno != EBADF) {
+        int fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
+        if (fd == -1 && errno != EBADF) {
             perror("fcntl");
             exit(EX_OSERR);
         }
+        std_fds[STDOUT_FILENO] = fd;
         freopen_tty(stdout, "w", STDOUT_FILENO);
-        if (old_stdout_fd == -1) {
-            // The call to fcntl(3) above failed with EBADF, meaning stdout was
-            // most likely closed and there's no point opening a buffer for it
-        } else {
-            Buffer *b = *inbuf;
-            const char *name = "(stdin|stdout)";
-            if (!b) {
-                b = open_empty_buffer();
-                name = "(stdout)";
-            }
-            set_display_filename(b, xstrdup(name));
-            b->stdout_buffer = true;
-            b->temporary = true;
-            *outbuf = b;
-        }
     }
 
     if (!isatty(STDERR_FILENO)) {
         freopen_tty(stderr, "w", STDERR_FILENO);
     }
+}
 
-    return old_stdout_fd;
+static void init_std_buffers(EditorState *e, Buffer *buffers[2], int fds[2])
+{
+    if (fds[STDIN_FILENO] >= 3) {
+        Encoding enc = encoding_from_type(UTF8);
+        Buffer *b = buffer_new(&enc);
+        if (read_blocks(b, fds[STDIN_FILENO])) {
+            set_display_filename(b, xmemdup_literal("(stdin)"));
+            b->temporary = true;
+            buffers[STDIN_FILENO] = b;
+        } else {
+            error_msg("Unable to read redirected stdin");
+            remove_and_free_buffer(&e->buffers, b);
+        }
+    }
+
+    if (fds[STDOUT_FILENO] >= 3) {
+        Buffer *b = buffers[STDIN_FILENO];
+        const char *name = "(stdin|stdout)";
+        if (!b) {
+            b = open_empty_buffer();
+            name = "(stdout)";
+        }
+        set_display_filename(b, xstrdup(name));
+        b->stdout_buffer = true;
+        b->temporary = true;
+        buffers[STDOUT_FILENO] = b;
+    }
 }
 
 static const char copyright[] =
@@ -405,6 +408,12 @@ int main(int argc, char *argv[])
 
 loop_break:;
 
+    // This must be done before calling log_init(), otherwise an
+    // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
+    // cause the logging fd to be opened as STDIN_FILENO.
+    int std_fds[2] = {-1, -1};
+    init_std_fds(std_fds);
+
     const char *log_filename = getenv("DTE_LOG");
     if (log_filename && log_filename[0] != '\0') {
         LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
@@ -413,8 +422,8 @@ loop_break:;
 
     init_editor_state();
 
-    Buffer *stdin_buffer, *stdout_buffer;
-    int old_stdout_fd = init_std_fds(&stdin_buffer, &stdout_buffer);
+    Buffer *std_buffers[2] = {NULL, NULL};
+    init_std_buffers(&editor, std_buffers, std_fds);
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
@@ -510,11 +519,11 @@ loop_break:;
         }
     }
 
-    if (stdin_buffer) {
-        window_add_buffer(window, stdin_buffer);
+    if (std_buffers[STDIN_FILENO]) {
+        window_add_buffer(window, std_buffers[STDIN_FILENO]);
     }
-    if (stdout_buffer && stdout_buffer != stdin_buffer) {
-        window_add_buffer(window, stdout_buffer);
+    if (std_buffers[STDOUT_FILENO] && std_buffers[0] != std_buffers[1]) {
+        window_add_buffer(window, std_buffers[STDOUT_FILENO]);
     }
 
     const View *empty_buffer = NULL;
@@ -565,10 +574,12 @@ loop_break:;
         file_history_save(&editor.file_history);
     }
 
+    Buffer *stdout_buffer = std_buffers[STDOUT_FILENO];
     if (stdout_buffer) {
+        int fd = std_fds[STDOUT_FILENO];
         Block *blk;
         block_for_each(blk, &stdout_buffer->blocks) {
-            if (xwrite_all(old_stdout_fd, blk->data, blk->size) < 0) {
+            if (xwrite_all(fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
                 editor.exit_code = EX_IOERR;
                 break;
