@@ -430,9 +430,6 @@ loop_break:;
 
     init_editor_state();
 
-    Buffer *std_buffer = init_std_buffer(&editor, std_fds);
-    bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
-
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
         fputs("Error: $TERM not set\n", stderr);
@@ -452,6 +449,9 @@ loop_break:;
     if (use_showkey) {
         return showkey_loop(term);
     }
+
+    Buffer *std_buffer = init_std_buffer(&editor, std_fds);
+    bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     // Create this early. Needed if lock-files is true.
     const char *editor_dir = editor.user_config_dir;
