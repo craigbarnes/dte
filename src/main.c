@@ -303,33 +303,41 @@ static void init_std_fds(int std_fds[2])
     }
 }
 
-static void init_std_buffers(EditorState *e, Buffer *buffers[2], int fds[2])
+static Buffer *init_std_buffer(EditorState *e, int fds[2])
 {
+    const char *name = NULL;
+    Buffer *b = NULL;
+
     if (fds[STDIN_FILENO] >= 3) {
         Encoding enc = encoding_from_type(UTF8);
-        Buffer *b = buffer_new(&enc);
+        b = buffer_new(&enc);
         if (read_blocks(b, fds[STDIN_FILENO])) {
-            set_display_filename(b, xmemdup_literal("(stdin)"));
+            name = "(stdin)";
             b->temporary = true;
-            buffers[STDIN_FILENO] = b;
         } else {
             error_msg("Unable to read redirected stdin");
             remove_and_free_buffer(&e->buffers, b);
+            b = NULL;
         }
     }
 
     if (fds[STDOUT_FILENO] >= 3) {
-        Buffer *b = buffers[STDIN_FILENO];
-        const char *name = "(stdin|stdout)";
         if (!b) {
             b = open_empty_buffer();
             name = "(stdout)";
+        } else {
+            name = "(stdin|stdout)";
         }
-        set_display_filename(b, xstrdup(name));
         b->stdout_buffer = true;
         b->temporary = true;
-        buffers[STDOUT_FILENO] = b;
     }
+
+    BUG_ON(!b != !name);
+    if (name) {
+        set_display_filename(b, xstrdup(name));
+    }
+
+    return b;
 }
 
 static const char copyright[] =
@@ -422,8 +430,8 @@ loop_break:;
 
     init_editor_state();
 
-    Buffer *std_buffers[2] = {NULL, NULL};
-    init_std_buffers(&editor, std_buffers, std_fds);
+    Buffer *std_buffer = init_std_buffer(&editor, std_fds);
+    bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
@@ -519,11 +527,8 @@ loop_break:;
         }
     }
 
-    if (std_buffers[STDIN_FILENO]) {
-        window_add_buffer(window, std_buffers[STDIN_FILENO]);
-    }
-    if (std_buffers[STDOUT_FILENO] && std_buffers[0] != std_buffers[1]) {
-        window_add_buffer(window, std_buffers[STDOUT_FILENO]);
+    if (std_buffer) {
+        window_add_buffer(window, std_buffer);
     }
 
     const View *empty_buffer = NULL;
@@ -574,19 +579,18 @@ loop_break:;
         file_history_save(&editor.file_history);
     }
 
-    Buffer *stdout_buffer = std_buffers[STDOUT_FILENO];
-    if (stdout_buffer) {
+    if (have_stdout_buffer) {
         int fd = std_fds[STDOUT_FILENO];
         Block *blk;
-        block_for_each(blk, &stdout_buffer->blocks) {
+        block_for_each(blk, &std_buffer->blocks) {
             if (xwrite_all(fd, blk->data, blk->size) < 0) {
                 perror_msg("write");
                 editor.exit_code = EX_IOERR;
                 break;
             }
         }
-        free_blocks(stdout_buffer);
-        free(stdout_buffer);
+        free_blocks(std_buffer);
+        free(std_buffer);
     }
 
     return editor.exit_code;
