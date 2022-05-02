@@ -92,10 +92,8 @@ IRC network.
 Donations
 ---------
 
-Donations can be made via Liberapay, using the link below. All support
-is very much appreciated and allows me to spend more time working on dte. 😊
-
-[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/craigbarnes/donate)
+Donations can be made via [Liberapay]. All support is very much
+appreciated and allows me to spend more time working on dte.
 
 License
 -------
@@ -142,3 +140,4 @@ Public License version 2 for more details.
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [Libera.Chat]: https://libera.chat/
+[Liberapay]: https://liberapay.com/craigbarnes/donate
