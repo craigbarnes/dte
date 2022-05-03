@@ -13,5 +13,5 @@ indent_size = 8
 indent_style = space
 indent_size = 2
 
-[.git/COMMIT_EDITMSG]
+[{COMMIT_EDITMSG,MERGE_MSG}]
 max_line_length = 72
