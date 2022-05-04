@@ -1,0 +1,43 @@
+syntax gomod
+
+# https://go.dev/ref/mod#go-mod-file-lexical
+state code
+    char \" dq-string
+    char ` raw-string
+    char / slash
+    char -bn " \t\r\n" ident
+    eat this
+
+state ident
+    char -bn " \t\r\n\"`/" ident
+    inlist keyword code
+    bufis '=>' code arrow
+    noeat code
+
+state slash
+    char -n / ident
+    recolor comment 1
+    eat comment
+
+state comment
+    char "\n" code
+    eat this
+
+state raw-string string
+    char "`\n" code
+    eat this
+
+state dq-string string
+    char \\ escape
+    char \" code string
+    char "\n" code
+    eat this
+
+state escape
+    eat dq-string escape
+
+list keyword \
+    module go require replace exclude retract
+
+default special escape
+default operator arrow
