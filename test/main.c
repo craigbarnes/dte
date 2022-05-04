@@ -10,6 +10,7 @@
 
 void init_headless_mode(void);
 extern const TestGroup bind_tests;
+extern const TestGroup bookmark_tests;
 extern const TestGroup buffer_tests;
 extern const TestGroup cmdline_tests;
 extern const TestGroup cmdline_tests_late;
@@ -136,6 +137,7 @@ int main(void)
     run_tests(&ctx, &bind_tests);
     run_tests(&ctx, &cmdline_tests_late);
     run_tests(&ctx, &buffer_tests);
+    run_tests(&ctx, &bookmark_tests);
     run_tests(&ctx, &syntax_tests);
     run_tests(&ctx, &dump_tests);
     remove_frame(editor.root_frame);
