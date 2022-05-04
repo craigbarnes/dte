@@ -9,6 +9,10 @@ prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
 pkg-var = $(shell $(PKGCONFIG) --variable='$(strip $(2))' $(1))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
+# Note: this doesn't work reliably in make 3.81, due to a bug, but
+# we already check for GNU Make 4.0+ in mk/compat.mk
+make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
+
 MAKEFLAGS += -r
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')

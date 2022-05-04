@@ -53,7 +53,7 @@ To build from source, first ensure the following dependencies are
 installed:
 
 * [GCC] 4.8+ or [Clang]
-* [GNU Make] 3.81+
+* [GNU Make] 4.0+
 * [iconv] library (usually provided by libc on Linux/FreeBSD)
 
 ...then download and unpack the latest release tarball:
