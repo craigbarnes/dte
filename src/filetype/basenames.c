@@ -51,6 +51,7 @@ static const struct FileBasenameMap {
     {"gitconfig", INI, true},
     {"gitmodules", INI, true},
     {"gnus", LISP, true},
+    {"go.mod", GOMODULE, false},
     {"hosts", CONFIG, false},
     {"htmlhintrc", JSON, true},
     {"indent.pro", INDENT, true},
