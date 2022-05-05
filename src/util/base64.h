@@ -6,6 +6,7 @@
 #include "macros.h"
 
 extern const uint8_t base64_decode_table[256];
+extern const char base64_encode_table[64];
 
 enum {
     BASE64_PADDING = 1 << 6, // Return value for padding bytes (=)

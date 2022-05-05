@@ -433,6 +433,15 @@ static void test_base64_decode(TestContext *ctx)
     EXPECT_EQ(base64_decode(0x00), BASE64_INVALID);
     EXPECT_EQ(base64_decode(0xFF), BASE64_INVALID);
 
+    EXPECT_EQ(base64_encode_table[0], 'A');
+    EXPECT_EQ(base64_encode_table[25], 'Z');
+    EXPECT_EQ(base64_encode_table[26], 'a');
+    EXPECT_EQ(base64_encode_table[51], 'z');
+    EXPECT_EQ(base64_encode_table[52], '0');
+    EXPECT_EQ(base64_encode_table[61], '9');
+    EXPECT_EQ(base64_encode_table[62], '+');
+    EXPECT_EQ(base64_encode_table[63], '/');
+
     for (unsigned int i = 'A'; i <= 'Z'; i++) {
         IEXPECT_EQ(base64_decode(i), i - 'A');
     }
@@ -449,6 +458,7 @@ static void test_base64_decode(TestContext *ctx)
         unsigned int val = base64_decode(i);
         if (ascii_isalnum(i) || i == '+' || i == '/') {
             IEXPECT_EQ(val, val & 63);
+            IEXPECT_EQ(i, base64_encode_table[val & 63]);
         } else {
             IEXPECT_EQ(val, val & 192);
         }
