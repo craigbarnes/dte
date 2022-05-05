@@ -83,7 +83,7 @@ static void test_history_add(TestContext *ctx)
     EXPECT_STREQ(h.first->text, "C");
     EXPECT_STREQ(h.last->prev->text, "H");
 
-    hashmap_free(&h.entries, free);
+    history_free(&h);
     h = (History){.max_entries = 2};
     EXPECT_EQ(h.entries.count, 0);
 
@@ -102,7 +102,7 @@ static void test_history_add(TestContext *ctx)
     EXPECT_STREQ(h.last->text, "3");
     EXPECT_STREQ(h.first->text, "2");
 
-    hashmap_free(&h.entries, free);
+    history_free(&h);
 }
 
 static void test_history_search(TestContext *ctx)
@@ -140,7 +140,7 @@ static void test_history_search(TestContext *ctx)
 
     h.filename = "build/test/saved_history";
     history_save(&h);
-    hashmap_free(&h.entries, free);
+    history_free(&h);
     char *buf = NULL;
     ssize_t n = read_file(h.filename, &buf);
     EXPECT_EQ(n, 14);
@@ -161,7 +161,7 @@ static void test_history_tombstone_pressure(TestContext *ctx)
 
     EXPECT_EQ(h.entries.count, h.max_entries);
     EXPECT_TRUE(h.entries.mask + 1 <= 2048);
-    hashmap_free(&h.entries, free);
+    history_free(&h);
 }
 
 static const TestEntry tests[] = {
