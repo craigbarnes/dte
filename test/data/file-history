@@ -11,3 +11,5 @@
 5 6
 7 8 
 4 3  /tmp/invalid-field-delim
+4 3:/usr/invalid-delim
+4,3 /usr/invalid-delim
