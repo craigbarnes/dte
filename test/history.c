@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "test.h"
+#include "file-history.h"
 #include "history.h"
 #include "util/numtostr.h"
 #include "util/readfile.h"
@@ -107,9 +108,11 @@ static void test_history_add(TestContext *ctx)
 
 static void test_history_search(TestContext *ctx)
 {
+    const char *filename = "test/data/history";
     History h = {.max_entries = 64};
-    history_load(&h, "test/data/history");
+    history_load(&h, filename);
     EXPECT_EQ(h.entries.count, 3);
+    EXPECT_STREQ(h.filename, filename);
     EXPECT_STREQ(h.first->text, "one");
     EXPECT_STREQ(h.last->text, "three");
     EXPECT_STREQ(h.first->next->text, "two");
@@ -164,10 +167,63 @@ static void test_history_tombstone_pressure(TestContext *ctx)
     history_free(&h);
 }
 
+static void test_file_history_find(TestContext *ctx)
+{
+    const char *fh_filename = "test/data/file-history";
+    FileHistory h = {.filename = NULL};
+    file_history_load(&h, fh_filename);
+    EXPECT_STREQ(h.filename, fh_filename);
+    EXPECT_EQ(h.entries.count, 3);
+
+    const FileHistoryEntry *first = h.first;
+    ASSERT_NONNULL(first);
+    ASSERT_NONNULL(first->next);
+    EXPECT_NULL(first->prev);
+    EXPECT_STREQ(first->filename, "/etc/hosts");
+    EXPECT_EQ(first->row, 3);
+    EXPECT_EQ(first->col, 42);
+
+    const FileHistoryEntry *last = h.last;
+    ASSERT_NONNULL(last);
+    ASSERT_NONNULL(last->prev);
+    EXPECT_NULL(last->next);
+    EXPECT_STREQ(last->filename, "/home/user/file.txt");
+    EXPECT_EQ(last->row, 4521);
+    EXPECT_EQ(last->col, 1);
+
+    const FileHistoryEntry *mid = first->next;
+    ASSERT_NONNULL(mid);
+    EXPECT_PTREQ(mid, last->prev);
+    EXPECT_PTREQ(mid->prev, first);
+    EXPECT_PTREQ(mid->next, last);
+    EXPECT_STREQ(mid->filename, "/tmp/foo");
+    EXPECT_EQ(mid->row, 123);
+    EXPECT_EQ(mid->col, 456);
+
+    unsigned long row = 0, col = 0;
+    EXPECT_TRUE(file_history_find(&h, first->filename, &row, &col));
+    EXPECT_EQ(row, first->row);
+    EXPECT_EQ(col, first->col);
+    EXPECT_TRUE(file_history_find(&h, mid->filename, &row, &col));
+    EXPECT_EQ(row, mid->row);
+    EXPECT_EQ(col, mid->col);
+    EXPECT_TRUE(file_history_find(&h, last->filename, &row, &col));
+    EXPECT_EQ(row, last->row);
+    EXPECT_EQ(col, last->col);
+
+    row = col = 99;
+    EXPECT_FALSE(file_history_find(&h, "/tmp/_", &row, &col));
+    EXPECT_EQ(row, 99);
+    EXPECT_EQ(col, 99);
+
+    file_history_free(&h);
+}
+
 static const TestEntry tests[] = {
     TEST(test_history_add),
     TEST(test_history_search),
     TEST(test_history_tombstone_pressure),
+    TEST(test_file_history_find),
 };
 
 const TestGroup history_tests = TEST_GROUP(tests);
