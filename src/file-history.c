@@ -61,16 +61,14 @@ void file_history_add(FileHistory *history, unsigned long row, unsigned long col
     }
 }
 
-static bool parse_ulong(const char **strp, unsigned long *valp)
+static bool parse_num_field(StringView *sv, unsigned long *valp)
 {
-    const char *str = *strp;
-    const size_t len = strlen(str);
-    const size_t ndigits = buf_parse_ulong(str, len, valp);
-    if (ndigits > 0) {
-        *strp = str + ndigits;
-        return true;
+    size_t n = buf_parse_ulong(sv->data, sv->length, valp);
+    if (n == 0 || *valp == 0 || sv->data[n] != ' ') {
+        return false;
     }
-    return false;
+    strview_remove_prefix(sv, n + 1);
+    return true;
 }
 
 void file_history_load(FileHistory *history, const char *filename)
@@ -90,20 +88,21 @@ void file_history_load(FileHistory *history, const char *filename)
 
     hashmap_init(&history->entries, MAX_ENTRIES);
     history->filename = filename;
+
     for (size_t pos = 0, size = ssize; pos < size; ) {
-        const char *line = buf_next_line(buf, &pos, size);
         unsigned long row, col;
-        if (!parse_ulong(&line, &row) || row == 0 || *line++ != ' ') {
+        StringView line = buf_slice_next_line(buf, &pos, size);
+        if (unlikely(
+            !parse_num_field(&line, &row)
+            || !parse_num_field(&line, &col)
+            || !strview_has_prefix(&line, "/")
+        )) {
             continue;
         }
-        if (!parse_ulong(&line, &col) || col == 0 || *line++ != ' ') {
-            continue;
-        }
-        const char *path = line;
-        if (!path_is_absolute(path)) {
-            continue;
-        }
-        file_history_add(history, row, col, path);
+        char *eol = &buf[pos - 1];
+        BUG_ON(*eol != '\n' && *eol != '\0');
+        *eol = '\0'; // null-terminate line, by replacing '\n' with '\0'
+        file_history_add(history, row, col, line.data);
     }
 
     free(buf);
