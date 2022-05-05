@@ -61,7 +61,7 @@ void file_history_add(FileHistory *history, unsigned long row, unsigned long col
     }
 }
 
-static bool parse_num_field(StringView *sv, unsigned long *valp)
+static bool parse_ulong_field(StringView *sv, unsigned long *valp)
 {
     size_t n = buf_parse_ulong(sv->data, sv->length, valp);
     if (n == 0 || *valp == 0 || sv->data[n] != ' ') {
@@ -93,8 +93,8 @@ void file_history_load(FileHistory *history, const char *filename)
         unsigned long row, col;
         StringView line = buf_slice_next_line(buf, &pos, size);
         if (unlikely(
-            !parse_num_field(&line, &row)
-            || !parse_num_field(&line, &col)
+            !parse_ulong_field(&line, &row)
+            || !parse_ulong_field(&line, &col)
             || !strview_has_prefix(&line, "/")
         )) {
             continue;
