@@ -33,6 +33,7 @@ static int ft_compare(const void *key, const void *elem)
 #include "filetype/signatures.c"
 
 UNITTEST {
+    static_assert(NR_BUILTIN_FILETYPES < 256);
     CHECK_BSEARCH_ARRAY(basenames, name, strcmp);
     CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
     CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
