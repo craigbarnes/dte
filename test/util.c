@@ -327,6 +327,7 @@ static void test_ascii(TestContext *ctx)
     EXPECT_FALSE(is_word_byte(0x7F));
     EXPECT_FALSE(is_word_byte(0x00));
 
+    EXPECT_TRUE(is_regex_special_char('$'));
     EXPECT_TRUE(is_regex_special_char('('));
     EXPECT_TRUE(is_regex_special_char(')'));
     EXPECT_TRUE(is_regex_special_char('*'));
@@ -334,11 +335,11 @@ static void test_ascii(TestContext *ctx)
     EXPECT_TRUE(is_regex_special_char('.'));
     EXPECT_TRUE(is_regex_special_char('?'));
     EXPECT_TRUE(is_regex_special_char('['));
+    EXPECT_TRUE(is_regex_special_char('^'));
     EXPECT_TRUE(is_regex_special_char('{'));
     EXPECT_TRUE(is_regex_special_char('|'));
     EXPECT_TRUE(is_regex_special_char('\\'));
     EXPECT_FALSE(is_regex_special_char('"'));
-    EXPECT_FALSE(is_regex_special_char('$'));
     EXPECT_FALSE(is_regex_special_char('&'));
     EXPECT_FALSE(is_regex_special_char(','));
     EXPECT_FALSE(is_regex_special_char('0'));
@@ -346,7 +347,6 @@ static void test_ascii(TestContext *ctx)
     EXPECT_FALSE(is_regex_special_char('A'));
     EXPECT_FALSE(is_regex_special_char('\''));
     EXPECT_FALSE(is_regex_special_char(']'));
-    EXPECT_FALSE(is_regex_special_char('^'));
     EXPECT_FALSE(is_regex_special_char('_'));
     EXPECT_FALSE(is_regex_special_char('z'));
     EXPECT_FALSE(is_regex_special_char('}'));
