@@ -39,6 +39,7 @@ static const struct FileBasenameMap {
     {"configure.ac", M4, false},
     {"cshrc", SH, true},
     {"curlrc", CONFIG, true},
+    {"dir_colors", CONFIG, true},
     {"dircolors", CONFIG, true},
     {"drirc", XML, true},
     {"editorconfig", INI, true},

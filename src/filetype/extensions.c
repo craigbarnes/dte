@@ -35,6 +35,7 @@ static const struct FileExtensionMap {
     {"desktop", INI},
     {"di", D},
     {"diff", DIFF},
+    {"dircolors", CONFIG},
     {"doap", XML},
     {"docbook", XML},
     {"docker", DOCKER},
