@@ -10,6 +10,7 @@ static const struct FileBasenameMap {
     {"COMMIT_EDITMSG", GITCOMMIT, false},
     {"Capfile", RUBY, false},
     {"Cargo.lock", TOML, false},
+    {"DIR_COLORS", CONFIG, false},
     {"Dockerfile", DOCKER, false},
     {"Doxyfile", CONFIG, false},
     {"GNUmakefile", MAKE, false},
