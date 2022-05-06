@@ -80,9 +80,12 @@ coverage:
     stage: test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-alpine
     artifacts:
-        reports: {cobertura: build/coverage.xml}
         expire_in: 30 days
         name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: build/coverage.xml
     script:
         - make build/coverage.xml
 
