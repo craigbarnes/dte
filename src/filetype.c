@@ -190,6 +190,9 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     BUG_ON(path.length == 0 && (base.length != 0 || ext.length != 0));
     BUG_ON(line.length == 0 && interpreter.length != 0);
 
+    // The order of elements in this array determines the order of
+    // precedence for the lookup() functions (but note that changing
+    // the initializer below makes no difference to the array order)
     const struct {
         StringView sv;
         FileTypeEnum (*lookup)(const StringView sv);
