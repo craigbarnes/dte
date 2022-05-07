@@ -819,7 +819,7 @@ copying to multiple targets in a single command. For example:
 
     copy -ib
 
-### **paste** [**-c**]
+### **paste** [**-cm**]
 
 Paste text previously copied by the [`copy`] or [`cut`] commands.
 
@@ -827,6 +827,9 @@ Paste text previously copied by the [`copy`] or [`cut`] commands.
 :   Paste at the cursor position, even when the text was copied as
     a whole-line selection (where the usual default is to paste at
     the start of the next line)
+
+`-m`
+:   Move after the pasted text
 
 ### **undo**
 

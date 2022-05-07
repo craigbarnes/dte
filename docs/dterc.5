@@ -142,7 +142,7 @@ Editing Commands:
 .br
    \fBcopy\fR [\fB\-bikp\fR]
 .br
-   \fBpaste\fR [\fB\-c\fR]
+   \fBpaste\fR [\fB\-cm\fR]
 .br
    \fBundo\fR
 .br
@@ -1336,7 +1336,7 @@ copy\ \-ib
 .fi
 .PP
 .RE
-\fBpaste\fR [\fB\-c\fR]
+\fBpaste\fR [\fB\-cm\fR]
 .RS
 Paste text previously copied by the \fBcopy\fR or \fBcut\fR commands.
 .P
@@ -1345,6 +1345,10 @@ Paste text previously copied by the \fBcopy\fR or \fBcut\fR commands.
 Paste at the cursor position, even when the text was copied as
 a whole\-line selection (where the usual default is to paste at
 the start of the next line)
+.PP
+.TP
+\fB\-m\fR
+Move after the pasted text
 .PP
 .RE
 \fBundo\fR

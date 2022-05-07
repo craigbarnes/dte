@@ -1447,7 +1447,8 @@ static void cmd_paste(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
     bool at_cursor = has_flag(a, 'c');
-    paste(&e->clipboard, e->view, at_cursor);
+    bool move_after = has_flag(a, 'm');
+    paste(&e->clipboard, e->view, at_cursor, move_after);
 }
 
 static void cmd_pgdown(const CommandArgs *a)
@@ -2547,7 +2548,7 @@ static const Command cmds[] = {
     {"next", "", false, 0, 0, cmd_next},
     {"open", "e=gt", false, 0, -1, cmd_open},
     {"option", "-r", true, 3, -1, cmd_option},
-    {"paste", "c", false, 0, 0, cmd_paste},
+    {"paste", "cm", false, 0, 0, cmd_paste},
     {"pgdown", "cl", false, 0, 0, cmd_pgdown},
     {"pgup", "cl", false, 0, 0, cmd_pgup},
     {"prev", "", false, 0, 0, cmd_prev},
