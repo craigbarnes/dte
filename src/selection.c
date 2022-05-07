@@ -49,15 +49,15 @@ size_t prepare_selection(View *v)
 
 char *view_get_selection(View *v, size_t *size)
 {
-    char *buf = NULL;
-
-    *size = 0;
-    if (v->selection) {
-        BlockIter save = v->cursor;
-        *size = prepare_selection(v);
-        buf = block_iter_get_bytes(&v->cursor, *size);
-        v->cursor = save;
+    if (v->selection == SELECT_NONE) {
+        *size = 0;
+        return NULL;
     }
+
+    BlockIter save = v->cursor;
+    *size = prepare_selection(v);
+    char *buf = block_iter_get_bytes(&v->cursor, *size);
+    v->cursor = save;
     return buf;
 }
 
