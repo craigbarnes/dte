@@ -287,6 +287,7 @@ list posix-type \
     id_t ino_t key_t locale_t mode_t nlink_t off_t pid_t regex_t regmatch_t \
     regoff_t siginfo_t sigjmp_buf sigset_t ssize_t suseconds_t timer_t uid_t \
     trace_attr_t trace_event_id_t trace_event_set_t trace_id_t \
+    posix_spawn_file_actions_t posix_spawnattr_t \
     pthread_t pthread_attr_t pthread_barrier_t pthread_barrierattr_t \
     pthread_cond_t pthread_condattr_t pthread_key_t pthread_mutex_t \
     pthread_mutexattr_t pthread_once_t pthread_rwlock_t \
