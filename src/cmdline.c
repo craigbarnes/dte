@@ -282,6 +282,19 @@ static void cmd_left(const CommandArgs *a)
     reset_completion(c);
 }
 
+static void cmd_paste(const CommandArgs *a)
+{
+    EditorState *e = a->userdata;
+    CommandLine *c = &e->cmdline;
+    const Clipboard *clip = &e->clipboard;
+    string_insert_buf(&c->buf, c->pos, clip->buf, clip->len);
+    if (cmdargs_has_flag(a, 'm')) {
+        c->pos += clip->len;
+    }
+    c->search_pos = NULL;
+    reset_completion(c);
+}
+
 static void cmd_right(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
@@ -450,6 +463,7 @@ static const Command common_cmds[] = {
     {"history-next", "", false, 0, 0, cmd_history_next},
     {"history-prev", "", false, 0, 0, cmd_history_prev},
     {"left", "", false, 0, 0, cmd_left},
+    {"paste", "m", false, 0, 0, cmd_paste},
     {"right", "", false, 0, 0, cmd_right},
     {"toggle", "g", false, 1, -1, cmd_toggle},
     {"word-bwd", "", false, 0, 0, cmd_word_bwd},

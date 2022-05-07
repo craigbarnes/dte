@@ -187,6 +187,7 @@ The commands available in [`command`]/[`search`] modes are as follows:
 * `cancel`
 * `clear`
 * `copy` [**-bip**]
+* `paste` [**-m**]
 * `history-next`
 * `history-prev`
 * `toggle` [**-g**] _option_ [_values_]...
