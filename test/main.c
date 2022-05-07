@@ -84,6 +84,49 @@ static void test_init(TestContext *ctx)
     EXPECT_STREQ(ver, editor.version);
 }
 
+static void test_deinit(TestContext *ctx)
+{
+    // Make sure default Terminal state wasn't changed
+    const Terminal *term = &editor.terminal;
+    EXPECT_EQ(term->width, 80);
+    EXPECT_EQ(term->height, 24);
+    EXPECT_EQ(term->color_type, TERM_8_COLOR);
+    EXPECT_EQ(term->ncv_attributes, 0);
+    EXPECT_EQ(term->features, 0);
+    EXPECT_EQ(term->ibuf.len, 0);
+    EXPECT_NONNULL(term->ibuf.buf);
+
+    // Make sure no terminal output was buffered
+    const TermOutputBuffer *obuf = &term->obuf;
+    EXPECT_NONNULL(obuf->buf);
+    EXPECT_EQ(obuf->count, 0);
+    EXPECT_EQ(obuf->scroll_x, 0);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_EQ(obuf->width, 0);
+    EXPECT_EQ(obuf->color.fg, 0);
+    EXPECT_EQ(obuf->color.bg, 0);
+    EXPECT_EQ(obuf->color.attr, 0);
+    EXPECT_EQ(obuf->cursor_style.type, 0);
+    EXPECT_EQ(obuf->cursor_style.color, 0);
+
+    ASSERT_NONNULL(editor.view);
+    ASSERT_NONNULL(editor.buffer);
+    EXPECT_EQ(editor.buffers.count, 1);
+    EXPECT_NULL(editor.buffer->abs_filename);
+    EXPECT_PTREQ(editor.buffer, editor.buffers.ptrs[0]);
+    EXPECT_FALSE(editor.child_controls_terminal);
+
+    remove_frame(editor.root_frame);
+    EXPECT_NULL(editor.view);
+    EXPECT_NULL(editor.buffer);
+    EXPECT_EQ(editor.buffers.count, 0);
+
+    free_editor_state(&editor);
+    EXPECT_EQ(editor.colors.other.count, 0);
+    EXPECT_EQ(editor.colors.other.mask, 0);
+    EXPECT_NULL(editor.colors.other.entries);
+}
+
 static void run_tests(TestContext *ctx, const TestGroup *g)
 {
     ASSERT_TRUE(g->nr_tests != 0);
@@ -105,12 +148,17 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
     }
 }
 
-static const TestEntry tests[] = {
+static const TestEntry itests[] = {
     TEST(test_posix_sanity),
     TEST(test_init),
 };
 
-const TestGroup init_tests = TEST_GROUP(tests);
+static const TestEntry dtests[] = {
+    TEST(test_deinit),
+};
+
+static const TestGroup init_tests = TEST_GROUP(itests);
+static const TestGroup deinit_tests = TEST_GROUP(dtests);
 
 int main(void)
 {
@@ -140,8 +188,7 @@ int main(void)
     run_tests(&ctx, &bookmark_tests);
     run_tests(&ctx, &syntax_tests);
     run_tests(&ctx, &dump_tests);
-    remove_frame(editor.root_frame);
-    free_editor_state(&editor);
+    run_tests(&ctx, &deinit_tests);
 
     fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", ctx.passed, ctx.failed);
     return ctx.failed ? 1 : 0;
