@@ -591,7 +591,8 @@ loop_break:;
         Block *blk;
         block_for_each(blk, &std_buffer->blocks) {
             if (xwrite_all(fd, blk->data, blk->size) < 0) {
-                perror_msg("write");
+                const char *err = strerror(errno);
+                error_msg("failed to write (stdout) buffer: %s", err);
                 editor.exit_code = EX_IOERR;
                 break;
             }
