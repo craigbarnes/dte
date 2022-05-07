@@ -72,30 +72,36 @@ state ident
     inlist builtin code
     inlist pattern code
     inlist variable code
+    inlist gawk-keyword code
+    inlist gawk-builtin code
+    inlist gawk-variable code
     noeat code
 
-# gawk reserved words are separated by an empty line
+list pattern BEGIN END
 
 list keyword \
     break continue delete do else exit for function getline if next \
-    print printf return while \
-\
+    print printf return while
+
+list gawk-keyword \
     func nextfile
 
 list builtin \
     atan2 close cos exp fflush gsub index int length log match rand sin \
-    split sprintf sqrt srand sub substr system \
-\
+    split sprintf sqrt srand sub substr system
+
+list gawk-builtin \
     and asort bindtextdomain compl dcgettext gensub lshift mktime or \
     rshift strftime strtonum systime tolower toupper xor
 
-list pattern BEGIN END
-
 list variable \
-    ARGC ARGV FILENAME FNR FS NF NR OFMT OFS ORS RLENGTH RS RSTART SUBSEP \
-\
+    ARGC ARGV FILENAME FNR FS NF NR OFMT OFS ORS RLENGTH RS RSTART SUBSEP
+
+list gawk-variable \
     ARGIND BINMODE CONVFMT ENVIRON ERRNO FIELDWIDTHS IGNORECASE LINT \
     PROCINFO RLENGTH RT TEXTDOMAIN
 
 default string regexp
-default keyword pattern
+default keyword gawk-keyword pattern
+default builtin gawk-builtin
+default variable gawk-variable
