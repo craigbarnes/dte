@@ -42,11 +42,6 @@ typedef struct {
     int32_t color;
 } TermCursorStyle;
 
-typedef struct {
-    StringView cup_mode_off;
-    StringView cup_mode_on;
-} TermControlCodes;
-
 typedef enum {
     TAB_NORMAL, // Render tabs as whitespace
     TAB_SPECIAL, // Render tabs according to `set display-special true` (">---")
@@ -82,7 +77,6 @@ typedef struct Terminal {
     unsigned int width;
     unsigned int height;
     unsigned int ncv_attributes;
-    TermControlCodes control_codes;
     ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;

@@ -108,10 +108,6 @@ EditorState editor = {
         .width = 80,
         .height = 24,
         .parse_key_sequence = xterm_parse_key,
-        .control_codes = {
-            .cup_mode_off = STRING_VIEW("\033[?1049l"),
-            .cup_mode_on = STRING_VIEW("\033[?1049h"),
-        }
     },
     .options = {
         .auto_indent = true,
@@ -408,7 +404,7 @@ void ui_start(EditorState *e)
     }
     Terminal *term = &e->terminal;
     term_enable_private_modes(term);
-    term_add_strview(&term->obuf, term->control_codes.cup_mode_on);
+    term_use_alt_screen_buffer(term);
     ui_resize(e);
 }
 
@@ -422,7 +418,7 @@ void ui_end(EditorState *e)
     term_clear_screen(obuf);
     term_move_cursor(obuf, 0, term->height - 1);
     term_show_cursor(term);
-    term_add_strview(obuf, term->control_codes.cup_mode_off);
+    term_use_normal_screen_buffer(term);
     term_restore_private_modes(term);
     term_restore_cursor_style(term);
     term_output_flush(obuf);

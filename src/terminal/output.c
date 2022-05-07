@@ -147,6 +147,17 @@ static void term_add_u8_hex(TermOutputBuffer *obuf, uint8_t x)
     obuf->count += 2;
 }
 
+// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-The-Alternate-Screen-Buffer
+void term_use_alt_screen_buffer(Terminal *term)
+{
+    term_add_literal(&term->obuf, "\033[?1049h");
+}
+
+void term_use_normal_screen_buffer(Terminal *term)
+{
+    term_add_literal(&term->obuf, "\033[?1049l");
+}
+
 void term_hide_cursor(Terminal *term)
 {
     term_add_literal(&term->obuf, "\033[?25l");
