@@ -150,13 +150,6 @@ void term_init(Terminal *term, const char *name)
         term->features = features;
         term->color_type = entry->color_type;
         term->ncv_attributes = entry->ncv_attrs;
-        if (features & TITLE) {
-            TermControlCodes *tcc = &term->control_codes;
-            tcc->save_title = strview_from_cstring("\033[22;2t");
-            tcc->restore_title = strview_from_cstring("\033[23;2t");
-            tcc->set_title_begin = strview_from_cstring("\033]2;");
-            tcc->set_title_end = strview_from_cstring("\033\\");
-        }
         if (features & RXVT) {
             term->parse_key_sequence = rxvt_parse_key;
         } else if (features & LINUX) {

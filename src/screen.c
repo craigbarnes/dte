@@ -67,7 +67,7 @@ void update_term_title(EditorState *e, const Buffer *b)
 {
     if (
         !e->options.set_window_title
-        || e->terminal.control_codes.set_title_begin.length == 0
+        || !(e->terminal.features & TFLAG_SET_WINDOW_TITLE)
     ) {
         return;
     }
@@ -76,12 +76,11 @@ void update_term_title(EditorState *e, const Buffer *b)
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     const char *filename = buffer_filename(b);
-    term_add_strview(obuf, term->control_codes.set_title_begin);
+    term_add_literal(obuf, "\033]2;");
     term_add_bytes(obuf, filename, strlen(filename));
     term_add_byte(obuf, ' ');
     term_add_byte(obuf, buffer_modified(b) ? '+' : '-');
-    term_add_literal(obuf, " dte");
-    term_add_strview(obuf, term->control_codes.set_title_end);
+    term_add_literal(obuf, " dte\033\\");
 }
 
 void mask_color(TermColor *color, const TermColor *over)

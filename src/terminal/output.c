@@ -170,12 +170,16 @@ void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 
 void term_save_title(Terminal *term)
 {
-    term_add_strview(&term->obuf, term->control_codes.save_title);
+    if (term->features & TFLAG_SET_WINDOW_TITLE) {
+        term_add_literal(&term->obuf, "\033[22;2t");
+    }
 }
 
 void term_restore_title(Terminal *term)
 {
-    term_add_strview(&term->obuf, term->control_codes.restore_title);
+    if (term->features & TFLAG_SET_WINDOW_TITLE) {
+        term_add_literal(&term->obuf, "\033[23;2t");
+    }
 }
 
 void term_clear_eol(Terminal *term)

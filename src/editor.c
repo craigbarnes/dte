@@ -111,10 +111,6 @@ EditorState editor = {
         .control_codes = {
             .cup_mode_off = STRING_VIEW("\033[?1049l"),
             .cup_mode_on = STRING_VIEW("\033[?1049h"),
-            .set_title_begin = STRING_VIEW_INIT,
-            .set_title_end = STRING_VIEW_INIT,
-            .save_title = STRING_VIEW_INIT,
-            .restore_title = STRING_VIEW_INIT,
         }
     },
     .options = {

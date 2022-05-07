@@ -45,10 +45,6 @@ typedef struct {
 typedef struct {
     StringView cup_mode_off;
     StringView cup_mode_on;
-    StringView save_title;
-    StringView restore_title;
-    StringView set_title_begin;
-    StringView set_title_end;
 } TermControlCodes;
 
 typedef enum {
