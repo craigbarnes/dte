@@ -45,8 +45,6 @@ typedef struct {
 typedef struct {
     StringView cup_mode_off;
     StringView cup_mode_on;
-    StringView show_cursor;
-    StringView hide_cursor;
     StringView save_title;
     StringView restore_title;
     StringView set_title_begin;

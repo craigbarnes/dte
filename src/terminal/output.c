@@ -149,12 +149,12 @@ static void term_add_u8_hex(TermOutputBuffer *obuf, uint8_t x)
 
 void term_hide_cursor(Terminal *term)
 {
-    term_add_strview(&term->obuf, term->control_codes.hide_cursor);
+    term_add_literal(&term->obuf, "\033[?25l");
 }
 
 void term_show_cursor(Terminal *term)
 {
-    term_add_strview(&term->obuf, term->control_codes.show_cursor);
+    term_add_literal(&term->obuf, "\033[?25h");
 }
 
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
