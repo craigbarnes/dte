@@ -432,7 +432,11 @@ loop_break:;
     const char *log_filename = getenv("DTE_LOG");
     if (log_filename && log_filename[0] != '\0') {
         LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
-        log_init(log_filename, log_level);
+        if (!log_init(log_filename, log_level)) {
+            const char *err = strerror(errno);
+            fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", log_filename, err);
+            return EX_IOERR;
+        }
     }
 
     init_editor_state();

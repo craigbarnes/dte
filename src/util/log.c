@@ -1,15 +1,12 @@
 #include <errno.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/utsname.h>
 #include <unistd.h>
 #include "log.h"
 #include "array.h"
 #include "debug.h"
-#include "exitcode.h"
 #include "str-util.h"
 #include "xreadwrite.h"
 #include "xsnprintf.h"
@@ -43,7 +40,7 @@ LogLevel log_level_from_str(const char *str)
     return STR_TO_ENUM(str, log_levels, LOG_LEVEL_NONE);
 }
 
-void log_init(const char *filename, LogLevel level)
+bool log_init(const char *filename, LogLevel level)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
@@ -52,19 +49,16 @@ void log_init(const char *filename, LogLevel level)
     BUG_ON(log_level != LOG_LEVEL_NONE);
 
     if (level == LOG_LEVEL_NONE) {
-        return;
+        return true;
     }
 
     int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
     logfd = xopen(filename, flags, 0666);
     if (unlikely(logfd < 0)) {
-        const char *err = strerror(errno);
-        fprintf(stderr, "Failed to open log file '%s': %s\n", filename, err);
-        exit(EX_IOERR);
+        return false;
     }
     if (unlikely(xwrite_all(logfd, "\n", 1) != 1)) {
-        fprintf(stderr, "Failed to write to log: %s\n", strerror(errno));
-        exit(EX_IOERR);
+        return false;
     }
 
     if (isatty(logfd)) {
@@ -79,6 +73,7 @@ void log_init(const char *filename, LogLevel level)
     } else {
         LOG_ERROR("uname() failed: %s", strerror(errno));
     }
+    return true;
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)

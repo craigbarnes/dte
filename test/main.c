@@ -72,7 +72,7 @@ static void test_init(TestContext *ctx)
     ASSERT_EQ(unsetenv("TERM"), 0);
     ASSERT_EQ(unsetenv("COLORTERM"), 0);
 
-    log_init("build/test/log.txt", LOG_LEVEL_WARNING);
+    ASSERT_TRUE(log_init("build/test/log.txt", LOG_LEVEL_WARNING));
     LOG_ERROR("%s: testing LOG_ERROR()", __func__);
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
     LOG_INFO("%s: testing LOG_INFO()", __func__);
