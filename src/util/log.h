@@ -24,7 +24,7 @@ typedef enum {
     static inline PRINTF(1) void LOG_DEBUG(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
-bool log_init(const char *varname, LogLevel level);
+bool log_init(const char *filename, LogLevel level);
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...) PRINTF(4);
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap) VPRINTF(4);
 LogLevel log_level_from_str(const char *str);
