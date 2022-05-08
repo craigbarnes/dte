@@ -88,11 +88,11 @@ void activate_prev_message(MessageArray *msgs)
     activate_current_message(msgs);
 }
 
-void activate_current_message_save(const MessageArray *arr, PointerArray *file_locations, const View *view)
+void activate_current_message_save(const MessageArray *msgs, PointerArray *file_locations, const View *view)
 {
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
-    activate_current_message(arr);
+    activate_current_message(msgs);
 
     // Save position if file changed or cursor moved
     view = editor.view;

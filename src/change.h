@@ -29,7 +29,7 @@ void begin_change_chain(void);
 void end_change_chain(View *v);
 bool undo(View *v);
 bool redo(View *v, unsigned long change_id);
-void free_changes(Change *head);
+void free_changes(Change *c);
 void buffer_insert_bytes(View *v, const char *buf, size_t len);
 void buffer_delete_bytes(View *v, size_t len);
 void buffer_erase_bytes(View *v, size_t len);

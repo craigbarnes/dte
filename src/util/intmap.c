@@ -80,9 +80,9 @@ static int intmap_do_init(IntMap *map, size_t size)
     return intmap_resize(map, size);
 }
 
-void intmap_init(IntMap *map, size_t size)
+void intmap_init(IntMap *map, size_t capacity)
 {
-    int err = intmap_do_init(map, size);
+    int err = intmap_do_init(map, capacity);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }

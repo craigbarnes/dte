@@ -285,26 +285,26 @@ bool redo(View *view, unsigned long change_id)
     return true;
 }
 
-void free_changes(Change *ch)
+void free_changes(Change *c)
 {
 top:
-    while (ch->nr_prev) {
-        ch = ch->prev[ch->nr_prev - 1];
+    while (c->nr_prev) {
+        c = c->prev[c->nr_prev - 1];
     }
 
-    // ch is leaf now
-    while (ch->next) {
-        Change *next = ch->next;
-        free(ch->buf);
-        free(ch);
+    // c is leaf now
+    while (c->next) {
+        Change *next = c->next;
+        free(c->buf);
+        free(c);
 
-        ch = next;
-        if (--ch->nr_prev) {
+        c = next;
+        if (--c->nr_prev) {
             goto top;
         }
 
         // We have become leaf
-        free(ch->prev);
+        free(c->prev);
     }
 }
 

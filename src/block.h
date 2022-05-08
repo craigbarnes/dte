@@ -33,7 +33,7 @@ static inline Block *BLOCK(ListHead *item)
     return (Block*)item;
 }
 
-Block *block_new(size_t size) RETURNS_NONNULL;
+Block *block_new(size_t alloc) RETURNS_NONNULL;
 void block_free(Block *blk) NONNULL_ARGS;
 
 #endif

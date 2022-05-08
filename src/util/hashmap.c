@@ -76,9 +76,9 @@ static int hashmap_do_init(HashMap *map, size_t size)
     return hashmap_resize(map, size);
 }
 
-void hashmap_init(HashMap *map, size_t size)
+void hashmap_init(HashMap *map, size_t capacity)
 {
-    int err = hashmap_do_init(map, size);
+    int err = hashmap_do_init(map, capacity);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }

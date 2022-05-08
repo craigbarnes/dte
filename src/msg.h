@@ -19,13 +19,13 @@ typedef struct {
 } MessageArray;
 
 Message *new_message(const char *msg, size_t len) RETURNS_NONNULL;
-void add_message(MessageArray *arr, Message *m);
-void activate_message(MessageArray *arr, size_t idx);
-void activate_current_message(const MessageArray *arr);
-void activate_next_message(MessageArray *arr);
-void activate_prev_message(MessageArray *arr);
-void activate_current_message_save(const MessageArray *arr, PointerArray *file_locations, const View *view) NONNULL_ARGS;
-void clear_messages(MessageArray *arr);
+void add_message(MessageArray *msgs, Message *m);
+void activate_message(MessageArray *msgs, size_t idx);
+void activate_current_message(const MessageArray *msgs);
+void activate_next_message(MessageArray *msgs);
+void activate_prev_message(MessageArray *msgs);
+void activate_current_message_save(const MessageArray *msgs, PointerArray *file_locations, const View *view) NONNULL_ARGS;
+void clear_messages(MessageArray *msgs);
 String dump_messages(const MessageArray *messages);
 
 #endif

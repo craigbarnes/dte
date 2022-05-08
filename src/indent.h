@@ -27,7 +27,7 @@ typedef struct {
 
 char *make_indent(const Buffer *b, size_t width);
 char *get_indent_for_next_line(const Buffer *buffer, const StringView *line);
-void get_indent_info(const Buffer *buffer, const StringView *buf, IndentInfo *info);
+void get_indent_info(const Buffer *buffer, const StringView *line, IndentInfo *info);
 size_t get_indent_level_bytes_left(const View *view);
 size_t get_indent_level_bytes_right(const View *view);
 
