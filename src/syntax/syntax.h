@@ -109,6 +109,11 @@ static inline bool is_subsyntax(const Syntax *syn)
     return syn->name[0] == '.';
 }
 
+static inline bool cond_type_has_destination(ConditionType type)
+{
+    return !(type == COND_RECOLOR || type == COND_RECOLOR_BUFFER);
+}
+
 StringList *find_string_list(const Syntax *syn, const char *name);
 State *find_state(const Syntax *syn, const char *name);
 void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_errors);

@@ -5,11 +5,6 @@
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
-static bool has_destination(ConditionType type)
-{
-    return !(type == COND_RECOLOR || type == COND_RECOLOR_BUFFER);
-}
-
 static const char *fix_name(const char *name, const char *prefix)
 {
     static char buf[256];
@@ -37,7 +32,7 @@ static void fix_conditions (
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
         fix_action(syn, &c->a, prefix);
-        if (!c->a.destination && has_destination(c->type)) {
+        if (!c->a.destination && cond_type_has_destination(c->type)) {
             c->a.destination = m->return_state;
         }
 

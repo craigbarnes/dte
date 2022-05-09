@@ -155,6 +155,7 @@ static Condition *add_condition (
     const char *dest,
     const char *emit
 ) {
+    BUG_ON(!dest && cond_type_has_destination(type));
     if (no_state()) {
         return NULL;
     }
