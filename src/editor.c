@@ -223,7 +223,7 @@ int free_editor_state(EditorState *e)
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
-    hashmap_free(&editor.compilers, FREE_FUNC(free_compiler));
+    hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
     hashmap_free(&e->colors.other, free);
     hashmap_free(&normal_commands.aliases, free);
     BUG_ON(cmd_mode_commands.aliases.count != 0);
@@ -238,7 +238,7 @@ int free_editor_state(EditorState *e)
     free_macro();
 
     // TODO: intern this (so that it's freed by free_intern_pool())
-    free((void*)editor.user_config_dir);
+    free((void*)e->user_config_dir);
 
     int exit_code = e->exit_code;
     *e = (EditorState){.window = NULL}; // Zero pointers, to help LSan find leaks
