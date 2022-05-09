@@ -11,6 +11,7 @@
 typedef struct {
     unsigned int passed;
     unsigned int failed;
+    void *userdata;
 } TestContext;
 
 typedef struct {

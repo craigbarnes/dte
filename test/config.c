@@ -25,8 +25,11 @@
 
 static void test_builtin_configs(TestContext *ctx)
 {
+    EditorState *e = ctx->userdata;
+    HashMap *syntaxes = &e->syntaxes;
     size_t n;
     const BuiltinConfig *editor_builtin_configs = get_builtin_configs_array(&n);
+
     for (size_t i = 0; i < n; i++) {
         const BuiltinConfig cfg = editor_builtin_configs[i];
         if (str_has_prefix(cfg.name, "syntax/")) {
@@ -34,13 +37,13 @@ static void test_builtin_configs(TestContext *ctx)
                 continue;
             }
             // Check that built-in syntax files load without errors
-            EXPECT_NULL(find_syntax(&editor.syntaxes, path_basename(cfg.name)));
+            EXPECT_NULL(find_syntax(syntaxes, path_basename(cfg.name)));
             int err;
             ConfigFlags flags = CFG_BUILTIN | CFG_MUST_EXIST;
             unsigned int saved_nr_errs = get_nr_errors();
             EXPECT_NONNULL(load_syntax_file(cfg.name, flags, &err));
             EXPECT_EQ(get_nr_errors(), saved_nr_errs);
-            EXPECT_NONNULL(find_syntax(&editor.syntaxes, path_basename(cfg.name)));
+            EXPECT_NONNULL(find_syntax(syntaxes, path_basename(cfg.name)));
         } else {
             // Check that built-in configs are identical to their source files
             char path[4096];
@@ -52,7 +55,8 @@ static void test_builtin_configs(TestContext *ctx)
             free(src);
         }
     }
-    update_all_syntax_colors(&editor.syntaxes);
+
+    update_all_syntax_colors(&e->syntaxes);
 }
 
 static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)
@@ -124,20 +128,22 @@ static void test_exec_config(TestContext *ctx)
         expect_files_equal(ctx, "build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 
+    EditorState *e = ctx->userdata;
     const StringView s = STRING_VIEW("toggle utf8-bom \\");
-    EXPECT_FALSE(editor.options.utf8_bom);
+    EXPECT_FALSE(e->options.utf8_bom);
     exec_config(cmds, s);
-    EXPECT_TRUE(editor.options.utf8_bom);
+    EXPECT_TRUE(e->options.utf8_bom);
     exec_config(cmds, s);
-    EXPECT_FALSE(editor.options.utf8_bom);
+    EXPECT_FALSE(e->options.utf8_bom);
 }
 
 static void test_detect_indent(TestContext *ctx)
 {
+    EditorState *e = ctx->userdata;
     const CommandSet *cmds = &normal_commands;
-    EXPECT_FALSE(editor.options.detect_indent);
-    EXPECT_FALSE(editor.options.expand_tab);
-    EXPECT_EQ(editor.options.indent_width, 8);
+    EXPECT_FALSE(e->options.detect_indent);
+    EXPECT_FALSE(e->options.expand_tab);
+    EXPECT_EQ(e->options.indent_width, 8);
 
     handle_command (
         cmds,
@@ -146,19 +152,20 @@ static void test_detect_indent(TestContext *ctx)
         false
     );
 
-    EXPECT_EQ(editor.buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
-    EXPECT_TRUE(editor.buffer->options.expand_tab);
-    EXPECT_EQ(editor.buffer->options.indent_width, 2);
+    EXPECT_EQ(e->buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
+    EXPECT_TRUE(e->buffer->options.expand_tab);
+    EXPECT_EQ(e->buffer->options.indent_width, 2);
 
     handle_command(cmds, "close", false);
 }
 
 static void test_global_state(TestContext *ctx)
 {
-    const Buffer *buffer = editor.buffer;
-    const View *view = editor.view;
-    const Window *window = editor.window;
-    const Frame *root_frame = editor.root_frame;
+    const EditorState *e = ctx->userdata;
+    const Buffer *buffer = e->buffer;
+    const View *view = e->view;
+    const Window *window = e->window;
+    const Frame *root_frame = e->root_frame;
     ASSERT_NONNULL(window);
     ASSERT_NONNULL(root_frame);
     ASSERT_NONNULL(buffer);
@@ -172,10 +179,10 @@ static void test_global_state(TestContext *ctx)
 
     ASSERT_EQ(window->views.count, 1);
     ASSERT_EQ(buffer->views.count, 1);
-    ASSERT_EQ(editor.buffers.count, 1);
+    ASSERT_EQ(e->buffers.count, 1);
     ASSERT_PTREQ(window->views.ptrs[0], view);
     ASSERT_PTREQ(buffer->views.ptrs[0], view);
-    ASSERT_PTREQ(editor.buffers.ptrs[0], buffer);
+    ASSERT_PTREQ(e->buffers.ptrs[0], buffer);
 
     ASSERT_NONNULL(buffer->encoding.name);
     ASSERT_NONNULL(buffer->blocks.next);
@@ -193,7 +200,7 @@ static void test_global_state(TestContext *ctx)
 
 static void test_macro_record(TestContext *ctx)
 {
-    EditorState *e = &editor;
+    EditorState *e = ctx->userdata;
     EXPECT_EQ(e->input_mode, INPUT_NORMAL);
     EXPECT_FALSE(macro_is_recording());
     macro_record();
@@ -248,12 +255,12 @@ const TestGroup config_tests = TEST_GROUP(tests);
 
 DISABLE_WARNING("-Wmissing-prototypes")
 
-void init_headless_mode(void)
+void init_headless_mode(EditorState *e)
 {
-    exec_builtin_rc(&editor.colors, TERM_8_COLOR);
-    update_all_syntax_colors(&editor.syntaxes);
-    editor.options.lock_files = false;
-    editor.window = new_window();
-    editor.root_frame = new_root_frame(editor.window);
-    set_view(&editor, window_open_empty_buffer(editor.window));
+    exec_builtin_rc(&e->colors, TERM_8_COLOR);
+    update_all_syntax_colors(&e->syntaxes);
+    e->options.lock_files = false;
+    e->window = new_window();
+    e->root_frame = new_root_frame(e->window);
+    set_view(e, window_open_empty_buffer(e->window));
 }

@@ -79,10 +79,11 @@ static void test_hl_line(TestContext *ctx)
         return;
     }
 
+    EditorState *e = ctx->userdata;
     const Encoding enc = encoding_from_type(UTF8);
     EXPECT_EQ(enc.type, UTF8);
     EXPECT_STREQ(enc.name, "UTF-8");
-    View *v = window_open_file(&editor, editor.window, "test/data/test.c", &enc);
+    View *v = window_open_file(e, e->window, "test/data/test.c", &enc);
     ASSERT_NONNULL(v);
 
     const size_t line_nr = 5;
@@ -104,11 +105,11 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_NONNULL(colors);
     EXPECT_TRUE(next_changed);
 
-    const TermColor *t = find_color(&editor.colors, "text");
-    const TermColor *c = find_color(&editor.colors, "constant");
-    const TermColor *s = find_color(&editor.colors, "string");
-    const TermColor *x = find_color(&editor.colors, "special");
-    const TermColor *n = find_color(&editor.colors, "numeric");
+    const TermColor *t = find_color(&e->colors, "text");
+    const TermColor *c = find_color(&e->colors, "constant");
+    const TermColor *s = find_color(&e->colors, "string");
+    const TermColor *x = find_color(&e->colors, "special");
+    const TermColor *n = find_color(&e->colors, "numeric");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);
@@ -133,7 +134,7 @@ static void test_hl_line(TestContext *ctx)
     }
 
     EXPECT_EQ(i, ARRAYLEN(expected_colors));
-    window_close_current(&editor);
+    window_close_current(e);
 }
 
 static const TestEntry tests[] = {

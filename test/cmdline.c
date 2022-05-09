@@ -12,7 +12,7 @@
 static void test_command_mode(TestContext *ctx)
 {
     const CommandSet *cmds = &cmd_mode_commands;
-    EditorState *e = &editor;
+    EditorState *e = ctx->userdata;
     CommandLine *c = &e->cmdline;
     set_input_mode(e, INPUT_COMMAND);
     EXPECT_EQ(e->input_mode, INPUT_COMMAND);
@@ -115,8 +115,8 @@ static void test_command_mode(TestContext *ctx)
 
 static void test_complete_command(TestContext *ctx)
 {
-    EditorState *e = &editor;
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = ctx->userdata;
+    CommandLine *c = &e->cmdline;
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "alias");
     reset_completion(c);
@@ -279,8 +279,8 @@ static void test_complete_command(TestContext *ctx)
 // depend on the buffer and default config being initialized
 static void test_complete_command_extra(TestContext *ctx)
 {
-    EditorState *e = &editor;
-    CommandLine *c = &editor.cmdline;
+    EditorState *e = ctx->userdata;
+    CommandLine *c = &e->cmdline;
     cmdline_set_text(c, "show bi");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "show bind ");

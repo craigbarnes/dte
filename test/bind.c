@@ -10,7 +10,8 @@
 
 static void test_add_binding(TestContext *ctx)
 {
-    KeyBindingGroup *kbg = &editor.bindings[INPUT_NORMAL];
+    EditorState *e = ctx->userdata;
+    KeyBindingGroup *kbg = &e->bindings[INPUT_NORMAL];
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F12;
     const CachedCommand *bind = lookup_binding(kbg, key);
     EXPECT_NULL(bind);
@@ -40,7 +41,8 @@ static void test_handle_binding(TestContext *ctx)
     handle_command(cmds, "open; bind C-S-F11 'insert -m zzz'", false);
 
     // Bound command should be cached
-    KeyBindingGroup *kbg = &editor.bindings[INPUT_NORMAL];
+    EditorState *e = ctx->userdata;
+    KeyBindingGroup *kbg = &e->bindings[INPUT_NORMAL];
     KeyCode key = MOD_CTRL | MOD_SHIFT | KEY_F11;
     const CachedCommand *binding = lookup_binding(kbg, key);
     ASSERT_NONNULL(binding);
@@ -54,7 +56,7 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_TRUE(cmdargs_has_flag(&binding->a, 'm'));
 
     handle_binding(kbg, key);
-    const Block *block = BLOCK(editor.buffer->blocks.next);
+    const Block *block = BLOCK(e->buffer->blocks.next);
     ASSERT_NONNULL(block);
     ASSERT_EQ(block->size, 4);
     EXPECT_EQ(block->nl, 1);
@@ -70,7 +72,7 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "\n", 1);
 
-    View *view = editor.view;
+    View *view = e->view;
     ASSERT_NONNULL(view);
     EXPECT_TRUE(undo(view));
     ASSERT_EQ(block->size, 3);

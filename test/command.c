@@ -157,8 +157,9 @@ static void test_parse_command_arg(TestContext *ctx)
     free(arg);
 
     // Environment var (via getenv(3))
+    EditorState *e = ctx->userdata;
     arg = parse_command_arg(nc, STRN("$DTE_VERSION"), false);
-    EXPECT_STREQ(arg, editor.version);
+    EXPECT_STREQ(arg, e->version);
     free(arg);
 
     // Tilde expansion

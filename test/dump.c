@@ -32,12 +32,13 @@ static const struct {
 
 static void test_dump_handlers(TestContext *ctx)
 {
+    EditorState *e = ctx->userdata;
     const CommandSet *cmds = &normal_commands;
     void *ud = cmds->userdata;
     ASSERT_NONNULL(ud);
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        String str = handlers[i].dump(&editor);
+        String str = handlers[i].dump(e);
         size_t pos = 0;
         while (pos < str.len) {
             bool check_parse = handlers[i].check_parse;

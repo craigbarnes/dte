@@ -6,18 +6,20 @@
 
 static void test_find_buffer_by_id(TestContext *ctx)
 {
-    const Buffer *buffer = editor.buffer;
+    EditorState *e = ctx->userdata;
+    const Buffer *buffer = e->buffer;
     ASSERT_NONNULL(buffer);
-    EXPECT_PTREQ(find_buffer_by_id(&editor.buffers, buffer->id), buffer);
+    EXPECT_PTREQ(find_buffer_by_id(&e->buffers, buffer->id), buffer);
 
     const unsigned long large_id = 1UL << 30;
     static_assert_compatible_types(large_id, buffer->id);
-    EXPECT_NULL(find_buffer_by_id(&editor.buffers, large_id));
+    EXPECT_NULL(find_buffer_by_id(&e->buffers, large_id));
 }
 
 static void test_make_indent(TestContext *ctx)
 {
-    Buffer *buffer = editor.buffer;
+    EditorState *e = ctx->userdata;
+    Buffer *buffer = e->buffer;
     ASSERT_NONNULL(buffer);
     const LocalOptions saved_opts = buffer->options;
     buffer->options.expand_tab = false;

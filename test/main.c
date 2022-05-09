@@ -8,7 +8,7 @@
 #include "util/log.h"
 #include "util/path.h"
 
-void init_headless_mode(void);
+void init_headless_mode(EditorState *e);
 extern const TestGroup bind_tests;
 extern const TestGroup bookmark_tests;
 extern const TestGroup buffer_tests;
@@ -79,15 +79,17 @@ static void test_init(TestContext *ctx)
 
     init_editor_state();
 
+    EditorState *e = ctx->userdata;
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
-    EXPECT_STREQ(ver, editor.version);
+    EXPECT_STREQ(ver, e->version);
 }
 
 static void test_deinit(TestContext *ctx)
 {
     // Make sure default Terminal state wasn't changed
-    const Terminal *term = &editor.terminal;
+    EditorState *e = ctx->userdata;
+    const Terminal *term = &e->terminal;
     EXPECT_EQ(term->width, 80);
     EXPECT_EQ(term->height, 24);
     EXPECT_EQ(term->color_type, TERM_8_COLOR);
@@ -109,22 +111,22 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(obuf->cursor_style.type, 0);
     EXPECT_EQ(obuf->cursor_style.color, 0);
 
-    ASSERT_NONNULL(editor.view);
-    ASSERT_NONNULL(editor.buffer);
-    EXPECT_EQ(editor.buffers.count, 1);
-    EXPECT_NULL(editor.buffer->abs_filename);
-    EXPECT_PTREQ(editor.buffer, editor.buffers.ptrs[0]);
-    EXPECT_FALSE(editor.child_controls_terminal);
+    ASSERT_NONNULL(e->view);
+    ASSERT_NONNULL(e->buffer);
+    EXPECT_EQ(e->buffers.count, 1);
+    EXPECT_NULL(e->buffer->abs_filename);
+    EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
+    EXPECT_FALSE(e->child_controls_terminal);
 
-    remove_frame(editor.root_frame);
-    EXPECT_NULL(editor.view);
-    EXPECT_NULL(editor.buffer);
-    EXPECT_EQ(editor.buffers.count, 0);
+    remove_frame(e->root_frame);
+    EXPECT_NULL(e->view);
+    EXPECT_NULL(e->buffer);
+    EXPECT_EQ(e->buffers.count, 0);
 
-    free_editor_state(&editor);
-    EXPECT_EQ(editor.colors.other.count, 0);
-    EXPECT_EQ(editor.colors.other.mask, 0);
-    EXPECT_NULL(editor.colors.other.entries);
+    free_editor_state(e);
+    EXPECT_EQ(e->colors.other.count, 0);
+    EXPECT_EQ(e->colors.other.mask, 0);
+    EXPECT_NULL(e->colors.other.entries);
 }
 
 static void run_tests(TestContext *ctx, const TestGroup *g)
@@ -165,6 +167,7 @@ int main(void)
     TestContext ctx = {
         .passed = 0,
         .failed = 0,
+        .userdata = &editor,
     };
 
     run_tests(&ctx, &init_tests);
@@ -180,7 +183,7 @@ int main(void)
     run_tests(&ctx, &ctags_tests);
     run_tests(&ctx, &spawn_tests);
 
-    init_headless_mode();
+    init_headless_mode(&editor);
     run_tests(&ctx, &config_tests);
     run_tests(&ctx, &bind_tests);
     run_tests(&ctx, &cmdline_tests_late);
