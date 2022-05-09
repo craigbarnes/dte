@@ -2,6 +2,7 @@
 #define SYNTAX_MERGE_H
 
 #include <stddef.h>
+#include "syntax/color.h"
 #include "syntax/syntax.h"
 #include "util/macros.h"
 
@@ -12,6 +13,6 @@ typedef struct {
     size_t delim_len;
 } SyntaxMerge;
 
-State *merge_syntax(Syntax *syn, SyntaxMerge *m) NONNULL_ARGS_AND_RETURN;
+State *merge_syntax(Syntax *syn, SyntaxMerge *m, const ColorScheme *colors) NONNULL_ARGS_AND_RETURN;
 
 #endif

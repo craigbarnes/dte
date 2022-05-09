@@ -56,7 +56,7 @@ static void test_builtin_configs(TestContext *ctx)
         }
     }
 
-    update_all_syntax_colors(&e->syntaxes);
+    update_all_syntax_colors(&e->syntaxes, &e->colors);
 }
 
 static void expect_files_equal(TestContext *ctx, const char *path1, const char *path2)
@@ -260,7 +260,7 @@ void init_headless_mode(TestContext *ctx)
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
     exec_builtin_rc(&e->colors, TERM_8_COLOR);
-    update_all_syntax_colors(&e->syntaxes);
+    update_all_syntax_colors(&e->syntaxes, &e->colors);
     e->options.lock_files = false;
     e->window = new_window();
     e->root_frame = new_root_frame(e->window);

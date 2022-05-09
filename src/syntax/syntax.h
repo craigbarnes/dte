@@ -115,9 +115,9 @@ void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_error
 
 Syntax *find_any_syntax(const HashMap *syntaxes, const char *name);
 Syntax *find_syntax(const HashMap *syntaxes, const char *name);
-void update_state_colors(const Syntax *syn, State *s);
-void update_syntax_colors(Syntax *syn);
-void update_all_syntax_colors(const HashMap *syntaxes);
+void update_state_colors(const Syntax *syn, State *s, const ColorScheme *colors);
+void update_syntax_colors(Syntax *syn, const ColorScheme *colors);
+void update_all_syntax_colors(const HashMap *syntaxes, const ColorScheme *colors);
 void find_unused_subsyntaxes(const HashMap *syntaxes);
 void free_syntaxes(HashMap *syntaxes);
 

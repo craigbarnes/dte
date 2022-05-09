@@ -88,7 +88,7 @@ static void test_hl_line(TestContext *ctx)
 
     const size_t line_nr = 5;
     ASSERT_TRUE(v->buffer->nl >= line_nr);
-    hl_fill_start_states(v->buffer, v->buffer->nl);
+    hl_fill_start_states(v->buffer, &e->colors, v->buffer->nl);
     block_iter_goto_line(&v->cursor, line_nr - 1);
     view_update_cursor_x(v);
     view_update_cursor_y(v);
@@ -101,7 +101,7 @@ static void test_hl_line(TestContext *ctx)
     ASSERT_EQ(line.length, 56);
 
     bool next_changed;
-    const TermColor **colors = hl_line(v->buffer, &line, line_nr, &next_changed);
+    const TermColor **colors = hl_line(v->buffer, &e->colors, &line, line_nr, &next_changed);
     ASSERT_NONNULL(colors);
     EXPECT_TRUE(next_changed);
 

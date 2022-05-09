@@ -121,7 +121,7 @@ static bool subsyntax_call(const EditorState *e, const char *name, const char *r
         m.return_state = reference_state(ret);
     }
     if (ok) {
-        *dest = merge_syntax(current_syntax, &m);
+        *dest = merge_syntax(current_syntax, &m, &e->colors);
     }
     return ok;
 }
@@ -576,7 +576,7 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
 
     Syntax *syn = find_syntax(&editor.syntaxes, path_basename(filename));
     if (syn && editor.status != EDITOR_INITIALIZING) {
-        update_syntax_colors(syn);
+        update_syntax_colors(syn, &editor.colors);
     }
     if (!syn) {
         *err = EINVAL;

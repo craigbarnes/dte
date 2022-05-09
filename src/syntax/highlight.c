@@ -46,6 +46,7 @@ static bool bufis_icase(const ConditionData *u, const char *buf, size_t len)
 static State *handle_heredoc (
     Syntax *syn,
     State *state,
+    const ColorScheme *cs,
     const char *delim,
     size_t len
 ) {
@@ -65,7 +66,7 @@ static State *handle_heredoc (
 
     HeredocState *s = xnew(HeredocState, 1);
     *s = (HeredocState) {
-        .state = merge_syntax(syn, &m),
+        .state = merge_syntax(syn, &m, cs),
         .delim = xmemdup(delim, len),
         .len = len,
     };
@@ -78,6 +79,7 @@ static State *handle_heredoc (
 static const TermColor **highlight_line (
     Syntax *syn,
     State *state,
+    const ColorScheme *cs,
     const StringView *line_sv,
     State **ret
 ) {
@@ -257,7 +259,7 @@ static const TermColor **highlight_line (
             if (sidx < 0) {
                 sidx = i;
             }
-            state = handle_heredoc(syn, state, line + sidx, i - sidx);
+            state = handle_heredoc(syn, state, cs, line + sidx, i - sidx);
             break;
         case STATE_INVALID:
         default:
@@ -295,7 +297,7 @@ static void block_iter_move_down(BlockIter *bi, size_t count)
     }
 }
 
-static ssize_t fill_hole(Buffer *b, BlockIter *bi, ssize_t sidx, ssize_t eidx)
+static ssize_t fill_hole(Buffer *b, BlockIter *bi, const ColorScheme *cs, ssize_t sidx, ssize_t eidx)
 {
     void **ptrs = b->line_start_states.ptrs;
     ssize_t idx = sidx;
@@ -305,7 +307,7 @@ static ssize_t fill_hole(Buffer *b, BlockIter *bi, ssize_t sidx, ssize_t eidx)
         State *st;
         fill_line_nl_ref(bi, &line);
         block_iter_eat_line(bi);
-        highlight_line(b->syn, ptrs[idx++], &line, &st);
+        highlight_line(b->syn, ptrs[idx++], cs, &line, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -326,7 +328,7 @@ static ssize_t fill_hole(Buffer *b, BlockIter *bi, ssize_t sidx, ssize_t eidx)
     return idx - sidx;
 }
 
-void hl_fill_start_states(Buffer *b, size_t line_nr)
+void hl_fill_start_states(Buffer *b, const ColorScheme *cs, size_t line_nr)
 {
     BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
     PointerArray *s = &b->line_start_states;
@@ -360,7 +362,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
         current_line = idx;
 
         // NOTE: might not fill entire hole, which is ok
-        ssize_t count = fill_hole(b, &bi, idx, last);
+        ssize_t count = fill_hole(b, &bi, cs, idx, last);
         idx += count;
         current_line += count;
     }
@@ -373,6 +375,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
         highlight_line (
             b->syn,
             states[s->count - 1],
+            cs,
             &line,
             &states[s->count]
         );
@@ -383,6 +386,7 @@ void hl_fill_start_states(Buffer *b, size_t line_nr)
 
 const TermColor **hl_line (
     Buffer *b,
+    const ColorScheme *cs,
     const StringView *line,
     size_t line_nr,
     bool *next_changed
@@ -395,7 +399,7 @@ const TermColor **hl_line (
     PointerArray *s = &b->line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    const TermColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], line, &next);
+    const TermColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], cs, line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);

@@ -486,7 +486,7 @@ loop_break:;
         read_config(&normal_commands, rc, flags);
     }
 
-    update_all_syntax_colors(&e->syntaxes);
+    update_all_syntax_colors(&e->syntaxes, &e->colors);
 
     Window *window = new_window();
     e->window = window;

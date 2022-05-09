@@ -35,10 +35,14 @@ static TermColor *find_real_color(ColorScheme *colors, const char *name)
     ssize_t idx = BSEARCH_IDX(name, builtin_color_names, (CompareFunction)strcmp);
     if (idx >= 0) {
         BUG_ON(idx >= ARRAYLEN(builtin_color_names));
-        return &colors->builtin[(BuiltinColorEnum)idx];
+        return &colors->builtin[idx];
     }
-
     return hashmap_get(&colors->other, name);
+}
+
+static const TermColor *find_real_color_const(const ColorScheme *colors, const char *name)
+{
+    return find_real_color((ColorScheme*)colors, name);
 }
 
 void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color)
@@ -54,15 +58,15 @@ void set_highlight_color(ColorScheme *colors, const char *name, const TermColor 
     hashmap_insert(&colors->other, xstrdup(name), c);
 }
 
-const TermColor *find_color(ColorScheme *colors, const char *name)
+const TermColor *find_color(const ColorScheme *colors, const char *name)
 {
-    const TermColor *c = find_real_color(colors, name);
+    const TermColor *c = find_real_color_const(colors, name);
     if (c) {
         return c;
     }
 
     const char *dot = strchr(name, '.');
-    return dot ? find_real_color(colors, dot + 1) : NULL;
+    return dot ? find_real_color_const(colors, dot + 1) : NULL;
 }
 
 void clear_hl_colors(ColorScheme *colors)

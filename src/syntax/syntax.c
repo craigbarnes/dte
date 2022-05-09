@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "syntax.h"
-#include "editor.h"
 #include "error.h"
 #include "syntax/merge.h"
 #include "util/str-util.h"
@@ -152,7 +151,7 @@ static const char *find_default_color(const Syntax *syn, const char *name)
     return hashmap_get(&syn->default_colors, name);
 }
 
-static void update_action_color(const Syntax *syn, Action *a)
+static void update_action_color(const Syntax *syn, Action *a, const ColorScheme *colors)
 {
     const char *name = a->emit_name;
     if (!name) {
@@ -161,7 +160,7 @@ static void update_action_color(const Syntax *syn, Action *a)
 
     char full[256];
     xsnprintf(full, sizeof full, "%s.%s", syn->name, name);
-    a->emit_color = find_color(&editor.colors, full);
+    a->emit_color = find_color(colors, full);
     if (a->emit_color) {
         return;
     }
@@ -172,33 +171,33 @@ static void update_action_color(const Syntax *syn, Action *a)
     }
 
     xsnprintf(full, sizeof full, "%s.%s", syn->name, def);
-    a->emit_color = find_color(&editor.colors, full);
+    a->emit_color = find_color(colors, full);
 }
 
-void update_state_colors(const Syntax *syn, State *s)
+void update_state_colors(const Syntax *syn, State *s, const ColorScheme *colors)
 {
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
-        update_action_color(syn, &c->a);
+        update_action_color(syn, &c->a, colors);
     }
-    update_action_color(syn, &s->default_action);
+    update_action_color(syn, &s->default_action, colors);
 }
 
-void update_syntax_colors(Syntax *syn)
+void update_syntax_colors(Syntax *syn, const ColorScheme *colors)
 {
     if (is_subsyntax(syn)) {
         // No point to update colors of a sub-syntax
         return;
     }
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
-        update_state_colors(syn, it.entry->value);
+        update_state_colors(syn, it.entry->value, colors);
     }
 }
 
-void update_all_syntax_colors(const HashMap *syntaxes)
+void update_all_syntax_colors(const HashMap *syntaxes, const ColorScheme *colors)
 {
     for (HashMapIter it = hashmap_iter(syntaxes); hashmap_next(&it); ) {
-        update_syntax_colors(it.entry->value);
+        update_syntax_colors(it.entry->value, colors);
     }
 }
 

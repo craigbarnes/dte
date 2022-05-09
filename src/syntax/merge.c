@@ -57,7 +57,7 @@ static void fix_conditions (
 // pointers and strings as appropriate.
 // NOTE: string_lists is owned by Syntax, so there's no need to
 // copy it. Freeing Condition does not free any string lists.
-State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
+State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
 {
     // Generate a prefix for merged state names, to avoid clashes
     static unsigned int counter;
@@ -102,7 +102,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge)
         BUG_ON(!new_state);
         fix_conditions(syn, new_state, merge, prefix);
         if (merge->delim) {
-            update_state_colors(syn, new_state);
+            update_state_colors(syn, new_state, colors);
         }
     }
 

@@ -999,7 +999,7 @@ update:
     // Don't call update_all_syntax_colors() needlessly.
     // It is called right after config has been loaded.
     if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_colors(&e->syntaxes);
+        update_all_syntax_colors(&e->syntaxes, &e->colors);
         mark_everything_changed(e);
     }
 }

@@ -214,7 +214,6 @@ void update_short_filename(Buffer *b)
 void buffer_update_syntax(Buffer *b)
 {
     Syntax *syn = NULL;
-
     if (b->options.syntax) {
         // Even "none" can have syntax
         syn = find_syntax(&editor.syntaxes, b->options.filetype);
