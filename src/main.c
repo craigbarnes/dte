@@ -480,7 +480,7 @@ loop_break:;
         if (rc) {
             flags |= CFG_MUST_EXIST;
         } else {
-            rc = editor_file("rc");
+            rc = editor_file(e, "rc");
         }
         LOG_INFO("loading configuration from %s", rc);
         read_config(&normal_commands, rc, flags);
@@ -496,10 +496,10 @@ loop_break:;
     set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        file_history_load(&e->file_history, editor_file("file-history"));
-        history_load(&e->command_history, editor_file("command-history"));
-        history_load(&e->search_history, editor_file("search-history"));
-        if (editor.search_history.last) {
+        file_history_load(&e->file_history, editor_file(e, "file-history"));
+        history_load(&e->command_history, editor_file(e, "command-history"));
+        history_load(&e->search_history, editor_file(e, "search-history"));
+        if (e->search_history.last) {
             search_set_regexp(&e->search, e->search_history.last->text);
         }
     }
