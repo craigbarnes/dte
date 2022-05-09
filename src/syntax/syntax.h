@@ -54,7 +54,7 @@ typedef struct {
 typedef union {
     BitSetWord bitset[BITSET_NR_WORDS(256)];
     StringView heredocend;
-    StringList *str_list;
+    const StringList *str_list;
     unsigned char ch;
     size_t recolor_len;
     struct {
