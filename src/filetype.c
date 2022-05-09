@@ -1,6 +1,5 @@
 #include "filetype.h"
 #include "command/serialize.h"
-#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/array.h"
@@ -264,11 +263,11 @@ bool is_ft(const PointerArray *filetypes, const char *name)
     return false;
 }
 
-void collect_ft(PointerArray *a, const char *prefix)
+void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *prefix)
 {
     COLLECT_STRINGS(builtin_filetype_names, a, prefix);
-    for (size_t i = 0, n = editor.filetypes.count; i < n; i++) {
-        const UserFileTypeEntry *ft = editor.filetypes.ptrs[i];
+    for (size_t i = 0, n = filetypes->count; i < n; i++) {
+        const UserFileTypeEntry *ft = filetypes->ptrs[i];
         const char *name = ft->name;
         if (str_has_prefix(name, prefix)) {
             ptr_array_append(a, xstrdup(name));

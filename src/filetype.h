@@ -25,7 +25,7 @@ static inline bool is_valid_filetype_name(const char *name)
 void add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type);
 bool is_ft(const PointerArray *filetypes, const char *name);
 const char *find_ft(const PointerArray *filetypes, const char *filename, StringView line);
-void collect_ft(PointerArray *a, const char *prefix);
+void collect_ft(const PointerArray *filetypes, PointerArray *a, const char *prefix);
 String dump_filetypes(const PointerArray *filetypes);
 void free_filetypes(PointerArray *filetypes);
 
