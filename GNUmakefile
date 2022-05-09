@@ -1,6 +1,6 @@
 include mk/compat.mk
--include Config.mk
 include mk/util.mk
+-include Config.mk
 include mk/build.mk
 include mk/docs.mk
 include mk/gen.mk
