@@ -307,7 +307,11 @@ static void cmd_heredocbegin(const CommandArgs *a)
 static void cmd_heredocend(const CommandArgs *a)
 {
     EditorState *e = a->userdata;
-    add_condition(e, COND_HEREDOCEND, a->args[0], a->args[1]);
+    Condition *c = add_condition(e, COND_HEREDOCEND, a->args[0], a->args[1]);
+    if (unlikely(!c)) {
+        return;
+    }
+    BUG_ON(!current_syntax);
     current_syntax->heredoc = true;
 }
 
@@ -459,6 +463,7 @@ static void cmd_str(const CommandArgs *a)
 
 static void finish_syntax(EditorState *e)
 {
+    BUG_ON(!current_syntax);
     close_state();
     finalize_syntax(&e->syntaxes, current_syntax, saved_nr_errors);
     current_syntax = NULL;
