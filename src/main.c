@@ -439,7 +439,7 @@ loop_break:;
         }
     }
 
-    init_editor_state();
+    EditorState *e = init_editor_state();
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
@@ -454,26 +454,26 @@ loop_break:;
         return EX_IOERR;
     }
 
-    Terminal *term = &editor.terminal;
+    Terminal *term = &e->terminal;
     term_init(term, term_name);
 
     if (use_showkey) {
         return showkey_loop(term);
     }
 
-    Buffer *std_buffer = init_std_buffer(&editor, std_fds);
+    Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     // Create this early. Needed if lock-files is true.
-    const char *editor_dir = editor.user_config_dir;
+    const char *editor_dir = e->user_config_dir;
     if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
         error_msg("Error creating %s: %s", editor_dir, strerror(errno));
         load_and_save_history = false;
-        editor.options.lock_files = false;
+        e->options.lock_files = false;
     }
 
     term_save_title(term);
-    exec_builtin_rc(&editor.colors, editor.terminal.color_type);
+    exec_builtin_rc(&e->colors, e->terminal.color_type);
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
@@ -486,21 +486,21 @@ loop_break:;
         read_config(&normal_commands, rc, flags);
     }
 
-    update_all_syntax_colors(&editor.syntaxes);
+    update_all_syntax_colors(&e->syntaxes);
 
     Window *window = new_window();
-    editor.window = window;
-    editor.root_frame = new_root_frame(window);
+    e->window = window;
+    e->root_frame = new_root_frame(window);
 
     set_signal_handlers();
-    set_fatal_error_cleanup_handler(cleanup_handler, &editor);
+    set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        file_history_load(&editor.file_history, editor_file("file-history"));
-        history_load(&editor.command_history, editor_file("command-history"));
-        history_load(&editor.search_history, editor_file("search-history"));
+        file_history_load(&e->file_history, editor_file("file-history"));
+        history_load(&e->command_history, editor_file("command-history"));
+        history_load(&e->search_history, editor_file("search-history"));
         if (editor.search_history.last) {
-            search_set_regexp(&editor.search, editor.search_history.last->text);
+            search_set_regexp(&e->search, e->search_history.last->text);
         }
     }
 
@@ -512,11 +512,11 @@ loop_break:;
         return EX_IOERR;
     }
     if (get_nr_errors()) {
-        any_key(&editor);
+        any_key(e);
         clear_error();
     }
 
-    editor.status = EDITOR_RUNNING;
+    e->status = EDITOR_RUNNING;
 
     for (size_t i = optind, line = 0, col = 0; i < argc; i++) {
         const char *str = argv[i];
@@ -525,9 +525,9 @@ loop_break:;
                 error_msg("Invalid file position: '%s'", str);
             }
         } else {
-            View *v = window_open_buffer(&editor, window, str, false, NULL);
+            View *v = window_open_buffer(e, window, str, false, NULL);
             if (line > 0) {
-                set_view(&editor, v);
+                set_view(e, v);
                 move_to_line(v, line);
                 line = 0;
                 if (col > 0) {
@@ -547,16 +547,16 @@ loop_break:;
         empty_buffer = window_open_empty_buffer(window);
     }
 
-    set_view(&editor, window->views.ptrs[0]);
-    ui_start(&editor);
+    set_view(e, window->views.ptrs[0]);
+    ui_start(e);
 
     if (command) {
         handle_command(&normal_commands, command, false);
     }
 
     if (tag) {
-        tag_lookup(tag, NULL, &editor.messages);
-        activate_current_message(&editor.messages);
+        tag_lookup(tag, NULL, &e->messages);
+        activate_current_message(&e->messages);
     }
 
     if (
@@ -568,26 +568,26 @@ loop_break:;
         && tag && window->views.count > 1
     ) {
         // Close the empty buffer, leaving just the buffer opened via "-t"
-        remove_view(&editor, window->views.ptrs[0]);
+        remove_view(e, window->views.ptrs[0]);
     }
 
     if (command || tag) {
-        normal_update(&editor);
+        normal_update(e);
     }
 
-    main_loop(&editor);
+    main_loop(e);
 
     term_restore_title(term);
-    ui_end(&editor);
+    ui_end(e);
     term_output_flush(&term->obuf);
 
     // Unlock files and add files to file history
-    remove_frame(editor.root_frame);
+    remove_frame(e->root_frame);
 
     if (load_and_save_history) {
-        history_save(&editor.command_history);
-        history_save(&editor.search_history);
-        file_history_save(&editor.file_history);
+        history_save(&e->command_history);
+        history_save(&e->search_history);
+        file_history_save(&e->file_history);
     }
 
     if (have_stdout_buffer) {
@@ -597,7 +597,7 @@ loop_break:;
             if (xwrite_all(fd, blk->data, blk->size) < 0) {
                 const char *err = strerror(errno);
                 error_msg("failed to write (stdout) buffer: %s", err);
-                editor.exit_code = EX_IOERR;
+                e->exit_code = EX_IOERR;
                 break;
             }
         }
@@ -605,5 +605,5 @@ loop_break:;
         free(std_buffer);
     }
 
-    return editor.exit_code;
+    return e->exit_code;
 }

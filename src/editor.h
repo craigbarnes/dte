@@ -117,7 +117,7 @@ static inline void set_input_mode(EditorState *e, InputMode mode)
     e->input_mode = mode;
 }
 
-void init_editor_state(void);
+EditorState *init_editor_state(void);
 int free_editor_state(EditorState *e);
 const char *editor_file(const char *name) NONNULL_ARGS_AND_RETURN;
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;

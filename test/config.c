@@ -255,8 +255,10 @@ const TestGroup config_tests = TEST_GROUP(tests);
 
 DISABLE_WARNING("-Wmissing-prototypes")
 
-void init_headless_mode(EditorState *e)
+void init_headless_mode(TestContext *ctx)
 {
+    EditorState *e = ctx->userdata;
+    ASSERT_NONNULL(e);
     exec_builtin_rc(&e->colors, TERM_8_COLOR);
     update_all_syntax_colors(&e->syntaxes);
     e->options.lock_files = false;

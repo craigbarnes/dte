@@ -8,7 +8,7 @@
 #include "util/log.h"
 #include "util/path.h"
 
-void init_headless_mode(EditorState *e);
+void init_headless_mode(TestContext *ctx);
 extern const TestGroup bind_tests;
 extern const TestGroup bookmark_tests;
 extern const TestGroup buffer_tests;
@@ -77,9 +77,14 @@ static void test_init(TestContext *ctx)
     LOG_WARNING("%s: testing LOG_WARNING()", __func__);
     LOG_INFO("%s: testing LOG_INFO()", __func__);
 
-    init_editor_state();
+    EditorState *e = init_editor_state();
+    ctx->userdata = e;
+    ASSERT_NONNULL(e);
+    ASSERT_NONNULL(e->user_config_dir);
+    ASSERT_NONNULL(e->home_dir.data);
+    EXPECT_NONNULL(e->terminal.obuf.buf);
+    EXPECT_NONNULL(e->terminal.ibuf.buf);
 
-    EditorState *e = ctx->userdata;
     const char *ver = getenv("DTE_VERSION");
     EXPECT_NONNULL(ver);
     EXPECT_STREQ(ver, e->version);
@@ -167,7 +172,6 @@ int main(void)
     TestContext ctx = {
         .passed = 0,
         .failed = 0,
-        .userdata = &editor,
     };
 
     run_tests(&ctx, &init_tests);
@@ -183,7 +187,7 @@ int main(void)
     run_tests(&ctx, &ctags_tests);
     run_tests(&ctx, &spawn_tests);
 
-    init_headless_mode(&editor);
+    init_headless_mode(&ctx);
     run_tests(&ctx, &config_tests);
     run_tests(&ctx, &bind_tests);
     run_tests(&ctx, &cmdline_tests_late);

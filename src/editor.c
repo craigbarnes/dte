@@ -171,7 +171,7 @@ static void set_and_check_locale(void)
     exit(EX_CONFIG);
 }
 
-void init_editor_state(void)
+EditorState *init_editor_state(void)
 {
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
@@ -203,6 +203,7 @@ void init_editor_state(void)
     intmap_init(&editor.bindings[INPUT_NORMAL].map, 150);
     intmap_init(&editor.bindings[INPUT_COMMAND].map, 40);
     intmap_init(&editor.bindings[INPUT_SEARCH].map, 40);
+    return &editor;
 }
 
 int free_editor_state(EditorState *e)
