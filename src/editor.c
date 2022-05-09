@@ -173,37 +173,38 @@ static void set_and_check_locale(void)
 
 EditorState *init_editor_state(void)
 {
+    EditorState *e = &editor;
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
-    editor.home_dir = strview_intern(home ? home : "");
+    e->home_dir = strview_intern(home ? home : "");
     if (dte_home) {
-        editor.user_config_dir = xstrdup(dte_home);
+        e->user_config_dir = xstrdup(dte_home);
     } else {
-        editor.user_config_dir = xasprintf("%s/.dte", editor.home_dir.data);
+        e->user_config_dir = xasprintf("%s/.dte", e->home_dir.data);
     }
 
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
-    editor.session_leader = leader;
+    e->session_leader = leader;
     LOG_INFO("version: %s", version);
     LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
     set_and_check_locale();
-    init_file_locks_context(editor.user_config_dir, pid);
+    init_file_locks_context(e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
     if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
         fatal_error("setenv", errno);
     }
 
-    term_input_init(&editor.terminal.ibuf);
-    term_output_init(&editor.terminal.obuf);
-    regexp_init_word_boundary_tokens(&editor.regexp_word_tokens);
+    term_input_init(&e->terminal.ibuf);
+    term_output_init(&e->terminal.obuf);
+    regexp_init_word_boundary_tokens(&e->regexp_word_tokens);
     hashmap_init(&normal_commands.aliases, 32);
-    intmap_init(&editor.bindings[INPUT_NORMAL].map, 150);
-    intmap_init(&editor.bindings[INPUT_COMMAND].map, 40);
-    intmap_init(&editor.bindings[INPUT_SEARCH].map, 40);
-    return &editor;
+    intmap_init(&e->bindings[INPUT_NORMAL].map, 150);
+    intmap_init(&e->bindings[INPUT_COMMAND].map, 40);
+    intmap_init(&e->bindings[INPUT_SEARCH].map, 40);
+    return e;
 }
 
 int free_editor_state(EditorState *e)
