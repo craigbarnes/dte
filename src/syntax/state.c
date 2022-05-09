@@ -345,18 +345,18 @@ static void cmd_inlist(const CommandArgs *a)
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
-    StringList *list = find_string_list(current_syntax, name);
     Condition *c = add_condition(e, COND_INLIST, args[1], emit);
-
     if (!c) {
         return;
     }
 
-    if (!list) {
+    StringList *list = find_string_list(current_syntax, name);
+    if (unlikely(!list)) {
         // Add undefined list
         list = xnew0(StringList, 1);
         hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
     }
+
     list->used = true;
     c->u.str_list = list;
 }
