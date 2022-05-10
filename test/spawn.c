@@ -29,6 +29,15 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(err->len, 4);
     EXPECT_STREQ(string_borrow_cstring(out), "IN-OUT\n");
     EXPECT_STREQ(string_borrow_cstring(err), "ERR\n");
+    string_clear(out);
+    string_clear(err);
+
+    actions[STDIN_FILENO] = SPAWN_NULL;
+    actions[STDERR_FILENO] = SPAWN_NULL;
+    ASSERT_EQ(spawn(&sc, actions), 0);
+    EXPECT_EQ(out->len, 4);
+    EXPECT_EQ(err->len, 0);
+    EXPECT_STREQ(string_borrow_cstring(out), "OUT\n");
     string_free(out);
     string_free(err);
 }
