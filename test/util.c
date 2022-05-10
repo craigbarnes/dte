@@ -1905,6 +1905,7 @@ static void test_popcount(TestContext *ctx)
     EXPECT_EQ(u32_popcount(255), 8);
     EXPECT_EQ(u32_popcount(UINT32_MAX), 32);
     EXPECT_EQ(u32_popcount(UINT32_MAX - 1), 31);
+    EXPECT_EQ(u64_popcount(U32(0xE10F02C9)), 13);
 
     EXPECT_EQ(u64_popcount(0), 0);
     EXPECT_EQ(u64_popcount(1), 1);
@@ -1913,6 +1914,7 @@ static void test_popcount(TestContext *ctx)
     EXPECT_EQ(u64_popcount(UINT64_MAX - 1), 63);
     EXPECT_EQ(u64_popcount(U64(0xFFFFFFFFFF)), 40);
     EXPECT_EQ(u64_popcount(U64(0x10000000000)), 1);
+    EXPECT_EQ(u64_popcount(U64(0x9010F0EEC2003B70)), 24);
 
     for (unsigned int i = 0; i < 32; i++) {
         IEXPECT_EQ(u32_popcount(UINT32_MAX << i), 32 - i);
