@@ -1913,6 +1913,18 @@ static void test_popcount(TestContext *ctx)
     EXPECT_EQ(u64_popcount(UINT64_MAX - 1), 63);
     EXPECT_EQ(u64_popcount(U64(0xFFFFFFFFFF)), 40);
     EXPECT_EQ(u64_popcount(U64(0x10000000000)), 1);
+
+    for (unsigned int i = 0; i < 32; i++) {
+        IEXPECT_EQ(u32_popcount(UINT32_MAX << i), 32 - i);
+        IEXPECT_EQ(u32_popcount(UINT32_MAX >> i), 32 - i);
+        IEXPECT_EQ(u32_popcount(UINT32_C(1) << i), 1);
+    }
+
+    for (unsigned int i = 0; i < 64; i++) {
+        IEXPECT_EQ(u64_popcount(UINT64_MAX << i), 64 - i);
+        IEXPECT_EQ(u64_popcount(UINT64_MAX >> i), 64 - i);
+        IEXPECT_EQ(u64_popcount(UINT64_C(1) << i), 1);
+    }
 }
 
 static void test_path_dirname_and_path_basename(TestContext *ctx)
