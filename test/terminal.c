@@ -332,6 +332,13 @@ static void test_cursor_color_from_str(TestContext *ctx)
     EXPECT_EQ(cursor_color_from_str("123456"), COLOR_INVALID);
 }
 
+static void test_cursor_color_to_str(TestContext *ctx)
+{
+    EXPECT_STREQ(cursor_color_to_str(COLOR_DEFAULT), "default");
+    EXPECT_STREQ(cursor_color_to_str(COLOR_KEEP), "keep");
+    EXPECT_STREQ(cursor_color_to_str(COLOR_RGB(0x190AFE)), "#190afe");
+}
+
 static void test_xterm_parse_key(TestContext *ctx)
 {
     static const struct {
@@ -1141,6 +1148,7 @@ static const TestEntry tests[] = {
     TEST(test_cursor_mode_from_str),
     TEST(test_cursor_type_from_str),
     TEST(test_cursor_color_from_str),
+    TEST(test_cursor_color_to_str),
     TEST(test_xterm_parse_key),
     TEST(test_xterm_parse_key_combo),
     TEST(test_rxvt_parse_key),
