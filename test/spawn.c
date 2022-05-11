@@ -38,6 +38,14 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(out->len, 4);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "OUT\n");
+    string_clear(out);
+    string_clear(err);
+
+    args[2] = "printf 'xyz 123'; exit 37";
+    EXPECT_EQ(spawn(&sc, actions), 37);
+    EXPECT_EQ(out->len, 7);
+    EXPECT_EQ(err->len, 0);
+    EXPECT_STREQ(string_borrow_cstring(out), "xyz 123");
     string_free(out);
     string_free(err);
 }

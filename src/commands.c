@@ -869,6 +869,7 @@ static void cmd_exec(const CommandArgs *a)
     free(alloc);
     if (err != 0) {
         show_spawn_error_msg(&ctx.outputs[1], err);
+        string_free(&ctx.outputs[0]);
         string_free(&ctx.outputs[1]);
         view->cursor = saved_cursor;
         return;

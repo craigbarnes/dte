@@ -354,9 +354,6 @@ int spawn(SpawnContext *ctx, SpawnAction actions[3])
     }
 
     resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
-    if (err != 0) {
-        string_free(&ctx->outputs[0]);
-    }
     return err;
 
 error_resume:
