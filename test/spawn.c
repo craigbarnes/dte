@@ -24,7 +24,7 @@ static void test_spawn(TestContext *ctx)
 
     String *out = &sc.outputs[0];
     String *err = &sc.outputs[1];
-    ASSERT_EQ(spawn(&sc, actions), 0);
+    EXPECT_EQ(spawn(&sc, actions), 0);
     EXPECT_EQ(out->len, 7);
     EXPECT_EQ(err->len, 4);
     EXPECT_STREQ(string_borrow_cstring(out), "IN-OUT\n");
@@ -34,7 +34,7 @@ static void test_spawn(TestContext *ctx)
 
     actions[STDIN_FILENO] = SPAWN_NULL;
     actions[STDERR_FILENO] = SPAWN_NULL;
-    ASSERT_EQ(spawn(&sc, actions), 0);
+    EXPECT_EQ(spawn(&sc, actions), 0);
     EXPECT_EQ(out->len, 4);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "OUT\n");
