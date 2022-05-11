@@ -24,9 +24,10 @@ typedef struct {
     StringView input;
     String outputs[2]; // For stdout/stderr
     SpawnFlags flags;
+    SpawnAction actions[3];
 } SpawnContext;
 
-int spawn(SpawnContext *ctx, SpawnAction actions[3]);
+int spawn(SpawnContext *ctx);
 void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
 
 #endif

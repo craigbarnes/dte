@@ -294,7 +294,7 @@ static void safe_xclose_all(int *fds, size_t nr_fds)
     }
 }
 
-int spawn(SpawnContext *ctx, SpawnAction actions[3])
+int spawn(SpawnContext *ctx)
 {
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};
@@ -302,7 +302,7 @@ int spawn(SpawnContext *ctx, SpawnAction actions[3])
     size_t nr_pipes = 0;
 
     for (size_t i = 0; i < ARRAYLEN(child_fds); i++) {
-        switch (actions[i]) {
+        switch (ctx->actions[i]) {
         case SPAWN_TTY:
             if (!quiet) {
                 child_fds[i] = i;

@@ -14,17 +14,19 @@ static void test_spawn(TestContext *ctx)
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = SPAWN_QUIET,
+        .actions = {
+            [STDIN_FILENO] = SPAWN_PIPE,
+            [STDOUT_FILENO] = SPAWN_PIPE,
+            [STDERR_FILENO] = SPAWN_PIPE,
+        },
     };
 
-    SpawnAction actions[3] = {
-        [STDIN_FILENO] = SPAWN_PIPE,
-        [STDOUT_FILENO] = SPAWN_PIPE,
-        [STDERR_FILENO] = SPAWN_PIPE,
-    };
+    static_assert(ARRAYLEN(sc.actions) == 3);
+    static_assert(ARRAYLEN(sc.outputs) == 2);
 
     String *out = &sc.outputs[0];
     String *err = &sc.outputs[1];
-    EXPECT_EQ(spawn(&sc, actions), 0);
+    EXPECT_EQ(spawn(&sc), 0);
     EXPECT_EQ(out->len, 7);
     EXPECT_EQ(err->len, 4);
     EXPECT_STREQ(string_borrow_cstring(out), "IN-OUT\n");
@@ -32,9 +34,9 @@ static void test_spawn(TestContext *ctx)
     string_clear(out);
     string_clear(err);
 
-    actions[STDIN_FILENO] = SPAWN_NULL;
-    actions[STDERR_FILENO] = SPAWN_NULL;
-    EXPECT_EQ(spawn(&sc, actions), 0);
+    sc.actions[STDIN_FILENO] = SPAWN_NULL;
+    sc.actions[STDERR_FILENO] = SPAWN_NULL;
+    EXPECT_EQ(spawn(&sc), 0);
     EXPECT_EQ(out->len, 4);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "OUT\n");
@@ -42,7 +44,7 @@ static void test_spawn(TestContext *ctx)
     string_clear(err);
 
     args[2] = "printf 'xyz 123'; exit 37";
-    EXPECT_EQ(spawn(&sc, actions), 37);
+    EXPECT_EQ(spawn(&sc), 37);
     EXPECT_EQ(out->len, 7);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "xyz 123");

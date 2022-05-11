@@ -751,7 +751,6 @@ UNITTEST {
 static void cmd_exec(const CommandArgs *a)
 {
     ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
-    SpawnAction spawn_actions[3] = {SPAWN_TTY, SPAWN_TTY, SPAWN_TTY};
     SpawnFlags spawn_flags = 0;
     bool lflag = false;
     bool move_after_insert = false;
@@ -778,7 +777,6 @@ static void cmd_exec(const CommandArgs *a)
             return;
         }
         actions[fd_idx] = action;
-        spawn_actions[fd_idx] = exec_map[action].spawn_action;
     }
 
     EditorState *e = a->userdata;
@@ -802,6 +800,11 @@ static void cmd_exec(const CommandArgs *a)
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = spawn_flags,
         .env = env,
+        .actions = {
+            exec_map[actions[0]].spawn_action,
+            exec_map[actions[1]].spawn_action,
+            exec_map[actions[2]].spawn_action,
+        },
     };
 
     switch (actions[STDIN_FILENO]) {
@@ -865,7 +868,7 @@ static void cmd_exec(const CommandArgs *a)
         return;
     }
 
-    int err = spawn(&ctx, spawn_actions);
+    int err = spawn(&ctx);
     free(alloc);
     if (err != 0) {
         show_spawn_error_msg(&ctx.outputs[1], err);
