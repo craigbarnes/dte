@@ -7,7 +7,6 @@
 #include "color.h"
 #include "terminal.h"
 #include "util/macros.h"
-#include "util/string-view.h"
 #include "util/unicode.h"
 
 #define term_add_literal(buf, s) term_add_bytes(buf, s, STRLEN(s))
@@ -24,7 +23,6 @@ void term_add_byte(TermOutputBuffer *obuf, char ch);
 void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count);
 void term_set_bytes(Terminal *term, char ch, size_t count);
 void term_repeat_byte(TermOutputBuffer *obuf, char ch, size_t count);
-void term_add_strview(TermOutputBuffer *obuf, StringView sv);
 void term_add_str(TermOutputBuffer *obuf, const char *str);
 void term_add_uint(TermOutputBuffer *obuf, unsigned int x);
 void term_use_alt_screen_buffer(Terminal *term);

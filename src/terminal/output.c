@@ -115,13 +115,6 @@ void term_add_byte(TermOutputBuffer *obuf, char ch)
     obuf->buf[obuf->count++] = ch;
 }
 
-void term_add_strview(TermOutputBuffer *obuf, StringView sv)
-{
-    if (sv.length) {
-        term_add_bytes(obuf, sv.data, sv.length);
-    }
-}
-
 void term_add_str(TermOutputBuffer *obuf, const char *str)
 {
     size_t i = 0;
