@@ -630,7 +630,6 @@ void main_loop(EditorState *e)
             continue;
         }
 
-        clear_error();
         const ScreenState s = {
             .is_modified = buffer_modified(e->buffer),
             .id = e->buffer->id,
@@ -639,6 +638,7 @@ void main_loop(EditorState *e)
             .vy = e->view->vy
         };
 
+        clear_error();
         handle_input(e, key);
         sanity_check(e->view);
         update_screen(e, &s);
