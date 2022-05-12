@@ -77,15 +77,14 @@ static noreturn COLD void handle_fatal_signal(int signum)
     }
 
     struct sigaction sa = {.sa_handler = SIG_DFL};
-    sigemptyset(&sa.sa_mask);
-    sigaction(signum, &sa, NULL);
-
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, signum);
-    sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
-    raise(signum);
+    if (
+        sigemptyset(&sa.sa_mask) == 0
+        && sigaction(signum, &sa, NULL) == 0
+        && sigaddset(&sa.sa_mask, signum) == 0
+        && sigprocmask(SIG_UNBLOCK, &sa.sa_mask, NULL) == 0
+    ) {
+        raise(signum);
+    }
 
     // This is here just to make extra certain the handler never returns.
     // If everything is working correctly, this code should be unreachable.
