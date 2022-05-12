@@ -286,12 +286,20 @@ static int safe_xclose(int fd)
     return (fd > STDERR_FILENO) ? xclose(fd) : 0;
 }
 
-static void safe_xclose_all(int *fds, size_t nr_fds)
+static void safe_xclose_all(int fds[], size_t nr_fds)
 {
     for (size_t i = 0; i < nr_fds; i++) {
         safe_xclose(fds[i]);
         fds[i] = -1;
     }
+}
+
+UNITTEST {
+    int fds[] = {-2, -3, -4};
+    safe_xclose_all(fds, 2);
+    BUG_ON(fds[0] != -1);
+    BUG_ON(fds[1] != -1);
+    BUG_ON(fds[2] != -4);
 }
 
 int spawn(SpawnContext *ctx)
@@ -342,7 +350,6 @@ int spawn(SpawnContext *ctx)
     }
 
     safe_xclose_all(child_fds, ARRAYLEN(child_fds));
-
     if (nr_pipes > 0) {
         handle_piped_data(parent_fds, ctx);
     }
