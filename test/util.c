@@ -2317,6 +2317,29 @@ static void test_fd_set_cloexec(TestContext *ctx)
     close(fd);
 }
 
+static void test_fd_set_nonblock(TestContext *ctx)
+{
+    int fd = open("/dev/null", O_RDONLY);
+    ASSERT_TRUE(fd >= 0);
+    int flags = fcntl(fd, F_GETFL);
+    EXPECT_TRUE(flags >= 0);
+    EXPECT_EQ(flags & O_NONBLOCK, 0);
+
+    EXPECT_TRUE(fd_set_nonblock(fd, true));
+    flags = fcntl(fd, F_GETFL);
+    EXPECT_TRUE(flags > 0);
+    EXPECT_EQ(flags & O_NONBLOCK, O_NONBLOCK);
+
+    for (size_t i = 0; i < 2; i++) {
+        IEXPECT_TRUE(fd_set_nonblock(fd, false));
+        flags = fcntl(fd, F_GETFL);
+        IEXPECT_TRUE(flags >= 0);
+        IEXPECT_EQ(flags & O_NONBLOCK, 0);
+    }
+
+    close(fd);
+}
+
 static void test_fork_exec(TestContext *ctx)
 {
     int fd[3];
@@ -2463,6 +2486,7 @@ static const TestEntry tests[] = {
     TEST(test_read_file),
     TEST(test_xfopen),
     TEST(test_fd_set_cloexec),
+    TEST(test_fd_set_nonblock),
     TEST(test_fork_exec),
     TEST(test_xmemmem),
     TEST(test_log_level_from_str),
