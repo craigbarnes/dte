@@ -16,7 +16,7 @@ static inline bool fd_set_cloexec(int fd, bool cloexec)
     return new_flags == flags || fcntl(fd, F_SETFD, new_flags) != -1;
 }
 
-bool pipe_cloexec(int fd[2]) WARN_UNUSED_RESULT;
+int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;
 pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty) NONNULL_ARG(1) WARN_UNUSED_RESULT;
 int wait_child(pid_t pid) WARN_UNUSED_RESULT;
 

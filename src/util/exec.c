@@ -13,27 +13,45 @@
 # include <sys/ioctl.h>
 #endif
 
-bool pipe_cloexec(int fd[2])
+static bool fd_set_nonblock(int fd, bool nonblock)
 {
+    int flags = fcntl(fd, F_GETFL);
+    if (unlikely(flags < 0)) {
+        return false;
+    }
+    int new_flags = nonblock ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
+    return new_flags == flags || fcntl(fd, F_SETFL, new_flags) != -1;
+}
+
+int xpipe2(int fd[2], int flags)
+{
+    BUG_ON((flags & (O_CLOEXEC | O_NONBLOCK)) != flags);
+
 #ifdef HAVE_PIPE2
-    if (likely(pipe2(fd, O_CLOEXEC) == 0)) {
-        return true;
+    if (likely(pipe2(fd, flags) == 0)) {
+        return 0;
     }
     // If pipe2() fails with ENOSYS, it means the function is just a stub
     // and not actually supported. In that case, the pure POSIX fallback
     // implementation should be tried instead. In other cases, the failure
     // is probably caused by a normal error condition.
     if (errno != ENOSYS) {
-        return false;
+        return -1;
     }
 #endif
 
     if (unlikely(pipe(fd) != 0)) {
-        return false;
+        return -1;
     }
-    fd_set_cloexec(fd[0], true);
-    fd_set_cloexec(fd[1], true);
-    return true;
+    if (flags & O_CLOEXEC) {
+        fd_set_cloexec(fd[0], true);
+        fd_set_cloexec(fd[1], true);
+    }
+    if (flags & O_NONBLOCK) {
+        fd_set_nonblock(fd[0], true);
+        fd_set_nonblock(fd[1], true);
+    }
+    return 0;
 }
 
 static int xdup3(int oldfd, int newfd, int flags)
@@ -161,7 +179,7 @@ static pid_t xwaitpid(pid_t pid, int *status, int options)
 pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
 {
     int ep[2];
-    if (!pipe_cloexec(ep)) {
+    if (xpipe2(ep, O_CLOEXEC) != 0) {
         return -1;
     }
 
