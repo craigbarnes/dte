@@ -350,8 +350,30 @@ int spawn(SpawnContext *ctx)
     }
 
     safe_xclose_all(child_fds, ARRAYLEN(child_fds));
-    if (nr_pipes > 0) {
+    if (nr_pipes >= 2 || ctx->actions[2] == SPAWN_PIPE) {
         handle_piped_data(parent_fds, ctx);
+    } else if (ctx->actions[0] == SPAWN_PIPE) {
+        size_t len = ctx->input.length;
+        if (len && xwrite_all(parent_fds[0], ctx->input.data, len) < 0) {
+            perror_msg("write");
+            goto error_resume;
+        }
+    } else if (ctx->actions[1] == SPAWN_PIPE) {
+        while (1) {
+            String *out = &ctx->outputs[0];
+            size_t max_read = 8192;
+            string_reserve_space(out, max_read);
+            char *buf = out->buffer + out->len;
+            ssize_t rc = xread_all(parent_fds[1], buf, max_read);
+            if (unlikely(rc < 0)) {
+                perror_msg("read");
+                goto error_resume;
+            }
+            if (rc == 0) {
+                break;
+            }
+            out->len += rc;
+        }
     }
 
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
