@@ -333,6 +333,10 @@ int spawn(SpawnContext *ctx)
             BUG_ON(p[1] <= STDERR_FILENO);
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
+            if (!fd_set_nonblock(parent_fds[i], true)) {
+                perror_msg("fcntl");
+                goto error_close;
+            }
             nr_pipes++;
             break;
         }

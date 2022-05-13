@@ -13,16 +13,6 @@
 # include <sys/ioctl.h>
 #endif
 
-static bool fd_set_nonblock(int fd, bool nonblock)
-{
-    int flags = fcntl(fd, F_GETFL);
-    if (unlikely(flags < 0)) {
-        return false;
-    }
-    int new_flags = nonblock ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
-    return new_flags == flags || fcntl(fd, F_SETFL, new_flags) != -1;
-}
-
 int xpipe2(int fd[2], int flags)
 {
     BUG_ON((flags & (O_CLOEXEC | O_NONBLOCK)) != flags);
