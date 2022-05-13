@@ -101,9 +101,12 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
     BUG_ON(f[1] >= 0 && f[1] <= 2);
     BUG_ON(f[2] >= 0 && f[2] <= 2);
 
-    if (!ctx->input.length) {
+    if (ctx->input.length == 0) {
         xclose(f[0]);
         f[0] = -1;
+        if (f[1] < 0 && f[2] < 0) {
+            return;
+        }
     }
 
     struct pollfd fds[] = {
