@@ -325,7 +325,7 @@ int spawn(SpawnContext *ctx)
             break;
         case SPAWN_PIPE: {
             int p[2];
-            if (xpipe2(p, O_CLOEXEC | O_NONBLOCK) != 0) {
+            if (xpipe2(p, O_CLOEXEC) != 0) {
                 perror_msg("pipe");
                 goto error_close;
             }
