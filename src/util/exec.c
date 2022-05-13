@@ -56,7 +56,9 @@ int xpipe2(int fd[2], int flags)
 
 static int xdup3(int oldfd, int newfd, int flags)
 {
+    BUG_ON((flags & O_CLOEXEC) != flags);
     int fd;
+
 #ifdef HAVE_DUP3
     do {
         fd = dup3(oldfd, newfd, flags);
