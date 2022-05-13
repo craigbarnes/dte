@@ -48,6 +48,17 @@ static void test_spawn(TestContext *ctx)
     EXPECT_EQ(out->len, 7);
     EXPECT_EQ(err->len, 0);
     EXPECT_STREQ(string_borrow_cstring(out), "xyz 123");
+    string_clear(out);
+    string_clear(err);
+
+    // Make sure zero-length input with one SPAWN_PIPE action
+    // doesn't deadlock
+    args[2] = "cat >/dev/null";
+    sc.input.length = 0;
+    sc.actions[STDIN_FILENO] = SPAWN_PIPE;
+    sc.actions[STDOUT_FILENO] = SPAWN_NULL;
+    sc.actions[STDERR_FILENO] = SPAWN_NULL;
+    EXPECT_EQ(spawn(&sc), 0);
     string_free(out);
     string_free(err);
 }
