@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
     const char *tag = NULL;
     const char *rc = NULL;
     const char *command = NULL;
-    PointerArray extra_rc;
+    PointerArray extra_rc = PTR_ARRAY_INIT;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
