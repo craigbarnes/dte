@@ -158,9 +158,11 @@ static void set_signal_handlers(void)
     // "The default actions for the realtime signals in the range SIGRTMIN
     // to SIGRTMAX shall be to terminate the process abnormally."
     // (POSIX.1-2017 §2.4.3)
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
     for (int s = SIGRTMIN, max = SIGRTMAX; s <= max; s++) {
         do_sigaction(s, &action);
     }
+#endif
 
     action.sa_handler = SIG_IGN;
     for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
