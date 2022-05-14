@@ -7,9 +7,9 @@ _dte() {
 
     case "$cur" in
     -)
-        COMPREPLY=($(compgen -W "-h -H -K -B -R -V -c -t -r -b -s" -- "$cur"))
+        COMPREPLY=($(compgen -W "-h -H -K -B -R -V -c -t -r -b -s -x" -- "$cur"))
         return;;
-    -[bcrstHR])
+    -[bcrstxHR])
         COMPREPLY=("$cur")
         return;;
     -*) # -[hBKV]
