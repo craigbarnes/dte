@@ -173,7 +173,7 @@ static Condition *add_condition (
     return c;
 }
 
-static void cmd_bufis(const CommandArgs *a)
+static void cmd_bufis(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
     const size_t len = strlen(str);
@@ -186,7 +186,6 @@ static void cmd_bufis(const CommandArgs *a)
         return;
     }
 
-    EditorState *e = a->userdata;
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
     c = add_condition(e, type, a->args[1], a->args[2]);
     if (c) {
@@ -195,7 +194,7 @@ static void cmd_bufis(const CommandArgs *a)
     }
 }
 
-static void cmd_char(const CommandArgs *a)
+static void cmd_char(EditorState *e, const CommandArgs *a)
 {
     const char *chars = a->args[0];
     if (unlikely(chars[0] == '\0')) {
@@ -214,7 +213,6 @@ static void cmd_char(const CommandArgs *a)
         type = COND_CHAR;
     }
 
-    EditorState *e = a->userdata;
     Condition *c = add_condition(e, type, a->args[1], a->args[2]);
     if (!c) {
         return;
@@ -230,7 +228,7 @@ static void cmd_char(const CommandArgs *a)
     }
 }
 
-static void cmd_default(const CommandArgs *a)
+static void cmd_default(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -253,13 +251,12 @@ static void cmd_default(const CommandArgs *a)
     }
 }
 
-static void cmd_eat(const CommandArgs *a)
+static void cmd_eat(EditorState *e, const CommandArgs *a)
 {
     if (no_state()) {
         return;
     }
 
-    EditorState *e = a->userdata;
     const char *dest = a->args[0];
     if (!destination_state(e, dest, &current_state->default_action.destination)) {
         return;
@@ -271,13 +268,12 @@ static void cmd_eat(const CommandArgs *a)
     current_state = NULL;
 }
 
-static void cmd_heredocbegin(const CommandArgs *a)
+static void cmd_heredocbegin(EditorState *e, const CommandArgs *a)
 {
     if (no_state()) {
         return;
     }
 
-    EditorState *e = a->userdata;
     const char *sub = a->args[0];
     Syntax *subsyn = find_any_syntax(&e->syntaxes, sub);
     if (unlikely(!subsyn)) {
@@ -305,9 +301,8 @@ static void cmd_heredocbegin(const CommandArgs *a)
     subsyn->used = true;
 }
 
-static void cmd_heredocend(const CommandArgs *a)
+static void cmd_heredocend(EditorState *e, const CommandArgs *a)
 {
-    EditorState *e = a->userdata;
     Condition *c = add_condition(e, COND_HEREDOCEND, a->args[0], a->args[1]);
     if (unlikely(!c)) {
         return;
@@ -316,7 +311,7 @@ static void cmd_heredocend(const CommandArgs *a)
     current_syntax->heredoc = true;
 }
 
-static void cmd_list(const CommandArgs *a)
+static void cmd_list(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -344,9 +339,8 @@ static void cmd_list(const CommandArgs *a)
     }
 }
 
-static void cmd_inlist(const CommandArgs *a)
+static void cmd_inlist(EditorState *e, const CommandArgs *a)
 {
-    EditorState *e = a->userdata;
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
@@ -366,9 +360,8 @@ static void cmd_inlist(const CommandArgs *a)
     c->u.str_list = list;
 }
 
-static void cmd_noeat(const CommandArgs *a)
+static void cmd_noeat(EditorState *e, const CommandArgs *a)
 {
-    EditorState *e = a->userdata;
     State *dest;
     if (unlikely(no_state() || !destination_state(e, a->args[0], &dest))) {
         return;
@@ -385,7 +378,7 @@ static void cmd_noeat(const CommandArgs *a)
     current_state = NULL;
 }
 
-static void cmd_recolor(const CommandArgs *a)
+static void cmd_recolor(EditorState *e, const CommandArgs *a)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
@@ -404,14 +397,13 @@ static void cmd_recolor(const CommandArgs *a)
         }
     }
 
-    EditorState *e = a->userdata;
     Condition *c = add_condition(e, type, NULL, a->args[0]);
     if (c && type == COND_RECOLOR) {
         c->u.recolor_len = len;
     }
 }
 
-static void cmd_state(const CommandArgs *a)
+static void cmd_state(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     close_state();
     if (no_syntax()) {
@@ -434,7 +426,7 @@ static void cmd_state(const CommandArgs *a)
     current_state = s;
 }
 
-static void cmd_str(const CommandArgs *a)
+static void cmd_str(EditorState *e, const CommandArgs *a)
 {
     bool icase = a->flags[0] == 'i';
     ConditionType type = icase ? COND_STR_ICASE : COND_STR;
@@ -454,7 +446,6 @@ static void cmd_str(const CommandArgs *a)
     if (!icase && len == 2) {
         type = COND_STR2;
     }
-    EditorState *e = a->userdata;
     c = add_condition(e, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
@@ -470,9 +461,8 @@ static void finish_syntax(EditorState *e)
     current_syntax = NULL;
 }
 
-static void cmd_syntax(const CommandArgs *a)
+static void cmd_syntax(EditorState *e, const CommandArgs *a)
 {
-    EditorState *e = a->userdata;
     if (current_syntax) {
         finish_syntax(e);
     }
@@ -484,8 +474,10 @@ static void cmd_syntax(const CommandArgs *a)
     saved_nr_errors = get_nr_errors();
 }
 
-static void cmd_include(const CommandArgs *a);
-static void cmd_require(const CommandArgs *a);
+static void cmd_include(EditorState *e, const CommandArgs *a);
+static void cmd_require(EditorState *e, const CommandArgs *a);
+
+IGNORE_WARNING("-Wincompatible-pointer-types")
 
 static const Command cmds[] = {
     {"bufis", "i", true, 2, 3, cmd_bufis},
@@ -505,6 +497,8 @@ static const Command cmds[] = {
     {"syntax", "", true, 1, 1, cmd_syntax},
 };
 
+UNIGNORE_WARNINGS
+
 UNITTEST {
     CHECK_BSEARCH_ARRAY(cmds, name, strcmp);
 }
@@ -522,7 +516,7 @@ static const CommandSet syntax_commands = {
     .userdata = &editor,
 };
 
-static void cmd_include(const CommandArgs *a)
+static void cmd_include(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
     if (a->flags[0] == 'b') {
@@ -531,7 +525,7 @@ static void cmd_include(const CommandArgs *a)
     read_config(&syntax_commands, a->args[0], flags);
 }
 
-static void cmd_require(const CommandArgs *a)
+static void cmd_require(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     static HashSet loaded_files;
     static HashSet loaded_builtins;

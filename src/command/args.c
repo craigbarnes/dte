@@ -15,7 +15,6 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 {
     char **args = a->args;
     BUG_ON(!args);
-    BUG_ON(!a->userdata);
 
     size_t argc = string_array_length(args);
     size_t nr_flags = 0;

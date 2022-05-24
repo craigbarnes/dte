@@ -69,7 +69,7 @@ static void test_dump_handlers(TestContext *ctx)
                 continue;
             }
 
-            CommandArgs a = cmdargs_new((char**)arr.ptrs + 1, ud);
+            CommandArgs a = cmdargs_new((char**)arr.ptrs + 1);
             ArgParseError arg_err = do_parse_args(cmd, &a);
             EXPECT_EQ(arg_err, ARGERR_NONE);
             if (arg_err != ARGERR_NONE) {

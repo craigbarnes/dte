@@ -61,7 +61,7 @@ static void run_command(RunContext *ctx, char **av)
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
-    if (ctx->allow_recording && cmds->allow_recording(cmd, av + 1, cmds->userdata)) {
+    if (ctx->allow_recording && cmds->allow_recording(cmd, av + 1)) {
         macro_command_hook(cmd->name, av + 1);
     }
 
@@ -69,10 +69,10 @@ static void run_command(RunContext *ctx, char **av)
     // Any command can override this by calling begin_change() again.
     begin_change(CHANGE_MERGE_NONE);
 
-    CommandArgs a = cmdargs_new(av + 1, cmds->userdata);
+    CommandArgs a = cmdargs_new(av + 1);
     current_command = cmd;
     if (likely(parse_args(cmd, &a))) {
-        cmd->cmd(&a);
+        cmd->cmd(cmds->userdata, &a);
     }
     current_command = NULL;
 

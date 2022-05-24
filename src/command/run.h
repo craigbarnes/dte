@@ -14,8 +14,9 @@ typedef struct {
     char flags[10]; // Flags in parsed order
     uint8_t nr_flags; // Number of parsed flags
     uint8_t nr_flag_args; // Number of flag args
-    void *userdata;
 } CommandArgs;
+
+typedef void (*CommandFunc)(void *userdata, const CommandArgs *args);
 
 typedef struct {
     const char name[15];
@@ -23,12 +24,12 @@ typedef struct {
     bool allow_in_rc;
     uint8_t min_args;
     uint8_t max_args; // 0xFF here means "no limit" (effectively SIZE_MAX)
-    void (*cmd)(const CommandArgs *args);
+    CommandFunc cmd;
 } Command;
 
 typedef struct {
     const Command* (*lookup)(const char *name);
-    bool (*allow_recording)(const Command *cmd, char **args, void *userdata);
+    bool (*allow_recording)(const Command *cmd, char **args);
     bool (*expand_variable)(const char *name, char **value, void *userdata);
     HashMap aliases;
     void *userdata;

@@ -44,9 +44,9 @@ bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
     }
 
     // If the command isn't cached or a macro is being recorded
+    const CommandSet *cmds = kbg->cmds;
     if (!binding->cmd || macro_is_recording()) {
         // Parse and run command string
-        const CommandSet *cmds = kbg->cmds;
         handle_command(cmds, binding->cmd_str, !!cmds->allow_recording);
         return true;
     }
@@ -54,7 +54,7 @@ bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
     current_command = binding->cmd;
-    binding->cmd->cmd(&binding->a);
+    binding->cmd->cmd(cmds->userdata, &binding->a);
     current_command = NULL;
     end_change();
     return true;
