@@ -259,50 +259,45 @@ static ExitCode showkey_loop(Terminal *term)
     return EX_OK;
 }
 
-static void freopen_tty(FILE *stream, const char *mode, int fd)
+static ExitCode init_std_fds(int std_fds[2])
 {
-    if (unlikely(!freopen("/dev/tty", mode, stream))) {
-        const char *err = strerror(errno);
-        fprintf(stderr, "Failed to open tty in mode '%s': %s\n", mode, err);
-        exit(EX_IOERR);
-    }
-
-    int new_fd = fileno(stream);
-    if (unlikely(new_fd != fd)) {
-        // This should never happen in a single-threaded program.
-        // freopen() should call fclose() followed by open() and
-        // POSIX requires a successful call to open() to return the
-        // lowest available file descriptor.
-        fprintf(stderr, "freopen() changed fd from %d to %d\n", fd, new_fd);
-        exit(EX_OSERR);
-    }
-}
-
-static void init_std_fds(int std_fds[2])
-{
-    if (!isatty(STDIN_FILENO)) {
-        int fd = fcntl(STDIN_FILENO, F_DUPFD_CLOEXEC, 3);
-        if (fd == -1 && errno != EBADF) {
-            perror("fcntl");
-            exit(EX_OSERR);
+    FILE *streams[3] = {stdin, stdout, stderr};
+    for (int i = 0; i < ARRAYLEN(streams); i++) {
+        if (isatty(i)) {
+            continue;
         }
-        std_fds[STDIN_FILENO] = fd;
-        freopen_tty(stdin, "r", STDIN_FILENO);
-    }
 
-    if (!isatty(STDOUT_FILENO)) {
-        int fd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
-        if (fd == -1 && errno != EBADF) {
-            perror("fcntl");
-            exit(EX_OSERR);
+        if (i < STDERR_FILENO) {
+            // Try to create a duplicate fd for redirected stdin/stdout; to
+            // allow reading/writing after freopen(3) closes the original
+            int fd = fcntl(i, F_DUPFD_CLOEXEC, 3);
+            if (fd == -1 && errno != EBADF) {
+                perror("fcntl");
+                return EX_OSERR;
+            }
+            std_fds[i] = fd;
         }
-        std_fds[STDOUT_FILENO] = fd;
-        freopen_tty(stdout, "w", STDOUT_FILENO);
+
+        // Ensure standard streams are connected to the terminal during
+        // editor operation, regardless of how they were redirected
+        if (unlikely(!freopen("/dev/tty", i ? "w" : "r", streams[i]))) {
+            const char *err = strerror(errno);
+            fprintf(stderr, "Failed to open tty for fd %d: %s\n", i, err);
+            return EX_IOERR;
+        }
+
+        int new_fd = fileno(streams[i]);
+        if (unlikely(new_fd != i)) {
+            // This should never happen in a single-threaded program.
+            // freopen() should call fclose() followed by open() and
+            // POSIX requires a successful call to open() to return the
+            // lowest available file descriptor.
+            fprintf(stderr, "freopen() changed fd from %d to %d\n", i, new_fd);
+            return EX_OSERR;
+        }
     }
 
-    if (!isatty(STDERR_FILENO)) {
-        freopen_tty(stderr, "w", STDERR_FILENO);
-    }
+    return EX_OK;
 }
 
 static Buffer *init_std_buffer(EditorState *e, int fds[2])
@@ -426,7 +421,10 @@ loop_break:;
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
     // cause the logging fd to be opened as STDIN_FILENO.
     int std_fds[2] = {-1, -1};
-    init_std_fds(std_fds);
+    ExitCode r = init_std_fds(std_fds);
+    if (unlikely(r != EX_OK)) {
+        return r;
+    }
 
     const char *log_filename = getenv("DTE_LOG");
     if (log_filename && log_filename[0] != '\0') {
