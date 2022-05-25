@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,13 +37,14 @@
 #include "window.h"
 #include "../build/version.h"
 
+static volatile sig_atomic_t resized = 0;
+
 EditorState editor = {
     .status = EDITOR_INITIALIZING,
     .input_mode = INPUT_NORMAL,
     .child_controls_terminal = false,
     .everything_changed = false,
     .cursor_style_changed = false,
-    .resized = false,
     .exit_code = EX_OK,
     .compilers = HASHMAP_INIT,
     .syntaxes = HASHMAP_INIT,
@@ -246,6 +248,11 @@ int free_editor_state(EditorState *e)
     return exit_code;
 }
 
+void handle_sigwinch(int UNUSED_ARG(signum))
+{
+    resized = 1;
+}
+
 static void sanity_check(const View *v)
 {
 #if DEBUG >= 1
@@ -394,7 +401,7 @@ static void ui_resize(EditorState *e)
     if (e->status == EDITOR_INITIALIZING) {
         return;
     }
-    e->resized = false;
+    resized = 0;
     update_screen_size(e);
     normal_update(e);
 }
@@ -516,7 +523,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
 
     char choice;
     while ((choice = get_choice(e, choices)) == 0) {
-        if (!e->resized) {
+        if (!resized) {
             continue;
         }
         ui_resize(e);
@@ -549,7 +556,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
 
     char choice;
     while ((choice = get_choice(e, choices)) == 0) {
-        if (!e->resized) {
+        if (!resized) {
             continue;
         }
         ui_resize(e);
@@ -620,7 +627,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
 void main_loop(EditorState *e)
 {
     while (e->status == EDITOR_RUNNING) {
-        if (e->resized) {
+        if (resized) {
             LOG_INFO("SIGWINCH received");
             ui_resize(e);
         }

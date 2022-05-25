@@ -2,7 +2,6 @@
 #define EDITOR_H
 
 #include <regex.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "bind.h"
@@ -101,7 +100,6 @@ typedef struct {
     History command_history;
     RegexpWordBoundaryTokens regexp_word_tokens;
     const char *version;
-    volatile sig_atomic_t resized;
 } EditorState;
 
 extern EditorState editor;
@@ -127,5 +125,6 @@ void normal_update(EditorState *e);
 void main_loop(EditorState *e);
 void ui_start(EditorState *e);
 void ui_end(EditorState *e);
+void handle_sigwinch(int signum);
 
 #endif

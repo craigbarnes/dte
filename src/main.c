@@ -49,13 +49,6 @@ static void handle_sigcont(int UNUSED_ARG(signum))
     }
 }
 
-#ifdef SIGWINCH
-static void handle_sigwinch(int UNUSED_ARG(signum))
-{
-    editor.resized = true;
-}
-#endif
-
 static void term_cleanup(EditorState *e)
 {
     set_fatal_error_cleanup_handler(NULL, NULL);
