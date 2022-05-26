@@ -160,20 +160,10 @@ static void add_misc_status(Formatter *f)
 
     SelectionInfo si;
     init_selection(v, &si);
-
-    switch (v->selection) {
-    case SELECT_CHARS:
-        add_status_format(f, "[%zu chars]", get_nr_selected_chars(&si));
-        return;
-    case SELECT_LINES:
-        add_status_format(f, "[%zu lines]", get_nr_selected_lines(&si));
-        return;
-    case SELECT_NONE:
-        // Already handled above
-        break;
-    }
-
-    BUG("unhandled selection type");
+    bool is_lines = (v->selection == SELECT_LINES);
+    const char *unit = is_lines ? "line" : "char";
+    size_t n = is_lines ? get_nr_selected_lines(&si) : get_nr_selected_chars(&si);
+    add_status_format(f, "[%zu %s%s]", n, unit, likely(n != 1) ? "s" : "");
 }
 
 static FormatSpecifierType lookup_format_specifier(unsigned char ch)
