@@ -858,6 +858,10 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(key, MOD_CTRL | 'i');
     EXPECT_TRUE(parse_key_string(&key, "C-M"));
     EXPECT_EQ(key, MOD_CTRL | 'm');
+    EXPECT_TRUE(parse_key_string(&key, "C-F1"));
+    EXPECT_EQ(key, MOD_CTRL | KEY_F1);
+    EXPECT_TRUE(parse_key_string(&key, "C-M-S-F20"));
+    EXPECT_EQ(key, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
 
     key = 0x18;
     EXPECT_FALSE(parse_key_string(&key, "C-"));
@@ -867,6 +871,12 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_FALSE(parse_key_string(&key, "paste"));
     EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "???"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "F0"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "F21"));
+    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "F01"));
     EXPECT_EQ(key, 0x18);
 
     // Special cases for normalization:
