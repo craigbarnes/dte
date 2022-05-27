@@ -10,7 +10,8 @@ pkg-var = $(shell $(PKGCONFIG) --variable='$(strip $(2))' $(1))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
 # Note: this doesn't work reliably in make 3.81, due to a bug, but
-# we already check for GNU Make 4.0+ in mk/compat.mk
+# we already check for GNU Make 4.0+ in mk/compat.mk.
+# See also: https://blog.jgc.org/2016/07/lazy-gnu-make-variables.html
 make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
 
 MAKEFLAGS += -r
