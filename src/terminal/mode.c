@@ -4,6 +4,8 @@
 #include "mode.h"
 #include "util/debug.h"
 
+// These are initialized during early startup and then never changed,
+// so they're deemed an "acceptable" use of globals:
 static bool initialized;
 static struct termios cooked, raw, raw_isig;
 
