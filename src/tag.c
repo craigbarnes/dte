@@ -10,7 +10,6 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
-#include "util/xsnprintf.h"
 
 typedef struct {
     char *filename;
