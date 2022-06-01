@@ -29,10 +29,12 @@
 #include "util/exitcode.h"
 #include "util/log.h"
 #include "util/macros.h"
+#include "util/path.h"
 #include "util/ptr-array.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+#include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
 
@@ -474,10 +476,12 @@ loop_break:;
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
+        char buf[4096];
         if (rc) {
             flags |= CFG_MUST_EXIST;
         } else {
-            rc = editor_file(e, "rc");
+            xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
+            rc = buf;
         }
         LOG_INFO("loading configuration from %s", rc);
         read_config(&normal_commands, rc, flags);
@@ -500,9 +504,10 @@ loop_break:;
     set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        file_history_load(&e->file_history, editor_file(e, "file-history"));
-        history_load(&e->command_history, editor_file(e, "command-history"));
-        history_load(&e->search_history, editor_file(e, "search-history"));
+        const char *dir = e->user_config_dir;
+        file_history_load(&e->file_history, path_join(dir, "file-history"));
+        history_load(&e->command_history, path_join(dir, "command-history"));
+        history_load(&e->search_history, path_join(dir, "search-history"));
         if (e->search_history.last) {
             search_set_regexp(&e->search, e->search_history.last->text);
         }

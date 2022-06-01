@@ -4,6 +4,7 @@
 #include "history.h"
 #include "util/numtostr.h"
 #include "util/readfile.h"
+#include "util/xmalloc.h"
 
 static void test_history_add(TestContext *ctx)
 {
@@ -110,7 +111,7 @@ static void test_history_search(TestContext *ctx)
 {
     const char *filename = "test/data/history";
     History h = {.max_entries = 64};
-    history_load(&h, filename);
+    history_load(&h, xstrdup(filename));
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.filename, filename);
     EXPECT_STREQ(h.first->text, "one");
@@ -141,11 +142,13 @@ static void test_history_search(TestContext *ctx)
     EXPECT_TRUE(history_search_backward(&h, &e, "th"));
     EXPECT_STREQ(e->text, "three");
 
-    h.filename = "build/test/saved_history";
+    free(h.filename);
+    filename = "build/test/saved_history";
+    h.filename = xstrdup(filename);
     history_save(&h);
     history_free(&h);
     char *buf = NULL;
-    ssize_t n = read_file(h.filename, &buf);
+    ssize_t n = read_file(filename, &buf);
     EXPECT_EQ(n, 14);
     EXPECT_STREQ(buf, "one\ntwo\nthree\n");
     free(buf);
@@ -171,7 +174,7 @@ static void test_file_history_find(TestContext *ctx)
 {
     const char *fh_filename = "test/data/file-history";
     FileHistory h = {.filename = NULL};
-    file_history_load(&h, fh_filename);
+    file_history_load(&h, xstrdup(fh_filename));
     EXPECT_STREQ(h.filename, fh_filename);
     EXPECT_EQ(h.entries.count, 3);
 

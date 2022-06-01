@@ -71,7 +71,7 @@ static bool parse_ulong_field(StringView *sv, unsigned long *valp)
     return true;
 }
 
-void file_history_load(FileHistory *history, const char *filename)
+void file_history_load(FileHistory *history, char *filename)
 {
     BUG_ON(!history);
     BUG_ON(!filename);
@@ -142,6 +142,8 @@ bool file_history_find(const FileHistory *history, const char *filename, unsigne
 void file_history_free(FileHistory *history)
 {
     hashmap_free(&history->entries, free);
+    free(history->filename);
+    history->filename = NULL;
     history->first = NULL;
     history->last = NULL;
 }

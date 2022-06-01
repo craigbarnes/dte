@@ -434,13 +434,6 @@ void ui_end(EditorState *e)
     term_cooked();
 }
 
-const char *editor_file(const EditorState *e, const char *name)
-{
-    char buf[4096];
-    size_t n = xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, name);
-    return mem_intern(buf, n);
-}
-
 static char get_choice(EditorState *e, const char *choices)
 {
     KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);

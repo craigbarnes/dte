@@ -89,7 +89,7 @@ bool history_search_backward (
     return false;
 }
 
-void history_load(History *history, const char *filename)
+void history_load(History *history, char *filename)
 {
     BUG_ON(!history);
     BUG_ON(!filename);
@@ -139,6 +139,8 @@ void history_save(const History *history)
 void history_free(History *history)
 {
     hashmap_free(&history->entries, free);
+    free(history->filename);
+    history->filename = NULL;
     history->first = NULL;
     history->last = NULL;
 }
