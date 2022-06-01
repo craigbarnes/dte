@@ -464,9 +464,10 @@ loop_break:;
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
     // Create this early. Needed if lock-files is true.
-    const char *editor_dir = e->user_config_dir;
-    if (mkdir(editor_dir, 0755) != 0 && errno != EEXIST) {
-        error_msg("Error creating %s: %s", editor_dir, strerror(errno));
+    const char *cfgdir = e->user_config_dir;
+    BUG_ON(!cfgdir);
+    if (mkdir(cfgdir, 0755) != 0 && errno != EEXIST) {
+        error_msg("Error creating %s: %s", cfgdir, strerror(errno));
         load_and_save_history = false;
         e->options.lock_files = false;
     }
@@ -480,7 +481,7 @@ loop_break:;
         if (rc) {
             flags |= CFG_MUST_EXIST;
         } else {
-            xsnprintf(buf, sizeof buf, "%s/%s", e->user_config_dir, "rc");
+            xsnprintf(buf, sizeof buf, "%s/%s", cfgdir, "rc");
             rc = buf;
         }
         LOG_INFO("loading configuration from %s", rc);
@@ -504,10 +505,9 @@ loop_break:;
     set_fatal_error_cleanup_handler(cleanup_handler, e);
 
     if (load_and_save_history) {
-        const char *dir = e->user_config_dir;
-        file_history_load(&e->file_history, path_join(dir, "file-history"));
-        history_load(&e->command_history, path_join(dir, "command-history"));
-        history_load(&e->search_history, path_join(dir, "search-history"));
+        file_history_load(&e->file_history, path_join(cfgdir, "file-history"));
+        history_load(&e->command_history, path_join(cfgdir, "command-history"));
+        history_load(&e->search_history, path_join(cfgdir, "search-history"));
         if (e->search_history.last) {
             search_set_regexp(&e->search, e->search_history.last->text);
         }
