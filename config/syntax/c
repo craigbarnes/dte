@@ -220,7 +220,25 @@ state bin numeric
 
 state hex numeric
     char 0-9a-fA-F this
+    char . hex-float
     noeat check-suffix
+
+state hex-float numeric
+    char 0-9a-fA-F this
+    char Pp hex-float-p
+    char a-zA-Z_+- error-ident
+    noeat c
+
+state hex-float-p numeric
+    char 0-9+- hex-float-exp
+    char a-zA-Z_ error-ident
+    noeat c
+
+state hex-float-exp numeric
+    char 0-9 this
+    char fFlL float-suffix
+    char a-zA-Z_ error-ident
+    noeat c
 
 state check-suffix error
     char -b a-zA-Z0-9_ this
