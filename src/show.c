@@ -40,6 +40,7 @@ extern char **environ;
 typedef enum {
     DTERC = 0x1, // Use "dte" filetype (and syntax highlighter)
     LASTLINE = 0x2, // Move cursor to last line (e.g. most recent history entry)
+    MSGLINE = 0x4, // Move cursor to line containing current message
 } ShowHandlerFlags;
 
 typedef struct {
@@ -63,10 +64,14 @@ static void open_temporary_buffer (
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
     buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
+
     if (flags & LASTLINE) {
         block_iter_eof(&v->cursor);
         block_iter_prev_line(&v->cursor);
+    } else if ((flags & MSGLINE) && e->messages.array.count > 0) {
+        block_iter_goto_line(&v->cursor, e->messages.pos);
     }
+
     if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(&e->file_options, v->buffer);
@@ -440,7 +445,7 @@ static const ShowHandler handlers[] = {
     {"hi", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
     {"include", 0, show_include, do_dump_builtin_configs, collect_builtin_configs},
     {"macro", DTERC, NULL, do_dump_macro, NULL},
-    {"msg", 0, NULL, do_dump_messages, NULL},
+    {"msg", MSGLINE, NULL, do_dump_messages, NULL},
     {"option", DTERC, show_option, do_dump_options, collect_all_options},
     {"search", LASTLINE, NULL, dump_search_history, NULL},
     {"wsplit", 0, show_wsplit, dump_frames, NULL},
