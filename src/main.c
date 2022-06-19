@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
     static const char optstring[] = "hBHKRVb:c:t:r:s:x:";
     const char *tag = NULL;
     const char *rc = NULL;
-    const char *command = NULL;
+    PointerArray commands = PTR_ARRAY_INIT;
     PointerArray extra_rc = PTR_ARRAY_INIT;
     bool read_rc = true;
     bool use_showkey = false;
@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
     while ((ch = getopt(argc, argv, optstring)) != -1) {
         switch (ch) {
         case 'c':
-            command = optarg;
+            ptr_array_append(&commands, optarg);
             break;
         case 't':
             tag = optarg;
@@ -559,8 +559,14 @@ loop_break:;
     set_view(e, window->views.ptrs[0]);
     ui_start(e);
 
-    if (command) {
-        handle_command(&normal_commands, command, false);
+    bool cflag = false;
+    if (commands.count > 0) {
+        for (size_t i = 0, n = commands.count; i < n; i++) {
+            const char *command = commands.ptrs[i];
+            handle_command(&normal_commands, command, false);
+        }
+        ptr_array_free_array(&commands);
+        cflag = true;
     }
 
     if (tag) {
@@ -572,7 +578,7 @@ loop_break:;
         // If window_open_empty_buffer() was called above
         empty_buffer
         // ...and no commands were executed via the "-c" flag
-        && !command
+        && !cflag
         // ...and a file was opened via the "-t" flag
         && tag && window->views.count > 1
     ) {
@@ -580,7 +586,7 @@ loop_break:;
         remove_view(e, window->views.ptrs[0]);
     }
 
-    if (command || tag) {
+    if (cflag || tag) {
         normal_update(e);
     }
 
