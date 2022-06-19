@@ -551,9 +551,12 @@ loop_break:;
         window_add_buffer(window, std_buffer);
     }
 
-    const View *empty_buffer = NULL;
+    View *empty_buffer = NULL;
     if (window->views.count == 0) {
         empty_buffer = window_open_empty_buffer(window);
+        BUG_ON(!empty_buffer);
+        BUG_ON(window->views.count != 1);
+        BUG_ON(empty_buffer != window->views.ptrs[0]);
     }
 
     set_view(e, window->views.ptrs[0]);
@@ -583,7 +586,8 @@ loop_break:;
         && tag && window->views.count > 1
     ) {
         // Close the empty buffer, leaving just the buffer opened via "-t"
-        remove_view(e, window->views.ptrs[0]);
+        remove_view(e, empty_buffer);
+        empty_buffer = NULL;
     }
 
     if (cflag || tag) {
