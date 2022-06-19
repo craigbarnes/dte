@@ -200,7 +200,7 @@ static void show_include(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, sv.data, sv.length);
     } else {
-        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, true);
+        open_temporary_buffer(e, sv.data, sv.length, "builtin", name, DTERC);
     }
 }
 
@@ -217,7 +217,7 @@ static void show_compiler(EditorState *e, const char *name, bool cflag)
     if (cflag) {
         buffer_insert_bytes(e->view, str.buffer, str.len);
     } else {
-        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, true);
+        open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, DTERC);
     }
     string_free(&str);
 }
