@@ -254,7 +254,7 @@ state float numeric
     char 0-9 this
     char eE exp
     char fFlL float-suffix
-    char a-zA-Z0-9_ error-ident
+    char a-zA-Z_ error-ident
     noeat c
 
 state float-suffix numeric
@@ -264,12 +264,12 @@ state float-suffix numeric
 state exp numeric
     char +- exp-digit
     char 0-9 exp-digit
-    char a-zA-Z0-9_ error-ident
+    char a-zA-Z_ error-ident
     noeat c
 
 state exp-digit numeric
     char 0-9 this
-    char a-zA-Z0-9_ error-ident
+    char a-zA-Z_ error-ident
     noeat c
 
 state error-ident error
