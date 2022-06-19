@@ -365,11 +365,10 @@ static const char usage[] =
 
 int main(int argc, char *argv[])
 {
-    static const char optstring[] = "hBHKRVb:c:t:r:s:x:";
+    static const char optstring[] = "hBHKRVb:c:t:r:s:";
     const char *tag = NULL;
     const char *rc = NULL;
     PointerArray commands = PTR_ARRAY_INIT;
-    PointerArray extra_rc = PTR_ARRAY_INIT;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
@@ -385,9 +384,6 @@ int main(int argc, char *argv[])
             break;
         case 'r':
             rc = optarg;
-            break;
-        case 'x':
-            ptr_array_append(&extra_rc, optarg);
             break;
         case 's':
             return lint_syntax(optarg);
@@ -488,13 +484,6 @@ loop_break:;
         read_config(&normal_commands, rc, flags);
     }
 
-    for (size_t i = 0, n = extra_rc.count; i < n; i++) {
-        const char *path = extra_rc.ptrs[i];
-        LOG_INFO("loading extra configuration from %s", path);
-        read_config(&normal_commands, path, CFG_MUST_EXIST);
-    }
-
-    ptr_array_free_array(&extra_rc);
     update_all_syntax_colors(&e->syntaxes, &e->colors);
 
     Window *window = new_window();
