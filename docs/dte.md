@@ -219,7 +219,8 @@ The following environment variables are inspected at startup:
     supported.
 
 `COLORTERM`
-:   Enables support for 24-bit terminal colors, if set to `truecolor`.
+:   Enables support for 24-bit terminal colors, if set to `truecolor` or
+    `24bit`.
 
 # Files
 
