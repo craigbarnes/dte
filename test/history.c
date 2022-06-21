@@ -172,7 +172,7 @@ static void test_history_tombstone_pressure(TestContext *ctx)
 
 static void test_file_history_find(TestContext *ctx)
 {
-    const char *fh_filename = "test/data/file-history";
+    const char fh_filename[] = "test/data/file-history";
     FileHistory h = {.filename = NULL};
     file_history_load(&h, xstrdup(fh_filename));
     EXPECT_STREQ(h.filename, fh_filename);

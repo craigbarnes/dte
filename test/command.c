@@ -354,7 +354,7 @@ static void test_parse_args(TestContext *ctx)
 static void test_cached_command_new(TestContext *ctx)
 {
     const CommandSet *cmds = &normal_commands;
-    const char *cmd_str = "open -t -e UTF-8 file.c inc.h";
+    const char cmd_str[] = "open -t -e UTF-8 file.c inc.h";
     CachedCommand *cc = cached_command_new(cmds, cmd_str);
     ASSERT_NONNULL(cc);
     ASSERT_NONNULL(cc->cmd);
@@ -506,10 +506,9 @@ static void test_cmdargs_convert_flags(TestContext *ctx)
 
 static void test_add_alias(TestContext *ctx)
 {
+    const char name[] = "insert-foo";
+    const char cmd[] = "insert -m foo";
     HashMap m = HASHMAP_INIT;
-    const char *name = "insert-foo";
-    const char *cmd = "insert -m foo";
-
     add_alias(&m, name, cmd);
     EXPECT_STREQ(find_alias(&m, name), cmd);
     EXPECT_EQ(m.count, 1);

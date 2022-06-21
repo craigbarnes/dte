@@ -19,7 +19,7 @@ static void test_add_binding(TestContext *ctx)
     const Command *insert_cmd = find_normal_command("insert");
     ASSERT_NONNULL(insert_cmd);
 
-    const char *cmd_str = "insert xyz";
+    const char cmd_str[] = "insert xyz";
     add_binding(kbg, key, cmd_str);
     bind = lookup_binding(kbg, key);
     ASSERT_NONNULL(bind);

@@ -1711,13 +1711,13 @@ static void test_hashmap(TestContext *ctx)
     EXPECT_EQ(map.mask, 511);
     hashmap_free(&map, NULL);
 
-    const char *val = "VAL";
+    const char val[] = "VAL";
     char *key = xstrdup("KEY");
     EXPECT_NULL(hashmap_insert_or_replace(&map, key, (char*)val));
     EXPECT_EQ(map.count, 1);
     EXPECT_STREQ(hashmap_get(&map, "KEY"), val);
 
-    const char *new_val = "NEW";
+    const char new_val[] = "NEW";
     char *duplicate_key = xstrdup(key);
     EXPECT_PTREQ(val, hashmap_insert_or_replace(&map, duplicate_key, (char*)new_val));
     EXPECT_EQ(map.count, 1);
@@ -1819,7 +1819,7 @@ static void test_intmap(TestContext *ctx)
     EXPECT_NULL(intmap_get(&map, 0));
     intmap_free(&map, free);
 
-    const char *value = "value";
+    const char value[] = "value";
     EXPECT_NULL(intmap_insert_or_replace(&map, 0, xstrdup(value)));
     EXPECT_NULL(intmap_insert_or_replace(&map, 1, xstrdup(value)));
     EXPECT_NULL(intmap_insert_or_replace(&map, 2, xstrdup(value)));
@@ -1999,8 +1999,8 @@ static void test_short_filename_cwd(TestContext *ctx)
     EXPECT_STREQ(s, "~/file");
     free(s);
 
-    const char *abs = "/a/b";
-    const char *cwd = "/a/x/c";
+    const char abs[] = "/a/b";
+    const char cwd[] = "/a/x/c";
     char *rel = path_relative(abs, cwd);
     EXPECT_TRUE(strlen(abs) < strlen(rel));
     EXPECT_STREQ(rel, "../../b");
@@ -2013,7 +2013,7 @@ static void test_short_filename_cwd(TestContext *ctx)
 static void test_short_filename(TestContext *ctx)
 {
     const StringView home = STRING_VIEW("/home/user");
-    const char *rel = "test/main.c";
+    const char rel[] = "test/main.c";
     char *abs = path_absolute(rel);
     ASSERT_NONNULL(abs);
     char *s = short_filename(abs, &home);
@@ -2062,7 +2062,7 @@ static void test_path_absolute(TestContext *ctx)
     EXPECT_STREQ(path, NULL);
     free(path);
 
-    const char *linkpath = "./build/../build/test/test-symlink";
+    const char linkpath[] = "./build/../build/test/test-symlink";
     if (symlink("../../README.md", linkpath) != 0) {
         TEST_FAIL("symlink() failed: %s", strerror(errno));
         return;

@@ -128,7 +128,7 @@ static void test_exec_config(TestContext *ctx)
         expect_files_equal(ctx, "build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 
-    EditorState *e = ctx->userdata;
+    const EditorState *e = ctx->userdata;
     const StringView s = STRING_VIEW("toggle utf8-bom \\");
     EXPECT_FALSE(e->options.utf8_bom);
     exec_config(cmds, s);
@@ -139,7 +139,7 @@ static void test_exec_config(TestContext *ctx)
 
 static void test_detect_indent(TestContext *ctx)
 {
-    EditorState *e = ctx->userdata;
+    const EditorState *e = ctx->userdata;
     const CommandSet *cmds = &normal_commands;
     EXPECT_FALSE(e->options.detect_indent);
     EXPECT_FALSE(e->options.expand_tab);
