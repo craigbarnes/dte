@@ -19,6 +19,7 @@
 #include "editor.h"
 #include "encoding.h"
 #include "error.h"
+#include "exec.h"
 #include "file-option.h"
 #include "filetype.h"
 #include "frame.h"
@@ -587,119 +588,6 @@ static void cmd_errorfmt(EditorState *e, const CommandArgs *a)
     add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
 }
 
-static void open_files_from_string(EditorState *e, const String *str)
-{
-    PointerArray filenames = PTR_ARRAY_INIT;
-    for (size_t pos = 0, size = str->len; pos < size; ) {
-        char *filename = buf_next_line(str->buffer, &pos, size);
-        if (filename[0] != '\0') {
-            ptr_array_append(&filenames, filename);
-        }
-    }
-
-    ptr_array_append(&filenames, NULL);
-    window_open_files(e, e->window, (char**)filenames.ptrs, NULL);
-    macro_command_hook("open", (char**)filenames.ptrs);
-    ptr_array_free_array(&filenames);
-}
-
-static void parse_and_activate_message(EditorState *e, const String *str)
-{
-    size_t x;
-    if (buf_parse_size(str->buffer, str->len, &x) > 0 && x > 0) {
-        activate_message(&e->messages, x - 1);
-    }
-}
-
-static void parse_and_goto_tag(EditorState *e, const String *str)
-{
-    if (unlikely(str->len == 0)) {
-        error_msg("child produced no output");
-        return;
-    }
-
-    Tag tag;
-    size_t pos = 0;
-    const char *line = buf_next_line(str->buffer, &pos, str->len);
-    if (pos == 0) {
-        return;
-    }
-
-    if (!parse_ctags_line(&tag, line, pos - 1)) {
-        // Treat line as simple tag name
-        tag_lookup(line, e->buffer->abs_filename, &e->messages);
-        goto activate;
-    }
-
-    char buf[8192];
-    const char *cwd = getcwd(buf, sizeof buf);
-    if (unlikely(!cwd)) {
-        error_msg("getcwd() failed: %s", strerror(errno));
-        return;
-    }
-
-    StringView dir = strview_from_cstring(cwd);
-    clear_messages(&e->messages);
-    add_message_for_tag(&e->messages, &tag, &dir);
-
-activate:
-    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
-}
-
-static const char **lines_and_columns_env(const Window *window)
-{
-    static char lines[DECIMAL_STR_MAX(window->edit_h)];
-    static char columns[DECIMAL_STR_MAX(window->edit_w)];
-    static const char *vars[] = {
-        "LINES", lines,
-        "COLUMNS", columns,
-        NULL,
-    };
-
-    xsnprintf(lines, sizeof lines, "%d", window->edit_h);
-    xsnprintf(columns, sizeof columns, "%d", window->edit_w);
-    return vars;
-}
-
-static void show_spawn_error_msg(const String *errstr, int err)
-{
-    if (err <= 0) {
-        return;
-    }
-
-    char msg[512];
-    if (errstr->len) {
-        size_t pos = 0;
-        StringView line = buf_slice_next_line(errstr->buffer, &pos, errstr->len);
-        BUG_ON(pos == 0);
-        xsnprintf(msg, sizeof(msg), ": \"%.*s\"", (int)line.length, line.data);
-    } else {
-        msg[0] = '\0';
-    }
-
-    if (err >= 256) {
-        int sig = err >> 8;
-        const char *str = strsignal(sig);
-        error_msg("Child received signal %d (%s)%s", sig, str ? str : "??", msg);
-    } else if (err) {
-        error_msg("Child returned %d%s", err, msg);
-    }
-}
-
-typedef enum {
-    // Note: these need to be kept sorted
-    EXEC_BUFFER,
-    EXEC_ERRMSG,
-    EXEC_EVAL,
-    EXEC_LINE,
-    EXEC_MSG,
-    EXEC_NULL,
-    EXEC_OPEN,
-    EXEC_TAG,
-    EXEC_TTY,
-    EXEC_WORD,
-} ExecAction;
-
 typedef enum {
     IN = 1 << 0,
     OUT = 1 << 1,
@@ -709,19 +597,18 @@ typedef enum {
 
 static const struct {
     char name[7];
-    uint8_t spawn_action : 2; // SpawnAction
-    uint8_t flags : 6; // ExecFlags
+    uint8_t flags; // ExecFlags
 } exec_map[] = {
-    [EXEC_BUFFER] = {"buffer", SPAWN_PIPE, IN | OUT},
-    [EXEC_ERRMSG] = {"errmsg", SPAWN_PIPE, ERR},
-    [EXEC_EVAL] = {"eval", SPAWN_PIPE, OUT},
-    [EXEC_LINE] = {"line", SPAWN_PIPE, IN},
-    [EXEC_MSG] = {"msg", SPAWN_PIPE, IN | OUT},
-    [EXEC_NULL] = {"null", SPAWN_NULL, ALL},
-    [EXEC_OPEN] = {"open", SPAWN_PIPE, OUT},
-    [EXEC_TAG] = {"tag", SPAWN_PIPE, OUT},
-    [EXEC_TTY] = {"tty", SPAWN_TTY, ALL},
-    [EXEC_WORD] = {"word", SPAWN_PIPE, IN},
+    [EXEC_BUFFER] = {"buffer", IN | OUT},
+    [EXEC_ERRMSG] = {"errmsg", ERR},
+    [EXEC_EVAL] = {"eval", OUT},
+    [EXEC_LINE] = {"line", IN},
+    [EXEC_MSG] = {"msg", IN | OUT},
+    [EXEC_NULL] = {"null", ALL},
+    [EXEC_OPEN] = {"open", OUT},
+    [EXEC_TAG] = {"tag", OUT},
+    [EXEC_TTY] = {"tty", ALL},
+    [EXEC_WORD] = {"word", IN},
 };
 
 UNITTEST {
@@ -734,7 +621,7 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
     SpawnFlags spawn_flags = 0;
     bool lflag = false;
     bool move_after_insert = false;
-    bool strip_trailing_newline = false;
+    bool strip_nl = false;
 
     for (size_t i = 0, n = a->nr_flags, x = 0; i < n; i++) {
         size_t fd_idx;
@@ -747,7 +634,7 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
             case 't': spawn_flags &= ~SPAWN_QUIET; continue;
             case 'l': lflag = true; continue;
             case 'm': move_after_insert = true; continue;
-            case 'n': strip_trailing_newline = true; continue;
+            case 'n': strip_nl = true; continue;
             default: BUG("unexpected flag"); return;
         }
         const char *flag_arg = a->args[x++];
@@ -759,155 +646,20 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
         actions[fd_idx] = action;
     }
 
-    View *view = e->view;
-    BlockIter saved_cursor = view->cursor;
-    char *alloc = NULL;
-    const char **env = NULL;
-    if (actions[STDOUT_FILENO] == EXEC_BUFFER) {
-        env = lines_and_columns_env(e->window);
-    }
-    if (move_after_insert && actions[STDOUT_FILENO] != EXEC_BUFFER) {
-        move_after_insert = false;
-    }
     if (lflag && actions[STDIN_FILENO] == EXEC_BUFFER) {
         // For compat. with old "filter" and "pipe-to" commands
         actions[STDIN_FILENO] = EXEC_LINE;
     }
 
-    SpawnContext ctx = {
-        .argv = (const char **)a->args + a->nr_flag_args,
-        .outputs = {STRING_INIT, STRING_INIT},
-        .flags = spawn_flags,
-        .env = env,
-        .actions = {
-            exec_map[actions[0]].spawn_action,
-            exec_map[actions[1]].spawn_action,
-            exec_map[actions[2]].spawn_action,
-        },
-    };
-
-    switch (actions[STDIN_FILENO]) {
-    case EXEC_LINE:
-        if (view->selection) {
-            ctx.input.length = prepare_selection(view);
-        } else {
-            StringView line;
-            move_bol(view);
-            fill_line_ref(&view->cursor, &line);
-            ctx.input.length = line.length;
-        }
-        get_bytes:
-        alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
-        ctx.input.data = alloc;
-        break;
-    case EXEC_BUFFER:
-        if (view->selection) {
-            ctx.input.length = prepare_selection(view);
-        } else {
-            Block *blk;
-            block_for_each(blk, &view->buffer->blocks) {
-                ctx.input.length += blk->size;
-            }
-            move_bof(view);
-        }
-        goto get_bytes;
-    case EXEC_WORD:
-        if (view->selection) {
-            ctx.input.length = prepare_selection(view);
-        } else {
-            size_t offset;
-            StringView word = view_do_get_word_under_cursor(e->view, &offset);
-            if (word.length == 0) {
-                break;
-            }
-            // TODO: optimize this, so that the BlockIter moves by just the
-            // minimal word offset instead of iterating to a line offset
-            ctx.input.length = word.length;
-            move_bol(view);
-            view->cursor.offset += offset;
-            BUG_ON(view->cursor.offset >= view->cursor.blk->size);
-        }
-        goto get_bytes;
-    case EXEC_MSG: {
-        String messages = dump_messages(&e->messages);
-        ctx.input = strview_from_string(&messages),
-        alloc = messages.buffer;
-        break;
-    }
-    case EXEC_NULL:
-    case EXEC_TTY:
-        break;
-    // These are already handled by the validity check above:
-    case EXEC_OPEN:
-    case EXEC_TAG:
-    case EXEC_EVAL:
-    case EXEC_ERRMSG:
-    default:
-        BUG("unhandled action");
+    const char **argv = (const char **)a->args + a->nr_flag_args;
+    ssize_t outlen = handle_exec(e, argv, actions, spawn_flags, strip_nl);
+    if (outlen <= 0) {
         return;
     }
 
-    int err = spawn(&ctx);
-    free(alloc);
-    if (err != 0) {
-        show_spawn_error_msg(&ctx.outputs[1], err);
-        string_free(&ctx.outputs[0]);
-        string_free(&ctx.outputs[1]);
-        view->cursor = saved_cursor;
-        return;
+    if (move_after_insert && actions[STDOUT_FILENO] == EXEC_BUFFER) {
+        block_iter_skip_bytes(&e->view->cursor, outlen);
     }
-
-    string_free(&ctx.outputs[1]);
-    String *output = &ctx.outputs[0];
-    if (
-        strip_trailing_newline
-        && actions[STDOUT_FILENO] == EXEC_BUFFER
-        && output->len > 0
-        && output->buffer[output->len - 1] == '\n'
-    ) {
-        output->len--;
-        if (output->len > 0 && output->buffer[output->len - 1] == '\r') {
-            output->len--;
-        }
-    }
-
-    switch (actions[STDOUT_FILENO]) {
-    case EXEC_BUFFER: {
-        size_t del_count = ctx.input.length;
-        if (view->selection && del_count == 0) {
-            del_count = prepare_selection(view);
-        }
-        buffer_replace_bytes(view, del_count, output->buffer, output->len);
-        unselect(view);
-        break;
-    }
-    case EXEC_MSG:
-        parse_and_activate_message(e, output);
-        break;
-    case EXEC_OPEN:
-        open_files_from_string(e, output);
-        break;
-    case EXEC_TAG:
-        parse_and_goto_tag(e, output);
-        break;
-    case EXEC_EVAL:
-        exec_config(&normal_commands, strview_from_string(output));
-        break;
-    case EXEC_NULL:
-    case EXEC_TTY:
-        break;
-    case EXEC_LINE: // Already handled above
-    case EXEC_ERRMSG:
-    case EXEC_WORD:
-    default:
-        BUG("unhandled action");
-        return;
-    }
-
-    if (move_after_insert) {
-        block_iter_skip_bytes(&view->cursor, output->len);
-    }
-    string_free(output);
 }
 
 static void cmd_ft(EditorState *e, const CommandArgs *a)
