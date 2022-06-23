@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "exec.h"
+#include "fork-exec.h"
 #include "debug.h"
 #include "xreadwrite.h"
 

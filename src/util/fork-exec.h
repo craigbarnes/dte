@@ -1,5 +1,5 @@
-#ifndef UTIL_EXEC_H
-#define UTIL_EXEC_H
+#ifndef UTIL_FORK_EXEC_H
+#define UTIL_FORK_EXEC_H
 
 #include <fcntl.h>
 #include <stdbool.h>

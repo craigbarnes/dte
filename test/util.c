@@ -10,7 +10,7 @@
 #include "util/ascii.h"
 #include "util/base64.h"
 #include "util/bit.h"
-#include "util/exec.h"
+#include "util/fork-exec.h"
 #include "util/hash.h"
 #include "util/hashmap.h"
 #include "util/hashset.h"
