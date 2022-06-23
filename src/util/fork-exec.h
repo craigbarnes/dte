@@ -6,24 +6,24 @@
 #include <sys/types.h>
 #include "macros.h"
 
-static inline bool fd_set_cloexec(int fd, bool cloexec)
+static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool state)
 {
-    int flags = fcntl(fd, F_GETFD);
+    int flags = fcntl(fd, get_cmd);
     if (unlikely(flags < 0)) {
         return false;
     }
-    int new_flags = cloexec ? (flags | FD_CLOEXEC) : (flags & ~FD_CLOEXEC);
-    return new_flags == flags || fcntl(fd, F_SETFD, new_flags) != -1;
+    int new_flags = state ? (flags | flag) : (flags & ~flag);
+    return new_flags == flags || fcntl(fd, set_cmd, new_flags) != -1;
+}
+
+static inline bool fd_set_cloexec(int fd, bool cloexec)
+{
+    return fd_set_flag(fd, FD_CLOEXEC, F_GETFD, F_SETFD, cloexec);
 }
 
 static inline bool fd_set_nonblock(int fd, bool nonblock)
 {
-    int flags = fcntl(fd, F_GETFL);
-    if (unlikely(flags < 0)) {
-        return false;
-    }
-    int new_flags = nonblock ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
-    return new_flags == flags || fcntl(fd, F_SETFL, new_flags) != -1;
+    return fd_set_flag(fd, O_NONBLOCK, F_GETFL, F_SETFL, nonblock);
 }
 
 int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;
