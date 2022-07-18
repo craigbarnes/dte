@@ -391,7 +391,7 @@ static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 
     const char *str = string_borrow_cstring(&c->buf);
     cmdline_clear(c);
-    if (str[0] != ' ') {
+    if (!cmdargs_has_flag(a, 'H') && str[0] != ' ') {
         // This is done before handle_command() because "command [text]"
         // can modify the contents of the command-line
         history_add(&e->command_history, str);
@@ -404,7 +404,6 @@ static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 {
     CommandLine *c = &e->cmdline;
-
     if (cmdargs_has_flag(a, 'e')) {
         if (c->buf.len == 0) {
             return;
@@ -423,24 +422,33 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         free(original);
     }
 
-    const char *args[3] = {NULL, NULL, NULL};
+    const char *args[4];
+    size_t i = 0;
     if (c->buf.len > 0) {
         const char *str = string_borrow_cstring(&c->buf);
         search_set_regexp(&e->search, str);
-        history_add(&e->search_history, str);
-        if (unlikely(str[0] == '-')) {
-            args[0] = "--";
-            args[1] = str;
+        if (cmdargs_has_flag(a, 'H')) {
+            args[i++] = "-H";
         } else {
-            args[0] = str;
+            history_add(&e->search_history, str);
         }
+        if (unlikely(str[0] == '-')) {
+            args[i++] = "--";
+        }
+        args[i++] = str;
     } else {
-        args[0] = "-n";
+        args[i++] = "-n";
     }
 
+    args[i] = NULL;
     current_command = NULL;
     search_next(e);
+
+    // TODO: move "recording_macro" global into EditorState struct and avoid
+    // calling this function (and constructing args above) if no macro is
+    // being recorded
     macro_command_hook("search", (char**)args);
+
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
 }
@@ -470,12 +478,12 @@ static const Command common_cmds[] = {
 };
 
 static const Command search_cmds[] = {
-    {"accept", "e", false, 0, 0, cmd_search_mode_accept},
+    {"accept", "eH", false, 0, 0, cmd_search_mode_accept},
     {"direction", "", false, 0, 0, cmd_direction},
 };
 
 static const Command command_cmds[] = {
-    {"accept", "", false, 0, 0, cmd_command_mode_accept},
+    {"accept", "H", false, 0, 0, cmd_command_mode_accept},
     {"complete-next", "", false, 0, 0, cmd_complete_next},
     {"complete-prev", "", false, 0, 0, cmd_complete_prev},
 };
