@@ -1715,6 +1715,7 @@ UNITTEST {
     ref |= cmdargs_flagset_value('p');
     ref |= cmdargs_flagset_value('w');
     BUG_ON(get_flagset_npw() != ref);
+    BUG_ON(u64_popcount(ref) != 3);
 }
 
 static void cmd_search(EditorState *e, const CommandArgs *a)
