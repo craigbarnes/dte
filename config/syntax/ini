@@ -1,6 +1,20 @@
+syntax .ini-comment
+
+state maybe-comment text
+    char " \t" this
+    char '#;' comment
+    noeat END
+
+state comment
+    char -n "\n" this
+    noeat END
+
 syntax ini
 
-list constant true false
+# Note: this syntax supports comments starting with '#' or ';', but they
+# must be either at the start of a line or preceded by at least 1 space
+# or tab character. This is in-keeping with INI parsers like libnih and
+# various other implementations.
 
 state line-start
     char " \t\n" this
@@ -15,13 +29,12 @@ state section ini.section
     eat this
 
 state section-end
+    char " \t" .ini-comment:this
     char "\n" line-start
-    char # comment
-    char " \t" this
     eat this error
 
 state text
-    char # comment
+    char " \t" .ini-comment:this
     char -b = key operator
     char -b -n "\n" text
     noeat line-start
@@ -37,7 +50,7 @@ state value
     char -b a-z this
     # FIXME: does this highlight constants with trailing characters?
     inlist constant this constant
-    char # comment
+    char " \t" .ini-comment:this
     char "\n" line-start
     eat this
 
@@ -54,3 +67,5 @@ state double-quote string
 state comment
     char "\n" line-start
     eat this
+
+list constant true false
