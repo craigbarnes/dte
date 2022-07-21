@@ -13,8 +13,8 @@ syntax ini
 
 # Note: this syntax supports comments starting with '#' or ';', but they
 # must be either at the start of a line or preceded by at least 1 space
-# or tab character. This is in-keeping with INI parsers like libnih and
-# various other implementations.
+# or tab character. This is in-keeping with parser libraries like inih
+# (https://github.com/benhoyt/inih) and various other implementations.
 
 state line-start
     char " \t\n" this
