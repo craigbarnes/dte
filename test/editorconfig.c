@@ -1,8 +1,68 @@
 #include <stdlib.h>
 #include "test.h"
 #include "editorconfig/editorconfig.h"
+#include "editorconfig/ini.h"
 #include "editorconfig/match.h"
 #include "util/path.h"
+
+static void test_ini_parse(TestContext *ctx)
+{
+    static const char input[] =
+        " \t  key = val   #   inline comment    \n"
+        "\n"
+        " \t [section 1] #; ...\n"
+        "xyz = 123\n"
+        "\tfoo bar = this;is#not#a;comment\n"
+        "[section 2]\n"
+        " x=0"
+    ;
+
+    IniParserContext ini = {
+        .input = input,
+        .input_len = sizeof(input) - 1,
+    };
+
+    ASSERT_TRUE(ini_parse(&ini));
+    ASSERT_NONNULL(ini.name.data);
+    ASSERT_NONNULL(ini.value.data);
+    EXPECT_NULL(ini.section.data);
+    EXPECT_EQ(ini.pos, 39);
+    EXPECT_EQ(ini.name_count, 1);
+    EXPECT_TRUE(strview_equal_cstring(&ini.name, "key"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.value, "val"));
+
+    ASSERT_TRUE(ini_parse(&ini));
+    ASSERT_NONNULL(ini.name.data);
+    ASSERT_NONNULL(ini.value.data);
+    ASSERT_NONNULL(ini.section.data);
+    EXPECT_EQ(ini.pos, 72);
+    EXPECT_EQ(ini.name_count, 1);
+    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.name, "xyz"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.value, "123"));
+
+    ASSERT_TRUE(ini_parse(&ini));
+    ASSERT_NONNULL(ini.name.data);
+    ASSERT_NONNULL(ini.value.data);
+    ASSERT_NONNULL(ini.section.data);
+    EXPECT_EQ(ini.pos, 105);
+    EXPECT_EQ(ini.name_count, 2);
+    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 1"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.name, "foo bar"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.value, "this;is#not#a;comment"));
+
+    ASSERT_TRUE(ini_parse(&ini));
+    ASSERT_NONNULL(ini.name.data);
+    ASSERT_NONNULL(ini.value.data);
+    ASSERT_NONNULL(ini.section.data);
+    EXPECT_EQ(ini.pos, 121);
+    EXPECT_EQ(ini.name_count, 1);
+    EXPECT_TRUE(strview_equal_cstring(&ini.section, "section 2"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.name, "x"));
+    EXPECT_TRUE(strview_equal_cstring(&ini.value, "0"));
+
+    EXPECT_FALSE(ini_parse(&ini));
+}
 
 static void test_editorconfig_pattern_match(TestContext *ctx)
 {
@@ -101,6 +161,7 @@ static void test_get_editorconfig_options(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_ini_parse),
     TEST(test_editorconfig_pattern_match),
     TEST(test_get_editorconfig_options),
 };
