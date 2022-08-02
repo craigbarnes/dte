@@ -11,6 +11,7 @@
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
+#include "util/xsnprintf.h"
 
 enum {
     NS_PER_SECOND = 1000000000LL
@@ -63,37 +64,45 @@ static uintmax_t timespec_to_ns(struct timespec *ts)
     return ns;
 }
 
-static void bench_find_ft(void)
+static void print_result(const char *name, struct timespec *diff, unsigned int iters)
 {
-    static const struct {
-        const char expected_ft[8];
-        const char *filename;
-    } inputs[] = {
-        {"tex", "/home/user/subdir/example.tex"},
-        {"make", "/home/user/subdir/Makefile"},
-        {"c", "/usr/include/stdlib.h"},
-        {"config", "/etc/hosts"},
-    };
+    uintmax_t ns = timespec_to_ns(diff);
+    fprintf(stderr, "   BENCH  %-30s  %9ju ns/iter\n", name, ns / iters);
+}
 
-    static_assert(IS_POWER_OF_2(ARRAYLEN(inputs)));
-    size_t mask = ARRAYLEN(inputs) - 1;
+static void do_bench_find_ft(const char *expected_ft, const char *filename)
+{
+    BUG_ON(expected_ft[0] == '/');
+    BUG_ON(filename[0] != '/');
+
     PointerArray filetypes = PTR_ARRAY_INIT;
     StringView line = STRING_VIEW_INIT;
+    if (!xstreq(find_ft(&filetypes, filename, line), expected_ft)) {
+        fail("unexpected return value for find_ft() in %s()", __func__);
+    }
+
     unsigned int iterations = 300000;
     struct timespec start, end, diff;
     get_time(&start);
 
     for (unsigned int i = 0; i < iterations; i++) {
-        const char *filename = inputs[i & mask].filename;
-        const char *ft = find_ft(&filetypes, filename, line);
-        const char *expected = inputs[i & mask].expected_ft;
-        BUG_ON(!xstreq(ft, expected));
+        find_ft(&filetypes, filename, line);
     }
 
     get_time(&end);
     timespec_subtract(&end, &start, &diff);
-    uintmax_t ns = timespec_to_ns(&diff);
-    fprintf(stderr, "   BENCH  %-30s  %9ju ns/iter\n", __func__, ns / iterations);
+
+    char name[64];
+    xsnprintf(name, sizeof name, "find_ft() -> %s", expected_ft);
+    print_result(name, &diff, iterations);
+}
+
+static void bench_find_ft(void)
+{
+    do_bench_find_ft("tex", "/home/user/tex/example.tex");
+    do_bench_find_ft("make", "/home/xyz/code/Makefile");
+    do_bench_find_ft("c", "/usr/include/stdlib.h");
+    do_bench_find_ft("config", "/etc/hosts");
 }
 
 int main(void)
