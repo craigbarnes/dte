@@ -1,5 +1,5 @@
-#ifndef UTIL_CHECKED_ARITH_H
-#define UTIL_CHECKED_ARITH_H
+#ifndef UTIL_ARITH_H
+#define UTIL_ARITH_H
 
 #include <stdbool.h>
 #include <stddef.h>
