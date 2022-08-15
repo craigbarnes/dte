@@ -266,7 +266,7 @@ static String term_read_detected_paste(TermInputBuffer *input)
         str.len += n;
     }
 
-    strn_replace_byte(str.buffer, str.len, '\r', '\n');
+    string_replace_byte(&str, '\r', '\n');
     return str;
 }
 
@@ -313,7 +313,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     }
 
     LOG_INFO("received bracketed paste of %zu bytes", str.len);
-    strn_replace_byte(str.buffer, str.len, '\r', '\n');
+    string_replace_byte(&str, '\r', '\n');
     return str;
 
 read_error:

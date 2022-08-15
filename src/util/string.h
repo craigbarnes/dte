@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "macros.h"
+#include "str-util.h"
 #include "string-view.h"
 #include "unicode.h"
 #include "xmalloc.h"
@@ -47,6 +48,11 @@ static inline void string_append_cstring(String *s, const char *cstr)
 static inline void string_append_strview(String *s, const StringView *sv)
 {
     string_append_buf(s, sv->data, sv->length);
+}
+
+static inline void string_replace_byte(String *s, char byte, char rep)
+{
+    strn_replace_byte(s->buffer, s->len, byte, rep);
 }
 
 static inline StringView strview_from_string(const String *s)

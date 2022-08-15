@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "string.h"
+#include "debug.h"
 #include "utf8.h"
 #include "xmalloc.h"
-#include "debug.h"
 
 static COLD void string_grow(String *s, size_t min_alloc)
 {

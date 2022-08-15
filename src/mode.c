@@ -54,7 +54,7 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
 static void cmdline_insert_paste(CommandLine *c, TermInputBuffer *input, bool bracketed)
 {
     String str = term_read_paste(input, bracketed);
-    strn_replace_byte(str.buffer, str.len, '\n', ' ');
+    string_replace_byte(&str, '\n', ' ');
     string_insert_buf(&c->buf, c->pos, str.buffer, str.len);
     c->pos += str.len;
     c->search_pos = NULL;
