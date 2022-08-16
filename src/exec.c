@@ -143,8 +143,9 @@ ssize_t handle_exec (
 ) {
     View *view = e->view;
     BlockIter saved_cursor = view->cursor;
-    bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     char *alloc = NULL;
+    bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
+    bool replace_input = false;
 
     SpawnContext ctx = {
         .argv = argv,
@@ -168,6 +169,7 @@ ssize_t handle_exec (
             fill_line_ref(&view->cursor, &line);
             ctx.input.length = line.length;
         }
+        replace_input = true;
         get_bytes:
         alloc = block_iter_get_bytes(&view->cursor, ctx.input.length);
         ctx.input.data = alloc;
@@ -182,10 +184,12 @@ ssize_t handle_exec (
             }
             move_bof(view);
         }
+        replace_input = true;
         goto get_bytes;
     case EXEC_WORD:
         if (view->selection) {
             ctx.input.length = prepare_selection(view);
+            replace_input = true;
         } else {
             size_t offset;
             StringView word = view_do_get_word_under_cursor(e->view, &offset);
@@ -245,15 +249,15 @@ ssize_t handle_exec (
     }
 
     switch (actions[STDOUT_FILENO]) {
-    case EXEC_BUFFER: {
-        size_t del_count = ctx.input.length;
-        if (view->selection && del_count == 0) {
-            del_count = prepare_selection(view);
+    case EXEC_BUFFER:
+        if (replace_input || view->selection) {
+            size_t del_count = replace_input ? ctx.input.length : prepare_selection(view);
+            buffer_replace_bytes(view, del_count, output->buffer, output->len);
+            unselect(view);
+        } else {
+            buffer_insert_bytes(view, output->buffer, output->len);
         }
-        buffer_replace_bytes(view, del_count, output->buffer, output->len);
-        unselect(view);
         break;
-    }
     case EXEC_MSG:
         parse_and_activate_message(e, output);
         break;
