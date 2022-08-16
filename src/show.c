@@ -285,12 +285,12 @@ static String do_history_dump(const History *history)
     return buf;
 }
 
-static String dump_command_history(EditorState *e)
+String dump_command_history(EditorState *e)
 {
     return do_history_dump(&e->command_history);
 }
 
-static String dump_search_history(EditorState *e)
+String dump_search_history(EditorState *e)
 {
     return do_history_dump(&e->search_history);
 }

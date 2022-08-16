@@ -10,12 +10,14 @@
 // Note: these need to be kept sorted
 typedef enum {
     EXEC_BUFFER,
+    EXEC_COMMAND,
     EXEC_ERRMSG,
     EXEC_EVAL,
     EXEC_LINE,
     EXEC_MSG,
     EXEC_NULL,
     EXEC_OPEN,
+    EXEC_SEARCH,
     EXEC_TAG,
     EXEC_TTY,
     EXEC_WORD,

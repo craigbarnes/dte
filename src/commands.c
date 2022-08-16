@@ -596,16 +596,18 @@ typedef enum {
 } ExecFlags;
 
 static const struct {
-    char name[7];
+    char name[8];
     uint8_t flags; // ExecFlags
 } exec_map[] = {
     [EXEC_BUFFER] = {"buffer", IN | OUT},
+    [EXEC_COMMAND] = {"command", IN},
     [EXEC_ERRMSG] = {"errmsg", ERR},
     [EXEC_EVAL] = {"eval", OUT},
     [EXEC_LINE] = {"line", IN},
     [EXEC_MSG] = {"msg", IN | OUT},
     [EXEC_NULL] = {"null", ALL},
     [EXEC_OPEN] = {"open", OUT},
+    [EXEC_SEARCH] = {"search", IN},
     [EXEC_TAG] = {"tag", OUT},
     [EXEC_TTY] = {"tty", ALL},
     [EXEC_WORD] = {"word", IN},

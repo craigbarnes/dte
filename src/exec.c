@@ -13,6 +13,7 @@
 #include "move.h"
 #include "msg.h"
 #include "selection.h"
+#include "show.h"
 #include "tag.h"
 #include "util/debug.h"
 #include "util/ptr-array.h"
@@ -32,6 +33,10 @@ static void open_files_from_string(EditorState *e, const String *str)
         if (filename[0] != '\0') {
             ptr_array_append(&filenames, filename);
         }
+    }
+
+    if (filenames.count == 0) {
+        return;
     }
 
     ptr_array_append(&filenames, NULL);
@@ -210,6 +215,18 @@ ssize_t handle_exec (
         alloc = messages.buffer;
         break;
     }
+    case EXEC_COMMAND: {
+        String hist = dump_command_history(e);
+        ctx.input = strview_from_string(&hist),
+        alloc = hist.buffer;
+        break;
+    }
+    case EXEC_SEARCH: {
+        String hist = dump_search_history(e);
+        ctx.input = strview_from_string(&hist),
+        alloc = hist.buffer;
+        break;
+    }
     case EXEC_NULL:
     case EXEC_TTY:
         break;
@@ -274,8 +291,10 @@ ssize_t handle_exec (
     case EXEC_TTY:
         break;
     // These can't be used as output actions
-    case EXEC_LINE:
+    case EXEC_COMMAND:
     case EXEC_ERRMSG:
+    case EXEC_LINE:
+    case EXEC_SEARCH:
     case EXEC_WORD:
     default:
         BUG("unhandled action");
