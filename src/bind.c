@@ -10,6 +10,7 @@
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
+#include "editor.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
@@ -45,9 +46,10 @@ bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
 
     // If the command isn't cached or a macro is being recorded
     const CommandSet *cmds = kbg->cmds;
-    if (!binding->cmd || macro_is_recording()) {
+    const EditorState *e = cmds->userdata;
+    if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
-        handle_command(cmds, binding->cmd_str, !!cmds->allow_recording);
+        handle_command(cmds, binding->cmd_str, true);
         return true;
     }
 

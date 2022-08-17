@@ -428,9 +428,9 @@ static String do_dump_messages(EditorState *e)
     return dump_messages(&e->messages);
 }
 
-static String do_dump_macro(EditorState* UNUSED_ARG(e))
+static String do_dump_macro(EditorState *e)
 {
-    return dump_macro();
+    return dump_macro(&e->macro);
 }
 
 static const ShowHandler handlers[] = {

@@ -201,10 +201,11 @@ static void test_global_state(TestContext *ctx)
 static void test_macro_record(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
+    CommandMacroState *m = &e->macro;
     EXPECT_EQ(e->input_mode, INPUT_NORMAL);
-    EXPECT_FALSE(macro_is_recording());
-    macro_record();
-    EXPECT_TRUE(macro_is_recording());
+    EXPECT_FALSE(macro_is_recording(m));
+    macro_record(m);
+    EXPECT_TRUE(macro_is_recording(m));
 
     const CommandSet *cmds = &normal_commands;
     handle_command(cmds, "open", false);
@@ -217,15 +218,15 @@ static void test_macro_record(TestContext *ctx)
 
     const StringView t1 = STRING_VIEW("test 1\n");
     insert_text(e->view, t1.data, t1.length, true);
-    macro_insert_text_hook(t1.data, t1.length);
+    macro_insert_text_hook(m, t1.data, t1.length);
 
     const StringView t2 = STRING_VIEW("-- test 2");
     insert_text(e->view, t2.data, t2.length, true);
-    macro_insert_text_hook(t2.data, t2.length);
+    macro_insert_text_hook(m, t2.data, t2.length);
 
-    EXPECT_TRUE(macro_is_recording());
-    macro_stop();
-    EXPECT_FALSE(macro_is_recording());
+    EXPECT_TRUE(macro_is_recording(m));
+    macro_stop(m);
+    EXPECT_FALSE(macro_is_recording(m));
 
     handle_command (
         cmds,

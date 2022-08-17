@@ -519,45 +519,6 @@ static void test_add_alias(TestContext *ctx)
     hashmap_free(&m, free);
 }
 
-static void test_allow_macro_recording(TestContext *ctx)
-{
-    const CommandSet *cmds = &normal_commands;
-    const char *args[4] = {NULL};
-    char **argp = (char**)args;
-
-    const Command *cmd = cmds->lookup("left");
-    ASSERT_NONNULL(cmd);
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-
-    cmd = cmds->lookup("exec");
-    ASSERT_NONNULL(cmd);
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-
-    cmd = cmds->lookup("command");
-    ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(cmds->allow_recording(cmd, argp));
-
-    cmd = cmds->lookup("macro");
-    ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(cmds->allow_recording(cmd, argp));
-
-    cmd = cmds->lookup("search");
-    ASSERT_NONNULL(cmd);
-    EXPECT_FALSE(cmds->allow_recording(cmd, argp));
-    args[0] = "xyz";
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-    args[0] = "-n";
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-    args[0] = "-p";
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-    args[0] = "-w";
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-    args[0] = "-Hr";
-    EXPECT_FALSE(cmds->allow_recording(cmd, argp));
-    args[1] = "str";
-    EXPECT_TRUE(cmds->allow_recording(cmd, argp));
-}
-
 static const TestEntry tests[] = {
     TEST(test_parse_command_arg),
     TEST(test_parse_commands),
@@ -570,7 +531,6 @@ static const TestEntry tests[] = {
     TEST(test_cmdargs_flagset_idx),
     TEST(test_cmdargs_convert_flags),
     TEST(test_add_alias),
-    TEST(test_allow_macro_recording),
 };
 
 const TestGroup command_tests = TEST_GROUP(tests);

@@ -444,10 +444,9 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     current_command = NULL;
     search_next(e);
 
-    // TODO: move "recording_macro" global into EditorState struct and avoid
-    // calling this function (and constructing args above) if no macro is
-    // being recorded
-    macro_command_hook("search", (char**)args);
+    // TODO: avoid calling this function (and constructing args above)
+    // if no macro is being recorded
+    macro_command_hook(&e->macro, "search", (char**)args);
 
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
@@ -504,14 +503,14 @@ static const Command *find_search_mode_command(const char *name)
 
 const CommandSet cmd_mode_commands = {
     .lookup = find_cmd_mode_command,
-    .allow_recording = NULL,
+    .macro_record = NULL,
     .aliases = HASHMAP_INIT,
     .userdata = &editor,
 };
 
 const CommandSet search_mode_commands = {
     .lookup = find_search_mode_command,
-    .allow_recording = NULL,
+    .macro_record = NULL,
     .aliases = HASHMAP_INIT,
     .userdata = &editor,
 };

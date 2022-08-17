@@ -3,87 +3,76 @@
 #include "error.h"
 #include "run.h"
 #include "serialize.h"
-#include "util/ptr-array.h"
 #include "util/string-view.h"
 
-static PointerArray macro = PTR_ARRAY_INIT;
-static PointerArray prev_macro = PTR_ARRAY_INIT;
-static String insert_buffer = STRING_INIT;
-static bool recording_macro = false;
-
-static void merge_insert_buffer(void)
+static void merge_insert_buffer(CommandMacroState *m)
 {
-    size_t len = insert_buffer.len;
+    size_t len = m->insert_buffer.len;
     if (len == 0) {
         return;
     }
     String s = string_new(32 + len);
-    StringView ibuf = strview_from_string(&insert_buffer);
+    StringView ibuf = strview_from_string(&m->insert_buffer);
     string_append_literal(&s, "insert -k ");
     if (unlikely(strview_has_prefix(&ibuf, "-"))) {
         string_append_literal(&s, "-- ");
     }
     string_append_escaped_arg_sv(&s, ibuf, true);
-    string_clear(&insert_buffer);
-    ptr_array_append(&macro, string_steal_cstring(&s));
+    string_clear(&m->insert_buffer);
+    ptr_array_append(&m->macro, string_steal_cstring(&s));
 }
 
-bool macro_is_recording(void)
+void macro_record(CommandMacroState *m)
 {
-    return recording_macro;
-}
-
-void macro_record(void)
-{
-    if (recording_macro) {
+    if (m->recording) {
         info_msg("Already recording");
         return;
     }
-    ptr_array_free(&prev_macro);
-    prev_macro = macro;
-    macro = (PointerArray) PTR_ARRAY_INIT;
+    ptr_array_free(&m->prev_macro);
+    m->prev_macro = m->macro;
+    m->macro = (PointerArray) PTR_ARRAY_INIT;
     info_msg("Recording macro");
-    recording_macro = true;
+    m->recording = true;
 }
 
-void macro_stop(void)
+void macro_stop(CommandMacroState *m)
 {
-    if (!recording_macro) {
+    if (!m->recording) {
         info_msg("Not recording");
         return;
     }
-    merge_insert_buffer();
-    const size_t count = macro.count;
+    merge_insert_buffer(m);
+    size_t count = m->macro.count;
     const char *plural = (count != 1) ? "s" : "";
     info_msg("Macro recording stopped; %zu command%s saved", count, plural);
-    recording_macro = false;
+    m->recording = false;
 }
 
-void macro_toggle(void)
+void macro_toggle(CommandMacroState *m)
 {
-    if (recording_macro) {
-        macro_stop();
+    if (m->recording) {
+        macro_stop(m);
     } else {
-        macro_record();
+        macro_record(m);
     }
 }
 
-void macro_cancel(void)
+void macro_cancel(CommandMacroState *m)
 {
-    if (!recording_macro) {
+    if (!m->recording) {
         info_msg("Not recording");
         return;
     }
-    ptr_array_free(&macro);
-    macro = prev_macro;
-    prev_macro = (PointerArray) PTR_ARRAY_INIT;
+    ptr_array_free(&m->macro);
+    m->macro = m->prev_macro;
+    m->prev_macro = (PointerArray) PTR_ARRAY_INIT;
     info_msg("Macro recording cancelled");
-    recording_macro = false;
+    m->recording = false;
 }
 
-void macro_command_hook(const char *cmd_name, char **args)
+void macro_command_hook(CommandMacroState *m, const char *cmd_name, char **args)
 {
-    if (!recording_macro) {
+    if (!m->recording) {
         return;
     }
     String buf = string_new(512);
@@ -92,21 +81,21 @@ void macro_command_hook(const char *cmd_name, char **args)
         string_append_byte(&buf, ' ');
         string_append_escaped_arg(&buf, args[i], true);
     }
-    merge_insert_buffer();
-    ptr_array_append(&macro, string_steal_cstring(&buf));
+    merge_insert_buffer(m);
+    ptr_array_append(&m->macro, string_steal_cstring(&buf));
 }
 
-void macro_insert_char_hook(CodePoint c)
+void macro_insert_char_hook(CommandMacroState *m, CodePoint c)
 {
-    if (!recording_macro) {
+    if (!m->recording) {
         return;
     }
-    string_append_codepoint(&insert_buffer, c);
+    string_append_codepoint(&m->insert_buffer, c);
 }
 
-void macro_insert_text_hook(const char *text, size_t size)
+void macro_insert_text_hook(CommandMacroState *m, const char *text, size_t size)
 {
-    if (!recording_macro) {
+    if (!m->recording) {
         return;
     }
     String buf = string_new(512);
@@ -116,15 +105,15 @@ void macro_insert_text_hook(const char *text, size_t size)
         string_append_literal(&buf, "-- ");
     }
     string_append_escaped_arg_sv(&buf, sv, true);
-    merge_insert_buffer();
-    ptr_array_append(&macro, string_steal_cstring(&buf));
+    merge_insert_buffer(m);
+    ptr_array_append(&m->macro, string_steal_cstring(&buf));
 }
 
-void macro_play(void)
+void macro_play(CommandMacroState *m)
 {
     unsigned int saved_nr_errors = get_nr_errors();
-    for (size_t i = 0, n = macro.count; i < n; i++) {
-        const char *cmd_str = macro.ptrs[i];
+    for (size_t i = 0, n = m->macro.count; i < n; i++) {
+        const char *cmd_str = m->macro.ptrs[i];
         handle_command(&normal_commands, cmd_str, false);
         if (get_nr_errors() != saved_nr_errors) {
             break;
@@ -132,20 +121,21 @@ void macro_play(void)
     }
 }
 
-String dump_macro(void)
+String dump_macro(const CommandMacroState *m)
 {
     String buf = string_new(4096);
-    for (size_t i = 0, n = macro.count; i < n; i++) {
-        const char *cmd_str = macro.ptrs[i];
+    for (size_t i = 0, n = m->macro.count; i < n; i++) {
+        const char *cmd_str = m->macro.ptrs[i];
         string_append_cstring(&buf, cmd_str);
         string_append_byte(&buf, '\n');
     }
     return buf;
 }
 
-void free_macro(void)
+void free_macro(CommandMacroState *m)
 {
-    string_free(&insert_buffer);
-    ptr_array_free(&macro);
-    ptr_array_free(&prev_macro);
+    string_free(&m->insert_buffer);
+    ptr_array_free(&m->macro);
+    ptr_array_free(&m->prev_macro);
+    m->recording = false;
 }

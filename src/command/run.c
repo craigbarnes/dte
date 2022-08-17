@@ -61,8 +61,8 @@ static void run_command(RunContext *ctx, char **av)
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
-    if (ctx->allow_recording && cmds->allow_recording(cmd, av + 1)) {
-        macro_command_hook(cmd->name, av + 1);
+    if (ctx->allow_recording && ctx->cmds->macro_record) {
+        ctx->cmds->macro_record(cmd, av + 1, ctx->cmds->userdata);
     }
 
     // By default change can't be merged with previous one.

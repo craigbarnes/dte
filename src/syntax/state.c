@@ -510,7 +510,7 @@ static const Command *find_syntax_command(const char *name)
 
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
-    .allow_recording = NULL,
+    .macro_record = NULL,
     .expand_variable = expand_syntax_var,
     .aliases = HASHMAP_INIT,
     .userdata = &editor,

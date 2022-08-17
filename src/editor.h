@@ -7,6 +7,7 @@
 #include "bind.h"
 #include "buffer.h"
 #include "cmdline.h"
+#include "command/macro.h"
 #include "copy.h"
 #include "encoding.h"
 #include "file-history.h"
@@ -85,6 +86,7 @@ typedef struct {
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;
+    CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     Frame *root_frame;
     Window *window;

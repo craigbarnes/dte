@@ -85,6 +85,12 @@ EditorState editor = {
         .max_entries = 128,
         .entries = HASHMAP_INIT
     },
+    .macro = {
+        .macro = PTR_ARRAY_INIT,
+        .prev_macro = PTR_ARRAY_INIT,
+        .insert_buffer = STRING_INIT,
+        .recording = false,
+    },
     .cursor_styles = {
         [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
         [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
@@ -223,6 +229,7 @@ int free_editor_state(EditorState *e)
     term_input_free(&e->terminal.ibuf);
     cmdline_free(&e->cmdline);
     clear_messages(&e->messages);
+    free_macro(&e->macro);
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
@@ -238,7 +245,6 @@ int free_editor_state(EditorState *e)
 
     tag_file_free();
     free_intern_pool();
-    free_macro();
 
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)e->user_config_dir);

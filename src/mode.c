@@ -37,7 +37,7 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
         begin_change(CHANGE_MERGE_NONE);
         insert_text(view, str.buffer, str.len, true);
         end_change();
-        macro_insert_text_hook(str.buffer, str.len);
+        macro_insert_text_hook(&e->macro, str.buffer, str.len);
         string_free(&str);
         return;
         }
@@ -45,7 +45,7 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
 
     if (u_is_unicode(key)) {
         insert_ch(view, key);
-        macro_insert_char_hook(key);
+        macro_insert_char_hook(&e->macro, key);
     } else {
         handle_binding(&e->bindings[INPUT_NORMAL], key);
     }

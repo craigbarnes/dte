@@ -41,7 +41,7 @@ static void open_files_from_string(EditorState *e, const String *str)
 
     ptr_array_append(&filenames, NULL);
     window_open_files(e, e->window, (char**)filenames.ptrs, NULL);
-    macro_command_hook("open", (char**)filenames.ptrs);
+    macro_command_hook(&e->macro, "open", (char**)filenames.ptrs);
     ptr_array_free_array(&filenames);
 }
 

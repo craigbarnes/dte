@@ -29,7 +29,7 @@ typedef struct {
 
 typedef struct {
     const Command* (*lookup)(const char *name);
-    bool (*allow_recording)(const Command *cmd, char **args);
+    void (*macro_record)(const Command *cmd, char **args, void *userdata);
     bool (*expand_variable)(const char *name, char **value, void *userdata);
     HashMap aliases;
     void *userdata;

@@ -812,11 +812,11 @@ static void cmd_load_syntax(EditorState *e, const CommandArgs *a)
     load_syntax_file(arg, CFG_MUST_EXIST, &err);
 }
 
-static void cmd_macro(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_macro(EditorState *e, const CommandArgs *a)
 {
     static const struct {
         const char name[8];
-        void (*handler)(void);
+        void (*handler)(CommandMacroState *m);
     } actions[] = {
         {"record", macro_record},
         {"stop", macro_stop},
@@ -828,7 +828,7 @@ static void cmd_macro(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     const char *action = a->args[0];
     for (size_t i = 0; i < ARRAYLEN(actions); i++) {
         if (streq(action, actions[i].name)) {
-            actions[i].handler();
+            actions[i].handler(&e->macro);
             return;
         }
     }
@@ -2324,6 +2324,51 @@ static bool allow_macro_recording(const Command *cmd, char **args)
     return true;
 }
 
+UNITTEST {
+    const char *args[4] = {NULL};
+    char **argp = (char**)args;
+    const Command *cmd = find_normal_command("left");
+    BUG_ON(!cmd);
+    BUG_ON(!allow_macro_recording(cmd, argp));
+
+    cmd = find_normal_command("exec");
+    BUG_ON(!cmd);
+    BUG_ON(!allow_macro_recording(cmd, argp));
+
+    cmd = find_normal_command("command");
+    BUG_ON(!cmd);
+    BUG_ON(allow_macro_recording(cmd, argp));
+
+    cmd = find_normal_command("macro");
+    BUG_ON(!cmd);
+    BUG_ON(allow_macro_recording(cmd, argp));
+
+    cmd = find_normal_command("search");
+    BUG_ON(!cmd);
+    BUG_ON(allow_macro_recording(cmd, argp));
+    args[0] = "xyz";
+    BUG_ON(!allow_macro_recording(cmd, argp));
+    args[0] = "-n";
+    BUG_ON(!allow_macro_recording(cmd, argp));
+    args[0] = "-p";
+    BUG_ON(!allow_macro_recording(cmd, argp));
+    args[0] = "-w";
+    BUG_ON(!allow_macro_recording(cmd, argp));
+    args[0] = "-Hr";
+    BUG_ON(allow_macro_recording(cmd, argp));
+    args[1] = "str";
+    BUG_ON(!allow_macro_recording(cmd, argp));
+}
+
+static void record_command(const Command *cmd, char **args, void *userdata)
+{
+    if (!allow_macro_recording(cmd, args)) {
+        return;
+    }
+    EditorState *e = userdata;
+    macro_command_hook(&e->macro, cmd->name, args);
+}
+
 const Command *find_normal_command(const char *name)
 {
     return BSEARCH(name, cmds, command_cmp);
@@ -2331,7 +2376,7 @@ const Command *find_normal_command(const char *name)
 
 CommandSet normal_commands = {
     .lookup = find_normal_command,
-    .allow_recording = allow_macro_recording,
+    .macro_record = record_command,
     .expand_variable = expand_normal_var,
     .aliases = HASHMAP_INIT,
     .userdata = &editor,
