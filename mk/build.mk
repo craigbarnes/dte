@@ -138,7 +138,7 @@ ifeq "$(USE_SANITIZER)" "1"
 else
   # 0: Disable debugging
   # 1: Enable BUG_ON() and light-weight sanity checks
-  # 2: Enable logging to $DTE_LOG
+  # 2: Enable LOG_DEBUG()
   # 3: Enable expensive sanity checks
   DEBUG ?= 0
 endif
