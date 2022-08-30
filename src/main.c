@@ -459,7 +459,7 @@ loop_break:;
     Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;
 
-    // Create this early. Needed if lock-files is true.
+    // Create this early (needed if "lock-files" is true)
     const char *cfgdir = e->user_config_dir;
     BUG_ON(!cfgdir);
     if (mkdir(cfgdir, 0755) != 0 && errno != EEXIST) {
