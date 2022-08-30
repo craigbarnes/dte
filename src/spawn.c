@@ -59,6 +59,9 @@ static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
             };
 
             static_assert(ARRAYLEN(ptrs) == 3);
+            static_assert(ERRFMT_LINE == 1);
+            static_assert(ERRFMT_COLUMN == 2);
+
             for (size_t j = ERRFMT_LINE; j < ARRAYLEN(ptrs); j++) {
                 int8_t ci = p->capture_index[j];
                 if (ci >= 0 && m[ci].rm_so >= 0) {
