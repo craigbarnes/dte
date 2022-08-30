@@ -15,7 +15,9 @@ mandir ?= $(datarootdir)/man
 man1dir ?= $(mandir)/man1
 man5dir ?= $(mandir)/man5
 appdir ?= $(datarootdir)/applications
+metainfodir ?= $(datarootdir)/metainfo
 bashcompletiondir ?= $(call pkg-var, bash-completion, completionsdir)
+appid = dte
 
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
@@ -27,6 +29,8 @@ all: $(dte)
 check: check-tests check-opts
 install: install-bin install-man
 uninstall: uninstall-bin uninstall-man
+install-full: install install-bash-completion install-desktop-file install-appstream
+uninstall-full: uninstall uninstall-bash-completion uninstall-desktop-file uninstall-appstream
 
 install-bin: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
@@ -62,17 +66,25 @@ uninstall-bash-completion:
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 
 install-desktop-file:
-	$(E) INSTALL '$(DESTDIR)$(appdir)/dte.desktop'
+	$(E) INSTALL '$(DESTDIR)$(appdir)/$(appid).desktop'
 	$(Q) $(INSTALL_DESKTOP_FILE) \
 	  --dir='$(DESTDIR)$(appdir)' \
 	  --set-key=TryExec --set-value='$(bindir)/$(dte)' \
 	  --set-key=Exec --set-value='$(bindir)/$(dte) %F' \
 	  $(if $(DESTDIR),, --rebuild-mime-info-cache) \
-	  dte.desktop
+	  '$(appid).desktop'
 
 uninstall-desktop-file:
-	$(RM) '$(DESTDIR)$(appdir)/dte.desktop'
+	$(RM) '$(DESTDIR)$(appdir)/$(appid).desktop'
 	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
+
+install-appstream:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(metainfodir)'
+	$(E) INSTALL '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
+	$(Q) $(INSTALL_DATA) '$(appid).appdata.xml' '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
+
+uninstall-appstream:
+	$(RM) '$(DESTDIR)$(metainfodir)/$(appid).appdata.xml'
 
 check-tests: $(test) all
 	$(E) EXEC '$(test)'
@@ -101,8 +113,10 @@ clean:
 .DEFAULT_GOAL = all
 .PHONY: all install install-bin install-man
 .PHONY: uninstall uninstall-bin uninstall-man
+.PHONY: install-full uninstall-full
 .PHONY: install-bash-completion uninstall-bash-completion
 .PHONY: install-desktop-file uninstall-desktop-file
+.PHONY: install-appstream uninstall-appstream
 .PHONY: check check-tests check-opts installcheck bench tags clean
 .DELETE_ON_ERROR:
 

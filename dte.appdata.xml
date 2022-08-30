@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="console-application">
+  <name>dte</name>
+  <id>dte</id>
+  <summary>A small and easy to use console text editor</summary>
+  <project_license>GPL-2.0-only</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+  <developer_name>Craig Barnes, Timo Hirvonen</developer_name>
+  <launchable type="desktop-id">dte.desktop</launchable>
+  <url type="homepage">https://craigbarnes.gitlab.io/dte/</url>
+  <url type="bugtracker">https://gitlab.com/craigbarnes/dte/-/issues</url>
+  <url type="donation">https://liberapay.com/craigbarnes/donate</url>
+  <content_rating type="oars-1.1"/>
+  <description>
+    <p>
+      Editor features:
+      <ul>
+        <li>Multiple buffers/tabs</li>
+        <li>Unlimited undo/redo</li>
+        <li>Regex search and replace</li>
+        <li>Syntax highlighting</li>
+        <li>Customizable color schemes (including 24-bit RGB)</li>
+        <li>Customizable key bindings</li>
+        <li>Command language with auto-completion</li>
+        <li>Unicode 14 compatible text rendering</li>
+        <li>Support for all xterm key combos</li>
+        <li>Support for kitty's keyboard protocol</li>
+        <li>Support for multiple encodings (using iconv)</li>
+        <li>Jump to definition (using ctags)</li>
+        <li>Jump to compiler error</li>
+        <li>Copy to system clipboard (using OSC 52, which works over SSH)</li>
+        <li>EditorConfig support</li>
+      </ul>
+    </p>
+  </description>
+  <provides>
+    <binary>dte</binary>
+  </provides>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://craigbarnes.gitlab.io/screenshot/dte16x9.png</image>
+    </screenshot>
+  </screenshots>
+  <categories>
+    <category>Utility</category>
+    <category>TextEditor</category>
+  </categories>
+  <keywords>
+    <keyword>development</keyword>
+    <keyword>programming</keyword>
+    <keyword>text</keyword>
+    <keyword>editor</keyword>
+  </keywords>
+  <releases>
+    <release version="1.10" date="2021-04-03"/>
+    <release version="1.9.1" date="2019-09-29"/>
+    <release version="1.9" date="2019-09-21"/>
+    <release version="1.8.2" date="2019-04-23"/>
+    <release version="1.8.1" date="2019-04-22"/>
+    <release version="1.8" date="2019-04-18"/>
+    <release version="1.7" date="2018-05-08"/>
+    <release version="1.6" date="2017-12-20"/>
+    <release version="1.5" date="2017-11-03"/>
+    <release version="1.4" date="2017-10-16"/>
+    <release version="1.3" date="2017-08-27"/>
+    <release version="1.2" date="2017-07-30"/>
+    <release version="1.1" date="2017-07-29"/>
+    <release version="1.0" date="2015-04-28"/>
+  </releases>
+</component>

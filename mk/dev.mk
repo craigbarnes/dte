@@ -20,10 +20,19 @@ dist-latest-release: $(firstword $(RELEASE_DIST))
 dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
+check-aux: check-desktop-file check-appstream
 
 check-shell-scripts:
 	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh test/*.sh tools/*.sh
 	$(E) TEST 'mk/*.sh test/*.sh tools/*.sh'
+
+check-desktop-file:
+	$(E) CHECK dte.desktop
+	$(Q) desktop-file-validate dte.desktop
+
+check-appstream:
+	$(E) CHECK dte.appdata.xml
+	$(Q) appstream-util --nonet validate dte.appdata.xml
 
 check-docs:
 	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
@@ -112,4 +121,5 @@ NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
     check-docs check-shell-scripts check-release-digests \
+    check-aux check-desktop-file check-appstream \
     git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)
