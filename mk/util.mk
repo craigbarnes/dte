@@ -1,12 +1,8 @@
-PKGCONFIG = $(shell command -v pkg-config || command -v pkgconf || echo ':')
-$(call make-lazy,PKGCONFIG)
-
 CFILE := mk/feature-test/basic.c
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -o /dev/null $(CFILE),$(1),$(2))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))
-pkg-var = $(shell $(PKGCONFIG) --variable='$(strip $(2))' $(1))
 echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 
 # Note: this doesn't work reliably in make 3.81, due to a bug, but
@@ -36,7 +32,7 @@ AUTOVARS = \
     $(if $(call streq,$(KERNEL),Linux), DISTRO) \
     ARCH NPROC _POSIX_VERSION _XOPEN_VERSION \
     TERM SHELL LANG $(call echo-if-set, LC_CTYPE LC_ALL) \
-    PKGCONFIG MAKE_VERSION MAKEFLAGS CC_VERSION CC_TARGET
+    MAKE_VERSION MAKEFLAGS CC_VERSION CC_TARGET
 
 vars:
 	@echo

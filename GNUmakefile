@@ -16,7 +16,7 @@ man1dir ?= $(mandir)/man1
 man5dir ?= $(mandir)/man5
 appdir ?= $(datarootdir)/applications
 metainfodir ?= $(datarootdir)/metainfo
-bashcompletiondir ?= $(call pkg-var, bash-completion, completionsdir)
+bashcompletiondir ?= $(datarootdir)/bash-completion/completions
 appid = dte
 
 INSTALL = install
@@ -56,13 +56,11 @@ uninstall-man:
 	$(RM) '$(DESTDIR)$(man5dir)/dte-syntax.5'
 
 install-bash-completion:
-	@$(if $(bashcompletiondir),, $(error $${bashcompletiondir} is unset))
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bashcompletiondir)'
 	$(E) INSTALL '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 	$(Q) $(INSTALL_DATA) completion.bash '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 
 uninstall-bash-completion:
-	@$(if $(bashcompletiondir),, $(error $${bashcompletiondir} is unset))
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 
 install-desktop-file:
