@@ -27,10 +27,15 @@ RM = rm -f
 
 all: $(dte)
 check: check-tests check-opts
-install: install-bin install-man
-uninstall: uninstall-bin uninstall-man
-install-full: install install-bash-completion install-desktop-file install-appstream
-uninstall-full: uninstall uninstall-bash-completion uninstall-desktop-file uninstall-appstream
+
+INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream
+install: $(addprefix install-, $(filter-out appstream, $(INSTALL_SUBTARGETS)))
+uninstall: $(addprefix uninstall-, $(filter-out appstream, $(INSTALL_SUBTARGETS)))
+
+ifneq "$(KERNEL)" "Darwin"
+ install: install-appstream
+ uninstall: uninstall-appstream
+endif
 
 install-bin: all
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(bindir)'
@@ -109,13 +114,9 @@ clean:
 
 
 .DEFAULT_GOAL = all
-.PHONY: all install install-bin install-man
-.PHONY: uninstall uninstall-bin uninstall-man
-.PHONY: install-full uninstall-full
-.PHONY: install-bash-completion uninstall-bash-completion
-.PHONY: install-desktop-file uninstall-desktop-file
-.PHONY: install-appstream uninstall-appstream
-.PHONY: check check-tests check-opts installcheck bench tags clean
+.PHONY: all clean tags install uninstall
+.PHONY: check check-tests check-opts installcheck bench
+.PHONY: $(foreach T, $(INSTALL_SUBTARGETS), install-$(T) uninstall-$(T))
 .DELETE_ON_ERROR:
 
 NON_PARALLEL_TARGETS += clean install% uninstall%
