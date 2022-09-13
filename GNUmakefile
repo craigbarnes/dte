@@ -29,7 +29,7 @@ RM = rm -f
 # indicates a distro packaging environment, in which case the equivalent,
 # distro-provided macros/hooks should be used instead.
 define POSTINSTALL
- update-desktop-database -q '$(appdir)' || :
+ (update-desktop-database -q '$(appdir)' 2>/dev/null && $(LOG) UPDATE '$(appdir)/mimeinfo.cache') || :
 endef
 
 all: $(dte)

@@ -46,14 +46,16 @@ vars:
 
 ifneq "$(MAKE_S)" ""
   # Make "-s" flag was used (silent build)
+  LOG = :
   Q = @
-  E = @:
 else ifeq "$(V)" "1"
   # "V=1" variable was set (verbose build)
+  LOG = :
   Q =
-  E = @:
 else
   # Normal build
+  LOG = printf ' %7s  %s\n'
   Q = @
-  E = @printf ' %7s  %s\n'
 endif
+
+E = @$(LOG)
