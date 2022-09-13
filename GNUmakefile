@@ -34,14 +34,12 @@ endef
 
 all: $(dte)
 check: check-tests check-opts
-
-INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream
-install: $(addprefix install-, $(filter-out appstream, $(INSTALL_SUBTARGETS)))
-uninstall: $(addprefix uninstall-, $(filter-out appstream, $(INSTALL_SUBTARGETS)))
+install: install-bin install-man install-bash-completion
+uninstall: uninstall-bin uninstall-man uninstall-bash-completion
 
 ifneq "$(KERNEL)" "Darwin"
- install: install-appstream
- uninstall: uninstall-appstream
+ install: install-desktop-file install-appstream
+ uninstall: uninstall-desktop-file uninstall-appstream
 endif
 
 install-bin: all
@@ -117,6 +115,7 @@ clean:
 	$(if $(CLEANDIRS),$(RM) -r $(CLEANDIRS))
 
 
+INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
 .PHONY: check check-tests check-opts installcheck bench
