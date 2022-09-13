@@ -22,8 +22,15 @@ appid = dte
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
-INSTALL_DESKTOP_FILE = desktop-file-install
 RM = rm -f
+
+# The following command is run after the *install-desktop-file targets,
+# unless the DESTDIR variable is set. The presence of DESTDIR usually
+# indicates a distro packaging environment, in which case the equivalent,
+# distro-provided macros/hooks should be used instead.
+define POSTINSTALL
+ update-desktop-database -q '$(appdir)' || :
+endef
 
 all: $(dte)
 check: check-tests check-opts
@@ -69,17 +76,14 @@ uninstall-bash-completion:
 	$(RM) '$(DESTDIR)$(bashcompletiondir)/$(dte)'
 
 install-desktop-file:
+	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(appdir)'
 	$(E) INSTALL '$(DESTDIR)$(appdir)/$(appid).desktop'
-	$(Q) $(INSTALL_DESKTOP_FILE) \
-	  --dir='$(DESTDIR)$(appdir)' \
-	  --set-key=TryExec --set-value='$(bindir)/$(dte)' \
-	  --set-key=Exec --set-value='$(bindir)/$(dte) %F' \
-	  $(if $(DESTDIR),, --rebuild-mime-info-cache) \
-	  '$(appid).desktop'
+	$(Q) mk/dtfilter.sh '$(bindir)/$(dte)' <'$(appid).desktop' >'$(DESTDIR)$(appdir)/$(appid).desktop'
+	$(Q) $(if $(DESTDIR),, $(POSTINSTALL))
 
 uninstall-desktop-file:
 	$(RM) '$(DESTDIR)$(appdir)/$(appid).desktop'
-	$(if $(DESTDIR),, update-desktop-database -q '$(appdir)' || :)
+	$(if $(DESTDIR),, $(POSTINSTALL))
 
 install-appstream:
 	$(Q) $(INSTALL) -d -m755 '$(DESTDIR)$(metainfodir)'
