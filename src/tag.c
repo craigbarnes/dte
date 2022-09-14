@@ -11,14 +11,6 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
-typedef struct {
-    char *filename;
-    char *buf;
-    size_t size;
-    time_t mtime;
-} TagFile;
-
-static TagFile *current_tag_file;
 static const char *current_filename; // For sorting tags
 
 static int visibility_cmp(const Tag *a, const Tag *b)
@@ -135,54 +127,57 @@ static bool tag_file_changed (
     return tf->mtime != st->st_mtime || !streq(tf->filename, filename);
 }
 
-void tag_file_free(void)
+// Note: does not free `tf` itself
+void tag_file_free(TagFile *tf)
 {
-    if (!current_tag_file) {
-        return;
-    }
-    free(current_tag_file->filename);
-    free(current_tag_file->buf);
-    free(current_tag_file);
-    current_tag_file = NULL;
+    free(tf->filename);
+    free(tf->buf);
+    *tf = (TagFile){.filename = NULL};
 }
 
-static TagFile *load_tag_file(void)
+static bool load_tag_file(TagFile *tf)
 {
     char path[4096];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
-        return NULL;
+        LOG_ERROR("getcwd() failed in %s(): %s", __func__, strerror(errno));
+        return false;
     }
 
     int fd = open_tag_file(path);
     if (fd < 0) {
-        return NULL;
+        return false;
     }
 
     struct stat st;
     if (fstat(fd, &st) != 0 || st.st_size <= 0) {
+        // TODO: LOG_ERROR() for fstat() failure?
         xclose(fd);
-        return NULL;
+        return false;
     }
 
-    if (current_tag_file) {
-        if (tag_file_changed(current_tag_file, path, &st)) {
-            tag_file_free();
-            BUG_ON(current_tag_file);
-        } else {
+    if (tf->filename) {
+        if (!tag_file_changed(tf, path, &st)) {
             xclose(fd);
-            return current_tag_file;
+            return true;
         }
+        tag_file_free(tf);
+        BUG_ON(tf->filename);
     }
 
-    char *buf = xmalloc(st.st_size);
+    char *buf = malloc(st.st_size);
+    if (unlikely(!buf)) {
+        LOG_ERROR("malloc() failed in %s()", __func__);
+        xclose(fd);
+        return false;
+    }
+
     ssize_t size = xread_all(fd, buf, st.st_size);
     xclose(fd);
     if (size < 0) {
         free(buf);
-        return NULL;
+        return false;
     }
 
-    TagFile *tf = xnew(TagFile, 1);
     *tf = (TagFile) {
         .filename = xstrdup(path),
         .buf = buf,
@@ -190,8 +185,7 @@ static TagFile *load_tag_file(void)
         .mtime = st.st_mtime,
     };
 
-    current_tag_file = tf;
-    return current_tag_file;
+    return true;
 }
 
 static void free_tags_cb(Tag *t)
@@ -274,11 +268,10 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     add_message(messages, m);
 }
 
-void tag_lookup(const char *name, const char *filename, MessageArray *messages)
+void tag_lookup(TagFile *tf, const char *name, const char *filename, MessageArray *messages)
 {
     clear_messages(messages);
-    TagFile *tf = load_tag_file();
-    if (!tf) {
+    if (!load_tag_file(tf)) {
         error_msg("No tags file");
         return;
     }
@@ -300,10 +293,9 @@ void tag_lookup(const char *name, const char *filename, MessageArray *messages)
     free_tags(&tags);
 }
 
-void collect_tags(PointerArray *a, const char *prefix)
+void collect_tags(TagFile *tf, PointerArray *a, const char *prefix)
 {
-    TagFile *tf = load_tag_file();
-    if (!tf) {
+    if (!load_tag_file(tf)) {
         return;
     }
 

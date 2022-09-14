@@ -1929,7 +1929,7 @@ static void cmd_tag(EditorState *e, const CommandArgs *a)
         name = word;
     }
 
-    tag_lookup(name, e->buffer->abs_filename, &e->messages);
+    tag_lookup(&e->tagfile, name, e->buffer->abs_filename, &e->messages);
     activate_current_message_save(&e->messages, &e->bookmarks, e->view);
     free(word);
 }

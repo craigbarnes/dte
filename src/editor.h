@@ -17,6 +17,7 @@
 #include "options.h"
 #include "regexp.h"
 #include "syntax/color.h"
+#include "tag.h"
 #include "terminal/cursor.h"
 #include "terminal/terminal.h"
 #include "util/macros.h"
@@ -83,6 +84,7 @@ typedef struct {
     size_t cmdline_x;
     KeyBindingGroup bindings[3];
     Clipboard clipboard;
+    TagFile tagfile;
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;

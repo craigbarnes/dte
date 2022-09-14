@@ -562,7 +562,7 @@ loop_break:;
     }
 
     if (tag) {
-        tag_lookup(tag, NULL, &e->messages);
+        tag_lookup(&e->tagfile, tag, NULL, &e->messages);
         activate_current_message(&e->messages);
     }
 

@@ -230,6 +230,7 @@ int free_editor_state(EditorState *e)
     cmdline_free(&e->cmdline);
     clear_messages(&e->messages);
     free_macro(&e->macro);
+    tag_file_free(&e->tagfile);
 
     ptr_array_free_cb(&e->bookmarks, FREE_FUNC(file_location_free));
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
@@ -243,7 +244,6 @@ int free_editor_state(EditorState *e)
     free_bindings(&e->bindings[INPUT_COMMAND]);
     free_bindings(&e->bindings[INPUT_SEARCH]);
 
-    tag_file_free();
     free_intern_pool();
 
     // TODO: intern this (so that it's freed by free_intern_pool())
