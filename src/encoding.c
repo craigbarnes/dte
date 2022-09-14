@@ -53,8 +53,9 @@ UNITTEST {
 
 static int enc_alias_cmp(const void *key, const void *elem)
 {
-    static_assert(offsetof(EncodingAlias, alias) == 0);
-    return ascii_strcmp_icase(key, elem);
+    const EncodingAlias *a = key;
+    const char *name = elem;
+    return ascii_strcmp_icase(a->alias, name);
 }
 
 EncodingType lookup_encoding(const char *name)
