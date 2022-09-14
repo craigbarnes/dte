@@ -369,7 +369,8 @@ static bool cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
-    Condition *c = add_condition(sp, COND_INLIST, args[1], emit);
+    Condition *c = add_condition(sp, cmdargs_has_flag(a, 'b') ? COND_INLIST_BUFFER : COND_INLIST, args[1], emit);
+
     if (!c) {
         return false;
     }
@@ -565,7 +566,7 @@ static const Command cmds[] = {
     {"heredocbegin", "", true, 2, 2, cmd_heredocbegin},
     {"heredocend", "", true, 1, 2, cmd_heredocend},
     {"include", "b", true, 1, 1, cmd_include},
-    {"inlist", "", true, 2, 3, cmd_inlist},
+    {"inlist", "b", true, 2, 3, cmd_inlist},
     {"list", "i", true, 2, -1, cmd_list},
     {"noeat", "b", true, 1, 1, cmd_noeat},
     {"recolor", "", true, 1, 2, cmd_recolor},

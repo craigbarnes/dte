@@ -172,6 +172,13 @@ static const TermColor **highlight_line (
             sidx = -1;
             state = a->destination;
             goto top;
+        case COND_INLIST_BUFFER:
+            if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
+                break;
+            }
+            set_color_range(colors, a, sidx, i);
+            state = a->destination;
+            goto top;
         case COND_RECOLOR: {
             size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
             set_color_range(colors, a, start, i);
