@@ -62,15 +62,17 @@ ssize_t xwrite_all(int fd, const void *buf, size_t count)
 
 int xclose(int fd)
 {
+    int saved_errno = errno;
     int r = close(fd);
     if (likely(r == 0 || (errno != EINTR && errno != EINPROGRESS))) {
-        return r;
+        goto out;
     }
 
     // Treat EINPROGRESS the same as r == 0
     // (https://git.musl-libc.org/cgit/musl/commit/?id=82dc1e2e783815e00a90cd)
     if (errno == EINPROGRESS) {
-        return 0;
+        r = 0;
+        goto out;
     }
 
     // If the first close() call failed with EINTR, retry until
@@ -96,5 +98,9 @@ int xclose(int fd)
         r = 0;
     }
 
+out:
+    if (r == 0) {
+        errno = saved_errno;
+    }
     return r;
 }
