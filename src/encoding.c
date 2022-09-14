@@ -51,6 +51,12 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(encoding_aliases, alias, ascii_strcmp_icase);
 }
 
+static int enc_alias_cmp(const void *key, const void *elem)
+{
+    static_assert(offsetof(EncodingAlias, alias) == 0);
+    return ascii_strcmp_icase(key, elem);
+}
+
 EncodingType lookup_encoding(const char *name)
 {
     static_assert(ARRAYLEN(encoding_names) == NR_ENCODING_TYPES - 1);
@@ -60,12 +66,7 @@ EncodingType lookup_encoding(const char *name)
         }
     }
 
-    static_assert(offsetof(EncodingAlias, alias) == 0);
-    const EncodingAlias *a = BSEARCH (
-        name,
-        encoding_aliases,
-        (CompareFunction)ascii_strcmp_icase
-    );
+    const EncodingAlias *a = BSEARCH(name, encoding_aliases, enc_alias_cmp);
     return a ? a->encoding : UNKNOWN_ENCODING;
 }
 
