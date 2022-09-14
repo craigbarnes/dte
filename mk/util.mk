@@ -43,7 +43,6 @@ vars:
 
 .PHONY: vars
 
-
 ifneq "$(MAKE_S)" ""
   # Make "-s" flag was used (silent build)
   LOG = :

@@ -306,6 +306,8 @@ UNITTEST {
     BUG_ON(fds[0] != -1);
     BUG_ON(fds[1] != -1);
     BUG_ON(fds[2] != -4);
+    safe_xclose_all(fds, 3);
+    BUG_ON(fds[2] != -1);
 }
 
 int spawn(SpawnContext *ctx)
