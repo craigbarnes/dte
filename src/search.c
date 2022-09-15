@@ -1,13 +1,11 @@
+#include <stdlib.h>
 #include "search.h"
+#include "block-iter.h"
 #include "buffer.h"
-#include "change.h"
 #include "error.h"
 #include "regexp.h"
-#include "selection.h"
 #include "util/ascii.h"
-#include "util/string.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 static bool do_search_fwd(View *view, regex_t *regex, BlockIter *bi, bool skip)
 {
@@ -195,18 +193,16 @@ void search_set_regexp(SearchState *search, const char *pattern)
     search->pattern = xstrdup(pattern);
 }
 
-static void do_search_next(EditorState *e, bool skip)
+static void do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
-    SearchState *search = &e->search;
     if (!search->pattern) {
         error_msg("No previous search pattern");
         return;
     }
-    if (!update_regex(search, e->options.case_sensitive_search)) {
+    if (!update_regex(search, cs)) {
         return;
     }
 
-    View *view = e->view;
     BlockIter bi = view->cursor;
     regex_t *regex = &search->regex;
     if (search->direction == SEARCH_FWD) {
@@ -233,20 +229,20 @@ static void do_search_next(EditorState *e, bool skip)
     error_msg("Pattern '%s' not found", search->pattern);
 }
 
-void search_prev(EditorState *e)
+void search_prev(View *v, SearchState *search, SearchCaseSensitivity cs)
 {
-    SearchDirection *dir = &e->search.direction;
+    SearchDirection *dir = &search->direction;
     toggle_search_direction(dir);
-    search_next(e);
+    search_next(v, search, cs);
     toggle_search_direction(dir);
 }
 
-void search_next(EditorState *e)
+void search_next(View *v, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(e, false);
+    do_search_next(v, search, cs, false);
 }
 
-void search_next_word(EditorState *e)
+void search_next_word(View *v, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(e, true);
+    do_search_next(v, search, cs, true);
 }

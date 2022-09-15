@@ -16,6 +16,7 @@
 #include "msg.h"
 #include "options.h"
 #include "regexp.h"
+#include "search.h"
 #include "syntax/color.h"
 #include "tag.h"
 #include "terminal/cursor.h"
@@ -36,18 +37,6 @@ typedef enum {
     INPUT_COMMAND,
     INPUT_SEARCH,
 } InputMode;
-
-typedef enum {
-    SEARCH_FWD,
-    SEARCH_BWD,
-} SearchDirection;
-
-typedef struct {
-    regex_t regex;
-    char *pattern;
-    SearchDirection direction;
-    int re_flags; // If zero, regex hasn't been compiled
-} SearchState;
 
 typedef struct Window {
     PointerArray views;

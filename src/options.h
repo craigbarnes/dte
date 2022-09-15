@@ -23,12 +23,6 @@ typedef enum {
     WSE_ALL_TRAILING = 1 << 7, // Like WSE_TRAILING, but including around cursor
 } WhitespaceErrorFlags;
 
-typedef enum {
-    CSS_FALSE,
-    CSS_TRUE,
-    CSS_AUTO,
-} SearchCaseSensitivity;
-
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
     unsigned int indent_width; \
@@ -73,7 +67,7 @@ typedef struct {
     unsigned int filesize_limit;
     unsigned int scroll_margin;
     unsigned int crlf_newlines; // Default value for new files
-    unsigned int case_sensitive_search;
+    unsigned int case_sensitive_search; // SearchCaseSensitivity
     const char *statusline_left;
     const char *statusline_right;
 } GlobalOptions;

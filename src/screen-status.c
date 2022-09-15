@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "screen.h"
+#include "search.h"
 #include "selection.h"
 #include "util/debug.h"
 #include "util/str-util.h"

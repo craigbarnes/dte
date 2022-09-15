@@ -1757,26 +1757,28 @@ static void cmd_search(EditorState *e, const CommandArgs *a)
         pattern = pattbuf;
     }
 
+    SearchState *search = &e->search;
+    SearchCaseSensitivity cs = e->options.case_sensitive_search;
     do_selection(view, SELECT_NONE);
 
     if (pattern) {
-        e->search.direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
-        search_set_regexp(&e->search, pattern);
+        search->direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
+        search_set_regexp(search, pattern);
         if (use_word_under_cursor) {
-            search_next_word(e);
+            search_next_word(view, search, cs);
         } else {
-            search_next(e);
+            search_next(view, search, cs);
         }
         if (!has_flag(a, 'H')) {
             history_add(&e->search_history, pattern);
         }
     } else if (has_flag(a, 'n')) {
-        search_next(e);
+        search_next(view, search, cs);
     } else if (has_flag(a, 'p')) {
-        search_prev(e);
+        search_prev(view, search, cs);
     } else {
         set_input_mode(e, INPUT_SEARCH);
-        e->search.direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
+        search->direction = has_flag(a, 'r') ? SEARCH_BWD : SEARCH_FWD;
     }
 }
 

@@ -442,7 +442,7 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 
     args[i] = NULL;
     current_command = NULL;
-    search_next(e);
+    search_next(e->view, &e->search, e->options.case_sensitive_search);
 
     // TODO: avoid calling this function (and constructing args above)
     // if no macro is being recorded
