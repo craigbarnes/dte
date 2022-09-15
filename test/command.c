@@ -8,6 +8,7 @@
 #include "command/serialize.h"
 #include "commands.h"
 #include "editor.h"
+#include "replace.h"
 #include "search.h"
 #include "util/ascii.h"
 #include "util/debug.h"

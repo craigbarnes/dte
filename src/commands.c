@@ -30,6 +30,7 @@
 #include "move.h"
 #include "msg.h"
 #include "regexp.h"
+#include "replace.h"
 #include "search.h"
 #include "selection.h"
 #include "shift.h"
