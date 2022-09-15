@@ -102,7 +102,7 @@ UNITTEST {
 
 bool expand_normal_var(const char *name, char **value, void *userdata)
 {
-    const BuiltinVar *var = BSEARCH(name, normal_vars, (CompareFunction)strcmp);
+    const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);
     if (!var) {
         return false;
     }

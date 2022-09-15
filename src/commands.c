@@ -640,7 +640,7 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
             default: BUG("unexpected flag"); return;
         }
         const char *flag_arg = a->args[x++];
-        ssize_t action = BSEARCH_IDX(flag_arg, exec_map, (CompareFunction)strcmp);
+        ssize_t action = BSEARCH_IDX(flag_arg, exec_map, vstrcmp);
         if (action < 0 || !(exec_map[action].flags & 1u << fd_idx)) {
             error_msg("invalid action for -%c: '%s'", a->flags[i], flag_arg);
             return;

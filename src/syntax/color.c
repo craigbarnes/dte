@@ -32,7 +32,7 @@ UNITTEST {
 
 static TermColor *find_real_color(ColorScheme *colors, const char *name)
 {
-    ssize_t idx = BSEARCH_IDX(name, builtin_color_names, (CompareFunction)strcmp);
+    ssize_t idx = BSEARCH_IDX(name, builtin_color_names, vstrcmp);
     if (idx >= 0) {
         BUG_ON(idx >= ARRAYLEN(builtin_color_names));
         return &colors->builtin[idx];

@@ -457,7 +457,7 @@ UNITTEST {
 
 void show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    const ShowHandler *handler = BSEARCH(type, handlers, (CompareFunction)strcmp);
+    const ShowHandler *handler = BSEARCH(type, handlers, vstrcmp);
     if (!handler) {
         error_msg("invalid argument: '%s'", type);
         return;
@@ -484,7 +484,7 @@ void collect_show_subcommands(PointerArray *a, const char *prefix)
 
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix)
 {
-    const ShowHandler *handler = BSEARCH(name, handlers, (CompareFunction)strcmp);
+    const ShowHandler *handler = BSEARCH(name, handlers, vstrcmp);
     if (handler && handler->complete_arg) {
         handler->complete_arg(e, a, arg_prefix);
     }

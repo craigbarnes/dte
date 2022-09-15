@@ -249,7 +249,7 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
 
 bool is_ft(const PointerArray *filetypes, const char *name)
 {
-    if (BSEARCH(name, builtin_filetype_names, (CompareFunction)strcmp)) {
+    if (BSEARCH(name, builtin_filetype_names, vstrcmp)) {
         return true;
     }
 

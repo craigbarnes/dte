@@ -586,7 +586,7 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
         goto out;
     }
 
-    const CompletionHandler *h = BSEARCH(args[0], handlers, (CompareFunction)strcmp);
+    const CompletionHandler *h = BSEARCH(args[0], handlers, vstrcmp);
     if (h) {
         h->complete(e, &a);
     } else if (streq(args[0], "repeat")) {
