@@ -40,7 +40,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
 util_objects := $(call prefix-obj, build/util/, \
     array ascii base64 debug fork-exec hashmap hashset intern intmap \
     log numtostr path ptr-array readfile string strtonum unicode utf8 \
-    xmalloc xmemmem xreadwrite xsnprintf )
+    xmalloc xmemmem xreadwrite xsnprintf xstdio )
 
 command_objects := $(call prefix-obj, build/command/, \
     alias args cache macro parse run serialize )

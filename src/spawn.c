@@ -19,6 +19,7 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
+#include "util/xstdio.h"
 
 static void handle_error_msg(const Compiler *c, MessageArray *msgs, char *str)
 {
@@ -88,9 +89,9 @@ static void read_errors(const Compiler *c, MessageArray *msgs, int fd, bool quie
         return;
     }
     char line[4096];
-    while (fgets(line, sizeof(line), f)) {
+    while (xfgets(line, sizeof(line), f)) {
         if (!quiet) {
-            fputs(line, stderr);
+            xfputs(line, stderr);
         }
         handle_error_msg(c, msgs, line);
     }

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include "debug.h"
 #include "macros.h"
 #include "xreadwrite.h"
 
@@ -37,5 +38,8 @@ static inline FILE *xfopen(const char *path, const char *mode, int flags, mode_t
     }
     return file;
 }
+
+char *xfgets(char *restrict buf, int bufsize, FILE *restrict stream);
+int xfputs(const char *restrict str, FILE *restrict stream);
 
 #endif
