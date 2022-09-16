@@ -15,6 +15,7 @@
 #include "selection.h"
 #include "show.h"
 #include "tag.h"
+#include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
@@ -24,6 +25,42 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
+
+enum {
+    IN = 1 << 0,
+    OUT = 1 << 1,
+    ERR = 1 << 2,
+    ALL = IN | OUT | ERR,
+};
+
+static const struct {
+    char name[8];
+    uint8_t flags;
+} exec_map[] = {
+    [EXEC_BUFFER] = {"buffer", IN | OUT},
+    [EXEC_COMMAND] = {"command", IN},
+    [EXEC_ERRMSG] = {"errmsg", ERR},
+    [EXEC_EVAL] = {"eval", OUT},
+    [EXEC_LINE] = {"line", IN},
+    [EXEC_MSG] = {"msg", IN | OUT},
+    [EXEC_NULL] = {"null", ALL},
+    [EXEC_OPEN] = {"open", OUT},
+    [EXEC_SEARCH] = {"search", IN},
+    [EXEC_TAG] = {"tag", OUT},
+    [EXEC_TTY] = {"tty", ALL},
+    [EXEC_WORD] = {"word", IN},
+};
+
+UNITTEST {
+    CHECK_BSEARCH_ARRAY(exec_map, name, strcmp);
+}
+
+ExecAction lookup_exec_action(const char *name, int fd)
+{
+    BUG_ON(fd < 0 || fd > 2);
+    ssize_t i = BSEARCH_IDX(name, exec_map, vstrcmp);
+    return (i >= 0 && (exec_map[i].flags & 1u << fd)) ? i : EXEC_INVALID;
+}
 
 static void open_files_from_string(EditorState *e, const String *str)
 {
@@ -130,6 +167,7 @@ static void show_spawn_error_msg(const String *errstr, int err)
 
 static SpawnAction spawn_action_from_exec_action(ExecAction action)
 {
+    BUG_ON(action == EXEC_INVALID);
     if (action == EXEC_NULL) {
         return SPAWN_NULL;
     } else if (action == EXEC_TTY) {
@@ -236,6 +274,7 @@ ssize_t handle_exec (
     case EXEC_TAG:
     case EXEC_EVAL:
     case EXEC_ERRMSG:
+    case EXEC_INVALID:
     default:
         BUG("unhandled action");
         return -1;
@@ -296,6 +335,7 @@ ssize_t handle_exec (
     case EXEC_LINE:
     case EXEC_SEARCH:
     case EXEC_WORD:
+    case EXEC_INVALID:
     default:
         BUG("unhandled action");
         return -1;

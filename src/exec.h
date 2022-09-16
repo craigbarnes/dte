@@ -7,9 +7,10 @@
 #include "spawn.h"
 #include "util/macros.h"
 
-// Note: these need to be kept sorted
 typedef enum {
-    EXEC_BUFFER,
+    EXEC_INVALID = -1,
+    // Note: items below here need to be kept sorted
+    EXEC_BUFFER = 0,
     EXEC_COMMAND,
     EXEC_ERRMSG,
     EXEC_EVAL,
@@ -30,5 +31,7 @@ ssize_t handle_exec (
     SpawnFlags spawn_flags,
     bool strip_trailing_newline
 ) NONNULL_ARGS;
+
+ExecAction lookup_exec_action(const char *name, int fd) NONNULL_ARGS;
 
 #endif

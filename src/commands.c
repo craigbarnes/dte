@@ -589,35 +589,6 @@ static void cmd_errorfmt(EditorState *e, const CommandArgs *a)
     add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
 }
 
-typedef enum {
-    IN = 1 << 0,
-    OUT = 1 << 1,
-    ERR = 1 << 2,
-    ALL = IN | OUT | ERR,
-} ExecFlags;
-
-static const struct {
-    char name[8];
-    uint8_t flags; // ExecFlags
-} exec_map[] = {
-    [EXEC_BUFFER] = {"buffer", IN | OUT},
-    [EXEC_COMMAND] = {"command", IN},
-    [EXEC_ERRMSG] = {"errmsg", ERR},
-    [EXEC_EVAL] = {"eval", OUT},
-    [EXEC_LINE] = {"line", IN},
-    [EXEC_MSG] = {"msg", IN | OUT},
-    [EXEC_NULL] = {"null", ALL},
-    [EXEC_OPEN] = {"open", OUT},
-    [EXEC_SEARCH] = {"search", IN},
-    [EXEC_TAG] = {"tag", OUT},
-    [EXEC_TTY] = {"tty", ALL},
-    [EXEC_WORD] = {"word", IN},
-};
-
-UNITTEST {
-    CHECK_BSEARCH_ARRAY(exec_map, name, strcmp);
-}
-
 static void cmd_exec(EditorState *e, const CommandArgs *a)
 {
     ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
@@ -626,12 +597,11 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
     bool move_after_insert = false;
     bool strip_nl = false;
 
-    for (size_t i = 0, n = a->nr_flags, x = 0; i < n; i++) {
-        size_t fd_idx;
+    for (size_t i = 0, n = a->nr_flags, argidx = 0, fd; i < n; i++) {
         switch (a->flags[i]) {
-            case 'e': fd_idx = STDERR_FILENO; break;
-            case 'i': fd_idx = STDIN_FILENO; break;
-            case 'o': fd_idx = STDOUT_FILENO; break;
+            case 'e': fd = STDERR_FILENO; break;
+            case 'i': fd = STDIN_FILENO; break;
+            case 'o': fd = STDOUT_FILENO; break;
             case 'p': spawn_flags |= SPAWN_PROMPT; continue;
             case 's': spawn_flags |= SPAWN_QUIET; continue;
             case 't': spawn_flags &= ~SPAWN_QUIET; continue;
@@ -640,13 +610,13 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
             case 'n': strip_nl = true; continue;
             default: BUG("unexpected flag"); return;
         }
-        const char *flag_arg = a->args[x++];
-        ssize_t action = BSEARCH_IDX(flag_arg, exec_map, vstrcmp);
-        if (action < 0 || !(exec_map[action].flags & 1u << fd_idx)) {
-            error_msg("invalid action for -%c: '%s'", a->flags[i], flag_arg);
+        const char *action_name = a->args[argidx++];
+        ExecAction action = lookup_exec_action(action_name, fd);
+        if (unlikely(action == EXEC_INVALID)) {
+            error_msg("invalid action for -%c: '%s'", a->flags[i], action_name);
             return;
         }
-        actions[fd_idx] = action;
+        actions[fd] = action;
     }
 
     if (lflag && actions[STDIN_FILENO] == EXEC_BUFFER) {
