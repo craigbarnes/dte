@@ -19,7 +19,7 @@ typedef enum {
 
 static inline bool is_valid_filetype_name(const char *name)
 {
-    return name[0] != '\0' && !strchr(name, '/');
+    return name[0] != '\0' && name[0] != '-' && !strchr(name, '/');
 }
 
 void add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type);

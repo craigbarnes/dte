@@ -7,6 +7,7 @@ static void test_is_valid_filetype_name(TestContext *ctx)
     EXPECT_FALSE(is_valid_filetype_name(""));
     EXPECT_FALSE(is_valid_filetype_name("x/y"));
     EXPECT_FALSE(is_valid_filetype_name("/"));
+    EXPECT_FALSE(is_valid_filetype_name("-c"));
 }
 
 static void test_find_ft_filename(TestContext *ctx)

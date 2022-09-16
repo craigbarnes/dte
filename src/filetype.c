@@ -36,8 +36,15 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(basenames, name, strcmp);
     CHECK_BSEARCH_ARRAY(extensions, ext, strcmp);
     CHECK_BSEARCH_ARRAY(interpreters, key, strcmp);
-    CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names, strcmp);
     CHECK_BSEARCH_STR_ARRAY(ignored_extensions, strcmp);
+    CHECK_BSEARCH_STR_ARRAY(builtin_filetype_names, strcmp);
+
+    for (size_t i = 0; i < ARRAYLEN(builtin_filetype_names); i++) {
+        const char *name = builtin_filetype_names[i];
+        if (unlikely(!is_valid_filetype_name(name))) {
+            BUG("invalid name at builtin_filetype_names[%zu]: \"%s\"", i, name);
+        }
+    }
 }
 
 typedef struct {
@@ -294,11 +301,9 @@ String dump_filetypes(const PointerArray *filetypes)
     for (size_t i = 0, n = filetypes->count; i < n; i++) {
         const UserFileTypeEntry *ft = filetypes->ptrs[i];
         BUG_ON(ft->type >= ARRAYLEN(flags));
+        BUG_ON(ft->name[0] == '-');
         string_append_literal(&s, "ft ");
         string_append_cstring(&s, flags[ft->type]);
-        if (unlikely(ft->name[0] == '-')) {
-            string_append_cstring(&s, "-- ");
-        }
         string_append_escaped_arg(&s, ft->name, true);
         string_append_byte(&s, ' ');
         string_append_escaped_arg(&s, ft_get_str(ft), true);
