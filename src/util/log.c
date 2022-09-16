@@ -13,8 +13,8 @@
 
 // These are initialized during early startup and then never changed,
 // so they're deemed an "acceptable" use of globals:
-static const char *dim = "";
-static const char *sgr0 = "";
+static char dim[] = "\033[2m";
+static char sgr0[] = "\033[0m";
 static LogLevel log_level = LOG_LEVEL_NONE;
 static int logfd = -1;
 
@@ -54,19 +54,25 @@ bool log_init(const char *filename, LogLevel level)
 
     int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
     logfd = xopen(filename, flags, 0666);
-    if (unlikely(logfd < 0)) {
-        return false;
-    }
-    if (unlikely(xwrite_all(logfd, "\n", 1) != 1)) {
+    if (unlikely(logfd < 0 || xwrite_all(logfd, "\n", 1) != 1)) {
         return false;
     }
 
-    if (isatty(logfd)) {
-        dim = "\033[2m";
-        sgr0 = "\033[0m";
+    if (!isatty(logfd)) {
+        dim[0] = '\0';
+        sgr0[0] = '\0';
     }
 
     log_level = level;
+    if (DEBUG < 2 && level >= LOG_LEVEL_DEBUG) {
+        const char *req = log_levels[level];
+        static_assert(LOG_LEVEL_INFO == LOG_LEVEL_DEBUG - 1);
+        log_level = LOG_LEVEL_INFO;
+        LOG_WARNING("log level '%s' unavailable; falling back to 'info'", req);
+    }
+
+    LOG_INFO("logging to '%s' (level: %s)", filename, log_levels[log_level]);
+
     struct utsname u;
     if (likely(uname(&u) >= 0)) {
         LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
