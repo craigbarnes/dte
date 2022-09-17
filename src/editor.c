@@ -326,6 +326,7 @@ static void restore_cursor(EditorState *e)
 
 static void start_update(EditorState *e)
 {
+    term_begin_sync_update(&e->terminal);
     term_hide_cursor(&e->terminal);
 }
 
@@ -338,6 +339,7 @@ static void end_update(EditorState *e)
 {
     restore_cursor(e);
     term_show_cursor(&e->terminal);
+    term_end_sync_update(&e->terminal);
     term_output_flush(&e->terminal.obuf);
 
     e->buffer->changed_line_min = LONG_MAX;
@@ -436,6 +438,7 @@ void ui_end(EditorState *e)
     term_use_normal_screen_buffer(term);
     term_restore_private_modes(term);
     term_restore_cursor_style(term);
+    term_end_sync_update(&e->terminal);
     term_output_flush(obuf);
     term_cooked();
 }

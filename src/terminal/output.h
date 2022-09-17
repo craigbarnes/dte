@@ -29,6 +29,8 @@ void term_use_alt_screen_buffer(Terminal *term);
 void term_use_normal_screen_buffer(Terminal *term);
 void term_hide_cursor(Terminal *term);
 void term_show_cursor(Terminal *term);
+void term_begin_sync_update(Terminal *term);
+void term_end_sync_update(Terminal *term);
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y);
 void term_save_title(Terminal *term);
 void term_restore_title(Terminal *term);

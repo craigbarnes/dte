@@ -161,6 +161,24 @@ void term_show_cursor(Terminal *term)
     term_add_literal(&term->obuf, "\033[?25h");
 }
 
+void term_begin_sync_update(Terminal *term)
+{
+    if (term->features & TFLAG_SYNC_CSI) {
+        term_add_literal(&term->obuf, "\033[?2026h");
+    } else if (term->features & TFLAG_SYNC_DCS) {
+        term_add_literal(&term->obuf, "\033P=1s\033\\");
+    }
+}
+
+void term_end_sync_update(Terminal *term)
+{
+    if (term->features & TFLAG_SYNC_CSI) {
+        term_add_literal(&term->obuf, "\033[?2026l");
+    } else if (term->features & TFLAG_SYNC_DCS) {
+        term_add_literal(&term->obuf, "\033P=2s\033\\");
+    }
+}
+
 void term_move_cursor(TermOutputBuffer *obuf, unsigned int x, unsigned int y)
 {
     term_add_literal(obuf, "\033[");
