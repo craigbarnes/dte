@@ -419,9 +419,13 @@ void ui_start(EditorState *e)
     if (e->status == EDITOR_INITIALIZING) {
         return;
     }
-    Terminal *term = &e->terminal;
-    term_use_alt_screen_buffer(term);
-    term_enable_private_modes(term);
+
+    // Note: the order of these calls is important - Kitty saves/restores
+    // some terminal state when switching buffers, so switching to the
+    // alternate screen buffer needs to happen before modes are enabled
+    term_use_alt_screen_buffer(&e->terminal);
+    term_enable_private_modes(&e->terminal);
+
     ui_resize(e);
 }
 
