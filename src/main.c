@@ -185,6 +185,7 @@ static void set_signal_handlers(void)
 static ExitCode list_builtin_configs(void)
 {
     String str = dump_builtin_configs();
+    BUG_ON(!str.buffer);
     ssize_t n = xwrite_all(STDOUT_FILENO, str.buffer, str.len);
     string_free(&str);
     if (n < 0) {
