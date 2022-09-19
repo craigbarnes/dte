@@ -13,7 +13,7 @@ Features
 * Customizable [color schemes] (including 24-bit RGB)
 * Customizable [key bindings]
 * [Command language] with auto-completion
-* Unicode 14 compatible text rendering
+* Unicode 15 compatible text rendering
 * Support for all xterm key combos (including [`modifyOtherKeys`])
 * Support for [kitty's keyboard protocol]
 * Support for multiple encodings (using [iconv])

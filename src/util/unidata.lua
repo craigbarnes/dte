@@ -68,7 +68,7 @@ local function read_ucd(path, pattern)
             " path/to/UnicodeData.txt",
             " path/to/EastAsianWidth.txt",
             " path/to/DerivedCoreProperties.txt",
-            "\n(available from: https://unicode.org/Public/13.0.0/ucd/)\n"
+            "\n(available from: https://unicode.org/Public/15.0.0/ucd/)\n"
         )
         os.exit(1)
     end
