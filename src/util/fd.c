@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "fd.h"
 #include "debug.h"
+#include "xreadwrite.h"
 
 int xpipe2(int fd[2], int flags)
 {
@@ -25,14 +26,23 @@ int xpipe2(int fd[2], int flags)
         return -1;
     }
     if (flags & O_CLOEXEC) {
-        fd_set_cloexec(fd[0], true);
-        fd_set_cloexec(fd[1], true);
+        if (unlikely(!fd_set_cloexec(fd[0], true) || !fd_set_cloexec(fd[1], true))) {
+            goto error;
+        }
     }
     if (flags & O_NONBLOCK) {
-        fd_set_nonblock(fd[0], true);
-        fd_set_nonblock(fd[1], true);
+        if (unlikely(!fd_set_nonblock(fd[0], true) || !fd_set_nonblock(fd[1], true))) {
+            goto error;
+        }
     }
     return 0;
+
+error:;
+    int e = errno;
+    xclose(fd[0]);
+    xclose(fd[1]);
+    errno = e;
+    return -1;
 }
 
 int xdup3(int oldfd, int newfd, int flags)
