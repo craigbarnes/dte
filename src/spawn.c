@@ -11,6 +11,7 @@
 #include "regexp.h"
 #include "terminal/mode.h"
 #include "util/debug.h"
+#include "util/fd.h"
 #include "util/fork-exec.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"

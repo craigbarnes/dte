@@ -38,7 +38,7 @@ TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \
     env thai crlf pipe redo shift fuzz1 fuzz2 ))
 
 util_objects := $(call prefix-obj, build/util/, \
-    array ascii base64 debug fork-exec hashmap hashset intern intmap \
+    array ascii base64 debug fd fork-exec hashmap hashset intern intmap \
     log numtostr path ptr-array readfile string strtonum unicode utf8 \
     xmalloc xmemmem xreadwrite xsnprintf xstdio )
 
@@ -188,6 +188,7 @@ build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
 build/editor.o: build/version.h
 build/load-save.o: build/feature.h
+build/util/fd.o: build/feature.h
 build/util/fork-exec.o: build/feature.h
 build/util/xmemmem.o: build/feature.h
 build/terminal/winsize.o: build/feature.h
