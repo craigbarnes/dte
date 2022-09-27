@@ -633,13 +633,13 @@ static void update_screen(EditorState *e, const ScreenState *s)
 void main_loop(EditorState *e)
 {
     while (e->status == EDITOR_RUNNING) {
-        if (resized) {
+        if (unlikely(resized)) {
             LOG_INFO("SIGWINCH received");
             ui_resize(e);
         }
 
         KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);
-        if (key == KEY_NONE) {
+        if (unlikely(key == KEY_NONE)) {
             continue;
         }
 
