@@ -18,29 +18,9 @@
 static void normal_mode_keypress(EditorState *e, KeyCode key)
 {
     View *view = e->view;
-    switch (key) {
-    case KEY_TAB:
-        if (view->selection == SELECT_LINES) {
-            shift_lines(view, 1);
-            return;
-        }
-        break;
-    case MOD_SHIFT | KEY_TAB:
-        if (view->selection == SELECT_LINES) {
-            shift_lines(view, -1);
-            return;
-        }
-        break;
-    case KEY_BRACKETED_PASTE:
-    case KEY_DETECTED_PASTE: {
-        String str = term_read_paste(&e->terminal.ibuf, key == KEY_BRACKETED_PASTE);
-        begin_change(CHANGE_MERGE_NONE);
-        insert_text(view, str.buffer, str.len, true);
-        end_change();
-        macro_insert_text_hook(&e->macro, str.buffer, str.len);
-        string_free(&str);
+    if ((key == KEY_TAB || key == (MOD_SHIFT | KEY_TAB)) && view->selection == SELECT_LINES) {
+        shift_lines(view, (key & MOD_SHIFT) ? -1 : 1);
         return;
-        }
     }
 
     if (u_is_unicode(key)) {
@@ -51,18 +31,31 @@ static void normal_mode_keypress(EditorState *e, KeyCode key)
     }
 }
 
-static void cmdline_insert_paste(CommandLine *c, TermInputBuffer *input, bool bracketed)
+static void insert_paste(EditorState *e, bool bracketed)
 {
-    String str = term_read_paste(input, bracketed);
-    string_replace_byte(&str, '\n', ' ');
-    string_insert_buf(&c->buf, c->pos, str.buffer, str.len);
-    c->pos += str.len;
-    c->search_pos = NULL;
+    String str = term_read_paste(&e->terminal.ibuf, bracketed);
+    if (e->input_mode == INPUT_NORMAL) {
+        begin_change(CHANGE_MERGE_NONE);
+        insert_text(e->view, str.buffer, str.len, true);
+        end_change();
+        macro_insert_text_hook(&e->macro, str.buffer, str.len);
+    } else {
+        CommandLine *c = &e->cmdline;
+        string_replace_byte(&str, '\n', ' ');
+        string_insert_buf(&c->buf, c->pos, str.buffer, str.len);
+        c->pos += str.len;
+        c->search_pos = NULL;
+    }
     string_free(&str);
 }
 
 void handle_input(EditorState *e, KeyCode key)
 {
+    if (key == KEY_DETECTED_PASTE || key == KEY_BRACKETED_PASTE) {
+        insert_paste(e, key == KEY_BRACKETED_PASTE);
+        return;
+    }
+
     InputMode mode = e->input_mode;
     if (mode == INPUT_NORMAL) {
         normal_mode_keypress(e, key);
@@ -73,8 +66,6 @@ void handle_input(EditorState *e, KeyCode key)
     CommandLine *c = &e->cmdline;
     if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
         c->pos += string_insert_ch(&c->buf, c->pos, key);
-    } else if (key == KEY_DETECTED_PASTE || key == KEY_BRACKETED_PASTE) {
-        cmdline_insert_paste(c, &e->terminal.ibuf, key == KEY_BRACKETED_PASTE);
     } else {
         handle_binding(&e->bindings[mode], key);
         return;
