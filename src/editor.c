@@ -115,7 +115,7 @@ EditorState editor = {
         .color_type = TERM_8_COLOR,
         .width = 80,
         .height = 24,
-        .parse_key_sequence = xterm_parse_key,
+        .parse_input = xterm_parse_key,
     },
     .options = {
         .auto_indent = true,

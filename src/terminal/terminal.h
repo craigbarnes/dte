@@ -79,7 +79,7 @@ typedef struct Terminal {
     unsigned int width;
     unsigned int height;
     unsigned int ncv_attributes;
-    ssize_t (*parse_key_sequence)(const char *buf, size_t length, KeyCode *key);
+    ssize_t (*parse_input)(const char *buf, size_t length, KeyCode *key);
     TermOutputBuffer obuf;
     TermInputBuffer ibuf;
 } Terminal;

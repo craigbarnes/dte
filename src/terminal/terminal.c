@@ -153,9 +153,9 @@ void term_init(Terminal *term, const char *name)
         term->color_type = entry->color_type;
         term->ncv_attributes = entry->ncv_attrs;
         if (features & RXVT) {
-            term->parse_key_sequence = rxvt_parse_key;
+            term->parse_input = rxvt_parse_key;
         } else if (features & LINUX) {
-            term->parse_key_sequence = linux_parse_key;
+            term->parse_input = linux_parse_key;
         }
         const int n = (int)root_name.length;
         LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);

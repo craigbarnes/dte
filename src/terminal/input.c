@@ -96,7 +96,7 @@ static KeyCode read_special(Terminal *term)
 {
     TermInputBuffer *input = &term->ibuf;
     KeyCode key;
-    ssize_t len = term->parse_key_sequence(input->buf, input->len, &key);
+    ssize_t len = term->parse_input(input->buf, input->len, &key);
     if (likely(len > 0)) {
         // Match
         consume_input(input, len);
