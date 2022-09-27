@@ -55,19 +55,19 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_EQ(binding->a.flags[1], '\0');
     EXPECT_TRUE(cmdargs_has_flag(&binding->a, 'm'));
 
-    handle_binding(kbg, key);
+    ASSERT_TRUE(handle_binding(kbg, key));
     const Block *block = BLOCK(e->buffer->blocks.next);
     ASSERT_NONNULL(block);
     ASSERT_EQ(block->size, 4);
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "zzz\n", 4);
 
-    handle_binding(kbg, MOD_CTRL | '?');
+    ASSERT_TRUE(handle_binding(kbg, MOD_CTRL | '?'));
     ASSERT_EQ(block->size, 3);
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "zz\n", 3);
 
-    handle_binding(kbg, MOD_CTRL | MOD_META | '?');
+    ASSERT_TRUE(handle_binding(kbg, MOD_CTRL | MOD_META | '?'));
     ASSERT_EQ(block->size, 1);
     EXPECT_EQ(block->nl, 1);
     EXPECT_MEMEQ(block->data, "\n", 1);
