@@ -17,11 +17,11 @@ static void test_command_mode(TestContext *ctx)
     set_input_mode(e, INPUT_COMMAND);
     EXPECT_EQ(e->input_mode, INPUT_COMMAND);
 
-    handle_input(e, 'a');
+    EXPECT_TRUE(handle_input(e, 'a'));
     EXPECT_EQ(c->pos, 1);
     EXPECT_STRING_EQ(c->buf, "a");
 
-    handle_input(e, 0x1F999);
+    EXPECT_TRUE(handle_input(e, 0x1F999));
     EXPECT_EQ(c->pos, 5);
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 

@@ -209,11 +209,11 @@ static void test_macro_record(TestContext *ctx)
 
     const CommandSet *cmds = &normal_commands;
     handle_command(cmds, "open", false);
-    handle_input(e, 'x');
-    handle_input(e, 'y');
+    EXPECT_TRUE(handle_input(e, 'x'));
+    EXPECT_TRUE(handle_input(e, 'y'));
     handle_command(cmds, "bol", true);
-    handle_input(e, '-');
-    handle_input(e, 'z');
+    EXPECT_TRUE(handle_input(e, '-'));
+    EXPECT_TRUE(handle_input(e, 'z'));
     handle_command(cmds, "eol; right; insert -m .; new-line", true);
 
     const StringView t1 = STRING_VIEW("test 1\n");

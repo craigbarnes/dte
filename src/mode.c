@@ -15,23 +15,24 @@
 #include "util/unicode.h"
 #include "view.h"
 
-static void normal_mode_keypress(EditorState *e, KeyCode key)
+static bool normal_mode_keypress(EditorState *e, KeyCode key)
 {
     View *view = e->view;
     if ((key == KEY_TAB || key == (MOD_SHIFT | KEY_TAB)) && view->selection == SELECT_LINES) {
         shift_lines(view, (key & MOD_SHIFT) ? -1 : 1);
-        return;
+        return true;
     }
 
     if (u_is_unicode(key)) {
         insert_ch(view, key);
         macro_insert_char_hook(&e->macro, key);
-    } else {
-        handle_binding(&e->bindings[INPUT_NORMAL], key);
+        return true;
     }
+
+    return handle_binding(&e->bindings[INPUT_NORMAL], key);
 }
 
-static void insert_paste(EditorState *e, bool bracketed)
+static bool insert_paste(EditorState *e, bool bracketed)
 {
     String str = term_read_paste(&e->terminal.ibuf, bracketed);
     if (e->input_mode == INPUT_NORMAL) {
@@ -47,31 +48,29 @@ static void insert_paste(EditorState *e, bool bracketed)
         c->search_pos = NULL;
     }
     string_free(&str);
+    return true;
 }
 
-void handle_input(EditorState *e, KeyCode key)
+bool handle_input(EditorState *e, KeyCode key)
 {
     if (key == KEY_DETECTED_PASTE || key == KEY_BRACKETED_PASTE) {
-        insert_paste(e, key == KEY_BRACKETED_PASTE);
-        return;
+        return insert_paste(e, key == KEY_BRACKETED_PASTE);
     }
 
     InputMode mode = e->input_mode;
     if (mode == INPUT_NORMAL) {
-        normal_mode_keypress(e, key);
-        return;
+        return normal_mode_keypress(e, key);
     }
 
     BUG_ON(!(mode == INPUT_COMMAND || mode == INPUT_SEARCH));
-    CommandLine *c = &e->cmdline;
-    if (u_is_unicode(key) && key != KEY_TAB && key != KEY_ENTER) {
-        c->pos += string_insert_ch(&c->buf, c->pos, key);
-    } else {
-        handle_binding(&e->bindings[mode], key);
-        return;
+    if (!u_is_unicode(key) || key == KEY_TAB || key == KEY_ENTER) {
+        return handle_binding(&e->bindings[mode], key);
     }
 
+    CommandLine *c = &e->cmdline;
+    c->pos += string_insert_ch(&c->buf, c->pos, key);
     if (mode == INPUT_COMMAND) {
         reset_completion(c);
     }
+    return true;
 }
