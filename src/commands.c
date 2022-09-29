@@ -1726,13 +1726,8 @@ UNITTEST {
 static void cmd_search(EditorState *e, const CommandArgs *a)
 {
     const char *pattern = a->args[0];
-    unsigned int npw_count = u64_popcount(a->flag_set & get_flagset_npw());
-    if (npw_count >= 2) {
-        error_msg("flags -n, -p and -w are mutually exclusive");
-        return;
-    }
-    if (npw_count == 1 && pattern) {
-        error_msg("flags [-npw] and pattern argument are mutually exclusive");
+    if (u64_popcount(a->flag_set & get_flagset_npw()) + !!pattern >= 2) {
+        error_msg("flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
         return;
     }
 
