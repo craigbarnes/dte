@@ -785,25 +785,57 @@ static void cmd_load_syntax(EditorState *e, const CommandArgs *a)
 
 static void cmd_macro(EditorState *e, const CommandArgs *a)
 {
-    static const struct {
-        const char name[8];
-        void (*handler)(CommandMacroState *m);
-    } actions[] = {
-        {"record", macro_record},
-        {"stop", macro_stop},
-        {"toggle", macro_toggle},
-        {"cancel", macro_cancel},
-        {"play", macro_play},
-        {"run", macro_play},
-    };
+    CommandMacroState *m = &e->macro;
     const char *action = a->args[0];
-    for (size_t i = 0; i < ARRAYLEN(actions); i++) {
-        if (streq(action, actions[i].name)) {
-            actions[i].handler(&e->macro);
-            return;
+
+    if (streq(action, "play") || streq(action, "run")) {
+        unsigned int saved_nr_errors = get_nr_errors();
+        for (size_t i = 0, n = m->macro.count; i < n; i++) {
+            const char *cmd_str = m->macro.ptrs[i];
+            handle_command(&normal_commands, cmd_str, false);
+            if (get_nr_errors() != saved_nr_errors) {
+                break;
+            }
         }
+        return;
     }
+
+    const char *msg;
+    if (streq(action, "toggle")) {
+        if (m->recording) {
+            goto stop;
+        }
+        goto record;
+    }
+
+    if (streq(action, "record")) {
+        record:
+        msg = macro_record(m) ? "Recording macro" : "Already recording";
+        goto message;
+    }
+
+    if (streq(action, "stop")) {
+        stop:
+        if (!macro_stop(m)) {
+            msg = "Not recording";
+            goto message;
+        }
+        size_t count = m->macro.count;
+        const char *plural = (count != 1) ? "s" : "";
+        info_msg("Macro recording stopped; %zu command%s saved", count, plural);
+        return;
+    }
+
+    if (streq(action, "cancel")) {
+        msg = macro_cancel(m) ? "Macro recording cancelled" : "Not recording";
+        goto message;
+    }
+
     error_msg("Unknown action '%s'", action);
+    return;
+
+message:
+    info_msg("%s", msg);
 }
 
 static void cmd_match_bracket(EditorState *e, const CommandArgs *a)

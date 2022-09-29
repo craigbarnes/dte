@@ -204,7 +204,7 @@ static void test_macro_record(TestContext *ctx)
     CommandMacroState *m = &e->macro;
     EXPECT_EQ(e->input_mode, INPUT_NORMAL);
     EXPECT_FALSE(macro_is_recording(m));
-    macro_record(m);
+    EXPECT_TRUE(macro_record(m));
     EXPECT_TRUE(macro_is_recording(m));
 
     const CommandSet *cmds = &normal_commands;
@@ -225,7 +225,7 @@ static void test_macro_record(TestContext *ctx)
     macro_insert_text_hook(m, t2.data, t2.length);
 
     EXPECT_TRUE(macro_is_recording(m));
-    macro_stop(m);
+    EXPECT_TRUE(macro_stop(m));
     EXPECT_FALSE(macro_is_recording(m));
 
     handle_command (
