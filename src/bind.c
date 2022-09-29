@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -69,9 +70,10 @@ typedef struct {
 
 static int binding_cmp(const void *ap, const void *bp)
 {
-    KeyCode a = ((const KeyBinding*)ap)->key;
-    KeyCode b = ((const KeyBinding*)bp)->key;
-    return a == b ? 0 : (a > b ? 1 : -1);
+    static_assert((MOD_MASK | KEY_SPECIAL_MAX) <= INT_MAX);
+    const KeyBinding *a = ap;
+    const KeyBinding *b = bp;
+    return (int)a->key - (int)b->key;
 }
 
 UNITTEST {
@@ -79,9 +81,9 @@ UNITTEST {
     KeyBinding b = {.key = KEY_F5};
     BUG_ON(binding_cmp(&a, &b) != 0);
     b.key = KEY_F3;
-    BUG_ON(binding_cmp(&a, &b) != 1);
+    BUG_ON(binding_cmp(&a, &b) <= 0);
     b.key = KEY_F12;
-    BUG_ON(binding_cmp(&a, &b) != -1);
+    BUG_ON(binding_cmp(&a, &b) >= 0);
 }
 
 bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf)
