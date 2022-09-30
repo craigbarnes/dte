@@ -137,6 +137,7 @@ state preproc-error error
     char "\n" start
     eat this
 
+# TODO: C23 [[attribute]] syntax
 state c code
     char -b a-z_ ident
     char -b A-Z ident-upper
