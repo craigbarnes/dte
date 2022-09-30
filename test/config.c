@@ -203,6 +203,8 @@ static void test_macro_record(TestContext *ctx)
     EditorState *e = ctx->userdata;
     CommandMacroState *m = &e->macro;
     EXPECT_EQ(e->input_mode, INPUT_NORMAL);
+    EXPECT_EQ(m->macro.count, 0);
+    EXPECT_EQ(m->prev_macro.count, 0);
     EXPECT_FALSE(macro_is_recording(m));
     EXPECT_TRUE(macro_record(m));
     EXPECT_TRUE(macro_is_recording(m));
@@ -227,6 +229,8 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(macro_is_recording(m));
     EXPECT_TRUE(macro_stop(m));
     EXPECT_FALSE(macro_is_recording(m));
+    EXPECT_EQ(m->macro.count, 9);
+    EXPECT_EQ(m->prev_macro.count, 0);
 
     handle_command (
         cmds,
@@ -242,6 +246,15 @@ static void test_macro_record(TestContext *ctx)
     );
 
     expect_files_equal(ctx, "build/test/macro-rec.txt", "build/test/macro-out.txt");
+
+    EXPECT_FALSE(macro_is_recording(m));
+    EXPECT_TRUE(macro_record(m));
+    EXPECT_TRUE(macro_is_recording(m));
+    EXPECT_TRUE(handle_input(e, 'x'));
+    EXPECT_TRUE(macro_cancel(m));
+    EXPECT_FALSE(macro_is_recording(m));
+    EXPECT_EQ(m->macro.count, 9);
+    EXPECT_EQ(m->prev_macro.count, 0);
 }
 
 static const TestEntry tests[] = {
