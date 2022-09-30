@@ -42,7 +42,7 @@ Editor Commands:
 .br
    \fBcommand\fR [\fItext\fR]
 .br
-   \fBsearch\fR [\fB\-Hnprw\fR] [\fIpattern\fR]
+   \fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .br
    \fBrefresh\fR
 .br
@@ -875,7 +875,7 @@ Enter command mode. If \fItext\fR is given then it is written to the command
 line (see the default \fB^L\fR key binding for why this is useful).
 .P
 .RE
-\fBsearch\fR [\fB\-Hnprw\fR] [\fIpattern\fR]
+\fBsearch\fR [\fB\-Hr\fR] [\fB\-n\fR|\fB\-p\fR|\fB\-w\fR|\fIpattern\fR]
 .RS
 If no flags or just \fB\-r\fR and no \fIpattern\fR given then dte changes to
 search mode where you can type a regular expression to search.

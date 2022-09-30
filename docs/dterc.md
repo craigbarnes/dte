@@ -447,7 +447,7 @@ Change the working directory and update `$PWD` and `$OLDPWD`. Running
 Enter command mode. If _text_ is given then it is written to the command
 line (see the default `^L` key binding for why this is useful).
 
-### **search** [**-Hnprw**] [_pattern_]
+### **search** [**-Hr**] [**-n**|**-p**|**-w**|_pattern_]
 
 If no flags or just `-r` and no _pattern_ given then dte changes to
 search mode where you can type a regular expression to search.
