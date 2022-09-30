@@ -182,6 +182,9 @@ static void set_and_check_locale(void)
 EditorState *init_editor_state(void)
 {
     EditorState *e = &editor;
+    BUG_ON(statusline_format_find_error(e->options.statusline_left));
+    BUG_ON(statusline_format_find_error(e->options.statusline_right));
+
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
     e->home_dir = strview_intern(home ? home : "");

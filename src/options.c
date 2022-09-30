@@ -37,7 +37,7 @@ typedef union {
 } OptionValue;
 
 typedef union {
-    struct {bool (*validate)(const char *value);} str_opt; // OPT_STR (optional)
+    struct {bool (*validate)(const EditorState *e, const char *value);} str_opt; // OPT_STR (optional)
     struct {unsigned int min, max;} uint_opt; // OPT_UINT
     struct {const char *const *values;} enum_opt; // OPT_ENUM, OPT_FLAG, OPT_BOOL
 } OptionConstraint;
@@ -49,7 +49,7 @@ typedef struct {
     unsigned int offset;
     OptionType type;
     OptionConstraint u;
-    void (*on_change)(bool global); // Optional
+    void (*on_change)(EditorState *e, bool global); // Optional
 } OptionDesc;
 
 #define STR_OPT(_name, OLG, _validate, _on_change) { \
@@ -104,21 +104,21 @@ typedef struct {
 #define G(member) OLG(offsetof(GlobalOptions, member), false, true)
 #define C(member) OLG(offsetof(CommonOptions, member), true, true)
 
-static void filetype_changed(bool global)
+static void filetype_changed(EditorState *e, bool global)
 {
-    BUG_ON(!editor.buffer);
+    BUG_ON(!e->buffer);
     BUG_ON(global);
-    set_file_options(&editor.file_options, editor.buffer);
-    buffer_update_syntax(editor.buffer);
+    set_file_options(&e->file_options, e->buffer);
+    buffer_update_syntax(e->buffer);
 }
 
-static void set_window_title_changed(bool global)
+static void set_window_title_changed(EditorState *e, bool global)
 {
     BUG_ON(!global);
-    Terminal *term = &editor.terminal;
-    if (editor.options.set_window_title) {
-        if (editor.status == EDITOR_RUNNING) {
-            update_term_title(&editor, editor.buffer);
+    Terminal *term = &e->terminal;
+    if (e->options.set_window_title) {
+        if (e->status == EDITOR_RUNNING) {
+            update_term_title(e, e->buffer);
         }
     } else {
         term_restore_title(term);
@@ -126,34 +126,34 @@ static void set_window_title_changed(bool global)
     }
 }
 
-static void syntax_changed(bool global)
+static void syntax_changed(EditorState *e, bool global)
 {
-    if (editor.buffer && !global) {
-        buffer_update_syntax(editor.buffer);
+    if (e->buffer && !global) {
+        buffer_update_syntax(e->buffer);
     }
 }
 
-static void overwrite_changed(bool global)
+static void overwrite_changed(EditorState *e, bool global)
 {
     if (!global) {
-        editor.cursor_style_changed = true;
+        e->cursor_style_changed = true;
     }
 }
 
-static void redraw_buffer(bool global)
+static void redraw_buffer(EditorState *e, bool global)
 {
-    if (editor.buffer && !global) {
-        mark_all_lines_changed(editor.buffer);
+    if (e->buffer && !global) {
+        mark_all_lines_changed(e->buffer);
     }
 }
 
-static void redraw_screen(bool global)
+static void redraw_screen(EditorState *e, bool global)
 {
     BUG_ON(!global);
-    mark_everything_changed(&editor);
+    mark_everything_changed(e);
 }
 
-static bool validate_statusline_format(const char *value)
+static bool validate_statusline_format(const EditorState* UNUSED_ARG(e), const char *value)
 {
     size_t errpos = statusline_format_find_error(value);
     if (likely(errpos == 0)) {
@@ -168,16 +168,16 @@ static bool validate_statusline_format(const char *value)
     return false;
 }
 
-static bool validate_filetype(const char *value)
+static bool validate_filetype(const EditorState *e, const char *value)
 {
-    if (!is_ft(&editor.filetypes, value)) {
+    if (!is_ft(&e->filetypes, value)) {
         error_msg("No such file type '%s'", value);
         return false;
     }
     return true;
 }
 
-static bool validate_regex(const char *value)
+static bool validate_regex(const EditorState* UNUSED_ARG(e), const char *value)
 {
     return value[0] == '\0' || regexp_is_valid(value, REG_NEWLINE);
 }
@@ -196,7 +196,7 @@ static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 
 static bool str_parse(const OptionDesc *d, const char *str, OptionValue *v)
 {
-    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(str);
+    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(&editor, str);
     v->str_val = valid ? str : NULL;
     return valid;
 }
@@ -489,10 +489,6 @@ UNITTEST {
 
     // Ensure option_desc[] is properly sorted
     CHECK_BSEARCH_ARRAY(option_desc, name, strcmp);
-
-    // Validate default statusline formats
-    BUG_ON(!validate_statusline_format(editor.options.statusline_left));
-    BUG_ON(!validate_statusline_format(editor.options.statusline_right));
 }
 
 static OptionValue desc_get(const OptionDesc *desc, void *ptr)
@@ -504,7 +500,7 @@ static void desc_set(const OptionDesc *desc, void *ptr, bool global, OptionValue
 {
     option_ops[desc->type].set(desc, ptr, value);
     if (desc->on_change) {
-        desc->on_change(global);
+        desc->on_change(&editor, global);
     }
 }
 
