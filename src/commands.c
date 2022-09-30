@@ -934,38 +934,51 @@ static void cmd_move_tab(EditorState *e, const CommandArgs *a)
     window->update_tabbar = true;
 }
 
+static uint_least64_t get_flagset_npw(void)
+{
+    // flagset mask for "-npw" flags
+    return UINT64_C(517) << 40;
+}
+
+UNITTEST {
+    uint_least64_t ref = 0;
+    ref |= cmdargs_flagset_value('n');
+    ref |= cmdargs_flagset_value('p');
+    ref |= cmdargs_flagset_value('w');
+    BUG_ON(get_flagset_npw() != ref);
+    BUG_ON(u64_popcount(ref) != 3);
+}
+
 static void cmd_msg(EditorState *e, const CommandArgs *a)
 {
-    const char *arg = a->args[0];
-    if (!arg) {
-        switch (last_flag(a)) {
-        case 0:
-            activate_current_message(&e->messages);
-            break;
-        case 'n':
-            activate_next_message(&e->messages);
-            break;
-        case 'p':
-            activate_prev_message(&e->messages);
-            break;
-        default:
-            BUG("unexpected flag");
+    const char *str = a->args[0];
+    if (u64_popcount(a->flag_set & get_flagset_npw()) + !!str >= 2) {
+        error_msg("flags [-n|-p] and [number] argument are mutually exclusive");
+        return;
+    }
+
+    MessageArray *msgs = &e->messages;
+    size_t count = msgs->array.count;
+    if (count == 0) {
+        return;
+    }
+
+    size_t p = msgs->pos;
+    BUG_ON(p >= count);
+    if (has_flag(a, 'n')) {
+        p = MIN(p + 1, count - 1);
+    } else if (has_flag(a, 'p')) {
+        p = p ? p - 1 : 0;
+    } else if (str) {
+        if (!str_to_size(str, &p) || p == 0) {
+            error_msg("invalid message index: %s", str);
+            return;
         }
-        return;
+        p = MIN(p - 1, count - 1);
     }
 
-    if (a->nr_flags != 0) {
-        error_msg("flags (-n|-p) and arguments are mutually exclusive");
-        return;
-    }
-
-    size_t idx;
-    if (!str_to_size(arg, &idx) || idx == 0) {
-        error_msg("invalid message index: %s", arg);
-        return;
-    }
-
-    activate_message(&e->messages, idx - 1);
+    msgs->pos = p;
+    activate_current_message(msgs);
 }
 
 static void cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -1706,21 +1719,6 @@ static void cmd_scroll_up(EditorState *e, const CommandArgs *a)
     if (view->vy + window->edit_h <= view->cy) {
         move_up(view, 1);
     }
-}
-
-static uint_least64_t get_flagset_npw(void)
-{
-    // flagset mask for "-npw" flags
-    return UINT64_C(517) << 40;
-}
-
-UNITTEST {
-    uint_least64_t ref = 0;
-    ref |= cmdargs_flagset_value('n');
-    ref |= cmdargs_flagset_value('p');
-    ref |= cmdargs_flagset_value('w');
-    BUG_ON(get_flagset_npw() != ref);
-    BUG_ON(u64_popcount(ref) != 3);
 }
 
 static void cmd_search(EditorState *e, const CommandArgs *a)

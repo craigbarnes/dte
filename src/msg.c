@@ -41,12 +41,13 @@ void add_message(MessageArray *msgs, Message *m)
 
 void activate_current_message(const MessageArray *msgs)
 {
-    size_t pos = msgs->pos;
     size_t count = msgs->array.count;
-    if (pos == count) {
+    if (count == 0) {
         return;
     }
 
+    size_t pos = msgs->pos;
+    BUG_ON(pos >= count);
     const Message *m = msgs->array.ptrs[pos];
     if (m->loc && m->loc->filename) {
         if (!file_location_go(m->loc)) {
@@ -60,32 +61,6 @@ void activate_current_message(const MessageArray *msgs)
     } else {
         info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
     }
-}
-
-void activate_message(MessageArray *msgs, size_t idx)
-{
-    const size_t count = msgs->array.count;
-    if (count == 0) {
-        return;
-    }
-    msgs->pos = (idx < count) ? idx : count - 1;
-    activate_current_message(msgs);
-}
-
-void activate_next_message(MessageArray *msgs)
-{
-    if (msgs->pos + 1 < msgs->array.count) {
-        msgs->pos++;
-    }
-    activate_current_message(msgs);
-}
-
-void activate_prev_message(MessageArray *msgs)
-{
-    if (msgs->pos > 0) {
-        msgs->pos--;
-    }
-    activate_current_message(msgs);
 }
 
 void activate_current_message_save(const MessageArray *msgs, PointerArray *file_locations, const View *view)
