@@ -44,9 +44,9 @@ static void test_util_macros(TestContext *ctx)
     EXPECT_EQ(ARRAYLEN("a"), 2);
     EXPECT_EQ(ARRAYLEN("123456789"), 10);
 
-    const UNUSED char a2[] = {1, 2};
-    const UNUSED int a3[] = {1, 2, 3};
-    const UNUSED long long a4[] = {1, 2, 3, 4};
+    UNUSED const char a2[] = {1, 2};
+    UNUSED const int a3[] = {1, 2, 3};
+    UNUSED const long long a4[] = {1, 2, 3, 4};
     EXPECT_EQ(ARRAYLEN(a2), 2);
     EXPECT_EQ(ARRAYLEN(a3), 3);
     EXPECT_EQ(ARRAYLEN(a4), 4);

@@ -46,6 +46,12 @@
     #define HAS_ATTRIBUTE(x) 0
 #endif
 
+#ifdef __has_c_attribute
+    #define HAS_C_ATTRIBUTE(x) __has_c_attribute(x)
+#else
+    #define HAS_C_ATTRIBUTE(x) 0
+#endif
+
 #ifdef __has_builtin
     #define HAS_BUILTIN(x) __has_builtin(x)
 #else
@@ -87,7 +93,9 @@
     #define MSAN_ENABLED 1
 #endif
 
-#if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
+#if HAS_C_ATTRIBUTE(maybe_unused)
+    #define UNUSED [[__maybe_unused__]]
+#elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
 #else
     #define UNUSED
@@ -313,9 +321,9 @@
 #endif
 
 #if defined(DEBUG) && (DEBUG > 0)
-    #define UNITTEST static void CONSTRUCTOR XPASTE(unittest_, COUNTER_)(void)
+    #define UNITTEST CONSTRUCTOR static void XPASTE(unittest_, COUNTER_)(void)
 #else
-    #define UNITTEST static void UNUSED XPASTE(unittest_, COUNTER_)(void)
+    #define UNITTEST UNUSED static void XPASTE(unittest_, COUNTER_)(void)
 #endif
 
 #ifdef __clang__
