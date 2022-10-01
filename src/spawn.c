@@ -222,7 +222,7 @@ static void resume_terminal(bool quiet, bool prompt)
     term_raw();
     if (!quiet && editor.child_controls_terminal) {
         if (prompt) {
-            any_key(&editor);
+            any_key(&editor.terminal, editor.options.esc_timeout);
         }
         ui_start(&editor);
         editor.child_controls_terminal = false;

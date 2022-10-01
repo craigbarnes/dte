@@ -511,7 +511,7 @@ loop_break:;
         return EX_IOERR;
     }
     if (get_nr_errors()) {
-        any_key(e);
+        any_key(term, e->options.esc_timeout);
         clear_error();
     }
 

@@ -112,7 +112,7 @@ EditorState *init_editor_state(void);
 int free_editor_state(EditorState *e);
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
-void any_key(EditorState *e);
+void any_key(Terminal *term, unsigned int esc_timeout);
 void normal_update(EditorState *e);
 void main_loop(EditorState *e);
 void ui_start(EditorState *e);

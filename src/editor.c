@@ -279,10 +279,8 @@ static void sanity_check(const View *v)
 #endif
 }
 
-void any_key(EditorState *e)
+void any_key(Terminal *term, unsigned int esc_timeout)
 {
-    Terminal *term = &e->terminal;
-    unsigned int esc_timeout = e->options.esc_timeout;
     KeyCode key;
     fputs("Press any key to continue\r\n", stderr);
     while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
@@ -453,9 +451,9 @@ void ui_end(EditorState *e)
     term_cooked();
 }
 
-static char get_choice(EditorState *e, const char *choices)
+static char get_choice(Terminal *term, const char *choices, unsigned int esc_timeout)
 {
-    KeyCode key = term_read_key(&e->terminal, e->options.esc_timeout);
+    KeyCode key = term_read_key(term, esc_timeout);
     if (key == KEY_NONE) {
         return 0;
     }
@@ -463,7 +461,7 @@ static char get_choice(EditorState *e, const char *choices)
     switch (key) {
     case KEY_BRACKETED_PASTE:
     case KEY_DETECTED_PASTE:
-        term_discard_paste(&e->terminal.ibuf, key == KEY_BRACKETED_PASTE);
+        term_discard_paste(&term->ibuf, key == KEY_BRACKETED_PASTE);
         return 0;
     case MOD_CTRL | 'c':
     case MOD_CTRL | 'g':
@@ -533,8 +531,9 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
     show_message(term, &e->colors, question, false);
     term_output_flush(obuf);
 
+    unsigned int esc_timeout = e->options.esc_timeout;
     char choice;
-    while ((choice = get_choice(e, choices)) == 0) {
+    while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
         if (!resized) {
             continue;
         }
@@ -566,8 +565,9 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     show_message(term, &e->colors, question, false);
     end_update(e);
 
+    unsigned int esc_timeout = e->options.esc_timeout;
     char choice;
-    while ((choice = get_choice(e, choices)) == 0) {
+    while ((choice = get_choice(term, choices, esc_timeout)) == 0) {
         if (!resized) {
             continue;
         }
