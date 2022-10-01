@@ -257,7 +257,7 @@ error:
     return ret;
 }
 
-bool load_buffer(const EditorState *e, Buffer *b, bool must_exist, const char *filename)
+bool load_buffer(Buffer *b, const char *filename, unsigned int size_limit_mib, bool must_exist)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
 
@@ -284,11 +284,10 @@ bool load_buffer(const EditorState *e, Buffer *b, bool must_exist, const char *f
             error_msg("Invalid file size: %jd", (intmax_t)b->file.size);
             goto error;
         }
-        if (b->file.size / 1024 / 1024 > e->options.filesize_limit) {
+        if (b->file.size / 1024 / 1024 > size_limit_mib) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
-                e->options.filesize_limit,
-                filename
+                size_limit_mib, filename
             );
             goto error;
         }

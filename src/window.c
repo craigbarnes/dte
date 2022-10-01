@@ -89,7 +89,7 @@ View *window_open_buffer (
     */
 
     Buffer *b = buffer_new(encoding);
-    if (!load_buffer(e, b, must_exist, filename)) {
+    if (!load_buffer(b, filename, e->options.filesize_limit, must_exist)) {
         remove_and_free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;
