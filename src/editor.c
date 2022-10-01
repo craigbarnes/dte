@@ -301,7 +301,9 @@ static void update_window_full(Window *window, void *ud)
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v, e->options.scroll_margin);
-    print_tabbar(e, window);
+    if (e->options.tab_bar) {
+        print_tabbar(&e->terminal, &e->colors, window);
+    }
     if (e->options.show_line_numbers) {
         update_line_numbers(e, window, true);
     }
@@ -360,8 +362,8 @@ static void update_all_windows(EditorState *e)
 
 static void update_window(EditorState *e, Window *window)
 {
-    if (window->update_tabbar) {
-        print_tabbar(e, window);
+    if (e->options.tab_bar && window->update_tabbar) {
+        print_tabbar(&e->terminal, &e->colors, window);
     }
 
     View *v = window->view;

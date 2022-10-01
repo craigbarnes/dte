@@ -27,7 +27,7 @@ void update_command_line(EditorState *e);
 void show_message(Terminal *term, const ColorScheme *colors, const char *msg, bool is_error);
 
 // screen-tabbar.c
-void print_tabbar(EditorState *e, Window *w);
+void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window);
 
 // screen-status.c
 void update_status_line (
