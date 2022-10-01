@@ -30,8 +30,14 @@ void show_message(Terminal *term, const ColorScheme *colors, const char *msg, bo
 void print_tabbar(EditorState *e, Window *w);
 
 // screen-status.c
-void update_status_line(EditorState *e, const Window *win);
 size_t statusline_format_find_error(const char *str);
+void update_status_line (
+    Terminal *term,
+    const ColorScheme *colors,
+    const GlobalOptions *gopts,
+    const Window *win,
+    InputMode mode
+);
 
 // screen-view.c
 void update_range(EditorState *e, const View *v, long y1, long y2);

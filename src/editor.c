@@ -293,19 +293,19 @@ void any_key(EditorState *e)
     }
 }
 
-static void update_window_full(Window *w, void *ud)
+static void update_window_full(Window *window, void *ud)
 {
     EditorState *e = ud;
-    View *v = w->view;
+    View *v = window->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
     view_update(v, e->options.scroll_margin);
-    print_tabbar(e, w);
+    print_tabbar(e, window);
     if (e->options.show_line_numbers) {
-        update_line_numbers(e, w, true);
+        update_line_numbers(e, window, true);
     }
-    update_range(e, v, v->vy, v->vy + w->edit_h);
-    update_status_line(e, w);
+    update_range(e, v, v->vy, v->vy + window->edit_h);
+    update_status_line(&e->terminal, &e->colors, &e->options, window, e->input_mode);
 }
 
 static void restore_cursor(EditorState *e)
@@ -357,22 +357,22 @@ static void update_all_windows(EditorState *e)
     update_separators(&e->terminal, &e->colors, e->root_frame);
 }
 
-static void update_window(EditorState *e, Window *w)
+static void update_window(EditorState *e, Window *window)
 {
-    if (w->update_tabbar) {
-        print_tabbar(e, w);
+    if (window->update_tabbar) {
+        print_tabbar(e, window);
     }
 
-    View *v = w->view;
+    View *v = window->view;
     if (e->options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        update_line_numbers(e, w, v->buffer->changed_line_max == LONG_MAX);
+        update_line_numbers(e, window, v->buffer->changed_line_max == LONG_MAX);
     }
 
     long y1 = MAX(v->buffer->changed_line_min, v->vy);
-    long y2 = MIN(v->buffer->changed_line_max, v->vy + w->edit_h - 1);
+    long y2 = MIN(v->buffer->changed_line_max, v->vy + window->edit_h - 1);
     update_range(e, v, y1, y2 + 1);
-    update_status_line(e, w);
+    update_status_line(&e->terminal, &e->colors, &e->options, window, e->input_mode);
 }
 
 // Update all visible views containing this buffer

@@ -20,6 +20,7 @@ typedef enum {
     STATUS_FILENAME,
     STATUS_MODIFIED,
     STATUS_LINE_ENDING,
+    STATUS_OVERWRITE,
     STATUS_SCROLL_POSITION,
     STATUS_READONLY,
     STATUS_SEPARATOR,
@@ -27,7 +28,6 @@ typedef enum {
     STATUS_UNICODE,
     STATUS_CURSOR_COL,
     STATUS_CURSOR_ROW,
-    STATUS_OVERWRITE,
 } FormatSpecifierType;
 
 static const uint8_t format_specifiers[] = {
@@ -58,7 +58,8 @@ typedef struct {
     size_t pos;
     size_t separator;
     const Window *win;
-    const EditorState *editor;
+    const GlobalOptions *opts;
+    InputMode input_mode;
 } Formatter;
 
 #define add_status_literal(f, s) add_status_bytes(f, s, STRLEN(s))
@@ -147,8 +148,8 @@ static void add_misc_status(Formatter *f)
         [CSS_AUTO] = {STRN("[case-sensitive = auto]")},
     };
 
-    if (f->editor->input_mode == INPUT_SEARCH) {
-        SearchCaseSensitivity css = f->editor->options.case_sensitive_search;
+    if (f->input_mode == INPUT_SEARCH) {
+        SearchCaseSensitivity css = f->opts->case_sensitive_search;
         BUG_ON(css >= ARRAYLEN(css_strs));
         add_status_bytes(f, css_strs[css].str, css_strs[css].len);
         return;
@@ -176,8 +177,9 @@ static FormatSpecifierType lookup_format_specifier(unsigned char ch)
 }
 
 static void sf_format (
-    const EditorState *e,
     const Window *w,
+    const GlobalOptions *opts,
+    InputMode mode,
     char *buf,
     size_t size,
     const char *format
@@ -185,7 +187,8 @@ static void sf_format (
     BUG_ON(size < 16);
     Formatter f = {
         .win = w,
-        .editor = e,
+        .opts = opts,
+        .input_mode = mode,
         .buf = buf,
         .size = size - 5, // Max length of char and terminating NUL
     };
@@ -328,60 +331,90 @@ UNITTEST {
     Window window = {.view = &view};
     view.window = &window;
 
-    EditorState e = {
-        .input_mode = INPUT_NORMAL,
-        .window = &window,
-        .buffer = &buffer,
-        .view = &view,
+    GlobalOptions opts = {
+        .case_sensitive_search = CSS_FALSE,
     };
 
     char buf[256];
-    sf_format(&e, &window, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
+    sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%% %n%s%y%s%Y%S%f%s%m%s%r... %E %t%S%N");
     BUG_ON(!streq(buf, "% LF 1 0   (No name) ... UTF-8 none"));
 
-    sf_format(&e, &window, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
     BUG_ON(!streq(buf, " LF INS"));
 
     buffer.bom = true;
     buffer.crlf_newlines = true;
     buffer.temporary = true;
     buffer.options.overwrite = true;
-    sf_format(&e, &window, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
+    sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof buf, "%b%s%n%s%N%s%r%s%o");
     BUG_ON(!streq(buf, "BOM CRLF CRLF TMP OVR"));
 
-    e.input_mode = INPUT_SEARCH;
-    sf_format(&e, &window, buf, sizeof buf, "%M");
+    sf_format(&window, &opts, INPUT_SEARCH, buf, sizeof buf, "%M");
     BUG_ON(!streq(buf, "[case-sensitive = false]"));
-
-    e.options.case_sensitive_search = CSS_AUTO;
-    sf_format(&e, &window, buf, sizeof buf, "%M");
+    opts.case_sensitive_search = CSS_AUTO;
+    sf_format(&window, &opts, INPUT_SEARCH, buf, sizeof buf, "%M");
     BUG_ON(!streq(buf, "[case-sensitive = auto]"));
 
+    static const char expected[][12] = {
+        [STATUS_INVALID] = "__INVALID__",
+        [STATUS_ESCAPED_PERCENT] = "%",
+        [STATUS_ENCODING] = "UTF-8",
+        [STATUS_MISC] = "",
+        [STATUS_IS_CRLF] = "CRLF",
+        [STATUS_SEPARATOR_LONG] = "",
+        [STATUS_CURSOR_COL_BYTES] = "1",
+        [STATUS_TOTAL_ROWS] = "0",
+        [STATUS_BOM] = "BOM",
+        [STATUS_FILENAME] = "(No name)",
+        [STATUS_MODIFIED] = "",
+        [STATUS_LINE_ENDING] = "CRLF",
+        [STATUS_OVERWRITE] = "OVR",
+        [STATUS_SCROLL_POSITION] = "All",
+        [STATUS_READONLY] = "TMP",
+        [STATUS_SEPARATOR] = "",
+        [STATUS_FILETYPE] = "none",
+        [STATUS_UNICODE] = "",
+        [STATUS_CURSOR_COL] = "1",
+        [STATUS_CURSOR_ROW] = "1",
+    };
+
+    char fmt[4] = "%_";
     for (unsigned char i = 0; i < ARRAYLEN(format_specifiers); i++) {
         FormatSpecifierType type =  format_specifiers[i];
+        BUG_ON(type >= ARRAYLEN(expected));
         if (type == STATUS_INVALID) {
             continue;
         }
-        const char fmt[4] = {'%', i, '\0'};
-        sf_format(&e, &window, buf, sizeof(buf), fmt);
+        fmt[1] = i;
+        sf_format(&window, &opts, INPUT_NORMAL, buf, sizeof(buf), fmt);
+        if (!streq(buf, expected[type])) {
+            BUG (
+                "sf_format() with %%%c produced \"%s\", expected \"%s\"",
+                i, buf, expected[type]
+            );
+        }
     }
 
     block_free(block);
 }
 
-void update_status_line(EditorState *e, const Window *win)
-{
+void update_status_line (
+    Terminal *term,
+    const ColorScheme *colors,
+    const GlobalOptions *opts,
+    const Window *win,
+    InputMode mode
+) {
     char lbuf[256], rbuf[256];
-    sf_format(e, win, lbuf, sizeof lbuf, e->options.statusline_left);
-    sf_format(e, win, rbuf, sizeof rbuf, e->options.statusline_right);
+    sf_format(win, opts, mode, lbuf, sizeof lbuf, opts->statusline_left);
+    sf_format(win, opts, mode, rbuf, sizeof rbuf, opts->statusline_right);
 
-    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);
     term_output_reset(term, win->x, win->w, 0);
     term_move_cursor(obuf, win->x, win->y + win->h - 1);
-    set_builtin_color(term, &e->colors, BC_STATUSLINE);
+    set_builtin_color(term, colors, BC_STATUSLINE);
 
     if (lw + rw <= win->w) {
         // Both fit
