@@ -135,12 +135,13 @@ static void print_tab_title(EditorState *e, const View *v, size_t idx)
     }
 
     const char *tab_number = uint_to_str((unsigned int)idx + 1);
-    TermOutputBuffer *obuf = &e->terminal.obuf;
+    Terminal *term = &e->terminal;
+    TermOutputBuffer *obuf = &term->obuf;
     bool is_active_tab = (v == v->window->view);
     bool is_modified = buffer_modified(v->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
-    set_builtin_color(e, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
+    set_builtin_color(term, &e->colors, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
     term_put_char(obuf, left_overflow ? '<' : ' ');
     term_add_str(obuf, tab_number);
     term_put_char(obuf, is_modified ? '+' : ':');
@@ -173,7 +174,7 @@ void print_tabbar(EditorState *e, Window *win)
         print_tab_title(e, view, i);
     }
 
-    set_builtin_color(e, BC_TABBAR);
+    set_builtin_color(term, &e->colors, BC_TABBAR);
 
     if (i == n) {
         term_clear_eol(term);

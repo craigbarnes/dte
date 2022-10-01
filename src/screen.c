@@ -6,25 +6,25 @@
 #include "terminal/terminal.h"
 #include "terminal/winsize.h"
 
-void set_color(EditorState *e, const TermColor *color)
+void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color)
 {
     TermColor tmp = *color;
     // NOTE: -2 (keep) is treated as -1 (default)
     if (tmp.fg < 0) {
-        tmp.fg = e->colors.builtin[BC_DEFAULT].fg;
+        tmp.fg = colors->builtin[BC_DEFAULT].fg;
     }
     if (tmp.bg < 0) {
-        tmp.bg = e->colors.builtin[BC_DEFAULT].bg;
+        tmp.bg = colors->builtin[BC_DEFAULT].bg;
     }
-    if (same_color(&tmp, &e->terminal.obuf.color)) {
+    if (same_color(&tmp, &term->obuf.color)) {
         return;
     }
-    term_set_color(&e->terminal, &tmp);
+    term_set_color(term, &tmp);
 }
 
-void set_builtin_color(EditorState *e, BuiltinColorEnum c)
+void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c)
 {
-    set_color(e, &e->colors.builtin[c]);
+    set_color(term, colors, &colors->builtin[c]);
 }
 
 void update_cursor_style(EditorState *e)
@@ -63,17 +63,13 @@ void update_cursor_style(EditorState *e)
     e->cursor_style_changed = false;
 }
 
-void update_term_title(EditorState *e, const Buffer *b)
+void update_term_title(Terminal *term, const Buffer *b, bool set_window_title)
 {
-    if (
-        !e->options.set_window_title
-        || !(e->terminal.features & TFLAG_SET_WINDOW_TITLE)
-    ) {
+    if (!set_window_title || !(term->features & TFLAG_SET_WINDOW_TITLE)) {
         return;
     }
 
     // FIXME: title must not contain control characters
-    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     const char *filename = buffer_filename(b);
     term_add_literal(obuf, "\033]2;");
@@ -109,10 +105,10 @@ static void print_separator(Window *win, void *ud)
     }
 }
 
-void update_separators(EditorState *e)
+void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame)
 {
-    set_builtin_color(e, BC_STATUSLINE);
-    frame_for_each_window(e->root_frame, print_separator, &e->terminal);
+    set_builtin_color(term, colors, BC_STATUSLINE);
+    frame_for_each_window(frame, print_separator, term);
 }
 
 void update_line_numbers(EditorState *e, Window *win, bool force)
@@ -142,7 +138,7 @@ void update_line_numbers(EditorState *e, Window *win, bool force)
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
     term_output_reset(&e->terminal, win->x, win->w, 0);
-    set_builtin_color(e, BC_LINENUMBER);
+    set_builtin_color(&e->terminal, &e->colors, BC_LINENUMBER);
 
     for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;
@@ -158,13 +154,13 @@ void update_line_numbers(EditorState *e, Window *win, bool force)
     }
 }
 
-void update_window_sizes(EditorState *e)
+void update_window_sizes(Terminal *term, Frame *frame)
 {
-    set_frame_size(e->root_frame, e->terminal.width, e->terminal.height - 1);
-    update_window_coordinates();
+    set_frame_size(frame, term->width, term->height - 1);
+    update_window_coordinates(frame);
 }
 
-void update_screen_size(EditorState *e)
+void update_screen_size(Terminal *term, Frame *root_frame)
 {
     unsigned int width, height;
     if (!term_get_size(&width, &height)) {
@@ -173,9 +169,9 @@ void update_screen_size(EditorState *e)
 
     // TODO: remove minimum width/height and instead make update_screen()
     // do something sensible when the terminal dimensions are tiny.
-    e->terminal.width = MAX(width, 3);
-    e->terminal.height = MAX(height, 3);
+    term->width = MAX(width, 3);
+    term->height = MAX(height, 3);
 
-    update_window_sizes(e);
+    update_window_sizes(term, root_frame);
     LOG_INFO("terminal size: %ux%u", width, height);
 }

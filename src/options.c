@@ -118,7 +118,7 @@ static void set_window_title_changed(EditorState *e, bool global)
     Terminal *term = &e->terminal;
     if (e->options.set_window_title) {
         if (e->status == EDITOR_RUNNING) {
-            update_term_title(e, e->buffer);
+            update_term_title(term, e->buffer, e->options.set_window_title);
         }
     } else {
         term_restore_title(term);

@@ -352,9 +352,9 @@ static void end_update(EditorState *e)
 
 static void update_all_windows(EditorState *e)
 {
-    update_window_sizes(e);
+    update_window_sizes(&e->terminal, e->root_frame);
     frame_for_each_window(e->root_frame, update_window_full, e);
-    update_separators(e);
+    update_separators(&e->terminal, &e->colors, e->root_frame);
 }
 
 static void update_window(EditorState *e, Window *w)
@@ -400,7 +400,7 @@ static void update_buffer_windows(EditorState *e, const Buffer *b)
 void normal_update(EditorState *e)
 {
     start_update(e);
-    update_term_title(e, e->buffer);
+    update_term_title(&e->terminal, e->buffer, e->options.set_window_title);
     update_all_windows(e);
     update_command_line(e);
     update_cursor_style(e);
@@ -413,7 +413,7 @@ static void ui_resize(EditorState *e)
         return;
     }
     resized = 0;
-    update_screen_size(e);
+    update_screen_size(&e->terminal, e->root_frame);
     normal_update(e);
 }
 
@@ -503,16 +503,16 @@ static void show_dialog (
     TermColor dialog_color = *text_color;
     TermOutputBuffer *obuf = &term->obuf;
     dialog_color.attr &= ~(ATTR_UNDERLINE | ATTR_STRIKETHROUGH);
-    set_color(e, &dialog_color);
+    set_color(term, &e->colors, &dialog_color);
 
     for (unsigned int y = top; y < bot; y++) {
         term_output_reset(term, x, width, 0);
         term_move_cursor(obuf, x, y);
         if (y == mid) {
             term_set_bytes(term, ' ', (width - question_width) / 2);
-            set_color(e, text_color);
+            set_color(term, &e->colors, text_color);
             term_add_str(obuf, question);
-            set_color(e, &dialog_color);
+            set_color(term, &e->colors, &dialog_color);
         }
         term_clear_eol(term);
     }
@@ -527,7 +527,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
     normal_update(e);
     term_hide_cursor(term);
     show_dialog(e, color, question);
-    show_message(e, question, false);
+    show_message(term, &e->colors, question, false);
     term_output_flush(obuf);
 
     char choice;
@@ -538,7 +538,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
         ui_resize(e);
         term_hide_cursor(term);
         show_dialog(e, color, question);
-        show_message(e, question, false);
+        show_message(term, &e->colors, question, false);
         term_output_flush(obuf);
     }
 
@@ -558,9 +558,9 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
 
     Terminal *term = &e->terminal;
     start_update(e);
-    update_term_title(e, e->buffer);
+    update_term_title(term, e->buffer, e->options.set_window_title);
     update_buffer_windows(e, e->buffer);
-    show_message(e, question, false);
+    show_message(term, &e->colors, question, false);
     end_update(e);
 
     char choice;
@@ -570,7 +570,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
         }
         ui_resize(e);
         term_hide_cursor(term);
-        show_message(e, question, false);
+        show_message(term, &e->colors, question, false);
         restore_cursor(e);
         term_show_cursor(term);
         term_output_flush(&term->obuf);
@@ -623,7 +623,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
 
     start_update(e);
     if (e->window->update_tabbar) {
-        update_term_title(e, buffer);
+        update_term_title(&e->terminal, e->buffer, e->options.set_window_title);
     }
     update_buffer_windows(e, buffer);
     update_command_line(e);

@@ -381,7 +381,7 @@ void update_status_line(EditorState *e, const Window *win)
     size_t rw = u_str_width(rbuf);
     term_output_reset(term, win->x, win->w, 0);
     term_move_cursor(obuf, win->x, win->y + win->h - 1);
-    set_builtin_color(e, BC_STATUSLINE);
+    set_builtin_color(term, &e->colors, BC_STATUSLINE);
 
     if (lw + rw <= win->w) {
         // Both fit

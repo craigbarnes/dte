@@ -22,9 +22,9 @@ typedef struct {
 } LineInfo;
 
 // Like mask_color() but can change bg color only if it has not been changed yet
-static void mask_color2(const EditorState *e, TermColor *color, const TermColor *over)
+static void mask_color2(const ColorScheme *colors, TermColor *color, const TermColor *over)
 {
-    int32_t default_bg = e->colors.builtin[BC_DEFAULT].bg;
+    int32_t default_bg = colors->builtin[BC_DEFAULT].bg;
     if (over->bg != COLOR_KEEP && (color->bg == default_bg || color->bg < 0)) {
         color->bg = over->bg;
     }
@@ -39,14 +39,14 @@ static void mask_color2(const EditorState *e, TermColor *color, const TermColor 
 }
 
 static void mask_selection_and_current_line (
-    const EditorState *e,
+    const ColorScheme *colors,
     const LineInfo *info,
     TermColor *color
 ) {
     if (info->offset >= info->sel_so && info->offset < info->sel_eo) {
-        mask_color(color, &e->colors.builtin[BC_SELECTION]);
+        mask_color(color, &colors->builtin[BC_SELECTION]);
     } else if (info->line_nr == info->view->cy) {
-        mask_color2(e, color, &e->colors.builtin[BC_CURRENTLINE]);
+        mask_color2(colors, color, &colors->builtin[BC_CURRENTLINE]);
     }
 }
 
@@ -161,8 +161,8 @@ static CodePoint screen_next_char(EditorState *e, LineInfo *info)
     if (ws_error) {
         mask_color(&color, &e->colors.builtin[BC_WSERROR]);
     }
-    mask_selection_and_current_line(e, info, &color);
-    set_color(e, &color);
+    mask_selection_and_current_line(&e->colors, info, &color);
+    set_color(&e->terminal, &e->colors, &color);
 
     info->offset += count;
     return u;
@@ -202,10 +202,10 @@ static bool is_notice(const char *word, size_t len)
 }
 
 // Highlight certain words inside comments
-static void hl_words(EditorState *e, const LineInfo *info)
+static void hl_words(Terminal *term, const ColorScheme *colors, const LineInfo *info)
 {
-    const TermColor *cc = find_color(&e->colors, "comment");
-    const TermColor *nc = find_color(&e->colors, "notice");
+    const TermColor *cc = find_color(colors, "comment");
+    const TermColor *nc = find_color(colors, "notice");
 
     if (!info->colors || !cc || !nc) {
         return;
@@ -223,7 +223,7 @@ static void hl_words(EditorState *e, const LineInfo *info)
 
     // This should be more than enough. I'm too lazy to iterate characters
     // instead of bytes and calculate text width.
-    const size_t max = info->pos + e->terminal.width * 4 + 8;
+    const size_t max = info->pos + term->width * 4 + 8;
 
     size_t si;
     while (i < info->size) {
@@ -327,7 +327,8 @@ static void print_line(EditorState *e, LineInfo *info)
         screen_skip_char(obuf, info);
     }
 
-    hl_words(e, info);
+    const ColorScheme *colors = &e->colors;
+    hl_words(term, colors, info);
 
     while (info->pos < info->size) {
         BUG_ON(obuf->x > obuf->scroll_x + obuf->width);
@@ -342,16 +343,16 @@ static void print_line(EditorState *e, LineInfo *info)
     TermColor color;
     if (e->options.display_special && obuf->x >= obuf->scroll_x) {
         // Syntax highlighter highlights \n but use default color anyway
-        color = e->colors.builtin[BC_DEFAULT];
-        mask_color(&color, &e->colors.builtin[BC_NONTEXT]);
-        mask_selection_and_current_line(e, info, &color);
-        set_color(e, &color);
+        color = colors->builtin[BC_DEFAULT];
+        mask_color(&color, &colors->builtin[BC_NONTEXT]);
+        mask_selection_and_current_line(colors, info, &color);
+        set_color(term, colors, &color);
         term_put_char(obuf, '$');
     }
 
-    color = e->colors.builtin[BC_DEFAULT];
-    mask_selection_and_current_line(e, info, &color);
-    set_color(e, &color);
+    color = colors->builtin[BC_DEFAULT];
+    mask_selection_and_current_line(colors, info, &color);
+    set_color(term, colors, &color);
     info->offset++;
     term_clear_eol(term);
 }
@@ -414,15 +415,15 @@ void update_range(EditorState *e, const View *v, long y1, long y2)
         TermColor color = e->colors.builtin[BC_DEFAULT];
 
         obuf->x = 0;
-        mask_color2(e, &color, &e->colors.builtin[BC_CURRENTLINE]);
-        set_color(e, &color);
+        mask_color2(&e->colors, &color, &e->colors.builtin[BC_CURRENTLINE]);
+        set_color(term, &e->colors, &color);
 
         term_move_cursor(obuf, edit_x, edit_y + i++);
         term_clear_eol(term);
     }
 
     if (i < y2) {
-        set_builtin_color(e, BC_NOLINE);
+        set_builtin_color(term, &e->colors, BC_NOLINE);
     }
     for (; i < y2; i++) {
         obuf->x = 0;

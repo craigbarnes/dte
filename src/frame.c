@@ -336,7 +336,7 @@ void equalize_frame_sizes(Frame *parent)
 {
     parent->equal_size = true;
     divide_equally(parent);
-    update_window_coordinates();
+    update_window_coordinates(parent);
 }
 
 void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
@@ -352,7 +352,7 @@ void add_to_frame_size(Frame *f, ResizeDirection dir, int amount)
     } else {
         resize_to(f, f->w + amount);
     }
-    update_window_coordinates();
+    update_window_coordinates(f->parent);
 }
 
 void resize_frame(Frame *f, ResizeDirection dir, int size)
@@ -364,7 +364,7 @@ void resize_frame(Frame *f, ResizeDirection dir, int size)
 
     f->parent->equal_size = false;
     resize_to(f, size);
-    update_window_coordinates();
+    update_window_coordinates(f->parent);
 }
 
 static void update_frame_coordinates(const Frame *f, int x, int y)
@@ -385,9 +385,18 @@ static void update_frame_coordinates(const Frame *f, int x, int y)
     }
 }
 
-void update_window_coordinates(void)
+static Frame *get_root_frame(Frame *frame)
 {
-    update_frame_coordinates(editor.root_frame, 0, 0);
+    BUG_ON(!frame);
+    while (frame->parent) {
+        frame = frame->parent;
+    }
+    return frame;
+}
+
+void update_window_coordinates(Frame *frame)
+{
+    update_frame_coordinates(get_root_frame(frame), 0, 0);
 }
 
 Frame *split_frame(Window *w, bool vertical, bool before)
@@ -412,7 +421,7 @@ Frame *split_frame(Window *w, bool vertical, bool before)
 
     // Recalculate
     set_frame_size(parent, parent->w, parent->h);
-    update_window_coordinates();
+    update_window_coordinates(parent);
     return f;
 }
 
@@ -439,7 +448,7 @@ Frame *split_root(Frame **root, bool vertical, bool before)
     old_root->parent = new_root;
     set_frame_size(new_root, old_root->w, old_root->h);
     *root = new_root;
-    update_window_coordinates();
+    update_window_coordinates(*root);
     return f;
 }
 
@@ -486,7 +495,7 @@ void remove_frame(Frame *f)
 
     // Recalculate
     set_frame_size(parent, parent->w, parent->h);
-    update_window_coordinates();
+    update_window_coordinates(parent);
 }
 
 void dump_frame(const Frame *f, int level, String *str)
