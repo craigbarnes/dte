@@ -328,10 +328,10 @@ static void restore_cursor(EditorState *e)
     term_move_cursor(&e->terminal.obuf, x, y);
 }
 
-static void start_update(EditorState *e)
+static void start_update(Terminal *term)
 {
-    term_begin_sync_update(&e->terminal);
-    term_hide_cursor(&e->terminal);
+    term_begin_sync_update(term);
+    term_hide_cursor(term);
 }
 
 static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
@@ -341,10 +341,11 @@ static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
 
 static void end_update(EditorState *e)
 {
+    Terminal *term = &e->terminal;
     restore_cursor(e);
-    term_show_cursor(&e->terminal);
-    term_end_sync_update(&e->terminal);
-    term_output_flush(&e->terminal.obuf);
+    term_show_cursor(term);
+    term_end_sync_update(term);
+    term_output_flush(&term->obuf);
 
     e->buffer->changed_line_min = LONG_MAX;
     e->buffer->changed_line_max = -1;
@@ -400,8 +401,9 @@ static void update_buffer_windows(EditorState *e, const Buffer *b)
 
 void normal_update(EditorState *e)
 {
-    start_update(e);
-    update_term_title(&e->terminal, e->buffer, e->options.set_window_title);
+    Terminal *term = &e->terminal;
+    start_update(term);
+    update_term_title(term, e->buffer, e->options.set_window_title);
     update_all_windows(e);
     update_command_line(e);
     update_cursor_style(e);
@@ -559,7 +561,7 @@ char status_prompt(EditorState *e, const char *question, const char *choices)
     mark_all_lines_changed(e->buffer);
 
     Terminal *term = &e->terminal;
-    start_update(e);
+    start_update(term);
     update_term_title(term, e->buffer, e->options.set_window_title);
     update_buffer_windows(e, e->buffer);
     show_message(term, &e->colors, question, false);
@@ -624,7 +626,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
         mark_all_lines_changed(buffer);
     }
 
-    start_update(e);
+    start_update(&e->terminal);
     if (e->window->update_tabbar) {
         update_term_title(&e->terminal, e->buffer, e->options.set_window_title);
     }
