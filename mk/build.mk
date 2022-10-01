@@ -61,7 +61,7 @@ editor_objects := $(call prefix-obj, build/, \
     encoding error exec file-history file-option filetype frame history \
     indent load-save lock main misc mode move msg options regexp replace \
     screen screen-cmdline screen-status screen-tabbar screen-view \
-    search selection shift show spawn tag vars view window ) \
+    search selection shift show spawn status tag vars view window ) \
     $(command_objects) \
     $(editorconfig_objects) \
     $(syntax_objects) \
@@ -70,7 +70,8 @@ editor_objects := $(call prefix-obj, build/, \
 
 test_objects := $(call prefix-obj, build/test/, \
     bind bookmark buffer cmdline command config ctags dump editorconfig \
-    encoding filetype history main options spawn syntax terminal test util )
+    encoding filetype history main options spawn status syntax terminal \
+    test util )
 
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 

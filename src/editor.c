@@ -19,6 +19,7 @@
 #include "regexp.h"
 #include "screen.h"
 #include "search.h"
+#include "status.h"
 #include "tag.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"

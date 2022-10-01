@@ -10,6 +10,7 @@
 #include "filetype.h"
 #include "regexp.h"
 #include "screen.h"
+#include "status.h"
 #include "terminal/output.h"
 #include "util/bsearch.h"
 #include "util/debug.h"

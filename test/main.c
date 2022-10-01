@@ -24,6 +24,7 @@ extern const TestGroup filetype_tests;
 extern const TestGroup history_tests;
 extern const TestGroup option_tests;
 extern const TestGroup spawn_tests;
+extern const TestGroup status_tests;
 extern const TestGroup syntax_tests;
 extern const TestGroup terminal_tests;
 extern const TestGroup util_tests;
@@ -186,6 +187,7 @@ int main(void)
     run_tests(&ctx, &history_tests);
     run_tests(&ctx, &ctags_tests);
     run_tests(&ctx, &spawn_tests);
+    run_tests(&ctx, &status_tests);
 
     init_headless_mode(&ctx);
     run_tests(&ctx, &config_tests);
