@@ -15,6 +15,7 @@ default:
         - make
         - cat build/feature.h
         - ldd dte
+        - make check-whitespace
         - make check
         - make clean && make check LDFLAGS=-static
         - ldd dte || true

@@ -1,6 +1,6 @@
-[attr]code text whitespace=tab-in-indent,tabwidth=4
-[attr]html text whitespace=tab-in-indent,tabwidth=2
-[attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
+[attr]code text whitespace=tab-in-indent,tabwidth=4 space-indent
+[attr]html text whitespace=tab-in-indent,tabwidth=2 space-indent
+[attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol space-indent
 [attr]dterc code
 [attr]generated is-generated linguist-generated
 [attr]vendored -whitespace is-vendored linguist-vendored
@@ -24,6 +24,7 @@ tools/** export-ignore
 *.awk code
 *.sed code
 *.sh code
+*.bash code
 *.yml code
 *.css code
 tools/git-hooks/* code
@@ -34,6 +35,7 @@ makefile text
 *.txt text
 test/data/crlf.txt -text diff
 *.dterc dterc
+test/data/syntax-lint.dterc -space-indent -whitespace
 config/** dterc
 config/README.md -dterc
 *.md markdown

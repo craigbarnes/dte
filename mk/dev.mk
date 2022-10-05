@@ -2,6 +2,7 @@ RELEASE_VERSIONS = 1.10 1.9.1 1.9 1.8.2 1.8.1 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.
 RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
 DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
+WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
 GCOVR ?= gcovr
 LCOV ?= lcov
@@ -24,7 +25,10 @@ check-aux: check-desktop-file check-appstream
 
 check-shell-scripts:
 	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh test/*.sh tools/*.sh
-	$(E) TEST 'mk/*.sh test/*.sh tools/*.sh'
+	$(E) SHCHECK 'mk/*.sh test/*.sh tools/*.sh'
+
+check-whitespace:
+	$(Q) $(WSCHECK) `git ls-files --error-unmatch ':(attr:space-indent)'`
 
 check-desktop-file:
 	$(E) CHECK dte.desktop
@@ -121,6 +125,6 @@ NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-docs check-shell-scripts check-release-digests \
+    check-docs check-shell-scripts check-whitespace check-release-digests \
     check-aux check-desktop-file check-appstream \
     git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)
