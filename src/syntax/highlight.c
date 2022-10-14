@@ -131,21 +131,21 @@ static const TermColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_BUFIS:
-                if (sidx >= 0 && bufis(u, line + sidx, i - sidx)) {
-                    set_color_range(colors, a, sidx, i);
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (sidx < 0 || !bufis(u, line + sidx, i - sidx)) {
+                    break;
                 }
-                break;
+                set_color_range(colors, a, sidx, i);
+                sidx = -1;
+                state = a->destination;
+                goto top;
             case COND_BUFIS_ICASE:
-                if (sidx >= 0 && bufis_icase(u, line + sidx, i - sidx)) {
-                    set_color_range(colors, a, sidx, i);
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (sidx < 0 || !bufis_icase(u, line + sidx, i - sidx)) {
+                    break;
                 }
-                break;
+                set_color_range(colors, a, sidx, i);
+                sidx = -1;
+                state = a->destination;
+                goto top;
             case COND_CHAR:
                 if (!bitset_contains(u->bitset, line[i])) {
                     break;
@@ -163,16 +163,13 @@ static const TermColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_INLIST:
-                if (
-                    sidx >= 0
-                    && hashset_get(&u->str_list->strings, line + sidx, i - sidx)
-                ) {
-                    set_color_range(colors, a, sidx, i);
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
+                    break;
                 }
-                break;
+                set_color_range(colors, a, sidx, i);
+                sidx = -1;
+                state = a->destination;
+                goto top;
             case COND_RECOLOR: {
                 size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
                 set_color_range(colors, a, start, i);
