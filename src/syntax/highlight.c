@@ -110,150 +110,148 @@ static const TermColor **highlight_line (
         xrenew(colors, alloc);
     }
 
-    while (1) {
-        top:
-        if (i == len) {
-            break;
-        }
-        for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
-            const Condition *cond = state->conds.ptrs[ci];
-            const ConditionData *u = &cond->u;
-            const Action *a = &cond->a;
-            switch (cond->type) {
-            case COND_CHAR_BUFFER:
-                if (!bitset_contains(u->bitset, line[i])) {
-                    break;
-                }
-                if (sidx < 0) {
-                    sidx = i;
-                }
-                colors[i++] = a->emit_color;
-                state = a->destination;
-                goto top;
-            case COND_BUFIS:
-                if (sidx < 0 || !bufis(u, line + sidx, i - sidx)) {
-                    break;
-                }
-                set_color_range(colors, a, sidx, i);
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_BUFIS_ICASE:
-                if (sidx < 0 || !bufis_icase(u, line + sidx, i - sidx)) {
-                    break;
-                }
-                set_color_range(colors, a, sidx, i);
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_CHAR:
-                if (!bitset_contains(u->bitset, line[i])) {
-                    break;
-                }
-                colors[i++] = a->emit_color;
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_CHAR1:
-                if (u->ch != line[i]) {
-                    break;
-                }
-                colors[i++] = a->emit_color;
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_INLIST:
-                if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
-                    break;
-                }
-                set_color_range(colors, a, sidx, i);
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_RECOLOR: {
-                size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
-                set_color_range(colors, a, start, i);
-                } break;
-            case COND_RECOLOR_BUFFER:
-                if (sidx >= 0) {
-                    set_color_range(colors, a, sidx, i);
-                    sidx = -1;
-                }
-                break;
-            case COND_STR: {
-                size_t slen = u->str.len;
-                size_t end = i + slen;
-                if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
-                    break;
-                }
-                i += set_color_range(colors, a, i, end);
-                sidx = -1;
-                state = a->destination;
-                goto top;
-                }
-            case COND_STR_ICASE: {
-                size_t slen = u->str.len;
-                size_t end = i + slen;
-                if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
-                    break;
-                }
-                i += set_color_range(colors, a, i, end);
-                sidx = -1;
-                state = a->destination;
-                goto top;
-                }
-            case COND_STR2:
-                // Optimized COND_STR (length 2, case sensitive)
-                if (len < i + 2 || !mem_equal(u->str.buf, line + i, 2)) {
-                    break;
-                }
-                colors[i++] = a->emit_color;
-                colors[i++] = a->emit_color;
-                sidx = -1;
-                state = a->destination;
-                goto top;
-            case COND_HEREDOCEND: {
-                const char *str = u->heredocend.data;
-                size_t slen = u->heredocend.length;
-                size_t end = i + slen;
-                if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
-                    i += set_color_range(colors, a, i, end);
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
-                }
-                } break;
-            default:
-                BUG("unhandled condition type");
-            }
-        }
+    top:
+    if (i >= len) {
+        BUG_ON(i > len);
+        *ret = state;
+        return colors;
+    }
 
-        switch (state->type) {
-        case STATE_EAT:
-            colors[i++] = state->default_action.emit_color;
-            // fallthrough
-        case STATE_NOEAT:
-            sidx = -1;
-            // fallthrough
-        case STATE_NOEAT_BUFFER:
-            state = state->default_action.destination;
-            break;
-        case STATE_HEREDOCBEGIN:
+    for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
+        const Condition *cond = state->conds.ptrs[ci];
+        const ConditionData *u = &cond->u;
+        const Action *a = &cond->a;
+        switch (cond->type) {
+        case COND_CHAR_BUFFER:
+            if (!bitset_contains(u->bitset, line[i])) {
+                break;
+            }
             if (sidx < 0) {
                 sidx = i;
             }
-            state = handle_heredoc(syn, state, cs, line + sidx, i - sidx);
+            colors[i++] = a->emit_color;
+            state = a->destination;
+            goto top;
+        case COND_BUFIS:
+            if (sidx < 0 || !bufis(u, line + sidx, i - sidx)) {
+                break;
+            }
+            set_color_range(colors, a, sidx, i);
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_BUFIS_ICASE:
+            if (sidx < 0 || !bufis_icase(u, line + sidx, i - sidx)) {
+                break;
+            }
+            set_color_range(colors, a, sidx, i);
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_CHAR:
+            if (!bitset_contains(u->bitset, line[i])) {
+                break;
+            }
+            colors[i++] = a->emit_color;
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_CHAR1:
+            if (u->ch != line[i]) {
+                break;
+            }
+            colors[i++] = a->emit_color;
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_INLIST:
+            if (sidx < 0 || !hashset_get(&u->str_list->strings, line + sidx, i - sidx)) {
+                break;
+            }
+            set_color_range(colors, a, sidx, i);
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_RECOLOR: {
+            size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
+            set_color_range(colors, a, start, i);
+            } break;
+        case COND_RECOLOR_BUFFER:
+            if (sidx >= 0) {
+                set_color_range(colors, a, sidx, i);
+                sidx = -1;
+            }
             break;
-        case STATE_INVALID:
+        case COND_STR: {
+            size_t slen = u->str.len;
+            size_t end = i + slen;
+            if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
+                break;
+            }
+            i += set_color_range(colors, a, i, end);
+            sidx = -1;
+            state = a->destination;
+            goto top;
+            }
+        case COND_STR_ICASE: {
+            size_t slen = u->str.len;
+            size_t end = i + slen;
+            if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
+                break;
+            }
+            i += set_color_range(colors, a, i, end);
+            sidx = -1;
+            state = a->destination;
+            goto top;
+            }
+        case COND_STR2:
+            // Optimized COND_STR (length 2, case sensitive)
+            if (len < i + 2 || !mem_equal(u->str.buf, line + i, 2)) {
+                break;
+            }
+            colors[i++] = a->emit_color;
+            colors[i++] = a->emit_color;
+            sidx = -1;
+            state = a->destination;
+            goto top;
+        case COND_HEREDOCEND: {
+            const char *str = u->heredocend.data;
+            size_t slen = u->heredocend.length;
+            size_t end = i + slen;
+            if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
+                i += set_color_range(colors, a, i, end);
+                sidx = -1;
+                state = a->destination;
+                goto top;
+            }
+            } break;
         default:
-            BUG("unhandled default action type");
+            BUG("unhandled condition type");
         }
     }
 
-    if (ret) {
-        *ret = state;
+    switch (state->type) {
+    case STATE_EAT:
+        colors[i++] = state->default_action.emit_color;
+        // fallthrough
+    case STATE_NOEAT:
+        sidx = -1;
+        // fallthrough
+    case STATE_NOEAT_BUFFER:
+        state = state->default_action.destination;
+        break;
+    case STATE_HEREDOCBEGIN:
+        if (sidx < 0) {
+            sidx = i;
+        }
+        state = handle_heredoc(syn, state, cs, line + sidx, i - sidx);
+        break;
+    case STATE_INVALID:
+    default:
+        BUG("unhandled default action type");
     }
-    return colors;
+
+    goto top;
 }
 
 static void resize_line_states(PointerArray *s, size_t count)
