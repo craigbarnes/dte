@@ -75,6 +75,21 @@ static State *handle_heredoc (
     return s->state;
 }
 
+// Set colors in range [start,end] and return number of colors set
+static size_t set_color_range (
+    const TermColor **colors,
+    const Action *action,
+    size_t start,
+    size_t end
+) {
+    BUG_ON(start > end);
+    const TermColor *color = action->emit_color;
+    for (size_t i = start; i < end; i++) {
+        colors[i] = color;
+    }
+    return end - start;
+}
+
 // Line should be terminated with \n unless it's the last line
 static const TermColor **highlight_line (
     Syntax *syn,
@@ -122,9 +137,7 @@ static const TermColor **highlight_line (
                 goto top;
             case COND_BUFIS:
                 if (sidx >= 0 && bufis(u, line + sidx, i - sidx)) {
-                    for (size_t idx = sidx; idx < i; idx++) {
-                        colors[idx] = a->emit_color;
-                    }
+                    set_color_range(colors, a, sidx, i);
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -132,9 +145,7 @@ static const TermColor **highlight_line (
                 break;
             case COND_BUFIS_ICASE:
                 if (sidx >= 0 && bufis_icase(u, line + sidx, i - sidx)) {
-                    for (size_t idx = sidx; idx < i; idx++) {
-                        colors[idx] = a->emit_color;
-                    }
+                    set_color_range(colors, a, sidx, i);
                     sidx = -1;
                     state = a->destination;
                     goto top;
@@ -161,28 +172,19 @@ static const TermColor **highlight_line (
                     sidx >= 0
                     && hashset_get(&u->str_list->strings, line + sidx, i - sidx)
                 ) {
-                    for (size_t idx = sidx; idx < i; idx++) {
-                        colors[idx] = a->emit_color;
-                    }
+                    set_color_range(colors, a, sidx, i);
                     sidx = -1;
                     state = a->destination;
                     goto top;
                 }
                 break;
             case COND_RECOLOR: {
-                ssize_t idx = i - u->recolor_len;
-                if (idx < 0) {
-                    idx = 0;
-                }
-                while (idx < i) {
-                    colors[idx++] = a->emit_color;
-                }
+                size_t start = (i >= u->recolor_len) ? i - u->recolor_len : 0;
+                set_color_range(colors, a, start, i);
                 } break;
             case COND_RECOLOR_BUFFER:
                 if (sidx >= 0) {
-                    while (sidx < i) {
-                        colors[sidx++] = a->emit_color;
-                    }
+                    set_color_range(colors, a, sidx, i);
                     sidx = -1;
                 }
                 break;
@@ -192,9 +194,7 @@ static const TermColor **highlight_line (
                 if (len < end || !mem_equal(u->str.buf, line + i, slen)) {
                     break;
                 }
-                while (i < end) {
-                    colors[i++] = a->emit_color;
-                }
+                i += set_color_range(colors, a, i, end);
                 sidx = -1;
                 state = a->destination;
                 goto top;
@@ -205,9 +205,7 @@ static const TermColor **highlight_line (
                 if (len < end || !mem_equal_icase(u->str.buf, line + i, slen)) {
                     break;
                 }
-                while (i < end) {
-                    colors[i++] = a->emit_color;
-                }
+                i += set_color_range(colors, a, i, end);
                 sidx = -1;
                 state = a->destination;
                 goto top;
@@ -231,9 +229,7 @@ static const TermColor **highlight_line (
                 size_t slen = u->heredocend.length;
                 size_t end = i + slen;
                 if (len >= end && (slen == 0 || mem_equal(str, line + i, slen))) {
-                    while (i < end) {
-                        colors[i++] = a->emit_color;
-                    }
+                    i += set_color_range(colors, a, i, end);
                     sidx = -1;
                     state = a->destination;
                     goto top;
