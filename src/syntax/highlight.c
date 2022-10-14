@@ -111,19 +111,15 @@ static const TermColor **highlight_line (
     }
 
     while (1) {
-        const Condition *cond;
-        const ConditionData *u;
-        const Action *a;
-        unsigned char ch;
-    top:
+        top:
         if (i == len) {
             break;
         }
-        ch = line[i];
+        unsigned char ch = line[i];
         for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
-            cond = state->conds.ptrs[ci];
-            u = &cond->u;
-            a = &cond->a;
+            const Condition *cond = state->conds.ptrs[ci];
+            const ConditionData *u = &cond->u;
+            const Action *a = &cond->a;
             switch (cond->type) {
             case COND_CHAR_BUFFER:
                 if (!bitset_contains(u->bitset, ch)) {
@@ -248,8 +244,7 @@ static const TermColor **highlight_line (
             sidx = -1;
             // fallthrough
         case STATE_NOEAT_BUFFER:
-            a = &state->default_action;
-            state = a->destination;
+            state = state->default_action.destination;
             break;
         case STATE_HEREDOCBEGIN:
             if (sidx < 0) {
