@@ -233,10 +233,10 @@ static const TermColor **highlight_line (
     switch (state->type) {
     case STATE_EAT:
         colors[i++] = state->default_action.emit_color;
-        // fallthrough
+        // Fallthrough
     case STATE_NOEAT:
         sidx = -1;
-        // fallthrough
+        // Fallthrough
     case STATE_NOEAT_BUFFER:
         state = state->default_action.destination;
         break;
