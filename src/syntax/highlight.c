@@ -207,18 +207,14 @@ static const TermColor **highlight_line (
                 }
             case COND_STR2:
                 // Optimized COND_STR (length 2, case sensitive)
-                if (
-                    line[i] == u->str.buf[0]
-                    && len - i > 1
-                    && line[i + 1] == u->str.buf[1]
-                ) {
-                    colors[i++] = a->emit_color;
-                    colors[i++] = a->emit_color;
-                    sidx = -1;
-                    state = a->destination;
-                    goto top;
+                if (len < i + 2 || !mem_equal(u->str.buf, line + i, 2)) {
+                    break;
                 }
-                break;
+                colors[i++] = a->emit_color;
+                colors[i++] = a->emit_color;
+                sidx = -1;
+                state = a->destination;
+                goto top;
             case COND_HEREDOCEND: {
                 const char *str = u->heredocend.data;
                 size_t slen = u->heredocend.length;
