@@ -115,14 +115,13 @@ static const TermColor **highlight_line (
         if (i == len) {
             break;
         }
-        unsigned char ch = line[i];
         for (size_t ci = 0, n = state->conds.count; ci < n; ci++) {
             const Condition *cond = state->conds.ptrs[ci];
             const ConditionData *u = &cond->u;
             const Action *a = &cond->a;
             switch (cond->type) {
             case COND_CHAR_BUFFER:
-                if (!bitset_contains(u->bitset, ch)) {
+                if (!bitset_contains(u->bitset, line[i])) {
                     break;
                 }
                 if (sidx < 0) {
@@ -148,7 +147,7 @@ static const TermColor **highlight_line (
                 }
                 break;
             case COND_CHAR:
-                if (!bitset_contains(u->bitset, ch)) {
+                if (!bitset_contains(u->bitset, line[i])) {
                     break;
                 }
                 colors[i++] = a->emit_color;
@@ -156,7 +155,7 @@ static const TermColor **highlight_line (
                 state = a->destination;
                 goto top;
             case COND_CHAR1:
-                if (u->ch != ch) {
+                if (u->ch != line[i]) {
                     break;
                 }
                 colors[i++] = a->emit_color;
@@ -209,7 +208,7 @@ static const TermColor **highlight_line (
             case COND_STR2:
                 // Optimized COND_STR (length 2, case sensitive)
                 if (
-                    ch == u->str.buf[0]
+                    line[i] == u->str.buf[0]
                     && len - i > 1
                     && line[i + 1] == u->str.buf[1]
                 ) {
