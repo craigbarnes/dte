@@ -70,6 +70,10 @@ static bool do_collect_files (
 
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
+        if (streq(name, ".") || streq(name, "..") || unlikely(streq(name, ""))) {
+            continue;
+        }
+
         if (flen ? strncmp(name, fileprefix, flen) : name[0] == '.') {
             continue;
         }
