@@ -45,7 +45,7 @@ static bool is_executable(int dir_fd, const char *filename)
     return faccessat(dir_fd, filename, X_OK, 0) == 0;
 }
 
-static void do_collect_files (
+static bool do_collect_files (
     PointerArray *array,
     const char *dirname,
     const char *dirprefix,
@@ -54,14 +54,14 @@ static void do_collect_files (
 ) {
     DIR *const dir = opendir(dirname);
     if (!dir) {
-        return;
+        return false;
     }
 
     const int dir_fd = dirfd(dir);
     if (unlikely(dir_fd < 0)) {
         LOG_ERROR("dirfd() failed: %s", strerror(errno));
         closedir(dir);
-        return;
+        return false;
     }
 
     size_t dlen = strlen(dirprefix);
@@ -70,14 +70,8 @@ static void do_collect_files (
 
     while ((de = readdir(dir))) {
         const char *name = de->d_name;
-        if (flen) {
-            if (strncmp(name, fileprefix, flen) != 0) {
-                continue;
-            }
-        } else {
-            if (name[0] == '.') {
-                continue;
-            }
+        if (flen ? strncmp(name, fileprefix, flen) : name[0] == '.') {
+            continue;
         }
 
         struct stat st;
@@ -99,19 +93,20 @@ static void do_collect_files (
             case COLLECT_ALL:
                 break;
             case COLLECT_EXECUTABLES:
-                if (is_executable(dir_fd, name)) {
-                    if (!dlen) {
-                        dirprefix = "./";
-                        dlen = 2;
-                    }
-                    break;
+                if (!is_executable(dir_fd, name)) {
+                    continue;
                 }
-                continue;
+                if (!dlen) {
+                    dirprefix = "./";
+                    dlen = 2;
+                }
+                break;
             default:
                 BUG("unhandled FileCollectionType value");
             }
         }
 
+        // TODO: use something like path_join() instead of the code below
         size_t name_len = strlen(name);
         char *buf = xmalloc(dlen + name_len + 3);
         size_t n = dlen;
@@ -133,6 +128,7 @@ static void do_collect_files (
     }
 
     closedir(dir);
+    return true;
 }
 
 static void collect_files(CompletionState *cs, FileCollectionType type)
