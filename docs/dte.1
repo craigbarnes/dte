@@ -265,6 +265,32 @@ supported.
 Enables support for 24\-bit terminal colors, if set to \fBtruecolor\fR or
 \fB24bit\fR.
 .PP
+The following environment variables affect various library routines used
+by dte and are inspected on every use:
+.P
+.TP
+\fBPATH\fR
+Colon\-delimited list of directory prefixes, used by \fBexecvp\fR(3)
+to find executables.
+.PP
+The following environment variables are set by dte:
+.P
+.TP
+\fBDTE_VERSION\fR
+Editor version string. This is set at startup to the same version
+string as shown by \fBdte \-V\fR.
+.PP
+.TP
+\fBPWD\fR
+Absolute path of the current working directory; set when changing
+directory with the \fBcd\fR command.
+.PP
+.TP
+\fBOLDPWD\fR
+Absolute path of the previous working directory; set when changing
+directory with the \fBcd\fR command and also used to determine which
+directory \fBcd \-\fR switches to.
+.PP
 .SH FILES
 .TP
 \fB$DTE_HOME/rc\fR

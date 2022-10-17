@@ -222,6 +222,28 @@ The following environment variables are inspected at startup:
 :   Enables support for 24-bit terminal colors, if set to `truecolor` or
     `24bit`.
 
+The following environment variables affect various library routines used
+by dte and are inspected on every use:
+
+`PATH`
+:   Colon-delimited list of directory prefixes, used by [`execvp`]
+    to find executables.
+
+The following environment variables are set by dte:
+
+`DTE_VERSION`
+:   Editor version string. This is set at startup to the same version
+    string as shown by `dte -V`.
+
+`PWD`
+:   Absolute path of the current working directory; set when changing
+    directory with the [`cd`] command.
+
+`OLDPWD`
+:   Absolute path of the previous working directory; set when changing
+    directory with the [`cd`] command and also used to determine which
+    directory `cd -` switches to.
+
 # Files
 
 `$DTE_HOME/rc`
@@ -305,6 +327,7 @@ input/output of both.
 [`dterc`]: dterc.html
 [`dte-syntax`]: dte-syntax.html
 [`bind`]: dterc.html#bind
+[`cd`]: dterc.html#cd
 [`show bind`]: dterc.html#show
 [`next`]: dterc.html#next
 [`prev`]: dterc.html#prev
@@ -315,3 +338,4 @@ input/output of both.
 [`file-history`]: dterc.html#file-history
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
 [`sysexits`]: https://www.freebsd.org/cgi/man.cgi?query=sysexits
+[`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
