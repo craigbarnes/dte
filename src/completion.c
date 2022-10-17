@@ -106,25 +106,7 @@ static bool do_collect_files (
             }
         }
 
-        // TODO: use something like path_join() instead of the code below
-        size_t name_len = strlen(name);
-        char *buf = xmalloc(dlen + name_len + 3);
-        size_t n = dlen;
-        if (dlen) {
-            memcpy(buf, dirprefix, dlen);
-            if (dirprefix[dlen - 1] != '/') {
-                buf[n++] = '/';
-            }
-        }
-
-        memcpy(buf + n, name, name_len);
-        n += name_len;
-        if (is_dir) {
-            buf[n++] = '/';
-        }
-
-        buf[n] = '\0';
-        ptr_array_append(array, buf);
+        ptr_array_append(array, path_joinx(dirprefix, name, is_dir));
     }
 
     closedir(dir);

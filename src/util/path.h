@@ -43,27 +43,36 @@ static inline char *path_dirname(const char *filename)
 }
 
 XSTRDUP
-static inline char *path_join_sv(const StringView *s1, const StringView *s2)
+static inline char *path_join_sv(const StringView *s1, const StringView *s2, bool trailing_slash)
 {
     size_t n1 = s1->length;
     size_t n2 = s2->length;
-    char *path = xmalloc(n1 + n2 + 2);
+    char *path = xmalloc(n1 + n2 + (trailing_slash ? 3 : 2));
     memcpy(path, s1->data, n1);
     char *ptr = path + n1;
     if (n1 && n2 && s1->data[n1 - 1] != '/') {
         *ptr++ = '/';
     }
     memcpy(ptr, s2->data, n2);
+    if (trailing_slash && n2 && s2->data[n2 - 1] != '/') {
+        ptr[n2++] = '/';
+    }
     ptr[n2] = '\0';
     return path;
 }
 
 XSTRDUP
-static inline char *path_join(const char *s1, const char *s2)
+static inline char *path_joinx(const char *s1, const char *s2, bool trailing_slash)
 {
     StringView sv1 = strview_from_cstring(s1);
     StringView sv2 = strview_from_cstring(s2);
-    return path_join_sv(&sv1, &sv2);
+    return path_join_sv(&sv1, &sv2, trailing_slash);
+}
+
+XSTRDUP
+static inline char *path_join(const char *s1, const char *s2)
+{
+    return path_joinx(s1, s2, false);
 }
 
 // If path is the root directory, return false. Otherwise, mutate

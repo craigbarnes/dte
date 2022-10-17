@@ -2115,6 +2115,28 @@ static void test_path_join(TestContext *ctx)
     p = path_join("/home/user//", ".dte");
     EXPECT_STREQ(p, "/home/user//.dte");
     free(p);
+
+    p = path_joinx("foo", "bar", true);
+    EXPECT_STREQ(p, "foo/bar/");
+    free(p);
+    p = path_joinx("foo", "bar", false);
+    EXPECT_STREQ(p, "foo/bar");
+    free(p);
+    p = path_joinx("", "", true);
+    EXPECT_STREQ(p, "");
+    free(p);
+    p = path_joinx("/", "", true);
+    EXPECT_STREQ(p, "/");
+    free(p);
+    p = path_joinx("", "file", true);
+    EXPECT_STREQ(p, "file/");
+    free(p);
+    p = path_joinx("", "file", false);
+    EXPECT_STREQ(p, "file");
+    free(p);
+    p = path_joinx("", "file/", true);
+    EXPECT_STREQ(p, "file/");
+    free(p);
 }
 
 static void test_path_parent(TestContext *ctx)

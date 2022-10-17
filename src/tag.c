@@ -256,7 +256,7 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     m->msg[msg_len] = '\0';
 
     m->loc = xnew0(FileLocation, 1);
-    m->loc->filename = path_join_sv(dir, &tag->filename);
+    m->loc->filename = path_join_sv(dir, &tag->filename, false);
 
     if (tag->pattern) {
         m->loc->pattern = tag->pattern; // Message takes ownership
