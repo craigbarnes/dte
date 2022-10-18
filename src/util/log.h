@@ -11,6 +11,7 @@ typedef enum {
     LOG_LEVEL_WARNING,
     LOG_LEVEL_INFO,
     LOG_LEVEL_DEBUG,
+    LOG_LEVEL_TRACE,
 } LogLevel;
 
 #define LOG(level, ...) log_msg(level, __FILE__, __LINE__, __VA_ARGS__)
@@ -22,6 +23,12 @@ typedef enum {
     #define LOG_DEBUG(...) LOG(LOG_LEVEL_DEBUG, __VA_ARGS__)
 #else
     static inline PRINTF(1) void LOG_DEBUG(const char* UNUSED_ARG(fmt), ...) {}
+#endif
+
+#if DEBUG >= 3
+    #define LOG_TRACE(...) LOG(LOG_LEVEL_TRACE, __VA_ARGS__)
+#else
+    static inline PRINTF(1) void LOG_TRACE(const char* UNUSED_ARG(fmt), ...) {}
 #endif
 
 bool log_init(const char *filename, LogLevel level);

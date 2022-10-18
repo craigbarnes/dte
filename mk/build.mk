@@ -140,7 +140,7 @@ else
   # 0: Disable debugging
   # 1: Enable BUG_ON() and light-weight sanity checks
   # 2: Enable LOG_DEBUG()
-  # 3: Enable expensive sanity checks
+  # 3: Enable LOG_TRACE() and expensive sanity checks
   DEBUG ?= 0
 endif
 

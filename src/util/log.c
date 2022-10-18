@@ -24,6 +24,7 @@ static const char log_levels[][8] = {
     [LOG_LEVEL_WARNING] = "warning",
     [LOG_LEVEL_INFO] = "info",
     [LOG_LEVEL_DEBUG] = "debug",
+    [LOG_LEVEL_TRACE] = "trace",
 };
 
 UNITTEST {
@@ -40,11 +41,21 @@ LogLevel log_level_from_str(const char *str)
     return STR_TO_ENUM(str, log_levels, LOG_LEVEL_NONE);
 }
 
+static LogLevel log_level_max(void)
+{
+    if (DEBUG >= 3) {
+        return LOG_LEVEL_TRACE;
+    } else if (DEBUG >= 2) {
+        return LOG_LEVEL_DEBUG;
+    }
+    return LOG_LEVEL_INFO;
+}
+
 bool log_init(const char *filename, LogLevel level)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
-    BUG_ON(level > LOG_LEVEL_DEBUG);
+    BUG_ON(level > LOG_LEVEL_TRACE);
     BUG_ON(logfd != -1);
     BUG_ON(log_level != LOG_LEVEL_NONE);
 
@@ -63,12 +74,13 @@ bool log_init(const char *filename, LogLevel level)
         sgr0[0] = '\0';
     }
 
+    LogLevel max = log_level_max();
     log_level = level;
-    if (DEBUG < 2 && level >= LOG_LEVEL_DEBUG) {
-        const char *req = log_levels[level];
-        static_assert(LOG_LEVEL_INFO == LOG_LEVEL_DEBUG - 1);
-        log_level = LOG_LEVEL_INFO;
-        LOG_WARNING("log level '%s' unavailable; falling back to 'info'", req);
+    if (level > max) {
+        const char *r = log_levels[level];
+        const char *m = log_levels[max];
+        log_level = max;
+        LOG_WARNING("log level '%s' unavailable; falling back to '%s'", r, m);
     }
 
     LOG_INFO("logging to '%s' (level: %s)", filename, log_levels[log_level]);
@@ -85,7 +97,7 @@ bool log_init(const char *filename, LogLevel level)
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
 {
     BUG_ON(level <= LOG_LEVEL_NONE);
-    BUG_ON(level > LOG_LEVEL_DEBUG);
+    BUG_ON(level > LOG_LEVEL_TRACE);
     if (level > log_level) {
         return;
     }
