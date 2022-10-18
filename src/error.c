@@ -7,6 +7,7 @@
 #include "config.h"
 #include "editor.h"
 #include "util/debug.h"
+#include "util/xstdio.h"
 
 static char error_buf[256];
 static unsigned int nr_errors;
@@ -52,8 +53,8 @@ void error_msg(const char *format, ...)
     nr_errors++;
 
     if (editor.status != EDITOR_RUNNING) {
-        fputs(error_buf, stderr);
-        fputc('\n', stderr);
+        xfputs(error_buf, stderr);
+        xfputc('\n', stderr);
     }
 
     LOG_INFO("%s", error_buf);

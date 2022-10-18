@@ -44,5 +44,6 @@ static inline FILE *xfopen(const char *path, const char *mode, int flags, mode_t
 
 char *xfgets(char *restrict buf, int bufsize, FILE *restrict stream);
 int xfputs(const char *restrict str, FILE *restrict stream);
+int xfputc(int c, FILE *stream);
 
 #endif

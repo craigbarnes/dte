@@ -35,6 +35,7 @@
 #include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+#include "util/xstdio.h"
 #include "window.h"
 #include "../build/version.h"
 
@@ -282,7 +283,7 @@ static void sanity_check(const View *v)
 void any_key(Terminal *term, unsigned int esc_timeout)
 {
     KeyCode key;
-    fputs("Press any key to continue\r\n", stderr);
+    xfputs("Press any key to continue\r\n", stderr);
     while ((key = term_read_key(term, esc_timeout)) == KEY_NONE) {
         ;
     }

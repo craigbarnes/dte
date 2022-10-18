@@ -18,3 +18,12 @@ int xfputs(const char *restrict str, FILE *restrict stream)
     } while (unlikely(r == EOF && errno == EINTR));
     return r;
 }
+
+int xfputc(int c, FILE *stream)
+{
+    int r;
+    do {
+        r = fputc(c, stream);
+    } while (unlikely(r == EOF && errno == EINTR));
+    return r;
+}
