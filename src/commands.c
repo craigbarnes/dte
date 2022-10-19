@@ -355,16 +355,20 @@ static void cmd_compile(EditorState *e, const CommandArgs *a)
         {'s', SPAWN_QUIET},
     };
 
-    const char *name = a->args[0];
-    Compiler *c = find_compiler(&e->compilers, name);
+    Compiler *c = find_compiler(&e->compilers, a->args[0]);
     if (unlikely(!c)) {
-        error_msg("No such error parser %s", name);
+        error_msg("No such error parser %s", a->args[0]);
         return;
     }
 
-    SpawnFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
+    SpawnContext ctx = {
+        .editor = e,
+        .argv = (const char **)a->args + 1,
+        .flags = cmdargs_convert_flags(a, map, ARRAYLEN(map)),
+    };
+
     clear_messages(&e->messages);
-    spawn_compiler((const char **)a->args + 1, flags, c, &e->messages);
+    spawn_compiler(&ctx, c, &e->messages);
     if (e->messages.array.count) {
         activate_current_message_save(&e->messages, &e->bookmarks, e->view);
     }

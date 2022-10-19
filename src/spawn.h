@@ -2,7 +2,9 @@
 #define SPAWN_H
 
 #include "compiler.h"
+#include "editor.h"
 #include "msg.h"
+#include "util/macros.h"
 #include "util/string.h"
 #include "util/string-view.h"
 
@@ -19,6 +21,7 @@ typedef enum {
 } SpawnAction;
 
 typedef struct {
+    EditorState *editor;
     const char **argv;
     const char **env;
     StringView input;
@@ -27,7 +30,7 @@ typedef struct {
     SpawnAction actions[3];
 } SpawnContext;
 
-int spawn(SpawnContext *ctx);
-void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs);
+int spawn(SpawnContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
+void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs) NONNULL_ARGS;
 
 #endif

@@ -4,12 +4,15 @@
 
 static void test_spawn(TestContext *ctx)
 {
+    EditorState *e = ctx->userdata;
+
     static const char *args[] = {
         "sh", "-c", "cat; echo OUT; echo ERR >&2",
         NULL
     };
 
     SpawnContext sc = {
+        .editor = e,
         .argv = args,
         .input = STRING_VIEW("IN-"),
         .outputs = {STRING_INIT, STRING_INIT},

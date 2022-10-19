@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "spawn.h"
-#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "terminal/mode.h"
@@ -207,25 +206,25 @@ static int handle_child_error(pid_t pid)
     return ret;
 }
 
-static void yield_terminal(bool quiet)
+static void yield_terminal(EditorState *e, bool quiet)
 {
     if (quiet) {
         term_raw_isig();
     } else {
-        editor.child_controls_terminal = true;
-        ui_end(&editor);
+        e->child_controls_terminal = true;
+        ui_end(e);
     }
 }
 
-static void resume_terminal(bool quiet, bool prompt)
+static void resume_terminal(EditorState *e, bool quiet, bool prompt)
 {
     term_raw();
-    if (!quiet && editor.child_controls_terminal) {
+    if (!quiet && e->child_controls_terminal) {
         if (prompt) {
-            any_key(&editor.terminal, editor.options.esc_timeout);
+            any_key(&e->terminal, e->options.esc_timeout);
         }
-        ui_start(&editor);
-        editor.child_controls_terminal = false;
+        ui_start(e);
+        e->child_controls_terminal = false;
     }
 }
 
@@ -234,8 +233,11 @@ static void exec_error(const char *argv0)
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
 }
 
-void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, MessageArray *msgs)
+void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
 {
+    BUG_ON(!ctx->editor);
+    BUG_ON(!ctx->argv[0]);
+
     int fd[3];
     fd[0] = open_dev_null(O_RDONLY);
     if (fd[0] < 0) {
@@ -256,6 +258,7 @@ void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, Mess
         return;
     }
 
+    SpawnFlags flags = ctx->flags;
     bool read_stdout = !!(flags & SPAWN_READ_STDOUT);
     bool quiet = !!(flags & SPAWN_QUIET);
     bool prompt = !!(flags & SPAWN_PROMPT);
@@ -267,10 +270,10 @@ void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, Mess
         fd[2] = p[1];
     }
 
-    yield_terminal(quiet);
-    pid_t pid = fork_exec(args, NULL, fd, quiet);
+    yield_terminal(ctx->editor, quiet);
+    pid_t pid = fork_exec(ctx->argv, NULL, fd, quiet);
     if (pid < 0) {
-        exec_error(args[0]);
+        exec_error(ctx->argv[0]);
         xclose(p[1]);
         prompt = false;
     } else {
@@ -280,7 +283,7 @@ void spawn_compiler(const char **args, SpawnFlags flags, const Compiler *c, Mess
         read_errors(c, msgs, p[0], quiet);
         handle_child_error(pid);
     }
-    resume_terminal(quiet, prompt);
+    resume_terminal(ctx->editor, quiet, prompt);
 
     xclose(p[0]);
     xclose(dev_null);
@@ -313,6 +316,9 @@ UNITTEST {
 
 int spawn(SpawnContext *ctx)
 {
+    BUG_ON(!ctx->editor);
+    BUG_ON(!ctx->argv[0]);
+
     int child_fds[3] = {-1, -1, -1};
     int parent_fds[3] = {-1, -1, -1};
     bool quiet = !!(ctx->flags & SPAWN_QUIET);
@@ -355,7 +361,7 @@ int spawn(SpawnContext *ctx)
         }
     }
 
-    yield_terminal(quiet);
+    yield_terminal(ctx->editor, quiet);
     pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds, quiet);
     if (pid < 0) {
         exec_error(ctx->argv[0]);
@@ -373,11 +379,11 @@ int spawn(SpawnContext *ctx)
         perror_msg("waitpid");
     }
 
-    resume_terminal(quiet, !!(ctx->flags & SPAWN_PROMPT));
+    resume_terminal(ctx->editor, quiet, !!(ctx->flags & SPAWN_PROMPT));
     return err;
 
 error_resume:
-    resume_terminal(quiet, false);
+    resume_terminal(ctx->editor, quiet, false);
 error_close:
     safe_xclose_all(child_fds, ARRAYLEN(child_fds));
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));

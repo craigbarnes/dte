@@ -195,6 +195,7 @@ ssize_t handle_exec (
     bool replace_input = false;
 
     SpawnContext ctx = {
+        .editor = e,
         .argv = argv,
         .outputs = {STRING_INIT, STRING_INIT},
         .flags = spawn_flags,
