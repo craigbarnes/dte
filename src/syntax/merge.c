@@ -13,7 +13,7 @@ enum {
 
 static const char *fix_name(char *buf, const char *prefix, const char *name)
 {
-    size_t plen = strnlen(prefix, FIXBUF_SIZE);
+    size_t plen = strlen(prefix);
     size_t nlen = strnlen(name, FIXBUF_SIZE);
     if (unlikely(plen + nlen >= FIXBUF_SIZE)) {
         fatal_error(__func__, ENOBUFS);
