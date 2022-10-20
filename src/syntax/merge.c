@@ -4,6 +4,7 @@
 #include "merge.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
+#include "util/string-view.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
@@ -11,19 +12,19 @@ enum {
     FIXBUF_SIZE = 512
 };
 
-static const char *fix_name(char *buf, const char *prefix, const char *name)
+static const char *fix_name(char *buf, StringView prefix, const char *name)
 {
-    size_t plen = strlen(prefix);
+    size_t plen = prefix.length;
     size_t nlen = strnlen(name, FIXBUF_SIZE);
     if (unlikely(plen + nlen >= FIXBUF_SIZE)) {
         fatal_error(__func__, ENOBUFS);
     }
-    memcpy(buf, prefix, plen);
+    memcpy(buf, prefix.data, plen);
     memcpy(buf + plen, name, nlen + 1);
     return buf;
 }
 
-static void fix_action(const Syntax *syn, Action *a, const char *prefix, char *buf)
+static void fix_action(const Syntax *syn, Action *a, StringView prefix, char *buf)
 {
     if (a->destination) {
         const char *name = fix_name(buf, prefix, a->destination->name);
@@ -38,7 +39,7 @@ static void fix_conditions (
     const Syntax *syn,
     State *s,
     const SyntaxMerge *m,
-    const char *prefix,
+    StringView prefix,
     char *buf
 ) {
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
@@ -68,8 +69,9 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
 {
     // Generate a prefix for merged state names, to avoid clashes
     static unsigned int counter;
-    char prefix[DECIMAL_STR_MAX(counter) + 2];
-    xsnprintf(prefix, sizeof prefix, "m%u-", counter++);
+    char prefix_buf[DECIMAL_STR_MAX(counter) + 2];
+    size_t prefix_len = xsnprintf(prefix_buf, sizeof prefix_buf, "m%u-", counter++);
+    StringView prefix = string_view(prefix_buf, prefix_len);
 
     const HashMap *subsyn_states = &merge->subsyn->states;
     HashMap *states = &syn->states;
@@ -77,7 +79,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
 
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
-        s->name = xstrjoin(prefix, s->name);
+        s->name = xstrjoin(prefix_buf, s->name);
         s->emit_name = xstrdup(s->emit_name);
         hashmap_insert(states, s->name, s);
 
