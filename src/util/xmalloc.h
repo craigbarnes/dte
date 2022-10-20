@@ -61,4 +61,15 @@ static inline char *xstrslice(const char *str, size_t pos, size_t end)
     return xstrcut(str + pos, end - pos);
 }
 
+XSTRDUP
+static inline char *xstrjoin(const char *s1, const char *s2)
+{
+    size_t n1 = strlen(s1);
+    size_t n2 = strlen(s2);
+    char *joined = xmalloc(size_add(n1, n2 + 1));
+    memcpy(joined, s1, n1);
+    memcpy(joined + n1, s2, n2 + 1);
+    return joined;
+}
+
 #endif

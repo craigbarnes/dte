@@ -140,6 +140,10 @@ static void test_xmalloc(TestContext *ctx)
     str = xstrslice("one two three", 4, 7);
     EXPECT_STREQ(str, "two");
     free(str);
+
+    str = xstrjoin("foo", "-bar");
+    EXPECT_STREQ(str, "foo-bar");
+    free(str);
 }
 
 static void test_xstreq(TestContext *ctx)

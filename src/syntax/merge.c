@@ -64,7 +64,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
 
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
-        s->name = xstrdup(fix_name(s->name, prefix));
+        s->name = xstrjoin(prefix, s->name);
         s->emit_name = xstrdup(s->emit_name);
         hashmap_insert(states, s->name, s);
 
