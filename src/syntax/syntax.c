@@ -186,7 +186,7 @@ void update_state_colors(const Syntax *syn, State *s, const ColorScheme *colors)
 void update_syntax_colors(Syntax *syn, const ColorScheme *colors)
 {
     if (is_subsyntax(syn)) {
-        // No point to update colors of a sub-syntax
+        // No point in updating colors of a sub-syntax
         return;
     }
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {

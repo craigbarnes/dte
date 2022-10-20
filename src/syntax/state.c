@@ -428,24 +428,27 @@ static void cmd_state(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 
 static void cmd_str(EditorState *e, const CommandArgs *a)
 {
-    bool icase = a->flags[0] == 'i';
-    ConditionType type = icase ? COND_STR_ICASE : COND_STR;
     const char *str = a->args[0];
-    Condition *c;
     size_t len = strlen(str);
-
-    if (unlikely(len > ARRAYLEN(c->u.str.buf))) {
-        error_msg (
-            "Maximum length of string is %zu bytes",
-            ARRAYLEN(c->u.str.buf)
-        );
+    if (unlikely(len < 2)) {
+        error_msg("string should be at least 2 bytes; use 'char' for single bytes");
         return;
     }
 
-    // Strings of length 2 are very common
-    if (!icase && len == 2) {
-        type = COND_STR2;
+    Condition *c;
+    size_t maxlen = ARRAYLEN(c->u.str.buf);
+    if (unlikely(len > maxlen)) {
+        error_msg("maximum length of string is %zu bytes", maxlen);
+        return;
     }
+
+    ConditionType type;
+    if (cmdargs_has_flag(a, 'i')) {
+        type = COND_STR_ICASE;
+    } else {
+        type = (len == 2) ? COND_STR2 : COND_STR;
+    }
+
     c = add_condition(e, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
