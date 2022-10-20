@@ -1,21 +1,32 @@
+#include <errno.h>
 #include <stdbool.h>
+#include <string.h>
 #include "merge.h"
 #include "util/debug.h"
 #include "util/hashmap.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
-static const char *fix_name(const char *name, const char *prefix)
+enum {
+    FIXBUF_SIZE = 512
+};
+
+static const char *fix_name(char *buf, const char *prefix, const char *name)
 {
-    static char buf[256];
-    xsnprintf(buf, sizeof(buf), "%s%s", prefix, name);
+    size_t plen = strlen(prefix);
+    size_t nlen = strlen(name);
+    if (unlikely(size_add(plen, nlen) >= FIXBUF_SIZE)) {
+        fatal_error(__func__, ENOBUFS);
+    }
+    memcpy(buf, prefix, plen);
+    memcpy(buf + plen, name, nlen + 1);
     return buf;
 }
 
-static void fix_action(const Syntax *syn, Action *a, const char *prefix)
+static void fix_action(const Syntax *syn, Action *a, const char *prefix, char *buf)
 {
     if (a->destination) {
-        const char *name = fix_name(a->destination->name, prefix);
+        const char *name = fix_name(buf, prefix, a->destination->name);
         a->destination = find_state(syn, name);
     }
     if (a->emit_name) {
@@ -27,11 +38,12 @@ static void fix_conditions (
     const Syntax *syn,
     State *s,
     const SyntaxMerge *m,
-    const char *prefix
+    const char *prefix,
+    char *buf
 ) {
     for (size_t i = 0, n = s->conds.count; i < n; i++) {
         Condition *c = s->conds.ptrs[i];
-        fix_action(syn, &c->a, prefix);
+        fix_action(syn, &c->a, prefix, buf);
         if (!c->a.destination && cond_type_has_destination(c->type)) {
             c->a.destination = m->return_state;
         }
@@ -42,7 +54,7 @@ static void fix_conditions (
         }
     }
 
-    fix_action(syn, &s->default_action, prefix);
+    fix_action(syn, &s->default_action, prefix, buf);
     if (!s->default_action.destination) {
         s->default_action.destination = m->return_state;
     }
@@ -61,6 +73,7 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
 
     const HashMap *subsyn_states = &merge->subsyn->states;
     HashMap *states = &syn->states;
+    char buf[FIXBUF_SIZE];
 
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         State *s = xmemdup(it.entry->value, sizeof(State));
@@ -92,16 +105,16 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
     for (HashMapIter it = hashmap_iter(subsyn_states); hashmap_next(&it); ) {
         const State *subsyn_state = it.entry->value;
         BUG_ON(!subsyn_state);
-        const char *new_name = fix_name(subsyn_state->name, prefix);
+        const char *new_name = fix_name(buf, prefix, subsyn_state->name);
         State *new_state = hashmap_get(states, new_name);
         BUG_ON(!new_state);
-        fix_conditions(syn, new_state, merge, prefix);
+        fix_conditions(syn, new_state, merge, prefix, buf);
         if (merge->delim) {
             update_state_colors(syn, new_state, colors);
         }
     }
 
-    const char *name = fix_name(merge->subsyn->start_state->name, prefix);
+    const char *name = fix_name(buf, prefix, merge->subsyn->start_state->name);
     State *start_state = hashmap_get(states, name);
     BUG_ON(!start_state);
     merge->subsyn->used = true;
