@@ -58,7 +58,7 @@ EditorState editor = {
     .window = NULL,
     .view = NULL,
     .buffer = NULL,
-    .version = version,
+    .version = VERSION,
     .cmdline_x = 0,
     .colors = {
         .other = HASHMAP_INIT,
@@ -199,14 +199,14 @@ EditorState *init_editor_state(void)
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
     e->session_leader = leader;
-    LOG_INFO("version: %s", version);
+    LOG_INFO("version: " VERSION);
     LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
     set_and_check_locale();
     init_file_locks_context(e->user_config_dir, pid);
 
     // Allow child processes to detect that they're running under dte
-    if (unlikely(setenv("DTE_VERSION", version, true) != 0)) {
+    if (unlikely(setenv("DTE_VERSION", VERSION, true) != 0)) {
         fatal_error("setenv", errno);
     }
 

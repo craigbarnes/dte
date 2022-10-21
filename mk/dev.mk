@@ -112,6 +112,7 @@ $(clang_tidy_targets): clang-tidy-%:
 
 clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h
+clang-tidy-src/main.c: build/version.h
 clang-tidy-src/load-save.c: build/feature.h
 clang-tidy-src/util/fd.c: build/feature.h
 clang-tidy-src/util/fork-exec.c: build/feature.h

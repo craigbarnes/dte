@@ -1,3 +1,4 @@
+HASH := \#
 CFILE := mk/feature-test/basic.c
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))

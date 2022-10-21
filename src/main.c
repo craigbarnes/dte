@@ -37,6 +37,7 @@
 #include "util/xsnprintf.h"
 #include "view.h"
 #include "window.h"
+#include "../build/version.h"
 
 static void handle_sigcont(int UNUSED_ARG(signum))
 {
@@ -182,17 +183,22 @@ static void set_signal_handlers(void)
     sigprocmask(SIG_SETMASK, &mask, NULL);
 }
 
-static ExitCode list_builtin_configs(void)
+static ExitCode write_str(int fd, const char *str, size_t len)
 {
-    String str = dump_builtin_configs();
-    BUG_ON(!str.buffer);
-    ssize_t n = xwrite_all(STDOUT_FILENO, str.buffer, str.len);
-    string_free(&str);
-    if (n < 0) {
+    if (xwrite_all(fd, str, len) < 0) {
         perror("write");
         return EX_IOERR;
     }
     return EX_OK;
+}
+
+static ExitCode list_builtin_configs(void)
+{
+    String str = dump_builtin_configs();
+    BUG_ON(!str.buffer);
+    ExitCode e = write_str(STDOUT_FILENO, str.buffer, str.len);
+    string_free(&str);
+    return e;
 }
 
 static ExitCode dump_builtin_config(const char *name)
@@ -202,11 +208,7 @@ static ExitCode dump_builtin_config(const char *name)
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
         return EX_USAGE;
     }
-    if (xwrite_all(STDOUT_FILENO, cfg->text.data, cfg->text.length) < 0) {
-        perror("write");
-        return EX_IOERR;
-    }
-    return EX_OK;
+    return write_str(STDOUT_FILENO, cfg->text.data, cfg->text.length);
 }
 
 static ExitCode lint_syntax(const char *filename)
@@ -341,12 +343,13 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 }
 
 static const char copyright[] =
+    "dte " VERSION "\n"
     "(C) 2013-2022 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
     "This program is free software; you can redistribute and/or modify\n"
     "it under the terms of the GNU General Public License version 2\n"
     "<https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>.\n"
-    "There is NO WARRANTY, to the extent permitted by law.";
+    "There is NO WARRANTY, to the extent permitted by law.\n";
 
 static const char usage[] =
     "Usage: %s [OPTIONS] [[+LINE] FILE]...\n\n"
@@ -402,9 +405,7 @@ int main(int argc, char *argv[])
             use_showkey = true;
             goto loop_break;
         case 'V':
-            printf("dte %s\n", editor.version);
-            puts(copyright);
-            return EX_OK;
+            return write_str(STDOUT_FILENO, copyright, sizeof(copyright));
         case 'h':
             printf(usage, (argv[0] && argv[0][0]) ? argv[0] : "dte");
             return EX_OK;
