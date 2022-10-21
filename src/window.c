@@ -18,11 +18,16 @@ Window *new_window(void)
 
 View *window_add_buffer(Window *w, Buffer *b)
 {
-    View *v = xnew0(View, 1);
-    v->buffer = b;
-    v->window = w;
-    v->cursor.head = &b->blocks;
-    v->cursor.blk = BLOCK(b->blocks.next);
+    View *v = xnew(View, 1);
+    *v = (View) {
+        .buffer = b,
+        .window = w,
+        .selection = SELECT_NONE,
+        .cursor = {
+            .blk = BLOCK(b->blocks.next),
+            .head = &b->blocks,
+        }
+    };
 
     ptr_array_append(&b->views, v);
     ptr_array_append(&w->views, v);
