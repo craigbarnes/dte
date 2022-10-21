@@ -4,7 +4,6 @@
 #include "state.h"
 #include "command/args.h"
 #include "command/run.h"
-#include "editor.h"
 #include "error.h"
 #include "filetype.h"
 #include "syntax/merge.h"
@@ -563,7 +562,7 @@ static void cmd_require(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     }
 }
 
-Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
+Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
 {
     const ConfigState saved = current_config;
     *err = do_read_config(&syntax_commands, filename, flags);
@@ -572,14 +571,14 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
         return NULL;
     }
     if (current_syntax) {
-        finish_syntax(&editor);
-        find_unused_subsyntaxes(&editor.syntaxes);
+        finish_syntax(e);
+        find_unused_subsyntaxes(&e->syntaxes);
     }
     current_config = saved;
 
-    Syntax *syn = find_syntax(&editor.syntaxes, path_basename(filename));
-    if (syn && editor.status != EDITOR_INITIALIZING) {
-        update_syntax_colors(syn, &editor.colors);
+    Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
+    if (syn && e->status != EDITOR_INITIALIZING) {
+        update_syntax_colors(syn, &e->colors);
     }
     if (!syn) {
         *err = EINVAL;
@@ -587,22 +586,22 @@ Syntax *load_syntax_file(const char *filename, ConfigFlags flags, int *err)
     return syn;
 }
 
-Syntax *load_syntax_by_filetype(const char *filetype)
+Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype)
 {
     if (!is_valid_filetype_name(filetype)) {
         return NULL;
     }
 
-    const char *cfgdir = editor.user_config_dir;
+    const char *cfgdir = e->user_config_dir;
     char filename[4096];
     int err;
 
     xsnprintf(filename, sizeof filename, "%s/syntax/%s", cfgdir, filetype);
-    Syntax *syn = load_syntax_file(filename, CFG_NOFLAGS, &err);
+    Syntax *syn = load_syntax_file(e, filename, CFG_NOFLAGS, &err);
     if (syn || err != ENOENT) {
         return syn;
     }
 
     xsnprintf(filename, sizeof filename, "syntax/%s", filetype);
-    return load_syntax_file(filename, CFG_BUILTIN, &err);
+    return load_syntax_file(e, filename, CFG_BUILTIN, &err);
 }

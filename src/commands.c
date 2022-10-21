@@ -772,7 +772,7 @@ static void cmd_load_syntax(EditorState *e, const CommandArgs *a)
     if (!slash) {
         const char *filetype = arg;
         if (!find_syntax(&e->syntaxes, filetype)) {
-            load_syntax_by_filetype(filetype);
+            load_syntax_by_filetype(e, filetype);
         }
         return;
     }
@@ -784,7 +784,7 @@ static void cmd_load_syntax(EditorState *e, const CommandArgs *a)
     }
 
     int err;
-    load_syntax_file(arg, CFG_MUST_EXIST, &err);
+    load_syntax_file(e, arg, CFG_MUST_EXIST, &err);
 }
 
 static void cmd_macro(EditorState *e, const CommandArgs *a)

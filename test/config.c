@@ -41,7 +41,7 @@ static void test_builtin_configs(TestContext *ctx)
             int err;
             ConfigFlags flags = CFG_BUILTIN | CFG_MUST_EXIST;
             unsigned int saved_nr_errs = get_nr_errors();
-            EXPECT_NONNULL(load_syntax_file(cfg.name, flags, &err));
+            EXPECT_NONNULL(load_syntax_file(e, cfg.name, flags, &err));
             EXPECT_EQ(get_nr_errors(), saved_nr_errs);
             EXPECT_NONNULL(find_syntax(syntaxes, path_basename(cfg.name)));
         } else {

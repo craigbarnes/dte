@@ -218,7 +218,7 @@ void buffer_update_syntax(Buffer *b)
         // Even "none" can have syntax
         syn = find_syntax(&editor.syntaxes, b->options.filetype);
         if (!syn) {
-            syn = load_syntax_by_filetype(b->options.filetype);
+            syn = load_syntax_by_filetype(&editor, b->options.filetype);
         }
     }
     if (syn == b->syn) {

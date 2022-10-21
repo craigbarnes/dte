@@ -214,7 +214,7 @@ static ExitCode dump_builtin_config(const char *name)
 static ExitCode lint_syntax(const char *filename)
 {
     int err;
-    const Syntax *s = load_syntax_file(filename, CFG_MUST_EXIST, &err);
+    const Syntax *s = load_syntax_file(&editor, filename, CFG_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
         const char *p = (n > 1) ? "s" : "";
