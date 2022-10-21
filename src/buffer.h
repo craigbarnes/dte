@@ -12,6 +12,7 @@
 #include "util/list.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
+#include "util/string-view.h"
 
 // Subset of stat(3) struct
 typedef struct {
@@ -69,21 +70,23 @@ static inline bool buffer_modified(const Buffer *b)
     return b->saved_change != b->cur_change && !b->temporary;
 }
 
+struct EditorState;
+
 void buffer_mark_lines_changed(Buffer *b, long min, long max) NONNULL_ARGS;
 void buffer_set_encoding(Buffer *b, Encoding encoding) NONNULL_ARGS;
 const char *buffer_filename(const Buffer *b) NONNULL_ARGS_AND_RETURN;
 void set_display_filename(Buffer *b, char *name) NONNULL_ARG(1);
-void update_short_filename_cwd(Buffer *b, const char *cwd) NONNULL_ARG(1);
-void update_short_filename(Buffer *b) NONNULL_ARGS;
+void update_short_filename_cwd(Buffer *b, const StringView *home, const char *cwd) NONNULL_ARG(1, 2);
+void update_short_filename(Buffer *b, const StringView *home) NONNULL_ARGS;
 Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
-Buffer *buffer_new(const Encoding *encoding) RETURNS_NONNULL;
-Buffer *open_empty_buffer(void) RETURNS_NONNULL;
+Buffer *buffer_new(struct EditorState *e, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1);
+Buffer *open_empty_buffer(struct EditorState *e) NONNULL_ARGS_AND_RETURN;
 void free_buffer(Buffer *b) NONNULL_ARGS;
 void remove_and_free_buffer(PointerArray *buffers, Buffer *b) NONNULL_ARGS;
 void free_blocks(Buffer *b) NONNULL_ARGS;
-bool buffer_detect_filetype(Buffer *b) NONNULL_ARGS;
-void buffer_update_syntax(Buffer *b) NONNULL_ARGS;
-void buffer_setup(Buffer *b, const PointerArray *file_options) NONNULL_ARGS;
+bool buffer_detect_filetype(Buffer *b, const PointerArray *filetypes) NONNULL_ARGS;
+void buffer_update_syntax(struct EditorState *e, Buffer *b) NONNULL_ARGS;
+void buffer_setup(struct EditorState *e, Buffer *b) NONNULL_ARGS;
 
 #endif

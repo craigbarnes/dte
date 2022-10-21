@@ -17,7 +17,7 @@ enum {
 
 Window *new_window(void);
 View *window_add_buffer(Window *w, Buffer *b);
-View *window_open_empty_buffer(Window *w);
+View *window_open_empty_buffer(EditorState *e, Window *w);
 View *window_open_buffer(EditorState *e, Window *w, const char *filename, bool must_exist, const Encoding *encoding);
 View *window_get_view(Window *w, Buffer *b);
 View *window_find_view(Window *w, Buffer *b);

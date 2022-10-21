@@ -75,7 +75,7 @@ static void open_temporary_buffer (
     if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
         set_file_options(&e->file_options, v->buffer);
-        buffer_update_syntax(v->buffer);
+        buffer_update_syntax(e, v->buffer);
     }
 }
 

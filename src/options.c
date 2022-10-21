@@ -110,7 +110,7 @@ static void filetype_changed(EditorState *e, bool global)
     BUG_ON(!e->buffer);
     BUG_ON(global);
     set_file_options(&e->file_options, e->buffer);
-    buffer_update_syntax(e->buffer);
+    buffer_update_syntax(e, e->buffer);
 }
 
 static void set_window_title_changed(EditorState *e, bool global)
@@ -130,7 +130,7 @@ static void set_window_title_changed(EditorState *e, bool global)
 static void syntax_changed(EditorState *e, bool global)
 {
     if (e->buffer && !global) {
-        buffer_update_syntax(e->buffer);
+        buffer_update_syntax(e, e->buffer);
     }
 }
 

@@ -56,7 +56,7 @@ typedef struct Window {
     } line_numbers;
 } Window;
 
-typedef struct {
+typedef struct EditorState {
     EditorStatus status;
     InputMode input_mode;
     CommandLine cmdline;

@@ -284,7 +284,7 @@ static void cmd_cd(EditorState *e, const CommandArgs *a)
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
         Buffer *b = e->buffers.ptrs[i];
-        update_short_filename_cwd(b, cwd);
+        update_short_filename_cwd(b, &e->home_dir, cwd);
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
@@ -1644,17 +1644,17 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
 
         free(buffer->abs_filename);
         buffer->abs_filename = absolute;
-        update_short_filename(buffer);
+        update_short_filename(buffer, &e->home_dir);
 
         // Filename change is not detected (only buffer_modified() change)
         mark_buffer_tabbars_changed(buffer);
     }
     if (!old_mode && streq(buffer->options.filetype, "none")) {
         // New file and most likely user has not changed the filetype
-        if (buffer_detect_filetype(buffer)) {
+        if (buffer_detect_filetype(buffer, &e->filetypes)) {
             set_file_options(&e->file_options, buffer);
             set_editorconfig_options(buffer);
-            buffer_update_syntax(buffer);
+            buffer_update_syntax(e, buffer);
         }
     }
     return;

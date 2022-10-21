@@ -15,7 +15,6 @@
 #include "util/intern.h"
 #include "util/path.h"
 #include "util/str-util.h"
-#include "util/string-view.h"
 #include "util/xmalloc.h"
 
 void set_display_filename(Buffer *b, char *name)
@@ -69,16 +68,15 @@ void buffer_set_encoding(Buffer *b, Encoding encoding)
     }
 }
 
-Buffer *buffer_new(const Encoding *encoding)
+Buffer *buffer_new(EditorState *e, const Encoding *encoding)
 {
     static unsigned long id;
-
     Buffer *b = xnew0(Buffer, 1);
     list_init(&b->blocks);
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
     b->id = ++id;
-    b->crlf_newlines = editor.options.crlf_newlines;
+    b->crlf_newlines = e->options.crlf_newlines;
 
     if (encoding) {
         buffer_set_encoding(b, *encoding);
@@ -86,19 +84,19 @@ Buffer *buffer_new(const Encoding *encoding)
         b->encoding.type = ENCODING_AUTODETECT;
     }
 
-    memcpy(&b->options, &editor.options, sizeof(CommonOptions));
+    memcpy(&b->options, &e->options, sizeof(CommonOptions));
     b->options.brace_indent = 0;
     b->options.filetype = str_intern("none");
     b->options.indent_regex = NULL;
 
-    ptr_array_append(&editor.buffers, b);
+    ptr_array_append(&e->buffers, b);
     return b;
 }
 
-Buffer *open_empty_buffer(void)
+Buffer *open_empty_buffer(EditorState *e)
 {
     Encoding enc = encoding_from_type(UTF8);
-    Buffer *b = buffer_new(&enc);
+    Buffer *b = buffer_new(e, &enc);
 
     // At least one block required
     Block *blk = block_new(1);
@@ -175,7 +173,7 @@ Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id)
     return NULL;
 }
 
-bool buffer_detect_filetype(Buffer *b)
+bool buffer_detect_filetype(Buffer *b, const PointerArray *filetypes)
 {
     StringView line = STRING_VIEW_INIT;
     if (BLOCK(b->blocks.next)->size) {
@@ -185,7 +183,7 @@ bool buffer_detect_filetype(Buffer *b)
         return false;
     }
 
-    const char *ft = find_ft(&editor.filetypes, b->abs_filename, line);
+    const char *ft = find_ft(filetypes, b->abs_filename, line);
     if (ft && !streq(ft, b->options.filetype)) {
         b->options.filetype = str_intern(ft);
         return true;
@@ -194,31 +192,30 @@ bool buffer_detect_filetype(Buffer *b)
     return false;
 }
 
-void update_short_filename_cwd(Buffer *b, const char *cwd)
+void update_short_filename_cwd(Buffer *b, const StringView *home, const char *cwd)
 {
     const char *abs = b->abs_filename;
     if (!abs) {
         return;
     }
-    const StringView *home = &editor.home_dir;
     char *name = cwd ? short_filename_cwd(abs, cwd, home) : xstrdup(abs);
     set_display_filename(b, name);
 }
 
-void update_short_filename(Buffer *b)
+void update_short_filename(Buffer *b, const StringView *home)
 {
     BUG_ON(!b->abs_filename);
-    set_display_filename(b, short_filename(b->abs_filename, &editor.home_dir));
+    set_display_filename(b, short_filename(b->abs_filename, home));
 }
 
-void buffer_update_syntax(Buffer *b)
+void buffer_update_syntax(EditorState *e, Buffer *b)
 {
     Syntax *syn = NULL;
     if (b->options.syntax) {
         // Even "none" can have syntax
-        syn = find_syntax(&editor.syntaxes, b->options.filetype);
+        syn = find_syntax(&e->syntaxes, b->options.filetype);
         if (!syn) {
-            syn = load_syntax_by_filetype(&editor, b->options.filetype);
+            syn = load_syntax_by_filetype(e, b->options.filetype);
         }
     }
     if (syn == b->syn) {
@@ -386,14 +383,14 @@ static bool detect_indent(Buffer *b)
     return true;
 }
 
-void buffer_setup(Buffer *b, const PointerArray *file_options)
+void buffer_setup(EditorState *e, Buffer *b)
 {
     const char *filename = b->abs_filename;
     b->setup = true;
-    buffer_detect_filetype(b);
-    set_file_options(file_options, b);
+    buffer_detect_filetype(b, &e->filetypes);
+    set_file_options(&e->file_options, b);
     set_editorconfig_options(b);
-    buffer_update_syntax(b);
+    buffer_update_syntax(e, b);
     if (b->options.detect_indent && filename) {
         detect_indent(b);
     }

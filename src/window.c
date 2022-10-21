@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include "window.h"
-#include "editor.h"
 #include "error.h"
 #include "file-history.h"
 #include "load-save.h"
@@ -31,9 +30,9 @@ View *window_add_buffer(Window *w, Buffer *b)
     return v;
 }
 
-View *window_open_empty_buffer(Window *w)
+View *window_open_empty_buffer(EditorState *e, Window *w)
 {
-    return window_add_buffer(w, open_empty_buffer());
+    return window_add_buffer(w, open_empty_buffer(e));
 }
 
 View *window_open_buffer (
@@ -88,7 +87,7 @@ View *window_open_buffer (
     dte /proc/$(pidof tail)/fd/3
     */
 
-    Buffer *b = buffer_new(encoding);
+    Buffer *b = buffer_new(e, encoding);
     if (!load_buffer(b, filename, e->options.filesize_limit, must_exist)) {
         remove_and_free_buffer(&e->buffers, b);
         free(absolute);
@@ -108,7 +107,7 @@ View *window_open_buffer (
         // FIXME: obviously wrong
         b->abs_filename = xstrdup(filename);
     }
-    update_short_filename(b);
+    update_short_filename(b, &e->home_dir);
 
     if (e->options.lock_files) {
         if (!lock_file(b->abs_filename)) {
@@ -221,7 +220,7 @@ void window_close_current_view(EditorState *e, Window *w)
         return;
     }
     if (w->views.count == 0) {
-        window_open_empty_buffer(w);
+        window_open_empty_buffer(e, w);
     }
     if (w->views.count == idx) {
         idx--;
@@ -255,7 +254,7 @@ void set_view(EditorState *e, View *v)
     e->window->view = v;
 
     if (!v->buffer->setup) {
-        buffer_setup(v->buffer, &e->file_options);
+        buffer_setup(e, v->buffer);
         if (v->buffer->options.file_history && v->buffer->abs_filename) {
             restore_cursor_from_history(&e->file_history, v);
         }
@@ -282,7 +281,7 @@ void set_view(EditorState *e, View *v)
 View *window_open_new_file(EditorState *e, Window *w)
 {
     View *prev = w->view;
-    View *v = window_open_empty_buffer(w);
+    View *v = window_open_empty_buffer(e, w);
     set_view(e, v);
     w->prev_view = prev;
     return v;
@@ -475,7 +474,7 @@ void window_close_current(EditorState *e)
     if (!window->frame->parent) {
         // Don't close last window
         window_remove_views(e, window);
-        set_view(e, window_open_empty_buffer(window));
+        set_view(e, window_open_empty_buffer(e, window));
         return;
     }
 

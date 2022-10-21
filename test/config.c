@@ -278,5 +278,5 @@ void init_headless_mode(TestContext *ctx)
     e->options.lock_files = false;
     e->window = new_window();
     e->root_frame = new_root_frame(e->window);
-    set_view(e, window_open_empty_buffer(e->window));
+    set_view(e, window_open_empty_buffer(e, e->window));
 }
