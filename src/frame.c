@@ -321,7 +321,7 @@ void set_frame_size(Frame *f, int w, int h)
         if (!rightmost_frame(f)) {
             w--; // Separator
         }
-        set_window_size(&editor, f->window, w, h);
+        set_window_size(f->window, w, h, &editor.options);
         return;
     }
 
@@ -370,7 +370,7 @@ void resize_frame(Frame *f, ResizeDirection dir, int size)
 static void update_frame_coordinates(const Frame *f, int x, int y)
 {
     if (f->window) {
-        set_window_coordinates(&editor, f->window, x, y);
+        set_window_coordinates(f->window, x, y, &editor.options);
         return;
     }
 

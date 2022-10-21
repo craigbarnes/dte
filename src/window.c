@@ -346,9 +346,9 @@ void mark_buffer_tabbars_changed(Buffer *b)
     }
 }
 
-static int line_numbers_width(const EditorState *e, const Window *win)
+static int line_numbers_width(const Window *win, const GlobalOptions *options)
 {
-    if (!e->options.show_line_numbers || !win->view) {
+    if (!options->show_line_numbers || !win->view) {
         return 0;
     }
     int width = size_str_width(win->view->buffer->nl) + 1;
@@ -356,51 +356,51 @@ static int line_numbers_width(const EditorState *e, const Window *win)
     return (width < min) ? min : width;
 }
 
-static int edit_x_offset(const EditorState *e, const Window *win)
+static int edit_x_offset(const Window *win, const GlobalOptions *options)
 {
-    return line_numbers_width(e, win);
+    return line_numbers_width(win, options);
 }
 
-static int edit_y_offset(const EditorState *e)
+static int edit_y_offset(const GlobalOptions *options)
 {
-    return e->options.tab_bar ? 1 : 0;
+    return options->tab_bar ? 1 : 0;
 }
 
-static void set_edit_size(const EditorState *e, Window *win)
+static void set_edit_size(Window *win, const GlobalOptions *options)
 {
-    int xo = edit_x_offset(e, win);
-    int yo = edit_y_offset(e);
+    int xo = edit_x_offset(win, options);
+    int yo = edit_y_offset(options);
 
     win->edit_w = win->w - xo;
     win->edit_h = win->h - yo - 1; // statusline
     win->edit_x = win->x + xo;
 }
 
-void calculate_line_numbers(const EditorState *e, Window *win)
+void calculate_line_numbers(Window *win, const GlobalOptions *options)
 {
-    int w = line_numbers_width(e, win);
+    int w = line_numbers_width(win, options);
     if (w != win->line_numbers.width) {
         win->line_numbers.width = w;
         win->line_numbers.first = 0;
         win->line_numbers.last = 0;
         mark_all_lines_changed(win->view->buffer);
     }
-    set_edit_size(e, win);
+    set_edit_size(win, options);
 }
 
-void set_window_coordinates(const EditorState *e, Window *win, int x, int y)
+void set_window_coordinates(Window *win, int x, int y, const GlobalOptions *options)
 {
     win->x = x;
     win->y = y;
-    win->edit_x = x + edit_x_offset(e, win);
-    win->edit_y = y + edit_y_offset(e);
+    win->edit_x = x + edit_x_offset(win, options);
+    win->edit_y = y + edit_y_offset(options);
 }
 
-void set_window_size(const EditorState *e, Window *win, int w, int h)
+void set_window_size(Window *win, int w, int h, const GlobalOptions *options)
 {
     win->w = w;
     win->h = h;
-    calculate_line_numbers(e, win);
+    calculate_line_numbers(win, options);
 }
 
 int window_get_scroll_margin(const Window *w, unsigned int scroll_margin)

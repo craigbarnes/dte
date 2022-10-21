@@ -117,7 +117,7 @@ void update_line_numbers(EditorState *e, Window *win, bool force)
     size_t lines = view->buffer->nl;
     int x = win->x;
 
-    calculate_line_numbers(e, win);
+    calculate_line_numbers(win, &e->options);
     long first = view->vy + 1;
     long last = MIN(view->vy + win->edit_h, lines);
 
