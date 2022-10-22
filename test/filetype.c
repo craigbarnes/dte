@@ -3,11 +3,28 @@
 
 static void test_is_valid_filetype_name(TestContext *ctx)
 {
+    EXPECT_TRUE(is_valid_filetype_name("c"));
+    EXPECT_TRUE(is_valid_filetype_name("asm"));
     EXPECT_TRUE(is_valid_filetype_name("abc-XYZ_128.90"));
     EXPECT_FALSE(is_valid_filetype_name(""));
     EXPECT_FALSE(is_valid_filetype_name("x/y"));
+    EXPECT_FALSE(is_valid_filetype_name(" "));
     EXPECT_FALSE(is_valid_filetype_name("/"));
     EXPECT_FALSE(is_valid_filetype_name("-c"));
+    EXPECT_FALSE(is_valid_filetype_name("abc xyz"));
+    EXPECT_FALSE(is_valid_filetype_name("abc\txyz"));
+    EXPECT_FALSE(is_valid_filetype_name("xyz "));
+
+    char str[65];
+    size_t n = sizeof(str) - 1;
+    memset(str, 'a', n);
+    str[n] = '\0';
+    ASSERT_EQ(strlen(str), 64);
+    EXPECT_FALSE(is_valid_filetype_name(str));
+
+    str[n - 1] = '\0';
+    ASSERT_EQ(strlen(str), 63);
+    EXPECT_TRUE(is_valid_filetype_name(str));
 }
 
 static void test_find_ft_filename(TestContext *ctx)
