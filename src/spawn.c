@@ -163,12 +163,13 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
 
         size_t active_fds = ARRAYLEN(fds);
         for (size_t i = 0; i < ARRAYLEN(fds); i++) {
-            if (fds[i].fd < 0 || fds[i].revents & POLLNVAL) {
+            int rev = fds[i].revents;
+            if (fds[i].fd < 0 || rev & POLLNVAL) {
                 fds[i].fd = -1;
                 active_fds--;
                 continue;
             }
-            if (fds[i].revents & (POLLHUP | POLLERR)) {
+            if (rev & POLLERR || (rev & (POLLHUP | POLLIN)) == POLLHUP) {
                 if (xclose(fds[i].fd)) {
                     perror_msg("close");
                 }
