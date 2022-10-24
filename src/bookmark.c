@@ -63,15 +63,14 @@ static bool file_location_return(const FileLocation *loc)
         view = window_get_view(window, buffer);
     } else {
         if (!loc->filename) {
-            // Can't restore closed buffer that had no filename.
-            // Try again.
+            // Can't restore closed buffer that had no filename; try again
             return false;
         }
         view = window_open_buffer(&editor, window, loc->filename, true, NULL);
     }
 
     if (!view) {
-        // Open failed. Don't try again.
+        // Open failed; don't try again
         return true;
     }
 
