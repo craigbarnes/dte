@@ -388,7 +388,7 @@ void buffer_setup(EditorState *e, Buffer *b)
     const char *filename = b->abs_filename;
     b->setup = true;
     buffer_detect_filetype(b, &e->filetypes);
-    set_file_options(&e->file_options, b);
+    set_file_options(e, b);
     set_editorconfig_options(b);
     buffer_update_syntax(e, b);
     if (b->options.detect_indent && filename) {

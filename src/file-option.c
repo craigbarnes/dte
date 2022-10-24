@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include "file-option.h"
 #include "command/serialize.h"
+#include "editor.h"
 #include "editorconfig/editorconfig.h"
 #include "options.h"
 #include "regexp.h"
@@ -17,10 +18,10 @@ typedef struct {
     } u;
 } FileOption;
 
-static void set_options(char **args)
+static void set_options(EditorState *e, char **args)
 {
     for (size_t i = 0; args[i]; i += 2) {
-        set_option(args[i], args[i + 1], true, false);
+        set_option(e, args[i], args[i + 1], true, false);
     }
 }
 
@@ -81,13 +82,13 @@ void set_editorconfig_options(Buffer *b)
     }
 }
 
-void set_file_options(const PointerArray *file_options, Buffer *b)
+void set_file_options(EditorState *e, Buffer *b)
 {
-    for (size_t i = 0, n = file_options->count; i < n; i++) {
-        const FileOption *opt = file_options->ptrs[i];
+    for (size_t i = 0, n = e->file_options.count; i < n; i++) {
+        const FileOption *opt = e->file_options.ptrs[i];
         if (opt->type == FILE_OPTIONS_FILETYPE) {
             if (streq(opt->u.filetype, b->options.filetype)) {
-                set_options(opt->strs);
+                set_options(e, opt->strs);
             }
             continue;
         }
@@ -101,7 +102,7 @@ void set_file_options(const PointerArray *file_options, Buffer *b)
         const regex_t *re = &opt->u.filename->re;
         regmatch_t m;
         if (regexp_exec(re, filename, strlen(filename), 0, &m, 0)) {
-            set_options(opt->strs);
+            set_options(e, opt->strs);
         }
     }
 }

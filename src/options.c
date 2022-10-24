@@ -38,7 +38,7 @@ typedef union {
 } OptionValue;
 
 typedef union {
-    struct {bool (*validate)(const EditorState *e, const char *value);} str_opt; // OPT_STR (optional)
+    struct {bool (*validate)(const char *value);} str_opt; // OPT_STR (optional)
     struct {unsigned int min, max;} uint_opt; // OPT_UINT
     struct {const char *const *values;} enum_opt; // OPT_ENUM, OPT_FLAG, OPT_BOOL
 } OptionConstraint;
@@ -109,7 +109,7 @@ static void filetype_changed(EditorState *e, bool global)
 {
     BUG_ON(!e->buffer);
     BUG_ON(global);
-    set_file_options(&e->file_options, e->buffer);
+    set_file_options(e, e->buffer);
     buffer_update_syntax(e, e->buffer);
 }
 
@@ -154,7 +154,7 @@ static void redraw_screen(EditorState *e, bool global)
     mark_everything_changed(e);
 }
 
-static bool validate_statusline_format(const EditorState* UNUSED_ARG(e), const char *value)
+static bool validate_statusline_format(const char *value)
 {
     size_t errpos = statusline_format_find_error(value);
     if (likely(errpos == 0)) {
@@ -169,16 +169,16 @@ static bool validate_statusline_format(const EditorState* UNUSED_ARG(e), const c
     return false;
 }
 
-static bool validate_filetype(const EditorState *e, const char *value)
+static bool validate_filetype(const char *value)
 {
-    if (!is_ft(&e->filetypes, value)) {
-        error_msg("No such file type '%s'", value);
+    if (!is_valid_filetype_name(value)) {
+        error_msg("Invalid filetype name '%s'", value);
         return false;
     }
     return true;
 }
 
-static bool validate_regex(const EditorState* UNUSED_ARG(e), const char *value)
+static bool validate_regex(const char *value)
 {
     return value[0] == '\0' || regexp_is_valid(value, REG_NEWLINE);
 }
@@ -197,7 +197,7 @@ static void str_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
 
 static bool str_parse(const OptionDesc *d, const char *str, OptionValue *v)
 {
-    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(&editor, str);
+    bool valid = !d->u.str_opt.validate || d->u.str_opt.validate(str);
     v->str_val = valid ? str : NULL;
     return valid;
 }
@@ -497,11 +497,11 @@ static OptionValue desc_get(const OptionDesc *desc, void *ptr)
     return option_ops[desc->type].get(desc, ptr);
 }
 
-static void desc_set(const OptionDesc *desc, void *ptr, bool global, OptionValue value)
+static void desc_set(EditorState *e, const OptionDesc *desc, void *ptr, bool global, OptionValue value)
 {
     option_ops[desc->type].set(desc, ptr, value);
     if (desc->on_change) {
-        desc->on_change(&editor, global);
+        desc->on_change(e, global);
     }
 }
 
@@ -552,6 +552,7 @@ static const OptionDesc *must_find_global_option(const char *name)
 }
 
 static void do_set_option (
+    EditorState *e,
     const OptionDesc *desc,
     const char *value,
     bool local,
@@ -581,23 +582,23 @@ static void do_set_option (
     }
 
     if (local) {
-        desc_set(desc, local_ptr(desc, &editor.buffer->options), false, val);
+        desc_set(e, desc, local_ptr(desc, &e->buffer->options), false, val);
     }
     if (global) {
-        desc_set(desc, global_ptr(desc, &editor.options), true, val);
+        desc_set(e, desc, global_ptr(desc, &e->options), true, val);
     }
 }
 
-void set_option(const char *name, const char *value, bool local, bool global)
+void set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
     if (!desc) {
         return;
     }
-    do_set_option(desc, value, local, global);
+    do_set_option(e, desc, value, local, global);
 }
 
-void set_bool_option(const char *name, bool local, bool global)
+void set_bool_option(EditorState *e, const char *name, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
     if (!desc) {
@@ -607,7 +608,7 @@ void set_bool_option(const char *name, bool local, bool global)
         error_msg("Option %s is not boolean", desc->name);
         return;
     }
-    do_set_option(desc, "true", local, global);
+    do_set_option(e, desc, "true", local, global);
 }
 
 static const OptionDesc *find_toggle_option(const char *name, bool *global)
@@ -624,14 +625,14 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
     return desc;
 }
 
-void toggle_option(const char *name, bool global, bool verbose)
+void toggle_option(EditorState *e, const char *name, bool global, bool verbose)
 {
     const OptionDesc *desc = find_toggle_option(name, &global);
     if (!desc) {
         return;
     }
 
-    char *ptr = get_option_ptr(&editor, desc, global);
+    char *ptr = get_option_ptr(e, desc, global);
     OptionValue value = desc_get(desc, ptr);
     OptionType type = desc->type;
     if (type == OPT_ENUM) {
@@ -647,7 +648,7 @@ void toggle_option(const char *name, bool global, bool verbose)
         return;
     }
 
-    desc_set(desc, ptr, global, value);
+    desc_set(e, desc, ptr, global, value);
     if (verbose) {
         const char *prefix = (global && desc->local) ? "[global] " : "";
         const char *str = desc_string(desc, value);
@@ -656,6 +657,7 @@ void toggle_option(const char *name, bool global, bool verbose)
 }
 
 void toggle_option_values (
+    EditorState *e,
     const char *name,
     bool global,
     bool verbose,
@@ -670,7 +672,7 @@ void toggle_option_values (
     BUG_ON(count == 0);
     size_t current = 0;
     bool error = false;
-    char *ptr = get_option_ptr(&editor, desc, global);
+    char *ptr = get_option_ptr(e, desc, global);
     OptionValue *parsed_values = xnew(OptionValue, count);
 
     for (size_t i = 0; i < count; i++) {
@@ -685,7 +687,7 @@ void toggle_option_values (
 
     if (!error) {
         size_t i = current % count;
-        desc_set(desc, ptr, global, parsed_values[i]);
+        desc_set(e, desc, ptr, global, parsed_values[i]);
         if (verbose) {
             const char *prefix = (global && desc->local) ? "[global] " : "";
             const char *str = desc_string(desc, parsed_values[i]);
@@ -763,7 +765,7 @@ void collect_toggleable_options(PointerArray *a, const char *prefix, bool global
     }
 }
 
-void collect_option_values(PointerArray *a, const char *option, const char *prefix)
+void collect_option_values(EditorState *e, PointerArray *a, const char *option, const char *prefix)
 {
     const OptionDesc *desc = find_option(option);
     if (!desc) {
@@ -771,7 +773,7 @@ void collect_option_values(PointerArray *a, const char *option, const char *pref
     }
 
     if (prefix[0] == '\0') {
-        char *ptr = get_option_ptr(&editor, desc, !desc->local);
+        char *ptr = get_option_ptr(e, desc, !desc->local);
         OptionValue value = desc_get(desc, ptr);
         ptr_array_append(a, xstrdup(desc_string(desc, value)));
         return;
@@ -846,12 +848,12 @@ String dump_options(GlobalOptions *gopts, LocalOptions *lopts)
     return buf;
 }
 
-const char *get_option_value_string(const char *name)
+const char *get_option_value_string(EditorState *e, const char *name)
 {
     const OptionDesc *desc = find_option(name);
     if (!desc) {
         return NULL;
     }
-    char *ptr = get_option_ptr(&editor, desc, !desc->local);
+    char *ptr = get_option_ptr(e, desc, !desc->local);
     return desc_string(desc, desc_get(desc, ptr));
 }

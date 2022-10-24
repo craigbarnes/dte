@@ -303,16 +303,16 @@ static void cmd_right(EditorState *e, const CommandArgs *a)
     reset_completion(c);
 }
 
-static void cmd_toggle(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_toggle(EditorState *e, const CommandArgs *a)
 {
     const char *option_name = a->args[0];
     bool global = cmdargs_has_flag(a, 'g');
     size_t nr_values = a->nr_args - 1;
     if (nr_values) {
         char **values = a->args + 1;
-        toggle_option_values(option_name, global, false, values, nr_values);
+        toggle_option_values(e, option_name, global, false, values, nr_values);
     } else {
-        toggle_option(option_name, global, false);
+        toggle_option(e, option_name, global, false);
     }
 }
 

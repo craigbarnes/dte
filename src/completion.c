@@ -402,7 +402,7 @@ static void complete_option(EditorState *e, const CommandArgs *a)
         // TODO: exclude options that have already been specified
         collect_auto_options(&cs->completions, cs->parsed);
     } else {
-        collect_option_values(&cs->completions, a->args[a->nr_args - 1], cs->parsed);
+        collect_option_values(e, &cs->completions, a->args[a->nr_args - 1], cs->parsed);
     }
 }
 
@@ -440,7 +440,7 @@ static void complete_set(EditorState *e, const CommandArgs *a)
         bool global = cmdargs_has_flag(a, 'g');
         collect_options(&cs->completions, cs->parsed, local, global);
     } else {
-        collect_option_values(&cs->completions, a->args[a->nr_args - 1], cs->parsed);
+        collect_option_values(e, &cs->completions, a->args[a->nr_args - 1], cs->parsed);
     }
 }
 

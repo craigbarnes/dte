@@ -1652,7 +1652,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
     if (!old_mode && streq(buffer->options.filetype, "none")) {
         // New file and most likely user has not changed the filetype
         if (buffer_detect_filetype(buffer, &e->filetypes)) {
-            set_file_options(&e->file_options, buffer);
+            set_file_options(e, buffer);
             set_editorconfig_options(buffer);
             buffer_update_syntax(e, buffer);
         }
@@ -1829,7 +1829,7 @@ static void cmd_set(EditorState *e, const CommandArgs *a)
     char **args = a->args;
     size_t count = a->nr_args;
     if (count == 1) {
-        set_bool_option(args[0], local, global);
+        set_bool_option(e, args[0], local, global);
         return;
     } else if (count & 1) {
         error_msg("One or even number of arguments expected");
@@ -1837,7 +1837,7 @@ static void cmd_set(EditorState *e, const CommandArgs *a)
     }
 
     for (size_t i = 0; i < count; i += 2) {
-        set_option(args[i], args[i + 1], local, global);
+        set_option(e, args[i], args[i + 1], local, global);
     }
 }
 
@@ -1947,7 +1947,7 @@ static void cmd_title(EditorState *e, const CommandArgs *a)
     mark_buffer_tabbars_changed(buffer);
 }
 
-static void cmd_toggle(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_toggle(EditorState *e, const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool verbose = has_flag(a, 'v');
@@ -1955,9 +1955,9 @@ static void cmd_toggle(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     size_t nr_values = a->nr_args - 1;
     if (nr_values) {
         char **values = a->args + 1;
-        toggle_option_values(option_name, global, verbose, values, nr_values);
+        toggle_option_values(e, option_name, global, verbose, values, nr_values);
     } else {
-        toggle_option(option_name, global, verbose);
+        toggle_option(e, option_name, global, verbose);
     }
 }
 

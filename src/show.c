@@ -74,7 +74,7 @@ static void open_temporary_buffer (
 
     if (flags & DTERC) {
         v->buffer->options.filetype = str_intern("dte");
-        set_file_options(&e->file_options, v->buffer);
+        set_file_options(e, v->buffer);
         buffer_update_syntax(e, v->buffer);
     }
 }
@@ -229,7 +229,7 @@ static void show_compiler(EditorState *e, const char *name, bool cflag)
 
 static void show_option(EditorState *e, const char *name, bool cflag)
 {
-    const char *value = get_option_value_string(name);
+    const char *value = get_option_value_string(e, name);
     if (!value) {
         error_msg("invalid option name: %s", name);
         return;
