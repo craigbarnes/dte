@@ -356,9 +356,8 @@ static int line_numbers_width(const Window *win, const GlobalOptions *options)
     if (!options->show_line_numbers || !win->view) {
         return 0;
     }
-    int width = size_str_width(win->view->buffer->nl) + 1;
-    int min = LINE_NUMBERS_MIN_WIDTH;
-    return (width < min) ? min : width;
+    size_t width = size_str_width(win->view->buffer->nl) + 1;
+    return MAX(width, LINE_NUMBERS_MIN_WIDTH);
 }
 
 static int edit_x_offset(const Window *win, const GlobalOptions *options)
