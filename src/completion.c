@@ -74,6 +74,8 @@ static bool do_collect_files (
             continue;
         }
 
+        // TODO: add a global option to allow dotfiles to be included
+        // even when there's no prefix
         if (flen ? strncmp(name, fileprefix, flen) : name[0] == '.') {
             continue;
         }
