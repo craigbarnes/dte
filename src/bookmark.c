@@ -21,17 +21,17 @@ FileLocation *get_current_file_location(const View *view)
     return loc;
 }
 
-bool file_location_go(const FileLocation *loc)
+bool file_location_go(EditorState *e, const FileLocation *loc)
 {
-    Window *window = editor.window;
-    View *view = window_open_buffer(&editor, window, loc->filename, true, NULL);
+    Window *window = e->window;
+    View *view = window_open_buffer(e, window, loc->filename, true, NULL);
     if (!view) {
         // Failed to open file. Error message should be visible.
         return false;
     }
 
     if (window->view != view) {
-        set_view(&editor, view);
+        set_view(e, view);
         // Force centering view to the cursor because file changed
         view->force_center = true;
     }
@@ -53,12 +53,11 @@ bool file_location_go(const FileLocation *loc)
     return ok;
 }
 
-static bool file_location_return(const FileLocation *loc)
+static bool file_location_return(EditorState *e, const FileLocation *loc)
 {
-    Window *window = editor.window;
-    Buffer *buffer = find_buffer_by_id(&editor.buffers, loc->buffer_id);
+    Window *window = e->window;
+    Buffer *buffer = find_buffer_by_id(&e->buffers, loc->buffer_id);
     View *view;
-
     if (buffer) {
         view = window_get_view(window, buffer);
     } else {
@@ -66,7 +65,7 @@ static bool file_location_return(const FileLocation *loc)
             // Can't restore closed buffer that had no filename; try again
             return false;
         }
-        view = window_open_buffer(&editor, window, loc->filename, true, NULL);
+        view = window_open_buffer(e, window, loc->filename, true, NULL);
     }
 
     if (!view) {
@@ -74,7 +73,7 @@ static bool file_location_return(const FileLocation *loc)
         return true;
     }
 
-    set_view(&editor, view);
+    set_view(e, view);
     unselect(view);
     move_to_line(view, loc->line);
     move_to_column(view, loc->column);
@@ -98,14 +97,14 @@ void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
     ptr_array_append(bookmarks, loc);
 }
 
-void bookmark_pop(PointerArray *bookmarks)
+void bookmark_pop(EditorState *e, PointerArray *bookmarks)
 {
     void **ptrs = bookmarks->ptrs;
     size_t count = bookmarks->count;
     bool go = true;
     while (count > 0 && go) {
         FileLocation *loc = ptrs[--count];
-        go = !file_location_return(loc);
+        go = !file_location_return(e, loc);
         file_location_free(loc);
     }
     bookmarks->count = count;

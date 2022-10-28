@@ -227,7 +227,7 @@ static void cmd_bolsf(EditorState *e, const CommandArgs *a)
 static void cmd_bookmark(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(&e->bookmarks);
+        bookmark_pop(e, &e->bookmarks);
         return;
     }
 
@@ -370,7 +370,7 @@ static void cmd_compile(EditorState *e, const CommandArgs *a)
     clear_messages(&e->messages);
     spawn_compiler(&ctx, c, &e->messages);
     if (e->messages.array.count) {
-        activate_current_message_save(&e->messages, &e->bookmarks, e->view);
+        activate_current_message_save(e);
     }
 }
 
@@ -982,7 +982,7 @@ static void cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    activate_current_message(msgs);
+    activate_current_message(e);
 }
 
 static void cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -1916,7 +1916,7 @@ static void cmd_suspend(EditorState *e, const CommandArgs *a)
 static void cmd_tag(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(&e->bookmarks);
+        bookmark_pop(e, &e->bookmarks);
         return;
     }
 
@@ -1932,7 +1932,7 @@ static void cmd_tag(EditorState *e, const CommandArgs *a)
     }
 
     tag_lookup(&e->tagfile, name, e->buffer->abs_filename, &e->messages);
-    activate_current_message_save(&e->messages, &e->bookmarks, e->view);
+    activate_current_message_save(e);
     free(word);
 }
 
