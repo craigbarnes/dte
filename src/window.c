@@ -488,7 +488,7 @@ void window_close_current(EditorState *e)
     Window *next_or_prev = data.next ? data.next : data.prev;
     BUG_ON(!next_or_prev);
 
-    remove_frame(window->frame);
+    remove_frame(e, window->frame);
     e->window = NULL;
     set_view(e, next_or_prev->view);
 

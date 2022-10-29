@@ -124,7 +124,7 @@ static void test_deinit(TestContext *ctx)
     EXPECT_PTREQ(e->buffer, e->buffers.ptrs[0]);
     EXPECT_FALSE(e->child_controls_terminal);
 
-    remove_frame(e->root_frame);
+    remove_frame(e, e->root_frame);
     EXPECT_NULL(e->view);
     EXPECT_NULL(e->buffer);
     EXPECT_EQ(e->buffers.count, 0);

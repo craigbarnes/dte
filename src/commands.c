@@ -2173,7 +2173,7 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     if (e->window->views.count == 0) {
         // Open failed, remove new window
-        remove_frame(e->window->frame);
+        remove_frame(e, e->window->frame);
         e->view = save;
         e->buffer = save->buffer;
         e->window = save->window;

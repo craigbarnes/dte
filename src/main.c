@@ -592,7 +592,7 @@ loop_break:;
     term_output_flush(&term->obuf);
 
     // Unlock files and add files to file history
-    remove_frame(e->root_frame);
+    remove_frame(e, e->root_frame);
 
     if (load_and_save_history) {
         history_save(&e->command_history);

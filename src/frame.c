@@ -464,7 +464,7 @@ static void free_frame(Frame *f)
     free(f);
 }
 
-void remove_frame(Frame *f)
+void remove_frame(EditorState *e, Frame *f)
 {
     Frame *parent = f->parent;
     if (!parent) {
@@ -486,7 +486,7 @@ void remove_frame(Frame *f)
             BUG_ON(idx >= gp->frames.count);
             gp->frames.ptrs[idx] = c;
         } else {
-            editor.root_frame = c;
+            e->root_frame = c;
         }
         free(parent->frames.ptrs);
         free(parent);
