@@ -453,14 +453,22 @@ Frame *split_root(Frame **root, bool vertical, bool before)
 }
 
 // NOTE: does not remove f from f->parent->frames
-static void free_frame(Frame *f)
+static void free_frame(EditorState *e, Frame *f)
 {
     f->parent = NULL;
-    ptr_array_free_cb(&f->frames, FREE_FUNC(free_frame));
+
+    PointerArray *frames = &f->frames;
+    for (size_t i = 0, n = frames->count; i < n; i++) {
+        free_frame(e, frames->ptrs[i]);
+        frames->ptrs[i] = NULL;
+    }
+    ptr_array_free_array(frames);
+
     if (f->window) {
-        window_free(&editor, f->window);
+        window_free(e, f->window);
         f->window = NULL;
     }
+
     free(f);
 }
 
@@ -468,11 +476,11 @@ void remove_frame(EditorState *e, Frame *f)
 {
     Frame *parent = f->parent;
     if (!parent) {
-        free_frame(f);
+        free_frame(e, f);
         return;
     }
     ptr_array_remove(&parent->frames, f);
-    free_frame(f);
+    free_frame(e, f);
 
     if (parent->frames.count == 1) {
         // Replace parent with the only child frame
