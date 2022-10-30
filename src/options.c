@@ -65,10 +65,10 @@ typedef struct {
     OLG \
     .name = _name, \
     .type = OPT_UINT, \
-    .u = { .uint_opt = { \
+    .u = {.uint_opt = { \
         .min = _min, \
         .max = _max, \
-    } }, \
+    }}, \
     .on_change = _on_change, \
 }
 
@@ -462,29 +462,41 @@ static char *get_option_ptr(EditorState *e, const OptionDesc *d, bool global)
 }
 
 UNITTEST {
-    static const size_t alignments[] = {
-        [OPT_STR] = alignof(const char*),
-        [OPT_UINT] = alignof(unsigned int),
-        [OPT_ENUM] = alignof(unsigned int),
-        [OPT_BOOL] = alignof(bool),
-        [OPT_FLAG] = alignof(unsigned int),
+    static const struct {
+        size_t alignment;
+        size_t size;
+    } map[] = {
+        [OPT_STR] = {alignof(const char*), sizeof(const char*)},
+        [OPT_UINT] = {alignof(unsigned int), sizeof(unsigned int)},
+        [OPT_ENUM] = {alignof(unsigned int), sizeof(unsigned int)},
+        [OPT_BOOL] = {alignof(bool), sizeof(bool)},
+        [OPT_FLAG] = {alignof(unsigned int), sizeof(unsigned int)},
     };
 
     GlobalOptions gopts = {.tab_bar = true};
     LocalOptions lopts = {.filetype = NULL};
 
-    // Check offset alignments
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
         const OptionDesc *desc = &option_desc[i];
-        BUG_ON(desc->type >= ARRAYLEN(alignments));
-        size_t alignment = alignments[desc->type];
+        const OptionType type = desc->type;
+        BUG_ON(type >= ARRAYLEN(map));
+        size_t alignment = map[type].alignment;
+        size_t end = desc->offset + map[type].size;
         if (desc->global) {
             uintptr_t ptr_val = (uintptr_t)global_ptr(desc, &gopts);
             BUG_ON(ptr_val % alignment != 0);
+            BUG_ON(end > sizeof(GlobalOptions));
         }
         if (desc->local) {
             uintptr_t ptr_val = (uintptr_t)local_ptr(desc, &lopts);
             BUG_ON(ptr_val % alignment != 0);
+            BUG_ON(end > sizeof(LocalOptions));
+        }
+        if (desc->global && desc->local) {
+            BUG_ON(end > sizeof(CommonOptions));
+        }
+        if (type == OPT_UINT) {
+            BUG_ON(desc->u.uint_opt.max <= desc->u.uint_opt.min);
         }
     }
 
