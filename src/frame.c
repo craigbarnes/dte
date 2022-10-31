@@ -4,6 +4,18 @@
 #include "util/xmalloc.h"
 #include "window.h"
 
+static void sanity_check_frame(const Frame *f)
+{
+    bool has_window = !!f->window;
+    bool has_frames = f->frames.count > 0;
+    if (has_window == has_frames) {
+        BUG("frames must contain a window or subframe(s), but never both");
+    }
+    if (has_window) {
+        BUG_ON(f != f->window->frame);
+    }
+}
+
 static int get_min_w(const Frame *f)
 {
     if (f->window) {
@@ -508,6 +520,7 @@ void remove_frame(EditorState *e, Frame *f)
 
 void dump_frame(const Frame *f, int level, String *str)
 {
+    sanity_check_frame(f);
     string_sprintf(str, "%*s%dx%d", level * 4, "", f->w, f->h);
 
     const Window *w = f->window;
@@ -525,9 +538,7 @@ void dump_frame(const Frame *f, int level, String *str)
     string_append_cstring(str, f->vertical ? " V" : " H");
     string_append_cstring(str, f->equal_size ? "\n" : " !\n");
 
-    const size_t n = f->frames.count;
-    BUG_ON(n == 0);
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0, n = f->frames.count; i < n; i++) {
         const Frame *c = f->frames.ptrs[i];
         dump_frame(c, level + 1, str);
     }
@@ -536,10 +547,7 @@ void dump_frame(const Frame *f, int level, String *str)
 #if DEBUG >= 1
 void debug_frame(const Frame *f)
 {
-    BUG_ON(f->window && f->frames.count);
-    if (f->window) {
-        BUG_ON(f != f->window->frame);
-    }
+    sanity_check_frame(f);
     for (size_t i = 0, n = f->frames.count; i < n; i++) {
         const Frame *c = f->frames.ptrs[i];
         BUG_ON(c->parent != f);
