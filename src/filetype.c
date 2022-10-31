@@ -324,5 +324,5 @@ static void free_filetype_entry(UserFileTypeEntry *ft)
 
 void free_filetypes(PointerArray *filetypes)
 {
-    ptr_array_free_cb(filetypes, (FreeFunction)free_filetype_entry);
+    ptr_array_free_cb(filetypes, FREE_FUNC(free_filetype_entry));
 }

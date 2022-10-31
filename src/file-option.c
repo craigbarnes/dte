@@ -185,5 +185,5 @@ static void free_file_option(FileOption *opt)
 
 void free_file_options(PointerArray *file_options)
 {
-    ptr_array_free_cb(file_options, (FreeFunction)free_file_option);
+    ptr_array_free_cb(file_options, FREE_FUNC(free_file_option));
 }

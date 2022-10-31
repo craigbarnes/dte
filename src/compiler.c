@@ -100,7 +100,7 @@ static void free_error_format(ErrorFormat *f)
 
 void free_compiler(Compiler *c)
 {
-    ptr_array_free_cb(&c->error_formats, (FreeFunction)free_error_format);
+    ptr_array_free_cb(&c->error_formats, FREE_FUNC(free_error_format));
     free(c);
 }
 
