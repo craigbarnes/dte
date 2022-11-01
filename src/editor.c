@@ -249,7 +249,7 @@ int free_editor_state(EditorState *e)
     free_bindings(&e->bindings[INPUT_COMMAND]);
     free_bindings(&e->bindings[INPUT_SEARCH]);
 
-    free_intern_pool();
+    free_interned_strings();
 
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)e->user_config_dir);

@@ -7,7 +7,7 @@
 #include "string-view.h"
 
 const void *mem_intern(const void *data, size_t len) NONNULL_ARGS_AND_RETURN;
-void free_intern_pool(void);
+void free_interned_strings(void);
 
 static inline const char *str_intern(const char *str)
 {
