@@ -4,6 +4,11 @@
 #include "util/xmalloc.h"
 #include "window.h"
 
+enum {
+    WINDOW_MIN_WIDTH = 8,
+    WINDOW_MIN_HEIGHT = 3,
+};
+
 static void sanity_check_frame(const Frame *f)
 {
     bool has_window = !!f->window;
@@ -11,90 +16,78 @@ static void sanity_check_frame(const Frame *f)
     if (has_window == has_frames) {
         BUG("frames must contain a window or subframe(s), but never both");
     }
-    if (has_window) {
-        BUG_ON(f != f->window->frame);
-    }
+    BUG_ON(has_window && f != f->window->frame);
 }
 
-static int get_min_w(const Frame *f)
+static int get_min_w(const Frame *frame)
 {
-    if (f->window) {
-        return 8;
+    if (frame->window) {
+        return WINDOW_MIN_WIDTH;
     }
 
-    if (f->vertical) {
-        int max = 0;
-        for (size_t i = 0, n = f->frames.count; i < n; i++) {
-            int w = get_min_w(f->frames.ptrs[i]);
-            if (w > max) {
-                max = w;
-            }
-        }
-        return max;
-    } else {
-        int w = f->frames.count - 1; // Separators
-        for (size_t i = 0, n = f->frames.count; i < n; i++) {
-            w += get_min_w(f->frames.ptrs[i]);
+    const PointerArray *subframes = &frame->frames;
+    const size_t count = subframes->count;
+    if (!frame->vertical) {
+        int w = count - 1; // Separators
+        for (size_t i = 0; i < count; i++) {
+            w += get_min_w(subframes->ptrs[i]);
         }
         return w;
     }
+
+    int max = 0;
+    for (size_t i = 0; i < count; i++) {
+        int w = get_min_w(subframes->ptrs[i]);
+        max = MAX(w, max);
+    }
+    return max;
 }
 
-static int get_min_h(const Frame *f)
+static int get_min_h(const Frame *frame)
 {
-    if (f->window) {
-        return 3;
+    if (frame->window) {
+        return WINDOW_MIN_HEIGHT;
     }
 
-    if (!f->vertical) {
-        int max = 0;
-        for (size_t i = 0, n = f->frames.count; i < n; i++) {
-            int h = get_min_h(f->frames.ptrs[i]);
-            if (h > max) {
-                max = h;
-            }
-        }
-        return max;
-    } else {
-        int h = 0; // No separators
-        for (size_t i = 0, n = f->frames.count; i < n; i++) {
-            h += get_min_h(f->frames.ptrs[i]);
+    const PointerArray *subframes = &frame->frames;
+    const size_t count = subframes->count;
+    if (frame->vertical) {
+        int h = 0;
+        for (size_t i = 0; i < count; i++) {
+            h += get_min_h(subframes->ptrs[i]);
         }
         return h;
     }
+
+    int max = 0;
+    for (size_t i = 0; i < count; i++) {
+        int h = get_min_h(subframes->ptrs[i]);
+        max = MAX(h, max);
+    }
+    return max;
 }
 
 static int get_min(const Frame *f)
 {
-    if (f->parent->vertical) {
-        return get_min_h(f);
-    }
-    return get_min_w(f);
+    return f->parent->vertical ? get_min_h(f) : get_min_w(f);
 }
 
 static int get_size(const Frame *f)
 {
-    if (f->parent->vertical) {
-        return f->h;
-    }
-    return f->w;
+    return f->parent->vertical ? f->h : f->w;
 }
 
 static int get_container_size(const Frame *f)
 {
-    if (f->vertical) {
-        return f->h;
-    }
-    return f->w;
+    return f->vertical ? f->h : f->w;
 }
 
-static void set_size(Frame *f, int size)
+static void set_size(Frame *frame, int size)
 {
-    if (f->parent->vertical) {
-        set_frame_size(f, f->parent->w, size);
-    } else {
-        set_frame_size(f, size, f->parent->h);
-    }
+    bool vertical = frame->parent->vertical;
+    int w = vertical ? frame->parent->w : size;
+    int h = vertical ? size : frame->parent->h;
+    set_frame_size(frame, w, h);
 }
 
 static void divide_equally(const Frame *f)
