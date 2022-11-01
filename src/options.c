@@ -583,14 +583,11 @@ static void do_set_option (
     if (!desc_parse(desc, value, &val)) {
         return;
     }
+
     if (!local && !global) {
         // Set both by default
-        if (desc->local) {
-            local = true;
-        }
-        if (desc->global) {
-            global = true;
-        }
+        local = desc->local;
+        global = desc->global;
     }
 
     if (local) {
