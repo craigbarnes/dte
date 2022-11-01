@@ -65,7 +65,9 @@ bool regexp_exec (
 #endif
 }
 
-void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
+// Check which word boundary tokens are supported by regcomp(3)
+// (if any) and initialize `rwbt` with them for later use
+bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
 {
     static const char text[] = "SSfooEE SSfoo fooEE foo SSfooEE";
     const regoff_t match_start = 20, match_end = 23;
@@ -91,11 +93,12 @@ void regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt)
         bool match = !regexec(&re, text, ARRAYLEN(m), m, 0);
         regfree(&re);
         if (match && m[0].rm_so == match_start && m[0].rm_eo == match_end) {
-            LOG_INFO("regexp word boundary tokens detected: %s %s", start, end);
             *rwbt = pairs[i];
-            break;
+            return true;
         }
     }
+
+    return false;
 }
 
 void free_cached_regexp(CachedRegexp *cr)

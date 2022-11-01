@@ -210,9 +210,15 @@ EditorState *init_editor_state(void)
         fatal_error("setenv", errno);
     }
 
+    RegexpWordBoundaryTokens *wb = &e->regexp_word_tokens;
+    if (regexp_init_word_boundary_tokens(wb)) {
+        LOG_INFO("regex word boundary tokens detected: %s %s", wb->start, wb->end);
+    } else {
+        LOG_WARNING("no regex word boundary tokens detected");
+    }
+
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
-    regexp_init_word_boundary_tokens(&e->regexp_word_tokens);
     hashmap_init(&normal_commands.aliases, 32);
     intmap_init(&e->bindings[INPUT_NORMAL].map, 150);
     intmap_init(&e->bindings[INPUT_COMMAND].map, 40);
