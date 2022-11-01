@@ -376,9 +376,9 @@ int main(int argc, char *argv[])
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
-    int ch;
+    set_print_errors_to_stderr(true);
 
-    while ((ch = getopt(argc, argv, optstring)) != -1) {
+    for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
         case 'c':
             ptr_array_append(&commands, optarg);
@@ -504,6 +504,8 @@ loop_break:;
         }
     }
 
+    set_print_errors_to_stderr(false);
+
     // Initialize terminal but don't update screen yet. Also display
     // "Press any key to continue" prompt if there were any errors
     // during reading configuration files.
@@ -590,6 +592,7 @@ loop_break:;
     term_restore_title(term);
     ui_end(e);
     term_output_flush(&term->obuf);
+    set_print_errors_to_stderr(true);
 
     // Unlock files and add files to file history
     remove_frame(e, e->root_frame);

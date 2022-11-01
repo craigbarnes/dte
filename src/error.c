@@ -5,13 +5,13 @@
 #include "error.h"
 #include "command/run.h"
 #include "config.h"
-#include "editor.h"
 #include "util/debug.h"
 #include "util/xstdio.h"
 
 static char error_buf[256];
 static unsigned int nr_errors;
 static bool msg_is_error;
+static bool print_errors_to_stderr;
 
 void clear_error(void)
 {
@@ -52,7 +52,7 @@ void error_msg(const char *format, ...)
     msg_is_error = true;
     nr_errors++;
 
-    if (editor.status != EDITOR_RUNNING) {
+    if (print_errors_to_stderr) {
         xfputs(error_buf, stderr);
         xfputc('\n', stderr);
     }
@@ -83,4 +83,9 @@ const char *get_msg(bool *is_error)
 unsigned int get_nr_errors(void)
 {
     return nr_errors;
+}
+
+void set_print_errors_to_stderr(bool enable)
+{
+    print_errors_to_stderr = enable;
 }
