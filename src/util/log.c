@@ -35,6 +35,11 @@ LogLevel log_level_default(void)
     return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
 }
 
+static LogLevel log_level_max(void)
+{
+    return (DEBUG >= 3) ? LOG_LEVEL_TRACE : log_level_default();
+}
+
 LogLevel log_level_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {
@@ -48,16 +53,6 @@ const char *log_level_to_str(LogLevel level)
     BUG_ON(level < LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
     return log_levels[level];
-}
-
-static LogLevel log_level_max(void)
-{
-    if (DEBUG >= 3) {
-        return LOG_LEVEL_TRACE;
-    } else if (DEBUG >= 2) {
-        return LOG_LEVEL_DEBUG;
-    }
-    return LOG_LEVEL_INFO;
 }
 
 LogLevel log_init(const char *filename, LogLevel level)
