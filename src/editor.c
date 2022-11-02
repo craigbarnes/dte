@@ -199,7 +199,7 @@ EditorState *init_editor_state(void)
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
     e->session_leader = leader;
-    LOG_INFO("version: " VERSION);
+    LOG_INFO("dte version: " VERSION);
     LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
     set_and_check_locale();
