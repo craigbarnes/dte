@@ -72,7 +72,7 @@ const char *log_level_to_str(LogLevel level)
     return log_levels[level];
 }
 
-LogLevel log_init(const char *filename, LogLevel level)
+LogLevel log_open(const char *filename, LogLevel level)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
@@ -97,6 +97,11 @@ LogLevel log_init(const char *filename, LogLevel level)
 
     log_level = MIN(level, log_level_max());
     return log_level;
+}
+
+bool log_close(void)
+{
+    return log_level == LOG_LEVEL_NONE || fclose(logfile) == 0;
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)

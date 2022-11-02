@@ -354,7 +354,7 @@ static ExitCode init_logging(const char *filename, const char *log_level_str)
         return EX_OK;
     }
 
-    LogLevel got_level = log_init(filename, req_level);
+    LogLevel got_level = log_open(filename, req_level);
     if (got_level == LOG_LEVEL_NONE) {
         const char *err = strerror(errno);
         fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
@@ -652,5 +652,6 @@ loop_break:;
     }
 
     LOG_INFO("exiting with status %d", e->exit_code);
+    log_close();
     return e->exit_code;
 }
