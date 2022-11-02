@@ -520,7 +520,7 @@ loop_break:;
 
     update_all_syntax_colors(&e->syntaxes, &e->colors);
 
-    Window *window = new_window();
+    Window *window = new_window(e);
     e->window = window;
     e->root_frame = new_root_frame(window);
 
@@ -559,7 +559,7 @@ loop_break:;
                 error_msg("Invalid file position: '%s'", str);
             }
         } else {
-            View *v = window_open_buffer(e, window, str, false, NULL);
+            View *v = window_open_buffer(window, str, false, NULL);
             if (line > 0) {
                 set_view(e, v);
                 move_to_line(v, line);
@@ -578,7 +578,7 @@ loop_break:;
 
     View *empty_buffer = NULL;
     if (window->views.count == 0) {
-        empty_buffer = window_open_empty_buffer(e, window);
+        empty_buffer = window_open_empty_buffer(window);
         BUG_ON(!empty_buffer);
         BUG_ON(window->views.count != 1);
         BUG_ON(empty_buffer != window->views.ptrs[0]);
@@ -611,7 +611,7 @@ loop_break:;
         && tag && window->views.count > 1
     ) {
         // Close the empty buffer, leaving just the buffer opened via "-t"
-        remove_view(e, empty_buffer);
+        remove_view(empty_buffer);
         empty_buffer = NULL;
     }
 

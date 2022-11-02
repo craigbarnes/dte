@@ -38,24 +38,6 @@ typedef enum {
     INPUT_SEARCH,
 } InputMode;
 
-typedef struct Window {
-    PointerArray views;
-    Frame *frame;
-    View *view; // Current view
-    View *prev_view; // Previous view, if set
-    int x, y; // Coordinates for top left of window
-    int w, h; // Width and height of window (including tabbar and status)
-    int edit_x, edit_y; // Top left of editable area
-    int edit_w, edit_h; // Width and height of editable area
-    size_t first_tab_idx;
-    bool update_tabbar;
-    struct {
-        int width;
-        long first;
-        long last;
-    } line_numbers;
-} Window;
-
 typedef struct EditorState {
     EditorStatus status;
     InputMode input_mode;
@@ -80,7 +62,7 @@ typedef struct EditorState {
     CommandMacroState macro;
     TermCursorStyle cursor_styles[NR_CURSOR_MODES];
     Frame *root_frame;
-    Window *window;
+    struct Window *window;
     View *view;
     Buffer *buffer;
     PointerArray buffers;

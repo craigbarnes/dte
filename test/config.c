@@ -276,7 +276,7 @@ void init_headless_mode(TestContext *ctx)
     exec_builtin_rc(&e->colors, TERM_8_COLOR);
     update_all_syntax_colors(&e->syntaxes, &e->colors);
     e->options.lock_files = false;
-    e->window = new_window();
+    e->window = new_window(e);
     e->root_frame = new_root_frame(e->window);
-    set_view(e, window_open_empty_buffer(e, e->window));
+    set_view(e, window_open_empty_buffer(e->window));
 }

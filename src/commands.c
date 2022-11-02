@@ -334,7 +334,7 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
         return;
     }
 
-    window_close_current_view(e, e->window);
+    window_close_current_view(e->window);
     set_view(e, e->window->view);
 }
 
@@ -1061,7 +1061,7 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
     }
 
     if (a->nr_args == 0) {
-        View *v = window_open_new_file(e, e->window);
+        View *v = window_open_new_file(e->window);
         v->buffer->temporary = temporary;
         if (requested_encoding) {
             buffer_set_encoding(v->buffer, encoding);
@@ -1081,11 +1081,11 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
 
     if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(e, e->window, paths[0], &encoding);
+        window_open_file(e->window, paths[0], &encoding);
     } else {
         // It makes no sense to remember previous view when opening
         // multiple files
-        window_open_files(e, e->window, paths, &encoding);
+        window_open_files(e->window, paths, &encoding);
     }
 
     if (use_glob) {
@@ -2039,7 +2039,7 @@ static void cmd_wflip(EditorState *e, const CommandArgs *a)
 static void cmd_wnext(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    e->window = next_window(e, e->window);
+    e->window = next_window(e->window);
     set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
@@ -2064,7 +2064,7 @@ static void cmd_word_fwd(EditorState *e, const CommandArgs *a)
 static void cmd_wprev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    e->window = prev_window(e, e->window);
+    e->window = prev_window(e->window);
     set_view(e, e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
@@ -2145,7 +2145,7 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     Frame *f;
     if (root) {
-        f = split_root(&e->root_frame, vertical, before);
+        f = split_root(e, vertical, before);
     } else {
         f = split_frame(e->window, vertical, before);
     }
@@ -2157,10 +2157,10 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
     mark_everything_changed(e);
 
     if (empty) {
-        window_open_new_file(e, e->window);
+        window_open_new_file(e->window);
         e->buffer->temporary = temporary;
     } else if (paths[0]) {
-        window_open_files(e, e->window, paths, NULL);
+        window_open_files(e->window, paths, NULL);
     } else {
         View *new = window_add_buffer(e->window, save->buffer);
         new->cursor = save->cursor;

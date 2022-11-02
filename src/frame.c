@@ -326,7 +326,7 @@ void set_frame_size(Frame *f, int w, int h)
         if (!rightmost_frame(f)) {
             w--; // Separator
         }
-        set_window_size(f->window, w, h, &editor.options);
+        set_window_size(f->window, w, h);
         return;
     }
 
@@ -375,7 +375,7 @@ void resize_frame(Frame *f, ResizeDirection dir, int size)
 static void update_frame_coordinates(const Frame *f, int x, int y)
 {
     if (f->window) {
-        set_window_coordinates(f->window, x, y, &editor.options);
+        set_window_coordinates(f->window, x, y);
         return;
     }
 
@@ -420,7 +420,7 @@ Frame *split_frame(Window *w, bool vertical, bool before)
     if (!before) {
         idx++;
     }
-    Window *neww = new_window();
+    Window *neww = new_window(w->editor);
     f = add_frame(parent, neww, idx);
     parent->equal_size = true;
 
@@ -431,16 +431,16 @@ Frame *split_frame(Window *w, bool vertical, bool before)
 }
 
 // Doesn't really split root but adds new frame between root and its contents
-Frame *split_root(Frame **root, bool vertical, bool before)
+Frame *split_root(EditorState *e, bool vertical, bool before)
 {
     Frame *new_root = new_frame();
     Frame *f = new_frame();
     f->parent = new_root;
-    f->window = new_window();
+    f->window = new_window(e);
     f->window->frame = f;
     new_root->vertical = vertical;
 
-    Frame *old_root = *root;
+    Frame *old_root = e->root_frame;
     if (before) {
         ptr_array_append(&new_root->frames, f);
         ptr_array_append(&new_root->frames, old_root);
@@ -452,25 +452,19 @@ Frame *split_root(Frame **root, bool vertical, bool before)
     BUG_ON(old_root->parent);
     old_root->parent = new_root;
     set_frame_size(new_root, old_root->w, old_root->h);
-    *root = new_root;
-    update_window_coordinates(*root);
+    e->root_frame = new_root;
+    update_window_coordinates(new_root);
     return f;
 }
 
 // NOTE: does not remove f from f->parent->frames
-static void free_frame(EditorState *e, Frame *f)
+static void free_frame(Frame *f)
 {
     f->parent = NULL;
-
-    PointerArray *frames = &f->frames;
-    for (size_t i = 0, n = frames->count; i < n; i++) {
-        free_frame(e, frames->ptrs[i]);
-        frames->ptrs[i] = NULL;
-    }
-    ptr_array_free_array(frames);
+    ptr_array_free_cb(&f->frames, FREE_FUNC(free_frame));
 
     if (f->window) {
-        window_free(e, f->window);
+        window_free(f->window);
         f->window = NULL;
     }
 
@@ -481,11 +475,11 @@ void remove_frame(EditorState *e, Frame *f)
 {
     Frame *parent = f->parent;
     if (!parent) {
-        free_frame(e, f);
+        free_frame(f);
         return;
     }
     ptr_array_remove(&parent->frames, f);
-    free_frame(e, f);
+    free_frame(f);
 
     if (parent->frames.count == 1) {
         // Replace parent with the only child frame

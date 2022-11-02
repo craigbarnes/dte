@@ -59,7 +59,7 @@ static void open_temporary_buffer (
     const char *cmd_arg,
     ShowHandlerFlags flags
 ) {
-    View *v = window_open_new_file(e, e->window);
+    View *v = window_open_new_file(e->window);
     v->buffer->temporary = true;
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));

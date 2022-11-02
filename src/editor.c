@@ -300,9 +300,9 @@ void any_key(Terminal *term, unsigned int esc_timeout)
     }
 }
 
-static void update_window_full(Window *window, void *ud)
+static void update_window_full(Window *window, void* UNUSED_ARG(data))
 {
-    EditorState *e = ud;
+    EditorState *e = window->editor;
     View *v = window->view;
     view_update_cursor_x(v);
     view_update_cursor_y(v);
@@ -363,7 +363,7 @@ static void end_update(EditorState *e)
 static void update_all_windows(EditorState *e)
 {
     update_window_sizes(&e->terminal, e->root_frame);
-    frame_for_each_window(e->root_frame, update_window_full, e);
+    frame_for_each_window(e->root_frame, update_window_full, NULL);
     update_separators(&e->terminal, &e->colors, e->root_frame);
 }
 
