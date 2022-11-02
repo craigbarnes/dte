@@ -621,6 +621,7 @@ loop_break:;
 
     main_loop(e);
 
+    BUG_ON(e->status != EDITOR_EXITING);
     term_restore_title(term);
     ui_end(e);
     term_output_flush(&term->obuf);
@@ -650,5 +651,6 @@ loop_break:;
         free(std_buffer);
     }
 
+    LOG_INFO("exiting with status %d", e->exit_code);
     return e->exit_code;
 }
