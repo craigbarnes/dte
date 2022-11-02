@@ -2443,7 +2443,7 @@ static void test_log_level_from_str(TestContext *ctx)
     EXPECT_EQ(log_level_from_str("warn"), LOG_LEVEL_NONE);
     EXPECT_EQ(log_level_from_str("errors"), LOG_LEVEL_NONE);
 
-    LogLevel default_level = (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+    LogLevel default_level = log_level_default();
     EXPECT_EQ(log_level_from_str(""), default_level);
     EXPECT_EQ(log_level_from_str(NULL), default_level);
 }

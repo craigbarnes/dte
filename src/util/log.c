@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/utsname.h>
 #include <unistd.h>
 #include "log.h"
 #include "array.h"
@@ -31,14 +30,24 @@ UNITTEST {
     CHECK_STRING_ARRAY(log_levels);
 }
 
+LogLevel log_level_default(void)
+{
+    return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+}
+
 LogLevel log_level_from_str(const char *str)
 {
     if (!str || str[0] == '\0') {
-        // This is the default log level, which takes effect when
-        // $DTE_LOG is set and $DTE_LOG_LEVEL is unset (or empty)
-        return (DEBUG >= 2) ? LOG_LEVEL_DEBUG : LOG_LEVEL_INFO;
+        return log_level_default();
     }
     return STR_TO_ENUM(str, log_levels, LOG_LEVEL_NONE);
+}
+
+const char *log_level_to_str(LogLevel level)
+{
+    BUG_ON(level < LOG_LEVEL_NONE);
+    BUG_ON(level > LOG_LEVEL_TRACE);
+    return log_levels[level];
 }
 
 static LogLevel log_level_max(void)
@@ -51,7 +60,7 @@ static LogLevel log_level_max(void)
     return LOG_LEVEL_INFO;
 }
 
-bool log_init(const char *filename, LogLevel level)
+LogLevel log_init(const char *filename, LogLevel level)
 {
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
@@ -60,13 +69,13 @@ bool log_init(const char *filename, LogLevel level)
     BUG_ON(log_level != LOG_LEVEL_NONE);
 
     if (level == LOG_LEVEL_NONE) {
-        return true;
+        return LOG_LEVEL_NONE;
     }
 
     int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
     logfd = xopen(filename, flags, 0666);
     if (unlikely(logfd < 0 || xwrite_all(logfd, "\n", 1) != 1)) {
-        return false;
+        return LOG_LEVEL_NONE;
     }
 
     if (!isatty(logfd)) {
@@ -74,24 +83,8 @@ bool log_init(const char *filename, LogLevel level)
         sgr0[0] = '\0';
     }
 
-    LogLevel max = log_level_max();
-    log_level = level;
-    if (level > max) {
-        const char *r = log_levels[level];
-        const char *m = log_levels[max];
-        log_level = max;
-        LOG_WARNING("log level '%s' unavailable; falling back to '%s'", r, m);
-    }
-
-    LOG_INFO("logging to '%s' (level: %s)", filename, log_levels[log_level]);
-
-    struct utsname u;
-    if (likely(uname(&u) >= 0)) {
-        LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
-    } else {
-        LOG_ERROR("uname() failed: %s", strerror(errno));
-    }
-    return true;
+    log_level = MIN(level, log_level_max());
+    return log_level;
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)

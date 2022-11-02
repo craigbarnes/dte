@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 #include "block.h"
 #include "command/serialize.h"
@@ -342,6 +343,42 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return b;
 }
 
+static ExitCode init_logging(const char *filename, const char *log_level_str)
+{
+    if (!filename || filename[0] == '\0') {
+        return EX_OK;
+    }
+
+    LogLevel req_level = log_level_from_str(log_level_str);
+    if (req_level == LOG_LEVEL_NONE) {
+        return EX_OK;
+    }
+
+    LogLevel got_level = log_init(filename, req_level);
+    if (got_level == LOG_LEVEL_NONE) {
+        const char *err = strerror(errno);
+        fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", filename, err);
+        return EX_IOERR;
+    }
+
+    const char *got_level_str = log_level_to_str(got_level);
+    if (got_level != req_level) {
+        const char *r = log_level_to_str(req_level);
+        const char *g = got_level_str;
+        LOG_WARNING("log level '%s' unavailable; falling back to '%s'", r, g);
+    }
+
+    LOG_INFO("logging to '%s' (level: %s)", filename, got_level_str);
+
+    struct utsname u;
+    if (likely(uname(&u) >= 0)) {
+        LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
+    } else {
+        LOG_ERROR("uname() failed: %s", strerror(errno));
+    }
+    return EX_OK;
+}
+
 static const char copyright[] =
     "dte " VERSION "\n"
     "(C) 2013-2022 Craig Barnes\n"
@@ -417,7 +454,7 @@ int main(int argc, char *argv[])
 
 loop_break:;
 
-    // This must be done before calling log_init(), otherwise an
+    // This must be done before calling init_logging(), otherwise an
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
     // cause the logging fd to be opened as STDIN_FILENO.
     int std_fds[2] = {-1, -1};
@@ -426,14 +463,9 @@ loop_break:;
         return r;
     }
 
-    const char *log_filename = getenv("DTE_LOG");
-    if (log_filename && log_filename[0] != '\0') {
-        LogLevel log_level = log_level_from_str(getenv("DTE_LOG_LEVEL"));
-        if (!log_init(log_filename, log_level)) {
-            const char *err = strerror(errno);
-            fprintf(stderr, "Failed to open $DTE_LOG (%s): %s\n", log_filename, err);
-            return EX_IOERR;
-        }
+    r = init_logging(getenv("DTE_LOG"), getenv("DTE_LOG_LEVEL"));
+    if (unlikely(r != EX_OK)) {
+        return r;
     }
 
     EditorState *e = init_editor_state();
