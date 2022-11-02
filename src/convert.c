@@ -1,9 +1,12 @@
 #include <errno.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include "convert.h"
 #include "util/debug.h"
+#include "util/intern.h"
 #include "util/str-util.h"
+#include "util/utf8.h"
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
@@ -137,9 +140,6 @@ bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 #else // ICONV_DISABLE is undefined; use full iconv implementation:
 
 #include <iconv.h>
-#include <inttypes.h>
-#include "util/intern.h"
-#include "util/utf8.h"
 
 static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
 
@@ -349,7 +349,6 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
     size_t ic = len;
     while (ic > 0) {
         size_t skip;
-
         switch (xiconv(c, (char**)&ib, &ic)) {
         case EINVAL:
             // Incomplete character at end of input buffer.
