@@ -27,3 +27,21 @@ int xfputc(int c, FILE *stream)
     } while (unlikely(r == EOF && errno == EINTR));
     return r;
 }
+
+int xvfprintf(FILE *restrict stream, const char *restrict fmt, va_list ap)
+{
+    int r;
+    do {
+        r = vfprintf(stream, fmt, ap);
+    } while (unlikely(r < 0 && errno == EINTR));
+    return r;
+}
+
+int xfprintf(FILE *restrict stream, const char *restrict fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    int r = xvfprintf(stream, fmt, ap);
+    va_end(ap);
+    return r;
+}
