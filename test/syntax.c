@@ -134,7 +134,7 @@ static void test_hl_line(TestContext *ctx)
     }
 
     EXPECT_EQ(i, ARRAYLEN(expected_colors));
-    window_close_current(e);
+    window_close(e->window);
 }
 
 static const TestEntry tests[] = {

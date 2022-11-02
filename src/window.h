@@ -44,7 +44,7 @@ View *window_find_view(Window *w, Buffer *b);
 View *window_find_unclosable_view(Window *w);
 void window_free(Window *w);
 size_t remove_view(View *v);
-void window_close_current(struct EditorState *e);
+void window_close(Window *w);
 void window_close_current_view(Window *w);
 void set_view(struct EditorState *e, View *v);
 View *window_open_new_file(Window *w);

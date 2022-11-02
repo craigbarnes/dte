@@ -478,9 +478,9 @@ Window *next_window(Window *w)
     return data.next ? data.next : data.first;
 }
 
-void window_close_current(EditorState *e)
+void window_close(Window *window)
 {
-    Window *window = e->window;
+    EditorState *e = window->editor;
     if (!window->frame->parent) {
         // Don't close last window
         window_remove_views(window);

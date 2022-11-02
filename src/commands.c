@@ -330,7 +330,7 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
     }
 
     if (allow_wclose && e->window->views.count <= 1) {
-        window_close_current(e);
+        window_close(e->window);
         return;
     }
 
@@ -2022,7 +2022,7 @@ static void cmd_wclose(EditorState *e, const CommandArgs *a)
             return;
         }
     }
-    window_close_current(e);
+    window_close(e->window);
 }
 
 static void cmd_wflip(EditorState *e, const CommandArgs *a)
