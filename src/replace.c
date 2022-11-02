@@ -2,12 +2,14 @@
 #include "replace.h"
 #include "buffer.h"
 #include "change.h"
+#include "editor.h"
 #include "error.h"
 #include "regexp.h"
 #include "selection.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 #include "view.h"
+#include "window.h"
 
 static void build_replacement (
     String *buf,
@@ -51,7 +53,7 @@ static void build_replacement (
  * "foo x bar abc baz"   " bar abc baz"
  */
 static unsigned int replace_on_line (
-    EditorState *e,
+    View *view,
     StringView *line,
     regex_t *re,
     const char *format,
@@ -60,7 +62,7 @@ static unsigned int replace_on_line (
 ) {
     const unsigned char *buf = line->data;
     unsigned char *alloc = NULL;
-    View *view = e->view;
+    EditorState *e = view->window->editor;
     ReplaceFlags flags = *flagsp;
     regmatch_t matches[32];
     size_t pos = 0;
@@ -151,7 +153,7 @@ out:
     return nr;
 }
 
-void reg_replace(EditorState *e, const char *pattern, const char *format, ReplaceFlags flags)
+void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
     if (unlikely(pattern[0] == '\0')) {
         error_msg("Search pattern must contain at least 1 character");
@@ -167,7 +169,6 @@ void reg_replace(EditorState *e, const char *pattern, const char *format, Replac
         return;
     }
 
-    View *view = e->view;
     BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
     size_t nr_bytes;
     bool swapped = false;
@@ -204,7 +205,7 @@ void reg_replace(EditorState *e, const char *pattern, const char *format, Replac
             line.length = nr_bytes;
         }
 
-        unsigned int nr = replace_on_line(e, &line, &re, format, &bi, &flags);
+        unsigned int nr = replace_on_line(view, &line, &re, format, &bi, &flags);
         if (nr) {
             nr_substitutions += nr;
             nr_lines++;

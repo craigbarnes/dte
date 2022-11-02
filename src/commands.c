@@ -1418,7 +1418,7 @@ static void cmd_replace(EditorState *e, const CommandArgs *a)
     };
 
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    reg_replace(e, a->args[0], a->args[1], flags);
+    reg_replace(e->view, a->args[0], a->args[1], flags);
 }
 
 static void cmd_right(EditorState *e, const CommandArgs *a)
