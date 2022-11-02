@@ -28,6 +28,11 @@ typedef struct {
     char str[];
 } CachedRegexp;
 
+typedef struct {
+    char *str;
+    regex_t re;
+} InternedRegexp;
+
 // Platform-specific patterns for matching word boundaries, as detected
 // and initialized by regexp_init_word_boundary_tokens()
 typedef struct {
@@ -64,6 +69,10 @@ void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
 bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt);
 void regexp_error_msg(const regex_t *re, const char *pattern, int err);
 void free_cached_regexp(CachedRegexp *cr);
+
+const InternedRegexp *regexp_intern(const char *pattern);
+bool regexp_is_interned(const char *pattern);
+void free_interned_regexps(void);
 
 bool regexp_exec (
     const regex_t *re,

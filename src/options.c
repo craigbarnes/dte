@@ -8,7 +8,6 @@
 #include "error.h"
 #include "file-option.h"
 #include "filetype.h"
-#include "regexp.h"
 #include "screen.h"
 #include "status.h"
 #include "terminal/output.h"
@@ -29,10 +28,11 @@ typedef enum {
     OPT_ENUM,
     OPT_BOOL,
     OPT_FLAG,
+    OPT_REGEX,
 } OptionType;
 
 typedef union {
-    const char *str_val; // OPT_STR
+    const char *str_val; // OPT_STR, OPT_REGEX
     unsigned int uint_val; // OPT_UINT, OPT_ENUM, OPT_FLAG
     bool bool_val; // OPT_BOOL
 } OptionValue;
@@ -93,6 +93,13 @@ typedef struct {
     .name = _name, \
     .type = OPT_BOOL, \
     .u = {.enum_opt = {.values = bool_enum}}, \
+    .on_change = _on_change, \
+}
+
+#define REGEX_OPT(_name, OLG, _on_change) { \
+    OLG \
+    .name = _name, \
+    .type = OPT_REGEX, \
     .on_change = _on_change, \
 }
 
@@ -178,11 +185,6 @@ static bool validate_filetype(const char *value)
     return true;
 }
 
-static bool validate_regex(const char *value)
-{
-    return value[0] == '\0' || regexp_is_valid(value, REG_NEWLINE);
-}
-
 static OptionValue str_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
 {
     const char *const *strp = ptr;
@@ -212,6 +214,36 @@ static bool str_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v
 {
     const char **strp = ptr;
     return xstreq(*strp, v.str_val);
+}
+
+static OptionValue re_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
+{
+    const InternedRegexp *const *irp = ptr;
+    return (OptionValue){.str_val = *irp ? (*irp)->str : NULL};
+}
+
+static void re_set(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    const InternedRegexp **irp = ptr;
+    *irp = v.str_val ? regexp_intern(v.str_val) : NULL;
+}
+
+static bool re_parse(const OptionDesc* UNUSED_ARG(d), const char *str, OptionValue *v)
+{
+    if (str[0] == '\0') {
+        v->str_val = NULL;
+        return true;
+    }
+
+    bool valid = regexp_is_interned(str) || regexp_is_valid(str, REG_NEWLINE);
+    v->str_val = valid ? str : NULL;
+    return valid;
+}
+
+static bool re_equals(const OptionDesc* UNUSED_ARG(d), void *ptr, OptionValue v)
+{
+    const InternedRegexp **irp = ptr;
+    return *irp ? xstreq((*irp)->str, v.str_val) : !v.str_val;
 }
 
 static OptionValue uint_get(const OptionDesc* UNUSED_ARG(desc), void *ptr)
@@ -386,6 +418,7 @@ static const struct {
     [OPT_ENUM] = {uint_get, uint_set, enum_parse, enum_string, uint_equals},
     [OPT_BOOL] = {bool_get, bool_set, bool_parse, bool_string, bool_equals},
     [OPT_FLAG] = {uint_get, uint_set, flag_parse, flag_string, uint_equals},
+    [OPT_REGEX] = {re_get, re_set, re_parse, str_string, re_equals},
 };
 
 static const char *const bool_enum[] = {"false", "true", NULL};
@@ -424,7 +457,7 @@ static const OptionDesc option_desc[] = {
     UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     BOOL_OPT("fsync", C(fsync), NULL),
-    STR_OPT("indent-regex", L(indent_regex), validate_regex, NULL),
+    REGEX_OPT("indent-regex", L(indent_regex), NULL),
     UINT_OPT("indent-width", C(indent_width), 1, INDENT_WIDTH_MAX, NULL),
     BOOL_OPT("lock-files", G(lock_files), NULL),
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
@@ -471,6 +504,7 @@ UNITTEST {
         [OPT_ENUM] = {alignof(unsigned int), sizeof(unsigned int)},
         [OPT_BOOL] = {alignof(bool), sizeof(bool)},
         [OPT_FLAG] = {alignof(unsigned int), sizeof(unsigned int)},
+        [OPT_REGEX] = {alignof(const InternedRegexp*), sizeof(const InternedRegexp*)},
     };
 
     GlobalOptions gopts = {.tab_bar = true};
@@ -789,7 +823,7 @@ void collect_option_values(EditorState *e, PointerArray *a, const char *option, 
     }
 
     OptionType type = desc->type;
-    if (type == OPT_STR || type == OPT_UINT) {
+    if (type == OPT_STR || type == OPT_UINT || type == OPT_REGEX) {
         return;
     }
 

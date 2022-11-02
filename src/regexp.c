@@ -3,9 +3,12 @@
 #include "regexp.h"
 #include "error.h"
 #include "util/debug.h"
+#include "util/hashmap.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
+
+static HashMap interned_regexps;
 
 void regexp_error_msg(const regex_t *re, const char *pattern, int err)
 {
@@ -105,4 +108,46 @@ void free_cached_regexp(CachedRegexp *cr)
 {
     regfree(&cr->re);
     free(cr);
+}
+
+const InternedRegexp *regexp_intern(const char *pattern)
+{
+    if (pattern[0] == '\0') {
+        return NULL;
+    }
+
+    InternedRegexp *ir = hashmap_get(&interned_regexps, pattern);
+    if (ir) {
+        return ir;
+    }
+
+    ir = xnew(InternedRegexp, 1);
+    int err = regcomp(&ir->re, pattern, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
+    if (unlikely(err)) {
+        regexp_error_msg(&ir->re, pattern, err);
+        free(ir);
+        return NULL;
+    }
+
+    ir->str = xstrdup(pattern);
+    hashmap_insert(&interned_regexps, ir->str, ir);
+    return ir;
+}
+
+bool regexp_is_interned(const char *pattern)
+{
+    return !!hashmap_find(&interned_regexps, pattern);
+}
+
+// Note: this does NOT free InternedRegexp::str, because it points at the
+// same string as HashMapEntry::key and is already freed by hashmap_free()
+static void free_interned_regexp(InternedRegexp *ir)
+{
+    regfree(&ir->re);
+    free(ir);
+}
+
+void free_interned_regexps(void)
+{
+    hashmap_free(&interned_regexps, (FreeFunction)free_interned_regexp);
 }

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "regexp.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 
@@ -48,7 +49,7 @@ typedef struct {
     // Only local
     bool brace_indent;
     const char *filetype;
-    const char *indent_regex;
+    const InternedRegexp *indent_regex;
 } LocalOptions;
 
 typedef struct {

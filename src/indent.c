@@ -54,29 +54,14 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
         }
     }
 
-    const char *pat = buffer->options.indent_regex;
-    if (!pat || pat[0] == '\0') {
+    const InternedRegexp *ir = buffer->options.indent_regex;
+    if (!ir) {
         return false;
     }
 
-    regex_t re;
-    int err = regcomp(&re, pat, DEFAULT_REGEX_FLAGS | REG_NOSUB | REG_NEWLINE);
-    if (unlikely(err)) {
-        // Note: the indent_regex pattern has already been checked by
-        // validate_regex(), so the only error that should be possible
-        // here is REG_ESPACE ("ran out of memory").
-        if (DEBUG >= 2) {
-            char msg[1024];
-            regerror(err, &re, msg, sizeof(msg));
-            LOG_ERROR("regcomp: %s", msg);
-        }
-        return false;
-    }
-
+    BUG_ON(ir->str[0] == '\0');
     regmatch_t m;
-    bool ret = regexp_exec(&re, line->data, line->length, 0, &m, 0);
-    regfree(&re);
-    return ret;
+    return regexp_exec(&ir->re, line->data, line->length, 0, &m, 0);
 }
 
 char *get_indent_for_next_line(const Buffer *buffer, const StringView *line)
