@@ -32,7 +32,7 @@ void init_selection(const View *v, SelectionInfo *info)
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
-        if (editor.options.select_cursor_char) {
+        if (v->window->editor->options.select_cursor_char) {
             // Character under cursor belongs to the selection
             info->eo += block_iter_next_column(&ei);
         }
