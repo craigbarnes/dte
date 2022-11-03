@@ -314,7 +314,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     if (fds[STDIN_FILENO] >= 3) {
         Encoding enc = encoding_from_type(UTF8);
         b = buffer_new(&e->buffers, &e->options, &enc);
-        if (read_blocks(b, fds[STDIN_FILENO])) {
+        if (read_blocks(b, fds[STDIN_FILENO], false)) {
             name = "(stdin)";
             b->temporary = true;
         } else {

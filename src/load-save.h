@@ -4,10 +4,11 @@
 #include <stdbool.h>
 #include "buffer.h"
 #include "encoding.h"
+#include "options.h"
 #include "util/macros.h"
 
-bool load_buffer(Buffer *b, const char *filename, unsigned int size_limit_mib, bool must_exist) WARN_UNUSED_RESULT;
+bool load_buffer(Buffer *b, const char *filename, const GlobalOptions *gopts, bool must_exist) WARN_UNUSED_RESULT;
 bool save_buffer(Buffer *b, const char *filename, const Encoding *encoding, bool crlf, bool write_bom) WARN_UNUSED_RESULT;
-bool read_blocks(Buffer *b, int fd) WARN_UNUSED_RESULT;
+bool read_blocks(Buffer *b, int fd, bool utf8_bom) WARN_UNUSED_RESULT;
 
 #endif

@@ -1065,7 +1065,7 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
         View *v = window_open_new_file(e->window);
         v->buffer->temporary = temporary;
         if (requested_encoding) {
-            buffer_set_encoding(v->buffer, encoding);
+            buffer_set_encoding(v->buffer, encoding, e->options.utf8_bom);
         }
         return;
     }

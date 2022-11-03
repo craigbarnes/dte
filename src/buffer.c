@@ -52,7 +52,7 @@ const char *buffer_filename(const Buffer *b)
     return b->display_filename ? b->display_filename : "(No name)";
 }
 
-void buffer_set_encoding(Buffer *b, Encoding encoding)
+void buffer_set_encoding(Buffer *b, Encoding encoding, bool utf8_bom)
 {
     if (
         b->encoding.type != encoding.type
@@ -60,7 +60,7 @@ void buffer_set_encoding(Buffer *b, Encoding encoding)
     ) {
         const EncodingType type = encoding.type;
         if (type == UTF8) {
-            b->bom = editor.options.utf8_bom;
+            b->bom = utf8_bom;
         } else {
             b->bom = type < NR_ENCODING_TYPES && !!get_bom_for_encoding(type);
         }
@@ -79,7 +79,7 @@ Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Enco
     b->crlf_newlines = gopts->crlf_newlines;
 
     if (encoding) {
-        buffer_set_encoding(b, *encoding);
+        buffer_set_encoding(b, *encoding, gopts->utf8_bom);
     } else {
         b->encoding.type = ENCODING_AUTODETECT;
     }

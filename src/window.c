@@ -97,7 +97,7 @@ View *window_open_buffer (
     */
 
     Buffer *b = buffer_new(&e->buffers, &e->options, encoding);
-    if (!load_buffer(b, filename, e->options.filesize_limit, must_exist)) {
+    if (!load_buffer(b, filename, &e->options, must_exist)) {
         remove_and_free_buffer(&e->buffers, b);
         free(absolute);
         return NULL;

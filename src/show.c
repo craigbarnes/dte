@@ -63,7 +63,7 @@ static void open_temporary_buffer (
     v->buffer->temporary = true;
     do_insert(v, text, text_len);
     set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
-    buffer_set_encoding(v->buffer, encoding_from_type(UTF8));
+    buffer_set_encoding(v->buffer, encoding_from_type(UTF8), e->options.utf8_bom);
 
     if (flags & LASTLINE) {
         block_iter_eof(&v->cursor);

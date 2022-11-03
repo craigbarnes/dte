@@ -48,7 +48,7 @@ copy:
     return blk;
 }
 
-static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size)
+static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t size, bool utf8_bom)
 {
     EncodingType bom_type = detect_encoding_from_bom(buf, size);
     EncodingType enc_type = b->encoding.type;
@@ -57,9 +57,9 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
             BUG_ON(b->encoding.name);
             Encoding e = encoding_from_type(bom_type);
             if (conversion_supported_by_iconv(e.name, "UTF-8")) {
-                buffer_set_encoding(b, e);
+                buffer_set_encoding(b, e, utf8_bom);
             } else {
-                buffer_set_encoding(b, encoding_from_type(UTF8));
+                buffer_set_encoding(b, encoding_from_type(UTF8), utf8_bom);
             }
         }
     }
@@ -101,7 +101,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
         const char *enc = file_decoder_get_encoding(dec);
-        buffer_set_encoding(b, encoding_from_name(enc ? enc : "UTF-8"));
+        buffer_set_encoding(b, encoding_from_name(enc ? enc : "UTF-8"), utf8_bom);
     }
 
     free_file_decoder(dec);
@@ -176,7 +176,7 @@ static bool buffer_fstat(Buffer *b, int fd)
     return true;
 }
 
-bool read_blocks(Buffer *b, int fd)
+bool read_blocks(Buffer *b, int fd, bool utf8_bom)
 {
     const size_t map_size = 64 * 1024;
     size_t size = b->file.size;
@@ -241,7 +241,7 @@ bool read_blocks(Buffer *b, int fd)
     }
 
 decode:
-    ret = decode_and_add_blocks(b, buf, size);
+    ret = decode_and_add_blocks(b, buf, size, utf8_bom);
 
 error:
     if (mapped) {
@@ -257,7 +257,7 @@ error:
     return ret;
 }
 
-bool load_buffer(Buffer *b, const char *filename, unsigned int size_limit_mib, bool must_exist)
+bool load_buffer(Buffer *b, const char *filename, const GlobalOptions *gopts, bool must_exist)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
 
@@ -284,14 +284,14 @@ bool load_buffer(Buffer *b, const char *filename, unsigned int size_limit_mib, b
             error_msg("Invalid file size: %jd", (intmax_t)b->file.size);
             goto error;
         }
-        if (b->file.size / 1024 / 1024 > size_limit_mib) {
+        if (b->file.size / 1024 / 1024 > gopts->filesize_limit) {
             error_msg (
                 "File size exceeds 'filesize-limit' option (%uMiB): %s",
-                size_limit_mib, filename
+                gopts->filesize_limit, filename
             );
             goto error;
         }
-        if (!read_blocks(b, fd)) {
+        if (!read_blocks(b, fd, gopts->utf8_bom)) {
             error_msg("Error reading %s: %s", filename, strerror(errno));
             goto error;
         }
@@ -300,7 +300,7 @@ bool load_buffer(Buffer *b, const char *filename, unsigned int size_limit_mib, b
 
     if (b->encoding.type == ENCODING_AUTODETECT) {
         Encoding enc = encoding_from_type(UTF8);
-        buffer_set_encoding(b, enc);
+        buffer_set_encoding(b, enc, gopts->utf8_bom);
     }
 
     return true;

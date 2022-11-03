@@ -73,7 +73,7 @@ static inline bool buffer_modified(const Buffer *b)
 struct EditorState;
 
 void buffer_mark_lines_changed(Buffer *b, long min, long max) NONNULL_ARGS;
-void buffer_set_encoding(Buffer *b, Encoding encoding) NONNULL_ARGS;
+void buffer_set_encoding(Buffer *b, Encoding encoding, bool utf8_bom) NONNULL_ARGS;
 const char *buffer_filename(const Buffer *b) NONNULL_ARGS_AND_RETURN;
 void set_display_filename(Buffer *b, char *name) NONNULL_ARG(1);
 void update_short_filename_cwd(Buffer *b, const StringView *home, const char *cwd) NONNULL_ARG(1, 2);
