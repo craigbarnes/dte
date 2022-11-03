@@ -227,7 +227,7 @@ static void cmd_bolsf(EditorState *e, const CommandArgs *a)
 static void cmd_bookmark(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(e, &e->bookmarks);
+        bookmark_pop(e->window, &e->bookmarks);
         return;
     }
 
@@ -1917,7 +1917,7 @@ static void cmd_suspend(EditorState *e, const CommandArgs *a)
 static void cmd_tag(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
-        bookmark_pop(e, &e->bookmarks);
+        bookmark_pop(e->window, &e->bookmarks);
         return;
     }
 

@@ -21,9 +21,8 @@ FileLocation *get_current_file_location(const View *view)
     return loc;
 }
 
-bool file_location_go(EditorState *e, const FileLocation *loc)
+bool file_location_go(Window *window, const FileLocation *loc)
 {
-    Window *window = e->window;
     View *view = window_open_buffer(window, loc->filename, true, NULL);
     if (!view) {
         // Failed to open file. Error message should be visible.
@@ -53,10 +52,9 @@ bool file_location_go(EditorState *e, const FileLocation *loc)
     return ok;
 }
 
-static bool file_location_return(EditorState *e, const FileLocation *loc)
+static bool file_location_return(Window *window, const FileLocation *loc)
 {
-    Window *window = e->window;
-    Buffer *buffer = find_buffer_by_id(&e->buffers, loc->buffer_id);
+    Buffer *buffer = find_buffer_by_id(&window->editor->buffers, loc->buffer_id);
     View *view;
     if (buffer) {
         view = window_get_view(window, buffer);
@@ -97,14 +95,14 @@ void bookmark_push(PointerArray *bookmarks, FileLocation *loc)
     ptr_array_append(bookmarks, loc);
 }
 
-void bookmark_pop(EditorState *e, PointerArray *bookmarks)
+void bookmark_pop(Window *window, PointerArray *bookmarks)
 {
     void **ptrs = bookmarks->ptrs;
     size_t count = bookmarks->count;
     bool go = true;
     while (count > 0 && go) {
         FileLocation *loc = ptrs[--count];
-        go = !file_location_return(e, loc);
+        go = !file_location_return(window, loc);
         file_location_free(loc);
     }
     bookmarks->count = count;

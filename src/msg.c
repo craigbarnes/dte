@@ -51,7 +51,7 @@ void activate_current_message(EditorState *e)
     BUG_ON(pos >= count);
     const Message *m = msgs->array.ptrs[pos];
     if (m->loc && m->loc->filename) {
-        if (!file_location_go(e, m->loc)) {
+        if (!file_location_go(e->window, m->loc)) {
             // Error message is visible
             return;
         }

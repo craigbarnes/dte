@@ -5,6 +5,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "view.h"
+#include "window.h"
 
 typedef struct {
     char *filename; // Needed after buffer is closed
@@ -13,13 +14,11 @@ typedef struct {
     unsigned long line, column; // File position (if non-zero, pattern is NULL)
 } FileLocation;
 
-struct EditorState;
-
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
-bool file_location_go(struct EditorState *e, const FileLocation *loc) NONNULL_ARGS;
+bool file_location_go(Window *window, const FileLocation *loc) NONNULL_ARGS;
 void file_location_free(FileLocation *loc) NONNULL_ARGS;
 
 void bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;
-void bookmark_pop(struct EditorState *e, PointerArray *bookmarks) NONNULL_ARGS;
+void bookmark_pop(Window *window, PointerArray *bookmarks) NONNULL_ARGS;
 
 #endif
