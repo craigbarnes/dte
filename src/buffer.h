@@ -80,8 +80,8 @@ void update_short_filename_cwd(Buffer *b, const StringView *home, const char *cw
 void update_short_filename(Buffer *b, const StringView *home) NONNULL_ARGS;
 Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename) NONNULL_ARGS;
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id) NONNULL_ARGS;
-Buffer *buffer_new(struct EditorState *e, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1);
-Buffer *open_empty_buffer(struct EditorState *e) NONNULL_ARGS_AND_RETURN;
+Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding) RETURNS_NONNULL NONNULL_ARG(1, 2);
+Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts) NONNULL_ARGS_AND_RETURN;
 void free_buffer(Buffer *b) NONNULL_ARGS;
 void remove_and_free_buffer(PointerArray *buffers, Buffer *b) NONNULL_ARGS;
 void free_blocks(Buffer *b) NONNULL_ARGS;

@@ -313,7 +313,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 
     if (fds[STDIN_FILENO] >= 3) {
         Encoding enc = encoding_from_type(UTF8);
-        b = buffer_new(e, &enc);
+        b = buffer_new(&e->buffers, &e->options, &enc);
         if (read_blocks(b, fds[STDIN_FILENO])) {
             name = "(stdin)";
             b->temporary = true;
@@ -326,7 +326,7 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
 
     if (fds[STDOUT_FILENO] >= 3) {
         if (!b) {
-            b = open_empty_buffer(e);
+            b = open_empty_buffer(&e->buffers, &e->options);
             name = "(stdout)";
         } else {
             name = "(stdin|stdout)";

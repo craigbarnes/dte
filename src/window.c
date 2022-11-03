@@ -40,7 +40,8 @@ View *window_add_buffer(Window *w, Buffer *b)
 
 View *window_open_empty_buffer(Window *w)
 {
-    return window_add_buffer(w, open_empty_buffer(w->editor));
+    EditorState *e = w->editor;
+    return window_add_buffer(w, open_empty_buffer(&e->buffers, &e->options));
 }
 
 View *window_open_buffer (
@@ -95,7 +96,7 @@ View *window_open_buffer (
     dte /proc/$(pidof tail)/fd/3
     */
 
-    Buffer *b = buffer_new(e, encoding);
+    Buffer *b = buffer_new(&e->buffers, &e->options, encoding);
     if (!load_buffer(b, filename, e->options.filesize_limit, must_exist)) {
         remove_and_free_buffer(&e->buffers, b);
         free(absolute);

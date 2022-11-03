@@ -68,7 +68,7 @@ void buffer_set_encoding(Buffer *b, Encoding encoding)
     }
 }
 
-Buffer *buffer_new(EditorState *e, const Encoding *encoding)
+Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding)
 {
     static unsigned long id;
     Buffer *b = xnew0(Buffer, 1);
@@ -76,7 +76,7 @@ Buffer *buffer_new(EditorState *e, const Encoding *encoding)
     b->cur_change = &b->change_head;
     b->saved_change = &b->change_head;
     b->id = ++id;
-    b->crlf_newlines = e->options.crlf_newlines;
+    b->crlf_newlines = gopts->crlf_newlines;
 
     if (encoding) {
         buffer_set_encoding(b, *encoding);
@@ -84,19 +84,20 @@ Buffer *buffer_new(EditorState *e, const Encoding *encoding)
         b->encoding.type = ENCODING_AUTODETECT;
     }
 
-    memcpy(&b->options, &e->options, sizeof(CommonOptions));
+    static_assert(sizeof(*gopts) >= sizeof(CommonOptions));
+    memcpy(&b->options, gopts, sizeof(CommonOptions));
     b->options.brace_indent = 0;
     b->options.filetype = str_intern("none");
     b->options.indent_regex = NULL;
 
-    ptr_array_append(&e->buffers, b);
+    ptr_array_append(buffers, b);
     return b;
 }
 
-Buffer *open_empty_buffer(EditorState *e)
+Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts)
 {
     Encoding enc = encoding_from_type(UTF8);
-    Buffer *b = buffer_new(e, &enc);
+    Buffer *b = buffer_new(buffers, gopts, &enc);
 
     // At least one block required
     Block *blk = block_new(1);
