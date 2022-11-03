@@ -68,15 +68,16 @@ static bool ft_uses_regex(FileDetectionType type)
     return type == FT_CONTENT || type == FT_FILENAME;
 }
 
-void add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type)
+bool add_filetype(PointerArray *filetypes, const char *name, const char *str, FileDetectionType type)
 {
+    BUG_ON(!is_valid_filetype_name(name));
     regex_t re;
     bool use_re = ft_uses_regex(type);
     if (use_re) {
         int err = regcomp(&re, str, DEFAULT_REGEX_FLAGS | REG_NEWLINE | REG_NOSUB);
         if (unlikely(err)) {
             regexp_error_msg(&re, str, err);
-            return;
+            return false;
         }
     }
 
@@ -101,6 +102,7 @@ void add_filetype(PointerArray *filetypes, const char *name, const char *str, Fi
     memcpy(ft->name, name, name_len + 1);
     memcpy(str_dest, str, str_len + 1);
     ptr_array_append(filetypes, ft);
+    return true;
 }
 
 static StringView path_extension(StringView filename)

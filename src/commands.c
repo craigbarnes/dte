@@ -645,6 +645,7 @@ static void cmd_ft(EditorState *e, const CommandArgs *a)
     const char *filetype = args[0];
     if (unlikely(!is_valid_filetype_name(filetype))) {
         error_msg("Invalid filetype name: '%s'", filetype);
+        return;
     }
 
     FileDetectionType dt = FT_EXTENSION;
@@ -664,7 +665,7 @@ static void cmd_ft(EditorState *e, const CommandArgs *a)
     }
 
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        add_filetype(&e->filetypes, filetype, args[i], dt);
+        UNUSED bool x = add_filetype(&e->filetypes, filetype, args[i], dt);
     }
 }
 
