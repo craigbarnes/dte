@@ -46,7 +46,7 @@ void window_free(Window *w);
 size_t remove_view(View *v);
 void window_close(Window *w);
 void window_close_current_view(Window *w);
-void set_view(struct EditorState *e, View *v);
+void set_view(View *v);
 View *window_open_new_file(Window *w);
 View *window_open_file(Window *w, const char *filename, const Encoding *encoding);
 void window_open_files(Window *w, char **filenames, const Encoding *encoding);

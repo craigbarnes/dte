@@ -335,7 +335,7 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
     }
 
     window_close_current_view(e->window);
-    set_view(e, e->window->view);
+    set_view(e->window->view);
 }
 
 static void cmd_command(EditorState *e, const CommandArgs *a)
@@ -997,7 +997,7 @@ static void cmd_next(EditorState *e, const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e, e->window->views.ptrs[size_increment_wrapped(i, n)]);
+    set_view(e->window->views.ptrs[size_increment_wrapped(i, n)]);
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -1237,7 +1237,7 @@ static void cmd_prev(EditorState *e, const CommandArgs *a)
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
-    set_view(e, e->window->views.ptrs[size_decrement_wrapped(i, n)]);
+    set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
 }
 
 static void cmd_quit(EditorState *e, const CommandArgs *a)
@@ -1270,7 +1270,7 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
                 e->window = v->window;
                 mark_everything_changed(e);
             }
-            set_view(e, v);
+            set_view(v);
             if (has_flag(a, 'p')) {
                 static const char str[] = "Quit without saving changes? [y/N]";
                 if (dialog_prompt(e, str, "ny") == 'y') {
@@ -2000,7 +2000,7 @@ static void cmd_view(EditorState *e, const CommandArgs *a)
             idx = window->views.count - 1;
         }
     }
-    set_view(e, window->views.ptrs[idx]);
+    set_view(window->views.ptrs[idx]);
 }
 
 static void cmd_wclose(EditorState *e, const CommandArgs *a)
@@ -2009,7 +2009,7 @@ static void cmd_wclose(EditorState *e, const CommandArgs *a)
     bool prompt = has_flag(a, 'p');
     View *v = window_find_unclosable_view(e->window);
     if (v && !force) {
-        set_view(e, v);
+        set_view(v);
         if (prompt) {
             static const char str[] = "Close window without saving? [y/N]";
             if (dialog_prompt(e, str, "ny") != 'y') {
@@ -2041,7 +2041,7 @@ static void cmd_wnext(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->window = next_window(e->window);
-    set_view(e, e->window->view);
+    set_view(e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
 }
@@ -2066,7 +2066,7 @@ static void cmd_wprev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->window = prev_window(e->window);
-    set_view(e, e->window->view);
+    set_view(e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
 }
@@ -2165,7 +2165,7 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
     } else {
         View *new = window_add_buffer(e->window, save->buffer);
         new->cursor = save->cursor;
-        set_view(e, new);
+        set_view(new);
     }
 
     if (use_glob) {

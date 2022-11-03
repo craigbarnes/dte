@@ -31,7 +31,7 @@ bool file_location_go(EditorState *e, const FileLocation *loc)
     }
 
     if (window->view != view) {
-        set_view(e, view);
+        set_view(view);
         // Force centering view to the cursor because file changed
         view->force_center = true;
     }
@@ -73,7 +73,7 @@ static bool file_location_return(EditorState *e, const FileLocation *loc)
         return true;
     }
 
-    set_view(e, view);
+    set_view(view);
     unselect(view);
     move_to_line(view, loc->line);
     move_to_column(view, loc->column);

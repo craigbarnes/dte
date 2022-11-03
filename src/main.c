@@ -561,7 +561,7 @@ loop_break:;
         } else {
             View *v = window_open_buffer(window, str, false, NULL);
             if (line > 0) {
-                set_view(e, v);
+                set_view(v);
                 move_to_line(v, line);
                 line = 0;
                 if (col > 0) {
@@ -584,7 +584,7 @@ loop_break:;
         BUG_ON(empty_buffer != window->views.ptrs[0]);
     }
 
-    set_view(e, window->views.ptrs[0]);
+    set_view(window->views.ptrs[0]);
     ui_start(e);
 
     bool cflag = false;
