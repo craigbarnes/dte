@@ -45,3 +45,12 @@ int xfprintf(FILE *restrict stream, const char *restrict fmt, ...)
     va_end(ap);
     return r;
 }
+
+int xfflush(FILE *stream)
+{
+    int r;
+    do {
+        r = fflush(stream);
+    } while (unlikely(r != 0 && errno == EINTR));
+    return r;
+}

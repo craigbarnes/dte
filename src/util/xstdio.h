@@ -48,5 +48,6 @@ int xfputs(const char *restrict str, FILE *restrict stream);
 int xfputc(int c, FILE *stream);
 int xvfprintf(FILE *restrict stream, const char *restrict fmt, va_list ap) VPRINTF(2);
 int xfprintf(FILE *restrict stream, const char *restrict fmt, ...) PRINTF(2);
+int xfflush(FILE *stream);
 
 #endif

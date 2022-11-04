@@ -122,6 +122,7 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     xfprintf(logfile, "%s%s%s: %s%s:%d:%s ", color, prefix, reset, dim, file, line, sgr0);
     xvfprintf(logfile, fmt, ap);
     xfputc('\n', logfile);
+    xfflush(logfile);
 }
 
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
