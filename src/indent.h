@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include "block-iter.h"
 #include "options.h"
 #include "util/string-view.h"
-#include "view.h"
 
 typedef struct {
     // Size in bytes
@@ -28,7 +28,7 @@ typedef struct {
 char *make_indent(const LocalOptions *options, size_t width);
 char *get_indent_for_next_line(const LocalOptions *options, const StringView *line);
 void get_indent_info(const LocalOptions *options, const StringView *line, IndentInfo *info);
-size_t get_indent_level_bytes_left(const View *view);
-size_t get_indent_level_bytes_right(const View *view);
+size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *cursor);
+size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *cursor);
 
 #endif

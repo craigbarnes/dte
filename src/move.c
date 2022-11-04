@@ -13,13 +13,14 @@ typedef enum {
 
 void move_to_preferred_x(View *view, long preferred_x)
 {
+    const LocalOptions *options = &view->buffer->options;
     StringView line;
     view->preferred_x = preferred_x;
     block_iter_bol(&view->cursor);
     fill_line_ref(&view->cursor, &line);
 
-    if (view->buffer->options.emulate_tab && view->preferred_x < line.length) {
-        const size_t iw = view->buffer->options.indent_width;
+    if (options->emulate_tab && view->preferred_x < line.length) {
+        const size_t iw = options->indent_width;
         const size_t ilevel = view->preferred_x / iw;
         for (size_t i = 0; i < line.length && line.data[i] == ' '; i++) {
             if (i + 1 == (ilevel + 1) * iw) {
@@ -30,7 +31,7 @@ void move_to_preferred_x(View *view, long preferred_x)
         }
     }
 
-    const unsigned int tw = view->buffer->options.tab_width;
+    const unsigned int tw = options->tab_width;
     unsigned long x = 0;
     size_t i = 0;
     while (x < view->preferred_x && i < line.length) {
@@ -70,8 +71,9 @@ void move_to_preferred_x(View *view, long preferred_x)
 
 void move_cursor_left(View *view)
 {
-    if (view->buffer->options.emulate_tab) {
-        size_t size = get_indent_level_bytes_left(view);
+    const LocalOptions *options = &view->buffer->options;
+    if (options->emulate_tab) {
+        size_t size = get_indent_level_bytes_left(options, &view->cursor);
         if (size) {
             block_iter_back_bytes(&view->cursor, size);
             view_reset_preferred_x(view);
@@ -84,8 +86,9 @@ void move_cursor_left(View *view)
 
 void move_cursor_right(View *view)
 {
-    if (view->buffer->options.emulate_tab) {
-        size_t size = get_indent_level_bytes_right(view);
+    const LocalOptions *options = &view->buffer->options;
+    if (options->emulate_tab) {
+        size_t size = get_indent_level_bytes_right(options, &view->cursor);
         if (size) {
             block_iter_skip_bytes(&view->cursor, size);
             view_reset_preferred_x(view);

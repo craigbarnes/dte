@@ -1,11 +1,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include "indent.h"
-#include "block-iter.h"
-#include "buffer.h"
 #include "regexp.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 char *make_indent(const LocalOptions *options, size_t width)
 {
@@ -143,23 +140,21 @@ static ssize_t get_current_indent_bytes(const LocalOptions *options, const char 
     return (ssize_t)ibytes;
 }
 
-size_t get_indent_level_bytes_left(const View *view)
+size_t get_indent_level_bytes_left(const LocalOptions *options, BlockIter *cursor)
 {
     StringView line;
-    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    size_t cursor_offset = fetch_this_line(cursor, &line);
     if (!cursor_offset) {
         return 0;
     }
-    const LocalOptions *options = &view->buffer->options;
     ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
     return (ibytes < 0) ? 0 : (size_t)ibytes;
 }
 
-size_t get_indent_level_bytes_right(const View *view)
+size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *cursor)
 {
-    const LocalOptions *options = &view->buffer->options;
     StringView line;
-    size_t cursor_offset = fetch_this_line(&view->cursor, &line);
+    size_t cursor_offset = fetch_this_line(cursor, &line);
     ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
     if (ibytes < 0) {
         return 0;

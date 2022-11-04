@@ -75,6 +75,11 @@ typedef struct {
 
 #undef COMMON_OPTIONS
 
+static inline bool use_spaces_for_indent(const LocalOptions *opt)
+{
+    return opt->expand_tab || opt->indent_width != opt->tab_width;
+}
+
 struct EditorState;
 
 void set_option(struct EditorState *e, const char *name, const char *value, bool local, bool global);

@@ -158,9 +158,10 @@ void delete_ch(View *view)
         size = prepare_selection(view);
         unselect(view);
     } else {
+        const LocalOptions *options = &view->buffer->options;
         begin_change(CHANGE_MERGE_DELETE);
-        if (view->buffer->options.emulate_tab) {
-            size = get_indent_level_bytes_right(view);
+        if (options->emulate_tab) {
+            size = get_indent_level_bytes_right(options, &view->cursor);
         }
         if (size == 0) {
             BlockIter bi = view->cursor;
@@ -177,9 +178,10 @@ void erase(View *view)
         size = prepare_selection(view);
         unselect(view);
     } else {
+        const LocalOptions *options = &view->buffer->options;
         begin_change(CHANGE_MERGE_ERASE);
-        if (view->buffer->options.emulate_tab) {
-            size = get_indent_level_bytes_left(view);
+        if (options->emulate_tab) {
+            size = get_indent_level_bytes_left(options, &view->cursor);
             block_iter_back_bytes(&view->cursor, size);
         }
         if (size == 0) {
