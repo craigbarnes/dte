@@ -172,6 +172,7 @@ static void test_global_state(TestContext *ctx)
     ASSERT_NONNULL(view);
     ASSERT_PTREQ(window->view, view);
     ASSERT_PTREQ(window->frame, root_frame);
+    ASSERT_PTREQ(window->editor, e);
     ASSERT_PTREQ(view->buffer, buffer);
     ASSERT_PTREQ(view->window, window);
     ASSERT_PTREQ(root_frame->window, window);
