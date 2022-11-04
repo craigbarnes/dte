@@ -61,10 +61,10 @@ static size_t copy_count_nl(char *dst, const char *src, size_t len)
     return nl;
 }
 
-static size_t insert_to_current(View *v, const char *buf, size_t len)
+static size_t insert_to_current(BlockIter *cursor, const char *buf, size_t len)
 {
-    Block *blk = v->cursor.blk;
-    size_t offset = v->cursor.offset;
+    Block *blk = cursor->blk;
+    size_t offset = cursor->offset;
     size_t size = blk->size + len;
 
     if (size > blk->alloc) {
@@ -86,14 +86,14 @@ static size_t insert_to_current(View *v, const char *buf, size_t len)
  *   - Size of any block can be larger than BLOCK_EDIT_SIZE
  *     only if there's a very long line
  */
-static size_t split_and_insert(View *v, const char *buf, size_t len)
+static size_t split_and_insert(BlockIter *cursor, const char *buf, size_t len)
 {
-    Block *blk = v->cursor.blk;
+    Block *blk = cursor->blk;
     ListHead *prev_node = blk->node.prev;
     const char *buf1 = blk->data;
     const char *buf2 = buf;
-    const char *buf3 = blk->data + v->cursor.offset;
-    size_t size1 = v->cursor.offset;
+    const char *buf3 = blk->data + cursor->offset;
+    size_t size1 = cursor->offset;
     size_t size2 = len;
     size_t size3 = blk->size - size1;
     size_t total = size1 + size2 + size3;
@@ -191,10 +191,10 @@ static size_t split_and_insert(View *v, const char *buf, size_t len)
         size = 0;
     }
 
-    v->cursor.blk = BLOCK(prev_node->next);
-    while (v->cursor.offset > v->cursor.blk->size) {
-        v->cursor.offset -= v->cursor.blk->size;
-        v->cursor.blk = BLOCK(v->cursor.blk->node.next);
+    cursor->blk = BLOCK(prev_node->next);
+    while (cursor->offset > cursor->blk->size) {
+        cursor->offset -= cursor->blk->size;
+        cursor->blk = BLOCK(cursor->blk->node.next);
     }
 
     nl_added -= blk->nl;
@@ -202,30 +202,30 @@ static size_t split_and_insert(View *v, const char *buf, size_t len)
     return nl_added;
 }
 
-static size_t insert_bytes(View *v, const char *buf, size_t len)
+static size_t insert_bytes(BlockIter *cursor, const char *buf, size_t len)
 {
     // Blocks must contain whole lines.
     // Last char of buf might not be newline.
-    block_iter_normalize(&v->cursor);
+    block_iter_normalize(cursor);
 
-    Block *blk = v->cursor.blk;
+    Block *blk = cursor->blk;
     size_t new_size = blk->size + len;
     if (new_size <= blk->alloc || new_size <= BLOCK_EDIT_SIZE) {
-        return insert_to_current(v, buf, len);
+        return insert_to_current(cursor, buf, len);
     }
 
     if (blk->nl <= 1 && !memchr(buf, '\n', len)) {
         // Can't split this possibly very long line.
         // insert_to_current() is much faster than split_and_insert().
-        return insert_to_current(v, buf, len);
+        return insert_to_current(cursor, buf, len);
     }
-    return split_and_insert(v, buf, len);
+    return split_and_insert(cursor, buf, len);
 }
 
 void do_insert(View *v, const char *buf, size_t len)
 {
     Buffer *b = v->buffer;
-    size_t nl = insert_bytes(v, buf, len);
+    size_t nl = insert_bytes(&v->cursor, buf, len);
     b->nl += nl;
     sanity_check_blocks(v, true);
 
