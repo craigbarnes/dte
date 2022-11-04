@@ -26,7 +26,7 @@ static inline FILE *xfopen(const char *path, const char *mode, int flags, mode_t
         flags |= (plus ? O_RDWR : O_WRONLY) | O_CREAT | O_TRUNC;
         break;
     default:
-        BUG("Invalid fopen() mode string: '%s'", mode);
+        BUG("Unknown fopen() mode string: '%s'", mode);
     }
 
     int fd = xopen(path, flags, mask);
