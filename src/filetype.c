@@ -244,10 +244,14 @@ const char *find_ft(const PointerArray *filetypes, const char *filename, StringV
     if (strview_equal_cstring(&ext, "conf")) {
         if (strview_has_prefix(&path, "/etc/systemd/")) {
             return builtin_filetype_names[INI];
-        } else if (
+        }
+        BUG_ON(!filename);
+        const StringView dir = path_slice_dirname(filename);
+        if (
             strview_has_prefix(&path, "/etc/")
             || strview_has_prefix(&path, "/usr/share/")
             || strview_has_prefix(&path, "/usr/local/share/")
+            || strview_has_suffix(&dir, "/tmpfiles.d")
         ) {
             return builtin_filetype_names[CONFIG];
         }
