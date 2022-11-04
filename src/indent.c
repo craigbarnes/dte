@@ -7,18 +7,18 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
-char *make_indent(const Buffer *buffer, size_t width)
+char *make_indent(const LocalOptions *options, size_t width)
 {
     if (width == 0) {
         return NULL;
     }
 
     size_t ntabs, nspaces;
-    if (use_spaces_for_indent(buffer)) {
+    if (use_spaces_for_indent(options)) {
         ntabs = 0;
         nspaces = width;
     } else {
-        size_t tw = buffer->options.tab_width;
+        size_t tw = options->tab_width;
         ntabs = width / tw;
         nspaces = width % tw;
     }
@@ -31,7 +31,7 @@ char *make_indent(const Buffer *buffer, size_t width)
     return str;
 }
 
-static bool indent_inc(const Buffer *buffer, const StringView *line)
+static bool indent_inc(const LocalOptions *options, const StringView *line)
 {
     static regex_t re1, re2;
     static bool compiled;
@@ -44,7 +44,7 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
         compiled = true;
     }
 
-    if (buffer->options.brace_indent) {
+    if (options->brace_indent) {
         regmatch_t m;
         if (regexp_exec(&re1, line->data, line->length, 0, &m, 0)) {
             return true;
@@ -54,7 +54,7 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
         }
     }
 
-    const InternedRegexp *ir = buffer->options.indent_regex;
+    const InternedRegexp *ir = options->indent_regex;
     if (!ir) {
         return false;
     }
@@ -64,24 +64,24 @@ static bool indent_inc(const Buffer *buffer, const StringView *line)
     return regexp_exec(&ir->re, line->data, line->length, 0, &m, 0);
 }
 
-char *get_indent_for_next_line(const Buffer *buffer, const StringView *line)
+char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
 {
     IndentInfo info;
-    get_indent_info(buffer, line, &info);
-    if (indent_inc(buffer, line)) {
-        size_t w = buffer->options.indent_width;
+    get_indent_info(options, line, &info);
+    if (indent_inc(options, line)) {
+        size_t w = options->indent_width;
         info.width = (info.width + w) / w * w;
     }
-    return make_indent(buffer, info.width);
+    return make_indent(options, info.width);
 }
 
-void get_indent_info(const Buffer *buffer, const StringView *line, IndentInfo *info)
+void get_indent_info(const LocalOptions *options, const StringView *line, IndentInfo *info)
 {
     const char *buf = line->data;
     const size_t len = line->length;
-    const size_t tw = buffer->options.tab_width;
-    const size_t iw = buffer->options.indent_width;
-    const bool space_indent = use_spaces_for_indent(buffer);
+    const size_t tw = options->tab_width;
+    const size_t iw = options->indent_width;
+    const bool space_indent = use_spaces_for_indent(options);
     size_t spaces = 0;
     size_t tabs = 0;
     size_t pos = 0;
@@ -109,10 +109,10 @@ void get_indent_info(const Buffer *buffer, const StringView *line, IndentInfo *i
     info->wsonly = pos == len;
 }
 
-static ssize_t get_current_indent_bytes(const Buffer *buffer, const char *buf, size_t cursor_offset)
+static ssize_t get_current_indent_bytes(const LocalOptions *options, const char *buf, size_t cursor_offset)
 {
-    const size_t tw = buffer->options.tab_width;
-    const size_t iw = buffer->options.indent_width;
+    const size_t tw = options->tab_width;
+    const size_t iw = options->indent_width;
     size_t ibytes = 0;
     size_t iwidth = 0;
 
@@ -150,21 +150,23 @@ size_t get_indent_level_bytes_left(const View *view)
     if (!cursor_offset) {
         return 0;
     }
-    ssize_t ibytes = get_current_indent_bytes(view->buffer, line.data, cursor_offset);
+    const LocalOptions *options = &view->buffer->options;
+    ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
     return (ibytes < 0) ? 0 : (size_t)ibytes;
 }
 
 size_t get_indent_level_bytes_right(const View *view)
 {
+    const LocalOptions *options = &view->buffer->options;
     StringView line;
     size_t cursor_offset = fetch_this_line(&view->cursor, &line);
-    ssize_t ibytes = get_current_indent_bytes(view->buffer, line.data, cursor_offset);
+    ssize_t ibytes = get_current_indent_bytes(options, line.data, cursor_offset);
     if (ibytes < 0) {
         return 0;
     }
 
-    const size_t tw = view->buffer->options.tab_width;
-    const size_t iw = view->buffer->options.indent_width;
+    const size_t tw = options->tab_width;
+    const size_t iw = options->indent_width;
     size_t iwidth = 0;
     for (size_t i = cursor_offset, n = line.length; i < n; i++) {
         switch (line.data[i]) {

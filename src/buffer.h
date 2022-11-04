@@ -59,9 +59,8 @@ static inline void mark_all_lines_changed(Buffer *b)
     b->changed_line_max = LONG_MAX;
 }
 
-static inline bool use_spaces_for_indent(const Buffer *b)
+static inline bool use_spaces_for_indent(const LocalOptions *opt)
 {
-    const LocalOptions *opt = &b->options;
     return opt->expand_tab || opt->indent_width != opt->tab_width;
 }
 

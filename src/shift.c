@@ -11,13 +11,13 @@
 #include "util/xmalloc.h"
 #include "view.h"
 
-static char *alloc_indent(const Buffer *buffer, size_t count, size_t *sizep)
+static char *alloc_indent(const LocalOptions *options, size_t count, size_t *sizep)
 {
     size_t size;
     int ch;
-    if (use_spaces_for_indent(buffer)) {
+    if (use_spaces_for_indent(options)) {
         ch = ' ';
-        size = count * buffer->options.indent_width;
+        size = count * options->indent_width;
     } else {
         ch = '\t';
         size = count;
@@ -30,14 +30,15 @@ static char *alloc_indent(const Buffer *buffer, size_t count, size_t *sizep)
 
 static void shift_right(View *view, size_t nr_lines, size_t count)
 {
+    const LocalOptions *options = &view->buffer->options;
     size_t indent_size;
-    char *indent = alloc_indent(view->buffer, count, &indent_size);
-    size_t i = 0;
-    while (1) {
+    char *indent = alloc_indent(options, count, &indent_size);
+
+    for (size_t i = 0; true; ) {
         IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(view->buffer, &line, &info);
+        get_indent_info(options, &line, &info);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -49,7 +50,7 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
         } else {
             // Replace whole indentation with sane one
             size_t size;
-            char *buf = alloc_indent(view->buffer, info.level + count, &size);
+            char *buf = alloc_indent(options, info.level + count, &size);
             buffer_replace_bytes(view, info.bytes, buf, size);
             free(buf);
         }
@@ -58,18 +59,21 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
         }
         block_iter_eat_line(&view->cursor);
     }
+
     free(indent);
 }
 
 static void shift_left(View *view, size_t nr_lines, size_t count)
 {
-    const size_t indent_width = view->buffer->options.indent_width;
-    const bool space_indent = use_spaces_for_indent(view->buffer);
+    const LocalOptions *options = &view->buffer->options;
+    const size_t indent_width = options->indent_width;
+    const bool space_indent = use_spaces_for_indent(options);
+
     for (size_t i = 0; true; ) {
         IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(view->buffer, &line, &info);
+        get_indent_info(options, &line, &info);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -88,7 +92,7 @@ static void shift_left(View *view, size_t nr_lines, size_t count)
             // Replace whole indentation with sane one
             if (info.level > count) {
                 size_t size;
-                char *buf = alloc_indent(view->buffer, info.level - count, &size);
+                char *buf = alloc_indent(options, info.level - count, &size);
                 buffer_replace_bytes(view, info.bytes, buf, size);
                 free(buf);
             } else {

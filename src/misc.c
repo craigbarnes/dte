@@ -109,6 +109,7 @@ void select_block(View *view)
 
 static int get_indent_of_matching_brace(const View *view)
 {
+    const LocalOptions *options = &view->buffer->options;
     BlockIter bi = view->cursor;
     StringView line;
     int level = 0;
@@ -118,7 +119,7 @@ static int get_indent_of_matching_brace(const View *view)
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
                 IndentInfo info;
-                get_indent_info(view->buffer, &line, &info);
+                get_indent_info(options, &line, &info);
                 return info.width;
             }
         }
@@ -257,7 +258,8 @@ static void insert_nl(View *view)
     }
 
     // Prepare inserted indentation
-    if (view->buffer->options.auto_indent) {
+    const LocalOptions *options = &view->buffer->options;
+    if (options->auto_indent) {
         // Current line will be split at cursor position
         BlockIter bi = view->cursor;
         size_t len = block_iter_bol(&bi);
@@ -269,10 +271,10 @@ static void insert_nl(View *view)
             // Find previous non whitespace only line.
             if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
                 fill_line_ref(&bi, &line);
-                ins = get_indent_for_next_line(view->buffer, &line);
+                ins = get_indent_for_next_line(options, &line);
             }
         } else {
-            ins = get_indent_for_next_line(view->buffer, &line);
+            ins = get_indent_for_next_line(options, &line);
         }
     }
 
@@ -303,6 +305,7 @@ void insert_ch(View *view, CodePoint ch)
     }
 
     const Buffer *b = view->buffer;
+    const LocalOptions *options = &b->options;
     char buf[8];
     char *ins = buf;
     char *alloc = NULL;
@@ -313,11 +316,11 @@ void insert_ch(View *view, CodePoint ch)
         // Prepare deleted text (selection)
         del_count = prepare_selection(view);
         unselect(view);
-    } else if (b->options.overwrite) {
+    } else if (options->overwrite) {
         // Delete character under cursor unless we're at end of line
         BlockIter bi = view->cursor;
         del_count = block_iter_is_eol(&bi) ? 0 : block_iter_next_column(&bi);
-    } else if (ch == '}' && b->options.auto_indent && b->options.brace_indent) {
+    } else if (ch == '}' && options->auto_indent && options->brace_indent) {
         BlockIter bi = view->cursor;
         StringView curlr;
         block_iter_bol(&bi);
@@ -329,7 +332,7 @@ void insert_ch(View *view, CodePoint ch)
                 block_iter_bol(&view->cursor);
                 del_count = curlr.length;
                 if (width) {
-                    alloc = make_indent(b, width);
+                    alloc = make_indent(options, width);
                     ins = alloc;
                     ins_count = strlen(ins);
                     // '}' will be replace the terminating NUL
@@ -339,8 +342,8 @@ void insert_ch(View *view, CodePoint ch)
     }
 
     // Prepare inserted text
-    if (ch == '\t' && b->options.expand_tab) {
-        ins_count = b->options.indent_width;
+    if (ch == '\t' && options->expand_tab) {
+        ins_count = options->indent_width;
         static_assert(sizeof(buf) >= INDENT_WIDTH_MAX);
         memset(ins, ' ', ins_count);
     } else {
@@ -453,23 +456,22 @@ void join_lines(View *view)
 
 void clear_lines(View *view)
 {
-    size_t del_count = 0, ins_count = 0;
+    const LocalOptions *options = &view->buffer->options;
     char *indent = NULL;
-
-    if (view->buffer->options.auto_indent) {
+    if (options->auto_indent) {
         BlockIter bi = view->cursor;
         if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
             StringView line;
             fill_line_ref(&bi, &line);
-            indent = get_indent_for_next_line(view->buffer, &line);
+            indent = get_indent_for_next_line(options, &line);
         }
     }
 
+    size_t del_count = 0;
     if (view->selection) {
         view->selection = SELECT_LINES;
         del_count = prepare_selection(view);
         unselect(view);
-
         // Don't delete last newline
         if (del_count) {
             del_count--;
@@ -483,9 +485,7 @@ void clear_lines(View *view)
         return;
     }
 
-    if (indent) {
-        ins_count = strlen(indent);
-    }
+    size_t ins_count = indent ? strlen(indent) : 0;
     buffer_replace_bytes(view, del_count, indent, ins_count);
     free(indent);
     block_iter_skip_bytes(&view->cursor, ins_count);
@@ -510,29 +510,27 @@ void delete_lines(View *view)
 
 void new_line(View *view, bool above)
 {
-    size_t ins_count = 1;
-    char *ins = NULL;
-
-    if (above) {
-        if (block_iter_prev_line(&view->cursor) == 0) {
-            // Already on first line; insert newline at bof
-            block_iter_bol(&view->cursor);
-            buffer_insert_bytes(view, "\n", 1);
-            return;
-        }
+    if (above && block_iter_prev_line(&view->cursor) == 0) {
+        // Already on first line; insert newline at bof
+        block_iter_bol(&view->cursor);
+        buffer_insert_bytes(view, "\n", 1);
+        return;
     }
 
+    const LocalOptions *options = &view->buffer->options;
+    char *ins = NULL;
     block_iter_eol(&view->cursor);
 
-    if (view->buffer->options.auto_indent) {
+    if (options->auto_indent) {
         BlockIter bi = view->cursor;
         if (find_non_empty_line_bwd(&bi)) {
             StringView line;
             fill_line_ref(&bi, &line);
-            ins = get_indent_for_next_line(view->buffer, &line);
+            ins = get_indent_for_next_line(options, &line);
         }
     }
 
+    size_t ins_count;
     if (ins) {
         ins_count = strlen(ins);
         memmove(ins + 1, ins, ins_count);
@@ -541,6 +539,7 @@ void new_line(View *view, bool above)
         buffer_insert_bytes(view, ins, ins_count);
         free(ins);
     } else {
+        ins_count = 1;
         buffer_insert_bytes(view, "\n", 1);
     }
 
@@ -587,16 +586,16 @@ static bool is_paragraph_separator(const StringView *line)
     ;
 }
 
-static size_t get_indent_width(const Buffer *b, const StringView *line)
+static size_t get_indent_width(const LocalOptions *options, const StringView *line)
 {
     IndentInfo info;
-    get_indent_info(b, line, &info);
+    get_indent_info(options, line, &info);
     return info.width;
 }
 
-static bool in_paragraph(const Buffer *b, const StringView *line, size_t indent_width)
+static bool in_paragraph(const LocalOptions *options, const StringView *line, size_t indent_width)
 {
-    if (get_indent_width(b, line) != indent_width) {
+    if (get_indent_width(options, line) != indent_width) {
         return false;
     }
     return !is_paragraph_separator(line);
@@ -604,6 +603,7 @@ static bool in_paragraph(const Buffer *b, const StringView *line, size_t indent_
 
 static size_t paragraph_size(View *view)
 {
+    const LocalOptions *options = &view->buffer->options;
     BlockIter bi = view->cursor;
     StringView line;
     block_iter_bol(&bi);
@@ -612,12 +612,12 @@ static size_t paragraph_size(View *view)
         // Not in paragraph
         return 0;
     }
-    size_t indent_width = get_indent_width(view->buffer, &line);
+    size_t indent_width = get_indent_width(options, &line);
 
     // Go to beginning of paragraph
     while (block_iter_prev_line(&bi)) {
         fill_line_ref(&bi, &line);
-        if (!in_paragraph(view->buffer, &line, indent_width)) {
+        if (!in_paragraph(options, &line, indent_width)) {
             block_iter_eat_line(&bi);
             break;
         }
@@ -633,7 +633,7 @@ static size_t paragraph_size(View *view)
         }
         size += bytes;
         fill_line_ref(&bi, &line);
-    } while (in_paragraph(view->buffer, &line, indent_width));
+    } while (in_paragraph(options, &line, indent_width));
     return size;
 }
 
@@ -650,10 +650,11 @@ void format_paragraph(View *view, size_t text_width)
         return;
     }
 
+    const LocalOptions *options = &view->buffer->options;
     char *sel = block_iter_get_bytes(&view->cursor, len);
     StringView sv = string_view(sel, len);
-    size_t indent_width = get_indent_width(view->buffer, &sv);
-    char *indent = make_indent(view->buffer, indent_width);
+    size_t indent_width = get_indent_width(options, &sv);
+    char *indent = make_indent(options, indent_width);
 
     ParagraphFormatter pf = {
         .buf = STRING_INIT,

@@ -18,41 +18,37 @@ static void test_find_buffer_by_id(TestContext *ctx)
 
 static void test_make_indent(TestContext *ctx)
 {
-    EditorState *e = ctx->userdata;
-    Buffer *buffer = e->buffer;
-    ASSERT_NONNULL(buffer);
-    const LocalOptions saved_opts = buffer->options;
-    buffer->options.expand_tab = false;
-    buffer->options.indent_width = 8;
-    buffer->options.tab_width = 8;
+    LocalOptions options = {
+        .expand_tab = false,
+        .indent_width = 8,
+        .tab_width = 8,
+    };
 
-    char *indent = make_indent(buffer, 16);
+    char *indent = make_indent(&options, 16);
     EXPECT_STREQ(indent, "\t\t");
     free(indent);
 
-    indent = make_indent(buffer, 17);
+    indent = make_indent(&options, 17);
     EXPECT_STREQ(indent, "\t\t ");
     free(indent);
 
-    indent = make_indent(buffer, 20);
+    indent = make_indent(&options, 20);
     EXPECT_STREQ(indent, "\t\t    ");
     free(indent);
 
-    indent = make_indent(buffer, 24);
+    indent = make_indent(&options, 24);
     EXPECT_STREQ(indent, "\t\t\t");
     free(indent);
 
-    buffer->options.expand_tab = true;
+    options.expand_tab = true;
 
-    indent = make_indent(buffer, 8);
+    indent = make_indent(&options, 8);
     EXPECT_STREQ(indent, "        ");
     free(indent);
 
-    indent = make_indent(buffer, 7);
+    indent = make_indent(&options, 7);
     EXPECT_STREQ(indent, "       ");
     free(indent);
-
-    buffer->options = saved_opts;
 }
 
 static const TestEntry tests[] = {
