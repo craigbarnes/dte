@@ -17,6 +17,7 @@ static FILE *logfile = NULL;
 
 static char log_colors[][8] = {
     [LOG_LEVEL_NONE] = "",
+    [LOG_LEVEL_CRITICAL] = "\033[1;31m",
     [LOG_LEVEL_ERROR] = "\033[31m",
     [LOG_LEVEL_WARNING] = "\033[33m",
     [LOG_LEVEL_INFO] = "",
@@ -26,6 +27,7 @@ static char log_colors[][8] = {
 
 static const char log_levels[][8] = {
     [LOG_LEVEL_NONE] = "none",
+    [LOG_LEVEL_CRITICAL] = "crit",
     [LOG_LEVEL_ERROR] = "error",
     [LOG_LEVEL_WARNING] = "warning",
     [LOG_LEVEL_INFO] = "info",
@@ -35,6 +37,7 @@ static const char log_levels[][8] = {
 
 static const char log_prefixes[][8] = {
     [LOG_LEVEL_NONE] = "_",
+    [LOG_LEVEL_CRITICAL] = "crit",
     [LOG_LEVEL_ERROR] = " err",
     [LOG_LEVEL_WARNING] = "warn",
     [LOG_LEVEL_INFO] = "info",

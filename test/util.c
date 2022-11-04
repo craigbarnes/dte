@@ -2432,6 +2432,7 @@ static void test_xmemmem(TestContext *ctx)
 static void test_log_level_from_str(TestContext *ctx)
 {
     EXPECT_EQ(log_level_from_str("none"), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str("crit"), LOG_LEVEL_CRITICAL);
     EXPECT_EQ(log_level_from_str("error"), LOG_LEVEL_ERROR);
     EXPECT_EQ(log_level_from_str("warning"), LOG_LEVEL_WARNING);
     EXPECT_EQ(log_level_from_str("info"), LOG_LEVEL_INFO);

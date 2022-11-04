@@ -7,6 +7,7 @@
 
 typedef enum {
     LOG_LEVEL_NONE,
+    LOG_LEVEL_CRITICAL,
     LOG_LEVEL_ERROR,
     LOG_LEVEL_WARNING,
     LOG_LEVEL_INFO,
@@ -15,6 +16,7 @@ typedef enum {
 } LogLevel;
 
 #define LOG(level, ...) log_msg(level, __FILE__, __LINE__, __VA_ARGS__)
+#define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
