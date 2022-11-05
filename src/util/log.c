@@ -10,44 +10,29 @@
 
 // These are initialized during early startup and then never changed,
 // so they're deemed an "acceptable" use of globals:
-static char dim[] = "\033[2m";
-static char sgr0[] = "\033[0m";
 static LogLevel log_level = LOG_LEVEL_NONE;
 static FILE *logfile = NULL;
+static bool log_colors = false;
 
-static char log_colors[][8] = {
-    [LOG_LEVEL_NONE] = "",
-    [LOG_LEVEL_CRITICAL] = "\033[1;31m",
-    [LOG_LEVEL_ERROR] = "\033[31m",
-    [LOG_LEVEL_WARNING] = "\033[33m",
-    [LOG_LEVEL_INFO] = "",
-    [LOG_LEVEL_DEBUG] = "",
-    [LOG_LEVEL_TRACE] = "",
-};
+static const char dim[] = "\033[2m";
+static const char sgr0[] = "\033[0m";
 
-static const char log_levels[][8] = {
-    [LOG_LEVEL_NONE] = "none",
-    [LOG_LEVEL_CRITICAL] = "crit",
-    [LOG_LEVEL_ERROR] = "error",
-    [LOG_LEVEL_WARNING] = "warning",
-    [LOG_LEVEL_INFO] = "info",
-    [LOG_LEVEL_DEBUG] = "debug",
-    [LOG_LEVEL_TRACE] = "trace",
-};
-
-static const char log_prefixes[][8] = {
-    [LOG_LEVEL_NONE] = "_",
-    [LOG_LEVEL_CRITICAL] = "crit",
-    [LOG_LEVEL_ERROR] = " err",
-    [LOG_LEVEL_WARNING] = "warn",
-    [LOG_LEVEL_INFO] = "info",
-    [LOG_LEVEL_DEBUG] = " dbg",
-    [LOG_LEVEL_TRACE] = "trce",
+static const struct {
+    char name[8];
+    char log_prefix[5];
+    char color[8];
+} log_level_map[] = {
+    [LOG_LEVEL_NONE] = {"none", "_", ""},
+    [LOG_LEVEL_CRITICAL] = {"crit", "crit", "\033[1;31m"},
+    [LOG_LEVEL_ERROR] = {"error", " err", "\033[31m"},
+    [LOG_LEVEL_WARNING] = {"warning", "warn", "\033[33m"},
+    [LOG_LEVEL_INFO] = {"info", "info", ""},
+    [LOG_LEVEL_DEBUG] = {"debug", " dbg", ""},
+    [LOG_LEVEL_TRACE] = {"trace", "trce", ""},
 };
 
 UNITTEST {
-    CHECK_STRING_ARRAY(log_levels);
-    CHECK_STRING_ARRAY(log_prefixes);
+    CHECK_STRUCT_ARRAY(log_level_map, name);
 }
 
 LogLevel log_level_default(void)
@@ -65,14 +50,19 @@ LogLevel log_level_from_str(const char *str)
     if (!str || str[0] == '\0') {
         return log_level_default();
     }
-    return STR_TO_ENUM(str, log_levels, LOG_LEVEL_NONE);
+    for (LogLevel i = 0; i < ARRAYLEN(log_level_map); i++) {
+        if (streq(str, log_level_map[i].name)) {
+            return i;
+        }
+    }
+    return LOG_LEVEL_NONE;
 }
 
 const char *log_level_to_str(LogLevel level)
 {
     BUG_ON(level < LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
-    return log_levels[level];
+    return log_level_map[level].name;
 }
 
 LogLevel log_open(const char *filename, LogLevel level)
@@ -92,10 +82,8 @@ LogLevel log_open(const char *filename, LogLevel level)
         return LOG_LEVEL_NONE;
     }
 
-    if (!isatty(fileno(logfile))) {
-        dim[0] = '\0';
-        sgr0[0] = '\0';
-        memset(log_colors, '\0', sizeof(log_colors));
+    if (isatty(fileno(logfile))) {
+        log_colors = true;
     }
 
     log_level = MIN(level, log_level_max());
@@ -116,10 +104,21 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     }
 
     BUG_ON(!logfile);
-    const char *prefix = log_prefixes[level];
-    const char *color = log_colors[level];
-    const char *reset = color[0] ? sgr0 : "";
-    xfprintf(logfile, "%s%s%s: %s%s:%d:%s ", color, prefix, reset, dim, file, line, sgr0);
+    const char *prefix = log_level_map[level].log_prefix;
+
+    if (log_colors) {
+        const char *color = log_level_map[level].color;
+        const char *reset = color[0] ? sgr0 : "";
+        xfprintf (
+            logfile,
+            "%s%s%s: %s%s:%d:%s ",
+            color, prefix, reset,
+            dim, file, line, sgr0
+        );
+    } else {
+        xfprintf(logfile, "%s: %s:%d: ", prefix, file, line);
+    }
+
     xvfprintf(logfile, fmt, ap);
     xfputc('\n', logfile);
     xfflush(logfile);
