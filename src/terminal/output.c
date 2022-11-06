@@ -43,16 +43,24 @@ void term_output_reset(Terminal *term, size_t start_x, size_t width, size_t scro
     obuf->can_clear = start_x + width == term->width;
 }
 
+// Write directly to the terminal, as done when e.g. flushing the output buffer
+static bool term_direct_write(const char *str, size_t count)
+{
+    ssize_t n = xwrite_all(STDOUT_FILENO, str, count);
+    if (unlikely(n != count)) {
+        LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
+        return false;
+    }
+    return true;
+}
+
 // Does not update obuf.x
 void term_add_bytes(TermOutputBuffer *obuf, const char *str, size_t count)
 {
     if (unlikely(count > obuf_avail(obuf))) {
         term_output_flush(obuf);
         if (unlikely(count >= TERM_OUTBUF_SIZE)) {
-            ssize_t n = xwrite_all(STDOUT_FILENO, str, count);
-            if (unlikely(n != count)) {
-                LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
-            } else {
+            if (term_direct_write(str, count)) {
                 LOG_INFO("writing %zu bytes directly to terminal", count);
             }
             return;
@@ -235,12 +243,8 @@ void term_clear_screen(TermOutputBuffer *obuf)
 
 void term_output_flush(TermOutputBuffer *obuf)
 {
-    size_t count = obuf->count;
-    if (count) {
-        ssize_t n = xwrite_all(STDOUT_FILENO, obuf->buf, count);
-        if (unlikely(n != count)) {
-            LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
-        }
+    if (obuf->count) {
+        term_direct_write(obuf->buf, obuf->count);
         obuf->count = 0;
     }
 }
