@@ -558,18 +558,15 @@ loop_break:;
             if (!str_to_filepos(str + 1, &line, &col)) {
                 error_msg("Invalid file position: '%s'", str);
             }
-        } else {
-            View *v = window_open_buffer(window, str, false, NULL);
-            if (line > 0) {
-                set_view(v);
-                move_to_line(v, line);
-                line = 0;
-                if (col > 0) {
-                    move_to_column(v, col);
-                    col = 0;
-                }
-            }
+            continue;
         }
+        View *v = window_open_buffer(window, str, false, NULL);
+        if (line == 0) {
+            continue;
+        }
+        set_view(v);
+        move_to_filepos(v, line, col);
+        line = 0;
     }
 
     if (std_buffer) {

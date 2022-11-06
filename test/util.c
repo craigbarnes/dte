@@ -902,29 +902,33 @@ static void test_str_to_size(TestContext *ctx)
 
 static void test_str_to_filepos(TestContext *ctx)
 {
-    size_t line = 0, col = 0;
+    size_t line = 0;
+    size_t col = 0;
     EXPECT_TRUE(str_to_filepos("10,60", &line, &col));
     EXPECT_EQ(line, 10);
     EXPECT_EQ(col, 60);
 
-    line = 0, col = 0;
     EXPECT_TRUE(str_to_filepos("1:9", &line, &col));
     EXPECT_EQ(line, 1);
     EXPECT_EQ(col, 9);
 
-    line = 0, col = 0;
     EXPECT_TRUE(str_to_filepos("4980", &line, &col));
     EXPECT_EQ(line, 4980);
-    EXPECT_EQ(col, 0);
+    EXPECT_EQ(col, 1);
 
-    line = 0, col = 0;
+    EXPECT_FALSE(str_to_filepos("0", &line, &col));
+    EXPECT_FALSE(str_to_filepos("1,0", &line, &col));
+    EXPECT_FALSE(str_to_filepos("0,1", &line, &col));
+    EXPECT_FALSE(str_to_filepos("1,2,3", &line, &col));
+    EXPECT_FALSE(str_to_filepos("1,2.3", &line, &col));
+    EXPECT_FALSE(str_to_filepos("5,", &line, &col));
+    EXPECT_FALSE(str_to_filepos(",5", &line, &col));
+    EXPECT_FALSE(str_to_filepos("6.7", &line, &col));
+    EXPECT_FALSE(str_to_filepos("2 3", &line, &col));
+    EXPECT_FALSE(str_to_filepos("9 ", &line, &col));
     EXPECT_FALSE(str_to_filepos("", &line, &col));
-    EXPECT_EQ(line, 0);
-    EXPECT_EQ(col, 0);
-
+    EXPECT_FALSE(str_to_filepos("\t", &line, &col));
     EXPECT_FALSE(str_to_filepos("44,9x", &line, &col));
-    EXPECT_EQ(line, 0);
-    EXPECT_EQ(col, 0);
 }
 
 static void test_umax_to_str(TestContext *ctx)

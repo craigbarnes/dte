@@ -210,6 +210,15 @@ void move_to_column(View *v, size_t column)
     view_reset_preferred_x(v);
 }
 
+void move_to_filepos(View *v, size_t line, size_t column)
+{
+    move_to_line(v, line);
+    BUG_ON(!block_iter_is_bol(&v->cursor));
+    if (column != 1) {
+        move_to_column(v, column);
+    }
+}
+
 static CharTypeEnum get_char_type(CodePoint u)
 {
     if (u == '\n') {
