@@ -91,15 +91,16 @@ static void cmd_copy(EditorState *e, const CommandArgs *a)
         internal = true;
     }
 
-    size_t len = e->cmdline.buf.len;
+    String *buf = &e->cmdline.buf;
+    size_t len = buf->len;
     if (internal) {
-        char *str = string_clone_cstring(&e->cmdline.buf);
+        char *str = string_clone_cstring(buf);
         record_copy(&e->clipboard, str, len, false);
     }
 
     Terminal *term = &e->terminal;
     if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
-        const char *str = string_borrow_cstring(&e->cmdline.buf);
+        const char *str = string_borrow_cstring(buf);
         if (!term_osc52_copy(&term->obuf, str, len, clipboard, primary)) {
             LOG_ERROR("term_osc52_copy() failed: %s", strerror(ENOMEM));
         }
