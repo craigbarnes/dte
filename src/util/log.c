@@ -78,7 +78,7 @@ LogLevel log_open(const char *filename, LogLevel level)
     }
 
     logfile = xfopen(filename, "w", O_APPEND | O_CLOEXEC, 0666);
-    if (!logfile || fputc('\n', logfile) < 0 || fflush(logfile) != 0) {
+    if (!logfile || xfputc('\n', logfile) < 0 || xfflush(logfile) != 0) {
         return LOG_LEVEL_NONE;
     }
 
