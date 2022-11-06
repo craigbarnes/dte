@@ -129,8 +129,8 @@ void history_save(const History *history)
     }
 
     for (const HistoryEntry *e = history->first; e; e = e->next) {
-        fputs(e->text, f);
-        fputc('\n', f);
+        xfputs(e->text, f);
+        xfputc('\n', f);
     }
 
     fclose(f);

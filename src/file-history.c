@@ -122,7 +122,7 @@ void file_history_save(const FileHistory *history)
     }
 
     for (const FileHistoryEntry *e = history->first; e; e = e->next) {
-        fprintf(f, "%lu %lu %s\n", e->row, e->col, e->filename);
+        xfprintf(f, "%lu %lu %s\n", e->row, e->col, e->filename);
     }
 
     fclose(f);
