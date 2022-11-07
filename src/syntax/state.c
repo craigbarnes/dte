@@ -455,18 +455,18 @@ static void cmd_str(EditorState *e, const CommandArgs *a)
     }
 }
 
-static void finish_syntax(EditorState *e)
+static void finish_syntax(HashMap *syntaxes)
 {
     BUG_ON(!current_syntax);
     close_state();
-    finalize_syntax(&e->syntaxes, current_syntax, saved_nr_errors);
+    finalize_syntax(syntaxes, current_syntax, saved_nr_errors);
     current_syntax = NULL;
 }
 
 static void cmd_syntax(EditorState *e, const CommandArgs *a)
 {
     if (current_syntax) {
-        finish_syntax(e);
+        finish_syntax(&e->syntaxes);
     }
 
     current_syntax = xnew0(Syntax, 1);
@@ -562,7 +562,7 @@ static void cmd_require(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     }
 }
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
+Syntax *do_load_syntax_file(HashMap *syntaxes, const char *filename, ConfigFlags flags, int *err)
 {
     const ConfigState saved = current_config;
     *err = do_read_config(&syntax_commands, filename, flags);
@@ -570,18 +570,26 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
         current_config = saved;
         return NULL;
     }
+
     if (current_syntax) {
-        finish_syntax(e);
-        find_unused_subsyntaxes(&e->syntaxes);
+        finish_syntax(syntaxes);
+        find_unused_subsyntaxes(syntaxes);
     }
+
     current_config = saved;
 
-    Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
-    if (syn && e->status != EDITOR_INITIALIZING) {
-        update_syntax_colors(syn, &e->colors);
-    }
+    Syntax *syn = find_syntax(syntaxes, path_basename(filename));
     if (!syn) {
         *err = EINVAL;
+    }
+    return syn;
+}
+
+Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
+{
+    Syntax *syn = do_load_syntax_file(&e->syntaxes, filename, flags, err);
+    if (syn && e->status != EDITOR_INITIALIZING) {
+        update_syntax_colors(syn, &e->colors);
     }
     return syn;
 }

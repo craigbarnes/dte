@@ -5,7 +5,8 @@
 #include "editor.h"
 #include "syntax/syntax.h"
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags f, int *err);
+Syntax *do_load_syntax_file(HashMap *syntaxes, const char *filename, ConfigFlags flags, int *err);
+Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err);
 Syntax *load_syntax_by_filetype(EditorState *e, const char *filetype);
 
 #endif

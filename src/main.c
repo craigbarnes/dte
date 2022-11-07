@@ -214,8 +214,9 @@ static ExitCode dump_builtin_config(const char *name)
 
 static ExitCode lint_syntax(const char *filename)
 {
+    HashMap syntaxes = HASHMAP_INIT;
     int err;
-    const Syntax *s = load_syntax_file(&editor, filename, CFG_MUST_EXIST, &err);
+    const Syntax *s = do_load_syntax_file(&syntaxes, filename, CFG_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
         const char *p = (n > 1) ? "s" : "";
@@ -223,6 +224,7 @@ static ExitCode lint_syntax(const char *filename)
     } else if (err == EINVAL) {
         error_msg("%s: no default syntax found", filename);
     }
+    free_syntaxes(&syntaxes);
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
