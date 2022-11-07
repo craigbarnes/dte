@@ -16,7 +16,7 @@ void update_term_title(Terminal *term, const Buffer *b, bool set_window_title);
 void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
-void update_line_numbers(EditorState *e, Window *win, bool force);
+void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *win, bool force);
 void update_cursor_style(EditorState *e);
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color);
 void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c);

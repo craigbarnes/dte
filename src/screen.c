@@ -111,7 +111,7 @@ void update_separators(Terminal *term, const ColorScheme *colors, const Frame *f
     frame_for_each_window(frame, print_separator, term);
 }
 
-void update_line_numbers(EditorState *e, Window *win, bool force)
+void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *win, bool force)
 {
     const View *view = win->view;
     size_t lines = view->buffer->nl;
@@ -132,13 +132,13 @@ void update_line_numbers(EditorState *e, Window *win, bool force)
     win->line_numbers.first = first;
     win->line_numbers.last = last;
 
-    TermOutputBuffer *obuf = &e->terminal.obuf;
+    TermOutputBuffer *obuf = &term->obuf;
     char buf[DECIMAL_STR_MAX(unsigned long) + 1];
     size_t width = win->line_numbers.width;
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
-    term_output_reset(&e->terminal, win->x, win->w, 0);
-    set_builtin_color(&e->terminal, &e->colors, BC_LINENUMBER);
+    term_output_reset(term, win->x, win->w, 0);
+    set_builtin_color(term, colors, BC_LINENUMBER);
 
     for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;

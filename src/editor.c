@@ -311,7 +311,7 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
         print_tabbar(&e->terminal, &e->colors, window);
     }
     if (e->options.show_line_numbers) {
-        update_line_numbers(e, window, true);
+        update_line_numbers(&e->terminal, &e->colors, window, true);
     }
     update_range(e, v, v->vy, v->vy + window->edit_h);
     update_status_line(window);
@@ -376,7 +376,8 @@ static void update_window(EditorState *e, Window *window)
     View *v = window->view;
     if (e->options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        update_line_numbers(e, window, v->buffer->changed_line_max == LONG_MAX);
+        bool force = (v->buffer->changed_line_max == LONG_MAX);
+        update_line_numbers(&e->terminal, &e->colors, window, force);
     }
 
     long y1 = MAX(v->buffer->changed_line_min, v->vy);
