@@ -30,26 +30,28 @@ typedef enum {
     STATUS_CURSOR_ROW,
 } FormatSpecifierType;
 
+#define ENTRY(x) [(x - 32)]
+
 static const uint8_t format_specifiers[] = {
-    ['%'] = STATUS_ESCAPED_PERCENT,
-    ['E'] = STATUS_ENCODING,
-    ['M'] = STATUS_MISC,
-    ['N'] = STATUS_IS_CRLF,
-    ['S'] = STATUS_SEPARATOR_LONG,
-    ['X'] = STATUS_CURSOR_COL_BYTES,
-    ['Y'] = STATUS_TOTAL_ROWS,
-    ['b'] = STATUS_BOM,
-    ['f'] = STATUS_FILENAME,
-    ['m'] = STATUS_MODIFIED,
-    ['n'] = STATUS_LINE_ENDING,
-    ['o'] = STATUS_OVERWRITE,
-    ['p'] = STATUS_SCROLL_POSITION,
-    ['r'] = STATUS_READONLY,
-    ['s'] = STATUS_SEPARATOR,
-    ['t'] = STATUS_FILETYPE,
-    ['u'] = STATUS_UNICODE,
-    ['x'] = STATUS_CURSOR_COL,
-    ['y'] = STATUS_CURSOR_ROW,
+    ENTRY('%') = STATUS_ESCAPED_PERCENT,
+    ENTRY('E') = STATUS_ENCODING,
+    ENTRY('M') = STATUS_MISC,
+    ENTRY('N') = STATUS_IS_CRLF,
+    ENTRY('S') = STATUS_SEPARATOR_LONG,
+    ENTRY('X') = STATUS_CURSOR_COL_BYTES,
+    ENTRY('Y') = STATUS_TOTAL_ROWS,
+    ENTRY('b') = STATUS_BOM,
+    ENTRY('f') = STATUS_FILENAME,
+    ENTRY('m') = STATUS_MODIFIED,
+    ENTRY('n') = STATUS_LINE_ENDING,
+    ENTRY('o') = STATUS_OVERWRITE,
+    ENTRY('p') = STATUS_SCROLL_POSITION,
+    ENTRY('r') = STATUS_READONLY,
+    ENTRY('s') = STATUS_SEPARATOR,
+    ENTRY('t') = STATUS_FILETYPE,
+    ENTRY('u') = STATUS_UNICODE,
+    ENTRY('x') = STATUS_CURSOR_COL,
+    ENTRY('y') = STATUS_CURSOR_ROW,
 };
 
 typedef struct {
@@ -170,6 +172,7 @@ static void add_misc_status(Formatter *f)
 
 static FormatSpecifierType lookup_format_specifier(unsigned char ch)
 {
+    ch -= 32;
     if (unlikely(ch >= ARRAYLEN(format_specifiers))) {
         return STATUS_INVALID;
     }
@@ -180,11 +183,16 @@ UNITTEST {
     BUG_ON(lookup_format_specifier('%') != STATUS_ESCAPED_PERCENT);
     BUG_ON(lookup_format_specifier('E') != STATUS_ENCODING);
     BUG_ON(lookup_format_specifier('M') != STATUS_MISC);
+    BUG_ON(lookup_format_specifier('b') != STATUS_BOM);
     BUG_ON(lookup_format_specifier('y') != STATUS_CURSOR_ROW);
+    BUG_ON(lookup_format_specifier('A') != STATUS_INVALID);
     BUG_ON(lookup_format_specifier('z') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('!') != STATUS_INVALID);
     BUG_ON(lookup_format_specifier('~') != STATUS_INVALID);
     BUG_ON(lookup_format_specifier('@') != STATUS_INVALID);
     BUG_ON(lookup_format_specifier('?') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('$') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier(' ') != STATUS_INVALID);
     BUG_ON(lookup_format_specifier(0x00) != STATUS_INVALID);
     BUG_ON(lookup_format_specifier(0x80) != STATUS_INVALID);
     BUG_ON(lookup_format_specifier(0xFF) != STATUS_INVALID);
