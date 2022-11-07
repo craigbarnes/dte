@@ -2,17 +2,17 @@
 #include "status.h"
 #include "util/utf8.h"
 
-void update_status_line (
-    Terminal *term,
-    const ColorScheme *colors,
-    const GlobalOptions *opts,
-    const Window *win,
-    InputMode mode
-) {
+void update_status_line(const Window *win)
+{
+    EditorState *e = win->editor;
+    const GlobalOptions *opts = &e->options;
+    InputMode mode = e->input_mode;
     char lbuf[256], rbuf[256];
     sf_format(win, opts, mode, lbuf, sizeof lbuf, opts->statusline_left);
     sf_format(win, opts, mode, rbuf, sizeof rbuf, opts->statusline_right);
 
+    const ColorScheme *colors = &e->colors;
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     size_t lw = u_str_width(lbuf);
     size_t rw = u_str_width(rbuf);

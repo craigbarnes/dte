@@ -314,7 +314,7 @@ static void update_window_full(Window *window, void* UNUSED_ARG(data))
         update_line_numbers(e, window, true);
     }
     update_range(e, v, v->vy, v->vy + window->edit_h);
-    update_status_line(&e->terminal, &e->colors, &e->options, window, e->input_mode);
+    update_status_line(window);
 }
 
 static void restore_cursor(EditorState *e)
@@ -382,7 +382,7 @@ static void update_window(EditorState *e, Window *window)
     long y1 = MAX(v->buffer->changed_line_min, v->vy);
     long y2 = MIN(v->buffer->changed_line_max, v->vy + window->edit_h - 1);
     update_range(e, v, y1, y2 + 1);
-    update_status_line(&e->terminal, &e->colors, &e->options, window, e->input_mode);
+    update_status_line(window);
 }
 
 // Update all visible views containing this buffer
