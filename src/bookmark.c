@@ -25,13 +25,13 @@ bool file_location_go(Window *window, const FileLocation *loc)
 {
     View *view = window_open_buffer(window, loc->filename, true, NULL);
     if (!view) {
-        // Failed to open file. Error message should be visible.
+        // Failed to open file; error message should be visible
         return false;
     }
 
     if (window->view != view) {
         set_view(view);
-        // Force centering view to the cursor because file changed
+        // Force centering view to cursor, because file changed
         view->force_center = true;
     }
 
