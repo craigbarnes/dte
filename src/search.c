@@ -106,28 +106,26 @@ static bool do_search_bwd(View *view, regex_t *regex, BlockIter *bi, ssize_t cx,
     return false;
 }
 
-bool search_tag(View *view, const char *pattern, bool *err)
+bool search_tag(View *view, const char *pattern)
 {
     regex_t regex;
-    bool found = false;
     if (!regexp_compile_basic(&regex, pattern, REG_NEWLINE)) {
-        *err = true;
-        return found;
+        return false;
     }
 
     BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
-    if (do_search_fwd(view, &regex, &bi, false)) {
-        view->center_on_scroll = true;
-        found = true;
-    } else {
+    bool found = do_search_fwd(view, &regex, &bi, false);
+    regfree(&regex);
+
+    if (!found) {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
         error_msg("Tag not found");
-        *err = true;
+        return false;
     }
 
-    regfree(&regex);
-    return found;
+    view->center_on_scroll = true;
+    return true;
 }
 
 static void free_regex(SearchState *search)

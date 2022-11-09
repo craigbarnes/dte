@@ -35,21 +35,16 @@ bool file_location_go(Window *window, const FileLocation *loc)
         view->force_center = true;
     }
 
-    bool ok = true;
     if (loc->pattern) {
-        bool err = false;
-        search_tag(view, loc->pattern, &err);
-        ok = !err;
-    } else if (loc->line > 0) {
-        move_to_line(view, loc->line);
-        if (loc->column > 0) {
-            move_to_column(view, loc->column);
+        if (!search_tag(view, loc->pattern)) {
+            return false;
         }
+    } else if (loc->line > 0) {
+        move_to_filepos(view, loc->line, loc->column ? loc->column : 1);
     }
-    if (ok) {
-        unselect(view);
-    }
-    return ok;
+
+    unselect(view);
+    return true;
 }
 
 static bool file_location_return(Window *window, const FileLocation *loc)

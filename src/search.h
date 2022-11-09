@@ -29,7 +29,7 @@ static inline void toggle_search_direction(SearchDirection *direction)
     *direction ^= 1;
 }
 
-bool search_tag(View *view, const char *pattern, bool *err);
+bool search_tag(View *view, const char *pattern);
 void search_set_regexp(SearchState *search, const char *pattern);
 void search_free_regexp(SearchState *search);
 void search_prev(View *view, SearchState *search, SearchCaseSensitivity cs);
