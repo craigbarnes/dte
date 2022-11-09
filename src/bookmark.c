@@ -73,8 +73,7 @@ static bool file_location_return(Window *window, const FileLocation *loc)
 
     set_view(view);
     unselect(view);
-    move_to_line(view, loc->line);
-    move_to_column(view, loc->column);
+    move_to_filepos(view, loc->line, loc->column);
     return true;
 }
 

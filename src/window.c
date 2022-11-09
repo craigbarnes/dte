@@ -242,8 +242,7 @@ static void restore_cursor_from_history(const FileHistory *hist, View *v)
 {
     unsigned long row, col;
     if (file_history_find(hist, v->buffer->abs_filename, &row, &col)) {
-        move_to_line(v, row);
-        move_to_column(v, col);
+        move_to_filepos(v, row, col);
     }
 }
 
