@@ -17,8 +17,11 @@ enum {
 
 void file_history_add(FileHistory *history, unsigned long row, unsigned long col, const char *filename)
 {
+    BUG_ON(row == 0);
+    BUG_ON(col == 0);
     HashMap *map = &history->entries;
     FileHistoryEntry *e = hashmap_get(map, filename);
+
     if (e) {
         if (e == history->last) {
             e->row = row;
