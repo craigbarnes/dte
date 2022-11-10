@@ -92,10 +92,15 @@ static noreturn COLD void handle_fatal_signal(int signum)
 
 static void do_sigaction(int sig, const struct sigaction *action)
 {
-    int r = sigaction(sig, action, NULL);
-    if (unlikely(r != 0)) {
+    struct sigaction old_action;
+    if (unlikely(sigaction(sig, action, &old_action) != 0)) {
         const char *err = strerror(errno);
         LOG_ERROR("failed to set disposition for signal %d: %s", sig, err);
+        return;
+    }
+    if (unlikely(old_action.sa_handler == SIG_IGN)) {
+        const char *str = strsignal(sig);
+        LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
     }
 }
 
