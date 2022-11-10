@@ -478,6 +478,7 @@ void remove_frame(EditorState *e, Frame *f)
         free_frame(f);
         return;
     }
+
     ptr_array_remove(&parent->frames, f);
     free_frame(f);
 

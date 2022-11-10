@@ -135,6 +135,8 @@ static void test_deinit(TestContext *ctx)
     EXPECT_EQ(e->colors.other.count, 0);
     EXPECT_EQ(e->colors.other.mask, 0);
     EXPECT_NULL(e->colors.other.entries);
+
+    EXPECT_TRUE(log_close());
 }
 
 static void run_tests(TestContext *ctx, const TestGroup *g)
