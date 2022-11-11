@@ -19,6 +19,12 @@ default:
         - make check
         - make clean && make check LDFLAGS=-static
         - ldd dte || true
+
+        # Ensure build works with no detected features (test fallbacks)
+        - echo > build/feature.h
+        - make check
+        - cat build/feature.h
+
         - make clean && make DEBUG=0 && make installcheck
         - strip dte && du -k -h dte
         - tools/objsize.sh dte
