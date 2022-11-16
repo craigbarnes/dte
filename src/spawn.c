@@ -129,17 +129,23 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
         }
 
         for (size_t i = 0; i < ARRAYLEN(ctx->outputs); i++) {
-            const struct pollfd *pfd = fds + i + 1;
+            struct pollfd *pfd = fds + i + 1;
             if (pfd->revents & POLLIN) {
                 size_t max_read = 8192;
                 string_reserve_space(&ctx->outputs[i], max_read);
                 char *buf = ctx->outputs[i].buffer + ctx->outputs[i].len;
                 ssize_t rc = xread(pfd->fd, buf, max_read);
-                if (unlikely(rc <= 0)) {
-                    if (rc < 0) {
-                        perror_msg("read");
+                if (unlikely(rc < 0)) {
+                    perror_msg("read");
+                    return;
+                }
+                if (rc == 0) { // EOF
+                    if (xclose(pfd->fd)) {
+                        perror_msg("close");
+                        return;
                     }
-                    break;
+                    pfd->fd = -1;
+                    continue;
                 }
                 ctx->outputs[i].len += rc;
             }
