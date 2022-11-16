@@ -392,35 +392,42 @@ static void test_ascii(TestContext *ctx)
     EXPECT_FALSE(mem_equal_icase(s1, s2, 7));
     EXPECT_FALSE(mem_equal_icase(s1, s2, 8));
 
-    locale_t c = newlocale(LC_CTYPE_MASK, "C", (locale_t)0);
-    ASSERT_TRUE(c != (locale_t)0);
+    // Query the current locale
+    const char *locale = setlocale(LC_CTYPE, NULL);
+    ASSERT_NONNULL(locale);
 
-    // Check ascii_*() functions/macros behave like the corresponding
-    // <ctype.h> macros in the standard "C" locale
+    // Copy the locale string (which may be in static storage)
+    char *saved_locale = xstrdup(locale);
+
+    // Check that the ascii_is*() functions behave like their corresponding
+    // <ctype.h> macros, when in the standard "C" locale
+    ASSERT_NONNULL(setlocale(LC_CTYPE, "C"));
     for (int i = -1; i < 256; i++) {
-        EXPECT_EQ(ascii_isalpha(i), !!isalpha_l(i, c));
-        EXPECT_EQ(ascii_isalnum(i), !!isalnum_l(i, c));
-        EXPECT_EQ(ascii_islower(i), !!islower_l(i, c));
-        EXPECT_EQ(ascii_isupper(i), !!isupper_l(i, c));
-        EXPECT_EQ(ascii_iscntrl(i), !!iscntrl_l(i, c));
-        EXPECT_EQ(ascii_isdigit(i), !!isdigit_l(i, c));
-        EXPECT_EQ(ascii_isblank(i), !!isblank_l(i, c));
-        EXPECT_EQ(ascii_isprint(i), !!isprint_l(i, c));
-        EXPECT_EQ(u_is_ascii_upper(i), !!isupper_l(i, c));
-        EXPECT_EQ(hex_decode(i) <= 0xF, !!isxdigit_l(i, c));
-        EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha_l(i, c) || i == '_');
-        EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum_l(i, c) || i == '_');
+        EXPECT_EQ(ascii_isalpha(i), !!isalpha(i));
+        EXPECT_EQ(ascii_isalnum(i), !!isalnum(i));
+        EXPECT_EQ(ascii_islower(i), !!islower(i));
+        EXPECT_EQ(ascii_isupper(i), !!isupper(i));
+        EXPECT_EQ(ascii_iscntrl(i), !!iscntrl(i));
+        EXPECT_EQ(ascii_isdigit(i), !!isdigit(i));
+        EXPECT_EQ(ascii_isblank(i), !!isblank(i));
+        EXPECT_EQ(ascii_isprint(i), !!isprint(i));
+        EXPECT_EQ(u_is_ascii_upper(i), !!isupper(i));
+        EXPECT_EQ(hex_decode(i) <= 0xF, !!isxdigit(i));
+        EXPECT_EQ(is_alpha_or_underscore(i), !!isalpha(i) || i == '_');
+        EXPECT_EQ(is_alnum_or_underscore(i), !!isalnum(i) || i == '_');
         if (i != '\v' && i != '\f') {
-            EXPECT_EQ(ascii_isspace(i), !!isspace_l(i, c));
-            EXPECT_EQ(ascii_is_nonspace_cntrl(i), !!iscntrl_l(i, c) && !isspace_l(i, c));
+            EXPECT_EQ(ascii_isspace(i), !!isspace(i));
+            EXPECT_EQ(ascii_is_nonspace_cntrl(i), !!iscntrl(i) && !isspace(i));
         }
         if (i != -1) {
-            EXPECT_EQ(ascii_tolower(i), tolower_l(i, c));
-            EXPECT_EQ(ascii_toupper(i), toupper_l(i, c));
+            EXPECT_EQ(ascii_tolower(i), tolower(i));
+            EXPECT_EQ(ascii_toupper(i), toupper(i));
         }
     }
 
-    freelocale(c);
+    // Restore the original locale
+    setlocale(LC_CTYPE, saved_locale);
+    free(saved_locale);
 }
 
 static void test_base64_decode(TestContext *ctx)
