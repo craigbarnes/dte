@@ -125,7 +125,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
                 continue;
             }
             perror_msg("poll");
-            break;
+            return;
         }
 
         for (size_t i = 0; i < ARRAYLEN(ctx->outputs); i++) {
@@ -155,13 +155,13 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             ssize_t rc = xwrite(fds[0].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (unlikely(rc < 0)) {
                 perror_msg("write");
-                break;
+                return;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
                 if (xclose(fds[0].fd)) {
                     perror_msg("close");
-                    break;
+                    return;
                 }
                 fds[0].fd = -1;
             }
@@ -184,7 +184,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             }
         }
         if (active_fds == 0) {
-            break;
+            return;
         }
     }
 }
