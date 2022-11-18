@@ -1,7 +1,8 @@
 name: Test
 on: [push]
+
 jobs:
-    check:
+    macos:
         strategy:
             matrix:
                 os: [macos-12, macos-11]
@@ -10,3 +11,12 @@ jobs:
             - uses: actions/checkout@v3
             - run: brew install make
             - run: gmake check V=1 DEBUG=3 WERROR=1
+
+    linux:
+        strategy:
+            matrix:
+                os: [ubuntu-22.04, ubuntu-20.04]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - uses: actions/checkout@v3
+            - run: make check V=1 DEBUG=3 WERROR=1
