@@ -1,5 +1,5 @@
 name: Test
-on: [push]
+runs-on: [push]
 jobs:
     check:
         strategy:
