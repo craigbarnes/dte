@@ -141,12 +141,18 @@ static void test_deinit(TestContext *ctx)
 
 static void run_tests(TestContext *ctx, const TestGroup *g)
 {
-    ASSERT_TRUE(g->nr_tests != 0);
-    ASSERT_NONNULL(g->tests);
+    // Note: we avoid using test.h assertions in this function, in order to
+    // avoid artificially inflating ctx->passed
+    if (unlikely(g->nr_tests == 0 || !g->tests)) {
+        fputs("Error: TestGroup with no entries\n", stderr);
+        abort();
+    }
 
     for (const TestEntry *t = g->tests, *end = t + g->nr_tests; t < end; t++) {
-        ASSERT_NONNULL(t->func);
-        ASSERT_NONNULL(t->name);
+        if (unlikely(!t->name || !t->func)) {
+            fputs("Error: TestEntry with NULL name or function\n", stderr);
+            abort();
+        }
         unsigned int prev_failed = ctx->failed;
         unsigned int prev_passed = ctx->passed;
         t->func(ctx);
