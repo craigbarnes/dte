@@ -5,4 +5,5 @@ jobs:
         runs-on: macos-12
         steps:
             - uses: actions/checkout@v3
-            - run: make check V=1 DEBUG=3 WERROR=1
+            - run: brew install make
+            - run: gmake check V=1 DEBUG=3 WERROR=1
