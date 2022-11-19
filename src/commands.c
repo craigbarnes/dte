@@ -671,8 +671,10 @@ static void cmd_ft(EditorState *e, const CommandArgs *a)
 
 static void cmd_hi(EditorState *e, const CommandArgs *a)
 {
+    TermColorCapabilityType color_type = e->terminal.color_type;
+    ColorScheme *colors = &e->colors;
     if (unlikely(a->nr_args == 0)) {
-        exec_builtin_color_reset(&e->colors, e->terminal.color_type);
+        exec_builtin_color_reset(colors, color_type);
         goto update;
     }
 
@@ -690,7 +692,6 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
         return;
     }
 
-    TermColorCapabilityType color_type = e->terminal.color_type;
     bool optimize = e->options.optimize_true_color;
     int32_t fg = color_to_nearest(color.fg, color_type, optimize);
     int32_t bg = color_to_nearest(color.bg, color_type, optimize);
@@ -704,13 +705,13 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
 
     color.fg = fg;
     color.bg = bg;
-    set_highlight_color(&e->colors, a->args[0], &color);
+    set_highlight_color(colors, a->args[0], &color);
 
 update:
     // Don't call update_all_syntax_colors() needlessly.
     // It is called right after config has been loaded.
     if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_colors(&e->syntaxes, &e->colors);
+        update_all_syntax_colors(&e->syntaxes, colors);
         mark_everything_changed(e);
     }
 }
