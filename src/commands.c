@@ -317,8 +317,8 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
             }
         } else {
             error_msg (
-                "The buffer is modified. "
-                "Save or run 'close -f' to close without saving."
+                "The buffer is modified; "
+                "save or run 'close -f' to close without saving"
             );
             return;
         }
@@ -1278,10 +1278,7 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
                 }
                 return;
             } else {
-                error_msg (
-                    "Save modified files or run 'quit -f' to quit"
-                    " without saving."
-                );
+                error_msg("Save modified files or run 'quit -f' to quit without saving");
                 return;
             }
         }
@@ -1582,8 +1579,8 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
             && stat_changed(buffer, &st)
         ) {
             error_msg (
-                "File has been modified by another process."
-                " Use 'save -f' to force overwrite."
+                "File has been modified by another process; "
+                "use 'save -f' to force overwrite"
             );
             goto error;
         }
