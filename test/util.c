@@ -133,10 +133,6 @@ static void test_xmalloc(TestContext *ctx)
     EXPECT_MEMEQ(str, "\0\0\0\0", 4);
     free(str);
 
-    str = xmemdup_literal("string literal");
-    EXPECT_STREQ(str, "string literal");
-    free(str);
-
     str = xstrslice("one two three", 4, 7);
     EXPECT_STREQ(str, "two");
     free(str);
