@@ -60,26 +60,9 @@ Note: auto-generated tarballs from GitHub/GitLab can (and
 have long-term stable checksums. Use the tarballs from the [releases]
 page, unless you're prepared to deal with future checksum failures.
 
-Desktop menu entry
-------------------
-
-A desktop menu entry for `dte` can be added by running:
-
-    make install-desktop-file
-
-Any variable overrides specified for `make install` must also be specified
-for `make install-desktop-file`. The easiest way to do this is simply to
-run both at the same time, e.g.:
-
-    make install install-desktop-file V=1 prefix=/usr DESTDIR=PKG
-
-**Note**: the `install-desktop-file` target requires [desktop-file-utils]
-to be installed.
-
 
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [syntax highlighters]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html
 [libgit issue #4343]: https://github.com/libgit2/libgit2/issues/4343
-[desktop-file-utils]: https://www.freedesktop.org/wiki/Software/desktop-file-utils/
