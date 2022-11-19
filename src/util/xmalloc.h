@@ -5,6 +5,7 @@
 #include <string.h>
 #include "macros.h"
 
+#define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
 #define xnew(type, n) xmalloc(size_multiply(sizeof(type), (n)))
 #define xnew0(type, n) xcalloc(size_multiply(sizeof(type), (n)))
 

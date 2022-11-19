@@ -47,15 +47,12 @@ static const TermColor *find_real_color_const(const ColorScheme *colors, const c
 
 void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color)
 {
-    TermColor *c = find_real_color(colors, name);
-    if (c) {
-        *c = *color;
-        return;
+    TermColor *existing = find_real_color(colors, name);
+    if (existing) {
+        *existing = *color;
+    } else {
+        hashmap_insert(&colors->other, xstrdup(name), XMEMDUP(color));
     }
-
-    c = xnew(TermColor, 1);
-    *c = *color;
-    hashmap_insert(&colors->other, xstrdup(name), c);
 }
 
 const TermColor *find_color(const ColorScheme *colors, const char *name)
