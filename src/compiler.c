@@ -23,13 +23,7 @@ UNITTEST {
 static Compiler *find_or_add_compiler(HashMap *compilers, const char *name)
 {
     Compiler *c = find_compiler(compilers, name);
-    if (c) {
-        return c;
-    }
-
-    c = xnew0(Compiler, 1);
-    hashmap_insert(compilers, xstrdup(name), c);
-    return c;
+    return c ? c : hashmap_insert(compilers, xstrdup(name), xnew0(Compiler, 1));
 }
 
 Compiler *find_compiler(const HashMap *compilers, const char *name)

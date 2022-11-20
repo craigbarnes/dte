@@ -130,8 +130,7 @@ const InternedRegexp *regexp_intern(const char *pattern)
     }
 
     ir->str = xstrdup(pattern);
-    hashmap_insert(&interned_regexps, ir->str, ir);
-    return ir;
+    return hashmap_insert(&interned_regexps, ir->str, ir);
 }
 
 bool regexp_is_interned(const char *pattern)

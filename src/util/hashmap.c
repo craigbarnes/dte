@@ -199,12 +199,13 @@ error:
     return err;
 }
 
-void hashmap_insert(HashMap *map, char *key, void *value)
+void *hashmap_insert(HashMap *map, char *key, void *value)
 {
     int err = hashmap_do_insert(map, key, value, NULL);
     if (unlikely(err)) {
         fatal_error(__func__, err);
     }
+    return value;
 }
 
 void *hashmap_insert_or_replace(HashMap *map, char *key, void *value)

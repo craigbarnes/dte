@@ -1618,7 +1618,7 @@ static void test_hashmap(TestContext *ctx)
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
         ASSERT_EQ(key[sizeof(strings[0]) - 1], '\0');
-        hashmap_insert(&map, xstrdup(key), (void*)value);
+        EXPECT_PTREQ(hashmap_insert(&map, xstrdup(key), (void*)value), value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1655,14 +1655,14 @@ static void test_hashmap(TestContext *ctx)
     it = hashmap_iter(&map);
     EXPECT_FALSE(hashmap_next(&it));
 
-    hashmap_insert(&map, xstrdup("new"), (void*)value);
+    EXPECT_PTREQ(hashmap_insert(&map, xstrdup("new"), (void*)value), value);
     ASSERT_NONNULL(hashmap_find(&map, "new"));
     EXPECT_STREQ(hashmap_find(&map, "new")->key, "new");
     EXPECT_EQ(map.count, 1);
 
     FOR_EACH_I(i, strings) {
         const char *key = strings[i];
-        hashmap_insert(&map, xstrdup(key), (void*)value);
+        EXPECT_PTREQ(hashmap_insert(&map, xstrdup(key), (void*)value), value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);
@@ -1711,7 +1711,7 @@ static void test_hashmap(TestContext *ctx)
     for (size_t i = 1; i <= 380; i++) {
         char key[4];
         EXPECT_EQ(xsnprintf(key, sizeof key, "%zu", i), size_str_width(i));
-        hashmap_insert(&map, xstrdup(key), (void*)value);
+        EXPECT_PTREQ(hashmap_insert(&map, xstrdup(key), (void*)value), value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
         EXPECT_STREQ(e->key, key);

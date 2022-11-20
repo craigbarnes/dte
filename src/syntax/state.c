@@ -69,12 +69,11 @@ static State *find_or_add_state(const char *name)
     st->defined = false;
     st->type = STATE_INVALID;
 
-    hashmap_insert(&current_syntax->states, st->name, st);
-    if (current_syntax->states.count == 1) {
+    if (current_syntax->states.count == 0) {
         current_syntax->start_state = st;
     }
 
-    return st;
+    return hashmap_insert(&current_syntax->states, st->name, st);
 }
 
 static State *reference_state(const char *name)
