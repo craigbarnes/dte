@@ -30,7 +30,7 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
 static size_t unicode_escape(const char *str, size_t count, String *buf)
 {
     // Note: `u` doesn't need to be initialized here, but `gcc -Og`
-    // gives a spurious -Wmaybe-uninitialized warning if it's not.
+    // gives a spurious -Wmaybe-uninitialized warning if it's not
     unsigned int u = 0;
     static_assert(sizeof(u) >= 4);
     size_t n = buf_parse_hex_uint(str, count, &u);

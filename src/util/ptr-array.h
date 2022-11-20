@@ -39,15 +39,15 @@ static inline void ptr_array_init(PointerArray *array, size_t capacity)
     array->alloc = capacity;
 }
 
-// Free each pointer and then free the array.
+// Free each pointer and then free the array
 NONNULL_ARGS
 static inline void ptr_array_free(PointerArray *array)
 {
     ptr_array_free_cb(array, free);
 }
 
-// Free the array itself but not the pointers. Useful when the pointers
-// are "borrowed" references.
+// Free the array itself but not the pointers (useful when the
+// pointers are "borrowed" references)
 NONNULL_ARGS
 static inline void ptr_array_free_array(PointerArray *array)
 {

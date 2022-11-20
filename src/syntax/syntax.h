@@ -38,10 +38,10 @@ typedef struct {
     struct State *destination;
 
     // If condition has no emit name this is set to destination state's
-    // emit name or list name (COND_INLIST).
+    // emit name or list name (COND_INLIST)
     char *emit_name;
 
-    // Set after all colors have been added (config loaded).
+    // Set after all colors have been added (config loaded)
     const TermColor *emit_color;
 } Action;
 

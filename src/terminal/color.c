@@ -328,7 +328,7 @@ int32_t color_to_nearest(int32_t color, TermColorCapabilityType type, bool optim
     BUG("unexpected TermColorCapabilityType value");
     // This should never be reached, but it silences compiler warnings
     // when DEBUG == 0 and __builtin_unreachable() isn't supported
-    // (i.e. BUG() expands to nothing).
+    // (i.e. BUG() expands to nothing)
     return COLOR_DEFAULT;
 }
 

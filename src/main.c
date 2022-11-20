@@ -463,7 +463,7 @@ loop_break:;
 
     // This must be done before calling init_logging(), otherwise an
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
-    // cause the logging fd to be opened as STDIN_FILENO.
+    // cause the logging fd to be opened as STDIN_FILENO
     int std_fds[2] = {-1, -1};
     ExitCode r = init_std_fds(std_fds);
     if (unlikely(r != EX_OK)) {

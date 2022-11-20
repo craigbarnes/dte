@@ -168,7 +168,7 @@ void update_screen_size(Terminal *term, Frame *root_frame)
     }
 
     // TODO: remove minimum width/height and instead make update_screen()
-    // do something sensible when the terminal dimensions are tiny.
+    // do something sensible when the terminal dimensions are tiny
     term->width = MAX(width, 3);
     term->height = MAX(height, 3);
 

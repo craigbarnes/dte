@@ -64,7 +64,7 @@ static bool decode_and_add_blocks(Buffer *b, const unsigned char *buf, size_t si
         }
     }
 
-    // Skip BOM only if it matches the specified file encoding.
+    // Skip BOM only if it matches the specified file encoding
     if (bom_type != UNKNOWN_ENCODING && bom_type == b->encoding.type) {
         const ByteOrderMark *bom = get_bom_for_encoding(bom_type);
         if (bom) {
@@ -114,8 +114,8 @@ static void fixup_blocks(Buffer *b)
         Block *blk = block_new(1);
         list_add_before(&blk->node, &b->blocks);
     } else {
-        // Incomplete lines are not allowed because they are
-        // special cases and cause lots of trouble.
+        // Incomplete lines are not allowed because they are special cases
+        // and cause lots of trouble
         Block *blk = BLOCK(b->blocks.prev);
         if (blk->size && blk->data[blk->size - 1] != '\n') {
             if (blk->size == blk->alloc) {
@@ -372,8 +372,8 @@ bool save_buffer (
     char tmp[8192];
     tmp[0] = '\0';
 
-    // Don't use temporary file when saving file in /tmp because
-    // crontab command doesn't like the file to be replaced.
+    // Don't use temporary file when saving file in /tmp because crontab
+    // command doesn't like the file to be replaced
     if (!str_has_prefix(filename, "/tmp/")) {
         // Try to use temporary file first (safer)
         const char *base = path_basename(filename);
@@ -386,7 +386,7 @@ bool save_buffer (
                 // No write permission to the directory?
                 tmp[0] = '\0';
             } else if (b->file.mode) {
-                // Preserve ownership and mode of the original file if possible.
+                // Preserve ownership and mode of the original file if possible
                 UNUSED int u1 = fchown(fd, b->file.uid, b->file.gid);
                 UNUSED int u2 = fchmod(fd, b->file.mode);
             } else {
@@ -397,11 +397,11 @@ bool save_buffer (
     }
 
     if (fd < 0) {
-        // Overwrite the original file (if exists) directly.
+        // Overwrite the original file directly (if it exists).
         // Ownership is preserved automatically if the file exists.
         mode_t mode = b->file.mode;
         if (mode == 0) {
-            // New file.
+            // New file
             mode = 0666 & ~get_umask();
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
@@ -467,7 +467,7 @@ error:
     if (*tmp) {
         unlink(tmp);
     } else {
-        // Not using temporary file therefore mtime may have changed.
+        // Not using temporary file, therefore mtime may have changed.
         // Update stat to avoid "File has been modified by someone else"
         // error later when saving the file again.
         buffer_stat(b, filename);

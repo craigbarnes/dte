@@ -75,8 +75,8 @@ int xclose(int fd)
         goto out;
     }
 
-    // If the first close() call failed with EINTR, retry until
-    // it succeeds or fails with a different error.
+    // If the first close() call failed with EINTR, retry until it succeeds or
+    // fails with a different error
     do {
         r = close(fd);
     } while (r && errno == EINTR);

@@ -206,7 +206,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     }
 
     // Set indent_size to "tab" if indent_size is not specified and
-    // indent_style is set to "tab".
+    // indent_style is set to "tab"
     if (
         data.options.indent_size == 0
         && data.options.indent_style == INDENT_STYLE_TAB
@@ -215,7 +215,7 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
     }
 
     // Set indent_size to tab_width if indent_size is "tab" and
-    // tab_width is specified.
+    // tab_width is specified
     if (data.options.indent_size_is_tab && data.options.tab_width > 0) {
         data.options.indent_size = data.options.tab_width;
     }

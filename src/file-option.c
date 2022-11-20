@@ -36,7 +36,7 @@ void set_editorconfig_options(Buffer *b)
     if (!path) {
         // For buffers with no associated filename, use a dummy path of
         // "$PWD/__", to obtain generic settings for the working directory
-        // or the user's default settings.
+        // or the user's default settings
         static const char suffix[] = "/__";
         if (unlikely(!getcwd(cwd, sizeof(cwd) - sizeof(suffix)))) {
             return;

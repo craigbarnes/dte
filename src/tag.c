@@ -30,7 +30,7 @@ static int visibility_cmp(const Tag *a, const Tag *b)
         b_this_file = current_filename && strview_equal_cstring(&b->filename, current_filename);
     }
 
-    // Tags local to other file than current are not interesting.
+    // Tags local to other file than current are not interesting
     if (a->local && !a_this_file) {
         // a is not interesting
         if (b->local && !b_this_file) {
@@ -67,7 +67,7 @@ static int kind_cmp(const Tag *a, const Tag *b)
         return 0;
     }
 
-    // Struct member (m) is not very interesting.
+    // Struct member (m) is not very interesting
     if (a->kind == 'm') {
         return 1;
     }
@@ -75,7 +75,7 @@ static int kind_cmp(const Tag *a, const Tag *b)
         return -1;
     }
 
-    // Global variable (v) is not very interesting.
+    // Global variable (v) is not very interesting
     if (a->kind == 'v') {
         return 1;
     }

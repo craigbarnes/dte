@@ -77,7 +77,7 @@
 #endif
 
 // __has_extension() is a Clang macro used to determine if a feature is
-// available even if not standardized in the current "-std" mode.
+// available even if not standardized in the current "-std" mode
 #ifdef __has_extension
     #define HAS_EXTENSION(x) __has_extension(x)
 #else

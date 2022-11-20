@@ -403,9 +403,8 @@ void update_range(EditorState *e, const View *v, long y1, long y2)
         info.line_nr++;
 
         if (next_changed && i + 1 == y2 && y2 < edit_h) {
-            // More lines need to be updated not because their
-            // contents have changed but because their highlight
-            // state has.
+            // More lines need to be updated not because their contents have
+            // changed but because their highlight state has
             y2++;
         }
     }

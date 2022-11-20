@@ -58,7 +58,7 @@ void select_block(View *view)
     int level = 0;
 
     // If current line does not match \{\s*$ but matches ^\s*\} then
-    // cursor is likely at end of the block you want to select.
+    // cursor is likely at end of the block you want to select
     fetch_this_line(&bi, &line);
     if (!line_has_opening_brace(line) && line_has_closing_brace(line)) {
         block_iter_prev_line(&bi);
@@ -269,8 +269,8 @@ static void insert_nl(View *view)
         fill_line_ref(&bi, &line);
         line.length = len;
         if (ws_only(&line)) {
-            // This line is (or will become) white space only.
-            // Find previous non whitespace only line.
+            // This line is (or will become) white space only; find previous,
+            // non whitespace only line
             if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
                 fill_line_ref(&bi, &line);
                 ins = get_indent_for_next_line(options, &line);

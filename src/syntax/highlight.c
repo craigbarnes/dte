@@ -415,8 +415,8 @@ void hl_insert(Buffer *b, size_t first, size_t lines)
     }
 
     if (last + 1 >= s->count) {
-        // Last already highlighted lines changed.
-        // There's nothing to gain, throw them away.
+        // Last already highlighted lines changed; there's nothing to
+        // gain, so throw them away
         s->count = first + 1;
         return;
     }
@@ -452,14 +452,14 @@ void hl_delete(Buffer *b, size_t first, size_t deleted_nl)
     }
 
     if (last + 1 >= s->count) {
-        // Last already highlighted lines changed.
-        // There's nothing to gain, throw them away.
+        // Last already highlighted lines changed; there's nothing to
+        // gain, so throw them away
         s->count = first + 1;
         return;
     }
 
-    // There are already highlighted lines after changed lines.
-    // Try to save the work.
+    // There are already highlighted lines after changed lines; try to
+    // save the work
 
     // Remove deleted lines (states)
     if (deleted_nl) {

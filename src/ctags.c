@@ -13,8 +13,8 @@ static size_t parse_excmd(Tag *t, const char *buf, size_t size)
 
     const char open_delim = buf[0];
     if (open_delim == '/' || open_delim == '?') {
-        // The search pattern is not a real regular expression.
-        // Need to escape special characters.
+        // The search pattern is not a real regular expression; special
+        // characters need to be escaped
         char *pattern = xmalloc(size * 2);
         for (size_t i = 1, j = 0; i < size; i++) {
             if (buf[i] == '\\' && i + 1 < size) {

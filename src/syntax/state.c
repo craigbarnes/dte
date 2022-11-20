@@ -296,7 +296,7 @@ static void cmd_heredocbegin(EditorState *e, const CommandArgs *a)
     current_state = NULL;
 
     // Normally merge() marks subsyntax used but in case of heredocs merge()
-    // is not called when syntax file is loaded.
+    // is not called when syntax file is loaded
     subsyn->used = true;
 }
 

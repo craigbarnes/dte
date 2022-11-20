@@ -96,10 +96,10 @@ State *merge_syntax(Syntax *syn, SyntaxMerge *merge, const ColorScheme *colors)
         }
 
         // Mark unvisited so that state that is used only as a return
-        // state gets visited.
+        // state gets visited
         s->visited = false;
 
-        // Don't complain about unvisited copied states.
+        // Don't complain about unvisited copied states
         s->copied = true;
     }
 

@@ -708,8 +708,8 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
     set_highlight_color(colors, a->args[0], &color);
 
 update:
-    // Don't call update_all_syntax_colors() needlessly.
-    // It is called right after config has been loaded.
+    // Don't call update_all_syntax_colors() needlessly; it's called
+    // right after config has been loaded
     if (e->status != EDITOR_INITIALIZING) {
         update_all_syntax_colors(&e->syntaxes, colors);
         mark_everything_changed(e);
@@ -1265,8 +1265,8 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
             // Activate modified buffer
             View *v = window_find_view(e->window, b);
             if (!v) {
-                // Buffer isn't open in current window.
-                // Activate first window of the buffer.
+                // Buffer isn't open in current window; activate first window
+                // of the buffer
                 v = b->views.ptrs[0];
                 e->window = v->window;
                 mark_everything_changed(e);
@@ -1530,7 +1530,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
                 cmdline_set_text(&e->cmdline, "save ");
                 // This branch is not really an error, but we still return via
                 // the "error" label because we need to clean up memory and
-                // that's all it's used for currently.
+                // that's all it's used for currently
                 goto error;
             } else {
                 error_msg("No filename");

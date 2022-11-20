@@ -39,7 +39,7 @@ enum {
     COLOR_WHITE = 15,
 
     // This bit flag is used to allow 24-bit RGB colors to be differentiated
-    // from basic colors (e.g. #000004 vs. COLOR_BLUE).
+    // from basic colors (e.g. #000004 vs. COLOR_BLUE)
     COLOR_FLAG_RGB = INT32_C(1) << 24
 };
 

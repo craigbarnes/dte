@@ -103,7 +103,7 @@ View *window_open_buffer (
         return NULL;
     }
     if (unlikely(b->file.mode == 0 && dir_missing)) {
-        // New file in non-existing directory. This is usually a mistake.
+        // New file in non-existing directory; this is usually a mistake
         error_msg("Error opening %s: Directory does not exist", filename);
         remove_and_free_buffer(&e->buffers, b);
         free(absolute);
@@ -189,7 +189,7 @@ void window_free(Window *w)
     free(w);
 }
 
-// Remove view from v->window and v->buffer->views and free it.
+// Remove view from v->window and v->buffer->views and free it
 size_t remove_view(View *v)
 {
     Window *w = v->window;

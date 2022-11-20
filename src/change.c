@@ -143,11 +143,11 @@ void begin_change_chain(void)
 void end_change_chain(View *view)
 {
     if (change_barrier) {
-        // There were no changes in this change chain.
+        // There were no changes in this change chain
         free(change_barrier);
         change_barrier = NULL;
     } else {
-        // There were some changes. Add end of chain marker.
+        // There were some changes; add end of chain marker
         add_change(view->buffer, alloc_change());
     }
 }

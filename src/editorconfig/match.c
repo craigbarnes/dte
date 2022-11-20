@@ -128,7 +128,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
         case '[':
             // The entire bracket expression is handled in a separate
             // loop because the POSIX regex escaping rules are different
-            // in that context.
+            // in that context
             i += handle_bracket_expression(pattern + i, pattern_len - i, &buf);
             break;
         case '{': {

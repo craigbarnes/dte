@@ -171,7 +171,7 @@ static int intmap_do_insert(IntMap *map, uint32_t key, void *value, void **old_v
         size_t new_size = map->mask + 1;
         if (map->count > map->tombstones || new_size <= 256) {
             // Only increase the size of the table when the number of
-            // real entries is higher than the number of tombstones.
+            // real entries is higher than the number of tombstones
             new_size <<= 1;
             if (unlikely(new_size == 0)) {
                 err = EOVERFLOW;

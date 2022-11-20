@@ -619,12 +619,9 @@ static void update_screen(EditorState *e, const ScreenState *s)
         if (s->vx != view->vx || s->vy != view->vy) {
             mark_all_lines_changed(buffer);
         } else {
-            // Because of trailing whitespace highlighting and
-            // highlighting current line in different color
-            // the lines cy (old cursor y) and v->cy need
-            // to be updated.
-            //
-            // Always update at least current line.
+            // Because of trailing whitespace highlighting and highlighting
+            // current line in different color, the lines cy (old cursor y) and
+            // v->cy need to be updated. Always update at least current line.
             buffer_mark_lines_changed(buffer, s->cy, view->cy);
         }
         if (s->is_modified != buffer_modified(buffer)) {

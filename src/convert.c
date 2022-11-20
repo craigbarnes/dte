@@ -161,7 +161,7 @@ struct cconv {
     char rbuf[4];
     size_t rcount;
 
-    // Input character size in bytes. zero for UTF-8.
+    // Input character size in bytes, or zero for UTF-8
     size_t char_size;
 };
 
@@ -193,7 +193,7 @@ static size_t iconv_wrapper (
     size_t *restrict outbytesleft
 ) {
     // POSIX defines the second parameter of iconv(3) as "char **restrict"
-    // but NetBSD declares it as "const char **restrict".
+    // but NetBSD declares it as "const char **restrict"
     #ifdef __NetBSD__
      #if HAS_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
       IGNORE_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
@@ -310,8 +310,8 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
 
         switch (rc) {
         case EINVAL:
-            // Incomplete character at end of input buffer.
-            // Try again with more input data.
+            // Incomplete character at end of input buffer; try again
+            // with more input data
             continue;
         case EILSEQ:
             // Invalid multibyte sequence
@@ -351,7 +351,7 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
         size_t skip;
         switch (xiconv(c, (char**)&ib, &ic)) {
         case EINVAL:
-            // Incomplete character at end of input buffer.
+            // Incomplete character at end of input buffer
             if (ic < sizeof(c->tbuf)) {
                 memcpy(c->tbuf, ib, ic);
                 c->tcount = ic;
@@ -361,7 +361,7 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
             ic = 0;
             break;
         case EILSEQ:
-            // Invalid multibyte sequence.
+            // Invalid multibyte sequence
             skip = handle_invalid(c, ib, ic);
             ic -= skip;
             ib += skip;
@@ -397,7 +397,7 @@ static struct cconv *cconv_from_utf8(const char *encoding)
 static void cconv_flush(struct cconv *c)
 {
     if (c->tcount > 0) {
-        // Replace incomplete character at end of input buffer.
+        // Replace incomplete character at end of input buffer
         LOG_DEBUG("incomplete character at EOF");
         add_replacement(c);
         c->tcount = 0;
