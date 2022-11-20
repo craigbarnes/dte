@@ -134,18 +134,17 @@ pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
     xclose(ep[1]);
     int error = 0;
     ssize_t rc = xread(ep[0], &error, sizeof(error));
-    int saved_errno = errno;
+    int xread_errno = errno;
     xclose(ep[0]);
+    BUG_ON(rc > sizeof(error));
 
-    if (rc > 0 && rc != sizeof(error)) {
-        error = EPIPE;
-    }
-    if (rc < 0) {
-        error = saved_errno;
-    }
     if (rc == 0) {
         // Child exec was successful
         return pid;
+    }
+
+    if (unlikely(rc != sizeof(error))) {
+        error = (rc < 0) ? xread_errno : EPIPE;
     }
 
     int status;
