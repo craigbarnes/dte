@@ -6,12 +6,12 @@ variables:
 default:
     before_script:
         - export DEBUG=3 WERROR=1 V=1
+        - export CC="ccache ${CC:-gcc}"
         - make vars
 
 .test:
     stage: test
     script:
-        - export CC="ccache ${CC:-gcc}"
         - make
         - cat build/feature.h
         - ldd dte
@@ -49,7 +49,7 @@ debian-10:
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
 
 debian-11:
-    extends: .test
+    stage: test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
     script:
         - make check CC='ccache clang'
