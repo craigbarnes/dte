@@ -186,12 +186,12 @@ int main(void)
     };
 
     run_tests(&ctx, &init_tests);
+    run_tests(&ctx, &util_tests);
     run_tests(&ctx, &command_tests);
     run_tests(&ctx, &option_tests);
     run_tests(&ctx, &editorconfig_tests);
     run_tests(&ctx, &encoding_tests);
     run_tests(&ctx, &filetype_tests);
-    run_tests(&ctx, &util_tests);
     run_tests(&ctx, &terminal_tests);
     run_tests(&ctx, &cmdline_tests);
     run_tests(&ctx, &history_tests);
