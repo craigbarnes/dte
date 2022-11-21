@@ -83,33 +83,36 @@ static void test_hl_line(TestContext *ctx)
     const Encoding enc = encoding_from_type(UTF8);
     EXPECT_EQ(enc.type, UTF8);
     EXPECT_STREQ(enc.name, "UTF-8");
-    View *v = window_open_file(e->window, "test/data/test.c", &enc);
-    ASSERT_NONNULL(v);
+    View *view = window_open_file(e->window, "test/data/test.c", &enc);
+    ASSERT_NONNULL(view);
+    Buffer *buffer = view->buffer;
+    ASSERT_NONNULL(buffer);
 
+    const ColorScheme *colors = &e->colors;
     const size_t line_nr = 5;
-    ASSERT_TRUE(v->buffer->nl >= line_nr);
-    hl_fill_start_states(v->buffer, &e->colors, v->buffer->nl);
-    block_iter_goto_line(&v->cursor, line_nr - 1);
-    view_update_cursor_x(v);
-    view_update_cursor_y(v);
-    view_update(v, 0);
-    ASSERT_EQ(v->cx, 0);
-    ASSERT_EQ(v->cy, line_nr - 1);
+    ASSERT_TRUE(buffer->nl >= line_nr);
+    hl_fill_start_states(buffer, colors, buffer->nl);
+    block_iter_goto_line(&view->cursor, line_nr - 1);
+    view_update_cursor_x(view);
+    view_update_cursor_y(view);
+    view_update(view, 0);
+    ASSERT_EQ(view->cx, 0);
+    ASSERT_EQ(view->cy, line_nr - 1);
 
     StringView line;
-    fetch_this_line(&v->cursor, &line);
+    fetch_this_line(&view->cursor, &line);
     ASSERT_EQ(line.length, 56);
 
     bool next_changed;
-    const TermColor **colors = hl_line(v->buffer, &e->colors, &line, line_nr, &next_changed);
-    ASSERT_NONNULL(colors);
+    const TermColor **hl = hl_line(buffer, colors, &line, line_nr, &next_changed);
+    ASSERT_NONNULL(hl);
     EXPECT_TRUE(next_changed);
 
-    const TermColor *t = find_color(&e->colors, "text");
-    const TermColor *c = find_color(&e->colors, "constant");
-    const TermColor *s = find_color(&e->colors, "string");
-    const TermColor *x = find_color(&e->colors, "special");
-    const TermColor *n = find_color(&e->colors, "numeric");
+    const TermColor *t = find_color(colors, "text");
+    const TermColor *c = find_color(colors, "constant");
+    const TermColor *s = find_color(colors, "string");
+    const TermColor *x = find_color(colors, "special");
+    const TermColor *n = find_color(colors, "numeric");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);
@@ -130,7 +133,7 @@ static void test_hl_line(TestContext *ctx)
         if (i >= ARRAYLEN(expected_colors)) {
             continue;
         }
-        IEXPECT_TRUE(same_color(colors[i], expected_colors[i]));
+        IEXPECT_TRUE(same_color(hl[i], expected_colors[i]));
     }
 
     EXPECT_EQ(i, ARRAYLEN(expected_colors));
