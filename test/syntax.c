@@ -79,11 +79,14 @@ static void test_hl_line(TestContext *ctx)
         return;
     }
 
+    const Encoding utf8 = encoding_from_type(UTF8);
+    EXPECT_EQ(utf8.type, UTF8);
+    EXPECT_STREQ(utf8.name, "UTF-8");
+
     EditorState *e = ctx->userdata;
-    const Encoding enc = encoding_from_type(UTF8);
-    EXPECT_EQ(enc.type, UTF8);
-    EXPECT_STREQ(enc.name, "UTF-8");
-    View *view = window_open_file(e->window, "test/data/test.c", &enc);
+    Window *window = e->window;
+    ASSERT_NONNULL(window);
+    View *view = window_open_file(window, "test/data/test.c", &utf8);
     ASSERT_NONNULL(view);
     Buffer *buffer = view->buffer;
     ASSERT_NONNULL(buffer);
@@ -137,7 +140,7 @@ static void test_hl_line(TestContext *ctx)
     }
 
     EXPECT_EQ(i, ARRAYLEN(expected_colors));
-    window_close(e->window);
+    window_close(window);
 }
 
 static const TestEntry tests[] = {
