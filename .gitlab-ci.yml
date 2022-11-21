@@ -17,15 +17,9 @@ default:
         - ldd dte
         - make check-whitespace
         - make check
-        - make clean && make check LDFLAGS=-static
-        - ldd dte || true
+        - make check LDFLAGS=-static
 
-        # Ensure build works with no detected features (test fallbacks)
-        - echo > build/feature.h
-        - make check
-        - cat build/feature.h
-
-        - make clean && make DEBUG=0 && make installcheck
+        - make DEBUG=0 && make installcheck
         - strip dte && du -k -h dte
         - tools/objsize.sh dte
         - make bench DEBUG=0 CFLAGS=-O3
@@ -49,39 +43,46 @@ rocky-8:
 debian-9:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-9
-    script:
-        - make check
-        - cat build/feature.h
-        - make installcheck
-        - make clean && make check CC='ccache gcc'
-        - make clean && make check CC='ccache clang'
-        - make clean && make CC='ccache arm-linux-gnueabihf-gcc'
-        - make clean && make CC='ccache aarch64-linux-gnu-gcc'
-        - export LDFLAGS=-static
-        - make clean && make check CC='ccache gcc'
-        - make clean && make check CC='ccache clang'
-        - make clean && make CC='ccache arm-linux-gnueabihf-gcc'
-        - make clean && make CC='ccache aarch64-linux-gnu-gcc'
-        - make clean && make distcheck
-        - make bench DEBUG=0 CFLAGS=-O3
 
 debian-10:
-    extends: debian-9
+    extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-10
 
 debian-11:
-    extends: debian-9
+    extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/cdev-debian-11
+    script:
+        - make check CC='ccache clang'
+        - make check CC='ccache clang' LDFLAGS=-static
+        - make check CC='ccache gcc'
+        - make check CC='ccache gcc' LDFLAGS=-static
+        - make check
+        - make installcheck
+
+        # Ensure build works with no detected features (test fallbacks)
+        - cat build/feature.h
+        - echo > build/feature.h
+        - make check
+        - cat build/feature.h
+
+        # Build with ARM cross-compilers
+        - make CC='ccache arm-linux-gnueabihf-gcc'
+        - make CC='ccache arm-linux-gnueabihf-gcc' LDFLAGS=-static
+        - make CC='ccache aarch64-linux-gnu-gcc'
+        - make CC='ccache aarch64-linux-gnu-gcc' LDFLAGS=-static
+
+        - make clean && make distcheck
+        - make bench DEBUG=0 CFLAGS=-O3
 
 android:
     extends: .test
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
     script:
-        - make clean && make CC="$CC_AARCH64"
+        - make CC="$CC_AARCH64"
         - cat build/feature.h
-        - make clean && make CC="$CC_ARMV7A"
-        - make clean && make CC="$CC_I686"
-        - make clean && make CC="$CC_X86_64"
+        - make CC="$CC_ARMV7A"
+        - make CC="$CC_I686"
+        - make CC="$CC_X86_64"
 
 coverage:
     stage: test
