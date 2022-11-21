@@ -153,14 +153,14 @@ static void run_tests(TestContext *ctx, const TestGroup *g)
             fputs("Error: TestEntry with NULL name or function\n", stderr);
             abort();
         }
-        unsigned int prev_failed = ctx->failed;
         unsigned int prev_passed = ctx->passed;
+        unsigned int prev_failed = ctx->failed;
         t->func(ctx);
-        unsigned int f = ctx->failed - prev_failed;
-        unsigned int p = ctx->passed - prev_passed;
-        fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, p);
-        if (unlikely(f > 0)) {
-            fprintf(stderr, " %4u FAILED", f);
+        unsigned int passed = ctx->passed - prev_passed;
+        unsigned int failed = ctx->failed - prev_failed;
+        fprintf(stderr, "   CHECK  %-35s  %4u passed", t->name, passed);
+        if (unlikely(failed > 0)) {
+            fprintf(stderr, " %4u FAILED", failed);
         }
         fputc('\n', stderr);
     }
