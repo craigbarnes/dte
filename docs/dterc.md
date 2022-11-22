@@ -548,13 +548,13 @@ Move current tab to position _N_ or 1 position left or right.
 
 ## Window Management Commands
 
-### **wsplit** [**-bhr**] [**-g**|**-n**|**-t**] [_filename_]...
+### **wsplit** [**-bghr**] [**-n**|**-t**|_filename_...]
 
 Split the current window.
 
 _filename_ arguments will be opened in a manner similar to the [`open`]
-command. If there are no arguments, the contents of the new window will
-be an additional view of the current buffer.
+command. If there are no _filename_ arguments, the contents of the new
+window will be an additional view of the current buffer.
 
 `-b`
 :   Add new window before current instead of after.
@@ -572,8 +572,8 @@ be an additional view of the current buffer.
 :   Split root instead of current window.
 
 `-t`
-:   Mark buffer as "temporary" (always closeable, without warnings
-    for "unsaved changes")
+:   Create a new, empty buffer and mark it as "temporary" (always
+    closeable, without warnings for "unsaved changes")
 
 ### **wclose** [**-f**|**-p**]
 

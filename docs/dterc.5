@@ -66,7 +66,7 @@ Buffer Management Commands:
 .P
 Window Management Commands:
 .br
-   \fBwsplit\fR [\fB\-bhr\fR] [\fB\-g\fR|\fB\-n\fR|\fB\-t\fR] [\fIfilename\fR]...
+   \fBwsplit\fR [\fB\-bghr\fR] [\fB\-n\fR|\fB\-t\fR|\fIfilename\fR...]
 .br
    \fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
 .br
@@ -1002,13 +1002,13 @@ Move current tab to position \fIN\fR or 1 position left or right.
 .P
 .RE
 .SS Window Management Commands
-\fBwsplit\fR [\fB\-bhr\fR] [\fB\-g\fR|\fB\-n\fR|\fB\-t\fR] [\fIfilename\fR]...
+\fBwsplit\fR [\fB\-bghr\fR] [\fB\-n\fR|\fB\-t\fR|\fIfilename\fR...]
 .RS
 Split the current window.
 .P
 \fIfilename\fR arguments will be opened in a manner similar to the \fBopen\fR
-command. If there are no arguments, the contents of the new window will
-be an additional view of the current buffer.
+command. If there are no \fIfilename\fR arguments, the contents of the new
+window will be an additional view of the current buffer.
 .P
 .TP
 \fB\-b\fR
@@ -1032,8 +1032,8 @@ Split root instead of current window.
 .PP
 .TP
 \fB\-t\fR
-Mark buffer as "temporary" (always closeable, without warnings
-for "unsaved changes")
+Create a new, empty buffer and mark it as "temporary" (always
+closeable, without warnings for "unsaved changes")
 .PP
 .RE
 \fBwclose\fR [\fB\-f\fR|\fB\-p\fR]
