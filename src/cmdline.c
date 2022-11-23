@@ -423,11 +423,14 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         free(original);
     }
 
-    const char *args[4];
+    const char *args[5];
     size_t i = 0;
     if (c->buf.len > 0) {
         const char *str = string_borrow_cstring(&c->buf);
         search_set_regexp(&e->search, str);
+        if (e->search.direction == SEARCH_BWD) {
+            args[i++] = "-r";
+        }
         if (cmdargs_has_flag(a, 'H')) {
             args[i++] = "-H";
         } else {
