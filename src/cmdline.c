@@ -423,34 +423,36 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
         free(original);
     }
 
-    if (e->macro.recording) {
-        const char *args[5];
-        size_t i = 0;
-        bool backwards = (e->search.direction == SEARCH_BWD);
-        if (c->buf.len > 0) {
-            const char *str = string_borrow_cstring(&c->buf);
-            search_set_regexp(&e->search, str);
-            if (backwards) {
-                args[i++] = "-r";
-            }
-            if (cmdargs_has_flag(a, 'H')) {
-                args[i++] = "-H";
-            } else {
-                history_add(&e->search_history, str);
-            }
-            if (unlikely(str[0] == '-')) {
-                args[i++] = "--";
-            }
-            args[i++] = str;
-        } else {
-            args[i++] = backwards ? "-p" : "-n";
+    const char *args[5];
+    size_t i = 0;
+    bool backwards = (e->search.direction == SEARCH_BWD);
+    if (c->buf.len > 0) {
+        const char *str = string_borrow_cstring(&c->buf);
+        search_set_regexp(&e->search, str);
+        if (backwards) {
+            args[i++] = "-r";
         }
-        args[i] = NULL;
-        macro_command_hook(&e->macro, "search", (char**)args);
+        if (cmdargs_has_flag(a, 'H')) {
+            args[i++] = "-H";
+        } else {
+            history_add(&e->search_history, str);
+        }
+        if (unlikely(str[0] == '-')) {
+            args[i++] = "--";
+        }
+        args[i++] = str;
+    } else {
+        args[i++] = backwards ? "-p" : "-n";
     }
 
+    args[i] = NULL;
     current_command = NULL;
     search_next(e->view, &e->search, e->options.case_sensitive_search);
+
+    // TODO: avoid calling this function (and constructing args above)
+    // if no macro is being recorded
+    macro_command_hook(&e->macro, "search", (char**)args);
+
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
 }
