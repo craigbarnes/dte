@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -11,6 +12,7 @@
 #include "encoding.h"
 #include "error.h"
 #include "util/debug.h"
+#include "util/fd.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -352,7 +354,7 @@ static bool write_buffer(Buffer *b, FileEncoder *enc, int fd, EncodingType bom_t
     }
 
     // Need to truncate if writing to existing file
-    if (ftruncate(fd, size)) {
+    if (xftruncate(fd, size)) {
         perror_msg("ftruncate");
         return false;
     }
@@ -387,11 +389,19 @@ bool save_buffer (
                 tmp[0] = '\0';
             } else if (b->file.mode) {
                 // Preserve ownership and mode of the original file if possible
-                UNUSED int u1 = fchown(fd, b->file.uid, b->file.gid);
-                UNUSED int u2 = fchmod(fd, b->file.mode);
+                if (xfchown(fd, b->file.uid, b->file.gid) != 0) {
+                    const char *err = strerror(errno);
+                    LOG_WARNING("failed to preserve file ownership: %s", err);
+                }
+                if (xfchmod(fd, b->file.mode) != 0) {
+                    const char *err = strerror(errno);
+                    LOG_WARNING("failed to preserve file mode: %s", err);
+                }
             } else {
                 // New file
-                fchmod(fd, 0666 & ~get_umask());
+                if (xfchmod(fd, 0666 & ~get_umask()) != 0) {
+                    LOG_WARNING("failed to set file mode: %s", strerror(errno));
+                }
             }
         }
     }

@@ -3,6 +3,7 @@
 
 #include <fcntl.h>
 #include <stdbool.h>
+#include <sys/types.h>
 #include "macros.h"
 
 static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool state)
@@ -27,5 +28,8 @@ static inline bool fd_set_nonblock(int fd, bool nonblock)
 
 int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;
 int xdup3(int oldfd, int newfd, int flags) WARN_UNUSED_RESULT;
+int xfchown(int fd, uid_t owner, gid_t group) WARN_UNUSED_RESULT;
+int xfchmod(int fd, mode_t mode) WARN_UNUSED_RESULT;
+int xftruncate(int fd, off_t length) WARN_UNUSED_RESULT;
 
 #endif

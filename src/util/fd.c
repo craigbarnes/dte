@@ -1,5 +1,6 @@
 #include "../build/feature.h"
 #include <errno.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "fd.h"
 #include "debug.h"
@@ -74,4 +75,31 @@ int xdup3(int oldfd, int newfd, int flags)
         fd_set_cloexec(fd, true);
     }
     return fd;
+}
+
+int xfchown(int fd, uid_t owner, gid_t group)
+{
+    int r;
+    do {
+        r = fchown(fd, owner, group);
+    } while (unlikely(r != 0 && errno == EINTR));
+    return r;
+}
+
+int xfchmod(int fd, mode_t mode)
+{
+    int r;
+    do {
+        r = fchmod(fd, mode);
+    } while (unlikely(r != 0 && errno == EINTR));
+    return r;
+}
+
+int xftruncate(int fd, off_t length)
+{
+    int r;
+    do {
+        r = ftruncate(fd, length);
+    } while (unlikely(r != 0 && errno == EINTR));
+    return r;
 }
