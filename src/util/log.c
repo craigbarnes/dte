@@ -1,21 +1,20 @@
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "log.h"
 #include "array.h"
 #include "debug.h"
 #include "str-util.h"
-#include "xstdio.h"
+#include "xreadwrite.h"
 
 // These are initialized during early startup and then never changed,
 // so they're deemed an "acceptable" use of globals:
 static LogLevel log_level = LOG_LEVEL_NONE;
-static FILE *logfile = NULL;
-static bool log_colors = false;
-
-static const char dim[] = "\033[2m";
-static const char sgr0[] = "\033[0m";
+static int logfd = -1;
+static char dim[] = "\033[2m";
+static char sgr0[] = "\033[0m";
 
 static const struct {
     char name[8];
@@ -70,20 +69,22 @@ LogLevel log_open(const char *filename, LogLevel level)
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
-    BUG_ON(logfile);
+    BUG_ON(logfd != -1);
     BUG_ON(log_level != LOG_LEVEL_NONE);
 
     if (level == LOG_LEVEL_NONE) {
         return LOG_LEVEL_NONE;
     }
 
-    logfile = xfopen(filename, "w", O_APPEND | O_CLOEXEC, 0666);
-    if (!logfile || xfputc('\n', logfile) < 0 || xfflush(logfile) != 0) {
+    int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
+    logfd = xopen(filename, flags, 0666);
+    if (unlikely(logfd < 0 || xwrite_all(logfd, "\n", 1) != 1)) {
         return LOG_LEVEL_NONE;
     }
 
-    if (isatty(fileno(logfile))) {
-        log_colors = true;
+    if (!isatty(logfd)) {
+        dim[0] = '\0';
+        sgr0[0] = '\0';
     }
 
     log_level = MIN(level, log_level_max());
@@ -92,7 +93,7 @@ LogLevel log_open(const char *filename, LogLevel level)
 
 bool log_close(void)
 {
-    return log_level == LOG_LEVEL_NONE || fclose(logfile) == 0;
+    return log_level == LOG_LEVEL_NONE || xclose(logfd) == 0;
 }
 
 void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_list ap)
@@ -103,25 +104,28 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
         return;
     }
 
-    BUG_ON(!logfile);
+    BUG_ON(logfd < 0);
+    char buf[2048];
+    const size_t buf_size = sizeof(buf) - 1;
     const char *prefix = log_level_map[level].log_prefix;
+    const char *color = sgr0[0] ? log_level_map[level].color : "";
+    const char *reset = color[0] ? sgr0 : "";
 
-    if (log_colors) {
-        const char *color = log_level_map[level].color;
-        const char *reset = color[0] ? sgr0 : "";
-        xfprintf (
-            logfile,
-            "%s%s%s: %s%s:%d:%s ",
-            color, prefix, reset,
-            dim, file, line, sgr0
-        );
-    } else {
-        xfprintf(logfile, "%s: %s:%d: ", prefix, file, line);
+    int len1 = snprintf (
+        buf, buf_size,
+        "%s%s%s: %s%s:%d:%s ",
+        color, prefix, reset,
+        dim, file, line, sgr0
+    );
+
+    if (unlikely(len1 < 0 || len1 >= buf_size)) {
+        len1 = 0;
     }
 
-    xvfprintf(logfile, fmt, ap);
-    xfputc('\n', logfile);
-    xfflush(logfile);
+    int len2 = vsnprintf(buf + len1, buf_size - len1, fmt, ap);
+    size_t n = MIN(len1 + MAX(len2, 0), buf_size);
+    buf[n++] = '\n';
+    (void)!xwrite_all(logfd, buf, n);
 }
 
 void log_msg(LogLevel level, const char *file, int line, const char *fmt, ...)
