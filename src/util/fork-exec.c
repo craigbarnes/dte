@@ -61,7 +61,9 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
     for (int i = 0; i < nr_fds; i++) {
         if (i == fd[i]) {
             // Clear FD_CLOEXEC flag
-            fd_set_cloexec(fd[i], false);
+            if (!fd_set_cloexec(fd[i], false)) {
+                goto error;
+            }
         } else {
             if (xdup3(fd[i], i, 0) < 0) {
                 goto error;
@@ -80,15 +82,22 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
         }
     }
 
+    static const int ignored_signals[] = {
+        SIGINT, SIGQUIT, SIGTSTP, SIGPIPE, SIGUSR1, SIGUSR2
+    };
+
+    struct sigaction action = {.sa_handler = SIG_DFL};
+    if (unlikely(sigemptyset(&action.sa_mask) != 0)) {
+        goto error;
+    }
+
     // Reset ignored signals to SIG_DFL (see exec(3p))
-    struct sigaction act = {.sa_handler = SIG_DFL};
-    sigemptyset(&act.sa_mask);
-    sigaction(SIGINT, &act, NULL);
-    sigaction(SIGQUIT, &act, NULL);
-    sigaction(SIGTSTP, &act, NULL);
-    sigaction(SIGPIPE, &act, NULL);
-    sigaction(SIGUSR1, &act, NULL);
-    sigaction(SIGUSR2, &act, NULL);
+    for (size_t i = 0; i < ARRAYLEN(ignored_signals); i++) {
+        int r = sigaction(ignored_signals[i], &action, NULL);
+        if (unlikely(r != 0)) {
+            goto error;
+        }
+    }
 
     execvp(argv[0], (char**)argv);
 
