@@ -28,10 +28,10 @@ static inline unsigned int base64_decode_branchy(unsigned char c)
         return c - 'A';
     }
     if (c >= 'a' && c <= 'z') {
-        return c + (26 - 'a');
+        return (c - 'a') + 26;
     }
     if (c >= '0' && c <= '9') {
-        return c + (52 - '0');
+        return (c - '0') + 52;
     }
     if (c == '+') {
         return 62;
