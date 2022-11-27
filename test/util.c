@@ -469,6 +469,7 @@ static void test_base64_decode(TestContext *ctx)
         } else {
             IEXPECT_EQ(val, val & 192);
         }
+        IEXPECT_EQ(val, base64_decode_branchy(i));
     }
 }
 

@@ -30,15 +30,15 @@ static inline CommandArgs cmdargs_new(char **args)
 
 // Map ASCII alphanumeric characters to values between 1 and 62,
 // for use as bitset indices in CommandArgs::flag_set
-static inline unsigned int cmdargs_flagset_idx(unsigned char flag)
+static inline unsigned int cmdargs_flagset_idx(unsigned char c)
 {
     // We use base64_decode() here simply because it does a similar byte
     // mapping to the one we want and allows us to share the lookup table.
     // There's no "real" base64 encoding involved.
     static_assert(BASE64_INVALID > 63);
-    unsigned int idx = base64_decode(flag) + 1;
-    BUG_ON(idx > 62);
-    return idx;
+    unsigned int idx = IS_CT_CONSTANT(c) ? base64_decode_branchy(c) : base64_decode(c);
+    BUG_ON(idx > 61);
+    return idx + 1;
 }
 
 static inline uint_least64_t cmdargs_flagset_value(unsigned char flag)
