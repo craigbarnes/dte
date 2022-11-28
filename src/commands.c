@@ -940,25 +940,11 @@ static void cmd_move_tab(EditorState *e, const CommandArgs *a)
     window->update_tabbar = true;
 }
 
-static uint_least64_t get_flagset_npw(void)
-{
-    // flagset mask for "-npw" flags
-    return UINT64_C(517) << 40;
-}
-
-UNITTEST {
-    uint_least64_t ref = 0;
-    ref |= cmdargs_flagset_value('n');
-    ref |= cmdargs_flagset_value('p');
-    ref |= cmdargs_flagset_value('w');
-    BUG_ON(get_flagset_npw() != ref);
-    BUG_ON(u64_popcount(ref) != 3);
-}
-
 static void cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
-    if (u64_popcount(a->flag_set & get_flagset_npw()) + !!str >= 2) {
+    uint_least64_t np = cmdargs_flagset_value('n') | cmdargs_flagset_value('p');
+    if (u64_popcount(a->flag_set & np) + !!str >= 2) {
         error_msg("flags [-n|-p] and [number] argument are mutually exclusive");
         return;
     }
@@ -1722,6 +1708,15 @@ static void cmd_scroll_up(EditorState *e, const CommandArgs *a)
     if (view->vy + window->edit_h <= view->cy) {
         move_up(view, 1);
     }
+}
+
+static uint_least64_t get_flagset_npw(void)
+{
+    uint_least64_t npw = 0;
+    npw |= cmdargs_flagset_value('n');
+    npw |= cmdargs_flagset_value('p');
+    npw |= cmdargs_flagset_value('w');
+    return npw;
 }
 
 static void cmd_search(EditorState *e, const CommandArgs *a)
