@@ -84,12 +84,9 @@ static void cmd_clear(EditorState *e, const CommandArgs *a)
 
 static void cmd_copy(EditorState *e, const CommandArgs *a)
 {
-    bool internal = cmdargs_has_flag(a, 'i');
+    bool internal = cmdargs_has_flag(a, 'i') || a->flag_set == 0;
     bool clipboard = cmdargs_has_flag(a, 'b');
     bool primary = cmdargs_has_flag(a, 'p');
-    if (!(internal || clipboard || primary)) {
-        internal = true;
-    }
 
     String *buf = &e->cmdline.buf;
     size_t len = buf->len;
