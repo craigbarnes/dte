@@ -41,7 +41,11 @@ the same name.
 
 ### **$FILE**
 
-The filename of the current buffer (or an empty string if unsaved).
+The absolute filename of the current buffer (or an empty string if unsaved).
+
+### **$RFILE**
+
+The relative filename of the current buffer (or an empty string if unsaved).
 
 ### **$FILEDIR**
 
