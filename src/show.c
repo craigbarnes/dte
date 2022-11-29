@@ -433,7 +433,7 @@ static String do_dump_macro(EditorState *e)
     return dump_macro(&e->macro);
 }
 
-static const ShowHandler handlers[] = {
+static const ShowHandler show_handlers[] = {
     {"alias", DTERC, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
     {"bind", DTERC, show_binding, dump_bindings, collect_bound_normal_keys},
     {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
@@ -452,12 +452,12 @@ static const ShowHandler handlers[] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(handlers, name, strcmp);
+    CHECK_BSEARCH_ARRAY(show_handlers, name, strcmp);
 }
 
 void show(EditorState *e, const char *type, const char *key, bool cflag)
 {
-    const ShowHandler *handler = BSEARCH(type, handlers, vstrcmp);
+    const ShowHandler *handler = BSEARCH(type, show_handlers, vstrcmp);
     if (!handler) {
         error_msg("invalid argument: '%s'", type);
         return;
@@ -479,12 +479,12 @@ void show(EditorState *e, const char *type, const char *key, bool cflag)
 
 void collect_show_subcommands(PointerArray *a, const char *prefix)
 {
-    COLLECT_STRING_FIELDS(handlers, name, a, prefix);
+    COLLECT_STRING_FIELDS(show_handlers, name, a, prefix);
 }
 
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix)
 {
-    const ShowHandler *handler = BSEARCH(name, handlers, vstrcmp);
+    const ShowHandler *handler = BSEARCH(name, show_handlers, vstrcmp);
     if (handler && handler->complete_arg) {
         handler->complete_arg(e, a, arg_prefix);
     }
