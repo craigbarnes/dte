@@ -501,7 +501,7 @@ typedef struct {
     void (*complete)(EditorState *e, const CommandArgs *a);
 } CompletionHandler;
 
-static const CompletionHandler handlers[] = {
+static const CompletionHandler completion_handlers[] = {
     {"alias", complete_alias},
     {"bind", complete_bind},
     {"cd", complete_cd},
@@ -528,10 +528,10 @@ static const CompletionHandler handlers[] = {
 };
 
 UNITTEST {
-    CHECK_BSEARCH_ARRAY(handlers, cmd_name, strcmp);
+    CHECK_BSEARCH_ARRAY(completion_handlers, cmd_name, strcmp);
     // Ensure handlers are kept in sync with renamed/removed commands
-    for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
-        const char *name = handlers[i].cmd_name;
+    for (size_t i = 0; i < ARRAYLEN(completion_handlers); i++) {
+        const char *name = completion_handlers[i].cmd_name;
         if (!find_normal_command(name)) {
             BUG("completion handler for non-existent command: \"%s\"", name);
         }
@@ -570,7 +570,7 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
         goto out;
     }
 
-    const CompletionHandler *h = BSEARCH(args[0], handlers, vstrcmp);
+    const CompletionHandler *h = BSEARCH(args[0], completion_handlers, vstrcmp);
     if (h) {
         h->complete(e, &a);
     } else if (streq(args[0], "repeat")) {
