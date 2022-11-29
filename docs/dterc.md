@@ -187,20 +187,27 @@ The commands available in [`command`]/[`search`] modes are as follows:
 * `erase`
 * `erase-word`
 * `erase-bol`
-* `accept`
-* `cancel`
 * `clear`
 * `copy` [**-bip**]
 * `paste` [**-m**]
-* `history-next`
-* `history-prev`
 * `toggle` [**-g**] _option_ [_values_]...
-* `complete-next` (command mode)
-* `complete-prev` (command mode)
-* `direction` (search mode)
+* `accept` [**-eH**] - Execute command or perform search
+* `cancel` - Return to normal mode
+* `history-next` - Find next history item matching current prefix
+* `history-prev` - Find previous history item matching current prefix
+* `complete-next` - Select next auto-completion in command mode
+* `complete-prev` - Select previous auto-completion in command mode
+* `direction` - Toggle search direction in search mode
 
 Most of these commands behave in a similar fashion to the normal mode
-commands of the same name. The exceptions should be self-explanatory.
+commands of the same name. The exceptions to this have been given a
+short description above.
+
+Most of the command flags also behave similarly to the normal mode
+equivalents, except for `accept -H`, which accepts the current text
+without adding a history entry and `accept -e` (search mode only)
+which escapes all [`regex`] special characters before performing a
+(plain-text) search.
 
 See also:
 

@@ -516,31 +516,38 @@ The commands available in \fBcommand\fR/\fBsearch\fR modes are as follows:
 .br
 \(bu \fBerase\-bol\fR
 .br
-\(bu \fBaccept\fR
-.br
-\(bu \fBcancel\fR
-.br
 \(bu \fBclear\fR
 .br
 \(bu \fBcopy\fR [\fB\-bip\fR]
 .br
 \(bu \fBpaste\fR [\fB\-m\fR]
 .br
-\(bu \fBhistory\-next\fR
-.br
-\(bu \fBhistory\-prev\fR
-.br
 \(bu \fBtoggle\fR [\fB\-g\fR] \fIoption\fR [\fIvalues\fR]...
 .br
-\(bu \fBcomplete\-next\fR (command mode)
+\(bu \fBaccept\fR [\fB\-eH\fR] \- Execute command or perform search
 .br
-\(bu \fBcomplete\-prev\fR (command mode)
+\(bu \fBcancel\fR \- Return to normal mode
 .br
-\(bu \fBdirection\fR (search mode)
+\(bu \fBhistory\-next\fR \- Find next history item matching current prefix
+.br
+\(bu \fBhistory\-prev\fR \- Find previous history item matching current prefix
+.br
+\(bu \fBcomplete\-next\fR \- Select next auto\-completion in command mode
+.br
+\(bu \fBcomplete\-prev\fR \- Select previous auto\-completion in command mode
+.br
+\(bu \fBdirection\fR \- Toggle search direction in search mode
 .br
 .P
 Most of these commands behave in a similar fashion to the normal mode
-commands of the same name. The exceptions should be self\-explanatory.
+commands of the same name. The exceptions to this have been given a
+short description above.
+.P
+Most of the command flags also behave similarly to the normal mode
+equivalents, except for \fBaccept \-H\fR, which accepts the current text
+without adding a history entry and \fBaccept \-e\fR (search mode only)
+which escapes all \fBregex\fR(7) special characters before performing a
+(plain\-text) search.
 .P
 See also:
 .P
