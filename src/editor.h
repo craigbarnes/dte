@@ -21,7 +21,6 @@
 #include "tag.h"
 #include "terminal/cursor.h"
 #include "terminal/terminal.h"
-#include "util/exitcode.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -31,7 +30,7 @@ typedef enum {
     EDITOR_INITIALIZING = -2,
     EDITOR_RUNNING = -1,
     // Values 0-125 are exit codes
-    EDITOR_EXIT_OK = EX_OK,
+    EDITOR_EXIT_OK = 0,
     EDITOR_EXIT_MAX = 125,
 } EditorStatus;
 
