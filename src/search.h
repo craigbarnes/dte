@@ -12,21 +12,16 @@ typedef enum {
     CSS_AUTO,
 } SearchCaseSensitivity;
 
-typedef enum {
-    SEARCH_FWD,
-    SEARCH_BWD,
-} SearchDirection;
-
 typedef struct {
     regex_t regex;
     char *pattern;
-    SearchDirection direction;
     int re_flags; // If zero, regex hasn't been compiled
+    bool reverse;
 } SearchState;
 
-static inline void toggle_search_direction(SearchDirection *direction)
+static inline void toggle_search_direction(SearchState *search)
 {
-    *direction ^= 1;
+    search->reverse ^= 1;
 }
 
 bool search_tag(View *view, const char *pattern);

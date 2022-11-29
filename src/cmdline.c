@@ -377,7 +377,7 @@ static void cmd_complete_prev(EditorState *e, const CommandArgs *a)
 static void cmd_direction(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    toggle_search_direction(&e->search.direction);
+    toggle_search_direction(&e->search);
 }
 
 static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
@@ -434,9 +434,8 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     if (e->macro.recording) {
         const char *args[5];
         size_t i = 0;
-        bool backwards = (e->search.direction == SEARCH_BWD);
         if (str) {
-            if (backwards) {
+            if (e->search.reverse) {
                 args[i++] = "-r";
             }
             if (!add_to_history) {
@@ -447,7 +446,7 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
             }
             args[i++] = str;
         } else {
-            args[i++] = backwards ? "-p" : "-n";
+            args[i++] = e->search.reverse ? "-p" : "-n";
         }
         args[i] = NULL;
         macro_command_hook(&e->macro, "search", (char**)args);

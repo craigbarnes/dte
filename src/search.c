@@ -203,7 +203,7 @@ static void do_search_next(View *view, SearchState *search, SearchCaseSensitivit
 
     BlockIter bi = view->cursor;
     regex_t *regex = &search->regex;
-    if (search->direction == SEARCH_FWD) {
+    if (!search->reverse) {
         if (do_search_fwd(view, regex, &bi, true)) {
             return;
         }
@@ -229,10 +229,9 @@ static void do_search_next(View *view, SearchState *search, SearchCaseSensitivit
 
 void search_prev(View *v, SearchState *search, SearchCaseSensitivity cs)
 {
-    SearchDirection *dir = &search->direction;
-    toggle_search_direction(dir);
+    toggle_search_direction(search);
     search_next(v, search, cs);
-    toggle_search_direction(dir);
+    toggle_search_direction(search);
 }
 
 void search_next(View *v, SearchState *search, SearchCaseSensitivity cs)

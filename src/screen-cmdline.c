@@ -81,7 +81,7 @@ void update_command_line(EditorState *e)
         break;
     }
     case INPUT_SEARCH:
-        prefix = e->search.direction == SEARCH_FWD ? '/' : '?';
+        prefix = e->search.reverse ? '?' : '/';
         // Fallthrough
     case INPUT_COMMAND:
         e->cmdline_x = print_command(term, &e->colors, &e->cmdline, prefix);
