@@ -45,7 +45,7 @@ The filename of the current buffer (or an empty string if unsaved).
 
 ### **$FILEDIR**
 
-The directory of the current buffer (or an empty string if unsaved).
+The directory part of `$FILE`.
 
 ### **$FILETYPE**
 
