@@ -1167,6 +1167,9 @@ The _type_ argument can be one of:
 `macro`
 :   Show last recorded [macro][`macro`]
 
+`msg`
+:   Show [messages][`msg`]
+
 `option`
 :   Show [option values](#options)
 
