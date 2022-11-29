@@ -623,9 +623,8 @@ loop_break:;
         normal_update(e);
     }
 
-    main_loop(e);
+    int exit_code = main_loop(e);
 
-    BUG_ON(e->status != EDITOR_EXITING);
     term_restore_title(term);
     ui_end(e);
     term_output_flush(&term->obuf);
@@ -647,7 +646,9 @@ loop_break:;
             if (xwrite_all(fd, blk->data, blk->size) < 0) {
                 const char *err = strerror(errno);
                 error_msg("failed to write (stdout) buffer: %s", err);
-                e->exit_code = EX_IOERR;
+                if (exit_code == EDITOR_EXIT_OK) {
+                    exit_code = EX_IOERR;
+                }
                 break;
             }
         }
@@ -655,7 +656,7 @@ loop_break:;
         free(std_buffer);
     }
 
-    LOG_INFO("exiting with status %d", e->exit_code);
+    LOG_INFO("exiting with status %d", exit_code);
     log_close();
-    return e->exit_code;
+    return exit_code;
 }

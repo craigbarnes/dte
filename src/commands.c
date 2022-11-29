@@ -325,7 +325,7 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
     }
 
     if (allow_quit && e->buffers.count == 1 && e->root_frame->frames.count <= 1) {
-        e->status = EDITOR_EXITING;
+        e->status = EDITOR_EXIT_OK;
         return;
     }
 
@@ -1229,14 +1229,15 @@ static void cmd_prev(EditorState *e, const CommandArgs *a)
 
 static void cmd_quit(EditorState *e, const CommandArgs *a)
 {
-    int exit_code = 0;
+    int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
         if (!str_to_int(a->args[0], &exit_code)) {
             error_msg("Not a valid integer argument: '%s'", a->args[0]);
             return;
         }
-        if (exit_code < 0 || exit_code > 125) {
-            error_msg("Exit code should be between 0 and 125");
+        int max = EDITOR_EXIT_MAX;
+        if (exit_code < 0 || exit_code > max) {
+            error_msg("Exit code should be between 0 and %d", max);
             return;
         }
     }
@@ -1272,8 +1273,7 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
     }
 
 exit:
-    e->status = EDITOR_EXITING;
-    e->exit_code = exit_code;
+    e->status = exit_code;
 }
 
 static void cmd_redo(EditorState *e, const CommandArgs *a)

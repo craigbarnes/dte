@@ -47,7 +47,6 @@ EditorState editor = {
     .child_controls_terminal = false,
     .everything_changed = false,
     .cursor_style_changed = false,
-    .exit_code = EX_OK,
     .compilers = HASHMAP_INIT,
     .syntaxes = HASHMAP_INIT,
     .buffers = PTR_ARRAY_INIT,
@@ -226,7 +225,7 @@ EditorState *init_editor_state(void)
     return e;
 }
 
-int free_editor_state(EditorState *e)
+void free_editor_state(EditorState *e)
 {
     free(e->clipboard.buf);
     free_file_options(&e->file_options);
@@ -261,9 +260,8 @@ int free_editor_state(EditorState *e)
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)e->user_config_dir);
 
-    int exit_code = e->exit_code;
-    *e = (EditorState){.window = NULL}; // Zero pointers, to help LSan find leaks
-    return exit_code;
+    // Zero pointers, to help LSan find leaks
+    *e = (EditorState){.window = NULL};
 }
 
 void handle_sigwinch(int UNUSED_ARG(signum))
@@ -644,7 +642,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
     end_update(e);
 }
 
-void main_loop(EditorState *e)
+int main_loop(EditorState *e)
 {
     while (e->status == EDITOR_RUNNING) {
         if (unlikely(resized)) {
@@ -670,4 +668,7 @@ void main_loop(EditorState *e)
         sanity_check(e->view);
         update_screen(e, &s);
     }
+
+    BUG_ON(e->status < 0 || e->status > EDITOR_EXIT_MAX);
+    return e->status;
 }

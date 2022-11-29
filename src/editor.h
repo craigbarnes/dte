@@ -21,15 +21,18 @@
 #include "tag.h"
 #include "terminal/cursor.h"
 #include "terminal/terminal.h"
+#include "util/exitcode.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
 #include "view.h"
 
 typedef enum {
-    EDITOR_INITIALIZING,
-    EDITOR_RUNNING,
-    EDITOR_EXITING,
+    EDITOR_INITIALIZING = -2,
+    EDITOR_RUNNING = -1,
+    // Values 0-125 are exit codes
+    EDITOR_EXIT_OK = EX_OK,
+    EDITOR_EXIT_MAX = 125,
 } EditorStatus;
 
 typedef enum {
@@ -51,7 +54,6 @@ typedef struct EditorState {
     bool everything_changed;
     bool cursor_style_changed;
     bool session_leader;
-    int exit_code;
     size_t cmdline_x;
     KeyBindingGroup bindings[3];
     Clipboard clipboard;
@@ -90,15 +92,15 @@ static inline void set_input_mode(EditorState *e, InputMode mode)
     e->input_mode = mode;
 }
 
-EditorState *init_editor_state(void);
-int free_editor_state(EditorState *e);
+EditorState *init_editor_state(void) RETURNS_NONNULL;
+void free_editor_state(EditorState *e) NONNULL_ARGS;
 char status_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
 char dialog_prompt(EditorState *e, const char *question, const char *choices) NONNULL_ARGS;
-void any_key(Terminal *term, unsigned int esc_timeout);
-void normal_update(EditorState *e);
-void main_loop(EditorState *e);
-void ui_start(EditorState *e);
-void ui_end(EditorState *e);
+void any_key(Terminal *term, unsigned int esc_timeout) NONNULL_ARGS;
+void normal_update(EditorState *e) NONNULL_ARGS;
+int main_loop(EditorState *e) NONNULL_ARGS WARN_UNUSED_RESULT;
+void ui_start(EditorState *e) NONNULL_ARGS;
+void ui_end(EditorState *e) NONNULL_ARGS;
 void handle_sigwinch(int signum);
 
 #endif
