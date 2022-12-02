@@ -696,13 +696,17 @@ Move backward one word.
 `-s`
 :   Skip special characters
 
-### **bol** [**-cs**]
+### **bol** [**-c**] [**-s**|**-t**]
 
 Move to beginning of current line.
 
 `-s`
 :   Move to beginning of indented text or beginning of line, depending
     on current cursor position.
+
+`-t`
+:   Like `-s`, but with the additional behavior of moving back and forth
+    between the two positions.
 
 ### **eol** [**-c**]
 

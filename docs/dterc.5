@@ -103,7 +103,7 @@ Movement Commands:
 .br
    \fBword\-bwd\fR [\fB\-cs\fR]
 .br
-   \fBbol\fR [\fB\-cs\fR]
+   \fBbol\fR [\fB\-c\fR] [\fB\-s\fR|\fB\-t\fR]
 .br
    \fBeol\fR [\fB\-c\fR]
 .br
@@ -1184,7 +1184,7 @@ Move backward one word.
 Skip special characters
 .PP
 .RE
-\fBbol\fR [\fB\-cs\fR]
+\fBbol\fR [\fB\-c\fR] [\fB\-s\fR|\fB\-t\fR]
 .RS
 Move to beginning of current line.
 .P
@@ -1192,6 +1192,11 @@ Move to beginning of current line.
 \fB\-s\fR
 Move to beginning of indented text or beginning of line, depending
 on current cursor position.
+.PP
+.TP
+\fB\-t\fR
+Like \fB\-s\fR, but with the additional behavior of moving back and forth
+between the two positions.
 .PP
 .RE
 \fBeol\fR [\fB\-c\fR]
