@@ -58,23 +58,17 @@ static bool is_non_text(CodePoint u, bool display_special)
     return u < 0x20 || u == 0x7F || u_is_unprintable(u);
 }
 
-static WhitespaceErrorFlags get_ws_error_option(const Buffer *b)
+static WhitespaceErrorFlags get_ws_error(const LocalOptions *opts)
 {
-    WhitespaceErrorFlags flags = b->options.ws_error;
-    if (flags & WSE_AUTO_INDENT) {
-        if (b->options.expand_tab) {
-            flags |= WSE_TAB_AFTER_INDENT | WSE_TAB_INDENT;
-        } else {
-            flags |= WSE_SPACE_INDENT;
-        }
-    }
-    return flags;
+    WhitespaceErrorFlags taberrs = WSE_TAB_INDENT | WSE_TAB_AFTER_INDENT;
+    WhitespaceErrorFlags extra = opts->expand_tab ? taberrs : WSE_SPACE_INDENT;
+    return opts->ws_error | ((opts->ws_error & WSE_AUTO_INDENT) ? extra : 0);
 }
 
 static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
     const View *v = info->view;
-    WhitespaceErrorFlags flags = get_ws_error_option(v->buffer);
+    WhitespaceErrorFlags flags = get_ws_error(&v->buffer->options);
     WhitespaceErrorFlags trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
