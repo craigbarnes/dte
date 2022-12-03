@@ -424,14 +424,14 @@ int window_get_scroll_margin(const Window *w, unsigned int scroll_margin)
     return scroll_margin;
 }
 
-void frame_for_each_window(const Frame *f, void (*func)(Window*, void*), void *data)
+void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data)
 {
-    if (f->window) {
-        func(f->window, data);
+    if (frame->window) {
+        func(frame->window, data);
         return;
     }
-    for (size_t i = 0, n = f->frames.count; i < n; i++) {
-        frame_for_each_window(f->frames.ptrs[i], func, data);
+    for (size_t i = 0, n = frame->frames.count; i < n; i++) {
+        frame_for_each_window(frame->frames.ptrs[i], func, data);
     }
 }
 

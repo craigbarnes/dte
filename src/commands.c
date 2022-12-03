@@ -2028,11 +2028,11 @@ static void cmd_wclose(EditorState *e, const CommandArgs *a)
 static void cmd_wflip(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    Frame *f = e->window->frame;
-    if (!f->parent) {
+    Frame *frame = e->window->frame;
+    if (!frame->parent) {
         return;
     }
-    f->parent->vertical ^= 1;
+    frame->parent->vertical ^= 1;
     mark_everything_changed(e);
 }
 
@@ -2143,15 +2143,15 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
         paths = globbuf.gl_pathv;
     }
 
-    Frame *f;
+    Frame *frame;
     if (root) {
-        f = split_root(e, vertical, before);
+        frame = split_root(e, vertical, before);
     } else {
-        f = split_frame(e->window, vertical, before);
+        frame = split_frame(e->window, vertical, before);
     }
 
     View *save = e->view;
-    e->window = f->window;
+    e->window = frame->window;
     e->view = NULL;
     e->buffer = NULL;
     mark_everything_changed(e);
