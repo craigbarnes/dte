@@ -1,0 +1,41 @@
+C Library Feature Tests
+=======================
+
+## Synopsis
+
+The files in this directory are used to detect support for extended
+(non-standard) features in libc. The `*.c` files are compiled for the
+target platform, but are never executed.
+
+Successful compilation is taken to mean that a given feature is supported
+and the corresponding `*.h` file is then copied to `build/feature/`, where
+it eventually gets concatenated into `build/feature.h`.
+
+## Adding New Tests
+
+The following points should be observed when adding new feature tests:
+
+* When detecting the presence of library functions, the function name
+  should be enclosed in parenthesis, e.g. `(fsync)(1)`. This suppresses
+  the expansion of function-like macros and forces the compiler to error
+  out if there's no function declaration. (see https://ewontfix.com/13/).
+* If the feature being detected depends on [`feature_test_macros(7)`], the
+  required definitions should be added to [`defs.h`] and `#include "defs.h"`
+  should be added at the top of the `*.c` file. The contents of [`defs.h`]
+  is concatenated into `build/feature.h` by the build system, along with the
+  other headers from `build/feature/*.h`, to ensure the code under [`src/`]
+  sees the same macro definitions as the feature tests.
+* Source files under [`src/`] that use constructs like e.g. `#ifdef HAVE_EXAMPLE`
+  should use `#include "../build/feature.h"` before any other includes and
+  should be given an explicit dependency on `build/feature.h` in [`mk/build.mk`].
+* Some platforms implement stubs for some extended functions, which simply
+  fail at runtime and set [`errno`] to `ENOSYS`. See `xpipe2()` in
+  [`src/util/fd.c`] for an example of how to handle this.
+
+
+[`feature_test_macros(7)`]: https://man7.org/linux/man-pages/man7/feature_test_macros.7.html
+[`errno`]: https://man7.org/linux/man-pages/man3/errno.3.html
+[`defs.h`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/feature-test/defs.h
+[`mk/build.mk`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/build.mk
+[`src/`]: https://gitlab.com/craigbarnes/dte/-/tree/master/src
+[`src/util/fd.c`]: https://gitlab.com/craigbarnes/dte/-/blob/master/src/util/fd.c
