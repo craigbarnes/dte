@@ -157,14 +157,14 @@ static void add_misc_status(Formatter *f)
         return;
     }
 
-    const View *v = f->win->view;
-    if (v->selection == SELECT_NONE) {
+    const View *view = f->win->view;
+    if (view->selection == SELECT_NONE) {
         return;
     }
 
     SelectionInfo si;
-    init_selection(v, &si);
-    bool is_lines = (v->selection == SELECT_LINES);
+    init_selection(view, &si);
+    bool is_lines = (view->selection == SELECT_LINES);
     const char *unit = is_lines ? "line" : "char";
     size_t n = is_lines ? get_nr_selected_lines(&si) : get_nr_selected_chars(&si);
     add_status_format(f, "[%zu %s%s]", n, unit, likely(n != 1) ? "s" : "");
@@ -215,7 +215,8 @@ void sf_format (
         .size = size - 5, // Max length of char and terminating NUL
     };
 
-    const View *v = w->view;
+    const View *view = w->view;
+    const Buffer *buffer = view->buffer;
     CodePoint u;
 
     while (f.pos < f.size && *format) {
@@ -228,64 +229,64 @@ void sf_format (
 
         switch (lookup_format_specifier(*format++)) {
         case STATUS_BOM:
-            if (v->buffer->bom) {
+            if (buffer->bom) {
                 add_status_literal(&f, "BOM");
             }
             break;
         case STATUS_FILENAME:
-            add_status_str(&f, buffer_filename(v->buffer));
+            add_status_str(&f, buffer_filename(buffer));
             break;
         case STATUS_MODIFIED:
-            if (buffer_modified(v->buffer)) {
+            if (buffer_modified(buffer)) {
                 add_separator(&f);
                 add_ch(&f, '*');
             }
             break;
         case STATUS_READONLY:
-            if (v->buffer->readonly) {
+            if (buffer->readonly) {
                 add_status_literal(&f, "RO");
-            } else if (v->buffer->temporary) {
+            } else if (buffer->temporary) {
                 add_status_literal(&f, "TMP");
             }
             break;
         case STATUS_CURSOR_ROW:
-            add_status_format(&f, "%ld", v->cy + 1);
+            add_status_format(&f, "%ld", view->cy + 1);
             break;
         case STATUS_TOTAL_ROWS:
-            add_status_format(&f, "%zu", v->buffer->nl);
+            add_status_format(&f, "%zu", buffer->nl);
             break;
         case STATUS_CURSOR_COL:
-            add_status_format(&f, "%ld", v->cx_display + 1);
+            add_status_format(&f, "%ld", view->cx_display + 1);
             break;
         case STATUS_CURSOR_COL_BYTES:
-            add_status_format(&f, "%ld", v->cx_char + 1);
-            if (v->cx_display != v->cx_char) {
-                add_status_format(&f, "-%ld", v->cx_display + 1);
+            add_status_format(&f, "%ld", view->cx_char + 1);
+            if (view->cx_display != view->cx_char) {
+                add_status_format(&f, "-%ld", view->cx_display + 1);
             }
             break;
         case STATUS_SCROLL_POSITION:
             add_status_pos(&f);
             break;
         case STATUS_ENCODING:
-            add_status_str(&f, v->buffer->encoding.name);
+            add_status_str(&f, buffer->encoding.name);
             break;
         case STATUS_MISC:
             add_misc_status(&f);
             break;
         case STATUS_IS_CRLF:
-            if (v->buffer->crlf_newlines) {
+            if (buffer->crlf_newlines) {
                 add_status_literal(&f, "CRLF");
             }
             break;
         case STATUS_LINE_ENDING:
-            if (v->buffer->crlf_newlines) {
+            if (buffer->crlf_newlines) {
                 add_status_literal(&f, "CRLF");
             } else {
                 add_status_literal(&f, "LF");
             }
             break;
         case STATUS_OVERWRITE:
-            if (v->buffer->options.overwrite) {
+            if (buffer->options.overwrite) {
                 add_status_literal(&f, "OVR");
             } else {
                 add_status_literal(&f, "INS");
@@ -298,10 +299,10 @@ void sf_format (
             f.separator = 1;
             break;
         case STATUS_FILETYPE:
-            add_status_str(&f, v->buffer->options.filetype);
+            add_status_str(&f, buffer->options.filetype);
             break;
         case STATUS_UNICODE:
-            if (unlikely(!block_iter_get_char(&v->cursor, &u))) {
+            if (unlikely(!block_iter_get_char(&view->cursor, &u))) {
                 break;
             }
             if (u_is_unicode(u)) {

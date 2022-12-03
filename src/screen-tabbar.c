@@ -9,19 +9,19 @@ static size_t tab_title_width(size_t tab_number, const char *filename)
     return 3 + size_str_width(tab_number) + u_str_width(filename);
 }
 
-static void update_tab_title_width(View *v, size_t tab_number)
+static void update_tab_title_width(View *view, size_t tab_number)
 {
-    size_t w = tab_title_width(tab_number, buffer_filename(v->buffer));
-    v->tt_width = w;
-    v->tt_truncated_width = w;
+    size_t w = tab_title_width(tab_number, buffer_filename(view->buffer));
+    view->tt_width = w;
+    view->tt_truncated_width = w;
 }
 
 static void update_first_tab_idx(Window *win)
 {
     size_t max_first_idx = win->views.count;
     for (size_t w = 0; max_first_idx > 0; max_first_idx--) {
-        const View *v = win->views.ptrs[max_first_idx - 1];
-        w += v->tt_truncated_width;
+        const View *view = win->views.ptrs[max_first_idx - 1];
+        w += view->tt_truncated_width;
         if (w > win->w) {
             break;
         }
@@ -29,9 +29,9 @@ static void update_first_tab_idx(Window *win)
 
     size_t min_first_idx = win->views.count;
     for (size_t w = 0; min_first_idx > 0; min_first_idx--) {
-        const View *v = win->views.ptrs[min_first_idx - 1];
-        if (w || v == win->view) {
-            w += v->tt_truncated_width;
+        const View *view = win->views.ptrs[min_first_idx - 1];
+        if (w || view == win->view) {
+            w += view->tt_truncated_width;
         }
         if (w > win->w) {
             break;
@@ -50,15 +50,15 @@ static void calculate_tabbar(Window *win)
 {
     int total_w = 0;
     for (size_t i = 0, n = win->views.count; i < n; i++) {
-        View *v = win->views.ptrs[i];
-        if (v == win->view) {
+        View *view = win->views.ptrs[i];
+        if (view == win->view) {
             // Make sure current tab is visible
             if (win->first_tab_idx > i) {
                 win->first_tab_idx = i;
             }
         }
-        update_tab_title_width(v, i + 1);
-        total_w += v->tt_width;
+        update_tab_title_width(view, i + 1);
+        total_w += view->tt_width;
     }
 
     if (total_w <= win->w) {
@@ -71,14 +71,14 @@ static void calculate_tabbar(Window *win)
     total_w = 0;
     int truncated_count = 0;
     for (size_t i = 0, n = win->views.count; i < n; i++) {
-        View *v = win->views.ptrs[i];
+        View *view = win->views.ptrs[i];
         int truncated_w = 20;
-        if (v->tt_width > truncated_w) {
-            v->tt_truncated_width = truncated_w;
+        if (view->tt_width > truncated_w) {
+            view->tt_truncated_width = truncated_w;
             total_w += truncated_w;
             truncated_count++;
         } else {
-            total_w += v->tt_width;
+            total_w += view->tt_width;
         }
     }
 
@@ -98,8 +98,8 @@ static void calculate_tabbar(Window *win)
         int extra_mod = extra % truncated_count;
 
         for (size_t i = 0, n = win->views.count; i < n; i++) {
-            View *v = win->views.ptrs[i];
-            int add = v->tt_width - v->tt_truncated_width;
+            View *view = win->views.ptrs[i];
+            int add = view->tt_width - view->tt_truncated_width;
             if (add == 0) {
                 continue;
             }
@@ -118,7 +118,7 @@ static void calculate_tabbar(Window *win)
                 truncated_count--;
             }
 
-            v->tt_truncated_width += add;
+            view->tt_truncated_width += add;
             extra -= add;
         }
     }
@@ -126,18 +126,18 @@ static void calculate_tabbar(Window *win)
     win->first_tab_idx = 0;
 }
 
-static void print_tab_title(Terminal *term, const ColorScheme *colors, const View *v, size_t idx)
+static void print_tab_title(Terminal *term, const ColorScheme *colors, const View *view, size_t idx)
 {
-    const char *filename = buffer_filename(v->buffer);
-    int skip = v->tt_width - v->tt_truncated_width;
+    const char *filename = buffer_filename(view->buffer);
+    int skip = view->tt_width - view->tt_truncated_width;
     if (skip > 0) {
         filename += u_skip_chars(filename, &skip);
     }
 
     const char *tab_number = uint_to_str((unsigned int)idx + 1);
     TermOutputBuffer *obuf = &term->obuf;
-    bool is_active_tab = (v == v->window->view);
-    bool is_modified = buffer_modified(v->buffer);
+    bool is_active_tab = (view == view->window->view);
+    bool is_modified = buffer_modified(view->buffer);
     bool left_overflow = (obuf->x == 0 && idx > 0);
 
     set_builtin_color(term, colors, is_active_tab ? BC_ACTIVETAB : BC_INACTIVETAB);
@@ -146,7 +146,7 @@ static void print_tab_title(Terminal *term, const ColorScheme *colors, const Vie
     term_put_char(obuf, is_modified ? '+' : ':');
     term_add_str(obuf, filename);
 
-    size_t ntabs = v->window->views.count;
+    size_t ntabs = view->window->views.count;
     bool right_overflow = (obuf->x == (obuf->width - 1) && idx < (ntabs - 1));
     term_put_char(obuf, right_overflow ? '>' : ' ');
 }

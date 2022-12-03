@@ -269,19 +269,19 @@ void handle_sigwinch(int UNUSED_ARG(signum))
     resized = 1;
 }
 
-static void sanity_check(const View *v)
+static void sanity_check(const View *view)
 {
 #if DEBUG >= 1
     const Block *blk;
-    block_for_each(blk, &v->buffer->blocks) {
-        if (blk == v->cursor.blk) {
-            BUG_ON(v->cursor.offset > v->cursor.blk->size);
+    block_for_each(blk, &view->buffer->blocks) {
+        if (blk == view->cursor.blk) {
+            BUG_ON(view->cursor.offset > view->cursor.blk->size);
             return;
         }
     }
     BUG("cursor not seen");
 #else
-    (void)v;
+    (void)view;
 #endif
 }
 
@@ -301,17 +301,17 @@ void any_key(Terminal *term, unsigned int esc_timeout)
 static void update_window_full(Window *window, void* UNUSED_ARG(data))
 {
     EditorState *e = window->editor;
-    View *v = window->view;
-    view_update_cursor_x(v);
-    view_update_cursor_y(v);
-    view_update(v, e->options.scroll_margin);
+    View *view = window->view;
+    view_update_cursor_x(view);
+    view_update_cursor_y(view);
+    view_update(view, e->options.scroll_margin);
     if (e->options.tab_bar) {
         print_tabbar(&e->terminal, &e->colors, window);
     }
     if (e->options.show_line_numbers) {
         update_line_numbers(&e->terminal, &e->colors, window, true);
     }
-    update_range(e, v, v->vy, v->vy + window->edit_h);
+    update_range(e, view, view->vy, view->vy + window->edit_h);
     update_status_line(window);
 }
 
@@ -371,16 +371,16 @@ static void update_window(EditorState *e, Window *window)
         print_tabbar(&e->terminal, &e->colors, window);
     }
 
-    View *v = window->view;
+    const View *view = window->view;
     if (e->options.show_line_numbers) {
         // Force updating lines numbers if all lines changed
-        bool force = (v->buffer->changed_line_max == LONG_MAX);
+        bool force = (view->buffer->changed_line_max == LONG_MAX);
         update_line_numbers(&e->terminal, &e->colors, window, force);
     }
 
-    long y1 = MAX(v->buffer->changed_line_min, v->vy);
-    long y2 = MIN(v->buffer->changed_line_max, v->vy + window->edit_h - 1);
-    update_range(e, v, y1, y2 + 1);
+    long y1 = MAX(view->buffer->changed_line_min, view->vy);
+    long y2 = MIN(view->buffer->changed_line_max, view->vy + window->edit_h - 1);
+    update_range(e, view, y1, y2 + 1);
     update_status_line(window);
 }
 
@@ -388,20 +388,20 @@ static void update_window(EditorState *e, Window *window)
 static void update_buffer_windows(EditorState *e, const Buffer *b)
 {
     for (size_t i = 0, n = b->views.count; i < n; i++) {
-        View *v = b->views.ptrs[i];
-        if (v->window->view == v) {
+        View *view = b->views.ptrs[i];
+        if (view->window->view == view) {
             // Visible view
-            if (v != e->window->view) {
+            if (view != e->window->view) {
                 // Restore cursor
-                v->cursor.blk = BLOCK(v->buffer->blocks.next);
-                block_iter_goto_offset(&v->cursor, v->saved_cursor_offset);
+                view->cursor.blk = BLOCK(view->buffer->blocks.next);
+                block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
 
                 // These have already been updated for current view
-                view_update_cursor_x(v);
-                view_update_cursor_y(v);
-                view_update(v, e->options.scroll_margin);
+                view_update_cursor_x(view);
+                view_update_cursor_y(view);
+                view_update(view, e->options.scroll_margin);
             }
-            update_window(e, v->window);
+            update_window(e, view->window);
         }
     }
 }
@@ -619,7 +619,7 @@ static void update_screen(EditorState *e, const ScreenState *s)
         } else {
             // Because of trailing whitespace highlighting and highlighting
             // current line in different color, the lines cy (old cursor y) and
-            // v->cy need to be updated. Always update at least current line.
+            // view->cy need to be updated. Always update at least current line.
             buffer_mark_lines_changed(buffer, s->cy, view->cy);
         }
         if (s->is_modified != buffer_modified(buffer)) {

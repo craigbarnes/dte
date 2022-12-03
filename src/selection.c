@@ -2,21 +2,21 @@
 #include "editor.h"
 #include "util/unicode.h"
 
-void init_selection(const View *v, SelectionInfo *info)
+void init_selection(const View *view, SelectionInfo *info)
 {
     BlockIter ei;
     CodePoint u;
 
-    info->so = v->sel_so;
-    info->eo = block_iter_get_offset(&v->cursor);
-    info->si = v->cursor;
+    info->so = view->sel_so;
+    info->eo = block_iter_get_offset(&view->cursor);
+    info->si = view->cursor;
     block_iter_goto_offset(&info->si, info->so);
     info->swapped = false;
     if (info->so > info->eo) {
         size_t o = info->so;
         info->so = info->eo;
         info->eo = o;
-        info->si = v->cursor;
+        info->si = view->cursor;
         info->swapped = true;
     }
 
@@ -28,36 +28,36 @@ void init_selection(const View *v, SelectionInfo *info)
         }
         info->eo -= block_iter_prev_char(&ei, &u);
     }
-    if (v->selection == SELECT_LINES) {
+    if (view->selection == SELECT_LINES) {
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
-        if (v->window->editor->options.select_cursor_char) {
+        if (view->window->editor->options.select_cursor_char) {
             // Character under cursor belongs to the selection
             info->eo += block_iter_next_column(&ei);
         }
     }
 }
 
-size_t prepare_selection(View *v)
+size_t prepare_selection(View *view)
 {
     SelectionInfo info;
-    init_selection(v, &info);
-    v->cursor = info.si;
+    init_selection(view, &info);
+    view->cursor = info.si;
     return info.eo - info.so;
 }
 
-char *view_get_selection(View *v, size_t *size)
+char *view_get_selection(View *view, size_t *size)
 {
-    if (v->selection == SELECT_NONE) {
+    if (view->selection == SELECT_NONE) {
         *size = 0;
         return NULL;
     }
 
-    BlockIter save = v->cursor;
-    *size = prepare_selection(v);
-    char *buf = block_iter_get_bytes(&v->cursor, *size);
-    v->cursor = save;
+    BlockIter save = view->cursor;
+    *size = prepare_selection(view);
+    char *buf = block_iter_get_bytes(&view->cursor, *size);
+    view->cursor = save;
     return buf;
 }
 

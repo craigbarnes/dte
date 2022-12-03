@@ -567,12 +567,12 @@ loop_break:;
             }
             continue;
         }
-        View *v = window_open_buffer(window, str, false, NULL);
+        View *view = window_open_buffer(window, str, false, NULL);
         if (line == 0) {
             continue;
         }
-        set_view(v);
-        move_to_filepos(v, line, col);
+        set_view(view);
+        move_to_filepos(view, line, col);
         line = 0;
     }
 

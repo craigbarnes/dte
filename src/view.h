@@ -39,17 +39,17 @@ typedef struct View {
     size_t saved_cursor_offset;
 } View;
 
-static inline void view_reset_preferred_x(View *v)
+static inline void view_reset_preferred_x(View *view)
 {
-    v->preferred_x = -1;
+    view->preferred_x = -1;
 }
 
-void view_update_cursor_y(View *v);
-void view_update_cursor_x(View *v);
-void view_update(View *v, unsigned int scroll_margin);
-long view_get_preferred_x(View *v);
-bool view_can_close(const View *v);
-StringView view_do_get_word_under_cursor(const View *v, size_t *offset_in_line);
-StringView view_get_word_under_cursor(const View *v);
+void view_update_cursor_y(View *view);
+void view_update_cursor_x(View *view);
+void view_update(View *view, unsigned int scroll_margin);
+long view_get_preferred_x(View *view);
+bool view_can_close(const View *view);
+StringView view_do_get_word_under_cursor(const View *view, size_t *offset_in_line);
+StringView view_get_word_under_cursor(const View *view);
 
 #endif

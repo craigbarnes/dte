@@ -6,17 +6,17 @@
 #include "util/unicode.h"
 #include "view.h"
 
-void select_block(View *v);
-void unselect(View *v);
-void insert_text(View *v, const char *text, size_t size, bool move_after);
-void delete_ch(View *v);
-void erase(View *v);
-void insert_ch(View *v, CodePoint ch);
-void join_lines(View *v);
-void clear_lines(View *v);
-void delete_lines(View *v);
-void new_line(View *v, bool above);
-void format_paragraph(View *v, size_t text_width);
-void change_case(View *v, char mode);
+void select_block(View *view);
+void unselect(View *view);
+void insert_text(View *view, const char *text, size_t size, bool move_after);
+void delete_ch(View *view);
+void erase(View *view);
+void insert_ch(View *view, CodePoint ch);
+void join_lines(View *view);
+void clear_lines(View *view);
+void delete_lines(View *view);
+void new_line(View *view, bool above);
+void format_paragraph(View *view, size_t text_width);
+void change_case(View *view, char mode);
 
 #endif

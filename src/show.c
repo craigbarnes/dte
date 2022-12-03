@@ -59,23 +59,24 @@ static void open_temporary_buffer (
     const char *cmd_arg,
     ShowHandlerFlags flags
 ) {
-    View *v = window_open_new_file(e->window);
-    v->buffer->temporary = true;
-    do_insert(v, text, text_len);
-    set_display_filename(v->buffer, xasprintf("(%s %s)", cmd, cmd_arg));
-    buffer_set_encoding(v->buffer, encoding_from_type(UTF8), e->options.utf8_bom);
+    View *view = window_open_new_file(e->window);
+    Buffer *buffer = view->buffer;
+    buffer->temporary = true;
+    do_insert(view, text, text_len);
+    set_display_filename(buffer, xasprintf("(%s %s)", cmd, cmd_arg));
+    buffer_set_encoding(buffer, encoding_from_type(UTF8), e->options.utf8_bom);
 
     if (flags & LASTLINE) {
-        block_iter_eof(&v->cursor);
-        block_iter_prev_line(&v->cursor);
+        block_iter_eof(&view->cursor);
+        block_iter_prev_line(&view->cursor);
     } else if ((flags & MSGLINE) && e->messages.array.count > 0) {
-        block_iter_goto_line(&v->cursor, e->messages.pos);
+        block_iter_goto_line(&view->cursor, e->messages.pos);
     }
 
     if (flags & DTERC) {
-        v->buffer->options.filetype = str_intern("dte");
-        set_file_options(e, v->buffer);
-        buffer_update_syntax(e, v->buffer);
+        buffer->options.filetype = str_intern("dte");
+        set_file_options(e, buffer);
+        buffer_update_syntax(e, buffer);
     }
 }
 

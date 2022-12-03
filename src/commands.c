@@ -1049,10 +1049,10 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
     }
 
     if (a->nr_args == 0) {
-        View *v = window_open_new_file(e->window);
-        v->buffer->temporary = temporary;
+        View *view = window_open_new_file(e->window);
+        view->buffer->temporary = temporary;
         if (requested_encoding) {
-            buffer_set_encoding(v->buffer, encoding, e->options.utf8_bom);
+            buffer_set_encoding(view->buffer, encoding, e->options.utf8_bom);
         }
         return;
     }
@@ -1247,18 +1247,18 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
     }
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
-        Buffer *b = e->buffers.ptrs[i];
-        if (buffer_modified(b)) {
+        Buffer *buffer = e->buffers.ptrs[i];
+        if (buffer_modified(buffer)) {
             // Activate modified buffer
-            View *v = window_find_view(e->window, b);
-            if (!v) {
+            View *view = window_find_view(e->window, buffer);
+            if (!view) {
                 // Buffer isn't open in current window; activate first window
                 // of the buffer
-                v = b->views.ptrs[0];
-                e->window = v->window;
+                view = buffer->views.ptrs[0];
+                e->window = view->window;
                 mark_everything_changed(e);
             }
-            set_view(v);
+            set_view(view);
             if (has_flag(a, 'p')) {
                 static const char str[] = "Quit without saving changes? [y/N]";
                 if (dialog_prompt(e, str, "ny") == 'y') {
@@ -2006,9 +2006,9 @@ static void cmd_wclose(EditorState *e, const CommandArgs *a)
 {
     bool force = has_flag(a, 'f');
     bool prompt = has_flag(a, 'p');
-    View *v = window_find_unclosable_view(e->window);
-    if (v && !force) {
-        set_view(v);
+    View *view = window_find_unclosable_view(e->window);
+    if (view && !force) {
+        set_view(view);
         if (prompt) {
             static const char str[] = "Close window without saving? [y/N]";
             if (dialog_prompt(e, str, "ny") != 'y') {

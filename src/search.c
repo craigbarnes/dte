@@ -227,19 +227,19 @@ static void do_search_next(View *view, SearchState *search, SearchCaseSensitivit
     error_msg("Pattern '%s' not found", search->pattern);
 }
 
-void search_prev(View *v, SearchState *search, SearchCaseSensitivity cs)
+void search_prev(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
     toggle_search_direction(search);
-    search_next(v, search, cs);
+    search_next(view, search, cs);
     toggle_search_direction(search);
 }
 
-void search_next(View *v, SearchState *search, SearchCaseSensitivity cs)
+void search_next(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(v, search, cs, false);
+    do_search_next(view, search, cs, false);
 }
 
-void search_next_word(View *v, SearchState *search, SearchCaseSensitivity cs)
+void search_next_word(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(v, search, cs, true);
+    do_search_next(view, search, cs, true);
 }

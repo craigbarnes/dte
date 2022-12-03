@@ -33,6 +33,6 @@ void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window);
 void update_status_line(const Window *win);
 
 // screen-view.c
-void update_range(EditorState *e, const View *v, long y1, long y2);
+void update_range(EditorState *e, const View *view, long y1, long y2);
 
 #endif

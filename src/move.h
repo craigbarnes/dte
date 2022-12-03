@@ -21,9 +21,9 @@ void move_up(View *view, long count);
 void move_down(View *view, long count);
 void move_bof(View *view);
 void move_eof(View *view);
-void move_to_line(View *v, size_t line);
-void move_to_column(View *v, size_t column);
-void move_to_filepos(View *v, size_t line, size_t column);
+void move_to_line(View *view, size_t line);
+void move_to_column(View *view, size_t column);
+void move_to_filepos(View *view, size_t line, size_t column);
 
 size_t word_fwd(BlockIter *bi, bool skip_non_word);
 size_t word_bwd(BlockIter *bi, bool skip_non_word);

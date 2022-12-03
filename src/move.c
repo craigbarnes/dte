@@ -186,36 +186,36 @@ void move_eof(View *view)
     view_reset_preferred_x(view);
 }
 
-void move_to_line(View *v, size_t line)
+void move_to_line(View *view, size_t line)
 {
     BUG_ON(line == 0);
-    block_iter_goto_line(&v->cursor, line - 1);
-    v->center_on_scroll = true;
+    block_iter_goto_line(&view->cursor, line - 1);
+    view->center_on_scroll = true;
 }
 
-void move_to_column(View *v, size_t column)
+void move_to_column(View *view, size_t column)
 {
     BUG_ON(column == 0);
-    block_iter_bol(&v->cursor);
+    block_iter_bol(&view->cursor);
     while (column-- > 1) {
         CodePoint u;
-        if (!block_iter_next_char(&v->cursor, &u)) {
+        if (!block_iter_next_char(&view->cursor, &u)) {
             break;
         }
         if (u == '\n') {
-            block_iter_prev_char(&v->cursor, &u);
+            block_iter_prev_char(&view->cursor, &u);
             break;
         }
     }
-    view_reset_preferred_x(v);
+    view_reset_preferred_x(view);
 }
 
-void move_to_filepos(View *v, size_t line, size_t column)
+void move_to_filepos(View *view, size_t line, size_t column)
 {
-    move_to_line(v, line);
-    BUG_ON(!block_iter_is_bol(&v->cursor));
+    move_to_line(view, line);
+    BUG_ON(!block_iter_is_bol(&view->cursor));
     if (column != 1) {
-        move_to_column(v, column);
+        move_to_column(view, column);
     }
 }
 

@@ -67,16 +67,16 @@ static WhitespaceErrorFlags get_ws_error(const LocalOptions *opts)
 
 static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
 {
-    const View *v = info->view;
-    WhitespaceErrorFlags flags = get_ws_error(&v->buffer->options);
+    const View *view = info->view;
+    WhitespaceErrorFlags flags = get_ws_error(&view->buffer->options);
     WhitespaceErrorFlags trailing = flags & (WSE_TRAILING | WSE_ALL_TRAILING);
     if (i >= info->trailing_ws_offset && trailing) {
         // Trailing whitespace
         if (
             // Cursor is not on this line
-            info->line_nr != v->cy
+            info->line_nr != view->cy
             // or is positioned before any trailing whitespace
-            || v->cx < info->trailing_ws_offset
+            || view->cx < info->trailing_ws_offset
             // or user explicitly wants trailing space under cursor highlighted
             || flags & WSE_ALL_TRAILING
         ) {
@@ -106,7 +106,7 @@ static bool whitespace_error(const LineInfo *info, CodePoint u, size_t i)
     }
 
     WhitespaceErrorFlags mask;
-    if (count >= v->buffer->options.tab_width) {
+    if (count >= view->buffer->options.tab_width) {
         // Spaces used instead of tab
         mask = WSE_SPACE_INDENT;
     } else if (pos < info->size && line[pos] == '\t') {
@@ -246,27 +246,27 @@ static void hl_words(Terminal *term, const ColorScheme *colors, const LineInfo *
 
 static void line_info_init (
     LineInfo *info,
-    const View *v,
+    const View *view,
     const BlockIter *bi,
     size_t line_nr
 ) {
     *info = (LineInfo) {
-        .view = v,
+        .view = view,
         .line_nr = line_nr,
         .offset = block_iter_get_offset(bi),
     };
 
-    if (!v->selection) {
+    if (!view->selection) {
         info->sel_so = -1;
         info->sel_eo = -1;
-    } else if (v->sel_eo != UINT_MAX) {
+    } else if (view->sel_eo != UINT_MAX) {
         // Already calculated
-        info->sel_so = v->sel_so;
-        info->sel_eo = v->sel_eo;
+        info->sel_so = view->sel_so;
+        info->sel_eo = view->sel_eo;
         BUG_ON(info->sel_so > info->sel_eo);
     } else {
         SelectionInfo sel;
-        init_selection(v, &sel);
+        init_selection(view, &sel);
         info->sel_so = sel.so;
         info->sel_eo = sel.eo;
     }
@@ -351,36 +351,36 @@ static void print_line(EditorState *e, LineInfo *info)
     term_clear_eol(term);
 }
 
-void update_range(EditorState *e, const View *v, long y1, long y2)
+void update_range(EditorState *e, const View *view, long y1, long y2)
 {
-    const int edit_x = v->window->edit_x;
-    const int edit_y = v->window->edit_y;
-    const int edit_w = v->window->edit_w;
-    const int edit_h = v->window->edit_h;
+    const int edit_x = view->window->edit_x;
+    const int edit_y = view->window->edit_y;
+    const int edit_w = view->window->edit_w;
+    const int edit_h = view->window->edit_h;
 
     Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
-    term_output_reset(term, edit_x, edit_w, v->vx);
-    obuf->tab_width = v->buffer->options.tab_width;
+    term_output_reset(term, edit_x, edit_w, view->vx);
+    obuf->tab_width = view->buffer->options.tab_width;
     obuf->tab_mode = e->options.display_special ? TAB_SPECIAL : TAB_NORMAL;
 
-    BlockIter bi = v->cursor;
-    for (long i = 0, n = v->cy - y1; i < n; i++) {
+    BlockIter bi = view->cursor;
+    for (long i = 0, n = view->cy - y1; i < n; i++) {
         block_iter_prev_line(&bi);
     }
-    for (long i = 0, n = y1 - v->cy; i < n; i++) {
+    for (long i = 0, n = y1 - view->cy; i < n; i++) {
         block_iter_eat_line(&bi);
     }
     block_iter_bol(&bi);
 
     LineInfo info;
-    line_info_init(&info, v, &bi, y1);
+    line_info_init(&info, view, &bi, y1);
 
-    y1 -= v->vy;
-    y2 -= v->vy;
+    y1 -= view->vy;
+    y2 -= view->vy;
 
     bool got_line = !block_iter_is_eof(&bi);
-    hl_fill_start_states(v->buffer, &e->colors, info.line_nr);
+    hl_fill_start_states(view->buffer, &e->colors, info.line_nr);
     long i;
     for (i = y1; got_line && i < y2; i++) {
         obuf->x = 0;
@@ -389,7 +389,7 @@ void update_range(EditorState *e, const View *v, long y1, long y2)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         bool next_changed;
-        const TermColor **colors = hl_line(v->buffer, &e->colors, &line, info.line_nr, &next_changed);
+        const TermColor **colors = hl_line(view->buffer, &e->colors, &line, info.line_nr, &next_changed);
         line_info_set_line(&info, &line, colors);
         print_line(e, &info);
 
@@ -403,7 +403,7 @@ void update_range(EditorState *e, const View *v, long y1, long y2)
         }
     }
 
-    if (i < y2 && info.line_nr == v->cy) {
+    if (i < y2 && info.line_nr == view->cy) {
         // Dummy empty line is shown only if cursor is on it
         TermColor color = e->colors.builtin[BC_DEFAULT];
 

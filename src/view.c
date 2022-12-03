@@ -6,15 +6,15 @@
 #include "util/utf8.h"
 #include "window.h"
 
-void view_update_cursor_y(View *v)
+void view_update_cursor_y(View *view)
 {
-    Buffer *b = v->buffer;
+    Buffer *buffer = view->buffer;
     Block *blk;
     size_t nl = 0;
-    block_for_each(blk, &b->blocks) {
-        if (blk == v->cursor.blk) {
-            nl += count_nl(blk->data, v->cursor.offset);
-            v->cy = nl;
+    block_for_each(blk, &buffer->blocks) {
+        if (blk == view->cursor.blk) {
+            nl += count_nl(blk->data, view->cursor.offset);
+            view->cy = nl;
             return;
         }
         nl += blk->nl;
@@ -22,11 +22,11 @@ void view_update_cursor_y(View *v)
     BUG("unreachable");
 }
 
-void view_update_cursor_x(View *v)
+void view_update_cursor_x(View *view)
 {
     StringView line;
-    const unsigned int tw = v->buffer->options.tab_width;
-    const size_t cx = fetch_this_line(&v->cursor, &line);
+    const unsigned int tw = view->buffer->options.tab_width;
+    const size_t cx = fetch_this_line(&view->cursor, &line);
     long cx_char = 0;
     long w = 0;
 
@@ -47,9 +47,9 @@ void view_update_cursor_x(View *v)
         }
     }
 
-    v->cx = cx;
-    v->cx_char = cx_char;
-    v->cx_display = w;
+    view->cx = cx;
+    view->cx_char = cx_char;
+    view->cx_display = w;
 }
 
 static bool view_is_cursor_visible(const View *v)
@@ -129,19 +129,19 @@ long view_get_preferred_x(View *v)
     return v->preferred_x;
 }
 
-bool view_can_close(const View *v)
+bool view_can_close(const View *view)
 {
-    if (!buffer_modified(v->buffer)) {
+    if (!buffer_modified(view->buffer)) {
         return true;
     }
     // Open in another window?
-    return v->buffer->views.count > 1;
+    return view->buffer->views.count > 1;
 }
 
-StringView view_do_get_word_under_cursor(const View *v, size_t *offset_in_line)
+StringView view_do_get_word_under_cursor(const View *view, size_t *offset_in_line)
 {
     StringView line;
-    size_t si = fetch_this_line(&v->cursor, &line);
+    size_t si = fetch_this_line(&view->cursor, &line);
     while (si < line.length) {
         size_t i = si;
         if (u_is_word_char(u_get_char(line.data, line.length, &i))) {
@@ -176,8 +176,8 @@ StringView view_do_get_word_under_cursor(const View *v, size_t *offset_in_line)
     return string_view(line.data + si, ei - si);
 }
 
-StringView view_get_word_under_cursor(const View *v)
+StringView view_get_word_under_cursor(const View *view)
 {
     size_t offset_in_line;
-    return view_do_get_word_under_cursor(v, &offset_in_line);
+    return view_do_get_word_under_cursor(view, &offset_in_line);
 }

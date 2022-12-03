@@ -13,8 +13,8 @@ typedef struct {
 } Clipboard;
 
 void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines);
-void copy(Clipboard *clip, View *v, size_t len, bool is_lines);
-void cut(Clipboard *clip, View *v, size_t len, bool is_lines);
-void paste(Clipboard *clip, View *v, bool at_cursor, bool move_after);
+void copy(Clipboard *clip, View *view, size_t len, bool is_lines);
+void cut(Clipboard *clip, View *view, size_t len, bool is_lines);
+void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after);
 
 #endif
