@@ -25,13 +25,14 @@ static void set_options(EditorState *e, char **args)
     }
 }
 
-void set_editorconfig_options(Buffer *b)
+void set_editorconfig_options(Buffer *buffer)
 {
-    if (!b->options.editorconfig) {
+    LocalOptions *options = &buffer->options;
+    if (!options->editorconfig) {
         return;
     }
 
-    const char *path = b->abs_filename;
+    const char *path = buffer->abs_filename;
     char cwd[8192];
     if (!path) {
         // For buffers with no associated filename, use a dummy path of
@@ -52,14 +53,14 @@ void set_editorconfig_options(Buffer *b)
 
     switch (opts.indent_style) {
     case INDENT_STYLE_SPACE:
-        b->options.expand_tab = true;
-        b->options.emulate_tab = true;
-        b->options.detect_indent = 0;
+        options->expand_tab = true;
+        options->emulate_tab = true;
+        options->detect_indent = 0;
         break;
     case INDENT_STYLE_TAB:
-        b->options.expand_tab = false;
-        b->options.emulate_tab = false;
-        b->options.detect_indent = 0;
+        options->expand_tab = false;
+        options->emulate_tab = false;
+        options->detect_indent = 0;
         break;
     case INDENT_STYLE_UNSPECIFIED:
         break;
@@ -67,34 +68,34 @@ void set_editorconfig_options(Buffer *b)
 
     const unsigned int indent_size = opts.indent_size;
     if (indent_size > 0 && indent_size <= INDENT_WIDTH_MAX) {
-        b->options.indent_width = indent_size;
-        b->options.detect_indent = 0;
+        options->indent_width = indent_size;
+        options->detect_indent = 0;
     }
 
     const unsigned int tab_width = opts.tab_width;
     if (tab_width > 0 && tab_width <= TAB_WIDTH_MAX) {
-        b->options.tab_width = tab_width;
+        options->tab_width = tab_width;
     }
 
     const unsigned int max_line_length = opts.max_line_length;
     if (max_line_length > 0 && max_line_length <= TEXT_WIDTH_MAX) {
-        b->options.text_width = max_line_length;
+        options->text_width = max_line_length;
     }
 }
 
-void set_file_options(EditorState *e, Buffer *b)
+void set_file_options(EditorState *e, Buffer *buffer)
 {
     for (size_t i = 0, n = e->file_options.count; i < n; i++) {
         const FileOption *opt = e->file_options.ptrs[i];
         if (opt->type == FILE_OPTIONS_FILETYPE) {
-            if (streq(opt->u.filetype, b->options.filetype)) {
+            if (streq(opt->u.filetype, buffer->options.filetype)) {
                 set_options(e, opt->strs);
             }
             continue;
         }
 
         BUG_ON(opt->type != FILE_OPTIONS_FILENAME);
-        const char *filename = b->abs_filename;
+        const char *filename = buffer->abs_filename;
         if (!filename) {
             continue;
         }

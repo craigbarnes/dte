@@ -59,7 +59,7 @@ typedef struct {
     size_t size;
     size_t pos;
     size_t separator;
-    const Window *win;
+    const Window *window;
     const GlobalOptions *opts;
     InputMode input_mode;
 } Formatter;
@@ -120,9 +120,9 @@ static void add_status_format(Formatter *f, const char *format, ...)
 
 static void add_status_pos(Formatter *f)
 {
-    size_t lines = f->win->view->buffer->nl;
-    int h = f->win->edit_h;
-    long pos = f->win->view->vy;
+    size_t lines = f->window->view->buffer->nl;
+    int h = f->window->edit_h;
+    long pos = f->window->view->vy;
     if (lines <= h) {
         if (pos) {
             add_status_literal(f, "Bot");
@@ -157,7 +157,7 @@ static void add_misc_status(Formatter *f)
         return;
     }
 
-    const View *view = f->win->view;
+    const View *view = f->window->view;
     if (view->selection == SELECT_NONE) {
         return;
     }
@@ -199,7 +199,7 @@ UNITTEST {
 }
 
 void sf_format (
-    const Window *w,
+    const Window *window,
     const GlobalOptions *opts,
     InputMode mode,
     char *buf,
@@ -208,14 +208,14 @@ void sf_format (
 ) {
     BUG_ON(size < 16);
     Formatter f = {
-        .win = w,
+        .window = window,
         .opts = opts,
         .input_mode = mode,
         .buf = buf,
         .size = size - 5, // Max length of char and terminating NUL
     };
 
-    const View *view = w->view;
+    const View *view = window->view;
     const Buffer *buffer = view->buffer;
     CodePoint u;
 

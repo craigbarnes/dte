@@ -36,27 +36,27 @@ typedef struct Window {
 struct EditorState;
 
 Window *new_window(struct EditorState *e) NONNULL_ARGS_AND_RETURN;
-View *window_add_buffer(Window *w, Buffer *b);
-View *window_open_empty_buffer(Window *w);
-View *window_open_buffer(Window *w, const char *filename, bool must_exist, const Encoding *encoding);
-View *window_get_view(Window *w, Buffer *b);
-View *window_find_view(Window *w, Buffer *b);
-View *window_find_unclosable_view(Window *w);
-void window_free(Window *w);
+View *window_add_buffer(Window *window, Buffer *buffer);
+View *window_open_empty_buffer(Window *window);
+View *window_open_buffer(Window *window, const char *filename, bool must_exist, const Encoding *encoding);
+View *window_get_view(Window *window, Buffer *buffer);
+View *window_find_view(Window *window, Buffer *buffer);
+View *window_find_unclosable_view(Window *window);
+void window_free(Window *window);
 size_t remove_view(View *view);
-void window_close(Window *w);
-void window_close_current_view(Window *w);
+void window_close(Window *window);
+void window_close_current_view(Window *window);
 void set_view(View *view);
-View *window_open_new_file(Window *w);
-View *window_open_file(Window *w, const char *filename, const Encoding *encoding);
-void window_open_files(Window *w, char **filenames, const Encoding *encoding);
-void mark_buffer_tabbars_changed(Buffer *b);
-void calculate_line_numbers(Window *win);
-void set_window_coordinates(Window *win, int x, int y);
-void set_window_size(Window *win, int w, int h);
-int window_get_scroll_margin(const Window *w, unsigned int scroll_margin);
+View *window_open_new_file(Window *window);
+View *window_open_file(Window *window, const char *filename, const Encoding *encoding);
+void window_open_files(Window *window, char **filenames, const Encoding *encoding);
+void mark_buffer_tabbars_changed(Buffer *buffer);
+void calculate_line_numbers(Window *window);
+void set_window_coordinates(Window *window, int x, int y);
+void set_window_size(Window *window, int w, int h);
+int window_get_scroll_margin(const Window *window, unsigned int scroll_margin);
 void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data);
-Window *prev_window(Window *w);
-Window *next_window(Window *w);
+Window *prev_window(Window *window);
+Window *next_window(Window *window);
 
 #endif

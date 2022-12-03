@@ -14,38 +14,38 @@
 
 Window *new_window(EditorState *e)
 {
-    Window *w = xnew0(Window, 1);
-    w->editor = e;
-    return w;
+    Window *window = xnew0(Window, 1);
+    window->editor = e;
+    return window;
 }
 
-View *window_add_buffer(Window *w, Buffer *b)
+View *window_add_buffer(Window *window, Buffer *buffer)
 {
     View *view = xnew(View, 1);
     *view = (View) {
-        .buffer = b,
-        .window = w,
+        .buffer = buffer,
+        .window = window,
         .selection = SELECT_NONE,
         .cursor = {
-            .blk = BLOCK(b->blocks.next),
-            .head = &b->blocks,
+            .blk = BLOCK(buffer->blocks.next),
+            .head = &buffer->blocks,
         }
     };
 
-    ptr_array_append(&b->views, view);
-    ptr_array_append(&w->views, view);
-    w->update_tabbar = true;
+    ptr_array_append(&buffer->views, view);
+    ptr_array_append(&window->views, view);
+    window->update_tabbar = true;
     return view;
 }
 
-View *window_open_empty_buffer(Window *w)
+View *window_open_empty_buffer(Window *window)
 {
-    EditorState *e = w->editor;
-    return window_add_buffer(w, open_empty_buffer(&e->buffers, &e->options));
+    EditorState *e = window->editor;
+    return window_add_buffer(window, open_empty_buffer(&e->buffers, &e->options));
 }
 
 View *window_open_buffer (
-    Window *w,
+    Window *window,
     const char *filename,
     bool must_exist,
     const Encoding *encoding
@@ -55,21 +55,21 @@ View *window_open_buffer (
         return NULL;
     }
 
-    EditorState *e = w->editor;
+    EditorState *e = window->editor;
     bool dir_missing = false;
     char *absolute = path_absolute(filename);
     if (absolute) {
         // Already open?
-        Buffer *b = find_buffer(&e->buffers, absolute);
-        if (b) {
-            if (!streq(absolute, b->abs_filename)) {
-                const char *bufname = buffer_filename(b);
+        Buffer *buffer = find_buffer(&e->buffers, absolute);
+        if (buffer) {
+            if (!streq(absolute, buffer->abs_filename)) {
+                const char *bufname = buffer_filename(buffer);
                 char *s = short_filename(absolute, &e->home_dir);
                 info_msg("%s and %s are the same file", s, bufname);
                 free(s);
             }
             free(absolute);
-            return window_get_view(w, b);
+            return window_get_view(window, buffer);
         }
     } else {
         // Let load_buffer() create error message
@@ -96,60 +96,60 @@ View *window_open_buffer (
     dte /proc/$(pidof tail)/fd/3
     */
 
-    Buffer *b = buffer_new(&e->buffers, &e->options, encoding);
-    if (!load_buffer(b, filename, &e->options, must_exist)) {
-        remove_and_free_buffer(&e->buffers, b);
+    Buffer *buffer = buffer_new(&e->buffers, &e->options, encoding);
+    if (!load_buffer(buffer, filename, &e->options, must_exist)) {
+        remove_and_free_buffer(&e->buffers, buffer);
         free(absolute);
         return NULL;
     }
-    if (unlikely(b->file.mode == 0 && dir_missing)) {
+    if (unlikely(buffer->file.mode == 0 && dir_missing)) {
         // New file in non-existing directory; this is usually a mistake
         error_msg("Error opening %s: Directory does not exist", filename);
-        remove_and_free_buffer(&e->buffers, b);
+        remove_and_free_buffer(&e->buffers, buffer);
         free(absolute);
         return NULL;
     }
 
     if (absolute) {
-        b->abs_filename = absolute;
+        buffer->abs_filename = absolute;
     } else {
         // FIXME: obviously wrong
-        b->abs_filename = xstrdup(filename);
+        buffer->abs_filename = xstrdup(filename);
     }
-    update_short_filename(b, &e->home_dir);
+    update_short_filename(buffer, &e->home_dir);
 
     if (e->options.lock_files) {
-        if (!lock_file(b->abs_filename)) {
-            b->readonly = true;
+        if (!lock_file(buffer->abs_filename)) {
+            buffer->readonly = true;
         } else {
-            b->locked = true;
+            buffer->locked = true;
         }
     }
 
-    if (b->file.mode != 0 && !b->readonly && access(filename, W_OK)) {
+    if (buffer->file.mode != 0 && !buffer->readonly && access(filename, W_OK)) {
         error_msg("No write permission to %s, marking read-only", filename);
-        b->readonly = true;
+        buffer->readonly = true;
     }
 
-    return window_add_buffer(w, b);
+    return window_add_buffer(window, buffer);
 }
 
-View *window_get_view(Window *w, Buffer *b)
+View *window_get_view(Window *window, Buffer *buffer)
 {
-    View *view = window_find_view(w, b);
+    View *view = window_find_view(window, buffer);
     if (!view) {
         // Open the buffer in other window to this window
-        view = window_add_buffer(w, b);
-        view->cursor = ((View*)b->views.ptrs[0])->cursor;
+        view = window_add_buffer(window, buffer);
+        view->cursor = ((View*)buffer->views.ptrs[0])->cursor;
     }
     return view;
 }
 
-View *window_find_view(Window *w, Buffer *b)
+View *window_find_view(Window *window, Buffer *buffer)
 {
-    for (size_t i = 0, n = b->views.count; i < n; i++) {
-        View *view = b->views.ptrs[i];
-        if (view->window == w) {
+    for (size_t i = 0, n = buffer->views.count; i < n; i++) {
+        View *view = buffer->views.ptrs[i];
+        if (view->window == window) {
             return view;
         }
     }
@@ -157,14 +157,14 @@ View *window_find_view(Window *w, Buffer *b)
     return NULL;
 }
 
-View *window_find_unclosable_view(Window *w)
+View *window_find_unclosable_view(Window *window)
 {
     // Check active view first
-    if (w->view && !view_can_close(w->view)) {
-        return w->view;
+    if (window->view && !view_can_close(window->view)) {
+        return window->view;
     }
-    for (size_t i = 0, n = w->views.count; i < n; i++) {
-        View *view = w->views.ptrs[i];
+    for (size_t i = 0, n = window->views.count; i < n; i++) {
+        View *view = window->views.ptrs[i];
         if (!view_can_close(view)) {
             return view;
         }
@@ -172,70 +172,70 @@ View *window_find_unclosable_view(Window *w)
     return NULL;
 }
 
-static void window_remove_views(Window *w)
+static void window_remove_views(Window *window)
 {
-    while (w->views.count > 0) {
-        View *view = w->views.ptrs[w->views.count - 1];
+    while (window->views.count > 0) {
+        View *view = window->views.ptrs[window->views.count - 1];
         remove_view(view);
     }
 }
 
-// NOTE: w->frame isn't removed
-void window_free(Window *w)
+// NOTE: window->frame isn't removed
+void window_free(Window *window)
 {
-    window_remove_views(w);
-    free(w->views.ptrs);
-    w->frame = NULL;
-    free(w);
+    window_remove_views(window);
+    free(window->views.ptrs);
+    window->frame = NULL;
+    free(window);
 }
 
 // Remove view from view->window and view->buffer->views and free it
 size_t remove_view(View *view)
 {
-    Window *w = view->window;
-    EditorState *e = w->editor;
-    if (view == w->prev_view) {
-        w->prev_view = NULL;
+    Window *window = view->window;
+    EditorState *e = window->editor;
+    if (view == window->prev_view) {
+        window->prev_view = NULL;
     }
     if (view == e->view) {
         e->view = NULL;
         e->buffer = NULL;
     }
 
-    size_t idx = ptr_array_idx(&w->views, view);
-    BUG_ON(idx >= w->views.count);
-    ptr_array_remove_idx(&w->views, idx);
-    w->update_tabbar = true;
+    size_t idx = ptr_array_idx(&window->views, view);
+    BUG_ON(idx >= window->views.count);
+    ptr_array_remove_idx(&window->views, idx);
+    window->update_tabbar = true;
 
-    Buffer *b = view->buffer;
-    ptr_array_remove(&b->views, view);
-    if (b->views.count == 0) {
-        if (b->options.file_history && b->abs_filename) {
+    Buffer *buffer = view->buffer;
+    ptr_array_remove(&buffer->views, view);
+    if (buffer->views.count == 0) {
+        if (buffer->options.file_history && buffer->abs_filename) {
             FileHistory *hist = &e->file_history;
-            file_history_add(hist, view->cy + 1, view->cx_char + 1, b->abs_filename);
+            file_history_add(hist, view->cy + 1, view->cx_char + 1, buffer->abs_filename);
         }
-        remove_and_free_buffer(&e->buffers, b);
+        remove_and_free_buffer(&e->buffers, buffer);
     }
 
     free(view);
     return idx;
 }
 
-void window_close_current_view(Window *w)
+void window_close_current_view(Window *window)
 {
-    size_t idx = remove_view(w->view);
-    if (w->prev_view) {
-        w->view = w->prev_view;
-        w->prev_view = NULL;
+    size_t idx = remove_view(window->view);
+    if (window->prev_view) {
+        window->view = window->prev_view;
+        window->prev_view = NULL;
         return;
     }
-    if (w->views.count == 0) {
-        window_open_empty_buffer(w);
+    if (window->views.count == 0) {
+        window_open_empty_buffer(window);
     }
-    if (w->views.count == idx) {
+    if (window->views.count == idx) {
         idx--;
     }
-    w->view = w->views.ptrs[idx];
+    window->view = window->views.ptrs[idx];
 }
 
 static void restore_cursor_from_history(const FileHistory *hist, View *view)
@@ -288,12 +288,12 @@ void set_view(View *view)
     }
 }
 
-View *window_open_new_file(Window *w)
+View *window_open_new_file(Window *window)
 {
-    View *prev = w->view;
-    View *view = window_open_empty_buffer(w);
+    View *prev = window->view;
+    View *view = window_open_empty_buffer(window);
     set_view(view);
-    w->prev_view = prev;
+    window->prev_view = prev;
     return view;
 }
 
@@ -316,59 +316,59 @@ static bool is_useless_empty_view(const View *view)
     return true;
 }
 
-View *window_open_file(Window *w, const char *filename, const Encoding *encoding)
+View *window_open_file(Window *window, const char *filename, const Encoding *encoding)
 {
-    View *prev = w->view;
+    View *prev = window->view;
     bool useless = is_useless_empty_view(prev);
-    View *view = window_open_buffer(w, filename, false, encoding);
+    View *view = window_open_buffer(window, filename, false, encoding);
     if (view) {
         set_view(view);
         if (useless) {
             remove_view(prev);
         } else {
-            w->prev_view = prev;
+            window->prev_view = prev;
         }
     }
     return view;
 }
 
-void window_open_files(Window *w, char **filenames, const Encoding *encoding)
+void window_open_files(Window *window, char **filenames, const Encoding *encoding)
 {
-    View *empty = w->view;
+    View *empty = window->view;
     bool useless = is_useless_empty_view(empty);
     bool first = true;
     for (size_t i = 0; filenames[i]; i++) {
-        View *view = window_open_buffer(w, filenames[i], false, encoding);
+        View *view = window_open_buffer(window, filenames[i], false, encoding);
         if (view && first) {
             set_view(view);
             first = false;
         }
     }
-    if (useless && w->view != empty) {
+    if (useless && window->view != empty) {
         remove_view(empty);
     }
 }
 
-void mark_buffer_tabbars_changed(Buffer *b)
+void mark_buffer_tabbars_changed(Buffer *buffer)
 {
-    for (size_t i = 0, n = b->views.count; i < n; i++) {
-        View *view = b->views.ptrs[i];
+    for (size_t i = 0, n = buffer->views.count; i < n; i++) {
+        View *view = buffer->views.ptrs[i];
         view->window->update_tabbar = true;
     }
 }
 
-static int line_numbers_width(const Window *win, const GlobalOptions *options)
+static int line_numbers_width(const Window *window, const GlobalOptions *options)
 {
-    if (!options->show_line_numbers || !win->view) {
+    if (!options->show_line_numbers || !window->view) {
         return 0;
     }
-    size_t width = size_str_width(win->view->buffer->nl) + 1;
+    size_t width = size_str_width(window->view->buffer->nl) + 1;
     return MAX(width, LINE_NUMBERS_MIN_WIDTH);
 }
 
-static int edit_x_offset(const Window *win, const GlobalOptions *options)
+static int edit_x_offset(const Window *window, const GlobalOptions *options)
 {
-    return line_numbers_width(win, options);
+    return line_numbers_width(window, options);
 }
 
 static int edit_y_offset(const GlobalOptions *options)
@@ -376,48 +376,48 @@ static int edit_y_offset(const GlobalOptions *options)
     return options->tab_bar ? 1 : 0;
 }
 
-static void set_edit_size(Window *win, const GlobalOptions *options)
+static void set_edit_size(Window *window, const GlobalOptions *options)
 {
-    int xo = edit_x_offset(win, options);
+    int xo = edit_x_offset(window, options);
     int yo = edit_y_offset(options);
 
-    win->edit_w = win->w - xo;
-    win->edit_h = win->h - yo - 1; // statusline
-    win->edit_x = win->x + xo;
+    window->edit_w = window->w - xo;
+    window->edit_h = window->h - yo - 1; // statusline
+    window->edit_x = window->x + xo;
 }
 
-void calculate_line_numbers(Window *win)
+void calculate_line_numbers(Window *window)
 {
-    const GlobalOptions *options = &win->editor->options;
-    int w = line_numbers_width(win, options);
-    if (w != win->line_numbers.width) {
-        win->line_numbers.width = w;
-        win->line_numbers.first = 0;
-        win->line_numbers.last = 0;
-        mark_all_lines_changed(win->view->buffer);
+    const GlobalOptions *options = &window->editor->options;
+    int w = line_numbers_width(window, options);
+    if (w != window->line_numbers.width) {
+        window->line_numbers.width = w;
+        window->line_numbers.first = 0;
+        window->line_numbers.last = 0;
+        mark_all_lines_changed(window->view->buffer);
     }
-    set_edit_size(win, options);
+    set_edit_size(window, options);
 }
 
-void set_window_coordinates(Window *win, int x, int y)
+void set_window_coordinates(Window *window, int x, int y)
 {
-    const GlobalOptions *options = &win->editor->options;
-    win->x = x;
-    win->y = y;
-    win->edit_x = x + edit_x_offset(win, options);
-    win->edit_y = y + edit_y_offset(options);
+    const GlobalOptions *options = &window->editor->options;
+    window->x = x;
+    window->y = y;
+    window->edit_x = x + edit_x_offset(window, options);
+    window->edit_y = y + edit_y_offset(options);
 }
 
-void set_window_size(Window *win, int w, int h)
+void set_window_size(Window *window, int w, int h)
 {
-    win->w = w;
-    win->h = h;
-    calculate_line_numbers(win);
+    window->w = w;
+    window->h = h;
+    calculate_line_numbers(window);
 }
 
-int window_get_scroll_margin(const Window *w, unsigned int scroll_margin)
+int window_get_scroll_margin(const Window *window, unsigned int scroll_margin)
 {
-    int max = (w->edit_h - 1) / 2;
+    int max = (window->edit_h - 1) / 2;
     if (scroll_margin > max) {
         return max;
     }
@@ -444,38 +444,38 @@ typedef struct {
     bool found; // Set to true when target is found
 } WindowCallbackData;
 
-static void find_prev_and_next(Window *w, void *ud)
+static void find_prev_and_next(Window *window, void *ud)
 {
     WindowCallbackData *data = ud;
-    data->last = w;
+    data->last = window;
     if (data->found) {
         if (!data->next) {
-            data->next = w;
+            data->next = window;
         }
         return;
     }
     if (!data->first) {
-        data->first = w;
+        data->first = window;
     }
-    if (w == data->target) {
+    if (window == data->target) {
         data->found = true;
         return;
     }
-    data->prev = w;
+    data->prev = window;
 }
 
-Window *prev_window(Window *w)
+Window *prev_window(Window *window)
 {
-    WindowCallbackData data = {.target = w};
-    frame_for_each_window(w->editor->root_frame, find_prev_and_next, &data);
+    WindowCallbackData data = {.target = window};
+    frame_for_each_window(window->editor->root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.prev ? data.prev : data.last;
 }
 
-Window *next_window(Window *w)
+Window *next_window(Window *window)
 {
-    WindowCallbackData data = {.target = w};
-    frame_for_each_window(w->editor->root_frame, find_prev_and_next, &data);
+    WindowCallbackData data = {.target = window};
+    frame_for_each_window(window->editor->root_frame, find_prev_and_next, &data);
     BUG_ON(!data.found);
     return data.next ? data.next : data.first;
 }

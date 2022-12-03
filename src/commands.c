@@ -239,9 +239,9 @@ static void cmd_case(EditorState *e, const CommandArgs *a)
     change_case(e->view, last_flag_or_default(a, 't'));
 }
 
-static void mark_tabbar_changed(Window *w, void* UNUSED_ARG(data))
+static void mark_tabbar_changed(Window *window, void* UNUSED_ARG(data))
 {
-    w->update_tabbar = true;
+    window->update_tabbar = true;
 }
 
 static void cmd_cd(EditorState *e, const CommandArgs *a)
@@ -283,8 +283,8 @@ static void cmd_cd(EditorState *e, const CommandArgs *a)
     }
 
     for (size_t i = 0, n = e->buffers.count; i < n; i++) {
-        Buffer *b = e->buffers.ptrs[i];
-        update_short_filename_cwd(b, &e->home_dir, cwd);
+        Buffer *buffer = e->buffers.ptrs[i];
+        update_short_filename_cwd(buffer, &e->home_dir, cwd);
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
@@ -1412,12 +1412,12 @@ static void cmd_right(EditorState *e, const CommandArgs *a)
     move_cursor_right(e->view);
 }
 
-static bool stat_changed(const Buffer *b, const struct stat *st)
+static bool stat_changed(const FileInfo *file, const struct stat *st)
 {
     // Don't compare st_mode because we allow chmod 755 etc.
-    return st->st_mtime != b->file.mtime
-        || st->st_dev != b->file.dev
-        || st->st_ino != b->file.ino;
+    return st->st_mtime != file->mtime
+        || st->st_dev != file->dev
+        || st->st_ino != file->ino;
 }
 
 static void cmd_save(EditorState *e, const CommandArgs *a)
@@ -1563,7 +1563,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
         if (
             absolute == buffer->abs_filename
             && !force
-            && stat_changed(buffer, &st)
+            && stat_changed(&buffer->file, &st)
         ) {
             error_msg (
                 "File has been modified by another process; "

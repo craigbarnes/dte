@@ -316,38 +316,38 @@ static ExitCode init_std_fds(int std_fds[2])
 static Buffer *init_std_buffer(EditorState *e, int fds[2])
 {
     const char *name = NULL;
-    Buffer *b = NULL;
+    Buffer *buffer = NULL;
 
     if (fds[STDIN_FILENO] >= 3) {
         Encoding enc = encoding_from_type(UTF8);
-        b = buffer_new(&e->buffers, &e->options, &enc);
-        if (read_blocks(b, fds[STDIN_FILENO], false)) {
+        buffer = buffer_new(&e->buffers, &e->options, &enc);
+        if (read_blocks(buffer, fds[STDIN_FILENO], false)) {
             name = "(stdin)";
-            b->temporary = true;
+            buffer->temporary = true;
         } else {
             error_msg("Unable to read redirected stdin");
-            remove_and_free_buffer(&e->buffers, b);
-            b = NULL;
+            remove_and_free_buffer(&e->buffers, buffer);
+            buffer = NULL;
         }
     }
 
     if (fds[STDOUT_FILENO] >= 3) {
-        if (!b) {
-            b = open_empty_buffer(&e->buffers, &e->options);
+        if (!buffer) {
+            buffer = open_empty_buffer(&e->buffers, &e->options);
             name = "(stdout)";
         } else {
             name = "(stdin|stdout)";
         }
-        b->stdout_buffer = true;
-        b->temporary = true;
+        buffer->stdout_buffer = true;
+        buffer->temporary = true;
     }
 
-    BUG_ON(!b != !name);
+    BUG_ON(!buffer != !name);
     if (name) {
-        set_display_filename(b, xstrdup(name));
+        set_display_filename(buffer, xstrdup(name));
     }
 
-    return b;
+    return buffer;
 }
 
 static ExitCode init_logging(const char *filename, const char *log_level_str)

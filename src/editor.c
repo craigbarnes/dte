@@ -340,9 +340,9 @@ static void start_update(Terminal *term)
     term_hide_cursor(term);
 }
 
-static void clear_update_tabbar(Window *w, void* UNUSED_ARG(data))
+static void clear_update_tabbar(Window *window, void* UNUSED_ARG(data))
 {
-    w->update_tabbar = false;
+    window->update_tabbar = false;
 }
 
 static void end_update(EditorState *e)
@@ -385,10 +385,10 @@ static void update_window(EditorState *e, Window *window)
 }
 
 // Update all visible views containing this buffer
-static void update_buffer_windows(EditorState *e, const Buffer *b)
+static void update_buffer_windows(EditorState *e, const Buffer *buffer)
 {
-    for (size_t i = 0, n = b->views.count; i < n; i++) {
-        View *view = b->views.ptrs[i];
+    for (size_t i = 0, n = buffer->views.count; i < n; i++) {
+        View *view = buffer->views.ptrs[i];
         if (view->window->view == view) {
             // Visible view
             if (view != e->window->view) {

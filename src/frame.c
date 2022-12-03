@@ -286,9 +286,9 @@ static Frame *add_frame(Frame *parent, Window *window, size_t idx)
     return frame;
 }
 
-Frame *new_root_frame(Window *w)
+Frame *new_root_frame(Window *window)
 {
-    return add_frame(NULL, w, 0);
+    return add_frame(NULL, window, 0);
 }
 
 static Frame *find_resizable(Frame *frame, ResizeDirection dir)
@@ -404,23 +404,23 @@ void update_window_coordinates(Frame *frame)
     update_frame_coordinates(get_root_frame(frame), 0, 0);
 }
 
-Frame *split_frame(Window *w, bool vertical, bool before)
+Frame *split_frame(Window *window, bool vertical, bool before)
 {
-    Frame *frame = w->frame;
+    Frame *frame = window->frame;
     Frame *parent = frame->parent;
     if (!parent || parent->vertical != vertical) {
-        // Reparent w
+        // Reparent window
         frame->vertical = vertical;
-        add_frame(frame, w, 0);
+        add_frame(frame, window, 0);
         parent = frame;
     }
 
-    size_t idx = ptr_array_idx(&parent->frames, w->frame);
+    size_t idx = ptr_array_idx(&parent->frames, window->frame);
     BUG_ON(idx >= parent->frames.count);
     if (!before) {
         idx++;
     }
-    Window *neww = new_window(w->editor);
+    Window *neww = new_window(window->editor);
     frame = add_frame(parent, neww, idx);
     parent->equal_size = true;
 
@@ -511,14 +511,14 @@ void dump_frame(const Frame *frame, int level, String *str)
     sanity_check_frame(frame);
     string_sprintf(str, "%*s%dx%d", level * 4, "", frame->w, frame->h);
 
-    const Window *w = frame->window;
-    if (w) {
+    const Window *window = frame->window;
+    if (window) {
         string_sprintf (
             str, "\n%*s%d,%d %dx%d %s\n",
             (level + 1) * 4, "",
-            w->x, w->y,
-            w->w, w->h,
-            buffer_filename(w->view->buffer)
+            window->x, window->y,
+            window->w, window->h,
+            buffer_filename(window->view->buffer)
         );
         return;
     }

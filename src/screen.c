@@ -63,7 +63,7 @@ void update_cursor_style(EditorState *e)
     e->cursor_style_changed = false;
 }
 
-void update_term_title(Terminal *term, const Buffer *b, bool set_window_title)
+void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title)
 {
     if (!set_window_title || !(term->features & TFLAG_SET_WINDOW_TITLE)) {
         return;
@@ -71,11 +71,11 @@ void update_term_title(Terminal *term, const Buffer *b, bool set_window_title)
 
     // FIXME: title must not contain control characters
     TermOutputBuffer *obuf = &term->obuf;
-    const char *filename = buffer_filename(b);
+    const char *filename = buffer_filename(buffer);
     term_add_literal(obuf, "\033]2;");
     term_add_bytes(obuf, filename, strlen(filename));
     term_add_byte(obuf, ' ');
-    term_add_byte(obuf, buffer_modified(b) ? '+' : '-');
+    term_add_byte(obuf, buffer_modified(buffer) ? '+' : '-');
     term_add_literal(obuf, " dte\033\\");
 }
 
@@ -92,15 +92,15 @@ void mask_color(TermColor *color, const TermColor *over)
     }
 }
 
-static void print_separator(Window *win, void *ud)
+static void print_separator(Window *window, void *ud)
 {
     Terminal *term = ud;
     TermOutputBuffer *obuf = &term->obuf;
-    if (win->x + win->w == term->width) {
+    if (window->x + window->w == term->width) {
         return;
     }
-    for (int y = 0, h = win->h; y < h; y++) {
-        term_move_cursor(obuf, win->x + win->w, win->y + y);
+    for (int y = 0, h = window->h; y < h; y++) {
+        term_move_cursor(obuf, window->x + window->w, window->y + y);
         term_add_byte(obuf, '|');
     }
 }
@@ -111,36 +111,36 @@ void update_separators(Terminal *term, const ColorScheme *colors, const Frame *f
     frame_for_each_window(frame, print_separator, term);
 }
 
-void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *win, bool force)
+void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force)
 {
-    const View *view = win->view;
+    const View *view = window->view;
     size_t lines = view->buffer->nl;
-    int x = win->x;
+    int x = window->x;
 
-    calculate_line_numbers(win);
+    calculate_line_numbers(window);
     long first = view->vy + 1;
-    long last = MIN(view->vy + win->edit_h, lines);
+    long last = MIN(view->vy + window->edit_h, lines);
 
     if (
         !force
-        && win->line_numbers.first == first
-        && win->line_numbers.last == last
+        && window->line_numbers.first == first
+        && window->line_numbers.last == last
     ) {
         return;
     }
 
-    win->line_numbers.first = first;
-    win->line_numbers.last = last;
+    window->line_numbers.first = first;
+    window->line_numbers.last = last;
 
     TermOutputBuffer *obuf = &term->obuf;
     char buf[DECIMAL_STR_MAX(unsigned long) + 1];
-    size_t width = win->line_numbers.width;
+    size_t width = window->line_numbers.width;
     BUG_ON(width > sizeof(buf));
     BUG_ON(width < LINE_NUMBERS_MIN_WIDTH);
-    term_output_reset(term, win->x, win->w, 0);
+    term_output_reset(term, window->x, window->w, 0);
     set_builtin_color(term, colors, BC_LINENUMBER);
 
-    for (int y = 0, h = win->edit_h, edit_y = win->edit_y; y < h; y++) {
+    for (int y = 0, h = window->edit_h, edit_y = window->edit_y; y < h; y++) {
         unsigned long line = view->vy + y + 1;
         memset(buf, ' ', width);
         if (line <= lines) {

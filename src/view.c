@@ -60,28 +60,28 @@ static bool view_is_cursor_visible(const View *v)
 static void view_center_to_cursor(View *v)
 {
     size_t lines = v->buffer->nl;
-    Window *w = v->window;
-    unsigned int hh = w->edit_h / 2;
+    Window *window = v->window;
+    unsigned int hh = window->edit_h / 2;
 
-    if (w->edit_h >= lines || v->cy < hh) {
+    if (window->edit_h >= lines || v->cy < hh) {
         v->vy = 0;
         return;
     }
 
     v->vy = v->cy - hh;
-    if (v->vy + w->edit_h > lines) {
+    if (v->vy + window->edit_h > lines) {
         // -1 makes one ~ line visible so that you know where the EOF is
-        v->vy -= v->vy + w->edit_h - lines - 1;
+        v->vy -= v->vy + window->edit_h - lines - 1;
     }
 }
 
 static void view_update_vx(View *v)
 {
-    Window *w = v->window;
+    Window *window = v->window;
     unsigned int c = 8;
 
-    if (v->cx_display - v->vx >= w->edit_w) {
-        v->vx = (v->cx_display - w->edit_w + c) / c * c;
+    if (v->cx_display - v->vx >= window->edit_w) {
+        v->vx = (v->cx_display - window->edit_w + c) / c * c;
     }
     if (v->cx_display < v->vx) {
         v->vx = v->cx_display / c * c;
@@ -90,9 +90,9 @@ static void view_update_vx(View *v)
 
 static void view_update_vy(View *v, unsigned int scroll_margin)
 {
-    Window *w = v->window;
-    int margin = window_get_scroll_margin(w, scroll_margin);
-    long max_y = v->vy + w->edit_h - 1 - margin;
+    Window *window = v->window;
+    int margin = window_get_scroll_margin(window, scroll_margin);
+    long max_y = v->vy + window->edit_h - 1 - margin;
 
     if (v->cy < v->vy + margin) {
         v->vy = v->cy - margin;
@@ -101,7 +101,7 @@ static void view_update_vy(View *v, unsigned int scroll_margin)
         }
     } else if (v->cy > max_y) {
         v->vy += v->cy - max_y;
-        max_y = v->buffer->nl - w->edit_h + 1;
+        max_y = v->buffer->nl - window->edit_h + 1;
         if (v->vy > max_y && max_y >= 0) {
             v->vy = max_y;
         }

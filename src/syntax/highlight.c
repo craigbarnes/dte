@@ -278,9 +278,9 @@ static void block_iter_move_down(BlockIter *bi, size_t count)
     }
 }
 
-static ssize_t fill_hole(Buffer *b, BlockIter *bi, const ColorScheme *cs, ssize_t sidx, ssize_t eidx)
+static ssize_t fill_hole(Buffer *buffer, BlockIter *bi, const ColorScheme *cs, ssize_t sidx, ssize_t eidx)
 {
-    void **ptrs = b->line_start_states.ptrs;
+    void **ptrs = buffer->line_start_states.ptrs;
     ssize_t idx = sidx;
 
     while (idx < eidx) {
@@ -288,7 +288,7 @@ static ssize_t fill_hole(Buffer *b, BlockIter *bi, const ColorScheme *cs, ssize_
         State *st;
         fill_line_nl_ref(bi, &line);
         block_iter_eat_line(bi);
-        highlight_line(b->syn, ptrs[idx++], cs, &line, &st);
+        highlight_line(buffer->syn, ptrs[idx++], cs, &line, &st);
 
         if (ptrs[idx] == st) {
             // Was not invalidated and didn't change
@@ -309,14 +309,14 @@ static ssize_t fill_hole(Buffer *b, BlockIter *bi, const ColorScheme *cs, ssize_
     return idx - sidx;
 }
 
-void hl_fill_start_states(Buffer *b, const ColorScheme *cs, size_t line_nr)
+void hl_fill_start_states(Buffer *buffer, const ColorScheme *cs, size_t line_nr)
 {
-    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
-    PointerArray *s = &b->line_start_states;
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    PointerArray *s = &buffer->line_start_states;
     ssize_t current_line = 0;
     ssize_t idx = 0;
 
-    if (!b->syn) {
+    if (!buffer->syn) {
         return;
     }
 
@@ -343,7 +343,7 @@ void hl_fill_start_states(Buffer *b, const ColorScheme *cs, size_t line_nr)
         current_line = idx;
 
         // NOTE: might not fill entire hole, which is ok
-        ssize_t count = fill_hole(b, &bi, cs, idx, last);
+        ssize_t count = fill_hole(buffer, &bi, cs, idx, last);
         idx += count;
         current_line += count;
     }
@@ -354,7 +354,7 @@ void hl_fill_start_states(Buffer *b, const ColorScheme *cs, size_t line_nr)
         StringView line;
         fill_line_nl_ref(&bi, &line);
         highlight_line (
-            b->syn,
+            buffer->syn,
             states[s->count - 1],
             cs,
             &line,
@@ -366,21 +366,21 @@ void hl_fill_start_states(Buffer *b, const ColorScheme *cs, size_t line_nr)
 }
 
 const TermColor **hl_line (
-    Buffer *b,
+    Buffer *buffer,
     const ColorScheme *cs,
     const StringView *line,
     size_t line_nr,
     bool *next_changed
 ) {
     *next_changed = false;
-    if (!b->syn) {
+    if (!buffer->syn) {
         return NULL;
     }
 
-    PointerArray *s = &b->line_start_states;
+    PointerArray *s = &buffer->line_start_states;
     BUG_ON(line_nr >= s->count);
     State *next;
-    const TermColor **colors = highlight_line(b->syn, s->ptrs[line_nr++], cs, line, &next);
+    const TermColor **colors = highlight_line(buffer->syn, s->ptrs[line_nr++], cs, line, &next);
 
     if (line_nr == s->count) {
         resize_line_states(s, s->count + 1);
@@ -404,9 +404,9 @@ const TermColor **hl_line (
 }
 
 // Called after text has been inserted to re-highlight changed lines
-void hl_insert(Buffer *b, size_t first, size_t lines)
+void hl_insert(Buffer *buffer, size_t first, size_t lines)
 {
-    PointerArray *s = &b->line_start_states;
+    PointerArray *s = &buffer->line_start_states;
     size_t last = first + lines;
 
     if (first >= s->count) {
@@ -437,9 +437,9 @@ void hl_insert(Buffer *b, size_t first, size_t lines)
 }
 
 // Called after text has been deleted to re-highlight changed lines
-void hl_delete(Buffer *b, size_t first, size_t deleted_nl)
+void hl_delete(Buffer *buffer, size_t first, size_t deleted_nl)
 {
-    PointerArray *s = &b->line_start_states;
+    PointerArray *s = &buffer->line_start_states;
     size_t last = first + deleted_nl;
 
     if (s->count == 1) {

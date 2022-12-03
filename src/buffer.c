@@ -17,10 +17,10 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-void set_display_filename(Buffer *b, char *name)
+void set_display_filename(Buffer *buffer, char *name)
 {
-    free(b->display_filename);
-    b->display_filename = name;
+    free(buffer->display_filename);
+    buffer->display_filename = name;
 }
 
 /*
@@ -32,84 +32,85 @@ void set_display_filename(Buffer *b, char *name)
  * Syntax highlighter has different logic. It cares about contents of the
  * lines, not about selection or if the lines have been moved up or down.
  */
-void buffer_mark_lines_changed(Buffer *b, long min, long max)
+void buffer_mark_lines_changed(Buffer *buffer, long min, long max)
 {
     if (min > max) {
         long tmp = min;
         min = max;
         max = tmp;
     }
-    if (min < b->changed_line_min) {
-        b->changed_line_min = min;
+    if (min < buffer->changed_line_min) {
+        buffer->changed_line_min = min;
     }
-    if (max > b->changed_line_max) {
-        b->changed_line_max = max;
+    if (max > buffer->changed_line_max) {
+        buffer->changed_line_max = max;
     }
 }
 
-const char *buffer_filename(const Buffer *b)
+const char *buffer_filename(const Buffer *buffer)
 {
-    return b->display_filename ? b->display_filename : "(No name)";
+    const char *name = buffer->display_filename;
+    return name ? name : "(No name)";
 }
 
-void buffer_set_encoding(Buffer *b, Encoding encoding, bool utf8_bom)
+void buffer_set_encoding(Buffer *buffer, Encoding encoding, bool utf8_bom)
 {
     if (
-        b->encoding.type != encoding.type
-        || b->encoding.name != encoding.name
+        buffer->encoding.type != encoding.type
+        || buffer->encoding.name != encoding.name
     ) {
         const EncodingType type = encoding.type;
         if (type == UTF8) {
-            b->bom = utf8_bom;
+            buffer->bom = utf8_bom;
         } else {
-            b->bom = type < NR_ENCODING_TYPES && !!get_bom_for_encoding(type);
+            buffer->bom = type < NR_ENCODING_TYPES && !!get_bom_for_encoding(type);
         }
-        b->encoding = encoding;
+        buffer->encoding = encoding;
     }
 }
 
 Buffer *buffer_new(PointerArray *buffers, const GlobalOptions *gopts, const Encoding *encoding)
 {
     static unsigned long id;
-    Buffer *b = xnew0(Buffer, 1);
-    list_init(&b->blocks);
-    b->cur_change = &b->change_head;
-    b->saved_change = &b->change_head;
-    b->id = ++id;
-    b->crlf_newlines = gopts->crlf_newlines;
+    Buffer *buffer = xnew0(Buffer, 1);
+    list_init(&buffer->blocks);
+    buffer->cur_change = &buffer->change_head;
+    buffer->saved_change = &buffer->change_head;
+    buffer->id = ++id;
+    buffer->crlf_newlines = gopts->crlf_newlines;
 
     if (encoding) {
-        buffer_set_encoding(b, *encoding, gopts->utf8_bom);
+        buffer_set_encoding(buffer, *encoding, gopts->utf8_bom);
     } else {
-        b->encoding.type = ENCODING_AUTODETECT;
+        buffer->encoding.type = ENCODING_AUTODETECT;
     }
 
     static_assert(sizeof(*gopts) >= sizeof(CommonOptions));
-    memcpy(&b->options, gopts, sizeof(CommonOptions));
-    b->options.brace_indent = 0;
-    b->options.filetype = str_intern("none");
-    b->options.indent_regex = NULL;
+    memcpy(&buffer->options, gopts, sizeof(CommonOptions));
+    buffer->options.brace_indent = 0;
+    buffer->options.filetype = str_intern("none");
+    buffer->options.indent_regex = NULL;
 
-    ptr_array_append(buffers, b);
-    return b;
+    ptr_array_append(buffers, buffer);
+    return buffer;
 }
 
 Buffer *open_empty_buffer(PointerArray *buffers, const GlobalOptions *gopts)
 {
     Encoding enc = encoding_from_type(UTF8);
-    Buffer *b = buffer_new(buffers, gopts, &enc);
+    Buffer *buffer = buffer_new(buffers, gopts, &enc);
 
     // At least one block required
     Block *blk = block_new(1);
-    list_add_before(&blk->node, &b->blocks);
+    list_add_before(&blk->node, &buffer->blocks);
 
-    return b;
+    return buffer;
 }
 
-void free_blocks(Buffer *b)
+void free_blocks(Buffer *buffer)
 {
-    ListHead *item = b->blocks.next;
-    while (item != &b->blocks) {
+    ListHead *item = buffer->blocks.next;
+    while (item != &buffer->blocks) {
         ListHead *next = item->next;
         Block *blk = BLOCK(item);
         free(blk->data);
@@ -118,35 +119,35 @@ void free_blocks(Buffer *b)
     }
 }
 
-void free_buffer(Buffer *b)
+void free_buffer(Buffer *buffer)
 {
-    if (b->locked) {
-        unlock_file(b->abs_filename);
+    if (buffer->locked) {
+        unlock_file(buffer->abs_filename);
     }
 
-    free_changes(&b->change_head);
-    free(b->line_start_states.ptrs);
-    free(b->views.ptrs);
-    free(b->display_filename);
-    free(b->abs_filename);
+    free_changes(&buffer->change_head);
+    free(buffer->line_start_states.ptrs);
+    free(buffer->views.ptrs);
+    free(buffer->display_filename);
+    free(buffer->abs_filename);
 
-    if (b->stdout_buffer) {
+    if (buffer->stdout_buffer) {
         return;
     }
 
-    free_blocks(b);
-    free(b);
+    free_blocks(buffer);
+    free(buffer);
 }
 
-void remove_and_free_buffer(PointerArray *buffers, Buffer *b)
+void remove_and_free_buffer(PointerArray *buffers, Buffer *buffer)
 {
-    ptr_array_remove(buffers, b);
-    free_buffer(b);
+    ptr_array_remove(buffers, buffer);
+    free_buffer(buffer);
 }
 
-static bool same_file(const Buffer *b, const struct stat *st)
+static bool same_file(const Buffer *buffer, const struct stat *st)
 {
-    return (st->st_dev == b->file.dev) && (st->st_ino == b->file.ino);
+    return (st->st_dev == buffer->file.dev) && (st->st_ino == buffer->file.ino);
 }
 
 Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename)
@@ -154,10 +155,10 @@ Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename)
     struct stat st;
     bool st_ok = stat(abs_filename, &st) == 0;
     for (size_t i = 0, n = buffers->count; i < n; i++) {
-        Buffer *b = buffers->ptrs[i];
-        const char *f = b->abs_filename;
-        if ((f && streq(f, abs_filename)) || (st_ok && same_file(b, &st))) {
-            return b;
+        Buffer *buffer = buffers->ptrs[i];
+        const char *f = buffer->abs_filename;
+        if ((f && streq(f, abs_filename)) || (st_ok && same_file(buffer, &st))) {
+            return buffer;
         }
     }
     return NULL;
@@ -166,67 +167,67 @@ Buffer *find_buffer(const PointerArray *buffers, const char *abs_filename)
 Buffer *find_buffer_by_id(const PointerArray *buffers, unsigned long id)
 {
     for (size_t i = 0, n = buffers->count; i < n; i++) {
-        Buffer *b = buffers->ptrs[i];
-        if (b->id == id) {
-            return b;
+        Buffer *buffer = buffers->ptrs[i];
+        if (buffer->id == id) {
+            return buffer;
         }
     }
     return NULL;
 }
 
-bool buffer_detect_filetype(Buffer *b, const PointerArray *filetypes)
+bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes)
 {
     StringView line = STRING_VIEW_INIT;
-    if (BLOCK(b->blocks.next)->size) {
-        BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
+    if (BLOCK(buffer->blocks.next)->size) {
+        BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
         fill_line_ref(&bi, &line);
-    } else if (!b->abs_filename) {
+    } else if (!buffer->abs_filename) {
         return false;
     }
 
-    const char *ft = find_ft(filetypes, b->abs_filename, line);
-    if (ft && !streq(ft, b->options.filetype)) {
-        b->options.filetype = str_intern(ft);
+    const char *ft = find_ft(filetypes, buffer->abs_filename, line);
+    if (ft && !streq(ft, buffer->options.filetype)) {
+        buffer->options.filetype = str_intern(ft);
         return true;
     }
 
     return false;
 }
 
-void update_short_filename_cwd(Buffer *b, const StringView *home, const char *cwd)
+void update_short_filename_cwd(Buffer *buffer, const StringView *home, const char *cwd)
 {
-    const char *abs = b->abs_filename;
+    const char *abs = buffer->abs_filename;
     if (!abs) {
         return;
     }
     char *name = cwd ? short_filename_cwd(abs, cwd, home) : xstrdup(abs);
-    set_display_filename(b, name);
+    set_display_filename(buffer, name);
 }
 
-void update_short_filename(Buffer *b, const StringView *home)
+void update_short_filename(Buffer *buffer, const StringView *home)
 {
-    BUG_ON(!b->abs_filename);
-    set_display_filename(b, short_filename(b->abs_filename, home));
+    BUG_ON(!buffer->abs_filename);
+    set_display_filename(buffer, short_filename(buffer->abs_filename, home));
 }
 
-void buffer_update_syntax(EditorState *e, Buffer *b)
+void buffer_update_syntax(EditorState *e, Buffer *buffer)
 {
     Syntax *syn = NULL;
-    if (b->options.syntax) {
+    if (buffer->options.syntax) {
         // Even "none" can have syntax
-        syn = find_syntax(&e->syntaxes, b->options.filetype);
+        syn = find_syntax(&e->syntaxes, buffer->options.filetype);
         if (!syn) {
-            syn = load_syntax_by_filetype(e, b->options.filetype);
+            syn = load_syntax_by_filetype(e, buffer->options.filetype);
         }
     }
-    if (syn == b->syn) {
+    if (syn == buffer->syn) {
         return;
     }
 
-    b->syn = syn;
+    buffer->syn = syn;
     if (syn) {
         // Start state of first line is constant
-        PointerArray *s = &b->line_start_states;
+        PointerArray *s = &buffer->line_start_states;
         if (!s->alloc) {
             ptr_array_init(s, 64);
         }
@@ -234,7 +235,7 @@ void buffer_update_syntax(EditorState *e, Buffer *b)
         s->count = 1;
     }
 
-    mark_all_lines_changed(b);
+    mark_all_lines_changed(buffer);
 }
 
 static bool allow_odd_indent(uint8_t indents_bitmask)
@@ -318,9 +319,10 @@ UNITTEST {
     BUG_ON(len != 3);
 }
 
-static bool detect_indent(Buffer *b)
+static bool detect_indent(Buffer *buffer)
 {
-    BlockIter bi = BLOCK_ITER_INIT(&b->blocks);
+    LocalOptions *options = &buffer->options;
+    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     unsigned int tab_count = 0;
     unsigned int space_count = 0;
     int current_indent = 0;
@@ -331,7 +333,7 @@ static bool detect_indent(Buffer *b)
         fill_line_ref(&bi, &line);
 
         bool tab;
-        int indent = indent_len(line, b->options.detect_indent, &tab);
+        int indent = indent_len(line, options->detect_indent, &tab);
         switch (indent) {
         case -2: // Ignore mixed indent because tab width might not be 8
         case -1: // Empty line; no change in indent
@@ -360,16 +362,16 @@ static bool detect_indent(Buffer *b)
     }
 
     if (tab_count > space_count) {
-        b->options.emulate_tab = false;
-        b->options.expand_tab = false;
-        b->options.indent_width = b->options.tab_width;
+        options->emulate_tab = false;
+        options->expand_tab = false;
+        options->indent_width = options->tab_width;
         return true;
     }
 
     size_t m = 0;
     for (size_t i = 1; i < ARRAYLEN(counts); i++) {
         unsigned int bit = 1u << (i - 1);
-        if ((b->options.detect_indent & bit) && counts[i] > counts[m]) {
+        if ((options->detect_indent & bit) && counts[i] > counts[m]) {
             m = i;
         }
     }
@@ -378,21 +380,21 @@ static bool detect_indent(Buffer *b)
         return false;
     }
 
-    b->options.emulate_tab = true;
-    b->options.expand_tab = true;
-    b->options.indent_width = m;
+    options->emulate_tab = true;
+    options->expand_tab = true;
+    options->indent_width = m;
     return true;
 }
 
-void buffer_setup(EditorState *e, Buffer *b)
+void buffer_setup(EditorState *e, Buffer *buffer)
 {
-    const char *filename = b->abs_filename;
-    b->setup = true;
-    buffer_detect_filetype(b, &e->filetypes);
-    set_file_options(e, b);
-    set_editorconfig_options(b);
-    buffer_update_syntax(e, b);
-    if (b->options.detect_indent && filename) {
-        detect_indent(b);
+    const char *filename = buffer->abs_filename;
+    buffer->setup = true;
+    buffer_detect_filetype(buffer, &e->filetypes);
+    set_file_options(e, buffer);
+    set_editorconfig_options(buffer);
+    buffer_update_syntax(e, buffer);
+    if (buffer->options.detect_indent && filename) {
+        detect_indent(buffer);
     }
 }

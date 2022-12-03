@@ -16,62 +16,62 @@ static void update_tab_title_width(View *view, size_t tab_number)
     view->tt_truncated_width = w;
 }
 
-static void update_first_tab_idx(Window *win)
+static void update_first_tab_idx(Window *window)
 {
-    size_t max_first_idx = win->views.count;
+    size_t max_first_idx = window->views.count;
     for (size_t w = 0; max_first_idx > 0; max_first_idx--) {
-        const View *view = win->views.ptrs[max_first_idx - 1];
+        const View *view = window->views.ptrs[max_first_idx - 1];
         w += view->tt_truncated_width;
-        if (w > win->w) {
+        if (w > window->w) {
             break;
         }
     }
 
-    size_t min_first_idx = win->views.count;
+    size_t min_first_idx = window->views.count;
     for (size_t w = 0; min_first_idx > 0; min_first_idx--) {
-        const View *view = win->views.ptrs[min_first_idx - 1];
-        if (w || view == win->view) {
+        const View *view = window->views.ptrs[min_first_idx - 1];
+        if (w || view == window->view) {
             w += view->tt_truncated_width;
         }
-        if (w > win->w) {
+        if (w > window->w) {
             break;
         }
     }
 
-    if (win->first_tab_idx < min_first_idx) {
-        win->first_tab_idx = min_first_idx;
+    if (window->first_tab_idx < min_first_idx) {
+        window->first_tab_idx = min_first_idx;
     }
-    if (win->first_tab_idx > max_first_idx) {
-        win->first_tab_idx = max_first_idx;
+    if (window->first_tab_idx > max_first_idx) {
+        window->first_tab_idx = max_first_idx;
     }
 }
 
-static void calculate_tabbar(Window *win)
+static void calculate_tabbar(Window *window)
 {
     int total_w = 0;
-    for (size_t i = 0, n = win->views.count; i < n; i++) {
-        View *view = win->views.ptrs[i];
-        if (view == win->view) {
+    for (size_t i = 0, n = window->views.count; i < n; i++) {
+        View *view = window->views.ptrs[i];
+        if (view == window->view) {
             // Make sure current tab is visible
-            if (win->first_tab_idx > i) {
-                win->first_tab_idx = i;
+            if (window->first_tab_idx > i) {
+                window->first_tab_idx = i;
             }
         }
         update_tab_title_width(view, i + 1);
         total_w += view->tt_width;
     }
 
-    if (total_w <= win->w) {
+    if (total_w <= window->w) {
         // All tabs fit without truncating
-        win->first_tab_idx = 0;
+        window->first_tab_idx = 0;
         return;
     }
 
     // Truncate all wide tabs
     total_w = 0;
     int truncated_count = 0;
-    for (size_t i = 0, n = win->views.count; i < n; i++) {
-        View *view = win->views.ptrs[i];
+    for (size_t i = 0, n = window->views.count; i < n; i++) {
+        View *view = window->views.ptrs[i];
         int truncated_w = 20;
         if (view->tt_width > truncated_w) {
             view->tt_truncated_width = truncated_w;
@@ -82,14 +82,14 @@ static void calculate_tabbar(Window *win)
         }
     }
 
-    if (total_w > win->w) {
+    if (total_w > window->w) {
         // Not all tabs fit even after truncating wide tabs
-        update_first_tab_idx(win);
+        update_first_tab_idx(window);
         return;
     }
 
     // All tabs fit after truncating wide tabs
-    int extra = win->w - total_w;
+    int extra = window->w - total_w;
 
     // Divide extra space between truncated tabs
     while (extra > 0) {
@@ -97,8 +97,8 @@ static void calculate_tabbar(Window *win)
         int extra_avg = extra / truncated_count;
         int extra_mod = extra % truncated_count;
 
-        for (size_t i = 0, n = win->views.count; i < n; i++) {
-            View *view = win->views.ptrs[i];
+        for (size_t i = 0, n = window->views.count; i < n; i++) {
+            View *view = window->views.ptrs[i];
             int add = view->tt_width - view->tt_truncated_width;
             if (add == 0) {
                 continue;
@@ -123,7 +123,7 @@ static void calculate_tabbar(Window *win)
         }
     }
 
-    win->first_tab_idx = 0;
+    window->first_tab_idx = 0;
 }
 
 static void print_tab_title(Terminal *term, const ColorScheme *colors, const View *view, size_t idx)

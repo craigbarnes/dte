@@ -12,11 +12,11 @@
 #include "window.h"
 
 // screen.c
-void update_term_title(Terminal *term, const Buffer *b, bool set_window_title);
+void update_term_title(Terminal *term, const Buffer *buffer, bool set_window_title);
 void update_separators(Terminal *term, const ColorScheme *colors, const Frame *frame);
 void update_window_sizes(Terminal *term, Frame *frame);
 void update_screen_size(Terminal *term, Frame *root_frame);
-void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *win, bool force);
+void update_line_numbers(Terminal *term, const ColorScheme *colors, Window *window, bool force);
 void update_cursor_style(EditorState *e);
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color);
 void set_builtin_color(Terminal *term, const ColorScheme *colors, BuiltinColorEnum c);
@@ -30,7 +30,7 @@ void show_message(Terminal *term, const ColorScheme *colors, const char *msg, bo
 void print_tabbar(Terminal *term, const ColorScheme *colors, Window *window);
 
 // screen-status.c
-void update_status_line(const Window *win);
+void update_status_line(const Window *window);
 
 // screen-view.c
 void update_range(EditorState *e, const View *view, long y1, long y2);

@@ -306,8 +306,8 @@ void insert_ch(View *view, CodePoint ch)
         return;
     }
 
-    const Buffer *b = view->buffer;
-    const LocalOptions *options = &b->options;
+    const Buffer *buffer = view->buffer;
+    const LocalOptions *options = &buffer->options;
     char buf[8];
     char *ins = buf;
     char *alloc = NULL;

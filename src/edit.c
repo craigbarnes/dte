@@ -13,21 +13,21 @@
 static void sanity_check_blocks(const View *view, bool check_newlines)
 {
 #if DEBUG >= 1
-    const Buffer *b = view->buffer;
-    BUG_ON(list_empty(&b->blocks));
+    const Buffer *buffer = view->buffer;
+    BUG_ON(list_empty(&buffer->blocks));
     BUG_ON(view->cursor.offset > view->cursor.blk->size);
 
-    const Block *blk = BLOCK(b->blocks.next);
+    const Block *blk = BLOCK(buffer->blocks.next);
     if (blk->size == 0) {
         // The only time a zero-sized block is valid is when it's the
         // first and only block
-        BUG_ON(b->blocks.next->next != &b->blocks);
+        BUG_ON(buffer->blocks.next->next != &buffer->blocks);
         BUG_ON(view->cursor.blk != blk);
         return;
     }
 
     bool cursor_seen = false;
-    block_for_each(blk, &b->blocks) {
+    block_for_each(blk, &buffer->blocks) {
         const size_t size = blk->size;
         BUG_ON(size == 0);
         BUG_ON(size > blk->alloc);
@@ -224,21 +224,21 @@ static size_t insert_bytes(BlockIter *cursor, const char *buf, size_t len)
 
 void do_insert(View *view, const char *buf, size_t len)
 {
-    Buffer *b = view->buffer;
+    Buffer *buffer = view->buffer;
     size_t nl = insert_bytes(&view->cursor, buf, len);
-    b->nl += nl;
+    buffer->nl += nl;
     sanity_check_blocks(view, true);
 
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(b, view->cy, nl ? LONG_MAX : view->cy);
-    if (b->syn) {
-        hl_insert(b, view->cy, nl);
+    buffer_mark_lines_changed(buffer, view->cy, nl ? LONG_MAX : view->cy);
+    if (buffer->syn) {
+        hl_insert(buffer, view->cy, nl);
     }
 }
 
-static bool only_block(const Buffer *b, const Block *blk)
+static bool only_block(const Buffer *buffer, const Block *blk)
 {
-    return blk->node.prev == &b->blocks && blk->node.next == &b->blocks;
+    return blk->node.prev == &buffer->blocks && blk->node.next == &buffer->blocks;
 }
 
 char *do_delete(View *view, size_t len, bool sanity_check_newlines)
@@ -258,7 +258,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
         saved_prev_node = blk->node.prev;
     }
 
-    Buffer *b = view->buffer;
+    Buffer *buffer = view->buffer;
     char *deleted = xmalloc(len);
     while (pos < len) {
         ListHead *next = blk->node.next;
@@ -274,10 +274,10 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
         }
 
         deleted_nl += nl;
-        b->nl -= nl;
+        buffer->nl -= nl;
         blk->nl -= nl;
         blk->size -= count;
-        if (!blk->size && !only_block(b, blk)) {
+        if (!blk->size && !only_block(buffer, blk)) {
             block_free(blk);
         }
 
@@ -285,12 +285,12 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
         pos += count;
         blk = BLOCK(next);
 
-        BUG_ON(pos < len && next == &b->blocks);
+        BUG_ON(pos < len && next == &buffer->blocks);
     }
 
     if (saved_prev_node) {
         // Cursor was at beginning of a block that was possibly deleted
-        if (saved_prev_node->next == &b->blocks) {
+        if (saved_prev_node->next == &buffer->blocks) {
             view->cursor.blk = BLOCK(saved_prev_node);
             view->cursor.offset = view->cursor.blk->size;
         } else {
@@ -302,7 +302,7 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     if (
         blk->size
         && blk->data[blk->size - 1] != '\n'
-        && blk->node.next != &b->blocks
+        && blk->node.next != &buffer->blocks
     ) {
         Block *next = BLOCK(blk->node.next);
         size_t size = blk->size + next->size;
@@ -320,9 +320,9 @@ char *do_delete(View *view, size_t len, bool sanity_check_newlines)
     sanity_check_blocks(view, sanity_check_newlines);
 
     view_update_cursor_y(view);
-    buffer_mark_lines_changed(b, view->cy, deleted_nl ? LONG_MAX : view->cy);
-    if (b->syn) {
-        hl_delete(b, view->cy, deleted_nl);
+    buffer_mark_lines_changed(buffer, view->cy, deleted_nl ? LONG_MAX : view->cy);
+    if (buffer->syn) {
+        hl_delete(buffer, view->cy, deleted_nl);
     }
     return deleted;
 }
@@ -353,12 +353,12 @@ char *do_replace(View *view, size_t del, const char *buf, size_t ins)
     }
 
     // Modification is limited to one block
-    Buffer *b = view->buffer;
+    Buffer *buffer = view->buffer;
     char *ptr = blk->data + offset;
     char *deleted = xmalloc(del);
     size_t del_nl = copy_count_nl(deleted, ptr, del);
     blk->nl -= del_nl;
-    b->nl -= del_nl;
+    buffer->nl -= del_nl;
 
     if (del != ins) {
         memmove(ptr + ins, ptr + del, avail - del);
@@ -366,7 +366,7 @@ char *do_replace(View *view, size_t del, const char *buf, size_t ins)
 
     size_t ins_nl = copy_count_nl(ptr, buf, ins);
     blk->nl += ins_nl;
-    b->nl += ins_nl;
+    buffer->nl += ins_nl;
     blk->size = new_size;
     sanity_check_blocks(view, true);
     view_update_cursor_y(view);
@@ -374,11 +374,11 @@ char *do_replace(View *view, size_t del, const char *buf, size_t ins)
     // If the number of inserted and removed bytes are the same, some
     // line(s) changed but the lines after them didn't move up or down
     long max = (del_nl == ins_nl) ? view->cy + del_nl : LONG_MAX;
-    buffer_mark_lines_changed(b, view->cy, max);
+    buffer_mark_lines_changed(buffer, view->cy, max);
 
-    if (b->syn) {
-        hl_delete(b, view->cy, del_nl);
-        hl_insert(b, view->cy, ins_nl);
+    if (buffer->syn) {
+        hl_delete(buffer, view->cy, del_nl);
+        hl_insert(buffer, view->cy, ins_nl);
     }
 
     return deleted;
