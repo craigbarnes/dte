@@ -5,8 +5,6 @@ Issues
 * Include any relevant error messages as Markdown [code blocks].
 * Avoid linking to external paste services.
 * Include relevant system information (as printed by `make vars`).
-* Please do not use the issue tracker to make "feature requests".
-  Pull requests are very welcome though.
 
 Pull Requests
 -------------
