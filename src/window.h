@@ -14,6 +14,11 @@ enum {
     LINE_NUMBERS_MIN_WIDTH = 5
 };
 
+// A sub-division of the screen, similar to a window in a tiling window
+// manager. There can be multiple Views associated with each Window, but
+// only one is visible at a time. Each tab displayed in the tab bar
+// corresponds to a View and the editable text area corresponds to the
+// Buffer of the *current* View (Window::view::buffer).
 typedef struct Window {
     struct EditorState *editor;
     PointerArray views;

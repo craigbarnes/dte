@@ -25,6 +25,9 @@ typedef struct {
     time_t mtime;
 } FileInfo;
 
+// A representation of a specific file, as it pertains to editing,
+// including text contents, filename (if saved), undo history and
+// some file-specific metadata and options.
 typedef struct Buffer {
     ListHead blocks;
     Change change_head;

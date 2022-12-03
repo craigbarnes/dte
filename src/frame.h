@@ -6,12 +6,15 @@
 #include "util/ptr-array.h"
 #include "util/string.h"
 
+// A container for other Frames or Windows. Frames and Windows form
+// a tree structure, wherein Windows are the terminal (leaf) nodes.
 typedef struct Frame {
     struct Frame *parent;
     // Every frame contains either one window or multiple subframes
     PointerArray frames;
     struct Window *window;
-    int w, h; // Width and height
+    int w; // Width
+    int h; // Height
     bool vertical;
     bool equal_size;
 } Frame;
