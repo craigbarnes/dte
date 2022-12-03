@@ -79,6 +79,19 @@ Packaging
 
 See [`docs/packaging.md`](https://gitlab.com/craigbarnes/dte/blob/master/docs/packaging.md).
 
+Contributing
+------------
+
+See:
+
+* [`docs/contributing.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/docs/contributing.md)
+* [`src/README.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/src/README.md)
+* [`config/README.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/config/README.md)
+* [`mk/README.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/mk/README.md)
+* [`mk/feature-test/README.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/mk/feature-test/README.md)
+* [`tools/README.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/tools/README.md)
+* [`docs/releasing.md`](https://gitlab.com/craigbarnes/dte/-/blob/master/docs/releasing.md)
+
 Contact
 -------
 
