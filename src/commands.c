@@ -1225,6 +1225,21 @@ static void cmd_prev(EditorState *e, const CommandArgs *a)
     set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
 }
 
+static size_t count_modified_buffers(const PointerArray *buffers, Buffer **first)
+{
+    size_t count = 0;
+    for (size_t i = 0, n = buffers->count; i < n; i++) {
+        Buffer *buffer = buffers->ptrs[i];
+        if (!buffer_modified(buffer)) {
+            continue;
+        }
+        if (count++ == 0) {
+            *first = buffer;
+        }
+    }
+    return count;
+}
+
 static void cmd_quit(EditorState *e, const CommandArgs *a)
 {
     int exit_code = EDITOR_EXIT_OK;
@@ -1244,30 +1259,37 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
         goto exit;
     }
 
-    for (size_t i = 0, n = e->buffers.count; i < n; i++) {
-        Buffer *buffer = e->buffers.ptrs[i];
-        if (buffer_modified(buffer)) {
-            // Activate modified buffer
-            View *view = window_find_view(e->window, buffer);
-            if (!view) {
-                // Buffer isn't open in current window; activate first window
-                // of the buffer
-                view = buffer->views.ptrs[0];
-                e->window = view->window;
-                mark_everything_changed(e);
-            }
-            set_view(view);
-            if (has_flag(a, 'p')) {
-                static const char str[] = "Quit without saving changes? [y/N]";
-                if (dialog_prompt(e, str, "ny") == 'y') {
-                    goto exit;
-                }
-                return;
-            } else {
-                error_msg("Save modified files or run 'quit -f' to quit without saving");
-                return;
-            }
-        }
+    Buffer *first_modified;
+    size_t n = count_modified_buffers(&e->buffers, &first_modified);
+    if (n == 0) {
+        goto exit;
+    }
+
+    // Activate first modified Buffer
+    BUG_ON(!first_modified);
+    View *view = window_find_view(e->window, first_modified);
+    if (!view) {
+        // Buffer isn't open in current window; activate first containing window
+        view = first_modified->views.ptrs[0];
+        e->window = view->window;
+        mark_everything_changed(e);
+    }
+    set_view(view);
+
+    if (!has_flag(a, 'p')) {
+        error_msg("Save modified files or run 'quit -f' to quit without saving");
+        return;
+    }
+
+    char question[128];
+    xsnprintf (
+        question, sizeof question,
+        "Quit without saving %zu modified buffer%s? [y/N]",
+        n, (n > 1) ? "s" : ""
+    );
+
+    if (dialog_prompt(e, question, "ny") != 'y') {
+        return;
     }
 
 exit:
