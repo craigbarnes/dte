@@ -307,16 +307,15 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
     bool force = has_flag(a, 'f');
     if (!force && !view_can_close(e->view)) {
         bool prompt = has_flag(a, 'p');
-        if (prompt) {
-            static const char str[] = "Close without saving changes? [y/N]";
-            if (dialog_prompt(e, str, "ny") != 'y') {
-                return;
-            }
-        } else {
+        if (!prompt) {
             error_msg (
                 "The buffer is modified; "
                 "save or run 'close -f' to close without saving"
             );
+            return;
+        }
+        static const char str[] = "Close without saving changes? [y/N]";
+        if (dialog_prompt(e, str, "ny") != 'y') {
             return;
         }
     }
