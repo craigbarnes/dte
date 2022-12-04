@@ -1259,7 +1259,7 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
         goto exit;
     }
 
-    Buffer *first_modified;
+    Buffer *first_modified = NULL;
     size_t n = count_modified_buffers(&e->buffers, &first_modified);
     if (n == 0) {
         goto exit;
