@@ -131,11 +131,8 @@ long view_get_preferred_x(View *v)
 
 bool view_can_close(const View *view)
 {
-    if (!buffer_modified(view->buffer)) {
-        return true;
-    }
-    // Open in another window?
-    return view->buffer->views.count > 1;
+    const Buffer *buffer = view->buffer;
+    return !buffer_modified(buffer) || buffer->views.count > 1;
 }
 
 StringView view_do_get_word_under_cursor(const View *view, size_t *offset_in_line)
