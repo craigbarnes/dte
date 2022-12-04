@@ -305,11 +305,8 @@ static void cmd_clear(EditorState *e, const CommandArgs *a)
 static void cmd_close(EditorState *e, const CommandArgs *a)
 {
     bool force = has_flag(a, 'f');
-    bool prompt = has_flag(a, 'p');
-    bool allow_quit = has_flag(a, 'q');
-    bool allow_wclose = has_flag(a, 'w');
-
-    if (!view_can_close(e->view) && !force) {
+    if (!force && !view_can_close(e->view)) {
+        bool prompt = has_flag(a, 'p');
         if (prompt) {
             static const char str[] = "Close without saving changes? [y/N]";
             if (dialog_prompt(e, str, "ny") != 'y') {
@@ -324,11 +321,13 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
         }
     }
 
+    bool allow_quit = has_flag(a, 'q');
     if (allow_quit && e->buffers.count == 1 && e->root_frame->frames.count <= 1) {
         e->status = EDITOR_EXIT_OK;
         return;
     }
 
+    bool allow_wclose = has_flag(a, 'w');
     if (allow_wclose && e->window->views.count <= 1) {
         window_close(e->window);
         return;
