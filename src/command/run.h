@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "util/hashmap.h"
+#include "util/string-view.h"
 
 typedef struct {
     char **args; // Positional args, with flag args moved to the front
@@ -30,10 +31,17 @@ typedef struct {
 typedef struct {
     const Command* (*lookup)(const char *name);
     void (*macro_record)(const Command *cmd, char **args, void *userdata);
-    bool (*expand_variable)(const char *name, char **value, void *userdata);
-    HashMap aliases;
-    void *userdata;
+    bool (*expand_variable)(const char *name, char **value, const void *userdata);
 } CommandSet;
+
+typedef struct {
+    const CommandSet *cmds;
+    const HashMap *aliases;
+    const StringView *home_dir;
+    void *userdata;
+    unsigned int recursion_count;
+    bool allow_recording;
+} CommandRunner;
 
 extern const Command *current_command;
 
@@ -44,6 +52,6 @@ static inline int command_cmp(const void *key, const void *elem)
     return strcmp(name, cmd->name);
 }
 
-void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recording);
+void handle_command(CommandRunner *runner, const char *cmd);
 
 #endif

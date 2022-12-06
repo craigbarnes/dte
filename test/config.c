@@ -110,10 +110,10 @@ static void test_exec_config(TestContext *ctx)
     }
 
     // Execute *.dterc files
-    const CommandSet *cmds = &normal_commands;
+    EditorState *e = ctx->userdata;
     FOR_EACH_I(i, builtin_configs) {
         const BuiltinConfig config = builtin_configs[i];
-        exec_config(cmds, config.text);
+        exec_normal_config(e, config.text);
     }
 
     // Check that output files have expected contents
@@ -128,25 +128,23 @@ static void test_exec_config(TestContext *ctx)
         expect_files_equal(ctx, "build/test/thai-tis620.txt", "test/data/thai-tis620.txt");
     }
 
-    const EditorState *e = ctx->userdata;
-    const StringView s = STRING_VIEW("toggle utf8-bom \\");
+    const StringView sv = STRING_VIEW("toggle utf8-bom \\");
     EXPECT_FALSE(e->options.utf8_bom);
-    exec_config(cmds, s);
+    exec_normal_config(e, sv);
     EXPECT_TRUE(e->options.utf8_bom);
-    exec_config(cmds, s);
+    exec_normal_config(e, sv);
     EXPECT_FALSE(e->options.utf8_bom);
 }
 
 static void test_detect_indent(TestContext *ctx)
 {
-    const EditorState *e = ctx->userdata;
-    const CommandSet *cmds = &normal_commands;
+    EditorState *e = ctx->userdata;
     EXPECT_FALSE(e->options.detect_indent);
     EXPECT_FALSE(e->options.expand_tab);
     EXPECT_EQ(e->options.indent_width, 8);
 
-    handle_command (
-        cmds,
+    handle_normal_command (
+        e,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
         "open test/data/detect-indent.ini",
         false
@@ -156,7 +154,7 @@ static void test_detect_indent(TestContext *ctx)
     EXPECT_TRUE(e->buffer->options.expand_tab);
     EXPECT_EQ(e->buffer->options.indent_width, 2);
 
-    handle_command(cmds, "close", false);
+    handle_normal_command(e, "close", false);
 }
 
 static void test_global_state(TestContext *ctx)
@@ -210,14 +208,13 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(macro_record(m));
     EXPECT_TRUE(macro_is_recording(m));
 
-    const CommandSet *cmds = &normal_commands;
-    handle_command(cmds, "open", false);
+    handle_normal_command(e, "open", false);
     EXPECT_TRUE(handle_input(e, 'x'));
     EXPECT_TRUE(handle_input(e, 'y'));
-    handle_command(cmds, "bol", true);
+    handle_normal_command(e, "bol", true);
     EXPECT_TRUE(handle_input(e, '-'));
     EXPECT_TRUE(handle_input(e, 'z'));
-    handle_command(cmds, "eol; right; insert -m .; new-line", true);
+    handle_normal_command(e, "eol; right; insert -m .; new-line", true);
 
     const StringView t1 = STRING_VIEW("test 1\n");
     insert_text(e->view, t1.data, t1.length, true);
@@ -233,8 +230,8 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_EQ(m->macro.count, 9);
     EXPECT_EQ(m->prev_macro.count, 0);
 
-    handle_command (
-        cmds,
+    handle_normal_command (
+        e,
         "save -f build/test/macro-rec.txt;"
         "close -f;"
         "open;"
@@ -274,7 +271,7 @@ void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
-    exec_builtin_rc(&e->colors, TERM_8_COLOR);
+    exec_builtin_rc(e, TERM_8_COLOR);
     update_all_syntax_colors(&e->syntaxes, &e->colors);
     e->options.lock_files = false;
     e->window = new_window(e);

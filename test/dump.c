@@ -20,7 +20,7 @@ static const struct {
     String (*dump)(EditorState *e);
 } handlers[] = {
     {"alias", true, true, dump_normal_aliases},
-    {"bind", true, true, dump_bindings},
+    {"bind", true, true, dump_all_bindings},
     {"cursor", true, true, dump_cursors},
     {"errorfmt", true, true, dump_compilers},
     {"ft", true, true, do_dump_filetypes},
@@ -33,9 +33,9 @@ static const struct {
 static void test_dump_handlers(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
-    const CommandSet *cmds = &normal_commands;
-    void *ud = cmds->userdata;
-    ASSERT_NONNULL(ud);
+    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const CommandSet *cmds = runner.cmds;
+    ASSERT_NONNULL(cmds);
 
     for (size_t i = 0; i < ARRAYLEN(handlers); i++) {
         String str = handlers[i].dump(e);
@@ -52,7 +52,7 @@ static void test_dump_handlers(TestContext *ctx)
             }
 
             PointerArray arr = PTR_ARRAY_INIT;
-            CommandParseError parse_err = parse_commands(cmds, &arr, line);
+            CommandParseError parse_err = parse_commands(&runner, &arr, line);
             EXPECT_EQ(parse_err, CMDERR_NONE);
             EXPECT_TRUE(arr.count >= 2);
             if (parse_err != CMDERR_NONE || arr.count < 2) {

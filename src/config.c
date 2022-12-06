@@ -9,7 +9,6 @@
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
-#include "util/string.h"
 #include "util/xmalloc.h"
 #include "../build/builtin-config.h"
 
@@ -34,7 +33,7 @@ UNITTEST {
     BUG_ON(has_line_continuation(strview_from_cstring("4 \\\\\\\\")));
 }
 
-void exec_config(const CommandSet *cmds, StringView config)
+void exec_config(CommandRunner *runner, StringView config)
 {
     String buf = string_new(1024);
 
@@ -50,14 +49,14 @@ void exec_config(const CommandSet *cmds, StringView config)
             string_append_strview(&buf, &line);
         } else {
             string_append_strview(&buf, &line);
-            handle_command(cmds, string_borrow_cstring(&buf), false);
+            handle_command(runner, string_borrow_cstring(&buf));
             string_clear(&buf);
         }
     }
 
     if (unlikely(buf.len)) {
         // This can only happen if the last line had a line continuation
-        handle_command(cmds, string_borrow_cstring(&buf), false);
+        handle_command(runner, string_borrow_cstring(&buf));
     }
 
     string_free(&buf);
@@ -89,7 +88,7 @@ const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs)
     return &builtin_configs[0];
 }
 
-int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
+int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     const bool must_exist = flags & CFG_MUST_EXIST;
     const bool builtin = flags & CFG_BUILTIN;
@@ -100,7 +99,7 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
         if (cfg) {
             current_config.file = filename;
             current_config.line = 1;
-            exec_config(cmds, cfg->text);
+            exec_config(runner, cfg->text);
         } else if (must_exist) {
             error_msg (
                 "Error reading '%s': no built-in config exists for that path",
@@ -123,32 +122,32 @@ int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags fla
 
     current_config.file = filename;
     current_config.line = 1;
-    exec_config(cmds, string_view(buf, size));
+    exec_config(runner, string_view(buf, size));
     free(buf);
     return 0;
 }
 
-int read_config(const CommandSet *cmds, const char *filename, ConfigFlags flags)
+int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 {
     // Recursive
     const ConfigState saved = current_config;
-    int ret = do_read_config(cmds, filename, flags);
+    int ret = do_read_config(runner, filename, flags);
     current_config = saved;
     return ret;
 }
 
-void exec_builtin_color_reset(ColorScheme *colors, TermColorCapabilityType type)
+void exec_builtin_color_reset(EditorState *e, TermColorCapabilityType type)
 {
-    clear_hl_colors(colors);
+    clear_hl_colors(&e->colors);
     bool basic = type == TERM_0_COLOR;
     const char *cfg = basic ? "color/reset-basic" : "color/reset";
-    read_config(&normal_commands, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
+    read_normal_config(e, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
-void exec_builtin_rc(ColorScheme *colors, TermColorCapabilityType color_type)
+void exec_builtin_rc(EditorState *e, TermColorCapabilityType color_type)
 {
-    exec_builtin_color_reset(colors, color_type);
-    read_config(&normal_commands, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    exec_builtin_color_reset(e, color_type);
+    read_normal_config(e, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 UNITTEST {

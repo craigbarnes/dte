@@ -329,7 +329,7 @@ ssize_t handle_exec (
         parse_and_goto_tag(e, output);
         break;
     case EXEC_EVAL:
-        exec_config(&normal_commands, strview_from_string(output));
+        exec_normal_config(e, strview_from_string(output));
         break;
     case EXEC_NULL:
     case EXEC_TTY:

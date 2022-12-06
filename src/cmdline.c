@@ -396,7 +396,7 @@ static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
     }
 
     current_command = NULL;
-    handle_command(&normal_commands, str, true);
+    handle_normal_command(e, str, true);
 }
 
 static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
@@ -510,13 +510,9 @@ static const Command *find_search_mode_command(const char *name)
 const CommandSet cmd_mode_commands = {
     .lookup = find_cmd_mode_command,
     .macro_record = NULL,
-    .aliases = HASHMAP_INIT,
-    .userdata = &editor,
 };
 
 const CommandSet search_mode_commands = {
     .lookup = find_search_mode_command,
     .macro_record = NULL,
-    .aliases = HASHMAP_INIT,
-    .userdata = &editor,
 };

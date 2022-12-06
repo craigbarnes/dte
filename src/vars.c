@@ -100,7 +100,7 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(normal_vars, name, strcmp);
 }
 
-bool expand_normal_var(const char *name, char **value, void *userdata)
+bool expand_normal_var(const char *name, char **value, const void *userdata)
 {
     const BuiltinVar *var = BSEARCH(name, normal_vars, vstrcmp);
     if (!var) {
@@ -110,7 +110,7 @@ bool expand_normal_var(const char *name, char **value, void *userdata)
     return true;
 }
 
-bool expand_syntax_var(const char *name, char **value, void *userdata)
+bool expand_syntax_var(const char *name, char **value, const void *userdata)
 {
     if (streq(name, "DTE_HOME")) {
         *value = expand_dte_home(userdata);

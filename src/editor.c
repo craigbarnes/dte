@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "editor.h"
+#include "bind.h"
 #include "command/macro.h"
 #include "commands.h"
 #include "compiler.h"
@@ -23,12 +24,10 @@
 #include "tag.h"
 #include "terminal/input.h"
 #include "terminal/mode.h"
-#include "terminal/terminal.h"
 #include "terminal/xterm.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
-#include "util/hashmap.h"
 #include "util/intern.h"
 #include "util/log.h"
 #include "util/path.h"
@@ -98,18 +97,21 @@ EditorState editor = {
         [CURSOR_MODE_OVERWRITE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
         [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
     },
-    .bindings = {
+    .modes = {
         [INPUT_NORMAL] = {
             .cmds = &normal_commands,
-            .map = INTMAP_INIT,
+            .aliases = HASHMAP_INIT,
+            .key_bindings = INTMAP_INIT,
         },
         [INPUT_COMMAND] = {
             .cmds = &cmd_mode_commands,
-            .map = INTMAP_INIT,
+            .aliases = HASHMAP_INIT,
+            .key_bindings = INTMAP_INIT,
         },
         [INPUT_SEARCH] = {
             .cmds = &search_mode_commands,
-            .map = INTMAP_INIT,
+            .aliases = HASHMAP_INIT,
+            .key_bindings = INTMAP_INIT,
         },
     },
     .terminal = {
@@ -218,10 +220,10 @@ EditorState *init_editor_state(void)
 
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
-    hashmap_init(&normal_commands.aliases, 32);
-    intmap_init(&e->bindings[INPUT_NORMAL].map, 150);
-    intmap_init(&e->bindings[INPUT_COMMAND].map, 40);
-    intmap_init(&e->bindings[INPUT_SEARCH].map, 40);
+    hashmap_init(&e->modes[INPUT_NORMAL].aliases, 32);
+    intmap_init(&e->modes[INPUT_NORMAL].key_bindings, 150);
+    intmap_init(&e->modes[INPUT_COMMAND].key_bindings, 40);
+    intmap_init(&e->modes[INPUT_SEARCH].key_bindings, 40);
     return e;
 }
 
@@ -246,13 +248,12 @@ void free_editor_state(EditorState *e)
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
     hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
     hashmap_free(&e->colors.other, free);
-    hashmap_free(&normal_commands.aliases, free);
-    BUG_ON(cmd_mode_commands.aliases.count != 0);
-    BUG_ON(search_mode_commands.aliases.count != 0);
 
-    free_bindings(&e->bindings[INPUT_NORMAL]);
-    free_bindings(&e->bindings[INPUT_COMMAND]);
-    free_bindings(&e->bindings[INPUT_SEARCH]);
+    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
+        ModeHandler *m = &e->modes[i];
+        free_bindings(&m->key_bindings);
+        hashmap_free(&m->aliases, free);
+    }
 
     free_interned_strings();
     free_interned_regexps();

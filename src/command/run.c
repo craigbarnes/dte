@@ -12,31 +12,30 @@
 
 const Command *current_command;
 
-typedef struct {
-    const CommandSet *const cmds;
-    unsigned int recursion_count;
-    bool allow_recording;
-} RunContext;
+static void run_commands(CommandRunner *runner, const PointerArray *array);
 
-static void run_commands(RunContext *ctx, const PointerArray *array);
-
-static void run_command(RunContext *ctx, char **av)
+static void run_command(CommandRunner *runner, char **av)
 {
-    const CommandSet *cmds = ctx->cmds;
+    const CommandSet *cmds = runner->cmds;
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
-        const char *alias_name = av[0];
-        const char *alias_value = find_alias(&cmds->aliases, alias_name);
+        const char *name = av[0];
+        if (!runner->aliases) {
+            error_msg("No such command: %s", name);
+            return;
+        }
+
+        const char *alias_value = find_alias(runner->aliases, name);
         if (unlikely(!alias_value)) {
-            error_msg("No such command or alias: %s", alias_name);
+            error_msg("No such command or alias: %s", name);
             return;
         }
 
         PointerArray array = PTR_ARRAY_INIT;
-        CommandParseError err = parse_commands(cmds, &array, alias_value);
+        CommandParseError err = parse_commands(runner, &array, alias_value);
         if (unlikely(err != CMDERR_NONE)) {
             const char *err_msg = command_parse_error_to_string(err);
-            error_msg("Parsing alias %s: %s", alias_name, err_msg);
+            error_msg("Parsing alias %s: %s", name, err_msg);
             ptr_array_free(&array);
             return;
         }
@@ -49,7 +48,7 @@ static void run_command(RunContext *ctx, char **av)
         }
         ptr_array_append(&array, NULL);
 
-        run_commands(ctx, &array);
+        run_commands(runner, &array);
         ptr_array_free(&array);
         return;
     }
@@ -61,8 +60,8 @@ static void run_command(RunContext *ctx, char **av)
 
     // Record command in macro buffer, if recording (this needs to be done
     // before parse_args() mutates the array)
-    if (ctx->allow_recording && ctx->cmds->macro_record) {
-        ctx->cmds->macro_record(cmd, av + 1, ctx->cmds->userdata);
+    if (runner->allow_recording && runner->cmds->macro_record) {
+        runner->cmds->macro_record(cmd, av + 1, runner->userdata);
     }
 
     // By default change can't be merged with previous one.
@@ -72,16 +71,16 @@ static void run_command(RunContext *ctx, char **av)
     CommandArgs a = cmdargs_new(av + 1);
     current_command = cmd;
     if (likely(parse_args(cmd, &a))) {
-        cmd->cmd(cmds->userdata, &a);
+        cmd->cmd(runner->userdata, &a);
     }
     current_command = NULL;
 
     end_change();
 }
 
-static void run_commands(RunContext *ctx, const PointerArray *array)
+static void run_commands(CommandRunner *runner, const PointerArray *array)
 {
-    if (unlikely(ctx->recursion_count++ > 16)) {
+    if (unlikely(runner->recursion_count++ > 16)) {
         error_msg("alias recursion overflow");
         goto out;
     }
@@ -101,7 +100,7 @@ static void run_commands(RunContext *ctx, const PointerArray *array)
         // If the value of `e` (end) changed, there's a run of at least
         // 1 string, which is a command followed by 0 or more arguments
         if (e != s) {
-            run_command(ctx, (char**)ptrs + s);
+            run_command(runner, (char**)ptrs + s);
         }
 
         // Skip past the NULL, onto the next command (if any)
@@ -109,20 +108,17 @@ static void run_commands(RunContext *ctx, const PointerArray *array)
     }
 
 out:
-    ctx->recursion_count--;
+    runner->recursion_count--;
 }
 
-void handle_command(const CommandSet *cmds, const char *cmd, bool allow_recording)
+void handle_command(CommandRunner *runner, const char *cmd)
 {
+    BUG_ON(runner->recursion_count != 0);
     PointerArray array = PTR_ARRAY_INIT;
-    CommandParseError err = parse_commands(cmds, &array, cmd);
+    CommandParseError err = parse_commands(runner, &array, cmd);
     if (likely(err == CMDERR_NONE)) {
-        RunContext ctx = {
-            .cmds = cmds,
-            .recursion_count = 0,
-            .allow_recording = allow_recording,
-        };
-        run_commands(&ctx, &array);
+        run_commands(runner, &array);
+        BUG_ON(runner->recursion_count != 0);
     } else {
         const char *str = command_parse_error_to_string(err);
         error_msg("Command syntax error: %s", str);

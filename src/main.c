@@ -221,7 +221,7 @@ static ExitCode lint_syntax(const char *filename)
 {
     HashMap syntaxes = HASHMAP_INIT;
     int err;
-    const Syntax *s = do_load_syntax_file(&syntaxes, filename, CFG_MUST_EXIST, &err);
+    const Syntax *s = do_load_syntax_file(&editor, filename, CFG_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
         const char *p = (n > 1) ? "s" : "";
@@ -510,7 +510,7 @@ loop_break:;
     }
 
     term_save_title(term);
-    exec_builtin_rc(&e->colors, e->terminal.color_type);
+    exec_builtin_rc(e, e->terminal.color_type);
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;
@@ -522,7 +522,7 @@ loop_break:;
             rc = buf;
         }
         LOG_INFO("loading configuration from %s", rc);
-        read_config(&normal_commands, rc, flags);
+        read_normal_config(e, rc, flags);
     }
 
     update_all_syntax_colors(&e->syntaxes, &e->colors);
@@ -595,7 +595,7 @@ loop_break:;
     if (commands.count > 0) {
         for (size_t i = 0, n = commands.count; i < n; i++) {
             const char *command = commands.ptrs[i];
-            handle_command(&normal_commands, command, false);
+            handle_normal_command(e, command, false);
         }
         ptr_array_free_array(&commands);
         cflag = true;

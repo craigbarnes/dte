@@ -6,58 +6,55 @@
 #include "change.h"
 #include "cmdline.h"
 #include "command/args.h"
-#include "command/cache.h"
 #include "command/macro.h"
 #include "command/parse.h"
 #include "command/serialize.h"
 #include "commands.h"
-#include "editor.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-void add_binding(KeyBindingGroup *kbg, KeyCode key, const char *command)
+void add_binding(IntMap *bindings, KeyCode key, CachedCommand *cc)
 {
-    CachedCommand *cc = cached_command_new(kbg->cmds, command);
-    cached_command_free(intmap_insert_or_replace(&kbg->map, key, cc));
+    cached_command_free(intmap_insert_or_replace(bindings, key, cc));
 }
 
-void remove_binding(KeyBindingGroup *kbg, KeyCode key)
+void remove_binding(IntMap *bindings, KeyCode key)
 {
-    cached_command_free(intmap_remove(&kbg->map, key));
+    cached_command_free(intmap_remove(bindings, key));
 }
 
-const CachedCommand *lookup_binding(KeyBindingGroup *kbg, KeyCode key)
+const CachedCommand *lookup_binding(const IntMap *bindings, KeyCode key)
 {
-    return intmap_get(&kbg->map, key);
+    return intmap_get(bindings, key);
 }
 
-void free_bindings(KeyBindingGroup *kbg)
+void free_bindings(IntMap *bindings)
 {
-    intmap_free(&kbg->map, (FreeFunction)cached_command_free);
+    intmap_free(bindings, (FreeFunction)cached_command_free);
 }
 
-bool handle_binding(KeyBindingGroup *kbg, KeyCode key)
+bool handle_binding(EditorState *e, InputMode mode, KeyCode key)
 {
-    const CachedCommand *binding = lookup_binding(kbg, key);
+    const IntMap *bindings = &e->modes[mode].key_bindings;
+    const CachedCommand *binding = lookup_binding(bindings, key);
     if (!binding) {
         return false;
     }
 
     // If the command isn't cached or a macro is being recorded
-    const CommandSet *cmds = kbg->cmds;
-    const EditorState *e = cmds->userdata;
+    const CommandSet *cmds = e->modes[mode].cmds;
     if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
-        handle_command(cmds, binding->cmd_str, true);
+        CommandRunner runner = cmdrunner_for_mode(e, mode, true);
+        handle_command(&runner, binding->cmd_str);
         return true;
     }
 
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
     current_command = binding->cmd;
-    binding->cmd->cmd(cmds->userdata, &binding->a);
+    binding->cmd->cmd(e, &binding->a);
     current_command = NULL;
     end_change();
     return true;
@@ -86,10 +83,9 @@ UNITTEST {
     BUG_ON(binding_cmp(&a, &b) >= 0);
 }
 
-bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *buf)
+bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
 {
-    const IntMap *map = &kbg->map;
-    const size_t count = map->count;
+    const size_t count = bindings->count;
     if (unlikely(count == 0)) {
         return false;
     }
@@ -97,7 +93,7 @@ bool dump_binding_group(const KeyBindingGroup *kbg, const char *flag, String *bu
     // Clone the contents of the map as an array of key/command pairs
     KeyBinding *array = xnew(*array, count);
     size_t n = 0;
-    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
+    for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
         const CachedCommand *cc = it.entry->value;
         array[n++] = (KeyBinding) {
             .key = it.entry->key,

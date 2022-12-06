@@ -13,9 +13,9 @@ typedef enum {
     CMDERR_UNEXPECTED_EOF,
 } CommandParseError;
 
-char *parse_command_arg(const CommandSet *cmds, const char *cmd, size_t len, bool tilde);
+char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len, bool tilde);
 size_t find_end(const char *cmd, size_t pos, CommandParseError *err);
-CommandParseError parse_commands(const CommandSet *cmds, PointerArray *array, const char *cmd);
+CommandParseError parse_commands(const CommandRunner *runner, PointerArray *array, const char *cmd);
 const char *command_parse_error_to_string(CommandParseError err);
 
 #endif

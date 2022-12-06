@@ -513,20 +513,34 @@ static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
     .macro_record = NULL,
     .expand_variable = expand_syntax_var,
-    .aliases = HASHMAP_INIT,
-    .userdata = &editor,
 };
 
-static void cmd_include(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static CommandRunner cmdrunner_for_syntaxes(EditorState *e)
+{
+    CommandRunner runner = {
+        .cmds = &syntax_commands,
+        .home_dir = &e->home_dir,
+        .userdata = e
+    };
+    return runner;
+}
+
+static int read_syntax(EditorState *e, const char *filename, ConfigFlags flags)
+{
+    CommandRunner runner = cmdrunner_for_syntaxes(e);
+    return read_config(&runner, filename, flags);
+}
+
+static void cmd_include(EditorState *e, const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
     if (a->flags[0] == 'b') {
         flags |= CFG_BUILTIN;
     }
-    read_config(&syntax_commands, a->args[0], flags);
+    read_syntax(e, a->args[0], flags);
 }
 
-static void cmd_require(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_require(EditorState *e, const CommandArgs *a)
 {
     static HashSet loaded_files;
     static HashSet loaded_builtins;
@@ -556,28 +570,29 @@ static void cmd_require(EditorState* UNUSED_ARG(e), const CommandArgs *a)
         return;
     }
 
-    if (read_config(&syntax_commands, path, flags) == 0) {
+    if (read_syntax(e, path, flags) == 0) {
         hashset_add(set, path, path_len);
     }
 }
 
-Syntax *do_load_syntax_file(HashMap *syntaxes, const char *filename, ConfigFlags flags, int *err)
+Syntax *do_load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
 {
     const ConfigState saved = current_config;
-    *err = do_read_config(&syntax_commands, filename, flags);
+    CommandRunner runner = cmdrunner_for_syntaxes(e);
+    *err = do_read_config(&runner, filename, flags);
     if (*err) {
         current_config = saved;
         return NULL;
     }
 
     if (current_syntax) {
-        finish_syntax(syntaxes);
-        find_unused_subsyntaxes(syntaxes);
+        finish_syntax(&e->syntaxes);
+        find_unused_subsyntaxes(&e->syntaxes);
     }
 
     current_config = saved;
 
-    Syntax *syn = find_syntax(syntaxes, path_basename(filename));
+    Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
     if (!syn) {
         *err = EINVAL;
     }
@@ -586,7 +601,7 @@ Syntax *do_load_syntax_file(HashMap *syntaxes, const char *filename, ConfigFlags
 
 Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
 {
-    Syntax *syn = do_load_syntax_file(&e->syntaxes, filename, flags, err);
+    Syntax *syn = do_load_syntax_file(e, filename, flags, err);
     if (syn && e->status != EDITOR_INITIALIZING) {
         update_syntax_colors(syn, &e->colors);
     }

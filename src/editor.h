@@ -4,7 +4,6 @@
 #include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "bind.h"
 #include "buffer.h"
 #include "cmdline.h"
 #include "command/macro.h"
@@ -21,6 +20,9 @@
 #include "tag.h"
 #include "terminal/cursor.h"
 #include "terminal/terminal.h"
+#include "util/debug.h"
+#include "util/hashmap.h"
+#include "util/intmap.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
@@ -40,6 +42,12 @@ typedef enum {
     INPUT_SEARCH,
 } InputMode;
 
+typedef struct {
+    const CommandSet *cmds;
+    HashMap aliases;
+    IntMap key_bindings;
+} ModeHandler;
+
 typedef struct EditorState {
     EditorStatus status;
     InputMode input_mode;
@@ -54,7 +62,7 @@ typedef struct EditorState {
     bool cursor_style_changed;
     bool session_leader;
     size_t cmdline_x;
-    KeyBindingGroup bindings[3];
+    ModeHandler modes[3];
     Clipboard clipboard;
     TagFile tagfile;
     HashMap compilers;
@@ -89,6 +97,19 @@ static inline void set_input_mode(EditorState *e, InputMode mode)
 {
     e->cursor_style_changed = true;
     e->input_mode = mode;
+}
+
+static inline CommandRunner cmdrunner_for_mode(EditorState *e, InputMode mode, bool allow_recording)
+{
+    BUG_ON(mode >= ARRAYLEN(e->modes));
+    CommandRunner runner = {
+        .cmds = e->modes[mode].cmds,
+        .aliases = &e->modes[mode].aliases,
+        .home_dir = &e->home_dir,
+        .allow_recording = allow_recording,
+        .userdata = e,
+    };
+    return runner;
 }
 
 EditorState *init_editor_state(void) RETURNS_NONNULL;

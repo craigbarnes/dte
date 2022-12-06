@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "parse.h"
-#include "editor.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/macros.h"
@@ -91,7 +90,7 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
     return pos;
 }
 
-static size_t parse_var(const CommandSet *cmds, const char *cmd, size_t len, String *buf)
+static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len, String *buf)
 {
     if (len == 0 || !is_alpha_or_underscore(cmd[0])) {
         return 0;
@@ -102,9 +101,11 @@ static size_t parse_var(const CommandSet *cmds, const char *cmd, size_t len, Str
         n++;
     }
 
+    const CommandSet *cmds = runner->cmds;
+    void *ud = runner->userdata;
     char *name = xstrcut(cmd, n);
     char *value;
-    if (cmds->expand_variable && cmds->expand_variable(name, &value, cmds->userdata)) {
+    if (cmds->expand_variable && cmds->expand_variable(name, &value, ud)) {
         if (value) {
             string_append_cstring(buf, value);
             free(value);
@@ -120,14 +121,14 @@ static size_t parse_var(const CommandSet *cmds, const char *cmd, size_t len, Str
     return n;
 }
 
-char *parse_command_arg(const CommandSet *cmds, const char *cmd, size_t len, bool tilde)
+char *parse_command_arg(const CommandRunner *runner, const char *cmd, size_t len, bool tilde)
 {
     String buf;
     size_t pos = 0;
 
     if (tilde && len >= 2 && cmd[0] == '~' && cmd[1] == '/') {
-        buf = string_new(len + editor.home_dir.length);
-        string_append_strview(&buf, &editor.home_dir);
+        buf = string_new(len + runner->home_dir->length);
+        string_append_strview(&buf, runner->home_dir);
         string_append_byte(&buf, '/');
         pos += 2;
     } else {
@@ -150,7 +151,7 @@ char *parse_command_arg(const CommandSet *cmds, const char *cmd, size_t len, boo
             pos += parse_dq(cmd + pos, len - pos, &buf);
             break;
         case '$':
-            pos += parse_var(cmds, cmd + pos, len - pos, &buf);
+            pos += parse_var(runner, cmd + pos, len - pos, &buf);
             break;
         case '\\':
             if (unlikely(pos == len)) {
@@ -226,7 +227,7 @@ size_t find_end(const char *cmd, size_t pos, CommandParseError *err)
 }
 
 // Note: `array` must be freed, regardless of the return value
-CommandParseError parse_commands(const CommandSet *cmds, PointerArray *array, const char *cmd)
+CommandParseError parse_commands(const CommandRunner *runner, PointerArray *array, const char *cmd)
 {
     size_t pos = 0;
     while (1) {
@@ -250,7 +251,7 @@ CommandParseError parse_commands(const CommandSet *cmds, PointerArray *array, co
             return err;
         }
 
-        ptr_array_append(array, parse_command_arg(cmds, cmd + pos, end - pos, true));
+        ptr_array_append(array, parse_command_arg(runner, cmd + pos, end - pos, true));
         pos = end;
     }
     ptr_array_append(array, NULL);

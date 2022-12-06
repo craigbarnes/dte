@@ -7,14 +7,14 @@
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-CachedCommand *cached_command_new(const CommandSet *cmds, const char *cmd_str)
+CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_str)
 {
     const size_t cmd_str_len = strlen(cmd_str);
     CachedCommand *cached = xmalloc(sizeof(*cached) + cmd_str_len + 1);
     memcpy(cached->cmd_str, cmd_str, cmd_str_len + 1);
 
     PointerArray array = PTR_ARRAY_INIT;
-    if (parse_commands(cmds, &array, cmd_str) != CMDERR_NONE) {
+    if (parse_commands(runner, &array, cmd_str) != CMDERR_NONE) {
         goto nocache;
     }
 
@@ -25,7 +25,7 @@ CachedCommand *cached_command_new(const CommandSet *cmds, const char *cmd_str)
         goto nocache;
     }
 
-    const Command *cmd = cmds->lookup(array.ptrs[0]);
+    const Command *cmd = runner->cmds->lookup(array.ptrs[0]);
     if (!cmd) {
         // Aliases or non-existent commands can't be cached
         goto nocache;

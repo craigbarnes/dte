@@ -11,7 +11,6 @@
 
 static void test_command_mode(TestContext *ctx)
 {
-    const CommandSet *cmds = &cmd_mode_commands;
     EditorState *e = ctx->userdata;
     CommandLine *c = &e->cmdline;
     set_input_mode(e, INPUT_COMMAND);
@@ -25,81 +24,88 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_EQ(c->pos, 5);
     EXPECT_STRING_EQ(c->buf, "a\xF0\x9F\xA6\x99");
 
+    CommandRunner runner = cmdrunner_for_mode(e, INPUT_COMMAND, false);
+    EXPECT_PTREQ(runner.userdata, e);
+    EXPECT_PTREQ(runner.cmds, e->modes[INPUT_COMMAND].cmds);
+    EXPECT_PTREQ(runner.aliases, &e->modes[INPUT_COMMAND].aliases);
+    EXPECT_EQ(runner.recursion_count, 0);
+    EXPECT_FALSE(runner.allow_recording);
+
     // Delete at end-of-line should do nothing
-    handle_command(cmds, "delete", false);
+    handle_command(&runner, "delete");
     EXPECT_EQ(c->pos, 5);
     EXPECT_EQ(c->buf.len, 5);
 
-    handle_command(cmds, "erase", false);
+    handle_command(&runner, "erase");
     EXPECT_EQ(c->pos, 1);
     EXPECT_STRING_EQ(c->buf, "a");
 
-    handle_command(cmds, "erase", false);
+    handle_command(&runner, "erase");
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "");
 
     cmdline_set_text(c, "word1 word2 word3 word4");
-    handle_command(cmds, "eol", false);
+    handle_command(&runner, "eol");
     EXPECT_EQ(c->pos, 23);
 
-    handle_command(cmds, "erase-word", false);
+    handle_command(&runner, "erase-word");
     EXPECT_EQ(c->pos, 18);
     EXPECT_STRING_EQ(c->buf, "word1 word2 word3 ");
 
-    handle_command(cmds, "erase-word", false);
+    handle_command(&runner, "erase-word");
     EXPECT_EQ(c->pos, 12);
     EXPECT_STRING_EQ(c->buf, "word1 word2 ");
 
-    handle_command(cmds, "word-bwd", false);
+    handle_command(&runner, "word-bwd");
     EXPECT_EQ(c->pos, 6);
 
-    handle_command(cmds, "word-fwd", false);
+    handle_command(&runner, "word-fwd");
     EXPECT_EQ(c->pos, 12);
 
-    handle_command(cmds, "bol", false);
+    handle_command(&runner, "bol");
     EXPECT_EQ(c->pos, 0);
 
-    handle_command(cmds, "delete-word", false);
+    handle_command(&runner, "delete-word");
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "word2 ");
 
-    handle_command(cmds, "right", false);
+    handle_command(&runner, "right");
     EXPECT_EQ(c->pos, 1);
 
-    handle_command(cmds, "erase-bol", false);
+    handle_command(&runner, "erase-bol");
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "ord2 ");
 
-    handle_command(cmds, "delete", false);
+    handle_command(&runner, "delete");
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "rd2 ");
 
-    handle_command(cmds, "delete-eol", false);
+    handle_command(&runner, "delete-eol");
     EXPECT_EQ(c->pos, 0);
     EXPECT_EQ(c->buf.len, 0);
 
     // Left at beginning-of-line should do nothing
-    handle_command(cmds, "left", false);
+    handle_command(&runner, "left");
     EXPECT_EQ(c->pos, 0);
 
     cmdline_set_text(c, "...");
     EXPECT_EQ(c->pos, 3);
     EXPECT_EQ(c->buf.len, 3);
 
-    handle_command(cmds, "bol", false);
+    handle_command(&runner, "bol");
     EXPECT_EQ(c->pos, 0);
     EXPECT_EQ(c->buf.len, 3);
 
-    handle_command(cmds, "right", false);
+    handle_command(&runner, "right");
     EXPECT_EQ(c->pos, 1);
 
-    handle_command(cmds, "word-bwd", false);
+    handle_command(&runner, "word-bwd");
     EXPECT_EQ(c->pos, 0);
 
-    handle_command(cmds, "eol", false);
+    handle_command(&runner, "eol");
     EXPECT_EQ(c->pos, 3);
 
-    handle_command(cmds, "cancel", false);
+    handle_command(&runner, "cancel");
     EXPECT_EQ(c->pos, 0);
     EXPECT_NULL(c->search_pos);
     EXPECT_EQ(c->buf.len, 0);
@@ -300,9 +306,8 @@ static void test_complete_command_extra(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "option c expand-tab true ");
     reset_completion(c);
 
-    const CommandSet *cmds = &normal_commands;
-    handle_command(cmds, "run -s mkdir -p $HOME/sub", false);
-    handle_command(cmds, "run -s touch $HOME/file $HOME/sub/subfile", false);
+    handle_normal_command(e, "run -s mkdir -p $HOME/sub", false);
+    handle_normal_command(e, "run -s touch $HOME/file $HOME/sub/subfile", false);
 
     cmdline_set_text(c, "open ~/");
     complete_command_next(e);

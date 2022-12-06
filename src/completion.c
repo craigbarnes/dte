@@ -119,11 +119,12 @@ static bool do_collect_files (
     return true;
 }
 
-static void collect_files(CompletionState *cs, FileCollectionType type)
+static void collect_files(EditorState *e, CompletionState *cs, FileCollectionType type)
 {
-    StringView e = cs->escaped;
-    if (strview_has_prefix(&e, "~/")) {
-        char *str = parse_command_arg(&normal_commands, e.data, e.length, false);
+    StringView esc = cs->escaped;
+    if (strview_has_prefix(&esc, "~/")) {
+        CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+        char *str = parse_command_arg(&runner, esc.data, esc.length, false);
         const char *slash = strrchr(str, '/');
         BUG_ON(!slash);
         cs->tilde_expanded = true;
@@ -154,15 +155,14 @@ static void collect_files(CompletionState *cs, FileCollectionType type)
     }
 }
 
-void collect_normal_aliases(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
+void collect_normal_aliases(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_hashmap_keys(&normal_commands.aliases, a, prefix);
+    collect_hashmap_keys(&e->modes[INPUT_NORMAL].aliases, a, prefix);
 }
 
-static void collect_bound_keys(const KeyBindingGroup *kbg, PointerArray *a, const char *prefix)
+static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const char *prefix)
 {
-    const IntMap *map = &kbg->map;
-    for (IntMapIter it = intmap_iter(map); intmap_next(&it); ) {
+    for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
         const char *str = keycode_to_string(it.entry->key);
         if (str_has_prefix(str, prefix)) {
             ptr_array_append(a, xstrdup(str));
@@ -172,7 +172,7 @@ static void collect_bound_keys(const KeyBindingGroup *kbg, PointerArray *a, cons
 
 void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_bound_keys(&e->bindings[INPUT_NORMAL], a, prefix);
+    collect_bound_keys(&e->modes[INPUT_NORMAL].key_bindings, a, prefix);
 }
 
 void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
@@ -215,7 +215,7 @@ void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix
 
 static void complete_alias(EditorState *e, const CommandArgs *a)
 {
-    const HashMap *aliases = &normal_commands.aliases;
+    const HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         collect_hashmap_keys(aliases, &cs->completions, cs->parsed);
@@ -235,7 +235,7 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
         [INPUT_SEARCH] = 's',
     };
 
-    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->bindings));
+    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->modes));
     InputMode mode = INPUT_NORMAL;
     for (size_t i = 0, count = 0; i < ARRAYLEN(flags); i++) {
         if (cmdargs_has_flag(a, flags[i])) {
@@ -246,10 +246,10 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
         }
     }
 
+    const IntMap *key_bindings = &e->modes[mode].key_bindings;
     CompletionState *cs = &e->cmdline.completion;
-    KeyBindingGroup *kbg = &e->bindings[mode];
     if (a->nr_args == 0) {
-        collect_bound_keys(kbg, &cs->completions, cs->parsed);
+        collect_bound_keys(key_bindings, &cs->completions, cs->parsed);
         return;
     }
 
@@ -261,7 +261,7 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
     if (!parse_key_string(&key, a->args[0])) {
         return;
     }
-    const CachedCommand *cmd = lookup_binding(kbg, key);
+    const CachedCommand *cmd = lookup_binding(key_bindings, key);
     if (!cmd) {
         return;
     }
@@ -272,7 +272,7 @@ static void complete_bind(EditorState *e, const CommandArgs *a)
 static void complete_cd(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
     CompletionState *cs = &e->cmdline.completion;
-    collect_files(cs, COLLECT_DIRS_ONLY);
+    collect_files(e, cs, COLLECT_DIRS_ONLY);
     if (str_has_prefix("-", cs->parsed)) {
         const char *oldpwd = getenv("OLDPWD");
         if (likely(oldpwd && oldpwd[0] != '\0')) {
@@ -285,7 +285,7 @@ static void complete_exec(EditorState *e, const CommandArgs *a)
 {
     // TODO: add completion for [-ioe] option arguments
     CompletionState *cs = &e->cmdline.completion;
-    collect_files(cs, a->nr_args == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
+    collect_files(e, cs, a->nr_args == 0 ? COLLECT_EXECUTABLES : COLLECT_ALL);
 }
 
 static void complete_compile(EditorState *e, const CommandArgs *a)
@@ -295,7 +295,7 @@ static void complete_compile(EditorState *e, const CommandArgs *a)
     if (n == 0) {
         collect_compilers(e, &cs->completions, cs->parsed);
     } else {
-        collect_files(cs, n == 1 ? COLLECT_EXECUTABLES : COLLECT_ALL);
+        collect_files(e, cs, n == 1 ? COLLECT_EXECUTABLES : COLLECT_ALL);
     }
 }
 
@@ -352,7 +352,7 @@ static void complete_include(EditorState *e, const CommandArgs *a)
         if (cmdargs_has_flag(a, 'b')) {
             collect_builtin_configs(e, &cs->completions, cs->parsed);
         } else {
-            collect_files(cs, COLLECT_ALL);
+            collect_files(e, cs, COLLECT_ALL);
         }
     }
 }
@@ -389,7 +389,7 @@ static void complete_move_tab(EditorState *e, const CommandArgs *a)
 static void complete_open(EditorState *e, const CommandArgs *a)
 {
     if (!cmdargs_has_flag(a, 't')) {
-        collect_files(&e->cmdline.completion, COLLECT_ALL);
+        collect_files(e, &e->cmdline.completion, COLLECT_ALL);
     }
 }
 
@@ -410,7 +410,7 @@ static void complete_option(EditorState *e, const CommandArgs *a)
 
 static void complete_save(EditorState *e, const CommandArgs* UNUSED_ARG(a))
 {
-    collect_files(&e->cmdline.completion, COLLECT_ALL);
+    collect_files(e, &e->cmdline.completion, COLLECT_ALL);
 }
 
 static void complete_quit(EditorState *e, const CommandArgs* UNUSED_ARG(a))
@@ -492,7 +492,7 @@ static void complete_wsplit(EditorState *e, const CommandArgs *a)
 {
     CompletionState *cs = &e->cmdline.completion;
     if (!cmdargs_has_flag(a, 't') && !cmdargs_has_flag(a, 'n')) {
-        collect_files(cs, COLLECT_ALL);
+        collect_files(e, cs, COLLECT_ALL);
     }
 }
 
@@ -632,7 +632,8 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
 {
     CompletionState *cs = &e->cmdline.completion;
     BUG_ON(cs->orig);
-    const CommandSet *cmds = &normal_commands;
+    const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    const HashMap *aliases = runner.aliases;
     const size_t cmdline_pos = cmdline->pos;
     char *const cmd = string_clone_cstring(&cmdline->buf);
     PointerArray array = PTR_ARRAY_INIT;
@@ -669,26 +670,26 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
 
         if (semicolon + 1 == array.count) {
             char *name = xstrslice(cmd, pos, end);
-            const char *value = find_alias(&normal_commands.aliases, name);
+            const char *value = find_alias(aliases, name);
             if (value) {
                 size_t save = array.count;
-                if (parse_commands(cmds, &array, value) != CMDERR_NONE) {
+                if (parse_commands(&runner, &array, value) != CMDERR_NONE) {
                     for (size_t i = save, n = array.count; i < n; i++) {
                         free(array.ptrs[i]);
                         array.ptrs[i] = NULL;
                     }
                     array.count = save;
-                    ptr_array_append(&array, parse_command_arg(cmds, name, end - pos, true));
+                    ptr_array_append(&array, parse_command_arg(&runner, name, end - pos, true));
                 } else {
                     // Remove NULL
                     array.count--;
                 }
             } else {
-                ptr_array_append(&array, parse_command_arg(cmds, name, end - pos, true));
+                ptr_array_append(&array, parse_command_arg(&runner, name, end - pos, true));
             }
             free(name);
         } else {
-            ptr_array_append(&array, parse_command_arg(cmds, cmd + pos, end - pos, true));
+            ptr_array_append(&array, parse_command_arg(&runner, cmd + pos, end - pos, true));
         }
         pos = end;
     }
@@ -703,7 +704,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         free(name);
     } else {
         cs->escaped = string_view(str, len);
-        cs->parsed = parse_command_arg(cmds, str, len, true);
+        cs->parsed = parse_command_arg(&runner, str, len, true);
         cs->add_space_after_single_match = true;
         char **args = NULL;
         size_t argc = 0;

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "command/run.h"
+#include "editor.h"
 #include "syntax/color.h"
 #include "terminal/color.h"
 #include "util/macros.h"
@@ -31,10 +32,10 @@ extern ConfigState current_config;
 String dump_builtin_configs(void);
 const BuiltinConfig *get_builtin_config(const char *name) PURE;
 const BuiltinConfig *get_builtin_configs_array(size_t *nconfigs);
-void exec_config(const CommandSet *cmds, StringView config);
-int do_read_config(const CommandSet *cmds, const char *filename, ConfigFlags f) WARN_UNUSED_RESULT;
-int read_config(const CommandSet *cmds, const char *filename, ConfigFlags f);
-void exec_builtin_color_reset(ColorScheme *colors, TermColorCapabilityType color_type);
-void exec_builtin_rc(ColorScheme *colors, TermColorCapabilityType color_type);
+void exec_config(CommandRunner *runner, StringView config);
+int do_read_config(CommandRunner *runner, const char *filename, ConfigFlags flags) WARN_UNUSED_RESULT;
+int read_config(CommandRunner *runner, const char *filename, ConfigFlags f);
+void exec_builtin_color_reset(EditorState *e, TermColorCapabilityType color_type);
+void exec_builtin_rc(EditorState *e, TermColorCapabilityType color_type);
 
 #endif

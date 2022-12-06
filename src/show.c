@@ -82,7 +82,7 @@ static void open_temporary_buffer (
 
 static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag)
 {
-    const char *cmd_str = find_alias(&normal_commands.aliases, alias_name);
+    const char *cmd_str = find_alias(&e->modes[INPUT_NORMAL].aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
@@ -113,7 +113,7 @@ static void show_binding(EditorState *e, const char *keystr, bool cflag)
         return;
     }
 
-    const CachedCommand *b = lookup_binding(&e->bindings[INPUT_NORMAL], key);
+    const CachedCommand *b = lookup_binding(&e->modes[INPUT_NORMAL].key_bindings, key);
     if (!b) {
         info_msg("%s is not bound to a command", keystr);
         return;
@@ -308,9 +308,9 @@ static int alias_cmp(const void *ap, const void *bp)
     return strcmp(a->name, b->name);
 }
 
-String dump_normal_aliases(EditorState* UNUSED_ARG(e))
+String dump_normal_aliases(EditorState *e)
 {
-    const HashMap *aliases = &normal_commands.aliases;
+    const HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
     const size_t count = aliases->count;
     if (unlikely(count == 0)) {
         return string_new(0);
@@ -348,7 +348,7 @@ String dump_normal_aliases(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
-String dump_bindings(EditorState *e)
+String dump_all_bindings(EditorState *e)
 {
     static const char flags[][4] = {
         [INPUT_NORMAL] = "",
@@ -356,10 +356,11 @@ String dump_bindings(EditorState *e)
         [INPUT_SEARCH] = "-s ",
     };
 
-    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->bindings));
+    static_assert(ARRAYLEN(flags) == ARRAYLEN(e->modes));
     String buf = string_new(4096);
-    for (InputMode i = 0, n = ARRAYLEN(e->bindings); i < n; i++) {
-        if (dump_binding_group(&e->bindings[i], flags[i], &buf) && i != n - 1) {
+    for (InputMode i = 0, n = ARRAYLEN(e->modes); i < n; i++) {
+        const IntMap *bindings = &e->modes[i].key_bindings;
+        if (dump_bindings(bindings, flags[i], &buf) && i != n - 1) {
             string_append_byte(&buf, '\n');
         }
     }
@@ -436,7 +437,7 @@ static String do_dump_macro(EditorState *e)
 
 static const ShowHandler show_handlers[] = {
     {"alias", DTERC, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
-    {"bind", DTERC, show_binding, dump_bindings, collect_bound_normal_keys},
+    {"bind", DTERC, show_binding, dump_all_bindings, collect_bound_normal_keys},
     {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
     {"command", DTERC | LASTLINE, NULL, dump_command_history, NULL},
     {"cursor", DTERC, show_cursor, dump_cursors, do_collect_cursor_modes},

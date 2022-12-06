@@ -118,7 +118,7 @@ static void handle_select_chars_or_lines_flags(EditorState *e, const CommandArgs
     do_selection(e->view, sel);
 }
 
-static void cmd_alias(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_alias(EditorState *e, const CommandArgs *a)
 {
     const char *const name = a->args[0];
     const char *const cmd = a->args[1];
@@ -146,7 +146,7 @@ static void cmd_alias(EditorState* UNUSED_ARG(e), const CommandArgs *a)
         return;
     }
 
-    HashMap *aliases = &normal_commands.aliases;
+    HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
     if (likely(cmd)) {
         add_alias(aliases, name, cmd);
     } else {
@@ -172,19 +172,18 @@ static void cmd_bind(EditorState *e, const CommandArgs *a)
         [INPUT_SEARCH] = has_flag(a, 's'),
     };
 
-    static_assert(ARRAYLEN(modes) == ARRAYLEN(e->bindings));
+    static_assert(ARRAYLEN(modes) == ARRAYLEN(e->modes));
 
-    if (likely(cmd)) {
-        for (InputMode mode = 0; mode < ARRAYLEN(modes); mode++) {
-            if (modes[mode]) {
-                add_binding(&e->bindings[mode], key, cmd);
-            }
+    for (InputMode i = 0; i < ARRAYLEN(modes); i++) {
+        if (!modes[i]) {
+            continue;
         }
-    } else {
-        for (InputMode mode = 0; mode < ARRAYLEN(modes); mode++) {
-            if (modes[mode]) {
-                remove_binding(&e->bindings[mode], key);
-            }
+        IntMap *bindings = &e->modes[i].key_bindings;
+        if (likely(cmd)) {
+            CommandRunner runner = cmdrunner_for_mode(e, i, false);
+            add_binding(bindings, key, cached_command_new(&runner, cmd));
+        } else {
+            remove_binding(bindings, key);
         }
     }
 }
@@ -670,9 +669,8 @@ static void cmd_ft(EditorState *e, const CommandArgs *a)
 static void cmd_hi(EditorState *e, const CommandArgs *a)
 {
     TermColorCapabilityType color_type = e->terminal.color_type;
-    ColorScheme *colors = &e->colors;
     if (unlikely(a->nr_args == 0)) {
-        exec_builtin_color_reset(colors, color_type);
+        exec_builtin_color_reset(e, color_type);
         goto update;
     }
 
@@ -703,24 +701,24 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
 
     color.fg = fg;
     color.bg = bg;
-    set_highlight_color(colors, a->args[0], &color);
+    set_highlight_color(&e->colors, a->args[0], &color);
 
 update:
     // Don't call update_all_syntax_colors() needlessly; it's called
     // right after config has been loaded
     if (e->status != EDITOR_INITIALIZING) {
-        update_all_syntax_colors(&e->syntaxes, colors);
+        update_all_syntax_colors(&e->syntaxes, &e->colors);
         mark_everything_changed(e);
     }
 }
 
-static void cmd_include(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_include(EditorState *e, const CommandArgs *a)
 {
     ConfigFlags flags = has_flag(a, 'q') ? CFG_NOFLAGS : CFG_MUST_EXIST;
     if (has_flag(a, 'b')) {
         flags |= CFG_BUILTIN;
     }
-    read_config(&normal_commands, a->args[0], flags);
+    read_normal_config(e, a->args[0], flags);
 }
 
 static void cmd_insert(EditorState *e, const CommandArgs *a)
@@ -796,7 +794,7 @@ static void cmd_macro(EditorState *e, const CommandArgs *a)
         unsigned int saved_nr_errors = get_nr_errors();
         for (size_t i = 0, n = m->macro.count; i < n; i++) {
             const char *cmd_str = m->macro.ptrs[i];
-            handle_command(&normal_commands, cmd_str, false);
+            handle_normal_command(e, cmd_str, false);
             if (get_nr_errors() != saved_nr_errors) {
                 break;
             }
@@ -2396,13 +2394,29 @@ const Command *find_normal_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
-CommandSet normal_commands = {
+const CommandSet normal_commands = {
     .lookup = find_normal_command,
     .macro_record = record_command,
     .expand_variable = expand_normal_var,
-    .aliases = HASHMAP_INIT,
-    .userdata = &editor,
 };
+
+void handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
+{
+    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, allow_recording);
+    handle_command(&runner, cmd);
+}
+
+void exec_normal_config(EditorState *e, StringView config)
+{
+    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    exec_config(&runner, config);
+}
+
+int read_normal_config(EditorState *e, const char *filename, ConfigFlags flags)
+{
+    CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    return read_config(&runner, filename, flags);
+}
 
 void collect_normal_commands(PointerArray *a, const char *prefix)
 {

@@ -11,7 +11,7 @@ void show(EditorState *e, const char *type, const char *key, bool cflag) NONNULL
 void collect_show_subcommands(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_show_subcommand_args(EditorState *e, PointerArray *a, const char *name, const char *arg_prefix) NONNULL_ARGS;
 
-String dump_bindings(EditorState *e);
+String dump_all_bindings(EditorState *e);
 String dump_command_history(EditorState *e);
 String dump_compilers(EditorState *e);
 String dump_cursors(EditorState *e);

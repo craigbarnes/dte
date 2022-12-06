@@ -29,7 +29,7 @@ static bool normal_mode_keypress(EditorState *e, KeyCode key)
         return true;
     }
 
-    return handle_binding(&e->bindings[INPUT_NORMAL], key);
+    return handle_binding(e, INPUT_NORMAL, key);
 }
 
 static bool insert_paste(EditorState *e, bool bracketed)
@@ -64,7 +64,7 @@ bool handle_input(EditorState *e, KeyCode key)
 
     BUG_ON(!(mode == INPUT_COMMAND || mode == INPUT_SEARCH));
     if (!u_is_unicode(key) || key == KEY_TAB || key == KEY_ENTER) {
-        return handle_binding(&e->bindings[mode], key);
+        return handle_binding(e, mode, key);
     }
 
     CommandLine *c = &e->cmdline;

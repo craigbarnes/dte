@@ -10,7 +10,7 @@ typedef struct {
     char cmd_str[]; // Original command string
 } CachedCommand;
 
-CachedCommand *cached_command_new(const CommandSet *cmds, const char *cmd_str) NONNULL_ARGS_AND_RETURN;
+CachedCommand *cached_command_new(const CommandRunner *runner, const char *cmd_str) NONNULL_ARGS_AND_RETURN;
 void cached_command_free(CachedCommand *cc);
 
 #endif
