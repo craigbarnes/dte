@@ -189,9 +189,9 @@ static void set_signal_handlers(void)
     sigprocmask(SIG_SETMASK, &mask, NULL);
 }
 
-static ExitCode write_str(int fd, const char *str, size_t len)
+static ExitCode write_stdout(const char *str, size_t len)
 {
-    if (xwrite_all(fd, str, len) < 0) {
+    if (xwrite_all(STDOUT_FILENO, str, len) < 0) {
         perror("write");
         return EX_IOERR;
     }
@@ -202,7 +202,7 @@ static ExitCode list_builtin_configs(void)
 {
     String str = dump_builtin_configs();
     BUG_ON(!str.buffer);
-    ExitCode e = write_str(STDOUT_FILENO, str.buffer, str.len);
+    ExitCode e = write_stdout(str.buffer, str.len);
     string_free(&str);
     return e;
 }
@@ -214,7 +214,7 @@ static ExitCode dump_builtin_config(const char *name)
         fprintf(stderr, "Error: no built-in config with name '%s'\n", name);
         return EX_USAGE;
     }
-    return write_str(STDOUT_FILENO, cfg->text.data, cfg->text.length);
+    return write_stdout(cfg->text.data, cfg->text.length);
 }
 
 static ExitCode lint_syntax(const char *filename)
@@ -449,7 +449,7 @@ int main(int argc, char *argv[])
             use_showkey = true;
             goto loop_break;
         case 'V':
-            return write_str(STDOUT_FILENO, copyright, sizeof(copyright));
+            return write_stdout(copyright, sizeof(copyright));
         case 'h':
             printf(usage, (argv[0] && argv[0][0]) ? argv[0] : "dte");
             return EX_OK;
