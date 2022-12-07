@@ -249,11 +249,16 @@ static ExitCode showkey_loop(Terminal *term)
     return EX_OK;
 }
 
+static bool is_controlling_tty(int fd)
+{
+    return tcgetpgrp(fd) != -1;
+}
+
 static ExitCode init_std_fds(int std_fds[2])
 {
     FILE *streams[3] = {stdin, stdout, stderr};
     for (int i = 0; i < ARRAYLEN(streams); i++) {
-        if (isatty(i)) {
+        if (is_controlling_tty(i)) {
             continue;
         }
 
