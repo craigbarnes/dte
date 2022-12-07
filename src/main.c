@@ -58,7 +58,7 @@ static noreturn COLD void handle_fatal_signal(int signum)
     LOG_CRITICAL("received signal %d (%s)", signum, strsignal(signum));
 
     if (signum != SIGHUP) {
-        term_cleanup(&editor);
+        fatal_error_cleanup();
     }
 
     struct sigaction sa = {.sa_handler = SIG_DFL};

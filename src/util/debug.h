@@ -23,5 +23,6 @@ typedef void (*CleanupHandler)(void *userdata);
 
 noreturn void fatal_error(const char *msg, int err) COLD NONNULL_ARGS;
 void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata);
+void fatal_error_cleanup(void);
 
 #endif

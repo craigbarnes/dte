@@ -18,6 +18,13 @@ void set_fatal_error_cleanup_handler(CleanupHandler handler, void *userdata)
     cleanup_userdata = userdata;
 }
 
+void fatal_error_cleanup(void)
+{
+    if (cleanup_handler) {
+        cleanup_handler(cleanup_userdata);
+    }
+}
+
 static void cleanup(void)
 {
     // Blocking signals here prevents the following call chain from leaving
@@ -31,11 +38,7 @@ static void cleanup(void)
     sigset_t mask, oldmask;
     sigfillset(&mask);
     sigprocmask(SIG_SETMASK, &mask, &oldmask);
-
-    if (cleanup_handler) {
-        cleanup_handler(cleanup_userdata);
-    }
-
+    fatal_error_cleanup();
     sigprocmask(SIG_SETMASK, &oldmask, NULL);
 }
 
