@@ -40,19 +40,6 @@
 #include "window.h"
 #include "../build/version.h"
 
-static void handle_sigcont(int UNUSED_ARG(signum))
-{
-    if (
-        !editor.child_controls_terminal
-        && editor.status != EDITOR_INITIALIZING
-    ) {
-        int saved_errno = errno;
-        term_raw();
-        ui_start(&editor);
-        errno = saved_errno;
-    }
-}
-
 static void term_cleanup(EditorState *e)
 {
     set_fatal_error_cleanup_handler(NULL, NULL);
@@ -139,16 +126,7 @@ static void set_signal_handlers(void)
         SIGURG,  // Ignore
         SIGTTIN, // Stop
         SIGTTOU, // Stop
-    };
-
-    static const struct {
-        int signum;
-        void (*handler)(int);
-    } handled_signals[] = {
-        {SIGCONT, handle_sigcont},
-#ifdef SIGWINCH
-        {SIGWINCH, handle_sigwinch},
-#endif
+        SIGCONT, // Continue
     };
 
     struct sigaction action = {.sa_handler = handle_fatal_signal};
@@ -176,11 +154,10 @@ static void set_signal_handlers(void)
         do_sigaction(default_signals[i], &action);
     }
 
-    sigemptyset(&action.sa_mask);
-    for (size_t i = 0; i < ARRAYLEN(handled_signals); i++) {
-        action.sa_handler = handled_signals[i].handler;
-        do_sigaction(handled_signals[i].signum, &action);
-    }
+#if defined(SIGWINCH)
+    action.sa_handler = handle_sigwinch;
+    do_sigaction(SIGWINCH, &action);
+#endif
 
     // Set signal mask explicitly, to avoid any possibility of
     // inheriting blocked signals

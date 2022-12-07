@@ -1913,22 +1913,24 @@ static void cmd_show(EditorState *e, const CommandArgs *a)
 static void cmd_suspend(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
+    if (e->status == EDITOR_INITIALIZING) {
+        LOG_WARNING("suspend request ignored");
+        return;
+    }
+
     if (e->session_leader) {
         error_msg("Session leader can't suspend");
         return;
     }
-    if (
-        !e->child_controls_terminal
-        && e->status != EDITOR_INITIALIZING
-    ) {
-        ui_end(e);
-    }
+
+    ui_end(e);
     int r = kill(0, SIGSTOP);
     if (unlikely(r != 0)) {
         perror_msg("kill");
-        term_raw();
-        ui_start(e);
     }
+
+    term_raw();
+    ui_start(e);
 }
 
 static void cmd_tag(EditorState *e, const CommandArgs *a)
