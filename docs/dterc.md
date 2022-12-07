@@ -1246,10 +1246,6 @@ command to set default options for specific file types.
 :   If search string contains an uppercase letter search is
     case-sensitive, otherwise it is case-insensitive.
 
-### **display-invisible** [false]
-
-Display invisible characters.
-
 ### **display-special** [false]
 
 Display special characters.

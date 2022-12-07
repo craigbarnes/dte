@@ -137,7 +137,6 @@ EditorState editor = {
         // Global-only options
         .case_sensitive_search = CSS_TRUE,
         .crlf_newlines = false,
-        .display_invisible = false,
         .display_special = false,
         .esc_timeout = 100,
         .filesize_limit = 250,

@@ -7,7 +7,6 @@ toggle file-history
 toggle fsync
 toggle syntax
 toggle brace-indent
-toggle display-invisible
 toggle display-special
 toggle set-window-title
 toggle show-line-numbers

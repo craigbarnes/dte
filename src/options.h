@@ -55,7 +55,6 @@ typedef struct {
 typedef struct {
     COMMON_OPTIONS;
     // Only global
-    bool display_invisible;
     bool display_special;
     bool lock_files;
     bool optimize_true_color;
