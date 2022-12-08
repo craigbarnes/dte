@@ -195,11 +195,11 @@ static ExitCode dump_builtin_config(const char *name)
     return write_stdout(cfg->text.data, cfg->text.length);
 }
 
-static ExitCode lint_syntax(const char *filename)
+static ExitCode lint_syntax(EditorState *e, const char *filename)
 {
-    HashMap syntaxes = HASHMAP_INIT;
     int err;
-    const Syntax *s = do_load_syntax_file(&editor, filename, CFG_MUST_EXIST, &err);
+    BUG_ON(e->status != EDITOR_INITIALIZING);
+    const Syntax *s = load_syntax_file(e, filename, CFG_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
         const char *p = (n > 1) ? "s" : "";
@@ -207,7 +207,6 @@ static ExitCode lint_syntax(const char *filename)
     } else if (err == EINVAL) {
         error_msg("%s: no default syntax found", filename);
     }
-    free_syntaxes(&syntaxes);
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
@@ -394,6 +393,7 @@ int main(int argc, char *argv[])
     static const char optstring[] = "hBHKRVb:c:t:r:s:";
     const char *tag = NULL;
     const char *rc = NULL;
+    const char *syntax = NULL;
     PointerArray commands = PTR_ARRAY_INIT;
     bool read_rc = true;
     bool use_showkey = false;
@@ -412,7 +412,8 @@ int main(int argc, char *argv[])
             rc = optarg;
             break;
         case 's':
-            return lint_syntax(optarg);
+            syntax = optarg;
+            goto lint;
         case 'R':
             read_rc = false;
             break;
@@ -453,7 +454,13 @@ loop_break:;
         return r;
     }
 
+lint:;
+
     EditorState *e = init_editor_state();
+
+    if (syntax) {
+        return lint_syntax(e, syntax);
+    }
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {

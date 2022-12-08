@@ -580,7 +580,7 @@ static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags
     return read_config(&runner, filename, flags);
 }
 
-Syntax *do_load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
+Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
 {
     SyntaxParser sp = {
         .home_dir = &e->home_dir,
@@ -609,16 +609,13 @@ Syntax *do_load_syntax_file(EditorState *e, const char *filename, ConfigFlags fl
     Syntax *syn = find_syntax(sp.syntaxes, path_basename(filename));
     if (!syn) {
         *err = EINVAL;
+        return NULL;
     }
-    return syn;
-}
 
-Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
-{
-    Syntax *syn = do_load_syntax_file(e, filename, flags, err);
-    if (syn && e->status != EDITOR_INITIALIZING) {
-        update_syntax_colors(syn, &e->colors);
+    if (e->status != EDITOR_INITIALIZING) {
+        update_syntax_colors(syn, sp.colors);
     }
+
     return syn;
 }
 
