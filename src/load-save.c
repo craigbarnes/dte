@@ -145,9 +145,9 @@ static int xmadvise_sequential(void *addr, size_t len)
 #endif
 }
 
-static void update_file_info(Buffer *buffer, const struct stat *st)
+static bool update_file_info(FileInfo *info, const struct stat *st)
 {
-    buffer->file = (FileInfo) {
+    *info = (FileInfo) {
         .size = st->st_size,
         .mode = st->st_mode,
         .gid = st->st_gid,
@@ -156,26 +156,19 @@ static void update_file_info(Buffer *buffer, const struct stat *st)
         .ino = st->st_ino,
         .mtime = st->st_mtime,
     };
-}
-
-static bool buffer_stat(Buffer *buffer, const char *filename)
-{
-    struct stat st;
-    if (stat(filename, &st) != 0) {
-        return false;
-    }
-    update_file_info(buffer, &st);
     return true;
 }
 
-static bool buffer_fstat(Buffer *buffer, int fd)
+static bool buffer_stat(FileInfo *info, const char *filename)
 {
     struct stat st;
-    if (fstat(fd, &st) != 0) {
-        return false;
-    }
-    update_file_info(buffer, &st);
-    return true;
+    return !stat(filename, &st) && update_file_info(info, &st);
+}
+
+static bool buffer_fstat(FileInfo *info, int fd)
+{
+    struct stat st;
+    return !fstat(fd, &st) && update_file_info(info, &st);
 }
 
 bool read_blocks(Buffer *buffer, int fd, bool utf8_bom)
@@ -274,7 +267,7 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
         }
         fixup_blocks(buffer);
     } else {
-        if (!buffer_fstat(buffer, fd)) {
+        if (!buffer_fstat(&buffer->file, fd)) {
             error_msg("fstat failed on %s: %s", filename, strerror(errno));
             goto error;
         }
@@ -467,7 +460,7 @@ bool save_buffer (
         goto error;
     }
     free_file_encoder(enc);
-    buffer_stat(buffer, filename);
+    buffer_stat(&buffer->file, filename);
     return true;
 
 error:
@@ -480,7 +473,7 @@ error:
         // Not using temporary file, therefore mtime may have changed.
         // Update stat to avoid "File has been modified by someone else"
         // error later when saving the file again.
-        buffer_stat(buffer, filename);
+        buffer_stat(&buffer->file, filename);
     }
     return false;
 }
