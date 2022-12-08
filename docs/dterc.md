@@ -249,7 +249,7 @@ See also: [`toggle`] and [`option`] commands.
 
 Set (or unset) environment variable.
 
-### **hi** [**-c**] _name_ [_fg-color_ [_bg-color_]] [_attribute_]...
+### **hi** [**-c**] [_name_] [_fg-color_ [_bg-color_]] [_attribute_]...
 
 Set highlight color.
 
@@ -327,6 +327,10 @@ _attribute_.
 Unset fg/bg colors are inherited from highlight color `default`.
 If you don't set fg/bg for the highlight color `default` then
 terminal's default fg/bg is used.
+
+If `hi` is run without any arguments, all highlight colors are
+removed and a very basic set of defaults is then re-applied
+(see `show include color/reset`).
 
 `-c`
 :   Do nothing at all if the terminal can't display _fg-color_ and/or

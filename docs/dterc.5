@@ -19,7 +19,7 @@ Configuration Commands:
 .br
    \fBsetenv\fR \fIname\fR [\fIvalue\fR]
 .br
-   \fBhi\fR [\fB\-c\fR] \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
+   \fBhi\fR [\fB\-c\fR] [\fIname\fR] [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
 .br
    \fBft\fR [\fB\-b\fR|\fB\-c\fR|\fB\-f\fR|\fB\-i\fR] \fIfiletype\fR \fIstring\fR...
 .br
@@ -601,7 +601,7 @@ See also: \fBtoggle\fR and \fBoption\fR commands.
 Set (or unset) environment variable.
 .P
 .RE
-\fBhi\fR [\fB\-c\fR] \fIname\fR [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
+\fBhi\fR [\fB\-c\fR] [\fIname\fR] [\fIfg\-color\fR [\fIbg\-color\fR]] [\fIattribute\fR]...
 .RS
 Set highlight color.
 .P
@@ -726,6 +726,10 @@ specify both \fIfg\-color\fR and \fIbg\-color\fR if you want to set the \fBkeep\
 Unset fg/bg colors are inherited from highlight color \fBdefault\fR.
 If you don't set fg/bg for the highlight color \fBdefault\fR then
 terminal's default fg/bg is used.
+.P
+If \fBhi\fR is run without any arguments, all highlight colors are
+removed and a very basic set of defaults is then re\-applied
+(see \fBshow include color/reset\fR).
 .P
 .TP
 \fB\-c\fR
