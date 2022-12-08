@@ -27,7 +27,7 @@ Configuration Commands:
 .br
    \fBinclude\fR [\fB\-bq\fR] \fIfile\fR
 .br
-   \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message|_]...
+   \fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
 .br
    \fBload\-syntax\fR \fIfilename\fR|\fIfiletype\fR
 .br
@@ -812,7 +812,7 @@ Note: "built\-in files" are config files bundled into the program binary.
 See the \fB\-B\fR and \fB\-b\fR flags in the \fBdte\fR(1) man page for more information.
 .P
 .RE
-\fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR \fIregexp\fR [file|line|column|message|_]...
+\fBerrorfmt\fR [\fB\-i\fR] \fIcompiler\fR [\fIregexp\fR] [file|line|column|message|_]...
 .RS
 Register a \fBregex\fR(7) pattern, for later use with the \fBcompile\fR command.
 .P

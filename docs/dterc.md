@@ -393,7 +393,7 @@ Read and execute commands from _file_.
 Note: "built-in files" are config files bundled into the program binary.
 See the `-B` and `-b` flags in the [`dte`] man page for more information.
 
-### **errorfmt** [**-i**] _compiler_ _regexp_ [file|line|column|message|_]...
+### **errorfmt** [**-i**] _compiler_ [_regexp_] [file|line|column|message|_]...
 
 Register a [`regex`] pattern, for later use with the [`compile`] command.
 
