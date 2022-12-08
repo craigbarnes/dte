@@ -2,7 +2,6 @@
 #include "parse.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/string.h"
 #include "util/strtonum.h"
 #include "util/unicode.h"
