@@ -202,6 +202,11 @@ EditorState *init_editor_state(void)
     LOG_INFO("dte version: " VERSION);
     LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
+    pid_t pgid = getpgrp();
+    if (pgid != pid) {
+        LOG_INFO("pgid: %jd", (intmax_t)pgid);
+    }
+
     set_and_check_locale();
     init_file_locks_context(e->user_config_dir, pid);
 
