@@ -1,7 +1,6 @@
 #include "../build/feature.h"
 #include <errno.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include "fd.h"
 #include "debug.h"
 #include "xreadwrite.h"

@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include "macros.h"
 
 static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool state)
@@ -24,6 +25,11 @@ static inline bool fd_set_cloexec(int fd, bool cloexec)
 static inline bool fd_set_nonblock(int fd, bool nonblock)
 {
     return fd_set_flag(fd, O_NONBLOCK, F_GETFL, F_SETFL, nonblock);
+}
+
+static inline bool is_controlling_tty(int fd)
+{
+    return tcgetpgrp(fd) != -1;
 }
 
 int xpipe2(int fd[2], int flags) WARN_UNUSED_RESULT;

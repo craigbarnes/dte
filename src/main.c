@@ -28,6 +28,7 @@
 #include "terminal/terminal.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
+#include "util/fd.h"
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
@@ -247,11 +248,6 @@ static ExitCode showkey_loop(Terminal *term)
     term_output_flush(obuf);
     term_cooked();
     return EX_OK;
-}
-
-static bool is_controlling_tty(int fd)
-{
-    return tcgetpgrp(fd) != -1;
 }
 
 static ExitCode init_std_fds(int std_fds[2])

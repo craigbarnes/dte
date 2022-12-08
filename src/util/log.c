@@ -6,6 +6,7 @@
 #include "log.h"
 #include "array.h"
 #include "debug.h"
+#include "fd.h"
 #include "str-util.h"
 #include "xreadwrite.h"
 
@@ -69,7 +70,7 @@ LogLevel log_open(const char *filename, LogLevel level)
     BUG_ON(!filename);
     BUG_ON(level < LOG_LEVEL_NONE);
     BUG_ON(level > LOG_LEVEL_TRACE);
-    BUG_ON(logfd != -1);
+    BUG_ON(logfd >= 0);
     BUG_ON(log_level != LOG_LEVEL_NONE);
 
     if (level == LOG_LEVEL_NONE) {
@@ -77,16 +78,25 @@ LogLevel log_open(const char *filename, LogLevel level)
     }
 
     int flags = O_WRONLY | O_CREAT | O_APPEND | O_TRUNC | O_CLOEXEC;
-    logfd = xopen(filename, flags, 0666);
-    if (unlikely(logfd < 0 || xwrite_all(logfd, "\n", 1) != 1)) {
+    int fd = xopen(filename, flags, 0666);
+    if (unlikely(fd < 0)) {
         return LOG_LEVEL_NONE;
     }
 
-    if (!isatty(logfd)) {
+    bool ctty = is_controlling_tty(fd);
+    if (unlikely(ctty || xwrite_all(fd, "\n", 1) != 1)) {
+        int err = ctty ? EINVAL : errno;
+        xclose(fd);
+        errno = err;
+        return LOG_LEVEL_NONE;
+    }
+
+    if (!isatty(fd)) {
         dim[0] = '\0';
         sgr0[0] = '\0';
     }
 
+    logfd = fd;
     log_level = MIN(level, log_level_max());
     return log_level;
 }
