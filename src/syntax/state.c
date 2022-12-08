@@ -17,86 +17,91 @@
 #include "util/xsnprintf.h"
 #include "vars.h"
 
-static Syntax *current_syntax;
-static State *current_state;
-static unsigned int saved_nr_errors; // Used to check if nr_errors changed
+typedef struct {
+    const StringView *home_dir;
+    const ColorScheme *colors;
+    HashMap *syntaxes;
+    Syntax *current_syntax;
+    State *current_state;
+    unsigned int saved_nr_errors; // Used to check if nr_errors changed
+} SyntaxParser;
 
-static bool no_syntax(void)
+static bool no_syntax(const SyntaxParser *sp)
 {
-    if (likely(current_syntax)) {
+    if (likely(sp->current_syntax)) {
         return false;
     }
     error_msg("No syntax started");
     return true;
 }
 
-static bool no_state(void)
+static bool no_state(const SyntaxParser *sp)
 {
-    if (unlikely(no_syntax())) {
+    if (unlikely(no_syntax(sp))) {
         return true;
     }
-    if (likely(current_state)) {
+    if (likely(sp->current_state)) {
         return false;
     }
     error_msg("No state started");
     return true;
 }
 
-static void close_state(void)
+static void close_state(SyntaxParser *sp)
 {
-    if (!current_state) {
+    if (!sp->current_state) {
         return;
     }
-    if (unlikely(current_state->type == STATE_INVALID)) {
+    if (unlikely(sp->current_state->type == STATE_INVALID)) {
         // Command prefix in error message makes no sense
         const Command *save = current_command;
         current_command = NULL;
-        error_msg("No default action in state %s", current_state->name);
+        error_msg("No default action in state %s", sp->current_state->name);
         current_command = save;
     }
-    current_state = NULL;
+    sp->current_state = NULL;
 }
 
-static State *find_or_add_state(const char *name)
+static State *find_or_add_state(SyntaxParser *sp, const char *name)
 {
-    State *st = find_state(current_syntax, name);
-    if (st) {
-        return st;
+    State *state = find_state(sp->current_syntax, name);
+    if (state) {
+        return state;
     }
 
-    st = xnew0(State, 1);
-    st->name = xstrdup(name);
-    st->defined = false;
-    st->type = STATE_INVALID;
+    state = xnew0(State, 1);
+    state->name = xstrdup(name);
+    state->defined = false;
+    state->type = STATE_INVALID;
 
-    if (current_syntax->states.count == 0) {
-        current_syntax->start_state = st;
+    if (sp->current_syntax->states.count == 0) {
+        sp->current_syntax->start_state = state;
     }
 
-    return hashmap_insert(&current_syntax->states, st->name, st);
+    return hashmap_insert(&sp->current_syntax->states, state->name, state);
 }
 
-static State *reference_state(const char *name)
+static State *reference_state(SyntaxParser *sp, const char *name)
 {
     if (streq(name, "this")) {
-        return current_state;
+        return sp->current_state;
     }
-    return find_or_add_state(name);
+    return find_or_add_state(sp, name);
 }
 
-static bool not_subsyntax(void)
+static bool not_subsyntax(const SyntaxParser *sp)
 {
-    if (likely(is_subsyntax(current_syntax))) {
+    if (likely(is_subsyntax(sp->current_syntax))) {
         return false;
     }
     error_msg("Destination state END allowed only in a subsyntax");
     return true;
 }
 
-static bool subsyntax_call(const EditorState *e, const char *name, const char *ret, State **dest)
+static bool subsyntax_call(SyntaxParser *sp, const char *name, const char *ret, State **dest)
 {
     SyntaxMerge m = {
-        .subsyn = find_any_syntax(&e->syntaxes, name),
+        .subsyn = find_any_syntax(sp->syntaxes, name),
         .return_state = NULL,
         .delim = NULL,
         .delim_len = 0,
@@ -112,54 +117,54 @@ static bool subsyntax_call(const EditorState *e, const char *name, const char *r
     }
 
     if (streq(ret, "END")) {
-        if (not_subsyntax()) {
+        if (not_subsyntax(sp)) {
             ok = false;
         }
     } else if (ok) {
-        m.return_state = reference_state(ret);
+        m.return_state = reference_state(sp, ret);
     }
     if (ok) {
-        *dest = merge_syntax(current_syntax, &m, &e->colors);
+        *dest = merge_syntax(sp->current_syntax, &m, sp->colors);
     }
     return ok;
 }
 
-static bool destination_state(const EditorState *e, const char *name, State **dest)
+static bool destination_state(SyntaxParser *sp, const char *name, State **dest)
 {
     const char *sep = strchr(name, ':');
     if (sep) {
         // subsyntax:returnstate
         char *sub = xstrcut(name, sep - name);
-        bool success = subsyntax_call(e, sub, sep + 1, dest);
+        bool success = subsyntax_call(sp, sub, sep + 1, dest);
         free(sub);
         return success;
     }
 
     if (streq(name, "END")) {
-        if (not_subsyntax()) {
+        if (not_subsyntax(sp)) {
             return false;
         }
         *dest = NULL;
         return true;
     }
 
-    *dest = reference_state(name);
+    *dest = reference_state(sp, name);
     return true;
 }
 
 static Condition *add_condition (
-    const EditorState *e,
+    SyntaxParser *sp,
     ConditionType type,
     const char *dest,
     const char *emit
 ) {
     BUG_ON(!dest && cond_type_has_destination(type));
-    if (no_state()) {
+    if (no_state(sp)) {
         return NULL;
     }
 
     State *d = NULL;
-    if (dest && !destination_state(e, dest, &d)) {
+    if (dest && !destination_state(sp, dest, &d)) {
         return NULL;
     }
 
@@ -167,11 +172,11 @@ static Condition *add_condition (
     c->a.destination = d;
     c->a.emit_name = emit ? xstrdup(emit) : NULL;
     c->type = type;
-    ptr_array_append(&current_state->conds, c);
+    ptr_array_append(&sp->current_state->conds, c);
     return c;
 }
 
-static void cmd_bufis(EditorState *e, const CommandArgs *a)
+static void cmd_bufis(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *str = a->args[0];
     const size_t len = strlen(str);
@@ -185,14 +190,14 @@ static void cmd_bufis(EditorState *e, const CommandArgs *a)
     }
 
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
-    c = add_condition(e, type, a->args[1], a->args[2]);
+    c = add_condition(sp, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
         c->u.str.len = len;
     }
 }
 
-static void cmd_char(EditorState *e, const CommandArgs *a)
+static void cmd_char(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *chars = a->args[0];
     if (unlikely(chars[0] == '\0')) {
@@ -211,7 +216,7 @@ static void cmd_char(EditorState *e, const CommandArgs *a)
         type = COND_CHAR;
     }
 
-    Condition *c = add_condition(e, type, a->args[1], a->args[2]);
+    Condition *c = add_condition(sp, type, a->args[1], a->args[2]);
     if (!c) {
         return;
     }
@@ -226,15 +231,15 @@ static void cmd_char(EditorState *e, const CommandArgs *a)
     }
 }
 
-static void cmd_default(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_default(SyntaxParser *sp, const CommandArgs *a)
 {
-    close_state();
-    if (no_syntax()) {
+    close_state(sp);
+    if (no_syntax(sp)) {
         return;
     }
 
     const char *value = str_intern(a->args[0]);
-    HashMap *map = &current_syntax->default_colors;
+    HashMap *map = &sp->current_syntax->default_colors;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *name = a->args[i];
         void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
@@ -249,31 +254,31 @@ static void cmd_default(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     }
 }
 
-static void cmd_eat(EditorState *e, const CommandArgs *a)
+static void cmd_eat(SyntaxParser *sp, const CommandArgs *a)
 {
-    if (no_state()) {
+    if (no_state(sp)) {
         return;
     }
 
     const char *dest = a->args[0];
-    if (!destination_state(e, dest, &current_state->default_action.destination)) {
+    if (!destination_state(sp, dest, &sp->current_state->default_action.destination)) {
         return;
     }
 
     const char *emit = a->args[1];
-    current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
-    current_state->type = STATE_EAT;
-    current_state = NULL;
+    sp->current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
+    sp->current_state->type = STATE_EAT;
+    sp->current_state = NULL;
 }
 
-static void cmd_heredocbegin(EditorState *e, const CommandArgs *a)
+static void cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
 {
-    if (no_state()) {
+    if (no_state(sp)) {
         return;
     }
 
     const char *sub = a->args[0];
-    Syntax *subsyn = find_any_syntax(&e->syntaxes, sub);
+    Syntax *subsyn = find_any_syntax(sp->syntaxes, sub);
     if (unlikely(!subsyn)) {
         error_msg("No such syntax %s", sub);
         return;
@@ -285,43 +290,55 @@ static void cmd_heredocbegin(EditorState *e, const CommandArgs *a)
 
     // default_action.destination is used as the return state
     const char *ret = a->args[1];
-    if (!destination_state(e, ret, &current_state->default_action.destination)) {
+    if (!destination_state(sp, ret, &sp->current_state->default_action.destination)) {
         return;
     }
 
-    current_state->default_action.emit_name = NULL;
-    current_state->type = STATE_HEREDOCBEGIN;
-    current_state->heredoc.subsyntax = subsyn;
-    current_state = NULL;
+    sp->current_state->default_action.emit_name = NULL;
+    sp->current_state->type = STATE_HEREDOCBEGIN;
+    sp->current_state->heredoc.subsyntax = subsyn;
+    sp->current_state = NULL;
 
     // Normally merge() marks subsyntax used but in case of heredocs merge()
     // is not called when syntax file is loaded
     subsyn->used = true;
 }
 
-static void cmd_heredocend(EditorState *e, const CommandArgs *a)
+static void cmd_heredocend(SyntaxParser *sp, const CommandArgs *a)
 {
-    Condition *c = add_condition(e, COND_HEREDOCEND, a->args[0], a->args[1]);
+    Condition *c = add_condition(sp, COND_HEREDOCEND, a->args[0], a->args[1]);
     if (unlikely(!c)) {
         return;
     }
-    BUG_ON(!current_syntax);
-    current_syntax->heredoc = true;
+    BUG_ON(!sp->current_syntax);
+    sp->current_syntax->heredoc = true;
 }
 
-static void cmd_list(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+// Forward declaration, used in cmd_include() and cmd_require()
+static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags);
+
+static void cmd_include(SyntaxParser *sp, const CommandArgs *a)
 {
-    close_state();
-    if (no_syntax()) {
+    ConfigFlags flags = CFG_MUST_EXIST;
+    if (a->flags[0] == 'b') {
+        flags |= CFG_BUILTIN;
+    }
+    read_syntax(sp, a->args[0], flags);
+}
+
+static void cmd_list(SyntaxParser *sp, const CommandArgs *a)
+{
+    close_state(sp);
+    if (no_syntax(sp)) {
         return;
     }
 
     char **args = a->args;
     const char *name = args[0];
-    StringList *list = find_string_list(current_syntax, name);
+    StringList *list = find_string_list(sp->current_syntax, name);
     if (!list) {
         list = xnew0(StringList, 1);
-        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
+        hashmap_insert(&sp->current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
         error_msg("List %s already exists", name);
         return;
@@ -337,46 +354,46 @@ static void cmd_list(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     }
 }
 
-static void cmd_inlist(EditorState *e, const CommandArgs *a)
+static void cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
 {
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
-    Condition *c = add_condition(e, COND_INLIST, args[1], emit);
+    Condition *c = add_condition(sp, COND_INLIST, args[1], emit);
     if (!c) {
         return;
     }
 
-    StringList *list = find_string_list(current_syntax, name);
+    StringList *list = find_string_list(sp->current_syntax, name);
     if (unlikely(!list)) {
         // Add undefined list
         list = xnew0(StringList, 1);
-        hashmap_insert(&current_syntax->string_lists, xstrdup(name), list);
+        hashmap_insert(&sp->current_syntax->string_lists, xstrdup(name), list);
     }
 
     list->used = true;
     c->u.str_list = list;
 }
 
-static void cmd_noeat(EditorState *e, const CommandArgs *a)
+static void cmd_noeat(SyntaxParser *sp, const CommandArgs *a)
 {
     State *dest;
-    if (unlikely(no_state() || !destination_state(e, a->args[0], &dest))) {
+    if (unlikely(no_state(sp) || !destination_state(sp, a->args[0], &dest))) {
         return;
     }
 
-    if (unlikely(dest == current_state)) {
+    if (unlikely(dest == sp->current_state)) {
         error_msg("using noeat to jump to same state causes infinite loop");
         return;
     }
 
-    current_state->default_action.destination = dest;
-    current_state->default_action.emit_name = NULL;
-    current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
-    current_state = NULL;
+    sp->current_state->default_action.destination = dest;
+    sp->current_state->default_action.emit_name = NULL;
+    sp->current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
+    sp->current_state = NULL;
 }
 
-static void cmd_recolor(EditorState *e, const CommandArgs *a)
+static void cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
@@ -395,16 +412,51 @@ static void cmd_recolor(EditorState *e, const CommandArgs *a)
         }
     }
 
-    Condition *c = add_condition(e, type, NULL, a->args[0]);
+    Condition *c = add_condition(sp, type, NULL, a->args[0]);
     if (c && type == COND_RECOLOR) {
         c->u.recolor_len = len;
     }
 }
 
-static void cmd_state(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static void cmd_require(SyntaxParser *sp, const CommandArgs *a)
 {
-    close_state();
-    if (no_syntax()) {
+    static HashSet loaded_files;
+    static HashSet loaded_builtins;
+    if (!loaded_files.table_size) {
+        hashset_init(&loaded_files, 8, false);
+        hashset_init(&loaded_builtins, 8, false);
+    }
+
+    char buf[4096];
+    char *path;
+    size_t path_len;
+    HashSet *set;
+    ConfigFlags flags = CFG_MUST_EXIST;
+
+    if (a->flags[0] == 'f') {
+        set = &loaded_files;
+        path = a->args[0];
+        path_len = strlen(path);
+    } else {
+        set = &loaded_builtins;
+        path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
+        path = buf;
+        flags |= CFG_BUILTIN;
+    }
+
+    if (hashset_get(set, path, path_len)) {
+        return;
+    }
+
+    if (read_syntax(sp, path, flags) == 0) {
+        hashset_add(set, path, path_len);
+    }
+}
+
+static void cmd_state(SyntaxParser *sp, const CommandArgs *a)
+{
+    close_state(sp);
+    if (no_syntax(sp)) {
         return;
     }
 
@@ -414,17 +466,17 @@ static void cmd_state(EditorState* UNUSED_ARG(e), const CommandArgs *a)
         return;
     }
 
-    State *s = find_or_add_state(name);
-    if (unlikely(s->defined)) {
+    State *state = find_or_add_state(sp, name);
+    if (unlikely(state->defined)) {
         error_msg("State %s already exists", name);
         return;
     }
-    s->defined = true;
-    s->emit_name = xstrdup(a->args[1] ? a->args[1] : a->args[0]);
-    current_state = s;
+    state->defined = true;
+    state->emit_name = xstrdup(a->args[1] ? a->args[1] : a->args[0]);
+    sp->current_state = state;
 }
 
-static void cmd_str(EditorState *e, const CommandArgs *a)
+static void cmd_str(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *str = a->args[0];
     size_t len = strlen(str);
@@ -447,36 +499,33 @@ static void cmd_str(EditorState *e, const CommandArgs *a)
         type = (len == 2) ? COND_STR2 : COND_STR;
     }
 
-    c = add_condition(e, type, a->args[1], a->args[2]);
+    c = add_condition(sp, type, a->args[1], a->args[2]);
     if (c) {
         memcpy(c->u.str.buf, str, len);
         c->u.str.len = len;
     }
 }
 
-static void finish_syntax(HashMap *syntaxes)
+static void finish_syntax(SyntaxParser *sp)
 {
-    BUG_ON(!current_syntax);
-    close_state();
-    finalize_syntax(syntaxes, current_syntax, saved_nr_errors);
-    current_syntax = NULL;
+    BUG_ON(!sp->current_syntax);
+    close_state(sp);
+    finalize_syntax(sp->syntaxes, sp->current_syntax, sp->saved_nr_errors);
+    sp->current_syntax = NULL;
 }
 
-static void cmd_syntax(EditorState *e, const CommandArgs *a)
+static void cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
 {
-    if (current_syntax) {
-        finish_syntax(&e->syntaxes);
+    if (sp->current_syntax) {
+        finish_syntax(sp);
     }
 
-    current_syntax = xnew0(Syntax, 1);
-    current_syntax->name = xstrdup(a->args[0]);
-    current_state = NULL;
+    sp->current_syntax = xnew0(Syntax, 1);
+    sp->current_syntax->name = xstrdup(a->args[0]);
+    sp->current_state = NULL;
 
-    saved_nr_errors = get_nr_errors();
+    sp->saved_nr_errors = get_nr_errors();
 }
-
-static void cmd_include(EditorState *e, const CommandArgs *a);
-static void cmd_require(EditorState *e, const CommandArgs *a);
 
 IGNORE_WARNING("-Wincompatible-pointer-types")
 
@@ -515,84 +564,49 @@ static const CommandSet syntax_commands = {
     .expand_variable = expand_syntax_var,
 };
 
-static CommandRunner cmdrunner_for_syntaxes(EditorState *e)
+static CommandRunner cmdrunner_for_syntaxes(SyntaxParser *sp)
 {
     CommandRunner runner = {
         .cmds = &syntax_commands,
-        .home_dir = &e->home_dir,
-        .userdata = e
+        .home_dir = sp->home_dir,
+        .userdata = sp,
     };
     return runner;
 }
 
-static int read_syntax(EditorState *e, const char *filename, ConfigFlags flags)
+static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags)
 {
-    CommandRunner runner = cmdrunner_for_syntaxes(e);
+    CommandRunner runner = cmdrunner_for_syntaxes(sp);
     return read_config(&runner, filename, flags);
-}
-
-static void cmd_include(EditorState *e, const CommandArgs *a)
-{
-    ConfigFlags flags = CFG_MUST_EXIST;
-    if (a->flags[0] == 'b') {
-        flags |= CFG_BUILTIN;
-    }
-    read_syntax(e, a->args[0], flags);
-}
-
-static void cmd_require(EditorState *e, const CommandArgs *a)
-{
-    static HashSet loaded_files;
-    static HashSet loaded_builtins;
-    if (!loaded_files.table_size) {
-        hashset_init(&loaded_files, 8, false);
-        hashset_init(&loaded_builtins, 8, false);
-    }
-
-    char buf[4096];
-    char *path;
-    size_t path_len;
-    HashSet *set;
-    ConfigFlags flags = CFG_MUST_EXIST;
-
-    if (a->flags[0] == 'f') {
-        set = &loaded_files;
-        path = a->args[0];
-        path_len = strlen(path);
-    } else {
-        set = &loaded_builtins;
-        path_len = xsnprintf(buf, sizeof(buf), "syntax/inc/%s", a->args[0]);
-        path = buf;
-        flags |= CFG_BUILTIN;
-    }
-
-    if (hashset_get(set, path, path_len)) {
-        return;
-    }
-
-    if (read_syntax(e, path, flags) == 0) {
-        hashset_add(set, path, path_len);
-    }
 }
 
 Syntax *do_load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags, int *err)
 {
+    SyntaxParser sp = {
+        .home_dir = &e->home_dir,
+        .colors = &e->colors,
+        .syntaxes = &e->syntaxes,
+        .current_syntax = NULL,
+        .current_state = NULL,
+        .saved_nr_errors = 0,
+    };
+
     const ConfigState saved = current_config;
-    CommandRunner runner = cmdrunner_for_syntaxes(e);
+    CommandRunner runner = cmdrunner_for_syntaxes(&sp);
     *err = do_read_config(&runner, filename, flags);
     if (*err) {
         current_config = saved;
         return NULL;
     }
 
-    if (current_syntax) {
-        finish_syntax(&e->syntaxes);
-        find_unused_subsyntaxes(&e->syntaxes);
+    if (sp.current_syntax) {
+        finish_syntax(&sp);
+        find_unused_subsyntaxes(sp.syntaxes);
     }
 
     current_config = saved;
 
-    Syntax *syn = find_syntax(&e->syntaxes, path_basename(filename));
+    Syntax *syn = find_syntax(sp.syntaxes, path_basename(filename));
     if (!syn) {
         *err = EINVAL;
     }
