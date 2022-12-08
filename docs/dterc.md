@@ -303,7 +303,7 @@ are grayscale values.
 
 If the terminal has limited support for rendering colors, the _fg-color_
 and _bg-color_ arguments will fall back to the nearest supported color
-(unless the `-c` flag is used).
+(unless the `-c` flag is used; see below).
 
 The _attribute_ argument(s) can be any combination of the following:
 
