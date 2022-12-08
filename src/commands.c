@@ -1253,13 +1253,15 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
         }
     }
 
-    if (has_flag(a, 'f')) {
-        goto exit;
-    }
-
     Buffer *first_modified = NULL;
     size_t n = count_modified_buffers(&e->buffers, &first_modified);
     if (n == 0) {
+        goto exit;
+    }
+
+    const char *plural = (n > 1) ? "s" : "";
+    if (has_flag(a, 'f')) {
+        LOG_INFO("force quitting with %zu modified buffer%s", n, plural);
         goto exit;
     }
 
@@ -1283,12 +1285,14 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
     xsnprintf (
         question, sizeof question,
         "Quit without saving %zu modified buffer%s? [y/N]",
-        n, (n > 1) ? "s" : ""
+        n, plural
     );
 
     if (dialog_prompt(e, question, "ny") != 'y') {
         return;
     }
+
+    LOG_INFO("quit prompt accepted with %zu modified buffer%s", n, plural);
 
 exit:
     e->status = exit_code;
