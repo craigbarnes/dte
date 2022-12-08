@@ -2028,24 +2028,27 @@ static void cmd_view(EditorState *e, const CommandArgs *a)
 
 static void cmd_wclose(EditorState *e, const CommandArgs *a)
 {
-    bool force = has_flag(a, 'f');
-    bool prompt = has_flag(a, 'p');
     View *view = window_find_unclosable_view(e->window);
-    if (view && !force) {
-        set_view(view);
-        if (prompt) {
-            static const char str[] = "Close window without saving? [y/N]";
-            if (dialog_prompt(e, str, "ny") != 'y') {
-                return;
-            }
-        } else {
-            error_msg (
-                "Save modified files or run 'wclose -f' to close "
-                "window without saving."
-            );
-            return;
-        }
+    bool force = has_flag(a, 'f');
+    if (!view || force) {
+        goto close;
     }
+
+    bool prompt = has_flag(a, 'p');
+    set_view(view);
+    if (!prompt) {
+        error_msg (
+            "Save modified files or run 'wclose -f' to close "
+            "window without saving"
+        );
+        return;
+    }
+
+    if (dialog_prompt(e, "Close window without saving? [y/N]", "ny") != 'y') {
+        return;
+    }
+
+close:
     window_close(e->window);
 }
 
