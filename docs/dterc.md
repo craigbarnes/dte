@@ -106,7 +106,7 @@ Configuration commands are used to customize certain aspects of the
 editor, for example adding key bindings, setting options, etc. These
 are the only commands allowed in user config files.
 
-### **alias** _name_ _command_
+### **alias** _name_ [_command_]
 
 Create an alias _name_ for _command_. If no _command_ is given then any
 existing alias for _name_ is removed.
