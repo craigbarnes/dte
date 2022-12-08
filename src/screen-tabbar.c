@@ -38,12 +38,8 @@ static void update_first_tab_idx(Window *window)
         }
     }
 
-    if (window->first_tab_idx < min_first_idx) {
-        window->first_tab_idx = min_first_idx;
-    }
-    if (window->first_tab_idx > max_first_idx) {
-        window->first_tab_idx = max_first_idx;
-    }
+    size_t idx = CLAMP(window->first_tab_idx, min_first_idx, max_first_idx);
+    window->first_tab_idx = idx;
 }
 
 static void calculate_tabbar(Window *window)

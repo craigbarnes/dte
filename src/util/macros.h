@@ -13,6 +13,7 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MAX3(a, b, c) MAX(a, MAX(b, c))
 #define MAX4(a, b, c, d) MAX(a, MAX3(b, c, d))
+#define CLAMP(x, lo, hi) MIN(hi, MAX(lo, x))
 #define IS_POWER_OF_2(x) (((x) > 0) && (((x) & ((x) - 1)) == 0))
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
 #define DO_PRAGMA(x) _Pragma(#x)
