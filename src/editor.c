@@ -40,119 +40,6 @@
 
 static volatile sig_atomic_t resized = 0;
 
-EditorState editor = {
-    .status = EDITOR_INITIALIZING,
-    .input_mode = INPUT_NORMAL,
-    .child_controls_terminal = false,
-    .everything_changed = false,
-    .cursor_style_changed = false,
-    .compilers = HASHMAP_INIT,
-    .syntaxes = HASHMAP_INIT,
-    .buffers = PTR_ARRAY_INIT,
-    .filetypes = PTR_ARRAY_INIT,
-    .file_options = PTR_ARRAY_INIT,
-    .bookmarks = PTR_ARRAY_INIT,
-    .root_frame = NULL,
-    .window = NULL,
-    .view = NULL,
-    .buffer = NULL,
-    .version = VERSION,
-    .cmdline_x = 0,
-    .colors = {
-        .other = HASHMAP_INIT,
-    },
-    .messages = {
-        .array = PTR_ARRAY_INIT,
-        .pos = 0,
-    },
-    .cmdline = {
-        .buf = STRING_INIT,
-        .pos = 0,
-        .search_pos = NULL,
-        .search_text = NULL
-    },
-    .file_history = {
-        .filename = NULL,
-        .entries = HASHMAP_INIT
-    },
-    .command_history = {
-        .filename = NULL,
-        .max_entries = 512,
-        .entries = HASHMAP_INIT
-    },
-    .search_history = {
-        .filename = NULL,
-        .max_entries = 128,
-        .entries = HASHMAP_INIT
-    },
-    .macro = {
-        .macro = PTR_ARRAY_INIT,
-        .prev_macro = PTR_ARRAY_INIT,
-        .insert_buffer = STRING_INIT,
-        .recording = false,
-    },
-    .cursor_styles = {
-        [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
-        [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
-        [CURSOR_MODE_OVERWRITE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
-        [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
-    },
-    .modes = {
-        [INPUT_NORMAL] = {
-            .cmds = &normal_commands,
-            .aliases = HASHMAP_INIT,
-            .key_bindings = INTMAP_INIT,
-        },
-        [INPUT_COMMAND] = {
-            .cmds = &cmd_mode_commands,
-            .aliases = HASHMAP_INIT,
-            .key_bindings = INTMAP_INIT,
-        },
-        [INPUT_SEARCH] = {
-            .cmds = &search_mode_commands,
-            .aliases = HASHMAP_INIT,
-            .key_bindings = INTMAP_INIT,
-        },
-    },
-    .terminal = {
-        .color_type = TERM_8_COLOR,
-        .width = 80,
-        .height = 24,
-        .parse_input = xterm_parse_key,
-    },
-    .options = {
-        .auto_indent = true,
-        .detect_indent = 0,
-        .editorconfig = false,
-        .emulate_tab = false,
-        .expand_tab = false,
-        .file_history = true,
-        .indent_width = 8,
-        .overwrite = false,
-        .syntax = true,
-        .tab_width = 8,
-        .text_width = 72,
-        .ws_error = WSE_SPECIAL,
-
-        // Global-only options
-        .case_sensitive_search = CSS_TRUE,
-        .crlf_newlines = false,
-        .display_special = false,
-        .esc_timeout = 100,
-        .filesize_limit = 250,
-        .lock_files = true,
-        .optimize_true_color = true,
-        .scroll_margin = 0,
-        .select_cursor_char = true,
-        .set_window_title = false,
-        .show_line_numbers = false,
-        .statusline_left = " %f%s%m%s%r%s%M",
-        .statusline_right = " %y,%X  %u  %o  %E%s%b%s%n %t   %p ",
-        .tab_bar = true,
-        .utf8_bom = false,
-    }
-};
-
 static void set_and_check_locale(void)
 {
     const char *default_locale = setlocale(LC_CTYPE, "");
@@ -183,7 +70,120 @@ static void set_and_check_locale(void)
 
 EditorState *init_editor_state(void)
 {
-    EditorState *e = &editor;
+    EditorState *e = xnew(EditorState, 1);
+    *e = (EditorState) {
+        .status = EDITOR_INITIALIZING,
+        .input_mode = INPUT_NORMAL,
+        .child_controls_terminal = false,
+        .everything_changed = false,
+        .cursor_style_changed = false,
+        .compilers = HASHMAP_INIT,
+        .syntaxes = HASHMAP_INIT,
+        .buffers = PTR_ARRAY_INIT,
+        .filetypes = PTR_ARRAY_INIT,
+        .file_options = PTR_ARRAY_INIT,
+        .bookmarks = PTR_ARRAY_INIT,
+        .root_frame = NULL,
+        .window = NULL,
+        .view = NULL,
+        .buffer = NULL,
+        .version = VERSION,
+        .cmdline_x = 0,
+        .colors = {
+            .other = HASHMAP_INIT,
+        },
+        .messages = {
+            .array = PTR_ARRAY_INIT,
+            .pos = 0,
+        },
+        .cmdline = {
+            .buf = STRING_INIT,
+            .pos = 0,
+            .search_pos = NULL,
+            .search_text = NULL
+        },
+        .file_history = {
+            .filename = NULL,
+            .entries = HASHMAP_INIT
+        },
+        .command_history = {
+            .filename = NULL,
+            .max_entries = 512,
+            .entries = HASHMAP_INIT
+        },
+        .search_history = {
+            .filename = NULL,
+            .max_entries = 128,
+            .entries = HASHMAP_INIT
+        },
+        .macro = {
+            .macro = PTR_ARRAY_INIT,
+            .prev_macro = PTR_ARRAY_INIT,
+            .insert_buffer = STRING_INIT,
+            .recording = false,
+        },
+        .cursor_styles = {
+            [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
+            [CURSOR_MODE_INSERT] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
+            [CURSOR_MODE_OVERWRITE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
+            [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
+        },
+        .modes = {
+            [INPUT_NORMAL] = {
+                .cmds = &normal_commands,
+                .aliases = HASHMAP_INIT,
+                .key_bindings = INTMAP_INIT,
+            },
+            [INPUT_COMMAND] = {
+                .cmds = &cmd_mode_commands,
+                .aliases = HASHMAP_INIT,
+                .key_bindings = INTMAP_INIT,
+            },
+            [INPUT_SEARCH] = {
+                .cmds = &search_mode_commands,
+                .aliases = HASHMAP_INIT,
+                .key_bindings = INTMAP_INIT,
+            },
+        },
+        .terminal = {
+            .color_type = TERM_8_COLOR,
+            .width = 80,
+            .height = 24,
+            .parse_input = xterm_parse_key,
+        },
+        .options = {
+            .auto_indent = true,
+            .detect_indent = 0,
+            .editorconfig = false,
+            .emulate_tab = false,
+            .expand_tab = false,
+            .file_history = true,
+            .indent_width = 8,
+            .overwrite = false,
+            .syntax = true,
+            .tab_width = 8,
+            .text_width = 72,
+            .ws_error = WSE_SPECIAL,
+
+            // Global-only options
+            .case_sensitive_search = CSS_TRUE,
+            .crlf_newlines = false,
+            .display_special = false,
+            .esc_timeout = 100,
+            .filesize_limit = 250,
+            .lock_files = true,
+            .optimize_true_color = true,
+            .scroll_margin = 0,
+            .select_cursor_char = true,
+            .set_window_title = false,
+            .show_line_numbers = false,
+            .statusline_left = " %f%s%m%s%r%s%M",
+            .statusline_right = " %y,%X  %u  %o  %E%s%b%s%n %t   %p ",
+            .tab_bar = true,
+            .utf8_bom = false,
+        }
+    };
+
     BUG_ON(statusline_format_find_error(e->options.statusline_left));
     BUG_ON(statusline_format_find_error(e->options.statusline_right));
 
@@ -265,8 +265,7 @@ void free_editor_state(EditorState *e)
     // TODO: intern this (so that it's freed by free_intern_pool())
     free((void*)e->user_config_dir);
 
-    // Zero pointers, to help LSan find leaks
-    *e = (EditorState){.window = NULL};
+    free(e);
 }
 
 void handle_sigwinch(int UNUSED_ARG(signum))

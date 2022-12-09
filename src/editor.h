@@ -86,8 +86,6 @@ typedef struct EditorState {
     const char *version;
 } EditorState;
 
-extern EditorState editor;
-
 static inline void mark_everything_changed(EditorState *e)
 {
     e->everything_changed = true;

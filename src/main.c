@@ -207,6 +207,7 @@ static ExitCode lint_syntax(EditorState *e, const char *filename)
     } else if (err == EINVAL) {
         error_msg("%s: no default syntax found", filename);
     }
+    free_editor_state(e);
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
@@ -641,6 +642,7 @@ lint:;
         free(std_buffer);
     }
 
+    free_editor_state(e);
     LOG_INFO("exiting with status %d", exit_code);
     log_close();
     return exit_code;
