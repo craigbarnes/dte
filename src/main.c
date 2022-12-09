@@ -212,13 +212,16 @@ static ExitCode lint_syntax(const char *filename)
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
-static ExitCode showkey_loop(Terminal *term)
+static ExitCode showkey_loop(EditorState *e)
 {
-    if (!term_raw()) {
+    ExitCode status = EX_OK;
+    if (unlikely(!term_raw())) {
         perror("tcsetattr");
-        return EX_IOERR;
+        status = EX_IOERR;
+        goto out;
     }
 
+    Terminal *term = &e->terminal;
     TermOutputBuffer *obuf = &term->obuf;
     term_enable_private_modes(term);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
@@ -248,7 +251,10 @@ static ExitCode showkey_loop(Terminal *term)
     term_restore_private_modes(term);
     term_output_flush(obuf);
     term_cooked();
-    return EX_OK;
+
+out:
+    free_editor_state(e);
+    return status;
 }
 
 static ExitCode init_std_fds(int std_fds[2])
@@ -454,8 +460,6 @@ loop_break:;
         return r;
     }
 
-    EditorState *e = init_editor_state();
-
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
         fputs("Error: $TERM not set\n", stderr);
@@ -469,11 +473,12 @@ loop_break:;
         return EX_IOERR;
     }
 
+    EditorState *e = init_editor_state();
     Terminal *term = &e->terminal;
     term_init(term, term_name);
 
     if (use_showkey) {
-        return showkey_loop(term);
+        return showkey_loop(e);
     }
 
     Buffer *std_buffer = init_std_buffer(e, std_fds);
