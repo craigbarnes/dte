@@ -383,7 +383,7 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
 
 static const char *flag_string(const OptionDesc *desc, OptionValue value)
 {
-    static char buf[256];
+    static char buf[128];
     unsigned int flags = value.uint_val;
     if (!flags) {
         buf[0] = '0';
@@ -393,15 +393,19 @@ static const char *flag_string(const OptionDesc *desc, OptionValue value)
 
     char *ptr = buf;
     const char *const *values = desc->u.enum_opt.values;
-    for (size_t i = 0; values[i]; i++) {
+    for (size_t i = 0, avail = sizeof(buf); values[i]; i++) {
         if (flags & (1u << i)) {
-            size_t len = strlen(values[i]);
-            memcpy(ptr, values[i], len);
-            ptr += len;
-            *ptr++ = ',';
+            char *next = memccpy(ptr, values[i], '\0', avail);
+            if (DEBUG >= 1) {
+                BUG_ON(!next);
+                avail -= (size_t)(next - ptr);
+            }
+            ptr = next;
+            ptr[-1] = ',';
         }
     }
 
+    BUG_ON(ptr == buf);
     ptr[-1] = '\0';
     return buf;
 }
@@ -530,6 +534,11 @@ UNITTEST {
         }
         if (type == OPT_UINT) {
             BUG_ON(desc->u.uint_opt.max <= desc->u.uint_opt.min);
+        } else if (type == OPT_FLAG) {
+            OptionValue val = {.uint_val = -1};
+            const char *str = flag_string(desc, val);
+            BUG_ON(!str);
+            BUG_ON(str[0] == '\0');
         }
     }
 
