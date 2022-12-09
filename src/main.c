@@ -401,7 +401,8 @@ int main(int argc, char *argv[])
     static const char optstring[] = "hBHKRVb:c:t:r:s:";
     const char *tag = NULL;
     const char *rc = NULL;
-    PointerArray commands = PTR_ARRAY_INIT;
+    const char *commands[8];
+    size_t nr_commands = 0;
     bool read_rc = true;
     bool use_showkey = false;
     bool load_and_save_history = true;
@@ -410,7 +411,11 @@ int main(int argc, char *argv[])
     for (int ch; (ch = getopt(argc, argv, optstring)) != -1; ) {
         switch (ch) {
         case 'c':
-            ptr_array_append(&commands, optarg);
+            if (unlikely(nr_commands >= ARRAYLEN(commands))) {
+                fputs("Error: too many -c options used\n", stderr);
+                return EX_USAGE;
+            }
+            commands[nr_commands++] = optarg;
             break;
         case 't':
             tag = optarg;
@@ -575,14 +580,8 @@ loop_break:;
     set_view(window->views.ptrs[0]);
     ui_start(e);
 
-    bool cflag = false;
-    if (commands.count > 0) {
-        for (size_t i = 0, n = commands.count; i < n; i++) {
-            const char *command = commands.ptrs[i];
-            handle_normal_command(e, command, false);
-        }
-        ptr_array_free_array(&commands);
-        cflag = true;
+    for (size_t i = 0; i < nr_commands; i++) {
+        handle_normal_command(e, commands[i], false);
     }
 
     if (tag) {
@@ -594,7 +593,7 @@ loop_break:;
         // If window_open_empty_buffer() was called above
         empty_buffer
         // ...and no commands were executed via the "-c" flag
-        && !cflag
+        && nr_commands == 0
         // ...and a file was opened via the "-t" flag
         && tag && window->views.count > 1
     ) {
@@ -603,7 +602,7 @@ loop_break:;
         empty_buffer = NULL;
     }
 
-    if (cflag || tag) {
+    if (nr_commands > 0 || tag) {
         normal_update(e);
     }
 
