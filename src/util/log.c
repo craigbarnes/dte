@@ -17,9 +17,9 @@ static int logfd = -1;
 static char dim[] = "\033[2m";
 static char sgr0[] = "\033[0m";
 
-static const struct {
+static const struct llmap {
     char name[8];
-    char log_prefix[5];
+    char prefix[5];
     char color[8];
 } log_level_map[] = {
     [LOG_LEVEL_NONE] = {"none", "_", ""},
@@ -33,6 +33,11 @@ static const struct {
 
 UNITTEST {
     CHECK_STRUCT_ARRAY(log_level_map, name);
+    for (size_t i = 0; i < ARRAYLEN(log_level_map); i++) {
+        const struct llmap *m = &log_level_map[i];
+        BUG_ON(m->prefix[sizeof(m->prefix) - 1] != '\0');
+        BUG_ON(m->color[sizeof(m->color) - 1] != '\0');
+    }
 }
 
 LogLevel log_level_default(void)
@@ -117,7 +122,7 @@ void log_msgv(LogLevel level, const char *file, int line, const char *fmt, va_li
     BUG_ON(logfd < 0);
     char buf[2048];
     const size_t buf_size = sizeof(buf) - 1;
-    const char *prefix = log_level_map[level].log_prefix;
+    const char *prefix = log_level_map[level].prefix;
     const char *color = sgr0[0] ? log_level_map[level].color : "";
     const char *reset = color[0] ? sgr0 : "";
 
