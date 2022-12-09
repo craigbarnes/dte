@@ -195,8 +195,9 @@ static ExitCode dump_builtin_config(const char *name)
     return write_stdout(cfg->text.data, cfg->text.length);
 }
 
-static ExitCode lint_syntax(EditorState *e, const char *filename)
+static ExitCode lint_syntax(const char *filename)
 {
+    EditorState *e = init_editor_state();
     int err;
     BUG_ON(e->status != EDITOR_INITIALIZING);
     const Syntax *s = load_syntax_file(e, filename, CFG_MUST_EXIST, &err);
@@ -394,7 +395,6 @@ int main(int argc, char *argv[])
     static const char optstring[] = "hBHKRVb:c:t:r:s:";
     const char *tag = NULL;
     const char *rc = NULL;
-    const char *syntax = NULL;
     PointerArray commands = PTR_ARRAY_INIT;
     bool read_rc = true;
     bool use_showkey = false;
@@ -413,8 +413,7 @@ int main(int argc, char *argv[])
             rc = optarg;
             break;
         case 's':
-            syntax = optarg;
-            goto lint;
+            return lint_syntax(optarg);
         case 'R':
             read_rc = false;
             break;
@@ -455,13 +454,7 @@ loop_break:;
         return r;
     }
 
-lint:;
-
     EditorState *e = init_editor_state();
-
-    if (syntax) {
-        return lint_syntax(e, syntax);
-    }
 
     const char *term_name = getenv("TERM");
     if (!term_name || term_name[0] == '\0') {
