@@ -15,12 +15,12 @@ enum {
 static const char *fix_name(char *buf, StringView prefix, const char *name)
 {
     size_t plen = prefix.length;
-    size_t nlen = strnlen(name, FIXBUF_SIZE);
-    if (unlikely(plen + nlen >= FIXBUF_SIZE)) {
+    BUG_ON(plen >= FIXBUF_SIZE);
+    memcpy(buf, prefix.data, plen);
+    char *end = memccpy(buf + plen, name, '\0', FIXBUF_SIZE - plen);
+    if (unlikely(!end)) {
         fatal_error(__func__, ENOBUFS);
     }
-    memcpy(buf, prefix.data, plen);
-    memcpy(buf + plen, name, nlen + 1);
     return buf;
 }
 
