@@ -110,15 +110,6 @@ bool expand_normal_var(const char *name, char **value, const void *userdata)
     return true;
 }
 
-bool expand_syntax_var(const char *name, char **value, const void *userdata)
-{
-    if (streq(name, "DTE_HOME")) {
-        *value = expand_dte_home(userdata);
-        return true;
-    }
-    return false;
-}
-
 void collect_normal_vars(PointerArray *a, const char *prefix)
 {
     COLLECT_STRING_FIELDS(normal_vars, name, a, prefix);

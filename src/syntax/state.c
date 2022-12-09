@@ -15,10 +15,10 @@
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xsnprintf.h"
-#include "vars.h"
 
 typedef struct {
     const StringView *home_dir;
+    const char *user_config_dir;
     const ColorScheme *colors;
     HashMap *syntaxes;
     Syntax *current_syntax;
@@ -558,6 +558,16 @@ static const Command *find_syntax_command(const char *name)
     return BSEARCH(name, cmds, command_cmp);
 }
 
+static bool expand_syntax_var(const char *name, char **value, const void *userdata)
+{
+    if (streq(name, "DTE_HOME")) {
+        const SyntaxParser *sp = userdata;
+        *value = xstrdup(sp->user_config_dir);
+        return true;
+    }
+    return false;
+}
+
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
     .macro_record = NULL,
@@ -584,6 +594,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
 {
     SyntaxParser sp = {
         .home_dir = &e->home_dir,
+        .user_config_dir = e->user_config_dir,
         .colors = &e->colors,
         .syntaxes = &e->syntaxes,
         .current_syntax = NULL,
