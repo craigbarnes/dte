@@ -508,11 +508,9 @@ static const Command *find_search_mode_command(const char *name)
 }
 
 const CommandSet cmd_mode_commands = {
-    .lookup = find_cmd_mode_command,
-    .macro_record = NULL,
+    .lookup = find_cmd_mode_command
 };
 
 const CommandSet search_mode_commands = {
-    .lookup = find_search_mode_command,
-    .macro_record = NULL,
+    .lookup = find_search_mode_command
 };

@@ -187,6 +187,12 @@ EditorState *init_editor_state(void)
     BUG_ON(statusline_format_find_error(e->options.statusline_left));
     BUG_ON(statusline_format_find_error(e->options.statusline_right));
 
+    for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
+        const CommandSet *cmds = e->modes[i].cmds;
+        BUG_ON(!cmds);
+        BUG_ON(!cmds->lookup);
+    }
+
     const char *home = getenv("HOME");
     const char *dte_home = getenv("DTE_HOME");
     e->home_dir = strview_intern(home ? home : "");

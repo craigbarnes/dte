@@ -2407,6 +2407,7 @@ const CommandSet normal_commands = {
     .lookup = find_normal_command,
     .macro_record = record_command,
     .expand_variable = expand_normal_var,
+    .expand_env_vars = true,
 };
 
 void handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)

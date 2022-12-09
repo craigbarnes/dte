@@ -32,6 +32,7 @@ typedef struct {
     const Command* (*lookup)(const char *name);
     void (*macro_record)(const Command *cmd, char **args, void *userdata);
     bool (*expand_variable)(const char *name, char **value, const void *userdata);
+    bool expand_env_vars;
 } CommandSet;
 
 typedef struct {

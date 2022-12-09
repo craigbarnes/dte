@@ -570,7 +570,6 @@ static bool expand_syntax_var(const char *name, char **value, const void *userda
 
 static const CommandSet syntax_commands = {
     .lookup = find_syntax_command,
-    .macro_record = NULL,
     .expand_variable = expand_syntax_var,
 };
 

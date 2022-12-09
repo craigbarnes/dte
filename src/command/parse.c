@@ -109,7 +109,7 @@ static size_t parse_var(const CommandRunner *runner, const char *cmd, size_t len
             string_append_cstring(buf, value);
             free(value);
         }
-    } else {
+    } else if (cmds->expand_env_vars) {
         const char *val = getenv(name);
         if (val) {
             string_append_cstring(buf, val);
