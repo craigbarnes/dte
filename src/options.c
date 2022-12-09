@@ -539,6 +539,14 @@ UNITTEST {
             const char *str = flag_string(desc, val);
             BUG_ON(!str);
             BUG_ON(str[0] == '\0');
+            if (!flag_parse(desc, str, &val)) {
+                BUG("flag_parse() failed for string: %s", str);
+            }
+            size_t nvals = string_array_length((char**)desc->u.enum_opt.values);
+            unsigned int mask = (1 << nvals) - 1;
+            if (val.uint_val != mask) {
+                BUG("values not equal: %u, %u", val.uint_val, mask);
+            }
         }
     }
 
