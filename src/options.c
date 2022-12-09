@@ -543,7 +543,8 @@ UNITTEST {
                 BUG("flag_parse() failed for string: %s", str);
             }
             size_t nvals = string_array_length((char**)desc->u.enum_opt.values);
-            unsigned int mask = (1 << nvals) - 1;
+            BUG_ON(nvals >= BITSIZE(val.uint_val));
+            unsigned int mask = (1u << nvals) - 1;
             if (val.uint_val != mask) {
                 BUG("values not equal: %u, %u", val.uint_val, mask);
             }

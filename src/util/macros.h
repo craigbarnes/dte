@@ -16,6 +16,7 @@
 #define CLAMP(x, lo, hi) MIN(hi, MAX(lo, x))
 #define IS_POWER_OF_2(x) (((x) > 0) && (((x) & ((x) - 1)) == 0))
 #define DECIMAL_STR_MAX(T) ((sizeof(T) * 3) + 2)
+#define BITSIZE(T) (sizeof(T) * 8)
 #define DO_PRAGMA(x) _Pragma(#x)
 
 // Calculate the number of elements in an array.
