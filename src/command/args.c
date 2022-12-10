@@ -108,12 +108,12 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     return 0;
 }
 
-bool parse_args(const Command *cmd, CommandArgs *a)
+static void arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
 {
-    switch (BUILTIN_EXPECT(do_parse_args(cmd, a), ARGERR_NONE)) {
-    case ARGERR_NONE:
-        return true;
     // GCOV_EXCL_START
+    switch (err) {
+    case ARGERR_NONE:
+        break;
     case ARGERR_INVALID_OPTION:
         error_msg("Invalid option -%c", a->flags[0]);
         break;
@@ -147,6 +147,15 @@ bool parse_args(const Command *cmd, CommandArgs *a)
     default:
         BUG("unhandled error type");
     }
-    return false;
     // GCOV_EXCL_STOP
+}
+
+bool parse_args(const Command *cmd, CommandArgs *a)
+{
+    ArgParseError err = do_parse_args(cmd, a);
+    if (unlikely(err != ARGERR_NONE)) {
+        arg_parse_error_msg(cmd, a, err);
+        return false;
+    }
+    return true;
 }
