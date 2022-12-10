@@ -34,8 +34,9 @@ static void expect_keycode_eq (
     // so the generated strings must be copied if using several at the
     // same time:
     char a_str[32], b_str[32], seq_str[64];
-    xsnprintf(a_str, sizeof a_str, "%s", keycode_to_string(a));
-    xsnprintf(b_str, sizeof b_str, "%s", keycode_to_string(b));
+    char *a_end = memccpy(a_str, keycode_to_string(a), '\0', sizeof a_str);
+    char *b_end = memccpy(b_str, keycode_to_string(b), '\0', sizeof b_str);
+    BUG_ON(!a_end || !b_end);
     make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
