@@ -1223,42 +1223,37 @@ static void cmd_prev(EditorState *e, const CommandArgs *a)
     set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
 }
 
-static size_t count_modified_buffers(EditorState *e, Buffer **out)
+static View *window_find_modified_view(Window *window)
 {
-    // Check if the current buffer or a buffer in the current window
-    // is modified. These are preferred, when setting the out param.
-    Buffer *modified = NULL;
-    if (buffer_modified(e->buffer)) {
-        modified = e->buffer;
-    } else if (e->window->frame->parent) {
-        // Checking for buffers in the current window only happens if
-        // there are multiple windows in use. The counting loop further
-        // below accomplishes much the same thing if there's only one.
-        const PointerArray *views = &e->window->views;
-        for (size_t i = 0, n = views->count; i < n; i++) {
-            const View *view = views->ptrs[i];
-            Buffer *buffer = view->buffer;
-            if (buffer_modified(buffer)) {
-                modified = buffer;
-                break;
-            }
+    if (buffer_modified(window->view->buffer)) {
+        return window->view;
+    }
+    for (size_t i = 0, n = window->views.count; i < n; i++) {
+        View *view = window->views.ptrs[i];
+        if (buffer_modified(view->buffer)) {
+            return view;
         }
     }
+    return NULL;
+}
 
+static size_t count_modified_buffers(const PointerArray *buffers, View **first)
+{
+    View *modified = NULL;
     size_t nr_modified = 0;
-    for (size_t i = 0, n = e->buffers.count; i < n; i++) {
-        Buffer *buffer = e->buffers.ptrs[i];
+    for (size_t i = 0, n = buffers->count; i < n; i++) {
+        Buffer *buffer = buffers->ptrs[i];
         if (!buffer_modified(buffer)) {
             continue;
         }
         nr_modified++;
         if (!modified) {
-            modified = buffer;
+            modified = buffer->views.ptrs[0];
         }
     }
 
     BUG_ON(nr_modified > 0 && !modified);
-    *out = modified;
+    *first = modified;
     return nr_modified;
 }
 
@@ -1277,28 +1272,23 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
         }
     }
 
-    Buffer *modified = NULL;
-    size_t n = count_modified_buffers(e, &modified);
+    View *first_modified = NULL;
+    size_t n = count_modified_buffers(&e->buffers, &first_modified);
     if (n == 0) {
         goto exit;
     }
 
+    BUG_ON(!first_modified);
     const char *plural = (n > 1) ? "s" : "";
     if (has_flag(a, 'f')) {
         LOG_INFO("force quitting with %zu modified buffer%s", n, plural);
         goto exit;
     }
 
-    // Activate modified Buffer
-    BUG_ON(!modified);
-    View *view = window_find_view(e->window, modified);
-    if (!view) {
-        // Buffer isn't open in current window; activate first containing window
-        view = modified->views.ptrs[0];
-        e->window = view->window;
-        mark_everything_changed(e);
-    }
-    set_view(view);
+    // Activate a modified view (giving preference to the current view or
+    // a view in the current window)
+    View *view = window_find_modified_view(e->window);
+    set_view(view ? view : first_modified);
 
     if (!has_flag(a, 'p')) {
         error_msg("Save modified files or run 'quit -f' to quit without saving");
