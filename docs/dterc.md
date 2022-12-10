@@ -619,13 +619,13 @@ If no parameter given, equalize window sizes in current frame.
 :   Resize vertically
 
 _N_
-:   Set size of current window to _N_ columns.
+:   Set size of current window to _N_ columns/rows.
 
 `+`_N_
-:   Increase size of current window by _N_ columns.
+:   Increase size of current window by _N_ columns/rows.
 
 `-`_N_
-:   Decrease size of current window by _N_ columns. Use `--` to
+:   Decrease size of current window by _N_ columns/rows. Use `--` to
     prevent the minus symbol being parsed as an option flag, e.g.
     `wresize -- -5`.
 
