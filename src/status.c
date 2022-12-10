@@ -165,9 +165,10 @@ static void add_misc_status(Formatter *f)
     SelectionInfo si;
     init_selection(view, &si);
     bool is_lines = (view->selection == SELECT_LINES);
-    const char *unit = is_lines ? "line" : "char";
     size_t n = is_lines ? get_nr_selected_lines(&si) : get_nr_selected_chars(&si);
-    add_status_format(f, "[%zu %s%s]", n, unit, likely(n != 1) ? "s" : "");
+    const char *unit = is_lines ? "line" : "char";
+    const char *plural = unlikely(n == 1) ? "" : "s";
+    add_status_format(f, "[%zu %s%s]", n, unit, plural);
 }
 
 static FormatSpecifierType lookup_format_specifier(unsigned char ch)

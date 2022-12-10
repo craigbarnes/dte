@@ -312,7 +312,8 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
         input->len = remainder;
     }
 
-    LOG_INFO("received bracketed paste of %zu bytes", str.len);
+    const char *plural = (str.len == 1) ? "" : "s";
+    LOG_INFO("received bracketed paste of %zu byte%s", str.len, plural);
     string_replace_byte(&str, '\r', '\n');
     return str;
 

@@ -203,8 +203,8 @@ static ExitCode lint_syntax(const char *filename)
     const Syntax *s = load_syntax_file(e, filename, CFG_MUST_EXIST, &err);
     if (s) {
         const size_t n = s->states.count;
-        const char *p = (n > 1) ? "s" : "";
-        printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, p);
+        const char *plural = (n == 1) ? "" : "s";
+        printf("OK: loaded syntax '%s' with %zu state%s\n", s->name, n, plural);
     } else if (err == EINVAL) {
         error_msg("%s: no default syntax found", filename);
     }
