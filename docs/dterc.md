@@ -395,7 +395,8 @@ Read and execute commands from _file_.
 :   Don't show an error message if _file_ doesn't exist
 
 Note: "built-in files" are config files bundled into the program binary.
-See the `-B` and `-b` flags in the [`dte`] man page for more information.
+See the `-B` and `-b` flags in the [`dte`] man page and the [`show include`]
+command for more information.
 
 ### **errorfmt** [**-i**] _compiler_ [_regexp_] [file|line|column|message|_]...
 
@@ -1556,6 +1557,7 @@ errors should be highlighted. Set to `""` to disable.
 [`search`]: #search
 [`set`]: #set
 [`show bind`]: #show
+[`show include`]: #show
 [`show macro`]: #show
 [`tag`]: #tag
 [`toggle`]: #toggle
