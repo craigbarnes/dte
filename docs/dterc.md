@@ -329,8 +329,8 @@ If you don't set fg/bg for the highlight color `default` then
 terminal's default fg/bg is used.
 
 If `hi` is run without any arguments, all highlight colors are
-removed and a very basic set of defaults is then re-applied
-(see `show include color/reset`).
+removed and a baseline set of defaults is then loaded (as if by
+running [`include -b`] on the built-in [`color/reset`] config).
 
 `-c`
 :   Do nothing at all if the terminal can't display _fg-color_ and/or
@@ -1517,12 +1517,13 @@ errors should be highlighted. Set to `""` to disable.
 [`dte-syntax`]: dte-syntax.html
 ["key bindings"]: dte.html#key-bindings
 [`$DTE_HOME`]: dte.html#environment
+[double quotes]: #double-quoted-strings
+[`color/reset`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/color/reset
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/execvp.html
 [`glob`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/glob.html
 [`regex`]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html#tag_09_04
 [`xterm`]: https://invisible-island.net/xterm/
 [`ctags`]: https://ctags.io/
-[double quotes]: #double-quoted-strings
 
 [`alias`]: #alias
 [`bind`]: #bind
@@ -1538,6 +1539,7 @@ errors should be highlighted. Set to `""` to disable.
 [`filter`]: #filter
 [`ft`]: #ft
 [`hi`]: #hi
+[`include -b`]: #include
 [`include`]: #include
 [`left`]: #left
 [`macro`]: #macro

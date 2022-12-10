@@ -728,8 +728,8 @@ If you don't set fg/bg for the highlight color \fBdefault\fR then
 terminal's default fg/bg is used.
 .P
 If \fBhi\fR is run without any arguments, all highlight colors are
-removed and a very basic set of defaults is then re\-applied
-(see \fBshow include color/reset\fR).
+removed and a baseline set of defaults is then loaded (as if by
+running \fBinclude \-b\fR on the built\-in \fBcolor/reset\fR config).
 .P
 .TP
 \fB\-c\fR
