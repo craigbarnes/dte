@@ -132,9 +132,11 @@ bool parse_key_string(KeyCode *key, const char *str)
     return false;
 }
 
-const char *keycode_to_string(KeyCode k)
+// Writes the string representation of `k` into `buf` (which must
+// have at least `KEYCODE_STR_MAX` bytes available) and returns the
+// length of the written string.
+size_t keycode_to_string(KeyCode k, char *buf)
 {
-    static char buf[32];
     size_t i = 0;
     if (k & MOD_CTRL) {
         buf[i++] = 'C';
@@ -149,25 +151,31 @@ const char *keycode_to_string(KeyCode k)
         buf[i++] = '-';
     }
 
+    const char *name;
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
         for (size_t j = 0; j < ARRAYLEN(other_keys); j++) {
             if (key == other_keys[j].key) {
-                memcpy(buf + i, other_keys[j].name, sizeof(other_keys[0].name));
-                return buf;
+                name = other_keys[j].name;
+                goto copy;
             }
         }
         u_set_char(buf, &i, key);
         buf[i] = '\0';
-        return buf;
+        return i;
     }
 
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
-        const char *name = special_names[key - KEY_SPECIAL_MIN];
-        memcpy(buf + i, name, sizeof(special_names[0]));
-        return buf;
+        name = special_names[key - KEY_SPECIAL_MIN];
+        goto copy;
     }
 
-    xsnprintf(buf, sizeof buf, "INVALID (0x%08X)", (unsigned int)k);
-    return buf;
+    return xsnprintf(buf, KEYCODE_STR_MAX, "INVALID (0x%08X)", (unsigned int)k);
+
+copy:
+    BUG_ON(name[0] == '\0');
+    char *end = memccpy(buf + i, name, '\0', KEYCODE_STR_MAX - i);
+    BUG_ON(!end);
+    BUG_ON(end <= buf);
+    return (size_t)(end - buf) - 1;
 }

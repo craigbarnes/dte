@@ -162,10 +162,11 @@ void collect_normal_aliases(EditorState *e, PointerArray *a, const char *prefix)
 
 static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const char *prefix)
 {
+    char keystr[KEYCODE_STR_MAX];
     for (IntMapIter it = intmap_iter(bindings); intmap_next(&it); ) {
-        const char *str = keycode_to_string(it.entry->key);
-        if (str_has_prefix(str, prefix)) {
-            ptr_array_append(a, xstrdup(str));
+        size_t keylen = keycode_to_string(it.entry->key, keystr);
+        if (str_has_prefix(keystr, prefix)) {
+            ptr_array_append(a, xmemdup(keystr, keylen + 1));
         }
     }
 }

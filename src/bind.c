@@ -106,10 +106,12 @@ bool dump_bindings(const IntMap *bindings, const char *flag, String *buf)
     qsort(array, count, sizeof(array[0]), binding_cmp);
 
     // Serialize the bindings in sorted order
+    char keystr[KEYCODE_STR_MAX];
     for (size_t i = 0; i < count; i++) {
         string_append_literal(buf, "bind ");
         string_append_cstring(buf, flag);
-        string_append_escaped_arg(buf, keycode_to_string(array[i].key), true);
+        size_t keylen = keycode_to_string(array[i].key, keystr);
+        string_append_escaped_arg_sv(buf, string_view(keystr, keylen), true);
         string_append_byte(buf, ' ');
         string_append_escaped_arg(buf, array[i].cmd, true);
         string_append_byte(buf, '\n');

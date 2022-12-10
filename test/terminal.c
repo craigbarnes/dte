@@ -30,13 +30,11 @@ static void expect_keycode_eq (
         return;
     }
 
-    // Note: keycode_to_string() returns a pointer to static storage,
-    // so the generated strings must be copied if using several at the
-    // same time:
-    char a_str[32], b_str[32], seq_str[64];
-    char *a_end = memccpy(a_str, keycode_to_string(a), '\0', sizeof a_str);
-    char *b_end = memccpy(b_str, keycode_to_string(b), '\0', sizeof b_str);
-    BUG_ON(!a_end || !b_end);
+    char a_str[KEYCODE_STR_MAX];
+    char b_str[KEYCODE_STR_MAX];
+    char seq_str[64];
+    keycode_to_string(a, a_str);
+    keycode_to_string(b, b_str);
     make_printable_mem(seq, seq_len, seq_str, sizeof seq_str);
 
     test_fail(
@@ -827,25 +825,43 @@ static void test_keycode_to_string(TestContext *ctx)
 #endif
     };
 
+    char buf[KEYCODE_STR_MAX];
     FOR_EACH_I(i, tests) {
-        const char *str = keycode_to_string(tests[i].key);
-        IEXPECT_STREQ(str, tests[i].str);
-        KeyCode key = 0;
-        IEXPECT_TRUE(parse_key_string(&key, tests[i].str));
-        IEXPECT_EQ(key, tests[i].key);
+        const char *str = tests[i].str;
+        size_t len = strlen(str);
+        ASSERT_TRUE(len < sizeof(buf));
+        size_t buflen = keycode_to_string(tests[i].key, buf);
+        IEXPECT_STREQ(buf, str);
+        IEXPECT_EQ(buflen, len);
+        KeyCode parsed_key = 0;
+        IEXPECT_TRUE(parse_key_string(&parsed_key, str));
+        IEXPECT_EQ(parsed_key, tests[i].key);
     }
 
     // These combos aren't round-trippable by the code above and can't end
     // up in real bindings, since the letters are normalized to lower case
     // by parse_key_string(). We still test them nevertheless; for the sake
     // of completeness and catching unexpected changes.
-    EXPECT_STREQ(keycode_to_string(MOD_CTRL | 'A'), "C-A");
-    EXPECT_STREQ(keycode_to_string(MOD_CTRL | MOD_SHIFT | 'A'), "C-S-A");
-    EXPECT_STREQ(keycode_to_string(MOD_META | MOD_SHIFT | 'A'), "M-S-A");
+    static const struct {
+        const char *str;
+        KeyCode key;
+    } xtests[] = {
+        {"C-A", MOD_CTRL | 'A'},
+        {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
+        {"M-S-A", MOD_META | MOD_SHIFT | 'A'},
+        {"INVALID (0x08000000)", KEY_DETECTED_PASTE},
+        {"INVALID (0x08000001)", KEY_BRACKETED_PASTE},
+        {"INVALID (0xFFFFFFFF)", UINT32_MAX},
+    };
 
-    EXPECT_STREQ(keycode_to_string(KEY_DETECTED_PASTE), "INVALID (0x08000000)");
-    EXPECT_STREQ(keycode_to_string(KEY_BRACKETED_PASTE), "INVALID (0x08000001)");
-    EXPECT_STREQ(keycode_to_string(UINT32_MAX), "INVALID (0xFFFFFFFF)");
+    FOR_EACH_I(i, xtests) {
+        const char *str = xtests[i].str;
+        size_t len = strlen(str);
+        ASSERT_TRUE(len < sizeof(buf));
+        size_t buflen = keycode_to_string(xtests[i].key, buf);
+        IEXPECT_STREQ(buf, str);
+        IEXPECT_EQ(buflen, len);
+    }
 }
 
 static void test_parse_key_string(TestContext *ctx)

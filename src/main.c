@@ -227,6 +227,7 @@ static ExitCode showkey_loop(EditorState *e)
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
+    char keystr[KEYCODE_STR_MAX];
     bool loop = true;
     while (loop) {
         KeyCode key = term_read_key(term, 100);
@@ -241,9 +242,9 @@ static ExitCode showkey_loop(EditorState *e)
         case MOD_CTRL | 'd':
             loop = false;
         }
-        const char *str = keycode_to_string(key);
+        size_t keylen = keycode_to_string(key, keystr);
         term_add_literal(obuf, "  ");
-        term_add_bytes(obuf, str, strlen(str));
+        term_add_bytes(obuf, keystr, keylen);
         term_add_literal(obuf, "\r\n");
         term_output_flush(obuf);
     }

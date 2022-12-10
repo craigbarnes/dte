@@ -7,6 +7,11 @@
 #include "util/macros.h"
 
 enum {
+    // Maximum length of string produced by keycode_to_string()
+    KEYCODE_STR_MAX = 32
+};
+
+enum {
     KEY_NONE = 0,
     KEY_TAB = '\t',
     KEY_ENTER = '\n',
@@ -97,6 +102,6 @@ static inline KeyCode keycode_normalize(KeyCode k)
 }
 
 bool parse_key_string(KeyCode *key, const char *str) WARN_UNUSED_RESULT;
-const char *keycode_to_string(KeyCode key) RETURNS_NONNULL;
+size_t keycode_to_string(KeyCode key, char *buf) NONNULL_ARGS;
 
 #endif
