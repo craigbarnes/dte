@@ -619,9 +619,7 @@ static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
     }
 
     bool ignore = has_flag(a, 'i');
-    add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
-    // TODO: make add_error_fmt() return bool and use here
-    return true;
+    return add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
 }
 
 static bool cmd_exec(EditorState *e, const CommandArgs *a)

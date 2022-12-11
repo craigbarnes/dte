@@ -31,11 +31,19 @@ typedef struct {
     PointerArray error_formats;
 } Compiler;
 
-void add_error_fmt(HashMap *compilers, const char *name, bool ignore, const char *format, char **desc) NONNULL_ARGS;
 Compiler *find_compiler(const HashMap *compilers, const char *name) NONNULL_ARGS;
 void remove_compiler(HashMap *compilers, const char *name) NONNULL_ARGS;
 void free_compiler(Compiler *c) NONNULL_ARGS;
 void collect_errorfmt_capture_names(PointerArray *a, const char *prefix) NONNULL_ARGS;
 void dump_compiler(const Compiler *c, const char *name, String *s) NONNULL_ARGS;
+
+NONNULL_ARGS WARN_UNUSED_RESULT
+bool add_error_fmt (
+    HashMap *compilers,
+    const char *name,
+    bool ignore,
+    const char *format,
+    char **desc
+);
 
 #endif

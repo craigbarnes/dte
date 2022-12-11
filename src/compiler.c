@@ -31,7 +31,7 @@ Compiler *find_compiler(const HashMap *compilers, const char *name)
     return hashmap_get(compilers, name);
 }
 
-void add_error_fmt (
+bool add_error_fmt (
     HashMap *compilers,
     const char *name,
     bool ignore,
@@ -60,7 +60,7 @@ void add_error_fmt (
         }
         if (unlikely(j == n)) {
             error_msg("unknown substring name %s", desc[i]);
-            return;
+            return false;
         }
     }
 
@@ -71,19 +71,20 @@ void add_error_fmt (
 
     if (unlikely(!regexp_compile(&f->re, format, 0))) {
         free(f);
-        return;
+        return false;
     }
 
     if (unlikely(max_idx > f->re.re_nsub)) {
         error_msg("invalid substring count");
         regfree(&f->re);
         free(f);
-        return;
+        return false;
     }
 
     Compiler *compiler = find_or_add_compiler(compilers, name);
     f->pattern = str_intern(format);
     ptr_array_append(&compiler->error_formats, f);
+    return true;
 }
 
 static void free_error_format(ErrorFormat *f)
