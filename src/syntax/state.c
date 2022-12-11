@@ -86,7 +86,16 @@ static State *reference_state(SyntaxParser *sp, const char *name)
     if (streq(name, "this")) {
         return sp->current_state;
     }
-    return find_or_add_state(sp, name);
+
+    State *state = find_or_add_state(sp, name);
+    if (unlikely(state == sp->current_state)) {
+        LOG_WARNING (
+            "destination '%s' can be optimized to 'this' in '%s' syntax",
+            name,
+            sp->current_syntax->name
+        );
+    }
+    return state;
 }
 
 static bool not_subsyntax(const SyntaxParser *sp)
