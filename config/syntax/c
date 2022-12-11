@@ -43,8 +43,12 @@ state string
     char '"' END string
     # Avoid highlighting rest of the file again
     char "\n" END error
-    char "\\" .c-esc:this
+    char "\\" esc
     eat this
+
+state esc special
+    char "\n" string
+    noeat .c-esc:string
 
 syntax .c-char
 
