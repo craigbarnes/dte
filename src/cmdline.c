@@ -324,14 +324,12 @@ static bool cmd_toggle(EditorState *e, const CommandArgs *a)
     const char *option_name = a->args[0];
     bool global = cmdargs_has_flag(a, 'g');
     size_t nr_values = a->nr_args - 1;
-    if (nr_values) {
-        char **values = a->args + 1;
-        toggle_option_values(e, option_name, global, false, values, nr_values);
-    } else {
-        toggle_option(e, option_name, global, false);
+    if (nr_values == 0) {
+        return toggle_option(e, option_name, global, false);
     }
-    // TODO: return false if toggle_option_values() or toggle_option() fails
-    return true;
+
+    char **values = a->args + 1;
+    return toggle_option_values(e, option_name, global, false, values, nr_values);
 }
 
 static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)

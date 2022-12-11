@@ -81,10 +81,10 @@ static inline bool use_spaces_for_indent(const LocalOptions *opt)
 
 struct EditorState;
 
-void set_option(struct EditorState *e, const char *name, const char *value, bool local, bool global);
-void set_bool_option(struct EditorState *e, const char *name, bool local, bool global);
-void toggle_option(struct EditorState *e, const char *name, bool global, bool verbose);
-void toggle_option_values(struct EditorState *e, const char *name, bool global, bool verbose, char **values, size_t count);
+bool set_option(struct EditorState *e, const char *name, const char *value, bool local, bool global);
+bool set_bool_option(struct EditorState *e, const char *name, bool local, bool global);
+bool toggle_option(struct EditorState *e, const char *name, bool global, bool verbose);
+bool toggle_option_values(struct EditorState *e, const char *name, bool global, bool verbose, char **values, size_t count);
 bool validate_local_options(char **strs);
 void collect_options(PointerArray *a, const char *prefix, bool local, bool global);
 void collect_auto_options(PointerArray *a, const char *prefix);

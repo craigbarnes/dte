@@ -1960,19 +1960,21 @@ static bool cmd_set(EditorState *e, const CommandArgs *a)
     char **args = a->args;
     size_t count = a->nr_args;
     if (count == 1) {
-        set_bool_option(e, args[0], local, global);
-        // TODO: make set_bool_option() return bool and use here
-        return true;
-    } else if (count & 1) {
+        return set_bool_option(e, args[0], local, global);
+    }
+    if (count & 1) {
         error_msg("One or even number of arguments expected");
         return false;
     }
 
+    size_t errors = 0;
     for (size_t i = 0; i < count; i += 2) {
-        set_option(e, args[i], args[i + 1], local, global);
+        if (!set_option(e, args[i], args[i + 1], local, global)) {
+            errors++;
+        }
     }
-    // TODO: make set_option() return bool and use here
-    return true;
+
+    return !errors;
 }
 
 static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
@@ -2097,14 +2099,12 @@ static bool cmd_toggle(EditorState *e, const CommandArgs *a)
     bool verbose = has_flag(a, 'v');
     const char *option_name = a->args[0];
     size_t nr_values = a->nr_args - 1;
-    if (nr_values) {
-        char **values = a->args + 1;
-        toggle_option_values(e, option_name, global, verbose, values, nr_values);
-    } else {
-        toggle_option(e, option_name, global, verbose);
+    if (nr_values == 0) {
+        return toggle_option(e, option_name, global, verbose);
     }
-    // TODO: return false if one of the above functions fail
-    return true;
+
+    char **values = a->args + 1;
+    return toggle_option_values(e, option_name, global, verbose, values, nr_values);
 }
 
 static bool cmd_undo(EditorState *e, const CommandArgs *a)

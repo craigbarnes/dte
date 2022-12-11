@@ -614,7 +614,7 @@ static const OptionDesc *must_find_global_option(const char *name)
     return desc;
 }
 
-static void do_set_option (
+static bool do_set_option (
     EditorState *e,
     const OptionDesc *desc,
     const char *value,
@@ -623,16 +623,16 @@ static void do_set_option (
 ) {
     if (local && !desc->local) {
         error_msg("Option %s is not local", desc->name);
-        return;
+        return false;
     }
     if (global && !desc->global) {
         error_msg("Option %s is not global", desc->name);
-        return;
+        return false;
     }
 
     OptionValue val;
     if (!desc_parse(desc, value, &val)) {
-        return;
+        return false;
     }
 
     if (!local && !global) {
@@ -647,28 +647,30 @@ static void do_set_option (
     if (global) {
         desc_set(e, desc, global_ptr(desc, &e->options), true, val);
     }
+
+    return true;
 }
 
-void set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
+bool set_option(EditorState *e, const char *name, const char *value, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
     if (!desc) {
-        return;
+        return false;
     }
-    do_set_option(e, desc, value, local, global);
+    return do_set_option(e, desc, value, local, global);
 }
 
-void set_bool_option(EditorState *e, const char *name, bool local, bool global)
+bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
 {
     const OptionDesc *desc = must_find_option(name);
     if (!desc) {
-        return;
+        return false;
     }
     if (desc->type != OPT_BOOL) {
         error_msg("Option %s is not boolean", desc->name);
-        return;
+        return false;
     }
-    do_set_option(e, desc, "true", local, global);
+    return do_set_option(e, desc, "true", local, global);
 }
 
 static const OptionDesc *find_toggle_option(const char *name, bool *global)
@@ -685,11 +687,11 @@ static const OptionDesc *find_toggle_option(const char *name, bool *global)
     return desc;
 }
 
-void toggle_option(EditorState *e, const char *name, bool global, bool verbose)
+bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
 {
     const OptionDesc *desc = find_toggle_option(name, &global);
     if (!desc) {
-        return;
+        return false;
     }
 
     char *ptr = get_option_ptr(e, desc, global);
@@ -705,7 +707,7 @@ void toggle_option(EditorState *e, const char *name, bool global, bool verbose)
         value.bool_val = !value.bool_val;
     } else {
         error_msg("Toggling %s requires arguments", name);
-        return;
+        return false;
     }
 
     desc_set(e, desc, ptr, global, value);
@@ -714,9 +716,11 @@ void toggle_option(EditorState *e, const char *name, bool global, bool verbose)
         const char *str = desc_string(desc, value);
         info_msg("%s%s = %s", prefix, desc->name, str);
     }
+
+    return true;
 }
 
-void toggle_option_values (
+bool toggle_option_values (
     EditorState *e,
     const char *name,
     bool global,
@@ -726,7 +730,7 @@ void toggle_option_values (
 ) {
     const OptionDesc *desc = find_toggle_option(name, &global);
     if (!desc) {
-        return;
+        return false;
     }
 
     BUG_ON(count == 0);
@@ -756,6 +760,7 @@ void toggle_option_values (
     }
 
     free(parsed_values);
+    return !error;
 }
 
 bool validate_local_options(char **strs)
