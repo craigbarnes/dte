@@ -118,32 +118,32 @@ static void handle_select_chars_or_lines_flags(EditorState *e, const CommandArgs
     do_selection(e->view, sel);
 }
 
-static void cmd_alias(EditorState *e, const CommandArgs *a)
+static bool cmd_alias(EditorState *e, const CommandArgs *a)
 {
     const char *const name = a->args[0];
     const char *const cmd = a->args[1];
 
     if (unlikely(name[0] == '\0')) {
         error_msg("Empty alias name not allowed");
-        return;
+        return false;
     }
     if (unlikely(name[0] == '-')) {
         // Disallowing this simplifies auto-completion for "alias "
         error_msg("Alias name cannot begin with '-'");
-        return;
+        return false;
     }
 
     for (size_t i = 0; name[i]; i++) {
         unsigned char c = name[i];
         if (unlikely(!(is_word_byte(c) || c == '-' || c == '?' || c == '!'))) {
             error_msg("Invalid byte in alias name: %c (0x%02hhX)", c, c);
-            return;
+            return false;
         }
     }
 
     if (unlikely(find_normal_command(name))) {
         error_msg("Can't replace existing command %s with an alias", name);
-        return;
+        return false;
     }
 
     HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
@@ -152,18 +152,20 @@ static void cmd_alias(EditorState *e, const CommandArgs *a)
     } else {
         remove_alias(aliases, name);
     }
+    return true;
 }
 
-static void cmd_bind(EditorState *e, const CommandArgs *a)
+static bool cmd_bind(EditorState *e, const CommandArgs *a)
 {
     const char *keystr = a->args[0];
     const char *cmd = a->args[1];
     KeyCode key;
     if (unlikely(!parse_key_string(&key, keystr))) {
+        // TODO: call error_msg() in both cases?
         if (cmd) {
             error_msg("invalid key string: %s", keystr);
         }
-        return;
+        return false;
     }
 
     const bool modes[] = {
@@ -186,15 +188,18 @@ static void cmd_bind(EditorState *e, const CommandArgs *a)
             remove_binding(bindings, key);
         }
     }
+
+    return true;
 }
 
-static void cmd_bof(EditorState *e, const CommandArgs *a)
+static bool cmd_bof(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
     move_bof(e->view);
+    return true;
 }
 
-static void cmd_bol(EditorState *e, const CommandArgs *a)
+static bool cmd_bol(EditorState *e, const CommandArgs *a)
 {
     static const FlagMapping map[] = {
         {'s', BOL_SMART},
@@ -204,9 +209,10 @@ static void cmd_bol(EditorState *e, const CommandArgs *a)
     SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     handle_select_chars_flag(e, a);
     move_bol_smart(e->view, flags);
+    return true;
 }
 
-static void cmd_bolsf(EditorState *e, const CommandArgs *a)
+static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
@@ -221,21 +227,24 @@ static void cmd_bolsf(EditorState *e, const CommandArgs *a)
         }
     }
     view_reset_preferred_x(view);
+    return true;
 }
 
-static void cmd_bookmark(EditorState *e, const CommandArgs *a)
+static bool cmd_bookmark(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
         bookmark_pop(e->window, &e->bookmarks);
-        return;
+        return true;
     }
 
     bookmark_push(&e->bookmarks, get_current_file_location(e->view));
+    return true;
 }
 
-static void cmd_case(EditorState *e, const CommandArgs *a)
+static bool cmd_case(EditorState *e, const CommandArgs *a)
 {
     change_case(e->view, last_flag_or_default(a, 't'));
+    return true;
 }
 
 static void mark_tabbar_changed(Window *window, void* UNUSED_ARG(data))
@@ -243,19 +252,19 @@ static void mark_tabbar_changed(Window *window, void* UNUSED_ARG(data))
     window->update_tabbar = true;
 }
 
-static void cmd_cd(EditorState *e, const CommandArgs *a)
+static bool cmd_cd(EditorState *e, const CommandArgs *a)
 {
     const char *dir = a->args[0];
     if (unlikely(dir[0] == '\0')) {
         error_msg("directory argument cannot be empty");
-        return;
+        return false;
     }
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
         if (!dir || dir[0] == '\0') {
             error_msg("OLDPWD not set");
-            return;
+            return false;
         }
     }
 
@@ -263,7 +272,7 @@ static void cmd_cd(EditorState *e, const CommandArgs *a)
     const char *cwd = getcwd(buf, sizeof(buf));
     if (chdir(dir) != 0) {
         error_msg("changing directory failed: %s", strerror(errno));
-        return;
+        return false;
     }
 
     if (likely(cwd)) {
@@ -287,21 +296,24 @@ static void cmd_cd(EditorState *e, const CommandArgs *a)
     }
 
     frame_for_each_window(e->root_frame, mark_tabbar_changed, NULL);
+    return true;
 }
 
-static void cmd_center_view(EditorState *e, const CommandArgs *a)
+static bool cmd_center_view(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->view->force_center = true;
+    return true;
 }
 
-static void cmd_clear(EditorState *e, const CommandArgs *a)
+static bool cmd_clear(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     clear_lines(e->view);
+    return true;
 }
 
-static void cmd_close(EditorState *e, const CommandArgs *a)
+static bool cmd_close(EditorState *e, const CommandArgs *a)
 {
     bool force = has_flag(a, 'f');
     if (!force && !view_can_close(e->view)) {
@@ -311,40 +323,42 @@ static void cmd_close(EditorState *e, const CommandArgs *a)
                 "The buffer is modified; "
                 "save or run 'close -f' to close without saving"
             );
-            return;
+            return false;
         }
         static const char str[] = "Close without saving changes? [y/N]";
         if (dialog_prompt(e, str, "ny") != 'y') {
-            return;
+            return false;
         }
     }
 
     bool allow_quit = has_flag(a, 'q');
     if (allow_quit && e->buffers.count == 1 && e->root_frame->frames.count <= 1) {
         e->status = EDITOR_EXIT_OK;
-        return;
+        return true;
     }
 
     bool allow_wclose = has_flag(a, 'w');
     if (allow_wclose && e->window->views.count <= 1) {
         window_close(e->window);
-        return;
+        return true;
     }
 
     window_close_current_view(e->window);
     set_view(e->window->view);
+    return true;
 }
 
-static void cmd_command(EditorState *e, const CommandArgs *a)
+static bool cmd_command(EditorState *e, const CommandArgs *a)
 {
     const char *text = a->args[0];
     set_input_mode(e, INPUT_COMMAND);
     if (text) {
         cmdline_set_text(&e->cmdline, text);
     }
+    return true;
 }
 
-static void cmd_compile(EditorState *e, const CommandArgs *a)
+static bool cmd_compile(EditorState *e, const CommandArgs *a)
 {
     static const FlagMapping map[] = {
         {'1', SPAWN_READ_STDOUT},
@@ -355,7 +369,7 @@ static void cmd_compile(EditorState *e, const CommandArgs *a)
     Compiler *c = find_compiler(&e->compilers, a->args[0]);
     if (unlikely(!c)) {
         error_msg("No such error parser %s", a->args[0]);
-        return;
+        return false;
     }
 
     SpawnContext ctx = {
@@ -369,9 +383,11 @@ static void cmd_compile(EditorState *e, const CommandArgs *a)
     if (e->messages.array.count) {
         activate_current_message_save(e);
     }
+    // TODO: return false if something fails in spawn_compiler()
+    return true;
 }
 
-static void cmd_copy(EditorState *e, const CommandArgs *a)
+static bool cmd_copy(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
     const BlockIter save = view->cursor;
@@ -388,7 +404,7 @@ static void cmd_copy(EditorState *e, const CommandArgs *a)
     }
 
     if (unlikely(size == 0)) {
-        return;
+        return true;
     }
 
     bool internal = has_flag(a, 'i');
@@ -422,9 +438,11 @@ static void cmd_copy(EditorState *e, const CommandArgs *a)
     }
 
     view->cursor = save;
+    // TODO: return false if term_osc52_copy() failed?
+    return true;
 }
 
-static void cmd_cursor(EditorState *e, const CommandArgs *a)
+static bool cmd_cursor(EditorState *e, const CommandArgs *a)
 {
     if (unlikely(a->nr_args == 0)) {
         // Reset all cursor styles
@@ -432,13 +450,13 @@ static void cmd_cursor(EditorState *e, const CommandArgs *a)
             e->cursor_styles[m] = get_default_cursor_style(m);
         }
         e->cursor_style_changed = true;
-        return;
+        return true;
     }
 
     CursorInputMode mode = cursor_mode_from_str(a->args[0]);
     if (unlikely(mode >= NR_CURSOR_MODES)) {
         error_msg("invalid mode argument: %s", a->args[0]);
-        return;
+        return false;
     }
 
     TermCursorStyle style = get_default_cursor_style(mode);
@@ -446,7 +464,7 @@ static void cmd_cursor(EditorState *e, const CommandArgs *a)
         style.type = cursor_type_from_str(a->args[1]);
         if (unlikely(style.type == CURSOR_INVALID)) {
             error_msg("invalid cursor type: %s", a->args[1]);
-            return;
+            return false;
         }
     }
 
@@ -454,15 +472,16 @@ static void cmd_cursor(EditorState *e, const CommandArgs *a)
         style.color = cursor_color_from_str(a->args[2]);
         if (unlikely(style.color == COLOR_INVALID)) {
             error_msg("invalid cursor color: %s", a->args[2]);
-            return;
+            return false;
         }
     }
 
     e->cursor_styles[mode] = style;
     e->cursor_style_changed = true;
+    return true;
 }
 
-static void cmd_cut(EditorState *e, const CommandArgs *a)
+static bool cmd_cut(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
@@ -481,19 +500,22 @@ static void cmd_cut(EditorState *e, const CommandArgs *a)
         cut(&e->clipboard, view, block_iter_eat_line(&tmp), true);
         move_to_preferred_x(view, x);
     }
+    return true;
 }
 
-static void cmd_delete(EditorState *e, const CommandArgs *a)
+static bool cmd_delete(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     delete_ch(e->view);
+    return true;
 }
 
-static void cmd_delete_eol(EditorState *e, const CommandArgs *a)
+static bool cmd_delete_eol(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
     if (view->selection) {
-        return;
+        // TODO: return false?
+        return true;
     }
 
     bool delete_newline_if_at_eol = has_flag(a, 'n');
@@ -502,45 +524,51 @@ static void cmd_delete_eol(EditorState *e, const CommandArgs *a)
         CodePoint ch;
         if (block_iter_get_char(&view->cursor, &ch) == 1 && ch == '\n') {
             delete_ch(view);
-            return;
+            return true;
         }
     }
 
     buffer_delete_bytes(view, block_iter_eol(&bi));
+    return true;
 }
 
-static void cmd_delete_line(EditorState *e, const CommandArgs *a)
+static bool cmd_delete_line(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     delete_lines(e->view);
+    return true;
 }
 
-static void cmd_delete_word(EditorState *e, const CommandArgs *a)
+static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
 {
     bool skip_non_word = has_flag(a, 's');
     BlockIter bi = e->view->cursor;
     buffer_delete_bytes(e->view, word_fwd(&bi, skip_non_word));
+    return true;
 }
 
-static void cmd_down(EditorState *e, const CommandArgs *a)
+static bool cmd_down(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
     move_down(e->view, 1);
+    return true;
 }
 
-static void cmd_eof(EditorState *e, const CommandArgs *a)
+static bool cmd_eof(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
     move_eof(e->view);
+    return true;
 }
 
-static void cmd_eol(EditorState *e, const CommandArgs *a)
+static bool cmd_eol(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_flag(e, a);
     move_eol(e->view);
+    return true;
 }
 
-static void cmd_eolsf(EditorState *e, const CommandArgs *a)
+static bool cmd_eolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Window *window = e->window;
@@ -556,41 +584,47 @@ static void cmd_eolsf(EditorState *e, const CommandArgs *a)
         }
     }
     view_reset_preferred_x(view);
+    return true;
 }
 
-static void cmd_erase(EditorState *e, const CommandArgs *a)
+static bool cmd_erase(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     erase(e->view);
+    return true;
 }
 
-static void cmd_erase_bol(EditorState *e, const CommandArgs *a)
+static bool cmd_erase_bol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     buffer_erase_bytes(e->view, block_iter_bol(&e->view->cursor));
+    return true;
 }
 
-static void cmd_erase_word(EditorState *e, const CommandArgs *a)
+static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
     bool skip_non_word = has_flag(a, 's');
     buffer_erase_bytes(view, word_bwd(&view->cursor, skip_non_word));
+    return true;
 }
 
-static void cmd_errorfmt(EditorState *e, const CommandArgs *a)
+static bool cmd_errorfmt(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args == 0);
     const char *name = a->args[0];
     if (a->nr_args == 1) {
         remove_compiler(&e->compilers, name);
-        return;
+        return true;
     }
 
     bool ignore = has_flag(a, 'i');
     add_error_fmt(&e->compilers, name, ignore, a->args[1], a->args + 2);
+    // TODO: make add_error_fmt() return bool and use here
+    return true;
 }
 
-static void cmd_exec(EditorState *e, const CommandArgs *a)
+static bool cmd_exec(EditorState *e, const CommandArgs *a)
 {
     ExecAction actions[3] = {EXEC_TTY, EXEC_TTY, EXEC_TTY};
     SpawnFlags spawn_flags = 0;
@@ -609,13 +643,13 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
             case 'l': lflag = true; continue;
             case 'm': move_after_insert = true; continue;
             case 'n': strip_nl = true; continue;
-            default: BUG("unexpected flag"); return;
+            default: BUG("unexpected flag"); return false;
         }
         const char *action_name = a->args[argidx++];
         ExecAction action = lookup_exec_action(action_name, fd);
         if (unlikely(action == EXEC_INVALID)) {
             error_msg("invalid action for -%c: '%s'", a->flags[i], action_name);
-            return;
+            return false;
         }
         actions[fd] = action;
     }
@@ -628,21 +662,22 @@ static void cmd_exec(EditorState *e, const CommandArgs *a)
     const char **argv = (const char **)a->args + a->nr_flag_args;
     ssize_t outlen = handle_exec(e, argv, actions, spawn_flags, strip_nl);
     if (outlen <= 0) {
-        return;
+        return false;
     }
 
     if (move_after_insert && actions[STDOUT_FILENO] == EXEC_BUFFER) {
         block_iter_skip_bytes(&e->view->cursor, outlen);
     }
+    return true;
 }
 
-static void cmd_ft(EditorState *e, const CommandArgs *a)
+static bool cmd_ft(EditorState *e, const CommandArgs *a)
 {
     char **args = a->args;
     const char *filetype = args[0];
     if (unlikely(!is_valid_filetype_name(filetype))) {
         error_msg("Invalid filetype name: '%s'", filetype);
-        return;
+        return false;
     }
 
     FileDetectionType dt = FT_EXTENSION;
@@ -661,12 +696,17 @@ static void cmd_ft(EditorState *e, const CommandArgs *a)
         break;
     }
 
+    size_t nfailed = 0;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
-        UNUSED bool x = add_filetype(&e->filetypes, filetype, args[i], dt);
+        if (!add_filetype(&e->filetypes, filetype, args[i], dt)) {
+            nfailed++;
+        }
     }
+
+    return nfailed == 0;
 }
 
-static void cmd_hi(EditorState *e, const CommandArgs *a)
+static bool cmd_hi(EditorState *e, const CommandArgs *a)
 {
     TermColorCapabilityType color_type = e->terminal.color_type;
     if (unlikely(a->nr_args == 0)) {
@@ -685,7 +725,7 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
         } else {
             error_msg("invalid color or attribute: '%s'", strs[n]);
         }
-        return;
+        return false;
     }
 
     bool optimize = e->options.optimize_true_color;
@@ -696,7 +736,7 @@ static void cmd_hi(EditorState *e, const CommandArgs *a)
         && has_flag(a, 'c')
         && (fg != color.fg || bg != color.bg)
     ) {
-        return;
+        return true;
     }
 
     color.fg = fg;
@@ -710,44 +750,50 @@ update:
         update_all_syntax_colors(&e->syntaxes, &e->colors);
         mark_everything_changed(e);
     }
+    return true;
 }
 
-static void cmd_include(EditorState *e, const CommandArgs *a)
+static bool cmd_include(EditorState *e, const CommandArgs *a)
 {
     ConfigFlags flags = has_flag(a, 'q') ? CFG_NOFLAGS : CFG_MUST_EXIST;
     if (has_flag(a, 'b')) {
         flags |= CFG_BUILTIN;
     }
-    read_normal_config(e, a->args[0], flags);
+    int err = read_normal_config(e, a->args[0], flags);
+    // TODO: Clean up read_normal_config() so this can be simplified to `err == 0`
+    return err == 0 || (err == ENOENT && !(flags & CFG_MUST_EXIST));
 }
 
-static void cmd_insert(EditorState *e, const CommandArgs *a)
+static bool cmd_insert(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
     if (has_flag(a, 'k')) {
         for (size_t i = 0; str[i]; i++) {
             insert_ch(e->view, str[i]);
         }
-        return;
+        return true;
     }
 
     bool move_after = has_flag(a, 'm');
     insert_text(e->view, str, strlen(str), move_after);
+    return true;
 }
 
-static void cmd_join(EditorState *e, const CommandArgs *a)
+static bool cmd_join(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     join_lines(e->view);
+    return true;
 }
 
-static void cmd_left(EditorState *e, const CommandArgs *a)
+static bool cmd_left(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_flag(e, a);
     move_cursor_left(e->view);
+    return true;
 }
 
-static void cmd_line(EditorState *e, const CommandArgs *a)
+static bool cmd_line(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
     const char *arg = a->args[0];
@@ -755,37 +801,38 @@ static void cmd_line(EditorState *e, const CommandArgs *a)
     size_t line;
     if (unlikely(!str_to_size(arg, &line) || line == 0)) {
         error_msg("Invalid line number: %s", arg);
-        return;
+        return false;
     }
 
     do_selection(view, SELECT_NONE);
     move_to_line(view, line);
     move_to_preferred_x(view, x);
+    return true;
 }
 
-static void cmd_load_syntax(EditorState *e, const CommandArgs *a)
+static bool cmd_load_syntax(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
     const char *slash = strrchr(arg, '/');
     if (!slash) {
         const char *filetype = arg;
-        if (!find_syntax(&e->syntaxes, filetype)) {
-            load_syntax_by_filetype(e, filetype);
+        if (find_syntax(&e->syntaxes, filetype)) {
+            return true;
         }
-        return;
+        return !!load_syntax_by_filetype(e, filetype);
     }
 
     const char *filetype = slash + 1;
     if (find_syntax(&e->syntaxes, filetype)) {
         error_msg("Syntax for filetype %s already loaded", filetype);
-        return;
+        return false;
     }
 
     int err;
-    load_syntax_file(e, arg, CFG_MUST_EXIST, &err);
+    return !!load_syntax_file(e, arg, CFG_MUST_EXIST, &err);
 }
 
-static void cmd_macro(EditorState *e, const CommandArgs *a)
+static bool cmd_macro(EditorState *e, const CommandArgs *a)
 {
     CommandMacroState *m = &e->macro;
     const char *action = a->args[0];
@@ -799,7 +846,8 @@ static void cmd_macro(EditorState *e, const CommandArgs *a)
                 break;
             }
         }
-        return;
+        // TODO: make this conditional?
+        return true;
     }
 
     const char *msg;
@@ -825,7 +873,7 @@ static void cmd_macro(EditorState *e, const CommandArgs *a)
         size_t count = m->macro.count;
         const char *plural = (count != 1) ? "s" : "";
         info_msg("Macro recording stopped; %zu command%s saved", count, plural);
-        return;
+        return true;
     }
 
     if (streq(action, "cancel")) {
@@ -834,20 +882,22 @@ static void cmd_macro(EditorState *e, const CommandArgs *a)
     }
 
     error_msg("Unknown action '%s'", action);
-    return;
+    return false;
 
 message:
     info_msg("%s", msg);
+    // TODO: make this conditional?
+    return true;
 }
 
-static void cmd_match_bracket(EditorState *e, const CommandArgs *a)
+static bool cmd_match_bracket(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
     CodePoint cursor_char;
     if (!block_iter_get_char(&view->cursor, &cursor_char)) {
         error_msg("No character under cursor");
-        return;
+        return false;
     }
 
     CodePoint target = cursor_char;
@@ -874,7 +924,7 @@ static void cmd_match_bracket(EditorState *e, const CommandArgs *a)
         goto search_bwd;
     default:
         error_msg("Character under cursor not matchable");
-        return;
+        return false;
     }
 
 search_fwd:
@@ -885,7 +935,7 @@ search_fwd:
             if (level == 0) {
                 block_iter_prev_char(&bi, &u);
                 view->cursor = bi;
-                return; // Found
+                return true; // Found
             }
             level--;
         } else if (u == cursor_char) {
@@ -899,7 +949,7 @@ search_bwd:
         if (u == target) {
             if (level == 0) {
                 view->cursor = bi;
-                return; // Found
+                return true; // Found
             }
             level--;
         } else if (u == cursor_char) {
@@ -909,9 +959,10 @@ search_bwd:
 
 not_found:
     error_msg("No matching bracket found");
+    return false;
 }
 
-static void cmd_move_tab(EditorState *e, const CommandArgs *a)
+static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
 {
     Window *window = e->window;
     const size_t ntabs = window->views.count;
@@ -925,7 +976,7 @@ static void cmd_move_tab(EditorState *e, const CommandArgs *a)
     } else {
         if (!str_to_size(str, &to) || to == 0) {
             error_msg("Invalid tab position %s", str);
-            return;
+            return false;
         }
         to--;
         if (to >= ntabs) {
@@ -934,21 +985,23 @@ static void cmd_move_tab(EditorState *e, const CommandArgs *a)
     }
     ptr_array_move(&window->views, from, to);
     window->update_tabbar = true;
+    return true;
 }
 
-static void cmd_msg(EditorState *e, const CommandArgs *a)
+static bool cmd_msg(EditorState *e, const CommandArgs *a)
 {
     const char *str = a->args[0];
     uint_least64_t np = cmdargs_flagset_value('n') | cmdargs_flagset_value('p');
     if (u64_popcount(a->flag_set & np) + !!str >= 2) {
         error_msg("flags [-n|-p] and [number] argument are mutually exclusive");
-        return;
+        return false;
     }
 
     MessageArray *msgs = &e->messages;
     size_t count = msgs->array.count;
     if (count == 0) {
-        return;
+        // TODO: return false?
+        return true;
     }
 
     size_t p = msgs->pos;
@@ -960,27 +1013,31 @@ static void cmd_msg(EditorState *e, const CommandArgs *a)
     } else if (str) {
         if (!str_to_size(str, &p) || p == 0) {
             error_msg("invalid message index: %s", str);
-            return;
+            return false;
         }
         p = MIN(p - 1, count - 1);
     }
 
     msgs->pos = p;
     activate_current_message(e);
+    // TODO: make activate_current_message() return bool and use here
+    return true;
 }
 
-static void cmd_new_line(EditorState *e, const CommandArgs *a)
+static bool cmd_new_line(EditorState *e, const CommandArgs *a)
 {
     new_line(e->view, has_flag(a, 'a'));
+    return true;
 }
 
-static void cmd_next(EditorState *e, const CommandArgs *a)
+static bool cmd_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
     set_view(e->window->views.ptrs[size_increment_wrapped(i, n)]);
+    return true;
 }
 
 static bool xglob(char **args, glob_t *globbuf)
@@ -1005,12 +1062,12 @@ static bool xglob(char **args, glob_t *globbuf)
     return false;
 }
 
-static void cmd_open(EditorState *e, const CommandArgs *a)
+static bool cmd_open(EditorState *e, const CommandArgs *a)
 {
     bool temporary = has_flag(a, 't');
     if (unlikely(temporary && a->nr_args > 0)) {
         error_msg("'open -t' can't be used with filename arguments");
-        return;
+        return false;
     }
 
     const char *requested_encoding = NULL;
@@ -1040,7 +1097,7 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
                     strerror(errno)
                 );
             }
-            return;
+            return false;
         }
     }
 
@@ -1050,7 +1107,7 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
         if (requested_encoding) {
             buffer_set_encoding(view->buffer, encoding, e->options.utf8_bom);
         }
-        return;
+        return true;
     }
 
     char **paths = args;
@@ -1058,7 +1115,7 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
     bool use_glob = has_flag(a, 'g');
     if (use_glob) {
         if (!xglob(args, &globbuf)) {
-            return;
+            return false;
         }
         paths = globbuf.gl_pathv;
     }
@@ -1075,27 +1132,31 @@ static void cmd_open(EditorState *e, const CommandArgs *a)
     if (use_glob) {
         globfree(&globbuf);
     }
+
+    // TODO: return false if window_open_file() or window_open_files() fails
+    return true;
 }
 
-static void cmd_option(EditorState *e, const CommandArgs *a)
+static bool cmd_option(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args < 3);
     size_t nstrs = a->nr_args - 1;
     if (unlikely(nstrs & 1)) {
         error_msg("Missing option value");
-        return;
+        return false;
     }
 
     char **strs = a->args + 1;
     if (unlikely(!validate_local_options(strs))) {
-        return;
+        return false;
     }
 
     PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
         const StringView pattern = strview_from_cstring(a->args[0]);
         add_file_options(opts, FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
-        return;
+        // TODO: make add_file_options() return bool and use here
+        return true;
     }
 
     const char *ft_list = a->args[0];
@@ -1103,9 +1164,11 @@ static void cmd_option(EditorState *e, const CommandArgs *a)
         const StringView filetype = get_delim(ft_list, &pos, len, ',');
         add_file_options(opts, FILE_OPTIONS_FILETYPE, filetype, strs, nstrs);
     }
+    // TODO: make add_file_options() return bool and use here
+    return true;
 }
 
-static void cmd_blkdown(EditorState *e, const CommandArgs *a)
+static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
 
@@ -1137,9 +1200,11 @@ static void cmd_blkdown(EditorState *e, const CommandArgs *a)
     if (block_iter_is_eof(&tmp)) {
         view->cursor = tmp;
     }
+
+    return true;
 }
 
-static void cmd_blkup(EditorState *e, const CommandArgs *a)
+static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
 
@@ -1147,7 +1212,7 @@ static void cmd_blkup(EditorState *e, const CommandArgs *a)
     View *view = e->view;
     if (view->cy == 0) {
         block_iter_bol(&view->cursor);
-        return;
+        return true;
     }
 
     // If current line is blank, skip past consecutive blank lines
@@ -1169,16 +1234,19 @@ static void cmd_blkup(EditorState *e, const CommandArgs *a)
             break;
         }
     }
+
+    return true;
 }
 
-static void cmd_paste(EditorState *e, const CommandArgs *a)
+static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
     bool at_cursor = has_flag(a, 'c');
     bool move_after = has_flag(a, 'm');
     paste(&e->clipboard, e->view, at_cursor, move_after);
+    return true;
 }
 
-static void cmd_pgdown(EditorState *e, const CommandArgs *a)
+static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
 
@@ -1193,10 +1261,12 @@ static void cmd_pgdown(EditorState *e, const CommandArgs *a)
     } else {
         count = window->edit_h - 1 - margin * 2;
     }
+
     move_down(view, count);
+    return true;
 }
 
-static void cmd_pgup(EditorState *e, const CommandArgs *a)
+static bool cmd_pgup(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
 
@@ -1211,16 +1281,19 @@ static void cmd_pgup(EditorState *e, const CommandArgs *a)
     } else {
         count = window->edit_h - 1 - margin * 2;
     }
+
     move_up(view, count);
+    return true;
 }
 
-static void cmd_prev(EditorState *e, const CommandArgs *a)
+static bool cmd_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     size_t i = ptr_array_idx(&e->window->views, e->view);
     size_t n = e->window->views.count;
     BUG_ON(i >= n);
     set_view(e->window->views.ptrs[size_decrement_wrapped(i, n)]);
+    return true;
 }
 
 static View *window_find_modified_view(Window *window)
@@ -1257,18 +1330,18 @@ static size_t count_modified_buffers(const PointerArray *buffers, View **first)
     return nr_modified;
 }
 
-static void cmd_quit(EditorState *e, const CommandArgs *a)
+static bool cmd_quit(EditorState *e, const CommandArgs *a)
 {
     int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
         if (!str_to_int(a->args[0], &exit_code)) {
             error_msg("Not a valid integer argument: '%s'", a->args[0]);
-            return;
+            return false;
         }
         int max = EDITOR_EXIT_MAX;
         if (exit_code < 0 || exit_code > max) {
             error_msg("Exit code should be between 0 and %d", max);
-            return;
+            return false;
         }
     }
 
@@ -1292,7 +1365,7 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
 
     if (!has_flag(a, 'p')) {
         error_msg("Save modified files or run 'quit -f' to quit without saving");
-        return;
+        return false;
     }
 
     char question[128];
@@ -1303,51 +1376,56 @@ static void cmd_quit(EditorState *e, const CommandArgs *a)
     );
 
     if (dialog_prompt(e, question, "ny") != 'y') {
-        return;
+        return false;
     }
 
     LOG_INFO("quit prompt accepted with %zu modified buffer%s", n, plural);
 
 exit:
     e->status = exit_code;
+    return true;
 }
 
-static void cmd_redo(EditorState *e, const CommandArgs *a)
+static bool cmd_redo(EditorState *e, const CommandArgs *a)
 {
     char *arg = a->args[0];
     unsigned long change_id = 0;
     if (arg) {
         if (!str_to_ulong(arg, &change_id) || change_id == 0) {
             error_msg("Invalid change id: %s", arg);
-            return;
+            return false;
         }
     }
-    if (redo(e->view, change_id)) {
-        unselect(e->view);
+    if (!redo(e->view, change_id)) {
+        return false;
     }
+
+    unselect(e->view);
+    return true;
 }
 
-static void cmd_refresh(EditorState *e, const CommandArgs *a)
+static bool cmd_refresh(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     mark_everything_changed(e);
+    return true;
 }
 
-static void repeat_insert(EditorState *e, const char *str, unsigned int count, bool move_after)
+static bool repeat_insert(EditorState *e, const char *str, unsigned int count, bool move_after)
 {
     size_t str_len = strlen(str);
     size_t bufsize;
     if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
         error_msg("Repeated insert would overflow");
-        return;
+        return false;
     }
     if (unlikely(bufsize == 0)) {
-        return;
+        return true;
     }
     char *buf = malloc(bufsize);
     if (unlikely(!buf)) {
         perror_msg("malloc");
-        return;
+        return false;
     }
 
     char tmp[4096];
@@ -1390,23 +1468,24 @@ static void repeat_insert(EditorState *e, const char *str, unsigned int count, b
 insert:
     insert_text(e->view, buf, bufsize, move_after);
     free(buf);
+    return true;
 }
 
-static void cmd_repeat(EditorState *e, const CommandArgs *a)
+static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 {
     unsigned int count;
     if (unlikely(!str_to_uint(a->args[0], &count))) {
         error_msg("Not a valid repeat count: %s", a->args[0]);
-        return;
+        return false;
     }
     if (unlikely(count == 0)) {
-        return;
+        return true;
     }
 
     const Command *cmd = find_normal_command(a->args[1]);
     if (unlikely(!cmd)) {
         error_msg("No such command: %s", a->args[1]);
-        return;
+        return false;
     }
 
     CommandArgs a2 = cmdargs_new(a->args + 2);
@@ -1414,22 +1493,23 @@ static void cmd_repeat(EditorState *e, const CommandArgs *a)
     bool ok = parse_args(cmd, &a2);
     current_command = NULL;
     if (unlikely(!ok)) {
-        return;
+        return false;
     }
 
     CommandFunc fn = cmd->cmd;
     if (fn == (CommandFunc)cmd_insert && !has_flag(&a2, 'k')) {
         // Use optimized implementation for repeated "insert"
-        repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
-        return;
+        return repeat_insert(e, a2.args[0], count, has_flag(&a2, 'm'));
     }
 
     while (count--) {
         fn(e, &a2);
     }
+    // TODO: return false if fn() fails?
+    return true;
 }
 
-static void cmd_replace(EditorState *e, const CommandArgs *a)
+static bool cmd_replace(EditorState *e, const CommandArgs *a)
 {
     static const FlagMapping map[] = {
         {'b', REPLACE_BASIC},
@@ -1440,12 +1520,15 @@ static void cmd_replace(EditorState *e, const CommandArgs *a)
 
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
     reg_replace(e->view, a->args[0], a->args[1], flags);
+    // TODO: make reg_replace() return bool and use here
+    return true;
 }
 
-static void cmd_right(EditorState *e, const CommandArgs *a)
+static bool cmd_right(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_flag(e, a);
     move_cursor_right(e->view);
+    return true;
 }
 
 static bool stat_changed(const FileInfo *file, const struct stat *st)
@@ -1456,13 +1539,13 @@ static bool stat_changed(const FileInfo *file, const struct stat *st)
         || st->st_ino != file->ino;
 }
 
-static void cmd_save(EditorState *e, const CommandArgs *a)
+static bool cmd_save(EditorState *e, const CommandArgs *a)
 {
     Buffer *buffer = e->buffer;
     if (unlikely(buffer->stdout_buffer)) {
         const char *f = buffer_filename(buffer);
         info_msg("%s can't be saved; it will be piped to stdout on exit", f);
-        return;
+        return true;
     }
 
     bool dos_nl = has_flag(a, 'd');
@@ -1470,7 +1553,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
     bool crlf = buffer->crlf_newlines;
     if (unlikely(dos_nl && unix_nl)) {
         error_msg("flags -d and -u can't be used together");
-        return;
+        return false;
     } else if (dos_nl) {
         crlf = true;
     } else if (unix_nl) {
@@ -1511,7 +1594,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
                     strerror(errno)
                 );
             }
-            return;
+            return false;
         }
     }
 
@@ -1519,7 +1602,7 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
     bool B = has_flag(a, 'B');
     if (unlikely(b && B)) {
         error_msg("flags -b and -B can't be used together");
-        return;
+        return false;
     } else if (b) {
         bom = true;
     } else if (B) {
@@ -1678,7 +1761,11 @@ static void cmd_save(EditorState *e, const CommandArgs *a)
             buffer_update_syntax(e, buffer);
         }
     }
-    return;
+
+    // TODO: check if there are other errors that don't return via the "error" label,
+    // for example unlock_file() failure
+    return true;
+
 error:
     if (new_locked) {
         unlock_file(absolute);
@@ -1686,9 +1773,10 @@ error:
     if (absolute != buffer->abs_filename) {
         free(absolute);
     }
+    return false;
 }
 
-static void cmd_scroll_down(EditorState *e, const CommandArgs *a)
+static bool cmd_scroll_down(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
@@ -1696,9 +1784,10 @@ static void cmd_scroll_down(EditorState *e, const CommandArgs *a)
     if (view->cy < view->vy) {
         move_down(view, 1);
     }
+    return true;
 }
 
-static void cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
+static bool cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Window *window = e->window;
@@ -1714,9 +1803,10 @@ static void cmd_scroll_pgdown(EditorState *e, const CommandArgs *a)
     } else if (view->cy < view->buffer->nl) {
         move_down(view, view->buffer->nl - view->cy);
     }
+    return true;
 }
 
-static void cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
+static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Window *window = e->window;
@@ -1731,9 +1821,10 @@ static void cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
     } else if (view->cy > 0) {
         move_up(view, view->cy);
     }
+    return true;
 }
 
-static void cmd_scroll_up(EditorState *e, const CommandArgs *a)
+static bool cmd_scroll_up(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Window *window = e->window;
@@ -1744,6 +1835,7 @@ static void cmd_scroll_up(EditorState *e, const CommandArgs *a)
     if (view->vy + window->edit_h <= view->cy) {
         move_up(view, 1);
     }
+    return true;
 }
 
 static uint_least64_t get_flagset_npw(void)
@@ -1755,12 +1847,12 @@ static uint_least64_t get_flagset_npw(void)
     return npw;
 }
 
-static void cmd_search(EditorState *e, const CommandArgs *a)
+static bool cmd_search(EditorState *e, const CommandArgs *a)
 {
     const char *pattern = a->args[0];
     if (u64_popcount(a->flag_set & get_flagset_npw()) + !!pattern >= 2) {
         error_msg("flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
-        return;
+        return false;
     }
 
     View *view = e->view;
@@ -1771,14 +1863,14 @@ static void cmd_search(EditorState *e, const CommandArgs *a)
         StringView word = view_get_word_under_cursor(view);
         if (word.length == 0) {
             // Error message would not be very useful here
-            return;
+            return false; // TODO: return true?
         }
         const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
         const size_t bmax = sizeof(rwbt->start);
         static_assert_compatible_types(rwbt->start, char[8]);
         if (unlikely(word.length >= sizeof(pattbuf) - (bmax * 2))) {
             error_msg("word under cursor too long");
-            return;
+            return false;
         }
         char *ptr = stpncpy(pattbuf, rwbt->start, bmax);
         memcpy(ptr, word.data, word.length);
@@ -1792,17 +1884,19 @@ static void cmd_search(EditorState *e, const CommandArgs *a)
 
     if (has_flag(a, 'n')) {
         search_next(view, search, cs);
-        return;
+        // TODO: make search_next() return bool and use here
+        return true;
     }
     if (has_flag(a, 'p')) {
         search_prev(view, search, cs);
-        return;
+        // TODO: make search_prev() return bool and use here
+        return true;
     }
 
     search->reverse = has_flag(a, 'r');
     if (!pattern) {
         set_input_mode(e, INPUT_SEARCH);
-        return;
+        return true;
     }
 
     search_set_regexp(search, pattern);
@@ -1815,9 +1909,12 @@ static void cmd_search(EditorState *e, const CommandArgs *a)
     if (!has_flag(a, 'H')) {
         history_add(&e->search_history, pattern);
     }
+
+    // TODO: return false if search_next_word() or search_next() fails
+    return true;
 }
 
-static void cmd_select(EditorState *e, const CommandArgs *a)
+static bool cmd_select(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
     SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
@@ -1827,17 +1924,18 @@ static void cmd_select(EditorState *e, const CommandArgs *a)
 
     if (block) {
         select_block(view);
-        return;
+        // TODO: return false if select_block() doesn't select anything?
+        return true;
     }
 
     if (view->selection) {
         if (!keep && view->selection == sel) {
             unselect(view);
-            return;
+            return true;
         }
         view->selection = sel;
         mark_all_lines_changed(view->buffer);
-        return;
+        return true;
     }
 
     view->sel_so = block_iter_get_offset(&view->cursor);
@@ -1848,16 +1946,17 @@ static void cmd_select(EditorState *e, const CommandArgs *a)
     // move up or down before screen is updated
     view_update_cursor_y(view);
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+    return true;
 }
 
-static void cmd_set(EditorState *e, const CommandArgs *a)
+static bool cmd_set(EditorState *e, const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool local = has_flag(a, 'l');
     if (!e->buffer) {
         if (unlikely(local)) {
             error_msg("Flag -l makes no sense in config file");
-            return;
+            return false;
         }
         global = true;
     }
@@ -1866,23 +1965,26 @@ static void cmd_set(EditorState *e, const CommandArgs *a)
     size_t count = a->nr_args;
     if (count == 1) {
         set_bool_option(e, args[0], local, global);
-        return;
+        // TODO: make set_bool_option() return bool and use here
+        return true;
     } else if (count & 1) {
         error_msg("One or even number of arguments expected");
-        return;
+        return false;
     }
 
     for (size_t i = 0; i < count; i += 2) {
         set_option(e, args[i], args[i + 1], local, global);
     }
+    // TODO: make set_option() return bool and use here
+    return true;
 }
 
-static void cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
+static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     const char *name = a->args[0];
     if (unlikely(streq(name, "DTE_VERSION"))) {
         error_msg("$DTE_VERSION cannot be changed");
-        return;
+        return false;
     }
 
     const size_t nr_args = a->nr_args;
@@ -1894,68 +1996,75 @@ static void cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
         res = unsetenv(name);
     }
 
-    if (unlikely(res != 0)) {
-        if (errno == EINVAL) {
-            error_msg("Invalid environment variable name '%s'", name);
-        } else {
-            perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
-        }
+    if (likely(res == 0)) {
+        return true;
     }
+
+    if (errno == EINVAL) {
+        error_msg("Invalid environment variable name '%s'", name);
+    } else {
+        perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
+    }
+    return false;
 }
 
-static void cmd_shift(EditorState *e, const CommandArgs *a)
+static bool cmd_shift(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
     int count;
     if (!str_to_int(arg, &count)) {
         error_msg("Invalid number: %s", arg);
-        return;
+        return false;
     }
     if (count == 0) {
         error_msg("Count must be non-zero");
-        return;
+        return false;
     }
     shift_lines(e->view, count);
+    return true;
 }
 
-static void cmd_show(EditorState *e, const CommandArgs *a)
+static bool cmd_show(EditorState *e, const CommandArgs *a)
 {
     bool write_to_cmdline = has_flag(a, 'c');
     if (write_to_cmdline && a->nr_args < 2) {
         error_msg("\"show -c\" requires 2 arguments");
-        return;
+        return false;
     }
     show(e, a->args[0], a->args[1], write_to_cmdline);
+    // TODO: make show() return bool and use here
+    return true;
 }
 
-static void cmd_suspend(EditorState *e, const CommandArgs *a)
+static bool cmd_suspend(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     if (e->status == EDITOR_INITIALIZING) {
         LOG_WARNING("suspend request ignored");
-        return;
+        return false;
     }
 
     if (e->session_leader) {
         error_msg("Session leader can't suspend");
-        return;
+        return false;
     }
 
     ui_end(e);
-    int r = kill(0, SIGSTOP);
-    if (unlikely(r != 0)) {
+    bool suspended = !kill(0, SIGSTOP);
+    if (!suspended) {
         perror_msg("kill");
     }
 
     term_raw();
     ui_start(e);
+    return suspended;
 }
 
-static void cmd_tag(EditorState *e, const CommandArgs *a)
+static bool cmd_tag(EditorState *e, const CommandArgs *a)
 {
     if (has_flag(a, 'r')) {
         bookmark_pop(e->window, &e->bookmarks);
-        return;
+        return true;
     }
 
     const char *name = a->args[0];
@@ -1963,7 +2072,7 @@ static void cmd_tag(EditorState *e, const CommandArgs *a)
     if (!name) {
         StringView w = view_get_word_under_cursor(e->view);
         if (w.length == 0) {
-            return;
+            return false;
         }
         word = xstrcut(w.data, w.length);
         name = word;
@@ -1972,20 +2081,23 @@ static void cmd_tag(EditorState *e, const CommandArgs *a)
     tag_lookup(&e->tagfile, name, e->buffer->abs_filename, &e->messages);
     activate_current_message_save(e);
     free(word);
+    // TODO: return false if one of the above functions fail
+    return true;
 }
 
-static void cmd_title(EditorState *e, const CommandArgs *a)
+static bool cmd_title(EditorState *e, const CommandArgs *a)
 {
     Buffer *buffer = e->buffer;
     if (buffer->abs_filename) {
         error_msg("saved buffers can't be retitled");
-        return;
+        return false;
     }
     set_display_filename(buffer, xstrdup(a->args[0]));
     mark_buffer_tabbars_changed(buffer);
+    return true;
 }
 
-static void cmd_toggle(EditorState *e, const CommandArgs *a)
+static bool cmd_toggle(EditorState *e, const CommandArgs *a)
 {
     bool global = has_flag(a, 'g');
     bool verbose = has_flag(a, 'v');
@@ -1997,29 +2109,35 @@ static void cmd_toggle(EditorState *e, const CommandArgs *a)
     } else {
         toggle_option(e, option_name, global, verbose);
     }
+    // TODO: return false if one of the above functions fail
+    return true;
 }
 
-static void cmd_undo(EditorState *e, const CommandArgs *a)
+static bool cmd_undo(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    if (undo(e->view)) {
-        unselect(e->view);
+    if (!undo(e->view)) {
+        return false;
     }
+    unselect(e->view);
+    return true;
 }
 
-static void cmd_unselect(EditorState *e, const CommandArgs *a)
+static bool cmd_unselect(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     unselect(e->view);
+    return true;
 }
 
-static void cmd_up(EditorState *e, const CommandArgs *a)
+static bool cmd_up(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_or_lines_flags(e, a);
     move_up(e->view, 1);
+    return true;
 }
 
-static void cmd_view(EditorState *e, const CommandArgs *a)
+static bool cmd_view(EditorState *e, const CommandArgs *a)
 {
     Window *window = e->window;
     BUG_ON(window->views.count == 0);
@@ -2030,17 +2148,19 @@ static void cmd_view(EditorState *e, const CommandArgs *a)
     } else {
         if (!str_to_size(arg, &idx) || idx == 0) {
             error_msg("Invalid view index: %s", arg);
-            return;
+            return false;
         }
         idx--;
         if (idx > window->views.count - 1) {
+            // TODO: use MIN()/MAX()?
             idx = window->views.count - 1;
         }
     }
     set_view(window->views.ptrs[idx]);
+    return true;
 }
 
-static void cmd_wclose(EditorState *e, const CommandArgs *a)
+static bool cmd_wclose(EditorState *e, const CommandArgs *a)
 {
     View *view = window_find_unclosable_view(e->window);
     bool force = has_flag(a, 'f');
@@ -2055,81 +2175,89 @@ static void cmd_wclose(EditorState *e, const CommandArgs *a)
             "Save modified files or run 'wclose -f' to close "
             "window without saving"
         );
-        return;
+        return false;
     }
 
     if (dialog_prompt(e, "Close window without saving? [y/N]", "ny") != 'y') {
-        return;
+        return false;
     }
 
 close:
     window_close(e->window);
+    return true;
 }
 
-static void cmd_wflip(EditorState *e, const CommandArgs *a)
+static bool cmd_wflip(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Frame *frame = e->window->frame;
     if (!frame->parent) {
-        return;
+        return false;
     }
     frame->parent->vertical ^= 1;
     mark_everything_changed(e);
+    return true;
 }
 
-static void cmd_wnext(EditorState *e, const CommandArgs *a)
+static bool cmd_wnext(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->window = next_window(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
+    return true;
 }
 
-static void cmd_word_bwd(EditorState *e, const CommandArgs *a)
+static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_flag(e, a);
     bool skip_non_word = has_flag(a, 's');
     word_bwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
+    return true;
 }
 
-static void cmd_word_fwd(EditorState *e, const CommandArgs *a)
+static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 {
     handle_select_chars_flag(e, a);
     bool skip_non_word = has_flag(a, 's');
     word_fwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
+    return true;
 }
 
-static void cmd_wprev(EditorState *e, const CommandArgs *a)
+static bool cmd_wprev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->window = prev_window(e->window);
     set_view(e->window->view);
     mark_everything_changed(e);
     debug_frame(e->root_frame);
+    return true;
 }
 
-static void cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
+static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
     unsigned int width = e->buffer->options.text_width;
     if (arg) {
         if (!str_to_uint(arg, &width) || width < 1 || width > TEXT_WIDTH_MAX) {
             error_msg("invalid paragraph width: %s", arg);
-            return;
+            return false;
         }
     }
     format_paragraph(e->view, width);
+    // TODO: is there ever a reason to return false here?
+    return true;
 }
 
-static void cmd_wresize(EditorState *e, const CommandArgs *a)
+static bool cmd_wresize(EditorState *e, const CommandArgs *a)
 {
     Window *window = e->window;
     if (!window->frame->parent) {
         // Only window
-        return;
+        return false;
     }
 
     ResizeDirection dir = RESIZE_DIRECTION_AUTO;
@@ -2147,7 +2275,7 @@ static void cmd_wresize(EditorState *e, const CommandArgs *a)
         int n;
         if (!str_to_int(arg, &n)) {
             error_msg("Invalid resize value: %s", arg);
-            return;
+            return false;
         }
         if (arg[0] == '+' || arg[0] == '-') {
             add_to_frame_size(window->frame, dir, n);
@@ -2159,9 +2287,11 @@ static void cmd_wresize(EditorState *e, const CommandArgs *a)
     }
     mark_everything_changed(e);
     debug_frame(e->root_frame);
+    // TODO: return false if resize failed?
+    return true;
 }
 
-static void cmd_wsplit(EditorState *e, const CommandArgs *a)
+static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
 {
     bool before = has_flag(a, 'b');
     bool use_glob = has_flag(a, 'g') && a->nr_args > 0;
@@ -2172,14 +2302,14 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     if (unlikely(empty && a->nr_args > 0)) {
         error_msg("flags -n and -t can't be used with filename arguments");
-        return;
+        return false;
     }
 
     char **paths = a->args;
     glob_t globbuf;
     if (use_glob) {
         if (!xglob(a->args, &globbuf)) {
-            return;
+            return false;
         }
         paths = globbuf.gl_pathv;
     }
@@ -2221,15 +2351,17 @@ static void cmd_wsplit(EditorState *e, const CommandArgs *a)
     }
 
     debug_frame(e->root_frame);
+    // TODO: return false if something above failed (e.g. window_open_files())
+    return true;
 }
 
-static void cmd_wswap(EditorState *e, const CommandArgs *a)
+static bool cmd_wswap(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     Frame *frame = e->window->frame;
     Frame *parent = frame->parent;
     if (!parent) {
-        return;
+        return false;
     }
 
     size_t count = parent->frames.count;
@@ -2242,6 +2374,7 @@ static void cmd_wswap(EditorState *e, const CommandArgs *a)
     ptrs[current] = ptrs[next];
     ptrs[next] = tmp;
     mark_everything_changed(e);
+    return true;
 }
 
 IGNORE_WARNING("-Wincompatible-pointer-types")

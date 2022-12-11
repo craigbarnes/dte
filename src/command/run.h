@@ -17,7 +17,7 @@ typedef struct {
     uint8_t nr_flag_args; // Number of flag args
 } CommandArgs;
 
-typedef void (*CommandFunc)(void *userdata, const CommandArgs *args);
+typedef bool (*CommandFunc)(void *userdata, const CommandArgs *args);
 
 typedef struct {
     const char name[15];

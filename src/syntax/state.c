@@ -195,7 +195,7 @@ static Condition *add_condition (
     return c;
 }
 
-static void cmd_bufis(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_bufis(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *str = a->args[0];
     const size_t len = strlen(str);
@@ -205,23 +205,26 @@ static void cmd_bufis(SyntaxParser *sp, const CommandArgs *a)
             "Maximum length of string is %zu bytes",
             ARRAYLEN(c->u.str.buf)
         );
-        return;
+        return false;
     }
 
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
     c = add_condition(sp, type, a->args[1], a->args[2]);
-    if (c) {
-        memcpy(c->u.str.buf, str, len);
-        c->u.str.len = len;
+    if (!c) {
+        return false;
     }
+
+    memcpy(c->u.str.buf, str, len);
+    c->u.str.len = len;
+    return true;
 }
 
-static void cmd_char(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_char(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *chars = a->args[0];
     if (unlikely(chars[0] == '\0')) {
         error_msg("char argument can't be empty");
-        return;
+        return false;
     }
 
     bool add_to_buffer = cmdargs_has_flag(a, 'b');
@@ -237,7 +240,7 @@ static void cmd_char(SyntaxParser *sp, const CommandArgs *a)
 
     Condition *c = add_condition(sp, type, a->args[1], a->args[2]);
     if (!c) {
-        return;
+        return false;
     }
 
     if (type == COND_CHAR1) {
@@ -248,13 +251,15 @@ static void cmd_char(SyntaxParser *sp, const CommandArgs *a)
             BITSET_INVERT(c->u.bitset);
         }
     }
+
+    return true;
 }
 
-static void cmd_default(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
     if (no_syntax(sp)) {
-        return;
+        return false;
     }
 
     const char *value = str_intern(a->args[0]);
@@ -271,40 +276,43 @@ static void cmd_default(SyntaxParser *sp, const CommandArgs *a)
             );
         }
     }
+
+    return true;
 }
 
-static void cmd_eat(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_eat(SyntaxParser *sp, const CommandArgs *a)
 {
     if (no_state(sp)) {
-        return;
+        return false;
     }
 
     const char *dest = a->args[0];
     if (!destination_state(sp, dest, &sp->current_state->default_action.destination)) {
-        return;
+        return false;
     }
 
     const char *emit = a->args[1];
     sp->current_state->default_action.emit_name = emit ? xstrdup(emit) : NULL;
     sp->current_state->type = STATE_EAT;
     sp->current_state = NULL;
+    return true;
 }
 
-static void cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
 {
     if (no_state(sp)) {
-        return;
+        return false;
     }
 
     Syntax *subsyn = must_find_subsyntax(sp, a->args[0]);
     if (!subsyn) {
-        return;
+        return false;
     }
 
     // default_action.destination is used as the return state
     const char *ret = a->args[1];
     if (!destination_state(sp, ret, &sp->current_state->default_action.destination)) {
-        return;
+        return false;
     }
 
     sp->current_state->default_action.emit_name = NULL;
@@ -315,35 +323,38 @@ static void cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
     // Normally merge() marks subsyntax used but in case of heredocs merge()
     // is not called when syntax file is loaded
     subsyn->used = true;
+    return true;
 }
 
-static void cmd_heredocend(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_heredocend(SyntaxParser *sp, const CommandArgs *a)
 {
     Condition *c = add_condition(sp, COND_HEREDOCEND, a->args[0], a->args[1]);
     if (unlikely(!c)) {
-        return;
+        return false;
     }
     BUG_ON(!sp->current_syntax);
     sp->current_syntax->heredoc = true;
+    return true;
 }
 
 // Forward declaration, used in cmd_include() and cmd_require()
 static int read_syntax(SyntaxParser *sp, const char *filename, ConfigFlags flags);
 
-static void cmd_include(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_include(SyntaxParser *sp, const CommandArgs *a)
 {
     ConfigFlags flags = CFG_MUST_EXIST;
     if (a->flags[0] == 'b') {
         flags |= CFG_BUILTIN;
     }
-    read_syntax(sp, a->args[0], flags);
+    int r = read_syntax(sp, a->args[0], flags);
+    return r == 0;
 }
 
-static void cmd_list(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_list(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
     if (no_syntax(sp)) {
-        return;
+        return false;
     }
 
     char **args = a->args;
@@ -354,7 +365,7 @@ static void cmd_list(SyntaxParser *sp, const CommandArgs *a)
         hashmap_insert(&sp->current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
         error_msg("List '%s' already exists", name);
-        return;
+        return false;
     }
     list->defined = true;
 
@@ -365,16 +376,17 @@ static void cmd_list(SyntaxParser *sp, const CommandArgs *a)
         const char *str = args[i];
         hashset_add(set, str, strlen(str));
     }
+    return true;
 }
 
-static void cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
 {
     char **args = a->args;
     const char *name = args[0];
     const char *emit = args[2] ? args[2] : name;
     Condition *c = add_condition(sp, COND_INLIST, args[1], emit);
     if (!c) {
-        return;
+        return false;
     }
 
     StringList *list = find_string_list(sp->current_syntax, name);
@@ -386,27 +398,29 @@ static void cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
 
     list->used = true;
     c->u.str_list = list;
+    return true;
 }
 
-static void cmd_noeat(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_noeat(SyntaxParser *sp, const CommandArgs *a)
 {
     State *dest;
     if (unlikely(no_state(sp) || !destination_state(sp, a->args[0], &dest))) {
-        return;
+        return false;
     }
 
     if (unlikely(dest == sp->current_state)) {
         error_msg("using noeat to jump to same state causes infinite loop");
-        return;
+        return false;
     }
 
     sp->current_state->default_action.destination = dest;
     sp->current_state->default_action.emit_name = NULL;
     sp->current_state->type = a->flags[0] == 'b' ? STATE_NOEAT_BUFFER : STATE_NOEAT;
     sp->current_state = NULL;
+    return true;
 }
 
-static void cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
 {
     // If length is not specified then buffered bytes will be recolored
     ConditionType type = COND_RECOLOR_BUFFER;
@@ -417,21 +431,27 @@ static void cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
         type = COND_RECOLOR;
         if (unlikely(!str_to_size(len_str, &len))) {
             error_msg("invalid number: '%s'", len_str);
-            return;
+            return false;
         }
         if (unlikely(len < 1 || len > 2500)) {
             error_msg("number of bytes must be between 1-2500 (got %zu)", len);
-            return;
+            return false;
         }
     }
 
     Condition *c = add_condition(sp, type, NULL, a->args[0]);
-    if (c && type == COND_RECOLOR) {
+    if (!c) {
+        return false;
+    }
+
+    if (type == COND_RECOLOR) {
         c->u.recolor_len = len;
     }
+
+    return true;
 }
 
-static void cmd_require(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
 {
     static HashSet loaded_files;
     static HashSet loaded_builtins;
@@ -458,51 +478,56 @@ static void cmd_require(SyntaxParser *sp, const CommandArgs *a)
     }
 
     if (hashset_get(set, path, path_len)) {
-        return;
+        return true;
     }
 
-    if (read_syntax(sp, path, flags) == 0) {
-        hashset_add(set, path, path_len);
+    if (read_syntax(sp, path, flags) != 0) {
+        return false;
     }
+
+    hashset_add(set, path, path_len);
+    return true;
 }
 
-static void cmd_state(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_state(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
     if (no_syntax(sp)) {
-        return;
+        return false;
     }
 
     const char *name = a->args[0];
     if (unlikely(streq(name, "END") || streq(name, "this"))) {
         error_msg("'%s' is reserved state name", name);
-        return;
+        return false;
     }
 
     State *state = find_or_add_state(sp, name);
     if (unlikely(state->defined)) {
         error_msg("State '%s' already exists", name);
-        return;
+        return false;
     }
+
     state->defined = true;
     state->emit_name = xstrdup(a->args[1] ? a->args[1] : a->args[0]);
     sp->current_state = state;
+    return true;
 }
 
-static void cmd_str(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_str(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *str = a->args[0];
     size_t len = strlen(str);
     if (unlikely(len < 2)) {
         error_msg("string should be at least 2 bytes; use 'char' for single bytes");
-        return;
+        return false;
     }
 
     Condition *c;
     size_t maxlen = ARRAYLEN(c->u.str.buf);
     if (unlikely(len > maxlen)) {
         error_msg("maximum length of string is %zu bytes", maxlen);
-        return;
+        return false;
     }
 
     ConditionType type;
@@ -513,10 +538,13 @@ static void cmd_str(SyntaxParser *sp, const CommandArgs *a)
     }
 
     c = add_condition(sp, type, a->args[1], a->args[2]);
-    if (c) {
-        memcpy(c->u.str.buf, str, len);
-        c->u.str.len = len;
+    if (!c) {
+        return false;
     }
+
+    memcpy(c->u.str.buf, str, len);
+    c->u.str.len = len;
+    return true;
 }
 
 static void finish_syntax(SyntaxParser *sp)
@@ -527,7 +555,7 @@ static void finish_syntax(SyntaxParser *sp)
     sp->current_syntax = NULL;
 }
 
-static void cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
+static bool cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
 {
     if (sp->current_syntax) {
         finish_syntax(sp);
@@ -538,6 +566,7 @@ static void cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
     sp->current_state = NULL;
 
     sp->saved_nr_errors = get_nr_errors();
+    return true;
 }
 
 IGNORE_WARNING("-Wincompatible-pointer-types")

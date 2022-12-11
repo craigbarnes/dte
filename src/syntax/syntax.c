@@ -119,7 +119,8 @@ void finalize_syntax(HashMap *syntaxes, Syntax *syn, unsigned int saved_nr_error
         return;
     }
 
-    // Unused states and lists cause warning only
+    // Unused states and lists cause warnings only (to make loading WIP
+    // syntax files less annoying)
     visit(syn->start_state);
     for (HashMapIter it = hashmap_iter(&syn->states); hashmap_next(&it); ) {
         const State *s = it.entry->value;

@@ -60,29 +60,32 @@ void cmdline_set_text(CommandLine *c, const char *text)
     c->search_pos = NULL;
 }
 
-static void cmd_bol(EditorState *e, const CommandArgs *a)
+static bool cmd_bol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     e->cmdline.pos = 0;
     reset_completion(&e->cmdline);
+    return true;
 }
 
-static void cmd_cancel(EditorState *e, const CommandArgs *a)
+static bool cmd_cancel(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
     reset_completion(c);
+    return true;
 }
 
-static void cmd_clear(EditorState *e, const CommandArgs *a)
+static bool cmd_clear(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     cmdline_clear(&e->cmdline);
+    return true;
 }
 
-static void cmd_copy(EditorState *e, const CommandArgs *a)
+static bool cmd_copy(EditorState *e, const CommandArgs *a)
 {
     bool internal = cmdargs_has_flag(a, 'i') || a->flag_set == 0;
     bool clipboard = cmdargs_has_flag(a, 'b');
@@ -100,29 +103,34 @@ static void cmd_copy(EditorState *e, const CommandArgs *a)
         const char *str = string_borrow_cstring(buf);
         if (!term_osc52_copy(&term->obuf, str, len, clipboard, primary)) {
             LOG_ERROR("term_osc52_copy() failed: %s", strerror(ENOMEM));
+            // TODO: return false ?
         }
     }
+
+    return true;
 }
 
-static void cmd_delete(EditorState *e, const CommandArgs *a)
+static bool cmd_delete(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     cmdline_delete(c);
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_delete_eol(EditorState *e, const CommandArgs *a)
+static bool cmd_delete_eol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     c->buf.len = c->pos;
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_delete_word(EditorState *e, const CommandArgs *a)
+static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -131,7 +139,7 @@ static void cmd_delete_word(EditorState *e, const CommandArgs *a)
     size_t i = c->pos;
 
     if (i == len) {
-        return;
+        return true;
     }
 
     while (i < len && is_word_byte(buf[i])) {
@@ -146,17 +154,19 @@ static void cmd_delete_word(EditorState *e, const CommandArgs *a)
 
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_eol(EditorState *e, const CommandArgs *a)
+static bool cmd_eol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     c->pos = c->buf.len;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_erase(EditorState *e, const CommandArgs *a)
+static bool cmd_erase(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -166,9 +176,10 @@ static void cmd_erase(EditorState *e, const CommandArgs *a)
     }
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_erase_bol(EditorState *e, const CommandArgs *a)
+static bool cmd_erase_bol(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -176,15 +187,16 @@ static void cmd_erase_bol(EditorState *e, const CommandArgs *a)
     c->pos = 0;
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_erase_word(EditorState *e, const CommandArgs *a)
+static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     size_t i = c->pos;
     if (i == 0) {
-        return;
+        return true;
     }
 
     // open /path/to/file^W => open /path/to/
@@ -208,6 +220,7 @@ static void cmd_erase_word(EditorState *e, const CommandArgs *a)
     c->pos = i;
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
 static const History *get_history(EditorState *e)
@@ -224,12 +237,12 @@ static const History *get_history(EditorState *e)
     return NULL;
 }
 
-static void cmd_history_prev(EditorState *e, const CommandArgs *a)
+static bool cmd_history_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     const History *hist = get_history(e);
     if (unlikely(!hist)) {
-        return;
+        return true;
     }
 
     CommandLine *c = &e->cmdline;
@@ -243,14 +256,15 @@ static void cmd_history_prev(EditorState *e, const CommandArgs *a)
     }
 
     reset_completion(c);
+    return true;
 }
 
-static void cmd_history_next(EditorState *e, const CommandArgs *a)
+static bool cmd_history_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     const History *hist = get_history(e);
     if (unlikely(!hist)) {
-        return;
+        return true;
     }
 
     CommandLine *c = &e->cmdline;
@@ -267,9 +281,10 @@ static void cmd_history_next(EditorState *e, const CommandArgs *a)
 
 out:
     reset_completion(c);
+    return true;
 }
 
-static void cmd_left(EditorState *e, const CommandArgs *a)
+static bool cmd_left(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -277,9 +292,10 @@ static void cmd_left(EditorState *e, const CommandArgs *a)
         u_prev_char(c->buf.buffer, &c->pos);
     }
     reset_completion(c);
+    return true;
 }
 
-static void cmd_paste(EditorState *e, const CommandArgs *a)
+static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
     CommandLine *c = &e->cmdline;
     const Clipboard *clip = &e->clipboard;
@@ -289,9 +305,10 @@ static void cmd_paste(EditorState *e, const CommandArgs *a)
     }
     c->search_pos = NULL;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_right(EditorState *e, const CommandArgs *a)
+static bool cmd_right(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -299,9 +316,10 @@ static void cmd_right(EditorState *e, const CommandArgs *a)
         u_get_char(c->buf.buffer, c->buf.len, &c->pos);
     }
     reset_completion(c);
+    return true;
 }
 
-static void cmd_toggle(EditorState *e, const CommandArgs *a)
+static bool cmd_toggle(EditorState *e, const CommandArgs *a)
 {
     const char *option_name = a->args[0];
     bool global = cmdargs_has_flag(a, 'g');
@@ -312,15 +330,17 @@ static void cmd_toggle(EditorState *e, const CommandArgs *a)
     } else {
         toggle_option(e, option_name, global, false);
     }
+    // TODO: return false if toggle_option_values() or toggle_option() fails
+    return true;
 }
 
-static void cmd_word_bwd(EditorState *e, const CommandArgs *a)
+static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
     if (c->pos <= 1) {
         c->pos = 0;
-        return;
+        return true;
     }
 
     const unsigned char *const buf = c->buf.buffer;
@@ -340,9 +360,10 @@ static void cmd_word_bwd(EditorState *e, const CommandArgs *a)
 
     c->pos = i;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_word_fwd(EditorState *e, const CommandArgs *a)
+static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -360,27 +381,31 @@ static void cmd_word_fwd(EditorState *e, const CommandArgs *a)
 
     c->pos = i;
     reset_completion(c);
+    return true;
 }
 
-static void cmd_complete_next(EditorState *e, const CommandArgs *a)
+static bool cmd_complete_next(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     complete_command_next(e);
+    return true;
 }
 
-static void cmd_complete_prev(EditorState *e, const CommandArgs *a)
+static bool cmd_complete_prev(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     complete_command_prev(e);
+    return true;
 }
 
-static void cmd_direction(EditorState *e, const CommandArgs *a)
+static bool cmd_direction(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     toggle_search_direction(&e->search);
+    return true;
 }
 
-static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
+static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     CommandLine *c = &e->cmdline;
@@ -397,14 +422,15 @@ static void cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
 
     current_command = NULL;
     handle_normal_command(e, str, true);
+    return true;
 }
 
-static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
+static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
 {
     CommandLine *c = &e->cmdline;
     if (cmdargs_has_flag(a, 'e')) {
         if (c->buf.len == 0) {
-            return;
+            return true;
         }
         // Escape the regex; to match as plain text
         char *original = string_clone_cstring(&c->buf);
@@ -456,6 +482,8 @@ static void cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     search_next(e->view, &e->search, e->options.case_sensitive_search);
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
+    // TODO: make search_next() return bool and use here
+    return true;
 }
 
 IGNORE_WARNING("-Wincompatible-pointer-types")
