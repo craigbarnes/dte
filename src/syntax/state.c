@@ -107,35 +107,45 @@ static bool not_subsyntax(const SyntaxParser *sp)
     return true;
 }
 
+static Syntax *must_find_subsyntax(SyntaxParser *sp, const char *name)
+{
+    Syntax *syntax = find_any_syntax(sp->syntaxes, name);
+    if (unlikely(!syntax)) {
+        error_msg("No such syntax '%s'", name);
+        return NULL;
+    }
+    if (unlikely(!is_subsyntax(syntax))) {
+        error_msg("Syntax '%s' is not a subsyntax", name);
+        return NULL;
+    }
+    return syntax;
+}
+
 static bool subsyntax_call(SyntaxParser *sp, const char *name, const char *ret, State **dest)
 {
+    Syntax *subsyn = must_find_subsyntax(sp, name);
+
     SyntaxMerge m = {
-        .subsyn = find_any_syntax(sp->syntaxes, name),
+        .subsyn = subsyn,
         .return_state = NULL,
         .delim = NULL,
         .delim_len = 0,
     };
 
-    bool ok = true;
-    if (unlikely(!m.subsyn)) {
-        error_msg("No such syntax %s", name);
-        ok = false;
-    } else if (unlikely(!is_subsyntax(m.subsyn))) {
-        error_msg("Syntax %s is not subsyntax", name);
-        ok = false;
-    }
-
     if (streq(ret, "END")) {
         if (not_subsyntax(sp)) {
-            ok = false;
+            return false;
         }
-    } else if (ok) {
+    } else if (subsyn) {
         m.return_state = reference_state(sp, ret);
     }
-    if (ok) {
+
+    if (subsyn) {
         *dest = merge_syntax(sp->current_syntax, &m, sp->colors);
+        return true;
     }
-    return ok;
+
+    return false;
 }
 
 static bool destination_state(SyntaxParser *sp, const char *name, State **dest)
@@ -286,14 +296,8 @@ static void cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
         return;
     }
 
-    const char *sub = a->args[0];
-    Syntax *subsyn = find_any_syntax(sp->syntaxes, sub);
-    if (unlikely(!subsyn)) {
-        error_msg("No such syntax %s", sub);
-        return;
-    }
-    if (unlikely(!is_subsyntax(subsyn))) {
-        error_msg("Syntax %s is not subsyntax", sub);
+    Syntax *subsyn = must_find_subsyntax(sp, a->args[0]);
+    if (!subsyn) {
         return;
     }
 
