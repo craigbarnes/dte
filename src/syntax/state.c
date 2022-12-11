@@ -56,7 +56,7 @@ static void close_state(SyntaxParser *sp)
         // Command prefix in error message makes no sense
         const Command *save = current_command;
         current_command = NULL;
-        error_msg("No default action in state %s", sp->current_state->name);
+        error_msg("No default action in state '%s'", sp->current_state->name);
         current_command = save;
     }
     sp->current_state = NULL;
@@ -103,7 +103,7 @@ static bool not_subsyntax(const SyntaxParser *sp)
     if (likely(is_subsyntax(sp->current_syntax))) {
         return false;
     }
-    error_msg("Destination state END allowed only in a subsyntax");
+    error_msg("Destination state 'END' only allowed in a subsyntax");
     return true;
 }
 
@@ -349,7 +349,7 @@ static void cmd_list(SyntaxParser *sp, const CommandArgs *a)
         list = xnew0(StringList, 1);
         hashmap_insert(&sp->current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
-        error_msg("List %s already exists", name);
+        error_msg("List '%s' already exists", name);
         return;
     }
     list->defined = true;
@@ -412,7 +412,7 @@ static void cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
     if (len_str) {
         type = COND_RECOLOR;
         if (unlikely(!str_to_size(len_str, &len))) {
-            error_msg("invalid number: %s", len_str);
+            error_msg("invalid number: '%s'", len_str);
             return;
         }
         if (unlikely(len < 1 || len > 2500)) {
@@ -471,13 +471,13 @@ static void cmd_state(SyntaxParser *sp, const CommandArgs *a)
 
     const char *name = a->args[0];
     if (unlikely(streq(name, "END") || streq(name, "this"))) {
-        error_msg("%s is reserved state name", name);
+        error_msg("'%s' is reserved state name", name);
         return;
     }
 
     State *state = find_or_add_state(sp, name);
     if (unlikely(state->defined)) {
-        error_msg("State %s already exists", name);
+        error_msg("State '%s' already exists", name);
         return;
     }
     state->defined = true;
