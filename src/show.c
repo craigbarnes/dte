@@ -46,7 +46,7 @@ typedef enum {
 typedef struct {
     const char name[11];
     uint8_t flags; // ShowHandlerFlags
-    void (*show)(EditorState *e, const char *name, bool cmdline);
+    bool (*show)(EditorState *e, const char *name, bool cmdline);
     String (*dump)(EditorState *e);
     void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
 } ShowHandler;
@@ -80,7 +80,7 @@ static void open_temporary_buffer (
     }
 }
 
-static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag)
+static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag)
 {
     const char *cmd_str = find_alias(&e->modes[INPUT_NORMAL].aliases, alias_name);
     if (!cmd_str) {
@@ -89,7 +89,7 @@ static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag
         } else {
             info_msg("%s is not a known alias", alias_name);
         }
-        return;
+        return true;
     }
 
     if (cflag) {
@@ -98,25 +98,27 @@ static void show_normal_alias(EditorState *e, const char *alias_name, bool cflag
     } else {
         info_msg("%s is aliased to: %s", alias_name, cmd_str);
     }
+
+    return true;
 }
 
-static void show_binding(EditorState *e, const char *keystr, bool cflag)
+static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 {
     KeyCode key;
     if (!parse_key_string(&key, keystr)) {
         error_msg("invalid key string: %s", keystr);
-        return;
+        return false;
     }
 
     if (u_is_unicode(key)) {
-        info_msg("%s is not a bindable key", keystr);
-        return;
+        error_msg("%s is not a bindable key", keystr);
+        return false;
     }
 
     const CachedCommand *b = lookup_binding(&e->modes[INPUT_NORMAL].key_bindings, key);
     if (!b) {
         info_msg("%s is not bound to a command", keystr);
-        return;
+        return true;
     }
 
     if (cflag) {
@@ -125,14 +127,16 @@ static void show_binding(EditorState *e, const char *keystr, bool cflag)
     } else {
         info_msg("%s is bound to: %s", keystr, b->cmd_str);
     }
+
+    return true;
 }
 
-static void show_color(EditorState *e, const char *color_name, bool cflag)
+static bool show_color(EditorState *e, const char *color_name, bool cflag)
 {
     const TermColor *hl = find_color(&e->colors, color_name);
     if (!hl) {
-        error_msg("no color entry with name '%s'", color_name);
-        return;
+        info_msg("no color entry with name '%s'", color_name);
+        return true;
     }
 
     if (cflag) {
@@ -145,14 +149,16 @@ static void show_color(EditorState *e, const char *color_name, bool cflag)
         const char *color_str = term_color_to_string(hl);
         info_msg("color '%s' is set to: %s", color_name, color_str);
     }
+
+    return true;
 }
 
-static void show_cursor(EditorState *e, const char *mode_str, bool cflag)
+static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
 {
     CursorInputMode mode = cursor_mode_from_str(mode_str);
     if (mode >= NR_CURSOR_MODES) {
         error_msg("no cursor entry for '%s'", mode_str);
-        return;
+        return false;
     }
 
     TermCursorStyle style = e->cursor_styles[mode];
@@ -166,14 +172,16 @@ static void show_cursor(EditorState *e, const char *mode_str, bool cflag)
     } else {
         info_msg("cursor '%s' is set to: %s %s", mode_str, type, color);
     }
+
+    return true;
 }
 
-static void show_env(EditorState *e, const char *name, bool cflag)
+static bool show_env(EditorState *e, const char *name, bool cflag)
 {
     const char *value = getenv(name);
     if (!value) {
-        error_msg("no environment variable with name '%s'", name);
-        return;
+        info_msg("no environment variable with name '%s'", name);
+        return true;
     }
 
     if (cflag) {
@@ -182,6 +190,8 @@ static void show_env(EditorState *e, const char *name, bool cflag)
     } else {
         info_msg("$%s is set to: %s", name, value);
     }
+
+    return true;
 }
 
 static String dump_env(EditorState* UNUSED_ARG(e))
@@ -194,12 +204,12 @@ static String dump_env(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
-static void show_include(EditorState *e, const char *name, bool cflag)
+static bool show_include(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
         error_msg("no built-in config with name '%s'", name);
-        return;
+        return false;
     }
 
     const StringView sv = cfg->text;
@@ -208,14 +218,16 @@ static void show_include(EditorState *e, const char *name, bool cflag)
     } else {
         open_temporary_buffer(e, sv.data, sv.length, "builtin", name, DTERC);
     }
+
+    return true;
 }
 
-static void show_compiler(EditorState *e, const char *name, bool cflag)
+static bool show_compiler(EditorState *e, const char *name, bool cflag)
 {
     const Compiler *compiler = find_compiler(&e->compilers, name);
     if (!compiler) {
-        error_msg("no errorfmt entry found for '%s'", name);
-        return;
+        info_msg("no errorfmt entry found for '%s'", name);
+        return true;
     }
 
     String str = string_new(512);
@@ -225,22 +237,27 @@ static void show_compiler(EditorState *e, const char *name, bool cflag)
     } else {
         open_temporary_buffer(e, str.buffer, str.len, "errorfmt", name, DTERC);
     }
+
     string_free(&str);
+    return true;
 }
 
-static void show_option(EditorState *e, const char *name, bool cflag)
+static bool show_option(EditorState *e, const char *name, bool cflag)
 {
     const char *value = get_option_value_string(e, name);
     if (!value) {
         error_msg("invalid option name: %s", name);
-        return;
+        return false;
     }
+
     if (cflag) {
         set_input_mode(e, INPUT_COMMAND);
         cmdline_set_text(&e->cmdline, value);
     } else {
         info_msg("%s is set to: %s", name, value);
     }
+
+    return true;
 }
 
 static void collect_all_options(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
@@ -253,11 +270,11 @@ static void do_collect_cursor_modes(EditorState* UNUSED_ARG(e), PointerArray *a,
     collect_cursor_modes(a, prefix);
 }
 
-static void show_wsplit(EditorState *e, const char *name, bool cflag)
+static bool show_wsplit(EditorState *e, const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
         error_msg("invalid window: %s", name);
-        return;
+        return false;
     }
 
     const Window *w = e->window;
@@ -270,6 +287,8 @@ static void show_wsplit(EditorState *e, const char *name, bool cflag)
     } else {
         info_msg("current window dimensions: %s", buf);
     }
+
+    return true;
 }
 
 static String do_history_dump(const History *history)
@@ -457,26 +476,26 @@ UNITTEST {
     CHECK_BSEARCH_ARRAY(show_handlers, name, strcmp);
 }
 
-void show(EditorState *e, const char *type, const char *key, bool cflag)
+bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
     const ShowHandler *handler = BSEARCH(type, show_handlers, vstrcmp);
     if (!handler) {
         error_msg("invalid argument: '%s'", type);
-        return;
+        return false;
     }
 
     if (key) {
-        if (handler->show) {
-            handler->show(e, key, cflag);
-        } else {
+        if (!handler->show) {
             error_msg("'show %s' doesn't take extra arguments", type);
+            return false;
         }
-        return;
+        return handler->show(e, key, cflag);
     }
 
     String str = handler->dump(e);
     open_temporary_buffer(e, str.buffer, str.len, "show", type, handler->flags);
     string_free(&str);
+    return true;
 }
 
 void collect_show_subcommands(PointerArray *a, const char *prefix)

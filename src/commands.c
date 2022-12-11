@@ -2027,9 +2027,7 @@ static bool cmd_show(EditorState *e, const CommandArgs *a)
         error_msg("\"show -c\" requires 2 arguments");
         return false;
     }
-    show(e, a->args[0], a->args[1], write_to_cmdline);
-    // TODO: make show() return bool and use here
-    return true;
+    return show(e, a->args[0], a->args[1], write_to_cmdline);
 }
 
 static bool cmd_suspend(EditorState *e, const CommandArgs *a)
