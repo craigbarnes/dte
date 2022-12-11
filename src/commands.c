@@ -1120,21 +1120,20 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
         paths = globbuf.gl_pathv;
     }
 
+    View *first_opened;
     if (!paths[1]) {
         // Previous view is remembered when opening single file
-        window_open_file(e->window, paths[0], &encoding);
+        first_opened = window_open_file(e->window, paths[0], &encoding);
     } else {
-        // It makes no sense to remember previous view when opening
-        // multiple files
-        window_open_files(e->window, paths, &encoding);
+        // It makes no sense to remember previous view when opening multiple files
+        first_opened = window_open_files(e->window, paths, &encoding);
     }
 
     if (use_glob) {
         globfree(&globbuf);
     }
 
-    // TODO: return false if window_open_file() or window_open_files() fails
-    return true;
+    return !!first_opened;
 }
 
 static bool cmd_option(EditorState *e, const CommandArgs *a)
@@ -2242,7 +2241,6 @@ static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
         }
     }
     format_paragraph(e->view, width);
-    // TODO: is there ever a reason to return false here?
     return true;
 }
 
@@ -2321,22 +2319,23 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
     e->buffer = NULL;
     mark_everything_changed(e);
 
+    View *view;
     if (empty) {
-        window_open_new_file(e->window);
-        e->buffer->temporary = temporary;
+        view = window_open_new_file(e->window);
+        view->buffer->temporary = temporary;
     } else if (paths[0]) {
-        window_open_files(e->window, paths, NULL);
+        view = window_open_files(e->window, paths, NULL);
     } else {
-        View *new = window_add_buffer(e->window, save->buffer);
-        new->cursor = save->cursor;
-        set_view(new);
+        view = window_add_buffer(e->window, save->buffer);
+        view->cursor = save->cursor;
+        set_view(view);
     }
 
     if (use_glob) {
         globfree(&globbuf);
     }
 
-    if (e->window->views.count == 0) {
+    if (!view) {
         // Open failed, remove new window
         remove_frame(e, e->window->frame);
         e->view = save;
@@ -2345,8 +2344,7 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
     }
 
     debug_frame(e->root_frame);
-    // TODO: return false if something above failed (e.g. window_open_files())
-    return true;
+    return !!view;
 }
 
 static bool cmd_wswap(EditorState *e, const CommandArgs *a)

@@ -332,21 +332,26 @@ View *window_open_file(Window *window, const char *filename, const Encoding *enc
     return view;
 }
 
-void window_open_files(Window *window, char **filenames, const Encoding *encoding)
+// Open multiple files in window and return the first opened View
+View *window_open_files(Window *window, char **filenames, const Encoding *encoding)
 {
     View *empty = window->view;
     bool useless = is_useless_empty_view(empty);
-    bool first = true;
+    View *first = NULL;
+
     for (size_t i = 0; filenames[i]; i++) {
         View *view = window_open_buffer(window, filenames[i], false, encoding);
-        if (view && first) {
+        if (view && !first) {
             set_view(view);
-            first = false;
+            first = view;
         }
     }
+
     if (useless && window->view != empty) {
         remove_view(empty);
     }
+
+    return first;
 }
 
 void mark_buffer_tabbars_changed(Buffer *buffer)

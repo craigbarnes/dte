@@ -54,7 +54,7 @@ void window_close_current_view(Window *window);
 void set_view(View *view);
 View *window_open_new_file(Window *window);
 View *window_open_file(Window *window, const char *filename, const Encoding *encoding);
-void window_open_files(Window *window, char **filenames, const Encoding *encoding);
+View *window_open_files(Window *window, char **filenames, const Encoding *encoding);
 void mark_buffer_tabbars_changed(Buffer *buffer);
 void calculate_line_numbers(Window *window);
 void set_window_coordinates(Window *window, int x, int y);
