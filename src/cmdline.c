@@ -479,11 +479,10 @@ static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)
     }
 
     current_command = NULL;
-    search_next(e->view, &e->search, e->options.case_sensitive_search);
+    bool found = search_next(e->view, &e->search, e->options.case_sensitive_search);
     cmdline_clear(c);
     set_input_mode(e, INPUT_NORMAL);
-    // TODO: make search_next() return bool and use here
-    return true;
+    return found;
 }
 
 IGNORE_WARNING("-Wincompatible-pointer-types")

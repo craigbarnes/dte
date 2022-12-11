@@ -191,55 +191,57 @@ void search_set_regexp(SearchState *search, const char *pattern)
     search->pattern = xstrdup(pattern);
 }
 
-static void do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
+static bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
     if (!search->pattern) {
         error_msg("No previous search pattern");
-        return;
+        return false;
     }
     if (!update_regex(search, cs)) {
-        return;
+        return false;
     }
 
     BlockIter bi = view->cursor;
     regex_t *regex = &search->regex;
     if (!search->reverse) {
         if (do_search_fwd(view, regex, &bi, true)) {
-            return;
+            return true;
         }
         block_iter_bof(&bi);
         if (do_search_fwd(view, regex, &bi, false)) {
             info_msg("Continuing at top");
-            return;
+            return true;
         }
     } else {
         size_t cursor_x = block_iter_bol(&bi);
         if (do_search_bwd(view, regex, &bi, cursor_x, skip)) {
-            return;
+            return true;
         }
         block_iter_eof(&bi);
         if (do_search_bwd(view, regex, &bi, -1, false)) {
             info_msg("Continuing at bottom");
-            return;
+            return true;
         }
     }
 
     error_msg("Pattern '%s' not found", search->pattern);
+    return false;
 }
 
-void search_prev(View *view, SearchState *search, SearchCaseSensitivity cs)
+bool search_prev(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
     toggle_search_direction(search);
-    search_next(view, search, cs);
+    bool r = search_next(view, search, cs);
     toggle_search_direction(search);
+    return r;
 }
 
-void search_next(View *view, SearchState *search, SearchCaseSensitivity cs)
+bool search_next(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(view, search, cs, false);
+    return do_search_next(view, search, cs, false);
 }
 
-void search_next_word(View *view, SearchState *search, SearchCaseSensitivity cs)
+bool search_next_word(View *view, SearchState *search, SearchCaseSensitivity cs)
 {
-    do_search_next(view, search, cs, true);
+    return do_search_next(view, search, cs, true);
 }

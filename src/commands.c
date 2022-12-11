@@ -1883,14 +1883,10 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     do_selection(view, SELECT_NONE);
 
     if (has_flag(a, 'n')) {
-        search_next(view, search, cs);
-        // TODO: make search_next() return bool and use here
-        return true;
+        return search_next(view, search, cs);
     }
     if (has_flag(a, 'p')) {
-        search_prev(view, search, cs);
-        // TODO: make search_prev() return bool and use here
-        return true;
+        return search_prev(view, search, cs);
     }
 
     search->reverse = has_flag(a, 'r');
@@ -1899,19 +1895,19 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         return true;
     }
 
+    bool found;
     search_set_regexp(search, pattern);
     if (use_word_under_cursor) {
-        search_next_word(view, search, cs);
+        found = search_next_word(view, search, cs);
     } else {
-        search_next(view, search, cs);
+        found = search_next(view, search, cs);
     }
 
     if (!has_flag(a, 'H')) {
         history_add(&e->search_history, pattern);
     }
 
-    // TODO: return false if search_next_word() or search_next() fails
-    return true;
+    return found;
 }
 
 static bool cmd_select(EditorState *e, const CommandArgs *a)
