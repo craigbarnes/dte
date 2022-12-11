@@ -1153,18 +1153,19 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     PointerArray *opts = &e->file_options;
     if (has_flag(a, 'r')) {
         const StringView pattern = strview_from_cstring(a->args[0]);
-        add_file_options(opts, FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
-        // TODO: make add_file_options() return bool and use here
-        return true;
+        return add_file_options(opts, FILE_OPTIONS_FILENAME, pattern, strs, nstrs);
     }
 
     const char *ft_list = a->args[0];
+    size_t errors = 0;
     for (size_t pos = 0, len = strlen(ft_list); pos < len; ) {
         const StringView filetype = get_delim(ft_list, &pos, len, ',');
-        add_file_options(opts, FILE_OPTIONS_FILETYPE, filetype, strs, nstrs);
+        if (!add_file_options(opts, FILE_OPTIONS_FILETYPE, filetype, strs, nstrs)) {
+            errors++;
+        }
     }
-    // TODO: make add_file_options() return bool and use here
-    return true;
+
+    return !errors;
 }
 
 static bool cmd_blkdown(EditorState *e, const CommandArgs *a)

@@ -108,7 +108,7 @@ void set_file_options(EditorState *e, Buffer *buffer)
     }
 }
 
-void add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
+bool add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
     FileOption *opt = xnew(FileOption, 1);
     size_t len = str.length;
@@ -137,10 +137,11 @@ append:
     opt->type = type;
     opt->strs = copy_string_array(strs, nstrs);
     ptr_array_append(file_options, opt);
-    return;
+    return true;
 
 error:
     free(opt);
+    return false;
 }
 
 void dump_file_options(const PointerArray *file_options, String *buf)
