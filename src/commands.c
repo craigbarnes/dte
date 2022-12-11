@@ -2140,11 +2140,7 @@ static bool cmd_view(EditorState *e, const CommandArgs *a)
             error_msg("Invalid view index: %s", arg);
             return false;
         }
-        idx--;
-        if (idx > window->views.count - 1) {
-            // TODO: use MIN()/MAX()?
-            idx = window->views.count - 1;
-        }
+        idx = MIN(idx, window->views.count) - 1;
     }
     set_view(window->views.ptrs[idx]);
     return true;
