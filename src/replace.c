@@ -153,11 +153,11 @@ out:
     return nr;
 }
 
-void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
+bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
     if (unlikely(pattern[0] == '\0')) {
         error_msg("Search pattern must contain at least 1 character");
-        return;
+        return false;
     }
 
     int re_flags = REG_NEWLINE;
@@ -166,7 +166,7 @@ void reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
 
     regex_t re;
     if (unlikely(!regexp_compile_internal(&re, pattern, re_flags))) {
-        return;
+        return false;
     }
 
     BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
@@ -250,4 +250,6 @@ void reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
         block_iter_goto_offset(&view->cursor, view->sel_eo);
         view->sel_eo = UINT_MAX;
     }
+
+    return (nr_substitutions > 0);
 }

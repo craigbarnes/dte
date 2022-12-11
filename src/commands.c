@@ -1517,9 +1517,7 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
     };
 
     ReplaceFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    reg_replace(e->view, a->args[0], a->args[1], flags);
-    // TODO: make reg_replace() return bool and use here
-    return true;
+    return reg_replace(e->view, a->args[0], a->args[1], flags);
 }
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)

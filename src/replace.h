@@ -1,6 +1,7 @@
 #ifndef REPLACE_H
 #define REPLACE_H
 
+#include <stdbool.h>
 #include "util/macros.h"
 #include "view.h"
 
@@ -12,6 +13,6 @@ typedef enum {
     REPLACE_CANCEL = 1 << 4,
 } ReplaceFlags;
 
-void reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
+bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags) NONNULL_ARGS;
 
 #endif
