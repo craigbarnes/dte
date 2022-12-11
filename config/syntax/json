@@ -6,7 +6,7 @@ state value code
     char -b - number-negative
     char -b 0 number-zero
     char -b 1-9 number
-    inlist constant value constant
+    inlist constant this constant
     eat this
 
 state string

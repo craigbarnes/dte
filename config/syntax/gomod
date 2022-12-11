@@ -9,7 +9,7 @@ state code
     eat this
 
 state ident
-    char -bn " \t\r\n\"`/" ident
+    char -bn " \t\r\n\"`/" this
     inlist keyword code
     bufis '=>' code arrow
     noeat code

@@ -36,7 +36,7 @@ state section-end
 state text
     char " \t" .ini-comment:this
     char -b = key operator
-    char -b -n "\n" text
+    char -b -n "\n" this
     noeat line-start
 
 state key
