@@ -2070,11 +2070,11 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
         name = word;
     }
 
-    tag_lookup(&e->tagfile, name, e->buffer->abs_filename, &e->messages);
+    const char *filename = e->buffer->abs_filename;
+    size_t ntags = tag_lookup(&e->tagfile, name, filename, &e->messages);
     activate_current_message_save(e);
     free(word);
-    // TODO: return false if one of the above functions fail
-    return true;
+    return (ntags > 0);
 }
 
 static bool cmd_title(EditorState *e, const CommandArgs *a)

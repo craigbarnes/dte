@@ -268,29 +268,32 @@ void add_message_for_tag(MessageArray *messages, Tag *tag, const StringView *dir
     add_message(messages, m);
 }
 
-void tag_lookup(TagFile *tf, const char *name, const char *filename, MessageArray *messages)
+size_t tag_lookup(TagFile *tf, const char *name, const char *filename, MessageArray *messages)
 {
     clear_messages(messages);
     if (!load_tag_file(tf)) {
         error_msg("No tags file");
-        return;
+        return 0;
     }
 
-    PointerArray tags = PTR_ARRAY_INIT;
     // Filename helps to find correct tags
+    PointerArray tags = PTR_ARRAY_INIT;
     tag_file_find_tags(tf, filename, name, &tags);
-    if (tags.count == 0) {
+
+    size_t ntags = tags.count;
+    if (ntags == 0) {
         error_msg("Tag '%s' not found", name);
-        return;
+        return 0;
     }
 
     StringView tf_dir = path_slice_dirname(tf->filename);
-    for (size_t i = 0, n = tags.count; i < n; i++) {
+    for (size_t i = 0; i < ntags; i++) {
         Tag *tag = tags.ptrs[i];
         add_message_for_tag(messages, tag, &tf_dir);
     }
 
     free_tags(&tags);
+    return ntags;
 }
 
 void collect_tags(TagFile *tf, PointerArray *a, const char *prefix)
