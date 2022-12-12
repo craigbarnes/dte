@@ -1699,8 +1699,6 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
     }
 
-    // TODO: check if there are other errors that don't return via the "error" label,
-    // for example unlock_file() failure
     return true;
 
 error:
