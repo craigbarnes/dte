@@ -21,6 +21,23 @@ static void test_parse_ctags_line(TestContext *ctx)
     EXPECT_EQ(tag.local, true);
     free_tag(&tag);
 
+    line = "example\tsrc/xyz.c\t488;\"\tk";
+    tag = (Tag){.pattern = NULL};
+    EXPECT_TRUE(parse_ctags_line(&tag, line, strlen(line)));
+    EXPECT_EQ(tag.filename.length, 9);
+    EXPECT_NULL(tag.pattern);
+    EXPECT_EQ(tag.lineno, 488);
+    EXPECT_EQ(tag.kind, 'k');
+    free_tag(&tag);
+
+    line = "x\tstr.c\t12495\tz";
+    tag = (Tag){.pattern = NULL};
+    EXPECT_TRUE(parse_ctags_line(&tag, line, strlen(line)));
+    EXPECT_NULL(tag.pattern);
+    EXPECT_EQ(tag.lineno, 12495);
+    EXPECT_EQ(tag.kind, 'z');
+    free_tag(&tag);
+
     line = "name\tfile.c\t/^char after pattern with no tab delimiter/t";
     tag = (Tag){.pattern = NULL};
     EXPECT_FALSE(parse_ctags_line(&tag, line, strlen(line)));
