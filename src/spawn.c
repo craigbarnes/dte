@@ -1,6 +1,5 @@
 #include <errno.h>
 #include <poll.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -240,7 +239,7 @@ static void exec_error(const char *argv0)
     error_msg("Unable to exec '%s': %s", argv0, strerror(errno));
 }
 
-void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
 {
     BUG_ON(!ctx->editor);
     BUG_ON(!ctx->argv[0]);
@@ -248,13 +247,13 @@ void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
     int fd[3];
     fd[0] = open_dev_null(O_RDONLY);
     if (fd[0] < 0) {
-        return;
+        return false;
     }
 
     int dev_null = open_dev_null(O_WRONLY);
     if (dev_null < 0) {
         xclose(fd[0]);
-        return;
+        return false;
     }
 
     int p[2];
@@ -262,7 +261,7 @@ void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
         perror_msg("pipe");
         xclose(dev_null);
         xclose(fd[0]);
-        return;
+        return false;
     }
 
     SpawnFlags flags = ctx->flags;
@@ -295,6 +294,7 @@ void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
     xclose(p[0]);
     xclose(dev_null);
     xclose(fd[0]);
+    return (pid != -1);
 }
 
 // Close fd only if valid (positive) and not stdin/stdout/stderr

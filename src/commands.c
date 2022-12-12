@@ -366,12 +366,11 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
     };
 
     clear_messages(&e->messages);
-    spawn_compiler(&ctx, c, &e->messages);
+    bool ok = spawn_compiler(&ctx, c, &e->messages);
     if (e->messages.array.count) {
         activate_current_message_save(e);
     }
-    // TODO: return false if something fails in spawn_compiler()
-    return true;
+    return ok;
 }
 
 static bool cmd_copy(EditorState *e, const CommandArgs *a)

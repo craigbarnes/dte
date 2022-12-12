@@ -1,6 +1,7 @@
 #ifndef SPAWN_H
 #define SPAWN_H
 
+#include <stdbool.h>
 #include "compiler.h"
 #include "editor.h"
 #include "msg.h"
@@ -31,6 +32,6 @@ typedef struct {
 } SpawnContext;
 
 int spawn(SpawnContext *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
-void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs) NONNULL_ARGS;
+bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif
