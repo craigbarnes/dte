@@ -40,18 +40,15 @@ void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after)
     }
 
     BUG_ON(clip->len == 0);
+    if (!clip->is_lines || type == PASTE_LINES_INLINE) {
+        insert_text(view, clip->buf, clip->len, move_after);
+        return;
+    }
+
     size_t del_count = 0;
     if (view->selection) {
         del_count = prepare_selection(view);
         unselect(view);
-    }
-
-    if (!clip->is_lines || type == PASTE_LINES_INLINE) {
-        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
-        if (move_after) {
-            block_iter_skip_bytes(&view->cursor, clip->len);
-        }
-        return;
     }
 
     const long x = view_get_preferred_x(view);
