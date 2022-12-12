@@ -1560,13 +1560,11 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     bool new_locked = false;
     if (a->nr_args > 0) {
         if (args[0][0] == '\0') {
-            error_msg("Empty filename not allowed");
-            goto error;
+            return error_msg("Empty filename not allowed");
         }
         char *tmp = path_absolute(args[0]);
         if (!tmp) {
-            error_msg("Failed to make absolute path: %s", strerror(errno));
-            goto error;
+            return error_msg("Failed to make absolute path: %s", strerror(errno));
         }
         if (absolute && streq(tmp, absolute)) {
             free(tmp);
@@ -1575,22 +1573,15 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
     } else {
         if (!absolute) {
-            bool prompt = has_flag(a, 'p');
-            if (prompt) {
-                set_input_mode(e, INPUT_COMMAND);
-                cmdline_set_text(&e->cmdline, "save ");
-                // This branch is not really an error, but we still return via
-                // the "error" label because we need to clean up memory and
-                // that's all it's used for currently
-                goto error;
-            } else {
-                error_msg("No filename");
-                goto error;
+            if (!has_flag(a, 'p')) {
+                return error_msg("No filename");
             }
+            set_input_mode(e, INPUT_COMMAND);
+            cmdline_set_text(&e->cmdline, "save ");
+            return true;
         }
         if (buffer->readonly && !force) {
-            error_msg("Use -f to force saving read-only file");
-            goto error;
+            return error_msg("Use -f to force saving read-only file");
         }
     }
 
