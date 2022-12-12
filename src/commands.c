@@ -157,11 +157,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
     const char *cmd = a->args[1];
     KeyCode key;
     if (unlikely(!parse_key_string(&key, keystr))) {
-        // TODO: call error_msg() in both cases?
-        if (cmd) {
-            error_msg("invalid key string: %s", keystr);
-        }
-        return false;
+        return error_msg("invalid key string: %s", keystr);
     }
 
     const bool modes[] = {
