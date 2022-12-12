@@ -46,24 +46,28 @@ void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after)
         unselect(view);
     }
 
-    if (clip->is_lines && !at_cursor) {
-        const long x = view_get_preferred_x(view);
-        if (!del_count) {
-            block_iter_eat_line(&view->cursor);
-        }
-        buffer_replace_bytes(view, del_count, clip->buf, clip->len);
-        if (move_after) {
-            block_iter_skip_bytes(&view->cursor, clip->len);
-        } else {
-            // Try to keep cursor column
-            move_to_preferred_x(view, x);
-        }
-        // New preferred_x
-        view_reset_preferred_x(view);
-    } else {
+    if (!clip->is_lines || at_cursor) {
         buffer_replace_bytes(view, del_count, clip->buf, clip->len);
         if (move_after) {
             block_iter_skip_bytes(&view->cursor, clip->len);
         }
+        return;
     }
+
+    const long x = view_get_preferred_x(view);
+    if (!del_count) {
+        block_iter_eat_line(&view->cursor);
+    }
+
+    buffer_replace_bytes(view, del_count, clip->buf, clip->len);
+
+    if (move_after) {
+        block_iter_skip_bytes(&view->cursor, clip->len);
+    } else {
+        // Try to keep cursor column
+        move_to_preferred_x(view, x);
+    }
+
+    // New preferred_x
+    view_reset_preferred_x(view);
 }
