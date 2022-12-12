@@ -261,7 +261,7 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof(buf));
     if (chdir(dir) != 0) {
-        return error_msg("changing directory failed: %s", strerror(errno));
+        return perror_msg("changing directory failed");
     }
 
     if (likely(cwd)) {
@@ -414,7 +414,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         }
         char *buf = block_iter_get_bytes(&view->cursor, size);
         if (!term_osc52_copy(&term->obuf, buf, size, clipboard, primary)) {
-            error_msg("%s", strerror(errno));
+            perror_msg("OSC 52 copy failed");
         }
         free(buf);
     }
@@ -1575,7 +1575,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
         char *tmp = path_absolute(args[0]);
         if (!tmp) {
-            return error_msg("Failed to make absolute path: %s", strerror(errno));
+            return perror_msg("Failed to make absolute path");
         }
         if (absolute && streq(tmp, absolute)) {
             free(tmp);

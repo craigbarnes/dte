@@ -192,7 +192,7 @@ static int open_dev_null(int flags)
 {
     int fd = xopen("/dev/null", flags | O_CLOEXEC, 0);
     if (unlikely(fd < 0)) {
-        error_msg("Error opening /dev/null: %s", strerror(errno));
+        perror_msg("Error opening /dev/null");
     }
     return fd;
 }
