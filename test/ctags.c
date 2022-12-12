@@ -6,6 +6,22 @@
 #include "util/xmalloc.h"
 #include "util/xreadwrite.h"
 
+static void test_parse_ctags_line(TestContext *ctx)
+{
+    static const char line[] = "foo\tfile.c\t/^int foo(char *s)$/;\"\tf\tfile:";
+    Tag tag = {.pattern = NULL};
+    EXPECT_TRUE(parse_ctags_line(&tag, line, sizeof(line) - 1));
+    EXPECT_EQ(tag.name.length, 3);
+    EXPECT_PTREQ(tag.name.data, line);
+    EXPECT_EQ(tag.filename.length, 6);
+    EXPECT_PTREQ(tag.filename.data, line + 4);
+    EXPECT_STREQ(tag.pattern, "^int foo(char \\*s)$");
+    EXPECT_EQ(tag.lineno, 0);
+    EXPECT_EQ(tag.kind, 'f');
+    EXPECT_EQ(tag.local, true);
+    free_tag(&tag);
+}
+
 static void test_next_tag(TestContext *ctx)
 {
     static const struct {
@@ -54,6 +70,7 @@ static void test_next_tag(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_parse_ctags_line),
     TEST(test_next_tag),
 };
 
