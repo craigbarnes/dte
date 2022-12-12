@@ -40,7 +40,7 @@ size_t block_iter_eat_line(BlockIter *bi)
 
 /*
  * Move to beginning of next line.
- * If there is no next line iterator is not advanced.
+ * If there is no next line, iterator is not advanced.
  * Returns number of bytes iterator advanced.
  */
 size_t block_iter_next_line(BlockIter *bi)
