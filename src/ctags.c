@@ -100,7 +100,9 @@ bool parse_ctags_line(Tag *t, const char *line, size_t line_len)
      * typeref:struct:NAME::MEMBER_TYPE   MEMBER_TYPE is type of the tag
      */
     if (line[pos++] != '\t') {
-        free_tag(t); // free `pattern` allocated by parse_ex_cmd()
+        // free `pattern` allocated by parse_ex_cmd()
+        free_tag(t);
+        t->pattern = NULL;
         return false;
     }
 

@@ -21,6 +21,11 @@ static void test_parse_ctags_line(TestContext *ctx)
     EXPECT_EQ(tag.local, true);
     free_tag(&tag);
 
+    line = "name\tfile.c\t/^char after pattern with no tab delimiter/t";
+    tag = (Tag){.pattern = NULL};
+    EXPECT_FALSE(parse_ctags_line(&tag, line, strlen(line)));
+    free_tag(&tag);
+
     line = "bar\tsource.c\t/^unterminated pattern\tf";
     EXPECT_FALSE(parse_ctags_line(&tag, line, strlen(line)));
     free_tag(&tag);
