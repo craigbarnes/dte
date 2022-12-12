@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ctags.h"
+#include "util/debug.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
@@ -83,6 +84,7 @@ bool parse_ctags_line(Tag *t, const char *line, size_t line_len)
     // excmd can contain tabs
     size_t len = parse_ex_cmd(t, line + pos, line_len - pos);
     if (len == 0) {
+        BUG_ON(t->pattern);
         return false;
     }
 
