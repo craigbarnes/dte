@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -39,12 +38,12 @@ void add_message(MessageArray *msgs, Message *m)
     ptr_array_append(&msgs->array, m);
 }
 
-void activate_current_message(EditorState *e)
+bool activate_current_message(EditorState *e)
 {
     const MessageArray *msgs = &e->messages;
     size_t count = msgs->array.count;
     if (count == 0) {
-        return;
+        return true;
     }
 
     size_t pos = msgs->pos;
@@ -53,7 +52,7 @@ void activate_current_message(EditorState *e)
     const FileLocation *loc = m->loc;
     if (loc && loc->filename && !file_location_go(e->window, loc)) {
         // Failed to jump to location; error message is visible
-        return;
+        return false;
     }
 
     if (count == 1) {
@@ -61,14 +60,16 @@ void activate_current_message(EditorState *e)
     } else {
         info_msg("[%zu/%zu] %s", pos + 1, count, m->msg);
     }
+
+    return true;
 }
 
-void activate_current_message_save(EditorState *e)
+bool activate_current_message_save(EditorState *e)
 {
     const View *view = e->view;
     const BlockIter save = view->cursor;
     FileLocation *loc = get_current_file_location(view);
-    activate_current_message(e);
+    bool ok = activate_current_message(e);
 
     // Save position if file changed or cursor moved
     view = e->view;
@@ -77,6 +78,8 @@ void activate_current_message_save(EditorState *e)
     } else {
         file_location_free(loc);
     }
+
+    return ok;
 }
 
 void clear_messages(MessageArray *msgs)

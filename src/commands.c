@@ -970,7 +970,6 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     MessageArray *msgs = &e->messages;
     size_t count = msgs->array.count;
     if (count == 0) {
-        // TODO: return false?
         return true;
     }
 
@@ -988,9 +987,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     }
 
     msgs->pos = p;
-    activate_current_message(e);
-    // TODO: make activate_current_message() return bool and use here
-    return true;
+    return activate_current_message(e);
 }
 
 static bool cmd_new_line(EditorState *e, const CommandArgs *a)
@@ -2016,8 +2013,8 @@ static bool cmd_tag(EditorState *e, const CommandArgs *a)
 
     const char *filename = e->buffer->abs_filename;
     size_t ntags = tag_lookup(&e->tagfile, name, filename, &e->messages);
-    activate_current_message_save(e);
     free(word);
+    activate_current_message_save(e);
     return (ntags > 0);
 }
 
