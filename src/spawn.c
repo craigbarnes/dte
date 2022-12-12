@@ -279,7 +279,7 @@ void spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
 
     yield_terminal(ctx->editor, quiet);
     pid_t pid = fork_exec(ctx->argv, NULL, fd, quiet);
-    if (pid < 0) {
+    if (pid == -1) {
         exec_error(ctx->argv[0]);
         xclose(p[1]);
         prompt = false;
@@ -370,7 +370,7 @@ int spawn(SpawnContext *ctx)
 
     yield_terminal(ctx->editor, quiet);
     pid_t pid = fork_exec(ctx->argv, ctx->env, child_fds, quiet);
-    if (pid < 0) {
+    if (pid == -1) {
         exec_error(ctx->argv[0]);
         goto error_resume;
     }

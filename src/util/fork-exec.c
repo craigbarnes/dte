@@ -124,7 +124,7 @@ pid_t fork_exec(const char **argv, const char **env, int fd[3], bool drop_ctty)
     }
 
     const pid_t pid = fork();
-    if (unlikely(pid < 0)) {
+    if (unlikely(pid == -1)) {
         int saved_errno = errno;
         xclose(ep[0]);
         xclose(ep[1]);
