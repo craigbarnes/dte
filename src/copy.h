@@ -12,9 +12,15 @@ typedef struct {
     bool is_lines;
 } Clipboard;
 
+typedef enum {
+    PASTE_LINES_BELOW_CURSOR,
+    PASTE_LINES_ABOVE_CURSOR,
+    PASTE_LINES_INLINE,
+} PasteLinesType;
+
 void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines);
 void copy(Clipboard *clip, View *view, size_t len, bool is_lines);
 void cut(Clipboard *clip, View *view, size_t len, bool is_lines);
-void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after);
+void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after);
 
 #endif

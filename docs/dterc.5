@@ -142,7 +142,7 @@ Editing Commands:
 .br
    \fBcopy\fR [\fB\-bikp\fR]
 .br
-   \fBpaste\fR [\fB\-cm\fR]
+   \fBpaste\fR [\fB\-m\fR] [\fB\-a\fR|\fB\-c\fR]
 .br
    \fBundo\fR
 .br
@@ -1358,15 +1358,23 @@ copy\ \-ib
 .fi
 .PP
 .RE
-\fBpaste\fR [\fB\-cm\fR]
+\fBpaste\fR [\fB\-m\fR] [\fB\-a\fR|\fB\-c\fR]
 .RS
-Paste text previously copied by the \fBcopy\fR or \fBcut\fR commands.
+Insert text previously copied by the \fBcopy\fR or \fBcut\fR commands.
+.P
+If the text to be inserted was copied from a whole\-line selection
+(e.g. \fBdown \-l; copy\fR) or as a whole, single line (e.g. \fBunselect; copy\fR)
+the default behaviour is to insert the text at the start of the line
+below the cursor.
 .P
 .TP
+\fB\-a\fR
+Paste above the cursor (instead of below), if pasting whole lines
+.PP
+.TP
 \fB\-c\fR
-Paste at the cursor position, even when the text was copied as
-a whole\-line selection (where the usual default is to paste at
-the start of the next line)
+Always paste directly at the cursor position, even when pasting
+whole lines (instead of below/above the cursor)
 .PP
 .TP
 \fB\-m\fR

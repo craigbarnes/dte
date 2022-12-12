@@ -33,7 +33,7 @@ void cut(Clipboard *clip, View *view, size_t len, bool is_lines)
     }
 }
 
-void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after)
+void paste(Clipboard *clip, View *view, PasteLinesType type, bool move_after)
 {
     if (!clip->buf) {
         return;
@@ -46,7 +46,7 @@ void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after)
         unselect(view);
     }
 
-    if (!clip->is_lines || at_cursor) {
+    if (!clip->is_lines || type == PASTE_LINES_INLINE) {
         buffer_replace_bytes(view, del_count, clip->buf, clip->len);
         if (move_after) {
             block_iter_skip_bytes(&view->cursor, clip->len);
@@ -56,7 +56,12 @@ void paste(Clipboard *clip, View *view, bool at_cursor, bool move_after)
 
     const long x = view_get_preferred_x(view);
     if (!del_count) {
-        block_iter_eat_line(&view->cursor);
+        if (type == PASTE_LINES_BELOW_CURSOR) {
+            block_iter_eat_line(&view->cursor);
+        } else {
+            BUG_ON(type != PASTE_LINES_ABOVE_CURSOR);
+            block_iter_bol(&view->cursor);
+        }
     }
 
     buffer_replace_bytes(view, del_count, clip->buf, clip->len);

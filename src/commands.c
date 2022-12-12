@@ -1200,9 +1200,20 @@ static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 
 static bool cmd_paste(EditorState *e, const CommandArgs *a)
 {
-    bool at_cursor = has_flag(a, 'c');
     bool move_after = has_flag(a, 'm');
-    paste(&e->clipboard, e->view, at_cursor, move_after);
+    bool above_cursor = has_flag(a, 'a');
+    bool at_cursor = has_flag(a, 'c');
+    PasteLinesType type = PASTE_LINES_BELOW_CURSOR;
+
+    if (above_cursor && at_cursor) {
+        return error_msg("flags -a and -c are mutually exclusive");
+    } else if (above_cursor) {
+        type = PASTE_LINES_ABOVE_CURSOR;
+    } else if (at_cursor) {
+        type = PASTE_LINES_INLINE;
+    }
+
+    paste(&e->clipboard, e->view, type, move_after);
     return true;
 }
 
@@ -2335,7 +2346,7 @@ static const Command cmds[] = {
     {"next", "", false, 0, 0, cmd_next},
     {"open", "e=gt", false, 0, -1, cmd_open},
     {"option", "-r", true, 3, -1, cmd_option},
-    {"paste", "cm", false, 0, 0, cmd_paste},
+    {"paste", "acm", false, 0, 0, cmd_paste},
     {"pgdown", "cl", false, 0, 0, cmd_pgdown},
     {"pgup", "cl", false, 0, 0, cmd_pgup},
     {"prev", "", false, 0, 0, cmd_prev},

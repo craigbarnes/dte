@@ -840,14 +840,21 @@ copying to multiple targets in a single command. For example:
 
     copy -ib
 
-### **paste** [**-cm**]
+### **paste** [**-m**] [**-a**|**-c**]
 
-Paste text previously copied by the [`copy`] or [`cut`] commands.
+Insert text previously copied by the [`copy`] or [`cut`] commands.
+
+If the text to be inserted was copied from a whole-line selection
+(e.g. `down -l; copy`) or as a whole, single line (e.g. `unselect; copy`)
+the default behaviour is to insert the text at the start of the line
+below the cursor.
+
+`-a`
+:   Paste above the cursor (instead of below), if pasting whole lines
 
 `-c`
-:   Paste at the cursor position, even when the text was copied as
-    a whole-line selection (where the usual default is to paste at
-    the start of the next line)
+:   Always paste directly at the cursor position, even when pasting
+    whole lines (instead of below/above the cursor)
 
 `-m`
 :   Move after the pasted text
