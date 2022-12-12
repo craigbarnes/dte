@@ -106,13 +106,11 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
 {
     KeyCode key;
     if (!parse_key_string(&key, keystr)) {
-        error_msg("invalid key string: %s", keystr);
-        return false;
+        return error_msg("invalid key string: %s", keystr);
     }
 
     if (u_is_unicode(key)) {
-        error_msg("%s is not a bindable key", keystr);
-        return false;
+        return error_msg("%s is not a bindable key", keystr);
     }
 
     const CachedCommand *b = lookup_binding(&e->modes[INPUT_NORMAL].key_bindings, key);
@@ -157,8 +155,7 @@ static bool show_cursor(EditorState *e, const char *mode_str, bool cflag)
 {
     CursorInputMode mode = cursor_mode_from_str(mode_str);
     if (mode >= NR_CURSOR_MODES) {
-        error_msg("no cursor entry for '%s'", mode_str);
-        return false;
+        return error_msg("no cursor entry for '%s'", mode_str);
     }
 
     TermCursorStyle style = e->cursor_styles[mode];
@@ -208,8 +205,7 @@ static bool show_include(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
-        error_msg("no built-in config with name '%s'", name);
-        return false;
+        return error_msg("no built-in config with name '%s'", name);
     }
 
     const StringView sv = cfg->text;
@@ -246,8 +242,7 @@ static bool show_option(EditorState *e, const char *name, bool cflag)
 {
     const char *value = get_option_value_string(e, name);
     if (!value) {
-        error_msg("invalid option name: %s", name);
-        return false;
+        return error_msg("invalid option name: %s", name);
     }
 
     if (cflag) {
@@ -273,8 +268,7 @@ static void do_collect_cursor_modes(EditorState* UNUSED_ARG(e), PointerArray *a,
 static bool show_wsplit(EditorState *e, const char *name, bool cflag)
 {
     if (!streq(name, "this")) {
-        error_msg("invalid window: %s", name);
-        return false;
+        return error_msg("invalid window: %s", name);
     }
 
     const Window *w = e->window;
@@ -480,14 +474,12 @@ bool show(EditorState *e, const char *type, const char *key, bool cflag)
 {
     const ShowHandler *handler = BSEARCH(type, show_handlers, vstrcmp);
     if (!handler) {
-        error_msg("invalid argument: '%s'", type);
-        return false;
+        return error_msg("invalid argument: '%s'", type);
     }
 
     if (key) {
         if (!handler->show) {
-            error_msg("'show %s' doesn't take extra arguments", type);
-            return false;
+            return error_msg("'show %s' doesn't take extra arguments", type);
         }
         return handler->show(e, key, cflag);
     }

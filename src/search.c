@@ -120,8 +120,7 @@ bool search_tag(View *view, const char *pattern)
     if (!found) {
         // Don't center view to cursor unnecessarily
         view->force_center = false;
-        error_msg("Tag not found");
-        return false;
+        return error_msg("Tag not found");
     }
 
     view->center_on_scroll = true;
@@ -194,8 +193,7 @@ void search_set_regexp(SearchState *search, const char *pattern)
 static bool do_search_next(View *view, SearchState *search, SearchCaseSensitivity cs, bool skip)
 {
     if (!search->pattern) {
-        error_msg("No previous search pattern");
-        return false;
+        return error_msg("No previous search pattern");
     }
     if (!update_regex(search, cs)) {
         return false;
@@ -224,8 +222,7 @@ static bool do_search_next(View *view, SearchState *search, SearchCaseSensitivit
         }
     }
 
-    error_msg("Pattern '%s' not found", search->pattern);
-    return false;
+    return error_msg("Pattern '%s' not found", search->pattern);
 }
 
 bool search_prev(View *view, SearchState *search, SearchCaseSensitivity cs)

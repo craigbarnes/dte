@@ -115,17 +115,15 @@ static bool lock_or_unlock(const char *filename, bool lock)
         }
 
         if (errno != EEXIST) {
-            error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));
-            return false;
+            return error_msg("Error creating %s: %s", file_locks_lock, strerror(errno));
         }
         if (++tries == 3) {
             if (unlink(file_locks_lock)) {
-                error_msg (
+                return error_msg (
                     "Error removing stale lock file %s: %s",
                     file_locks_lock,
                     strerror(errno)
                 );
-                return false;
             }
             error_msg("Stale lock file %s removed", file_locks_lock);
         } else {

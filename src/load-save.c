@@ -258,12 +258,10 @@ bool load_buffer(Buffer *buffer, const char *filename, const GlobalOptions *gopt
 
     if (fd < 0) {
         if (errno != ENOENT) {
-            error_msg("Error opening %s: %s", filename, strerror(errno));
-            return false;
+            return error_msg("Error opening %s: %s", filename, strerror(errno));
         }
         if (must_exist) {
-            error_msg("File %s does not exist", filename);
-            return false;
+            return error_msg("File %s does not exist", filename);
         }
         fixup_blocks(buffer);
     } else {
@@ -321,8 +319,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
         size = bom->len;
         BUG_ON(size == 0);
         if (xwrite_all(fd, bom->bytes, size) < 0) {
-            perror_msg("write");
-            return false;
+            return perror_msg("write");
         }
     }
 
@@ -330,8 +327,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
     block_for_each(blk, &buffer->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
-            perror_msg("write");
-            return false;
+            return perror_msg("write");
         }
         size += rc;
     }
@@ -348,8 +344,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
 
     // Need to truncate if writing to existing file
     if (xftruncate(fd, size)) {
-        perror_msg("ftruncate");
-        return false;
+        return perror_msg("ftruncate");
     }
 
     return true;
@@ -409,8 +404,7 @@ bool save_buffer (
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            perror_msg("open");
-            return false;
+            return perror_msg("open");
         }
     }
 

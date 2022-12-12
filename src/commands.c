@@ -124,26 +124,22 @@ static bool cmd_alias(EditorState *e, const CommandArgs *a)
     const char *const cmd = a->args[1];
 
     if (unlikely(name[0] == '\0')) {
-        error_msg("Empty alias name not allowed");
-        return false;
+        return error_msg("Empty alias name not allowed");
     }
     if (unlikely(name[0] == '-')) {
         // Disallowing this simplifies auto-completion for "alias "
-        error_msg("Alias name cannot begin with '-'");
-        return false;
+        return error_msg("Alias name cannot begin with '-'");
     }
 
     for (size_t i = 0; name[i]; i++) {
         unsigned char c = name[i];
         if (unlikely(!(is_word_byte(c) || c == '-' || c == '?' || c == '!'))) {
-            error_msg("Invalid byte in alias name: %c (0x%02hhX)", c, c);
-            return false;
+            return error_msg("Invalid byte in alias name: %c (0x%02hhX)", c, c);
         }
     }
 
     if (unlikely(find_normal_command(name))) {
-        error_msg("Can't replace existing command %s with an alias", name);
-        return false;
+        return error_msg("Can't replace existing command %s with an alias", name);
     }
 
     HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
@@ -256,23 +252,20 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
 {
     const char *dir = a->args[0];
     if (unlikely(dir[0] == '\0')) {
-        error_msg("directory argument cannot be empty");
-        return false;
+        return error_msg("directory argument cannot be empty");
     }
 
     if (streq(dir, "-")) {
         dir = getenv("OLDPWD");
         if (!dir || dir[0] == '\0') {
-            error_msg("OLDPWD not set");
-            return false;
+            return error_msg("OLDPWD not set");
         }
     }
 
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof(buf));
     if (chdir(dir) != 0) {
-        error_msg("changing directory failed: %s", strerror(errno));
-        return false;
+        return error_msg("changing directory failed: %s", strerror(errno));
     }
 
     if (likely(cwd)) {
@@ -319,11 +312,10 @@ static bool cmd_close(EditorState *e, const CommandArgs *a)
     if (!force && !view_can_close(e->view)) {
         bool prompt = has_flag(a, 'p');
         if (!prompt) {
-            error_msg (
+            return error_msg (
                 "The buffer is modified; "
                 "save or run 'close -f' to close without saving"
             );
-            return false;
         }
         static const char str[] = "Close without saving changes? [y/N]";
         if (dialog_prompt(e, str, "ny") != 'y') {
@@ -368,8 +360,7 @@ static bool cmd_compile(EditorState *e, const CommandArgs *a)
 
     Compiler *c = find_compiler(&e->compilers, a->args[0]);
     if (unlikely(!c)) {
-        error_msg("No such error parser %s", a->args[0]);
-        return false;
+        return error_msg("No such error parser %s", a->args[0]);
     }
 
     SpawnContext ctx = {
@@ -455,24 +446,21 @@ static bool cmd_cursor(EditorState *e, const CommandArgs *a)
 
     CursorInputMode mode = cursor_mode_from_str(a->args[0]);
     if (unlikely(mode >= NR_CURSOR_MODES)) {
-        error_msg("invalid mode argument: %s", a->args[0]);
-        return false;
+        return error_msg("invalid mode argument: %s", a->args[0]);
     }
 
     TermCursorStyle style = get_default_cursor_style(mode);
     if (a->nr_args >= 2) {
         style.type = cursor_type_from_str(a->args[1]);
         if (unlikely(style.type == CURSOR_INVALID)) {
-            error_msg("invalid cursor type: %s", a->args[1]);
-            return false;
+            return error_msg("invalid cursor type: %s", a->args[1]);
         }
     }
 
     if (a->nr_args >= 3) {
         style.color = cursor_color_from_str(a->args[2]);
         if (unlikely(style.color == COLOR_INVALID)) {
-            error_msg("invalid cursor color: %s", a->args[2]);
-            return false;
+            return error_msg("invalid cursor color: %s", a->args[2]);
         }
     }
 
@@ -646,8 +634,7 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
         const char *action_name = a->args[argidx++];
         ExecAction action = lookup_exec_action(action_name, fd);
         if (unlikely(action == EXEC_INVALID)) {
-            error_msg("invalid action for -%c: '%s'", a->flags[i], action_name);
-            return false;
+            return error_msg("invalid action for -%c: '%s'", a->flags[i], action_name);
         }
         actions[fd] = action;
     }
@@ -674,8 +661,7 @@ static bool cmd_ft(EditorState *e, const CommandArgs *a)
     char **args = a->args;
     const char *filetype = args[0];
     if (unlikely(!is_valid_filetype_name(filetype))) {
-        error_msg("Invalid filetype name: '%s'", filetype);
-        return false;
+        return error_msg("Invalid filetype name: '%s'", filetype);
     }
 
     FileDetectionType dt = FT_EXTENSION;
@@ -719,11 +705,9 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
     if (unlikely(n != strs_len)) {
         BUG_ON(n > strs_len);
         if (n < 0) {
-            error_msg("too many colors");
-        } else {
-            error_msg("invalid color or attribute: '%s'", strs[n]);
+            return error_msg("too many colors");
         }
-        return false;
+        return error_msg("invalid color or attribute: '%s'", strs[n]);
     }
 
     bool optimize = e->options.optimize_true_color;
@@ -798,8 +782,7 @@ static bool cmd_line(EditorState *e, const CommandArgs *a)
     const long x = view_get_preferred_x(view);
     size_t line;
     if (unlikely(!str_to_size(arg, &line) || line == 0)) {
-        error_msg("Invalid line number: %s", arg);
-        return false;
+        return error_msg("Invalid line number: %s", arg);
     }
 
     do_selection(view, SELECT_NONE);
@@ -822,8 +805,7 @@ static bool cmd_load_syntax(EditorState *e, const CommandArgs *a)
 
     const char *filetype = slash + 1;
     if (find_syntax(&e->syntaxes, filetype)) {
-        error_msg("Syntax for filetype %s already loaded", filetype);
-        return false;
+        return error_msg("Syntax for filetype %s already loaded", filetype);
     }
 
     int err;
@@ -879,8 +861,7 @@ static bool cmd_macro(EditorState *e, const CommandArgs *a)
         goto message;
     }
 
-    error_msg("Unknown action '%s'", action);
-    return false;
+    return error_msg("Unknown action '%s'", action);
 
 message:
     info_msg("%s", msg);
@@ -894,8 +875,7 @@ static bool cmd_match_bracket(EditorState *e, const CommandArgs *a)
     View *view = e->view;
     CodePoint cursor_char;
     if (!block_iter_get_char(&view->cursor, &cursor_char)) {
-        error_msg("No character under cursor");
-        return false;
+        return error_msg("No character under cursor");
     }
 
     CodePoint target = cursor_char;
@@ -921,8 +901,7 @@ static bool cmd_match_bracket(EditorState *e, const CommandArgs *a)
         target--;
         goto search_bwd;
     default:
-        error_msg("Character under cursor not matchable");
-        return false;
+        return error_msg("Character under cursor not matchable");
     }
 
 search_fwd:
@@ -956,8 +935,7 @@ search_bwd:
     }
 
 not_found:
-    error_msg("No matching bracket found");
-    return false;
+    return error_msg("No matching bracket found");
 }
 
 static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
@@ -973,8 +951,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
         to = size_increment_wrapped(from, ntabs);
     } else {
         if (!str_to_size(str, &to) || to == 0) {
-            error_msg("Invalid tab position %s", str);
-            return false;
+            return error_msg("Invalid tab position %s", str);
         }
         to--;
         if (to >= ntabs) {
@@ -991,8 +968,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
     const char *str = a->args[0];
     uint_least64_t np = cmdargs_flagset_value('n') | cmdargs_flagset_value('p');
     if (u64_popcount(a->flag_set & np) + !!str >= 2) {
-        error_msg("flags [-n|-p] and [number] argument are mutually exclusive");
-        return false;
+        return error_msg("flags [-n|-p] and [number] argument are mutually exclusive");
     }
 
     MessageArray *msgs = &e->messages;
@@ -1010,8 +986,7 @@ static bool cmd_msg(EditorState *e, const CommandArgs *a)
         p = p ? p - 1 : 0;
     } else if (str) {
         if (!str_to_size(str, &p) || p == 0) {
-            error_msg("invalid message index: %s", str);
-            return false;
+            return error_msg("invalid message index: %s", str);
         }
         p = MIN(p - 1, count - 1);
     }
@@ -1055,17 +1030,15 @@ static bool xglob(char **args, glob_t *globbuf)
     }
 
     BUG_ON(err == GLOB_NOMATCH);
-    error_msg("glob: %s", (err == GLOB_NOSPACE) ? strerror(ENOMEM) : "failed");
     globfree(globbuf);
-    return false;
+    return error_msg("glob: %s", (err == GLOB_NOSPACE) ? strerror(ENOMEM) : "failed");
 }
 
 static bool cmd_open(EditorState *e, const CommandArgs *a)
 {
     bool temporary = has_flag(a, 't');
     if (unlikely(temporary && a->nr_args > 0)) {
-        error_msg("'open -t' can't be used with filename arguments");
-        return false;
+        return error_msg("'open -t' can't be used with filename arguments");
     }
 
     const char *requested_encoding = NULL;
@@ -1087,15 +1060,13 @@ static bool cmd_open(EditorState *e, const CommandArgs *a)
             encoding = encoding_from_name(requested_encoding);
         } else {
             if (errno == EINVAL) {
-                error_msg("Unsupported encoding '%s'", requested_encoding);
-            } else {
-                error_msg (
-                    "iconv conversion from '%s' failed: %s",
-                    requested_encoding,
-                    strerror(errno)
-                );
+                return error_msg("Unsupported encoding '%s'", requested_encoding);
             }
-            return false;
+            return error_msg (
+                "iconv conversion from '%s' failed: %s",
+                requested_encoding,
+                strerror(errno)
+            );
         }
     }
 
@@ -1139,8 +1110,7 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args < 3);
     size_t nstrs = a->nr_args - 1;
     if (unlikely(nstrs & 1)) {
-        error_msg("Missing option value");
-        return false;
+        return error_msg("Missing option value");
     }
 
     char **strs = a->args + 1;
@@ -1333,13 +1303,11 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     int exit_code = EDITOR_EXIT_OK;
     if (a->nr_args) {
         if (!str_to_int(a->args[0], &exit_code)) {
-            error_msg("Not a valid integer argument: '%s'", a->args[0]);
-            return false;
+            return error_msg("Not a valid integer argument: '%s'", a->args[0]);
         }
         int max = EDITOR_EXIT_MAX;
         if (exit_code < 0 || exit_code > max) {
-            error_msg("Exit code should be between 0 and %d", max);
-            return false;
+            return error_msg("Exit code should be between 0 and %d", max);
         }
     }
 
@@ -1362,8 +1330,7 @@ static bool cmd_quit(EditorState *e, const CommandArgs *a)
     set_view(view ? view : first_modified);
 
     if (!has_flag(a, 'p')) {
-        error_msg("Save modified files or run 'quit -f' to quit without saving");
-        return false;
+        return error_msg("Save modified files or run 'quit -f' to quit without saving");
     }
 
     char question[128];
@@ -1390,8 +1357,7 @@ static bool cmd_redo(EditorState *e, const CommandArgs *a)
     unsigned long change_id = 0;
     if (arg) {
         if (!str_to_ulong(arg, &change_id) || change_id == 0) {
-            error_msg("Invalid change id: %s", arg);
-            return false;
+            return error_msg("Invalid change id: %s", arg);
         }
     }
     if (!redo(e->view, change_id)) {
@@ -1414,16 +1380,14 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
     size_t str_len = strlen(str);
     size_t bufsize;
     if (unlikely(size_multiply_overflows(count, str_len, &bufsize))) {
-        error_msg("Repeated insert would overflow");
-        return false;
+        return error_msg("Repeated insert would overflow");
     }
     if (unlikely(bufsize == 0)) {
         return true;
     }
     char *buf = malloc(bufsize);
     if (unlikely(!buf)) {
-        perror_msg("malloc");
-        return false;
+        return perror_msg("malloc");
     }
 
     char tmp[4096];
@@ -1473,8 +1437,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 {
     unsigned int count;
     if (unlikely(!str_to_uint(a->args[0], &count))) {
-        error_msg("Not a valid repeat count: %s", a->args[0]);
-        return false;
+        return error_msg("Not a valid repeat count: %s", a->args[0]);
     }
     if (unlikely(count == 0)) {
         return true;
@@ -1482,8 +1445,7 @@ static bool cmd_repeat(EditorState *e, const CommandArgs *a)
 
     const Command *cmd = find_normal_command(a->args[1]);
     if (unlikely(!cmd)) {
-        error_msg("No such command: %s", a->args[1]);
-        return false;
+        return error_msg("No such command: %s", a->args[1]);
     }
 
     CommandArgs a2 = cmdargs_new(a->args + 2);
@@ -1548,8 +1510,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
     bool unix_nl = has_flag(a, 'u');
     bool crlf = buffer->crlf_newlines;
     if (unlikely(dos_nl && unix_nl)) {
-        error_msg("flags -d and -u can't be used together");
-        return false;
+        return error_msg("flags -d and -u can't be used together");
     } else if (dos_nl) {
         crlf = true;
     } else if (unix_nl) {
@@ -1582,23 +1543,20 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
             }
         } else {
             if (errno == EINVAL) {
-                error_msg("Unsupported encoding '%s'", requested_encoding);
-            } else {
-                error_msg (
-                    "iconv conversion to '%s' failed: %s",
-                    requested_encoding,
-                    strerror(errno)
-                );
+                return error_msg("Unsupported encoding '%s'", requested_encoding);
             }
-            return false;
+            return error_msg (
+                "iconv conversion to '%s' failed: %s",
+                requested_encoding,
+                strerror(errno)
+            );
         }
     }
 
     bool b = has_flag(a, 'b');
     bool B = has_flag(a, 'B');
     if (unlikely(b && B)) {
-        error_msg("flags -b and -B can't be used together");
-        return false;
+        return error_msg("flags -b and -B can't be used together");
     } else if (b) {
         bom = true;
     } else if (B) {
@@ -1847,8 +1805,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 {
     const char *pattern = a->args[0];
     if (u64_popcount(a->flag_set & get_flagset_npw()) + !!pattern >= 2) {
-        error_msg("flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
-        return false;
+        return error_msg("flags [-n|-p|-w] and [pattern] argument are mutually exclusive");
     }
 
     View *view = e->view;
@@ -1859,14 +1816,13 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
         StringView word = view_get_word_under_cursor(view);
         if (word.length == 0) {
             // Error message would not be very useful here
-            return false; // TODO: return true?
+            return false;
         }
         const RegexpWordBoundaryTokens *rwbt = &e->regexp_word_tokens;
         const size_t bmax = sizeof(rwbt->start);
         static_assert_compatible_types(rwbt->start, char[8]);
         if (unlikely(word.length >= sizeof(pattbuf) - (bmax * 2))) {
-            error_msg("word under cursor too long");
-            return false;
+            return error_msg("word under cursor too long");
         }
         char *ptr = stpncpy(pattbuf, rwbt->start, bmax);
         memcpy(ptr, word.data, word.length);
@@ -1947,8 +1903,7 @@ static bool cmd_set(EditorState *e, const CommandArgs *a)
     bool local = has_flag(a, 'l');
     if (!e->buffer) {
         if (unlikely(local)) {
-            error_msg("Flag -l makes no sense in config file");
-            return false;
+            return error_msg("Flag -l makes no sense in config file");
         }
         global = true;
     }
@@ -1959,8 +1914,7 @@ static bool cmd_set(EditorState *e, const CommandArgs *a)
         return set_bool_option(e, args[0], local, global);
     }
     if (count & 1) {
-        error_msg("One or even number of arguments expected");
-        return false;
+        return error_msg("One or even number of arguments expected");
     }
 
     size_t errors = 0;
@@ -1977,8 +1931,7 @@ static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
 {
     const char *name = a->args[0];
     if (unlikely(streq(name, "DTE_VERSION"))) {
-        error_msg("$DTE_VERSION cannot be changed");
-        return false;
+        return error_msg("$DTE_VERSION cannot be changed");
     }
 
     const size_t nr_args = a->nr_args;
@@ -1995,11 +1948,10 @@ static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
     }
 
     if (errno == EINVAL) {
-        error_msg("Invalid environment variable name '%s'", name);
-    } else {
-        perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
+        return error_msg("Invalid environment variable name '%s'", name);
     }
-    return false;
+
+    return perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
 }
 
 static bool cmd_shift(EditorState *e, const CommandArgs *a)
@@ -2007,12 +1959,10 @@ static bool cmd_shift(EditorState *e, const CommandArgs *a)
     const char *arg = a->args[0];
     int count;
     if (!str_to_int(arg, &count)) {
-        error_msg("Invalid number: %s", arg);
-        return false;
+        return error_msg("Invalid number: %s", arg);
     }
     if (count == 0) {
-        error_msg("Count must be non-zero");
-        return false;
+        return error_msg("Count must be non-zero");
     }
     shift_lines(e->view, count);
     return true;
@@ -2022,8 +1972,7 @@ static bool cmd_show(EditorState *e, const CommandArgs *a)
 {
     bool write_to_cmdline = has_flag(a, 'c');
     if (write_to_cmdline && a->nr_args < 2) {
-        error_msg("\"show -c\" requires 2 arguments");
-        return false;
+        return error_msg("\"show -c\" requires 2 arguments");
     }
     return show(e, a->args[0], a->args[1], write_to_cmdline);
 }
@@ -2037,8 +1986,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
     }
 
     if (e->session_leader) {
-        error_msg("Session leader can't suspend");
-        return false;
+        return error_msg("Session leader can't suspend");
     }
 
     ui_end(e);
@@ -2081,8 +2029,7 @@ static bool cmd_title(EditorState *e, const CommandArgs *a)
 {
     Buffer *buffer = e->buffer;
     if (buffer->abs_filename) {
-        error_msg("saved buffers can't be retitled");
-        return false;
+        return error_msg("saved buffers can't be retitled");
     }
     set_display_filename(buffer, xstrdup(a->args[0]));
     mark_buffer_tabbars_changed(buffer);
@@ -2137,8 +2084,7 @@ static bool cmd_view(EditorState *e, const CommandArgs *a)
         idx = window->views.count - 1;
     } else {
         if (!str_to_size(arg, &idx) || idx == 0) {
-            error_msg("Invalid view index: %s", arg);
-            return false;
+            return error_msg("Invalid view index: %s", arg);
         }
         idx = MIN(idx, window->views.count) - 1;
     }
@@ -2157,11 +2103,10 @@ static bool cmd_wclose(EditorState *e, const CommandArgs *a)
     bool prompt = has_flag(a, 'p');
     set_view(view);
     if (!prompt) {
-        error_msg (
+        return error_msg (
             "Save modified files or run 'wclose -f' to close "
             "window without saving"
         );
-        return false;
     }
 
     if (dialog_prompt(e, "Close window without saving? [y/N]", "ny") != 'y') {
@@ -2229,8 +2174,7 @@ static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
     unsigned int width = e->buffer->options.text_width;
     if (arg) {
         if (!str_to_uint(arg, &width) || width < 1 || width > TEXT_WIDTH_MAX) {
-            error_msg("invalid paragraph width: %s", arg);
-            return false;
+            return error_msg("invalid paragraph width: %s", arg);
         }
     }
     format_paragraph(e->view, width);
@@ -2259,8 +2203,7 @@ static bool cmd_wresize(EditorState *e, const CommandArgs *a)
     if (arg) {
         int n;
         if (!str_to_int(arg, &n)) {
-            error_msg("Invalid resize value: %s", arg);
-            return false;
+            return error_msg("Invalid resize value: %s", arg);
         }
         if (arg[0] == '+' || arg[0] == '-') {
             add_to_frame_size(window->frame, dir, n);
@@ -2286,8 +2229,7 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
     bool empty = temporary || has_flag(a, 'n');
 
     if (unlikely(empty && a->nr_args > 0)) {
-        error_msg("flags -n and -t can't be used with filename arguments");
-        return false;
+        return error_msg("flags -n and -t can't be used with filename arguments");
     }
 
     char **paths = a->args;

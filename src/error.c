@@ -18,7 +18,7 @@ void clear_error(void)
     error_buf[0] = '\0';
 }
 
-void error_msg(const char *format, ...)
+bool error_msg(const char *format, ...)
 {
     const char *cmd = current_command ? current_command->name : NULL;
     const char *file = current_config.file;
@@ -58,11 +58,15 @@ void error_msg(const char *format, ...)
     }
 
     LOG_INFO("%s", error_buf);
+
+    // Always return false, to allow tail-calling as `return error_msg(...);`
+    // from command handlers, instead of `error_msg(...); return false;`
+    return false;
 }
 
-void perror_msg(const char *prefix)
+bool perror_msg(const char *prefix)
 {
-    error_msg("%s: %s", prefix, strerror(errno));
+    return error_msg("%s: %s", prefix, strerror(errno));
 }
 
 void info_msg(const char *format, ...)

@@ -169,18 +169,15 @@ static bool validate_statusline_format(const char *value)
     }
     char ch = value[errpos];
     if (ch == '\0') {
-        error_msg("Format character expected after '%%'");
-    } else {
-        error_msg("Invalid format character '%c'", ch);
+        return error_msg("Format character expected after '%%'");
     }
-    return false;
+    return error_msg("Invalid format character '%c'", ch);
 }
 
 static bool validate_filetype(const char *value)
 {
     if (!is_valid_filetype_name(value)) {
-        error_msg("Invalid filetype name '%s'", value);
-        return false;
+        return error_msg("Invalid filetype name '%s'", value);
     }
     return true;
 }
@@ -262,15 +259,13 @@ static bool uint_parse(const OptionDesc *d, const char *str, OptionValue *v)
 {
     unsigned int val;
     if (!str_to_uint(str, &val)) {
-        error_msg("Integer value for %s expected", d->name);
-        return false;
+        return error_msg("Integer value for %s expected", d->name);
     }
 
     const unsigned int min = d->u.uint_opt.min;
     const unsigned int max = d->u.uint_opt.max;
     if (val < min || val > max) {
-        error_msg("Value for %s must be in %u-%u range", d->name, min, max);
-        return false;
+        return error_msg("Value for %s must be in %u-%u range", d->name, min, max);
     }
 
     v->uint_val = val;
@@ -309,8 +304,7 @@ static bool bool_parse(const OptionDesc *d, const char *str, OptionValue *v)
         v->bool_val = false;
         return true;
     }
-    error_msg("Invalid value for %s", d->name);
-    return false;
+    return error_msg("Invalid value for %s", d->name);
 }
 
 static const char *bool_string(const OptionDesc* UNUSED_ARG(d), OptionValue v)
@@ -337,8 +331,7 @@ static bool enum_parse(const OptionDesc *d, const char *str, OptionValue *v)
 
     unsigned int val;
     if (!str_to_uint(str, &val) || val >= i) {
-        error_msg("Invalid value for %s", d->name);
-        return false;
+        return error_msg("Invalid value for %s", d->name);
     }
 
     v->uint_val = val;
@@ -372,8 +365,7 @@ static bool flag_parse(const OptionDesc *d, const char *str, OptionValue *v)
         }
         if (unlikely(!values[i])) {
             int flen = (int)flag.length;
-            error_msg("Invalid flag '%.*s' for %s", flen, flag.data, d->name);
-            return false;
+            return error_msg("Invalid flag '%.*s' for %s", flen, flag.data, d->name);
         }
     }
 
@@ -622,12 +614,10 @@ static bool do_set_option (
     bool global
 ) {
     if (local && !desc->local) {
-        error_msg("Option %s is not local", desc->name);
-        return false;
+        return error_msg("Option %s is not local", desc->name);
     }
     if (global && !desc->global) {
-        error_msg("Option %s is not global", desc->name);
-        return false;
+        return error_msg("Option %s is not global", desc->name);
     }
 
     OptionValue val;
@@ -667,8 +657,7 @@ bool set_bool_option(EditorState *e, const char *name, bool local, bool global)
         return false;
     }
     if (desc->type != OPT_BOOL) {
-        error_msg("Option %s is not boolean", desc->name);
-        return false;
+        return error_msg("Option %s is not boolean", desc->name);
     }
     return do_set_option(e, desc, "true", local, global);
 }
@@ -706,8 +695,7 @@ bool toggle_option(EditorState *e, const char *name, bool global, bool verbose)
     } else if (type == OPT_BOOL) {
         value.bool_val = !value.bool_val;
     } else {
-        error_msg("Toggling %s requires arguments", name);
-        return false;
+        return error_msg("Toggling %s requires arguments", name);
     }
 
     desc_set(e, desc, ptr, global, value);

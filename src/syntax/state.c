@@ -201,11 +201,10 @@ static bool cmd_bufis(SyntaxParser *sp, const CommandArgs *a)
     const size_t len = strlen(str);
     Condition *c;
     if (unlikely(len > ARRAYLEN(c->u.str.buf))) {
-        error_msg (
+        return error_msg (
             "Maximum length of string is %zu bytes",
             ARRAYLEN(c->u.str.buf)
         );
-        return false;
     }
 
     ConditionType type = a->flags[0] == 'i' ? COND_BUFIS_ICASE : COND_BUFIS;
@@ -223,8 +222,7 @@ static bool cmd_char(SyntaxParser *sp, const CommandArgs *a)
 {
     const char *chars = a->args[0];
     if (unlikely(chars[0] == '\0')) {
-        error_msg("char argument can't be empty");
-        return false;
+        return error_msg("char argument can't be empty");
     }
 
     bool add_to_buffer = cmdargs_has_flag(a, 'b');
@@ -364,8 +362,7 @@ static bool cmd_list(SyntaxParser *sp, const CommandArgs *a)
         list = xnew0(StringList, 1);
         hashmap_insert(&sp->current_syntax->string_lists, xstrdup(name), list);
     } else if (unlikely(list->defined)) {
-        error_msg("List '%s' already exists", name);
-        return false;
+        return error_msg("List '%s' already exists", name);
     }
     list->defined = true;
 
@@ -409,8 +406,7 @@ static bool cmd_noeat(SyntaxParser *sp, const CommandArgs *a)
     }
 
     if (unlikely(dest == sp->current_state)) {
-        error_msg("using noeat to jump to same state causes infinite loop");
-        return false;
+        return error_msg("using noeat to jump to same state causes infinite loop");
     }
 
     sp->current_state->default_action.destination = dest;
@@ -430,12 +426,10 @@ static bool cmd_recolor(SyntaxParser *sp, const CommandArgs *a)
     if (len_str) {
         type = COND_RECOLOR;
         if (unlikely(!str_to_size(len_str, &len))) {
-            error_msg("invalid number: '%s'", len_str);
-            return false;
+            return error_msg("invalid number: '%s'", len_str);
         }
         if (unlikely(len < 1 || len > 2500)) {
-            error_msg("number of bytes must be between 1-2500 (got %zu)", len);
-            return false;
+            return error_msg("number of bytes must be between 1-2500 (got %zu)", len);
         }
     }
 
@@ -498,14 +492,12 @@ static bool cmd_state(SyntaxParser *sp, const CommandArgs *a)
 
     const char *name = a->args[0];
     if (unlikely(streq(name, "END") || streq(name, "this"))) {
-        error_msg("'%s' is reserved state name", name);
-        return false;
+        return error_msg("'%s' is reserved state name", name);
     }
 
     State *state = find_or_add_state(sp, name);
     if (unlikely(state->defined)) {
-        error_msg("State '%s' already exists", name);
-        return false;
+        return error_msg("State '%s' already exists", name);
     }
 
     state->defined = true;
@@ -519,15 +511,13 @@ static bool cmd_str(SyntaxParser *sp, const CommandArgs *a)
     const char *str = a->args[0];
     size_t len = strlen(str);
     if (unlikely(len < 2)) {
-        error_msg("string should be at least 2 bytes; use 'char' for single bytes");
-        return false;
+        return error_msg("string should be at least 2 bytes; use 'char' for single bytes");
     }
 
     Condition *c;
     size_t maxlen = ARRAYLEN(c->u.str.buf);
     if (unlikely(len > maxlen)) {
-        error_msg("maximum length of string is %zu bytes", maxlen);
-        return false;
+        return error_msg("maximum length of string is %zu bytes", maxlen);
     }
 
     ConditionType type;

@@ -156,8 +156,7 @@ out:
 bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFlags flags)
 {
     if (unlikely(pattern[0] == '\0')) {
-        error_msg("Search pattern must contain at least 1 character");
-        return false;
+        return error_msg("Search pattern must contain at least 1 character");
     }
 
     int re_flags = REG_NEWLINE;

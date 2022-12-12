@@ -255,11 +255,9 @@ bool redo(View *view, unsigned long change_id)
     } else {
         if (--change_id >= nr_prev) {
             if (nr_prev == 1) {
-                error_msg("There is only 1 possible change to redo");
-            } else {
-                error_msg("There are only %lu possible changes to redo", nr_prev);
+                return error_msg("There is only 1 possible change to redo");
             }
-            return false;
+            return error_msg("There are only %lu possible changes to redo", nr_prev);
         }
     }
 
