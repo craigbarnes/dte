@@ -64,7 +64,7 @@ bool error_msg(const char *format, ...)
     return false;
 }
 
-bool perror_msg(const char *prefix)
+bool error_msg_errno(const char *prefix)
 {
     return error_msg("%s: %s", prefix, strerror(errno));
 }

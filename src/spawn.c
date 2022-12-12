@@ -123,7 +123,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             if (errno == EINTR) {
                 continue;
             }
-            perror_msg("poll");
+            error_msg_errno("poll");
             return;
         }
 
@@ -135,12 +135,12 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
                 char *buf = ctx->outputs[i].buffer + ctx->outputs[i].len;
                 ssize_t rc = xread(pfd->fd, buf, max_read);
                 if (unlikely(rc < 0)) {
-                    perror_msg("read");
+                    error_msg_errno("read");
                     return;
                 }
                 if (rc == 0) { // EOF
                     if (xclose(pfd->fd)) {
-                        perror_msg("close");
+                        error_msg_errno("close");
                         return;
                     }
                     pfd->fd = -1;
@@ -153,13 +153,13 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
         if (fds[0].revents & POLLOUT) {
             ssize_t rc = xwrite(fds[0].fd, ctx->input.data + wlen, ctx->input.length - wlen);
             if (unlikely(rc < 0)) {
-                perror_msg("write");
+                error_msg_errno("write");
                 return;
             }
             wlen += (size_t) rc;
             if (wlen == ctx->input.length) {
                 if (xclose(fds[0].fd)) {
-                    perror_msg("close");
+                    error_msg_errno("close");
                     return;
                 }
                 fds[0].fd = -1;
@@ -176,7 +176,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             }
             if (rev & POLLERR || (rev & (POLLHUP | POLLIN)) == POLLHUP) {
                 if (xclose(fds[i].fd)) {
-                    perror_msg("close");
+                    error_msg_errno("close");
                 }
                 fds[i].fd = -1;
                 active_fds--;
@@ -192,7 +192,7 @@ static int open_dev_null(int flags)
 {
     int fd = xopen("/dev/null", flags | O_CLOEXEC, 0);
     if (unlikely(fd < 0)) {
-        perror_msg("Error opening /dev/null");
+        error_msg_errno("Error opening /dev/null");
     }
     return fd;
 }
@@ -201,7 +201,7 @@ static int handle_child_error(pid_t pid)
 {
     int ret = wait_child(pid);
     if (ret < 0) {
-        perror_msg("waitpid");
+        error_msg_errno("waitpid");
     } else if (ret >= 256) {
         int sig = ret >> 8;
         const char *str = strsignal(sig);
@@ -258,7 +258,7 @@ bool spawn_compiler(SpawnContext *ctx, const Compiler *c, MessageArray *msgs)
 
     int p[2];
     if (xpipe2(p, O_CLOEXEC) != 0) {
-        perror_msg("pipe");
+        error_msg_errno("pipe");
         xclose(dev_null);
         xclose(fd[0]);
         return false;
@@ -348,7 +348,7 @@ int spawn(SpawnContext *ctx)
         case SPAWN_PIPE: {
             int p[2];
             if (xpipe2(p, O_CLOEXEC) != 0) {
-                perror_msg("pipe");
+                error_msg_errno("pipe");
                 goto error_close;
             }
             BUG_ON(p[0] <= STDERR_FILENO);
@@ -356,7 +356,7 @@ int spawn(SpawnContext *ctx)
             child_fds[i] = i ? p[1] : p[0];
             parent_fds[i] = i ? p[0] : p[1];
             if (!fd_set_nonblock(parent_fds[i], true)) {
-                perror_msg("fcntl");
+                error_msg_errno("fcntl");
                 goto error_close;
             }
             nr_pipes++;
@@ -383,7 +383,7 @@ int spawn(SpawnContext *ctx)
     safe_xclose_all(parent_fds, ARRAYLEN(parent_fds));
     int err = wait_child(pid);
     if (err < 0) {
-        perror_msg("waitpid");
+        error_msg_errno("waitpid");
     }
 
     resume_terminal(ctx->editor, quiet, !!(ctx->flags & SPAWN_PROMPT));

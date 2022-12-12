@@ -319,7 +319,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
         size = bom->len;
         BUG_ON(size == 0);
         if (xwrite_all(fd, bom->bytes, size) < 0) {
-            return perror_msg("write");
+            return error_msg_errno("write");
         }
     }
 
@@ -327,7 +327,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
     block_for_each(blk, &buffer->blocks) {
         ssize_t rc = file_encoder_write(enc, blk->data, blk->size);
         if (rc < 0) {
-            return perror_msg("write");
+            return error_msg_errno("write");
         }
         size += rc;
     }
@@ -344,7 +344,7 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
 
     // Need to truncate if writing to existing file
     if (xftruncate(fd, size)) {
-        return perror_msg("ftruncate");
+        return error_msg_errno("ftruncate");
     }
 
     return true;
@@ -404,14 +404,14 @@ bool save_buffer (
         }
         fd = xopen(filename, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, mode);
         if (fd < 0) {
-            return perror_msg("open");
+            return error_msg_errno("open");
         }
     }
 
     enc = new_file_encoder(encoding, crlf, fd);
     if (unlikely(!enc)) {
         // This should never happen because encoding is validated early
-        perror_msg("new_file_encoder");
+        error_msg_errno("new_file_encoder");
         xclose(fd);
         goto error;
     }
@@ -437,7 +437,7 @@ bool save_buffer (
             case EINTR:
                 goto retry;
             default:
-                perror_msg("fsync");
+                error_msg_errno("fsync");
                 xclose(fd);
                 goto error;
             }
@@ -446,11 +446,11 @@ bool save_buffer (
 #endif
 
     if (xclose(fd)) {
-        perror_msg("close");
+        error_msg_errno("close");
         goto error;
     }
     if (*tmp && rename(tmp, filename)) {
-        perror_msg("rename");
+        error_msg_errno("rename");
         goto error;
     }
     free_file_encoder(enc);

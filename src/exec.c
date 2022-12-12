@@ -117,7 +117,7 @@ static void parse_and_goto_tag(EditorState *e, const String *str)
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof buf);
     if (unlikely(!cwd)) {
-        perror_msg("getcwd() failed");
+        error_msg_errno("getcwd() failed");
         return;
     }
 

@@ -261,7 +261,7 @@ static bool cmd_cd(EditorState *e, const CommandArgs *a)
     char buf[8192];
     const char *cwd = getcwd(buf, sizeof(buf));
     if (chdir(dir) != 0) {
-        return perror_msg("changing directory failed");
+        return error_msg_errno("changing directory failed");
     }
 
     if (likely(cwd)) {
@@ -414,7 +414,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
         }
         char *buf = block_iter_get_bytes(&view->cursor, size);
         if (!term_osc52_copy(&term->obuf, buf, size, clipboard, primary)) {
-            perror_msg("OSC 52 copy failed");
+            error_msg_errno("OSC 52 copy failed");
         }
         free(buf);
     }
@@ -1390,7 +1390,7 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
     }
     char *buf = malloc(bufsize);
     if (unlikely(!buf)) {
-        return perror_msg("malloc");
+        return error_msg_errno("malloc");
     }
 
     char tmp[4096];
@@ -1575,7 +1575,7 @@ static bool cmd_save(EditorState *e, const CommandArgs *a)
         }
         char *tmp = path_absolute(args[0]);
         if (!tmp) {
-            return perror_msg("Failed to make absolute path");
+            return error_msg_errno("Failed to make absolute path");
         }
         if (absolute && streq(tmp, absolute)) {
             free(tmp);
@@ -1943,7 +1943,7 @@ static bool cmd_setenv(EditorState* UNUSED_ARG(e), const CommandArgs *a)
         return error_msg("Invalid environment variable name '%s'", name);
     }
 
-    return perror_msg(nr_args == 2 ? "setenv" : "unsetenv");
+    return error_msg_errno(nr_args == 2 ? "setenv" : "unsetenv");
 }
 
 static bool cmd_shift(EditorState *e, const CommandArgs *a)
@@ -1984,7 +1984,7 @@ static bool cmd_suspend(EditorState *e, const CommandArgs *a)
     ui_end(e);
     bool suspended = !kill(0, SIGSTOP);
     if (!suspended) {
-        perror_msg("kill");
+        error_msg_errno("kill");
     }
 
     term_raw();
