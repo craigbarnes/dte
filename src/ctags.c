@@ -16,6 +16,9 @@ static size_t parse_ex_pattern(char **escaped, const char *buf, size_t size)
     char *pattern = xmalloc(size * 2);
     char open_delim = buf[0];
     for (size_t i = 1, j = 0; i < size; i++) {
+        if (unlikely(buf[i] == '\0')) {
+            break;
+        }
         if (buf[i] == '\\' && i + 1 < size) {
             i++;
             if (buf[i] == '\\') {

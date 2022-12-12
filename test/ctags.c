@@ -46,6 +46,10 @@ static void test_parse_ctags_line(TestContext *ctx)
     line = "bar\tsource.c\t/^unterminated pattern\tf";
     EXPECT_FALSE(parse_ctags_line(&tag, line, strlen(line)));
     free_tag(&tag);
+
+    StringView sv = STRING_VIEW("tag-name\tfile.txt\t/^embedded NUL \0 char/\tf");
+    EXPECT_FALSE(parse_ctags_line(&tag, sv.data, sv.length));
+    free_tag(&tag);
 }
 
 static void test_next_tag(TestContext *ctx)
