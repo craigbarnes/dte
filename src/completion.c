@@ -178,7 +178,7 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *pref
 
 void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix)
 {
-    COLLECT_STRINGS(builtin_color_names, a, prefix);
+    collect_builtin_colors(a, prefix);
     collect_hashmap_keys(&e->colors.other, a, prefix);
 }
 

@@ -2,13 +2,14 @@
 #include <string.h>
 #include "color.h"
 #include "command/serialize.h"
+#include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/macros.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
 
-const char builtin_color_names[NR_BC][16] = {
+static const char builtin_color_names[NR_BC][16] = {
     [BC_ACTIVETAB] = "activetab",
     [BC_COMMANDLINE] = "commandline",
     [BC_CURRENTLINE] = "currentline",
@@ -69,6 +70,11 @@ const TermColor *find_color(const ColorScheme *colors, const char *name)
 void clear_hl_colors(ColorScheme *colors)
 {
     hashmap_clear(&colors->other, free);
+}
+
+void collect_builtin_colors(PointerArray *a, const char *prefix)
+{
+    COLLECT_STRINGS(builtin_color_names, a, prefix);
 }
 
 typedef struct {
