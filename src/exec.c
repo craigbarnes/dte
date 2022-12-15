@@ -78,7 +78,10 @@ static void open_files_from_string(EditorState *e, const String *str)
 
     ptr_array_append(&filenames, NULL);
     window_open_files(e->window, (char**)filenames.ptrs, NULL);
-    macro_command_hook(&e->macro, "open", (char**)filenames.ptrs);
+
+    // TODO: re-enable this when the todo in allow_macro_recording() is done
+    // macro_command_hook(&e->macro, "open", (char**)filenames.ptrs);
+
     ptr_array_free_array(&filenames);
 }
 
