@@ -61,7 +61,8 @@ debian-11:
 
         # Ensure build works with no detected features (test fallbacks)
         - cat build/feature.h
-        - echo > build/feature.h
+        - sed 's/ 1$/ 0/' build/feature.h > build/feature-tmp.h
+        - mv build/feature-tmp.h build/feature.h
         - make check
         - cat build/feature.h
 
