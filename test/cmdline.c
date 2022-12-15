@@ -32,80 +32,80 @@ static void test_command_mode(TestContext *ctx)
     EXPECT_FALSE(runner.allow_recording);
 
     // Delete at end-of-line should do nothing
-    handle_command(&runner, "delete");
+    EXPECT_TRUE(handle_command(&runner, "delete"));
     EXPECT_EQ(c->pos, 5);
     EXPECT_EQ(c->buf.len, 5);
 
-    handle_command(&runner, "erase");
+    EXPECT_TRUE(handle_command(&runner, "erase"));
     EXPECT_EQ(c->pos, 1);
     EXPECT_STRING_EQ(c->buf, "a");
 
-    handle_command(&runner, "erase");
+    EXPECT_TRUE(handle_command(&runner, "erase"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "");
 
     cmdline_set_text(c, "word1 word2 word3 word4");
-    handle_command(&runner, "eol");
+    EXPECT_TRUE(handle_command(&runner, "eol"));
     EXPECT_EQ(c->pos, 23);
 
-    handle_command(&runner, "erase-word");
+    EXPECT_TRUE(handle_command(&runner, "erase-word"));
     EXPECT_EQ(c->pos, 18);
     EXPECT_STRING_EQ(c->buf, "word1 word2 word3 ");
 
-    handle_command(&runner, "erase-word");
+    EXPECT_TRUE(handle_command(&runner, "erase-word"));
     EXPECT_EQ(c->pos, 12);
     EXPECT_STRING_EQ(c->buf, "word1 word2 ");
 
-    handle_command(&runner, "word-bwd");
+    EXPECT_TRUE(handle_command(&runner, "word-bwd"));
     EXPECT_EQ(c->pos, 6);
 
-    handle_command(&runner, "word-fwd");
+    EXPECT_TRUE(handle_command(&runner, "word-fwd"));
     EXPECT_EQ(c->pos, 12);
 
-    handle_command(&runner, "bol");
+    EXPECT_TRUE(handle_command(&runner, "bol"));
     EXPECT_EQ(c->pos, 0);
 
-    handle_command(&runner, "delete-word");
+    EXPECT_TRUE(handle_command(&runner, "delete-word"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "word2 ");
 
-    handle_command(&runner, "right");
+    EXPECT_TRUE(handle_command(&runner, "right"));
     EXPECT_EQ(c->pos, 1);
 
-    handle_command(&runner, "erase-bol");
+    EXPECT_TRUE(handle_command(&runner, "erase-bol"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "ord2 ");
 
-    handle_command(&runner, "delete");
+    EXPECT_TRUE(handle_command(&runner, "delete"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_STRING_EQ(c->buf, "rd2 ");
 
-    handle_command(&runner, "delete-eol");
+    EXPECT_TRUE(handle_command(&runner, "delete-eol"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_EQ(c->buf.len, 0);
 
     // Left at beginning-of-line should do nothing
-    handle_command(&runner, "left");
+    EXPECT_TRUE(handle_command(&runner, "left"));
     EXPECT_EQ(c->pos, 0);
 
     cmdline_set_text(c, "...");
     EXPECT_EQ(c->pos, 3);
     EXPECT_EQ(c->buf.len, 3);
 
-    handle_command(&runner, "bol");
+    EXPECT_TRUE(handle_command(&runner, "bol"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_EQ(c->buf.len, 3);
 
-    handle_command(&runner, "right");
+    EXPECT_TRUE(handle_command(&runner, "right"));
     EXPECT_EQ(c->pos, 1);
 
-    handle_command(&runner, "word-bwd");
+    EXPECT_TRUE(handle_command(&runner, "word-bwd"));
     EXPECT_EQ(c->pos, 0);
 
-    handle_command(&runner, "eol");
+    EXPECT_TRUE(handle_command(&runner, "eol"));
     EXPECT_EQ(c->pos, 3);
 
-    handle_command(&runner, "cancel");
+    EXPECT_TRUE(handle_command(&runner, "cancel"));
     EXPECT_EQ(c->pos, 0);
     EXPECT_NULL(c->search_pos);
     EXPECT_EQ(c->buf.len, 0);
