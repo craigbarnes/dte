@@ -156,6 +156,7 @@ static void set_signal_handlers(void)
     }
 
 #if defined(SIGWINCH)
+    LOG_INFO("setting SIGWINCH handler");
     action.sa_handler = handle_sigwinch;
     do_sigaction(SIGWINCH, &action);
 #endif
