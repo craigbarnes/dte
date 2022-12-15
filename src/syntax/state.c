@@ -23,6 +23,7 @@ typedef struct {
     HashMap *syntaxes;
     Syntax *current_syntax;
     State *current_state;
+    bool warn_on_unused_subsyn;
     unsigned int saved_nr_errors; // Used to check if nr_errors changed
 } SyntaxParser;
 
@@ -475,7 +476,11 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
         return true;
     }
 
-    if (read_syntax(sp, path, flags) != 0) {
+    bool save = sp->warn_on_unused_subsyn;
+    sp->warn_on_unused_subsyn = false;
+    int r = read_syntax(sp, path, flags);
+    sp->warn_on_unused_subsyn = save;
+    if (r != 0) {
         return false;
     }
 
@@ -551,10 +556,14 @@ static bool cmd_syntax(SyntaxParser *sp, const CommandArgs *a)
         finish_syntax(sp);
     }
 
-    sp->current_syntax = xnew0(Syntax, 1);
-    sp->current_syntax->name = xstrdup(a->args[0]);
-    sp->current_state = NULL;
+    Syntax *syntax = xnew0(Syntax, 1);
+    syntax->name = xstrdup(a->args[0]);
+    if (is_subsyntax(syntax) && !sp->warn_on_unused_subsyn) {
+        syntax->warned_unused_subsyntax = true;
+    }
 
+    sp->current_syntax = syntax;
+    sp->current_state = NULL;
     sp->saved_nr_errors = get_nr_errors();
     return true;
 }
@@ -630,6 +639,7 @@ Syntax *load_syntax_file(EditorState *e, const char *filename, ConfigFlags flags
         .syntaxes = &e->syntaxes,
         .current_syntax = NULL,
         .current_state = NULL,
+        .warn_on_unused_subsyn = true,
         .saved_nr_errors = 0,
     };
 
