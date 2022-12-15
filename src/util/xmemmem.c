@@ -7,7 +7,7 @@ void *xmemmem(const void *haystack, size_t hlen, const void *needle, size_t nlen
 {
     BUG_ON(nlen == 0);
 
-#ifdef HAVE_MEMMEM
+#if HAVE_MEMMEM
     return memmem(haystack, hlen, needle, nlen);
 #else
     // Note: this fallback implementation isn't well suited to general

@@ -111,7 +111,7 @@ $(clang_tidy_targets): clang-tidy-%:
 	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 1>&2
 
 clang-tidy-src/config.c: build/builtin-config.h
-clang-tidy-src/editor.c: build/version.h
+clang-tidy-src/editor.c: build/version.h build/feature.h
 clang-tidy-src/main.c: build/version.h
 clang-tidy-src/load-save.c: build/feature.h
 clang-tidy-src/util/fd.c: build/feature.h

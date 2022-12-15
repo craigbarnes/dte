@@ -4,12 +4,9 @@ C Library Feature Tests
 ## Synopsis
 
 The files in this directory are used to detect support for extended
-(non-standard) features in libc. The `*.c` files are compiled for the
-target platform, but are never executed.
-
-Successful compilation is taken to mean that a given feature is supported
-and the corresponding `*.h` file is then copied to `build/feature/`, where
-it eventually gets concatenated into `build/feature.h`.
+(non-standard) features in libc. Each `*.c` file corresponds to a
+single feature to be detected and successful compilation is taken to
+mean the feature is supported by the target platform.
 
 ## Adding New Tests
 
@@ -23,9 +20,9 @@ The following points should be observed when adding new feature tests:
   required definitions should be added to [`defs.h`] and `#include "defs.h"`
   should be added at the top of the `*.c` file. The contents of [`defs.h`]
   is concatenated into `build/feature.h` by the build system, along with the
-  other headers from `build/feature/*.h`, to ensure the code under [`src/`]
+  generated headers from `build/feature/*.h`, to ensure the code under [`src/`]
   sees the same macro definitions as the feature tests.
-* Source files under [`src/`] that use constructs like e.g. `#ifdef HAVE_EXAMPLE`
+* Source files under [`src/`] that use constructs like e.g. `#if HAVE_EXAMPLE`
   should use `#include "../build/feature.h"` before any other includes and
   should be given an explicit dependency on `build/feature.h` in [`mk/build.mk`].
 * Some platforms implement stubs for some extended functions, which simply

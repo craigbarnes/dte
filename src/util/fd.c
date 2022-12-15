@@ -9,7 +9,7 @@ int xpipe2(int fd[2], int flags)
 {
     BUG_ON((flags & (O_CLOEXEC | O_NONBLOCK)) != flags);
 
-#ifdef HAVE_PIPE2
+#if HAVE_PIPE2
     if (likely(pipe2(fd, flags) == 0)) {
         return 0;
     }
@@ -50,7 +50,7 @@ int xdup3(int oldfd, int newfd, int flags)
     BUG_ON((flags & O_CLOEXEC) != flags);
     int fd;
 
-#ifdef HAVE_DUP3
+#if HAVE_DUP3
     do {
         fd = dup3(oldfd, newfd, flags);
     } while (unlikely(fd < 0 && errno == EINTR));

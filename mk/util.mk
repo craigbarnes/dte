@@ -1,6 +1,7 @@
 HASH := \#
 CFILE := mk/feature-test/basic.c
 streq = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+toupper = $(shell echo '$(1)' | tr a-z A-Z)
 try-run = $(if $(shell $(1) >/dev/null 2>&1 && echo 1),$(2),$(3))
 cc-option = $(call try-run,$(CC) $(1) -Werror -c -o /dev/null $(CFILE),$(1),$(2))
 prefix-obj = $(addprefix $(1), $(addsuffix .o, $(2)))

@@ -5,13 +5,13 @@
 #include "ioctl.h"
 #include "util/log.h"
 
-#if defined(HAVE_TIOCGWINSZ) || defined(HAVE_TIOCNOTTY)
+#if HAVE_TIOCGWINSZ || HAVE_TIOCNOTTY
 # include <sys/ioctl.h>
 #endif
 
 bool term_drop_controlling_tty(void)
 {
-#if defined(HAVE_TIOCNOTTY)
+#if HAVE_TIOCNOTTY
     if (ioctl(STDIN_FILENO, TIOCNOTTY) == -1) {
         LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
         return false;
@@ -23,7 +23,7 @@ bool term_drop_controlling_tty(void)
 #endif
 }
 
-#if defined(HAVE_TIOCGWINSZ)
+#if HAVE_TIOCGWINSZ
 
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
@@ -37,7 +37,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
     return true;
 }
 
-#elif defined(HAVE_TCGETWINSIZE)
+#elif HAVE_TCGETWINSIZE
 
 #include <termios.h>
 

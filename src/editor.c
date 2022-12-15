@@ -1,3 +1,4 @@
+#include "../build/feature.h"
 #include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
@@ -202,10 +203,22 @@ EditorState *init_editor_state(void)
         e->user_config_dir = xasprintf("%s/.dte", e->home_dir.data);
     }
 
+    LOG_INFO("dte version: " VERSION);
+
+    LOG_INFO("features:%s%s%s%s%s%s%s%s",
+        HAVE_DUP3 ? " dup3" : "",
+        HAVE_PIPE2 ? " pipe2" : "",
+        HAVE_FSYNC ? " fsync" : "",
+        HAVE_MEMMEM ? " memmem" : "",
+        HAVE_TIOCGWINSZ ? " TIOCGWINSZ" : "",
+        HAVE_TIOCNOTTY ? " TIOCNOTTY" : "",
+        HAVE_TCGETWINSIZE ? " tcgetwinsize" : "",
+        HAVE_POSIX_MADVISE ? " posix_madvise" : ""
+    );
+
     pid_t pid = getpid();
     bool leader = pid == getsid(0);
     e->session_leader = leader;
-    LOG_INFO("dte version: " VERSION);
     LOG_INFO("pid: %jd%s", (intmax_t)pid, leader ? " (session leader)" : "");
 
     pid_t pgid = getpgrp();

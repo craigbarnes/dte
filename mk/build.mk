@@ -187,7 +187,7 @@ build/builtin-config.h: build/builtin-config.mk
 build/test/data.h: build/test/data.mk
 build/config.o: build/builtin-config.h
 build/test/config.o: build/test/data.h
-build/editor.o: build/version.h
+build/editor.o: build/version.h build/feature.h
 build/main.o: build/version.h
 build/load-save.o: build/feature.h
 build/util/fd.o: build/feature.h
@@ -197,6 +197,7 @@ build/convert.o: build/convert.cflags
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
 LDFLAGS_ALL = $(CFLAGS) $(LDFLAGS) $(BASIC_LDFLAGS)
+featuredef = $(HASH)define HAVE_$(call toupper,$(notdir $(basename $(1))))
 
 $(dte) $(test) $(bench): build/all.ldflags
 	$(E) LINK $@
@@ -237,12 +238,12 @@ build/feature.h: mk/feature-test/defs.h $(feature_tests)
 	$(E) GEN $@
 	$(Q) cat $^ > $@
 
-$(feature_tests): build/feature/%.h: mk/feature-test/%.c mk/feature-test/%.h
+$(feature_tests): build/feature/%.h: mk/feature-test/%.c
 	$(E) DETECT $@
 	$(Q) if $(CC) $(CFLAGS_ALL) -o $(@:.h=.o) $< 2>$(@:.h=.log); then \
-	  cp $(<:.c=.h) $@ ; \
+	  echo '$(call featuredef,$@) 1' > $@ ; \
 	else \
-	  echo '// $* not detected' > $@ ; \
+	  echo '$(call featuredef,$@) 0' > $@ ; \
 	fi
 
 build/ $(build_subdirs):

@@ -133,7 +133,7 @@ static void fixup_blocks(Buffer *buffer)
 
 static int xmadvise_sequential(void *addr, size_t len)
 {
-#ifdef HAVE_POSIX_MADVISE
+#if HAVE_POSIX_MADVISE
     return posix_madvise(addr, len, POSIX_MADV_SEQUENTIAL);
 #else
     // "The posix_madvise() function shall have no effect on the semantics
@@ -422,7 +422,7 @@ bool save_buffer (
         goto error;
     }
 
-#ifdef HAVE_FSYNC
+#if HAVE_FSYNC
     if (buffer->options.fsync) {
         retry:
         if (fsync(fd) != 0) {
