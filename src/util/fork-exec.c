@@ -1,4 +1,3 @@
-#include "../../build/feature.h" // Must be first include
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -8,26 +7,19 @@
 #include "fork-exec.h"
 #include "debug.h"
 #include "fd.h"
+#include "terminal/ioctl.h"
 #include "xreadwrite.h"
-
-#ifdef HAVE_TIOCNOTTY
-# include <sys/ioctl.h>
-#endif
 
 static noreturn void handle_child(const char **argv, const char **env, int fd[3], int error_fd, bool drop_ctty)
 {
-#ifdef HAVE_TIOCNOTTY
-    if (drop_ctty && ioctl(STDOUT_FILENO, TIOCNOTTY) == -1) {
-        LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
-    }
-#else
-    (void)drop_ctty;
-#endif
-
     int error;
     int nr_fds = 3;
     bool move = error_fd < nr_fds;
     int max = error_fd;
+
+    if (drop_ctty) {
+        term_drop_controlling_tty();
+    }
 
     // Find if we must move fds out of the way
     for (int i = 0; i < nr_fds; i++) {

@@ -191,7 +191,6 @@ build/editor.o: build/version.h
 build/main.o: build/version.h
 build/load-save.o: build/feature.h
 build/util/fd.o: build/feature.h
-build/util/fork-exec.o: build/feature.h
 build/util/xmemmem.o: build/feature.h
 build/terminal/ioctl.o: build/feature.h
 build/convert.o: build/convert.cflags

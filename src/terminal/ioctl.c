@@ -5,9 +5,25 @@
 #include "ioctl.h"
 #include "util/log.h"
 
-#if defined(HAVE_TIOCGWINSZ)
+#if defined(HAVE_TIOCGWINSZ) || defined(HAVE_TIOCNOTTY)
+# include <sys/ioctl.h>
+#endif
 
-#include <sys/ioctl.h>
+bool term_drop_controlling_tty(void)
+{
+#if defined(HAVE_TIOCNOTTY)
+    if (ioctl(STDIN_FILENO, TIOCNOTTY) == -1) {
+        LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
+        return false;
+    }
+    return true;
+#else
+    // errno = ENOSYS;
+    return false;
+#endif
+}
+
+#if defined(HAVE_TIOCGWINSZ)
 
 bool term_get_size(unsigned int *w, unsigned int *h)
 {
