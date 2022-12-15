@@ -1,78 +1,56 @@
+require c-uchar
+
 syntax json
 
 state value code
-    char -b a-z this
-    char -b \" string
-    char -b - number-negative
-    char -b 0 number-zero
-    char -b 1-9 number
-    inlist constant this constant
+    char -b a-z ident
+    char \" string
+    char 0 zero
+    char 1-9 number
     eat this
 
+state ident code
+    char -b a-zA-Z0-9_ this
+    inlist constant this
+    noeat value
+
 state string
-    char -b \" value string
-    char -b \\ string-escape
+    char \" value string
+    char \\ string-escape
     char "\n" value
     eat this
 
 state string-escape special
-    char -b \"\\/bfnrt string special
-    char -b u string-escape-unicode
-    recolor string 1
-    eat string
+    char \"\\/bfnrt string special
+    char u .c-uchar4:string special
+    eat string error
 
-state string-escape-unicode special
-    char -b a-fA-F0-9 string-escape-unicode-2
-    recolor string 2
-    noeat string
-
-state string-escape-unicode-2 special
-    char -b a-fA-F0-9 string-escape-unicode-3
-    recolor string 3
-    noeat string
-
-state string-escape-unicode-3 special
-    char -b a-fA-F0-9 string-escape-unicode-4
-    recolor string 4
-    noeat string
-
-state string-escape-unicode-4 special
-    char -b a-fA-F0-9 string special
-    recolor string 5
-    noeat string
-
-state number-negative numeric
-    char -b 0 number-zero
-    char -b 1-9 number
-    recolor code
-    noeat number-check-suffix
-
-state number-zero numeric
-    char . number-fraction
-    char eE number-exponent
-    noeat number-check-suffix
+state zero numeric
+    char . fraction
+    char eE exponent
+    noeat check-num-suffix
 
 state number numeric
-    char -b 0-9 this
-    char . number-fraction
-    char eE number-exponent
-    noeat number-check-suffix
+    char 0-9 this
+    char . fraction
+    char eE exponent
+    noeat check-num-suffix
 
-state number-fraction numeric
-    char -b 0-9 this
-    char eE number-exponent
-    noeat number-check-suffix
+state fraction numeric
+    char 0-9 this
+    char eE exponent
+    noeat check-num-suffix
 
-state number-exponent numeric
-    char +- number-exponent-signed
+state exponent numeric
+    char +- exponent-signed
     char -b 0-9 this
-    noeat number-check-suffix
+    noeat check-num-suffix
 
-state number-exponent-signed numeric
-    char -b 0-9 this
-    noeat number-check-suffix
+state exponent-signed numeric
+    char 0-9 this
+    noeat check-num-suffix
 
-state number-check-suffix error
+state check-num-suffix error
     char a-zA-Z0-9_ this
     noeat value
 
