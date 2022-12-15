@@ -79,19 +79,12 @@ static char *expand_word(const EditorState *e)
     return word.length ? xstrcut(word.data, word.length) : NULL;
 }
 
-static char *expand_pkgdatadir(const EditorState* UNUSED_ARG(e))
-{
-    error_msg("The $PKGDATADIR variable was removed in dte v1.4");
-    return NULL;
-}
-
 static const BuiltinVar normal_vars[] = {
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"FILEDIR", expand_file_dir},
     {"FILETYPE", expand_filetype},
     {"LINENO", expand_lineno},
-    {"PKGDATADIR", expand_pkgdatadir},
     {"RFILE", expand_rfile},
     {"WORD", expand_word},
 };
