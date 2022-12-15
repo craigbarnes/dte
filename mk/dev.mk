@@ -117,7 +117,7 @@ clang-tidy-src/load-save.c: build/feature.h
 clang-tidy-src/util/fd.c: build/feature.h
 clang-tidy-src/util/fork-exec.c: build/feature.h
 clang-tidy-src/util/xmemmem.c: build/feature.h
-clang-tidy-src/terminal/winsize.c: build/feature.h
+clang-tidy-src/terminal/ioctl.c: build/feature.h
 clang-tidy-test/config.c: build/test/data.h
 
 

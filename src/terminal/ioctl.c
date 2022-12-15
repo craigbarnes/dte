@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-#include "winsize.h"
+#include "ioctl.h"
 #include "util/log.h"
 
 #if defined(HAVE_TIOCGWINSZ)

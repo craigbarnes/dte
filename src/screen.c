@@ -2,9 +2,9 @@
 #include "screen.h"
 #include "frame.h"
 #include "terminal/cursor.h"
+#include "terminal/ioctl.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
-#include "terminal/winsize.h"
 
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color)
 {

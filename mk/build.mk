@@ -52,8 +52,8 @@ syntax_objects := $(call prefix-obj, build/syntax/, \
     color highlight merge state syntax )
 
 terminal_objects := $(call prefix-obj, build/terminal/, \
-    color cursor input key linux mode osc52 output rxvt terminal \
-    winsize xterm )
+    color cursor input ioctl key linux mode osc52 output rxvt terminal \
+    xterm )
 
 editor_objects := $(call prefix-obj, build/, \
     bind block block-iter bookmark buffer change cmdline commands \
@@ -193,7 +193,7 @@ build/load-save.o: build/feature.h
 build/util/fd.o: build/feature.h
 build/util/fork-exec.o: build/feature.h
 build/util/xmemmem.o: build/feature.h
-build/terminal/winsize.o: build/feature.h
+build/terminal/ioctl.o: build/feature.h
 build/convert.o: build/convert.cflags
 
 CFLAGS_ALL = $(CPPFLAGS) $(CFLAGS) $(BASIC_CFLAGS)
