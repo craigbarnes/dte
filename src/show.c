@@ -46,8 +46,8 @@ typedef enum {
 typedef struct {
     const char name[11];
     uint8_t flags; // ShowHandlerFlags
-    bool (*show)(EditorState *e, const char *name, bool cmdline);
     String (*dump)(EditorState *e);
+    bool (*show)(EditorState *e, const char *name, bool cmdline);
     void (*complete_arg)(EditorState *e, PointerArray *a, const char *prefix);
 } ShowHandler;
 
@@ -449,21 +449,21 @@ static String do_dump_macro(EditorState *e)
 }
 
 static const ShowHandler show_handlers[] = {
-    {"alias", DTERC, show_normal_alias, dump_normal_aliases, collect_normal_aliases},
-    {"bind", DTERC, show_binding, dump_all_bindings, collect_bound_normal_keys},
-    {"color", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
-    {"command", DTERC | LASTLINE, NULL, dump_command_history, NULL},
-    {"cursor", DTERC, show_cursor, dump_cursors, do_collect_cursor_modes},
-    {"env", 0, show_env, dump_env, collect_env},
-    {"errorfmt", DTERC, show_compiler, dump_compilers, collect_compilers},
-    {"ft", DTERC, NULL, do_dump_filetypes, NULL},
-    {"hi", DTERC, show_color, do_dump_hl_colors, collect_hl_colors},
-    {"include", 0, show_include, do_dump_builtin_configs, collect_builtin_configs},
-    {"macro", DTERC, NULL, do_dump_macro, NULL},
-    {"msg", MSGLINE, NULL, do_dump_messages, NULL},
-    {"option", DTERC, show_option, do_dump_options, collect_all_options},
-    {"search", LASTLINE, NULL, dump_search_history, NULL},
-    {"wsplit", 0, show_wsplit, dump_frames, NULL},
+    {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
+    {"bind", DTERC, dump_all_bindings, show_binding, collect_bound_normal_keys},
+    {"color", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
+    {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
+    {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
+    {"env", 0, dump_env, show_env, collect_env},
+    {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
+    {"ft", DTERC, do_dump_filetypes, NULL, NULL},
+    {"hi", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
+    {"include", 0, do_dump_builtin_configs, show_include, collect_builtin_configs},
+    {"macro", DTERC, do_dump_macro, NULL, NULL},
+    {"msg", MSGLINE, do_dump_messages, NULL, NULL},
+    {"option", DTERC, do_dump_options, show_option, collect_all_options},
+    {"search", LASTLINE, dump_search_history, NULL, NULL},
+    {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 
 UNITTEST {
