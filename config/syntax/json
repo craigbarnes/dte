@@ -3,7 +3,7 @@ require c-uchar
 syntax json
 
 state value code
-    char -b a-z ident
+    char -b a-zA-Z_ ident
     char \" string
     char 0 zero
     char 1-9 number
