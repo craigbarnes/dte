@@ -12,32 +12,29 @@
 
 const Command *current_command;
 
-static void run_commands(CommandRunner *runner, const PointerArray *array);
+static bool run_commands(CommandRunner *runner, const PointerArray *array);
 
-static void run_command(CommandRunner *runner, char **av)
+static bool run_command(CommandRunner *runner, char **av)
 {
     const CommandSet *cmds = runner->cmds;
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
         const char *name = av[0];
         if (!runner->aliases) {
-            error_msg("No such command: %s", name);
-            return;
+            return error_msg("No such command: %s", name);
         }
 
         const char *alias_value = find_alias(runner->aliases, name);
         if (unlikely(!alias_value)) {
-            error_msg("No such command or alias: %s", name);
-            return;
+            return error_msg("No such command or alias: %s", name);
         }
 
         PointerArray array = PTR_ARRAY_INIT;
         CommandParseError err = parse_commands(runner, &array, alias_value);
         if (unlikely(err != CMDERR_NONE)) {
             const char *err_msg = command_parse_error_to_string(err);
-            error_msg("Parsing alias %s: %s", name, err_msg);
             ptr_array_free(&array);
-            return;
+            return error_msg("Parsing alias %s: %s", name, err_msg);
         }
 
         // Remove NULL
@@ -48,14 +45,13 @@ static void run_command(CommandRunner *runner, char **av)
         }
         ptr_array_append(&array, NULL);
 
-        run_commands(runner, &array);
+        bool r = run_commands(runner, &array);
         ptr_array_free(&array);
-        return;
+        return r;
     }
 
     if (unlikely(current_config.file && !cmd->allow_in_rc)) {
-        error_msg("Command %s not allowed in config file", cmd->name);
-        return;
+        return error_msg("Command %s not allowed in config file", cmd->name);
     }
 
     // Record command in macro buffer, if recording (this needs to be done
@@ -70,25 +66,25 @@ static void run_command(CommandRunner *runner, char **av)
 
     CommandArgs a = cmdargs_new(av + 1);
     current_command = cmd;
-    if (likely(parse_args(cmd, &a))) {
-        cmd->cmd(runner->userdata, &a);
-    }
+    bool r = likely(parse_args(cmd, &a)) && cmd->cmd(runner->userdata, &a);
     current_command = NULL;
 
     end_change();
+    return r;
 }
 
-static void run_commands(CommandRunner *runner, const PointerArray *array)
+static bool run_commands(CommandRunner *runner, const PointerArray *array)
 {
-    if (unlikely(runner->recursion_count++ > 16)) {
-        error_msg("alias recursion overflow");
-        goto out;
+    if (unlikely(runner->recursion_count > 16)) {
+        return error_msg("alias recursion overflow");
     }
 
     void **ptrs = array->ptrs;
     size_t len = array->count;
+    size_t nfailed = 0;
     BUG_ON(len == 0);
     BUG_ON(ptrs[len - 1] != NULL);
+    runner->recursion_count++;
 
     for (size_t s = 0, e = 0; s < len; ) {
         // Iterate over strings, until a terminating NULL is encountered
@@ -100,28 +96,33 @@ static void run_commands(CommandRunner *runner, const PointerArray *array)
         // If the value of `e` (end) changed, there's a run of at least
         // 1 string, which is a command followed by 0 or more arguments
         if (e != s) {
-            run_command(runner, (char**)ptrs + s);
+            if (!run_command(runner, (char**)ptrs + s)) {
+                nfailed++;
+            }
         }
 
         // Skip past the NULL, onto the next command (if any)
         s = ++e;
     }
 
-out:
     runner->recursion_count--;
+    return (nfailed == 0);
 }
 
-void handle_command(CommandRunner *runner, const char *cmd)
+bool handle_command(CommandRunner *runner, const char *cmd)
 {
     BUG_ON(runner->recursion_count != 0);
     PointerArray array = PTR_ARRAY_INIT;
     CommandParseError err = parse_commands(runner, &array, cmd);
+    bool r;
     if (likely(err == CMDERR_NONE)) {
-        run_commands(runner, &array);
+        r = run_commands(runner, &array);
         BUG_ON(runner->recursion_count != 0);
     } else {
         const char *str = command_parse_error_to_string(err);
         error_msg("Command syntax error: %s", str);
+        r = false;
     }
     ptr_array_free(&array);
+    return r;
 }

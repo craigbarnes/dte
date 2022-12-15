@@ -419,8 +419,7 @@ static bool cmd_command_mode_accept(EditorState *e, const CommandArgs *a)
     }
 
     current_command = NULL;
-    handle_normal_command(e, str, true);
-    return true;
+    return handle_normal_command(e, str, true);
 }
 
 static bool cmd_search_mode_accept(EditorState *e, const CommandArgs *a)

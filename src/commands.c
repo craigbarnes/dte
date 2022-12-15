@@ -642,7 +642,7 @@ static bool cmd_exec(EditorState *e, const CommandArgs *a)
     const char **argv = (const char **)a->args + a->nr_flag_args;
     ssize_t outlen = handle_exec(e, argv, actions, spawn_flags, strip_nl);
     if (outlen <= 0) {
-        return false;
+        return outlen == 0;
     }
 
     if (move_after_insert && actions[STDOUT_FILENO] == EXEC_BUFFER) {
@@ -813,15 +813,12 @@ static bool cmd_macro(EditorState *e, const CommandArgs *a)
     const char *action = a->args[0];
 
     if (streq(action, "play") || streq(action, "run")) {
-        unsigned int saved_nr_errors = get_nr_errors();
         for (size_t i = 0, n = m->macro.count; i < n; i++) {
             const char *cmd_str = m->macro.ptrs[i];
-            handle_normal_command(e, cmd_str, false);
-            if (get_nr_errors() != saved_nr_errors) {
-                break;
+            if (!handle_normal_command(e, cmd_str, false)) {
+                return false;
             }
         }
-        // TODO: make this conditional?
         return true;
     }
 
@@ -2476,10 +2473,10 @@ const CommandSet normal_commands = {
     .expand_env_vars = true,
 };
 
-void handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
+bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
 {
     CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, allow_recording);
-    handle_command(&runner, cmd);
+    return handle_command(&runner, cmd);
 }
 
 void exec_normal_config(EditorState *e, StringView config)

@@ -143,18 +143,18 @@ static void test_detect_indent(TestContext *ctx)
     EXPECT_FALSE(e->options.expand_tab);
     EXPECT_EQ(e->options.indent_width, 8);
 
-    handle_normal_command (
+    EXPECT_TRUE(handle_normal_command (
         e,
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
         "open test/data/detect-indent.ini",
         false
-    );
+    ));
 
     EXPECT_EQ(e->buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
     EXPECT_TRUE(e->buffer->options.expand_tab);
     EXPECT_EQ(e->buffer->options.indent_width, 2);
 
-    handle_normal_command(e, "close", false);
+    EXPECT_TRUE(handle_normal_command(e, "close", false));
 }
 
 static void test_global_state(TestContext *ctx)
@@ -197,6 +197,15 @@ static void test_global_state(TestContext *ctx)
     EXPECT_TRUE(buffer->id > 0);
 }
 
+static void test_handle_normal_command(TestContext *ctx)
+{
+    EditorState *e = ctx->userdata;
+    EXPECT_TRUE(handle_normal_command(e, "right; left", false));
+    EXPECT_TRUE(handle_normal_command(e, ";left;right;;left;right;;;", false));
+    EXPECT_FALSE(handle_normal_command(e, "alias 'err", false));
+    EXPECT_FALSE(handle_normal_command(e, "refresh; alias 'x", false));
+}
+
 static void test_macro_record(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
@@ -208,13 +217,13 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_TRUE(macro_record(m));
     EXPECT_TRUE(macro_is_recording(m));
 
-    handle_normal_command(e, "open", false);
+    EXPECT_TRUE(handle_normal_command(e, "open", false));
     EXPECT_TRUE(handle_input(e, 'x'));
     EXPECT_TRUE(handle_input(e, 'y'));
-    handle_normal_command(e, "bol", true);
+    EXPECT_TRUE(handle_normal_command(e, "bol", true));
     EXPECT_TRUE(handle_input(e, '-'));
     EXPECT_TRUE(handle_input(e, 'z'));
-    handle_normal_command(e, "eol; right; insert -m .; new-line", true);
+    EXPECT_TRUE(handle_normal_command(e, "eol; right; insert -m .; new-line", true));
 
     const StringView t1 = STRING_VIEW("test 1\n");
     insert_text(e->view, t1.data, t1.length, true);
@@ -230,7 +239,7 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_EQ(m->macro.count, 9);
     EXPECT_EQ(m->prev_macro.count, 0);
 
-    handle_normal_command (
+    EXPECT_TRUE(handle_normal_command (
         e,
         "save -f build/test/macro-rec.txt;"
         "close -f;"
@@ -241,7 +250,7 @@ static void test_macro_record(TestContext *ctx)
         "show macro;"
         "close -f;",
         true
-    );
+    ));
 
     expect_files_equal(ctx, "build/test/macro-rec.txt", "build/test/macro-out.txt");
 
@@ -257,6 +266,7 @@ static void test_macro_record(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_global_state),
+    TEST(test_handle_normal_command),
     TEST(test_builtin_configs),
     TEST(test_exec_config),
     TEST(test_detect_indent),

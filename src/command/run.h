@@ -53,6 +53,6 @@ static inline int command_cmp(const void *key, const void *elem)
     return strcmp(name, cmd->name);
 }
 
-void handle_command(CommandRunner *runner, const char *cmd);
+bool handle_command(CommandRunner *runner, const char *cmd);
 
 #endif

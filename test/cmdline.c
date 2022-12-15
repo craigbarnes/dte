@@ -306,8 +306,8 @@ static void test_complete_command_extra(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "option c expand-tab true ");
     reset_completion(c);
 
-    handle_normal_command(e, "run -s mkdir -p $HOME/sub", false);
-    handle_normal_command(e, "run -s touch $HOME/file $HOME/sub/subfile", false);
+    EXPECT_TRUE(handle_normal_command(e, "run -s mkdir -p $HOME/sub", false));
+    EXPECT_TRUE(handle_normal_command(e, "run -s touch $HOME/file $HOME/sub/subfile", false));
 
     cmdline_set_text(c, "open ~/");
     complete_command_next(e);

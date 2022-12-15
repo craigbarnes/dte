@@ -42,7 +42,7 @@ static void test_handle_binding(TestContext *ctx)
     ASSERT_NONNULL(insert);
 
     EditorState *e = ctx->userdata;
-    handle_normal_command(e, "open; bind C-S-F11 'insert -m zzz'", false);
+    EXPECT_TRUE(handle_normal_command(e, "open; bind C-S-F11 'insert -m zzz'", false));
 
     // Bound command should be cached
     InputMode mode = INPUT_NORMAL;
@@ -86,7 +86,7 @@ static void test_handle_binding(TestContext *ctx)
     EXPECT_EQ(block->size, 0);
     EXPECT_EQ(block->nl, 0);
     EXPECT_FALSE(undo(view));
-    handle_normal_command(e, "close", false);
+    EXPECT_TRUE(handle_normal_command(e, "close", false));
 }
 
 static const TestEntry tests[] = {

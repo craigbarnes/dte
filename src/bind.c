@@ -47,17 +47,16 @@ bool handle_binding(EditorState *e, InputMode mode, KeyCode key)
     if (!binding->cmd || (cmds->macro_record && macro_is_recording(&e->macro))) {
         // Parse and run command string
         CommandRunner runner = cmdrunner_for_mode(e, mode, true);
-        handle_command(&runner, binding->cmd_str);
-        return true;
+        return handle_command(&runner, binding->cmd_str);
     }
 
     // Command is cached; call it directly
     begin_change(CHANGE_MERGE_NONE);
     current_command = binding->cmd;
-    binding->cmd->cmd(e, &binding->a);
+    bool r = binding->cmd->cmd(e, &binding->a);
     current_command = NULL;
     end_change();
-    return true;
+    return r;
 }
 
 typedef struct {
