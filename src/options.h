@@ -13,6 +13,7 @@ enum {
     TEXT_WIDTH_MAX = 1000,
 };
 
+// Note: this must be kept in sync with ws_error_values[]
 typedef enum {
     WSE_SPACE_INDENT = 1 << 0, // Spaces in indent (except WSE_SPACE_ALIGN)
     WSE_SPACE_ALIGN = 1 << 1, // Less than tab-width spaces at end of indent

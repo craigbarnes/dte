@@ -426,6 +426,7 @@ static const char *const detect_indent_values[] = {
     NULL
 };
 
+// Note: this must be kept in sync with WhitespaceErrorFlags
 static const char *const ws_error_values[] = {
     "space-indent",
     "space-align",
