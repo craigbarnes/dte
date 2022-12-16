@@ -3,6 +3,7 @@
 #include "buffer.h"
 #include "editor.h"
 #include "indent.h"
+#include "regexp.h"
 
 static void test_find_buffer_by_id(TestContext *ctx)
 {
@@ -51,9 +52,35 @@ static void test_make_indent(TestContext *ctx)
     free(indent);
 }
 
+static void test_get_indent_for_next_line(TestContext *ctx)
+{
+    const char *pattern = "\\{$";
+    const InternedRegexp *ir = regexp_intern(pattern);
+    ASSERT_NONNULL(ir);
+
+    LocalOptions options = {
+        .brace_indent = false,
+        .expand_tab = true,
+        .indent_regex = ir,
+        .indent_width = 4,
+        .tab_width = 8
+    };
+
+    const StringView line1 = STRING_VIEW("foo {");
+    char *indent = get_indent_for_next_line(&options, &line1);
+    EXPECT_STREQ(indent, "    ");
+    free(indent);
+
+    const StringView line2 = STRING_VIEW("foo");
+    indent = get_indent_for_next_line(&options, &line2);
+    EXPECT_STREQ(indent, NULL);
+    free(indent);
+}
+
 static const TestEntry tests[] = {
     TEST(test_find_buffer_by_id),
     TEST(test_make_indent),
+    TEST(test_get_indent_for_next_line),
 };
 
 const TestGroup buffer_tests = TEST_GROUP(tests);
