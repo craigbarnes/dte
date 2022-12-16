@@ -350,6 +350,52 @@ static bool write_buffer(Buffer *buffer, FileEncoder *enc, int fd, EncodingType 
     return true;
 }
 
+static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_t buflen)
+{
+    buf[0] = '\0';
+    if (str_has_prefix(filename, "/tmp/")) {
+        // Don't use temporary file when saving file in /tmp because crontab
+        // command doesn't like the file to be replaced
+        return -1;
+    }
+
+    const char *base = path_basename(filename);
+    const StringView dir = path_slice_dirname(filename);
+    const int dlen = (int)dir.length;
+    int n = snprintf(buf, buflen, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
+    if (unlikely(n <= 0 || n >= buflen)) {
+        return -1;
+    }
+
+    int fd = mkstemp(buf);
+    if (fd < 0) {
+        // No write permission to the directory?
+        buf[0] = '\0';
+        return -1;
+    }
+
+    if (!info->mode) {
+        // New file
+        if (xfchmod(fd, 0666 & ~get_umask()) != 0) {
+            LOG_WARNING("failed to set file mode: %s", strerror(errno));
+        }
+        return fd;
+    }
+
+    // Preserve ownership and mode of the original file if possible
+    if (xfchown(fd, info->uid, info->gid) != 0) {
+        const char *err = strerror(errno);
+        LOG_WARNING("failed to preserve file ownership: %s", err);
+    }
+
+    if (xfchmod(fd, info->mode) != 0) {
+        const char *err = strerror(errno);
+        LOG_WARNING("failed to preserve file mode: %s", err);
+    }
+
+    return fd;
+}
+
 bool save_buffer (
     Buffer *buffer,
     const char *filename,
@@ -357,42 +403,9 @@ bool save_buffer (
     bool crlf,
     bool write_bom
 ) {
-    FileEncoder *enc;
-    int fd = -1;
+    // Try to use temporary file first (safer)
     char tmp[8192];
-    tmp[0] = '\0';
-
-    // Don't use temporary file when saving file in /tmp because crontab
-    // command doesn't like the file to be replaced
-    if (!str_has_prefix(filename, "/tmp/")) {
-        // Try to use temporary file first (safer)
-        const char *base = path_basename(filename);
-        const StringView dir = path_slice_dirname(filename);
-        const int dlen = (int)dir.length;
-        int n = snprintf(tmp, sizeof tmp, "%.*s/.tmp.%s.XXXXXX", dlen, dir.data, base);
-        if (likely(n > 0 && n < sizeof(tmp))) {
-            fd = mkstemp(tmp);
-            if (fd < 0) {
-                // No write permission to the directory?
-                tmp[0] = '\0';
-            } else if (buffer->file.mode) {
-                // Preserve ownership and mode of the original file if possible
-                if (xfchown(fd, buffer->file.uid, buffer->file.gid) != 0) {
-                    const char *err = strerror(errno);
-                    LOG_WARNING("failed to preserve file ownership: %s", err);
-                }
-                if (xfchmod(fd, buffer->file.mode) != 0) {
-                    const char *err = strerror(errno);
-                    LOG_WARNING("failed to preserve file mode: %s", err);
-                }
-            } else {
-                // New file
-                if (xfchmod(fd, 0666 & ~get_umask()) != 0) {
-                    LOG_WARNING("failed to set file mode: %s", strerror(errno));
-                }
-            }
-        }
-    }
+    int fd = tmp_file(filename, &buffer->file, tmp, sizeof(tmp));
 
     if (fd < 0) {
         // Overwrite the original file directly (if it exists).
@@ -408,7 +421,7 @@ bool save_buffer (
         }
     }
 
-    enc = new_file_encoder(encoding, crlf, fd);
+    FileEncoder *enc = new_file_encoder(encoding, crlf, fd);
     if (unlikely(!enc)) {
         // This should never happen because encoding is validated early
         error_msg_errno("new_file_encoder");
