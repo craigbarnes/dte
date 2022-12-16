@@ -396,6 +396,32 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
     return fd;
 }
 
+static int xfsync(int fd)
+{
+#if HAVE_FSYNC
+    retry:
+    if (fsync(fd) == 0) {
+        return 0;
+    }
+
+    switch (errno) {
+    // EINVAL is ignored because it just means "operation not possible
+    // on this descriptor" rather than indicating an actual error
+    case EINVAL:
+    case ENOTSUP:
+    case ENOSYS:
+        return 0;
+    case EINTR:
+        goto retry;
+    }
+
+    return -1;
+#else
+    (void)fd;
+    return 0;
+#endif
+}
+
 bool save_buffer (
     Buffer *buffer,
     const char *filename,
@@ -433,27 +459,10 @@ bool save_buffer (
         goto error;
     }
 
-#if HAVE_FSYNC
-    if (buffer->options.fsync) {
-        retry:
-        if (fsync(fd) != 0) {
-            switch (errno) {
-            // EINVAL is ignored because it just means "operation not
-            // possible on this descriptor" rather than indicating an
-            // actual error
-            case EINVAL:
-            case ENOTSUP:
-            case ENOSYS:
-                break;
-            case EINTR:
-                goto retry;
-            default:
-                error_msg_errno("fsync");
-                goto error;
-            }
-        }
+    if (buffer->options.fsync && xfsync(fd) != 0) {
+        error_msg_errno("fsync");
+        goto error;
     }
-#endif
 
     int r = xclose(fd);
     fd = -1;
