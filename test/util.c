@@ -2450,6 +2450,17 @@ static void test_log_level_from_str(TestContext *ctx)
     EXPECT_EQ(log_level_from_str(NULL), default_level);
 }
 
+static void test_log_level_to_str(TestContext *ctx)
+{
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_NONE), "none");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_CRITICAL), "crit");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_ERROR), "error");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_WARNING), "warning");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_INFO), "info");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_DEBUG), "debug");
+    EXPECT_STREQ(log_level_to_str(LOG_LEVEL_TRACE), "trace");
+}
+
 static const TestEntry tests[] = {
     TEST(test_util_macros),
     TEST(test_IS_POWER_OF_2),
@@ -2526,6 +2537,7 @@ static const TestEntry tests[] = {
     TEST(test_fork_exec),
     TEST(test_xmemmem),
     TEST(test_log_level_from_str),
+    TEST(test_log_level_to_str),
 };
 
 const TestGroup util_tests = TEST_GROUP(tests);
