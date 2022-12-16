@@ -18,7 +18,7 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
     int max = error_fd;
 
     if (drop_ctty) {
-        term_drop_controlling_tty();
+        term_drop_controlling_tty(STDIN_FILENO);
     }
 
     // Find if we must move fds out of the way

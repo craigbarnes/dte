@@ -9,16 +9,12 @@
 # include <sys/ioctl.h>
 #endif
 
-bool term_drop_controlling_tty(void)
+bool term_drop_controlling_tty(int fd)
 {
 #if HAVE_TIOCNOTTY
-    if (ioctl(STDIN_FILENO, TIOCNOTTY) == -1) {
-        LOG_WARNING("TIOCNOTTY ioctl failed: %s", strerror(errno));
-        return false;
-    }
-    return true;
+    return ioctl(fd, TIOCNOTTY) != -1;
 #else
-    // errno = ENOSYS;
+    errno = ENOSYS;
     return false;
 #endif
 }
