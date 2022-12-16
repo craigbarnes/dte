@@ -14,6 +14,7 @@ bool term_drop_controlling_tty(int fd)
 #if HAVE_TIOCNOTTY
     return ioctl(fd, TIOCNOTTY) != -1;
 #else
+    (void)fd;
     errno = ENOSYS;
     return false;
 #endif
