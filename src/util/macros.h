@@ -95,7 +95,7 @@
     #define MSAN_ENABLED 1
 #endif
 
-#if HAS_C_ATTRIBUTE(maybe_unused)
+#if __STDC_VERSION__ > 202300L
     #define UNUSED [[__maybe_unused__]]
 #elif GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(unused) || defined(__TINYC__)
     #define UNUSED __attribute__((__unused__))
