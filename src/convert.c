@@ -141,15 +141,13 @@ bool file_decoder_read_line(FileDecoder *dec, const char **linep, size_t *lenp)
 
 #include <iconv.h>
 
-static unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
+static const unsigned char replacement[2] = "\xc2\xbf"; // U+00BF
 
 struct cconv {
     iconv_t cd;
-
     char *obuf;
     size_t osize;
     size_t opos;
-
     size_t consumed;
     size_t errors;
 
@@ -187,31 +185,25 @@ static size_t encoding_char_size(const char *encoding)
 
 static size_t iconv_wrapper (
     iconv_t cd,
-    char **restrict inbuf,
+    const char **restrict inbuf,
     size_t *restrict inbytesleft,
     char **restrict outbuf,
     size_t *restrict outbytesleft
 ) {
     // POSIX defines the second parameter of iconv(3) as "char **restrict"
     // but NetBSD declares it as "const char **restrict"
-    #ifdef __NetBSD__
-     #if HAS_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
-      IGNORE_WARNING("-Wincompatible-pointer-types-discards-qualifiers")
-     #else
-      IGNORE_WARNING("-Wincompatible-pointer-types")
-     #endif
-    #endif
+#ifdef __NetBSD__
+    const char **restrict in = inbuf;
+#else
+    char **restrict in = (char **restrict)inbuf;
+#endif
 
-    return iconv(cd, inbuf, inbytesleft, outbuf, outbytesleft);
-
-    #ifdef __NetBSD__
-     UNIGNORE_WARNINGS
-    #endif
+    return iconv(cd, in, inbytesleft, outbuf, outbytesleft);
 }
 
 static void encode_replacement(struct cconv *c)
 {
-    char *ib = replacement;
+    const char *ib = replacement;
     char *ob = c->rbuf;
     size_t ic = sizeof(replacement);
     size_t oc = sizeof(c->rbuf);
@@ -259,13 +251,12 @@ static size_t handle_invalid(struct cconv *c, const char *buf, size_t count)
     return c->char_size;
 }
 
-static int xiconv(struct cconv *c, char **ib, size_t *ic)
+static int xiconv(struct cconv *c, const char **ib, size_t *ic)
 {
     while (1) {
         char *ob = c->obuf + c->opos;
         size_t oc = c->osize - c->opos;
         size_t rc = iconv_wrapper(c->cd, ib, ic, &ob, &oc);
-
         c->opos = ob - c->obuf;
         if (rc == (size_t)-1) {
             switch (errno) {
@@ -291,31 +282,24 @@ static int xiconv(struct cconv *c, char **ib, size_t *ic)
 
 static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
 {
-    size_t ic, ipos = 0;
-    char *ib;
-
+    size_t ipos = 0;
     while (c->tcount < sizeof(c->tbuf) && ipos < len) {
-        size_t skip;
-
         c->tbuf[c->tcount++] = input[ipos++];
-
-        ib = c->tbuf;
-        ic = c->tcount;
+        const char *ib = c->tbuf;
+        size_t ic = c->tcount;
         int rc = xiconv(c, &ib, &ic);
-
         if (ic > 0) {
             memmove(c->tbuf, ib, ic);
         }
         c->tcount = ic;
-
-        switch (rc) {
-        case EINVAL:
+        if (rc == EINVAL) {
             // Incomplete character at end of input buffer; try again
             // with more input data
             continue;
-        case EILSEQ:
+        }
+        if (rc == EILSEQ) {
             // Invalid multibyte sequence
-            skip = handle_invalid(c, c->tbuf, c->tcount);
+            size_t skip = handle_invalid(c, c->tbuf, c->tcount);
             c->tcount -= skip;
             if (c->tcount > 0) {
                 LOG_DEBUG("tcount=%zu, skip=%zu", c->tcount, skip);
@@ -326,6 +310,7 @@ static size_t convert_incomplete(struct cconv *c, const char *input, size_t len)
         }
         break;
     }
+
     LOG_DEBUG("%zu %zu", ipos, c->tcount);
     return ipos;
 }
@@ -346,11 +331,9 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
     }
 
     const char *ib = input;
-    size_t ic = len;
-    while (ic > 0) {
-        size_t skip;
-        switch (xiconv(c, (char**)&ib, &ic)) {
-        case EINVAL:
+    for (size_t ic = len; ic > 0; ) {
+        int r = xiconv(c, &ib, &ic);
+        if (r == EINVAL) {
             // Incomplete character at end of input buffer
             if (ic < sizeof(c->tbuf)) {
                 memcpy(c->tbuf, ib, ic);
@@ -359,13 +342,14 @@ static void cconv_process(struct cconv *c, const char *input, size_t len)
                 // FIXME
             }
             ic = 0;
-            break;
-        case EILSEQ:
+            continue;
+        }
+        if (r == EILSEQ) {
             // Invalid multibyte sequence
-            skip = handle_invalid(c, ib, ic);
+            size_t skip = handle_invalid(c, ib, ic);
             ic -= skip;
             ib += skip;
-            break;
+            continue;
         }
     }
 }
@@ -408,7 +392,6 @@ static char *cconv_consume_line(struct cconv *c, size_t *len)
 {
     char *line = c->obuf + c->consumed;
     char *nl = memchr(line, '\n', c->opos - c->consumed);
-
     if (!nl) {
         *len = 0;
         return NULL;
@@ -441,10 +424,12 @@ bool conversion_supported_by_iconv(const char *from, const char *to)
         errno = EINVAL;
         return false;
     }
+
     iconv_t cd = iconv_open(to, from);
     if (cd == (iconv_t)-1) {
         return false;
     }
+
     iconv_close(cd);
     return true;
 }
@@ -523,11 +508,7 @@ static bool decode_and_read_line(FileDecoder *dec, const char **linep, size_t *l
     size_t len;
     while (1) {
         line = cconv_consume_line(dec->cconv, &len);
-        if (line) {
-            break;
-        }
-
-        if (!fill(dec)) {
+        if (line || !fill(dec)) {
             break;
         }
     }
