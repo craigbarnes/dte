@@ -425,13 +425,11 @@ bool save_buffer (
     if (unlikely(!enc)) {
         // This should never happen because encoding is validated early
         error_msg_errno("new_file_encoder");
-        xclose(fd);
         goto error;
     }
 
     EncodingType bom_type = write_bom ? encoding->type : UNKNOWN_ENCODING;
     if (!write_buffer(buffer, enc, fd, bom_type)) {
-        xclose(fd);
         goto error;
     }
 
@@ -451,30 +449,36 @@ bool save_buffer (
                 goto retry;
             default:
                 error_msg_errno("fsync");
-                xclose(fd);
                 goto error;
             }
         }
     }
 #endif
 
-    if (xclose(fd)) {
+    int r = xclose(fd);
+    fd = -1;
+    if (r != 0) {
         error_msg_errno("close");
         goto error;
     }
-    if (*tmp && rename(tmp, filename)) {
+
+    if (tmp[0] && rename(tmp, filename)) {
         error_msg_errno("rename");
         goto error;
     }
+
     free_file_encoder(enc);
     buffer_stat(&buffer->file, filename);
     return true;
 
 error:
+    if (fd >= 0) {
+        xclose(fd);
+    }
     if (enc) {
         free_file_encoder(enc);
     }
-    if (*tmp) {
+    if (tmp[0]) {
         unlink(tmp);
     } else {
         // Not using temporary file, therefore mtime may have changed.
