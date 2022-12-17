@@ -3,7 +3,6 @@
 [attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol space-indent
 [attr]dterc code
 [attr]generated is-generated linguist-generated
-[attr]vendored -whitespace is-vendored linguist-vendored
 
 mk/version.sh export-subst
 .git* export-ignore
@@ -41,6 +40,5 @@ config/README.md -dterc
 *.md markdown
 *.html html
 
-lib/** vendored
 docs/*.[15] code generated
 src/util/unidata.h generated
