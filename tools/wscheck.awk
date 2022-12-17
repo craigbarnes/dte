@@ -4,9 +4,9 @@ FNR == 1 {
     printf(" %7s  %s\n", "WSCHECK", FILENAME)
 }
 
-/^\t/ {
+/^ *\t/ {
     nlines++
-    print FILENAME ":" FNR ": tab indent"
+    print FILENAME ":" FNR ": tab in indent"
 }
 
 END {
