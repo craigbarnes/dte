@@ -26,7 +26,6 @@
 #include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
-#include "terminal/xterm.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/fd.h"
@@ -214,34 +213,32 @@ static ExitCode lint_syntax(const char *filename)
     return get_nr_errors() ? EX_DATAERR : EX_OK;
 }
 
-static ExitCode showkey_loop(const char *term_name, const char *colorterm)
+static ExitCode showkey_loop(EditorState *e)
 {
+    ExitCode status = EX_OK;
     if (unlikely(!term_raw())) {
         perror("tcsetattr");
-        return EX_IOERR;
+        status = EX_IOERR;
+        goto out;
     }
 
-    Terminal term;
-    TermOutputBuffer *obuf = &term.obuf;
-    TermInputBuffer *ibuf = &term.ibuf;
-    term_init(&term, term_name, colorterm);
-    term_input_init(ibuf);
-    term_output_init(obuf);
-    term_enable_private_modes(&term);
+    Terminal *term = &e->terminal;
+    TermOutputBuffer *obuf = &term->obuf;
+    term_enable_private_modes(term);
     term_add_literal(obuf, "Press any key combination, or use Ctrl+D to exit\r\n");
     term_output_flush(obuf);
 
     char keystr[KEYCODE_STR_MAX];
     bool loop = true;
     while (loop) {
-        KeyCode key = term_read_key(&term, 100);
+        KeyCode key = term_read_key(term, 100);
         switch (key) {
         case KEY_NONE:
         case KEY_IGNORE:
             continue;
         case KEY_BRACKETED_PASTE:
         case KEY_DETECTED_PASTE:
-            term_discard_paste(ibuf, key == KEY_BRACKETED_PASTE);
+            term_discard_paste(&term->ibuf, key == KEY_BRACKETED_PASTE);
             continue;
         case MOD_CTRL | 'd':
             loop = false;
@@ -253,12 +250,13 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
         term_output_flush(obuf);
     }
 
-    term_restore_private_modes(&term);
+    term_restore_private_modes(term);
     term_output_flush(obuf);
     term_cooked();
-    term_input_free(ibuf);
-    term_output_free(obuf);
-    return EX_OK;
+
+out:
+    free_editor_state(e);
+    return status;
 }
 
 static ExitCode init_std_fds(int std_fds[2])
@@ -482,14 +480,13 @@ loop_break:;
         return EX_IOERR;
     }
 
-    const char *colorterm = getenv("COLORTERM");
-    if (use_showkey) {
-        return showkey_loop(term_name, colorterm);
-    }
-
     EditorState *e = init_editor_state();
     Terminal *term = &e->terminal;
-    term_init(term, term_name, colorterm);
+    term_init(term, term_name);
+
+    if (use_showkey) {
+        return showkey_loop(e);
+    }
 
     Buffer *std_buffer = init_std_buffer(e, std_fds);
     bool have_stdout_buffer = std_buffer && std_buffer->stdout_buffer;

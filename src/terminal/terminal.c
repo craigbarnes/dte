@@ -126,17 +126,9 @@ UNITTEST {
     BUG_ON(BSEARCH(&k, terms, term_name_compare));
 }
 
-void term_init(Terminal *term, const char *name, const char *colorterm)
+void term_init(Terminal *term, const char *name)
 {
     BUG_ON(name[0] == '\0');
-
-    // Initialize defaults
-    *term = (Terminal) {
-        .color_type = TERM_8_COLOR,
-        .width = 80,
-        .height = 24,
-        .parse_input = xterm_parse_key,
-    };
 
     // Strip phony "xterm-" prefix used by certain terminals
     const char *real_name = name;
@@ -169,7 +161,7 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
         LOG_INFO("using built-in terminal support for '%.*s'", n, root_name.data);
     }
 
-    const char *ct = colorterm;
+    const char *ct = getenv("COLORTERM");
     if (ct && (streq(ct, "truecolor") || streq(ct, "24bit"))) {
         term->color_type = TERM_TRUE_COLOR;
         LOG_INFO("24-bit color support detected (COLORTERM=%s)", ct);

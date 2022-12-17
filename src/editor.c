@@ -146,6 +146,12 @@ EditorState *init_editor_state(void)
                 .key_bindings = INTMAP_INIT,
             },
         },
+        .terminal = {
+            .color_type = TERM_8_COLOR,
+            .width = 80,
+            .height = 24,
+            .parse_input = xterm_parse_key,
+        },
         .options = {
             .auto_indent = true,
             .detect_indent = 0,

@@ -84,7 +84,7 @@ typedef struct Terminal {
     TermInputBuffer ibuf;
 } Terminal;
 
-void term_init(Terminal *term, const char *name, const char *colorterm) NONNULL_ARG(1, 2);
+void term_init(Terminal *term, const char *name) NONNULL_ARGS;
 void term_enable_private_modes(Terminal *term) NONNULL_ARGS;
 void term_restore_private_modes(Terminal *term) NONNULL_ARGS;
 void term_restore_cursor_style(Terminal *term) NONNULL_ARGS;
