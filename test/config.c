@@ -143,13 +143,11 @@ static void test_detect_indent(TestContext *ctx)
     EXPECT_FALSE(e->options.expand_tab);
     EXPECT_EQ(e->options.indent_width, 8);
 
-    EXPECT_TRUE(handle_normal_command (
-        e,
+    static const char cmds[] =
         "option -r '/test/data/detect-indent\\.ini$' detect-indent 2,4,8;"
-        "open test/data/detect-indent.ini",
-        false
-    ));
+        "open test/data/detect-indent.ini;";
 
+    EXPECT_TRUE(handle_normal_command(e, cmds, false));
     EXPECT_EQ(e->buffer->options.detect_indent, 1 << 1 | 1 << 3 | 1 << 7);
     EXPECT_TRUE(e->buffer->options.expand_tab);
     EXPECT_EQ(e->buffer->options.indent_width, 2);
