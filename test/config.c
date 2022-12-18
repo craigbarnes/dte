@@ -239,8 +239,7 @@ static void test_macro_record(TestContext *ctx)
     EXPECT_EQ(m->macro.count, 9);
     EXPECT_EQ(m->prev_macro.count, 0);
 
-    EXPECT_TRUE(handle_normal_command (
-        e,
+    static const char cmds[] =
         "save -f build/test/macro-rec.txt;"
         "close -f;"
         "open;"
@@ -248,10 +247,9 @@ static void test_macro_record(TestContext *ctx)
         "save -f build/test/macro-out.txt;"
         "close -f;"
         "show macro;"
-        "close -f;",
-        true
-    ));
+        "close -f;";
 
+    EXPECT_TRUE(handle_normal_command(e, cmds, false));
     expect_files_equal(ctx, "build/test/macro-rec.txt", "build/test/macro-out.txt");
 
     EXPECT_FALSE(macro_is_recording(m));
