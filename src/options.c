@@ -777,6 +777,25 @@ bool validate_local_options(char **strs)
     return !invalid;
 }
 
+#if DEBUG >= 1
+void sanity_check_global_options(const GlobalOptions *gopts)
+{
+    // TODO: check ws_error, esc_timeout, filesize_limit, scroll_margin
+    BUG_ON(statusline_format_find_error(gopts->statusline_left));
+    BUG_ON(statusline_format_find_error(gopts->statusline_right));
+    BUG_ON(gopts->indent_width < 1);
+    BUG_ON(gopts->tab_width < 1);
+    BUG_ON(gopts->text_width < 1);
+    BUG_ON(gopts->indent_width > INDENT_WIDTH_MAX);
+    BUG_ON(gopts->tab_width > TAB_WIDTH_MAX);
+    BUG_ON(gopts->text_width > TEXT_WIDTH_MAX);
+    BUG_ON(gopts->crlf_newlines > 1);
+    BUG_ON(gopts->case_sensitive_search > CSS_AUTO);
+    unsigned int di = gopts->detect_indent;
+    BUG_ON((di & ((1u << INDENT_WIDTH_MAX) - 1)) != di);
+}
+#endif
+
 void collect_options(PointerArray *a, const char *prefix, bool local, bool global)
 {
     for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {

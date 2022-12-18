@@ -179,8 +179,7 @@ EditorState *init_editor_state(void)
         }
     };
 
-    BUG_ON(statusline_format_find_error(e->options.statusline_left));
-    BUG_ON(statusline_format_find_error(e->options.statusline_right));
+    sanity_check_global_options(&e->options);
 
     for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
         const CommandSet *cmds = e->modes[i].cmds;

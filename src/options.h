@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "regexp.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 
@@ -93,5 +94,11 @@ void collect_toggleable_options(PointerArray *a, const char *prefix, bool global
 void collect_option_values(struct EditorState *e, PointerArray *a, const char *option, const char *prefix);
 String dump_options(GlobalOptions *gopts, LocalOptions *lopts);
 const char *get_option_value_string(struct EditorState *e, const char *name);
+
+#if DEBUG >= 1
+    void sanity_check_global_options(const GlobalOptions *opts);
+#else
+    static inline void sanity_check_global_options(const GlobalOptions* UNUSED_ARG(opts)) {}
+#endif
 
 #endif
