@@ -322,18 +322,19 @@ UNITTEST {
 static bool detect_indent(Buffer *buffer)
 {
     LocalOptions *options = &buffer->options;
+    unsigned int bitset = options->detect_indent;
     BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
     unsigned int tab_count = 0;
     unsigned int space_count = 0;
     int current_indent = 0;
-    int counts[9] = {0};
+    int counts[INDENT_WIDTH_MAX + 1] = {0};
+    BUG_ON((bitset & ((1u << INDENT_WIDTH_MAX) - 1)) != bitset);
 
     for (size_t i = 0, j = 1; i < 200 && j > 0; i++, j = block_iter_next_line(&bi)) {
         StringView line;
         fill_line_ref(&bi, &line);
-
         bool tab;
-        int indent = indent_len(line, options->detect_indent, &tab);
+        int indent = indent_len(line, bitset, &tab);
         switch (indent) {
         case -2: // Ignore mixed indent because tab width might not be 8
         case -1: // Empty line; no change in indent
@@ -345,7 +346,7 @@ static bool detect_indent(Buffer *buffer)
 
         BUG_ON(indent <= 0);
         int change = indent - current_indent;
-        if (change >= 1 && change <= 8) {
+        if (change >= 1 && change <= INDENT_WIDTH_MAX) {
             counts[change]++;
         }
 
@@ -371,7 +372,7 @@ static bool detect_indent(Buffer *buffer)
     size_t m = 0;
     for (size_t i = 1; i < ARRAYLEN(counts); i++) {
         unsigned int bit = 1u << (i - 1);
-        if ((options->detect_indent & bit) && counts[i] > counts[m]) {
+        if ((bitset & bit) && counts[i] > counts[m]) {
             m = i;
         }
     }
