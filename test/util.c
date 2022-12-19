@@ -519,7 +519,7 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.alloc, 0);
     EXPECT_NULL(s.buffer);
 
-    string_insert_ch(&s, 0, 0x1F4AF);
+    EXPECT_EQ(string_insert_codepoint(&s, 0, 0x1F4AF), 4);
     EXPECT_EQ(s.len, 4);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xF0\x9F\x92\xAF");
 
@@ -531,13 +531,13 @@ static void test_string(TestContext *ctx)
     EXPECT_EQ(s.len, 3);
     EXPECT_STREQ(string_borrow_cstring(&s), "est");
 
-    string_insert_ch(&s, 0, 't');
+    EXPECT_EQ(string_insert_codepoint(&s, 0, 't'), 1);
     EXPECT_EQ(s.len, 4);
     EXPECT_STREQ(string_borrow_cstring(&s), "test");
 
     string_clear(&s);
     EXPECT_EQ(s.len, 0);
-    string_insert_ch(&s, 0, 0x0E01);
+    EXPECT_EQ(string_insert_codepoint(&s, 0, 0x0E01), 3);
     EXPECT_EQ(s.len, 3);
     EXPECT_STREQ(string_borrow_cstring(&s), "\xE0\xB8\x81");
 
@@ -583,7 +583,7 @@ static void test_string(TestContext *ctx)
     cstr = string_clone_cstring(&s);
     EXPECT_STREQ(cstr, "12foo3123");
 
-    EXPECT_EQ(string_insert_ch(&s, 0, '>'), 1);
+    EXPECT_EQ(string_insert_codepoint(&s, 0, '>'), 1);
     EXPECT_STREQ(string_borrow_cstring(&s), ">12foo3123");
     EXPECT_EQ(s.len, 10);
 
@@ -1255,40 +1255,40 @@ static void test_u_set_char_raw(TestContext *ctx)
     MEMZERO(&buf);
 
     i = 0;
-    u_set_char_raw(buf, &i, 'a');
+    EXPECT_EQ(u_set_char_raw(buf, &i, 'a'), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 'a');
 
     i = 0;
-    u_set_char_raw(buf, &i, '\0');
+    EXPECT_EQ(u_set_char_raw(buf, &i, '\0'), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], '\0');
 
     i = 0;
-    u_set_char_raw(buf, &i, 0x1F);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x1F), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 0x1F);
 
     i = 0;
-    u_set_char_raw(buf, &i, 0x7F);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x7F), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 0x7F);
 
     i = 0;
-    u_set_char_raw(buf, &i, 0x7FF);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x7FF), 2);
     EXPECT_EQ(i, 2);
     EXPECT_EQ(buf[0], 0xDF);
     EXPECT_EQ(buf[1], 0xBF);
 
     i = 0;
-    u_set_char_raw(buf, &i, 0xFF45);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0xFF45), 3);
     EXPECT_EQ(i, 3);
     EXPECT_EQ(buf[0], 0xEF);
     EXPECT_EQ(buf[1], 0xBD);
     EXPECT_EQ(buf[2], 0x85);
 
     i = 0;
-    u_set_char_raw(buf, &i, 0x1F311);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x1F311), 4);
     EXPECT_EQ(i, 4);
     EXPECT_EQ(buf[0], 0xF0);
     EXPECT_EQ(buf[1], 0x9F);
@@ -1297,13 +1297,13 @@ static void test_u_set_char_raw(TestContext *ctx)
 
     i = 0;
     buf[1] = 0x88;
-    u_set_char_raw(buf, &i, 0x110000);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x110000), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 0);
     EXPECT_EQ(buf[1], 0x88);
 
     i = 0;
-    u_set_char_raw(buf, &i, 0x110042);
+    EXPECT_EQ(u_set_char_raw(buf, &i, 0x110042), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 0x42);
     EXPECT_EQ(buf[1], 0x88);

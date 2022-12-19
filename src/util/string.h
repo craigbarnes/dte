@@ -68,7 +68,7 @@ static inline void string_clear(String *s)
 void string_reserve_space(String *s, size_t more) NONNULL_ARGS;
 void string_append_byte(String *s, unsigned char byte) NONNULL_ARGS;
 size_t string_append_codepoint(String *s, CodePoint u) NONNULL_ARGS;
-size_t string_insert_ch(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
+size_t string_insert_codepoint(String *s, size_t pos, CodePoint u) NONNULL_ARGS;
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len) NONNULL_ARG(1);
 void string_sprintf(String *s, const char *fmt, ...) PRINTF(2) NONNULL_ARGS;
 char *string_steal_cstring(String *s) NONNULL_ARGS_AND_RETURN;

@@ -68,7 +68,7 @@ bool handle_input(EditorState *e, KeyCode key)
     }
 
     CommandLine *c = &e->cmdline;
-    c->pos += string_insert_ch(&c->buf, c->pos, key);
+    c->pos += string_insert_codepoint(&c->buf, c->pos, key);
     if (mode == INPUT_COMMAND) {
         reset_completion(c);
     }

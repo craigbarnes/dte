@@ -40,10 +40,8 @@ void string_append_byte(String *s, unsigned char byte)
 
 size_t string_append_codepoint(String *s, CodePoint u)
 {
-    size_t len = u_char_size(u);
-    string_reserve_space(s, len);
-    u_set_char_raw(s->buffer, &s->len, u);
-    return len;
+    string_reserve_space(s, 4);
+    return u_set_char_raw(s->buffer, &s->len, u);
 }
 
 static void string_make_space(String *s, size_t pos, size_t len)
@@ -55,12 +53,10 @@ static void string_make_space(String *s, size_t pos, size_t len)
     s->len += len;
 }
 
-size_t string_insert_ch(String *s, size_t pos, CodePoint u)
+size_t string_insert_codepoint(String *s, size_t pos, CodePoint u)
 {
-    size_t len = u_char_size(u);
-    string_make_space(s, pos, len);
-    u_set_char_raw(s->buffer, &pos, u);
-    return len;
+    string_make_space(s, pos, u_char_size(u));
+    return u_set_char_raw(s->buffer, &pos, u);
 }
 
 void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
