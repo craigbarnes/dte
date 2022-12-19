@@ -28,9 +28,6 @@ static size_t parse_ex_pattern(char **escaped, const char *buf, size_t size)
             continue;
         }
         if (buf[i] == open_delim) {
-            if (i + 2 < size && buf[i + 1] == ';' && buf[i + 2] == '"') {
-                i += 2;
-            }
             pattern[j] = '\0';
             *escaped = pattern;
             return i + 1;
@@ -52,22 +49,22 @@ static size_t parse_ex_cmd(Tag *t, const char *buf, size_t size)
         return 0;
     }
 
+    size_t n;
     if (buf[0] == '/' || buf[0] == '?') {
-        return parse_ex_pattern(&t->pattern, buf, size);
+        n = parse_ex_pattern(&t->pattern, buf, size);
+    } else {
+        n = buf_parse_ulong(buf, size, &t->lineno);
     }
 
-    unsigned long lineno;
-    size_t i = buf_parse_ulong(buf, size, &lineno);
-    if (i == 0) {
+    if (n == 0) {
         return 0;
     }
 
-    if (i + 1 < size && buf[i] == ';' && buf[i + 1] == '"') {
-        i += 2;
+    if (n + 1 < size && buf[n] == ';' && buf[n + 1] == '"') {
+        n += 2;
     }
 
-    t->lineno = lineno;
-    return i;
+    return n;
 }
 
 bool parse_ctags_line(Tag *t, const char *line, size_t line_len)
