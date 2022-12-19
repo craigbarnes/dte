@@ -384,13 +384,10 @@ static int tmp_file(const char *filename, const FileInfo *info, char *buf, size_
 
     // Preserve ownership and mode of the original file if possible
     if (xfchown(fd, info->uid, info->gid) != 0) {
-        const char *err = strerror(errno);
-        LOG_WARNING("failed to preserve file ownership: %s", err);
+        LOG_WARNING("failed to preserve file ownership: %s", strerror(errno));
     }
-
     if (xfchmod(fd, info->mode) != 0) {
-        const char *err = strerror(errno);
-        LOG_WARNING("failed to preserve file mode: %s", err);
+        LOG_WARNING("failed to preserve file mode: %s", strerror(errno));
     }
 
     return fd;
