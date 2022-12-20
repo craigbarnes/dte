@@ -314,6 +314,13 @@ ssize_t handle_exec (
         }
     }
 
+    if (!output_to_buffer) {
+        view->cursor = saved_cursor;
+        view->sel_so = saved_sel_so;
+        view->sel_eo = saved_sel_eo;
+        mark_all_lines_changed(view->buffer);
+    }
+
     switch (actions[STDOUT_FILENO]) {
     case EXEC_BUFFER:
         if (replace_input || view->selection) {
@@ -349,13 +356,6 @@ ssize_t handle_exec (
     default:
         BUG("unhandled action");
         return -1;
-    }
-
-    if (!output_to_buffer) {
-        view->cursor = saved_cursor;
-        view->sel_so = saved_sel_so;
-        view->sel_eo = saved_sel_eo;
-        mark_all_lines_changed(view->buffer);
     }
 
     size_t output_len = output->len;
