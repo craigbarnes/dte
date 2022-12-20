@@ -192,7 +192,9 @@ ssize_t handle_exec (
     bool strip_trailing_newline
 ) {
     View *view = e->view;
-    BlockIter saved_cursor = view->cursor;
+    const BlockIter saved_cursor = view->cursor;
+    const ssize_t saved_sel_so = view->sel_so;
+    const ssize_t saved_sel_eo = view->sel_eo;
     char *alloc = NULL;
     bool output_to_buffer = (actions[STDOUT_FILENO] == EXEC_BUFFER);
     bool replace_input = false;
@@ -347,6 +349,13 @@ ssize_t handle_exec (
     default:
         BUG("unhandled action");
         return -1;
+    }
+
+    if (!output_to_buffer) {
+        view->cursor = saved_cursor;
+        view->sel_so = saved_sel_so;
+        view->sel_eo = saved_sel_eo;
+        mark_all_lines_changed(view->buffer);
     }
 
     size_t output_len = output->len;
