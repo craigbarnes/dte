@@ -67,7 +67,7 @@ static inline bool regexp_is_valid(const char *pattern, int flags)
 
 void regexp_compile_or_fatal_error(regex_t *re, const char *pattern, int flags);
 bool regexp_init_word_boundary_tokens(RegexpWordBoundaryTokens *rwbt);
-void regexp_error_msg(const regex_t *re, const char *pattern, int err);
+bool regexp_error_msg(const regex_t *re, const char *pattern, int err);
 void free_cached_regexp(CachedRegexp *cr);
 
 const InternedRegexp *regexp_intern(const char *pattern);

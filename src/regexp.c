@@ -10,19 +10,18 @@
 
 static HashMap interned_regexps;
 
-void regexp_error_msg(const regex_t *re, const char *pattern, int err)
+bool regexp_error_msg(const regex_t *re, const char *pattern, int err)
 {
     char msg[1024];
     regerror(err, re, msg, sizeof(msg));
-    error_msg("%s: %s", msg, pattern);
+    return error_msg("%s: %s", msg, pattern);
 }
 
 bool regexp_compile_internal(regex_t *re, const char *pattern, int flags)
 {
     int err = regcomp(re, pattern, flags);
     if (err) {
-        regexp_error_msg(re, pattern, err);
-        return false;
+        return regexp_error_msg(re, pattern, err);
     }
     return true;
 }
