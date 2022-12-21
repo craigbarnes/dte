@@ -72,7 +72,7 @@ bind C-q 'quit -p'
 bind C-r 'command replace\ '
 bind C-s 'save -p'
 bind C-t open
-bind C-v 'paste -c'
+bind C-v 'paste -a'
 bind C-w 'close -pwq'
 bind C-x cut
 bind C-y redo
