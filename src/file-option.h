@@ -9,8 +9,8 @@
 #include "util/string.h"
 
 typedef enum {
-    FILE_OPTIONS_FILENAME,
-    FILE_OPTIONS_FILETYPE,
+    FOPTS_FILENAME,
+    FOPTS_FILETYPE,
 } FileOptionType;
 
 struct EditorState;

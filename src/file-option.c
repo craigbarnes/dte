@@ -3,6 +3,7 @@
 #include "command/serialize.h"
 #include "editor.h"
 #include "editorconfig/editorconfig.h"
+#include "error.h"
 #include "options.h"
 #include "regexp.h"
 #include "util/debug.h"
@@ -87,14 +88,14 @@ void set_file_options(EditorState *e, Buffer *buffer)
 {
     for (size_t i = 0, n = e->file_options.count; i < n; i++) {
         const FileOption *opt = e->file_options.ptrs[i];
-        if (opt->type == FILE_OPTIONS_FILETYPE) {
+        if (opt->type == FOPTS_FILETYPE) {
             if (streq(opt->u.filetype, buffer->options.filetype)) {
                 set_options(e, opt->strs);
             }
             continue;
         }
 
-        BUG_ON(opt->type != FILE_OPTIONS_FILENAME);
+        BUG_ON(opt->type != FOPTS_FILENAME);
         const char *filename = buffer->abs_filename;
         if (!filename) {
             continue;
@@ -110,17 +111,19 @@ void set_file_options(EditorState *e, Buffer *buffer)
 
 bool add_file_options(PointerArray *file_options, FileOptionType type, StringView str, char **strs, size_t nstrs)
 {
-    FileOption *opt = xnew(FileOption, 1);
     size_t len = str.length;
-    if (type == FILE_OPTIONS_FILETYPE) {
-        if (unlikely(len == 0)) {
-            goto error;
-        }
+    if (unlikely(len == 0)) {
+        const char *desc = (type == FOPTS_FILETYPE) ? "filetype" : "pattern";
+        return error_msg("can't add option with empty %s", desc);
+    }
+
+    FileOption *opt = xnew(FileOption, 1);
+    if (type == FOPTS_FILETYPE) {
         opt->u.filetype = xstrcut(str.data, len);
         goto append;
     }
 
-    BUG_ON(type != FILE_OPTIONS_FILENAME);
+    BUG_ON(type != FOPTS_FILENAME);
     CachedRegexp *r = xmalloc(sizeof(*r) + len + 1);
     memcpy(r->str, str.data, len);
     r->str[len] = '\0';
@@ -130,7 +133,8 @@ bool add_file_options(PointerArray *file_options, FileOptionType type, StringVie
     if (unlikely(err)) {
         regexp_error_msg(&r->re, r->str, err);
         free(r);
-        goto error;
+        free(opt);
+        return false;
     }
 
 append:
@@ -138,10 +142,6 @@ append:
     opt->strs = copy_string_array(strs, nstrs);
     ptr_array_append(file_options, opt);
     return true;
-
-error:
-    free(opt);
-    return false;
 }
 
 void dump_file_options(const PointerArray *file_options, String *buf)
@@ -149,14 +149,14 @@ void dump_file_options(const PointerArray *file_options, String *buf)
     for (size_t i = 0, n = file_options->count; i < n; i++) {
         const FileOption *opt = file_options->ptrs[i];
         const char *tp;
-        if (opt->type == FILE_OPTIONS_FILENAME) {
+        if (opt->type == FOPTS_FILENAME) {
             tp = opt->u.filename->str;
         } else {
             tp = opt->u.filetype;
         }
         char **strs = opt->strs;
         string_append_literal(buf, "option ");
-        if (opt->type == FILE_OPTIONS_FILENAME) {
+        if (opt->type == FOPTS_FILENAME) {
             string_append_literal(buf, "-r ");
         }
         if (str_has_prefix(tp, "-") || string_array_contains_prefix(strs, "-")) {
@@ -175,10 +175,10 @@ void dump_file_options(const PointerArray *file_options, String *buf)
 
 static void free_file_option(FileOption *opt)
 {
-    if (opt->type == FILE_OPTIONS_FILENAME) {
+    if (opt->type == FOPTS_FILENAME) {
         free_cached_regexp(opt->u.filename);
     } else {
-        BUG_ON(opt->type != FILE_OPTIONS_FILETYPE);
+        BUG_ON(opt->type != FOPTS_FILETYPE);
         free(opt->u.filetype);
     }
     free_string_array(opt->strs);
