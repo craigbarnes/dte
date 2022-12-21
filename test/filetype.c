@@ -77,6 +77,7 @@ static void test_find_ft_filename(TestContext *ctx)
         {".bash_profile", "sh"},
         {".clang-format", "yaml"},
         {".drirc", "xml"},
+        {".dterc", "dte"},
         {".editorconfig", "ini"},
         {".gitattributes", "config"},
         {".gitconfig", "ini"},

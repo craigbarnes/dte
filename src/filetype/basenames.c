@@ -43,6 +43,7 @@ static const struct FileBasenameMap {
     {"dir_colors", CONFIG, true},
     {"dircolors", CONFIG, true},
     {"drirc", XML, true},
+    {"dterc", DTE, true},
     {"editorconfig", INI, true},
     {"emacs", LISP, true},
     {"fstab", CONFIG, false},
