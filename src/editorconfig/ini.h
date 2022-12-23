@@ -13,8 +13,8 @@ typedef struct {
     StringView name;
     StringView value;
     unsigned int name_count;
-} IniParserContext;
+} IniParser;
 
-bool ini_parse(IniParserContext *ctx) WARN_UNUSED_RESULT;
+bool ini_parse(IniParser *ctx) WARN_UNUSED_RESULT;
 
 #endif

@@ -28,7 +28,7 @@ static void strip_trailing_comments_and_whitespace(StringView *line)
     line->length = len;
 }
 
-bool ini_parse(IniParserContext *ctx)
+bool ini_parse(IniParser *ctx)
 {
     const char *input = ctx->input;
     const size_t len = ctx->input_len;

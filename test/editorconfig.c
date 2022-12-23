@@ -17,7 +17,7 @@ static void test_ini_parse(TestContext *ctx)
         " x=0"
     ;
 
-    IniParserContext ini = {
+    IniParser ini = {
         .input = input,
         .input_len = sizeof(input) - 1,
     };

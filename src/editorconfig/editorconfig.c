@@ -98,7 +98,7 @@ static void editorconfig_option_set (
 
 static void editorconfig_parse(const char *buf, size_t size, UserData *data)
 {
-    IniParserContext ini = {
+    IniParser ini = {
         .input = buf,
         .input_len = size,
     };
