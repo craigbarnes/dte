@@ -447,10 +447,10 @@ static const OptionDesc option_desc[] = {
     BOOL_OPT("display-special", G(display_special), redraw_screen),
     BOOL_OPT("editorconfig", C(editorconfig), NULL),
     BOOL_OPT("emulate-tab", C(emulate_tab), NULL),
-    UINT_OPT("esc-timeout", G(esc_timeout), 0, 2000, NULL),
+    UINT_OPT("esc-timeout", G(esc_timeout), 0, ESC_TIMEOUT_MAX, NULL),
     BOOL_OPT("expand-tab", C(expand_tab), redraw_buffer),
     BOOL_OPT("file-history", C(file_history), NULL),
-    UINT_OPT("filesize-limit", G(filesize_limit), 0, 16000, NULL),
+    UINT_OPT("filesize-limit", G(filesize_limit), 0, FILESIZE_LIMIT_MAX, NULL),
     STR_OPT("filetype", L(filetype), validate_filetype, filetype_changed),
     BOOL_OPT("fsync", C(fsync), NULL),
     REGEX_OPT("indent-regex", L(indent_regex), NULL),
@@ -459,7 +459,7 @@ static const OptionDesc option_desc[] = {
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
     BOOL_OPT("optimize-true-color", G(optimize_true_color), redraw_screen),
     BOOL_OPT("overwrite", C(overwrite), overwrite_changed),
-    UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
+    UINT_OPT("scroll-margin", G(scroll_margin), 0, SCROLL_MARGIN_MAX, redraw_screen),
     BOOL_OPT("select-cursor-char", G(select_cursor_char), redraw_screen),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),
     BOOL_OPT("show-line-numbers", G(show_line_numbers), redraw_screen),
@@ -780,7 +780,6 @@ bool validate_local_options(char **strs)
 #if DEBUG >= 1
 void sanity_check_global_options(const GlobalOptions *gopts)
 {
-    // TODO: check ws_error, esc_timeout, filesize_limit, scroll_margin
     BUG_ON(statusline_format_find_error(gopts->statusline_left));
     BUG_ON(statusline_format_find_error(gopts->statusline_right));
     BUG_ON(gopts->indent_width < 1);
@@ -791,8 +790,13 @@ void sanity_check_global_options(const GlobalOptions *gopts)
     BUG_ON(gopts->text_width > TEXT_WIDTH_MAX);
     BUG_ON(gopts->crlf_newlines > 1);
     BUG_ON(gopts->case_sensitive_search > CSS_AUTO);
+    BUG_ON(gopts->esc_timeout > ESC_TIMEOUT_MAX);
+    BUG_ON(gopts->filesize_limit > FILESIZE_LIMIT_MAX);
+    BUG_ON(gopts->scroll_margin > SCROLL_MARGIN_MAX);
     unsigned int di = gopts->detect_indent;
     BUG_ON((di & ((1u << INDENT_WIDTH_MAX) - 1)) != di);
+    unsigned int wse = gopts->ws_error;
+    BUG_ON((wse & WSE_MASK) != wse);
 }
 #endif
 

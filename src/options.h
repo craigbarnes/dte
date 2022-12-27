@@ -12,6 +12,9 @@ enum {
     INDENT_WIDTH_MAX = 8,
     TAB_WIDTH_MAX = 8,
     TEXT_WIDTH_MAX = 1000,
+    ESC_TIMEOUT_MAX = 2000,
+    FILESIZE_LIMIT_MAX = 16000,
+    SCROLL_MARGIN_MAX = 100,
 };
 
 // Note: this must be kept in sync with ws_error_values[]
@@ -24,6 +27,7 @@ typedef enum {
     WSE_AUTO_INDENT = 1 << 5, // expand-tab ? WSE_TAB_AFTER_INDENT | WSE_TAB_INDENT : WSE_SPACE_INDENT
     WSE_TRAILING = 1 << 6, // Trailing whitespace
     WSE_ALL_TRAILING = 1 << 7, // Like WSE_TRAILING, but including around cursor
+    WSE_MASK = (1 << 8) - 1, // Mask of all above flags
 } WhitespaceErrorFlags;
 
 #define COMMON_OPTIONS \
