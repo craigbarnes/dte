@@ -17,6 +17,30 @@ static void test_find_buffer_by_id(TestContext *ctx)
     EXPECT_NULL(find_buffer_by_id(&e->buffers, large_id));
 }
 
+static void test_buffer_mark_lines_changed(TestContext *ctx)
+{
+    Buffer b = {
+        .changed_line_min = 101,
+        .changed_line_max = 399,
+    };
+
+    buffer_mark_lines_changed(&b, 400, 12);
+    EXPECT_EQ(b.changed_line_min, 12);
+    EXPECT_EQ(b.changed_line_max, 400);
+
+    buffer_mark_lines_changed(&b, 3, 3);
+    EXPECT_EQ(b.changed_line_min, 3);
+    EXPECT_EQ(b.changed_line_max, 400);
+
+    buffer_mark_lines_changed(&b, 3, 990);
+    EXPECT_EQ(b.changed_line_min, 3);
+    EXPECT_EQ(b.changed_line_max, 990);
+
+    buffer_mark_lines_changed(&b, 1234, 1);
+    EXPECT_EQ(b.changed_line_min, 1);
+    EXPECT_EQ(b.changed_line_max, 1234);
+}
+
 static void test_make_indent(TestContext *ctx)
 {
     LocalOptions options = {
@@ -79,6 +103,7 @@ static void test_get_indent_for_next_line(TestContext *ctx)
 
 static const TestEntry tests[] = {
     TEST(test_find_buffer_by_id),
+    TEST(test_buffer_mark_lines_changed),
     TEST(test_make_indent),
     TEST(test_get_indent_for_next_line),
 };
