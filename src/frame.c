@@ -313,19 +313,13 @@ void set_frame_size(Frame *frame, int w, int h)
 {
     int min_w = get_min_w(frame);
     int min_h = get_min_h(frame);
-
-    if (w < min_w) {
-        w = min_w;
-    }
-    if (h < min_h) {
-        h = min_h;
-    }
+    w = MAX(w, min_w);
+    h = MAX(h, min_h);
     frame->w = w;
     frame->h = h;
+
     if (frame->window) {
-        if (!rightmost_frame(frame)) {
-            w--; // Separator
-        }
+        w -= rightmost_frame(frame) ? 0 : 1; // Separator
         set_window_size(frame->window, w, h);
         return;
     }
