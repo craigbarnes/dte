@@ -4,7 +4,6 @@
 #include "regexp.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/str-util.h"
 #include "util/string.h"
 
 static size_t get_last_paired_brace_index(const char *str, size_t len)
@@ -97,8 +96,7 @@ bool ec_pattern_match(const char *pattern, size_t pattern_len, const char *path)
     String buf = string_new(pattern_len * 2);
     size_t brace_level = 0;
     size_t last_paired_brace_index = get_last_paired_brace_index(pattern, pattern_len);
-    bool brace_group_has_empty_alternate[32];
-    MEMZERO(&brace_group_has_empty_alternate);
+    bool brace_group_has_empty_alternate[32] = {false};
 
     for (size_t i = 0; i < pattern_len; i++) {
         char ch = pattern[i];

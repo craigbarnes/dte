@@ -1250,11 +1250,8 @@ static void test_u_str_width(TestContext *ctx)
 
 static void test_u_set_char_raw(TestContext *ctx)
 {
-    unsigned char buf[16];
-    size_t i;
-    MEMZERO(&buf);
-
-    i = 0;
+    unsigned char buf[16] = "";
+    size_t i = 0;
     EXPECT_EQ(u_set_char_raw(buf, &i, 'a'), 1);
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 'a');
@@ -1311,11 +1308,8 @@ static void test_u_set_char_raw(TestContext *ctx)
 
 static void test_u_set_char(TestContext *ctx)
 {
-    unsigned char buf[16];
-    size_t i;
-    MEMZERO(&buf);
-
-    i = 0;
+    unsigned char buf[16] = "";
+    size_t i = 0;
     u_set_char(buf, &i, 'a');
     EXPECT_EQ(i, 1);
     EXPECT_EQ(buf[0], 'a');
@@ -1779,8 +1773,6 @@ static void test_hashset(TestContext *ctx)
     }
 
     hashset_free(&set);
-    MEMZERO(&set);
-
     hashset_init(&set, 0, true);
     EXPECT_EQ(set.nr_entries, 0);
     hashset_add(&set, STRN("foo"));
@@ -1790,7 +1782,6 @@ static void test_hashset(TestContext *ctx)
     EXPECT_NONNULL(hashset_get(&set, STRN("FOO")));
     EXPECT_NONNULL(hashset_get(&set, STRN("fOO")));
     hashset_free(&set);
-    MEMZERO(&set);
 
     // Check that hashset_add() returns existing entries instead of
     // inserting duplicates

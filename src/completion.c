@@ -791,7 +791,7 @@ void reset_completion(CommandLine *cmdline)
     free(cs->parsed);
     free(cs->orig);
     ptr_array_free(&cs->completions);
-    MEMZERO(cs);
+    *cs = (CompletionState){.orig = NULL};
 }
 
 void collect_hashmap_keys(const HashMap *map, PointerArray *a, const char *prefix)

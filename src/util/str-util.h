@@ -10,8 +10,6 @@
 #include "string-view.h"
 #include "xmalloc.h"
 
-#define MEMZERO(ptr) memset((ptr), 0, sizeof(*(ptr)))
-
 PURE NONNULL_ARGS
 static inline bool streq(const char *a, const char *b)
 {
