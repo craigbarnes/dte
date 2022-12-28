@@ -945,10 +945,7 @@ static bool cmd_move_tab(EditorState *e, const CommandArgs *a)
         if (!str_to_size(str, &to) || to == 0) {
             return error_msg("Invalid tab position %s", str);
         }
-        to--;
-        if (to >= ntabs) {
-            to = ntabs - 1;
-        }
+        to = MIN(to, ntabs) - 1;
     }
     ptr_array_move(&window->views, from, to);
     window->update_tabbar = true;
