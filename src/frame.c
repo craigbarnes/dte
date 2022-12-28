@@ -427,6 +427,7 @@ Frame *split_frame(Window *window, bool vertical, bool before)
 // Doesn't really split root but adds new frame between root and its contents
 Frame *split_root(EditorState *e, bool vertical, bool before)
 {
+    Frame *old_root = e->root_frame;
     Frame *new_root = new_frame();
     Frame *frame = new_frame();
     frame->parent = new_root;
@@ -434,14 +435,8 @@ Frame *split_root(EditorState *e, bool vertical, bool before)
     frame->window->frame = frame;
     new_root->vertical = vertical;
 
-    Frame *old_root = e->root_frame;
-    if (before) {
-        ptr_array_append(&new_root->frames, frame);
-        ptr_array_append(&new_root->frames, old_root);
-    } else {
-        ptr_array_append(&new_root->frames, old_root);
-        ptr_array_append(&new_root->frames, frame);
-    }
+    ptr_array_append(&new_root->frames, before ? frame : old_root);
+    ptr_array_append(&new_root->frames, before ? old_root : frame);
 
     BUG_ON(old_root->parent);
     old_root->parent = new_root;
