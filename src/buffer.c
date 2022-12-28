@@ -39,12 +39,8 @@ void buffer_mark_lines_changed(Buffer *buffer, long min, long max)
         min = max;
         max = tmp;
     }
-    if (min < buffer->changed_line_min) {
-        buffer->changed_line_min = min;
-    }
-    if (max > buffer->changed_line_max) {
-        buffer->changed_line_max = max;
-    }
+    buffer->changed_line_min = MIN(min, buffer->changed_line_min);
+    buffer->changed_line_max = MAX(max, buffer->changed_line_max);
 }
 
 const char *buffer_filename(const Buffer *buffer)
