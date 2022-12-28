@@ -411,11 +411,8 @@ Frame *split_frame(Window *window, bool vertical, bool before)
 
     size_t idx = ptr_array_idx(&parent->frames, window->frame);
     BUG_ON(idx >= parent->frames.count);
-    if (!before) {
-        idx++;
-    }
-    Window *neww = new_window(window->editor);
-    frame = add_frame(parent, neww, idx);
+    idx += before ? 0 : 1;
+    frame = add_frame(parent, new_window(window->editor), idx);
     parent->equal_size = true;
 
     // Recalculate
