@@ -429,19 +429,13 @@ Frame *split_root(EditorState *e, bool vertical, bool before)
 {
     Frame *old_root = e->root_frame;
     Frame *new_root = new_frame();
-    Frame *frame = new_frame();
-    frame->parent = new_root;
-    frame->window = new_window(e);
-    frame->window->frame = frame;
-    new_root->vertical = vertical;
-
-    ptr_array_append(&new_root->frames, before ? frame : old_root);
-    ptr_array_append(&new_root->frames, before ? old_root : frame);
-
-    BUG_ON(old_root->parent);
+    ptr_array_append(&new_root->frames, old_root);
     old_root->parent = new_root;
-    set_frame_size(new_root, old_root->w, old_root->h);
+    new_root->vertical = vertical;
     e->root_frame = new_root;
+
+    Frame *frame = add_frame(new_root, new_window(e), before ? 0 : 1);
+    set_frame_size(new_root, old_root->w, old_root->h);
     update_window_coordinates(new_root);
     return frame;
 }
