@@ -4,9 +4,6 @@
 
 void init_selection(const View *view, SelectionInfo *info)
 {
-    BlockIter ei;
-    CodePoint u;
-
     info->so = view->sel_so;
     info->eo = block_iter_get_offset(&view->cursor);
     info->si = view->cursor;
@@ -20,14 +17,16 @@ void init_selection(const View *view, SelectionInfo *info)
         info->swapped = true;
     }
 
-    ei = info->si;
+    BlockIter ei = info->si;
     block_iter_skip_bytes(&ei, info->eo - info->so);
     if (block_iter_is_eof(&ei)) {
         if (info->so == info->eo) {
             return;
         }
+        CodePoint u;
         info->eo -= block_iter_prev_char(&ei, &u);
     }
+
     if (view->selection == SELECT_LINES) {
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
