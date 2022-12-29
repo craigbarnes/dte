@@ -326,19 +326,6 @@ void equalize_frame_sizes(Frame *parent)
     update_window_coordinates(parent);
 }
 
-void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount)
-{
-    frame = find_resizable(frame, dir);
-    if (!frame) {
-        return;
-    }
-
-    Frame *parent = frame->parent;
-    parent->equal_size = false;
-    resize_to(frame, (parent->vertical ? frame->h : frame->w) + amount);
-    update_window_coordinates(parent);
-}
-
 void resize_frame(Frame *frame, ResizeDirection dir, int size)
 {
     frame = find_resizable(frame, dir);
@@ -350,6 +337,11 @@ void resize_frame(Frame *frame, ResizeDirection dir, int size)
     parent->equal_size = false;
     resize_to(frame, size);
     update_window_coordinates(parent);
+}
+
+void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount)
+{
+    resize_frame(frame, dir, get_size(frame) + amount);
 }
 
 static void update_frame_coordinates(const Frame *frame, int x, int y)
