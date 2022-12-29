@@ -75,7 +75,8 @@ static noreturn void handle_child(const char **argv, const char **env, int fd[3]
     }
 
     static const int ignored_signals[] = {
-        SIGINT, SIGQUIT, SIGTSTP, SIGPIPE, SIGUSR1, SIGUSR2
+        SIGINT, SIGQUIT, SIGTSTP, SIGXFSZ,
+        SIGPIPE, SIGUSR1, SIGUSR2,
     };
 
     struct sigaction action = {.sa_handler = SIG_DFL};

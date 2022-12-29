@@ -109,7 +109,7 @@ static void set_signal_handlers(void)
 {
     static const int fatal_signals[] = {
         SIGBUS, SIGFPE, SIGILL, SIGSEGV,
-        SIGSYS, SIGTRAP, SIGXCPU, SIGXFSZ,
+        SIGSYS, SIGTRAP, SIGXCPU,
         SIGALRM, SIGVTALRM,
         SIGHUP, SIGTERM,
 #ifdef SIGEMT
@@ -118,7 +118,7 @@ static void set_signal_handlers(void)
     };
 
     static const int ignored_signals[] = {
-        SIGINT, SIGQUIT, SIGTSTP,
+        SIGINT, SIGQUIT, SIGTSTP, SIGXFSZ,
         SIGPIPE, SIGUSR1, SIGUSR2,
     };
 
