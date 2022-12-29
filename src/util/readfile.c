@@ -1,11 +1,12 @@
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "readfile.h"
 #include "xreadwrite.h"
 
-ssize_t read_file(const char *filename, char **bufp)
+ssize_t read_file_with_limit(const char *filename, char **bufp, size_t size_limit)
 {
     int fd = xopen(filename, O_RDONLY | O_CLOEXEC, 0);
     if (fd == -1) {
@@ -22,12 +23,18 @@ ssize_t read_file(const char *filename, char **bufp)
         goto error;
     }
 
-    char *buf = malloc(st.st_size + 1);
+    off_t size = st.st_size;
+    if (unlikely(size >= SSIZE_MAX || (size_limit && size > size_limit))) {
+        errno = EFBIG;
+        goto error;
+    }
+
+    char *buf = malloc(size + 1);
     if (unlikely(!buf)) {
         goto error;
     }
 
-    ssize_t r = xread_all(fd, buf, st.st_size);
+    ssize_t r = xread_all(fd, buf, size);
     if (unlikely(r < 0)) {
         free(buf);
         goto error;
@@ -45,4 +52,9 @@ error:
 error_noclose:
     *bufp = NULL;
     return -1;
+}
+
+ssize_t read_file(const char *filename, char **bufp)
+{
+    return read_file_with_limit(filename, bufp, 0);
 }
