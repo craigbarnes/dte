@@ -80,10 +80,7 @@ static void shift_left(View *view, size_t nr_lines, size_t count)
                 buffer_delete_bytes(view, info.bytes);
             }
         } else if (info.level && info.sane) {
-            size_t n = count;
-            if (n > info.level) {
-                n = info.level;
-            }
+            size_t n = MIN(count, info.level);
             if (space_indent) {
                 n *= indent_width;
             }

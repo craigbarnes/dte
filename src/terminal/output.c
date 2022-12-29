@@ -102,9 +102,7 @@ void term_set_bytes(Terminal *term, char ch, size_t count)
     }
     ssize_t skip = obuf->scroll_x - obuf->x;
     if (skip > 0) {
-        if (skip > count) {
-            skip = count;
-        }
+        skip = MIN(skip, count);
         obuf->x += skip;
         count -= skip;
     }
@@ -335,10 +333,7 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
             const size_t tw = obuf->tab_width;
             const size_t x = obuf->x;
             size_t width = (x + tw) / tw * tw - x;
-            if (unlikely(width > space)) {
-                width = space;
-            }
-            print_tab(obuf, width);
+            print_tab(obuf, MIN(width, space));
         } else {
             // Use caret notation for control chars:
             obuf->buf[obuf->count++] = '^';

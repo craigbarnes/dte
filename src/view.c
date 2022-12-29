@@ -95,10 +95,7 @@ static void view_update_vy(View *v, unsigned int scroll_margin)
     long max_y = v->vy + window->edit_h - 1 - margin;
 
     if (v->cy < v->vy + margin) {
-        v->vy = v->cy - margin;
-        if (v->vy < 0) {
-            v->vy = 0;
-        }
+        v->vy = MAX(v->cy - margin, 0);
     } else if (v->cy > max_y) {
         v->vy += v->cy - max_y;
         max_y = v->buffer->nl - window->edit_h + 1;

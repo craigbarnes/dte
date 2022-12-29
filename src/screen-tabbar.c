@@ -49,9 +49,7 @@ static void calculate_tabbar(Window *window)
         View *view = window->views.ptrs[i];
         if (view == window->view) {
             // Make sure current tab is visible
-            if (window->first_tab_idx > i) {
-                window->first_tab_idx = i;
-            }
+            window->first_tab_idx = MIN(i, window->first_tab_idx);
         }
         update_tab_title_width(view, i + 1);
         total_w += view->tt_width;

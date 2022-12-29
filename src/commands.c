@@ -1752,10 +1752,7 @@ static bool cmd_scroll_pgup(EditorState *e, const CommandArgs *a)
     Window *window = e->window;
     View *view = e->view;
     if (view->vy > 0) {
-        long count = window->edit_h - 1;
-        if (count > view->vy) {
-            count = view->vy;
-        }
+        long count = MIN(window->edit_h - 1, view->vy);
         view->vy -= count;
         move_up(view, count);
     } else if (view->cy > 0) {

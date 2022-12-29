@@ -152,10 +152,7 @@ static void fix_size(const Frame *frame)
     if (total > s) {
         int n = total - s;
         for (ssize_t i = count - 1; n > 0 && i >= 0; i--) {
-            int new_size = size[i] - n;
-            if (new_size < min[i]) {
-                new_size = min[i];
-            }
+            int new_size = MAX(size[i] - n, min[i]);
             n -= size[i] - new_size;
             size[i] = new_size;
         }

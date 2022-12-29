@@ -423,10 +423,8 @@ void set_window_size(Window *window, int w, int h)
 int window_get_scroll_margin(const Window *window, unsigned int scroll_margin)
 {
     int max = (window->edit_h - 1) / 2;
-    if (scroll_margin > max) {
-        return max;
-    }
-    return scroll_margin;
+    BUG_ON(max < 0);
+    return MIN(max, scroll_margin);
 }
 
 void frame_for_each_window(const Frame *frame, void (*func)(Window*, void*), void *data)
