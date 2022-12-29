@@ -98,13 +98,13 @@ void file_history_load(FileHistory *history, char *filename)
         if (unlikely(
             !parse_ulong_field(&line, &row)
             || !parse_ulong_field(&line, &col)
-            || !strview_has_prefix(&line, "/")
+            || line.length < 2
+            || line.data[0] != '/'
+            || buf[pos - 1] != '\n'
         )) {
             continue;
         }
-        char *eol = &buf[pos - 1];
-        BUG_ON(*eol != '\n' && *eol != '\0');
-        *eol = '\0'; // null-terminate line, by replacing '\n' with '\0'
+        buf[pos - 1] = '\0'; // null-terminate line, by replacing '\n' with '\0'
         file_history_add(history, row, col, line.data);
     }
 
