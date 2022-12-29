@@ -188,10 +188,7 @@ static int sub(Frame *frame, int count)
 {
     int min = get_min(frame);
     int old = get_size(frame);
-    int new = old - count;
-    if (new < min) {
-        new = min;
-    }
+    int new = MAX(min, old - count);
     if (new != old) {
         set_size(frame, new);
     }
@@ -226,19 +223,10 @@ static void resize_to(Frame *frame, int size)
     int count = parent->frames.count;
     int min = get_min(frame);
     int max = total - (count - 1) * min;
-    int change;
+    max = MAX(min, max);
+    size = CLAMP(size, min, max);
 
-    if (max < min) {
-        max = min;
-    }
-    if (size < min) {
-        size = min;
-    }
-    if (size > max) {
-        size = max;
-    }
-
-    change = size - get_size(frame);
+    int change = size - get_size(frame);
     if (change == 0) {
         return;
     }
@@ -345,13 +333,10 @@ void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount)
         return;
     }
 
-    frame->parent->equal_size = false;
-    if (frame->parent->vertical) {
-        resize_to(frame, frame->h + amount);
-    } else {
-        resize_to(frame, frame->w + amount);
-    }
-    update_window_coordinates(frame->parent);
+    Frame *parent = frame->parent;
+    parent->equal_size = false;
+    resize_to(frame, (parent->vertical ? frame->h : frame->w) + amount);
+    update_window_coordinates(parent);
 }
 
 void resize_frame(Frame *frame, ResizeDirection dir, int size)
@@ -361,9 +346,10 @@ void resize_frame(Frame *frame, ResizeDirection dir, int size)
         return;
     }
 
-    frame->parent->equal_size = false;
+    Frame *parent = frame->parent;
+    parent->equal_size = false;
     resize_to(frame, size);
-    update_window_coordinates(frame->parent);
+    update_window_coordinates(parent);
 }
 
 static void update_frame_coordinates(const Frame *frame, int x, int y)
