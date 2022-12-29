@@ -21,6 +21,7 @@ extern const TestGroup dump_tests;
 extern const TestGroup editorconfig_tests;
 extern const TestGroup encoding_tests;
 extern const TestGroup filetype_tests;
+extern const TestGroup frame_tests;
 extern const TestGroup history_tests;
 extern const TestGroup option_tests;
 extern const TestGroup spawn_tests;
@@ -191,6 +192,7 @@ int main(void)
     run_tests(&ctx, &terminal_tests);
     run_tests(&ctx, &cmdline_tests);
     run_tests(&ctx, &history_tests);
+    run_tests(&ctx, &frame_tests);
     run_tests(&ctx, &ctags_tests);
     run_tests(&ctx, &spawn_tests);
     run_tests(&ctx, &status_tests);
