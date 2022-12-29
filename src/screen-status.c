@@ -7,7 +7,7 @@ void update_status_line(const Window *window)
     EditorState *e = window->editor;
     const GlobalOptions *opts = &e->options;
     InputMode mode = e->input_mode;
-    char lbuf[256], rbuf[256];
+    char lbuf[512], rbuf[512];
     sf_format(window, opts, mode, lbuf, sizeof lbuf, opts->statusline_left);
     sf_format(window, opts, mode, rbuf, sizeof rbuf, opts->statusline_right);
 

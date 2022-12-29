@@ -8,7 +8,7 @@
 #include "util/debug.h"
 #include "util/xstdio.h"
 
-static char error_buf[256];
+static char error_buf[512];
 static unsigned int nr_errors;
 static bool msg_is_error;
 static bool print_errors_to_stderr;
