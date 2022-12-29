@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
     const char *file;
-    int line;
+    unsigned int line;
 } ConfigState;
 
 extern ConfigState current_config;

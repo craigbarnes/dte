@@ -268,7 +268,7 @@ static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
         void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
             LOG_WARNING (
-                "duplicate 'default' argument in %s:%d: '%s'",
+                "duplicate 'default' argument in %s:%u: '%s'",
                 current_config.file,
                 current_config.line,
                 name

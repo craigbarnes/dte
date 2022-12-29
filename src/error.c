@@ -22,14 +22,14 @@ bool error_msg(const char *format, ...)
 {
     const char *cmd = current_command ? current_command->name : NULL;
     const char *file = current_config.file;
-    const int line = current_config.line;
+    const unsigned int line = current_config.line;
     const size_t size = sizeof(error_buf);
     int pos = 0;
 
     if (file && cmd) {
-        pos = snprintf(error_buf, size, "%s:%d: %s: ", file, line, cmd);
+        pos = snprintf(error_buf, size, "%s:%u: %s: ", file, line, cmd);
     } else if (file) {
-        pos = snprintf(error_buf, size, "%s:%d: ", file, line);
+        pos = snprintf(error_buf, size, "%s:%u: ", file, line);
     } else if (cmd) {
         pos = snprintf(error_buf, size, "%s: ", cmd);
     }
