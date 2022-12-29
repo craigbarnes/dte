@@ -575,7 +575,7 @@ char dialog_prompt(EditorState *e, const char *question, const char *choices)
 
 char status_prompt(EditorState *e, const char *question, const char *choices)
 {
-    // update_windows() assumes these have been called for the current view
+    // update_buffer_windows() assumes these have been called for current view
     view_update_cursor_x(e->view);
     view_update_cursor_y(e->view);
     view_update(e->view, e->options.scroll_margin);
