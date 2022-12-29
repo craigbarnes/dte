@@ -34,7 +34,7 @@ void add_to_frame_size(Frame *frame, ResizeDirection dir, int amount);
 void resize_frame(Frame *frame, ResizeDirection dir, int size);
 void update_window_coordinates(Frame *frame);
 Frame *split_frame(struct Window *window, bool vertical, bool before);
-Frame *split_root(struct EditorState *e, bool vertical, bool before);
+Frame *split_root_frame(struct EditorState *e, bool vertical, bool before);
 void remove_frame(struct EditorState *e, Frame *frame);
 void dump_frame(const Frame *frame, int level, String *str);
 

@@ -2226,7 +2226,7 @@ static bool cmd_wsplit(EditorState *e, const CommandArgs *a)
 
     Frame *frame;
     if (root) {
-        frame = split_root(e, vertical, before);
+        frame = split_root_frame(e, vertical, before);
     } else {
         frame = split_frame(e->window, vertical, before);
     }

@@ -397,7 +397,7 @@ Frame *split_frame(Window *window, bool vertical, bool before)
 }
 
 // Doesn't really split root but adds new frame between root and its contents
-Frame *split_root(EditorState *e, bool vertical, bool before)
+Frame *split_root_frame(EditorState *e, bool vertical, bool before)
 {
     Frame *old_root = e->root_frame;
     Frame *new_root = new_frame();

@@ -17,7 +17,7 @@ static void test_resize_frame(TestContext *ctx)
     EXPECT_EQ(root->w, 80);
     EXPECT_EQ(root->h, 23);
 
-    Frame *frame = split_root(&e, false, false);
+    Frame *frame = split_root_frame(&e, false, false);
     root = e.root_frame;
     ASSERT_NONNULL(frame);
     ASSERT_NONNULL(frame->window);
