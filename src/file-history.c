@@ -80,6 +80,9 @@ void file_history_load(FileHistory *history, char *filename)
     BUG_ON(!filename);
     BUG_ON(history->filename);
 
+    hashmap_init(&history->entries, MAX_ENTRIES);
+    history->filename = filename;
+
     char *buf;
     const ssize_t ssize = read_file(filename, &buf);
     if (ssize < 0) {
@@ -88,9 +91,6 @@ void file_history_load(FileHistory *history, char *filename)
         }
         return;
     }
-
-    hashmap_init(&history->entries, MAX_ENTRIES);
-    history->filename = filename;
 
     for (size_t pos = 0, size = ssize; pos < size; ) {
         unsigned long row, col;
