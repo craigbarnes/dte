@@ -403,22 +403,24 @@ static void update_window(EditorState *e, Window *window)
 // Update all visible views containing this buffer
 static void update_buffer_windows(EditorState *e, const Buffer *buffer)
 {
+    const View *current_view = e->view;
     for (size_t i = 0, n = buffer->views.count; i < n; i++) {
         View *view = buffer->views.ptrs[i];
-        if (view->window->view == view) {
-            // Visible view
-            if (view != e->window->view) {
-                // Restore cursor
-                view->cursor.blk = BLOCK(view->buffer->blocks.next);
-                block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
-
-                // These have already been updated for current view
-                view_update_cursor_x(view);
-                view_update_cursor_y(view);
-                view_update(view, e->options.scroll_margin);
-            }
-            update_window(e, view->window);
+        if (view != view->window->view) {
+            // Not visible
+            continue;
         }
+        if (view != current_view) {
+            // Restore cursor
+            view->cursor.blk = BLOCK(view->buffer->blocks.next);
+            block_iter_goto_offset(&view->cursor, view->saved_cursor_offset);
+
+            // These have already been updated for current view
+            view_update_cursor_x(view);
+            view_update_cursor_y(view);
+            view_update(view, e->options.scroll_margin);
+        }
+        update_window(e, view->window);
     }
 }
 
