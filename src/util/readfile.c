@@ -24,7 +24,8 @@ ssize_t read_file_with_limit(const char *filename, char **bufp, size_t size_limi
     }
 
     off_t size = st.st_size;
-    if (unlikely(size >= SSIZE_MAX || (size_limit && size > size_limit))) {
+    size_limit = size_limit ? MIN(size_limit, SSIZE_MAX) : SSIZE_MAX;
+    if (unlikely(size > size_limit)) {
         errno = EFBIG;
         goto error;
     }
