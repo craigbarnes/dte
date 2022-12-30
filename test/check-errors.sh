@@ -47,5 +47,5 @@ TERM= $dte -cquit 2>/dev/null
 check "$?" 64
 
 # No controlling tty
-setsid $dte -cquit >/dev/null 2>&1 0>&1
+TERM=xterm-256color setsid $dte -cquit >/dev/null 2>&1 0>&1
 check "$?" 74
