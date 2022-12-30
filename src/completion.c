@@ -192,11 +192,9 @@ void collect_builtin_configs(EditorState* UNUSED_ARG(e), PointerArray *a, const 
     size_t nconfigs;
     const BuiltinConfig *configs = get_builtin_configs_array(&nconfigs);
     for (size_t i = 0; i < nconfigs; i++) {
-        const BuiltinConfig *cfg = &configs[i];
-        if (str_has_prefix(cfg->name, "syntax/")) {
-            return;
-        } else if (str_has_prefix(cfg->name, prefix)) {
-            ptr_array_append(a, xstrdup(cfg->name));
+        const char *name = configs[i].name;
+        if (str_has_prefix(name, prefix) && !str_has_prefix(name, "syntax/")) {
+            ptr_array_append(a, xstrdup(name));
         }
     }
 }
