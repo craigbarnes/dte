@@ -30,7 +30,7 @@ test -x "$dte" || abort "argument #1 ('$dte') not executable"
 
 check "$($dte -V | head -n1)" "dte $ver"
 check "$($dte -h | head -n1)" "Usage: $dte [OPTIONS] [[+LINE] FILE]..."
-check "$($dte -B | head -n1)" "rc"
+check "$($dte -B | grep -c '^rc$')" "1"
 check "$($dte -b rc)" "$(cat config/rc)"
 
 $dte -s config/syntax/dte >/dev/null
