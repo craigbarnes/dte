@@ -139,17 +139,26 @@ int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
 void exec_builtin_color_reset(EditorState *e)
 {
     clear_hl_colors(&e->colors);
-    read_normal_config(e, "color/reset", CFG_MUST_EXIST | CFG_BUILTIN);
+    const StringView reset = string_view(builtin_color_reset, sizeof(builtin_color_reset) - 1);
+    const ConfigState saved = current_config;
+    current_config.file = "color/reset";
+    current_config.line = 1;
+    exec_normal_config(e, reset);
+    current_config = saved;
 }
 
 void exec_builtin_rc(EditorState *e)
 {
     exec_builtin_color_reset(e);
-    read_normal_config(e, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
+    const StringView rc = string_view(builtin_rc, sizeof(builtin_rc) - 1);
+    const ConfigState saved = current_config;
+    current_config.file = "rc";
+    current_config.line = 1;
+    exec_normal_config(e, rc);
+    current_config = saved;
 }
 
 UNITTEST {
-    // Built-in configs can be customized, but these 2 are required:
     BUG_ON(!get_builtin_config("rc"));
     BUG_ON(!get_builtin_config("color/reset"));
 }
