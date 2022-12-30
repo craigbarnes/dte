@@ -17,6 +17,7 @@ void collect_bound_normal_keys(EditorState *e, PointerArray *a, const char *keys
 void collect_hl_colors(EditorState *e, PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_compilers(EditorState *e, PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_builtin_configs(EditorState *e, PointerArray *a, const char *prefix) NONNULL_ARGS;
+void collect_builtin_includes(EditorState *e, PointerArray *a, const char *prefix) NONNULL_ARGS;
 void collect_hashmap_keys(const HashMap *map, PointerArray *a, const char *prefix) NONNULL_ARGS;
 
 #endif
