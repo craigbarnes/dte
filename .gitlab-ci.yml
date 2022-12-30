@@ -76,7 +76,7 @@ debian-11:
         - make bench DEBUG=0 CFLAGS=-O3
 
 android:
-    extends: .test
+    stage: test
     image: registry.gitlab.com/craigbarnes/dockerfiles/android-ndk
     script:
         - make CC="$CC_AARCH64"
