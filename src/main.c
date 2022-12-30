@@ -504,7 +504,7 @@ loop_break:;
     }
 
     term_save_title(term);
-    exec_builtin_rc(e, e->terminal.color_type);
+    exec_builtin_rc(e);
 
     if (read_rc) {
         ConfigFlags flags = CFG_NOFLAGS;

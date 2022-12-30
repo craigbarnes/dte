@@ -31,7 +31,7 @@ BUILTIN_SYNTAX_FILES ?= \
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc binding/default compiler/gcc compiler/go \
-    $(addprefix color/, reset reset-basic default darkgray) \
+    $(addprefix color/, reset default darkgray) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
 TEST_CONFIGS := $(addprefix test/data/, $(addsuffix .dterc, \

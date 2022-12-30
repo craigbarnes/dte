@@ -277,7 +277,8 @@ void init_headless_mode(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     ASSERT_NONNULL(e);
-    exec_builtin_rc(e, TERM_8_COLOR);
+    EXPECT_EQ(e->terminal.color_type, TERM_0_COLOR);
+    exec_builtin_rc(e);
     update_all_syntax_colors(&e->syntaxes, &e->colors);
     e->options.lock_files = false;
     e->window = new_window(e);

@@ -1,16 +1,28 @@
-# Reset for terminals that support at least 8 colors
+# For terminals that support basic attributes but not colors (e.g. vt220):
 hi default
-hi nontext blue keep
-hi noline blue
-hi wserror default yellow
-hi selection keep gray keep
+hi nontext reverse
+hi noline
+hi wserror reverse
+hi selection reverse
 hi currentline keep keep keep
-hi linenumber
-hi statusline black gray
+hi linenumber reverse
+hi statusline reverse
 hi commandline
-hi errormsg bold red
-hi infomsg bold blue
-hi tabbar black gray
+hi errormsg bold
+hi infomsg
+hi tabbar reverse
 hi activetab bold
-hi inactivetab black gray
-hi dialog white red bold
+hi inactivetab reverse
+hi dialog reverse
+
+# For terminals that support at least 8 colors:
+hi -c nontext blue keep
+hi -c noline blue
+hi -c wserror default yellow
+hi -c selection keep gray keep
+hi -c statusline black gray
+hi -c errormsg bold red
+hi -c infomsg bold blue
+hi -c tabbar black gray
+hi -c inactivetab black gray
+hi -c dialog white red bold

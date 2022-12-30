@@ -687,9 +687,8 @@ static bool cmd_ft(EditorState *e, const CommandArgs *a)
 
 static bool cmd_hi(EditorState *e, const CommandArgs *a)
 {
-    TermColorCapabilityType color_type = e->terminal.color_type;
     if (unlikely(a->nr_args == 0)) {
-        exec_builtin_color_reset(e, color_type);
+        exec_builtin_color_reset(e);
         goto update;
     }
 
@@ -705,6 +704,7 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
         return error_msg("invalid color or attribute: '%s'", strs[n]);
     }
 
+    TermColorCapabilityType color_type = e->terminal.color_type;
     bool optimize = e->options.optimize_true_color;
     int32_t fg = color_to_nearest(color.fg, color_type, optimize);
     int32_t bg = color_to_nearest(color.bg, color_type, optimize);

@@ -3,7 +3,6 @@
 # compatibility and remain suitable for both light and dark terminals.
 
 hi
-hi linenumber reverse
 hi selection default blue
 
 hi text

@@ -136,23 +136,20 @@ int read_config(CommandRunner *runner, const char *filename, ConfigFlags flags)
     return ret;
 }
 
-void exec_builtin_color_reset(EditorState *e, TermColorCapabilityType type)
+void exec_builtin_color_reset(EditorState *e)
 {
     clear_hl_colors(&e->colors);
-    bool basic = type == TERM_0_COLOR;
-    const char *cfg = basic ? "color/reset-basic" : "color/reset";
-    read_normal_config(e, cfg, CFG_MUST_EXIST | CFG_BUILTIN);
+    read_normal_config(e, "color/reset", CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
-void exec_builtin_rc(EditorState *e, TermColorCapabilityType color_type)
+void exec_builtin_rc(EditorState *e)
 {
-    exec_builtin_color_reset(e, color_type);
+    exec_builtin_color_reset(e);
     read_normal_config(e, "rc", CFG_MUST_EXIST | CFG_BUILTIN);
 }
 
 UNITTEST {
-    // Built-in configs can be customized, but these 3 are required:
+    // Built-in configs can be customized, but these 2 are required:
     BUG_ON(!get_builtin_config("rc"));
     BUG_ON(!get_builtin_config("color/reset"));
-    BUG_ON(!get_builtin_config("color/reset-basic"));
 }
