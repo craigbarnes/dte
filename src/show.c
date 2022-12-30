@@ -448,9 +448,15 @@ static String do_dump_macro(EditorState *e)
     return dump_macro(&e->macro);
 }
 
+static String do_dump_buffer(EditorState *e)
+{
+    return dump_buffer(e->buffer);
+}
+
 static const ShowHandler show_handlers[] = {
     {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
     {"bind", DTERC, dump_all_bindings, show_binding, collect_bound_normal_keys},
+    {"buffer", 0, do_dump_buffer, NULL, NULL},
     {"builtin", 0, do_dump_builtin_configs, show_builtin, collect_builtin_configs},
     {"color", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},

@@ -13,6 +13,7 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"
+#include "util/string.h"
 
 // Subset of stat(3) struct
 typedef struct {
@@ -85,5 +86,6 @@ void free_blocks(Buffer *buffer) NONNULL_ARGS;
 bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes) NONNULL_ARGS;
 void buffer_update_syntax(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
 void buffer_setup(struct EditorState *e, Buffer *buffer) NONNULL_ARGS;
+String dump_buffer(const Buffer *buffer) NONNULL_ARGS;
 
 #endif

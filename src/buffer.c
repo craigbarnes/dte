@@ -395,3 +395,82 @@ void buffer_setup(EditorState *e, Buffer *buffer)
         detect_indent(buffer);
     }
 }
+
+String dump_buffer(const Buffer *buffer)
+{
+    uintmax_t blocks = 0;
+    uintmax_t bytes = 0;
+    uintmax_t nl = 0;
+    Block *blk;
+    block_for_each(blk, &buffer->blocks) {
+        blocks += 1;
+        bytes += blk->size;
+        nl += blk->nl;
+    }
+
+    BUG_ON(blocks < 1);
+    BUG_ON(nl != buffer->nl);
+    BUG_ON(!buffer->setup);
+
+    String buf = string_new(4096);
+    if (buffer->abs_filename) {
+        string_append_literal(&buf, "In memory:\n----------\n\n");
+    }
+
+    string_sprintf(&buf, "%9s: %s\n", "Name", buffer_filename(buffer));
+    string_sprintf(&buf, "%9s: %lu\n", "ID", buffer->id);
+    string_sprintf(&buf, "%9s: %s\n", "Encoding", buffer->encoding.name);
+    string_sprintf(&buf, "%9s: %s\n", "Filetype", buffer->options.filetype);
+    string_sprintf(&buf, "%9s: %ju\n", "Blocks", blocks);
+    string_sprintf(&buf, "%9s: %ju\n", "Lines", nl);
+    string_sprintf(&buf, "%9s: %ju\n", "Bytes", bytes);
+
+    if (
+        buffer->stdout_buffer || buffer->temporary || buffer->readonly
+        || buffer->locked || buffer->crlf_newlines || buffer->bom
+    ) {
+        string_sprintf (
+            &buf,
+            "%9s:%s%s%s%s%s%s\n",
+            "Flags",
+            buffer->stdout_buffer ? " STDOUT" : "",
+            buffer->temporary ? " TMP" : "",
+            buffer->readonly ? " RO" : "",
+            buffer->locked ? " LOCKED" : "",
+            buffer->crlf_newlines ? " CRLF" : "",
+            buffer->bom ? " BOM" : ""
+        );
+    }
+
+    if (buffer->views.count > 1) {
+        string_sprintf(&buf, "%9s: %zu\n", "Views", buffer->views.count);
+    }
+
+    if (buffer->abs_filename) {
+        string_append_literal(&buf, "\nOn filesystem:\n--------------\n\n");
+        string_sprintf(&buf, "%9s: %s\n", "Path", buffer->abs_filename);
+        const FileInfo *file = &buffer->file;
+        const unsigned int access = file->mode & 0777;
+        string_sprintf(&buf, "%9s: 0%o\n", "Mode", access);
+        string_sprintf(&buf, "%9s: %jd\n", "User", (intmax_t)file->uid);
+        string_sprintf(&buf, "%9s: %jd\n", "Group", (intmax_t)file->gid);
+        string_sprintf(&buf, "%9s: %ju\n", "Size", (uintmax_t)file->size);
+        string_sprintf(&buf, "%9s: %jd\n", "Modified", (intmax_t)file->mtime);
+        string_sprintf(&buf, "%9s: %jd\n", "Device", (intmax_t)file->dev);
+        string_sprintf(&buf, "%9s: %ju\n", "Inode", (uintmax_t)file->ino);
+    }
+
+    /* TODO:
+     - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::mode
+     - Human-readable date/time for FileInfo::mtime
+     - File type for FileInfo::mode (S_IFREG/S_IFLNK/etc.; see inode(7))
+     - SUID/SGID/sticky bits for FileInfo::mode (S_ISUID/S_ISGID/S_ISVTX)
+     - Number of changes since Buffer::saved_change
+     - Total number of changes? (Buffer::change_head)
+     - Modified status? (buffer_modified())
+     - Show info for Buffer::syn and Buffer::options?
+     - Make formatting similar to stat(1) output?
+    */
+
+    return buf;
+}
