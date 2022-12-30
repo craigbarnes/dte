@@ -201,7 +201,7 @@ static String dump_env(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
-static bool show_include(EditorState *e, const char *name, bool cflag)
+static bool show_builtin(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
     if (!cfg) {
@@ -451,6 +451,7 @@ static String do_dump_macro(EditorState *e)
 static const ShowHandler show_handlers[] = {
     {"alias", DTERC, dump_normal_aliases, show_normal_alias, collect_normal_aliases},
     {"bind", DTERC, dump_all_bindings, show_binding, collect_bound_normal_keys},
+    {"builtin", 0, do_dump_builtin_configs, show_builtin, collect_builtin_configs},
     {"color", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
     {"command", DTERC | LASTLINE, dump_command_history, NULL, NULL},
     {"cursor", DTERC, dump_cursors, show_cursor, do_collect_cursor_modes},
@@ -458,7 +459,7 @@ static const ShowHandler show_handlers[] = {
     {"errorfmt", DTERC, dump_compilers, show_compiler, collect_compilers},
     {"ft", DTERC, do_dump_filetypes, NULL, NULL},
     {"hi", DTERC, do_dump_hl_colors, show_color, collect_hl_colors},
-    {"include", 0, do_dump_builtin_configs, show_include, collect_builtin_configs},
+    {"include", 0, do_dump_builtin_configs, show_builtin, collect_builtin_includes},
     {"macro", DTERC, do_dump_macro, NULL, NULL},
     {"msg", MSGLINE, do_dump_messages, NULL, NULL},
     {"option", DTERC, do_dump_options, show_option, collect_all_options},
