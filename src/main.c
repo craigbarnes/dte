@@ -455,6 +455,14 @@ int main(int argc, char *argv[])
 
 loop_break:;
 
+    const char *term_name = getenv("TERM");
+    if (!term_name || term_name[0] == '\0') {
+        fputs("Error: $TERM not set\n", stderr);
+        // This is considered a "usage" error, because the program
+        // must be started from a properly configured terminal
+        return EX_USAGE;
+    }
+
     // This must be done before calling init_logging(), otherwise an
     // invocation like e.g. `DTE_LOG=/dev/pts/2 dte 0<&-` could
     // cause the logging fd to be opened as STDIN_FILENO
@@ -467,14 +475,6 @@ loop_break:;
     r = init_logging(getenv("DTE_LOG"), getenv("DTE_LOG_LEVEL"));
     if (unlikely(r != EX_OK)) {
         return r;
-    }
-
-    const char *term_name = getenv("TERM");
-    if (!term_name || term_name[0] == '\0') {
-        fputs("Error: $TERM not set\n", stderr);
-        // This is considered a "usage" error, because the program
-        // must be started from a properly configured terminal
-        return EX_USAGE;
     }
 
     if (!term_mode_init()) {
