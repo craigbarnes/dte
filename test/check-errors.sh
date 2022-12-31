@@ -46,6 +46,14 @@ check "$?" 64
 TERM= $dte -cquit 2>/dev/null
 check "$?" 64
 
+if ! command -v setsid >/dev/null; then
+    if test "$(uname -s)" = "Linux"; then
+        echo "$0:$LINENO: setsid(1) required; install util-linux" >&2
+        exit 1
+    fi
+    exit 0
+fi
+
 # No controlling tty
 TERM=xterm-256color setsid $dte -cquit >/dev/null 2>&1 0>&1
 check "$?" 74
