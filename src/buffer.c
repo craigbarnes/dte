@@ -419,14 +419,14 @@ String dump_buffer(const Buffer *buffer)
 
     string_sprintf (
         &buf,
-        "%9s: %s\n%9s: %lu\n%9s: %s\n%9s: %s\n%9s: %ju\n%9s: %ju\n%9s: %ju\n",
-        "Name", buffer_filename(buffer),
-        "ID", buffer->id,
-        "Encoding", buffer->encoding.name,
-        "Filetype", buffer->options.filetype,
-        "Blocks", blocks,
-        "Lines", nl,
-        "Bytes", bytes
+        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %ju\n%s %ju\n",
+        "     Name:", buffer_filename(buffer),
+        "       ID:", buffer->id,
+        " Encoding:", buffer->encoding.name,
+        " Filetype:", buffer->options.filetype,
+        "   Blocks:", blocks,
+        "    Lines:", nl,
+        "    Bytes:", bytes
     );
 
     if (
@@ -435,8 +435,7 @@ String dump_buffer(const Buffer *buffer)
     ) {
         string_sprintf (
             &buf,
-            "%9s:%s%s%s%s%s%s\n",
-            "Flags",
+            "    Flags:%s%s%s%s%s%s\n",
             buffer->stdout_buffer ? " STDOUT" : "",
             buffer->temporary ? " TMP" : "",
             buffer->readonly ? " RO" : "",
@@ -447,7 +446,7 @@ String dump_buffer(const Buffer *buffer)
     }
 
     if (buffer->views.count > 1) {
-        string_sprintf(&buf, "%9s: %zu\n", "Views", buffer->views.count);
+        string_sprintf(&buf, "    Views: %zu\n", buffer->views.count);
     }
 
     if (!buffer->abs_filename) {
@@ -456,18 +455,18 @@ String dump_buffer(const Buffer *buffer)
 
     const FileInfo *file = &buffer->file;
     string_append_literal(&buf, "\nOn filesystem:\n--------------\n\n");
-    string_sprintf(&buf, "%9s: %s\n", "Path", buffer->abs_filename);
 
     string_sprintf (
         &buf,
-        "%9s: 0%o\n%9s: %jd\n%9s: %jd\n%9s: %ju\n%9s: %jd\n%9s: %jd\n%9s: %ju\n",
-        "Mode", (unsigned int)(file->mode & 0777),
-        "User", (intmax_t)file->uid,
-        "Group", (intmax_t)file->gid,
-        "Size", (uintmax_t)file->size,
-        "Modified", (intmax_t)file->mtime,
-        "Device", (intmax_t)file->dev,
-        "Inode", (uintmax_t)file->ino
+        "%s %s\n%s 0%o\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %jd\n%s %ju\n",
+        "     Path:", buffer->abs_filename,
+        "     Mode:", (unsigned int)(file->mode & 0777),
+        "     User:", (intmax_t)file->uid,
+        "    Group:", (intmax_t)file->gid,
+        "     Size:", (uintmax_t)file->size,
+        " Modified:", (intmax_t)file->mtime,
+        "   Device:", (intmax_t)file->dev,
+        "    Inode:", (uintmax_t)file->ino
     );
 
     /* TODO:
