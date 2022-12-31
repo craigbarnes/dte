@@ -417,13 +417,17 @@ String dump_buffer(const Buffer *buffer)
         string_append_literal(&buf, "In memory:\n----------\n\n");
     }
 
-    string_sprintf(&buf, "%9s: %s\n", "Name", buffer_filename(buffer));
-    string_sprintf(&buf, "%9s: %lu\n", "ID", buffer->id);
-    string_sprintf(&buf, "%9s: %s\n", "Encoding", buffer->encoding.name);
-    string_sprintf(&buf, "%9s: %s\n", "Filetype", buffer->options.filetype);
-    string_sprintf(&buf, "%9s: %ju\n", "Blocks", blocks);
-    string_sprintf(&buf, "%9s: %ju\n", "Lines", nl);
-    string_sprintf(&buf, "%9s: %ju\n", "Bytes", bytes);
+    string_sprintf (
+        &buf,
+        "%9s: %s\n%9s: %lu\n%9s: %s\n%9s: %s\n%9s: %ju\n%9s: %ju\n%9s: %ju\n",
+        "Name", buffer_filename(buffer),
+        "ID", buffer->id,
+        "Encoding", buffer->encoding.name,
+        "Filetype", buffer->options.filetype,
+        "Blocks", blocks,
+        "Lines", nl,
+        "Bytes", bytes
+    );
 
     if (
         buffer->stdout_buffer || buffer->temporary || buffer->readonly
@@ -446,19 +450,25 @@ String dump_buffer(const Buffer *buffer)
         string_sprintf(&buf, "%9s: %zu\n", "Views", buffer->views.count);
     }
 
-    if (buffer->abs_filename) {
-        string_append_literal(&buf, "\nOn filesystem:\n--------------\n\n");
-        string_sprintf(&buf, "%9s: %s\n", "Path", buffer->abs_filename);
-        const FileInfo *file = &buffer->file;
-        const unsigned int access = file->mode & 0777;
-        string_sprintf(&buf, "%9s: 0%o\n", "Mode", access);
-        string_sprintf(&buf, "%9s: %jd\n", "User", (intmax_t)file->uid);
-        string_sprintf(&buf, "%9s: %jd\n", "Group", (intmax_t)file->gid);
-        string_sprintf(&buf, "%9s: %ju\n", "Size", (uintmax_t)file->size);
-        string_sprintf(&buf, "%9s: %jd\n", "Modified", (intmax_t)file->mtime);
-        string_sprintf(&buf, "%9s: %jd\n", "Device", (intmax_t)file->dev);
-        string_sprintf(&buf, "%9s: %ju\n", "Inode", (uintmax_t)file->ino);
+    if (!buffer->abs_filename) {
+        return buf;
     }
+
+    const FileInfo *file = &buffer->file;
+    string_append_literal(&buf, "\nOn filesystem:\n--------------\n\n");
+    string_sprintf(&buf, "%9s: %s\n", "Path", buffer->abs_filename);
+
+    string_sprintf (
+        &buf,
+        "%9s: 0%o\n%9s: %jd\n%9s: %jd\n%9s: %ju\n%9s: %jd\n%9s: %jd\n%9s: %ju\n",
+        "Mode", (unsigned int)(file->mode & 0777),
+        "User", (intmax_t)file->uid,
+        "Group", (intmax_t)file->gid,
+        "Size", (uintmax_t)file->size,
+        "Modified", (intmax_t)file->mtime,
+        "Device", (intmax_t)file->dev,
+        "Inode", (uintmax_t)file->ino
+    );
 
     /* TODO:
      - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::mode
