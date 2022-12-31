@@ -48,8 +48,7 @@ check "$?" 64
 
 if ! command -v setsid >/dev/null; then
     if test "$(uname -s)" = "Linux"; then
-        echo "$0:$LINENO: setsid(1) required; install util-linux" >&2
-        exit 1
+        abort "setsid(1) required; install util-linux"
     fi
     exit 0
 fi
