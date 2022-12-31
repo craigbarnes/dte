@@ -411,11 +411,7 @@ String dump_buffer(const Buffer *buffer)
     BUG_ON(blocks < 1);
     BUG_ON(nl != buffer->nl);
     BUG_ON(!buffer->setup);
-
-    String buf = string_new(4096);
-    if (buffer->abs_filename) {
-        string_append_literal(&buf, "In memory:\n----------\n\n");
-    }
+    String buf = string_new(1024);
 
     string_sprintf (
         &buf,
@@ -454,7 +450,7 @@ String dump_buffer(const Buffer *buffer)
     }
 
     const FileInfo *file = &buffer->file;
-    string_append_literal(&buf, "\nOn filesystem:\n--------------\n\n");
+    string_append_literal(&buf, "\nLast stat:\n----------\n\n");
 
     string_sprintf (
         &buf,
