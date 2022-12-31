@@ -131,8 +131,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
             struct pollfd *pfd = fds + i + 1;
             if (pfd->revents & POLLIN) {
                 size_t max_read = 8192;
-                string_reserve_space(&ctx->outputs[i], max_read);
-                char *buf = ctx->outputs[i].buffer + ctx->outputs[i].len;
+                char *buf = string_reserve_space(&ctx->outputs[i], max_read);
                 ssize_t rc = xread(pfd->fd, buf, max_read);
                 if (unlikely(rc < 0)) {
                     error_msg_errno("read");
