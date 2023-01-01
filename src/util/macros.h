@@ -136,9 +136,11 @@
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(format)
     #define PRINTF(x) __attribute__((__format__(__printf__, (x), (x + 1))))
     #define VPRINTF(x) __attribute__((__format__(__printf__, (x), 0)))
+    #define STRFTIME(x) __attribute__((__format__(__strftime__, (x), 0)))
 #else
     #define PRINTF(x)
     #define VPRINTF(x)
+    #define STRFTIME(x)
 #endif
 
 #if (GNUC_AT_LEAST(3, 0) || HAS_BUILTIN(__builtin_expect)) && defined(__OPTIMIZE__)

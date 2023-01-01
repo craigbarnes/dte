@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 #include "block.h"
 #include "block-iter.h"
@@ -396,6 +397,27 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     }
 }
 
+STRFTIME(3) NONNULL_ARGS WARN_UNUSED_RESULT
+static size_t xstrftime (
+    char *restrict s,
+    size_t max,
+    const char *restrict format,
+    const struct tm *restrict tm
+) {
+    // GCC 12.2.0 emits a "-Wformat-nonliteral" warning, despite the
+    // presence of the format(strftime) attribute
+    IGNORE_WARNING("-Wformat-nonliteral")
+    size_t r = strftime(s, max, format, tm);
+    UNIGNORE_WARNINGS
+
+    // "Note that the return value 0 does not necessarily indicate an
+    // error. For example, in many locales %p yields an empty string."
+    // Therefore, use of this function is only appropriate when `format`
+    // is guaranteed to produce a non-empty string.
+    BUG_ON(r == 0);
+    return r;
+}
+
 String dump_buffer(const Buffer *buffer)
 {
     uintmax_t blocks = 0;
@@ -449,25 +471,37 @@ String dump_buffer(const Buffer *buffer)
         return buf;
     }
 
+    string_sprintf (
+        &buf,
+        "\n"
+        "Last stat:\n"
+        "----------\n"
+        "\n"
+        "     Path: %s\n",
+        buffer->abs_filename
+    );
+
     const FileInfo *file = &buffer->file;
-    string_append_literal(&buf, "\nLast stat:\n----------\n\n");
+    struct tm tm;
+    if (likely(localtime_r(&file->mtime, &tm))) {
+        size_t maxsize = 64;
+        char *ptr = string_reserve_space(&buf, maxsize);
+        buf.len += xstrftime(ptr, maxsize, " Modified: %F %T %z\n", &tm);
+    }
 
     string_sprintf (
         &buf,
-        "%s %s\n%s 0%o\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %jd\n%s %ju\n",
-        "     Path:", buffer->abs_filename,
+        "%s 0%o\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
         "     Mode:", (unsigned int)(file->mode & 0777),
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,
         "     Size:", (uintmax_t)file->size,
-        " Modified:", (intmax_t)file->mtime,
         "   Device:", (intmax_t)file->dev,
         "    Inode:", (uintmax_t)file->ino
     );
 
     /* TODO:
      - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::mode
-     - Human-readable date/time for FileInfo::mtime
      - File type for FileInfo::mode (S_IFREG/S_IFLNK/etc.; see inode(7))
      - SUID/SGID/sticky bits for FileInfo::mode (S_ISUID/S_ISGID/S_ISVTX)
      - Number of changes since Buffer::saved_change
