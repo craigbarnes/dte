@@ -130,9 +130,9 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
         for (size_t i = 0; i < ARRAYLEN(ctx->outputs); i++) {
             struct pollfd *pfd = fds + i + 1;
             if (pfd->revents & POLLIN) {
-                size_t max_read = 8192;
-                char *buf = string_reserve_space(&ctx->outputs[i], max_read);
-                ssize_t rc = xread(pfd->fd, buf, max_read);
+                String *output = &ctx->outputs[i];
+                char *buf = string_reserve_space(output, 4096);
+                ssize_t rc = xread(pfd->fd, buf, output->alloc - output->len);
                 if (unlikely(rc < 0)) {
                     error_msg_errno("read");
                     return;
@@ -145,7 +145,7 @@ static void handle_piped_data(int f[3], SpawnContext *ctx)
                     pfd->fd = -1;
                     continue;
                 }
-                ctx->outputs[i].len += rc;
+                output->len += rc;
             }
         }
 
