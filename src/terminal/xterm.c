@@ -123,13 +123,13 @@ static KeyCode decode_modifiers(uint32_t n)
         return 0;
     }
 
-    static_assert(MOD_MASK >> MOD_OFFSET == 7);
+    static_assert(MOD_MASK >> KEYCODE_MODIFIER_OFFSET == 7);
 
     // Decode Meta (bit 4) and/or Alt (bit 2) as just Meta
     KeyCode mods = (n & 7) | ((n & 8) >> 2);
     BUG_ON(mods > 7);
 
-    return mods << MOD_OFFSET;
+    return mods << KEYCODE_MODIFIER_OFFSET;
 }
 
 static KeyCode decode_key_from_param(uint32_t param)
