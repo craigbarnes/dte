@@ -33,7 +33,7 @@ static void cleanup(void)
     //  cleanup() -> cleanup_handler() -> set_fatal_error_cleanup_handler()
     //
     // Without this, one of the other functions below might call cleanup()
-    // and then get interupted in the middle of a sequence of instructions
+    // and then get interrupted in the middle of a sequence of instructions
     // that aren't async-signal-safe (see: signal-safety(7)).
     sigset_t mask, oldmask;
     sigfillset(&mask);

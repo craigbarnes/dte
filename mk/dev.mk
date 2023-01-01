@@ -4,6 +4,7 @@ DISTVER = $(VERSION)
 GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
+CODESPELL ?= codespell
 GCOVR ?= gcovr
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
@@ -29,6 +30,9 @@ check-shell-scripts:
 
 check-whitespace:
 	$(Q) $(WSCHECK) `git ls-files --error-unmatch ':(attr:space-indent)'`
+
+check-codespell:
+	$(Q) $(CODESPELL) -Literm,clen,ede $$(git ls-files -- src/ mk/ 'docs/*.md') >&2
 
 check-desktop-file:
 	$(E) CHECK dte.desktop
@@ -125,6 +129,6 @@ NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
-    check-docs check-shell-scripts check-whitespace check-release-digests \
-    check-aux check-desktop-file check-appstream \
+    check-docs check-shell-scripts check-whitespace check-codespell \
+    check-release-digests check-aux check-desktop-file check-appstream \
     git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)
