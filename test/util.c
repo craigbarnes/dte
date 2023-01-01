@@ -2256,8 +2256,8 @@ static void test_mem_intern(TestContext *ctx)
 {
     const char *ptrs[256];
     char str[8];
-    for (size_t i = 0; i < ARRAYLEN(ptrs); i++) {
-        size_t len = xsnprintf(str, sizeof str, "%zu", i);
+    for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
+        size_t len = buf_uint_to_str(i, str);
         ptrs[i] = mem_intern(str, len);
     }
 
@@ -2266,8 +2266,8 @@ static void test_mem_intern(TestContext *ctx)
     EXPECT_STREQ(ptrs[101], "101");
     EXPECT_STREQ(ptrs[255], "255");
 
-    for (size_t i = 0; i < ARRAYLEN(ptrs); i++) {
-        size_t len = xsnprintf(str, sizeof str, "%zu", i);
+    for (unsigned int i = 0; i < ARRAYLEN(ptrs); i++) {
+        size_t len = buf_uint_to_str(i, str);
         const char *ptr = mem_intern(str, len);
         EXPECT_PTREQ(ptr, ptrs[i]);
     }
