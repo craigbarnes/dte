@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include "block-iter.h"
 #include "change.h"
 #include "encoding.h"
 #include "options.h"
@@ -66,6 +67,15 @@ static inline void mark_all_lines_changed(Buffer *buffer)
 static inline bool buffer_modified(const Buffer *buffer)
 {
     return buffer->saved_change != buffer->cur_change && !buffer->temporary;
+}
+
+static inline BlockIter block_iter(Buffer *buffer)
+{
+    return (BlockIter) {
+        .blk = BLOCK(buffer->blocks.next),
+        .head = &buffer->blocks,
+        .offset = 0
+    };
 }
 
 struct EditorState;

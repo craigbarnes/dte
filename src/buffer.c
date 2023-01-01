@@ -4,8 +4,6 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-#include "block.h"
-#include "block-iter.h"
 #include "buffer.h"
 #include "editor.h"
 #include "file-option.h"
@@ -176,7 +174,7 @@ bool buffer_detect_filetype(Buffer *buffer, const PointerArray *filetypes)
 {
     StringView line = STRING_VIEW_INIT;
     if (BLOCK(buffer->blocks.next)->size) {
-        BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+        BlockIter bi = block_iter(buffer);
         fill_line_ref(&bi, &line);
     } else if (!buffer->abs_filename) {
         return false;
@@ -320,7 +318,7 @@ static bool detect_indent(Buffer *buffer)
 {
     LocalOptions *options = &buffer->options;
     unsigned int bitset = options->detect_indent;
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    BlockIter bi = block_iter(buffer);
     unsigned int tab_count = 0;
     unsigned int space_count = 0;
     int current_indent = 0;

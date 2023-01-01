@@ -15,12 +15,6 @@ typedef struct {
     size_t offset;
 } BlockIter;
 
-#define BLOCK_ITER_INIT(head_) { \
-    .blk = BLOCK((head_)->next), \
-    .head = (head_), \
-    .offset = 0 \
-}
-
 static inline void block_iter_bof(BlockIter *bi)
 {
     bi->blk = BLOCK(bi->head->next);

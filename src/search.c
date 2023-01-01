@@ -113,7 +113,7 @@ bool search_tag(View *view, const char *pattern)
         return false;
     }
 
-    BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
+    BlockIter bi = block_iter(view->buffer);
     bool found = do_search_fwd(view, &regex, &bi, false);
     regfree(&regex);
 

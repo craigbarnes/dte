@@ -168,7 +168,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
         return false;
     }
 
-    BlockIter bi = BLOCK_ITER_INIT(&view->buffer->blocks);
+    BlockIter bi = block_iter(view->buffer);
     size_t nr_bytes;
     bool swapped = false;
     if (view->selection) {

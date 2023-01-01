@@ -311,7 +311,7 @@ static ssize_t fill_hole(Buffer *buffer, BlockIter *bi, const ColorScheme *cs, s
 
 void hl_fill_start_states(Buffer *buffer, const ColorScheme *cs, size_t line_nr)
 {
-    BlockIter bi = BLOCK_ITER_INIT(&buffer->blocks);
+    BlockIter bi = block_iter(buffer);
     PointerArray *s = &buffer->line_start_states;
     ssize_t current_line = 0;
     ssize_t idx = 0;
