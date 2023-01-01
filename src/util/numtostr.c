@@ -13,7 +13,8 @@ static size_t umax_count_base10_digits(uintmax_t x)
 }
 
 // Writes the decimal string representation of `x` into `buf`,
-// which must have at least `DECIMAL_STR_MAX(x)` bytes available.
+// which must have enough space available for a known/constant
+// value of `x` or `DECIMAL_STR_MAX(x)` bytes for arbitrary values.
 // Returns the number of bytes (digits) written.
 size_t buf_umax_to_str(uintmax_t x, char *buf)
 {
