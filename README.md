@@ -21,6 +21,7 @@ Features
 * Jump to compiler error
 * [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
+* Fast startup (~10ms)
 
 Screenshot
 ----------
