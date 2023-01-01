@@ -297,8 +297,8 @@ static bool cmd_center_view(EditorState *e, const CommandArgs *a)
 
 static bool cmd_clear(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args);
-    clear_lines(e->view);
+    bool auto_indent = e->buffer->options.auto_indent && !has_flag(a, 'i');
+    clear_lines(e->view, auto_indent);
     return true;
 }
 
@@ -2301,7 +2301,7 @@ static const Command cmds[] = {
     {"case", "lu", false, 0, 0, cmd_case},
     {"cd", "", true, 1, 1, cmd_cd},
     {"center-view", "", false, 0, 0, cmd_center_view},
-    {"clear", "", false, 0, 0, cmd_clear},
+    {"clear", "i", false, 0, 0, cmd_clear},
     {"close", "fpqw", false, 0, 0, cmd_close},
     {"command", "-", false, 0, 1, cmd_command},
     {"compile", "-1ps", false, 2, -1, cmd_compile},

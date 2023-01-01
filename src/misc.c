@@ -456,16 +456,15 @@ void join_lines(View *view)
     }
 }
 
-void clear_lines(View *view)
+void clear_lines(View *view, bool auto_indent)
 {
-    const LocalOptions *options = &view->buffer->options;
     char *indent = NULL;
-    if (options->auto_indent) {
+    if (auto_indent) {
         BlockIter bi = view->cursor;
         if (block_iter_prev_line(&bi) && find_non_empty_line_bwd(&bi)) {
             StringView line;
             fill_line_ref(&bi, &line);
-            indent = get_indent_for_next_line(options, &line);
+            indent = get_indent_for_next_line(&view->buffer->options, &line);
         }
     }
 
