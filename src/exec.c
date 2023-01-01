@@ -17,6 +17,7 @@
 #include "tag.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/ptr-array.h"
 #include "util/str-util.h"
 #include "util/string-view.h"
@@ -142,8 +143,8 @@ static const char **lines_and_columns_env(const Window *window)
         NULL,
     };
 
-    xsnprintf(lines, sizeof lines, "%d", window->edit_h);
-    xsnprintf(columns, sizeof columns, "%d", window->edit_w);
+    buf_uint_to_str(window->edit_h, lines);
+    buf_uint_to_str(window->edit_w, columns);
     return vars;
 }
 
