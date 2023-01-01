@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "macros.h"
 
+WARN_UNUSED_RESULT
 static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool state)
 {
     int flags = fcntl(fd, get_cmd);
@@ -17,16 +18,19 @@ static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool 
     return new_flags == flags || fcntl(fd, set_cmd, new_flags) != -1;
 }
 
+WARN_UNUSED_RESULT
 static inline bool fd_set_cloexec(int fd, bool cloexec)
 {
     return fd_set_flag(fd, FD_CLOEXEC, F_GETFD, F_SETFD, cloexec);
 }
 
+WARN_UNUSED_RESULT
 static inline bool fd_set_nonblock(int fd, bool nonblock)
 {
     return fd_set_flag(fd, O_NONBLOCK, F_GETFL, F_SETFL, nonblock);
 }
 
+WARN_UNUSED_RESULT
 static inline bool is_controlling_tty(int fd)
 {
     return tcgetpgrp(fd) != -1;

@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include "macros.h"
 
-NONNULL_ARGS
+NONNULL_ARGS WARN_UNUSED_RESULT
 static inline int xopen(const char *path, int flags, mode_t mode)
 {
     int fd;

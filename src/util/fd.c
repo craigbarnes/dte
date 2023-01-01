@@ -25,6 +25,7 @@ int xpipe2(int fd[2], int flags)
     if (unlikely(pipe(fd) != 0)) {
         return -1;
     }
+
     if (flags & O_CLOEXEC) {
         if (unlikely(!fd_set_cloexec(fd[0], true) || !fd_set_cloexec(fd[1], true))) {
             goto error;
@@ -35,6 +36,7 @@ int xpipe2(int fd[2], int flags)
             goto error;
         }
     }
+
     return 0;
 
 error:;
@@ -54,9 +56,11 @@ int xdup3(int oldfd, int newfd, int flags)
     do {
         fd = dup3(oldfd, newfd, flags);
     } while (unlikely(fd < 0 && errno == EINTR));
+
     if (fd != -1 || errno != ENOSYS) {
         return fd;
     }
+
     // If execution reaches this point, dup3() failed with ENOSYS
     // ("function not supported"), so we fall through to the pure
     // POSIX implementation below.
@@ -67,12 +71,15 @@ int xdup3(int oldfd, int newfd, int flags)
         errno = EINVAL;
         return -1;
     }
+
     do {
         fd = dup2(oldfd, newfd);
     } while (unlikely(fd < 0 && errno == EINTR));
+
     if (fd >= 0 && (flags & O_CLOEXEC)) {
-        fd_set_cloexec(fd, true);
+        (void)!fd_set_cloexec(fd, true);
     }
+
     return fd;
 }
 
