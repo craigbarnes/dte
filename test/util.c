@@ -1703,9 +1703,9 @@ static void test_hashmap(TestContext *ctx)
     EXPECT_EQ(map.mask, 31);
     EXPECT_EQ(map.count, 0);
 
-    for (size_t i = 1; i <= 380; i++) {
+    for (unsigned int i = 1; i <= 380; i++) {
         char key[4];
-        EXPECT_EQ(xsnprintf(key, sizeof key, "%zu", i), size_str_width(i));
+        ASSERT_TRUE(buf_uint_to_str(i, key) < sizeof(key));
         EXPECT_PTREQ(hashmap_insert(&map, xstrdup(key), (void*)value), value);
         HashMapEntry *e = hashmap_find(&map, key);
         ASSERT_NONNULL(e);
@@ -1799,10 +1799,11 @@ static void test_hashset(TestContext *ctx)
     hashset_init(&set, 0, false);
     // Initial table size should be 16 (minimum + load factor + rounding)
     EXPECT_EQ(set.table_size, 16);
-    for (size_t i = 1; i <= 80; i++) {
+    for (unsigned int i = 1; i <= 80; i++) {
         char buf[4];
-        size_t n = xsnprintf(buf, sizeof buf, "%zu", i);
-        hashset_add(&set, buf, n);
+        size_t len = buf_uint_to_str(i, buf);
+        ASSERT_TRUE(len < sizeof(buf));
+        hashset_add(&set, buf, len);
     }
     EXPECT_EQ(set.nr_entries, 80);
     EXPECT_NONNULL(hashset_get(&set, STRN("1")));
