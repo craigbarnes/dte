@@ -159,7 +159,8 @@ static void show_spawn_error_msg(const String *errstr, int err)
         size_t pos = 0;
         StringView line = buf_slice_next_line(errstr->buffer, &pos, errstr->len);
         BUG_ON(pos == 0);
-        xsnprintf(msg, sizeof(msg), ": \"%.*s\"", (int)line.length, line.data);
+        size_t len = MIN(line.length, sizeof(msg) - 8);
+        xsnprintf(msg, sizeof(msg), ": \"%.*s\"", (int)len, line.data);
     } else {
         msg[0] = '\0';
     }
