@@ -297,6 +297,11 @@ static ExitCode init_std_fds(int std_fds[2])
             fprintf(stderr, "freopen() changed fd from %d to %d\n", i, new_fd);
             return EX_OSERR;
         }
+
+        if (unlikely(!is_controlling_tty(new_fd))) {
+            perror("tcgetpgrp");
+            return EX_OSERR;
+        }
     }
 
     return EX_OK;
