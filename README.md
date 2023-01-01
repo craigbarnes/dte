@@ -7,8 +7,8 @@ Features
 --------
 
 * Multiple buffers/tabs
-* Unlimited undo/redo
-* Regex search and replace
+* Unlimited [undo]/[redo]
+* Regex [search] and [replace]
 * Syntax highlighting
 * Customizable [color schemes] (including 24-bit RGB)
 * Customizable [key bindings]
@@ -18,7 +18,7 @@ Features
 * Support for [kitty's keyboard protocol]
 * Support for multiple encodings (using [iconv])
 * Jump to definition (using [ctags])
-* Jump to compiler error
+* Jump to [compiler error]
 * [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
 * Fast startup (~10ms)
@@ -125,6 +125,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 Public License version 2 for more details.
 
 
+[undo]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
+[redo]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
+[search]: https://craigbarnes.gitlab.io/dte/dterc.html#search
+[replace]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
 [color schemes]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [key bindings]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [Command language]: https://craigbarnes.gitlab.io/dte/dterc.html
@@ -132,6 +136,7 @@ Public License version 2 for more details.
 [kitty's keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [ctags]: https://ctags.io/
+[compiler error]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
 [Copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 [EditorConfig]: https://editorconfig.org/
