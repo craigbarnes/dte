@@ -116,15 +116,15 @@
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(pure)
-    #define PURE __attribute__((__pure__))
+    #define PURE WARN_UNUSED_RESULT __attribute__((__pure__))
 #else
-    #define PURE
+    #define PURE WARN_UNUSED_RESULT
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(const)
-    #define CONST_FN __attribute__((__const__))
+    #define CONST_FN WARN_UNUSED_RESULT __attribute__((__const__))
 #else
-    #define CONST_FN
+    #define CONST_FN WARN_UNUSED_RESULT
 #endif
 
 #if GNUC_AT_LEAST(3, 0) || HAS_ATTRIBUTE(constructor)
