@@ -82,7 +82,7 @@ static void open_temporary_buffer (
 
 static bool show_normal_alias(EditorState *e, const char *alias_name, bool cflag)
 {
-    const char *cmd_str = find_alias(&e->modes[INPUT_NORMAL].aliases, alias_name);
+    const char *cmd_str = find_alias(&e->aliases, alias_name);
     if (!cmd_str) {
         if (find_normal_command(alias_name)) {
             info_msg("%s is a built-in command, not an alias", alias_name);
@@ -323,8 +323,7 @@ static int alias_cmp(const void *ap, const void *bp)
 
 String dump_normal_aliases(EditorState *e)
 {
-    const HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
-    const size_t count = aliases->count;
+    const size_t count = e->aliases.count;
     if (unlikely(count == 0)) {
         return string_new(0);
     }
@@ -332,7 +331,7 @@ String dump_normal_aliases(EditorState *e)
     // Clone the contents of the HashMap as an array of name/value pairs
     CommandAlias *array = xnew(CommandAlias, count);
     size_t n = 0;
-    for (HashMapIter it = hashmap_iter(aliases); hashmap_next(&it); ) {
+    for (HashMapIter it = hashmap_iter(&e->aliases); hashmap_next(&it); ) {
         array[n++] = (CommandAlias) {
             .name = it.entry->key,
             .value = it.entry->value,

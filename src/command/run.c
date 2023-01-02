@@ -19,11 +19,11 @@ static bool run_command(CommandRunner *runner, char **av)
     const Command *cmd = cmds->lookup(av[0]);
     if (!cmd) {
         const char *name = av[0];
-        if (!runner->aliases) {
+        if (!runner->lookup_alias) {
             return error_msg("No such command: %s", name);
         }
 
-        const char *alias_value = find_alias(runner->aliases, name);
+        const char *alias_value = runner->lookup_alias(name, runner->userdata);
         if (unlikely(!alias_value)) {
             return error_msg("No such command or alias: %s", name);
         }

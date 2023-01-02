@@ -7,6 +7,7 @@
 #include "buffer.h"
 #include "cmdline.h"
 #include "command/macro.h"
+#include "commands.h"
 #include "copy.h"
 #include "encoding.h"
 #include "file-history.h"
@@ -44,7 +45,6 @@ typedef enum {
 
 typedef struct {
     const CommandSet *cmds;
-    HashMap aliases;
     IntMap key_bindings;
 } ModeHandler;
 
@@ -65,6 +65,7 @@ typedef struct EditorState {
     ModeHandler modes[3];
     Clipboard clipboard;
     TagFile tagfile;
+    HashMap aliases;
     HashMap compilers;
     HashMap syntaxes;
     ColorScheme colors;
@@ -102,7 +103,7 @@ static inline CommandRunner cmdrunner_for_mode(EditorState *e, InputMode mode, b
     BUG_ON(mode >= ARRAYLEN(e->modes));
     CommandRunner runner = {
         .cmds = e->modes[mode].cmds,
-        .aliases = &e->modes[mode].aliases,
+        .lookup_alias = (mode == INPUT_NORMAL) ? find_normal_alias : NULL,
         .home_dir = &e->home_dir,
         .allow_recording = allow_recording,
         .userdata = e,

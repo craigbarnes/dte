@@ -157,7 +157,7 @@ static void collect_files(EditorState *e, CompletionState *cs, FileCollectionTyp
 
 void collect_normal_aliases(EditorState *e, PointerArray *a, const char *prefix)
 {
-    collect_hashmap_keys(&e->modes[INPUT_NORMAL].aliases, a, prefix);
+    collect_hashmap_keys(&e->aliases, a, prefix);
 }
 
 static void collect_bound_keys(const IntMap *bindings, PointerArray *a, const char *prefix)
@@ -226,12 +226,11 @@ void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix
 
 static void complete_alias(EditorState *e, const CommandArgs *a)
 {
-    const HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
-        collect_hashmap_keys(aliases, &cs->completions, cs->parsed);
+        collect_normal_aliases(e, &cs->completions, cs->parsed);
     } else if (a->nr_args == 1 && cs->parsed[0] == '\0') {
-        const char *cmd = find_alias(aliases, a->args[0]);
+        const char *cmd = find_alias(&e->aliases, a->args[0]);
         if (cmd) {
             ptr_array_append(&cs->completions, xstrdup(cmd));
         }
@@ -642,9 +641,11 @@ static int strptrcmp(const void *v1, const void *v2)
 static void init_completion(EditorState *e, const CommandLine *cmdline)
 {
     CompletionState *cs = &e->cmdline.completion;
-    BUG_ON(cs->orig);
     const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
-    const HashMap *aliases = runner.aliases;
+    BUG_ON(cs->orig);
+    BUG_ON(runner.userdata != e);
+    BUG_ON(!runner.lookup_alias);
+
     const size_t cmdline_pos = cmdline->pos;
     char *const cmd = string_clone_cstring(&cmdline->buf);
     PointerArray array = PTR_ARRAY_INIT;
@@ -681,7 +682,7 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
 
         if (semicolon + 1 == array.count) {
             char *name = xstrslice(cmd, pos, end);
-            const char *value = find_alias(aliases, name);
+            const char *value = runner.lookup_alias(name, runner.userdata);
             if (value) {
                 size_t save = array.count;
                 if (parse_commands(&runner, &array, value) != CMDERR_NONE) {

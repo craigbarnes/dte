@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
     const CommandSet *cmds;
-    const HashMap *aliases;
+    const char* (*lookup_alias)(const char *name, void *userdata);
     const StringView *home_dir;
     void *userdata;
     unsigned int recursion_count;

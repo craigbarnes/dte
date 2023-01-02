@@ -27,7 +27,7 @@ static void test_command_mode(TestContext *ctx)
     CommandRunner runner = cmdrunner_for_mode(e, INPUT_COMMAND, false);
     EXPECT_PTREQ(runner.userdata, e);
     EXPECT_PTREQ(runner.cmds, e->modes[INPUT_COMMAND].cmds);
-    EXPECT_PTREQ(runner.aliases, &e->modes[INPUT_COMMAND].aliases);
+    EXPECT_NULL(runner.lookup_alias);
     EXPECT_EQ(runner.recursion_count, 0);
     EXPECT_FALSE(runner.allow_recording);
 

@@ -142,12 +142,12 @@ static bool cmd_alias(EditorState *e, const CommandArgs *a)
         return error_msg("Can't replace existing command %s with an alias", name);
     }
 
-    HashMap *aliases = &e->modes[INPUT_NORMAL].aliases;
     if (likely(cmd)) {
-        add_alias(aliases, name, cmd);
+        add_alias(&e->aliases, name, cmd);
     } else {
-        remove_alias(aliases, name);
+        remove_alias(&e->aliases, name);
     }
+
     return true;
 }
 
@@ -2466,6 +2466,12 @@ const CommandSet normal_commands = {
     .expand_variable = expand_normal_var,
     .expand_env_vars = true,
 };
+
+const char *find_normal_alias(const char *name, void *userdata)
+{
+    EditorState *e = userdata;
+    return find_alias(&e->aliases, name);
+}
 
 bool handle_normal_command(EditorState *e, const char *cmd, bool allow_recording)
 {

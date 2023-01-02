@@ -19,6 +19,12 @@ static void test_parse_command_arg(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     const CommandRunner runner = cmdrunner_for_mode(e, INPUT_NORMAL, false);
+    ASSERT_PTREQ(runner.userdata, e);
+    ASSERT_PTREQ(runner.cmds, &normal_commands);
+    EXPECT_PTREQ(runner.lookup_alias, find_normal_alias);
+    EXPECT_PTREQ(runner.home_dir, &e->home_dir);
+    EXPECT_FALSE(runner.allow_recording);
+    EXPECT_EQ(runner.recursion_count, 0);
 
     // Single, unquoted argument
     char *arg = parse_command_arg(&runner, STRN("arg"), false);

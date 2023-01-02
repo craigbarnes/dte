@@ -132,17 +132,14 @@ EditorState *init_editor_state(void)
         .modes = {
             [INPUT_NORMAL] = {
                 .cmds = &normal_commands,
-                .aliases = HASHMAP_INIT,
                 .key_bindings = INTMAP_INIT,
             },
             [INPUT_COMMAND] = {
                 .cmds = &cmd_mode_commands,
-                .aliases = HASHMAP_INIT,
                 .key_bindings = INTMAP_INIT,
             },
             [INPUT_SEARCH] = {
                 .cmds = &search_mode_commands,
-                .aliases = HASHMAP_INIT,
                 .key_bindings = INTMAP_INIT,
             },
         },
@@ -236,7 +233,7 @@ EditorState *init_editor_state(void)
 
     term_input_init(&e->terminal.ibuf);
     term_output_init(&e->terminal.obuf);
-    hashmap_init(&e->modes[INPUT_NORMAL].aliases, 32);
+    hashmap_init(&e->aliases, 32);
     intmap_init(&e->modes[INPUT_NORMAL].key_bindings, 150);
     intmap_init(&e->modes[INPUT_COMMAND].key_bindings, 40);
     intmap_init(&e->modes[INPUT_SEARCH].key_bindings, 40);
@@ -264,11 +261,10 @@ void free_editor_state(EditorState *e)
     ptr_array_free_cb(&e->buffers, FREE_FUNC(free_buffer));
     hashmap_free(&e->compilers, FREE_FUNC(free_compiler));
     hashmap_free(&e->colors.other, free);
+    hashmap_free(&e->aliases, free);
 
     for (size_t i = 0; i < ARRAYLEN(e->modes); i++) {
-        ModeHandler *m = &e->modes[i];
-        free_bindings(&m->key_bindings);
-        hashmap_free(&m->aliases, free);
+        free_bindings(&e->modes[i].key_bindings);
     }
 
     free_interned_strings();
