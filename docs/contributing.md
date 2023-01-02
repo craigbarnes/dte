@@ -1,10 +1,18 @@
+Contributing
+============
+
+Please observe the following guidelines when creating new [issues]
+or [pull requests] for dte.
+
 Issues
 ------
 
-* Check for existing [bug reports] before opening a new one.
+* Check for existing [issues] before opening a new one.
 * Include any relevant error messages as Markdown [code blocks].
 * Avoid linking to external paste services.
 * Include relevant system information (as printed by `make vars`).
+* If suggesting new features, mention *at least* one real-world
+  use case in the opening description.
 
 Pull Requests
 -------------
@@ -26,7 +34,8 @@ Coding Style
 * Above all else, be consistent with the existing code.
 
 
-[bug reports]: https://gitlab.com/craigbarnes/dte/-/issues
+[issues]: https://gitlab.com/craigbarnes/dte/-/issues
+[pull requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
 [code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-and-syntax-highlighting
 [`pre-commit`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/pre-commit
 [`commit-msg`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/commit-msg
