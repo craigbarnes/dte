@@ -19,10 +19,6 @@ Pull Requests
 
 * Create a separate git branch for each pull request.
 * Use `git rebase` to avoid merge commits and fix-up commits.
-
-Commits
--------
-
 * Run `make git-hooks` **before** creating any commits. This installs
   a git [`pre-commit`] hook that automatically builds and tests each
   commit and a [`commit-msg`] hook that checks commit message
