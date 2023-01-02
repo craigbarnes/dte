@@ -17,7 +17,7 @@ bool file_decoder_read_line(FileDecoder *dec, const char **line, size_t *len) NO
 const char *file_decoder_get_encoding(const FileDecoder *dec) NONNULL_ARGS;
 
 FileEncoder *new_file_encoder(const Encoding *encoding, bool crlf, int fd) NONNULL_ARGS;
-void free_file_encoder(FileEncoder *enc);
+void free_file_encoder(FileEncoder *enc) NONNULL_ARGS;
 ssize_t file_encoder_write(FileEncoder *enc, const unsigned char *buf, size_t size) NONNULL_ARGS WARN_UNUSED_RESULT;
 size_t file_encoder_get_nr_errors(const FileEncoder *enc) NONNULL_ARGS;
 

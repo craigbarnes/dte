@@ -15,6 +15,6 @@ typedef struct {
     unsigned int name_count;
 } IniParser;
 
-bool ini_parse(IniParser *ctx) WARN_UNUSED_RESULT;
+bool ini_parse(IniParser *ctx) NONNULL_ARGS WARN_UNUSED_RESULT;
 
 #endif

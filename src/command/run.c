@@ -6,7 +6,6 @@
 #include "config.h"
 #include "error.h"
 #include "macro.h"
-#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 

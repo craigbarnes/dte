@@ -13,6 +13,7 @@ typedef struct {
     bool local; // Indicates if tag is local to file (e.g. "static" in C)
 } Tag;
 
+NONNULL_ARGS WARN_UNUSED_RESULT
 bool next_tag (
     const char *buf,
     size_t buf_len,
@@ -22,7 +23,7 @@ bool next_tag (
     Tag *t
 );
 
-bool parse_ctags_line(Tag *t, const char *line, size_t line_len);
-void free_tag(Tag *t);
+bool parse_ctags_line(Tag *t, const char *line, size_t line_len) NONNULL_ARG(1);
+void free_tag(Tag *t) NONNULL_ARGS;
 
 #endif

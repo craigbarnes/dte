@@ -4,7 +4,6 @@
 #include "error.h"
 #include "util/debug.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 static ChangeMergeEnum change_merge;
 static ChangeMergeEnum prev_change_merge;

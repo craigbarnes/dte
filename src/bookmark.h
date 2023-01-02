@@ -15,7 +15,7 @@ typedef struct {
 } FileLocation;
 
 FileLocation *get_current_file_location(const View *view) NONNULL_ARGS_AND_RETURN;
-bool file_location_go(Window *window, const FileLocation *loc) NONNULL_ARGS;
+bool file_location_go(Window *window, const FileLocation *loc) NONNULL_ARGS WARN_UNUSED_RESULT;
 void file_location_free(FileLocation *loc) NONNULL_ARGS;
 
 void bookmark_push(PointerArray *bookmarks, FileLocation *loc) NONNULL_ARGS;

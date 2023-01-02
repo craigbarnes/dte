@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "util/hashmap.h"
+#include "util/macros.h"
 #include "util/string-view.h"
 
 typedef struct {
@@ -53,6 +54,6 @@ static inline int command_cmp(const void *key, const void *elem)
     return strcmp(name, cmd->name);
 }
 
-bool handle_command(CommandRunner *runner, const char *cmd);
+bool handle_command(CommandRunner *runner, const char *cmd) NONNULL_ARGS;
 
 #endif
