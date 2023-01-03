@@ -108,4 +108,13 @@ static inline bool mem_equal_icase(const void *p1, const void *p2, size_t n)
     return true;
 }
 
+static inline size_t ascii_blank_prefix_length(const char *str, size_t len)
+{
+    size_t i = 0;
+    while (i < len && ascii_isblank(str[i])) {
+        i++;
+    }
+    return i;
+}
+
 #endif

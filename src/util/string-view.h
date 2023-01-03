@@ -107,13 +107,8 @@ static inline bool strview_has_suffix(const StringView *sv, const char *suf)
 NONNULL_ARGS
 static inline bool strview_isblank(const StringView *sv)
 {
-    const unsigned char *data = sv->data;
-    const size_t len = sv->length;
-    size_t i = 0;
-    while (i < len && ascii_isblank(data[i])) {
-        i++;
-    }
-    return (i == len);
+    size_t len = sv->length;
+    return len == ascii_blank_prefix_length(sv->data, len);
 }
 
 NONNULL_ARGS
@@ -167,14 +162,9 @@ static inline void strview_remove_prefix(StringView *sv, size_t len)
 NONNULL_ARGS
 static inline size_t strview_trim_left(StringView *sv)
 {
-    const unsigned char *data = sv->data;
-    const size_t len = sv->length;
-    size_t i = 0;
-    while (i < len && ascii_isblank(data[i])) {
-        i++;
-    }
-    strview_remove_prefix(sv, i);
-    return i;
+    size_t blank_len = ascii_blank_prefix_length(sv->data, sv->length);
+    strview_remove_prefix(sv, blank_len);
+    return blank_len;
 }
 
 NONNULL_ARGS

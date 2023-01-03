@@ -125,13 +125,7 @@ void move_bol_smart(View *view, SmartBolFlags flags)
         fwd = true;
     }
 
-    // Note: this loop is safe, because there's always a newline
-    const char *ptr = line.data;
-    size_t indent = 0;
-    while (ascii_isblank(*ptr++)) {
-        indent++;
-    }
-
+    size_t indent = ascii_blank_prefix_length(line.data, line.length);
     if (fwd) {
         block_iter_skip_bytes(&view->cursor, indent);
     } else {
