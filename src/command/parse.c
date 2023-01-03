@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "parse.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -9,22 +10,10 @@
 
 static size_t parse_sq(const char *cmd, size_t len, String *buf)
 {
-    size_t pos = 0;
-    char ch = '\0';
-    while (pos < len) {
-        ch = cmd[pos];
-        if (ch == '\'') {
-            break;
-        }
-        pos++;
-    }
-
+    const char *end = memchr(cmd, '\'', len);
+    size_t pos = end ? (size_t)(end - cmd) : len;
     string_append_buf(buf, cmd, pos);
-    if (ch == '\'') {
-        pos++;
-    }
-
-    return pos;
+    return pos + (end ? 1 : 0);
 }
 
 static size_t unicode_escape(const char *str, size_t count, String *buf)
