@@ -174,6 +174,10 @@ static void test_parse_command_arg(TestContext *ctx)
     EXPECT_TRUE(str_has_suffix(arg, "/build/test/HOME/filename"));
     free(arg);
 
+    arg = parse_command_arg(&runner, STRN("'xyz"), false);
+    EXPECT_STREQ(arg, "xyz");
+    free(arg);
+
     arg = parse_command_arg(&runner, STRN("\"\\u148A\"xyz'foo'\"\\x5A\"\\;\t."), false);
     EXPECT_STREQ(arg, "\xE1\x92\x8AxyzfooZ;");
     free(arg);
