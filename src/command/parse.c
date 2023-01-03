@@ -18,10 +18,12 @@ static size_t parse_sq(const char *cmd, size_t len, String *buf)
         }
         pos++;
     }
+
     string_append_buf(buf, cmd, pos);
     if (ch == '\'') {
         pos++;
     }
+
     return pos;
 }
 
@@ -86,6 +88,7 @@ static size_t parse_dq(const char *cmd, size_t len, String *buf)
         }
         string_append_byte(buf, ch);
     }
+
     return pos;
 }
 
@@ -228,8 +231,7 @@ size_t find_end(const char *cmd, size_t pos, CommandParseError *err)
 // Note: `array` must be freed, regardless of the return value
 CommandParseError parse_commands(const CommandRunner *runner, PointerArray *array, const char *cmd)
 {
-    size_t pos = 0;
-    while (1) {
+    for (size_t pos = 0; true; ) {
         while (ascii_isspace(cmd[pos])) {
             pos++;
         }
@@ -253,6 +255,7 @@ CommandParseError parse_commands(const CommandRunner *runner, PointerArray *arra
         ptr_array_append(array, parse_command_arg(runner, cmd + pos, end - pos, true));
         pos = end;
     }
+
     ptr_array_append(array, NULL);
     return CMDERR_NONE;
 }
@@ -264,6 +267,7 @@ const char *command_parse_error_to_string(CommandParseError err)
         [CMDERR_UNCLOSED_DQUOTE] = "unclosed \"",
         [CMDERR_UNEXPECTED_EOF] = "unexpected EOF",
     };
+
     BUG_ON(err <= CMDERR_NONE);
     BUG_ON(err >= ARRAYLEN(error_strings));
     return error_strings[err];

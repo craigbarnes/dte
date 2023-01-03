@@ -232,8 +232,7 @@ static ExitCode showkey_loop(const char *term_name, const char *colorterm)
     term_output_flush(obuf);
 
     char keystr[KEYCODE_STR_MAX];
-    bool loop = true;
-    while (loop) {
+    for (bool loop = true; loop; ) {
         KeyCode key = term_read_key(&term, 100);
         switch (key) {
         case KEY_NONE:

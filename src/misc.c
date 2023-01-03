@@ -127,6 +127,7 @@ static int get_indent_of_matching_brace(const View *view)
             level--;
         }
     }
+
     return -1;
 }
 
@@ -666,12 +667,9 @@ void format_paragraph(View *view, size_t text_width)
         .text_width = text_width
     };
 
-    size_t i = 0;
-    while (1) {
-        size_t start, tmp;
-
+    for (size_t i = 0; true; ) {
         while (i < len) {
-            tmp = i;
+            size_t tmp = i;
             if (!u_is_breakable_whitespace(u_get_char(sel, len, &tmp))) {
                 break;
             }
@@ -681,9 +679,9 @@ void format_paragraph(View *view, size_t text_width)
             break;
         }
 
-        start = i;
+        size_t start = i;
         while (i < len) {
-            tmp = i;
+            size_t tmp = i;
             if (u_is_breakable_whitespace(u_get_char(sel, len, &tmp))) {
                 break;
             }
