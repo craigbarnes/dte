@@ -108,54 +108,45 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
     return 0;
 }
 
-static void arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
+static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
 {
     // GCOV_EXCL_START
     switch (err) {
-    case ARGERR_NONE:
-        break;
     case ARGERR_INVALID_OPTION:
-        error_msg("Invalid option -%c", a->flags[0]);
-        break;
+        return error_msg("Invalid option -%c", a->flags[0]);
     case ARGERR_TOO_MANY_OPTIONS:
-        error_msg("Too many options given");
-        break;
+        return error_msg("Too many options given");
     case ARGERR_OPTION_ARGUMENT_NOT_SEPARATE:
-        error_msg (
+        return error_msg (
             "Flag -%c must be given separately because it"
             " requires an argument",
             a->flags[0]
         );
-        break;
     case ARGERR_OPTION_ARGUMENT_MISSING:
-        error_msg("Option -%c requires an argument", a->flags[0]);
-        break;
+        return error_msg("Option -%c requires an argument", a->flags[0]);
     case ARGERR_TOO_FEW_ARGUMENTS:
-        error_msg (
+        return error_msg (
             "Too few arguments (got: %zu, minimum: %u)",
             a->nr_args,
             (unsigned int)cmd->min_args
         );
-        break;
     case ARGERR_TOO_MANY_ARGUMENTS:
-        error_msg (
+        return error_msg (
             "Too many arguments (got: %zu, maximum: %u)",
             a->nr_args,
             (unsigned int)cmd->max_args
         );
+    case ARGERR_NONE:
         break;
-    default:
-        BUG("unhandled error type");
     }
+
+    BUG("unhandled error type");
+    return false;
     // GCOV_EXCL_STOP
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a)
 {
     ArgParseError err = do_parse_args(cmd, a);
-    if (unlikely(err != ARGERR_NONE)) {
-        arg_parse_error_msg(cmd, a, err);
-        return false;
-    }
-    return true;
+    return likely(err == ARGERR_NONE) || arg_parse_error_msg(cmd, a, err);
 }
