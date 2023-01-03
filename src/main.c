@@ -101,7 +101,7 @@ static void do_sigaction(int sig, const struct sigaction *action)
  *
  * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
  *
- * Signals not handled by this function:
+ * Signal handlers not set by this function:
  * - SIGKILL, SIGSTOP (can't be caught or ignored)
  * - SIGPOLL, SIGPROF (marked "obsolete" in POSIX 2008)
  */
