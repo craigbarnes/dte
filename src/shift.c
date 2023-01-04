@@ -35,10 +35,9 @@ static void shift_right(View *view, size_t nr_lines, size_t count)
     char *indent = alloc_indent(options, count, &indent_size);
 
     for (size_t i = 0; true; ) {
-        IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(options, &line, &info);
+        IndentInfo info = get_indent_info(options, &line);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation
@@ -70,10 +69,9 @@ static void shift_left(View *view, size_t nr_lines, size_t count)
     const bool space_indent = use_spaces_for_indent(options);
 
     for (size_t i = 0; true; ) {
-        IndentInfo info;
         StringView line;
         fetch_this_line(&view->cursor, &line);
-        get_indent_info(options, &line, &info);
+        IndentInfo info = get_indent_info(options, &line);
         if (info.wsonly) {
             if (info.bytes) {
                 // Remove indentation

@@ -63,47 +63,51 @@ static bool indent_inc(const LocalOptions *options, const StringView *line)
 
 char *get_indent_for_next_line(const LocalOptions *options, const StringView *line)
 {
-    IndentInfo info;
-    get_indent_info(options, line, &info);
+    size_t width = get_indent_width(options, line);
     if (indent_inc(options, line)) {
-        size_t w = options->indent_width;
-        info.width = (info.width + w) / w * w;
+        size_t iw = options->indent_width;
+        width = (width + iw) / iw * iw;
     }
-    return make_indent(options, info.width);
+    return make_indent(options, width);
 }
 
-void get_indent_info(const LocalOptions *options, const StringView *line, IndentInfo *info)
+IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
 {
     const char *buf = line->data;
     const size_t len = line->length;
     const size_t tw = options->tab_width;
     const size_t iw = options->indent_width;
     const bool space_indent = use_spaces_for_indent(options);
+    IndentInfo info = {.sane = true};
     size_t spaces = 0;
     size_t tabs = 0;
     size_t pos = 0;
 
-    *info = (IndentInfo){.sane = true};
-
-    while (pos < len) {
+    for (; pos < len; pos++) {
         if (buf[pos] == ' ') {
-            info->width++;
+            info.width++;
             spaces++;
         } else if (buf[pos] == '\t') {
-            info->width = (info->width + tw) / tw * tw;
+            info.width = (info.width + tw) / tw * tw;
             tabs++;
         } else {
             break;
         }
-        info->bytes++;
-        pos++;
-        if (info->width % iw == 0 && info->sane) {
-            info->sane = space_indent ? !tabs : !spaces;
+        if (info.width % iw == 0 && info.sane) {
+            info.sane = space_indent ? !tabs : !spaces;
         }
     }
 
-    info->level = info->width / iw;
-    info->wsonly = pos == len;
+    info.level = info.width / iw;
+    info.wsonly = (pos == len);
+    info.bytes = spaces + tabs;
+    return info;
+}
+
+size_t get_indent_width(const LocalOptions *options, const StringView *line)
+{
+    IndentInfo info = get_indent_info(options, line);
+    return info.width;
 }
 
 static ssize_t get_current_indent_bytes(const LocalOptions *options, const char *buf, size_t cursor_offset)

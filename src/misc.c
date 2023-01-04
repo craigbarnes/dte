@@ -118,9 +118,7 @@ static int get_indent_of_matching_brace(const View *view)
         fetch_this_line(&bi, &line);
         if (line_has_opening_brace(line)) {
             if (level++ == 0) {
-                IndentInfo info;
-                get_indent_info(options, &line, &info);
-                return info.width;
+                return get_indent_width(options, &line);
             }
         }
         if (line_has_closing_brace(line)) {
@@ -586,13 +584,6 @@ static bool is_paragraph_separator(const StringView *line)
         || strview_equal_cstring(&trimmed, "/*")
         || strview_equal_cstring(&trimmed, "*/")
     ;
-}
-
-static size_t get_indent_width(const LocalOptions *options, const StringView *line)
-{
-    IndentInfo info;
-    get_indent_info(options, line, &info);
-    return info.width;
 }
 
 static bool in_paragraph(const LocalOptions *options, const StringView *line, size_t indent_width)
