@@ -381,7 +381,7 @@ static ExitCode init_logging(const char *filename, const char *log_level_str)
 
 static const char copyright[] =
     "dte " VERSION "\n"
-    "(C) 2013-2022 Craig Barnes\n"
+    "(C) 2013-2023 Craig Barnes\n"
     "(C) 2010-2015 Timo Hirvonen\n"
     "This program is free software; you can redistribute and/or modify\n"
     "it under the terms of the GNU General Public License version 2\n"
