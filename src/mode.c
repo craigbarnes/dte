@@ -18,8 +18,10 @@
 static bool normal_mode_keypress(EditorState *e, KeyCode key)
 {
     View *view = e->view;
-    if ((key == KEY_TAB || key == (MOD_SHIFT | KEY_TAB)) && view->selection == SELECT_LINES) {
-        shift_lines(view, (key & MOD_SHIFT) ? -1 : 1);
+    KeyCode shift = key & MOD_SHIFT;
+    if ((key & ~shift) == KEY_TAB && view->selection == SELECT_LINES) {
+        // In line selections, Tab/S-Tab behave like `shift -- 1/-1`
+        shift_lines(view, shift ? -1 : 1);
         return true;
     }
 
