@@ -490,6 +490,15 @@ static char *get_option_ptr(EditorState *e, const OptionDesc *d, bool global)
     return global ? global_ptr(d, &e->options) : local_ptr(d, &e->buffer->options);
 }
 
+static inline size_t count_enum_values(const OptionDesc *desc)
+{
+    OptionType type = desc->type;
+    BUG_ON(type != OPT_ENUM && type != OPT_FLAG && type != OPT_BOOL);
+    const char *const *values = desc->u.enum_opt.values;
+    BUG_ON(!values);
+    return string_array_length((char**)values);
+}
+
 UNITTEST {
     static const struct {
         size_t alignment;
@@ -527,16 +536,21 @@ UNITTEST {
         }
         if (type == OPT_UINT) {
             BUG_ON(desc->u.uint_opt.max <= desc->u.uint_opt.min);
+        } else if (type == OPT_BOOL) {
+            BUG_ON(desc->u.enum_opt.values != bool_enum);
+        } else if (type == OPT_ENUM) {
+            BUG_ON(count_enum_values(desc) < 2);
         } else if (type == OPT_FLAG) {
+            size_t nvals = count_enum_values(desc);
             OptionValue val = {.uint_val = -1};
+            BUG_ON(nvals < 2);
+            BUG_ON(nvals >= BITSIZE(val.uint_val));
             const char *str = flag_string(desc, val);
             BUG_ON(!str);
             BUG_ON(str[0] == '\0');
             if (!flag_parse(desc, str, &val)) {
                 BUG("flag_parse() failed for string: %s", str);
             }
-            size_t nvals = string_array_length((char**)desc->u.enum_opt.values);
-            BUG_ON(nvals >= BITSIZE(val.uint_val));
             unsigned int mask = (1u << nvals) - 1;
             if (val.uint_val != mask) {
                 BUG("values not equal: %u, %u", val.uint_val, mask);
