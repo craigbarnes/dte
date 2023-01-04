@@ -393,6 +393,7 @@ void buffer_setup(EditorState *e, Buffer *buffer)
     if (buffer->options.detect_indent && filename) {
         detect_indent(buffer);
     }
+    sanity_check_local_options(&buffer->options);
 }
 
 STRFTIME(3) NONNULL_ARGS WARN_UNUSED_RESULT

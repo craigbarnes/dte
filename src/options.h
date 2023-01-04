@@ -101,8 +101,10 @@ const char *get_option_value_string(struct EditorState *e, const char *name);
 
 #if DEBUG >= 1
     void sanity_check_global_options(const GlobalOptions *opts);
+    void sanity_check_local_options(const LocalOptions *lopts);
 #else
-    static inline void sanity_check_global_options(const GlobalOptions* UNUSED_ARG(opts)) {}
+    static inline void sanity_check_global_options(const GlobalOptions* UNUSED_ARG(gopts)) {}
+    static inline void sanity_check_local_options(const LocalOptions* UNUSED_ARG(lopts)) {}
 #endif
 
 #endif

@@ -792,25 +792,61 @@ bool validate_local_options(char **strs)
 }
 
 #if DEBUG >= 1
+static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
+{
+    switch (desc->type) {
+    case OPT_STR:
+        BUG_ON(!val.str_val);
+        BUG_ON(val.str_val != str_intern(val.str_val));
+        if (desc->u.str_opt.validate) {
+            BUG_ON(!desc->u.str_opt.validate(val.str_val));
+        }
+        return;
+    case OPT_UINT:
+        BUG_ON(val.uint_val < desc->u.uint_opt.min);
+        BUG_ON(val.uint_val > desc->u.uint_opt.max);
+        return;
+    case OPT_ENUM:
+        BUG_ON(val.uint_val >= count_enum_values(desc));
+        return;
+    case OPT_FLAG: {
+            size_t nvals = count_enum_values(desc);
+            unsigned int mask = (1u << nvals) - 1;
+            unsigned int uint_val = val.uint_val;
+            BUG_ON((uint_val & mask) != uint_val);
+        }
+        return;
+    case OPT_REGEX:
+        BUG_ON(val.str_val && val.str_val[0] == '\0');
+        BUG_ON(val.str_val && !regexp_is_interned(val.str_val));
+        return;
+    case OPT_BOOL:
+        return;
+    }
+
+    BUG("unhandled option type");
+}
+
+static void sanity_check_options(const void *opts, bool global)
+{
+    for (size_t i = 0; i < ARRAYLEN(option_desc); i++) {
+        const OptionDesc *desc = &option_desc[i];
+        BUG_ON(desc->type >= ARRAYLEN(option_ops));
+        if ((desc->global && desc->local) || global == desc->global) {
+            OptionValue val = desc_get(desc, (char*)opts + desc->offset);
+            sanity_check_option_value(desc, val);
+        }
+    }
+}
+
 void sanity_check_global_options(const GlobalOptions *gopts)
 {
-    BUG_ON(statusline_format_find_error(gopts->statusline_left));
-    BUG_ON(statusline_format_find_error(gopts->statusline_right));
-    BUG_ON(gopts->indent_width < 1);
-    BUG_ON(gopts->tab_width < 1);
-    BUG_ON(gopts->text_width < 1);
-    BUG_ON(gopts->indent_width > INDENT_WIDTH_MAX);
-    BUG_ON(gopts->tab_width > TAB_WIDTH_MAX);
-    BUG_ON(gopts->text_width > TEXT_WIDTH_MAX);
-    BUG_ON(gopts->crlf_newlines > 1);
-    BUG_ON(gopts->case_sensitive_search > CSS_AUTO);
-    BUG_ON(gopts->esc_timeout > ESC_TIMEOUT_MAX);
-    BUG_ON(gopts->filesize_limit > FILESIZE_LIMIT_MAX);
-    BUG_ON(gopts->scroll_margin > SCROLL_MARGIN_MAX);
-    unsigned int di = gopts->detect_indent;
-    BUG_ON((di & ((1u << INDENT_WIDTH_MAX) - 1)) != di);
-    unsigned int wse = gopts->ws_error;
-    BUG_ON((wse & WSE_MASK) != wse);
+    sanity_check_options(gopts, true);
+}
+
+void sanity_check_local_options(const LocalOptions *lopts)
+{
+    sanity_check_options(lopts, false);
 }
 #endif
 
