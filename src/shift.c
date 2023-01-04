@@ -13,19 +13,10 @@
 
 static char *alloc_indent(const LocalOptions *options, size_t count, size_t *sizep)
 {
-    size_t size;
-    int ch;
-    if (use_spaces_for_indent(options)) {
-        ch = ' ';
-        size = count * options->indent_width;
-    } else {
-        ch = '\t';
-        size = count;
-    }
-    char *indent = xmalloc(size);
-    memset(indent, ch, size);
+    bool use_spaces = use_spaces_for_indent(options);
+    size_t size = use_spaces ? count * options->indent_width : count;
     *sizep = size;
-    return indent;
+    return memset(xmalloc(size), use_spaces ? ' ' : '\t', size);
 }
 
 static void shift_right(View *view, size_t nr_lines, size_t count)
