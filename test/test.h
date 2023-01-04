@@ -24,7 +24,7 @@ typedef struct {
     size_t nr_tests;
 } TestGroup;
 
-#define TEST(e) (TestEntry) { \
+#define TEST(e) { \
     .name = #e, \
     .func = e \
 }
