@@ -10,22 +10,21 @@ char *make_indent(const LocalOptions *options, size_t width)
         return NULL;
     }
 
-    size_t ntabs, nspaces;
     if (use_spaces_for_indent(options)) {
-        ntabs = 0;
-        nspaces = width;
-    } else {
-        size_t tw = options->tab_width;
-        ntabs = width / tw;
-        nspaces = width % tw;
+        char *str = xmalloc(width + 1);
+        str[width] = '\0';
+        return memset(str, ' ', width);
     }
 
+    size_t tw = options->tab_width;
+    BUG_ON(tw == 0 || tw > TAB_WIDTH_MAX);
+    size_t ntabs = width / tw;
+    size_t nspaces = width % tw;
     size_t n = ntabs + nspaces;
     char *str = xmalloc(n + 1);
-    memset(str, '\t', ntabs);
     memset(str + ntabs, ' ', nspaces);
     str[n] = '\0';
-    return str;
+    return memset(str, '\t', ntabs);
 }
 
 static bool indent_inc(const LocalOptions *options, const StringView *line)
