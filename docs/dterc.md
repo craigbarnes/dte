@@ -725,12 +725,12 @@ Move to beginning of file.
 
 Move to end of file.
 
-### **bolsf**
+### **bolsf** [**-c**|**-l**]
 
 Incrementally move to beginning of line, then beginning of screen, then
 beginning of file.
 
-### **eolsf**
+### **eolsf** [**-c**|**-l**]
 
 Incrementally move to end of line, then end of screen, then end of file.
 

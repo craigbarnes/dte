@@ -209,7 +209,8 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    unselect(view);
+    handle_select_chars_or_lines_flags(view, a);
+
     if (!block_iter_bol(&view->cursor)) {
         unsigned int margin = e->options.scroll_margin;
         long top = view->vy + window_get_scroll_margin(e->window, margin);
@@ -219,6 +220,7 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
             block_iter_bof(&view->cursor);
         }
     }
+
     view_reset_preferred_x(view);
     return true;
 }
@@ -555,10 +557,11 @@ static bool cmd_eol(EditorState *e, const CommandArgs *a)
 static bool cmd_eolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
-    Window *window = e->window;
     View *view = e->view;
-    unselect(view);
+    handle_select_chars_or_lines_flags(view, a);
+
     if (!block_iter_eol(&view->cursor)) {
+        Window *window = e->window;
         long margin = window_get_scroll_margin(window, e->options.scroll_margin);
         long bottom = view->vy + window->edit_h - 1 - margin;
         if (view->cy < bottom) {
@@ -567,6 +570,7 @@ static bool cmd_eolsf(EditorState *e, const CommandArgs *a)
             block_iter_eof(&view->cursor);
         }
     }
+
     view_reset_preferred_x(view);
     return true;
 }
@@ -2285,7 +2289,7 @@ static const Command cmds[] = {
     {"blkup", "cl", false, 0, 0, cmd_blkup},
     {"bof", "cl", false, 0, 0, cmd_bof},
     {"bol", "cst", false, 0, 0, cmd_bol},
-    {"bolsf", "", false, 0, 0, cmd_bolsf},
+    {"bolsf", "cl", false, 0, 0, cmd_bolsf},
     {"bookmark", "r", false, 0, 0, cmd_bookmark},
     {"case", "lu", false, 0, 0, cmd_case},
     {"cd", "", true, 1, 1, cmd_cd},
@@ -2304,7 +2308,7 @@ static const Command cmds[] = {
     {"down", "cl", false, 0, 0, cmd_down},
     {"eof", "cl", false, 0, 0, cmd_eof},
     {"eol", "c", false, 0, 0, cmd_eol},
-    {"eolsf", "", false, 0, 0, cmd_eolsf},
+    {"eolsf", "cl", false, 0, 0, cmd_eolsf},
     {"erase", "", false, 0, 0, cmd_erase},
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
     {"erase-word", "s", false, 0, 0, cmd_erase_word},
