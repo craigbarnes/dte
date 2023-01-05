@@ -58,8 +58,12 @@
 #include "view.h"
 #include "window.h"
 
-static void do_selection(View *view, SelectionType sel)
+NOINLINE
+static void do_selection_noinline(View *view, SelectionType sel)
 {
+    // Should only be called from do_selection()
+    BUG_ON(sel == view->selection);
+
     if (sel == SELECT_NONE) {
         unselect(view);
         return;
@@ -83,6 +87,17 @@ static void do_selection(View *view, SelectionType sel)
     // move up or down before screen is updated
     view_update_cursor_y(view);
     buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+}
+
+static void do_selection(View *view, SelectionType sel)
+{
+    if (likely(sel == view->selection)) {
+        // If `sel` is SELECT_NONE here, it's always equal to select_mode
+        BUG_ON(!sel && view->select_mode);
+        return;
+    }
+
+    do_selection_noinline(view, sel);
 }
 
 static char last_flag_or_default(const CommandArgs *a, char def)
