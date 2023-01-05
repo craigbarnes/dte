@@ -101,18 +101,6 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
     return cmdargs_has_flag(a, flag);
 }
 
-static void handle_select_chars_flag(View *view, const CommandArgs *a)
-{
-    SelectionType sel;
-    if (has_flag(a, 'c')) {
-        static_assert(SELECT_CHARS < SELECT_LINES);
-        sel = MAX(SELECT_CHARS, view->select_mode);
-    } else {
-        sel = view->select_mode;
-    }
-    do_selection(view, sel);
-}
-
 static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
 {
     SelectionType sel;
@@ -125,6 +113,12 @@ static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
         sel = view->select_mode;
     }
     do_selection(view, sel);
+}
+
+static void handle_select_chars_flag(View *view, const CommandArgs *a)
+{
+    BUG_ON(has_flag(a, 'l'));
+    handle_select_chars_or_lines_flags(view, a);
 }
 
 static bool cmd_alias(EditorState *e, const CommandArgs *a)
