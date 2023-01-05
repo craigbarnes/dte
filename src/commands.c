@@ -1846,16 +1846,18 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
     return found;
 }
 
+static bool cmd_select_block(EditorState *e, const CommandArgs *a)
+{
+    BUG_ON(a->nr_args);
+    select_block(e->view);
+
+    // TODO: return false if select_block() doesn't select anything?
+    return true;
+}
+
 static bool cmd_select(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    bool block = has_flag(a, 'b');
-    if (block) {
-        select_block(view);
-        // TODO: return false if select_block() doesn't select anything?
-        return true;
-    }
-
     SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
     bool keep = has_flag(a, 'k');
     if (!keep && view->selection && view->selection == sel) {
@@ -2340,7 +2342,8 @@ static const Command cmds[] = {
     {"scroll-pgup", "", false, 0, 0, cmd_scroll_pgup},
     {"scroll-up", "", false, 0, 0, cmd_scroll_up},
     {"search", "Hnprw", false, 0, 1, cmd_search},
-    {"select", "bkl", false, 0, 0, cmd_select},
+    {"select", "kl", false, 0, 0, cmd_select},
+    {"select-block", "", false, 0, 0, cmd_select_block},
     {"set", "gl", true, 1, -1, cmd_set},
     {"setenv", "", true, 1, 2, cmd_setenv},
     {"shift", "", false, 1, 1, cmd_shift},

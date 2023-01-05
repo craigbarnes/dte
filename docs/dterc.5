@@ -178,7 +178,7 @@ Editing Commands:
 .br
    \fBwrap\-paragraph\fR [\fIwidth\fR]
 .br
-   \fBselect\fR [\fB\-bkl\fR]
+   \fBselect\fR [\fB\-kl\fR]
 .br
    \fBunselect\fR
 .br
@@ -1572,19 +1572,17 @@ multiple paragraphs use the external \fBfmt\fR(1) program with the
 \fBfilter\fR command, e.g. \fBfilter fmt \-w 60\fR.
 .P
 .RE
-\fBselect\fR [\fB\-bkl\fR]
+\fBselect\fR [\fB\-kl\fR]
 .RS
-Enter selection mode. All movement commands while in this mode extend
-the selected area.
+Enter selection mode. All basic movement commands while in this mode
+extend the selected area, until either the \fBunselect\fR command is used
+(e.g. by pressing \fBEsc\fR) or some other operation (e.g. \fBdelete\fR,
+\fBinsert\fR, etc.) clears the selection.
 .P
 Note: A better way to create selections is to hold the Shift key whilst
 moving the cursor. The \fBselect\fR command exists mostly as a fallback,
 for terminals with limited key binding support.
 .P
-.TP
-\fB\-b\fR
-Select block between opening \fB{\fR and closing \fB}\fR curly braces
-.PP
 .TP
 \fB\-k\fR
 Keep existing selections
