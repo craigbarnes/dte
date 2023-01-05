@@ -75,53 +75,12 @@ EditorState *init_editor_state(void)
     *e = (EditorState) {
         .status = EDITOR_INITIALIZING,
         .input_mode = INPUT_NORMAL,
-        .child_controls_terminal = false,
-        .everything_changed = false,
-        .cursor_style_changed = false,
-        .compilers = HASHMAP_INIT,
-        .syntaxes = HASHMAP_INIT,
-        .buffers = PTR_ARRAY_INIT,
-        .filetypes = PTR_ARRAY_INIT,
-        .file_options = PTR_ARRAY_INIT,
-        .bookmarks = PTR_ARRAY_INIT,
-        .root_frame = NULL,
-        .window = NULL,
-        .view = NULL,
-        .buffer = NULL,
         .version = VERSION,
-        .cmdline_x = 0,
-        .colors = {
-            .other = HASHMAP_INIT,
-        },
-        .messages = {
-            .array = PTR_ARRAY_INIT,
-            .pos = 0,
-        },
-        .cmdline = {
-            .buf = STRING_INIT,
-            .pos = 0,
-            .search_pos = NULL,
-            .search_text = NULL
-        },
-        .file_history = {
-            .filename = NULL,
-            .entries = HASHMAP_INIT
-        },
         .command_history = {
-            .filename = NULL,
             .max_entries = 512,
-            .entries = HASHMAP_INIT
         },
         .search_history = {
-            .filename = NULL,
             .max_entries = 128,
-            .entries = HASHMAP_INIT
-        },
-        .macro = {
-            .macro = PTR_ARRAY_INIT,
-            .prev_macro = PTR_ARRAY_INIT,
-            .insert_buffer = STRING_INIT,
-            .recording = false,
         },
         .cursor_styles = {
             [CURSOR_MODE_DEFAULT] = {.type = CURSOR_DEFAULT, .color = COLOR_DEFAULT},
@@ -130,18 +89,9 @@ EditorState *init_editor_state(void)
             [CURSOR_MODE_CMDLINE] = {.type = CURSOR_KEEP, .color = COLOR_KEEP},
         },
         .modes = {
-            [INPUT_NORMAL] = {
-                .cmds = &normal_commands,
-                .key_bindings = INTMAP_INIT,
-            },
-            [INPUT_COMMAND] = {
-                .cmds = &cmd_mode_commands,
-                .key_bindings = INTMAP_INIT,
-            },
-            [INPUT_SEARCH] = {
-                .cmds = &search_mode_commands,
-                .key_bindings = INTMAP_INIT,
-            },
+            [INPUT_NORMAL] = {.cmds = &normal_commands},
+            [INPUT_COMMAND] = {.cmds = &cmd_mode_commands},
+            [INPUT_SEARCH] = {.cmds = &search_mode_commands},
         },
         .options = {
             .auto_indent = true,
