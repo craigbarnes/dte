@@ -103,7 +103,14 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
 
 static void handle_select_chars_flag(View *view, const CommandArgs *a)
 {
-    do_selection(view, has_flag(a, 'c') ? SELECT_CHARS : view->select_mode);
+    SelectionType sel;
+    if (has_flag(a, 'c')) {
+        static_assert(SELECT_CHARS < SELECT_LINES);
+        sel = MAX(SELECT_CHARS, view->select_mode);
+    } else {
+        sel = view->select_mode;
+    }
+    do_selection(view, sel);
 }
 
 static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
@@ -112,7 +119,8 @@ static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
     if (has_flag(a, 'l')) {
         sel = SELECT_LINES;
     } else if (has_flag(a, 'c')) {
-        sel = SELECT_CHARS;
+        static_assert(SELECT_CHARS < SELECT_LINES);
+        sel = MAX(SELECT_CHARS, view->select_mode);
     } else {
         sel = view->select_mode;
     }
