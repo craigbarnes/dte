@@ -451,7 +451,6 @@ int main(int argc, char *argv[])
         case 'h':
             printf(usage, (argv[0] && argv[0][0]) ? argv[0] : "dte");
             return EX_OK;
-        case '?':
         default:
             return EX_USAGE;
         }
