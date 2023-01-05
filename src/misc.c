@@ -131,6 +131,7 @@ static int get_indent_of_matching_brace(const View *view)
 
 void unselect(View *view)
 {
+    view->select_mode = SELECT_NONE;
     if (view->selection) {
         view->selection = SELECT_NONE;
         mark_all_lines_changed(view->buffer);

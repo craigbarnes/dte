@@ -28,8 +28,9 @@ typedef struct View {
     int tt_truncated_width;
     bool center_on_scroll; // Center view to cursor if scrolled
     bool force_center; // Force centering view to cursor
-    bool next_movement_cancels_selection;
+
     SelectionType selection;
+    SelectionType select_mode;
     ssize_t sel_so; // Cursor offset when selection was started
 
     // If sel_eo is UINT_MAX that means the offset must be calculated from

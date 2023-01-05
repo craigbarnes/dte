@@ -21,11 +21,14 @@ Window *new_window(EditorState *e)
 
 View *window_add_buffer(Window *window, Buffer *buffer)
 {
+    // We rely on this being 0, for implicit initialization of
+    // View::selection and View::select_mode
+    static_assert(SELECT_NONE == 0);
+
     View *view = xnew(View, 1);
     *view = (View) {
         .buffer = buffer,
         .window = window,
-        .selection = SELECT_NONE,
         .cursor = {
             .blk = BLOCK(buffer->blocks.next),
             .head = &buffer->blocks,

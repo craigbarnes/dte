@@ -61,18 +61,17 @@
 static void do_selection(View *view, SelectionType sel)
 {
     if (sel == SELECT_NONE) {
-        if (view->next_movement_cancels_selection) {
-            view->next_movement_cancels_selection = false;
-            unselect(view);
-        }
+        unselect(view);
         return;
     }
 
-    view->next_movement_cancels_selection = true;
-
     if (view->selection) {
-        view->selection = sel;
-        mark_all_lines_changed(view->buffer);
+        if (view->selection != sel) {
+            view->selection = sel;
+            // TODO: be less brute force about this; only the first/last
+            // line of the selection can change in this case
+            mark_all_lines_changed(view->buffer);
+        }
         return;
     }
 
@@ -102,20 +101,22 @@ static bool has_flag(const CommandArgs *a, unsigned char flag)
     return cmdargs_has_flag(a, flag);
 }
 
-static void handle_select_chars_flag(EditorState *e, const CommandArgs *a)
+static void handle_select_chars_flag(View *view, const CommandArgs *a)
 {
-    do_selection(e->view, has_flag(a, 'c') ? SELECT_CHARS : SELECT_NONE);
+    do_selection(view, has_flag(a, 'c') ? SELECT_CHARS : view->select_mode);
 }
 
-static void handle_select_chars_or_lines_flags(EditorState *e, const CommandArgs *a)
+static void handle_select_chars_or_lines_flags(View *view, const CommandArgs *a)
 {
-    SelectionType sel = SELECT_NONE;
+    SelectionType sel;
     if (has_flag(a, 'l')) {
         sel = SELECT_LINES;
     } else if (has_flag(a, 'c')) {
         sel = SELECT_CHARS;
+    } else {
+        sel = view->select_mode;
     }
-    do_selection(e->view, sel);
+    do_selection(view, sel);
 }
 
 static bool cmd_alias(EditorState *e, const CommandArgs *a)
@@ -186,7 +187,7 @@ static bool cmd_bind(EditorState *e, const CommandArgs *a)
 
 static bool cmd_bof(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    handle_select_chars_or_lines_flags(e->view, a);
     move_bof(e->view);
     return true;
 }
@@ -199,7 +200,7 @@ static bool cmd_bol(EditorState *e, const CommandArgs *a)
     };
 
     SmartBolFlags flags = cmdargs_convert_flags(a, map, ARRAYLEN(map));
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     move_bol_smart(e->view, flags);
     return true;
 }
@@ -208,7 +209,7 @@ static bool cmd_bolsf(EditorState *e, const CommandArgs *a)
 {
     BUG_ON(a->nr_args);
     View *view = e->view;
-    do_selection(view, SELECT_NONE);
+    unselect(view);
     if (!block_iter_bol(&view->cursor)) {
         unsigned int margin = e->options.scroll_margin;
         long top = view->vy + window_get_scroll_margin(e->window, margin);
@@ -532,21 +533,21 @@ static bool cmd_delete_word(EditorState *e, const CommandArgs *a)
 
 static bool cmd_down(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    handle_select_chars_or_lines_flags(e->view, a);
     move_down(e->view, 1);
     return true;
 }
 
 static bool cmd_eof(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    handle_select_chars_or_lines_flags(e->view, a);
     move_eof(e->view);
     return true;
 }
 
 static bool cmd_eol(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     move_eol(e->view);
     return true;
 }
@@ -556,7 +557,7 @@ static bool cmd_eolsf(EditorState *e, const CommandArgs *a)
     BUG_ON(a->nr_args);
     Window *window = e->window;
     View *view = e->view;
-    do_selection(view, SELECT_NONE);
+    unselect(view);
     if (!block_iter_eol(&view->cursor)) {
         long margin = window_get_scroll_margin(window, e->options.scroll_margin);
         long bottom = view->vy + window->edit_h - 1 - margin;
@@ -765,7 +766,7 @@ static bool cmd_join(EditorState *e, const CommandArgs *a)
 
 static bool cmd_left(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     move_cursor_left(e->view);
     return true;
 }
@@ -780,7 +781,7 @@ static bool cmd_line(EditorState *e, const CommandArgs *a)
         return error_msg("Invalid line number: %s", arg);
     }
 
-    do_selection(view, SELECT_NONE);
+    unselect(view);
     move_to_line(view, line);
     move_to_preferred_x(view, x);
     return true;
@@ -1124,10 +1125,10 @@ static bool cmd_option(EditorState *e, const CommandArgs *a)
 
 static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    View *view = e->view;
+    handle_select_chars_or_lines_flags(view, a);
 
     // If current line is blank, skip past consecutive blank lines
-    View *view = e->view;
     StringView line;
     fetch_this_line(&view->cursor, &line);
     if (strview_isblank(&line)) {
@@ -1160,10 +1161,10 @@ static bool cmd_blkdown(EditorState *e, const CommandArgs *a)
 
 static bool cmd_blkup(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    View *view = e->view;
+    handle_select_chars_or_lines_flags(view, a);
 
     // If cursor is on the first line, just move to bol
-    View *view = e->view;
     if (view->cy == 0) {
         block_iter_bol(&view->cursor);
         return true;
@@ -1213,10 +1214,10 @@ static bool cmd_paste(EditorState *e, const CommandArgs *a)
 
 static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    View *view = e->view;
+    handle_select_chars_or_lines_flags(view, a);
 
     Window *window = e->window;
-    View *view = e->view;
     long margin = window_get_scroll_margin(window, e->options.scroll_margin);
     long bottom = view->vy + window->edit_h - 1 - margin;
     long count;
@@ -1233,10 +1234,10 @@ static bool cmd_pgdown(EditorState *e, const CommandArgs *a)
 
 static bool cmd_pgup(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    View *view = e->view;
+    handle_select_chars_or_lines_flags(view, a);
 
     Window *window = e->window;
-    View *view = e->view;
     long margin = window_get_scroll_margin(window, e->options.scroll_margin);
     long top = view->vy + margin;
     long count;
@@ -1481,7 +1482,7 @@ static bool cmd_replace(EditorState *e, const CommandArgs *a)
 
 static bool cmd_right(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     move_cursor_right(e->view);
     return true;
 }
@@ -1815,7 +1816,7 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 
     SearchState *search = &e->search;
     SearchCaseSensitivity cs = e->options.case_sensitive_search;
-    do_selection(view, SELECT_NONE);
+    unselect(view);
 
     if (has_flag(a, 'n')) {
         return search_next(view, search, cs);
@@ -1848,35 +1849,21 @@ static bool cmd_search(EditorState *e, const CommandArgs *a)
 static bool cmd_select(EditorState *e, const CommandArgs *a)
 {
     View *view = e->view;
-    SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
     bool block = has_flag(a, 'b');
-    bool keep = has_flag(a, 'k');
-    view->next_movement_cancels_selection = false;
-
     if (block) {
         select_block(view);
         // TODO: return false if select_block() doesn't select anything?
         return true;
     }
 
-    if (view->selection) {
-        if (!keep && view->selection == sel) {
-            unselect(view);
-            return true;
-        }
-        view->selection = sel;
-        mark_all_lines_changed(view->buffer);
-        return true;
+    SelectionType sel = has_flag(a, 'l') ? SELECT_LINES : SELECT_CHARS;
+    bool keep = has_flag(a, 'k');
+    if (!keep && view->selection && view->selection == sel) {
+        sel = SELECT_NONE;
     }
 
-    view->sel_so = block_iter_get_offset(&view->cursor);
-    view->sel_eo = UINT_MAX;
-    view->selection = sel;
-
-    // Need to mark current line changed because cursor might
-    // move up or down before screen is updated
-    view_update_cursor_y(view);
-    buffer_mark_lines_changed(view->buffer, view->cy, view->cy);
+    view->select_mode = sel;
+    do_selection(view, sel);
     return true;
 }
 
@@ -2052,7 +2039,7 @@ static bool cmd_unselect(EditorState *e, const CommandArgs *a)
 
 static bool cmd_up(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_or_lines_flags(e, a);
+    handle_select_chars_or_lines_flags(e->view, a);
     move_up(e->view, 1);
     return true;
 }
@@ -2125,7 +2112,7 @@ static bool cmd_wnext(EditorState *e, const CommandArgs *a)
 
 static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     bool skip_non_word = has_flag(a, 's');
     word_bwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
@@ -2134,7 +2121,7 @@ static bool cmd_word_bwd(EditorState *e, const CommandArgs *a)
 
 static bool cmd_word_fwd(EditorState *e, const CommandArgs *a)
 {
-    handle_select_chars_flag(e, a);
+    handle_select_chars_flag(e->view, a);
     bool skip_non_word = has_flag(a, 's');
     word_fwd(&e->view->cursor, skip_non_word);
     view_reset_preferred_x(e->view);
