@@ -19,7 +19,11 @@ pdf: public/dte.pdf
 
 $(html): docs/template.html | public/style.css
 
-docs/%.1 docs/%.5: docs/%.md docs/pdman.lua
+docs/%.1: docs/%.md docs/pdman.lua
+	$(E) PANDOC $@
+	$(Q) $(PDMAN) -o $@ $<
+
+docs/%.5: docs/%.md docs/pdman.lua
 	$(E) PANDOC $@
 	$(Q) $(PDMAN) -o $@ $<
 
