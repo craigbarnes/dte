@@ -5,13 +5,13 @@ FNR == 1 {
 }
 
 /^ *\t/ {
-    nlines++
+    t++
     print FILENAME ":" FNR ": tab in indent"
 }
 
 END {
-    if (nlines) {
-        print "Error: tab indents found on " nlines " lines"
+    if (t) {
+        print "Error: found " t " tab indent" (t == 1 ? "" : "s")
         exit 1
     }
 }
