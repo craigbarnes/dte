@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 
 FNR == 1 {
-    printf(" %7s  %s\n", "WSCHECK", FILENAME)
+    print " WSCHECK  " FILENAME
 }
 
 /^ *\t/ {
