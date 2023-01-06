@@ -34,7 +34,6 @@
 #include "util/path.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"
-#include "util/xsnprintf.h"
 #include "util/xstdio.h"
 #include "window.h"
 #include "../build/version.h"
