@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <locale.h>
 #include <signal.h>
@@ -2369,7 +2370,7 @@ static void test_fd_set_nonblock(TestContext *ctx)
 static void test_fork_exec(TestContext *ctx)
 {
     int fd[3];
-    fd[0] = xopen("/dev/null", O_RDWR | O_CLOEXEC, 0);
+    fd[0] = open("/dev/null", O_RDWR | O_CLOEXEC);
     ASSERT_TRUE(fd[0] > 0);
     fd[1] = fd[0];
     fd[2] = fd[0];
