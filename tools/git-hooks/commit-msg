@@ -5,11 +5,14 @@
     exit 0
 }
 
+# Skip other commented lines
 /^#/ {
     next
 }
 
-# Exclude long URLs from maximum line length check
+# Exclude long URLs from maximum line length check, so long as they
+# appear at the start of a line (excluding an optional bullet point
+# or numbered back-reference)
 /^([*-]|\[[0-9]]:)? *https?:/ {
     LINES++
     next
