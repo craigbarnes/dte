@@ -18,6 +18,7 @@ GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
+DOCFILES = $(shell git ls-files -- '*.md' '*.xml')
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
@@ -36,7 +37,7 @@ check-whitespace:
 	$(Q) $(WSCHECK) `git ls-files --error-unmatch ':(attr:space-indent)'`
 
 check-codespell:
-	$(Q) $(CODESPELL) -Literm,clen,ede $$(git ls-files -- src/ mk/ 'docs/*.md') >&2
+	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES) >&2
 
 check-desktop-file:
 	$(E) CHECK dte.desktop
@@ -47,8 +48,9 @@ check-appstream:
 	$(Q) appstream-util --nonet validate dte.appdata.xml
 
 check-docs:
-	@printf '\nChecking links from:\n\n%s\n\n' "`git ls-files '*.md'`"
-	@$(FINDLINKS) `git ls-files '*.md'` | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
+	@printf '\nChecking links from:\n\n'
+	@echo '$(DOCFILES) ' | tr ' ' '\n'
+	@$(FINDLINKS) $(DOCFILES) | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
 
 distcheck: TARDIR = build/dte-$(DISTVER)/
 distcheck: build/dte-$(DISTVER).tar.gz | build/
