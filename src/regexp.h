@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "util/macros.h"
-#include "util/string-view.h"
 
 enum {
 #ifdef REG_ENHANCED
