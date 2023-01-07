@@ -119,8 +119,13 @@ static void set_signal_handlers(void)
     };
 
     static const int ignored_signals[] = {
-        SIGINT, SIGQUIT, SIGTSTP, SIGXFSZ,
-        SIGPIPE, SIGUSR1, SIGUSR2,
+        SIGINT,  // Terminal interrupt (see: VINTR in termios(3))
+        SIGQUIT, // Terminal quit (see: VQUIT in termios(3))
+        SIGTSTP, // Terminal stop (see: VSUSP in termios(3))
+        SIGXFSZ, // File size limit exceeded (see: RLIMIT_FSIZE in getrlimit(3))
+        SIGPIPE, // Broken pipe (see: EPIPE error in write(3))
+        SIGUSR1, // User signal 1 (terminates by default, for no good reason)
+        SIGUSR2, // User signal 2 (as above)
     };
 
     static const int default_signals[] = {
