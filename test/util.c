@@ -911,8 +911,20 @@ static void test_str_to_filepos(TestContext *ctx)
     EXPECT_EQ(line, 1);
     EXPECT_EQ(col, 9);
 
-    EXPECT_TRUE(str_to_filepos("4980", &line, &col));
-    EXPECT_EQ(line, 4980);
+    EXPECT_TRUE(str_to_filepos("2", &line, &col));
+    EXPECT_EQ(line, 2);
+    EXPECT_EQ(col, 1);
+
+    EXPECT_TRUE(str_to_filepos("3,1", &line, &col));
+    EXPECT_EQ(line, 3);
+    EXPECT_EQ(col, 1);
+
+    EXPECT_TRUE(str_to_xfilepos("4", &line, &col));
+    EXPECT_EQ(line, 4);
+    EXPECT_EQ(col, 0);
+
+    EXPECT_TRUE(str_to_xfilepos("5,1", &line, &col));
+    EXPECT_EQ(line, 5);
     EXPECT_EQ(col, 1);
 
     EXPECT_FALSE(str_to_filepos("0", &line, &col));

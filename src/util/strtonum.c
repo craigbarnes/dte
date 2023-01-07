@@ -178,7 +178,7 @@ bool str_to_size(const char *str, size_t *valp)
 }
 
 // Parse line and column number from line[,col] or line[:col]
-bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
+bool str_to_xfilepos(const char *str, size_t *linep, size_t *colp)
 {
     size_t len = strlen(str);
     size_t line, col;
@@ -186,8 +186,13 @@ bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
     if (i == 0 || line < 1) {
         return false;
     }
+
+    // If an explicit column wasn't specified in `str`, set *colp to 0
+    // (which is NOT a valid column number). Callers should be prepared
+    // to check this and substitute it for something more appropriate,
+    // or otherwise use str_to_filepos() instead.
     if (i == len) {
-        col = 1;
+        col = 0;
         goto out;
     }
 
@@ -200,6 +205,19 @@ out:
     *linep = line;
     *colp = col;
     return true;
+}
+
+// This is much like str_to_xfilepos(), except *colp is set to 1 if no
+// explicit column number is specified in `str`. This is a convenience
+// to callers that want a valid column number (when omitted) and don't
+// need to do anything different for e.g. "32" vs. "32:1".
+bool str_to_filepos(const char *str, size_t *linep, size_t *colp)
+{
+    bool r = str_to_xfilepos(str, linep, colp);
+    if (r && *colp == 0) {
+        *colp = 1;
+    }
+    return r;
 }
 
 size_t size_str_width(size_t x)

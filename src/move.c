@@ -213,6 +213,7 @@ void move_to_filepos(View *view, size_t line, size_t column)
     if (column != 1) {
         move_to_column(view, column);
     }
+    view_reset_preferred_x(view);
 }
 
 static CharTypeEnum get_char_type(CodePoint u)

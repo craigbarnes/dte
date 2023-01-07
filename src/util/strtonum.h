@@ -47,6 +47,7 @@ bool str_to_int(const char *str, int *valp) NONNULL_ARGS;
 bool str_to_uint(const char *str, unsigned int *valp) NONNULL_ARGS;
 bool str_to_size(const char *str, size_t *valp) NONNULL_ARGS;
 bool str_to_ulong(const char *str, unsigned long *valp) NONNULL_ARGS;
-bool str_to_filepos(const char *str, size_t *line, size_t *col) NONNULL_ARGS;
+bool str_to_filepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS;
+bool str_to_xfilepos(const char *str, size_t *linep, size_t *colp) NONNULL_ARGS;
 
 #endif

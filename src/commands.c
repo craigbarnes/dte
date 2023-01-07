@@ -799,17 +799,25 @@ static bool cmd_left(EditorState *e, const CommandArgs *a)
 
 static bool cmd_line(EditorState *e, const CommandArgs *a)
 {
-    View *view = e->view;
-    const char *arg = a->args[0];
-    const long x = view_get_preferred_x(view);
-    size_t line;
-    if (unlikely(!str_to_size(arg, &line) || line == 0)) {
-        return error_msg("Invalid line number: %s", arg);
+    const char *str = a->args[0];
+    size_t line, column;
+    if (unlikely(!str_to_xfilepos(str, &line, &column))) {
+        return error_msg("Invalid line number: %s", str);
     }
 
+    View *view = e->view;
+    long x = view_get_preferred_x(view);
     unselect(view);
-    move_to_line(view, line);
-    move_to_preferred_x(view, x);
+
+    if (column >= 1) {
+        // Column was specified; move to exact position
+        move_to_filepos(view, line, column);
+    } else {
+        // Column was omitted; move to line while preserving current column
+        move_to_line(view, line);
+        move_to_preferred_x(view, x);
+    }
+
     return true;
 }
 
