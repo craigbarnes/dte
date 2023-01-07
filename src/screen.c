@@ -3,9 +3,7 @@
 #include "frame.h"
 #include "terminal/cursor.h"
 #include "terminal/ioctl.h"
-#include "util/debug.h"
 #include "util/log.h"
-#include "util/macros.h"
 
 void set_color(Terminal *term, const ColorScheme *colors, const TermColor *color)
 {

@@ -8,6 +8,9 @@
 #include "syntax/color.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
+#include "util/debug.h"
+#include "util/macros.h"
+#include "util/utf8.h"
 #include "view.h"
 #include "window.h"
 

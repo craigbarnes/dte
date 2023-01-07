@@ -1,8 +1,6 @@
 #include "screen.h"
 #include "error.h"
 #include "search.h"
-#include "util/debug.h"
-#include "util/utf8.h"
 
 static void print_message(Terminal *term, const ColorScheme *colors, const char *msg, bool is_error)
 {

@@ -1,8 +1,6 @@
 #include "screen.h"
-#include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/strtonum.h"
-#include "util/utf8.h"
 
 static size_t tab_title_width(size_t tab_number, const char *filename)
 {

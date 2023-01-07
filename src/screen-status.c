@@ -1,6 +1,5 @@
 #include "screen.h"
 #include "status.h"
-#include "util/utf8.h"
 
 void update_status_line(const Window *window)
 {
