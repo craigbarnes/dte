@@ -60,12 +60,15 @@ static noreturn COLD void handle_fatal_signal(int signum)
 {
     LOG_CRITICAL("received signal %d (%s)", signum, strsignal(signum));
 
-    // If signal is SIGHUP, there's no point in trying to clean up the
-    // state of a disconnected terminal
+    // If `signum` is SIGHUP, there's no point in trying to clean up the
+    // state of the (disconnected) terminal
     if (signum != SIGHUP) {
         fatal_error_cleanup();
     }
 
+    // Restore and unblock `signum` and then re-raise it, to ensure the
+    // termination status (as seen by e.g. waitpid(3) in the parent) is
+    // set appropriately
     struct sigaction sa = {.sa_handler = SIG_DFL};
     if (
         sigemptyset(&sa.sa_mask) == 0
