@@ -86,6 +86,11 @@ size_t ptr_array_idx(const PointerArray *array, const void *ptr)
             return i;
         }
     }
+
+    // If `ptr` isn't found in the array, return -1 (SIZE_MAX). Callers
+    // should check that the returned index is less than `array->count`
+    // before indexing `array->ptrs` with it or use a BUG_ON() assertion
+    // for the same condition if `ptr` is always expected to be found.
     return -1;
 }
 
