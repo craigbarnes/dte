@@ -60,6 +60,8 @@ static noreturn COLD void handle_fatal_signal(int signum)
 {
     LOG_CRITICAL("received signal %d (%s)", signum, strsignal(signum));
 
+    // If signal is SIGHUP, there's no point in trying to clean up the
+    // state of a disconnected terminal
     if (signum != SIGHUP) {
         fatal_error_cleanup();
     }
