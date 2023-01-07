@@ -4,9 +4,10 @@
 #include <sys/types.h>
 #include "file-history.h"
 #include "error.h"
-#include "util/path.h"
+#include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
+#include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
 #include "util/xstdio.h"

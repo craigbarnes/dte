@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "debug.h"
+#include "log.h"
 
 static CleanupHandler cleanup_handler = NULL;
 static void *cleanup_userdata = NULL;

@@ -1,5 +1,6 @@
 #include "../build/feature.h"
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,8 @@
 #include "error.h"
 #include "util/debug.h"
 #include "util/fd.h"
+#include "util/list.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

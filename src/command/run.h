@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include "util/hashmap.h"
 #include "util/macros.h"
 #include "util/string-view.h"
 

@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +9,6 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 #include "block.h"
-#include "command/serialize.h"
 #include "commands.h"
 #include "config.h"
 #include "editor.h"
@@ -23,10 +23,11 @@
 #include "syntax/syntax.h"
 #include "tag.h"
 #include "terminal/input.h"
+#include "terminal/key.h"
 #include "terminal/mode.h"
 #include "terminal/output.h"
 #include "terminal/terminal.h"
-#include "terminal/xterm.h"
+#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/fd.h"

@@ -1,11 +1,10 @@
 #include "run.h"
-#include "alias.h"
 #include "args.h"
 #include "parse.h"
 #include "change.h"
 #include "config.h"
 #include "error.h"
-#include "macro.h"
+#include "util/debug.h"
 #include "util/ptr-array.h"
 #include "util/xmalloc.h"
 

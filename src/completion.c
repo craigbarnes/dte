@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -10,6 +11,7 @@
 #include "command/alias.h"
 #include "command/args.h"
 #include "command/parse.h"
+#include "command/run.h"
 #include "command/serialize.h"
 #include "commands.h"
 #include "compiler.h"
@@ -19,11 +21,16 @@
 #include "show.h"
 #include "syntax/color.h"
 #include "tag.h"
+#include "terminal/color.h"
+#include "terminal/cursor.h"
+#include "terminal/key.h"
 #include "util/arith.h"
 #include "util/array.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/intmap.h"
+#include "util/log.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"

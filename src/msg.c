@@ -2,17 +2,12 @@
 #include <string.h>
 #include <unistd.h>
 #include "msg.h"
-#include "buffer.h"
 #include "editor.h"
 #include "error.h"
-#include "misc.h"
-#include "move.h"
-#include "search.h"
 #include "util/debug.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/xmalloc.h"
-#include "window.h"
 
 static void free_message(Message *m)
 {

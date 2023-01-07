@@ -5,7 +5,7 @@
 #include "error.h"
 #include "command/run.h"
 #include "config.h"
-#include "util/debug.h"
+#include "util/log.h"
 #include "util/xstdio.h"
 
 static char error_buf[512];

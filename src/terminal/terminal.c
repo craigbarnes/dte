@@ -1,16 +1,15 @@
-#include <errno.h>
 #include <stdint.h>
 #include <string.h>
 #include "terminal.h"
 #include "linux.h"
-#include "mode.h"
-#include "osc52.h"
+#include "output.h"
 #include "rxvt.h"
-#include "xterm.h"
 #include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/str-util.h"
+#include "xterm.h"
 
 typedef struct {
     const char name[12];

@@ -1,7 +1,5 @@
 #include <errno.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 #include "log.h"
 #include "array.h"

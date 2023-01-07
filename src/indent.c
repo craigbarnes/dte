@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include "indent.h"
 #include "regexp.h"
+#include "util/debug.h"
 #include "util/xmalloc.h"
 
 char *make_indent(const LocalOptions *options, size_t width)

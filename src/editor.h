@@ -1,15 +1,14 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "buffer.h"
 #include "cmdline.h"
 #include "command/macro.h"
+#include "command/run.h"
 #include "commands.h"
 #include "copy.h"
-#include "encoding.h"
 #include "file-history.h"
 #include "frame.h"
 #include "history.h"

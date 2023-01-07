@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include "change.h"
 #include "buffer.h"
 #include "edit.h"

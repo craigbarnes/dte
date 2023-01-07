@@ -3,9 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 #include "macros.h"
-#include "string-view.h"
 
 // This is a container type for holding a set of related strings.
 // It uses hashing for primary lookups and separate chaining for

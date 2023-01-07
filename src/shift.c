@@ -7,9 +7,11 @@
 #include "change.h"
 #include "indent.h"
 #include "move.h"
+#include "options.h"
 #include "selection.h"
+#include "util/debug.h"
+#include "util/macros.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 static char *alloc_indent(const LocalOptions *options, size_t count, size_t *sizep)
 {

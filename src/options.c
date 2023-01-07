@@ -19,8 +19,6 @@
 #include "util/string-view.h"
 #include "util/strtonum.h"
 #include "util/xmalloc.h"
-#include "view.h"
-#include "window.h"
 
 typedef enum {
     OPT_STR,

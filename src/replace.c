@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdlib.h>
 #include "replace.h"
 #include "buffer.h"
@@ -6,6 +7,7 @@
 #include "error.h"
 #include "regexp.h"
 #include "selection.h"
+#include "util/debug.h"
 #include "util/string.h"
 #include "util/xmalloc.h"
 #include "view.h"

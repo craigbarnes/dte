@@ -2,6 +2,7 @@
 #define COMMAND_ARGS_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "run.h"
 #include "util/base64.h"

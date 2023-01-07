@@ -1,9 +1,8 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include "show.h"
 #include "bind.h"
-#include "block.h"
 #include "buffer.h"
 #include "change.h"
 #include "cmdline.h"
@@ -24,9 +23,11 @@
 #include "options.h"
 #include "syntax/color.h"
 #include "terminal/color.h"
+#include "terminal/cursor.h"
 #include "terminal/key.h"
 #include "util/array.h"
 #include "util/bsearch.h"
+#include "util/debug.h"
 #include "util/intern.h"
 #include "util/str-util.h"
 #include "util/unicode.h"

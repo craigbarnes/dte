@@ -1,10 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 #include "compiler.h"
 #include "command/serialize.h"
 #include "error.h"
 #include "regexp.h"
 #include "util/array.h"
-#include "util/hashmap.h"
+#include "util/debug.h"
 #include "util/intern.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

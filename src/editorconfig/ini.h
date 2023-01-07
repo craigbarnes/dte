@@ -1,6 +1,7 @@
 #ifndef EDITORCONFIG_INI_H
 #define EDITORCONFIG_INI_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "util/macros.h"
 #include "util/string-view.h"

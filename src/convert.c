@@ -5,6 +5,7 @@
 #include "convert.h"
 #include "util/debug.h"
 #include "util/intern.h"
+#include "util/log.h"
 #include "util/str-util.h"
 #include "util/utf8.h"
 #include "util/xmalloc.h"

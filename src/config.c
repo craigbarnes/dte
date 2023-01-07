@@ -1,16 +1,16 @@
 #include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include "config.h"
 #include "commands.h"
 #include "editor.h"
 #include "error.h"
-#include "terminal/terminal.h"
-#include "util/ascii.h"
+#include "syntax/color.h"
 #include "util/debug.h"
 #include "util/readfile.h"
 #include "util/str-util.h"
-#include "util/xmalloc.h"
 #include "../build/builtin-config.h"
 
 ConfigState current_config;

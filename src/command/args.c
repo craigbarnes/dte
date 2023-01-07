@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "args.h"
 #include "error.h"
 #include "util/str-util.h"

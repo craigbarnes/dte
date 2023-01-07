@@ -3,7 +3,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
 #include "buffer.h"
 #include "editor.h"
 #include "file-option.h"

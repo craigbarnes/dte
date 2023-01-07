@@ -4,13 +4,11 @@
 #include "vars.h"
 #include "buffer.h"
 #include "editor.h"
-#include "error.h"
 #include "selection.h"
 #include "util/array.h"
 #include "util/bsearch.h"
 #include "util/numtostr.h"
 #include "util/path.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 #include "view.h"
 

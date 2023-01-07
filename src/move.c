@@ -2,6 +2,8 @@
 #include "buffer.h"
 #include "indent.h"
 #include "util/ascii.h"
+#include "util/debug.h"
+#include "util/macros.h"
 #include "util/utf8.h"
 
 typedef enum {

@@ -3,12 +3,10 @@
 
 #include <stdbool.h>
 #include "command/cache.h"
-#include "command/run.h"
 #include "editor.h"
 #include "terminal/key.h"
 #include "util/intmap.h"
 #include "util/macros.h"
-#include "util/ptr-array.h"
 #include "util/string.h"
 
 void add_binding(IntMap *bindings, KeyCode key, CachedCommand *cc) NONNULL_ARGS;

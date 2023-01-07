@@ -9,12 +9,14 @@
 #include "copy.h"
 #include "editor.h"
 #include "history.h"
+#include "options.h"
 #include "search.h"
-#include "terminal/input.h"
 #include "terminal/osc52.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
+#include "util/log.h"
+#include "util/log.h"
 #include "util/utf8.h"
 
 static void cmdline_delete(CommandLine *c)

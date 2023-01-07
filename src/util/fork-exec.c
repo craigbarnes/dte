@@ -1,12 +1,12 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "fork-exec.h"
 #include "debug.h"
 #include "fd.h"
+#include "log.h"
 #include "terminal/ioctl.h"
 #include "xreadwrite.h"
 

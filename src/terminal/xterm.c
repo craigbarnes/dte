@@ -3,10 +3,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 // See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "xterm.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/string-view.h"
 #include "util/unicode.h"
 

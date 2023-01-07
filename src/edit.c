@@ -1,12 +1,11 @@
+#include <string.h>
 #include "edit.h"
 #include "block.h"
 #include "buffer.h"
 #include "syntax/highlight.h"
 #include "util/debug.h"
 #include "util/list.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
-#include "view.h"
 
 #define BLOCK_EDIT_SIZE 512
 

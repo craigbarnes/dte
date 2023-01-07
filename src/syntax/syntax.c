@@ -1,10 +1,6 @@
 #include <stdlib.h>
-#include <string.h>
 #include "syntax.h"
 #include "error.h"
-#include "syntax/merge.h"
-#include "util/str-util.h"
-#include "util/xmalloc.h"
 #include "util/xsnprintf.h"
 
 StringList *find_string_list(const Syntax *syn, const char *name)

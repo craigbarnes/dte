@@ -1,7 +1,6 @@
 #ifndef UTIL_DEBUG_H
 #define UTIL_DEBUG_H
 
-#include "log.h"
 #include "macros.h"
 
 #define BUG_ON(a) do { \

@@ -3,6 +3,7 @@
 
 #include "terminal/color.h"
 #include "util/hashmap.h"
+#include "util/ptr-array.h"
 #include "util/string.h"
 
 typedef enum {

@@ -1,9 +1,11 @@
+#include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include "status.h"
 #include "search.h"
 #include "selection.h"
 #include "util/debug.h"
-#include "util/str-util.h"
+#include "util/macros.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 

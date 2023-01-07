@@ -1,4 +1,6 @@
+#include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 #include "misc.h"
 #include "buffer.h"
 #include "change.h"

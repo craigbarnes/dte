@@ -1,9 +1,8 @@
-#include <stddef.h>
 #include <string.h>
 #include "cursor.h"
 #include "util/array.h"
 #include "util/numtostr.h"
-#include "util/str-util.h"
+#include "util/debug.h"
 
 static const char cursor_modes[NR_CURSOR_MODES][12] = {
     [CURSOR_MODE_DEFAULT] = "default",

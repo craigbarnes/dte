@@ -2,6 +2,7 @@
 #define TERMINAL_KEY_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include "util/ascii.h"
 #include "util/macros.h"

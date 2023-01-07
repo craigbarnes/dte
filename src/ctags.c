@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ctags.h"
+#include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"
 #include "util/strtonum.h"

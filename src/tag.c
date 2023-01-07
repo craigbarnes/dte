@@ -6,6 +6,7 @@
 #include "tag.h"
 #include "error.h"
 #include "util/debug.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"

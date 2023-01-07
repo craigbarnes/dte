@@ -1,12 +1,13 @@
-#include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "exec.h"
 #include "block-iter.h"
+#include "buffer.h"
+#include "change.h"
 #include "command/macro.h"
 #include "commands.h"
-#include "config.h"
 #include "ctags.h"
 #include "error.h"
 #include "misc.h"

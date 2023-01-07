@@ -19,6 +19,7 @@
 #include "util/intern.h"
 #include "util/intmap.h"
 #include "util/list.h"
+#include "util/log.h"
 #include "util/numtostr.h"
 #include "util/path.h"
 #include "util/ptr-array.h"

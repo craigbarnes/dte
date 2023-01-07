@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include "state.h"
 #include "command/args.h"
@@ -8,7 +9,9 @@
 #include "filetype.h"
 #include "syntax/merge.h"
 #include "util/bsearch.h"
+#include "util/debug.h"
 #include "util/intern.h"
+#include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"

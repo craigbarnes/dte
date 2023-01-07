@@ -5,8 +5,8 @@
 #include "misc.h"
 #include "move.h"
 #include "search.h"
+#include "util/debug.h"
 #include "util/xmalloc.h"
-#include "window.h"
 
 FileLocation *get_current_file_location(const View *view)
 {

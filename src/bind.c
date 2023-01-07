@@ -1,17 +1,11 @@
 #include <limits.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 #include "bind.h"
 #include "change.h"
-#include "cmdline.h"
-#include "command/args.h"
 #include "command/macro.h"
-#include "command/parse.h"
+#include "command/run.h"
 #include "command/serialize.h"
-#include "commands.h"
 #include "util/debug.h"
-#include "util/str-util.h"
 #include "util/xmalloc.h"
 
 void add_binding(IntMap *bindings, KeyCode key, CachedCommand *cc)

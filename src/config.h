@@ -3,9 +3,7 @@
 
 #include <stddef.h>
 #include "command/run.h"
-#include "syntax/color.h"
 #include "util/macros.h"
-#include "util/ptr-array.h"
 #include "util/string-view.h"
 #include "util/string.h"
 

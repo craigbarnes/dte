@@ -8,11 +8,13 @@
 #include "input.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/str-util.h"
 #include "util/unicode.h"
 #include "util/xmalloc.h"
 #include "util/xmemmem.h"
 #include "util/xreadwrite.h"
+#include "util/string-view.h"
+#include "util/log.h"
+#include "util/macros.h"
 
 void term_input_init(TermInputBuffer *ibuf)
 {

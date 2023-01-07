@@ -6,6 +6,7 @@
 #include "buffer.h"
 #include "encoding.h"
 #include "frame.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "view.h"
 

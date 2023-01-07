@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include "command/run.h"
 #include "history.h"
-#include "terminal/key.h"
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string-view.h"

@@ -1,6 +1,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <stdbool.h>
 #include "command/run.h"
 #include "config.h"
 #include "util/macros.h"

@@ -5,6 +5,7 @@
 #include "misc.h"
 #include "move.h"
 #include "selection.h"
+#include "util/debug.h"
 
 void record_copy(Clipboard *clip, char *buf, size_t len, bool is_lines)
 {

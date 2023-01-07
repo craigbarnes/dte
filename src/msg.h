@@ -7,7 +7,6 @@
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
-#include "view.h"
 
 typedef struct {
     FileLocation *loc;

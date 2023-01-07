@@ -3,7 +3,6 @@
 
 #include <limits.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <sys/types.h>
 #include "block-iter.h"
 #include "change.h"

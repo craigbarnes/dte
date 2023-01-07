@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "osc52.h"
+#include "output.h"
 #include "util/base64.h"
 #include "util/debug.h"
 #include "util/macros.h"

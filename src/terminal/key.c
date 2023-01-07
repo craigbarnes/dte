@@ -2,6 +2,7 @@
 #include "key.h"
 #include "util/array.h"
 #include "util/ascii.h"
+#include "util/debug.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 

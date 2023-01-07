@@ -4,7 +4,7 @@
 #include "editor.h"
 #include "syntax/bitset.h"
 #include "syntax/highlight.h"
-#include "util/debug.h"
+#include "util/log.h"
 #include "util/utf8.h"
 #include "window.h"
 

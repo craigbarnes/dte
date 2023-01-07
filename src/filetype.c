@@ -1,12 +1,12 @@
+#include <stdint.h>
+#include <stdlib.h>
 #include "filetype.h"
 #include "command/serialize.h"
-#include "error.h"
 #include "regexp.h"
 #include "util/array.h"
 #include "util/ascii.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
