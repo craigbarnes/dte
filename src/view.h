@@ -45,7 +45,7 @@ enum {
     // be calculated from the cursor iterator. Otherwise the offset
     // is precalculated and may not be the same as the cursor position
     // (see search/replace code).
-    SEL_EO_RECALC = UINT_MAX
+    SEL_EO_RECALC = SSIZE_MAX
 };
 
 static inline void view_reset_preferred_x(View *view)
