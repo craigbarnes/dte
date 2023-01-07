@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <stdlib.h>
 #include "replace.h"
 #include "buffer.h"
@@ -249,7 +248,7 @@ bool reg_replace(View *view, const char *pattern, const char *format, ReplaceFla
             view->sel_eo = tmp;
         }
         block_iter_goto_offset(&view->cursor, view->sel_eo);
-        view->sel_eo = UINT_MAX;
+        view->sel_eo = SEL_EO_RECALC;
     }
 
     return (nr_substitutions > 0);

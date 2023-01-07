@@ -1,6 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include <limits.h>
 #include <stdbool.h>
 #include <sys/types.h>
 #include "block-iter.h"
@@ -32,16 +33,20 @@ typedef struct View {
     SelectionType selection;
     SelectionType select_mode;
     ssize_t sel_so; // Cursor offset when selection was started
-
-    // If sel_eo is UINT_MAX that means the offset must be calculated from
-    // the cursor iterator. Otherwise the offset is precalculated and may
-    // not be same as cursor position (see search/replace code).
-    ssize_t sel_eo;
+    ssize_t sel_eo; // See `SEL_EO_RECALC` below
 
     // Used to save cursor state when multiple views share same buffer
     bool restore_cursor;
     size_t saved_cursor_offset;
 } View;
+
+enum {
+    // If View::sel_eo is set to this value it means the offset must
+    // be calculated from the cursor iterator. Otherwise the offset
+    // is precalculated and may not be the same as the cursor position
+    // (see search/replace code).
+    SEL_EO_RECALC = UINT_MAX
+};
 
 static inline void view_reset_preferred_x(View *view)
 {

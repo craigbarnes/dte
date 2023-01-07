@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include "misc.h"
@@ -103,7 +102,7 @@ void select_block(View *view)
 
     view->cursor = sbi;
     view->sel_so = block_iter_get_offset(&ebi);
-    view->sel_eo = UINT_MAX;
+    view->sel_eo = SEL_EO_RECALC;
     view->selection = SELECT_LINES;
 
     mark_all_lines_changed(view->buffer);

@@ -85,7 +85,7 @@ static void do_selection_noinline(View *view, SelectionType sel)
     }
 
     view->sel_so = block_iter_get_offset(&view->cursor);
-    view->sel_eo = UINT_MAX;
+    view->sel_eo = SEL_EO_RECALC;
     view->selection = sel;
 
     // Need to mark current line changed because cursor might

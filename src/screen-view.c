@@ -259,7 +259,7 @@ static void line_info_init (
     if (!view->selection) {
         info->sel_so = -1;
         info->sel_eo = -1;
-    } else if (view->sel_eo != UINT_MAX) {
+    } else if (view->sel_eo != SEL_EO_RECALC) {
         // Already calculated
         info->sel_so = view->sel_so;
         info->sel_eo = view->sel_eo;
