@@ -1,13 +1,13 @@
 #include <errno.h>
-#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 #include "signals.h"
-#include "editor.h"
 #include "util/debug.h"
 #include "util/exitcode.h"
 #include "util/log.h"
 #include "util/macros.h"
+
+volatile sig_atomic_t resized = 0;
 
 static const int ignored_signals[] = {
     SIGINT,  // Terminal interrupt (see: VINTR in termios(3))
@@ -44,6 +44,11 @@ static const int fatal_signals[] = {
     SIGEMT,
 #endif
 };
+
+void handle_sigwinch(int UNUSED_ARG(signum))
+{
+    resized = 1;
+}
 
 static noreturn COLD void handle_fatal_signal(int signum)
 {

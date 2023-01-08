@@ -2,7 +2,6 @@
 #include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
-#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +22,7 @@
 #include "regexp.h"
 #include "screen.h"
 #include "search.h"
+#include "signals.h"
 #include "syntax/syntax.h"
 #include "tag.h"
 #include "terminal/color.h"
@@ -39,8 +39,6 @@
 #include "util/xstdio.h"
 #include "window.h"
 #include "../build/version.h"
-
-static volatile sig_atomic_t resized = 0;
 
 static void set_and_check_locale(void)
 {
@@ -225,11 +223,6 @@ void free_editor_state(EditorState *e)
     free((void*)e->user_config_dir);
 
     free(e);
-}
-
-void handle_sigwinch(int UNUSED_ARG(signum))
-{
-    resized = 1;
 }
 
 static void sanity_check(const View *view)

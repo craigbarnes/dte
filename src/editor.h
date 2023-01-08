@@ -119,6 +119,5 @@ void normal_update(EditorState *e) NONNULL_ARGS;
 int main_loop(EditorState *e) NONNULL_ARGS WARN_UNUSED_RESULT;
 void ui_start(EditorState *e) NONNULL_ARGS;
 void ui_end(EditorState *e) NONNULL_ARGS;
-void handle_sigwinch(int signum);
 
 #endif
