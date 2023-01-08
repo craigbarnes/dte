@@ -230,15 +230,19 @@ static Buffer *init_std_buffer(EditorState *e, int fds[2])
     return buffer;
 }
 
-static ExitCode init_logging(const char *filename, const char *log_level_str)
+static ExitCode init_logging(const char *filename, const char *req_level_str)
 {
     if (!filename || filename[0] == '\0') {
         return EX_OK;
     }
 
-    LogLevel req_level = log_level_from_str(log_level_str);
+    LogLevel req_level = log_level_from_str(req_level_str);
     if (req_level == LOG_LEVEL_NONE) {
         return EX_OK;
+    }
+    if (req_level == LOG_LEVEL_INVALID) {
+        fprintf(stderr, "Invalid $DTE_LOG_LEVEL value: '%s'\n", req_level_str);
+        return EX_USAGE;
     }
 
     LogLevel got_level = log_open(filename, req_level);
@@ -250,7 +254,7 @@ static ExitCode init_logging(const char *filename, const char *log_level_str)
 
     const char *got_level_str = log_level_to_str(got_level);
     if (got_level != req_level) {
-        const char *r = log_level_to_str(req_level);
+        const char *r = req_level_str;
         const char *g = got_level_str;
         LOG_WARNING("log level '%s' unavailable; falling back to '%s'", r, g);
     }

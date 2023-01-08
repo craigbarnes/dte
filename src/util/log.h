@@ -6,7 +6,8 @@
 #include "macros.h"
 
 typedef enum {
-    LOG_LEVEL_NONE,
+    LOG_LEVEL_INVALID = -1,
+    LOG_LEVEL_NONE = 0,
     LOG_LEVEL_CRITICAL,
     LOG_LEVEL_ERROR,
     LOG_LEVEL_WARNING,

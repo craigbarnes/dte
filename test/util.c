@@ -2446,10 +2446,10 @@ static void test_log_level_from_str(TestContext *ctx)
     EXPECT_EQ(log_level_from_str("debug"), LOG_LEVEL_DEBUG);
     EXPECT_EQ(log_level_from_str("trace"), LOG_LEVEL_TRACE);
 
-    EXPECT_EQ(log_level_from_str("xyz"), LOG_LEVEL_NONE);
-    EXPECT_EQ(log_level_from_str(" "), LOG_LEVEL_NONE);
-    EXPECT_EQ(log_level_from_str("warn"), LOG_LEVEL_NONE);
-    EXPECT_EQ(log_level_from_str("errors"), LOG_LEVEL_NONE);
+    EXPECT_EQ(log_level_from_str("xyz"), LOG_LEVEL_INVALID);
+    EXPECT_EQ(log_level_from_str(" "), LOG_LEVEL_INVALID);
+    EXPECT_EQ(log_level_from_str("warn"), LOG_LEVEL_INVALID);
+    EXPECT_EQ(log_level_from_str("errors"), LOG_LEVEL_INVALID);
 
     LogLevel default_level = log_level_default();
     EXPECT_EQ(log_level_from_str(""), default_level);

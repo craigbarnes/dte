@@ -58,7 +58,7 @@ LogLevel log_level_from_str(const char *str)
             return i;
         }
     }
-    return LOG_LEVEL_NONE;
+    return LOG_LEVEL_INVALID;
 }
 
 const char *log_level_to_str(LogLevel level)
