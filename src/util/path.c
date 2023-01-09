@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "path.h"
-#include "util/str-util.h"
+#include "str-util.h"
 
 char *path_absolute(const char *path)
 {
