@@ -6,6 +6,7 @@
 #include "selection.h"
 #include "util/debug.h"
 #include "util/macros.h"
+#include "util/numtostr.h"
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
@@ -120,6 +121,13 @@ static void add_status_format(Formatter *f, const char *format, ...)
     add_status_bytes(f, buf, len);
 }
 
+static void add_status_umax(Formatter *f, uintmax_t x)
+{
+    char buf[DECIMAL_STR_MAX(x)];
+    size_t len = buf_umax_to_str(x, buf);
+    add_status_bytes(f, buf, len);
+}
+
 static void add_status_pos(Formatter *f)
 {
     size_t lines = f->window->view->buffer->nl;
@@ -136,8 +144,13 @@ static void add_status_pos(Formatter *f)
     } else if (pos + h - 1 >= lines) {
         add_status_literal(f, "Bot");
     } else {
-        const long d = lines - (h - 1);
-        add_status_format(f, "%2ld%%", (pos * 100 + d / 2) / d);
+        unsigned int d = lines - (h - 1);
+        unsigned int percent = (pos * 100 + d / 2) / d;
+        BUG_ON(percent > 100);
+        char buf[4];
+        size_t len = buf_uint_to_str(percent, buf);
+        buf[len++] = '%';
+        add_status_bytes(f, buf, len);
     }
 }
 
@@ -253,18 +266,19 @@ void sf_format (
             }
             break;
         case STATUS_CURSOR_ROW:
-            add_status_format(&f, "%ld", view->cy + 1);
+            add_status_umax(&f, view->cy + 1);
             break;
         case STATUS_TOTAL_ROWS:
-            add_status_format(&f, "%zu", buffer->nl);
+            add_status_umax(&f, buffer->nl);
             break;
         case STATUS_CURSOR_COL:
-            add_status_format(&f, "%ld", view->cx_display + 1);
+            add_status_umax(&f, view->cx_display + 1);
             break;
         case STATUS_CURSOR_COL_BYTES:
-            add_status_format(&f, "%ld", view->cx_char + 1);
+            add_status_umax(&f, view->cx_char + 1);
             if (view->cx_display != view->cx_char) {
-                add_status_format(&f, "-%ld", view->cx_display + 1);
+                add_ch(&f, '-');
+                add_status_umax(&f, view->cx_display + 1);
             }
             break;
         case STATUS_SCROLL_POSITION:
