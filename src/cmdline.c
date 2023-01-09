@@ -16,7 +16,6 @@
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/log.h"
-#include "util/log.h"
 #include "util/utf8.h"
 
 static void cmdline_delete(CommandLine *c)
