@@ -26,7 +26,8 @@ static const struct {
     {"ft", true, true, do_dump_filetypes},
     {"hi", true, true, do_dump_hl_colors},
     {"include", false, false, do_dump_builtin_configs},
-    {"option", true, false, do_dump_options},
+    {"option", true, false, dump_options_and_fileopts},
+    {"set", true, true, do_dump_options},
     {"wsplit", false, false, dump_frames},
 };
 

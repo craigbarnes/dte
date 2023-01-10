@@ -17,6 +17,7 @@ String dump_compilers(EditorState *e);
 String dump_cursors(EditorState *e);
 String dump_frames(EditorState *e);
 String dump_normal_aliases(EditorState *e);
+String dump_options_and_fileopts(EditorState *e);
 String dump_search_history(EditorState *e);
 String do_dump_builtin_configs(EditorState *e);
 String do_dump_filetypes(EditorState *e);

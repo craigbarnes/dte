@@ -415,9 +415,16 @@ String dump_cursors(EditorState *e)
     return buf;
 }
 
+// Dump option values only
 String do_dump_options(EditorState *e)
 {
-    String str = dump_options(&e->options, &e->buffer->options);
+    return dump_options(&e->options, &e->buffer->options);
+}
+
+// Dump option values and FileOption entries
+String dump_options_and_fileopts(EditorState *e)
+{
+    String str = do_dump_options(e);
     string_append_literal(&str, "\n\n");
     dump_file_options(&e->file_options, &str);
     return str;
@@ -468,8 +475,9 @@ static const ShowHandler show_handlers[] = {
     {"include", 0, do_dump_builtin_configs, show_builtin, collect_builtin_includes},
     {"macro", DTERC, do_dump_macro, NULL, NULL},
     {"msg", MSGLINE, do_dump_messages, NULL, NULL},
-    {"option", DTERC, do_dump_options, show_option, collect_all_options},
+    {"option", DTERC, dump_options_and_fileopts, show_option, collect_all_options},
     {"search", LASTLINE, dump_search_history, NULL, NULL},
+    {"set", DTERC, do_dump_options, show_option, collect_all_options},
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 
