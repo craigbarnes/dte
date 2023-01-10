@@ -2,6 +2,26 @@
 #include "editor.h"
 #include "util/unicode.h"
 
+static bool include_cursor_char_in_selection(const View *view)
+{
+    const EditorState *e = view->window->editor;
+    if (!e->options.select_cursor_char) {
+        return false;
+    }
+
+    bool overwrite = view->buffer->options.overwrite;
+    CursorInputMode mode = overwrite ? CURSOR_MODE_OVERWRITE : CURSOR_MODE_INSERT;
+    TermCursorType type = e->cursor_styles[mode].type;
+    if (type == CURSOR_KEEP) {
+        type = e->cursor_styles[CURSOR_MODE_DEFAULT].type;
+    }
+
+    // If "select-cursor-char" option is true, include character under cursor
+    // in selections for any cursor type except bars (where it makes no sense
+    // to do so)
+    return !(type == CURSOR_STEADY_BAR || type == CURSOR_BLINKING_BAR);
+}
+
 void init_selection(const View *view, SelectionInfo *info)
 {
     info->so = view->sel_so;
@@ -31,8 +51,7 @@ void init_selection(const View *view, SelectionInfo *info)
         info->so -= block_iter_bol(&info->si);
         info->eo += block_iter_eat_line(&ei);
     } else {
-        if (view->window->editor->options.select_cursor_char) {
-            // Character under cursor belongs to the selection
+        if (include_cursor_char_in_selection(view)) {
             info->eo += block_iter_next_column(&ei);
         }
     }
