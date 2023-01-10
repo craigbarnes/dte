@@ -57,6 +57,11 @@ UNITTEST {
 
 static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
 {
+    if (str[0] == '^' && str[1] != '\0') {
+        *modifiersp = MOD_CTRL;
+        return 1;
+    }
+
     KeyCode modifiers = 0;
     size_t i = 0;
 
@@ -90,16 +95,11 @@ end:
 bool parse_key_string(KeyCode *key, const char *str)
 {
     KeyCode modifiers;
-    if (str[0] == '^' && str[1] != '\0') {
-        modifiers = MOD_CTRL;
-        str += 1;
-    } else {
-        str += parse_modifiers(str, &modifiers);
-    }
-
-    const size_t len = strlen(str);
+    str += parse_modifiers(str, &modifiers);
+    size_t len = strlen(str);
     size_t i = 0;
     KeyCode ch = u_get_char(str, len, &i);
+
     if (u_is_unicode(ch) && i == len) {
         if (u_is_ascii_upper(ch)) {
             if (modifiers & MOD_CTRL) {

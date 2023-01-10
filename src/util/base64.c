@@ -28,8 +28,7 @@ const uint8_t base64_decode_table[256] = {
 const char base64_encode_table[64] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz"
-    "0123456789"
-    "+/"
+    "0123456789+/"
 };
 
 size_t base64_encode_block(const char *in, size_t ilen, char *out, size_t olen)
