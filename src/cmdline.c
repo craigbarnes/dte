@@ -103,7 +103,7 @@ static bool cmd_copy(EditorState *e, const CommandArgs *a)
     if ((clipboard || primary) && term->features & TFLAG_OSC52_COPY) {
         const char *str = string_borrow_cstring(buf);
         if (!term_osc52_copy(&term->obuf, str, len, clipboard, primary)) {
-            LOG_ERROR("term_osc52_copy() failed: %s", strerror(ENOMEM));
+            LOG_ERRNO("term_osc52_copy");
             // TODO: return false ?
         }
     }
