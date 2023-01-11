@@ -1,8 +1,10 @@
 #ifndef UTIL_LOG_H
 #define UTIL_LOG_H
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <string.h>
 #include "macros.h"
 
 typedef enum {
@@ -19,6 +21,7 @@ typedef enum {
 #define LOG(level, ...) log_msg(level, __FILE__, __LINE__, __VA_ARGS__)
 #define LOG_CRITICAL(...) LOG(LOG_LEVEL_CRITICAL, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_LEVEL_ERROR, __VA_ARGS__)
+#define LOG_ERRNO(prefix) LOG_ERROR("%s: %s", prefix, strerror(errno))
 #define LOG_WARNING(...) LOG(LOG_LEVEL_WARNING, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_LEVEL_INFO, __VA_ARGS__)
 

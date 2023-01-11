@@ -265,7 +265,7 @@ static ExitCode init_logging(const char *filename, const char *req_level_str)
     if (likely(uname(&u) >= 0)) {
         LOG_INFO("system: %s/%s %s", u.sysname, u.machine, u.release);
     } else {
-        LOG_ERROR("uname() failed: %s", strerror(errno));
+        LOG_ERRNO("uname");
     }
     return EX_OK;
 }

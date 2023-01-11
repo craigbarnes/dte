@@ -48,7 +48,7 @@ static bool term_direct_write(const char *str, size_t count)
 {
     ssize_t n = xwrite_all(STDOUT_FILENO, str, count);
     if (unlikely(n != count)) {
-        LOG_ERROR("write() failed in %s(): %s", __func__, strerror(errno));
+        LOG_ERRNO("write");
         return false;
     }
     return true;

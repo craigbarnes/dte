@@ -140,7 +140,7 @@ static bool load_tag_file(TagFile *tf)
 {
     char path[4096];
     if (unlikely(!getcwd(path, sizeof(path) - STRLEN("/tags")))) {
-        LOG_ERROR("getcwd() failed in %s(): %s", __func__, strerror(errno));
+        LOG_ERRNO("getcwd");
         return false;
     }
 
@@ -167,7 +167,7 @@ static bool load_tag_file(TagFile *tf)
 
     char *buf = malloc(st.st_size);
     if (unlikely(!buf)) {
-        LOG_ERROR("malloc() failed in %s()", __func__);
+        LOG_ERRNO("malloc");
         xclose(fd);
         return false;
     }

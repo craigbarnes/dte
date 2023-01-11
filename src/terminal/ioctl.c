@@ -26,7 +26,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
     if (unlikely(ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)) {
-        LOG_ERROR("TIOCGWINSZ ioctl failed: %s", strerror(errno));
+        LOG_ERRNO("TIOCGWINSZ ioctl");
         return false;
     }
     *w = ws.ws_col;
@@ -42,7 +42,7 @@ bool term_get_size(unsigned int *w, unsigned int *h)
 {
     struct winsize ws;
     if (unlikely(tcgetwinsize(STDIN_FILENO, &ws) != 0)) {
-        LOG_ERROR("tcgetwinsize() failed: %s", strerror(errno));
+        LOG_ERRNO("tcgetwinsize");
         return false;
     }
     *w = ws.ws_col;

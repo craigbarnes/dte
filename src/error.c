@@ -36,7 +36,7 @@ bool error_msg(const char *format, ...)
 
     if (unlikely(pos < 0)) {
         // Note: POSIX snprintf(3) *does* set errno on failure (unlike ISO C)
-        LOG_ERROR("snprintf() failed: %s", strerror(errno));
+        LOG_ERRNO("snprintf");
         pos = 0;
     }
 

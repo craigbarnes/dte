@@ -318,7 +318,7 @@ static String term_read_bracketed_paste(TermInputBuffer *input)
     return str;
 
 read_error:
-    LOG_ERROR("read error: %s", strerror(errno));
+    LOG_ERRNO("read");
     string_free(&str);
     BUG_ON(str.buffer);
     return str;
