@@ -15,7 +15,7 @@ error() {
 
 alias abort='error "$LINENO"'
 
-for cmd in git gcc clang ccache awk pandoc; do
+for cmd in git gcc clang ccache awk pandoc mkdir cp basename diff; do
     if ! command -v "$cmd" >/dev/null; then
         abort "'$cmd' is required but couldn't be found"
     fi
