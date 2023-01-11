@@ -4,13 +4,16 @@
 # (i.e. not including unstaged/dirty changes from the working tree)
 # and then performs a full build.
 
+export POSIXLY_CORRECT=1
 TMPDIR='.pre-commit-test'
 PROGNAME="$0"
 
-abort() {
-    echo "$PROGNAME:$2: Error: $1" >&2
+error() {
+    echo "$PROGNAME:$1: Error: $2" >&2
     exit 1
 }
+
+alias abort='error "$LINENO"'
 
 for cmd in git gcc clang ccache awk pandoc; do
     if ! command -v "$cmd" >/dev/null; then
@@ -18,10 +21,10 @@ for cmd in git gcc clang ccache awk pandoc; do
     fi
 done
 
-test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists" $LINENO
+test ! -e "$TMPDIR" || abort "path '$TMPDIR' already exists"
 
 MAKE="$(command -v gmake || command -v make)"
-test -x "$MAKE" || abort 'unable to find GNU Make command' $LINENO
+test -x "$MAKE" || abort 'unable to find GNU Make command'
 MAKE="$MAKE --no-print-directory -C $TMPDIR -j$(mk/nproc.sh)"
 export MAKEFLAGS='DEBUG=3 WERROR=1'
 export CFLAGS='-g -Og -pipe'
@@ -47,7 +50,7 @@ $MAKE -B man
 for F in $GENERATED; do
     B="$(basename $F)"
     if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
-        abort "re-generate '${F##${TMPDIR}/}' before committing" $LINENO
+        abort "re-generate '${F##${TMPDIR}/}' before committing"
     fi
 done
 
