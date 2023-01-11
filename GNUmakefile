@@ -5,6 +5,7 @@ include mk/build.mk
 include mk/docs.mk
 include mk/gen.mk
 -include mk/dev.mk
+include mk/help.mk
 
 # https://www.gnu.org/prep/standards/html_node/Directory-Variables.html
 prefix ?= /usr/local
