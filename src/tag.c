@@ -150,8 +150,13 @@ static bool load_tag_file(TagFile *tf)
     }
 
     struct stat st;
-    if (fstat(fd, &st) != 0 || st.st_size <= 0) {
-        // TODO: LOG_ERROR() for fstat() failure?
+    if (unlikely(fstat(fd, &st) != 0)) {
+        LOG_ERRNO("fstat");
+        xclose(fd);
+        return false;
+    }
+
+    if (unlikely(st.st_size <= 0)) {
         xclose(fd);
         return false;
     }
