@@ -59,6 +59,10 @@ The value of the [`filetype`] option for the current buffer.
 
 The line number of the cursor in the current buffer.
 
+### **$COLNO**
+
+The column number of the cursor in the current buffer.
+
 ### **$WORD**
 
 The selected text or the word under the cursor.

@@ -54,6 +54,11 @@ static char *expand_filetype(const EditorState *e)
     return e->buffer ? xstrdup(e->buffer->options.filetype) : NULL;
 }
 
+static char *expand_colno(const EditorState *e)
+{
+    return e->view ? xstrdup(umax_to_str(e->view->cx_display + 1)) : NULL;
+}
+
 static char *expand_lineno(const EditorState *e)
 {
     return e->view ? xstrdup(umax_to_str(e->view->cy + 1)) : NULL;
@@ -78,6 +83,7 @@ static char *expand_word(const EditorState *e)
 }
 
 static const BuiltinVar normal_vars[] = {
+    {"COLNO", expand_colno},
     {"DTE_HOME", expand_dte_home},
     {"FILE", expand_file},
     {"FILEDIR", expand_file_dir},
