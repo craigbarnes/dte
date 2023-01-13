@@ -48,7 +48,7 @@ static void test_sf_format(TestContext *ctx)
     EXPECT_TRUE(str_has_prefix(buf, "[case-sensitive = true][case-sensitive = true]"));
 
     char fmt[4] = "%_";
-    for (unsigned char c = '\0'; c < 'z'; c++) {
+    for (char c = '\0', n = 'z'; c < n; c++) {
         fmt[1] = c;
         size_t err = statusline_format_find_error(fmt);
         if (err) {
