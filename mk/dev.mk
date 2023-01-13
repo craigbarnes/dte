@@ -17,7 +17,9 @@ GENHTML ?= genhtml
 GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
-XARGS_P_FLAG = $(call try-run, printf "1\n2" | xargs -P2 -I@ echo '@', -P$(NPROC))
+XARGS = xargs
+XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NPROC))
+XARGS_P = $(XARGS) $(XARGS_P_FLAG)
 DOCFILES = $(shell git ls-files -- '*.md' '*.xml')
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
@@ -50,7 +52,7 @@ check-appstream:
 check-docs:
 	@printf '\nChecking links from:\n\n'
 	@echo '$(DOCFILES) ' | tr ' ' '\n'
-	@$(FINDLINKS) $(DOCFILES) | xargs -I@1 $(XARGS_P_FLAG) $(CHECKURL)
+	@$(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
 
 distcheck: TARDIR = build/dte-$(DISTVER)/
 distcheck: build/dte-$(DISTVER).tar.gz | build/
@@ -106,7 +108,7 @@ coverage-report: build/docs/lcov.css
 	$(call LCOV_REMOVE, build/coverage.info, */src/util/debug.c */test/test.c)
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
-	  xargs $(XARGS_P_FLAG) -- gzip -9 -k -f
+	  $(XARGS_P) -- gzip -9 -k -f
 
 build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@
