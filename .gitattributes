@@ -1,44 +1,56 @@
-[attr]code text whitespace=tab-in-indent,tabwidth=4 space-indent
-[attr]html text whitespace=tab-in-indent,tabwidth=2 space-indent
-[attr]markdown text whitespace=tab-in-indent,tabwidth=4,-blank-at-eol space-indent
-[attr]dterc code
 [attr]generated is-generated linguist-generated
+[attr]4space text whitespace=tab-in-indent,tabwidth=4 space-indent
+[attr]2space text whitespace=tab-in-indent,tabwidth=2 space-indent
+[attr]markdown 4space whitespace=tab-in-indent,tabwidth=4,-blank-at-eol
+[attr]c 4space linguist-language=C
+[attr]make text
+[attr]shell 4space
+[attr]dterc 4space
+[attr]awk 4space
+[attr]sed 4space
+[attr]lua 4space
+[attr]yaml 4space
+[attr]css 4space
+[attr]html 2space
+[attr]xml 2space
 
-mk/version.sh export-subst
+/mk/version.sh export-subst
 .git* export-ignore
-.mailmap export-ignore
-.clang-tidy export-ignore
+/.mailmap export-ignore
+/.clang-tidy export-ignore
 /.editorconfig export-ignore
-docs/README.md export-ignore
-docs/contributing.md export-ignore
-docs/releasing.md export-ignore
-mk/dev.mk export-ignore
-mk/lcovrc export-ignore
-mk/sha256sums.txt export-ignore
-tools export-ignore
-tools/** export-ignore
+/docs/README.md export-ignore
+/docs/contributing.md export-ignore
+/docs/releasing.md export-ignore
+/mk/dev.mk export-ignore
+/mk/lcovrc export-ignore
+/mk/sha256sums.txt export-ignore
+/tools export-ignore
+/tools/** export-ignore
 
-*.[ch] code linguist-language=C
-*.lua code
-*.awk code
-*.sed code
-*.sh code
-*.bash code
-*.yml code
-*.css code
-tools/git-hooks/* code
-LICENSE text
-GNUmakefile text
-makefile text
-*.mk text
-*.txt text
-test/data/crlf.txt -text diff
-*.dterc dterc
-test/data/syntax-lint.dterc -space-indent -whitespace
-config/** dterc
-config/README.md -dterc
-*.md markdown
+*.[ch] c
+*.lua lua
+*.awk awk
+*.sed sed
+*.sh shell
+*.bash shell
+*.yml yaml
+*.css css
 *.html html
+*.xml xml
+*.md markdown
+*.dterc dterc
+*.txt text
+*.mk make
+GNUmakefile make
+makefile make
+LICENSE text
 
-docs/*.[15] code generated
-src/util/unidata.h generated
+/config/** dterc
+/config/README.md -dterc
+/tools/git-hooks/commit-msg awk
+/tools/git-hooks/pre-commit shell
+/test/data/crlf.txt -text diff
+/test/data/syntax-lint.dterc -space-indent -whitespace
+/docs/*.[15] roff 4space generated
+/src/util/unidata.h generated
