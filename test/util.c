@@ -424,7 +424,7 @@ static void test_ascii(TestContext *ctx)
     }
 
     // Restore the original locale
-    setlocale(LC_CTYPE, saved_locale);
+    ASSERT_NONNULL(setlocale(LC_CTYPE, saved_locale));
     free(saved_locale);
 }
 
