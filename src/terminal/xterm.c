@@ -168,26 +168,16 @@ static ssize_t parse_ss3(const char *buf, size_t length, size_t i, KeyCode *k)
     KeyCode key = decode_key_from_final_byte(ch);
     if (key) {
         *k = key;
-        return i;
+    } else if (ch == 'X') {
+        *k = '=';
+    } else if (ch == ' ') {
+        *k = KEY_SPACE;
+    } else if ((ch >= 'j' && ch <= 'y') || ch == 'I') {
+        *k = ch - 64;
+    } else {
+        *k = KEY_IGNORE;
     }
 
-    switch (ch) {
-    case 'X':
-        *k = '=';
-        return i;
-    case ' ':
-        *k = KEY_SPACE;
-        return i;
-    case 'j': case 'k': case 'l':
-    case 'm': case 'n': case 'o':
-    case 'p': case 'q': case 'r':
-    case 's': case 't': case 'u':
-    case 'v': case 'w': case 'x':
-    case 'y': case 'I':
-        *k = ch - 64;
-        return i;
-    }
-    *k = KEY_IGNORE;
     return i;
 }
 
