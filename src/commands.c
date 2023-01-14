@@ -2178,11 +2178,17 @@ static bool cmd_wprev(EditorState *e, const CommandArgs *a)
 static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    unsigned int w = e->buffer->options.text_width;
-    if (arg && (!str_to_uint(arg, &w) || w < 1 || w > TEXT_WIDTH_MAX)) {
-        return error_msg("invalid paragraph width: %s", arg);
+    unsigned int width = e->buffer->options.text_width;
+    if (arg) {
+        if (!str_to_uint(arg, &width)) {
+            return error_msg("invalid paragraph width: %s", arg);
+        }
+        unsigned int max = TEXT_WIDTH_MAX;
+        if (width < 1 || width > max) {
+            return error_msg("width must be between 1 and %u", max);
+        }
     }
-    format_paragraph(e->view, w);
+    format_paragraph(e->view, width);
     return true;
 }
 
