@@ -1417,6 +1417,7 @@ static bool repeat_insert(EditorState *e, const char *str, unsigned int count, b
     if (unlikely(bufsize == 0)) {
         return true;
     }
+
     char *buf = malloc(bufsize);
     if (unlikely(!buf)) {
         return error_msg_errno("malloc");
@@ -2177,13 +2178,11 @@ static bool cmd_wprev(EditorState *e, const CommandArgs *a)
 static bool cmd_wrap_paragraph(EditorState *e, const CommandArgs *a)
 {
     const char *arg = a->args[0];
-    unsigned int width = e->buffer->options.text_width;
-    if (arg) {
-        if (!str_to_uint(arg, &width) || width < 1 || width > TEXT_WIDTH_MAX) {
-            return error_msg("invalid paragraph width: %s", arg);
-        }
+    unsigned int w = e->buffer->options.text_width;
+    if (arg && (!str_to_uint(arg, &w) || w < 1 || w > TEXT_WIDTH_MAX)) {
+        return error_msg("invalid paragraph width: %s", arg);
     }
-    format_paragraph(e->view, width);
+    format_paragraph(e->view, w);
     return true;
 }
 
@@ -2219,6 +2218,7 @@ static bool cmd_wresize(EditorState *e, const CommandArgs *a)
     } else {
         equalize_frame_sizes(window->frame->parent);
     }
+
     mark_everything_changed(e);
     debug_frame(e->root_frame);
     // TODO: return false if resize failed?
