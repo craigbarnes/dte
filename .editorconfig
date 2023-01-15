@@ -13,5 +13,9 @@ indent_size = 8
 indent_style = space
 indent_size = 2
 
+[*.appdata.xml]
+indent_style = space
+indent_size = 2
+
 [{COMMIT_EDITMSG,MERGE_MSG}]
 max_line_length = 72
