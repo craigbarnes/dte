@@ -40,20 +40,21 @@ check-whitespace:
 	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
 
 check-codespell:
+	$(E) CODESPL '*.md $(filter-out %.md, $(DOCFILES))'
 	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES) >&2
 
 check-desktop-file:
-	$(E) CHECK dte.desktop
+	$(E) LINT dte.desktop
 	$(Q) desktop-file-validate dte.desktop >&2
 
 check-appstream:
-	$(E) CHECK dte.appdata.xml
+	$(E) LINT dte.appdata.xml
 	$(Q) appstream-util --nonet validate dte.appdata.xml | sed '/OK$$/d' >&2
 
 check-docs:
 	@printf '\nChecking links from:\n\n'
 	@echo '$(DOCFILES) ' | tr ' ' '\n'
-	@$(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
+	$(Q) $(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
 
 distcheck: TARDIR = build/dte-$(DISTVER)/
 distcheck: build/dte-$(DISTVER).tar.gz | build/
