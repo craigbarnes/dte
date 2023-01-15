@@ -61,7 +61,7 @@ Example:
 Use the [`inlist`] command to test if a buffered string is in a list.
 
 `-i`
-:   Make list case-insensitive.
+:   Make list case-insensitive
 
 ## Conditionals
 
@@ -71,7 +71,7 @@ Test if buffered bytes are same as _string_. If they are, emit
 _emit-name_ and jump to _destination_ state.
 
 `-i`
-:   Case-insensitive.
+:   Case-insensitive
 
 ### **char** [**-bn**] _characters_ _destination_ [_emit-name_]
 
@@ -83,10 +83,10 @@ _characters_ is a list of strings. Ranges are supported (`a-d` is the
 same as `abcd`).
 
 `-b`
-:   Add byte to buffer.
+:   Add byte to buffer
 
 `-n`
-:   Invert character bitmap.
+:   Invert character bitmap
 
 ### **heredocend** _destination_
 
@@ -104,7 +104,7 @@ See if following bytes are same as _string_. If they are, emit
 _emit-name_ and jump to _destination_ state.
 
 `-i`
-:   Case-insensitive.
+:   Case-insensitive
 
 NOTE: This conditional can be slow, especially if _string_ is
 longer than two bytes.
@@ -131,7 +131,7 @@ Continue to _destination_ state without emitting color or
 consuming byte.
 
 `-b`
-:   Don't stop buffering.
+:   Don't stop buffering
 
 ## Other commands
 
