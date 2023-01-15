@@ -127,7 +127,7 @@ Movement Commands:
 .br
    \fBmatch\-bracket\fR
 .br
-   \fBline\fR \fInumber\fR
+   \fBline\fR \fIlineno\fR[:\fIcolno\fR]
 .br
    \fBbookmark\fR [\fB\-r\fR]
 .br
@@ -1261,9 +1261,10 @@ Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
 .P
 .RE
-\fBline\fR \fInumber\fR
+\fBline\fR \fIlineno\fR[:\fIcolno\fR]
 .RS
-Go to line.
+Move the cursor to line given by \fIlineno\fR. Optionally moves the cursor
+to \fIcolno\fR on the same line.
 .P
 .RE
 \fBbookmark\fR [\fB\-r\fR]

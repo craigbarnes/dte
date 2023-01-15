@@ -761,9 +761,10 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
 
-### **line** _number_
+### **line** _lineno_[:_colno_]
 
-Go to line.
+Move the cursor to line given by _lineno_. Optionally moves the cursor
+to _colno_ on the same line.
 
 ### **bookmark** [**-r**]
 
