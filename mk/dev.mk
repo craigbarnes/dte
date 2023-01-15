@@ -121,7 +121,8 @@ build/coverage.xml: gcovr-xml.cfg | build/
 
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
-	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 1>&2
+	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 2>&1 | \
+	  sed '/^[0-9]\+ warnings generated\.$$/d' >&2
 
 clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h build/feature.h
