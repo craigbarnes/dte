@@ -20,7 +20,8 @@ CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 XARGS = xargs
 XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NPROC))
 XARGS_P = $(XARGS) $(XARGS_P_FLAG)
-DOCFILES = $(shell git ls-files -- '*.md' '*.xml')
+GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
+DOCFILES = $(call GITATTRS, xml markdown)
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
@@ -32,22 +33,22 @@ clang-tidy: $(clang_tidy_targets)
 check-aux: check-desktop-file check-appstream
 
 check-shell-scripts:
-	$(Q) $(SHELLCHECK) -fgcc -eSC1091 mk/*.sh test/*.sh tools/*.sh
-	$(E) SHCHECK 'mk/*.sh test/*.sh tools/*.sh'
+	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
+	$(Q) $(SHELLCHECK) -fgcc -eSC1091 $(call GITATTRS, shell) >&2
 
 check-whitespace:
-	$(Q) $(WSCHECK) `git ls-files --error-unmatch ':(attr:space-indent)'`
+	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
 
 check-codespell:
 	$(Q) $(CODESPELL) -Literm,clen,ede src/ mk/ $(DOCFILES) >&2
 
 check-desktop-file:
 	$(E) CHECK dte.desktop
-	$(Q) desktop-file-validate dte.desktop
+	$(Q) desktop-file-validate dte.desktop >&2
 
 check-appstream:
 	$(E) CHECK dte.appdata.xml
-	$(Q) appstream-util --nonet validate dte.appdata.xml
+	$(Q) appstream-util --nonet validate dte.appdata.xml | sed '/OK$$/d' >&2
 
 check-docs:
 	@printf '\nChecking links from:\n\n'
@@ -66,7 +67,7 @@ distcheck: build/dte-$(DISTVER).tar.gz | build/
 	$(Q) $(RM) '$<'
 
 check-release-digests: dist-all-releases
-	@sha256sum -c mk/sha256sums.txt
+	@sha256sum -c mk/sha256sums.txt >&2
 
 $(RELEASE_DIST): dte-%.tar.gz:
 	$(E) ARCHIVE $@
@@ -108,7 +109,7 @@ coverage-report: build/docs/lcov.css
 	$(call LCOV_REMOVE, build/coverage.info, */src/util/debug.c */test/test.c)
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
-	  $(XARGS_P) -- gzip -9 -k -f
+	  $(XARGS_P) -- gzip -9kf
 
 build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@

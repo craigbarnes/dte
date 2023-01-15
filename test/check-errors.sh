@@ -43,7 +43,7 @@ $dte -cquit -c2 -c3 -c4 -c5 -c6 -c7 -c8 -c9 2>/dev/null
 check "$?" 64
 
 # Unset $TERM
-TERM= $dte -cquit 2>/dev/null
+TERM='' $dte -cquit 2>/dev/null
 check "$?" 64
 
 if ! command -v setsid >/dev/null; then
@@ -54,5 +54,6 @@ if ! command -v setsid >/dev/null; then
 fi
 
 # No controlling tty
+# shellcheck disable=SC2086
 TERM=xterm-256color setsid $dte -cquit >/dev/null 2>&1 0>&1
 check "$?" 74

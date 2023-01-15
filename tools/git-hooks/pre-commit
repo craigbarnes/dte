@@ -4,6 +4,8 @@
 # (i.e. not including unstaged/dirty changes from the working tree)
 # and then performs a full build.
 
+# shellcheck disable=SC2064,SC2295
+
 export POSIXLY_CORRECT=1
 TMPDIR='.pre-commit-test'
 PROGNAME="$0"
@@ -42,13 +44,14 @@ done
 
 # ...snapshot and re-generate these files:
 mkdir -p "$TMPDIR/GEN/"
+# shellcheck disable=SC2086
 cp $GENERATED "$TMPDIR/GEN/"
 $MAKE -B man
 
 # ...and then check the freshly generated files are identical to the
 # ones that are to be committed:
 for F in $GENERATED; do
-    B="$(basename $F)"
+    B=$(basename "$F")
     if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
         abort "re-generate '${F##${TMPDIR}/}' before committing"
     fi

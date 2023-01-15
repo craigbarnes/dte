@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+# shellcheck disable=SC2207
 _dte() {
     local dte="$1"
     local cur="$2"
@@ -18,8 +19,7 @@ _dte() {
 
     case "$prev" in
     -b)
-        local rcnames="$($dte -B)"
-        COMPREPLY=($(compgen -W "$rcnames" -- "$cur"))
+        COMPREPLY=($(compgen -W "$($dte -B)" -- "$cur"))
         return;;
     -t)
         COMPREPLY=($(
