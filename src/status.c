@@ -218,7 +218,7 @@ void sf_format (
     const Window *window,
     const GlobalOptions *opts,
     InputMode mode,
-    char *buf,
+    char *buf, // NOLINT(readability-non-const-parameter)
     size_t size,
     const char *format
 ) {

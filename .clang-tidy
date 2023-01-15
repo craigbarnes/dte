@@ -8,6 +8,7 @@ Checks: >
     readability-*,
     misc-*,
     -clang-diagnostic-pointer-sign,
+    -clang-analyzer-core.NonNullParamChecker,
     -clang-analyzer-core.NullDereference,
     -clang-analyzer-unix.Malloc,
     -cert-err33-c,
