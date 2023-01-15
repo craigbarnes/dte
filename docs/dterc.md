@@ -877,6 +877,9 @@ then, for example, `redo 1`.
 
 Clear current line.
 
+`-i`
+:   Do not [`auto-indent`] the line after clearing.
+
 ### **join**
 
 Join selection or next line to current.
