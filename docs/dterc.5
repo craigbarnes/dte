@@ -377,16 +377,16 @@ Double quote
 .PP
 .TP
 \fB\\x0a\fR
-Hexadecimal byte value 0x0a. Note that \fB\\x00\fR is not supported
-because strings are NUL\-terminated.
+Hexadecimal byte value 0x0A (note that \fB\\x00\fR is not supported,
+because strings are null\-terminated)
 .PP
 .TP
 \fB\\u20ac\fR
-Four hex digit Unicode code point U+20AC.
+Four hex digit Unicode code point U+20AC
 .PP
 .TP
 \fB\\U000020ac\fR
-Eight hex digit Unicode code point U+20AC.
+Eight hex digit Unicode code point U+20AC
 .PP
 .SH COMMANDS
 .SS Configuration Commands
@@ -928,11 +928,11 @@ Open file. If \fIfilename\fR is omitted, a new file is opened.
 .P
 .TP
 \fB\-e\fR \fIencoding\fR
-Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
+Set file \fIencoding\fR (see \fBiconv \-l\fR for list of supported encodings)
 .PP
 .TP
 \fB\-g\fR
-Perform \fBglob\fR(7) expansion on \fIfilename\fR.
+Perform \fBglob\fR(7) expansion on \fIfilename\fR
 .PP
 .TP
 \fB\-t\fR
@@ -970,7 +970,7 @@ Open a command prompt if there's no specified or existing \fIfilename\fR
 .PP
 .TP
 \fB\-e\fR \fIencoding\fR
-Set file \fIencoding\fR. See \fBiconv \-l\fR for list of supported encodings.
+Set file \fIencoding\fR (see \fBiconv \-l\fR for list of supported encodings)
 .PP
 See also: \fBnewline\fR and \fButf8\-bom\fR global options
 .P
@@ -1027,23 +1027,23 @@ window will be an additional view of the current buffer.
 .P
 .TP
 \fB\-b\fR
-Add new window before current instead of after.
+Add new window before current instead of after
 .PP
 .TP
 \fB\-g\fR
-Perform \fBglob\fR(7) expansion on \fIfilename\fR.
+Perform \fBglob\fR(7) expansion on \fIfilename\fR
 .PP
 .TP
 \fB\-h\fR
-Split horizontally instead of vertically.
+Split horizontally instead of vertically
 .PP
 .TP
 \fB\-n\fR
-Create a new, empty buffer.
+Create a new, empty buffer
 .PP
 .TP
 \fB\-r\fR
-Split root instead of current window.
+Split root instead of current window
 .PP
 .TP
 \fB\-t\fR
@@ -1088,17 +1088,17 @@ Resize vertically
 .PP
 .TP
 \fIN\fR
-Set size of current window to \fIN\fR columns/rows.
+Set size of current window to \fIN\fR columns/rows
 .PP
 .TP
 \fB+\fR\fIN\fR
-Increase size of current window by \fIN\fR columns/rows.
+Increase size of current window by \fIN\fR columns/rows
 .PP
 .TP
 \fB\-\fR\fIN\fR
-Decrease size of current window by \fIN\fR columns/rows. Use \fB\-\-\fR to
+Decrease size of current window by \fIN\fR columns/rows (use \fB\-\-\fR to
 prevent the minus symbol being parsed as an option flag, e.g.
-\fBwresize \-\- \-5\fR.
+\fBwresize \-\- \-5\fR)
 .PP
 .RE
 \fBwflip\fR
@@ -1194,12 +1194,12 @@ Move to beginning of current line.
 .TP
 \fB\-s\fR
 Move to beginning of indented text or beginning of line, depending
-on current cursor position.
+on current cursor position
 .PP
 .TP
 \fB\-t\fR
 Like \fB\-s\fR, but with the additional behavior of moving back and forth
-between the two positions.
+between the two positions
 .PP
 .RE
 \fBeol\fR [\fB\-c\fR]
@@ -1408,7 +1408,7 @@ Clear current line.
 .P
 .TP
 \fB\-i\fR
-Do not \fBauto\-indent\fR the line after clearing.
+Do not \fBauto\-indent\fR the line after clearing
 .PP
 .RE
 \fBjoin\fR
@@ -1492,10 +1492,10 @@ Insert \fItext\fR into the buffer.
 .P
 .TP
 \fB\-k\fR
-Insert one character at a time, as if manually typed. Normally
+Insert one character at a time, as if manually typed (normally
 \fItext\fR is inserted exactly as specified, but this option allows
 it to be affected by special input handling like auto\-indents,
-whitespace trimming, line\-by\-line undo, etc.
+whitespace trimming, line\-by\-line undo, etc.)
 .PP
 .TP
 \fB\-m\fR
@@ -1673,7 +1673,7 @@ Display "Press any key to continue" prompt
 .PP
 .TP
 \fB\-s\fR
-Silent \-\- both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\fR
+Silent; both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\fR
 .PP
 .RE
 \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
@@ -1888,16 +1888,16 @@ command to set default options for specific file types.
 .RS
 .TP
 \fBfalse\fR
-Search is case\-insensitive.
+Search is case\-insensitive
 .PP
 .TP
 \fBtrue\fR
-Search is case\-sensitive.
+Search is case\-sensitive
 .PP
 .TP
 \fBauto\fR
 If search string contains an uppercase letter search is
-case\-sensitive, otherwise it is case\-insensitive.
+case\-sensitive, otherwise it is case\-insensitive
 .PP
 .RE
 \fBdisplay\-special\fR [false]
@@ -1982,81 +1982,81 @@ Format string for the left aligned part of status line.
 .P
 .TP
 \fB%f\fR
-Filename.
+Filename
 .PP
 .TP
 \fB%m\fR
-Prints \fB*\fR if file has been modified since last save.
+Prints \fB*\fR if file has been modified since last save
 .PP
 .TP
 \fB%r\fR
-Prints \fBRO\fR for read\-only buffers or \fBTMP\fR for temporary buffers.
+Prints \fBRO\fR for read\-only buffers or \fBTMP\fR for temporary buffers
 .PP
 .TP
 \fB%y\fR
-Cursor row.
+Cursor row
 .PP
 .TP
 \fB%Y\fR
-Total rows in file.
+Total rows in file
 .PP
 .TP
 \fB%x\fR
-Cursor display column.
+Cursor display column
 .PP
 .TP
 \fB%X\fR
 Cursor column as characters. If it differs from cursor display
-column then both are shown (e.g. \fB2\-9\fR).
+column then both are shown (e.g. \fB2\-9\fR)
 .PP
 .TP
 \fB%p\fR
-Position in percentage.
+Position in percentage
 .PP
 .TP
 \fB%E\fR
-File encoding.
+File encoding
 .PP
 .TP
 \fB%b\fR
-Prints \fBBOM\fR if file has a byte order mark.
+Prints \fBBOM\fR if file has a byte order mark
 .PP
 .TP
 \fB%M\fR
-Miscellaneous status information.
+Miscellaneous status information
 .PP
 .TP
 \fB%n\fR
-Line\-ending (\fBLF\fR or \fBCRLF\fR).
+Line\-ending (\fBLF\fR or \fBCRLF\fR)
 .PP
 .TP
 \fB%N\fR
-Line\-ending (only if \fBCRLF\fR).
+Line\-ending (only if \fBCRLF\fR)
 .PP
 .TP
 \fB%s\fR
 Separator (a single space, unless the preceding format character
-expanded to an empty string).
+expanded to an empty string)
 .PP
 .TP
 \fB%S\fR
-Like \fB%s\fR, but 3 spaces instead of 1.
+Like \fB%s\fR, but 3 spaces instead of 1
 .PP
 .TP
 \fB%t\fR
-File type.
+File type
 .PP
 .TP
 \fB%u\fR
-Hexadecimal Unicode value value of character under cursor.
+Hexadecimal Unicode value value of character under cursor
 .PP
 .TP
 \fB%o\fR
-Prints \fBOVR\fR or \fBINS\fR for overwrite mode on or off respectively.
+Prints \fBOVR\fR or \fBINS\fR for overwrite mode on or off respectively
 .PP
 .TP
 \fB%%\fR
-Literal \fB%\fR.
+Literal \fB%\fR
 .PP
 .RE
 \fBstatusline\-right\fR [" %y,%X %u %o %E%s%b%s%n %t %p "]
@@ -2189,8 +2189,7 @@ the same as \fBspace\-indent\fR.
 .PP
 .TP
 \fBspace\-align\fR
-Highlight spaces used for alignment after tab
-indents as errors.
+Highlight spaces used for alignment after tab indents as errors.
 .PP
 .TP
 \fBspace\-indent\fR

@@ -89,14 +89,14 @@ Double quoted strings may contain the following escapes:
 :   Double quote
 
 `\x0a`
-:   Hexadecimal byte value 0x0a. Note that `\x00` is not supported
-    because strings are NUL-terminated.
+:   Hexadecimal byte value 0x0A (note that `\x00` is not supported,
+    because strings are null-terminated)
 
 `\u20ac`
-:   Four hex digit Unicode code point U+20AC.
+:   Four hex digit Unicode code point U+20AC
 
 `\U000020ac`
-:   Eight hex digit Unicode code point U+20AC.
+:   Eight hex digit Unicode code point U+20AC
 
 # Commands
 
@@ -494,10 +494,10 @@ Trigger a full redraw of the screen.
 Open file. If _filename_ is omitted, a new file is opened.
 
 `-e` _encoding_
-:   Set file _encoding_. See `iconv -l` for list of supported encodings.
+:   Set file _encoding_ (see `iconv -l` for list of supported encodings)
 
 `-g`
-:   Perform [`glob`] expansion on _filename_.
+:   Perform [`glob`] expansion on _filename_
 
 `-t`
 :   Mark buffer as "temporary" (always closeable, without warnings for
@@ -526,7 +526,7 @@ Save current buffer.
 :   Open a command prompt if there's no specified or existing _filename_
 
 `-e` _encoding_
-:   Set file _encoding_. See `iconv -l` for list of supported encodings.
+:   Set file _encoding_ (see `iconv -l` for list of supported encodings)
 
 See also: [`newline`] and [`utf8-bom`] global options
 
@@ -573,19 +573,19 @@ command. If there are no _filename_ arguments, the contents of the new
 window will be an additional view of the current buffer.
 
 `-b`
-:   Add new window before current instead of after.
+:   Add new window before current instead of after
 
 `-g`
-:   Perform [`glob`] expansion on _filename_.
+:   Perform [`glob`] expansion on _filename_
 
 `-h`
-:   Split horizontally instead of vertically.
+:   Split horizontally instead of vertically
 
 `-n`
-:   Create a new, empty buffer.
+:   Create a new, empty buffer
 
 `-r`
-:   Split root instead of current window.
+:   Split root instead of current window
 
 `-t`
 :   Create a new, empty buffer and mark it as "temporary" (always
@@ -620,15 +620,15 @@ If no parameter given, equalize window sizes in current frame.
 :   Resize vertically
 
 _N_
-:   Set size of current window to _N_ columns/rows.
+:   Set size of current window to _N_ columns/rows
 
 `+`_N_
-:   Increase size of current window by _N_ columns/rows.
+:   Increase size of current window by _N_ columns/rows
 
 `-`_N_
-:   Decrease size of current window by _N_ columns/rows. Use `--` to
+:   Decrease size of current window by _N_ columns/rows (use `--` to
     prevent the minus symbol being parsed as an option flag, e.g.
-    `wresize -- -5`.
+    `wresize -- -5`)
 
 ### **wflip**
 
@@ -707,11 +707,11 @@ Move to beginning of current line.
 
 `-s`
 :   Move to beginning of indented text or beginning of line, depending
-    on current cursor position.
+    on current cursor position
 
 `-t`
 :   Like `-s`, but with the additional behavior of moving back and forth
-    between the two positions.
+    between the two positions
 
 ### **eol** [**-c**]
 
@@ -878,7 +878,7 @@ then, for example, `redo 1`.
 Clear current line.
 
 `-i`
-:   Do not [`auto-indent`] the line after clearing.
+:   Do not [`auto-indent`] the line after clearing
 
 ### **join**
 
@@ -944,10 +944,10 @@ vice versa.
 Insert _text_ into the buffer.
 
 `-k`
-:   Insert one character at a time, as if manually typed. Normally
+:   Insert one character at a time, as if manually typed (normally
     _text_ is inserted exactly as specified, but this option allows
     it to be affected by special input handling like auto-indents,
-    whitespace trimming, line-by-line undo, etc.
+    whitespace trimming, line-by-line undo, etc.)
 
 `-m`
 :   Move after inserted text
@@ -1080,7 +1080,7 @@ Run external _command_.
 :   Display "Press any key to continue" prompt
 
 `-s`
-:   Silent -- both `stderr` and `stdout` are redirected to `/dev/null`
+:   Silent; both `stderr` and `stdout` are redirected to `/dev/null`
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
 
@@ -1251,14 +1251,14 @@ command to set default options for specific file types.
 ### **case-sensitive-search** [true]
 
 `false`
-:   Search is case-insensitive.
+:   Search is case-insensitive
 
 `true`
-:   Search is case-sensitive.
+:   Search is case-sensitive
 
 `auto`
 :   If search string contains an uppercase letter search is
-    case-sensitive, otherwise it is case-insensitive.
+    case-sensitive, otherwise it is case-insensitive
 
 ### **display-special** [false]
 
@@ -1331,63 +1331,63 @@ Show line numbers.
 Format string for the left aligned part of status line.
 
 `%f`
-:   Filename.
+:   Filename
 
 `%m`
-:   Prints `*` if file has been modified since last save.
+:   Prints `*` if file has been modified since last save
 
 `%r`
-:   Prints `RO` for read-only buffers or `TMP` for temporary buffers.
+:   Prints `RO` for read-only buffers or `TMP` for temporary buffers
 
 `%y`
-:   Cursor row.
+:   Cursor row
 
 `%Y`
-:   Total rows in file.
+:   Total rows in file
 
 `%x`
-:   Cursor display column.
+:   Cursor display column
 
 `%X`
 :   Cursor column as characters. If it differs from cursor display
-    column then both are shown (e.g. `2-9`).
+    column then both are shown (e.g. `2-9`)
 
 `%p`
-:   Position in percentage.
+:   Position in percentage
 
 `%E`
-:   File encoding.
+:   File encoding
 
 `%b`
-:   Prints `BOM` if file has a byte order mark.
+:   Prints `BOM` if file has a byte order mark
 
 `%M`
-:   Miscellaneous status information.
+:   Miscellaneous status information
 
 `%n`
-:   Line-ending (`LF` or `CRLF`).
+:   Line-ending (`LF` or `CRLF`)
 
 `%N`
-:   Line-ending (only if `CRLF`).
+:   Line-ending (only if `CRLF`)
 
 `%s`
 :   Separator (a single space, unless the preceding format character
-    expanded to an empty string).
+    expanded to an empty string)
 
 `%S`
-:   Like `%s`, but 3 spaces instead of 1.
+:   Like `%s`, but 3 spaces instead of 1
 
 `%t`
-:   File type.
+:   File type
 
 `%u`
-:   Hexadecimal Unicode value value of character under cursor.
+:   Hexadecimal Unicode value value of character under cursor
 
 `%o`
-:   Prints `OVR` or `INS` for overwrite mode on or off respectively.
+:   Prints `OVR` or `INS` for overwrite mode on or off respectively
 
 `%%`
-:   Literal `%`.
+:   Literal `%`
 
 ### **statusline-right** [" %y,%X  %u  %o  %E%s%b%s%n %t   %p "]
 
@@ -1498,8 +1498,7 @@ errors should be highlighted. Set to `""` to disable.
     the same as `space-indent`.
 
 `space-align`
-:   Highlight spaces used for alignment after tab
-    indents as errors.
+:   Highlight spaces used for alignment after tab indents as errors.
 
 `space-indent`
 :   Highlight space indents as errors. Note that this still allows
