@@ -1378,13 +1378,13 @@ Format string for the left aligned part of status line.
 :   Like `%s`, but 3 spaces instead of 1
 
 `%t`
-:   File type
+:   [File type][`filetype`]
 
 `%u`
 :   Hexadecimal Unicode value value of character under cursor
 
 `%o`
-:   Prints `OVR` or `INS` for overwrite mode on or off respectively
+:   Prints `OVR` or `INS` for [`overwrite`] mode on or off respectively
 
 `%%`
 :   Literal `%`
@@ -1581,6 +1581,7 @@ errors should be highlighted. Set to `""` to disable.
 [`indent-regex`]: #indent-regex
 [`indent-width`]: #indent-width
 [`newline`]: #newline
+[`overwrite`]: #overwrite
 [`tab-width`]: #tab-width
 [`text-width`]: #text-width
 [`utf8-bom`]: #utf8-bom
