@@ -68,8 +68,8 @@ in the format **+***line***:***column*.
 # Key Bindings
 
 There are 3 editor modes, each having a different set of key bindings.
-Normal mode bindings can be customized by using the [`bind`] command
-(see [`dterc`]) or displayed using the [`show bind`] command.
+Bindings can be customized using the [`bind`] command (see [`dterc`])
+or displayed using the [`show bind`] command.
 
 The key bindings listed below are in the same format as accepted by
 the [`bind`] command. In particular, key combinations are represented
