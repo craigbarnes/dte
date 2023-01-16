@@ -1182,6 +1182,9 @@ The _type_ argument can be one of:
 `ft`
 :   Show [filetype associations][`ft`]
 
+`hi`
+:   Show [highlight colors][`hi`]
+
 `include`
 :   Show [built-in configs][`include`]
 
@@ -1192,10 +1195,13 @@ The _type_ argument can be one of:
 :   Show [messages][`msg`]
 
 `option`
-:   Show [option values](#options)
+:   Show [option values](#options) and automatic [`option`] entries
 
 `search`
 :   Show [search history][`search`]
+
+`set`
+:   Show [option values](#options)
 
 `wsplit`
 :   Show [window dimensions][`wsplit`]
