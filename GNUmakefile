@@ -34,7 +34,7 @@ define POSTINSTALL
 endef
 
 all: $(dte)
-check: check-tests check-opts check-errors
+check: check-tests check-opts
 install: install-bin install-man install-bash-completion
 uninstall: uninstall-bin uninstall-man uninstall-bash-completion
 
@@ -100,10 +100,6 @@ check-opts: $(dte)
 	$(E) EXEC 'test/check-opts.sh'
 	$(Q) test/check-opts.sh './$<' '$(VERSION)'
 
-check-errors: $(dte)
-	$(E) EXEC 'test/check-errors.sh'
-	$(Q) test/check-errors.sh './$<'
-
 installcheck: install
 	$(E) EXEC '$(DESTDIR)$(bindir)/$(dte) -V'
 	$(Q) '$(DESTDIR)$(bindir)/$(dte)' -V >/dev/null
@@ -123,7 +119,7 @@ clean:
 INSTALL_SUBTARGETS = bin man bash-completion desktop-file appstream
 .DEFAULT_GOAL = all
 .PHONY: all clean tags install uninstall
-.PHONY: check check-tests check-opts check-errors installcheck bench
+.PHONY: check check-tests check-opts installcheck bench
 .PHONY: $(foreach T, $(INSTALL_SUBTARGETS), install-$(T) uninstall-$(T))
 .DELETE_ON_ERROR:
 

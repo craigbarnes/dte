@@ -25,10 +25,9 @@ help:
 	$P uninstall 'Uninstall files installed by "make install"'
 	$P 'uninstall-*' 'Uninstall files installed by "make install-*"'
 	$P installcheck 'Run "make install" and sanity test installed binary'
-	$P check 'Equivalent to the 3 check-* targets below'
+	$P check 'Equivalent to "make check-tests check-opts"'
 	$P check-tests 'Compile and run unit tests'
-	$P check-opts 'Test dte(1) command-line options'
-	$P check-errors 'Test dte(1) command-line errors'
+	$P check-opts 'Test dte(1) command-line options and error handling'
 	@echo
 ifeq "$(DEVMK)" "loaded"
 	@printf ' Dev targets:\n\n'
