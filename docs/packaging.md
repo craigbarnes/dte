@@ -1,6 +1,11 @@
 Packaging
 =========
 
+Installation targets
+--------------------
+
+Run `make help` to see a summary of available `make` targets.
+
 Installation variables
 ----------------------
 
