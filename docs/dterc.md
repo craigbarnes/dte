@@ -1034,54 +1034,84 @@ Cancel selection.
 
 ## External Commands
 
-### **filter** [**-l**] _command_ [_parameter_]...
+### **exec** [**-pstmn**] [**-ioe** _action_] _command_ [_parameter_]...
 
-Filter selected text or whole file through external _command_.
+Execute external _command_, with custom actions for standard streams.
+The `-i`, `-o` and `-e` options represent standard input, output and
+error respectively and each one can be given a specific _action_, as
+decribed below.
 
-Example:
+The following _action_ arguments are supported by all **-ioe** options:
+
+* `null` - redirect to `/dev/null`
+* `tty` - redirect to controlling terminal
+
+Actions for stdin (`-i`):
+
+* `buffer` - pipe selected text or whole buffer (to _command_)
+* `line` - pipe selected text or current line
+* `word` - pipe selected text or current word
+* `command` - pipe command history
+* `search` - pipe search history
+* `msg` - pipe list of numbered messages (see [`msg`] command)
+
+Actions for stdout (`-o`):
+
+* `buffer` - [`insert`] output (from _command_) into buffer
+* `eval` - execute output as dterc commands
+* `msg` - run [`msg`] command with numerical argument parsed from first
+  line of output
+* `open` - run [`open`] command with each line of output as an argument
+* `tag` - run [`tag`] command with first line of output as an argument
+
+Actions for stderr (`-e`):
+
+* `errmsg` - if _command_ exits non-zero, display first line of stderr
+  output as an error message
+
+`-p`
+:   Display "press any key to continue" prompt
+
+`-s`
+:   Don't yield terminal control to child processes and transparently
+    convert `tty` actions to `null` (use this to avoid screen flicker
+    when _command_ doesn't need terminal access)
+
+`-t`
+:   Cancel the effects of `-s` (last one wins)
+
+`-m`
+:   Move cursor after any inserted text
+
+`-n`
+:   Strip newline from end of inserted text
+
+For convenience, there are several built-in aliases to simplify common
+uses of `exec`:
+
+    alias filter 'exec -s -i buffer -o buffer -e errmsg'
+    alias pipe-from 'exec -s -o buffer -e errmsg'
+    alias pipe-to 'exec -s -i buffer -e errmsg'
+    alias run 'exec'
+    alias eval 'exec -o eval'
+    alias exec-open 'exec -o open'
+    alias exec-tag 'exec -o tag'
+    alias exec-msg 'exec -o msg -i msg'
+
+Examples:
 
     filter sort -r
+    filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
+    pipe-to xsel -b
+    exec-open -s find . -type f -name *.h
+    exec-open -s git ls-files --modified
+    exec-open fzf -m --reverse
+    exec-tag -s echo main
+    exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf --reverse'
 
 Note that _command_ is executed directly using [`execvp`]. To use shell
 features like pipes or redirection, use a shell interpreter as the
-_command_. For example:
-
-    filter sh -c 'tr a-z A-Z | sed s/foo/bar/'
-
-`-l`
-:   Operate on current line instead of whole file, if there's no selection
-
-### **pipe-from** [**-mn**] _command_ [_parameter_]...
-
-Run external _command_ and insert its standard output.
-
-`-m`
-:   Move after the inserted text
-
-`-n`
-:   Strip newline from end of output
-
-### **pipe-to** [**-l**] _command_ [_parameter_]...
-
-Run external _command_ and pipe the selected text (or whole file) to
-its standard input.
-
-Can be used to e.g. write text to the system clipboard:
-
-    pipe-to xsel -b
-
-`-l`
-:   Operate on current line instead of whole file, if there's no selection
-
-### **run** [**-ps**] _command_ [_parameters_]...
-
-Run external _command_.
-
-`-p`
-:   Display "Press any key to continue" prompt
-
-`-s`
-:   Silent; both `stderr` and `stdout` are redirected to `/dev/null`
+_command_ (see second example above).
 
 ### **compile** [**-1ps**] _errorfmt_ _command_ [_parameters_]...
 
@@ -1104,41 +1134,6 @@ exits successfully, parsed messages can be navigated using the
 :   Silent. Both `stderr` and `stdout` are redirected to `/dev/null`
 
 See also: [`errorfmt`] and [`msg`] commands.
-
-### **eval** [**-s**] _command_ [_parameter_]...
-
-Run external _command_ and execute its standard output text as dterc
-commands.
-
-`-s`
-:   Don't yield terminal control to the child process
-
-### **exec-open** [**-s**] _command_ [_parameter_]...
-
-Run external _command_ and open all filenames listed on its standard
-output.
-
-`-s`
-:   Don't yield terminal control to the child process
-
-Example uses:
-
-    exec-open -s find . -type f -name *.h
-    exec-open -s git ls-files --modified
-    exec-open fzf -m --reverse
-
-### **exec-tag** [**-s**] _command_ [_parameter_]...
-
-Run external _command_ and then execute the `tag` command with its
-first line of standard output as the argument.
-
-`-s`
-:   Don't yield terminal control to the child process
-
-Example uses:
-
-    exec-tag -s echo main
-    exec-tag sh -c 'readtags -l | cut -f1 | sort | uniq | fzf --reverse'
 
 ## Other Commands
 

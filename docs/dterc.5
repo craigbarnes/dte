@@ -185,21 +185,9 @@ Editing Commands:
 .P
 External Commands:
 .br
-   \fBfilter\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
-   \fBpipe\-from\fR [\fB\-mn\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
-   \fBpipe\-to\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
-   \fBrun\fR [\fB\-ps\fR] \fIcommand\fR [\fIparameters\fR]...
+   \fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
-.br
-   \fBeval\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
-   \fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
-.br
-   \fBexec\-tag\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
 .br
 .P
 Other Commands:
@@ -1603,79 +1591,114 @@ Cancel selection.
 .P
 .RE
 .SS External Commands
-\fBfilter\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
+\fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR] \fIcommand\fR [\fIparameter\fR]...
 .RS
-Filter selected text or whole file through external \fIcommand\fR.
+Execute external \fIcommand\fR, with custom actions for standard streams.
+The \fB\-i\fR, \fB\-o\fR and \fB\-e\fR options represent standard input, output and
+error respectively and each one can be given a specific \fIaction\fR, as
+decribed below.
 .P
-Example:
+The following \fIaction\fR arguments are supported by all \fB\-ioe\fR options:
+.P
+\(bu \fBnull\fR \- redirect to \fB/dev/null\fR
+.br
+\(bu \fBtty\fR \- redirect to controlling terminal
+.br
+.P
+Actions for stdin (\fB\-i\fR):
+.P
+\(bu \fBbuffer\fR \- pipe selected text or whole buffer (to \fIcommand\fR)
+.br
+\(bu \fBline\fR \- pipe selected text or current line
+.br
+\(bu \fBword\fR \- pipe selected text or current word
+.br
+\(bu \fBcommand\fR \- pipe command history
+.br
+\(bu \fBsearch\fR \- pipe search history
+.br
+\(bu \fBmsg\fR \- pipe list of numbered messages (see \fBmsg\fR command)
+.br
+.P
+Actions for stdout (\fB\-o\fR):
+.P
+\(bu \fBbuffer\fR \- \fBinsert\fR output (from \fIcommand\fR) into buffer
+.br
+\(bu \fBeval\fR \- execute output as dterc commands
+.br
+\(bu \fBmsg\fR \- run \fBmsg\fR command with numerical argument parsed from first
+line of output
+.br
+\(bu \fBopen\fR \- run \fBopen\fR command with each line of output as an argument
+.br
+\(bu \fBtag\fR \- run \fBtag\fR command with first line of output as an argument
+.br
+.P
+Actions for stderr (\fB\-e\fR):
+.P
+\(bu \fBerrmsg\fR \- if \fIcommand\fR exits non\-zero, display first line of stderr
+output as an error message
+.br
+.P
+.TP
+\fB\-p\fR
+Display "press any key to continue" prompt
+.PP
+.TP
+\fB\-s\fR
+Don't yield terminal control to child processes and transparently
+convert \fBtty\fR actions to \fBnull\fR (use this to avoid screen flicker
+when \fIcommand\fR doesn't need terminal access)
+.PP
+.TP
+\fB\-t\fR
+Cancel the effects of \fB\-s\fR (last one wins)
+.PP
+.TP
+\fB\-m\fR
+Move cursor after any inserted text
+.PP
+.TP
+\fB\-n\fR
+Strip newline from end of inserted text
+.PP
+For convenience, there are several built\-in aliases to simplify common
+uses of \fBexec\fR:
+.P
+.IP
+.nf
+\f[C]
+alias\ filter\ 'exec\ \-s\ \-i\ buffer\ \-o\ buffer\ \-e\ errmsg'
+alias\ pipe\-from\ 'exec\ \-s\ \-o\ buffer\ \-e\ errmsg'
+alias\ pipe\-to\ 'exec\ \-s\ \-i\ buffer\ \-e\ errmsg'
+alias\ run\ 'exec'
+alias\ eval\ 'exec\ \-o\ eval'
+alias\ exec\-open\ 'exec\ \-o\ open'
+alias\ exec\-tag\ 'exec\ \-o\ tag'
+alias\ exec\-msg\ 'exec\ \-o\ msg\ \-i\ msg'
+\f[]
+.fi
+.PP
+Examples:
 .P
 .IP
 .nf
 \f[C]
 filter\ sort\ \-r
+filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
+pipe\-to\ xsel\ \-b
+exec\-open\ \-s\ find\ .\ \-type\ f\ \-name\ *.h
+exec\-open\ \-s\ git\ ls\-files\ \-\-modified
+exec\-open\ fzf\ \-m\ \-\-reverse
+exec\-tag\ \-s\ echo\ main
+exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse'
 \f[]
 .fi
 .PP
 Note that \fIcommand\fR is executed directly using \fBexecvp\fR(3). To use shell
 features like pipes or redirection, use a shell interpreter as the
-\fIcommand\fR. For example:
+\fIcommand\fR (see second example above).
 .P
-.IP
-.nf
-\f[C]
-filter\ sh\ \-c\ 'tr\ a\-z\ A\-Z\ |\ sed\ s/foo/bar/'
-\f[]
-.fi
-.PP
-.TP
-\fB\-l\fR
-Operate on current line instead of whole file, if there's no selection
-.PP
-.RE
-\fBpipe\-from\fR [\fB\-mn\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and insert its standard output.
-.P
-.TP
-\fB\-m\fR
-Move after the inserted text
-.PP
-.TP
-\fB\-n\fR
-Strip newline from end of output
-.PP
-.RE
-\fBpipe\-to\fR [\fB\-l\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and pipe the selected text (or whole file) to
-its standard input.
-.P
-Can be used to e.g. write text to the system clipboard:
-.P
-.IP
-.nf
-\f[C]
-pipe\-to\ xsel\ \-b
-\f[]
-.fi
-.PP
-.TP
-\fB\-l\fR
-Operate on current line instead of whole file, if there's no selection
-.PP
-.RE
-\fBrun\fR [\fB\-ps\fR] \fIcommand\fR [\fIparameters\fR]...
-.RS
-Run external \fIcommand\fR.
-.P
-.TP
-\fB\-p\fR
-Display "Press any key to continue" prompt
-.PP
-.TP
-\fB\-s\fR
-Silent; both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\fR
-.PP
 .RE
 \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
 .RS
@@ -1702,57 +1725,6 @@ Silent. Both \fBstderr\fR(3) and \fBstdout\fR(3) are redirected to \fB/dev/null\
 .PP
 See also: \fBerrorfmt\fR and \fBmsg\fR commands.
 .P
-.RE
-\fBeval\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and execute its standard output text as dterc
-commands.
-.P
-.TP
-\fB\-s\fR
-Don't yield terminal control to the child process
-.PP
-.RE
-\fBexec\-open\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and open all filenames listed on its standard
-output.
-.P
-.TP
-\fB\-s\fR
-Don't yield terminal control to the child process
-.PP
-Example uses:
-.P
-.IP
-.nf
-\f[C]
-exec\-open\ \-s\ find\ .\ \-type\ f\ \-name\ *.h
-exec\-open\ \-s\ git\ ls\-files\ \-\-modified
-exec\-open\ fzf\ \-m\ \-\-reverse
-\f[]
-.fi
-.PP
-.RE
-\fBexec\-tag\fR [\fB\-s\fR] \fIcommand\fR [\fIparameter\fR]...
-.RS
-Run external \fIcommand\fR and then execute the \fBtag\fR command with its
-first line of standard output as the argument.
-.P
-.TP
-\fB\-s\fR
-Don't yield terminal control to the child process
-.PP
-Example uses:
-.P
-.IP
-.nf
-\f[C]
-exec\-tag\ \-s\ echo\ main
-exec\-tag\ sh\ \-c\ 'readtags\ \-l\ |\ cut\ \-f1\ |\ sort\ |\ uniq\ |\ fzf\ \-\-reverse'
-\f[]
-.fi
-.PP
 .RE
 .SS Other Commands
 \fBrepeat\fR \fIcount\fR \fIcommand\fR [\fIparameters\fR]...
