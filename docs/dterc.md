@@ -761,10 +761,17 @@ Center view to cursor.
 Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of `{}[]()<>`.
 
-### **line** _lineno_[:_colno_]
+### **line** _lineno_[`,`_colno_]
 
-Move the cursor to line given by _lineno_. Optionally moves the cursor
-to _colno_ on the same line.
+Move the cursor to the line number specified by _lineno_ and
+(optionally) the column number specified by _colno_. The delimiter
+between the two numbers can either be a comma (`,`) or a colon (`:`).
+
+Examples:
+
+    line 19
+    line 20,15
+    line 20:15
 
 ### **bookmark** [**-r**]
 

@@ -127,7 +127,7 @@ Movement Commands:
 .br
    \fBmatch\-bracket\fR
 .br
-   \fBline\fR \fIlineno\fR[:\fIcolno\fR]
+   \fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .br
    \fBbookmark\fR [\fB\-r\fR]
 .br
@@ -1249,11 +1249,23 @@ Move to the bracket character paired with the one under the cursor.
 The character under the cursor should be one of \fB{}[]()<>\fR.
 .P
 .RE
-\fBline\fR \fIlineno\fR[:\fIcolno\fR]
+\fBline\fR \fIlineno\fR[\fB,\fR\fIcolno\fR]
 .RS
-Move the cursor to line given by \fIlineno\fR. Optionally moves the cursor
-to \fIcolno\fR on the same line.
+Move the cursor to the line number specified by \fIlineno\fR and
+(optionally) the column number specified by \fIcolno\fR. The delimiter
+between the two numbers can either be a comma (\fB,\fR) or a colon (\fB:\fR).
 .P
+Examples:
+.P
+.IP
+.nf
+\f[C]
+line\ 19
+line\ 20,15
+line\ 20:15
+\f[]
+.fi
+.PP
 .RE
 \fBbookmark\fR [\fB\-r\fR]
 .RS
