@@ -1046,7 +1046,7 @@ Cancel selection.
 Execute external _command_, with custom actions for standard streams.
 The `-i`, `-o` and `-e` options represent standard input, output and
 error respectively and each one can be given a specific _action_, as
-decribed below.
+described below.
 
 The following _action_ arguments are supported by all **-ioe** options:
 
