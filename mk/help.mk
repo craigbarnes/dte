@@ -1,14 +1,3 @@
-# TODO: Mention macOS caveats for "make install" in a footnote
-
-# TODO: Add help info for missing targets:
-#  * coverage-report
-#  * dte-%.tar.gz
-#  * gen-unidata
-#  * show-sizes
-#  * bench
-#  * check-aux
-#  * check-release-digests
-
 help: private P = @printf '   %-24s %s\n'
 help:
 	@printf '\n Targets:\n\n'
@@ -37,6 +26,8 @@ ifeq "$(DEVMK)" "loaded"
 	$P html 'Generate website'
 	$P htmlgz 'Generate statically gzipped website (for GitLab Pages)'
 	$P pdf 'Generate PDF user manual from man pages'
+	$P coverage-report 'Generate HTML coverage report with lcov(1)'
+	$P gen-unidata 'Generate Unicode data tables'
 	$P dist 'Generate tarball for latest git commit'
 	$P dist-latest-release 'Generate tarball for latest release'
 	$P dist-all-releases 'Generate tarballs for all releases'
@@ -50,6 +41,5 @@ ifeq "$(DEVMK)" "loaded"
 	$P distcheck 'Run "make check" on the unpacked "make dist" tarball'
 	@echo
 endif
-
 
 .PHONY: help
