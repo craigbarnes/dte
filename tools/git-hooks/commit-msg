@@ -1,5 +1,10 @@
 #!/usr/bin/awk -f
 
+function error(msg) {
+    printf("%s:%d: Error: %s\n", FILENAME, FNR, msg)
+    exit 1
+}
+
 # Ignore everything below "scissors" line (as used by "git commit -v")
 /^# *--+ >8 --+$/ {
     exit 0
@@ -14,13 +19,14 @@
 # appear at the start of a line (excluding an optional bullet point
 # or numbered back-reference)
 /^([*-]|\[[0-9]]:)? *https?:/ {
-    LINES++
+    if (++LINES <= 2) {
+        error("this line shouldn't begin with a URL")
+    }
     next
 }
 
 /^.{73}/ {
-    printf("%s:%d: Line exceeds 72 columns\n", FILENAME, FNR)
-    exit 1
+    error("line exceeds 72 columns")
 }
 
 /^$/ {
@@ -29,8 +35,11 @@
 }
 
 {
-    if (++LINES == 2) {
-        printf("%s: line #2 should always be blank\n", FILENAME)
-        exit 1
+    LINES++
+    if (LINES == 1 && $0 ~ /\. *$/) {
+        error("first line shouldn't end with '.'")
+    }
+    if (LINES == 2) {
+        error("second line should always be blank")
     }
 }
