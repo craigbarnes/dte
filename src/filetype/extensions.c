@@ -62,6 +62,7 @@ static const struct FileExtensionMap {
     {"gcode", GCODE},
     {"gemspec", RUBY},
     {"geojson", JSON},
+    {"gitignore", GITIGNORE},
     {"glsl", GLSL},
     {"glslf", GLSL},
     {"glslv", GLSL},

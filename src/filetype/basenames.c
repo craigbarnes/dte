@@ -52,6 +52,7 @@ static const struct FileBasenameMap {
     {"git-rebase-todo", GITREBASE, false},
     {"gitattributes", CONFIG, true},
     {"gitconfig", INI, true},
+    {"gitignore", GITIGNORE, true},
     {"gitmodules", INI, true},
     {"gnus", LISP, true},
     {"go.mod", GOMODULE, false},

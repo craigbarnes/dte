@@ -1,0 +1,27 @@
+syntax gitignore
+
+state line-start text
+    char # comment
+    char ! text negated
+    noeat text
+
+state text
+    char "\n" line-start
+    char "\\" backslash
+    char * this wildcard
+    char ? this matchone
+    eat this
+
+state comment
+    char "\n" line-start
+    eat this
+
+state backslash escape
+    char -n "\n" text escape
+    recolor error 1
+    eat line-start error
+
+default variable wildcard
+default constant matchone
+default label negated
+default special escape
