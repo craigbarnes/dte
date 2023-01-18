@@ -57,6 +57,7 @@ static const struct FileExtensionMap {
     {"erl", ERLANG},
     {"ex", ELIXIR},
     {"exs", ELIXIR},
+    {"fish", FISH},
     {"flatpakref", INI},
     {"frag", GLSL},
     {"gawk", AWK},

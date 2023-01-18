@@ -17,6 +17,7 @@ static const struct FileInterpreterMap {
     {"ecl", LISP},
     {"elixir", ELIXIR},
     {"escript", ERLANG},
+    {"fish", FISH},
     {"gawk", AWK},
     {"gjs", JAVASCRIPT},
     {"gmake", MAKE},
