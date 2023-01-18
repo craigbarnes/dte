@@ -172,6 +172,7 @@ static const struct FileExtensionMap {
     {"sty", TEX},
     {"supp", CONFIG},
     {"svg", XML},
+    {"swift", SWIFT},
     {"target", INI},
     {"tcl", TCL},
     {"tcsh", CSH},
