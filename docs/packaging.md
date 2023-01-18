@@ -4,7 +4,16 @@ Packaging
 Installation targets
 --------------------
 
-Run `make help` to see a summary of available `make` targets.
+Running `make install` is equivalent to running the following `make`
+targets:
+
+1. `install-bin`: Install `dte` binary
+2. `install-man`: Install man pages
+3. `install-bash-completion`: Install bash auto-completion script
+4. `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
+5. `install-appstream`: Install [AppStream] metadata (excluded on macOS)
+
+For more information about available `make` targets, run `make help`.
 
 Installation variables
 ----------------------
@@ -66,6 +75,8 @@ have long-term stable checksums. Use the tarballs from the [releases]
 page, unless you're prepared to deal with future checksum failures.
 
 
+[desktop entry]: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html
+[AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
 [syntax highlighters]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
