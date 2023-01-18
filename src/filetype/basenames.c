@@ -28,6 +28,7 @@ static const struct FileBasenameMap {
     {"Vagrantfile", RUBY, false},
     {"XCompose", CONFIG, true},
     {"Xresources", XRESOURCES, true},
+    {"bash_aliases", SH, true},
     {"bash_logout", SH, true},
     {"bash_profile", SH, true},
     {"bashrc", SH, true},
