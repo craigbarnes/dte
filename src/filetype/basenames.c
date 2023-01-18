@@ -79,6 +79,7 @@ static const struct FileBasenameMap {
     {"nginx.conf", NGINX, false},
     {"pacman.conf", INI, false},
     {"profile", SH, true},
+    {"pylintrc", INI, true},
     {"robots.txt", ROBOTSTXT, false},
     {"rockspec.in", LUA, false},
     {"shellcheckrc", CONFIG, true},

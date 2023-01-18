@@ -43,6 +43,7 @@ static const struct FileInterpreterMap {
     {"php", PHP},
     {"pwsh", POWERSHELL},
     {"python", PYTHON},
+    {"qjs", JAVASCRIPT},
     {"r6rs", SCHEME},
     {"racket", SCHEME},
     {"rake", RUBY},
