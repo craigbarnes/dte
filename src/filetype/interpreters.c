@@ -11,6 +11,7 @@ static const struct FileInterpreterMap {
     {"clisp", LISP},
     {"coffee", COFFEESCRIPT},
     {"crystal", RUBY},
+    {"csh", CSH},
     {"dart", DART},
     {"dash", SH},
     {"ecl", LISP},
@@ -56,6 +57,7 @@ static const struct FileInterpreterMap {
     {"sh", SH},
     {"tcc", C},
     {"tclsh", TCL},
+    {"tcsh", CSH},
     {"wish", TCL},
     {"zsh", SH},
 };
