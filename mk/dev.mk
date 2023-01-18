@@ -67,9 +67,6 @@ distcheck: build/dte-$(DISTVER).tar.gz | build/
 	$(E) RM $<
 	$(Q) $(RM) '$<'
 
-check-release-digests: dist-all-releases
-	@sha256sum -c mk/sha256sums.txt >&2
-
 $(RELEASE_DIST): dte-%.tar.gz:
 	$(E) ARCHIVE $@
 	$(Q) git archive --prefix='dte-$*/' -o '$@' 'v$*'
@@ -142,5 +139,5 @@ DEVMK := loaded
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
     check-docs check-shell-scripts check-whitespace check-codespell \
-    check-release-digests check-aux check-desktop-file check-appstream \
+    check-aux check-desktop-file check-appstream \
     git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)

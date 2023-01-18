@@ -7,6 +7,7 @@ dte Release Checklist
    3. Update tarball name in `README.md`
    4. Hard code `VERSION` variable in `mk/build.mk` to release version
    5. Update `RELEASE_VERSIONS` in `mk/dev.mk`
+   5. Update `<releases>` in `dte.appdata.xml`
    6. Remove `-g` from default `CFLAGS`
    7. Check `make vars` output
    8. `git commit -m "Prepare v${VER} release"`
@@ -21,8 +22,10 @@ dte Release Checklist
 
 3. Create post-release commit
    1. Add link to GPG signature in `CHANGELOG.md`
-   2. Update `mk/sha256sums.txt`
-   3. Reset `VERSION` and `CFLAGS`
+   2. Reset `VERSION` and `CFLAGS`
+   3. `git commit -m 'Post-release updates'`
+
+4. Update "portable builds" in `CHANGELOG.md`
 
 
 [releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte
