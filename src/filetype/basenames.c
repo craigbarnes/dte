@@ -38,6 +38,7 @@ static const struct FileBasenameMap {
     {"composer.lock", JSON, false},
     {"config.ld", LUA, false},
     {"configure.ac", M4, false},
+    {"coveragerc", INI, true},
     {"cshrc", SH, true},
     {"curlrc", CONFIG, true},
     {"dir_colors", CONFIG, true},
