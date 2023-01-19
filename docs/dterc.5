@@ -185,7 +185,7 @@ Editing Commands:
 .P
 External Commands:
 .br
-   \fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR] \fIcommand\fR [\fIparameter\fR]...
+   \fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIparameter\fR]...
 .br
    \fBcompile\fR [\fB\-1ps\fR] \fIerrorfmt\fR \fIcommand\fR [\fIparameters\fR]...
 .br
@@ -1603,7 +1603,7 @@ Cancel selection.
 .P
 .RE
 .SS External Commands
-\fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR] \fIcommand\fR [\fIparameter\fR]...
+\fBexec\fR [\fB\-pstmn\fR] [\fB\-ioe\fR \fIaction\fR]... \fIcommand\fR [\fIparameter\fR]...
 .RS
 Execute external \fIcommand\fR, with custom actions for standard streams.
 The \fB\-i\fR, \fB\-o\fR and \fB\-e\fR options represent standard input, output and
@@ -1652,6 +1652,18 @@ Actions for stderr (\fB\-e\fR):
 output as an error message
 .br
 .P
+.TP
+\fB\-i\fR \fIaction\fR
+Specify standard input action
+.PP
+.TP
+\fB\-o\fR \fIaction\fR
+Specify standard output action
+.PP
+.TP
+\fB\-e\fR \fIaction\fR
+Specify standard error action
+.PP
 .TP
 \fB\-p\fR
 Display "press any key to continue" prompt
