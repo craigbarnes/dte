@@ -545,11 +545,11 @@ String dump_buffer(const Buffer *buffer)
     }
 
     char modestr[12];
-    unsigned int perms = file->mode & 0777;
+    unsigned int perms = file->mode & 07777;
 
     string_sprintf (
         &buf,
-        "%s %s (0%o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
+        "%s %s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
         "     Mode:", filemode_to_str(file->mode, modestr), perms,
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,
