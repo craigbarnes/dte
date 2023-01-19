@@ -417,36 +417,13 @@ static size_t xstrftime (
     return r;
 }
 
-// TODO: optimize this by shifting (a|b) bits into 0b11 positions and
-// using the resulting value as an index into codes[]
-static char ixmodechar(mode_t mode, mode_t a, mode_t b, const char codes[3])
-{
-    BUG_ON(a == b);
-    mode_t mask = mode & (a | b);
-    if (mask == a) {
-        return codes[0];
-    } else if (mask == b) {
-        return codes[1];
-    } else if (mask == (a | b)) {
-        return codes[2];
-    }
-    BUG_ON(mask != 0);
-    return '-';
-}
+#ifdef S_ISVTX
+# define VTXBIT (S_ISVTX)
+#else
+# define VTXBIT ((mode_t)0)
+#endif
 
-UNITTEST {
-    static char codes[] = "123";
-    char c = ixmodechar(S_IXGRP, S_IXGRP, S_ISGID, codes);
-    BUG_ON(c != '1');
-    c = ixmodechar(S_ISGID, S_IXGRP, S_ISGID, codes);
-    BUG_ON(c != '2');
-    c = ixmodechar(S_IXGRP | S_ISGID, S_IXGRP, S_ISGID, codes);
-    BUG_ON(c != '3');
-    c = ixmodechar(0, S_IXGRP, S_ISGID, codes);
-    BUG_ON(c != '-');
-}
-
-static char *filemode_to_str(mode_t mode, char buf[10])
+static char *filemode_to_str(mode_t mode, char *buf)
 {
     // Saved buffers are always regular files (see S_ISREG() in load_buffer())
     if (unlikely((mode & S_IFMT) != S_IFREG)) {
@@ -454,23 +431,57 @@ static char *filemode_to_str(mode_t mode, char buf[10])
     }
     buf[0] = '-';
 
+    static char ucodes[4] = "-xSs";
+    static char ocodes[4] = "-xTt";
+    static_assert(S_IXUSR >> 6 == 1);
+    static_assert(S_ISUID >> 10 == 2);
+    static_assert(S_IXGRP >> 3 == 1);
+    static_assert(S_ISGID >> 9 == 2);
+    static_assert(S_IXOTH >> 0 == 1);
+    static_assert(VTXBIT >> 8 == 2 || VTXBIT == 0);
+
     // Owner
     buf[1] = (mode & S_IRUSR) ? 'r' : '-';
     buf[2] = (mode & S_IWUSR) ? 'w' : '-';
-    buf[3] = ixmodechar(mode, S_IXUSR, S_ISUID, "xSs");
+    buf[3] = ucodes[((mode & S_IXUSR) >> 6) | ((mode & S_ISUID) >> 10)];
 
     // Group
     buf[4] = (mode & S_IRGRP) ? 'r' : '-';
     buf[5] = (mode & S_IWGRP) ? 'w' : '-';
-    buf[6] = ixmodechar(mode, S_IXGRP, S_ISGID, "xSs");
+    buf[6] = ucodes[((mode & S_IXGRP) >> 3) | ((mode & S_ISGID) >> 9)];
 
     // Others
     buf[7] = (mode & S_IROTH) ? 'r' : '-';
     buf[8] = (mode & S_IWOTH) ? 'w' : '-';
-    buf[9] = ixmodechar(mode, S_IXOTH, S_ISVTX, "xTt");
+    buf[9] = ocodes[((mode & S_IXOTH) >> 0) | ((mode & VTXBIT) >> 8)];
 
     buf[10] = '\0';
     return buf;
+}
+
+UNITTEST {
+    char buf[12];
+    const mode_t r = S_IFREG;
+    BUG_ON(!streq("----------", filemode_to_str(r, buf)));
+    BUG_ON(!streq("---------x", filemode_to_str(r | 01, buf)));
+    BUG_ON(!streq("---x--x--x", filemode_to_str(r | 0111, buf)));
+    BUG_ON(!streq("-rwx------", filemode_to_str(r | 0700, buf)));
+    BUG_ON(!streq("-r--r--r--", filemode_to_str(r | 0444, buf)));
+    BUG_ON(!streq("-rw-rw-rw-", filemode_to_str(r | 0666, buf)));
+    BUG_ON(!streq("-rwxrwxrwx", filemode_to_str(r | 0777, buf)));
+    BUG_ON(!streq("---S------", filemode_to_str(r | 04000, buf)));
+    BUG_ON(!streq("---S--S---", filemode_to_str(r | 06000, buf)));
+    if (VTXBIT == 0) {
+        BUG_ON(!streq("---S--S---", filemode_to_str(r | 07000, buf)));
+        BUG_ON(!streq("-rwsrwsrwx", filemode_to_str(r | 07777, buf)));
+        BUG_ON(!streq("-rwSrwSrw-", filemode_to_str(r | 07666, buf)));
+        BUG_ON(!streq("-------rwx", filemode_to_str(r | 01007, buf)));
+    } else {
+        BUG_ON(!streq("---S--S--T", filemode_to_str(r | 07000, buf)));
+        BUG_ON(!streq("-rwsrwsrwt", filemode_to_str(r | 07777, buf)));
+        BUG_ON(!streq("-rwSrwSrwT", filemode_to_str(r | 07666, buf)));
+        BUG_ON(!streq("-------rwt", filemode_to_str(r | 01007, buf)));
+    }
 }
 
 String dump_buffer(const Buffer *buffer)
