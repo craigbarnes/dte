@@ -1051,7 +1051,7 @@ described below.
 The following _action_ arguments are supported by all **-ioe** options:
 
 * `null` - redirect to `/dev/null`
-* `tty` - redirect to controlling terminal
+* `tty` - redirect to controlling terminal (default action)
 
 Actions for stdin (`-i`):
 
