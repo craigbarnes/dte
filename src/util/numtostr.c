@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include "numtostr.h"
 
 const char hex_encode_table[16] = "0123456789abcdef";
@@ -57,4 +58,40 @@ const char *ulong_to_str(unsigned long x)
 size_t buf_uint_to_str(unsigned int x, char *buf)
 {
     return buf_umax_to_str(x, buf);
+}
+
+#ifdef S_ISVTX
+# define VTXBIT (S_ISVTX)
+#else
+# define VTXBIT ((mode_t)0)
+#endif
+
+char *filemode_to_str(mode_t mode, char *buf)
+{
+    static char ucodes[4] = "-xSs";
+    static char ocodes[4] = "-xTt";
+    static_assert(S_IXUSR >> 6 == 1);
+    static_assert(S_ISUID >> 10 == 2);
+    static_assert(S_IXGRP >> 3 == 1);
+    static_assert(S_ISGID >> 9 == 2);
+    static_assert(S_IXOTH >> 0 == 1);
+    static_assert(VTXBIT >> 8 == 2 || VTXBIT == 0);
+
+    // Owner
+    buf[0] = (mode & S_IRUSR) ? 'r' : '-';
+    buf[1] = (mode & S_IWUSR) ? 'w' : '-';
+    buf[2] = ucodes[((mode & S_IXUSR) >> 6) | ((mode & S_ISUID) >> 10)];
+
+    // Group
+    buf[3] = (mode & S_IRGRP) ? 'r' : '-';
+    buf[4] = (mode & S_IWGRP) ? 'w' : '-';
+    buf[5] = ucodes[((mode & S_IXGRP) >> 3) | ((mode & S_ISGID) >> 9)];
+
+    // Others
+    buf[6] = (mode & S_IROTH) ? 'r' : '-';
+    buf[7] = (mode & S_IWOTH) ? 'w' : '-';
+    buf[8] = ocodes[((mode & S_IXOTH) >> 0) | ((mode & VTXBIT) >> 8)];
+
+    buf[9] = '\0';
+    return buf;
 }

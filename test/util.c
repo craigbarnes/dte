@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "test.h"
 #include "util/arith.h"
@@ -1006,6 +1007,32 @@ static void test_buf_uint_to_str(TestContext *ctx)
     static_assert(sizeof(buf) > 10);
     EXPECT_EQ(buf_uint_to_str(4294967295u, buf), 10);
     EXPECT_STREQ(buf, "4294967295");
+}
+
+static void test_filemode_to_str(TestContext *ctx)
+{
+    char buf[12];
+    EXPECT_STREQ("---------", filemode_to_str(0, buf));
+    EXPECT_STREQ("--------x", filemode_to_str(01, buf));
+    EXPECT_STREQ("--x--x--x", filemode_to_str(0111, buf));
+    EXPECT_STREQ("rwx------", filemode_to_str(0700, buf));
+    EXPECT_STREQ("r--r--r--", filemode_to_str(0444, buf));
+    EXPECT_STREQ("rw-rw-rw-", filemode_to_str(0666, buf));
+    EXPECT_STREQ("rwxrwxrwx", filemode_to_str(0777, buf));
+    EXPECT_STREQ("--S------", filemode_to_str(04000, buf));
+    EXPECT_STREQ("--S--S---", filemode_to_str(06000, buf));
+
+#ifdef S_ISVTX
+    EXPECT_STREQ("--S--S--T", filemode_to_str(07000, buf));
+    EXPECT_STREQ("rwsrwsrwt", filemode_to_str(07777, buf));
+    EXPECT_STREQ("rwSrwSrwT", filemode_to_str(07666, buf));
+    EXPECT_STREQ("------rwt", filemode_to_str(01007, buf));
+#else
+    EXPECT_STREQ("--S--S---", filemode_to_str(07000, buf));
+    EXPECT_STREQ("rwsrwsrwx", filemode_to_str(07777, buf));
+    EXPECT_STREQ("rwSrwSrw-", filemode_to_str(07666, buf));
+    EXPECT_STREQ("------rwx", filemode_to_str(01007, buf));
+#endif
 }
 
 static void test_u_char_width(TestContext *ctx)
@@ -2499,6 +2526,7 @@ static const TestEntry tests[] = {
     TEST(test_uint_to_str),
     TEST(test_ulong_to_str),
     TEST(test_buf_uint_to_str),
+    TEST(test_filemode_to_str),
     TEST(test_u_char_width),
     TEST(test_u_to_lower),
     TEST(test_u_to_upper),

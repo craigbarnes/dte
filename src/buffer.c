@@ -12,6 +12,7 @@
 #include "util/debug.h"
 #include "util/intern.h"
 #include "util/log.h"
+#include "util/numtostr.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -417,73 +418,6 @@ static size_t xstrftime (
     return r;
 }
 
-#ifdef S_ISVTX
-# define VTXBIT (S_ISVTX)
-#else
-# define VTXBIT ((mode_t)0)
-#endif
-
-static char *filemode_to_str(mode_t mode, char *buf)
-{
-    // Saved buffers are always regular files (see S_ISREG() in load_buffer())
-    if (unlikely((mode & S_IFMT) != S_IFREG)) {
-        LOG_WARNING("not a regular file");
-    }
-    buf[0] = '-';
-
-    static char ucodes[4] = "-xSs";
-    static char ocodes[4] = "-xTt";
-    static_assert(S_IXUSR >> 6 == 1);
-    static_assert(S_ISUID >> 10 == 2);
-    static_assert(S_IXGRP >> 3 == 1);
-    static_assert(S_ISGID >> 9 == 2);
-    static_assert(S_IXOTH >> 0 == 1);
-    static_assert(VTXBIT >> 8 == 2 || VTXBIT == 0);
-
-    // Owner
-    buf[1] = (mode & S_IRUSR) ? 'r' : '-';
-    buf[2] = (mode & S_IWUSR) ? 'w' : '-';
-    buf[3] = ucodes[((mode & S_IXUSR) >> 6) | ((mode & S_ISUID) >> 10)];
-
-    // Group
-    buf[4] = (mode & S_IRGRP) ? 'r' : '-';
-    buf[5] = (mode & S_IWGRP) ? 'w' : '-';
-    buf[6] = ucodes[((mode & S_IXGRP) >> 3) | ((mode & S_ISGID) >> 9)];
-
-    // Others
-    buf[7] = (mode & S_IROTH) ? 'r' : '-';
-    buf[8] = (mode & S_IWOTH) ? 'w' : '-';
-    buf[9] = ocodes[((mode & S_IXOTH) >> 0) | ((mode & VTXBIT) >> 8)];
-
-    buf[10] = '\0';
-    return buf;
-}
-
-UNITTEST {
-    char buf[12];
-    const mode_t r = S_IFREG;
-    BUG_ON(!streq("----------", filemode_to_str(r, buf)));
-    BUG_ON(!streq("---------x", filemode_to_str(r | 01, buf)));
-    BUG_ON(!streq("---x--x--x", filemode_to_str(r | 0111, buf)));
-    BUG_ON(!streq("-rwx------", filemode_to_str(r | 0700, buf)));
-    BUG_ON(!streq("-r--r--r--", filemode_to_str(r | 0444, buf)));
-    BUG_ON(!streq("-rw-rw-rw-", filemode_to_str(r | 0666, buf)));
-    BUG_ON(!streq("-rwxrwxrwx", filemode_to_str(r | 0777, buf)));
-    BUG_ON(!streq("---S------", filemode_to_str(r | 04000, buf)));
-    BUG_ON(!streq("---S--S---", filemode_to_str(r | 06000, buf)));
-    if (VTXBIT == 0) {
-        BUG_ON(!streq("---S--S---", filemode_to_str(r | 07000, buf)));
-        BUG_ON(!streq("-rwsrwsrwx", filemode_to_str(r | 07777, buf)));
-        BUG_ON(!streq("-rwSrwSrw-", filemode_to_str(r | 07666, buf)));
-        BUG_ON(!streq("-------rwx", filemode_to_str(r | 01007, buf)));
-    } else {
-        BUG_ON(!streq("---S--S--T", filemode_to_str(r | 07000, buf)));
-        BUG_ON(!streq("-rwsrwsrwt", filemode_to_str(r | 07777, buf)));
-        BUG_ON(!streq("-rwSrwSrwT", filemode_to_str(r | 07666, buf)));
-        BUG_ON(!streq("-------rwt", filemode_to_str(r | 01007, buf)));
-    }
-}
-
 String dump_buffer(const Buffer *buffer)
 {
     uintmax_t blocks = 0;
@@ -555,13 +489,19 @@ String dump_buffer(const Buffer *buffer)
         buf.len += xstrftime(ptr, maxsize, " Modified: %F %T %z\n", &tm);
     }
 
+    // Saved buffers are always regular files (see S_ISREG() in load_buffer())
+    char type = '-';
+    if (unlikely((file->mode & S_IFMT) != S_IFREG)) {
+        LOG_WARNING("not a regular file");
+    }
+
     char modestr[12];
     unsigned int perms = file->mode & 07777;
 
     string_sprintf (
         &buf,
-        "%s %s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
-        "     Mode:", filemode_to_str(file->mode, modestr), perms,
+        "%s %c%s (%04o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
+        "     Mode:", type, filemode_to_str(file->mode, modestr), perms,
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,
         "     Size:", (uintmax_t)file->size,

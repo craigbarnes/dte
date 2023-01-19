@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include "macros.h"
 
 extern const char hex_encode_table[16];
@@ -28,9 +29,9 @@ static inline char *hex_encode_u24_fixed(char *out, uint32_t x)
 
 size_t buf_umax_to_str(uintmax_t x, char *buf) NONNULL_ARGS;
 size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;
-
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
 const char *ulong_to_str(unsigned long x) RETURNS_NONNULL;
+char *filemode_to_str(mode_t mode, char *buf) NONNULL_ARGS_AND_RETURN;
 
 #endif
