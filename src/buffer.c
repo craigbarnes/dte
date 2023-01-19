@@ -434,6 +434,18 @@ static char ixmodechar(mode_t mode, mode_t a, mode_t b, const char codes[3])
     return '-';
 }
 
+UNITTEST {
+    static char codes[] = "123";
+    char c = ixmodechar(S_IXGRP, S_IXGRP, S_ISGID, codes);
+    BUG_ON(c != '1');
+    c = ixmodechar(S_ISGID, S_IXGRP, S_ISGID, codes);
+    BUG_ON(c != '2');
+    c = ixmodechar(S_IXGRP | S_ISGID, S_IXGRP, S_ISGID, codes);
+    BUG_ON(c != '3');
+    c = ixmodechar(0, S_IXGRP, S_ISGID, codes);
+    BUG_ON(c != '-');
+}
+
 static char *filemode_to_str(mode_t mode, char buf[10])
 {
     // Saved buffers are always regular files (see S_ISREG() in load_buffer())
@@ -442,7 +454,7 @@ static char *filemode_to_str(mode_t mode, char buf[10])
     }
     buf[0] = '-';
 
-    // User
+    // Owner
     buf[1] = (mode & S_IRUSR) ? 'r' : '-';
     buf[2] = (mode & S_IWUSR) ? 'w' : '-';
     buf[3] = ixmodechar(mode, S_IXUSR, S_ISUID, "xSs");
@@ -452,7 +464,7 @@ static char *filemode_to_str(mode_t mode, char buf[10])
     buf[5] = (mode & S_IWGRP) ? 'w' : '-';
     buf[6] = ixmodechar(mode, S_IXGRP, S_ISGID, "xSs");
 
-    // Other
+    // Others
     buf[7] = (mode & S_IROTH) ? 'r' : '-';
     buf[8] = (mode & S_IWOTH) ? 'w' : '-';
     buf[9] = ixmodechar(mode, S_IXOTH, S_ISVTX, "xTt");
