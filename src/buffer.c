@@ -11,6 +11,7 @@
 #include "syntax/state.h"
 #include "util/debug.h"
 #include "util/intern.h"
+#include "util/log.h"
 #include "util/path.h"
 #include "util/str-util.h"
 #include "util/xmalloc.h"
@@ -416,6 +417,50 @@ static size_t xstrftime (
     return r;
 }
 
+// TODO: optimize this by shifting (a|b) bits into 0b11 positions and
+// using the resulting value as an index into codes[]
+static char ixmodechar(mode_t mode, mode_t a, mode_t b, const char codes[3])
+{
+    BUG_ON(a == b);
+    mode_t mask = mode & (a | b);
+    if (mask == a) {
+        return codes[0];
+    } else if (mask == b) {
+        return codes[1];
+    } else if (mask == (a | b)) {
+        return codes[2];
+    }
+    BUG_ON(mask != 0);
+    return '-';
+}
+
+static char *filemode_to_str(mode_t mode, char buf[10])
+{
+    // Saved buffers are always regular files (see S_ISREG() in load_buffer())
+    if (unlikely((mode & S_IFMT) != S_IFREG)) {
+        LOG_WARNING("not a regular file");
+    }
+    buf[0] = '-';
+
+    // User
+    buf[1] = (mode & S_IRUSR) ? 'r' : '-';
+    buf[2] = (mode & S_IWUSR) ? 'w' : '-';
+    buf[3] = ixmodechar(mode, S_IXUSR, S_ISUID, "xSs");
+
+    // Group
+    buf[4] = (mode & S_IRGRP) ? 'r' : '-';
+    buf[5] = (mode & S_IWGRP) ? 'w' : '-';
+    buf[6] = ixmodechar(mode, S_IXGRP, S_ISGID, "xSs");
+
+    // Other
+    buf[7] = (mode & S_IROTH) ? 'r' : '-';
+    buf[8] = (mode & S_IWOTH) ? 'w' : '-';
+    buf[9] = ixmodechar(mode, S_IXOTH, S_ISVTX, "xTt");
+
+    buf[10] = '\0';
+    return buf;
+}
+
 String dump_buffer(const Buffer *buffer)
 {
     uintmax_t blocks = 0;
@@ -487,10 +532,13 @@ String dump_buffer(const Buffer *buffer)
         buf.len += xstrftime(ptr, maxsize, " Modified: %F %T %z\n", &tm);
     }
 
+    char modestr[12];
+    unsigned int perms = file->mode & 0777;
+
     string_sprintf (
         &buf,
-        "%s 0%o\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
-        "     Mode:", (unsigned int)(file->mode & 0777),
+        "%s %s (0%o)\n%s %jd\n%s %jd\n%s %ju\n%s %jd\n%s %ju\n",
+        "     Mode:", filemode_to_str(file->mode, modestr), perms,
         "     User:", (intmax_t)file->uid,
         "    Group:", (intmax_t)file->gid,
         "     Size:", (uintmax_t)file->size,
@@ -500,13 +548,10 @@ String dump_buffer(const Buffer *buffer)
 
     /* TODO:
      - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::mode
-     - File type for FileInfo::mode (S_IFREG/S_IFLNK/etc.; see inode(7))
-     - SUID/SGID/sticky bits for FileInfo::mode (S_ISUID/S_ISGID/S_ISVTX)
      - Number of changes since Buffer::saved_change
      - Total number of changes? (Buffer::change_head)
      - Modified status? (buffer_modified())
      - Show info for Buffer::syn and Buffer::options?
-     - Make formatting similar to stat(1) output?
     */
 
     return buf;
