@@ -1,5 +1,3 @@
-#include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -36,6 +34,7 @@
 #include "util/str-util.h"
 #include "util/string-view.h"
 #include "util/string.h"
+#include "util/xdirent.h"
 #include "util/xmalloc.h"
 #include "vars.h"
 
@@ -59,7 +58,7 @@ static bool do_collect_files (
     const char *fileprefix,
     FileCollectionType type
 ) {
-    DIR *const dir = opendir(dirname);
+    DIR *const dir = xopendir(dirname);
     if (!dir) {
         return false;
     }
@@ -67,7 +66,7 @@ static bool do_collect_files (
     const int dir_fd = dirfd(dir);
     if (unlikely(dir_fd < 0)) {
         LOG_ERRNO("dirfd");
-        closedir(dir);
+        xclosedir(dir);
         return false;
     }
 
@@ -75,7 +74,7 @@ static bool do_collect_files (
     size_t flen = strlen(fileprefix);
     const struct dirent *de;
 
-    while ((de = readdir(dir))) {
+    while ((de = xreaddir(dir))) {
         const char *name = de->d_name;
         if (streq(name, ".") || streq(name, "..") || unlikely(streq(name, ""))) {
             continue;
@@ -122,7 +121,7 @@ static bool do_collect_files (
         ptr_array_append(array, path_joinx(dirprefix, name, is_dir));
     }
 
-    closedir(dir);
+    xclosedir(dir);
     return true;
 }
 
