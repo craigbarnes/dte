@@ -461,20 +461,19 @@ void remove_frame(EditorState *e, Frame *frame)
     update_window_coordinates(parent);
 }
 
-void dump_frame(const Frame *frame, int level, String *str)
+void dump_frame(const Frame *frame, size_t level, String *str)
 {
     sanity_check_frame(frame);
-    string_sprintf(str, "%*s%dx%d", level * 4, "", frame->w, frame->h);
+    string_append_memset(str, ' ', level * 4);
+    string_sprintf(str, "%dx%d", frame->w, frame->h);
 
-    const Window *window = frame->window;
-    if (window) {
-        string_sprintf (
-            str, "\n%*s%d,%d %dx%d %s\n",
-            (level + 1) * 4, "",
-            window->x, window->y,
-            window->w, window->h,
-            buffer_filename(window->view->buffer)
-        );
+    const Window *win = frame->window;
+    if (win) {
+        string_append_byte(str, '\n');
+        string_append_memset(str, ' ', (level + 1) * 4);
+        string_sprintf(str, "%d,%d %dx%d ", win->x, win->y, win->w, win->h);
+        string_append_cstring(str, buffer_filename(win->view->buffer));
+        string_append_byte(str, '\n');
         return;
     }
 

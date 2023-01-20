@@ -71,10 +71,19 @@ void string_insert_buf(String *s, size_t pos, const char *buf, size_t len)
 
 void string_append_buf(String *s, const char *ptr, size_t len)
 {
-    if (!len) {
+    if (len == 0) {
         return;
     }
     memcpy(string_reserve_space(s, len), ptr, len);
+    s->len += len;
+}
+
+void string_append_memset(String *s, unsigned char byte, size_t len)
+{
+    if (len == 0) {
+        return;
+    }
+    memset(string_reserve_space(s, len), byte, len);
     s->len += len;
 }
 

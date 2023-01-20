@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
@@ -36,7 +37,7 @@ void update_window_coordinates(Frame *frame);
 Frame *split_frame(struct Window *window, bool vertical, bool before);
 Frame *split_root_frame(struct EditorState *e, bool vertical, bool before);
 void remove_frame(struct EditorState *e, Frame *frame);
-void dump_frame(const Frame *frame, int level, String *str);
+void dump_frame(const Frame *frame, size_t level, String *str);
 
 #if DEBUG >= 1
   void debug_frame(const Frame *frame);
