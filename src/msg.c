@@ -92,9 +92,11 @@ String dump_messages(const MessageArray *messages)
     }
 
     for (size_t i = 0, n = messages->array.count; i < n; i++) {
-        const Message *m = messages->array.ptrs[i];
-        string_sprintf(&buf, "%zu: ", i + 1);
+        char *ptr = string_reserve_space(&buf, DECIMAL_STR_MAX(i));
+        buf.len += buf_umax_to_str(i + 1, ptr);
+        string_append_literal(&buf, ": ");
 
+        const Message *m = messages->array.ptrs[i];
         const FileLocation *loc = m->loc;
         if (!loc || !loc->filename) {
             goto append_msg;
