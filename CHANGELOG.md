@@ -87,11 +87,11 @@ v1.11 (not yet released)
 
 **Breaking changes:**
 
-* Removed `display-invisible` global option.
-* Made [`str`] [`dte-syntax`] command produce an error if used with
-  single-byte arguments ([`char`] should be used instead).
 * Changed the default Ctrl+v key binding to [`paste -a`][`paste`]
   (previously `paste -c`).
+* Made the [`str`] command in [`dte-syntax`] files produce an error if
+  used with single-byte arguments ([`char`] should be used instead).
+* Removed the `display-invisible` global option.
 * The `pipe-from` `-s` flag was effectively renamed to `-n`, as part of
   the [changes][commit d0c22068c340e79] made for the new [`exec`] command.
 
