@@ -1,6 +1,105 @@
 Releases
 ========
 
+v1.11 (not yet released)
+------------------------
+
+**Additions:**
+
+* Added 15 new command flags:
+  * [`bind -n`][`bind`]
+  * [`bind -c`][`bind`] (custom key bindings in [`command`] mode)
+  * [`bind -s`][`bind`] (custom key bindings in [`search`] mode)
+  * [`bol -t`][`bol`]
+  * [`bof -c`][`bof`]
+  * [`bof -l`][`bof`]
+  * [`eof -c`][`eof`]
+  * [`eof -l`][`eof`]
+  * [`clear -i`][`clear`]
+  * [`copy -b`][`copy`] (copy to system clipboard)
+  * [`copy -i`][`copy`]
+  * [`copy -p`][`copy`]
+  * [`paste -a`][`paste`]
+  * [`paste -m`][`paste`]
+  * [`new-line -a`][`new-line`]
+* Added a new [`exec`] command, (this replaces `run`, `filter`, `pipe-from`,
+  `pipe-to`, `eval`, `exec-open` and `exec-tag`, which are now just built-in
+  aliases of [`exec`]).
+* Added [`overwrite`] and [`optimize-true-color`] options.
+* Added built-in [`$RFILE`] and [`$FILEDIR`] variables.
+* Added `hi`, `msg` and `set` arguments to the [`show`] command.
+* Added a _number_ argument to the [`msg`] command.
+* Added support for 3-digit `#rgb` colors to the [`hi`] command (in addition
+  to the existing `#rrggbb` support).
+* Added support for binding `F13`-`F20` keys.
+* Added support for parsing alternate encodings of `F1`-`F4` keys
+  (e.g. `CSI P`) sent by some terminals.
+* Added syntax highlighters for JSON, Go Module (`go.mod`), G-code and
+  `.gitignore` files.
+* Added support for binary literals and hex float literals to the C syntax
+  highlighter.
+* Added support for escaped newlines in string literals to the C syntax
+  highlighter.
+* Added support for `<<-EOF` heredocs to the shell syntax highlighter.
+* Added support for template literals to the JavaScript syntax highlighter.
+* Added support for terminal "synchronized updates" (both the DCS-based
+  variant and the private mode `2026` variant).
+* Added documentation for the [`bookmark`] command.
+* Added `$PATH`, `$PWD`, `$OLDPWD` and `$DTE_VERSION` to the [environment]
+  section of the [`dte`] man page.
+* Added extended support for [Contour] and [WezTerm] terminals.
+* Added an [AppStream] metadata file, which is installed by default when
+  running `make install` (except on macOS).
+* Added `make help` to the build system, to allow printing information
+  about the available `make` targets.
+
+**Improvements:**
+
+* Updated Unicode support to version 15.
+* Allowed [`alias`] and [`errorfmt`] entries to be removed, by running
+  the commands with only 1 argument.
+* Improved command auto-completion for [`alias`], [`bind`], [`cd`],
+  [`redo`], [`move-tab`] and [`quit`] commands.
+* Improved documentation for [`alias`]. [`tag`], [`hi`], [`msg`] and
+  [`wsplit`] commands.
+* Changed [`quit -p`][`quit`] to display the number of modified/unsaved
+  buffers in the dialog prompt.
+* Excluded `.` and `..` from filename auto-completions.
+* Allowed `-c <command>` options to be used multiple (up to 8) times.
+* Allowed `+lineno,colno` command-line arguments (in addition to
+  `+lineno`).
+* Extended [`line`] command to accept a `lineno,colno` argument (in
+  addition to `lineno`).
+* Various improvements to built-in filetype detection.
+* Limited the size of `.editorconfig` files to 32MiB.
+* Enabled "enhanced" regex features on macOS, by using the
+  [`REG_ENHANCED`] flag when calling `regcomp(3)`.
+
+**Fixes:**
+
+* Fixed a bug that caused searches started by [`search -r`][`search`] to
+  be incorrectly recorded by `macro record`.
+* Fixed a bug that caused "broken pipe" errors to occur if the terminal
+  was resized during certain long-running commands (e.g. [`compile`]).
+* Fixed several regular expressions in built-in configs that were using
+  non-portable regex features (`\s`, `\b` and `\w`) and causing errors
+  on some systems.
+
+**Breaking changes:**
+
+* Removed `display-invisible` global option.
+* Made [`str`] [`dte-syntax`] command produce an error if used with
+  single-byte arguments ([`char`] should be used instead).
+* Changed the default Ctrl+v key binding to [`paste -a`][`paste`]
+  (previously `paste -c`).
+* The `pipe-from` `-s` flag was effectively renamed to `-n`, as part of
+  the [changes][commit d0c22068c340e79] made for the new [`exec`] command.
+
+**Other changes:**
+
+* Increased minimum [GNU Make] version requirement to 4.0.
+* Increased minimum [GCC] version requirement to 4.8.
+
 v1.10 (latest release)
 ----------------------
 
@@ -12,15 +111,15 @@ Released on 2021-04-03.
   * [`blkdown`]
   * [`blkup`]
   * [`delete-line`]
-  * [`exec-open`]
-  * [`exec-tag`]
+  * `exec-open` (note: replaced by [`exec`] in v1.11)
+  * `exec-tag` (note: replaced by [`exec`] in v1.11)
   * [`macro`]
   * [`match-bracket`]
 * Added 12 new command flags:
   * [`include -q`][`include`]
   * [`hi -c`][`hi`]
-  * [`filter -l`][`filter`]
-  * [`pipe-to -l`][`pipe-to`]
+  * `filter -l` (note: replaced by [`exec`] in v1.11)
+  * `pipe-to -l` (note: replaced by [`exec`] in v1.11)
   * [`close -p`][`close`]
   * [`wclose -p`][`wclose`]
   * [`open -t`][`open`]
@@ -446,37 +545,69 @@ system except a somewhat recent kernel.
 
 
 [website]: https://craigbarnes.gitlab.io/dte/
+[Contour]: https://github.com/contour-terminal/contour
+[WezTerm]: https://wezfurlong.org/wezterm/
+[GNU Make]: https://www.gnu.org/software/make/
+[GCC]: https://gcc.gnu.org/
+[AppStream]: https://www.freedesktop.org/software/appstream/docs/
+[`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
+[commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [ECMA-48]: https://www.ecma-international.org/publications-and-standards/standards/ecma-48/
 [musl]: https://www.musl-libc.org/
 [issue]: https://gitlab.com/craigbarnes/dte/-/issues
-[`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 
+[`dte`]: https://craigbarnes.gitlab.io/dte/dte.html
+[environment]: https://craigbarnes.gitlab.io/dte/dte.html#environment
+
+[`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
+[`str`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#str
+[`char`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#char
+
+[`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
+[`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
+[`bind`]: https://craigbarnes.gitlab.io/dte/dterc.html#bind
 [`blkdown`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkdown
 [`blkup`]: https://craigbarnes.gitlab.io/dte/dterc.html#blkup
+[`bof`]: https://craigbarnes.gitlab.io/dte/dterc.html#bof
+[`bol`]: https://craigbarnes.gitlab.io/dte/dterc.html#bol
+[`bookmark`]: https://craigbarnes.gitlab.io/dte/dterc.html#bookmark
+[`cd`]: https://craigbarnes.gitlab.io/dte/dterc.html#cd
+[`clear`]: https://craigbarnes.gitlab.io/dte/dterc.html#clear
 [`close`]: https://craigbarnes.gitlab.io/dte/dterc.html#close
+[`command`]: https://craigbarnes.gitlab.io/dte/dterc.html#command
+[`compile`]: https://craigbarnes.gitlab.io/dte/dterc.html#compile
 [`copy`]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [`delete-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#delete-line
+[`eof`]: https://craigbarnes.gitlab.io/dte/dterc.html#eof
 [`errorfmt`]: https://craigbarnes.gitlab.io/dte/dterc.html#errorfmt
-[`exec-open`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec-open
-[`exec-tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec-tag
-[`filter`]: https://craigbarnes.gitlab.io/dte/dterc.html#filter
+[`exec`]: https://craigbarnes.gitlab.io/dte/dterc.html#exec
 [`hi`]: https://craigbarnes.gitlab.io/dte/dterc.html#hi
 [`include`]: https://craigbarnes.gitlab.io/dte/dterc.html#include
+[`line`]: https://craigbarnes.gitlab.io/dte/dterc.html#line
 [`macro`]: https://craigbarnes.gitlab.io/dte/dterc.html#macro
 [`match-bracket`]: https://craigbarnes.gitlab.io/dte/dterc.html#match-bracket
+[`move-tab`]: https://craigbarnes.gitlab.io/dte/dterc.html#move-tab
+[`msg`]: https://craigbarnes.gitlab.io/dte/dterc.html#msg
+[`new-line`]: https://craigbarnes.gitlab.io/dte/dterc.html#new-line
 [`open`]: https://craigbarnes.gitlab.io/dte/dterc.html#open
-[`pipe-to`]: https://craigbarnes.gitlab.io/dte/dterc.html#pipe-to
+[`paste`]: https://craigbarnes.gitlab.io/dte/dterc.html#paste
 [`quit`]: https://craigbarnes.gitlab.io/dte/dterc.html#quit
+[`redo`]: https://craigbarnes.gitlab.io/dte/dterc.html#redo
 [`replace`]: https://craigbarnes.gitlab.io/dte/dterc.html#replace
 [`save`]: https://craigbarnes.gitlab.io/dte/dterc.html#save
+[`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
 [`tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#tag
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
 [double-quoted]: https://craigbarnes.gitlab.io/dte/dterc.html#double-quoted-strings
+[`optimize-true-color`]: https://craigbarnes.gitlab.io/dte/dterc.html#optimize-true-color
+[`overwrite`]: https://craigbarnes.gitlab.io/dte/dterc.html#overwrite
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
 [`utf8-bom`]: https://craigbarnes.gitlab.io/dte/dterc.html#utf8-bom
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
+[`$RFILE`]: https://craigbarnes.gitlab.io/dte/dterc.html#RFILE
+[`$FILEDIR`]: https://craigbarnes.gitlab.io/dte/dterc.html#FILEDIR
