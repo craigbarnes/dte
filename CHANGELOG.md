@@ -26,7 +26,7 @@ v1.11 (not yet released)
   `pipe-to`, `eval`, `exec-open` and `exec-tag`, which are now just built-in
   aliases of [`exec`]).
 * Added [`overwrite`] and [`optimize-true-color`] options.
-* Added built-in [`$RFILE`] and [`$FILEDIR`] variables.
+* Added built-in [`$RFILE`], [`$FILEDIR`] and [`$COLNO`] variables.
 * Added `hi`, `msg` and `set` arguments to the [`show`] command.
 * Added a _number_ argument to the [`msg`] command.
 * Added support for 3-digit `#rgb` colors to the [`hi`] command (in addition
@@ -609,5 +609,6 @@ system except a somewhat recent kernel.
 [`select-cursor-char`]: https://craigbarnes.gitlab.io/dte/dterc.html#select-cursor-char
 [`utf8-bom`]: https://craigbarnes.gitlab.io/dte/dterc.html#utf8-bom
 [statusline]: https://craigbarnes.gitlab.io/dte/dterc.html#statusline-left
+[`$COLNO`]: https://craigbarnes.gitlab.io/dte/dterc.html#COLNO
 [`$RFILE`]: https://craigbarnes.gitlab.io/dte/dterc.html#RFILE
 [`$FILEDIR`]: https://craigbarnes.gitlab.io/dte/dterc.html#FILEDIR
