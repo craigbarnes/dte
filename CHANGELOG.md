@@ -24,7 +24,7 @@ v1.11 (not yet released)
   * [`new-line -a`][`new-line`]
 * Added a new [`exec`] command, (this replaces `run`, `filter`, `pipe-from`,
   `pipe-to`, `eval`, `exec-open` and `exec-tag`, which are now just built-in
-  aliases of [`exec`]).
+  [aliases][exec aliases] of [`exec`]).
 * Added [`overwrite`] and [`optimize-true-color`] options.
 * Added built-in [`$RFILE`], [`$FILEDIR`] and [`$COLNO`] variables.
 * Added `hi`, `msg` and `set` arguments to the [`show`] command.
@@ -97,8 +97,8 @@ v1.11 (not yet released)
 
 **Other changes:**
 
-* Increased minimum [GNU Make] version requirement to 4.0.
-* Increased minimum [GCC] version requirement to 4.8.
+* Increased the minimum [GNU Make] version requirement to 4.0.
+* Increased the minimum [GCC] version requirement to 4.8.
 
 v1.10 (latest release)
 ----------------------
@@ -552,6 +552,7 @@ system except a somewhat recent kernel.
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
+[exec aliases]: https://gitlab.com/craigbarnes/dte/-/blob/14dd15b72383db784156b20d4ab7ac392552fe59/config/rc#L60-66
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
 [ECMA-48]: https://www.ecma-international.org/publications-and-standards/standards/ecma-48/
