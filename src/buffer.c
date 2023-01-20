@@ -510,11 +510,12 @@ String dump_buffer(const Buffer *buffer)
     );
 
     /* TODO:
-     - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::mode
+     - Human-readable size (MiB/GiB/etc.) for `bytes` and FileInfo::size
      - Number of changes since Buffer::saved_change
      - Total number of changes? (Buffer::change_head)
      - Modified status? (buffer_modified())
-     - Show info for Buffer::syn and Buffer::options?
+     - Show Buffer::syn info?
+     - Show Buffer::options? (perhaps just for non-default values)
     */
 
     return buf;
