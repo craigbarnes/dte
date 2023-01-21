@@ -29,9 +29,25 @@ Coding Style
 
 * Above all else, be consistent with the existing code.
 
+See Also
+--------
+
+* [`src/README.md`]
+* [`config/README.md`]
+* [`mk/README.md`]
+* [`mk/feature-test/README.md`]
+* [`tools/README.md`]
+* [`docs/releasing.md`]
+
 
 [issues]: https://gitlab.com/craigbarnes/dte/-/issues
 [pull requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
-[code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-and-syntax-highlighting
+[code blocks]: https://docs.gitlab.com/ee/user/markdown.html#code-spans-and-blocks
 [`pre-commit`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/pre-commit
 [`commit-msg`]: https://gitlab.com/craigbarnes/dte/blob/master/tools/git-hooks/commit-msg
+[`src/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/src/README.md
+[`config/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/config/README.md
+[`mk/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/README.md
+[`mk/feature-test/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/feature-test/README.md
+[`tools/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/tools/README.md
+[`docs/releasing.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/releasing.md
