@@ -25,6 +25,12 @@ The following Make variables may be useful when packaging `dte`:
   `$prefix/bin`).
 * `mandir`: Installation prefix for manual pages (defaults to
   `$prefix/share/man`).
+* `bashcompletiondir`: Installation prefix for bash auto-completion
+  scripts (defaults to `$prefix/share/bash-completion/completions`).
+* `appdir`: Installation prefix for [desktop entry] files (defaults
+  to `$prefix/share/applications`).
+* `metainfodir`: Installation prefix for [AppStream] metadata files
+  (defaults to `$prefix/share/metainfo`).
 * `DESTDIR`: Standard variable used for [staged installs].
 * `V=1`: Enable verbose build output.
 
