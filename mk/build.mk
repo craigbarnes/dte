@@ -30,7 +30,7 @@ BUILTIN_SYNTAX_FILES ?= \
     tex texmfcnf tmux vala xml xresources zig inc/c-comment inc/c-uchar
 
 BUILTIN_CONFIGS = $(addprefix config/, \
-    rc binding/default compiler/basic compiler/gcc compiler/go \
+    rc binding/default compiler/gcc compiler/go \
     $(addprefix color/, reset default darkgray) \
     $(addprefix syntax/, $(BUILTIN_SYNTAX_FILES)) )
 
