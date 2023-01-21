@@ -1,8 +1,10 @@
 Releases
 ========
 
-v1.11 (not yet released)
-------------------------
+v1.11 (latest release)
+----------------------
+
+Released on 2023-01-21.
 
 **Additions:**
 
@@ -108,8 +110,13 @@ v1.11 (not yet released)
 * Increased the minimum [GNU Make] version requirement to 4.0.
 * Increased the minimum [GCC] version requirement to 4.8.
 
-v1.10 (latest release)
-----------------------
+**Downloads:**
+
+* [dte-1.11.tar.gz](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.tar.gz)
+* [dte-1.11.tar.gz.sig](https://craigbarnes.gitlab.io/dist/dte/dte-1.11.tar.gz.sig)
+
+v1.10
+-----
 
 Released on 2021-04-03.
 
