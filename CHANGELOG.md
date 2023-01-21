@@ -54,8 +54,6 @@ Released on 2023-01-21.
 * Added extended support for [Contour] and [WezTerm] terminals.
 * Added an [AppStream] metadata file, which is installed by default when
   running `make install` (except on macOS).
-* Added `make help` to the build system, to allow printing information
-  about the available `make` targets.
 
 **Improvements:**
 
