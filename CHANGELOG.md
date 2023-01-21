@@ -34,6 +34,8 @@ v1.11 (not yet released)
 * Added support for binding `F13`-`F20` keys.
 * Added support for parsing alternate encodings of `F1`-`F4` keys
   (e.g. `CSI P`) sent by some terminals.
+* Added support for the [Kitty keyboard protocol][] (which significantly
+  increases the number of bindable key combos).
 * Added syntax highlighters for JSON, Go Module (`go.mod`), G-code and
   `.gitignore` files.
 * Added support for binary literals and hex float literals to the C syntax
@@ -70,10 +72,14 @@ v1.11 (not yet released)
   `+lineno`).
 * Extended [`line`] command to accept a `lineno,colno` argument (in
   addition to `lineno`).
-* Various improvements to built-in filetype detection.
 * Limited the size of `.editorconfig` files to 32MiB.
 * Enabled "enhanced" regex features on macOS, by using the
   [`REG_ENHANCED`] flag when calling `regcomp(3)`.
+* Improved support for the [`modifyOtherKeys`] keyboard mode (which
+  increases the number of bindable key combos somewhat), by emitting
+  the escape sequence to enable it at startup.
+* Various improvements to built-in filetype detection.
+* Various performance/efficiency improvements.
 
 **Fixes:**
 
@@ -89,9 +95,11 @@ v1.11 (not yet released)
 
 * Changed the default Ctrl+v key binding to [`paste -a`][`paste`]
   (previously `paste -c`).
+* Removed the `display-invisible` global option.
+* Removed the `-b` flag from the `select` command.
+* Renamed the built-in `coffeescript` filetype to `coffee`.
 * Made the [`str`] command in [`dte-syntax`] files produce an error if
   used with single-byte arguments ([`char`] should be used instead).
-* Removed the `display-invisible` global option.
 * The `pipe-from` `-s` flag was effectively renamed to `-n`, as part of
   the [changes][commit d0c22068c340e79] made for the new [`exec`] command.
 
@@ -547,6 +555,8 @@ system except a somewhat recent kernel.
 [website]: https://craigbarnes.gitlab.io/dte/
 [Contour]: https://github.com/contour-terminal/contour
 [WezTerm]: https://wezfurlong.org/wezterm/
+[Kitty keyboard protocol]: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+[`modifyOtherKeys`]: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 [GNU Make]: https://www.gnu.org/software/make/
 [GCC]: https://gcc.gnu.org/
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
