@@ -17,6 +17,9 @@ local function Header(header)
         return header
     end
 
+    -- Uppercase all `<h3>` anchors in the "special variables" section,
+    -- so that the one for e.g. `$FILETYPE` doesn't clash with the one
+    -- for the `filetype` local option.
     if level == 3 and section == "special-variables" then
         header.attr.identifier = id:upper()
         return header
