@@ -133,21 +133,22 @@ function CodeBlock(s, attr)
     return ".IP\n.nf\n\\f[C]\n" .. code .. "\n\\f[]\n.fi\n.PP\n"
 end
 
+local crossrefs = {
+    dte = "(1)",
+    dterc = "(5)",
+    ["dte-syntax"] = "(5)",
+    execvp = "(3)",
+    glob = "(7)",
+    regex = "(7)",
+    stdout = "(3)",
+    stderr = "(3)",
+    sysexits = "(3)",
+    ctags = "(1)",
+    fmt = "(1)",
+    terminfo = "(5)",
+}
+
 function Code(s, attr)
-    local crossrefs = {
-        dte = "(1)",
-        dterc = "(5)",
-        ["dte-syntax"] = "(5)",
-        execvp = "(3)",
-        glob = "(7)",
-        regex = "(7)",
-        stdout = "(3)",
-        stderr = "(3)",
-        sysexits = "(3)",
-        ctags = "(1)",
-        fmt = "(1)",
-        terminfo = "(5)",
-    }
     return "\\fB" .. escape(s) .. "\\fR" .. (crossrefs[s] or "")
 end
 
