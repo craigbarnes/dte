@@ -1,9 +1,9 @@
 syntax .ini-comment
 
 state maybe-comment text
-    char " \t" this
+    char -b " \t" this
     char '#;' comment
-    noeat END
+    noeat -b END
 
 state comment
     char -n "\n" this
@@ -34,9 +34,9 @@ state section-end
     eat this error
 
 state text
-    char " \t" .ini-comment:this
+    char -b " \t" .ini-comment:this
     char -b = key operator
-    char -b -n "\n" this
+    char -bn "\n" this
     noeat line-start
 
 state key
