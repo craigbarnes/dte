@@ -535,7 +535,7 @@ Public Key
 A detached PGP signature file is provided for each release. The public
 key for verifying these signatures is available to download at
 <https://craigbarnes.gitlab.io/pubkey/0330BEB4.asc>
-or from the keyserver at `hkps://hkps.pool.sks-keyservers.net`.
+or from the keyserver at `hkps://keys.openpgp.org`.
 
 Checksums
 =========
