@@ -1,3 +1,4 @@
+errorfmt gcc
 errorfmt -i gcc 'error: \(Each undeclared identifier is reported only once'
 errorfmt -i gcc 'error: for each function it appears in.\)'
 errorfmt -i gcc '^([^:]+):([0-9]+): (error|warning): \(near '
