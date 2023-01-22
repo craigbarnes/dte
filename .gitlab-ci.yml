@@ -126,8 +126,10 @@ coverage:
 
 pages:
     extends: .pages
-    only: [master]
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
 
 pages:non-master:
     extends: .pages
-    except: [master]
+    rules:
+        - if: $CI_COMMIT_BRANCH != "master"
