@@ -90,6 +90,9 @@ Released on 2023-01-21.
 * Fixed several regular expressions in built-in configs that were using
   non-portable regex features (`\s`, `\b` and `\w`) and causing errors
   on some systems.
+* [Fixed][commit c4af2b1a15c96e8] a portability issue that was causing
+  execution of external commands to fail with "function not implemented"
+  errors on some systems (notably Debian GNU/kFreeBSD).
 
 **Breaking changes:**
 
@@ -567,6 +570,7 @@ system except a somewhat recent kernel.
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
+[commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
 [exec aliases]: https://gitlab.com/craigbarnes/dte/-/blob/14dd15b72383db784156b20d4ab7ac392552fe59/config/rc#L60-66
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
