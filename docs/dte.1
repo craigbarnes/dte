@@ -10,7 +10,7 @@ dte \- A small, configurable text editor
 [\fB\-c\fR \fIcommand\fR]
 [\fB\-t\fR \fIctag\fR]
 [\fB\-r\fR \fIrcfile\fR]
-[[\fB+\fR\fIline\fR[\fB,\fR\fIcolumn\fR]] \fIfile\fR]...
+[[+\fIline\fR[,\fIcolumn\fR]] \fIfile\fR]...
 .br
 \fBdte\fR [\fB\-h\fR|\fB\-B\fR|\fB\-K\fR|\fB\-V\fR|\fB\-b\fR \fIrcname\fR|\fB\-s\fR \fIfile\fR]
 .P
@@ -68,9 +68,9 @@ Display the help summary and exit.
 \fB\-V\fR
 Display the version number and exit.
 .PP
-\fB+\fR\fIline\fR\fB,\fR\fIcolumn\fR arguments can be used to specify the initial
-cursor position of the next \fIfile\fR argument. These can also be specified
-in the format \fB+\fR\fIline\fR\fB:\fR\fIcolumn\fR.
++\fIline\fR,\fIcolumn\fR arguments can be used to specify the initial cursor
+position of the next \fIfile\fR argument. These can also be specified in
+the format +\fIline\fR:\fIcolumn\fR.
 .P
 .SH KEY BINDINGS
 There are 3 editor modes, each having a different set of key bindings.
