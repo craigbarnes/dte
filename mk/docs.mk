@@ -1,5 +1,9 @@
+# TODO: Use "-f gfm+definition_lists" and remove $(QUIET_PANDOC) when
+# pandoc 2.13 becomes widely available
+PANDOC_FLAGS = -f markdown_github+definition_lists+auto_identifiers+yaml_metadata_block-hard_line_breaks
+QUIET_PANDOC = 2>&1 | sed '/^\[WARNING] Deprecated: markdown_github/d' >&2
+
 PANDOC = pandoc
-PANDOC_FLAGS = -f gfm+definition_lists
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
 PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html -Voutput_basename=$(@F)
 
@@ -19,16 +23,16 @@ $(html-man): public/%.html: docs/%.md
 public/index.html: docs/index.yml build/docs/index.md docs/gitlab.md
 public/releases.html: docs/releases.yml CHANGELOG.md
 public/dterc.html public/dte-syntax.html: docs/fix-anchors.lua
-public/dterc.html public/dte-syntax.html: PANDOC_FLAGS += -L docs/fix-anchors.lua
-public/dte.html: PANDOC_FLAGS += --indented-code-classes=sh
+public/dterc.html public/dte-syntax.html: PDHTML += -L docs/fix-anchors.lua
+public/dte.html: PDHTML += --indented-code-classes=sh
 
 docs/%.1: docs/%.md docs/pdman.lua
 	$(E) PANDOC $@
-	$(Q) $(PDMAN) -o $@ $<
+	$(Q) $(PDMAN) -o $@ $< $(QUIET_PANDOC)
 
 docs/%.5: docs/%.md docs/pdman.lua
 	$(E) PANDOC $@
-	$(Q) $(PDMAN) -o $@ $<
+	$(Q) $(PDMAN) -o $@ $< $(QUIET_PANDOC)
 
 public/dte.pdf: $(man) | public/
 	$(E) GROFF $@
@@ -40,7 +44,7 @@ build/docs/index.md: docs/index.sed README.md | build/docs/
 
 $(html): docs/template.html | public/style.css
 	$(E) PANDOC $@
-	$(Q) $(PDHTML) -o $@ $(filter-out %.html %.lua, $^)
+	$(Q) $(PDHTML) -o $@ $(filter-out %.html %.lua, $^) $(QUIET_PANDOC)
 
 public/style.css: docs/layout.css docs/style.css | public/
 	$(E) CSSCAT $@
