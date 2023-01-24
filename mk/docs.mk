@@ -1,5 +1,5 @@
 PANDOC = pandoc
-PANDOC_FLAGS = -f gfm+definition_lists+yaml_metadata_block-hard_line_breaks
+PANDOC_FLAGS = -f gfm+definition_lists
 PDMAN = $(PANDOC) $(PANDOC_FLAGS) -t docs/pdman.lua
 PDHTML = $(PANDOC) $(PANDOC_FLAGS) -t html5 --toc --template=docs/template.html -Voutput_basename=$(@F)
 
