@@ -110,6 +110,12 @@ static bool show_binding(EditorState *e, const char *keystr, bool cflag)
         return error_msg("invalid key string: %s", keystr);
     }
 
+    // Use canonical key string in printed messages
+    char buf[KEYCODE_STR_MAX];
+    size_t len = keycode_to_string(key, buf);
+    BUG_ON(len == 0);
+    keystr = buf;
+
     if (u_is_unicode(key)) {
         return error_msg("%s is not a bindable key", keystr);
     }
