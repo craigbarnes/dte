@@ -338,6 +338,25 @@ static void test_cursor_color_to_str(TestContext *ctx)
     EXPECT_STREQ(cursor_color_to_str(COLOR_RGB(0x190AFE)), "#190afe");
 }
 
+static void test_same_cursor(TestContext *ctx)
+{
+    TermCursorStyle a = get_default_cursor_style(CURSOR_MODE_DEFAULT);
+    EXPECT_EQ(a.type, CURSOR_DEFAULT);
+    EXPECT_EQ(a.color, COLOR_DEFAULT);
+    EXPECT_TRUE(same_cursor(&a, &a));
+
+    TermCursorStyle b = get_default_cursor_style(CURSOR_MODE_INSERT);
+    EXPECT_EQ(b.type, CURSOR_KEEP);
+    EXPECT_EQ(b.color, COLOR_KEEP);
+    EXPECT_TRUE(same_cursor(&b, &b));
+
+    EXPECT_FALSE(same_cursor(&a, &b));
+    b.type = CURSOR_DEFAULT;
+    EXPECT_FALSE(same_cursor(&a, &b));
+    b.color = COLOR_DEFAULT;
+    EXPECT_TRUE(same_cursor(&a, &b));
+}
+
 static void test_xterm_parse_key(TestContext *ctx)
 {
     static const struct {
@@ -1176,6 +1195,7 @@ static const TestEntry tests[] = {
     TEST(test_cursor_type_from_str),
     TEST(test_cursor_color_from_str),
     TEST(test_cursor_color_to_str),
+    TEST(test_same_cursor),
     TEST(test_xterm_parse_key),
     TEST(test_xterm_parse_key_combo),
     TEST(test_rxvt_parse_key),
