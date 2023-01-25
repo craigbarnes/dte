@@ -12,12 +12,18 @@ echo-if-set = $(foreach var, $(1), $(if $($(var)), $(var)))
 # See also: https://blog.jgc.org/2016/07/lazy-gnu-make-variables.html
 make-lazy = $(eval $1 = $$(eval $1 := $(value $(1)))$$($1))
 
+NPROC = $(or $(shell sh mk/nproc.sh), 1)
+$(call make-lazy,NPROC)
+XARGS = xargs
+XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NPROC))
+$(call make-lazy,XARGS_P_FLAG)
+XARGS_P = $(XARGS) $(XARGS_P_FLAG)
+
 MAKEFLAGS += -r
 KERNEL := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 OS := $(shell sh -c 'uname -o 2>/dev/null || echo not')
 DISTRO = $(shell . /etc/os-release && echo "$$NAME $$VERSION_ID")
 ARCH = $(shell uname -m 2>/dev/null)
-NPROC = $(or $(shell sh mk/nproc.sh), 1)
 _POSIX_VERSION = $(shell getconf _POSIX_VERSION 2>/dev/null)
 _XOPEN_VERSION = $(shell getconf _XOPEN_VERSION 2>/dev/null)
 CC_VERSION = $(or \
