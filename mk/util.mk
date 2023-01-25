@@ -49,7 +49,7 @@ vars:
 	@echo
 
 
-.PHONY: vars
+.PHONY: vars FORCE
 
 ifneq "$(MAKE_S)" ""
   # Make "-s" flag was used (silent build)

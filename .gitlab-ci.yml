@@ -101,7 +101,8 @@ coverage:
                 coverage_format: cobertura
                 path: build/coverage.xml
     script:
-        - make build/coverage.xml
+        - make gcovr-xml
+        - awk -f tools/gcovr-txt.awk build/coverage.txt
 
 .pages:
     stage: dist

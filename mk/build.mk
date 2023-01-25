@@ -252,5 +252,4 @@ build/ $(build_subdirs):
 
 CLEANFILES += $(dte)
 CLEANDIRS += build/
-.PHONY: FORCE
 .SECONDARY: build/
