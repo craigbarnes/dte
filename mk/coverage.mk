@@ -44,7 +44,7 @@ public/coverage/gcovr.html: gcovr.cfg FORCE | public/coverage/
 build/coverage.xml: gcovr.cfg FORCE | build/
 	$(RM) $@ build/coverage.txt
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(GCOVR) -j$(NPROC) --config '$<' --xml-pretty --xml '$@' --txt build/coverage.txt
+	$(GCOVR) -j$(NPROC) -p --config '$<' --xml-pretty --xml '$@' --txt build/coverage.txt
 
 public/coverage/: public/
 	$(Q) mkdir -p $@
