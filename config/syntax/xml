@@ -63,15 +63,37 @@ state doctype comment
     eat this
 
 state text
-    str "<!--" comment
+    str "<!" maybe-comment-or-cdata
     char < tag-start
     char > this error
     char "&" .xml-entity:this
     eat this
 
+state maybe-comment-or-cdata comment
+    str -- '--' comment
+    str '[CDATA[' cdata-open
+    recolor error 2
+    noeat tag-start
+
 state comment
-    str -- --> text comment
+    str -- '-->' text comment
     eat this
+
+state cdata-open
+    recolor cdata-delim 9
+    noeat cdata
+
+state cdata
+    char ] cdata-maybe-close
+    eat this
+
+state cdata-maybe-close cdata
+    str ']>' cdata-close
+    noeat cdata
+
+state cdata-close
+    recolor cdata-delim 3
+    noeat text
 
 state tag-start tag
     char / close-tag
@@ -130,3 +152,5 @@ state sq string
     eat this
 
 default special entity
+default text cdata
+default constant cdata-delim
