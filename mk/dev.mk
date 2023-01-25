@@ -1,6 +1,5 @@
 # This makefile contains various targets that are only useful for
-# development purposes (e.g. linting, coverage, etc.) and is NOT
-# included in release tarballs.
+# development purposes and is NOT included in release tarballs
 
 RELEASE_VERSIONS = 1.11 1.10 1.9.1 1.9 1.8.2 1.8.1 1.8 1.7 1.6 1.5 1.4 1.3 1.2 1.1 1.0
 RELEASE_DIST = $(addprefix dte-, $(addsuffix .tar.gz, $(RELEASE_VERSIONS)))
@@ -9,12 +8,6 @@ GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
-GCOVR ?= gcovr
-LCOV ?= lcov
-LCOVFLAGS ?= --config-file mk/lcovrc
-LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '*/$(PAT)';)
-GENHTML ?= genhtml
-GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 XARGS = xargs
@@ -22,16 +15,6 @@ XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NP
 XARGS_P = $(XARGS) $(XARGS_P_FLAG)
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
-
-EXCLUDE_FROM_COVERAGE = \
-    src/lock.c \
-    src/screen*.c \
-    src/signals.c \
-    src/terminal/input.c \
-    src/terminal/ioctl.c \
-    src/terminal/mode.c \
-    src/util/debug.c \
-    test/test.c
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
@@ -111,22 +94,6 @@ show-sizes:
 	@strip build/dte-*
 	@du -h build/dte-*
 
-coverage-report: build/docs/lcov.css
-	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
-	$(call LCOV_REMOVE, build/coverage.info, $(EXCLUDE_FROM_COVERAGE))
-	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
-	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
-	  $(XARGS_P) -- gzip -9kf
-
-build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
-	$(E) CSSCAT $@
-	$(Q) cat $^ > $@
-
-build/coverage.xml: gcovr-xml.cfg | build/
-	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(GCOVR) -j$(NPROC) -s --config $< --xml-pretty --xml $@
-
 $(clang_tidy_targets): clang-tidy-%:
 	$(E) TIDY $*
 	$(Q) clang-tidy -quiet $* -- $(CSTD) $(CWARNS) -Isrc -DDEBUG=3 2>&1 | \
@@ -143,11 +110,11 @@ clang-tidy-test/config.c: build/test/data.h
 
 
 CLEANFILES += dte-*.tar.gz
-NON_PARALLEL_TARGETS += distcheck show-sizes coverage-report
+NON_PARALLEL_TARGETS += distcheck show-sizes
 DEVMK := loaded
 
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
     check-docs check-shell-scripts check-whitespace check-codespell \
     check-aux check-desktop-file check-appstream \
-    git-hooks show-sizes coverage-report clang-tidy $(clang_tidy_targets)
+    git-hooks show-sizes clang-tidy $(clang_tidy_targets)
