@@ -1062,15 +1062,15 @@ static void test_term_set_bytes(TestContext *ctx)
 
 static void test_term_set_color(TestContext *ctx)
 {
-    Terminal term = {
-        .width = 80,
-        .height = 24,
-        .color_type = TERM_TRUE_COLOR,
-        .ncv_attributes = 0,
-    };
+    Terminal term = {.color_type = TERM_8_COLOR};
+    term_init(&term, "tmux", "truecolor");
+    EXPECT_EQ(term.color_type, TERM_TRUE_COLOR);
+    EXPECT_EQ(term.ncv_attributes, 0);
 
     TermOutputBuffer *obuf = &term.obuf;
     term_output_init(obuf);
+    ASSERT_TRUE(TERM_OUTBUF_SIZE >= 64);
+    memset(obuf->buf, '?', 64);
 
     TermColor c = {
         .fg = COLOR_RED,
