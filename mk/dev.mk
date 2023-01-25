@@ -12,7 +12,7 @@ CODESPELL ?= codespell
 GCOVR ?= gcovr
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
-LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '$(PAT)';)
+LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '*/$(PAT)';)
 GENHTML ?= genhtml
 GENHTMLFLAGS ?= --config-file mk/lcovrc --title dte
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
@@ -22,6 +22,16 @@ XARGS_P_FLAG = $(call try-run, printf "1\n2" | $(XARGS) -P2 -I@ echo '@', -P$(NP
 XARGS_P = $(XARGS) $(XARGS_P_FLAG)
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
+
+EXCLUDE_FROM_COVERAGE = \
+    src/lock.c \
+    src/screen*.c \
+    src/signals.c \
+    src/terminal/input.c \
+    src/terminal/ioctl.c \
+    src/terminal/mode.c \
+    src/util/debug.c \
+    test/test.c
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
@@ -104,7 +114,7 @@ show-sizes:
 coverage-report: build/docs/lcov.css
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
 	$(LCOV) $(LCOVFLAGS) -c -b . -d build/ -o build/coverage.info
-	$(call LCOV_REMOVE, build/coverage.info, */src/util/debug.c */test/test.c)
+	$(call LCOV_REMOVE, build/coverage.info, $(EXCLUDE_FROM_COVERAGE))
 	$(GENHTML) $(GENHTMLFLAGS) -o public/coverage/ build/coverage.info
 	find public/coverage/ -type f -regex '.*\.\(css\|html\)$$' | \
 	  $(XARGS_P) -- gzip -9kf
