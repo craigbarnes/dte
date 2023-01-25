@@ -880,21 +880,21 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_TRUE(parse_key_string(&key, "C-M-S-F20"));
     EXPECT_EQ(key, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
 
-    key = 0x18;
     EXPECT_FALSE(parse_key_string(&key, "C-"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "C-M-"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "paste"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "???"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "F0"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "F21"));
-    EXPECT_EQ(key, 0x18);
     EXPECT_FALSE(parse_key_string(&key, "F01"));
-    EXPECT_EQ(key, 0x18);
+    EXPECT_FALSE(parse_key_string(&key, "\t"));
+    EXPECT_FALSE(parse_key_string(&key, "\n"));
+    EXPECT_FALSE(parse_key_string(&key, "\r"));
+    EXPECT_FALSE(parse_key_string(&key, "\x1f"));
+    EXPECT_FALSE(parse_key_string(&key, "\x7f"));
+    EXPECT_FALSE(parse_key_string(&key, "C-\t"));
+    EXPECT_FALSE(parse_key_string(&key, "C-\r"));
+    EXPECT_FALSE(parse_key_string(&key, "C-\x7f"));
 
     // Special cases for normalization:
     EXPECT_TRUE(parse_key_string(&key, "C-A"));
