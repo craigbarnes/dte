@@ -97,10 +97,13 @@ bool parse_key_string(KeyCode *key, const char *str)
     KeyCode modifiers;
     str += parse_modifiers(str, &modifiers);
     size_t len = strlen(str);
-    size_t i = 0;
-    KeyCode ch = u_get_char(str, len, &i);
+    size_t pos = 0;
+    KeyCode ch = u_get_char(str, len, &pos);
 
-    if (u_is_unicode(ch) && i == len) {
+    if (u_is_unicode(ch) && pos == len) {
+        if (unlikely(u_is_cntrl(ch))) {
+            return false;
+        }
         if (u_is_ascii_upper(ch)) {
             if (modifiers & MOD_CTRL) {
                 // Convert C-A to C-a
@@ -115,15 +118,15 @@ bool parse_key_string(KeyCode *key, const char *str)
         return true;
     }
 
-    for (size_t j = 0; j < ARRAYLEN(other_keys); j++) {
-        if (ascii_streq_icase(str, other_keys[j].name)) {
-            *key = modifiers | other_keys[j].key;
+    for (size_t i = 0; i < ARRAYLEN(other_keys); i++) {
+        if (ascii_streq_icase(str, other_keys[i].name)) {
+            *key = modifiers | other_keys[i].key;
             return true;
         }
     }
 
     static_assert(ARRAYLEN(special_names) == NR_SPECIAL_KEYS);
-    for (i = 0; i < NR_SPECIAL_KEYS; i++) {
+    for (size_t i = 0; i < NR_SPECIAL_KEYS; i++) {
         if (ascii_streq_icase(str, special_names[i])) {
             *key = modifiers | (KEY_SPECIAL_MIN + i);
             return true;
