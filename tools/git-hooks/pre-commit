@@ -4,8 +4,6 @@
 # (i.e. not including unstaged/dirty changes from the working tree)
 # and then performs a full build.
 
-# shellcheck disable=SC2064,SC2295
-
 export POSIXLY_CORRECT=1
 TMPDIR='.pre-commit-test'
 PROGNAME="$0"
@@ -53,6 +51,7 @@ $MAKE -B man
 for F in $GENERATED; do
     B=$(basename "$F")
     if ! diff "$F" "$TMPDIR/GEN/$B" >/dev/null; then
+        # shellcheck disable=SC2295
         abort "re-generate '${F##${TMPDIR}/}' before committing"
     fi
 done

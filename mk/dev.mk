@@ -24,7 +24,7 @@ check-aux: check-desktop-file check-appstream
 
 check-shell-scripts:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
-	$(Q) $(SHELLCHECK) -fgcc -eSC1091 $(call GITATTRS, shell) >&2
+	$(Q) $(SHELLCHECK) -fgcc $(call GITATTRS, shell) >&2
 
 check-whitespace:
 	$(Q) $(WSCHECK) $(call GITATTRS, space-indent) >&2
