@@ -199,6 +199,24 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "hi default blink");
     reset_completion(c);
 
+    cmdline_set_text(c, "cursor i");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor insert ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor insert bar");
+    reset_completion(c);
+
+    cmdline_set_text(c, "cursor default blo");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor default block ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor default block #22AABB");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor default block default");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "cursor default block keep");
+    reset_completion(c);
+
     cmdline_set_text(c, "show op");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "show option ");
