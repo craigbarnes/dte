@@ -185,6 +185,9 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
             size_t len = color_suffixes[i].suffix_len;
             if (strview_equal_strn(&str, suffix, len)) {
                 term->color_type = color_suffixes[i].color_type;
+                if (term->color_type == TERM_0_COLOR) {
+                    term->ncv_attributes = 0;
+                }
                 LOG_INFO("color type detected from $TERM suffix '-%s'", suffix);
                 return;
             }
