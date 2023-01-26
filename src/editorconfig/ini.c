@@ -1,8 +1,6 @@
-#include <stdlib.h>
 #include "ini.h"
 #include "util/ascii.h"
 #include "util/debug.h"
-#include "util/readfile.h"
 #include "util/str-util.h"
 
 static void strip_trailing_comments_and_whitespace(StringView *line)
