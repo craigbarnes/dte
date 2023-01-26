@@ -1186,6 +1186,39 @@ static void test_term_restore_cursor_style(TestContext *ctx)
     term_output_free(obuf);
 }
 
+static void test_term_begin_sync_update(TestContext *ctx)
+{
+    Terminal term;
+    term_init(&term, "xterm-kitty", NULL);
+    EXPECT_TRUE(term.features & TFLAG_SYNC_CSI);
+
+    static const char expected[] =
+        "\033[?2026h"
+        "\033[?1049h"
+        "\033[?25l"
+        "\033[?25h"
+        "\033[?1049l"
+        "\033[?2026l"
+    ;
+
+    TermOutputBuffer *obuf = &term.obuf;
+    term_output_init(obuf);
+    memset(obuf->buf, '.', 128);
+
+    term_begin_sync_update(&term);
+    term_use_alt_screen_buffer(&term);
+    term_hide_cursor(&term);
+    term_show_cursor(&term);
+    term_use_normal_screen_buffer(&term);
+    term_end_sync_update(&term);
+
+    EXPECT_EQ(obuf->count, sizeof(expected) - 1);
+    EXPECT_EQ(obuf->x, 0);
+    EXPECT_MEMEQ(obuf->buf, expected, sizeof(expected) - 1);
+
+    term_output_free(obuf);
+}
+
 static const TestEntry tests[] = {
     TEST(test_parse_rgb),
     TEST(test_parse_term_color),
@@ -1210,6 +1243,7 @@ static const TestEntry tests[] = {
     TEST(test_term_osc52_copy),
     TEST(test_term_set_cursor_style),
     TEST(test_term_restore_cursor_style),
+    TEST(test_term_begin_sync_update),
 };
 
 const TestGroup terminal_tests = TEST_GROUP(tests);
