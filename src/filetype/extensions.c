@@ -157,6 +157,7 @@ static const struct FileExtensionMap {
     {"roff", ROFF},
     {"rs", RUST},
     {"rst", RST},
+    {"sarif", JSON},
     {"scala", SCALA},
     {"scm", SCHEME},
     {"scss", SCSS},
