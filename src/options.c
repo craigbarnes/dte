@@ -809,6 +809,7 @@ static void sanity_check_option_value(const OptionDesc *desc, OptionValue val)
         return;
     case OPT_FLAG: {
             size_t nvals = count_enum_values(desc);
+            BUG_ON(nvals >= 32);
             unsigned int mask = (1u << nvals) - 1;
             unsigned int uint_val = val.uint_val;
             BUG_ON((uint_val & mask) != uint_val);
