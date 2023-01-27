@@ -3,6 +3,7 @@
 
 #include "terminal/color.h"
 #include "util/hashmap.h"
+#include "util/macros.h"
 #include "util/ptr-array.h"
 #include "util/string.h"
 
@@ -30,11 +31,11 @@ typedef struct {
     HashMap other;
 } ColorScheme;
 
-void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color);
-const TermColor *find_color(const ColorScheme *colors, const char *name);
-void clear_hl_colors(ColorScheme *colors);
-void collect_builtin_colors(PointerArray *a, const char *prefix);
-void string_append_hl_color(String *s, const char *name, const TermColor *color);
-String dump_hl_colors(const ColorScheme *colors);
+void set_highlight_color(ColorScheme *colors, const char *name, const TermColor *color) NONNULL_ARGS;
+const TermColor *find_color(const ColorScheme *colors, const char *name) NONNULL_ARGS;
+void clear_hl_colors(ColorScheme *colors) NONNULL_ARGS;
+void collect_builtin_colors(PointerArray *a, const char *prefix) NONNULL_ARGS;
+void string_append_hl_color(String *s, const char *name, const TermColor *color) NONNULL_ARGS;
+String dump_hl_colors(const ColorScheme *colors) NONNULL_ARGS;
 
 #endif

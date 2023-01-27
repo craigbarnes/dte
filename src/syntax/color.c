@@ -5,7 +5,6 @@
 #include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
-#include "util/macros.h"
 #include "util/xmalloc.h"
 
 static const char builtin_color_names[NR_BC][16] = {

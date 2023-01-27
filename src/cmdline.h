@@ -35,8 +35,8 @@ typedef struct {
 extern const CommandSet cmd_mode_commands;
 extern const CommandSet search_mode_commands;
 
-void cmdline_set_text(CommandLine *c, const char *text);
-void cmdline_clear(CommandLine *c);
-void cmdline_free(CommandLine *c);
+void cmdline_set_text(CommandLine *c, const char *text) NONNULL_ARGS;
+void cmdline_clear(CommandLine *c) NONNULL_ARGS;
+void cmdline_free(CommandLine *c) NONNULL_ARGS;
 
 #endif

@@ -252,6 +252,7 @@ static bool cmd_history_prev(EditorState *e, const CommandArgs *a)
     }
 
     if (history_search_forward(hist, &c->search_pos, c->search_text)) {
+        BUG_ON(!c->search_pos);
         set_text(c, c->search_pos->text);
     }
 
@@ -273,6 +274,7 @@ static bool cmd_history_next(EditorState *e, const CommandArgs *a)
     }
 
     if (history_search_backward(hist, &c->search_pos, c->search_text)) {
+        BUG_ON(!c->search_pos);
         set_text(c, c->search_pos->text);
     } else {
         set_text(c, c->search_text);

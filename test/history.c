@@ -114,9 +114,13 @@ static void test_history_search(TestContext *ctx)
     history_load(&h, xstrdup(filename));
     EXPECT_EQ(h.entries.count, 3);
     EXPECT_STREQ(h.filename, filename);
+    ASSERT_NONNULL(h.first);
     EXPECT_STREQ(h.first->text, "one");
+    ASSERT_NONNULL(h.last);
     EXPECT_STREQ(h.last->text, "three");
+    ASSERT_NONNULL(h.first->next);
     EXPECT_STREQ(h.first->next->text, "two");
+    ASSERT_NONNULL(h.last->prev);
     EXPECT_STREQ(h.last->prev->text, "two");
     EXPECT_NULL(h.first->prev);
     EXPECT_NULL(h.last->next);
