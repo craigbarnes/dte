@@ -2,6 +2,7 @@
 # development purposes and is NOT included in release tarballs
 
 GCOVR ?= gcovr
+GCOVRFLAGS ?= -j$(NPROC) --config gcovr.cfg --sort-percentage
 LCOV ?= lcov
 LCOVFLAGS ?= --config-file mk/lcovrc
 LCOV_REMOVE = $(foreach PAT, $(2), $(LCOV) -r $(1) -o $(1) '*/$(PAT)';)
@@ -35,16 +36,16 @@ build/docs/lcov.css: docs/lcov-orig.css docs/lcov-extra.css | build/docs/
 	$(E) CSSCAT $@
 	$(Q) cat $^ > $@
 
-public/coverage/gcovr.html: gcovr.cfg FORCE | public/coverage/
+public/coverage/gcovr.html: FORCE | public/coverage/
 	$(RM) public/coverage/gcovr*
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(GCOVR) -j$(NPROC) -sp --config '$<' --html-details '$@'
+	$(GCOVR) $(GCOVRFLAGS) -s --html-details '$@'
 	$(call GZIP_ALL_HTML_CSS, '$|')
 
-build/coverage.xml: gcovr.cfg FORCE | build/
+build/coverage.xml: FORCE | build/
 	$(RM) $@ build/coverage.txt
 	$(MAKE) -j$(NPROC) check CFLAGS='-Og -g -pipe --coverage -fno-inline' DEBUG=3 USE_SANITIZER=
-	$(GCOVR) -j$(NPROC) -p --config '$<' --xml-pretty --xml '$@' --txt build/coverage.txt
+	$(GCOVR) $(GCOVRFLAGS) --xml-pretty --xml '$@' --txt build/coverage.txt
 
 public/coverage/: public/
 	$(Q) mkdir -p $@
