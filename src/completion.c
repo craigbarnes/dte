@@ -227,7 +227,7 @@ void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix
         const char *var = environ[i];
         if (str_has_prefix(var, prefix)) {
             const char *delim = strchr(var, '=');
-            if (likely(delim)) {
+            if (likely(delim && delim != var)) {
                 ptr_array_append(a, xstrcut(var, delim - var));
             }
         }

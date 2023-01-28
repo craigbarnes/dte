@@ -208,6 +208,28 @@ static String dump_env(EditorState* UNUSED_ARG(e))
     return buf;
 }
 
+static String dump_setenv(EditorState* UNUSED_ARG(e))
+{
+    String buf = string_new(4096);
+    for (size_t i = 0; environ[i]; i++) {
+        const char *str = environ[i];
+        const char *delim = strchr(str, '=');
+        if (unlikely(!delim || delim == str)) {
+            continue;
+        }
+        string_append_literal(&buf, "setenv ");
+        if (unlikely(str[0] == '-' || delim[1] == '-')) {
+            string_append_literal(&buf, "-- ");
+        }
+        const StringView name = string_view(str, delim - str);
+        string_append_escaped_arg_sv(&buf, name, true);
+        string_append_byte(&buf, ' ');
+        string_append_escaped_arg(&buf, delim + 1, true);
+        string_append_byte(&buf, '\n');
+    }
+    return buf;
+}
+
 static bool show_builtin(EditorState *e, const char *name, bool cflag)
 {
     const BuiltinConfig *cfg = get_builtin_config(name);
@@ -484,6 +506,7 @@ static const ShowHandler show_handlers[] = {
     {"option", DTERC, dump_options_and_fileopts, show_option, collect_all_options},
     {"search", LASTLINE, dump_search_history, NULL, NULL},
     {"set", DTERC, do_dump_options, show_option, collect_all_options},
+    {"setenv", DTERC, dump_setenv, show_env, collect_env},
     {"wsplit", 0, dump_frames, show_wsplit, NULL},
 };
 
