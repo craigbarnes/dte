@@ -44,7 +44,7 @@ Installing
 | DragonFly BSD ([DPorts])  | `pkg install dte`                          |
 | [OpenBSD]                 | `pkg_add dte`                              |
 | NetBSD ([pkgsrc])         | `pkg_add dte`                              |
-| OS X ([Homebrew])         | `brew tap yumitsu/dte && brew install dte` |
+| macOS ([Homebrew])        | `brew tap yumitsu/dte && brew install dte` |
 | Android ([Termux])        | `pkg install dte`                          |
 
 Building
@@ -66,6 +66,15 @@ installed:
 ...and compile and install:
 
     make && sudo make install
+
+------
+
+**Note to macOS users:** macOS still ships with GNU Make 3.81, so
+you'll likely have to install a more recent version with [`brew`]
+and then use `gmake` in place of `make`. For example:
+
+    brew install make
+    gmake && sudo gmake install
 
 Documentation
 -------------
@@ -147,6 +156,7 @@ Public License version 2 for more details.
 [OpenBSD]: https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/editors/dte/
 [pkgsrc]: https://pkgsrc.se/editors/dte
 [Homebrew]: https://github.com/yumitsu/homebrew-dte
+[`brew`]: https://brew.sh/
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/dte
 [issue reports]: https://gitlab.com/craigbarnes/dte/-/issues
 [merge requests]: https://gitlab.com/craigbarnes/dte/-/merge_requests
