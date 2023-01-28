@@ -7,6 +7,16 @@
 #include <unistd.h>
 #include "macros.h"
 
+/*
+ * "The arg values to F_GETFD, F_SETFD, F_GETFL, and F_SETFL all
+ * represent flag values to allow for future growth. Applications
+ * using these functions should do a read-modify-write operation on
+ * them, rather than assuming that only the values defined by this
+ * volume of POSIX.1-2017 are valid. It is a common error to forget
+ * this, particularly in the case of F_SETFD.
+ *
+ * https://pubs.opengroup.org/onlinepubs/9699919799/functions/fcntl.html#tag_16_122_07
+ */
 WARN_UNUSED_RESULT
 static inline bool fd_set_flag(int fd, int flag, int get_cmd, int set_cmd, bool state)
 {
