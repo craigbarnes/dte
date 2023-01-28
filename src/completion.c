@@ -219,6 +219,10 @@ void collect_builtin_includes(EditorState* UNUSED_ARG(e), PointerArray *a, const
 
 void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
+    if (strchr(prefix, '=')) {
+        return;
+    }
+
     for (size_t i = 0; environ[i]; i++) {
         const char *var = environ[i];
         if (str_has_prefix(var, prefix)) {
