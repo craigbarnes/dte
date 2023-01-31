@@ -111,7 +111,6 @@ ArgParseError do_parse_args(const Command *cmd, CommandArgs *a)
 
 static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgParseError err)
 {
-    // GCOV_EXCL_START
     switch (err) {
     case ARGERR_INVALID_OPTION:
         return error_msg("Invalid option -%c", a->flags[0]);
@@ -143,7 +142,6 @@ static bool arg_parse_error_msg(const Command *cmd, const CommandArgs *a, ArgPar
 
     BUG("unhandled error type");
     return false;
-    // GCOV_EXCL_STOP
 }
 
 bool parse_args(const Command *cmd, CommandArgs *a)

@@ -364,6 +364,46 @@ static void test_parse_args(TestContext *ctx)
     EXPECT_EQ(do_parse_args(cmd, &a), ARGERR_OPTION_ARGUMENT_NOT_SEPARATE);
     EXPECT_EQ(a.flags[0], 'e');
     ptr_array_free(&array);
+
+    static const struct {
+        const char *cmd_str;
+        char expected_flag0;
+    } invalid[] = {
+        {"open -7", '7'}, // ARGERR_INVALID_OPTION
+        {"exec -oopen ls", 'o'}, // ARGERR_OPTION_ARGUMENT_NOT_SEPARATE
+        {"exec -e", 'e'}, // ARGERR_OPTION_ARGUMENT_MISSING
+        {"quit -ffffffffffffffff", '\0'}, // ARGERR_TOO_MANY_OPTIONS
+        {"exec", '\0'}, // ARGERR_TOO_FEW_ARGUMENTS
+        {"up 1 2 3", '\0'}, // ARGERR_TOO_MANY_ARGUMENTS
+    };
+
+    FOR_EACH_I(i, invalid) {
+        cmd_str = invalid[i].cmd_str;
+        ASSERT_EQ(parse_commands(&runner, &array, cmd_str), CMDERR_NONE);
+        ASSERT_NONNULL(array.ptrs);
+        ASSERT_NONNULL(array.ptrs[0]);
+        cmd = cmds->lookup(array.ptrs[0]);
+        ASSERT_NONNULL(cmd);
+        a = cmdargs_new((char**)array.ptrs + 1);
+        EXPECT_FALSE(parse_args(cmd, &a));
+        char f0 = invalid[i].expected_flag0;
+        if (f0 != '\0') {
+            IEXPECT_EQ(a.flags[0], f0);
+        }
+        ptr_array_free(&array);
+    }
+
+    // ARGERR_NONE
+    ASSERT_EQ(parse_commands(&runner, &array, "close -f"), CMDERR_NONE);
+    ASSERT_NONNULL(array.ptrs);
+    ASSERT_NONNULL(array.ptrs[0]);
+    cmd = cmds->lookup(array.ptrs[0]);
+    ASSERT_NONNULL(cmd);
+    a = cmdargs_new((char**)array.ptrs + 1);
+    EXPECT_TRUE(parse_args(cmd, &a));
+    EXPECT_EQ(a.nr_flags, 1);
+    EXPECT_TRUE(cmdargs_has_flag(&a, 'f'));
+    ptr_array_free(&array);
 }
 
 static void test_cached_command_new(TestContext *ctx)
