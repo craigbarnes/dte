@@ -1,10 +1,10 @@
 #include <string.h>
 #include "serialize.h"
 #include "util/ascii.h"
+#include "util/numtostr.h"
 
 void string_append_escaped_arg_sv(String *s, StringView arg, bool escape_tilde)
 {
-    static const char hexmap[16] = "0123456789ABCDEF";
     static const char escmap[] = {
         [0x07] = 'a', [0x08] = 'b',
         [0x09] = 't', [0x0A] = 'n',
@@ -65,8 +65,8 @@ dquote:
             ch = escmap[ch];
         } else if (unlikely(ascii_iscntrl(ch))) {
             string_append_literal(s, "\\x");
-            string_append_byte(s, hexmap[(ch >> 4) & 15]);
-            ch = hexmap[ch & 15];
+            string_append_byte(s, hextab_upper[(ch >> 4) & 15]);
+            ch = hextab_upper[ch & 15];
         }
         string_append_byte(s, ch);
     }

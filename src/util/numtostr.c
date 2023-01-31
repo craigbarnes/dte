@@ -1,7 +1,8 @@
 #include <sys/stat.h>
 #include "numtostr.h"
 
-const char hex_encode_table[16] = "0123456789abcdef";
+const char hextab_lower[16] = "0123456789abcdef";
+const char hextab_upper[16] = "0123456789ABCDEF";
 
 static size_t umax_count_base10_digits(uintmax_t x)
 {

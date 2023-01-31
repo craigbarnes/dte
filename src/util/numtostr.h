@@ -6,13 +6,14 @@
 #include <sys/types.h>
 #include "macros.h"
 
-extern const char hex_encode_table[16];
+extern const char hextab_lower[16];
+extern const char hextab_upper[16];
 
 // Encodes a byte of data as 2 hexadecimal digits
 static inline char *hex_encode_byte(char *out, uint8_t byte)
 {
-    out[0] = hex_encode_table[byte >> 4];
-    out[1] = hex_encode_table[byte & 0xF];
+    out[0] = hextab_lower[byte >> 4];
+    out[1] = hextab_lower[byte & 0xF];
     return out;
 }
 
@@ -22,7 +23,7 @@ static inline char *hex_encode_u24_fixed(char *out, uint32_t x)
     UNROLL_LOOP(6)
     for (size_t i = 0, n = 6; i < n; i++) {
         unsigned int shift = (n - i - 1) * 4;
-        out[i] = hex_encode_table[(x >> shift) & 0xF];
+        out[i] = hextab_lower[(x >> shift) & 0xF];
     }
     return out;
 }
