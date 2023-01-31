@@ -1,5 +1,6 @@
 #include <sys/stat.h>
 #include "numtostr.h"
+#include "debug.h"
 
 const char hextab_lower[16] = "0123456789abcdef";
 const char hextab_upper[16] = "0123456789ABCDEF";
@@ -9,6 +10,16 @@ static size_t umax_count_base10_digits(uintmax_t x)
     size_t digits = 0;
     do {
         x /= 10;
+        digits++;
+    } while (x);
+    return digits;
+}
+
+static size_t umax_count_base16_digits(uintmax_t x)
+{
+    size_t digits = 0;
+    do {
+        x >>= 4;
         digits++;
     } while (x);
     return digits;
@@ -28,6 +39,20 @@ size_t buf_umax_to_str(uintmax_t x, char *buf)
         buf[i--] = '0' + digit;
         x -= digit;
     } while (x /= 10);
+    return ndigits;
+}
+
+size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits)
+{
+    const size_t ndigits = MAX(min_digits, umax_count_base16_digits(x));
+    BUG_ON(ndigits < 1);
+    size_t i = ndigits;
+    buf[i--] = '\0';
+    do {
+        unsigned int nibble = x & 0xF;
+        buf[i] = hextab_upper[nibble];
+        x >>= 4;
+    } while (i--);
     return ndigits;
 }
 

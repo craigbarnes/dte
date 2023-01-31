@@ -943,6 +943,36 @@ static void test_str_to_filepos(TestContext *ctx)
     EXPECT_FALSE(str_to_filepos("44,9x", &line, &col));
 }
 
+static void test_buf_umax_to_hex_str(TestContext *ctx)
+{
+    char buf[HEX_STR_MAX(uintmax_t)];
+    memset(buf, '@', sizeof(buf));
+
+    size_t ndigits = buf_umax_to_hex_str(0x98EA412F0ull, buf, 0);
+    EXPECT_EQ(ndigits, 9);
+    EXPECT_STREQ(buf, "98EA412F0");
+
+    ndigits = buf_umax_to_hex_str(0xE, buf, 0);
+    EXPECT_EQ(ndigits, 1);
+    EXPECT_STREQ(buf, "E");
+
+    ndigits = buf_umax_to_hex_str(0xF, buf, 4);
+    EXPECT_EQ(ndigits, 4);
+    EXPECT_STREQ(buf, "000F");
+
+    ndigits = buf_umax_to_hex_str(0, buf, 10);
+    EXPECT_EQ(ndigits, 10);
+    EXPECT_STREQ(buf, "0000000000");
+
+    ndigits = buf_umax_to_hex_str(0xEF1300, buf, 8);
+    EXPECT_EQ(ndigits, 8);
+    EXPECT_STREQ(buf, "00EF1300");
+
+    ndigits = buf_umax_to_hex_str(0x1000, buf, 3);
+    EXPECT_EQ(ndigits, 4);
+    EXPECT_STREQ(buf, "1000");
+}
+
 static void test_umax_to_str(TestContext *ctx)
 {
     EXPECT_STREQ(umax_to_str(0), "0");
@@ -2522,6 +2552,7 @@ static const TestEntry tests[] = {
     TEST(test_str_to_int),
     TEST(test_str_to_size),
     TEST(test_str_to_filepos),
+    TEST(test_buf_umax_to_hex_str),
     TEST(test_umax_to_str),
     TEST(test_uint_to_str),
     TEST(test_ulong_to_str),

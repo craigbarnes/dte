@@ -29,6 +29,7 @@ static inline char *hex_encode_u24_fixed(char *out, uint32_t x)
 }
 
 size_t buf_umax_to_str(uintmax_t x, char *buf) NONNULL_ARGS;
+size_t buf_umax_to_hex_str(uintmax_t x, char *buf, size_t min_digits) NONNULL_ARGS;
 size_t buf_uint_to_str(unsigned int x, char *buf) NONNULL_ARGS;
 const char *umax_to_str(uintmax_t x) RETURNS_NONNULL;
 const char *uint_to_str(unsigned int x) RETURNS_NONNULL;
