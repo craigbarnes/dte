@@ -323,7 +323,11 @@ void sf_format (
                 break;
             }
             if (u_is_unicode(u)) {
-                add_status_format(&f, "U+%04X", u);
+                char str[STRLEN("U+10FFFF") + 1];
+                str[0] = 'U';
+                str[1] = '+';
+                size_t ndigits = buf_umax_to_hex_str(u, str + 2, 4);
+                add_status_bytes(&f, str, 2 + ndigits);
             } else {
                 add_status_literal(&f, "Invalid");
             }

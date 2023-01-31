@@ -3,8 +3,8 @@
 #include "util/array.h"
 #include "util/ascii.h"
 #include "util/debug.h"
+#include "util/numtostr.h"
 #include "util/utf8.h"
-#include "util/xsnprintf.h"
 
 // Note: these strings must be kept in sync with the enum in key.h
 static const char special_names[][8] = {
@@ -174,7 +174,10 @@ size_t keycode_to_string(KeyCode k, char *buf)
         goto copy;
     }
 
-    return xsnprintf(buf, KEYCODE_STR_MAX, "INVALID (0x%08X)", (unsigned int)k);
+    static const char prefix[] = "INVALID; 0x";
+    const size_t plen = sizeof(prefix) - 1;
+    memcpy(buf, prefix, plen);
+    return plen + buf_umax_to_hex_str(k, buf + plen, 8);
 
 copy:
     BUG_ON(name[0] == '\0');

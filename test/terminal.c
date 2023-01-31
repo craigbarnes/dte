@@ -868,9 +868,9 @@ static void test_keycode_to_string(TestContext *ctx)
         {"C-A", MOD_CTRL | 'A'},
         {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
         {"M-S-A", MOD_META | MOD_SHIFT | 'A'},
-        {"INVALID (0x08000000)", KEY_DETECTED_PASTE},
-        {"INVALID (0x08000001)", KEY_BRACKETED_PASTE},
-        {"INVALID (0xFFFFFFFF)", UINT32_MAX},
+        {"INVALID; 0x08000000", KEY_DETECTED_PASTE},
+        {"INVALID; 0x08000001", KEY_BRACKETED_PASTE},
+        {"INVALID; 0xFFFFFFFF", UINT32_MAX},
     };
 
     FOR_EACH_I(i, xtests) {
