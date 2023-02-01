@@ -724,10 +724,10 @@ static bool cmd_hi(EditorState *e, const CommandArgs *a)
     TermColor color;
     ssize_t n = parse_term_color(&color, strs, strs_len);
     if (unlikely(n != strs_len)) {
-        BUG_ON(n > strs_len);
         if (n < 0) {
             return error_msg("too many colors");
         }
+        BUG_ON(n > strs_len);
         return error_msg("invalid color or attribute: '%s'", strs[n]);
     }
 
