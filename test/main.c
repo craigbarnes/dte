@@ -20,6 +20,7 @@ extern const TestGroup ctags_tests;
 extern const TestGroup dump_tests;
 extern const TestGroup editorconfig_tests;
 extern const TestGroup encoding_tests;
+extern const TestGroup error_tests;
 extern const TestGroup filetype_tests;
 extern const TestGroup frame_tests;
 extern const TestGroup history_tests;
@@ -205,6 +206,7 @@ int main(void)
     run_tests(&ctx, &bookmark_tests);
     run_tests(&ctx, &syntax_tests);
     run_tests(&ctx, &dump_tests);
+    run_tests(&ctx, &error_tests);
     run_tests(&ctx, &deinit_tests);
 
     fprintf(stderr, "\n   TOTAL  %u passed, %u failed\n\n", ctx.passed, ctx.failed);
