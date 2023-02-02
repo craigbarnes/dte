@@ -7,11 +7,11 @@ Installation targets
 Running `make install` is equivalent to running the following `make`
 targets:
 
-1. `install-bin`: Install `dte` binary
-2. `install-man`: Install man pages
-3. `install-bash-completion`: Install bash auto-completion script
-4. `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
-5. `install-appstream`: Install [AppStream] metadata (excluded on macOS)
+* `install-bin`: Install `dte` binary
+* `install-man`: Install man pages
+* `install-bash-completion`: Install bash auto-completion script
+* `install-desktop-file`: Install [desktop entry] file (excluded on macOS)
+* `install-appstream`: Install [AppStream] metadata (excluded on macOS)
 
 For more information about available `make` targets, run `make help`.
 
