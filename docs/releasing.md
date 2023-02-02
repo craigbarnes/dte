@@ -3,7 +3,7 @@ dte Release Checklist
 
 1. Create release commit
    1. Update summary of changes in `CHANGELOG.md`
-   2. Add link to release tarball in `CHANGELOG.md`
+   2. Add link to release tarball and GPG signature in `CHANGELOG.md`
    3. Update tarball name in `README.md`
    4. Hard code `VERSION` variable in `mk/build.mk` to release version
    5. Update `RELEASE_VERSIONS` in `mk/dev.mk`
@@ -21,9 +21,8 @@ dte Release Checklist
    6. Push tag to remotes
 
 3. Create post-release commit
-   1. Add link to GPG signature in `CHANGELOG.md`
-   2. Reset `VERSION` and `CFLAGS`
-   3. `git commit -m 'Post-release updates'`
+   1. Reset `VERSION` and `CFLAGS`
+   2. `git commit -m 'Post-release updates'`
 
 4. Update "portable builds" in `CHANGELOG.md`
 
