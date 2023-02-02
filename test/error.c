@@ -74,6 +74,7 @@ static void test_normal_command_errors(TestContext *ctx)
         ASSERT_NONNULL(substr);
         ASSERT_TRUE(substr[0] != '\0');
         ASSERT_TRUE(substr[1] != '\0');
+        ASSERT_TRUE(!ascii_isupper(substr[0]));
 
         clear_error();
         EXPECT_FALSE(handle_normal_command(e, cmd, false));
@@ -84,11 +85,15 @@ static void test_normal_command_errors(TestContext *ctx)
 
         // Check for substring in error message (ignoring capitalization)
         const char *found = strstr(msg, substr + 1);
-        if (unlikely(!found || found == msg)) {
-            TEST_FAIL("substring '%s' not found in message '%s'", substr, msg);
-            continue;
+        if (likely(found && found != msg)) {
+            ctx->passed++;
+            EXPECT_EQ(ascii_tolower(found[-1]), substr[0]);
+        } else {
+            TEST_FAIL (
+                "Test #%zu: substring \"%s\" not found in message \"%s\"",
+                i + 1, substr, msg
+            );
         }
-        EXPECT_EQ(ascii_tolower(found[-1]), substr[0]);
     }
 
     window_close_current_view(e->window);
