@@ -46,16 +46,15 @@ check-docs:
 	@echo '$(DOCFILES) ' | tr ' ' '\n'
 	$(Q) $(FINDLINKS) $(DOCFILES) | sort | uniq | $(XARGS_P) -I@1 $(CHECKURL)
 
-distcheck: TARDIR = build/dte-$(DISTVER)/
-distcheck: build/dte-$(DISTVER).tar.gz | build/
-	$(E) EXTRACT $(TARDIR)
-	$(Q) cd $(<D) && tar -xzf $(<F)
-	$(E) MAKE $(TARDIR)
-	$(Q) $(MAKE) -B -C$(TARDIR) check installcheck prefix=/usr DESTDIR=pkg
-	$(E) RM $(TARDIR)
-	$(Q) $(RM) -r '$(TARDIR)'
-	$(E) RM $<
-	$(Q) $(RM) '$<'
+distcheck: private TARDIR = build/dte-$(DISTVER)/
+distcheck: private DIST = dte-$(DISTVER).tar.gz
+distcheck: dist | build/
+	cp -f $(DIST) build/
+	cd build/ && tar -xzf $(DIST)
+	$(MAKE) -C$(TARDIR) -B check
+	$(MAKE) -C$(TARDIR) installcheck prefix=/usr DESTDIR=pkg
+	$(RM) -r '$(TARDIR)'
+	$(RM) 'build/$(DIST)'
 
 $(RELEASE_DIST): dte-%.tar.gz:
 	$(E) ARCHIVE $@
@@ -68,10 +67,6 @@ dte-v%.tar.gz:
 dte-%.tar.gz:
 	$(E) ARCHIVE $@
 	$(Q) git archive --prefix='dte-$*/' -o '$@' '$*'
-
-build/dte-%.tar.gz: dte-%.tar.gz | build/
-	$(E) CP $@
-	$(Q) cp $< $@
 
 $(GIT_HOOKS): .git/hooks/%: tools/git-hooks/%
 	$(E) CP $@
