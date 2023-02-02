@@ -14,7 +14,7 @@ dte Release Checklist
 
 2. Tag and upload
    1. `git tag -s -m "Release v${VER}" v${VER} ${COMMIT}`
-   2. `make dist`
+   2. `make distcheck`
    3. Copy generated tarball to `public/dist/dte/` in [releases repo]
    4. Run `make generate` in [releases repo]
    5. Commit tarball and generated signature/checksums to [releases repo]
