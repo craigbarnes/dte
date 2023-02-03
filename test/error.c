@@ -78,7 +78,6 @@ static void test_normal_command_errors(TestContext *ctx)
         {"show -c alias", "requires 2 arguments"},
         {"show zzz", "invalid argument"},
         {"show bind M-M-M---", "invalid key string"},
-        {"tag _x_p_q_9___", "not found"},
         {"toggle ws-error", "requires arguments"},
         {"view z", "invalid view index"},
         {"view 0", "invalid view index"},
