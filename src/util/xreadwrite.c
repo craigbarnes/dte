@@ -36,7 +36,7 @@ ssize_t xread_all(int fd, void *buf, size_t count)
             break;
         }
         pos += rc;
-    } while (count - pos > 0);
+    } while (pos < count);
     return pos;
 }
 
