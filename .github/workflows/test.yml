@@ -13,10 +13,18 @@ jobs:
             - run: gmake check V=1 DEBUG=3 WERROR=1
 
     linux:
+        permissions:
+            actions: read
+            contents: read
+            security-events: write
         strategy:
+            fail-fast: false
             matrix:
                 os: [ubuntu-22.04, ubuntu-20.04]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v3
+            - uses: github/codeql-action/init@v2
+              with: {languages: cpp, queries: +security-and-quality}
             - run: make check V=1 DEBUG=3 WERROR=1
+            - uses: github/codeql-action/analyze@v2
