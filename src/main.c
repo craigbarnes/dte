@@ -449,10 +449,7 @@ loop_break:;
 
     for (size_t i = optind, line = 0, col = 0; i < argc; i++) {
         const char *str = argv[i];
-        if (str[0] == '+' && ascii_isdigit(str[1]) && line == 0) {
-            if (!str_to_filepos(str + 1, &line, &col)) {
-                error_msg("Invalid file position: '%s'", str);
-            }
+        if (line == 0 && *str == '+' && str_to_filepos(str + 1, &line, &col)) {
             continue;
         }
         View *view = window_open_buffer(window, str, false, NULL);
