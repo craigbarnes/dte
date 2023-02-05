@@ -268,14 +268,9 @@ static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
     HashMap *map = &sp->current_syntax->default_colors;
     for (size_t i = 1, n = a->nr_args; i < n; i++) {
         const char *name = a->args[i];
-        void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
+        const void *oldval = hashmap_insert_or_replace(map, xstrdup(name), (char*)value);
         if (unlikely(oldval)) {
-            LOG_WARNING (
-                "duplicate 'default' argument in %s:%u: '%s'",
-                current_config.file,
-                current_config.line,
-                name
-            );
+            error_msg("'%s' argument specified multiple times", name);
         }
     }
 
