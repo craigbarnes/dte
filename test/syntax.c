@@ -104,7 +104,7 @@ static void test_hl_line(TestContext *ctx)
 
     StringView line;
     fetch_this_line(&view->cursor, &line);
-    ASSERT_EQ(line.length, 56);
+    ASSERT_EQ(line.length, 65);
 
     bool next_changed;
     const TermColor **hl = hl_line(buffer, colors, &line, line_nr, &next_changed);
@@ -116,17 +116,26 @@ static void test_hl_line(TestContext *ctx)
     const TermColor *s = find_color(colors, "string");
     const TermColor *x = find_color(colors, "special");
     const TermColor *n = find_color(colors, "numeric");
+    const TermColor *y = find_color(colors, "type");
     ASSERT_NONNULL(t);
     ASSERT_NONNULL(c);
     ASSERT_NONNULL(s);
     ASSERT_NONNULL(x);
     ASSERT_NONNULL(n);
+    ASSERT_NONNULL(y);
+    EXPECT_EQ(t->fg, COLOR_DEFAULT);
+    EXPECT_EQ(c->fg, COLOR_CYAN);
+    EXPECT_EQ(s->fg, COLOR_YELLOW);
+    EXPECT_EQ(x->fg, COLOR_MAGENTA);
+    EXPECT_EQ(n->fg, COLOR_BLUE);
+    EXPECT_EQ(y->fg, COLOR_GREEN);
 
     const TermColor *const expected_colors[] = {
         t, t, t, t, t, t, t, t, t, t, t, t, c, c, c, c,
         c, c, t, t, s, s, s, s, s, s, s, s, s, s, s, s,
-        s, s, s, x, x, s, t, t, s, s, s, s, s, t, t, x,
-        x, x, t, t, n, n, t, t
+        s, s, s, s, x, x, s, t, t, s, s, s, s, s, t, t,
+        x, x, x, t, t, t, y, y, y, y, y, y, t, n, n, t,
+        t
     };
 
     size_t i = 0;
