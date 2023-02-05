@@ -30,25 +30,17 @@ typedef struct {
     unsigned int saved_nr_errors; // Used to check if nr_errors changed
 } SyntaxParser;
 
-static bool no_syntax(const SyntaxParser *sp)
+static bool in_syntax(const SyntaxParser *sp)
 {
-    if (likely(sp->current_syntax)) {
-        return false;
-    }
-    error_msg("No syntax started");
-    return true;
+    return likely(sp->current_syntax) || error_msg("No syntax started");
 }
 
-static bool no_state(const SyntaxParser *sp)
+static bool in_state(const SyntaxParser *sp)
 {
-    if (unlikely(no_syntax(sp))) {
-        return true;
-    }
-    if (likely(sp->current_state)) {
+    if (unlikely(!in_syntax(sp))) {
         return false;
     }
-    error_msg("No state started");
-    return true;
+    return likely(sp->current_state) || error_msg("No state started");
 }
 
 static void close_state(SyntaxParser *sp)
@@ -102,13 +94,10 @@ static State *reference_state(SyntaxParser *sp, const char *name)
     return state;
 }
 
-static bool not_subsyntax(const SyntaxParser *sp)
+static bool in_subsyntax(const SyntaxParser *sp)
 {
-    if (likely(is_subsyntax(sp->current_syntax))) {
-        return false;
-    }
-    error_msg("Destination state 'END' only allowed in a subsyntax");
-    return true;
+    bool ss = likely(is_subsyntax(sp->current_syntax));
+    return ss || error_msg("Destination state 'END' only allowed in a subsyntax");
 }
 
 static Syntax *must_find_subsyntax(SyntaxParser *sp, const char *name)
@@ -137,7 +126,7 @@ static bool subsyntax_call(SyntaxParser *sp, const char *name, const char *ret, 
     };
 
     if (streq(ret, "END")) {
-        if (not_subsyntax(sp)) {
+        if (!in_subsyntax(sp)) {
             return false;
         }
     } else if (subsyn) {
@@ -164,7 +153,7 @@ static bool destination_state(SyntaxParser *sp, const char *name, State **dest)
     }
 
     if (streq(name, "END")) {
-        if (not_subsyntax(sp)) {
+        if (!in_subsyntax(sp)) {
             return false;
         }
         *dest = NULL;
@@ -182,7 +171,7 @@ static Condition *add_condition (
     const char *emit
 ) {
     BUG_ON(!dest && cond_type_has_destination(type));
-    if (no_state(sp)) {
+    if (!in_state(sp)) {
         return NULL;
     }
 
@@ -260,7 +249,7 @@ static bool cmd_char(SyntaxParser *sp, const CommandArgs *a)
 static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
-    if (no_syntax(sp)) {
+    if (!in_syntax(sp)) {
         return false;
     }
 
@@ -279,7 +268,7 @@ static bool cmd_default(SyntaxParser *sp, const CommandArgs *a)
 
 static bool cmd_eat(SyntaxParser *sp, const CommandArgs *a)
 {
-    if (no_state(sp)) {
+    if (!in_state(sp)) {
         return false;
     }
 
@@ -297,7 +286,7 @@ static bool cmd_eat(SyntaxParser *sp, const CommandArgs *a)
 
 static bool cmd_heredocbegin(SyntaxParser *sp, const CommandArgs *a)
 {
-    if (no_state(sp)) {
+    if (!in_state(sp)) {
         return false;
     }
 
@@ -350,7 +339,7 @@ static bool cmd_include(SyntaxParser *sp, const CommandArgs *a)
 static bool cmd_list(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
-    if (no_syntax(sp)) {
+    if (!in_syntax(sp)) {
         return false;
     }
 
@@ -400,7 +389,7 @@ static bool cmd_inlist(SyntaxParser *sp, const CommandArgs *a)
 static bool cmd_noeat(SyntaxParser *sp, const CommandArgs *a)
 {
     State *dest;
-    if (unlikely(no_state(sp) || !destination_state(sp, a->args[0], &dest))) {
+    if (unlikely(!in_state(sp) || !destination_state(sp, a->args[0], &dest))) {
         return false;
     }
 
@@ -489,7 +478,7 @@ static bool cmd_require(SyntaxParser *sp, const CommandArgs *a)
 static bool cmd_state(SyntaxParser *sp, const CommandArgs *a)
 {
     close_state(sp);
-    if (no_syntax(sp)) {
+    if (!in_syntax(sp)) {
         return false;
     }
 
