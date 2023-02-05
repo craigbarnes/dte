@@ -126,14 +126,10 @@ char *string_steal_cstring(String *s)
 
 char *string_clone_cstring(const String *s)
 {
-    const size_t len = s->len;
+    size_t len = s->len;
     char *b = xmalloc(len + 1);
-    if (len > 0) {
-        BUG_ON(!s->buffer);
-        memcpy(b, s->buffer, len);
-    }
     b[len] = '\0';
-    return b;
+    return likely(len) ? memcpy(b, s->buffer, len) : b;
 }
 
 /*
