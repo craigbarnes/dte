@@ -928,6 +928,8 @@ static void test_str_to_filepos(TestContext *ctx)
     EXPECT_EQ(line, 5);
     EXPECT_EQ(col, 1);
 
+    line = 1111;
+    col = 2222;
     EXPECT_FALSE(str_to_filepos("0", &line, &col));
     EXPECT_FALSE(str_to_filepos("1,0", &line, &col));
     EXPECT_FALSE(str_to_filepos("0,1", &line, &col));
@@ -941,6 +943,8 @@ static void test_str_to_filepos(TestContext *ctx)
     EXPECT_FALSE(str_to_filepos("", &line, &col));
     EXPECT_FALSE(str_to_filepos("\t", &line, &col));
     EXPECT_FALSE(str_to_filepos("44,9x", &line, &col));
+    EXPECT_EQ(line, 1111);
+    EXPECT_EQ(col, 2222);
 }
 
 static void test_buf_umax_to_hex_str(TestContext *ctx)
