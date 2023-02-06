@@ -27,11 +27,23 @@ dte Release Checklist
    2. `git commit -m 'Post-release updates'`
 
 4. Create [GitLab release] and [GitHub release]
-5. Update [portable builds] in `CHANGELOG.md`
+5. Update [AUR package]
+
+6. Update [portable builds] in `CHANGELOG.md`
+   1. `git checkout v${VER}`
+   2. `make CC=musl-gcc CFLAGS='-O2 -flto' LDFLAGS='-static -s'`
+   3. Check `./dte -V` output
+   4. `tar -czf "dte-${VER}-linux-$(uname -m).tar.gz" dte docs/dte.1 docs/dterc.5 docs/dte-syntax.5`
+   5. Copy tarball to `public/dist/dte/` in [releases repo]
+   6. Run `make generate` in [releases repo]
+   7. Commit and push tarball and generated files to [releases repo]
+   8. `git checkout master`
+   9. Update URL for [portable builds] in `CHANGELOG.md`
 
 
 [releases repo]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/tree/master/public/dist/dte
 [GitLab Pages job]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/pipelines
 [GitLab release]: https://gitlab.com/craigbarnes/dte/-/releases
 [GitHub release]: https://github.com/craigbarnes/dte/releases
+[AUR package]: https://aur.archlinux.org/packages/dte
 [portable builds]: https://gitlab.com/craigbarnes/dte/-/blob/master/CHANGELOG.md#portable-builds-for-linux
