@@ -337,5 +337,5 @@ input/output of both.
 [`lock-files`]: dterc.html#lock-files
 [`file-history`]: dterc.html#file-history
 [`ctags`]: https://en.wikipedia.org/wiki/Ctags
-[`sysexits`]: https://www.freebsd.org/cgi/man.cgi?query=sysexits
+[`sysexits`]: https://man.freebsd.org/cgi/man.cgi?query=sysexits
 [`execvp`]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html
