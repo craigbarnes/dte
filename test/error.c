@@ -30,6 +30,7 @@ static void test_normal_command_errors(TestContext *ctx)
         {"exec -s sh -c 'kill -s USR1 $$'", "child received signal"},
         {"exec -s sh -c 'exit 44'", "child returned 44"},
         {"exec -s _z9kjdf_2dmm_92:j-a3d_xzkw::", "unable to exec"},
+        {"exec -s -e errmsg sh -c 'echo X >&2; exit 9'", "child returned 9: \"X\""},
         {"ft -- -name ext", "invalid filetype name"},
         {"hi xyz red green blue", "too many colors"},
         {"hi xyz _invalid_", "invalid color or attribute"},
