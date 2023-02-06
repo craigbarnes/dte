@@ -45,5 +45,5 @@ dte Release Checklist
 [GitLab Pages job]: https://gitlab.com/craigbarnes/craigbarnes.gitlab.io/-/pipelines
 [GitLab release]: https://gitlab.com/craigbarnes/dte/-/releases
 [GitHub release]: https://github.com/craigbarnes/dte/releases
-[AUR package]: https://aur.archlinux.org/packages/dte
+[AUR package]: https://aur.archlinux.org/packages/dte/
 [portable builds]: https://gitlab.com/craigbarnes/dte/-/blob/master/CHANGELOG.md#portable-builds-for-linux
