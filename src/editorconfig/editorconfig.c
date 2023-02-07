@@ -208,27 +208,21 @@ int get_editorconfig_options(const char *pathname, EditorConfigOptions *opts)
 
     // Set indent_size to "tab" if indent_size is not specified and
     // indent_style is set to "tab"
-    if (
-        data.options.indent_size == 0
-        && data.options.indent_style == INDENT_STYLE_TAB
-    ) {
-        data.options.indent_size_is_tab = true;
+    EditorConfigOptions *o = &data.options;
+    if (o->indent_size == 0 && o->indent_style == INDENT_STYLE_TAB) {
+        o->indent_size_is_tab = true;
     }
 
     // Set indent_size to tab_width if indent_size is "tab" and
     // tab_width is specified
-    if (data.options.indent_size_is_tab && data.options.tab_width > 0) {
-        data.options.indent_size = data.options.tab_width;
+    if (o->indent_size_is_tab && o->tab_width > 0) {
+        o->indent_size = o->tab_width;
     }
 
     // Set tab_width to indent_size if indent_size is specified as
     // something other than "tab" and tab_width is unspecified
-    if (
-        data.options.indent_size != 0
-        && data.options.tab_width == 0
-        && !data.options.indent_size_is_tab
-    ) {
-        data.options.tab_width = data.options.indent_size;
+    if (o->indent_size != 0 && o->tab_width == 0 && !o->indent_size_is_tab) {
+        o->tab_width = o->indent_size;
     }
 
     *opts = data.options;
