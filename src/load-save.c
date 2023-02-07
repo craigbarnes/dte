@@ -41,9 +41,7 @@ static Block *add_utf8_line (
         }
         add_block(buffer, blk);
     }
-    if (size < 8192) {
-        size = 8192;
-    }
+    size = MAX(size, 8192);
     blk = block_new(size);
 copy:
     memcpy(blk->data + blk->size, line, len);
