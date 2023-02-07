@@ -141,10 +141,7 @@ static void fix_size(const Frame *frame)
     for (size_t i = 0; i < count; i++) {
         const Frame *c = frame->frames.ptrs[i];
         min[i] = get_min(c);
-        size[i] = get_size(c);
-        if (size[i] < min[i]) {
-            size[i] = min[i];
-        }
+        size[i] = MAX(get_size(c), min[i]);
         total += size[i];
     }
 

@@ -8,10 +8,13 @@ GIT_HOOKS = $(addprefix .git/hooks/, commit-msg pre-commit)
 WSCHECK = $(AWK) -f tools/wscheck.awk
 SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
+SPATCH ?= spatch
+SPATCHFLAGS ?= --very-quiet
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
 DOCFILES = $(call GITATTRS, xml markdown)
+SPATCHFILES = $(foreach f, assertions minmax, tools/coccinelle/$f.cocci)
 
 clang_tidy_targets = $(addprefix clang-tidy-, $(all_sources))
 
@@ -21,6 +24,10 @@ dist-all-releases: $(RELEASE_DIST)
 git-hooks: $(GIT_HOOKS)
 clang-tidy: $(clang_tidy_targets)
 check-aux: check-desktop-file check-appstream
+
+check-coccinelle:
+	$(E) SPATCH '.'
+	$(Q) $(foreach sp, $(SPATCHFILES), $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources);)
 
 check-shell-scripts:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
@@ -108,5 +115,5 @@ DEVMK := loaded
 .PHONY: \
     dist distcheck dist-latest-release dist-all-releases \
     check-docs check-shell-scripts check-whitespace check-codespell \
-    check-aux check-desktop-file check-appstream \
+    check-coccinelle check-aux check-desktop-file check-appstream \
     git-hooks show-sizes clang-tidy $(clang_tidy_targets)

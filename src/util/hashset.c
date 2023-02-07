@@ -19,9 +19,7 @@ static void alloc_table(HashSet *set, size_t size)
 
 void hashset_init(HashSet *set, size_t size, bool icase)
 {
-    if (size < 8) {
-        size = 8;
-    }
+    size = MAX(size, 8);
 
     // Accommodate the 75% load factor in the table size, to allow filling
     // the set to the requested size without needing to rehash()

@@ -113,9 +113,7 @@ void shift_lines(View *view, int count)
     BUG_ON(count == 0);
 
     long x = view_get_preferred_x(view) + (count * width);
-    if (x < 0) {
-        x = 0;
-    }
+    x = MAX(x, 0);
 
     if (view->selection == SELECT_NONE) {
         do_shift_lines(view, count, 1);

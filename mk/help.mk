@@ -31,6 +31,7 @@ ifeq "$(DEVMK)" "loaded"
 	$P dist 'Generate tarball for latest git commit'
 	$P dist-latest-release 'Generate tarball for latest release'
 	$P dist-all-releases 'Generate tarballs for all releases'
+	$P check-coccinelle 'Apply Coccinelle semantic patches'
 	$P check-codespell 'Check spelling errors with codespell(1)'
 	$P check-shell-scripts 'Check shell scripts with shellcheck(1)'
 	$P check-whitespace 'Check source files for indent/newline errors'
