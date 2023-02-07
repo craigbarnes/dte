@@ -94,7 +94,7 @@ size_t buf_uint_to_str(unsigned int x, char *buf)
 
 char *filemode_to_str(mode_t mode, char *buf)
 {
-    static char xmap[8] = "-xSs-xTt";
+    static const char xmap[8] = "-xSs-xTt";
 
     // Owner
     buf[0] = (mode & S_IRUSR) ? 'r' : '-';
