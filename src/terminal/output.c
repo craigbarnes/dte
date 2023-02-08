@@ -294,22 +294,6 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
     }
 }
 
-static void print_tab(TermOutputBuffer *obuf, size_t width)
-{
-    char ch = ' ';
-    if (unlikely(obuf->tab_mode == TAB_SPECIAL)) {
-        obuf->buf[obuf->count++] = '>';
-        obuf->x++;
-        width--;
-        ch = '-';
-    }
-    if (width > 0) {
-        memset(obuf->buf + obuf->count, ch, width);
-        obuf->count += width;
-        obuf->x += width;
-    }
-}
-
 bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
 {
     if (unlikely(obuf->x < obuf->scroll_x)) {
@@ -323,16 +307,24 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
         return false;
     }
 
+    static const char tabstr[][8] = {
+        [TAB_NORMAL]  = "        ",
+        [TAB_SPECIAL] = ">-------",
+    };
+
     obuf_need_space(obuf, 8);
     if (likely(u < 0x80)) {
         if (likely(!ascii_iscntrl(u))) {
             obuf->buf[obuf->count++] = u;
             obuf->x++;
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-            size_t x = obuf->x;
-            size_t width = next_indent_width(x, obuf->tab_width) - x;
+            size_t width = next_indent_width(obuf->x, obuf->tab_width) - obuf->x;
             BUG_ON(width > 8);
-            print_tab(obuf, MIN(width, space));
+            BUG_ON(obuf->tab_mode >= ARRAYLEN(tabstr));
+            width = MIN(width, space);
+            memcpy(obuf->buf + obuf->count, tabstr[obuf->tab_mode], 8);
+            obuf->count += width;
+            obuf->x += width;
         } else {
             // Use caret notation for control chars:
             obuf->buf[obuf->count++] = '^';
