@@ -1984,7 +1984,7 @@ static void test_popcount(TestContext *ctx)
     EXPECT_EQ(u32_popcount(255), 8);
     EXPECT_EQ(u32_popcount(UINT32_MAX), 32);
     EXPECT_EQ(u32_popcount(UINT32_MAX - 1), 31);
-    EXPECT_EQ(u64_popcount(U32(0xE10F02C9)), 13);
+    EXPECT_EQ(u32_popcount(U32(0xE10F02C9)), 13);
 
     EXPECT_EQ(u64_popcount(0), 0);
     EXPECT_EQ(u64_popcount(1), 1);

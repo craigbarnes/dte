@@ -1,6 +1,57 @@
 #include "test.h"
 #include "indent.h"
 
+static void test_get_indent_info(TestContext *ctx)
+{
+    LocalOptions options = {
+        .expand_tab = true,
+        .indent_width = 4,
+        .tab_width = 4,
+    };
+
+    StringView line = strview_from_cstring("            ");
+    IndentInfo info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 12);
+    EXPECT_EQ(info.width, 12);
+    EXPECT_EQ(info.level, 3);
+    EXPECT_TRUE(info.wsonly);
+    EXPECT_TRUE(info.sane);
+
+    line = strview_from_cstring("\t\t");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 2);
+    EXPECT_EQ(info.width, 8);
+    EXPECT_EQ(info.level, 2);
+    EXPECT_TRUE(info.wsonly);
+    EXPECT_FALSE(info.sane);
+
+    options.expand_tab = false,
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 2);
+    EXPECT_EQ(info.width, 8);
+    EXPECT_EQ(info.level, 2);
+    EXPECT_TRUE(info.wsonly);
+    EXPECT_TRUE(info.sane);
+
+    options.indent_width = 8,
+    options.tab_width = 8,
+    line = strview_from_cstring("\t\t  ");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 4);
+    EXPECT_EQ(info.width, 18);
+    EXPECT_EQ(info.level, 2);
+    EXPECT_TRUE(info.wsonly);
+    EXPECT_TRUE(info.sane);
+
+    line = strview_from_cstring("\t \t ");
+    info = get_indent_info(&options, &line);
+    EXPECT_EQ(info.bytes, 4);
+    EXPECT_EQ(info.width, 17);
+    EXPECT_EQ(info.level, 2);
+    EXPECT_TRUE(info.wsonly);
+    EXPECT_FALSE(info.sane);
+}
+
 static void test_next_indent_width(TestContext *ctx)
 {
     EXPECT_EQ(next_indent_width(0, 4), 4);
@@ -56,6 +107,7 @@ static void test_next_indent_width(TestContext *ctx)
 }
 
 static const TestEntry tests[] = {
+    TEST(test_get_indent_info),
     TEST(test_next_indent_width),
 };
 
