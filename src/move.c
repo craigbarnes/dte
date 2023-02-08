@@ -42,7 +42,7 @@ void move_to_preferred_x(View *view, long preferred_x)
             if (likely(!ascii_iscntrl(u))) {
                 x++;
             } else if (u == '\t') {
-                x = (x + tw) / tw * tw;
+                x = next_indent_width(x, tw);
             } else if (u == '\n') {
                 break;
             } else {

@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "indent.h"
 #include "selection.h"
 #include "syntax/highlight.h"
 #include "util/ascii.h"
@@ -170,8 +171,7 @@ static void screen_skip_char(TermOutputBuffer *obuf, LineInfo *info)
         if (likely(!ascii_iscntrl(u))) {
             obuf->x++;
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-            size_t tw = obuf->tab_width;
-            obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
+            obuf->x = next_indent_width(obuf->x, obuf->tab_width);
         } else {
             // Control
             obuf->x += 2;

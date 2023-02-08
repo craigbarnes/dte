@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "indent.h"
 #include "output.h"
 #include "util/ascii.h"
 #include "util/debug.h"
@@ -278,8 +279,7 @@ static void buf_skip(TermOutputBuffer *obuf, CodePoint u)
         if (!ascii_iscntrl(u)) {
             obuf->x++;
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-            size_t tw = obuf->tab_width;
-            obuf->x += (obuf->x + tw) / tw * tw - obuf->x;
+            obuf->x = next_indent_width(obuf->x, obuf->tab_width);
         } else {
             // Control
             obuf->x += 2;
@@ -329,9 +329,9 @@ bool term_put_char(TermOutputBuffer *obuf, CodePoint u)
             obuf->buf[obuf->count++] = u;
             obuf->x++;
         } else if (u == '\t' && obuf->tab_mode != TAB_CONTROL) {
-            const size_t tw = obuf->tab_width;
-            const size_t x = obuf->x;
-            size_t width = (x + tw) / tw * tw - x;
+            size_t x = obuf->x;
+            size_t width = next_indent_width(x, obuf->tab_width) - x;
+            BUG_ON(width > 8);
             print_tab(obuf, MIN(width, space));
         } else {
             // Use caret notation for control chars:

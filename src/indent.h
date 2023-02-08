@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include "block-iter.h"
 #include "options.h"
+#include "util/debug.h"
+#include "util/macros.h"
 #include "util/string-view.h"
 
 typedef struct {
@@ -24,6 +26,13 @@ typedef struct {
     // The line is empty or contains only white space
     bool wsonly;
 } IndentInfo;
+
+static inline size_t next_indent_width(size_t x, size_t mul)
+{
+    BUG_ON(mul == 0);
+    BUG_ON(mul > INDENT_WIDTH_MAX);
+    return ((x + mul) / mul) * mul;
+}
 
 char *make_indent(const LocalOptions *options, size_t width);
 char *get_indent_for_next_line(const LocalOptions *options, const StringView *line);

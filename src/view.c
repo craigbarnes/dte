@@ -1,5 +1,6 @@
 #include "view.h"
 #include "buffer.h"
+#include "indent.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/str-util.h"
@@ -36,7 +37,7 @@ void view_update_cursor_x(View *view)
             if (likely(!ascii_iscntrl(u))) {
                 w++;
             } else if (u == '\t') {
-                w = (w + tw) / tw * tw;
+                w = next_indent_width(w, tw);
             } else {
                 w += 2;
             }

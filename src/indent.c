@@ -2,7 +2,6 @@
 #include <sys/types.h>
 #include "indent.h"
 #include "regexp.h"
-#include "util/debug.h"
 #include "util/xmalloc.h"
 
 char *make_indent(const LocalOptions *options, size_t width)
@@ -65,8 +64,7 @@ char *get_indent_for_next_line(const LocalOptions *options, const StringView *li
 {
     size_t width = get_indent_width(options, line);
     if (indent_inc(options, line)) {
-        size_t iw = options->indent_width;
-        width = (width + iw) / iw * iw;
+        width = next_indent_width(width, options->indent_width);
     }
     return make_indent(options, width);
 }
@@ -88,7 +86,7 @@ IndentInfo get_indent_info(const LocalOptions *options, const StringView *line)
             info.width++;
             spaces++;
         } else if (buf[pos] == '\t') {
-            info.width = (info.width + tw) / tw * tw;
+            info.width = next_indent_width(info.width, tw);
             tabs++;
         } else {
             break;
@@ -124,7 +122,7 @@ static ssize_t get_current_indent_bytes(const LocalOptions *options, const char 
         }
         switch (buf[i]) {
         case '\t':
-            iwidth = (iwidth + tw) / tw * tw;
+            iwidth = next_indent_width(iwidth, tw);
             break;
         case ' ':
             iwidth++;
@@ -170,7 +168,7 @@ size_t get_indent_level_bytes_right(const LocalOptions *options, BlockIter *curs
     for (size_t i = cursor_offset, n = line.length; i < n; i++) {
         switch (line.data[i]) {
         case '\t':
-            iwidth = (iwidth + tw) / tw * tw;
+            iwidth = next_indent_width(iwidth, tw);
             break;
         case ' ':
             iwidth++;
