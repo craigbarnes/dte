@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 #include "load-save.h"
 #include "block.h"
@@ -155,6 +156,8 @@ static bool update_file_info(FileInfo *info, const struct stat *st)
         .uid = st->st_uid,
         .dev = st->st_dev,
         .ino = st->st_ino,
+        // TODO: use full `timespec` for `FileInfo::mtime` member and assign
+        // `st_mtim` instead of `st_mtime` (may require portability fallbacks)
         .mtime = st->st_mtime,
     };
     return true;
@@ -420,6 +423,61 @@ static int xfsync(int fd)
 #endif
 }
 
+static bool fileinfo_changed(const FileInfo *info, const struct stat *st)
+{
+    return
+        st->st_dev != info->dev
+        || st->st_ino != info->ino
+        || st->st_size != info->size
+        || st->st_mode != info->mode
+        || st->st_uid != info->uid
+        || st->st_gid != info->gid
+        || st->st_mtime != info->mtime
+    ;
+}
+
+static bool save_unmodified_buffer(Buffer *buffer, const char *filename)
+{
+    SaveUnmodifiedType type = buffer->options.save_unmodified;
+    if (type == SAVE_FULL) {
+        return false;
+    }
+
+    struct stat st;
+    if (unlikely(stat(filename, &st) != 0)) {
+        LOG_ERRNO("aborting partial save; stat() failed");
+        return false;
+    }
+
+    if (fileinfo_changed(&buffer->file, &st)) {
+        LOG_INFO("aborting partial save; stat info changed");
+        return false;
+    }
+
+    if (type == SAVE_NONE) {
+        LOG_INFO("buffer unchanged; leaving file untouched");
+        return true;
+    }
+
+    BUG_ON(type != SAVE_TOUCH);
+    struct timespec times[2];
+    if (unlikely(clock_gettime(CLOCK_REALTIME, &times[0]) != 0)) {
+        LOG_ERRNO("aborting partial save; clock_getttime() failed");
+        return false;
+    }
+
+    times[1] = times[0];
+    if (unlikely(utimensat(AT_FDCWD, filename, times, 0) != 0)) {
+        LOG_ERRNO("aborting partial save; utimensat() failed");
+        return false;
+    }
+
+    // TODO: Use full `timespec` instead of `time_t` for FileInfo::mtime
+    buffer->file.mtime = times[0].tv_sec;
+    LOG_INFO("buffer unchanged; mtime/atime updated");
+    return true;
+}
+
 bool save_buffer (
     Buffer *buffer,
     const char *filename,
@@ -427,6 +485,14 @@ bool save_buffer (
     bool crlf,
     bool write_bom
 ) {
+    if (
+        !buffer_modified(buffer)
+        && xstreq(filename, buffer->abs_filename)
+        && save_unmodified_buffer(buffer, filename)
+    ) {
+        return true;
+    }
+
     // Try to use temporary file first (safer)
     char tmp[8192];
     int fd = tmp_file(filename, &buffer->file, tmp, sizeof(tmp));

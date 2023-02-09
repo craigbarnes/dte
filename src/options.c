@@ -418,6 +418,7 @@ static const struct {
 static const char *const bool_enum[] = {"false", "true", NULL};
 static const char *const newline_enum[] = {"unix", "dos", NULL};
 static const char *const tristate_enum[] = {"false", "true", "auto", NULL};
+static const char *const save_unmodified_enum[] = {"none", "touch", "full", NULL};
 
 static const char *const detect_indent_values[] = {
     "1", "2", "3", "4", "5", "6", "7", "8",
@@ -457,6 +458,7 @@ static const OptionDesc option_desc[] = {
     ENUM_OPT("newline", G(crlf_newlines), newline_enum, NULL),
     BOOL_OPT("optimize-true-color", G(optimize_true_color), redraw_screen),
     BOOL_OPT("overwrite", C(overwrite), overwrite_changed),
+    ENUM_OPT("save-unmodified", C(save_unmodified), save_unmodified_enum, NULL),
     UINT_OPT("scroll-margin", G(scroll_margin), 0, 100, redraw_screen),
     BOOL_OPT("select-cursor-char", G(select_cursor_char), redraw_screen),
     BOOL_OPT("set-window-title", G(set_window_title), set_window_title_changed),

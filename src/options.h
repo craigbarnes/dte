@@ -26,9 +26,17 @@ typedef enum {
     WSE_ALL_TRAILING = 1 << 7, // Like WSE_TRAILING, but including around cursor
 } WhitespaceErrorFlags;
 
+// Note: this must be kept in sync with save_unmodified_enum[]
+typedef enum {
+    SAVE_NONE,
+    SAVE_TOUCH,
+    SAVE_FULL,
+} SaveUnmodifiedType;
+
 #define COMMON_OPTIONS \
     unsigned int detect_indent; \
     unsigned int indent_width; \
+    unsigned int save_unmodified; \
     unsigned int tab_width; \
     unsigned int text_width; \
     unsigned int ws_error; \

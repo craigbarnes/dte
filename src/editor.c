@@ -101,6 +101,7 @@ EditorState *init_editor_state(void)
             .file_history = true,
             .indent_width = 8,
             .overwrite = false,
+            .save_unmodified = SAVE_FULL,
             .syntax = true,
             .tab_width = 8,
             .text_width = 72,
