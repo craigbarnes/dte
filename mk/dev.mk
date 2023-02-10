@@ -102,6 +102,7 @@ clang-tidy-src/config.c: build/builtin-config.h
 clang-tidy-src/editor.c: build/version.h build/feature.h
 clang-tidy-src/main.c: build/version.h
 clang-tidy-src/load-save.c: build/feature.h
+clang-tidy-src/signals.c: build/feature.h
 clang-tidy-src/util/fd.c: build/feature.h
 clang-tidy-src/util/xmemmem.c: build/feature.h
 clang-tidy-src/terminal/ioctl.c: build/feature.h

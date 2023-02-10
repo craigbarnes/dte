@@ -1,3 +1,4 @@
+#include "../build/feature.h"
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
@@ -80,6 +81,29 @@ static noreturn COLD void handle_fatal_signal(int signum)
     _exit(EX_OSERR);
 }
 
+// strsignal(3) is fine in situations where a signal is being reported
+// as terminating a process, but it tends to be confusing in most other
+// circumstances, where the signal name (not description) is usually
+// clearer
+static const char *signum_to_str(int signum)
+{
+#if HAVE_SIG2STR
+    static char buf[SIG2STR_MAX + 3];
+    if (sig2str(signum, buf + 3) == 0) {
+        return memcpy(buf, "SIG", 3);
+    }
+#elif HAVE_SIGABBREV_NP
+    static char buf[16];
+    const char *abbr = sigabbrev_np(signum);
+    if (abbr && memccpy(buf + 3, abbr, '\0', sizeof(buf) - 3)) {
+        return memcpy(buf, "SIG", 3);
+    }
+#endif
+
+    const char *str = strsignal(signum);
+    return likely(str) ? str : "??";
+}
+
 static void do_sigaction(int sig, const struct sigaction *action)
 {
     struct sigaction old_action;
@@ -89,7 +113,7 @@ static void do_sigaction(int sig, const struct sigaction *action)
         return;
     }
     if (unlikely(old_action.sa_handler == SIG_IGN)) {
-        const char *str = strsignal(sig);
+        const char *str = signum_to_str(sig);
         LOG_WARNING("ignored signal was inherited: %d (%s)", sig, str);
     }
 }

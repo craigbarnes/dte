@@ -145,14 +145,16 @@ EditorState *init_editor_state(void)
 
     LOG_INFO("dte version: " VERSION);
 
-    LOG_INFO("features:%s%s%s%s%s%s%s%s",
+    LOG_INFO("features:%s%s%s%s%s%s%s%s%s%s",
         HAVE_DUP3 ? " dup3" : "",
         HAVE_PIPE2 ? " pipe2" : "",
         HAVE_FSYNC ? " fsync" : "",
         HAVE_MEMMEM ? " memmem" : "",
+        HAVE_SIG2STR ? " sig2str" : "",
+        (HAVE_SIGABBREV_NP && !HAVE_SIG2STR) ? " sigabbrev_np" : "",
         HAVE_TIOCGWINSZ ? " TIOCGWINSZ" : "",
         HAVE_TIOCNOTTY ? " TIOCNOTTY" : "",
-        HAVE_TCGETWINSIZE ? " tcgetwinsize" : "",
+        (HAVE_TCGETWINSIZE && !HAVE_TIOCGWINSZ) ? " tcgetwinsize" : "",
         HAVE_POSIX_MADVISE ? " posix_madvise" : ""
     );
 

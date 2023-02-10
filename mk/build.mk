@@ -76,7 +76,8 @@ test_objects := $(call prefix-obj, build/test/, \
 bench_objects := $(call prefix-obj, build/test/, benchmark)
 
 feature_tests := $(addprefix build/feature/, $(addsuffix .h, \
-    dup3 pipe2 fsync memmem TIOCGWINSZ TIOCNOTTY tcgetwinsize posix_madvise ))
+    dup3 pipe2 fsync memmem sig2str sigabbrev_np TIOCGWINSZ TIOCNOTTY \
+    tcgetwinsize posix_madvise ))
 
 all_objects := $(editor_objects) $(test_objects) $(bench_objects)
 build_subdirs := $(filter-out build/, $(sort $(dir $(all_objects)))) build/feature/
@@ -190,6 +191,7 @@ build/test/config.o: build/test/data.h
 build/editor.o: build/version.h build/feature.h
 build/main.o: build/version.h
 build/load-save.o: build/feature.h
+build/signals.o: build/feature.h
 build/util/fd.o: build/feature.h
 build/util/xmemmem.o: build/feature.h
 build/terminal/ioctl.o: build/feature.h
