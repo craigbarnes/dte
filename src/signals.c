@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <limits.h>
 #include <string.h>
 #include <unistd.h>
 #include "signals.h"
@@ -99,7 +100,26 @@ static void do_sigaction(int sig, const struct sigaction *action)
  * program terminates, whether planned or not, the terminal device's
  * state is restored to its original state."
  *
- * (https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html)
+ * -- https://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html
+ *
+ * "The <signal.h> header shall declare the SIGRTMIN and SIGRTMAX
+ * macros, which shall expand to positive integer expressions with
+ * type int, but which need not be constant expressions."
+ *
+ * "The range SIGRTMIN through SIGRTMAX inclusive shall include at
+ * least {RTSIG_MAX} signal numbers."
+ *
+ * -- https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html
+ *
+ * "{RTSIG_MAX} Minimum Acceptable Value: {_POSIX_RTSIG_MAX}"
+ * "{_POSIX_RTSIG_MAX} Value: 8"
+ *
+ * -- https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/limits.h.html
+ *
+ * "The default actions for the realtime signals in the range SIGRTMIN
+ * to SIGRTMAX shall be to terminate the process abnormally."
+ *
+ * -- https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html
  *
  * Signal handlers not set by this function:
  * - SIGKILL, SIGSTOP (can't be caught or ignored)
@@ -113,10 +133,7 @@ void set_signal_handlers(void)
         do_sigaction(fatal_signals[i], &action);
     }
 
-    // "The default actions for the realtime signals in the range SIGRTMIN
-    // to SIGRTMAX shall be to terminate the process abnormally."
-    // (POSIX.1-2017 §2.4.3)
-#if defined(SIGRTMIN) && defined(SIGRTMAX)
+#if defined(RTSIG_MAX)
     for (int s = SIGRTMIN, max = SIGRTMAX; s <= max; s++) {
         do_sigaction(s, &action);
     }
