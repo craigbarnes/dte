@@ -25,6 +25,7 @@ static const struct FileExtensionMap {
     {"cmake", CMAKE},
     {"cmd", BATCH},
     {"cnc", GCODE},
+    {"cocci", COCCINELLE},
     {"coffee", COFFEESCRIPT},
     {"cpp", CPLUSPLUS},
     {"cr", RUBY},
