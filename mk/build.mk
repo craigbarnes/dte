@@ -24,10 +24,11 @@ WARNINGS_EXTRA = \
     -Wlogical-op
 
 BUILTIN_SYNTAX_FILES ?= \
-    awk c config css d diff docker dte gcode gitcommit gitignore gitrebase \
-    go gomod html ini java javascript json lisp lua mail make markdown \
-    meson nginx ninja php python robotstxt roff ruby scheme sed sh sql \
-    tex texmfcnf tmux vala xml xresources zig inc/c-comment inc/c-uchar
+    awk c coccinelle config css d diff docker dte gcode gitcommit \
+    gitignore gitrebase go gomod html ini java javascript json lisp \
+    lua mail make markdown meson nginx ninja php python robotstxt \
+    roff ruby scheme sed sh sql tex texmfcnf tmux vala xml xresources \
+    zig inc/c-comment inc/c-uchar
 
 BUILTIN_CONFIGS = $(addprefix config/, \
     rc binding/default compiler/gcc compiler/go \
