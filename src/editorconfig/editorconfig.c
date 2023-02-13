@@ -50,12 +50,28 @@ static PropertyType lookup_property(const StringView *name)
     return EC_UNKNOWN_PROPERTY;
 }
 
+static unsigned int parse_indent_width(const StringView *val)
+{
+    // Valid indent widths are 1-8
+    if (val->length != 1) {
+        return 0;
+    }
+    unsigned int n = (unsigned char)val->data[0] - '0';
+    return (n <= 8) ? n : 0;
+}
+
+static unsigned int parse_max_line_length(const StringView *val)
+{
+    unsigned int n = 0;
+    buf_parse_uint(val->data, val->length, &n);
+    return n;
+}
+
 static void editorconfig_option_set (
     EditorConfigOptions *options,
     const StringView *name,
     const StringView *val
 ) {
-    unsigned int n = 0;
     switch (lookup_property(name)) {
     case EC_INDENT_STYLE:
         if (strview_equal_cstring_icase(val, "space")) {
@@ -71,20 +87,17 @@ static void editorconfig_option_set (
             options->indent_size_is_tab = true;
             options->indent_size = 0;
         } else {
-            buf_parse_uint(val->data, val->length, &n);
-            // If buf_parse_uint() failed, n is zero, which is deliberately
-            // used to "reset" the option due to an invalid value
-            options->indent_size = n;
+            // Note: parse_indent_width() returns 0 for invalid indent widths,
+            // which is used here to "reset" the option
+            options->indent_size = parse_indent_width(val);
             options->indent_size_is_tab = false;
         }
         break;
     case EC_TAB_WIDTH:
-        buf_parse_uint(val->data, val->length, &n);
-        options->tab_width = n;
+        options->tab_width = parse_indent_width(val);
         break;
     case EC_MAX_LINE_LENGTH:
-        buf_parse_uint(val->data, val->length, &n);
-        options->max_line_length = n;
+        options->max_line_length = parse_max_line_length(val);
         break;
     case EC_CHARSET:
     case EC_END_OF_LINE:
