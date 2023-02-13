@@ -2059,11 +2059,24 @@ static bool cmd_toggle(EditorState *e, const CommandArgs *a)
 
 static bool cmd_undo(EditorState *e, const CommandArgs *a)
 {
-    BUG_ON(a->nr_args);
-    if (!undo(e->view)) {
+    View *view = e->view;
+    bool move_only = has_flag(a, 'm');
+    if (move_only) {
+        const Change *change = view->buffer->cur_change;
+        if (!change->next) {
+            // If there's only 1 change, there's nothing meaningful to move to
+            return false;
+        }
+        block_iter_goto_offset(&view->cursor, change->offset);
+        view_reset_preferred_x(view);
+        return true;
+    }
+
+    if (!undo(view)) {
         return false;
     }
-    unselect(e->view);
+
+    unselect(view);
     return true;
 }
 
@@ -2392,7 +2405,7 @@ static const Command cmds[] = {
     {"tag", "r", false, 0, 1, cmd_tag},
     {"title", "", false, 1, 1, cmd_title},
     {"toggle", "gv", false, 1, -1, cmd_toggle},
-    {"undo", "", false, 0, 0, cmd_undo},
+    {"undo", "m", false, 0, 0, cmd_undo},
     {"unselect", "", false, 0, 0, cmd_unselect},
     {"up", "cl", false, 0, 0, cmd_up},
     {"view", "", false, 1, 1, cmd_view},
