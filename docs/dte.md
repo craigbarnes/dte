@@ -296,9 +296,9 @@ in the range `0`..`125` by the [`quit`] command.
 
 # Examples
 
-Open `/etc/passwd` with cursor on line 3:
+Open `/etc/passwd` with cursor on line 3, column 8:
 
-    dte +3 /etc/passwd
+    dte +3:8 /etc/passwd
 
 Run several commands at startup:
 
