@@ -50,14 +50,28 @@ static PropertyType lookup_property(const StringView *name)
     return EC_UNKNOWN_PROPERTY;
 }
 
-static unsigned int parse_indent_width(const StringView *val)
+static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
+{
+    if (strview_equal_cstring_icase(val, "space")) {
+        return INDENT_STYLE_SPACE;
+    } else if (strview_equal_cstring_icase(val, "tab")) {
+        return INDENT_STYLE_TAB;
+    }
+    return INDENT_STYLE_UNSPECIFIED;
+}
+
+static unsigned int parse_indent_digit(const StringView *val)
 {
     // Valid indent widths are 1-8
-    if (val->length != 1) {
-        return 0;
-    }
-    unsigned int n = (unsigned char)val->data[0] - '0';
+    unsigned int n = (val->length != 1) ? 0 : (unsigned char)val->data[0] - '0';
     return (n <= 8) ? n : 0;
+}
+
+static void parse_indent_size(EditorConfigOptions *options, const StringView *val)
+{
+    bool tab = strview_equal_cstring_icase(val, "tab");
+    options->indent_size_is_tab = tab;
+    options->indent_size = tab ? 0 : parse_indent_digit(val);
 }
 
 static unsigned int parse_max_line_length(const StringView *val)
@@ -74,27 +88,13 @@ static void editorconfig_option_set (
 ) {
     switch (lookup_property(name)) {
     case EC_INDENT_STYLE:
-        if (strview_equal_cstring_icase(val, "space")) {
-            options->indent_style = INDENT_STYLE_SPACE;
-        } else if (strview_equal_cstring_icase(val, "tab")) {
-            options->indent_style = INDENT_STYLE_TAB;
-        } else {
-            options->indent_style = INDENT_STYLE_UNSPECIFIED;
-        }
+        options->indent_style = lookup_indent_style(val);
         break;
     case EC_INDENT_SIZE:
-        if (strview_equal_cstring_icase(val, "tab")) {
-            options->indent_size_is_tab = true;
-            options->indent_size = 0;
-        } else {
-            // Note: parse_indent_width() returns 0 for invalid indent widths,
-            // which is used here to "reset" the option
-            options->indent_size = parse_indent_width(val);
-            options->indent_size_is_tab = false;
-        }
+        parse_indent_size(options, val);
         break;
     case EC_TAB_WIDTH:
-        options->tab_width = parse_indent_width(val);
+        options->tab_width = parse_indent_digit(val);
         break;
     case EC_MAX_LINE_LENGTH:
         options->max_line_length = parse_max_line_length(val);
