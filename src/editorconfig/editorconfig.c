@@ -63,7 +63,8 @@ static EditorConfigIndentStyle lookup_indent_style(const StringView *val)
 static unsigned int parse_indent_digit(const StringView *val)
 {
     // Valid indent widths are 1-8
-    unsigned int n = (val->length != 1) ? 0 : (unsigned char)val->data[0] - '0';
+    static_assert_compatible_types(val->data[0], unsigned char);
+    unsigned int n = (val->length != 1) ? 0 : val->data[0] - '0';
     return (n <= 8) ? n : 0;
 }
 
