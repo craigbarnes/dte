@@ -556,12 +556,84 @@ UNITTEST {
     }
 }
 
+static bool can_collect_flags (
+    char **args,
+    size_t argc,
+    size_t nr_flag_args,
+    bool allow_flags_after_nonflags
+) {
+    if (allow_flags_after_nonflags) {
+        for (size_t i = 0; i < argc; i++) {
+            if (streq(args[i], "--")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    for (size_t i = 0, nonflag = 0; i < argc; i++) {
+        if (args[i][0] != '-') {
+            if (++nonflag > nr_flag_args) {
+                return false;
+            }
+            continue;
+        }
+        if (streq(args[i], "--")) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static bool collect_command_flags (
+    PointerArray *array,
+    char **args,
+    size_t argc,
+    const Command *cmd,
+    const CommandArgs *a,
+    const char *prefix
+) {
+    BUG_ON(prefix[0] != '-');
+    const char *flags = cmd->flags;
+    bool flags_after_nonflags = (flags[0] != '-');
+
+    if (!can_collect_flags(args, argc, a->nr_flag_args, flags_after_nonflags)) {
+        return false;
+    }
+
+    flags += flags_after_nonflags ? 0 : 1;
+    if (ascii_isalnum(prefix[1]) && prefix[2] == '\0') {
+        if (strchr(flags, prefix[1])) {
+            ptr_array_append(array, xmemdup(prefix, 3));
+        }
+        return true;
+    }
+
+    if (prefix[1] != '\0') {
+        return true;
+    }
+
+    char buf[3] = "-";
+    for (size_t i = 0; flags[i]; i++) {
+        if (!ascii_isalnum(flags[i]) || cmdargs_has_flag(a, flags[i])) {
+            continue;
+        }
+        buf[1] = flags[i];
+        ptr_array_append(array, xmemdup(buf, 3));
+    }
+
+    return true;
+}
+
 static void collect_completions(EditorState *e, char **args, size_t argc)
 {
     CompletionState *cs = &e->cmdline.completion;
+    PointerArray *arr = &cs->completions;
+    const char *prefix = cs->parsed;
     if (!argc) {
-        collect_normal_commands(&cs->completions, cs->parsed);
-        collect_normal_aliases(e, &cs->completions, cs->parsed);
+        collect_normal_commands(arr, prefix);
+        collect_normal_aliases(e, arr, prefix);
         return;
     }
 
@@ -574,7 +646,7 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
     }
 
     const Command *cmd = find_normal_command(args[0]);
-    if (!cmd || cmd->max_args == 0) {
+    if (!cmd) {
         return;
     }
 
@@ -588,12 +660,21 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
         goto out;
     }
 
+    bool dash = (prefix[0] == '-');
+    if (dash && collect_command_flags(arr, args + 1, argc - 1, cmd, &a, prefix)) {
+        goto out;
+    }
+
+    if (cmd->max_args == 0) {
+        goto out;
+    }
+
     const CompletionHandler *h = BSEARCH(args[0], completion_handlers, vstrcmp);
     if (h) {
         h->complete(e, &a);
     } else if (streq(args[0], "repeat")) {
         if (a.nr_args == 1) {
-            collect_normal_commands(&cs->completions, cs->parsed);
+            collect_normal_commands(arr, prefix);
         } else if (a.nr_args >= 2) {
             collect_completions(e, args + 2, argc - 2);
         }
@@ -726,12 +807,9 @@ static void init_completion(EditorState *e, const CommandLine *cmdline)
         cs->escaped = string_view(str, len);
         cs->parsed = parse_command_arg(&runner, str, len, true);
         cs->add_space_after_single_match = true;
-        char **args = NULL;
-        size_t argc = 0;
-        if (array.count) {
-            args = (char**)array.ptrs + 1 + semicolon;
-            argc = array.count - semicolon - 1;
-        }
+        size_t count = array.count;
+        char **args = count ? (char**)array.ptrs + 1 + semicolon : NULL;
+        size_t argc = count ? array.count - semicolon - 1 : 0;
         collect_completions(e, args, argc);
     }
 

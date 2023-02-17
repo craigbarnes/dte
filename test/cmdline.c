@@ -298,6 +298,89 @@ static void test_complete_command(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "left; right; word-bwd");
     reset_completion(c);
+
+    cmdline_set_text(c, "replace -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -b");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -c");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -g");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -i");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -b");
+    reset_completion(c);
+
+    cmdline_set_text(c, "replace -- -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -- -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "left -c; replace -b -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "left -c; replace -b -c");
+    reset_completion(c);
+
+    cmdline_set_text(c, "replace -bci -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -bci -g ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "replace -bcgi -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -bcgi -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "replace -i");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -i ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "wswap -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "wswap -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -e");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -o");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -o ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -- -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -- -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -p ls -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -p ls -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -p ls -l");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -p ls -l");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -s -i buffer -o buffer -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -s -i buffer -o buffer -e");
+    reset_completion(c);
+
+    cmdline_set_text(c, "exec -s -i buffer ls -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "exec -s -i buffer ls -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "replace -cg");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "replace -cg");
+    reset_completion(c);
 }
 
 // This should only be run after init_headless_mode() because the completions
