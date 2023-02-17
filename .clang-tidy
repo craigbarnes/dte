@@ -7,6 +7,7 @@ Checks: >
     portability-*,
     readability-*,
     misc-*,
+    modernize-macro-to-enum,
     -clang-diagnostic-pointer-sign,
     -clang-analyzer-core.NonNullParamChecker,
     -clang-analyzer-core.NullDereference,

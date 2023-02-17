@@ -7,7 +7,9 @@
 #include "util/list.h"
 #include "util/xmalloc.h"
 
-#define BLOCK_EDIT_SIZE 512
+enum {
+    BLOCK_EDIT_SIZE = 512
+};
 
 static void sanity_check_blocks(const View *view, bool check_newlines)
 {
