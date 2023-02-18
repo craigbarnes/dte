@@ -128,6 +128,21 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "alias");
     reset_completion(c);
 
+    cmdline_set_text(c, "bind C-invalidkey");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind C-invalidkey");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -s C-M-S-l");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -s C-M-S-l");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -cs ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -cs ");
+    reset_completion(c);
+
     cmdline_set_text(c, "wrap");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "wrap-paragraph ");
@@ -284,6 +299,20 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "macro record ");
     reset_completion(c);
 
+    cmdline_set_text(c, "move-tab ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "move-tab left");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "move-tab right");
+    reset_completion(c);
+
+    cmdline_set_text(c, "quit ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "quit 0");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "quit 1");
+    reset_completion(c);
+
     cmdline_set_text(c, "repeat 3 ");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "repeat 3 alias");
@@ -428,6 +457,43 @@ static void test_complete_command_extra(TestContext *ctx)
 {
     EditorState *e = ctx->userdata;
     CommandLine *c = &e->cmdline;
+
+    cmdline_set_text(c, "alias reverse-li");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "alias reverse-lines ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "alias reverse-lines 'filter tac' ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind C-z");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind C-z ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind C-z undo ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "bind -s C-g");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -s C-g ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "bind -s C-g cancel ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "compile -1s bas");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "compile -1s basic ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "errorfmt bas");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "errorfmt basic ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "errorfmt xyz '^(.*)$' m");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "errorfmt xyz '^(.*)$' message ");
+    reset_completion(c);
+
     cmdline_set_text(c, "show bi");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "show bind ");
