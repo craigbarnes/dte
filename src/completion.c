@@ -653,14 +653,14 @@ static void collect_completions(EditorState *e, char **args, size_t argc)
     char **args_copy = copy_string_array(args + 1, argc - 1);
     CommandArgs a = cmdargs_new(args_copy);
     ArgParseError err = do_parse_args(cmd, &a);
+    bool dash = (prefix[0] == '-');
     if (
         (err != ARGERR_NONE && err != ARGERR_TOO_FEW_ARGUMENTS)
-        || (a.nr_args >= cmd->max_args && cmd->max_args != 0xFF)
+        || (a.nr_args >= cmd->max_args && cmd->max_args != 0xFF && !dash)
     ) {
         goto out;
     }
 
-    bool dash = (prefix[0] == '-');
     if (dash && collect_command_flags(arr, args + 1, argc - 1, cmd, &a, prefix)) {
         goto out;
     }

@@ -381,6 +381,45 @@ static void test_complete_command(TestContext *ctx)
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "replace -cg");
     reset_completion(c);
+
+    cmdline_set_text(c, "left -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "left -c ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "option -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "option -r ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "quit 1 -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "quit 1 -f");
+    reset_completion(c);
+
+    cmdline_set_text(c, "quit 1 2 -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "quit 1 2 -");
+    reset_completion(c);
+
+    const Command *wflip = find_normal_command("wflip");
+    EXPECT_EQ(wflip->flags[0], '\0');
+    EXPECT_EQ(wflip->max_args, 0);
+
+    cmdline_set_text(c, "wflip ");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "wflip ");
+    reset_completion(c);
+
+    cmdline_set_text(c, "wflip -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "wflip -");
+    reset_completion(c);
+
+    cmdline_set_text(c, "wflip -- -");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "wflip -- -");
+    reset_completion(c);
 }
 
 // This should only be run after init_headless_mode() because the completions
