@@ -193,30 +193,6 @@ void collect_compilers(EditorState *e, PointerArray *a, const char *prefix)
     collect_hashmap_keys(&e->compilers, a, prefix);
 }
 
-void collect_builtin_configs(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
-{
-    size_t nconfigs;
-    const BuiltinConfig *configs = get_builtin_configs_array(&nconfigs);
-    for (size_t i = 0; i < nconfigs; i++) {
-        const char *name = configs[i].name;
-        if (str_has_prefix(name, prefix)) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
-}
-
-void collect_builtin_includes(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
-{
-    size_t nconfigs;
-    const BuiltinConfig *configs = get_builtin_configs_array(&nconfigs);
-    for (size_t i = 0; i < nconfigs; i++) {
-        const char *name = configs[i].name;
-        if (str_has_prefix(name, prefix) && !str_has_prefix(name, "syntax/")) {
-            ptr_array_append(a, xstrdup(name));
-        }
-    }
-}
-
 void collect_env(EditorState* UNUSED_ARG(e), PointerArray *a, const char *prefix)
 {
     if (strchr(prefix, '=')) {
@@ -370,7 +346,7 @@ static void complete_include(EditorState *e, const CommandArgs *a)
     CompletionState *cs = &e->cmdline.completion;
     if (a->nr_args == 0) {
         if (cmdargs_has_flag(a, 'b')) {
-            collect_builtin_includes(e, &cs->completions, cs->parsed);
+            collect_builtin_includes(&cs->completions, cs->parsed);
         } else {
             collect_files(e, cs, COLLECT_ALL);
         }

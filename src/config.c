@@ -159,6 +159,26 @@ void exec_builtin_rc(EditorState *e)
     current_config = saved;
 }
 
+void collect_builtin_configs(PointerArray *a, const char *prefix)
+{
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        if (str_has_prefix(name, prefix)) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
+}
+
+void collect_builtin_includes(PointerArray *a, const char *prefix)
+{
+    for (size_t i = 0; i < ARRAYLEN(builtin_configs); i++) {
+        const char *name = builtin_configs[i].name;
+        if (str_has_prefix(name, prefix) && !str_has_prefix(name, "syntax/")) {
+            ptr_array_append(a, xstrdup(name));
+        }
+    }
+}
+
 UNITTEST {
     BUG_ON(!get_builtin_config("rc"));
     BUG_ON(!get_builtin_config("color/reset"));
