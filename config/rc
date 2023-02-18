@@ -11,7 +11,6 @@ alias reverse-lines 'filter tac'
 alias sort-lines 'filter sh -c "LC_COLLATE=C sort"'
 alias split-words 'replace -g "[ \t]+" "\n"'
 alias trim-lines 'replace "[ \t]+$" ""'
-alias xsel 'pipe-to xsel -b'
 alias color hi
 alias exit quit
 
