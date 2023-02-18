@@ -239,6 +239,11 @@ static void test_complete_command(TestContext *ctx)
     EXPECT_STRING_EQ(c->buf, "show option auto-indent");
     reset_completion(c);
 
+    cmdline_set_text(c, "show builtin syntax/gitcom");
+    complete_command_next(e);
+    EXPECT_STRING_EQ(c->buf, "show builtin syntax/gitcommit ");
+    reset_completion(c);
+
     cmdline_set_text(c, "set ws-error tr");
     complete_command_next(e);
     EXPECT_STRING_EQ(c->buf, "set ws-error trailing ");
