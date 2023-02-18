@@ -28,8 +28,8 @@ check-aux: check-desktop-file check-appstream
 
 check-coccinelle:
 	$(Q) $(foreach sp, $(SPATCHFILES), \
-	  $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources) $(SPATCHFILTER); \
 	  $(LOG) SPATCH $(sp); \
+	  $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources) $(SPATCHFILTER); \
 	)
 
 check-shell-scripts:
