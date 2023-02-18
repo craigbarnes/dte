@@ -21,6 +21,8 @@ Features
 * Jump to [compiler error]
 * [Copy] to system clipboard (using [OSC 52], which works over SSH)
 * [EditorConfig] support
+* Minimal dependencies (just libc on most systems)
+* Portable (to any [POSIX] 2008 operating system)
 * Fast startup (~10ms)
 
 Screenshot
@@ -141,6 +143,7 @@ Public License version 2 for more details.
 [Copy]: https://craigbarnes.gitlab.io/dte/dterc.html#copy
 [OSC 52]: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 [EditorConfig]: https://editorconfig.org/
+[POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/
 [GCC]: https://gcc.gnu.org/
 [Clang]: https://clang.llvm.org/
 [GNU Make]: https://www.gnu.org/software/make/
