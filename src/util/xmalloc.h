@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "arith.h"
 #include "macros.h"
 
 #define XMEMDUP(ptr) xmemdup(ptr, sizeof(*ptr))
@@ -36,14 +37,6 @@ NONNULL_ARGS_AND_RETURN ALLOC_SIZE(2)
 static inline void *xmemdup(const void *ptr, size_t size)
 {
     return memcpy(xmalloc(size), ptr, size);
-}
-
-// Round x up to a multiple of r (which *must* be a power of 2)
-static inline size_t round_size_to_next_multiple(size_t x, size_t r)
-DIAGNOSE_IF(!IS_POWER_OF_2(r))
-{
-    r--;
-    return (x + r) & ~r;
 }
 
 XSTRDUP

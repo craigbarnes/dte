@@ -1,5 +1,6 @@
 #include <sys/stat.h>
 #include "numtostr.h"
+#include "arith.h"
 #include "debug.h"
 
 const char hextab_lower[16] = "0123456789abcdef";
@@ -17,6 +18,12 @@ static size_t umax_count_base10_digits(uintmax_t x)
 
 static size_t umax_count_base16_digits(uintmax_t x)
 {
+#if HAS_BUILTIN(__builtin_clzll)
+    if (sizeof(x) == sizeof(long long)) {
+        size_t base2_digits = BITSIZE(x) - __builtin_clzll(x + !x);
+        return round_size_to_next_multiple(base2_digits, 4) / 4;
+    }
+#endif
     size_t digits = 0;
     do {
         x >>= 4;

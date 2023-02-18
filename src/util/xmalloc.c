@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "xmalloc.h"
-#include "arith.h"
 #include "debug.h"
 
 static void *check_alloc(void *alloc)

@@ -975,6 +975,30 @@ static void test_buf_umax_to_hex_str(TestContext *ctx)
     ndigits = buf_umax_to_hex_str(0x1000, buf, 3);
     EXPECT_EQ(ndigits, 4);
     EXPECT_STREQ(buf, "1000");
+
+    ndigits = buf_umax_to_hex_str(0, buf, 0);
+    EXPECT_EQ(ndigits, 1);
+    EXPECT_STREQ(buf, "0");
+
+    ndigits = buf_umax_to_hex_str(1, buf, 0);
+    EXPECT_EQ(ndigits, 1);
+    EXPECT_STREQ(buf, "1");
+
+    ndigits = buf_umax_to_hex_str(0x10000000ULL, buf, 0);
+    EXPECT_EQ(ndigits, 8);
+    EXPECT_STREQ(buf, "10000000");
+
+    ndigits = buf_umax_to_hex_str(0x11111111ULL, buf, 0);
+    EXPECT_EQ(ndigits, 8);
+    EXPECT_STREQ(buf, "11111111");
+
+    ndigits = buf_umax_to_hex_str(0x123456789ABCDEF0ULL, buf, 0);
+    EXPECT_EQ(ndigits, 16);
+    EXPECT_STREQ(buf, "123456789ABCDEF0");
+
+    ndigits = buf_umax_to_hex_str(0xFFFFFFFFFFFFFFFFULL, buf, 0);
+    EXPECT_EQ(ndigits, 16);
+    EXPECT_STREQ(buf, "FFFFFFFFFFFFFFFF");
 }
 
 static void test_umax_to_str(TestContext *ctx)

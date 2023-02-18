@@ -45,6 +45,14 @@ static inline bool size_add_overflows(size_t a, size_t b, size_t *result)
     CHECKED_ADD(a, b, result);
 }
 
+// Round x up to a multiple of r (which *must* be a power of 2)
+static inline size_t round_size_to_next_multiple(size_t x, size_t r)
+DIAGNOSE_IF(!IS_POWER_OF_2(r))
+{
+    r--;
+    return (x + r) & ~r;
+}
+
 // This is equivalent to `(x + 1) % modulus`, given the constraints
 // imposed by BUG_ON(), but avoids expensive divisions by a non-constant
 // and/or non-power-of-2
