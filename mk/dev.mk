@@ -10,6 +10,7 @@ SHELLCHECK ?= shellcheck
 CODESPELL ?= codespell
 SPATCH ?= spatch
 SPATCHFLAGS ?= --very-quiet
+SPATCHFILTER = 2>&1 | sed '/egrep is obsolescent/d'
 FINDLINKS = sed -n 's|^.*\(https\?://[A-Za-z0-9_/.-]*\).*|\1|gp'
 CHECKURL = curl -sSI -w '%{http_code}  @1  %{redirect_url}\n' -o /dev/null @1
 GITATTRS = $(shell git ls-files --error-unmatch $(foreach A, $(1), ':(attr:$A)'))
@@ -26,8 +27,10 @@ clang-tidy: $(clang_tidy_targets)
 check-aux: check-desktop-file check-appstream
 
 check-coccinelle:
-	$(E) SPATCH '.'
-	$(Q) $(foreach sp, $(SPATCHFILES), $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources);)
+	$(Q) $(foreach sp, $(SPATCHFILES), \
+	  $(SPATCH) $(SPATCHFLAGS) --sp-file $(sp) $(all_sources) $(SPATCHFILTER); \
+	  $(LOG) SPATCH $(sp); \
+	)
 
 check-shell-scripts:
 	$(E) SHCHECK '*.sh *.bash $(filter-out %.sh %.bash, $(call GITATTRS, shell))'
