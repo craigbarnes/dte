@@ -141,32 +141,35 @@ bool parse_key_string(KeyCode *key, const char *str)
 // length of the written string.
 size_t keycode_to_string(KeyCode k, char *buf)
 {
-    size_t i = 0;
-    if (k & MOD_CTRL) {
-        buf[i++] = 'C';
-        buf[i++] = '-';
-    }
-    if (k & MOD_META) {
-        buf[i++] = 'M';
-        buf[i++] = '-';
-    }
-    if (k & MOD_SHIFT) {
-        buf[i++] = 'S';
-        buf[i++] = '-';
+    static const struct {
+        char prefix;
+        KeyCode code;
+    } mods[] = {
+        {'C', MOD_CTRL},
+        {'M', MOD_META},
+        {'S', MOD_SHIFT},
+    };
+
+    size_t pos = 0;
+    for (size_t i = 0; i < ARRAYLEN(mods); i++) {
+        if (k & mods[i].code) {
+            buf[pos++] = mods[i].prefix;
+            buf[pos++] = '-';
+        }
     }
 
     const char *name;
     const KeyCode key = keycode_get_key(k);
     if (u_is_unicode(key)) {
-        for (size_t j = 0; j < ARRAYLEN(other_keys); j++) {
-            if (key == other_keys[j].key) {
-                name = other_keys[j].name;
+        for (size_t i = 0; i < ARRAYLEN(other_keys); i++) {
+            if (key == other_keys[i].key) {
+                name = other_keys[i].name;
                 goto copy;
             }
         }
-        u_set_char(buf, &i, key);
-        buf[i] = '\0';
-        return i;
+        u_set_char(buf, &pos, key);
+        buf[pos] = '\0';
+        return pos;
     }
 
     if (key >= KEY_SPECIAL_MIN && key <= KEY_SPECIAL_MAX) {
@@ -181,7 +184,7 @@ size_t keycode_to_string(KeyCode k, char *buf)
 
 copy:
     BUG_ON(name[0] == '\0');
-    char *end = memccpy(buf + i, name, '\0', KEYCODE_STR_MAX - i);
+    char *end = memccpy(buf + pos, name, '\0', KEYCODE_STR_MAX - pos);
     BUG_ON(!end);
     BUG_ON(end <= buf);
     return (size_t)(end - buf) - 1;
