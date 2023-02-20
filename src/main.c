@@ -465,12 +465,13 @@ loop_break:;
         window_add_buffer(window, std_buffer);
     }
 
-    View *empty_buffer = NULL;
+    View *dview = NULL;
     if (window->views.count == 0) {
-        empty_buffer = window_open_empty_buffer(window);
-        BUG_ON(!empty_buffer);
+        // Open a default buffer, if none were opened for arguments
+        dview = window_open_empty_buffer(window);
+        BUG_ON(!dview);
         BUG_ON(window->views.count != 1);
-        BUG_ON(empty_buffer != window->views.ptrs[0]);
+        BUG_ON(dview != window->views.ptrs[0]);
     }
 
     set_view(window->views.ptrs[0]);
@@ -480,22 +481,14 @@ loop_break:;
         handle_normal_command(e, commands[i], false);
     }
 
-    if (tag) {
-        tag_lookup(&e->tagfile, tag, NULL, &e->messages);
+    if (tag && tag_lookup(&e->tagfile, tag, NULL, &e->messages)) {
         activate_current_message(e);
-    }
-
-    if (
-        // If window_open_empty_buffer() was called above
-        empty_buffer
-        // ...and no commands were executed via the "-c" flag
-        && nr_commands == 0
-        // ...and a file was opened via the "-t" flag
-        && tag && window->views.count > 1
-    ) {
-        // Close the empty buffer, leaving just the buffer opened via "-t"
-        remove_view(empty_buffer);
-        empty_buffer = NULL;
+        if (dview && nr_commands == 0 && window->views.count > 1) {
+            // Close default/empty buffer, if `-t` jumped to a tag
+            // and no commands were executed via `-c`
+            remove_view(dview);
+            dview = NULL;
+        }
     }
 
     if (nr_commands > 0 || tag) {
