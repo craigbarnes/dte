@@ -32,7 +32,8 @@ The following points should be observed when adding new feature tests:
 
 [`feature_test_macros(7)`]: https://man7.org/linux/man-pages/man7/feature_test_macros.7.html
 [`errno`]: https://man7.org/linux/man-pages/man3/errno.3.html
-[`defs.h`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/feature-test/defs.h
-[`mk/build.mk`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/build.mk
-[`src/`]: https://gitlab.com/craigbarnes/dte/-/tree/master/src
-[`src/util/fd.c`]: https://gitlab.com/craigbarnes/dte/-/blob/master/src/util/fd.c
+
+[`defs.h`]: defs.h
+[`mk/build.mk`]: ../build.mk
+[`src/`]: ../../src
+[`src/util/fd.c`]: ../../src/util/fd.c

@@ -16,5 +16,5 @@ after installation or by browsing the [online documentation].
 
 
 [Pandoc]: https://pandoc.org/
-[`pre-commit`]: https://gitlab.com/craigbarnes/dte/-/blob/master/tools/git-hooks/pre-commit
+[`pre-commit`]: ../tools/git-hooks/pre-commit
 [online documentation]: https://craigbarnes.gitlab.io/dte/

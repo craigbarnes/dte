@@ -85,6 +85,6 @@ page, unless you're prepared to deal with future checksum failures.
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
 [staged installs]: https://www.gnu.org/prep/standards/html_node/DESTDIR.html
 [iconv]: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/iconv.h.html
-[syntax highlighters]: https://gitlab.com/craigbarnes/dte/tree/master/config/syntax
+[syntax highlighters]: ../config/syntax
 [releases]: https://craigbarnes.gitlab.io/dte/releases.html
 [libgit issue #4343]: https://github.com/libgit2/libgit2/issues/4343
