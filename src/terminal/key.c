@@ -65,6 +65,7 @@ static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
     KeyCode modifiers = 0;
     size_t i = 0;
 
+    // https://www.gnu.org/software/emacs/manual/html_node/efaq/Binding-combinations-of-modifiers-and-function-keys.html
     while (1) {
         KeyCode tmp;
         switch (str[i]) {
@@ -76,6 +77,12 @@ static size_t parse_modifiers(const char *str, KeyCode *modifiersp)
             break;
         case 'S':
             tmp = MOD_SHIFT;
+            break;
+        case 's':
+            tmp = MOD_SUPER;
+            break;
+        case 'H':
+            tmp = MOD_HYPER;
             break;
         default:
             goto end;
@@ -148,6 +155,8 @@ size_t keycode_to_string(KeyCode k, char *buf)
         {'C', MOD_CTRL},
         {'M', MOD_META},
         {'S', MOD_SHIFT},
+        {'s', MOD_SUPER},
+        {'H', MOD_HYPER},
     };
 
     size_t pos = 0;

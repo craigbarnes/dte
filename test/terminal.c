@@ -524,6 +524,14 @@ static void test_xterm_parse_key(TestContext *ctx)
         {"\033[97;5:2u", 9, MOD_CTRL | 'a'},
         {"\033[97;5:3u", 9, KEY_IGNORE},
         // TODO: {"\033[97;5:u", 8, MOD_CTRL | 'a'},
+        {"\033[104;5u", 8, MOD_CTRL | 'h'},
+        {"\033[104;9u", 8, MOD_SUPER | 'h'},
+        {"\033[104;17u", 9, MOD_HYPER | 'h'},
+        {"\033[104;10u", 9, MOD_SUPER | MOD_SHIFT | 'h'},
+        {"\033[116;69u", 9, MOD_CTRL | 't'}, // Ignored Capslock in modifiers
+        {"\033[116;133u", 10, MOD_CTRL | 't'}, // Ignored Numlock in modifiers
+        {"\033[116;256u", 10, MOD_MASK | 't'}, // Ignored Capslock and Numlock
+        {"\033[116;257u", 10, KEY_IGNORE}, // Unknown bit in modifiers
         // Excess params
         {"\033[1;2;3;4;5;6;7;8;9m", 20, KEY_IGNORE},
         // XTWINOPS replies
@@ -818,6 +826,7 @@ static void test_keycode_to_string(TestContext *ctx)
         {"up", KEY_UP},
         {"down", KEY_DOWN},
         {"C-a", MOD_CTRL | 'a'},
+        {"C-s", MOD_CTRL | 's'},
         {"M-a", MOD_META | 'a'},
         {"M-S-{", MOD_META | MOD_SHIFT | '{'},
         {"C-S-a", MOD_CTRL | MOD_SHIFT | 'a'},
@@ -837,6 +846,8 @@ static void test_keycode_to_string(TestContext *ctx)
         {"C-M-S-up", MOD_CTRL | MOD_META | MOD_SHIFT | KEY_UP},
         {"C-M-delete", MOD_CTRL | MOD_META | KEY_DELETE},
         {"C-home", MOD_CTRL | KEY_HOME},
+        {"s-space", MOD_SUPER | ' '},
+        {"H-end", MOD_HYPER | KEY_END},
 #if __STDC_VERSION__ >= 201112L
         {u8"ก", 0x0E01},
         {u8"C-ก", MOD_CTRL | 0x0E01},
@@ -868,8 +879,8 @@ static void test_keycode_to_string(TestContext *ctx)
         {"C-A", MOD_CTRL | 'A'},
         {"C-S-A", MOD_CTRL | MOD_SHIFT | 'A'},
         {"M-S-A", MOD_META | MOD_SHIFT | 'A'},
-        {"INVALID; 0x08000000", KEY_DETECTED_PASTE},
-        {"INVALID; 0x08000001", KEY_BRACKETED_PASTE},
+        {"INVALID; 0x20000000", KEY_DETECTED_PASTE},
+        {"INVALID; 0x20000001", KEY_BRACKETED_PASTE},
         {"INVALID; 0xFFFFFFFF", UINT32_MAX},
     };
 
@@ -898,6 +909,16 @@ static void test_parse_key_string(TestContext *ctx)
     EXPECT_EQ(key, MOD_CTRL | KEY_F1);
     EXPECT_TRUE(parse_key_string(&key, "C-M-S-F20"));
     EXPECT_EQ(key, MOD_CTRL | MOD_META | MOD_SHIFT | KEY_F20);
+    EXPECT_TRUE(parse_key_string(&key, "s-m"));
+    EXPECT_EQ(key, MOD_SUPER | 'm');
+    EXPECT_TRUE(parse_key_string(&key, "H-y"));
+    EXPECT_EQ(key, MOD_HYPER | 'y');
+    EXPECT_TRUE(parse_key_string(&key, "H-y"));
+    EXPECT_EQ(key, MOD_HYPER | 'y');
+    EXPECT_TRUE(parse_key_string(&key, "H-S-z"));
+    EXPECT_EQ(key, MOD_HYPER | MOD_SHIFT | 'z');
+    EXPECT_TRUE(parse_key_string(&key, "s-S-t"));
+    EXPECT_EQ(key, MOD_SUPER | MOD_SHIFT | 't');
 
     EXPECT_FALSE(parse_key_string(&key, "C-"));
     EXPECT_FALSE(parse_key_string(&key, "C-M-"));
