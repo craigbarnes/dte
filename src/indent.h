@@ -10,21 +10,14 @@
 #include "util/string-view.h"
 
 typedef struct {
-    // Size in bytes
-    size_t bytes;
+    size_t bytes; // Size in bytes
+    size_t width; // Width in columns
+    size_t level; // Number of whole `indent-width` levels
+    bool wsonly; // Empty or whitespace-only line
 
-    // Width in chars
-    size_t width;
-
-    // Number of whole indentation levels (depends on the indent-width option)
-    size_t level;
-
-    // Only spaces or tabs depending on expand-tab, indent-width and tab-width.
-    // Note that "sane" line can contain spaces after tabs for alignment.
+    // Only spaces or tabs, depending on `use_spaces_for_indent()`.
+    // Note that a "sane" line can contain spaces after tabs for alignment.
     bool sane;
-
-    // The line is empty or contains only white space
-    bool wsonly;
 } IndentInfo;
 
 static inline size_t next_indent_width(size_t x, size_t mul)
