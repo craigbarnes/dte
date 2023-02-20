@@ -38,6 +38,7 @@ See Also
 * [`mk/feature-test/README.md`]
 * [`tools/README.md`]
 * [`docs/README.md`]
+* [`docs/packaging.md`]
 * [`docs/releasing.md`]
 
 
@@ -52,4 +53,5 @@ See Also
 [`mk/feature-test/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/mk/feature-test/README.md
 [`tools/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/tools/README.md
 [`docs/README.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/README.md
+[`docs/packaging.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/packaging.md
 [`docs/releasing.md`]: https://gitlab.com/craigbarnes/dte/-/blob/master/docs/releasing.md
