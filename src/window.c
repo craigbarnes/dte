@@ -301,23 +301,18 @@ View *window_open_new_file(Window *window)
     return view;
 }
 
+static bool buffer_is_empty_and_untouched(const Buffer *b)
+{
+    return !b->abs_filename && b->change_head.nr_prev == 0 && !b->display_filename;
+}
+
 // If window contains only one untouched buffer it'll be closed after
 // opening another file. This is done because closing the last buffer
 // causes an empty buffer to be opened (windows must contain at least
 // one buffer).
-static bool is_useless_empty_view(const View *view)
+static bool is_useless_empty_view(const View *v)
 {
-    if (view == NULL || view->window->views.count != 1) {
-        return false;
-    }
-    const Buffer *buffer = view->buffer;
-    if (buffer->abs_filename || buffer->change_head.nr_prev != 0) {
-        return false;
-    }
-    if (buffer->display_filename) {
-        return false;
-    }
-    return true;
+    return v && v->window->views.count == 1 && buffer_is_empty_and_untouched(v->buffer);
 }
 
 View *window_open_file(Window *window, const char *filename, const Encoding *encoding)
