@@ -223,29 +223,8 @@ static bool cmd_erase_word(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static const History *get_history(EditorState *e)
+static bool do_history_prev(const History *hist, CommandLine *c)
 {
-    switch (e->input_mode) {
-    case INPUT_COMMAND:
-        return &e->command_history;
-    case INPUT_SEARCH:
-        return &e->search_history;
-    case INPUT_NORMAL:
-        return NULL;
-    }
-    BUG("unhandled input mode");
-    return NULL;
-}
-
-static bool cmd_history_prev(EditorState *e, const CommandArgs *a)
-{
-    BUG_ON(a->nr_args);
-    const History *hist = get_history(e);
-    if (unlikely(!hist)) {
-        return true;
-    }
-
-    CommandLine *c = &e->cmdline;
     if (!c->search_pos) {
         free(c->search_text);
         c->search_text = string_clone_cstring(&c->buf);
@@ -260,15 +239,8 @@ static bool cmd_history_prev(EditorState *e, const CommandArgs *a)
     return true;
 }
 
-static bool cmd_history_next(EditorState *e, const CommandArgs *a)
+static bool do_history_next(const History *hist, CommandLine *c)
 {
-    BUG_ON(a->nr_args);
-    const History *hist = get_history(e);
-    if (unlikely(!hist)) {
-        return true;
-    }
-
-    CommandLine *c = &e->cmdline;
     if (!c->search_pos) {
         goto out;
     }
@@ -284,6 +256,30 @@ static bool cmd_history_next(EditorState *e, const CommandArgs *a)
 out:
     reset_completion(c);
     return true;
+}
+
+static bool cmd_search_history_next(EditorState *e, const CommandArgs *a)
+{
+    BUG_ON(a->nr_args);
+    return do_history_next(&e->search_history, &e->cmdline);
+}
+
+static bool cmd_search_history_prev(EditorState *e, const CommandArgs *a)
+{
+    BUG_ON(a->nr_args);
+    return do_history_prev(&e->search_history, &e->cmdline);
+}
+
+static bool cmd_command_history_next(EditorState *e, const CommandArgs *a)
+{
+    BUG_ON(a->nr_args);
+    return do_history_next(&e->command_history, &e->cmdline);
+}
+
+static bool cmd_command_history_prev(EditorState *e, const CommandArgs *a)
+{
+    BUG_ON(a->nr_args);
+    return do_history_prev(&e->command_history, &e->cmdline);
 }
 
 static bool cmd_left(EditorState *e, const CommandArgs *a)
@@ -498,8 +494,6 @@ static const Command common_cmds[] = {
     {"erase", "", false, 0, 0, cmd_erase},
     {"erase-bol", "", false, 0, 0, cmd_erase_bol},
     {"erase-word", "", false, 0, 0, cmd_erase_word},
-    {"history-next", "", false, 0, 0, cmd_history_next},
-    {"history-prev", "", false, 0, 0, cmd_history_prev},
     {"left", "", false, 0, 0, cmd_left},
     {"paste", "m", false, 0, 0, cmd_paste},
     {"right", "", false, 0, 0, cmd_right},
@@ -511,12 +505,16 @@ static const Command common_cmds[] = {
 static const Command search_cmds[] = {
     {"accept", "eH", false, 0, 0, cmd_search_mode_accept},
     {"direction", "", false, 0, 0, cmd_direction},
+    {"history-next", "", false, 0, 0, cmd_search_history_next},
+    {"history-prev", "", false, 0, 0, cmd_search_history_prev},
 };
 
 static const Command command_cmds[] = {
     {"accept", "H", false, 0, 0, cmd_command_mode_accept},
     {"complete-next", "", false, 0, 0, cmd_complete_next},
     {"complete-prev", "", false, 0, 0, cmd_complete_prev},
+    {"history-next", "", false, 0, 0, cmd_command_history_next},
+    {"history-prev", "", false, 0, 0, cmd_command_history_prev},
 };
 
 UNIGNORE_WARNINGS
