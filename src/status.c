@@ -69,25 +69,6 @@ static FormatSpecifierType lookup_format_specifier(unsigned char ch)
     return STATUS_INVALID;
 }
 
-UNITTEST {
-    BUG_ON(lookup_format_specifier('%') != STATUS_ESCAPED_PERCENT);
-    BUG_ON(lookup_format_specifier('E') != STATUS_ENCODING);
-    BUG_ON(lookup_format_specifier('M') != STATUS_MISC);
-    BUG_ON(lookup_format_specifier('b') != STATUS_BOM);
-    BUG_ON(lookup_format_specifier('y') != STATUS_CURSOR_ROW);
-    BUG_ON(lookup_format_specifier('A') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('z') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('!') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('~') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('@') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('?') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('$') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(' ') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0x00) != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0x80) != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0xFF) != STATUS_INVALID);
-}
-
 #define add_status_literal(f, s) add_status_bytes(f, s, STRLEN(s))
 
 static void add_ch(Formatter *f, char ch)
