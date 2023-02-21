@@ -1,6 +1,27 @@
 Releases
 ========
 
+v1.11.1 (not yet released)
+--------------------------
+
+**Changes:**
+
+* Fixed a bug that was causing key bindings to not work properly when
+  the Num Lock and/or Caps Lock modifiers were in effect in terminals
+  supporting the [kitty keyboard protocol].
+* Fixed an issue in the build system causing `make distcheck` to fail.
+* Added a [`show setenv`][`show`] sub-command.
+* Added an `-m` flag to the [`undo`] command, to allow moving to the last
+  change without undoing it.
+* Added support for Super (`s-`) and Hyper (`H-`) modifiers in key bindings.
+* Added a syntax highlighter for [Coccinelle] "semantic patch" (`*.cocci`)
+  files.
+* Added rules for handling CDATA sections to the XML syntax highlighter.
+* Added auto-completion for command flags.
+* Changed the [`default`] command in [`dte-syntax`] files to show an error
+  if there are duplicate arguments.
+* [Removed][commit 0fe5e5f224e832a] the built-in `xsel` alias.
+
 v1.11 (latest release)
 ----------------------
 
@@ -568,9 +589,11 @@ system except a somewhat recent kernel.
 [GNU Make]: https://www.gnu.org/software/make/
 [GCC]: https://gcc.gnu.org/
 [AppStream]: https://www.freedesktop.org/software/appstream/docs/
+[Coccinelle]: https://coccinelle.gitlabpages.inria.fr/website/
 [`REG_ENHANCED`]: https://www.unix.com/man-page/osx/7/re_format/
 [commit d0c22068c340e79]: https://gitlab.com/craigbarnes/dte/-/commit/d0c22068c340e795f4e98e6d2bcea6a228f57403
 [commit c4af2b1a15c96e8]: https://gitlab.com/craigbarnes/dte/-/commit/c4af2b1a15c96e820452c183e81e9bd415492778
+[commit 0fe5e5f224e832a]: https://gitlab.com/craigbarnes/dte/-/commit/0fe5e5f224e832a382ce1fb7e6b4e0d6f0da8f55
 [exec aliases]: https://gitlab.com/craigbarnes/dte/-/blob/14dd15b72383db784156b20d4ab7ac392552fe59/config/rc#L60-66
 [dex]: https://github.com/tihirvon/dex
 [dex v1.0]: https://github.com/tihirvon/dex/releases/tag/v1.0
@@ -584,6 +607,7 @@ system except a somewhat recent kernel.
 [`dte-syntax`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html
 [`str`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#str
 [`char`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#char
+[`default`]: https://craigbarnes.gitlab.io/dte/dte-syntax.html#default
 
 [`dterc`]: https://craigbarnes.gitlab.io/dte/dterc.html
 [`alias`]: https://craigbarnes.gitlab.io/dte/dterc.html#alias
@@ -620,6 +644,7 @@ system except a somewhat recent kernel.
 [`search`]: https://craigbarnes.gitlab.io/dte/dterc.html#search
 [`show`]: https://craigbarnes.gitlab.io/dte/dterc.html#show
 [`tag`]: https://craigbarnes.gitlab.io/dte/dterc.html#tag
+[`undo`]: https://craigbarnes.gitlab.io/dte/dterc.html#undo
 [`wclose`]: https://craigbarnes.gitlab.io/dte/dterc.html#wclose
 [`wsplit`]: https://craigbarnes.gitlab.io/dte/dterc.html#wsplit
 
