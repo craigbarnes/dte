@@ -1,5 +1,5 @@
+#include "parse.h"
 #include "rxvt.h"
-#include "xterm.h"
 
 /*
  rxvt uses some key codes that differ from the ones used by xterm.

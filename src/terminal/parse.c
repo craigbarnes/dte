@@ -5,7 +5,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "xterm.h"
+#include "parse.h"
 #include "util/ascii.h"
 #include "util/debug.h"
 #include "util/log.h"

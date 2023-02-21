@@ -3,13 +3,13 @@
 #include "terminal.h"
 #include "linux.h"
 #include "output.h"
+#include "parse.h"
 #include "rxvt.h"
 #include "util/array.h"
 #include "util/bsearch.h"
 #include "util/debug.h"
 #include "util/log.h"
 #include "util/str-util.h"
-#include "xterm.h"
 
 typedef struct {
     const char name[12];
