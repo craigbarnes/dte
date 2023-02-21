@@ -10,6 +10,16 @@
 #include "util/utf8.h"
 #include "util/xsnprintf.h"
 
+typedef struct {
+    char *buf;
+    size_t size;
+    size_t pos;
+    size_t separator;
+    const Window *window;
+    const GlobalOptions *opts;
+    InputMode input_mode;
+} Formatter;
+
 typedef enum {
     STATUS_INVALID = 0,
     STATUS_ESCAPED_PERCENT,
@@ -33,39 +43,50 @@ typedef enum {
     STATUS_CURSOR_ROW,
 } FormatSpecifierType;
 
-#define ENTRY(x) [(x - 32)]
+static FormatSpecifierType lookup_format_specifier(unsigned char ch)
+{
+    switch (ch) {
+    case '%': return STATUS_ESCAPED_PERCENT;
+    case 'E': return STATUS_ENCODING;
+    case 'M': return STATUS_MISC;
+    case 'N': return STATUS_IS_CRLF;
+    case 'S': return STATUS_SEPARATOR_LONG;
+    case 'X': return STATUS_CURSOR_COL_BYTES;
+    case 'Y': return STATUS_TOTAL_ROWS;
+    case 'b': return STATUS_BOM;
+    case 'f': return STATUS_FILENAME;
+    case 'm': return STATUS_MODIFIED;
+    case 'n': return STATUS_LINE_ENDING;
+    case 'o': return STATUS_OVERWRITE;
+    case 'p': return STATUS_SCROLL_POSITION;
+    case 'r': return STATUS_READONLY;
+    case 's': return STATUS_SEPARATOR;
+    case 't': return STATUS_FILETYPE;
+    case 'u': return STATUS_UNICODE;
+    case 'x': return STATUS_CURSOR_COL;
+    case 'y': return STATUS_CURSOR_ROW;
+    }
+    return STATUS_INVALID;
+}
 
-static const uint8_t format_specifiers[] = {
-    ENTRY('%') = STATUS_ESCAPED_PERCENT,
-    ENTRY('E') = STATUS_ENCODING,
-    ENTRY('M') = STATUS_MISC,
-    ENTRY('N') = STATUS_IS_CRLF,
-    ENTRY('S') = STATUS_SEPARATOR_LONG,
-    ENTRY('X') = STATUS_CURSOR_COL_BYTES,
-    ENTRY('Y') = STATUS_TOTAL_ROWS,
-    ENTRY('b') = STATUS_BOM,
-    ENTRY('f') = STATUS_FILENAME,
-    ENTRY('m') = STATUS_MODIFIED,
-    ENTRY('n') = STATUS_LINE_ENDING,
-    ENTRY('o') = STATUS_OVERWRITE,
-    ENTRY('p') = STATUS_SCROLL_POSITION,
-    ENTRY('r') = STATUS_READONLY,
-    ENTRY('s') = STATUS_SEPARATOR,
-    ENTRY('t') = STATUS_FILETYPE,
-    ENTRY('u') = STATUS_UNICODE,
-    ENTRY('x') = STATUS_CURSOR_COL,
-    ENTRY('y') = STATUS_CURSOR_ROW,
-};
-
-typedef struct {
-    char *buf;
-    size_t size;
-    size_t pos;
-    size_t separator;
-    const Window *window;
-    const GlobalOptions *opts;
-    InputMode input_mode;
-} Formatter;
+UNITTEST {
+    BUG_ON(lookup_format_specifier('%') != STATUS_ESCAPED_PERCENT);
+    BUG_ON(lookup_format_specifier('E') != STATUS_ENCODING);
+    BUG_ON(lookup_format_specifier('M') != STATUS_MISC);
+    BUG_ON(lookup_format_specifier('b') != STATUS_BOM);
+    BUG_ON(lookup_format_specifier('y') != STATUS_CURSOR_ROW);
+    BUG_ON(lookup_format_specifier('A') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('z') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('!') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('~') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('@') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('?') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier('$') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier(' ') != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier(0x00) != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier(0x80) != STATUS_INVALID);
+    BUG_ON(lookup_format_specifier(0xFF) != STATUS_INVALID);
+}
 
 #define add_status_literal(f, s) add_status_bytes(f, s, STRLEN(s))
 
@@ -184,34 +205,6 @@ static void add_misc_status(Formatter *f)
     const char *unit = is_lines ? "line" : "char";
     const char *plural = unlikely(n == 1) ? "" : "s";
     add_status_format(f, "[%zu %s%s]", n, unit, plural);
-}
-
-static FormatSpecifierType lookup_format_specifier(unsigned char ch)
-{
-    ch -= 32;
-    if (unlikely(ch >= ARRAYLEN(format_specifiers))) {
-        return STATUS_INVALID;
-    }
-    return format_specifiers[ch];
-}
-
-UNITTEST {
-    BUG_ON(lookup_format_specifier('%') != STATUS_ESCAPED_PERCENT);
-    BUG_ON(lookup_format_specifier('E') != STATUS_ENCODING);
-    BUG_ON(lookup_format_specifier('M') != STATUS_MISC);
-    BUG_ON(lookup_format_specifier('b') != STATUS_BOM);
-    BUG_ON(lookup_format_specifier('y') != STATUS_CURSOR_ROW);
-    BUG_ON(lookup_format_specifier('A') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('z') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('!') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('~') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('@') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('?') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier('$') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(' ') != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0x00) != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0x80) != STATUS_INVALID);
-    BUG_ON(lookup_format_specifier(0xFF) != STATUS_INVALID);
 }
 
 void sf_format (
