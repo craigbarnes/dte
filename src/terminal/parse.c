@@ -21,7 +21,7 @@ typedef enum {
     BYTE_FINAL,         // 0x40..0x6F
     BYTE_FINAL_PRIVATE, // 0x70..0x7E
     BYTE_DELETE,        // 0x7F
-    BYTE_OTHER,
+    BYTE_OTHER,         // 0x80..0xFF
 } ByteType;
 
 #define ENTRY(x) [(x - 64)]
