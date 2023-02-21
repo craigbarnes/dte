@@ -101,11 +101,51 @@ static void test_get_indent_for_next_line(TestContext *ctx)
     free(indent);
 }
 
+static void test_buffer_insert_bytes(TestContext *ctx)
+{
+    size_t len = 600; // (> BLOCK_EDIT_SIZE)
+    char *text = xmalloc(len);
+    memset(text, 'a', len);
+    text[len - 1] = '\n';
+    for (size_t i = 72; i < len; i += 72) {
+        text[i] = '\n';
+    }
+
+    EditorState *e = ctx->userdata;
+    View *view = window_open_empty_buffer(e->window);
+    const Buffer *buffer = view->buffer;
+    uintmax_t counts[3];
+    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    EXPECT_EQ(counts[0], 1);
+    EXPECT_EQ(counts[1], 0);
+    EXPECT_EQ(counts[2], 0);
+
+    buffer_insert_bytes(view, text, len);
+    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    EXPECT_EQ(counts[0], 2);
+    EXPECT_EQ(counts[1], 9);
+    EXPECT_EQ(counts[2], len);
+
+    block_iter_goto_offset(&view->cursor, len / 2);
+    EXPECT_EQ(view->cursor.offset, 300);
+    buffer_insert_bytes(view, text, len);
+    EXPECT_EQ(view->cursor.offset, 300);
+    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    EXPECT_EQ(counts[0], 4);
+    EXPECT_EQ(counts[1], 18);
+    EXPECT_EQ(counts[2], len * 2);
+
+    free(text);
+    window_close_current_view(e->window);
+}
+
+
 static const TestEntry tests[] = {
     TEST(test_find_buffer_by_id),
     TEST(test_buffer_mark_lines_changed),
     TEST(test_make_indent),
     TEST(test_get_indent_for_next_line),
+    TEST(test_buffer_insert_bytes),
 };
 
 const TestGroup buffer_tests = TEST_GROUP(tests);

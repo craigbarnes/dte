@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -418,7 +417,7 @@ static size_t xstrftime (
     return r;
 }
 
-String dump_buffer(const Buffer *buffer)
+void buffer_count_blocks_lines_and_bytes(const Buffer *buffer, uintmax_t counts[3])
 {
     uintmax_t blocks = 0;
     uintmax_t bytes = 0;
@@ -429,9 +428,17 @@ String dump_buffer(const Buffer *buffer)
         bytes += blk->size;
         nl += blk->nl;
     }
+    counts[0] = blocks;
+    counts[1] = nl;
+    counts[2] = bytes;
+}
 
-    BUG_ON(blocks < 1);
-    BUG_ON(nl != buffer->nl);
+String dump_buffer(const Buffer *buffer)
+{
+    uintmax_t counts[3];
+    buffer_count_blocks_lines_and_bytes(buffer, counts);
+    BUG_ON(counts[0] < 1);
+    BUG_ON(counts[1] != buffer->nl);
     BUG_ON(!buffer->setup);
     String buf = string_new(1024);
 
@@ -442,9 +449,9 @@ String dump_buffer(const Buffer *buffer)
         "       ID:", buffer->id,
         " Encoding:", buffer->encoding.name,
         " Filetype:", buffer->options.filetype,
-        "   Blocks:", blocks,
-        "    Lines:", nl,
-        "    Bytes:", bytes
+        "   Blocks:", counts[0],
+        "    Lines:", counts[1],
+        "    Bytes:", counts[2]
     );
 
     if (
