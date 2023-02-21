@@ -431,7 +431,7 @@ String dump_buffer(const Buffer *buffer)
 
     string_sprintf (
         &buf,
-        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %ju\n%s %ju\n",
+        "%s %s\n%s %lu\n%s %s\n%s %s\n%s %ju\n%s %zu\n%s %ju\n",
         "     Name:", buffer_filename(buffer),
         "       ID:", buffer->id,
         " Encoding:", buffer->encoding.name,
