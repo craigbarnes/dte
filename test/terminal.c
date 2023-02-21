@@ -357,7 +357,7 @@ static void test_same_cursor(TestContext *ctx)
     EXPECT_TRUE(same_cursor(&a, &b));
 }
 
-static void test_xterm_parse_key(TestContext *ctx)
+static void test_term_parse_sequence(TestContext *ctx)
 {
     static const struct {
         const char *escape_sequence;
@@ -545,7 +545,7 @@ static void test_xterm_parse_key(TestContext *ctx)
         const size_t seq_length = strlen(seq);
         BUG_ON(seq_length == 0);
         KeyCode key = 0x18;
-        ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+        ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
         ssize_t expected_length = tests[i].expected_length;
         IEXPECT_EQ(parsed_length, expected_length);
         if (parsed_length <= 0) {
@@ -557,14 +557,14 @@ static void test_xterm_parse_key(TestContext *ctx)
         // Ensure that parsing any truncated sequence returns -1:
         key = 0x18;
         for (size_t n = expected_length - 1; n != 0; n--) {
-            parsed_length = xterm_parse_key(seq, n, &key);
+            parsed_length = term_parse_sequence(seq, n, &key);
             IEXPECT_EQ(parsed_length, -1);
             IEXPECT_EQ(key, 0x18);
         }
     }
 }
 
-static void test_xterm_parse_key_combo(TestContext *ctx)
+static void test_term_parse_sequence2(TestContext *ctx)
 {
     static const struct {
         char key_str[3];
@@ -646,7 +646,7 @@ static void test_xterm_parse_key_combo(TestContext *ctx)
                 templates[i].final_byte
             );
             KeyCode key = 24;
-            ssize_t parsed_length = xterm_parse_key(seq, seq_length, &key);
+            ssize_t parsed_length = term_parse_sequence(seq, seq_length, &key);
             if (modifiers[j].mask == 0) {
                 EXPECT_EQ(parsed_length, seq_length);
                 EXPECT_EQ(key, KEY_IGNORE);
@@ -658,14 +658,14 @@ static void test_xterm_parse_key_combo(TestContext *ctx)
             // Truncated
             key = 25;
             for (size_t n = seq_length - 1; n != 0; n--) {
-                parsed_length = xterm_parse_key(seq, n, &key);
+                parsed_length = term_parse_sequence(seq, n, &key);
                 EXPECT_EQ(parsed_length, -1);
                 EXPECT_EQ(key, 25);
             }
             // Overlength
             key = 26;
             seq[seq_length++] = '~';
-            parsed_length = xterm_parse_key(seq, seq_length, &key);
+            parsed_length = term_parse_sequence(seq, seq_length, &key);
             IEXPECT_EQ(parsed_length, seq_length - 1);
             EXPECT_KEYCODE_EQ(i, key, expected_key, seq, seq_length);
         }
@@ -972,7 +972,7 @@ static void test_term_init(TestContext *ctx)
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
-    EXPECT_PTREQ(term.parse_input, xterm_parse_key);
+    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
     EXPECT_TRUE(term.features & (TFLAG_SET_WINDOW_TITLE | TFLAG_META_ESC));
 
     term_init(&term, "ansi-m", NULL);
@@ -980,7 +980,7 @@ static void test_term_init(TestContext *ctx)
     EXPECT_EQ(term.width, 80);
     EXPECT_EQ(term.height, 24);
     EXPECT_EQ(term.ncv_attributes, 0);
-    EXPECT_PTREQ(term.parse_input, xterm_parse_key);
+    EXPECT_PTREQ(term.parse_input, term_parse_sequence);
     EXPECT_EQ(term.features, 0);
 }
 
@@ -1270,8 +1270,8 @@ static const TestEntry tests[] = {
     TEST(test_cursor_color_from_str),
     TEST(test_cursor_color_to_str),
     TEST(test_same_cursor),
-    TEST(test_xterm_parse_key),
-    TEST(test_xterm_parse_key_combo),
+    TEST(test_term_parse_sequence),
+    TEST(test_term_parse_sequence2),
     TEST(test_rxvt_parse_key),
     TEST(test_linux_parse_key),
     TEST(test_keycode_to_string),

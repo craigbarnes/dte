@@ -1,7 +1,9 @@
-// Escape sequence parser for xterm function keys.
-// Copyright 2018-2022 Craig Barnes.
+// Parser for escape sequences sent by terminals to clients.
+// Copyright 2018-2023 Craig Barnes.
 // SPDX-License-Identifier: GPL-2.0-only
-// See also: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+// See also:
+// - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+// - https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -620,7 +622,7 @@ ignore:
     return i;
 }
 
-ssize_t xterm_parse_key(const char *buf, size_t length, KeyCode *k)
+ssize_t term_parse_sequence(const char *buf, size_t length, KeyCode *k)
 {
     if (unlikely(length == 0 || buf[0] != '\033')) {
         return 0;

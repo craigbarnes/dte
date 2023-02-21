@@ -5,7 +5,7 @@
 ssize_t linux_parse_key(const char *buf, size_t length, KeyCode *k)
 {
     if (length < 3 || !mem_equal(buf, "\033[[", 3)) {
-        return xterm_parse_key(buf, length, k);
+        return term_parse_sequence(buf, length, k);
     }
 
     if (unlikely(length == 3)) {

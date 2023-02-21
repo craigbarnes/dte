@@ -135,7 +135,7 @@ void term_init(Terminal *term, const char *name, const char *colorterm)
     term->height = 24;
     term->features = 0;
     term->ncv_attributes = 0;
-    term->parse_input = xterm_parse_key;
+    term->parse_input = term_parse_sequence;
 
     // Strip phony "xterm-" prefix used by certain terminals
     const char *real_name = name;
